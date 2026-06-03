@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tauri::command;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum OperationType {
@@ -200,24 +199,18 @@ impl Default for OperationsQueue {
     }
 }
 
-#[command]
-pub fn get_queue_status(queue: tauri::State<'_, OperationsQueue>) -> QueueStatus {
+pub fn get_queue_status(queue: &OperationsQueue) -> QueueStatus {
     queue.get_status()
 }
 
-#[command]
-pub fn cancel_operation(
-    id: String,
-    queue: tauri::State<'_, OperationsQueue>,
-) -> Result<(), String> {
+pub fn cancel_operation(id: String, queue: &OperationsQueue) -> Result<(), String> {
     queue.update_operation(&id, |op| {
         op.status = OperationStatus::Cancelled;
     });
     Ok(())
 }
 
-#[command]
-pub fn pause_operation(id: String, queue: tauri::State<'_, OperationsQueue>) -> Result<(), String> {
+pub fn pause_operation(id: String, queue: &OperationsQueue) -> Result<(), String> {
     queue.update_operation(&id, |op| {
         if op.status == OperationStatus::InProgress {
             op.status = OperationStatus::Paused;
@@ -226,11 +219,7 @@ pub fn pause_operation(id: String, queue: tauri::State<'_, OperationsQueue>) -> 
     Ok(())
 }
 
-#[command]
-pub fn resume_operation(
-    id: String,
-    queue: tauri::State<'_, OperationsQueue>,
-) -> Result<(), String> {
+pub fn resume_operation(id: String, queue: &OperationsQueue) -> Result<(), String> {
     queue.update_operation(&id, |op| {
         if op.status == OperationStatus::Paused {
             op.status = OperationStatus::InProgress;

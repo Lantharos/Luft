@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
-use tauri::{command, State};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TrashLocation {
@@ -34,7 +33,6 @@ pub struct TrashContents {
     pub locations: Vec<TrashLocation>,
 }
 
-#[command]
 pub fn list_trash() -> Result<TrashContents, String> {
     let locations = trash_locations()?;
     let mut items = Vec::new();
@@ -229,34 +227,18 @@ fn urlencoding_decode(s: &str) -> String {
     result
 }
 
-#[command]
-pub async fn move_to_trash(
-    paths: Vec<String>,
-    queue: State<'_, OperationsQueue>,
-) -> Result<(), String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || {
-        let id = queue.add_operation(OperationType::Trash, paths.clone(), None, 0, paths.len());
-        let result = move_to_trash_impl(paths, &queue, &id);
-        finish_operation(&queue, &id, result)
-    })
-    .await
-    .map_err(|error| error.to_string())?
+pub fn move_to_trash(paths: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    let queue = queue.clone();
+    let id = queue.add_operation(OperationType::Trash, paths.clone(), None, 0, paths.len());
+    let result = move_to_trash_impl(paths, &queue, &id);
+    finish_operation(&queue, &id, result)
 }
 
-#[command]
-pub async fn restore_from_trash(
-    ids: Vec<String>,
-    queue: State<'_, OperationsQueue>,
-) -> Result<(), String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || {
-        let id = queue.add_operation(OperationType::Move, ids.clone(), None, 0, ids.len());
-        let result = restore_from_trash_impl(ids, &queue, &id);
-        finish_operation(&queue, &id, result)
-    })
-    .await
-    .map_err(|error| error.to_string())?
+pub fn restore_from_trash(ids: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    let queue = queue.clone();
+    let id = queue.add_operation(OperationType::Move, ids.clone(), None, 0, ids.len());
+    let result = restore_from_trash_impl(ids, &queue, &id);
+    finish_operation(&queue, &id, result)
 }
 
 fn restore_from_trash_impl(
@@ -316,19 +298,11 @@ fn restore_from_trash_impl(
     Ok(())
 }
 
-#[command]
-pub async fn delete_permanently(
-    ids: Vec<String>,
-    queue: State<'_, OperationsQueue>,
-) -> Result<(), String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || {
-        let id = queue.add_operation(OperationType::Delete, ids.clone(), None, 0, ids.len());
-        let result = delete_permanently_impl(ids, &queue, &id);
-        finish_operation(&queue, &id, result)
-    })
-    .await
-    .map_err(|error| error.to_string())?
+pub fn delete_permanently(ids: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    let queue = queue.clone();
+    let id = queue.add_operation(OperationType::Delete, ids.clone(), None, 0, ids.len());
+    let result = delete_permanently_impl(ids, &queue, &id);
+    finish_operation(&queue, &id, result)
 }
 
 fn delete_permanently_impl(
@@ -433,8 +407,7 @@ fn finish_operation<T>(
     }
 }
 
-#[command]
-pub async fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
+pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
     let locations = trash_locations()?;
     let targets = if let Some(path) = trash_path {
         let allowed = locations.iter().any(|location| location.path == path);

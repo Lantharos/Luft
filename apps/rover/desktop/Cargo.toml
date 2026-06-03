@@ -1,0 +1,31 @@
+[package]
+name = "rover"
+version = "0.1.0"
+description = "A modern file manager for Linux"
+authors = ["Kristof"]
+license = "MIT"
+repository = ""
+edition = "2021"
+rust-version = "1.87"
+
+[lib]
+name = "rover_lib"
+
+[dependencies]
+fenestra-cef = { path = "../../fenestra/crates/fenestra-cef" }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+walkdir = "2.5"
+trash = "5"
+notify = "8"
+dirs = "6"
+mime_guess = "2"
+chrono = { version = "0.4", features = ["serde"] }
+parking_lot = "0.12"
+thiserror = "2"
+
+open = "5"
+libc = "0.2"
+zbus = { version = "5.16.0", default-features = false, features = ["tokio"] }
+url = "2.5.8"

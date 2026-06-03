@@ -1,18 +1,10 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-#[cfg(target_os = "linux")]
-fn apply_webkit_nvidia_quirk() {
-    webkit2gtk_nvidia_quirk::apply_workaround_with_options(
-        webkit2gtk_nvidia_quirk::ApplyWorkaroundOptions::default(),
-    );
-}
-
-#[cfg(not(target_os = "linux"))]
-fn apply_webkit_nvidia_quirk() {}
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
+    if fenestra_cef::run_fenestra_host_from_args(&args) {
+        return;
+    }
     if args.iter().any(|arg| arg == "--portal-backend") {
         if let Err(error) = rover_lib::run_portal_backend() {
             eprintln!("rover portal backend failed: {}", error);
@@ -31,7 +23,8 @@ fn main() {
         println!("Rover file chooser portal installed for this user.");
         return;
     }
-
-    apply_webkit_nvidia_quirk();
-    rover_lib::run();
+    if let Err(error) = rover_lib::run(&args) {
+        eprintln!("failed to run Rover: {}", error);
+        std::process::exit(1);
+    }
 }

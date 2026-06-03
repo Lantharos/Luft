@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use tauri::command;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DriveInfo {
@@ -158,7 +157,6 @@ pub(crate) fn visible_mount_points() -> Result<Vec<String>, String> {
     Ok(mount_points)
 }
 
-#[command]
 pub fn list_drives() -> Result<DriveList, String> {
     let mut drives_by_device: HashMap<String, DriveInfo> = HashMap::new();
 
@@ -230,7 +228,6 @@ pub fn list_drives() -> Result<DriveList, String> {
     Ok(DriveList { drives })
 }
 
-#[command]
 pub fn get_drive_info(mount_point: String) -> Result<DriveInfo, String> {
     let drives = list_drives()?;
 

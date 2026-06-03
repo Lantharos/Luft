@@ -1,5 +1,4 @@
 use serde::Serialize;
-use tauri::command;
 
 #[derive(Debug, Serialize)]
 pub struct BackgroundEffectStatus {
@@ -7,7 +6,6 @@ pub struct BackgroundEffectStatus {
     pub background_effect_reason: String,
 }
 
-#[command]
 pub fn get_background_effect_status() -> BackgroundEffectStatus {
     platform_background_effect_status()
 }

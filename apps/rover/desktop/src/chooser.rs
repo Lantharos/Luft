@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{env, fs, path::PathBuf};
-use tauri::{AppHandle, Manager, State};
+use std::{env, fs, path::PathBuf, time::Duration};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -45,7 +44,7 @@ impl ChooserState {
         Self { session }
     }
 
-    fn config(&self) -> ChooserConfig {
+    pub fn config(&self) -> ChooserConfig {
         self.session
             .as_ref()
             .map(|session| session.config.clone())
@@ -102,48 +101,32 @@ pub fn inactive_config() -> ChooserConfig {
     }
 }
 
-#[tauri::command]
-pub fn get_chooser_config(state: State<'_, ChooserState>) -> ChooserConfig {
+pub fn get_chooser_config(state: &ChooserState) -> ChooserConfig {
     state.config()
 }
 
-#[tauri::command]
-pub fn accept_chooser(
-    paths: Vec<String>,
-    state: State<'_, ChooserState>,
-    app: AppHandle,
-) -> Result<(), String> {
+pub fn accept_chooser(paths: Vec<String>, state: &ChooserState) -> Result<(), String> {
     write_response(
-        &state,
+        state,
         ChooserResponse {
             accepted: true,
             paths,
         },
     )?;
-    app.exit(0);
+    schedule_exit();
     Ok(())
 }
 
-#[tauri::command]
-pub fn cancel_chooser(state: State<'_, ChooserState>, app: AppHandle) -> Result<(), String> {
+pub fn cancel_chooser(state: &ChooserState) -> Result<(), String> {
     write_response(
-        &state,
+        state,
         ChooserResponse {
             accepted: false,
             paths: Vec::new(),
         },
     )?;
-    app.exit(0);
+    schedule_exit();
     Ok(())
-}
-
-pub fn configure_window(app: &tauri::App, state: &ChooserState) {
-    let Some(session) = &state.session else {
-        return;
-    };
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.set_title(&session.config.title);
-    }
 }
 
 fn write_response(state: &ChooserState, response: ChooserResponse) -> Result<(), String> {
@@ -156,6 +139,13 @@ fn write_response(state: &ChooserState, response: ChooserResponse) -> Result<(),
     }
     let payload = serde_json::to_vec(&response).map_err(|error| error.to_string())?;
     fs::write(&session.response_path, payload).map_err(|error| error.to_string())
+}
+
+fn schedule_exit() {
+    std::thread::spawn(|| {
+        std::thread::sleep(Duration::from_millis(80));
+        std::process::exit(0);
+    });
 }
 
 fn env_bool(name: &str) -> bool {

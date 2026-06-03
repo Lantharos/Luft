@@ -1,8 +1,6 @@
 import { get } from 'svelte/store';
-import { convertFileSrc } from '@tauri-apps/api/core';
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import * as api from '$lib/api';
-import { isTauriRuntime } from '$lib/runtime';
+import { closeWindow, fileSource, isDesktopRuntime, minimizeWindow, startWindowDrag, toggleMaximizeWindow } from '$lib/runtime';
 import {
 	activeTab,
 	clearClipboard,
@@ -25,7 +23,6 @@ import { thumbnailCandidates } from '$lib/file-manager/thumbnails';
 import { normalizePath, viewModeForPath } from '$lib/file-manager/view-modes';
 import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, TrashItem, ViewMode } from '$lib/types';
 import { getParentPath, getPathSegments } from '$lib/utils';
-type TauriWindow = Awaited<ReturnType<typeof getCurrentWindow>>;
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 export class FileManager {
 	entries = $state<FileEntry[]>([]);
@@ -42,7 +39,6 @@ export class FileManager {
 	dragTarget = $state<FileEntry | null>(null);
 	dropTarget = $state<string | null>(null);
 	isDragging = $state(false);
-	appWindow: TauriWindow | null = $state(null);
 	backgroundEffect = $state<BackgroundEffect>('opaque');
 	thumbnails = $state<Record<string, string | null>>({});
 	lastMouseNavButton = 0;
@@ -55,8 +51,7 @@ export class FileManager {
 	}
 	init = async () => {
 		this.isLoading = true;
-		if (!isTauriRuntime()) return this.initPreview();
-		this.appWindow = getCurrentWindow();
+		if (!isDesktopRuntime()) return this.initPreview();
 		const settingsTask = settings.load();
 		const dirsTask = loadUserDirs();
 		void loadDrives();
@@ -92,13 +87,13 @@ export class FileManager {
 		this.contextMenu = null;
 	};
 	minimize = async () => {
-		await this.appWindow?.minimize();
+		minimizeWindow();
 	};
 	toggleMaximize = async () => {
-		await this.appWindow?.toggleMaximize();
+		toggleMaximizeWindow();
 	};
 	closeWindow = async () => {
-		await this.appWindow?.close();
+		closeWindow();
 	};
 	loadBackgroundEffectStatus = async () => {
 		try {
@@ -109,16 +104,17 @@ export class FileManager {
 		}
 	};
 	startDrag = async (event: MouseEvent) => {
-		if (event.button !== 0 || !this.appWindow) return;
+		if (event.button !== 0) return;
 		const target = event.target instanceof Element ? event.target : null;
 		if (!target) return;
 		if (target.closest('button, input, a, [data-no-drag]')) return;
 		event.preventDefault();
-		await this.appWindow.startDragging();
+		event.stopPropagation();
+		startWindowDrag();
 	};
 	handleDragRegionMouseDown = (event: MouseEvent) => {
 		const target = event.target instanceof Element ? event.target : null;
-		if (!target?.closest('.drag-region, [data-window-drag], [data-tauri-drag-region]')) return;
+		if (!target?.closest('.drag-region, [data-window-drag]')) return;
 		this.startDrag(event);
 	};
 	rememberPath = async (path: string) => {
@@ -128,7 +124,7 @@ export class FileManager {
 		}));
 	};
 	loadDirectory = async (path: string) => {
-		if (!isTauriRuntime()) {
+		if (!isDesktopRuntime()) {
 			this.loadPreviewDirectory(path);
 			return;
 		}
@@ -160,7 +156,7 @@ export class FileManager {
 			pending.map(async (entry) => {
 				try {
 					const thumbnailPath = await api.getThumbnail(entry.path);
-					return [entry.path, thumbnailPath ? convertFileSrc(thumbnailPath) : null] as const;
+					return [entry.path, thumbnailPath ? fileSource(thumbnailPath) : null] as const;
 				} catch {
 					return [entry.path, null] as const;
 				}
@@ -169,7 +165,7 @@ export class FileManager {
 		this.thumbnails = { ...this.thumbnails, ...Object.fromEntries(loadedEntries) };
 	};
 	loadTrash = async () => {
-		if (!isTauriRuntime()) {
+		if (!isDesktopRuntime()) {
 			this.trashItems = previewTrash;
 			selection.clear();
 			return;

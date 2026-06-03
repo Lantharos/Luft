@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import * as api from '$lib/api';
 	import Icon from '$lib/components/Icon.svelte';
-	import { isTauriRuntime } from '$lib/runtime';
+	import { isDesktopRuntime } from '$lib/runtime';
 	import type { Operation, QueueStatus } from '$lib/types';
 	import { formatBytes } from '$lib/utils';
 
@@ -18,7 +18,7 @@
 	);
 
 	onMount(() => {
-		if (!isTauriRuntime()) return;
+		if (!isDesktopRuntime()) return;
 		void refreshQueue();
 		const interval = window.setInterval(() => {
 			now = Math.floor(Date.now() / 1000);

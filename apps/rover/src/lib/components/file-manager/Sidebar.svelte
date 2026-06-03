@@ -149,7 +149,6 @@
 <aside
 	class="rover-sidebar drag-region flex w-[260px] shrink-0 flex-col px-2.5 pb-4 pt-3"
 	data-effect={backgroundEffect}
-	data-tauri-drag-region
 	data-window-drag
 >
 	<div class="px-0.5 pb-3 pt-1">

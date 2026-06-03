@@ -1,6 +1,6 @@
 # Rover
 
-A modern, fast, and user-friendly file manager for Linux built with Tauri + SvelteKit.
+A modern, fast, and user-friendly file manager for Linux built with Fenestra + SvelteKit.
 
 ## Features
 
@@ -18,26 +18,12 @@ A modern, fast, and user-friendly file manager for Linux built with Tauri + Svel
 - **Hidden Files Toggle**: Show or hide dotfiles without leaving the current folder
 - **Keyboard Shortcuts**: Full keyboard navigation support
 - **Search**: Quick file search within current directory
-- **Custom Window**: Frameless window with custom title bar
-- **NVIDIA WebKitGTK Workaround**: Applies the required X11/Wayland startup fixes automatically on proprietary NVIDIA drivers
+- **Custom Window**: Fenestra OSR window with native controls, rounded input regions, and a translucent sidebar on supported compositors
 - **File Chooser Portal**: Rover can register as the xdg-desktop-portal file picker for apps that use the Linux portal picker
 
 ## Prerequisites
 
-### Fedora
-```bash
-sudo dnf install gtk3-devel webkit2gtk4.1-devel libsoup3-devel
-```
-
-### Ubuntu/Debian
-```bash
-sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-```
-
-### Arch Linux
-```bash
-sudo pacman -S webkit2gtk-4.1 gtk3 libsoup3
-```
+Rover uses the shared Fenestra CEF runtime. Development builds resolve an installed runtime first and can install the shared user runtime when needed.
 
 ## Development
 
@@ -46,26 +32,22 @@ sudo pacman -S webkit2gtk-4.1 gtk3 libsoup3
 bun install
 
 # Run in development mode
-bun run tauri:dev
+bun run desktop:dev
 
 # Build for production
-bun run tauri:build
+bun run desktop:build
 ```
 
-The production build script sets `NO_STRIP=1` for AppImage packaging. This avoids linuxdeploy strip failures on newer Linux distributions while still producing `.deb`, `.rpm`, and `.AppImage` bundles.
-
-Rover applies the WebKitGTK/NVIDIA startup workaround before the webview is created, so packaged builds work on both X11 and Wayland NVIDIA sessions without wrapper scripts.
-
-Sidebar translucency uses the compositor-provided `ext-background-effect-v1` path when available. Rover falls back to an opaque sidebar on sessions where that native blur path is unavailable or unreliable.
+Sidebar translucency is configured through Fenestra window regions. Rover keeps the main content opaque and uses compositor-backed blur only for the sidebar surface where available.
 
 ## File Picker Portal
 
-Rover includes an xdg-desktop-portal FileChooser backend. The `.deb` and `.rpm` packages install the portal descriptor and D-Bus activation file.
+Rover includes an xdg-desktop-portal FileChooser backend. The local installer writes the portal descriptor and D-Bus activation file for the current user.
 
 To prefer Rover for portal file pickers in your user session:
 
 ```bash
-rover --install-file-chooser-portal
+desktop/target/debug/rover --install-file-chooser-portal
 systemctl --user restart xdg-desktop-portal.service
 ```
 
@@ -93,7 +75,7 @@ The same command also works from an AppImage or local build, using the executabl
 rover/
 ├── src/                    # Frontend (SvelteKit)
 │   ├── lib/
-│   │   ├── api.ts          # Tauri command wrappers
+│   │   ├── api.ts          # Fenestra bridge wrappers
 │   │   ├── components/     # Svelte components
 │   │   │   └── file-manager/ # File manager UI shell
 │   │   ├── file-manager/   # File manager state and list helpers
@@ -102,9 +84,9 @@ rover/
 │   │   └── utils/          # Utility functions
 │   └── routes/
 │       └── +page.svelte    # Main application UI
-├── src-tauri/              # Backend (Rust)
+├── desktop/                # Fenestra backend (Rust)
 │   └── src/
-│       ├── lib.rs          # Tauri setup
+│       ├── lib.rs          # Fenestra window and bridge setup
 │       ├── fs_ops.rs       # File system operations
 │       ├── drives.rs       # Drive/mount detection
 │       ├── trash_manager.rs # Trash operations

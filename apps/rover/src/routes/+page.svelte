@@ -12,7 +12,7 @@
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
-	import { isTauriRuntime } from '$lib/runtime';
+	import { isDesktopRuntime } from '$lib/runtime';
 	import { activeTab, clipboard, currentView, drives, selection, settings, tabs, userDirs } from '$lib/stores';
 	import type { ChooserConfig, FavoriteItem, FileEntry, PinnedFolder, SidebarView, TrashLocation } from '$lib/types';
 
@@ -68,7 +68,7 @@
 	});
 
 	async function initialize() {
-		if (isTauriRuntime()) {
+		if (isDesktopRuntime()) {
 			try {
 				const config = await api.getChooserConfig();
 				if (config.active) {

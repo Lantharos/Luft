@@ -11,7 +11,7 @@ import type {
 import { generateId } from '../utils';
 import * as api from '../api';
 import { previewDrives, previewUserDirs } from '$lib/file-manager/preview';
-import { isTauriRuntime } from '$lib/runtime';
+import { isDesktopRuntime } from '$lib/runtime';
 
 // Settings store
 function createSettingsStore() {
@@ -38,7 +38,7 @@ function createSettingsStore() {
 		set,
 		update,
 		async load() {
-			if (!isTauriRuntime()) return;
+			if (!isDesktopRuntime()) return;
 			try {
 				const settings = await api.getSettings();
 				set(settings);
@@ -48,7 +48,7 @@ function createSettingsStore() {
 		},
 		async save(settings: Settings) {
 			set(settings);
-			if (!isTauriRuntime()) return;
+			if (!isDesktopRuntime()) return;
 			try {
 				await api.updateSettings(settings);
 			} catch (e) {
@@ -58,7 +58,7 @@ function createSettingsStore() {
 		async updateAndSave(updater: (settings: Settings) => Settings) {
 			const next = updater(get({ subscribe }));
 			set(next);
-			if (!isTauriRuntime()) return;
+			if (!isDesktopRuntime()) return;
 			try {
 				await api.updateSettings(next);
 			} catch (e) {
@@ -74,7 +74,7 @@ export const settings = createSettingsStore();
 export const userDirs = writable<UserDirs | null>(null);
 
 export async function loadUserDirs() {
-	if (!isTauriRuntime()) {
+	if (!isDesktopRuntime()) {
 		userDirs.set(previewUserDirs);
 		return previewUserDirs;
 	}
@@ -310,7 +310,7 @@ export const currentView = writable<SidebarView>('home');
 export const drives = writable<DriveInfo[]>([]);
 
 export async function loadDrives() {
-	if (!isTauriRuntime()) {
+	if (!isDesktopRuntime()) {
 		drives.set(previewDrives);
 		return previewDrives;
 	}

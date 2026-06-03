@@ -58,7 +58,6 @@
 	role="toolbar"
 	aria-label="Window and tab controls"
 	tabindex="-1"
-	data-tauri-drag-region
 	data-window-drag
 >
 	<div class="flex min-w-0 flex-1 items-center gap-1">

@@ -1,8 +1,20 @@
 import type { DriveInfo, Settings, SidebarView, UserDirs, ViewMode } from '$lib/types';
 
 export function normalizePath(path: string) {
-	if (!path || path === '/') return '/';
-	return path.replace(/\/+$/, '');
+	const decoded = decodeAbsolutePath(path);
+	if (!decoded || decoded === '/') return '/';
+	return decoded.replace(/\/+$/, '');
+}
+
+function decodeAbsolutePath(path: string) {
+	const trimmed = path.trim();
+	if (!/%[0-9a-f]{2}/i.test(trimmed)) return trimmed;
+	try {
+		const decoded = decodeURIComponent(trimmed);
+		return decoded.startsWith('/') ? decoded : trimmed;
+	} catch {
+		return trimmed;
+	}
 }
 
 export function isDrivePath(path: string, drives: DriveInfo[]) {

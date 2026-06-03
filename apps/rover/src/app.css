@@ -40,6 +40,7 @@
 	--shadow-soft: rgba(0, 0, 0, 0.32);
 	--shadow-faint: rgba(0, 0, 0, 0.22);
 	--radius-pill: 999px;
+	--window-radius: 16px;
 }
 
 * {
@@ -97,6 +98,9 @@ input:focus-visible {
 
 .rover-shell {
 	background: var(--app-bg);
+	border-radius: var(--window-radius);
+	clip-path: inset(0 round var(--window-radius));
+	overflow: hidden;
 	-webkit-user-select: none;
 	user-select: none;
 }
@@ -467,7 +471,7 @@ input:focus-visible {
 }
 
 .drag-region,
-[data-tauri-drag-region] {
+[data-window-drag] {
 	-webkit-app-region: drag;
 	cursor: default;
 }
@@ -476,7 +480,7 @@ input:focus-visible {
 .drag-region input,
 .drag-region a,
 .drag-region [data-no-drag],
-.drag-region [data-tauri-drag-region='false'],
+.drag-region [data-window-drag='false'],
 .no-drag {
 	-webkit-app-region: no-drag;
 }

@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
-use tauri::command;
 
 const COPY_BUFFER_SIZE: usize = 1024 * 1024;
 
@@ -61,39 +60,24 @@ impl<'a> OperationTracker<'a> {
     }
 }
 
-#[command]
-pub async fn copy_items(
+pub fn copy_items(
     sources: Vec<String>,
     destination: String,
-    queue: tauri::State<'_, OperationsQueue>,
+    queue: &OperationsQueue,
 ) -> Result<Vec<String>, String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || run_copy_items(sources, destination, queue))
-        .await
-        .map_err(|error| error.to_string())?
+    run_copy_items(sources, destination, queue.clone())
 }
 
-#[command]
-pub async fn move_items(
+pub fn move_items(
     sources: Vec<String>,
     destination: String,
-    queue: tauri::State<'_, OperationsQueue>,
+    queue: &OperationsQueue,
 ) -> Result<Vec<String>, String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || run_move_items(sources, destination, queue))
-        .await
-        .map_err(|error| error.to_string())?
+    run_move_items(sources, destination, queue.clone())
 }
 
-#[command]
-pub async fn delete_items(
-    paths: Vec<String>,
-    queue: tauri::State<'_, OperationsQueue>,
-) -> Result<(), String> {
-    let queue = queue.inner().clone();
-    tauri::async_runtime::spawn_blocking(move || run_delete_items(paths, queue))
-        .await
-        .map_err(|error| error.to_string())?
+pub fn delete_items(paths: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    run_delete_items(paths, queue.clone())
 }
 
 fn run_copy_items(

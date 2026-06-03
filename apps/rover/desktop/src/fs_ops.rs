@@ -7,7 +7,6 @@ use std::io::Read;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
-use tauri::command;
 
 const MAX_THUMBNAIL_BYTES: u64 = 8 * 1024 * 1024;
 
@@ -155,7 +154,6 @@ fn file_entry_from_path(path: &Path) -> std::io::Result<FileEntry> {
     })
 }
 
-#[command]
 pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryContents, String> {
     let path_buf = PathBuf::from(&path);
 
@@ -209,13 +207,11 @@ pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryConten
     })
 }
 
-#[command]
 pub fn get_file_info(path: String) -> Result<FileEntry, String> {
     let path_buf = PathBuf::from(&path);
     file_entry_from_path(&path_buf).map_err(|e| e.to_string())
 }
 
-#[command]
 pub fn create_file(path: String, name: String) -> Result<FileEntry, String> {
     let file_path = PathBuf::from(&path).join(&name);
 
@@ -233,7 +229,6 @@ pub fn create_file(path: String, name: String) -> Result<FileEntry, String> {
     file_entry_from_path(&file_path).map_err(|e| e.to_string())
 }
 
-#[command]
 pub fn create_directory(path: String, name: String) -> Result<FileEntry, String> {
     let dir_path = PathBuf::from(&path).join(&name);
 
@@ -251,7 +246,6 @@ pub fn create_directory(path: String, name: String) -> Result<FileEntry, String>
     file_entry_from_path(&dir_path).map_err(|e| e.to_string())
 }
 
-#[command]
 pub fn rename_item(path: String, new_name: String) -> Result<FileEntry, String> {
     let old_path = PathBuf::from(&path);
     let parent = old_path.parent().ok_or("Cannot get parent directory")?;
@@ -278,14 +272,12 @@ pub fn rename_item(path: String, new_name: String) -> Result<FileEntry, String> 
     file_entry_from_path(&new_path).map_err(|e| e.to_string())
 }
 
-#[command]
 pub fn get_home_dir() -> Result<String, String> {
     dirs::home_dir()
         .map(|p| p.to_string_lossy().to_string())
         .ok_or_else(|| "Could not determine home directory".to_string())
 }
 
-#[command]
 pub fn get_user_dirs() -> Result<UserDirs, String> {
     let home = dirs::home_dir()
         .map(|p| p.to_string_lossy().to_string())
@@ -302,7 +294,6 @@ pub fn get_user_dirs() -> Result<UserDirs, String> {
     })
 }
 
-#[command]
 pub fn read_text_file(path: String, max_bytes: Option<usize>) -> Result<String, String> {
     let path_buf = PathBuf::from(&path);
     let max = max_bytes.unwrap_or(1024 * 1024); // Default 1MB limit
@@ -317,12 +308,10 @@ pub fn read_text_file(path: String, max_bytes: Option<usize>) -> Result<String, 
     String::from_utf8(content).map_err(|_| "File is not valid UTF-8 text".to_string())
 }
 
-#[command]
 pub fn open_with_default(path: String) -> Result<(), String> {
     open::that(&path).map_err(|e| e.to_string())
 }
 
-#[command]
 pub fn get_thumbnail(path: String) -> Result<Option<String>, String> {
     let path_buf = PathBuf::from(&path);
     if !path_buf.is_file() {

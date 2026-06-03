@@ -1,9 +1,11 @@
-use parking_lot::RwLock;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use tauri::command;
+
+use parking_lot::RwLock;
+use serde::{Deserialize, Serialize};
+
+use crate::path_codec;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PinnedFolder {
@@ -24,7 +26,6 @@ pub struct FavoriteItem {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings {
-    // View settings
     pub view_mode: String, // "list" | "grid" | "columns"
     #[serde(default)]
     pub folder_view_modes: HashMap<String, String>,
@@ -33,16 +34,13 @@ pub struct Settings {
     pub show_hidden: bool,
     pub preview_panel: bool,
 
-    // Behavior
     pub confirm_delete: bool,
     pub confirm_trash: bool,
     pub single_click_open: bool,
 
-    // Appearance
     pub sidebar_width: u32,
     pub icon_size: u32,
 
-    // User data
     pub favorites: Vec<FavoriteItem>,
     pub pinned_folders: Vec<PinnedFolder>,
     #[serde(default)]
@@ -85,43 +83,44 @@ impl Settings {
     pub fn load_or_default() -> Self {
         let path = Self::config_path();
 
-        if let Ok(content) = fs::read_to_string(&path) {
+        let mut settings = if let Ok(content) = fs::read_to_string(&path) {
             serde_json::from_str(&content).unwrap_or_default()
         } else {
             Self::default()
-        }
+        };
+        path_codec::normalize_settings(&mut settings);
+        settings
     }
 
     pub fn save(&self) -> Result<(), String> {
         let path = Self::config_path();
-        let content = serde_json::to_string_pretty(self).map_err(|e| e.to_string())?;
+        let mut settings = self.clone();
+        path_codec::normalize_settings(&mut settings);
+        let content = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
         fs::write(&path, content).map_err(|e| e.to_string())
     }
 }
 
-#[command]
-pub fn get_settings(settings: tauri::State<'_, RwLock<Settings>>) -> Settings {
-    settings.read().clone()
+pub fn get_settings(settings: &RwLock<Settings>) -> Settings {
+    let mut settings = settings.read().clone();
+    path_codec::normalize_settings(&mut settings);
+    settings
 }
 
-#[command]
 pub fn update_settings(
-    new_settings: Settings,
-    settings: tauri::State<'_, RwLock<Settings>>,
+    mut new_settings: Settings,
+    settings: &RwLock<Settings>,
 ) -> Result<(), String> {
+    path_codec::normalize_settings(&mut new_settings);
     let mut s = settings.write();
     *s = new_settings;
     s.save()
 }
 
-#[command]
-pub fn add_favorite(
-    item: FavoriteItem,
-    settings: tauri::State<'_, RwLock<Settings>>,
-) -> Result<(), String> {
+pub fn add_favorite(mut item: FavoriteItem, settings: &RwLock<Settings>) -> Result<(), String> {
+    item.path = path_codec::normalize_path(item.path);
     let mut s = settings.write();
 
-    // Check if already exists
     if s.favorites.iter().any(|f| f.path == item.path) {
         return Ok(());
     }
@@ -130,24 +129,20 @@ pub fn add_favorite(
     s.save()
 }
 
-#[command]
-pub fn remove_favorite(
-    path: String,
-    settings: tauri::State<'_, RwLock<Settings>>,
-) -> Result<(), String> {
+pub fn remove_favorite(path: String, settings: &RwLock<Settings>) -> Result<(), String> {
+    let path = path_codec::normalize_path(path);
     let mut s = settings.write();
     s.favorites.retain(|f| f.path != path);
     s.save()
 }
 
-#[command]
 pub fn add_pinned_folder(
-    folder: PinnedFolder,
-    settings: tauri::State<'_, RwLock<Settings>>,
+    mut folder: PinnedFolder,
+    settings: &RwLock<Settings>,
 ) -> Result<(), String> {
+    folder.path = path_codec::normalize_path(folder.path);
     let mut s = settings.write();
 
-    // Check if already exists
     if s.pinned_folders.iter().any(|f| f.path == folder.path) {
         return Ok(());
     }
@@ -156,11 +151,8 @@ pub fn add_pinned_folder(
     s.save()
 }
 
-#[command]
-pub fn remove_pinned_folder(
-    path: String,
-    settings: tauri::State<'_, RwLock<Settings>>,
-) -> Result<(), String> {
+pub fn remove_pinned_folder(path: String, settings: &RwLock<Settings>) -> Result<(), String> {
+    let path = path_codec::normalize_path(path);
     let mut s = settings.write();
     s.pinned_folders.retain(|f| f.path != path);
     s.save()

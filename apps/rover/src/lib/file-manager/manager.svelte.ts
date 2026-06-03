@@ -1,0 +1,499 @@
+import { get } from 'svelte/store';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import * as api from '$lib/api';
+import { isTauriRuntime } from '$lib/runtime';
+import {
+	activeTab,
+	clearClipboard,
+	clipboard,
+	copyToClipboard,
+	currentView,
+	cutToClipboard,
+	drives,
+	loadDrives,
+	loadUserDirs,
+	selection,
+	settings,
+	tabs,
+	userDirs
+} from '$lib/stores';
+import { sortedEntries, visibleEntries } from '$lib/file-manager/entries';
+import { previewDrives, previewEntries, previewThumbnails, previewTrash, previewUserDirs } from '$lib/file-manager/preview';
+import { handleShortcut, isTextInputTarget } from '$lib/file-manager/shortcuts';
+import { thumbnailCandidates } from '$lib/file-manager/thumbnails';
+import { normalizePath, viewModeForPath } from '$lib/file-manager/view-modes';
+import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, TrashItem, ViewMode } from '$lib/types';
+import { getParentPath, getPathSegments } from '$lib/utils';
+type TauriWindow = Awaited<ReturnType<typeof getCurrentWindow>>;
+export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
+export class FileManager {
+	entries = $state<FileEntry[]>([]);
+	trashItems = $state<TrashItem[]>([]);
+	currentPath = $state('');
+	isLoading = $state(false);
+	error = $state<string | null>(null);
+	searchQuery = $state('');
+	inlineDraft = $state<InlineDraft | null>(null);
+	viewMode = $state<ViewMode>('list');
+	sortBy = $state<SortBy>('name');
+	sortAsc = $state(true);
+	contextMenu = $state<ContextMenuState | null>(null);
+	dragTarget = $state<FileEntry | null>(null);
+	dropTarget = $state<string | null>(null);
+	isDragging = $state(false);
+	appWindow: TauriWindow | null = $state(null);
+	backgroundEffect = $state<BackgroundEffect>('opaque');
+	thumbnails = $state<Record<string, string | null>>({});
+	lastMouseNavButton = 0;
+	lastMouseNavAt = 0;
+	get displayEntries() {
+		return visibleEntries(sortedEntries(this.entries, this.sortBy, this.sortAsc), this.searchQuery);
+	}
+	get pathSegments() {
+		return getPathSegments(this.currentPath);
+	}
+	init = async () => {
+		this.isLoading = true;
+		if (!isTauriRuntime()) return this.initPreview();
+		this.appWindow = getCurrentWindow();
+		const settingsTask = settings.load();
+		const dirsTask = loadUserDirs();
+		void loadDrives();
+		void this.loadBackgroundEffectStatus();
+		await settingsTask;
+		const savedSettings = get(settings);
+		this.sortBy = savedSettings.sortBy;
+		this.sortAsc = savedSettings.sortAsc;
+		const dirs = await dirsTask;
+		const startPath = dirs?.home ?? '/';
+		await tabs.init(startPath);
+		await this.loadDirectory(startPath);
+	};
+	initPreview = async () => {
+		userDirs.set(previewUserDirs);
+		drives.set(previewDrives);
+		await tabs.init(previewUserDirs.home);
+		this.loadPreviewDirectory(previewUserDirs.home);
+	};
+	loadPreviewDirectory(path: string) {
+		const entries = previewEntries(path);
+		this.entries = entries;
+		this.thumbnails = { ...this.thumbnails, ...previewThumbnails(entries) };
+		this.currentPath = path;
+		this.viewMode = viewModeForPath(path, get(settings), get(userDirs));
+		this.searchQuery = '';
+		this.inlineDraft = null;
+		this.isLoading = false;
+		selection.clear();
+		currentView.set('home');
+	}
+	closeFloatingUi = () => {
+		this.contextMenu = null;
+	};
+	minimize = async () => {
+		await this.appWindow?.minimize();
+	};
+	toggleMaximize = async () => {
+		await this.appWindow?.toggleMaximize();
+	};
+	closeWindow = async () => {
+		await this.appWindow?.close();
+	};
+	loadBackgroundEffectStatus = async () => {
+		try {
+			const status = await api.getBackgroundEffectStatus();
+			this.backgroundEffect = status.background_effect;
+		} catch {
+			this.backgroundEffect = 'opaque';
+		}
+	};
+	startDrag = async (event: MouseEvent) => {
+		if (event.button !== 0 || !this.appWindow) return;
+		const target = event.target instanceof Element ? event.target : null;
+		if (!target) return;
+		if (target.closest('button, input, a, [data-no-drag]')) return;
+		event.preventDefault();
+		await this.appWindow.startDragging();
+	};
+	handleDragRegionMouseDown = (event: MouseEvent) => {
+		const target = event.target instanceof Element ? event.target : null;
+		if (!target?.closest('.drag-region, [data-window-drag], [data-tauri-drag-region]')) return;
+		this.startDrag(event);
+	};
+	rememberPath = async (path: string) => {
+		await settings.updateAndSave((current) => ({
+			...current,
+			recentPaths: [path, ...current.recentPaths.filter((item) => item !== path)].slice(0, 12)
+		}));
+	};
+	loadDirectory = async (path: string) => {
+		if (!isTauriRuntime()) {
+			this.loadPreviewDirectory(path);
+			return;
+		}
+		this.isLoading = true;
+		this.error = null;
+		this.currentPath = path;
+		this.viewMode = viewModeForPath(path, get(settings), get(userDirs));
+		this.entries = [];
+		try {
+			const result = await api.listDirectory(path, get(settings).showHidden);
+			this.entries = result.entries;
+			void this.loadThumbnails(result.entries);
+			this.searchQuery = '';
+			this.inlineDraft = null;
+			selection.clear();
+			currentView.set('home');
+			await this.rememberPath(path);
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.entries = [];
+		} finally {
+			this.isLoading = false;
+		}
+	};
+	loadThumbnails = async (entries: FileEntry[]) => {
+		const pending = thumbnailCandidates(entries).filter((entry) => this.thumbnails[entry.path] === undefined);
+		if (pending.length === 0) return;
+		const loadedEntries = await Promise.all(
+			pending.map(async (entry) => {
+				try {
+					const thumbnailPath = await api.getThumbnail(entry.path);
+					return [entry.path, thumbnailPath ? convertFileSrc(thumbnailPath) : null] as const;
+				} catch {
+					return [entry.path, null] as const;
+				}
+			})
+		);
+		this.thumbnails = { ...this.thumbnails, ...Object.fromEntries(loadedEntries) };
+	};
+	loadTrash = async () => {
+		if (!isTauriRuntime()) {
+			this.trashItems = previewTrash;
+			selection.clear();
+			return;
+		}
+		this.isLoading = true;
+		this.error = null;
+		try {
+			const result = await api.listTrash();
+			this.trashItems = result.items;
+			selection.clear();
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.trashItems = [];
+		} finally {
+			this.isLoading = false;
+		}
+	};
+	navigate = async (path: string) => {
+		const tab = get(activeTab);
+		if (tab) tabs.navigate(tab.id, path, path.split('/').filter(Boolean).at(-1) || 'Home');
+		await this.loadDirectory(path);
+	};
+	switchView = async (view: SidebarView) => {
+		this.contextMenu = null;
+		this.searchQuery = '';
+		selection.clear();
+		currentView.set(view);
+		if (view === 'home') await this.navigate(get(userDirs)?.home || this.currentPath || '/');
+		if (view === 'drives') await loadDrives();
+		if (view === 'trash') await this.loadTrash();
+	};
+	openFavorite = async (favorite: FavoriteItem) => {
+		if (favorite.is_dir) await this.navigate(favorite.path);
+		else await api.openWithDefault(favorite.path);
+	};
+	goBack = () => {
+		const tab = get(activeTab);
+		if (!tab || !tabs.canGoBack(tab)) return;
+		const path = tabs.goBack(tab.id);
+		if (path) this.loadDirectory(path);
+	};
+	goForward = () => {
+		const tab = get(activeTab);
+		if (!tab || !tabs.canGoForward(tab)) return;
+		const path = tabs.goForward(tab.id);
+		if (path) this.loadDirectory(path);
+	};
+	goUp = () => {
+		if (!this.currentPath || this.currentPath === '/') return;
+		this.navigate(getParentPath(this.currentPath));
+	};
+	openNewTab = async (path?: string) => {
+		const nextPath = path || this.currentPath || get(userDirs)?.home || '/';
+		tabs.addTab(nextPath, nextPath.split('/').filter(Boolean).at(-1) || 'Home');
+		await this.loadDirectory(nextPath);
+	};
+	closeTab = (id: string) => {
+		if (get(tabs).length <= 1) return void this.closeWindow();
+		const wasActive = get(activeTab)?.id === id;
+		tabs.closeTab(id);
+		const nextActive = get(activeTab);
+		if (wasActive && nextActive) this.loadDirectory(nextActive.path);
+	};
+	switchTab = (id: string) => {
+		tabs.setActiveTab(id);
+		const tab = get(tabs).find((item) => item.id === id);
+		if (tab) this.loadDirectory(tab.path);
+	};
+	setSortBy = async (nextSort: SortBy) => {
+		if (this.sortBy === nextSort) this.sortAsc = !this.sortAsc;
+		else {
+			this.sortBy = nextSort;
+			this.sortAsc = true;
+		}
+		await settings.updateAndSave((current) => ({ ...current, sortBy: this.sortBy, sortAsc: this.sortAsc }));
+	};
+	setViewMode = async (mode: ViewMode) => {
+		this.viewMode = mode;
+		await settings.updateAndSave((current) => ({
+			...current,
+			viewMode: mode,
+			folderViewModes: { ...current.folderViewModes, [normalizePath(this.currentPath)]: mode }
+		}));
+	};
+	toggleHidden = async () => {
+		await settings.updateAndSave((current) => ({ ...current, showHidden: !current.showHidden }));
+		await this.loadDirectory(this.currentPath || get(userDirs)?.home || '/');
+	};
+	handleItemClick = (entry: FileEntry, event: MouseEvent) => {
+		const selected = get(selection);
+		if (event.ctrlKey || event.metaKey) {
+			selection.toggle(entry.path);
+			return;
+		}
+		if (event.shiftKey && selected.size > 0) {
+			const selectedPaths = Array.from(selected);
+			const last = this.displayEntries.findIndex((item) => item.path === selectedPaths[selectedPaths.length - 1]);
+			const current = this.displayEntries.findIndex((item) => item.path === entry.path);
+			if (last !== -1 && current !== -1) {
+				selection.selectRange(
+					this.displayEntries.slice(Math.min(last, current), Math.max(last, current) + 1).map((item) => item.path)
+				);
+			}
+			return;
+		}
+		if (selected.has(entry.path)) {
+			this.handleItemOpen(entry);
+			return;
+		}
+		selection.select(entry.path);
+	};
+	handleItemOpen = (entry: FileEntry) => {
+		if (entry.is_dir) this.navigate(entry.path);
+		else api.openWithDefault(entry.path);
+	};
+	handleMiddleClick = (entry: FileEntry, event: MouseEvent) => {
+		if (event.button === 1 && entry.is_dir) this.openNewTab(entry.path);
+	};
+	handleContextMenu = (event: MouseEvent, entry?: FileEntry) => {
+		event.preventDefault();
+		event.stopPropagation();
+		if (entry && !get(selection).has(entry.path)) selection.select(entry.path);
+		this.contextMenu = { x: event.clientX, y: event.clientY, target: entry ?? null };
+	};
+	handleDragStart = (event: DragEvent, entry: FileEntry) => {
+		if (!get(selection).has(entry.path)) selection.select(entry.path);
+		this.isDragging = true;
+		this.dragTarget = entry;
+		event.dataTransfer?.setData('text/plain', JSON.stringify(Array.from(get(selection))));
+		if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copyMove';
+	};
+	handleDragEnd = () => {
+		this.isDragging = false;
+		this.dragTarget = null;
+		this.dropTarget = null;
+	};
+	handleDragOver = (event: DragEvent, entry?: FileEntry) => {
+		event.preventDefault();
+		if (!this.isDragging) return;
+		if (entry?.is_dir && !get(selection).has(entry.path)) {
+			this.dropTarget = entry.path;
+			if (event.dataTransfer) event.dataTransfer.dropEffect = event.ctrlKey ? 'copy' : 'move';
+			return;
+		}
+		if (!entry) this.dropTarget = this.currentPath;
+	};
+	handleDragLeave = () => {
+		this.dropTarget = null;
+	};
+	handleDrop = async (event: DragEvent, targetPath: string) => {
+		event.preventDefault();
+		if (!this.isDragging || !targetPath) return;
+		const sourcePaths = Array.from(get(selection));
+		const droppingIntoSelf = sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
+		if (droppingIntoSelf || (!event.ctrlKey && targetPath === this.currentPath)) {
+			this.handleDragEnd();
+			return;
+		}
+		try {
+			if (event.ctrlKey) await api.copyItems(sourcePaths, targetPath);
+			else await api.moveItems(sourcePaths, targetPath);
+			await this.loadDirectory(this.currentPath);
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		} finally {
+			this.handleDragEnd();
+		}
+	};
+	copy = () => {
+		const selected = this.entries.filter((entry) => get(selection).has(entry.path));
+		if (selected.length > 0) copyToClipboard(selected);
+	};
+	cut = () => {
+		const selected = this.entries.filter((entry) => get(selection).has(entry.path));
+		if (selected.length > 0) cutToClipboard(selected);
+	};
+	paste = async () => {
+		const currentClipboard = get(clipboard);
+		if (!currentClipboard.items.length || !currentClipboard.operation) return;
+		try {
+			const paths = currentClipboard.items.map((item) => item.path);
+			if (currentClipboard.operation === 'copy') await api.copyItems(paths, this.currentPath);
+			else {
+				await api.moveItems(paths, this.currentPath);
+				clearClipboard();
+			}
+			await this.loadDirectory(this.currentPath);
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	};
+	deleteSelected = async () => {
+		const selected = Array.from(get(selection));
+		if (selected.length === 0) return;
+		try {
+			if (get(currentView) === 'trash') {
+				await api.deletePermanently(selected);
+				await this.loadTrash();
+			} else {
+				await api.moveToTrash(selected);
+				await this.loadDirectory(this.currentPath);
+			}
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	};
+	startCreate = (type: 'file' | 'folder') => {
+		this.inlineDraft = {
+			mode: 'create',
+			itemType: type,
+			targetPath: null,
+			value: type === 'folder' ? 'New folder' : 'New file.txt',
+			originalName: null
+		};
+		this.contextMenu = null;
+		selection.clear();
+	};
+	startRename = (entry: FileEntry) => {
+		this.inlineDraft = {
+			mode: 'rename',
+			itemType: entry.is_dir ? 'folder' : 'file',
+			targetPath: entry.path,
+			value: entry.name,
+			originalName: entry.name
+		};
+		this.contextMenu = null;
+	};
+	updateDraft = (value: string) => {
+		if (this.inlineDraft) this.inlineDraft = { ...this.inlineDraft, value };
+	};
+	cancelDraft = () => {
+		this.inlineDraft = null;
+	};
+	commitDraft = async () => {
+		const draft = this.inlineDraft;
+		if (!draft) return;
+		const name = draft.value.trim();
+		if (!name || (draft.mode === 'rename' && name === draft.originalName)) {
+			this.cancelDraft();
+			return;
+		}
+		try {
+			const entry =
+				draft.mode === 'create'
+					? draft.itemType === 'folder'
+						? await api.createDirectory(this.currentPath, name)
+						: await api.createFile(this.currentPath, name)
+					: await api.renameItem(draft.targetPath!, name);
+			this.inlineDraft = null;
+			await this.loadDirectory(this.currentPath);
+			selection.select(entry.path);
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	};
+	toggleFavorite = async (entry: FileEntry) => {
+		const currentSettings = get(settings);
+		const exists = currentSettings.favorites.some((favorite) => favorite.path === entry.path);
+		const favorite = { name: entry.name, path: entry.path, is_dir: entry.is_dir };
+		await settings.updateAndSave((current) => ({
+			...current,
+			favorites: exists
+				? current.favorites.filter((item) => item.path !== entry.path)
+				: [favorite, ...current.favorites.filter((item) => item.path !== entry.path)]
+		}));
+	};
+	restoreSelected = async (ids?: string[]) => {
+		const selected = ids ?? Array.from(get(selection));
+		if (selected.length === 0) return;
+		try {
+			await api.restoreFromTrash(selected);
+			await this.loadTrash();
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	};
+	emptyTrash = async (trashPath?: string) => {
+		try {
+			await api.emptyTrash(trashPath);
+			await this.loadTrash();
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	};
+	handleKeydown = (event: KeyboardEvent) => {
+		if (isTextInputTarget(event.target)) return;
+		if (event.ctrlKey || event.metaKey) {
+			handleShortcut(event, {
+				copy: this.copy,
+				cut: this.cut,
+				paste: this.paste,
+				selectAll: () =>
+					selection.selectAll(
+						get(currentView) === 'trash'
+							? this.trashItems.map((item) => item.id)
+							: this.displayEntries.map((item) => item.path)
+					),
+				newTab: () => this.openNewTab(),
+				closeTab: () => this.closeTab(get(activeTab)!.id),
+				hasActiveTab: () => Boolean(get(activeTab))
+			});
+			return;
+		}
+		if (event.key === 'Delete') this.deleteSelected();
+		if (event.key === 'F2') {
+			const selected = this.entries.find((entry) => get(selection).has(entry.path));
+			if (selected) this.startRename(selected);
+		}
+		if (event.key === 'Backspace') this.goUp();
+		if (event.key === 'Escape') {
+			selection.clear();
+			this.inlineDraft = null;
+			this.contextMenu = null;
+		}
+	};
+	handleMouseButtonNavigation = (event: MouseEvent) => {
+		if (event.button !== 3 && event.button !== 4) return;
+		const now = performance.now();
+		if (this.lastMouseNavButton === event.button && now - this.lastMouseNavAt < 120) return;
+		this.lastMouseNavButton = event.button;
+		this.lastMouseNavAt = now;
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.button === 3) this.goBack();
+		else this.goForward();
+	};
+}

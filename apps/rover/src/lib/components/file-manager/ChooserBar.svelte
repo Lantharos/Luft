@@ -13,6 +13,8 @@
 	}
 
 	let { config, selectedCount, canAccept, saveName, onSaveName, onAccept, onCancel }: Props = $props();
+	const chooserButton =
+		'inline-flex h-10 min-w-[96px] items-center justify-center rounded-full px-4 text-[13px] font-medium transition-[background-color,color,transform,opacity] duration-150 active:scale-[0.96]';
 
 	let selectionText = $derived.by(() => {
 		if (config.mode === 'save') return 'Save as';
@@ -52,8 +54,25 @@
 	{/if}
 
 	<div class="flex shrink-0 items-center gap-2">
-		<button class="tool-button px-4" type="button" onclick={onCancel}>Cancel</button>
-		<button class="command-button px-4" type="button" disabled={!canAccept} onclick={onAccept}>
+		<button
+			class={[
+				chooserButton,
+				'text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]'
+			]}
+			type="button"
+			onclick={onCancel}
+		>
+			Cancel
+		</button>
+		<button
+			class={[
+				chooserButton,
+				'bg-[var(--control)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] hover:bg-[var(--control-hover)] disabled:opacity-35'
+			]}
+			type="button"
+			disabled={!canAccept}
+			onclick={onAccept}
+		>
 			{config.accept_label || 'Select'}
 		</button>
 	</div>

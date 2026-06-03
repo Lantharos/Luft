@@ -6,7 +6,7 @@ authors = ["Kristof"]
 license = "MIT"
 repository = ""
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.87"
 
 [lib]
 name = "rover_lib"
@@ -38,6 +38,8 @@ thiserror = "2"
 
 open = "5"
 libc = "0.2"
+zbus = { version = "5.16.0", default-features = false, features = ["tokio"] }
+url = "2.5.8"
 
 # Linux specific
 [target.'cfg(target_os = "linux")'.dependencies]

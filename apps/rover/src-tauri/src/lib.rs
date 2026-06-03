@@ -1,8 +1,10 @@
+mod chooser;
 mod drives;
 mod file_actions;
 mod fs_ops;
 mod operations_queue;
 mod platform;
+mod portal_backend;
 mod settings;
 mod system_status;
 mod trash_manager;
@@ -28,6 +30,11 @@ pub fn run() {
             // Initialize settings
             let settings = settings::Settings::load_or_default();
             app.manage(parking_lot::RwLock::new(settings));
+
+            let chooser_state =
+                chooser::ChooserState::new(chooser::ChooserSession::from_environment());
+            chooser::configure_window(app, &chooser_state);
+            app.manage(chooser_state);
 
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -75,7 +82,18 @@ pub fn run() {
             settings::add_pinned_folder,
             settings::remove_pinned_folder,
             system_status::get_background_effect_status,
+            chooser::get_chooser_config,
+            chooser::accept_chooser,
+            chooser::cancel_chooser,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+pub fn run_portal_backend() -> Result<(), String> {
+    portal_backend::run()
+}
+
+pub fn install_file_chooser_portal() -> Result<(), String> {
+    portal_backend::install_user_portal()
 }

@@ -20,6 +20,7 @@ A modern, fast, and user-friendly file manager for Linux built with Tauri + Svel
 - **Search**: Quick file search within current directory
 - **Custom Window**: Frameless window with custom title bar
 - **NVIDIA WebKitGTK Workaround**: Applies the required X11/Wayland startup fixes automatically on proprietary NVIDIA drivers
+- **File Chooser Portal**: Rover can register as the xdg-desktop-portal file picker for apps that use the Linux portal picker
 
 ## Prerequisites
 
@@ -56,6 +57,19 @@ The production build script sets `NO_STRIP=1` for AppImage packaging. This avoid
 Rover applies the WebKitGTK/NVIDIA startup workaround before the webview is created, so packaged builds work on both X11 and Wayland NVIDIA sessions without wrapper scripts.
 
 Sidebar translucency uses the compositor-provided `ext-background-effect-v1` path when available. Rover falls back to an opaque sidebar on sessions where that native blur path is unavailable or unreliable.
+
+## File Picker Portal
+
+Rover includes an xdg-desktop-portal FileChooser backend. The `.deb` and `.rpm` packages install the portal descriptor and D-Bus activation file.
+
+To prefer Rover for portal file pickers in your user session:
+
+```bash
+rover --install-file-chooser-portal
+systemctl --user restart xdg-desktop-portal.service
+```
+
+The same command also works from an AppImage or local build, using the executable path that ran the command.
 
 ## Keyboard Shortcuts
 
@@ -94,6 +108,8 @@ rover/
 │       ├── fs_ops.rs       # File system operations
 │       ├── drives.rs       # Drive/mount detection
 │       ├── trash_manager.rs # Trash operations
+│       ├── portal_backend.rs # xdg-desktop-portal FileChooser backend
+│       ├── chooser.rs      # Portal-launched picker session state
 │       ├── operations_queue.rs # File op queue
 │       └── settings.rs     # User settings
 └── package.json

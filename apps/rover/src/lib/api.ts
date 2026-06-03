@@ -10,7 +10,8 @@ import type {
 	Settings,
 	FavoriteItem,
 	PinnedFolder,
-	BackgroundEffectStatus
+	BackgroundEffectStatus,
+	ChooserConfig
 } from './types';
 
 // File system operations
@@ -140,4 +141,16 @@ export async function removePinnedFolder(path: string): Promise<void> {
 
 export async function getBackgroundEffectStatus(): Promise<BackgroundEffectStatus> {
 	return invoke('get_background_effect_status');
+}
+
+export async function getChooserConfig(): Promise<ChooserConfig> {
+	return invoke('get_chooser_config');
+}
+
+export async function acceptChooser(paths: string[]): Promise<void> {
+	return invoke('accept_chooser', { paths });
+}
+
+export async function cancelChooser(): Promise<void> {
+	return invoke('cancel_chooser');
 }

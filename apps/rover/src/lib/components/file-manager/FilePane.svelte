@@ -22,6 +22,8 @@
 		error: string | null;
 		dropTarget: string | null;
 		isDragging: boolean;
+		canDrag?: boolean;
+		allowSelectedDoubleClick?: boolean;
 		onSelectEntry: (entry: FileEntry, event: MouseEvent) => void;
 		onOpenEntry: (entry: FileEntry) => void;
 		onMiddleClick: (entry: FileEntry, event: MouseEvent) => void;
@@ -59,6 +61,8 @@
 		error,
 		dropTarget,
 		isDragging,
+		canDrag = true,
+		allowSelectedDoubleClick = false,
 		onSelectEntry,
 		onOpenEntry,
 		onMiddleClick,
@@ -299,9 +303,9 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable="true"
+						draggable={canDrag}
 						onclick={(event) => onSelectEntry(entry, event)}
-						ondblclick={() => !selectedPaths.has(entry.path) && onOpenEntry(entry)}
+						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}
@@ -364,9 +368,9 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable="true"
+						draggable={canDrag}
 						onclick={(event) => onSelectEntry(entry, event)}
-						ondblclick={() => !selectedPaths.has(entry.path) && onOpenEntry(entry)}
+						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}
@@ -421,9 +425,9 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable="true"
+						draggable={canDrag}
 						onclick={(event) => onSelectEntry(entry, event)}
-						ondblclick={() => !selectedPaths.has(entry.path) && onOpenEntry(entry)}
+						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}

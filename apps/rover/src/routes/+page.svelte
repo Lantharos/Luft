@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import AppHeader from '$lib/components/file-manager/AppHeader.svelte';
+	import ChooserBar from '$lib/components/file-manager/ChooserBar.svelte';
 	import ContextMenu from '$lib/components/file-manager/ContextMenu.svelte';
 	import FilePane from '$lib/components/file-manager/FilePane.svelte';
 	import OperationDock from '$lib/components/file-manager/OperationDock.svelte';
@@ -11,14 +12,17 @@
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
+	import { isTauriRuntime } from '$lib/runtime';
 	import { activeTab, clipboard, currentView, drives, selection, settings, tabs, userDirs } from '$lib/stores';
-	import type { FileEntry, PinnedFolder, TrashLocation } from '$lib/types';
+	import type { ChooserConfig, FavoriteItem, FileEntry, PinnedFolder, SidebarView, TrashLocation } from '$lib/types';
 
 	const manager = new FileManager();
 	let seededSidebarBookmarks = false;
+	let chooser = $state<ChooserConfig | null>(null);
+	let chooserSaveName = $state('');
 
 	onMount(() => {
-		manager.init();
+		void initialize();
 		document.addEventListener('click', manager.closeFloatingUi);
 		return () => document.removeEventListener('click', manager.closeFloatingUi);
 	});
@@ -48,6 +52,8 @@
 		}
 		return [...locations.values()];
 	});
+	let chooserAcceptPaths = $derived.by(() => pathsForChooser());
+	let chooserCanAccept = $derived(Boolean(chooser && chooserAcceptPaths.length > 0));
 	let contextTargetIsPinned = $derived(
 		Boolean(
 			manager.contextMenu?.target &&
@@ -60,6 +66,22 @@
 		seededSidebarBookmarks = true;
 		void settings.updateAndSave((current) => ensureSidebarBookmarks(current, $userDirs));
 	});
+
+	async function initialize() {
+		if (isTauriRuntime()) {
+			try {
+				const config = await api.getChooserConfig();
+				if (config.active) {
+					chooser = config;
+					chooserSaveName = config.current_name ?? '';
+				}
+			} catch {
+				chooser = null;
+			}
+		}
+		await manager.init();
+		if (chooser?.current_folder) await manager.navigate(chooser.current_folder);
+	}
 
 	function draggedSidebarEntries() {
 		const entries = manager.entries.filter((entry) => $selection.has(entry.path));
@@ -132,13 +154,123 @@
 	}
 
 	async function openSidebarBookmark(bookmark: PinnedFolder) {
+		if (chooser && !bookmark.is_dir && selectableChooserPath(false)) {
+			await submitChooser([bookmark.path]);
+			return;
+		}
 		if (bookmark.is_dir) await manager.navigate(bookmark.path);
 		else await api.openWithDefault(bookmark.path);
+	}
+
+	function selectableChooserEntry(entry: FileEntry) {
+		if (!chooser) return true;
+		if (chooser.mode === 'save_files') return entry.is_dir;
+		if (chooser.mode === 'save') return true;
+		return chooser.directory ? entry.is_dir : entry.is_file;
+	}
+
+	function selectableChooserPath(isDir: boolean) {
+		if (!chooser) return true;
+		if (chooser.mode === 'save_files') return isDir;
+		if (chooser.mode === 'save') return true;
+		return chooser.directory ? isDir : !isDir;
+	}
+
+	function handleChooserSelectEntry(entry: FileEntry, event: MouseEvent) {
+		if (!chooser) return manager.handleItemClick(entry, event);
+		if (!selectableChooserEntry(entry) && !entry.is_dir) return;
+		if ((event.ctrlKey || event.metaKey) && chooser.multiple && selectableChooserEntry(entry)) selection.toggle(entry.path);
+		else selection.select(entry.path);
+	}
+
+	function handleChooserOpenEntry(entry: FileEntry) {
+		if (!chooser) return manager.handleItemOpen(entry);
+		if (entry.is_dir) {
+			manager.navigate(entry.path);
+			return;
+		}
+		if (selectableChooserEntry(entry)) {
+			selection.select(entry.path);
+			void submitChooser([entry.path]);
+		}
+	}
+
+	async function handleChooserFavorite(favorite: FavoriteItem) {
+		if (!chooser) return manager.openFavorite(favorite);
+		if (favorite.is_dir) await manager.navigate(favorite.path);
+		else if (selectableChooserPath(false)) await submitChooser([favorite.path]);
+	}
+
+	function handleChooserRange(paths: string[]) {
+		if (!chooser) {
+			selection.selectAll(paths);
+			return;
+		}
+		const allowed = manager.entries.filter((entry) => paths.includes(entry.path) && selectableChooserEntry(entry)).map((entry) => entry.path);
+		selection.selectAll(chooser.multiple ? allowed : allowed.slice(0, 1));
+	}
+
+	function pathsForChooser() {
+		if (!chooser) return [];
+		if (chooser.mode === 'save') {
+			const name = chooserSaveName.trim();
+			if (!name) return [];
+			return [joinPath(manager.currentPath || chooser.current_folder || $userDirs?.home || '/', name)];
+		}
+		if (chooser.mode === 'save_files') {
+			const folder = selectedChooserDirectories()[0] ?? manager.currentPath;
+			if (!folder || chooser.files.length === 0) return [];
+			return chooser.files.map((name) => joinPath(folder, name));
+		}
+		const paths = manager.entries.filter((entry) => $selection.has(entry.path) && selectableChooserEntry(entry)).map((entry) => entry.path);
+		return chooser.multiple ? paths : paths.slice(0, 1);
+	}
+
+	function selectedChooserDirectories() {
+		return manager.entries.filter((entry) => entry.is_dir && $selection.has(entry.path)).map((entry) => entry.path);
+	}
+
+	function joinPath(folder: string, name: string) {
+		return `${folder.replace(/\/$/, '')}/${name.replace(/^\//, '')}`;
+	}
+
+	async function submitChooser(paths = chooserAcceptPaths) {
+		if (!chooser || paths.length === 0) return;
+		await api.acceptChooser(paths);
+	}
+
+	async function cancelChooser() {
+		await api.cancelChooser();
+	}
+
+	function handleChooserKeydown(event: KeyboardEvent) {
+		const target = event.target instanceof Element ? event.target : null;
+		if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+		if (!chooser) return manager.handleKeydown(event);
+		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
+			event.preventDefault();
+			const allowed = manager.displayEntries.filter(selectableChooserEntry).map((entry) => entry.path);
+			selection.selectAll(chooser.multiple ? allowed : allowed.slice(0, 1));
+		}
+		if (event.key === 'Enter' && chooserCanAccept) {
+			event.preventDefault();
+			void submitChooser();
+		}
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			void cancelChooser();
+		}
+		if (event.key === 'Backspace') manager.goUp();
+	}
+
+	async function switchChooserView(view: SidebarView) {
+		if (chooser && view === 'trash') return;
+		await manager.switchView(view);
 	}
 </script>
 
 <svelte:window
-	onkeydown={manager.handleKeydown}
+	onkeydown={handleChooserKeydown}
 	onmousedown={manager.handleDragRegionMouseDown}
 	onmouseup={manager.handleMouseButtonNavigation}
 />
@@ -155,7 +287,7 @@
 				drives={$drives}
 				backgroundEffect={manager.backgroundEffect}
 				onSearch={(value) => (manager.searchQuery = value)}
-				onSwitchView={manager.switchView}
+				onSwitchView={switchChooserView}
 				onNavigate={manager.navigate}
 				onOpenBookmark={openSidebarBookmark}
 				onRemoveBookmark={removeSidebarBookmark}
@@ -190,6 +322,7 @@
 						sortBy={manager.sortBy}
 						sortAsc={manager.sortAsc}
 						showHidden={$settings.showHidden}
+						chooserMode={Boolean(chooser)}
 						onBack={manager.goBack}
 						onForward={manager.goForward}
 						onUp={manager.goUp}
@@ -221,35 +354,49 @@
 					error={manager.error}
 					dropTarget={manager.dropTarget}
 					isDragging={manager.isDragging}
-					onSelectEntry={manager.handleItemClick}
-					onOpenEntry={manager.handleItemOpen}
-					onMiddleClick={manager.handleMiddleClick}
-					onContextMenu={manager.handleContextMenu}
-					onDragStart={manager.handleDragStart}
+					canDrag={!chooser}
+					allowSelectedDoubleClick={Boolean(chooser)}
+					onSelectEntry={handleChooserSelectEntry}
+					onOpenEntry={handleChooserOpenEntry}
+					onMiddleClick={chooser ? () => {} : manager.handleMiddleClick}
+					onContextMenu={chooser ? (event) => event.preventDefault() : manager.handleContextMenu}
+					onDragStart={chooser ? (event) => event.preventDefault() : manager.handleDragStart}
 					onDragEnd={manager.handleDragEnd}
-					onDragOver={manager.handleDragOver}
+					onDragOver={chooser ? (event) => event.preventDefault() : manager.handleDragOver}
 					onDragLeave={manager.handleDragLeave}
-					onDrop={manager.handleDrop}
+					onDrop={chooser ? (event) => event.preventDefault() : manager.handleDrop}
 					onSort={manager.setSortBy}
 					onNavigate={manager.navigate}
-					onSelectRange={(paths) => selection.selectAll(paths)}
+					onSelectRange={handleChooserRange}
 					onDraftInput={manager.updateDraft}
 					onDraftConfirm={manager.commitDraft}
 					onDraftCancel={manager.cancelDraft}
-					onOpenFavorite={manager.openFavorite}
+					onOpenFavorite={handleChooserFavorite}
 					onSelectTrashItem={(id) => selection.toggle(id)}
 					onRestoreTrash={manager.restoreSelected}
 					onEmptyTrash={manager.emptyTrash}
 				/>
 
-				<StatusBar {itemCount} {selectedCount} {selectedSize} />
+				{#if chooser}
+					<ChooserBar
+						config={chooser}
+						{selectedCount}
+						canAccept={chooserCanAccept}
+						saveName={chooserSaveName}
+						onSaveName={(value) => (chooserSaveName = value)}
+						onAccept={() => submitChooser()}
+						onCancel={cancelChooser}
+					/>
+				{:else}
+					<StatusBar {itemCount} {selectedCount} {selectedSize} />
+				{/if}
 				<OperationDock />
 			</section>
 		</div>
 	</main>
 </div>
 
-{#if manager.contextMenu}
+{#if manager.contextMenu && !chooser}
 	<ContextMenu
 		menu={manager.contextMenu}
 		hasClipboard={$clipboard.items.length > 0}

@@ -20,6 +20,7 @@
 		sortBy: SortBy;
 		sortAsc: boolean;
 		showHidden: boolean;
+		chooserMode?: boolean;
 		onBack: () => void;
 		onForward: () => void;
 		onUp: () => void;
@@ -46,6 +47,7 @@
 		sortBy,
 		sortAsc,
 		showHidden,
+		chooserMode = false,
 		onBack,
 		onForward,
 		onUp,
@@ -185,26 +187,28 @@
 
 	<div class="flex min-h-10 items-center justify-between gap-3">
 		<div class="flex min-w-0 items-center gap-1">
-			<button class="command-button" type="button" onclick={() => onCreate('folder')}>
-				<Icon name="folder-plus" size={16} />
-				<span>New folder</span>
-			</button>
-			<button class="tool-button" type="button" aria-label="New file" onclick={() => onCreate('file')}>
-				<Icon name="file-plus" size={16} />
-			</button>
-			<div class="mx-1 h-5 w-px bg-[var(--hairline)]"></div>
-			<button class="tool-button" type="button" aria-label="Cut" disabled={selectedCount === 0} onclick={onCut}>
-				<Icon name="scissors" size={16} />
-			</button>
-			<button class="tool-button" type="button" aria-label="Copy" disabled={selectedCount === 0} onclick={onCopy}>
-				<Icon name="copy" size={16} />
-			</button>
-			<button class="tool-button" type="button" aria-label="Paste" disabled={!hasClipboard} onclick={onPaste}>
-				<Icon name="clipboard" size={16} />
-			</button>
-			<button class="tool-button" type="button" aria-label="Move to trash" disabled={selectedCount === 0} onclick={onTrash}>
-				<Icon name="trash-2" size={16} />
-			</button>
+			{#if !chooserMode}
+				<button class="command-button" type="button" onclick={() => onCreate('folder')}>
+					<Icon name="folder-plus" size={16} />
+					<span>New folder</span>
+				</button>
+				<button class="tool-button" type="button" aria-label="New file" onclick={() => onCreate('file')}>
+					<Icon name="file-plus" size={16} />
+				</button>
+				<div class="mx-1 h-5 w-px bg-[var(--hairline)]"></div>
+				<button class="tool-button" type="button" aria-label="Cut" disabled={selectedCount === 0} onclick={onCut}>
+					<Icon name="scissors" size={16} />
+				</button>
+				<button class="tool-button" type="button" aria-label="Copy" disabled={selectedCount === 0} onclick={onCopy}>
+					<Icon name="copy" size={16} />
+				</button>
+				<button class="tool-button" type="button" aria-label="Paste" disabled={!hasClipboard} onclick={onPaste}>
+					<Icon name="clipboard" size={16} />
+				</button>
+				<button class="tool-button" type="button" aria-label="Move to trash" disabled={selectedCount === 0} onclick={onTrash}>
+					<Icon name="trash-2" size={16} />
+				</button>
+			{/if}
 		</div>
 
 		<div class="flex shrink-0 items-center gap-1">

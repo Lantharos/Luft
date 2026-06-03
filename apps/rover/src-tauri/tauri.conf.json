@@ -45,6 +45,20 @@
     ],
     "category": "Utility",
     "shortDescription": "A modern file manager for Linux",
-    "longDescription": "Rover is a fast, beautiful, and user-friendly file manager that combines the best of Windows, macOS, and Linux file management."
+    "longDescription": "Rover is a fast, beautiful, and user-friendly file manager that combines the best of Windows, macOS, and Linux file management.",
+    "linux": {
+      "deb": {
+        "files": {
+          "/usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.rover.service": "portal/org.freedesktop.impl.portal.desktop.rover.service",
+          "/usr/share/xdg-desktop-portal/portals/rover.portal": "portal/rover.portal"
+        }
+      },
+      "rpm": {
+        "files": {
+          "/usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.rover.service": "portal/org.freedesktop.impl.portal.desktop.rover.service",
+          "/usr/share/xdg-desktop-portal/portals/rover.portal": "portal/rover.portal"
+        }
+      }
+    }
   }
 }

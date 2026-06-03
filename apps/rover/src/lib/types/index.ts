@@ -118,6 +118,20 @@ export interface BackgroundEffectStatus {
 	background_effect_reason: string;
 }
 
+export type ChooserMode = 'open' | 'save' | 'save_files';
+
+export interface ChooserConfig {
+	active: boolean;
+	mode: ChooserMode;
+	title: string;
+	accept_label: string;
+	directory: boolean;
+	multiple: boolean;
+	current_folder: string | null;
+	current_name: string | null;
+	files: string[];
+}
+
 // Settings types
 export interface PinnedFolder {
 	name: string;

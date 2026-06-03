@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { FileEntry } from '$lib/types';
 
@@ -44,16 +45,63 @@
 		onClose
 	}: Props = $props();
 
+	const viewportMargin = 10;
+	let menuElement: HTMLDivElement;
+	let placed = $state(false);
+	let menuX = $state(0);
+	let menuY = $state(0);
+	let menuOrigin = $state('top left');
+	let placementKey = $derived(
+		`${menu.x}:${menu.y}:${menu.target?.path ?? 'pane'}:${hasClipboard}:${isFavorite}:${isPinned}`
+	);
+
 	function run(action: () => void) {
 		action();
 		onClose();
 	}
+
+	function clamp(value: number, min: number, max: number) {
+		return Math.min(Math.max(value, min), Math.max(min, max));
+	}
+
+	async function placeMenu() {
+		placed = false;
+		menuX = menu.x;
+		menuY = menu.y;
+		await tick();
+		if (!menuElement) return;
+
+		const rect = menuElement.getBoundingClientRect();
+		const maxX = window.innerWidth - rect.width - viewportMargin;
+		const maxY = window.innerHeight - rect.height - viewportMargin;
+		const opensLeft =
+			menu.x + rect.width + viewportMargin > window.innerWidth && menu.x - rect.width > viewportMargin;
+		const opensUp =
+			menu.y + rect.height + viewportMargin > window.innerHeight && menu.y - rect.height > viewportMargin;
+
+		menuX = clamp(opensLeft ? menu.x - rect.width : menu.x, viewportMargin, maxX);
+		menuY = clamp(opensUp ? menu.y - rect.height : menu.y, viewportMargin, maxY);
+		menuOrigin = `${opensUp ? 'bottom' : 'top'} ${opensLeft ? 'right' : 'left'}`;
+		placed = true;
+	}
+
+	$effect(() => {
+		placementKey;
+		void placeMenu();
+	});
 </script>
 
+<svelte:window onresize={placeMenu} />
+
 <div
-	class="fixed z-[80] w-[196px] rounded-[18px] bg-[var(--surface)] p-1 shadow-[0_18px_50px_var(--shadow-soft),inset_0_1px_0_var(--hairline)]"
-	style:left={`${menu.x}px`}
-	style:top={`${menu.y}px`}
+	bind:this={menuElement}
+	class={[
+		'fixed z-[80] max-h-[calc(100vh-20px)] w-[196px] overflow-y-auto rounded-[18px] bg-[var(--surface)] p-1 shadow-[0_18px_50px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] transition-[opacity,scale] duration-[120ms]',
+		placed ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.98]'
+	]}
+	style:left={`${menuX}px`}
+	style:top={`${menuY}px`}
+	style:transform-origin={menuOrigin}
 	role="menu"
 	tabindex="-1"
 	onkeydown={(event) => event.key === 'Escape' && onClose()}

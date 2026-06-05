@@ -8,6 +8,8 @@
 	import PathToolbar from '$lib/components/file-manager/PathToolbar.svelte';
 	import Sidebar from '$lib/components/file-manager/Sidebar.svelte';
 	import StatusBar from '$lib/components/file-manager/StatusBar.svelte';
+	import VcsPanel from '$lib/components/file-manager/VcsPanel.svelte';
+	import VcsSaveDialog from '$lib/components/file-manager/VcsSaveDialog.svelte';
 	import * as api from '$lib/api';
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
@@ -15,8 +17,10 @@
 	import { isDesktopRuntime } from '$lib/runtime';
 	import { activeTab, clipboard, currentView, drives, selection, settings, tabs, userDirs } from '$lib/stores';
 	import type { ChooserConfig, FavoriteItem, FileEntry, PinnedFolder, SidebarView, TrashLocation } from '$lib/types';
+	import { VcsState } from '$lib/vcs/state.svelte';
 
 	const manager = new FileManager();
+	const vcs = new VcsState();
 	let seededSidebarBookmarks = false;
 	let chooser = $state<ChooserConfig | null>(null);
 	let chooserSaveName = $state('');
@@ -60,11 +64,20 @@
 				$settings.pinnedFolders.some((bookmark) => bookmark.path === manager.contextMenu?.target?.path)
 		)
 	);
+	let contextTargetVcsStatus = $derived.by(() => {
+		const target = manager.contextMenu?.target;
+		return target ? vcs.statusFor(target.path, target.is_dir) : null;
+	});
 
 	$effect(() => {
 		if (!$userDirs || seededSidebarBookmarks) return;
 		seededSidebarBookmarks = true;
 		void settings.updateAndSave((current) => ensureSidebarBookmarks(current, $userDirs));
+	});
+
+	$effect(() => {
+		if ($currentView === 'home' && !chooser && !manager.isLoading && manager.currentPath) vcs.open(manager.currentPath);
+		else vcs.clear();
 	});
 
 	async function initialize() {
@@ -267,10 +280,23 @@
 		if (chooser && view === 'trash') return;
 		await manager.switchView(view);
 	}
+
+	function openVcsChanges(entry?: FileEntry) {
+		if (!vcs.project) return;
+		vcs.panelOpen = true;
+		if (entry && !entry.is_dir) void vcs.loadDiff(vcs.relativePath(entry.path));
+	}
+
+	function openVcsSave(entry?: FileEntry) {
+		if (!vcs.project) return;
+		const file = entry && !entry.is_dir ? [vcs.relativePath(entry.path)] : undefined;
+		vcs.openSaveDialog(file);
+	}
 </script>
 
 <svelte:window
 	onkeydown={handleChooserKeydown}
+	onfocus={() => vcs.refreshNow()}
 	onmousedown={manager.handleDragRegionMouseDown}
 	onmouseup={manager.handleMouseButtonNavigation}
 />
@@ -322,6 +348,7 @@
 						sortBy={manager.sortBy}
 						sortAsc={manager.sortAsc}
 						showHidden={$settings.showHidden}
+						vcsProject={vcs.project}
 						chooserMode={Boolean(chooser)}
 						onBack={manager.goBack}
 						onForward={manager.goForward}
@@ -335,47 +362,52 @@
 						onToggleHidden={manager.toggleHidden}
 						onSort={manager.setSortBy}
 						onViewMode={manager.setViewMode}
+						onOpenVcs={() => openVcsChanges()}
 					/>
 				{/if}
 
-				<FilePane
-					currentView={$currentView}
-					currentPath={manager.currentPath}
-					entries={manager.displayEntries}
-					favorites={$settings.favorites}
-					trashItems={manager.trashItems}
-					{trashLocations}
-					drives={$drives}
-					thumbnails={manager.thumbnails}
-					draft={manager.inlineDraft}
-					viewMode={manager.viewMode}
-					selectedPaths={$selection}
-					isLoading={manager.isLoading}
-					error={manager.error}
-					dropTarget={manager.dropTarget}
-					isDragging={manager.isDragging}
-					canDrag={!chooser}
-					allowSelectedDoubleClick={Boolean(chooser)}
-					onSelectEntry={handleChooserSelectEntry}
-					onOpenEntry={handleChooserOpenEntry}
-					onMiddleClick={chooser ? () => {} : manager.handleMiddleClick}
-					onContextMenu={chooser ? (event) => event.preventDefault() : manager.handleContextMenu}
-					onDragStart={chooser ? (event) => event.preventDefault() : manager.handleDragStart}
-					onDragEnd={manager.handleDragEnd}
-					onDragOver={chooser ? (event) => event.preventDefault() : manager.handleDragOver}
-					onDragLeave={manager.handleDragLeave}
-					onDrop={chooser ? (event) => event.preventDefault() : manager.handleDrop}
-					onSort={manager.setSortBy}
-					onNavigate={manager.navigate}
-					onSelectRange={handleChooserRange}
-					onDraftInput={manager.updateDraft}
-					onDraftConfirm={manager.commitDraft}
-					onDraftCancel={manager.cancelDraft}
-					onOpenFavorite={handleChooserFavorite}
-					onSelectTrashItem={(id) => selection.toggle(id)}
-					onRestoreTrash={manager.restoreSelected}
-					onEmptyTrash={manager.emptyTrash}
-				/>
+				<div class="flex min-h-0 flex-1 overflow-hidden">
+					<FilePane
+						currentView={$currentView}
+						currentPath={manager.currentPath}
+						entries={manager.displayEntries}
+						favorites={$settings.favorites}
+						trashItems={manager.trashItems}
+						{trashLocations}
+						drives={$drives}
+						thumbnails={manager.thumbnails}
+						draft={manager.inlineDraft}
+						viewMode={manager.viewMode}
+						selectedPaths={$selection}
+						isLoading={manager.isLoading}
+						error={manager.error}
+						dropTarget={manager.dropTarget}
+						isDragging={manager.isDragging}
+						canDrag={!chooser}
+						allowSelectedDoubleClick={Boolean(chooser)}
+						entryVcsStatus={(entry) => vcs.statusFor(entry.path, entry.is_dir)}
+						onSelectEntry={handleChooserSelectEntry}
+						onOpenEntry={handleChooserOpenEntry}
+						onMiddleClick={chooser ? () => {} : manager.handleMiddleClick}
+						onContextMenu={chooser ? (event) => event.preventDefault() : manager.handleContextMenu}
+						onDragStart={chooser ? (event) => event.preventDefault() : manager.handleDragStart}
+						onDragEnd={manager.handleDragEnd}
+						onDragOver={chooser ? (event) => event.preventDefault() : manager.handleDragOver}
+						onDragLeave={manager.handleDragLeave}
+						onDrop={chooser ? (event) => event.preventDefault() : manager.handleDrop}
+						onSort={manager.setSortBy}
+						onNavigate={manager.navigate}
+						onSelectRange={handleChooserRange}
+						onDraftInput={manager.updateDraft}
+						onDraftConfirm={manager.commitDraft}
+						onDraftCancel={manager.cancelDraft}
+						onOpenFavorite={handleChooserFavorite}
+						onSelectTrashItem={(id) => selection.toggle(id)}
+						onRestoreTrash={manager.restoreSelected}
+						onEmptyTrash={manager.emptyTrash}
+					/>
+					<VcsPanel {vcs} />
+				</div>
 
 				{#if chooser}
 					<ChooserBar
@@ -388,7 +420,15 @@
 						onCancel={cancelChooser}
 					/>
 				{:else}
-					<StatusBar {itemCount} {selectedCount} {selectedSize} />
+					<StatusBar
+						{itemCount}
+						{selectedCount}
+						{selectedSize}
+						vcsProject={vcs.project}
+						vcsBusy={vcs.busy}
+						vcsMessage={vcs.lastResult}
+						vcsError={vcs.error}
+					/>
 				{/if}
 				<OperationDock />
 			</section>
@@ -402,6 +442,8 @@
 		hasClipboard={$clipboard.items.length > 0}
 		isFavorite={contextTargetIsFavorite}
 		isPinned={contextTargetIsPinned}
+		vcsProject={vcs.project}
+		targetVcsStatus={contextTargetVcsStatus}
 		onOpen={manager.handleItemOpen}
 		onOpenInTab={(entry) => manager.openNewTab(entry.path)}
 		onCut={manager.cut}
@@ -410,8 +452,13 @@
 		onTrash={manager.deleteSelected}
 		onToggleFavorite={manager.toggleFavorite}
 		onTogglePinned={toggleSidebarBookmark}
+		onViewVcsChanges={openVcsChanges}
+		onSaveVcs={openVcsSave}
+		onSyncVcs={() => vcs.sync()}
 		onCreate={manager.startCreate}
 		onPaste={manager.paste}
 		onClose={() => (manager.contextMenu = null)}
 	/>
 {/if}
+
+<VcsSaveDialog {vcs} />

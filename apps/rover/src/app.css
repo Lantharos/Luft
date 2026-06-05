@@ -272,6 +272,9 @@ input:focus-visible {
 
 .selected-entry,.selected-entry:hover{background:var(--selection);color:var(--text);box-shadow:inset 0 0 0 1px rgba(200,182,111,.24);}
 
+.hidden-entry,.hidden-entry:hover{color:var(--text-muted);opacity:.44;filter:grayscale(.65) saturate(.22);}
+.selected-entry.hidden-entry,.selected-entry.hidden-entry:hover{color:var(--text-soft);opacity:.78;filter:grayscale(.4) saturate(.45);}
+
 .table-head {
 	text-align: left;
 	font-size: 12px;
@@ -300,7 +303,7 @@ input:focus-visible {
 	padding: 12px 8px;
 }
 
-.selection-marquee{position:fixed;z-index:30;pointer-events:none;border-radius:10px;background:rgba(200,182,111,.14);box-shadow:inset 0 0 0 1px rgba(200,182,111,.42);}
+.selection-marquee{position:absolute;z-index:30;pointer-events:none;border-radius:10px;background:rgba(200,182,111,.14);box-shadow:inset 0 0 0 1px rgba(200,182,111,.42);}
 
 .entry-icon {
 	display: grid;

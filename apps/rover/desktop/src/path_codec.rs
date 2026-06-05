@@ -79,6 +79,9 @@ fn is_single_path_key(key: &str) -> bool {
             | "mountPoint"
             | "mount_point"
             | "destination"
+            | "root"
+            | "filePath"
+            | "file_path"
             | "trashPath"
             | "trash_path"
             | "originalPath"
@@ -87,7 +90,10 @@ fn is_single_path_key(key: &str) -> bool {
 }
 
 fn is_path_list_key(key: &str) -> bool {
-    matches!(key, "paths" | "sources" | "recentPaths" | "recent_paths")
+    matches!(
+        key,
+        "paths" | "sources" | "files" | "recentPaths" | "recent_paths"
+    )
 }
 
 fn percent_decode(input: &str) -> Option<String> {

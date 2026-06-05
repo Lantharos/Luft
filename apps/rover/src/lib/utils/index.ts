@@ -97,7 +97,12 @@ export function getPathSegments(path: string): { name: string; path: string }[] 
 // Check if path is image
 export function isImagePath(path: string): boolean {
 	const ext = getExtension(path);
-	return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico'].includes(ext);
+	return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'avif', 'heic', 'heif', 'tif', 'tiff'].includes(ext);
+}
+
+export function isPackagePath(path: string): boolean {
+	const ext = getExtension(path);
+	return ['appimage', 'deb', 'rpm', 'flatpak', 'snap'].includes(ext);
 }
 
 // Check if path is video
@@ -131,8 +136,9 @@ export function getFileIcon(entry: { is_dir: boolean; name: string; mime_type?: 
 	if (entry.is_dir) return 'folder';
 	
 	const ext = getExtension(entry.name);
+	const mime = entry.mime_type ?? '';
 	
-	if (isImagePath(entry.name)) return 'image';
+	if (isImagePath(entry.name) || mime.startsWith('image/')) return 'image';
 	
 	if (isVideoPath(entry.name)) return 'video';
 	
@@ -145,13 +151,26 @@ export function getFileIcon(entry: { is_dir: boolean; name: string; mime_type?: 
 	if (['xls', 'xlsx', 'ods', 'csv'].includes(ext)) return 'spreadsheet';
 	if (['ppt', 'pptx', 'odp'].includes(ext)) return 'presentation';
 	
-	if (isTextPath(entry.name)) return 'code';
+	if (isPackagePath(entry.name) || isPackageMime(mime)) return 'package';
 	
-	if (['appimage', 'deb', 'rpm', 'flatpak', 'snap'].includes(ext)) return 'package';
+	if (isTextPath(entry.name)) return 'code';
 	
 	if (['exe', 'msi', 'run', 'bin'].includes(ext)) return 'executable';
 	
 	return 'file';
+}
+
+function isPackageMime(mime: string): boolean {
+	return [
+		'application/vnd.appimage',
+		'application/x-appimage',
+		'application/x-iso9660-appimage',
+		'application/vnd.debian.binary-package',
+		'application/x-debian-package',
+		'application/x-rpm',
+		'application/vnd.flatpak',
+		'application/vnd.snap'
+	].includes(mime);
 }
 
 // Debounce function

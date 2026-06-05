@@ -2,6 +2,8 @@
 	import { tick } from 'svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { SortBy, ViewMode } from '$lib/types';
+	import { projectSummary } from '$lib/vcs/format';
+	import type { VcsProject } from '$lib/vcs/types';
 
 	interface PathSegment {
 		name: string;
@@ -20,6 +22,7 @@
 		sortBy: SortBy;
 		sortAsc: boolean;
 		showHidden: boolean;
+		vcsProject?: VcsProject | null;
 		chooserMode?: boolean;
 		onBack: () => void;
 		onForward: () => void;
@@ -33,6 +36,7 @@
 		onToggleHidden: () => void;
 		onSort: (sort: SortBy) => void;
 		onViewMode: (mode: ViewMode) => void;
+		onOpenVcs?: () => void;
 	}
 
 	let {
@@ -47,6 +51,7 @@
 		sortBy,
 		sortAsc,
 		showHidden,
+		vcsProject = null,
 		chooserMode = false,
 		onBack,
 		onForward,
@@ -59,7 +64,8 @@
 		onTrash,
 		onToggleHidden,
 		onSort,
-		onViewMode
+		onViewMode,
+		onOpenVcs
 	}: Props = $props();
 
 	let showSortMenu = $state(false);
@@ -208,18 +214,25 @@
 				<button class="tool-button" type="button" aria-label="Move to trash" disabled={selectedCount === 0} onclick={onTrash}>
 					<Icon name="trash-2" size={16} />
 				</button>
+				<button
+					class={['tool-button', showHidden ? 'bg-[var(--sidebar-active)] text-[var(--text)]' : '']}
+					type="button"
+					aria-pressed={showHidden}
+					aria-label={showHidden ? 'Hide hidden files' : 'Show hidden files'}
+					onclick={onToggleHidden}
+				>
+					<Icon name={showHidden ? 'eye' : 'eye-off'} size={16} />
+				</button>
 			{/if}
 		</div>
 
 		<div class="flex shrink-0 items-center gap-1">
-			<button
-				class={['tool-button', showHidden ? 'bg-[var(--sidebar-active)] text-[var(--text)]' : '']}
-				type="button"
-				aria-label={showHidden ? 'Hide hidden files' : 'Show hidden files'}
-				onclick={onToggleHidden}
-			>
-				<Icon name={showHidden ? 'eye' : 'eye-off'} size={16} />
-			</button>
+			{#if vcsProject && onOpenVcs}
+				<button class="command-button max-w-[280px]" type="button" onclick={onOpenVcs}>
+					<Icon name="code" size={16} />
+					<span class="truncate">{projectSummary(vcsProject)}</span>
+				</button>
+			{/if}
 
 			<div class="relative">
 				<button

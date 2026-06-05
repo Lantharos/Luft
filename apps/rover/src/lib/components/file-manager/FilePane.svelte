@@ -2,9 +2,19 @@
 	import EntryIcon from '$lib/components/file-manager/EntryIcon.svelte';
 	import InlineNameField from '$lib/components/file-manager/InlineNameField.svelte';
 	import TrashPane from '$lib/components/file-manager/TrashPane.svelte';
+	import VcsBadge from '$lib/components/file-manager/VcsBadge.svelte';
+	import {
+		contentPoint,
+		elementContentRect,
+		normalizeSelectionBox,
+		rectsIntersect,
+		selectionBoxStyle,
+		type SelectionBox
+	} from '$lib/file-manager/marquee';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { DriveInfo, FavoriteItem, FileEntry, InlineDraft, SidebarView, TrashItem, TrashLocation, ViewMode } from '$lib/types';
 	import { formatBytes, formatDate, getFileIcon } from '$lib/utils';
+	import type { VcsFileStatus } from '$lib/vcs/types';
 
 	interface Props {
 		currentView: SidebarView;
@@ -24,6 +34,7 @@
 		isDragging: boolean;
 		canDrag?: boolean;
 		allowSelectedDoubleClick?: boolean;
+		entryVcsStatus?: (entry: FileEntry) => VcsFileStatus | null;
 		onSelectEntry: (entry: FileEntry, event: MouseEvent) => void;
 		onOpenEntry: (entry: FileEntry) => void;
 		onMiddleClick: (entry: FileEntry, event: MouseEvent) => void;
@@ -63,6 +74,7 @@
 		isDragging,
 		canDrag = true,
 		allowSelectedDoubleClick = false,
+		entryVcsStatus = () => null,
 		onSelectEntry,
 		onOpenEntry,
 		onMiddleClick,
@@ -85,7 +97,6 @@
 	}: Props = $props();
 
 	type FileIcon = 'folder' | 'file' | 'image' | 'video' | 'music' | 'archive' | 'code' | 'file-text' | 'package';
-	type SelectionBox = { pointerId: number; startX: number; startY: number; currentX: number; currentY: number };
 
 	let paneElement = $state<HTMLElement>();
 	let selectionBox = $state<SelectionBox | null>(null);
@@ -109,6 +120,10 @@
 		return draft?.mode === 'rename' && draft.targetPath === entry.path;
 	}
 
+	function vcsStatus(entry: FileEntry) {
+		return entryVcsStatus(entry);
+	}
+
 	function driveUsage(drive: DriveInfo) {
 		if (drive.total_space === 0) return 0;
 		return Math.min(100, Math.round((drive.used_space / drive.total_space) * 100));
@@ -122,35 +137,30 @@
 		];
 	}
 
+	function entryState(entry: FileEntry) {
+		return [...itemState(entry.path), entry.is_hidden ? 'hidden-entry' : ''];
+	}
+
 	function itemDelay(index: number) {
 		return `${Math.min(index * 18, 140)}ms`;
 	}
 
-	function normalizedBox(box: SelectionBox) {
-		const left = Math.min(box.startX, box.currentX);
-		const top = Math.min(box.startY, box.currentY);
-		const right = Math.max(box.startX, box.currentX);
-		const bottom = Math.max(box.startY, box.currentY);
-		return { left, top, right, bottom, width: right - left, height: bottom - top };
-	}
-
-	function selectionStyle(box: SelectionBox) {
-		const rect = normalizedBox(box);
-		return `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px`;
-	}
-
-	function intersects(a: DOMRect, b: ReturnType<typeof normalizedBox>) {
-		return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-	}
-
 	function updateMarqueeSelection(box: SelectionBox) {
-		const rect = normalizedBox(box);
+		const rect = normalizeSelectionBox(box);
 		const nextSelection = new Set(selectionBase);
 		paneElement?.querySelectorAll<HTMLElement>('[data-entry-path]').forEach((element) => {
 			const path = element.dataset.entryPath;
-			if (path && intersects(element.getBoundingClientRect(), rect)) nextSelection.add(path);
+			const elementRect = elementContentRect(paneElement, element);
+			if (path && elementRect && rectsIntersect(elementRect, rect)) nextSelection.add(path);
 		});
 		onSelectRange([...nextSelection]);
+	}
+
+	function refreshMarqueeAfterScroll() {
+		if (!selectionBox) return;
+		const point = contentPoint(paneElement, selectionBox.lastClientX, selectionBox.lastClientY);
+		selectionBox = { ...selectionBox, currentX: point.x, currentY: point.y };
+		updateMarqueeSelection(selectionBox);
 	}
 
 	function startMarqueeSelection(event: PointerEvent) {
@@ -158,12 +168,15 @@
 		const target = event.target instanceof Element ? event.target : null;
 		if (target?.closest('button, input, [data-no-marquee]')) return;
 		selectionBase = event.ctrlKey || event.metaKey ? new Set(selectedPaths) : new Set();
+		const point = contentPoint(paneElement, event.clientX, event.clientY);
 		selectionBox = {
 			pointerId: event.pointerId,
-			startX: event.clientX,
-			startY: event.clientY,
-			currentX: event.clientX,
-			currentY: event.clientY
+			startX: point.x,
+			startY: point.y,
+			currentX: point.x,
+			currentY: point.y,
+			lastClientX: event.clientX,
+			lastClientY: event.clientY
 		};
 		onSelectRange([...selectionBase]);
 		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
@@ -172,13 +185,27 @@
 
 	function moveMarqueeSelection(event: PointerEvent) {
 		if (!selectionBox || selectionBox.pointerId !== event.pointerId) return;
-		selectionBox = { ...selectionBox, currentX: event.clientX, currentY: event.clientY };
+		const point = contentPoint(paneElement, event.clientX, event.clientY);
+		selectionBox = {
+			...selectionBox,
+			currentX: point.x,
+			currentY: point.y,
+			lastClientX: event.clientX,
+			lastClientY: event.clientY
+		};
 		updateMarqueeSelection(selectionBox);
 	}
 
 	function endMarqueeSelection(event: PointerEvent) {
 		if (!selectionBox || selectionBox.pointerId !== event.pointerId) return;
-		selectionBox = { ...selectionBox, currentX: event.clientX, currentY: event.clientY };
+		const point = contentPoint(paneElement, event.clientX, event.clientY);
+		selectionBox = {
+			...selectionBox,
+			currentX: point.x,
+			currentY: point.y,
+			lastClientX: event.clientX,
+			lastClientY: event.clientY
+		};
 		updateMarqueeSelection(selectionBox);
 		(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
 		selectionBox = null;
@@ -194,12 +221,13 @@
 	onpointermove={moveMarqueeSelection}
 	onpointerup={endMarqueeSelection}
 	onpointercancel={endMarqueeSelection}
+	onscroll={refreshMarqueeAfterScroll}
 	oncontextmenu={(event) => onContextMenu(event)}
 	ondragover={(event) => onDragOver(event)}
 	ondrop={(event) => onDrop(event, currentPath)}
 >
 	{#if selectionBox}
-		<div class="selection-marquee" style={selectionStyle(selectionBox)}></div>
+		<div class="selection-marquee" style={selectionBoxStyle(selectionBox)}></div>
 	{/if}
 
 	{#if isLoading}
@@ -285,8 +313,9 @@
 				</div>
 			{/if}
 			{#each entries as entry, index (entry.path)}
+				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
-					<div class={['grid-tile', ...itemState(entry.path)]} style:animation-delay={itemDelay(index)}>
+					<div class={['grid-tile', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
 						<EntryIcon name={entryIcon(entry)} density="grid" thumbnail={thumbnailFor(entry)} />
 						<InlineNameField
 							class="inline-name-field--grid"
@@ -299,7 +328,7 @@
 					</div>
 				{:else}
 					<button
-						class={['grid-tile', ...itemState(entry.path)]}
+						class={['grid-tile', 'relative', ...entryState(entry)]}
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
@@ -315,6 +344,7 @@
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
 					>
 						<EntryIcon name={entryIcon(entry)} density="grid" thumbnail={thumbnailFor(entry)} />
+						<VcsBadge {status} density="grid" />
 						<span class="grid-name">{entry.name}</span>
 					</button>
 				{/if}
@@ -346,8 +376,9 @@
 				</div>
 			{/if}
 			{#each entries as entry, index (entry.path)}
+				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
-					<div class={['table-row', ...itemState(entry.path)]} style:animation-delay={itemDelay(index)}>
+					<div class={['table-row', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
 						<span class="flex min-w-0 items-center gap-3">
 							<EntryIcon name={entryIcon(entry)} thumbnail={thumbnailFor(entry)} />
 							<InlineNameField
@@ -364,7 +395,7 @@
 					</div>
 				{:else}
 					<button
-						class={['table-row', ...itemState(entry.path)]}
+						class={['table-row', ...entryState(entry)]}
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
@@ -382,6 +413,7 @@
 						<span class="flex min-w-0 items-center gap-3">
 							<EntryIcon name={entryIcon(entry)} thumbnail={thumbnailFor(entry)} />
 							<span class="truncate">{entry.name}</span>
+							<VcsBadge {status} />
 						</span>
 						<span class="text-[var(--text-muted)]">{entry.is_dir ? '-' : formatBytes(entry.size)}</span>
 						<span class="text-[var(--text-muted)]">{entry.modified ? formatDate(entry.modified) : '-'}</span>
@@ -405,8 +437,9 @@
 				</div>
 			{/if}
 			{#each entries as entry, index (entry.path)}
+				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
-					<div class={['file-row', ...itemState(entry.path)]} style:animation-delay={itemDelay(index)}>
+					<div class={['file-row', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
 						<EntryIcon name={entryIcon(entry)} thumbnail={thumbnailFor(entry)} />
 						<InlineNameField
 							value={draft?.value ?? ''}
@@ -421,7 +454,7 @@
 					</div>
 				{:else}
 					<button
-						class={['file-row', ...itemState(entry.path)]}
+						class={['file-row', ...entryState(entry)]}
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
@@ -438,6 +471,7 @@
 					>
 						<EntryIcon name={entryIcon(entry)} thumbnail={thumbnailFor(entry)} />
 						<span class="min-w-0 flex-1 truncate text-[14px]">{entry.name}{entry.is_dir ? '/' : ''}</span>
+						<VcsBadge {status} />
 						<span class="w-[96px] shrink-0 text-right text-[12px] text-[var(--text-muted)]">
 							{entry.is_dir ? '' : formatBytes(entry.size)}
 						</span>

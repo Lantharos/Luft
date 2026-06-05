@@ -9,6 +9,7 @@ mod portal_backend;
 mod settings;
 mod system_status;
 mod trash_manager;
+mod vcs;
 
 use std::{path::PathBuf, sync::Arc};
 
@@ -35,6 +36,7 @@ struct RoverState {
     queue: operations_queue::OperationsQueue,
     settings: Arc<RwLock<settings::Settings>>,
     chooser: Arc<chooser::ChooserState>,
+    vcs_jobs: vcs::VcsJobs,
 }
 
 impl RoverState {
@@ -45,6 +47,7 @@ impl RoverState {
             chooser: Arc::new(chooser::ChooserState::new(
                 chooser::ChooserSession::from_environment(),
             )),
+            vcs_jobs: vcs::VcsJobs::default(),
         }
     }
 
@@ -319,6 +322,59 @@ fn register_commands(mut window: CefWindow, state: RoverState) -> CefWindow {
 
     command!("get_background_effect_status", move |_| {
         json_ok(system_status::get_background_effect_status())
+    });
+
+    let context = state.clone();
+    command!("vcs_start_status", move |command| {
+        let vcs::VcsParams { path, .. } = params(&command)?;
+        json_ok(context.vcs_jobs.start_status(path.unwrap_or_default()))
+    });
+
+    let context = state.clone();
+    command!("vcs_status_result", move |command| {
+        let vcs::VcsParams { job_id, .. } = params(&command)?;
+        json_result(context.vcs_jobs.status_result(job_id.unwrap_or_default()))
+    });
+
+    command!("vcs_detect", move |command| {
+        let vcs::VcsParams { path, .. } = params(&command)?;
+        json_result(vcs::detect(path.unwrap_or_default()))
+    });
+
+    command!("vcs_project_status", move |command| {
+        let vcs::VcsParams { root, .. } = params(&command)?;
+        json_result(vcs::get_project_status(root.unwrap_or_default()))
+    });
+
+    command!("vcs_file_statuses", move |command| {
+        let vcs::VcsParams { root, .. } = params(&command)?;
+        json_result(vcs::get_file_statuses(root.unwrap_or_default()))
+    });
+
+    command!("vcs_diff", move |command| {
+        let vcs::VcsParams {
+            root, file_path, ..
+        } = params(&command)?;
+        json_result(vcs::get_diff(root.unwrap_or_default(), file_path))
+    });
+
+    command!("vcs_save", move |command| {
+        let vcs::VcsParams {
+            root,
+            message,
+            files,
+            ..
+        } = params(&command)?;
+        json_result(vcs::save(
+            root.unwrap_or_default(),
+            message.unwrap_or_default(),
+            files,
+        ))
+    });
+
+    command!("vcs_sync", move |command| {
+        let vcs::VcsParams { root, .. } = params(&command)?;
+        json_result(vcs::sync(root.unwrap_or_default()))
     });
 
     let context = state.clone();

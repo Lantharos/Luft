@@ -12,6 +12,7 @@ import type {
 	BackgroundEffectStatus,
 	ChooserConfig
 } from './types';
+import type { VcsFileStatus, VcsJobTicket, VcsJobUpdate, VcsProject } from './vcs/types';
 
 async function invoke<T>(name: string, params?: Record<string, unknown>): Promise<T> {
 	const bridge = await waitForBridge();
@@ -208,4 +209,36 @@ export async function acceptChooser(paths: string[]): Promise<void> {
 
 export async function cancelChooser(): Promise<void> {
 	return invoke('cancel_chooser');
+}
+
+export async function detectVcs(path: string): Promise<VcsProject | null> {
+	return invoke('vcs_detect', { path: filePath(path) });
+}
+
+export async function startVcsStatus(path: string): Promise<VcsJobTicket> {
+	return invoke('vcs_start_status', { path: filePath(path) });
+}
+
+export async function getVcsStatusResult(jobId: string): Promise<VcsJobUpdate> {
+	return invoke('vcs_status_result', { jobId });
+}
+
+export async function getVcsProjectStatus(root: string): Promise<VcsProject> {
+	return invoke('vcs_project_status', { root: filePath(root) });
+}
+
+export async function getVcsFileStatuses(root: string): Promise<Record<string, VcsFileStatus>> {
+	return invoke('vcs_file_statuses', { root: filePath(root) });
+}
+
+export async function getVcsDiff(root: string, targetPath?: string): Promise<string> {
+	return invoke('vcs_diff', { root: filePath(root), filePath: targetPath ? filePath(targetPath) : null });
+}
+
+export async function saveVcs(root: string, message: string, files?: string[]): Promise<void> {
+	return invoke('vcs_save', { root: filePath(root), message, files: files ? filePaths(files) : null });
+}
+
+export async function syncVcs(root: string): Promise<void> {
+	return invoke('vcs_sync', { root: filePath(root) });
 }

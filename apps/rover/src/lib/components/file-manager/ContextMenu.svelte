@@ -2,6 +2,8 @@
 	import { tick } from 'svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { FileEntry } from '$lib/types';
+	import { primaryActionLabel } from '$lib/vcs/format';
+	import type { VcsFileStatus, VcsProject } from '$lib/vcs/types';
 
 	interface MenuState {
 		x: number;
@@ -14,6 +16,8 @@
 		hasClipboard: boolean;
 		isFavorite: boolean;
 		isPinned: boolean;
+		vcsProject?: VcsProject | null;
+		targetVcsStatus?: VcsFileStatus | null;
 		onOpen: (entry: FileEntry) => void;
 		onOpenInTab: (entry: FileEntry) => void;
 		onCut: () => void;
@@ -22,6 +26,9 @@
 		onTrash: () => void;
 		onToggleFavorite: (entry: FileEntry) => void;
 		onTogglePinned: (entry: FileEntry) => void;
+		onViewVcsChanges?: (entry?: FileEntry) => void;
+		onSaveVcs?: (entry?: FileEntry) => void;
+		onSyncVcs?: () => void;
 		onCreate: (type: 'file' | 'folder') => void;
 		onPaste: () => void;
 		onClose: () => void;
@@ -32,6 +39,8 @@
 		hasClipboard,
 		isFavorite,
 		isPinned,
+		vcsProject = null,
+		targetVcsStatus = null,
 		onOpen,
 		onOpenInTab,
 		onCut,
@@ -40,6 +49,9 @@
 		onTrash,
 		onToggleFavorite,
 		onTogglePinned,
+		onViewVcsChanges,
+		onSaveVcs,
+		onSyncVcs,
 		onCreate,
 		onPaste,
 		onClose
@@ -89,6 +101,8 @@
 		placementKey;
 		void placeMenu();
 	});
+
+	let primaryAction = $derived(primaryActionLabel(vcsProject));
 </script>
 
 <svelte:window onresize={placeMenu} />
@@ -112,6 +126,18 @@
 			<Icon name="external-link" size={16} />
 			<span>Open</span>
 		</button>
+		{#if vcsProject && onViewVcsChanges && (targetVcsStatus || menu.target.is_dir)}
+			<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onViewVcsChanges(menu.target!))}>
+				<Icon name="code" size={16} />
+				<span>{menu.target.is_dir ? 'View project changes' : 'View changes'}</span>
+			</button>
+		{/if}
+		{#if vcsProject && onSaveVcs && (targetVcsStatus || menu.target.is_dir)}
+			<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onSaveVcs(menu.target!))}>
+				<Icon name="check" size={16} />
+				<span>{menu.target.is_dir ? `${primaryAction} changes` : `${primaryAction} this file`}</span>
+			</button>
+		{/if}
 		{#if menu.target.is_dir}
 			<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onOpenInTab(menu.target!))}>
 				<Icon name="plus" size={16} />
@@ -158,5 +184,24 @@
 			<Icon name="clipboard" size={16} />
 			<span>Paste</span>
 		</button>
+		{#if vcsProject && onViewVcsChanges}
+			<div class="my-1 h-px bg-[var(--hairline)]"></div>
+			<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onViewVcsChanges())}>
+				<Icon name="code" size={16} />
+				<span>View project changes</span>
+			</button>
+			{#if onSaveVcs}
+				<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onSaveVcs())}>
+					<Icon name="check" size={16} />
+					<span>{primaryAction} changes</span>
+				</button>
+			{/if}
+			{#if onSyncVcs}
+				<button class="menu-item" type="button" role="menuitem" onclick={() => run(onSyncVcs)}>
+					<Icon name="refresh" size={16} />
+					<span>Sync project</span>
+				</button>
+			{/if}
+		{/if}
 	{/if}
 </div>

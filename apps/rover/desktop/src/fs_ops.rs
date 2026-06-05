@@ -1,5 +1,6 @@
 use crate::drives;
 use crate::file_actions::{os, run_pkexec};
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs;
@@ -8,7 +9,7 @@ use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
-const MAX_THUMBNAIL_BYTES: u64 = 8 * 1024 * 1024;
+const MAX_THUMBNAIL_BYTES: u64 = 24 * 1024 * 1024;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FileEntry {
@@ -85,6 +86,8 @@ fn detect_image_mime(path: &Path) -> Option<String> {
         "image/gif"
     } else if bytes.starts_with(b"BM") {
         "image/bmp"
+    } else if bytes.len() >= 4 && bytes.starts_with(&[0, 0, 1, 0]) {
+        "image/x-icon"
     } else if bytes.len() >= 12 && bytes.starts_with(b"RIFF") && &bytes[8..12] == b"WEBP" {
         "image/webp"
     } else if String::from_utf8_lossy(&bytes[..bytes.len().min(512)])
@@ -318,14 +321,19 @@ pub fn get_thumbnail(path: String) -> Result<Option<String>, String> {
         return Ok(None);
     }
 
-    if detect_image_mime(&path_buf).is_none() {
+    let Some(mime) = detect_image_mime(&path_buf) else {
         return Ok(None);
-    }
+    };
 
     let metadata = fs::metadata(&path_buf).map_err(|e| e.to_string())?;
     if metadata.len() > MAX_THUMBNAIL_BYTES {
-        return Ok(None);
+        return Ok(Some(path));
     }
 
-    Ok(Some(path))
+    let bytes = fs::read(&path_buf).map_err(|e| e.to_string())?;
+    Ok(Some(format!(
+        "data:{};base64,{}",
+        mime,
+        BASE64.encode(bytes)
+    )))
 }

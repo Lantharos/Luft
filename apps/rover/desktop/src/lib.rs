@@ -2,26 +2,31 @@ mod chooser;
 mod drives;
 mod file_actions;
 mod fs_ops;
+mod launch_args;
 mod operations_queue;
 mod path_codec;
 mod platform;
 mod portal_backend;
 mod settings;
+mod state;
 mod system_status;
 mod trash_manager;
 mod vcs;
+mod web_entry;
 
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 
+use fenestra_cef::SingleInstancePolicy;
 use fenestra_cef::{
     BridgeCommand, BridgeCommandDescriptor, BridgeError, BridgeResponse, BridgeResult, CefWindow,
     CefWindowControlAction, RuntimeConfig, RuntimeMode, WebViewSecurity, WindowRegion,
     WindowRegionRect,
 };
-use parking_lot::RwLock;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use state::RoverState;
 
 const APP_NAME: &str = "Rover";
+const APP_ID: &str = "dev.kristof.rover";
 const WINDOW_WIDTH: u32 = 1200;
 const WINDOW_HEIGHT: u32 = 800;
 const MIN_WINDOW_WIDTH: u32 = 800;
@@ -31,42 +36,20 @@ const APP_HEADER_HEIGHT: i32 = 52;
 const SIDEBAR_STATIC_CONTROLS_HEIGHT: i32 = 520;
 const WINDOW_RADIUS: i32 = 16;
 
-#[derive(Clone)]
-struct RoverState {
-    queue: operations_queue::OperationsQueue,
-    settings: Arc<RwLock<settings::Settings>>,
-    chooser: Arc<chooser::ChooserState>,
-    vcs_jobs: vcs::VcsJobs,
-}
-
-impl RoverState {
-    fn new() -> Self {
-        Self {
-            queue: operations_queue::OperationsQueue::new(),
-            settings: Arc::new(RwLock::new(settings::Settings::load_or_default())),
-            chooser: Arc::new(chooser::ChooserState::new(
-                chooser::ChooserSession::from_environment(),
-            )),
-            vcs_jobs: vcs::VcsJobs::default(),
-        }
-    }
-
-    fn title(&self) -> String {
-        let config = self.chooser.config();
-        if config.active && !config.title.is_empty() {
-            config.title
-        } else {
-            APP_NAME.to_string()
-        }
-    }
-}
-
 pub fn run(args: &[String]) -> Result<(), String> {
-    let state = RoverState::new();
+    let state = RoverState::new(args);
     let window = build_window(args, &state);
-    let process = window
-        .launch_or_install()
-        .map_err(|error| error.to_string())?;
+    let process = match window.launch_or_install() {
+        Ok(process) => process,
+        Err(error)
+            if error
+                .to_string()
+                .contains("another instance is already running") =>
+        {
+            return Ok(());
+        }
+        Err(error) => return Err(error.to_string()),
+    };
     let _ = process.wait();
     Ok(())
 }
@@ -85,6 +68,7 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
     };
     let mut window = CefWindow::new()
         .title(state.title())
+        .app_id(APP_ID)
         .size(WINDOW_WIDTH, WINDOW_HEIGHT)
         .min_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         .frameless()
@@ -125,6 +109,12 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
             WindowRegionRect::new(-44, 12, 28, 28),
         );
 
+    if !state.chooser.config().active {
+        window = window
+            .single_instance_id(APP_ID)
+            .single_instance(SingleInstancePolicy::FocusExisting);
+    }
+
     if args.iter().any(|arg| arg == "--dev") {
         window = window
             .security(WebViewSecurity {
@@ -132,13 +122,11 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
                 allowed_origins: Vec::new(),
                 allowed_bridge_permissions: Vec::new(),
             })
-            .dev_url("http://localhost:5173?fenestra=1")
+            .dev_url("http://localhost:5173?fenestra=1#/")
             .dev_command("bun run dev");
     } else {
-        window = window.entry(format!(
-            "{}?fenestra=1",
-            root_dir.join("build/index.html").display()
-        ));
+        let entry = web_entry::resolve(&root_dir);
+        window = window.entry(format!("{}?fenestra=1#/", entry.display()));
     }
 
     register_commands(window, state.clone())
@@ -209,6 +197,11 @@ fn register_commands(mut window: CefWindow, state: RoverState) -> CefWindow {
     command!("get_user_dirs", move |_| json_result(
         fs_ops::get_user_dirs()
     ));
+
+    let context = state.clone();
+    command!("get_launch_paths", move |_| {
+        json_ok(context.launch_paths.clone())
+    });
 
     command!("read_text_file", move |command| {
         let input: ReadTextParams = params(&command)?;

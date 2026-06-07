@@ -14,6 +14,7 @@
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
+	import type { SingleInstanceActivation } from '$lib/file-manager/open-targets';
 	import { isDesktopRuntime } from '$lib/runtime';
 	import { activeTab, clipboard, currentView, drives, selection, settings, tabs, userDirs } from '$lib/stores';
 	import type { ChooserConfig, FavoriteItem, FileEntry, PinnedFolder, SidebarView, TrashLocation } from '$lib/types';
@@ -26,9 +27,26 @@
 	let chooserSaveName = $state('');
 
 	onMount(() => {
+		let disposed = false;
+		let removeSingleInstanceListener: (() => void) | null = null;
 		void initialize();
 		document.addEventListener('click', manager.closeFloatingUi);
-		return () => document.removeEventListener('click', manager.closeFloatingUi);
+		if (isDesktopRuntime()) {
+			void api
+				.listenBridgeEvent<SingleInstanceActivation>('singleInstance.activate', (activation) => {
+					void manager.openSingleInstanceActivation(activation);
+				})
+				.then((cleanup) => {
+					if (disposed) cleanup();
+					else removeSingleInstanceListener = cleanup;
+				})
+				.catch(() => {});
+		}
+		return () => {
+			disposed = true;
+			document.removeEventListener('click', manager.closeFloatingUi);
+			removeSingleInstanceListener?.();
+		};
 	});
 
 	let selectedCount = $derived($selection.size);
@@ -81,6 +99,7 @@
 	});
 
 	async function initialize() {
+		let launchPaths: string[] = [];
 		if (isDesktopRuntime()) {
 			try {
 				const config = await api.getChooserConfig();
@@ -91,9 +110,15 @@
 			} catch {
 				chooser = null;
 			}
+			try {
+				launchPaths = await api.getLaunchPaths();
+			} catch {
+				launchPaths = [];
+			}
 		}
 		await manager.init();
 		if (chooser?.current_folder) await manager.navigate(chooser.current_folder);
+		else if (launchPaths.length > 0) await manager.openLaunchPaths(launchPaths);
 	}
 
 	function draggedSidebarEntries() {

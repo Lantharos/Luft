@@ -40,6 +40,22 @@ bun run desktop:build
 
 Sidebar translucency is configured through Fenestra window regions. Rover keeps the main content opaque and uses compositor-backed blur only for the sidebar surface where available.
 
+## Install
+
+Rover has a `Fenestra.toml`, so Fenestra can detect the app id, icon, web build, and source launch command from the repo root:
+
+```bash
+fenestra install
+```
+
+Update the installed desktop entry and staged web/icon assets from the repo root with:
+
+```bash
+fenestra update
+```
+
+The installed desktop entry accepts paths. Opening a folder with Rover opens that folder; opening a file opens its parent folder and selects the file. If Rover is already running, the path opens in a new tab in the existing window and Fenestra focuses that window.
+
 ## File Picker Portal
 
 Rover includes an xdg-desktop-portal FileChooser backend. The local installer writes the portal descriptor and D-Bus activation file for the current user.

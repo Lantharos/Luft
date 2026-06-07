@@ -1,0 +1,16 @@
+[app]
+id = "dev.kristof.rover"
+name = "Rover"
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["inode/directory"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"

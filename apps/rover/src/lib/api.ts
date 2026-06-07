@@ -19,6 +19,15 @@ async function invoke<T>(name: string, params?: Record<string, unknown>): Promis
 	return bridge.invoke<T>(name, params ?? {});
 }
 
+export async function listenBridgeEvent<T>(name: string, callback: (payload: T) => void): Promise<() => void> {
+	const bridge = await waitForBridge();
+	if (bridge.listen) return bridge.listen(name, callback);
+	const eventName = `fenestra:${name}`;
+	const listener = (event: Event) => callback((event as CustomEvent<T>).detail);
+	window.addEventListener(eventName, listener);
+	return () => window.removeEventListener(eventName, listener);
+}
+
 function waitForBridge(timeoutMs = 2500): Promise<FenestraBridge> {
 	if (window.fenestra?.bridge) return Promise.resolve(window.fenestra.bridge);
 	return new Promise((resolve, reject) => {
@@ -109,6 +118,10 @@ export async function getHomeDir(): Promise<string> {
 
 export async function getUserDirs(): Promise<UserDirs> {
 	return invoke('get_user_dirs');
+}
+
+export async function getLaunchPaths(): Promise<string[]> {
+	return invoke('get_launch_paths');
 }
 
 export async function readTextFile(path: string, maxBytes?: number): Promise<string> {

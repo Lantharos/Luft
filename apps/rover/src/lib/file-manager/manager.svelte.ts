@@ -17,6 +17,7 @@ import {
 	userDirs
 } from '$lib/stores';
 import { sortedEntries, visibleEntries } from '$lib/file-manager/entries';
+import { openExternalTargets, pathsFromActivation, type SingleInstanceActivation } from '$lib/file-manager/open-targets';
 import { previewDrives, previewEntries, previewThumbnails, previewTrash, previewUserDirs } from '$lib/file-manager/preview';
 import { handleShortcut, isTextInputTarget } from '$lib/file-manager/shortcuts';
 import { thumbnailCandidates } from '$lib/file-manager/thumbnails';
@@ -222,6 +223,10 @@ export class FileManager {
 		tabs.addTab(nextPath, nextPath.split('/').filter(Boolean).at(-1) || 'Home');
 		await this.loadDirectory(nextPath);
 	};
+	openLaunchPaths = (paths: string[]) =>
+		openExternalTargets(paths, true, (folder, replaceActive) => (replaceActive ? this.navigate(folder) : this.openNewTab(folder)));
+	openSingleInstanceActivation = (activation: SingleInstanceActivation) =>
+		openExternalTargets(pathsFromActivation(activation), false, (folder) => this.openNewTab(folder));
 	closeTab = (id: string) => {
 		if (get(tabs).length <= 1) return void this.closeWindow();
 		const wasActive = get(activeTab)?.id === id;

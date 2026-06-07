@@ -2,6 +2,7 @@
 // for information about these interfaces
 declare global {
 	interface FenestraBridge {
+		listen?<T>(name: string, callback: (payload: T) => void): () => void;
 		invoke<T>(name: string, params?: Record<string, unknown>): Promise<T>;
 	}
 

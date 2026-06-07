@@ -422,16 +422,7 @@ input:focus-visible {
 	animation: item-enter 240ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
-@keyframes item-enter {
-	from {
-		opacity: 0;
-		transform: translateY(5px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
+@keyframes item-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
 .drive-tile {
 	padding: 14px;

@@ -28,7 +28,7 @@
 		draft: InlineDraft | null;
 		viewMode: ViewMode;
 		selectedPaths: Set<string>;
-		isLoading: boolean;
+		showLoadingSkeleton: boolean;
 		error: string | null;
 		dropTarget: string | null;
 		isDragging: boolean;
@@ -68,7 +68,7 @@
 		draft,
 		viewMode,
 		selectedPaths,
-		isLoading,
+		showLoadingSkeleton,
 		error,
 		dropTarget,
 		isDragging,
@@ -230,8 +230,8 @@
 		<div class="selection-marquee" style={selectionBoxStyle(selectionBox)}></div>
 	{/if}
 
-	{#if isLoading}
-		<div class="grid gap-2 pt-2">
+	{#if showLoadingSkeleton}
+		<div class="loading-skeleton grid gap-2 pt-2">
 			{#each Array.from({ length: 9 }) as _, index (index)}
 				<div class="h-11 rounded-full bg-[var(--surface-soft)]" style:opacity={0.36 + index * 0.04}></div>
 			{/each}
@@ -481,3 +481,14 @@
 		</div>
 	{/if}
 </section>
+
+<style>
+	.loading-skeleton {
+		animation: skeleton-enter 180ms cubic-bezier(0.2, 0, 0, 1) both;
+	}
+
+	@keyframes skeleton-enter {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+</style>

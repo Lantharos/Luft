@@ -404,7 +404,7 @@
 						draft={manager.inlineDraft}
 						viewMode={manager.viewMode}
 						selectedPaths={$selection}
-						isLoading={manager.isLoading}
+						showLoadingSkeleton={manager.showLoadingSkeleton}
 						error={manager.error}
 						dropTarget={manager.dropTarget}
 						isDragging={manager.isDragging}

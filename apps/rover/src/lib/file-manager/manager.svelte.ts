@@ -16,7 +16,9 @@ import {
 	tabs,
 	userDirs
 } from '$lib/stores';
+import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from '$lib/file-manager/drag-drop';
 import { sortedEntries, visibleEntries } from '$lib/file-manager/entries';
+import { DelayedLoading } from '$lib/file-manager/loading.svelte';
 import { openExternalTargets, pathsFromActivation, type SingleInstanceActivation } from '$lib/file-manager/open-targets';
 import { previewDrives, previewEntries, previewThumbnails, previewTrash, previewUserDirs } from '$lib/file-manager/preview';
 import { handleShortcut, isTextInputTarget } from '$lib/file-manager/shortcuts';
@@ -29,7 +31,7 @@ export class FileManager {
 	entries = $state<FileEntry[]>([]);
 	trashItems = $state<TrashItem[]>([]);
 	currentPath = $state('');
-	isLoading = $state(false);
+	loading = new DelayedLoading();
 	error = $state<string | null>(null);
 	searchQuery = $state('');
 	inlineDraft = $state<InlineDraft | null>(null);
@@ -44,14 +46,11 @@ export class FileManager {
 	thumbnails = $state<Record<string, string | null>>({});
 	lastMouseNavButton = 0;
 	lastMouseNavAt = 0;
-	get displayEntries() {
-		return visibleEntries(sortedEntries(this.entries, this.sortBy, this.sortAsc), this.searchQuery);
-	}
-	get pathSegments() {
-		return getPathSegments(this.currentPath);
-	}
+	get displayEntries() { return visibleEntries(sortedEntries(this.entries, this.sortBy, this.sortAsc), this.searchQuery); }
+	get isLoading() { return this.loading.active; }
+	get showLoadingSkeleton() { return this.loading.skeleton; }
+	get pathSegments() { return getPathSegments(this.currentPath); }
 	init = async () => {
-		this.isLoading = true;
 		if (!isDesktopRuntime()) return this.initPreview();
 		const settingsTask = settings.load();
 		const dirsTask = loadUserDirs();
@@ -73,6 +72,7 @@ export class FileManager {
 		this.loadPreviewDirectory(previewUserDirs.home);
 	};
 	loadPreviewDirectory(path: string) {
+		this.loading.cancel();
 		const entries = previewEntries(path);
 		this.entries = entries;
 		this.thumbnails = { ...this.thumbnails, ...previewThumbnails(entries) };
@@ -80,22 +80,13 @@ export class FileManager {
 		this.viewMode = viewModeForPath(path, get(settings), get(userDirs));
 		this.searchQuery = '';
 		this.inlineDraft = null;
-		this.isLoading = false;
 		selection.clear();
 		currentView.set('home');
 	}
-	closeFloatingUi = () => {
-		this.contextMenu = null;
-	};
-	minimize = async () => {
-		minimizeWindow();
-	};
-	toggleMaximize = async () => {
-		toggleMaximizeWindow();
-	};
-	closeWindow = async () => {
-		closeWindow();
-	};
+	closeFloatingUi = () => { this.contextMenu = null; };
+	minimize = async () => { minimizeWindow(); };
+	toggleMaximize = async () => { toggleMaximizeWindow(); };
+	closeWindow = async () => { closeWindow(); };
 	loadBackgroundEffectStatus = async () => {
 		try {
 			const status = await api.getBackgroundEffectStatus();
@@ -129,25 +120,28 @@ export class FileManager {
 			this.loadPreviewDirectory(path);
 			return;
 		}
-		this.isLoading = true;
+		const loading = this.loading.start();
 		this.error = null;
-		this.currentPath = path;
-		this.viewMode = viewModeForPath(path, get(settings), get(userDirs));
-		this.entries = [];
 		try {
 			const result = await api.listDirectory(path, get(settings).showHidden);
+			if (!this.loading.isCurrent(loading)) return;
+			this.currentPath = result.path;
+			this.viewMode = viewModeForPath(result.path, get(settings), get(userDirs));
 			this.entries = result.entries;
 			void this.loadThumbnails(result.entries);
 			this.searchQuery = '';
 			this.inlineDraft = null;
 			selection.clear();
 			currentView.set('home');
-			await this.rememberPath(path);
+			await this.rememberPath(result.path);
 		} catch (caught) {
+			if (!this.loading.isCurrent(loading)) return;
 			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.currentPath = path;
+			this.viewMode = viewModeForPath(path, get(settings), get(userDirs));
 			this.entries = [];
 		} finally {
-			this.isLoading = false;
+			this.loading.finish(loading);
 		}
 	};
 	loadThumbnails = async (entries: FileEntry[]) => {
@@ -167,21 +161,24 @@ export class FileManager {
 	};
 	loadTrash = async () => {
 		if (!isDesktopRuntime()) {
+			this.loading.cancel();
 			this.trashItems = previewTrash;
 			selection.clear();
 			return;
 		}
-		this.isLoading = true;
+		const loading = this.loading.start();
 		this.error = null;
 		try {
 			const result = await api.listTrash();
+			if (!this.loading.isCurrent(loading)) return;
 			this.trashItems = result.items;
 			selection.clear();
 		} catch (caught) {
+			if (!this.loading.isCurrent(loading)) return;
 			this.error = caught instanceof Error ? caught.message : String(caught);
 			this.trashItems = [];
 		} finally {
-			this.isLoading = false;
+			this.loading.finish(loading);
 		}
 	};
 	navigate = async (path: string) => {
@@ -282,13 +279,8 @@ export class FileManager {
 		}
 		selection.select(entry.path);
 	};
-	handleItemOpen = (entry: FileEntry) => {
-		if (entry.is_dir) this.navigate(entry.path);
-		else api.openWithDefault(entry.path);
-	};
-	handleMiddleClick = (entry: FileEntry, event: MouseEvent) => {
-		if (event.button === 1 && entry.is_dir) this.openNewTab(entry.path);
-	};
+	handleItemOpen = (entry: FileEntry) => { if (entry.is_dir) this.navigate(entry.path); else api.openWithDefault(entry.path); };
+	handleMiddleClick = (entry: FileEntry, event: MouseEvent) => { if (event.button === 1 && entry.is_dir) this.openNewTab(entry.path); };
 	handleContextMenu = (event: MouseEvent, entry?: FileEntry) => {
 		event.preventDefault();
 		event.stopPropagation();
@@ -299,8 +291,7 @@ export class FileManager {
 		if (!get(selection).has(entry.path)) selection.select(entry.path);
 		this.isDragging = true;
 		this.dragTarget = entry;
-		event.dataTransfer?.setData('text/plain', JSON.stringify(Array.from(get(selection))));
-		if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copyMove';
+		setFileDragData(event.dataTransfer, Array.from(get(selection)));
 	};
 	handleDragEnd = () => {
 		this.isDragging = false;
@@ -308,30 +299,35 @@ export class FileManager {
 		this.dropTarget = null;
 	};
 	handleDragOver = (event: DragEvent, entry?: FileEntry) => {
+		const hasDropPaths = this.isDragging || dataTransferHasPaths(event.dataTransfer);
+		if (!hasDropPaths) return;
+		const internalTargetSelected = this.isDragging && entry && get(selection).has(entry.path);
+		if (entry && (!entry.is_dir || internalTargetSelected)) return;
 		event.preventDefault();
-		if (!this.isDragging) return;
-		if (entry?.is_dir && !get(selection).has(entry.path)) {
+		if (entry?.is_dir) {
 			this.dropTarget = entry.path;
-			if (event.dataTransfer) event.dataTransfer.dropEffect = event.ctrlKey ? 'copy' : 'move';
+			if (event.dataTransfer) event.dataTransfer.dropEffect = this.isDragging ? (event.ctrlKey ? 'copy' : 'move') : 'copy';
 			return;
 		}
-		if (!entry) this.dropTarget = this.currentPath;
+		this.dropTarget = this.currentPath;
+		if (event.dataTransfer) event.dataTransfer.dropEffect = this.isDragging ? (event.ctrlKey ? 'copy' : 'move') : 'copy';
 	};
-	handleDragLeave = () => {
-		this.dropTarget = null;
-	};
+	handleDragLeave = () => { this.dropTarget = null; };
 	handleDrop = async (event: DragEvent, targetPath: string) => {
 		event.preventDefault();
-		if (!this.isDragging || !targetPath) return;
-		const sourcePaths = Array.from(get(selection));
+		if (!targetPath) return;
+		const internalDrop = this.isDragging;
+		const sourcePaths = internalDrop ? Array.from(get(selection)) : dataTransferPaths(event.dataTransfer);
+		if (sourcePaths.length === 0) return this.handleDragEnd();
+		const move = internalDrop ? !event.ctrlKey : event.shiftKey;
 		const droppingIntoSelf = sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
-		if (droppingIntoSelf || (!event.ctrlKey && targetPath === this.currentPath)) {
+		if (droppingIntoSelf || (internalDrop && move && targetPath === this.currentPath)) {
 			this.handleDragEnd();
 			return;
 		}
 		try {
-			if (event.ctrlKey) await api.copyItems(sourcePaths, targetPath);
-			else await api.moveItems(sourcePaths, targetPath);
+			if (move) await api.moveItems(sourcePaths, targetPath);
+			else await api.copyItems(sourcePaths, targetPath);
 			await this.loadDirectory(this.currentPath);
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);

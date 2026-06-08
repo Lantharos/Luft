@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::path_codec;
@@ -275,6 +275,19 @@ pub fn get_drive_info(mount_point: String) -> Result<DriveInfo, String> {
         .into_iter()
         .find(|d| d.mount_point == mount_point)
         .ok_or_else(|| format!("Drive not found: {}", mount_point))
+}
+
+pub(crate) fn drive_for_path(path: &Path) -> Option<DriveInfo> {
+    let path = path.to_string_lossy();
+    let mut drives = list_drives().ok()?.drives;
+    drives.sort_by(|a, b| b.mount_point.len().cmp(&a.mount_point.len()));
+
+    drives.into_iter().find(|drive| {
+        if drive.mount_point == "/" {
+            return path.starts_with('/');
+        }
+        path == drive.mount_point || path.starts_with(&format!("{}/", drive.mount_point))
+    })
 }
 
 pub fn eject_drive(mount_point: String) -> Result<(), String> {

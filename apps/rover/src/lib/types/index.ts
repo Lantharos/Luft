@@ -87,13 +87,17 @@ export interface TrashContents {
 // Operations queue types
 export type OperationType = 'Copy' | 'Move' | 'Delete' | 'Trash';
 export type OperationStatus = 'Pending' | 'InProgress' | 'Paused' | 'Completed' | 'Failed' | 'Cancelled';
+export type OperationPhase = 'Preparing' | 'Copying' | 'Moving' | 'Deleting' | 'Finalizing' | 'Completed' | 'SafeToEject';
 
 export interface Operation {
 	id: string;
 	op_type: OperationType;
 	status: OperationStatus;
+	phase: OperationPhase;
 	sources: string[];
 	destination: string | null;
+	destination_label: string | null;
+	destination_is_removable: boolean;
 	progress: number;
 	current_file: string | null;
 	bytes_processed: number;

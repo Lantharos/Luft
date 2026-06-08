@@ -1,7 +1,9 @@
-use crate::operations_queue::{OperationStatus, OperationType, OperationsQueue};
+use crate::drives;
+use crate::operations_queue::{OperationPhase, OperationStatus, OperationType, OperationsQueue};
 use std::ffi::OsString;
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::io::{Read, Write};
+use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::thread;
@@ -145,15 +147,32 @@ fn copy_items_impl(
         return Err("Destination must be a directory".to_string());
     }
 
+    set_destination_context(queue, id, &dest_path);
     let plans = operation_plans(&sources, &dest_path)?;
     let (total_bytes, total_items) = operation_totals(&plans);
     queue.set_totals(id, total_bytes, total_items);
+    ensure_destination_space(&dest_path, total_bytes)?;
+    queue.set_phase(id, OperationPhase::Copying);
     let mut tracker = OperationTracker::new(queue, id.to_string());
     let mut copied = Vec::new();
+    let destinations: Vec<PathBuf> = plans
+        .iter()
+        .map(|(_, destination)| destination.clone())
+        .collect();
 
-    for (source, destination) in plans {
-        copy_path(&source, &destination, &mut tracker)?;
+    for (source, destination) in &plans {
+        if let Err(error) = copy_path(source, destination, &mut tracker) {
+            cleanup_destinations(&destinations);
+            return Err(error);
+        }
         copied.push(destination.to_string_lossy().to_string());
+    }
+
+    if let Err(error) = finalize_destinations(queue, id, &dest_path, &destinations, &mut tracker) {
+        if is_cancelled(&error) {
+            cleanup_destinations(&destinations);
+        }
+        return Err(error);
     }
 
     Ok(copied)
@@ -177,9 +196,14 @@ fn move_items_impl(
         return Err("Destination must be a directory".to_string());
     }
 
+    set_destination_context(queue, id, &dest_path);
     let plans = operation_plans(&sources, &dest_path)?;
     let (total_bytes, total_items) = operation_totals(&plans);
     queue.set_totals(id, total_bytes, total_items);
+    if move_requires_copy_space(&plans, &dest_path) {
+        ensure_destination_space(&dest_path, total_bytes)?;
+    }
+    queue.set_phase(id, OperationPhase::Moving);
     let mut tracker = OperationTracker::new(queue, id.to_string());
     let mut moved = Vec::new();
 
@@ -199,7 +223,10 @@ fn move_items_impl(
                 mark_path_done(&destination, &mut tracker)?;
             }
             Err(_) => {
-                copy_path(&source, &destination, &mut tracker)?;
+                if let Err(error) = copy_path(&source, &destination, &mut tracker) {
+                    cleanup_destinations(&[destination.clone()]);
+                    return Err(error);
+                }
                 remove_path(&source)?;
             }
         }
@@ -214,6 +241,7 @@ fn delete_items_impl(paths: Vec<String>, queue: &OperationsQueue, id: &str) -> R
     let total_bytes = plans.iter().map(|path| path_size(path)).sum();
     let total_items: usize = plans.iter().map(|path| path_items(path)).sum();
     queue.set_totals(id, total_bytes, total_items.max(1));
+    queue.set_phase(id, OperationPhase::Deleting);
     let mut tracker = OperationTracker::new(queue, id.to_string());
 
     for path in plans {
@@ -247,6 +275,152 @@ fn operation_totals(plans: &[(PathBuf, PathBuf)]) -> (u64, usize) {
             .sum::<usize>()
             .max(1),
     )
+}
+
+fn set_destination_context(queue: &OperationsQueue, id: &str, destination: &Path) {
+    let drive = drives::drive_for_path(destination);
+    let label = drive.as_ref().map(|drive| drive.name.clone()).or_else(|| {
+        destination
+            .file_name()
+            .map(|name| name.to_string_lossy().to_string())
+    });
+    queue.set_destination_context(
+        id,
+        label,
+        drive.map(|drive| drive.is_removable).unwrap_or(false),
+    );
+}
+
+fn ensure_destination_space(destination: &Path, required_bytes: u64) -> Result<(), String> {
+    if required_bytes == 0 {
+        return Ok(());
+    }
+    let available = available_space(destination)?;
+    if available >= required_bytes {
+        return Ok(());
+    }
+    let label = drives::drive_for_path(destination)
+        .map(|drive| drive.name)
+        .or_else(|| {
+            destination
+                .file_name()
+                .map(|name| name.to_string_lossy().to_string())
+        })
+        .unwrap_or_else(|| "destination".to_string());
+    Err(format!(
+        "Not enough space on {label}: need {}, available {}",
+        format_bytes(required_bytes),
+        format_bytes(available)
+    ))
+}
+
+fn available_space(path: &Path) -> Result<u64, String> {
+    use std::ffi::CString;
+    use std::mem::MaybeUninit;
+
+    let path = CString::new(path.to_string_lossy().as_bytes())
+        .map_err(|_| "Destination path contains an invalid byte".to_string())?;
+
+    unsafe {
+        let mut stat: MaybeUninit<libc::statvfs> = MaybeUninit::uninit();
+        if libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) == 0 {
+            let stat = stat.assume_init();
+            return Ok(stat.f_bavail as u64 * stat.f_frsize as u64);
+        }
+    }
+
+    Err("Could not read destination free space".to_string())
+}
+
+fn move_requires_copy_space(plans: &[(PathBuf, PathBuf)], destination: &Path) -> bool {
+    let Ok(destination_metadata) = fs::metadata(destination) else {
+        return true;
+    };
+    let destination_device = destination_metadata.dev();
+
+    plans.iter().any(|(source, _)| {
+        fs::metadata(source)
+            .map(|metadata| metadata.dev() != destination_device)
+            .unwrap_or(true)
+    })
+}
+
+fn finalize_destinations(
+    queue: &OperationsQueue,
+    id: &str,
+    destination: &Path,
+    paths: &[PathBuf],
+    tracker: &mut OperationTracker,
+) -> Result<(), String> {
+    queue.set_phase(id, OperationPhase::Finalizing);
+    queue.update_progress(id, None, tracker.bytes_processed, tracker.items_processed);
+
+    for path in paths {
+        sync_path(path, tracker)?;
+    }
+    sync_directory(destination, tracker)?;
+    Ok(())
+}
+
+fn sync_path(path: &Path, tracker: &mut OperationTracker) -> Result<(), String> {
+    tracker.guard()?;
+    if path.is_dir() {
+        for entry in walkdir::WalkDir::new(path).contents_first(true) {
+            let entry = entry.map_err(|error| error.to_string())?;
+            if entry.file_type().is_file() {
+                sync_file(entry.path(), tracker)?;
+            } else if entry.file_type().is_dir() {
+                sync_directory(entry.path(), tracker)?;
+            }
+        }
+        sync_directory(path, tracker)?;
+        return Ok(());
+    }
+    sync_file(path, tracker)
+}
+
+fn sync_file(path: &Path, tracker: &mut OperationTracker) -> Result<(), String> {
+    tracker.guard()?;
+    tracker.set_file(path);
+    OpenOptions::new()
+        .read(true)
+        .open(path)
+        .and_then(|file| file.sync_all())
+        .map_err(|error| error.to_string())
+}
+
+fn sync_directory(path: &Path, tracker: &mut OperationTracker) -> Result<(), String> {
+    tracker.guard()?;
+    OpenOptions::new()
+        .read(true)
+        .open(path)
+        .and_then(|directory| directory.sync_all())
+        .map_err(|error| error.to_string())
+}
+
+fn cleanup_destinations(destinations: &[PathBuf]) {
+    for destination in destinations {
+        let _ = remove_path(destination);
+    }
+}
+
+fn is_cancelled(error: &str) -> bool {
+    error == "Operation cancelled"
+}
+
+fn format_bytes(bytes: u64) -> String {
+    const UNITS: [&str; 5] = ["B", "KB", "MB", "GB", "TB"];
+    let mut size = bytes as f64;
+    let mut unit = 0;
+    while size >= 1024.0 && unit < UNITS.len() - 1 {
+        size /= 1024.0;
+        unit += 1;
+    }
+    if unit == 0 {
+        format!("{bytes} B")
+    } else {
+        format!("{size:.1} {}", UNITS[unit])
+    }
 }
 
 fn destination_path(src_path: &Path, destination: &Path) -> Result<PathBuf, String> {

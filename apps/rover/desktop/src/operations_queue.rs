@@ -22,13 +22,27 @@ pub enum OperationStatus {
     Cancelled,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum OperationPhase {
+    Preparing,
+    Copying,
+    Moving,
+    Deleting,
+    Finalizing,
+    Completed,
+    SafeToEject,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Operation {
     pub id: String,
     pub op_type: OperationType,
     pub status: OperationStatus,
+    pub phase: OperationPhase,
     pub sources: Vec<String>,
     pub destination: Option<String>,
+    pub destination_label: Option<String>,
+    pub destination_is_removable: bool,
     pub progress: f32, // 0.0 to 1.0
     pub current_file: Option<String>,
     pub bytes_processed: u64,
@@ -84,8 +98,11 @@ impl OperationsQueue {
                 id: id.clone(),
                 op_type,
                 status: OperationStatus::InProgress,
+                phase: OperationPhase::Preparing,
                 sources,
                 destination,
+                destination_label: None,
+                destination_is_removable: false,
                 progress: 0.0,
                 current_file: None,
                 bytes_processed: 0,
@@ -125,6 +142,19 @@ impl OperationsQueue {
         });
     }
 
+    pub fn set_phase(&self, id: &str, phase: OperationPhase) {
+        self.update_operation(id, |op| {
+            op.phase = phase;
+        });
+    }
+
+    pub fn set_destination_context(&self, id: &str, label: Option<String>, removable: bool) {
+        self.update_operation(id, |op| {
+            op.destination_label = label;
+            op.destination_is_removable = removable;
+        });
+    }
+
     pub fn set_totals(&self, id: &str, total_bytes: u64, total_items: usize) {
         self.update_operation(id, |op| {
             op.total_bytes = total_bytes;
@@ -136,6 +166,11 @@ impl OperationsQueue {
     pub fn complete(&self, id: &str) {
         self.update_operation(id, |op| {
             op.status = OperationStatus::Completed;
+            op.phase = if op.destination_is_removable {
+                OperationPhase::SafeToEject
+            } else {
+                OperationPhase::Completed
+            };
             op.progress = 1.0;
             op.bytes_processed = op.total_bytes;
             op.items_processed = op.total_items;

@@ -12,7 +12,8 @@
 
 	const activeStatuses: OperationStatus[] = ['Pending', 'InProgress', 'Paused'];
 	const attentionDelay = 650;
-	const completedLinger = 2000;
+	const completedLinger = 2500;
+	const safeToEjectLinger = 8000;
 	const firstSeenAt = new SvelteMap<string, number>();
 	const shownOperations = new SvelteSet<string>();
 
@@ -74,23 +75,34 @@
 	}
 
 	function completedRecently(operation: Operation) {
-		return !operation.completed_at || now - operation.completed_at * 1000 < completedLinger;
+		const linger = operation.phase === 'SafeToEject' ? safeToEjectLinger : completedLinger;
+		return !operation.completed_at || now - operation.completed_at * 1000 < linger;
 	}
 
 	function operationTitle(operation: Operation) {
 		if (operation.status === 'Completed') {
+			if (operation.phase === 'SafeToEject') return 'Safe to eject';
 			if (operation.op_type === 'Copy') return 'Copied';
 			if (operation.op_type === 'Move') return 'Moved';
 			if (operation.op_type === 'Trash') return 'Moved to trash';
 			return 'Deleted';
 		}
-		if (operation.op_type === 'Copy') return 'Copying';
-		if (operation.op_type === 'Move') return 'Moving';
+		if (operation.phase === 'Finalizing') return `Finalizing writes${destinationText(operation)}`;
+		if (operation.phase === 'Preparing') return 'Preparing';
+		if (operation.op_type === 'Copy') return `Copying${destinationText(operation)}`;
+		if (operation.op_type === 'Move') return `Moving${destinationText(operation)}`;
 		if (operation.op_type === 'Trash') return 'Moving to trash';
 		return 'Deleting';
 	}
 
-	function operationIcon(operation: Operation): 'trash-2' | 'upload' | 'copy' {
+	function destinationText(operation: Operation) {
+		if (!operation.destination_label) return '';
+		return ` to ${operation.destination_label}`;
+	}
+
+	function operationIcon(operation: Operation): 'trash-2' | 'upload' | 'copy' | 'check' | 'usb' {
+		if (operation.phase === 'SafeToEject') return 'check';
+		if (operation.phase === 'Finalizing' && operation.destination_is_removable) return 'usb';
 		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return 'trash-2';
 		if (operation.op_type === 'Move') return 'upload';
 		return 'copy';
@@ -98,6 +110,7 @@
 
 	function fileName(operation: Operation) {
 		if (!isActiveStatus(operation.status)) return operation.status === 'Failed' ? 'Failed' : 'Done';
+		if (operation.phase === 'Finalizing') return operation.destination_is_removable ? 'Do not unplug yet' : 'Finishing writes';
 		return operation.current_file?.split('/').filter(Boolean).at(-1) ?? 'Preparing';
 	}
 
@@ -106,13 +119,52 @@
 	}
 
 	function progressText(operation: Operation) {
-		if (operation.status === 'Completed') return operation.total_items === 1 ? 'Finished' : `${operation.total_items} items finished`;
+		if (operation.status === 'Completed') {
+			if (operation.phase === 'SafeToEject') return operation.op_type === 'Move' ? 'Moved successfully' : 'Copied successfully';
+			return operation.total_items === 1 ? 'Finished' : `${operation.total_items} items finished`;
+		}
 		if (operation.status === 'Failed') return operation.error ?? 'Failed';
 		if (operation.status === 'Cancelled') return 'Cancelled';
+		if (operation.phase === 'Finalizing') return operation.destination_is_removable ? 'Finalizing writes. Do not unplug yet.' : 'Finalizing writes';
 		if (operation.total_bytes > 0) {
-			return `${formatBytes(operation.bytes_processed)} of ${formatBytes(operation.total_bytes)}`;
+			return [
+				`${formatBytes(operation.bytes_processed)} of ${formatBytes(operation.total_bytes)}`,
+				speedText(operation),
+				etaText(operation)
+			]
+				.filter(Boolean)
+				.join(' · ');
 		}
 		return `${operation.items_processed} of ${operation.total_items || operation.sources.length} items`;
+	}
+
+	function speedBytesPerSecond(operation: Operation) {
+		if (operation.status !== 'InProgress' || operation.phase === 'Finalizing') return 0;
+		if (!operation.started_at || operation.bytes_processed <= 0) return 0;
+		const elapsedSeconds = Math.max(0.75, (now - operation.started_at * 1000) / 1000);
+		return operation.bytes_processed / elapsedSeconds;
+	}
+
+	function speedText(operation: Operation) {
+		const speed = speedBytesPerSecond(operation);
+		return speed > 0 ? `${formatBytes(speed)}/s` : '';
+	}
+
+	function etaText(operation: Operation) {
+		const speed = speedBytesPerSecond(operation);
+		if (speed <= 0 || operation.total_bytes <= operation.bytes_processed) return '';
+		return `${formatDuration((operation.total_bytes - operation.bytes_processed) / speed)} left`;
+	}
+
+	function formatDuration(seconds: number) {
+		const rounded = Math.max(1, Math.round(seconds));
+		const minutes = Math.floor(rounded / 60);
+		const remainingSeconds = rounded % 60;
+		if (minutes < 1) return `${rounded}s`;
+		const hours = Math.floor(minutes / 60);
+		const remainingMinutes = minutes % 60;
+		if (hours < 1) return `${minutes}m ${remainingSeconds}s`;
+		return `${hours}h ${remainingMinutes}m`;
 	}
 </script>
 

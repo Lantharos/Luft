@@ -64,27 +64,8 @@ pub fn copy_items(
     sources: Vec<String>,
     destination: String,
     queue: &OperationsQueue,
-) -> Result<Vec<String>, String> {
-    run_copy_items(sources, destination, queue.clone())
-}
-
-pub fn move_items(
-    sources: Vec<String>,
-    destination: String,
-    queue: &OperationsQueue,
-) -> Result<Vec<String>, String> {
-    run_move_items(sources, destination, queue.clone())
-}
-
-pub fn delete_items(paths: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
-    run_delete_items(paths, queue.clone())
-}
-
-fn run_copy_items(
-    sources: Vec<String>,
-    destination: String,
-    queue: OperationsQueue,
-) -> Result<Vec<String>, String> {
+) -> Result<String, String> {
+    ensure_destination_directory(&destination)?;
     let id = queue.add_operation(
         OperationType::Copy,
         sources.clone(),
@@ -92,15 +73,18 @@ fn run_copy_items(
         0,
         sources.len(),
     );
-    let result = copy_items_impl(sources, destination, &queue, &id);
-    finish_operation(&queue, &id, result)
+    spawn_operation(queue.clone(), id.clone(), move |queue, id| {
+        copy_items_impl(sources, destination, queue, id)
+    });
+    Ok(id)
 }
 
-fn run_move_items(
+pub fn move_items(
     sources: Vec<String>,
     destination: String,
-    queue: OperationsQueue,
-) -> Result<Vec<String>, String> {
+    queue: &OperationsQueue,
+) -> Result<String, String> {
+    ensure_destination_directory(&destination)?;
     let id = queue.add_operation(
         OperationType::Move,
         sources.clone(),
@@ -108,14 +92,29 @@ fn run_move_items(
         0,
         sources.len(),
     );
-    let result = move_items_impl(sources, destination, &queue, &id);
-    finish_operation(&queue, &id, result)
+    spawn_operation(queue.clone(), id.clone(), move |queue, id| {
+        move_items_impl(sources, destination, queue, id)
+    });
+    Ok(id)
 }
 
-fn run_delete_items(paths: Vec<String>, queue: OperationsQueue) -> Result<(), String> {
+pub fn delete_items(paths: Vec<String>, queue: &OperationsQueue) -> Result<String, String> {
     let id = queue.add_operation(OperationType::Delete, paths.clone(), None, 0, paths.len());
-    let result = delete_items_impl(paths, &queue, &id);
-    finish_operation(&queue, &id, result)
+    spawn_operation(queue.clone(), id.clone(), move |queue, id| {
+        delete_items_impl(paths, queue, id)
+    });
+    Ok(id)
+}
+
+fn spawn_operation<T, F>(queue: OperationsQueue, id: String, operation: F)
+where
+    T: Send + 'static,
+    F: FnOnce(&OperationsQueue, &str) -> Result<T, String> + Send + 'static,
+{
+    let _ = thread::spawn(move || {
+        let result = operation(&queue, &id);
+        let _ = finish_operation(&queue, &id, result);
+    });
 }
 
 fn finish_operation<T>(
@@ -158,6 +157,13 @@ fn copy_items_impl(
     }
 
     Ok(copied)
+}
+
+fn ensure_destination_directory(destination: &str) -> Result<(), String> {
+    if Path::new(destination).is_dir() {
+        return Ok(());
+    }
+    Err("Destination must be a directory".to_string())
 }
 
 fn move_items_impl(

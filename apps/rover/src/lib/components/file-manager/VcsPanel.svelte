@@ -29,7 +29,7 @@
 
 {#if vcs.panelOpen && vcs.project}
 	<aside
-		class="flex h-full w-[400px] min-w-[340px] max-w-[42vw] shrink-0 flex-col bg-[var(--surface)] text-[var(--text)] shadow-[inset_1px_0_0_var(--hairline)]"
+		class="flex h-full w-[400px] min-w-[340px] max-w-[42vw] shrink-0 flex-col bg-[var(--surface)] text-[var(--text)] shadow-[inset_1px_0_0_var(--hairline),inset_0_1px_0_var(--hairline)]"
 		aria-label="Version Control"
 	>
 		<header class="flex h-12 shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">

@@ -7,6 +7,11 @@ import { SvelteMap } from 'svelte/reactivity';
 
 const refreshDelay = 720;
 const pollDelay = 180;
+const vcsMetadataNames = ['.pig', '.git'];
+
+type VcsFolderEntry = {
+	name: string;
+};
 
 export class VcsState {
 	project = $state<VcsProject | null>(null);
@@ -36,19 +41,31 @@ export class VcsState {
 		return groupChangedFiles(this.changedFiles);
 	}
 
-	open(path: string) {
+	open(path: string, entries: VcsFolderEntry[] = []) {
 		if (!path.startsWith('/')) {
 			this.clear();
 			return;
 		}
 		this.path = path;
+		if (this.project && pathInsideRoot(path, this.project.root)) {
+			if (path !== this.project.root && folderHasVisibleVcsMetadata(entries)) {
+				this.scheduleRefresh(true);
+				return;
+			}
+			const requestId = ++this.requestId;
+			this.cancelScheduledRefresh();
+			this.error = null;
+			this.isLoading = false;
+			if (path !== this.project.root) void this.detectNestedMetadata(path, requestId);
+			return;
+		}
 		this.scheduleRefresh();
 	}
 
 	clear() {
 		this.path = '';
 		this.requestId += 1;
-		if (this.refreshTimer) clearTimeout(this.refreshTimer);
+		this.cancelScheduledRefresh();
 		this.reset();
 	}
 
@@ -74,7 +91,7 @@ export class VcsState {
 		return this.project ? relativePath(this.project.root, path) : path;
 	}
 
-	async refreshNow(path = this.path) {
+	async refreshNow(path = this.path, forceDetect = false) {
 		if (!path.startsWith('/') || !isDesktopRuntime()) {
 			this.reset();
 			return;
@@ -83,6 +100,10 @@ export class VcsState {
 		this.isLoading = true;
 		this.error = null;
 		try {
+			if (!forceDetect && this.project && pathInsideRoot(path, this.project.root)) {
+				await this.refreshProject(this.project.root, requestId);
+				return;
+			}
 			const ticket = await api.startVcsStatus(path);
 			await this.pollStatus(ticket.id, requestId);
 		} catch (caught) {
@@ -144,9 +165,43 @@ export class VcsState {
 		}
 	}
 
-	private scheduleRefresh() {
-		if (this.refreshTimer) clearTimeout(this.refreshTimer);
-		this.refreshTimer = setTimeout(() => void this.refreshNow(), refreshDelay);
+	private scheduleRefresh(forceDetect = false) {
+		this.cancelScheduledRefresh();
+		this.refreshTimer = setTimeout(() => void this.refreshNow(this.path, forceDetect), refreshDelay);
+	}
+
+	private cancelScheduledRefresh() {
+		if (!this.refreshTimer) return;
+		clearTimeout(this.refreshTimer);
+		this.refreshTimer = null;
+	}
+
+	private async refreshProject(root: string, requestId: number) {
+		if (!this.project) return;
+		const provider = providerFor(this.project.kind);
+		const [project, statuses] = await Promise.all([provider.getProjectStatus(root), provider.getFileStatuses(root)]);
+		if (requestId !== this.requestId) return;
+		this.project = project;
+		this.setStatuses(statuses.entries());
+		this.clearStaleDiff();
+	}
+
+	private async detectNestedMetadata(path: string, requestId: number) {
+		if (!(await this.folderHasVcsMetadata(path))) return;
+		if (requestId !== this.requestId || path !== this.path) return;
+		await this.refreshNow(path, true);
+	}
+
+	private async folderHasVcsMetadata(path: string) {
+		for (const name of vcsMetadataNames) {
+			try {
+				await api.getFileInfo(absolutePath(path, name));
+				return true;
+			} catch {
+				continue;
+			}
+		}
+		return false;
 	}
 
 	private async pollStatus(jobId: string, requestId: number) {
@@ -206,4 +261,12 @@ export class VcsState {
 
 function wait(ms: number) {
 	return new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+}
+
+function pathInsideRoot(path: string, root: string) {
+	return path === root || path.startsWith(`${root.replace(/\/$/, '')}/`);
+}
+
+function folderHasVisibleVcsMetadata(entries: VcsFolderEntry[]) {
+	return entries.some((entry) => vcsMetadataNames.includes(entry.name));
 }

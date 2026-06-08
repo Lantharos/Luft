@@ -169,6 +169,7 @@ export interface Tab {
 	id: string;
 	path: string;
 	title: string;
+	view: SidebarView;
 	history: string[];
 	historyIndex: number;
 }

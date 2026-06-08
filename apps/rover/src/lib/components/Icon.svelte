@@ -10,7 +10,7 @@
 		| 'music' | 'archive' | 'code' | 'settings' | 'eye' | 'eye-off' | 'pin'
 		| 'refresh' | 'external-link' | 'more-vertical' | 'package'
 		| 'check' | 'alert-circle' | 'info' | 'edit' | 'pause' | 'play'
-		| 'folder-plus' | 'file-plus' | 'upload';
+		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb';
 
 	interface Props {
 		name: IconName;
@@ -60,6 +60,17 @@
 		<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
 		<polyline points="17 8 12 3 7 8" />
 		<line x1="12" x2="12" y1="3" y2="15" />
+	{:else if name === 'eject'}
+		<path d="m7 11 5-5 5 5" />
+		<path d="M5 15h14" />
+	{:else if name === 'usb'}
+		<circle cx="10" cy="7" r="1" />
+		<circle cx="4" cy="20" r="1" />
+		<path d="M4.7 19.3 19 5" />
+		<path d="m21 3-3 1 2 2Z" />
+		<path d="M9.26 7.68 5 12l2 5" />
+		<path d="m10 14 5 2 3.5-3.5" />
+		<path d="m18 12 1-1 1 1-1 1Z" />
 	{:else if name === 'file-text'}
 		<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
 		<polyline points="14 2 14 8 20 8" />

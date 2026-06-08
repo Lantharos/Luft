@@ -42,6 +42,17 @@ export const previewDrives: DriveInfo[] = [
 		used_space: 0.7 * 1024 ** 4,
 		is_removable: false,
 		is_readonly: false
+	},
+	{
+		name: 'ROVER USB',
+		mount_point: '/run/media/kristof/ROVER_USB',
+		device: '/dev/sdb1',
+		fs_type: 'exfat',
+		total_space: 64 * 1024 ** 3,
+		available_space: 42 * 1024 ** 3,
+		used_space: 22 * 1024 ** 3,
+		is_removable: true,
+		is_readonly: false
 	}
 ];
 

@@ -17,6 +17,7 @@ import {
 	userDirs
 } from '$lib/stores';
 import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from '$lib/file-manager/drag-drop';
+import { dropTargetKeyForPath, type DropTarget, trashDropKey } from '$lib/file-manager/drop-targets';
 import { sortedEntries, visibleEntries } from '$lib/file-manager/entries';
 import { DelayedLoading } from '$lib/file-manager/loading.svelte';
 import { openExternalTargets, pathsFromActivation, type SingleInstanceActivation } from '$lib/file-manager/open-targets';
@@ -24,7 +25,7 @@ import { previewDrives, previewEntries, previewThumbnails, previewTrash, preview
 import { handleShortcut, isTextInputTarget } from '$lib/file-manager/shortcuts';
 import { thumbnailCandidates } from '$lib/file-manager/thumbnails';
 import { normalizePath, viewModeForPath } from '$lib/file-manager/view-modes';
-import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, TrashItem, ViewMode } from '$lib/types';
+import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, Tab, TrashItem, ViewMode } from '$lib/types';
 import { getParentPath, getPathSegments } from '$lib/utils';
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 export class FileManager {
@@ -41,6 +42,9 @@ export class FileManager {
 	contextMenu = $state<ContextMenuState | null>(null);
 	dragTarget = $state<FileEntry | null>(null);
 	dropTarget = $state<string | null>(null);
+	dropTargetKey = $state<string | null>(null);
+	dragPaths = $state<string[]>([]);
+	dropCommitted = $state(false);
 	isDragging = $state(false);
 	backgroundEffect = $state<BackgroundEffect>('opaque');
 	thumbnails = $state<Record<string, string | null>>({});
@@ -159,6 +163,21 @@ export class FileManager {
 		);
 		this.thumbnails = { ...this.thumbnails, ...Object.fromEntries(loadedEntries) };
 	};
+	restoreTabView = async (tab: Tab) => {
+		this.contextMenu = null;
+		this.searchQuery = '';
+		this.inlineDraft = null;
+		selection.clear();
+		currentView.set(tab.view);
+		if (tab.view === 'home') {
+			await this.loadDirectory(tab.path);
+			return;
+		}
+		this.loading.cancel();
+		this.error = null;
+		if (tab.view === 'drives') await loadDrives();
+		if (tab.view === 'trash') await this.loadTrash();
+	};
 	loadTrash = async () => {
 		if (!isDesktopRuntime()) {
 			this.loading.cancel();
@@ -191,6 +210,12 @@ export class FileManager {
 		this.searchQuery = '';
 		selection.clear();
 		currentView.set(view);
+		const tab = get(activeTab);
+		if (tab) tabs.updateTab(tab.id, { view });
+		if (view !== 'home') {
+			this.loading.cancel();
+			this.error = null;
+		}
 		if (view === 'home') await this.navigate(get(userDirs)?.home || this.currentPath || '/');
 		if (view === 'drives') await loadDrives();
 		if (view === 'trash') await this.loadTrash();
@@ -220,6 +245,16 @@ export class FileManager {
 		tabs.addTab(nextPath, nextPath.split('/').filter(Boolean).at(-1) || 'Home');
 		await this.loadDirectory(nextPath);
 	};
+	openViewInNewTab = async (view: SidebarView) => {
+		if (view === 'home') {
+			await this.openNewTab(get(userDirs)?.home || this.currentPath || '/');
+			return;
+		}
+		const path = this.currentPath || get(userDirs)?.home || '/';
+		const title = view[0].toUpperCase() + view.slice(1);
+		const tab = tabs.addTab(path, title, view);
+		await this.restoreTabView(tab);
+	};
 	openLaunchPaths = (paths: string[]) =>
 		openExternalTargets(paths, true, (folder, replaceActive) => (replaceActive ? this.navigate(folder) : this.openNewTab(folder)));
 	openSingleInstanceActivation = (activation: SingleInstanceActivation) =>
@@ -229,12 +264,12 @@ export class FileManager {
 		const wasActive = get(activeTab)?.id === id;
 		tabs.closeTab(id);
 		const nextActive = get(activeTab);
-		if (wasActive && nextActive) this.loadDirectory(nextActive.path);
+		if (wasActive && nextActive) this.restoreTabView(nextActive);
 	};
 	switchTab = (id: string) => {
 		tabs.setActiveTab(id);
 		const tab = get(tabs).find((item) => item.id === id);
-		if (tab) this.loadDirectory(tab.path);
+		if (tab) this.restoreTabView(tab);
 	};
 	setSortBy = async (nextSort: SortBy) => {
 		if (this.sortBy === nextSort) this.sortAsc = !this.sortAsc;
@@ -290,45 +325,158 @@ export class FileManager {
 	handleDragStart = (event: DragEvent, entry: FileEntry) => {
 		if (!get(selection).has(entry.path)) selection.select(entry.path);
 		this.isDragging = true;
+		this.dropCommitted = false;
 		this.dragTarget = entry;
-		setFileDragData(event.dataTransfer, Array.from(get(selection)));
+		this.dragPaths = Array.from(get(selection));
+		setFileDragData(event.dataTransfer, this.dragPaths);
+	};
+	beginInternalDrag = (entry: FileEntry) => {
+		if (!get(selection).has(entry.path)) selection.select(entry.path);
+		this.isDragging = true;
+		this.dropCommitted = false;
+		this.dragTarget = entry;
+		this.dragPaths = Array.from(get(selection));
+		this.setDropTarget(null);
 	};
 	handleDragEnd = () => {
 		this.isDragging = false;
+		this.dropCommitted = false;
 		this.dragTarget = null;
-		this.dropTarget = null;
+		this.dragPaths = [];
+		this.setDropTarget(null);
 	};
-	handleDragOver = (event: DragEvent, entry?: FileEntry) => {
+	claimInternalDrop() {
+		if (this.dropCommitted) return false;
+		this.dropCommitted = true;
+		return true;
+	}
+	canDropSelectionOnPath(targetPath: string) {
+		if (!targetPath) return false;
+		if (get(selection).has(targetPath)) return false;
+		const sourcePaths = this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection));
+		return !sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
+	}
+	setDropTarget(target: DropTarget | null) {
+		this.dropTarget = target?.path ?? null;
+		this.dropTargetKey = target?.key ?? null;
+	}
+	updateInternalDropTarget = (target: DropTarget | null) => {
+		if (!target) {
+			this.setDropTarget(null);
+			return;
+		}
+		if (target.path === 'trash' || this.canDropSelectionOnPath(target.path)) this.setDropTarget(target);
+		else this.setDropTarget(null);
+	};
+	handleDragOver = (event: DragEvent, entry?: FileEntry, targetKey?: string) => {
 		const hasDropPaths = this.isDragging || dataTransferHasPaths(event.dataTransfer);
 		if (!hasDropPaths) return;
 		const internalTargetSelected = this.isDragging && entry && get(selection).has(entry.path);
 		if (entry && (!entry.is_dir || internalTargetSelected)) return;
 		event.preventDefault();
+		event.stopPropagation();
 		if (entry?.is_dir) {
-			this.dropTarget = entry.path;
+			this.setDropTarget({ path: entry.path, key: targetKey ?? dropTargetKeyForPath(entry.path) });
 			if (event.dataTransfer) event.dataTransfer.dropEffect = this.isDragging ? (event.ctrlKey ? 'copy' : 'move') : 'copy';
 			return;
 		}
-		this.dropTarget = this.currentPath;
+		this.setDropTarget({ path: this.currentPath, key: targetKey ?? dropTargetKeyForPath(this.currentPath) });
 		if (event.dataTransfer) event.dataTransfer.dropEffect = this.isDragging ? (event.ctrlKey ? 'copy' : 'move') : 'copy';
 	};
-	handleDragLeave = () => { this.dropTarget = null; };
-	handleDrop = async (event: DragEvent, targetPath: string) => {
+	handlePathDragOver = (event: DragEvent, targetPath: string, targetKey = dropTargetKeyForPath(targetPath)) => {
+		if (!targetPath) return false;
+		const hasDropPaths = this.isDragging || dataTransferHasPaths(event.dataTransfer);
+		if (!hasDropPaths) return false;
+		if (this.isDragging && !this.canDropSelectionOnPath(targetPath)) return false;
 		event.preventDefault();
-		if (!targetPath) return;
-		const internalDrop = this.isDragging;
-		const sourcePaths = internalDrop ? Array.from(get(selection)) : dataTransferPaths(event.dataTransfer);
+		event.stopPropagation();
+		this.setDropTarget({ path: targetPath, key: targetKey });
+		if (event.dataTransfer) event.dataTransfer.dropEffect = this.isDragging ? (event.ctrlKey ? 'copy' : 'move') : 'copy';
+		return true;
+	};
+	handleTrashDragOver = (event: DragEvent, targetKey = trashDropKey()) => {
+		const hasDropPaths = this.isDragging || dataTransferHasPaths(event.dataTransfer);
+		if (!hasDropPaths) return false;
+		event.preventDefault();
+		event.stopPropagation();
+		this.setDropTarget({ path: 'trash', key: targetKey });
+		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+		return true;
+	};
+	handleDragLeave = () => { this.setDropTarget(null); };
+	dropPaths = async (sourcePaths: string[], targetPath: string, move: boolean) => {
 		if (sourcePaths.length === 0) return this.handleDragEnd();
-		const move = internalDrop ? !event.ctrlKey : event.shiftKey;
 		const droppingIntoSelf = sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
-		if (droppingIntoSelf || (internalDrop && move && targetPath === this.currentPath)) {
+		const movingWithinCurrentFolder =
+			move && targetPath === this.currentPath && sourcePaths.every((source) => getParentPath(source) === this.currentPath);
+		if (droppingIntoSelf || movingWithinCurrentFolder) {
 			this.handleDragEnd();
 			return;
 		}
 		try {
-			if (move) await api.moveItems(sourcePaths, targetPath);
-			else await api.copyItems(sourcePaths, targetPath);
-			await this.loadDirectory(this.currentPath);
+			if (move) {
+				await api.moveItems(sourcePaths, targetPath);
+				this.optimisticallyRemoveMovedSources(sourcePaths, targetPath);
+			} else await api.copyItems(sourcePaths, targetPath);
+			this.scheduleDirectoryRefresh();
+		} catch (caught) {
+			this.error = caught instanceof Error ? caught.message : String(caught);
+		} finally {
+			this.handleDragEnd();
+		}
+	};
+	optimisticallyRemoveMovedSources(sourcePaths: string[], targetPath: string) {
+		if (get(currentView) !== 'home' || targetPath === this.currentPath) return;
+		const sourceSet = new Set(sourcePaths);
+		const nextEntries = this.entries.filter((entry) => !sourceSet.has(entry.path));
+		if (nextEntries.length === this.entries.length) return;
+		this.entries = nextEntries;
+		selection.clear();
+	}
+	scheduleDirectoryRefresh() {
+		const path = this.currentPath;
+		if (!isDesktopRuntime() || get(currentView) !== 'home' || !path) return;
+		for (const delay of [900, 3500]) {
+			window.setTimeout(() => {
+				if (get(currentView) === 'home' && this.currentPath === path) void this.loadDirectory(path);
+			}, delay);
+		}
+	}
+	finishInternalDrop = async (targetPath: string | null, copy: boolean) => {
+		if (!targetPath) return this.handleDragEnd();
+		if (!this.claimInternalDrop()) return;
+		if (targetPath === 'trash') {
+			await this.trashSelected();
+			return;
+		}
+		await this.dropPaths(this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection)), targetPath, !copy);
+	};
+	handleDrop = async (event: DragEvent, targetPath: string) => {
+		event.preventDefault();
+		event.stopPropagation();
+		if (!targetPath) return;
+		const internalDrop = this.isDragging;
+		if (internalDrop && !this.claimInternalDrop()) return;
+		const sourcePaths = internalDrop ? (this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection))) : dataTransferPaths(event.dataTransfer);
+		const move = internalDrop ? !event.ctrlKey : event.shiftKey;
+		await this.dropPaths(sourcePaths, targetPath, move);
+	};
+	handleTrashDrop = async (event: DragEvent) => {
+		event.preventDefault();
+		event.stopPropagation();
+		if (this.isDragging && !this.claimInternalDrop()) return;
+		const sourcePaths = this.isDragging ? (this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection))) : dataTransferPaths(event.dataTransfer);
+		await this.trashPaths(sourcePaths);
+	};
+	trashSelected = async () => {
+		await this.trashPaths(this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection)));
+	};
+	trashPaths = async (sourcePaths: string[]) => {
+		if (sourcePaths.length === 0) return this.handleDragEnd();
+		try {
+			await api.moveToTrash(sourcePaths);
+			if (get(currentView) === 'trash') await this.loadTrash();
+			else if (get(currentView) === 'home' && this.currentPath) await this.loadDirectory(this.currentPath);
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
 		} finally {
@@ -351,9 +499,10 @@ export class FileManager {
 			if (currentClipboard.operation === 'copy') await api.copyItems(paths, this.currentPath);
 			else {
 				await api.moveItems(paths, this.currentPath);
+				this.optimisticallyRemoveMovedSources(paths, this.currentPath);
 				clearClipboard();
 			}
-			await this.loadDirectory(this.currentPath);
+			this.scheduleDirectoryRefresh();
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
 		}

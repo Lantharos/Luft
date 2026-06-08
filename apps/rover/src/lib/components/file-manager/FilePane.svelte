@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DragBundle from '$lib/components/file-manager/DragBundle.svelte';
 	import EntryIcon from '$lib/components/file-manager/EntryIcon.svelte';
 	import InlineNameField from '$lib/components/file-manager/InlineNameField.svelte';
 	import TrashPane from '$lib/components/file-manager/TrashPane.svelte';
@@ -11,6 +12,7 @@
 		selectionBoxStyle,
 		type SelectionBox
 	} from '$lib/file-manager/marquee';
+	import { dropTargetKeyForPath, scopedDropKey, type DropTarget } from '$lib/file-manager/drop-targets';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { DriveInfo, FavoriteItem, FileEntry, InlineDraft, SidebarView, TrashItem, TrashLocation, ViewMode } from '$lib/types';
 	import { formatBytes, formatDate, getFileIcon } from '$lib/utils';
@@ -30,7 +32,7 @@
 		selectedPaths: Set<string>;
 		showLoadingSkeleton: boolean;
 		error: string | null;
-		dropTarget: string | null;
+		dropTargetKey: string | null;
 		isDragging: boolean;
 		canDrag?: boolean;
 		allowSelectedDoubleClick?: boolean;
@@ -41,11 +43,16 @@
 		onContextMenu: (event: MouseEvent, entry?: FileEntry) => void;
 		onDragStart: (event: DragEvent, entry: FileEntry) => void;
 		onDragEnd: () => void;
-		onDragOver: (event: DragEvent, entry?: FileEntry) => void;
+		onDragOver: (event: DragEvent, entry?: FileEntry, targetKey?: string) => void;
 		onDragLeave: () => void;
 		onDrop: (event: DragEvent, targetPath: string) => void;
+		onPathDragOver: (event: DragEvent, targetPath: string, targetKey?: string) => boolean;
+		onInternalDragStart: (entry: FileEntry) => void;
+		onInternalDragMove: (target: DropTarget | null) => void;
+		onInternalDragEnd: (targetPath: string | null, copy: boolean) => void;
 		onSort: (sort: 'name' | 'size' | 'date' | 'type') => void;
 		onNavigate: (path: string) => void;
+		onOpenPathInTab: (path: string) => void;
 		onSelectRange: (paths: string[]) => void;
 		onDraftInput: (value: string) => void;
 		onDraftConfirm: () => void;
@@ -70,7 +77,7 @@
 		selectedPaths,
 		showLoadingSkeleton,
 		error,
-		dropTarget,
+		dropTargetKey,
 		isDragging,
 		canDrag = true,
 		allowSelectedDoubleClick = false,
@@ -84,8 +91,13 @@
 		onDragOver,
 		onDragLeave,
 		onDrop,
+		onPathDragOver,
+		onInternalDragStart,
+		onInternalDragMove,
+		onInternalDragEnd,
 		onSort,
 		onNavigate,
+		onOpenPathInTab,
 		onSelectRange,
 		onDraftInput,
 		onDraftConfirm,
@@ -100,7 +112,23 @@
 
 	let paneElement = $state<HTMLElement>();
 	let selectionBox = $state<SelectionBox | null>(null);
+	let pointerDrag = $state<{
+		entry: FileEntry;
+		entries: FileEntry[];
+		pointerId: number;
+		startX: number;
+		startY: number;
+		currentX: number;
+		currentY: number;
+		started: boolean;
+		copy: boolean;
+	} | null>(null);
+	let suppressClickPath = $state<string | null>(null);
 	let selectionBase = new Set<string>();
+	let internalDrives = $derived(drives.filter((drive) => !drive.is_removable));
+	let externalDrives = $derived(drives.filter((drive) => drive.is_removable));
+	let draggedPathSet = $derived.by(() => new Set(pointerDrag?.started ? pointerDrag.entries.map((entry) => entry.path) : []));
+	let paneEntries = $derived(entries.filter((entry) => !draggedPathSet.has(entry.path)));
 
 	function entryIcon(entry: FileEntry): FileIcon {
 		const icon = getFileIcon(entry);
@@ -129,10 +157,113 @@
 		return Math.min(100, Math.round((drive.used_space / drive.total_space) * 100));
 	}
 
+	function driveIcon(drive: DriveInfo): 'hard-drive' | 'usb' {
+		return drive.is_removable ? 'usb' : 'hard-drive';
+	}
+
+	function openDriveWithMiddleClick(event: MouseEvent, drive: DriveInfo) {
+		if (event.button !== 1) return;
+		event.preventDefault();
+		event.stopPropagation();
+		onOpenPathInTab(drive.mount_point);
+	}
+
+	function paneDropKey(path: string) {
+		return scopedDropKey('pane', path);
+	}
+
+	function entryDropKey(path: string) {
+		return scopedDropKey('entry', path);
+	}
+
+	function driveDropKey(path: string) {
+		return scopedDropKey('drive', path);
+	}
+
+	function dragEntriesFor(entry: FileEntry) {
+		if (!selectedPaths.has(entry.path)) return [entry];
+		const selected = entries.filter((item) => selectedPaths.has(item.path));
+		return selected.length > 0 ? selected : [entry];
+	}
+
+	function dropTargetFromPoint(clientX: number, clientY: number): DropTarget | null {
+		for (const element of document.elementsFromPoint(clientX, clientY)) {
+			if (!(element instanceof HTMLElement)) continue;
+			const target = element.closest<HTMLElement>('[data-drop-key], [data-drop-path], [data-drop-trash="true"]');
+			if (!target) continue;
+			const key = target.dataset.dropKey;
+			const tabId = target.dataset.dropTabId ?? null;
+			if (target.dataset.dropTrash === 'true') return { path: 'trash', key: key ?? 'trash', tabId };
+			const pathTarget = target.closest<HTMLElement>('[data-drop-path]') ?? target;
+			const targetPath = pathTarget?.dataset.dropPath;
+			if (targetPath) return { path: targetPath, key: key ?? dropTargetKeyForPath(targetPath), tabId };
+		}
+		return null;
+	}
+
+	function startEntryPointerDrag(event: PointerEvent, entry: FileEntry) {
+		if (!canDrag || currentView !== 'home' || event.button !== 0) return;
+		pointerDrag = {
+			entry,
+			entries: dragEntriesFor(entry),
+			pointerId: event.pointerId,
+			startX: event.clientX,
+			startY: event.clientY,
+			currentX: event.clientX,
+			currentY: event.clientY,
+			started: false,
+			copy: event.ctrlKey || event.metaKey
+		};
+	}
+
+	function moveEntryPointerDrag(event: PointerEvent) {
+		if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
+		const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
+		if (!pointerDrag.started) {
+			if (distance < 6) return;
+			pointerDrag = { ...pointerDrag, started: true, currentX: event.clientX, currentY: event.clientY };
+			onInternalDragStart(pointerDrag.entry);
+		}
+		pointerDrag = { ...pointerDrag, currentX: event.clientX, currentY: event.clientY, copy: event.ctrlKey || event.metaKey };
+		event.preventDefault();
+		event.stopPropagation();
+		onInternalDragMove(dropTargetFromPoint(event.clientX, event.clientY));
+	}
+
+	function endEntryPointerDrag(event: PointerEvent) {
+		if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
+		const wasDragging = pointerDrag.started;
+		const entryPath = pointerDrag.entry.path;
+		const target = wasDragging ? dropTargetFromPoint(event.clientX, event.clientY) : null;
+		const copy = pointerDrag.copy;
+		pointerDrag = null;
+		if (!wasDragging) return;
+		suppressClickPath = entryPath;
+		event.preventDefault();
+		event.stopPropagation();
+		onInternalDragEnd(target?.path ?? null, copy);
+	}
+
+	function cancelEntryPointerDrag(event: PointerEvent) {
+		if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
+		pointerDrag = null;
+		onInternalDragEnd(null, false);
+	}
+
+	function selectEntry(entry: FileEntry, event: MouseEvent) {
+		if (suppressClickPath === entry.path) {
+			suppressClickPath = null;
+			event.preventDefault();
+			event.stopPropagation();
+			return;
+		}
+		onSelectEntry(entry, event);
+	}
+
 	function itemState(path: string) {
 		return [
 			selectedPaths.has(path) ? 'selected-entry' : '',
-			dropTarget === path ? 'outline outline-2 outline-[var(--accent)] outline-offset-[-2px]' : '',
+			dropTargetKey === entryDropKey(path) ? 'drop-target-entry' : '',
 			isDragging && selectedPaths.has(path) ? 'opacity-50' : ''
 		];
 	}
@@ -212,18 +343,65 @@
 	}
 </script>
 
+<svelte:window
+	onpointermove={moveEntryPointerDrag}
+	onpointerup={endEntryPointerDrag}
+	onpointercancel={cancelEntryPointerDrag}
+/>
+
+{#snippet driveTile(drive: DriveInfo)}
+	<div
+		class={[
+			'drive-tile',
+			dropTargetKey === driveDropKey(drive.mount_point) ? 'drop-target-entry' : ''
+		]}
+		role="group"
+		ondragover={(event) => onPathDragOver(event, drive.mount_point, driveDropKey(drive.mount_point))}
+		ondragleave={onDragLeave}
+		ondrop={(event) => onDrop(event, drive.mount_point)}
+		data-drop-path={drive.mount_point}
+		data-drop-key={driveDropKey(drive.mount_point)}
+	>
+		<button
+			class="drive-open w-full text-left"
+			type="button"
+			onclick={() => onNavigate(drive.mount_point)}
+			onauxclick={(event) => openDriveWithMiddleClick(event, drive)}
+		>
+			<div class="flex items-center gap-3">
+				<div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--control)] text-[var(--text-soft)]">
+					<Icon name={driveIcon(drive)} size={20} />
+				</div>
+				<div class="min-w-0">
+					<div class="truncate text-[14px] font-medium text-[var(--text)]">{drive.name}</div>
+					<div class="truncate text-[12px] text-[var(--text-muted)]">{drive.mount_point}</div>
+				</div>
+			</div>
+			<div class="mt-4 h-2 overflow-hidden rounded-full bg-[var(--control)]">
+				<div class="h-full rounded-full bg-[var(--accent)]" style:width={`${driveUsage(drive)}%`}></div>
+			</div>
+			<div class="mt-2 flex justify-between text-[12px] text-[var(--text-muted)]">
+				<span>{formatBytes(drive.available_space)} free</span>
+				<span>{driveUsage(drive)}%</span>
+			</div>
+		</button>
+	</div>
+{/snippet}
+
 <section
 	bind:this={paneElement}
 	class="soft-scroll relative min-h-0 flex-1 overflow-auto px-5 pb-2"
 	aria-label="File browser"
 	tabindex="-1"
+	data-drop-path={currentPath}
+	data-drop-key={paneDropKey(currentPath)}
 	onpointerdown={startMarqueeSelection}
 	onpointermove={moveMarqueeSelection}
 	onpointerup={endMarqueeSelection}
 	onpointercancel={endMarqueeSelection}
 	onscroll={refreshMarqueeAfterScroll}
 	oncontextmenu={(event) => onContextMenu(event)}
-	ondragover={(event) => onDragOver(event)}
+	ondragover={(event) => onDragOver(event, undefined, paneDropKey(currentPath))}
 	ondrop={(event) => onDrop(event, currentPath)}
 >
 	{#if selectionBox}
@@ -244,28 +422,24 @@
 			</div>
 		</div>
 	{:else if currentView === 'drives'}
-		<div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 pb-4 pt-2">
-			{#each drives as drive (drive.mount_point)}
-				<button class="drive-tile" type="button" onclick={() => onNavigate(drive.mount_point)}>
-					<div class="flex items-center gap-3">
-						<div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--control)] text-[var(--text-soft)]">
-							<Icon name="hard-drive" size={20} />
-						</div>
-						<div class="min-w-0">
-							<div class="truncate text-[14px] font-medium text-[var(--text)]">{drive.name}</div>
-							<div class="truncate text-[12px] text-[var(--text-muted)]">{drive.mount_point}</div>
-						</div>
-					</div>
-					<div class="mt-4 h-2 overflow-hidden rounded-full bg-[var(--control)]">
-						<div class="h-full rounded-full bg-[var(--accent)]" style:width={`${driveUsage(drive)}%`}></div>
-					</div>
-					<div class="mt-2 flex justify-between text-[12px] text-[var(--text-muted)]">
-						<span>{formatBytes(drive.available_space)} free</span>
-						<span>{driveUsage(drive)}%</span>
-					</div>
-				</button>
-			{/each}
-		</div>
+		{#if drives.length === 0}
+			<div class="empty-pane">
+				<Icon name="hard-drive" size={42} />
+				<p>No drives mounted</p>
+			</div>
+		{:else}
+			<div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 pb-4 pt-2">
+				{#each internalDrives as drive (drive.mount_point)}
+					{@render driveTile(drive)}
+				{/each}
+				{#if internalDrives.length > 0 && externalDrives.length > 0}
+					<div class="col-span-full my-1 h-px bg-[var(--hairline)]"></div>
+				{/if}
+				{#each externalDrives as drive (drive.mount_point)}
+					{@render driveTile(drive)}
+				{/each}
+			</div>
+		{/if}
 	{:else if currentView === 'trash'}
 		<TrashPane {trashItems} {trashLocations} {selectedPaths} {onSelectTrashItem} {onRestoreTrash} {onEmptyTrash} {itemDelay} />
 	{:else if currentView === 'favorites'}
@@ -312,7 +486,7 @@
 					/>
 				</div>
 			{/if}
-			{#each entries as entry, index (entry.path)}
+			{#each paneEntries as entry, index (entry.path)}
 				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
 					<div class={['grid-tile', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
@@ -332,14 +506,17 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable={canDrag}
-						onclick={(event) => onSelectEntry(entry, event)}
+						draggable={false}
+						data-drop-path={entry.is_dir ? entry.path : undefined}
+						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
+						onclick={(event) => selectEntry(entry, event)}
 						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
+						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}
 						ondragend={onDragEnd}
-						ondragover={(event) => onDragOver(event, entry)}
+						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
 					>
@@ -375,7 +552,7 @@
 					<span class="truncate text-[var(--text-muted)]">{draft.itemType === 'folder' ? 'Folder' : 'File'}</span>
 				</div>
 			{/if}
-			{#each entries as entry, index (entry.path)}
+			{#each paneEntries as entry, index (entry.path)}
 				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
 					<div class={['table-row', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
@@ -399,14 +576,17 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable={canDrag}
-						onclick={(event) => onSelectEntry(entry, event)}
+						draggable={false}
+						data-drop-path={entry.is_dir ? entry.path : undefined}
+						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
+						onclick={(event) => selectEntry(entry, event)}
 						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
+						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}
 						ondragend={onDragEnd}
-						ondragover={(event) => onDragOver(event, entry)}
+						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
 					>
@@ -436,7 +616,7 @@
 					/>
 				</div>
 			{/if}
-			{#each entries as entry, index (entry.path)}
+			{#each paneEntries as entry, index (entry.path)}
 				{@const status = vcsStatus(entry)}
 				{#if isRenaming(entry)}
 					<div class={['file-row', ...entryState(entry)]} style:animation-delay={itemDelay(index)}>
@@ -458,14 +638,17 @@
 						data-entry-path={entry.path}
 						style:animation-delay={itemDelay(index)}
 						type="button"
-						draggable={canDrag}
-						onclick={(event) => onSelectEntry(entry, event)}
+						draggable={false}
+						data-drop-path={entry.is_dir ? entry.path : undefined}
+						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
+						onclick={(event) => selectEntry(entry, event)}
 						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
+						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
 						ondragstart={(event) => onDragStart(event, entry)}
 						ondragend={onDragEnd}
-						ondragover={(event) => onDragOver(event, entry)}
+						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
 					>
@@ -481,6 +664,16 @@
 		</div>
 	{/if}
 </section>
+
+{#if pointerDrag?.started}
+	<DragBundle
+		entries={pointerDrag.entries}
+		{thumbnails}
+		x={pointerDrag.currentX}
+		y={pointerDrag.currentY}
+		copy={pointerDrag.copy}
+	/>
+{/if}
 
 <style>
 	.loading-skeleton {

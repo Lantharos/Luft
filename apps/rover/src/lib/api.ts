@@ -100,15 +100,15 @@ export async function renameItem(path: string, newName: string): Promise<FileEnt
 	return invoke('rename_item', { path: filePath(path), newName });
 }
 
-export async function copyItems(sources: string[], destination: string): Promise<string[]> {
+export async function copyItems(sources: string[], destination: string): Promise<string> {
 	return invoke('copy_items', { sources: filePaths(sources), destination: filePath(destination) });
 }
 
-export async function moveItems(sources: string[], destination: string): Promise<string[]> {
+export async function moveItems(sources: string[], destination: string): Promise<string> {
 	return invoke('move_items', { sources: filePaths(sources), destination: filePath(destination) });
 }
 
-export async function deleteItems(paths: string[]): Promise<void> {
+export async function deleteItems(paths: string[]): Promise<string> {
 	return invoke('delete_items', { paths: filePaths(paths) });
 }
 
@@ -143,6 +143,10 @@ export async function listDrives(): Promise<DriveList> {
 
 export async function getDriveInfo(mountPoint: string): Promise<DriveInfo> {
 	return invoke('get_drive_info', { mountPoint: filePath(mountPoint) });
+}
+
+export async function ejectDrive(mountPoint: string): Promise<void> {
+	return invoke('eject_drive', { mountPoint: filePath(mountPoint) });
 }
 
 // Trash

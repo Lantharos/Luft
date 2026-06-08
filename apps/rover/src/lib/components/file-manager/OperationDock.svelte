@@ -1,19 +1,24 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import * as api from '$lib/api';
 	import Icon from '$lib/components/Icon.svelte';
 	import { isDesktopRuntime } from '$lib/runtime';
-	import type { Operation, QueueStatus } from '$lib/types';
+	import type { Operation, OperationStatus, QueueStatus } from '$lib/types';
 	import { formatBytes } from '$lib/utils';
 
 	let queue = $state<QueueStatus | null>(null);
-	let now = $state(Math.floor(Date.now() / 1000));
+	let now = $state(Date.now());
 
-	const activeStatuses = new Set(['Pending', 'InProgress', 'Paused']);
+	const activeStatuses: OperationStatus[] = ['Pending', 'InProgress', 'Paused'];
+	const attentionDelay = 650;
+	const completedLinger = 2000;
+	const firstSeenAt = new SvelteMap<string, number>();
+	const shownOperations = new SvelteSet<string>();
 
 	let visibleOperations = $derived(
 		(queue?.operations ?? [])
-			.filter((operation) => activeStatuses.has(operation.status) || !operation.completed_at || now - operation.completed_at < 2)
+			.filter((operation) => shouldRenderOperation(operation))
 			.slice(0, 4)
 	);
 
@@ -21,7 +26,7 @@
 		if (!isDesktopRuntime()) return;
 		void refreshQueue();
 		const interval = window.setInterval(() => {
-			now = Math.floor(Date.now() / 1000);
+			now = Date.now();
 			void refreshQueue();
 		}, 500);
 		return () => window.clearInterval(interval);
@@ -29,10 +34,47 @@
 
 	async function refreshQueue() {
 		try {
-			queue = await api.getQueueStatus();
+			const nextQueue = await api.getQueueStatus();
+			rememberOperationVisibility(nextQueue.operations, now);
+			queue = nextQueue;
 		} catch {
 			queue = null;
 		}
+	}
+
+	function rememberOperationVisibility(operations: Operation[], timestamp: number) {
+		const liveIds = operations.map((operation) => operation.id);
+		for (const operation of operations) {
+			if (!firstSeenAt.has(operation.id)) firstSeenAt.set(operation.id, operation.started_at ? operation.started_at * 1000 : timestamp);
+			if (operation.status === 'Failed' || operation.status === 'Cancelled' || operationRanLongEnough(operation, timestamp)) {
+				shownOperations.add(operation.id);
+			}
+		}
+		for (const id of firstSeenAt.keys()) {
+			if (liveIds.includes(id)) continue;
+			firstSeenAt.delete(id);
+			shownOperations.delete(id);
+		}
+	}
+
+	function operationRanLongEnough(operation: Operation, timestamp: number) {
+		const started = operation.started_at ? operation.started_at * 1000 : (firstSeenAt.get(operation.id) ?? timestamp);
+		const ended = operation.completed_at ? operation.completed_at * 1000 : timestamp;
+		return ended - started >= attentionDelay;
+	}
+
+	function shouldRenderOperation(operation: Operation) {
+		if (isActiveStatus(operation.status)) return shownOperations.has(operation.id);
+		if (operation.status === 'Completed') return shownOperations.has(operation.id) && completedRecently(operation);
+		return shownOperations.has(operation.id) && completedRecently(operation);
+	}
+
+	function isActiveStatus(status: OperationStatus) {
+		return activeStatuses.includes(status);
+	}
+
+	function completedRecently(operation: Operation) {
+		return !operation.completed_at || now - operation.completed_at * 1000 < completedLinger;
 	}
 
 	function operationTitle(operation: Operation) {
@@ -48,8 +90,14 @@
 		return 'Deleting';
 	}
 
+	function operationIcon(operation: Operation): 'trash-2' | 'upload' | 'copy' {
+		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return 'trash-2';
+		if (operation.op_type === 'Move') return 'upload';
+		return 'copy';
+	}
+
 	function fileName(operation: Operation) {
-		if (!activeStatuses.has(operation.status)) return operation.status === 'Failed' ? 'Failed' : 'Done';
+		if (!isActiveStatus(operation.status)) return operation.status === 'Failed' ? 'Failed' : 'Done';
 		return operation.current_file?.split('/').filter(Boolean).at(-1) ?? 'Preparing';
 	}
 
@@ -77,7 +125,7 @@
 			>
 				<div class="flex items-center gap-3">
 					<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[rgba(245,245,242,0.08)] text-[var(--text-soft)]">
-						<Icon name={operation.op_type === 'Delete' ? 'trash-2' : operation.op_type === 'Move' ? 'upload' : 'copy'} size={17} />
+						<Icon name={operationIcon(operation)} size={17} />
 					</div>
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center justify-between gap-3 text-[var(--text)]">
@@ -102,7 +150,7 @@
 								<Icon name="play" size={14} />
 							</button>
 						{/if}
-						{#if activeStatuses.has(operation.status)}
+						{#if isActiveStatus(operation.status)}
 							<button class="tool-button h-8 min-h-8 w-8 min-w-8" type="button" aria-label="Cancel operation" onclick={() => api.cancelOperation(operation.id)}>
 								<Icon name="x" size={14} />
 							</button>

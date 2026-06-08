@@ -103,6 +103,7 @@ function createTabsStore() {
 				id,
 				path: homePath,
 				title: 'Home',
+				view: 'home',
 				history: [homePath],
 				historyIndex: 0
 			};
@@ -111,12 +112,13 @@ function createTabsStore() {
 			return tab;
 		},
 		
-		addTab(path: string, title: string) {
+		addTab(path: string, title: string, view: SidebarView = 'home') {
 			const id = generateId();
 			const tab: Tab = {
 				id,
 				path,
 				title,
+				view,
 				history: [path],
 				historyIndex: 0
 			};
@@ -170,6 +172,7 @@ function createTabsStore() {
 							...t,
 							path,
 							title,
+							view: 'home',
 							history: newHistory,
 							historyIndex: newHistory.length - 1
 						};
@@ -189,6 +192,7 @@ function createTabsStore() {
 					return {
 						...t,
 						path: newPath!,
+						view: 'home',
 						historyIndex: newIndex
 					};
 				})
@@ -206,6 +210,7 @@ function createTabsStore() {
 					return {
 						...t,
 						path: newPath!,
+						view: 'home',
 						historyIndex: newIndex
 					};
 				})

@@ -13,11 +13,13 @@
 	import * as api from '$lib/api';
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
+	import { tabDropKey, type DropTarget } from '$lib/file-manager/drop-targets';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
 	import type { SingleInstanceActivation } from '$lib/file-manager/open-targets';
+	import { isDrivePath } from '$lib/file-manager/view-modes';
 	import { isDesktopRuntime } from '$lib/runtime';
-	import { activeTab, clipboard, currentView, drives, selection, settings, tabs, userDirs } from '$lib/stores';
-	import type { ChooserConfig, FavoriteItem, FileEntry, PinnedFolder, SidebarView, TrashLocation } from '$lib/types';
+	import { activeTab, clipboard, currentView, drives, loadDrives, selection, settings, tabs, userDirs } from '$lib/stores';
+	import type { ChooserConfig, DriveInfo, FavoriteItem, FileEntry, PinnedFolder, SidebarView, Tab, TrashLocation } from '$lib/types';
 	import { VcsState } from '$lib/vcs/state.svelte';
 
 	const manager = new FileManager();
@@ -25,13 +27,19 @@
 	let seededSidebarBookmarks = false;
 	let chooser = $state<ChooserConfig | null>(null);
 	let chooserSaveName = $state('');
+	let sidebar: { focusSearch: () => void } | null = null;
+	let hiddenSidebarDriveMounts = $state<string[]>([]);
+	let dragHoverTabId: string | null = null;
+	let dragHoverTabTimer: number | null = null;
 
 	onMount(() => {
 		let disposed = false;
 		let removeSingleInstanceListener: (() => void) | null = null;
+		let driveRefreshTimer: number | null = null;
 		void initialize();
 		document.addEventListener('click', manager.closeFloatingUi);
 		if (isDesktopRuntime()) {
+			driveRefreshTimer = window.setInterval(() => void loadDrives(), 5000);
 			void api
 				.listenBridgeEvent<SingleInstanceActivation>('singleInstance.activate', (activation) => {
 					void manager.openSingleInstanceActivation(activation);
@@ -44,7 +52,9 @@
 		}
 		return () => {
 			disposed = true;
+			clearDragHoverTab();
 			document.removeEventListener('click', manager.closeFloatingUi);
+			if (driveRefreshTimer !== null) window.clearInterval(driveRefreshTimer);
 			removeSingleInstanceListener?.();
 		};
 	});
@@ -76,6 +86,9 @@
 	});
 	let chooserAcceptPaths = $derived.by(() => pathsForChooser());
 	let chooserCanAccept = $derived(Boolean(chooser && chooserAcceptPaths.length > 0));
+	let sidebarDrives = $derived.by(() =>
+		$drives.filter((drive) => drive.is_removable && !hiddenSidebarDriveMounts.includes(drive.mount_point))
+	);
 	let contextTargetIsPinned = $derived(
 		Boolean(
 			manager.contextMenu?.target &&
@@ -94,8 +107,12 @@
 	});
 
 	$effect(() => {
-		if ($currentView === 'home' && !chooser && !manager.isLoading && manager.currentPath) vcs.open(manager.currentPath);
-		else vcs.clear();
+		if ($currentView !== 'home' || chooser) {
+			vcs.clear();
+			return;
+		}
+		if (!manager.currentPath || manager.isLoading) return;
+		vcs.open(manager.currentPath, manager.entries);
 	});
 
 	async function initialize() {
@@ -173,6 +190,23 @@
 		}));
 	}
 
+	function hideSidebarDrive(mountPoint: string) {
+		if (hiddenSidebarDriveMounts.includes(mountPoint)) return;
+		hiddenSidebarDriveMounts = [...hiddenSidebarDriveMounts, mountPoint];
+	}
+
+	async function ejectDrive(drive: DriveInfo) {
+		try {
+			await api.ejectDrive(drive.mount_point);
+			await loadDrives();
+			if ($currentView === 'home' && isDrivePath(manager.currentPath, [drive])) {
+				await manager.navigate($userDirs?.home ?? '/');
+			}
+		} catch (caught) {
+			manager.error = caught instanceof Error ? caught.message : String(caught);
+		}
+	}
+
 	async function reorderSidebarBookmark(sourcePath: string, targetPath: string | null) {
 		await settings.updateAndSave((current) => {
 			const next = [...current.pinnedFolders];
@@ -198,6 +232,62 @@
 		}
 		if (bookmark.is_dir) await manager.navigate(bookmark.path);
 		else await api.openWithDefault(bookmark.path);
+	}
+
+	async function openSidebarBookmarkInTab(bookmark: PinnedFolder) {
+		if (bookmark.is_dir) await manager.openNewTab(bookmark.path);
+		else await api.openWithDefault(bookmark.path);
+	}
+
+	function handleTabDragOver(event: DragEvent, tab: Tab) {
+		if (tab.view === 'home') return manager.handlePathDragOver(event, tab.path, tabDropKey(tab.id));
+		if (tab.view === 'trash') {
+			const accepted = manager.handleTrashDragOver(event);
+			if (accepted) manager.setDropTarget({ path: 'trash', key: tabDropKey(tab.id), tabId: tab.id });
+			return accepted;
+		}
+		return false;
+	}
+
+	function handleTabDrop(event: DragEvent, tab: Tab) {
+		if (tab.view === 'home') {
+			void manager.handleDrop(event, tab.path);
+			return;
+		}
+		if (tab.view === 'trash') void manager.handleTrashDrop(event);
+	}
+
+	function clearDragHoverTab() {
+		if (dragHoverTabTimer !== null) {
+			window.clearTimeout(dragHoverTabTimer);
+			dragHoverTabTimer = null;
+		}
+		dragHoverTabId = null;
+	}
+
+	function scheduleDragHoverTab(tabId: string | null) {
+		if (!tabId || tabId === $activeTab?.id) {
+			clearDragHoverTab();
+			return;
+		}
+		if (dragHoverTabId === tabId) return;
+		clearDragHoverTab();
+		dragHoverTabId = tabId;
+		dragHoverTabTimer = window.setTimeout(() => {
+			dragHoverTabTimer = null;
+			const tab = $tabs.find((item) => item.id === tabId);
+			if (tab && $activeTab?.id !== tab.id) void manager.switchTab(tab.id);
+		}, 450);
+	}
+
+	function handleInternalDragMove(target: DropTarget | null) {
+		manager.updateInternalDropTarget(target);
+		scheduleDragHoverTab(target?.tabId ?? null);
+	}
+
+	function handleInternalDragEnd(targetPath: string | null, copy: boolean) {
+		clearDragHoverTab();
+		void manager.finishInternalDrop(targetPath, copy);
 	}
 
 	function selectableChooserEntry(entry: FileEntry) {
@@ -282,6 +372,11 @@
 	}
 
 	function handleChooserKeydown(event: KeyboardEvent) {
+		if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'f') {
+			event.preventDefault();
+			sidebar?.focusSearch();
+			return;
+		}
 		const target = event.target instanceof Element ? event.target : null;
 		if (target?.closest('input, textarea, [contenteditable="true"]')) return;
 		if (!chooser) return manager.handleKeydown(event);
@@ -312,16 +407,26 @@
 		if (entry && !entry.is_dir) void vcs.loadDiff(vcs.relativePath(entry.path));
 	}
 
+	function toggleVcsPanel() {
+		if (!vcs.project) return;
+		vcs.panelOpen = !vcs.panelOpen;
+	}
+
 	function openVcsSave(entry?: FileEntry) {
 		if (!vcs.project) return;
 		const file = entry && !entry.is_dir ? [vcs.relativePath(entry.path)] : undefined;
 		vcs.openSaveDialog(file);
 	}
+
+	function handleWindowFocus() {
+		vcs.refreshNow();
+		void loadDrives();
+	}
 </script>
 
 <svelte:window
 	onkeydown={handleChooserKeydown}
-	onfocus={() => vcs.refreshNow()}
+	onfocus={handleWindowFocus}
 	onmousedown={manager.handleDragRegionMouseDown}
 	onmouseup={manager.handleMouseButtonNavigation}
 />
@@ -330,18 +435,31 @@
 	<main class="rover-shell h-full overflow-hidden" data-effect={manager.backgroundEffect}>
 		<div class="flex h-full">
 			<Sidebar
+				bind:this={sidebar}
 				currentView={$currentView}
 				currentPath={manager.currentPath}
 				searchQuery={manager.searchQuery}
 				userDirs={$userDirs}
 				pinnedFolders={$settings.pinnedFolders}
 				drives={$drives}
+				{sidebarDrives}
+				dropTargetKey={manager.dropTargetKey}
 				backgroundEffect={manager.backgroundEffect}
 				onSearch={(value) => (manager.searchQuery = value)}
 				onSwitchView={switchChooserView}
 				onNavigate={manager.navigate}
+				onOpenPathInTab={manager.openNewTab}
+				onOpenViewInTab={manager.openViewInNewTab}
 				onOpenBookmark={openSidebarBookmark}
+				onOpenBookmarkInTab={openSidebarBookmarkInTab}
 				onRemoveBookmark={removeSidebarBookmark}
+				onHideDrive={hideSidebarDrive}
+				onEjectDrive={ejectDrive}
+				onPathDragOver={manager.handlePathDragOver}
+				onPathDrop={manager.handleDrop}
+				onPathDragLeave={manager.handleDragLeave}
+				onTrashDragOver={manager.handleTrashDragOver}
+				onTrashDrop={manager.handleTrashDrop}
 				onReorderBookmarks={reorderSidebarBookmark}
 				onDropBookmark={(event) => pinPathsToSidebar(droppedSidebarPaths(event))}
 			/>
@@ -350,11 +468,14 @@
 				<AppHeader
 					tabs={$tabs}
 					activeTab={$activeTab}
-					currentView={$currentView}
 					homePath={$userDirs?.home ?? null}
+					dropTargetKey={manager.dropTargetKey}
 					onSwitchTab={manager.switchTab}
 					onCloseTab={manager.closeTab}
 					onOpenTab={() => manager.openNewTab()}
+					onTabDragOver={handleTabDragOver}
+					onTabDrop={handleTabDrop}
+					onTabDragLeave={manager.handleDragLeave}
 					onMinimize={manager.minimize}
 					onToggleMaximize={manager.toggleMaximize}
 					onCloseWindow={manager.closeWindow}
@@ -387,7 +508,7 @@
 						onToggleHidden={manager.toggleHidden}
 						onSort={manager.setSortBy}
 						onViewMode={manager.setViewMode}
-						onOpenVcs={() => openVcsChanges()}
+						onOpenVcs={toggleVcsPanel}
 					/>
 				{/if}
 
@@ -406,7 +527,7 @@
 						selectedPaths={$selection}
 						showLoadingSkeleton={manager.showLoadingSkeleton}
 						error={manager.error}
-						dropTarget={manager.dropTarget}
+						dropTargetKey={manager.dropTargetKey}
 						isDragging={manager.isDragging}
 						canDrag={!chooser}
 						allowSelectedDoubleClick={Boolean(chooser)}
@@ -420,8 +541,13 @@
 						onDragOver={chooser ? (event) => event.preventDefault() : manager.handleDragOver}
 						onDragLeave={manager.handleDragLeave}
 						onDrop={chooser ? (event) => event.preventDefault() : manager.handleDrop}
+						onPathDragOver={chooser ? () => false : manager.handlePathDragOver}
+						onInternalDragStart={manager.beginInternalDrag}
+						onInternalDragMove={handleInternalDragMove}
+						onInternalDragEnd={handleInternalDragEnd}
 						onSort={manager.setSortBy}
 						onNavigate={manager.navigate}
+						onOpenPathInTab={manager.openNewTab}
 						onSelectRange={handleChooserRange}
 						onDraftInput={manager.updateDraft}
 						onDraftConfirm={manager.commitDraft}

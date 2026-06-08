@@ -225,6 +225,11 @@ fn register_commands(mut window: CefWindow, state: RoverState) -> CefWindow {
         json_result(drives::get_drive_info(mount_point))
     });
 
+    command!("eject_drive", move |command| {
+        let MountPointParams { mount_point } = params(&command)?;
+        json_result(drives::eject_drive(mount_point))
+    });
+
     command!("list_trash", move |_| json_result(
         trash_manager::list_trash()
     ));

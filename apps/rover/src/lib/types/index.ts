@@ -169,12 +169,18 @@ export interface Settings {
 }
 
 // Tab types
+export interface TabHistoryEntry {
+	path: string;
+	title: string;
+	view: SidebarView;
+}
+
 export interface Tab {
 	id: string;
 	path: string;
 	title: string;
 	view: SidebarView;
-	history: string[];
+	history: TabHistoryEntry[];
 	historyIndex: number;
 }
 

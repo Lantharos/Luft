@@ -26,6 +26,7 @@
 		trashItems: TrashItem[];
 		trashLocations: TrashLocation[];
 		drives: DriveInfo[];
+		ejectingDriveMounts: string[];
 		thumbnails: Record<string, string | null>;
 		draft: InlineDraft | null;
 		viewMode: ViewMode;
@@ -71,6 +72,7 @@
 		trashItems,
 		trashLocations,
 		drives,
+		ejectingDriveMounts,
 		thumbnails,
 		draft,
 		viewMode,
@@ -159,6 +161,10 @@
 
 	function driveIcon(drive: DriveInfo): 'hard-drive' | 'usb' {
 		return drive.is_removable ? 'usb' : 'hard-drive';
+	}
+
+	function driveEjecting(drive: DriveInfo) {
+		return ejectingDriveMounts.includes(drive.mount_point);
 	}
 
 	function openDriveWithMiddleClick(event: MouseEvent, drive: DriveInfo) {
@@ -350,31 +356,34 @@
 />
 
 {#snippet driveTile(drive: DriveInfo)}
+	{@const ejecting = driveEjecting(drive)}
 	<div
 		class={[
 			'drive-tile',
+			ejecting ? 'opacity-60' : '',
 			dropTargetKey === driveDropKey(drive.mount_point) ? 'drop-target-entry' : ''
 		]}
 		role="group"
-		ondragover={(event) => onPathDragOver(event, drive.mount_point, driveDropKey(drive.mount_point))}
+		ondragover={(event) => !ejecting && onPathDragOver(event, drive.mount_point, driveDropKey(drive.mount_point))}
 		ondragleave={onDragLeave}
-		ondrop={(event) => onDrop(event, drive.mount_point)}
-		data-drop-path={drive.mount_point}
-		data-drop-key={driveDropKey(drive.mount_point)}
+		ondrop={(event) => !ejecting && onDrop(event, drive.mount_point)}
+		data-drop-path={ejecting ? undefined : drive.mount_point}
+		data-drop-key={ejecting ? undefined : driveDropKey(drive.mount_point)}
 	>
 		<button
 			class="drive-open w-full text-left"
 			type="button"
+			disabled={ejecting}
 			onclick={() => onNavigate(drive.mount_point)}
 			onauxclick={(event) => openDriveWithMiddleClick(event, drive)}
 		>
 			<div class="flex items-center gap-3">
 				<div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--control)] text-[var(--text-soft)]">
-					<Icon name={driveIcon(drive)} size={20} />
+					<Icon name={ejecting ? 'refresh' : driveIcon(drive)} size={20} class={ejecting ? 'animate-spin' : ''} />
 				</div>
 				<div class="min-w-0">
 					<div class="truncate text-[14px] font-medium text-[var(--text)]">{drive.name}</div>
-					<div class="truncate text-[12px] text-[var(--text-muted)]">{drive.mount_point}</div>
+					<div class="truncate text-[12px] text-[var(--text-muted)]">{ejecting ? 'Ejecting' : drive.mount_point}</div>
 				</div>
 			</div>
 			<div class="mt-4 h-2 overflow-hidden rounded-full bg-[var(--control)]">

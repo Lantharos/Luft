@@ -29,6 +29,7 @@
 	let chooserSaveName = $state('');
 	let sidebar: { focusSearch: () => void } | null = null;
 	let hiddenSidebarDriveMounts = $state<string[]>([]);
+	let ejectingDriveMounts = $state<string[]>([]);
 	let dragHoverTabId: string | null = null;
 	let dragHoverTabTimer: number | null = null;
 
@@ -195,15 +196,45 @@
 		hiddenSidebarDriveMounts = [...hiddenSidebarDriveMounts, mountPoint];
 	}
 
+	function driveIsEjecting(mountPoint: string) {
+		return ejectingDriveMounts.includes(mountPoint);
+	}
+
+	function setDriveEjecting(mountPoint: string, ejecting: boolean) {
+		if (ejecting) {
+			if (!ejectingDriveMounts.includes(mountPoint)) ejectingDriveMounts = [...ejectingDriveMounts, mountPoint];
+			return;
+		}
+		ejectingDriveMounts = ejectingDriveMounts.filter((item) => item !== mountPoint);
+	}
+
+	function wait(ms: number) {
+		return new Promise((resolve) => window.setTimeout(resolve, ms));
+	}
+
+	async function refreshDrivesUntilUnmounted(mountPoint: string) {
+		for (const delay of [0, 300, 900, 1800, 3000, 5000, 8000, 12000]) {
+			if (delay > 0) await wait(delay);
+			const mountedDrives = await loadDrives();
+			if (!mountedDrives.some((item) => item.mount_point === mountPoint)) return true;
+		}
+		return false;
+	}
+
 	async function ejectDrive(drive: DriveInfo) {
+		if (driveIsEjecting(drive.mount_point)) return;
+		setDriveEjecting(drive.mount_point, true);
 		try {
 			await api.ejectDrive(drive.mount_point);
-			await loadDrives();
-			if ($currentView === 'home' && isDrivePath(manager.currentPath, [drive])) {
+			const unmounted = await refreshDrivesUntilUnmounted(drive.mount_point);
+			if (unmounted && $currentView === 'home' && isDrivePath(manager.currentPath, [drive])) {
 				await manager.navigate($userDirs?.home ?? '/');
 			}
 		} catch (caught) {
 			manager.error = caught instanceof Error ? caught.message : String(caught);
+			await loadDrives();
+		} finally {
+			setDriveEjecting(drive.mount_point, false);
 		}
 	}
 
@@ -377,6 +408,11 @@
 			sidebar?.focusSearch();
 			return;
 		}
+		if (event.key === 'F5') {
+			event.preventDefault();
+			void manager.refresh();
+			return;
+		}
 		const target = event.target instanceof Element ? event.target : null;
 		if (target?.closest('input, textarea, [contenteditable="true"]')) return;
 		if (!chooser) return manager.handleKeydown(event);
@@ -443,6 +479,7 @@
 				pinnedFolders={$settings.pinnedFolders}
 				drives={$drives}
 				{sidebarDrives}
+				{ejectingDriveMounts}
 				dropTargetKey={manager.dropTargetKey}
 				backgroundEffect={manager.backgroundEffect}
 				onSearch={(value) => (manager.searchQuery = value)}
@@ -521,6 +558,7 @@
 						trashItems={manager.trashItems}
 						{trashLocations}
 						drives={$drives}
+						{ejectingDriveMounts}
 						thumbnails={manager.thumbnails}
 						draft={manager.inlineDraft}
 						viewMode={manager.viewMode}

@@ -1,6 +1,7 @@
 import { writable, derived, get } from 'svelte/store';
 import type {
 	Tab,
+	TabHistoryEntry,
 	FileEntry,
 	Settings,
 	ClipboardState,
@@ -93,6 +94,34 @@ function createTabsStore() {
 	const { subscribe, set, update } = writable<Tab[]>([]);
 	const activeTabId = writable<string | null>(null);
 
+	function tabEntry(path: string, title: string, view: SidebarView): TabHistoryEntry {
+		return { path, title, view };
+	}
+
+	function sameEntry(tab: Tab, entry: TabHistoryEntry) {
+		return tab.path === entry.path && tab.view === entry.view;
+	}
+
+	function navigateEntry(id: string, entry: TabHistoryEntry) {
+		update(tabs =>
+			tabs.map(t => {
+				if (t.id !== id) return t;
+
+				if (!sameEntry(t, entry)) {
+					const newHistory = t.history.slice(0, t.historyIndex + 1);
+					newHistory.push(entry);
+					return {
+						...t,
+						...entry,
+						history: newHistory,
+						historyIndex: newHistory.length - 1
+					};
+				}
+				return t;
+			})
+		);
+	}
+
 	return {
 		subscribe,
 		activeTabId,
@@ -104,7 +133,7 @@ function createTabsStore() {
 				path: homePath,
 				title: 'Home',
 				view: 'home',
-				history: [homePath],
+				history: [tabEntry(homePath, 'Home', 'home')],
 				historyIndex: 0
 			};
 			set([tab]);
@@ -119,7 +148,7 @@ function createTabsStore() {
 				path,
 				title,
 				view,
-				history: [path],
+				history: [tabEntry(path, title, view)],
 				historyIndex: 0
 			};
 			update(tabs => [...tabs, tab]);
@@ -159,63 +188,48 @@ function createTabsStore() {
 			);
 		},
 		
+		navigateEntry,
+
 		navigate(id: string, path: string, title: string) {
-			update(tabs => 
-				tabs.map(t => {
-					if (t.id !== id) return t;
-					
-					// Add to history if different from current
-					if (t.path !== path) {
-						const newHistory = t.history.slice(0, t.historyIndex + 1);
-						newHistory.push(path);
-						return {
-							...t,
-							path,
-							title,
-							view: 'home',
-							history: newHistory,
-							historyIndex: newHistory.length - 1
-						};
-					}
-					return t;
-				})
-			);
+			navigateEntry(id, tabEntry(path, title, 'home'));
+		},
+
+		navigateView(id: string, view: SidebarView, path: string, title: string) {
+			navigateEntry(id, tabEntry(path, title, view));
 		},
 		
 		goBack(id: string) {
-			let newPath: string | null = null;
+			let entry: TabHistoryEntry | null = null;
 			update(tabs => 
 				tabs.map(t => {
 					if (t.id !== id || t.historyIndex <= 0) return t;
 					const newIndex = t.historyIndex - 1;
-					newPath = t.history[newIndex];
+					entry = t.history[newIndex];
 					return {
 						...t,
-						path: newPath!,
-						view: 'home',
+						...entry!,
 						historyIndex: newIndex
 					};
 				})
 			);
-			return newPath;
+			return entry;
 		},
 		
 		goForward(id: string) {
-			let newPath: string | null = null;
+			let entry: TabHistoryEntry | null = null;
 			update(tabs => 
 				tabs.map(t => {
 					if (t.id !== id || t.historyIndex >= t.history.length - 1) return t;
 					const newIndex = t.historyIndex + 1;
-					newPath = t.history[newIndex];
+					entry = t.history[newIndex];
 					return {
 						...t,
-						path: newPath!,
-						view: 'home',
+						...entry!,
 						historyIndex: newIndex
 					};
 				})
 			);
-			return newPath;
+			return entry;
 		},
 		
 		canGoBack(tab: Tab): boolean {

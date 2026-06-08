@@ -25,7 +25,7 @@ import { previewDrives, previewEntries, previewThumbnails, previewTrash, preview
 import { handleShortcut, isTextInputTarget } from '$lib/file-manager/shortcuts';
 import { thumbnailCandidates } from '$lib/file-manager/thumbnails';
 import { normalizePath, viewModeForPath } from '$lib/file-manager/view-modes';
-import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, Tab, TrashItem, ViewMode } from '$lib/types';
+import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, Tab, TabHistoryEntry, TrashItem, ViewMode } from '$lib/types';
 import { getParentPath, getPathSegments } from '$lib/utils';
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 export class FileManager {
@@ -164,19 +164,24 @@ export class FileManager {
 		this.thumbnails = { ...this.thumbnails, ...Object.fromEntries(loadedEntries) };
 	};
 	restoreTabView = async (tab: Tab) => {
+		await this.restoreHistoryEntry(tab);
+	};
+	restoreHistoryEntry = async (entry: Pick<TabHistoryEntry, 'path' | 'view'>) => {
 		this.contextMenu = null;
 		this.searchQuery = '';
 		this.inlineDraft = null;
 		selection.clear();
-		currentView.set(tab.view);
-		if (tab.view === 'home') {
-			await this.loadDirectory(tab.path);
+		this.currentPath = entry.path;
+		currentView.set(entry.view);
+		if (entry.view === 'home') {
+			await this.loadDirectory(entry.path);
 			return;
 		}
 		this.loading.cancel();
 		this.error = null;
-		if (tab.view === 'drives') await loadDrives();
-		if (tab.view === 'trash') await this.loadTrash();
+		if (entry.view === 'drives') await loadDrives();
+		if (entry.view === 'favorites') selection.clear();
+		if (entry.view === 'trash') await this.loadTrash();
 	};
 	loadTrash = async () => {
 		if (!isDesktopRuntime()) {
@@ -211,14 +216,22 @@ export class FileManager {
 		selection.clear();
 		currentView.set(view);
 		const tab = get(activeTab);
-		if (tab) tabs.updateTab(tab.id, { view });
 		if (view !== 'home') {
 			this.loading.cancel();
 			this.error = null;
 		}
 		if (view === 'home') await this.navigate(get(userDirs)?.home || this.currentPath || '/');
-		if (view === 'drives') await loadDrives();
-		if (view === 'trash') await this.loadTrash();
+		if (view === 'drives') {
+			if (tab) tabs.navigateView(tab.id, view, this.currentPath || get(userDirs)?.home || '/', 'Drives');
+			await loadDrives();
+		}
+		if (view === 'favorites') {
+			if (tab) tabs.navigateView(tab.id, view, this.currentPath || get(userDirs)?.home || '/', 'Favorites');
+		}
+		if (view === 'trash') {
+			if (tab) tabs.navigateView(tab.id, view, this.currentPath || get(userDirs)?.home || '/', 'Trash');
+			await this.loadTrash();
+		}
 	};
 	openFavorite = async (favorite: FavoriteItem) => {
 		if (favorite.is_dir) await this.navigate(favorite.path);
@@ -227,14 +240,22 @@ export class FileManager {
 	goBack = () => {
 		const tab = get(activeTab);
 		if (!tab || !tabs.canGoBack(tab)) return;
-		const path = tabs.goBack(tab.id);
-		if (path) this.loadDirectory(path);
+		const entry = tabs.goBack(tab.id);
+		if (entry) this.restoreHistoryEntry(entry);
 	};
 	goForward = () => {
 		const tab = get(activeTab);
 		if (!tab || !tabs.canGoForward(tab)) return;
-		const path = tabs.goForward(tab.id);
-		if (path) this.loadDirectory(path);
+		const entry = tabs.goForward(tab.id);
+		if (entry) this.restoreHistoryEntry(entry);
+	};
+	refresh = async () => {
+		if (get(currentView) === 'home') {
+			await this.loadDirectory(this.currentPath || get(userDirs)?.home || '/');
+			return;
+		}
+		if (get(currentView) === 'drives') await loadDrives();
+		if (get(currentView) === 'trash') await this.loadTrash();
 	};
 	goUp = () => {
 		if (!this.currentPath || this.currentPath === '/') return;
@@ -601,6 +622,11 @@ export class FileManager {
 		}
 	};
 	handleKeydown = (event: KeyboardEvent) => {
+		if (event.key === 'F5') {
+			event.preventDefault();
+			void this.refresh();
+			return;
+		}
 		if (isTextInputTarget(event.target)) return;
 		if (event.ctrlKey || event.metaKey) {
 			handleShortcut(event, {

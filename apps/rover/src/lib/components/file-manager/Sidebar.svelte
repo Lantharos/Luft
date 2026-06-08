@@ -12,6 +12,7 @@
 		pinnedFolders: PinnedFolder[];
 		drives: DriveInfo[];
 		sidebarDrives: DriveInfo[];
+		ejectingDriveMounts: string[];
 		dropTargetKey: string | null;
 		backgroundEffect: 'translucent' | 'opaque';
 		onSearch: (value: string) => void;
@@ -41,6 +42,7 @@
 		pinnedFolders,
 		drives,
 		sidebarDrives,
+		ejectingDriveMounts,
 		dropTargetKey,
 		backgroundEffect,
 		onSearch,
@@ -125,6 +127,10 @@
 
 	function driveActive(drive: DriveInfo) {
 		return currentView === 'home' && isDrivePath(currentPath, [drive]);
+	}
+
+	function driveEjecting(drive: DriveInfo) {
+		return ejectingDriveMounts.includes(drive.mount_point);
 	}
 
 	function primaryDropTarget(view: SidebarView) {
@@ -319,10 +325,17 @@
 
 		<nav class="flex flex-col gap-1 rounded-[18px] p-0.5" aria-label="External drives" data-no-drag>
 			{#each sidebarDrives as drive (drive.mount_point)}
-				<div class={rowStateClasses(driveActive(drive), dropTargetKey === sidebarDropKey(drive.mount_point))}>
+				{@const ejecting = driveEjecting(drive)}
+				<div
+					class={[
+						...rowStateClasses(driveActive(drive), dropTargetKey === sidebarDropKey(drive.mount_point)),
+						ejecting ? 'opacity-60' : ''
+					]}
+				>
 					<button
 						class="flex h-full min-w-0 flex-1 items-center gap-3 px-3 text-left"
 						type="button"
+						disabled={ejecting}
 						onclick={() => onNavigate(drive.mount_point)}
 						onauxclick={(event) => openPathWithMiddleClick(event, drive.mount_point)}
 						ondragover={(event) => onPathDragOver(event, drive.mount_point, sidebarDropKey(drive.mount_point))}
@@ -331,20 +344,25 @@
 						data-drop-path={drive.mount_point}
 						data-drop-key={sidebarDropKey(drive.mount_point)}
 					>
-						<Icon name="usb" size={19} />
-						<span class="truncate">{drive.name}</span>
+						<Icon name={ejecting ? 'refresh' : 'usb'} size={19} class={ejecting ? 'animate-spin' : ''} />
+						<span class="truncate">{drive.name}{ejecting ? ' · Ejecting' : ''}</span>
 					</button>
 					<button
-						class="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[var(--text-muted)] opacity-0 transition-[background-color,color,opacity,transform] duration-150 hover:bg-[var(--surface-soft)] hover:text-[var(--text)] group-hover:opacity-100 active:scale-[0.96]"
+						class={[
+							'grid h-7 w-7 shrink-0 place-items-center rounded-full text-[var(--text-muted)] transition-[background-color,color,opacity,transform] duration-150 active:scale-[0.96]',
+							ejecting ? 'opacity-100' : 'opacity-0 hover:bg-[var(--surface-soft)] hover:text-[var(--text)] group-hover:opacity-100'
+						]}
 						type="button"
-						aria-label={`Eject ${drive.name}`}
+						disabled={ejecting}
+						aria-label={ejecting ? `${drive.name} is ejecting` : `Eject ${drive.name}`}
 						onclick={(event) => ejectDrive(event, drive)}
 					>
-						<Icon name="eject" size={14} />
+						<Icon name={ejecting ? 'refresh' : 'eject'} size={14} class={ejecting ? 'animate-spin' : ''} />
 					</button>
 					<button
 						class="mr-1 grid h-7 w-7 shrink-0 place-items-center rounded-full text-[var(--text-muted)] opacity-0 transition-[background-color,color,opacity,transform] duration-150 hover:bg-[var(--surface-soft)] hover:text-[var(--text)] group-hover:opacity-100 active:scale-[0.96]"
 						type="button"
+						disabled={ejecting}
 						aria-label={`Hide ${drive.name} from sidebar`}
 						onclick={(event) => hideDrive(event, drive)}
 					>

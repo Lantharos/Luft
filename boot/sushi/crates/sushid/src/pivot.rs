@@ -28,7 +28,6 @@ pub fn ensure_sysroot_mounted() -> Result<()> {
     let root_dev = root_device_from_cmdline().unwrap_or_else(|| "/dev/vda".to_string());
     wait_for_block_device(&root_dev)?;
     mount_root(&root_dev, "/sysroot")?;
-    let init = Path::new("/sysroot/sbin/init");
     eprintln!("sushid: mounted {root_dev} on /sysroot");
     Ok(())
 }
@@ -68,9 +67,7 @@ pub fn switch_root(new_root: &Path) -> Result<()> {
         }
 
         detach_old_root_mounts();
-
-        // Hand the visible console back to fbcon before PID 1 takes over.
-        crate::enable_fbcon();
+        crate::console::handoff_framebuffer_to_console();
 
         let argv = [c_init.as_ptr(), std::ptr::null()];
         libc::execv(c_init.as_ptr(), argv.as_ptr());
@@ -78,8 +75,25 @@ pub fn switch_root(new_root: &Path) -> Result<()> {
     }
 }
 
-fn root_device_from_cmdline() -> Option<String> {
+pub fn parse_root_from_cmdline(cmdline: &str) -> Option<String> {
+    for token in cmdline.split_whitespace() {
+        let Some(dev) = token.strip_prefix("root=") else {
+            continue;
+        };
+        let dev = dev.trim_matches('"');
+        if dev.starts_with("UUID=") || dev.starts_with("LABEL=") {
+            return None;
+        }
+        return Some(dev.to_string());
+    }
+    None
+}
+
+pub fn root_device_from_cmdline() -> Option<String> {
     let cmdline = fs::read_to_string("/proc/cmdline").ok()?;
+    if let Some(dev) = parse_root_from_cmdline(&cmdline) {
+        return Some(dev);
+    }
     for token in cmdline.split_whitespace() {
         let Some(dev) = token.strip_prefix("root=") else {
             continue;
@@ -88,7 +102,6 @@ fn root_device_from_cmdline() -> Option<String> {
         if dev.starts_with("UUID=") || dev.starts_with("LABEL=") {
             return resolve_root_spec(dev);
         }
-        return Some(dev.to_string());
     }
     None
 }
@@ -172,5 +185,22 @@ fn detach_old_root_mounts() {
         unsafe {
             let _ = libc::umount2(cpath.as_ptr(), libc::MNT_DETACH);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_root_from_cmdline;
+
+    #[test]
+    fn parse_root_device_plain() {
+        let dev = parse_root_from_cmdline("ro root=/dev/vda console=ttyS0");
+        assert_eq!(dev.as_deref(), Some("/dev/vda"));
+    }
+
+    #[test]
+    fn parse_root_device_quoted() {
+        let dev = parse_root_from_cmdline(r#"root="/dev/nvme0n1p2" quiet"#);
+        assert_eq!(dev.as_deref(), Some("/dev/nvme0n1p2"));
     }
 }

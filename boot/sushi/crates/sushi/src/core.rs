@@ -54,7 +54,7 @@ pub enum VisualMode {
 impl VisualMode {
     /// Bottom status line — only for maintenance-style boots, not normal splash.
     pub fn shows_status_line(self) -> bool {
-        matches!(self, VisualMode::Updating | VisualMode::Recovering)
+        matches!(self, VisualMode::Updating)
     }
 }
 

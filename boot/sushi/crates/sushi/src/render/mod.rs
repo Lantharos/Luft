@@ -61,27 +61,37 @@ pub fn render_frame_into(
 }
 
 fn draw_recovery_menu(frame: &mut FrameBuffer, state: &SushiVisualState) {
-    let lines = [
-        "Boot recovery",
-        "",
+    let accent = Color::SUSHI_ACCENT.to_argb32();
+    let text = Color::SUSHI_TEXT.to_argb32();
+    let title_y = state.logo_rect.y + state.logo_rect.h as i32 + 32;
+    font::draw_text_centered(frame, 0, title_y, state.width, 12, "BOOT RECOVERY", accent);
+    font::draw_text_centered(
+        frame,
+        0,
+        title_y + 24,
+        state.width,
+        10,
         &state.status_text,
-        "",
-        "[Try again]  [View details]",
-        "[Recovery shell]  [Reboot]",
-    ];
-    let start_y = state.logo_rect.y + state.logo_rect.h as i32 + 48;
-    for (i, line) in lines.iter().enumerate() {
-        if line.is_empty() {
-            continue;
-        }
+        text,
+    );
+    let menu_y = title_y + 56;
+    for (i, line) in [
+        "1 TRY AGAIN",
+        "2 VIEW DETAILS  F1 LOG",
+        "3 RECOVERY SHELL",
+        "4 REBOOT",
+    ]
+    .iter()
+    .enumerate()
+    {
         font::draw_text_centered(
             frame,
             0,
-            start_y + (i as i32 * 28),
+            menu_y + (i as i32 * 14),
             state.width,
-            24,
+            10,
             line,
-            Color::SUSHI_TEXT.to_argb32(),
+            text,
         );
     }
 }

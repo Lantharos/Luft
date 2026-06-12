@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-uefi
+      - name: Host build and test
+        run: |
+          cargo test --workspace --exclude sushiboot
+          cargo build --workspace --exclude sushiboot --release
+      - name: UEFI build (SushiBoot)
+        run: |
+          RUSTFLAGS='-C link-arg=-Wl,--subsystem,efi_application' \
+            cargo build -p sushiboot --target x86_64-unknown-uefi --release

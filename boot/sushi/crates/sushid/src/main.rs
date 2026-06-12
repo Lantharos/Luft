@@ -1,5 +1,6 @@
 //! Sushi initramfs splash daemon.
 
+mod console;
 mod display_watch;
 mod logo;
 mod pivot;
@@ -171,7 +172,7 @@ fn run() -> Result<()> {
             break;
         }
 
-        handle_keyboard(&mut ui, &mut state, &mut display)?;
+        handle_keyboard(&mut ui, &mut state, &mut display, &mut recovery)?;
 
         while let Ok(msg) = request_rx.try_recv() {
             match msg {
@@ -196,8 +197,8 @@ fn run() -> Result<()> {
         }
 
         if recovery.check_failures(&state) {
-            state.set_mode(VisualMode::Recovering);
-            state.flags |= VisualFlags::RECOVERY;
+            recovery.enter(state.status_text.clone());
+            recovery.apply_menu_to_state(&mut state);
             sushi::log::log_event(&SushiEvent::new(
                 SushiStage::Initramfs,
                 SushiEventKind::RecoveryEntered {
@@ -244,14 +245,43 @@ fn run() -> Result<()> {
 
     agent.shutdown();
     serial_note("Sushi: handing off!");
-    enable_fbcon();
+    drop(display);
+    console::handoff_framebuffer_to_console();
     pivot::switch_root(Path::new("/sysroot"))
+}
+
+fn handle_recovery_key(
+    recovery: &mut recovery::RecoveryState,
+    ch: char,
+    state: &mut SushiVisualState,
+    ui: &mut UiState,
+    display: &mut DisplayManager,
+) -> Result<()> {
+    match ch {
+        '1' => {
+            recovery.selected = recovery::RecoveryAction::TryAgain;
+            state.set_mode(VisualMode::Booting);
+            state.flags.remove(VisualFlags::RECOVERY);
+            state.set_status(String::new());
+        }
+        '2' => {
+            recovery.selected = recovery::RecoveryAction::ViewDetails;
+            state.flags |= VisualFlags::DEBUG_LOG;
+            ui.refresh_debug_lines();
+        }
+        '3' => recovery.selected = recovery::RecoveryAction::RecoveryShell,
+        '4' => recovery.selected = recovery::RecoveryAction::Reboot,
+        _ => recovery.select_next(),
+    }
+    recovery.apply_menu_to_state(state);
+    draw_and_present(display, state, &ui.overlay)
 }
 
 fn handle_keyboard(
     ui: &mut UiState,
     state: &mut SushiVisualState,
     display: &mut DisplayManager,
+    recovery: &mut recovery::RecoveryState,
 ) -> Result<()> {
     let Some(action) = ui.keyboard.poll() else {
         return Ok(());
@@ -286,6 +316,9 @@ fn handle_keyboard(
                 ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
                 draw_and_present(display, state, &ui.overlay)?;
             }
+        }
+        KeyAction::Char(ch) if state.mode == VisualMode::Recovering => {
+            handle_recovery_key(recovery, ch, state, ui, display)?;
         }
         _ => {}
     }

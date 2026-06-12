@@ -36,6 +36,7 @@ QEMU_ARGS=(
     -drive "file=$ROOTFS,if=none,format=raw,id=rootdisk"
     -device virtio-blk-pci,drive=rootdisk
     -device ramfb
+    -vga none
     -no-reboot
 )
 

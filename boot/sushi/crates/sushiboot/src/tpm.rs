@@ -30,10 +30,22 @@ pub struct TpmBlobs {
 
 /// Try to unseal a LUKS passphrase in EFI. Returns plaintext key on success.
 pub fn try_unseal_luks_key(device: Handle) -> Option<String> {
-    let _ = tcg2_ready();
+    if !tcg2_ready() {
+        return None;
+    }
     let blobs = read_esp_tpm_blobs(device)?;
     stage_blobs_for_initramfs(&blobs);
-    None
+
+    let sealed = blobs.files.iter().find(|(n, _)| n == "sealed.ctx").map(|(_, d)| d.as_slice());
+    let policy = blobs
+        .files
+        .iter()
+        .find(|(n, _)| n == "policy.digest")
+        .map(|(_, d)| d.as_slice());
+
+    let sealed = sealed?;
+    let secret = crate::tpm2::try_unseal_sealed_ctx(sealed, policy)?;
+    String::from_utf8(secret).ok()
 }
 
 pub fn append_tpm_hint(cmdline: &mut String) {

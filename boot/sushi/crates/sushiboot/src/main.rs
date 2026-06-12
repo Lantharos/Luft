@@ -5,6 +5,7 @@ extern crate alloc;
 
 mod linux_boot;
 mod tpm;
+mod tpm2;
 
 use alloc::format;
 use alloc::string::{String, ToString};

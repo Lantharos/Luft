@@ -35,4 +35,3 @@ strip = true
 panic = "abort"
 
 [profile.release.package.sushiboot]
-# UEFI builds use their own profile via .cargo/config.toml

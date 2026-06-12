@@ -7,9 +7,11 @@ VM_DIR="$ROOT/vm"
 ESP="$VM_DIR/esp"
 KERNEL="${KERNEL:-$(ls -1 /boot/vmlinuz-* 2>/dev/null | grep -v rescue | tail -1)}"
 
+SUSHI_UEFI_RUSTFLAGS='-C link-arg=-Wl,--subsystem,efi_application'
+
 echo "==> Building Sushi release binaries"
 cargo build --workspace --exclude sushiboot --release -p sushid -p sushictl
-cargo build -p sushiboot --target x86_64-unknown-uefi --release
+RUSTFLAGS="$SUSHI_UEFI_RUSTFLAGS" cargo build -p sushiboot --target x86_64-unknown-uefi --release
 
 mkdir -p "$ESP/EFI/BOOT" "$ESP/loader/entries"
 rm -f "$ESP/loader/entries/"*.conf

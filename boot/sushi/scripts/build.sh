@@ -35,7 +35,9 @@ cp -a "$ROOT/initramfs/dracut/90sushi/." "${DESTDIR}/usr/lib/dracut/modules.d/90
 if command -v rustup >/dev/null 2>&1; then
     if rustup target list --installed | grep -q x86_64-unknown-uefi; then
         echo "==> Building SushiBoot.efi"
-        cargo build -p sushiboot --profile "$PROFILE" \
+        SUSHI_UEFI_RUSTFLAGS='-C link-arg=-Wl,--subsystem,efi_application'
+        RUSTFLAGS="$SUSHI_UEFI_RUSTFLAGS" cargo build -p sushiboot --profile "$PROFILE" \
+            --target x86_64-unknown-uefi \
             -Z build-std=core,alloc \
             -Z build-std-features=compiler-builtins-mem 2>/dev/null \
             || echo "SushiBoot.efi build skipped (install uefi target: rustup target add x86_64-unknown-uefi)"

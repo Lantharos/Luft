@@ -1,5 +1,0 @@
-[build]
-# Default host build; sushiboot uses: cargo build -p sushiboot --target x86_64-unknown-uefi
-
-[target.x86_64-unknown-uefi]
-rustflags = ["-C", "link-arg=-Wl,--subsystem,efi_application"]

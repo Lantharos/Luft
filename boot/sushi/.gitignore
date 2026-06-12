@@ -1,5 +1,6 @@
 # Rust / Cargo
 /target/
+.cargo/
 **/*.rs.bk
 *.pdb
 *.dwo

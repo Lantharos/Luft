@@ -4,6 +4,7 @@
 extern crate alloc;
 
 mod linux_boot;
+mod tpm;
 
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -24,7 +25,7 @@ use uefi::proto::media::fs::SimpleFileSystem;
 use uefi::table::boot::{AllocateType, MemoryType};
 use uefi::{CString16, Handle, Identify};
 
-const SUSHI_VENDOR_GUID: uefi::Guid = uefi::guid!("a7b3c4d5-e6f7-4890-abcd-ef1234567890");
+pub(crate) const SUSHI_VENDOR_GUID: uefi::Guid = uefi::guid!("a7b3c4d5-e6f7-4890-abcd-ef1234567890");
 
 // Must match sushi spinner constants exactly.
 const SPINNER_ACTIVITY_PX: usize = 56;
@@ -116,6 +117,12 @@ fn efi_main() -> Status {
         cmdline.push_str(" console=ttyS0,115200n8");
     }
     ensure_kernel_logo_suppressed(&mut cmdline);
+    tpm::append_tpm_hint(&mut cmdline);
+    if let Some(key) = tpm::try_unseal_luks_key(device) {
+        let key_b64 = base64_encode(key.as_bytes());
+        cmdline.push_str(" sushi.luks.key=b64:");
+        cmdline.push_str(&key_b64);
+    }
     cmdline.push_str(" sushi.state=b64:");
     cmdline.push_str(&b64);
 

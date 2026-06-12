@@ -18,7 +18,13 @@ install() {
     local moddir="$moddir"
     local initdir="$initdir"
 
-    inst_multiple sushid sushictl
+    inst_multiple sushid sushictl cryptsetup
+    for _tpm_tool in tpm2 tpm2_unseal tpm2_startauthsession tpm2_policypcr \
+        tpm2_createprimary tpm2_createpolicy tpm2_create tpm2_load; do
+        if command -v "$_tpm_tool" >/dev/null 2>&1; then
+            inst "$_tpm_tool"
+        fi
+    done
     inst_multiple \
         /usr/lib/sushi/themes/default/logo.txt \
         /etc/sushi/sushi.conf

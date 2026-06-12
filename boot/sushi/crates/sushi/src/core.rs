@@ -48,6 +48,7 @@ pub enum VisualMode {
     Updating = 2,
     Recovering = 3,
     HandingOff = 4,
+    Error = 5,
 }
 
 impl VisualMode {
@@ -154,6 +155,10 @@ bitflags! {
         const RECOVERY = 1 << 6;
         /// activity_rect came from a prior stage — do not relayout on logo resolve.
         const ACTIVITY_LOCKED = 1 << 7;
+        /// F1 debug log overlay is visible.
+        const DEBUG_LOG = 1 << 8;
+        /// TPM was configured previously; offer reseal after manual unlock.
+        const TPM_CONFIGURED = 1 << 9;
     }
 }
 
@@ -324,6 +329,10 @@ pub enum SushiEventKind {
     UnlockTpmSuccess,
     UnlockManualRequired,
     UnlockManualFailed,
+    UnlockTpmReseal,
+    UnlockTpmResealSuccess,
+    UnlockTpmResealFailed { reason: String },
+    DebugOverlayToggled { visible: bool },
     DisplayBackendChanged { backend: String },
     DisplayDriverReady { device: String },
     GreeterWaiting,
@@ -355,6 +364,7 @@ impl SushiEvent {
         let severity = match &kind {
             SushiEventKind::BootDegraded { .. }
             | SushiEventKind::UnlockManualFailed
+            | SushiEventKind::UnlockTpmResealFailed { .. }
             | SushiEventKind::BlackScreenDetected { .. }
             | SushiEventKind::RecoveryEntered { .. } => EventSeverity::Warning,
             _ => EventSeverity::Info,

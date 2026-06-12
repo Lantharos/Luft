@@ -53,6 +53,35 @@ pub fn log_info(stage: SushiStage, message: impl AsRef<str>) {
     }
 }
 
+pub fn tail_human_lines(path: impl AsRef<Path>, max_lines: usize) -> Vec<String> {
+    let Ok(data) = fs::read_to_string(path.as_ref()) else {
+        return Vec::new();
+    };
+    let mut lines = Vec::new();
+    for line in data.lines() {
+        if let Ok(entry) = serde_json::from_str::<MachineLogEntry>(line) {
+            let stage = entry.stage;
+            let event = if let Some(target) = entry.target.filter(|t| !t.is_empty()) {
+                format!("{} ({target})", entry.event)
+            } else {
+                entry.event
+            };
+            lines.push(format!("{stage}: {event}"));
+        } else if !line.trim().is_empty() {
+            lines.push(line.trim().to_string());
+        }
+    }
+    if lines.len() > max_lines {
+        lines.split_off(lines.len() - max_lines)
+    } else {
+        lines
+    }
+}
+
+pub fn boot_log_path(run_dir: &str) -> PathBuf {
+    PathBuf::from(run_dir).join("boot.log")
+}
+
 pub fn load_events(path: impl AsRef<Path>) -> Vec<SushiEvent> {
     let Ok(data) = fs::read_to_string(path) else {
         return Vec::new();
@@ -118,6 +147,16 @@ fn human_message(event: &SushiEvent) -> String {
             format!("scene restored ({duration_ms}ms)")
         }
         SushiEventKind::RecoveryEntered { reason } => format!("recovery needed ({reason})"),
+        SushiEventKind::UnlockTpmReseal => "resealing TPM secret".to_string(),
+        SushiEventKind::UnlockTpmResealSuccess => "TPM reseal complete".to_string(),
+        SushiEventKind::UnlockTpmResealFailed { reason } => format!("TPM reseal failed ({reason})"),
+        SushiEventKind::DebugOverlayToggled { visible } => {
+            if *visible {
+                "debug log shown (F1)".to_string()
+            } else {
+                "debug log hidden (F1)".to_string()
+            }
+        }
     };
     format!("{prefix}: {msg}")
 }
@@ -150,6 +189,14 @@ fn machine_entry(event: &SushiEvent) -> MachineLogEntry {
         }
         SushiEventKind::RecoveryEntered { reason } => {
             ("recovery.entered".to_string(), Some(reason.clone()))
+        }
+        SushiEventKind::UnlockTpmReseal => ("unlock.tpm.reseal".to_string(), None),
+        SushiEventKind::UnlockTpmResealSuccess => ("unlock.tpm.reseal.success".to_string(), None),
+        SushiEventKind::UnlockTpmResealFailed { reason } => {
+            ("unlock.tpm.reseal.failed".to_string(), Some(reason.clone()))
+        }
+        SushiEventKind::DebugOverlayToggled { visible } => {
+            ("debug.overlay".to_string(), Some(visible.to_string()))
         }
     };
 
@@ -211,6 +258,14 @@ fn parse_machine_entry(entry: &MachineLogEntry) -> Option<SushiEvent> {
         },
         "recovery.entered" => SushiEventKind::RecoveryEntered {
             reason: entry.target.clone().unwrap_or_default(),
+        },
+        "unlock.tpm.reseal" => SushiEventKind::UnlockTpmReseal,
+        "unlock.tpm.reseal.success" => SushiEventKind::UnlockTpmResealSuccess,
+        "unlock.tpm.reseal.failed" => SushiEventKind::UnlockTpmResealFailed {
+            reason: entry.target.clone().unwrap_or_default(),
+        },
+        "debug.overlay" => SushiEventKind::DebugOverlayToggled {
+            visible: entry.target.as_deref() == Some("true"),
         },
         other => SushiEventKind::BootDegraded {
             reason: other.to_string(),

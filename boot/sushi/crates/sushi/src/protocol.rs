@@ -1,4 +1,4 @@
-//! Relay state serialization and EFI handoff constants.
+//! Sushi state serialization and EFI handoff constants.
 
 use std::fs;
 use std::io::Write;

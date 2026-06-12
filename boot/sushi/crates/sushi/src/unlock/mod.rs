@@ -1,6 +1,10 @@
 //! LUKS unlock orchestration and systemd ask-password agent.
 
+pub mod luks;
 pub mod tpm;
+
+pub use luks::{CrypttabEntry, LuksUnlock, UnlockOutcome};
+pub use tpm::TpmUnlock;
 
 use std::fs;
 use std::io::Write;

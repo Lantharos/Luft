@@ -15,20 +15,47 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use sushi::{
-    Color, SushiEvent, SushiEventKind, SushiStage, SushiVisualState, VisualFlags, VisualMode,
-    spinner_phase_at, SPINNER_FRAME_INTERVAL_MS, SUSHI_RUN_DIR,
+    classify_boot_error, render_frame_into, render_spinner_only, Color, CrypttabEntry,
+    DisplayBackend, DisplayManager, FrameBuffer, KeyAction, Keyboard, LuksUnlock, RenderOverlay,
+    SushiEvent,
+    SushiEventKind, SushiStage, SushiVisualState, TpmUnlock, UnlockMessage, UnlockOutcome,
+    VisualFlags, VisualMode, spinner_phase_at, SPINNER_FRAME_INTERVAL_MS, SUSHI_RUN_DIR,
 };
-use sushi::{DisplayBackend, DisplayManager, FrameBuffer};
+use sushi::{load_state, load_state_from_efi, persist_state};
+use sushi::emergency_blackout_all;
+use sushi::unlock::{respond_to_request, secure_wipe, AskPasswordAgent, PasswordRequest};
+
 use crate::probe::probe_and_acquire;
 
-use sushi::{load_state, load_state_from_efi, persist_state};
-use sushi::{render_frame_into, render_spinner_only};
-use sushi::emergency_blackout_all;
-use sushi::unlock::{
-    respond_to_request, secure_wipe, tpm::TpmUnlock, AskPasswordAgent, TtyReader, UnlockMessage,
-};
+enum PendingUnlock {
+    AskPassword(PasswordRequest),
+    Luks(CrypttabEntry),
+}
 
+struct UiState {
+    overlay: RenderOverlay,
+    keyboard: Keyboard,
+    unlock_buffer: String,
+    cursor_on: bool,
+    pending: Option<PendingUnlock>,
+}
 
+impl UiState {
+    fn new() -> Self {
+        Self {
+            overlay: RenderOverlay::default(),
+            keyboard: Keyboard::open(),
+            unlock_buffer: String::new(),
+            cursor_on: true,
+            pending: None,
+        }
+    }
+
+    fn refresh_debug_lines(&mut self) {
+        let path = sushi::log::boot_log_path(SUSHI_RUN_DIR);
+        self.overlay.debug_lines = sushi::log::tail_human_lines(&path, 18);
+    }
+}
 
 fn serial_note(msg: &str) {
     let line = format!("{msg}\r\n");
@@ -43,12 +70,13 @@ fn main() -> Result<()> {
     }
 
     serial_note("Sushi: sushid is up");
-
-    // Beat kernel fbcon to the scanout buffer if /dev/fb0 already exists.
     emergency_blackout_all();
 
     if let Err(err) = run() {
         eprintln!("sushid: fatal error: {err:#}");
+        if let Ok(mut display) = probe_and_acquire() {
+            run_fatal_error_screen(&mut display, err);
+        }
         if std::process::id() == 1 {
             eprintln!("sushid: staying alive as init after error");
             loop {
@@ -86,21 +114,20 @@ fn run() -> Result<()> {
     if !handoff_locked {
         logo::resolve_logo(&mut state);
     } else {
-        // Keep SushiBoot layout for the first paint so the spinner does not jump.
         state.logo.native_width = 80;
         state.logo.native_height = 96;
     }
     state.stage = SushiStage::Initramfs;
 
-    // First paint ASAP — black + spinner only so we never flash a full-screen logo.
+    let mut ui = UiState::new();
     if handoff_locked {
         paint_spinner_only(&mut display, &state)?;
         logo::resolve_logo(&mut state);
     } else {
         clear_screen(&mut display)?;
-        draw_and_present(&mut display, &mut state)?;
+        draw_and_present(&mut display, &mut state, &ui.overlay)?;
     }
-    draw_and_present(&mut display, &mut state)?;
+    draw_and_present(&mut display, &mut state, &ui.overlay)?;
 
     finish_initramfs_setup();
     disable_kernel_boot_logo();
@@ -111,13 +138,22 @@ fn run() -> Result<()> {
     let running = Arc::new(AtomicBool::new(true));
     let display_watch = display_watch::spawn_display_watch(running.clone());
 
-    draw_and_present(&mut display, &mut state)?;
+    draw_and_present(&mut display, &mut state, &ui.overlay)?;
     sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
     serial_note("Sushi: caught the frame");
     persist_state(&state)?;
 
-    let _ = TpmUnlock::try_silent_unlock(&mut state);
-    draw_and_present(&mut display, &mut state)?;
+    match TpmUnlock::try_silent_unlock(&mut state) {
+        UnlockOutcome::NeedsPassphrase(entry) => {
+            ui.pending = Some(PendingUnlock::Luks(entry));
+            ui.unlock_buffer.clear();
+            ui.overlay.unlock_input = Some(String::new());
+            ui.overlay.unlock_prompt = Some("ENTER DISK PASSPHRASE".to_string());
+        }
+        UnlockOutcome::Unlocked { .. } => {}
+        UnlockOutcome::NothingToDo => {}
+    }
+    draw_and_present(&mut display, &mut state, &ui.overlay)?;
 
     let (mut agent, request_rx) = AskPasswordAgent::start()?;
     let spinner_base_phase = state.spinner_phase;
@@ -125,22 +161,27 @@ fn run() -> Result<()> {
     let frame_interval = Duration::from_millis(SPINNER_FRAME_INTERVAL_MS);
     let mut last_frame = Instant::now();
     let mut last_persist = Instant::now();
-    let mut pending_unlock: Option<sushi::unlock::PasswordRequest> = None;
+    let mut last_cursor = Instant::now();
     let mut recovery = recovery::RecoveryState::default();
     let splash_started = Instant::now();
     let min_splash = Duration::from_secs(4);
 
     while running.load(Ordering::SeqCst) {
-        if pivot::sysroot_ready() && splash_started.elapsed() >= min_splash {
+        if pivot::sysroot_ready() && splash_started.elapsed() >= min_splash && ui.pending.is_none() {
             break;
         }
+
+        handle_keyboard(&mut ui, &mut state, &mut display)?;
 
         while let Ok(msg) = request_rx.try_recv() {
             match msg {
                 UnlockMessage::Request(req) => {
-                    pending_unlock = Some(req);
+                    ui.pending = Some(PendingUnlock::AskPassword(req));
+                    ui.unlock_buffer.clear();
+                    ui.overlay.unlock_input = Some(String::new());
+                    ui.overlay.unlock_prompt = Some("ENTER DISK PASSPHRASE".to_string());
                     state.set_mode(VisualMode::Unlocking);
-                    state.set_status("Enter disk passphrase");
+                    state.set_status(String::new());
                     sushi::log::log_event(&SushiEvent::new(
                         SushiStage::Initramfs,
                         SushiEventKind::UnlockManualRequired,
@@ -151,25 +192,7 @@ fn run() -> Result<()> {
         }
 
         if let Some(handoff) = display_watch.try_recv_handoff() {
-            perform_display_handoff(&mut display, &mut state, handoff)?;
-        }
-
-        if let Some(req) = pending_unlock.take() {
-            match handle_unlock_request(&mut display, &mut state, &req) {
-                Ok(()) => {
-                    state.set_mode(VisualMode::Booting);
-                    state.set_status(String::new());
-                }
-                Err(_) => {
-                    state.set_mode(VisualMode::Unlocking);
-                    state.set_status("Wrong passphrase, try again");
-                    state.flags |= VisualFlags::DEGRADED;
-                    sushi::log::log_event(&SushiEvent::new(
-                        SushiStage::Initramfs,
-                        SushiEventKind::UnlockManualFailed,
-                    ));
-                }
-            }
+            perform_display_handoff(&mut display, &mut state, &ui.overlay, handoff)?;
         }
 
         if recovery.check_failures(&state) {
@@ -183,10 +206,24 @@ fn run() -> Result<()> {
             ));
         }
 
+        if last_cursor.elapsed() >= Duration::from_millis(500) {
+            ui.cursor_on = !ui.cursor_on;
+            ui.overlay.cursor_visible = ui.cursor_on;
+            last_cursor = Instant::now();
+        }
+
         if last_frame.elapsed() >= frame_interval {
-            state.spinner_phase =
-                spinner_phase_at(spinner_base_phase, spinner_started.elapsed().as_secs_f32());
-            draw_and_present(&mut display, &mut state)?;
+            if state.mode != VisualMode::Unlocking {
+                state.spinner_phase =
+                    spinner_phase_at(spinner_base_phase, spinner_started.elapsed().as_secs_f32());
+            }
+            if state.flags.contains(VisualFlags::DEBUG_LOG) {
+                ui.refresh_debug_lines();
+            }
+            if state.mode == VisualMode::Unlocking {
+                ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
+            }
+            draw_and_present(&mut display, &mut state, &ui.overlay)?;
             if last_persist.elapsed() >= Duration::from_millis(500) {
                 persist_state(&state)?;
                 last_persist = Instant::now();
@@ -203,12 +240,147 @@ fn run() -> Result<()> {
             target: "switch-root".to_string(),
         },
     ));
-    let _ = draw_and_present(&mut display, &mut state);
+    let _ = draw_and_present(&mut display, &mut state, &ui.overlay);
 
     agent.shutdown();
     serial_note("Sushi: handing off!");
     enable_fbcon();
     pivot::switch_root(Path::new("/sysroot"))
+}
+
+fn handle_keyboard(
+    ui: &mut UiState,
+    state: &mut SushiVisualState,
+    display: &mut DisplayManager,
+) -> Result<()> {
+    let Some(action) = ui.keyboard.poll() else {
+        return Ok(());
+    };
+
+    match action {
+        KeyAction::ToggleDebug => {
+            state.flags ^= VisualFlags::DEBUG_LOG;
+            let visible = state.flags.contains(VisualFlags::DEBUG_LOG);
+            if visible {
+                ui.refresh_debug_lines();
+            }
+            sushi::log::log_event(&SushiEvent::new(
+                SushiStage::Initramfs,
+                SushiEventKind::DebugOverlayToggled { visible },
+            ));
+            draw_and_present(display, state, &ui.overlay)?;
+        }
+        KeyAction::Submit if state.mode == VisualMode::Unlocking => {
+            if let Some(pending) = ui.pending.take() {
+                submit_unlock(ui, state, display, pending)?;
+            }
+        }
+        KeyAction::Backspace if state.mode == VisualMode::Unlocking => {
+            ui.unlock_buffer.pop();
+            ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
+            draw_and_present(display, state, &ui.overlay)?;
+        }
+        KeyAction::Char(ch) if state.mode == VisualMode::Unlocking => {
+            if ui.unlock_buffer.len() < 128 {
+                ui.unlock_buffer.push(ch);
+                ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
+                draw_and_present(display, state, &ui.overlay)?;
+            }
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+fn submit_unlock(
+    ui: &mut UiState,
+    state: &mut SushiVisualState,
+    display: &mut DisplayManager,
+    pending: PendingUnlock,
+) -> Result<()> {
+    let mut passphrase = std::mem::take(&mut ui.unlock_buffer);
+    ui.overlay.unlock_input = Some(String::new());
+
+    let result = match &pending {
+        PendingUnlock::AskPassword(req) => respond_to_request(req, &passphrase).context("send passphrase"),
+        PendingUnlock::Luks(entry) => LuksUnlock::unlock_with_passphrase(entry, &passphrase),
+    };
+
+    match result {
+        Ok(()) => {
+            state.set_mode(VisualMode::Booting);
+            state.set_status(String::new());
+            if let PendingUnlock::Luks(entry) = pending {
+                if state.flags.contains(VisualFlags::TPM_CONFIGURED)
+                    || state.flags.contains(VisualFlags::TPM_TRIED)
+                {
+                    sushi::log::log_event(&SushiEvent::new(
+                        SushiStage::Initramfs,
+                        SushiEventKind::UnlockTpmReseal,
+                    ));
+                    if let Err(err) = LuksUnlock::try_reseal(&entry, &passphrase) {
+                        sushi::log::log_event(&SushiEvent::new(
+                            SushiStage::Initramfs,
+                            SushiEventKind::UnlockTpmResealFailed {
+                                reason: format!("{err:#}"),
+                            },
+                        ));
+                    }
+                }
+            }
+        }
+        Err(_) => {
+            ui.pending = Some(pending);
+            ui.unlock_buffer.clear();
+            state.set_mode(VisualMode::Unlocking);
+            state.set_status("Wrong passphrase, try again".to_string());
+            state.flags |= VisualFlags::DEGRADED;
+            sushi::log::log_event(&SushiEvent::new(
+                SushiStage::Initramfs,
+                SushiEventKind::UnlockManualFailed,
+            ));
+        }
+    }
+
+    secure_wipe(&mut passphrase);
+    draw_and_present(display, state, &ui.overlay)
+}
+
+fn run_fatal_error_screen(display: &mut DisplayManager, err: anyhow::Error) -> ! {
+    let _ = fs::create_dir_all(SUSHI_RUN_DIR);
+    let _ = sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"));
+    sushi::log::log_info(SushiStage::Initramfs, &format!("fatal: {err:#}"));
+
+    let mut state = bootstrap_visual_state().unwrap_or_else(|_| {
+        SushiVisualState::new_boot_scene(1920, 1080)
+    });
+    let (w, h) = display.dimensions();
+    state.apply_dimensions(w, h);
+    logo::resolve_logo(&mut state);
+    state.set_mode(VisualMode::Error);
+
+    let mut ui = UiState::new();
+    ui.overlay.error = Some(classify_boot_error(&err));
+    ui.refresh_debug_lines();
+
+    loop {
+        if let Some(KeyAction::ToggleDebug) = ui.keyboard.poll() {
+            state.flags ^= VisualFlags::DEBUG_LOG;
+            let visible = state.flags.contains(VisualFlags::DEBUG_LOG);
+            if visible {
+                ui.refresh_debug_lines();
+            }
+            sushi::log::log_event(&SushiEvent::new(
+                SushiStage::Initramfs,
+                SushiEventKind::DebugOverlayToggled { visible },
+            ));
+        }
+        if state.flags.contains(VisualFlags::DEBUG_LOG) {
+            ui.refresh_debug_lines();
+        }
+        let _ = draw_and_present(display, &mut state, &ui.overlay);
+        thread::sleep(Duration::from_millis(50));
+    }
 }
 
 fn run_headless_switch_root() -> Result<()> {
@@ -218,6 +390,14 @@ fn run_headless_switch_root() -> Result<()> {
     sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"))?;
     sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
     serial_note("Sushi: caught the frame (headless)");
+
+    let mut state = SushiVisualState::new_boot_scene(0, 0);
+    match TpmUnlock::try_silent_unlock(&mut state) {
+        UnlockOutcome::NeedsPassphrase(_) => {
+            anyhow::bail!("LUKS unlock required but no display for passphrase entry");
+        }
+        _ => {}
+    }
 
     let splash_started = Instant::now();
     let min_splash = Duration::from_secs(4);
@@ -251,8 +431,12 @@ fn bootstrap_visual_state() -> Result<SushiVisualState> {
     Ok(SushiVisualState::new_boot_scene(1920, 1080))
 }
 
-fn draw_and_present(display: &mut DisplayManager, state: &mut SushiVisualState) -> Result<()> {
-    display.render(|frame| render_frame_into(frame, state))
+fn draw_and_present(
+    display: &mut DisplayManager,
+    state: &mut SushiVisualState,
+    overlay: &RenderOverlay,
+) -> Result<()> {
+    display.render(|frame| render_frame_into(frame, state, overlay))
 }
 
 fn paint_spinner_only(display: &mut DisplayManager, state: &SushiVisualState) -> Result<()> {
@@ -268,6 +452,7 @@ fn clear_screen(display: &mut DisplayManager) -> Result<()> {
 fn perform_display_handoff(
     display: &mut DisplayManager,
     state: &mut SushiVisualState,
+    overlay: &RenderOverlay,
     device: String,
 ) -> Result<()> {
     sushi::log::log_event(&SushiEvent::new(
@@ -287,7 +472,7 @@ fn perform_display_handoff(
 
     if let Ok(new_backend) = sushi::DrmBackend::open(&device) {
         let mut frame = FrameBuffer::new(new_backend.width(), new_backend.height(), new_backend.format());
-        render_frame_into(&mut frame, state);
+        render_frame_into(&mut frame, state, overlay);
         let start = Instant::now();
         match display.try_handoff(Box::new(new_backend), &frame) {
             Ok(()) => {
@@ -322,20 +507,6 @@ fn perform_display_handoff(
             }
         }
     }
-    Ok(())
-}
-
-fn handle_unlock_request(
-    display: &mut DisplayManager,
-    state: &mut SushiVisualState,
-    request: &sushi::unlock::PasswordRequest,
-) -> Result<()> {
-    draw_and_present(display, state)?;
-
-    let mut passphrase =
-        TtyReader::read_line_hidden(&format!("{}: ", request.message)).context("read passphrase")?;
-    respond_to_request(request, &passphrase).context("send passphrase")?;
-    secure_wipe(&mut passphrase);
     Ok(())
 }
 
@@ -391,6 +562,7 @@ fn finish_initramfs_setup() {
     let _ = fs::create_dir_all("/run/sushi");
     let _ = fs::create_dir_all("/run/systemd/ask-password");
     let _ = fs::create_dir_all("/dev/dri");
+    let _ = fs::create_dir_all("/dev/input");
     ensure_display_device_nodes();
 }
 
@@ -398,6 +570,7 @@ fn ensure_display_device_nodes() {
     for _ in 0..40 {
         ensure_class_devices("graphics");
         ensure_class_devices("drm");
+        ensure_class_devices("input");
         for card in ["card0", "card1"] {
             let drm_fb = format!("/sys/class/drm/{card}/device/graphics/fb0/dev");
             if Path::new(&drm_fb).exists() {
@@ -434,7 +607,6 @@ fn ensure_device_node_from_sysfs_dev_file(sysfs_dev: &str, dev_path: &str, mode:
     }
 }
 
-/// Minimal initramfs has no udev — create /dev nodes from /sys/class/* /dev.
 fn disable_kernel_boot_logo() {
     for path in [
         "/sys/module/fbcon/parameters/logo",
@@ -445,7 +617,6 @@ fn disable_kernel_boot_logo() {
     }
 }
 
-/// Re-attach fbcon so getty/login renders on the framebuffer after switch_root.
 pub fn enable_fbcon() {
     if let Ok(entries) = fs::read_dir("/sys/class/vtconsole") {
         for entry in entries.flatten() {

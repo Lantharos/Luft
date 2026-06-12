@@ -19,13 +19,36 @@ pub const SPINNER_RADIUS_INSET: u32 = 4;
 pub const SPINNER_WHITE: u32 = 0xFF_FF_FF_FF;
 /// Smooth spin rate — phase is advanced from wall clock, not fixed per-frame steps.
 pub const SPINNER_ROTATIONS_PER_SEC: f32 = 0.9;
-pub const SPINNER_FRAME_INTERVAL_MS: u64 = 16;
+/// Frame interval shared with SushiBoot (`SPINNER_FRAME_US` = 16_666 µs).
+pub const SPINNER_FRAME_INTERVAL_US: u64 = 16_666;
+pub const SPINNER_FRAME_INTERVAL_MS: u64 = SPINNER_FRAME_INTERVAL_US / 1000;
 pub const SUSHI_STATE_PATH: &str = "/run/sushi/state";
 
 /// Phase in `[0, 1)` from a handoff/base phase and elapsed wall time.
 #[inline]
 pub fn spinner_phase_at(base_phase: f32, elapsed_secs: f32) -> f32 {
     (base_phase + elapsed_secs * SPINNER_ROTATIONS_PER_SEC) % 1.0
+}
+
+/// Monotonic seconds since kernel boot — used to continue EFI spinner phase in initramfs.
+pub fn monotonic_boot_secs() -> f32 {
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
+    // CLOCK_BOOTTIME is Linux-specific; initramfs-only is fine for sushid.
+    let rc = unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, &mut ts) };
+    if rc != 0 {
+        return 0.0;
+    }
+    ts.tv_sec as f32 + ts.tv_nsec as f32 / 1_000_000_000.0
+}
+
+/// Advance `state.spinner_phase` from a handoff/base phase and kernel boot clock.
+#[inline]
+pub fn advance_spinner_from_boot(state: &mut SushiVisualState, base_phase: f32) {
+    state.spinner_phase = spinner_phase_at(base_phase, monotonic_boot_secs());
+    state.timestamp_ns = now_ns();
 }
 pub const SUSHI_LOG_DIR: &str = "/var/log/sushi";
 pub const SUSHI_RUN_DIR: &str = "/run/sushi";
@@ -286,21 +309,33 @@ impl SushiVisualState {
             self.logo.native_width,
             self.logo.native_height,
         );
-        self.logo_rect = logo_rect;
         if self.flags.contains(VisualFlags::ACTIVITY_LOCKED) {
-            // Keep handoff Y/size/phase; re-center X on the live display width.
-            let y = self.activity_rect.y;
-            let w = self.activity_rect.w;
-            let h = self.activity_rect.h;
-            self.activity_rect.x = ((self.width.saturating_sub(w)) / 2) as i32;
-            self.activity_rect.y = y;
-            self.activity_rect.w = w;
-            self.activity_rect.h = h;
+            // Keep EFI handoff geometry; only re-center X if the display width changed.
+            let spin = self.activity_rect;
+            self.activity_rect.x = ((self.width.saturating_sub(spin.w)) / 2) as i32;
+            self.activity_rect.y = spin.y;
+            self.activity_rect.w = spin.w;
+            self.activity_rect.h = spin.h;
+
+            let logo = self.logo_rect;
+            if logo.w > 0 && logo.h > 0 {
+                self.logo_rect.x = ((self.width.saturating_sub(logo.w)) / 2) as i32;
+                self.logo_rect.y = logo.y;
+                self.logo_rect.w = logo.w;
+                self.logo_rect.h = logo.h;
+                self.logo.width = logo.w;
+                self.logo.height = logo.h;
+            } else {
+                self.logo_rect = logo_rect;
+                self.logo.width = logo_rect.w;
+                self.logo.height = logo_rect.h;
+            }
         } else {
+            self.logo_rect = logo_rect;
             self.activity_rect = activity_rect;
+            self.logo.width = logo_rect.w;
+            self.logo.height = logo_rect.h;
         }
-        self.logo.width = logo_rect.w;
-        self.logo.height = logo_rect.h;
     }
 
     pub fn advance_spinner(&mut self, delta_secs: f32) {

@@ -15,12 +15,19 @@ use uefi::table::boot::{AllocateType, MemoryType};
 use uefi::{CString16, Handle};
 
 pub struct LinuxEntry<'a> {
-    pub linux: &'a str,
     pub initrd: Option<&'a str>,
     pub cmdline: &'a str,
 }
 
-pub fn boot(device: Handle, entry: &LinuxEntry<'_>) -> uefi::Result<()> {
+/// Load the kernel image while the EFI splash is still animating.
+pub fn preload_kernel(device: Handle, linux_path: &str) -> uefi::Result<Handle> {
+    load_via_device_path(device, linux_path).or_else(|_| {
+        let kernel = load_file(device, linux_path)?;
+        load_via_buffer(&kernel)
+    })
+}
+
+pub fn start_preloaded(image: Handle, entry: &LinuxEntry<'_>) -> uefi::Result<()> {
     let mut cmdline = String::from(entry.cmdline);
     if let Some(initrd_path) = entry.initrd {
         let initrd_arg = initrd_cmdline_arg(initrd_path);
@@ -29,13 +36,6 @@ pub fn boot(device: Handle, entry: &LinuxEntry<'_>) -> uefi::Result<()> {
             cmdline = alloc::format!("{prefix}{cmdline}");
         }
     }
-
-    if let Ok(image) = load_via_device_path(device, entry.linux) {
-        return start_with_cmdline(image, &cmdline);
-    }
-
-    let kernel = load_file(device, entry.linux)?;
-    let image = load_via_buffer(&kernel)?;
     start_with_cmdline(image, &cmdline)
 }
 

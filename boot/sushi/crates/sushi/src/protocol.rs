@@ -143,6 +143,14 @@ pub fn state_from_efi_payload(payload: &[u8]) -> Option<SushiVisualState> {
         ay: Option<i32>,
         aw: Option<u32>,
         ah: Option<u32>,
+        lx: Option<i32>,
+        ly: Option<i32>,
+        lw: Option<u32>,
+        lh: Option<u32>,
+        logo_source: Option<u8>,
+        logo_native_w: Option<u32>,
+        logo_native_h: Option<u32>,
+        logo_path: Option<String>,
     }
 
     let partial: PartialEfiState = serde_json::from_slice(trimmed).ok()?;
@@ -161,6 +169,31 @@ pub fn state_from_efi_payload(payload: &[u8]) -> Option<SushiVisualState> {
     {
         state.activity_rect = crate::core::Rect { x, y, w, h };
         state.flags |= crate::core::VisualFlags::ACTIVITY_LOCKED;
+    }
+    if let (Some(x), Some(y), Some(w), Some(h)) =
+        (partial.lx, partial.ly, partial.lw, partial.lh)
+    {
+        state.logo_rect = crate::core::Rect { x, y, w, h };
+        state.logo.width = w;
+        state.logo.height = h;
+    }
+    if let Some(source) = partial.logo_source {
+        state.logo.source = match source {
+            0 => crate::core::LogoSource::Firmware,
+            1 => crate::core::LogoSource::OemAsset,
+            2 => crate::core::LogoSource::Distro,
+            3 => crate::core::LogoSource::SushiFallback,
+            _ => crate::core::LogoSource::SushiFallback,
+        };
+    }
+    if let Some(w) = partial.logo_native_w {
+        state.logo.native_width = w;
+    }
+    if let Some(h) = partial.logo_native_h {
+        state.logo.native_height = h;
+    }
+    if let Some(path) = partial.logo_path {
+        state.logo.path = Some(path);
     }
     state.stage = crate::core::SushiStage::Initramfs;
     Some(state)

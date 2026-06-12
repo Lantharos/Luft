@@ -8,6 +8,7 @@ mod probe;
 mod recovery;
 
 use std::fs;
+use std::mem;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -16,11 +17,11 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use sushi::{
-    classify_boot_error, render_frame_into, render_spinner_only, Color, CrypttabEntry,
-    DisplayBackend, DisplayManager, FrameBuffer, KeyAction, Keyboard, LuksUnlock, RenderOverlay,
-    SushiEvent,
-    SushiEventKind, SushiStage, SushiVisualState, TpmUnlock, UnlockMessage, UnlockOutcome,
-    VisualFlags, VisualMode, spinner_phase_at, SPINNER_FRAME_INTERVAL_MS, SUSHI_RUN_DIR,
+    advance_spinner_from_boot, classify_boot_error, render_frame_into, render_handoff_overlay,
+    CrypttabEntry, DisplayBackend, DisplayManager, FrameBuffer, KeyAction, Keyboard, LuksUnlock,
+    RenderOverlay, SushiEvent, SushiEventKind, SushiStage, SushiVisualState, TpmUnlock,
+    UnlockMessage, UnlockOutcome, VisualFlags, VisualMode, SPINNER_FRAME_INTERVAL_US,
+    SUSHI_RUN_DIR,
 };
 use sushi::{load_state, load_state_from_efi, persist_state};
 use sushi::emergency_blackout_all;
@@ -71,7 +72,6 @@ fn main() -> Result<()> {
     }
 
     serial_note("Sushi: sushid is up");
-    emergency_blackout_all();
 
     if let Err(err) = run() {
         eprintln!("sushid: fatal error: {err:#}");
@@ -91,11 +91,18 @@ fn main() -> Result<()> {
 
 fn run() -> Result<()> {
     mount_essential()?;
-    disable_kernel_boot_logo();
-    ensure_display_device_nodes();
-    emergency_blackout_all();
 
     let mut state = bootstrap_visual_state()?;
+    let spinner_base_phase = state.spinner_phase;
+    let handoff_locked = state.flags.contains(VisualFlags::ACTIVITY_LOCKED);
+
+    disable_kernel_boot_logo();
+    suppress_fbcon_console();
+    ensure_display_device_nodes();
+    if !handoff_locked {
+        emergency_blackout_all();
+    }
+
     let display = match probe_with_retry() {
         Ok(display) => Some(display),
         Err(e) => {
@@ -110,39 +117,34 @@ fn run() -> Result<()> {
     let mut display = display.expect("display branch");
 
     let (width, height) = display.dimensions();
-    let handoff_locked = state.flags.contains(VisualFlags::ACTIVITY_LOCKED);
-    state.apply_dimensions(width, height);
-    if !handoff_locked {
+    if handoff_locked {
+        state.width = width;
+        state.height = height;
         logo::resolve_logo(&mut state);
     } else {
-        state.logo.native_width = 80;
-        state.logo.native_height = 96;
+        state.apply_dimensions(width, height);
+        logo::resolve_logo(&mut state);
+        emergency_blackout_all();
     }
     state.stage = SushiStage::Initramfs;
 
     let mut ui = UiState::new();
-    if handoff_locked {
-        paint_spinner_only(&mut display, &state)?;
-        logo::resolve_logo(&mut state);
-    } else {
-        clear_screen(&mut display)?;
-        draw_and_present(&mut display, &mut state, &ui.overlay)?;
-    }
-    draw_and_present(&mut display, &mut state, &ui.overlay)?;
 
+    // Paint immediately — reuse EFI scanout when possible, only overlay the spinner.
+    advance_spinner_from_boot(&mut state, spinner_base_phase);
+    paint_first_handoff_frame(&mut display, &mut state, &ui.overlay, handoff_locked)?;
+    serial_note("Sushi: caught the frame");
+
+    stage_firmware_assets();
     finish_initramfs_setup();
     disable_kernel_boot_logo();
-
     fs::create_dir_all(SUSHI_RUN_DIR).context("create sushi run dir")?;
     sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"))?;
+    sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
+    persist_state(&state)?;
 
     let running = Arc::new(AtomicBool::new(true));
     let display_watch = display_watch::spawn_display_watch(running.clone());
-
-    draw_and_present(&mut display, &mut state, &ui.overlay)?;
-    sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
-    serial_note("Sushi: caught the frame");
-    persist_state(&state)?;
 
     match TpmUnlock::try_silent_unlock(&mut state) {
         UnlockOutcome::NeedsPassphrase(entry) => {
@@ -154,12 +156,9 @@ fn run() -> Result<()> {
         UnlockOutcome::Unlocked { .. } => {}
         UnlockOutcome::NothingToDo => {}
     }
-    draw_and_present(&mut display, &mut state, &ui.overlay)?;
 
     let (mut agent, request_rx) = AskPasswordAgent::start()?;
-    let spinner_base_phase = state.spinner_phase;
-    let spinner_started = Instant::now();
-    let frame_interval = Duration::from_millis(SPINNER_FRAME_INTERVAL_MS);
+    let frame_interval = Duration::from_micros(SPINNER_FRAME_INTERVAL_US);
     let mut last_frame = Instant::now();
     let mut last_persist = Instant::now();
     let mut last_cursor = Instant::now();
@@ -215,8 +214,7 @@ fn run() -> Result<()> {
 
         if last_frame.elapsed() >= frame_interval {
             if state.mode != VisualMode::Unlocking {
-                state.spinner_phase =
-                    spinner_phase_at(spinner_base_phase, spinner_started.elapsed().as_secs_f32());
+                advance_spinner_from_boot(&mut state, spinner_base_phase);
             }
             if state.flags.contains(VisualFlags::DEBUG_LOG) {
                 ui.refresh_debug_lines();
@@ -232,7 +230,7 @@ fn run() -> Result<()> {
             last_frame = Instant::now();
         }
 
-        thread::sleep(Duration::from_millis(8));
+        thread::sleep(Duration::from_millis(4));
     }
 
     sushi::log::log_event(&SushiEvent::new(
@@ -241,13 +239,22 @@ fn run() -> Result<()> {
             target: "switch-root".to_string(),
         },
     ));
+    advance_spinner_from_boot(&mut state, spinner_base_phase);
     let _ = draw_and_present(&mut display, &mut state, &ui.overlay);
 
     agent.shutdown();
     serial_note("Sushi: handing off!");
-    drop(display);
+    // Hand off while /dev/fb0 still exists; forget display so munmap does not tear down scanout.
     console::handoff_framebuffer_to_console();
+    mem::forget(display);
     pivot::switch_root(Path::new("/sysroot"))
+}
+
+fn stage_firmware_assets() {
+    let _ = fs::create_dir_all("/run/sushi");
+    if Path::new("/sys/firmware/acpi/bgrt/image").is_file() {
+        let _ = fs::copy("/sys/firmware/acpi/bgrt/image", "/run/sushi/bgrt.bmp");
+    }
 }
 
 fn handle_recovery_key(
@@ -472,14 +479,17 @@ fn draw_and_present(
     display.render(|frame| render_frame_into(frame, state, overlay))
 }
 
-fn paint_spinner_only(display: &mut DisplayManager, state: &SushiVisualState) -> Result<()> {
-    display.render(|frame| render_spinner_only(frame, state))
-}
-
-fn clear_screen(display: &mut DisplayManager) -> Result<()> {
-    display.render(|frame| {
-        frame.fill_rect(0, 0, frame.width, frame.height, Color::SUSHI_BG.to_argb32());
-    })
+fn paint_first_handoff_frame(
+    display: &mut DisplayManager,
+    state: &mut SushiVisualState,
+    overlay: &RenderOverlay,
+    handoff_locked: bool,
+) -> Result<()> {
+    if handoff_locked && display.import_scanout() {
+        display.render(|frame| render_handoff_overlay(frame, state))?;
+        return Ok(());
+    }
+    draw_and_present(display, state, overlay)
 }
 
 fn perform_display_handoff(
@@ -544,14 +554,15 @@ fn perform_display_handoff(
 }
 
 fn probe_with_retry() -> Result<DisplayManager, sushi::DisplayError> {
-    for attempt in 0..300 {
+    for attempt in 0..200 {
         if let Ok(display) = probe_and_acquire() {
             return Ok(display);
         }
         if attempt == 0 {
             eprintln!("sushid: waiting for display backend...");
         }
-        thread::sleep(Duration::from_millis(5));
+        let delay = if attempt < 30 { 1 } else { 4 };
+        thread::sleep(Duration::from_millis(delay));
     }
     probe_and_acquire()
 }
@@ -600,7 +611,7 @@ fn finish_initramfs_setup() {
 }
 
 fn ensure_display_device_nodes() {
-    for _ in 0..40 {
+    for _ in 0..25 {
         ensure_class_devices("graphics");
         ensure_class_devices("drm");
         ensure_class_devices("input");
@@ -613,7 +624,7 @@ fn ensure_display_device_nodes() {
         if Path::new("/dev/fb0").exists() || Path::new("/dev/dri/card0").exists() {
             break;
         }
-        thread::sleep(Duration::from_millis(2));
+        thread::sleep(Duration::from_millis(1));
     }
 }
 
@@ -647,6 +658,21 @@ fn disable_kernel_boot_logo() {
         "/sys/module/fbcon/parameters/rotate",
     ] {
         let _ = fs::write(path, "0");
+    }
+}
+
+/// Keep fbcon from scribbling on the scanout buffer while sushid owns the splash.
+fn suppress_fbcon_console() {
+    if let Ok(entries) = fs::read_dir("/sys/class/vtconsole") {
+        for entry in entries.flatten() {
+            let name_path = entry.path().join("name");
+            let Ok(label) = fs::read_to_string(&name_path) else {
+                continue;
+            };
+            if label.to_ascii_lowercase().contains("frame buffer") {
+                let _ = fs::write(entry.path().join("bind"), "0");
+            }
+        }
     }
 }
 

@@ -41,15 +41,6 @@ impl RecoveryState {
         };
     }
 
-    pub fn status_line(&self) -> String {
-        match self.selected {
-            RecoveryAction::TryAgain => "Press 1 try again".to_string(),
-            RecoveryAction::ViewDetails => "Press 2 view details (F1 log)".to_string(),
-            RecoveryAction::RecoveryShell => "Press 3 recovery shell".to_string(),
-            RecoveryAction::Reboot => "Press 4 reboot".to_string(),
-        }
-    }
-
     pub fn apply_menu_to_state(&self, state: &mut SushiVisualState) {
         state.set_mode(VisualMode::Recovering);
         state.flags |= VisualFlags::RECOVERY;

@@ -8,6 +8,10 @@ EFI_LUKS_KEY="/run/sushi/efi-luks-key"
 mkdir -p /run/sushi "$EFI_TPM_ROOT"
 state_done=0
 
+if [ -f /sys/firmware/acpi/bgrt/image ]; then
+    cp /sys/firmware/acpi/bgrt/image /run/sushi/bgrt.bmp 2>/dev/null || true
+fi
+
 # Kernel exports EFI config tables at /sys/firmware/efi/config_tables/<guid>/data
 if [ -d /sys/firmware/efi/config_tables ]; then
     for dir in /sys/firmware/efi/config_tables/*; do

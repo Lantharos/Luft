@@ -41,6 +41,7 @@ copy_binary_with_libs "$SUSHID" "$ROOTFS/usr/bin/sushid"
 
 mkdir -p "$ROOTFS/run/sushi" "$ROOTFS/run/systemd/ask-password"
 
-(cd "$ROOTFS" && find . -print0 | cpio --null -o --format=newc | gzip -9) > "$OUT"
-echo "==> Wrote $OUT ($(du -h "$OUT" | awk '{print $1}'))"
+# Uncompressed cpio: faster kernel unpack at handoff (VM-only tradeoff).
+(cd "$ROOTFS" && find . -print0 | cpio --null -o --format=newc) > "$OUT"
+echo "==> Wrote $OUT ($(du -h "$OUT" | awk '{print $1}'), uncompressed cpio)"
 echo "    sushid mounts root=/dev/vda -> switch_root -> /sbin/init"

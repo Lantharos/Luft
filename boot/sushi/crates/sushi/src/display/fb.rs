@@ -301,6 +301,35 @@ impl FbdevBackend {
 }
 
 impl DisplayBackend for FbdevBackend {
+    fn import_scanout(&mut self) -> bool {
+        if self.mmap_ptr.is_null() || self.mmap_len == 0 {
+            return false;
+        }
+        let row_bytes = self.stride as usize;
+        let copy_bytes = (self.width * 4).min(self.stride) as usize;
+        let rows = self.height.min(self.shadow.height);
+        for y in 0..rows {
+            let src_off = (y as usize) * row_bytes;
+            let dst_off = (y * self.shadow.stride) as usize;
+            if src_off + copy_bytes > self.mmap_len || dst_off + copy_bytes > self.shadow.pixels.len() {
+                return false;
+            }
+            unsafe {
+                std::ptr::copy_nonoverlapping(
+                    self.mmap_ptr.add(src_off),
+                    self.shadow.pixels.as_mut_ptr().add(dst_off),
+                    copy_bytes,
+                );
+            }
+        }
+        // Kernel may have cleared the buffer — only reuse when something is still visible.
+        self.shadow.pixels.chunks(4).any(|px| {
+            px.first().copied().unwrap_or(0) > 8
+                || px.get(1).copied().unwrap_or(0) > 8
+                || px.get(2).copied().unwrap_or(0) > 8
+        })
+    }
+
     fn name(&self) -> &'static str {
         "fbdev"
     }

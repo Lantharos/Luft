@@ -12,7 +12,10 @@ pub mod error;
 pub use core::*;
 pub use protocol::*;
 pub use display::{DisplayBackend, DisplayError, DisplayManager, FrameBuffer, PixelFormat};
-pub use render::{render_frame_into, render_spinner_only, probe_oem_asset, LINUX_LOGO_NATIVE};
+pub use render::{
+    render_frame_into, render_handoff_overlay, render_spinner_only, probe_oem_asset,
+    LINUX_LOGO_NATIVE, SUSHI_FALLBACK_NATIVE,
+};
 pub use unlock::{
     AskPasswordAgent, CrypttabEntry, LuksUnlock, PasswordRequest, TtyReader, TpmUnlock,
     UnlockMessage, UnlockOutcome, respond_to_request, secure_wipe,

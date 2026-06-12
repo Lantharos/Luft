@@ -43,7 +43,7 @@ cat > "$ESP/loader/entries/sushi-test.conf" <<EOF
 title Sushi QEMU Test
 linux \\vmlinuz
 initrd \\initramfs.img
-options rd.sushi=1 rdinit=/usr/bin/sushid root=/dev/vda rw loglevel=4 console=ttyS0,115200n8 console=tty0 fbcon.logo=0 fbcon.logo_centerscreen=0
+options rd.sushi=1 rdinit=/usr/bin/sushid root=/dev/vda rw loglevel=4 console=ttyS0,115200n8 console=tty1 fbcon.logo=0
 EOF
 
 echo "==> ESP ready at $ESP"

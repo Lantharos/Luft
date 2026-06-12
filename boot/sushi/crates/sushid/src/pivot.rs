@@ -67,7 +67,6 @@ pub fn switch_root(new_root: &Path) -> Result<()> {
         }
 
         detach_old_root_mounts();
-        crate::console::handoff_framebuffer_to_console();
 
         let argv = [c_init.as_ptr(), std::ptr::null()];
         libc::execv(c_init.as_ptr(), argv.as_ptr());

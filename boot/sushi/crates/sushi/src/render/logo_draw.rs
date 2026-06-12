@@ -7,15 +7,18 @@ use crate::core::{LogoSource, SushiVisualState};
 use crate::display::FrameBuffer;
 
 use super::bmp::{bmp_dimensions, decode_bmp, DecodedBmp};
-use super::tux;
+use super::font;
 
 const OEM_PATHS: &[&str] = &[
     "/sys/firmware/acpi/bgrt/image",
+    "/run/sushi/bgrt.bmp",
     "/usr/share/sushi/oem/logo.bmp",
     "/usr/lib/sushi/oem/logo.bmp",
 ];
 
 pub const LINUX_LOGO_NATIVE: (u32, u32) = (80, 96);
+pub const SUSHI_FALLBACK_NATIVE: (u32, u32) = (80, 24);
+const SUSHI_FALLBACK_TEXT: &str = "SUSHI";
 
 pub fn draw_logo(frame: &mut FrameBuffer, state: &SushiVisualState) {
     if let Some(path) = state.logo.path.as_deref() {
@@ -35,7 +38,7 @@ pub fn draw_logo(frame: &mut FrameBuffer, state: &SushiVisualState) {
         }
     }
 
-    draw_linux_fallback(frame, state);
+    draw_sushi_fallback(frame, state);
 }
 
 fn try_draw_bmp_path(frame: &mut FrameBuffer, state: &SushiVisualState, path: &str) -> bool {
@@ -77,9 +80,24 @@ fn blit_logo(frame: &mut FrameBuffer, bmp: &DecodedBmp, state: &SushiVisualState
     }
 }
 
-fn draw_linux_fallback(frame: &mut FrameBuffer, state: &SushiVisualState) {
+fn draw_sushi_fallback(frame: &mut FrameBuffer, state: &SushiVisualState) {
     let r = state.logo_rect;
-    tux::draw_linux_logo(frame, r.x, r.y, r.w, r.h);
+    let color = crate::core::Color::SUSHI_TEXT.to_argb32();
+    let scale = fit_text_scale(SUSHI_FALLBACK_TEXT, r.w, r.h);
+    font::draw_text_scaled(frame, r.x, r.y, r.w, r.h, SUSHI_FALLBACK_TEXT, scale, color);
+}
+
+fn fit_text_scale(text: &str, w: u32, h: u32) -> u32 {
+    let glyph_w = 8u32;
+    let glyph_h = 8u32;
+    let spacing = 1u32;
+    let text_w = text.len() as u32 * (glyph_w + spacing) - spacing;
+    if text_w == 0 || glyph_h == 0 {
+        return 1;
+    }
+    let scale_w = w / text_w;
+    let scale_h = h / glyph_h;
+    scale_w.max(1).min(scale_h.max(1)).max(1)
 }
 
 pub fn probe_oem_asset() -> Option<(String, u32, u32)> {

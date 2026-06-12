@@ -8,9 +8,8 @@ mod font;
 mod logo_draw;
 mod overlay;
 mod spinner;
-mod tux;
 
-pub use logo_draw::{probe_oem_asset, LINUX_LOGO_NATIVE};
+pub use logo_draw::{probe_oem_asset, LINUX_LOGO_NATIVE, SUSHI_FALLBACK_NATIVE};
 pub use overlay::{draw_debug_overlay, draw_error_screen, draw_unlock_field, ErrorDisplay, RenderOverlay};
 
 pub(crate) use logo_draw::draw_logo;
@@ -21,6 +20,11 @@ pub(crate) fn draw_background(frame: &mut FrameBuffer, color: Color) {
 /// Black background + spinner only (no logo) — first initramfs paint after EFI handoff.
 pub fn render_spinner_only(frame: &mut FrameBuffer, state: &SushiVisualState) {
     draw_background(frame, state.background);
+    spinner::draw_spinner(frame, state);
+}
+
+/// Overlay only the spinner — caller must have imported the live scanout first.
+pub fn render_handoff_overlay(frame: &mut FrameBuffer, state: &SushiVisualState) {
     spinner::draw_spinner(frame, state);
 }
 

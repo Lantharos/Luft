@@ -27,6 +27,58 @@ pub fn draw_text(frame: &mut FrameBuffer, mut x: i32, y: i32, text: &str, color:
     }
 }
 
+pub fn draw_text_scaled(
+    frame: &mut FrameBuffer,
+    x: i32,
+    y: i32,
+    w: u32,
+    h: u32,
+    text: &str,
+    scale: u32,
+    color: u32,
+) {
+    let scale = scale.max(1) as usize;
+    let spacing = 1usize;
+    let text_w = text.len() * (GLYPH_W as usize + spacing) * scale;
+    let text_h = GLYPH_H as usize * scale;
+    let start_x = x + ((w as i32).saturating_sub(text_w as i32)) / 2;
+    let start_y = y + ((h as i32).saturating_sub(text_h as i32)) / 2;
+
+    let mut cursor_x = start_x;
+    for ch in text.chars() {
+        draw_glyph_scaled(frame, cursor_x, start_y, ch, scale, color);
+        cursor_x += ((GLYPH_W + 1) as usize * scale) as i32;
+    }
+}
+
+fn draw_glyph_scaled(
+    frame: &mut FrameBuffer,
+    x: i32,
+    y: i32,
+    ch: char,
+    scale: usize,
+    color: u32,
+) {
+    let glyph = glyph_bits(ch);
+    for row in 0..GLYPH_H {
+        let bits = glyph[row as usize];
+        for col in 0..GLYPH_W {
+            if (bits >> (7 - col)) & 1 == 0 {
+                continue;
+            }
+            for sy in 0..scale {
+                for sx in 0..scale {
+                    frame.put_pixel(
+                        (x + col as i32 * scale as i32 + sx as i32) as u32,
+                        (y + row as i32 * scale as i32 + sy as i32) as u32,
+                        color,
+                    );
+                }
+            }
+        }
+    }
+}
+
 fn draw_glyph(frame: &mut FrameBuffer, x: i32, y: i32, ch: char, color: u32) {
     let glyph = glyph_bits(ch);
     for row in 0..GLYPH_H {

@@ -45,7 +45,7 @@ mkdir -p /dev/pts /dev/shm
 mount -t devpts devpts /dev/pts 2>/dev/null || true
 mount -t tmpfs tmpfs /dev/shm 2>/dev/null || true
 hostname sushi-vm
-# Ensure fbcon drives the QEMU ramfb window.
+# fbcon on ramfb needs devtmpfs + bound vtconsole before getty.
 for vtc in /sys/class/vtconsole/*/name; do
     case "$(cat "$vtc" 2>/dev/null)" in
         *frame*buffer*|*Frame*buffer*)
@@ -53,8 +53,8 @@ for vtc in /sys/class/vtconsole/*/name; do
             ;;
     esac
 done
+echo 0 > /sys/module/fbcon/parameters/logo 2>/dev/null || true
 chvt 1 2>/dev/null || true
-# Paint the framebuffer console — QEMU gtk shows ramfb on tty1.
 for vt in /dev/tty1 /dev/tty0; do
     if [ -c "$vt" ]; then
         printf '\033[?25h\033[0m\033[2J\033[H' > "$vt"

@@ -1,4 +1,7 @@
-use sushi::{render_frame_into, render_spinner_only, RenderOverlay, SushiVisualState, VisualMode};
+use sushi::{
+    render_frame_into, render_handoff_overlay, render_spinner_only, RenderOverlay,
+    SushiVisualState, VisualMode,
+};
 
 #[test]
 fn render_boot_scene_has_pixels() {
@@ -20,6 +23,17 @@ fn render_unlock_mode_draws_field() {
     let mut frame = sushi::FrameBuffer::new(640, 480, sushi::PixelFormat::Xrgb8888);
     render_frame_into(&mut frame, &state, &overlay);
     assert!(frame.pixels.iter().any(|b| *b != 0));
+}
+
+#[test]
+fn render_handoff_overlay_preserves_existing_pixels() {
+    let state = SushiVisualState::new_boot_scene(200, 200);
+    let mut frame = sushi::FrameBuffer::new(200, 200, sushi::PixelFormat::Xrgb8888);
+    for px in frame.pixels.chunks_exact_mut(4) {
+        px.copy_from_slice(&[40, 80, 120, 0]);
+    }
+    render_handoff_overlay(&mut frame, &state);
+    assert_eq!(&frame.pixels[0..4], &[40, 80, 120, 0]);
 }
 
 #[test]

@@ -159,6 +159,10 @@ pub trait DisplayBackend: Send {
     fn map_frame(&mut self) -> Result<&mut FrameBuffer>;
     fn present(&mut self) -> Result<()>;
     fn blit(&mut self, frame: &FrameBuffer) -> Result<()>;
+    /// Copy the live scanout buffer into the draw shadow (fbdev only).
+    fn import_scanout(&mut self) -> bool {
+        false
+    }
 }
 
 pub struct DisplayManager {
@@ -185,6 +189,11 @@ impl DisplayManager {
         let frame = self.backend.map_frame()?;
         draw(frame);
         self.backend.present()
+    }
+
+    /// True when the backend mirrored the visible framebuffer into the draw buffer.
+    pub fn import_scanout(&mut self) -> bool {
+        self.backend.import_scanout()
     }
 
     pub fn try_handoff(&mut self, new_backend: Box<dyn DisplayBackend>, frame: &FrameBuffer) -> Result<()> {

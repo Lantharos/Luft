@@ -3,7 +3,7 @@
 use sushi::{LogoSource, SushiVisualState};
 use sushi::{probe_oem_asset, LINUX_LOGO_NATIVE};
 
-/// Apply relay.md logo priority unless EFI already handed off a concrete asset.
+/// Apply logo priority (OEM/firmware asset → Linux fallback) unless EFI already handed off a concrete asset.
 pub fn resolve_logo(state: &mut SushiVisualState) {
     if let Some(path) = state.logo.path.as_deref() {
         if std::path::Path::new(path).exists()

@@ -1,0 +1,16 @@
+[package]
+name = "relayboot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "relayboot"
+path = "src/main.rs"
+
+[dependencies]
+log = { workspace = true }
+uefi = { version = "0.32", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
+
+[package.metadata.uefi]
+targets = ["x86_64-unknown-uefi"]

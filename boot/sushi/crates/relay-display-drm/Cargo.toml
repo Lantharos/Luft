@@ -1,0 +1,11 @@
+[package]
+name = "relay-display-drm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+drm = { workspace = true }
+relay-display = { workspace = true }
+thiserror = { workspace = true }

@@ -1,0 +1,53 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/relay-core",
+    "crates/relay-protocol",
+    "crates/relay-log",
+    "crates/relay-render",
+    "crates/relay-display",
+    "crates/relay-display-fb",
+    "crates/relay-display-drm",
+    "crates/relay-unlock",
+    "crates/relayd",
+    "crates/relayctl",
+    "crates/relayboot",
+    "crates/relay-demo-init",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/relay-linux/relay"
+rust-version = "1.75"
+
+[workspace.dependencies]
+relay-core = { path = "crates/relay-core" }
+relay-protocol = { path = "crates/relay-protocol" }
+relay-log = { path = "crates/relay-log" }
+relay-render = { path = "crates/relay-render" }
+relay-display = { path = "crates/relay-display" }
+relay-display-fb = { path = "crates/relay-display-fb" }
+relay-display-drm = { path = "crates/relay-display-drm" }
+relay-unlock = { path = "crates/relay-unlock" }
+
+anyhow = "1"
+bitflags = { version = "2", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+drm = "0.12"
+libc = "0.2"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.release.package.relayboot]
+# UEFI builds use their own profile via .cargo/config.toml

@@ -1,0 +1,43 @@
+# Rust / Cargo
+/target/
+**/*.rs.bk
+*.pdb
+*.dwo
+
+# VM & QEMU artifacts (rebuilt by scripts/vm/*.sh)
+/vm/esp/
+/vm/staging/
+/vm/initramfs-root/
+/vm/*.img
+/vm/*.cpio
+/vm/*.cpio.gz
+/vm/OVMF_VARS.fd
+/vm/serial.log
+/vm/qemu.pid
+
+# Logs
+*.log
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*~
+.project
+.classpath
+.settings/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup / patch debris
+*.orig
+*.rej
+*.bak
+
+# Local env overrides (secrets, machine-specific paths)
+.env
+.env.*
+!.env.example

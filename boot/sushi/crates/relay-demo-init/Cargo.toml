@@ -1,0 +1,9 @@
+[package]
+name = "relay-demo-init"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "relay-demo-init"
+path = "src/main.rs"

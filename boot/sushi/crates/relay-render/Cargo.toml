@@ -1,0 +1,9 @@
+[package]
+name = "relay-render"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+relay-core = { workspace = true }
+relay-display = { workspace = true }

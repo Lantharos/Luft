@@ -1,0 +1,2 @@
+# Trigger relay display handoff when a DRM card appears
+ACTION=="add", SUBSYSTEM=="drm", KERNEL=="card*", TAG+="relay-display"

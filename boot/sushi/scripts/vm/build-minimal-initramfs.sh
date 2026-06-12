@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
-# Build a minimal initramfs that runs relayd (no dracut/sudo required).
+# Build a minimal initramfs that runs sushid (no dracut/sudo required).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-OUT="${1:-$ROOT/vm/initramfs-relay.img}"
+OUT="${1:-$ROOT/vm/initramfs-sushi.img}"
 ROOTFS="$ROOT/vm/initramfs-root"
-RELAYD="$ROOT/target/release/relayd"
-DEMO_INIT="$ROOT/target/release/relay-demo-init"
+SUSHID="$ROOT/target/release/sushid"
 
-if [[ ! -x "$RELAYD" ]]; then
-    cargo build -p relayd --release
-fi
-if [[ ! -x "$DEMO_INIT" ]]; then
-    cargo build -p relay-demo-init --release
+if [[ ! -x "$SUSHID" ]]; then
+    cargo build -p sushid --release
 fi
 
-echo "==> Building minimal relay initramfs"
+echo "==> Building minimal sushi initramfs"
 rm -rf "$ROOTFS"
-mkdir -p "$ROOTFS"/{bin,sbin,usr/bin,usr/lib/relay,run/relay,run/systemd/ask-password,proc,sys,dev,dev/dri,tmp,sysroot/sbin,sysroot/lib,sysroot/lib64}
+mkdir -p "$ROOTFS"/{bin,sbin,usr/bin,usr/lib/sushi,run/sushi,run/systemd/ask-password,proc,sys,dev,dev/dri,tmp,sysroot}
 
-cp "$RELAYD" "$ROOTFS/usr/bin/relayd"
-cp "$ROOT/initramfs/dracut/90relay/relay-efi-state.sh" "$ROOTFS/usr/lib/relay/relay-efi-state.sh"
-chmod +x "$ROOTFS/usr/lib/relay/relay-efi-state.sh"
+cp "$SUSHID" "$ROOTFS/usr/bin/sushid"
+cp "$ROOT/initramfs/dracut/90sushi/sushi-efi-state.sh" "$ROOTFS/usr/lib/sushi/sushi-efi-state.sh"
+chmod +x "$ROOTFS/usr/lib/sushi/sushi-efi-state.sh"
 
 copy_binary_with_libs() {
     local bin="$1"
@@ -40,24 +36,11 @@ copy_binary_with_libs() {
     fi
 }
 
-echo "==> Bundling relayd"
-copy_binary_with_libs "$RELAYD" "$ROOTFS/usr/bin/relayd"
+echo "==> Bundling sushid"
+copy_binary_with_libs "$SUSHID" "$ROOTFS/usr/bin/sushid"
 
-echo "==> Bundling demo sysroot (/sysroot/sbin/init)"
-copy_binary_with_libs "$DEMO_INIT" "$ROOTFS/sysroot/sbin/init"
-while IFS= read -r lib; do
-    [[ -f "$lib" ]] || continue
-    mkdir -p "$ROOTFS/sysroot$(dirname "$lib")"
-    cp -L "$lib" "$ROOTFS/sysroot$lib"
-done < <(ldd "$DEMO_INIT" | awk '/=> \// {print $3}')
-demo_interp=$(readelf -l "$DEMO_INIT" | awk '/interpreter/ {print $NF}' | tr -d '[]')
-if [[ -f "$demo_interp" ]]; then
-    mkdir -p "$ROOTFS/sysroot$(dirname "$demo_interp")"
-    cp -L "$demo_interp" "$ROOTFS/sysroot$demo_interp"
-fi
-
-mkdir -p "$ROOTFS/run/relay" "$ROOTFS/run/systemd/ask-password"
+mkdir -p "$ROOTFS/run/sushi" "$ROOTFS/run/systemd/ask-password"
 
 (cd "$ROOTFS" && find . -print0 | cpio --null -o --format=newc | gzip -9) > "$OUT"
 echo "==> Wrote $OUT ($(du -h "$OUT" | awk '{print $1}'))"
-echo "    relayd -> switch_root -> /sysroot/sbin/init after splash"
+echo "    sushid mounts root=/dev/vda -> switch_root -> /sbin/init"

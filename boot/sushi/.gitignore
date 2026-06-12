@@ -9,6 +9,9 @@
 /vm/staging/
 /vm/initramfs-root/
 /vm/*.img
+/vm/initramfs-sushi.img
+/vm/rootfs-tree/
+/vm/rootfs-mnt/
 /vm/*.cpio
 /vm/*.cpio.gz
 /vm/OVMF_VARS.fd

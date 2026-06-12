@@ -420,123 +420,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
-name = "relay-core"
-version = "0.1.0"
-dependencies = [
- "bitflags",
- "serde",
- "uuid",
-]
-
-[[package]]
-name = "relay-demo-init"
-version = "0.1.0"
-
-[[package]]
-name = "relay-display"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "thiserror",
-]
-
-[[package]]
-name = "relay-display-drm"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "drm",
- "relay-display",
- "thiserror",
-]
-
-[[package]]
-name = "relay-display-fb"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "relay-display",
- "thiserror",
-]
-
-[[package]]
-name = "relay-log"
-version = "0.1.0"
-dependencies = [
- "relay-core",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "relay-protocol"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "relay-core",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "relay-render"
-version = "0.1.0"
-dependencies = [
- "relay-core",
- "relay-display",
-]
-
-[[package]]
-name = "relay-unlock"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "relay-core",
- "relay-log",
- "thiserror",
-]
-
-[[package]]
-name = "relayboot"
-version = "0.1.0"
-dependencies = [
- "log",
- "uefi",
-]
-
-[[package]]
-name = "relayctl"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "relay-core",
- "relay-log",
- "relay-protocol",
- "serde_json",
-]
-
-[[package]]
-name = "relayd"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "relay-core",
- "relay-display",
- "relay-display-drm",
- "relay-display-fb",
- "relay-log",
- "relay-protocol",
- "relay-render",
- "relay-unlock",
- "serde_json",
-]
-
-[[package]]
 name = "rustix"
 version = "0.38.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -615,6 +498,48 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
+name = "sushi"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bitflags",
+ "drm",
+ "libc",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "uuid",
+]
+
+[[package]]
+name = "sushiboot"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "uefi",
+]
+
+[[package]]
+name = "sushictl"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde_json",
+ "sushi",
+]
+
+[[package]]
+name = "sushid"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "serde_json",
+ "sushi",
+]
 
 [[package]]
 name = "syn"

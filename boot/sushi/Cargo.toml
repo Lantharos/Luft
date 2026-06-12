@@ -1,36 +1,21 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/relay-core",
-    "crates/relay-protocol",
-    "crates/relay-log",
-    "crates/relay-render",
-    "crates/relay-display",
-    "crates/relay-display-fb",
-    "crates/relay-display-drm",
-    "crates/relay-unlock",
-    "crates/relayd",
-    "crates/relayctl",
-    "crates/relayboot",
-    "crates/relay-demo-init",
+    "crates/sushi",
+    "crates/sushid",
+    "crates/sushictl",
+    "crates/sushiboot",
 ]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/relay-linux/relay"
+repository = "https://github.com/sushi-linux/sushi"
 rust-version = "1.75"
 
 [workspace.dependencies]
-relay-core = { path = "crates/relay-core" }
-relay-protocol = { path = "crates/relay-protocol" }
-relay-log = { path = "crates/relay-log" }
-relay-render = { path = "crates/relay-render" }
-relay-display = { path = "crates/relay-display" }
-relay-display-fb = { path = "crates/relay-display-fb" }
-relay-display-drm = { path = "crates/relay-display-drm" }
-relay-unlock = { path = "crates/relay-unlock" }
+sushi = { path = "crates/sushi" }
 
 anyhow = "1"
 bitflags = { version = "2", features = ["serde"] }
@@ -49,5 +34,5 @@ codegen-units = 1
 strip = true
 panic = "abort"
 
-[profile.release.package.relayboot]
+[profile.release.package.sushiboot]
 # UEFI builds use their own profile via .cargo/config.toml

@@ -7,11 +7,11 @@ install: build
 	DESTDIR=$(DESTDIR) ./scripts/build.sh
 
 dracut: install
-	sudo dracut --force --omit plymouth --add relay
+	sudo dracut --force --omit plymouth --add sushi
 
 test:
-	cargo test --workspace --exclude relayboot
-	cargo build --workspace --exclude relayboot
+	cargo test --workspace --exclude sushiboot
+	cargo build --workspace --exclude sushiboot
 
 vm-build:
 	./scripts/vm/build-esp.sh

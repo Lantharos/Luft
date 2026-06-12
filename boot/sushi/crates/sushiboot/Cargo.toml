@@ -9,6 +9,7 @@ name = "sushiboot"
 path = "src/main.rs"
 
 [dependencies]
+libm = "0.2"
 log = { workspace = true }
 uefi = { version = "0.32", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
 

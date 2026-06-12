@@ -28,14 +28,13 @@ use uefi::{CString16, Handle, Identify};
 
 pub(crate) const SUSHI_VENDOR_GUID: uefi::Guid = uefi::guid!("a7b3c4d5-e6f7-4890-abcd-ef1234567890");
 
-// Must match sushi spinner constants exactly.
+// Must match crates/sushi/src/core.rs + render/spinner.rs exactly.
 const SPINNER_ACTIVITY_PX: usize = 56;
-const SPINNER_ARC_MILLIDEG: usize = 900;
-const SPINNER_ROTATION_OFFSET_MILLIDEG: usize = 2700;
+const SPINNER_ARC_RAD: f32 = core::f32::consts::FRAC_PI_2;
+const SPINNER_STROKE_PX: f32 = 3.5;
+const SPINNER_AA_FRINGE: f32 = 1.25;
 const SPINNER_RADIUS_INSET: usize = 4;
-const SPINNER_STROKE_HALF_MILLI: i32 = 1750; // 3.5px * 1000 / 2
-const SPINNER_AA_FRINGE_MILLI: i32 = 1250;
-const SPINNER_ROTATIONS_PER_SEC_MILLI: u32 = 900; // 0.9 rps
+const SPINNER_ROTATIONS_PER_SEC: f32 = 0.9;
 const SPINNER_FRAME_US: u32 = 16_666;
 const SPINNER_BOOT_FRAMES: usize = 90;
 
@@ -73,8 +72,7 @@ fn efi_main() -> Status {
 
     for frame in 0..SPINNER_BOOT_FRAMES {
         let elapsed = frame as f32 * SPINNER_FRAME_US as f32 / 1_000_000_000.0;
-        scene.spinner_phase =
-            (elapsed * SPINNER_ROTATIONS_PER_SEC_MILLI as f32 / 1000.0) % 1.0;
+        scene.spinner_phase = (elapsed * SPINNER_ROTATIONS_PER_SEC) % 1.0;
         let _ = draw_boot_scene(gop_device, &scene);
         boot::stall(SPINNER_FRAME_US as usize);
     }
@@ -153,7 +151,7 @@ fn efi_main() -> Status {
 
 fn spinner_phase_at_handoff(_scene: &BootScene) -> f32 {
     let elapsed = SPINNER_BOOT_FRAMES as f32 * SPINNER_FRAME_US as f32 / 1_000_000_000.0;
-    (elapsed * SPINNER_ROTATIONS_PER_SEC_MILLI as f32 / 1000.0) % 1.0
+    (elapsed * SPINNER_ROTATIONS_PER_SEC) % 1.0
 }
 
 fn ensure_kernel_logo_suppressed(cmdline: &mut String) {
@@ -401,6 +399,7 @@ fn draw_linux_logo(
     }
 }
 
+/// Same renderer as `crates/sushi/src/render/spinner.rs` (float arc + round caps + AA).
 fn draw_arc_spinner(
     frame: &mut uefi::proto::console::gop::FrameBuffer<'_>,
     scene: &BootScene,
@@ -408,143 +407,83 @@ fn draw_arc_spinner(
     spin_y: usize,
 ) {
     let spin_size = SPINNER_ACTIVITY_PX;
-    let cx_milli = scene.width as i32 * 500;
-    let cy_milli = (spin_y as i32 + spin_size as i32 / 2) * 1000;
-    let radius_px = (spin_size / 2).saturating_sub(SPINNER_RADIUS_INSET) as i32;
-    let radius = radius_px * 1000;
-    let phase_milli = (scene.spinner_phase * 3600.0) as usize;
-    let rotation_milli = (phase_milli + SPINNER_ROTATION_OFFSET_MILLIDEG) % 3600;
-    let cap1_milli = (rotation_milli + SPINNER_ARC_MILLIDEG) % 3600;
-    let (cap0x, cap0y) = circle_offset_millideg(rotation_milli, radius_px);
-    let (cap1x, cap1y) = circle_offset_millideg(cap1_milli, radius_px);
-    let cap0_mx = cx_milli + cap0x * 1000;
-    let cap0_my = cy_milli + cap0y * 1000;
-    let cap1_mx = cx_milli + cap1x * 1000;
-    let cap1_my = cy_milli + cap1y * 1000;
-    let pad = radius_px + 6;
-    let cx_i = scene.width as i32 / 2;
-    let cy_i = spin_y as i32 + spin_size as i32 / 2;
+    let cx = scene.width as f32 * 0.5;
+    let cy = spin_y as f32 + spin_size as f32 * 0.5;
+    let radius = (spin_size / 2).saturating_sub(SPINNER_RADIUS_INSET) as f32;
+    let half = SPINNER_STROKE_PX * 0.5;
+    let rotation = scene.spinner_phase * core::f32::consts::TAU - core::f32::consts::FRAC_PI_2;
 
-    for py in (cy_i - pad)..=(cy_i + pad) {
-        if py < 0 || py >= scene.height as i32 {
-            continue;
-        }
-        for px in (cx_i - pad)..=(cx_i + pad) {
-            if px < 0 || px >= scene.width as i32 {
-                continue;
-            }
-            let fx = px * 1000 + 500;
-            let fy = py * 1000 + 500;
-            let dx = fx - cx_milli;
-            let dy = fy - cy_milli;
-            let dist = isqrt((dx as i64 * dx as i64 + dy as i64 * dy as i64) as u64) as i32;
-            let ring = (dist - radius).unsigned_abs() as i32;
+    let cap0_x = cx + radius * libm::cosf(rotation);
+    let cap0_y = cy + radius * libm::sinf(rotation);
+    let cap1_x = cx + radius * libm::cosf(rotation + SPINNER_ARC_RAD);
+    let cap1_y = cy + radius * libm::sinf(rotation + SPINNER_ARC_RAD);
 
-            let deg = angle_millideg(dx / 1000, dy / 1000);
-            let rel = (deg + 3600 - rotation_milli) % 3600;
-            let arc_cov = if rel <= SPINNER_ARC_MILLIDEG {
-                stroke_coverage_milli(ring)
-            } else {
-                0
+    let pad = libm::ceilf(radius + half + SPINNER_AA_FRINGE + 1.0) as i32;
+    let cx_i = cx as i32;
+    let cy_i = cy as i32;
+    let x0 = (cx_i - pad).max(0);
+    let y0 = (cy_i - pad).max(0);
+    let x1 = (cx_i + pad).min(scene.width as i32);
+    let y1 = (cy_i + pad).min(scene.height as i32);
+
+    for py in y0..y1 {
+        for px in x0..x1 {
+            let fx = px as f32 + 0.5;
+            let fy = py as f32 + 0.5;
+            let dx = fx - cx;
+            let dy = fy - cy;
+            let dist = libm::sqrtf(dx * dx + dy * dy);
+            let ring = (dist - radius).abs();
+
+            let arc_cov = {
+                let mut angle = libm::atan2f(dy, dx) - rotation;
+                angle = angle - core::f32::consts::TAU * libm::floorf(angle / core::f32::consts::TAU);
+                if angle <= SPINNER_ARC_RAD {
+                    stroke_coverage(ring, half)
+                } else {
+                    0.0
+                }
             };
 
-            let cap0_dx = fx - cap0_mx;
-            let cap0_dy = fy - cap0_my;
-            let cap0_dist = isqrt(
-                (cap0_dx as i64 * cap0_dx as i64 + cap0_dy as i64 * cap0_dy as i64) as u64,
-            ) as i32;
-            let cap1_dx = fx - cap1_mx;
-            let cap1_dy = fy - cap1_my;
-            let cap1_dist = isqrt(
-                (cap1_dx as i64 * cap1_dx as i64 + cap1_dy as i64 * cap1_dy as i64) as u64,
-            ) as i32;
-            let coverage = arc_cov
-                .max(stroke_coverage_milli(cap0_dist))
-                .max(stroke_coverage_milli(cap1_dist));
-            if coverage == 0 {
+            let d0x = fx - cap0_x;
+            let d0y = fy - cap0_y;
+            let d1x = fx - cap1_x;
+            let d1y = fy - cap1_y;
+            let cap0 = stroke_coverage(libm::sqrtf(d0x * d0x + d0y * d0y), half);
+            let cap1 = stroke_coverage(libm::sqrtf(d1x * d1x + d1y * d1y), half);
+
+            let coverage = arc_cov.max(cap0).max(cap1);
+            if coverage <= 0.0 {
+                continue;
+            }
+
+            let alpha = libm::roundf(coverage * 255.0).clamp(0.0, 255.0) as u8;
+            if alpha == 0 {
                 continue;
             }
 
             let offset = (py as usize * scene.stride + px as usize) * 4;
-            write_pixel_alpha(frame, scene, offset, (255, 255, 255), coverage as u8);
+            write_pixel_alpha(frame, scene, offset, (255, 255, 255), alpha);
         }
     }
 }
 
-fn circle_offset_millideg(millideg: usize, radius: i32) -> (i32, i32) {
-    let d = (millideg / 10) % 360;
-    let s = SIN_TABLE[d];
-    let c = SIN_TABLE[(d + 90) % 360];
-    ((c * radius) / 1000, (s * radius) / 1000)
+fn stroke_coverage(dist_from_centerline: f32, half: f32) -> f32 {
+    let outer = half + SPINNER_AA_FRINGE;
+    1.0 - smoothstep(half - 0.25, outer, dist_from_centerline)
 }
 
-fn stroke_coverage_milli(dist: i32) -> u8 {
-    let inner = SPINNER_STROKE_HALF_MILLI - 250;
-    let outer = SPINNER_STROKE_HALF_MILLI + SPINNER_AA_FRINGE_MILLI;
-    if dist <= inner {
-        return 255;
+fn smoothstep(edge0: f32, edge1: f32, x: f32) -> f32 {
+    if edge0 >= edge1 {
+        return 0.0;
     }
-    if dist >= outer {
-        return 0;
+    let mut t = (x - edge0) / (edge1 - edge0);
+    if t < 0.0 {
+        t = 0.0;
+    } else if t > 1.0 {
+        t = 1.0;
     }
-    let t = ((dist - inner) * 1000 / (outer - inner)).clamp(0, 1000) as u32;
-    let smooth = t * t * (3000 - 2 * t) / 1_000_000;
-    (255 - (smooth * 255 / 1000)).clamp(0, 255) as u8
-}
-
-static SIN_TABLE: [i32; 360] = [
-    0, 17, 35, 52, 70, 87, 105, 122, 139, 156, 174, 191, 208, 225, 242, 259, 276, 292, 309,
-    326, 342, 358, 375, 391, 407, 423, 438, 454, 469, 485, 500, 515, 530, 545, 559, 574, 588,
-    602, 616, 629, 643, 656, 669, 682, 695, 707, 719, 731, 743, 755, 766, 777, 788, 799, 809,
-    819, 829, 839, 848, 857, 866, 875, 883, 891, 899, 906, 914, 921, 927, 934, 940, 946, 951,
-    956, 961, 966, 970, 974, 978, 982, 985, 988, 990, 993, 995, 996, 998, 999, 999, 1000, 1000,
-    1000, 999, 999, 998, 996, 995, 993, 990, 988, 985, 982, 978, 974, 970, 966, 961, 956, 951,
-    946, 940, 934, 927, 921, 914, 906, 899, 891, 883, 875, 866, 857, 848, 839, 829, 819, 809,
-    799, 788, 777, 766, 755, 743, 731, 719, 707, 695, 682, 669, 656, 643, 629, 616, 602, 588,
-    574, 559, 545, 530, 515, 500, 485, 469, 454, 438, 423, 407, 391, 375, 358, 342, 326, 309,
-    292, 276, 259, 242, 225, 208, 191, 174, 156, 139, 122, 105, 87, 70, 52, 35, 17, 0, -17, -35,
-    -52, -70, -87, -105, -122, -139, -156, -174, -191, -208, -225, -242, -259, -276, -292, -309,
-    -326, -342, -358, -375, -391, -407, -423, -438, -454, -469, -485, -500, -515, -530, -545,
-    -559, -574, -588, -602, -616, -629, -643, -656, -669, -682, -695, -707, -719, -731, -743,
-    -755, -766, -777, -788, -799, -809, -819, -829, -839, -848, -857, -866, -875, -883, -891,
-    -899, -906, -914, -921, -927, -934, -940, -946, -951, -956, -961, -966, -970, -974, -978,
-    -982, -985, -988, -990, -993, -995, -996, -998, -999, -999, -1000, -1000, -1000, -999, -999,
-    -998, -996, -995, -993, -990, -988, -985, -982, -978, -974, -970, -966, -961, -956, -951, -946,
-    -940, -934, -927, -921, -914, -906, -899, -891, -883, -875, -866, -857, -848, -839, -829, -819,
-    -809, -799, -788, -777, -766, -755, -743, -731, -719, -707, -695, -682, -669, -656, -643, -629,
-    -616, -602, -588, -574, -559, -545, -530, -515, -500, -485, -469, -454, -438, -423, -407, -391,
-    -375, -358, -342, -326, -309, -292, -276, -259, -242, -225, -208, -191, -174, -156, -139, -122,
-    -105, -87, -70, -52, -35, -17,
-];
-
-fn angle_millideg(dx: i32, dy: i32) -> usize {
-    let ax = dx.unsigned_abs() as u32;
-    let ay = dy.unsigned_abs() as u32;
-    let mut deg = if ax == 0 {
-        900usize
-    } else {
-        (ay as u64 * 900 / ax as u64) as usize
-    };
-    match (dx >= 0, dy >= 0) {
-        (true, false) => deg = 3600 - deg,
-        (false, false) => deg = 1800 + deg,
-        (false, true) => deg = 1800 - deg,
-        (true, true) => {}
-    }
-    deg % 3600
-}
-
-fn isqrt(n: u64) -> u32 {
-    if n == 0 {
-        return 0;
-    }
-    let mut x = n;
-    let mut y = (x + 1) / 2;
-    while y < x {
-        x = y;
-        y = (x + n / x) / 2;
-    }
-    x as u32
+    t * t * (3.0 - 2.0 * t)
 }
 
 fn write_pixel_alpha(
@@ -638,6 +577,9 @@ fn tux_color(x: i32, y: i32) -> Option<(u8, u8, u8)> {
     }
     if in_ellipse(x, y - 12, 5, 4) && y > -18 {
         return Some((252, 160, 48));
+    }
+    if (x + 9).abs() + (y + 28).abs() < 4 || (x - 9).abs() + (y + 28).abs() < 4 {
+        return Some((20, 20, 24));
     }
     None
 }

@@ -4,6 +4,7 @@ members = [
     "crates/sushi",
     "crates/sushid",
     "crates/sushictl",
+    "crates/sushi-bootctl",
     "crates/sushiboot",
 ]
 

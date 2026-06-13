@@ -93,7 +93,8 @@ impl UiState {
     }
 }
 
-fn serial_note(msg: &str) {
+/// User-visible serial hints (unlock prompts, failures). Routine boot traces go to boot.log only.
+fn serial_alert(msg: &str) {
     let line = format!("{msg}\r\n");
     let _ = fs::write("/dev/ttyS0", &line);
     let _ = fs::write("/dev/console", &line);
@@ -104,8 +105,6 @@ fn main() -> Result<()> {
         println!("sushid {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
-
-    serial_note("Sushi: sushid is up");
 
     if let Err(err) = run() {
         eprintln!("sushid: fatal error: {err:#}");
@@ -132,6 +131,7 @@ fn run() -> Result<()> {
 
     disable_kernel_boot_logo();
     suppress_fbcon_console();
+    console::clear_text_console();
     ensure_display_device_nodes();
     if !handoff_locked {
         emergency_blackout_all();
@@ -167,7 +167,6 @@ fn run() -> Result<()> {
     // Paint immediately — reuse EFI scanout when possible, only overlay the spinner.
     advance_spinner_from_boot(&mut state, spinner_base_phase);
     paint_first_handoff_frame(&mut display, &mut state, &ui.overlay, handoff_locked)?;
-    serial_note("Sushi: caught the frame");
 
     stage_firmware_assets();
     finish_initramfs_setup();
@@ -180,11 +179,14 @@ fn run() -> Result<()> {
     } else {
         "unavailable".to_string()
     };
-    serial_note(&format!("Sushi: keyboard {keyboard_label}"));
     disable_kernel_boot_logo();
     fs::create_dir_all(SUSHI_RUN_DIR).context("create sushi run dir")?;
     sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"))?;
     sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
+    sushi::log::log_info(
+        SushiStage::Initramfs,
+        &format!("keyboard: {keyboard_label}"),
+    );
     persist_state(&state)?;
 
     let running = Arc::new(AtomicBool::new(true));
@@ -214,7 +216,10 @@ fn run() -> Result<()> {
     while running.load(Ordering::SeqCst) {
         if last_keyboard_probe.elapsed() >= Duration::from_millis(250) {
             if ui.keyboard.refresh() {
-                serial_note(&format!("Sushi: keyboard {}", ui.keyboard.source_label()));
+                sushi::log::log_info(
+                    SushiStage::Initramfs,
+                    &format!("keyboard: {}", ui.keyboard.source_label()),
+                );
             }
             last_keyboard_probe = Instant::now();
         }
@@ -306,7 +311,6 @@ fn run() -> Result<()> {
     let _ = draw_and_present(&mut display, &mut state, &ui.overlay);
 
     agent.shutdown();
-    serial_note("Sushi: handing off!");
     // Hand off while /dev/fb0 still exists; forget display so munmap does not tear down scanout.
     console::handoff_framebuffer_to_console();
     mem::forget(display);
@@ -519,10 +523,10 @@ fn finish_unlock_submit(
             thread::spawn(|| {
                 let _ = pivot::ensure_sysroot_mounted();
             });
-            serial_note("Sushi: disk unlocked, resuming boot");
+            sushi::log::log_info(SushiStage::Initramfs, "disk unlocked, resuming boot");
         }
         Err(err) => {
-            serial_note(&format!("Sushi: unlock failed: {err:#}"));
+            serial_alert(&format!("Sushi: unlock failed: {err:#}"));
             ui.pending = Some(done.pending);
             ui.unlock_buffer.clear();
             ui.overlay.unlock_input = Some(String::new());
@@ -585,7 +589,7 @@ fn run_headless_switch_root() -> Result<()> {
     fs::create_dir_all(SUSHI_RUN_DIR).context("create sushi run dir")?;
     sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"))?;
     sushi::log::log_event(&SushiEvent::new(SushiStage::Initramfs, SushiEventKind::BootFirstFrame));
-    serial_note("Sushi: caught the frame (headless)");
+
 
     let mut state = SushiVisualState::new_boot_scene(0, 0);
     match TpmUnlock::try_silent_unlock(&mut state) {
@@ -607,7 +611,7 @@ fn run_headless_switch_root() -> Result<()> {
             target: "switch-root".to_string(),
         },
     ));
-    serial_note("Sushi: handing off!");
+    console::clear_text_console();
     enable_fbcon();
     pivot::switch_root(Path::new("/sysroot"))
 }
@@ -647,7 +651,7 @@ fn apply_unlock_probe(ui: &mut UiState, state: &mut SushiVisualState, probe: Unl
             ui.overlay.unlock_input = Some(String::new());
             ui.overlay.unlock_prompt = Some("Disk passphrase".to_string());
             state.set_mode(VisualMode::Unlocking);
-            serial_note("Sushi: unlock UI ready (type passphrase, Enter)");
+            serial_alert("Sushi: unlock UI ready (type passphrase, Enter)");
         }
         UnlockOutcome::Unlocked { .. } => {
             state.set_mode(probe.mode);
@@ -789,7 +793,7 @@ fn finish_initramfs_setup() {
     if Path::new("/etc/crypttab").exists() {
         if let Err(err) = LuksUnlock::prepare_kernel() {
             eprintln!("sushid: LUKS kernel prep: {err:#}");
-            serial_note(&format!("Sushi: LUKS kernel prep failed: {err:#}"));
+            serial_alert(&format!("Sushi: LUKS kernel prep failed: {err:#}"));
         }
     }
 }

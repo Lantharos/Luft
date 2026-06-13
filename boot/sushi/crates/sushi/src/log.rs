@@ -32,7 +32,9 @@ pub fn log_event(event: &SushiEvent) {
     let human = human_message(event);
     let machine = machine_entry(event);
 
-    eprintln!("{human}");
+    if !logging_to_file() {
+        eprintln!("{human}");
+    }
 
     if let Ok(json) = serde_json::to_string(&machine) {
         append_line(&json);
@@ -40,7 +42,9 @@ pub fn log_event(event: &SushiEvent) {
 }
 
 pub fn log_info(stage: SushiStage, message: impl AsRef<str>) {
-    eprintln!("{}: {}", stage_name(stage), message.as_ref());
+    if !logging_to_file() {
+        eprintln!("{}: {}", stage_name(stage), message.as_ref());
+    }
     let entry = MachineLogEntry {
         stage: stage_name(stage).to_string(),
         event: message.as_ref().to_string(),
@@ -92,6 +96,10 @@ pub fn load_events(path: impl AsRef<Path>) -> Vec<SushiEvent> {
             parse_machine_entry(&entry)
         })
         .collect()
+}
+
+fn logging_to_file() -> bool {
+    LOG_PATH.lock().unwrap().is_some()
 }
 
 fn append_line(line: &str) {

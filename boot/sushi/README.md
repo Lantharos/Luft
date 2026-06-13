@@ -9,7 +9,8 @@ Sushi is a Rust boot splash stack for Linux: an initramfs daemon that owns the d
 | `sushi` | Shared library: display backends (DRM/fbdev), renderer, protocol, unlock helpers |
 | `sushid` | Initramfs splash daemon (`rdinit=/usr/bin/sushid`) |
 | `sushictl` | Diagnostics and manual control CLI |
-| `sushiboot` | UEFI `BOOTX64.EFI` — spinner before the kernel loads |
+| `sushi-bootctl` | Install SushiBoot on ESP, kernel-install layout, signing |
+| `sushiboot` | UEFI bootloader — scans all ESPs, auto-detects OS entries, minimal menu |
 | `90sushi` | Dracut module under `initramfs/dracut/90sushi/` |
 
 Log prefixes in serial/console output: `SushiBoot`, `Sushi`, `SushiDisplay`.
@@ -64,9 +65,14 @@ Serial log when using the GTK window: `vm/serial.log`.
 
 ```bash
 make build
-sudo make install DESTDIR=/   # installs sushid, sushictl, dracut module, themes
+sudo make install DESTDIR=/   # sushid, sushictl, sushi-bootctl, dracut, kernel-install
+sudo sushi-bootctl install --sign --efi-entry
 sudo dracut --force --omit plymouth --add sushi
+sudo kernel-install add "$(uname -r)"   # or: dracut --regenerate-all
 ```
+
+Secure Boot (optional): `sudo sbctl create-keys && sudo sbctl enroll -m`, then
+`sudo sushi-bootctl sign`. Dual-boot Windows: `sudo sushi-bootctl add-windows`.
 
 Kernel cmdline (enabled by default when the module is installed):
 

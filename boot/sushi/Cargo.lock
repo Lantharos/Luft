@@ -520,6 +520,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "sushi-bootctl"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+]
+
+[[package]]
 name = "sushiboot"
 version = "0.1.0"
 dependencies = [

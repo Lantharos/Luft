@@ -14,8 +14,21 @@ const KD_TEXT: libc::c_ulong = 0x00;
 const FBIOBLANK: libc::c_ulong = 0x4611;
 const FB_BLANK_UNBLANK: libc::c_ulong = 0;
 
+/// Erase scrollback on serial/VT before login or the next boot stage owns the console.
+pub fn clear_text_console() {
+    const CLEAR: &[u8] = b"\x1b[2J\x1b[3J\x1b[H";
+    for path in ["/dev/ttyS0", "/dev/console", "/dev/tty1", "/dev/tty0"] {
+        let Ok(mut tty) = OpenOptions::new().write(true).open(path) else {
+            continue;
+        };
+        let _ = tty.write_all(CLEAR);
+        let _ = tty.flush();
+    }
+}
+
 /// Keep the last splash frame on scanout through switch_root — do not rebind fbcon here.
 pub fn handoff_framebuffer_to_console() {
+    clear_text_console();
     unblank_framebuffer();
     activate_text_console();
 }

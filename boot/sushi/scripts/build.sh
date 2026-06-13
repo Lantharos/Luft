@@ -7,7 +7,7 @@ cd "$ROOT"
 PROFILE="${PROFILE:-release}"
 
 echo "==> Building sushi workspace (${PROFILE})"
-cargo build --workspace --exclude sushiboot --profile "$PROFILE"
+cargo build --workspace --exclude sushiboot --profile "$PROFILE" -p sushid -p sushictl -p sushi-bootctl
 
 if [[ -d "target/${PROFILE}" ]]; then
     BIN_DIR="target/${PROFILE}"
@@ -22,11 +22,16 @@ fi
 
 install -d "${DESTDIR}/usr/bin"
 install -d "${DESTDIR}/usr/lib/sushi/themes/default"
+install -d "${DESTDIR}/usr/lib/kernel/install.d"
 install -d "${DESTDIR}/etc/sushi"
 install -d "${DESTDIR}/usr/lib/dracut/modules.d/90sushi"
 
 install -m 0755 "$BIN_DIR/sushid" "${DESTDIR}/usr/bin/sushid"
 install -m 0755 "$BIN_DIR/sushictl" "${DESTDIR}/usr/bin/sushictl"
+install -m 0755 "$BIN_DIR/sushi-bootctl" "${DESTDIR}/usr/bin/sushi-bootctl"
+install -m 0755 "$ROOT/scripts/kernel-install/90-sushi.install" \
+    "${DESTDIR}/usr/lib/kernel/install.d/90-sushi.install"
+install -m 0755 "$ROOT/scripts/sushi-sign.sh" "${DESTDIR}/usr/lib/sushi/sushi-sign.sh"
 install -m 0644 "$ROOT/themes/default/logo.txt" "${DESTDIR}/usr/lib/sushi/themes/default/logo.txt"
 install -m 0644 "$ROOT/initramfs/dracut/90sushi/sushi.conf" "${DESTDIR}/etc/sushi/sushi.conf"
 

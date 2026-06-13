@@ -5,30 +5,33 @@ extern crate alloc;
 
 mod bgrt;
 mod bmp;
+mod chainload;
+mod entries;
 mod font;
 mod linux_boot;
+mod loader_conf;
+mod menu;
 mod scene;
 mod tpm;
 mod tpm2;
+mod volume;
 
 use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 use core::fmt::Write as _;
+use entries::{BootEntry, BootKind};
 use linux_boot::LinuxEntry;
+use loader_conf::LoaderConfig;
 use scene::{BootScene, MIN_ANIM_FRAMES, SPINNER_FRAME_US};
 use uefi::boot;
-use uefi::cstr16;
 use uefi::prelude::*;
 use uefi::proto::console::gop::GraphicsOutput;
 use uefi::proto::console::serial::Serial;
 use uefi::proto::loaded_image::LoadedImage;
-use uefi::proto::media::file::{File, FileAttribute, FileInfo, FileMode, FileType};
-use uefi::proto::media::fs::SimpleFileSystem;
-use uefi::table::boot::{AllocateType, MemoryType, SearchType};
-use uefi::{CString16, Handle, Identify};
+use uefi::table::boot::SearchType;
+use uefi::{Handle, Identify};
 
 pub(crate) const SUSHI_VENDOR_GUID: uefi::Guid = uefi::guid!("a7b3c4d5-e6f7-4890-abcd-ef1234567890");
 
@@ -43,61 +46,78 @@ fn efi_main() -> Status {
     let (width, height) = gop.current_mode_info().resolution();
     let mut scene = BootScene::new(width as u32, height as u32);
 
-    let fmt = gop.current_mode_info().pixel_format();
-    boot_log(&format!("SushiBoot: GOP {}x{} fmt={fmt:?}", scene.width, scene.height));
+    boot_log(&format!("SushiBoot: GOP {}x{} fmt={:?}", scene.width, scene.height, gop.current_mode_info().pixel_format()));
     boot_log(&format!(
         "SushiBoot: logo {:?} ({}x{})",
         scene.logo_kind, scene.logo_native_w, scene.logo_native_h
     ));
 
-    // Cover OVMF splash before any disk/TPM work.
     present_frame(&mut scene, &mut gop, "first frame");
 
-    let mut entry: Option<BlsEntry> = None;
-    let mut cmdline: Option<String> = None;
-    let mut preloaded_kernel: Option<Handle> = None;
+    let mut collected: Option<Vec<BootEntry>> = None;
+    let mut loader_conf: Option<LoaderConfig> = None;
 
-    // Keep the spinner moving while BLS/cmdline/TPM work and the kernel image
-    // preloads from disk — StartImage then only jumps into a loaded bzImage.
-    while scene.animation_frames < MIN_ANIM_FRAMES
-        || entry.is_none()
-        || cmdline.is_none()
-        || preloaded_kernel.is_none()
-    {
-        if entry.is_none() && scene.animation_frames >= 1 {
-            let entries = collect_bls_entries(device);
-            let selected = select_entry(&entries);
-            boot_log(&format!("SushiBoot: booting {}", selected.title));
-            entry = Some(selected);
-        }
-        if cmdline.is_none() && entry.is_some() {
-            store_sushi_state(&scene);
-            let selected = entry.as_ref().unwrap();
-            cmdline = Some(build_cmdline(device, selected, &scene.handoff_json()));
-        }
-        if preloaded_kernel.is_none() {
-            if let Some(selected) = entry.as_ref() {
-                if let Ok(image) = linux_boot::preload_kernel(device, &selected.linux) {
-                    preloaded_kernel = Some(image);
-                    boot_log("SushiBoot: kernel ready");
-                }
+    while scene.animation_frames < MIN_ANIM_FRAMES || collected.is_none() {
+        if collected.is_none() && scene.animation_frames >= 1 {
+            let (mut list, esp_count) = entries::collect_all(device);
+            if list.is_empty() {
+                list.push(entries::fallback_entry(device));
             }
+            loader_conf = Some(loader_conf::load(device));
+            boot_log(&format!("SushiBoot: {} entries from {} ESP(s)", list.len(), esp_count));
+            collected = Some(list);
         }
         spin_frame(&mut scene, &mut gop);
     }
 
-    let entry = entry.expect("entry selected");
-    let cmdline = cmdline.expect("cmdline built");
-    let kernel = preloaded_kernel.expect("kernel preloaded");
-    present_handoff_frame(&mut scene, &mut gop);
-    let linux = LinuxEntry {
-        initrd: entry.initrd.as_deref(),
+    let entries = collected.unwrap_or_else(|| alloc::vec![entries::fallback_entry(device)]);
+    let conf = loader_conf.unwrap_or_default();
+    let selected_idx = menu::run_menu(&mut scene, &mut gop, &entries, &conf);
+    let entry = &entries[selected_idx];
+    boot_log(&format!("SushiBoot: booting {}", entry.title));
+
+    match &entry.kind {
+        BootKind::Linux { linux, initrd, options } => {
+            boot_linux(entry.volume, &mut scene, &mut gop, linux, initrd.as_deref(), options)
+        }
+        BootKind::Efi { efi, .. } => {
+            present_handoff_frame(&mut scene, &mut gop);
+            clear_serial_console();
+            match chainload::start_efi(entry.volume, efi) {
+                Ok(()) => Status::SUCCESS,
+                Err(err) => {
+                    boot_log(&format!("SushiBoot: chainload failed: {err:?}"));
+                    Status::LOAD_ERROR
+                }
+            }
+        }
+    }
+}
+
+fn boot_linux(
+    device: Handle,
+    scene: &mut BootScene,
+    gop: &mut GraphicsOutput,
+    linux: &str,
+    initrd: Option<&str>,
+    options: &str,
+) -> Status {
+    store_sushi_state(scene);
+    let cmdline = build_linux_cmdline(device, options, &scene.handoff_json());
+    let kernel = match linux_boot::preload_kernel(device, linux) {
+        Ok(image) => image,
+        Err(err) => {
+            boot_log(&format!("SushiBoot: kernel load failed: {err:?}"));
+            return Status::LOAD_ERROR;
+        }
+    };
+    present_handoff_frame(scene, gop);
+    clear_serial_console();
+    let linux_entry = LinuxEntry {
+        initrd,
         cmdline: &cmdline,
     };
-
-    boot_log("SushiBoot: handing off!");
-
-    match linux_boot::start_preloaded(kernel, &linux) {
+    match linux_boot::start_preloaded(kernel, &linux_entry) {
         Ok(()) => Status::SUCCESS,
         Err(err) => {
             boot_log(&format!("SushiBoot: boot failed: {err:?}"));
@@ -107,10 +127,7 @@ fn efi_main() -> Status {
 }
 
 fn ensure_kernel_logo_suppressed(cmdline: &mut String) {
-    for flag in [
-        "fbcon.logo=0",
-        "rdinit=/usr/bin/sushid",
-    ] {
+    for flag in ["fbcon.logo=0"] {
         let key = flag.split('=').next().unwrap_or(flag);
         if !cmdline.split_whitespace().any(|tok| tok == flag || tok.starts_with(&format!("{key}=")))
         {
@@ -120,12 +137,43 @@ fn ensure_kernel_logo_suppressed(cmdline: &mut String) {
     }
 }
 
+fn build_linux_cmdline(device: Handle, options: &str, state_json: &str) -> String {
+    let b64 = base64_encode(state_json.as_bytes());
+    let mut cmdline = String::from(options);
+    if !cmdline.contains("rd.sushi") {
+        cmdline.push_str(" rd.sushi=1");
+    }
+    ensure_kernel_logo_suppressed(&mut cmdline);
+    tpm::append_tpm_hint(&mut cmdline);
+    if let Some(key) = tpm::try_unseal_luks_key(device) {
+        let key_b64 = base64_encode(key.as_bytes());
+        cmdline.push_str(" sushi.luks.key=b64:");
+        cmdline.push_str(&key_b64);
+    }
+    cmdline.push_str(" sushi.state=b64:");
+    cmdline.push_str(&b64);
+    cmdline
+}
+
 fn boot_log(msg: &str) {
     if let Ok(handles) = boot::locate_handle_buffer(SearchType::ByProtocol(&Serial::GUID)) {
         for &handle in handles.iter() {
             if let Ok(mut serial) = boot::open_protocol_exclusive::<Serial>(handle) {
                 let _ = serial.write_str(msg);
                 let _ = serial.write_str("\r\n");
+                return;
+            }
+        }
+    }
+}
+
+/// Drop firmware/SushiBoot scrollback before the next image owns the console.
+fn clear_serial_console() {
+    const CLEAR: &str = "\x1b[2J\x1b[3J\x1b[H";
+    if let Ok(handles) = boot::locate_handle_buffer(SearchType::ByProtocol(&Serial::GUID)) {
+        for &handle in handles.iter() {
+            if let Ok(mut serial) = boot::open_protocol_exclusive::<Serial>(handle) {
+                let _ = serial.write_str(CLEAR);
                 return;
             }
         }
@@ -161,152 +209,16 @@ fn present_handoff_frame(scene: &mut BootScene, gop: &mut GraphicsOutput) {
     }
 }
 
-fn select_entry(entries: &[BlsEntry]) -> BlsEntry {
-    if entries.is_empty() {
-        BlsEntry {
-            title: String::from("Sushi Linux"),
-            linux: String::from("vmlinuz"),
-            initrd: Some(String::from("initramfs.img")),
-            options: String::from("rd.sushi=1"),
-        }
-    } else {
-        entries[0].clone()
-    }
-}
-
-fn build_cmdline(device: Handle, entry: &BlsEntry, state_json: &str) -> String {
-    let b64 = base64_encode(state_json.as_bytes());
-    let mut cmdline = entry.options.clone();
-    if !cmdline.contains("rd.sushi") {
-        cmdline.push_str(" rd.sushi=1");
-    }
-    if !cmdline.contains("console=") {
-        cmdline.push_str(" console=ttyS0,115200n8");
-    }
-    ensure_kernel_logo_suppressed(&mut cmdline);
-    tpm::append_tpm_hint(&mut cmdline);
-    if let Some(key) = tpm::try_unseal_luks_key(device) {
-        let key_b64 = base64_encode(key.as_bytes());
-        cmdline.push_str(" sushi.luks.key=b64:");
-        cmdline.push_str(&key_b64);
-    }
-    cmdline.push_str(" sushi.state=b64:");
-    cmdline.push_str(&b64);
-    cmdline
-}
-
 fn store_sushi_state(scene: &BootScene) {
     let json = scene.store_state_json();
     let bytes = json.as_bytes();
     let pages = (bytes.len() + 4095) / 4096;
-    if let Ok(addr) = boot::allocate_pages(AllocateType::AnyPages, MemoryType::LOADER_DATA, pages) {
+    if let Ok(addr) = boot::allocate_pages(uefi::table::boot::AllocateType::AnyPages, uefi::table::boot::MemoryType::LOADER_DATA, pages) {
         let ptr = addr.as_ptr();
         unsafe {
             core::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, bytes.len());
             let _ = boot::install_configuration_table(&SUSHI_VENDOR_GUID, ptr.cast());
         }
-    }
-}
-
-#[derive(Clone)]
-struct BlsEntry {
-    title: String,
-    linux: String,
-    initrd: Option<String>,
-    options: String,
-}
-
-fn collect_bls_entries(device: Handle) -> Vec<BlsEntry> {
-    let mut fs = match boot::open_protocol_exclusive::<SimpleFileSystem>(device) {
-        Ok(fs) => fs,
-        Err(_) => return Vec::new(),
-    };
-    let mut root = match fs.open_volume() {
-        Ok(root) => root,
-        Err(_) => return Vec::new(),
-    };
-    let mut out = Vec::new();
-    for dir_path in [
-        cstr16!("\\loader\\entries"),
-        cstr16!("loader\\entries"),
-        cstr16!("loader/entries"),
-    ] {
-        read_bls_dir(&mut root, dir_path, &mut out);
-    }
-    out
-}
-
-fn read_bls_dir(
-    root: &mut uefi::proto::media::file::Directory,
-    dir_path: &uefi::CStr16,
-    out: &mut Vec<BlsEntry>,
-) {
-    let dir = match root.open(dir_path, FileMode::Read, FileAttribute::empty()) {
-        Ok(dir) => dir,
-        Err(_) => return,
-    };
-    let Ok(FileType::Dir(mut directory)) = dir.into_type() else {
-        return;
-    };
-    while let Ok(Some(info)) = directory.read_entry_boxed() {
-        let name = info.file_name().to_string();
-        if name.ends_with(".conf") {
-            if let Ok(cname) = CString16::try_from(name.as_str()) {
-                if let Some(parsed) = parse_bls_file(&mut directory, &cname) {
-                    out.push(parsed);
-                }
-            }
-        }
-    }
-}
-
-fn parse_bls_file(
-    directory: &mut uefi::proto::media::file::Directory,
-    name: &uefi::CStr16,
-) -> Option<BlsEntry> {
-    let file = directory.open(name, FileMode::Read, FileAttribute::empty()).ok()?;
-    let FileType::Regular(mut regular) = file.into_type().ok()? else {
-        return None;
-    };
-    let info = regular.get_boxed_info::<FileInfo>().ok()?;
-    let mut data = vec![0u8; info.file_size() as usize];
-    regular.read(&mut data).ok()?;
-    parse_bls_text(core::str::from_utf8(&data).ok()?)
-}
-
-fn parse_bls_text(text: &str) -> Option<BlsEntry> {
-    let mut title = String::from("Linux");
-    let mut linux = String::new();
-    let mut initrd = None;
-    let mut options = String::new();
-    for line in text.lines() {
-        if let Some((k, v)) = line.split_once(' ') {
-            match k {
-                "title" => title = v.to_string(),
-                "linux" | "efi" => linux = v.to_string(),
-                "initrd" => initrd = Some(v.to_string()),
-                "options" => options = push_options(&options, v),
-                _ => {}
-            }
-        }
-    }
-    if linux.is_empty() {
-        None
-    } else {
-        Some(BlsEntry {
-            title,
-            linux,
-            initrd,
-            options,
-        })
-    }
-}
-
-fn push_options(existing: &str, more: &str) -> String {
-    if existing.is_empty() {
-        more.to_string()
-    } else {
-        format!("{existing} {more}")
     }
 }
 
@@ -318,19 +230,19 @@ fn base64_encode(input: &[u8]) -> String {
         let b0 = input[i] as u32;
         let b1 = if i + 1 < input.len() { input[i + 1] as u32 } else { 0 };
         let b2 = if i + 2 < input.len() { input[i + 2] as u32 } else { 0 };
-        let n = (b0 << 16) | (b1 << 8) | b2;
-        out.push(TABLE[((n >> 18) & 63) as usize] as char);
-        out.push(TABLE[((n >> 12) & 63) as usize] as char);
-        if i + 1 < input.len() {
-            out.push(TABLE[((n >> 6) & 63) as usize] as char);
+        let triple = (b0 << 16) | (b1 << 8) | b2;
+        out.push(TABLE[((triple >> 18) & 63) as usize] as char);
+        out.push(TABLE[((triple >> 12) & 63) as usize] as char);
+        out.push(if i + 1 < input.len() {
+            TABLE[((triple >> 6) & 63) as usize] as char
         } else {
-            out.push('=');
-        }
-        if i + 2 < input.len() {
-            out.push(TABLE[(n & 63) as usize] as char);
+            '='
+        });
+        out.push(if i + 2 < input.len() {
+            TABLE[(triple & 63) as usize] as char
         } else {
-            out.push('=');
-        }
+            '='
+        });
         i += 3;
     }
     out

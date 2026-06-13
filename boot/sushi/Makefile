@@ -13,6 +13,10 @@ test:
 	cargo test --workspace --exclude sushiboot
 	cargo build --workspace --exclude sushiboot
 
+bootctl-install:
+	cargo build -p sushi-bootctl --release
+	sudo ./target/release/sushi-bootctl install --sign --efi-entry
+
 vm-clean:
 	@rm -rf vm/rootfs-tree vm/initramfs-root 2>/dev/null || true
 	@if [ -e vm/rootfs-tree ]; then \

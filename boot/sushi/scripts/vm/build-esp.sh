@@ -17,7 +17,15 @@ mkdir -p "$ESP/EFI/BOOT" "$ESP/loader/entries"
 rm -f "$ESP/loader/entries/"*.conf
 
 echo "==> Installing SushiBoot as BOOTX64.EFI"
+mkdir -p "$ESP/EFI/sushi"
 cp "$ROOT/target/x86_64-unknown-uefi/release/sushiboot.efi" "$ESP/EFI/BOOT/BOOTX64.EFI"
+cp "$ROOT/target/x86_64-unknown-uefi/release/sushiboot.efi" "$ESP/EFI/sushi/SushiBoot.efi"
+
+cat > "$ESP/loader/loader.conf" <<'EOF'
+default sushi-test
+timeout 5
+editor no
+EOF
 
 if [[ "${LUKS:-0}" == "1" ]]; then
     echo "==> Building VM LUKS root disk (busybox inside LUKS2 on /dev/vda)"

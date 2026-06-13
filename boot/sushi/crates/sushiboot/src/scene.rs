@@ -1,7 +1,7 @@
 //! Boot splash scene: BGRT logo, SUSHI fallback, spinner, and GOP present.
 
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -9,6 +9,7 @@ use uefi::proto::console::gop::{BltOp, BltPixel, BltRegion, GraphicsOutput, Pixe
 
 use crate::bmp::{self, DecodedBmp};
 use crate::bgrt;
+use crate::entries::BootEntry;
 use crate::font;
 
 // Must match crates/sushi/src/core.rs + render/spinner.rs exactly.
@@ -31,6 +32,9 @@ const SUSHI_FALLBACK_NATIVE_W: u32 = 80;
 const SUSHI_FALLBACK_NATIVE_H: u32 = 24;
 const SUSHI_TEXT: &str = "SUSHI";
 const SUSHI_TEXT_COLOR: (u8, u8, u8) = (230, 234, 242);
+const MENU_MUTED: (u8, u8, u8) = (120, 130, 145);
+const MENU_TEXT: (u8, u8, u8) = (230, 234, 242);
+const MENU_ACCENT: (u8, u8, u8) = (88, 166, 255);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LogoKind {
@@ -162,6 +166,82 @@ impl BootScene {
     /// Static logo splash for kernel handoff — no spinner so a brief pause does not look frozen.
     pub fn draw_handoff_and_present(&mut self, gop: &mut GraphicsOutput) -> uefi::Result<()> {
         self.draw_scene(gop, false)
+    }
+
+    pub fn draw_menu(
+        &mut self,
+        gop: &mut GraphicsOutput,
+        entries: &[BootEntry],
+        selected: usize,
+        remaining_ms: u32,
+    ) -> uefi::Result<()> {
+        self.clear();
+        self.draw_logo();
+        self.draw_menu_entries(entries, selected);
+        let hint = if remaining_ms > 0 && entries.len() > 1 {
+            let secs = (remaining_ms + 999) / 1000;
+            format!("^ v select   enter boot   {secs}s")
+        } else if entries.len() > 1 {
+            String::from("^ v select   enter boot")
+        } else {
+            String::from("enter boot")
+        };
+        self.draw_menu_hint(&hint);
+        self.present(gop)
+    }
+
+    fn draw_menu_entries(&mut self, entries: &[BootEntry], selected: usize) {
+        let (_, logo_y, _, logo_h, _, _) = self.menu_layout();
+        let list_top = logo_y + logo_h + 36;
+        let line_h = 12;
+        let max_visible = 5usize;
+        let start = selected.saturating_sub(max_visible / 2);
+        let start = start.min(entries.len().saturating_sub(1));
+
+        let screen_w = self.width as usize;
+        for (row, entry) in entries.iter().skip(start).take(max_visible).enumerate() {
+            let idx = start + row;
+            let y = list_top + row * line_h;
+            let prefix = if idx == selected { "> " } else { "  " };
+            let line = format!("{prefix}{}", clip_menu_title(&entry.title, 34));
+            let color = if idx == selected {
+                MENU_ACCENT
+            } else {
+                MENU_TEXT
+            };
+            font::draw_text_line(
+                &mut |x, py, r, g, b| self.put_pixel(x, py, r, g, b),
+                0,
+                y,
+                screen_w,
+                1,
+                &line,
+                color,
+            );
+        }
+    }
+
+    fn draw_menu_hint(&mut self, hint: &str) {
+        let y = self.height.saturating_sub(28) as usize;
+        let screen_w = self.width as usize;
+        font::draw_text_line(
+            &mut |x, py, r, g, b| self.put_pixel(x, py, r, g, b),
+            0,
+            y,
+            screen_w,
+            1,
+            hint,
+            MENU_MUTED,
+        );
+    }
+
+    fn menu_layout(&self) -> (usize, usize, usize, usize, usize, usize) {
+        boot_layout(
+            self.width,
+            self.height,
+            self.logo_native_w,
+            self.logo_native_h,
+        )
     }
 
     fn draw_scene(&mut self, gop: &mut GraphicsOutput, show_spinner: bool) -> uefi::Result<()> {
@@ -421,6 +501,13 @@ fn fit_contain(iw: usize, ih: usize, max_w: usize, max_h: usize) -> (usize, usiz
 fn stroke_coverage(dist_from_centerline: f32, half: f32) -> f32 {
     let outer = half + SPINNER_AA_FRINGE;
     1.0 - smoothstep(half - 0.25, outer, dist_from_centerline)
+}
+
+fn clip_menu_title(title: &str, max: usize) -> String {
+    if title.len() <= max {
+        return title.to_string();
+    }
+    format!("{}...", &title[..max.saturating_sub(3)])
 }
 
 fn smoothstep(edge0: f32, edge1: f32, x: f32) -> f32 {

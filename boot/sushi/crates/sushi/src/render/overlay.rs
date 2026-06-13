@@ -14,11 +14,24 @@ pub struct ErrorDisplay {
     pub hints: Vec<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum UnlockFeedback {
+    #[default]
+    Normal,
+    Checking {
+        accent: bool,
+    },
+    Error {
+        accent: bool,
+    },
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct RenderOverlay {
     pub debug_lines: Vec<String>,
     pub unlock_input: Option<String>,
     pub unlock_prompt: Option<String>,
+    pub unlock_feedback: UnlockFeedback,
     pub error: Option<ErrorDisplay>,
     pub cursor_visible: bool,
 }
@@ -29,7 +42,7 @@ pub fn draw_error_screen(frame: &mut FrameBuffer, state: &SushiVisualState, erro
 
     let accent = Color::SUSHI_ERROR.to_argb32();
     let text = Color::SUSHI_TEXT.to_argb32();
-    let muted = Color::SUSHI_ACCENT.to_argb32();
+    let muted = Color::SUSHI_MUTED.to_argb32();
 
     let title_y = state.logo_rect.y + state.logo_rect.h as i32 + 36;
     font::draw_text_centered(frame, 0, title_y, state.width, 12, &error.title, accent);
@@ -79,7 +92,7 @@ pub fn draw_debug_overlay(frame: &mut FrameBuffer, state: &SushiVisualState, lin
     let x = ((state.width.saturating_sub(panel_w)) / 2) as i32;
     let y = ((state.height.saturating_sub(panel_h)) / 2) as i32;
 
-    let border = Color::SUSHI_ACCENT.to_argb32();
+    let border = Color::SUSHI_MUTED.to_argb32();
     let bg = Color {
         r: 12,
         g: 14,
@@ -87,7 +100,7 @@ pub fn draw_debug_overlay(frame: &mut FrameBuffer, state: &SushiVisualState, lin
         a: 230,
     }
     .to_argb32();
-    let title_c = Color::SUSHI_ACCENT.to_argb32();
+    let title_c = Color::SUSHI_MUTED.to_argb32();
     let text_c = Color::SUSHI_TEXT.to_argb32();
 
     frame.fill_rect(x, y, panel_w, panel_h, border);
@@ -120,44 +133,97 @@ pub fn draw_unlock_field(
     state: &SushiVisualState,
     overlay: &RenderOverlay,
 ) {
-    let rect = state.activity_rect;
-    let box_w = rect.w.saturating_mul(4).min(state.width * 2 / 3).max(260);
-    let box_h = 44u32;
-    let x = ((state.width.saturating_sub(box_w)) / 2) as i32;
-    let y = rect.y;
-
-    frame.fill_rect(x, y, box_w, box_h, Color::SUSHI_ACCENT.to_argb32());
-    frame.fill_rect(x + 2, y + 2, box_w - 4, box_h - 4, Color::SUSHI_BG.to_argb32());
+    let spin = state.activity_rect;
+    // Center in the spinner slot — spinner is hidden while unlock UI is shown.
+    const PROMPT_H: i32 = 10;
+    const PROMPT_GAP: i32 = 14;
+    const BOX_H: i32 = 24;
+    let block_h = PROMPT_H + PROMPT_GAP + BOX_H;
+    let prompt_y = spin.y + ((spin.h as i32 - block_h) / 2).max(0);
 
     let prompt = overlay
         .unlock_prompt
         .as_deref()
-        .unwrap_or("ENTER PASSPHRASE");
+        .unwrap_or("Disk passphrase");
+
+    let (prompt_color, border_color, fill_color, text_color) = match overlay.unlock_feedback {
+        UnlockFeedback::Normal => (
+            Color::SUSHI_MUTED,
+            Color::SUSHI_MUTED,
+            Color { r: 14, g: 16, b: 22, a: 255 },
+            Color::SUSHI_TEXT,
+        ),
+        UnlockFeedback::Checking { accent } => {
+            if accent {
+                (
+                    Color::SUSHI_ACCENT,
+                    Color::SUSHI_ACCENT,
+                    Color { r: 18, g: 24, b: 34, a: 255 },
+                    Color::SUSHI_TEXT,
+                )
+            } else {
+                (
+                    Color::SUSHI_MUTED,
+                    Color::SUSHI_MUTED,
+                    Color { r: 14, g: 16, b: 22, a: 255 },
+                    Color::SUSHI_MUTED,
+                )
+            }
+        }
+        UnlockFeedback::Error { accent } => {
+            if accent {
+                (
+                    Color::SUSHI_ERROR,
+                    Color::SUSHI_ERROR,
+                    Color { r: 36, g: 14, b: 14, a: 255 },
+                    Color::SUSHI_ERROR,
+                )
+            } else {
+                (
+                    Color::SUSHI_MUTED,
+                    Color::SUSHI_MUTED,
+                    Color { r: 14, g: 16, b: 22, a: 255 },
+                    Color::SUSHI_TEXT,
+                )
+            }
+        }
+    };
+
     font::draw_text_centered(
         frame,
-        x,
-        y - 18,
-        box_w,
+        0,
+        prompt_y,
+        state.width,
         10,
         prompt,
-        Color::SUSHI_TEXT.to_argb32(),
+        prompt_color.to_argb32(),
     );
+
+    let box_w = 300u32;
+    let box_h = BOX_H as u32;
+    let x = ((state.width.saturating_sub(box_w)) / 2) as i32;
+    let y = prompt_y + PROMPT_GAP;
+
+    let border = border_color.to_argb32();
+    let fill = fill_color.to_argb32();
+    let text = text_color.to_argb32();
+
+    frame.fill_rect(x, y, box_w, box_h, border);
+    frame.fill_rect(x + 1, y + 1, box_w - 2, box_h - 2, fill);
 
     let input = overlay.unlock_input.as_deref().unwrap_or("");
     let masked: String = input.chars().map(|_| '*').collect();
-    let mut display = masked;
+    let text_w = font::text_pixel_width(&masked);
+    let start_x = x + ((box_w.saturating_sub(text_w)) / 2) as i32;
+    let start_y = y + ((box_h.saturating_sub(font::GLYPH_H)) / 2) as i32;
+    font::draw_text(frame, start_x, start_y, &masked, text);
+
     if overlay.cursor_visible {
-        display.push('_');
+        let caret_x = start_x + masked.len() as i32 * font::GLYPH_ADVANCE as i32;
+        let caret_y = start_y + 2;
+        let caret_h = font::GLYPH_H.saturating_sub(4);
+        frame.fill_rect(caret_x, caret_y, 2, caret_h, text);
     }
-    font::draw_text_centered(
-        frame,
-        x,
-        y,
-        box_w,
-        box_h,
-        &display,
-        Color::SUSHI_TEXT.to_argb32(),
-    );
 }
 
 fn wrap_lines(text: &str, width: usize) -> Vec<String> {

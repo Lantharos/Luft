@@ -125,17 +125,48 @@ impl FrameBuffer {
     }
 
     pub fn fill_rect(&mut self, x: i32, y: i32, w: u32, h: u32, color: u32) {
-        for row in 0..h {
-            let py = y + row as i32;
-            if py < 0 {
-                continue;
+        let x0 = x.max(0) as u32;
+        let y0 = y.max(0) as u32;
+        if x0 >= self.width || y0 >= self.height || w == 0 || h == 0 {
+            return;
+        }
+        let x1 = x.saturating_add(w as i32).min(self.width as i32) as u32;
+        let y1 = y.saturating_add(h as i32).min(self.height as i32) as u32;
+        let fill_w = x1.saturating_sub(x0);
+        if fill_w == 0 {
+            return;
+        }
+
+        let bytes = match self.format {
+            PixelFormat::Xrgb8888 => {
+                let r = ((color >> 16) & 0xff) as u8;
+                let g = ((color >> 8) & 0xff) as u8;
+                let b = (color & 0xff) as u8;
+                [b, g, r, 0x00]
             }
-            for col in 0..w {
-                let px = x + col as i32;
-                if px < 0 {
-                    continue;
-                }
-                self.put_pixel(px as u32, py as u32, color);
+            PixelFormat::Bgra8888 | PixelFormat::Argb8888 => {
+                let a = ((color >> 24) & 0xff) as u8;
+                let r = ((color >> 16) & 0xff) as u8;
+                let g = ((color >> 8) & 0xff) as u8;
+                let b = (color & 0xff) as u8;
+                [b, g, r, a]
+            }
+        };
+
+        let row_len = (fill_w * 4) as usize;
+        for py in y0..y1 {
+            let row_start = (py * self.stride) as usize + (x0 * 4) as usize;
+            let row_end = row_start + row_len;
+            if row_end > self.pixels.len() {
+                break;
+            }
+            self.pixels[row_start..row_start + 4].copy_from_slice(&bytes);
+            let mut filled = 4usize;
+            while filled < row_len {
+                let chunk = filled.min(row_len - filled);
+                self.pixels
+                    .copy_within(row_start..row_start + chunk, row_start + filled);
+                filled += chunk;
             }
         }
     }

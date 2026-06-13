@@ -2,8 +2,13 @@
 
 use crate::display::FrameBuffer;
 
-const GLYPH_W: u32 = 8;
-const GLYPH_H: u32 = 8;
+pub const GLYPH_W: u32 = 8;
+pub const GLYPH_H: u32 = 8;
+pub const GLYPH_ADVANCE: u32 = GLYPH_W + 1;
+
+pub fn text_pixel_width(text: &str) -> u32 {
+    text.chars().count() as u32 * GLYPH_ADVANCE
+}
 
 pub fn draw_text_centered(
     frame: &mut FrameBuffer,
@@ -14,7 +19,7 @@ pub fn draw_text_centered(
     text: &str,
     color: u32,
 ) {
-    let text_w = text.len() as u32 * (GLYPH_W + 1);
+    let text_w = text_pixel_width(text);
     let start_x = rect_x + ((rect_w.saturating_sub(text_w)) / 2) as i32;
     let start_y = rect_y + ((rect_h.saturating_sub(GLYPH_H)) / 2) as i32;
     draw_text(frame, start_x, start_y, text, color);

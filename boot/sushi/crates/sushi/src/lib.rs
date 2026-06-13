@@ -22,7 +22,7 @@ pub use unlock::{
 };
 pub use input::{KeyAction, Keyboard};
 pub use error::classify_boot_error;
-pub use render::{ErrorDisplay, RenderOverlay};
+pub use render::{ErrorDisplay, RenderOverlay, UnlockFeedback};
 pub use display::fb::emergency_blackout_all;
 pub use display::drm::DrmBackend;
 pub use display::fb::FbdevBackend;

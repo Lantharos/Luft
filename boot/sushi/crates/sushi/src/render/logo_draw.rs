@@ -1,13 +1,16 @@
 //! Load and draw OEM/firmware logos with Linux fallback.
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
 use crate::core::{LogoSource, SushiVisualState};
 use crate::display::FrameBuffer;
 
 use super::bmp::{bmp_dimensions, decode_bmp, DecodedBmp};
 use super::font;
+
+static LOGO_CACHE: Mutex<Option<(PathBuf, DecodedBmp)>> = Mutex::new(None);
 
 const OEM_PATHS: &[&str] = &[
     "/sys/firmware/acpi/bgrt/image",
@@ -45,13 +48,27 @@ fn try_draw_bmp_path(frame: &mut FrameBuffer, state: &SushiVisualState, path: &s
     if !Path::new(path).exists() {
         return false;
     }
-    let Ok(data) = fs::read(path) else {
+    let Ok(mut cache) = LOGO_CACHE.lock() else {
         return false;
     };
-    let Some(bmp) = decode_bmp(&data) else {
+    let path_buf = PathBuf::from(path);
+    if cache
+        .as_ref()
+        .map(|(cached_path, _)| cached_path.as_path() != path_buf.as_path())
+        .unwrap_or(true)
+    {
+        let Ok(data) = fs::read(&path_buf) else {
+            return false;
+        };
+        let Some(bmp) = decode_bmp(&data) else {
+            return false;
+        };
+        *cache = Some((path_buf, bmp));
+    }
+    let Some((_, bmp)) = cache.as_ref() else {
         return false;
     };
-    blit_logo(frame, &bmp, state);
+    blit_logo(frame, bmp, state);
     true
 }
 

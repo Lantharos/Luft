@@ -11,11 +11,23 @@ use anyhow::{Context, Result};
 
 const MS_MOVE: libc::c_ulong = 0x2000;
 
+/// Fast, non-blocking check — safe to call every main-loop tick.
+pub fn sysroot_mounted() -> bool {
+    Path::new("/sysroot/sbin/init").exists()
+}
+
 pub fn sysroot_ready() -> bool {
-    if Path::new("/sysroot/sbin/init").exists() {
+    if sysroot_mounted() {
         return true;
     }
-    ensure_sysroot_mounted().is_ok() && Path::new("/sysroot/sbin/init").exists()
+    let Some(root_dev) = root_device_from_cmdline() else {
+        return false;
+    };
+    // Encrypted root stays missing until LUKS opens — never block the splash loop here.
+    if !Path::new(&root_dev).exists() {
+        return false;
+    }
+    ensure_sysroot_mounted().is_ok() && sysroot_mounted()
 }
 
 /// Mount the block root from kernel cmdline (or VM default) onto `/sysroot`.

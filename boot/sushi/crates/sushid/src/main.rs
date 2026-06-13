@@ -11,6 +11,7 @@ use std::fs;
 use std::mem;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -20,8 +21,8 @@ use sushi::{
     advance_spinner_from_boot, classify_boot_error, render_frame_into, render_handoff_overlay,
     CrypttabEntry, DisplayBackend, DisplayManager, FrameBuffer, KeyAction, Keyboard, LuksUnlock,
     RenderOverlay, SushiEvent, SushiEventKind, SushiStage, SushiVisualState, TpmUnlock,
-    UnlockMessage, UnlockOutcome, VisualFlags, VisualMode, SPINNER_FRAME_INTERVAL_US,
-    SUSHI_RUN_DIR,
+    UnlockFeedback, UnlockMessage, UnlockOutcome, VisualFlags, VisualMode,
+    SPINNER_FRAME_INTERVAL_US, SUSHI_RUN_DIR,
 };
 use sushi::{load_state, load_state_from_efi, persist_state};
 use sushi::emergency_blackout_all;
@@ -34,12 +35,38 @@ enum PendingUnlock {
     Luks(CrypttabEntry),
 }
 
+struct UnlockProbeResult {
+    outcome: UnlockOutcome,
+    flags: VisualFlags,
+    status: String,
+    mode: VisualMode,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum UnlockTone {
+    Idle,
+    Checking,
+    ErrorFlash,
+}
+
+struct UnlockJobResult {
+    result: Result<(), anyhow::Error>,
+    pending: PendingUnlock,
+}
+
+struct UnlockJob {
+    rx: mpsc::Receiver<UnlockJobResult>,
+}
+
 struct UiState {
     overlay: RenderOverlay,
     keyboard: Keyboard,
     unlock_buffer: String,
     cursor_on: bool,
     pending: Option<PendingUnlock>,
+    unlock_tone: UnlockTone,
+    unlock_tone_at: Instant,
+    unlock_job: Option<UnlockJob>,
 }
 
 impl UiState {
@@ -50,7 +77,14 @@ impl UiState {
             unlock_buffer: String::new(),
             cursor_on: true,
             pending: None,
+            unlock_tone: UnlockTone::Idle,
+            unlock_tone_at: Instant::now(),
+            unlock_job: None,
         }
+    }
+
+    fn unlock_input_active(&self) -> bool {
+        self.unlock_job.is_none() && self.unlock_tone == UnlockTone::Idle
     }
 
     fn refresh_debug_lines(&mut self) {
@@ -137,6 +171,16 @@ fn run() -> Result<()> {
 
     stage_firmware_assets();
     finish_initramfs_setup();
+    thread::spawn(|| {
+        let _ = pivot::ensure_sysroot_mounted();
+    });
+    ui.keyboard.reopen();
+    let keyboard_label = if ui.keyboard.is_connected() {
+        ui.keyboard.source_label()
+    } else {
+        "unavailable".to_string()
+    };
+    serial_note(&format!("Sushi: keyboard {keyboard_label}"));
     disable_kernel_boot_logo();
     fs::create_dir_all(SUSHI_RUN_DIR).context("create sushi run dir")?;
     sushi::log::init(format!("{SUSHI_RUN_DIR}/boot.log"))?;
@@ -146,18 +190,18 @@ fn run() -> Result<()> {
     let running = Arc::new(AtomicBool::new(true));
     let display_watch = display_watch::spawn_display_watch(running.clone());
 
-    match TpmUnlock::try_silent_unlock(&mut state) {
-        UnlockOutcome::NeedsPassphrase(entry) => {
-            ui.pending = Some(PendingUnlock::Luks(entry));
-            ui.unlock_buffer.clear();
-            ui.overlay.unlock_input = Some(String::new());
-            ui.overlay.unlock_prompt = Some("ENTER DISK PASSPHRASE".to_string());
-        }
-        UnlockOutcome::Unlocked { .. } => {}
-        UnlockOutcome::NothingToDo => {}
-    }
-
     let (mut agent, request_rx) = AskPasswordAgent::start()?;
+    let (unlock_tx, unlock_rx) = mpsc::channel();
+    thread::spawn(move || {
+        let mut probe_state = SushiVisualState::new_boot_scene(0, 0);
+        let outcome = TpmUnlock::try_silent_unlock(&mut probe_state);
+        let _ = unlock_tx.send(UnlockProbeResult {
+            outcome,
+            flags: probe_state.flags,
+            status: probe_state.status_text.clone(),
+            mode: probe_state.mode,
+        });
+    });
     let frame_interval = Duration::from_micros(SPINNER_FRAME_INTERVAL_US);
     let mut last_frame = Instant::now();
     let mut last_persist = Instant::now();
@@ -165,9 +209,26 @@ fn run() -> Result<()> {
     let mut recovery = recovery::RecoveryState::default();
     let splash_started = Instant::now();
     let min_splash = Duration::from_secs(4);
+    let mut last_keyboard_probe = Instant::now();
 
     while running.load(Ordering::SeqCst) {
-        if pivot::sysroot_ready() && splash_started.elapsed() >= min_splash && ui.pending.is_none() {
+        if last_keyboard_probe.elapsed() >= Duration::from_millis(250) {
+            if ui.keyboard.refresh() {
+                serial_note(&format!("Sushi: keyboard {}", ui.keyboard.source_label()));
+            }
+            last_keyboard_probe = Instant::now();
+        }
+        if let Ok(probe) = unlock_rx.try_recv() {
+            apply_unlock_probe(&mut ui, &mut state, probe);
+        }
+
+        poll_unlock_job(&mut ui, &mut state, &mut display)?;
+
+        if ui.pending.is_none()
+            && ui.unlock_job.is_none()
+            && pivot::sysroot_mounted()
+            && splash_started.elapsed() >= min_splash
+        {
             break;
         }
 
@@ -179,7 +240,7 @@ fn run() -> Result<()> {
                     ui.pending = Some(PendingUnlock::AskPassword(req));
                     ui.unlock_buffer.clear();
                     ui.overlay.unlock_input = Some(String::new());
-                    ui.overlay.unlock_prompt = Some("ENTER DISK PASSPHRASE".to_string());
+                    ui.overlay.unlock_prompt = Some("Disk passphrase".to_string());
                     state.set_mode(VisualMode::Unlocking);
                     state.set_status(String::new());
                     sushi::log::log_event(&SushiEvent::new(
@@ -208,7 +269,6 @@ fn run() -> Result<()> {
 
         if last_cursor.elapsed() >= Duration::from_millis(500) {
             ui.cursor_on = !ui.cursor_on;
-            ui.overlay.cursor_visible = ui.cursor_on;
             last_cursor = Instant::now();
         }
 
@@ -220,7 +280,10 @@ fn run() -> Result<()> {
                 ui.refresh_debug_lines();
             }
             if state.mode == VisualMode::Unlocking {
+                sync_unlock_feedback(&mut ui);
                 ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
+                ui.overlay.cursor_visible =
+                    ui.unlock_input_active() && ui.cursor_on;
             }
             draw_and_present(&mut display, &mut state, &ui.overlay)?;
             if last_persist.elapsed() >= Duration::from_millis(500) {
@@ -290,10 +353,19 @@ fn handle_keyboard(
     display: &mut DisplayManager,
     recovery: &mut recovery::RecoveryState,
 ) -> Result<()> {
-    let Some(action) = ui.keyboard.poll() else {
-        return Ok(());
-    };
+    while let Some(action) = ui.keyboard.poll() {
+        handle_key_action(ui, state, display, recovery, action)?;
+    }
+    Ok(())
+}
 
+fn handle_key_action(
+    ui: &mut UiState,
+    state: &mut SushiVisualState,
+    display: &mut DisplayManager,
+    recovery: &mut recovery::RecoveryState,
+    action: KeyAction,
+) -> Result<()> {
     match action {
         KeyAction::ToggleDebug => {
             state.flags ^= VisualFlags::DEBUG_LOG;
@@ -307,17 +379,21 @@ fn handle_keyboard(
             ));
             draw_and_present(display, state, &ui.overlay)?;
         }
-        KeyAction::Submit if state.mode == VisualMode::Unlocking => {
+        KeyAction::Submit if state.mode == VisualMode::Unlocking && ui.unlock_input_active() => {
             if let Some(pending) = ui.pending.take() {
-                submit_unlock(ui, state, display, pending)?;
+                begin_unlock_submit(ui, state, display, pending)?;
             }
         }
-        KeyAction::Backspace if state.mode == VisualMode::Unlocking => {
+        KeyAction::Backspace
+            if state.mode == VisualMode::Unlocking && ui.unlock_input_active() =>
+        {
             ui.unlock_buffer.pop();
             ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
             draw_and_present(display, state, &ui.overlay)?;
         }
-        KeyAction::Char(ch) if state.mode == VisualMode::Unlocking => {
+        KeyAction::Char(ch)
+            if state.mode == VisualMode::Unlocking && ui.unlock_input_active() =>
+        {
             if ui.unlock_buffer.len() < 128 {
                 ui.unlock_buffer.push(ch);
                 ui.overlay.unlock_input = Some(ui.unlock_buffer.clone());
@@ -332,7 +408,39 @@ fn handle_keyboard(
     Ok(())
 }
 
-fn submit_unlock(
+fn resume_boot_splash_after_unlock(ui: &mut UiState, state: &mut SushiVisualState) {
+    ui.unlock_tone = UnlockTone::Idle;
+    ui.overlay.unlock_input = None;
+    ui.overlay.unlock_prompt = None;
+    ui.overlay.unlock_feedback = UnlockFeedback::Normal;
+    ui.overlay.cursor_visible = false;
+    state.set_mode(VisualMode::Booting);
+    state.set_status(String::new());
+    console::keep_splash_visible();
+}
+
+fn sync_unlock_feedback(ui: &mut UiState) {
+    ui.overlay.unlock_feedback = match ui.unlock_tone {
+        UnlockTone::Idle => UnlockFeedback::Normal,
+        UnlockTone::Checking => {
+            let pulse = ui.unlock_tone_at.elapsed().as_millis() / 350 % 2 == 0;
+            UnlockFeedback::Checking { accent: pulse }
+        }
+        UnlockTone::ErrorFlash => {
+            let elapsed = ui.unlock_tone_at.elapsed();
+            if elapsed > Duration::from_millis(1350) {
+                ui.unlock_tone = UnlockTone::Idle;
+                ui.overlay.unlock_prompt = Some("Disk passphrase".to_string());
+                UnlockFeedback::Normal
+            } else {
+                let flash = elapsed.as_millis() / 150 % 2 == 0;
+                UnlockFeedback::Error { accent: flash }
+            }
+        }
+    };
+}
+
+fn begin_unlock_submit(
     ui: &mut UiState,
     state: &mut SushiVisualState,
     display: &mut DisplayManager,
@@ -340,40 +448,89 @@ fn submit_unlock(
 ) -> Result<()> {
     let mut passphrase = std::mem::take(&mut ui.unlock_buffer);
     ui.overlay.unlock_input = Some(String::new());
+    ui.unlock_tone = UnlockTone::Checking;
+    ui.unlock_tone_at = Instant::now();
+    ui.overlay.unlock_prompt = Some("Unlocking disk...".to_string());
+    sync_unlock_feedback(ui);
+    draw_and_present(display, state, &ui.overlay)?;
 
-    let result = match &pending {
-        PendingUnlock::AskPassword(req) => respond_to_request(req, &passphrase).context("send passphrase"),
-        PendingUnlock::Luks(entry) => LuksUnlock::unlock_with_passphrase(entry, &passphrase),
-    };
-
-    match result {
-        Ok(()) => {
-            state.set_mode(VisualMode::Booting);
-            state.set_status(String::new());
-            if let PendingUnlock::Luks(entry) = pending {
-                if state.flags.contains(VisualFlags::TPM_CONFIGURED)
-                    || state.flags.contains(VisualFlags::TPM_TRIED)
-                {
-                    sushi::log::log_event(&SushiEvent::new(
-                        SushiStage::Initramfs,
-                        SushiEventKind::UnlockTpmReseal,
-                    ));
-                    if let Err(err) = LuksUnlock::try_reseal(&entry, &passphrase) {
+    let try_reseal = state.flags.contains(VisualFlags::TPM_CONFIGURED)
+        || state.flags.contains(VisualFlags::TPM_TRIED);
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        let result = match &pending {
+            PendingUnlock::AskPassword(req) => {
+                respond_to_request(req, &passphrase).map_err(|err| err.into())
+            }
+            PendingUnlock::Luks(entry) => {
+                LuksUnlock::unlock_with_passphrase(entry, &passphrase).map_err(|err| err.into())
+            }
+        };
+        if result.is_ok() {
+            if let PendingUnlock::Luks(entry) = &pending {
+                if try_reseal {
+                    if let Err(err) = LuksUnlock::try_reseal(entry, &passphrase) {
                         sushi::log::log_event(&SushiEvent::new(
                             SushiStage::Initramfs,
                             SushiEventKind::UnlockTpmResealFailed {
                                 reason: format!("{err:#}"),
                             },
                         ));
+                    } else {
+                        sushi::log::log_event(&SushiEvent::new(
+                            SushiStage::Initramfs,
+                            SushiEventKind::UnlockTpmReseal,
+                        ));
                     }
                 }
             }
         }
-        Err(_) => {
-            ui.pending = Some(pending);
+        secure_wipe(&mut passphrase);
+        let _ = tx.send(UnlockJobResult { result, pending });
+    });
+    ui.unlock_job = Some(UnlockJob { rx });
+    Ok(())
+}
+
+fn poll_unlock_job(
+    ui: &mut UiState,
+    state: &mut SushiVisualState,
+    display: &mut DisplayManager,
+) -> Result<()> {
+    let Some(job) = ui.unlock_job.as_ref() else {
+        return Ok(());
+    };
+    let Ok(done) = job.rx.try_recv() else {
+        return Ok(());
+    };
+    ui.unlock_job = None;
+    finish_unlock_submit(ui, state, display, done)
+}
+
+fn finish_unlock_submit(
+    ui: &mut UiState,
+    state: &mut SushiVisualState,
+    display: &mut DisplayManager,
+    done: UnlockJobResult,
+) -> Result<()> {
+    match done.result {
+        Ok(()) => {
+            resume_boot_splash_after_unlock(ui, state);
+            thread::spawn(|| {
+                let _ = pivot::ensure_sysroot_mounted();
+            });
+            serial_note("Sushi: disk unlocked, resuming boot");
+        }
+        Err(err) => {
+            serial_note(&format!("Sushi: unlock failed: {err:#}"));
+            ui.pending = Some(done.pending);
             ui.unlock_buffer.clear();
+            ui.overlay.unlock_input = Some(String::new());
+            ui.unlock_tone = UnlockTone::ErrorFlash;
+            ui.unlock_tone_at = Instant::now();
+            ui.overlay.unlock_prompt = Some("Incorrect passphrase".to_string());
             state.set_mode(VisualMode::Unlocking);
-            state.set_status("Wrong passphrase, try again".to_string());
+            state.set_status(String::new());
             state.flags |= VisualFlags::DEGRADED;
             sushi::log::log_event(&SushiEvent::new(
                 SushiStage::Initramfs,
@@ -381,8 +538,7 @@ fn submit_unlock(
             ));
         }
     }
-
-    secure_wipe(&mut passphrase);
+    sync_unlock_feedback(ui);
     draw_and_present(display, state, &ui.overlay)
 }
 
@@ -477,6 +633,27 @@ fn draw_and_present(
     overlay: &RenderOverlay,
 ) -> Result<()> {
     display.render(|frame| render_frame_into(frame, state, overlay))
+}
+
+fn apply_unlock_probe(ui: &mut UiState, state: &mut SushiVisualState, probe: UnlockProbeResult) {
+    state.flags |= probe.flags;
+    if !probe.status.is_empty() {
+        state.set_status(probe.status);
+    }
+    match probe.outcome {
+        UnlockOutcome::NeedsPassphrase(entry) => {
+            ui.pending = Some(PendingUnlock::Luks(entry));
+            ui.unlock_buffer.clear();
+            ui.overlay.unlock_input = Some(String::new());
+            ui.overlay.unlock_prompt = Some("Disk passphrase".to_string());
+            state.set_mode(VisualMode::Unlocking);
+            serial_note("Sushi: unlock UI ready (type passphrase, Enter)");
+        }
+        UnlockOutcome::Unlocked { .. } => {
+            state.set_mode(probe.mode);
+        }
+        UnlockOutcome::NothingToDo => {}
+    }
 }
 
 fn paint_first_handoff_frame(
@@ -608,6 +785,25 @@ fn finish_initramfs_setup() {
     let _ = fs::create_dir_all("/dev/dri");
     let _ = fs::create_dir_all("/dev/input");
     ensure_display_device_nodes();
+    activate_boot_vt();
+    if Path::new("/etc/crypttab").exists() {
+        if let Err(err) = LuksUnlock::prepare_kernel() {
+            eprintln!("sushid: LUKS kernel prep: {err:#}");
+            serial_note(&format!("Sushi: LUKS kernel prep failed: {err:#}"));
+        }
+    }
+}
+
+fn activate_boot_vt() {
+    use std::fs::OpenOptions;
+    use std::os::unix::io::AsRawFd;
+    const VT_ACTIVATE: libc::c_ulong = 0x5606;
+    let Ok(tty) = OpenOptions::new().write(true).open("/dev/tty0") else {
+        return;
+    };
+    unsafe {
+        let _ = libc::ioctl(tty.as_raw_fd(), VT_ACTIVATE, 1);
+    }
 }
 
 fn ensure_display_device_nodes() {
@@ -662,7 +858,7 @@ fn disable_kernel_boot_logo() {
 }
 
 /// Keep fbcon from scribbling on the scanout buffer while sushid owns the splash.
-fn suppress_fbcon_console() {
+pub(crate) fn suppress_fbcon_console() {
     if let Ok(entries) = fs::read_dir("/sys/class/vtconsole") {
         for entry in entries.flatten() {
             let name_path = entry.path().join("name");

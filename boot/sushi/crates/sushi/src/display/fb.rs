@@ -351,8 +351,26 @@ impl DisplayBackend for FbdevBackend {
     }
 
     fn present(&mut self) -> Result<()> {
-        let frame = self.shadow.clone();
-        self.blit(&frame)
+        let row_bytes = self.stride as usize;
+        let copy_bytes = (self.shadow.width * 4).min(self.stride) as usize;
+        for y in 0..self.shadow.height.min(self.height) {
+            let src_off = (y * self.shadow.stride) as usize;
+            let dst_off = (y as usize) * row_bytes;
+            if src_off + copy_bytes > self.shadow.pixels.len() {
+                break;
+            }
+            if dst_off + copy_bytes > self.mmap_len {
+                break;
+            }
+            unsafe {
+                std::ptr::copy_nonoverlapping(
+                    self.shadow.pixels.as_ptr().add(src_off),
+                    self.mmap_ptr.add(dst_off),
+                    copy_bytes,
+                );
+            }
+        }
+        Ok(())
     }
 
     fn blit(&mut self, frame: &FrameBuffer) -> Result<()> {

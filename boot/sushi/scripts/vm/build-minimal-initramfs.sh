@@ -39,9 +39,43 @@ copy_binary_with_libs() {
 echo "==> Bundling sushid"
 copy_binary_with_libs "$SUSHID" "$ROOTFS/usr/bin/sushid"
 
+if [[ "${LUKS:-0}" == "1" ]]; then
+    CRYPTSETUP="${CRYPTSETUP:-$(command -v cryptsetup)}"
+    if [[ -z "$CRYPTSETUP" || ! -x "$CRYPTSETUP" ]]; then
+        echo "ERROR: cryptsetup not found. Install cryptsetup-luks or set CRYPTSETUP=" >&2
+        exit 1
+    fi
+    KVER="${KVER:-$(uname -r)}"
+    DM_CRYPT_MOD="/lib/modules/${KVER}/kernel/drivers/md/dm-crypt.ko.xz"
+    MODPROBE_BIN="${MODPROBE:-$(command -v modprobe)}"
+    if [[ ! -f "$DM_CRYPT_MOD" ]]; then
+        echo "ERROR: dm_crypt module not found at $DM_CRYPT_MOD (set KVER=)" >&2
+        exit 1
+    fi
+    if [[ -z "$MODPROBE_BIN" || ! -x "$MODPROBE_BIN" ]]; then
+        echo "ERROR: modprobe not found. Install kmod." >&2
+        exit 1
+    fi
+    echo "==> LUKS test mode: cryptsetup + dm_crypt module ($KVER) + /etc/crypttab"
+    mkdir -p "$ROOTFS/etc"
+    cat > "$ROOTFS/etc/crypttab" <<'EOF'
+root /dev/vda - luks
+EOF
+    copy_binary_with_libs "$CRYPTSETUP" "$ROOTFS/usr/bin/cryptsetup"
+    mkdir -p "$ROOTFS/lib/modules/${KVER}/kernel/drivers/md"
+    cp "$DM_CRYPT_MOD" "$ROOTFS/lib/modules/${KVER}/kernel/drivers/md/"
+    depmod -b "$ROOTFS" "$KVER" 2>/dev/null || depmod -b "$ROOTFS" "$KVER"
+    mkdir -p "$ROOTFS/usr/sbin"
+    copy_binary_with_libs "$MODPROBE_BIN" "$ROOTFS/usr/sbin/modprobe"
+fi
+
 mkdir -p "$ROOTFS/run/sushi" "$ROOTFS/run/systemd/ask-password"
 
 # Uncompressed cpio: faster kernel unpack at handoff (VM-only tradeoff).
 (cd "$ROOTFS" && find . -print0 | cpio --null -o --format=newc) > "$OUT"
 echo "==> Wrote $OUT ($(du -h "$OUT" | awk '{print $1}'), uncompressed cpio)"
-echo "    sushid mounts root=/dev/vda -> switch_root -> /sbin/init"
+if [[ "${LUKS:-0}" == "1" ]]; then
+    echo "    sushid unlocks LUKS on /dev/vda -> root=/dev/mapper/root -> switch_root"
+else
+    echo "    sushid mounts root=/dev/vda -> switch_root -> /sbin/init"
+fi

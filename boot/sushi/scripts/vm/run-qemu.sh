@@ -10,6 +10,8 @@ MEMORY="${MEMORY:-2048}"
 SMP="${SMP:-2}"
 HEADLESS="${HEADLESS:-0}"
 DISPLAY_BACKEND="${DISPLAY_BACKEND:-gtk}"
+# file = log only (type in the QEMU window). stdio = type in this terminal (Ctrl+C to quit).
+SERIAL="${SERIAL:-file}"
 
 if [[ ! -f "$ESP/EFI/BOOT/BOOTX64.EFI" ]]; then
     echo "ESP missing. Run: $ROOT/scripts/vm/build-esp.sh" >&2
@@ -35,17 +37,27 @@ QEMU_ARGS=(
     -drive "file=fat:rw:$ESP,format=raw"
     -drive "file=$ROOTFS,if=none,format=raw,id=rootdisk"
     -device virtio-blk-pci,drive=rootdisk
+    -device virtio-keyboard-pci
+    -k en-us
     -device ramfb
     -vga none
     -no-reboot
 )
 
-if [[ "$HEADLESS" == "1" ]]; then
-    echo "==> Starting QEMU headless (serial on stdout)"
-    QEMU_ARGS+=(-display none -serial mon:stdio)
+if [[ "$HEADLESS" == "1" || "$SERIAL" == "stdio" ]]; then
+    echo "==> Serial console on this terminal (type passphrase here after unlock UI)"
+    QEMU_ARGS+=(-serial mon:stdio)
+    if [[ "$HEADLESS" == "1" ]]; then
+        QEMU_ARGS+=(-display none)
+    else
+        echo "    Graphics: $DISPLAY_BACKEND (click window for graphical keyboard)"
+        QEMU_ARGS+=(-display "$DISPLAY_BACKEND,show-cursor=on")
+    fi
 else
     echo "==> Starting QEMU with graphics window ($DISPLAY_BACKEND)"
     echo "    Serial log: $ROOT/vm/serial.log"
+    echo "    Click the QEMU window before typing; Ctrl+Alt+G releases grab"
+    echo "    Or: SERIAL=stdio make vm-run-luks  (type in this terminal instead)"
     QEMU_ARGS+=(-display "$DISPLAY_BACKEND,show-cursor=on" -serial "file:$ROOT/vm/serial.log")
 fi
 

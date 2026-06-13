@@ -111,6 +111,13 @@ impl Color {
         a: 255,
     };
 
+    pub const SUSHI_MUTED: Self = Self {
+        r: 148,
+        g: 156,
+        b: 170,
+        a: 255,
+    };
+
     pub const SUSHI_ERROR: Self = Self {
         r: 255,
         g: 96,

@@ -10,7 +10,10 @@ mod overlay;
 mod spinner;
 
 pub use logo_draw::{probe_oem_asset, LINUX_LOGO_NATIVE, SUSHI_FALLBACK_NATIVE};
-pub use overlay::{draw_debug_overlay, draw_error_screen, draw_unlock_field, ErrorDisplay, RenderOverlay};
+pub use overlay::{
+    draw_debug_overlay, draw_error_screen, draw_unlock_field, ErrorDisplay, RenderOverlay,
+    UnlockFeedback,
+};
 
 pub(crate) use logo_draw::draw_logo;
 pub(crate) fn draw_background(frame: &mut FrameBuffer, color: Color) {

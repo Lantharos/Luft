@@ -15,7 +15,12 @@ if [[ -z "$BUSYBOX" || ! -x "$BUSYBOX" ]]; then
 fi
 
 echo "==> Building VM root disk ($ROOTFS_IMG, ${SIZE_MB}MB)"
-rm -rf "$ROOTFS_DIR"
+if [[ -e "$ROOTFS_DIR" ]] && ! rm -rf "$ROOTFS_DIR" 2>/dev/null; then
+    echo "ERROR: $ROOTFS_DIR is root-owned (left over from a prior sudo/LUKS build)." >&2
+    echo "       Run: sudo rm -rf $ROOTFS_DIR" >&2
+    echo "       Then: make vm-build" >&2
+    exit 1
+fi
 mkdir -p "$ROOTFS_DIR"/{bin,sbin,etc,proc,sys,dev,tmp,root,usr/bin,var/log,run}
 
 cp -L "$BUSYBOX" "$ROOTFS_DIR/bin/busybox"
@@ -53,13 +58,15 @@ for vtc in /sys/class/vtconsole/*/name; do
             ;;
     esac
 done
-echo 0 > /sys/module/fbcon/parameters/logo 2>/dev/null || true
+if [ -f /sys/module/fbcon/parameters/logo ]; then
+    echo 0 > /sys/module/fbcon/parameters/logo
+fi
 chvt 1 2>/dev/null || true
+chvt 1 2>/dev/null || true
+# Keep the splash scanout — getty will draw the login prompt when it starts.
 for vt in /dev/tty1 /dev/tty0; do
     if [ -c "$vt" ]; then
-        printf '\033[?25h\033[0m\033[2J\033[H' > "$vt"
-        echo "  Sushi VM — press Enter at login (user: root)" > "$vt"
-        echo > "$vt"
+        printf '\033[?25h' > "$vt"
     fi
 done
 EOF
@@ -85,6 +92,11 @@ EOF
 # Strip host SELinux xattrs — they break visibility when the VM kernel has no SELinux.
 if command -v setfattr >/dev/null 2>&1; then
     find "$ROOTFS_DIR" -xattrname security.selinux -exec setfattr -x security.selinux {} + 2>/dev/null || true
+fi
+
+if [[ "${ROOTFS_TREE_ONLY:-0}" == "1" ]]; then
+    echo "==> Rootfs tree ready at $ROOTFS_DIR (image not created)"
+    exit 0
 fi
 
 rm -f "$ROOTFS_IMG"

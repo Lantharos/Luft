@@ -2,6 +2,7 @@
 
 use std::fs::{self, OpenOptions};
 use std::io::Write;
+
 use std::os::unix::io::AsRawFd;
 
 const VT_OPENQRY: libc::c_ulong = 0x5600;
@@ -13,11 +14,16 @@ const KD_TEXT: libc::c_ulong = 0x00;
 const FBIOBLANK: libc::c_ulong = 0x4611;
 const FB_BLANK_UNBLANK: libc::c_ulong = 0;
 
-/// Release splash ownership of the scanout buffer and wake fbcon on tty1.
+/// Keep the last splash frame on scanout through switch_root — do not rebind fbcon here.
 pub fn handoff_framebuffer_to_console() {
-    crate::enable_fbcon();
     unblank_framebuffer();
     activate_text_console();
+}
+
+/// Reclaim the framebuffer from kernel console scribbles (e.g. after cryptsetup).
+pub fn keep_splash_visible() {
+    crate::suppress_fbcon_console();
+    unblank_framebuffer();
 }
 
 fn unblank_framebuffer() {
@@ -48,6 +54,7 @@ fn activate_text_console() {
         }
     }
 
+    // Leave the last splash frame on scanout — do not ESC[2J clear the framebuffer here.
     for path in ["/dev/tty1", "/dev/tty0"] {
         let Ok(mut tty) = OpenOptions::new().read(true).write(true).open(path) else {
             continue;
@@ -56,8 +63,7 @@ fn activate_text_console() {
         unsafe {
             let _ = libc::ioctl(fd, KDSETMODE as _, KD_TEXT);
         }
-        let _ = write!(tty, "\x1b[?25h\x1b[0m\x1b[2J\x1b[H");
-        let _ = tty.write_all(b"Sushi VM ready \xe2\x80\x94 login on this screen or serial\r\n\r\n");
+        let _ = tty.write_all(b"\x1b[?25h");
         let _ = tty.flush();
         break;
     }

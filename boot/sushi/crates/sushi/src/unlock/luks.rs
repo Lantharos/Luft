@@ -4,6 +4,8 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use crate::core::{SushiEvent, SushiEventKind, SushiStage, VisualFlags, VisualMode};
@@ -31,6 +33,11 @@ pub enum UnlockOutcome {
 pub struct LuksUnlock;
 
 impl LuksUnlock {
+    /// Load `dm_crypt` when the kernel ships it as a module (typical on Fedora).
+    pub fn prepare_kernel() -> Result<()> {
+        ensure_dm_crypt_module()
+    }
+
     pub fn pending_entries() -> Vec<CrypttabEntry> {
         parse_crypttab("/etc/crypttab")
             .into_iter()
@@ -85,7 +92,6 @@ impl LuksUnlock {
                 };
             }
 
-            state.set_mode(VisualMode::Unlocking);
             state.flags |= VisualFlags::MANUAL_UNLOCK;
             log_event(&SushiEvent::new(
                 SushiStage::Initramfs,
@@ -351,46 +357,147 @@ fn crypttab_option_args(options: &[String]) -> Vec<String> {
 }
 
 fn unlock_entry(entry: &CrypttabEntry, passphrase: &str) -> Result<()> {
+    ensure_dm_crypt_module().context("load dm_crypt module")?;
+    let device = resolve_device(&entry.device)?;
+    wait_for_block_device(&device)?;
+
     if command_exists("systemd-cryptsetup") {
         let mut cmd = Command::new("systemd-cryptsetup");
         cmd.arg("attach")
             .arg(&entry.name)
             .arg(&entry.device)
             .arg("-")
-            .args(crypttab_option_args(&entry.options));
-        let mut child = cmd.stdin(Stdio::piped()).spawn()?;
-        child.stdin.as_mut().context("stdin")?.write_all(passphrase.as_bytes())?;
-        child.stdin.as_mut().context("stdin")?.write_all(b"\n")?;
-        if child.wait()?.success() && is_mapper_open(&entry.name) {
+            .args(crypttab_option_args(&entry.options))
+            .stdin(Stdio::piped())
+            .stderr(Stdio::piped());
+        let mut child = cmd.spawn().context("spawn systemd-cryptsetup")?;
+        feed_passphrase_stdin(&mut child, passphrase)?;
+        let output = child.wait_with_output().context("systemd-cryptsetup")?;
+        if output.status.success() && is_mapper_open(&entry.name) {
             return Ok(());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if !stderr.trim().is_empty() {
+            crate::log::log_info(
+                SushiStage::Initramfs,
+                &format!("systemd-cryptsetup: {}", stderr.trim()),
+            );
         }
     }
 
     if command_exists("cryptsetup") {
-        let device = resolve_device(&entry.device)?;
-        let status = Command::new("cryptsetup")
-            .arg("open")
-            .arg("--type")
-            .arg("luks2")
-            .arg("--key-file")
-            .arg("-")
-            .arg(&device)
-            .arg(&entry.name)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .and_then(|mut child| {
-                child.stdin.as_mut().unwrap().write_all(passphrase.as_bytes())?;
-                child.stdin.as_mut().unwrap().write_all(b"\n")?;
-                child.wait()
-            })?;
-        if status.success() && is_mapper_open(&entry.name) {
-            return Ok(());
+        let attempts: &[&[&str]] = &[
+            &["open", "--type", "luks2", "--key-file", "-"],
+            &["open", "--type", "luks", "--key-file", "-"],
+            &["open", "--key-file", "-"],
+        ];
+        for args in attempts {
+            let mut cmd = Command::new("cryptsetup");
+            cmd.args(*args)
+                .arg(&device)
+                .arg(&entry.name)
+                .stdin(Stdio::piped())
+                .stdout(Stdio::null())
+                .stderr(Stdio::piped());
+            let mut child = cmd.spawn().context("spawn cryptsetup")?;
+            feed_passphrase_stdin(&mut child, passphrase)?;
+            let output = child.wait_with_output().context("cryptsetup")?;
+            if output.status.success() && is_mapper_open(&entry.name) {
+                return Ok(());
+            }
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            if !stderr.trim().is_empty() {
+                crate::log::log_info(
+                    SushiStage::Initramfs,
+                    &format!("cryptsetup {args:?}: {}", stderr.trim()),
+                );
+            }
         }
     }
 
-    anyhow::bail!("cryptsetup/systemd-cryptsetup unavailable or unlock rejected");
+    anyhow::bail!("cryptsetup/systemd-cryptsetup unavailable or unlock rejected for {}", device);
+}
+
+/// Passphrase bytes only — no trailing newline. LUKS volumes are often formatted with `echo -n`.
+fn feed_passphrase_stdin(child: &mut std::process::Child, passphrase: &str) -> Result<()> {
+    if let Some(stdin) = child.stdin.as_mut() {
+        stdin.write_all(passphrase.as_bytes())?;
+        stdin.flush()?;
+    }
+    child.stdin.take();
+    Ok(())
+}
+
+fn ensure_dm_crypt_module() -> Result<()> {
+    if Path::new("/sys/module/dm_crypt").exists() {
+        return Ok(());
+    }
+
+    for modprobe in ["/usr/sbin/modprobe", "/sbin/modprobe"] {
+        if !Path::new(modprobe).exists() {
+            continue;
+        }
+        let output = Command::new(modprobe)
+            .arg("dm_crypt")
+            .output()
+            .with_context(|| format!("run {modprobe} dm_crypt"))?;
+        if output.status.success() && Path::new("/sys/module/dm_crypt").exists() {
+            return Ok(());
+        }
+        if !output.stderr.is_empty() {
+            crate::log::log_info(
+                SushiStage::Initramfs,
+                &format!(
+                    "{modprobe} dm_crypt: {}",
+                    String::from_utf8_lossy(&output.stderr).trim()
+                ),
+            );
+        }
+    }
+
+    let kver = fs::read_to_string("/proc/sys/kernel/osrelease")
+        .context("read kernel release")?
+        .trim()
+        .to_string();
+    let ko = format!("/lib/modules/{kver}/kernel/drivers/md/dm-crypt.ko.xz");
+    if Path::new(&ko).exists() {
+        for insmod in ["/usr/sbin/insmod", "/sbin/insmod"] {
+            if !Path::new(insmod).exists() {
+                continue;
+            }
+            let output = Command::new(insmod)
+                .arg(&ko)
+                .output()
+                .with_context(|| format!("run {insmod} {ko}"))?;
+            if output.status.success() && Path::new("/sys/module/dm_crypt").exists() {
+                return Ok(());
+            }
+            if !output.stderr.is_empty() {
+                crate::log::log_info(
+                    SushiStage::Initramfs,
+                    &format!(
+                        "{insmod} dm_crypt: {}",
+                        String::from_utf8_lossy(&output.stderr).trim()
+                    ),
+                );
+            }
+        }
+    }
+
+    anyhow::bail!(
+        "dm_crypt kernel module is not loaded; bundle it in the initramfs for LUKS unlock"
+    );
+}
+
+fn wait_for_block_device(path: &str) -> Result<()> {
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while Instant::now() < deadline {
+        if Path::new(path).exists() {
+            return Ok(());
+        }
+        thread::sleep(Duration::from_millis(25));
+    }
+    anyhow::bail!("block device not found: {path}");
 }
 
 fn resolve_device(spec: &str) -> Result<String> {
@@ -439,6 +546,18 @@ fn pcr_digits(pcrs: &[u32]) -> String {
 }
 
 fn command_exists(cmd: &str) -> bool {
+    if let Ok(path) = std::env::var("PATH") {
+        for dir in path.split(':').filter(|d| !d.is_empty()) {
+            if Path::new(dir).join(cmd).is_file() {
+                return true;
+            }
+        }
+    }
+    for dir in ["/usr/sbin", "/usr/bin", "/sbin", "/bin"] {
+        if Path::new(dir).join(cmd).is_file() {
+            return true;
+        }
+    }
     Command::new("sh")
         .arg("-c")
         .arg(format!("command -v {cmd}"))

@@ -18,9 +18,9 @@ use std::path::PathBuf;
 
 use fenestra_cef::SingleInstancePolicy;
 use fenestra_cef::{
-    BridgeCommand, BridgeCommandDescriptor, BridgeError, BridgeResponse, BridgeResult, CefWindow,
-    CefWindowControlAction, RuntimeConfig, RuntimeMode, WebViewSecurity, WindowRegion,
-    WindowRegionRect,
+    BridgeCommand, BridgeCommandDescriptor, BridgeError, BridgeResponse, BridgeResult,
+    FenestraWindow, FenestraWindowControlAction, RuntimeConfig, RuntimeMode, WebViewSecurity,
+    WindowRegion, WindowRegionRect,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use state::RoverState;
@@ -54,7 +54,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-fn build_window(args: &[String], state: &RoverState) -> CefWindow {
+fn build_window(args: &[String], state: &RoverState) -> FenestraWindow {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root_dir = manifest_dir
         .parent()
@@ -66,7 +66,7 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
         bundled_dir: Some(root_dir.clone()),
         ..RuntimeConfig::default()
     };
-    let mut window = CefWindow::new()
+    let mut window = FenestraWindow::new()
         .title(state.title())
         .app_id(APP_ID)
         .size(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -97,15 +97,15 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
             APP_HEADER_HEIGHT,
         ))
         .control_region(
-            CefWindowControlAction::Minimize,
+            FenestraWindowControlAction::Minimize,
             WindowRegionRect::new(-108, 12, 28, 28),
         )
         .control_region(
-            CefWindowControlAction::Maximize,
+            FenestraWindowControlAction::Maximize,
             WindowRegionRect::new(-76, 12, 28, 28),
         )
         .control_region(
-            CefWindowControlAction::Close,
+            FenestraWindowControlAction::Close,
             WindowRegionRect::new(-44, 12, 28, 28),
         );
 
@@ -132,7 +132,7 @@ fn build_window(args: &[String], state: &RoverState) -> CefWindow {
     register_commands(window, state.clone())
 }
 
-fn register_commands(mut window: CefWindow, state: RoverState) -> CefWindow {
+fn register_commands(mut window: FenestraWindow, state: RoverState) -> FenestraWindow {
     macro_rules! command {
         ($name:literal, $handler:expr) => {{
             window = window.bridge_descriptor_handler(

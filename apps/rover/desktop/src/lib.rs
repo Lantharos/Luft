@@ -1,6 +1,7 @@
 mod chooser;
 mod drives;
 mod file_actions;
+mod file_manager_bus;
 mod fs_ops;
 mod launch_args;
 mod operations_queue;
@@ -400,6 +401,14 @@ pub fn run_portal_backend() -> Result<(), String> {
 
 pub fn install_file_chooser_portal() -> Result<(), String> {
     portal_backend::install_user_portal()
+}
+
+pub fn run_file_manager_bus() -> Result<(), String> {
+    file_manager_bus::run()
+}
+
+pub fn install_file_manager_bus_service() -> Result<(), String> {
+    file_manager_bus::install_user_service()
 }
 
 fn params<T: DeserializeOwned>(command: &BridgeCommand) -> Result<T, BridgeError> {

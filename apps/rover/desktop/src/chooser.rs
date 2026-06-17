@@ -106,46 +106,46 @@ pub fn get_chooser_config(state: &ChooserState) -> ChooserConfig {
 }
 
 pub fn accept_chooser(paths: Vec<String>, state: &ChooserState) -> Result<(), String> {
-    write_response(
-        state,
-        ChooserResponse {
-            accepted: true,
-            paths,
-        },
-    )?;
-    schedule_exit();
-    Ok(())
+	let result = write_response(
+		state,
+		ChooserResponse {
+			accepted: true,
+			paths,
+		},
+	);
+	schedule_exit();
+	result
 }
 
 pub fn cancel_chooser(state: &ChooserState) -> Result<(), String> {
-    write_response(
-        state,
-        ChooserResponse {
-            accepted: false,
-            paths: Vec::new(),
-        },
-    )?;
-    schedule_exit();
-    Ok(())
+	let result = write_response(
+		state,
+		ChooserResponse {
+			accepted: false,
+			paths: Vec::new(),
+		},
+	);
+	schedule_exit();
+	result
 }
 
 fn write_response(state: &ChooserState, response: ChooserResponse) -> Result<(), String> {
-    let session = state
-        .session
-        .as_ref()
-        .ok_or_else(|| "Rover was not started as a chooser".to_string())?;
-    if let Some(parent) = session.response_path.parent() {
-        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-    }
-    let payload = serde_json::to_vec(&response).map_err(|error| error.to_string())?;
-    fs::write(&session.response_path, payload).map_err(|error| error.to_string())
+	let session = state
+		.session
+		.as_ref()
+		.ok_or_else(|| "Rover was not started as a chooser".to_string())?;
+	if let Some(parent) = session.response_path.parent() {
+		fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+	}
+	let payload = serde_json::to_vec(&response).map_err(|error| error.to_string())?;
+	fs::write(&session.response_path, payload).map_err(|error| error.to_string())
 }
 
 fn schedule_exit() {
-    std::thread::spawn(|| {
-        std::thread::sleep(Duration::from_millis(80));
-        std::process::exit(0);
-    });
+	std::thread::spawn(|| {
+		std::thread::sleep(Duration::from_millis(80));
+		std::process::exit(0);
+	});
 }
 
 fn env_bool(name: &str) -> bool {

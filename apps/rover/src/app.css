@@ -285,6 +285,29 @@ button:focus-visible,
 
 .selected-entry,.selected-entry:hover{background:var(--selection);color:var(--text);box-shadow:inset 0 0 0 1px rgba(200,182,111,.24);}
 
+.cutting-entry {
+	color: var(--text-muted);
+	opacity: 0.62;
+	filter: grayscale(0.45) saturate(0.4);
+	box-shadow: inset 0 0 0 1px rgba(245, 245, 242, 0.04);
+	background-image: repeating-linear-gradient(
+		135deg,
+		transparent 0,
+		transparent 6px,
+		rgba(245, 245, 242, 0.045) 6px,
+		rgba(245, 245, 242, 0.045) 7px
+	);
+}
+.cutting-entry:hover {
+	color: var(--text-soft);
+	opacity: 0.78;
+}
+.cutting-entry.selected-entry,
+.cutting-entry.selected-entry:hover {
+	opacity: 0.82;
+	filter: grayscale(0.3) saturate(0.55);
+}
+
 .drop-target-entry,.drop-target-entry:hover{background:rgba(200,182,111,.13);color:var(--text);box-shadow:inset 3px 0 0 rgba(200,182,111,.62),inset 0 1px 0 var(--hairline);}
 .grid-tile.drop-target-entry,.grid-tile.drop-target-entry:hover,.drive-tile.drop-target-entry,.drive-tile.drop-target-entry:hover{box-shadow:inset 0 0 0 1px rgba(200,182,111,.18),inset 0 1px 0 var(--hairline);}
 

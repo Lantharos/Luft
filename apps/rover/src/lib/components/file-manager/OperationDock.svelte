@@ -169,7 +169,7 @@
 </script>
 
 {#if visibleOperations.length > 0}
-	<div class="pointer-events-none absolute bottom-4 right-4 z-40 flex w-[360px] max-w-[calc(100%-32px)] flex-col gap-2">
+	<div class="pointer-events-none fixed bottom-4 right-4 z-40 flex w-[360px] max-w-[calc(100%-32px)] flex-col gap-2">
 		{#each visibleOperations as operation (operation.id)}
 			<section
 				class="pointer-events-auto rounded-[18px] bg-[rgba(28,28,25,0.86)] p-3 text-[13px] shadow-[0_20px_60px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] backdrop-blur-2xl"

@@ -69,6 +69,24 @@ systemctl --user restart xdg-desktop-portal.service
 
 The same command also works from an AppImage or local build, using the executable path that ran the command.
 
+## Show in Folder (FileManager1 D-Bus)
+
+Many apps (browsers, chat clients, download managers) call `org.freedesktop.FileManager1.ShowItems` over D-Bus for "Show in Folder" / "Open Containing Folder" actions. Without a service registered for that bus name the call silently fails and the calling app may surface an error.
+
+Rover ships a D-Bus service that implements `org.freedesktop.FileManager1` and routes `ShowItems`, `ShowFolders`, and the legacy `OpenFolder` into the existing window. To install it for the current user:
+
+```bash
+desktop/target/debug/rover --install-file-manager-bus
+```
+
+The installer writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service` pointing at the running binary. D-Bus will auto-start the service on the first call and keep it running for the session. New `ShowItems` calls are forwarded via Fenestra's single-instance activation, so they reuse the existing window.
+
+To hand the bus name back to another file manager (for example, Nautilus), just remove the service file:
+
+```bash
+rm ~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
+```
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |

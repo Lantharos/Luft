@@ -6,6 +6,7 @@
 	import FilePane from '$lib/components/file-manager/FilePane.svelte';
 	import OperationDock from '$lib/components/file-manager/OperationDock.svelte';
 	import PathToolbar from '$lib/components/file-manager/PathToolbar.svelte';
+	import Portal from '$lib/components/Portal.svelte';
 	import Sidebar from '$lib/components/file-manager/Sidebar.svelte';
 	import StatusBar from '$lib/components/file-manager/StatusBar.svelte';
 	import VcsPanel from '$lib/components/file-manager/VcsPanel.svelte';
@@ -116,16 +117,30 @@
 		vcs.open(manager.currentPath, manager.entries);
 	});
 
+	async function readChooserConfig() {
+		for (let attempt = 0; attempt < 3; attempt += 1) {
+			try {
+				const config = await api.getChooserConfig();
+				return config;
+			} catch (error) {
+				if (attempt === 2) throw error;
+				await new Promise((resolve) => window.setTimeout(resolve, 250 + attempt * 250));
+			}
+		}
+		throw new Error('Rover chooser config unavailable');
+	}
+
 	async function initialize() {
 		let launchPaths: string[] = [];
 		if (isDesktopRuntime()) {
 			try {
-				const config = await api.getChooserConfig();
+				const config = await readChooserConfig();
 				if (config.active) {
 					chooser = config;
 					chooserSaveName = config.current_name ?? '';
 				}
-			} catch {
+			} catch (caught) {
+				console.error('Rover chooser config failed to load:', caught);
 				chooser = null;
 			}
 			try {
@@ -134,9 +149,13 @@
 				launchPaths = [];
 			}
 		}
-		await manager.init();
-		if (chooser?.current_folder) await manager.navigate(chooser.current_folder);
-		else if (launchPaths.length > 0) await manager.openLaunchPaths(launchPaths);
+		const startPath = chooser?.current_folder ?? undefined;
+		await manager.init(startPath);
+		if (chooser?.current_folder) {
+			// Already navigated by manager.init
+		} else if (launchPaths.length > 0) {
+			await manager.openLaunchPaths(launchPaths);
+		}
 	}
 
 	function draggedSidebarEntries() {
@@ -280,6 +299,11 @@
 		return false;
 	}
 
+	function canDropOnPathBar(path: string) {
+		if (chooser) return false;
+		return manager.canAcceptExternalDrop(path);
+	}
+
 	function handleTabDrop(event: DragEvent, tab: Tab) {
 		if (tab.view === 'home') {
 			void manager.handleDrop(event, tab.path);
@@ -395,11 +419,18 @@
 
 	async function submitChooser(paths = chooserAcceptPaths) {
 		if (!chooser || paths.length === 0) return;
-		await api.acceptChooser(paths);
+		const acceptPaths = paths.slice();
+		chooser = null;
+		void api.acceptChooser(acceptPaths).catch((error) => {
+			console.error('Rover chooser accept failed:', error);
+		});
 	}
 
 	async function cancelChooser() {
-		await api.cancelChooser();
+		chooser = null;
+		void api.cancelChooser().catch((error) => {
+			console.error('Rover chooser cancel failed:', error);
+		});
 	}
 
 	function handleChooserKeydown(event: KeyboardEvent) {
@@ -411,6 +442,13 @@
 		if (event.key === 'F5') {
 			event.preventDefault();
 			void manager.refresh();
+			return;
+		}
+		if (event.key === 'F2' || event.code === 'F2') {
+			if (!chooser) {
+				manager.handleKeydown(event);
+				return;
+			}
 			return;
 		}
 		const target = event.target instanceof Element ? event.target : null;
@@ -531,6 +569,8 @@
 						sortBy={manager.sortBy}
 						sortAsc={manager.sortAsc}
 						showHidden={$settings.showHidden}
+						dropTargetKey={manager.dropTargetKey}
+						canDropOnPath={canDropOnPathBar}
 						vcsProject={vcs.project}
 						chooserMode={Boolean(chooser)}
 						onBack={manager.goBack}
@@ -546,6 +586,9 @@
 						onSort={manager.setSortBy}
 						onViewMode={manager.setViewMode}
 						onOpenVcs={toggleVcsPanel}
+						onPathDragOver={(event, path) => manager.handlePathDragOver(event, path, `pathbar:${path}`)}
+						onPathDrop={manager.handleDrop}
+						onPathDragLeave={manager.handleDragLeave}
 					/>
 				{/if}
 
@@ -563,12 +606,12 @@
 						draft={manager.inlineDraft}
 						viewMode={manager.viewMode}
 						selectedPaths={$selection}
+						cuttingPaths={manager.cuttingPaths}
 						showLoadingSkeleton={manager.showLoadingSkeleton}
 						error={manager.error}
 						dropTargetKey={manager.dropTargetKey}
 						isDragging={manager.isDragging}
 						canDrag={!chooser}
-						allowSelectedDoubleClick={Boolean(chooser)}
 						entryVcsStatus={(entry) => vcs.statusFor(entry.path, entry.is_dir)}
 						onSelectEntry={handleChooserSelectEntry}
 						onOpenEntry={handleChooserOpenEntry}
@@ -619,35 +662,41 @@
 						vcsError={vcs.error}
 					/>
 				{/if}
-				<OperationDock />
+				<Portal>
+					<OperationDock />
+				</Portal>
 			</section>
 		</div>
 	</main>
 </div>
 
 {#if manager.contextMenu && !chooser}
-	<ContextMenu
-		menu={manager.contextMenu}
-		hasClipboard={$clipboard.items.length > 0}
-		isFavorite={contextTargetIsFavorite}
-		isPinned={contextTargetIsPinned}
-		vcsProject={vcs.project}
-		targetVcsStatus={contextTargetVcsStatus}
-		onOpen={manager.handleItemOpen}
-		onOpenInTab={(entry) => manager.openNewTab(entry.path)}
-		onCut={manager.cut}
-		onCopy={manager.copy}
-		onRename={manager.startRename}
-		onTrash={manager.deleteSelected}
-		onToggleFavorite={manager.toggleFavorite}
-		onTogglePinned={toggleSidebarBookmark}
-		onViewVcsChanges={openVcsChanges}
-		onSaveVcs={openVcsSave}
-		onSyncVcs={() => vcs.sync()}
-		onCreate={manager.startCreate}
-		onPaste={manager.paste}
-		onClose={() => (manager.contextMenu = null)}
-	/>
+	<Portal>
+		<ContextMenu
+			menu={manager.contextMenu}
+			hasClipboard={$clipboard.items.length > 0}
+			isFavorite={contextTargetIsFavorite}
+			isPinned={contextTargetIsPinned}
+			vcsProject={vcs.project}
+			targetVcsStatus={contextTargetVcsStatus}
+			onOpen={manager.handleItemOpen}
+			onOpenInTab={(entry) => manager.openNewTab(entry.path)}
+			onCut={manager.cut}
+			onCopy={manager.copy}
+			onRename={manager.startRename}
+			onTrash={manager.deleteSelected}
+			onToggleFavorite={manager.toggleFavorite}
+			onTogglePinned={toggleSidebarBookmark}
+			onViewVcsChanges={openVcsChanges}
+			onSaveVcs={openVcsSave}
+			onSyncVcs={() => vcs.sync()}
+			onCreate={manager.startCreate}
+			onPaste={manager.paste}
+			onClose={() => (manager.contextMenu = null)}
+		/>
+	</Portal>
 {/if}
 
-<VcsSaveDialog {vcs} />
+<Portal>
+	<VcsSaveDialog {vcs} />
+</Portal>

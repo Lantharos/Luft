@@ -28,9 +28,12 @@ export async function listenBridgeEvent<T>(name: string, callback: (payload: T) 
 	return () => window.removeEventListener(eventName, listener);
 }
 
-function waitForBridge(timeoutMs = 2500): Promise<FenestraBridge> {
+let bridgePromise: Promise<FenestraBridge> | null = null;
+
+function waitForBridge(timeoutMs = 30000): Promise<FenestraBridge> {
 	if (window.fenestra?.bridge) return Promise.resolve(window.fenestra.bridge);
-	return new Promise((resolve, reject) => {
+	if (bridgePromise) return bridgePromise;
+	bridgePromise = new Promise<FenestraBridge>((resolve, reject) => {
 		const startedAt = performance.now();
 		const poll = () => {
 			if (window.fenestra?.bridge) {
@@ -38,6 +41,7 @@ function waitForBridge(timeoutMs = 2500): Promise<FenestraBridge> {
 				return;
 			}
 			if (performance.now() - startedAt > timeoutMs) {
+				bridgePromise = null;
 				reject(new Error('Rover desktop bridge is not available'));
 				return;
 			}
@@ -45,6 +49,7 @@ function waitForBridge(timeoutMs = 2500): Promise<FenestraBridge> {
 		};
 		poll();
 	});
+	return bridgePromise;
 }
 
 function filePath(path: string): string {

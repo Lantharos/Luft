@@ -1,0 +1,4 @@
+format = "appimage"
+release = false
+source = "/home/kristof/dev/Desktop/rover/."
+cargo_package = "rover"

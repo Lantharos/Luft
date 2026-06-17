@@ -7,6 +7,10 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+/dist
+
+# Tooling artifacts
+.playwright-cli
 
 # OS
 .DS_Store

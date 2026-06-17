@@ -23,6 +23,24 @@ fn main() {
         println!("Rover file chooser portal installed for this user.");
         return;
     }
+    if args.iter().any(|arg| arg == "--file-manager-bus") {
+        if let Err(error) = rover_lib::run_file_manager_bus() {
+            eprintln!("Rover file manager bus failed: {}", error);
+            std::process::exit(1);
+        }
+        return;
+    }
+    if args
+        .iter()
+        .any(|arg| arg == "--install-file-manager-bus")
+    {
+        if let Err(error) = rover_lib::install_file_manager_bus_service() {
+            eprintln!("failed to install Rover file manager bus: {}", error);
+            std::process::exit(1);
+        }
+        println!("Rover file manager bus installed for this user.");
+        return;
+    }
     if let Err(error) = rover_lib::run(&args) {
         eprintln!("failed to run Rover: {}", error);
         std::process::exit(1);

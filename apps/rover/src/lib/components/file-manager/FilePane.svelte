@@ -31,12 +31,12 @@
 		draft: InlineDraft | null;
 		viewMode: ViewMode;
 		selectedPaths: Set<string>;
+		cuttingPaths: Set<string>;
 		showLoadingSkeleton: boolean;
 		error: string | null;
 		dropTargetKey: string | null;
 		isDragging: boolean;
 		canDrag?: boolean;
-		allowSelectedDoubleClick?: boolean;
 		entryVcsStatus?: (entry: FileEntry) => VcsFileStatus | null;
 		onSelectEntry: (entry: FileEntry, event: MouseEvent) => void;
 		onOpenEntry: (entry: FileEntry) => void;
@@ -77,12 +77,12 @@
 		draft,
 		viewMode,
 		selectedPaths,
+		cuttingPaths,
 		showLoadingSkeleton,
 		error,
 		dropTargetKey,
 		isDragging,
 		canDrag = true,
-		allowSelectedDoubleClick = false,
 		entryVcsStatus = () => null,
 		onSelectEntry,
 		onOpenEntry,
@@ -226,7 +226,7 @@
 		if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
 		const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
 		if (!pointerDrag.started) {
-			if (distance < 6) return;
+			if (distance < 8) return;
 			pointerDrag = { ...pointerDrag, started: true, currentX: event.clientX, currentY: event.clientY };
 			onInternalDragStart(pointerDrag.entry);
 		}
@@ -270,7 +270,8 @@
 		return [
 			selectedPaths.has(path) ? 'selected-entry' : '',
 			dropTargetKey === entryDropKey(path) ? 'drop-target-entry' : '',
-			isDragging && selectedPaths.has(path) ? 'opacity-50' : ''
+			isDragging && selectedPaths.has(path) ? 'opacity-50' : '',
+			cuttingPaths.has(path) ? 'cutting-entry' : ''
 		];
 	}
 
@@ -489,6 +490,9 @@
 						class="inline-name-field--grid"
 						value={draft.value}
 						label={draft.itemType === 'folder' ? 'Folder name' : 'File name'}
+						mode="create"
+						itemType={draft.itemType}
+						placeholder={draft.itemType === 'folder' ? 'New folder' : 'New file.txt'}
 						onInput={onDraftInput}
 						onConfirm={onDraftConfirm}
 						onCancel={onDraftCancel}
@@ -504,6 +508,10 @@
 							class="inline-name-field--grid"
 							value={draft?.value ?? ''}
 							label="File name"
+							mode="rename"
+							originalName={entry.name}
+							itemType={entry.is_dir ? 'folder' : 'file'}
+							selectNameOnly
 							onInput={onDraftInput}
 							onConfirm={onDraftConfirm}
 							onCancel={onDraftCancel}
@@ -519,12 +527,10 @@
 						data-drop-path={entry.is_dir ? entry.path : undefined}
 						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
 						onclick={(event) => selectEntry(entry, event)}
-						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
+						ondblclick={() => onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
-						ondragstart={(event) => onDragStart(event, entry)}
-						ondragend={onDragEnd}
 						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
@@ -551,6 +557,9 @@
 						<InlineNameField
 							value={draft.value}
 							label={draft.itemType === 'folder' ? 'Folder name' : 'File name'}
+							mode="create"
+							itemType={draft.itemType}
+							placeholder={draft.itemType === 'folder' ? 'New folder' : 'New file.txt'}
 							onInput={onDraftInput}
 							onConfirm={onDraftConfirm}
 							onCancel={onDraftCancel}
@@ -570,6 +579,10 @@
 							<InlineNameField
 								value={draft?.value ?? ''}
 								label="File name"
+								mode="rename"
+								originalName={entry.name}
+								itemType={entry.is_dir ? 'folder' : 'file'}
+								selectNameOnly
 								onInput={onDraftInput}
 								onConfirm={onDraftConfirm}
 								onCancel={onDraftCancel}
@@ -589,12 +602,10 @@
 						data-drop-path={entry.is_dir ? entry.path : undefined}
 						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
 						onclick={(event) => selectEntry(entry, event)}
-						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
+						ondblclick={() => onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
-						ondragstart={(event) => onDragStart(event, entry)}
-						ondragend={onDragEnd}
 						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}
@@ -619,6 +630,9 @@
 					<InlineNameField
 						value={draft.value}
 						label={draft.itemType === 'folder' ? 'Folder name' : 'File name'}
+						mode="create"
+						itemType={draft.itemType}
+						placeholder={draft.itemType === 'folder' ? 'New folder' : 'New file.txt'}
 						onInput={onDraftInput}
 						onConfirm={onDraftConfirm}
 						onCancel={onDraftCancel}
@@ -633,6 +647,10 @@
 						<InlineNameField
 							value={draft?.value ?? ''}
 							label="File name"
+							mode="rename"
+							originalName={entry.name}
+							itemType={entry.is_dir ? 'folder' : 'file'}
+							selectNameOnly
 							onInput={onDraftInput}
 							onConfirm={onDraftConfirm}
 							onCancel={onDraftCancel}
@@ -651,12 +669,10 @@
 						data-drop-path={entry.is_dir ? entry.path : undefined}
 						data-drop-key={entry.is_dir ? entryDropKey(entry.path) : undefined}
 						onclick={(event) => selectEntry(entry, event)}
-						ondblclick={() => (allowSelectedDoubleClick || !selectedPaths.has(entry.path)) && onOpenEntry(entry)}
+						ondblclick={() => onOpenEntry(entry)}
 						onauxclick={(event) => onMiddleClick(entry, event)}
 						oncontextmenu={(event) => onContextMenu(event, entry)}
 						onpointerdown={(event) => startEntryPointerDrag(event, entry)}
-						ondragstart={(event) => onDragStart(event, entry)}
-						ondragend={onDragEnd}
 						ondragover={(event) => onDragOver(event, entry, entry.is_dir ? entryDropKey(entry.path) : undefined)}
 						ondragleave={onDragLeave}
 						ondrop={(event) => entry.is_dir && onDrop(event, entry.path)}

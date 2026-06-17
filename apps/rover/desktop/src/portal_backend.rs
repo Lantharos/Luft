@@ -146,7 +146,11 @@ impl FileChooserBackend {
         });
         let _ = fs::remove_file(&response_path);
 
-        if !status.success() && response.accepted {
+        if response.accepted {
+            return Ok(response);
+        }
+
+        if !status.success() {
             return Err(format!("Rover chooser exited with status {}", status));
         }
 
@@ -335,7 +339,7 @@ fn service_file(exe: &Path) -> String {
 }
 
 fn portal_file() -> &'static str {
-    "[portal]\nDBusName=org.freedesktop.impl.portal.desktop.rover\nInterfaces=org.freedesktop.impl.portal.FileChooser;\nUseIn=rover;\n"
+    "[portal]\nDBusName=org.freedesktop.impl.portal.desktop.rover\nInterfaces=org.freedesktop.impl.portal.FileChooser;\nUseIn=*;\n"
 }
 
 fn portal_config(path: &Path) -> Result<String, String> {

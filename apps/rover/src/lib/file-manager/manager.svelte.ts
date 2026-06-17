@@ -28,6 +28,13 @@ import { normalizePath, viewModeForPath } from '$lib/file-manager/view-modes';
 import type { BackgroundEffect, FavoriteItem, FileEntry, InlineDraft, SidebarView, SortBy, Tab, TabHistoryEntry, TrashItem, ViewMode } from '$lib/types';
 import { getParentPath, getPathSegments } from '$lib/utils';
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
+export type ToastTone = 'info' | 'success' | 'error';
+export interface ToastMessage {
+	id: number;
+	text: string;
+	tone: ToastTone;
+}
+const EMPTY_PATH_SET: Set<string> = new Set();
 export class FileManager {
 	entries = $state<FileEntry[]>([]);
 	trashItems = $state<TrashItem[]>([]);
@@ -48,14 +55,41 @@ export class FileManager {
 	isDragging = $state(false);
 	backgroundEffect = $state<BackgroundEffect>('opaque');
 	thumbnails = $state<Record<string, string | null>>({});
+	cuttingPaths = $state<Set<string>>(EMPTY_PATH_SET);
+	toasts = $state<ToastMessage[]>([]);
+	private clipboardUnsub: (() => void) | null = null;
+	private nextToastId = 1;
+	private toastTimers = new Map<number, ReturnType<typeof setTimeout>>();
 	lastMouseNavButton = 0;
 	lastMouseNavAt = 0;
 	get displayEntries() { return visibleEntries(sortedEntries(this.entries, this.sortBy, this.sortAsc), this.searchQuery); }
 	get isLoading() { return this.loading.active; }
 	get showLoadingSkeleton() { return this.loading.skeleton; }
 	get pathSegments() { return getPathSegments(this.currentPath); }
-	init = async () => {
-		if (!isDesktopRuntime()) return this.initPreview();
+	private showToast(text: string, tone: ToastTone = 'info', durationMs = 2400) {
+		const id = this.nextToastId++;
+		this.toasts = [...this.toasts, { id, text, tone }];
+		const timer = setTimeout(() => this.dismissToast(id), durationMs);
+		this.toastTimers.set(id, timer);
+	}
+	dismissToast(id: number) {
+		const timer = this.toastTimers.get(id);
+		if (timer) {
+			clearTimeout(timer);
+			this.toastTimers.delete(id);
+		}
+		this.toasts = this.toasts.filter((toast) => toast.id !== id);
+	}
+	private setError(message: string) {
+		this.error = message;
+		this.showToast(message, 'error', 3600);
+	}
+	private basename(path: string) {
+		return path.split('/').filter(Boolean).pop() ?? path;
+	}
+	init = async (startPathOverride?: string) => {
+		this.subscribeClipboard();
+		if (!isDesktopRuntime()) return this.initPreview(startPathOverride);
 		const settingsTask = settings.load();
 		const dirsTask = loadUserDirs();
 		void loadDrives();
@@ -65,15 +99,30 @@ export class FileManager {
 		this.sortBy = savedSettings.sortBy;
 		this.sortAsc = savedSettings.sortAsc;
 		const dirs = await dirsTask;
-		const startPath = dirs?.home ?? '/';
+		const startPath = startPathOverride || dirs?.home || '/';
 		await tabs.init(startPath);
 		await this.loadDirectory(startPath);
 	};
-	initPreview = async () => {
+	private subscribeClipboard = () => {
+		if (this.clipboardUnsub) return;
+		this.updateCuttingPaths(get(clipboard));
+		this.clipboardUnsub = clipboard.subscribe((value) => this.updateCuttingPaths(value));
+	};
+	private updateCuttingPaths = (clip: { operation: 'copy' | 'cut' | null; items: { path: string }[] }) => {
+		if (clip.operation !== 'cut') {
+			this.cuttingPaths = EMPTY_PATH_SET;
+			return;
+		}
+		const next = new Set<string>();
+		for (const item of clip.items) next.add(item.path);
+		this.cuttingPaths = next;
+	};
+	initPreview = async (startPathOverride?: string) => {
 		userDirs.set(previewUserDirs);
 		drives.set(previewDrives);
-		await tabs.init(previewUserDirs.home);
-		this.loadPreviewDirectory(previewUserDirs.home);
+		const startPath = startPathOverride || previewUserDirs.home;
+		await tabs.init(startPath);
+		this.loadPreviewDirectory(startPath);
 	};
 	loadPreviewDirectory(path: string) {
 		this.loading.cancel();
@@ -350,6 +399,12 @@ export class FileManager {
 		this.dragTarget = entry;
 		this.dragPaths = Array.from(get(selection));
 		setFileDragData(event.dataTransfer, this.dragPaths);
+		if (event.dataTransfer) {
+			const transparent = new Image();
+			transparent.src =
+				'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+			event.dataTransfer.setDragImage(transparent, 0, 0);
+		}
 	};
 	beginInternalDrag = (entry: FileEntry) => {
 		if (!get(selection).has(entry.path)) selection.select(entry.path);
@@ -376,6 +431,10 @@ export class FileManager {
 		if (get(selection).has(targetPath)) return false;
 		const sourcePaths = this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection));
 		return !sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
+	}
+	canAcceptExternalDrop(targetPath: string) {
+		if (!targetPath) return false;
+		return this.canDropSelectionOnPath(targetPath);
 	}
 	setDropTarget(target: DropTarget | null) {
 		this.dropTarget = target?.path ?? null;
@@ -435,17 +494,59 @@ export class FileManager {
 			return;
 		}
 		try {
+			const sourceEntries = await this.fetchSourceEntries(sourcePaths);
 			if (move) {
 				await api.moveItems(sourcePaths, targetPath);
-				this.optimisticallyRemoveMovedSources(sourcePaths, targetPath);
-			} else await api.copyItems(sourcePaths, targetPath);
-			this.scheduleDirectoryRefresh();
+				if (targetPath === this.currentPath) {
+					this.optimisticallyAddMovedTargets(sourcePaths, sourceEntries);
+				} else {
+					this.optimisticallyRemoveMovedSources(sourcePaths, targetPath);
+				}
+			} else {
+				await api.copyItems(sourcePaths, targetPath);
+				if (targetPath === this.currentPath) this.optimisticallyAddMovedTargets(sourcePaths, sourceEntries);
+			}
+			this.scheduleDirectoryRefresh(120, 1400);
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
 		} finally {
 			this.handleDragEnd();
 		}
 	};
+	private async fetchSourceEntries(sourcePaths: string[]): Promise<Map<string, FileEntry>> {
+		const byPath = new Map<string, FileEntry>();
+		for (const path of sourcePaths) {
+			const cached = this.entries.find((entry) => entry.path === path);
+			if (cached) {
+				byPath.set(path, cached);
+				continue;
+			}
+			try {
+				const entry = await api.getFileInfo(path);
+				byPath.set(path, entry);
+			} catch {
+				const name = path.split('/').filter(Boolean).pop() ?? path;
+				byPath.set(path, {
+					name,
+					path,
+					is_dir: !name.includes('.'),
+					is_file: name.includes('.'),
+					is_symlink: false,
+					is_hidden: name.startsWith('.'),
+					size: 0,
+					modified: null,
+					created: null,
+					accessed: null,
+					mime_type: null,
+					extension: name.includes('.') ? name.split('.').pop() ?? null : null,
+					permissions: 0o644,
+					uid: 0,
+					gid: 0
+				});
+			}
+		}
+		return byPath;
+	}
 	optimisticallyRemoveMovedSources(sourcePaths: string[], targetPath: string) {
 		if (get(currentView) !== 'home' || targetPath === this.currentPath) return;
 		const sourceSet = new Set(sourcePaths);
@@ -454,13 +555,52 @@ export class FileManager {
 		this.entries = nextEntries;
 		selection.clear();
 	}
-	scheduleDirectoryRefresh() {
+	optimisticallyAddMovedTargets(sourcePaths: string[], sourceEntries?: Map<string, FileEntry>) {
+		if (get(currentView) !== 'home') return;
+		const basePath = this.currentPath.replace(/\/+$/, '');
+		const knownByPath = new Map(this.entries.map((entry) => [entry.path, entry] as const));
+		const additions: FileEntry[] = [];
+		for (const sourcePath of sourcePaths) {
+			const name = sourcePath.split('/').filter(Boolean).pop() ?? sourcePath;
+			const template = sourceEntries?.get(sourcePath) ?? this.entries.find((entry) => entry.path === sourcePath);
+			const destinationPath = `${basePath}/${name}`;
+			if (knownByPath.has(destinationPath)) continue;
+			const next: FileEntry = template
+				? { ...template, path: destinationPath, name }
+				: {
+						name,
+						path: destinationPath,
+						is_dir: !name.includes('.'),
+						is_file: name.includes('.'),
+						is_symlink: false,
+						is_hidden: name.startsWith('.'),
+						size: 0,
+						modified: null,
+						created: null,
+						accessed: null,
+						mime_type: null,
+						extension: name.includes('.') ? name.split('.').pop() ?? null : null,
+						permissions: 0o644,
+						uid: 0,
+						gid: 0
+					};
+			knownByPath.set(next.path, next);
+			additions.push(next);
+		}
+		if (additions.length === 0) return;
+		this.entries = [...this.entries, ...additions];
+		selection.clear();
+	}
+	scheduleDirectoryRefresh(initialDelay = 120, followupDelay = 1400) {
 		const path = this.currentPath;
 		if (!isDesktopRuntime() || get(currentView) !== 'home' || !path) return;
-		for (const delay of [900, 3500]) {
+		window.setTimeout(() => {
+			if (get(currentView) === 'home' && this.currentPath === path) void this.loadDirectory(path);
+		}, initialDelay);
+		if (followupDelay > initialDelay) {
 			window.setTimeout(() => {
 				if (get(currentView) === 'home' && this.currentPath === path) void this.loadDirectory(path);
-			}, delay);
+			}, followupDelay);
 		}
 	}
 	finishInternalDrop = async (targetPath: string | null, copy: boolean) => {
@@ -494,14 +634,22 @@ export class FileManager {
 	};
 	trashPaths = async (sourcePaths: string[]) => {
 		if (sourcePaths.length === 0) return this.handleDragEnd();
+		const sourceSet = new Set(sourcePaths);
+		const previousEntries = this.entries;
+		if (get(currentView) === 'home' && this.currentPath) {
+			const next = this.entries.filter((entry) => !sourceSet.has(entry.path));
+			if (next.length !== this.entries.length) this.entries = next;
+		}
 		try {
 			await api.moveToTrash(sourcePaths);
 			if (get(currentView) === 'trash') await this.loadTrash();
 			else if (get(currentView) === 'home' && this.currentPath) await this.loadDirectory(this.currentPath);
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.entries = previousEntries;
 		} finally {
 			this.handleDragEnd();
+			selection.clear();
 		}
 	};
 	copy = () => {
@@ -517,13 +665,23 @@ export class FileManager {
 		if (!currentClipboard.items.length || !currentClipboard.operation) return;
 		try {
 			const paths = currentClipboard.items.map((item) => item.path);
-			if (currentClipboard.operation === 'copy') await api.copyItems(paths, this.currentPath);
-			else {
+			if (currentClipboard.operation === 'copy') {
+				await api.copyItems(paths, this.currentPath);
+				const sourceEntries = await this.fetchSourceEntries(paths);
+				this.optimisticallyAddMovedTargets(paths, sourceEntries);
+			} else {
+				const sourcePaths = paths.slice();
+				const sourceViewIsHome = get(currentView) === 'home';
+				const sourceParent = sourcePaths.length > 0 ? getParentPath(sourcePaths[0]) : null;
+				const pastingBackIntoSource =
+					sourceParent === this.currentPath && sourcePaths.every((source) => getParentPath(source) === this.currentPath);
+				const sourceEntries = await this.fetchSourceEntries(sourcePaths);
 				await api.moveItems(paths, this.currentPath);
-				this.optimisticallyRemoveMovedSources(paths, this.currentPath);
+				if (sourceViewIsHome && !pastingBackIntoSource) this.optimisticallyRemoveMovedSources(sourcePaths, this.currentPath);
+				if (this.currentPath && !pastingBackIntoSource) this.optimisticallyAddMovedTargets(sourcePaths, sourceEntries);
 				clearClipboard();
 			}
-			this.scheduleDirectoryRefresh();
+			this.scheduleDirectoryRefresh(120, 1400);
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
 		}
@@ -537,7 +695,10 @@ export class FileManager {
 				await this.loadTrash();
 			} else {
 				await api.moveToTrash(selected);
-				await this.loadDirectory(this.currentPath);
+				const remaining = this.entries.filter((entry) => !selected.includes(entry.path));
+				if (remaining.length !== this.entries.length) this.entries = remaining;
+				selection.clear();
+				this.scheduleDirectoryRefresh(180, 1600);
 			}
 		} catch (caught) {
 			this.error = caught instanceof Error ? caught.message : String(caught);
@@ -570,11 +731,18 @@ export class FileManager {
 	cancelDraft = () => {
 		this.inlineDraft = null;
 	};
-	commitDraft = async () => {
+	isDraftUnchanged = (draft = this.inlineDraft) => {
+		if (!draft) return true;
+		const trimmed = draft.value.trim();
+		if (!trimmed) return true;
+		if (draft.mode === 'rename') return trimmed === draft.originalName;
+		return trimmed === (draft.itemType === 'folder' ? 'New folder' : 'New file.txt');
+	};
+	commitDraft = async ({ allowUnchanged = false }: { allowUnchanged?: boolean } = {}) => {
 		const draft = this.inlineDraft;
 		if (!draft) return;
 		const name = draft.value.trim();
-		if (!name || (draft.mode === 'rename' && name === draft.originalName)) {
+		if (!name || (!allowUnchanged && this.isDraftUnchanged(draft))) {
 			this.cancelDraft();
 			return;
 		}
@@ -627,6 +795,26 @@ export class FileManager {
 			void this.refresh();
 			return;
 		}
+		if (event.key === 'F2' || event.code === 'F2') {
+			if (this.inlineDraft) {
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
+			if (get(currentView) !== 'home') return;
+			const selected = get(selection);
+			if (selected.size !== 1) return;
+			const selectedPath = selected.values().next().value;
+			const target = this.entries.find((entry) => entry.path === selectedPath);
+			if (!target) return;
+			event.preventDefault();
+			event.stopPropagation();
+			if (event.target instanceof HTMLElement && typeof event.target.blur === 'function') {
+				event.target.blur();
+			}
+			this.startRename(target);
+			return;
+		}
 		if (isTextInputTarget(event.target)) return;
 		if (event.ctrlKey || event.metaKey) {
 			handleShortcut(event, {
@@ -646,10 +834,6 @@ export class FileManager {
 			return;
 		}
 		if (event.key === 'Delete') this.deleteSelected();
-		if (event.key === 'F2') {
-			const selected = this.entries.find((entry) => get(selection).has(entry.path));
-			if (selected) this.startRename(selected);
-		}
 		if (event.key === 'Backspace') this.goUp();
 		if (event.key === 'Escape') {
 			selection.clear();

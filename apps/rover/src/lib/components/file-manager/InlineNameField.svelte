@@ -60,12 +60,7 @@
 		await tick();
 		if (!input || input !== element) return;
 		element.focus({ preventScroll: true });
-		selectNamePortion(element);
-		window.requestAnimationFrame(() => {
-			if (!input || input !== element) return;
-			input.focus({ preventScroll: true });
-			selectNamePortion(input);
-		});
+		selectNamePortion(input);
 	}
 
 	$effect(() => {

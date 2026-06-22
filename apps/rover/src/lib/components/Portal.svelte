@@ -35,6 +35,9 @@
 
 	onMount(() => {
 		moveToTarget();
+		return () => {
+			if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+		};
 	});
 
 	$effect(() => {

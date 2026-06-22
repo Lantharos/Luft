@@ -79,9 +79,10 @@ fn build_window(args: &[String], state: &RoverState) -> FenestraWindow {
             SIDEBAR_WIDTH,
             WINDOW_RADIUS,
         ))
-        .opaque_region(WindowRegion::adaptive_content_after_sidebar(
+        .opaque_region(WindowRegion::adaptive_content_after_sidebar_rounded_right(
             SIDEBAR_WIDTH,
             0,
+            WINDOW_RADIUS,
         ))
         .input_region(WindowRegion::adaptive_rounded_rect(WINDOW_RADIUS))
         .drag_region(WindowRegionRect::new(0, 0, SIDEBAR_WIDTH, i32::MAX))

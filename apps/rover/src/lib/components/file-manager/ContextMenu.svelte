@@ -120,6 +120,8 @@
 	tabindex="-1"
 	onkeydown={(event) => event.key === 'Escape' && onClose()}
 	onclick={(event) => event.stopPropagation()}
+	onpointerdown={(event) => event.stopPropagation()}
+	oncontextmenu={(event) => event.stopPropagation()}
 >
 	{#if menu.target}
 		<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onOpen(menu.target!))}>
@@ -162,7 +164,7 @@
 			<span>Copy</span>
 		</button>
 		<div class="my-1 h-px bg-[var(--hairline)]"></div>
-		<button class="menu-item" type="button" role="menuitem" onclick={() => onRename(menu.target!)}>
+		<button class="menu-item" type="button" role="menuitem" onclick={() => run(() => onRename(menu.target!))}>
 			<Icon name="edit" size={16} />
 			<span>Rename</span>
 		</button>

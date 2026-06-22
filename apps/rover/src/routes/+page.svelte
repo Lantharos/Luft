@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	import AppHeader from '$lib/components/file-manager/AppHeader.svelte';
 	import ChooserBar from '$lib/components/file-manager/ChooserBar.svelte';
 	import ContextMenu from '$lib/components/file-manager/ContextMenu.svelte';
@@ -39,7 +40,6 @@
 		let removeSingleInstanceListener: (() => void) | null = null;
 		let driveRefreshTimer: number | null = null;
 		void initialize();
-		document.addEventListener('click', manager.closeFloatingUi);
 		if (isDesktopRuntime()) {
 			driveRefreshTimer = window.setInterval(() => void loadDrives(), 5000);
 			void api
@@ -55,7 +55,6 @@
 		return () => {
 			disposed = true;
 			clearDragHoverTab();
-			document.removeEventListener('click', manager.closeFloatingUi);
 			if (driveRefreshTimer !== null) window.clearInterval(driveRefreshTimer);
 			removeSingleInstanceListener?.();
 		};
@@ -433,6 +432,29 @@
 		});
 	}
 
+	function closeContextMenuForWindowEvent(event: Event) {
+		const target = event.target instanceof Element ? event.target : null;
+		if (target?.closest('[role="menu"]')) return;
+		manager.contextMenu = null;
+	}
+
+	function startRenameFromKey(event: KeyboardEvent) {
+		if (get(currentView) !== 'home') return;
+		if (manager.inlineDraft) return;
+		const selected = get(selection);
+		if (selected.size !== 1) return;
+		const selectedPath = selected.values().next().value as string | undefined;
+		if (!selectedPath) return;
+		const target = manager.entries.find((entry) => entry.path === selectedPath);
+		if (!target) return;
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.target instanceof HTMLElement && typeof event.target.blur === 'function') {
+			event.target.blur();
+		}
+		manager.startRename(target);
+	}
+
 	function handleChooserKeydown(event: KeyboardEvent) {
 		if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'f') {
 			event.preventDefault();
@@ -446,7 +468,7 @@
 		}
 		if (event.key === 'F2' || event.code === 'F2') {
 			if (!chooser) {
-				manager.handleKeydown(event);
+				startRenameFromKey(event);
 				return;
 			}
 			return;
@@ -465,9 +487,13 @@
 		}
 		if (event.key === 'Escape') {
 			event.preventDefault();
-			void cancelChooser();
+			if (chooser) {
+				void cancelChooser();
+			} else {
+				manager.contextMenu = null;
+			}
 		}
-		if (event.key === 'Backspace') manager.goUp();
+		if (event.key === 'Backspace' && !chooser) manager.goUp();
 	}
 
 	async function switchChooserView(view: SidebarView) {
@@ -500,6 +526,9 @@
 
 <svelte:window
 	onkeydown={handleChooserKeydown}
+	onclick={closeContextMenuForWindowEvent}
+	onpointerdown={closeContextMenuForWindowEvent}
+	oncontextmenu={closeContextMenuForWindowEvent}
 	onfocus={handleWindowFocus}
 	onmousedown={manager.handleDragRegionMouseDown}
 	onmouseup={manager.handleMouseButtonNavigation}
@@ -671,6 +700,7 @@
 </div>
 
 {#if manager.contextMenu && !chooser}
+	{#key manager.contextMenu}
 	<Portal>
 		<ContextMenu
 			menu={manager.contextMenu}
@@ -695,6 +725,7 @@
 			onClose={() => (manager.contextMenu = null)}
 		/>
 	</Portal>
+	{/key}
 {/if}
 
 <Portal>

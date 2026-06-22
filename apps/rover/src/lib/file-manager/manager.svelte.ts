@@ -47,6 +47,7 @@ export class FileManager {
 	sortBy = $state<SortBy>('name');
 	sortAsc = $state(true);
 	contextMenu = $state<ContextMenuState | null>(null);
+	private lastContextMenuEvent: { x: number; y: number; targetPath: string | null; openedAt: number } | null = null;
 	dragTarget = $state<FileEntry | null>(null);
 	dropTarget = $state<string | null>(null);
 	dropTargetKey = $state<string | null>(null);
@@ -389,6 +390,16 @@ export class FileManager {
 	handleContextMenu = (event: MouseEvent, entry?: FileEntry) => {
 		event.preventDefault();
 		event.stopPropagation();
+		const now = performance.now();
+		const targetPath = entry?.path ?? null;
+		const duplicate =
+			this.lastContextMenuEvent &&
+			now - this.lastContextMenuEvent.openedAt < 120 &&
+			Math.abs(event.clientX - this.lastContextMenuEvent.x) < 2 &&
+			Math.abs(event.clientY - this.lastContextMenuEvent.y) < 2 &&
+			this.lastContextMenuEvent.targetPath === targetPath;
+		if (duplicate) return;
+		this.lastContextMenuEvent = { x: event.clientX, y: event.clientY, targetPath, openedAt: now };
 		if (entry && !get(selection).has(entry.path)) selection.select(entry.path);
 		this.contextMenu = { x: event.clientX, y: event.clientY, target: entry ?? null };
 	};

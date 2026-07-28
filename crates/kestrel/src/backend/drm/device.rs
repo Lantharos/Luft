@@ -1,5 +1,10 @@
 use self::outputs::{ConnectedOutput, descriptors};
-use super::{DrmError, cursor::HardwareCursor};
+use super::{
+    DrmError,
+    cursor::HardwareCursor,
+    dmabuf_feedback::{SurfaceDmabufFeedback, build_surface_dmabuf_feedback},
+    redraw::OutputFrameState,
+};
 use crate::{
     output::OutputDescriptor,
     state::KestrelState,
@@ -22,6 +27,7 @@ use smithay::{
         session::{Session, libseat::LibSeatSession, libseat::LibSeatSessionNotifier},
         udev::{UdevBackend, UdevEvent, primary_gpu},
     },
+    desktop::utils::OutputPresentationFeedback,
     output::OutputModeSource,
     reexports::{
         drm::{control::crtc, node::DrmNode},
@@ -32,6 +38,8 @@ use smithay::{
     },
     utils::{DeviceFd, Scale},
 };
+use smithay::reexports::drm::control::Device as DrmControlDevice;
+use std::time::Duration;
 use tracing::info;
 
 mod outputs;
@@ -43,10 +51,14 @@ const SUPPORTED_COLOR_FORMATS: [Fourcc; 4] = [
     Fourcc::Abgr8888,
 ];
 
+pub struct QueuedFrameData {
+    pub presentation: OutputPresentationFeedback,
+}
+
 pub type SessionCompositor = DrmCompositor<
     GbmAllocator<DrmDeviceFd>,
     GbmFramebufferExporter<DrmDeviceFd>,
-    (),
+    QueuedFrameData,
     DrmDeviceFd,
 >;
 
@@ -198,7 +210,55 @@ impl SessionDevice {
             session_output
                 .compositor
                 .set_output_mode_source(OutputModeSource::Auto(output.downgrade()));
+            if session_output.dmabuf_feedback.is_none()
+                && let Some(render_node) = self.import_node
+            {
+                session_output.dmabuf_feedback = build_surface_dmabuf_feedback(
+                    &session_output.compositor,
+                    state.dmabuf_formats.clone(),
+                    render_node,
+                )
+                .ok();
+            }
         }
+    }
+
+    pub fn queue_redraws(&mut self) {
+        for output in &mut self.outputs {
+            output.frame_state.queue_redraw();
+        }
+    }
+
+    pub fn any_output_should_render(&self) -> bool {
+        self.outputs
+            .iter()
+            .any(|output| output.frame_state.redraw_state.should_render())
+    }
+
+    pub fn output_by_name_mut(&mut self, name: &str) -> Option<&mut SessionOutput> {
+        self.outputs
+            .iter_mut()
+            .find(|output| output.descriptor.name == name)
+    }
+
+    pub fn non_primary_output_names(&self) -> Vec<String> {
+        self.outputs
+            .iter()
+            .enumerate()
+            .filter(|(index, _)| *index != self.primary)
+            .map(|(_, output)| output.descriptor.name.clone())
+            .collect()
+    }
+
+    pub fn renderer_and_output_by_name(
+        &mut self,
+        name: &str,
+    ) -> Option<(&mut GlesRenderer, &mut SessionOutput)> {
+        let index = self
+            .outputs
+            .iter()
+            .position(|output| output.descriptor.name == name)?;
+        Some((&mut self.renderer, &mut self.outputs[index]))
     }
 
     pub fn rescan_outputs(&mut self, display_config: &DisplayConfig) -> Result<bool, DrmError> {
@@ -252,6 +312,7 @@ impl SessionDevice {
         (&mut self.renderer, &mut self.outputs[self.primary])
     }
 
+    #[allow(dead_code)]
     pub fn renderer_and_outputs(&mut self) -> (&mut GlesRenderer, usize, &mut [SessionOutput]) {
         (&mut self.renderer, self.primary, &mut self.outputs)
     }
@@ -260,6 +321,7 @@ impl SessionDevice {
         &self.outputs[self.primary]
     }
 
+    #[allow(dead_code)]
     pub fn is_primary_crtc(&self, crtc: crtc::Handle) -> bool {
         self.primary_output().compositor.crtc() == crtc
     }
@@ -283,22 +345,62 @@ impl SessionDevice {
     }
 
     pub fn sync_cursor(&mut self, state: &mut KestrelState) {
+        use smithay::input::pointer::CursorImageStatus;
+
+        if matches!(state.cursor_image, CursorImageStatus::Surface(_)) {
+            let crtcs = self
+                .outputs
+                .iter()
+                .map(|output| output.compositor.crtc())
+                .collect::<Vec<_>>();
+            for crtc in crtcs {
+                #[allow(deprecated)]
+                let _ = DrmControlDevice::set_cursor2(
+                    self.drm.device_fd(),
+                    crtc,
+                    Option::<&smithay::reexports::drm::control::dumbbuffer::DumbBuffer>::None,
+                    (0, 0),
+                );
+            }
+            self.cursor.reset();
+            return;
+        }
+
         let crtcs = self
             .outputs
             .iter()
-            .map(|output| output.compositor.crtc());
+            .map(|output| output.compositor.crtc())
+            .collect::<Vec<_>>();
         self.cursor.sync(&self.drm, crtcs, state);
     }
 
-    pub fn frame_submitted(&mut self, crtc: crtc::Handle) -> Result<(), DrmError> {
-        let Some(output) = self
+    pub fn frame_submitted(
+        &mut self,
+        crtc: crtc::Handle,
+    ) -> Result<Option<SubmittedFrameInfo>, DrmError> {
+        let Some(index) = self
             .outputs
-            .iter_mut()
-            .find(|output| output.compositor.crtc() == crtc)
+            .iter()
+            .position(|output| output.compositor.crtc() == crtc)
         else {
-            return Ok(());
+            return Ok(None);
         };
-        output.frame_submitted()
+        let output = &mut self.outputs[index];
+        if !output.frame_queued {
+            return Ok(None);
+        }
+        let queued = output
+            .compositor
+            .frame_submitted()
+            .map_err(compositor_error)?;
+        output.frame_queued = false;
+        let redraw_needed = output.frame_state.frame_submitted();
+        Ok(Some(SubmittedFrameInfo {
+            descriptor_name: output.descriptor.name.clone(),
+            queued,
+            redraw_needed,
+            sequence: output.frame_state.frame_callback_sequence,
+        }))
     }
 
     pub fn pause(&mut self) {
@@ -328,10 +430,19 @@ impl SessionDevice {
     }
 }
 
+pub struct SubmittedFrameInfo {
+    pub descriptor_name: String,
+    pub queued: Option<QueuedFrameData>,
+    pub redraw_needed: bool,
+    pub sequence: u32,
+}
+
 pub struct SessionOutput {
     pub descriptor: OutputDescriptor,
     output: ConnectedOutput,
     pub compositor: SessionCompositor,
+    pub frame_state: OutputFrameState,
+    pub dmabuf_feedback: Option<SurfaceDmabufFeedback>,
     frame_queued: bool,
 }
 
@@ -346,17 +457,6 @@ impl SessionOutput {
 
     fn discard_pending_frame(&mut self) {
         self.frame_queued = false;
-    }
-
-    fn frame_submitted(&mut self) -> Result<(), DrmError> {
-        if !self.frame_queued {
-            return Ok(());
-        }
-        self.compositor
-            .frame_submitted()
-            .map_err(compositor_error)?;
-        self.frame_queued = false;
-        Ok(())
     }
 }
 
@@ -402,6 +502,8 @@ fn create_session_outputs(
     outputs
         .into_iter()
         .map(|output| {
+            let descriptor = output.descriptor.clone();
+            let refresh = refresh_interval_for_descriptor(&descriptor);
             let compositor = create_compositor(
                 drm,
                 gbm.clone(),
@@ -410,9 +512,11 @@ fn create_session_outputs(
                 &output,
             )?;
             Ok(SessionOutput {
-                descriptor: output.descriptor.clone(),
+                descriptor,
                 output,
                 compositor,
+                frame_state: OutputFrameState::new(refresh),
+                dmabuf_feedback: None,
                 frame_queued: false,
             })
         })
@@ -421,6 +525,11 @@ fn create_session_outputs(
 
 fn output_scale(scale: f64) -> Scale<f64> {
     Scale::from(scale.clamp(0.5, 4.0))
+}
+
+fn refresh_interval_for_descriptor(descriptor: &OutputDescriptor) -> Duration {
+    let refresh = descriptor.refresh_millihertz.max(1) as u64;
+    Duration::from_nanos((1_000_000_000_000u64 + refresh / 2) / refresh)
 }
 
 fn compositor_error<E: std::fmt::Display>(error: E) -> DrmError {

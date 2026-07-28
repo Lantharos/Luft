@@ -1,4 +1,4 @@
-use crate::{client::ClientState, render::handle_commit, state::KestrelState};
+use crate::{client::ClientState, commit, state::KestrelState};
 use smithay::{
     backend::allocator::Buffer,
     delegate_alpha_modifier, delegate_compositor, delegate_cursor_shape, delegate_data_device,
@@ -12,7 +12,7 @@ use smithay::{
     input::{
         Seat, SeatHandler,
         keyboard::LedState,
-        pointer::{CursorIcon, CursorImageStatus},
+        pointer::CursorImageStatus,
     },
     output::Output,
     reexports::wayland_server::{
@@ -51,13 +51,8 @@ use smithay::{
 };
 #[cfg(feature = "session-backend")]
 use smithay::{
-    backend::renderer::sync::Fence,
     delegate_drm_syncobj,
-    wayland::{
-        compositor,
-        compositor::{BufferAssignment, SurfaceAttributes},
-        drm_syncobj::{DrmSyncobjCachedState, DrmSyncobjHandler, DrmSyncobjState},
-    },
+    wayland::drm_syncobj::{DrmSyncobjHandler, DrmSyncobjState},
 };
 use tracing::debug;
 
@@ -221,38 +216,12 @@ impl CompositorHandler for KestrelState {
     }
 
     fn new_surface(&mut self, surface: &WlSurface) {
-        self.update_surface_scale(surface);
-        #[cfg(feature = "session-backend")]
-        install_syncobj_pre_commit_hook(surface);
+        commit::install_surface_hooks(self, surface);
         self.mark_scene_dirty();
     }
 
     fn commit(&mut self, surface: &WlSurface) {
-        let popup_needs_render = self.popup_manager.find_popup(surface).is_some();
-        let needs_render = self.commit_surface_needs_render(surface) || popup_needs_render;
-        handle_commit(surface);
-        self.popup_manager.commit(surface);
-        let popup_mapped = !popup_needs_render && self.popup_manager.find_popup(surface).is_some();
-        let initial_size_adopted = self.adopt_initial_toplevel_size(surface);
-        let decoration_changed = self.reconcile_decoration_after_commit(surface);
-        let foreign_toplevel_changed = self.sync_foreign_toplevel(surface);
-        if needs_render || popup_mapped {
-            self.mark_scene_dirty();
-        }
-        if initial_size_adopted {
-            self.mark_scene_dirty();
-        }
-        if decoration_changed {
-            self.mark_scene_dirty();
-        }
-        if foreign_toplevel_changed {
-            self.mark_scene_dirty();
-        }
-        if let Some(layer_surface) = self.layer_surface_for_commit(surface) {
-            self.arrange_layers();
-            self.mark_scene_dirty();
-            layer_surface.send_pending_configure();
-        }
+        commit::surface_commit(self, surface);
     }
 }
 
@@ -279,11 +248,9 @@ impl SeatHandler for KestrelState {
 
     fn cursor_image(&mut self, _seat: &Seat<Self>, image: CursorImageStatus) {
         self.frame_cursor_active = false;
-        self.cursor_image = match image {
-            CursorImageStatus::Surface(_) => CursorImageStatus::Named(CursorIcon::Default),
-            image => image,
-        };
+        self.cursor_image = image;
         self.cursor_dirty = true;
+        self.mark_scene_dirty();
     }
 
     fn led_state_changed(&mut self, _seat: &Seat<Self>, led_state: LedState) {
@@ -321,50 +288,3 @@ delegate_single_pixel_buffer!(KestrelState);
 #[cfg(feature = "session-backend")]
 delegate_drm_syncobj!(KestrelState);
 
-#[cfg(feature = "session-backend")]
-fn install_syncobj_pre_commit_hook(surface: &WlSurface) {
-    compositor::add_pre_commit_hook::<KestrelState, _>(surface, |state, _dh, surface| {
-        queue_syncobj_acquire(state, surface);
-    });
-}
-
-#[cfg(feature = "session-backend")]
-fn queue_syncobj_acquire(state: &mut KestrelState, surface: &WlSurface) {
-    let Some(client) = surface.client() else {
-        return;
-    };
-
-    let acquire = compositor::with_states(surface, |states| {
-        let mut attributes = states.cached_state.get::<SurfaceAttributes>();
-        if !matches!(
-            attributes.pending().buffer,
-            Some(BufferAssignment::NewBuffer(_))
-        ) {
-            return None;
-        }
-
-        let mut syncobj = states.cached_state.get::<DrmSyncobjCachedState>();
-        let pending = syncobj.pending();
-        pending
-            .release_point
-            .as_ref()
-            .and_then(|_| pending.acquire_point.clone())
-    });
-
-    let Some(acquire) = acquire else {
-        return;
-    };
-    if acquire.is_signaled() {
-        return;
-    }
-
-    match acquire.generate_blocker() {
-        Ok((blocker, source)) => {
-            compositor::add_blocker(surface, blocker);
-            state.queue_syncobj_source(client, source);
-        }
-        Err(error) => {
-            tracing::warn!(%error, "failed to create drm syncobj acquire blocker");
-        }
-    }
-}

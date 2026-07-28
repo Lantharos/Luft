@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "session-backend"), allow(dead_code))]
+
 use smithay::{
     desktop::utils::{OutputPresentationFeedback, take_presentation_feedback_surface_tree},
     output::Output,
@@ -67,6 +69,18 @@ impl FrameClock {
 }
 
 impl FrameTime {
+    pub fn time(&self) -> Time<Monotonic> {
+        self.time
+    }
+
+    pub fn refresh(&self) -> Refresh {
+        self.refresh
+    }
+
+    pub fn sequence(&self) -> u64 {
+        self.sequence
+    }
+
     fn millis(self) -> u32 {
         self.time.as_millis()
     }

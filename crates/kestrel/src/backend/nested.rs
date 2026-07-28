@@ -1,46 +1,45 @@
-use super::nested_timing::{host_refresh_millihertz, idle_wait, pace_frame, refresh_interval};
+use super::nested_timing::{host_refresh_millihertz, refresh_interval};
 use crate::{
-    background::Background,
-    background_effect,
     client::ClientState,
-    damage::DamageTracker,
-    frame_clock::{FrameClock, send_surface_frame_tree},
+    damage::DamageRenderResult,
+    frame_clock::{send_surface_frame_tree, FrameClock},
     input::handle_input_event,
     ipc::IpcServer,
-    layers,
     output::NestedOutput,
-    render::{RenderStage, render_stage_elements},
-    scene_backdrop::SceneBackdrop,
-    scene_blur::BlurEffectManager,
-    scene_render::{
-        SceneRenderRequest, collect_window_scene_layers, render_scene,
-    },
+    render::{NestedFrameRenderer, SceneFrameInput},
+    scanout::update_primary_scanout_output,
     session_services,
     shell::ShellProcess,
-    state::KestrelState,
+    state::{refresh_space, KestrelState},
     xwayland::XwaylandSatellite,
 };
 use luft_config::LuftConfig;
-use luft_ipc::{ShellStatus, shell_socket_path};
+use luft_ipc::{shell_socket_path, ShellStatus};
+use calloop::{
+    timer::{TimeoutAction, Timer},
+    EventLoop, LoopSignal, PostAction,
+    generic::Generic,
+};
 use smithay::{
     backend::{
         renderer::gles::GlesRenderer,
-        winit::{self, WinitEvent},
+        winit::{self, WinitEvent, WinitGraphicsBackend},
     },
-    input::Seat,
-    input::pointer::CursorImageStatus,
-    reexports::{
-        wayland_server::{Display, ListeningSocket},
-        winit::platform::pump_events::PumpStatus,
+    input::{
+        keyboard::KeyboardHandle,
+        pointer::{CursorImageStatus, PointerHandle},
+        Seat,
     },
-    wayland::shell::wlr_layer::Layer,
+    wayland::socket::ListeningSocketSource,
 };
+use smithay::reexports::wayland_server::{Display, DisplayHandle};
 use std::{
+    path::PathBuf,
     sync::Arc,
     time::{Duration, Instant},
 };
 use thiserror::Error;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 const REFRESH_CHECK_INTERVAL: Duration = Duration::from_millis(500);
 const PENDING_REFRESH_CHECK_INTERVAL: Duration = Duration::from_millis(50);
@@ -51,348 +50,452 @@ pub struct NestedOptions {
     pub socket_name: Option<String>,
 }
 
-pub fn run(options: NestedOptions) -> Result<(), NestedError> {
-    let mut display: Display<KestrelState> = Display::new()?;
-    let dh = display.handle();
-    let mut state = KestrelState::new(&dh, options.config);
-    let ipc = IpcServer::bind()?;
-    let shell_control_socket = shell_socket_path(ipc.path());
-    state.shell_control_path = Some(shell_control_socket.clone());
-    let mut output = NestedOutput::default();
-    let listener = bind_socket(options.socket_name.as_deref())?;
-    let socket_name = listener
-        .socket_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("unknown")
-        .to_string();
+struct NestedLoopState {
+    state: KestrelState,
+    display_handle: DisplayHandle,
+    backend: WinitGraphicsBackend<GlesRenderer>,
+    scene_renderer: NestedFrameRenderer,
+    output: NestedOutput,
+    frame_clock: FrameClock,
+    ipc: IpcServer,
+    shell: Option<ShellProcess>,
+    shell_control_socket: PathBuf,
+    xwayland: XwaylandSatellite,
+    keyboard: KeyboardHandle<KestrelState>,
+    pointer: PointerHandle<KestrelState>,
+    socket_name: String,
+    loop_signal: LoopSignal,
+    host_refresh_known: bool,
+    host_frame_presented: bool,
+}
 
-    let (mut backend, mut event_loop) = winit::init::<GlesRenderer>()?;
-    backend.window().set_decorations(true);
-    let mut host_refresh_known = match host_refresh_millihertz(backend.window()) {
-        Some(refresh) => {
-            output.set_refresh(refresh);
-            true
-        }
-        None => false,
-    };
-    state.set_output_refresh(output.refresh_millihertz);
-    let mut background = Background::new(state.config.compositor.background_image.clone());
-    let keyboard = state.seat.add_keyboard(Default::default(), 200, 200)?;
-    state.keyboard = Some(keyboard.clone());
-    let pointer = state.seat.add_pointer();
-    let mut frame_interval = refresh_interval(output.refresh_millihertz);
-    let mut frame_clock = FrameClock::new(frame_interval);
-    let mut last_refresh_check = Instant::now() - REFRESH_CHECK_INTERVAL;
-    let mut last_process_check = Instant::now() - PROCESS_CHECK_INTERVAL;
-    let mut damage_tracker = DamageTracker::from_output(state.output());
-    let mut clients = Vec::new();
-    let mut blur_effects = BlurEffectManager::default();
-    let mut scene_backdrop = SceneBackdrop::default();
-    let mut visible_popups = state.has_visible_popups();
+pub fn run(options: NestedOptions) -> Result<(), NestedError> {
+    let mut event_loop = EventLoop::<NestedLoopState>::try_new()?;
+    let loop_signal = event_loop.get_signal();
+    let display: Display<KestrelState> = Display::new()?;
+    let display_handle = display.handle();
+    let (backend, winit) = winit::init::<GlesRenderer>()?;
+    let mut compositor = NestedLoopState::new(options, display_handle, loop_signal, backend)?;
+    register_sources(&mut event_loop, display, winit, &mut compositor)?;
+
+    compositor.xwayland =
+        XwaylandSatellite::start(compositor.state.config.compositor.xwayland, &compositor.socket_name);
+    compositor.state.xwayland_status = compositor.xwayland.status();
+    compositor.state.xwayland_display = compositor.xwayland.display().map(str::to_string);
+
+    session_services::start(
+        &compositor.socket_name,
+        compositor.state.xwayland_display.as_deref(),
+    );
+
+    compositor.shell = Some(ShellProcess::start(
+        &compositor.socket_name,
+        compositor.state.xwayland_display.as_deref(),
+        compositor.ipc.path(),
+        &compositor.shell_control_socket,
+        compositor.output.refresh_millihertz,
+        compositor.output.size.w,
+        compositor.output.size.h,
+        true,
+    ));
+    compositor.state.shell_status = compositor
+        .shell
+        .as_ref()
+        .map(ShellProcess::status)
+        .unwrap_or(ShellStatus::NotStarted);
+
+    if compositor.state.shell_status == ShellStatus::Failed {
+        eprintln!(
+            "warning: luft-shell was not found; build it with `cargo build --bin luft-shell` and ensure it sits beside kestrel or is on PATH"
+        );
+    } else if compositor.state.shell_status != ShellStatus::Running {
+        eprintln!(
+            "warning: luft-shell did not start (status={:?}); check ~/.config/luft/logs/luft-shell.log",
+            compositor.state.shell_status
+        );
+    }
 
     println!("Kestrel nested compositor is running");
-    println!("WAYLAND_DISPLAY={socket_name}");
-    let mut xwayland = XwaylandSatellite::start(state.config.compositor.xwayland, &socket_name);
-    state.xwayland_status = xwayland.status();
-    state.xwayland_display = xwayland.display().map(str::to_string);
-    if let Some(display) = &state.xwayland_display {
+    println!("WAYLAND_DISPLAY={}", compositor.socket_name);
+    if let Some(display) = &compositor.state.xwayland_display {
         println!("DISPLAY={display}");
     }
-    session_services::start(&socket_name, state.xwayland_display.as_deref());
-    let mut shell = ShellProcess::start(
-        &socket_name,
-        state.xwayland_display.as_deref(),
-        ipc.path(),
-        &shell_control_socket,
-        output.refresh_millihertz,
-        output.size.w,
-        output.size.h,
-    );
-    state.shell_status = shell.status();
     info!(
-        wayland_display = %socket_name,
-        ipc_socket = %ipc.path().display(),
-        refresh_millihertz = output.refresh_millihertz,
+        wayland_display = %compositor.socket_name,
+        ipc_socket = %compositor.ipc.path().display(),
+        refresh_millihertz = compositor.output.refresh_millihertz,
         "nested compositor ready"
     );
 
-    loop {
+    event_loop.run(None, &mut compositor, |_| {})?;
+    Ok(())
+}
+
+impl NestedLoopState {
+    fn new(
+        options: NestedOptions,
+        display_handle: DisplayHandle,
+        loop_signal: LoopSignal,
+        backend: WinitGraphicsBackend<GlesRenderer>,
+    ) -> Result<Self, NestedError> {
+        let state = KestrelState::new(&display_handle, options.config);
+        let ipc = IpcServer::bind()?;
+        let shell_control_socket = shell_socket_path(ipc.path());
+        let mut output = NestedOutput::default();
+
+        backend.window().set_decorations(true);
+
+        let size = backend.window_size();
+        output.resize(size);
+        let mut state = state;
+        state.set_output_size(output.size);
+        state.set_primary_output_scale(backend.scale_factor());
+        state.shell_control_path = Some(shell_control_socket.clone());
+
+        let host_refresh_known = host_refresh_millihertz(backend.window()).is_some();
+        if let Some(refresh) = host_refresh_millihertz(backend.window()) {
+            output.set_refresh(refresh);
+        }
+        state.set_output_refresh(output.refresh_millihertz);
+
+        let keyboard = state.seat.add_keyboard(Default::default(), 200, 200)?;
+        state.keyboard = Some(keyboard.clone());
+        let pointer = state.seat.add_pointer();
+
+        let socket_name = options.socket_name.unwrap_or_default();
+
+        let scene_renderer = NestedFrameRenderer::new(state.output());
+
+        Ok(Self {
+            state,
+            display_handle,
+            backend,
+            scene_renderer,
+            output,
+            frame_clock: FrameClock::new(refresh_interval(output.refresh_millihertz)),
+            ipc,
+            shell: None,
+            shell_control_socket,
+            xwayland: XwaylandSatellite::start(false, "pending"),
+            keyboard,
+            pointer,
+            socket_name,
+            loop_signal,
+            host_refresh_known,
+            host_frame_presented: false,
+        })
+    }
+
+    fn handle_resized(
+        &mut self,
+        size: smithay::utils::Size<i32, smithay::utils::Physical>,
+        scale_factor: f64,
+    ) {
+        let size_changed = self.output.resize(size);
+        if size_changed {
+            self.state.set_output_size(self.output.size);
+        }
+        let scale_changed = self.state.set_primary_output_scale(scale_factor);
+        if size_changed || scale_changed {
+            self.scene_renderer.reset_buffers(&self.state);
+            self.request_redraw();
+        }
+    }
+
+    fn request_redraw(&self) {
+        self.backend.window().request_redraw();
+    }
+
+    fn process_maintenance(&mut self) {
         let frame_started = Instant::now();
-        let mut force_full_damage = false;
-        let status = event_loop.dispatch_new_events(|event| match event {
-            WinitEvent::Resized { size, .. } if output.resize(size) => {
-                state.set_output_size(output.size);
-                damage_tracker = DamageTracker::from_output(state.output());
-                force_full_damage = true;
-            }
-            WinitEvent::Input(event) => {
-                handle_input_event(&mut state, &keyboard, &pointer, event, output.size);
-            }
-            WinitEvent::Focus(focused) => debug!(focused, "nested host focus changed"),
-            WinitEvent::CloseRequested => {}
-            _ => {}
-        });
 
-        if let PumpStatus::Exit(_) = status {
-            return Ok(());
+        self.state.remove_dead_windows();
+        self.state.send_finished_window_closes();
+        self.state.cleanup_layers();
+        self.state.cleanup_output();
+        refresh_space(&mut self.state);
+
+        self.xwayland.reap(&self.socket_name);
+        let xwayland_status = self.xwayland.status();
+        if self.state.xwayland_status != xwayland_status {
+            self.state.xwayland_status = xwayland_status;
+            self.state.mark_scene_content_dirty();
+            self.request_redraw();
+        }
+        let xwayland_display = self.xwayland.display().map(str::to_string);
+        if self.state.xwayland_display != xwayland_display {
+            self.state.xwayland_display = xwayland_display;
+            self.state.mark_scene_content_dirty();
+            self.request_redraw();
+        }
+        if self.xwayland.restart_due(frame_started) {
+            self.request_redraw();
         }
 
-        if output.resize(backend.window_size()) {
-            state.set_output_size(output.size);
-            damage_tracker = DamageTracker::from_output(state.output());
-            force_full_damage = true;
+        if self.ipc.handle_pending(&mut self.state, &self.keyboard).unwrap_or(false) {
+            self.state.mark_scene_structural_dirty();
+            self.request_redraw();
         }
-        let refresh_check_interval = if host_refresh_known {
-            REFRESH_CHECK_INTERVAL
-        } else {
-            PENDING_REFRESH_CHECK_INTERVAL
-        };
-        if last_refresh_check.elapsed() >= refresh_check_interval {
-            last_refresh_check = Instant::now();
-            if let Some(refresh) = host_refresh_millihertz(backend.window()) {
-                host_refresh_known = true;
-                if output.set_refresh(refresh) {
-                    frame_interval = refresh_interval(output.refresh_millihertz);
-                    frame_clock.set_refresh(frame_interval);
-                    state.set_output_refresh(output.refresh_millihertz);
-                    info!(
-                        refresh_millihertz = output.refresh_millihertz,
-                        "nested host refresh changed"
-                    );
-                }
+
+        if self.state.take_shell_restart_requested() {
+            if let Some(shell) = &mut self.shell {
+                shell.restart();
             }
-        }
-        let removed_windows = state.remove_dead_windows();
-        let finished_window_closes = state.send_finished_window_closes();
-        state.cleanup_layers();
-        state.cleanup_output();
-        let process_check_due = last_process_check.elapsed() >= PROCESS_CHECK_INTERVAL
-            || xwayland.restart_due(frame_started)
-            || shell.restart_due(frame_started);
-        if process_check_due {
-            last_process_check = Instant::now();
-            xwayland.reap(&socket_name);
-            let xwayland_status = xwayland.status();
-            if state.xwayland_status != xwayland_status {
-                state.xwayland_status = xwayland_status;
-                state.mark_scene_dirty();
-            }
-            let xwayland_display = xwayland.display().map(str::to_string);
-            if state.xwayland_display != xwayland_display {
-                state.xwayland_display = xwayland_display;
-                session_services::sync_activation_environment(
-                    &socket_name,
-                    state.xwayland_display.as_deref(),
-                );
-                state.mark_scene_dirty();
-            }
-        }
-        let shell_restarted = state.take_shell_restart_requested();
-        if shell_restarted {
-            shell.restart();
-        } else if process_check_due {
-            shell.reap(&mut state.config);
-        }
-        if process_check_due || shell_restarted {
+        } else if let Some(shell) = &mut self.shell {
+            shell.reap(&mut self.state.config);
             let shell_status = shell.status();
-            if state.shell_status != shell_status {
-                state.shell_status = shell_status;
+            if self.state.shell_status != shell_status {
+                self.state.shell_status = shell_status;
                 if shell_status != ShellStatus::Running {
-                    damage_tracker = DamageTracker::from_output(state.output());
-                    scene_backdrop.reset(state.output());
+                    self.scene_renderer.reset_buffers(&self.state);
                 }
-                state.mark_scene_dirty();
+                self.state.mark_scene_dirty();
+                self.request_redraw();
             }
         }
-        if ipc.handle_pending(&mut state, &keyboard)? {
-            state.mark_scene_dirty();
-        }
+    }
 
-        while let Some(stream) = listener.accept()? {
-            let client = display
-                .handle()
-                .insert_client(stream, Arc::new(ClientState::default()))?;
-            clients.push(client);
-            debug!(connected_clients = clients.len(), "accepted wayland client");
+    fn dispatch_frame_callbacks(
+        &mut self,
+        render_element_states: &smithay::backend::renderer::element::RenderElementStates,
+    ) {
+        let frame_time = self.frame_clock.next_frame();
+        update_primary_scanout_output(&self.state, self.state.output(), render_element_states);
+        for surface in self.state.frame_callback_surfaces() {
+            send_surface_frame_tree(self.state.output(), &surface, frame_time);
         }
+    }
 
-        display.dispatch_clients(&mut state)?;
-        display.flush_clients()?;
-        sync_host_cursor(&backend, &mut state);
-        if background.set_path(state.config.compositor.background_image.clone()) {
-            force_full_damage = true;
-        }
+    fn render_frame(&mut self) {
+        let removed_windows = self.state.remove_dead_windows();
+        let finished_window_closes = self.state.send_finished_window_closes();
+        let content_dirty = self.state.scene_content_dirty();
 
-        let workspace_transition_active = state.workspace_transition().is_some();
-        let current_popups = state.has_visible_popups();
-        let popup_visibility_changed =
-            std::mem::replace(&mut visible_popups, current_popups) != current_popups;
-        let content_render_needed = force_full_damage
-            || state.scene_dirty()
-            || popup_visibility_changed
-            || removed_windows
-            || finished_window_closes
-            || state.animations_active()
-            || workspace_transition_active;
+        let content_render_needed = self.scene_renderer.content_render_needed(
+            &self.state,
+            removed_windows,
+            finished_window_closes,
+            false,
+        );
+
         if !content_render_needed {
-            idle_wait();
-            continue;
+            if self.state.has_pending_frame_callbacks() {
+                self.dispatch_frame_callbacks(
+                    &smithay::backend::renderer::element::RenderElementStates::default(),
+                );
+            }
+            if self.state.animations_active() || self.state.scene_needs_frame() {
+                self.request_redraw();
+            }
+            return;
         }
 
-        let (renderer, mut framebuffer) = backend.bind()?;
-        let fullscreen_active = state
-            .windows
-            .fullscreen_on_workspace(state.layout.active_workspace())
-            .is_some();
-        let mut top_targets = if fullscreen_active {
-            Vec::new()
-        } else {
-            layers::render_targets(state.output(), Layer::Top)
+        refresh_space(&mut self.state);
+
+        let frame_input = SceneFrameInput {
+            state: &self.state,
+            removed_windows,
+            finished_window_closes,
+            force_full_damage: content_dirty,
         };
-        if !fullscreen_active {
-            top_targets.extend(background_effect::layer_popup_blur_targets(
-                &state,
-                Layer::Top,
-            ));
+
+        if self
+            .scene_renderer
+            .prepare(self.backend.renderer(), frame_input)
+            .is_err()
+        {
+            warn!("nested prepare failed");
+            if self.state.has_pending_frame_callbacks() {
+                self.dispatch_frame_callbacks(
+                    &smithay::backend::renderer::element::RenderElementStates::default(),
+                );
+            }
+            self.request_redraw();
+            return;
         }
-        let mut overlay_targets = if fullscreen_active {
-            Vec::new()
-        } else {
-            layers::render_targets(state.output(), Layer::Overlay)
-        };
-        if !fullscreen_active {
-            overlay_targets.extend(background_effect::layer_popup_blur_targets(
-                &state,
-                Layer::Overlay,
-            ));
+
+        let cursor_visible = !matches!(self.state.cursor_image, CursorImageStatus::Surface(_));
+        let render_result = self.backend.bind().and_then(|(renderer, mut framebuffer)| {
+                let age = 0;
+                let mut output = match self.scene_renderer.present(
+                    &self.state,
+                    renderer,
+                    &mut framebuffer,
+                    age,
+                )? {
+                    Some(output) => output,
+                    None => {
+                        return Ok(DamageRenderResult {
+                            damage: None,
+                            states: smithay::backend::renderer::element::RenderElementStates::default(),
+                        });
+                    }
+                };
+
+                if output.damage.is_none() && content_dirty {
+                    self.scene_renderer.reset_damage(&self.state);
+                    output = self
+                        .scene_renderer
+                        .render_prepared(&self.state, renderer, &mut framebuffer, 0)?;
+                }
+
+                Ok(output)
+            });
+
+        match render_result {
+            Ok(output) => {
+                let submit_result = match output.damage.as_deref() {
+                    Some(damage) => self.backend.submit(Some(damage)),
+                    None => self.backend.submit(None),
+                };
+                if submit_result.is_err() {
+                    warn!("nested submit failed");
+                    self.request_redraw();
+                    return;
+                }
+                self.host_frame_presented = true;
+                self.backend.window().set_cursor_visible(cursor_visible);
+                self.dispatch_frame_callbacks(&output.states);
+                self.state.clear_frame_dirty();
+                refresh_space(&mut self.state);
+            }
+            Err(err) => {
+                warn!("nested render error: {err}");
+                self.request_redraw();
+                return;
+            }
         }
-        let background_element = background.render_element(renderer, output.size)?;
-        let window_effect_targets = background_effect::window_blur_targets(&state);
-        let mut blur_targets = window_effect_targets.clone();
-        blur_targets.extend(top_targets.iter().cloned());
-        blur_targets.extend(overlay_targets.iter().cloned());
-        blur_effects.retain_targets(&blur_targets);
-        let background_layer = render_stage_elements(
-            renderer,
-            &state,
-            RenderStage::Layer(Layer::Background),
-        );
-        let bottom_layer = render_stage_elements(
-            renderer,
-            &state,
-            RenderStage::Layer(Layer::Bottom),
-        );
-        let top_layer = if fullscreen_active {
-            Vec::new()
-        } else {
-            render_stage_elements(renderer, &state, RenderStage::Layer(Layer::Top))
-        };
-        let overlay_layer = if fullscreen_active {
-            Vec::new()
-        } else {
-            render_stage_elements(renderer, &state, RenderStage::Layer(Layer::Overlay))
-        };
-        if force_full_damage || removed_windows || finished_window_closes {
-            damage_tracker.reset(state.output());
-            scene_backdrop.reset(state.output());
+
+        if self.state.animations_active() || self.state.scene_needs_frame() {
+            self.request_redraw();
         }
-        let target_transform = state.output_transform();
-        let window_layers = collect_window_scene_layers(
-            renderer,
-            &state,
-            &mut blur_effects,
-            output.size,
-            target_transform,
-            Some(&scene_backdrop),
-        )?;
-        let top_blurs = blur_effects.elements_for(
-            output.size,
-            target_transform,
-            &top_targets,
-            Some(&scene_backdrop),
-        );
-        let overlay_blurs = blur_effects.elements_for(
-            output.size,
-            target_transform,
-            &overlay_targets,
-            Some(&scene_backdrop),
-        );
-        let submit_damage = render_scene(
-            &mut damage_tracker,
-            &mut scene_backdrop,
-            renderer,
-            &mut framebuffer,
-            SceneRenderRequest {
-                output_size: output.size,
-                background: background_element,
-                background_layer: &background_layer,
-                bottom_layer: &bottom_layer,
-                window_layers: &window_layers,
-                top_blurs: &top_blurs,
-                top_layer: &top_layer,
-                overlay_blurs: &overlay_blurs,
-                overlay_layer: &overlay_layer,
+    }
+}
+
+fn register_sources(
+    event_loop: &mut EventLoop<NestedLoopState>,
+    display: Display<KestrelState>,
+    winit: smithay::backend::winit::WinitEventLoop,
+    compositor: &mut NestedLoopState,
+) -> Result<(), NestedError> {
+    let handle = event_loop.handle();
+
+    let listening = if compositor.socket_name.is_empty() {
+        ListeningSocketSource::new_auto().map_err(NestedError::Socket)?
+    } else {
+        ListeningSocketSource::with_name(&compositor.socket_name).map_err(NestedError::Socket)?
+    };
+    compositor.socket_name = listening
+        .socket_name()
+        .to_string_lossy()
+        .into_owned();
+
+    handle
+        .insert_source(listening, |client_stream, _, nested| {
+            let _ = nested.display_handle.insert_client(
+                client_stream,
+                Arc::new(ClientState::default()),
+            );
+            debug!("accepted wayland client");
+        })
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
+
+    handle
+        .insert_source(
+            Generic::new(display, calloop::Interest::READ, calloop::Mode::Level),
+            |_, display, nested| {
+                unsafe {
+                    display.get_mut().dispatch_clients(&mut nested.state)?;
+                    display.get_mut().flush_clients()?;
+                }
+                if nested.state.scene_needs_frame() {
+                    nested.request_redraw();
+                }
+                Ok(PostAction::Continue)
             },
-            0,
-        )?;
-        let Some(submit_damage) = submit_damage else {
-            state.mark_scene_dirty();
-            drop(framebuffer);
-            idle_wait();
-            continue;
-        };
-        state.take_scene_dirty();
-        drop(framebuffer);
+        )
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
 
-        let frame_time = frame_clock.next_frame();
-        for surface in state.frame_callback_surfaces() {
-            send_surface_frame_tree(state.output(), &surface, frame_time);
-        }
+    let refresh_interval = if compositor.host_refresh_known {
+        REFRESH_CHECK_INTERVAL
+    } else {
+        PENDING_REFRESH_CHECK_INTERVAL
+    };
+    handle
+        .insert_source(Timer::from_duration(refresh_interval), move |_, _, nested| {
+            if let Some(refresh) = host_refresh_millihertz(nested.backend.window()) {
+                nested.host_refresh_known = true;
+                if nested.output.set_refresh(refresh) {
+                    nested
+                        .frame_clock
+                        .set_refresh(super::nested_timing::refresh_interval(refresh));
+                    nested.state.set_output_refresh(refresh);
+                    nested.request_redraw();
+                }
+            }
+            TimeoutAction::ToDuration(refresh_interval)
+        })
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
 
-        backend.submit(Some(&submit_damage))?;
-        pace_frame(frame_started, frame_interval);
-    }
-}
+    handle
+        .insert_source(Timer::from_duration(PROCESS_CHECK_INTERVAL), |_, _, nested| {
+            nested.process_maintenance();
+            TimeoutAction::ToDuration(PROCESS_CHECK_INTERVAL)
+        })
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
 
-fn bind_socket(socket_name: Option<&str>) -> Result<ListeningSocket, NestedError> {
-    match socket_name {
-        Some(name) => Ok(ListeningSocket::bind(name)?),
-        None => Ok(ListeningSocket::bind_auto("luft", 1..33)?),
-    }
-}
+    handle
+        .insert_source(Timer::from_duration(Duration::from_millis(16)), |_, _, nested| {
+            if nested.host_frame_presented {
+                return TimeoutAction::Drop;
+            }
+            nested.request_redraw();
+            TimeoutAction::ToDuration(Duration::from_millis(16))
+        })
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
 
-fn sync_host_cursor(
-    backend: &smithay::backend::winit::WinitGraphicsBackend<GlesRenderer>,
-    state: &mut KestrelState,
-) {
-    if !state.cursor_dirty {
-        return;
-    }
+    handle
+        .insert_source(winit, |event, _, nested| {
+            match event {
+                WinitEvent::Resized { size, scale_factor } => {
+                    nested.handle_resized(size, scale_factor);
+                }
+                WinitEvent::Input(input) => {
+                    handle_input_event(
+                        &mut nested.state,
+                        &nested.keyboard,
+                        &nested.pointer,
+                        input,
+                        nested.output.size,
+                    );
+                    if nested.state.scene_needs_frame() {
+                        nested.request_redraw();
+                    }
+                }
+                WinitEvent::Focus(focused) => debug!(focused, "nested host focus changed"),
+                WinitEvent::CloseRequested => nested.loop_signal.stop(),
+                WinitEvent::Redraw => nested.render_frame(),
+            }
+        })
+        .map_err(|error| NestedError::EventSource(error.to_string()))?;
 
-    match &state.cursor_image {
-        CursorImageStatus::Hidden => backend.window().set_cursor_visible(false),
-        CursorImageStatus::Named(icon) => {
-            backend.window().set_cursor_visible(true);
-            backend.window().set_cursor(*icon);
-        }
-        CursorImageStatus::Surface(_) => {
-            backend.window().set_cursor_visible(true);
-        }
-    }
-
-    state.cursor_dirty = false;
+    Ok(())
 }
 
 #[derive(Debug, Error)]
 pub enum NestedError {
     #[error("failed to create wayland display: {0}")]
     Display(#[from] smithay::reexports::wayland_server::backend::InitError),
+    #[error("failed to initialize nested event loop: {0}")]
+    Calloop(#[from] calloop::Error),
     #[error("failed to initialize nested winit backend: {0}")]
     Winit(#[from] smithay::backend::winit::Error),
     #[error("failed to initialize keyboard seat: {0}")]
     Keyboard(#[from] smithay::input::keyboard::Error),
     #[error("failed to bind wayland socket: {0}")]
     Socket(#[from] smithay::reexports::wayland_server::BindError),
+    #[error("failed to register nested event source: {0}")]
+    EventSource(String),
     #[error("failed to swap nested compositor buffer: {0}")]
     Swap(#[from] smithay::backend::SwapBuffersError),
     #[error("failed to render nested compositor frame: {0}")]

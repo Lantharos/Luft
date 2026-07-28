@@ -33,6 +33,7 @@ impl KestrelState {
         self.shell_restart_requested = true;
     }
 
+    #[cfg_attr(not(feature = "session-backend"), allow(dead_code))]
     pub fn take_shell_restart_requested(&mut self) -> bool {
         std::mem::take(&mut self.shell_restart_requested)
     }
@@ -81,7 +82,7 @@ impl KestrelState {
         self.config = config;
         self.layout = layout;
         self.set_primary_output_scale(output_scale);
-        self.drag = None;
+        self.window_grab = None;
         self.workspace_transition = None;
         self.apply_active_arrangement();
         self.mark_scene_dirty();

@@ -1,11 +1,11 @@
 use super::current_blur_region;
 use crate::{
     layers::{BlurLayer, LayerMaterial, LayerRenderTarget, material_for},
+    space_window::space_window_render_targets,
     state::KestrelState,
     window::ManagedWindow,
     window_clip::WINDOW_RADIUS,
 };
-use luft_ipc::WorkspaceId;
 use smithay::{
     desktop::{PopupManager, layer_map_for_output},
     reexports::wayland_server::protocol::wl_surface::WlSurface,
@@ -25,15 +25,17 @@ pub fn window_blur_targets(state: &KestrelState) -> Vec<LayerRenderTarget> {
 
 pub fn window_blur_targets_grouped(state: &KestrelState) -> Vec<Vec<LayerRenderTarget>> {
     let mut grouped = Vec::new();
-    if let Some(transition) = state.workspace_transition() {
-        let width = state.output_size().w as f64;
-        let direction = transition.direction as f64;
-        let from_offset = (-direction * width * transition.progress).round() as i32;
-        let to_offset = (direction * width * (1.0 - transition.progress)).round() as i32;
-        append_workspace_targets_grouped(state, &transition.from, from_offset, &mut grouped);
-        append_workspace_targets_grouped(state, &transition.to, to_offset, &mut grouped);
-    } else {
-        append_workspace_targets_grouped(state, state.layout.active_workspace(), 0, &mut grouped);
+    let mut opaque_above = Vec::new();
+    for target in space_window_render_targets(state) {
+        let Some(managed) = state.windows.window(target.id) else {
+            grouped.push(Vec::new());
+            continue;
+        };
+        let transform = managed.render_transform(target.offset_x, state.output_size());
+        let mut window_targets = Vec::new();
+        append_window_targets(managed, transform, &mut window_targets, &opaque_above);
+        grouped.push(window_targets);
+        opaque_above.extend(window_opaque_rects(managed, transform));
     }
     grouped
 }
@@ -70,22 +72,6 @@ pub fn layer_popup_blur_targets(state: &KestrelState, layer: Layer) -> Vec<Layer
         }
     }
     targets
-}
-
-fn append_workspace_targets_grouped(
-    state: &KestrelState,
-    workspace: &WorkspaceId,
-    offset_x: i32,
-    grouped: &mut Vec<Vec<LayerRenderTarget>>,
-) {
-    let mut opaque_above = Vec::new();
-    for window in state.windows.render_windows_on_workspace(workspace) {
-        let transform = window.render_transform(offset_x, state.output_size());
-        let mut window_targets = Vec::new();
-        append_window_targets(window, transform, &mut window_targets, &opaque_above);
-        grouped.push(window_targets);
-        opaque_above.extend(window_opaque_rects(window, transform));
-    }
 }
 
 fn append_window_targets(

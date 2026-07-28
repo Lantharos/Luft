@@ -3,8 +3,9 @@
 use super::KestrelState;
 use smithay::{
     backend::{allocator::format::FormatSet, drm::DrmDeviceFd},
-    reexports::wayland_server::Client,
+    reexports::wayland_server::{Client, protocol::wl_surface::WlSurface},
     wayland::{
+        compositor::{self, BufferAssignment, SurfaceAttributes},
         dmabuf::DmabufFeedbackBuilder,
         drm_syncobj::{DrmSyncPointSource, DrmSyncobjState, supports_syncobj_eventfd},
     },
@@ -67,6 +68,17 @@ impl KestrelState {
 
     pub(crate) fn take_syncobj_sources(&mut self) -> Vec<PendingSyncobjSource> {
         std::mem::take(&mut self.pending_syncobj_sources)
+    }
+
+    pub(crate) fn session_early_import(&mut self, surface: &WlSurface) {
+        use smithay::wayland::dmabuf::get_dmabuf;
+
+        compositor::with_states(surface, |states| {
+            let mut attributes = states.cached_state.get::<SurfaceAttributes>();
+            if let Some(BufferAssignment::NewBuffer(buffer)) = attributes.pending().buffer.as_ref() {
+                let _ = get_dmabuf(buffer);
+            }
+        });
     }
 }
 

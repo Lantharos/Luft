@@ -20,11 +20,16 @@ const ARROW_HEIGHT: u32 = 28;
 const CURSOR_IMAGE_SIZE: u32 = 24;
 
 pub struct HardwareCursor {
+    #[allow(dead_code)]
     buffer: DumbBuffer,
+    #[allow(dead_code)]
     size: (u32, u32),
+    #[allow(dead_code)]
     hotspot: (u32, u32),
+    #[allow(dead_code)]
     cursor_name: String,
     visible: bool,
+    #[allow(dead_code)]
     last_position: Option<(i32, i32)>,
 }
 
@@ -54,6 +59,7 @@ impl HardwareCursor {
         })
     }
 
+    #[allow(dead_code)]
     pub fn sync(
         &mut self,
         device: &DrmDevice,
@@ -493,4 +499,53 @@ fn write_argb(buffer: &mut [u8], pitch: usize, x: u32, y: u32, rgba: [u8; 4]) {
     buffer[index + 1] = g;
     buffer[index + 2] = r;
     buffer[index + 3] = a;
+}
+
+#[allow(dead_code)]
+pub fn named_cursor_element(
+    renderer: &mut smithay::backend::renderer::gles::GlesRenderer,
+    icon: smithay::input::pointer::CursorIcon,
+    position: smithay::utils::Point<i32, smithay::utils::Physical>,
+    scale: smithay::utils::Scale<f64>,
+) -> Option<smithay::backend::renderer::element::memory::MemoryRenderBufferRenderElement<
+    smithay::backend::renderer::gles::GlesRenderer,
+>> {
+    use smithay::{
+        backend::{
+            allocator::Fourcc,
+            renderer::element::{
+                memory::{MemoryRenderBuffer, MemoryRenderBufferRenderElement},
+                Kind,
+            },
+        },
+        input::pointer::CursorImageStatus,
+        utils::{Size, Transform},
+    };
+
+    let _ = scale;
+    let image_size = (CURSOR_IMAGE_SIZE, CURSOR_IMAGE_SIZE);
+    let name = name::cursor_name(&CursorImageStatus::Named(icon));
+    let (pixels, hotspot, _) = load_cursor_pixels(name, image_size.0, image_size.1)
+        .unwrap_or_else(|| generated_cursor_pixels(image_size.0, image_size.1));
+    let buffer = MemoryRenderBuffer::from_slice(
+        &pixels,
+        Fourcc::Abgr8888,
+        Size::from((image_size.0 as i32, image_size.1 as i32)),
+        1,
+        Transform::Normal,
+        None,
+    );
+    MemoryRenderBufferRenderElement::from_buffer(
+        renderer,
+        (
+            f64::from(position.x.saturating_sub(hotspot.0 as i32)),
+            f64::from(position.y.saturating_sub(hotspot.1 as i32)),
+        ),
+        &buffer,
+        None,
+        None,
+        None,
+        Kind::Cursor,
+    )
+    .ok()
 }

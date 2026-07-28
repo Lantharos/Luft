@@ -20,6 +20,14 @@ use smithay::{
     utils::{Logical, Physical, Point, Rectangle, Scale, Size},
     wayland::shell::wlr_layer::Layer,
 };
+mod pipeline;
+mod scene_frame;
+
+pub use pipeline::{ScenePipeline, SceneScratch};
+pub use scene_frame::{NestedFrameRenderer, SceneFrameInput};
+
+#[cfg(feature = "session-backend")]
+pub use scene_frame::SceneFrameCore;
 
 pub fn handle_commit(surface: &wl_surface::WlSurface) {
     on_commit_buffer_handler::<KestrelState>(surface);

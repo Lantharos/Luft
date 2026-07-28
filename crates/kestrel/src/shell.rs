@@ -14,6 +14,8 @@ const USE_HOST_DBUS_ENV: &str = "LUFT_USE_HOST_DBUS";
 const OUTPUT_REFRESH_ENV: &str = "LUFT_OUTPUT_REFRESH_MILLIHERTZ";
 const OUTPUT_WIDTH_ENV: &str = "LUFT_OUTPUT_WIDTH";
 const OUTPUT_HEIGHT_ENV: &str = "LUFT_OUTPUT_HEIGHT";
+const SKIP_STARTUP_APPS_ENV: &str = "LUFT_SKIP_STARTUP_APPS";
+const SHELL_BINARY_ENV: &str = "LUFT_SHELL";
 
 #[derive(Debug)]
 pub struct ShellProcess {
@@ -26,6 +28,7 @@ pub struct ShellProcess {
     output_refresh_millihertz: i32,
     output_width: i32,
     output_height: i32,
+    skip_startup_apps: bool,
     next_spawn_after: Option<Instant>,
 }
 
@@ -38,11 +41,15 @@ impl ShellProcess {
         output_refresh_millihertz: i32,
         output_width: i32,
         output_height: i32,
+        skip_startup_apps: bool,
     ) -> Self {
         let binary = shell_binary();
         if binary.is_none() {
-            warn!("luft-shell binary was not found beside kestrel");
+            warn!(
+                "luft-shell binary was not found; build it with `cargo build --bin luft-shell` or set {SHELL_BINARY_ENV}"
+            );
         };
+
         remove_stale_shell_socket(shell_socket);
 
         let mut shell = Self {
@@ -55,6 +62,7 @@ impl ShellProcess {
             output_refresh_millihertz,
             output_width,
             output_height,
+            skip_startup_apps,
             next_spawn_after: None,
         };
         shell.spawn();
@@ -98,6 +106,7 @@ impl ShellProcess {
         self.restart_now();
     }
 
+    #[cfg(feature = "session-backend")]
     pub fn restart_due(&self, now: Instant) -> bool {
         self.child.is_none()
             && self
@@ -165,6 +174,9 @@ impl ShellProcess {
         if let Some(display) = &self.x11_display {
             command.env("DISPLAY", display);
         }
+        if self.skip_startup_apps {
+            command.env(SKIP_STARTUP_APPS_ENV, "1");
+        }
         let child = command.spawn();
 
         match child {
@@ -197,9 +209,21 @@ impl Drop for ShellProcess {
 }
 
 fn shell_binary() -> Option<std::path::PathBuf> {
-    let mut path = std::env::current_exe().ok()?;
-    path.set_file_name("luft-shell");
-    path.exists().then_some(path)
+    if let Ok(path) = env::var(SHELL_BINARY_ENV) {
+        let path = PathBuf::from(path);
+        if path.is_file() {
+            return Some(path);
+        }
+        warn!(path = %path.display(), "LUFT_SHELL points to a missing file");
+    }
+
+    sibling_binary("luft-shell").or_else(|| find_in_path("luft-shell"))
+}
+
+fn sibling_binary(name: &str) -> Option<PathBuf> {
+    let mut path = env::current_exe().ok()?;
+    path.set_file_name(name);
+    path.is_file().then_some(path)
 }
 
 fn shell_command(binary: &Path) -> Command {

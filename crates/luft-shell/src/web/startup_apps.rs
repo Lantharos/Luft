@@ -1,11 +1,16 @@
 use super::{LaunchedProcess, WebShell};
 use crate::apps::{discover_user_autostart, normalize_launch_command, spawn_command};
 use std::collections::HashSet;
-use std::time::Instant;
+use std::{env, time::Instant};
 use tracing::{debug, warn};
 
 impl WebShell {
     pub(super) fn launch_startup_apps(&mut self) {
+        if skip_startup_apps() {
+            self.startup_apps_launched = true;
+            return;
+        }
+
         if self.startup_apps_launched || Instant::now() < self.startup_apps_launch_after {
             return;
         }
@@ -38,4 +43,8 @@ impl WebShell {
             .filter(|command| seen.insert(command.clone()))
             .collect()
     }
+}
+
+fn skip_startup_apps() -> bool {
+    env::var_os("LUFT_SKIP_STARTUP_APPS").is_some()
 }

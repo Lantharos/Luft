@@ -1,7 +1,7 @@
 use crate::{
     layers,
-    state::KestrelState,
-    window::{ResizeEdge, WindowFrameControl, WindowFrameHit, WindowGrab},
+    state::{KestrelState, WindowGrabKind},
+    window::{ResizeEdge, WindowFrameControl, WindowFrameHit},
 };
 use smithay::{
     backend::input::{
@@ -11,14 +11,16 @@ use smithay::{
     input::{
         keyboard::{FilterResult, KeyboardHandle},
         pointer::{
-            AxisFrame, ButtonEvent, CursorIcon, MotionEvent, PointerHandle, RelativeMotionEvent,
+            AxisFrame, ButtonEvent, CursorIcon, CursorImageStatus, MotionEvent, PointerHandle,
+            RelativeMotionEvent,
         },
     },
-    utils::{Physical, Size},
+    utils::{Logical, Physical, Size},
     wayland::keyboard_shortcuts_inhibit::KeyboardShortcutsInhibitorSeat,
 };
 
 mod gestures;
+mod grab;
 mod shortcuts;
 
 use shortcuts::{ShortcutAction, handle_shortcut, shortcut_for_key};
@@ -119,11 +121,30 @@ pub fn handle_input_event<B>(
         }
         InputEvent::PointerButton { event } => {
             let serial = state.next_serial();
-            let mut frame_interaction = false;
-            let mut forward_button_release = false;
             let left_button = event.button_code() == BTN_LEFT;
             let right_button = event.button_code() == BTN_RIGHT;
             let button_pressed = button_pressed(event.state());
+
+            if pointer.is_grabbed() {
+                pointer.button(
+                    state,
+                    &ButtonEvent {
+                        serial,
+                        time: event.time_msec(),
+                        button: event.button_code(),
+                        state: event.state(),
+                    },
+                );
+                pointer.frame(state);
+                update_frame_cursor(state);
+                if !button_pressed {
+                    state.clear_client_grab();
+                }
+                return;
+            }
+
+            let mut frame_interaction = false;
+            let mut forward_button_release = false;
             let closes_transient = button_pressed
                 && (left_button || right_button)
                 && layers::should_close_transient_popover(state.output(), state.pointer_location);
@@ -136,9 +157,31 @@ pub fn handle_input_event<B>(
             if closes_transient {
                 state.close_shell_transient_popovers();
             }
+
+            let frame_hit = if button_pressed && left_button {
+                if closes_transient {
+                    state.window_frame_hit_below_shell(state.pointer_location)
+                } else {
+                    state.window_frame_hit(state.pointer_location)
+                }
+            } else {
+                None
+            };
+
             if button_pressed && (left_button || right_button) {
-                if let Some(surface) = hit.clone() {
-                    state.allow_client_grab(surface, serial);
+                if frame_hit.is_some() {
+                    state.clear_client_grab();
+                } else if let Some(surface) = hit.clone() {
+                    let drag_surface = if closes_transient {
+                        state.client_drag_surface_at_below_shell(state.pointer_location)
+                    } else {
+                        state.client_drag_surface_at(state.pointer_location)
+                    };
+                    if drag_surface.as_ref() == Some(&surface) {
+                        state.allow_client_grab(surface, serial);
+                    } else {
+                        state.clear_client_grab();
+                    }
                 } else {
                     state.clear_client_grab();
                 }
@@ -153,30 +196,45 @@ pub fn handle_input_event<B>(
                 state.super_used = true;
                 state.activate_surface(keyboard, &surface);
                 if left_button {
-                    state.begin_drag(surface);
+                    state.prepare_window_drag(surface, serial, BTN_LEFT);
                 } else if let Some((surface, edge)) = if closes_transient {
                     state.modifier_resize_at_below_shell(state.pointer_location)
                 } else {
                     state.modifier_resize_at(state.pointer_location)
                 } {
-                    state.begin_resize(surface, edge);
+                    state.activate_surface(keyboard, &surface);
+                    state.begin_resize(pointer, surface, edge, serial, event.button_code());
+                    pointer.button(
+                        state,
+                        &ButtonEvent {
+                            serial,
+                            time: event.time_msec(),
+                            button: event.button_code(),
+                            state: event.state(),
+                        },
+                    );
                 }
             } else if left_button && button_pressed {
-                let frame_hit = if closes_transient {
-                    state.window_frame_hit_below_shell(state.pointer_location)
-                } else {
-                    state.window_frame_hit(state.pointer_location)
-                };
                 if let Some(frame_hit) = frame_hit {
                     frame_interaction = true;
                     match frame_hit {
                         WindowFrameHit::Titlebar { surface } => {
                             state.activate_surface(keyboard, &surface);
-                            state.begin_drag(surface);
+                            state.clear_client_grab();
+                            state.prepare_window_drag(surface, serial, BTN_LEFT);
                         }
                         WindowFrameHit::Resize { surface, edge } => {
                             state.activate_surface(keyboard, &surface);
-                            state.begin_resize(surface, edge);
+                            state.begin_resize(pointer, surface, edge, serial, BTN_LEFT);
+                            pointer.button(
+                                state,
+                                &ButtonEvent {
+                                    serial,
+                                    time: event.time_msec(),
+                                    button: event.button_code(),
+                                    state: event.state(),
+                                },
+                            );
                         }
                         WindowFrameHit::Control { id, control } => {
                             let _ = state.handle_window_control(keyboard, id, control);
@@ -192,7 +250,7 @@ pub fn handle_input_event<B>(
                         state.client_drag_surface_at(state.pointer_location)
                     };
                     if drag_surface.as_ref() == Some(&surface) {
-                        state.prepare_window_drag(surface);
+                        state.prepare_window_drag(surface, serial, BTN_LEFT);
                     }
                     refresh_pointer_focus(state, pointer, serial, event.time_msec());
                 } else {
@@ -201,9 +259,9 @@ pub fn handle_input_event<B>(
             }
 
             if (left_button || right_button) && !button_pressed {
-                forward_button_release = state.drag_forwards_button_release();
-                frame_interaction |= state.drag.is_some() && !forward_button_release;
-                state.end_drag();
+                forward_button_release = state.window_grab_forwards_button_release();
+                frame_interaction |= state.window_grab.is_some() && !forward_button_release;
+                state.clear_window_grab();
                 state.clear_client_grab();
             }
 
@@ -295,12 +353,17 @@ fn refresh_pointer_focus(
 fn move_pointer(
     state: &mut KestrelState,
     pointer: &PointerHandle<KestrelState>,
-    location: smithay::utils::Point<f64, smithay::utils::Logical>,
+    location: smithay::utils::Point<f64, Logical>,
     time: u32,
     relative: Option<RelativeMotion>,
 ) {
     state.pointer_location = location;
-    state.update_drag(location);
+    if matches!(state.cursor_image, CursorImageStatus::Surface(_)) {
+        state.mark_scene_dirty();
+    }
+    if !pointer.is_grabbed() {
+        state.try_promote_pending_window_drag(pointer, location);
+    }
     update_frame_cursor(state);
 
     let serial = state.next_serial();
@@ -347,10 +410,10 @@ fn frame_control_hover(state: &KestrelState) -> Option<WindowFrameControl> {
 }
 
 fn update_frame_cursor(state: &mut KestrelState) {
-    if let Some(grab) = &state.drag {
-        match grab {
-            WindowGrab::Move { .. } => state.set_frame_cursor(CursorIcon::Grabbing),
-            WindowGrab::Resize { edge, .. } => state.set_frame_cursor(resize_cursor(*edge)),
+    if let Some(grab) = &state.window_grab {
+        match grab.kind {
+            WindowGrabKind::Move => state.set_frame_cursor(CursorIcon::Grabbing),
+            WindowGrabKind::Resize { edge } => state.set_frame_cursor(resize_cursor(edge)),
         }
         return;
     }

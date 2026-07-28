@@ -2,11 +2,14 @@
 
 ## Nested
 
+Build both compositor and shell first:
+
 ```sh
-cargo run -p kestrel -- --nested
+cargo build -p kestrel -p luft-shell
+cargo run -p luft-session -- --nested
 ```
 
-Kestrel prints the Wayland socket name. Launch clients against it from another terminal:
+Nested starts `luft-shell` (panel only — startup apps and XDG autostart are skipped) and prints a warning if the shell binary is missing. Kestrel prints the Wayland socket name. Launch clients against it from another terminal:
 
 ```sh
 WAYLAND_DISPLAY=<printed-socket> ghostty

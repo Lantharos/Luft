@@ -1,18 +1,20 @@
 use super::{
     DrmError, DrmOptions,
     device::{self, SessionDevice},
+    estimated_vblank,
     frame::{FrameResult, SessionFrameRenderer, render_secondary_output},
-    scheduler::RenderScheduler,
+    vblank_throttle::VblankThrottle,
 };
 use crate::{
-    client::ClientState, frame_clock::send_surface_frame_tree, input::handle_input_event,
-    ipc::IpcServer, session_services, shell::ShellProcess, state::KestrelState,
+    client::ClientState, input::handle_input_event,
+    ipc::IpcServer, scanout::{monotonic_now, send_frame_callbacks}, session_services, shell::ShellProcess, state::KestrelState,
     xwayland::XwaylandSatellite,
 };
 use ::input::{
     Device as LibinputDevice, DeviceCapability as LibinputDeviceCapability,
 };
 use calloop::{
+    timer::{TimeoutAction, Timer},
     EventLoop,
     signals::{Signal, Signals},
 };
@@ -28,7 +30,7 @@ use smithay::{
     },
     reexports::{
         drm::control::crtc,
-        wayland_server::{Client, Display, ListeningSocket, protocol::wl_surface::WlSurface},
+        wayland_server::{Client, Display, ListeningSocket},
     },
     utils::{Clock, Monotonic},
 };
@@ -90,12 +92,10 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
     let mut keyboard_led_state = keyboard.led_state();
     let mut frame_renderer =
         SessionFrameRenderer::new(&state, refresh_interval(state.output_refresh_millihertz()));
-    let mut render_scheduler =
-        RenderScheduler::new(refresh_interval(state.output_refresh_millihertz()));
+    let mut vblank_throttle = VblankThrottle::default();
     let presentation_clock = Clock::<Monotonic>::new();
     let mut clients = Vec::new();
     let mut force_full_damage = true;
-    let mut pending_frame_callbacks: Option<Vec<WlSurface>> = None;
     let mut active = true;
     let mut loop_events = LoopEvents::default();
     let mut event_loop = EventLoop::<LoopEvents>::try_new().map_err(|error| {
@@ -165,6 +165,7 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
         state.output_refresh_millihertz(),
         state.output_size().w,
         state.output_size().h,
+        false,
     );
     state.shell_status = shell.status();
     info!(
@@ -188,7 +189,7 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             &mut force_full_damage,
         )?;
         if !active {
-            pending_frame_callbacks = None;
+            device.discard_pending_frame();
         }
         clear_ready_syncobj_blockers(&mut loop_events, &mut state, &dh);
         for event in loop_events.udev.drain(..) {
@@ -201,10 +202,8 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
                         state.set_output_descriptors(device.descriptors());
                         device.link_compositor_outputs(&state);
                         frame_renderer.reset_for_output(&state);
-                        render_scheduler.set_refresh_interval(refresh_interval(
-                            state.output_refresh_millihertz(),
-                        ));
-                        pending_frame_callbacks = None;
+                        vblank_throttle.reset();
+                        device.queue_redraws();
                         force_full_damage = true;
                         let descriptor = device.primary_descriptor();
                         info!(
@@ -228,18 +227,62 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             warn!(%error, "DRM event error");
         }
         for vblank in loop_events.vblank.drain(..) {
-            let primary = device.is_primary_crtc(vblank.crtc);
-            device.frame_submitted(vblank.crtc)?;
-            if primary {
-                let (presentation, presentation_instant) =
-                    presentation_time(&presentation_clock, vblank.metadata);
-                render_scheduler.frame_presented(presentation_instant);
-                if let Some(callback_surfaces) = pending_frame_callbacks.take() {
-                    let frame_time = frame_renderer.frame_presented(presentation);
-                    for surface in callback_surfaces {
-                        send_surface_frame_tree(state.output(), &surface, frame_time);
-                    }
+            let refresh = refresh_interval(state.output_refresh_millihertz());
+            if !vblank_throttle.should_process(vblank.crtc, refresh) {
+                continue;
+            }
+
+            let Some(submitted) = device.frame_submitted(vblank.crtc)? else {
+                continue;
+            };
+
+            let (presentation, _presentation_instant) =
+                presentation_time(&presentation_clock, vblank.metadata);
+            let frame_time = frame_renderer.frame_presented(presentation);
+
+            if let Some(output) = state.outputs.output(&submitted.descriptor_name) {
+                send_frame_callbacks(
+                    &state,
+                    output,
+                    submitted.sequence,
+                    monotonic_now(&presentation_clock),
+                );
+                if let Some(mut queued) = submitted.queued {
+                    use smithay::reexports::wayland_protocols::wp::presentation_time::server::wp_presentation_feedback;
+                    queued.presentation.presented(
+                        frame_time.time(),
+                        frame_time.refresh(),
+                        frame_time.sequence(),
+                        wp_presentation_feedback::Kind::Vsync,
+                    );
                 }
+            }
+
+            if submitted.redraw_needed {
+                device.queue_redraws();
+            }
+        }
+        for output_name in loop_events.pending_estimated_vblanks.drain(..) {
+            let animations_active = state.animations_active();
+            let sequence = {
+                let Some(session_output) = device.output_by_name_mut(&output_name) else {
+                    continue;
+                };
+                if let Some(token) = estimated_vblank::take_timer_token(session_output) {
+                    event_loop.handle().remove(token);
+                }
+                estimated_vblank::on_timer_fired(session_output);
+                session_output.frame_state.frame_callback_sequence
+            };
+            if animations_active {
+                device.queue_redraws();
+            } else if let Some(output) = state.outputs.output(&output_name) {
+                send_frame_callbacks(
+                    &state,
+                    output,
+                    sequence,
+                    monotonic_now(&presentation_clock),
+                );
             }
         }
         for event in loop_events.input.drain(..) {
@@ -317,47 +360,89 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             && !device.frame_pending()
             && (force_full_damage
                 || state.scene_dirty()
+                || state.cursor_dirty
                 || state.animations_active())
         {
-            render_scheduler.request_repaint(Instant::now());
+            device.queue_redraws();
         }
 
-        if active && !device.frame_pending() && render_scheduler.should_render(Instant::now()) {
-            let render_started = Instant::now();
+        if active && !device.frame_pending() && device.any_output_should_render() {
+            let primary_name = device.primary_descriptor().name.clone();
+            let primary_output = state.outputs.output(&primary_name).cloned();
             let frame_result = {
-                let (renderer, output) = device.renderer_and_primary_output();
-                let frame_result = frame_renderer.render(
-                    &mut state,
-                    renderer,
-                    &mut output.compositor,
-                    force_full_damage,
-                )?;
-                if matches!(frame_result, FrameResult::Queued { .. }) {
-                    output.mark_frame_queued();
+                let (renderer, session_output) = device.renderer_and_primary_output();
+                if let Some(output) = primary_output.as_ref() {
+                    frame_renderer.render(
+                        &mut state,
+                        renderer,
+                        output,
+                        session_output,
+                        force_full_damage,
+                        true,
+                    )?
+                } else {
+                    FrameResult::Idle
                 }
-                frame_result
             };
             if force_full_damage {
-                let (renderer, primary, outputs) = device.renderer_and_outputs();
-                for (index, output) in outputs.iter_mut().enumerate() {
-                    if index != primary {
-                        let _ = render_secondary_output(renderer, output)?;
-                    }
+                let secondary_names = device.non_primary_output_names();
+                for name in secondary_names {
+                    let Some(output) = state.outputs.output(&name).cloned() else {
+                        continue;
+                    };
+                    let Some((renderer, session_output)) = device.renderer_and_output_by_name(&name)
+                    else {
+                        continue;
+                    };
+                    let _ = render_secondary_output(
+                        &mut frame_renderer,
+                        &mut state,
+                        renderer,
+                        &output,
+                        session_output,
+                        force_full_damage,
+                    )?;
                 }
             }
-            match frame_result {
+            match &frame_result {
                 FrameResult::Queued {
-                    callback_surfaces,
+                    cancel_estimated_vblank,
                 } => {
-                    render_scheduler.frame_rendered(render_started.elapsed());
-                    pending_frame_callbacks = Some(callback_surfaces);
+                    if let Some(token) = cancel_estimated_vblank {
+                        event_loop.handle().remove(*token);
+                    }
+                    force_full_damage = false;
+                    display.flush_clients().map_err(|error| {
+                        DrmError::Unsupported(format!("Wayland flush failed after frame: {error}"))
+                    })?;
+                }
+                FrameResult::NoDamage => {
+                    if let Some(session_output) = device.output_by_name_mut(&primary_name)
+                        && !estimated_vblank::should_skip_queue(session_output)
+                    {
+                        let output_name = primary_name.clone();
+                        let duration = estimated_vblank::timer_duration(session_output);
+                        let timer = Timer::from_duration(duration);
+                        let token = event_loop
+                            .handle()
+                            .insert_source(timer, move |_, _, data| {
+                                data.pending_estimated_vblanks
+                                    .push(output_name.clone());
+                                TimeoutAction::Drop
+                            })
+                            .map_err(|error| {
+                                DrmError::Unsupported(format!(
+                                    "failed to register estimated vblank timer: {error}"
+                                ))
+                            })?;
+                        estimated_vblank::mark_waiting(session_output, token);
+                    }
                     force_full_damage = false;
                     display.flush_clients().map_err(|error| {
                         DrmError::Unsupported(format!("Wayland flush failed after frame: {error}"))
                     })?;
                 }
                 FrameResult::Idle => {
-                    render_scheduler.cancel_repaint();
                     let timeout = process_timeout(Instant::now(), IDLE_DISPATCH, &shell, &xwayland);
                     event_loop
                         .dispatch(Some(timeout), &mut loop_events)
@@ -368,8 +453,7 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             }
         } else if active && !device.frame_pending() {
             let now = Instant::now();
-            let timeout = render_scheduler.dispatch_timeout(now, IDLE_DISPATCH);
-            let timeout = process_timeout(now, timeout, &shell, &xwayland);
+            let timeout = process_timeout(now, IDLE_DISPATCH, &shell, &xwayland);
             event_loop
                 .dispatch(Some(timeout), &mut loop_events)
                 .map_err(|error| {
@@ -401,6 +485,7 @@ struct LoopEvents {
     udev: Vec<UdevEvent>,
     syncobj_ready: Vec<Client>,
     child_process_changed: bool,
+    pending_estimated_vblanks: Vec<String>,
 }
 
 struct VBlankEvent {

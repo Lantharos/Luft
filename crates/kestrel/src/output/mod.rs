@@ -55,6 +55,10 @@ impl NestedOutput {
     }
 
     pub fn resize(&mut self, size: Size<i32, Physical>) -> bool {
+        let size = (
+            size.w.max(1),
+            size.h.max(1),
+        ).into();
         if self.size == size {
             return false;
         }

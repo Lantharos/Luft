@@ -6,7 +6,6 @@ mod stack;
 mod stack_hit;
 pub use hit::{ResizeEdge, WindowFrameControl, WindowFrameHit};
 use luft_ipc::{Rect, WindowId, WindowState, WorkspaceId};
-pub use ops::WindowGrab;
 use smithay::{
     desktop::utils::bbox_from_surface_tree,
     utils::{Logical, Physical, Point, Rectangle, Size},

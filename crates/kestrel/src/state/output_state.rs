@@ -103,8 +103,8 @@ impl KestrelState {
         true
     }
 
-    pub fn set_primary_output_scale(&mut self, scale: f64) {
-        let _ = self.set_output_scale(None, scale);
+    pub fn set_primary_output_scale(&mut self, scale: f64) -> bool {
+        self.set_output_scale(None, scale)
     }
 
     pub fn enter_output(&self, surface: &WlSurface) {

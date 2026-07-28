@@ -1,20 +1,14 @@
 use super::LoopEvents;
-use crate::backend::drm::DrmError;
-use crate::{client::ClientState, state::KestrelState};
+use crate::{backend::drm::DrmError, commit, state::KestrelState};
 use calloop::EventLoop;
-use smithay::reexports::wayland_server::DisplayHandle;
 
 pub(super) fn clear_ready_syncobj_blockers(
     events: &mut LoopEvents,
     state: &mut KestrelState,
-    dh: &DisplayHandle,
+    _dh: &smithay::reexports::wayland_server::DisplayHandle,
 ) {
     for client in events.syncobj_ready.drain(..) {
-        let Some(client_state) = client.get_data::<ClientState>() else {
-            continue;
-        };
-        client_state.compositor_state.blocker_cleared(state, dh);
-        state.mark_scene_dirty();
+        commit::blocker_cleared(state, &client);
     }
 }
 

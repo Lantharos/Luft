@@ -61,7 +61,14 @@ impl XdgShellHandler for KestrelState {
         if let Some(keyboard) = self.keyboard.clone() {
             self.activate_surface(&keyboard, &surface);
         }
-        self.begin_client_drag(surface);
+        let Some(pointer) = self.seat.get_pointer() else {
+            return;
+        };
+        let button = pointer
+            .grab_start_data()
+            .map(|data| data.button)
+            .unwrap_or(0x110);
+        self.prepare_window_drag(surface, serial, button);
     }
 
     fn resize_request(
@@ -82,7 +89,14 @@ impl XdgShellHandler for KestrelState {
         if let Some(keyboard) = self.keyboard.clone() {
             self.activate_surface(&keyboard, &surface);
         }
-        self.begin_client_resize(surface, edge);
+        let Some(pointer) = self.seat.get_pointer() else {
+            return;
+        };
+        let button = pointer
+            .grab_start_data()
+            .map(|data| data.button)
+            .unwrap_or(0x110);
+        self.begin_client_resize(&pointer, surface, edge, serial, button);
     }
 
     fn grab(&mut self, surface: PopupSurface, _seat: wl_seat::WlSeat, serial: Serial) {
@@ -216,7 +230,7 @@ impl KestrelState {
         });
     }
 
-    pub(super) fn reconcile_decoration_after_commit(&mut self, surface: &WlSurface) -> bool {
+    pub(crate) fn reconcile_decoration_after_commit(&mut self, surface: &WlSurface) -> bool {
         let Some((toplevel, change)) = self.windows.refresh_decoration_for_root_surface(surface)
         else {
             return false;

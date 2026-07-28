@@ -1,7 +1,7 @@
 use super::{
     actions::WebShellAction,
     model::{WebShellSnapshot, WebShellSurface},
-    surface_layout::shell_surface,
+    surface_layout::{panel_output_width, shell_surface},
     surface_motion::shell_blur_region,
 };
 use fenestra_cef::{
@@ -405,7 +405,12 @@ fn cef_initial_size(shell_surface: &ShellSurfaceOptions, fallback: (i32, i32)) -
     let (width, height) = shell_surface
         .size
         .unwrap_or((fallback.0.max(1) as u32, fallback.1.max(1) as u32));
-    (width.max(1), height.max(1))
+    let width = if width == 0 {
+        panel_output_width().max(1) as u32
+    } else {
+        width.max(1)
+    };
+    (width, height.max(1))
 }
 
 fn workspace_root() -> PathBuf {

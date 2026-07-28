@@ -3,11 +3,17 @@ mod cursor;
 #[cfg(feature = "session-backend")]
 mod device;
 #[cfg(feature = "session-backend")]
+mod dmabuf_feedback;
+#[cfg(feature = "session-backend")]
+mod estimated_vblank;
+#[cfg(feature = "session-backend")]
 mod frame;
+#[cfg(feature = "session-backend")]
+mod redraw;
 #[cfg(feature = "session-backend")]
 mod runtime;
 #[cfg(feature = "session-backend")]
-mod scheduler;
+mod vblank_throttle;
 
 use luft_config::LuftConfig;
 use thiserror::Error;

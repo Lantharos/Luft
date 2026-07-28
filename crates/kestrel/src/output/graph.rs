@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "session-backend"), allow(dead_code))]
+
 use super::{OutputDescriptor, configure_output_at, create_output};
 use luft_config::DisplayConfig;
 use luft_ipc::OutputSummary;

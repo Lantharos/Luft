@@ -3,7 +3,7 @@ use crate::{
     output::{NestedOutput, OutputDescriptor, OutputGraph},
     protocol_state::ProtocolState,
     titlebar::TitlebarCache,
-    window::{WindowGrab, WindowStack},
+    window::WindowStack,
     workspace_transition::WorkspaceTransition,
 };
 use luft_config::LuftConfig;
@@ -11,7 +11,7 @@ use luft_ipc::{LayoutEngine, LayoutError, Rect, WindowId, WindowInfo, WorkspaceI
 use luft_ipc::{ShellStatus, XwaylandStatus};
 use smithay::{
     backend::allocator::format::FormatSet,
-    desktop::PopupManager,
+    desktop::{PopupManager, Space},
     input::{
         Seat, SeatState,
         keyboard::{KeyboardHandle, LedState},
@@ -47,6 +47,10 @@ mod output_state;
 mod scene;
 mod session;
 mod shell_control;
+mod space_sync;
+pub use space_sync::{refresh_space, sync_window_to_space};
+
+use crate::space_window::KestrelWindow;
 
 pub struct KestrelState {
     pub display_handle: DisplayHandle,
@@ -66,8 +70,10 @@ pub struct KestrelState {
     pub windows: WindowStack,
     pub foreign_toplevel_handles: BTreeMap<WindowId, ForeignToplevelHandle>,
     pub popup_manager: PopupManager,
+    pub space: Space<KestrelWindow>,
+    pub space_windows: BTreeMap<WindowId, KestrelWindow>,
     pub pointer_location: Point<f64, Logical>,
-    pub drag: Option<WindowGrab>,
+    pub window_grab: Option<WindowGrabMeta>,
     pub pending_window_drag: Option<PendingWindowDrag>,
     pub pending_client_grab: Option<ClientGrabSerial>,
     pub config: LuftConfig,
@@ -86,7 +92,8 @@ pub struct KestrelState {
     #[cfg(feature = "session-backend")]
     pending_syncobj_sources: Vec<session::PendingSyncobjSource>,
     pending_keyboard_led_state: Option<LedState>,
-    scene_dirty: bool,
+    structural_dirty: bool,
+    content_dirty: bool,
     workspace_transition: Option<WorkspaceTransition>,
     serial: u32,
 }
@@ -129,6 +136,8 @@ impl KestrelState {
             (f64::from(output_size.h) / scale).round().max(1.0) as i32,
         ));
         layout.set_bounds(Rect::new(0, 0, logical.w, logical.h));
+        let mut space = Space::default();
+        space.map_output(outputs.primary_output(), (0, 0));
 
         Self {
             display_handle: display.clone(),
@@ -148,8 +157,10 @@ impl KestrelState {
             windows: WindowStack::default(),
             foreign_toplevel_handles: BTreeMap::new(),
             popup_manager: PopupManager::default(),
+            space,
+            space_windows: BTreeMap::new(),
             pointer_location: (0.0, 0.0).into(),
-            drag: None,
+            window_grab: None,
             pending_window_drag: None,
             pending_client_grab: None,
             config,
@@ -168,7 +179,8 @@ impl KestrelState {
             #[cfg(feature = "session-backend")]
             pending_syncobj_sources: Vec::new(),
             pending_keyboard_led_state: None,
-            scene_dirty: true,
+            structural_dirty: true,
+            content_dirty: true,
             workspace_transition: None,
             serial: 1,
         }
@@ -205,7 +217,8 @@ impl KestrelState {
                 }
                 self.register_foreign_toplevel(id, &surface);
                 self.enter_output(surface.wl_surface());
-                self.mark_scene_dirty();
+                space_sync::sync_window_to_space(self, id);
+                self.mark_scene_structural_dirty();
             }
             Err(error) => debug!(?error, "failed to register toplevel in layout"),
         }
@@ -261,17 +274,18 @@ impl KestrelState {
             self.windows.set_workspace(id, workspace);
         }
         self.raise_transient(parent, id);
-        self.mark_scene_dirty();
+        self.mark_scene_structural_dirty();
     }
 
     pub fn unmap_toplevel(&mut self, surface: &ToplevelSurface) {
         self.dismiss_popups_for_surface(surface.wl_surface());
         self.leave_output(surface.wl_surface());
+        space_sync::unmap_toplevel_from_space(self, surface);
         if let Some(window) = self.windows.remove(surface) {
             self.remove_foreign_toplevel(window.id);
             self.layout.unregister_window(window.id);
             self.apply_active_arrangement();
-            self.mark_scene_dirty();
+            self.mark_scene_structural_dirty();
         }
     }
 
@@ -280,10 +294,11 @@ impl KestrelState {
         for id in &removed {
             self.remove_foreign_toplevel(*id);
             self.layout.unregister_window(*id);
+            space_sync::remove_window_from_space(self, *id);
         }
         if !removed.is_empty() {
             self.apply_active_arrangement();
-            self.mark_scene_dirty();
+            self.mark_scene_structural_dirty();
         }
         !removed.is_empty()
     }
@@ -320,6 +335,7 @@ impl KestrelState {
         self.set_activated_window(id);
         let serial = self.next_serial();
         keyboard.set_focus(self, Some(surface.wl_surface().clone()), serial);
+        space_sync::sync_window_to_space(self, id);
         self.mark_scene_dirty();
         Ok(())
     }
@@ -441,7 +457,8 @@ impl KestrelState {
             self.workspace_transition = self
                 .workspace_transition_direction(&from, workspace)
                 .map(|direction| WorkspaceTransition::new(from, workspace.clone(), direction));
-            self.mark_scene_dirty();
+            space_sync::sync_active_workspace(self);
+            self.mark_scene_structural_dirty();
         }
         Ok(())
     }
@@ -581,8 +598,22 @@ pub struct ClientGrabSerial {
     surface: ToplevelSurface,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum WindowGrabKind {
+    Move,
+    Resize { edge: crate::window::ResizeEdge },
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct WindowGrabMeta {
+    pub kind: WindowGrabKind,
+    pub forward_button_release: bool,
+}
+
 #[derive(Clone)]
 pub struct PendingWindowDrag {
-    pub surface: ToplevelSurface,
+    pub surface: smithay::wayland::shell::xdg::ToplevelSurface,
     pub pointer_start: Point<f64, Logical>,
+    pub serial: smithay::utils::Serial,
+    pub button: u32,
 }

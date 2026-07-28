@@ -1,81 +1,71 @@
 use super::{
     DrmError,
-    device::{SessionCompositor, SessionOutput},
+    device::{QueuedFrameData, SessionOutput},
+    dmabuf_feedback::send_dmabuf_feedbacks,
+    redraw::RedrawState,
 };
 use crate::{
-    background::Background,
-    background_effect,
     damage::SCENE_CLEAR_COLOR,
     frame_clock::FrameClock,
     frame_clock::FrameTime,
-    layers,
-    render::{RenderStage, render_stage_elements},
-    scene_backdrop::SceneBackdrop,
-    scene_blur::BlurEffectManager,
-    scene_composite::SceneCompositeElement,
-    scene_composite::{scene_backdrop_elements, scene_elements},
-    scene_render::{collect_window_scene_layers, window_layer_refs},
-    state::KestrelState,
+    render::{SceneFrameCore, SceneFrameInput},
+    scanout::{collect_pointer_elements, take_presentation_feedback, update_primary_scanout_output},
+    scene_handle::SceneDrawSession,
+    state::{refresh_space, KestrelState},
 };
 use smithay::{
     backend::{
         drm::compositor::FrameFlags,
         renderer::gles::GlesRenderer,
     },
-    reexports::wayland_server::protocol::wl_surface::WlSurface,
-    utils::{Monotonic, Time, Transform},
-    wayland::shell::wlr_layer::Layer,
+    output::Output,
+    utils::{Monotonic, Time},
 };
 use std::time::Duration;
 
 pub enum FrameResult {
     Idle,
+    NoDamage,
     Queued {
-        callback_surfaces: Vec<WlSurface>,
+        cancel_estimated_vblank: Option<calloop::RegistrationToken>,
     },
 }
 
 pub fn render_secondary_output(
+    frame_renderer: &mut SessionFrameRenderer,
+    state: &mut KestrelState,
     renderer: &mut GlesRenderer,
-    output: &mut SessionOutput,
+    output: &Output,
+    session_output: &mut SessionOutput,
+    force_full_damage: bool,
 ) -> Result<bool, DrmError> {
-    if output.has_pending_frame() {
+    if session_output.has_pending_frame() {
         return Ok(false);
     }
 
-    output.compositor.reset_buffer_ages();
-    let elements: &[SceneCompositeElement] = &[];
-    let frame = output
-        .compositor
-        .render_frame(renderer, elements, SCENE_CLEAR_COLOR, FrameFlags::DEFAULT)
-        .map_err(compositor_error)?;
-    if frame.is_empty {
-        return Ok(false);
+    match frame_renderer.render(
+        state,
+        renderer,
+        output,
+        session_output,
+        force_full_damage,
+        false,
+    )? {
+        FrameResult::Queued { .. } => Ok(true),
+        FrameResult::NoDamage | FrameResult::Idle => Ok(false),
     }
-    output
-        .compositor
-        .queue_frame(())
-        .map_err(compositor_error)?;
-    output.mark_frame_queued();
-    Ok(true)
 }
 
 pub struct SessionFrameRenderer {
-    background: Background,
+    scene: SceneFrameCore,
     frame_clock: FrameClock,
-    scene_backdrop: SceneBackdrop,
-    blur_effects: BlurEffectManager,
-    visible_popups: bool,
 }
 
 impl SessionFrameRenderer {
-    pub fn new(state: &KestrelState, frame_interval: Duration) -> Self {
+    pub fn new(_state: &KestrelState, frame_interval: Duration) -> Self {
         Self {
-            background: Background::new(state.config.compositor.background_image.clone()),
+            scene: SceneFrameCore::new(),
             frame_clock: FrameClock::new(frame_interval),
-            scene_backdrop: SceneBackdrop::default(),
-            blur_effects: BlurEffectManager::default(),
-            visible_popups: state.has_visible_popups(),
         }
     }
 
@@ -83,148 +73,110 @@ impl SessionFrameRenderer {
         &mut self,
         state: &mut KestrelState,
         renderer: &mut GlesRenderer,
-        compositor: &mut SessionCompositor,
+        output: &Output,
+        session_output: &mut SessionOutput,
         force_full_damage: bool,
+        clear_state: bool,
     ) -> Result<FrameResult, DrmError> {
+        let compositor = &mut session_output.compositor;
         let removed_windows = state.remove_dead_windows();
         let finished_window_closes = state.send_finished_window_closes();
         state.cleanup_layers();
         state.cleanup_output();
-        let workspace_transition_active = state.workspace_transition().is_some();
-        let visible_popups = state.has_visible_popups();
-        let popup_visibility_changed =
-            std::mem::replace(&mut self.visible_popups, visible_popups) != visible_popups;
-        let content_render_needed = force_full_damage
-            || state.scene_dirty()
-            || popup_visibility_changed
+
+        let content_render_needed = self.scene.content_render_needed(
+            state,
+            removed_windows,
+            finished_window_closes,
+            force_full_damage,
+        );
+
+        if !content_render_needed {
+            if session_output.frame_state.redraw_state.should_render() {
+                session_output.frame_state.redraw_state = RedrawState::Idle;
+            }
+            return Ok(FrameResult::Idle);
+        }
+
+        if force_full_damage
             || removed_windows
             || finished_window_closes
-            || state.animations_active()
-            || workspace_transition_active
-            || self
-                .background
-                .set_path(state.config.compositor.background_image.clone());
-        if !content_render_needed {
-            return Ok(FrameResult::Idle);
-        }
-
-        let fullscreen_active = state
-            .windows
-            .fullscreen_on_workspace(state.layout.active_workspace())
-            .is_some();
-        let mut top_targets = if fullscreen_active {
-            Vec::new()
-        } else {
-            layers::render_targets(state.output(), Layer::Top)
-        };
-        if !fullscreen_active {
-            top_targets.extend(background_effect::layer_popup_blur_targets(
-                state,
-                Layer::Top,
-            ));
-        }
-        let mut overlay_targets = if fullscreen_active {
-            Vec::new()
-        } else {
-            layers::render_targets(state.output(), Layer::Overlay)
-        };
-        if !fullscreen_active {
-            overlay_targets.extend(background_effect::layer_popup_blur_targets(
-                state,
-                Layer::Overlay,
-            ));
-        }
-        let window_effect_targets = background_effect::window_blur_targets(state);
-        let mut blur_targets = window_effect_targets.clone();
-        blur_targets.extend(top_targets.iter().cloned());
-        blur_targets.extend(overlay_targets.iter().cloned());
-        self.blur_effects.retain_targets(&blur_targets);
-
-        let background_element = self
-            .background
-            .render_element(renderer, state.output_size())
-            .map_err(render_error)?;
-        let background_layer =
-            render_stage_elements(renderer, state, RenderStage::Layer(Layer::Background));
-        let bottom_layer =
-            render_stage_elements(renderer, state, RenderStage::Layer(Layer::Bottom));
-
-        if force_full_damage || removed_windows || finished_window_closes {
+            || state.scene_structural_dirty()
+            || state.scene_content_dirty()
+        {
             compositor.reset_buffer_ages();
-            self.scene_backdrop.reset(state.output());
         }
 
-        let output_size = state.output_size();
-        let target_transform = Transform::Normal;
-        let window_layers = collect_window_scene_layers(
-            renderer,
-            state,
-            &mut self.blur_effects,
-            output_size,
-            target_transform,
-            Some(&self.scene_backdrop),
-        )
-        .map_err(render_error)?;
-        let top_blurs = self.blur_effects.elements_for(
-            output_size,
-            target_transform,
-            &top_targets,
-            Some(&self.scene_backdrop),
-        );
-        let overlay_blurs = self.blur_effects.elements_for(
-            output_size,
-            target_transform,
-            &overlay_targets,
-            Some(&self.scene_backdrop),
-        );
-        let top_layer = if fullscreen_active {
-            Vec::new()
-        } else {
-            render_stage_elements(renderer, state, RenderStage::Layer(Layer::Top))
-        };
-        let overlay_layer = if fullscreen_active {
-            Vec::new()
-        } else {
-            render_stage_elements(renderer, state, RenderStage::Layer(Layer::Overlay))
-        };
+        refresh_space(state);
 
-        let window_layer_refs = window_layer_refs(&window_layers);
-        let backdrop_elements = scene_backdrop_elements(
-            background_element.as_ref(),
-            &background_layer,
-            &bottom_layer,
-            &window_layer_refs,
-        );
-        self.scene_backdrop
-            .render(renderer, output_size, &backdrop_elements)
+        self.scene
+            .prepare(
+                renderer,
+                SceneFrameInput {
+                    state,
+                    removed_windows,
+                    finished_window_closes,
+                    force_full_damage,
+                },
+            )
             .map_err(render_error)?;
-        let elements = scene_elements(
-            background_element.as_ref(),
-            &background_layer,
-            &bottom_layer,
-            &window_layer_refs,
-            &top_blurs,
-            &top_layer,
-            &overlay_blurs,
-            &overlay_layer,
-        );
+        let pointer = collect_pointer_elements(state, output, renderer);
+        let elements = SceneDrawSession::enter(&self.scene.scratch, || {
+            self.scene.collect_elements(state, &pointer.surfaces)
+        });
 
-        let frame = compositor
-            .render_frame(renderer, &elements, SCENE_CLEAR_COLOR, compositor_frame_flags())
+        let flags_with_scanout = FrameFlags::ALLOW_PRIMARY_PLANE_SCANOUT
+            | FrameFlags::ALLOW_PRIMARY_PLANE_SCANOUT_ANY
+            | FrameFlags::ALLOW_CURSOR_PLANE_SCANOUT;
+        let flags_composited = FrameFlags::ALLOW_CURSOR_PLANE_SCANOUT;
+
+        let mut frame = compositor
+            .render_frame(renderer, &elements, SCENE_CLEAR_COLOR, flags_with_scanout)
             .map_err(compositor_error)?;
-        if frame.is_empty {
-            return Ok(FrameResult::Idle);
+        if frame.is_empty && !elements.is_empty() {
+            compositor.reset_buffer_ages();
+            frame = compositor
+                .render_frame(renderer, &elements, SCENE_CLEAR_COLOR, flags_composited)
+                .map_err(compositor_error)?;
+        }
+        if frame.is_empty && !elements.is_empty() {
+            compositor.reset_buffers();
+            frame = compositor
+                .render_frame(renderer, &elements, SCENE_CLEAR_COLOR, FrameFlags::empty())
+                .map_err(compositor_error)?;
         }
 
-        compositor.queue_frame(()).map_err(compositor_error)?;
-        state.take_scene_dirty();
+        let render_element_states = frame.states.clone();
+        update_primary_scanout_output(state, output, &render_element_states);
+        if let Some(feedback) = session_output.dmabuf_feedback.as_ref() {
+            send_dmabuf_feedbacks(state, output, feedback, &render_element_states);
+        }
+
+        if frame.is_empty {
+            return Ok(FrameResult::NoDamage);
+        }
+
+        let presentation = take_presentation_feedback(state, output, &render_element_states);
+        compositor
+            .queue_frame(QueuedFrameData { presentation })
+            .map_err(compositor_error)?;
+        session_output.mark_frame_queued();
+        let cancel_estimated_vblank = session_output.frame_state.mark_waiting_for_vblank();
+        session_output.frame_state.frame_callback_sequence = session_output
+            .frame_state
+            .frame_callback_sequence
+            .wrapping_add(1);
+
+        if clear_state {
+            state.clear_frame_dirty();
+        }
         Ok(FrameResult::Queued {
-            callback_surfaces: state.frame_callback_surfaces(),
+            cancel_estimated_vblank,
         })
     }
 
     pub fn reset_damage(&mut self, state: &KestrelState) {
-        self.scene_backdrop.reset(state.output());
+        self.scene.reset_damage(state);
     }
 
     pub fn frame_presented(&mut self, presentation: Option<(Time<Monotonic>, u64)>) -> FrameTime {
@@ -237,16 +189,8 @@ impl SessionFrameRenderer {
     pub fn reset_for_output(&mut self, state: &KestrelState) {
         let frame_interval = refresh_interval(state.output_refresh_millihertz());
         self.frame_clock.set_refresh(frame_interval);
-        self.reset_damage(state);
-        self.blur_effects.retain_targets(&[]);
-        self.visible_popups = state.has_visible_popups();
+        self.scene.reset_for_output(state);
     }
-}
-
-fn compositor_frame_flags() -> FrameFlags {
-    FrameFlags::ALLOW_PRIMARY_PLANE_SCANOUT
-        | FrameFlags::ALLOW_PRIMARY_PLANE_SCANOUT_ANY
-        | FrameFlags::ALLOW_CURSOR_PLANE_SCANOUT
 }
 
 fn compositor_error<E: std::fmt::Display>(error: E) -> DrmError {

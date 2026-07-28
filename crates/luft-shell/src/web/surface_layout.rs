@@ -3,6 +3,7 @@ use fenestra_cef::{
     ShellSurfaceAnchor, ShellSurfaceKeyboardInteractivity, ShellSurfaceLayer, ShellSurfaceMargin,
     ShellSurfaceOptions,
 };
+use std::env;
 
 pub(crate) const PANEL_WIDTH_HINT: i32 = 1;
 const PANEL_BAR_HEIGHT: i32 = 48;
@@ -67,7 +68,15 @@ fn shell_size(kind: WebShellSurface, size: (i32, i32)) -> (u32, u32) {
         WebShellSurface::Panel => (0, panel_size().1),
         _ => size,
     };
-    (size.0.max(0) as u32, size.1.max(0) as u32)
+    (size.0.max(0) as u32, size.1.max(1) as u32)
+}
+
+pub(crate) fn panel_output_width() -> i32 {
+    env::var("LUFT_OUTPUT_WIDTH")
+        .ok()
+        .and_then(|value| value.parse::<i32>().ok())
+        .filter(|width| *width > 0)
+        .unwrap_or(1920)
 }
 
 fn layer(kind: WebShellSurface) -> ShellSurfaceLayer {
@@ -82,7 +91,9 @@ fn layer(kind: WebShellSurface) -> ShellSurfaceLayer {
 
 fn anchor(kind: WebShellSurface, panel_menu_x: Option<i32>) -> ShellSurfaceAnchor {
     match kind {
-        WebShellSurface::Panel => ShellSurfaceAnchor::BOTTOM | horizontal_anchor(),
+        WebShellSurface::Panel => {
+            ShellSurfaceAnchor::BOTTOM | ShellSurfaceAnchor::LEFT | ShellSurfaceAnchor::RIGHT
+        }
         WebShellSurface::PanelMenu if panel_menu_x.is_some() => {
             ShellSurfaceAnchor::BOTTOM | ShellSurfaceAnchor::LEFT
         }
@@ -127,10 +138,6 @@ fn margin(
         }
         _ => zero_margin(),
     }
-}
-
-fn horizontal_anchor() -> ShellSurfaceAnchor {
-    ShellSurfaceAnchor::LEFT | ShellSurfaceAnchor::RIGHT
 }
 
 fn zero_margin() -> ShellSurfaceMargin {

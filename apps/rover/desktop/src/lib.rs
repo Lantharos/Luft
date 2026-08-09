@@ -13,9 +13,6 @@ mod state;
 mod system_status;
 mod trash_manager;
 mod vcs;
-mod web_entry;
-
-use std::path::PathBuf;
 
 use sabine::{
     BridgeCommand, BridgeCommandDescriptor, BridgeError, BridgeResponse, BridgeResult,
@@ -38,14 +35,7 @@ const WINDOW_RADIUS: i32 = 16;
 
 pub fn build_window(window: SabineWindow, args: &[String]) -> SabineResult<SabineWindow> {
     let state = RoverState::new(args);
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let root_dir = manifest_dir
-        .parent()
-        .map(PathBuf::from)
-        .unwrap_or_else(|| manifest_dir.clone());
     let mut window = window
-        .app_id(APP_ID)
-        .app_version(env!("CARGO_PKG_VERSION"))
         .title(state.title())
         .size(WINDOW_WIDTH, WINDOW_HEIGHT)
         .min_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
@@ -94,10 +84,7 @@ pub fn build_window(window: SabineWindow, args: &[String]) -> SabineResult<Sabin
             .single_instance(SingleInstancePolicy::FocusExisting);
     }
 
-    let entry = web_entry::resolve(&root_dir);
-    window = window
-        .security(ContentSecurity::default())
-        .entry(format!("{}?sabine=1#/", entry.display()));
+    window = window.security(ContentSecurity::default());
 
     Ok(register_commands(window, state))
 }

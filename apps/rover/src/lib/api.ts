@@ -1,3 +1,4 @@
+import { invoke, listen } from '@lantharos/sabine';
 import type {
 	DirectoryContents,
 	FileEntry,
@@ -14,42 +15,8 @@ import type {
 } from './types';
 import type { VcsFileStatus, VcsJobTicket, VcsJobUpdate, VcsProject } from './vcs/types';
 
-async function invoke<T>(name: string, params?: Record<string, unknown>): Promise<T> {
-	const bridge = await waitForBridge();
-	return bridge.invoke<T>(name, params ?? {});
-}
-
 export async function listenBridgeEvent<T>(name: string, callback: (payload: T) => void): Promise<() => void> {
-	const bridge = await waitForBridge();
-	if (bridge.listen) return bridge.listen(name, callback);
-	const eventName = `fenestra:${name}`;
-	const listener = (event: Event) => callback((event as CustomEvent<T>).detail);
-	window.addEventListener(eventName, listener);
-	return () => window.removeEventListener(eventName, listener);
-}
-
-let bridgePromise: Promise<FenestraBridge> | null = null;
-
-function waitForBridge(timeoutMs = 30000): Promise<FenestraBridge> {
-	if (window.fenestra?.bridge) return Promise.resolve(window.fenestra.bridge);
-	if (bridgePromise) return bridgePromise;
-	bridgePromise = new Promise<FenestraBridge>((resolve, reject) => {
-		const startedAt = performance.now();
-		const poll = () => {
-			if (window.fenestra?.bridge) {
-				resolve(window.fenestra.bridge);
-				return;
-			}
-			if (performance.now() - startedAt > timeoutMs) {
-				bridgePromise = null;
-				reject(new Error('Rover desktop bridge is not available'));
-				return;
-			}
-			window.setTimeout(poll, 16);
-		};
-		poll();
-	});
-	return bridgePromise;
+	return listen(name, callback);
 }
 
 function filePath(path: string): string {

@@ -193,7 +193,7 @@ impl OperationsQueue {
     pub fn get_status(&self) -> QueueStatus {
         let operations = self.operations.read();
         let mut ops: Vec<Operation> = operations.values().cloned().collect();
-        ops.sort_by(|a, b| b.started_at.cmp(&a.started_at));
+        ops.sort_by_key(|operation| std::cmp::Reverse(operation.started_at));
 
         let active_count = ops
             .iter()

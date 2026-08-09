@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
+	import { events, type WindowFileDragEvent } from '@lantharos/sabine';
 	import AppHeader from '$lib/components/file-manager/AppHeader.svelte';
 	import ChooserBar from '$lib/components/file-manager/ChooserBar.svelte';
 	import ContextMenu from '$lib/components/file-manager/ContextMenu.svelte';
@@ -15,7 +16,7 @@
 	import * as api from '$lib/api';
 	import { ensureSidebarBookmarks, entryToSidebarBookmark, mergeSidebarBookmarks } from '$lib/file-manager/bookmarks';
 	import { dataTransferPaths } from '$lib/file-manager/drag-drop';
-	import { tabDropKey, type DropTarget } from '$lib/file-manager/drop-targets';
+	import { dropTargetFromPoint, tabDropKey } from '$lib/file-manager/drop-targets';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
 	import type { SingleInstanceActivation } from '$lib/file-manager/open-targets';
 	import { isDrivePath } from '$lib/file-manager/view-modes';
@@ -38,9 +39,11 @@
 	onMount(() => {
 		let disposed = false;
 		let removeSingleInstanceListener: (() => void) | null = null;
+		let removeFileDragListener: (() => void) | null = null;
 		let driveRefreshTimer: number | null = null;
 		void initialize();
 		if (isDesktopRuntime()) {
+			removeFileDragListener = events.fileDrag(handleNativeFileDrag);
 			driveRefreshTimer = window.setInterval(() => void loadDrives(), 5000);
 			void api
 				.listenBridgeEvent<SingleInstanceActivation>('singleInstance.activate', (activation) => {
@@ -57,6 +60,7 @@
 			clearDragHoverTab();
 			if (driveRefreshTimer !== null) window.clearInterval(driveRefreshTimer);
 			removeSingleInstanceListener?.();
+			removeFileDragListener?.();
 		};
 	});
 
@@ -334,14 +338,23 @@
 		}, 450);
 	}
 
-	function handleInternalDragMove(target: DropTarget | null) {
-		manager.updateInternalDropTarget(target);
-		scheduleDragHoverTab(target?.tabId ?? null);
-	}
-
-	function handleInternalDragEnd(targetPath: string | null, copy: boolean) {
+	function handleNativeFileDrag(event: WindowFileDragEvent) {
+		if (chooser) return;
+		if (event.phase === 'leave') {
+			clearDragHoverTab();
+			manager.handleDragEnd();
+			return;
+		}
+		const target = dropTargetFromPoint(event.x, event.y);
+		if (event.phase === 'enter' || event.phase === 'over') {
+			manager.updateNativeDropTarget(target, event.paths);
+			scheduleDragHoverTab(target?.tabId ?? null);
+			return;
+		}
 		clearDragHoverTab();
-		void manager.finishInternalDrop(targetPath, copy);
+		const internal = event.internal || manager.isDragging;
+		const move = event.action === 'move' || (event.action === 'none' && internal);
+		void manager.finishNativeDrop(event.paths, target?.path ?? null, move, internal);
 	}
 
 	function selectableChooserEntry(entry: FileEntry) {
@@ -652,9 +665,6 @@
 						onDragLeave={manager.handleDragLeave}
 						onDrop={chooser ? (event) => event.preventDefault() : manager.handleDrop}
 						onPathDragOver={chooser ? () => false : manager.handlePathDragOver}
-						onInternalDragStart={manager.beginInternalDrag}
-						onInternalDragMove={handleInternalDragMove}
-						onInternalDragEnd={handleInternalDragEnd}
 						onSort={manager.setSortBy}
 						onNavigate={manager.navigate}
 						onOpenPathInTab={manager.openNewTab}

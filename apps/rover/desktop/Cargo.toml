@@ -12,7 +12,7 @@ rust-version = "1.87"
 name = "rover_lib"
 
 [dependencies]
-fenestra-cef = { path = "../../fenestra/crates/fenestra-cef" }
+sabine = { git = "https://github.com/Lantharos/Sabine.git" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }

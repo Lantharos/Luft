@@ -1,6 +1,6 @@
 # Rover
 
-A modern, fast, and user-friendly file manager for Linux built with Fenestra + SvelteKit.
+A modern, fast, and user-friendly file manager for Linux built with Sabine + SvelteKit.
 
 ## Features
 
@@ -10,6 +10,7 @@ A modern, fast, and user-friendly file manager for Linux built with Fenestra + S
 - **Trash Management**: Full trash support with restore and permanent delete
 - **Favorites**: Pin files and folders from the context menu for quick access
 - **Sidebar Bookmarks**: Drop files or folders into the sidebar and remove pinned entries inline
+- **Native Drag and Drop**: Move files within Rover or drag them between Rover and other desktop apps
 - **File Previews**: Inline image thumbnails with dedicated package and AppImage icons
 - **Per-Folder Views**: Table, list, and gallery choices are remembered per folder
 - **Marquee Selection**: Drag through empty space to select multiple files
@@ -18,12 +19,12 @@ A modern, fast, and user-friendly file manager for Linux built with Fenestra + S
 - **Hidden Files Toggle**: Show or hide dotfiles without leaving the current folder
 - **Keyboard Shortcuts**: Full keyboard navigation support
 - **Search**: Quick file search within current directory
-- **Custom Window**: Fenestra OSR window with native controls, rounded input regions, and a translucent sidebar on supported compositors
+- **Custom Window**: Sabine OSR window with native controls, rounded input regions, and a translucent sidebar on supported compositors
 - **File Chooser Portal**: Rover can register as the xdg-desktop-portal file picker for apps that use the Linux portal picker
 
 ## Prerequisites
 
-Rover uses the shared Fenestra CEF runtime. Development builds resolve an installed runtime first and can install the shared user runtime when needed.
+Rover uses Sabine's shared Chromium runtime and service. The first launch prepares the runtime when needed, and later launches reuse it.
 
 ## Development
 
@@ -38,23 +39,23 @@ bun run desktop:dev
 bun run desktop:build
 ```
 
-Sidebar translucency is configured through Fenestra window regions. Rover keeps the main content opaque and uses compositor-backed blur only for the sidebar surface where available.
+Sidebar translucency is configured through Sabine window regions. Rover keeps the main content opaque and uses compositor-backed blur only for the sidebar surface where available.
 
 ## Install
 
-Rover has a `Fenestra.toml`, so Fenestra can detect the app id, icon, web build, and source launch command from the repo root:
+Rover has a `Sabine.toml`, so Sabine can detect the app id, icon, web build, and source launch command from the repo root:
 
 ```bash
-fenestra install
+sabine install .
 ```
 
 Update the installed desktop entry and staged web/icon assets from the repo root with:
 
 ```bash
-fenestra update
+sabine update
 ```
 
-The installed desktop entry accepts paths. Opening a folder with Rover opens that folder; opening a file opens its parent folder and selects the file. If Rover is already running, the path opens in a new tab in the existing window and Fenestra focuses that window.
+The installed desktop entry accepts paths. Opening a folder with Rover opens that folder; opening a file opens its parent folder and selects the file. If Rover is already running, the path opens in a new tab in the existing window and Sabine focuses that window.
 
 ## File Picker Portal
 
@@ -79,7 +80,7 @@ Rover ships a D-Bus service that implements `org.freedesktop.FileManager1` and r
 desktop/target/debug/rover --install-file-manager-bus
 ```
 
-The installer writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service` pointing at the running binary. D-Bus will auto-start the service on the first call and keep it running for the session. New `ShowItems` calls are forwarded via Fenestra's single-instance activation, so they reuse the existing window.
+The installer writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service` pointing at the running binary. D-Bus will auto-start the service on the first call and keep it running for the session. New `ShowItems` calls are forwarded via Sabine's single-instance activation, so they reuse the existing window.
 
 To hand the bus name back to another file manager (for example, Nautilus), just remove the service file:
 
@@ -109,7 +110,7 @@ rm ~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
 rover/
 ├── src/                    # Frontend (SvelteKit)
 │   ├── lib/
-│   │   ├── api.ts          # Fenestra bridge wrappers
+│   │   ├── api.ts          # Sabine bridge wrappers
 │   │   ├── components/     # Svelte components
 │   │   │   └── file-manager/ # File manager UI shell
 │   │   ├── file-manager/   # File manager state and list helpers
@@ -118,9 +119,9 @@ rover/
 │   │   └── utils/          # Utility functions
 │   └── routes/
 │       └── +page.svelte    # Main application UI
-├── desktop/                # Fenestra backend (Rust)
+├── desktop/                # Sabine backend (Rust)
 │   └── src/
-│       ├── lib.rs          # Fenestra window and bridge setup
+│       ├── lib.rs          # Sabine window and bridge setup
 │       ├── fs_ops.rs       # File system operations
 │       ├── drives.rs       # Drive/mount detection
 │       ├── trash_manager.rs # Trash operations

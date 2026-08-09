@@ -1,6 +1,9 @@
 {
 	"name": "rover",
-	"version": "0.0.1",
+	"version": "0.1.0",
+	"dependencies": {
+		"@lantharos/sabine": "github:Lantharos/Sabine"
+	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-static": "^3.0.10",
@@ -23,8 +26,9 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"desktop": "bun run desktop:dev",
-		"desktop:dev": "cargo run --manifest-path desktop/Cargo.toml -- --dev",
-		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release"
+		"desktop:dev": "sabine dev .",
+		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release",
+		"desktop:bundle": "sabine bundle . --release"
 	},
 	"type": "module"
 }

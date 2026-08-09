@@ -2,9 +2,6 @@
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
-    if fenestra_cef::run_fenestra_host_from_args(&args) {
-        return;
-    }
     if args.iter().any(|arg| arg == "--portal-backend") {
         if let Err(error) = rover_lib::run_portal_backend() {
             eprintln!("rover portal backend failed: {}", error);
@@ -30,10 +27,7 @@ fn main() {
         }
         return;
     }
-    if args
-        .iter()
-        .any(|arg| arg == "--install-file-manager-bus")
-    {
+    if args.iter().any(|arg| arg == "--install-file-manager-bus") {
         if let Err(error) = rover_lib::install_file_manager_bus_service() {
             eprintln!("failed to install Rover file manager bus: {}", error);
             std::process::exit(1);
@@ -41,8 +35,5 @@ fn main() {
         println!("Rover file manager bus installed for this user.");
         return;
     }
-    if let Err(error) = rover_lib::run(&args) {
-        eprintln!("failed to run Rover: {}", error);
-        std::process::exit(1);
-    }
+    sabine::SabineWindow::main(move |window| rover_lib::build_window(window, &args));
 }

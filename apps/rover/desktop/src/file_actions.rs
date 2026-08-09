@@ -224,7 +224,7 @@ fn move_items_impl(
             }
             Err(_) => {
                 if let Err(error) = copy_path(&source, &destination, &mut tracker) {
-                    cleanup_destinations(&[destination.clone()]);
+                    cleanup_destinations(std::slice::from_ref(&destination));
                     return Err(error);
                 }
                 remove_path(&source)?;
@@ -325,7 +325,7 @@ fn available_space(path: &Path) -> Result<u64, String> {
         let mut stat: MaybeUninit<libc::statvfs> = MaybeUninit::uninit();
         if libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) == 0 {
             let stat = stat.assume_init();
-            return Ok(stat.f_bavail as u64 * stat.f_frsize as u64);
+            return Ok(stat.f_bavail * stat.f_frsize);
         }
     }
 

@@ -72,8 +72,8 @@ fn get_disk_space(mount_point: &str) -> (u64, u64) {
         let mut stat: MaybeUninit<libc::statvfs> = MaybeUninit::uninit();
         if libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) == 0 {
             let stat = stat.assume_init();
-            let total = stat.f_blocks as u64 * stat.f_frsize as u64;
-            let available = stat.f_bavail as u64 * stat.f_frsize as u64;
+            let total = stat.f_blocks * stat.f_frsize;
+            let available = stat.f_bavail * stat.f_frsize;
             (total, available)
         } else {
             (0, 0)
@@ -280,7 +280,7 @@ pub fn get_drive_info(mount_point: String) -> Result<DriveInfo, String> {
 pub(crate) fn drive_for_path(path: &Path) -> Option<DriveInfo> {
     let path = path.to_string_lossy();
     let mut drives = list_drives().ok()?.drives;
-    drives.sort_by(|a, b| b.mount_point.len().cmp(&a.mount_point.len()));
+    drives.sort_by_key(|drive| std::cmp::Reverse(drive.mount_point.len()));
 
     drives.into_iter().find(|drive| {
         if drive.mount_point == "/" {

@@ -410,20 +410,6 @@ export class FileManager {
 		this.dragTarget = entry;
 		this.dragPaths = Array.from(get(selection));
 		setFileDragData(event.dataTransfer, this.dragPaths);
-		if (event.dataTransfer) {
-			const transparent = new Image();
-			transparent.src =
-				'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-			event.dataTransfer.setDragImage(transparent, 0, 0);
-		}
-	};
-	beginInternalDrag = (entry: FileEntry) => {
-		if (!get(selection).has(entry.path)) selection.select(entry.path);
-		this.isDragging = true;
-		this.dropCommitted = false;
-		this.dragTarget = entry;
-		this.dragPaths = Array.from(get(selection));
-		this.setDropTarget(null);
 	};
 	handleDragEnd = () => {
 		this.isDragging = false;
@@ -437,11 +423,13 @@ export class FileManager {
 		this.dropCommitted = true;
 		return true;
 	}
-	canDropSelectionOnPath(targetPath: string) {
+	canDropPathsOnPath(sourcePaths: string[], targetPath: string) {
 		if (!targetPath) return false;
-		if (get(selection).has(targetPath)) return false;
-		const sourcePaths = this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection));
 		return !sourcePaths.some((source) => targetPath === source || targetPath.startsWith(`${source}/`));
+	}
+	canDropSelectionOnPath(targetPath: string) {
+		const sourcePaths = this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection));
+		return this.canDropPathsOnPath(sourcePaths, targetPath);
 	}
 	canAcceptExternalDrop(targetPath: string) {
 		if (!targetPath) return false;
@@ -451,12 +439,12 @@ export class FileManager {
 		this.dropTarget = target?.path ?? null;
 		this.dropTargetKey = target?.key ?? null;
 	}
-	updateInternalDropTarget = (target: DropTarget | null) => {
+	updateNativeDropTarget = (target: DropTarget | null, sourcePaths: string[]) => {
 		if (!target) {
 			this.setDropTarget(null);
 			return;
 		}
-		if (target.path === 'trash' || this.canDropSelectionOnPath(target.path)) this.setDropTarget(target);
+		if (target.path === 'trash' || this.canDropPathsOnPath(sourcePaths, target.path)) this.setDropTarget(target);
 		else this.setDropTarget(null);
 	};
 	handleDragOver = (event: DragEvent, entry?: FileEntry, targetKey?: string) => {
@@ -614,14 +602,16 @@ export class FileManager {
 			}, followupDelay);
 		}
 	}
-	finishInternalDrop = async (targetPath: string | null, copy: boolean) => {
-		if (!targetPath) return this.handleDragEnd();
-		if (!this.claimInternalDrop()) return;
+	finishNativeDrop = async (sourcePaths: string[], targetPath: string | null, move: boolean, internal: boolean) => {
+		if (!targetPath || (targetPath !== 'trash' && !this.canDropPathsOnPath(sourcePaths, targetPath))) {
+			return this.handleDragEnd();
+		}
+		if (internal && !this.claimInternalDrop()) return;
 		if (targetPath === 'trash') {
-			await this.trashSelected();
+			await this.trashPaths(sourcePaths);
 			return;
 		}
-		await this.dropPaths(this.dragPaths.length > 0 ? this.dragPaths : Array.from(get(selection)), targetPath, !copy);
+		await this.dropPaths(sourcePaths, targetPath, move);
 	};
 	handleDrop = async (event: DragEvent, targetPath: string) => {
 		event.preventDefault();

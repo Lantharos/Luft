@@ -10,16 +10,16 @@ pub fn resolve(source_root: &Path) -> PathBuf {
 }
 
 fn installed() -> Option<PathBuf> {
-    env::var_os("FENESTRA_WEB_ENTRY")
+    env::var_os("SABINE_WEB_ENTRY")
         .map(PathBuf::from)
         .filter(|entry| entry.is_file())
         .or_else(|| {
-            env::var_os("FENESTRA_WEB_DIR")
+            env::var_os("SABINE_WEB_DIR")
                 .map(|dir| PathBuf::from(dir).join("index.html"))
                 .filter(|entry| entry.is_file())
         })
         .or_else(|| {
-            env::var_os("FENESTRA_APP_DIR")
+            env::var_os("SABINE_APP_DIR")
                 .map(|dir| PathBuf::from(dir).join("web/index.html"))
                 .filter(|entry| entry.is_file())
         })
@@ -28,7 +28,7 @@ fn installed() -> Option<PathBuf> {
 fn bundled() -> Option<PathBuf> {
     let exe = std::env::current_exe().ok()?;
     let bin_dir = exe.parent()?;
-    let resources_root = bin_dir.parent()?.join("share/fenestra");
+    let resources_root = bin_dir.parent()?.join("share/sabine");
     let mut entries = fs::read_dir(resources_root)
         .ok()?
         .filter_map(Result::ok)

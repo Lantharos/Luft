@@ -17,11 +17,10 @@ mod web_entry;
 
 use std::path::PathBuf;
 
-use fenestra_cef::SingleInstancePolicy;
-use fenestra_cef::{
+use sabine::{
     BridgeCommand, BridgeCommandDescriptor, BridgeError, BridgeResponse, BridgeResult,
-    FenestraWindow, FenestraWindowControlAction, RuntimeConfig, RuntimeMode, WebViewSecurity,
-    WindowRegion, WindowRegionRect,
+    ContentSecurity, SabineLifecyclePolicy, SabineResult, SabineWindow, SabineWindowControlAction,
+    SingleInstancePolicy, WindowRegion, WindowRegionRect,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use state::RoverState;
@@ -37,44 +36,22 @@ const APP_HEADER_HEIGHT: i32 = 52;
 const SIDEBAR_STATIC_CONTROLS_HEIGHT: i32 = 520;
 const WINDOW_RADIUS: i32 = 16;
 
-pub fn run(args: &[String]) -> Result<(), String> {
+pub fn build_window(window: SabineWindow, args: &[String]) -> SabineResult<SabineWindow> {
     let state = RoverState::new(args);
-    let window = build_window(args, &state);
-    let process = match window.launch_or_install() {
-        Ok(process) => process,
-        Err(error)
-            if error
-                .to_string()
-                .contains("another instance is already running") =>
-        {
-            return Ok(());
-        }
-        Err(error) => return Err(error.to_string()),
-    };
-    let _ = process.wait();
-    Ok(())
-}
-
-fn build_window(args: &[String], state: &RoverState) -> FenestraWindow {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root_dir = manifest_dir
         .parent()
         .map(PathBuf::from)
         .unwrap_or_else(|| manifest_dir.clone());
-    let runtime = RuntimeConfig {
-        mode: RuntimeMode::SharedPreferred,
-        allow_user_install: true,
-        bundled_dir: Some(root_dir.clone()),
-        ..RuntimeConfig::default()
-    };
-    let mut window = FenestraWindow::new()
-        .title(state.title())
+    let mut window = window
         .app_id(APP_ID)
+        .app_version(env!("CARGO_PKG_VERSION"))
+        .title(state.title())
         .size(WINDOW_WIDTH, WINDOW_HEIGHT)
         .min_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         .frameless()
         .glass()
-        .runtime(runtime)
+        .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
         .blur_region(WindowRegion::adaptive_rounded_left(
             SIDEBAR_WIDTH,
             WINDOW_RADIUS,
@@ -99,15 +76,15 @@ fn build_window(args: &[String], state: &RoverState) -> FenestraWindow {
             APP_HEADER_HEIGHT,
         ))
         .control_region(
-            FenestraWindowControlAction::Minimize,
+            SabineWindowControlAction::Minimize,
             WindowRegionRect::new(-108, 12, 28, 28),
         )
         .control_region(
-            FenestraWindowControlAction::Maximize,
+            SabineWindowControlAction::Maximize,
             WindowRegionRect::new(-76, 12, 28, 28),
         )
         .control_region(
-            FenestraWindowControlAction::Close,
+            SabineWindowControlAction::Close,
             WindowRegionRect::new(-44, 12, 28, 28),
         );
 
@@ -117,24 +94,15 @@ fn build_window(args: &[String], state: &RoverState) -> FenestraWindow {
             .single_instance(SingleInstancePolicy::FocusExisting);
     }
 
-    if args.iter().any(|arg| arg == "--dev") {
-        window = window
-            .security(WebViewSecurity {
-                remote_content: true,
-                allowed_origins: Vec::new(),
-                allowed_bridge_permissions: Vec::new(),
-            })
-            .dev_url("http://localhost:5173?fenestra=1#/")
-            .dev_command("bun run dev");
-    } else {
-        let entry = web_entry::resolve(&root_dir);
-        window = window.entry(format!("{}?fenestra=1#/", entry.display()));
-    }
+    let entry = web_entry::resolve(&root_dir);
+    window = window
+        .security(ContentSecurity::default())
+        .entry(format!("{}?sabine=1#/", entry.display()));
 
-    register_commands(window, state.clone())
+    Ok(register_commands(window, state))
 }
 
-fn register_commands(mut window: FenestraWindow, state: RoverState) -> FenestraWindow {
+fn register_commands(mut window: SabineWindow, state: RoverState) -> SabineWindow {
     macro_rules! command {
         ($name:literal, $handler:expr) => {{
             window = window.bridge_descriptor_handler(

@@ -56,7 +56,7 @@ pub fn list_trash() -> Result<TrashContents, String> {
         }
     }
 
-    items.sort_by(|a, b| b.deleted_at.cmp(&a.deleted_at));
+    items.sort_by_key(|item| std::cmp::Reverse(item.deleted_at));
 
     let total_items = items.len();
 
@@ -190,12 +190,11 @@ fn parse_trashinfo(path: &PathBuf) -> Option<(String, i64)> {
     let mut deletion_date = None;
 
     for line in content.lines() {
-        if line.starts_with("Path=") {
-            let decoded = urlencoding_decode(&line[5..]);
+        if let Some(path) = line.strip_prefix("Path=") {
+            let decoded = urlencoding_decode(path);
             original_path = Some(decoded);
-        } else if line.starts_with("DeletionDate=") {
-            if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(&line[13..], "%Y-%m-%dT%H:%M:%S")
-            {
+        } else if let Some(date) = line.strip_prefix("DeletionDate=") {
+            if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(date, "%Y-%m-%dT%H:%M:%S") {
                 deletion_date = Some(dt.and_utc().timestamp());
             }
         }

@@ -1,5 +1,7 @@
+import { appWindow, isAvailable } from '@lantharos/sabine';
+
 export function isDesktopRuntime() {
-	return typeof window !== 'undefined' && (Boolean(window.fenestra?.bridge) || new URLSearchParams(window.location.search).has('fenestra'));
+	return typeof window !== 'undefined' && (isAvailable() || new URLSearchParams(window.location.search).has('sabine'));
 }
 
 export function fileSource(path: string) {
@@ -8,23 +10,17 @@ export function fileSource(path: string) {
 }
 
 export function minimizeWindow() {
-	controlWindow('minimize');
+	if (isDesktopRuntime()) appWindow.minimize();
 }
 
 export function toggleMaximizeWindow() {
-	controlWindow('maximize');
+	if (isDesktopRuntime()) appWindow.toggleMaximize();
 }
 
 export function closeWindow() {
-	controlWindow('close');
+	if (isDesktopRuntime()) appWindow.close();
 }
 
 export function startWindowDrag() {
-	if (!isDesktopRuntime()) return;
-	window.location.href = `fenestra://window/start-drag?at=${Date.now()}`;
-}
-
-function controlWindow(action: 'close' | 'minimize' | 'maximize') {
-	if (!isDesktopRuntime()) return;
-	window.location.href = `fenestra://window/${action}`;
+	if (isDesktopRuntime()) appWindow.startDrag();
 }

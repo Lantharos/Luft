@@ -255,7 +255,7 @@ pub fn rename_item(path: String, new_name: String) -> Result<FileEntry, String> 
     let new_path = parent.join(&new_name);
 
     if new_path.exists() {
-        return Err(format!("An item with that name already exists"));
+        return Err("An item with that name already exists".to_string());
     }
 
     match fs::rename(&old_path, &new_path) {

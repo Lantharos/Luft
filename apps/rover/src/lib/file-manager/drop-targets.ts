@@ -25,3 +25,18 @@ export function trashDropKey() {
 export function dropTargetKeyForPath(path: string) {
 	return path === TRASH_DROP_PATH ? trashDropKey() : pathDropKey(path);
 }
+
+export function dropTargetFromPoint(clientX: number, clientY: number): DropTarget | null {
+	for (const element of document.elementsFromPoint(clientX, clientY)) {
+		if (!(element instanceof HTMLElement)) continue;
+		const target = element.closest<HTMLElement>('[data-drop-key], [data-drop-path], [data-drop-trash="true"]');
+		if (!target) continue;
+		const key = target.dataset.dropKey;
+		const tabId = target.dataset.dropTabId ?? null;
+		if (target.dataset.dropTrash === 'true') return { path: TRASH_DROP_PATH, key: key ?? trashDropKey(), tabId };
+		const pathTarget = target.closest<HTMLElement>('[data-drop-path]') ?? target;
+		const path = pathTarget.dataset.dropPath;
+		if (path) return { path, key: key ?? dropTargetKeyForPath(path), tabId };
+	}
+	return null;
+}

@@ -47,8 +47,6 @@ cargo build "${build_args[@]}" \
   -p luft-portal \
   --features kestrel/session-backend
 
-"$target_dir/luft-shell" --refresh-fenestra-host
-
 "${SUDO[@]}" install -Dm755 "$target_dir/kestrel" "$BIN_DIR/kestrel"
 "${SUDO[@]}" install -Dm755 "$target_dir/luft-shell" "$BIN_DIR/luft-shell"
 "${SUDO[@]}" install -Dm755 "$target_dir/luft-session" "$BIN_DIR/luft-session"

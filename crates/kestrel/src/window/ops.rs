@@ -3,8 +3,7 @@ use crate::state::KestrelState;
 use luft_ipc::{LayoutError, Rect, WindowId, WindowState};
 use smithay::{
     input::keyboard::KeyboardHandle,
-    reexports::wayland_protocols::xdg::shell::server::xdg_toplevel,
-    utils::Serial,
+    reexports::wayland_protocols::xdg::shell::server::xdg_toplevel, utils::Serial,
     wayland::shell::xdg::ToplevelSurface,
 };
 
@@ -12,12 +11,7 @@ const MAXIMIZED_MARGIN: i32 = 0;
 const BOTTOM_PANEL_HEIGHT: i32 = 48;
 
 impl KestrelState {
-    pub fn prepare_window_drag(
-        &mut self,
-        surface: ToplevelSurface,
-        serial: Serial,
-        button: u32,
-    ) {
+    pub fn prepare_window_drag(&mut self, surface: ToplevelSurface, serial: Serial, button: u32) {
         self.pending_window_drag = Some(crate::state::PendingWindowDrag {
             surface,
             pointer_start: self.pointer_location,
@@ -299,7 +293,8 @@ impl KestrelState {
             .ok_or(LayoutError::UnknownWindow(id))?;
         let top = self.reserved_top();
         let bottom = self.reserved_bottom();
-        let width = (self.output_size().w - MAXIMIZED_MARGIN * 2).max(crate::window::MIN_WINDOW_WIDTH);
+        let width =
+            (self.output_size().w - MAXIMIZED_MARGIN * 2).max(crate::window::MIN_WINDOW_WIDTH);
         let height = (self.output_size().h - top - bottom - titlebar_height)
             .max(crate::window::MIN_WINDOW_HEIGHT);
         Ok(Rect::new(MAXIMIZED_MARGIN, top, width, height))
@@ -308,15 +303,23 @@ impl KestrelState {
     fn fit_window_geometry(&self, geometry: Rect, titlebar_height: i32) -> Rect {
         let min_x = 0;
         let min_y = 0;
-        let max_right = self.output_size().w.max(min_x + crate::window::MIN_WINDOW_WIDTH);
+        let max_right = self
+            .output_size()
+            .w
+            .max(min_x + crate::window::MIN_WINDOW_WIDTH);
         let max_bottom = self
             .output_size()
             .h
             .max(min_y + crate::window::MIN_WINDOW_HEIGHT + titlebar_height);
         let max_width = (max_right - min_x).max(crate::window::MIN_WINDOW_WIDTH);
-        let max_height = (max_bottom - min_y - titlebar_height).max(crate::window::MIN_WINDOW_HEIGHT);
-        let width = geometry.width.clamp(crate::window::MIN_WINDOW_WIDTH, max_width);
-        let height = geometry.height.clamp(crate::window::MIN_WINDOW_HEIGHT, max_height);
+        let max_height =
+            (max_bottom - min_y - titlebar_height).max(crate::window::MIN_WINDOW_HEIGHT);
+        let width = geometry
+            .width
+            .clamp(crate::window::MIN_WINDOW_WIDTH, max_width);
+        let height = geometry
+            .height
+            .clamp(crate::window::MIN_WINDOW_HEIGHT, max_height);
         let max_x = (max_right - width).max(min_x);
         let max_y = (max_bottom - titlebar_height - height).max(min_y);
 
@@ -337,8 +340,12 @@ impl KestrelState {
         Rect::new(
             0,
             min_y,
-            geometry.width.clamp(crate::window::MIN_WINDOW_WIDTH, max_width),
-            geometry.height.clamp(crate::window::MIN_WINDOW_HEIGHT, max_height),
+            geometry
+                .width
+                .clamp(crate::window::MIN_WINDOW_WIDTH, max_width),
+            geometry
+                .height
+                .clamp(crate::window::MIN_WINDOW_HEIGHT, max_height),
         )
     }
 
@@ -360,7 +367,12 @@ impl KestrelState {
     }
 }
 
-pub(crate) fn configure_surface(surface: &ToplevelSurface, geometry: Rect, maximized: bool, fullscreen: bool) {
+pub(crate) fn configure_surface(
+    surface: &ToplevelSurface,
+    geometry: Rect,
+    maximized: bool,
+    fullscreen: bool,
+) {
     surface.with_pending_state(|state| {
         state.size = Some((geometry.width, geometry.height).into());
         if maximized {

@@ -15,6 +15,11 @@ impl KestrelState {
         &self,
         location: Point<f64, Logical>,
     ) -> Option<(WlSurface, Point<f64, Logical>)> {
+        if self.session_locked() {
+            return self
+                .lock_surface_for_output()
+                .map(|surface| (surface.wl_surface().clone(), Point::from((0.0, 0.0))));
+        }
         let fullscreen = self
             .windows
             .fullscreen_on_workspace(self.layout.active_workspace())
@@ -28,6 +33,11 @@ impl KestrelState {
     }
 
     pub fn keyboard_focus(&self, location: Point<f64, Logical>) -> Option<WlSurface> {
+        if self.session_locked() {
+            return self
+                .lock_surface_for_output()
+                .map(|surface| surface.wl_surface().clone());
+        }
         let fullscreen = self
             .windows
             .fullscreen_on_workspace(self.layout.active_workspace())
@@ -136,11 +146,19 @@ impl KestrelState {
     }
 
     pub fn commit_surface_needs_render(&self, surface: &WlSurface) -> bool {
+        if self.session_locked()
+            && self
+                .lock_surface_roots()
+                .iter()
+                .any(|root| surface_tree_contains(root, surface))
+        {
+            return true;
+        }
         if self.visible_window_contains_surface(surface) {
             return true;
         }
 
-        layers::surfaces(self.output())
+        self.all_layer_surfaces()
             .iter()
             .any(|root| surface_tree_contains(root, surface))
     }

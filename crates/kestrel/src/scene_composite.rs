@@ -1,25 +1,22 @@
 #![cfg_attr(not(feature = "session-backend"), allow(dead_code))]
 
 use crate::{
-    render::LayerElement,
-    scene_blur::FramebufferBlurElement,
-    scene_render::WindowSceneLayer,
+    render::LayerElement, scene_blur::FramebufferBlurElement, scene_render::WindowSceneLayer,
     state::KestrelState,
 };
 use luft_ipc::WindowId;
-use std::collections::HashMap;
 use smithay::{
     backend::renderer::{
         element::{
             Element, Id, Kind, RenderElement, UnderlyingStorage,
-            memory::MemoryRenderBufferRenderElement,
-            surface::WaylandSurfaceRenderElement,
+            memory::MemoryRenderBufferRenderElement, surface::WaylandSurfaceRenderElement,
         },
         gles::{GlesError, GlesRenderer},
         utils::{CommitCounter, DamageSet, OpaqueRegions},
     },
-    utils::{user_data::UserDataMap, Buffer, Physical, Rectangle, Scale, Transform},
+    utils::{Buffer, Physical, Rectangle, Scale, Transform, user_data::UserDataMap},
 };
+use std::collections::HashMap;
 
 type MemoryElement = MemoryRenderBufferRenderElement<GlesRenderer>;
 type CursorSurfaceElement = WaylandSurfaceRenderElement<GlesRenderer>;
@@ -157,24 +154,45 @@ impl RenderElement<GlesRenderer> for SceneRenderElement<'_> {
     ) -> Result<(), GlesError> {
         match self {
             Self::Rounded(element) => RenderElement::<GlesRenderer>::draw(
-                element, frame, src, dst, damage, opaque_regions, cache,
+                element,
+                frame,
+                src,
+                dst,
+                damage,
+                opaque_regions,
+                cache,
             ),
             Self::Memory(element) => RenderElement::<GlesRenderer>::draw(
-                element, frame, src, dst, damage, opaque_regions, cache,
+                element,
+                frame,
+                src,
+                dst,
+                damage,
+                opaque_regions,
+                cache,
             ),
             Self::Blur(element) => RenderElement::<GlesRenderer>::draw(
-                element, frame, src, dst, damage, opaque_regions, cache,
+                element,
+                frame,
+                src,
+                dst,
+                damage,
+                opaque_regions,
+                cache,
             ),
             Self::Cursor(element) => RenderElement::<GlesRenderer>::draw(
-                element, frame, src, dst, damage, opaque_regions, cache,
+                element,
+                frame,
+                src,
+                dst,
+                damage,
+                opaque_regions,
+                cache,
             ),
         }
     }
 
-    fn underlying_storage(
-        &self,
-        renderer: &mut GlesRenderer,
-    ) -> Option<UnderlyingStorage<'_>> {
+    fn underlying_storage(&self, renderer: &mut GlesRenderer) -> Option<UnderlyingStorage<'_>> {
         match self {
             Self::Rounded(element) => element.underlying_storage(renderer),
             Self::Memory(element) => element.underlying_storage(renderer),
@@ -283,17 +301,7 @@ mod tests {
     #[test]
     fn empty_scene_has_no_elements() {
         let window_layers = HashMap::new();
-        let elements = scene_elements(
-            None,
-            None,
-            &[],
-            &[],
-            &window_layers,
-            &[],
-            &[],
-            &[],
-            &[],
-        );
+        let elements = scene_elements(None, None, &[], &[], &window_layers, &[], &[], &[], &[]);
         assert!(elements.is_empty());
     }
 }

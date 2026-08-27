@@ -1,21 +1,14 @@
 use crate::layers::{BlurLayer, LayerMaterial, LayerRenderTarget};
 use crate::scene_backdrop::SceneBackdrop;
 use smithay::{
-    backend::{
-        allocator::Fourcc,
-        renderer::{
-            Bind, BlitFrame, Frame, FrameContext, Offscreen, TextureFilter,
-            element::{Element, Id, Kind, RenderElement},
-            gles::{
-                GlesError, GlesFrame, GlesRenderer, GlesTexProgram, GlesTexture,
-                UniformName, UniformType,
-            },
-        },
+    backend::renderer::{
+        Bind, BlitFrame, Frame, FrameContext, Renderer, TextureFilter,
+        element::{Element, Id, Kind, RenderElement},
+        gles::{GlesError, GlesFrame, GlesRenderer, GlesTexture},
     },
     reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::{
-        user_data::UserDataMap, Buffer, Logical, Physical, Point, Rectangle, Scale, Size,
-        Transform,
+        Buffer, Logical, Physical, Point, Rectangle, Scale, Size, Transform, user_data::UserDataMap,
     },
 };
 use std::cell::RefCell;
@@ -24,11 +17,13 @@ use std::rc::Rc;
 
 mod geometry;
 mod render_pass;
+mod resources;
 
 use geometry::{
     blur_texture_size, clipped_target_rect, padded_target_rect, source_rect_for_visible_target,
 };
 use render_pass::{BlurRenderPass, render_blur_texture};
+use resources::BlurInner;
 
 const BLUR_SHADER: &str = include_str!("shaders/scene_blur.frag");
 
@@ -52,6 +47,8 @@ struct BlurTargetEntry {
 struct BackdropCapture {
     texture: GlesTexture,
     generation: u64,
+    history_base: u64,
+    damage: Vec<crate::scene_backdrop::BackdropDamage>,
 }
 
 pub struct FramebufferBlurElement {
@@ -69,18 +66,6 @@ pub struct FramebufferBlurElement {
     target_transform: Transform,
     backdrop: Option<BackdropCapture>,
     inner_cache: Rc<RefCell<HashMap<Id, BlurInner>>>,
-}
-
-struct BlurInner {
-    capture: GlesTexture,
-    scratch: GlesTexture,
-    blurred: GlesTexture,
-    output: GlesTexture,
-    intermediate: Option<GlesTexture>,
-    program: Option<GlesTexProgram>,
-    texture_size: Size<i32, Physical>,
-    capture_size: Size<i32, Physical>,
-    backdrop_generation: Option<u64>,
 }
 
 impl Default for BlurEffectManager {
@@ -125,9 +110,20 @@ impl BlurEffectManager {
     ) -> Vec<FramebufferBlurElement> {
         let layer_backdrop = backdrop.and_then(|backdrop| {
             let texture = backdrop.texture()?.clone();
+            let damage = backdrop
+                .damage_history()
+                .iter()
+                .cloned()
+                .collect::<Vec<_>>();
+            let history_base = damage
+                .first()
+                .map(|change| change.generation.wrapping_sub(1))
+                .unwrap_or_else(|| backdrop.generation());
             Some(BackdropCapture {
                 texture,
                 generation: backdrop.generation(),
+                history_base,
+                damage,
             })
         });
         let mut elements = Vec::with_capacity(targets.len());
@@ -141,8 +137,7 @@ impl BlurEffectManager {
             let sample_rect = padded_target_rect(output_size, target, rect);
             let capture_size = blur_texture_size(target, sample_rect.size);
             let texture_size = blur_texture_size(target, rect.size);
-            let visible_source =
-                source_rect_for_visible_target(sample_rect, rect, capture_size);
+            let visible_source = source_rect_for_visible_target(sample_rect, rect, capture_size);
             let entry = self.entry_for(target);
             elements.push(FramebufferBlurElement {
                 id: entry.id.clone(),
@@ -275,10 +270,7 @@ impl RenderElement<GlesRenderer> for FramebufferBlurElement {
 
         let blit_source =
             framebuffer_source_rect(self.output_size, self.target_transform, self.sample_rect);
-        self.prepare_blur_inner(
-            frame,
-            BlurCaptureSource::LiveFramebuffer { blit_source },
-        )
+        self.prepare_blur_inner(frame, BlurCaptureSource::LiveFramebuffer { blit_source })
     }
 
     fn draw(
@@ -297,6 +289,8 @@ impl RenderElement<GlesRenderer> for FramebufferBlurElement {
                     texture: &backdrop.texture,
                     generation: backdrop.generation,
                     sample_rect: self.sample_rect,
+                    history_base: backdrop.history_base,
+                    damage: &backdrop.damage,
                 },
             )?;
         }
@@ -331,12 +325,10 @@ impl RenderElement<GlesRenderer> for FramebufferBlurElement {
             return Ok(());
         }
 
-        let texture_source = Rectangle::from_size(
-            Size::<f64, Buffer>::from((
-                self.texture_size.w as f64,
-                self.texture_size.h as f64,
-            )),
-        );
+        let texture_source = Rectangle::from_size(Size::<f64, Buffer>::from((
+            self.texture_size.w as f64,
+            self.texture_size.h as f64,
+        )));
         frame.render_texture_from_to(
             &texture,
             texture_source,
@@ -359,6 +351,8 @@ enum BlurCaptureSource<'a> {
         texture: &'a GlesTexture,
         generation: u64,
         sample_rect: Rectangle<i32, Physical>,
+        history_base: u64,
+        damage: &'a [crate::scene_backdrop::BackdropDamage],
     },
 }
 
@@ -387,12 +381,30 @@ impl FramebufferBlurElement {
         }
 
         let needs_refresh = match &source {
-            BlurCaptureSource::Backdrop { generation, .. } => {
-                inner.backdrop_generation != Some(*generation)
-            }
+            BlurCaptureSource::Backdrop {
+                generation,
+                sample_rect,
+                history_base,
+                damage,
+                ..
+            } => backdrop_changed(
+                inner.backdrop_generation,
+                *generation,
+                *history_base,
+                damage,
+                *sample_rect,
+            ),
             BlurCaptureSource::LiveFramebuffer { .. } => true,
         };
+        if let BlurCaptureSource::Backdrop { generation, .. } = &source {
+            inner.backdrop_generation = Some(*generation);
+        }
         if !needs_refresh {
+            tracing::trace!(
+                target = ?self.id,
+                generation = inner.backdrop_generation,
+                "reused blur texture outside backdrop damage"
+            );
             return Ok(());
         }
 
@@ -404,17 +416,20 @@ impl FramebufferBlurElement {
                         let mut guard = frame.renderer();
                         guard.as_mut().bind(&mut inner.capture)?
                     };
-                    frame.blit_to(
+                    let sync = frame.blit_to(
                         &mut capture_framebuffer,
                         blit_source,
                         capture_target,
                         TextureFilter::Linear,
                     )?;
+                    let mut guard = frame.renderer();
+                    guard.as_mut().wait(&sync)?;
                 }
-                let capture_source = Rectangle::<f64, Buffer>::from_size(Size::<f64, Buffer>::from((
-                    self.capture_size.w as f64,
-                    self.capture_size.h as f64,
-                )));
+                let capture_source =
+                    Rectangle::<f64, Buffer>::from_size(Size::<f64, Buffer>::from((
+                        self.capture_size.w as f64,
+                        self.capture_size.h as f64,
+                    )));
                 let mut guard = frame.renderer();
                 let renderer = guard.as_mut();
                 let program = inner.program(renderer)?;
@@ -439,8 +454,9 @@ impl FramebufferBlurElement {
                 texture,
                 generation,
                 sample_rect,
+                history_base: _,
+                damage: _,
             } => {
-                inner.backdrop_generation = Some(generation);
                 let capture_source = Rectangle::<f64, Buffer>::new(
                     (sample_rect.loc.x as f64, sample_rect.loc.y as f64).into(),
                     (sample_rect.size.w as f64, sample_rect.size.h as f64).into(),
@@ -464,6 +480,13 @@ impl FramebufferBlurElement {
                         output: &mut inner.output,
                     },
                 )?;
+                tracing::trace!(
+                    target = ?self.id,
+                    generation,
+                    sample_width = sample_rect.size.w,
+                    sample_height = sample_rect.size.h,
+                    "recomputed blur texture for backdrop damage"
+                );
             }
         }
         inner.intermediate = Some(inner.output.clone());
@@ -471,54 +494,30 @@ impl FramebufferBlurElement {
     }
 }
 
-impl BlurInner {
-    fn new(
-        renderer: &mut GlesRenderer,
-        texture_size: Size<i32, Physical>,
-        capture_size: Size<i32, Physical>,
-    ) -> Result<Self, GlesError> {
-        Ok(Self {
-            capture: texture(renderer, capture_size)?,
-            scratch: texture(renderer, capture_size)?,
-            blurred: texture(renderer, capture_size)?,
-            output: texture(renderer, texture_size)?,
-            intermediate: None,
-            program: None,
-            texture_size,
-            capture_size,
-            backdrop_generation: None,
-        })
+fn backdrop_changed(
+    previous: Option<u64>,
+    current: u64,
+    history_base: u64,
+    damage: &[crate::scene_backdrop::BackdropDamage],
+    sample_rect: Rectangle<i32, Physical>,
+) -> bool {
+    let Some(previous) = previous else {
+        return true;
+    };
+    if previous == current {
+        return false;
+    }
+    if previous < history_base || previous > current {
+        return true;
     }
 
-    fn program(&mut self, renderer: &mut GlesRenderer) -> Result<GlesTexProgram, GlesError> {
-        if let Some(program) = &self.program {
-            return Ok(program.clone());
-        }
-        let program = renderer.compile_custom_texture_shader(
-            BLUR_SHADER,
-            &[
-                UniformName::new("texel", UniformType::_2f),
-                UniformName::new("target_size", UniformType::_2f),
-                UniformName::new("radius", UniformType::_1f),
-                UniformName::new("shape", UniformType::_1f),
-                UniformName::new("direction", UniformType::_2f),
-                UniformName::new("final_pass", UniformType::_1f),
-                UniformName::new("mask_pass", UniformType::_1f),
-            ],
-        )?;
-        self.program = Some(program.clone());
-        Ok(program)
-    }
-}
-
-fn texture(
-    renderer: &mut GlesRenderer,
-    size: Size<i32, Physical>,
-) -> Result<GlesTexture, GlesError> {
-    renderer.create_buffer(
-        Fourcc::Abgr8888,
-        Size::<i32, Buffer>::from((size.w, size.h)),
-    )
+    damage.iter().any(|change| {
+        change.generation > previous
+            && change
+                .rectangles
+                .iter()
+                .any(|rect| rect.overlaps(sample_rect))
+    })
 }
 
 fn framebuffer_source_rect(
@@ -527,4 +526,34 @@ fn framebuffer_source_rect(
     rect: Rectangle<i32, Physical>,
 ) -> Rectangle<i32, Physical> {
     transform.transform_rect_in(rect, &output_size)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::backdrop_changed;
+    use crate::scene_backdrop::BackdropDamage;
+    use smithay::utils::Rectangle;
+
+    #[test]
+    fn backdrop_damage_only_invalidates_intersecting_blur_targets() {
+        let damage = [BackdropDamage {
+            generation: 8,
+            rectangles: vec![Rectangle::new((100, 100).into(), (40, 40).into())],
+        }];
+
+        assert!(backdrop_changed(
+            Some(7),
+            8,
+            7,
+            &damage,
+            Rectangle::new((120, 120).into(), (80, 80).into()),
+        ));
+        assert!(!backdrop_changed(
+            Some(7),
+            8,
+            7,
+            &damage,
+            Rectangle::new((500, 500).into(), (80, 80).into()),
+        ));
+    }
 }

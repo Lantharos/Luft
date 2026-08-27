@@ -19,6 +19,8 @@ use std::time::Duration;
 pub struct FrameClock {
     clock: Clock<Monotonic>,
     refresh: Refresh,
+    refresh_interval: Duration,
+    last_presentation: Option<Duration>,
     sequence: u64,
 }
 
@@ -34,12 +36,16 @@ impl FrameClock {
         Self {
             clock: Clock::new(),
             refresh: Refresh::fixed(refresh),
+            refresh_interval: refresh,
+            last_presentation: None,
             sequence: 1,
         }
     }
 
     pub fn set_refresh(&mut self, refresh: Duration) {
         self.refresh = Refresh::fixed(refresh);
+        self.refresh_interval = refresh;
+        self.last_presentation = None;
     }
 
     pub fn next_frame(&mut self) -> FrameTime {
@@ -47,6 +53,7 @@ impl FrameClock {
     }
 
     pub fn frame_at(&mut self, time: Time<Monotonic>) -> FrameTime {
+        self.last_presentation = Some(time.into());
         let frame = FrameTime {
             time,
             refresh: self.refresh,
@@ -58,6 +65,7 @@ impl FrameClock {
 
     #[cfg(feature = "session-backend")]
     pub fn frame_at_sequence(&mut self, time: Time<Monotonic>, sequence: u64) -> FrameTime {
+        self.last_presentation = Some(time.into());
         let frame = FrameTime {
             time,
             refresh: self.refresh,
@@ -65,6 +73,25 @@ impl FrameClock {
         };
         self.sequence = sequence.wrapping_add(1).max(1);
         frame
+    }
+
+    pub fn next_presentation_delay(&self) -> Duration {
+        let now = Duration::from(self.clock.now());
+        let Some(last) = self.last_presentation else {
+            return self.refresh_interval;
+        };
+        if now <= last {
+            return last.saturating_sub(now) + self.refresh_interval;
+        }
+
+        let elapsed = now - last;
+        let refresh_nanos = self.refresh_interval.as_nanos().max(1);
+        let intervals = elapsed.as_nanos() / refresh_nanos + 1;
+        let target = last
+            + Duration::from_nanos(
+                u64::try_from(intervals.saturating_mul(refresh_nanos)).unwrap_or(u64::MAX),
+            );
+        target.saturating_sub(now)
     }
 }
 

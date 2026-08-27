@@ -1,5 +1,5 @@
 use super::model::WebShellSurface;
-use fenestra_cef::{ShellSurfaceMargin, WindowRegion};
+use sabine::{ShellSurfaceMargin, WindowRegion};
 use std::time::Duration;
 
 pub(super) fn smoothstep(value: f32) -> f32 {
@@ -121,9 +121,9 @@ fn lerp_i32(from: i32, to: i32, progress: f32) -> i32 {
 
 pub(super) fn shell_blur_region(kind: WebShellSurface, _width: i32, _height: i32) -> WindowRegion {
     match kind {
-        WebShellSurface::QuickSettings | WebShellSurface::DateCenter | WebShellSurface::SessionMenu => {
-            WindowRegion::adaptive_rounded_rect(26)
-        }
+        WebShellSurface::QuickSettings
+        | WebShellSurface::DateCenter
+        | WebShellSurface::SessionMenu => WindowRegion::adaptive_rounded_rect(26),
         WebShellSurface::NotificationToast => WindowRegion::adaptive_rounded_rect(22),
         WebShellSurface::StartMenu => WindowRegion::adaptive_rounded_rect(24),
         _ => WindowRegion::adaptive_full(),

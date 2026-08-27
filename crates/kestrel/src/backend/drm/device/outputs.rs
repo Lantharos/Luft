@@ -1,5 +1,5 @@
 use super::DrmError;
-use crate::output::OutputDescriptor;
+use crate::output::{OutputDescriptor, OutputModeDescriptor};
 use luft_config::{DisplayConfig, OutputConfig};
 use smithay::{
     backend::drm::DrmDevice,
@@ -22,6 +22,7 @@ pub(super) struct ConnectedOutput {
     pub(super) connector: connector::Handle,
     pub(super) mode: Mode,
     pub(super) crtc: crtc::Handle,
+    pub(super) enabled: bool,
 }
 
 impl ConnectedOutput {
@@ -49,11 +50,6 @@ impl ConnectedOutput {
             }
         }
 
-        if outputs.is_empty() {
-            return Err(DrmError::Unsupported(
-                "no connected DRM outputs with usable modes were found".to_string(),
-            ));
-        }
         Ok(outputs)
     }
 
@@ -89,7 +85,7 @@ impl ConnectedOutput {
             descriptor: OutputDescriptor {
                 name: connector_name.clone(),
                 make: "DRM".to_string(),
-                model: connector_name,
+                model: connector_name.clone(),
                 physical_size: connector_physical_size(&info),
                 subpixel: info.subpixel().into(),
                 size: Size::<i32, Physical>::from((i32::from(width), i32::from(height))),
@@ -97,10 +93,30 @@ impl ConnectedOutput {
                     .unwrap_or(crate::output::DEFAULT_REFRESH_MILLIHERTZ),
                 scale: 1.0,
                 transform: Transform::Normal,
+                modes: info
+                    .modes()
+                    .iter()
+                    .copied()
+                    .map(|candidate| {
+                        let (mode_width, mode_height) = candidate.size();
+                        OutputModeDescriptor {
+                            size: Size::<i32, Physical>::from((
+                                i32::from(mode_width),
+                                i32::from(mode_height),
+                            )),
+                            refresh_millihertz: mode_refresh_millihertz(candidate),
+                            preferred: candidate == mode,
+                        }
+                    })
+                    .collect(),
             },
             connector,
             mode,
             crtc,
+            enabled: display_config
+                .outputs
+                .get(&connector_name)
+                .is_none_or(|config| config.enabled),
         }))
     }
 }

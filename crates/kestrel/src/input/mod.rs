@@ -1,7 +1,7 @@
 use crate::{
     layers,
     state::{KestrelState, WindowGrabKind},
-    window::{ResizeEdge, WindowFrameControl, WindowFrameHit},
+    window::{ResizeEdge, WindowFrameHit},
 };
 use smithay::{
     backend::input::{
@@ -15,8 +15,9 @@ use smithay::{
             RelativeMotionEvent,
         },
     },
-    utils::{Logical, Physical, Size},
+    utils::{Logical, Physical, Point, Size},
     wayland::keyboard_shortcuts_inhibit::KeyboardShortcutsInhibitorSeat,
+    wayland::pointer_constraints::{PointerConstraint, with_pointer_constraint},
 };
 
 mod gestures;
@@ -37,6 +38,7 @@ pub fn handle_input_event<B>(
 ) where
     B: InputBackend,
 {
+    state.notify_idle_activity();
     match event {
         InputEvent::Keyboard { event } => {
             let serial = state.next_serial();
@@ -51,6 +53,10 @@ pub fn handle_input_event<B>(
                 serial,
                 event.time_msec(),
                 |state, modifiers, key| {
+                    if state.session_locked() {
+                        state.super_active = false;
+                        return FilterResult::Forward;
+                    }
                     let key = key.raw_latin_sym_or_raw_current_sym();
                     if state.handle_vicinae_hotkey(
                         key,
@@ -88,15 +94,11 @@ pub fn handle_input_event<B>(
             }
         }
         InputEvent::PointerMotionAbsolute { event } => {
-            let frame_hover_before = frame_control_hover(state);
             let location = event.position_transformed(output_size.to_logical(1));
             move_pointer(state, pointer, location, event.time_msec(), None);
-            if frame_hover_before != frame_control_hover(state) {
-                state.mark_scene_dirty();
-            }
+            state.mark_scene_dirty();
         }
         InputEvent::PointerMotion { event } => {
-            let frame_hover_before = frame_control_hover(state);
             let delta = event.delta();
             let max = output_size.to_logical(1);
             let location = (
@@ -115,9 +117,7 @@ pub fn handle_input_event<B>(
                     utime: event.time(),
                 }),
             );
-            if frame_hover_before != frame_control_hover(state) {
-                state.mark_scene_dirty();
-            }
+            state.mark_scene_dirty();
         }
         InputEvent::PointerButton { event } => {
             let serial = state.next_serial();
@@ -357,6 +357,71 @@ fn move_pointer(
     time: u32,
     relative: Option<RelativeMotion>,
 ) {
+    if let Some(relative) = relative.as_ref() {
+        let focus = state.pointer_focus(state.pointer_location);
+        pointer.relative_motion(
+            state,
+            focus,
+            &RelativeMotionEvent {
+                delta: relative.delta,
+                delta_unaccel: relative.delta_unaccel,
+                utime: relative.utime,
+            },
+        );
+    }
+
+    let current_focus = state.pointer_focus(state.pointer_location);
+    let mut locked = false;
+    let mut confined = None;
+    if let Some((surface, origin)) = current_focus.as_ref() {
+        with_pointer_constraint(surface, pointer, |constraint| {
+            let Some(constraint) = constraint.filter(|constraint| constraint.is_active()) else {
+                return;
+            };
+            if !constraint.region().is_none_or(|region| {
+                region.contains((state.pointer_location - *origin).to_i32_round())
+            }) {
+                return;
+            }
+            match &*constraint {
+                PointerConstraint::Locked(_) => locked = true,
+                PointerConstraint::Confined(_) => confined = Some((surface.clone(), *origin)),
+            }
+        });
+    }
+
+    if locked {
+        pointer.frame(state);
+        return;
+    }
+
+    let mut location = location;
+    if let Some((surface, origin)) = confined {
+        if let Some(region) = with_pointer_constraint(&surface, pointer, |constraint| {
+            constraint.and_then(|constraint| constraint.region().cloned())
+        }) {
+            let mut delta = location - state.pointer_location;
+            if !region.contains(
+                (state.pointer_location + Point::from((delta.x, 0.0)) - origin).to_i32_round(),
+            ) {
+                delta.x = 0.0;
+            }
+            if !region.contains(
+                (state.pointer_location + Point::from((0.0, delta.y)) - origin).to_i32_round(),
+            ) {
+                delta.y = 0.0;
+            }
+            location = state.pointer_location + delta;
+        }
+        let same_surface = state
+            .pointer_focus(location)
+            .as_ref()
+            .is_some_and(|(candidate, _)| candidate == &surface);
+        if !same_surface {
+            location = state.pointer_location;
+        }
+    }
+
     state.pointer_location = location;
     if matches!(state.cursor_image, CursorImageStatus::Surface(_)) {
         state.mark_scene_dirty();
@@ -377,18 +442,21 @@ fn move_pointer(
             time,
         },
     );
-    if let Some(relative) = relative {
-        pointer.relative_motion(
-            state,
-            focus,
-            &RelativeMotionEvent {
-                delta: relative.delta,
-                delta_unaccel: relative.delta_unaccel,
-                utime: relative.utime,
-            },
-        );
-    }
     pointer.frame(state);
+
+    if let Some((surface, origin)) = state.pointer_focus(location) {
+        with_pointer_constraint(&surface, pointer, |constraint| {
+            let Some(constraint) = constraint.filter(|constraint| !constraint.is_active()) else {
+                return;
+            };
+            if constraint
+                .region()
+                .is_none_or(|region| region.contains((location - origin).to_i32_round()))
+            {
+                constraint.activate();
+            }
+        });
+    }
 }
 
 fn shortcuts_inhibited(state: &KestrelState, keyboard: &KeyboardHandle<KestrelState>) -> bool {
@@ -400,13 +468,6 @@ fn shortcuts_inhibited(state: &KestrelState, keyboard: &KeyboardHandle<KestrelSt
                 .keyboard_shortcuts_inhibitor_for_surface(&surface)
         })
         .is_some_and(|inhibitor| inhibitor.is_active())
-}
-
-fn frame_control_hover(state: &KestrelState) -> Option<WindowFrameControl> {
-    match state.window_frame_hit(state.pointer_location) {
-        Some(WindowFrameHit::Control { control, .. }) => Some(control),
-        _ => None,
-    }
 }
 
 fn update_frame_cursor(state: &mut KestrelState) {

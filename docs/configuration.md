@@ -30,7 +30,16 @@ Luft picks the largest available mode at the highest refresh rate by default. Pi
 width = 3440
 height = 1440
 refresh_millihertz = 165000
+x = 0
+y = 0
+transform = "normal"
+adaptive_sync = true
 ```
+
+`transform` accepts `normal`, `rotate90`, `rotate180`, `rotate270`, `flipped`,
+`flipped90`, `flipped180`, or `flipped270`. Output-management clients can
+change the same values, including output enablement, and Luft persists a
+successful DRM configuration automatically.
 
 ## Startup Apps
 

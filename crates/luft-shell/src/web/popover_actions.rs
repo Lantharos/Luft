@@ -111,8 +111,8 @@ impl WebShell {
         if self.session_menu_visible {
             return;
         }
-        let snapshot = super::model::WebShellSnapshot::from_shell(
-            super::snapshot::WebShellSnapshotInput {
+        let snapshot =
+            super::model::WebShellSnapshot::from_shell(super::snapshot::WebShellSnapshotInput {
                 model: &self.model,
                 running_window_order: &self.running_app_order,
                 status: &self.status,
@@ -126,8 +126,7 @@ impl WebShell {
                 start_menu_open: self.start_menu_visible,
                 quick_settings_open: self.quick_visible,
                 date_center_open: self.date_visible,
-            },
-        );
+            });
         let qs_height = super::surface_sizing::quick_settings_size(&snapshot).1;
         self.session_menu_visible = true;
         self.session_menu_qs_height = Some(qs_height);

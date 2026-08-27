@@ -1,17 +1,9 @@
-use crate::{
-    scene_handle::{active_scratch_for_render, KestrelRenderHandle},
-    state::KestrelState,
-    window::ManagedWindow,
-};
+use crate::{state::KestrelState, window::ManagedWindow};
 use luft_ipc::{WindowId, WorkspaceId};
 use smithay::{
-    backend::renderer::{
-        element::AsRenderElements,
-        gles::GlesRenderer,
-    },
-    desktop::{space::SpaceElement, Window},
+    desktop::{Window, space::SpaceElement},
     output::Output,
-    utils::{IsAlive, Logical, Point, Rectangle, Scale, Physical},
+    utils::{IsAlive, Logical, Point, Rectangle},
     wayland::shell::xdg::ToplevelSurface,
 };
 use std::{
@@ -124,33 +116,10 @@ impl SpaceElement for KestrelWindow {
     }
 }
 
-impl AsRenderElements<GlesRenderer> for KestrelWindow {
-    type RenderElement = KestrelRenderHandle;
-
-    fn render_elements<C: From<KestrelRenderHandle>>(
-        &self,
-        _renderer: &mut GlesRenderer,
-        _location: Point<i32, Physical>,
-        _scale: Scale<f64>,
-        _alpha: f32,
-    ) -> Vec<C> {
-        let Some(scratch) = active_scratch_for_render() else {
-            return Vec::new();
-        };
-        let Some(layer) = scratch.window_layers_by_id.get(&self.id) else {
-            return Vec::new();
-        };
-        KestrelRenderHandle::handles_for_layer(self.id, layer)
-            .into_iter()
-            .map(C::from)
-            .collect()
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct SpaceWindowRenderTarget {
     pub id: WindowId,
-    pub offset_x: i32,
+    pub offset: Point<i32, Logical>,
 }
 
 pub fn workspace_slide_offset(state: &KestrelState, workspace: &WorkspaceId) -> i32 {
@@ -170,24 +139,33 @@ pub fn workspace_slide_offset(state: &KestrelState, workspace: &WorkspaceId) -> 
 
 pub fn space_window_render_targets(state: &KestrelState) -> Vec<SpaceWindowRenderTarget> {
     let mut targets = Vec::new();
+    let output_location = state.output().current_location();
     if let Some(transition) = state.workspace_transition() {
         append_workspace_render_targets(
             state,
             &transition.from,
-            workspace_slide_offset(state, &transition.from),
+            (
+                workspace_slide_offset(state, &transition.from) - output_location.x,
+                -output_location.y,
+            )
+                .into(),
             &mut targets,
         );
         append_workspace_render_targets(
             state,
             &transition.to,
-            workspace_slide_offset(state, &transition.to),
+            (
+                workspace_slide_offset(state, &transition.to) - output_location.x,
+                -output_location.y,
+            )
+                .into(),
             &mut targets,
         );
     } else {
         append_workspace_render_targets(
             state,
             state.layout.active_workspace(),
-            0,
+            (-output_location.x, -output_location.y).into(),
             &mut targets,
         );
     }
@@ -197,13 +175,13 @@ pub fn space_window_render_targets(state: &KestrelState) -> Vec<SpaceWindowRende
 fn append_workspace_render_targets(
     state: &KestrelState,
     workspace: &WorkspaceId,
-    offset_x: i32,
+    offset: Point<i32, Logical>,
     targets: &mut Vec<SpaceWindowRenderTarget>,
 ) {
     for window in state.windows.render_windows_on_workspace(workspace) {
         targets.push(SpaceWindowRenderTarget {
             id: window.id,
-            offset_x,
+            offset,
         });
     }
 }

@@ -7,9 +7,9 @@ use luft_ipc::{Rect, WindowId};
 use smithay::{
     input::pointer::{
         AxisFrame, ButtonEvent, Focus, GestureHoldBeginEvent, GestureHoldEndEvent,
-        GesturePinchBeginEvent, GesturePinchEndEvent, GesturePinchUpdateEvent, GestureSwipeBeginEvent,
-        GestureSwipeEndEvent, GestureSwipeUpdateEvent, GrabStartData, MotionEvent, PointerGrab,
-        PointerHandle, PointerInnerHandle, RelativeMotionEvent,
+        GesturePinchBeginEvent, GesturePinchEndEvent, GesturePinchUpdateEvent,
+        GestureSwipeBeginEvent, GestureSwipeEndEvent, GestureSwipeUpdateEvent, GrabStartData,
+        MotionEvent, PointerGrab, PointerHandle, PointerInnerHandle, RelativeMotionEvent,
     },
     reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::{Logical, Point, Serial},
@@ -165,7 +165,11 @@ impl PointerGrab<KestrelState> for MoveSurfaceGrab {
         event: &MotionEvent,
     ) {
         handle.motion(data, None, event);
-        let geometry = move_geometry(self.start_geometry, self.start_data.location, event.location);
+        let geometry = move_geometry(
+            self.start_geometry,
+            self.start_data.location,
+            event.location,
+        );
         data.apply_grabbed_window_geometry(self.id, geometry);
     }
 
@@ -202,7 +206,11 @@ impl PointerGrab<KestrelState> for MoveSurfaceGrab {
         handle.axis(data, details);
     }
 
-    fn frame(&mut self, data: &mut KestrelState, handle: &mut PointerInnerHandle<'_, KestrelState>) {
+    fn frame(
+        &mut self,
+        data: &mut KestrelState,
+        handle: &mut PointerInnerHandle<'_, KestrelState>,
+    ) {
         handle.frame(data);
     }
 
@@ -338,7 +346,11 @@ impl PointerGrab<KestrelState> for ResizeSurfaceGrab {
         handle.axis(data, details);
     }
 
-    fn frame(&mut self, data: &mut KestrelState, handle: &mut PointerInnerHandle<'_, KestrelState>) {
+    fn frame(
+        &mut self,
+        data: &mut KestrelState,
+        handle: &mut PointerInnerHandle<'_, KestrelState>,
+    ) {
         handle.frame(data);
     }
 

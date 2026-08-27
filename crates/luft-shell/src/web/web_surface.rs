@@ -4,9 +4,9 @@ use super::{
     surface_layout::{panel_output_width, shell_surface},
     surface_motion::shell_blur_region,
 };
-use fenestra_cef::{
-    BridgeCommandDescriptor, BridgeError, BridgeResponse, FenestraProcess, FenestraWindow,
-    RuntimeConfig, RuntimeMode, ShellSurfaceMargin, ShellSurfaceOptions, WebViewSecurity,
+use sabine::{
+    BridgeCommandDescriptor, BridgeError, BridgeResponse, ContentSecurity, RuntimeConfig,
+    RuntimeMode, SabineProcess, SabineWindow, ShellSurfaceMargin, ShellSurfaceOptions,
 };
 use serde_json::json;
 use std::{
@@ -26,7 +26,7 @@ pub struct WebSurface {
     keep_alive_when_hidden: bool,
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
-    process: Option<FenestraProcess>,
+    process: Option<SabineProcess>,
     surface_alpha: f32,
     pub(crate) shell_margin: ShellSurfaceMargin,
     pending_snapshot: String,
@@ -36,9 +36,13 @@ pub struct WebSurface {
 impl WebSurface {
     pub(crate) fn new(config: WebSurfaceConfig<'_>) -> Result<Self, Box<dyn Error>> {
         let initial = serde_json::to_string(config.snapshot)?;
-        let shell_margin =
-            shell_surface(config.kind, config.size, config.panel_menu_x, config.session_menu_qs_height)
-                .margin;
+        let shell_margin = shell_surface(
+            config.kind,
+            config.size,
+            config.panel_menu_x,
+            config.session_menu_qs_height,
+        )
+        .margin;
         let mut surface = Self {
             kind: config.kind,
             size: config.size,
@@ -125,17 +129,17 @@ impl WebSurface {
         }
 
         let window = self.build_window();
-        match window.launch_or_install() {
+        match window.launch() {
             Ok(process) => {
                 debug!(
                     pid = process.id(),
                     surface = self.kind.as_str(),
-                    "launched Fenestra shell surface"
+                    "launched Sabine shell surface"
                 );
                 self.process = Some(process);
             }
             Err(error) => {
-                warn!(%error, surface = self.kind.as_str(), "failed to launch Fenestra shell surface");
+                warn!(%error, surface = self.kind.as_str(), "failed to launch Sabine shell surface");
             }
         }
     }
@@ -201,9 +205,6 @@ impl WebSurface {
 
     pub(crate) fn set_surface_alpha(&mut self, alpha: f32) {
         let alpha = alpha.clamp(0.0, 1.0);
-        if (self.surface_alpha - alpha).abs() < f32::EPSILON {
-            return;
-        }
         self.surface_alpha = alpha;
         if let Some(process) = &self.process {
             let _ = process.set_shell_surface_alpha(self.surface_alpha);
@@ -230,7 +231,7 @@ impl WebSurface {
         .margin
     }
 
-    fn build_window(&self) -> FenestraWindow {
+    fn build_window(&self) -> SabineWindow {
         let snapshot = Arc::clone(&self.snapshot);
         let action_tx = self.actions_tx.clone();
         let kind = self.kind;
@@ -242,7 +243,8 @@ impl WebSurface {
         )
         .margin(self.shell_margin);
         let (width, height) = cef_initial_size(&shell_options, self.size);
-        let window = FenestraWindow::new()
+        let window = SabineWindow::new()
+            .app_id("net.aveid.luft.shell")
             .title(format!("Luft {}", kind.as_str()))
             .fixed_size(width, height)
             .frameless()
@@ -252,11 +254,11 @@ impl WebSurface {
             .shell_surface_alpha(self.surface_alpha)
             .visible(self.visible)
             .active(self.visible && kind == WebShellSurface::StartMenu)
-            .active_frame_rate(shell_surface_frame_rate(kind))
+            .active_frame_rate(shell_surface_frame_rate())
             .background_frame_rate(1)
             .blur_region(shell_blur_region(kind, width as i32, height as i32))
             .runtime(runtime_config())
-            .security(WebViewSecurity::default())
+            .security(ContentSecurity::default())
             .bridge_descriptor_handler(
                 BridgeCommandDescriptor::new("luft.ready").target("desktop"),
                 move |_| {
@@ -353,11 +355,8 @@ pub(crate) struct WebSurfaceConfig<'a> {
     pub snapshot: &'a WebShellSnapshot,
 }
 
-fn shell_surface_frame_rate(kind: WebShellSurface) -> u32 {
-    match kind {
-        WebShellSurface::Panel => 30,
-        _ => output_frame_rate(),
-    }
+fn shell_surface_frame_rate() -> u32 {
+    output_frame_rate()
 }
 
 fn output_frame_rate() -> u32 {
@@ -398,7 +397,7 @@ fn shell_entry(kind: WebShellSurface) -> ShellEntry {
 
 fn append_shell_query(base: &str, kind: WebShellSurface) -> String {
     let separator = if base.contains('?') { '&' } else { '?' };
-    format!("{base}{separator}surface={}&fenestra=1", kind.as_str())
+    format!("{base}{separator}surface={}&sabine=1", kind.as_str())
 }
 
 fn cef_initial_size(shell_surface: &ShellSurfaceOptions, fallback: (i32, i32)) -> (u32, u32) {

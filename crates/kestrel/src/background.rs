@@ -13,7 +13,7 @@ use smithay::{
     utils::{Buffer, Physical, Rectangle, Size, Transform},
 };
 use std::path::{Path, PathBuf};
-use tracing::warn;
+use tracing::{info, warn};
 
 #[derive(Debug, Default)]
 pub struct Background {
@@ -156,6 +156,12 @@ impl BackgroundImage {
 fn load_background(path: &Path) -> Result<BackgroundImage, image::ImageError> {
     let image = ImageReader::open(path)?.decode()?.to_rgba8();
     let (width, height) = image.dimensions();
+    info!(
+        path = %path.display(),
+        width,
+        height,
+        "loaded background image"
+    );
     Ok(BackgroundImage {
         width: width as i32,
         height: height as i32,

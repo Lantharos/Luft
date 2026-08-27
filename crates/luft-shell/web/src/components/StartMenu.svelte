@@ -47,9 +47,9 @@
         focusSearch();
       }
     };
-    window.addEventListener("fenestra:luft.surface-open", surfaceOpen);
+    window.addEventListener("sabine:luft.surface-open", surfaceOpen);
     return () => {
-      window.removeEventListener("fenestra:luft.surface-open", surfaceOpen);
+      window.removeEventListener("sabine:luft.surface-open", surfaceOpen);
       cancelSearchFocus();
     };
   });

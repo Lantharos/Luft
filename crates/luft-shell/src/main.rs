@@ -17,13 +17,11 @@ use tracing::info;
 struct ShellArgs {
     #[arg(long)]
     once: bool,
-    #[arg(long, hide = true)]
-    refresh_fenestra_host: bool,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let raw_args = env::args().collect::<Vec<_>>();
-    if fenestra_cef::run_fenestra_host_from_args(&raw_args) {
+    if sabine::dispatch_host_mode_from_args(&raw_args) {
         return Ok(());
     }
 
@@ -31,10 +29,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     init_logging();
 
     let args = ShellArgs::parse();
-    if args.refresh_fenestra_host {
-        return refresh_fenestra_host();
-    }
-
     let loaded = load_config()?;
     info!("luft shell configuration loaded");
 
@@ -43,36 +37,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     web::run(loaded.config)
-}
-
-fn refresh_fenestra_host() -> Result<(), Box<dyn std::error::Error>> {
-    let config = fenestra_cef::RuntimeConfig::default();
-    let runtime = match fenestra_cef::resolve_runtime(&config) {
-        Ok(runtime) => runtime,
-        Err(_) if config.allow_user_install => {
-            fenestra_cef::install_user_runtime_with_progress(&config, |progress| {
-                if let Some(fraction) = progress.fraction {
-                    eprintln!(
-                        "Fenestra runtime: {} ({:.0}%)",
-                        progress.message,
-                        fraction * 100.0
-                    );
-                } else {
-                    eprintln!("Fenestra runtime: {}", progress.message);
-                }
-            })?
-        }
-        Err(error) => return Err(Box::new(error)),
-    };
-
-    let runtime_dir = runtime.location.path();
-    let source_stamp = runtime_dir
-        .join(".fenestra-host-build")
-        .join("fenestra-host-source.fnv");
-    let _ = fs::remove_file(source_stamp);
-    let host = fenestra_cef::ensure_cef_host(runtime_dir)?;
-    println!("Refreshed Fenestra CEF host: {}", host.display());
-    Ok(())
 }
 
 fn disable_accessibility_bridge() {

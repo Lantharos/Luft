@@ -18,7 +18,7 @@ pub use cursor_theme::{
     DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_THEME_DIR, DEFAULT_CURSOR_THEME_NAME,
     DEFAULT_CURSOR_THEME_PARENT, cursor_environment_entries,
 };
-pub use display::{DisplayConfig, OutputConfig};
+pub use display::{DisplayConfig, OutputConfig, OutputTransform};
 pub use panel::{PanelConfig, PinnedAppConfig};
 pub use paths::ConfigPaths;
 pub use session::SessionConfig;

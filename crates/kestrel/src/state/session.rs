@@ -2,7 +2,13 @@
 
 use super::KestrelState;
 use smithay::{
-    backend::{allocator::format::FormatSet, drm::DrmDeviceFd},
+    backend::{
+        allocator::{
+            dmabuf::{Dmabuf, DmabufSource},
+            format::FormatSet,
+        },
+        drm::DrmDeviceFd,
+    },
     reexports::wayland_server::{Client, protocol::wl_surface::WlSurface},
     wayland::{
         compositor::{self, BufferAssignment, SurfaceAttributes},
@@ -70,16 +76,36 @@ impl KestrelState {
         std::mem::take(&mut self.pending_syncobj_sources)
     }
 
+    pub(crate) fn queue_dmabuf_source(&mut self, client: Client, source: DmabufSource) {
+        self.pending_dmabuf_sources
+            .push(PendingDmabufSource { client, source });
+    }
+
+    pub(crate) fn take_dmabuf_sources(&mut self) -> Vec<PendingDmabufSource> {
+        std::mem::take(&mut self.pending_dmabuf_sources)
+    }
+
+    pub(crate) fn take_dmabuf_imports(&mut self) -> Vec<Dmabuf> {
+        std::mem::take(&mut self.pending_dmabuf_imports)
+    }
+
     pub(crate) fn session_early_import(&mut self, surface: &WlSurface) {
         use smithay::wayland::dmabuf::get_dmabuf;
 
         compositor::with_states(surface, |states| {
             let mut attributes = states.cached_state.get::<SurfaceAttributes>();
-            if let Some(BufferAssignment::NewBuffer(buffer)) = attributes.pending().buffer.as_ref() {
-                let _ = get_dmabuf(buffer);
+            if let Some(BufferAssignment::NewBuffer(buffer)) = attributes.current().buffer.as_ref()
+                && let Ok(dmabuf) = get_dmabuf(buffer)
+            {
+                self.pending_dmabuf_imports.push(dmabuf.clone());
             }
         });
     }
+}
+
+pub(crate) struct PendingDmabufSource {
+    pub client: Client,
+    pub source: DmabufSource,
 }
 
 pub(crate) struct PendingSyncobjSource {

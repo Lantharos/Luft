@@ -56,18 +56,22 @@ impl ManagedWindow {
         Rect::new(self.location.x, self.location.y, self.size.w, self.size.h)
     }
 
-    pub fn full_geometry(&self, offset_x: i32) -> Rect {
+    pub fn full_geometry_at(&self, offset: Point<i32, Logical>) -> Rect {
         Rect::new(
-            self.location.x + offset_x,
-            self.location.y,
+            self.location.x + offset.x,
+            self.location.y + offset.y,
             self.size.w,
             self.size.h + self.titlebar_height(),
         )
     }
 
-    pub fn render_transform(&self, offset_x: i32, output: Size<i32, Physical>) -> WindowTransform {
+    pub fn render_transform_at(
+        &self,
+        offset: Point<i32, Logical>,
+        output: Size<i32, Physical>,
+    ) -> WindowTransform {
         self.animation
-            .transform(self.full_geometry(offset_x), output)
+            .transform(self.full_geometry_at(offset), output)
     }
 
     pub fn content_location(&self) -> Point<i32, Logical> {

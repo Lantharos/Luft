@@ -5,7 +5,7 @@ declare global {
   interface Window {
     __LUFT_INITIAL_STATE__?: ShellSnapshot;
     __LUFT_SURFACE__?: ShellSurface;
-    fenestra?: {
+    sabine?: {
       bridge?: NativeBridge;
       window?: NativeWindowControls;
       popup?: NativePopupControls;
@@ -61,7 +61,7 @@ export const subscribe = (listener: Listener) => {
 };
 
 export const sendAction = (action: ShellAction) => {
-  const bridge = window.fenestra?.bridge;
+  const bridge = window.sabine?.bridge;
   if (bridge?.commands.includes("luft.action")) {
     void bridge.invoke(
       "luft.action",
@@ -108,22 +108,22 @@ function applySnapshot(snapshot: ShellSnapshot) {
 }
 
 async function waitForNativeBridge(): Promise<NativeBridge | undefined> {
-  if (!isFenestraRuntime()) return undefined;
+  if (!isSabineRuntime()) return undefined;
 
   const deadline = performance.now() + 2000;
   while (performance.now() < deadline) {
-    if (window.fenestra?.bridge) {
-      return window.fenestra.bridge;
+    if (window.sabine?.bridge) {
+      return window.sabine.bridge;
     }
     await new Promise((resolve) => window.setTimeout(resolve, 16));
   }
   return undefined;
 }
 
-function isFenestraRuntime() {
+function isSabineRuntime() {
   return (
-    Boolean(window.fenestra?.bridge) ||
-    new URLSearchParams(window.location.search).has("fenestra")
+    Boolean(window.sabine?.bridge) ||
+    new URLSearchParams(window.location.search).has("sabine")
   );
 }
 

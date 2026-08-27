@@ -8,7 +8,7 @@ use super::{
     },
     web_surface::{WebSurface, WebSurfaceConfig},
 };
-use fenestra_cef::ShellSurfaceMargin;
+use sabine::ShellSurfaceMargin;
 use std::{sync::mpsc::Sender, time::Instant};
 use tracing::warn;
 

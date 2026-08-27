@@ -12,7 +12,7 @@ use smithay::{
         shell::wlr_layer::{Layer, LayerSurface as WlrLayerSurface},
     },
 };
-use tracing::debug;
+use tracing::{debug, trace};
 
 pub fn map(output: &Output, surface: WlrLayerSurface, namespace: String) {
     let layer = LayerSurface::new(surface, namespace);
@@ -35,6 +35,12 @@ pub fn unmap(output: &Output, surface: &WlrLayerSurface) {
     if let Some(layer) = layer {
         layer_map.unmap_layer(&layer);
     }
+}
+
+pub fn contains(output: &Output, surface: &WlrLayerSurface) -> bool {
+    layer_map_for_output(output)
+        .layers()
+        .any(|layer| layer.layer_surface() == surface)
 }
 
 pub fn arrange(output: &Output) {
@@ -102,7 +108,10 @@ pub fn should_close_transient_popover(output: &Output, point: Point<f64, Logical
         for surface in layer_map.layers_on(layer) {
             if !matches!(
                 surface.namespace(),
-                "luft-quick-settings" | "luft-date-center" | "luft-start-menu" | "luft-panel-menu"
+                "luft-quick-settings"
+                    | "luft-date-center"
+                    | "luft-start-menu"
+                    | "luft-panel-menu"
                     | "luft-session-menu"
             ) {
                 continue;
@@ -136,6 +145,13 @@ pub fn render_targets(output: &Output, layer: Layer) -> Vec<LayerRenderTarget> {
                 (location.x - geometry.loc.x, location.y - geometry.loc.y).into(),
                 size,
             );
+            trace!(
+                namespace = surface.namespace(),
+                opacity, "evaluated layer blur target"
+            );
+            if opacity <= 0.01 {
+                return None;
+            }
             Some(LayerRenderTarget {
                 surface: surface.wl_surface().clone(),
                 blur_layer: BlurLayer::from_shell_layer(layer)?,
@@ -153,10 +169,14 @@ pub fn render_surfaces(output: &Output, layer: Layer) -> Vec<LayerRenderSurface>
     layer_map
         .layers_on(layer)
         .filter_map(|surface| {
+            if surface_alpha_multiplier(surface.wl_surface()) <= 0.01 {
+                return None;
+            }
             let geometry = layer_map.layer_geometry(surface)?;
             let material = material_for(surface.namespace()).unwrap_or(LayerMaterial::Rect);
             Some(LayerRenderSurface {
                 surface: surface.wl_surface().clone(),
+                namespace: surface.namespace().to_string(),
                 location: geometry.loc,
                 size: geometry.size,
                 material,
@@ -185,6 +205,7 @@ pub struct LayerRenderTarget {
 #[derive(Debug, Clone)]
 pub struct LayerRenderSurface {
     pub surface: WlSurface,
+    pub namespace: String,
     pub location: Point<i32, Logical>,
     pub size: smithay::utils::Size<i32, Logical>,
     pub material: LayerMaterial,

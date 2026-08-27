@@ -1,24 +1,23 @@
 use crate::{client::ClientState, commit, state::KestrelState};
+#[cfg(feature = "session-backend")]
+use smithay::wayland::drm_syncobj::{DrmSyncobjHandler, DrmSyncobjState};
 use smithay::{
     backend::allocator::Buffer,
-    delegate_alpha_modifier, delegate_compositor, delegate_cursor_shape, delegate_data_device,
-    delegate_dmabuf, delegate_ext_data_control, delegate_foreign_toplevel_list,
-    delegate_fractional_scale, delegate_keyboard_shortcuts_inhibit, delegate_layer_shell,
-    delegate_output, delegate_pointer_gestures, delegate_presentation, delegate_primary_selection,
-    delegate_relative_pointer, delegate_seat, delegate_shm, delegate_single_pixel_buffer,
-    delegate_text_input_manager, delegate_viewporter, delegate_xdg_activation,
-    delegate_xdg_decoration, delegate_xdg_foreign, delegate_xdg_shell,
+    delegate_dispatch2,
     desktop::PopupKind,
     input::{
         Seat, SeatHandler,
+        dnd::{DnDGrab, DndGrabHandler, DndTarget, GrabType, Source},
         keyboard::LedState,
         pointer::CursorImageStatus,
+        tablet::TabletSeatHandler,
     },
     output::Output,
     reexports::wayland_server::{
         Client, Resource,
         protocol::{wl_buffer, wl_output::WlOutput, wl_surface::WlSurface},
     },
+    utils::{Logical, Point, Serial},
     wayland::{
         buffer::BufferHandler,
         compositor::{CompositorClientState, CompositorHandler, CompositorState},
@@ -42,24 +41,24 @@ use smithay::{
         shell::wlr_layer::{Layer, LayerSurface, WlrLayerShellHandler, WlrLayerShellState},
         shell::xdg::PopupSurface,
         shm::{ShmHandler, ShmState},
-        tablet_manager::TabletSeatHandler,
         xdg_activation::{
             XdgActivationHandler, XdgActivationState, XdgActivationToken, XdgActivationTokenData,
         },
         xdg_foreign::{XdgForeignHandler, XdgForeignState},
     },
 };
-#[cfg(feature = "session-backend")]
-use smithay::{
-    delegate_drm_syncobj,
-    wayland::drm_syncobj::{DrmSyncobjHandler, DrmSyncobjState},
-};
 use tracing::debug;
 
-mod xdg;
+mod capture;
+mod idle;
+mod input_support;
+mod output_management;
+mod session_lock;
 mod toplevel_icon;
-pub use toplevel_icon::{ToplevelIconGlobal, toplevel_icon_for_surface};
+mod xdg;
 use self::xdg::configure_existing_popup;
+pub use output_management::OutputManagementState;
+pub use toplevel_icon::{ToplevelIconGlobal, toplevel_icon_for_surface};
 
 impl BufferHandler for KestrelState {
     fn buffer_destroyed(&mut self, _buffer: &wl_buffer::WlBuffer) {}
@@ -150,28 +149,41 @@ impl WlrLayerShellHandler for KestrelState {
     fn new_layer_surface(
         &mut self,
         surface: LayerSurface,
-        _output: Option<WlOutput>,
+        output: Option<WlOutput>,
         layer: Layer,
         namespace: String,
     ) {
-        self.map_layer_surface(surface, namespace.clone());
-        self.mark_scene_dirty();
-        debug!(?layer, namespace, "mapped layer surface");
+        let output = output
+            .as_ref()
+            .and_then(Output::from_resource)
+            .unwrap_or_else(|| self.output().clone());
+        let output_name = output.name();
+        self.map_layer_surface(surface, namespace.clone(), output);
+        self.mark_output_structural_dirty(&output_name);
+        tracing::info!(?layer, namespace, "mapped layer surface");
     }
 
-    fn new_popup(&mut self, _parent: LayerSurface, popup: PopupSurface) {
-        self.enter_output(popup.wl_surface());
+    fn new_popup(&mut self, parent: LayerSurface, popup: PopupSurface) {
+        let output = self
+            .layer_output_for_surface(parent.wl_surface())
+            .unwrap_or_else(|| self.output().clone());
+        output.enter(popup.wl_surface());
         configure_existing_popup(&popup, self.popup_constraint_for(&popup));
         let _ = self
             .popup_manager
             .track_popup(PopupKind::from(popup.clone()));
         let _ = popup.send_configure();
-        self.mark_scene_dirty();
+        self.mark_output_structural_dirty(&output.name());
     }
 
     fn layer_destroyed(&mut self, surface: LayerSurface) {
+        let output_name = self
+            .layer_output_for_surface(surface.wl_surface())
+            .map(|output| output.name());
         self.unmap_layer_surface(&surface);
-        self.mark_scene_dirty();
+        if let Some(output_name) = output_name {
+            self.mark_output_structural_dirty(&output_name);
+        }
         debug!("unmapped layer surface");
     }
 }
@@ -204,7 +216,65 @@ impl DataControlHandler for KestrelState {
     }
 }
 
-impl WaylandDndGrabHandler for KestrelState {}
+impl WaylandDndGrabHandler for KestrelState {
+    fn dnd_requested<S: Source>(
+        &mut self,
+        source: S,
+        icon: Option<WlSurface>,
+        seat: Seat<Self>,
+        serial: Serial,
+        type_: GrabType,
+    ) {
+        if self.session_locked() {
+            source.cancel();
+            return;
+        }
+        self.dnd_icon = icon.map(|surface| crate::state::DndIcon {
+            surface,
+            offset: (0, 0).into(),
+        });
+        self.mark_scene_dirty();
+
+        match type_ {
+            GrabType::Pointer => {
+                let Some(pointer) = seat.get_pointer() else {
+                    source.cancel();
+                    return;
+                };
+                let Some(start_data) = pointer.grab_start_data() else {
+                    source.cancel();
+                    return;
+                };
+                let display = self.display_handle.clone();
+                pointer.set_grab(
+                    self,
+                    DnDGrab::new_pointer(&display, start_data, source, seat),
+                    serial,
+                    smithay::input::pointer::Focus::Keep,
+                );
+            }
+            GrabType::Touch => source.cancel(),
+        }
+    }
+}
+
+impl DndGrabHandler for KestrelState {
+    fn dropped(
+        &mut self,
+        _target: Option<DndTarget<'_, Self>>,
+        _validated: bool,
+        _seat: Seat<Self>,
+        _location: Point<f64, Logical>,
+    ) {
+        self.dnd_icon = None;
+        self.mark_scene_dirty();
+    }
+
+    fn cancelled(&mut self, _seat: Seat<Self>, _location: Point<f64, Logical>) {
+        self.dnd_icon = None;
+        self.mark_scene_dirty();
+    }
+}
 
 impl CompositorHandler for KestrelState {
     fn compositor_state(&mut self) -> &mut CompositorState {
@@ -244,12 +314,17 @@ impl SeatHandler for KestrelState {
         let client = focused.and_then(Resource::client);
         set_data_device_focus(&self.display_handle, seat, client.clone());
         set_primary_focus(&self.display_handle, seat, client);
+
+        use smithay::wayland::text_input::TextInputSeat;
+        let text_input = seat.text_input();
+        text_input.leave();
+        text_input.set_focus(focused.cloned());
+        text_input.enter();
     }
 
     fn cursor_image(&mut self, _seat: &Seat<Self>, image: CursorImageStatus) {
         self.frame_cursor_active = false;
         self.cursor_image = image;
-        self.cursor_dirty = true;
         self.mark_scene_dirty();
     }
 
@@ -258,33 +333,8 @@ impl SeatHandler for KestrelState {
     }
 }
 
-impl TabletSeatHandler for KestrelState {}
+impl TabletSeatHandler for KestrelState {
+    type ToolFocus = WlSurface;
+}
 
-delegate_xdg_shell!(KestrelState);
-delegate_xdg_decoration!(KestrelState);
-delegate_xdg_foreign!(KestrelState);
-delegate_foreign_toplevel_list!(KestrelState);
-delegate_keyboard_shortcuts_inhibit!(KestrelState);
-delegate_relative_pointer!(KestrelState);
-delegate_pointer_gestures!(KestrelState);
-delegate_xdg_activation!(KestrelState);
-delegate_cursor_shape!(KestrelState);
-delegate_fractional_scale!(KestrelState);
-delegate_viewporter!(KestrelState);
-delegate_text_input_manager!(KestrelState);
-delegate_presentation!(KestrelState);
-delegate_layer_shell!(KestrelState);
-delegate_compositor!(KestrelState);
-delegate_dmabuf!(KestrelState);
-delegate_output!(KestrelState);
-delegate_shm!(KestrelState);
-delegate_seat!(KestrelState);
-delegate_data_device!(KestrelState);
-delegate_primary_selection!(KestrelState);
-delegate_ext_data_control!(KestrelState);
-delegate_alpha_modifier!(KestrelState);
-delegate_single_pixel_buffer!(KestrelState);
-
-#[cfg(feature = "session-backend")]
-delegate_drm_syncobj!(KestrelState);
-
+delegate_dispatch2!(KestrelState);

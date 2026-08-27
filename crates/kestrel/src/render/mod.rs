@@ -20,6 +20,7 @@ use smithay::{
     utils::{Logical, Physical, Point, Rectangle, Scale, Size},
     wayland::shell::wlr_layer::Layer,
 };
+use tracing::trace;
 mod pipeline;
 mod scene_frame;
 
@@ -51,13 +52,13 @@ pub fn window_chrome_elements_for_window(
     renderer: &mut GlesRenderer,
     state: &KestrelState,
     window: &ManagedWindow,
-    offset_x: i32,
+    offset: Point<i32, Logical>,
 ) -> Result<Vec<MemoryRenderBufferRenderElement<GlesRenderer>>, GlesError> {
     if window.titlebar_height() == 0 {
         return Ok(Vec::new());
     }
 
-    let transform = window.render_transform(offset_x, state.output_size());
+    let transform = window.render_transform_at(offset, state.output_size());
     let titlebar_width = (window.size.w as f64 * transform.scale).round().max(1.0) as i32;
     let titlebar_height = ((TITLEBAR_HEIGHT + TITLEBAR_OVERLAP) as f64 * transform.scale)
         .round()
@@ -121,7 +122,20 @@ fn append_layer_elements(
                 clip,
                 layer_material_shape(target.material, target.size),
             )
-        });
+        })
+        .collect::<Vec<_>>();
+        trace!(
+            namespace = %target.namespace,
+            elements = surface_elements.len(),
+            alpha = surface_elements.first().map(Element::alpha),
+            commit = ?surface_elements.first().map(Element::current_commit),
+            x = target.location.x,
+            y = target.location.y,
+            width = target.size.w,
+            height = target.size.h,
+            ?layer,
+            "collected layer render surface"
+        );
         let popup_elements =
             PopupManager::popups_for_surface(&target.surface).flat_map(|(popup, popup_offset)| {
                 let offset = popup_offset - popup.geometry().loc;

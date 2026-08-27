@@ -1,50 +1,48 @@
 use super::{
-    DrmError, DrmOptions,
-    device::{self, SessionDevice},
-    estimated_vblank,
-    frame::{FrameResult, SessionFrameRenderer, render_secondary_output},
-    vblank_throttle::VblankThrottle,
+    DrmError, DrmOptions, device, estimated_vblank,
+    frame::{FrameResult, SessionFrameRenderer},
 };
 use crate::{
-    client::ClientState, input::handle_input_event,
-    ipc::IpcServer, scanout::{monotonic_now, send_frame_callbacks}, session_services, shell::ShellProcess, state::KestrelState,
+    client::ClientState,
+    input::handle_input_event,
+    ipc::IpcServer,
+    scanout::send_frame_callbacks,
+    session_services,
+    shell::{ShellLaunch, ShellProcess},
+    state::{KestrelState, idle::IdleRuntime},
     xwayland::XwaylandSatellite,
 };
-use ::input::{
-    Device as LibinputDevice, DeviceCapability as LibinputDeviceCapability,
-};
 use calloop::{
-    timer::{TimeoutAction, Timer},
     EventLoop,
     signals::{Signal, Signals},
 };
 use luft_ipc::{ShellStatus, shell_socket_path};
 use smithay::{
-    backend::{
-        drm::{DrmEvent, DrmEventMetadata},
-        input::InputEvent,
-        libinput::LibinputInputBackend,
-        renderer::ImportDma,
-        session::Event as SessionEvent,
-        udev::UdevEvent,
-    },
-    reexports::{
-        drm::control::crtc,
-        wayland_server::{Client, Display, ListeningSocket},
-    },
+    backend::{drm::DrmEvent, input::InputEvent, renderer::ImportDma, udev::UdevEvent},
+    reexports::wayland_server::Display,
     utils::{Clock, Monotonic},
 };
 use std::{
+    collections::BTreeMap,
     sync::Arc,
     time::{Duration, Instant},
 };
 use tracing::{debug, info, warn};
 
+mod events;
+mod output_config;
 mod process;
+mod support;
 mod syncobj;
 mod timing;
 
+use events::{LoopEvents, VBlankEvent};
+use output_config::{process_pending_output_apply, sync_runtime_outputs};
 use process::process_timeout;
+use support::{
+    bind_socket, handle_session_events, queue_estimated_vblank, register_input_device,
+    unregister_input_device, update_keyboard_leds, update_xwayland_state,
+};
 use syncobj::{clear_ready_syncobj_blockers, register_syncobj_sources};
 use timing::{presentation_time, refresh_interval};
 
@@ -64,6 +62,9 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
         input,
     } = opened.sources;
     let mut state = KestrelState::new_for_outputs(&dh, options.config, device.descriptors());
+    let mut idle_runtime = IdleRuntime::new(&mut state).map_err(|error| {
+        DrmError::Unsupported(format!("idle timer initialization failed: {error}"))
+    })?;
     device.link_compositor_outputs(&state);
     state.enable_dmabuf(
         device.dmabuf_main_device(),
@@ -90,12 +91,18 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
     let pointer = state.seat.add_pointer();
     let mut keyboard_devices = Vec::new();
     let mut keyboard_led_state = keyboard.led_state();
-    let mut frame_renderer =
-        SessionFrameRenderer::new(&state, refresh_interval(state.output_refresh_millihertz()));
-    let mut vblank_throttle = VblankThrottle::default();
+    let mut frame_renderers = device
+        .descriptors()
+        .into_iter()
+        .map(|descriptor| {
+            (
+                descriptor.name,
+                SessionFrameRenderer::new(refresh_interval(descriptor.refresh_millihertz)),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
     let presentation_clock = Clock::<Monotonic>::new();
     let mut clients = Vec::new();
-    let mut force_full_damage = true;
     let mut active = true;
     let mut loop_events = LoopEvents::default();
     let mut event_loop = EventLoop::<LoopEvents>::try_new().map_err(|error| {
@@ -157,16 +164,16 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
         println!("DISPLAY={display}");
     }
     session_services::start(&socket_name, state.xwayland_display.as_deref());
-    let mut shell = ShellProcess::start(
-        &socket_name,
-        state.xwayland_display.as_deref(),
-        ipc.path(),
-        &shell_control_socket,
-        state.output_refresh_millihertz(),
-        state.output_size().w,
-        state.output_size().h,
-        false,
-    );
+    let mut shell = ShellProcess::start(ShellLaunch {
+        wayland_display: &socket_name,
+        x11_display: state.xwayland_display.as_deref(),
+        ipc_socket: ipc.path(),
+        shell_socket: &shell_control_socket,
+        output_refresh_millihertz: state.output_refresh_millihertz(),
+        output_width: state.output_size().w,
+        output_height: state.output_size().h,
+        skip_startup_apps: false,
+    });
     state.shell_status = shell.status();
     info!(
         wayland_display = %socket_name,
@@ -177,21 +184,25 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
     );
 
     loop {
+        idle_runtime.dispatch(&mut state).map_err(|error| {
+            DrmError::Unsupported(format!("idle timer dispatch failed: {error}"))
+        })?;
         event_loop
             .dispatch(Some(Duration::ZERO), &mut loop_events)
             .map_err(|error| {
                 DrmError::Unsupported(format!("session event dispatch failed: {error}"))
             })?;
-        handle_session_events(
-            &mut loop_events,
-            &mut device,
-            &mut active,
-            &mut force_full_damage,
-        )?;
+        handle_session_events(&mut loop_events, &mut device, &mut active)?;
         if !active {
             device.discard_pending_frame();
         }
         clear_ready_syncobj_blockers(&mut loop_events, &mut state, &dh);
+        for dmabuf in state.take_dmabuf_imports() {
+            if let Err(error) = device.renderer.import_dmabuf(&dmabuf, None) {
+                warn!(%error, "failed to import committed dmabuf");
+            }
+        }
+        process_pending_output_apply(&mut state, &mut device, &mut frame_renderers);
         for event in loop_events.udev.drain(..) {
             if !device.handles_udev_event(&event) {
                 continue;
@@ -199,20 +210,19 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             match event {
                 UdevEvent::Changed { .. } => {
                     if device.rescan_outputs(&state.config.display)? {
-                        state.set_output_descriptors(device.descriptors());
-                        device.link_compositor_outputs(&state);
-                        frame_renderer.reset_for_output(&state);
-                        vblank_throttle.reset();
-                        device.queue_redraws();
-                        force_full_damage = true;
-                        let descriptor = device.primary_descriptor();
-                        info!(
-                            output = %descriptor.name,
-                            width = descriptor.size.w,
-                            height = descriptor.size.h,
-                            outputs = device.descriptors().len(),
-                            "DRM output graph changed"
-                        );
+                        sync_runtime_outputs(&mut state, &mut device, &mut frame_renderers);
+                        state.refresh_output_management();
+                        if let Some(descriptor) = device.primary_descriptor() {
+                            info!(
+                                output = %descriptor.name,
+                                width = descriptor.size.w,
+                                height = descriptor.size.h,
+                                outputs = device.descriptors().len(),
+                                "DRM output graph changed"
+                            );
+                        } else {
+                            info!("all DRM outputs disconnected; waiting for hotplug");
+                        }
                     }
                 }
                 UdevEvent::Removed { .. } => {
@@ -227,72 +237,75 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             warn!(%error, "DRM event error");
         }
         for vblank in loop_events.vblank.drain(..) {
-            let refresh = refresh_interval(state.output_refresh_millihertz());
-            if !vblank_throttle.should_process(vblank.crtc, refresh) {
-                continue;
-            }
-
-            let Some(submitted) = device.frame_submitted(vblank.crtc)? else {
+            let Some(mut submitted) = device.frame_submitted(vblank.crtc)? else {
                 continue;
             };
 
             let (presentation, _presentation_instant) =
                 presentation_time(&presentation_clock, vblank.metadata);
-            let frame_time = frame_renderer.frame_presented(presentation);
-
-            if let Some(output) = state.outputs.output(&submitted.descriptor_name) {
-                send_frame_callbacks(
-                    &state,
-                    output,
-                    submitted.sequence,
-                    monotonic_now(&presentation_clock),
+            let hardware_clock = presentation.is_some();
+            if submitted.sequence == 1 {
+                info!(
+                    output = %submitted.descriptor_name,
+                    sequence = submitted.sequence,
+                    "presented first DRM scene frame"
                 );
-                if let Some(mut queued) = submitted.queued {
-                    use smithay::reexports::wayland_protocols::wp::presentation_time::server::wp_presentation_feedback;
-                    queued.presentation.presented(
-                        frame_time.time(),
-                        frame_time.refresh(),
-                        frame_time.sequence(),
-                        wp_presentation_feedback::Kind::Vsync,
-                    );
+            } else {
+                tracing::trace!(
+                    output = %submitted.descriptor_name,
+                    sequence = submitted.sequence,
+                    "received DRM vblank"
+                );
+            }
+            let Some(frame_time) = frame_renderers
+                .get_mut(&submitted.descriptor_name)
+                .map(|renderer| renderer.frame_presented(presentation))
+            else {
+                continue;
+            };
+            state.session_lock_presented(&submitted.descriptor_name);
+
+            if state.outputs.output(&submitted.descriptor_name).is_some() {
+                use smithay::reexports::wayland_protocols::wp::presentation_time::server::wp_presentation_feedback;
+                let mut flags = wp_presentation_feedback::Kind::Vsync;
+                if hardware_clock {
+                    flags |= wp_presentation_feedback::Kind::HwClock
+                        | wp_presentation_feedback::Kind::HwCompletion;
                 }
+                submitted.queued.presentation.presented(
+                    frame_time.time(),
+                    frame_time.refresh(),
+                    frame_time.sequence(),
+                    flags,
+                );
             }
 
             if submitted.redraw_needed {
-                device.queue_redraws();
+                device.queue_redraw(&submitted.descriptor_name);
             }
         }
         for output_name in loop_events.pending_estimated_vblanks.drain(..) {
             let animations_active = state.animations_active();
-            let sequence = {
+            {
                 let Some(session_output) = device.output_by_name_mut(&output_name) else {
                     continue;
                 };
                 if let Some(token) = estimated_vblank::take_timer_token(session_output) {
                     event_loop.handle().remove(token);
                 }
-                estimated_vblank::on_timer_fired(session_output);
-                session_output.frame_state.frame_callback_sequence
             };
             if animations_active {
-                device.queue_redraws();
-            } else if let Some(output) = state.outputs.output(&output_name) {
-                send_frame_callbacks(
-                    &state,
-                    output,
-                    sequence,
-                    monotonic_now(&presentation_clock),
-                );
+                device.queue_redraw(&output_name);
             }
         }
         for event in loop_events.input.drain(..) {
             if active {
                 match event {
                     InputEvent::DeviceAdded { device } => {
-                        register_keyboard_device(&mut keyboard_devices, device, keyboard_led_state);
+                        register_input_device(&mut keyboard_devices, device, keyboard_led_state);
                     }
                     InputEvent::DeviceRemoved { device } => {
-                        unregister_keyboard_device(&mut keyboard_devices, &device);
+                        unregister_input_device(&mut keyboard_devices, &device);
                     }
                     event => {
                         let output_size = state.output_size();
@@ -321,7 +334,9 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
         if state.shell_status != shell_status {
             state.shell_status = shell_status;
             if shell_status != ShellStatus::Running {
-                frame_renderer.reset_damage(&state);
+                for renderer in frame_renderers.values_mut() {
+                    renderer.reset_damage(&state);
+                }
             }
             state.mark_scene_dirty();
         }
@@ -342,7 +357,11 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
                     DrmError::Unsupported(format!("failed to insert Wayland client: {error}"))
                 })?;
             clients.push(client);
-            debug!(connected_clients = clients.len(), "accepted wayland client");
+            if clients.len() == 1 {
+                info!("accepted first Wayland client");
+            } else {
+                debug!(connected_clients = clients.len(), "accepted wayland client");
+            }
         }
 
         display
@@ -353,105 +372,105 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
             .flush_clients()
             .map_err(|error| DrmError::Unsupported(format!("Wayland flush failed: {error}")))?;
         if active {
-            device.sync_cursor(&mut state);
-        }
-
-        if active
-            && !device.frame_pending()
-            && (force_full_damage
-                || state.scene_dirty()
-                || state.cursor_dirty
-                || state.animations_active())
-        {
-            device.queue_redraws();
-        }
-
-        if active && !device.frame_pending() && device.any_output_should_render() {
-            let primary_name = device.primary_descriptor().name.clone();
-            let primary_output = state.outputs.output(&primary_name).cloned();
-            let frame_result = {
-                let (renderer, session_output) = device.renderer_and_primary_output();
-                if let Some(output) = primary_output.as_ref() {
-                    frame_renderer.render(
-                        &mut state,
-                        renderer,
-                        output,
-                        session_output,
-                        force_full_damage,
-                        true,
-                    )?
-                } else {
-                    FrameResult::Idle
-                }
-            };
-            if force_full_damage {
-                let secondary_names = device.non_primary_output_names();
-                for name in secondary_names {
-                    let Some(output) = state.outputs.output(&name).cloned() else {
-                        continue;
-                    };
-                    let Some((renderer, session_output)) = device.renderer_and_output_by_name(&name)
-                    else {
-                        continue;
-                    };
-                    let _ = render_secondary_output(
-                        &mut frame_renderer,
-                        &mut state,
-                        renderer,
-                        &output,
-                        session_output,
-                        force_full_damage,
-                    )?;
+            for output in state.take_pending_redraws() {
+                device.queue_redraw(&output);
+            }
+            if state.animations_active() {
+                for output in device.output_names() {
+                    device.queue_redraw(&output);
                 }
             }
-            match &frame_result {
-                FrameResult::Queued {
-                    cancel_estimated_vblank,
-                } => {
-                    if let Some(token) = cancel_estimated_vblank {
-                        event_loop.handle().remove(*token);
+        }
+
+        if active && device.any_output_should_render() {
+            let mut results = Vec::new();
+            for name in device.output_names() {
+                let Some(output) = state.outputs.output(&name).cloned() else {
+                    continue;
+                };
+                let Some(frame_renderer) = frame_renderers.get_mut(&name) else {
+                    continue;
+                };
+                let frame_target =
+                    presentation_clock.now() + frame_renderer.next_presentation_delay();
+                state.set_render_output(Some(&name));
+                state.signal_commit_timers(frame_target);
+                let Some((renderer, session_output)) = device.renderer_and_output_by_name(&name)
+                else {
+                    state.set_render_output(None);
+                    continue;
+                };
+                let force_full_damage = session_output.frame_state.force_full_damage();
+                let result = frame_renderer.render(
+                    &mut state,
+                    renderer,
+                    &output,
+                    session_output,
+                    force_full_damage,
+                )?;
+                let frame_callback_sequence = match &result {
+                    FrameResult::Queued { .. } | FrameResult::NoDamage => {
+                        Some(session_output.frame_state.frame_rendered())
                     }
-                    force_full_damage = false;
-                    display.flush_clients().map_err(|error| {
-                        DrmError::Unsupported(format!("Wayland flush failed after frame: {error}"))
-                    })?;
+                    FrameResult::Idle | FrameResult::Retry => None,
+                };
+                state.set_render_output(None);
+                let estimated_vblank_delay = frame_renderer.next_presentation_delay();
+                results.push((
+                    name,
+                    result,
+                    estimated_vblank_delay,
+                    frame_target,
+                    frame_callback_sequence,
+                ));
+            }
+
+            for (name, result, estimated_vblank_delay, frame_target, frame_callback_sequence) in
+                results
+            {
+                if let Some(sequence) = frame_callback_sequence
+                    && let Some(output) = state.outputs.output(&name).cloned()
+                {
+                    state.set_render_output(Some(&name));
+                    state.signal_fifo_barriers();
+                    state.set_render_output(None);
+                    send_frame_callbacks(&state, &output, sequence, frame_target);
                 }
-                FrameResult::NoDamage => {
-                    if let Some(session_output) = device.output_by_name_mut(&primary_name)
-                        && !estimated_vblank::should_skip_queue(session_output)
-                    {
-                        let output_name = primary_name.clone();
-                        let duration = estimated_vblank::timer_duration(session_output);
-                        let timer = Timer::from_duration(duration);
-                        let token = event_loop
-                            .handle()
-                            .insert_source(timer, move |_, _, data| {
-                                data.pending_estimated_vblanks
-                                    .push(output_name.clone());
-                                TimeoutAction::Drop
-                            })
-                            .map_err(|error| {
-                                DrmError::Unsupported(format!(
-                                    "failed to register estimated vblank timer: {error}"
-                                ))
-                            })?;
-                        estimated_vblank::mark_waiting(session_output, token);
+                match result {
+                    FrameResult::Queued {
+                        cancel_estimated_vblank,
+                    } => {
+                        state.session_lock_frame_queued(&name);
+                        if let Some(token) = cancel_estimated_vblank {
+                            event_loop.handle().remove(token);
+                        }
                     }
-                    force_full_damage = false;
-                    display.flush_clients().map_err(|error| {
-                        DrmError::Unsupported(format!("Wayland flush failed after frame: {error}"))
-                    })?;
-                }
-                FrameResult::Idle => {
-                    let timeout = process_timeout(Instant::now(), IDLE_DISPATCH, &shell, &xwayland);
-                    event_loop
-                        .dispatch(Some(timeout), &mut loop_events)
-                        .map_err(|error| {
-                            DrmError::Unsupported(format!("session idle dispatch failed: {error}"))
-                        })?;
+                    FrameResult::NoDamage => {
+                        queue_estimated_vblank(
+                            &mut device,
+                            &event_loop,
+                            &name,
+                            estimated_vblank_delay,
+                        )?;
+                    }
+                    FrameResult::Retry => {
+                        queue_estimated_vblank(
+                            &mut device,
+                            &event_loop,
+                            &name,
+                            estimated_vblank_delay,
+                        )?;
+                    }
+                    FrameResult::Idle => {}
                 }
             }
-        } else if active && !device.frame_pending() {
+
+            display.flush_clients().map_err(|error| {
+                DrmError::Unsupported(format!("Wayland flush failed after frame: {error}"))
+            })?;
+        }
+
+        if active && !device.frame_pending() {
             let now = Instant::now();
             let timeout = process_timeout(now, IDLE_DISPATCH, &shell, &xwayland);
             event_loop
@@ -461,7 +480,7 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
                 })?;
         } else if active {
             event_loop
-                .dispatch(None, &mut loop_events)
+                .dispatch(Some(IDLE_DISPATCH), &mut loop_events)
                 .map_err(|error| {
                     DrmError::Unsupported(format!("session frame-pending dispatch failed: {error}"))
                 })?;
@@ -474,107 +493,4 @@ pub fn run(options: DrmOptions) -> Result<(), DrmError> {
                 })?;
         }
     }
-}
-
-#[derive(Default)]
-struct LoopEvents {
-    input: Vec<InputEvent<LibinputInputBackend>>,
-    vblank: Vec<VBlankEvent>,
-    drm_errors: Vec<String>,
-    session: Vec<SessionEvent>,
-    udev: Vec<UdevEvent>,
-    syncobj_ready: Vec<Client>,
-    child_process_changed: bool,
-    pending_estimated_vblanks: Vec<String>,
-}
-
-struct VBlankEvent {
-    crtc: crtc::Handle,
-    metadata: Option<DrmEventMetadata>,
-}
-
-impl LoopEvents {
-    fn take_child_process_changed(&mut self) -> bool {
-        std::mem::take(&mut self.child_process_changed)
-    }
-}
-
-fn register_keyboard_device(
-    devices: &mut Vec<LibinputDevice>,
-    mut device: LibinputDevice,
-    led_state: smithay::input::keyboard::LedState,
-) {
-    if !device.has_capability(LibinputDeviceCapability::Keyboard) {
-        return;
-    }
-    device.led_update(led_state.into());
-    devices.push(device);
-}
-
-fn unregister_keyboard_device(devices: &mut Vec<LibinputDevice>, device: &LibinputDevice) {
-    devices.retain(|current| current.sysname() != device.sysname());
-}
-
-fn update_keyboard_leds(
-    devices: &mut [LibinputDevice],
-    led_state: smithay::input::keyboard::LedState,
-) {
-    let leds = led_state.into();
-    for device in devices {
-        device.led_update(leds);
-    }
-}
-
-fn handle_session_events(
-    events: &mut LoopEvents,
-    device: &mut SessionDevice,
-    active: &mut bool,
-    force_full_damage: &mut bool,
-) -> Result<(), DrmError> {
-    for event in events.session.drain(..) {
-        match event {
-            SessionEvent::PauseSession => {
-                *active = false;
-                device.pause();
-                info!("paused DRM session");
-            }
-            SessionEvent::ActivateSession => {
-                device.activate()?;
-                *active = true;
-                *force_full_damage = true;
-                info!("reactivated DRM session");
-            }
-        }
-    }
-
-    Ok(())
-}
-
-fn update_xwayland_state(
-    state: &mut KestrelState,
-    xwayland: &XwaylandSatellite,
-    socket_name: &str,
-) {
-    let xwayland_status = xwayland.status();
-    if state.xwayland_status != xwayland_status {
-        state.xwayland_status = xwayland_status;
-        state.mark_scene_dirty();
-    }
-    let xwayland_display = xwayland.display().map(str::to_string);
-    if state.xwayland_display != xwayland_display {
-        state.xwayland_display = xwayland_display;
-        session_services::sync_activation_environment(
-            socket_name,
-            state.xwayland_display.as_deref(),
-        );
-        state.mark_scene_dirty();
-    }
-}
-
-fn bind_socket(socket_name: Option<&str>) -> Result<ListeningSocket, DrmError> {
-    match socket_name {
-        Some(name) => ListeningSocket::bind(name),
-        None => ListeningSocket::bind_auto("luft", 1..33),
-    }
-    .map_err(|error| DrmError::Unsupported(format!("failed to bind Wayland socket: {error}")))
 }

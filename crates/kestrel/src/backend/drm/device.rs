@@ -1,25 +1,19 @@
 use self::outputs::{ConnectedOutput, descriptors};
-use super::{
-    DrmError,
-    cursor::HardwareCursor,
-    dmabuf_feedback::{SurfaceDmabufFeedback, build_surface_dmabuf_feedback},
-    redraw::OutputFrameState,
-};
-use crate::{
-    output::OutputDescriptor,
-    state::KestrelState,
-};
+use super::{DrmError, dmabuf_feedback::SurfaceDmabufFeedback, redraw::OutputFrameState};
+use crate::output::OutputDescriptor;
 use luft_config::DisplayConfig;
 use smithay::{
     backend::{
+        SwapBuffersError,
         allocator::{
-            Format, Fourcc,
+            Fourcc,
             dmabuf::Dmabuf,
             gbm::{GbmAllocator, GbmBufferFlags, GbmDevice},
         },
         drm::{
-            DrmDevice, DrmDeviceFd, DrmDeviceNotifier, compositor::DrmCompositor,
+            DrmDevice, DrmDeviceFd, DrmDeviceNotifier, DrmError as SmithayDrmError,
             exporter::gbm::GbmFramebufferExporter,
+            output::{DrmOutput, DrmOutputManager, DrmOutputRenderElements},
         },
         egl::{EGLContext, EGLDisplay},
         libinput::{LibinputInputBackend, LibinputSessionInterface},
@@ -38,10 +32,9 @@ use smithay::{
     },
     utils::{DeviceFd, Scale},
 };
-use smithay::reexports::drm::control::Device as DrmControlDevice;
-use std::time::Duration;
 use tracing::info;
 
+mod output_link;
 mod outputs;
 
 const SUPPORTED_COLOR_FORMATS: [Fourcc; 4] = [
@@ -55,12 +48,18 @@ pub struct QueuedFrameData {
     pub presentation: OutputPresentationFeedback,
 }
 
-pub type SessionCompositor = DrmCompositor<
-    GbmAllocator<DrmDeviceFd>,
-    GbmFramebufferExporter<DrmDeviceFd>,
+type SessionAllocator = GbmAllocator<DrmDeviceFd>;
+type SessionExporter = GbmFramebufferExporter<DrmDeviceFd>;
+pub type SessionCompositor =
+    DrmOutput<SessionAllocator, SessionExporter, QueuedFrameData, DrmDeviceFd>;
+pub type SessionRawCompositor = smithay::backend::drm::compositor::DrmCompositor<
+    SessionAllocator,
+    SessionExporter,
     QueuedFrameData,
     DrmDeviceFd,
 >;
+type SessionOutputManager =
+    DrmOutputManager<SessionAllocator, SessionExporter, QueuedFrameData, DrmDeviceFd>;
 
 pub struct OpenedSessionDevice {
     pub device: SessionDevice,
@@ -77,13 +76,12 @@ pub struct SessionSources {
 pub struct SessionDevice {
     _session: LibSeatSession,
     pub active_device_id: u64,
-    pub drm: DrmDevice,
-    cursor: HardwareCursor,
+    output_manager: SessionOutputManager,
+    connected: Vec<ConnectedOutput>,
     outputs: Vec<SessionOutput>,
     primary: usize,
-    gbm: GbmDevice<DrmDeviceFd>,
-    renderer_formats: Vec<Format>,
     import_node: Option<DrmNode>,
+    libinput: Libinput,
     pub renderer: GlesRenderer,
 }
 
@@ -112,7 +110,10 @@ pub fn open(
         .ok_or_else(|| DrmError::Unsupported(format!("no DRM devices found on {seat}")))?;
 
     let fd = session
-        .open(&path, OFlags::RDWR | OFlags::CLOEXEC)
+        .open(
+            &path,
+            OFlags::RDWR | OFlags::CLOEXEC | OFlags::NOCTTY | OFlags::NONBLOCK,
+        )
         .map_err(|error| {
             DrmError::Unsupported(format!(
                 "failed to open {} through libseat: {error}",
@@ -128,16 +129,20 @@ pub fn open(
         })?
         .st_rdev as u64;
     let drm_fd = DrmDeviceFd::new(DeviceFd::from(fd));
-    let (mut drm, drm_notifier) = DrmDevice::new(drm_fd.clone(), true).map_err(|error| {
+    let (drm, drm_notifier) = DrmDevice::new(drm_fd.clone(), true).map_err(|error| {
         DrmError::Unsupported(format!(
             "failed to initialize DRM device {}: {error}",
             path.display()
         ))
     })?;
-    let outputs = ConnectedOutput::discover_all(&drm, display_config)?;
-    let output = outputs.first().cloned().ok_or_else(|| {
-        DrmError::Unsupported("no connected DRM outputs with usable modes were found".to_string())
-    })?;
+    let connected = ConnectedOutput::discover_all(&drm, display_config)?;
+    let output = connected
+        .iter()
+        .find(|output| output.enabled)
+        .cloned()
+        .ok_or_else(|| {
+            DrmError::Unsupported("display configuration disables every output".into())
+        })?;
 
     let gbm = GbmDevice::new(drm_fd.clone())
         .map_err(|error| DrmError::Unsupported(format!("failed to create GBM device: {error}")))?;
@@ -145,7 +150,7 @@ pub fn open(
         .map_err(|error| DrmError::Unsupported(format!("failed to create EGL display: {error}")))?;
     let context = EGLContext::new(&egl)
         .map_err(|error| DrmError::Unsupported(format!("failed to create EGL context: {error}")))?;
-    let renderer = unsafe { GlesRenderer::new(context) }.map_err(|error| {
+    let mut renderer = unsafe { GlesRenderer::new(context) }.map_err(|error| {
         DrmError::Unsupported(format!("failed to create GLES renderer: {error}"))
     })?;
     let renderer_formats = <GlesRenderer as Bind<Dmabuf>>::supported_formats(&renderer)
@@ -155,20 +160,30 @@ pub fn open(
         .into_iter()
         .collect::<Vec<_>>();
     let import_node = DrmNode::from_file(&drm_fd).ok();
-    let cursor = HardwareCursor::new(&drm)?;
-    let outputs = create_session_outputs(
-        &mut drm,
+    let allocator = GbmAllocator::new(
         gbm.clone(),
+        GbmBufferFlags::RENDERING | GbmBufferFlags::SCANOUT,
+    );
+    let exporter = GbmFramebufferExporter::new(gbm.clone(), import_node.into());
+    let mut output_manager = DrmOutputManager::new(
+        drm,
+        allocator,
+        exporter,
+        Some(gbm.clone()),
+        SUPPORTED_COLOR_FORMATS,
         renderer_formats.clone(),
-        import_node,
-        outputs,
+    );
+    let outputs = create_session_outputs(
+        &mut output_manager,
+        &mut renderer,
+        connected.iter().filter(|output| output.enabled).cloned(),
     )?;
 
     let mut libinput = Libinput::new_with_udev(LibinputSessionInterface::from(session.clone()));
     libinput
         .udev_assign_seat(&seat)
         .map_err(|()| DrmError::Unsupported(format!("failed to assign libinput to {seat}")))?;
-    let input = LibinputInputBackend::new(libinput);
+    let input = LibinputInputBackend::new(libinput.clone());
 
     info!(
         device = %path.display(),
@@ -183,13 +198,12 @@ pub fn open(
         device: SessionDevice {
             _session: session,
             active_device_id,
-            drm,
-            cursor,
+            output_manager,
+            connected,
             outputs,
             primary: 0,
-            gbm,
-            renderer_formats,
             import_node,
+            libinput,
             renderer,
         },
         sources: SessionSources {
@@ -202,30 +216,15 @@ pub fn open(
 }
 
 impl SessionDevice {
-    pub fn link_compositor_outputs(&mut self, state: &KestrelState) {
-        for session_output in &mut self.outputs {
-            let Some(output) = state.outputs.output(&session_output.descriptor.name) else {
-                continue;
-            };
-            session_output
-                .compositor
-                .set_output_mode_source(OutputModeSource::Auto(output.downgrade()));
-            if session_output.dmabuf_feedback.is_none()
-                && let Some(render_node) = self.import_node
-            {
-                session_output.dmabuf_feedback = build_surface_dmabuf_feedback(
-                    &session_output.compositor,
-                    state.dmabuf_formats.clone(),
-                    render_node,
-                )
-                .ok();
-            }
+    pub fn queue_redraw(&mut self, name: &str) {
+        if let Some(output) = self.output_by_name_mut(name) {
+            output.frame_state.queue_redraw();
         }
     }
 
-    pub fn queue_redraws(&mut self) {
+    pub fn queue_full_redraws(&mut self) {
         for output in &mut self.outputs {
-            output.frame_state.queue_redraw();
+            output.frame_state.queue_full_redraw();
         }
     }
 
@@ -241,12 +240,10 @@ impl SessionDevice {
             .find(|output| output.descriptor.name == name)
     }
 
-    pub fn non_primary_output_names(&self) -> Vec<String> {
+    pub fn output_names(&self) -> Vec<String> {
         self.outputs
             .iter()
-            .enumerate()
-            .filter(|(index, _)| *index != self.primary)
-            .map(|(_, output)| output.descriptor.name.clone())
+            .map(|output| output.descriptor.name.clone())
             .collect()
     }
 
@@ -262,27 +259,39 @@ impl SessionDevice {
     }
 
     pub fn rescan_outputs(&mut self, display_config: &DisplayConfig) -> Result<bool, DrmError> {
-        let connected = ConnectedOutput::discover_all(&self.drm, display_config)?;
-        let output = connected.first().cloned().ok_or_else(|| {
-            DrmError::Unsupported(
-                "no connected DRM outputs with usable modes were found".to_string(),
-            )
-        })?;
+        let connected =
+            ConnectedOutput::discover_all(self.output_manager.device(), display_config)?;
+        let output = connected.iter().find(|output| output.enabled).cloned();
+        if !connected.is_empty() && output.is_none() {
+            return Err(DrmError::Unsupported(
+                "display configuration disables every output".into(),
+            ));
+        }
         let descriptors = descriptors(&connected);
         let descriptors_changed = self.descriptors() != descriptors;
-        let primary_changed = !self.primary_output().output.matches(&output);
-        if !primary_changed && !descriptors_changed {
+        let topology_changed = self.connected.len() != connected.len()
+            || self
+                .connected
+                .iter()
+                .zip(&connected)
+                .any(|(current, next)| !current.matches(next) || current.enabled != next.enabled);
+        let primary_changed = match (self.outputs.get(self.primary), output.as_ref()) {
+            (Some(current), Some(output)) => !current.output.matches(output),
+            (None, None) => false,
+            _ => true,
+        };
+        if !primary_changed && !descriptors_changed && !topology_changed {
             return Ok(false);
         }
 
         self.reset_surfaces()?;
+        drop(std::mem::take(&mut self.outputs));
         self.outputs = create_session_outputs(
-            &mut self.drm,
-            self.gbm.clone(),
-            self.renderer_formats.clone(),
-            self.import_node,
-            connected,
+            &mut self.output_manager,
+            &mut self.renderer,
+            connected.iter().filter(|output| output.enabled).cloned(),
         )?;
+        self.connected = connected;
         self.discard_pending_frame();
         self.primary = 0;
         Ok(true)
@@ -298,36 +307,20 @@ impl SessionDevice {
     }
 
     pub fn descriptors(&self) -> Vec<OutputDescriptor> {
-        self.outputs
+        self.connected
             .iter()
             .map(|output| output.descriptor.clone())
             .collect()
     }
 
-    pub fn primary_descriptor(&self) -> &OutputDescriptor {
-        &self.primary_output().descriptor
-    }
-
-    pub fn renderer_and_primary_output(&mut self) -> (&mut GlesRenderer, &mut SessionOutput) {
-        (&mut self.renderer, &mut self.outputs[self.primary])
-    }
-
-    #[allow(dead_code)]
-    pub fn renderer_and_outputs(&mut self) -> (&mut GlesRenderer, usize, &mut [SessionOutput]) {
-        (&mut self.renderer, self.primary, &mut self.outputs)
-    }
-
-    fn primary_output(&self) -> &SessionOutput {
-        &self.outputs[self.primary]
-    }
-
-    #[allow(dead_code)]
-    pub fn is_primary_crtc(&self, crtc: crtc::Handle) -> bool {
-        self.primary_output().compositor.crtc() == crtc
+    pub fn primary_descriptor(&self) -> Option<&OutputDescriptor> {
+        self.outputs
+            .get(self.primary)
+            .map(|output| &output.descriptor)
     }
 
     pub fn drm_device_fd(&self) -> DrmDeviceFd {
-        self.drm.device_fd().clone()
+        self.output_manager.device().device_fd().clone()
     }
 
     pub fn dmabuf_main_device(&self) -> u64 {
@@ -342,36 +335,6 @@ impl SessionDevice {
         for output in &mut self.outputs {
             output.discard_pending_frame();
         }
-    }
-
-    pub fn sync_cursor(&mut self, state: &mut KestrelState) {
-        use smithay::input::pointer::CursorImageStatus;
-
-        if matches!(state.cursor_image, CursorImageStatus::Surface(_)) {
-            let crtcs = self
-                .outputs
-                .iter()
-                .map(|output| output.compositor.crtc())
-                .collect::<Vec<_>>();
-            for crtc in crtcs {
-                #[allow(deprecated)]
-                let _ = DrmControlDevice::set_cursor2(
-                    self.drm.device_fd(),
-                    crtc,
-                    Option::<&smithay::reexports::drm::control::dumbbuffer::DumbBuffer>::None,
-                    (0, 0),
-                );
-            }
-            self.cursor.reset();
-            return;
-        }
-
-        let crtcs = self
-            .outputs
-            .iter()
-            .map(|output| output.compositor.crtc())
-            .collect::<Vec<_>>();
-        self.cursor.sync(&self.drm, crtcs, state);
     }
 
     pub fn frame_submitted(
@@ -389,10 +352,54 @@ impl SessionDevice {
         if !output.frame_queued {
             return Ok(None);
         }
-        let queued = output
+        let queued = match output
             .compositor
             .frame_submitted()
-            .map_err(compositor_error)?;
+            .map_err(Into::<SwapBuffersError>::into)
+        {
+            Ok(queued) => queued,
+            Err(error) => {
+                output.frame_queued = false;
+                match error {
+                    SwapBuffersError::AlreadySwapped | SwapBuffersError::TemporaryFailure(_) => {
+                        tracing::warn!(output = %output.descriptor.name, "DRM completion failed; scheduling a clean retry");
+                        output.frame_state.reject_submission();
+                        output
+                            .compositor
+                            .with_compositor(|compositor| compositor.reset_buffer_ages());
+                        return Ok(None);
+                    }
+                    SwapBuffersError::ContextLost(error)
+                        if matches!(
+                            error.downcast_ref::<SmithayDrmError>(),
+                            Some(SmithayDrmError::TestFailed(_))
+                        ) =>
+                    {
+                        tracing::warn!(output = %output.descriptor.name, %error, "DRM completion state test failed; resetting KMS state");
+                        output
+                            .compositor
+                            .with_compositor(|compositor| compositor.reset_state())
+                            .map_err(compositor_error)?;
+                        output.frame_state.reject_submission();
+                        return Ok(None);
+                    }
+                    SwapBuffersError::ContextLost(error) => {
+                        return Err(DrmError::Unsupported(format!(
+                            "DRM completion context was lost: {error}"
+                        )));
+                    }
+                }
+            }
+        };
+        let Some(queued) = queued else {
+            tracing::warn!(
+                output = %output.descriptor.name,
+                "DRM completion advanced Smithay state without presenting the queued Kestrel frame"
+            );
+            output.frame_queued = false;
+            output.frame_state.reject_submission();
+            return Ok(None);
+        };
         output.frame_queued = false;
         let redraw_needed = output.frame_state.frame_submitted();
         Ok(Some(SubmittedFrameInfo {
@@ -404,26 +411,27 @@ impl SessionDevice {
     }
 
     pub fn pause(&mut self) {
+        self.libinput.suspend();
         self.discard_pending_frame();
-        self.drm.pause();
+        self.output_manager.pause();
     }
 
     pub fn activate(&mut self) -> Result<(), DrmError> {
-        self.drm.activate(true).map_err(|error| {
-            DrmError::Unsupported(format!("failed to reactivate DRM device: {error}"))
-        })?;
-        self.reset_surfaces()?;
+        self.libinput
+            .resume()
+            .map_err(|()| DrmError::Unsupported("failed to resume libinput context".to_string()))?;
+        if let Err(error) = self.output_manager.lock().activate(false) {
+            self.libinput.suspend();
+            return Err(DrmError::Unsupported(format!(
+                "failed to reactivate DRM device: {error}"
+            )));
+        }
         self.discard_pending_frame();
         Ok(())
     }
 
     fn reset_surfaces(&mut self) -> Result<(), DrmError> {
-        self.cursor.reset();
         for output in &mut self.outputs {
-            output
-                .compositor
-                .reset_state()
-                .map_err(compositor_error)?;
             output.compositor.reset_buffers();
         }
         Ok(())
@@ -432,7 +440,7 @@ impl SessionDevice {
 
 pub struct SubmittedFrameInfo {
     pub descriptor_name: String,
-    pub queued: Option<QueuedFrameData>,
+    pub queued: QueuedFrameData,
     pub redraw_needed: bool,
     pub sequence: u32,
 }
@@ -457,65 +465,53 @@ impl SessionOutput {
 
     fn discard_pending_frame(&mut self) {
         self.frame_queued = false;
+        self.frame_state.discard_pending_frame();
     }
 }
 
 fn create_compositor(
-    drm: &mut DrmDevice,
-    gbm: GbmDevice<DrmDeviceFd>,
-    renderer_formats: Vec<Format>,
-    import_node: Option<DrmNode>,
+    output_manager: &mut SessionOutputManager,
+    renderer: &mut GlesRenderer,
     output: &ConnectedOutput,
 ) -> Result<SessionCompositor, DrmError> {
-    let drm_surface = drm
-        .create_surface(output.crtc, output.mode, &[output.connector])
-        .map_err(|error| DrmError::Unsupported(format!("failed to create DRM surface: {error}")))?;
-    let allocator = GbmAllocator::new(gbm.clone(), GbmBufferFlags::RENDERING | GbmBufferFlags::SCANOUT);
-    let exporter = GbmFramebufferExporter::new(gbm.clone(), import_node.into());
     let mode_source = OutputModeSource::Static {
         size: output.descriptor.size,
         scale: output_scale(output.descriptor.scale),
         transform: output.descriptor.transform,
     };
-
-    DrmCompositor::new(
-        mode_source,
-        drm_surface,
-        None,
-        allocator,
-        exporter,
-        SUPPORTED_COLOR_FORMATS,
-        renderer_formats,
-        drm.cursor_size(),
-        Some(gbm),
-    )
-    .map_err(compositor_error)
+    let render_elements = DrmOutputRenderElements::<
+        GlesRenderer,
+        smithay::backend::renderer::element::solid::SolidColorRenderElement,
+    >::new();
+    output_manager
+        .lock()
+        .initialize_output(
+            output.crtc,
+            output.mode,
+            &[output.connector],
+            mode_source,
+            None,
+            renderer,
+            &render_elements,
+        )
+        .map_err(compositor_error)
 }
 
 fn create_session_outputs(
-    drm: &mut DrmDevice,
-    gbm: GbmDevice<DrmDeviceFd>,
-    renderer_formats: Vec<Format>,
-    import_node: Option<DrmNode>,
-    outputs: Vec<ConnectedOutput>,
+    output_manager: &mut SessionOutputManager,
+    renderer: &mut GlesRenderer,
+    outputs: impl IntoIterator<Item = ConnectedOutput>,
 ) -> Result<Vec<SessionOutput>, DrmError> {
     outputs
         .into_iter()
         .map(|output| {
             let descriptor = output.descriptor.clone();
-            let refresh = refresh_interval_for_descriptor(&descriptor);
-            let compositor = create_compositor(
-                drm,
-                gbm.clone(),
-                renderer_formats.clone(),
-                import_node,
-                &output,
-            )?;
+            let compositor = create_compositor(output_manager, renderer, &output)?;
             Ok(SessionOutput {
                 descriptor,
                 output,
                 compositor,
-                frame_state: OutputFrameState::new(refresh),
+                frame_state: OutputFrameState::new(),
                 dmabuf_feedback: None,
                 frame_queued: false,
             })
@@ -525,11 +521,6 @@ fn create_session_outputs(
 
 fn output_scale(scale: f64) -> Scale<f64> {
     Scale::from(scale.clamp(0.5, 4.0))
-}
-
-fn refresh_interval_for_descriptor(descriptor: &OutputDescriptor) -> Duration {
-    let refresh = descriptor.refresh_millihertz.max(1) as u64;
-    Duration::from_nanos((1_000_000_000_000u64 + refresh / 2) / refresh)
 }
 
 fn compositor_error<E: std::fmt::Display>(error: E) -> DrmError {

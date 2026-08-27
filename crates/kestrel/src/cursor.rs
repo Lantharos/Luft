@@ -9,7 +9,7 @@ impl KestrelState {
         }
 
         self.cursor_image = CursorImageStatus::Named(icon);
-        self.cursor_dirty = true;
+        self.mark_scene_content_dirty();
     }
 
     pub(crate) fn clear_frame_cursor(&mut self) {
@@ -19,6 +19,6 @@ impl KestrelState {
 
         self.frame_cursor_active = false;
         self.cursor_image = CursorImageStatus::Named(CursorIcon::Default);
-        self.cursor_dirty = true;
+        self.mark_scene_content_dirty();
     }
 }

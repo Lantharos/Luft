@@ -1,5 +1,5 @@
 use super::model::WebShellSurface;
-use fenestra_cef::{
+use sabine::{
     ShellSurfaceAnchor, ShellSurfaceKeyboardInteractivity, ShellSurfaceLayer, ShellSurfaceMargin,
     ShellSurfaceOptions,
 };
@@ -64,11 +64,13 @@ pub(crate) fn shell_surface(
 }
 
 fn shell_size(kind: WebShellSurface, size: (i32, i32)) -> (u32, u32) {
-    let size = match kind {
-        WebShellSurface::Panel => (0, panel_size().1),
-        _ => size,
-    };
-    (size.0.max(0) as u32, size.1.max(1) as u32)
+    match kind {
+        WebShellSurface::Panel => (
+            panel_output_width().max(1) as u32,
+            panel_size().1.max(1) as u32,
+        ),
+        _ => (size.0.max(1) as u32, size.1.max(1) as u32),
+    }
 }
 
 pub(crate) fn panel_output_width() -> i32 {
@@ -123,12 +125,7 @@ fn margin(
         ),
         WebShellSurface::SessionMenu => {
             let qs_height = session_menu_qs_height.unwrap_or(280);
-            ShellSurfaceMargin::new(
-                0,
-                0,
-                PANEL_BAR_HEIGHT + 8 + qs_height - 76 - size.1,
-                0,
-            )
+            ShellSurfaceMargin::new(0, 0, PANEL_BAR_HEIGHT + 8 + qs_height - 76 - size.1, 0)
         }
         WebShellSurface::StartMenu => ShellSurfaceMargin::new(0, 0, PANEL_BAR_HEIGHT + 10, 0),
         WebShellSurface::QuickSettings => ShellSurfaceMargin::new(0, 0, PANEL_BAR_HEIGHT + 8, 0),

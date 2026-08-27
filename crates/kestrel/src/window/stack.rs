@@ -5,8 +5,7 @@ use super::{
 use crate::window_animation::WindowAnimation;
 use luft_ipc::{Rect, WindowId, WorkspaceId};
 use smithay::{
-    desktop::PopupManager,
-    reexports::wayland_server::protocol::wl_surface::WlSurface,
+    desktop::PopupManager, reexports::wayland_server::protocol::wl_surface::WlSurface,
     wayland::shell::xdg::ToplevelSurface,
 };
 

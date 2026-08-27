@@ -21,8 +21,8 @@ pub fn start(wayland_display: &str, x11_display: Option<&str>) {
         return;
     }
 
-    start_luft_portal();
-    start_portal_broker();
+    start_luft_portal(wayland_display, x11_display);
+    start_portal_broker(wayland_display, x11_display);
 }
 
 pub fn sync_activation_environment(wayland_display: &str, x11_display: Option<&str>) {
@@ -63,17 +63,18 @@ pub fn sync_activation_environment(wayland_display: &str, x11_display: Option<&s
     }
 }
 
-fn start_luft_portal() {
+fn start_luft_portal(wayland_display: &str, x11_display: Option<&str>) {
     let Some(binary) = luft_portal_binary() else {
-        warn!("luft-portal is not installed; portal Settings will be unavailable");
+        warn!("luft-portal is not installed; Luft portal services will be unavailable");
         return;
     };
 
     let mut command = Command::new(binary);
+    apply_display_environment(&mut command, wayland_display, x11_display);
     spawn_session_helper("luft-portal", &mut command);
 }
 
-fn start_portal_broker() {
+fn start_portal_broker(wayland_display: &str, x11_display: Option<&str>) {
     let Some(binary) =
         find_known_program("xdg-desktop-portal", &["/usr/libexec/xdg-desktop-portal"])
     else {
@@ -82,7 +83,21 @@ fn start_portal_broker() {
     };
 
     let mut command = Command::new(binary);
+    apply_display_environment(&mut command, wayland_display, x11_display);
     spawn_session_helper("xdg-desktop-portal", &mut command);
+}
+
+fn apply_display_environment(
+    command: &mut Command,
+    wayland_display: &str,
+    x11_display: Option<&str>,
+) {
+    command.env("WAYLAND_DISPLAY", wayland_display);
+    if let Some(display) = x11_display {
+        command.env("DISPLAY", display);
+    } else {
+        command.env_remove("DISPLAY");
+    }
 }
 
 fn luft_portal_binary() -> Option<PathBuf> {

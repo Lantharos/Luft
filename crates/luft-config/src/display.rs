@@ -49,6 +49,8 @@ pub struct OutputConfig {
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub refresh_millihertz: Option<i32>,
+    pub transform: OutputTransform,
+    pub adaptive_sync: bool,
 }
 
 impl Default for OutputConfig {
@@ -61,8 +63,24 @@ impl Default for OutputConfig {
             width: None,
             height: None,
             refresh_millihertz: None,
+            transform: OutputTransform::Normal,
+            adaptive_sync: false,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OutputTransform {
+    #[default]
+    Normal,
+    Rotate90,
+    Rotate180,
+    Rotate270,
+    Flipped,
+    Flipped90,
+    Flipped180,
+    Flipped270,
 }
 
 impl OutputConfig {

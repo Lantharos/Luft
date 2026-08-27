@@ -18,7 +18,8 @@ fn map_kestrel_window(
     managed: &crate::window::ManagedWindow,
 ) {
     kw.update_from_managed(managed);
-    let location = slide_content_location(managed, workspace_slide_offset(state, &managed.workspace));
+    let location =
+        slide_content_location(managed, workspace_slide_offset(state, &managed.workspace));
     state.space.map_element(kw.clone(), location, false);
 }
 
@@ -28,7 +29,8 @@ fn update_kestrel_window_location(
     managed: &crate::window::ManagedWindow,
 ) {
     kw.update_from_managed(managed);
-    let location = slide_content_location(managed, workspace_slide_offset(state, &managed.workspace));
+    let location =
+        slide_content_location(managed, workspace_slide_offset(state, &managed.workspace));
     if state.space.elements().any(|element| element == kw) {
         state.space.relocate_element(kw, location);
     } else {
@@ -65,7 +67,8 @@ pub fn sync_active_workspace(state: &mut KestrelState) {
 
 pub fn sync_visible_windows(state: &mut KestrelState) {
     let targets = space_window_render_targets(state);
-    let visible: std::collections::HashSet<WindowId> = targets.iter().map(|target| target.id).collect();
+    let visible: std::collections::HashSet<WindowId> =
+        targets.iter().map(|target| target.id).collect();
 
     for id in state
         .space_windows

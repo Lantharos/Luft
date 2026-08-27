@@ -20,6 +20,14 @@ pub struct OutputDescriptor {
     pub refresh_millihertz: i32,
     pub scale: f64,
     pub transform: Transform,
+    pub modes: Vec<OutputModeDescriptor>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct OutputModeDescriptor {
+    pub size: Size<i32, Physical>,
+    pub refresh_millihertz: i32,
+    pub preferred: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -50,15 +58,17 @@ impl NestedOutput {
             size: self.size,
             refresh_millihertz: self.refresh_millihertz,
             scale: 1.0,
-            transform: Transform::Flipped180,
+            transform: Transform::Normal,
+            modes: vec![OutputModeDescriptor {
+                size: self.size,
+                refresh_millihertz: self.refresh_millihertz,
+                preferred: true,
+            }],
         }
     }
 
     pub fn resize(&mut self, size: Size<i32, Physical>) -> bool {
-        let size = (
-            size.w.max(1),
-            size.h.max(1),
-        ).into();
+        let size = (size.w.max(1), size.h.max(1)).into();
         if self.size == size {
             return false;
         }

@@ -1,17 +1,13 @@
-use super::device::SessionCompositor;
 use super::DrmError;
+use super::device::SessionRawCompositor;
 use crate::state::KestrelState;
 use smithay::{
     backend::{
-        allocator::{Format, Modifier},
+        allocator::Format,
         allocator::format::FormatSet,
-        renderer::element::{
-            utils::select_dmabuf_feedback, RenderElementStates,
-        },
+        renderer::element::{RenderElementStates, utils::select_dmabuf_feedback},
     },
-    desktop::utils::{
-        send_dmabuf_feedback_surface_tree, surface_primary_scanout_output,
-    },
+    desktop::utils::{send_dmabuf_feedback_surface_tree, surface_primary_scanout_output},
     output::Output,
     reexports::{
         drm::node::DrmNode,
@@ -27,7 +23,7 @@ pub struct SurfaceDmabufFeedback {
 }
 
 pub fn build_surface_dmabuf_feedback(
-    compositor: &SessionCompositor,
+    compositor: &SessionRawCompositor,
     primary_formats: FormatSet,
     render_node: DrmNode,
 ) -> Result<SurfaceDmabufFeedback, DrmError> {
@@ -40,36 +36,40 @@ pub fn build_surface_dmabuf_feedback(
         .copied()
         .collect::<FormatSet>();
 
-    let mut primary_scanout_formats = primary_plane_formats
+    let primary_scanout_formats = primary_plane_formats
         .intersection(&primary_formats)
         .copied()
         .collect::<Vec<Format>>();
-    let mut primary_or_overlay_scanout_formats = primary_or_overlay_plane_formats
+    let primary_or_overlay_scanout_formats = primary_or_overlay_plane_formats
         .intersection(&primary_formats)
         .copied()
         .collect::<Vec<Format>>();
-
-    primary_scanout_formats.retain(|format| format.modifier == Modifier::Linear);
-    primary_or_overlay_scanout_formats.retain(|format| format.modifier == Modifier::Linear);
 
     let builder = DmabufFeedbackBuilder::new(render_node.dev_id(), primary_formats.clone());
+    let scanout_node = surface.device_fd().dev_id().map_err(|error| {
+        DrmError::Unsupported(format!("failed to identify DRM scanout device: {error}"))
+    })?;
 
     let scanout = builder
         .clone()
         .add_preference_tranche(
-            render_node.dev_id(),
-            Some(TrancheFlags::Scanout),
+            scanout_node,
+            TrancheFlags::Scanout,
             primary_scanout_formats,
+            4u32..=6,
         )
         .add_preference_tranche(
-            render_node.dev_id(),
-            Some(TrancheFlags::Scanout),
+            scanout_node,
+            TrancheFlags::Scanout,
             primary_or_overlay_scanout_formats,
+            4u32..=6,
         )
         .build()
         .map_err(|error| DrmError::Unsupported(format!("dmabuf feedback build failed: {error}")))?;
 
-    let render = scanout.clone();
+    let render = builder
+        .build()
+        .map_err(|error| DrmError::Unsupported(format!("dmabuf feedback build failed: {error}")))?;
 
     Ok(SurfaceDmabufFeedback { render, scanout })
 }

@@ -9,7 +9,7 @@ Luft loads `~/.config/luft/config.toml` when present and uses built-in defaults 
 background_image = "/home/kristof/Pictures/bg.jpg"
 ```
 
-Set `background_image = null` to use the solid compositor clear color.
+Luft uses its packaged wallpaper when `background_image` is omitted or `null`. Set an absolute path to use a JPEG or PNG of your own. Reload the compositor configuration to apply the change.
 
 ## Display
 
@@ -37,9 +37,9 @@ adaptive_sync = true
 ```
 
 `transform` accepts `normal`, `rotate90`, `rotate180`, `rotate270`, `flipped`,
-`flipped90`, `flipped180`, or `flipped270`. Output-management clients can
-change the same values, including output enablement, and Luft persists a
-successful DRM configuration automatically.
+`flipped90`, `flipped180`, or `flipped270`. Kestrel applies configured
+enablement, mode, position, scale, transform, and adaptive sync while creating
+the DRM output. The nested backend uses its host window's output settings.
 
 ## Startup Apps
 

@@ -26,7 +26,7 @@ bun install
 bun run build
 ```
 
-The DRM/KMS session backend is behind an explicit feature while it is still under active development:
+Build the DRM/KMS session backend explicitly:
 
 ```sh
 cargo build -p kestrel --features session-backend
@@ -44,12 +44,6 @@ Kestrel prints a `WAYLAND_DISPLAY` value. Use that socket from another terminal 
 
 ```sh
 WAYLAND_DISPLAY=<printed-socket> ghostty
-```
-
-Run the protocol/headless backend for smoke tests:
-
-```sh
-LUFT_IPC_SOCKET=/tmp/luft-headless.sock cargo run -p kestrel -- --headless --socket luft-headless
 ```
 
 ## Checks

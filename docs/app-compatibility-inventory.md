@@ -33,11 +33,14 @@ This list tracks protocol and service work needed for ordinary apps to behave li
   input path.
 - Idle notify and inhibit: advertised; input activity resets idle timers and
   mapped inhibitors suppress idle transitions.
-- Tablet protocol: do not advertise until libinput tablet events are mapped into Smithay tablet seats.
+- Tablet protocol: advertised in the session backend; libinput tablet tool
+  proximity, axis, tip, and button events are mapped into Smithay's tablet seat.
 
 ## Window And App Integration
 
 - XDG popup/transient handling: keep aligning coordinates, grabs, stacking, and constraints with the toplevel-rooted model used by KWin and Mutter.
-- Foreign toplevel list: advertised because Kestrel publishes real toplevel handles and keeps title/app-id state in sync.
+- Foreign toplevel list: not advertised. Luft's own shell gets window state
+  through typed compositor IPC; a public protocol should only be added for a
+  concrete external consumer.
 - Data control and clipboard: advertised through Smithay selection state.
 - StatusNotifier tray: keep improving icon lookup and menu activation; generic window icons should not be treated as tray items.

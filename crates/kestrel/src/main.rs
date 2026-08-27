@@ -1,117 +1,53 @@
-mod backend;
-mod background;
-mod background_effect;
-mod client;
-mod commit;
-mod cursor;
-mod cursor_image;
-mod damage;
-mod frame_clock;
-mod input;
-mod ipc;
-mod ipc_summary;
-mod layers;
-mod layout_config;
-mod output;
-mod protocol_state;
-mod protocols;
-mod render;
-mod render_helpers;
-mod scanout;
-mod scene_backdrop;
-mod scene_blur;
-mod scene_composite;
-mod scene_render;
-mod session_services;
-mod shell;
-mod space_window;
-mod state;
-mod state_focus;
-mod titlebar;
-mod vicinae_hotkey;
-mod window;
-mod window_animation;
-mod window_clip;
-mod window_geometry;
-mod workspace_transition;
-mod xwayland;
-
-use backend::RuntimeBackend;
 use clap::Parser;
-use luft_config::{ConfigPaths, ConfigSource, load_config};
-use std::{fs, fs::OpenOptions, io};
-use tracing::{info, warn};
+use kestrel::runtime::RuntimeOptions;
+use std::process::ExitCode;
 
 #[derive(Debug, Parser)]
-#[command(name = "kestrel", about = "Kestrel Wayland compositor for Luft")]
-struct KestrelArgs {
-    #[arg(long, conflicts_with_all = ["headless", "session"])]
+#[command(name = "kestrel", about = "Luft Wayland compositor")]
+struct Args {
+    #[arg(long, conflicts_with = "session")]
     nested: bool,
-    #[arg(long, conflicts_with_all = ["nested", "session"])]
-    headless: bool,
-    #[arg(long, conflicts_with_all = ["nested", "headless"])]
+    #[arg(long, conflicts_with = "nested")]
     session: bool,
     #[arg(long)]
     socket: Option<String>,
+    #[arg(long)]
+    no_shell: bool,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> ExitCode {
     init_logging();
+    let args = Args::parse();
+    let runtime = RuntimeOptions::new(args.socket, !args.no_shell, args.nested);
 
-    let args = KestrelArgs::parse();
-    let backend = selected_backend(&args);
-    let loaded_config = load_config()?;
-    match &loaded_config.source {
-        ConfigSource::User(path) => {
-            info!(path = %path.display(), "loaded user config")
+    if args.nested {
+        #[cfg(feature = "nested")]
+        {
+            kestrel::winit::run_winit(runtime);
+            return ExitCode::SUCCESS;
         }
-        ConfigSource::Defaults => warn!("using built-in default config"),
-    }
-
-    backend::run(backend, loaded_config.config, args.socket)?;
-    Ok(())
-}
-
-fn selected_backend(args: &KestrelArgs) -> RuntimeBackend {
-    if args.headless {
-        RuntimeBackend::Headless
+        #[cfg(not(feature = "nested"))]
+        tracing::error!("Kestrel was built without the nested backend");
     } else if args.session {
-        RuntimeBackend::Session
+        #[cfg(feature = "session-backend")]
+        {
+            kestrel::udev::run_udev(runtime);
+            return ExitCode::SUCCESS;
+        }
+        #[cfg(not(feature = "session-backend"))]
+        tracing::error!("Kestrel was built without the session backend");
     } else {
-        RuntimeBackend::Nested
+        tracing::error!("expected --nested or --session");
     }
+
+    ExitCode::FAILURE
 }
 
 fn init_logging() {
-    let subscriber = tracing_subscriber::fmt()
-        .with_ansi(false)
-        .with_writer(file_log_writer("kestrel"))
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                tracing_subscriber::EnvFilter::new("kestrel=info,smithay=warn")
-            }),
-        )
-        .finish();
-
-    let _ = tracing::subscriber::set_global_default(subscriber);
-}
-
-fn file_log_writer(component: &'static str) -> impl Fn() -> Box<dyn io::Write + Send> + Clone {
-    let path = ConfigPaths::discover()
-        .ok()
-        .map(|paths| paths.log_file(component));
-    move || -> Box<dyn io::Write + Send> {
-        let Some(path) = &path else {
-            return Box::new(io::stderr());
-        };
-        if let Some(parent) = path.parent()
-            && fs::create_dir_all(parent).is_err()
-        {
-            return Box::new(io::stderr());
-        }
-        match OpenOptions::new().create(true).append(true).open(path) {
-            Ok(file) => Box::new(file),
-            Err(_) => Box::new(io::stderr()),
-        }
-    }
+    let filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("kestrel=info,smithay=warn"));
+    tracing_subscriber::fmt()
+        .compact()
+        .with_env_filter(filter)
+        .init();
 }

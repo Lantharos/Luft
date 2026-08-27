@@ -16,11 +16,9 @@ const PRIVATE_DBUS_ENV: &str = "LUFT_PRIVATE_DBUS";
 #[derive(Debug, Parser)]
 #[command(name = "luft-session", about = "Start a Luft desktop session")]
 struct SessionArgs {
-    #[arg(long, conflicts_with_all = ["headless", "session"])]
+    #[arg(long, conflicts_with = "session")]
     nested: bool,
-    #[arg(long, conflicts_with_all = ["nested", "session"])]
-    headless: bool,
-    #[arg(long, conflicts_with_all = ["nested", "headless"])]
+    #[arg(long, conflicts_with = "nested")]
     session: bool,
     #[arg(long)]
     socket: Option<String>,
@@ -168,16 +166,12 @@ fn selected_backend(args: &SessionArgs, preference: BackendPreference) -> Kestre
     if args.nested {
         return KestrelBackend::Nested;
     }
-    if args.headless {
-        return KestrelBackend::Headless;
-    }
     if args.session {
         return KestrelBackend::Session;
     }
 
     match preference {
         BackendPreference::Nested => KestrelBackend::Nested,
-        BackendPreference::Headless => KestrelBackend::Headless,
         BackendPreference::Session => KestrelBackend::Session,
         BackendPreference::Auto => {
             if env::var_os("WAYLAND_DISPLAY").is_some() {
@@ -271,7 +265,6 @@ fn file_log_writer(component: &'static str) -> impl Fn() -> Box<dyn io::Write + 
 #[derive(Debug, Clone, Copy)]
 enum KestrelBackend {
     Nested,
-    Headless,
     Session,
 }
 
@@ -279,7 +272,6 @@ impl KestrelBackend {
     fn flag(self) -> &'static str {
         match self {
             Self::Nested => "--nested",
-            Self::Headless => "--headless",
             Self::Session => "--session",
         }
     }
@@ -287,7 +279,6 @@ impl KestrelBackend {
     fn name(self) -> &'static str {
         match self {
             Self::Nested => "nested",
-            Self::Headless => "headless",
             Self::Session => "session",
         }
     }

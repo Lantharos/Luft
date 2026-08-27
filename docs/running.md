@@ -18,18 +18,6 @@ WAYLAND_DISPLAY=<printed-socket> wayland-info
 
 When run directly for development, Kestrel wraps `luft-shell` in a private D-Bus session when possible. Set `LUFT_USE_HOST_DBUS=1` only when intentionally debugging against the host session bus.
 
-## Headless
-
-```sh
-LUFT_IPC_SOCKET=/tmp/luft-headless.sock cargo run -p kestrel -- --headless --socket luft-headless
-```
-
-The headless backend binds a Wayland socket and runs compositor protocol, layout, frame-callback, and IPC loops without opening a host window or starting the shell.
-
-```sh
-WAYLAND_DISPLAY=luft-headless wayland-info
-```
-
 ## Session Launcher
 
 `luft-session` is the display-manager entry point from `data/sessions/luft.desktop`. The installed entry launches `luft-session --session`, sets Luft desktop environment variables, and starts Kestrel as a real Wayland session.

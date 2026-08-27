@@ -9,9 +9,9 @@ use smithay::{
     backend::{
         allocator::Fourcc,
         renderer::{
-            Frame, FrameContext, Offscreen, Texture,
+            Bind, BlitFrame, Frame, FrameContext, Offscreen, Texture, TextureFilter,
             element::{Element, Id, Kind, RenderElement},
-            gles::{GlesError, GlesFrame, GlesRenderer, GlesTexture, ffi},
+            gles::{GlesError, GlesFrame, GlesRenderer, GlesTexture},
             utils::{CommitCounter, DamageSet, OpaqueRegions, RendererSurfaceStateUserData},
         },
     },
@@ -427,7 +427,7 @@ impl RenderElement<GlesRenderer> for BlurElement {
         let framebuffer_rect = transform.transform_rect_in(clamped_dst, &output_rect.size);
         let size = (framebuffer_rect.size.w, framebuffer_rect.size.h).into();
 
-        let texture = {
+        let mut texture = {
             let mut cache = cache.inner.lock().unwrap();
             if cache
                 .framebuffer
@@ -454,44 +454,17 @@ impl RenderElement<GlesRenderer> for BlurElement {
             texture
         };
 
-        frame.with_context(|gl| unsafe {
-            while gl.GetError() != ffi::NO_ERROR {}
-
-            let mut current_fbo = 0_i32;
-            gl.GetIntegerv(ffi::DRAW_FRAMEBUFFER_BINDING, &mut current_fbo);
-            gl.Disable(ffi::SCISSOR_TEST);
-
-            let mut fbo = 0;
-            gl.GenFramebuffers(1, &mut fbo);
-            gl.BindFramebuffer(ffi::DRAW_FRAMEBUFFER, fbo);
-            gl.FramebufferTexture2D(
-                ffi::DRAW_FRAMEBUFFER,
-                ffi::COLOR_ATTACHMENT0,
-                ffi::TEXTURE_2D,
-                texture.tex_id(),
-                0,
-            );
-            gl.BlitFramebuffer(
-                framebuffer_rect.loc.x,
-                framebuffer_rect.loc.y,
-                framebuffer_rect.loc.x + framebuffer_rect.size.w,
-                framebuffer_rect.loc.y + framebuffer_rect.size.h,
-                0,
-                0,
-                size.w,
-                size.h,
-                ffi::COLOR_BUFFER_BIT,
-                ffi::LINEAR,
-            );
-
-            gl.BindFramebuffer(ffi::DRAW_FRAMEBUFFER, current_fbo as u32);
-            gl.Enable(ffi::SCISSOR_TEST);
-            gl.DeleteFramebuffers(1, &fbo);
-
-            (gl.GetError() == ffi::NO_ERROR)
-                .then_some(())
-                .ok_or(GlesError::BlitError)
-        })??;
+        let mut renderer = frame.renderer();
+        let mut target = renderer.as_mut().bind(&mut texture)?;
+        drop(renderer);
+        let sync = frame.blit_to(
+            &mut target,
+            framebuffer_rect,
+            Rectangle::from_size(framebuffer_rect.size),
+            TextureFilter::Linear,
+        )?;
+        frame.wait(&sync)?;
+        drop(target);
 
         let mut cache = cache.inner.lock().unwrap();
         let mut renderer = frame.renderer();

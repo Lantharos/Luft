@@ -19,6 +19,13 @@ pub struct PendingCapture {
     pub frame: Frame,
 }
 
+pub struct FramebufferCopy<M> {
+    mapping: M,
+    size: Size<i32, BufferCoords>,
+    captures: Vec<PendingCapture>,
+    presented: Duration,
+}
+
 pub fn take_for_output(queue: &mut Vec<PendingCapture>, output: &Output) -> Vec<PendingCapture> {
     let mut selected = Vec::new();
     let mut remaining = Vec::new();
@@ -46,22 +53,45 @@ pub fn copy_framebuffer<R>(
     size: Size<i32, BufferCoords>,
     captures: Vec<PendingCapture>,
     presented: Duration,
-) where
+) -> Option<FramebufferCopy<R::TextureMapping>>
+where
     R: Renderer + ExportMem,
 {
     if captures.is_empty() {
-        return;
+        return None;
     }
     let region = Rectangle::from_size(size);
-    let result = renderer
-        .copy_framebuffer(framebuffer, region, Fourcc::Argb8888)
-        .and_then(|mapping| {
-            let pixels = renderer.map_texture(&mapping)?;
-            write_frames(pixels, size, captures, presented);
-            Ok(())
-        });
-    if let Err(error) = result {
-        tracing::warn!(%error, "failed to read captured output");
+    match renderer.copy_framebuffer(framebuffer, region, Fourcc::Argb8888) {
+        Ok(mapping) => Some(FramebufferCopy {
+            mapping,
+            size,
+            captures,
+            presented,
+        }),
+        Err(error) => {
+            tracing::warn!(%error, "failed to copy captured output");
+            fail_frames(captures, CaptureFailureReason::Unknown);
+            None
+        }
+    }
+}
+
+pub fn finish_framebuffer_copy<R>(renderer: &mut R, copy: FramebufferCopy<R::TextureMapping>)
+where
+    R: Renderer + ExportMem,
+{
+    match renderer.map_texture(&copy.mapping) {
+        Ok(pixels) => write_frames(pixels, copy.size, copy.captures, copy.presented),
+        Err(error) => {
+            tracing::warn!(%error, "failed to map captured output");
+            fail_frames(copy.captures, CaptureFailureReason::Unknown);
+        }
+    }
+}
+
+fn fail_frames(captures: Vec<PendingCapture>, reason: CaptureFailureReason) {
+    for capture in captures {
+        capture.frame.fail(reason);
     }
 }
 

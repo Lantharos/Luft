@@ -398,23 +398,26 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                     OutputDamageTrackerError::Rendering(err) => SwapBuffersError::from(err),
                     _ => unreachable!(),
                 })?;
-                crate::capture::copy_framebuffer(
+                let capture = crate::capture::copy_framebuffer(
                     renderer,
                     &fb,
                     capture_size,
                     captures,
                     capture_time,
                 );
-                Ok(rendered)
+                Ok((rendered, capture))
             });
 
             match render_res {
-                Ok(render_output_result) => {
+                Ok((render_output_result, capture)) => {
                     let has_rendered = render_output_result.damage.is_some();
                     if let Some(damage) = render_output_result.damage
                         && let Err(err) = backend.submit(Some(damage))
                     {
                         warn!("Failed to submit buffer: {}", err);
+                    }
+                    if let Some(capture) = capture {
+                        crate::capture::finish_framebuffer_copy(backend.renderer(), capture);
                     }
                     if session_locked {
                         state.session_lock.output_cleared(&output);

@@ -15,6 +15,7 @@ pub struct ShellProcess {
     wayland_socket: String,
     ipc_socket: PathBuf,
     xwayland_display: Option<String>,
+    skip_startup_apps: bool,
     restart_at: Instant,
     failures: u32,
 }
@@ -25,6 +26,7 @@ impl ShellProcess {
         wayland_socket: String,
         ipc_socket: PathBuf,
         xwayland_display: Option<String>,
+        skip_startup_apps: bool,
     ) -> Self {
         let mut process = Self {
             child: None,
@@ -32,6 +34,7 @@ impl ShellProcess {
             wayland_socket,
             ipc_socket,
             xwayland_display,
+            skip_startup_apps,
             restart_at: Instant::now(),
             failures: 0,
         };
@@ -108,6 +111,9 @@ impl ShellProcess {
             .env("LUFT_WAYLAND_DISPLAY", &self.wayland_socket)
             .env(SOCKET_ENV, &self.ipc_socket)
             .env(SHELL_SOCKET_ENV, shell_control);
+        if self.skip_startup_apps {
+            command.env("LUFT_SKIP_STARTUP_APPS", "1");
+        }
         if let Some(display) = &self.xwayland_display {
             command
                 .env("DISPLAY", display)

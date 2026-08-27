@@ -1,102 +1,56 @@
-# Compositor Overhaul
+# Kestrel Architecture
 
-This checklist tracks the DRM correctness, performance, Smithay integration, and
-desktop compatibility work needed before Kestrel's session backend is considered
-stable. An item is complete only after the relevant workspace and session-backend
-checks pass.
+Kestrel is a Smithay compositor with two presentation backends. The nested
+backend uses Smithay's winit/EGL integration for development inside an existing
+Wayland session. The session backend uses libseat, udev, libinput, GBM, KMS,
+Smithay's DRM output manager, multi-GPU renderer, damage tracker, and frame
+submission lifecycle.
 
-## Frame Correctness
+The compositor deliberately has no protocol-only or headless backend. Runtime
+validation always exercises a real renderer and presentation target.
 
-- [x] Wait for the primary swapchain sync point when a DRM frame reports
-  `needs_sync`.
-- [x] Treat an empty DRM frame as no damage instead of resetting buffers and
-  rendering again.
-- [x] Replace dropped vblank events with per-output presentation handling.
-- [x] Predict estimated vblank deadlines from each output's frame clock.
-- [x] Keep frame callback and presentation-feedback lifecycles correct for
-  rendered, scanned-out, occluded, and no-damage surfaces.
-- [x] Handle explicit acquire points independently from release points.
-- [x] Add implicit dmabuf readiness blockers and real renderer early import.
+## Rendering
 
-## Per-Output Rendering
+- `Space`, layer maps, popup management, render elements, output damage, buffer
+  age, frame callbacks, presentation feedback, direct scanout, and DRM planes
+  use Smithay's abstractions.
+- Outputs have independent redraw and presentation state. DRM page flips finish
+  presentation feedback; successful repaints release frame callbacks, FIFO
+  barriers, and commit-timing barriers.
+- Output capture uses `ext-image-copy-capture-v1`. DRM capture composes the
+  actual Smithay frame result only when a capture is pending, so capture does
+  not disable direct scanout during ordinary frames.
+- Background blur is a Smithay framebuffer-effect render element. The damage
+  tracker invalidates the complete effect when its backdrop changes, while
+  unchanged frames retain buffer-age and damage reuse.
+- Session locking renders an opaque black fallback until every output has
+  presented its lock surface. Normal shell and application surfaces are not
+  rendered or focused while locked.
 
-- [x] Give every output independent redraw, pending-frame, timing, damage, and
-  presentation state.
-- [x] Render queued secondary outputs during ordinary updates.
-- [x] Remove the global frame-pending gate between CRTCs.
-- [x] Track scene revisions per output instead of clearing one global dirty bit
-  after the primary output renders.
-- [x] Make output scale, transform, geometry, and refresh rate authoritative
-  throughout scene collection and frame scheduling.
-- [x] Handle hotplug, suspend, resume, modesets, and renderer resets without
-  leaking pending frame state.
-- [x] Pause and resume both libinput and DRM through the seat lifecycle, retain
-  CRTCs on activation, and survive a last-monitor disconnect until hotplug.
+## Desktop Integration
 
-## Scanout, Cursor, And Effects
+Kestrel provides xdg-shell, layer-shell, decorations, activation, fractional
+scale, presentation time, selection and data control, pointer constraints and
+gestures, tablet input, text input and input methods, virtual keyboards,
+session lock, idle notify/inhibit, cursor shape, alpha modifier, background
+effects, security contexts, FIFO, commit timing, and output image capture.
 
-- [x] Build dmabuf render and scanout feedback from the actual render and scanout
-  nodes without forcing linear modifiers on same-device paths.
-- [x] Represent named cursors as Smithay render elements and remove direct legacy
-  cursor KMS programming.
-- [x] Preserve primary-plane and cursor-plane scanout with composited fallbacks.
-- [x] Keep persistent per-output backdrop damage and buffer ages.
-- [x] Recompute a blur target only when backdrop damage intersects its
-  radius-expanded capture region.
-- [x] Add low-overhead tracing for render time, damage area, plane selection,
-  synchronization, queueing, and presentation.
+X11 applications run through `xwayland-satellite`. The satellite is a normal
+Wayland client, so Kestrel does not carry a second embedded XWM/window-management
+path. If the executable is unavailable, the Wayland session remains usable and
+IPC reports XWayland as unavailable.
 
-## Smithay And Architecture
+The Luft shell is supervised independently from the compositor. Shell and
+satellite crashes use bounded restart delays and are stopped when the session
+ends. Typed Unix-socket IPC owns workspace/window policy and configuration
+reloads; slow or incomplete IPC clients cannot block the compositor loop.
 
-- [x] Update Smithay to a tested current revision and resolve API changes.
-- [x] Use Smithay's winit buffer age and damage-coordinate conversion in the
-  nested backend.
-- [x] Update workspace dependencies to current compatible releases.
-- [x] Replace the hand-written background-effect protocol with Smithay's module.
-- [x] Adopt current `Space` stacking and relocation operations.
-- [x] Migrate connector and CRTC lifecycle to Smithay's `DrmOutputManager`.
-- [x] Remove the unsafe thread-local scene handle and use direct render elements.
-- [x] Delete dead helpers and retain only feature-gated suppressions needed by
-  the nested-only build.
-- [x] Split compositor modules that exceed the project's maintainability limit.
+## Validation Boundary
 
-## Desktop Compatibility
-
-- [x] Add secure session locking with an opaque compositor fallback until every
-  output has presented its lock surface.
-- [x] Complete pointer constraints, cursor-position hints, and relative-pointer
-  motion.
-- [x] Add compositor-side output capture through ext-image-copy-capture.
-- [x] Add the Luft-owned screenshot and PipeWire screencast portal interfaces.
-- [x] Add writable output management with persisted mode, position, transform,
-  scale, enablement, and adaptive-sync state.
-- [x] Complete native drag-and-drop and route XWayland XDND through the shared
-  data-device path.
-- [x] Wire text input, input methods, and input-method popups through real focus
-  handling.
-- [x] Add idle notification and inhibition.
-- [x] Release FIFO and commit-timing barriers from each output's predicted
-  presentation and actual presentation paths.
-- [x] Add DRM VRR validation and application.
-- [x] Stop advertising tearing control until Kestrel has a real asynchronous
-  page-flip path.
-- [x] Advertise protocols only when their compositor behavior is complete.
-
-## Validation
-
-- [x] `cargo fmt --check`
-- [x] `cargo check --workspace`
-- [x] `cargo check -p kestrel --features session-backend`
-- [x] `cargo clippy -p kestrel --all-targets -- -D warnings`
-- [x] `cargo clippy -p luft-shell --all-targets -- -D warnings`
-- [x] `cargo clippy -p kestrel --features session-backend --all-targets -- -D warnings`
-- [x] `cargo test --workspace`
-- [ ] Verify the session backend on NVIDIA at normal and high refresh rates.
-- [ ] Verify mixed-refresh multi-output rendering, direct scanout, blur, cursor
-  planes, suspend/resume, VT switching, and hotplug.
-
-The hardware checks remain intentionally open. The development machine has an
-RTX 3060 on the NVIDIA driver, but the audit was run from another compositor
-with only one connected display. They require a real Luft session and at least
-two connected outputs; compile-time validation cannot establish vblank,
-page-flip, VRR, or mixed-refresh correctness.
+Workspace checks, both renderer backends, tests, and a live nested protocol run
+are required before publishing. A nested run establishes Wayland protocol,
+shell process, Xwayland-satellite, EGL rendering, and IPC integration. It does
+not establish physical KMS page flips, direct scanout, VRR, hotplug,
+suspend/resume, VT switching, mixed-refresh behavior, or GPU-driver-specific
+correctness. Those require logging into a real Luft session on the target
+hardware.

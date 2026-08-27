@@ -84,6 +84,14 @@ impl LayoutEngine {
         self.windows.get(&id)
     }
 
+    pub fn window_mut(&mut self, id: WindowId) -> Option<&mut WindowInfo> {
+        self.windows.get_mut(&id)
+    }
+
+    pub fn windows(&self) -> impl Iterator<Item = &WindowInfo> {
+        self.windows.values()
+    }
+
     pub fn set_window_geometry(&mut self, id: WindowId, geometry: Rect) -> Result<(), LayoutError> {
         let window = self
             .windows
@@ -121,7 +129,6 @@ impl LayoutEngine {
             self.next_window_id = self.next_window_id.max(info.id.0 + 1);
         }
 
-        info.state = WindowState::Floating;
         let id = info.id;
         let workspace = self
             .workspaces

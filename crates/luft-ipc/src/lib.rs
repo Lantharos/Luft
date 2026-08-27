@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     env, fs, io,
+    io::Read,
     os::unix::net::UnixStream,
     path::{Path, PathBuf},
 };
@@ -14,6 +15,7 @@ pub use layout::{
 
 pub const SOCKET_ENV: &str = "LUFT_IPC_SOCKET";
 pub const SHELL_SOCKET_ENV: &str = "LUFT_SHELL_SOCKET";
+const MAX_REQUEST_BYTES: u64 = 64 * 1024;
 
 pub fn socket_path() -> PathBuf {
     if let Some(path) = env::var_os(SOCKET_ENV) {
@@ -58,7 +60,7 @@ pub fn send_shell_control_to(path: &Path, request: &ShellControlRequest) -> io::
 }
 
 pub fn read_request(stream: &mut UnixStream) -> io::Result<IpcRequest> {
-    read_json(stream)
+    serde_json::from_reader(stream.take(MAX_REQUEST_BYTES)).map_err(json_error)
 }
 
 pub fn read_shell_control(stream: &mut UnixStream) -> io::Result<ShellControlRequest> {

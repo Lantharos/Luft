@@ -71,7 +71,6 @@ impl Default for CompositorConfig {
 pub enum BackendPreference {
     Auto,
     Nested,
-    Headless,
     Session,
 }
 

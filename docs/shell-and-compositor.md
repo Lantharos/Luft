@@ -47,9 +47,10 @@ Wayland layer surfaces, typed actions, tray and notification services, app
 launching, session commands, and configuration; the web bundle renders the
 chrome.
 
-Transient shell surfaces are created lazily and evicted after an idle period.
-Set `LUFT_SHELL_PREWARM=1` during development when first-open latency matters
-more than resident memory.
+Transient shell surfaces are prewarmed incrementally after startup, remain
+non-visible while their alpha is zero, and are evicted after an idle period.
+This keeps first-open latency low without making hidden surfaces participate in
+composition.
 
 Kestrel renders `ext-background-effect-v1` blur regions as Smithay framebuffer
 effects. Blur follows the exact region supplied by Sabine, including rounded

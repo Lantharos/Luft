@@ -1904,6 +1904,14 @@ fn capture_drm_frame<'a>(
         [],
     )?;
     renderer.wait(&sync)?;
-    crate::capture::copy_framebuffer(renderer, &framebuffer, buffer_size, captures, capture_time);
+    if let Some(copy) = crate::capture::copy_framebuffer(
+        renderer,
+        &framebuffer,
+        buffer_size,
+        captures,
+        capture_time,
+    ) {
+        crate::capture::finish_framebuffer_copy(renderer, copy);
+    }
     Ok(())
 }

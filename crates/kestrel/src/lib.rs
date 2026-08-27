@@ -8,6 +8,7 @@
 )]
 
 pub mod blur;
+mod blur_pipeline;
 pub mod capture;
 #[cfg(feature = "session-backend")]
 pub mod cursor;

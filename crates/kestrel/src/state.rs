@@ -816,6 +816,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             wayland_socket,
             ipc_path,
             xwayland_process.display().map(str::to_owned),
+            nested,
         );
 
         KestrelState {

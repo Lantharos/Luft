@@ -1,4 +1,9 @@
-use std::{marker::PhantomData, sync::Mutex};
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+    marker::PhantomData,
+    sync::Mutex,
+};
 
 use smithay::{
     backend::{
@@ -6,22 +11,20 @@ use smithay::{
         renderer::{
             Frame, FrameContext, Offscreen, Texture,
             element::{Element, Id, Kind, RenderElement},
-            gles::{
-                GlesError, GlesFrame, GlesRenderer, GlesTexProgram, GlesTexture, Uniform,
-                UniformName, UniformType, ffi,
-            },
+            gles::{GlesError, GlesFrame, GlesRenderer, GlesTexture, ffi},
             utils::{CommitCounter, DamageSet, OpaqueRegions, RendererSurfaceStateUserData},
         },
     },
     reexports::wayland_server::protocol::wl_surface::WlSurface,
-    utils::{
-        Buffer, Logical, Physical, Point, Rectangle, Scale, Transform, user_data::UserDataMap,
-    },
+    utils::{Buffer, Logical, Physical, Point, Rectangle, Scale, user_data::UserDataMap},
     wayland::{
+        alpha_modifier::AlphaModifierSurfaceCachedState,
         background_effect::BackgroundEffectSurfaceCachedState,
         compositor::{RectangleKind, with_states},
     },
 };
+
+use crate::blur_pipeline::BlurPipeline;
 
 pub trait BlurRenderer: smithay::backend::renderer::Renderer {
     fn draw_blur(
@@ -115,67 +118,28 @@ impl<'render, 'target> BlurRenderer
     }
 }
 
-const BLUR_SHADER: &str = r#"#version 100
-
-//_DEFINES_
-
-#if defined(EXTERNAL)
-#extension GL_OES_EGL_image_external : require
-#endif
-
-precision highp float;
-#if defined(EXTERNAL)
-uniform samplerExternalOES tex;
-#else
-uniform sampler2D tex;
-#endif
-
-uniform float alpha;
-uniform vec2 blur_step;
-varying vec2 v_coords;
-
-#if defined(DEBUG_FLAGS)
-uniform float tint;
-#endif
-
-void main() {
-    vec4 color = texture2D(tex, v_coords) * 0.20;
-    color += texture2D(tex, v_coords + vec2( blur_step.x, 0.0)) * 0.10;
-    color += texture2D(tex, v_coords + vec2(-blur_step.x, 0.0)) * 0.10;
-    color += texture2D(tex, v_coords + vec2(0.0,  blur_step.y)) * 0.10;
-    color += texture2D(tex, v_coords + vec2(0.0, -blur_step.y)) * 0.10;
-    color += texture2D(tex, v_coords + blur_step) * 0.10;
-    color += texture2D(tex, v_coords - blur_step) * 0.10;
-    color += texture2D(tex, v_coords + vec2( blur_step.x, -blur_step.y)) * 0.10;
-    color += texture2D(tex, v_coords + vec2(-blur_step.x,  blur_step.y)) * 0.10;
-    color *= alpha;
-#if defined(NO_ALPHA)
-    color.a = alpha;
-#endif
-#if defined(DEBUG_FLAGS)
-    if (tint == 1.0)
-        color = vec4(0.0, 0.2, 0.0, 0.2) + color * 0.8;
-#endif
-    gl_FragColor = color;
-}
-"#;
-
 #[derive(Debug)]
 struct BlurCache {
-    texture: Mutex<Option<GlesTexture>>,
-    program: Mutex<Option<GlesTexProgram>>,
-    transform: Mutex<Transform>,
+    inner: Mutex<BlurCacheInner>,
 }
 
 impl Default for BlurCache {
     fn default() -> Self {
         Self {
-            texture: Mutex::new(None),
-            program: Mutex::new(None),
-            transform: Mutex::new(Transform::Normal),
+            inner: Mutex::new(BlurCacheInner::default()),
         }
     }
 }
+
+#[derive(Debug, Default)]
+struct BlurCacheInner {
+    framebuffer: Option<GlesTexture>,
+    blurred: Option<GlesTexture>,
+    pipeline: Option<BlurPipeline>,
+}
+
+#[derive(Debug, Default)]
+struct BlurCommitState(Mutex<(u64, CommitCounter)>);
 
 #[derive(Clone, Debug)]
 pub struct BlurElement {
@@ -183,6 +147,7 @@ pub struct BlurElement {
     commit: CommitCounter,
     geometry: Rectangle<i32, Physical>,
     regions: Vec<Rectangle<i32, Physical>>,
+    alpha: f32,
 }
 
 #[derive(Clone, Debug)]
@@ -271,7 +236,7 @@ impl BlurElement {
         location: Point<i32, Physical>,
         scale: Scale<f64>,
     ) -> Option<Self> {
-        let (region, surface_size, commit) = with_states(surface, |states| {
+        let (region, surface_size, commit, alpha) = with_states(surface, |states| {
             let region = states
                 .cached_state
                 .get::<BackgroundEffectSurfaceCachedState>()
@@ -280,12 +245,40 @@ impl BlurElement {
                 .clone()?;
             let renderer_state = states.data_map.get::<RendererSurfaceStateUserData>()?;
             let renderer_state = renderer_state.lock().unwrap();
-            Some((
-                region,
-                renderer_state.surface_size()?,
-                renderer_state.current_commit(),
-            ))
+            let surface_size = renderer_state.surface_size()?;
+            let alpha = states
+                .cached_state
+                .get::<AlphaModifierSurfaceCachedState>()
+                .current()
+                .multiplier_f32()
+                .unwrap_or(1.0);
+            let mut hasher = DefaultHasher::new();
+            surface_size.w.hash(&mut hasher);
+            surface_size.h.hash(&mut hasher);
+            for (kind, rect) in &region.rects {
+                match kind {
+                    RectangleKind::Add => 1_u8,
+                    RectangleKind::Subtract => 2_u8,
+                }
+                .hash(&mut hasher);
+                rect.loc.x.hash(&mut hasher);
+                rect.loc.y.hash(&mut hasher);
+                rect.size.w.hash(&mut hasher);
+                rect.size.h.hash(&mut hasher);
+            }
+            let signature = hasher.finish();
+            let commit_state = states.data_map.get_or_insert(BlurCommitState::default);
+            let mut commit_state = commit_state.0.lock().unwrap();
+            if commit_state.0 != signature {
+                commit_state.0 = signature;
+                commit_state.1.increment();
+            }
+            Some((region, surface_size, commit_state.1, alpha))
         })?;
+
+        if alpha <= f32::EPSILON {
+            return None;
+        }
 
         let clip = Rectangle::from_size(surface_size);
         let mut logical_regions = Vec::<Rectangle<i32, Logical>>::new();
@@ -306,7 +299,7 @@ impl BlurElement {
         let logical_bounds = logical_regions.iter().copied().reduce(Rectangle::merge)?;
         let mut geometry = logical_bounds.to_physical_precise_round(scale);
         geometry.loc += location;
-        let regions = logical_regions
+        let regions: Vec<Rectangle<i32, Physical>> = logical_regions
             .into_iter()
             .map(|rect| {
                 let mut rect = rect.to_physical_precise_round(scale);
@@ -320,6 +313,7 @@ impl BlurElement {
             commit,
             geometry,
             regions,
+            alpha,
         })
     }
 
@@ -358,7 +352,11 @@ impl Element for BlurElement {
     }
 
     fn opaque_regions(&self, _scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
-        self.regions.iter().copied().collect()
+        OpaqueRegions::default()
+    }
+
+    fn alpha(&self) -> f32 {
+        self.alpha
     }
 
     fn kind(&self) -> Kind {
@@ -383,10 +381,8 @@ impl RenderElement<GlesRenderer> for BlurElement {
         let Some(cache) = cache.and_then(UserDataMap::get::<BlurCache>) else {
             return Ok(());
         };
-        let texture = cache.texture.lock().unwrap().clone();
-        let program = cache.program.lock().unwrap().clone();
-        let transform = *cache.transform.lock().unwrap();
-        let (Some(texture), Some(program)) = (texture, program) else {
+        let texture = cache.inner.lock().unwrap().blurred.clone();
+        let Some(texture) = texture else {
             return Ok(());
         };
 
@@ -402,21 +398,16 @@ impl RenderElement<GlesRenderer> for BlurElement {
         if visible_damage.is_empty() {
             return Ok(());
         }
-        let size = texture.size();
-        let blur_step = Uniform::new(
-            "blur_step",
-            (7.0 / size.w.max(1) as f32, 7.0 / size.h.max(1) as f32),
-        );
         frame.render_texture_from_to(
             &texture,
-            Rectangle::from_size(size).to_f64(),
+            Rectangle::from_size(texture.size()).to_f64(),
             dst,
             &visible_damage,
             &[],
-            transform,
-            1.0,
-            Some(&program),
-            &[blur_step],
+            frame.transformation().invert(),
+            self.alpha,
+            None,
+            &[],
         )
     }
 
@@ -428,49 +419,89 @@ impl RenderElement<GlesRenderer> for BlurElement {
         cache: &UserDataMap,
     ) -> Result<(), GlesError> {
         let cache = cache.get_or_insert(BlurCache::default);
-        let output_size = frame.output_size();
+        let output_rect = Rectangle::from_size(frame.output_size());
         let transform = frame.transformation();
-        let framebuffer_rect = transform.transform_rect_in(dst, &output_size);
+        let Some(clamped_dst) = dst.intersection(output_rect) else {
+            return Ok(());
+        };
+        let framebuffer_rect = transform.transform_rect_in(clamped_dst, &output_rect.size);
         let size = (framebuffer_rect.size.w, framebuffer_rect.size.h).into();
-        *cache.transform.lock().unwrap() = transform;
 
-        {
-            let mut texture = cache.texture.lock().unwrap();
-            if texture
+        let texture = {
+            let mut cache = cache.inner.lock().unwrap();
+            if cache
+                .framebuffer
                 .as_ref()
                 .is_none_or(|texture| texture.size() != size)
             {
                 let mut renderer = frame.renderer();
-                *texture = Some(renderer.as_mut().create_buffer(Fourcc::Argb8888, size)?);
+                cache.framebuffer = Some(renderer.as_mut().create_buffer(Fourcc::Abgr8888, size)?);
             }
-        }
-        {
-            let mut program = cache.program.lock().unwrap();
-            if program.is_none() {
-                let mut renderer = frame.renderer();
-                *program = Some(renderer.as_mut().compile_custom_texture_shader(
-                    BLUR_SHADER,
-                    &[UniformName::new("blur_step", UniformType::_2f)],
-                )?);
+            let mut renderer = frame.renderer();
+            if cache
+                .pipeline
+                .as_ref()
+                .is_none_or(|pipeline| !pipeline.matches(renderer.as_ref()))
+            {
+                cache.pipeline = Some(BlurPipeline::new(renderer.as_mut())?);
             }
-        }
+            let texture = cache.framebuffer.clone().unwrap();
+            cache
+                .pipeline
+                .as_mut()
+                .unwrap()
+                .prepare(renderer.as_mut(), &texture)?;
+            texture
+        };
 
-        let texture = cache.texture.lock().unwrap().clone().unwrap();
         frame.with_context(|gl| unsafe {
-            gl.BindTexture(ffi::TEXTURE_2D, texture.tex_id());
-            gl.CopyTexSubImage2D(
+            while gl.GetError() != ffi::NO_ERROR {}
+
+            let mut current_fbo = 0_i32;
+            gl.GetIntegerv(ffi::DRAW_FRAMEBUFFER_BINDING, &mut current_fbo);
+            gl.Disable(ffi::SCISSOR_TEST);
+
+            let mut fbo = 0;
+            gl.GenFramebuffers(1, &mut fbo);
+            gl.BindFramebuffer(ffi::DRAW_FRAMEBUFFER, fbo);
+            gl.FramebufferTexture2D(
+                ffi::DRAW_FRAMEBUFFER,
+                ffi::COLOR_ATTACHMENT0,
                 ffi::TEXTURE_2D,
+                texture.tex_id(),
                 0,
-                0,
-                0,
-                framebuffer_rect.loc.x,
-                transform.transform_size(output_size).h
-                    - framebuffer_rect.loc.y
-                    - framebuffer_rect.size.h,
-                framebuffer_rect.size.w,
-                framebuffer_rect.size.h,
             );
-            gl.BindTexture(ffi::TEXTURE_2D, 0);
-        })
+            gl.BlitFramebuffer(
+                framebuffer_rect.loc.x,
+                framebuffer_rect.loc.y,
+                framebuffer_rect.loc.x + framebuffer_rect.size.w,
+                framebuffer_rect.loc.y + framebuffer_rect.size.h,
+                0,
+                0,
+                size.w,
+                size.h,
+                ffi::COLOR_BUFFER_BIT,
+                ffi::LINEAR,
+            );
+
+            gl.BindFramebuffer(ffi::DRAW_FRAMEBUFFER, current_fbo as u32);
+            gl.Enable(ffi::SCISSOR_TEST);
+            gl.DeleteFramebuffers(1, &fbo);
+
+            (gl.GetError() == ffi::NO_ERROR)
+                .then_some(())
+                .ok_or(GlesError::BlitError)
+        })??;
+
+        let mut cache = cache.inner.lock().unwrap();
+        let mut renderer = frame.renderer();
+        cache.blurred = Some(
+            cache
+                .pipeline
+                .as_mut()
+                .unwrap()
+                .render(renderer.as_mut(), &texture)?,
+        );
+        Ok(())
     }
 }

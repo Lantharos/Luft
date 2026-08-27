@@ -10,7 +10,7 @@ use smithay::{
         utils::{CommitCounter, DamageSet, OpaqueRegions},
     },
     desktop::PopupManager,
-    utils::{user_data::UserDataMap, Buffer, Physical, Point, Rectangle, Scale, Size},
+    utils::{Buffer, Logical, Physical, Point, Rectangle, Scale, Size, user_data::UserDataMap},
 };
 
 pub const WINDOW_RADIUS: i32 = 12;
@@ -33,22 +33,22 @@ pub enum ClipShape {
 pub fn window_elements_for_window(
     renderer: &mut GlesRenderer,
     window: &ManagedWindow,
-    offset_x: i32,
+    offset: Point<i32, Logical>,
     output_size: Size<i32, Physical>,
 ) -> Vec<RoundedWindowElement<WaylandSurfaceRenderElement<GlesRenderer>>> {
     let mut elements = Vec::new();
-    append_window_elements(renderer, window, offset_x, output_size, &mut elements);
+    append_window_elements(renderer, window, offset, output_size, &mut elements);
     elements
 }
 
 fn append_window_elements(
     renderer: &mut GlesRenderer,
     window: &ManagedWindow,
-    offset_x: i32,
+    offset: Point<i32, Logical>,
     output_size: Size<i32, Physical>,
     elements: &mut Vec<RoundedWindowElement<WaylandSurfaceRenderElement<GlesRenderer>>>,
 ) {
-    let transform = window.render_transform(offset_x, output_size);
+    let transform = window.render_transform_at(offset, output_size);
     let titlebar_height = window.titlebar_height();
     let surface_offset = window.surface_offset();
     let location = Point::<i32, Physical>::from((
@@ -262,8 +262,14 @@ where
 
             let piece_src =
                 source_for_piece(src, element_geometry, piece, self.element.transform());
-            self.element
-                .draw(frame, piece_src, piece, &piece_damage, opaque_regions, cache)?;
+            self.element.draw(
+                frame,
+                piece_src,
+                piece,
+                &piece_damage,
+                opaque_regions,
+                cache,
+            )?;
         }
         Ok(())
     }

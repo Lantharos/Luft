@@ -2,11 +2,12 @@ use crate::output::DEFAULT_REFRESH_MILLIHERTZ;
 use smithay::reexports::winit::window::Window as WinitWindow;
 use std::time::Duration;
 
-pub(super) fn host_refresh_millihertz(window: &WinitWindow) -> Option<i32> {
+pub(super) fn host_refresh_millihertz(window: &dyn WinitWindow) -> Option<i32> {
     window
         .current_monitor()
-        .and_then(|monitor| monitor.refresh_rate_millihertz())
-        .and_then(|refresh| i32::try_from(refresh).ok())
+        .and_then(|monitor| monitor.current_video_mode())
+        .and_then(|mode| mode.refresh_rate_millihertz())
+        .and_then(|refresh| i32::try_from(refresh.get()).ok())
         .filter(|refresh| *refresh > 0)
 }
 

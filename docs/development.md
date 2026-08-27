@@ -2,11 +2,11 @@
 
 ## Dependencies
 
-The workspace uses Rust and Bun. The shell UI is built with the shared Fenestra CEF runtime and embeds a generated single-file web bundle into `luft-shell`.
+The workspace uses Rust and Bun. The shell UI is built with the shared Sabine CEF runtime and embeds a generated single-file web bundle into `luft-shell`.
 
 For X11 application support, install `xwayland-satellite` and `Xwayland`. Luft starts the satellite process automatically when `compositor.xwayland = true`.
 
-The DRM/KMS backend requires libseat and graphics/input development packages. On Fedora, install `libseat-devel`, `systemd-devel`, `mesa-libgbm-devel`, `mesa-libEGL-devel`, `mesa-libGLES-devel`, `libxkbcommon-devel`, `libudev-devel`, `libinput-devel`, `xwayland-satellite`, `xorg-x11-server-Xwayland`, and `xdg-desktop-portal`. On Arch-based systems, install `seatd`. On Debian/Ubuntu-style systems, install `libseat-dev`.
+The DRM/KMS backend requires libseat and graphics/input development packages. The Luft screencast portal also requires PipeWire development headers and libclang for Rust binding generation. On Fedora, install `libseat-devel`, `systemd-devel`, `mesa-libgbm-devel`, `mesa-libEGL-devel`, `mesa-libGLES-devel`, `libxkbcommon-devel`, `libudev-devel`, `libinput-devel`, `pipewire-devel`, `clang`, `xwayland-satellite`, `xorg-x11-server-Xwayland`, and `xdg-desktop-portal`. On Arch-based systems, install `seatd`, `pipewire`, and `clang`. On Debian/Ubuntu-style systems, install `libseat-dev`, `libpipewire-0.3-dev`, and `clang`.
 
 For a complete login session, install `dbus-run-session`, `dbus-update-activation-environment`, and a PolicyKit authentication agent.
 

@@ -3,15 +3,24 @@ use smithay::{
     backend::{
         allocator::Fourcc,
         renderer::{
-            damage::OutputDamageTracker,
-            utils::CommitCounter,
             Bind, Color32F, Offscreen,
+            damage::OutputDamageTracker,
             gles::{GlesError, GlesRenderer, GlesTexture},
+            utils::CommitCounter,
         },
     },
     output::Output,
-    utils::{Buffer, Physical, Scale, Size, Transform},
+    utils::{Buffer, Physical, Rectangle, Scale, Size, Transform},
 };
+use std::collections::VecDeque;
+
+const DAMAGE_HISTORY_LIMIT: usize = 16;
+
+#[derive(Clone, Debug)]
+pub(crate) struct BackdropDamage {
+    pub generation: u64,
+    pub rectangles: Vec<Rectangle<i32, Physical>>,
+}
 
 /// Offscreen copy of the scene below layer-shell blur targets (niri `EffectBuffer` pattern).
 pub struct SceneBackdrop {
@@ -21,6 +30,7 @@ pub struct SceneBackdrop {
     size: Size<i32, Physical>,
     scale: Scale<f64>,
     generation: u64,
+    damage_history: VecDeque<BackdropDamage>,
 }
 
 impl Default for SceneBackdrop {
@@ -36,6 +46,7 @@ impl Default for SceneBackdrop {
             size: Size::from((0, 0)),
             scale: Scale::from(1.0),
             generation: 0,
+            damage_history: VecDeque::new(),
         }
     }
 }
@@ -49,9 +60,8 @@ impl SceneBackdrop {
         self.texture.as_ref()
     }
 
-    #[allow(dead_code)]
-    pub fn commit(&self) -> CommitCounter {
-        self.commit_counter
+    pub(crate) fn damage_history(&self) -> &VecDeque<BackdropDamage> {
+        &self.damage_history
     }
 
     pub fn render(
@@ -64,19 +74,41 @@ impl SceneBackdrop {
             return Ok(());
         }
 
+        let buffer_age = usize::from(self.size == output_size && self.texture.is_some());
         self.ensure_texture(renderer, output_size)?;
-        let texture = self
-            .texture
-            .as_mut()
-            .expect("texture ensured before backdrop render");
-        let mut target = renderer.bind(texture)?;
-        let result = self
-            .damage
-            .render_output(renderer, &mut target, 0, elements, Color32F::TRANSPARENT)
-            .map_err(|_error| GlesError::BlitError)?;
-        if result.damage.is_some() {
+        let damage = {
+            let texture = self
+                .texture
+                .as_mut()
+                .expect("texture ensured before backdrop render");
+            let mut target = renderer.bind(texture)?;
+            self.damage
+                .render_output(
+                    renderer,
+                    &mut target,
+                    buffer_age,
+                    elements,
+                    Color32F::TRANSPARENT,
+                )
+                .map_err(|_error| GlesError::BlitError)?
+                .damage
+                .cloned()
+        };
+        if let Some(damage) = damage {
             self.commit_counter.increment();
             self.generation = self.generation.wrapping_add(1);
+            self.record_damage(damage.clone());
+            let area = damage
+                .iter()
+                .map(|rect| i64::from(rect.size.w) * i64::from(rect.size.h))
+                .sum::<i64>();
+            tracing::trace!(
+                generation = self.generation,
+                rectangles = damage.len(),
+                damaged_pixels = area,
+                output_pixels = i64::from(output_size.w) * i64::from(output_size.h),
+                "updated scene backdrop"
+            );
         }
         Ok(())
     }
@@ -95,6 +127,7 @@ impl SceneBackdrop {
         self.damage = OutputDamageTracker::new(output_size, self.scale, Transform::Normal);
         self.commit_counter.increment();
         self.generation = self.generation.wrapping_add(1);
+        self.record_damage(vec![Rectangle::from_size(output_size)]);
         Ok(())
     }
 
@@ -108,6 +141,17 @@ impl SceneBackdrop {
         self.damage = OutputDamageTracker::new(self.size, self.scale, Transform::Normal);
         self.commit_counter.increment();
         self.generation = self.generation.wrapping_add(1);
+        self.record_damage(vec![Rectangle::from_size(self.size)]);
+    }
+
+    fn record_damage(&mut self, rectangles: Vec<Rectangle<i32, Physical>>) {
+        self.damage_history.push_back(BackdropDamage {
+            generation: self.generation,
+            rectangles,
+        });
+        while self.damage_history.len() > DAMAGE_HISTORY_LIMIT {
+            self.damage_history.pop_front();
+        }
     }
 }
 

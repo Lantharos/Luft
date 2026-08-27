@@ -4,21 +4,35 @@ This list tracks protocol and service work needed for ordinary apps to behave li
 
 ## Portals
 
-- Own portal backend: screenshot, screencast, remote desktop, file chooser, wallpaper, and background app policy should grow in `luft-portal` as Luft-owned implementations.
+- Screenshot and screencast: `luft-portal` captures Kestrel outputs through
+  `ext-image-copy-capture-v1`, writes PNG screenshots, and publishes monitor
+  streams as PipeWire video nodes. Screencasts support hidden and embedded
+  cursor modes without changing the visible compositor cursor.
+- Remaining portal work: remote desktop, file chooser, wallpaper, and
+  background app policy should grow in `luft-portal` as Luft-owned
+  implementations.
 - Settings: `luft-portal` provides `org.freedesktop.impl.portal.Settings` so toolkits and Electron apps can read appearance preferences without GNOME/KDE backends.
 - Secret service: add a Luft-owned provider later; do not depend on KWallet or GNOME Keyring.
 - Permission store: rely on the portal broker for now; replace only when Luft owns a complete portal backend.
 
 ## Frame Pacing
 
-- FIFO (`wp_fifo_v1`): lets a client require one committed frame to be shown for at least one refresh before the next commit becomes ready. It needs barrier release from the real presentation/vblank path, plus a fallback for occluded or unmapped surfaces.
-- Commit timing (`wp_commit_timing_v1`): lets a client request that a commit land no earlier than a target presentation-clock timestamp. It needs scheduler deadlines and wakeups tied to Kestrel's frame clock.
-- Tearing control: useful later for games, but only after the DRM path can choose presentation mode per surface.
+- FIFO (`wp_fifo_v1`): advertised; barriers are released from the real
+  per-output presentation path, including estimated presentation for no-damage
+  frames.
+- Commit timing (`wp_commit_timing_v1`): advertised; target-time barriers use
+  the per-output frame clock and presentation deadline.
+- Tearing control: not advertised. Kestrel enables DRM VRR only after the
+  connector reports support, but does not claim asynchronous presentation
+  until it has a real async page-flip policy.
 
 ## Input And Devices
 
-- Pointer constraints: do not advertise until pointer confinement/locking is enforced in `handle_input_event`.
-- Idle inhibit: do not advertise until Kestrel tracks active inhibitors and suppresses output/session idle behavior.
+- Pointer constraints: advertised; confinement, pointer locking, relative
+  motion, activation regions, and cursor-position hints are enforced in the
+  input path.
+- Idle notify and inhibit: advertised; input activity resets idle timers and
+  mapped inhibitors suppress idle transitions.
 - Tablet protocol: do not advertise until libinput tablet events are mapped into Smithay tablet seats.
 
 ## Window And App Integration

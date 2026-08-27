@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "session-backend"), allow(dead_code))]
 
 use super::{OutputDescriptor, configure_output_at, create_output};
-use luft_config::DisplayConfig;
+use luft_config::{DisplayConfig, OutputTransform};
 use luft_ipc::OutputSummary;
 use smithay::{
     output::Output,
@@ -86,6 +86,14 @@ impl OutputGraph {
 
     pub fn output(&self, name: &str) -> Option<&Output> {
         self.outputs.get(name).map(|managed| &managed.output)
+    }
+
+    pub fn managed(&self, name: &str) -> Option<&ManagedOutput> {
+        self.outputs.get(name)
+    }
+
+    pub fn managed_outputs(&self) -> impl Iterator<Item = &ManagedOutput> {
+        self.order.iter().filter_map(|name| self.outputs.get(name))
     }
 
     pub fn primary_size(&self) -> Size<i32, Physical> {
@@ -254,7 +262,26 @@ fn configured_descriptor(
     mut descriptor: OutputDescriptor,
 ) -> OutputDescriptor {
     descriptor.scale = config.output_scale(&descriptor.name);
+    let transform = config
+        .outputs
+        .get(&descriptor.name)
+        .map(|output| output.transform)
+        .unwrap_or_default();
+    descriptor.transform = output_transform(transform);
     descriptor
+}
+
+fn output_transform(value: OutputTransform) -> smithay::utils::Transform {
+    match value {
+        OutputTransform::Normal => smithay::utils::Transform::Normal,
+        OutputTransform::Rotate90 => smithay::utils::Transform::_90,
+        OutputTransform::Rotate180 => smithay::utils::Transform::_180,
+        OutputTransform::Rotate270 => smithay::utils::Transform::_270,
+        OutputTransform::Flipped => smithay::utils::Transform::Flipped,
+        OutputTransform::Flipped90 => smithay::utils::Transform::Flipped90,
+        OutputTransform::Flipped180 => smithay::utils::Transform::Flipped180,
+        OutputTransform::Flipped270 => smithay::utils::Transform::Flipped270,
+    }
 }
 
 fn configured_location(config: &DisplayConfig, name: &str) -> Point<i32, Logical> {

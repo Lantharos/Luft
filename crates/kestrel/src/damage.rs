@@ -1,12 +1,12 @@
 use smithay::{
     backend::renderer::{
-        element::RenderElementStates,
         Color32F,
         damage::OutputDamageTracker,
+        element::RenderElementStates,
         gles::{GlesError, GlesRenderer, GlesTarget},
     },
     output::Output,
-    utils::{Physical, Rectangle},
+    utils::{Physical, Rectangle, Scale, Transform},
 };
 
 pub struct DamageRenderResult {
@@ -28,8 +28,15 @@ impl DamageTracker {
         }
     }
 
-    pub fn reset(&mut self, output: &Output) {
-        self.tracker = OutputDamageTracker::from_output(output);
+    pub fn from_output_with_target_transform(output: &Output, transform: Transform) -> Self {
+        let size = output
+            .current_mode()
+            .map(|mode| mode.size)
+            .unwrap_or_else(|| (1, 1).into());
+        let scale = Scale::from(output.current_scale().fractional_scale());
+        Self {
+            tracker: OutputDamageTracker::new(size, scale, transform),
+        }
     }
 
     pub fn render_output<E>(
@@ -62,6 +69,22 @@ impl DamageTracker {
                     states: RenderElementStates::default(),
                 })
             }
+        }
+    }
+
+    pub fn damage_output<E>(&mut self, buffer_age: usize, elements: &[E]) -> DamageRenderResult
+    where
+        E: smithay::backend::renderer::element::Element,
+    {
+        match self.tracker.damage_output(buffer_age, elements) {
+            Ok((damage, states)) => DamageRenderResult {
+                damage: damage.cloned(),
+                states,
+            },
+            Err(_) => DamageRenderResult {
+                damage: None,
+                states: RenderElementStates::default(),
+            },
         }
     }
 }

@@ -31,5 +31,20 @@ pub(super) fn register_syncobj_sources(
             })?;
     }
 
+    for pending in state.take_dmabuf_sources() {
+        let client = pending.client;
+        event_loop
+            .handle()
+            .insert_source(pending.source, move |_, _, events| {
+                events.syncobj_ready.push(client.clone());
+                Ok(())
+            })
+            .map_err(|error| {
+                DrmError::Unsupported(format!(
+                    "failed to register dmabuf readiness source: {error}"
+                ))
+            })?;
+    }
+
     Ok(())
 }

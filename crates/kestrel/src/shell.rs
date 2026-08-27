@@ -6,7 +6,7 @@ use std::{
     process::{Child, Command},
     time::{Duration, Instant},
 };
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 const NORMAL_RESTART_DELAY: Duration = Duration::from_millis(500);
 const PRIVATE_DBUS_ENV: &str = "LUFT_PRIVATE_DBUS";
@@ -32,17 +32,29 @@ pub struct ShellProcess {
     next_spawn_after: Option<Instant>,
 }
 
+pub struct ShellLaunch<'a> {
+    pub wayland_display: &'a str,
+    pub x11_display: Option<&'a str>,
+    pub ipc_socket: &'a Path,
+    pub shell_socket: &'a Path,
+    pub output_refresh_millihertz: i32,
+    pub output_width: i32,
+    pub output_height: i32,
+    pub skip_startup_apps: bool,
+}
+
 impl ShellProcess {
-    pub fn start(
-        wayland_display: &str,
-        x11_display: Option<&str>,
-        ipc_socket: &Path,
-        shell_socket: &Path,
-        output_refresh_millihertz: i32,
-        output_width: i32,
-        output_height: i32,
-        skip_startup_apps: bool,
-    ) -> Self {
+    pub fn start(launch: ShellLaunch<'_>) -> Self {
+        let ShellLaunch {
+            wayland_display,
+            x11_display,
+            ipc_socket,
+            shell_socket,
+            output_refresh_millihertz,
+            output_width,
+            output_height,
+            skip_startup_apps,
+        } = launch;
         let binary = shell_binary();
         if binary.is_none() {
             warn!(
@@ -181,7 +193,7 @@ impl ShellProcess {
 
         match child {
             Ok(child) => {
-                debug!(pid = child.id(), path = %binary.display(), "started luft shell");
+                info!(pid = child.id(), path = %binary.display(), "started luft shell");
                 self.child = Some(child);
             }
             Err(error) => {

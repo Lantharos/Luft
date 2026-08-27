@@ -1,10 +1,10 @@
+use luft_ipc::WindowSummary;
 use std::{
     collections::HashMap,
     fs,
     path::{Path, PathBuf},
     sync::{Mutex, OnceLock},
 };
-use luft_ipc::WindowSummary;
 
 static ICON_URI_CACHE: OnceLock<Mutex<HashMap<PathBuf, Option<String>>>> = OnceLock::new();
 const BASE64_TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

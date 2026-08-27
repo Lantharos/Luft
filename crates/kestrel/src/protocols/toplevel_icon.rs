@@ -55,10 +55,7 @@ fn best_icon_buffer(buffers: &[CopiedIconBuffer]) -> Option<&CopiedIconBuffer> {
     buffers
         .iter()
         .filter(|buffer| {
-            buffer.width > 0
-                && buffer.height > 0
-                && buffer.stride > 0
-                && !buffer.pixels.is_empty()
+            buffer.width > 0 && buffer.height > 0 && buffer.stride > 0 && !buffer.pixels.is_empty()
         })
         .max_by_key(|buffer| buffer.width * buffer.height)
 }
@@ -382,7 +379,10 @@ fn post_immutable_error(handle: &DisplayHandle, icon: &XdgToplevelIconV1) {
     );
 }
 
-fn copy_shm_icon_buffer(buffer: &WlBuffer, scale: i32) -> Result<CopiedIconBuffer, IconBufferError> {
+fn copy_shm_icon_buffer(
+    buffer: &WlBuffer,
+    scale: i32,
+) -> Result<CopiedIconBuffer, IconBufferError> {
     shm::with_buffer_contents(buffer, |ptr, len, data| {
         if data.width != data.height || data.width <= 0 || data.height <= 0 {
             return Err(IconBufferError::Invalid);

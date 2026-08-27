@@ -5,7 +5,7 @@ use crate::{
     scene_blur::{BlurEffectManager, FramebufferBlurElement},
     space_window::space_window_render_targets,
     state::KestrelState,
-    window_clip::{window_elements_for_window, RoundedWindowElement},
+    window_clip::{RoundedWindowElement, window_elements_for_window},
 };
 use luft_ipc::WindowId;
 use smithay::{
@@ -48,18 +48,8 @@ pub fn collect_window_scene_layers(
         layers.insert(
             target.id,
             WindowSceneLayer {
-                chrome: window_chrome_elements_for_window(
-                    renderer,
-                    state,
-                    managed,
-                    target.offset_x,
-                )?,
-                surfaces: window_elements_for_window(
-                    renderer,
-                    managed,
-                    target.offset_x,
-                    output_size,
-                ),
+                chrome: window_chrome_elements_for_window(renderer, state, managed, target.offset)?,
+                surfaces: window_elements_for_window(renderer, managed, target.offset, output_size),
                 blurs: blur_effects.elements_for(
                     output_size,
                     target_transform,

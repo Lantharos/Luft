@@ -218,7 +218,18 @@ impl FractionalScaleHandler for KestrelState {
 
 impl KestrelState {
     pub(crate) fn update_surface_scale(&self, surface: &WlSurface) {
-        let scale = self.output().current_scale();
+        let output = self
+            .layer_output_for_surface(surface)
+            .unwrap_or_else(|| self.output().clone());
+        self.update_surface_scale_for_output(surface, &output);
+    }
+
+    pub(crate) fn update_surface_scale_for_output(
+        &self,
+        surface: &WlSurface,
+        output: &smithay::output::Output,
+    ) {
+        let scale = output.current_scale();
         let integer_scale = scale.integer_scale().max(1);
         let fractional_scale = scale.fractional_scale();
 
@@ -409,9 +420,7 @@ fn popup_surface_origin(
         if popup.wl_surface() == surface {
             return Some(popup_origin);
         }
-        if let Some(origin) =
-            popup_surface_origin(popup.wl_surface(), popup_origin, surface)
-        {
+        if let Some(origin) = popup_surface_origin(popup.wl_surface(), popup_origin, surface) {
             return Some(origin);
         }
     }

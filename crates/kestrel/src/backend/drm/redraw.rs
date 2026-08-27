@@ -1,8 +1,6 @@
 use calloop::RegistrationToken;
-use std::time::{Duration, Instant};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
 pub enum RedrawState {
     #[default]
     Idle,
@@ -14,12 +12,13 @@ pub enum RedrawState {
     WaitingForEstimatedVBlankAndQueued(RegistrationToken),
 }
 
-#[allow(dead_code)]
 impl RedrawState {
     pub fn queue_redraw(&mut self) {
         *self = match *self {
             Self::Idle => Self::Queued,
-            Self::WaitingForEstimatedVBlank(token) => Self::WaitingForEstimatedVBlankAndQueued(token),
+            Self::WaitingForEstimatedVBlank(token) => {
+                Self::WaitingForEstimatedVBlankAndQueued(token)
+            }
             Self::WaitingForVBlank { redraw_needed: _ } => Self::WaitingForVBlank {
                 redraw_needed: true,
             },
@@ -33,29 +32,20 @@ impl RedrawState {
             Self::Queued | Self::WaitingForEstimatedVBlankAndQueued(_)
         )
     }
-
-    pub fn needs_redraw(&self) -> bool {
-        !matches!(self, Self::Idle)
-    }
-
-    pub fn next_estimated_vblank(now: Instant, refresh: Duration) -> Instant {
-        now + refresh
-    }
 }
 
 #[derive(Debug, Default)]
-#[allow(dead_code)]
 pub struct OutputFrameState {
     pub redraw_state: RedrawState,
     pub frame_callback_sequence: u32,
-    pub refresh_interval: Duration,
+    force_full_damage: bool,
 }
 
-#[allow(dead_code)]
 impl OutputFrameState {
-    pub fn new(refresh_interval: Duration) -> Self {
+    pub fn new() -> Self {
         Self {
-            refresh_interval,
+            redraw_state: RedrawState::Queued,
+            force_full_damage: true,
             ..Self::default()
         }
     }
@@ -64,14 +54,41 @@ impl OutputFrameState {
         self.redraw_state.queue_redraw();
     }
 
+    pub fn queue_full_redraw(&mut self) {
+        self.force_full_damage = true;
+        self.queue_redraw();
+    }
+
+    pub fn force_full_damage(&self) -> bool {
+        self.force_full_damage
+    }
+
+    pub fn rendered(&mut self) {
+        self.force_full_damage = false;
+    }
+
+    pub fn discard_pending_frame(&mut self) {
+        self.redraw_state = RedrawState::Idle;
+        self.force_full_damage = true;
+    }
+
+    pub fn reject_submission(&mut self) {
+        self.redraw_state = RedrawState::Queued;
+        self.force_full_damage = true;
+    }
+
     pub fn frame_submitted(&mut self) -> bool {
         let redraw_needed = match self.redraw_state {
             RedrawState::WaitingForVBlank { redraw_needed } => redraw_needed,
             _ => false,
         };
         self.redraw_state = RedrawState::Idle;
-        self.frame_callback_sequence = self.frame_callback_sequence.wrapping_add(1);
         redraw_needed
+    }
+
+    pub fn frame_rendered(&mut self) -> u32 {
+        self.frame_callback_sequence = self.frame_callback_sequence.wrapping_add(1);
+        self.frame_callback_sequence
     }
 
     pub fn mark_waiting_for_vblank(&mut self) -> Option<RegistrationToken> {
@@ -94,12 +111,43 @@ impl OutputFrameState {
             other => other,
         };
     }
+}
 
-    pub fn clear_estimated_vblank(&mut self) {
-        self.redraw_state = match self.redraw_state {
-            RedrawState::WaitingForEstimatedVBlank(_) => RedrawState::Idle,
-            RedrawState::WaitingForEstimatedVBlankAndQueued(_) => RedrawState::Queued,
-            other => other,
-        };
+#[cfg(test)]
+mod tests {
+    use super::{OutputFrameState, RedrawState};
+    #[test]
+    fn discarded_frame_requires_a_fresh_full_redraw() {
+        let mut state = OutputFrameState::new();
+        state.rendered();
+        state.mark_waiting_for_vblank();
+        state.discard_pending_frame();
+
+        assert_eq!(state.redraw_state, RedrawState::Idle);
+        assert!(state.force_full_damage());
+
+        state.queue_redraw();
+        assert_eq!(state.redraw_state, RedrawState::Queued);
+    }
+
+    #[test]
+    fn rejected_submission_is_immediately_renderable() {
+        let mut state = OutputFrameState::new();
+        state.rendered();
+        state.mark_waiting_for_vblank();
+        state.reject_submission();
+
+        assert!(state.redraw_state.should_render());
+        assert!(state.force_full_damage());
+    }
+
+    #[test]
+    fn callbacks_advance_after_render_not_submission() {
+        let mut state = OutputFrameState::new();
+        state.mark_waiting_for_vblank();
+
+        assert_eq!(state.frame_rendered(), 1);
+        assert!(!state.frame_submitted());
+        assert_eq!(state.frame_callback_sequence, 1);
     }
 }

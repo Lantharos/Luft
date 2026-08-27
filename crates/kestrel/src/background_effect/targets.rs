@@ -31,7 +31,7 @@ pub fn window_blur_targets_grouped(state: &KestrelState) -> Vec<Vec<LayerRenderT
             grouped.push(Vec::new());
             continue;
         };
-        let transform = managed.render_transform(target.offset_x, state.output_size());
+        let transform = managed.render_transform_at(target.offset, state.output_size());
         let mut window_targets = Vec::new();
         append_window_targets(managed, transform, &mut window_targets, &opaque_above);
         grouped.push(window_targets);

@@ -2,10 +2,11 @@ use crate::{
     client::ClientState,
     frame_clock::{FrameClock, send_surface_frame_tree},
     ipc::IpcServer,
-    state::KestrelState,
+    state::{KestrelState, idle::IdleRuntime},
 };
 use luft_config::LuftConfig;
 use smithay::reexports::wayland_server::{Display, ListeningSocket};
+use smithay::utils::{Clock, Monotonic};
 use std::{sync::Arc, thread, time::Duration};
 use thiserror::Error;
 use tracing::{debug, info};
@@ -21,6 +22,7 @@ pub fn run(options: HeadlessOptions) -> Result<(), HeadlessError> {
     let mut display: Display<KestrelState> = Display::new()?;
     let dh = display.handle();
     let mut state = KestrelState::new(&dh, options.config);
+    let mut idle_runtime = IdleRuntime::new(&mut state)?;
     let ipc = IpcServer::bind()?;
     let listener = bind_socket(options.socket_name.as_deref())?;
     let socket_name = listener
@@ -59,8 +61,15 @@ pub fn run(options: HeadlessOptions) -> Result<(), HeadlessError> {
 
         display.dispatch_clients(&mut state)?;
         display.flush_clients()?;
+        idle_runtime.dispatch(&mut state)?;
 
+        let frame_target = Clock::<Monotonic>::new().now() + frame_clock.next_presentation_delay();
+        state.signal_commit_timers(frame_target);
         let frame_time = frame_clock.next_frame();
+        let output_name = state.output().name();
+        state.session_lock_frame_queued(&output_name);
+        state.session_lock_presented(&output_name);
+        state.signal_fifo_barriers();
         for surface in state.frame_callback_surfaces() {
             send_surface_frame_tree(state.output(), &surface, frame_time);
         }
@@ -86,4 +95,6 @@ pub enum HeadlessError {
     Socket(#[from] smithay::reexports::wayland_server::BindError),
     #[error("headless compositor I/O failed: {0}")]
     Io(#[from] std::io::Error),
+    #[error("headless idle timer failed: {0}")]
+    Calloop(#[from] calloop::Error),
 }

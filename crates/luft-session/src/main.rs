@@ -57,6 +57,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let backend = selected_backend(&args, loaded.config.compositor.backend);
+    if !args.dry_run {
+        prepare_development_components(backend)?;
+    }
     let kestrel = resolve_kestrel(args.kestrel.clone());
     let environment = SessionEnvironment::default();
     let mut command = session_command(&kestrel, backend);
@@ -94,6 +97,40 @@ fn resolve_kestrel(explicit: Option<PathBuf>) -> PathBuf {
         return path;
     }
     PathBuf::from("kestrel")
+}
+
+fn prepare_development_components(backend: KestrelBackend) -> io::Result<()> {
+    if !cfg!(debug_assertions) {
+        return Ok(());
+    }
+    let workspace = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .and_then(Path::parent)
+        .map(Path::to_path_buf);
+    let Some(workspace) = workspace else {
+        return Ok(());
+    };
+    let current_exe = env::current_exe()?;
+    if !current_exe.starts_with(workspace.join("target")) {
+        return Ok(());
+    }
+
+    let mut command = Command::new(env::var_os("CARGO").unwrap_or_else(|| "cargo".into()));
+    command
+        .current_dir(&workspace)
+        .arg("build")
+        .args(["-p", "kestrel", "-p", "luft-shell"]);
+    if matches!(backend, KestrelBackend::Session) {
+        command.args(["--features", "kestrel/session-backend"]);
+    }
+    let status = command.status()?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(io::Error::other(format!(
+            "failed to build Kestrel development components ({status})"
+        )))
+    }
 }
 
 fn session_command(kestrel: &Path, backend: KestrelBackend) -> Command {

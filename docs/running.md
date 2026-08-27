@@ -42,7 +42,7 @@ Run the installer from the repository root:
 ./install.sh
 ```
 
-It builds the shell web assets with Bun, builds the session binaries with the DRM/KMS backend enabled, refreshes the Fenestra CEF host, installs the binaries to `/usr/local/bin`, writes the Wayland session entry, and installs Luft's portal preference file.
+It builds the shell web assets with Bun, builds the session binaries with the DRM/KMS backend enabled, installs the binaries to `/usr/local/bin`, writes the Wayland session entry, and installs Luft's portal preference file. Sabine prepares its shared CEF runtime when the shell first launches.
 
 Override install paths or build a debug profile when needed:
 

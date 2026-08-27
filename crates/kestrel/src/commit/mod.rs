@@ -11,7 +11,9 @@ use smithay::reexports::wayland_server::Client;
 
 #[cfg(feature = "session-backend")]
 use smithay::{
+    backend::allocator::dmabuf::Dmabuf,
     backend::renderer::sync::Fence,
+    reexports::calloop::Interest,
     reexports::wayland_server::Resource,
     wayland::{
         compositor::{self, BufferAssignment, SurfaceAttributes},
@@ -43,15 +45,15 @@ pub fn surface_commit(state: &mut KestrelState, surface: &WlSurface) {
     let foreign_toplevel_changed = state.sync_foreign_toplevel(surface);
 
     if needs_render || popup_mapped {
-        state.mark_scene_content_dirty();
+        state.mark_surface_content_dirty(surface);
     }
     if initial_size_adopted || decoration_changed || foreign_toplevel_changed {
-        state.mark_scene_structural_dirty();
+        state.mark_surface_structural_dirty(surface);
     }
 
     if let Some(layer_surface) = state.layer_surface_for_commit(surface) {
-        state.arrange_layers();
-        state.mark_scene_structural_dirty();
+        state.arrange_layer_surface(&layer_surface);
+        state.mark_surface_structural_dirty(surface);
         layer_surface.send_pending_configure();
     }
 }
@@ -82,39 +84,39 @@ fn queue_syncobj_acquire(state: &mut KestrelState, surface: &WlSurface) {
         return;
     };
 
-    let acquire = compositor::with_states(surface, |states| {
+    let (acquire, dmabuf) = compositor::with_states(surface, |states| {
         let mut attributes = states.cached_state.get::<SurfaceAttributes>();
-        if !matches!(
-            attributes.pending().buffer,
-            Some(BufferAssignment::NewBuffer(_))
-        ) {
-            return None;
-        }
+        let dmabuf = pending_dmabuf(attributes.pending().buffer.as_ref());
 
         let mut syncobj = states.cached_state.get::<DrmSyncobjCachedState>();
-        let pending = syncobj.pending();
-        pending
-            .release_point
-            .as_ref()
-            .and_then(|_| pending.acquire_point.clone())
+        (syncobj.pending().acquire_point.clone(), dmabuf)
     });
 
-    let Some(acquire) = acquire else {
-        return;
-    };
-    if acquire.is_signaled() {
-        return;
-    }
-
-    match acquire.generate_blocker() {
-        Ok((blocker, source)) => {
+    if let Some(acquire) = acquire {
+        if acquire.is_signaled() {
+            return;
+        }
+        if let Ok((blocker, source)) = acquire.generate_blocker() {
             compositor::add_blocker(surface, blocker);
             state.queue_syncobj_source(client, source);
-        }
-        Err(error) => {
-            tracing::warn!(%error, "failed to create drm syncobj acquire blocker");
+            return;
         }
     }
+
+    if let Some(dmabuf) = dmabuf
+        && let Ok((blocker, source)) = dmabuf.generate_blocker(Interest::READ)
+    {
+        compositor::add_blocker(surface, blocker);
+        state.queue_dmabuf_source(client, source);
+    }
+}
+
+#[cfg(feature = "session-backend")]
+fn pending_dmabuf(buffer: Option<&BufferAssignment>) -> Option<Dmabuf> {
+    let BufferAssignment::NewBuffer(buffer) = buffer? else {
+        return None;
+    };
+    smithay::wayland::dmabuf::get_dmabuf(buffer).cloned().ok()
 }
 
 #[cfg(feature = "session-backend")]

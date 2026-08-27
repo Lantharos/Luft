@@ -1,7 +1,12 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
-use zbus::{fdo, interface};
-use zvariant::{OwnedValue, Value};
+use ashpd::{
+    PortalError,
+    backend::settings::{SettingsImpl, SettingsSignalEmitter},
+    desktop::settings::Namespace,
+    zvariant::{OwnedValue, Value},
+};
 
 const APPEARANCE: &str = "org.freedesktop.appearance";
 const GNOME_WM: &str = "org.gnome.desktop.wm.preferences";
@@ -9,6 +14,7 @@ const GNOME_INTERFACE: &str = "org.gnome.desktop.interface";
 
 pub struct PortalSettings {
     values: HashMap<String, HashMap<String, OwnedValue>>,
+    signal_emitter: Option<Arc<dyn SettingsSignalEmitter>>,
 }
 
 impl PortalSettings {
@@ -33,16 +39,16 @@ impl PortalSettings {
                 .try_into()
                 .expect("portal string value"),
         );
-        interface.insert(
-            "enable-animations".to_string(),
-            OwnedValue::from(true),
-        );
+        interface.insert("enable-animations".to_string(), OwnedValue::from(true));
 
         let mut values = HashMap::new();
         values.insert(APPEARANCE.to_string(), appearance);
         values.insert(GNOME_WM.to_string(), wm_preferences);
         values.insert(GNOME_INTERFACE.to_string(), interface);
-        Self { values }
+        Self {
+            values,
+            signal_emitter: None,
+        }
     }
 
     fn lookup(&self, namespace: &str, key: &str) -> Option<OwnedValue> {
@@ -76,33 +82,21 @@ impl PortalSettings {
     }
 }
 
-#[interface(name = "org.freedesktop.impl.portal.Settings")]
-impl PortalSettings {
-    #[zbus(property, name = "version")]
-    fn version(&self) -> u32 {
-        1
-    }
-
-    fn read(&self, namespace: &str, key: &str) -> fdo::Result<OwnedValue> {
+#[async_trait::async_trait]
+impl SettingsImpl for PortalSettings {
+    async fn read(&self, namespace: &str, key: &str) -> Result<OwnedValue, PortalError> {
         self.lookup(namespace, key)
-            .ok_or_else(|| fdo::Error::InvalidArgs(format!("unknown setting {namespace}::{key}")))
+            .ok_or_else(|| PortalError::NotFound(format!("unknown setting {namespace}::{key}")))
     }
 
-    fn read_all(
+    async fn read_all(
         &self,
         namespaces: Vec<String>,
-    ) -> fdo::Result<HashMap<String, HashMap<String, Value<'_>>>> {
-        Ok(self
-            .filtered(&namespaces)
-            .into_iter()
-            .map(|(namespace, keys)| {
-                (
-                    namespace,
-                    keys.into_iter()
-                        .map(|(key, value)| (key, value.into()))
-                        .collect(),
-                )
-            })
-            .collect())
+    ) -> Result<HashMap<String, Namespace>, PortalError> {
+        Ok(self.filtered(&namespaces))
+    }
+
+    fn set_signal_emitter(&mut self, signal_emitter: Arc<dyn SettingsSignalEmitter>) {
+        self.signal_emitter = Some(signal_emitter);
     }
 }

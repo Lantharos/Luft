@@ -12,7 +12,11 @@ use super::{
         session_menu_size,
     },
 };
-use std::{error::Error, sync::mpsc::Sender};
+use std::{
+    error::Error,
+    sync::mpsc::Sender,
+    time::{Duration, Instant},
+};
 
 const START_MENU_WIDTH: i32 = 720;
 const START_MENU_HEIGHT: i32 = 640;
@@ -25,6 +29,8 @@ pub struct WebSurfaces {
     panel_menu: LazyWebSurface,
     session_menu: LazyWebSurface,
     panel: WebSurface,
+    prewarm_index: usize,
+    prewarm_at: Instant,
 }
 
 impl WebSurfaces {
@@ -32,7 +38,7 @@ impl WebSurfaces {
         actions_tx: Sender<WebShellAction>,
         snapshot: &WebShellSnapshot,
     ) -> Result<Self, Box<dyn Error>> {
-        let mut surfaces = Self {
+        let surfaces = Self {
             panel: WebSurface::new(WebSurfaceConfig {
                 kind: WebShellSurface::Panel,
                 size: (PANEL_WIDTH_HINT, PANEL_HEIGHT),
@@ -79,13 +85,9 @@ impl WebSurfaces {
                 &actions_tx,
                 snapshot,
             ),
+            prewarm_index: 0,
+            prewarm_at: Instant::now() + Duration::from_secs(1),
         };
-        surfaces.quick.prewarm();
-        surfaces.date.prewarm();
-        surfaces.start_menu.prewarm();
-        surfaces.panel_menu.prewarm();
-        surfaces.session_menu.prewarm();
-        surfaces.notification_toast.prewarm();
         Ok(surfaces)
     }
 
@@ -129,12 +131,32 @@ impl WebSurfaces {
     }
 
     pub fn tick(&mut self) {
+        self.prewarm_next_surface();
         self.panel_menu.tick();
         self.session_menu.tick();
         self.start_menu.tick();
         self.quick.tick();
         self.date.tick();
         self.notification_toast.tick();
+    }
+
+    fn prewarm_next_surface(&mut self) {
+        let now = Instant::now();
+        if now < self.prewarm_at {
+            return;
+        }
+        let surface = match self.prewarm_index {
+            0 => &mut self.start_menu,
+            1 => &mut self.quick,
+            2 => &mut self.date,
+            3 => &mut self.panel_menu,
+            4 => &mut self.session_menu,
+            5 => &mut self.notification_toast,
+            _ => return,
+        };
+        surface.prewarm();
+        self.prewarm_index += 1;
+        self.prewarm_at = now + Duration::from_secs(1);
     }
 
     pub fn is_animating(&self) -> bool {

@@ -29,12 +29,12 @@
     const unsubscribe = subscribe(applySnapshot);
     const surfaceOpen = () => scheduleSurfaceAnimation("opening");
     const surfaceClose = () => runSurfaceAnimation("closing");
-    window.addEventListener("fenestra:luft.surface-open", surfaceOpen);
-    window.addEventListener("fenestra:luft.surface-close", surfaceClose);
+    window.addEventListener("sabine:luft.surface-open", surfaceOpen);
+    window.addEventListener("sabine:luft.surface-close", surfaceClose);
     return () => {
       unsubscribe();
-      window.removeEventListener("fenestra:luft.surface-open", surfaceOpen);
-      window.removeEventListener("fenestra:luft.surface-close", surfaceClose);
+      window.removeEventListener("sabine:luft.surface-open", surfaceOpen);
+      window.removeEventListener("sabine:luft.surface-close", surfaceClose);
       if (surfaceAnimationTimer) {
         window.clearTimeout(surfaceAnimationTimer);
       }
@@ -113,7 +113,7 @@
   }
 
   function isNativeSurfaceRuntime() {
-    return Boolean(window.fenestra?.bridge) || new URLSearchParams(window.location.search).has("fenestra");
+    return Boolean(window.sabine?.bridge) || new URLSearchParams(window.location.search).has("sabine");
   }
 
   function keydown(event: KeyboardEvent) {

@@ -1,13 +1,9 @@
 use crate::{
-    layout_config::layout_from_config,
-    output::{NestedOutput, OutputDescriptor, OutputGraph},
-    protocol_state::ProtocolState,
-    titlebar::TitlebarCache,
-    window::WindowStack,
-    workspace_transition::WorkspaceTransition,
+    output::OutputGraph, protocol_state::ProtocolState, titlebar::TitlebarCache,
+    window::WindowStack, workspace_transition::WorkspaceTransition,
 };
 use luft_config::LuftConfig;
-use luft_ipc::{LayoutEngine, LayoutError, Rect, WindowId, WindowInfo, WorkspaceId};
+use luft_ipc::{LayoutEngine, LayoutError, WindowId, WindowInfo, WorkspaceId};
 use luft_ipc::{ShellStatus, XwaylandStatus};
 use smithay::{
     backend::allocator::format::FormatSet,
@@ -15,16 +11,16 @@ use smithay::{
     input::{
         Seat, SeatState,
         keyboard::{KeyboardHandle, LedState},
-        pointer::{CursorIcon, CursorImageStatus},
+        pointer::CursorImageStatus,
     },
     reexports::{
         wayland_protocols::xdg::decoration::zv1::server::zxdg_toplevel_decoration_v1::Mode,
         wayland_protocols::xdg::shell::server::xdg_toplevel,
         wayland_server::{DisplayHandle, protocol::wl_surface::WlSurface},
     },
-    utils::{Logical, Point, Size},
+    utils::{Logical, Point},
     wayland::{
-        compositor::{self, CompositorState},
+        compositor::CompositorState,
         foreign_toplevel_list::ForeignToplevelHandle,
         selection::{
             data_device::DataDeviceState, ext_data_control::DataControlState,
@@ -32,7 +28,7 @@ use smithay::{
         },
         shell::{
             wlr_layer::WlrLayerShellState,
-            xdg::{ToplevelSurface, XdgShellState, XdgToplevelSurfaceData},
+            xdg::{ToplevelSurface, XdgShellState},
         },
         shm::ShmState,
     },
@@ -40,15 +36,24 @@ use smithay::{
 use std::{cell::RefCell, collections::BTreeMap, path::PathBuf};
 use tracing::debug;
 
+pub(crate) mod capture;
 mod frame_callbacks;
+mod frame_pacing;
+pub(crate) mod idle;
+mod initialization;
 mod input;
 mod layers;
 mod output_state;
 mod scene;
 mod session;
+mod session_lock;
 mod shell_control;
 mod space_sync;
+mod types;
+mod workspaces;
 pub use space_sync::{refresh_space, sync_window_to_space};
+use types::toplevel_metadata;
+pub use types::{ClientGrabSerial, DndIcon, PendingWindowDrag, WindowGrabKind, WindowGrabMeta};
 
 use crate::space_window::KestrelWindow;
 
@@ -66,6 +71,7 @@ pub struct KestrelState {
     pub seat: Seat<Self>,
     pub keyboard: Option<KeyboardHandle<Self>>,
     pub outputs: OutputGraph,
+    render_output_name: Option<String>,
     pub layout: LayoutEngine,
     pub windows: WindowStack,
     pub foreign_toplevel_handles: BTreeMap<WindowId, ForeignToplevelHandle>,
@@ -73,12 +79,19 @@ pub struct KestrelState {
     pub space: Space<KestrelWindow>,
     pub space_windows: BTreeMap<WindowId, KestrelWindow>,
     pub pointer_location: Point<f64, Logical>,
+    pub pointer_constraint_hint: Option<(WlSurface, Point<f64, Logical>)>,
+    session_lock: session_lock::SessionLock,
+    pub(crate) capture_sessions: Vec<smithay::wayland::image_copy_capture::Session>,
+    pub(crate) pending_captures: Vec<capture::CaptureRequest>,
+    pub(crate) idle_notifier:
+        Option<smithay::wayland::idle_notify::IdleNotifierState<KestrelState>>,
+    pub(crate) idle_inhibitors: Vec<WlSurface>,
+    pub dnd_icon: Option<DndIcon>,
     pub window_grab: Option<WindowGrabMeta>,
     pub pending_window_drag: Option<PendingWindowDrag>,
     pub pending_client_grab: Option<ClientGrabSerial>,
     pub config: LuftConfig,
     pub cursor_image: CursorImageStatus,
-    pub cursor_dirty: bool,
     pub frame_cursor_active: bool,
     pub super_active: bool,
     pub super_used: bool,
@@ -90,102 +103,20 @@ pub struct KestrelState {
     pub titlebar_cache: RefCell<TitlebarCache>,
     pub dmabuf_formats: FormatSet,
     #[cfg(feature = "session-backend")]
+    pending_dmabuf_sources: Vec<session::PendingDmabufSource>,
+    #[cfg(feature = "session-backend")]
+    pending_dmabuf_imports: Vec<smithay::backend::allocator::dmabuf::Dmabuf>,
+    #[cfg(feature = "session-backend")]
     pending_syncobj_sources: Vec<session::PendingSyncobjSource>,
     pending_keyboard_led_state: Option<LedState>,
-    structural_dirty: bool,
-    content_dirty: bool,
+    scene_revisions: BTreeMap<String, u64>,
+    structural_revisions: BTreeMap<String, u64>,
+    pending_redraws: std::collections::BTreeSet<String>,
     workspace_transition: Option<WorkspaceTransition>,
     serial: u32,
 }
 
 impl KestrelState {
-    pub fn new(display: &DisplayHandle, config: LuftConfig) -> Self {
-        Self::new_for_output(display, config, NestedOutput::default().descriptor())
-    }
-
-    pub fn new_for_output(
-        display: &DisplayHandle,
-        config: LuftConfig,
-        output_descriptor: OutputDescriptor,
-    ) -> Self {
-        Self::new_for_outputs(display, config, vec![output_descriptor])
-    }
-
-    pub fn new_for_outputs(
-        display: &DisplayHandle,
-        config: LuftConfig,
-        output_descriptors: Vec<OutputDescriptor>,
-    ) -> Self {
-        let compositor_state = CompositorState::new_v6::<Self>(display);
-        let xdg_shell_state = XdgShellState::new::<Self>(display);
-        let protocol_state = ProtocolState::new(display);
-        let layer_shell_state = WlrLayerShellState::new::<Self>(display);
-        let shm_state = ShmState::new::<Self>(display, vec![]);
-        let data_device_state = DataDeviceState::new::<Self>(display);
-        let primary_selection_state = PrimarySelectionState::new::<Self>(display);
-        let data_control_state =
-            DataControlState::new::<Self, _>(display, Some(&primary_selection_state), |_| true);
-        let mut seat_state = SeatState::new();
-        let seat = seat_state.new_wl_seat(display, "luft-seat");
-        let outputs = OutputGraph::new(display, &config.display, output_descriptors);
-        let mut layout = layout_from_config(&config);
-        let output_size = outputs.primary_size();
-        let scale = outputs.primary_scale().max(1.0);
-        let logical = Size::<i32, Logical>::from((
-            (f64::from(output_size.w) / scale).round().max(1.0) as i32,
-            (f64::from(output_size.h) / scale).round().max(1.0) as i32,
-        ));
-        layout.set_bounds(Rect::new(0, 0, logical.w, logical.h));
-        let mut space = Space::default();
-        space.map_output(outputs.primary_output(), (0, 0));
-
-        Self {
-            display_handle: display.clone(),
-            compositor_state,
-            xdg_shell_state,
-            protocol_state,
-            layer_shell_state,
-            shm_state,
-            seat_state,
-            data_device_state,
-            primary_selection_state,
-            data_control_state,
-            seat,
-            keyboard: None,
-            outputs,
-            layout,
-            windows: WindowStack::default(),
-            foreign_toplevel_handles: BTreeMap::new(),
-            popup_manager: PopupManager::default(),
-            space,
-            space_windows: BTreeMap::new(),
-            pointer_location: (0.0, 0.0).into(),
-            window_grab: None,
-            pending_window_drag: None,
-            pending_client_grab: None,
-            config,
-            cursor_image: CursorImageStatus::Named(CursorIcon::Default),
-            cursor_dirty: true,
-            frame_cursor_active: false,
-            super_active: false,
-            super_used: false,
-            shell_control_path: None,
-            shell_status: ShellStatus::NotStarted,
-            shell_restart_requested: false,
-            xwayland_status: XwaylandStatus::Disabled,
-            xwayland_display: None,
-            titlebar_cache: RefCell::new(TitlebarCache::default()),
-            dmabuf_formats: FormatSet::default(),
-            #[cfg(feature = "session-backend")]
-            pending_syncobj_sources: Vec::new(),
-            pending_keyboard_led_state: None,
-            structural_dirty: true,
-            content_dirty: true,
-            workspace_transition: None,
-            serial: 1,
-        }
-    }
-
     pub fn map_toplevel(&mut self, surface: ToplevelSurface) {
         let parent = self.parent_window_for_toplevel(&surface);
         let workspace = parent
@@ -524,28 +455,6 @@ impl KestrelState {
         }
     }
 
-    fn workspace_transition_direction(&self, from: &WorkspaceId, to: &WorkspaceId) -> Option<i32> {
-        let workspaces = self
-            .layout
-            .workspaces()
-            .map(|workspace| workspace.id.clone())
-            .collect::<Vec<_>>();
-        let from_index = workspaces.iter().position(|workspace| workspace == from)?;
-        let to_index = workspaces.iter().position(|workspace| workspace == to)?;
-        let len = workspaces.len();
-        if len <= 1 || from_index == to_index {
-            return None;
-        }
-
-        let forward = (to_index + len - from_index) % len;
-        let backward = (from_index + len - to_index) % len;
-        if forward <= backward {
-            Some(1)
-        } else {
-            Some(-1)
-        }
-    }
-
     fn parent_window_for_toplevel(&self, surface: &ToplevelSurface) -> Option<WindowId> {
         let parent = surface.parent()?;
         self.windows.id_for_wl_surface(&parent)
@@ -572,48 +481,4 @@ impl KestrelState {
         let _ = self.windows.raise_by_id(parent);
         let _ = self.windows.raise_by_id(child);
     }
-}
-
-fn toplevel_metadata(surface: &ToplevelSurface) -> ToplevelMetadata {
-    compositor::with_states(surface.wl_surface(), |states| {
-        let Some(data) = states.data_map.get::<XdgToplevelSurfaceData>() else {
-            return ToplevelMetadata::default();
-        };
-        let role = data.lock().unwrap();
-        ToplevelMetadata {
-            title: role.title.clone().unwrap_or_default(),
-            app_id: role.app_id.clone().unwrap_or_default(),
-        }
-    })
-}
-
-#[derive(Debug, Default)]
-struct ToplevelMetadata {
-    title: String,
-    app_id: String,
-}
-
-#[derive(Clone)]
-pub struct ClientGrabSerial {
-    surface: ToplevelSurface,
-}
-
-#[derive(Clone, Copy, Debug)]
-pub enum WindowGrabKind {
-    Move,
-    Resize { edge: crate::window::ResizeEdge },
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct WindowGrabMeta {
-    pub kind: WindowGrabKind,
-    pub forward_button_release: bool,
-}
-
-#[derive(Clone)]
-pub struct PendingWindowDrag {
-    pub surface: smithay::wayland::shell::xdg::ToplevelSurface,
-    pub pointer_start: Point<f64, Logical>,
-    pub serial: smithay::utils::Serial,
-    pub button: u32,
 }

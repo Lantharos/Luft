@@ -1,7 +1,4 @@
-use crate::{
-    scene_backdrop::SceneBackdrop,
-    scene_composite::SceneCompositeElement,
-};
+use crate::{scene_backdrop::SceneBackdrop, scene_composite::SceneCompositeElement};
 use smithay::{
     backend::renderer::gles::{GlesError, GlesRenderer},
     output::Output,

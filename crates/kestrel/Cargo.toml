@@ -19,6 +19,7 @@ tracing-subscriber.workspace = true
 wayland-backend.workspace = true
 wayland-scanner.workspace = true
 wayland-server.workspace = true
+wayland-protocols-wlr = { version = "0.3.12", features = ["server"] }
 
 [features]
 session-backend = [

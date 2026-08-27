@@ -1,24 +1,30 @@
+mod capture;
+mod pipewire_cast;
+mod screencast;
+mod screenshot;
 mod settings;
 
+use ashpd::backend::Builder;
+use screencast::ScreencastPortal;
+use screenshot::ScreenshotPortal;
 use settings::PortalSettings;
-use std::{env, fs, fs::OpenOptions, io, thread, time::Duration};
+use std::{env, fs, fs::OpenOptions, io};
 use tracing::info;
-use zbus::blocking::connection;
 
 const DBUS_NAME: &str = "org.freedesktop.impl.portal.desktop.luft";
-const OBJECT_PATH: &str = "/org/freedesktop/portal/desktop";
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     init_logging();
-    let _connection = connection::Builder::session()?
-        .name(DBUS_NAME)?
-        .serve_at(OBJECT_PATH, PortalSettings::new())?
-        .build()?;
-
+    Builder::new(DBUS_NAME)?
+        .settings(PortalSettings::new())
+        .screenshot(ScreenshotPortal)
+        .screencast(ScreencastPortal::default())
+        .build()
+        .await?;
     info!(dbus_name = DBUS_NAME, "luft portal backend ready");
-    loop {
-        thread::sleep(Duration::from_secs(3600));
-    }
+    std::future::pending::<()>().await;
+    Ok(())
 }
 
 fn init_logging() {

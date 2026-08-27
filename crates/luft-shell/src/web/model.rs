@@ -1,4 +1,7 @@
-use super::{icons::{icon_data_uri, window_icon_uri}, palette::WebPalette};
+use super::{
+    icons::{icon_data_uri, window_icon_uri},
+    palette::WebPalette,
+};
 use crate::services::{
     notifications::{NotificationItem, NotificationUrgency},
     system_status::{AudioInfo, BatteryInfo, BrightnessInfo, NetworkInfo, SystemStatus},

@@ -132,6 +132,7 @@ impl WebSurfaces {
 
     pub fn tick(&mut self) {
         self.prewarm_next_surface();
+        self.panel.tick_visibility();
         self.panel_menu.tick();
         self.session_menu.tick();
         self.start_menu.tick();

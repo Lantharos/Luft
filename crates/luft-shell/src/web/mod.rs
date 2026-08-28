@@ -43,7 +43,7 @@ use std::{
     time::{Duration, Instant},
 };
 use surface::WebSurfaces;
-use tracing::warn;
+use tracing::{debug, warn};
 
 const MODEL_REFRESH: Duration = Duration::from_millis(500);
 const STATUS_REFRESH: Duration = Duration::from_secs(1);
@@ -174,6 +174,7 @@ impl WebShell {
         match control.drain() {
             Ok(requests) => {
                 for request in requests {
+                    debug!(?request, "received shell control request");
                     match request {
                         luft_ipc::ShellControlRequest::LaunchDefaultApp { app } => {
                             self.launch_default_app(app)

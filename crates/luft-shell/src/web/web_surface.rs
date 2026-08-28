@@ -7,6 +7,7 @@ use super::{
 use sabine::{
     BridgeCommandDescriptor, BridgeError, BridgeResponse, ContentSecurity, RuntimeConfig,
     RuntimeMode, SabineProcess, SabineWindow, ShellSurfaceMargin, ShellSurfaceOptions,
+    ShellSurfaceVisibilityRequest, ShellSurfaceVisibilityState,
 };
 use serde_json::json;
 use std::{
@@ -27,6 +28,7 @@ pub struct WebSurface {
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
     process: Option<SabineProcess>,
+    visibility_request: Option<ShellSurfaceVisibilityRequest>,
     surface_alpha: f32,
     pub(crate) shell_margin: ShellSurfaceMargin,
     pending_snapshot: String,
@@ -53,6 +55,7 @@ impl WebSurface {
             panel_menu_x: config.panel_menu_x,
             session_menu_qs_height: config.session_menu_qs_height,
             process: None,
+            visibility_request: None,
             surface_alpha: if config.visible { 1.0 } else { 0.0 },
             shell_margin,
             pending_snapshot: initial,
@@ -131,6 +134,7 @@ impl WebSurface {
         let window = self.build_window();
         match window.launch() {
             Ok(process) => {
+                self.visibility_request = None;
                 debug!(
                     pid = process.id(),
                     surface = self.kind.as_str(),
@@ -156,15 +160,12 @@ impl WebSurface {
     fn show_process(&mut self, alpha: f32) {
         let had_process = self.process.is_some();
         if had_process {
-            self.flush_snapshot();
             self.set_surface_alpha(alpha);
         }
-        let restored = self
-            .process
-            .as_ref()
-            .is_some_and(|process| process.set_shell_surface_visible(true));
+        let restored = self.request_visibility(true);
         if had_process && !restored {
             self.process = None;
+            self.visibility_request = None;
             self.rendered_snapshot.clear();
         }
         if self.process.is_none() {
@@ -183,14 +184,11 @@ impl WebSurface {
             self.rendered_snapshot.clear();
             return;
         }
-        if self
-            .process
-            .as_ref()
-            .is_none_or(|process| process.set_shell_surface_visible(false))
-        {
+        if self.process.is_none() || self.request_visibility(false) {
             return;
         }
         self.process = None;
+        self.visibility_request = None;
         self.rendered_snapshot.clear();
     }
 
@@ -199,7 +197,47 @@ impl WebSurface {
             return;
         }
         if self.process.take().is_some() {
+            self.visibility_request = None;
             self.rendered_snapshot.clear();
+        }
+    }
+
+    pub(crate) fn tick_visibility(&mut self) {
+        let Some(request) = &self.visibility_request else {
+            return;
+        };
+        let state = request.state();
+        if state == ShellSurfaceVisibilityState::Pending {
+            return;
+        }
+        let requested_visible = request.requested_visible();
+        let request_id = request.id();
+        self.visibility_request = None;
+        let completed = matches!(
+            (requested_visible, state),
+            (true, ShellSurfaceVisibilityState::Mapped)
+                | (false, ShellSurfaceVisibilityState::Unmapped)
+        );
+        if completed {
+            debug!(
+                surface = self.kind.as_str(),
+                request_id,
+                requested_visible,
+                ?state,
+                "Sabine shell visibility request completed"
+            );
+            return;
+        }
+        warn!(
+            surface = self.kind.as_str(),
+            requested_visible,
+            ?state,
+            "Sabine shell visibility request failed"
+        );
+        self.process = None;
+        self.rendered_snapshot.clear();
+        if self.visible || self.keep_alive_when_hidden {
+            self.launch();
         }
     }
 
@@ -336,11 +374,29 @@ impl WebSurface {
             return;
         }
         self.process = None;
+        self.visibility_request = None;
         self.rendered_snapshot.clear();
         self.launch();
         if !self.visible {
             self.hide_process();
         }
+    }
+
+    fn request_visibility(&mut self, visible: bool) -> bool {
+        let Some(request) = self
+            .process
+            .as_ref()
+            .and_then(|process| process.set_shell_surface_visible(visible))
+        else {
+            return false;
+        };
+        let request_id = request.id();
+        self.visibility_request = Some(request);
+        debug!(
+            surface = self.kind.as_str(),
+            request_id, visible, "queued Sabine shell visibility request"
+        );
+        true
     }
 }
 

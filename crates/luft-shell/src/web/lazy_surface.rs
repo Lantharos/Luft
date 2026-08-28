@@ -121,6 +121,9 @@ impl LazyWebSurface {
     }
 
     pub(super) fn tick(&mut self) {
+        if let Some(surface) = &mut self.surface {
+            surface.tick_visibility();
+        }
         let now = Instant::now();
         if let Some(show_at) = self.show_at
             && now >= show_at

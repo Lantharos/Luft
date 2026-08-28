@@ -58,6 +58,8 @@ pub struct WinitData {
     backend: WinitGraphicsBackend<GlesRenderer>,
     damage_tracker: OutputDamageTracker,
     dmabuf_state: (DmabufState, DmabufGlobal, Option<DmabufFeedback>),
+    buffer_age: usize,
+    buffer_age_size: smithay::utils::Size<i32, smithay::utils::Physical>,
     full_redraw: u8,
     #[cfg(feature = "debug")]
     pub fps: fps_ticker::Fps,
@@ -213,6 +215,8 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             backend,
             damage_tracker,
             dmabuf_state,
+            buffer_age: 0,
+            buffer_age_size: size,
             full_redraw: 0,
             #[cfg(feature = "debug")]
             fps: fps_ticker::Fps::default(),
@@ -297,6 +301,9 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
 
             let full_redraw = &mut state.backend_data.full_redraw;
             *full_redraw = full_redraw.saturating_sub(1);
+            let buffer_age = state.backend_data.buffer_age;
+            let buffer_age_size = state.backend_data.buffer_age_size;
+            let window_size = backend.window_size();
             let space = &mut state.space;
             let damage_tracker = &mut state.backend_data.damage_tracker;
             let show_window_preview = state.show_window_preview;
@@ -324,11 +331,6 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             #[cfg(feature = "debug")]
             let mut renderdoc = state.renderdoc.as_mut();
 
-            let age = if *full_redraw > 0 {
-                0
-            } else {
-                backend.buffer_age().unwrap_or(0)
-            };
             #[cfg(feature = "debug")]
             let window_handle = backend
                 .window()
@@ -342,6 +344,11 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                 })
                 .unwrap_or_else(|_| std::ptr::null_mut());
             let render_res = backend.bind().and_then(|(renderer, mut fb)| {
+                let age = if *full_redraw > 0 || window_size != buffer_age_size {
+                    0
+                } else {
+                    buffer_age
+                };
                 #[cfg(feature = "debug")]
                 if let Some(renderdoc) = renderdoc.as_mut() {
                     renderdoc.start_frame_capture(
@@ -412,10 +419,14 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             match render_res {
                 Ok((render_output_result, capture)) => {
                     let has_rendered = render_output_result.damage.is_some();
-                    if let Some(damage) = render_output_result.damage
-                        && let Err(err) = backend.submit(Some(damage))
-                    {
-                        warn!("Failed to submit buffer: {}", err);
+                    if let Some(damage) = render_output_result.damage {
+                        match backend.submit(Some(damage)) {
+                            Ok(()) => {
+                                state.backend_data.buffer_age = backend.buffer_age().unwrap_or(0);
+                                state.backend_data.buffer_age_size = backend.window_size();
+                            }
+                            Err(err) => warn!("Failed to submit buffer: {}", err),
+                        }
                     }
                     if let Some(capture) = capture {
                         crate::capture::finish_framebuffer_copy(backend.renderer(), capture);

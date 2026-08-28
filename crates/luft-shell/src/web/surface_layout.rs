@@ -83,10 +83,7 @@ pub(crate) fn panel_output_width() -> i32 {
 
 fn layer(kind: WebShellSurface) -> ShellSurfaceLayer {
     match kind {
-        WebShellSurface::PanelMenu
-        | WebShellSurface::SessionMenu
-        | WebShellSurface::NotificationToast
-        | WebShellSurface::Panel => ShellSurfaceLayer::Overlay,
+        WebShellSurface::Panel => ShellSurfaceLayer::Overlay,
         _ => ShellSurfaceLayer::Top,
     }
 }

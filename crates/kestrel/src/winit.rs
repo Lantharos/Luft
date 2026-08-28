@@ -393,6 +393,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                     show_window_preview,
                     session_locked.then_some(lock_surface.as_ref()).flatten(),
                     wallpaper,
+                    &state.layer_motion,
                 )
                 .map_err(|err| match err {
                     OutputDamageTrackerError::Rendering(err) => SwapBuffersError::from(err),

@@ -7,8 +7,8 @@ use smithay::{
             memory::MemoryRenderBufferRenderElement,
             surface::WaylandSurfaceRenderElement,
             utils::{
-                ConstrainAlign, ConstrainScaleBehavior, CropRenderElement, RelocateRenderElement,
-                RescaleRenderElement,
+                ConstrainAlign, ConstrainScaleBehavior, CropRenderElement, Relocate,
+                RelocateRenderElement, RescaleRenderElement,
             },
         },
     },
@@ -63,7 +63,7 @@ impl<R: Renderer> std::fmt::Debug for CustomRenderElements<R> {
 
 smithay::backend::renderer::element::render_elements! {
     pub OutputRenderElements<R, E> where R: ImportAll + ImportMem + BlurRenderer;
-    Space=SpaceRenderElements<R, E>,
+    Space=RelocateRenderElement<SpaceRenderElements<R, E>>,
     Window=Wrap<E>,
     Custom=CustomRenderElements<R>,
     Preview=CropRenderElement<RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>>,
@@ -148,6 +148,7 @@ where
         })
 }
 
+#[allow(clippy::too_many_arguments)]
 #[profiling::function]
 pub fn output_elements<R>(
     output: &Output,
@@ -157,6 +158,7 @@ pub fn output_elements<R>(
     show_window_preview: bool,
     lock_surface: Option<&WlSurface>,
     wallpaper: &crate::wallpaper::Wallpaper,
+    layer_motion: &crate::layer_motion::LayerMotionState,
 ) -> (
     Vec<OutputRenderElements<R, WindowRenderElement<R>>>,
     Color32F,
@@ -210,6 +212,8 @@ where
         (elements, CLEAR_COLOR_FULLSCREEN)
     } else {
         let output_scale = output.current_scale().fractional_scale();
+        let motion_offsets =
+            layer_motion.offsets(output, Scale::from(output_scale), std::time::Instant::now());
         let mut output_render_elements = custom_elements
             .into_iter()
             .map(OutputRenderElements::from)
@@ -226,10 +230,13 @@ where
             1.0,
         )
         .expect("output without mode?");
-        let blur_elements = blur_elements(space, output, output_scale);
+        let blur_elements = blur_elements(space, output, output_scale, &motion_offsets);
         for element in space_elements {
             let element_id = element.id().clone();
-            output_render_elements.push(OutputRenderElements::Space(element));
+            let offset = motion_offset(&motion_offsets, &element_id);
+            output_render_elements.push(OutputRenderElements::Space(
+                RelocateRenderElement::from_element(element, offset, Relocate::Relative),
+            ));
             output_render_elements.extend(
                 blur_elements
                     .iter()
@@ -264,6 +271,7 @@ pub fn render_output<'a, 'd, R>(
     show_window_preview: bool,
     lock_surface: Option<&WlSurface>,
     wallpaper: &crate::wallpaper::Wallpaper,
+    layer_motion: &crate::layer_motion::LayerMotionState,
 ) -> Result<RenderOutputResult<'d>, OutputDamageTrackerError<R::Error>>
 where
     R: Renderer + ImportAll + ImportMem,
@@ -278,6 +286,7 @@ where
         show_window_preview,
         lock_surface,
         wallpaper,
+        layer_motion,
     );
     damage_tracker.render_output(renderer, framebuffer, age, &elements, clear_color)
 }
@@ -286,6 +295,7 @@ fn blur_elements(
     space: &Space<WindowElement>,
     output: &Output,
     output_scale: f64,
+    motion_offsets: &[(Id, Point<i32, smithay::utils::Physical>)],
 ) -> Vec<(Id, crate::blur::BlurElement)> {
     let scale = Scale::from(output_scale);
     let mut elements = Vec::new();
@@ -295,9 +305,11 @@ fn blur_elements(
             continue;
         };
         let surface = layer.wl_surface();
-        let location = geometry.loc.to_physical_precise_round(output_scale);
+        let surface_id = crate::blur::BlurElement::surface_id(surface);
+        let location = geometry.loc.to_physical_precise_round(output_scale)
+            + motion_offset(motion_offsets, &surface_id);
         if let Some(blur) = crate::blur::BlurElement::from_surface(surface, location, scale) {
-            elements.push((crate::blur::BlurElement::surface_id(surface), blur));
+            elements.push((surface_id, blur));
         }
     }
     drop(layers);
@@ -322,4 +334,14 @@ fn blur_elements(
         }
     }
     elements
+}
+
+fn motion_offset(
+    offsets: &[(Id, Point<i32, smithay::utils::Physical>)],
+    id: &Id,
+) -> Point<i32, smithay::utils::Physical> {
+    offsets
+        .iter()
+        .find_map(|(candidate, offset)| (candidate == id).then_some(*offset))
+        .unwrap_or_default()
 }

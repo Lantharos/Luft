@@ -23,6 +23,10 @@ validation always exercises a real renderer and presentation target.
 - Background blur is a Smithay framebuffer-effect render element. The damage
   tracker invalidates the complete effect when its backdrop changes, while
   unchanged frames retain buffer-age and damage reuse.
+- Shell popover motion uses Smithay render-element relocation. Layer-shell
+  geometry is committed only at hidden and shown endpoints; Kestrel holds
+  intermediate resize/configure states at the last stable position and moves
+  the surface and its blur together through the damage-tracked scene.
 - Session locking renders an opaque black fallback until every output has
   presented its lock surface. Normal shell and application surfaces are not
   rendered or focused while locked.

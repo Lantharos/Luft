@@ -153,6 +153,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub ipc_socket: IpcSocket,
     pub nested: bool,
     pub wallpaper: crate::wallpaper::Wallpaper,
+    pub layer_motion: crate::layer_motion::LayerMotionState,
     pub layout: LayoutEngine,
     pub windows: BTreeMap<WindowId, WindowElement>,
 
@@ -830,6 +831,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             ipc_socket,
             nested,
             wallpaper,
+            layer_motion: crate::layer_motion::LayerMotionState::default(),
             layout: crate::policy::create_layout(),
             windows: BTreeMap::new(),
             space: Space::default(),

@@ -1639,6 +1639,7 @@ impl KestrelState<UdevData> {
             &mut self.cursor_status,
             self.show_window_preview,
             &self.wallpaper,
+            &self.layer_motion,
             captures,
             capture_time,
             session_locked,
@@ -1730,6 +1731,7 @@ fn render_surface<'a>(
     cursor_status: &mut CursorImageStatus,
     show_window_preview: bool,
     wallpaper: &crate::wallpaper::Wallpaper,
+    layer_motion: &crate::layer_motion::LayerMotionState,
     captures: Vec<PendingCapture>,
     capture_time: Duration,
     session_locked: bool,
@@ -1818,6 +1820,7 @@ fn render_surface<'a>(
         show_window_preview,
         session_locked.then_some(lock_surface).flatten(),
         wallpaper,
+        layer_motion,
     );
 
     let frame_mode = if surface.disable_direct_scanout {

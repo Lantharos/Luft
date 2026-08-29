@@ -904,7 +904,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -934,7 +934,7 @@ version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab8ecd87370524b461f8557c119c405552c396ed91fc0a8eec68679eab26f94a"
 dependencies = [
- "libloading 0.8.9",
+ "libloading 0.7.4",
 ]
 
 [[package]]
@@ -1077,7 +1077,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1116,6 +1116,27 @@ checksum = "8be9f3dfaaffdae2972880079a491a1a8bb7cbed0b8dd7a347f668b4150a3b93"
 dependencies = [
  "event-listener",
  "pin-project-lite",
+]
+
+[[package]]
+name = "exwlshellev"
+version = "0.20.0"
+source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=5c56310b589190188bc2e6e5b3b72d6a222b7501#5c56310b589190188bc2e6e5b3b72d6a222b7501"
+dependencies = [
+ "calloop",
+ "calloop-wayland-source",
+ "log",
+ "raw-window-handle",
+ "smithay-client-toolkit 0.21.1",
+ "tempfile",
+ "thiserror 2.0.20",
+ "waycrate_xkbkeycode",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-cursor",
+ "wayland-protocols",
+ "wayland-protocols-misc",
+ "wayland-protocols-wlr",
 ]
 
 [[package]]
@@ -2120,28 +2141,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "layershellev"
-version = "0.19.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69fbd3ced50d91a5a118e3e00f49c72040ea6b48b78b159a3936104fc2632925"
-dependencies = [
- "calloop",
- "calloop-wayland-source",
- "log",
- "raw-window-handle",
- "smithay-client-toolkit 0.20.0",
- "tempfile",
- "thiserror 2.0.20",
- "waycrate_xkbkeycode",
- "wayland-backend",
- "wayland-client",
- "wayland-cursor",
- "wayland-protocols",
- "wayland-protocols-misc",
- "wayland-protocols-wlr",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2633,7 +2632,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3501,7 +3500,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3548,18 +3547,18 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "ashpd",
  "bytemuck",
  "crossbeam-channel",
+ "exwlshellev",
  "futures-util",
  "getrandom 0.4.3",
  "global-hotkey",
  "glyphon",
  "image",
  "ksni",
- "layershellev",
  "libc",
  "pollster",
  "raw-window-handle",
@@ -3586,7 +3585,7 @@ dependencies = [
 [[package]]
 name = "sabine-bridge"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "serde",
  "serde_json",
@@ -3595,7 +3594,7 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "sabine-bridge",
  "serde",
@@ -3606,7 +3605,7 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
@@ -3618,7 +3617,7 @@ dependencies = [
 [[package]]
 name = "sabine-runtime"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "libc",
  "serde",
@@ -3632,7 +3631,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=2817facb006bf2e198c77978ec7abb4b5bf2afe2#2817facb006bf2e198c77978ec7abb4b5bf2afe2"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=4984224b6e4fadc448ab7f01a8b7bb3ac6884649#4984224b6e4fadc448ab7f01a8b7bb3ac6884649"
 dependencies = [
  "base64",
  "clap",
@@ -3991,11 +3990,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74dc9ee14b0fdcb535f9556141bacac070c994a977d2240ee455d7438a617f00"
 dependencies = [
  "bitflags",
+ "bytemuck",
  "calloop",
  "calloop-wayland-source",
  "cursor-icon",
  "log",
  "memmap2",
+ "pkg-config",
  "rustix 1.1.4",
  "thiserror 2.0.20",
  "wayland-client",
@@ -4006,6 +4007,7 @@ dependencies = [
  "wayland-protocols-misc",
  "wayland-protocols-wlr",
  "wayland-scanner",
+ "xkbcommon 0.8.0",
  "xkeysym",
 ]
 
@@ -4217,10 +4219,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.4",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4833,9 +4835,8 @@ dependencies = [
 
 [[package]]
 name = "waycrate_xkbkeycode"
-version = "0.19.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e904c31025b16851793aa2e8eae3c1b4466af8345b45fb7e46ec61b05a4f9086"
+version = "0.20.0"
+source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=5c56310b589190188bc2e6e5b3b72d6a222b7501#5c56310b589190188bc2e6e5b3b72d6a222b7501"
 dependencies = [
  "calloop",
  "log",
@@ -4849,9 +4850,9 @@ dependencies = [
 
 [[package]]
 name = "wayland-backend"
-version = "0.3.16"
+version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "016ccf01d1c58b6f8999612813e17c9b2390f7d70671428869913310f83f54b8"
+checksum = "38a91b4eaddff87b1cd1074985e3713da4af2c49742d1b356b2c01670a67a078"
 dependencies = [
  "cc",
  "downcast-rs",
@@ -5247,7 +5248,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]

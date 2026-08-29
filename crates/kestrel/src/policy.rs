@@ -192,6 +192,15 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         self.xwayland_process
             .reconfigure(config.compositor.xwayland);
         self.wallpaper = crate::wallpaper::Wallpaper::load(&config.compositor);
+        if let Some(keyboard) = self.seat.get_keyboard() {
+            let mut modifiers = keyboard.modifier_state();
+            if modifiers.num_lock != config.input.num_lock {
+                modifiers.num_lock = config.input.num_lock;
+                keyboard.set_modifier_state(modifiers);
+                keyboard.advertise_modifier_state(self);
+                self.backend_data.update_led_state(keyboard.led_state());
+            }
+        }
         self.shell_process
             .set_xwayland_display(self.xwayland_process.display().map(str::to_owned));
         self.reconcile_workspace();

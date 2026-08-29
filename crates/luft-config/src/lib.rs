@@ -9,6 +9,7 @@ use thiserror::Error;
 mod apps;
 mod cursor_theme;
 mod display;
+mod input;
 mod panel;
 mod paths;
 mod session;
@@ -19,6 +20,7 @@ pub use cursor_theme::{
     DEFAULT_CURSOR_THEME_PARENT, cursor_environment_entries,
 };
 pub use display::{DisplayConfig, OutputConfig, OutputTransform};
+pub use input::InputConfig;
 pub use panel::{PanelConfig, PinnedAppConfig};
 pub use paths::ConfigPaths;
 pub use session::SessionConfig;
@@ -28,6 +30,7 @@ pub use session::SessionConfig;
 pub struct LuftConfig {
     pub compositor: CompositorConfig,
     pub display: DisplayConfig,
+    pub input: InputConfig,
     pub session: SessionConfig,
     pub workspaces: WorkspacesConfig,
     pub panel: PanelConfig,

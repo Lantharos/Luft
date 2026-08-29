@@ -41,6 +41,17 @@ adaptive_sync = true
 enablement, mode, position, scale, transform, and adaptive sync while creating
 the DRM output. The nested backend uses its host window's output settings.
 
+## Input
+
+The numeric keypad starts in numeric mode by default, and session keyboards keep
+their Num Lock LEDs synchronized with the compositor. Disable that default when
+navigation-mode keypad keys are preferred:
+
+```toml
+[input]
+num_lock = false
+```
+
 ## Startup Apps
 
 Luft launches user desktop entries from `~/.config/autostart` once when the shell starts. Add explicit commands when you want startup apps that are not represented by desktop files:

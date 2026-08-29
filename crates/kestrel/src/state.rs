@@ -28,7 +28,7 @@ use smithay::{
     input::{
         Seat, SeatHandler, SeatState,
         dnd::{DnDGrab, DndGrabHandler, DndTarget, GrabType, Source},
-        keyboard::{Keysym, LedState, XkbConfig},
+        keyboard::{Keysym, LedState, ModifiersState, XkbConfig},
         pointer::{CursorImageStatus, Focus, PointerHandle},
         tablet::TabletSeatHandler,
     },
@@ -786,13 +786,22 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         let idle_inhibit_state = IdleInhibitManagerState::new::<Self>(&dh);
         let idle_notifier_state = IdleNotifierState::new(&dh, handle.clone());
 
+        let config = luft_config::load_config()
+            .map(|loaded| loaded.config)
+            .unwrap_or_default();
+
         // init input
         let seat_name = backend_data.seat_name();
         let mut seat = seat_state.new_wl_seat(&dh, seat_name.clone());
 
         let pointer = seat.add_pointer();
-        seat.add_keyboard(XkbConfig::default(), 200, 25)
+        let keyboard = seat
+            .add_keyboard(XkbConfig::default(), 200, 25)
             .expect("Failed to initialize the keyboard");
+        keyboard.set_modifier_state(ModifiersState {
+            num_lock: config.input.num_lock,
+            ..ModifiersState::default()
+        });
 
         let keyboard_shortcuts_inhibit_state = KeyboardShortcutsInhibitState::new::<Self>(&dh);
 
@@ -801,9 +810,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         let ipc_socket = crate::ipc::install(&handle, ipc_path.clone())
             .expect("failed to create Luft IPC socket");
         let wayland_socket = socket_name.clone().expect("Wayland socket is initialized");
-        let compositor_config = luft_config::load_config()
-            .map(|loaded| loaded.config.compositor)
-            .unwrap_or_else(|_| luft_config::LuftConfig::default().compositor);
+        let compositor_config = config.compositor;
         let xwayland_enabled = compositor_config.xwayland;
         let wallpaper = crate::wallpaper::Wallpaper::load(&compositor_config);
         let xwayland_process =

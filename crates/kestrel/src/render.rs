@@ -30,7 +30,7 @@ use crate::drawing::FpsElement;
 use crate::{
     blur::BlurRenderer,
     drawing::{CLEAR_COLOR, CLEAR_COLOR_FULLSCREEN, PointerRenderElement},
-    shell::{FullscreenSurface, RoundedRenderer, WindowElement, WindowRenderElement},
+    shell::{AnimatedWindowRenderElement, FullscreenSurface, RoundedRenderer, WindowElement},
 };
 
 smithay::backend::renderer::element::render_elements! {
@@ -67,7 +67,7 @@ smithay::backend::renderer::element::render_elements! {
     Space=RelocateRenderElement<SpaceRenderElements<R, E>>,
     Window=Wrap<E>,
     Custom=CustomRenderElements<R>,
-    Preview=CropRenderElement<RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>>,
+    Preview=CropRenderElement<RelocateRenderElement<RescaleRenderElement<AnimatedWindowRenderElement<R>>>>,
 }
 
 impl<
@@ -94,8 +94,11 @@ pub fn space_preview_elements<'a, R, C>(
 where
     R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
-    C: From<CropRenderElement<RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>>>
-        + 'a,
+    C: From<
+            CropRenderElement<
+                RelocateRenderElement<RescaleRenderElement<AnimatedWindowRenderElement<R>>>,
+            >,
+        > + 'a,
 {
     let constrain_behavior = ConstrainBehavior {
         reference: ConstrainReference::BoundingBox,
@@ -162,7 +165,7 @@ pub fn output_elements<R>(
     wallpaper: &crate::wallpaper::Wallpaper,
     layer_motion: &crate::layer_motion::LayerMotionState,
 ) -> (
-    Vec<OutputRenderElements<R, WindowRenderElement<R>>>,
+    Vec<OutputRenderElements<R, AnimatedWindowRenderElement<R>>>,
     Color32F,
 )
 where
@@ -185,31 +188,15 @@ where
         .and_then(|f| f.get())
     {
         let scale = output.current_scale().fractional_scale().into();
-        let window_render_elements: Vec<WindowRenderElement<R>> =
+        let window_render_elements: Vec<AnimatedWindowRenderElement<R>> =
             AsRenderElements::<R>::render_elements(&window, renderer, (0, 0).into(), scale, 1.0);
-        let blur = window.wl_surface().and_then(|surface| {
-            crate::blur::BlurElement::from_surface(
-                &surface,
-                (0, 0).into(),
-                Scale::from(output.current_scale().fractional_scale()),
-            )
-            .map(|blur| (crate::blur::BlurElement::surface_id(&surface), blur))
-        });
 
         let mut elements = custom_elements
             .into_iter()
             .map(OutputRenderElements::from)
             .collect::<Vec<_>>();
         for element in window_render_elements {
-            let id = element.id().clone();
             elements.push(OutputRenderElements::Window(Wrap::from(element)));
-            if let Some((surface_id, blur)) = &blur
-                && surface_id == &id
-            {
-                elements.push(OutputRenderElements::Custom(CustomRenderElements::Blur(
-                    blur.clone().into(),
-                )));
-            }
         }
         (elements, CLEAR_COLOR_FULLSCREEN)
     } else {
@@ -226,7 +213,7 @@ where
         }
 
         let space_elements = ordered_space_render_elements(renderer, space, output);
-        let blur_elements = blur_elements(space, output, output_scale, &motion_offsets);
+        let blur_elements = blur_elements(output, output_scale, &motion_offsets);
         for element in space_elements {
             let element_id = element.id().clone();
             let offset = motion_offset(&motion_offsets, &element_id);
@@ -259,7 +246,7 @@ fn ordered_space_render_elements<R>(
     renderer: &mut R,
     space: &Space<WindowElement>,
     output: &Output,
-) -> Vec<SpaceRenderElements<R, WindowRenderElement<R>>>
+) -> Vec<SpaceRenderElements<R, AnimatedWindowRenderElement<R>>>
 where
     R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
@@ -309,7 +296,7 @@ where
 }
 
 fn extend_layer_elements<R>(
-    elements: &mut Vec<SpaceRenderElements<R, WindowRenderElement<R>>>,
+    elements: &mut Vec<SpaceRenderElements<R, AnimatedWindowRenderElement<R>>>,
     renderer: &mut R,
     layers: &LayerMap,
     layer: WlrLayer,
@@ -318,10 +305,13 @@ fn extend_layer_elements<R>(
     R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
 {
+    let mut surfaces = layers.layers_on(layer).rev().collect::<Vec<_>>();
+    if layer == WlrLayer::Top {
+        surfaces.sort_by_key(|surface| u8::from(surface.namespace() != "luft-panel"));
+    }
     elements.extend(
-        layers
-            .layers_on(layer)
-            .rev()
+        surfaces
+            .into_iter()
             .filter_map(|surface| {
                 layers
                     .layer_geometry(surface)
@@ -373,7 +363,6 @@ where
 }
 
 fn blur_elements(
-    space: &Space<WindowElement>,
     output: &Output,
     output_scale: f64,
     motion_offsets: &[(Id, Point<i32, smithay::utils::Physical>)],
@@ -395,25 +384,6 @@ fn blur_elements(
     }
     drop(layers);
 
-    let Some(output_geometry) = space.output_geometry(output) else {
-        return elements;
-    };
-    for window in space.elements_for_output(output) {
-        let Some(surface) = window.wl_surface() else {
-            continue;
-        };
-        let Some(mut location) = space.element_location(window) else {
-            continue;
-        };
-        location -= output_geometry.loc;
-        if window.decoration_state().is_ssd {
-            location.y += crate::shell::ssd::HEADER_BAR_HEIGHT;
-        }
-        let location = location.to_physical_precise_round(output_scale);
-        if let Some(blur) = crate::blur::BlurElement::from_surface(&surface, location, scale) {
-            elements.push((crate::blur::BlurElement::surface_id(&surface), blur));
-        }
-    }
     elements
 }
 

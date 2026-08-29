@@ -29,23 +29,6 @@
   transform-origin: center bottom;
 }
 
-#app.is-surface-opening[data-surface="panel-menu"] .panel-menu {
-  animation: panel-menu-shell-in 170ms var(--ease-shell) both;
-  will-change: transform;
-}
-
-#app.is-surface-closing[data-surface="panel-menu"] .panel-menu {
-  pointer-events: none;
-}
-
-#app.is-surface-opening[data-surface="panel-menu"] .panel-menu > * {
-  animation: panel-menu-content-in 135ms var(--ease-shell) both;
-}
-
-#app.is-surface-closing[data-surface="panel-menu"] .panel-menu > * {
-  pointer-events: none;
-}
-
 .panel-menu strong {
   overflow: hidden;
   padding: 5px 8px 6px;
@@ -91,25 +74,5 @@
   to {
     opacity: 1;
     transform: translateY(0) scaleX(1);
-  }
-}
-
-@keyframes panel-menu-content-in {
-  from {
-    transform: translateY(4px);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes panel-menu-shell-in {
-  from {
-    transform: translate3d(0, 14px, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
   }
 }

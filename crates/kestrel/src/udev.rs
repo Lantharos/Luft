@@ -17,7 +17,7 @@ use crate::{
     state::{Backend, KestrelState, take_presentation_feedback, update_primary_scanout_output},
 };
 use crate::{
-    shell::WindowRenderElement,
+    shell::AnimatedWindowRenderElement,
     state::{DndIcon, SurfaceDmabufFeedback},
 };
 #[cfg(feature = "renderer_sync")]
@@ -1135,7 +1135,10 @@ impl KestrelState<UdevData> {
             let drm_output = match device
                 .drm_output_manager
                 .lock()
-                .initialize_output::<_, OutputRenderElements<UdevRenderer<'_>, WindowRenderElement<UdevRenderer<'_>>>>(
+                .initialize_output::<_, OutputRenderElements<
+                    UdevRenderer<'_>,
+                    AnimatedWindowRenderElement<UdevRenderer<'_>>,
+                >>(
                     crtc,
                     drm_mode,
                     &[connector.handle()],
@@ -1230,15 +1233,19 @@ impl KestrelState<UdevData> {
             .gpus
             .single_renderer(&render_node)
             .unwrap();
-        let _ = device.drm_output_manager.lock().try_to_restore_modifiers::<_, OutputRenderElements<
-            UdevRenderer<'_>,
-            WindowRenderElement<UdevRenderer<'_>>,
-        >>(
-            &mut renderer,
-            // FIXME: For a flicker free operation we should return the actual elements for this output..
-            // Instead we just use black to "simulate" a modeset :)
-            &DrmOutputRenderElements::default(),
-        );
+        let _ =
+            device
+                .drm_output_manager
+                .lock()
+                .try_to_restore_modifiers::<_, OutputRenderElements<
+                    UdevRenderer<'_>,
+                    AnimatedWindowRenderElement<UdevRenderer<'_>>,
+                >>(
+                    &mut renderer,
+                    // FIXME: For a flicker free operation we should return the actual elements for this output..
+                    // Instead we just use black to "simulate" a modeset :)
+                    &DrmOutputRenderElements::default(),
+                );
     }
 
     fn device_changed(&mut self, node: DrmNode) {
@@ -1887,7 +1894,7 @@ fn capture_drm_frame<'a>(
         '_,
         smithay::backend::allocator::gbm::GbmBuffer,
         smithay::backend::drm::gbm::GbmFramebuffer,
-        OutputRenderElements<UdevRenderer<'a>, WindowRenderElement<UdevRenderer<'a>>>,
+        OutputRenderElements<UdevRenderer<'a>, AnimatedWindowRenderElement<UdevRenderer<'a>>>,
     >,
     size: Size<i32, Physical>,
     scale: Scale<f64>,

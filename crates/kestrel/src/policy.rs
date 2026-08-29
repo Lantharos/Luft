@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    time::{Duration, Instant},
+};
 
 use luft_config::{LuftConfig, load_config};
 use luft_ipc::{
@@ -8,7 +11,11 @@ use luft_ipc::{
 use smithay::{
     desktop::space::SpaceElement,
     output::Scale,
-    reexports::{wayland_protocols::xdg::shell::server::xdg_toplevel, wayland_server::Resource},
+    reexports::{
+        calloop::timer::{TimeoutAction, Timer},
+        wayland_protocols::xdg::shell::server::xdg_toplevel,
+        wayland_server::Resource,
+    },
     utils::{IsAlive, SERIAL_COUNTER},
     wayland::{
         compositor::with_states,
@@ -19,7 +26,10 @@ use smithay::{
 use tracing::warn;
 
 use crate::{
-    shell::WindowElement,
+    shell::{
+        WindowElement,
+        ssd::{WindowAnimation, WindowAnimationKind},
+    },
     state::{Backend, KestrelState},
 };
 
@@ -57,7 +67,7 @@ fn create_layout_from_config(config: LuftConfig) -> LayoutEngine {
 
 impl<BackendData: Backend> KestrelState<BackendData> {
     pub fn register_window(&mut self, window: WindowElement) {
-        let geometry = self.window_rect(&window);
+        let geometry = self.window_rect(&window).unwrap_or_else(Rect::zero);
         let mut info = WindowInfo::new(
             WindowId(0),
             self.layout.active_workspace().clone(),
@@ -88,7 +98,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let updates = self
             .windows
             .iter()
-            .map(|(id, window)| (*id, window.clone(), self.window_rect(window)))
+            .filter_map(|(id, window)| {
+                self.window_rect(window)
+                    .map(|geometry| (*id, window.clone(), geometry))
+            })
             .collect::<Vec<_>>();
         for (id, window, geometry) in updates {
             if let Some(mut info) = self.layout.window(id).cloned() {
@@ -268,11 +281,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .ok_or_else(|| format!("unknown window {}", id.0))?
             .workspace
             .clone();
-        if self
+        let was_hidden = self
             .layout
             .window(id)
-            .is_some_and(|window| window.state == WindowState::Hidden)
-        {
+            .is_some_and(|window| window.state == WindowState::Hidden);
+        if was_hidden {
             self.layout
                 .set_window_state(id, WindowState::Floating)
                 .map_err(|error| error.to_string())?;
@@ -283,6 +296,18 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .get(&id)
             .cloned()
             .ok_or_else(|| format!("unknown window {}", id.0))?;
+        if was_hidden {
+            self.reconcile_workspace();
+            if let Some(rect) = self.window_rect(&window) {
+                window.decoration_state().animation = Some(WindowAnimation {
+                    kind: WindowAnimationKind::Open,
+                    from: smithay_rect(rect),
+                    to: smithay_rect(rect),
+                    started_at: Instant::now(),
+                    duration: Duration::from_millis(170),
+                });
+            }
+        }
         self.space.raise_element(&window, true);
         if let Some(keyboard) = self.seat.get_keyboard() {
             keyboard.set_focus(self, Some(window.into()), SERIAL_COUNTER.next_serial());
@@ -291,23 +316,80 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 
     fn close_window(&mut self, id: WindowId) -> Result<(), String> {
-        let window = self
-            .windows
-            .get(&id)
-            .ok_or_else(|| format!("unknown window {}", id.0))?;
-        let toplevel = window
-            .0
-            .toplevel()
-            .ok_or_else(|| "window is not an xdg toplevel".to_string())?;
-        toplevel.send_close();
-        Ok(())
+        self.animate_close_window(id)
     }
 
     pub(crate) fn minimize_window(&mut self, id: WindowId) -> Result<(), String> {
-        self.layout
-            .set_window_state(id, WindowState::Hidden)
+        let window = self
+            .windows
+            .get(&id)
+            .cloned()
+            .ok_or_else(|| format!("unknown window {}", id.0))?;
+        let rect = self
+            .window_rect(&window)
+            .ok_or_else(|| "window is not mapped".to_string())?;
+        window.decoration_state().animation = Some(WindowAnimation {
+            kind: WindowAnimationKind::Minimize,
+            from: smithay_rect(rect),
+            to: smithay_rect(rect),
+            started_at: Instant::now(),
+            duration: Duration::from_millis(180),
+        });
+        self.handle
+            .insert_source(
+                Timer::from_duration(Duration::from_millis(180)),
+                move |_, _, state| {
+                    if state.windows.get(&id).is_some_and(|window| {
+                        window
+                            .decoration_state()
+                            .animation
+                            .is_some_and(|animation| {
+                                animation.kind == WindowAnimationKind::Minimize
+                            })
+                    }) {
+                        let _ = state.layout.set_window_state(id, WindowState::Hidden);
+                        state.reconcile_workspace();
+                    }
+                    TimeoutAction::Drop
+                },
+            )
             .map_err(|error| error.to_string())?;
-        self.reconcile_workspace();
+        Ok(())
+    }
+
+    pub(crate) fn animate_close_window(&mut self, id: WindowId) -> Result<(), String> {
+        let window = self
+            .windows
+            .get(&id)
+            .cloned()
+            .ok_or_else(|| format!("unknown window {}", id.0))?;
+        let rect = self
+            .window_rect(&window)
+            .ok_or_else(|| "window is not mapped".to_string())?;
+        window.decoration_state().animation = Some(WindowAnimation {
+            kind: WindowAnimationKind::Close,
+            from: smithay_rect(rect),
+            to: smithay_rect(rect),
+            started_at: Instant::now(),
+            duration: Duration::from_millis(220),
+        });
+        self.handle
+            .insert_source(
+                Timer::from_duration(Duration::from_millis(220)),
+                move |_, _, state| {
+                    if let Some(window) = state.windows.get(&id)
+                        && window
+                            .decoration_state()
+                            .animation
+                            .is_some_and(|animation| animation.kind == WindowAnimationKind::Close)
+                        && let Some(toplevel) = window.0.toplevel()
+                    {
+                        toplevel.send_close();
+                    }
+                    TimeoutAction::Drop
+                },
+            )
+            .map_err(|error| error.to_string())?;
         Ok(())
     }
 
@@ -392,10 +474,15 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         Ok(())
     }
 
-    fn window_rect(&self, window: &WindowElement) -> Rect {
+    fn window_rect(&self, window: &WindowElement) -> Option<Rect> {
         let geometry = window.geometry();
-        let location = self.space.element_location(window).unwrap_or_default();
-        Rect::new(location.x, location.y, geometry.size.w, geometry.size.h)
+        let location = self.space.element_location(window)?;
+        Some(Rect::new(
+            location.x,
+            location.y,
+            geometry.size.w,
+            geometry.size.h,
+        ))
     }
 
     fn update_window_info(&self, window: &WindowElement, info: &mut WindowInfo) {
@@ -414,6 +501,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .and_then(|client| client.get_credentials(&self.display_handle).ok())
             .and_then(|credentials| credentials.pid.try_into().ok());
     }
+}
+
+fn smithay_rect(rect: Rect) -> smithay::utils::Rectangle<i32, smithay::utils::Logical> {
+    smithay::utils::Rectangle::new((rect.x, rect.y).into(), (rect.width, rect.height).into())
 }
 
 fn ipc_error(error: impl ToString) -> IpcResponse {

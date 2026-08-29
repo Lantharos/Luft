@@ -12,7 +12,7 @@ use smithay::{
         self, Axis, AxisSource, Device, DeviceCapability, Event, InputBackend, InputEvent,
         InputTime, KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent, TouchEvent,
     },
-    desktop::{WindowSurfaceType, layer_map_for_output},
+    desktop::{LayerMap, LayerSurface, WindowSurfaceType, layer_map_for_output},
     input::{
         keyboard::{FilterResult, Keysym, ModifiersState, keysyms as xkb},
         pointer::{AxisFrame, ButtonEvent, MotionEvent},
@@ -282,11 +282,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 }
 
                 let layers = layer_map_for_output(output);
-                if let Some(layer) = layers
-                    .layer_under(WlrLayer::Overlay, location - output_geo.loc.to_f64())
-                    .or_else(|| {
-                        layers.layer_under(WlrLayer::Top, location - output_geo.loc.to_f64())
-                    })
+                let layer_location = location - output_geo.loc.to_f64();
+                if let Some(layer) = panel_layer_under(&layers, layer_location)
+                    .or_else(|| layers.layer_under(WlrLayer::Overlay, layer_location))
+                    .or_else(|| layers.layer_under(WlrLayer::Top, layer_location))
                     && layer.can_receive_keyboard_focus()
                     && let Some((_, _)) = layer.surface_under(
                         location
@@ -369,8 +368,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .and_then(|w| w.surface_under(pos - output_geo.loc.to_f64(), WindowSurfaceType::ALL))
         {
             under = Some((surface, loc + output_geo.loc));
-        } else if let Some(focus) = layers
-            .layer_under(WlrLayer::Overlay, pos - output_geo.loc.to_f64())
+        } else if let Some(focus) = panel_layer_under(&layers, pos - output_geo.loc.to_f64())
+            .or_else(|| layers.layer_under(WlrLayer::Overlay, pos - output_geo.loc.to_f64()))
             .or_else(|| layers.layer_under(WlrLayer::Top, pos - output_geo.loc.to_f64()))
             .and_then(|layer| {
                 let layer_loc = layers.layer_geometry(layer).unwrap().loc;
@@ -578,6 +577,20 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             }
         }
     }
+}
+
+fn panel_layer_under(layers: &LayerMap, position: Point<f64, Logical>) -> Option<&LayerSurface> {
+    layers
+        .layers_on(WlrLayer::Top)
+        .find(|layer| layer.namespace() == "luft-panel")
+        .filter(|layer| {
+            let Some(geometry) = layers.layer_geometry(layer) else {
+                return false;
+            };
+            layer
+                .surface_under(position - geometry.loc.to_f64(), WindowSurfaceType::ALL)
+                .is_some()
+        })
 }
 
 #[cfg(feature = "nested")]

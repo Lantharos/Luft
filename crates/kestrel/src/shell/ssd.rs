@@ -1,4 +1,7 @@
-use std::cell::{RefCell, RefMut};
+use std::{
+    cell::{RefCell, RefMut},
+    time::{Duration, Instant},
+};
 
 use smithay::{
     backend::{
@@ -24,7 +27,46 @@ use super::WindowElement;
 
 pub struct WindowState {
     pub is_ssd: bool,
+    pub maximized: bool,
+    pub fullscreen: bool,
+    pub pending_initial_center: bool,
+    pub floating_geometry: Option<Rectangle<i32, Logical>>,
+    pub animation: Option<WindowAnimation>,
     pub header_bar: HeaderBar,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WindowAnimationKind {
+    Open,
+    Minimize,
+    Maximize,
+    Unmaximize,
+    Close,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct WindowAnimation {
+    pub kind: WindowAnimationKind,
+    pub from: Rectangle<i32, Logical>,
+    pub to: Rectangle<i32, Logical>,
+    pub started_at: Instant,
+    pub duration: Duration,
+}
+
+impl WindowAnimation {
+    pub fn progress(self, now: Instant) -> f64 {
+        let linear = (now.saturating_duration_since(self.started_at).as_secs_f64()
+            / self.duration.as_secs_f64())
+        .clamp(0.0, 1.0);
+        match self.kind {
+            WindowAnimationKind::Close | WindowAnimationKind::Minimize => linear * linear * linear,
+            _ => 1.0 - (1.0 - linear).powi(4),
+        }
+    }
+
+    pub fn complete(self, now: Instant) -> bool {
+        now.saturating_duration_since(self.started_at) >= self.duration
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,16 +81,17 @@ pub struct HeaderBar {
     pointer_loc: Option<Point<f64, Logical>>,
     width: u32,
     hovered_button: Option<HeaderButton>,
+    corner_radius: f32,
     buffer: MemoryRenderBuffer,
 }
 
 pub const HEADER_BAR_HEIGHT: i32 = 40;
 pub const WINDOW_CORNER_RADIUS: f64 = 14.0;
 
-const BUTTON_SLOT_WIDTH: u32 = 36;
+const BUTTON_SLOT_WIDTH: u32 = 28;
 const BUTTON_COUNT: u32 = 3;
-const BUTTONS_RIGHT_PADDING: u32 = 6;
-const BUTTON_RADIUS: f32 = 6.5;
+const BUTTONS_RIGHT_PADDING: u32 = 10;
+const BUTTON_RADIUS: f32 = 8.0;
 
 impl HeaderBar {
     pub fn pointer_enter(&mut self, loc: Point<f64, Logical>) {
@@ -124,7 +167,13 @@ impl HeaderBar {
             .iter()
             .find_map(|(id, candidate)| (candidate == window).then_some(*id));
         match button {
-            HeaderButton::Close => toplevel.send_close(),
+            HeaderButton::Close => {
+                if let Some(id) = window_id {
+                    let _ = state.animate_close_window(id);
+                } else {
+                    toplevel.send_close();
+                }
+            }
             HeaderButton::Maximize => {
                 if let Some(id) = window_id {
                     let _ = state.toggle_maximize(id);
@@ -157,26 +206,30 @@ impl HeaderBar {
         }
     }
 
-    pub fn redraw(&mut self, width: u32) {
+    pub fn redraw(&mut self, width: u32, corner_radius: f32) {
         if width == 0 {
             self.width = 0;
             return;
         }
 
         let hovered_button = self.button_at_pointer();
-        if self.width == width && self.hovered_button == hovered_button {
+        if self.width == width
+            && self.hovered_button == hovered_button
+            && (self.corner_radius - corner_radius).abs() < 0.1
+        {
             return;
         }
 
         self.width = width;
         self.hovered_button = self.button_at_pointer();
+        self.corner_radius = corner_radius;
         let hovered_button = self.hovered_button;
         let mut context = self.buffer.render();
         context.resize((width as i32, HEADER_BAR_HEIGHT));
         context.update_opaque_regions(None);
         context
             .draw(|pixels| {
-                draw_header(pixels, width, hovered_button);
+                draw_header(pixels, width, hovered_button, corner_radius);
                 Result::<_, std::convert::Infallible>::Ok(vec![Rectangle::from_size(
                     (width as i32, HEADER_BAR_HEIGHT).into(),
                 )])
@@ -215,10 +268,16 @@ where
     }
 }
 
-fn draw_header(pixels: &mut [u8], width: u32, hovered_button: Option<HeaderButton>) {
+fn draw_header(
+    pixels: &mut [u8],
+    width: u32,
+    hovered_button: Option<HeaderButton>,
+    corner_radius: f32,
+) {
     for y in 0..HEADER_BAR_HEIGHT as u32 {
         for x in 0..width {
-            let coverage = top_rounded_coverage(x as f32 + 0.5, y as f32 + 0.5, width as f32);
+            let coverage =
+                top_rounded_coverage(x as f32 + 0.5, y as f32 + 0.5, width as f32, corner_radius);
             let mut color = [0.105, 0.102, 0.095, 0.76 * coverage];
             if y == HEADER_BAR_HEIGHT as u32 - 1 {
                 color = over([1.0, 1.0, 1.0, 0.10 * coverage], color);
@@ -272,8 +331,10 @@ fn draw_header(pixels: &mut [u8], width: u32, hovered_button: Option<HeaderButto
     }
 }
 
-fn top_rounded_coverage(x: f32, y: f32, width: f32) -> f32 {
-    let radius = WINDOW_CORNER_RADIUS as f32;
+fn top_rounded_coverage(x: f32, y: f32, width: f32, radius: f32) -> f32 {
+    if radius <= 0.0 {
+        return 1.0;
+    }
     let center_x = if x < radius {
         radius
     } else if x > width - radius {
@@ -332,10 +393,16 @@ impl WindowElement {
         self.user_data().insert_if_missing(|| {
             RefCell::new(WindowState {
                 is_ssd: true,
+                maximized: false,
+                fullscreen: false,
+                pending_initial_center: false,
+                floating_geometry: None,
+                animation: None,
                 header_bar: HeaderBar {
                     pointer_loc: None,
                     width: 0,
                     hovered_button: None,
+                    corner_radius: WINDOW_CORNER_RADIUS as f32,
                     buffer: MemoryRenderBuffer::new(
                         Fourcc::Argb8888,
                         (1, HEADER_BAR_HEIGHT),

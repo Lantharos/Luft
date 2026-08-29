@@ -18,10 +18,6 @@
   contain: layout paint style;
 }
 
-#app.is-surface-closing[data-surface="start-menu"] .shell-start-menu {
-  pointer-events: none;
-}
-
 .start-menu-top {
   display: flex;
   align-items: center;

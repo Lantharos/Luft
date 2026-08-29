@@ -109,10 +109,6 @@ impl WebSurface {
             return;
         }
         self.session_menu_qs_height = height;
-        self.shell_margin = self.base_shell_margin();
-        if self.kind == WebShellSurface::SessionMenu {
-            self.restart_for_geometry_change();
-        }
     }
 
     pub(crate) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, json: &str) {

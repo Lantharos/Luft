@@ -111,26 +111,7 @@ impl WebShell {
         if self.session_menu_visible {
             return;
         }
-        let snapshot =
-            super::model::WebShellSnapshot::from_shell(super::snapshot::WebShellSnapshotInput {
-                model: &self.model,
-                running_window_order: &self.running_app_order,
-                status: &self.status,
-                tray: self.tray.snapshot(),
-                notifications: self.notifications.snapshot(),
-                panel_apps: &self.panel_apps,
-                panel_menu_command: self.panel_menu_command.as_deref(),
-                panel_menu_x: self.panel_menu_x,
-                applications: &self.applications,
-                palette: self.palette,
-                start_menu_open: self.start_menu_visible,
-                quick_settings_open: self.quick_visible,
-                date_center_open: self.date_visible,
-            });
-        let qs_height = super::surface_sizing::quick_settings_size(&snapshot).1;
         self.session_menu_visible = true;
-        self.session_menu_qs_height = Some(qs_height);
-        self.surfaces.set_session_menu_qs_height(Some(qs_height));
         self.sync_surfaces();
         self.surfaces.set_session_menu_visible(true);
     }
@@ -140,8 +121,6 @@ impl WebShell {
             return;
         }
         self.session_menu_visible = false;
-        self.session_menu_qs_height = None;
-        self.surfaces.set_session_menu_qs_height(None);
         self.sync_surfaces();
         self.surfaces.set_session_menu_visible(false);
     }

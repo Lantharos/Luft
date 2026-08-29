@@ -65,7 +65,6 @@ impl WebShell {
             panel_menu_command: None,
             panel_menu_x: None,
             session_menu_visible: false,
-            session_menu_qs_height: None,
             last_model_refresh: Instant::now(),
             last_status_refresh: Instant::now(),
             last_config_refresh: Instant::now(),

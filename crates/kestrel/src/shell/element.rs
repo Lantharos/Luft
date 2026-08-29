@@ -643,7 +643,11 @@ where
                     BlurElement::from_geometry(
                         header.id().clone(),
                         geometry,
-                        rounded_top_regions(geometry.size, scale, corner_radius),
+                        rounded_regions(
+                            geometry.size,
+                            scale,
+                            [corner_radius, corner_radius, 0.0, 0.0],
+                        ),
                     )
                     .into(),
                 ));
@@ -674,7 +678,12 @@ where
             if let Some(surface) = self.wl_surface()
                 && let Some(blur) = BlurElement::from_surface(&surface, location, scale)
             {
-                vec.push(WindowRenderElement::Blur(blur.into()));
+                let clip = rounded_regions(
+                    blur.geometry(scale).size,
+                    scale,
+                    [0.0, 0.0, corner_radius, corner_radius],
+                );
+                vec.push(WindowRenderElement::Blur(blur.clip_to(&clip).into()));
             }
             vec
         } else {
@@ -704,7 +713,8 @@ where
             if let Some(surface) = self.wl_surface()
                 && let Some(blur) = BlurElement::from_surface(&surface, location, scale)
             {
-                vec.push(WindowRenderElement::Blur(blur.into()));
+                let clip = rounded_regions(blur.geometry(scale).size, scale, [corner_radius; 4]);
+                vec.push(WindowRenderElement::Blur(blur.clip_to(&clip).into()));
             }
             vec
         };
@@ -789,32 +799,41 @@ fn lerp_i32(from: i32, to: i32, progress: f64) -> i32 {
     (from as f64 + (to - from) as f64 * progress).round() as i32
 }
 
-fn rounded_top_regions(
+fn rounded_regions(
     size: smithay::utils::Size<i32, Physical>,
     scale: Scale<f64>,
-    corner_radius: f64,
+    radii: [f64; 4],
 ) -> Vec<Rectangle<i32, Physical>> {
-    let radius = (corner_radius * scale.x).round() as i32;
-    if radius <= 0 {
-        return vec![Rectangle::from_size(size)];
-    }
-    let mut regions = Vec::with_capacity(radius.max(1) as usize + 1);
-    for y in 0..radius.min(size.h) {
-        let sample_y = y as f64 + 0.5;
-        let distance_y = radius as f64 - sample_y;
-        let inset = (radius as f64
-            - (radius as f64 * radius as f64 - distance_y * distance_y).sqrt())
-        .ceil() as i32;
-        let width = size.w - inset * 2;
+    let radii = radii.map(|radius| (radius * scale.x).round() as i32);
+    let top_rows = radii[0].max(radii[1]).clamp(0, size.h);
+    let bottom_rows = radii[2]
+        .max(radii[3])
+        .clamp(0, size.h.saturating_sub(top_rows));
+    let mut regions = Vec::with_capacity((top_rows + bottom_rows + 1) as usize);
+    for y in (0..top_rows).chain(size.h - bottom_rows..size.h) {
+        let from_top = y as f64 + 0.5;
+        let from_bottom = (size.h - y) as f64 - 0.5;
+        let left = corner_inset(radii[0], from_top).max(corner_inset(radii[3], from_bottom));
+        let right = corner_inset(radii[1], from_top).max(corner_inset(radii[2], from_bottom));
+        let width = size.w - left - right;
         if width > 0 {
-            regions.push(Rectangle::new((inset, y).into(), (width, 1).into()));
+            regions.push(Rectangle::new((left, y).into(), (width, 1).into()));
         }
     }
-    if size.h > radius {
+    let middle_height = size.h - top_rows - bottom_rows;
+    if middle_height > 0 {
         regions.push(Rectangle::new(
-            (0, radius).into(),
-            (size.w, size.h - radius).into(),
+            (0, top_rows).into(),
+            (size.w, middle_height).into(),
         ));
     }
     regions
+}
+
+fn corner_inset(radius: i32, distance_from_edge: f64) -> i32 {
+    if radius <= 0 || distance_from_edge >= radius as f64 {
+        return 0;
+    }
+    let distance = radius as f64 - distance_from_edge;
+    (radius as f64 - (radius as f64 * radius as f64 - distance * distance).sqrt()).ceil() as i32
 }

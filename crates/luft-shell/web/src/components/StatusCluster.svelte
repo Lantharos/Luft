@@ -7,9 +7,7 @@
 
   function toggleSettings(event: MouseEvent) {
     if ((event.target as Element).closest(".tray-item")) return;
-    sendAction({
-      type: snapshot.quickSettingsOpen ? "close-quick-settings" : "toggle-quick-settings",
-    });
+    sendAction({ type: "toggle-quick-settings" });
   }
 
   function activateTray(event: MouseEvent, index: number) {
@@ -26,9 +24,7 @@
   function keydown(event: KeyboardEvent) {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    sendAction({
-      type: snapshot.quickSettingsOpen ? "close-quick-settings" : "toggle-quick-settings",
-    });
+    sendAction({ type: "toggle-quick-settings" });
   }
 </script>
 

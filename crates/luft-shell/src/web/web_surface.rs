@@ -15,8 +15,12 @@ use std::{
     error::Error,
     path::PathBuf,
     sync::{Arc, Mutex, mpsc::Sender},
+    time::{Duration, Instant},
 };
 use tracing::{debug, warn};
+
+const VISIBILITY_ACK_TIMEOUT: Duration = Duration::from_millis(250);
+const VISIBILITY_RETRY_LIMIT: u8 = 3;
 
 pub struct WebSurface {
     kind: WebShellSurface,
@@ -29,6 +33,9 @@ pub struct WebSurface {
     session_menu_qs_height: Option<i32>,
     process: Option<SabineProcess>,
     visibility_request: Option<ShellSurfaceVisibilityRequest>,
+    visibility_requested_at: Option<Instant>,
+    visibility_attempts: u8,
+    mapped: Option<bool>,
     surface_alpha: f32,
     pub(crate) shell_margin: ShellSurfaceMargin,
     pending_snapshot: String,
@@ -56,6 +63,9 @@ impl WebSurface {
             session_menu_qs_height: config.session_menu_qs_height,
             process: None,
             visibility_request: None,
+            visibility_requested_at: None,
+            visibility_attempts: 0,
+            mapped: None,
             surface_alpha: if config.visible { 1.0 } else { 0.0 },
             shell_margin,
             pending_snapshot: initial,
@@ -74,9 +84,11 @@ impl WebSurface {
             if visible {
                 self.set_surface_alpha(alpha);
             }
+            self.ensure_visibility_request();
             return;
         }
         self.visible = visible;
+        self.visibility_attempts = 0;
         if visible {
             self.show_process(alpha);
         } else {
@@ -131,12 +143,16 @@ impl WebSurface {
         match window.launch() {
             Ok(process) => {
                 self.visibility_request = None;
+                self.visibility_requested_at = None;
+                self.visibility_attempts = 0;
+                self.mapped = None;
                 debug!(
                     pid = process.id(),
                     surface = self.kind.as_str(),
                     "launched Sabine shell surface"
                 );
                 self.process = Some(process);
+                let _ = self.request_visibility(self.visible);
             }
             Err(error) => {
                 warn!(%error, surface = self.kind.as_str(), "failed to launch Sabine shell surface");
@@ -162,6 +178,8 @@ impl WebSurface {
         if had_process && !restored {
             self.process = None;
             self.visibility_request = None;
+            self.visibility_requested_at = None;
+            self.mapped = None;
             self.rendered_snapshot.clear();
         }
         if self.process.is_none() {
@@ -177,6 +195,10 @@ impl WebSurface {
         self.set_surface_alpha(0.0);
         if !self.keep_alive_when_hidden {
             self.process = None;
+            self.visibility_request = None;
+            self.visibility_requested_at = None;
+            self.visibility_attempts = 0;
+            self.mapped = Some(false);
             self.rendered_snapshot.clear();
             return;
         }
@@ -185,6 +207,8 @@ impl WebSurface {
         }
         self.process = None;
         self.visibility_request = None;
+        self.visibility_requested_at = None;
+        self.mapped = None;
         self.rendered_snapshot.clear();
     }
 
@@ -194,27 +218,57 @@ impl WebSurface {
         }
         if self.process.take().is_some() {
             self.visibility_request = None;
+            self.visibility_requested_at = None;
+            self.mapped = None;
             self.rendered_snapshot.clear();
         }
     }
 
     pub(crate) fn tick_visibility(&mut self) {
-        let Some(request) = &self.visibility_request else {
+        let Some(request) = self.visibility_request.as_ref() else {
+            self.ensure_visibility_request();
             return;
         };
-        let state = request.state();
+        let (state, requested_visible, request_id) =
+            (request.state(), request.requested_visible(), request.id());
         if state == ShellSurfaceVisibilityState::Pending {
+            let timed_out = self
+                .visibility_requested_at
+                .is_some_and(|started| started.elapsed() >= VISIBILITY_ACK_TIMEOUT);
+            if !timed_out {
+                return;
+            }
+            if self.visibility_attempts < VISIBILITY_RETRY_LIMIT
+                && self.request_visibility(self.visible)
+            {
+                warn!(
+                    surface = self.kind.as_str(),
+                    request_id,
+                    requested_visible,
+                    attempt = self.visibility_attempts,
+                    "retrying stalled Sabine shell visibility request"
+                );
+                return;
+            }
+            warn!(
+                surface = self.kind.as_str(),
+                request_id,
+                requested_visible,
+                "restarting shell surface after stalled visibility requests"
+            );
+            self.restart_process();
             return;
         }
-        let requested_visible = request.requested_visible();
-        let request_id = request.id();
         self.visibility_request = None;
+        self.visibility_requested_at = None;
         let completed = matches!(
             (requested_visible, state),
             (true, ShellSurfaceVisibilityState::Mapped)
                 | (false, ShellSurfaceVisibilityState::Unmapped)
         );
         if completed {
+            self.mapped = Some(requested_visible);
+            self.visibility_attempts = 0;
             debug!(
                 surface = self.kind.as_str(),
                 request_id,
@@ -222,6 +276,7 @@ impl WebSurface {
                 ?state,
                 "Sabine shell visibility request completed"
             );
+            self.ensure_visibility_request();
             return;
         }
         warn!(
@@ -230,11 +285,7 @@ impl WebSurface {
             ?state,
             "Sabine shell visibility request failed"
         );
-        self.process = None;
-        self.rendered_snapshot.clear();
-        if self.visible || self.keep_alive_when_hidden {
-            self.launch();
-        }
+        self.restart_process();
     }
 
     pub(crate) fn set_surface_alpha(&mut self, alpha: f32) {
@@ -371,6 +422,9 @@ impl WebSurface {
         }
         self.process = None;
         self.visibility_request = None;
+        self.visibility_requested_at = None;
+        self.visibility_attempts = 0;
+        self.mapped = None;
         self.rendered_snapshot.clear();
         self.launch();
         if !self.visible {
@@ -388,11 +442,44 @@ impl WebSurface {
         };
         let request_id = request.id();
         self.visibility_request = Some(request);
+        self.visibility_requested_at = Some(Instant::now());
+        self.visibility_attempts = self.visibility_attempts.saturating_add(1);
         debug!(
             surface = self.kind.as_str(),
-            request_id, visible, "queued Sabine shell visibility request"
+            request_id,
+            visible,
+            attempt = self.visibility_attempts,
+            "queued Sabine shell visibility request"
         );
         true
+    }
+
+    fn ensure_visibility_request(&mut self) {
+        if self.process.is_none() || self.mapped == Some(self.visible) {
+            return;
+        }
+        if self
+            .visibility_request
+            .as_ref()
+            .is_some_and(|request| request.requested_visible() == self.visible)
+        {
+            return;
+        }
+        if !self.request_visibility(self.visible) {
+            self.restart_process();
+        }
+    }
+
+    fn restart_process(&mut self) {
+        self.process = None;
+        self.visibility_request = None;
+        self.visibility_requested_at = None;
+        self.visibility_attempts = 0;
+        self.mapped = None;
+        self.rendered_snapshot.clear();
+        if self.visible || self.keep_alive_when_hidden {
+            self.launch();
+        }
     }
 }
 

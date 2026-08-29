@@ -115,7 +115,12 @@ impl HeaderBar {
         }
 
         match self.button_at_pointer() {
-            Some(button) => self.activate(button, state, window),
+            Some(button) => {
+                let window = window.clone();
+                state
+                    .handle
+                    .insert_idle(move |state| Self::activate(button, state, &window));
+            }
             None if self.pointer_loc.is_some() => {
                 let WindowSurface::Wayland(toplevel) = window.0.underlying_surface();
                 let seat = seat.clone();
@@ -151,12 +156,14 @@ impl HeaderBar {
         window: &WindowElement,
     ) {
         if let Some(button) = self.button_at_pointer() {
-            self.activate(button, state, window);
+            let window = window.clone();
+            state
+                .handle
+                .insert_idle(move |state| Self::activate(button, state, &window));
         }
     }
 
     fn activate<BackendData: Backend>(
-        &self,
         button: HeaderButton,
         state: &mut KestrelState<BackendData>,
         window: &WindowElement,

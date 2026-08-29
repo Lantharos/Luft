@@ -44,11 +44,13 @@ use crate::{
 
 mod element;
 mod grabs;
+mod rounded;
 pub(crate) mod ssd;
 mod xdg;
 
 pub use self::element::*;
 pub use self::grabs::*;
+pub use self::rounded::*;
 
 fn fullscreen_output_geometry(
     wl_surface: &WlSurface,

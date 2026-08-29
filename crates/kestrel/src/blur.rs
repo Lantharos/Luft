@@ -231,6 +231,20 @@ where
 }
 
 impl BlurElement {
+    pub fn from_geometry(
+        id: Id,
+        geometry: Rectangle<i32, Physical>,
+        regions: Vec<Rectangle<i32, Physical>>,
+    ) -> Self {
+        Self {
+            id: id.namespaced(0x53_53_44_42),
+            commit: CommitCounter::default(),
+            geometry,
+            regions,
+            alpha: 1.0,
+        }
+    }
+
     pub fn from_surface(
         surface: &WlSurface,
         location: Point<i32, Physical>,

@@ -167,6 +167,16 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
     }
 
     fn commit(&mut self, surface: &WlSurface) {
+        let unmaps_surface = with_states(surface, |states| {
+            matches!(
+                states
+                    .cached_state
+                    .get::<SurfaceAttributes>()
+                    .current()
+                    .buffer,
+                Some(BufferAssignment::Removed)
+            )
+        });
         on_commit_buffer_handler::<Self>(surface);
         self.backend_data.early_import(surface);
         self.refresh_idle_inhibition();
@@ -236,7 +246,9 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
             });
         }
 
-        ensure_initial_configure(surface, &self.space, &mut self.popups)
+        if !unmaps_surface {
+            ensure_initial_configure(surface, &self.space, &mut self.popups);
+        }
     }
 }
 

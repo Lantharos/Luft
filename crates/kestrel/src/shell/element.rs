@@ -703,34 +703,15 @@ where
             }
             vec
         } else {
-            let window_geo = SpaceElement::geometry(&self.0);
-            let clip_geometry = Rectangle::new(
-                location.to_f64().to_logical(scale),
-                window_geo.size.to_f64(),
-            );
-            let program = R::rounded_program(renderer).ok();
             let mut vec =
                 AsRenderElements::render_elements(&self.0, renderer, location, scale, alpha)
                     .into_iter()
-                    .map(|element| {
-                        if let Some(program) = &program {
-                            WindowRenderElement::Rounded(RoundedSurfaceRenderElement::new(
-                                element,
-                                program.clone(),
-                                clip_geometry,
-                                [corner_radius as f32; 4],
-                                scale,
-                            ))
-                        } else {
-                            WindowRenderElement::Window(element)
-                        }
-                    })
+                    .map(WindowRenderElement::Window)
                     .collect::<Vec<_>>();
             if let Some(surface) = self.wl_surface()
                 && let Some(blur) = BlurElement::from_surface(&surface, location, scale)
             {
-                let clip = rounded_regions(blur.geometry(scale).size, scale, [corner_radius; 4]);
-                vec.push(WindowRenderElement::Blur(blur.clip_to(&clip).into()));
+                vec.push(WindowRenderElement::Blur(blur.into()));
             }
             vec
         };

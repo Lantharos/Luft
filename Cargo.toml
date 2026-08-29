@@ -22,8 +22,8 @@ glam = "0.33.2"
 input = "0.10.0"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
-smithay = { git = "https://github.com/krissedout/smithay.git", rev = "bdf4ad6d3282bda9e64c594386d27459700e694e", default-features = false, features = ["desktop", "wayland_frontend"] }
-smithay-drm-extras = { git = "https://github.com/krissedout/smithay.git", rev = "bdf4ad6d3282bda9e64c594386d27459700e694e" }
+smithay = { git = "https://github.com/krissedout/smithay.git", rev = "f813370612e30c1be42bbd1f99018b892e6de462", default-features = false, features = ["desktop", "wayland_frontend"] }
+smithay-drm-extras = { git = "https://github.com/krissedout/smithay.git", rev = "f813370612e30c1be42bbd1f99018b892e6de462" }
 thiserror = "2.0.19"
 toml = "1.1.4"
 tracing = "0.1.44"

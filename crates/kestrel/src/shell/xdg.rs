@@ -374,6 +374,15 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
         }
     }
 
+    fn minimize_request(&mut self, surface: ToplevelSurface) {
+        let id = self.windows.iter().find_map(|(id, window)| {
+            (window.wl_surface().as_deref() == Some(surface.wl_surface())).then_some(*id)
+        });
+        if let Some(id) = id {
+            let _ = self.minimize_window(id);
+        }
+    }
+
     fn maximize_request(&mut self, surface: ToplevelSurface) {
         let window = self.window_for_surface(surface.wl_surface()).unwrap();
         let outputs_for_window = self.space.outputs_for_element(&window);
@@ -407,7 +416,12 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
 
         surface.with_pending_state(|state| {
             state.states.set(xdg_toplevel::State::Maximized);
-            state.size = Some((geometry.size.w, geometry.size.h - HEADER_BAR_HEIGHT).into());
+            let header_height = if window.decoration_state().is_ssd {
+                HEADER_BAR_HEIGHT
+            } else {
+                0
+            };
+            state.size = Some((geometry.size.w, geometry.size.h - header_height).into());
         });
         self.space.map_element(window, geometry.loc, true);
         if let Some(id) = self.windows.iter().find_map(|(id, candidate)| {
@@ -450,7 +464,12 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
         }
         surface.with_pending_state(|state| {
             state.states.unset(xdg_toplevel::State::Maximized);
-            state.size = Some((target.size.w, target.size.h - HEADER_BAR_HEIGHT).into());
+            let header_height = if window.decoration_state().is_ssd {
+                HEADER_BAR_HEIGHT
+            } else {
+                0
+            };
+            state.size = Some((target.size.w, target.size.h - header_height).into());
         });
         self.space.map_element(window, target.loc, true);
         if let Some(id) = self.windows.iter().find_map(|(id, candidate)| {

@@ -30,6 +30,9 @@ pub enum WebShellAction {
     WindowMinimize {
         window: u64,
     },
+    WindowToggleMaximize {
+        window: u64,
+    },
     WindowMove {
         window: u64,
         workspace: String,

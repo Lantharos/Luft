@@ -1,5 +1,8 @@
 use super::{WebShell, actions::window_id};
-use crate::ipc::{activate_window, close_window, minimize_window, switch_relative_workspace};
+use crate::ipc::{
+    activate_window, close_window, minimize_window, switch_relative_workspace,
+    toggle_maximize_window,
+};
 
 impl WebShell {
     pub(super) fn new_workspace_from_start_menu(&mut self) {
@@ -33,6 +36,11 @@ impl WebShell {
 
     pub(super) fn minimize_task_window(&mut self, window: u64) {
         self.apply_model_result(minimize_window(window_id(window)));
+        self.close_panel_menu();
+    }
+
+    pub(super) fn toggle_maximize_task_window(&mut self, window: u64) {
+        self.apply_model_result(toggle_maximize_window(window_id(window)));
         self.close_panel_menu();
     }
 }

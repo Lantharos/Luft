@@ -27,7 +27,7 @@ impl PortalSettings {
         let mut wm_preferences = HashMap::new();
         wm_preferences.insert(
             "button-layout".to_string(),
-            Value::from(":minimize,:maximize,:close")
+            Value::from(":minimize,maximize,close")
                 .try_into()
                 .expect("portal string value"),
         );
@@ -35,7 +35,7 @@ impl PortalSettings {
         let mut interface = HashMap::new();
         interface.insert(
             "gtk-decoration-layout".to_string(),
-            Value::from(":minimize,:maximize,:close")
+            Value::from(":minimize,maximize,close")
                 .try_into()
                 .expect("portal string value"),
         );

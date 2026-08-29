@@ -9,6 +9,8 @@ pub(crate) const NOTIFICATION_TOAST_ACTION_HEIGHT: i32 = 140;
 pub(crate) const DOCK_MENU_WIDTH: i32 = 184;
 pub(crate) const SESSION_MENU_WIDTH: i32 = 188;
 pub(crate) const SESSION_MENU_HEIGHT: i32 = 172;
+pub(crate) const SESSION_MENU_RIGHT_MARGIN: i32 = 16;
+pub(crate) const SESSION_MENU_TOP_OFFSET: i32 = 60;
 pub(crate) const DATE_CENTER_WIDTH: i32 = 360;
 const DATE_CENTER_COMPACT_HEIGHT: i32 = 560;
 const DATE_CENTER_VERTICAL_MARGIN: i32 = 80;
@@ -24,7 +26,10 @@ pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
     if sliders > 0 {
         height += 13 + sliders * 58 + (sliders - 1) * 10;
     }
-    (QUICK_SETTINGS_WIDTH, height)
+    (
+        QUICK_SETTINGS_WIDTH,
+        height.max(SESSION_MENU_TOP_OFFSET + SESSION_MENU_HEIGHT),
+    )
 }
 
 pub(crate) fn session_menu_size() -> (i32, i32) {

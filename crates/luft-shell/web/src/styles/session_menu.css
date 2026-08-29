@@ -26,6 +26,7 @@
 
 #app.is-surface-closing[data-surface="session-menu"] .session-menu {
   pointer-events: none;
+  animation: session-menu-out 140ms var(--ease-shell) both;
 }
 
 .session-menu-item {
@@ -68,10 +69,21 @@
 @keyframes session-menu-in {
   from {
     opacity: 0;
-    transform: translate3d(8px, -6px, 0) scale(0.96);
+    transform: translate3d(0, -6px, 0) scale(0.94);
   }
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes session-menu-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0) scale(0.97);
   }
 }

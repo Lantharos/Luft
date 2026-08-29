@@ -562,6 +562,64 @@ fn center_new_window<BackendData: Backend>(
 }
 
 impl<BackendData: Backend> KestrelState<BackendData> {
+    fn restore_maximized_window_for_move(
+        &mut self,
+        surface: &ToplevelSurface,
+        window: &WindowElement,
+        pointer_location: Point<f64, Logical>,
+    ) -> Option<Point<i32, Logical>> {
+        let maximized = surface
+            .with_pending_state(|state| state.states.contains(xdg_toplevel::State::Maximized));
+        if !maximized {
+            return None;
+        }
+
+        let current = Rectangle::new(self.space.element_location(window)?, window.geometry().size);
+        let saved = window
+            .decoration_state()
+            .floating_geometry
+            .unwrap_or(current);
+        let horizontal_anchor = ((pointer_location.x - current.loc.x as f64)
+            / current.size.w.max(1) as f64)
+            .clamp(0.0, 1.0);
+        let titlebar_anchor =
+            (pointer_location.y - current.loc.y as f64).clamp(0.0, (HEADER_BAR_HEIGHT - 1) as f64);
+        let target_location = Point::from((
+            (pointer_location.x - saved.size.w as f64 * horizontal_anchor).round() as i32,
+            (pointer_location.y - titlebar_anchor).round() as i32,
+        ));
+        let target = Rectangle::new(target_location, saved.size);
+
+        {
+            let mut decoration = window.decoration_state();
+            decoration.maximized = false;
+            decoration.floating_geometry = Some(target);
+            decoration.animation = Some(WindowAnimation {
+                kind: WindowAnimationKind::Unmaximize,
+                from: current,
+                to: target,
+                started_at: Instant::now(),
+                duration: Duration::from_millis(180),
+            });
+        }
+        surface.with_pending_state(|state| {
+            state.states.unset(xdg_toplevel::State::Maximized);
+            state.size = Some((target.size.w, target.size.h - HEADER_BAR_HEIGHT).into());
+        });
+        self.space.map_element(window.clone(), target.loc, true);
+        if let Some(id) = self
+            .windows
+            .iter()
+            .find_map(|(id, candidate)| (candidate == window).then_some(*id))
+        {
+            let _ = self
+                .layout
+                .set_window_state(id, luft_ipc::WindowState::Floating);
+        }
+        surface.send_configure();
+        Some(target.loc)
+    }
+
     pub fn move_request_xdg(
         &mut self,
         surface: &ToplevelSurface,
@@ -591,33 +649,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 return;
             }
 
-            let mut initial_window_location = self.space.element_location(&window).unwrap();
-
-            // If surface is maximized then unmaximize it
-            let changed = surface.with_pending_state(|state| {
-                if state.states.unset(xdg_toplevel::State::Maximized) {
-                    state.size = None;
-                    true
-                } else {
-                    false
-                }
-            });
-            if changed {
-                surface.send_configure();
-
-                // NOTE: In real compositor mouse location should be mapped to a new window size
-                // For example, you could:
-                // 1) transform mouse pointer position from compositor space to window space (location relative)
-                // 2) divide the x coordinate by width of the window to get the percentage
-                //   - 0.0 would be on the far left of the window
-                //   - 0.5 would be in middle of the window
-                //   - 1.0 would be on the far right of the window
-                // 3) multiply the percentage by new window width
-                // 4) by doing that, drag will look a lot more natural
-                //
-                // but for kestrel needs setting location to pointer location is fine
-                initial_window_location = start_data.location.to_i32_round();
-            }
+            let initial_window_location = self
+                .restore_maximized_window_for_move(surface, &window, start_data.location)
+                .unwrap_or_else(|| self.space.element_location(&window).unwrap());
 
             let grab = TouchMoveSurfaceGrab {
                 start_data,
@@ -656,34 +690,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             return;
         }
 
-        let mut initial_window_location = self.space.element_location(&window).unwrap();
-
-        // If surface is maximized then unmaximize it
-        let changed = surface.with_pending_state(|state| {
-            if state.states.unset(xdg_toplevel::State::Maximized) {
-                state.size = None;
-                true
-            } else {
-                false
-            }
-        });
-        if changed {
-            surface.send_configure();
-
-            // NOTE: In real compositor mouse location should be mapped to a new window size
-            // For example, you could:
-            // 1) transform mouse pointer position from compositor space to window space (location relative)
-            // 2) divide the x coordinate by width of the window to get the percentage
-            //   - 0.0 would be on the far left of the window
-            //   - 0.5 would be in middle of the window
-            //   - 1.0 would be on the far right of the window
-            // 3) multiply the percentage by new window width
-            // 4) by doing that, drag will look a lot more natural
-            //
-            // but for kestrel needs setting location to pointer location is fine
-            let pos = pointer.current_location();
-            initial_window_location = (pos.x as i32, pos.y as i32).into();
-        }
+        let initial_window_location = self
+            .restore_maximized_window_for_move(surface, &window, pointer.current_location())
+            .unwrap_or_else(|| self.space.element_location(&window).unwrap());
 
         let grab = PointerMoveSurfaceGrab {
             start_data,

@@ -23,20 +23,26 @@
     reorderable?: boolean;
   } = $props();
 
-  let launchRaised = $state(false);
-  let jumping = $state(false);
-  let settling = $state(false);
-  let hovered = $state(false);
+  let hovered = false;
   let dragging = $state(false);
   let suppressClick = false;
   let reorderPointerId: number | undefined;
   let reorderStartX = 0;
   let reorderStartY = 0;
-  let launchFrame: number | undefined;
-  let launchTimer: ReturnType<typeof setTimeout> | undefined;
-  let settleTimer: ReturnType<typeof setTimeout> | undefined;
-  const jumpDuration = 320;
-  const settleDuration = 90;
+  let motionFrame: number | undefined;
+  let motionCleanupFrame: number | undefined;
+  let jumpHoldTimer: ReturnType<typeof setTimeout> | undefined;
+  let motionElement: HTMLElement | undefined;
+  let motionButton: HTMLElement | undefined;
+  let motionY = 0;
+  let motionVelocity = 0;
+  let motionTime = 0;
+  let jumpOffset = 0;
+
+  const hoverLift = -5;
+  const jumpLift = -11;
+  const springStiffness = 155;
+  const springDamping = 19;
 
   const className = "panel-app app-button";
 
@@ -53,34 +59,16 @@
       suppressClick = false;
       return;
     }
-    hovered = (event.currentTarget as HTMLElement).matches(":hover");
-    launchRaised = hovered;
-    jumping = false;
-    settling = false;
-    if (launchFrame !== undefined) {
-      cancelAnimationFrame(launchFrame);
-    }
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-    }
-    launchFrame = requestAnimationFrame(() => {
-      launchFrame = undefined;
-      jumping = true;
-    });
-    if (launchTimer) {
-      clearTimeout(launchTimer);
-    }
-    launchTimer = setTimeout(() => {
-      const shouldSettle = launchRaised && !hovered;
-      jumping = false;
-      launchRaised = false;
-      if (shouldSettle) {
-        settling = true;
-        settleTimer = setTimeout(() => {
-          settling = false;
-        }, settleDuration);
-      }
-    }, jumpDuration);
+    const button = event.currentTarget as HTMLElement;
+    hovered = button.matches(":hover");
+    beginIconMotion(button);
+    jumpOffset = jumpLift;
+    if (jumpHoldTimer) clearTimeout(jumpHoldTimer);
+    jumpHoldTimer = setTimeout(() => {
+      jumpOffset = 0;
+      scheduleMotionFrame();
+    }, 190);
+    scheduleMotionFrame();
     onlaunch(app);
   }
 
@@ -92,16 +80,80 @@
 
   function pointerEnter() {
     hovered = true;
-    if (settling) {
-      settling = false;
-    }
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-    }
+    if (motionElement) scheduleMotionFrame();
   }
 
   function pointerLeave() {
     hovered = false;
+    if (motionElement) scheduleMotionFrame();
+  }
+
+  function beginIconMotion(button: HTMLElement) {
+    const icon = button.querySelector<HTMLElement>(".app-icon");
+    if (!icon) return;
+    if (motionElement !== icon) {
+      stopIconMotion();
+      motionElement = icon;
+      motionButton = button;
+      motionY = new DOMMatrixReadOnly(getComputedStyle(icon).transform).m42;
+      motionVelocity = 0;
+    }
+    button.classList.add("is-motion-controlled");
+    icon.style.transform = `translate3d(0, ${motionY}px, 0)`;
+  }
+
+  function scheduleMotionFrame() {
+    if (!motionElement || motionFrame !== undefined) return;
+    if (motionCleanupFrame !== undefined) {
+      cancelAnimationFrame(motionCleanupFrame);
+      motionCleanupFrame = undefined;
+    }
+    if (motionTime === 0) motionTime = performance.now();
+    motionFrame = requestAnimationFrame(stepIconMotion);
+  }
+
+  function stepIconMotion(now: number) {
+    motionFrame = undefined;
+    if (!motionElement) return;
+    const elapsed = Math.min((now - motionTime) / 1000, 1 / 30);
+    motionTime = now;
+    const target = (hovered ? hoverLift : 0) + jumpOffset;
+    const acceleration =
+      springStiffness * (target - motionY) - springDamping * motionVelocity;
+    motionVelocity += acceleration * elapsed;
+    motionY += motionVelocity * elapsed;
+    motionElement.style.transform = `translate3d(0, ${motionY}px, 0)`;
+
+    if (jumpOffset === 0 && Math.abs(target - motionY) < 0.02 && Math.abs(motionVelocity) < 0.05) {
+      motionY = target;
+      motionElement.style.transform = `translate3d(0, ${target}px, 0)`;
+      const icon = motionElement;
+      const button = motionButton;
+      motionCleanupFrame = requestAnimationFrame(() => {
+        icon.style.removeProperty("transform");
+        button?.classList.remove("is-motion-controlled");
+        motionCleanupFrame = undefined;
+        if (motionElement === icon) {
+          motionElement = undefined;
+          motionButton = undefined;
+        }
+      });
+      motionTime = 0;
+      return;
+    }
+    scheduleMotionFrame();
+  }
+
+  function stopIconMotion() {
+    if (motionFrame !== undefined) cancelAnimationFrame(motionFrame);
+    if (motionCleanupFrame !== undefined) cancelAnimationFrame(motionCleanupFrame);
+    motionFrame = undefined;
+    motionCleanupFrame = undefined;
+    motionElement?.style.removeProperty("transform");
+    motionButton?.classList.remove("is-motion-controlled");
+    motionElement = undefined;
+    motionButton = undefined;
+    motionTime = 0;
   }
 
   function pointerDown(event: PointerEvent) {
@@ -171,15 +223,8 @@
   }
 
   onDestroy(() => {
-    if (launchFrame !== undefined) {
-      cancelAnimationFrame(launchFrame);
-    }
-    if (launchTimer) {
-      clearTimeout(launchTimer);
-    }
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-    }
+    if (jumpHoldTimer) clearTimeout(jumpHoldTimer);
+    stopIconMotion();
   });
 </script>
 
@@ -188,9 +233,6 @@
   class={className}
   class:is-active={app.active}
   class:is-running={app.running}
-  class:is-launching={jumping}
-  class:is-launch-raised={launchRaised}
-  class:is-launch-settling={settling}
   class:is-reordering={dragging}
   data-command={app.command}
   aria-label={app.label}

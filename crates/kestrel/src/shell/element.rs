@@ -45,7 +45,7 @@ use smithay::{
 
 use super::{
     RoundedRenderer, RoundedSurfaceRenderElement,
-    ssd::{HEADER_BAR_HEIGHT, WINDOW_CORNER_RADIUS, WindowAnimationKind},
+    ssd::{HEADER_BAR_HEIGHT, HeaderClick, WINDOW_CORNER_RADIUS, WindowAnimationKind},
 };
 use crate::{
     KestrelState,
@@ -212,9 +212,17 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for SSD {
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state
-                .header_bar
-                .clicked(seat, data, &self.0, event.serial, event.state);
+            state.header_bar.clicked(
+                seat,
+                data,
+                &self.0,
+                HeaderClick {
+                    serial: event.serial,
+                    time_micros: event.time.micros(),
+                    button: event.button,
+                    state: event.state,
+                },
+            );
         }
     }
     fn axis(
@@ -456,9 +464,17 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for SSD {
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state
-                .header_bar
-                .clicked(seat, data, &self.0, event.serial, event.state);
+            state.header_bar.clicked(
+                seat,
+                data,
+                &self.0,
+                HeaderClick {
+                    serial: event.serial,
+                    time_micros: event.time.micros(),
+                    button: event.button,
+                    state: event.state,
+                },
+            );
         }
     }
 

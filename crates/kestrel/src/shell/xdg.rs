@@ -562,7 +562,7 @@ fn center_new_window<BackendData: Backend>(
 }
 
 impl<BackendData: Backend> KestrelState<BackendData> {
-    fn restore_maximized_window_for_move(
+    pub(super) fn restore_maximized_window_for_move(
         &mut self,
         surface: &ToplevelSurface,
         window: &WindowElement,
@@ -690,14 +690,15 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             return;
         }
 
-        let initial_window_location = self
-            .restore_maximized_window_for_move(surface, &window, pointer.current_location())
-            .unwrap_or_else(|| self.space.element_location(&window).unwrap());
+        let restore_maximized = surface
+            .with_pending_state(|state| state.states.contains(xdg_toplevel::State::Maximized));
+        let initial_window_location = self.space.element_location(&window).unwrap();
 
         let grab = PointerMoveSurfaceGrab {
             start_data,
             window,
             initial_window_location,
+            restore_maximized,
         };
 
         pointer.set_grab(self, grab, serial, Focus::Clear);

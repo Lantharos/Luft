@@ -55,6 +55,7 @@ export type WindowItem = {
   geometry: Geometry;
   active: boolean;
   visible: boolean;
+  state: "floating" | "tiled" | "fullscreen" | "maximized" | "hidden";
 };
 
 export type PanelApp = {
@@ -124,6 +125,7 @@ export type ShellAction =
   | { type: "window-activate"; window: number }
   | { type: "window-close"; window: number }
   | { type: "window-minimize"; window: number }
+  | { type: "window-toggle-maximize"; window: number }
   | { type: "window-move"; window: number; workspace: string }
   | { type: "panel-launch"; command: string }
   | { type: "panel-menu-open"; command: string; x?: number }

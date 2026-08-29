@@ -1,12 +1,15 @@
 <script lang="ts">
   import { sendAction } from "../shell/bridge";
   import type { PanelApp, ShellSnapshot, WindowItem } from "../shell/model";
+  import AppIcon from "./AppIcon.svelte";
+  import Icon from "./Icon.svelte";
 
   let { snapshot }: { snapshot: ShellSnapshot } = $props();
   const app = $derived(snapshot.panelApps.find((entry) => entry.command === snapshot.panelMenuCommand));
   const window = $derived(app ? matchedWindow(app, snapshot.windows) : undefined);
   const isRunning = $derived(Boolean(window ?? app?.running));
   const canLaunch = $derived(Boolean(app && launchable(app)));
+  const isMaximized = $derived(window?.state === "maximized");
 
   function close() {
     sendAction({ type: "panel-menu-close" });
@@ -36,6 +39,11 @@
   function minimize(window: WindowItem) {
     close();
     sendAction({ type: "window-minimize", window: window.id });
+  }
+
+  function toggleMaximize(window: WindowItem) {
+    close();
+    sendAction({ type: "window-toggle-maximize", window: window.id });
   }
 
   function closeWindow(window: WindowItem) {
@@ -82,49 +90,84 @@
 <section class="panel-menu-shell">
   {#if app}
     <div class="panel-menu" role="menu" tabindex="-1" data-command={app.command} onpointerdown={(event) => event.stopPropagation()}>
-      <strong>{app.label}</strong>
+      <header class="panel-menu-header">
+        <span class="panel-menu-icon"><AppIcon {app} /></span>
+        <span class="panel-menu-identity">
+          <strong>{app.label}</strong>
+          {#if window}
+            <span>{window.title}</span>
+          {:else if isRunning}
+            <span>Running</span>
+          {:else}
+            <span>Not running</span>
+          {/if}
+        </span>
+      </header>
+
       {#if window}
-        {#if !window.active}
-          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app)}>
-            <span>Focus</span>
-          </button>
+        {#if !window.active || canLaunch}
+          <div class="panel-menu-group">
+            {#if !window.active}
+              <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app)}>
+                <Icon name="app" />
+                <span>Show Window</span>
+              </button>
+            {/if}
+            {#if canLaunch}
+              <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app, true)}>
+                <Icon name="plus" />
+                <span>New Window</span>
+              </button>
+            {/if}
+          </div>
         {/if}
-        {#if app.pinned || canLaunch}
-          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app, true)}>
-            <span>Open New Window</span>
+
+        <div class="panel-menu-group">
+          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => minimize(window)}>
+            <Icon name="minimize" />
+            <span>Minimize</span>
           </button>
-        {/if}
-        <button type="button" class="panel-menu-item" role="menuitem" onclick={() => minimize(window)}>
-          <span>Minimize</span>
-        </button>
-        <button type="button" class="panel-menu-item" role="menuitem" onclick={() => closeWindow(window)}>
-          <span>Close Window</span>
-        </button>
-        <button type="button" class="panel-menu-item is-danger" role="menuitem" onclick={() => forceQuit(app)}>
-          <span>Force Quit</span>
-        </button>
-      {:else if isRunning}
-        {#if canLaunch}
-          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app, true)}>
-            <span>Open New Window</span>
+          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => toggleMaximize(window)}>
+            <Icon name="maximize" />
+            <span>{isMaximized ? "Restore" : "Maximize"}</span>
           </button>
-        {/if}
-        <button type="button" class="panel-menu-item is-danger" role="menuitem" onclick={() => forceQuit(app)}>
-          <span>Force Quit</span>
-        </button>
-      {:else}
-        <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app, true)}>
-          <span>Open</span>
-        </button>
-      {/if}
-      {#if app.pinned}
-        <button type="button" class="panel-menu-item" role="menuitem" onclick={() => unpin(app)}>
-          <span>Unpin from Panel</span>
-        </button>
+          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => closeWindow(window)}>
+            <Icon name="close" />
+            <span>Close Window</span>
+          </button>
+        </div>
       {:else if canLaunch}
-        <button type="button" class="panel-menu-item" role="menuitem" onclick={() => pin(app)}>
-          <span>Pin to Panel</span>
-        </button>
+        <div class="panel-menu-group">
+          <button type="button" class="panel-menu-item" role="menuitem" onclick={() => open(app, true)}>
+            <Icon name={isRunning ? "plus" : "app"} />
+            <span>{isRunning ? "New Window" : "Open"}</span>
+          </button>
+        </div>
+      {/if}
+
+      {#if app.pinned || canLaunch}
+        <div class="panel-menu-group">
+          {#if app.pinned}
+            <button type="button" class="panel-menu-item" role="menuitem" onclick={() => unpin(app)}>
+              <Icon name="panel" />
+              <span>Remove from Panel</span>
+            </button>
+          {:else}
+            <button type="button" class="panel-menu-item" role="menuitem" onclick={() => pin(app)}>
+              <Icon name="panel" />
+              <span>Keep in Panel</span>
+            </button>
+          {/if}
+        </div>
+      {/if}
+
+      {#if isRunning}
+        <div class="panel-menu-group">
+          <button type="button" class="panel-menu-item is-danger" role="menuitem" onclick={() => forceQuit(app)}>
+            <Icon name="power" />
+            <span>Force Quit</span>
+          </button>
+        </div>
       {/if}
     </div>
   {/if}

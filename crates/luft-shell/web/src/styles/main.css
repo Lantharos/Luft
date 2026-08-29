@@ -98,6 +98,13 @@ body,
   background: transparent;
 }
 
+#app[data-surface="panel-menu"] {
+  overflow: hidden;
+  border-radius: 18px;
+  clip-path: inset(0 round 18px);
+  background: transparent;
+}
+
 #app[data-surface="quick-settings"] .popover,
 #app[data-surface="date-center"] .popover {
   height: 100vh;

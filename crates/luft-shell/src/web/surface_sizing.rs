@@ -6,7 +6,7 @@ pub(crate) const NOTIFICATION_TOAST_WIDTH: i32 = 380;
 pub(crate) const NOTIFICATION_TOAST_BASE_HEIGHT: i32 = 96;
 pub(crate) const NOTIFICATION_TOAST_BODY_HEIGHT: i32 = 116;
 pub(crate) const NOTIFICATION_TOAST_ACTION_HEIGHT: i32 = 140;
-pub(crate) const DOCK_MENU_WIDTH: i32 = 184;
+pub(crate) const DOCK_MENU_WIDTH: i32 = 228;
 pub(crate) const SESSION_MENU_WIDTH: i32 = 188;
 pub(crate) const SESSION_MENU_HEIGHT: i32 = 172;
 pub(crate) const SESSION_MENU_RIGHT_MARGIN: i32 = 16;
@@ -76,23 +76,29 @@ pub(crate) fn panel_menu_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
         return (DOCK_MENU_WIDTH, 128);
     };
     let window = matched_window(app, &snapshot.windows);
-    let action_count = if let Some(window) = window {
-        let focus = i32::from(!window.active);
-        let open_new = i32::from(app.pinned || can_launch_app(app));
-        let pinning = i32::from(app.pinned || can_launch_app(app));
-        focus + open_new + pinning + 3
-    } else if app.running {
-        1 + i32::from(can_launch_app(app)) + i32::from(app.pinned || can_launch_app(app))
+    let can_launch = can_launch_app(app);
+    let can_pin = app.pinned || can_launch;
+    let (actions, groups) = if let Some(window) = window {
+        let primary = i32::from(!window.active) + i32::from(can_launch);
+        (
+            primary + 3 + i32::from(can_pin) + 1,
+            i32::from(primary > 0) + 1 + i32::from(can_pin) + 1,
+        )
     } else {
-        2
+        let primary = i32::from(can_launch);
+        let danger = i32::from(app.running);
+        (
+            primary + i32::from(can_pin) + danger,
+            i32::from(primary > 0) + i32::from(can_pin) + i32::from(danger > 0),
+        )
     };
-    (DOCK_MENU_WIDTH, panel_menu_height(action_count))
+    (DOCK_MENU_WIDTH, panel_menu_height(actions, groups))
 }
 
-fn panel_menu_height(action_count: i32) -> i32 {
-    let content_items = action_count + 1;
-    let content_height = 16 + 23 + action_count * 34 + (content_items - 1) * 4;
-    content_height.clamp(128, 264)
+fn panel_menu_height(actions: i32, groups: i32) -> i32 {
+    let row_gaps = (actions - groups).max(0) * 2;
+    let group_separators = (groups - 1).max(0) * 13;
+    66 + actions * 36 + row_gaps + group_separators
 }
 
 fn matched_window<'a>(app: &WebPanelApp, windows: &'a [WebWindow]) -> Option<&'a WebWindow> {

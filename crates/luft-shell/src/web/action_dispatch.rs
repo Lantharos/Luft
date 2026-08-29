@@ -32,6 +32,9 @@ impl WebShell {
             WebShellAction::WindowActivate { window } => self.activate_task_window(window),
             WebShellAction::WindowClose { window } => self.close_task_window(window),
             WebShellAction::WindowMinimize { window } => self.minimize_task_window(window),
+            WebShellAction::WindowToggleMaximize { window } => {
+                self.toggle_maximize_task_window(window)
+            }
             WebShellAction::WindowMove { window, workspace } => self.apply_model_result(
                 move_window_to_workspace(window_id(window), workspace_id(workspace)),
             ),

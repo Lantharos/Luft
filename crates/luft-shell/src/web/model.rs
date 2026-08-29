@@ -7,7 +7,7 @@ use crate::services::{
     system_status::{AudioInfo, BatteryInfo, BrightnessInfo, NetworkInfo, SystemStatus},
     tray::TrayItemStatus,
 };
-use luft_ipc::WindowSummary;
+use luft_ipc::{WindowState, WindowSummary};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
@@ -66,6 +66,7 @@ pub struct WebWindow {
     pub geometry: WebGeometry,
     pub active: bool,
     pub visible: bool,
+    pub state: WindowState,
 }
 
 impl From<&WindowSummary> for WebWindow {
@@ -88,6 +89,7 @@ impl From<&WindowSummary> for WebWindow {
             },
             active: window.is_active,
             visible: window.is_visible,
+            state: window.state.clone(),
         }
     }
 }

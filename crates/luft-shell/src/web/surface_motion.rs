@@ -87,6 +87,7 @@ pub(super) fn shell_blur_region(kind: WebShellSurface, _width: i32, _height: i32
         | WebShellSurface::SessionMenu => WindowRegion::adaptive_rounded_rect(26),
         WebShellSurface::NotificationToast => WindowRegion::adaptive_rounded_rect(22),
         WebShellSurface::StartMenu => WindowRegion::adaptive_rounded_rect(24),
+        WebShellSurface::PanelMenu => WindowRegion::adaptive_rounded_rect(18),
         _ => WindowRegion::adaptive_full(),
     }
 }

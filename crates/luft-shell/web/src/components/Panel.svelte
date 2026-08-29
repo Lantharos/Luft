@@ -103,10 +103,7 @@
       type="button"
       class="panel-launcher"
       aria-label="Open Start menu"
-      onclick={() =>
-        sendAction({
-          type: snapshot.startMenuOpen ? "close-start-menu" : "toggle-start-menu",
-        })}
+      onclick={() => sendAction({ type: "toggle-start-menu" })}
     >
       <svg class="luft-mark" width="31" height="32" viewBox="0 0 31 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -160,10 +157,7 @@
     type="button"
     class="panel-clock"
     aria-label={`${snapshot.date} ${snapshot.time}`}
-    onclick={() =>
-      sendAction({
-        type: snapshot.dateCenterOpen ? "close-date-center" : "toggle-date-center",
-      })}
+    onclick={() => sendAction({ type: "toggle-date-center" })}
   >
     <span>{snapshot.time}</span>
     <strong>{shortDate()}</strong>

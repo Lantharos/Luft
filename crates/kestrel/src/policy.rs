@@ -210,10 +210,13 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .windows()
             .filter_map(|info| {
                 let window = self.windows.get(&info.id)?;
-                let is_active = focus
-                    .as_ref()
-                    .zip(window.wl_surface().as_deref())
-                    .is_some_and(|(focus, surface)| focus == surface);
+                let is_visible =
+                    info.workspace == active_workspace && info.state != WindowState::Hidden;
+                let is_active = is_visible
+                    && focus
+                        .as_ref()
+                        .zip(window.wl_surface().as_deref())
+                        .is_some_and(|(focus, surface)| focus == surface);
                 Some(WindowSummary {
                     id: info.id,
                     title: info.title.clone(),
@@ -223,8 +226,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                     state: info.state.clone(),
                     geometry: info.geometry,
                     is_active,
-                    is_visible: info.workspace == active_workspace
-                        && info.state != WindowState::Hidden,
+                    is_visible,
                     icon_uri: None,
                     icon_name: info.app_id.clone(),
                 })
@@ -347,12 +349,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                                 animation.kind == WindowAnimationKind::Minimize
                             })
                     }) {
-                        let _ = state.layout.set_window_state(id, WindowState::Hidden);
                         state.reconcile_workspace();
                     }
                     TimeoutAction::Drop
                 },
             )
+            .map_err(|error| error.to_string())?;
+        self.layout
+            .set_window_state(id, WindowState::Hidden)
             .map_err(|error| error.to_string())?;
         Ok(())
     }

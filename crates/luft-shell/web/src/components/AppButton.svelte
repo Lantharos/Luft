@@ -35,6 +35,8 @@
   let launchFrame: number | undefined;
   let launchTimer: ReturnType<typeof setTimeout> | undefined;
   let settleTimer: ReturnType<typeof setTimeout> | undefined;
+  const jumpDuration = 320;
+  const settleDuration = 90;
 
   const className = "panel-app app-button";
 
@@ -76,9 +78,9 @@
         settling = true;
         settleTimer = setTimeout(() => {
           settling = false;
-        }, 180);
+        }, settleDuration);
       }
-    }, 430);
+    }, jumpDuration);
     onlaunch(app);
   }
 

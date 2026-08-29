@@ -334,6 +334,19 @@ impl BlurElement {
     pub fn surface_id(surface: &WlSurface) -> Id {
         Id::from(surface)
     }
+
+    pub fn clip_to(mut self, clip_regions: &[Rectangle<i32, Physical>]) -> Self {
+        self.regions = self
+            .regions
+            .into_iter()
+            .flat_map(|region| {
+                clip_regions
+                    .iter()
+                    .filter_map(move |clip| region.intersection(*clip))
+            })
+            .collect();
+        self
+    }
 }
 
 impl Element for BlurElement {

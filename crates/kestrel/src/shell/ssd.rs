@@ -434,7 +434,7 @@ impl WindowElement {
     pub fn decoration_state(&self) -> RefMut<'_, WindowState> {
         self.user_data().insert_if_missing(|| {
             RefCell::new(WindowState {
-                is_ssd: true,
+                is_ssd: false,
                 maximized: false,
                 fullscreen: false,
                 pending_initial_center: false,

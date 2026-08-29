@@ -483,11 +483,14 @@ impl<BackendData: Backend> XdgDecorationHandler for KestrelState<BackendData> {
             state.decoration_mode = Some(Mode::ServerSide);
         });
     }
-    fn request_mode(&mut self, toplevel: ToplevelSurface, _mode: DecorationMode) {
+    fn request_mode(&mut self, toplevel: ToplevelSurface, mode: DecorationMode) {
         use xdg_decoration::zv1::server::zxdg_toplevel_decoration_v1::Mode;
 
         toplevel.with_pending_state(|state| {
-            state.decoration_mode = Some(Mode::ServerSide);
+            state.decoration_mode = Some(match mode {
+                DecorationMode::ServerSide => Mode::ServerSide,
+                _ => Mode::ClientSide,
+            });
         });
 
         if toplevel.is_initial_configure_sent() {

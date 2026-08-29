@@ -271,8 +271,9 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
                     .state
                     .decoration_mode
                     .map(|mode| mode == Mode::ServerSide)
-                    .unwrap_or(true);
-                window.set_ssd(is_ssd);
+                    .unwrap_or(false);
+                let fullscreen = window.decoration_state().fullscreen;
+                window.set_ssd(is_ssd && !fullscreen);
             }
         }
     }
@@ -341,8 +342,13 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
     }
 
     fn unfullscreen_request(&mut self, surface: ToplevelSurface) {
+        use xdg_decoration::zv1::server::zxdg_toplevel_decoration_v1::Mode;
+
+        let is_ssd = surface.with_committed_state(|state| {
+            state.and_then(|state| state.decoration_mode) == Some(Mode::ServerSide)
+        });
         if let Some(window) = self.window_for_surface(surface.wl_surface()) {
-            window.set_ssd(true);
+            window.set_ssd(is_ssd);
             window.decoration_state().fullscreen = false;
         }
         let ret = surface.with_pending_state(|state| {

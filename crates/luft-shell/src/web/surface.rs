@@ -38,7 +38,7 @@ impl WebSurfaces {
         actions_tx: Sender<WebShellAction>,
         snapshot: &WebShellSnapshot,
     ) -> Result<Self, Box<dyn Error>> {
-        let surfaces = Self {
+        let mut surfaces = Self {
             panel: WebSurface::new(WebSurfaceConfig {
                 kind: WebShellSurface::Panel,
                 size: (PANEL_WIDTH_HINT, PANEL_HEIGHT),
@@ -88,16 +88,22 @@ impl WebSurfaces {
             prewarm_index: 0,
             prewarm_at: Instant::now() + Duration::from_secs(1),
         };
+        surfaces
+            .session_menu
+            .set_session_menu_qs_height(Some(quick_settings_size(snapshot).1));
         Ok(surfaces)
     }
 
     pub fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, json: &str) {
+        let quick_settings_size = quick_settings_size(snapshot);
         self.panel.evaluate_snapshot(snapshot, json);
         self.panel_menu.resize(panel_menu_size(snapshot));
         self.panel_menu.evaluate_snapshot(snapshot, json);
+        self.session_menu
+            .set_session_menu_qs_height(Some(quick_settings_size.1));
         self.session_menu.evaluate_snapshot(snapshot, json);
         self.start_menu.evaluate_snapshot(snapshot, json);
-        self.quick.resize(quick_settings_size(snapshot));
+        self.quick.resize(quick_settings_size);
         self.quick.evaluate_snapshot(snapshot, json);
         self.date.resize(date_center_size(snapshot));
         self.date.evaluate_snapshot(snapshot, json);
@@ -120,10 +126,6 @@ impl WebSurfaces {
 
     pub fn set_panel_menu_x(&mut self, x: Option<i32>) {
         self.panel_menu.set_panel_menu_x(x);
-    }
-
-    pub fn set_session_menu_qs_height(&mut self, height: Option<i32>) {
-        self.session_menu.set_session_menu_qs_height(height);
     }
 
     pub fn set_notification_toast_visible(&mut self, visible: bool) {

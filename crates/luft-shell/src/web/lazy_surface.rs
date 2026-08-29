@@ -247,6 +247,9 @@ impl LazyWebSurface {
         self.session_menu_qs_height = height;
         if let Some(surface) = &mut self.surface {
             surface.set_session_menu_qs_height(height);
+            if self.visible && self.hide_at.is_none() {
+                surface.set_shell_margin(surface.base_shell_margin());
+            }
         }
     }
 

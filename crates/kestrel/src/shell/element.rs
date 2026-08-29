@@ -598,9 +598,19 @@ where
     ) -> Vec<C> {
         let window_bbox = SpaceElement::bbox(&self.0);
         let now = Instant::now();
+        let render_size = self.geometry().size;
         let (corner_radius, animation) = {
             let state = self.decoration_state();
-            let animation = state.animation.filter(|animation| !animation.complete(now));
+            if state.pending_initial_center {
+                return Vec::new();
+            }
+            let animation = state.animation.filter(|animation| match animation.kind {
+                WindowAnimationKind::Close | WindowAnimationKind::Minimize => true,
+                WindowAnimationKind::Maximize | WindowAnimationKind::Unmaximize => {
+                    !animation.complete(now) || render_size != animation.to.size
+                }
+                WindowAnimationKind::Open => !animation.complete(now),
+            });
             let radius = match animation {
                 Some(animation) if matches!(animation.kind, WindowAnimationKind::Maximize) => {
                     WINDOW_CORNER_RADIUS * (1.0 - animation.progress(now))
@@ -701,7 +711,7 @@ where
 
         let render_target = Rectangle::new(
             location.to_f64().to_logical(scale).to_i32_round(),
-            self.geometry().size,
+            render_size,
         );
         let (element_scale, offset) = animation
             .map(|animation| window_visual_transform(animation, render_target, now, scale))

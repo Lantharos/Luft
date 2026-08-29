@@ -37,7 +37,6 @@ pub(super) fn surface_margin_animates(kind: WebShellSurface) -> bool {
             | WebShellSurface::QuickSettings
             | WebShellSurface::DateCenter
             | WebShellSurface::PanelMenu
-            | WebShellSurface::SessionMenu
             | WebShellSurface::NotificationToast
     )
 }
@@ -69,9 +68,6 @@ pub(super) fn hidden_shell_margin(
         }
         WebShellSurface::PanelMenu => {
             margin.bottom = -(size.1 + 8);
-        }
-        WebShellSurface::SessionMenu => {
-            margin.right = -(size.0 + 8);
         }
         WebShellSurface::NotificationToast => {
             margin.right = -(size.0 + 12);

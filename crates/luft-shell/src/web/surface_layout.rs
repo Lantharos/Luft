@@ -1,4 +1,5 @@
 use super::model::WebShellSurface;
+use super::surface_sizing::{SESSION_MENU_RIGHT_MARGIN, SESSION_MENU_TOP_OFFSET};
 use sabine::{
     ShellSurfaceAnchor, ShellSurfaceKeyboardInteractivity, ShellSurfaceLayer, ShellSurfaceMargin,
     ShellSurfaceOptions,
@@ -11,7 +12,6 @@ pub(crate) const PANEL_HEIGHT: i32 = PANEL_BAR_HEIGHT;
 const PANEL_MENU_EDGE_MARGIN: i32 = 6;
 const PANEL_MENU_GAP: i32 = 6;
 const PANEL_POPOVER_GAP: i32 = 8;
-const SESSION_MENU_TOP_OFFSET: i32 = 76;
 const LAYER_SURFACE_ZONE_IGNORE: i32 = -1;
 
 impl WebShellSurface {
@@ -126,7 +126,12 @@ fn margin(
             let qs_height = session_menu_qs_height.unwrap_or(280);
             let panel_clearance = PANEL_BAR_HEIGHT + PANEL_POPOVER_GAP;
             let aligned_margin = panel_clearance + qs_height - SESSION_MENU_TOP_OFFSET - size.1;
-            ShellSurfaceMargin::new(0, 0, aligned_margin.max(panel_clearance), 0)
+            ShellSurfaceMargin::new(
+                0,
+                SESSION_MENU_RIGHT_MARGIN,
+                aligned_margin.max(panel_clearance),
+                0,
+            )
         }
         WebShellSurface::StartMenu => ShellSurfaceMargin::new(0, 0, PANEL_BAR_HEIGHT + 10, 0),
         WebShellSurface::QuickSettings => {

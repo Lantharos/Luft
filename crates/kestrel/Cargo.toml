@@ -10,6 +10,7 @@ bitflags.workspace = true
 clap.workspace = true
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
 fps_ticker = { version = "1.0.0", optional = true }
+glam.workspace = true
 luft-config.workspace = true
 luft-ipc.workspace = true
 profiling = "1.0.18"

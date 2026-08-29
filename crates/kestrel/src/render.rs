@@ -30,7 +30,7 @@ use crate::drawing::FpsElement;
 use crate::{
     blur::BlurRenderer,
     drawing::{CLEAR_COLOR, CLEAR_COLOR_FULLSCREEN, PointerRenderElement},
-    shell::{FullscreenSurface, WindowElement, WindowRenderElement},
+    shell::{FullscreenSurface, RoundedRenderer, WindowElement, WindowRenderElement},
 };
 
 smithay::backend::renderer::element::render_elements! {
@@ -63,15 +63,17 @@ impl<R: Renderer> std::fmt::Debug for CustomRenderElements<R> {
 }
 
 smithay::backend::renderer::element::render_elements! {
-    pub OutputRenderElements<R, E> where R: ImportAll + ImportMem + BlurRenderer;
+    pub OutputRenderElements<R, E> where R: ImportAll + ImportMem + BlurRenderer + RoundedRenderer;
     Space=RelocateRenderElement<SpaceRenderElements<R, E>>,
     Window=Wrap<E>,
     Custom=CustomRenderElements<R>,
     Preview=CropRenderElement<RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>>,
 }
 
-impl<R: Renderer + ImportAll + ImportMem + BlurRenderer, E: RenderElement<R> + std::fmt::Debug>
-    std::fmt::Debug for OutputRenderElements<R, E>
+impl<
+    R: Renderer + ImportAll + ImportMem + BlurRenderer + crate::shell::RoundedRenderer,
+    E: RenderElement<R> + std::fmt::Debug,
+> std::fmt::Debug for OutputRenderElements<R, E>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -90,8 +92,7 @@ pub fn space_preview_elements<'a, R, C>(
     output: &'a Output,
 ) -> impl Iterator<Item = C> + 'a
 where
-    R: Renderer + ImportAll + ImportMem,
-    R: crate::blur::BlurRenderer,
+    R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
     C: From<CropRenderElement<RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>>>
         + 'a,
@@ -165,7 +166,7 @@ pub fn output_elements<R>(
     Color32F,
 )
 where
-    R: Renderer + ImportAll + ImportMem + crate::blur::BlurRenderer,
+    R: Renderer + ImportAll + ImportMem + crate::blur::BlurRenderer + crate::shell::RoundedRenderer,
     R::TextureId: Send + Clone + 'static,
 {
     if let Some(surface) = lock_surface {
@@ -260,7 +261,7 @@ fn ordered_space_render_elements<R>(
     output: &Output,
 ) -> Vec<SpaceRenderElements<R, WindowRenderElement<R>>>
 where
-    R: Renderer + ImportAll + ImportMem,
+    R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
 {
     let output_scale = output.current_scale().fractional_scale();
@@ -314,7 +315,7 @@ fn extend_layer_elements<R>(
     layer: WlrLayer,
     output_scale: f64,
 ) where
-    R: Renderer + ImportAll + ImportMem,
+    R: Renderer + ImportAll + ImportMem + crate::shell::RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + 'static,
 {
     elements.extend(
@@ -355,7 +356,7 @@ pub fn render_output<'a, 'd, R>(
 ) -> Result<RenderOutputResult<'d>, OutputDamageTrackerError<R::Error>>
 where
     R: Renderer + ImportAll + ImportMem,
-    R: crate::blur::BlurRenderer,
+    R: crate::blur::BlurRenderer + crate::shell::RoundedRenderer,
     R::TextureId: Send + Clone + 'static,
 {
     let (elements, clear_color) = output_elements(

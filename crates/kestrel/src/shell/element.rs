@@ -6,7 +6,7 @@ use smithay::{
         renderer::{
             ImportAll, ImportMem, Renderer, Texture,
             element::{
-                AsRenderElements, solid::SolidColorRenderElement,
+                AsRenderElements, Element, memory::MemoryRenderBufferRenderElement,
                 surface::WaylandSurfaceRenderElement,
             },
         },
@@ -38,8 +38,16 @@ use smithay::{
     },
 };
 
-use super::ssd::HEADER_BAR_HEIGHT;
-use crate::{KestrelState, focus::PointerFocusTarget, state::Backend};
+use super::{
+    RoundedRenderer, RoundedSurfaceRenderElement,
+    ssd::{HEADER_BAR_HEIGHT, WINDOW_CORNER_RADIUS},
+};
+use crate::{
+    KestrelState,
+    blur::{BlurElement, BlurRenderElement, BlurRenderer},
+    focus::PointerFocusTarget,
+    state::Backend,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct WindowElement(pub Window);
@@ -199,7 +207,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for SSD {
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state.header_bar.clicked(seat, data, &self.0, event.serial);
+            state
+                .header_bar
+                .clicked(seat, data, &self.0, event.serial, event.state);
         }
     }
     fn axis(
@@ -303,13 +313,13 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for SSD {
 
     fn up(
         &self,
-        seat: &Seat<KestrelState<BackendData>>,
+        _seat: &Seat<KestrelState<BackendData>>,
         data: &mut KestrelState<BackendData>,
         _event: &smithay::input::touch::UpEvent,
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state.header_bar.touch_up(seat, data, &self.0);
+            state.header_bar.touch_up(data, &self.0);
         }
     }
 
@@ -408,14 +418,14 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for SSD {
 
     fn up(
         &self,
-        seat: &Seat<KestrelState<BackendData>>,
+        _seat: &Seat<KestrelState<BackendData>>,
         data: &mut KestrelState<BackendData>,
         _tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         _event: &smithay::input::tablet::tool::UpEvent,
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state.header_bar.touch_up(seat, data, &self.0);
+            state.header_bar.touch_up(data, &self.0);
         }
     }
 
@@ -441,7 +451,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for SSD {
     ) {
         let mut state = self.0.decoration_state();
         if state.is_ssd {
-            state.header_bar.clicked(seat, data, &self.0, event.serial);
+            state
+                .header_bar
+                .clicked(seat, data, &self.0, event.serial, event.state);
         }
     }
 
@@ -481,6 +493,11 @@ impl SpaceElement for WindowElement {
     }
     fn is_in_input_region(&self, point: &Point<f64, Logical>) -> bool {
         if self.decoration_state().is_ssd {
+            let mut size = SpaceElement::geometry(&self.0).size.to_f64();
+            size.h += HEADER_BAR_HEIGHT as f64;
+            if !point_in_rounded_window(*point, size) {
+                return false;
+            }
             point.y < HEADER_BAR_HEIGHT as f64
                 || SpaceElement::is_in_input_region(
                     &self.0,
@@ -509,17 +526,46 @@ impl SpaceElement for WindowElement {
     }
 }
 
+fn point_in_rounded_window(
+    point: Point<f64, Logical>,
+    size: smithay::utils::Size<f64, Logical>,
+) -> bool {
+    if point.x < 0.0 || point.y < 0.0 || point.x >= size.w || point.y >= size.h {
+        return false;
+    }
+    let radius = WINDOW_CORNER_RADIUS;
+    let corner_center = match (
+        point.x < radius,
+        point.x > size.w - radius,
+        point.y < radius,
+        point.y > size.h - radius,
+    ) {
+        (true, _, true, _) => Some((radius, radius)),
+        (_, true, true, _) => Some((size.w - radius, radius)),
+        (true, _, _, true) => Some((radius, size.h - radius)),
+        (_, true, _, true) => Some((size.w - radius, size.h - radius)),
+        _ => None,
+    };
+    corner_center.is_none_or(|(center_x, center_y)| {
+        (point.x - center_x).powi(2) + (point.y - center_y).powi(2) <= radius.powi(2)
+    })
+}
+
 render_elements!(
-    pub WindowRenderElement<R> where R: ImportAll + ImportMem;
+    pub WindowRenderElement<R> where R: ImportAll + ImportMem + RoundedRenderer + BlurRenderer;
     Window=WaylandSurfaceRenderElement<R>,
-    Decoration=SolidColorRenderElement,
+    Rounded=RoundedSurfaceRenderElement<R>,
+    Decoration=MemoryRenderBufferRenderElement<R>,
+    Blur=BlurRenderElement<R>,
 );
 
-impl<R: Renderer> std::fmt::Debug for WindowRenderElement<R> {
+impl<R: Renderer + RoundedRenderer + BlurRenderer> std::fmt::Debug for WindowRenderElement<R> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Window(arg0) => f.debug_tuple("Window").field(arg0).finish(),
+            Self::Rounded(arg0) => f.debug_tuple("Rounded").field(arg0).finish(),
             Self::Decoration(arg0) => f.debug_tuple("Decoration").field(arg0).finish(),
+            Self::Blur(arg0) => f.debug_tuple("Blur").field(arg0).finish(),
             Self::_GenericCatcher(arg0) => f.debug_tuple("_GenericCatcher").field(arg0).finish(),
         }
     }
@@ -527,8 +573,8 @@ impl<R: Renderer> std::fmt::Debug for WindowRenderElement<R> {
 
 impl<R> AsRenderElements<R> for WindowElement
 where
-    R: Renderer + ImportAll + ImportMem,
-    R::TextureId: Clone + Texture + 'static,
+    R: Renderer + ImportAll + ImportMem + RoundedRenderer + BlurRenderer,
+    R::TextureId: Send + Clone + Texture + 'static,
 {
     type RenderElement = WindowRenderElement<R>;
 
@@ -554,12 +600,45 @@ where
                 scale,
                 alpha,
             );
+            if let Some(header) = vec.first() {
+                let geometry = header.geometry(scale);
+                vec.push(WindowRenderElement::Blur(
+                    BlurElement::from_geometry(
+                        header.id().clone(),
+                        geometry,
+                        rounded_top_regions(geometry.size, scale),
+                    )
+                    .into(),
+                ));
+            }
 
             location.y += (scale.y * HEADER_BAR_HEIGHT as f64) as i32;
-
-            let window_elements =
-                AsRenderElements::render_elements(&self.0, renderer, location, scale, alpha);
-            vec.extend(window_elements);
+            let clip_geometry = Rectangle::new(
+                location.to_f64().to_logical(scale),
+                window_geo.size.to_f64(),
+            );
+            let program = R::rounded_program(renderer).ok();
+            let window_elements = AsRenderElements::<R>::render_elements::<
+                WaylandSurfaceRenderElement<R>,
+            >(&self.0, renderer, location, scale, alpha);
+            vec.extend(window_elements.into_iter().map(|element| {
+                if let Some(program) = &program {
+                    WindowRenderElement::Rounded(RoundedSurfaceRenderElement::new(
+                        element,
+                        program.clone(),
+                        clip_geometry,
+                        [
+                            0.0,
+                            0.0,
+                            WINDOW_CORNER_RADIUS as f32,
+                            WINDOW_CORNER_RADIUS as f32,
+                        ],
+                        scale,
+                    ))
+                } else {
+                    WindowRenderElement::Window(element)
+                }
+            }));
             vec.into_iter().map(C::from).collect()
         } else {
             AsRenderElements::render_elements(&self.0, renderer, location, scale, alpha)
@@ -568,4 +647,30 @@ where
                 .collect()
         }
     }
+}
+
+fn rounded_top_regions(
+    size: smithay::utils::Size<i32, Physical>,
+    scale: Scale<f64>,
+) -> Vec<Rectangle<i32, Physical>> {
+    let radius = (WINDOW_CORNER_RADIUS * scale.x).round() as i32;
+    let mut regions = Vec::with_capacity(radius.max(1) as usize + 1);
+    for y in 0..radius.min(size.h) {
+        let sample_y = y as f64 + 0.5;
+        let distance_y = radius as f64 - sample_y;
+        let inset = (radius as f64
+            - (radius as f64 * radius as f64 - distance_y * distance_y).sqrt())
+        .ceil() as i32;
+        let width = size.w - inset * 2;
+        if width > 0 {
+            regions.push(Rectangle::new((inset, y).into(), (width, 1).into()));
+        }
+    }
+    if size.h > radius {
+        regions.push(Rectangle::new(
+            (0, radius).into(),
+            (size.w, size.h - radius).into(),
+        ));
+    }
+    regions
 }

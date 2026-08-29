@@ -303,7 +303,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         Ok(())
     }
 
-    fn minimize_window(&mut self, id: WindowId) -> Result<(), String> {
+    pub(crate) fn minimize_window(&mut self, id: WindowId) -> Result<(), String> {
         self.layout
             .set_window_state(id, WindowState::Hidden)
             .map_err(|error| error.to_string())?;
@@ -311,7 +311,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         Ok(())
     }
 
-    fn toggle_maximize(&mut self, id: WindowId) -> Result<(), String> {
+    pub(crate) fn toggle_maximize(&mut self, id: WindowId) -> Result<(), String> {
         let window = self
             .windows
             .get(&id)

@@ -57,8 +57,10 @@ effects. Blur follows the exact region supplied by Sabine, including rounded
 popover regions, and participates in Smithay's damage tracking instead of
 forcing full-frame redraws.
 
-Wayland applications keep client-side decorations unless they request
-server-side decorations. Server frames support move, resize, close, minimize,
-and maximize actions. The shell's app model comes from Kestrel IPC, so clicking
-a running app can focus, restore, or minimize the existing window before a new
-process is launched.
+Normal Wayland application windows use Kestrel's server frame: a blurred glass
+titlebar with right-aligned minimize, maximize, and close controls. The renderer
+clips floating client buffers to the same rounded outline and excludes those
+transparent corners from input. Fullscreen windows bypass both effects and
+remain eligible for direct scanout. The shell's app model comes from Kestrel
+IPC, so clicking a running app can focus, restore, or minimize the existing
+window before a new process is launched.

@@ -2074,6 +2074,7 @@ dependencies = [
  "bitflags",
  "clap",
  "fps_ticker",
+ "glam",
  "image",
  "luft-config",
  "luft-ipc",

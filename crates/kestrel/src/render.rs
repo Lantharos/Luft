@@ -13,7 +13,7 @@ use smithay::{
         },
     },
     desktop::{
-        layer_map_for_output,
+        LayerMap, layer_map_for_output,
         space::{
             ConstrainBehavior, ConstrainReference, Space, SpaceRenderElements, SurfaceTree,
             constrain_space_element,
@@ -22,6 +22,7 @@ use smithay::{
     output::Output,
     reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::{Point, Rectangle, Scale, Size},
+    wayland::shell::wlr_layer::Layer as WlrLayer,
 };
 
 #[cfg(feature = "debug")]
@@ -223,13 +224,7 @@ where
             output_render_elements.extend(space_preview_elements(renderer, space, output));
         }
 
-        let space_elements = smithay::desktop::space::space_render_elements::<_, WindowElement, _>(
-            renderer,
-            [space],
-            output,
-            1.0,
-        )
-        .expect("output without mode?");
+        let space_elements = ordered_space_render_elements(renderer, space, output);
         let blur_elements = blur_elements(space, output, output_scale, &motion_offsets);
         for element in space_elements {
             let element_id = element.id().clone();
@@ -257,6 +252,91 @@ where
 
         (output_render_elements, CLEAR_COLOR)
     }
+}
+
+fn ordered_space_render_elements<R>(
+    renderer: &mut R,
+    space: &Space<WindowElement>,
+    output: &Output,
+) -> Vec<SpaceRenderElements<R, WindowRenderElement<R>>>
+where
+    R: Renderer + ImportAll + ImportMem,
+    R::TextureId: Send + Clone + 'static,
+{
+    let output_scale = output.current_scale().fractional_scale();
+    let output_geometry = space
+        .output_geometry(output)
+        .expect("output must be mapped into the space");
+    let layers = layer_map_for_output(output);
+    let mut elements = Vec::new();
+
+    extend_layer_elements(
+        &mut elements,
+        renderer,
+        &layers,
+        WlrLayer::Overlay,
+        output_scale,
+    );
+    extend_layer_elements(
+        &mut elements,
+        renderer,
+        &layers,
+        WlrLayer::Top,
+        output_scale,
+    );
+    elements.extend(
+        space
+            .render_elements_for_region(renderer, &output_geometry, output_scale, 1.0)
+            .into_iter()
+            .map(|element| SpaceRenderElements::Element(Wrap::from(element))),
+    );
+    extend_layer_elements(
+        &mut elements,
+        renderer,
+        &layers,
+        WlrLayer::Bottom,
+        output_scale,
+    );
+    extend_layer_elements(
+        &mut elements,
+        renderer,
+        &layers,
+        WlrLayer::Background,
+        output_scale,
+    );
+    elements
+}
+
+fn extend_layer_elements<R>(
+    elements: &mut Vec<SpaceRenderElements<R, WindowRenderElement<R>>>,
+    renderer: &mut R,
+    layers: &LayerMap,
+    layer: WlrLayer,
+    output_scale: f64,
+) where
+    R: Renderer + ImportAll + ImportMem,
+    R::TextureId: Send + Clone + 'static,
+{
+    elements.extend(
+        layers
+            .layers_on(layer)
+            .rev()
+            .filter_map(|surface| {
+                layers
+                    .layer_geometry(surface)
+                    .map(|geometry| (geometry.loc, surface))
+            })
+            .flat_map(|(location, surface)| {
+                AsRenderElements::<R>::render_elements::<WaylandSurfaceRenderElement<R>>(
+                    surface,
+                    renderer,
+                    location.to_physical_precise_round(output_scale),
+                    Scale::from(output_scale),
+                    1.0,
+                )
+            })
+            .map(SpaceRenderElements::Surface),
+    );
 }
 
 #[allow(clippy::too_many_arguments)]

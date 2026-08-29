@@ -41,8 +41,8 @@
 
   const hoverLift = -5;
   const jumpLift = -11;
-  const springStiffness = 155;
-  const springDamping = 19;
+  const springStiffness = 190;
+  const springDamping = 21;
 
   const className = "panel-app app-button";
 
@@ -67,7 +67,7 @@
     jumpHoldTimer = setTimeout(() => {
       jumpOffset = 0;
       scheduleMotionFrame();
-    }, 190);
+    }, 170);
     scheduleMotionFrame();
     onlaunch(app);
   }

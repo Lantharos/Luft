@@ -76,9 +76,17 @@ enum HeaderButton {
     Close,
 }
 
+pub(super) struct HeaderClick {
+    pub serial: Serial,
+    pub time_micros: u64,
+    pub button: u32,
+    pub state: ButtonState,
+}
+
 #[derive(Debug, Clone)]
 pub struct HeaderBar {
     pointer_loc: Option<Point<f64, Logical>>,
+    last_titlebar_click: Option<(u64, Point<f64, Logical>)>,
     width: u32,
     hovered_button: Option<HeaderButton>,
     corner_radius: f32,
@@ -88,10 +96,13 @@ pub struct HeaderBar {
 pub const HEADER_BAR_HEIGHT: i32 = 40;
 pub const WINDOW_CORNER_RADIUS: f64 = 14.0;
 
-const BUTTON_SLOT_WIDTH: u32 = 28;
+const BUTTON_SLOT_WIDTH: u32 = 24;
 const BUTTON_COUNT: u32 = 3;
 const BUTTONS_RIGHT_PADDING: u32 = 10;
 const BUTTON_RADIUS: f32 = 8.0;
+const PRIMARY_BUTTON: u32 = 0x110;
+const DOUBLE_CLICK_INTERVAL_MICROS: u64 = 400_000;
+const DOUBLE_CLICK_DISTANCE: f64 = 6.0;
 
 impl HeaderBar {
     pub fn pointer_enter(&mut self, loc: Point<f64, Logical>) {
@@ -102,35 +113,59 @@ impl HeaderBar {
         self.pointer_loc = None;
     }
 
-    pub fn clicked<BackendData: Backend>(
+    pub(super) fn clicked<BackendData: Backend>(
         &mut self,
         seat: &Seat<KestrelState<BackendData>>,
         state: &mut KestrelState<BackendData>,
         window: &WindowElement,
-        serial: Serial,
-        button_state: ButtonState,
+        click: HeaderClick,
     ) {
-        if button_state != ButtonState::Pressed {
+        if click.state != ButtonState::Pressed || click.button != PRIMARY_BUTTON {
             return;
         }
 
         match self.button_at_pointer() {
             Some(button) => {
+                self.last_titlebar_click = None;
                 let window = window.clone();
                 state
                     .handle
                     .insert_idle(move |state| Self::activate(button, state, &window));
             }
-            None if self.pointer_loc.is_some() => {
+            None if self.pointer_loc.is_some_and(|location| {
+                self.is_titlebar_double_click(location, click.time_micros)
+            }) =>
+            {
+                let window = window.clone();
+                state.handle.insert_idle(move |state| {
+                    Self::activate(HeaderButton::Maximize, state, &window)
+                });
+            }
+            None if let Some(location) = self.pointer_loc => {
+                self.last_titlebar_click = Some((click.time_micros, location));
                 let WindowSurface::Wayland(toplevel) = window.0.underlying_surface();
                 let seat = seat.clone();
                 let toplevel = toplevel.clone();
                 state
                     .handle
-                    .insert_idle(move |data| data.move_request_xdg(&toplevel, &seat, serial));
+                    .insert_idle(move |data| data.move_request_xdg(&toplevel, &seat, click.serial));
             }
             None => {}
         }
+    }
+
+    fn is_titlebar_double_click(
+        &mut self,
+        location: Point<f64, Logical>,
+        time_micros: u64,
+    ) -> bool {
+        let Some((previous_time, previous_location)) = self.last_titlebar_click.take() else {
+            return false;
+        };
+        let delta = location - previous_location;
+        time_micros >= previous_time
+            && time_micros - previous_time <= DOUBLE_CLICK_INTERVAL_MICROS
+            && delta.x.hypot(delta.y) <= DOUBLE_CLICK_DISTANCE
     }
 
     pub fn touch_down<BackendData: Backend>(
@@ -407,6 +442,7 @@ impl WindowElement {
                 animation: None,
                 header_bar: HeaderBar {
                     pointer_loc: None,
+                    last_titlebar_click: None,
                     width: 0,
                     hovered_button: None,
                     corner_radius: WINDOW_CORNER_RADIUS as f32,

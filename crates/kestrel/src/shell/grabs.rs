@@ -27,7 +27,10 @@ pub struct PointerMoveSurfaceGrab<BackendData: Backend + 'static> {
     pub start_data: PointerGrabStartData<KestrelState<BackendData>>,
     pub window: WindowElement,
     pub initial_window_location: Point<i32, Logical>,
+    pub restore_maximized: bool,
 }
+
+const MAXIMIZED_DRAG_THRESHOLD: f64 = 4.0;
 
 impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
     for PointerMoveSurfaceGrab<BackendData>
@@ -41,6 +44,21 @@ impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
     ) {
         // While the grab is active, no client has pointer focus
         handle.motion(data, None, event);
+
+        if self.restore_maximized {
+            let pending_delta = event.location - self.start_data.location;
+            if pending_delta.x.hypot(pending_delta.y) < MAXIMIZED_DRAG_THRESHOLD {
+                return;
+            }
+            if let Some(toplevel) = self.window.0.toplevel()
+                && let Some(location) =
+                    data.restore_maximized_window_for_move(toplevel, &self.window, event.location)
+            {
+                self.initial_window_location = location;
+                self.start_data.location = event.location;
+            }
+            self.restore_maximized = false;
+        }
 
         let delta = event.location - self.start_data.location;
         let new_location = self.initial_window_location.to_f64() + delta;

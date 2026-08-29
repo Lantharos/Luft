@@ -514,14 +514,15 @@ impl SpaceElement for WindowElement {
     }
     fn is_in_input_region(&self, point: &Point<f64, Logical>) -> bool {
         let state = self.decoration_state();
-        let mut rounded_size = SpaceElement::geometry(&self.0).size.to_f64();
         if state.is_ssd {
+            let mut rounded_size = SpaceElement::geometry(&self.0).size.to_f64();
             rounded_size.h += HEADER_BAR_HEIGHT as f64;
-        }
-        if !state.maximized && !state.fullscreen && !point_in_rounded_window(*point, rounded_size) {
-            return false;
-        }
-        if state.is_ssd {
+            if !state.maximized
+                && !state.fullscreen
+                && !point_in_rounded_window(*point, rounded_size)
+            {
+                return false;
+            }
             point.y < HEADER_BAR_HEIGHT as f64
                 || SpaceElement::is_in_input_region(
                     &self.0,

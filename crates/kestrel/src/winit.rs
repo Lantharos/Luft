@@ -60,9 +60,34 @@ pub struct WinitData {
     dmabuf_state: (DmabufState, DmabufGlobal, Option<DmabufFeedback>),
     buffer_age: usize,
     buffer_age_size: smithay::utils::Size<i32, smithay::utils::Physical>,
+    buffer_age_available: bool,
     full_redraw: u8,
     #[cfg(feature = "debug")]
     pub fps: fps_ticker::Fps,
+}
+
+fn update_buffer_age(
+    backend: &WinitGraphicsBackend<GlesRenderer>,
+    buffer_age: &mut usize,
+    buffer_age_size: &mut smithay::utils::Size<i32, smithay::utils::Physical>,
+    buffer_age_available: &mut bool,
+) {
+    let size = backend.window_size();
+    if size != *buffer_age_size {
+        *buffer_age_available = true;
+    }
+    *buffer_age = if *buffer_age_available {
+        match backend.buffer_age() {
+            Some(age) => age,
+            None => {
+                *buffer_age_available = false;
+                0
+            }
+        }
+    } else {
+        0
+    };
+    *buffer_age_size = size;
 }
 
 impl DmabufHandler for KestrelState<WinitData> {
@@ -217,6 +242,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             dmabuf_state,
             buffer_age: 0,
             buffer_age_size: size,
+            buffer_age_available: true,
             full_redraw: 0,
             #[cfg(feature = "debug")]
             fps: fps_ticker::Fps::default(),
@@ -279,8 +305,6 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                 .map(|surface| surface.wl_surface().clone());
             let session_locked = state.session_lock.is_active();
 
-            let backend = &mut state.backend_data.backend;
-
             // draw the cursor as relevant
             // reset the cursor if the surface is no longer alive
             let mut reset = false;
@@ -299,13 +323,20 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             #[cfg(feature = "debug")]
             fps_element.update_fps(fps);
 
-            let full_redraw = &mut state.backend_data.full_redraw;
+            let WinitData {
+                backend,
+                damage_tracker,
+                buffer_age,
+                buffer_age_size,
+                buffer_age_available,
+                full_redraw,
+                ..
+            } = &mut state.backend_data;
             *full_redraw = full_redraw.saturating_sub(1);
-            let buffer_age = state.backend_data.buffer_age;
-            let buffer_age_size = state.backend_data.buffer_age_size;
+            let previous_buffer_age = *buffer_age;
+            let previous_buffer_age_size = *buffer_age_size;
             let window_size = backend.window_size();
             let space = &mut state.space;
-            let damage_tracker = &mut state.backend_data.damage_tracker;
             let show_window_preview = state.show_window_preview;
             let wallpaper = &state.wallpaper;
 
@@ -344,10 +375,10 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                 })
                 .unwrap_or_else(|_| std::ptr::null_mut());
             let render_res = backend.bind().and_then(|(renderer, mut fb)| {
-                let age = if *full_redraw > 0 || window_size != buffer_age_size {
+                let age = if *full_redraw > 0 || window_size != previous_buffer_age_size {
                     0
                 } else {
-                    buffer_age
+                    previous_buffer_age
                 };
                 #[cfg(feature = "debug")]
                 if let Some(renderdoc) = renderdoc.as_mut() {
@@ -422,8 +453,12 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                     if let Some(damage) = render_output_result.damage {
                         match backend.submit(Some(damage)) {
                             Ok(()) => {
-                                state.backend_data.buffer_age = backend.buffer_age().unwrap_or(0);
-                                state.backend_data.buffer_age_size = backend.window_size();
+                                update_buffer_age(
+                                    backend,
+                                    buffer_age,
+                                    buffer_age_size,
+                                    buffer_age_available,
+                                );
                             }
                             Err(err) => warn!("Failed to submit buffer: {}", err),
                         }

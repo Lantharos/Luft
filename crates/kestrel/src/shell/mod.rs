@@ -413,10 +413,6 @@ fn place_new_window(
     window: &WindowElement,
     activate: bool,
 ) {
-    // place the window at a random location on same output as pointer
-    // or if there is not output in a [0;800]x[0;800] square
-    use rand::Rng;
-
     let output = space
         .output_under(pointer_location)
         .next()
@@ -439,13 +435,13 @@ fn place_new_window(
         });
     }
 
-    let max_x = output_geometry.loc.x + (((output_geometry.size.w as f32) / 3.0) * 2.0) as i32;
-    let max_y = output_geometry.loc.y + (((output_geometry.size.h as f32) / 3.0) * 2.0) as i32;
-    let mut rng = rand::rng();
-    let x = rng.random_range(output_geometry.loc.x..max_x);
-    let y = rng.random_range(output_geometry.loc.y..max_y);
-
-    space.map_element(window.clone(), (x, y), activate);
+    let size = window.geometry().size;
+    let location = Point::from((
+        output_geometry.loc.x + (output_geometry.size.w - size.w.max(1)) / 2,
+        output_geometry.loc.y + (output_geometry.size.h - size.h.max(1)) / 2,
+    ));
+    window.decoration_state().pending_initial_center = activate;
+    space.map_element(window.clone(), location, activate);
 }
 
 pub fn fixup_positions(space: &mut Space<WindowElement>, pointer_location: Point<f64, Logical>) {

@@ -253,14 +253,6 @@ img {
   transform-origin: bottom right;
 }
 
-#app.is-surface-closing[data-surface="quick-settings"] .popover {
-  pointer-events: none;
-}
-
-#app.is-surface-closing[data-surface="date-center"] .popover {
-  pointer-events: none;
-}
-
 @keyframes panel-popover-in {
   from {
     opacity: 0;

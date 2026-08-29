@@ -1,4 +1,7 @@
-use std::{borrow::Cow, time::Duration};
+use std::{
+    borrow::Cow,
+    time::{Duration, Instant},
+};
 
 use smithay::{
     backend::{
@@ -6,8 +9,10 @@ use smithay::{
         renderer::{
             ImportAll, ImportMem, Renderer, Texture,
             element::{
-                AsRenderElements, Element, memory::MemoryRenderBufferRenderElement,
+                AsRenderElements, Element,
+                memory::MemoryRenderBufferRenderElement,
                 surface::WaylandSurfaceRenderElement,
+                utils::{Relocate, RelocateRenderElement, RescaleRenderElement},
             },
         },
     },
@@ -40,7 +45,7 @@ use smithay::{
 
 use super::{
     RoundedRenderer, RoundedSurfaceRenderElement,
-    ssd::{HEADER_BAR_HEIGHT, WINDOW_CORNER_RADIUS},
+    ssd::{HEADER_BAR_HEIGHT, WINDOW_CORNER_RADIUS, WindowAnimationKind},
 };
 use crate::{
     KestrelState,
@@ -492,12 +497,15 @@ impl SpaceElement for WindowElement {
         bbox
     }
     fn is_in_input_region(&self, point: &Point<f64, Logical>) -> bool {
-        if self.decoration_state().is_ssd {
-            let mut size = SpaceElement::geometry(&self.0).size.to_f64();
-            size.h += HEADER_BAR_HEIGHT as f64;
-            if !point_in_rounded_window(*point, size) {
-                return false;
-            }
+        let state = self.decoration_state();
+        let mut rounded_size = SpaceElement::geometry(&self.0).size.to_f64();
+        if state.is_ssd {
+            rounded_size.h += HEADER_BAR_HEIGHT as f64;
+        }
+        if !state.maximized && !state.fullscreen && !point_in_rounded_window(*point, rounded_size) {
+            return false;
+        }
+        if state.is_ssd {
             point.y < HEADER_BAR_HEIGHT as f64
                 || SpaceElement::is_in_input_region(
                     &self.0,
@@ -559,6 +567,9 @@ render_elements!(
     Blur=BlurRenderElement<R>,
 );
 
+pub type AnimatedWindowRenderElement<R> =
+    RelocateRenderElement<RescaleRenderElement<WindowRenderElement<R>>>;
+
 impl<R: Renderer + RoundedRenderer + BlurRenderer> std::fmt::Debug for WindowRenderElement<R> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -576,7 +587,7 @@ where
     R: Renderer + ImportAll + ImportMem + RoundedRenderer + BlurRenderer,
     R::TextureId: Send + Clone + Texture + 'static,
 {
-    type RenderElement = WindowRenderElement<R>;
+    type RenderElement = AnimatedWindowRenderElement<R>;
 
     fn render_elements<C: From<Self::RenderElement>>(
         &self,
@@ -586,13 +597,29 @@ where
         alpha: f32,
     ) -> Vec<C> {
         let window_bbox = SpaceElement::bbox(&self.0);
+        let now = Instant::now();
+        let (corner_radius, animation) = {
+            let state = self.decoration_state();
+            let animation = state.animation.filter(|animation| !animation.complete(now));
+            let radius = match animation {
+                Some(animation) if matches!(animation.kind, WindowAnimationKind::Maximize) => {
+                    WINDOW_CORNER_RADIUS * (1.0 - animation.progress(now))
+                }
+                Some(animation) if matches!(animation.kind, WindowAnimationKind::Unmaximize) => {
+                    WINDOW_CORNER_RADIUS * animation.progress(now)
+                }
+                _ if state.maximized || state.fullscreen => 0.0,
+                _ => WINDOW_CORNER_RADIUS,
+            };
+            (radius, animation)
+        };
 
-        if self.decoration_state().is_ssd && !window_bbox.is_empty() {
+        let elements = if self.decoration_state().is_ssd && !window_bbox.is_empty() {
             let window_geo = SpaceElement::geometry(&self.0);
 
             let mut state = self.decoration_state();
             let width = window_geo.size.w;
-            state.header_bar.redraw(width as u32);
+            state.header_bar.redraw(width as u32, corner_radius as f32);
             let mut vec = AsRenderElements::<R>::render_elements::<WindowRenderElement<R>>(
                 &state.header_bar,
                 renderer,
@@ -606,7 +633,7 @@ where
                     BlurElement::from_geometry(
                         header.id().clone(),
                         geometry,
-                        rounded_top_regions(geometry.size, scale),
+                        rounded_top_regions(geometry.size, scale, corner_radius),
                     )
                     .into(),
                 ));
@@ -627,33 +654,140 @@ where
                         element,
                         program.clone(),
                         clip_geometry,
-                        [
-                            0.0,
-                            0.0,
-                            WINDOW_CORNER_RADIUS as f32,
-                            WINDOW_CORNER_RADIUS as f32,
-                        ],
+                        [0.0, 0.0, corner_radius as f32, corner_radius as f32],
                         scale,
                     ))
                 } else {
                     WindowRenderElement::Window(element)
                 }
             }));
-            vec.into_iter().map(C::from).collect()
+            if let Some(surface) = self.wl_surface()
+                && let Some(blur) = BlurElement::from_surface(&surface, location, scale)
+            {
+                vec.push(WindowRenderElement::Blur(blur.into()));
+            }
+            vec
         } else {
-            AsRenderElements::render_elements(&self.0, renderer, location, scale, alpha)
-                .into_iter()
-                .map(C::from)
-                .collect()
-        }
+            let window_geo = SpaceElement::geometry(&self.0);
+            let clip_geometry = Rectangle::new(
+                location.to_f64().to_logical(scale),
+                window_geo.size.to_f64(),
+            );
+            let program = R::rounded_program(renderer).ok();
+            let mut vec =
+                AsRenderElements::render_elements(&self.0, renderer, location, scale, alpha)
+                    .into_iter()
+                    .map(|element| {
+                        if let Some(program) = &program {
+                            WindowRenderElement::Rounded(RoundedSurfaceRenderElement::new(
+                                element,
+                                program.clone(),
+                                clip_geometry,
+                                [corner_radius as f32; 4],
+                                scale,
+                            ))
+                        } else {
+                            WindowRenderElement::Window(element)
+                        }
+                    })
+                    .collect::<Vec<_>>();
+            if let Some(surface) = self.wl_surface()
+                && let Some(blur) = BlurElement::from_surface(&surface, location, scale)
+            {
+                vec.push(WindowRenderElement::Blur(blur.into()));
+            }
+            vec
+        };
+
+        let render_target = Rectangle::new(
+            location.to_f64().to_logical(scale).to_i32_round(),
+            self.geometry().size,
+        );
+        let (element_scale, offset) = animation
+            .map(|animation| window_visual_transform(animation, render_target, now, scale))
+            .unwrap_or((Scale::from(1.0), Point::default()));
+        elements
+            .into_iter()
+            .map(|element| RescaleRenderElement::from_element(element, location, element_scale))
+            .map(|element| RelocateRenderElement::from_element(element, offset, Relocate::Relative))
+            .map(C::from)
+            .collect()
     }
+}
+
+fn window_visual_transform(
+    animation: super::ssd::WindowAnimation,
+    render_target: Rectangle<i32, Logical>,
+    now: Instant,
+    output_scale: Scale<f64>,
+) -> (Scale<f64>, Point<i32, Physical>) {
+    let progress = animation.progress(now);
+    let visual = match animation.kind {
+        WindowAnimationKind::Open => {
+            let scale = 0.94 + 0.06 * progress;
+            scaled_about_center(animation.to, scale, scale)
+        }
+        WindowAnimationKind::Minimize => {
+            let scale = 1.0 - 0.12 * progress;
+            let mut rect = scaled_about_center(animation.from, scale, scale);
+            rect.loc.y += (32.0 * progress).round() as i32;
+            rect
+        }
+        WindowAnimationKind::Close => {
+            let scale_y = (1.0 - progress).max(0.012);
+            let scale_x = 1.0 - 0.06 * progress;
+            scaled_about_center(animation.from, scale_x, scale_y)
+        }
+        WindowAnimationKind::Maximize | WindowAnimationKind::Unmaximize => Rectangle::new(
+            Point::from((
+                lerp_i32(animation.from.loc.x, animation.to.loc.x, progress),
+                lerp_i32(animation.from.loc.y, animation.to.loc.y, progress),
+            )),
+            smithay::utils::Size::from((
+                lerp_i32(animation.from.size.w, animation.to.size.w, progress).max(1),
+                lerp_i32(animation.from.size.h, animation.to.size.h, progress).max(1),
+            )),
+        ),
+    };
+    let target = render_target;
+    let scale = Scale::from((
+        visual.size.w as f64 / target.size.w.max(1) as f64,
+        visual.size.h as f64 / target.size.h.max(1) as f64,
+    ));
+    let offset = (visual.loc - animation.to.loc).to_physical_precise_round(output_scale);
+    (scale, offset)
+}
+
+fn scaled_about_center(
+    rect: Rectangle<i32, Logical>,
+    scale_x: f64,
+    scale_y: f64,
+) -> Rectangle<i32, Logical> {
+    let width = (rect.size.w as f64 * scale_x).round().max(1.0) as i32;
+    let height = (rect.size.h as f64 * scale_y).round().max(1.0) as i32;
+    Rectangle::new(
+        (
+            rect.loc.x + (rect.size.w - width) / 2,
+            rect.loc.y + (rect.size.h - height) / 2,
+        )
+            .into(),
+        (width, height).into(),
+    )
+}
+
+fn lerp_i32(from: i32, to: i32, progress: f64) -> i32 {
+    (from as f64 + (to - from) as f64 * progress).round() as i32
 }
 
 fn rounded_top_regions(
     size: smithay::utils::Size<i32, Physical>,
     scale: Scale<f64>,
+    corner_radius: f64,
 ) -> Vec<Rectangle<i32, Physical>> {
-    let radius = (WINDOW_CORNER_RADIUS * scale.x).round() as i32;
+    let radius = (corner_radius * scale.x).round() as i32;
+    if radius <= 0 {
+        return vec![Rectangle::from_size(size)];
+    }
     let mut regions = Vec::with_capacity(radius.max(1) as usize + 1);
     for y in 0..radius.min(size.h) {
         let sample_y = y as f64 + 0.5;

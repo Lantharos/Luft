@@ -27,8 +27,12 @@
       scheduleSurfaceAnimation("opening");
     }
     const unsubscribe = subscribe(applySnapshot);
-    const surfaceOpen = () => scheduleSurfaceAnimation("opening");
-    const surfaceClose = () => runSurfaceAnimation("closing");
+    const surfaceOpen = () => {
+      if (usesContentAnimation(surface)) scheduleSurfaceAnimation("opening");
+    };
+    const surfaceClose = () => {
+      if (usesContentAnimation(surface)) runSurfaceAnimation("closing");
+    };
     window.addEventListener("sabine:luft.surface-open", surfaceOpen);
     window.addEventListener("sabine:luft.surface-close", surfaceClose);
     return () => {
@@ -114,6 +118,10 @@
 
   function isNativeSurfaceRuntime() {
     return Boolean(window.sabine?.bridge) || new URLSearchParams(window.location.search).has("sabine");
+  }
+
+  function usesContentAnimation(kind: string) {
+    return kind === "session-menu";
   }
 
   function keydown(event: KeyboardEvent) {

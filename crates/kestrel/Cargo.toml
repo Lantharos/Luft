@@ -14,7 +14,6 @@ glam.workspace = true
 luft-config.workspace = true
 luft-ipc.workspace = true
 profiling = "1.0.18"
-rand = "0.9.2"
 renderdoc = { version = "0.12.1", optional = true }
 smithay.workspace = true
 smithay-drm-extras = { workspace = true, optional = true }

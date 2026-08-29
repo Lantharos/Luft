@@ -8,7 +8,7 @@ use smithay::{
     wayland::compositor::with_states,
 };
 
-const STABLE_GEOMETRY_AGE: Duration = Duration::from_millis(8);
+const MOTION_CACHE_TTL: Duration = Duration::from_secs(2);
 
 #[derive(Debug, Default)]
 pub struct LayerMotionState {
@@ -19,8 +19,7 @@ pub struct LayerMotionState {
 struct SurfaceMotion {
     id: Id,
     target: Rectangle<i32, Logical>,
-    candidate: Rectangle<i32, Logical>,
-    candidate_since: Instant,
+    last_seen: Instant,
     transition: Option<LayerTransition>,
 }
 
@@ -102,8 +101,7 @@ impl LayerMotionState {
                     surfaces.push(SurfaceMotion {
                         id: id.clone(),
                         target: geometry,
-                        candidate: geometry,
-                        candidate_since: now,
+                        last_seen: now,
                         transition: None,
                     });
                     surfaces.last_mut().unwrap()
@@ -133,7 +131,10 @@ impl LayerMotionState {
         }
         drop(map);
 
-        surfaces.retain(|motion| live_ids.iter().any(|id| id == &motion.id));
+        surfaces.retain(|motion| {
+            live_ids.iter().any(|id| id == &motion.id)
+                || now.saturating_duration_since(motion.last_seen) < MOTION_CACHE_TTL
+        });
         offsets
     }
 }
@@ -146,14 +147,8 @@ impl SurfaceMotion {
         now: Instant,
         namespace: &str,
     ) {
-        if self.candidate != geometry {
-            self.candidate = geometry;
-            self.candidate_since = now;
-            return;
-        }
-        if self.target == geometry
-            || now.saturating_duration_since(self.candidate_since) < STABLE_GEOMETRY_AGE
-        {
+        self.last_seen = now;
+        if self.target == geometry {
             return;
         }
 

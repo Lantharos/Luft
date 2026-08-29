@@ -1,10 +1,11 @@
 use std::{cell::RefCell, time::Duration, time::Instant};
 
 use smithay::{
-    backend::renderer::element::Id,
+    backend::renderer::{element::Id, utils::RendererSurfaceStateUserData},
     desktop::layer_map_for_output,
     output::Output,
     utils::{Logical, Physical, Point, Rectangle, Scale, Size},
+    wayland::compositor::with_states,
 };
 
 const STABLE_GEOMETRY_AGE: Duration = Duration::from_millis(8);
@@ -86,6 +87,15 @@ impl LayerMotionState {
             };
             let id = Id::from_wayland_resource(layer.wl_surface());
             live_ids.push(id.clone());
+            let mapped = with_states(layer.wl_surface(), |states| {
+                states
+                    .data_map
+                    .get::<RendererSurfaceStateUserData>()
+                    .is_some_and(|state| state.lock().unwrap().buffer().is_some())
+            });
+            if !mapped && !outside_output(geometry, output_size) {
+                continue;
+            }
             let motion = match surfaces.iter_mut().find(|motion| motion.id == id) {
                 Some(motion) => motion,
                 None => {

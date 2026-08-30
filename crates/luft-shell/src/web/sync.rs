@@ -1,7 +1,7 @@
 use super::{CONFIG_REFRESH, MODEL_REFRESH, STATUS_REFRESH, WebShell};
 use crate::{
     apps::{launcher_apps, panel_apps},
-    ipc::{ShellModel, load_model, reload_config},
+    ipc::{ShellModel, load_model},
     services::system_status::SystemStatus,
     theme::shell_palette,
 };
@@ -64,11 +64,12 @@ impl WebShell {
     }
 
     pub(super) fn save_shell_config(&mut self, config: LuftConfig) {
+        self.apply_shell_config(config.clone());
+        self.sync_surfaces();
         match save_config(&config) {
             Ok(path) => {
                 debug!(path = %path.display(), "saved shell config");
-                self.apply_model_result(reload_config());
-                self.apply_shell_config(config);
+                self.last_config_refresh = Instant::now();
             }
             Err(error) => warn!(%error, "failed to save shell config"),
         }
@@ -105,7 +106,7 @@ impl WebShell {
         };
         if json != self.last_snapshot {
             self.last_snapshot = json.clone();
-            self.surfaces.evaluate_snapshot(&snapshot, &json);
+            self.surfaces.evaluate_snapshot(&snapshot);
         }
         self.surfaces
             .set_notification_toast_visible(notification_toast_visible);

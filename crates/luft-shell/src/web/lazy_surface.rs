@@ -15,7 +15,6 @@ pub(crate) struct LazyWebSurface {
     size: (i32, i32),
     actions_tx: Sender<WebShellAction>,
     snapshot: WebShellSnapshot,
-    snapshot_json: String,
     visible: bool,
     show_at: Option<Instant>,
     hide_at: Option<Instant>,
@@ -37,7 +36,6 @@ impl LazyWebSurface {
             size,
             actions_tx: actions_tx.clone(),
             snapshot: snapshot.clone(),
-            snapshot_json: serde_json::to_string(snapshot).unwrap_or_default(),
             visible: false,
             show_at: None,
             hide_at: None,
@@ -189,7 +187,7 @@ impl LazyWebSurface {
                         surface.size,
                     ));
                 }
-                surface.evaluate_snapshot(&self.snapshot, &self.snapshot_json);
+                surface.evaluate_snapshot(&self.snapshot);
                 self.surface = Some(surface);
             }
             Err(error) => {
@@ -208,13 +206,10 @@ impl LazyWebSurface {
         }
     }
 
-    pub(super) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, json: &str) {
+    pub(super) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot) {
         self.snapshot = snapshot.clone();
-        if self.snapshot_json != json {
-            self.snapshot_json = json.to_string();
-        }
         if let Some(surface) = &mut self.surface {
-            surface.evaluate_snapshot(snapshot, json);
+            surface.evaluate_snapshot(snapshot);
         }
     }
 

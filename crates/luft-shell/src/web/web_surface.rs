@@ -9,7 +9,7 @@ use sabine::{
     RuntimeMode, SabineProcess, SabineWindow, ShellSurfaceMargin, ShellSurfaceOptions,
     ShellSurfaceVisibilityRequest, ShellSurfaceVisibilityState,
 };
-use serde_json::json;
+use serde_json::{Map, Value, json};
 use std::{
     env,
     error::Error,
@@ -40,6 +40,8 @@ pub struct WebSurface {
     pub(crate) shell_margin: ShellSurfaceMargin,
     pending_snapshot: String,
     rendered_snapshot: String,
+    rendered_value: Option<Value>,
+    snapshot_revision: u64,
 }
 
 impl WebSurface {
@@ -70,6 +72,8 @@ impl WebSurface {
             shell_margin,
             pending_snapshot: initial,
             rendered_snapshot: String::new(),
+            rendered_value: None,
+            snapshot_revision: 0,
         };
         surface.set_visible(config.visible);
         Ok(surface)
@@ -101,8 +105,10 @@ impl WebSurface {
             return;
         }
         self.size = size;
-        self.shell_margin = self.base_shell_margin();
-        self.restart_for_geometry_change();
+        if let Some(process) = &self.process {
+            let _ = process.set_shell_surface_size(size.0.max(1) as u32, size.1.max(1) as u32);
+        }
+        self.set_shell_margin(self.base_shell_margin());
     }
 
     pub(crate) fn set_panel_menu_x(&mut self, x: Option<i32>) {
@@ -110,10 +116,7 @@ impl WebSurface {
             return;
         }
         self.panel_menu_x = x;
-        self.shell_margin = self.base_shell_margin();
-        if self.kind == WebShellSurface::PanelMenu {
-            self.restart_for_geometry_change();
-        }
+        self.set_shell_margin(self.base_shell_margin());
     }
 
     pub(crate) fn set_session_menu_qs_height(&mut self, height: Option<i32>) {
@@ -123,12 +126,14 @@ impl WebSurface {
         self.session_menu_qs_height = height;
     }
 
-    pub(crate) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, json: &str) {
+    pub(crate) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot) {
         if let Ok(mut current) = self.snapshot.lock() {
             *current = snapshot.clone();
         }
-        if self.pending_snapshot != json {
-            self.pending_snapshot = json.to_string();
+        if let Ok(json) = serde_json::to_string(snapshot)
+            && self.pending_snapshot != json
+        {
+            self.pending_snapshot = json;
         }
         self.flush_snapshot();
     }
@@ -181,6 +186,8 @@ impl WebSurface {
             self.visibility_requested_at = None;
             self.mapped = None;
             self.rendered_snapshot.clear();
+            self.rendered_value = None;
+            self.snapshot_revision = 0;
         }
         if self.process.is_none() {
             self.launch();
@@ -200,6 +207,8 @@ impl WebSurface {
             self.visibility_attempts = 0;
             self.mapped = Some(false);
             self.rendered_snapshot.clear();
+            self.rendered_value = None;
+            self.snapshot_revision = 0;
             return;
         }
         if self.process.is_none() || self.request_visibility(false) {
@@ -210,6 +219,8 @@ impl WebSurface {
         self.visibility_requested_at = None;
         self.mapped = None;
         self.rendered_snapshot.clear();
+        self.rendered_value = None;
+        self.snapshot_revision = 0;
     }
 
     pub(crate) fn release_hidden_process(&mut self) {
@@ -221,10 +232,13 @@ impl WebSurface {
             self.visibility_requested_at = None;
             self.mapped = None;
             self.rendered_snapshot.clear();
+            self.rendered_value = None;
+            self.snapshot_revision = 0;
         }
     }
 
     pub(crate) fn tick_visibility(&mut self) {
+        self.flush_snapshot();
         let Some(request) = self.visibility_request.as_ref() else {
             self.ensure_visibility_request();
             return;
@@ -378,7 +392,7 @@ impl WebSurface {
     }
 
     fn flush_snapshot(&mut self) {
-        if !self.visible || self.pending_snapshot == self.rendered_snapshot {
+        if self.pending_snapshot == self.rendered_snapshot {
             return;
         }
         let Some(process) = &self.process else {
@@ -390,8 +404,21 @@ impl WebSurface {
         let Ok(value) = serde_json::to_value(&*snapshot) else {
             return;
         };
-        if process.emit_bridge_event("luft.snapshot", value) {
+        let revision = self.snapshot_revision.saturating_add(1);
+        let (event, payload) = match &self.rendered_value {
+            Some(rendered) => (
+                "luft.patch",
+                json!({
+                    "revision": revision,
+                    "changes": top_level_patch(rendered, &value),
+                }),
+            ),
+            None => ("luft.snapshot", value.clone()),
+        };
+        if process.emit_bridge_event(event, payload) {
             self.rendered_snapshot.clone_from(&self.pending_snapshot);
+            self.rendered_value = Some(value);
+            self.snapshot_revision = revision;
         }
     }
 
@@ -413,23 +440,6 @@ impl WebSurface {
             "luft.surface-close",
             json!({ "surface": self.kind.as_str() }),
         );
-    }
-
-    fn restart_for_geometry_change(&mut self) {
-        let was_running = self.process.is_some();
-        if !self.visible && (!self.keep_alive_when_hidden || !was_running) {
-            return;
-        }
-        self.process = None;
-        self.visibility_request = None;
-        self.visibility_requested_at = None;
-        self.visibility_attempts = 0;
-        self.mapped = None;
-        self.rendered_snapshot.clear();
-        self.launch();
-        if !self.visible {
-            self.hide_process();
-        }
     }
 
     fn request_visibility(&mut self, visible: bool) -> bool {
@@ -477,10 +487,24 @@ impl WebSurface {
         self.visibility_attempts = 0;
         self.mapped = None;
         self.rendered_snapshot.clear();
+        self.rendered_value = None;
+        self.snapshot_revision = 0;
         if self.visible || self.keep_alive_when_hidden {
             self.launch();
         }
     }
+}
+
+fn top_level_patch(previous: &Value, next: &Value) -> Value {
+    let (Some(previous), Some(next)) = (previous.as_object(), next.as_object()) else {
+        return next.clone();
+    };
+    let changes = next
+        .iter()
+        .filter(|(key, value)| previous.get(*key) != Some(*value))
+        .map(|(key, value)| (key.clone(), value.clone()))
+        .collect::<Map<String, Value>>();
+    Value::Object(changes)
 }
 
 pub(crate) struct WebSurfaceConfig<'a> {
@@ -561,4 +585,18 @@ fn workspace_root() -> PathBuf {
 
 fn manifest_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::top_level_patch;
+    use serde_json::json;
+
+    #[test]
+    fn snapshot_patch_only_contains_changed_domains() {
+        let previous = json!({"time": "10:00", "panelApps": [1], "status": {"audio": 50}});
+        let next = json!({"time": "10:01", "panelApps": [1], "status": {"audio": 50}});
+
+        assert_eq!(top_level_patch(&previous, &next), json!({"time": "10:01"}));
+    }
 }

@@ -20,7 +20,7 @@ calloop = { version = "0.14.4", features = ["signals"] }
 clap = { version = "4.6.4", features = ["derive"] }
 glam = "0.33.2"
 input = "0.10.0"
-serde = { version = "1.0.229", features = ["derive"] }
+serde = { version = "1.0.229", features = ["derive", "rc"] }
 serde_json = "1.0.151"
 smithay = { git = "https://github.com/krissedout/smithay.git", rev = "f813370612e30c1be42bbd1f99018b892e6de462", default-features = false, features = ["desktop", "wayland_frontend"] }
 smithay-drm-extras = { git = "https://github.com/krissedout/smithay.git", rev = "f813370612e30c1be42bbd1f99018b892e6de462" }

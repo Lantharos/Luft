@@ -1,4 +1,11 @@
-use std::{fs, io, path::Path, process::Command};
+use std::{
+    fs, io,
+    path::Path,
+    process::Command,
+    sync::mpsc::{self, Receiver, Sender},
+    thread,
+    time::Duration,
+};
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct SystemStatus {
@@ -29,6 +36,77 @@ pub struct AudioInfo {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BrightnessInfo {
     pub percent: u8,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SystemStatusCommand {
+    SetVolume(u8),
+    ToggleMute,
+    SetBrightness(u8),
+}
+
+pub struct SystemStatusService {
+    commands: Sender<SystemStatusCommand>,
+    updates: Receiver<SystemStatus>,
+}
+
+impl SystemStatusService {
+    pub fn start() -> Self {
+        let (commands_tx, commands_rx) = mpsc::channel();
+        let (updates_tx, updates_rx) = mpsc::channel();
+        thread::spawn(move || run_status_worker(commands_rx, updates_tx));
+        Self {
+            commands: commands_tx,
+            updates: updates_rx,
+        }
+    }
+
+    pub fn send(&self, command: SystemStatusCommand) {
+        let _ = self.commands.send(command);
+    }
+
+    pub fn latest(&self) -> Option<SystemStatus> {
+        self.updates.try_iter().last()
+    }
+}
+
+fn run_status_worker(commands: Receiver<SystemStatusCommand>, updates: Sender<SystemStatus>) {
+    let _ = updates.send(SystemStatus::read());
+    loop {
+        let first = match commands.recv_timeout(Duration::from_secs(1)) {
+            Ok(command) => Some(command),
+            Err(mpsc::RecvTimeoutError::Timeout) => None,
+            Err(mpsc::RecvTimeoutError::Disconnected) => break,
+        };
+        if let Some(first) = first {
+            apply_commands(std::iter::once(first).chain(commands.try_iter()));
+        }
+        if updates.send(SystemStatus::read()).is_err() {
+            break;
+        }
+    }
+}
+
+fn apply_commands(commands: impl Iterator<Item = SystemStatusCommand>) {
+    let mut volume = None;
+    let mut brightness = None;
+    let mut toggle_mute = false;
+    for command in commands {
+        match command {
+            SystemStatusCommand::SetVolume(percent) => volume = Some(percent),
+            SystemStatusCommand::ToggleMute => toggle_mute = !toggle_mute,
+            SystemStatusCommand::SetBrightness(percent) => brightness = Some(percent),
+        }
+    }
+    if let Some(percent) = volume {
+        let _ = set_audio_volume(percent);
+    }
+    if toggle_mute {
+        let _ = toggle_audio_mute();
+    }
+    if let Some(percent) = brightness {
+        let _ = set_brightness(percent);
+    }
 }
 
 impl SystemStatus {
@@ -163,16 +241,16 @@ fn brightness_from_path(path: &Path) -> Option<BrightnessInfo> {
     })
 }
 
-pub fn set_audio_volume(percent: u8) -> std::io::Result<()> {
+fn set_audio_volume(percent: u8) -> std::io::Result<()> {
     let value = format!("{}%", percent.min(100));
     run_command("wpctl", &["set-volume", "@DEFAULT_AUDIO_SINK@", &value])
 }
 
-pub fn toggle_audio_mute() -> std::io::Result<()> {
+fn toggle_audio_mute() -> std::io::Result<()> {
     run_command("wpctl", &["set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
 }
 
-pub fn set_brightness(percent: u8) -> std::io::Result<()> {
+fn set_brightness(percent: u8) -> std::io::Result<()> {
     let value = format!("{}%", percent.min(100));
     run_command("brightnessctl", &["set", &value])
 }

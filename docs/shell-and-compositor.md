@@ -9,7 +9,9 @@ and frame presentation. Layer surfaces are composed in background, bottom,
 application, top, and overlay order.
 
 The compositor supervises `luft-shell` and `xwayland-satellite`. Their current
-state, the active workspace, windows, and outputs are exposed through typed IPC.
+state, the active workspace, windows, and outputs are exposed through one
+versioned, framed IPC connection. Kestrel pushes revisions when state changes;
+the shell does not poll or block the compositor while waiting for a response.
 Configuration reload rebuilds workspace policy without losing live windows and
 reconfigures X11 support. Child processes are stopped with the compositor.
 
@@ -48,9 +50,10 @@ launching, session commands, and configuration; the web bundle renders the
 chrome.
 
 Transient shell surfaces are prewarmed incrementally after startup, remain
-non-visible while their alpha is zero, and are evicted after an idle period.
-This keeps first-open latency low without making hidden surfaces participate in
-composition.
+non-visible while their alpha is zero, and retain their browser process while
+hidden. Live Sabine size and frame-rate controls keep the same surface attached
+when notification content grows or an output refresh rate changes. This keeps
+every open fast without making hidden surfaces participate in composition.
 
 Kestrel renders `ext-background-effect-v1` blur regions as Smithay framebuffer
 effects. Blur follows the exact region supplied by Sabine, including rounded

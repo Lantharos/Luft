@@ -1,11 +1,11 @@
 use super::WebShell;
-use crate::{apps::spawn_command, ipc::reload_config};
+use crate::apps::spawn_command;
 use luft_config::ConfigPaths;
 use tracing::warn;
 
 impl WebShell {
     pub(super) fn reload_config_from_command(&mut self) {
-        self.apply_model_result(reload_config());
+        self.send_ipc(luft_ipc::IpcRequest::Reload);
         self.reload_shell_config();
     }
 

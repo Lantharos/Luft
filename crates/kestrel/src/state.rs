@@ -1,7 +1,7 @@
 use std::{
     collections::{BTreeMap, HashMap},
     sync::{Arc, atomic::AtomicBool},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 use luft_ipc::{LayoutEngine, WindowId};
@@ -133,6 +133,19 @@ use crate::{
 pub struct ClientState {
     pub compositor_state: CompositorClientState,
     pub security_context: Option<SecurityContext>,
+    pub privileged: bool,
+}
+
+fn privileged_client(client: &Client) -> bool {
+    client
+        .get_data::<ClientState>()
+        .is_some_and(|state| state.privileged && state.security_context.is_none())
+}
+
+fn unsandboxed_client(client: &Client) -> bool {
+    client
+        .get_data::<ClientState>()
+        .is_some_and(|state| state.security_context.is_none())
 }
 impl ClientData for ClientState {
     /// Notification that a client was initialized
@@ -156,6 +169,8 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub layer_motion: crate::layer_motion::LayerMotionState,
     pub layout: LayoutEngine,
     pub windows: BTreeMap<WindowId, WindowElement>,
+    pub shell_state_dirty: bool,
+    pub last_shell_focus: Option<WlSurface>,
 
     // desktop
     pub space: Space<WindowElement>,
@@ -191,6 +206,12 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub idle_inhibit_state: IdleInhibitManagerState,
     pub idle_notifier_state: IdleNotifierState<KestrelState<BackendData>>,
     pub idle_inhibitors: Vec<WlSurface>,
+    pub idle_inhibited: bool,
+    pub last_activity: Instant,
+    pub idle_lock_after: Option<Duration>,
+    pub idle_suspend_after: Option<Duration>,
+    pub idle_lock_sent: bool,
+    pub idle_suspend_sent: bool,
     pub capture_sessions: Vec<Session>,
     pub pending_captures: Vec<PendingCapture>,
 
@@ -463,14 +484,13 @@ impl<BackendData: Backend> XdgActivationHandler for KestrelState<BackendData> {
         surface: WlSurface,
     ) {
         if token_data.timestamp.elapsed().as_secs() < 10 {
-            // Just grant the wish
-            let w = self
-                .space
-                .elements()
-                .find(|window| window.wl_surface().map(|s| *s == surface).unwrap_or(false))
-                .cloned();
-            if let Some(window) = w {
-                self.space.raise_element(&window, true);
+            let id = self.windows.iter().find_map(|(id, window)| {
+                (window.wl_surface().as_deref() == Some(&surface)).then_some(*id)
+            });
+            if let Some(id) = id
+                && let Err(error) = self.activate_window(id)
+            {
+                tracing::warn!(%error, "failed to honor xdg activation request");
             }
         }
     }
@@ -672,6 +692,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     pub fn notify_idle_activity(&mut self) {
         let seat = self.seat.clone();
         self.idle_notifier_state.notify_activity(&seat);
+        self.last_activity = Instant::now();
+        self.idle_lock_sent = false;
+        self.idle_suspend_sent = false;
     }
 
     pub fn refresh_idle_inhibition(&mut self) {
@@ -685,6 +708,12 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             })
         });
         self.idle_notifier_state.set_is_inhibited(inhibited);
+        self.idle_inhibited = inhibited;
+        if inhibited {
+            self.last_activity = Instant::now();
+            self.idle_lock_sent = false;
+            self.idle_suspend_sent = false;
+        }
     }
 }
 
@@ -722,6 +751,27 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             info!(name = socket_name, "Listening on wayland socket");
             Some(socket_name)
         };
+        let privileged_socket_name = {
+            let source = ListeningSocketSource::new_auto()
+                .expect("failed to create privileged Wayland socket");
+            let socket_name = source.socket_name().to_string_lossy().into_owned();
+            handle
+                .insert_source(source, |client_stream, _, data| {
+                    let client_state = ClientState {
+                        privileged: true,
+                        ..ClientState::default()
+                    };
+                    if let Err(err) = data
+                        .display_handle
+                        .insert_client(client_stream, Arc::new(client_state))
+                    {
+                        warn!("Error adding privileged wayland client: {}", err);
+                    }
+                })
+                .expect("Failed to init privileged Wayland socket source");
+            info!(name = socket_name, "Listening on privileged Wayland socket");
+            socket_name
+        };
         handle
             .insert_source(
                 Generic::new(display, Interest::READ, Mode::Level),
@@ -742,8 +792,11 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         let layer_shell_state = WlrLayerShellState::new::<Self>(&dh);
         let output_manager_state = OutputManagerState::new_with_xdg_output::<Self>(&dh);
         let primary_selection_state = PrimarySelectionState::new::<Self>(&dh);
-        let data_control_state =
-            DataControlState::new::<Self, _>(&dh, Some(&primary_selection_state), |_| true);
+        let data_control_state = DataControlState::new::<Self, _>(
+            &dh,
+            Some(&primary_selection_state),
+            privileged_client,
+        );
         let mut seat_state = SeatState::new();
         let shm_state = ShmState::new::<Self>(&dh, vec![]);
         let viewporter_state = ViewporterState::new::<Self>(&dh);
@@ -757,8 +810,8 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         let fifo_manager_state = FifoManagerState::new::<Self>(&dh);
         let commit_timing_manager_state = CommitTimingManagerState::new::<Self>(&dh);
         TextInputManagerState::new::<Self>(&dh);
-        InputMethodManagerState::new::<Self, _>(&dh, |_client| true);
-        VirtualKeyboardManagerState::new::<Self, _>(&dh, |_client| true);
+        InputMethodManagerState::new::<Self, _>(&dh, privileged_client);
+        VirtualKeyboardManagerState::new::<Self, _>(&dh, privileged_client);
         // Expose global only if backend supports relative motion events
         if BackendData::HAS_RELATIVE_MOTION {
             RelativePointerManagerState::new::<Self>(&dh);
@@ -777,21 +830,25 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
 
         // Image capture protocols (screencopy)
         let image_capture_source_state = ImageCaptureSourceState::new();
-        let output_capture_source_state = OutputCaptureSourceState::new::<Self>(&dh);
-        let image_copy_capture_state = ImageCopyCaptureState::new::<Self>(&dh);
+        let output_capture_source_state =
+            OutputCaptureSourceState::new_with_filter::<Self, _>(&dh, unsandboxed_client);
+        let image_copy_capture_state =
+            ImageCopyCaptureState::new_with_filter::<Self, _>(&dh, unsandboxed_client);
         let alpha_modifier_state = AlphaModifierState::new::<Self>(&dh);
         let background_effect_state = BackgroundEffectState::new::<Self>(&dh);
         let cursor_shape_state = CursorShapeManagerState::new::<Self>(&dh);
         let session_lock = crate::session_lock::SessionLock::new(SessionLockManagerState::new::<
             Self,
             _,
-        >(&dh, |_| true));
+        >(&dh, privileged_client));
         let idle_inhibit_state = IdleInhibitManagerState::new::<Self>(&dh);
         let idle_notifier_state = IdleNotifierState::new(&dh, handle.clone());
 
         let config = luft_config::load_config()
             .map(|loaded| loaded.config)
             .unwrap_or_default();
+        let idle_lock_after = config.session.idle_lock_seconds.map(Duration::from_secs);
+        let idle_suspend_after = config.session.idle_suspend_seconds.map(Duration::from_secs);
 
         // init input
         let seat_name = backend_data.seat_name();
@@ -820,6 +877,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             crate::xwayland_process::XwaylandProcess::new(xwayland_enabled, wayland_socket.clone());
         let shell_process = ShellProcess::new(
             runtime.start_shell,
+            privileged_socket_name,
             wayland_socket,
             ipc_path,
             xwayland_process.display().map(str::to_owned),
@@ -840,6 +898,8 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             layer_motion: crate::layer_motion::LayerMotionState::default(),
             layout: crate::policy::create_layout(),
             windows: BTreeMap::new(),
+            shell_state_dirty: true,
+            last_shell_focus: None,
             space: Space::default(),
             popups: PopupManager::default(),
             compositor_state,
@@ -871,6 +931,12 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             idle_inhibit_state,
             idle_notifier_state,
             idle_inhibitors: Vec::new(),
+            idle_inhibited: false,
+            last_activity: Instant::now(),
+            idle_lock_after,
+            idle_suspend_after,
+            idle_lock_sent: false,
+            idle_suspend_sent: false,
             capture_sessions: Vec::new(),
             pending_captures: Vec::new(),
             dnd_icon: None,

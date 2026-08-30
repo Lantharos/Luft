@@ -22,6 +22,7 @@ pub(crate) struct LazyWebSurface {
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
     surface: Option<WebSurface>,
+    frame_rate: u32,
 }
 
 impl LazyWebSurface {
@@ -30,6 +31,7 @@ impl LazyWebSurface {
         size: (i32, i32),
         actions_tx: &Sender<WebShellAction>,
         snapshot: &WebShellSnapshot,
+        frame_rate: u32,
     ) -> Self {
         Self {
             kind,
@@ -43,6 +45,7 @@ impl LazyWebSurface {
             panel_menu_x: None,
             session_menu_qs_height: None,
             surface: None,
+            frame_rate,
         }
     }
 
@@ -178,6 +181,7 @@ impl LazyWebSurface {
             session_menu_qs_height: self.session_menu_qs_height,
             actions_tx: &self.actions_tx,
             snapshot: &self.snapshot,
+            frame_rate: self.frame_rate,
         }) {
             Ok(mut surface) => {
                 if surface_margin_animates(self.kind) {
@@ -203,6 +207,13 @@ impl LazyWebSurface {
         }
         if !self.visible {
             self.schedule_release(Instant::now());
+        }
+    }
+
+    pub(super) fn set_frame_rate(&mut self, frame_rate: u32) {
+        self.frame_rate = frame_rate;
+        if let Some(surface) = &mut self.surface {
+            surface.set_frame_rate(frame_rate);
         }
     }
 

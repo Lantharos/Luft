@@ -245,6 +245,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                     refresh: 60_000,
                 };
                 output.change_current_state(Some(mode), None, None, None);
+                state.shell_state_dirty = true;
                 output.set_preferred(mode);
                 crate::shell::fixup_positions(&mut state.space, state.pointer.current_location());
             }
@@ -521,7 +522,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
             state.running.store(false, Ordering::SeqCst);
         } else {
             state.space.refresh();
-            state.sync_policy();
+            state.sync_shell_state();
             state.popups.cleanup();
             display_handle.flush_clients().unwrap();
         }

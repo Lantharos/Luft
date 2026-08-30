@@ -50,8 +50,13 @@ IPC reports XWayland as unavailable.
 
 The Luft shell is supervised independently from the compositor. Shell and
 satellite crashes use bounded restart delays and are stopped when the session
-ends. Typed Unix-socket IPC owns workspace/window policy and configuration
-reloads; slow or incomplete IPC clients cannot block the compositor loop.
+ends. The shell uses a separate privileged Wayland socket for layer-shell,
+session-lock, input-method, virtual-keyboard, and data-control capabilities;
+applications it launches receive the public socket. Sandboxed security-context
+clients cannot bind output-capture globals. Typed framed Unix-socket IPC owns
+workspace/window policy and configuration reloads, pushes state revisions over
+one persistent connection, and bounds message and connection counts so slow or
+incomplete clients cannot block the compositor loop.
 
 ## Validation Boundary
 

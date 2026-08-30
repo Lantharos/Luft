@@ -5,8 +5,8 @@ use std::{
 
 use luft_config::{LuftConfig, load_config};
 use luft_ipc::{
-    IpcRequest, IpcResponse, LayoutEngine, OutputSummary, Rect, StatusPayload, WindowId,
-    WindowInfo, WindowState, WindowSummary, Workspace, WorkspaceId, WorkspaceSummary,
+    IpcRequest, IpcResponse, LayoutEngine, OutputSummary, Rect, ShellSnapshot, StatusPayload,
+    WindowId, WindowInfo, WindowState, WindowSummary, Workspace, WorkspaceId, WorkspaceSummary,
 };
 use smithay::{
     desktop::space::SpaceElement,
@@ -27,7 +27,7 @@ use tracing::warn;
 
 use crate::{
     shell::{
-        WindowElement,
+        WindowElement, fixup_positions,
         ssd::{WindowAnimation, WindowAnimationKind},
     },
     state::{Backend, KestrelState},
@@ -78,18 +78,19 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         match self.layout.register_window(info) {
             Ok(id) => {
                 self.windows.insert(id, window);
-                self.reconcile_workspace();
+                self.shell_state_dirty = true;
             }
             Err(error) => warn!(%error, "failed to register window"),
         }
     }
 
-    pub fn sync_policy(&mut self) {
+    pub fn sync_policy(&mut self) -> bool {
         let dead = self
             .windows
             .iter()
             .filter_map(|(id, window)| (!window.alive()).then_some(*id))
             .collect::<Vec<_>>();
+        let mut changed = !dead.is_empty();
         for id in dead {
             self.windows.remove(&id);
             self.layout.unregister_window(id);
@@ -107,67 +108,82 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             if let Some(mut info) = self.layout.window(id).cloned() {
                 info.geometry = geometry;
                 self.update_window_info(&window, &mut info);
-                if let Some(stored) = self.layout.window_mut(id) {
+                if let Some(stored) = self.layout.window_mut(id)
+                    && *stored != info
+                {
                     *stored = info;
+                    changed = true;
                 }
             }
         }
+        changed
     }
 
     pub fn handle_ipc(&mut self, request: IpcRequest) -> IpcResponse {
-        self.sync_policy();
+        self.shell_state_dirty = true;
         match request {
-            IpcRequest::ShellSnapshot => self.shell_snapshot(),
+            IpcRequest::SubscribeShell => IpcResponse::Accepted { revision: 0 },
             IpcRequest::ListOutputs => IpcResponse::Outputs {
                 outputs: self.output_summaries(),
             },
             IpcRequest::ActivateWindow { window } => self
                 .activate_window(window)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::CloseWindow { window } => self
                 .close_window(window)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::MinimizeWindow { window } => self
                 .minimize_window(window)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::ToggleMaximizeWindow { window } => self
                 .toggle_maximize(window)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::MoveWindowToWorkspace { window, workspace } => self
                 .layout
                 .move_window_to_workspace(window, &workspace)
                 .map(|()| self.reconcile_workspace())
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::SwitchWorkspace { workspace } => self
                 .switch_workspace(workspace)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::SwitchRelativeWorkspace { offset } => self
                 .switch_relative_workspace(offset)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::SetOutputScale { output, scale } => self
                 .set_output_scale(output.as_deref(), scale)
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::RestartShell => {
                 self.shell_process.restart();
-                IpcResponse::Accepted
+                IpcResponse::Accepted { revision: 0 }
             }
             IpcRequest::Reload => self
                 .reload_config()
-                .map(|()| IpcResponse::Accepted)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
         }
     }
 
     fn reload_config(&mut self) -> Result<(), String> {
         let config = load_config().map_err(|error| error.to_string())?.config;
+        self.idle_lock_after = config
+            .session
+            .idle_lock_seconds
+            .map(std::time::Duration::from_secs);
+        self.idle_suspend_after = config
+            .session
+            .idle_suspend_seconds
+            .map(std::time::Duration::from_secs);
+        self.last_activity = std::time::Instant::now();
+        self.idle_lock_sent = false;
+        self.idle_suspend_sent = false;
         let active = self.layout.active_workspace().clone();
         let windows = self.layout.windows().cloned().collect::<Vec<_>>();
         let mut layout = create_layout_from_config(config.clone());
@@ -207,20 +223,73 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         Ok(())
     }
 
-    fn shell_snapshot(&self) -> IpcResponse {
-        let focus = self
-            .seat
+    pub fn sync_shell_state(&mut self) -> ShellSnapshot {
+        self.process_idle_actions();
+        let policy_changed = self.sync_policy();
+        let focus = self.shell_focus_surface();
+        let focus_changed = focus != self.last_shell_focus;
+        self.last_shell_focus = focus;
+        let process_changed = self.ipc_socket.snapshot().is_some_and(|snapshot| {
+            snapshot.status.shell != self.shell_process.status()
+                || snapshot.status.xwayland != self.xwayland_process.status()
+                || snapshot.status.xwayland_display.as_deref() != self.xwayland_process.display()
+        });
+        if !self.shell_state_dirty
+            && !policy_changed
+            && !focus_changed
+            && !process_changed
+            && let Some(snapshot) = self.ipc_socket.snapshot()
+        {
+            return snapshot;
+        }
+        let snapshot = self.shell_snapshot();
+        let snapshot = self.ipc_socket.publish(snapshot);
+        self.shell_state_dirty = false;
+        snapshot
+    }
+
+    fn shell_focus_surface(
+        &self,
+    ) -> Option<smithay::reexports::wayland_server::protocol::wl_surface::WlSurface> {
+        self.seat
             .get_keyboard()
             .and_then(|keyboard| keyboard.current_focus())
-            .and_then(|focus| focus.wl_surface().map(|surface| surface.into_owned()));
+            .and_then(|focus| focus.wl_surface().map(|surface| surface.into_owned()))
+    }
+
+    fn process_idle_actions(&mut self) {
+        if self.idle_inhibited {
+            return;
+        }
+
+        let idle_for = self.last_activity.elapsed();
+        if !self.idle_lock_sent && self.idle_lock_after.is_some_and(|after| idle_for >= after) {
+            self.ipc_socket
+                .send_shell_command(luft_ipc::ShellCommand::Lock);
+            self.idle_lock_sent = true;
+        }
+        if !self.idle_suspend_sent
+            && self
+                .idle_suspend_after
+                .is_some_and(|after| idle_for >= after)
+        {
+            self.ipc_socket
+                .send_shell_command(luft_ipc::ShellCommand::Suspend);
+            self.idle_suspend_sent = true;
+        }
+    }
+
+    fn shell_snapshot(&self) -> ShellSnapshot {
+        let focus = self.shell_focus_surface();
         let active_workspace = self.layout.active_workspace().clone();
         let windows = self
             .layout
             .windows()
             .filter_map(|info| {
                 let window = self.windows.get(&info.id)?;
-                let is_visible =
-                    info.workspace == active_workspace && info.state != WindowState::Hidden;
+                let is_visible = info.workspace == active_workspace
+                    && info.state != WindowState::Hidden
+                    && self.space.element_location(window).is_some();
                 let is_active = is_visible
                     && focus
                         .as_ref()
@@ -242,7 +311,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             })
             .collect();
 
-        IpcResponse::ShellSnapshot {
+        ShellSnapshot {
+            revision: 0,
             status: StatusPayload {
                 compositor: "Kestrel".to_string(),
                 shell: self.shell_process.status(),
@@ -289,7 +359,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .collect()
     }
 
-    fn activate_window(&mut self, id: WindowId) -> Result<(), String> {
+    pub(crate) fn activate_window(&mut self, id: WindowId) -> Result<(), String> {
         let workspace = self
             .layout
             .window(id)
@@ -487,6 +557,24 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .cloned()
             .ok_or_else(|| "output not found".to_string())?;
         output.change_current_state(None, None, Some(Scale::Fractional(scale)), None);
+        self.shell_state_dirty = true;
+        fixup_positions(&mut self.space, self.pointer.current_location());
+        let reconfigure = self
+            .windows
+            .values()
+            .filter_map(|window| {
+                let toplevel = window.0.toplevel()?.clone();
+                let decoration = window.decoration_state();
+                Some((toplevel, decoration.maximized, decoration.fullscreen))
+            })
+            .collect::<Vec<_>>();
+        for (toplevel, maximized, fullscreen) in reconfigure {
+            if fullscreen {
+                XdgShellHandler::fullscreen_request(self, toplevel, None);
+            } else if maximized {
+                XdgShellHandler::maximize_request(self, toplevel);
+            }
+        }
         self.backend_data.reset_buffers(&output);
         Ok(())
     }

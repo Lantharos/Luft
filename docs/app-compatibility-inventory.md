@@ -31,8 +31,9 @@ This list tracks protocol and service work needed for ordinary apps to behave li
 - Pointer constraints: advertised; confinement, pointer locking, relative
   motion, activation regions, and cursor-position hints are enforced in the
   input path.
-- Idle notify and inhibit: advertised; input activity resets idle timers and
-  mapped inhibitors suppress idle transitions.
+- Idle notify and inhibit: advertised; input activity resets idle timers,
+  mapped inhibitors suppress idle transitions, and configured lock and suspend
+  deadlines are delivered to the supervised shell without polling.
 - Tablet protocol: advertised in the session backend; libinput tablet tool
   proximity, axis, tip, and button events are mapped into Smithay's tablet seat.
 

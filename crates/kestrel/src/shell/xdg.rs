@@ -57,6 +57,7 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
             self.pointer.current_location(),
             &window,
             true,
+            false,
         );
         self.register_window(window);
 

@@ -574,7 +574,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
             state.running.store(false, Ordering::SeqCst);
         } else {
             state.space.refresh();
-            state.sync_policy();
+            state.sync_shell_state();
             state.popups.cleanup();
             display_handle.flush_clients().unwrap();
         }
@@ -1092,6 +1092,7 @@ impl KestrelState<UdevData> {
                 Some(position),
             );
             self.space.map_output(&output, position);
+            self.shell_state_dirty = true;
 
             output.user_data().insert_if_missing(|| UdevOutputId {
                 crtc,
@@ -1225,6 +1226,7 @@ impl KestrelState<UdevData> {
         } else if let Some(surface) = device.surfaces.remove(&crtc) {
             self.space.unmap_output(&surface.output);
             self.space.refresh();
+            self.shell_state_dirty = true;
         }
 
         let render_node = device.render_node.unwrap_or(self.backend_data.primary_gpu);

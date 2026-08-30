@@ -16,9 +16,15 @@ use std::{
     process::{Child, Command, Stdio},
 };
 
-pub fn panel_apps(config: &LuftConfig) -> Vec<PanelApp> {
+pub fn shell_apps(config: &LuftConfig) -> (Vec<PanelApp>, Vec<AppEntry>) {
+    let applications = discover_applications(config);
+    let panel = panel_apps_from(config, &applications);
+    let launcher = launcher_apps_from(applications, &panel);
+    (panel, launcher)
+}
+
+pub fn panel_apps_from(config: &LuftConfig, applications: &[AppEntry]) -> Vec<PanelApp> {
     if config.panel.customized || !config.panel.pinned.is_empty() {
-        let applications = discover_applications(config);
         return config
             .panel
             .pinned
@@ -39,7 +45,6 @@ pub fn panel_apps(config: &LuftConfig) -> Vec<PanelApp> {
             .collect();
     }
 
-    let applications = discover_applications(config);
     vec![
         default_panel_app(
             "Terminal",
@@ -54,7 +59,7 @@ pub fn panel_apps(config: &LuftConfig) -> Vec<PanelApp> {
                 "kitty",
                 "Terminal",
             ],
-            &applications,
+            applications,
         ),
         default_panel_app(
             "Files",
@@ -66,7 +71,7 @@ pub fn panel_apps(config: &LuftConfig) -> Vec<PanelApp> {
                 "dolphin",
                 "Thunar",
             ],
-            &applications,
+            applications,
         ),
         default_panel_app(
             "Browser",
@@ -82,13 +87,12 @@ pub fn panel_apps(config: &LuftConfig) -> Vec<PanelApp> {
                 "org.mozilla.firefox",
                 "brave-browser",
             ],
-            &applications,
+            applications,
         ),
     ]
 }
 
-pub fn launcher_apps(config: &LuftConfig, fallback: &[PanelApp]) -> Vec<AppEntry> {
-    let applications = discover_applications(config);
+pub fn launcher_apps_from(applications: Vec<AppEntry>, fallback: &[PanelApp]) -> Vec<AppEntry> {
     if !applications.is_empty() {
         return applications;
     }
@@ -112,6 +116,20 @@ pub fn spawn_command(command: &str, xwayland_display: Option<&str>) -> io::Resul
     log_app_launch(&command);
     let mut child = command_for_launch(&command);
     apply_app_environment(&mut child, xwayland_display);
+    child.spawn()
+}
+
+pub fn spawn_privileged_command(
+    command: &str,
+    xwayland_display: Option<&str>,
+) -> io::Result<Child> {
+    let command = normalize_launch_command(command);
+    log_app_launch(&command);
+    let mut child = command_for_launch(&command);
+    apply_app_environment(&mut child, xwayland_display);
+    if let Some(display) = env::var_os("LUFT_PRIVILEGED_WAYLAND_DISPLAY") {
+        child.env("WAYLAND_DISPLAY", display);
+    }
     child.spawn()
 }
 

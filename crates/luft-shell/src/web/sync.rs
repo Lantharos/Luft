@@ -1,48 +1,61 @@
-use super::{CONFIG_REFRESH, MODEL_REFRESH, STATUS_REFRESH, WebShell};
+use super::{CONFIG_REFRESH, WebShell};
 use crate::{
-    apps::{launcher_apps, panel_apps},
-    ipc::{ShellModel, load_model},
-    services::system_status::SystemStatus,
+    apps::{launcher_apps_from, panel_apps_from, shell_apps},
+    ipc::ShellModel,
     theme::shell_palette,
 };
 use luft_config::{LuftConfig, load_config, save_config};
-use std::{error::Error, time::Instant};
+use std::time::Instant;
 use tracing::{debug, warn};
 
 impl WebShell {
-    pub(super) fn apply_model_result(&mut self, result: Result<ShellModel, Box<dyn Error>>) {
-        match result {
-            Ok(model) => self.apply_model(model),
-            Err(error) => warn!(%error, "failed to apply shell action"),
+    pub(super) fn send_ipc(&self, request: luft_ipc::IpcRequest) {
+        if let Err(error) = self.ipc.send(request.clone()) {
+            warn!(%error, ?request, "failed to send Kestrel command");
         }
     }
 
     pub(super) fn refresh_model(&mut self) {
-        if self.last_model_refresh.elapsed() < MODEL_REFRESH {
-            return;
+        let mut latest = None;
+        let messages = self.ipc.drain().collect::<Vec<_>>();
+        for message in messages {
+            match message {
+                luft_ipc::ServerMessage::ShellUpdate(snapshot)
+                    if snapshot.revision > self.model.revision =>
+                {
+                    latest = Some(snapshot.into())
+                }
+                luft_ipc::ServerMessage::ShellUpdate(_) => {}
+                luft_ipc::ServerMessage::Response {
+                    response: luft_ipc::IpcResponse::Error { message },
+                    ..
+                } => warn!(message, "Kestrel rejected shell command"),
+                luft_ipc::ServerMessage::ShellCommand(command) => match command {
+                    luft_ipc::ShellCommand::Lock => {
+                        self.run_session_command(super::actions::SessionCommand::Lock)
+                    }
+                    luft_ipc::ShellCommand::Suspend => {
+                        self.run_session_command(super::actions::SessionCommand::Suspend)
+                    }
+                },
+                luft_ipc::ServerMessage::Response { .. } => {}
+            }
         }
-        self.last_model_refresh = Instant::now();
-        match load_model() {
-            Ok(model) => self.apply_model(model),
-            Err(error) => debug!(%error, "failed to refresh shell model"),
+        if let Some(model) = latest {
+            self.apply_model(model);
         }
     }
 
     fn apply_model(&mut self, model: ShellModel) {
+        self.surfaces.set_frame_rate(model.primary_frame_rate());
         self.model = model;
         super::running_order::sync(&mut self.running_app_order, &self.model);
     }
 
     pub(super) fn refresh_status(&mut self) {
-        if self.last_status_refresh.elapsed() < STATUS_REFRESH {
-            return;
+        if let Some(status) = self.system_status.latest() {
+            self.status = status;
         }
-        self.refresh_status_now();
-    }
-
-    pub(super) fn refresh_status_now(&mut self) {
-        self.last_status_refresh = Instant::now();
-        self.status = SystemStatus::read();
     }
 
     pub(super) fn refresh_config(&mut self) {
@@ -77,8 +90,18 @@ impl WebShell {
 
     fn apply_shell_config(&mut self, config: LuftConfig) {
         self.palette = shell_palette(&config);
-        self.panel_apps = panel_apps(&config);
-        self.applications = launcher_apps(&config, &self.panel_apps);
+        if config.default_apps.terminal != self.config.default_apps.terminal {
+            (self.panel_apps, self.applications) = shell_apps(&config);
+        } else {
+            let used_panel_fallback = self
+                .applications
+                .iter()
+                .all(|application| application.desktop_id.is_none());
+            self.panel_apps = panel_apps_from(&config, &self.applications);
+            if used_panel_fallback {
+                self.applications = launcher_apps_from(Vec::new(), &self.panel_apps);
+            }
+        }
         self.launcher_command = config.default_apps.launcher.clone();
         self.config = config;
     }

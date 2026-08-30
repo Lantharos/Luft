@@ -108,9 +108,10 @@ impl WebShellSnapshot {
                     name: workspace.name.clone(),
                     active: workspace.id == model.active_workspace,
                 })
-                .collect(),
-            windows,
-            panel_apps: web_panel_apps,
+                .collect::<Vec<_>>()
+                .into(),
+            windows: windows.into(),
+            panel_apps: web_panel_apps.into(),
             panel_menu_command: panel_menu_command.map(str::to_string),
             panel_menu_x,
             applications: applications
@@ -125,7 +126,8 @@ impl WebShellSnapshot {
                         .iter()
                         .any(|panel_app| commands_equal(&panel_app.command, &app.command)),
                 })
-                .collect(),
+                .collect::<Vec<_>>()
+                .into(),
             status: status.into(),
             tray: tray
                 .items
@@ -144,10 +146,21 @@ impl WebShellSnapshot {
                         status: WebTrayStatus::from(item.status),
                     })
                 })
-                .collect(),
+                .collect::<Vec<_>>()
+                .into(),
             do_not_disturb: notifications.do_not_disturb,
-            notifications: notifications.items.iter().map(Into::into).collect(),
-            toast_notifications: notifications.toast_items.iter().map(Into::into).collect(),
+            notifications: notifications
+                .items
+                .iter()
+                .map(Into::into)
+                .collect::<Vec<_>>()
+                .into(),
+            toast_notifications: notifications
+                .toast_items
+                .iter()
+                .map(Into::into)
+                .collect::<Vec<_>>()
+                .into(),
             start_menu_open,
             quick_settings_open,
             date_center_open,

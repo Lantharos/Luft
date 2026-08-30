@@ -47,10 +47,17 @@ type NativeReady = {
   snapshot?: ShellSnapshot;
 };
 
+type NativePatch = {
+  revision: number;
+  changes: Partial<ShellSnapshot>;
+};
+
 type Listener = (snapshot: ShellSnapshot) => void;
 
 const listeners = new Set<Listener>();
 let currentSnapshot = normalizeSnapshot(window.__LUFT_INITIAL_STATE__);
+let currentRevision = 0;
+let receivedNativeState = false;
 
 export const getSnapshot = () => currentSnapshot;
 
@@ -84,7 +91,12 @@ async function initializeNativeBridge() {
   const bridge = await waitForNativeBridge();
   if (!bridge) return;
 
-  bridge.listen?.<ShellSnapshot>("luft.snapshot", applySnapshot);
+  bridge.listen?.<ShellSnapshot>("luft.snapshot", (snapshot) => {
+    receivedNativeState = true;
+    currentRevision = Math.max(currentRevision, 1);
+    applySnapshot(snapshot);
+  });
+  bridge.listen?.<NativePatch>("luft.patch", applyPatch);
 
   if (!bridge.commands.includes("luft.ready")) return;
   try {
@@ -92,7 +104,7 @@ async function initializeNativeBridge() {
     if (ready.surface) {
       window.__LUFT_SURFACE__ = ready.surface;
     }
-    if (ready.snapshot) {
+    if (ready.snapshot && !receivedNativeState) {
       applySnapshot(ready.snapshot);
     }
   } catch (error) {
@@ -105,6 +117,15 @@ function applySnapshot(snapshot: ShellSnapshot) {
   for (const listener of listeners) {
     listener(currentSnapshot);
   }
+}
+
+function applyPatch(patch: NativePatch) {
+  if (!Number.isSafeInteger(patch.revision) || patch.revision <= currentRevision) {
+    return;
+  }
+  receivedNativeState = true;
+  currentRevision = patch.revision;
+  applySnapshot({ ...currentSnapshot, ...patch.changes });
 }
 
 async function waitForNativeBridge(): Promise<NativeBridge | undefined> {

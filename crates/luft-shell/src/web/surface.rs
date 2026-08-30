@@ -38,6 +38,13 @@ impl WebSurfaces {
         actions_tx: Sender<WebShellAction>,
         snapshot: &WebShellSnapshot,
     ) -> Result<Self, Box<dyn Error>> {
+        let panel_snapshot = snapshot.project_for(WebShellSurface::Panel);
+        let panel_menu_snapshot = snapshot.project_for(WebShellSurface::PanelMenu);
+        let session_menu_snapshot = snapshot.project_for(WebShellSurface::SessionMenu);
+        let start_menu_snapshot = snapshot.project_for(WebShellSurface::StartMenu);
+        let quick_snapshot = snapshot.project_for(WebShellSurface::QuickSettings);
+        let date_snapshot = snapshot.project_for(WebShellSurface::DateCenter);
+        let toast_snapshot = snapshot.project_for(WebShellSurface::NotificationToast);
         let mut surfaces = Self {
             panel: WebSurface::new(WebSurfaceConfig {
                 kind: WebShellSurface::Panel,
@@ -47,43 +54,43 @@ impl WebSurfaces {
                 panel_menu_x: None,
                 session_menu_qs_height: None,
                 actions_tx: &actions_tx,
-                snapshot,
+                snapshot: &panel_snapshot,
             })?,
             panel_menu: LazyWebSurface::new(
                 WebShellSurface::PanelMenu,
                 panel_menu_size(snapshot),
                 &actions_tx,
-                snapshot,
+                &panel_menu_snapshot,
             ),
             session_menu: LazyWebSurface::new(
                 WebShellSurface::SessionMenu,
                 session_menu_size(),
                 &actions_tx,
-                snapshot,
+                &session_menu_snapshot,
             ),
             start_menu: LazyWebSurface::new(
                 WebShellSurface::StartMenu,
                 (START_MENU_WIDTH, START_MENU_HEIGHT),
                 &actions_tx,
-                snapshot,
+                &start_menu_snapshot,
             ),
             quick: LazyWebSurface::new(
                 WebShellSurface::QuickSettings,
                 quick_settings_size(snapshot),
                 &actions_tx,
-                snapshot,
+                &quick_snapshot,
             ),
             date: LazyWebSurface::new(
                 WebShellSurface::DateCenter,
                 date_center_size(snapshot),
                 &actions_tx,
-                snapshot,
+                &date_snapshot,
             ),
             notification_toast: LazyWebSurface::new(
                 WebShellSurface::NotificationToast,
                 notification_toast_size(snapshot),
                 &actions_tx,
-                snapshot,
+                &toast_snapshot,
             ),
             prewarm_index: 0,
             prewarm_at: Instant::now() + Duration::from_secs(1),
@@ -94,22 +101,29 @@ impl WebSurfaces {
         Ok(surfaces)
     }
 
-    pub fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, json: &str) {
+    pub fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot) {
         let quick_settings_size = quick_settings_size(snapshot);
-        self.panel.evaluate_snapshot(snapshot, json);
+        self.panel
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::Panel));
         self.panel_menu.resize(panel_menu_size(snapshot));
-        self.panel_menu.evaluate_snapshot(snapshot, json);
+        self.panel_menu
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::PanelMenu));
         self.session_menu
             .set_session_menu_qs_height(Some(quick_settings_size.1));
-        self.session_menu.evaluate_snapshot(snapshot, json);
-        self.start_menu.evaluate_snapshot(snapshot, json);
+        self.session_menu
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::SessionMenu));
+        self.start_menu
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::StartMenu));
         self.quick.resize(quick_settings_size);
-        self.quick.evaluate_snapshot(snapshot, json);
+        self.quick
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::QuickSettings));
         self.date.resize(date_center_size(snapshot));
-        self.date.evaluate_snapshot(snapshot, json);
+        self.date
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::DateCenter));
         self.notification_toast
             .resize(notification_toast_size(snapshot));
-        self.notification_toast.evaluate_snapshot(snapshot, json);
+        self.notification_toast
+            .evaluate_snapshot(&snapshot.project_for(WebShellSurface::NotificationToast));
     }
 
     pub fn set_panel_visible(&mut self, visible: bool) {

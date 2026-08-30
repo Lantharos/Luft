@@ -9,6 +9,7 @@ use crate::services::{
 };
 use luft_ipc::{WindowState, WindowSummary};
 use serde::Serialize;
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,17 +20,17 @@ pub struct WebShellSnapshot {
     pub active_workspace: String,
     pub user_profile_icon_uri: Option<String>,
     pub palette: WebPalette,
-    pub workspaces: Vec<WebWorkspace>,
-    pub windows: Vec<WebWindow>,
-    pub panel_apps: Vec<WebPanelApp>,
+    pub workspaces: Arc<[WebWorkspace]>,
+    pub windows: Arc<[WebWindow]>,
+    pub panel_apps: Arc<[WebPanelApp]>,
     pub panel_menu_command: Option<String>,
     pub panel_menu_x: Option<i32>,
-    pub applications: Vec<WebApplication>,
+    pub applications: Arc<[WebApplication]>,
     pub status: WebSystemStatus,
-    pub tray: Vec<WebTrayItem>,
+    pub tray: Arc<[WebTrayItem]>,
     pub do_not_disturb: bool,
-    pub notifications: Vec<WebNotification>,
-    pub toast_notifications: Vec<WebNotification>,
+    pub notifications: Arc<[WebNotification]>,
+    pub toast_notifications: Arc<[WebNotification]>,
     pub start_menu_open: bool,
     pub quick_settings_open: bool,
     pub date_center_open: bool,
@@ -45,6 +46,122 @@ pub enum WebShellSurface {
     DateCenter,
     NotificationToast,
     StartMenu,
+}
+
+impl WebShellSnapshot {
+    pub fn project_for(&self, surface: WebShellSurface) -> Self {
+        let mut snapshot = self.clone();
+        snapshot.surface = Some(surface);
+        match surface {
+            WebShellSurface::Panel => {
+                snapshot.applications = Arc::default();
+                snapshot.notifications = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+            }
+            WebShellSurface::PanelMenu => {
+                snapshot.time.clear();
+                snapshot.date.clear();
+                snapshot.active_workspace.clear();
+                snapshot.user_profile_icon_uri = None;
+                snapshot.workspaces = Arc::default();
+                snapshot.applications = Arc::default();
+                snapshot.status = WebSystemStatus::default();
+                snapshot.tray = Arc::default();
+                snapshot.do_not_disturb = false;
+                snapshot.notifications = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+            WebShellSurface::SessionMenu => {
+                snapshot.time.clear();
+                snapshot.date.clear();
+                snapshot.active_workspace.clear();
+                snapshot.user_profile_icon_uri = None;
+                snapshot.workspaces = Arc::default();
+                snapshot.windows = Arc::default();
+                snapshot.panel_apps = Arc::default();
+                snapshot.panel_menu_command = None;
+                snapshot.panel_menu_x = None;
+                snapshot.applications = Arc::default();
+                snapshot.status = WebSystemStatus::default();
+                snapshot.tray = Arc::default();
+                snapshot.do_not_disturb = false;
+                snapshot.notifications = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+            WebShellSurface::QuickSettings => {
+                snapshot.time.clear();
+                snapshot.date.clear();
+                snapshot.active_workspace.clear();
+                snapshot.workspaces = Arc::default();
+                snapshot.windows = Arc::default();
+                snapshot.panel_apps = Arc::default();
+                snapshot.panel_menu_command = None;
+                snapshot.panel_menu_x = None;
+                snapshot.applications = Arc::default();
+                snapshot.tray = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+            WebShellSurface::DateCenter => {
+                snapshot.active_workspace.clear();
+                snapshot.user_profile_icon_uri = None;
+                snapshot.workspaces = Arc::default();
+                snapshot.windows = Arc::default();
+                snapshot.panel_apps = Arc::default();
+                snapshot.panel_menu_command = None;
+                snapshot.panel_menu_x = None;
+                snapshot.applications = Arc::default();
+                snapshot.status = WebSystemStatus::default();
+                snapshot.tray = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+            WebShellSurface::NotificationToast => {
+                snapshot.time.clear();
+                snapshot.date.clear();
+                snapshot.active_workspace.clear();
+                snapshot.user_profile_icon_uri = None;
+                snapshot.workspaces = Arc::default();
+                snapshot.windows = Arc::default();
+                snapshot.panel_apps = Arc::default();
+                snapshot.panel_menu_command = None;
+                snapshot.panel_menu_x = None;
+                snapshot.applications = Arc::default();
+                snapshot.status = WebSystemStatus::default();
+                snapshot.tray = Arc::default();
+                snapshot.do_not_disturb = false;
+                snapshot.notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+            WebShellSurface::StartMenu => {
+                snapshot.time.clear();
+                snapshot.date.clear();
+                snapshot.user_profile_icon_uri = None;
+                snapshot.panel_menu_command = None;
+                snapshot.panel_menu_x = None;
+                snapshot.status = WebSystemStatus::default();
+                snapshot.tray = Arc::default();
+                snapshot.notifications = Arc::default();
+                snapshot.toast_notifications = Arc::default();
+                snapshot.start_menu_open = false;
+                snapshot.quick_settings_open = false;
+                snapshot.date_center_open = false;
+            }
+        }
+        snapshot
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]

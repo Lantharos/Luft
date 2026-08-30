@@ -42,6 +42,7 @@ pub struct WebSurface {
     rendered_snapshot: String,
     rendered_value: Option<Value>,
     snapshot_revision: u64,
+    frame_rate: u32,
 }
 
 impl WebSurface {
@@ -74,6 +75,7 @@ impl WebSurface {
             rendered_snapshot: String::new(),
             rendered_value: None,
             snapshot_revision: 0,
+            frame_rate: config.frame_rate,
         };
         surface.set_visible(config.visible);
         Ok(surface)
@@ -157,6 +159,7 @@ impl WebSurface {
                     "launched Sabine shell surface"
                 );
                 self.process = Some(process);
+                self.set_frame_rate(self.frame_rate);
                 let _ = self.request_visibility(self.visible);
             }
             Err(error) => {
@@ -320,6 +323,16 @@ impl WebSurface {
         }
     }
 
+    pub(crate) fn set_frame_rate(&mut self, frame_rate: u32) {
+        let frame_rate = frame_rate.clamp(1, 1_000);
+        self.frame_rate = frame_rate;
+        if let Some(process) = &self.process
+            && let Some(frame_rate) = sabine::ShellSurfaceFrameRate::new(frame_rate)
+        {
+            let _ = process.set_shell_surface_frame_rate(frame_rate);
+        }
+    }
+
     pub(crate) fn base_shell_margin(&self) -> ShellSurfaceMargin {
         shell_surface(
             self.kind,
@@ -353,7 +366,7 @@ impl WebSurface {
             .shell_surface_alpha(self.surface_alpha)
             .visible(self.visible)
             .active(self.visible && kind == WebShellSurface::StartMenu)
-            .active_frame_rate(shell_surface_frame_rate())
+            .active_frame_rate(self.frame_rate)
             .background_frame_rate(1)
             .blur_region(shell_blur_region(kind, width as i32, height as i32))
             .runtime(runtime_config())
@@ -516,19 +529,7 @@ pub(crate) struct WebSurfaceConfig<'a> {
     pub session_menu_qs_height: Option<i32>,
     pub actions_tx: &'a Sender<WebShellAction>,
     pub snapshot: &'a WebShellSnapshot,
-}
-
-fn shell_surface_frame_rate() -> u32 {
-    output_frame_rate()
-}
-
-fn output_frame_rate() -> u32 {
-    env::var("LUFT_OUTPUT_REFRESH_MILLIHERTZ")
-        .ok()
-        .and_then(|value| value.parse::<u32>().ok())
-        .map(|millihertz| (millihertz.saturating_add(999)) / 1000)
-        .filter(|rate| *rate > 0)
-        .unwrap_or(60)
+    pub frame_rate: u32,
 }
 
 fn runtime_config() -> RuntimeConfig {

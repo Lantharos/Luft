@@ -1,6 +1,5 @@
 mod apps;
 mod color;
-mod control;
 mod ipc;
 mod panel;
 mod services;

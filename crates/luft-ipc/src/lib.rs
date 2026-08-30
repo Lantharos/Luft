@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     env, fs, io,
-    io::Read,
+    io::{Read, Write},
     os::unix::net::UnixStream,
     path::{Path, PathBuf},
 };
@@ -14,8 +14,7 @@ pub use layout::{
 };
 
 pub const SOCKET_ENV: &str = "LUFT_IPC_SOCKET";
-pub const SHELL_SOCKET_ENV: &str = "LUFT_SHELL_SOCKET";
-const MAX_REQUEST_BYTES: u64 = 64 * 1024;
+const MAX_FRAME_BYTES: usize = 8 * 1024 * 1024;
 
 pub fn socket_path() -> PathBuf {
     if let Some(path) = env::var_os(SOCKET_ENV) {
@@ -23,16 +22,6 @@ pub fn socket_path() -> PathBuf {
     }
 
     runtime_dir().join("luft").join("kestrel.sock")
-}
-
-pub fn shell_socket_path(ipc_socket: &Path) -> PathBuf {
-    let mut path = ipc_socket.to_path_buf();
-    let file_name = ipc_socket
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("kestrel.sock");
-    path.set_file_name(format!("{file_name}.shell"));
-    path
 }
 
 pub fn ensure_socket_parent(path: &Path) -> io::Result<()> {
@@ -48,27 +37,23 @@ pub fn send_request(request: &IpcRequest) -> io::Result<IpcResponse> {
 
 pub fn send_request_to(path: &Path, request: &IpcRequest) -> io::Result<IpcResponse> {
     let mut stream = UnixStream::connect(path)?;
-    write_json(&mut stream, request)?;
-    stream.shutdown(std::net::Shutdown::Write)?;
-    read_json(&mut stream)
-}
-
-pub fn send_shell_control_to(path: &Path, request: &ShellControlRequest) -> io::Result<()> {
-    let mut stream = UnixStream::connect(path)?;
-    write_json(&mut stream, request)?;
-    stream.shutdown(std::net::Shutdown::Write)
-}
-
-pub fn read_request(stream: &mut UnixStream) -> io::Result<IpcRequest> {
-    serde_json::from_reader(stream.take(MAX_REQUEST_BYTES)).map_err(json_error)
-}
-
-pub fn read_shell_control(stream: &mut UnixStream) -> io::Result<ShellControlRequest> {
-    read_json(stream)
-}
-
-pub fn write_response(stream: &mut UnixStream, response: &IpcResponse) -> io::Result<()> {
-    write_json(stream, response)
+    stream.set_read_timeout(Some(std::time::Duration::from_secs(2)))?;
+    stream.set_write_timeout(Some(std::time::Duration::from_secs(2)))?;
+    write_frame(
+        &mut stream,
+        &ClientMessage::Request {
+            id: 1,
+            request: request.clone(),
+        },
+    )?;
+    loop {
+        match read_frame(&mut stream)? {
+            ServerMessage::Response { id: 1, response } => return Ok(response),
+            ServerMessage::Response { .. }
+            | ServerMessage::ShellUpdate(_)
+            | ServerMessage::ShellCommand(_) => {}
+        }
+    }
 }
 
 fn runtime_dir() -> PathBuf {
@@ -81,12 +66,28 @@ fn current_user() -> String {
     env::var("USER").unwrap_or_else(|_| "user".to_string())
 }
 
-fn read_json<T: for<'de> Deserialize<'de>>(stream: &mut UnixStream) -> io::Result<T> {
-    serde_json::from_reader(stream).map_err(json_error)
+pub fn read_frame<T: for<'de> Deserialize<'de>>(stream: &mut impl Read) -> io::Result<T> {
+    let mut length = [0_u8; 4];
+    stream.read_exact(&mut length)?;
+    let length = u32::from_be_bytes(length) as usize;
+    if length > MAX_FRAME_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Luft IPC frame exceeds maximum size",
+        ));
+    }
+    let mut payload = vec![0; length];
+    stream.read_exact(&mut payload)?;
+    serde_json::from_slice(&payload).map_err(json_error)
 }
 
-fn write_json<T: Serialize>(stream: &mut UnixStream, value: &T) -> io::Result<()> {
-    serde_json::to_writer(stream, value).map_err(json_error)
+pub fn write_frame<T: Serialize>(stream: &mut impl Write, value: &T) -> io::Result<()> {
+    let payload = serde_json::to_vec(value).map_err(json_error)?;
+    let length = u32::try_from(payload.len())
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Luft IPC frame is too large"))?;
+    stream.write_all(&length.to_be_bytes())?;
+    stream.write_all(&payload)?;
+    stream.flush()
 }
 
 fn json_error(error: serde_json::Error) -> io::Error {
@@ -96,7 +97,7 @@ fn json_error(error: serde_json::Error) -> io::Error {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum IpcRequest {
-    ShellSnapshot,
+    SubscribeShell,
     Reload,
     ListOutputs,
     ActivateWindow {
@@ -128,15 +129,6 @@ pub enum IpcRequest {
     RestartShell,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "kebab-case")]
-pub enum ShellControlRequest {
-    LaunchDefaultApp { app: DefaultAppKind },
-    OpenLauncher,
-    ToggleStartMenu,
-    CloseTransientPopovers,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum DefaultAppKind {
@@ -149,19 +141,49 @@ pub enum DefaultAppKind {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum IpcResponse {
-    ShellSnapshot {
-        status: StatusPayload,
-        outputs: Vec<OutputSummary>,
-        workspaces: Vec<WorkspaceSummary>,
-        windows: Vec<WindowSummary>,
-    },
-    Outputs {
-        outputs: Vec<OutputSummary>,
-    },
-    Accepted,
-    Error {
-        message: String,
-    },
+    ShellSnapshot(ShellSnapshot),
+    Outputs { outputs: Vec<OutputSummary> },
+    Accepted { revision: u64 },
+    Error { message: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ShellSnapshot {
+    pub revision: u64,
+    pub status: StatusPayload,
+    pub outputs: Vec<OutputSummary>,
+    pub workspaces: Vec<WorkspaceSummary>,
+    pub windows: Vec<WindowSummary>,
+}
+
+impl ShellSnapshot {
+    pub fn without_revision_eq(&self, other: &Self) -> bool {
+        self.status == other.status
+            && self.outputs == other.outputs
+            && self.workspaces == other.workspaces
+            && self.windows == other.windows
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum ClientMessage {
+    Request { id: u64, request: IpcRequest },
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum ServerMessage {
+    Response { id: u64, response: IpcResponse },
+    ShellUpdate(ShellSnapshot),
+    ShellCommand(ShellCommand),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ShellCommand {
+    Lock,
+    Suspend,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

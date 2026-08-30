@@ -1,10 +1,11 @@
 use crate::{
     apps::AppEntry,
-    control::ShellControlServer,
-    ipc::ShellModel,
+    ipc::{ShellIpc, ShellModel},
     panel::PanelApp,
     services::{
-        notifications::NotificationService, system_status::SystemStatus, tray::TrayService,
+        notifications::NotificationService,
+        system_status::{SystemStatus, SystemStatusService},
+        tray::TrayService,
     },
     theme::ShellPalette,
 };
@@ -43,31 +44,29 @@ use std::{
     time::{Duration, Instant},
 };
 use surface::WebSurfaces;
-use tracing::{debug, warn};
 
-const MODEL_REFRESH: Duration = Duration::from_millis(500);
-const STATUS_REFRESH: Duration = Duration::from_secs(1);
 const CONFIG_REFRESH: Duration = Duration::from_secs(2);
 const ACTION_TICK: Duration = Duration::from_millis(16);
 const MAINTENANCE_TICK: Duration = Duration::from_millis(100);
-const OUTPUT_REFRESH_ENV: &str = "LUFT_OUTPUT_REFRESH_MILLIHERTZ";
 
 pub fn run(config: LuftConfig) -> Result<(), Box<dyn Error>> {
     let (actions_tx, actions_rx) = mpsc::channel();
     let shell = Rc::new(RefCell::new(WebShell::new(config, actions_tx, actions_rx)?));
     shell.borrow_mut().sync_surfaces();
 
-    let animation_tick = animation_tick_interval();
     let mut last_maintenance = Instant::now();
     loop {
-        let animating = {
+        let (animating, animation_tick) = {
             let mut shell = shell.borrow_mut();
             shell.tick_actions();
             if last_maintenance.elapsed() >= MAINTENANCE_TICK {
                 shell.tick();
                 last_maintenance = Instant::now();
             }
-            shell.surfaces.is_animating()
+            (
+                shell.surfaces.is_animating(),
+                shell.model.animation_tick_interval(),
+            )
         };
         let wait = if animating {
             animation_tick
@@ -78,20 +77,13 @@ pub fn run(config: LuftConfig) -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn animation_tick_interval() -> Duration {
-    let millihertz = std::env::var(OUTPUT_REFRESH_ENV)
-        .ok()
-        .and_then(|value| value.parse::<u64>().ok())
-        .filter(|refresh| *refresh > 0)
-        .unwrap_or(60_000);
-    Duration::from_nanos((1_000_000_000_000u64 + millihertz / 2) / millihertz)
-}
-
 pub(super) struct WebShell {
     pub(super) config: LuftConfig,
     pub(super) palette: ShellPalette,
     pub(super) model: ShellModel,
+    pub(super) ipc: ShellIpc,
     pub(super) status: SystemStatus,
+    pub(super) system_status: SystemStatusService,
     pub(super) tray: TrayService,
     pub(super) notifications: NotificationService,
     pub(super) panel_apps: Vec<PanelApp>,
@@ -100,7 +92,6 @@ pub(super) struct WebShell {
     pub(super) surfaces: WebSurfaces,
     actions_rx: Receiver<WebShellAction>,
     queued_actions: VecDeque<WebShellAction>,
-    control: Option<ShellControlServer>,
     pub(super) app_processes: Vec<LaunchedProcess>,
     pub(super) startup_apps: Vec<String>,
     pub(super) startup_apps_launched: bool,
@@ -113,8 +104,6 @@ pub(super) struct WebShell {
     pub(super) panel_menu_command: Option<String>,
     pub(super) panel_menu_x: Option<i32>,
     pub(super) session_menu_visible: bool,
-    last_model_refresh: Instant,
-    last_status_refresh: Instant,
     last_config_refresh: Instant,
     last_snapshot: String,
 }
@@ -135,10 +124,6 @@ impl WebShell {
     fn tick_actions(&mut self) {
         let mut pending_actions: Vec<WebShellAction> = self.queued_actions.drain(..).collect();
         pending_actions.extend(self.actions_rx.try_iter());
-        let blocks_dismiss = pending_actions.iter().any(WebShellAction::affects_popover);
-
-        self.handle_control_requests(blocks_dismiss);
-
         let mut handled_action = false;
         for action in pending_actions {
             handled_action = true;
@@ -163,33 +148,5 @@ impl WebShell {
         self.refresh_status();
         self.refresh_config();
         self.sync_surfaces();
-    }
-
-    fn handle_control_requests(&mut self, blocks_dismiss: bool) {
-        let Some(control) = &self.control else {
-            return;
-        };
-
-        match control.drain() {
-            Ok(requests) => {
-                for request in requests {
-                    debug!(?request, "received shell control request");
-                    match request {
-                        luft_ipc::ShellControlRequest::LaunchDefaultApp { app } => {
-                            self.launch_default_app(app)
-                        }
-                        luft_ipc::ShellControlRequest::OpenLauncher => self.open_launcher(),
-                        luft_ipc::ShellControlRequest::ToggleStartMenu => self.toggle_start_menu(),
-                        luft_ipc::ShellControlRequest::CloseTransientPopovers => {
-                            if blocks_dismiss {
-                                continue;
-                            }
-                            self.close_transient_popovers()
-                        }
-                    }
-                }
-            }
-            Err(error) => warn!(%error, "failed to read shell control request"),
-        }
     }
 }

@@ -266,13 +266,27 @@ impl<BackendData: Backend> WlrLayerShellHandler for KestrelState<BackendData> {
         _layer: Layer,
         namespace: String,
     ) {
-        let output = wl_output
+        let privileged = surface.wl_surface().client().is_some_and(|client| {
+            client
+                .get_data::<ClientState>()
+                .is_some_and(|state| state.privileged && state.security_context.is_none())
+        });
+        if !privileged {
+            tracing::warn!(namespace, "rejected layer surface from unprivileged client");
+            return;
+        }
+        let Some(output) = wl_output
             .as_ref()
             .and_then(Output::from_resource)
-            .unwrap_or_else(|| self.space.outputs().next().unwrap().clone());
+            .or_else(|| self.space.outputs().next().cloned())
+        else {
+            tracing::warn!(namespace, "ignoring layer surface because no output exists");
+            return;
+        };
         let mut map = layer_map_for_output(&output);
-        map.map_layer(&LayerSurface::new(surface, namespace))
-            .unwrap();
+        if let Err(error) = map.map_layer(&LayerSurface::new(surface, namespace.clone())) {
+            tracing::warn!(%error, namespace, "failed to map layer surface");
+        }
     }
 
     fn layer_destroyed(&mut self, surface: WlrLayerSurface) {
@@ -412,6 +426,7 @@ fn place_new_window(
     pointer_location: Point<f64, Logical>,
     window: &WindowElement,
     activate: bool,
+    map: bool,
 ) {
     let output = space
         .output_under(pointer_location)
@@ -441,7 +456,9 @@ fn place_new_window(
         output_geometry.loc.y + (output_geometry.size.h - size.h.max(1)) / 2,
     ));
     window.decoration_state().pending_initial_center = activate;
-    space.map_element(window.clone(), location, activate);
+    if map {
+        space.map_element(window.clone(), location, activate);
+    }
 }
 
 pub fn fixup_positions(space: &mut Space<WindowElement>, pointer_location: Point<f64, Logical>) {
@@ -480,6 +497,6 @@ pub fn fixup_positions(space: &mut Space<WindowElement>, pointer_location: Point
         }
     }
     for window in orphaned_windows.into_iter() {
-        place_new_window(space, pointer_location, &window, false);
+        place_new_window(space, pointer_location, &window, false, true);
     }
 }

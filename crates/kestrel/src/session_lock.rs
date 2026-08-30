@@ -94,6 +94,15 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
         for output in outputs {
             self.backend_data.reset_buffers(&output);
         }
+
+        let focus = self.space.elements().last().cloned();
+        if let Some(keyboard) = self.seat.get_keyboard() {
+            keyboard.set_focus(
+                self,
+                focus.map(KeyboardFocusTarget::from),
+                smithay::utils::SERIAL_COUNTER.next_serial(),
+            );
+        }
     }
 
     fn new_surface(&mut self, surface: LockSurface, wl_output: WlOutput) {

@@ -5,7 +5,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use luft_ipc::{SHELL_SOCKET_ENV, SOCKET_ENV, ShellStatus, shell_socket_path};
+use luft_ipc::{SOCKET_ENV, ShellStatus};
 use tracing::{info, warn};
 
 #[derive(Debug)]
@@ -13,6 +13,7 @@ pub struct ShellProcess {
     child: Option<Child>,
     enabled: bool,
     wayland_socket: String,
+    app_wayland_socket: String,
     ipc_socket: PathBuf,
     xwayland_display: Option<String>,
     skip_startup_apps: bool,
@@ -24,6 +25,7 @@ impl ShellProcess {
     pub fn new(
         enabled: bool,
         wayland_socket: String,
+        app_wayland_socket: String,
         ipc_socket: PathBuf,
         xwayland_display: Option<String>,
         skip_startup_apps: bool,
@@ -32,6 +34,7 @@ impl ShellProcess {
             child: None,
             enabled,
             wayland_socket,
+            app_wayland_socket,
             ipc_socket,
             xwayland_display,
             skip_startup_apps,
@@ -104,13 +107,12 @@ impl ShellProcess {
     }
 
     fn spawn(&self) -> io::Result<Child> {
-        let shell_control = shell_socket_path(&self.ipc_socket);
         let mut command = Command::new(resolve_shell_binary());
         command
             .env("WAYLAND_DISPLAY", &self.wayland_socket)
-            .env("LUFT_WAYLAND_DISPLAY", &self.wayland_socket)
-            .env(SOCKET_ENV, &self.ipc_socket)
-            .env(SHELL_SOCKET_ENV, shell_control);
+            .env("LUFT_PRIVILEGED_WAYLAND_DISPLAY", &self.wayland_socket)
+            .env("LUFT_WAYLAND_DISPLAY", &self.app_wayland_socket)
+            .env(SOCKET_ENV, &self.ipc_socket);
         if self.skip_startup_apps {
             command.env("LUFT_SKIP_STARTUP_APPS", "1");
         }

@@ -37,6 +37,7 @@ impl WebSurfaces {
     pub fn new(
         actions_tx: Sender<WebShellAction>,
         snapshot: &WebShellSnapshot,
+        frame_rate: u32,
     ) -> Result<Self, Box<dyn Error>> {
         let panel_snapshot = snapshot.project_for(WebShellSurface::Panel);
         let panel_menu_snapshot = snapshot.project_for(WebShellSurface::PanelMenu);
@@ -55,42 +56,49 @@ impl WebSurfaces {
                 session_menu_qs_height: None,
                 actions_tx: &actions_tx,
                 snapshot: &panel_snapshot,
+                frame_rate,
             })?,
             panel_menu: LazyWebSurface::new(
                 WebShellSurface::PanelMenu,
                 panel_menu_size(snapshot),
                 &actions_tx,
                 &panel_menu_snapshot,
+                frame_rate,
             ),
             session_menu: LazyWebSurface::new(
                 WebShellSurface::SessionMenu,
                 session_menu_size(),
                 &actions_tx,
                 &session_menu_snapshot,
+                frame_rate,
             ),
             start_menu: LazyWebSurface::new(
                 WebShellSurface::StartMenu,
                 (START_MENU_WIDTH, START_MENU_HEIGHT),
                 &actions_tx,
                 &start_menu_snapshot,
+                frame_rate,
             ),
             quick: LazyWebSurface::new(
                 WebShellSurface::QuickSettings,
                 quick_settings_size(snapshot),
                 &actions_tx,
                 &quick_snapshot,
+                frame_rate,
             ),
             date: LazyWebSurface::new(
                 WebShellSurface::DateCenter,
                 date_center_size(snapshot),
                 &actions_tx,
                 &date_snapshot,
+                frame_rate,
             ),
             notification_toast: LazyWebSurface::new(
                 WebShellSurface::NotificationToast,
                 notification_toast_size(snapshot),
                 &actions_tx,
                 &toast_snapshot,
+                frame_rate,
             ),
             prewarm_index: 0,
             prewarm_at: Instant::now() + Duration::from_secs(1),
@@ -124,6 +132,16 @@ impl WebSurfaces {
             .resize(notification_toast_size(snapshot));
         self.notification_toast
             .evaluate_snapshot(&snapshot.project_for(WebShellSurface::NotificationToast));
+    }
+
+    pub fn set_frame_rate(&mut self, frame_rate: u32) {
+        self.panel.set_frame_rate(frame_rate);
+        self.panel_menu.set_frame_rate(frame_rate);
+        self.session_menu.set_frame_rate(frame_rate);
+        self.start_menu.set_frame_rate(frame_rate);
+        self.quick.set_frame_rate(frame_rate);
+        self.date.set_frame_rate(frame_rate);
+        self.notification_toast.set_frame_rate(frame_rate);
     }
 
     pub fn set_panel_visible(&mut self, visible: bool) {

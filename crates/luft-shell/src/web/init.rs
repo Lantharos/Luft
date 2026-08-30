@@ -1,10 +1,6 @@
 use super::*;
 use super::{model::WebShellSnapshot, snapshot::WebShellSnapshotInput};
-use crate::{
-    apps::{launcher_apps, panel_apps},
-    ipc::load_model,
-    theme::shell_palette,
-};
+use crate::{apps::shell_apps, ipc::ShellIpc, theme::shell_palette};
 use std::sync::mpsc::Sender;
 
 impl WebShell {
@@ -14,10 +10,10 @@ impl WebShell {
         actions_rx: Receiver<WebShellAction>,
     ) -> Result<Self, Box<dyn Error>> {
         let palette = shell_palette(&config);
-        let model = load_model()?;
-        let status = SystemStatus::read();
-        let panel_apps = panel_apps(&config);
-        let applications = launcher_apps(&config, &panel_apps);
+        let (ipc, model) = ShellIpc::connect()?;
+        let system_status = SystemStatusService::start();
+        let status = SystemStatus::default();
+        let (panel_apps, applications) = shell_apps(&config);
         let running_app_order = super::running_order::from_model(&model);
         let tray = TrayService::start();
         let notifications = NotificationService::start();
@@ -36,7 +32,7 @@ impl WebShell {
             quick_settings_open: false,
             date_center_open: false,
         });
-        let mut surfaces = WebSurfaces::new(actions_tx, &snapshot)?;
+        let mut surfaces = WebSurfaces::new(actions_tx, &snapshot, model.primary_frame_rate())?;
         surfaces.set_panel_visible(true);
 
         Ok(Self {
@@ -47,7 +43,9 @@ impl WebShell {
             config,
             palette,
             model,
+            ipc,
             status,
+            system_status,
             tray,
             notifications,
             panel_apps,
@@ -56,7 +54,6 @@ impl WebShell {
             surfaces,
             actions_rx,
             queued_actions: Default::default(),
-            control: ShellControlServer::bind_from_env()?,
             app_processes: Vec::new(),
             start_menu_visible: false,
             quick_visible: false,
@@ -65,8 +62,6 @@ impl WebShell {
             panel_menu_command: None,
             panel_menu_x: None,
             session_menu_visible: false,
-            last_model_refresh: Instant::now(),
-            last_status_refresh: Instant::now(),
             last_config_refresh: Instant::now(),
             last_snapshot: String::new(),
         })

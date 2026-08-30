@@ -40,7 +40,7 @@ impl WebShell {
         self.date_visible = false;
         self.start_menu_visible = false;
         self.quick_visible = true;
-        self.refresh_status_now();
+        self.refresh_status();
         self.sync_surfaces();
         self.surfaces.quick.set_visible(true);
         self.surfaces.date.set_visible(false);

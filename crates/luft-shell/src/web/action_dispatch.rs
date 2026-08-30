@@ -4,9 +4,8 @@ use super::{
     settings_command::settings_command,
 };
 use crate::{
-    apps::spawn_command,
-    ipc::{move_window_to_workspace, switch_workspace},
-    services::system_status::{set_audio_volume, set_brightness, toggle_audio_mute},
+    apps::{spawn_command, spawn_privileged_command},
+    services::system_status::{AudioInfo, BrightnessInfo, SystemStatusCommand},
 };
 use tracing::{debug, warn};
 
@@ -22,11 +21,13 @@ impl WebShell {
             WebShellAction::ToggleDateCenter => self.toggle_date_center(),
             WebShellAction::CloseDateCenter => self.close_date_center(),
             WebShellAction::WorkspaceSwitch { workspace } => {
-                self.apply_model_result(switch_workspace(workspace_id(workspace)));
+                self.send_ipc(luft_ipc::IpcRequest::SwitchWorkspace {
+                    workspace: workspace_id(workspace),
+                });
                 self.close_transient_popovers();
             }
             WebShellAction::WorkspaceRelative { offset } => {
-                self.apply_model_result(crate::ipc::switch_relative_workspace(offset))
+                self.send_ipc(luft_ipc::IpcRequest::SwitchRelativeWorkspace { offset })
             }
             WebShellAction::WorkspaceNew => self.new_workspace_from_start_menu(),
             WebShellAction::WindowActivate { window } => self.activate_task_window(window),
@@ -35,9 +36,12 @@ impl WebShell {
             WebShellAction::WindowToggleMaximize { window } => {
                 self.toggle_maximize_task_window(window)
             }
-            WebShellAction::WindowMove { window, workspace } => self.apply_model_result(
-                move_window_to_workspace(window_id(window), workspace_id(workspace)),
-            ),
+            WebShellAction::WindowMove { window, workspace } => {
+                self.send_ipc(luft_ipc::IpcRequest::MoveWindowToWorkspace {
+                    window: window_id(window),
+                    workspace: workspace_id(workspace),
+                })
+            }
             WebShellAction::PanelLaunch { command } => self.activate_panel_command(command),
             WebShellAction::PanelMenuOpen { command, x } => self.open_panel_menu(command, x),
             WebShellAction::PanelMenuClose => self.close_panel_menu(),
@@ -57,22 +61,21 @@ impl WebShell {
             WebShellAction::TrayMenu { index } => self.activate_tray(index, true),
             WebShellAction::QuickOpenSettings { page } => self.open_settings_page(page),
             WebShellAction::QuickSetVolume { percent } => {
-                if let Err(error) = set_audio_volume(percent) {
-                    warn!(%error, "failed to set audio volume");
-                }
-                self.refresh_status_now();
+                let muted = self.status.audio.as_ref().is_some_and(|audio| audio.muted);
+                self.status.audio = Some(AudioInfo { percent, muted });
+                self.system_status
+                    .send(SystemStatusCommand::SetVolume(percent));
             }
             WebShellAction::QuickToggleMute => {
-                if let Err(error) = toggle_audio_mute() {
-                    warn!(%error, "failed to toggle audio mute");
+                if let Some(audio) = &mut self.status.audio {
+                    audio.muted = !audio.muted;
                 }
-                self.refresh_status_now();
+                self.system_status.send(SystemStatusCommand::ToggleMute);
             }
             WebShellAction::QuickSetBrightness { percent } => {
-                if let Err(error) = set_brightness(percent) {
-                    warn!(%error, "failed to set brightness");
-                }
-                self.refresh_status_now();
+                self.status.brightness = Some(BrightnessInfo { percent });
+                self.system_status
+                    .send(SystemStatusCommand::SetBrightness(percent));
             }
             WebShellAction::SessionCommand { command } => self.run_session_command(command),
             WebShellAction::SessionMenuOpen => self.open_session_menu(),
@@ -144,6 +147,7 @@ impl WebShell {
     }
 
     pub(super) fn run_session_command(&mut self, command: SessionCommand) {
+        let privileged = matches!(command, SessionCommand::Lock);
         let command = match command {
             SessionCommand::Lock => self.config.session.lock_command.clone(),
             SessionCommand::Suspend => self.config.session.suspend_command.clone(),
@@ -151,7 +155,12 @@ impl WebShell {
             SessionCommand::PowerOff => self.config.session.poweroff_command.clone(),
         };
         self.close_transient_popovers();
-        match spawn_command(&command, self.model.xwayland_display.as_deref()) {
+        let spawn = if privileged {
+            spawn_privileged_command
+        } else {
+            spawn_command
+        };
+        match spawn(&command, self.model.xwayland_display.as_deref()) {
             Ok(child) => {
                 debug!(pid = child.id(), command, "started session command");
                 self.app_processes

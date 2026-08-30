@@ -151,6 +151,7 @@ pub enum DefaultAppKind {
 pub enum IpcResponse {
     ShellSnapshot {
         status: StatusPayload,
+        outputs: Vec<OutputSummary>,
         workspaces: Vec<WorkspaceSummary>,
         windows: Vec<WindowSummary>,
     },
@@ -180,6 +181,8 @@ pub struct OutputSummary {
     pub model: String,
     pub width: i32,
     pub height: i32,
+    pub logical_width: i32,
+    pub logical_height: i32,
     pub refresh_millihertz: i32,
     pub scale: f64,
     pub primary: bool,

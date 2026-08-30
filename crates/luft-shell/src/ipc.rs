@@ -1,6 +1,6 @@
 use luft_ipc::{
-    IpcRequest, IpcResponse, StatusPayload, WindowId, WindowSummary, WorkspaceId, WorkspaceSummary,
-    send_request,
+    IpcRequest, IpcResponse, OutputSummary, StatusPayload, WindowId, WindowSummary, WorkspaceId,
+    WorkspaceSummary, send_request,
 };
 use std::{error::Error, io};
 
@@ -8,6 +8,7 @@ use std::{error::Error, io};
 pub struct ShellModel {
     pub active_workspace: WorkspaceId,
     pub xwayland_display: Option<String>,
+    pub outputs: Vec<OutputSummary>,
     pub workspaces: Vec<WorkspaceSummary>,
     pub windows: Vec<WindowSummary>,
 }
@@ -16,9 +17,10 @@ pub fn load_model() -> Result<ShellModel, Box<dyn Error>> {
     match send_request(&IpcRequest::ShellSnapshot)? {
         IpcResponse::ShellSnapshot {
             status,
+            outputs,
             workspaces,
             windows,
-        } => Ok(shell_model_from_parts(status, workspaces, windows)),
+        } => Ok(shell_model_from_parts(status, outputs, workspaces, windows)),
         IpcResponse::Error { message } => Err(message.into()),
         response => Err(unexpected_response(response).into()),
     }
@@ -26,12 +28,14 @@ pub fn load_model() -> Result<ShellModel, Box<dyn Error>> {
 
 fn shell_model_from_parts(
     status: StatusPayload,
+    outputs: Vec<OutputSummary>,
     workspaces: Vec<WorkspaceSummary>,
     windows: Vec<WindowSummary>,
 ) -> ShellModel {
     ShellModel {
         active_workspace: status.active_workspace,
         xwayland_display: status.xwayland_display,
+        outputs,
         workspaces,
         windows,
     }

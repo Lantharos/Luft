@@ -1,5 +1,6 @@
-use super::model::{WebPanelApp, WebShellSnapshot, WebWindow};
+use super::model::{WebNotification, WebPanelApp, WebShellSnapshot, WebWindow};
 use crate::apps::normalize_launch_command;
+use std::collections::HashSet;
 
 pub(crate) const QUICK_SETTINGS_WIDTH: i32 = 420;
 pub(crate) const NOTIFICATION_TOAST_WIDTH: i32 = 380;
@@ -14,6 +15,9 @@ pub(crate) const SESSION_MENU_TOP_OFFSET: i32 = 60;
 pub(crate) const DATE_CENTER_WIDTH: i32 = 360;
 const DATE_CENTER_COMPACT_HEIGHT: i32 = 560;
 const DATE_CENTER_VERTICAL_MARGIN: i32 = 80;
+const NOTIFICATION_GROUP_HEIGHT: i32 = 128;
+const NOTIFICATION_GROUP_GAP: i32 = 10;
+const NOTIFICATION_ACTIONS_HEIGHT: i32 = 36;
 
 pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
     let status_tiles = 1
@@ -53,17 +57,32 @@ pub(crate) fn notification_toast_size(snapshot: &WebShellSnapshot) -> (i32, i32)
 }
 
 pub(crate) fn date_center_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
-    if snapshot.notifications.is_empty() {
-        return (DATE_CENTER_WIDTH, DATE_CENTER_COMPACT_HEIGHT);
+    let available_height = snapshot
+        .output_height
+        .saturating_sub(DATE_CENTER_VERTICAL_MARGIN)
+        .max(1);
+    let content_height = notification_center_height(&snapshot.notifications);
+    (DATE_CENTER_WIDTH, content_height.min(available_height))
+}
+
+fn notification_center_height(notifications: &[WebNotification]) -> i32 {
+    let mut groups = HashSet::new();
+    let mut visible_actions = 0;
+    for notification in notifications {
+        let key = notification.app_name.trim().to_lowercase();
+        if groups.insert(key)
+            && notification
+                .actions
+                .iter()
+                .any(|action| action.key != "default")
+        {
+            visible_actions += 1;
+        }
     }
-    let output_height = std::env::var("LUFT_OUTPUT_HEIGHT")
-        .ok()
-        .and_then(|value| value.parse::<i32>().ok())
-        .unwrap_or(DATE_CENTER_COMPACT_HEIGHT + DATE_CENTER_VERTICAL_MARGIN);
-    (
-        DATE_CENTER_WIDTH,
-        (output_height - DATE_CENTER_VERTICAL_MARGIN).max(DATE_CENTER_COMPACT_HEIGHT),
-    )
+    let additional_groups = groups.len().saturating_sub(1) as i32;
+    DATE_CENTER_COMPACT_HEIGHT
+        + additional_groups * (NOTIFICATION_GROUP_HEIGHT + NOTIFICATION_GROUP_GAP)
+        + visible_actions * NOTIFICATION_ACTIONS_HEIGHT
 }
 
 pub(crate) fn panel_menu_size(snapshot: &WebShellSnapshot) -> (i32, i32) {

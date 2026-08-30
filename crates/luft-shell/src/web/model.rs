@@ -15,6 +15,7 @@ use std::sync::Arc;
 #[serde(rename_all = "camelCase")]
 pub struct WebShellSnapshot {
     pub surface: Option<WebShellSurface>,
+    pub output_height: i32,
     pub time: String,
     pub date: String,
     pub active_workspace: String,
@@ -54,11 +55,13 @@ impl WebShellSnapshot {
         snapshot.surface = Some(surface);
         match surface {
             WebShellSurface::Panel => {
+                snapshot.output_height = 0;
                 snapshot.applications = Arc::default();
                 snapshot.notifications = Arc::default();
                 snapshot.toast_notifications = Arc::default();
             }
             WebShellSurface::PanelMenu => {
+                snapshot.output_height = 0;
                 snapshot.time.clear();
                 snapshot.date.clear();
                 snapshot.active_workspace.clear();
@@ -75,6 +78,7 @@ impl WebShellSnapshot {
                 snapshot.date_center_open = false;
             }
             WebShellSurface::SessionMenu => {
+                snapshot.output_height = 0;
                 snapshot.time.clear();
                 snapshot.date.clear();
                 snapshot.active_workspace.clear();
@@ -95,6 +99,7 @@ impl WebShellSnapshot {
                 snapshot.date_center_open = false;
             }
             WebShellSurface::QuickSettings => {
+                snapshot.output_height = 0;
                 snapshot.time.clear();
                 snapshot.date.clear();
                 snapshot.active_workspace.clear();
@@ -127,6 +132,7 @@ impl WebShellSnapshot {
                 snapshot.date_center_open = false;
             }
             WebShellSurface::NotificationToast => {
+                snapshot.output_height = 0;
                 snapshot.time.clear();
                 snapshot.date.clear();
                 snapshot.active_workspace.clear();
@@ -146,6 +152,7 @@ impl WebShellSnapshot {
                 snapshot.date_center_open = false;
             }
             WebShellSurface::StartMenu => {
+                snapshot.output_height = 0;
                 snapshot.time.clear();
                 snapshot.date.clear();
                 snapshot.user_profile_icon_uri = None;

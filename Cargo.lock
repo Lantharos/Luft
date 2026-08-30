@@ -3509,7 +3509,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "ashpd",
  "bytemuck",
@@ -3547,7 +3547,7 @@ dependencies = [
 [[package]]
 name = "sabine-bridge"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "serde",
  "serde_json",
@@ -3556,7 +3556,7 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "sabine-bridge",
  "serde",
@@ -3567,7 +3567,7 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
@@ -3579,7 +3579,7 @@ dependencies = [
 [[package]]
 name = "sabine-runtime"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "libc",
  "serde",
@@ -3593,7 +3593,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=46f518c7ae41aa29433a9e871264c66cbea861df#46f518c7ae41aa29433a9e871264c66cbea861df"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=1b4a58552400660cb2a3ee518dcb11d971e15d0c#1b4a58552400660cb2a3ee518dcb11d971e15d0c"
 dependencies = [
  "base64",
  "clap",

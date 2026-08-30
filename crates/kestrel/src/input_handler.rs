@@ -235,7 +235,22 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let state = wl_pointer::ButtonState::from(evt.state());
 
         if wl_pointer::ButtonState::Pressed == state {
-            self.update_keyboard_focus(self.pointer.current_location(), serial);
+            let location = self.pointer.current_location();
+            let pointer = self.pointer.clone();
+            if !pointer.is_grabbed() {
+                let under = self.surface_under(location);
+                pointer.motion(
+                    self,
+                    under,
+                    &MotionEvent {
+                        location,
+                        serial,
+                        time: evt.time(),
+                    },
+                );
+                pointer.frame(self);
+            }
+            self.update_keyboard_focus(location, serial);
         };
         let pointer = self.pointer.clone();
         pointer.button(
@@ -1055,7 +1070,7 @@ impl KestrelState<UdevData> {
 
         pointer.motion(
             self,
-            under,
+            new_under.clone(),
             &MotionEvent {
                 location: pointer_location,
                 serial,

@@ -52,6 +52,24 @@
     sendAction({ type: "workspace-relative", offset });
   }
 
+  function toggleStartMenu(event: MouseEvent) {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    sendAction({ type: "toggle-start-menu" });
+  }
+
+  function toggleDateCenter(event: MouseEvent) {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    sendAction({ type: "toggle-date-center" });
+  }
+
+  function activateFromKeyboard(event: KeyboardEvent, action: "toggle-start-menu" | "toggle-date-center") {
+    if (event.repeat || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    sendAction({ type: action });
+  }
+
   function startReorder(command: string) {
     draggedCommand = command;
     order = pinnedApps.map((app) => app.command);
@@ -103,7 +121,8 @@
       type="button"
       class="panel-launcher"
       aria-label="Open Start menu"
-      onclick={() => sendAction({ type: "toggle-start-menu" })}
+      onmousedown={toggleStartMenu}
+      onkeydown={(event) => activateFromKeyboard(event, "toggle-start-menu")}
     >
       <svg class="luft-mark" width="31" height="32" viewBox="0 0 31 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -157,7 +176,8 @@
     type="button"
     class="panel-clock"
     aria-label={`${snapshot.date} ${snapshot.time}`}
-    onclick={() => sendAction({ type: "toggle-date-center" })}
+    onmousedown={toggleDateCenter}
+    onkeydown={(event) => activateFromKeyboard(event, "toggle-date-center")}
   >
     <span>{snapshot.time}</span>
     <strong>{shortDate()}</strong>

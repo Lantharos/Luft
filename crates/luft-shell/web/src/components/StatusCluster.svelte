@@ -6,7 +6,9 @@
   let { snapshot, className }: { snapshot: ShellSnapshot; className: string } = $props();
 
   function toggleSettings(event: MouseEvent) {
+    if (event.button !== 0) return;
     if ((event.target as Element).closest(".tray-item")) return;
+    event.stopPropagation();
     sendAction({ type: "toggle-quick-settings" });
   }
 
@@ -28,7 +30,7 @@
   }
 </script>
 
-<div class={className} role="button" tabindex="0" aria-label="Quick settings" onclick={toggleSettings} onkeydown={keydown}>
+<div class={className} role="button" tabindex="0" aria-label="Quick settings" onmousedown={toggleSettings} onkeydown={keydown}>
   {#each snapshot.tray as item, index (item.title + index)}
     <button
       type="button"

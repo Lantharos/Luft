@@ -162,7 +162,13 @@
       sendAction({ type: "session-menu-close" });
       return;
     }
-    if (target.closest(".panel-menu, .session-menu, .panel-item, .app-button")) return;
+    if (
+      target.closest(
+        ".panel-menu, .session-menu, .panel-item, .app-button, .panel-launcher, .panel-status, .panel-clock",
+      )
+    ) {
+      return;
+    }
     sendAction({ type: "session-menu-close" });
     sendAction({ type: "panel-menu-close" });
   }

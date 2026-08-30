@@ -31,7 +31,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
 dependencies = [
  "cfg-if",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "version_check",
  "zerocopy",
@@ -1964,7 +1964,7 @@ checksum = "eae7b9aee968036d54dce06cebaefd919e4472e753296daccd6d344e3e2df0c2"
 dependencies = [
  "hermit-abi 0.3.9",
  "libc",
- "windows-sys 0.48.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3509,7 +3509,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "ashpd",
  "bytemuck",
@@ -3547,7 +3547,7 @@ dependencies = [
 [[package]]
 name = "sabine-bridge"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "serde",
  "serde_json",
@@ -3556,7 +3556,7 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "sabine-bridge",
  "serde",
@@ -3567,7 +3567,7 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
@@ -3579,7 +3579,7 @@ dependencies = [
 [[package]]
 name = "sabine-runtime"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "libc",
  "serde",
@@ -3593,7 +3593,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=8da2a14f5dc4e45cb3d30ca648c474e513fb83e9#8da2a14f5dc4e45cb3d30ca648c474e513fb83e9"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=00c7360cf5a71de3d617cc9c0845d723b9fbe55b#00c7360cf5a71de3d617cc9c0845d723b9fbe55b"
 dependencies = [
  "base64",
  "clap",
@@ -4181,7 +4181,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.4",
  "windows-sys 0.61.2",
@@ -5210,7 +5210,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]

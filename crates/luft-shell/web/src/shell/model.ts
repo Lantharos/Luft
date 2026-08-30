@@ -9,6 +9,7 @@ export type ShellSurface =
 
 export type ShellSnapshot = {
   surface?: ShellSurface;
+  outputHeight: number;
   time: string;
   date: string;
   activeWorkspace: string;
@@ -155,6 +156,7 @@ export type ShellAction =
 export const emptySnapshot = (): ShellSnapshot => {
   const now = new Date();
   return {
+    outputHeight: 640,
     time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     date: now.toLocaleDateString([], {
       weekday: "long",

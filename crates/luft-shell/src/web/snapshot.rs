@@ -21,6 +21,8 @@ use std::{
 };
 use time::{OffsetDateTime, macros::format_description};
 
+const DATE_CENTER_FALLBACK_OUTPUT_HEIGHT: i32 = 640;
+
 pub struct WebShellSnapshotInput<'a> {
     pub model: &'a ShellModel,
     pub running_window_order: &'a [luft_ipc::WindowId],
@@ -89,6 +91,7 @@ impl WebShellSnapshot {
 
         Self {
             surface: None,
+            output_height: primary_output_height(model),
             time: now
                 .format(format_description!("[hour]:[minute]"))
                 .unwrap_or_else(|_| "--:--".to_string()),
@@ -166,6 +169,16 @@ impl WebShellSnapshot {
             date_center_open,
         }
     }
+}
+
+fn primary_output_height(model: &ShellModel) -> i32 {
+    model
+        .outputs
+        .iter()
+        .find(|output| output.enabled && output.primary)
+        .or_else(|| model.outputs.iter().find(|output| output.enabled))
+        .map(|output| output.logical_height.max(1))
+        .unwrap_or(DATE_CENTER_FALLBACK_OUTPUT_HEIGHT)
 }
 
 fn append_running_window_app(

@@ -251,6 +251,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 active_workspace,
                 nested: self.nested,
             },
+            outputs: self.output_summaries(),
             workspaces: self
                 .layout
                 .workspaces()
@@ -269,6 +270,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .enumerate()
             .filter_map(|(index, output)| {
                 let mode = output.current_mode()?;
+                let geometry = self.space.output_geometry(output)?;
                 let physical = output.physical_properties();
                 Some(OutputSummary {
                     name: output.name(),
@@ -276,6 +278,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                     model: physical.model,
                     width: mode.size.w,
                     height: mode.size.h,
+                    logical_width: geometry.size.w,
+                    logical_height: geometry.size.h,
                     refresh_millihertz: mode.refresh,
                     scale: output.current_scale().fractional_scale(),
                     primary: index == 0,

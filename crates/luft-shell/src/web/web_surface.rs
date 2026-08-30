@@ -426,11 +426,9 @@ impl WebSurface {
     }
 
     fn request_visibility(&mut self, visible: bool) -> bool {
-        let Some(request) = self
-            .process
-            .as_ref()
-            .and_then(|process| process.set_shell_surface_visible(visible))
-        else {
+        let Some(request) = self.process.as_ref().and_then(|process| {
+            process.set_shell_surface_presentation(visible, self.surface_alpha, self.shell_margin)
+        }) else {
             self.control_unavailable_since
                 .get_or_insert_with(Instant::now);
             return false;

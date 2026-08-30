@@ -109,9 +109,9 @@ impl LazyWebSurface {
                     surface.size,
                 ));
             }
+            surface.set_shell_margin(target_margin);
             surface.set_visible_with_alpha(true, 1.0);
             surface.emit_surface_open();
-            surface.set_shell_margin(target_margin);
             if let Some(duration) = open_duration.filter(|_| animates_margin) {
                 self.show_at = Some(now + duration);
             } else {

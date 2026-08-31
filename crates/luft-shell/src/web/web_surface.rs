@@ -1,7 +1,5 @@
 use super::{
-    actions::WebShellAction,
-    model::WebShellSurface,
-    surface_layout::{panel_output_width, shell_surface},
+    actions::WebShellAction, model::WebShellSurface, surface_layout::shell_surface,
     surface_motion::shell_blur_region,
 };
 use sabine::{
@@ -41,6 +39,7 @@ pub struct WebSurface {
     rendered_value: Option<Value>,
     snapshot_revision: u64,
     frame_rate: u32,
+    sent_size: Option<(i32, i32)>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -83,6 +82,7 @@ impl WebSurface {
             rendered_value: None,
             snapshot_revision: 0,
             frame_rate: config.frame_rate,
+            sent_size: None,
         };
         surface.set_visible(config.visible);
         Ok(surface)
@@ -122,6 +122,7 @@ impl WebSurface {
             self.presented = Some(presentation);
             self.rendered_value = None;
             self.snapshot_revision = 0;
+            self.sent_size = None;
             return;
         }
 
@@ -140,14 +141,11 @@ impl WebSurface {
     }
 
     pub fn resize(&mut self, size: (i32, i32)) {
-        if self.size == size {
-            return;
+        if self.size != size {
+            self.size = size;
+            self.set_shell_margin(self.base_shell_margin());
         }
-        self.size = size;
-        if let Some(process) = &self.process {
-            let _ = process.set_shell_surface_size(size.0.max(1) as u32, size.1.max(1) as u32);
-        }
-        self.set_shell_margin(self.base_shell_margin());
+        self.flush_size();
     }
 
     pub(crate) fn set_panel_menu_x(&mut self, x: Option<i32>) {
@@ -202,6 +200,8 @@ impl WebSurface {
                     "launched Sabine shell surface"
                 );
                 self.process = Some(process);
+                self.sent_size = None;
+                self.flush_size();
                 self.set_frame_rate(self.frame_rate);
                 let _ = self.request_presentation(self.presentation);
             }
@@ -232,10 +232,12 @@ impl WebSurface {
             self.presented = None;
             self.rendered_value = None;
             self.snapshot_revision = 0;
+            self.sent_size = None;
         }
     }
 
     pub(crate) fn tick_visibility(&mut self) {
+        self.flush_size();
         self.flush_snapshot();
         let Some(request) = self.visibility_request.as_ref() else {
             self.ensure_presentation_request();
@@ -334,7 +336,13 @@ impl WebSurface {
             .shell_surface(shell_options)
             .shell_surface_alpha(self.presentation.alpha)
             .visible(self.presentation.visible)
-            .active(self.presentation.visible && kind == WebShellSurface::StartMenu)
+            .active(
+                self.presentation.visible
+                    && matches!(
+                        kind,
+                        WebShellSurface::StartMenu | WebShellSurface::CaptureConsent
+                    ),
+            )
             .active_frame_rate(self.frame_rate)
             .background_frame_rate(1)
             .blur_region(shell_blur_region(kind, width as i32, height as i32))
@@ -398,6 +406,18 @@ impl WebSurface {
         if process.emit_bridge_event(event, payload) {
             self.rendered_value = Some(value);
             self.snapshot_revision = revision;
+        }
+    }
+
+    fn flush_size(&mut self) {
+        if self.sent_size == Some(self.size) {
+            return;
+        }
+        let Some(process) = &self.process else {
+            return;
+        };
+        if process.set_shell_surface_size(self.size.0.max(1) as u32, self.size.1.max(1) as u32) {
+            self.sent_size = Some(self.size);
         }
     }
 
@@ -491,6 +511,7 @@ impl WebSurface {
         self.presented = None;
         self.rendered_value = None;
         self.snapshot_revision = 0;
+        self.sent_size = None;
         if self.presentation.visible || self.keep_alive_when_hidden {
             self.launch();
         }
@@ -557,12 +578,7 @@ fn cef_initial_size(shell_surface: &ShellSurfaceOptions, fallback: (i32, i32)) -
     let (width, height) = shell_surface
         .size
         .unwrap_or((fallback.0.max(1) as u32, fallback.1.max(1) as u32));
-    let width = if width == 0 {
-        panel_output_width().max(1) as u32
-    } else {
-        width.max(1)
-    };
-    (width, height.max(1))
+    (width.max(1), height.max(1))
 }
 
 #[cfg(test)]

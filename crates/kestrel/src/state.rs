@@ -17,7 +17,7 @@ use smithay::{
     },
     delegate_dispatch2,
     desktop::{
-        PopupKind, PopupManager, Space,
+        PopupKind, PopupManager, Space, find_popup_root_surface,
         space::SpaceElement,
         utils::{
             OutputPresentationFeedback, send_frames_surface_tree,
@@ -73,7 +73,7 @@ use smithay::{
         input_method::{InputMethodHandler, InputMethodManagerState, PopupSurface},
         keyboard_shortcuts_inhibit::{
             KeyboardShortcutsInhibitHandler, KeyboardShortcutsInhibitState,
-            KeyboardShortcutsInhibitor,
+            KeyboardShortcutsInhibitor, KeyboardShortcutsInhibitorSeat,
         },
         output::{OutputHandler, OutputManagerState},
         pointer_constraints::{
@@ -126,7 +126,7 @@ use crate::{
     ipc::IpcSocket,
     runtime::RuntimeOptions,
     shell::WindowElement,
-    shell_process::ShellProcess,
+    shell_process::{ShellProcess, ShellProcessConfig},
 };
 
 #[derive(Debug, Default)]
@@ -148,6 +148,14 @@ fn capture_client(client: &Client) -> bool {
         .get_data::<ClientState>()
         .is_some_and(|state| state.capture_privileged && state.security_context.is_none())
 }
+
+fn shortcut_focus_surface(target: &KeyboardFocusTarget) -> Option<WlSurface> {
+    match target {
+        KeyboardFocusTarget::Popup(popup) => find_popup_root_surface(popup).ok(),
+        _ => target.wl_surface().map(|surface| surface.into_owned()),
+    }
+}
+
 impl ClientData for ClientState {
     /// Notification that a client was initialized
     fn initialized(&self, _client_id: ClientId) {}
@@ -163,10 +171,13 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub running: Arc<AtomicBool>,
     pub handle: LoopHandle<'static, KestrelState<BackendData>>,
     pub shell_process: ShellProcess,
+    pub wayland_broker: crate::wayland_broker::WaylandConnectionBroker,
+    pub lock_process: crate::lock_process::LockProcess,
     pub portal_process: crate::portal_process::PortalProcess,
     pub xwayland_process: crate::xwayland_process::XwaylandProcess,
     pub ipc_socket: IpcSocket,
     pub nested: bool,
+    pub primary_output: Option<String>,
     pub wallpaper: crate::wallpaper::Wallpaper,
     pub layer_motion: crate::layer_motion::LayerMotionState,
     pub layout: LayoutEngine,
@@ -218,11 +229,15 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub idle_suspend_sent: bool,
     pub capture_sessions: Vec<Session>,
     pub pending_captures: Vec<PendingCapture>,
+    pub(crate) capture_consent: crate::capture_consent::CaptureConsentBroker,
 
     pub dnd_icon: Option<DndIcon>,
 
     // input-related fields
     pub suppressed_keys: Vec<Keysym>,
+    pub active_shortcuts_inhibitor: Option<KeyboardShortcutsInhibitor>,
+    pub logo_tap_candidate: bool,
+    pub workspace_scroll_accumulator: f64,
     pub cursor_status: CursorImageStatus,
     pub seat_name: String,
     pub seat: Seat<KestrelState<BackendData>>,
@@ -335,6 +350,19 @@ impl<BackendData: Backend> SeatHandler for KestrelState<BackendData> {
         let dh = &self.display_handle;
 
         let wl_surface = target.and_then(WaylandFocus::wl_surface);
+        let shortcut_surface = target.and_then(shortcut_focus_surface);
+        let next_inhibitor = shortcut_surface
+            .as_ref()
+            .and_then(|surface| seat.keyboard_shortcuts_inhibitor_for_surface(surface));
+        if self.active_shortcuts_inhibitor != next_inhibitor {
+            if let Some(inhibitor) = self.active_shortcuts_inhibitor.take() {
+                inhibitor.inactivate();
+            }
+            if let Some(inhibitor) = next_inhibitor {
+                inhibitor.activate();
+                self.active_shortcuts_inhibitor = Some(inhibitor);
+            }
+        }
 
         let focus = wl_surface.and_then(|s| dh.get_client(s.id()).ok());
         set_data_device_focus(dh, seat, focus.clone());
@@ -389,22 +417,102 @@ impl<BackendData: Backend> KeyboardShortcutsInhibitHandler for KestrelState<Back
     }
 
     fn new_inhibitor(&mut self, inhibitor: KeyboardShortcutsInhibitor) {
-        // Just grant the wish for everyone
-        inhibitor.activate();
+        let focused_surface = self
+            .seat
+            .get_keyboard()
+            .and_then(|keyboard| keyboard.current_focus())
+            .as_ref()
+            .and_then(shortcut_focus_surface);
+        if focused_surface.as_ref() == Some(inhibitor.wl_surface()) {
+            if let Some(active) = self.active_shortcuts_inhibitor.replace(inhibitor.clone())
+                && active != inhibitor
+            {
+                active.inactivate();
+            }
+            inhibitor.activate();
+        }
+    }
+
+    fn inhibitor_destroyed(&mut self, inhibitor: KeyboardShortcutsInhibitor) {
+        if self.active_shortcuts_inhibitor.as_ref() == Some(&inhibitor) {
+            self.active_shortcuts_inhibitor = None;
+        }
+    }
+}
+
+impl<BackendData: Backend> KestrelState<BackendData> {
+    fn pointer_constraint_surface_origin(
+        &self,
+        surface: &WlSurface,
+    ) -> Option<Point<f64, Logical>> {
+        if let Some(window) = self
+            .space
+            .elements()
+            .find(|window| window.wl_surface().as_deref() == Some(surface))
+        {
+            let location = self.space.element_location(window)?;
+            let render_location = location - SpaceElement::geometry(window).loc;
+            let decoration_offset = if window.decoration_state().is_ssd {
+                Point::from((0, crate::shell::ssd::HEADER_BAR_HEIGHT))
+            } else {
+                Point::default()
+            };
+            return Some((render_location + decoration_offset).to_f64());
+        }
+
+        for output in self.space.outputs() {
+            let Some(output_location) = self
+                .space
+                .output_geometry(output)
+                .map(|geometry| geometry.loc)
+            else {
+                continue;
+            };
+            let layers = smithay::desktop::layer_map_for_output(output);
+            if let Some(layer) = layers.layers().find(|layer| layer.wl_surface() == surface)
+                && let Some(geometry) = layers.layer_geometry(layer)
+            {
+                return Some((output_location + geometry.loc).to_f64());
+            }
+            if let Some(lock_surface) = self.session_lock.surface_for_output(output)
+                && lock_surface.wl_surface() == surface
+            {
+                return Some(output_location.to_f64());
+            }
+        }
+
+        self.pointer_contents
+            .as_ref()
+            .and_then(|(target, origin)| match target {
+                PointerFocusTarget::WlSurface(focused) if focused == surface => Some(*origin),
+                PointerFocusTarget::WlSurface(_) | PointerFocusTarget::SSD(_) => None,
+            })
     }
 }
 
 impl<BackendData: Backend> PointerConstraintsHandler for KestrelState<BackendData> {
     fn new_constraint(&mut self, surface: &WlSurface, pointer: &PointerHandle<Self>) {
-        // XXX region
-        let Some(current_focus) = pointer.current_focus() else {
+        if self.session_lock.is_active() {
+            return;
+        }
+        let Some((PointerFocusTarget::WlSurface(focused), surface_location)) =
+            self.pointer_contents.as_ref()
+        else {
             return;
         };
-        if current_focus.wl_surface().as_deref() == Some(surface) {
-            with_pointer_constraint(surface, pointer, |constraint| {
-                constraint.unwrap().activate();
-            });
+        if focused != surface {
+            return;
         }
+        let point = (pointer.current_location() - *surface_location).to_i32_floor();
+        with_pointer_constraint(surface, pointer, |constraint| {
+            if let Some(constraint) = constraint
+                && constraint
+                    .region()
+                    .is_none_or(|region| region.contains(point))
+            {
+                constraint.activate();
+            }
+        });
     }
 
     fn remove_constraint(
@@ -424,24 +532,12 @@ impl<BackendData: Backend> PointerConstraintsHandler for KestrelState<BackendDat
             ConstraintRemove::Destroyed(pointer_constraint) => match pointer_constraint {
                 PointerConstraint::Confined(_confined_pointer) => (),
                 PointerConstraint::Locked(locked_pointer) => {
-                    let origin = self
-                        .space
-                        .elements()
-                        .find_map(|window| {
-                            (window.wl_surface().as_deref() == Some(&hint_surface))
-                                .then(|| window.geometry())
-                        })
-                        .unwrap_or_default()
-                        .loc
-                        .to_f64();
-
-                    let surface_location = origin + hint_location;
-                    if let Some(region) = locked_pointer.region()
-                        && region.contains(hint_location.to_i32_floor())
+                    if locked_pointer
+                        .region()
+                        .is_none_or(|region| region.contains(hint_location.to_i32_floor()))
+                        && let Some(origin) = self.pointer_constraint_surface_origin(&hint_surface)
                     {
-                        pointer.set_location(surface_location);
-                    } else {
-                        pointer.set_location(surface_location);
+                        pointer.set_location(origin + hint_location);
                     }
                 }
             },
@@ -803,27 +899,6 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             info!(name = socket_name, "Listening on wayland socket");
             Some(socket_name)
         };
-        let privileged_socket_name = {
-            let source = ListeningSocketSource::new_auto()
-                .expect("failed to create privileged Wayland socket");
-            let socket_name = source.socket_name().to_string_lossy().into_owned();
-            handle
-                .insert_source(source, |client_stream, _, data| {
-                    let client_state = ClientState {
-                        privileged: true,
-                        ..ClientState::default()
-                    };
-                    if let Err(err) = data
-                        .display_handle
-                        .insert_client(client_stream, Arc::new(client_state))
-                    {
-                        warn!("Error adding privileged wayland client: {}", err);
-                    }
-                })
-                .expect("Failed to init privileged Wayland socket source");
-            info!(name = socket_name, "Listening on privileged Wayland socket");
-            socket_name
-        };
         handle
             .insert_source(
                 Generic::new(display, Interest::READ, Mode::Level),
@@ -841,7 +916,8 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         // init globals
         let compositor_state = CompositorState::new::<Self>(&dh);
         let data_device_state = DataDeviceState::new::<Self>(&dh);
-        let layer_shell_state = WlrLayerShellState::new::<Self>(&dh);
+        let layer_shell_state =
+            WlrLayerShellState::new_with_filter::<Self, _>(&dh, privileged_client);
         let output_manager_state = OutputManagerState::new_with_xdg_output::<Self>(&dh);
         let primary_selection_state = PrimarySelectionState::new::<Self>(&dh);
         let data_control_state = DataControlState::new::<Self, _>(
@@ -919,23 +995,45 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
 
         let nested = runtime.nested;
         let ipc_path = runtime.ipc_socket;
-        let ipc_socket = crate::ipc::install(&handle, ipc_path.clone())
-            .expect("failed to create Luft IPC socket");
+        let capture_consent = crate::capture_consent::CaptureConsentBroker::new()
+            .expect("failed to initialize capture consent capabilities");
+        let shell_ipc_capability = capture_consent.shell_capability().to_owned();
+        let portal_ipc_capability = capture_consent.portal_capability().to_owned();
+        let ipc_socket = crate::ipc::install(
+            &handle,
+            ipc_path.clone(),
+            shell_ipc_capability.clone(),
+            portal_ipc_capability.clone(),
+        )
+        .expect("failed to create Luft IPC socket");
         let wayland_socket = socket_name.clone().expect("Wayland socket is initialized");
+        let wayland_broker = crate::wayland_broker::WaylandConnectionBroker::new(dh.clone())
+            .expect("failed to initialize the shell Wayland broker");
+        let shell_wayland_broker = wayland_broker
+            .client()
+            .expect("failed to clone the shell Wayland broker connection");
+        let shell_wayland_broker_key = wayland_broker.key().to_owned();
         let compositor_config = config.compositor;
         let xwayland_enabled = compositor_config.xwayland;
         let wallpaper = crate::wallpaper::Wallpaper::load(&compositor_config);
         let xwayland_process =
             crate::xwayland_process::XwaylandProcess::new(xwayland_enabled, wayland_socket.clone());
         let shell_process = ShellProcess::new(
-            runtime.start_shell,
-            privileged_socket_name,
-            wayland_socket,
-            ipc_path,
-            xwayland_process.display().map(str::to_owned),
-            nested,
+            shell_wayland_broker,
+            shell_wayland_broker_key,
+            ShellProcessConfig {
+                enabled: runtime.start_shell,
+                app_wayland_socket: wayland_socket,
+                ipc_socket: ipc_path.clone(),
+                ipc_capability: shell_ipc_capability,
+                xwayland_display: xwayland_process.display().map(str::to_owned),
+                skip_startup_apps: nested,
+            },
         );
-        let portal_process = crate::portal_process::PortalProcess::new(dh.clone());
+        let lock_process =
+            crate::lock_process::LockProcess::new(dh.clone(), config.session.lock_command.clone());
+        let portal_process =
+            crate::portal_process::PortalProcess::new(dh.clone(), ipc_path, portal_ipc_capability);
 
         KestrelState {
             backend_data,
@@ -944,10 +1042,13 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             running: Arc::new(AtomicBool::new(true)),
             handle,
             shell_process,
+            wayland_broker,
+            lock_process,
             portal_process,
             xwayland_process,
             ipc_socket,
             nested,
+            primary_output: config.display.primary.clone(),
             wallpaper,
             layer_motion: crate::layer_motion::LayerMotionState::default(),
             layout: crate::policy::create_layout(),
@@ -995,8 +1096,12 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             idle_suspend_sent: false,
             capture_sessions: Vec::new(),
             pending_captures: Vec::new(),
+            capture_consent,
             dnd_icon: None,
             suppressed_keys: Vec::new(),
+            active_shortcuts_inhibitor: None,
+            logo_tap_candidate: false,
+            workspace_scroll_accumulator: 0.0,
             cursor_status: CursorImageStatus::default_named(),
             seat_name,
             seat,

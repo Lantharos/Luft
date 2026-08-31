@@ -15,6 +15,8 @@ use std::sync::Arc;
 #[serde(rename_all = "camelCase")]
 pub struct WebShellSnapshot {
     pub surface: Option<WebShellSurface>,
+    #[serde(skip)]
+    pub output_width: i32,
     pub output_height: i32,
     pub time: String,
     pub date: String,
@@ -35,6 +37,7 @@ pub struct WebShellSnapshot {
     pub start_menu_open: bool,
     pub quick_settings_open: bool,
     pub date_center_open: bool,
+    pub capture_prompt: Option<WebCapturePrompt>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -47,6 +50,29 @@ pub enum WebShellSurface {
     DateCenter,
     NotificationToast,
     StartMenu,
+    CaptureConsent,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WebCapturePrompt {
+    pub id: String,
+    pub kind: luft_ipc::CaptureKind,
+    pub app_id: Option<String>,
+    pub app_name: String,
+    pub app_icon_uri: Option<String>,
+    pub outputs: Vec<WebCaptureOutput>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WebCaptureOutput {
+    pub name: String,
+    pub label: String,
+    pub width: i32,
+    pub height: i32,
+    pub scale: f64,
+    pub primary: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]

@@ -235,6 +235,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
     while state.running.load(Ordering::SeqCst) {
         state.xwayland_process.tick();
         state.shell_process.tick();
+        state.lock_process.tick();
         state.portal_process.tick();
         let status = winit.dispatch_new_events(|event| match event {
             WinitEvent::Resized { size, .. } => {
@@ -404,7 +405,8 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                     damage_tracker,
                     age,
                     show_window_preview,
-                    session_locked.then_some(lock_surface.as_ref()).flatten(),
+                    session_locked,
+                    lock_surface.as_ref(),
                     wallpaper,
                     &state.layer_motion,
                 )

@@ -26,6 +26,7 @@ use smithay::{
 use tracing::warn;
 
 use crate::{
+    capture_consent::IpcAccess,
     focus::KeyboardFocusTarget,
     shell::{
         WindowElement, fixup_positions,
@@ -122,10 +123,47 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         changed
     }
 
-    pub fn handle_ipc(&mut self, request: IpcRequest) -> IpcResponse {
+    pub(crate) fn handle_ipc(&mut self, request: IpcRequest, access: IpcAccess) -> IpcResponse {
+        if !ipc_request_allowed(&request, access) {
+            return ipc_error("IPC access denied");
+        }
+        if let IpcRequest::PollCaptureConsent { request } = request {
+            let prompt_expired = self.capture_consent.expire();
+            let response = self
+                .capture_consent
+                .poll(access, request)
+                .map(|status| IpcResponse::CaptureConsent { status })
+                .unwrap_or_else(ipc_error);
+            if prompt_expired {
+                self.shell_state_dirty = true;
+                self.sync_shell_state();
+            }
+            return response;
+        }
         self.shell_state_dirty = true;
         match request {
             IpcRequest::SubscribeShell => IpcResponse::Accepted { revision: 0 },
+            IpcRequest::BeginCaptureConsent { request } => {
+                if !self.ipc_socket.has_shell_subscriber() {
+                    return ipc_error("capture consent shell is unavailable");
+                }
+                let outputs = self.output_summaries();
+                self.capture_consent
+                    .begin(access, request, outputs)
+                    .map(|()| IpcResponse::Accepted { revision: 0 })
+                    .unwrap_or_else(ipc_error)
+            }
+            IpcRequest::CancelCaptureConsent { request } => self
+                .capture_consent
+                .cancel(access, request)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
+                .unwrap_or_else(ipc_error),
+            IpcRequest::ResolveCaptureConsent { request, decision } => self
+                .capture_consent
+                .resolve(access, request, decision)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
+                .unwrap_or_else(ipc_error),
+            IpcRequest::PollCaptureConsent { .. } => unreachable!(),
             IpcRequest::ListOutputs => IpcResponse::Outputs {
                 outputs: self.output_summaries(),
             },
@@ -167,6 +205,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 self.shell_process.restart();
                 IpcResponse::Accepted { revision: 0 }
             }
+            IpcRequest::LockSession => self
+                .lock_process
+                .start()
+                .map(|()| IpcResponse::Accepted { revision: 0 })
+                .unwrap_or_else(ipc_error),
             IpcRequest::Reload => self
                 .reload_config()
                 .map(|()| IpcResponse::Accepted { revision: 0 })
@@ -184,6 +227,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .session
             .idle_suspend_seconds
             .map(std::time::Duration::from_secs);
+        self.lock_process
+            .set_command(config.session.lock_command.clone());
+        self.primary_output.clone_from(&config.display.primary);
         self.last_activity = std::time::Instant::now();
         self.idle_lock_sent = false;
         self.idle_suspend_sent = false;
@@ -228,6 +274,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     pub fn sync_shell_state(&mut self) -> ShellSnapshot {
         self.process_idle_actions();
+        if self.capture_consent.expire() {
+            self.shell_state_dirty = true;
+        }
         let sweep_due = self.last_policy_sweep.elapsed() >= POLICY_INTEGRITY_SWEEP_INTERVAL;
         let policy_changed = if self.shell_state_dirty || sweep_due {
             self.last_policy_sweep = Instant::now();
@@ -273,9 +322,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
         let idle_for = self.last_activity.elapsed();
         if !self.idle_lock_sent && self.idle_lock_after.is_some_and(|after| idle_for >= after) {
-            self.ipc_socket
-                .send_shell_command(luft_ipc::ShellCommand::Lock);
-            self.idle_lock_sent = true;
+            self.idle_lock_sent = self.lock_process.start().is_ok();
         }
         if !self.idle_suspend_sent
             && self
@@ -340,6 +387,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 })
                 .collect(),
             windows,
+            capture_prompts: self.capture_consent.prompts(),
         }
     }
 
@@ -361,7 +409,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                     logical_height: geometry.size.h,
                     refresh_millihertz: mode.refresh,
                     scale: output.current_scale().fractional_scale(),
-                    primary: index == 0,
+                    primary: self
+                        .primary_output
+                        .as_ref()
+                        .map_or(index == 0, |primary| primary == &output.name()),
                     enabled: true,
                 })
             })
@@ -406,7 +457,80 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         if let Some(keyboard) = self.seat.get_keyboard() {
             keyboard.set_focus(self, Some(window.into()), SERIAL_COUNTER.next_serial());
         }
+        self.shell_state_dirty = true;
         Ok(())
+    }
+
+    pub(crate) fn close_active_window(&mut self) -> Result<(), String> {
+        let id = self
+            .focused_window_id()
+            .ok_or_else(|| "no active window".to_string())?;
+        self.animate_close_window(id)
+    }
+
+    pub(crate) fn move_active_window_to_workspace(
+        &mut self,
+        workspace: WorkspaceId,
+    ) -> Result<(), String> {
+        let id = self
+            .focused_window_id()
+            .ok_or_else(|| "no active window".to_string())?;
+        self.layout
+            .move_window_to_workspace(id, &workspace)
+            .map_err(|error| error.to_string())?;
+        self.reconcile_workspace();
+        self.shell_state_dirty = true;
+        Ok(())
+    }
+
+    pub(crate) fn cycle_active_window(&mut self, reverse: bool) -> Result<(), String> {
+        let active_workspace = self.layout.active_workspace().clone();
+        let candidates = self
+            .layout
+            .workspaces()
+            .find(|workspace| workspace.id == active_workspace)
+            .map(|workspace| workspace.floating_windows.clone())
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|id| {
+                self.layout
+                    .window(*id)
+                    .is_some_and(|window| window.state != WindowState::Hidden)
+                    && self
+                        .windows
+                        .get(id)
+                        .is_some_and(|window| self.space.element_location(window).is_some())
+            })
+            .collect::<Vec<_>>();
+        let target = match (candidates.len(), self.focused_window_id()) {
+            (0, _) => return Err("no window in the active workspace".to_string()),
+            (_, Some(current)) => {
+                let current = candidates
+                    .iter()
+                    .position(|candidate| *candidate == current)
+                    .unwrap_or(0);
+                let next = if reverse {
+                    current.checked_sub(1).unwrap_or(candidates.len() - 1)
+                } else {
+                    (current + 1) % candidates.len()
+                };
+                candidates[next]
+            }
+            (_, None) if reverse => *candidates.last().unwrap(),
+            (_, None) => candidates[0],
+        };
+        self.activate_window(target)
+    }
+
+    fn focused_window_id(&self) -> Option<WindowId> {
+        let focus = self.seat.get_keyboard()?.current_focus()?;
+        let surface = match focus {
+            KeyboardFocusTarget::Popup(popup) => find_popup_root_surface(&popup).ok()?,
+            _ => focus.wl_surface()?.into_owned(),
+        };
+        self.windows.iter().find_map(|(id, window)| {
+            (window.wl_surface().as_deref() == Some(&surface)).then_some(*id)
+        })
     }
 
     fn close_window(&mut self, id: WindowId) -> Result<(), String> {
@@ -516,15 +640,16 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         Ok(())
     }
 
-    fn switch_workspace(&mut self, workspace: WorkspaceId) -> Result<(), String> {
+    pub(crate) fn switch_workspace(&mut self, workspace: WorkspaceId) -> Result<(), String> {
         self.layout
             .switch_workspace(&workspace)
             .map_err(|error| error.to_string())?;
         self.reconcile_workspace();
+        self.shell_state_dirty = true;
         Ok(())
     }
 
-    fn switch_relative_workspace(&mut self, offset: i32) -> Result<(), String> {
+    pub(crate) fn switch_relative_workspace(&mut self, offset: i32) -> Result<(), String> {
         let workspace = self
             .layout
             .relative_workspace(offset)
@@ -678,6 +803,28 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .client()
             .and_then(|client| client.get_credentials(&self.display_handle).ok())
             .and_then(|credentials| credentials.pid.try_into().ok());
+    }
+}
+
+fn ipc_request_allowed(request: &IpcRequest, access: IpcAccess) -> bool {
+    match request {
+        IpcRequest::ListOutputs => true,
+        IpcRequest::BeginCaptureConsent { .. }
+        | IpcRequest::PollCaptureConsent { .. }
+        | IpcRequest::CancelCaptureConsent { .. } => access == IpcAccess::Portal,
+        IpcRequest::SubscribeShell
+        | IpcRequest::ResolveCaptureConsent { .. }
+        | IpcRequest::ActivateWindow { .. }
+        | IpcRequest::CloseWindow { .. }
+        | IpcRequest::MinimizeWindow { .. }
+        | IpcRequest::ToggleMaximizeWindow { .. }
+        | IpcRequest::MoveWindowToWorkspace { .. }
+        | IpcRequest::SwitchWorkspace { .. }
+        | IpcRequest::SwitchRelativeWorkspace { .. }
+        | IpcRequest::SetOutputScale { .. }
+        | IpcRequest::RestartShell
+        | IpcRequest::LockSession
+        | IpcRequest::Reload => access == IpcAccess::Shell,
     }
 }
 

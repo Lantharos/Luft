@@ -13,6 +13,7 @@ ashpd = { version = "0.13.13", features = ["backend", "screencast", "screenshot"
 async-trait = "0.1.89"
 enumflags2 = "0.7.12"
 image = { version = "0.25.10", default-features = false, features = ["png"] }
+luft-ipc.workspace = true
 memmap2 = "0.9.11"
 pipewire = "0.10.0"
 rustix = { version = "1.1.4", features = ["event"] }

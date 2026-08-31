@@ -18,6 +18,7 @@ const DATE_CENTER_FIELDS: &[&str] = &[
 ];
 const NOTIFICATION_TOAST_FIELDS: &[&str] = &["toastNotifications"];
 const START_MENU_FIELDS: &[&str] = &["workspaces", "windows", "applications", "doNotDisturb"];
+const CAPTURE_CONSENT_FIELDS: &[&str] = &["capturePrompt"];
 
 pub(super) fn project(snapshot: &Value, surface: WebShellSurface) -> Value {
     let mut payload = Map::new();
@@ -45,6 +46,7 @@ fn fields(surface: WebShellSurface) -> &'static [&'static str] {
         WebShellSurface::DateCenter => DATE_CENTER_FIELDS,
         WebShellSurface::NotificationToast => NOTIFICATION_TOAST_FIELDS,
         WebShellSurface::StartMenu => START_MENU_FIELDS,
+        WebShellSurface::CaptureConsent => CAPTURE_CONSENT_FIELDS,
     }
 }
 

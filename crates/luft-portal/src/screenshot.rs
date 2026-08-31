@@ -1,7 +1,11 @@
 use std::{
     env, fs, io,
     path::PathBuf,
-    time::{SystemTime, UNIX_EPOCH},
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 use ashpd::{
@@ -13,10 +17,23 @@ use ashpd::{
     },
 };
 use enumflags2::BitFlags;
+use wayland_client::Connection;
 
-use crate::capture::CaptureClient;
+use crate::{
+    capture::CaptureClient,
+    consent::{ConsentOutcome, RequestCancellation, request_consent},
+};
 
-pub struct ScreenshotPortal;
+#[derive(Clone)]
+pub struct ScreenshotPortal {
+    wayland: Connection,
+}
+
+impl ScreenshotPortal {
+    pub fn new(wayland: Connection) -> Self {
+        Self { wayland }
+    }
+}
 
 #[async_trait::async_trait]
 impl RequestImpl for ScreenshotPortal {
@@ -32,14 +49,36 @@ impl ScreenshotImpl for ScreenshotPortal {
     async fn screenshot(
         &self,
         _: HandleToken,
-        _: Option<MaybeAppID>,
+        app_id: Option<MaybeAppID>,
         _: Option<WindowIdentifierType>,
         _: ScreenshotOptions,
     ) -> Result<Screenshot> {
-        let path = tokio::task::spawn_blocking(capture_png)
-            .await
+        let mut cancellation = RequestCancellation::new();
+        let cancelled = cancellation.flag();
+        let wayland = self.wayland.clone();
+        let result = tokio::task::spawn_blocking(move || {
+            let app_id = app_id
+                .map(|value| value.to_string())
+                .filter(|value| !value.trim().is_empty());
+            match request_consent(luft_ipc::CaptureKind::Screenshot, app_id, &cancelled)? {
+                ConsentOutcome::Granted(output) => {
+                    match capture_png(wayland, &output, &cancelled) {
+                        Ok(path) => Ok(Some(path)),
+                        Err(_) if cancelled.load(Ordering::Acquire) => Ok(None),
+                        Err(error) => Err(error),
+                    }
+                }
+                ConsentOutcome::Denied | ConsentOutcome::Cancelled | ConsentOutcome::TimedOut => {
+                    Ok(None)
+                }
+            }
+        })
+        .await
+        .map_err(|error| PortalError::Failed(error.to_string()))?;
+        cancellation.disarm();
+        let path = result
             .map_err(|error| PortalError::Failed(error.to_string()))?
-            .map_err(|error| PortalError::Failed(error.to_string()))?;
+            .ok_or_else(|| PortalError::Cancelled("screen capture was cancelled".into()))?;
         let uri = url::Url::from_file_path(&path)
             .map_err(|()| PortalError::Failed("failed to create screenshot URI".into()))?;
         Ok(Screenshot::new(
@@ -60,18 +99,23 @@ impl ScreenshotImpl for ScreenshotPortal {
     }
 }
 
-fn capture_png() -> std::result::Result<PathBuf, Box<dyn std::error::Error + Send + Sync>> {
-    let mut client = CaptureClient::connect(false)?;
-    let frame = client
-        .capture(None)?
-        .ok_or_else(|| io::Error::other("screenshot capture was cancelled"))?;
+fn capture_png(
+    wayland: Connection,
+    output: &str,
+    cancelled: &Arc<AtomicBool>,
+) -> std::result::Result<PathBuf, Box<dyn std::error::Error + Send + Sync>> {
+    let mut client = CaptureClient::connect(wayland, output, false)?;
+    if !client.capture(Some(cancelled), Duration::from_secs(5))? {
+        return Err(
+            io::Error::new(io::ErrorKind::Interrupted, "screenshot capture cancelled").into(),
+        );
+    }
     let directory = screenshot_directory();
     fs::create_dir_all(&directory)?;
     let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis();
     let path = directory.join(format!("Luft Screenshot {timestamp}.png"));
-    let width = frame.width;
-    let height = frame.height;
-    let rgba = frame.into_rgba();
+    let (width, height) = client.size();
+    let rgba = client.rgba();
     image::save_buffer_with_format(
         &path,
         &rgba,

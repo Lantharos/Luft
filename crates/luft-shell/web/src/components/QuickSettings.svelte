@@ -76,7 +76,7 @@
     </div>
   </header>
 
-  <div class="quick-status-strip">
+  <div class="quick-status-strip" class:has-three={showNetwork && showPower}>
     {#if showNetwork}
       <button
         type="button"

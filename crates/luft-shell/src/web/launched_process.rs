@@ -34,7 +34,7 @@ impl LaunchedProcess {
             Ok(None) => true,
             Err(error) => {
                 warn!(command = %self.command, %error, "failed to poll launched app");
-                false
+                true
             }
         }
     }

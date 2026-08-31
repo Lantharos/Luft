@@ -126,6 +126,7 @@ function isSurface(value: string | null): value is ShellSurface {
     value === "quick-settings" ||
     value === "date-center" ||
     value === "notification-toast" ||
-    value === "start-menu"
+    value === "start-menu" ||
+    value === "capture-consent"
   );
 }

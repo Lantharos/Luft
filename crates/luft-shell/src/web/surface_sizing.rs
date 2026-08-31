@@ -13,11 +13,17 @@ pub(crate) const SESSION_MENU_HEIGHT: i32 = 172;
 pub(crate) const SESSION_MENU_RIGHT_MARGIN: i32 = 16;
 pub(crate) const SESSION_MENU_TOP_OFFSET: i32 = 60;
 pub(crate) const DATE_CENTER_WIDTH: i32 = 360;
+pub(crate) const CAPTURE_CONSENT_WIDTH: i32 = 520;
+pub(crate) const PANEL_HEIGHT: i32 = 48;
 const DATE_CENTER_COMPACT_HEIGHT: i32 = 560;
 const DATE_CENTER_VERTICAL_MARGIN: i32 = 80;
 const NOTIFICATION_GROUP_HEIGHT: i32 = 128;
 const NOTIFICATION_GROUP_GAP: i32 = 10;
 const NOTIFICATION_ACTIONS_HEIGHT: i32 = 36;
+
+pub(crate) fn panel_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
+    (snapshot.output_width.max(1), PANEL_HEIGHT)
+}
 
 pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
     let sliders = i32::from(snapshot.status.audio.is_some())
@@ -30,6 +36,14 @@ pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
         QUICK_SETTINGS_WIDTH,
         height.max(SESSION_MENU_TOP_OFFSET + SESSION_MENU_HEIGHT),
     )
+}
+
+pub(crate) fn capture_consent_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
+    let output_count = snapshot
+        .capture_prompt
+        .as_ref()
+        .map_or(1, |prompt| prompt.outputs.len().clamp(1, 4)) as i32;
+    (CAPTURE_CONSENT_WIDTH, 248 + output_count * 72)
 }
 
 pub(crate) fn session_menu_size() -> (i32, i32) {

@@ -7,10 +7,15 @@ use std::{
 };
 
 mod layout;
+mod portal;
 
 pub use layout::{
     Arrangement, LayoutEngine, LayoutError, Rect, WindowId, WindowInfo, WindowState, Workspace,
     WorkspaceId,
+};
+pub use portal::{
+    CaptureConsentDecision, CaptureConsentPrompt, CaptureConsentRequest, CaptureConsentStatus,
+    CaptureKind, CaptureRequestId, PORTAL_CAPABILITY_ENV, SHELL_CAPABILITY_ENV,
 };
 
 pub const SOCKET_ENV: &str = "LUFT_IPC_SOCKET";
@@ -98,6 +103,19 @@ fn json_error(error: serde_json::Error) -> io::Error {
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum IpcRequest {
     SubscribeShell,
+    BeginCaptureConsent {
+        request: CaptureConsentRequest,
+    },
+    PollCaptureConsent {
+        request: CaptureRequestId,
+    },
+    CancelCaptureConsent {
+        request: CaptureRequestId,
+    },
+    ResolveCaptureConsent {
+        request: CaptureRequestId,
+        decision: CaptureConsentDecision,
+    },
     Reload,
     ListOutputs,
     ActivateWindow {
@@ -127,6 +145,7 @@ pub enum IpcRequest {
         scale: f64,
     },
     RestartShell,
+    LockSession,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -144,6 +163,7 @@ pub enum IpcResponse {
     ShellSnapshot(ShellSnapshot),
     Outputs { outputs: Vec<OutputSummary> },
     Accepted { revision: u64 },
+    CaptureConsent { status: CaptureConsentStatus },
     Error { message: String },
 }
 
@@ -154,6 +174,7 @@ pub struct ShellSnapshot {
     pub outputs: Vec<OutputSummary>,
     pub workspaces: Vec<WorkspaceSummary>,
     pub windows: Vec<WindowSummary>,
+    pub capture_prompts: Vec<CaptureConsentPrompt>,
 }
 
 impl ShellSnapshot {
@@ -162,12 +183,14 @@ impl ShellSnapshot {
             && self.outputs == other.outputs
             && self.workspaces == other.workspaces
             && self.windows == other.windows
+            && self.capture_prompts == other.capture_prompts
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ClientMessage {
+    Authenticate { capability: String },
     Request { id: u64, request: IpcRequest },
 }
 
@@ -184,6 +207,9 @@ pub enum ServerMessage {
 pub enum ShellCommand {
     Lock,
     Suspend,
+    ToggleStartMenu,
+    OpenLauncher,
+    LaunchDefaultApp { app: DefaultAppKind },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

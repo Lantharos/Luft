@@ -110,8 +110,7 @@ while IFS= read -r -d '' asset; do
 done < <(find "$ROOT/crates/luft-shell/web/dist" -type f -print0)
 
 desktop_entry="$(mktemp)"
-portal_service=""
-trap 'rm -f "$desktop_entry" "$portal_service"' EXIT
+trap 'rm -f "$desktop_entry"' EXIT
 cat >"$desktop_entry" <<EOF
 [Desktop Entry]
 Name=Luft
@@ -131,15 +130,7 @@ install_file 644 \
   "$ROOT/data/xdg-desktop-portal/portals/luft.portal" \
   "$PORTAL_DIR/portals/luft.portal"
 
-portal_service="$(mktemp)"
-cat >"$portal_service" <<EOF
-[D-BUS Service]
-Name=org.freedesktop.impl.portal.desktop.luft
-Exec=$BIN_DIR/luft-portal
-EOF
-install_file 644 \
-  "$portal_service" \
-  "$DBUS_SERVICE_DIR/org.freedesktop.impl.portal.desktop.luft.service"
+remove_file "$DBUS_SERVICE_DIR/org.freedesktop.impl.portal.desktop.luft.service"
 
 echo "Installed Luft session:"
 echo "  binaries: $BIN_DIR"

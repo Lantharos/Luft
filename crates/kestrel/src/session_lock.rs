@@ -44,6 +44,17 @@ impl SessionLock {
             .filter(|surface| surface.alive())
     }
 
+    pub fn output_added(&mut self, output: &Output) {
+        if self.active && self.confirmation.is_some() {
+            self.pending_outputs.insert(output.name());
+        }
+    }
+
+    pub fn output_removed(&mut self, output: &Output) {
+        self.surfaces.retain(|(candidate, _)| candidate != output);
+        self.output_cleared(output);
+    }
+
     pub fn output_cleared(&mut self, output: &Output) {
         self.pending_outputs.remove(&output.name());
         if self.pending_outputs.is_empty()
@@ -61,6 +72,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
 
     fn lock(&mut self, confirmation: SessionLocker) {
         self.session_lock.active = true;
+        self.release_pointer_focus_for_session_lock();
         self.session_lock.surfaces.clear();
         self.session_lock.pending_outputs = self
             .space
@@ -104,6 +116,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
                 smithay::utils::SERIAL_COUNTER.next_serial(),
             );
         }
+        self.refresh_pointer_focus_now();
         self.refresh_idle_inhibition();
     }
 
@@ -141,6 +154,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
             Some(KeyboardFocusTarget::Surface(surface.wl_surface().clone())),
             smithay::utils::SERIAL_COUNTER.next_serial(),
         );
+        self.refresh_pointer_focus_now();
         self.refresh_idle_inhibition();
         self.backend_data.reset_buffers(&output);
     }

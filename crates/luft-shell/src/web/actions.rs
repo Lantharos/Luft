@@ -97,6 +97,13 @@ pub enum WebShellAction {
         notification: u32,
         action: String,
     },
+    CaptureConsentAllow {
+        request: String,
+        output: String,
+    },
+    CaptureConsentDeny {
+        request: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]

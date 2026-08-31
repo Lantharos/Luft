@@ -6,6 +6,7 @@
   import StartMenu from "./components/StartMenu.svelte";
   import QuickSettings from "./components/QuickSettings.svelte";
   import Panel from "./components/Panel.svelte";
+  import CaptureConsent from "./components/CaptureConsent.svelte";
   import { getSnapshot, sendAction, subscribe } from "./shell/bridge";
   import type { ShellSnapshot } from "./shell/model";
   import { onMount } from "svelte";
@@ -17,18 +18,17 @@
   const surface = $derived(snapshot.surface ?? "panel");
   const rootElement = document.querySelector<HTMLElement>("#app");
   let surfaceAnimationTimer: number | undefined;
-  let surfaceAnimationFrame: number | undefined;
   let surfaceAnimationPhase: "opening" | "closing" | undefined;
   let lastSurfaceAnimationAt = 0;
 
   onMount(() => {
     applySnapshot(snapshot);
     if (!isNativeSurfaceRuntime()) {
-      scheduleSurfaceAnimation("opening");
+      runSurfaceAnimation("opening");
     }
     const unsubscribe = subscribe(applySnapshot);
     const surfaceOpen = () => {
-      if (usesContentAnimation(surface)) scheduleSurfaceAnimation("opening");
+      if (usesContentAnimation(surface)) runSurfaceAnimation("opening");
     };
     const surfaceClose = () => {
       if (usesContentAnimation(surface)) runSurfaceAnimation("closing");
@@ -41,9 +41,6 @@
       window.removeEventListener("sabine:luft.surface-close", surfaceClose);
       if (surfaceAnimationTimer) {
         window.clearTimeout(surfaceAnimationTimer);
-      }
-      if (surfaceAnimationFrame) {
-        window.cancelAnimationFrame(surfaceAnimationFrame);
       }
     };
   });
@@ -70,13 +67,8 @@
   function runSurfaceAnimation(phase: "opening" | "closing") {
     if (!rootElement) return;
     const now = performance.now();
-    const reopening =
-      phase === "opening" && surfaceAnimationPhase === "closing";
-    if (
-      !reopening &&
-      surfaceAnimationPhase === phase &&
-      now - lastSurfaceAnimationAt < 80
-    ) {
+    const reopening = phase === "opening" && surfaceAnimationPhase === "closing";
+    if (!reopening && surfaceAnimationPhase === phase && now - lastSurfaceAnimationAt < 80) {
       return;
     }
     surfaceAnimationPhase = phase;
@@ -92,28 +84,12 @@
     surfaceAnimationTimer = window.setTimeout(
       () => {
         rootElement.classList.remove(activeClass);
-      if (surfaceAnimationPhase === phase) {
-        surfaceAnimationPhase = undefined;
-      }
-    },
+        if (surfaceAnimationPhase === phase) {
+          surfaceAnimationPhase = undefined;
+        }
+      },
       phase === "opening" ? 280 : 210,
     );
-  }
-
-  function scheduleSurfaceAnimation(phase: "opening" | "closing") {
-    if (phase === "closing") {
-      if (surfaceAnimationFrame) {
-        window.cancelAnimationFrame(surfaceAnimationFrame);
-        surfaceAnimationFrame = undefined;
-      }
-      runSurfaceAnimation(phase);
-      return;
-    }
-    if (surfaceAnimationFrame) {
-      window.cancelAnimationFrame(surfaceAnimationFrame);
-    }
-    surfaceAnimationFrame = undefined;
-    runSurfaceAnimation("opening");
   }
 
   function isNativeSurfaceRuntime() {
@@ -121,7 +97,7 @@
   }
 
   function usesContentAnimation(kind: string) {
-    return kind === "session-menu";
+    return kind === "session-menu" || kind === "capture-consent";
   }
 
   function keydown(event: KeyboardEvent) {
@@ -135,6 +111,10 @@
     }
     if (event.key === "Escape" && surface === "date-center") {
       sendAction({ type: "close-date-center" });
+      return;
+    }
+    if (event.key === "Escape" && surface === "capture-consent" && snapshot.capturePrompt) {
+      sendAction({ type: "capture-consent-deny", request: snapshot.capturePrompt.id });
       return;
     }
     if (event.key === "Escape") {
@@ -194,6 +174,8 @@
     setQuery={(query) => (startMenuQuery = query)}
     setSelection={(selection) => (startMenuSelection = selection)}
   />
+{:else if surface === "capture-consent"}
+  <CaptureConsent {snapshot} />
 {:else}
   <Panel {snapshot} />
 {/if}

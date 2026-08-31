@@ -18,7 +18,7 @@ use smithay::{
             protocol::{wl_buffer::WlBuffer, wl_output, wl_surface::WlSurface},
         },
     },
-    utils::{IsAlive, Logical, Point, Rectangle, Size},
+    utils::{IsAlive, Logical, Point, Rectangle},
     wayland::{
         buffer::BufferHandler,
         compositor::{
@@ -448,19 +448,10 @@ fn place_new_window(
 }
 
 pub fn fixup_positions(space: &mut Space<WindowElement>, pointer_location: Point<f64, Logical>) {
-    // fixup outputs
-    let mut offset = Point::<i32, Logical>::from((0, 0));
-    for output in space.outputs().cloned().collect::<Vec<_>>().into_iter() {
-        let size = space
-            .output_geometry(&output)
-            .map(|geo| geo.size)
-            .unwrap_or_else(|| Size::from((0, 0)));
-        space.map_output(&output, offset);
-        layer_map_for_output(&output).arrange();
-        offset.x += size.w;
+    for output in space.outputs() {
+        layer_map_for_output(output).arrange();
     }
 
-    // fixup windows
     let mut orphaned_windows = Vec::new();
     let outputs = space
         .outputs()

@@ -1,8 +1,10 @@
 use luft_ipc::{
-    ClientMessage, IpcRequest, IpcResponse, OutputSummary, ServerMessage, ShellSnapshot,
-    WindowSummary, WorkspaceId, WorkspaceSummary, read_frame, socket_path, write_frame,
+    CaptureConsentPrompt, ClientMessage, IpcRequest, IpcResponse, OutputSummary,
+    SHELL_CAPABILITY_ENV, ServerMessage, ShellSnapshot, WindowSummary, WorkspaceId,
+    WorkspaceSummary, read_frame, socket_path, write_frame,
 };
 use std::{
+    env,
     error::Error,
     os::unix::net::UnixStream,
     sync::{
@@ -21,6 +23,7 @@ pub struct ShellModel {
     pub outputs: Vec<OutputSummary>,
     pub workspaces: Vec<WorkspaceSummary>,
     pub windows: Vec<WindowSummary>,
+    pub capture_prompts: Vec<CaptureConsentPrompt>,
 }
 
 impl From<ShellSnapshot> for ShellModel {
@@ -32,6 +35,7 @@ impl From<ShellSnapshot> for ShellModel {
             outputs: snapshot.outputs,
             workspaces: snapshot.workspaces,
             windows: snapshot.windows,
+            capture_prompts: snapshot.capture_prompts,
         }
     }
 }
@@ -66,6 +70,7 @@ pub struct ShellIpc {
 
 impl ShellIpc {
     pub fn connect() -> Result<(Self, ShellModel), Box<dyn Error>> {
+        let capability = take_shell_capability()?;
         let stream = UnixStream::connect(socket_path())?;
         let read_stream = stream.try_clone()?;
         let (outgoing_tx, outgoing_rx) = mpsc::channel();
@@ -78,6 +83,8 @@ impl ShellIpc {
             incoming: incoming_rx,
             next_request: AtomicU64::new(2),
         };
+        ipc.outgoing
+            .send(ClientMessage::Authenticate { capability })?;
         ipc.outgoing.send(ClientMessage::Request {
             id: 1,
             request: IpcRequest::SubscribeShell,
@@ -111,6 +118,15 @@ impl ShellIpc {
     pub fn drain(&self) -> impl Iterator<Item = ServerMessage> + '_ {
         self.incoming.try_iter()
     }
+}
+
+fn take_shell_capability() -> Result<String, Box<dyn Error>> {
+    let capability =
+        env::var(SHELL_CAPABILITY_ENV).map_err(|_| format!("missing {SHELL_CAPABILITY_ENV}"))?;
+    unsafe {
+        env::remove_var(SHELL_CAPABILITY_ENV);
+    }
+    Ok(capability)
 }
 
 fn spawn_reader(mut stream: UnixStream, incoming: Sender<ServerMessage>) {

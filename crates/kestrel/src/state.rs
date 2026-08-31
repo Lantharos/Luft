@@ -171,6 +171,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub windows: BTreeMap<WindowId, WindowElement>,
     pub shell_state_dirty: bool,
     pub last_shell_focus: Option<WlSurface>,
+    pub(crate) pointer_contents: Option<(PointerFocusTarget, Point<f64, Logical>)>,
 
     // desktop
     pub space: Space<WindowElement>,
@@ -900,6 +901,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             windows: BTreeMap::new(),
             shell_state_dirty: true,
             last_shell_focus: None,
+            pointer_contents: None,
             space: Space::default(),
             popups: PopupManager::default(),
             compositor_state,

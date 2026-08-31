@@ -29,8 +29,7 @@ use smithay::{
         dmabuf::get_dmabuf,
         shell::{
             wlr_layer::{
-                Layer, LayerSurface as WlrLayerSurface, LayerSurfaceData, WlrLayerShellHandler,
-                WlrLayerShellState,
+                Layer, LayerSurface as WlrLayerSurface, WlrLayerShellHandler, WlrLayerShellState,
             },
             xdg::XdgToplevelSurfaceData,
         },
@@ -251,6 +250,8 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
         if !unmaps_surface {
             ensure_initial_configure(surface, &self.space, &mut self.popups);
         }
+        self.layer_motion
+            .observe_surface_commit(surface, &self.space, std::time::Instant::now());
     }
 }
 
@@ -395,29 +396,13 @@ fn ensure_initial_configure(
         map.layer_for_surface(surface, WindowSurfaceType::TOPLEVEL)
             .is_some()
     }) {
-        let initial_configure_sent = with_states(surface, |states| {
-            states
-                .data_map
-                .get::<LayerSurfaceData>()
-                .unwrap()
-                .lock()
-                .unwrap()
-                .initial_configure_sent
-        });
-
         let mut map = layer_map_for_output(output);
 
-        // arrange the layers before sending the initial configure
-        // to respect any size the client may have sent
         map.arrange();
-        // send the initial configure if relevant
-        if !initial_configure_sent {
-            let layer = map
-                .layer_for_surface(surface, WindowSurfaceType::TOPLEVEL)
-                .unwrap();
-
-            layer.layer_surface().send_configure();
-        }
+        let layer = map
+            .layer_for_surface(surface, WindowSurfaceType::TOPLEVEL)
+            .unwrap();
+        layer.layer_surface().send_pending_configure();
     };
 }
 

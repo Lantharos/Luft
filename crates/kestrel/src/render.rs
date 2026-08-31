@@ -306,7 +306,7 @@ fn extend_layer_elements<R>(
     R::TextureId: Send + Clone + 'static,
 {
     let mut surfaces = layers.layers_on(layer).rev().collect::<Vec<_>>();
-    if layer == WlrLayer::Top {
+    if layer == WlrLayer::Overlay {
         surfaces.sort_by_key(|surface| u8::from(surface.namespace() != "luft-panel"));
     }
     elements.extend(

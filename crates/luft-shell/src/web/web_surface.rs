@@ -1,6 +1,6 @@
 use super::{
     actions::WebShellAction,
-    model::{WebShellSnapshot, WebShellSurface},
+    model::WebShellSurface,
     surface_layout::{panel_output_width, shell_surface},
     surface_motion::shell_blur_region,
 };
@@ -13,7 +13,6 @@ use serde_json::{Map, Value, json};
 use std::{
     env,
     error::Error,
-    path::PathBuf,
     sync::{Arc, Mutex, mpsc::Sender},
     time::{Duration, Instant},
 };
@@ -27,7 +26,7 @@ pub struct WebSurface {
     kind: WebShellSurface,
     pub(crate) size: (i32, i32),
     actions_tx: Sender<WebShellAction>,
-    snapshot: Arc<Mutex<WebShellSnapshot>>,
+    snapshot: Arc<Mutex<Value>>,
     keep_alive_when_hidden: bool,
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
@@ -38,8 +37,7 @@ pub struct WebSurface {
     control_unavailable_since: Option<Instant>,
     presentation: SurfacePresentation,
     presented: Option<SurfacePresentation>,
-    pending_snapshot: String,
-    rendered_snapshot: String,
+    pending_snapshot: Value,
     rendered_value: Option<Value>,
     snapshot_revision: u64,
     frame_rate: u32,
@@ -54,7 +52,7 @@ struct SurfacePresentation {
 
 impl WebSurface {
     pub(crate) fn new(config: WebSurfaceConfig<'_>) -> Result<Self, Box<dyn Error>> {
-        let initial = serde_json::to_string(config.snapshot)?;
+        let initial = config.snapshot.clone();
         let shell_margin = shell_surface(
             config.kind,
             config.size,
@@ -82,7 +80,6 @@ impl WebSurface {
             },
             presented: None,
             pending_snapshot: initial,
-            rendered_snapshot: String::new(),
             rendered_value: None,
             snapshot_revision: 0,
             frame_rate: config.frame_rate,
@@ -123,7 +120,6 @@ impl WebSurface {
             self.visibility_requested_at = None;
             self.control_unavailable_since = None;
             self.presented = Some(presentation);
-            self.rendered_snapshot.clear();
             self.rendered_value = None;
             self.snapshot_revision = 0;
             return;
@@ -169,14 +165,12 @@ impl WebSurface {
         self.session_menu_qs_height = height;
     }
 
-    pub(crate) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot) {
+    pub(crate) fn evaluate_snapshot(&mut self, snapshot: &Value) {
         if let Ok(mut current) = self.snapshot.lock() {
             *current = snapshot.clone();
         }
-        if let Ok(json) = serde_json::to_string(snapshot)
-            && self.pending_snapshot != json
-        {
-            self.pending_snapshot = json;
+        if self.pending_snapshot != *snapshot {
+            self.pending_snapshot = snapshot.clone();
         }
         self.flush_snapshot();
     }
@@ -187,7 +181,14 @@ impl WebSurface {
             return;
         }
 
-        let window = self.build_window();
+        let window = match self.build_window() {
+            Ok(window) => window,
+            Err(error) => {
+                self.control_unavailable_since = Some(Instant::now());
+                warn!(%error, surface = self.kind.as_str(), "failed to prepare web shell surface");
+                return;
+            }
+        };
         match window.launch() {
             Ok(process) => {
                 self.visibility_request = None;
@@ -229,7 +230,6 @@ impl WebSurface {
             self.visibility_requested_at = None;
             self.control_unavailable_since = None;
             self.presented = None;
-            self.rendered_snapshot.clear();
             self.rendered_value = None;
             self.snapshot_revision = 0;
         }
@@ -312,7 +312,7 @@ impl WebSurface {
         .margin
     }
 
-    fn build_window(&self) -> SabineWindow {
+    fn build_window(&self) -> Result<SabineWindow, Box<dyn Error>> {
         let snapshot = Arc::clone(&self.snapshot);
         let action_tx = self.actions_tx.clone();
         let kind = self.kind;
@@ -367,14 +367,14 @@ impl WebSurface {
                 },
             );
 
-        match shell_entry(kind) {
+        Ok(match shell_entry(kind)? {
             ShellEntry::Dev(url) => window.dev_url(url),
             ShellEntry::File(path) => window.entry(path),
-        }
+        })
     }
 
     fn flush_snapshot(&mut self) {
-        if self.pending_snapshot == self.rendered_snapshot {
+        if self.rendered_value.as_ref() == Some(&self.pending_snapshot) {
             return;
         }
         let Some(process) = &self.process else {
@@ -383,9 +383,7 @@ impl WebSurface {
         let Ok(snapshot) = self.snapshot.lock() else {
             return;
         };
-        let Ok(value) = serde_json::to_value(&*snapshot) else {
-            return;
-        };
+        let value = snapshot.clone();
         let revision = self.snapshot_revision.saturating_add(1);
         let (event, payload) = match &self.rendered_value {
             Some(rendered) => (
@@ -398,7 +396,6 @@ impl WebSurface {
             None => ("luft.snapshot", value.clone()),
         };
         if process.emit_bridge_event(event, payload) {
-            self.rendered_snapshot.clone_from(&self.pending_snapshot);
             self.rendered_value = Some(value);
             self.snapshot_revision = revision;
         }
@@ -492,7 +489,6 @@ impl WebSurface {
         self.visibility_requested_at = None;
         self.control_unavailable_since = None;
         self.presented = None;
-        self.rendered_snapshot.clear();
         self.rendered_value = None;
         self.snapshot_revision = 0;
         if self.presentation.visible || self.keep_alive_when_hidden {
@@ -521,7 +517,7 @@ pub(crate) struct WebSurfaceConfig<'a> {
     pub panel_menu_x: Option<i32>,
     pub session_menu_qs_height: Option<i32>,
     pub actions_tx: &'a Sender<WebShellAction>,
-    pub snapshot: &'a WebShellSnapshot,
+    pub snapshot: &'a Value,
     pub frame_rate: u32,
 }
 
@@ -529,7 +525,6 @@ fn runtime_config() -> RuntimeConfig {
     RuntimeConfig {
         mode: RuntimeMode::SharedPreferred,
         allow_user_install: true,
-        bundled_dir: Some(workspace_root()),
         ..RuntimeConfig::default()
     }
 }
@@ -539,17 +534,18 @@ enum ShellEntry {
     File(String),
 }
 
-fn shell_entry(kind: WebShellSurface) -> ShellEntry {
+fn shell_entry(kind: WebShellSurface) -> Result<ShellEntry, Box<dyn Error>> {
     if let Ok(url) = env::var("LUFT_SHELL_WEB_DEV_URL") {
-        return ShellEntry::Dev(append_shell_query(url.trim_end_matches('/'), kind));
+        return Ok(ShellEntry::Dev(append_shell_query(
+            url.trim_end_matches('/'),
+            kind,
+        )));
     }
-    ShellEntry::File(append_shell_query(
-        &manifest_dir()
-            .join("web/dist/index.html")
-            .display()
-            .to_string(),
+    let entrypoint = super::resources::entrypoint()?;
+    Ok(ShellEntry::File(append_shell_query(
+        &entrypoint.display().to_string(),
         kind,
-    ))
+    )))
 }
 
 fn append_shell_query(base: &str, kind: WebShellSurface) -> String {
@@ -567,18 +563,6 @@ fn cef_initial_size(shell_surface: &ShellSurfaceOptions, fallback: (i32, i32)) -
         width.max(1)
     };
     (width, height.max(1))
-}
-
-fn workspace_root() -> PathBuf {
-    manifest_dir()
-        .parent()
-        .and_then(|path| path.parent())
-        .map(PathBuf::from)
-        .unwrap_or_else(manifest_dir)
-}
-
-fn manifest_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
 #[cfg(test)]

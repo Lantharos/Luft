@@ -20,6 +20,7 @@ mod model;
 mod palette;
 mod panel_actions;
 mod popover_actions;
+mod resources;
 mod running_order;
 mod settings_command;
 mod snapshot;
@@ -27,6 +28,7 @@ mod startup_apps;
 mod surface;
 mod surface_layout;
 mod surface_motion;
+mod surface_payload;
 mod surface_sizing;
 mod sync;
 mod web_surface;
@@ -41,7 +43,7 @@ use std::{
     rc::Rc,
     sync::mpsc::{self, Receiver, RecvTimeoutError},
     thread,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use surface::WebSurfaces;
 
@@ -105,7 +107,8 @@ pub(super) struct WebShell {
     pub(super) panel_menu_x: Option<i32>,
     pub(super) session_menu_visible: bool,
     last_config_refresh: Instant,
-    last_snapshot: String,
+    last_clock_minute: u64,
+    last_snapshot: Option<serde_json::Value>,
 }
 
 impl WebShell {
@@ -130,7 +133,7 @@ impl WebShell {
             self.handle_action(action);
         }
 
-        if handled_action || self.start_menu_visible || self.quick_visible || self.date_visible {
+        if handled_action {
             self.sync_surfaces();
         }
         self.surfaces.tick();
@@ -141,12 +144,27 @@ impl WebShell {
 
         self.app_processes
             .retain_mut(LaunchedProcess::is_running_or_report_exit);
-        self.tray.refresh();
-        self.notifications.refresh();
-        self.refresh_model();
+        let mut shell_changed = self.tray.refresh();
+        shell_changed |= self.notifications.refresh();
+        shell_changed |= self.refresh_model();
         self.launch_startup_apps();
-        self.refresh_status();
-        self.refresh_config();
-        self.sync_surfaces();
+        shell_changed |= self.refresh_status();
+        shell_changed |= self.refresh_config();
+        let clock_minute = current_clock_minute();
+        if clock_minute != self.last_clock_minute {
+            self.last_clock_minute = clock_minute;
+            shell_changed = true;
+        }
+        if shell_changed {
+            self.sync_surfaces();
+        }
     }
+}
+
+fn current_clock_minute() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+        / 60
 }

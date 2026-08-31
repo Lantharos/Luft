@@ -8,6 +8,8 @@ use std::{
 use luft_ipc::{SOCKET_ENV, ShellStatus};
 use tracing::{info, warn};
 
+const STABLE_PROCESS_WINDOW: Duration = Duration::from_secs(30);
+
 #[derive(Debug)]
 pub struct ShellProcess {
     child: Option<Child>,
@@ -18,6 +20,7 @@ pub struct ShellProcess {
     xwayland_display: Option<String>,
     skip_startup_apps: bool,
     restart_at: Instant,
+    started_at: Option<Instant>,
     failures: u32,
 }
 
@@ -39,8 +42,10 @@ impl ShellProcess {
             xwayland_display,
             skip_startup_apps,
             restart_at: Instant::now(),
+            started_at: None,
             failures: 0,
         };
+        process.publish_activation_environment();
         process.tick();
         process
     }
@@ -52,11 +57,21 @@ impl ShellProcess {
 
         if let Some(child) = self.child.as_mut() {
             match child.try_wait() {
-                Ok(None) => return,
+                Ok(None) => {
+                    if self
+                        .started_at
+                        .is_some_and(|started| started.elapsed() >= STABLE_PROCESS_WINDOW)
+                    {
+                        self.failures = 0;
+                        self.started_at = None;
+                    }
+                    return;
+                }
                 Ok(Some(status)) => warn!(?status, "Luft shell exited"),
                 Err(error) => warn!(%error, "failed to inspect Luft shell process"),
             }
             self.child = None;
+            self.started_at = None;
             self.failures = self.failures.saturating_add(1);
             let delay = 1_u64.checked_shl(self.failures.min(4)).unwrap_or(16);
             self.restart_at = Instant::now() + Duration::from_secs(delay);
@@ -70,6 +85,7 @@ impl ShellProcess {
             Ok(child) => {
                 info!(pid = child.id(), "started Luft shell");
                 self.child = Some(child);
+                self.started_at = Some(Instant::now());
             }
             Err(error) => {
                 warn!(%error, "failed to start Luft shell");
@@ -91,6 +107,7 @@ impl ShellProcess {
             return;
         }
         self.xwayland_display = display;
+        self.publish_activation_environment();
         self.restart();
     }
 
@@ -124,10 +141,56 @@ impl ShellProcess {
         command.spawn()
     }
 
+    fn publish_activation_environment(&self) {
+        let mut names = vec![
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_DESKTOP",
+            "XDG_SESSION_TYPE",
+        ];
+        let mut environment = vec![
+            ("WAYLAND_DISPLAY", self.app_wayland_socket.as_str()),
+            ("XDG_CURRENT_DESKTOP", "Luft"),
+            ("XDG_SESSION_DESKTOP", "luft"),
+            ("XDG_SESSION_TYPE", "wayland"),
+        ];
+        if let Some(display) = self.xwayland_display.as_deref() {
+            names.push("DISPLAY");
+            environment.push(("DISPLAY", display));
+        }
+
+        let mut dbus = Command::new("dbus-update-activation-environment");
+        dbus.args(&names);
+        for (name, value) in &environment {
+            dbus.env(name, value);
+        }
+        match dbus.status() {
+            Ok(status) if status.success() => {}
+            Ok(status) => warn!(?status, "failed to update D-Bus activation environment"),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+            Err(error) => warn!(%error, "failed to update D-Bus activation environment"),
+        }
+
+        if env::var_os("LUFT_PRIVATE_DBUS").is_none() {
+            let mut systemd = Command::new("systemctl");
+            systemd.args(["--user", "import-environment"]).args(&names);
+            for (name, value) in &environment {
+                systemd.env(name, value);
+            }
+            match systemd.status() {
+                Ok(status) if status.success() => {}
+                Ok(status) => warn!(?status, "failed to update user service environment"),
+                Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+                Err(error) => warn!(%error, "failed to update user service environment"),
+            }
+        }
+    }
+
     fn stop(&mut self) {
         let Some(mut child) = self.child.take() else {
             return;
         };
+        self.started_at = None;
         let _ = child.kill();
         let _ = child.wait();
     }

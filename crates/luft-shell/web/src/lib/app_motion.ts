@@ -2,7 +2,7 @@ import type { TransitionConfig } from "svelte/transition";
 import { cubicOut } from "svelte/easing";
 
 export function appFly(
-  node: Element,
+  _node: Element,
   params: { y: number; duration: number; easing: (value: number) => number; opacity?: number },
 ): TransitionConfig {
   const y = params.y;

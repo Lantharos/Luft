@@ -18,6 +18,7 @@ pub mod input_handler;
 pub mod ipc;
 pub mod layer_motion;
 pub mod policy;
+pub mod portal_process;
 pub mod render;
 pub mod runtime;
 pub mod session_lock;

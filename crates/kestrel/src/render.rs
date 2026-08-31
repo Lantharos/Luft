@@ -187,6 +187,9 @@ where
         .get::<FullscreenSurface>()
         .and_then(|f| f.get())
     {
+        let output_scale = output.current_scale().fractional_scale();
+        let motion_offsets =
+            layer_motion.offsets(output, Scale::from(output_scale), std::time::Instant::now());
         let scale = output.current_scale().fractional_scale().into();
         let window_render_elements: Vec<AnimatedWindowRenderElement<R>> =
             AsRenderElements::<R>::render_elements(&window, renderer, (0, 0).into(), scale, 1.0);
@@ -195,6 +198,34 @@ where
             .into_iter()
             .map(OutputRenderElements::from)
             .collect::<Vec<_>>();
+        let layers = layer_map_for_output(output);
+        let mut overlay_elements = Vec::new();
+        extend_layer_elements(
+            &mut overlay_elements,
+            renderer,
+            &layers,
+            WlrLayer::Overlay,
+            output_scale,
+        );
+        drop(layers);
+        let blur_elements = blur_elements(output, output_scale, &motion_offsets);
+        for element in overlay_elements {
+            let element_id = element.id().clone();
+            let offset = motion_offset(&motion_offsets, &element_id);
+            elements.push(OutputRenderElements::Space(
+                RelocateRenderElement::from_element(element, offset, Relocate::Relative),
+            ));
+            elements.extend(
+                blur_elements
+                    .iter()
+                    .filter(|(surface_id, _)| surface_id == &element_id)
+                    .map(|(_, blur)| {
+                        OutputRenderElements::Custom(CustomRenderElements::Blur(
+                            blur.clone().into(),
+                        ))
+                    }),
+            );
+        }
         for element in window_render_elements {
             elements.push(OutputRenderElements::Window(Wrap::from(element)));
         }

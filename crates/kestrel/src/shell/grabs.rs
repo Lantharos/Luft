@@ -65,6 +65,7 @@ impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
 
         data.space
             .map_element(self.window.clone(), new_location.to_i32_round(), true);
+        data.shell_state_dirty = true;
     }
 
     fn relative_motion(
@@ -239,6 +240,7 @@ impl<BackendData: Backend> TouchGrab<KestrelState<BackendData>>
         let new_location = self.initial_window_location.to_f64() + delta;
         data.space
             .map_element(self.window.clone(), new_location.to_i32_round(), true);
+        data.shell_state_dirty = true;
     }
 
     fn frame(
@@ -474,6 +476,7 @@ impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
                         }
 
                         data.space.map_element(self.window.clone(), location, true);
+                        data.shell_state_dirty = true;
                     }
 
                     with_states(&self.window.wl_surface().unwrap(), |states| {
@@ -651,6 +654,7 @@ impl<BackendData: Backend> TouchGrab<KestrelState<BackendData>>
                     }
 
                     data.space.map_element(self.window.clone(), location, true);
+                    data.shell_state_dirty = true;
                 }
 
                 with_states(&self.window.wl_surface().unwrap(), |states| {

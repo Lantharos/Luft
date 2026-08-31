@@ -1,4 +1,4 @@
-use std::{convert::TryInto, process::Command, sync::atomic::Ordering};
+use std::{convert::TryInto, process::Command, sync::atomic::Ordering, time::Instant};
 
 use crate::{KestrelState, focus::PointerFocusTarget, shell::FullscreenSurface};
 
@@ -308,9 +308,31 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 let output_geo = self.space.output_geometry(output).unwrap();
                 let layers = layer_map_for_output(output);
                 let layer_location = location - output_geo.loc.to_f64();
-                if let Some(layer) = panel_layer_under(&layers, layer_location)
-                    .or_else(|| input_layer_under(&layers, WlrLayer::Overlay, layer_location, None))
-                    .or_else(|| input_layer_under(&layers, WlrLayer::Top, layer_location, None))
+                let fullscreen = output
+                    .user_data()
+                    .get::<FullscreenSurface>()
+                    .and_then(|surface| surface.get());
+                if let Some(layer) = panel_layer_under(&layers, &self.layer_motion, layer_location)
+                    .or_else(|| {
+                        input_layer_under(
+                            &layers,
+                            &self.layer_motion,
+                            WlrLayer::Overlay,
+                            layer_location,
+                            None,
+                        )
+                    })
+                    .or_else(|| {
+                        fullscreen.is_none().then(|| {
+                            input_layer_under(
+                                &layers,
+                                &self.layer_motion,
+                                WlrLayer::Top,
+                                layer_location,
+                                None,
+                            )
+                        })?
+                    })
                 {
                     if layer.can_receive_keyboard_focus() {
                         keyboard.set_focus(self, Some(layer.clone().into()), serial);
@@ -318,14 +340,12 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                     return;
                 }
 
-                if let Some(window) = output
-                    .user_data()
-                    .get::<FullscreenSurface>()
-                    .and_then(|f| f.get())
-                    && let Some((_, _)) = window
+                if let Some(window) = fullscreen {
+                    if let Some((_, _)) = window
                         .surface_under(location - output_geo.loc.to_f64(), WindowSurfaceType::ALL)
-                {
-                    keyboard.set_focus(self, Some(window.into()), serial);
+                    {
+                        keyboard.set_focus(self, Some(window.into()), serial);
+                    }
                     return;
                 }
             }
@@ -344,11 +364,22 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 let output_geo = self.space.output_geometry(output).unwrap();
                 let layers = layer_map_for_output(output);
                 let layer_location = location - output_geo.loc.to_f64();
-                if let Some(layer) =
-                    input_layer_under(&layers, WlrLayer::Bottom, layer_location, None).or_else(
-                        || input_layer_under(&layers, WlrLayer::Background, layer_location, None),
+                if let Some(layer) = input_layer_under(
+                    &layers,
+                    &self.layer_motion,
+                    WlrLayer::Bottom,
+                    layer_location,
+                    None,
+                )
+                .or_else(|| {
+                    input_layer_under(
+                        &layers,
+                        &self.layer_motion,
+                        WlrLayer::Background,
+                        layer_location,
+                        None,
                     )
-                    && layer.can_receive_keyboard_focus()
+                }) && layer.can_receive_keyboard_focus()
                 {
                     keyboard.set_focus(self, Some(layer.clone().into()), serial);
                 }
@@ -386,37 +417,58 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let layers = layer_map_for_output(output);
 
         let mut under = None;
-        if let Some(focus) = panel_surface_under(&layers, pos - output_geo.loc.to_f64())
-            .or_else(|| {
-                layer_surface_under(&layers, WlrLayer::Overlay, pos - output_geo.loc.to_f64())
-            })
-            .or_else(|| layer_surface_under(&layers, WlrLayer::Top, pos - output_geo.loc.to_f64()))
-            .map(|(surface, location)| (surface, location + output_geo.loc))
-        {
-            under = Some(focus)
-        } else if let Some((surface, loc)) = output
+        let fullscreen = output
             .user_data()
             .get::<FullscreenSurface>()
-            .and_then(|f| f.get())
-            .and_then(|w| w.surface_under(pos - output_geo.loc.to_f64(), WindowSurfaceType::ALL))
+            .and_then(|surface| surface.get());
+        if let Some(focus) =
+            panel_surface_under(&layers, &self.layer_motion, pos - output_geo.loc.to_f64())
+                .or_else(|| {
+                    layer_surface_under(
+                        &layers,
+                        &self.layer_motion,
+                        WlrLayer::Overlay,
+                        pos - output_geo.loc.to_f64(),
+                    )
+                })
+                .or_else(|| {
+                    fullscreen.is_none().then(|| {
+                        layer_surface_under(
+                            &layers,
+                            &self.layer_motion,
+                            WlrLayer::Top,
+                            pos - output_geo.loc.to_f64(),
+                        )
+                    })?
+                })
+                .map(|(surface, location)| (surface, location + output_geo.loc))
         {
-            under = Some((surface, loc + output_geo.loc));
+            under = Some(focus)
+        } else if let Some(window) = fullscreen {
+            under = window
+                .surface_under(pos - output_geo.loc.to_f64(), WindowSurfaceType::ALL)
+                .map(|(surface, loc)| (surface, loc + output_geo.loc));
         } else if let Some(focus) = self.space.element_under(pos).and_then(|(window, loc)| {
             window
                 .surface_under(pos - loc.to_f64(), WindowSurfaceType::ALL)
                 .map(|(surface, surf_loc)| (surface, surf_loc + loc))
         }) {
             under = Some(focus);
-        } else if let Some(focus) =
-            layer_surface_under(&layers, WlrLayer::Bottom, pos - output_geo.loc.to_f64())
-                .or_else(|| {
-                    layer_surface_under(
-                        &layers,
-                        WlrLayer::Background,
-                        pos - output_geo.loc.to_f64(),
-                    )
-                })
-                .map(|(surface, location)| (surface, location + output_geo.loc))
+        } else if let Some(focus) = layer_surface_under(
+            &layers,
+            &self.layer_motion,
+            WlrLayer::Bottom,
+            pos - output_geo.loc.to_f64(),
+        )
+        .or_else(|| {
+            layer_surface_under(
+                &layers,
+                &self.layer_motion,
+                WlrLayer::Background,
+                pos - output_geo.loc.to_f64(),
+            )
+        })
+        .map(|(surface, location)| (surface, location + output_geo.loc))
         {
             under = Some(focus)
         };
@@ -586,12 +638,23 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 }
 
-fn panel_layer_under(layers: &LayerMap, position: Point<f64, Logical>) -> Option<&LayerSurface> {
-    input_layer_under(layers, WlrLayer::Overlay, position, Some("luft-panel"))
+fn panel_layer_under<'a>(
+    layers: &'a LayerMap,
+    layer_motion: &crate::layer_motion::LayerMotionState,
+    position: Point<f64, Logical>,
+) -> Option<&'a LayerSurface> {
+    input_layer_under(
+        layers,
+        layer_motion,
+        WlrLayer::Overlay,
+        position,
+        Some("luft-panel"),
+    )
 }
 
 fn input_layer_under<'a>(
     layers: &'a LayerMap,
+    layer_motion: &crate::layer_motion::LayerMotionState,
     layer: WlrLayer,
     position: Point<f64, Logical>,
     namespace: Option<&str>,
@@ -603,38 +666,54 @@ fn input_layer_under<'a>(
         let Some(geometry) = layers.layer_geometry(surface) else {
             return false;
         };
+        let visual_offset = layer_motion.visual_offset(surface.wl_surface(), Instant::now());
         surface
-            .surface_under(position - geometry.loc.to_f64(), WindowSurfaceType::ALL)
+            .surface_under(
+                position - geometry.loc.to_f64() - visual_offset,
+                WindowSurfaceType::ALL,
+            )
             .is_some()
     })
 }
 
 fn panel_surface_under(
     layers: &LayerMap,
+    layer_motion: &crate::layer_motion::LayerMotionState,
     position: Point<f64, Logical>,
 ) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
-    let surface = panel_layer_under(layers, position)?;
-    surface_focus_under(layers, surface, position)
+    let surface = panel_layer_under(layers, layer_motion, position)?;
+    surface_focus_under(layers, layer_motion, surface, position)
 }
 
 fn layer_surface_under(
     layers: &LayerMap,
+    layer_motion: &crate::layer_motion::LayerMotionState,
     layer: WlrLayer,
     position: Point<f64, Logical>,
 ) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
-    let surface = input_layer_under(layers, layer, position, None)?;
-    surface_focus_under(layers, surface, position)
+    let surface = input_layer_under(layers, layer_motion, layer, position, None)?;
+    surface_focus_under(layers, layer_motion, surface, position)
 }
 
 fn surface_focus_under(
     layers: &LayerMap,
+    layer_motion: &crate::layer_motion::LayerMotionState,
     layer: &LayerSurface,
     position: Point<f64, Logical>,
 ) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
     let layer_location = layers.layer_geometry(layer)?.loc;
+    let visual_offset = layer_motion.visual_offset(layer.wl_surface(), Instant::now());
     layer
-        .surface_under(position - layer_location.to_f64(), WindowSurfaceType::ALL)
-        .map(|(surface, location)| (PointerFocusTarget::from(surface), location + layer_location))
+        .surface_under(
+            position - layer_location.to_f64() - visual_offset,
+            WindowSurfaceType::ALL,
+        )
+        .map(|(surface, location)| {
+            (
+                PointerFocusTarget::from(surface),
+                location + layer_location + visual_offset.to_i32_round(),
+            )
+        })
 }
 
 #[cfg(feature = "nested")]

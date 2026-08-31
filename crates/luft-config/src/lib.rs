@@ -15,10 +15,7 @@ mod paths;
 mod session;
 
 pub use apps::DefaultAppsConfig;
-pub use cursor_theme::{
-    DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_THEME_DIR, DEFAULT_CURSOR_THEME_NAME,
-    DEFAULT_CURSOR_THEME_PARENT, cursor_environment_entries,
-};
+pub use cursor_theme::CursorConfig;
 pub use display::{DisplayConfig, OutputConfig, OutputTransform};
 pub use input::InputConfig;
 pub use panel::{PanelConfig, PinnedAppConfig};
@@ -31,6 +28,7 @@ pub struct LuftConfig {
     pub compositor: CompositorConfig,
     pub display: DisplayConfig,
     pub input: InputConfig,
+    pub cursor: CursorConfig,
     pub session: SessionConfig,
     pub workspaces: WorkspacesConfig,
     pub panel: PanelConfig,
@@ -47,6 +45,16 @@ impl LuftConfig {
             }
         }
         self.display.validate()?;
+        if self.cursor.theme.trim().is_empty() {
+            return Err(ConfigError::Validation(
+                "cursor theme must not be empty".to_string(),
+            ));
+        }
+        if self.cursor.size == 0 {
+            return Err(ConfigError::Validation(
+                "cursor size must be greater than zero".to_string(),
+            ));
+        }
         Ok(())
     }
 }

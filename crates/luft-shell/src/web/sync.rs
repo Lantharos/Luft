@@ -15,7 +15,7 @@ impl WebShell {
         }
     }
 
-    pub(super) fn refresh_model(&mut self) {
+    pub(super) fn refresh_model(&mut self) -> bool {
         let mut latest = None;
         let messages = self.ipc.drain().collect::<Vec<_>>();
         for message in messages {
@@ -43,7 +43,9 @@ impl WebShell {
         }
         if let Some(model) = latest {
             self.apply_model(model);
+            return true;
         }
+        false
     }
 
     fn apply_model(&mut self, model: ShellModel) {
@@ -52,27 +54,35 @@ impl WebShell {
         super::running_order::sync(&mut self.running_app_order, &self.model);
     }
 
-    pub(super) fn refresh_status(&mut self) {
-        if let Some(status) = self.system_status.latest() {
+    pub(super) fn refresh_status(&mut self) -> bool {
+        if let Some(status) = self.system_status.latest()
+            && status != self.status
+        {
             self.status = status;
+            return true;
         }
+        false
     }
 
-    pub(super) fn refresh_config(&mut self) {
+    pub(super) fn refresh_config(&mut self) -> bool {
         if self.last_config_refresh.elapsed() < CONFIG_REFRESH {
-            return;
+            return false;
         }
         self.last_config_refresh = Instant::now();
-        self.reload_shell_config();
+        self.reload_shell_config()
     }
 
-    pub(super) fn reload_shell_config(&mut self) {
+    pub(super) fn reload_shell_config(&mut self) -> bool {
         match load_config() {
             Ok(loaded) if loaded.config != self.config => {
                 self.apply_shell_config(loaded.config);
+                true
             }
-            Ok(_) => {}
-            Err(error) => debug!(%error, "failed to refresh shell config"),
+            Ok(_) => false,
+            Err(error) => {
+                debug!(%error, "failed to refresh shell config");
+                false
+            }
         }
     }
 
@@ -124,12 +134,12 @@ impl WebShell {
                 quick_settings_open: self.quick_visible,
                 date_center_open: self.date_visible,
             });
-        let Ok(json) = serde_json::to_string(&snapshot) else {
+        let Ok(value) = serde_json::to_value(&snapshot) else {
             return;
         };
-        if json != self.last_snapshot {
-            self.last_snapshot = json.clone();
-            self.surfaces.evaluate_snapshot(&snapshot);
+        if self.last_snapshot.as_ref() != Some(&value) {
+            self.last_snapshot = Some(value.clone());
+            self.surfaces.evaluate_snapshot(&snapshot, &value);
         }
         self.surfaces
             .set_notification_toast_visible(notification_toast_visible);

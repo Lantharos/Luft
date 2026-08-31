@@ -60,6 +60,21 @@ impl LayerTransition {
 }
 
 impl LayerMotionState {
+    pub fn visual_offset(&self, surface: &WlSurface, now: Instant) -> Point<f64, Logical> {
+        let id = Id::from_wayland_resource(surface);
+        let surfaces = self.surfaces.borrow();
+        let Some(motion) = surfaces.iter().find(|motion| motion.id == id) else {
+            return Point::default();
+        };
+        let visual_location = motion
+            .transition
+            .as_ref()
+            .filter(|transition| !transition.is_complete(now))
+            .map(|transition| transition.location(now))
+            .unwrap_or(motion.target.loc);
+        (visual_location - motion.target.loc).to_f64()
+    }
+
     pub fn observe_surface_commit(
         &self,
         surface: &WlSurface,

@@ -8,6 +8,10 @@ default_scale = 1.0
 [input]
 num_lock = true
 
+[cursor]
+theme = "default"
+size = 24
+
 [session]
 lock_command = "if command -v luft-lock >/dev/null 2>&1; then exec luft-lock; elif command -v swaylock >/dev/null 2>&1; then exec swaylock; elif command -v waylock >/dev/null 2>&1; then exec waylock; else exec loginctl lock-session; fi"
 suspend_command = "systemctl suspend"

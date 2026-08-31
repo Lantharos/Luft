@@ -134,6 +134,7 @@ pub struct ClientState {
     pub compositor_state: CompositorClientState,
     pub security_context: Option<SecurityContext>,
     pub privileged: bool,
+    pub capture_privileged: bool,
 }
 
 fn privileged_client(client: &Client) -> bool {
@@ -142,10 +143,10 @@ fn privileged_client(client: &Client) -> bool {
         .is_some_and(|state| state.privileged && state.security_context.is_none())
 }
 
-fn unsandboxed_client(client: &Client) -> bool {
+fn capture_client(client: &Client) -> bool {
     client
         .get_data::<ClientState>()
-        .is_some_and(|state| state.security_context.is_none())
+        .is_some_and(|state| state.capture_privileged && state.security_context.is_none())
 }
 impl ClientData for ClientState {
     /// Notification that a client was initialized
@@ -162,6 +163,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub running: Arc<AtomicBool>,
     pub handle: LoopHandle<'static, KestrelState<BackendData>>,
     pub shell_process: ShellProcess,
+    pub portal_process: crate::portal_process::PortalProcess,
     pub xwayland_process: crate::xwayland_process::XwaylandProcess,
     pub ipc_socket: IpcSocket,
     pub nested: bool,
@@ -170,6 +172,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub layout: LayoutEngine,
     pub windows: BTreeMap<WindowId, WindowElement>,
     pub shell_state_dirty: bool,
+    pub last_policy_sweep: Instant,
     pub last_shell_focus: Option<WlSurface>,
     pub(crate) pointer_contents: Option<(PointerFocusTarget, Point<f64, Logical>)>,
 
@@ -700,14 +703,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     pub fn refresh_idle_inhibition(&mut self) {
         self.idle_inhibitors.retain(Resource::is_alive);
-        let inhibited = self.idle_inhibitors.iter().any(|surface| {
-            with_states(surface, |states| {
-                states
-                    .data_map
-                    .get::<smithay::backend::renderer::utils::RendererSurfaceStateUserData>()
-                    .is_some_and(|data| data.lock().unwrap().buffer().is_some())
-            })
-        });
+        let inhibited = self
+            .idle_inhibitors
+            .iter()
+            .any(|surface| self.surface_is_visible(surface));
         self.idle_notifier_state.set_is_inhibited(inhibited);
         self.idle_inhibited = inhibited;
         if inhibited {
@@ -715,6 +714,58 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             self.idle_lock_sent = false;
             self.idle_suspend_sent = false;
         }
+    }
+
+    fn surface_is_visible(&self, target: &WlSurface) -> bool {
+        if self.session_lock.is_active() {
+            return self.space.outputs().any(|output| {
+                self.session_lock
+                    .surface_for_output(output)
+                    .is_some_and(|lock| {
+                        let visible = std::cell::Cell::new(false);
+                        with_surfaces_surface_tree(lock.wl_surface(), |surface, _| {
+                            if surface == target {
+                                visible.set(true);
+                            }
+                        });
+                        visible.get()
+                    })
+            });
+        }
+
+        if self.space.elements().any(|window| {
+            let visible = std::cell::Cell::new(false);
+            window.with_surfaces(|surface, _| {
+                if surface == target {
+                    visible.set(true);
+                }
+            });
+            visible.get()
+        }) {
+            return true;
+        }
+
+        self.space.outputs().any(|output| {
+            let map = smithay::desktop::layer_map_for_output(output);
+            map.layers().any(|layer| {
+                let mapped = with_states(layer.wl_surface(), |states| {
+                    states
+                        .data_map
+                        .get::<smithay::backend::renderer::utils::RendererSurfaceStateUserData>()
+                        .is_some_and(|data| data.lock().unwrap().buffer().is_some())
+                });
+                if !mapped {
+                    return false;
+                }
+                let visible = std::cell::Cell::new(false);
+                layer.with_surfaces(|surface, _| {
+                    if surface == target {
+                        visible.set(true);
+                    }
+                });
+                visible.get()
+            })
+        })
     }
 }
 
@@ -832,9 +883,9 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         // Image capture protocols (screencopy)
         let image_capture_source_state = ImageCaptureSourceState::new();
         let output_capture_source_state =
-            OutputCaptureSourceState::new_with_filter::<Self, _>(&dh, unsandboxed_client);
+            OutputCaptureSourceState::new_with_filter::<Self, _>(&dh, capture_client);
         let image_copy_capture_state =
-            ImageCopyCaptureState::new_with_filter::<Self, _>(&dh, unsandboxed_client);
+            ImageCopyCaptureState::new_with_filter::<Self, _>(&dh, capture_client);
         let alpha_modifier_state = AlphaModifierState::new::<Self>(&dh);
         let background_effect_state = BackgroundEffectState::new::<Self>(&dh);
         let cursor_shape_state = CursorShapeManagerState::new::<Self>(&dh);
@@ -884,6 +935,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             xwayland_process.display().map(str::to_owned),
             nested,
         );
+        let portal_process = crate::portal_process::PortalProcess::new(dh.clone());
 
         KestrelState {
             backend_data,
@@ -892,6 +944,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             running: Arc::new(AtomicBool::new(true)),
             handle,
             shell_process,
+            portal_process,
             xwayland_process,
             ipc_socket,
             nested,
@@ -900,6 +953,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             layout: crate::policy::create_layout(),
             windows: BTreeMap::new(),
             shell_state_dirty: true,
+            last_policy_sweep: Instant::now(),
             last_shell_focus: None,
             pointer_contents: None,
             space: Space::default(),

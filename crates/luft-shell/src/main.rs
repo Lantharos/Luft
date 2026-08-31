@@ -24,7 +24,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    disable_accessibility_bridge();
     init_logging();
 
     let args = ShellArgs::parse();
@@ -36,14 +35,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     web::run(loaded.config)
-}
-
-fn disable_accessibility_bridge() {
-    unsafe {
-        env::set_var("NO_AT_BRIDGE", "1");
-        env::set_var("GTK_A11Y", "none");
-        env::set_var("GTK_MODULES", "");
-    }
 }
 
 fn init_logging() {

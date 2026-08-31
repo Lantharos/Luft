@@ -189,6 +189,7 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
             }
             if let Some(window) = self.window_for_surface(&root) {
                 window.0.on_commit();
+                self.shell_state_dirty = true;
 
                 if &root == surface {
                     let buffer_offset = with_states(surface, |states| {

@@ -26,12 +26,12 @@ const ITEM_INTERFACES: [&str; 2] = [
 ];
 const REFRESH_INTERVAL: Duration = Duration::from_secs(1);
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct TraySnapshot {
     pub items: Vec<TrayItem>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrayItem {
     pub registration: TrayRegistration,
     pub title: String,
@@ -85,8 +85,10 @@ impl TrayService {
     pub fn refresh(&mut self) -> bool {
         let mut changed = false;
         while let Ok(snapshot) = self.updates.try_recv() {
-            self.snapshot = snapshot;
-            changed = true;
+            if self.snapshot != snapshot {
+                self.snapshot = snapshot;
+                changed = true;
+            }
         }
         changed
     }

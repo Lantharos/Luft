@@ -30,18 +30,26 @@ Run the installer from the repository root:
 ./install.sh
 ```
 
-It builds the shell web assets with Bun, builds the session binaries with the DRM/KMS backend enabled, installs the binaries to `/usr/local/bin`, writes the Wayland session entry, and installs Luft's portal preference file. Sabine prepares its shared CEF runtime when the shell first launches.
+It builds the shell web assets with Bun, builds the session binaries with the DRM/KMS backend enabled, installs the binaries to `/usr/local/bin`, installs immutable shell resources under `/usr/local/share/luft`, writes the Wayland session entry, and installs Luft's portal configuration. The installed shell does not depend on the source checkout. Sabine prepares its shared CEF runtime when the shell first launches.
 
 Override install paths or build a debug profile when needed:
 
 ```sh
 PROFILE=debug ./install.sh
-BIN_DIR="$HOME/.local/bin" SESSION_DIR="$HOME/.local/share/wayland-sessions" PORTAL_DIR="$HOME/.local/share/xdg-desktop-portal" ./install.sh
+BIN_DIR="$HOME/.local/bin" \
+DATA_DIR="$HOME/.local/share/luft" \
+SESSION_DIR="$HOME/.local/share/wayland-sessions" \
+PORTAL_DIR="$HOME/.local/share/xdg-desktop-portal" \
+DBUS_SERVICE_DIR="$HOME/.local/share/dbus-1/services" \
+./install.sh
 ```
+
+Writable user destinations are installed without `sudo`. Remove the installed
+files using the same path overrides with `./install.sh --uninstall`.
 
 After that, pick Luft from the display manager's session menu.
 
-When run manually without an explicit backend, `luft-session` defaults to nested inside an existing Wayland session and to the session backend outside one. When `dbus-run-session` is available, the session runs Kestrel under a private D-Bus session so shell services and launched apps do not attach to the host desktop session while testing nested.
+When run manually without an explicit backend, `luft-session` defaults to nested inside an existing Wayland session and to the session backend outside one. When `dbus-run-session` is available, the session runs Kestrel under a private D-Bus session so shell services and launched apps do not attach to the host desktop session while testing nested. Once Kestrel creates its public Wayland socket, it publishes that display to D-Bus and user-service activation so the portal and other activated services connect to the Luft session.
 
 ```sh
 cargo run -p luft-session -- --nested --socket luft-dev

@@ -235,6 +235,7 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
     while state.running.load(Ordering::SeqCst) {
         state.xwayland_process.tick();
         state.shell_process.tick();
+        state.portal_process.tick();
         let status = winit.dispatch_new_events(|event| match event {
             WinitEvent::Resized { size, .. } => {
                 // We only have one output

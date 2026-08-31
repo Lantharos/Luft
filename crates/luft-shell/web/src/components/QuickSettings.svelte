@@ -10,10 +10,15 @@
   const showPower = $derived(Boolean(snapshot.status.battery));
   const showVolume = $derived(Boolean(snapshot.status.audio));
   const showBrightness = $derived(Boolean(snapshot.status.brightness));
-  const tileCount = $derived(Number(showNetwork) + Number(showPower) + 1);
   const volume = $derived(snapshot.status.audio?.percent ?? 0);
   const brightness = $derived(snapshot.status.brightness?.percent ?? 0);
   const notificationLabel = $derived(snapshot.notifications.length === 1 ? "1 notification" : `${snapshot.notifications.length} notifications`);
+  const statusSummary = $derived.by(() => {
+    const details = [];
+    if (showNetwork) details.push(networkLabel(snapshot));
+    if (showPower) details.push(batteryLabel(snapshot));
+    return details.join(" · ") || "System controls";
+  });
 
   function setVolume(percent: number) {
     sendAction({ type: "quick-set-volume", percent });
@@ -38,13 +43,19 @@
 
 <section class="popover quick-settings">
   <header class="quick-header">
-    <span class="quick-profile" aria-label="User profile">
-      {#if snapshot.userProfileIconUri}
-        <img src={snapshot.userProfileIconUri} alt="" />
-      {:else}
-        <Icon name="user" />
-      {/if}
-    </span>
+    <div class="quick-identity">
+      <span class="quick-profile" aria-label="User profile">
+        {#if snapshot.userProfileIconUri}
+          <img src={snapshot.userProfileIconUri} alt="" />
+        {:else}
+          <Icon name="user" />
+        {/if}
+      </span>
+      <span class="quick-heading">
+        <strong>Quick Settings</strong>
+        <small>{statusSummary}</small>
+      </span>
+    </div>
     <div class="quick-header-actions">
       <button
         type="button"
@@ -65,13 +76,11 @@
     </div>
   </header>
 
-  <div class="quick-status-grid">
+  <div class="quick-status-strip">
     {#if showNetwork}
       <button
         type="button"
-        class="setting-tile is-action is-primary"
-        class:is-wide={tileCount === 1}
-        style="--index: 0"
+        class="setting-tile is-action is-online"
         onclick={() => sendAction({ type: "quick-open-settings", page: "network" })}
       >
         <span class="setting-icon"><Icon name="network" /></span>
@@ -82,8 +91,6 @@
       <button
         type="button"
         class="setting-tile is-action"
-        class:is-wide={tileCount === 1}
-        style="--index: 1"
         onclick={() => sendAction({ type: "quick-open-settings", page: "power" })}
       >
         <span class="setting-icon"><Icon name="power" /></span>
@@ -93,9 +100,7 @@
     <button
       type="button"
       class="setting-tile is-action"
-      class:is-primary={snapshot.doNotDisturb}
-      class:is-wide={tileCount === 1}
-      style="--index: 2"
+      class:is-active={snapshot.doNotDisturb}
       aria-pressed={snapshot.doNotDisturb}
       onclick={toggleDoNotDisturb}
     >
@@ -104,20 +109,19 @@
     </button>
   </div>
 
-  <div class="quick-slider-stack">
+  <div class="quick-mixers">
     {#if showVolume}
       <ControlSlider
         label="Volume"
         icon="volume"
         value={volume}
         muted={snapshot.status.audio?.muted ?? false}
-        index={2}
         onChange={setVolume}
         onToggle={toggleMute}
       />
     {/if}
     {#if showBrightness}
-      <ControlSlider label="Brightness" icon="sun" value={brightness} index={3} onChange={setBrightness} />
+      <ControlSlider label="Brightness" icon="sun" value={brightness} onChange={setBrightness} />
     {/if}
   </div>
 </section>

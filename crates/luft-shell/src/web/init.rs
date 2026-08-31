@@ -32,7 +32,13 @@ impl WebShell {
             quick_settings_open: false,
             date_center_open: false,
         });
-        let mut surfaces = WebSurfaces::new(actions_tx, &snapshot, model.primary_frame_rate())?;
+        let snapshot_value = serde_json::to_value(&snapshot)?;
+        let mut surfaces = WebSurfaces::new(
+            actions_tx,
+            &snapshot,
+            &snapshot_value,
+            model.primary_frame_rate(),
+        )?;
         surfaces.set_panel_visible(true);
 
         Ok(Self {
@@ -63,7 +69,8 @@ impl WebShell {
             panel_menu_x: None,
             session_menu_visible: false,
             last_config_refresh: Instant::now(),
-            last_snapshot: String::new(),
+            last_clock_minute: super::current_clock_minute(),
+            last_snapshot: Some(snapshot_value),
         })
     }
 }

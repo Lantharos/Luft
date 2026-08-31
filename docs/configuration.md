@@ -6,7 +6,7 @@ Luft loads `~/.config/luft/config.toml` when present and uses built-in defaults 
 
 ```toml
 [compositor]
-background_image = "/home/kristof/Pictures/bg.jpg"
+background_image = "/home/alex/Pictures/wallpaper.jpg"
 ```
 
 Luft uses its packaged wallpaper when `background_image` is omitted or `null`. Set an absolute path to use a JPEG or PNG of your own. Reload the compositor configuration to apply the change.
@@ -51,6 +51,21 @@ navigation-mode keypad keys are preferred:
 [input]
 num_lock = false
 ```
+
+## Cursor
+
+Luft uses the system's default cursor theme at 24 pixels unless configured:
+
+```toml
+[cursor]
+theme = "Adwaita"
+size = 28
+path = "/home/alex/.local/share/icons"
+```
+
+Omit `path` for themes installed in the standard system or user icon directories.
+When set, it becomes the cursor search path and Luft looks for the selected theme
+inside it.
 
 ## Startup Apps
 

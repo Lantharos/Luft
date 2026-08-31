@@ -56,8 +56,8 @@
       startMenuSelection = -1;
     }
     if (!rootElement) return;
-    rootElement.dataset.surface = next.surface ?? "panel";
-    rootElement.dataset.material = "glass";
+    rootElement.dataset["surface"] = next.surface ?? "panel";
+    rootElement.dataset["material"] = "glass";
     rootElement.style.setProperty("--panel", next.palette.panel);
     rootElement.style.setProperty("--panel-control", next.palette.panelControl);
     rootElement.style.setProperty("--panel-text", next.palette.panelText);
@@ -179,7 +179,7 @@
 {#if surface === "panel-menu"}
   <PanelMenu {snapshot} />
 {:else if surface === "session-menu"}
-  <SessionMenu {snapshot} />
+  <SessionMenu />
 {:else if surface === "quick-settings"}
   <QuickSettings {snapshot} />
 {:else if surface === "date-center"}

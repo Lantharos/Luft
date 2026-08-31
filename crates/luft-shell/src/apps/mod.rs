@@ -7,7 +7,7 @@ mod xdg;
 pub use desktop_entry::{AppEntry, discover_applications, discover_user_autostart};
 pub(crate) use icon_theme::resolve_icon_path;
 
-use luft_config::{ConfigPaths, LuftConfig, cursor_environment_entries};
+use luft_config::{ConfigPaths, LuftConfig};
 use std::{
     env,
     fs::OpenOptions,
@@ -325,14 +325,8 @@ fn apply_app_environment(command: &mut Command, xwayland_display: Option<&str>) 
     command.env("XDG_SESSION_DESKTOP", "luft");
     command.env("DESKTOP_SESSION", "luft");
     command.env("XDG_SESSION_TYPE", "wayland");
-    command.env("NO_AT_BRIDGE", "1");
-    command.env("GTK_A11Y", "none");
-    command.env("GTK_MODULES", "");
     command.env("UBUNTU_MENUPROXY", "0");
     command.env("GTK_OVERLAY_SCROLLING", "0");
-    for (name, value) in cursor_environment_entries() {
-        command.env(name, value);
-    }
     if let Some(address) = env::var_os("DBUS_SESSION_BUS_ADDRESS") {
         command.env("DBUS_SESSION_BUS_ADDRESS", address);
     }

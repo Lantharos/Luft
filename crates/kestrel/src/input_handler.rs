@@ -63,6 +63,40 @@ use smithay::{
 };
 
 impl<BackendData: Backend> KestrelState<BackendData> {
+    fn pointer_motion(
+        &mut self,
+        contents: Option<(PointerFocusTarget, Point<f64, Logical>)>,
+        event: &MotionEvent,
+    ) {
+        self.pointer_contents.clone_from(&contents);
+        let pointer = self.pointer.clone();
+        pointer.motion(self, contents, event);
+    }
+
+    fn pointer_frame(&mut self) {
+        let pointer = self.pointer.clone();
+        pointer.frame(self);
+    }
+
+    fn refresh_pointer_contents_at(&mut self, serial: Serial, time: InputTime) -> bool {
+        let location = self.pointer.current_location();
+        let contents = self.surface_under(location);
+        if self.pointer_contents == contents {
+            return false;
+        }
+
+        self.pointer_motion(
+            contents,
+            &MotionEvent {
+                location,
+                serial,
+                time,
+            },
+        );
+        self.pointer_frame();
+        true
+    }
+
     // Allow in this method because of existing usage
     #[allow(clippy::uninlined_format_args)]
     fn process_common_key_action(&mut self, action: KeyAction) {
@@ -236,20 +270,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
         if wl_pointer::ButtonState::Pressed == state {
             let location = self.pointer.current_location();
-            let pointer = self.pointer.clone();
-            if !pointer.is_grabbed() {
-                let under = self.surface_under(location);
-                pointer.motion(
-                    self,
-                    under,
-                    &MotionEvent {
-                        location,
-                        serial,
-                        time: evt.time(),
-                    },
-                );
-                pointer.frame(self);
-            }
+            self.refresh_pointer_contents_at(serial, evt.time());
             self.update_keyboard_focus(location, serial);
         };
         let pointer = self.pointer.clone();
@@ -262,7 +283,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 time: evt.time(),
             },
         );
-        pointer.frame(self);
+        self.pointer_frame();
     }
 
     fn update_keyboard_focus(&mut self, location: Point<f64, Logical>, serial: Serial) {
@@ -285,6 +306,18 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             let output = self.space.output_under(location).next().cloned();
             if let Some(output) = output.as_ref() {
                 let output_geo = self.space.output_geometry(output).unwrap();
+                let layers = layer_map_for_output(output);
+                let layer_location = location - output_geo.loc.to_f64();
+                if let Some(layer) = panel_layer_under(&layers, layer_location)
+                    .or_else(|| input_layer_under(&layers, WlrLayer::Overlay, layer_location, None))
+                    .or_else(|| input_layer_under(&layers, WlrLayer::Top, layer_location, None))
+                {
+                    if layer.can_receive_keyboard_focus() {
+                        keyboard.set_focus(self, Some(layer.clone().into()), serial);
+                    }
+                    return;
+                }
+
                 if let Some(window) = output
                     .user_data()
                     .get::<FullscreenSurface>()
@@ -293,23 +326,6 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                         .surface_under(location - output_geo.loc.to_f64(), WindowSurfaceType::ALL)
                 {
                     keyboard.set_focus(self, Some(window.into()), serial);
-                    return;
-                }
-
-                let layers = layer_map_for_output(output);
-                let layer_location = location - output_geo.loc.to_f64();
-                if let Some(layer) = panel_layer_under(&layers, layer_location)
-                    .or_else(|| layers.layer_under(WlrLayer::Overlay, layer_location))
-                    .or_else(|| layers.layer_under(WlrLayer::Top, layer_location))
-                    && layer.can_receive_keyboard_focus()
-                    && let Some((_, _)) = layer.surface_under(
-                        location
-                            - output_geo.loc.to_f64()
-                            - layers.layer_geometry(layer).unwrap().loc.to_f64(),
-                        WindowSurfaceType::ALL,
-                    )
-                {
-                    keyboard.set_focus(self, Some(layer.clone().into()), serial);
                     return;
                 }
             }
@@ -327,18 +343,12 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             if let Some(output) = output.as_ref() {
                 let output_geo = self.space.output_geometry(output).unwrap();
                 let layers = layer_map_for_output(output);
-                if let Some(layer) = layers
-                    .layer_under(WlrLayer::Bottom, location - output_geo.loc.to_f64())
-                    .or_else(|| {
-                        layers.layer_under(WlrLayer::Background, location - output_geo.loc.to_f64())
-                    })
-                    && layer.can_receive_keyboard_focus()
-                    && let Some((_, _)) = layer.surface_under(
-                        location
-                            - output_geo.loc.to_f64()
-                            - layers.layer_geometry(layer).unwrap().loc.to_f64(),
-                        WindowSurfaceType::ALL,
+                let layer_location = location - output_geo.loc.to_f64();
+                if let Some(layer) =
+                    input_layer_under(&layers, WlrLayer::Bottom, layer_location, None).or_else(
+                        || input_layer_under(&layers, WlrLayer::Background, layer_location, None),
                     )
+                    && layer.can_receive_keyboard_focus()
                 {
                     keyboard.set_focus(self, Some(layer.clone().into()), serial);
                 }
@@ -376,55 +386,37 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let layers = layer_map_for_output(output);
 
         let mut under = None;
-        if let Some((surface, loc)) = output
+        if let Some(focus) = panel_surface_under(&layers, pos - output_geo.loc.to_f64())
+            .or_else(|| {
+                layer_surface_under(&layers, WlrLayer::Overlay, pos - output_geo.loc.to_f64())
+            })
+            .or_else(|| layer_surface_under(&layers, WlrLayer::Top, pos - output_geo.loc.to_f64()))
+            .map(|(surface, location)| (surface, location + output_geo.loc))
+        {
+            under = Some(focus)
+        } else if let Some((surface, loc)) = output
             .user_data()
             .get::<FullscreenSurface>()
             .and_then(|f| f.get())
             .and_then(|w| w.surface_under(pos - output_geo.loc.to_f64(), WindowSurfaceType::ALL))
         {
             under = Some((surface, loc + output_geo.loc));
-        } else if let Some(focus) = panel_layer_under(&layers, pos - output_geo.loc.to_f64())
-            .or_else(|| layers.layer_under(WlrLayer::Overlay, pos - output_geo.loc.to_f64()))
-            .or_else(|| layers.layer_under(WlrLayer::Top, pos - output_geo.loc.to_f64()))
-            .and_then(|layer| {
-                let layer_loc = layers.layer_geometry(layer).unwrap().loc;
-                layer
-                    .surface_under(
-                        pos - output_geo.loc.to_f64() - layer_loc.to_f64(),
-                        WindowSurfaceType::ALL,
-                    )
-                    .map(|(surface, loc)| {
-                        (
-                            PointerFocusTarget::from(surface),
-                            loc + layer_loc + output_geo.loc,
-                        )
-                    })
-            })
-        {
-            under = Some(focus)
         } else if let Some(focus) = self.space.element_under(pos).and_then(|(window, loc)| {
             window
                 .surface_under(pos - loc.to_f64(), WindowSurfaceType::ALL)
                 .map(|(surface, surf_loc)| (surface, surf_loc + loc))
         }) {
             under = Some(focus);
-        } else if let Some(focus) = layers
-            .layer_under(WlrLayer::Bottom, pos - output_geo.loc.to_f64())
-            .or_else(|| layers.layer_under(WlrLayer::Background, pos - output_geo.loc.to_f64()))
-            .and_then(|layer| {
-                let layer_loc = layers.layer_geometry(layer).unwrap().loc;
-                layer
-                    .surface_under(
-                        pos - output_geo.loc.to_f64() - layer_loc.to_f64(),
-                        WindowSurfaceType::ALL,
+        } else if let Some(focus) =
+            layer_surface_under(&layers, WlrLayer::Bottom, pos - output_geo.loc.to_f64())
+                .or_else(|| {
+                    layer_surface_under(
+                        &layers,
+                        WlrLayer::Background,
+                        pos - output_geo.loc.to_f64(),
                     )
-                    .map(|(surface, loc)| {
-                        (
-                            PointerFocusTarget::from(surface),
-                            loc + layer_loc + output_geo.loc,
-                        )
-                    })
-            })
+                })
+                .map(|(surface, location)| (surface, location + output_geo.loc))
         {
             under = Some(focus)
         };
@@ -469,7 +461,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             }
             let pointer = self.pointer.clone();
             pointer.axis(self, frame);
-            pointer.frame(self);
+            self.pointer_frame();
         }
     }
 
@@ -595,17 +587,54 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 }
 
 fn panel_layer_under(layers: &LayerMap, position: Point<f64, Logical>) -> Option<&LayerSurface> {
-    layers
-        .layers_on(WlrLayer::Top)
-        .find(|layer| layer.namespace() == "luft-panel")
-        .filter(|layer| {
-            let Some(geometry) = layers.layer_geometry(layer) else {
-                return false;
-            };
-            layer
-                .surface_under(position - geometry.loc.to_f64(), WindowSurfaceType::ALL)
-                .is_some()
-        })
+    input_layer_under(layers, WlrLayer::Overlay, position, Some("luft-panel"))
+}
+
+fn input_layer_under<'a>(
+    layers: &'a LayerMap,
+    layer: WlrLayer,
+    position: Point<f64, Logical>,
+    namespace: Option<&str>,
+) -> Option<&'a LayerSurface> {
+    layers.layers_on(layer).rev().find(|surface| {
+        if namespace.is_some_and(|namespace| surface.namespace() != namespace) {
+            return false;
+        }
+        let Some(geometry) = layers.layer_geometry(surface) else {
+            return false;
+        };
+        surface
+            .surface_under(position - geometry.loc.to_f64(), WindowSurfaceType::ALL)
+            .is_some()
+    })
+}
+
+fn panel_surface_under(
+    layers: &LayerMap,
+    position: Point<f64, Logical>,
+) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
+    let surface = panel_layer_under(layers, position)?;
+    surface_focus_under(layers, surface, position)
+}
+
+fn layer_surface_under(
+    layers: &LayerMap,
+    layer: WlrLayer,
+    position: Point<f64, Logical>,
+) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
+    let surface = input_layer_under(layers, layer, position, None)?;
+    surface_focus_under(layers, surface, position)
+}
+
+fn surface_focus_under(
+    layers: &LayerMap,
+    layer: &LayerSurface,
+    position: Point<f64, Logical>,
+) -> Option<(PointerFocusTarget, Point<i32, Logical>)> {
+    let layer_location = layers.layer_geometry(layer)?.loc;
+    layer
+        .surface_under(position - layer_location.to_f64(), WindowSurfaceType::ALL)
+        .map(|(surface, location)| (PointerFocusTarget::from(surface), location + layer_location))
 }
 
 #[cfg(feature = "nested")]
@@ -732,10 +761,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let pos = evt.position_transformed(output_geo.size) + output_geo.loc.to_f64();
         let serial = SCOUNTER.next_serial();
 
-        let pointer = self.pointer.clone();
         let under = self.surface_under(pos);
-        pointer.motion(
-            self,
+        self.pointer_motion(
             under,
             &MotionEvent {
                 location: pos,
@@ -743,7 +770,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 time: evt.time(),
             },
         );
-        pointer.frame(self);
+        self.pointer_frame();
     }
 
     pub fn release_all_keys(&mut self) {
@@ -789,10 +816,8 @@ impl KestrelState<UdevData> {
                         let x = geometry.loc.x as f64 + geometry.size.w as f64 / 2.0;
                         let y = geometry.size.h as f64 / 2.0;
                         let location = (x, y).into();
-                        let pointer = self.pointer.clone();
                         let under = self.surface_under(location);
-                        pointer.motion(
-                            self,
+                        self.pointer_motion(
                             under,
                             &MotionEvent {
                                 location,
@@ -800,7 +825,7 @@ impl KestrelState<UdevData> {
                                 time: InputTime::now(),
                             },
                         );
-                        pointer.frame(self);
+                        self.pointer_frame();
                     }
                 }
                 KeyAction::ScaleUp => {
@@ -833,10 +858,8 @@ impl KestrelState<UdevData> {
                         let pointer_location = output_location + pointer_output_location;
 
                         crate::shell::fixup_positions(&mut self.space, pointer_location);
-                        let pointer = self.pointer.clone();
                         let under = self.surface_under(pointer_location);
-                        pointer.motion(
-                            self,
+                        self.pointer_motion(
                             under,
                             &MotionEvent {
                                 location: pointer_location,
@@ -844,7 +867,7 @@ impl KestrelState<UdevData> {
                                 time: InputTime::now(),
                             },
                         );
-                        pointer.frame(self);
+                        self.pointer_frame();
                         self.backend_data.reset_buffers(&output);
                     }
                 }
@@ -878,10 +901,8 @@ impl KestrelState<UdevData> {
                         let pointer_location = output_location + pointer_output_location;
 
                         crate::shell::fixup_positions(&mut self.space, pointer_location);
-                        let pointer = self.pointer.clone();
                         let under = self.surface_under(pointer_location);
-                        pointer.motion(
-                            self,
+                        self.pointer_motion(
                             under,
                             &MotionEvent {
                                 location: pointer_location,
@@ -889,7 +910,7 @@ impl KestrelState<UdevData> {
                                 time: InputTime::now(),
                             },
                         );
-                        pointer.frame(self);
+                        self.pointer_frame();
                         self.backend_data.reset_buffers(&output);
                     }
                 }
@@ -1028,7 +1049,7 @@ impl KestrelState<UdevData> {
 
         // If pointer is locked, only emit relative motion
         if pointer_locked {
-            pointer.frame(self);
+            self.pointer_frame();
             return;
         }
 
@@ -1064,12 +1085,11 @@ impl KestrelState<UdevData> {
             && let Some((surface, _)) = &under
             && new_under.as_ref().and_then(|(under, _)| under.wl_surface()) != surface.wl_surface()
         {
-            pointer.frame(self);
+            self.pointer_frame();
             return;
         }
 
-        pointer.motion(
-            self,
+        self.pointer_motion(
             new_under.clone(),
             &MotionEvent {
                 location: pointer_location,
@@ -1077,7 +1097,7 @@ impl KestrelState<UdevData> {
                 time: evt.time(),
             },
         );
-        pointer.frame(self);
+        self.pointer_frame();
 
         // If pointer is now in a constraint region, activate it
         // TODO Anywhere else pointer is moved needs to do this
@@ -1123,11 +1143,9 @@ impl KestrelState<UdevData> {
         // clamp to screen limits
         pointer_location = self.clamp_coords(pointer_location);
 
-        let pointer = self.pointer.clone();
         let under = self.surface_under(pointer_location);
 
-        pointer.motion(
-            self,
+        self.pointer_motion(
             under,
             &MotionEvent {
                 location: pointer_location,
@@ -1135,20 +1153,18 @@ impl KestrelState<UdevData> {
                 time: evt.time(),
             },
         );
-        pointer.frame(self);
+        self.pointer_frame();
     }
 
     fn on_tablet_tool_axis<B: InputBackend>(&mut self, evt: B::TabletToolAxisEvent) {
         let tablet_seat = self.seat.tablet_seat();
 
         if let Some(pointer_location) = self.touch_location_transformed(&evt) {
-            let pointer = self.pointer.clone();
             let under = self.surface_under(pointer_location);
             let tool = tablet_seat.get_tool(&evt.tool());
             let time = InputTime::now();
 
-            pointer.motion(
-                self,
+            self.pointer_motion(
                 under.clone(),
                 &MotionEvent {
                     location: pointer_location,
@@ -1184,7 +1200,7 @@ impl KestrelState<UdevData> {
                 tool.frame(self, time);
             }
 
-            pointer.frame(self);
+            self.pointer_frame();
         }
     }
 
@@ -1198,15 +1214,13 @@ impl KestrelState<UdevData> {
         if let Some(pointer_location) = self.touch_location_transformed(&evt) {
             let tool = evt.tool();
 
-            let pointer = self.pointer.clone();
             let under = self.surface_under(pointer_location);
             let tablet = tablet_seat.get_tablet(&TabletDescriptor::from(&evt.device()));
             let tool = tablet_seat
                 .get_tool(&tool)
                 .unwrap_or_else(|| tablet_seat.add_wp_tool(self, dh, &tool));
 
-            pointer.motion(
-                self,
+            self.pointer_motion(
                 under.clone(),
                 &MotionEvent {
                     location: pointer_location,
@@ -1214,7 +1228,7 @@ impl KestrelState<UdevData> {
                     time: evt.time(),
                 },
             );
-            pointer.frame(self);
+            self.pointer_frame();
 
             if let Some(tablet) = tablet {
                 let frame = tablet::tool::AxisFrame {

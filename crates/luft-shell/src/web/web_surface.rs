@@ -21,28 +21,35 @@ use tracing::{debug, warn};
 
 const VISIBILITY_ACK_TIMEOUT: Duration = Duration::from_secs(5);
 const CONTROL_CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
+const PROCESS_LAUNCH_RETRY_DELAY: Duration = Duration::from_secs(1);
 
 pub struct WebSurface {
     kind: WebShellSurface,
     pub(crate) size: (i32, i32),
     actions_tx: Sender<WebShellAction>,
     snapshot: Arc<Mutex<WebShellSnapshot>>,
-    pub(crate) visible: bool,
     keep_alive_when_hidden: bool,
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
     process: Option<SabineProcess>,
     visibility_request: Option<ShellSurfaceVisibilityRequest>,
+    requested_presentation: Option<SurfacePresentation>,
     visibility_requested_at: Option<Instant>,
     control_unavailable_since: Option<Instant>,
-    mapped: Option<bool>,
-    surface_alpha: f32,
-    pub(crate) shell_margin: ShellSurfaceMargin,
+    presentation: SurfacePresentation,
+    presented: Option<SurfacePresentation>,
     pending_snapshot: String,
     rendered_snapshot: String,
     rendered_value: Option<Value>,
     snapshot_revision: u64,
     frame_rate: u32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct SurfacePresentation {
+    visible: bool,
+    alpha: f32,
+    margin: ShellSurfaceMargin,
 }
 
 impl WebSurface {
@@ -60,17 +67,20 @@ impl WebSurface {
             size: config.size,
             actions_tx: config.actions_tx.clone(),
             snapshot: Arc::new(Mutex::new(config.snapshot.clone())),
-            visible: false,
             keep_alive_when_hidden: config.keep_alive_when_hidden,
             panel_menu_x: config.panel_menu_x,
             session_menu_qs_height: config.session_menu_qs_height,
             process: None,
             visibility_request: None,
+            requested_presentation: None,
             visibility_requested_at: None,
             control_unavailable_since: None,
-            mapped: None,
-            surface_alpha: if config.visible { 1.0 } else { 0.0 },
-            shell_margin,
+            presentation: SurfacePresentation {
+                visible: false,
+                alpha: 0.0,
+                margin: shell_margin,
+            },
+            presented: None,
             pending_snapshot: initial,
             rendered_snapshot: String::new(),
             rendered_value: None,
@@ -82,23 +92,55 @@ impl WebSurface {
     }
 
     pub fn set_visible(&mut self, visible: bool) {
-        self.set_visible_with_alpha(visible, 1.0);
+        self.set_visible_with_alpha(visible, if visible { 1.0 } else { 0.0 });
     }
 
     pub(crate) fn set_visible_with_alpha(&mut self, visible: bool, alpha: f32) {
-        if self.visible == visible {
-            if visible {
-                self.set_surface_alpha(alpha);
-            }
-            self.ensure_visibility_request();
+        self.set_presentation(visible, alpha, self.presentation.margin);
+    }
+
+    pub(crate) fn set_presentation(
+        &mut self,
+        visible: bool,
+        alpha: f32,
+        margin: ShellSurfaceMargin,
+    ) {
+        let presentation = SurfacePresentation {
+            visible,
+            alpha: alpha.clamp(0.0, 1.0),
+            margin,
+        };
+        if self.presentation == presentation {
+            self.ensure_presentation_request();
             return;
         }
-        self.visible = visible;
-        if visible {
-            self.show_process(alpha);
-        } else {
-            self.hide_process();
+        self.presentation = presentation;
+
+        if !visible && !self.keep_alive_when_hidden {
+            self.process = None;
+            self.visibility_request = None;
+            self.requested_presentation = None;
+            self.visibility_requested_at = None;
+            self.control_unavailable_since = None;
+            self.presented = Some(presentation);
+            self.rendered_snapshot.clear();
+            self.rendered_value = None;
+            self.snapshot_revision = 0;
+            return;
         }
+
+        if visible && self.process.is_none() {
+            self.launch();
+        } else {
+            self.ensure_presentation_request();
+        }
+        if visible {
+            self.flush_snapshot();
+        }
+    }
+
+    pub(crate) fn is_visible(&self) -> bool {
+        self.presentation.visible
     }
 
     pub fn resize(&mut self, size: (i32, i32)) {
@@ -149,9 +191,10 @@ impl WebSurface {
         match window.launch() {
             Ok(process) => {
                 self.visibility_request = None;
+                self.requested_presentation = None;
                 self.visibility_requested_at = None;
                 self.control_unavailable_since = None;
-                self.mapped = None;
+                self.presented = None;
                 debug!(
                     pid = process.id(),
                     surface = self.kind.as_str(),
@@ -159,9 +202,10 @@ impl WebSurface {
                 );
                 self.process = Some(process);
                 self.set_frame_rate(self.frame_rate);
-                let _ = self.request_visibility(self.visible);
+                let _ = self.request_presentation(self.presentation);
             }
             Err(error) => {
+                self.control_unavailable_since = Some(Instant::now());
                 warn!(%error, surface = self.kind.as_str(), "failed to launch Sabine shell surface");
             }
         }
@@ -170,53 +214,21 @@ impl WebSurface {
     pub(crate) fn prewarm(&mut self) {
         if self.process.is_none() {
             self.launch();
-        } else if !self.visible {
-            self.hide_process();
+        } else if !self.presentation.visible {
+            self.ensure_presentation_request();
         }
-    }
-
-    fn show_process(&mut self, alpha: f32) {
-        if self.process.is_some() {
-            self.set_surface_alpha(alpha);
-        }
-        let _ = self.request_visibility(true);
-        if self.process.is_none() {
-            self.launch();
-            self.set_surface_alpha(alpha);
-            self.flush_snapshot();
-            return;
-        }
-        self.flush_snapshot();
-    }
-
-    fn hide_process(&mut self) {
-        self.set_surface_alpha(0.0);
-        if !self.keep_alive_when_hidden {
-            self.process = None;
-            self.visibility_request = None;
-            self.visibility_requested_at = None;
-            self.control_unavailable_since = None;
-            self.mapped = Some(false);
-            self.rendered_snapshot.clear();
-            self.rendered_value = None;
-            self.snapshot_revision = 0;
-            return;
-        }
-        if self.process.is_none() {
-            return;
-        }
-        let _ = self.request_visibility(false);
     }
 
     pub(crate) fn release_hidden_process(&mut self) {
-        if self.visible {
+        if self.presentation.visible {
             return;
         }
         if self.process.take().is_some() {
             self.visibility_request = None;
+            self.requested_presentation = None;
             self.visibility_requested_at = None;
             self.control_unavailable_since = None;
-            self.mapped = None;
+            self.presented = None;
             self.rendered_snapshot.clear();
             self.rendered_value = None;
             self.snapshot_revision = 0;
@@ -226,7 +238,7 @@ impl WebSurface {
     pub(crate) fn tick_visibility(&mut self) {
         self.flush_snapshot();
         let Some(request) = self.visibility_request.as_ref() else {
-            self.ensure_visibility_request();
+            self.ensure_presentation_request();
             return;
         };
         let (state, requested_visible, request_id) =
@@ -249,13 +261,14 @@ impl WebSurface {
         }
         self.visibility_request = None;
         self.visibility_requested_at = None;
+        let requested_presentation = self.requested_presentation.take();
         let completed = matches!(
             (requested_visible, state),
             (true, ShellSurfaceVisibilityState::Mapped)
                 | (false, ShellSurfaceVisibilityState::Unmapped)
         );
         if completed {
-            self.mapped = Some(requested_visible);
+            self.presented = requested_presentation;
             debug!(
                 surface = self.kind.as_str(),
                 request_id,
@@ -263,7 +276,7 @@ impl WebSurface {
                 ?state,
                 "Sabine shell visibility request completed"
             );
-            self.ensure_visibility_request();
+            self.ensure_presentation_request();
             return;
         }
         warn!(
@@ -275,22 +288,8 @@ impl WebSurface {
         self.restart_process();
     }
 
-    pub(crate) fn set_surface_alpha(&mut self, alpha: f32) {
-        let alpha = alpha.clamp(0.0, 1.0);
-        self.surface_alpha = alpha;
-        if let Some(process) = &self.process {
-            let _ = process.set_shell_surface_alpha(self.surface_alpha);
-        }
-    }
-
     pub(crate) fn set_shell_margin(&mut self, margin: ShellSurfaceMargin) {
-        if self.shell_margin == margin {
-            return;
-        }
-        self.shell_margin = margin;
-        if let Some(process) = &self.process {
-            let _ = process.set_shell_surface_margin(margin);
-        }
+        self.set_presentation(self.presentation.visible, self.presentation.alpha, margin);
     }
 
     pub(crate) fn set_frame_rate(&mut self, frame_rate: u32) {
@@ -323,7 +322,7 @@ impl WebSurface {
             self.panel_menu_x,
             self.session_menu_qs_height,
         )
-        .margin(self.shell_margin);
+        .margin(self.presentation.margin);
         let (width, height) = cef_initial_size(&shell_options, self.size);
         let window = SabineWindow::new()
             .app_id("net.aveid.luft.shell")
@@ -333,9 +332,9 @@ impl WebSurface {
             .glass()
             .always_on_top(true)
             .shell_surface(shell_options)
-            .shell_surface_alpha(self.surface_alpha)
-            .visible(self.visible)
-            .active(self.visible && kind == WebShellSurface::StartMenu)
+            .shell_surface_alpha(self.presentation.alpha)
+            .visible(self.presentation.visible)
+            .active(self.presentation.visible && kind == WebShellSurface::StartMenu)
             .active_frame_rate(self.frame_rate)
             .background_frame_rate(1)
             .blur_region(shell_blur_region(kind, width as i32, height as i32))
@@ -425,9 +424,13 @@ impl WebSurface {
         );
     }
 
-    fn request_visibility(&mut self, visible: bool) -> bool {
+    fn request_presentation(&mut self, presentation: SurfacePresentation) -> bool {
         let Some(request) = self.process.as_ref().and_then(|process| {
-            process.set_shell_surface_presentation(visible, self.surface_alpha, self.shell_margin)
+            process.set_shell_surface_presentation(
+                presentation.visible,
+                presentation.alpha,
+                presentation.margin,
+            )
         }) else {
             self.control_unavailable_since
                 .get_or_insert_with(Instant::now);
@@ -436,26 +439,40 @@ impl WebSurface {
         self.control_unavailable_since = None;
         let request_id = request.id();
         self.visibility_request = Some(request);
+        self.requested_presentation = Some(presentation);
         self.visibility_requested_at = Some(Instant::now());
         debug!(
             surface = self.kind.as_str(),
-            request_id, visible, "queued Sabine shell visibility request"
+            request_id,
+            visible = presentation.visible,
+            alpha = presentation.alpha,
+            margin = ?presentation.margin,
+            "queued Sabine shell presentation request"
         );
         true
     }
 
-    fn ensure_visibility_request(&mut self) {
-        if self.process.is_none() || self.mapped == Some(self.visible) {
+    fn ensure_presentation_request(&mut self) {
+        if self.process.is_none() {
+            if (self.presentation.visible || self.keep_alive_when_hidden)
+                && self
+                    .control_unavailable_since
+                    .is_some_and(|failed_at| failed_at.elapsed() >= PROCESS_LAUNCH_RETRY_DELAY)
+            {
+                self.control_unavailable_since = Some(Instant::now());
+                self.launch();
+            }
             return;
         }
-        if self
-            .visibility_request
-            .as_ref()
-            .is_some_and(|request| request.requested_visible() == self.visible)
+        if self.presented == Some(self.presentation) {
+            return;
+        }
+        if self.visibility_request.is_some()
+            && self.requested_presentation == Some(self.presentation)
         {
             return;
         }
-        if !self.request_visibility(self.visible)
+        if !self.request_presentation(self.presentation)
             && self
                 .control_unavailable_since
                 .is_some_and(|started| started.elapsed() >= CONTROL_CONNECT_TIMEOUT)
@@ -471,13 +488,14 @@ impl WebSurface {
     fn restart_process(&mut self) {
         self.process = None;
         self.visibility_request = None;
+        self.requested_presentation = None;
         self.visibility_requested_at = None;
         self.control_unavailable_since = None;
-        self.mapped = None;
+        self.presented = None;
         self.rendered_snapshot.clear();
         self.rendered_value = None;
         self.snapshot_revision = 0;
-        if self.visible || self.keep_alive_when_hidden {
+        if self.presentation.visible || self.keep_alive_when_hidden {
             self.launch();
         }
     }

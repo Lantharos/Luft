@@ -55,7 +55,11 @@ impl LazyWebSurface {
                 if self.hide_at.is_some() {
                     return;
                 }
-                if self.surface.as_ref().is_none_or(|surface| !surface.visible) {
+                if self
+                    .surface
+                    .as_ref()
+                    .is_none_or(|surface| !surface.is_visible())
+                {
                     return;
                 }
             }
@@ -64,17 +68,13 @@ impl LazyWebSurface {
             if let Some(surface) = &mut self.surface {
                 if let Some(delay) = close_animation_duration(self.kind) {
                     let now = Instant::now();
-                    surface.set_surface_alpha(1.0);
                     surface.emit_surface_close();
-                    surface.set_shell_margin(hidden_shell_margin(
-                        self.kind,
-                        surface.base_shell_margin(),
-                        surface.size,
-                    ));
+                    let hidden_margin =
+                        hidden_shell_margin(self.kind, surface.base_shell_margin(), surface.size);
+                    surface.set_presentation(true, 1.0, hidden_margin);
                     self.hide_at = Some(now + delay);
                 } else {
                     self.hide_at = None;
-                    surface.set_surface_alpha(0.0);
                     surface.set_visible(false);
                     self.schedule_release(Instant::now());
                 }
@@ -109,14 +109,12 @@ impl LazyWebSurface {
                     surface.size,
                 ));
             }
-            surface.set_shell_margin(target_margin);
-            surface.set_visible_with_alpha(true, 1.0);
+            surface.set_presentation(true, 1.0, target_margin);
             surface.emit_surface_open();
             if let Some(duration) = open_duration.filter(|_| animates_margin) {
                 self.show_at = Some(now + duration);
             } else {
                 self.show_at = None;
-                surface.set_surface_alpha(1.0);
             }
         }
     }
@@ -133,8 +131,7 @@ impl LazyWebSurface {
             if self.visible
                 && let Some(surface) = &mut self.surface
             {
-                surface.set_surface_alpha(1.0);
-                surface.set_shell_margin(surface.base_shell_margin());
+                surface.set_presentation(true, 1.0, surface.base_shell_margin());
             }
         }
 
@@ -145,7 +142,6 @@ impl LazyWebSurface {
             self.hide_at = None;
             if !self.visible {
                 if let Some(surface) = &mut self.surface {
-                    surface.set_surface_alpha(0.0);
                     surface.set_visible(false);
                 }
                 self.schedule_release(now);

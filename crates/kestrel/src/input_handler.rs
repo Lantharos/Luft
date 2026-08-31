@@ -33,12 +33,15 @@ use smithay::{
     wayland::{
         compositor::{SurfaceAttributes, with_states},
         input_method::InputMethodSeat,
-        pointer_constraints::{PointerConstraint, with_pointer_constraint},
+        pointer_constraints::with_pointer_constraint,
         shell::wlr_layer::{KeyboardInteractivity, Layer as WlrLayer},
     },
 };
 
 use smithay::backend::input::AbsolutePositionEvent;
+
+#[cfg(feature = "session-backend")]
+use smithay::wayland::pointer_constraints::PointerConstraint;
 
 #[cfg(feature = "nested")]
 use smithay::output::Output;
@@ -160,6 +163,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         self.surface_under(location)
     }
 
+    #[cfg(feature = "session-backend")]
     fn pointer_constraint_is_locked(&self) -> bool {
         if self.session_lock.is_active() {
             return false;

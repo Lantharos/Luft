@@ -1,5 +1,6 @@
 use std::{
     fs, io,
+    net::Shutdown,
     os::unix::{fs::PermissionsExt, net::UnixListener},
     path::{Path, PathBuf},
     sync::{
@@ -18,12 +19,14 @@ use luft_ipc::{
 use smithay::reexports::calloop::{Interest, LoopHandle, Mode, PostAction, generic::Generic, ping};
 use tracing::warn;
 
+use crate::capture_consent::IpcAccess;
 use crate::state::{Backend, KestrelState};
 
 #[derive(Debug)]
 struct IpcCommand {
     id: u64,
     request: IpcRequest,
+    access: IpcAccess,
     reply: SyncSender<WriterEvent>,
     alive: Arc<AtomicBool>,
 }
@@ -47,6 +50,15 @@ struct Subscriber {
     alive: Arc<AtomicBool>,
 }
 
+#[derive(Clone)]
+struct ReaderShared {
+    commands: SyncSender<IpcCommand>,
+    command_ping: ping::Ping,
+    connection_count: Arc<AtomicUsize>,
+    shell_capability: Arc<str>,
+    portal_capability: Arc<str>,
+}
+
 #[derive(Debug)]
 pub struct IpcSocket {
     path: PathBuf,
@@ -57,6 +69,15 @@ pub struct IpcSocket {
 impl IpcSocket {
     pub fn snapshot(&self) -> Option<ShellSnapshot> {
         self.snapshot.clone()
+    }
+
+    pub fn has_shell_subscriber(&self) -> bool {
+        self.subscribers.lock().is_ok_and(|subscribers| {
+            subscribers.iter().any(|subscriber| {
+                subscriber.alive.load(Ordering::Acquire)
+                    && subscriber.subscribed.load(Ordering::Acquire)
+            })
+        })
     }
 
     pub fn publish(&mut self, mut snapshot: ShellSnapshot) -> ShellSnapshot {
@@ -117,6 +138,8 @@ impl Drop for IpcSocket {
 pub fn install<BackendData: Backend + 'static>(
     handle: &LoopHandle<'static, KestrelState<BackendData>>,
     path: PathBuf,
+    shell_capability: String,
+    portal_capability: String,
 ) -> io::Result<IpcSocket> {
     ensure_socket_parent(&path)?;
     if let Some(parent) = path.parent() {
@@ -134,14 +157,14 @@ pub fn install<BackendData: Backend + 'static>(
     handle
         .insert_source(command_source, move |(), _, state| {
             while let Ok(command) = receiver.try_recv() {
-                let subscribing = command.request == IpcRequest::SubscribeShell;
-                let mut response = state.handle_ipc(command.request);
-                let snapshot = state.sync_shell_state();
+                let subscribing = command.access == IpcAccess::Shell
+                    && command.request == IpcRequest::SubscribeShell;
+                let mut response = state.handle_ipc(command.request, command.access);
                 response = if subscribing {
-                    IpcResponse::ShellSnapshot(snapshot.clone())
+                    IpcResponse::ShellSnapshot(state.sync_shell_state())
                 } else if matches!(response, IpcResponse::Accepted { .. }) {
                     IpcResponse::Accepted {
-                        revision: snapshot.revision,
+                        revision: state.sync_shell_state().revision,
                     }
                 } else {
                     response
@@ -160,6 +183,15 @@ pub fn install<BackendData: Backend + 'static>(
 
     let connection_subscribers = Arc::clone(&subscribers);
     let listener_connection_count = Arc::clone(&connection_count);
+    let shell_capability: Arc<str> = shell_capability.into();
+    let portal_capability: Arc<str> = portal_capability.into();
+    let reader_shared = ReaderShared {
+        commands: sender,
+        command_ping,
+        connection_count: Arc::clone(&listener_connection_count),
+        shell_capability,
+        portal_capability,
+    };
     handle
         .insert_source(
             Generic::new(listener, Interest::READ, Mode::Level),
@@ -175,6 +207,10 @@ pub fn install<BackendData: Backend + 'static>(
                     };
                     if !peer_is_current_user(&stream) {
                         warn!("rejected Luft IPC connection from another user");
+                        continue;
+                    }
+                    if let Err(error) = stream.set_write_timeout(Some(Duration::from_secs(2))) {
+                        warn!(%error, "failed to bound Luft IPC writes");
                         continue;
                     }
                     if listener_connection_count.fetch_add(1, Ordering::AcqRel) >= MAX_CONNECTIONS {
@@ -212,12 +248,10 @@ pub fn install<BackendData: Backend + 'static>(
                     );
                     spawn_reader(
                         read_stream,
-                        sender.clone(),
-                        command_ping.clone(),
+                        reader_shared.clone(),
                         outgoing,
                         subscribed,
                         alive,
-                        Arc::clone(&listener_connection_count),
                     );
                 }
                 Ok(PostAction::Continue)
@@ -234,14 +268,14 @@ pub fn install<BackendData: Backend + 'static>(
 
 fn spawn_reader(
     mut stream: std::os::unix::net::UnixStream,
-    commands: SyncSender<IpcCommand>,
-    command_ping: ping::Ping,
+    shared: ReaderShared,
     reply: SyncSender<WriterEvent>,
     subscribed: Arc<AtomicBool>,
     alive: Arc<AtomicBool>,
-    connection_count: Arc<AtomicUsize>,
 ) {
     thread::spawn(move || {
+        let mut access = IpcAccess::Public;
+        let mut received_request = false;
         loop {
             let message = match read_frame::<ClientMessage>(&mut stream) {
                 Ok(message) => message,
@@ -260,22 +294,40 @@ fn spawn_reader(
                     break;
                 }
             };
-            let ClientMessage::Request { id, request } = message;
-            if request == IpcRequest::SubscribeShell {
+            let (id, request) = match message {
+                ClientMessage::Authenticate { capability } if !received_request => {
+                    access = if capability.as_bytes() == shared.shell_capability.as_bytes() {
+                        IpcAccess::Shell
+                    } else if capability.as_bytes() == shared.portal_capability.as_bytes() {
+                        IpcAccess::Portal
+                    } else {
+                        break;
+                    };
+                    continue;
+                }
+                ClientMessage::Authenticate { .. } => break,
+                ClientMessage::Request { id, request } => {
+                    received_request = true;
+                    (id, request)
+                }
+            };
+            if access == IpcAccess::Shell && request == IpcRequest::SubscribeShell {
                 subscribed.store(true, Ordering::Release);
             }
-            match commands.try_send(IpcCommand {
+            match shared.commands.try_send(IpcCommand {
                 id,
                 request,
+                access,
                 reply: reply.clone(),
                 alive: Arc::clone(&alive),
             }) {
-                Ok(()) => command_ping.ping(),
+                Ok(()) => shared.command_ping.ping(),
                 Err(TrySendError::Full(_)) | Err(TrySendError::Disconnected(_)) => break,
             }
         }
         alive.store(false, Ordering::Release);
-        connection_count.fetch_sub(1, Ordering::AcqRel);
+        let _ = stream.shutdown(Shutdown::Both);
+        shared.connection_count.fetch_sub(1, Ordering::AcqRel);
     });
 }
 
@@ -311,6 +363,7 @@ fn spawn_writer(
             }
         }
         alive.store(false, Ordering::Release);
+        let _ = stream.shutdown(Shutdown::Both);
     });
 }
 

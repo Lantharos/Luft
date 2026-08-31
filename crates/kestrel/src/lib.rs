@@ -10,6 +10,7 @@
 pub mod blur;
 mod blur_pipeline;
 pub mod capture;
+pub mod capture_consent;
 #[cfg(feature = "session-backend")]
 pub mod cursor;
 pub mod drawing;
@@ -17,6 +18,7 @@ pub mod focus;
 pub mod input_handler;
 pub mod ipc;
 pub mod layer_motion;
+pub mod lock_process;
 pub mod policy;
 pub mod portal_process;
 pub mod render;
@@ -28,6 +30,7 @@ pub mod state;
 #[cfg(feature = "session-backend")]
 pub mod udev;
 pub mod wallpaper;
+pub mod wayland_broker;
 #[cfg(feature = "nested")]
 pub mod winit;
 pub mod xwayland_process;

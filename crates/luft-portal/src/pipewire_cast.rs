@@ -12,12 +12,14 @@ use std::{
 use pipewire as pw;
 use pw::{properties::properties, spa};
 use spa::pod::Pod;
+use wayland_client::Connection;
 
 use crate::capture::CaptureClient;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 type SharedFrame = Arc<Mutex<Vec<u8>>>;
 type CaptureStartup = (u32, u32, SharedFrame);
+const CAPTURE_FRAME_TIMEOUT: Duration = Duration::from_secs(5);
 
 pub struct CastHandle {
     stop: Arc<AtomicBool>,
@@ -36,25 +38,46 @@ impl Drop for CastHandle {
     }
 }
 
-pub fn start(draw_cursor: bool) -> Result<CastInfo> {
-    let stop = Arc::new(AtomicBool::new(false));
+pub fn start(
+    wayland: Connection,
+    output: &str,
+    draw_cursor: bool,
+    stop: Arc<AtomicBool>,
+) -> Result<CastInfo> {
+    let failure_stop = Arc::clone(&stop);
+    let result = start_inner(wayland, output, draw_cursor, stop);
+    if result.is_err() {
+        failure_stop.store(true, Ordering::Release);
+    }
+    result
+}
+
+fn start_inner(
+    wayland: Connection,
+    output: &str,
+    draw_cursor: bool,
+    stop: Arc<AtomicBool>,
+) -> Result<CastInfo> {
     let (frame_tx, frame_rx) = mpsc::sync_channel(1);
     let capture_stop = Arc::clone(&stop);
-    thread::Builder::new()
-        .name("luft-capture".into())
-        .spawn(move || capture_frames(draw_cursor, capture_stop, frame_tx))?;
+    thread::Builder::new().name("luft-capture".into()).spawn({
+        let output = output.to_string();
+        move || capture_frames(wayland, output, draw_cursor, capture_stop, frame_tx)
+    })?;
 
     let (width, height, latest) = frame_rx
         .recv_timeout(Duration::from_secs(5))
         .map_err(|error| io::Error::other(format!("capture startup timed out: {error}")))??;
     let (node_tx, node_rx) = mpsc::sync_channel(1);
     let pipewire_stop = Arc::clone(&stop);
+    let pipewire_finished = Arc::clone(&stop);
     thread::Builder::new()
         .name("luft-pipewire".into())
         .spawn(move || {
             if let Err(error) = run_pipewire(width, height, latest, pipewire_stop, node_tx) {
                 tracing::error!(%error, "PipeWire screencast stopped");
             }
+            pipewire_finished.store(true, Ordering::Release);
         })?;
     let node_id = node_rx
         .recv_timeout(Duration::from_secs(5))
@@ -69,43 +92,47 @@ pub fn start(draw_cursor: bool) -> Result<CastInfo> {
 }
 
 fn capture_frames(
+    wayland: Connection,
+    output: String,
     draw_cursor: bool,
     stop: Arc<AtomicBool>,
     ready: mpsc::SyncSender<Result<CaptureStartup>>,
 ) {
     let started = (|| -> Result<_> {
-        let mut client = CaptureClient::connect(draw_cursor)?;
-        let frame = client
-            .capture(Some(&stop))?
-            .ok_or_else(|| io::Error::other("capture stopped before its first frame"))?;
-        let width = frame.width;
-        let height = frame.height;
-        let latest = Arc::new(Mutex::new(frame.bgra));
+        let mut client = CaptureClient::connect(wayland, &output, draw_cursor)?;
+        if !client.capture(Some(&stop), CAPTURE_FRAME_TIMEOUT)? {
+            return Err(io::Error::other("capture stopped before its first frame").into());
+        }
+        let (width, height) = client.size();
+        let latest = Arc::new(Mutex::new(client.bgra().to_vec()));
         Ok((client, width, height, latest))
     })();
     let Ok((mut client, width, height, latest)) = started else {
         let _ = ready.send(started.map(|_| unreachable!()));
+        stop.store(true, Ordering::Release);
         return;
     };
     if ready
         .send(Ok((width, height, Arc::clone(&latest))))
         .is_err()
     {
+        stop.store(true, Ordering::Release);
         return;
     }
 
     while !stop.load(Ordering::Relaxed) {
-        match client.capture(Some(&stop)) {
-            Ok(Some(frame)) => {
-                *latest.lock().unwrap() = frame.bgra;
+        match client.capture(Some(&stop), CAPTURE_FRAME_TIMEOUT) {
+            Ok(true) => {
+                latest.lock().unwrap().copy_from_slice(client.bgra());
             }
-            Ok(None) => break,
+            Ok(false) => break,
             Err(error) => {
                 tracing::warn!(%error, "Wayland screencast capture stopped");
                 break;
             }
         }
     }
+    stop.store(true, Ordering::Release);
 }
 
 fn run_pipewire(

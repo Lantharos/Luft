@@ -6,11 +6,10 @@ use super::{
 use super::actions::WebShellAction;
 use super::{
     model::{WebShellSnapshot, WebShellSurface},
-    surface_layout::{PANEL_HEIGHT, PANEL_WIDTH_HINT},
     surface_payload,
     surface_sizing::{
-        date_center_size, notification_toast_size, panel_menu_size, quick_settings_size,
-        session_menu_size,
+        capture_consent_size, date_center_size, notification_toast_size, panel_menu_size,
+        panel_size, quick_settings_size, session_menu_size,
     },
 };
 use serde_json::Value;
@@ -28,6 +27,7 @@ pub struct WebSurfaces {
     pub quick: LazyWebSurface,
     pub date: LazyWebSurface,
     pub notification_toast: LazyWebSurface,
+    capture_consent: LazyWebSurface,
     panel_menu: LazyWebSurface,
     session_menu: LazyWebSurface,
     panel: WebSurface,
@@ -54,10 +54,12 @@ impl WebSurfaces {
         let date_snapshot = surface_payload::project(snapshot_value, WebShellSurface::DateCenter);
         let toast_snapshot =
             surface_payload::project(snapshot_value, WebShellSurface::NotificationToast);
+        let capture_snapshot =
+            surface_payload::project(snapshot_value, WebShellSurface::CaptureConsent);
         let mut surfaces = Self {
             panel: WebSurface::new(WebSurfaceConfig {
                 kind: WebShellSurface::Panel,
-                size: (PANEL_WIDTH_HINT, PANEL_HEIGHT),
+                size: panel_size(snapshot),
                 visible: true,
                 keep_alive_when_hidden: false,
                 panel_menu_x: None,
@@ -108,6 +110,13 @@ impl WebSurfaces {
                 &toast_snapshot,
                 frame_rate,
             ),
+            capture_consent: LazyWebSurface::new(
+                WebShellSurface::CaptureConsent,
+                capture_consent_size(snapshot),
+                &actions_tx,
+                &capture_snapshot,
+                frame_rate,
+            ),
             prewarm_index: 0,
             prewarm_at: Instant::now() + Duration::from_secs(1),
         };
@@ -119,6 +128,7 @@ impl WebSurfaces {
 
     pub fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot, snapshot_value: &Value) {
         let quick_settings_size = quick_settings_size(snapshot);
+        self.panel.resize(panel_size(snapshot));
         self.panel.evaluate_snapshot(&surface_payload::project(
             snapshot_value,
             WebShellSurface::Panel,
@@ -156,6 +166,12 @@ impl WebSurfaces {
                 snapshot_value,
                 WebShellSurface::NotificationToast,
             ));
+        self.capture_consent.resize(capture_consent_size(snapshot));
+        self.capture_consent
+            .evaluate_snapshot(&surface_payload::project(
+                snapshot_value,
+                WebShellSurface::CaptureConsent,
+            ));
     }
 
     pub fn set_frame_rate(&mut self, frame_rate: u32) {
@@ -166,6 +182,7 @@ impl WebSurfaces {
         self.quick.set_frame_rate(frame_rate);
         self.date.set_frame_rate(frame_rate);
         self.notification_toast.set_frame_rate(frame_rate);
+        self.capture_consent.set_frame_rate(frame_rate);
     }
 
     pub fn set_panel_visible(&mut self, visible: bool) {
@@ -188,6 +205,10 @@ impl WebSurfaces {
         self.notification_toast.set_visible(visible);
     }
 
+    pub fn set_capture_consent_visible(&mut self, visible: bool) {
+        self.capture_consent.set_visible(visible);
+    }
+
     pub fn tick(&mut self) {
         self.prewarm_next_surface();
         self.panel.tick_visibility();
@@ -197,6 +218,7 @@ impl WebSurfaces {
         self.quick.tick();
         self.date.tick();
         self.notification_toast.tick();
+        self.capture_consent.tick();
     }
 
     fn prewarm_next_surface(&mut self) {
@@ -205,12 +227,13 @@ impl WebSurfaces {
             return;
         }
         let surface = match self.prewarm_index {
-            0 => &mut self.start_menu,
-            1 => &mut self.quick,
-            2 => &mut self.date,
-            3 => &mut self.panel_menu,
-            4 => &mut self.session_menu,
-            5 => &mut self.notification_toast,
+            0 => &mut self.capture_consent,
+            1 => &mut self.start_menu,
+            2 => &mut self.quick,
+            3 => &mut self.date,
+            4 => &mut self.panel_menu,
+            5 => &mut self.session_menu,
+            6 => &mut self.notification_toast,
             _ => return,
         };
         surface.prewarm();
@@ -225,5 +248,6 @@ impl WebSurfaces {
             || self.quick.is_animating()
             || self.date.is_animating()
             || self.notification_toast.is_animating()
+            || self.capture_consent.is_animating()
     }
 }

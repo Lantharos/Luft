@@ -11,6 +11,7 @@
 @import "./start_menu.css";
 @import "./start_menu_apps.css";
 @import "./start_menu_search.css";
+@import "./capture_consent.css";
 
 @theme {
   --font-sans: "Adwaita Sans", "Cantarell", ui-sans-serif, system-ui, sans-serif;
@@ -102,6 +103,14 @@ body,
   overflow: hidden;
   border-radius: 18px;
   clip-path: inset(0 round 18px);
+  background: transparent;
+}
+
+#app[data-surface="capture-consent"] {
+  display: block;
+  overflow: hidden;
+  border-radius: 28px;
+  clip-path: inset(0 round 28px);
   background: transparent;
 }
 

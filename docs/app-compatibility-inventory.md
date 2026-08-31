@@ -4,10 +4,13 @@ This list tracks protocol and service work needed for ordinary apps to behave li
 
 ## Portals
 
-- Screenshot and screencast: `luft-portal` captures Kestrel outputs through
-  `ext-image-copy-capture-v1`, writes PNG screenshots, and publishes monitor
-  streams as PipeWire video nodes. Screencasts support hidden and embedded
-  cursor modes without changing the visible compositor cursor.
+- Screenshot and screencast: `luft-portal` asks through the trusted shell before
+  every capture, identifies the requesting application, and lets the user pick
+  an enabled monitor. Only that output is captured through
+  `ext-image-copy-capture-v1`. Screenshots are written as PNG files and
+  screencasts become PipeWire video nodes with hidden or embedded cursors.
+  Closing a request or session cancels pending frame work, and stalled frame
+  requests time out instead of blocking the portal indefinitely.
 - Remaining portal work: remote desktop, file chooser, wallpaper, and
   background app policy should grow in `luft-portal` as Luft-owned
   implementations.

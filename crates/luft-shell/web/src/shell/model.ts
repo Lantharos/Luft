@@ -5,7 +5,8 @@ export type ShellSurface =
   | "quick-settings"
   | "date-center"
   | "notification-toast"
-  | "start-menu";
+  | "start-menu"
+  | "capture-consent";
 
 export type ShellSnapshot = {
   surface?: ShellSurface;
@@ -29,6 +30,25 @@ export type ShellSnapshot = {
   startMenuOpen: boolean;
   quickSettingsOpen: boolean;
   dateCenterOpen: boolean;
+  capturePrompt?: CapturePrompt;
+};
+
+export type CapturePrompt = {
+  id: string;
+  kind: "screenshot" | "screen-cast";
+  appId?: string;
+  appName: string;
+  appIconUri?: string;
+  outputs: CaptureOutput[];
+};
+
+export type CaptureOutput = {
+  name: string;
+  label: string;
+  width: number;
+  height: number;
+  scale: number;
+  primary: boolean;
 };
 
 export type ShellPalette = {
@@ -151,7 +171,9 @@ export type ShellAction =
   | { type: "notification-close"; notification: number }
   | { type: "notification-clear-all" }
   | { type: "notification-do-not-disturb"; enabled: boolean }
-  | { type: "notification-action"; notification: number; action: string };
+  | { type: "notification-action"; notification: number; action: string }
+  | { type: "capture-consent-allow"; request: string; output: string }
+  | { type: "capture-consent-deny"; request: string };
 
 export const emptySnapshot = (): ShellSnapshot => {
   const now = new Date();
@@ -187,5 +209,6 @@ export const emptySnapshot = (): ShellSnapshot => {
     startMenuOpen: false,
     quickSettingsOpen: false,
     dateCenterOpen: false,
+    capturePrompt: undefined,
   };
 };

@@ -8,6 +8,12 @@ drag-and-drop, input routing, session locking, idle handling, output capture,
 and frame presentation. Layer surfaces are composed in background, bottom,
 application, top, and overlay order.
 
+Screenshot and screencast requests cross an authenticated typed IPC channel.
+Kestrel owns pending consent, the shell renders the application identity and
+monitor chooser, and the portal receives an output name only after explicit
+approval. The portal's private Wayland connection remains the only client that
+can bind output-capture globals.
+
 The compositor supervises `luft-shell` and `xwayland-satellite`. Their current
 state, the active workspace, windows, and outputs are exposed through one
 versioned, framed IPC connection. Kestrel pushes revisions when state changes;

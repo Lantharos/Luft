@@ -119,20 +119,6 @@ pub fn spawn_command(command: &str, xwayland_display: Option<&str>) -> io::Resul
     child.spawn()
 }
 
-pub fn spawn_privileged_command(
-    command: &str,
-    xwayland_display: Option<&str>,
-) -> io::Result<Child> {
-    let command = normalize_launch_command(command);
-    log_app_launch(&command);
-    let mut child = command_for_launch(&command);
-    apply_app_environment(&mut child, xwayland_display);
-    if let Some(display) = env::var_os("LUFT_PRIVILEGED_WAYLAND_DISPLAY") {
-        child.env("WAYLAND_DISPLAY", display);
-    }
-    child.spawn()
-}
-
 pub(crate) fn normalize_launch_command(command: &str) -> String {
     clean_exec_forwarding_tokens(&clean_exec_placeholders(
         &percent_decode(command).unwrap_or_else(|| command.to_string()),
@@ -334,6 +320,11 @@ fn apply_app_environment(command: &mut Command, xwayland_display: Option<&str>) 
         command.env("XDG_RUNTIME_DIR", runtime_dir);
     }
     command.env_remove("WAYLAND_DISPLAY");
+    command.env_remove("WAYLAND_SOCKET");
+    command.env_remove("SABINE_WAYLAND_BROKER_FD");
+    command.env_remove("SABINE_WAYLAND_BROKER_KEY");
+    command.env_remove(luft_ipc::SHELL_CAPABILITY_ENV);
+    command.env_remove(luft_ipc::PORTAL_CAPABILITY_ENV);
     if let Some(display) = luft_wayland_display() {
         command.env("WAYLAND_DISPLAY", display);
     }

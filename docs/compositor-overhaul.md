@@ -50,10 +50,13 @@ IPC reports XWayland as unavailable.
 
 The Luft shell is supervised independently from the compositor. Shell and
 satellite crashes use bounded restart delays and are stopped when the session
-ends. The shell uses a separate privileged Wayland socket for layer-shell,
-session-lock, input-method, virtual-keyboard, and data-control capabilities;
-applications it launches receive the public socket. Sandboxed security-context
-clients cannot bind output-capture globals. Typed framed Unix-socket IPC owns
+ends. Kestrel gives the supervised shell a private inherited connection broker;
+Sabine uses it to request an independent compositor connection for each OSR and
+CEF process. The broker is not inherited by launched applications, so they
+cannot bind layer-shell, input-method, virtual-keyboard, or data-control globals.
+Session-lock clients receive private inherited connections, while applications receive only
+the public socket. Sandboxed security-context clients cannot bind
+output-capture globals. Typed framed Unix-socket IPC owns
 workspace/window policy and configuration reloads, pushes state revisions over
 one persistent connection, and bounds message and connection counts so slow or
 incomplete clients cannot block the compositor loop.

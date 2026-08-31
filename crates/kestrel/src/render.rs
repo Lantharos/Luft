@@ -161,6 +161,7 @@ pub fn output_elements<R>(
     custom_elements: impl IntoIterator<Item = CustomRenderElements<R>>,
     renderer: &mut R,
     show_window_preview: bool,
+    session_locked: bool,
     lock_surface: Option<&WlSurface>,
     wallpaper: &crate::wallpaper::Wallpaper,
     layer_motion: &crate::layer_motion::LayerMotionState,
@@ -172,13 +173,15 @@ where
     R: Renderer + ImportAll + ImportMem + crate::blur::BlurRenderer + crate::shell::RoundedRenderer,
     R::TextureId: Send + Clone + 'static,
 {
-    if let Some(surface) = lock_surface {
-        let scale = output.current_scale().fractional_scale().into();
-        let elements = SurfaceTree::from_surface(surface)
-            .render_elements::<CustomRenderElements<R>>(renderer, (0, 0).into(), scale, 1.0)
-            .into_iter()
-            .map(OutputRenderElements::Custom)
-            .collect();
+    if session_locked {
+        let elements = lock_surface.map_or_else(Vec::new, |surface| {
+            let scale = output.current_scale().fractional_scale().into();
+            SurfaceTree::from_surface(surface)
+                .render_elements::<CustomRenderElements<R>>(renderer, (0, 0).into(), scale, 1.0)
+                .into_iter()
+                .map(OutputRenderElements::Custom)
+                .collect()
+        });
         return (elements, Color32F::BLACK);
     }
 
@@ -371,6 +374,7 @@ pub fn render_output<'a, 'd, R>(
     damage_tracker: &'d mut OutputDamageTracker,
     age: usize,
     show_window_preview: bool,
+    session_locked: bool,
     lock_surface: Option<&WlSurface>,
     wallpaper: &crate::wallpaper::Wallpaper,
     layer_motion: &crate::layer_motion::LayerMotionState,
@@ -386,6 +390,7 @@ where
         custom_elements,
         renderer,
         show_window_preview,
+        session_locked,
         lock_surface,
         wallpaper,
         layer_motion,

@@ -8,7 +8,7 @@ use smithay::{
     output::{Output, WeakOutput},
     utils::{Buffer as BufferCoords, Rectangle, Size, Transform},
     wayland::{
-        image_copy_capture::{CaptureFailureReason, Frame, SessionRef},
+        image_copy_capture::{CaptureFailureReason, Frame, Session, SessionRef},
         shm::with_buffer_contents_mut,
     },
 };
@@ -45,6 +45,32 @@ pub fn take_for_output(queue: &mut Vec<PendingCapture>, output: &Output) -> Vec<
     }
     *queue = remaining;
     selected
+}
+
+pub fn stop_for_output(
+    sessions: &mut Vec<Session>,
+    pending: &mut Vec<PendingCapture>,
+    output: &Output,
+) {
+    let mut retained = Vec::with_capacity(sessions.len());
+    for session in sessions.drain(..) {
+        if session_targets_output(&session, output) {
+            session.stop();
+        } else {
+            retained.push(session);
+        }
+    }
+    *sessions = retained;
+    pending.retain(|capture| !session_targets_output(&capture.session, output));
+}
+
+fn session_targets_output(session: &SessionRef, output: &Output) -> bool {
+    session
+        .source()
+        .user_data()
+        .get::<WeakOutput>()
+        .and_then(WeakOutput::upgrade)
+        .is_some_and(|source| source == *output)
 }
 
 pub fn copy_framebuffer<R>(

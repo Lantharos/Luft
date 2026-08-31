@@ -12,6 +12,7 @@ pub(super) fn close_animation_duration(kind: WebShellSurface) -> Option<Duration
             Some(Duration::from_millis(170))
         }
         WebShellSurface::SessionMenu => Some(Duration::from_millis(140)),
+        WebShellSurface::CaptureConsent => Some(Duration::from_millis(150)),
         WebShellSurface::Panel => None,
     }
 }
@@ -26,6 +27,7 @@ pub(super) fn open_animation_duration(kind: WebShellSurface) -> Option<Duration>
             Some(Duration::from_millis(190))
         }
         WebShellSurface::SessionMenu => Some(Duration::from_millis(150)),
+        WebShellSurface::CaptureConsent => Some(Duration::from_millis(180)),
         WebShellSurface::Panel => None,
     }
 }
@@ -49,6 +51,7 @@ pub(super) fn hidden_process_ttl(kind: WebShellSurface) -> Option<Duration> {
         | WebShellSurface::PanelMenu
         | WebShellSurface::SessionMenu
         | WebShellSurface::NotificationToast
+        | WebShellSurface::CaptureConsent
         | WebShellSurface::Panel => None,
     }
 }
@@ -88,6 +91,7 @@ pub(super) fn shell_blur_region(kind: WebShellSurface, _width: i32, _height: i32
         WebShellSurface::NotificationToast => WindowRegion::adaptive_rounded_rect(22),
         WebShellSurface::StartMenu => WindowRegion::adaptive_rounded_rect(24),
         WebShellSurface::PanelMenu => WindowRegion::adaptive_rounded_rect(18),
+        WebShellSurface::CaptureConsent => WindowRegion::adaptive_rounded_rect(28),
         _ => WindowRegion::adaptive_full(),
     }
 }

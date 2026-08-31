@@ -23,6 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if sabine::dispatch_host_mode_from_args(&raw_args) {
         return Ok(());
     }
+    sabine::adopt_inherited_wayland_broker()?;
 
     init_logging();
 

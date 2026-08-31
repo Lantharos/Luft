@@ -1,14 +1,10 @@
 use super::model::WebShellSurface;
-use super::surface_sizing::{SESSION_MENU_RIGHT_MARGIN, SESSION_MENU_TOP_OFFSET};
+use super::surface_sizing::{PANEL_HEIGHT, SESSION_MENU_RIGHT_MARGIN, SESSION_MENU_TOP_OFFSET};
 use sabine::{
     ShellSurfaceAnchor, ShellSurfaceKeyboardInteractivity, ShellSurfaceLayer, ShellSurfaceMargin,
     ShellSurfaceOptions,
 };
-use std::env;
-
-pub(crate) const PANEL_WIDTH_HINT: i32 = 1;
-const PANEL_BAR_HEIGHT: i32 = 48;
-pub(crate) const PANEL_HEIGHT: i32 = PANEL_BAR_HEIGHT;
+const PANEL_BAR_HEIGHT: i32 = PANEL_HEIGHT;
 const PANEL_MENU_EDGE_MARGIN: i32 = 6;
 const PANEL_MENU_GAP: i32 = 6;
 const PANEL_POPOVER_GAP: i32 = 8;
@@ -24,6 +20,7 @@ impl WebShellSurface {
             Self::DateCenter => "date-center",
             Self::NotificationToast => "notification-toast",
             Self::StartMenu => "start-menu",
+            Self::CaptureConsent => "capture-consent",
         }
     }
 }
@@ -38,12 +35,9 @@ impl WebShellSurface {
             Self::DateCenter => "luft-date-center",
             Self::NotificationToast => "luft-notifications",
             Self::StartMenu => "luft-start-menu",
+            Self::CaptureConsent => "luft-capture-consent",
         }
     }
-}
-
-pub(crate) fn panel_size() -> (i32, i32) {
-    (PANEL_WIDTH_HINT, PANEL_HEIGHT)
 }
 
 pub(crate) fn shell_surface(
@@ -65,27 +59,13 @@ pub(crate) fn shell_surface(
     shell_surface
 }
 
-fn shell_size(kind: WebShellSurface, size: (i32, i32)) -> (u32, u32) {
-    match kind {
-        WebShellSurface::Panel => (
-            panel_output_width().max(1) as u32,
-            panel_size().1.max(1) as u32,
-        ),
-        _ => (size.0.max(1) as u32, size.1.max(1) as u32),
-    }
-}
-
-pub(crate) fn panel_output_width() -> i32 {
-    env::var("LUFT_OUTPUT_WIDTH")
-        .ok()
-        .and_then(|value| value.parse::<i32>().ok())
-        .filter(|width| *width > 0)
-        .unwrap_or(1920)
+fn shell_size(_kind: WebShellSurface, size: (i32, i32)) -> (u32, u32) {
+    (size.0.max(1) as u32, size.1.max(1) as u32)
 }
 
 fn layer(kind: WebShellSurface) -> ShellSurfaceLayer {
     match kind {
-        WebShellSurface::Panel => ShellSurfaceLayer::Overlay,
+        WebShellSurface::Panel | WebShellSurface::CaptureConsent => ShellSurfaceLayer::Overlay,
         _ => ShellSurfaceLayer::Top,
     }
 }
@@ -106,6 +86,7 @@ fn anchor(kind: WebShellSurface, panel_menu_x: Option<i32>) -> ShellSurfaceAncho
             ShellSurfaceAnchor::BOTTOM | ShellSurfaceAnchor::RIGHT
         }
         WebShellSurface::StartMenu => ShellSurfaceAnchor::BOTTOM,
+        WebShellSurface::CaptureConsent => ShellSurfaceAnchor::default(),
     }
 }
 
@@ -160,9 +141,10 @@ fn panel_menu_left_margin(width: i32, x: Option<i32>) -> i32 {
 
 fn exclusive_zone(kind: WebShellSurface) -> Option<i32> {
     match kind {
-        WebShellSurface::Panel | WebShellSurface::StartMenu | WebShellSurface::PanelMenu => {
-            Some(LAYER_SURFACE_ZONE_IGNORE)
-        }
+        WebShellSurface::Panel
+        | WebShellSurface::StartMenu
+        | WebShellSurface::PanelMenu
+        | WebShellSurface::CaptureConsent => Some(LAYER_SURFACE_ZONE_IGNORE),
         WebShellSurface::SessionMenu => Some(LAYER_SURFACE_ZONE_IGNORE),
         _ => None,
     }
@@ -174,6 +156,7 @@ fn keyboard_interactivity(kind: WebShellSurface) -> ShellSurfaceKeyboardInteract
             ShellSurfaceKeyboardInteractivity::None
         }
         WebShellSurface::StartMenu => ShellSurfaceKeyboardInteractivity::OnDemand,
+        WebShellSurface::CaptureConsent => ShellSurfaceKeyboardInteractivity::Exclusive,
         WebShellSurface::PanelMenu
         | WebShellSurface::SessionMenu
         | WebShellSurface::QuickSettings

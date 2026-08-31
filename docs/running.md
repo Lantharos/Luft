@@ -49,7 +49,7 @@ files using the same path overrides with `./install.sh --uninstall`.
 
 After that, pick Luft from the display manager's session menu.
 
-When run manually without an explicit backend, `luft-session` defaults to nested inside an existing Wayland session and to the session backend outside one. When `dbus-run-session` is available, the session runs Kestrel under a private D-Bus session so shell services and launched apps do not attach to the host desktop session while testing nested. Once Kestrel creates its public Wayland socket, it publishes that display to D-Bus and user-service activation so the portal and other activated services connect to the Luft session.
+When run manually without an explicit backend, `luft-session` defaults to nested inside an existing Wayland session and to the session backend outside one. When `dbus-run-session` is available, the session runs Kestrel under a private D-Bus session so shell services and launched apps do not attach to the host desktop session while testing nested. Once Kestrel creates its public Wayland socket, it publishes that display to D-Bus and user-service activation. Kestrel supervises the Luft portal itself and gives it a private capture-capable Wayland connection; it is not independently D-Bus activated.
 
 ```sh
 cargo run -p luft-session -- --nested --socket luft-dev

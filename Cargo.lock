@@ -1121,7 +1121,7 @@ dependencies = [
 [[package]]
 name = "exwlshellev"
 version = "0.20.0"
-source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=5c56310b589190188bc2e6e5b3b72d6a222b7501#5c56310b589190188bc2e6e5b3b72d6a222b7501"
+source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=fdff48c7a525f00e2229fef9734030d9cb3d24cb#fdff48c7a525f00e2229fef9734030d9cb3d24cb"
 dependencies = [
  "calloop",
  "calloop-wayland-source",
@@ -2408,6 +2408,7 @@ dependencies = [
  "async-trait",
  "enumflags2",
  "image",
+ "luft-ipc",
  "memmap2",
  "pipewire",
  "rustix 1.1.4",
@@ -3510,7 +3511,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "ashpd",
  "bytemuck",
@@ -3525,6 +3526,7 @@ dependencies = [
  "libc",
  "pollster",
  "raw-window-handle",
+ "rustix 1.1.4",
  "sabine-bridge",
  "sabine-host",
  "sabine-platform",
@@ -3548,7 +3550,7 @@ dependencies = [
 [[package]]
 name = "sabine-bridge"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "serde",
  "serde_json",
@@ -3557,7 +3559,7 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "sabine-bridge",
  "serde",
@@ -3568,7 +3570,7 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
@@ -3580,7 +3582,7 @@ dependencies = [
 [[package]]
 name = "sabine-runtime"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "libc",
  "serde",
@@ -3594,7 +3596,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=31266ed12e9beab0e7a1ef9ef26483eddc74331b#31266ed12e9beab0e7a1ef9ef26483eddc74331b"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=b6709e083e2f48d864a013bd45458cf49a12876b#b6709e083e2f48d864a013bd45458cf49a12876b"
 dependencies = [
  "base64",
  "clap",
@@ -4182,7 +4184,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.4",
  "windows-sys 0.61.2",
@@ -4799,7 +4801,7 @@ dependencies = [
 [[package]]
 name = "waycrate_xkbkeycode"
 version = "0.20.0"
-source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=5c56310b589190188bc2e6e5b3b72d6a222b7501#5c56310b589190188bc2e6e5b3b72d6a222b7501"
+source = "git+https://github.com/Lantharos/exwlshelleventloop.git?rev=fdff48c7a525f00e2229fef9734030d9cb3d24cb#fdff48c7a525f00e2229fef9734030d9cb3d24cb"
 dependencies = [
  "calloop",
  "log",
@@ -5211,7 +5213,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

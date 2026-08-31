@@ -1,22 +1,35 @@
 use std::{
     env, io,
+    os::{fd::AsRawFd, unix::net::UnixStream},
     path::{Path, PathBuf},
     process::{Child, Command},
     time::{Duration, Instant},
 };
 
-use luft_ipc::{SOCKET_ENV, ShellStatus};
+use luft_ipc::{SHELL_CAPABILITY_ENV, SOCKET_ENV, ShellStatus};
 use tracing::{info, warn};
+
+use crate::wayland_broker::{BROKER_FD_ENV, BROKER_KEY_ENV};
 
 const STABLE_PROCESS_WINDOW: Duration = Duration::from_secs(30);
 
-#[derive(Debug)]
+pub struct ShellProcessConfig {
+    pub enabled: bool,
+    pub app_wayland_socket: String,
+    pub ipc_socket: PathBuf,
+    pub ipc_capability: String,
+    pub xwayland_display: Option<String>,
+    pub skip_startup_apps: bool,
+}
+
 pub struct ShellProcess {
+    broker: UnixStream,
+    broker_key: String,
     child: Option<Child>,
     enabled: bool,
-    wayland_socket: String,
     app_wayland_socket: String,
     ipc_socket: PathBuf,
+    ipc_capability: String,
     xwayland_display: Option<String>,
     skip_startup_apps: bool,
     restart_at: Instant,
@@ -24,23 +37,35 @@ pub struct ShellProcess {
     failures: u32,
 }
 
+impl std::fmt::Debug for ShellProcess {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("ShellProcess")
+            .field("pid", &self.child.as_ref().map(Child::id))
+            .field("enabled", &self.enabled)
+            .field("app_wayland_socket", &self.app_wayland_socket)
+            .field("ipc_socket", &self.ipc_socket)
+            .field("xwayland_display", &self.xwayland_display)
+            .field("skip_startup_apps", &self.skip_startup_apps)
+            .field("restart_at", &self.restart_at)
+            .field("started_at", &self.started_at)
+            .field("failures", &self.failures)
+            .finish_non_exhaustive()
+    }
+}
+
 impl ShellProcess {
-    pub fn new(
-        enabled: bool,
-        wayland_socket: String,
-        app_wayland_socket: String,
-        ipc_socket: PathBuf,
-        xwayland_display: Option<String>,
-        skip_startup_apps: bool,
-    ) -> Self {
+    pub fn new(broker: UnixStream, broker_key: String, config: ShellProcessConfig) -> Self {
         let mut process = Self {
+            broker,
+            broker_key,
             child: None,
-            enabled,
-            wayland_socket,
-            app_wayland_socket,
-            ipc_socket,
-            xwayland_display,
-            skip_startup_apps,
+            enabled: config.enabled,
+            app_wayland_socket: config.app_wayland_socket,
+            ipc_socket: config.ipc_socket,
+            ipc_capability: config.ipc_capability,
+            xwayland_display: config.xwayland_display,
+            skip_startup_apps: config.skip_startup_apps,
             restart_at: Instant::now(),
             started_at: None,
             failures: 0,
@@ -68,9 +93,13 @@ impl ShellProcess {
                     return;
                 }
                 Ok(Some(status)) => warn!(?status, "Luft shell exited"),
-                Err(error) => warn!(%error, "failed to inspect Luft shell process"),
+                Err(error) => {
+                    warn!(%error, "failed to inspect Luft shell process");
+                    return;
+                }
             }
-            self.child = None;
+            let mut child = self.child.take().expect("shell child exists");
+            let _ = child.wait();
             self.started_at = None;
             self.failures = self.failures.saturating_add(1);
             let delay = 1_u64.checked_shl(self.failures.min(4)).unwrap_or(16);
@@ -123,13 +152,19 @@ impl ShellProcess {
         }
     }
 
-    fn spawn(&self) -> io::Result<Child> {
+    fn spawn(&mut self) -> io::Result<Child> {
+        let broker = rustix::io::fcntl_dupfd_cloexec(&self.broker, 0)?;
+        let flags = rustix::io::fcntl_getfd(&broker)?;
+        rustix::io::fcntl_setfd(&broker, flags & !rustix::io::FdFlags::CLOEXEC)?;
         let mut command = Command::new(resolve_shell_binary());
         command
-            .env("WAYLAND_DISPLAY", &self.wayland_socket)
-            .env("LUFT_PRIVILEGED_WAYLAND_DISPLAY", &self.wayland_socket)
+            .env_remove("WAYLAND_SOCKET")
+            .env("WAYLAND_DISPLAY", &self.app_wayland_socket)
             .env("LUFT_WAYLAND_DISPLAY", &self.app_wayland_socket)
-            .env(SOCKET_ENV, &self.ipc_socket);
+            .env(SOCKET_ENV, &self.ipc_socket)
+            .env(SHELL_CAPABILITY_ENV, &self.ipc_capability)
+            .env(BROKER_FD_ENV, broker.as_raw_fd().to_string())
+            .env(BROKER_KEY_ENV, &self.broker_key);
         if self.skip_startup_apps {
             command.env("LUFT_SKIP_STARTUP_APPS", "1");
         }

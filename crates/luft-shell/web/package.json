@@ -20,7 +20,7 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
-    "@lantharos/sabine": "github:Lantharos/Sabine#31266ed12e9beab0e7a1ef9ef26483eddc74331b",
+    "@lantharos/sabine": "github:Lantharos/Sabine#b6709e083e2f48d864a013bd45458cf49a12876b",
     "lucide": "^1.37.0"
   }
 }

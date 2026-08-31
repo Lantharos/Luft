@@ -1,8 +1,8 @@
 use super::{
     icons::{icon_data_uri, window_icon_uri},
     model::{
-        WebApplication, WebPanelApp, WebShellSnapshot, WebTrayItem, WebTrayStatus, WebWindow,
-        WebWorkspace,
+        WebApplication, WebCaptureOutput, WebCapturePrompt, WebPanelApp, WebShellSnapshot,
+        WebTrayItem, WebTrayStatus, WebWindow, WebWorkspace,
     },
     palette::WebPalette,
 };
@@ -22,6 +22,7 @@ use std::{
 use time::{OffsetDateTime, macros::format_description};
 
 const DATE_CENTER_FALLBACK_OUTPUT_HEIGHT: i32 = 640;
+const PANEL_FALLBACK_OUTPUT_WIDTH: i32 = 1920;
 
 pub struct WebShellSnapshotInput<'a> {
     pub model: &'a ShellModel,
@@ -91,6 +92,7 @@ impl WebShellSnapshot {
 
         Self {
             surface: None,
+            output_width: primary_output_width(model),
             output_height: primary_output_height(model),
             time: now
                 .format(format_description!("[hour]:[minute]"))
@@ -167,7 +169,81 @@ impl WebShellSnapshot {
             start_menu_open,
             quick_settings_open,
             date_center_open,
+            capture_prompt: capture_prompt(model, applications),
         }
+    }
+}
+
+fn capture_prompt(model: &ShellModel, applications: &[AppEntry]) -> Option<WebCapturePrompt> {
+    let prompt = model.capture_prompts.first()?;
+    let application = prompt.app_id.as_deref().and_then(|app_id| {
+        let app_id = app_id.trim_end_matches(".desktop");
+        applications.iter().find(|application| {
+            application
+                .desktop_id
+                .as_deref()
+                .is_some_and(|candidate| candidate.eq_ignore_ascii_case(app_id))
+                || application
+                    .startup_wm_class
+                    .as_deref()
+                    .is_some_and(|candidate| candidate.eq_ignore_ascii_case(app_id))
+        })
+    });
+    let app_name = application.map_or_else(
+        || requester_name(prompt.app_id.as_deref()),
+        |application| application.name.clone(),
+    );
+    let app_icon_uri = application
+        .and_then(|application| application.icon_path.as_deref())
+        .and_then(icon_data_uri);
+    Some(WebCapturePrompt {
+        id: prompt.id.0.to_string(),
+        kind: prompt.kind,
+        app_id: prompt.app_id.clone(),
+        app_name,
+        app_icon_uri,
+        outputs: prompt
+            .outputs
+            .iter()
+            .map(|output| WebCaptureOutput {
+                name: output.name.clone(),
+                label: output_label(output),
+                width: output.width,
+                height: output.height,
+                scale: output.scale,
+                primary: output.primary,
+            })
+            .collect(),
+    })
+}
+
+fn requester_name(app_id: Option<&str>) -> String {
+    let Some(app_id) = app_id.map(str::trim).filter(|value| !value.is_empty()) else {
+        return "An application".to_string();
+    };
+    let name = app_id
+        .trim_end_matches(".desktop")
+        .rsplit(['.', '/'])
+        .next()
+        .unwrap_or(app_id)
+        .replace(['-', '_'], " ");
+    let mut chars = name.chars();
+    match chars.next() {
+        Some(first) => first.to_uppercase().chain(chars).collect(),
+        None => "An application".to_string(),
+    }
+}
+
+fn output_label(output: &luft_ipc::OutputSummary) -> String {
+    let hardware = [output.make.trim(), output.model.trim()]
+        .into_iter()
+        .filter(|part| !part.is_empty() && !part.eq_ignore_ascii_case("unknown"))
+        .collect::<Vec<_>>()
+        .join(" ");
+    if hardware.is_empty() {
+        output.name.clone()
+    } else {
+        hardware
     }
 }
 
@@ -179,6 +255,16 @@ fn primary_output_height(model: &ShellModel) -> i32 {
         .or_else(|| model.outputs.iter().find(|output| output.enabled))
         .map(|output| output.logical_height.max(1))
         .unwrap_or(DATE_CENTER_FALLBACK_OUTPUT_HEIGHT)
+}
+
+fn primary_output_width(model: &ShellModel) -> i32 {
+    model
+        .outputs
+        .iter()
+        .find(|output| output.enabled && output.primary)
+        .or_else(|| model.outputs.iter().find(|output| output.enabled))
+        .map(|output| output.logical_width.max(1))
+        .unwrap_or(PANEL_FALLBACK_OUTPUT_WIDTH)
 }
 
 fn append_running_window_app(

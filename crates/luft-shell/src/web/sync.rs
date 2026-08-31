@@ -37,6 +37,11 @@ impl WebShell {
                     luft_ipc::ShellCommand::Suspend => {
                         self.run_session_command(super::actions::SessionCommand::Suspend)
                     }
+                    luft_ipc::ShellCommand::ToggleStartMenu => self.toggle_start_menu(),
+                    luft_ipc::ShellCommand::OpenLauncher => self.open_launcher(),
+                    luft_ipc::ShellCommand::LaunchDefaultApp { app } => {
+                        self.launch_default_app(app)
+                    }
                 },
                 luft_ipc::ServerMessage::Response { .. } => {}
             }
@@ -143,6 +148,8 @@ impl WebShell {
         }
         self.surfaces
             .set_notification_toast_visible(notification_toast_visible);
+        self.surfaces
+            .set_capture_consent_visible(snapshot.capture_prompt.is_some());
     }
 
     fn notification_toast_visible(&self) -> bool {

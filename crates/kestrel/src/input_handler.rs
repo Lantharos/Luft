@@ -1,16 +1,25 @@
-use std::{convert::TryInto, process::Command, sync::atomic::Ordering, time::Instant};
+use std::{convert::TryInto, time::Instant};
 
-use crate::{KestrelState, focus::PointerFocusTarget, shell::FullscreenSurface};
+use crate::{
+    KestrelState,
+    focus::{KeyboardFocusTarget, PointerFocusTarget},
+    shell::FullscreenSurface,
+};
+use luft_ipc::{DefaultAppKind, ShellCommand, WorkspaceId};
 
 #[cfg(feature = "session-backend")]
 use crate::udev::UdevData;
 #[cfg(feature = "session-backend")]
-use smithay::{backend::renderer::DebugFlags, input::tablet};
+use smithay::input::tablet;
 
 use smithay::{
-    backend::input::{
-        self, Axis, AxisSource, Device, DeviceCapability, Event, InputBackend, InputEvent,
-        InputTime, KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent, TouchEvent,
+    backend::{
+        input::{
+            self, Axis, AxisSource, Device, DeviceCapability, Event, InputBackend, InputEvent,
+            InputTime, KeyState, KeyboardKeyEvent, PointerAxisEvent, PointerButtonEvent,
+            TouchEvent,
+        },
+        renderer::utils::RendererSurfaceStateUserData,
     },
     desktop::{LayerMap, LayerSurface, WindowSurfaceType, layer_map_for_output},
     input::{
@@ -19,15 +28,12 @@ use smithay::{
         tablet::{TabletDescriptor, TabletSeatTrait},
         touch::{DownEvent, UpEvent},
     },
-    output::Scale,
-    reexports::{
-        wayland_protocols::xdg::decoration::zv1::server::zxdg_toplevel_decoration_v1,
-        wayland_server::protocol::wl_pointer,
-    },
-    utils::{Logical, Point, SERIAL_COUNTER as SCOUNTER, Serial, Transform},
+    reexports::wayland_server::protocol::wl_pointer,
+    utils::{Logical, Point, Rectangle, SERIAL_COUNTER as SCOUNTER, Serial},
     wayland::{
+        compositor::{SurfaceAttributes, with_states},
         input_method::InputMethodSeat,
-        keyboard_shortcuts_inhibit::KeyboardShortcutsInhibitorSeat,
+        pointer_constraints::{PointerConstraint, with_pointer_constraint},
         shell::wlr_layer::{KeyboardInteractivity, Layer as WlrLayer},
     },
 };
@@ -36,7 +42,10 @@ use smithay::backend::input::AbsolutePositionEvent;
 
 #[cfg(feature = "nested")]
 use smithay::output::Output;
-use tracing::{debug, error, info};
+use tracing::{debug, warn};
+
+#[cfg(feature = "session-backend")]
+use tracing::{error, info};
 
 use crate::state::Backend;
 #[cfg(feature = "session-backend")]
@@ -56,10 +65,6 @@ use smithay::{
         GestureSwipeUpdateEvent, RelativeMotionEvent,
     },
     reexports::wayland_server::DisplayHandle,
-    wayland::{
-        pointer_constraints::{PointerConstraint, with_pointer_constraint},
-        seat::WaylandFocus,
-    },
 };
 
 impl<BackendData: Backend> KestrelState<BackendData> {
@@ -68,9 +73,130 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         contents: Option<(PointerFocusTarget, Point<f64, Logical>)>,
         event: &MotionEvent,
     ) {
-        self.pointer_contents.clone_from(&contents);
         let pointer = self.pointer.clone();
-        pointer.motion(self, contents, event);
+        pointer.motion(self, contents.clone(), event);
+        self.pointer_contents.clone_from(&contents);
+        if !self.session_lock.is_active()
+            && let Some((PointerFocusTarget::WlSurface(surface), surface_location)) = contents
+        {
+            with_pointer_constraint(&surface, &pointer, |constraint| {
+                if let Some(constraint) = constraint
+                    && !constraint.is_active()
+                    && constraint.region().is_none_or(|region| {
+                        region.contains((event.location - surface_location).to_i32_floor())
+                    })
+                {
+                    constraint.activate();
+                }
+            });
+        }
+    }
+
+    fn constrained_pointer_location(&self, requested: Point<f64, Logical>) -> Point<f64, Logical> {
+        if self.session_lock.is_active() {
+            return requested;
+        }
+        let current = self.pointer.current_location();
+        let Some((PointerFocusTarget::WlSurface(surface), surface_location)) =
+            self.pointer_contents.as_ref()
+        else {
+            return requested;
+        };
+        let pointer = self.pointer.clone();
+        let Some((locked, region)) = with_pointer_constraint(surface, &pointer, |constraint| {
+            let constraint = constraint.filter(|constraint| constraint.is_active())?;
+            let current_local = (current - *surface_location).to_i32_floor();
+            if !constraint
+                .region()
+                .is_none_or(|region| region.contains(current_local))
+            {
+                return None;
+            }
+            Some((
+                matches!(*constraint, PointerConstraint::Locked(_)),
+                constraint.region().cloned(),
+            ))
+        }) else {
+            return requested;
+        };
+        if locked {
+            return current;
+        }
+
+        let remains_on_surface = |location: Point<f64, Logical>| {
+            let local = location - *surface_location;
+            let in_region = region
+                .as_ref()
+                .is_none_or(|region| region.contains(local.to_i32_floor()));
+            in_region && surface_contains_point(surface, local)
+        };
+
+        let mut location = current;
+        let horizontal = Point::from((requested.x, current.y));
+        if remains_on_surface(horizontal) {
+            location.x = requested.x;
+        }
+        let vertical = Point::from((location.x, requested.y));
+        if remains_on_surface(vertical) {
+            location.y = requested.y;
+        }
+        location
+    }
+
+    fn pointer_focus_at(
+        &self,
+        location: Point<f64, Logical>,
+    ) -> Option<(PointerFocusTarget, Point<f64, Logical>)> {
+        if self.session_lock.is_active() {
+            return self.surface_under(location);
+        }
+        if let Some((PointerFocusTarget::WlSurface(surface), _)) = &self.pointer_contents
+            && with_pointer_constraint(surface, &self.pointer, |constraint| {
+                constraint.is_some_and(|constraint| constraint.is_active())
+            })
+        {
+            return self.pointer_contents.clone();
+        }
+        self.surface_under(location)
+    }
+
+    fn pointer_constraint_is_locked(&self) -> bool {
+        if self.session_lock.is_active() {
+            return false;
+        }
+        let Some((PointerFocusTarget::WlSurface(surface), _)) = &self.pointer_contents else {
+            return false;
+        };
+        with_pointer_constraint(surface, &self.pointer, |constraint| {
+            constraint.is_some_and(|constraint| {
+                constraint.is_active() && matches!(*constraint, PointerConstraint::Locked(_))
+            })
+        })
+    }
+
+    pub(crate) fn release_pointer_focus_for_session_lock(&mut self) {
+        self.cursor_position_hint = None;
+        if let Some((PointerFocusTarget::WlSurface(surface), _)) = &self.pointer_contents {
+            with_pointer_constraint(surface, &self.pointer, |constraint| {
+                if let Some(constraint) = constraint {
+                    constraint.deactivate();
+                }
+            });
+        }
+        let location = self.pointer.current_location();
+        self.pointer_motion(
+            None,
+            &MotionEvent {
+                location,
+                serial: SCOUNTER.next_serial(),
+                time: InputTime::now(),
+            },
+        );
+        self.pointer_frame();
+    }
+
+    pub(crate) fn refresh_pointer_focus_now(&mut self) {
+        self.refresh_pointer_contents_at(SCOUNTER.next_serial(), InputTime::now());
     }
 
     fn pointer_frame(&mut self) {
@@ -80,7 +206,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     fn refresh_pointer_contents_at(&mut self, serial: Serial, time: InputTime) -> bool {
         let location = self.pointer.current_location();
-        let contents = self.surface_under(location);
+        let contents = self.pointer_focus_at(location);
         if self.pointer_contents == contents {
             return false;
         }
@@ -97,69 +223,42 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         true
     }
 
-    // Allow in this method because of existing usage
-    #[allow(clippy::uninlined_format_args)]
     fn process_common_key_action(&mut self, action: KeyAction) {
         match action {
             KeyAction::None => (),
-
-            KeyAction::Quit => {
-                info!("Quitting.");
-                self.running.store(false, Ordering::SeqCst);
-            }
-
-            KeyAction::Run(cmd) => {
-                info!(cmd, "Starting program");
-
-                if let Err(e) = Command::new(&cmd)
-                    .envs(
-                        self.socket_name
-                            .clone()
-                            .map(|v| ("WAYLAND_DISPLAY", v))
-                            .into_iter()
-                            .chain(None),
-                    )
-                    .spawn()
-                {
-                    error!(cmd, err = %e, "Failed to start program");
+            KeyAction::SwitchWorkspace(workspace) => {
+                if let Err(error) = self.switch_workspace(workspace) {
+                    debug!(%error, "workspace shortcut was not applied");
                 }
             }
-
-            KeyAction::TogglePreview => {
-                self.show_window_preview = !self.show_window_preview;
-            }
-
-            KeyAction::ToggleDecorations => {
-                for element in self.space.elements() {
-                    #[allow(irrefutable_let_patterns)]
-                    if let Some(toplevel) = element.0.toplevel() {
-                        let mode_changed = toplevel.with_pending_state(|state| {
-                            if let Some(current_mode) = state.decoration_mode {
-                                let new_mode = if current_mode
-                                    == zxdg_toplevel_decoration_v1::Mode::ClientSide
-                                {
-                                    zxdg_toplevel_decoration_v1::Mode::ServerSide
-                                } else {
-                                    zxdg_toplevel_decoration_v1::Mode::ClientSide
-                                };
-                                state.decoration_mode = Some(new_mode);
-                                true
-                            } else {
-                                false
-                            }
-                        });
-
-                        if mode_changed && toplevel.is_initial_configure_sent() {
-                            toplevel.send_pending_configure();
-                        }
-                    }
+            KeyAction::SwitchRelativeWorkspace(offset) => {
+                if let Err(error) = self.switch_relative_workspace(offset) {
+                    debug!(%error, "relative workspace shortcut was not applied");
                 }
             }
-
-            _ => unreachable!(
-                "Common key action handler encountered backend specific action {:?}",
-                action
-            ),
+            KeyAction::MoveWindowToWorkspace(workspace) => {
+                if let Err(error) = self.move_active_window_to_workspace(workspace) {
+                    debug!(%error, "move-to-workspace shortcut was not applied");
+                }
+            }
+            KeyAction::CycleWindows { reverse } => {
+                if let Err(error) = self.cycle_active_window(reverse) {
+                    debug!(%error, "window-cycle shortcut was not applied");
+                }
+            }
+            KeyAction::CloseActiveWindow => {
+                if let Err(error) = self.close_active_window() {
+                    debug!(%error, "close-window shortcut was not applied");
+                }
+            }
+            KeyAction::RestartShell => self.shell_process.restart(),
+            KeyAction::Shell(command) => self.ipc_socket.send_shell_command(command),
+            KeyAction::VtSwitch(vt) => {
+                warn!(
+                    vt,
+                    "VT switch shortcut is unavailable on the nested backend"
+                )
+            }
         }
     }
 
@@ -173,6 +272,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let keyboard = self.seat.get_keyboard().unwrap();
 
         if self.session_lock.is_active() {
+            let focus = self
+                .space
+                .output_under(self.pointer.current_location())
+                .next()
+                .or_else(|| self.space.outputs().next())
+                .and_then(|output| self.session_lock.surface_for_output(output))
+                .map(|surface| KeyboardFocusTarget::Surface(surface.wl_surface().clone()));
+            keyboard.set_focus(self, focus, serial);
             keyboard.input::<(), _>(self, keycode, state, serial, time, |_, _, _| {
                 FilterResult::Forward
             });
@@ -199,15 +306,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             }
         }
 
-        let inhibited = self
-            .space
-            .element_under(self.pointer.current_location())
-            .and_then(|(window, _)| {
-                let surface = window.wl_surface()?;
-                self.seat.keyboard_shortcuts_inhibitor_for_surface(&surface)
-            })
-            .map(|inhibitor| inhibitor.is_active())
-            .unwrap_or(false);
+        let inhibited = self.active_shortcuts_inhibitor.is_some();
+        let mut logo_tap_candidate = self.logo_tap_candidate;
 
         let action = keyboard
             .input(
@@ -217,41 +317,66 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 serial,
                 time,
                 |_, modifiers, handle| {
-                    let keysym = handle.modified_sym();
+                    let modified_keysym = handle.modified_sym();
+                    let keysym = handle
+                        .raw_latin_sym_or_raw_current_sym()
+                        .unwrap_or(modified_keysym);
 
                     debug!(
                         ?state,
                         mods = ?modifiers,
-                        keysym = ::xkbcommon::xkb::keysym_get_name(keysym),
+                        keysym = ::xkbcommon::xkb::keysym_get_name(modified_keysym),
                         "keysym"
                     );
 
-                    // If the key is pressed and triggered a action
-                    // we will not forward the key to the client.
-                    // Additionally add the key to the suppressed keys
-                    // so that we can decide on a release if the key
-                    // should be forwarded to the client or not.
-                    if let KeyState::Pressed = state {
-                        if !inhibited {
-                            let action = process_keyboard_shortcut(*modifiers, keysym);
-
-                            if action.is_some() {
-                                suppressed_keys.push(keysym);
-                            }
-
-                            action
-                                .map(FilterResult::Intercept)
-                                .unwrap_or(FilterResult::Forward)
-                        } else {
+                    match state {
+                        KeyState::Pressed if inhibited => {
+                            logo_tap_candidate = false;
                             FilterResult::Forward
                         }
-                    } else {
-                        let suppressed = suppressed_keys.contains(&keysym);
-                        if suppressed {
-                            suppressed_keys.retain(|k| *k != keysym);
+                        KeyState::Pressed
+                            if is_logo_key(keysym)
+                                && !modifiers.ctrl
+                                && !modifiers.alt
+                                && !modifiers.shift =>
+                        {
+                            logo_tap_candidate = true;
+                            if !suppressed_keys.contains(&keysym) {
+                                suppressed_keys.push(keysym);
+                            }
                             FilterResult::Intercept(KeyAction::None)
-                        } else {
-                            FilterResult::Forward
+                        }
+                        KeyState::Pressed => {
+                            logo_tap_candidate = false;
+                            if let Some(action) = process_keyboard_shortcut(*modifiers, keysym) {
+                                if !suppressed_keys.contains(&keysym) {
+                                    suppressed_keys.push(keysym);
+                                }
+                                FilterResult::Intercept(action)
+                            } else {
+                                FilterResult::Forward
+                            }
+                        }
+                        KeyState::Released => {
+                            let suppressed = suppressed_keys.contains(&keysym);
+                            suppressed_keys.retain(|k| *k != keysym);
+                            if is_logo_key(keysym) {
+                                let toggle_start_menu = logo_tap_candidate && suppressed;
+                                logo_tap_candidate = false;
+                                if toggle_start_menu {
+                                    FilterResult::Intercept(KeyAction::Shell(
+                                        ShellCommand::ToggleStartMenu,
+                                    ))
+                                } else if suppressed {
+                                    FilterResult::Intercept(KeyAction::None)
+                                } else {
+                                    FilterResult::Forward
+                                }
+                            } else if suppressed {
+                                FilterResult::Intercept(KeyAction::None)
+                            } else {
+                                FilterResult::Forward
+                            }
                         }
                     }
                 },
@@ -259,6 +384,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .unwrap_or(KeyAction::None);
 
         self.suppressed_keys = suppressed_keys;
+        self.logo_tap_candidate = logo_tap_candidate;
         action
     }
 
@@ -288,6 +414,16 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     fn update_keyboard_focus(&mut self, location: Point<f64, Logical>, serial: Serial) {
         let keyboard = self.seat.get_keyboard().unwrap();
+        if self.session_lock.is_active() {
+            let focus = self
+                .space
+                .output_under(location)
+                .next()
+                .and_then(|output| self.session_lock.surface_for_output(output))
+                .map(|surface| KeyboardFocusTarget::Surface(surface.wl_surface().clone()));
+            keyboard.set_focus(self, focus, serial);
+            return;
+        }
         let touch = self.seat.get_touch();
         let input_method = self.seat.input_method();
         // change the keyboard focus unless the pointer or keyboard is grabbed
@@ -393,7 +529,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     ) -> Option<(PointerFocusTarget, Point<f64, Logical>)> {
         let output = self.space.outputs().find(|o| {
             let geometry = self.space.output_geometry(o).unwrap();
-            geometry.contains(pos.to_i32_round())
+            geometry.to_f64().contains(pos)
         })?;
         let output_geo = self.space.output_geometry(output).unwrap();
 
@@ -484,6 +620,34 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .unwrap_or_else(|| evt.amount_v120(input::Axis::Vertical).unwrap_or(0.0) * 15.0 / 120.);
         let horizontal_amount_discrete = evt.amount_v120(input::Axis::Horizontal);
         let vertical_amount_discrete = evt.amount_v120(input::Axis::Vertical);
+
+        let workspace_scroll = self
+            .seat
+            .get_keyboard()
+            .map(|keyboard| keyboard.modifier_state())
+            .is_some_and(|modifiers| {
+                modifiers.logo && !modifiers.ctrl && !modifiers.alt && !modifiers.shift
+            })
+            && self.active_shortcuts_inhibitor.is_none();
+        if workspace_scroll {
+            self.logo_tap_candidate = false;
+            let units = vertical_amount_discrete.unwrap_or(vertical_amount * 8.0);
+            self.workspace_scroll_accumulator += units;
+            if self.workspace_scroll_accumulator.abs() >= 120.0 {
+                let offset = if self.workspace_scroll_accumulator.is_sign_positive() {
+                    1
+                } else {
+                    -1
+                };
+                self.workspace_scroll_accumulator -= f64::from(offset) * 120.0;
+                if let Err(error) = self.switch_relative_workspace(offset) {
+                    debug!(%error, "workspace scroll shortcut was not applied");
+                    self.workspace_scroll_accumulator = 0.0;
+                }
+            }
+            return;
+        }
+        self.workspace_scroll_accumulator = 0.0;
 
         {
             let mut frame = AxisFrame::new(evt.time()).source(evt.source());
@@ -725,88 +889,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     ) {
         self.notify_idle_activity();
         match event {
-            InputEvent::Keyboard { event } => match self.keyboard_key_to_action::<B>(event) {
-                KeyAction::ScaleUp => {
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| o.name() == output_name)
-                        .unwrap()
-                        .clone();
-
-                    let current_scale = output.current_scale().fractional_scale();
-                    let new_scale = current_scale + 0.25;
-                    output.change_current_state(
-                        None,
-                        None,
-                        Some(Scale::Fractional(new_scale)),
-                        None,
-                    );
-
-                    crate::shell::fixup_positions(&mut self.space, self.pointer.current_location());
-                    self.backend_data.reset_buffers(&output);
-                }
-
-                KeyAction::ScaleDown => {
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| o.name() == output_name)
-                        .unwrap()
-                        .clone();
-
-                    let current_scale = output.current_scale().fractional_scale();
-                    let new_scale = f64::max(1.0, current_scale - 0.25);
-                    output.change_current_state(
-                        None,
-                        None,
-                        Some(Scale::Fractional(new_scale)),
-                        None,
-                    );
-
-                    crate::shell::fixup_positions(&mut self.space, self.pointer.current_location());
-                    self.backend_data.reset_buffers(&output);
-                }
-
-                KeyAction::RotateOutput => {
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| o.name() == output_name)
-                        .unwrap()
-                        .clone();
-
-                    let current_transform = output.current_transform();
-                    let new_transform = match current_transform {
-                        Transform::Normal => Transform::_90,
-                        Transform::_90 => Transform::_180,
-                        Transform::_180 => Transform::_270,
-                        Transform::_270 => Transform::Flipped,
-                        Transform::Flipped => Transform::Flipped90,
-                        Transform::Flipped90 => Transform::Flipped180,
-                        Transform::Flipped180 => Transform::Flipped270,
-                        Transform::Flipped270 => Transform::Normal,
-                    };
-                    tracing::info!(?current_transform, ?new_transform, output = ?output.name(), "changing output transform");
-                    output.change_current_state(None, Some(new_transform), None, None);
-                    crate::shell::fixup_positions(&mut self.space, self.pointer.current_location());
-                    self.backend_data.reset_buffers(&output);
-                }
-
-                action => match action {
-                    KeyAction::None
-                    | KeyAction::Quit
-                    | KeyAction::Run(_)
-                    | KeyAction::TogglePreview
-                    | KeyAction::ToggleDecorations => self.process_common_key_action(action),
-
-                    _ => tracing::warn!(
-                        ?action,
-                        output_name,
-                        "Key action unsupported on on output backend.",
-                    ),
-                },
-            },
+            InputEvent::Keyboard { event } => {
+                let action = self.keyboard_key_to_action::<B>(event);
+                self.process_common_key_action(action);
+            }
 
             InputEvent::PointerMotionAbsolute { event } => {
                 let output = self
@@ -837,10 +923,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     ) {
         let output_geo = self.space.output_geometry(output).unwrap();
 
-        let pos = evt.position_transformed(output_geo.size) + output_geo.loc.to_f64();
+        let requested = evt.position_transformed(output_geo.size) + output_geo.loc.to_f64();
+        let pos = self.constrained_pointer_location(requested);
         let serial = SCOUNTER.next_serial();
 
-        let under = self.surface_under(pos);
+        let under = self.pointer_focus_at(pos);
         self.pointer_motion(
             under,
             &MotionEvent {
@@ -854,6 +941,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     pub fn release_all_keys(&mut self) {
         let keyboard = self.seat.get_keyboard().unwrap();
+        let mut suppressed_keys = self.suppressed_keys.clone();
         for keycode in keyboard.pressed_keys() {
             keyboard.input(
                 self,
@@ -861,9 +949,21 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 KeyState::Released,
                 SCOUNTER.next_serial(),
                 InputTime::now(),
-                |_, _, _| FilterResult::Forward::<bool>,
+                |_, _, handle| {
+                    let keysym = handle
+                        .raw_latin_sym_or_raw_current_sym()
+                        .unwrap_or_else(|| handle.modified_sym());
+                    if suppressed_keys.contains(&keysym) {
+                        suppressed_keys.retain(|candidate| *candidate != keysym);
+                        FilterResult::Intercept(false)
+                    } else {
+                        FilterResult::Forward
+                    }
+                },
             );
         }
+        self.suppressed_keys.clear();
+        self.logo_tap_candidate = false;
     }
 }
 
@@ -877,165 +977,13 @@ impl KestrelState<UdevData> {
         self.notify_idle_activity();
         match event {
             InputEvent::Keyboard { event, .. } => match self.keyboard_key_to_action::<B>(event) {
-                #[cfg(feature = "session-backend")]
                 KeyAction::VtSwitch(vt) => {
                     info!(to = vt, "Trying to switch vt");
                     if let Err(err) = self.backend_data.session.change_vt(vt) {
-                        error!(vt, "Error switching vt: {}", err);
+                        error!(vt, %err, "failed to switch VT");
                     }
                 }
-                KeyAction::Screen(num) => {
-                    let geometry = self
-                        .space
-                        .outputs()
-                        .nth(num)
-                        .map(|o| self.space.output_geometry(o).unwrap());
-
-                    if let Some(geometry) = geometry {
-                        let x = geometry.loc.x as f64 + geometry.size.w as f64 / 2.0;
-                        let y = geometry.size.h as f64 / 2.0;
-                        let location = (x, y).into();
-                        let under = self.surface_under(location);
-                        self.pointer_motion(
-                            under,
-                            &MotionEvent {
-                                location,
-                                serial: SCOUNTER.next_serial(),
-                                time: InputTime::now(),
-                            },
-                        );
-                        self.pointer_frame();
-                    }
-                }
-                KeyAction::ScaleUp => {
-                    let pos = self.pointer.current_location().to_i32_round();
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| self.space.output_geometry(o).unwrap().contains(pos))
-                        .cloned();
-
-                    if let Some(output) = output {
-                        let (output_location, scale) = (
-                            self.space.output_geometry(&output).unwrap().loc,
-                            output.current_scale().fractional_scale(),
-                        );
-                        let new_scale = scale + 0.25;
-                        output.change_current_state(
-                            None,
-                            None,
-                            Some(Scale::Fractional(new_scale)),
-                            None,
-                        );
-
-                        let rescale = scale / new_scale;
-                        let output_location = output_location.to_f64();
-                        let mut pointer_output_location =
-                            self.pointer.current_location() - output_location;
-                        pointer_output_location.x *= rescale;
-                        pointer_output_location.y *= rescale;
-                        let pointer_location = output_location + pointer_output_location;
-
-                        crate::shell::fixup_positions(&mut self.space, pointer_location);
-                        let under = self.surface_under(pointer_location);
-                        self.pointer_motion(
-                            under,
-                            &MotionEvent {
-                                location: pointer_location,
-                                serial: SCOUNTER.next_serial(),
-                                time: InputTime::now(),
-                            },
-                        );
-                        self.pointer_frame();
-                        self.backend_data.reset_buffers(&output);
-                    }
-                }
-                KeyAction::ScaleDown => {
-                    let pos = self.pointer.current_location().to_i32_round();
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| self.space.output_geometry(o).unwrap().contains(pos))
-                        .cloned();
-
-                    if let Some(output) = output {
-                        let (output_location, scale) = (
-                            self.space.output_geometry(&output).unwrap().loc,
-                            output.current_scale().fractional_scale(),
-                        );
-                        let new_scale = f64::max(1.0, scale - 0.25);
-                        output.change_current_state(
-                            None,
-                            None,
-                            Some(Scale::Fractional(new_scale)),
-                            None,
-                        );
-
-                        let rescale = scale / new_scale;
-                        let output_location = output_location.to_f64();
-                        let mut pointer_output_location =
-                            self.pointer.current_location() - output_location;
-                        pointer_output_location.x *= rescale;
-                        pointer_output_location.y *= rescale;
-                        let pointer_location = output_location + pointer_output_location;
-
-                        crate::shell::fixup_positions(&mut self.space, pointer_location);
-                        let under = self.surface_under(pointer_location);
-                        self.pointer_motion(
-                            under,
-                            &MotionEvent {
-                                location: pointer_location,
-                                serial: SCOUNTER.next_serial(),
-                                time: InputTime::now(),
-                            },
-                        );
-                        self.pointer_frame();
-                        self.backend_data.reset_buffers(&output);
-                    }
-                }
-                KeyAction::RotateOutput => {
-                    let pos = self.pointer.current_location().to_i32_round();
-                    let output = self
-                        .space
-                        .outputs()
-                        .find(|o| self.space.output_geometry(o).unwrap().contains(pos))
-                        .cloned();
-
-                    if let Some(output) = output {
-                        let current_transform = output.current_transform();
-                        let new_transform = match current_transform {
-                            Transform::Normal => Transform::_90,
-                            Transform::_90 => Transform::_180,
-                            Transform::_180 => Transform::_270,
-                            Transform::_270 => Transform::Flipped,
-                            Transform::Flipped => Transform::Flipped90,
-                            Transform::Flipped90 => Transform::Flipped180,
-                            Transform::Flipped180 => Transform::Flipped270,
-                            Transform::Flipped270 => Transform::Normal,
-                        };
-                        output.change_current_state(None, Some(new_transform), None, None);
-                        crate::shell::fixup_positions(
-                            &mut self.space,
-                            self.pointer.current_location(),
-                        );
-                        self.backend_data.reset_buffers(&output);
-                    }
-                }
-                KeyAction::ToggleTint => {
-                    let mut debug_flags = self.backend_data.debug_flags();
-                    debug_flags.toggle(DebugFlags::TINT);
-                    self.backend_data.set_debug_flags(debug_flags);
-                }
-
-                action => match action {
-                    KeyAction::None
-                    | KeyAction::Quit
-                    | KeyAction::Run(_)
-                    | KeyAction::TogglePreview
-                    | KeyAction::ToggleDecorations => self.process_common_key_action(action),
-
-                    _ => unreachable!(),
-                },
+                action => self.process_common_key_action(action),
             },
             InputEvent::PointerMotion { event, .. } => self.on_pointer_move::<B>(dh, event),
             InputEvent::PointerMotionAbsolute { event, .. } => {
@@ -1081,40 +1029,11 @@ impl KestrelState<UdevData> {
         _dh: &DisplayHandle,
         evt: B::PointerMotionEvent,
     ) {
-        let mut pointer_location = self.pointer.current_location();
+        let pointer_location = self.pointer.current_location();
         let serial = SCOUNTER.next_serial();
 
         let pointer = self.pointer.clone();
-        let under = self.surface_under(pointer_location);
-
-        let mut pointer_locked = false;
-        let mut pointer_confined = false;
-        let mut confine_region = None;
-        if let Some((surface, surface_loc)) = under
-            .as_ref()
-            .and_then(|(target, l)| Some((target.wl_surface()?, l)))
-        {
-            with_pointer_constraint(&surface, &pointer, |constraint| match constraint {
-                Some(constraint) if constraint.is_active() => {
-                    // Constraint does not apply if not within region
-                    if !constraint.region().is_none_or(|x| {
-                        x.contains((pointer_location - *surface_loc).to_i32_round())
-                    }) {
-                        return;
-                    }
-                    match &*constraint {
-                        PointerConstraint::Locked(_locked) => {
-                            pointer_locked = true;
-                        }
-                        PointerConstraint::Confined(confine) => {
-                            pointer_confined = true;
-                            confine_region = confine.region().cloned();
-                        }
-                    }
-                }
-                _ => {}
-            });
-        }
+        let under = self.pointer_focus_at(pointer_location);
 
         pointer.relative_motion(
             self,
@@ -1126,50 +1045,17 @@ impl KestrelState<UdevData> {
             },
         );
 
-        // If pointer is locked, only emit relative motion
-        if pointer_locked {
+        if self.pointer_constraint_is_locked() {
             self.pointer_frame();
             return;
         }
 
-        // Clamp delta, such that the pointer never moves out of bounds
-        let mut delta = self.clamp_coords(pointer_location + evt.delta()) - pointer_location;
-
-        // Clamp the individual x and y components of delta to respect confinement regions
-        if pointer_confined
-            && let Some((_, surface_loc)) = &under
-            && let Some(region) = &confine_region
-        {
-            // Clamp delta.x
-            if !region.contains(
-                (pointer_location + Point::new(delta.x, 0f64) - *surface_loc).to_i32_round(),
-            ) {
-                delta.x = 0f64;
-            }
-
-            // Clamp delta.y
-            if !region.contains(
-                (pointer_location + Point::new(0f64, delta.y) - *surface_loc).to_i32_round(),
-            ) {
-                delta.y = 0f64;
-            }
-        }
-
-        pointer_location += delta;
-
-        let new_under = self.surface_under(pointer_location);
-
-        // If confined, don't move pointer if it would go outside surface
-        if pointer_confined
-            && let Some((surface, _)) = &under
-            && new_under.as_ref().and_then(|(under, _)| under.wl_surface()) != surface.wl_surface()
-        {
-            self.pointer_frame();
-            return;
-        }
+        let pointer_location =
+            self.constrained_pointer_location(self.clamp_coords(pointer_location + evt.delta()));
+        let new_under = self.pointer_focus_at(pointer_location);
 
         self.pointer_motion(
-            new_under.clone(),
+            new_under,
             &MotionEvent {
                 location: pointer_location,
                 serial,
@@ -1177,25 +1063,6 @@ impl KestrelState<UdevData> {
             },
         );
         self.pointer_frame();
-
-        // If pointer is now in a constraint region, activate it
-        // TODO Anywhere else pointer is moved needs to do this
-        if let Some((under, surface_location)) =
-            new_under.and_then(|(target, loc)| Some((target.wl_surface()?.into_owned(), loc)))
-        {
-            with_pointer_constraint(&under, &pointer, |constraint| match constraint {
-                Some(constraint) if !constraint.is_active() => {
-                    let point = (pointer_location - surface_location).to_i32_round();
-                    if constraint
-                        .region()
-                        .is_none_or(|region| region.contains(point))
-                    {
-                        constraint.activate();
-                    }
-                }
-                _ => {}
-            });
-        }
     }
 
     fn on_pointer_move_absolute<B: InputBackend>(
@@ -1205,24 +1072,22 @@ impl KestrelState<UdevData> {
     ) {
         let serial = SCOUNTER.next_serial();
 
-        let max_x = self.space.outputs().fold(0, |acc, o| {
-            acc + self.space.output_geometry(o).unwrap().size.w
-        });
+        if self.pointer_constraint_is_locked() {
+            self.pointer_frame();
+            return;
+        }
 
-        let max_h_output = self
-            .space
-            .outputs()
-            .max_by_key(|o| self.space.output_geometry(o).unwrap().size.h)
-            .unwrap();
+        let Some(bounds) = self.output_bounds() else {
+            return;
+        };
+        let pointer_location = self.constrained_pointer_location(self.clamp_coords(
+            Point::from((
+                evt.x_transformed(bounds.size.w),
+                evt.y_transformed(bounds.size.h),
+            )) + bounds.loc.to_f64(),
+        ));
 
-        let max_y = self.space.output_geometry(max_h_output).unwrap().size.h;
-
-        let mut pointer_location = (evt.x_transformed(max_x), evt.y_transformed(max_y)).into();
-
-        // clamp to screen limits
-        pointer_location = self.clamp_coords(pointer_location);
-
-        let under = self.surface_under(pointer_location);
+        let under = self.pointer_focus_at(pointer_location);
 
         self.pointer_motion(
             under,
@@ -1239,7 +1104,9 @@ impl KestrelState<UdevData> {
         let tablet_seat = self.seat.tablet_seat();
 
         if let Some(pointer_location) = self.touch_location_transformed(&evt) {
-            let under = self.surface_under(pointer_location);
+            let pointer_location =
+                self.constrained_pointer_location(self.clamp_coords(pointer_location));
+            let under = self.pointer_focus_at(pointer_location);
             let tool = tablet_seat.get_tool(&evt.tool());
             let time = InputTime::now();
 
@@ -1291,9 +1158,11 @@ impl KestrelState<UdevData> {
         let tablet_seat = self.seat.tablet_seat();
 
         if let Some(pointer_location) = self.touch_location_transformed(&evt) {
+            let pointer_location =
+                self.constrained_pointer_location(self.clamp_coords(pointer_location));
             let tool = evt.tool();
 
-            let under = self.surface_under(pointer_location);
+            let under = self.pointer_focus_at(pointer_location);
             let tablet = tablet_seat.get_tablet(&TabletDescriptor::from(&evt.device()));
             let tool = tablet_seat
                 .get_tool(&tool)
@@ -1509,85 +1378,154 @@ impl KestrelState<UdevData> {
     }
 
     fn clamp_coords(&self, pos: Point<f64, Logical>) -> Point<f64, Logical> {
-        if self.space.outputs().next().is_none() {
+        let geometries = self
+            .space
+            .outputs()
+            .filter_map(|output| self.space.output_geometry(output))
+            .collect::<Vec<_>>();
+        if geometries
+            .iter()
+            .any(|geometry| geometry.to_f64().contains(pos))
+        {
             return pos;
         }
 
-        let (pos_x, pos_y) = pos.into();
-        let max_x = self.space.outputs().fold(0, |acc, o| {
-            acc + self.space.output_geometry(o).unwrap().size.w
-        });
-        let clamped_x = pos_x.clamp(0.0, max_x as f64);
-        let max_y = self
+        geometries
+            .into_iter()
+            .map(|geometry| {
+                let geometry = geometry.to_f64();
+                let end = geometry.loc + geometry.size;
+                let candidate = Point::from((
+                    pos.x.clamp(geometry.loc.x, end.x - 0.001),
+                    pos.y.clamp(geometry.loc.y, end.y - 0.001),
+                ));
+                let delta = candidate - pos;
+                (candidate, delta.x.mul_add(delta.x, delta.y * delta.y))
+            })
+            .min_by(|(_, left), (_, right)| left.total_cmp(right))
+            .map_or(pos, |(candidate, _)| candidate)
+    }
+
+    fn output_bounds(&self) -> Option<Rectangle<i32, Logical>> {
+        let mut geometries = self
             .space
             .outputs()
-            .find(|o| {
-                let geo = self.space.output_geometry(o).unwrap();
-                geo.contains((clamped_x as i32, 0))
-            })
-            .map(|o| self.space.output_geometry(o).unwrap().size.h);
-
-        if let Some(max_y) = max_y {
-            let clamped_y = pos_y.clamp(0.0, max_y as f64);
-            (clamped_x, clamped_y).into()
-        } else {
-            (clamped_x, pos_y).into()
+            .filter_map(|output| self.space.output_geometry(output));
+        let first = geometries.next()?;
+        let mut min_x = first.loc.x;
+        let mut min_y = first.loc.y;
+        let mut max_x = first.loc.x + first.size.w;
+        let mut max_y = first.loc.y + first.size.h;
+        for geometry in geometries {
+            min_x = min_x.min(geometry.loc.x);
+            min_y = min_y.min(geometry.loc.y);
+            max_x = max_x.max(geometry.loc.x + geometry.size.w);
+            max_y = max_y.max(geometry.loc.y + geometry.size.h);
         }
+        Some(Rectangle::new(
+            (min_x, min_y).into(),
+            (max_x - min_x, max_y - min_y).into(),
+        ))
     }
 }
 
-/// Possible results of a keyboard action
-#[allow(dead_code)] // some of these are only read if udev is enabled
 #[derive(Debug)]
 enum KeyAction {
-    /// Quit the compositor
-    Quit,
-    /// Trigger a vt-switch
     VtSwitch(i32),
-    /// run a command
-    Run(String),
-    /// Switch the current screen
-    Screen(usize),
-    ScaleUp,
-    ScaleDown,
-    TogglePreview,
-    RotateOutput,
-    ToggleTint,
-    ToggleDecorations,
-    /// Do nothing more
+    SwitchWorkspace(WorkspaceId),
+    SwitchRelativeWorkspace(i32),
+    MoveWindowToWorkspace(WorkspaceId),
+    CycleWindows { reverse: bool },
+    CloseActiveWindow,
+    RestartShell,
+    Shell(ShellCommand),
     None,
 }
 
 fn process_keyboard_shortcut(modifiers: ModifiersState, keysym: Keysym) -> Option<KeyAction> {
-    if modifiers.ctrl && modifiers.alt && keysym == Keysym::BackSpace
-        || modifiers.logo && keysym == Keysym::q
-    {
-        // ctrl+alt+backspace = quit
-        // logo + q = quit
-        Some(KeyAction::Quit)
-    } else if (xkb::KEY_XF86Switch_VT_1..=xkb::KEY_XF86Switch_VT_12).contains(&keysym.raw()) {
-        // VTSwitch
-        Some(KeyAction::VtSwitch(
+    let symbol = keysym.raw();
+    if (xkb::KEY_XF86Switch_VT_1..=xkb::KEY_XF86Switch_VT_12).contains(&symbol) {
+        return Some(KeyAction::VtSwitch(
             (keysym.raw() - xkb::KEY_XF86Switch_VT_1 + 1) as i32,
-        ))
-    } else if modifiers.logo && keysym == Keysym::Return {
-        // run terminal
-        Some(KeyAction::Run("weston-terminal".into()))
-    } else if modifiers.logo && (xkb::KEY_1..=xkb::KEY_9).contains(&keysym.raw()) {
-        Some(KeyAction::Screen((keysym.raw() - xkb::KEY_1) as usize))
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::M {
-        Some(KeyAction::ScaleDown)
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::P {
-        Some(KeyAction::ScaleUp)
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::W {
-        Some(KeyAction::TogglePreview)
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::R {
-        Some(KeyAction::RotateOutput)
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::T {
-        Some(KeyAction::ToggleTint)
-    } else if modifiers.logo && modifiers.shift && keysym == Keysym::D {
-        Some(KeyAction::ToggleDecorations)
-    } else {
-        None
+        ));
     }
+
+    let plain_logo = modifiers.logo && !modifiers.ctrl && !modifiers.alt && !modifiers.shift;
+    let shifted_logo = modifiers.logo && !modifiers.ctrl && !modifiers.alt && modifiers.shift;
+    let plain_alt = modifiers.alt && !modifiers.ctrl && !modifiers.logo && !modifiers.shift;
+    let shifted_alt = modifiers.alt && !modifiers.ctrl && !modifiers.logo && modifiers.shift;
+    let workspace = (xkb::KEY_1..=xkb::KEY_9)
+        .contains(&symbol)
+        .then(|| WorkspaceId((symbol - xkb::KEY_1 + 1).to_string()));
+    let tab = symbol == xkb::KEY_Tab || symbol == xkb::KEY_ISO_Left_Tab;
+
+    if shifted_logo {
+        if let Some(workspace) = workspace {
+            return Some(KeyAction::MoveWindowToWorkspace(workspace));
+        }
+        if symbol == xkb::KEY_r {
+            return Some(KeyAction::RestartShell);
+        }
+        if tab {
+            return Some(KeyAction::CycleWindows { reverse: true });
+        }
+        return None;
+    }
+
+    if plain_logo {
+        if let Some(workspace) = workspace {
+            return Some(KeyAction::SwitchWorkspace(workspace));
+        }
+        return match symbol {
+            xkb::KEY_Left | xkb::KEY_Up => Some(KeyAction::SwitchRelativeWorkspace(-1)),
+            xkb::KEY_Right | xkb::KEY_Down => Some(KeyAction::SwitchRelativeWorkspace(1)),
+            xkb::KEY_space => Some(KeyAction::Shell(ShellCommand::OpenLauncher)),
+            xkb::KEY_Return => Some(KeyAction::Shell(ShellCommand::LaunchDefaultApp {
+                app: DefaultAppKind::Terminal,
+            })),
+            xkb::KEY_e => Some(KeyAction::Shell(ShellCommand::LaunchDefaultApp {
+                app: DefaultAppKind::FileManager,
+            })),
+            xkb::KEY_q => Some(KeyAction::CloseActiveWindow),
+            _ if tab => Some(KeyAction::CycleWindows { reverse: false }),
+            _ => None,
+        };
+    }
+
+    if (plain_alt || shifted_alt) && tab {
+        return Some(KeyAction::CycleWindows {
+            reverse: shifted_alt,
+        });
+    }
+
+    None
+}
+
+fn is_logo_key(keysym: Keysym) -> bool {
+    matches!(keysym.raw(), xkb::KEY_Super_L | xkb::KEY_Super_R)
+}
+
+fn surface_contains_point(
+    surface: &smithay::reexports::wayland_server::protocol::wl_surface::WlSurface,
+    point: Point<f64, Logical>,
+) -> bool {
+    with_states(surface, |states| {
+        let Some(size) = states
+            .data_map
+            .get::<RendererSurfaceStateUserData>()
+            .and_then(|state| state.lock().ok()?.view().map(|view| view.dst))
+        else {
+            return false;
+        };
+        if !Rectangle::from_size(size).to_f64().contains(point) {
+            return false;
+        }
+        states
+            .cached_state
+            .get::<SurfaceAttributes>()
+            .current()
+            .input_region
+            .as_ref()
+            .is_none_or(|region| region.contains(point.to_i32_floor()))
+    })
 }

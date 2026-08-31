@@ -569,6 +569,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
     while state.running.load(Ordering::SeqCst) {
         state.xwayland_process.tick();
         state.shell_process.tick();
+        state.lock_process.tick();
         state.portal_process.tick();
         let result = event_loop.dispatch(Some(Duration::from_millis(16)), &mut state);
         if result.is_err() {
@@ -1037,6 +1038,11 @@ impl KestrelState<UdevData> {
                 return;
             }
             let mode_id = configured
+                .filter(|output| {
+                    output.width.is_some()
+                        || output.height.is_some()
+                        || output.refresh_millihertz.is_some()
+                })
                 .and_then(|output| {
                     connector.modes().iter().position(|mode| {
                         let wl_mode = WlMode::from(*mode);
@@ -1051,7 +1057,30 @@ impl KestrelState<UdevData> {
                     connector
                         .modes()
                         .iter()
-                        .position(|mode| mode.mode_type().contains(ModeTypeFlags::PREFERRED))
+                        .enumerate()
+                        .filter(|(_, mode)| mode.mode_type().contains(ModeTypeFlags::PREFERRED))
+                        .max_by_key(|(_, mode)| {
+                            let mode = WlMode::from(**mode);
+                            (
+                                i64::from(mode.size.w) * i64::from(mode.size.h),
+                                mode.refresh,
+                            )
+                        })
+                        .map(|(index, _)| index)
+                })
+                .or_else(|| {
+                    connector
+                        .modes()
+                        .iter()
+                        .enumerate()
+                        .max_by_key(|(_, mode)| {
+                            let mode = WlMode::from(**mode);
+                            (
+                                i64::from(mode.size.w) * i64::from(mode.size.h),
+                                mode.refresh,
+                            )
+                        })
+                        .map(|(index, _)| index)
                 })
                 .unwrap_or(0);
 
@@ -1074,9 +1103,13 @@ impl KestrelState<UdevData> {
 
             let position = configured.map_or_else(
                 || {
-                    let x = self.space.outputs().fold(0, |acc, output| {
-                        acc + self.space.output_geometry(output).unwrap().size.w
-                    });
+                    let x = self
+                        .space
+                        .outputs()
+                        .filter_map(|output| self.space.output_geometry(output))
+                        .map(|geometry| geometry.loc.x + geometry.size.w)
+                        .max()
+                        .unwrap_or(0);
                     (x, 0).into()
                 },
                 |output| (output.x, output.y).into(),
@@ -1093,6 +1126,7 @@ impl KestrelState<UdevData> {
                 Some(position),
             );
             self.space.map_output(&output, position);
+            self.session_lock.output_added(&output);
             self.shell_state_dirty = true;
 
             output.user_data().insert_if_missing(|| UdevOutputId {
@@ -1225,6 +1259,12 @@ impl KestrelState<UdevData> {
                 leasing_state.withdraw_connector(connector.handle());
             }
         } else if let Some(surface) = device.surfaces.remove(&crtc) {
+            crate::capture::stop_for_output(
+                &mut self.capture_sessions,
+                &mut self.pending_captures,
+                &surface.output,
+            );
+            self.session_lock.output_removed(&surface.output);
             self.space.unmap_output(&surface.output);
             self.space.refresh();
             self.shell_state_dirty = true;
@@ -1283,10 +1323,13 @@ impl KestrelState<UdevData> {
                 } => {
                     self.connector_disconnected(node, connector, crtc);
                 }
-                // The connector's mode list changed while it stayed connected (e.g. EDID
-                // arrived after the initial probe returned empty/fallback modes). Compositors
-                // should re-evaluate the output's mode selection and recreate the surface here.
-                DrmScanEvent::Changed { .. } => {}
+                DrmScanEvent::Changed {
+                    connector,
+                    crtc: Some(crtc),
+                } => {
+                    self.connector_disconnected(node, connector.clone(), crtc);
+                    self.connector_connected(node, connector, crtc);
+                }
                 _ => {}
             }
         }
@@ -1472,7 +1515,11 @@ impl KestrelState<UdevData> {
                             ..
                         })) if source.kind() == io::ErrorKind::PermissionDenied
                     ),
-                    SwapBuffersError::ContextLost(err) => panic!("Rendering loop lost: {err}"),
+                    SwapBuffersError::ContextLost(err) => {
+                        error!(%err, "rendering context lost; ending compositor session");
+                        self.running.store(false, Ordering::SeqCst);
+                        false
+                    }
                 }
             }
         };
@@ -1688,7 +1735,11 @@ impl KestrelState<UdevData> {
                                 .expect("failed to reset drm device");
                             true
                         }
-                        _ => panic!("Rendering loop lost: {err}"),
+                        _ => {
+                            error!(%err, "rendering context lost; ending compositor session");
+                            self.running.store(false, Ordering::SeqCst);
+                            false
+                        }
                     },
                 }
             }
@@ -1828,7 +1879,8 @@ fn render_surface<'a>(
         custom_elements,
         renderer,
         show_window_preview,
-        session_locked.then_some(lock_surface).flatten(),
+        session_locked,
+        lock_surface,
         wallpaper,
         layer_motion,
     );

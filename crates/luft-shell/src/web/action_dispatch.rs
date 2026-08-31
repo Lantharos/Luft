@@ -4,7 +4,7 @@ use super::{
     settings_command::settings_command,
 };
 use crate::{
-    apps::{spawn_command, spawn_privileged_command},
+    apps::spawn_command,
     services::system_status::{AudioInfo, BrightnessInfo, SystemStatusCommand},
 };
 use tracing::{debug, warn};
@@ -98,7 +98,30 @@ impl WebShell {
             } => {
                 self.notifications.invoke(notification, action);
             }
+            WebShellAction::CaptureConsentAllow { request, output } => {
+                self.resolve_capture_consent(
+                    request,
+                    luft_ipc::CaptureConsentDecision::Allow { output },
+                );
+            }
+            WebShellAction::CaptureConsentDeny { request } => {
+                self.resolve_capture_consent(request, luft_ipc::CaptureConsentDecision::Deny);
+            }
         }
+    }
+
+    fn resolve_capture_consent(&self, request: String, decision: luft_ipc::CaptureConsentDecision) {
+        let Ok(request) = request.parse::<u64>() else {
+            warn!(
+                request,
+                "ignored malformed capture consent request identifier"
+            );
+            return;
+        };
+        self.send_ipc(luft_ipc::IpcRequest::ResolveCaptureConsent {
+            request: luft_ipc::CaptureRequestId(request),
+            decision,
+        });
     }
 
     pub(super) fn open_settings_page(&mut self, page: QuickSettingsPage) {
@@ -147,20 +170,19 @@ impl WebShell {
     }
 
     pub(super) fn run_session_command(&mut self, command: SessionCommand) {
-        let privileged = matches!(command, SessionCommand::Lock);
+        if matches!(command, SessionCommand::Lock) {
+            self.close_transient_popovers();
+            self.send_ipc(luft_ipc::IpcRequest::LockSession);
+            return;
+        }
         let command = match command {
-            SessionCommand::Lock => self.config.session.lock_command.clone(),
+            SessionCommand::Lock => unreachable!(),
             SessionCommand::Suspend => self.config.session.suspend_command.clone(),
             SessionCommand::Reboot => self.config.session.reboot_command.clone(),
             SessionCommand::PowerOff => self.config.session.poweroff_command.clone(),
         };
         self.close_transient_popovers();
-        let spawn = if privileged {
-            spawn_privileged_command
-        } else {
-            spawn_command
-        };
-        match spawn(&command, self.model.xwayland_display.as_deref()) {
+        match spawn_command(&command, self.model.xwayland_display.as_deref()) {
             Ok(child) => {
                 debug!(pid = child.id(), command, "started session command");
                 self.app_processes

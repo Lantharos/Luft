@@ -1,4 +1,5 @@
 mod capture;
+mod consent;
 mod pipewire_cast;
 mod screencast;
 mod screenshot;
@@ -10,16 +11,24 @@ use screenshot::ScreenshotPortal;
 use settings::PortalSettings;
 use std::{env, fs, fs::OpenOptions, io};
 use tracing::info;
+use wayland_client::Connection;
 
 const DBUS_NAME: &str = "org.freedesktop.impl.portal.desktop.luft";
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     init_logging();
+    let wayland = Connection::connect_to_env()?;
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()?
+        .block_on(run(wayland))
+}
+
+async fn run(wayland: Connection) -> Result<(), Box<dyn std::error::Error>> {
     Builder::new(DBUS_NAME)?
         .settings(PortalSettings::new())
-        .screenshot(ScreenshotPortal)
-        .screencast(ScreencastPortal::default())
+        .screenshot(ScreenshotPortal::new(wayland.clone()))
+        .screencast(ScreencastPortal::new(wayland))
         .build()
         .await?;
     info!(dbus_name = DBUS_NAME, "luft portal backend ready");

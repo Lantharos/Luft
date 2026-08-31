@@ -56,9 +56,13 @@ impl XwaylandProcess {
                     return;
                 }
                 Ok(Some(status)) => warn!(?status, "xwayland-satellite exited"),
-                Err(error) => warn!(%error, "failed to inspect xwayland-satellite"),
+                Err(error) => {
+                    warn!(%error, "failed to inspect xwayland-satellite");
+                    return;
+                }
             }
-            self.child = None;
+            let mut child = self.child.take().expect("xwayland child exists");
+            let _ = child.wait();
             self.started_at = None;
             self.failures = self.failures.saturating_add(1);
             self.restart_at = Instant::now()

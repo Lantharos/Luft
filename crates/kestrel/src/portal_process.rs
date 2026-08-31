@@ -8,6 +8,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use luft_ipc::{PORTAL_CAPABILITY_ENV, SOCKET_ENV};
 use smithay::reexports::wayland_server::DisplayHandle;
 use tracing::{info, warn};
 
@@ -15,23 +16,39 @@ use crate::ClientState;
 
 const STABLE_PROCESS_WINDOW: Duration = Duration::from_secs(30);
 
-#[derive(Debug)]
 pub struct PortalProcess {
     display: DisplayHandle,
     child: Option<Child>,
     restart_at: Instant,
     started_at: Option<Instant>,
     failures: u32,
+    ipc_socket: PathBuf,
+    ipc_capability: String,
+}
+
+impl std::fmt::Debug for PortalProcess {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("PortalProcess")
+            .field("pid", &self.child.as_ref().map(Child::id))
+            .field("restart_at", &self.restart_at)
+            .field("started_at", &self.started_at)
+            .field("failures", &self.failures)
+            .field("ipc_socket", &self.ipc_socket)
+            .finish_non_exhaustive()
+    }
 }
 
 impl PortalProcess {
-    pub fn new(display: DisplayHandle) -> Self {
+    pub fn new(display: DisplayHandle, ipc_socket: PathBuf, ipc_capability: String) -> Self {
         let mut process = Self {
             display,
             child: None,
             restart_at: Instant::now(),
             started_at: None,
             failures: 0,
+            ipc_socket,
+            ipc_capability,
         };
         process.tick();
         process
@@ -51,9 +68,13 @@ impl PortalProcess {
                     return;
                 }
                 Ok(Some(status)) => warn!(?status, "Luft portal exited"),
-                Err(error) => warn!(%error, "failed to inspect Luft portal process"),
+                Err(error) => {
+                    warn!(%error, "failed to inspect Luft portal process");
+                    return;
+                }
             }
-            self.child = None;
+            let mut child = self.child.take().expect("portal child exists");
+            let _ = child.wait();
             self.started_at = None;
             self.failures = self.failures.saturating_add(1);
             let delay = 1_u64.checked_shl(self.failures.min(4)).unwrap_or(16);
@@ -64,7 +85,7 @@ impl PortalProcess {
             return;
         }
 
-        match spawn(&mut self.display) {
+        match spawn(&mut self.display, &self.ipc_socket, &self.ipc_capability) {
             Ok(child) => {
                 info!(pid = child.id(), "started Luft portal");
                 self.child = Some(child);
@@ -88,7 +109,11 @@ impl Drop for PortalProcess {
     }
 }
 
-fn spawn(display: &mut DisplayHandle) -> io::Result<Child> {
+fn spawn(
+    display: &mut DisplayHandle,
+    ipc_socket: &std::path::Path,
+    ipc_capability: &str,
+) -> io::Result<Child> {
     let (server, client) = UnixStream::pair()?;
     display
         .insert_client(
@@ -105,7 +130,9 @@ fn spawn(display: &mut DisplayHandle) -> io::Result<Child> {
     let mut command = Command::new(resolve_portal_binary());
     command
         .env_remove("WAYLAND_DISPLAY")
-        .env("WAYLAND_SOCKET", client.as_raw_fd().to_string());
+        .env("WAYLAND_SOCKET", client.as_raw_fd().to_string())
+        .env(SOCKET_ENV, ipc_socket)
+        .env(PORTAL_CAPABILITY_ENV, ipc_capability);
     let child = command.spawn()?;
     drop(client);
     Ok(child)

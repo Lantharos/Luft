@@ -1,12 +1,13 @@
 use super::{
     actions::WebShellAction,
-    model::{WebShellSnapshot, WebShellSurface},
+    model::WebShellSurface,
     surface_motion::{
         close_animation_duration, hidden_process_ttl, hidden_shell_margin, open_animation_duration,
         surface_margin_animates,
     },
     web_surface::{WebSurface, WebSurfaceConfig},
 };
+use serde_json::Value;
 use std::{sync::mpsc::Sender, time::Instant};
 use tracing::warn;
 
@@ -14,7 +15,7 @@ pub(crate) struct LazyWebSurface {
     kind: WebShellSurface,
     size: (i32, i32),
     actions_tx: Sender<WebShellAction>,
-    snapshot: WebShellSnapshot,
+    snapshot: Value,
     visible: bool,
     show_at: Option<Instant>,
     hide_at: Option<Instant>,
@@ -30,7 +31,7 @@ impl LazyWebSurface {
         kind: WebShellSurface,
         size: (i32, i32),
         actions_tx: &Sender<WebShellAction>,
-        snapshot: &WebShellSnapshot,
+        snapshot: &Value,
         frame_rate: u32,
     ) -> Self {
         Self {
@@ -213,7 +214,7 @@ impl LazyWebSurface {
         }
     }
 
-    pub(super) fn evaluate_snapshot(&mut self, snapshot: &WebShellSnapshot) {
+    pub(super) fn evaluate_snapshot(&mut self, snapshot: &Value) {
         self.snapshot = snapshot.clone();
         if let Some(surface) = &mut self.surface {
             surface.evaluate_snapshot(snapshot);

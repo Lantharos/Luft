@@ -569,6 +569,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
     while state.running.load(Ordering::SeqCst) {
         state.xwayland_process.tick();
         state.shell_process.tick();
+        state.portal_process.tick();
         let result = event_loop.dispatch(Some(Duration::from_millis(16)), &mut state);
         if result.is_err() {
             state.running.store(false, Ordering::SeqCst);

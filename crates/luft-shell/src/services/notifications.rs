@@ -22,14 +22,14 @@ const INTERFACE: &str = "org.freedesktop.Notifications";
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
 const WORKER_TICK: Duration = Duration::from_millis(250);
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct NotificationSnapshot {
     pub items: Vec<NotificationItem>,
     pub toast_items: Vec<NotificationItem>,
     pub do_not_disturb: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NotificationItem {
     pub id: u32,
     pub app_name: String,
@@ -41,7 +41,7 @@ pub struct NotificationItem {
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NotificationAction {
     pub key: String,
     pub label: String,
@@ -85,8 +85,10 @@ impl NotificationService {
     pub fn refresh(&mut self) -> bool {
         let mut changed = false;
         while let Ok(snapshot) = self.updates.try_recv() {
-            self.snapshot = snapshot;
-            changed = true;
+            if self.snapshot != snapshot {
+                self.snapshot = snapshot;
+                changed = true;
+            }
         }
         changed
     }

@@ -61,7 +61,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let kestrel = resolve_kestrel(args.kestrel.clone());
     let environment = SessionEnvironment::default();
     let mut command = session_command(&kestrel, backend);
-    environment.apply_to_command(&mut command);
+    environment.apply_to_command(&mut command, &loaded.config.cursor);
 
     if let Some(socket) = &args.socket {
         command.arg("--socket").arg(socket);

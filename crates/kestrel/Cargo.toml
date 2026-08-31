@@ -15,6 +15,7 @@ luft-config.workspace = true
 luft-ipc.workspace = true
 profiling = "1.0.18"
 renderdoc = { version = "0.12.1", optional = true }
+rustix = { version = "1.1.4", features = ["net", "process"] }
 smithay.workspace = true
 smithay-drm-extras = { workspace = true, optional = true }
 thiserror.workspace = true

@@ -8,6 +8,7 @@ Luft is a Linux desktop environment built around the Kestrel Wayland compositor,
 crates/kestrel          Wayland compositor and render backends
 crates/luft-shell      Panel shell service and Sabine web chrome
 crates/luft-session    Display-manager/session launcher
+crates/luft-portal     Screenshot and screencast portal backend
 crates/luft-config     Shared config model and XDG path handling
 crates/luft-ipc        Typed compositor IPC payloads
 ```

@@ -7,7 +7,6 @@
     value,
     available = true,
     muted = false,
-    index = 0,
     onChange,
     onToggle,
   }: {
@@ -16,7 +15,6 @@
     value: number;
     available?: boolean;
     muted?: boolean;
-    index?: number;
     onChange: (value: number) => void;
     onToggle?: () => void;
   } = $props();
@@ -102,7 +100,6 @@
   class:is-disabled={!available}
   class:is-dragging={dragging}
   style:--slider-ratio={`${available ? displayValue / 100 : 0}`}
-  style:--index={index}
 >
   <button type="button" class="control-slider-icon" aria-label={onToggle ? `Toggle ${label}` : label} onclick={toggle} disabled={!available}>
     <Icon name={currentIcon} />

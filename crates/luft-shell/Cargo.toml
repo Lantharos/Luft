@@ -6,7 +6,7 @@ license.workspace = true
 
 [dependencies]
 clap.workspace = true
-sabine = { git = "https://github.com/Lantharos/Sabine.git", rev = "54b976c1bcb45487ed2b315ee942ac695af17e7d" }
+sabine = { git = "https://github.com/Lantharos/Sabine.git", rev = "31266ed12e9beab0e7a1ef9ef26483eddc74331b" }
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp"] }
 serde.workspace = true
 serde_json.workspace = true

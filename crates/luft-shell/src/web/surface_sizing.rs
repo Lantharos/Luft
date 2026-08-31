@@ -20,15 +20,11 @@ const NOTIFICATION_GROUP_GAP: i32 = 10;
 const NOTIFICATION_ACTIONS_HEIGHT: i32 = 36;
 
 pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
-    let status_tiles = 1
-        + i32::from(snapshot.status.network.is_some())
-        + i32::from(snapshot.status.battery.is_some());
-    let status_rows = (status_tiles + 1) / 2;
     let sliders = i32::from(snapshot.status.audio.is_some())
         + i32::from(snapshot.status.brightness.is_some());
-    let mut height = 32 + 36 + 13 + status_rows * 58 + (status_rows - 1) * 10;
+    let mut height = 32 + 42 + 14 + 76;
     if sliders > 0 {
-        height += 13 + sliders * 58 + (sliders - 1) * 10;
+        height += 14 + 8 + sliders * 56;
     }
     (
         QUICK_SETTINGS_WIDTH,

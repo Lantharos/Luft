@@ -1,46 +1,6 @@
 import type { ShellAction, ShellSnapshot, ShellSurface } from "./model";
 import { emptySnapshot } from "./model";
-
-declare global {
-  interface Window {
-    __LUFT_INITIAL_STATE__?: ShellSnapshot;
-    __LUFT_SURFACE__?: ShellSurface;
-    sabine?: {
-      bridge?: NativeBridge;
-      window?: NativeWindowControls;
-      popup?: NativePopupControls;
-    };
-    ipc?: { postMessage: (message: string) => void };
-    luftShell?: {
-      setSnapshot: (snapshot: ShellSnapshot) => void;
-    };
-  }
-}
-
-type NativeBridge = {
-  commands: string[];
-  invoke<T>(name: string, params?: Record<string, unknown>): Promise<T>;
-  listen?<T>(name: string, callback: (payload: T) => void): () => void;
-};
-
-type NativeWindowControls = {
-  close?: () => void;
-  minimize?: () => void;
-  toggleMaximize?: () => void;
-  startDrag?: () => void;
-};
-
-type NativePopupControls = {
-  open?: (options: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    html?: string;
-    url?: string;
-  }) => void | Promise<unknown>;
-  close?: () => void | Promise<unknown>;
-};
+import { bridge, invoke, isAvailable, listen } from "@lantharos/sabine";
 
 type NativeReady = {
   surface?: ShellSurface;
@@ -55,7 +15,7 @@ type NativePatch = {
 type Listener = (snapshot: ShellSnapshot) => void;
 
 const listeners = new Set<Listener>();
-let currentSnapshot = normalizeSnapshot(window.__LUFT_INITIAL_STATE__);
+let currentSnapshot = normalizeSnapshot();
 let currentRevision = 0;
 let receivedNativeState = false;
 
@@ -68,44 +28,39 @@ export const subscribe = (listener: Listener) => {
 };
 
 export const sendAction = (action: ShellAction) => {
-  const bridge = window.sabine?.bridge;
-  if (bridge?.commands.includes("luft.action")) {
-    void bridge.invoke(
-      "luft.action",
-      action as unknown as Record<string, unknown>,
-    );
+  if (!isAvailable() || !bridge.commands().includes("luft.action")) {
+    console.error("Luft shell action bridge is unavailable", action);
     return;
   }
-  window.ipc?.postMessage(JSON.stringify(action));
-};
-
-window.luftShell = {
-  setSnapshot(snapshot: ShellSnapshot) {
-    applySnapshot(snapshot);
-  },
+  void invoke("luft.action", action as unknown as Record<string, unknown>).catch(
+    (error) => console.error("Luft shell action failed", error),
+  );
 };
 
 void initializeNativeBridge();
 
 async function initializeNativeBridge() {
-  const bridge = await waitForNativeBridge();
-  if (!bridge) return;
+  if (!isAvailable()) {
+    if (isSabineRuntime()) {
+      console.error("Sabine did not install the Luft shell bridge");
+    }
+    return;
+  }
 
-  bridge.listen?.<ShellSnapshot>("luft.snapshot", (snapshot) => {
+  listen<ShellSnapshot>("luft.snapshot", (snapshot) => {
     receivedNativeState = true;
     currentRevision = Math.max(currentRevision, 1);
     applySnapshot(snapshot);
   });
-  bridge.listen?.<NativePatch>("luft.patch", applyPatch);
+  listen<NativePatch>("luft.patch", applyPatch);
 
-  if (!bridge.commands.includes("luft.ready")) return;
+  if (!bridge.commands().includes("luft.ready")) return;
   try {
-    const ready = await bridge.invoke<NativeReady>("luft.ready");
-    if (ready.surface) {
-      window.__LUFT_SURFACE__ = ready.surface;
-    }
+    const ready = await invoke<NativeReady>("luft.ready");
     if (ready.snapshot && !receivedNativeState) {
       applySnapshot(ready.snapshot);
+    } else if (ready.surface && !receivedNativeState) {
+      applySnapshot({ ...currentSnapshot, surface: ready.surface });
     }
   } catch (error) {
     console.error("failed to initialize luft shell bridge", error);
@@ -128,24 +83,8 @@ function applyPatch(patch: NativePatch) {
   applySnapshot({ ...currentSnapshot, ...patch.changes });
 }
 
-async function waitForNativeBridge(): Promise<NativeBridge | undefined> {
-  if (!isSabineRuntime()) return undefined;
-
-  const deadline = performance.now() + 2000;
-  while (performance.now() < deadline) {
-    if (window.sabine?.bridge) {
-      return window.sabine.bridge;
-    }
-    await new Promise((resolve) => window.setTimeout(resolve, 16));
-  }
-  return undefined;
-}
-
 function isSabineRuntime() {
-  return (
-    Boolean(window.sabine?.bridge) ||
-    new URLSearchParams(window.location.search).has("sabine")
-  );
+  return isAvailable() || new URLSearchParams(window.location.search).has("sabine");
 }
 
 function normalizeSnapshot(snapshot?: ShellSnapshot): ShellSnapshot {
@@ -168,9 +107,6 @@ function normalizeSnapshot(snapshot?: ShellSnapshot): ShellSnapshot {
 }
 
 function surfaceFromRuntime(snapshot?: ShellSnapshot): ShellSurface {
-  if (window.__LUFT_SURFACE__) {
-    return window.__LUFT_SURFACE__;
-  }
   if (snapshot?.surface) {
     return snapshot.surface;
   }

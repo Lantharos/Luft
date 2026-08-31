@@ -9,29 +9,21 @@
   import type { PanelApp, ShellSnapshot } from "../shell/model";
 
   let { snapshot }: { snapshot: ShellSnapshot } = $props();
-  let order = $state<string[]>([]);
-  let orderSignature = $state("");
   let draggedCommand = $state<string | null>(null);
+  let draggedOrder = $state<string[] | null>(null);
 
   const pinnedApps = $derived(snapshot.panelApps.filter((app) => app.pinned));
   const runningOnlyApps = $derived(snapshot.panelApps.filter((app) => !app.pinned));
   const appByCommand = $derived(new Map(pinnedApps.map((app) => [app.command, app])));
+  const pinnedCommands = $derived(pinnedApps.map((app) => app.command));
+  const visibleOrder = $derived(draggedOrder ?? pinnedCommands);
   const orderedPinnedApps = $derived(
-    (order.length > 0 ? order : pinnedApps.map((app) => app.command))
+    visibleOrder
       .map((command) => appByCommand.get(command))
       .filter((app): app is PanelApp => Boolean(app)),
   );
 
   const runningExit = runningAppExit;
-
-  $effect(() => {
-    const commands = pinnedApps.map((app) => app.command);
-    const signature = commands.join("\0");
-    if (!draggedCommand && signature !== orderSignature) {
-      order = commands;
-      orderSignature = signature;
-    }
-  });
 
   function launch(app: PanelApp) {
     const windowId = nextWindowId(app);
@@ -72,28 +64,28 @@
 
   function startReorder(command: string) {
     draggedCommand = command;
-    order = pinnedApps.map((app) => app.command);
+    draggedOrder = pinnedCommands;
     sendAction({ type: "panel-menu-close" });
   }
 
   function previewReorder(target: string, after: boolean) {
-    if (!draggedCommand) return;
-    order = movePanelCommand(order, draggedCommand, target, after);
+    if (!draggedCommand || !draggedOrder) return;
+    draggedOrder = movePanelCommand(draggedOrder, draggedCommand, target, after);
   }
 
   function commitReorder() {
-    if (!draggedCommand) return;
-    const current = pinnedApps.map((app) => app.command);
-    if (!sameOrder(order, current)) {
-      sendAction({ type: "panel-reorder", commands: order });
+    if (!draggedCommand || !draggedOrder) return;
+    if (!sameOrder(draggedOrder, pinnedCommands)) {
+      sendAction({ type: "panel-reorder", commands: draggedOrder });
     }
     draggedCommand = null;
+    draggedOrder = null;
   }
 
   function endReorder() {
     if (!draggedCommand) return;
     draggedCommand = null;
-    order = pinnedApps.map((app) => app.command);
+    draggedOrder = null;
   }
 
   function windowIdFromCommand(command: string) {

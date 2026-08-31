@@ -9,7 +9,7 @@ use luft_ipc::{
     WindowId, WindowInfo, WindowState, WindowSummary, Workspace, WorkspaceId, WorkspaceSummary,
 };
 use smithay::{
-    desktop::space::SpaceElement,
+    desktop::{find_popup_root_surface, space::SpaceElement},
     output::Scale,
     reexports::{
         calloop::timer::{TimeoutAction, Timer},
@@ -26,12 +26,15 @@ use smithay::{
 use tracing::warn;
 
 use crate::{
+    focus::KeyboardFocusTarget,
     shell::{
         WindowElement, fixup_positions,
         ssd::{WindowAnimation, WindowAnimationKind},
     },
     state::{Backend, KestrelState},
 };
+
+const POLICY_INTEGRITY_SWEEP_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn create_layout() -> LayoutEngine {
     let config = load_config()
@@ -225,7 +228,13 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
     pub fn sync_shell_state(&mut self) -> ShellSnapshot {
         self.process_idle_actions();
-        let policy_changed = self.sync_policy();
+        let sweep_due = self.last_policy_sweep.elapsed() >= POLICY_INTEGRITY_SWEEP_INTERVAL;
+        let policy_changed = if self.shell_state_dirty || sweep_due {
+            self.last_policy_sweep = Instant::now();
+            self.sync_policy()
+        } else {
+            false
+        };
         let focus = self.shell_focus_surface();
         let focus_changed = focus != self.last_shell_focus;
         self.last_shell_focus = focus;
@@ -441,6 +450,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         self.layout
             .set_window_state(id, WindowState::Hidden)
             .map_err(|error| error.to_string())?;
+        self.reconcile_keyboard_focus();
         Ok(())
     }
 
@@ -544,6 +554,69 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 self.space.unmap_elem(window);
             }
         }
+        self.reconcile_keyboard_focus();
+        self.refresh_idle_inhibition();
+    }
+
+    fn reconcile_keyboard_focus(&mut self) {
+        let Some(keyboard) = self.seat.get_keyboard() else {
+            return;
+        };
+        let Some((focused_surface, focused_popup)) =
+            keyboard.current_focus().and_then(|focus| match focus {
+                KeyboardFocusTarget::Window(window) => window
+                    .wl_surface()
+                    .map(|surface| (surface.into_owned(), None)),
+                KeyboardFocusTarget::Popup(popup) => find_popup_root_surface(&popup)
+                    .ok()
+                    .map(|root| (root, Some(popup))),
+                KeyboardFocusTarget::LayerSurface(_) | KeyboardFocusTarget::Surface(_) => None,
+            })
+        else {
+            return;
+        };
+        let Some(focused_id) = self.windows.iter().find_map(|(id, window)| {
+            (window.wl_surface().as_deref() == Some(&focused_surface)).then_some(*id)
+        }) else {
+            return;
+        };
+        let active_workspace = self.layout.active_workspace();
+        let focused_visible = self.layout.window(focused_id).is_some_and(|window| {
+            &window.workspace == active_workspace
+                && window.state != WindowState::Hidden
+                && self
+                    .windows
+                    .get(&focused_id)
+                    .is_some_and(|window| self.space.element_location(window).is_some())
+        });
+        if focused_visible {
+            return;
+        }
+
+        let next = self
+            .space
+            .elements()
+            .rev()
+            .find(|window| {
+                let Some(id) = self
+                    .windows
+                    .iter()
+                    .find_map(|(id, candidate)| (candidate == *window).then_some(*id))
+                else {
+                    return false;
+                };
+                self.layout.window(id).is_some_and(|info| {
+                    &info.workspace == active_workspace && info.state != WindowState::Hidden
+                })
+            })
+            .cloned();
+        for window in self.windows.values() {
+            window.set_activate(next.as_ref() == Some(window));
+        }
+        if let Some(popup) = focused_popup {
+            let _ = smithay::desktop::PopupManager::dismiss_popup(&focused_surface, &popup);
+        }
+        keyboard.set_focus(self, next.map(Into::into), SERIAL_COUNTER.next_serial());
     }
 
     fn set_output_scale(&mut self, name: Option<&str>, scale: f64) -> Result<(), String> {

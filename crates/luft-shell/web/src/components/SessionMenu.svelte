@@ -1,9 +1,6 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
   import { sendAction } from "../shell/bridge";
-  import type { ShellSnapshot } from "../shell/model";
-
-  let { snapshot }: { snapshot: ShellSnapshot } = $props();
 
   function close() {
     sendAction({ type: "session-menu-close" });

@@ -216,7 +216,7 @@
   function previewPointerTarget(clientX: number, clientY: number) {
     if (!onreorderover) return;
     const target = document.elementFromPoint(clientX, clientY)?.closest<HTMLElement>(".app-button");
-    const command = target?.dataset.command;
+    const command = target?.dataset["command"];
     if (!command) return;
     const rect = target.getBoundingClientRect();
     onreorderover(command, clientX > rect.left + rect.width / 2);

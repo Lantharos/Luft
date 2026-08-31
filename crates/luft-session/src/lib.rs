@@ -1,3 +1,4 @@
+use luft_config::CursorConfig;
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 use thiserror::Error;
@@ -64,7 +65,7 @@ impl Default for SessionEnvironment {
 
 impl SessionEnvironment {
     pub fn entries(&self) -> Vec<(&'static str, &str)> {
-        let mut entries = vec![
+        vec![
             ("XDG_CURRENT_DESKTOP", self.xdg_current_desktop.as_str()),
             ("XDG_SESSION_DESKTOP", self.xdg_session_desktop.as_str()),
             ("DESKTOP_SESSION", self.desktop_session.as_str()),
@@ -75,16 +76,14 @@ impl SessionEnvironment {
             ("CLUTTER_BACKEND", "wayland"),
             ("MOZ_ENABLE_WAYLAND", "1"),
             ("ELECTRON_OZONE_PLATFORM_HINT", "auto"),
-            ("NO_AT_BRIDGE", "1"),
-        ];
-        entries.extend(luft_config::cursor_environment_entries());
-        entries
+        ]
     }
 
-    pub fn apply_to_command(&self, command: &mut Command) {
+    pub fn apply_to_command(&self, command: &mut Command, cursor: &CursorConfig) {
         for (name, value) in self.entries() {
             command.env(name, value);
         }
+        cursor.apply_to_command(command);
     }
 }
 

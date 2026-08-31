@@ -8,6 +8,8 @@ use std::{
 use luft_ipc::XwaylandStatus;
 use tracing::{info, warn};
 
+const STABLE_PROCESS_WINDOW: Duration = Duration::from_secs(30);
+
 #[derive(Debug)]
 pub struct XwaylandProcess {
     child: Option<Child>,
@@ -16,6 +18,7 @@ pub struct XwaylandProcess {
     display: Option<String>,
     wayland_socket: String,
     restart_at: Instant,
+    started_at: Option<Instant>,
     failures: u32,
 }
 
@@ -29,6 +32,7 @@ impl XwaylandProcess {
             display,
             wayland_socket,
             restart_at: Instant::now(),
+            started_at: None,
             failures: 0,
         };
         process.tick();
@@ -41,11 +45,21 @@ impl XwaylandProcess {
         }
         if let Some(child) = self.child.as_mut() {
             match child.try_wait() {
-                Ok(None) => return,
+                Ok(None) => {
+                    if self
+                        .started_at
+                        .is_some_and(|started| started.elapsed() >= STABLE_PROCESS_WINDOW)
+                    {
+                        self.failures = 0;
+                        self.started_at = None;
+                    }
+                    return;
+                }
                 Ok(Some(status)) => warn!(?status, "xwayland-satellite exited"),
                 Err(error) => warn!(%error, "failed to inspect xwayland-satellite"),
             }
             self.child = None;
+            self.started_at = None;
             self.failures = self.failures.saturating_add(1);
             self.restart_at = Instant::now()
                 + Duration::from_secs(1_u64.checked_shl(self.failures.min(4)).unwrap_or(16));
@@ -66,6 +80,7 @@ impl XwaylandProcess {
             Ok(child) => {
                 info!(pid = child.id(), xdisplay, "started xwayland-satellite");
                 self.child = Some(child);
+                self.started_at = Some(Instant::now());
             }
             Err(error) if error.kind() == io::ErrorKind::NotFound => {
                 self.available = false;
@@ -114,6 +129,7 @@ impl XwaylandProcess {
         let Some(mut child) = self.child.take() else {
             return;
         };
+        self.started_at = None;
         let _ = child.kill();
         let _ = child.wait();
     }

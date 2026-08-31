@@ -13,7 +13,7 @@
 @import "./start_menu_search.css";
 
 @theme {
-  --font-sans: "Geist", "Adwaita Sans", "Cantarell", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Adwaita Sans", "Cantarell", ui-sans-serif, system-ui, sans-serif;
   --ease-shell: cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -120,6 +120,22 @@ button {
   font: inherit;
   text-align: left;
   background: transparent;
+}
+
+button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent), white 28%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 svg {

@@ -76,6 +76,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
         for output in outputs {
             self.backend_data.reset_buffers(&output);
         }
+        self.refresh_idle_inhibition();
 
         if self.session_lock.pending_outputs.is_empty()
             && let Some(confirmation) = self.session_lock.confirmation.take()
@@ -103,6 +104,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
                 smithay::utils::SERIAL_COUNTER.next_serial(),
             );
         }
+        self.refresh_idle_inhibition();
     }
 
     fn new_surface(&mut self, surface: LockSurface, wl_output: WlOutput) {
@@ -139,6 +141,7 @@ impl<BackendData: Backend> SessionLockHandler for KestrelState<BackendData> {
             Some(KeyboardFocusTarget::Surface(surface.wl_surface().clone())),
             smithay::utils::SERIAL_COUNTER.next_serial(),
         );
+        self.refresh_idle_inhibition();
         self.backend_data.reset_buffers(&output);
     }
 }

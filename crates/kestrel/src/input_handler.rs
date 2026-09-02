@@ -33,15 +33,12 @@ use smithay::{
     wayland::{
         compositor::{SurfaceAttributes, with_states},
         input_method::InputMethodSeat,
-        pointer_constraints::with_pointer_constraint,
+        pointer_constraints::{PointerConstraint, with_pointer_constraint},
         shell::wlr_layer::{KeyboardInteractivity, Layer as WlrLayer},
     },
 };
 
 use smithay::backend::input::AbsolutePositionEvent;
-
-#[cfg(feature = "session-backend")]
-use smithay::wayland::pointer_constraints::PointerConstraint;
 
 #[cfg(feature = "nested")]
 use smithay::output::Output;

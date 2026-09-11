@@ -23,9 +23,10 @@ tracing = { workspace = true, features = ["max_level_trace", "release_max_level_
 tracing-subscriber.workspace = true
 xcursor = { version = "0.3.11", optional = true }
 xkbcommon = "0.9.0"
+zbus = { version = "5.18.0", features = ["blocking-api"] }
 
 [features]
-default = ["egl", "nested"]
+default = ["egl", "nested", "session-backend"]
 egl = ["smithay/use_system_lib", "smithay/backend_egl"]
 nested = ["smithay/backend_winit", "smithay/backend_drm"]
 session-backend = [

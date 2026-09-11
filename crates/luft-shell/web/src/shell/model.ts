@@ -1,4 +1,5 @@
 export type ShellSurface =
+  | "settings"
   | "panel"
   | "panel-menu"
   | "session-menu"
@@ -76,6 +77,7 @@ export type WindowItem = {
   geometry: Geometry;
   active: boolean;
   visible: boolean;
+  canForceQuit: boolean;
   state: "floating" | "tiled" | "fullscreen" | "maximized" | "hidden";
 };
 
@@ -115,6 +117,8 @@ export type SystemStatus = {
 };
 
 export type TrayItem = {
+  service: string;
+  path: string;
   title: string;
   iconUri?: string;
   status: "passive" | "active" | "needs-attention";
@@ -153,11 +157,11 @@ export type ShellAction =
   | { type: "panel-menu-close" }
   | { type: "panel-pin"; label: string; command: string; icon?: string }
   | { type: "panel-unpin"; command: string }
-  | { type: "panel-force-quit"; command: string }
+  | { type: "panel-force-quit"; window: number }
   | { type: "panel-reorder"; commands: string[] }
   | { type: "app-launch"; command: string }
-  | { type: "tray-activate"; index: number }
-  | { type: "tray-menu"; index: number }
+  | { type: "tray-activate"; service: string; path: string }
+  | { type: "tray-menu"; service: string; path: string }
   | { type: "quick-open-settings"; page: "appearance" | "network" | "audio" | "power" }
   | { type: "quick-set-volume"; percent: number }
   | { type: "quick-toggle-mute" }
@@ -165,7 +169,7 @@ export type ShellAction =
   | { type: "session-menu-open" }
   | { type: "session-menu-close" }
   | { type: "toggle-session-menu" }
-  | { type: "session-command"; command: "lock" | "suspend" | "reboot" | "power-off" }
+  | { type: "session-command"; command: "lock" | "logout" | "suspend" | "reboot" | "power-off" }
   | { type: "reload-config" }
   | { type: "open-logs-folder" }
   | { type: "notification-close"; notification: number }

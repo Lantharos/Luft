@@ -20,7 +20,8 @@ mod model;
 mod palette;
 mod panel_actions;
 mod popover_actions;
-mod resources;
+mod process_watch;
+pub(crate) mod resources;
 mod running_order;
 mod settings_command;
 mod snapshot;
@@ -41,14 +42,13 @@ use std::{
     collections::VecDeque,
     error::Error,
     rc::Rc,
-    sync::mpsc::{self, Receiver, RecvTimeoutError},
+    sync::mpsc::{self, Receiver},
     thread,
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use surface::WebSurfaces;
 
 const CONFIG_REFRESH: Duration = Duration::from_secs(2);
-const ACTION_TICK: Duration = Duration::from_millis(16);
 const MAINTENANCE_TICK: Duration = Duration::from_millis(100);
 
 pub fn run(config: LuftConfig) -> Result<(), Box<dyn Error>> {
@@ -60,6 +60,9 @@ pub fn run(config: LuftConfig) -> Result<(), Box<dyn Error>> {
     loop {
         let (animating, animation_tick) = {
             let mut shell = shell.borrow_mut();
+            if !shell.ipc.is_connected() {
+                return Err("compositor connection closed".into());
+            }
             shell.tick_actions();
             if last_maintenance.elapsed() >= MAINTENANCE_TICK {
                 shell.tick();
@@ -117,17 +120,17 @@ impl WebShell {
             return;
         }
 
-        match self.actions_rx.recv_timeout(timeout) {
-            Ok(action) => self.queued_actions.push_back(action),
-            Err(RecvTimeoutError::Timeout) => {}
-            Err(RecvTimeoutError::Disconnected) => thread::sleep(ACTION_TICK),
+        if let Ok(action) = self.actions_rx.try_recv() {
+            self.queued_actions.push_back(action);
+        } else {
+            thread::park_timeout(timeout);
         }
     }
 
     fn tick_actions(&mut self) {
         let mut pending_actions: Vec<WebShellAction> = self.queued_actions.drain(..).collect();
         pending_actions.extend(self.actions_rx.try_iter());
-        let mut handled_action = false;
+        let mut handled_action = self.refresh_model();
         for action in pending_actions {
             handled_action = true;
             self.handle_action(action);

@@ -29,6 +29,7 @@ pub struct WebSurface {
     panel_menu_x: Option<i32>,
     session_menu_qs_height: Option<i32>,
     process: Option<SabineProcess>,
+    process_watch: Option<super::process_watch::ProcessWatch>,
     visibility_request: Option<ShellSurfaceVisibilityRequest>,
     requested_presentation: Option<SurfacePresentation>,
     visibility_requested_at: Option<Instant>,
@@ -68,6 +69,7 @@ impl WebSurface {
             panel_menu_x: config.panel_menu_x,
             session_menu_qs_height: config.session_menu_qs_height,
             process: None,
+            process_watch: None,
             visibility_request: None,
             requested_presentation: None,
             visibility_requested_at: None,
@@ -115,6 +117,7 @@ impl WebSurface {
 
         if !visible && !self.keep_alive_when_hidden {
             self.process = None;
+            self.process_watch = None;
             self.visibility_request = None;
             self.requested_presentation = None;
             self.visibility_requested_at = None;
@@ -189,6 +192,14 @@ impl WebSurface {
         };
         match window.launch() {
             Ok(process) => {
+                match super::process_watch::ProcessWatch::new(process.id()) {
+                    Ok(watch) => self.process_watch = Some(watch),
+                    Err(error) => {
+                        warn!(%error, "cannot monitor shell host");
+                        self.control_unavailable_since = Some(Instant::now());
+                        return;
+                    }
+                }
                 self.visibility_request = None;
                 self.requested_presentation = None;
                 self.visibility_requested_at = None;
@@ -317,6 +328,7 @@ impl WebSurface {
     fn build_window(&self) -> Result<SabineWindow, Box<dyn Error>> {
         let snapshot = Arc::clone(&self.snapshot);
         let action_tx = self.actions_tx.clone();
+        let action_wake = std::thread::current();
         let kind = self.kind;
         let shell_options = shell_surface(
             kind,
@@ -367,6 +379,7 @@ impl WebSurface {
                         action_tx
                             .send(action)
                             .map_err(|_| BridgeError::new("luft shell action channel closed"))?;
+                        action_wake.unpark();
                         Ok(BridgeResponse::json(json!({ "ok": true })))
                     }
                     Err(error) => Err(BridgeError::new(format!(
@@ -470,6 +483,13 @@ impl WebSurface {
     }
 
     fn ensure_presentation_request(&mut self) {
+        if self
+            .process_watch
+            .as_ref()
+            .is_some_and(|watch| watch.exited())
+        {
+            self.restart_process();
+        }
         if self.process.is_none() {
             if (self.presentation.visible || self.keep_alive_when_hidden)
                 && self
@@ -504,6 +524,7 @@ impl WebSurface {
 
     fn restart_process(&mut self) {
         self.process = None;
+        self.process_watch = None;
         self.visibility_request = None;
         self.requested_presentation = None;
         self.visibility_requested_at = None;
@@ -545,7 +566,7 @@ pub(crate) struct WebSurfaceConfig<'a> {
 fn runtime_config() -> RuntimeConfig {
     RuntimeConfig {
         mode: RuntimeMode::SharedPreferred,
-        allow_user_install: true,
+        allow_user_install: cfg!(debug_assertions),
         ..RuntimeConfig::default()
     }
 }

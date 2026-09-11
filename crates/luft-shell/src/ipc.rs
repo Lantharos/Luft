@@ -8,7 +8,8 @@ use std::{
     error::Error,
     os::unix::net::UnixStream,
     sync::{
-        atomic::{AtomicU64, Ordering},
+        Arc,
+        atomic::{AtomicBool, AtomicU64, Ordering},
         mpsc::{self, Receiver, Sender},
     },
     thread,
@@ -66,6 +67,7 @@ pub struct ShellIpc {
     outgoing: Sender<ClientMessage>,
     incoming: Receiver<ServerMessage>,
     next_request: AtomicU64,
+    connected: Arc<AtomicBool>,
 }
 
 impl ShellIpc {
@@ -76,12 +78,19 @@ impl ShellIpc {
         let (outgoing_tx, outgoing_rx) = mpsc::channel();
         let (incoming_tx, incoming_rx) = mpsc::channel();
         spawn_writer(stream, outgoing_rx);
-        spawn_reader(read_stream, incoming_tx);
+        let connected = Arc::new(AtomicBool::new(true));
+        spawn_reader(
+            read_stream,
+            incoming_tx,
+            connected.clone(),
+            thread::current(),
+        );
 
         let ipc = Self {
             outgoing: outgoing_tx,
             incoming: incoming_rx,
             next_request: AtomicU64::new(2),
+            connected,
         };
         ipc.outgoing
             .send(ClientMessage::Authenticate { capability })?;
@@ -109,6 +118,10 @@ impl ShellIpc {
         }
     }
 
+    pub fn is_connected(&self) -> bool {
+        self.connected.load(Ordering::Acquire)
+    }
+
     pub fn send(&self, request: IpcRequest) -> Result<u64, mpsc::SendError<ClientMessage>> {
         let id = self.next_request.fetch_add(1, Ordering::Relaxed);
         self.outgoing.send(ClientMessage::Request { id, request })?;
@@ -129,13 +142,21 @@ fn take_shell_capability() -> Result<String, Box<dyn Error>> {
     Ok(capability)
 }
 
-fn spawn_reader(mut stream: UnixStream, incoming: Sender<ServerMessage>) {
+fn spawn_reader(
+    mut stream: UnixStream,
+    incoming: Sender<ServerMessage>,
+    connected: Arc<AtomicBool>,
+    wake: thread::Thread,
+) {
     thread::spawn(move || {
         while let Ok(message) = read_frame(&mut stream) {
             if incoming.send(message).is_err() {
                 break;
             }
+            wake.unpark();
         }
+        connected.store(false, Ordering::Release);
+        wake.unpark();
     });
 }
 

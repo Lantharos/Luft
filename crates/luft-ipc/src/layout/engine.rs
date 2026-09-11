@@ -186,7 +186,6 @@ impl LayoutEngine {
 
         if let Some(info) = self.windows.get_mut(&window) {
             info.workspace = workspace_id.clone();
-            info.state = WindowState::Floating;
         }
 
         self.normalize_dynamic_workspaces();

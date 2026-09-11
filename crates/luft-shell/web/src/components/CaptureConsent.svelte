@@ -2,6 +2,9 @@
   import { sendAction } from "../shell/bridge";
   import type { ShellSnapshot } from "../shell/model";
   import Icon from "./Icon.svelte";
+  import { surfaceFocus } from "../lib/surface_focus";
+
+  const focusConsent = surfaceFocus("capture-consent", ".is-secondary");
 
   let { snapshot }: { snapshot: ShellSnapshot } = $props();
   const prompt = $derived(snapshot.capturePrompt);
@@ -22,6 +25,20 @@
       ? "Only the selected display will be captured."
       : "You can stop sharing from the requesting app.",
   );
+  function outputKeydown(event: KeyboardEvent) {
+    if (!prompt || !["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const outputs = prompt.outputs;
+    const current = outputs.findIndex((output) => output.name === selectedOutput);
+    const index = event.key === "Home" ? 0 : event.key === "End" ? outputs.length - 1
+      : (current + (["ArrowDown", "ArrowRight"].includes(event.key) ? 1 : -1) + outputs.length) % outputs.length;
+    const output = outputs[index];
+    if (!output) return;
+    selectedOutput = output.name;
+    const list = (event.currentTarget as HTMLElement).parentElement;
+    list?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[index]?.focus();
+  }
+
   function allow() {
     if (!prompt || !selectedOutput) return;
     sendAction({
@@ -38,7 +55,8 @@
 </script>
 
 {#if prompt}
-  <section class="capture-consent" aria-labelledby="capture-consent-title">
+  {#key prompt.id}
+  <div class="capture-consent" role="dialog" aria-modal="true" aria-labelledby="capture-consent-title" aria-describedby="capture-consent-description" tabindex="-1" {@attach focusConsent}>
     <header class="capture-consent-header">
       <span class="capture-app-icon">
         {#if prompt.appIconUri}
@@ -49,7 +67,7 @@
       </span>
       <span class="capture-consent-copy">
         <h1 id="capture-consent-title">{title}</h1>
-        <p>{description}</p>
+        <p id="capture-consent-description">{description}</p>
       </span>
       <span class="capture-security" aria-label="Luft protected request">
         <Icon name="shield-check" />
@@ -63,6 +81,8 @@
           class="capture-output"
           class:is-selected={selectedOutput === output.name}
           role="radio"
+          tabindex={selectedOutput === output.name ? 0 : -1}
+          onkeydown={outputKeydown}
           aria-checked={selectedOutput === output.name}
           onclick={() => (selectedOutput = output.name)}
         >
@@ -93,5 +113,6 @@
         >{confirmLabel}</button>
       </div>
     </footer>
-  </section>
+  </div>
+  {/key}
 {/if}

@@ -1,26 +1,13 @@
-use super::notification_metadata::{
-    action_pairs, clean_app_name, clean_icon_name, current_unix_time, strip_markup,
-    urgency_from_hints,
-};
 use std::{
-    collections::HashMap,
     sync::{
         Arc, Mutex,
-        mpsc::{self, Receiver, Sender},
+        mpsc::{self, Sender},
     },
     thread,
-    time::{Duration, Instant},
 };
-use tracing::{debug, warn};
-use zbus::{
-    blocking::connection, fdo, interface, object_server::SignalEmitter, zvariant::OwnedValue,
-};
-
-const SERVICE: &str = "org.freedesktop.Notifications";
-const PATH: &str = "/org/freedesktop/Notifications";
-const INTERFACE: &str = "org.freedesktop.Notifications";
-const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
-const WORKER_TICK: Duration = Duration::from_millis(250);
+use tracing::warn;
+mod server;
+use server::{NotificationCommand, run_notification_worker};
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct NotificationSnapshot {
@@ -54,22 +41,29 @@ pub enum NotificationUrgency {
     Critical,
 }
 
+type NotificationUpdates = Arc<Mutex<Option<NotificationSnapshot>>>;
+
 #[derive(Debug)]
 pub struct NotificationService {
     snapshot: NotificationSnapshot,
-    updates: Receiver<NotificationSnapshot>,
+    updates: NotificationUpdates,
     commands: Sender<NotificationCommand>,
 }
 
 impl NotificationService {
     pub fn start() -> Self {
-        let (updates_tx, updates_rx) = mpsc::channel();
+        let updates = Arc::new(Mutex::new(None));
+        let worker_updates = updates.clone();
         let (commands_tx, commands_rx) = mpsc::channel();
+        let server_commands = commands_tx.clone();
+        let wake = thread::current();
 
         thread::Builder::new()
             .name("luft-notificationd".to_string())
             .spawn(move || {
-                if let Err(error) = run_notification_worker(updates_tx, commands_rx) {
+                if let Err(error) =
+                    run_notification_worker(worker_updates, server_commands, commands_rx, wake)
+                {
                     warn!(%error, "desktop notifications disabled");
                 }
             })
@@ -77,20 +71,25 @@ impl NotificationService {
 
         Self {
             snapshot: NotificationSnapshot::default(),
-            updates: updates_rx,
+            updates,
             commands: commands_tx,
         }
     }
 
     pub fn refresh(&mut self) -> bool {
-        let mut changed = false;
-        while let Ok(snapshot) = self.updates.try_recv() {
-            if self.snapshot != snapshot {
-                self.snapshot = snapshot;
-                changed = true;
-            }
+        let Some(snapshot) = self
+            .updates
+            .lock()
+            .expect("notification update poisoned")
+            .take()
+        else {
+            return false;
+        };
+        if self.snapshot == snapshot {
+            return false;
         }
-        changed
+        self.snapshot = snapshot;
+        true
     }
 
     pub fn snapshot(&self) -> &NotificationSnapshot {
@@ -110,8 +109,6 @@ impl NotificationService {
     }
 
     pub fn invoke(&mut self, id: u32, action_key: String) {
-        self.snapshot.items.retain(|item| item.id != id);
-        self.snapshot.toast_items.retain(|item| item.id != id);
         let _ = self
             .commands
             .send(NotificationCommand::Invoke { id, action_key });
@@ -130,341 +127,8 @@ impl NotificationService {
     }
 }
 
-#[derive(Debug)]
-enum NotificationCommand {
-    Close(u32),
-    ClearAll,
-    SetDoNotDisturb(bool),
-    Invoke { id: u32, action_key: String },
-}
-
-#[derive(Debug)]
-struct NotificationState {
-    next_id: u32,
-    do_not_disturb: bool,
-    items: Vec<StoredNotification>,
-}
-
-#[derive(Debug, Clone)]
-struct StoredNotification {
-    item: NotificationItem,
-    toast_until: Option<Instant>,
-    toast_visible: bool,
-}
-
-#[derive(Clone)]
-struct NotificationShared {
-    state: Arc<Mutex<NotificationState>>,
-    changed: Sender<()>,
-}
-
-struct NotificationServer {
-    shared: NotificationShared,
-}
-
-type Hints = HashMap<String, OwnedValue>;
-
-struct NotificationRequest {
-    app_name: String,
-    replaces_id: u32,
-    app_icon: String,
-    summary: String,
-    body: String,
-    actions: Vec<String>,
-    hints: Hints,
-    expire_timeout: i32,
-}
-
-#[interface(name = "org.freedesktop.Notifications")]
-impl NotificationServer {
-    fn get_capabilities(&self) -> Vec<String> {
-        ["actions", "body", "icon-static"]
-            .into_iter()
-            .map(ToString::to_string)
-            .collect()
+impl Drop for NotificationService {
+    fn drop(&mut self) {
+        let _ = self.commands.send(NotificationCommand::Stop);
     }
-
-    fn get_server_information(&self) -> (String, String, String, String) {
-        (
-            "Luft".to_string(),
-            "Luft".to_string(),
-            env!("CARGO_PKG_VERSION").to_string(),
-            "1.3".to_string(),
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn notify(
-        &self,
-        app_name: String,
-        replaces_id: u32,
-        app_icon: String,
-        summary: String,
-        body: String,
-        actions: Vec<String>,
-        hints: Hints,
-        expire_timeout: i32,
-    ) -> u32 {
-        self.shared.upsert(NotificationRequest {
-            app_name,
-            replaces_id,
-            app_icon,
-            summary,
-            body,
-            actions,
-            hints,
-            expire_timeout,
-        })
-    }
-
-    async fn close_notification(
-        &self,
-        id: u32,
-        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
-    ) -> fdo::Result<()> {
-        if self.shared.remove(id) {
-            let _ = self.shared.changed.send(());
-            emitter.notification_closed(id, 3).await?;
-            Ok(())
-        } else {
-            Err(fdo::Error::Failed("notification not found".to_string()))
-        }
-    }
-
-    #[zbus(signal)]
-    async fn notification_closed(
-        emitter: &SignalEmitter<'_>,
-        id: u32,
-        reason: u32,
-    ) -> zbus::Result<()>;
-
-    #[zbus(signal)]
-    async fn action_invoked(
-        emitter: &SignalEmitter<'_>,
-        id: u32,
-        action_key: &str,
-    ) -> zbus::Result<()>;
-}
-
-impl NotificationShared {
-    fn upsert(&self, request: NotificationRequest) -> u32 {
-        let mut state = self.state.lock().expect("notification state poisoned");
-        let id = if request.replaces_id > 0 {
-            state.next_id = state.next_id.max(request.replaces_id.saturating_add(1));
-            request.replaces_id
-        } else {
-            let id = state.next_id.max(1);
-            state.next_id = id.saturating_add(1).max(1);
-            id
-        };
-        let urgency = urgency_from_hints(&request.hints);
-        let item = NotificationItem {
-            id,
-            app_name: clean_app_name(&request.app_name),
-            app_icon: clean_icon_name(&request.app_icon),
-            received_at: current_unix_time(),
-            summary: strip_markup(&request.summary),
-            body: strip_markup(&request.body),
-            urgency,
-            actions: action_pairs(request.actions),
-        };
-        let toast_visible = !state.do_not_disturb || urgency == NotificationUrgency::Critical;
-        let stored = StoredNotification {
-            item,
-            toast_until: expiration_for(request.expire_timeout, urgency),
-            toast_visible,
-        };
-
-        if let Some(existing) = state
-            .items
-            .iter_mut()
-            .find(|notification| notification.item.id == id)
-        {
-            *existing = stored;
-        } else {
-            state.items.insert(0, stored);
-        }
-        state.items.truncate(5);
-        let _ = self.changed.send(());
-        id
-    }
-
-    fn remove(&self, id: u32) -> bool {
-        let mut state = self.state.lock().expect("notification state poisoned");
-        let Some(index) = state
-            .items
-            .iter()
-            .position(|notification| notification.item.id == id)
-        else {
-            return false;
-        };
-        state.items.remove(index);
-        true
-    }
-
-    fn snapshot(&self) -> NotificationSnapshot {
-        let now = Instant::now();
-        let state = self.state.lock().expect("notification state poisoned");
-        NotificationSnapshot {
-            do_not_disturb: state.do_not_disturb,
-            items: state
-                .items
-                .iter()
-                .map(|notification| notification.item.clone())
-                .collect(),
-            toast_items: state
-                .items
-                .iter()
-                .filter(|notification| notification.toast_visible)
-                .filter(|notification| {
-                    notification
-                        .toast_until
-                        .is_none_or(|expires_at| expires_at > now)
-                })
-                .map(|notification| notification.item.clone())
-                .collect(),
-        }
-    }
-
-    fn expire_toasts(&self) -> bool {
-        let now = Instant::now();
-        let mut state = self.state.lock().expect("notification state poisoned");
-        let mut changed = false;
-        for notification in &mut state.items {
-            if notification.toast_visible
-                && notification
-                    .toast_until
-                    .is_some_and(|expires_at| expires_at <= now)
-            {
-                notification.toast_visible = false;
-                changed = true;
-            }
-        }
-        changed
-    }
-}
-
-fn run_notification_worker(
-    updates: Sender<NotificationSnapshot>,
-    commands: Receiver<NotificationCommand>,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let (changed_tx, changed_rx) = mpsc::channel();
-    let shared = NotificationShared {
-        state: Arc::new(Mutex::new(NotificationState {
-            next_id: 1,
-            do_not_disturb: false,
-            items: Vec::new(),
-        })),
-        changed: changed_tx,
-    };
-    let connection = connection::Builder::session()?
-        .name(SERVICE)?
-        .serve_at(
-            PATH,
-            NotificationServer {
-                shared: shared.clone(),
-            },
-        )?
-        .build()?;
-
-    debug!("desktop notification server ready");
-    let _ = updates.send(shared.snapshot());
-    loop {
-        let mut dirty = false;
-        while let Ok(command) = commands.try_recv() {
-            dirty |= handle_command(&connection, &shared, command);
-        }
-        dirty |= shared.expire_toasts();
-        dirty |= changed_rx.recv_timeout(WORKER_TICK).is_ok();
-        if dirty {
-            let _ = updates.send(shared.snapshot());
-        }
-    }
-}
-
-fn handle_command(
-    connection: &zbus::blocking::Connection,
-    shared: &NotificationShared,
-    command: NotificationCommand,
-) -> bool {
-    match command {
-        NotificationCommand::Close(id) => {
-            if shared.remove(id) {
-                emit_closed(connection, id, 2);
-                return true;
-            }
-            false
-        }
-        NotificationCommand::ClearAll => {
-            let ids = {
-                let mut state = shared.state.lock().expect("notification state poisoned");
-                let ids = state
-                    .items
-                    .iter()
-                    .map(|notification| notification.item.id)
-                    .collect::<Vec<_>>();
-                state.items.clear();
-                ids
-            };
-            for id in ids {
-                emit_closed(connection, id, 2);
-            }
-            true
-        }
-        NotificationCommand::SetDoNotDisturb(enabled) => {
-            {
-                let mut state = shared.state.lock().expect("notification state poisoned");
-                state.do_not_disturb = enabled;
-                if enabled {
-                    for notification in &mut state.items {
-                        if notification.item.urgency != NotificationUrgency::Critical {
-                            notification.toast_visible = false;
-                        }
-                    }
-                }
-            }
-            true
-        }
-        NotificationCommand::Invoke { id, action_key } => {
-            emit_action(connection, id, &action_key);
-            if shared.remove(id) {
-                emit_closed(connection, id, 2);
-                return true;
-            }
-            false
-        }
-    }
-}
-
-fn emit_closed(connection: &zbus::blocking::Connection, id: u32, reason: u32) {
-    let _ = connection.emit_signal::<&str, _, _, _, _>(
-        None,
-        PATH,
-        INTERFACE,
-        "NotificationClosed",
-        &(id, reason),
-    );
-}
-
-fn emit_action(connection: &zbus::blocking::Connection, id: u32, action_key: &str) {
-    let _ = connection.emit_signal::<&str, _, _, _, _>(
-        None,
-        PATH,
-        INTERFACE,
-        "ActionInvoked",
-        &(id, action_key),
-    );
-}
-
-fn expiration_for(timeout: i32, urgency: NotificationUrgency) -> Option<Instant> {
-    if timeout == 0 || urgency == NotificationUrgency::Critical {
-        return None;
-    }
-
-    let timeout = if timeout < 0 {
-        DEFAULT_TIMEOUT
-    } else {
-        Duration::from_millis(timeout as u64)
-    };
-    Some(Instant::now() + timeout)
 }

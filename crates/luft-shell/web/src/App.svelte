@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Settings from "./components/Settings.svelte";
   import DateCenter from "./components/DateCenter.svelte";
   import PanelMenu from "./components/PanelMenu.svelte";
   import SessionMenu from "./components/SessionMenu.svelte";
@@ -10,6 +11,7 @@
   import { getSnapshot, sendAction, subscribe } from "./shell/bridge";
   import type { ShellSnapshot } from "./shell/model";
   import { onMount } from "svelte";
+  import { containTabFocus } from "./lib/surface_focus";
 
   let snapshot = $state.raw<ShellSnapshot>(getSnapshot());
   let startMenuQuery = $state("");
@@ -101,6 +103,8 @@
   }
 
   function keydown(event: KeyboardEvent) {
+    if (surface === "settings") return;
+    if (surface !== "panel" && surface !== "notification-toast") containTabFocus(event, rootElement);
     if (event.key === "Escape" && surface === "start-menu") {
       sendAction({ type: "close-start-menu" });
       return;
@@ -124,6 +128,7 @@
   }
 
   function pointerdown(event: PointerEvent) {
+    if (surface === "settings") return;
     if (!(event.target instanceof Element)) return;
     const target = event.target;
     if (surface === "start-menu" && !target.closest(".shell-start-menu")) {
@@ -156,7 +161,9 @@
 
 <svelte:document onkeydown={keydown} onpointerdown={pointerdown} />
 
-{#if surface === "panel-menu"}
+{#if surface === "settings"}
+  <Settings />
+{:else if surface === "panel-menu"}
   <PanelMenu {snapshot} />
 {:else if surface === "session-menu"}
   <SessionMenu />

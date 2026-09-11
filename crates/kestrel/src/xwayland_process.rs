@@ -111,6 +111,10 @@ impl XwaylandProcess {
         self.tick();
     }
 
+    pub fn pid(&self) -> Option<u32> {
+        self.child.as_ref().map(Child::id)
+    }
+
     pub fn display(&self) -> Option<&str> {
         self.enabled.then_some(self.display.as_deref()).flatten()
     }

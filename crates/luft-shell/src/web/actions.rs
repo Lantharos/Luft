@@ -54,7 +54,7 @@ pub enum WebShellAction {
         command: String,
     },
     PanelForceQuit {
-        command: String,
+        window: u64,
     },
     PanelReorder {
         commands: Vec<String>,
@@ -63,10 +63,12 @@ pub enum WebShellAction {
         command: String,
     },
     TrayActivate {
-        index: usize,
+        service: String,
+        path: String,
     },
     TrayMenu {
-        index: usize,
+        service: String,
+        path: String,
     },
     QuickOpenSettings {
         page: QuickSettingsPage,
@@ -109,6 +111,7 @@ pub enum WebShellAction {
 #[derive(Debug, Clone, Copy, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum SessionCommand {
+    Logout,
     Lock,
     Suspend,
     Reboot,

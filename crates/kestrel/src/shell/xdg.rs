@@ -10,7 +10,6 @@ use smithay::{
         layer_map_for_output, space::SpaceElement,
     },
     input::{Seat, pointer::Focus},
-    output::Output,
     reexports::{
         wayland_protocols::xdg::{decoration as xdg_decoration, shell::server::xdg_toplevel},
         wayland_server::{
@@ -20,7 +19,7 @@ use smithay::{
     },
     utils::{Logical, Point, Rectangle, Serial},
     wayland::{
-        compositor::{self, with_states},
+        compositor::with_states,
         seat::WaylandFocus,
         shell::xdg::{
             Configure, PopupSurface, PositionerState, ToplevelCachedState, ToplevelSurface,
@@ -28,7 +27,7 @@ use smithay::{
         },
     },
 };
-use tracing::{trace, warn};
+use tracing::warn;
 
 use crate::{
     focus::KeyboardFocusTarget,
@@ -37,8 +36,8 @@ use crate::{
 };
 
 use super::{
-    FullscreenSurface, PointerMoveSurfaceGrab, PointerResizeSurfaceGrab, ResizeData, ResizeEdge,
-    ResizeState, SurfaceData, WindowElement, fullscreen_output_geometry, place_new_window,
+    PointerMoveSurfaceGrab, PointerResizeSurfaceGrab, ResizeData, ResizeEdge, ResizeState,
+    SurfaceData, WindowElement, place_new_window,
     ssd::{HEADER_BAR_HEIGHT, WindowAnimation, WindowAnimationKind},
 };
 
@@ -60,11 +59,6 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
             false,
         );
         self.register_window(window);
-
-        compositor::add_post_commit_hook(surface.wl_surface(), |state: &mut Self, _, surface| {
-            handle_toplevel_commit(&mut state.space, surface);
-            center_new_window(state, surface);
-        });
     }
 
     fn new_popup(&mut self, surface: PopupSurface, _positioner: PositionerState) {
@@ -263,8 +257,8 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
             }
 
             let window = self
-                .space
-                .elements()
+                .windows
+                .values()
                 .find(|element| element.wl_surface().as_deref() == Some(&surface));
             if let Some(window) = window {
                 use xdg_decoration::zv1::server::zxdg_toplevel_decoration_v1::Mode;
@@ -282,97 +276,13 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
     fn fullscreen_request(
         &mut self,
         surface: ToplevelSurface,
-        mut wl_output: Option<wl_output::WlOutput>,
+        output: Option<wl_output::WlOutput>,
     ) {
-        // NOTE: This is only one part of the solution. We can set the
-        // location and configure size here, but the surface should be rendered fullscreen
-        // independently from its buffer size
-        let wl_surface = surface.wl_surface();
-
-        let output_geometry =
-            fullscreen_output_geometry(wl_surface, wl_output.as_ref(), &mut self.space);
-
-        if let Some(geometry) = output_geometry {
-            let output = wl_output
-                .as_ref()
-                .and_then(Output::from_resource)
-                .unwrap_or_else(|| self.space.outputs().next().unwrap().clone());
-            let client = match self.display_handle.get_client(wl_surface.id()) {
-                Ok(client) => client,
-                Err(_) => return,
-            };
-            for output in output.client_outputs(&client) {
-                wl_output = Some(output);
-            }
-            let window = self
-                .space
-                .elements()
-                .find(|window| {
-                    window
-                        .wl_surface()
-                        .map(|s| &*s == wl_surface)
-                        .unwrap_or(false)
-                })
-                .unwrap();
-            window.set_ssd(false);
-            window.decoration_state().fullscreen = true;
-
-            surface.with_pending_state(|state| {
-                state.states.set(xdg_toplevel::State::Fullscreen);
-                state.size = Some(geometry.size);
-                state.fullscreen_output = wl_output;
-            });
-            output
-                .user_data()
-                .insert_if_missing(FullscreenSurface::default);
-            output
-                .user_data()
-                .get::<FullscreenSurface>()
-                .unwrap()
-                .set(window.clone());
-            trace!("Fullscreening: {:?}", window);
-        }
-
-        // The protocol demands us to always reply with a configure,
-        // regardless of we fulfilled the request or not
-        if surface.is_initial_configure_sent() {
-            surface.send_configure();
-        } else {
-            // Will be sent during initial configure
-        }
+        self.set_window_fullscreen(surface, output, true);
     }
 
     fn unfullscreen_request(&mut self, surface: ToplevelSurface) {
-        use xdg_decoration::zv1::server::zxdg_toplevel_decoration_v1::Mode;
-
-        let is_ssd = surface.with_committed_state(|state| {
-            state.and_then(|state| state.decoration_mode) == Some(Mode::ServerSide)
-        });
-        if let Some(window) = self.window_for_surface(surface.wl_surface()) {
-            window.set_ssd(is_ssd);
-            window.decoration_state().fullscreen = false;
-        }
-        let ret = surface.with_pending_state(|state| {
-            state.states.unset(xdg_toplevel::State::Fullscreen);
-            state.size = None;
-            state.fullscreen_output.take()
-        });
-        if let Some(output) = ret {
-            let output = Output::from_resource(&output).unwrap();
-            if let Some(fullscreen) = output.user_data().get::<FullscreenSurface>() {
-                trace!("Unfullscreening: {:?}", fullscreen.get());
-                fullscreen.clear();
-                self.backend_data.reset_buffers(&output);
-            }
-        }
-
-        // The protocol demands us to always reply with a configure,
-        // regardless of we fulfilled the request or not
-        if surface.is_initial_configure_sent() {
-            surface.send_configure();
-        } else {
-            // Will be sent during initial configure
-        }
+        self.set_window_fullscreen(surface, None, false);
     }
 
     fn minimize_request(&mut self, surface: ToplevelSurface) {
@@ -385,112 +295,18 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
     }
 
     fn maximize_request(&mut self, surface: ToplevelSurface) {
-        let window = self.window_for_surface(surface.wl_surface()).unwrap();
-        let outputs_for_window = self.space.outputs_for_element(&window);
-        let output = outputs_for_window
-            .first()
-            // The window hasn't been mapped yet, use the primary output instead
-            .or_else(|| self.space.outputs().next())
-            // Assumes that at least one output exists
-            .expect("No outputs found");
-        let output_geometry = self.space.output_geometry(output).unwrap();
-        let zone = layer_map_for_output(output).non_exclusive_zone();
-        let geometry = Rectangle::new(output_geometry.loc + zone.loc, zone.size);
-        let current = Rectangle::new(
-            self.space.element_location(&window).unwrap_or(geometry.loc),
-            window.geometry().size,
-        );
-        {
-            let mut decoration = window.decoration_state();
-            if !decoration.maximized {
-                decoration.floating_geometry = Some(current);
-            }
-            decoration.maximized = true;
-            decoration.animation = Some(WindowAnimation {
-                kind: WindowAnimationKind::Maximize,
-                from: current,
-                to: geometry,
-                started_at: Instant::now(),
-                duration: Duration::from_millis(220),
-            });
-        }
-
-        surface.with_pending_state(|state| {
-            state.states.set(xdg_toplevel::State::Maximized);
-            let header_height = if window.decoration_state().is_ssd {
-                HEADER_BAR_HEIGHT
-            } else {
-                0
-            };
-            state.size = Some((geometry.size.w, geometry.size.h - header_height).into());
-        });
-        self.space.map_element(window, geometry.loc, true);
-        if let Some(id) = self.windows.iter().find_map(|(id, candidate)| {
-            (candidate.wl_surface().as_deref() == Some(surface.wl_surface())).then_some(*id)
-        }) {
-            let _ = self
-                .layout
-                .set_window_state(id, luft_ipc::WindowState::Maximized);
-        }
-
-        // The protocol demands us to always reply with a configure,
-        // regardless of we fulfilled the request or not
-        if surface.is_initial_configure_sent() {
-            surface.send_configure();
-        } else {
-            // Will be sent during initial configure
-        }
+        self.set_window_maximized(surface, true);
     }
 
     fn unmaximize_request(&mut self, surface: ToplevelSurface) {
-        let window = self.window_for_surface(surface.wl_surface()).unwrap();
-        let current = Rectangle::new(
-            self.space.element_location(&window).unwrap_or_default(),
-            window.geometry().size,
-        );
-        let target = window
-            .decoration_state()
-            .floating_geometry
-            .unwrap_or(current);
-        {
-            let mut decoration = window.decoration_state();
-            decoration.maximized = false;
-            decoration.animation = Some(WindowAnimation {
-                kind: WindowAnimationKind::Unmaximize,
-                from: current,
-                to: target,
-                started_at: Instant::now(),
-                duration: Duration::from_millis(220),
-            });
-        }
-        surface.with_pending_state(|state| {
-            state.states.unset(xdg_toplevel::State::Maximized);
-            let header_height = if window.decoration_state().is_ssd {
-                HEADER_BAR_HEIGHT
-            } else {
-                0
-            };
-            state.size = Some((target.size.w, target.size.h - header_height).into());
-        });
-        self.space.map_element(window, target.loc, true);
-        if let Some(id) = self.windows.iter().find_map(|(id, candidate)| {
-            (candidate.wl_surface().as_deref() == Some(surface.wl_surface())).then_some(*id)
-        }) {
-            let _ = self
-                .layout
-                .set_window_state(id, luft_ipc::WindowState::Floating);
-        }
-
-        // The protocol demands us to always reply with a configure,
-        // regardless of we fulfilled the request or not
-        if surface.is_initial_configure_sent() {
-            surface.send_configure();
-        } else {
-            // Will be sent during initial configure
-        }
+        self.set_window_maximized(surface, false);
     }
 
     fn grab(&mut self, surface: PopupSurface, seat: wl_seat::WlSeat, serial: Serial) {
+        if self.session_lock.is_active() {
+            surface.send_popup_done();
+            return;
+        }
         let seat: Seat<KestrelState<BackendData>> = Seat::from_resource(&seat).unwrap();
         let kind = PopupKind::Xdg(surface);
         if let Some(root) = find_popup_root_surface(&kind).ok().and_then(|root| {
@@ -538,53 +354,6 @@ impl<BackendData: Backend> XdgShellHandler for KestrelState<BackendData> {
             }
         }
     }
-}
-
-fn center_new_window<BackendData: Backend>(
-    state: &mut KestrelState<BackendData>,
-    surface: &WlSurface,
-) {
-    let Some(window) = state.window_for_surface(surface) else {
-        return;
-    };
-    if !window.decoration_state().pending_initial_center {
-        return;
-    }
-    let size = window.geometry().size;
-    if size.w <= 1 || size.h <= HEADER_BAR_HEIGHT + 1 {
-        return;
-    }
-    let output = state
-        .space
-        .output_under(state.pointer.current_location())
-        .next()
-        .or_else(|| state.space.outputs().next())
-        .cloned();
-    let Some(output) = output else {
-        return;
-    };
-    let Some(output_geometry) = state.space.output_geometry(&output) else {
-        return;
-    };
-    let zone = layer_map_for_output(&output).non_exclusive_zone();
-    let usable = Rectangle::new(output_geometry.loc + zone.loc, zone.size);
-    let location = Point::from((
-        usable.loc.x + ((usable.size.w - size.w) / 2).max(0),
-        usable.loc.y + ((usable.size.h - size.h) / 2).max(0),
-    ));
-    let target = Rectangle::new(location, size);
-    {
-        let mut decoration = window.decoration_state();
-        decoration.pending_initial_center = false;
-        decoration.animation = Some(WindowAnimation {
-            kind: WindowAnimationKind::Open,
-            from: target,
-            to: target,
-            started_at: Instant::now(),
-            duration: Duration::from_millis(180),
-        });
-    }
-    state.space.map_element(window, location, true);
 }
 
 impl<BackendData: Backend> KestrelState<BackendData> {
@@ -767,7 +536,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 }
 
 /// Should be called on `WlSurface::commit` of xdg toplevel
-fn handle_toplevel_commit(space: &mut Space<WindowElement>, surface: &WlSurface) -> Option<()> {
+pub(super) fn handle_toplevel_commit(
+    space: &mut Space<WindowElement>,
+    surface: &WlSurface,
+) -> Option<()> {
     let window = space
         .elements()
         .find(|w| w.wl_surface().as_deref() == Some(surface))
@@ -780,7 +552,10 @@ fn handle_toplevel_commit(space: &mut Space<WindowElement>, surface: &WlSurface)
         with_states(window.wl_surface().as_deref()?, |states| {
             let data = states.data_map.get::<RefCell<SurfaceData>>()?.borrow_mut();
 
-            if let ResizeState::Resizing(resize_data) = data.resize_state {
+            if let ResizeState::Resizing(resize_data)
+            | ResizeState::WaitingForFinalAck(resize_data, _)
+            | ResizeState::WaitingForCommit(resize_data) = data.resize_state
+            {
                 let edges = resize_data.edges;
                 let loc = resize_data.initial_window_location;
                 let size = resize_data.initial_window_size;

@@ -1,5 +1,6 @@
 // Allow in this module because of existing usage
 #![allow(clippy::uninlined_format_args)]
+mod config;
 use std::{
     collections::hash_map::HashMap,
     io,
@@ -153,13 +154,18 @@ pub struct UdevData {
     primary_gpu: DrmNode,
     gpus: GpuManager<GbmGlesBackend<GlesRenderer, DrmDeviceFd>>,
     backends: HashMap<DrmNode, BackendData>,
-    pointer_images: Vec<(xcursor::parser::Image, MemoryRenderBuffer)>,
+    pointer_images: Vec<(
+        std::sync::Arc<xcursor::parser::Image>,
+        i32,
+        MemoryRenderBuffer,
+    )>,
     pointer_element: PointerElement,
     #[cfg(feature = "debug")]
     fps_texture: Option<MultiTexture>,
     pointer_image: crate::cursor::Cursor,
     debug_flags: DebugFlags,
     keyboards: Vec<smithay::reexports::input::Device>,
+    input_devices: Vec<smithay::reexports::input::Device>,
 }
 
 impl UdevData {
@@ -231,6 +237,19 @@ impl Backend for UdevData {
         }
     }
 
+    fn configure_outputs(
+        state: &mut KestrelState<Self>,
+        config: &luft_config::DisplayConfig,
+    ) -> Result<(), String> {
+        state.configure_outputs(config)
+    }
+
+    fn configure_input(&mut self, config: &luft_config::InputConfig) {
+        for device in &mut self.input_devices {
+            crate::input_config::device(device, config);
+        }
+    }
+
     fn update_led_state(&mut self, led_state: LedState) {
         for keyboard in self.keyboards.iter_mut() {
             keyboard.led_update(led_state.into());
@@ -238,9 +257,12 @@ impl Backend for UdevData {
     }
 }
 
-pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
-    let mut event_loop = EventLoop::try_new().unwrap();
-    let display = Display::new().unwrap();
+pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
+    let mut event_loop =
+        EventLoop::try_new().map_err(|error| format!("could not create event loop: {error}"))?;
+    let display = Display::new().map_err(|error| {
+        format!("could not load the Wayland server library; install libwayland-server: {error}")
+    })?;
     let mut display_handle = display.handle();
 
     /*
@@ -249,8 +271,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
     let (session, notifier) = match LibSeatSession::new() {
         Ok(ret) => ret,
         Err(err) => {
-            error!("Could not initialize a session: {}", err);
-            return;
+            return Err(format!("could not initialize a session: {err}"));
         }
     };
 
@@ -303,6 +324,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
         fps_texture: None,
         debug_flags: DebugFlags::empty(),
         keyboards: Vec::new(),
+        input_devices: Vec::new(),
     };
     let mut state = KestrelState::init(display, event_loop.handle(), data, runtime);
 
@@ -312,8 +334,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
     let udev_backend = match UdevBackend::new(&state.seat_name) {
         Ok(ret) => ret,
         Err(err) => {
-            error!(error = ?err, "Failed to initialize udev backend");
-            return;
+            return Err(format!("failed to initialize udev backend: {err}"));
         }
     };
 
@@ -334,6 +355,8 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
         .insert_source(libinput_backend, move |mut event, _, data| {
             let dh = data.backend_data.dh.clone();
             if let InputEvent::DeviceAdded { device } = &mut event {
+                crate::input_config::device(device, &data.input_config);
+                data.backend_data.input_devices.push(device.clone());
                 if device.has_capability(DeviceCapability::Keyboard) {
                     if let Some(led_state) = data
                         .seat
@@ -344,9 +367,10 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
                     }
                     data.backend_data.keyboards.push(device.clone());
                 }
-            } else if let InputEvent::DeviceRemoved { ref device } = event
-                && device.has_capability(DeviceCapability::Keyboard)
-            {
+            } else if let InputEvent::DeviceRemoved { ref device } = event {
+                data.backend_data
+                    .input_devices
+                    .retain(|item| item != device);
                 data.backend_data.keyboards.retain(|item| item != device);
             }
 
@@ -572,8 +596,8 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
         state.lock_process.tick();
         state.portal_process.tick();
         let result = event_loop.dispatch(Some(Duration::from_millis(16)), &mut state);
-        if result.is_err() {
-            state.running.store(false, Ordering::SeqCst);
+        if let Err(error) = result {
+            return Err(format!("session event loop failed: {error}"));
         } else {
             state.space.refresh();
             state.sync_shell_state();
@@ -581,6 +605,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) {
             display_handle.flush_clients().unwrap();
         }
     }
+    Ok(())
 }
 
 impl DrmLeaseHandler for KestrelState<UdevData> {
@@ -662,13 +687,18 @@ impl DrmSyncobjHandler for KestrelState<UdevData> {
     }
 }
 
-pub type RenderSurface =
-    GbmBufferedSurface<GbmAllocator<DrmDeviceFd>, Option<OutputPresentationFeedback>>;
+pub struct FramePresentation {
+    feedback: OutputPresentationFeedback,
+    lock_generation: Option<u64>,
+    output: Output,
+}
+
+pub type RenderSurface = GbmBufferedSurface<GbmAllocator<DrmDeviceFd>, FramePresentation>;
 
 pub type GbmDrmCompositor = DrmCompositor<
     GbmAllocator<DrmDeviceFd>,
     GbmDevice<DrmDeviceFd>,
-    Option<OutputPresentationFeedback>,
+    FramePresentation,
     DrmDeviceFd,
 >;
 
@@ -681,7 +711,7 @@ struct SurfaceData {
     drm_output: DrmOutput<
         GbmAllocator<DrmDeviceFd>,
         GbmFramebufferExporter<DrmDeviceFd>,
-        Option<OutputPresentationFeedback>,
+        FramePresentation,
         DrmDeviceFd,
     >,
     disable_direct_scanout: bool,
@@ -711,7 +741,7 @@ struct BackendData {
     drm_output_manager: DrmOutputManager<
         GbmAllocator<DrmDeviceFd>,
         GbmFramebufferExporter<DrmDeviceFd>,
-        Option<OutputPresentationFeedback>,
+        FramePresentation,
         DrmDeviceFd,
     >,
     drm_scanner: DrmScanner,
@@ -1099,21 +1129,22 @@ impl KestrelState<UdevData> {
                     serial_number,
                 },
             );
-            let global = output.create_global::<KestrelState<UdevData>>(&self.display_handle);
 
-            let position = configured.map_or_else(
-                || {
-                    let x = self
-                        .space
-                        .outputs()
-                        .filter_map(|output| self.space.output_geometry(output))
-                        .map(|geometry| geometry.loc.x + geometry.size.w)
-                        .max()
-                        .unwrap_or(0);
-                    (x, 0).into()
-                },
-                |output| (output.x, output.y).into(),
-            );
+            let position = configured
+                .filter(|output| output.x.is_some() || output.y.is_some())
+                .map_or_else(
+                    || {
+                        let x = self
+                            .space
+                            .outputs()
+                            .filter_map(|output| self.space.output_geometry(output))
+                            .map(|geometry| geometry.loc.x + geometry.size.w)
+                            .max()
+                            .unwrap_or(0);
+                        (x, 0).into()
+                    },
+                    |output| (output.x.unwrap_or(0), output.y.unwrap_or(0)).into(),
+                );
             let transform = configured
                 .map(|output| output_transform(output.transform))
                 .unwrap_or(Transform::Normal);
@@ -1125,9 +1156,6 @@ impl KestrelState<UdevData> {
                 Some(scale),
                 Some(position),
             );
-            self.space.map_output(&output, position);
-            self.session_lock.output_added(&output);
-            self.shell_state_dirty = true;
 
             output.user_data().insert_if_missing(|| UdevOutputId {
                 crtc,
@@ -1211,6 +1239,10 @@ impl KestrelState<UdevData> {
                 )
             });
 
+            let global = output.create_global::<KestrelState<UdevData>>(&self.display_handle);
+            self.space.map_output(&output, position);
+            self.session_lock.output_added(&output);
+            self.shell_state_dirty = true;
             let surface = SurfaceData {
                 dh: self.display_handle.clone(),
                 device_id: node,
@@ -1276,19 +1308,32 @@ impl KestrelState<UdevData> {
             .gpus
             .single_renderer(&render_node)
             .unwrap();
-        let _ =
-            device
-                .drm_output_manager
-                .lock()
-                .try_to_restore_modifiers::<_, OutputRenderElements<
-                    UdevRenderer<'_>,
-                    AnimatedWindowRenderElement<UdevRenderer<'_>>,
-                >>(
-                    &mut renderer,
-                    // FIXME: For a flicker free operation we should return the actual elements for this output..
-                    // Instead we just use black to "simulate" a modeset :)
-                    &DrmOutputRenderElements::default(),
-                );
+        let mut elements = DrmOutputRenderElements::new();
+        for (crtc, surface) in &device.surfaces {
+            let lock = self
+                .session_lock
+                .surface_for_output(&surface.output)
+                .map(|surface| surface.wl_surface());
+            let (render, clear) = crate::render::output_elements::<UdevRenderer<'_>>(
+                &surface.output,
+                &self.space,
+                [],
+                &mut renderer,
+                self.show_window_preview,
+                self.session_lock.is_active(),
+                lock,
+                &self.wallpaper,
+                &self.layer_motion,
+            );
+            elements.add_output(crtc, clear, render);
+        }
+        if let Err(error) = device
+            .drm_output_manager
+            .lock()
+            .try_to_restore_modifiers(&mut renderer, &elements)
+        {
+            warn!(%error, "could not restore output modifiers after disconnect");
+        }
     }
 
     fn device_changed(&mut self, node: DrmNode) {
@@ -1488,8 +1533,21 @@ impl KestrelState<UdevData> {
 
         let schedule_render = match submit_result {
             Ok(user_data) => {
-                if let Some(mut feedback) = user_data.flatten() {
-                    feedback.presented(clock, Refresh::fixed(frame_duration), seq as u64, flags);
+                if let Some(mut presented) = user_data {
+                    let refresh = surface.drm_output.with_compositor(|compositor| {
+                        if compositor.vrr_enabled() {
+                            Refresh::variable(frame_duration)
+                        } else {
+                            Refresh::fixed(frame_duration)
+                        }
+                    });
+                    presented
+                        .feedback
+                        .presented(clock, refresh, seq as u64, flags);
+                    if let Some(generation) = presented.lock_generation {
+                        self.session_lock
+                            .output_presented(&presented.output, generation);
+                    }
                 }
 
                 true
@@ -1644,11 +1702,22 @@ impl KestrelState<UdevData> {
 
         let start = Instant::now();
 
+        let cursor_scale = output.current_scale().fractional_scale().ceil().max(1.0) as i32;
+        let cursor_name = match &self.cursor_status {
+            CursorImageStatus::Named(icon) => icon.name(),
+            _ => "default",
+        };
         let frame = self.backend_data.pointer_image.get_image(
-            output.current_scale().integer_scale().max(1) as u32,
+            cursor_name,
+            cursor_scale as u32,
             self.clock.now().into(),
         );
 
+        let cursor_hotspot = (
+            frame.xhot as f64 / cursor_scale as f64,
+            frame.yhot as f64 / cursor_scale as f64,
+        )
+            .into();
         let primary_gpu = self.backend_data.primary_gpu;
         let render_node = surface.render_node.unwrap_or(primary_gpu);
         let mut renderer = if primary_gpu == render_node {
@@ -1664,8 +1733,8 @@ impl KestrelState<UdevData> {
         let pointer_images = &mut self.backend_data.pointer_images;
         let pointer_image = pointer_images
             .iter()
-            .find_map(|(image, texture)| {
-                if image == &frame {
+            .find_map(|(image, scale, texture)| {
+                if std::sync::Arc::ptr_eq(image, &frame) && *scale == cursor_scale {
                     Some(texture.clone())
                 } else {
                     None
@@ -1676,11 +1745,11 @@ impl KestrelState<UdevData> {
                     &frame.pixels_rgba,
                     Fourcc::Argb8888,
                     (frame.width as i32, frame.height as i32),
-                    1,
+                    cursor_scale,
                     Transform::Normal,
                     None,
                 );
-                pointer_images.push((frame, buffer.clone()));
+                pointer_images.push((frame, cursor_scale, buffer.clone()));
                 buffer
             });
 
@@ -1691,6 +1760,7 @@ impl KestrelState<UdevData> {
             &output,
             self.pointer.current_location(),
             &pointer_image,
+            cursor_hotspot,
             &mut self.backend_data.pointer_element,
             &self.dnd_icon,
             &mut self.cursor_status,
@@ -1700,15 +1770,13 @@ impl KestrelState<UdevData> {
             captures,
             capture_time,
             session_locked,
+            self.session_lock.generation(),
             lock_surface.as_ref(),
         );
         let reschedule = match result {
             Ok((has_rendered, states)) => {
                 let dmabuf_feedback = surface.dmabuf_feedback.clone();
                 self.post_repaint(&output, frame_target, dmabuf_feedback, &states);
-                if session_locked {
-                    self.session_lock.output_cleared(&output);
-                }
                 !has_rendered
             }
             Err(err) => {
@@ -1755,7 +1823,7 @@ impl KestrelState<UdevData> {
             // did not cause any damage on the output. In this case we just re-schedule a repaint
             // after approx. one frame to re-test for damage.
             let next_frame_target =
-                frame_target + Duration::from_millis(1_000_000 / output_refresh as u64);
+                frame_target + Duration::from_nanos(1_000_000_000_000 / output_refresh as u64);
             let reschedule_timeout =
                 Duration::from(next_frame_target).saturating_sub(self.clock.now().into());
             trace!(
@@ -1787,6 +1855,7 @@ fn render_surface<'a>(
     output: &Output,
     pointer_location: Point<f64, Logical>,
     pointer_image: &MemoryRenderBuffer,
+    named_cursor_hotspot: Point<f64, Logical>,
     pointer_element: &mut PointerElement,
     dnd_icon: &Option<DndIcon>,
     cursor_status: &mut CursorImageStatus,
@@ -1796,6 +1865,7 @@ fn render_surface<'a>(
     captures: Vec<PendingCapture>,
     capture_time: Duration,
     session_locked: bool,
+    lock_generation: Option<u64>,
     lock_surface: Option<&wl_surface::WlSurface>,
 ) -> Result<(bool, RenderElementStates), SwapBuffersError> {
     let output_geometry = space.output_geometry(output).unwrap();
@@ -1813,9 +1883,10 @@ fn render_surface<'a>(
                     .lock()
                     .unwrap()
                     .hotspot
+                    .to_f64()
             })
         } else {
-            (0, 0).into()
+            named_cursor_hotspot
         };
         let cursor_pos = pointer_location - output_geometry.loc.to_f64();
 
@@ -1839,7 +1910,7 @@ fn render_surface<'a>(
         custom_elements.extend(
             pointer_element.render_elements(
                 renderer,
-                (cursor_pos - cursor_hotspot.to_f64())
+                (cursor_pos - cursor_hotspot)
                     .to_physical(scale)
                     .to_i32_round(),
                 scale,
@@ -1936,7 +2007,11 @@ fn render_surface<'a>(
         let output_presentation_feedback = take_presentation_feedback(output, space, &states);
         surface
             .drm_output
-            .queue_frame(Some(output_presentation_feedback))
+            .queue_frame(FramePresentation {
+                feedback: output_presentation_feedback,
+                lock_generation,
+                output: output.clone(),
+            })
             .map_err(Into::<SwapBuffersError>::into)?;
     }
 

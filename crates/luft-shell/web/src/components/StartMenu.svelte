@@ -4,7 +4,7 @@
   import { filteredApplications, startMenuSearchResults, selectedStartMenuResult, type StartMenuSearchResult } from "../lib/start_menu_state";
   import type { ApplicationItem, ShellSnapshot } from "../shell/model";
   import type { Attachment } from "svelte/attachments";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   let {
     snapshot,
@@ -101,6 +101,8 @@
       scrollStartMenuList(event);
       return;
     }
+    const page = (event.target as HTMLElement).closest(".start-menu-app-page");
+    if (page && page.scrollHeight > page.clientHeight) return;
     if (appPageCount <= 1) return;
     const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
     if (Math.abs(delta) < 10) return;
@@ -120,12 +122,18 @@
   }
 
   function searchKeydown(event: KeyboardEvent) {
-    if (["ArrowDown", "ArrowRight"].includes(event.key)) {
+    if (event.isComposing) return;
+    if (!searching && event.key === "ArrowDown") {
+      event.preventDefault();
+      document.querySelector<HTMLButtonElement>('.start-menu-app-page:not([inert]) .start-menu-app')?.focus();
+      return;
+    }
+    if (searching && event.key === "ArrowDown") {
       event.preventDefault();
       moveSelection(1);
       return;
     }
-    if (["ArrowUp", "ArrowLeft"].includes(event.key)) {
+    if (searching && event.key === "ArrowUp") {
       event.preventDefault();
       moveSelection(-1);
       return;
@@ -154,10 +162,38 @@
     setSearch((event.currentTarget as HTMLInputElement).value);
   }
 
-  function moveSelection(offset: number) {
+  async function moveSelection(offset: number) {
     if (searchResults.length <= 0) return;
     const base = clampedSelection < 0 ? (offset > 0 ? -1 : 0) : clampedSelection;
-    setSelection((base + offset + searchResults.length) % searchResults.length);
+    const next = (base + offset + searchResults.length) % searchResults.length;
+    setSelection(next);
+    await tick();
+    document.getElementById(`start-menu-result-${next}`)?.scrollIntoView({ block: "nearest" });
+  }
+
+  async function appKeydown(event: KeyboardEvent, appIndex: number) {
+    const button = event.currentTarget as HTMLButtonElement;
+    const page = button.parentElement;
+    if (!page) return;
+    if (["PageDown", "PageUp"].includes(event.key)) {
+      event.preventDefault();
+      setAppPage(currentAppPage + (event.key === "PageDown" ? 1 : -1));
+      await tick();
+      document.querySelector<HTMLButtonElement>('.start-menu-app-page:not([inert]) .start-menu-app')?.focus();
+      return;
+    }
+    if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const apps = Array.from(page.querySelectorAll<HTMLButtonElement>(".start-menu-app"));
+    const columns = getComputedStyle(page).gridTemplateColumns.split(" ").length;
+    const offset = event.key === "ArrowDown" ? columns : event.key === "ArrowUp" ? -columns
+      : event.key === "ArrowRight" ? 1 : -1;
+    const next = event.key === "Home" ? 0 : event.key === "End" ? apps.length - 1 : appIndex + offset;
+    if (next < 0 && event.key === "ArrowUp") {
+      focusSearch();
+    } else {
+      apps[Math.max(0, Math.min(next, apps.length - 1))]?.focus();
+    }
   }
 
   function launchApp(app: ApplicationItem) {
@@ -227,7 +263,12 @@
         id="start-menu-search-input"
         class="start-menu-search-input"
         type="text"
-        aria-label="Search apps"
+        aria-label="Search apps, windows, workspaces and actions"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={searching}
+        aria-controls={searching ? "start-menu-results" : undefined}
+        aria-activedescendant={searching && clampedSelection >= 0 ? `start-menu-result-${clampedSelection}` : undefined}
         inputmode="search"
         autocomplete="off"
         autocapitalize="off"
@@ -235,14 +276,13 @@
         placeholder="Search"
         value={query}
         onpointerdown={(event) => event.stopPropagation()}
-        onclick={focusSearch}
         oninput={searchInput}
         onkeydown={searchKeydown}
       />
     </label>
   </header>
 
-  <div class={searching ? "start-menu-results" : "start-menu-apps"} onwheel={startMenuAppsWheel}>
+  <div id={searching ? "start-menu-results" : undefined} role={searching ? "listbox" : undefined} aria-label={searching ? "Search results" : undefined} class={searching ? "start-menu-results" : "start-menu-apps"} onwheel={startMenuAppsWheel}>
     {#if searching && searchResults.length === 0}
       <div class="start-menu-empty">
         <Icon name="search" />
@@ -252,6 +292,10 @@
       {#each searchResults as result, index (result.key)}
         <button
           type="button"
+          id={`start-menu-result-${index}`}
+          role="option"
+          aria-selected={clampedSelection === index}
+          tabindex="-1"
           class="start-menu-result"
           class:is-selected={clampedSelection >= 0 && index === clampedSelection}
           style={`--index: ${index}`}
@@ -293,6 +337,7 @@
             style:--page-rows={pageRows(page, 6)}
             style:--mobile-page-rows={pageRows(page, 3)}
             aria-hidden={pageIndex !== currentAppPage}
+            inert={pageIndex !== currentAppPage}
           >
             {#each page as app, appIndex (app.command)}
               <button
@@ -302,6 +347,7 @@
                 style={`--index: ${pageIndex * APPS_PER_PAGE + appIndex}`}
                 aria-label={app.name}
                 tabindex={pageIndex === currentAppPage ? 0 : -1}
+                onkeydown={(event) => appKeydown(event, appIndex)}
                 onclick={() => launchApp(app)}
                 oncontextmenu={(event) => pinApp(event, app)}
               >

@@ -3,6 +3,7 @@ use std::{
     os::{fd::AsRawFd, unix::net::UnixStream},
     process::{Child, Command},
     sync::Arc,
+    time::{Duration, Instant},
 };
 
 use smithay::reexports::wayland_server::DisplayHandle;
@@ -15,6 +16,7 @@ pub struct LockProcess {
     display: DisplayHandle,
     command: String,
     child: Option<Child>,
+    retry_at: Instant,
 }
 
 impl LockProcess {
@@ -23,6 +25,7 @@ impl LockProcess {
             display,
             command,
             child: None,
+            retry_at: Instant::now(),
         }
     }
 
@@ -57,6 +60,15 @@ impl LockProcess {
         info!(pid = child.id(), "started session lock");
         self.child = Some(child);
         Ok(())
+    }
+
+    pub fn recover(&mut self) {
+        if self.child.is_none() && Instant::now() >= self.retry_at {
+            self.retry_at = Instant::now() + Duration::from_secs(2);
+            if let Err(error) = self.start() {
+                warn!(%error, "failed to restart session locker");
+            }
+        }
     }
 
     pub fn tick(&mut self) {

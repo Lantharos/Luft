@@ -132,7 +132,7 @@ fn prepare_development_components(backend: KestrelBackend) -> io::Result<()> {
 }
 
 fn session_command(kestrel: &Path, backend: KestrelBackend) -> Command {
-    if env::var_os("LUFT_USE_HOST_DBUS").is_none()
+    if matches!(backend, KestrelBackend::Nested)
         && let Some(dbus_run_session) = find_in_path("dbus-run-session")
     {
         let mut command = Command::new(dbus_run_session);

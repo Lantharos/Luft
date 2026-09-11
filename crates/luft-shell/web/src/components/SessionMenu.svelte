@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { surfaceFocus, menuKeydown } from "../lib/surface_focus";
+  const focusMenu = surfaceFocus("session-menu", '[role="menuitem"]');
   import Icon from "./Icon.svelte";
   import { sendAction } from "../shell/bridge";
 
@@ -6,17 +8,21 @@
     sendAction({ type: "session-menu-close" });
   }
 
-  function run(command: "lock" | "suspend" | "reboot" | "power-off") {
+  function run(command: "lock" | "logout" | "suspend" | "reboot" | "power-off") {
     close();
     sendAction({ type: "session-command", command });
   }
 </script>
 
 <section class="session-menu-shell">
-  <div class="session-menu" role="menu" tabindex="-1" onpointerdown={(event) => event.stopPropagation()}>
+  <div class="session-menu" role="menu" tabindex="-1" {@attach focusMenu} onkeydown={menuKeydown} onpointerdown={(event) => event.stopPropagation()}>
     <button type="button" class="session-menu-item" role="menuitem" onclick={() => run("lock")}>
       <span class="session-menu-icon"><Icon name="lock" /></span>
       <span>Lock</span>
+    </button>
+    <button type="button" class="session-menu-item" role="menuitem" onclick={() => run("logout")}>
+      <span class="session-menu-icon"><Icon name="logout" /></span>
+      <span>Log Out</span>
     </button>
     <button type="button" class="session-menu-item" role="menuitem" onclick={() => run("suspend")}>
       <span class="session-menu-icon"><Icon name="moon" /></span>

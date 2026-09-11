@@ -65,8 +65,8 @@ fn shell_size(_kind: WebShellSurface, size: (i32, i32)) -> (u32, u32) {
 
 fn layer(kind: WebShellSurface) -> ShellSurfaceLayer {
     match kind {
-        WebShellSurface::Panel | WebShellSurface::CaptureConsent => ShellSurfaceLayer::Overlay,
-        _ => ShellSurfaceLayer::Top,
+        WebShellSurface::Panel | WebShellSurface::NotificationToast => ShellSurfaceLayer::Top,
+        _ => ShellSurfaceLayer::Overlay,
     }
 }
 
@@ -141,8 +141,8 @@ fn panel_menu_left_margin(width: i32, x: Option<i32>) -> i32 {
 
 fn exclusive_zone(kind: WebShellSurface) -> Option<i32> {
     match kind {
-        WebShellSurface::Panel
-        | WebShellSurface::StartMenu
+        WebShellSurface::Panel => Some(PANEL_HEIGHT),
+        WebShellSurface::StartMenu
         | WebShellSurface::PanelMenu
         | WebShellSurface::CaptureConsent => Some(LAYER_SURFACE_ZONE_IGNORE),
         WebShellSurface::SessionMenu => Some(LAYER_SURFACE_ZONE_IGNORE),

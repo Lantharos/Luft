@@ -26,6 +26,9 @@ fn resource_candidates() -> Vec<PathBuf> {
     {
         candidates.push(prefix.join("share/luft/shell"));
     }
+    if let Some(directory) = option_env!("LUFT_SHELL_INSTALL_DATA_DIR") {
+        candidates.push(PathBuf::from(directory));
+    }
     #[cfg(debug_assertions)]
     candidates.push(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("web/dist"));
     candidates

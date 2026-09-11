@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { surfaceFocus, menuKeydown } from "../lib/surface_focus";
+  const focusMenu = surfaceFocus("panel-menu", '[role="menuitem"]');
   import { sendAction } from "../shell/bridge";
   import type { PanelApp, ShellSnapshot, WindowItem } from "../shell/model";
   import AppIcon from "./AppIcon.svelte";
@@ -51,9 +53,9 @@
     sendAction({ type: "window-close", window: window.id });
   }
 
-  function forceQuit(app: PanelApp) {
+  function forceQuit(window: WindowItem) {
     close();
-    sendAction({ type: "panel-force-quit", command: app.command });
+    sendAction({ type: "panel-force-quit", window: window.id });
   }
 
   function matchedWindow(app: PanelApp, windows: WindowItem[]) {
@@ -61,25 +63,8 @@
       windows.find((window) => window.active && app.windowIds.includes(window.id)) ??
       windows.find((window) => window.visible && app.windowIds.includes(window.id)) ??
       windows.find((window) => app.windowIds.includes(window.id)) ??
-      windows.find((window) => window.active && window.visible && windowMatchesApp(window, app)) ??
-      windows.find((window) => window.visible && windowMatchesApp(window, app)) ??
-      windows.find((window) => windowMatchesApp(window, app))
+      windows.find((window) => window.id === app.windowId)
     );
-  }
-
-  function windowMatchesApp(window: WindowItem, app: PanelApp) {
-    if (app.windowIds.includes(window.id)) return true;
-    if (app.windowId === window.id) return true;
-    const command = commandName(app.command);
-    const label = app.label.toLowerCase();
-    return [window.appId, window.title].some((value) => {
-      const text = value?.toLowerCase() ?? "";
-      return Boolean(text && ((command && text.includes(command)) || (label && text.includes(label))));
-    });
-  }
-
-  function commandName(command: string) {
-    return command.trim().split(/\s+/)[0]?.split("/").at(-1)?.replace(/^['"]|['"]$/g, "").toLowerCase() ?? "";
   }
 
   function launchable(app: PanelApp) {
@@ -89,7 +74,7 @@
 
 <section class="panel-menu-shell">
   {#if app}
-    <div class="panel-menu" role="menu" tabindex="-1" data-command={app.command} onpointerdown={(event) => event.stopPropagation()}>
+    <div class="panel-menu" role="menu" tabindex="-1" {@attach focusMenu} onkeydown={menuKeydown} data-command={app.command} onpointerdown={(event) => event.stopPropagation()}>
       <header class="panel-menu-header">
         <span class="panel-menu-icon"><AppIcon {app} /></span>
         <span class="panel-menu-identity">
@@ -161,9 +146,9 @@
         </div>
       {/if}
 
-      {#if isRunning}
+      {#if window?.canForceQuit}
         <div class="panel-menu-group">
-          <button type="button" class="panel-menu-item is-danger" role="menuitem" onclick={() => forceQuit(app)}>
+          <button type="button" class="panel-menu-item is-danger" role="menuitem" onclick={() => forceQuit(window)}>
             <Icon name="power" />
             <span>Force Quit</span>
           </button>

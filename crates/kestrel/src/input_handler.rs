@@ -273,6 +273,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let keyboard = self.seat.get_keyboard().unwrap();
 
         if self.session_lock.is_active() {
+            keyboard.unset_grab(self);
             let focus = self
                 .space
                 .output_under(self.pointer.current_location())
@@ -292,7 +293,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 data.keyboard_interactivity == KeyboardInteractivity::Exclusive
                     && (data.layer == WlrLayer::Top || data.layer == WlrLayer::Overlay)
             });
-            if exclusive {
+            let mapped = crate::shell::layer_focus::layer_surface_visible(layer.wl_surface());
+            if exclusive && mapped {
                 let surface = self.space.outputs().find_map(|o| {
                     let map = layer_map_for_output(o);
                     map.layers().find(|l| l.layer_surface() == &layer).cloned()
@@ -319,9 +321,15 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 time,
                 |_, modifiers, handle| {
                     let modified_keysym = handle.modified_sym();
-                    let keysym = handle
-                        .raw_latin_sym_or_raw_current_sym()
-                        .unwrap_or(modified_keysym);
+                    let keysym = if (xkb::KEY_XF86Switch_VT_1..=xkb::KEY_XF86Switch_VT_12)
+                        .contains(&modified_keysym.raw())
+                    {
+                        modified_keysym
+                    } else {
+                        handle
+                            .raw_latin_sym_or_raw_current_sym()
+                            .unwrap_or(modified_keysym)
+                    };
 
                     debug!(
                         ?state,
@@ -448,7 +456,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 let fullscreen = output
                     .user_data()
                     .get::<FullscreenSurface>()
-                    .and_then(|surface| surface.get());
+                    .and_then(|surface| surface.get())
+                    .filter(|window| {
+                        self.space.element_location(window).is_some()
+                            && window.decoration_state().fullscreen
+                    });
                 if let Some(layer) = panel_layer_under(&layers, &self.layer_motion, layer_location)
                     .or_else(|| {
                         input_layer_under(
@@ -557,7 +569,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let fullscreen = output
             .user_data()
             .get::<FullscreenSurface>()
-            .and_then(|surface| surface.get());
+            .and_then(|surface| surface.get())
+            .filter(|window| {
+                self.space.element_location(window).is_some()
+                    && window.decoration_state().fullscreen
+            });
         if let Some(focus) =
             panel_surface_under(&layers, &self.layer_motion, pos - output_geo.loc.to_f64())
                 .or_else(|| {

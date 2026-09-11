@@ -83,7 +83,6 @@ where
     {
         match &self.status {
             CursorImageStatus::Hidden => vec![],
-            // Always render `Default` for a named shape.
             CursorImageStatus::Named(_) => {
                 if let Some(buffer) = self.buffer.as_ref() {
                     vec![

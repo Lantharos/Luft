@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use smithay::{
-    desktop::{WindowSurface, space::SpaceElement},
+    desktop::WindowSurface,
     input::{
         pointer::{
             AxisFrame, ButtonEvent, GestureHoldBeginEvent, GestureHoldEndEvent,
@@ -449,51 +449,6 @@ impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
         if handle.current_pressed().is_empty() {
             // No more buttons are pressed, release the grab.
             handle.unset_grab(self, data, event.serial, event.time, true);
-
-            // If toplevel is dead, we can't resize it, so we return early.
-            if !self.window.alive() {
-                return;
-            }
-
-            match &self.window.0.underlying_surface() {
-                WindowSurface::Wayland(xdg) => {
-                    xdg.with_pending_state(|state| {
-                        state.states.unset(xdg_toplevel::State::Resizing);
-                        state.size = Some(self.last_window_size);
-                    });
-                    xdg.send_pending_configure();
-                    if self.edges.intersects(ResizeEdge::TOP_LEFT) {
-                        let geometry = self.window.geometry();
-                        let mut location = data.space.element_location(&self.window).unwrap();
-
-                        if self.edges.intersects(ResizeEdge::LEFT) {
-                            location.x = self.initial_window_location.x
-                                + (self.initial_window_size.w - geometry.size.w);
-                        }
-                        if self.edges.intersects(ResizeEdge::TOP) {
-                            location.y = self.initial_window_location.y
-                                + (self.initial_window_size.h - geometry.size.h);
-                        }
-
-                        data.space.map_element(self.window.clone(), location, true);
-                        data.shell_state_dirty = true;
-                    }
-
-                    with_states(&self.window.wl_surface().unwrap(), |states| {
-                        let mut data = states
-                            .data_map
-                            .get::<RefCell<SurfaceData>>()
-                            .unwrap()
-                            .borrow_mut();
-                        if let ResizeState::Resizing(resize_data) = data.resize_state {
-                            data.resize_state =
-                                ResizeState::WaitingForFinalAck(resize_data, event.serial);
-                        } else {
-                            panic!("invalid resize state: {:?}", data.resize_state);
-                        }
-                    });
-                }
-            }
         }
     }
 
@@ -590,7 +545,9 @@ impl<BackendData: Backend> PointerGrab<KestrelState<BackendData>>
         &self.start_data
     }
 
-    fn unset(&mut self, _data: &mut KestrelState<BackendData>) {}
+    fn unset(&mut self, data: &mut KestrelState<BackendData>) {
+        finish_resize(data, &self.window, self.last_window_size);
+    }
 }
 
 pub struct TouchResizeSurfaceGrab<BackendData: Backend + 'static> {
@@ -627,51 +584,6 @@ impl<BackendData: Backend> TouchGrab<KestrelState<BackendData>>
             return;
         }
         handle.unset_grab(self, data);
-
-        // If toplevel is dead, we can't resize it, so we return early.
-        if !self.window.alive() {
-            return;
-        }
-
-        match self.window.0.underlying_surface() {
-            WindowSurface::Wayland(xdg) => {
-                xdg.with_pending_state(|state| {
-                    state.states.unset(xdg_toplevel::State::Resizing);
-                    state.size = Some(self.last_window_size);
-                });
-                xdg.send_pending_configure();
-                if self.edges.intersects(ResizeEdge::TOP_LEFT) {
-                    let geometry = self.window.geometry();
-                    let mut location = data.space.element_location(&self.window).unwrap();
-
-                    if self.edges.intersects(ResizeEdge::LEFT) {
-                        location.x = self.initial_window_location.x
-                            + (self.initial_window_size.w - geometry.size.w);
-                    }
-                    if self.edges.intersects(ResizeEdge::TOP) {
-                        location.y = self.initial_window_location.y
-                            + (self.initial_window_size.h - geometry.size.h);
-                    }
-
-                    data.space.map_element(self.window.clone(), location, true);
-                    data.shell_state_dirty = true;
-                }
-
-                with_states(&self.window.wl_surface().unwrap(), |states| {
-                    let mut data = states
-                        .data_map
-                        .get::<RefCell<SurfaceData>>()
-                        .unwrap()
-                        .borrow_mut();
-                    if let ResizeState::Resizing(resize_data) = data.resize_state {
-                        data.resize_state =
-                            ResizeState::WaitingForFinalAck(resize_data, event.serial);
-                    } else {
-                        panic!("invalid resize state: {:?}", data.resize_state);
-                    }
-                });
-            }
-        }
     }
 
     fn motion(
@@ -795,5 +707,34 @@ impl<BackendData: Backend> TouchGrab<KestrelState<BackendData>>
         &self.start_data
     }
 
-    fn unset(&mut self, _data: &mut KestrelState<BackendData>) {}
+    fn unset(&mut self, data: &mut KestrelState<BackendData>) {
+        finish_resize(data, &self.window, self.last_window_size);
+    }
+}
+
+fn finish_resize<B: Backend>(
+    data: &mut KestrelState<B>,
+    window: &WindowElement,
+    size: Size<i32, Logical>,
+) {
+    if !window.alive() {
+        return;
+    }
+    let WindowSurface::Wayland(toplevel) = window.0.underlying_surface();
+    toplevel.with_pending_state(|state| {
+        state.states.unset(xdg_toplevel::State::Resizing);
+        state.size = Some(size);
+    });
+    let serial = toplevel.send_configure();
+    with_states(toplevel.wl_surface(), |states| {
+        let mut surface = states
+            .data_map
+            .get::<RefCell<SurfaceData>>()
+            .unwrap()
+            .borrow_mut();
+        if let ResizeState::Resizing(resize) = surface.resize_state {
+            surface.resize_state = ResizeState::WaitingForFinalAck(resize, serial);
+        }
+    });
+    data.shell_state_dirty = true;
 }

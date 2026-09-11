@@ -127,6 +127,15 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         if !ipc_request_allowed(&request, access) {
             return ipc_error("IPC access denied");
         }
+        if !matches!(
+            &request,
+            IpcRequest::GetSettings
+                | IpcRequest::ListOutputs
+                | IpcRequest::SubscribeShell
+                | IpcRequest::PollCaptureConsent { .. }
+        ) {
+            self.backend_data.request_redraw(None);
+        }
         if let IpcRequest::PollCaptureConsent { request } = request {
             let prompt_expired = self.capture_consent.expire();
             let response = self
@@ -142,6 +151,17 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         }
         self.shell_state_dirty = true;
         match request {
+            IpcRequest::GetSettings => self.settings_state().unwrap_or_else(ipc_error),
+            IpcRequest::ApplySettings { original, config } => self
+                .apply_settings(*original, *config)
+                .unwrap_or_else(ipc_error),
+            IpcRequest::ConfirmSettings { id } => {
+                self.confirm_settings(id).unwrap_or_else(ipc_error)
+            }
+            IpcRequest::RevertSettings { id } => self
+                .revert_settings(id)
+                .and_then(|()| self.settings_state())
+                .unwrap_or_else(ipc_error),
             IpcRequest::SubscribeShell => IpcResponse::Accepted { revision: 0 },
             IpcRequest::BeginCaptureConsent { request } => {
                 if !self.ipc_socket.has_shell_subscriber() {
@@ -230,7 +250,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 
     fn reload_config(&mut self) -> Result<(), String> {
+        if self.pending_settings.is_some() {
+            return Err("Finish the display confirmation before reloading settings".into());
+        }
         let config = load_config().map_err(|error| error.to_string())?.config;
+        self.apply_config(&config)
+    }
+
+    pub(crate) fn apply_config(&mut self, config: &luft_config::LuftConfig) -> Result<(), String> {
         self.idle_lock_after = config
             .session
             .idle_lock_seconds
@@ -303,6 +330,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 
     pub fn sync_shell_state(&mut self) -> &ShellSnapshot {
+        self.release_due_commits();
+        self.expire_settings();
         self.process_idle_actions();
         if self.session_lock.needs_locker() {
             self.lock_process.recover();
@@ -321,6 +350,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         let focus = self.shell_focus_surface();
         let focus_changed = focus != self.last_shell_focus;
         self.last_shell_focus = focus;
+        if policy_changed || focus_changed {
+            self.backend_data.request_redraw(None);
+        }
         let process_changed = self.ipc_socket.snapshot().is_some_and(|snapshot| {
             snapshot.status.shell != self.shell_process.status()
                 || snapshot.status.xwayland != self.xwayland_process.status()
@@ -350,13 +382,16 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 
     fn process_idle_actions(&mut self) {
-        if self.idle_inhibited {
+        if self.idle_inhibited || Instant::now() < self.idle_action_retry_at {
             return;
         }
 
         let idle_for = self.last_activity.elapsed();
         if !self.idle_lock_sent && self.idle_lock_after.is_some_and(|after| idle_for >= after) {
             self.idle_lock_sent = self.request_lock().is_ok();
+            if !self.idle_lock_sent {
+                self.idle_action_retry_at = Instant::now() + Duration::from_secs(2);
+            }
         }
         if !self.idle_suspend_sent
             && self
@@ -364,6 +399,9 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 .is_some_and(|after| idle_for >= after)
         {
             self.idle_suspend_sent = self.request_suspend().is_ok();
+            if !self.idle_suspend_sent {
+                self.idle_action_retry_at = Instant::now() + Duration::from_secs(2);
+            }
         }
     }
 
@@ -701,6 +739,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
     }
 
     pub(crate) fn reconcile_workspace(&mut self) {
+        self.backend_data.request_redraw(None);
         let active = self.layout.active_workspace().clone();
         let visible = self
             .layout
@@ -856,7 +895,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
 fn ipc_request_allowed(request: &IpcRequest, access: IpcAccess) -> bool {
     match request {
-        IpcRequest::ListOutputs => true,
+        IpcRequest::ListOutputs
+        | IpcRequest::GetSettings
+        | IpcRequest::ApplySettings { .. }
+        | IpcRequest::ConfirmSettings { .. }
+        | IpcRequest::RevertSettings { .. } => true,
         IpcRequest::BeginCaptureConsent { .. }
         | IpcRequest::PollCaptureConsent { .. }
         | IpcRequest::CancelCaptureConsent { .. } => access == IpcAccess::Portal,

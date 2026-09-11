@@ -1,11 +1,8 @@
-use luft_config::{LuftConfig, load_config, save_config};
-use luft_ipc::{
-    ClientMessage, IpcRequest, IpcResponse, OutputSummary, ServerMessage, read_frame, socket_path,
-    write_frame,
-};
+use luft_config::LuftConfig;
+use luft_ipc::{IpcRequest, IpcResponse, OutputSummary, SettingsConfirmation, send_request};
 use sabine::{BridgeError, RuntimeConfig, RuntimeMode, SabineWindow};
 use serde::{Deserialize, Serialize};
-use std::{error::Error, os::unix::net::UnixStream, sync::Mutex, time::Duration};
+use std::error::Error;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -18,9 +15,16 @@ struct SaveSettings {
     config: LuftConfig,
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ConfirmSettings {
+    id: u64,
+}
+
 #[derive(Serialize)]
-struct SettingsState {
-    config: LuftConfig,
+struct SettingsResult {
+    config: Box<LuftConfig>,
+    confirmation: Option<SettingsConfirmation>,
     outputs: Vec<OutputSummary>,
     outputs_error: Option<String>,
 }
@@ -44,7 +48,6 @@ pub fn run(page: &str) -> Result<(), Box<dyn Error>> {
         "display" | "input" | "appearance" | "power" | "apps" | "network" | "audio" => page,
         _ => "appearance",
     };
-    let save_guard = Mutex::new(());
     let entry = crate::web::resources::entrypoint()?;
     let window = SabineWindow::new()
         .app_id("net.aveid.luft.settings")
@@ -58,19 +61,20 @@ pub fn run(page: &str) -> Result<(), Box<dyn Error>> {
             allow_user_install: cfg!(debug_assertions),
             ..RuntimeConfig::default()
         })
-        .bridge_typed("settings.read", |_: ReadSettings| read_settings())
-        .bridge_typed("settings.save", move |request: SaveSettings| {
-            let _guard = save_guard
-                .lock()
-                .map_err(|_| BridgeError::new("Settings could not be saved"))?;
-            let current = load_config().map_err(bridge_error)?.config;
-            if current != request.original {
-                return Err(BridgeError::new(
-                    "Settings changed elsewhere. Reload before saving your changes.",
-                ));
-            }
-            save_config(&request.config).map_err(bridge_error)?;
-            Ok(request.config)
+        .bridge_typed("settings.read", |_: ReadSettings| {
+            settings_request(IpcRequest::GetSettings)
+        })
+        .bridge_typed("settings.save", |request: SaveSettings| {
+            settings_request(IpcRequest::ApplySettings {
+                original: Box::new(request.original),
+                config: Box::new(request.config),
+            })
+        })
+        .bridge_typed("settings.confirm", |request: ConfirmSettings| {
+            settings_request(IpcRequest::ConfirmSettings { id: request.id })
+        })
+        .bridge_typed("settings.revert", |request: ConfirmSettings| {
+            settings_request(IpcRequest::RevertSettings { id: request.id })
         })
         .bridge_typed("settings.open-tool", |request: OpenTool| {
             let command = match request.tool {
@@ -95,40 +99,32 @@ pub fn run(page: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn read_settings() -> Result<SettingsState, BridgeError> {
-    let config = load_config().map_err(bridge_error)?.config;
-    let (outputs, outputs_error) = match connected_outputs() {
-        Ok(outputs) => (outputs, None),
-        Err(error) => (Vec::new(), Some(error.to_string())),
-    };
-    Ok(SettingsState {
-        config,
-        outputs,
-        outputs_error,
-    })
+fn settings_request(request: IpcRequest) -> Result<SettingsResult, BridgeError> {
+    match send_request(&request).map_err(bridge_error)? {
+        IpcResponse::Settings {
+            config,
+            confirmation,
+        } => {
+            let (outputs, outputs_error) = match connected_outputs() {
+                Ok(outputs) => (outputs, None),
+                Err(error) => (Vec::new(), Some(error.to_string())),
+            };
+            Ok(SettingsResult {
+                config,
+                confirmation,
+                outputs,
+                outputs_error,
+            })
+        }
+        IpcResponse::Error { message } => Err(BridgeError::new(message)),
+        _ => Err(BridgeError::new("Unexpected settings response")),
+    }
 }
 
 fn connected_outputs() -> Result<Vec<OutputSummary>, Box<dyn Error>> {
-    let mut stream = UnixStream::connect(socket_path())?;
-    let timeout = Some(Duration::from_secs(1));
-    stream.set_read_timeout(timeout)?;
-    stream.set_write_timeout(timeout)?;
-    write_frame(
-        &mut stream,
-        &ClientMessage::Request {
-            id: 1,
-            request: IpcRequest::ListOutputs,
-        },
-    )?;
-    match read_frame::<ServerMessage>(&mut stream)? {
-        ServerMessage::Response {
-            response: IpcResponse::Outputs { outputs },
-            ..
-        } => Ok(outputs),
-        ServerMessage::Response {
-            response: IpcResponse::Error { message },
-            ..
-        } => Err(message.into()),
+    match send_request(&IpcRequest::ListOutputs)? {
+        IpcResponse::Outputs { outputs } => Ok(outputs),
+        IpcResponse::Error { message } => Err(message.into()),
         _ => Err("Could not read the connected displays".into()),
     }
 }

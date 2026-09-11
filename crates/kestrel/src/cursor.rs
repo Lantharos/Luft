@@ -47,6 +47,12 @@ impl Cursor {
         }
     }
 
+    pub fn is_animated(&self, name: &str, scale: u32) -> bool {
+        self.icons
+            .get(name)
+            .is_some_and(|images| nearest_images(self.size * scale, images).take(2).count() > 1)
+    }
+
     pub fn get_image(&mut self, name: &str, scale: u32, time: Duration) -> Arc<Image> {
         if !self.icons.contains_key(name) {
             let images = load_icon(&self.theme, name)

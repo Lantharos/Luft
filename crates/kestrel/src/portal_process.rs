@@ -54,6 +54,19 @@ impl PortalProcess {
         process
     }
 
+    pub fn deadline(&self) -> Option<Instant> {
+        if self.child.is_some() {
+            self.started_at
+                .map(|started| started + STABLE_PROCESS_WINDOW)
+        } else {
+            Some(self.restart_at)
+        }
+    }
+
+    pub fn pid(&self) -> Option<u32> {
+        self.child.as_ref().map(Child::id)
+    }
+
     pub fn tick(&mut self) {
         if let Some(child) = self.child.as_mut() {
             match child.try_wait() {

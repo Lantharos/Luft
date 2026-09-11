@@ -41,6 +41,7 @@ pub struct WebSurface {
     snapshot_revision: u64,
     frame_rate: u32,
     sent_size: Option<(i32, i32)>,
+    output_available: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -85,6 +86,7 @@ impl WebSurface {
             snapshot_revision: 0,
             frame_rate: config.frame_rate,
             sent_size: None,
+            output_available: true,
         };
         surface.set_visible(config.visible);
         Ok(surface)
@@ -176,7 +178,18 @@ impl WebSurface {
         self.flush_snapshot();
     }
 
+    pub(crate) fn set_output_available(&mut self, available: bool) {
+        if self.output_available == available {
+            return;
+        }
+        self.output_available = available;
+        self.restart_process();
+    }
+
     fn launch(&mut self) {
+        if !self.output_available {
+            return;
+        }
         if self.process.is_some() {
             self.flush_snapshot();
             return;

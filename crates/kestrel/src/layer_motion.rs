@@ -60,6 +60,19 @@ impl LayerTransition {
 }
 
 impl LayerMotionState {
+    pub fn is_animating(&self, output: &Output, now: Instant) -> bool {
+        let map = layer_map_for_output(output);
+        self.surfaces.borrow().iter().any(|motion| {
+            motion
+                .transition
+                .as_ref()
+                .is_some_and(|transition| !transition.is_complete(now))
+                && map
+                    .layers()
+                    .any(|layer| Id::from_wayland_resource(layer.wl_surface()) == motion.id)
+        })
+    }
+
     pub fn visual_offset(&self, surface: &WlSurface, now: Instant) -> Point<f64, Logical> {
         let id = Id::from_wayland_resource(surface);
         let surfaces = self.surfaces.borrow();

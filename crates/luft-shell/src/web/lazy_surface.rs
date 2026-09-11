@@ -24,6 +24,7 @@ pub(crate) struct LazyWebSurface {
     session_menu_qs_height: Option<i32>,
     surface: Option<WebSurface>,
     frame_rate: u32,
+    output_available: bool,
 }
 
 impl LazyWebSurface {
@@ -47,6 +48,7 @@ impl LazyWebSurface {
             session_menu_qs_height: None,
             surface: None,
             frame_rate,
+            output_available: true,
         }
     }
 
@@ -166,7 +168,7 @@ impl LazyWebSurface {
     }
 
     fn ensure_created(&mut self) {
-        if self.surface.is_some() {
+        if !self.output_available || self.surface.is_some() {
             return;
         }
         match WebSurface::new(WebSurfaceConfig {
@@ -194,6 +196,16 @@ impl LazyWebSurface {
             Err(error) => {
                 warn!(%error, surface = self.kind.as_str(), "failed to create web shell surface");
             }
+        }
+    }
+
+    pub(super) fn set_output_available(&mut self, available: bool) {
+        self.output_available = available;
+        if let Some(surface) = &mut self.surface {
+            surface.set_output_available(available);
+        }
+        if available && self.visible && self.surface.is_none() {
+            self.set_visible(true);
         }
     }
 

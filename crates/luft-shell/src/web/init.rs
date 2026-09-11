@@ -39,6 +39,7 @@ impl WebShell {
             &snapshot_value,
             model.primary_frame_rate(),
         )?;
+        surfaces.set_output_available(model.outputs.iter().any(|output| output.enabled));
         surfaces.set_panel_visible(true);
 
         Ok(Self {

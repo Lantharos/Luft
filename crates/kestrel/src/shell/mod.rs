@@ -92,6 +92,8 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
 
     fn new_surface(&mut self, surface: &WlSurface) {
         add_pre_commit_hook::<Self, _>(surface, move |state, _dh, surface| {
+            state.track_commit_timer(surface);
+            state.queue_surface_redraw(surface);
             #[cfg(feature = "session-backend")]
             let mut acquire_point = None;
             let maybe_dmabuf = with_states(surface, |surface_data| {
@@ -148,7 +150,14 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
         });
     }
 
+    fn destroyed(&mut self, surface: &WlSurface) {
+        self.timed_surfaces.retain(|timed| timed != surface);
+        self.shell_state_dirty = true;
+        self.backend_data.request_redraw(None);
+    }
+
     fn commit(&mut self, surface: &WlSurface) {
+        self.queue_surface_redraw(surface);
         let unmaps_surface = with_states(surface, |states| {
             matches!(
                 states
@@ -239,6 +248,7 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
         self.layer_motion
             .observe_surface_commit(surface, &self.space, std::time::Instant::now());
         self.update_layer_focus(surface);
+        self.queue_surface_redraw(surface);
     }
 }
 
@@ -260,21 +270,26 @@ impl<BackendData: Backend> WlrLayerShellHandler for KestrelState<BackendData> {
                 .is_some_and(|state| state.privileged && state.security_context.is_none())
         });
         if !privileged {
+            surface.send_close();
             tracing::warn!(namespace, "rejected layer surface from unprivileged client");
             return;
         }
-        let Some(output) = wl_output
-            .as_ref()
-            .and_then(Output::from_resource)
-            .or_else(|| {
-                self.space
-                    .outputs()
-                    .find(|output| self.primary_output.as_deref() == Some(output.name().as_str()))
-                    .cloned()
-            })
-            .or_else(|| self.space.outputs().next().cloned())
-        else {
-            tracing::warn!(namespace, "ignoring layer surface because no output exists");
+        let output = if let Some(requested) = wl_output.as_ref() {
+            Output::from_resource(requested)
+                .filter(|requested| self.space.outputs().any(|output| output == requested))
+        } else {
+            self.space
+                .outputs()
+                .find(|output| self.primary_output.as_deref() == Some(output.name().as_str()))
+                .or_else(|| self.space.outputs().next())
+                .cloned()
+        };
+        let Some(output) = output else {
+            surface.send_close();
+            tracing::debug!(
+                namespace,
+                "closing layer surface because its output is unavailable"
+            );
             return;
         };
         let mut map = layer_map_for_output(&output);
@@ -284,6 +299,7 @@ impl<BackendData: Backend> WlrLayerShellHandler for KestrelState<BackendData> {
     }
 
     fn layer_destroyed(&mut self, surface: WlrLayerSurface) {
+        self.backend_data.request_redraw(None);
         let layer = self.space.outputs().find_map(|output| {
             let mut map = layer_map_for_output(output);
             let layer = map

@@ -39,6 +39,18 @@ impl XwaylandProcess {
         process
     }
 
+    pub fn deadline(&self) -> Option<Instant> {
+        if !(self.enabled && self.available) {
+            return None;
+        }
+        if self.child.is_some() {
+            self.started_at
+                .map(|started| started + STABLE_PROCESS_WINDOW)
+        } else {
+            Some(self.restart_at)
+        }
+    }
+
     pub fn tick(&mut self) {
         if !self.enabled || !self.available {
             return;

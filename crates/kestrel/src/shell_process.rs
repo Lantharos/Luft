@@ -78,6 +78,22 @@ impl ShellProcess {
         process
     }
 
+    pub fn deadline(&self) -> Option<Instant> {
+        if !(self.enabled) {
+            return None;
+        }
+        if self.child.is_some() {
+            self.started_at
+                .map(|started| started + STABLE_PROCESS_WINDOW)
+        } else {
+            Some(self.restart_at)
+        }
+    }
+
+    pub fn pid(&self) -> Option<u32> {
+        self.child.as_ref().map(Child::id)
+    }
+
     pub fn tick(&mut self) {
         if !self.enabled {
             return;

@@ -52,7 +52,7 @@ export type ConnectedOutput = {
   enabled: boolean;
 };
 
-export type SettingsState = { config: SettingsConfig; outputs: ConnectedOutput[]; outputs_error: string | null };
+export type SettingsResult = { config: SettingsConfig; confirmation: { id: number; remaining_ms: number } | null; outputs: ConnectedOutput[]; outputs_error: string | null };
 
 export const settingsPages = [
   { id: "appearance", label: "Appearance", icon: "palette" },

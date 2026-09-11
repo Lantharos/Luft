@@ -54,6 +54,8 @@ impl WebShell {
     }
 
     fn apply_model(&mut self, model: ShellModel) {
+        self.surfaces
+            .set_output_available(model.outputs.iter().any(|output| output.enabled));
         self.surfaces.set_frame_rate(model.primary_frame_rate());
         self.model = model;
         super::running_order::sync(&mut self.running_app_order, &self.model);

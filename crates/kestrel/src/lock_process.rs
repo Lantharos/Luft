@@ -71,6 +71,14 @@ impl LockProcess {
         }
     }
 
+    pub fn pid(&self) -> Option<u32> {
+        self.child.as_ref().map(Child::id)
+    }
+
+    pub fn deadline(&self) -> Option<Instant> {
+        self.child.is_none().then_some(self.retry_at)
+    }
+
     pub fn tick(&mut self) {
         let Some(child) = self.child.as_mut() else {
             return;

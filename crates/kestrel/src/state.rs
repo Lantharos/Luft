@@ -189,6 +189,8 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub windows: BTreeMap<WindowId, WindowElement>,
     pub shell_state_dirty: bool,
     pub last_policy_sweep: Instant,
+    pub(crate) pending_settings: Option<crate::settings::PendingSettings>,
+    pub(crate) next_settings_id: u64,
     pub last_shell_focus: Option<WlSurface>,
     pub(crate) pointer_contents: Option<(PointerFocusTarget, Point<f64, Logical>)>,
 
@@ -215,6 +217,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub xdg_foreign_state: XdgForeignState,
     pub single_pixel_buffer_state: SinglePixelBufferState,
     pub fifo_manager_state: FifoManagerState,
+    pub(crate) timed_surfaces: Vec<WlSurface>,
     pub commit_timing_manager_state: CommitTimingManagerState,
     pub image_capture_source_state: ImageCaptureSourceState,
     pub output_capture_source_state: OutputCaptureSourceState,
@@ -233,6 +236,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub idle_suspend_after: Option<Duration>,
     pub idle_lock_sent: bool,
     pub idle_suspend_sent: bool,
+    pub idle_action_retry_at: Instant,
     pub capture_sessions: Vec<Session>,
     pub pending_captures: Vec<PendingCapture>,
     pub(crate) capture_consent: crate::capture_consent::CaptureConsentBroker,
@@ -278,6 +282,7 @@ impl<BackendData: Backend> WaylandDndGrabHandler for KestrelState<BackendData> {
         serial: Serial,
         type_: GrabType,
     ) {
+        self.backend_data.request_redraw(None);
         self.dnd_icon = icon.map(|surface| DndIcon {
             surface,
             offset: (0, 0).into(),
@@ -316,6 +321,7 @@ impl<BackendData: Backend> DndGrabHandler for KestrelState<BackendData> {
         _location: Point<f64, Logical>,
     ) {
         self.dnd_icon = None;
+        self.backend_data.request_redraw(None);
     }
 }
 
@@ -376,6 +382,7 @@ impl<BackendData: Backend> SeatHandler for KestrelState<BackendData> {
     }
     fn cursor_image(&mut self, _seat: &Seat<Self>, image: CursorImageStatus) {
         self.cursor_status = image;
+        self.backend_data.request_redraw(None);
     }
 
     fn led_state_changed(&mut self, _seat: &Seat<Self>, led_state: LedState) {
@@ -389,6 +396,7 @@ impl<BackendData: Backend> TabletSeatHandler for KestrelState<BackendData> {
     fn tablet_tool_image(&mut self, _tool: &TabletToolDescriptor, image: CursorImageStatus) {
         // TODO: tablet tools should have their own cursors
         self.cursor_status = image;
+        self.backend_data.request_redraw(None);
     }
 }
 
@@ -759,6 +767,7 @@ impl<BackendData: Backend> ImageCopyCaptureHandler for KestrelState<BackendData>
     }
 
     fn frame(&mut self, session: &SessionRef, frame: Frame) {
+        self.backend_data.request_redraw(None);
         self.pending_captures.push(PendingCapture {
             session: session.clone(),
             frame,
@@ -1080,6 +1089,8 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             windows: BTreeMap::new(),
             shell_state_dirty: true,
             last_policy_sweep: Instant::now(),
+            pending_settings: None,
+            next_settings_id: 0,
             last_shell_focus: None,
             pointer_contents: None,
             space: Space::default(),
@@ -1103,6 +1114,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             single_pixel_buffer_state,
             fifo_manager_state,
             commit_timing_manager_state,
+            timed_surfaces: Vec::new(),
             image_capture_source_state,
             output_capture_source_state,
             image_copy_capture_state,
@@ -1120,6 +1132,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             idle_suspend_after,
             idle_lock_sent: false,
             idle_suspend_sent: false,
+            idle_action_retry_at: Instant::now(),
             capture_sessions: Vec::new(),
             pending_captures: Vec::new(),
             capture_consent,
@@ -1510,6 +1523,7 @@ pub trait Backend {
     fn seat_name(&self) -> String;
     fn reset_buffers(&mut self, output: &Output);
     fn early_import(&mut self, surface: &WlSurface);
+    fn request_redraw(&mut self, _output: Option<&Output>) {}
     fn update_led_state(&mut self, led_state: LedState);
     fn configure_outputs(
         _state: &mut KestrelState<Self>,
@@ -1519,6 +1533,12 @@ pub trait Backend {
         Self: Sized,
     {
         Ok(())
+    }
+    fn output_configuration(state: &KestrelState<Self>) -> luft_config::DisplayConfig
+    where
+        Self: Sized,
+    {
+        state.display_config.clone()
     }
     fn configure_input(&mut self, _config: &luft_config::InputConfig) {}
 }

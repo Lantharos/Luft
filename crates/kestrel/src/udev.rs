@@ -1,12 +1,13 @@
 // Allow in this module because of existing usage
 #![allow(clippy::uninlined_format_args)]
 mod config;
+mod modes;
+mod scheduling;
 use std::{
     collections::hash_map::HashMap,
     io,
-    ops::Not,
     path::Path,
-    sync::{Mutex, Once, atomic::Ordering},
+    sync::{Mutex, atomic::Ordering},
     time::{Duration, Instant},
 };
 
@@ -38,7 +39,7 @@ use smithay::{
         },
         drm::{
             CreateDrmNodeError, DrmAccessError, DrmDevice, DrmDeviceFd, DrmError, DrmEvent,
-            DrmEventMetadata, DrmEventTime, DrmNode, DrmSurface, GbmBufferedSurface, NodeType,
+            DrmEventMetadata, DrmNode, DrmSurface, GbmBufferedSurface, NodeType,
             compositor::{DrmCompositor, FrameFlags},
             exporter::gbm::GbmFramebufferExporter,
             output::{DrmOutput, DrmOutputManager, DrmOutputRenderElements},
@@ -104,7 +105,7 @@ use smithay_drm_extras::{
     display_info,
     drm_scanner::{DrmScanEvent, DrmScanner},
 };
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, info, warn};
 
 // we cannot simply pick the first supported format of the intersection of *all* formats, because:
 // - we do not want something like Abgr4444, which looses color information, if something better is available
@@ -228,6 +229,17 @@ impl Backend for UdevData {
             && let Some(surface) = gpu.surfaces.get_mut(&id.crtc)
         {
             surface.drm_output.reset_buffers();
+            surface.schedule.dirty = true;
+        }
+    }
+
+    fn request_redraw(&mut self, output: Option<&Output>) {
+        for backend in self.backends.values_mut() {
+            for surface in backend.surfaces.values_mut() {
+                if output.is_none_or(|output| output == &surface.output) {
+                    surface.schedule.dirty = true;
+                }
+            }
         }
     }
 
@@ -242,6 +254,10 @@ impl Backend for UdevData {
         config: &luft_config::DisplayConfig,
     ) -> Result<(), String> {
         state.configure_outputs(config)
+    }
+
+    fn output_configuration(state: &KestrelState<Self>) -> luft_config::DisplayConfig {
+        state.output_configuration()
     }
 
     fn configure_input(&mut self, config: &luft_config::InputConfig) {
@@ -374,6 +390,7 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
                 data.backend_data.keyboards.retain(|item| item != device);
             }
 
+            data.backend_data.request_redraw(None);
             data.process_input_event(&dh, event)
         })
         .unwrap();
@@ -387,6 +404,15 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
 
                 for backend in data.backend_data.backends.values_mut() {
                     backend.drm_output_manager.pause();
+                    for surface in backend.surfaces.values_mut() {
+                        if let Some(timer) = surface.schedule.timer.take() {
+                            data.handle.remove(timer);
+                        }
+                        surface.schedule.pending = false;
+                        surface.schedule.unavailable = false;
+                        surface.schedule.dirty = true;
+                        surface.last_presentation_time = None;
+                    }
                     backend.active_leases.clear();
                     if let Some(lease_global) = backend.leasing_global.as_mut() {
                         lease_global.suspend();
@@ -405,12 +431,6 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
                     .iter_mut()
                     .map(|(handle, backend)| (*handle, backend))
                 {
-                    // if we do not care about flicking (caused by modesetting) we could just
-                    // pass true for disable connectors here. this would make sure our drm
-                    // device is in a known state (all connectors and planes disabled).
-                    // but for demonstration we choose a more optimistic path by leaving the
-                    // state as is and assume it will just work. If this assumption fails
-                    // we will try to reset the state when trying to queue a frame.
                     backend
                         .drm_output_manager
                         .lock()
@@ -419,8 +439,14 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
                     if let Some(lease_global) = backend.leasing_global.as_mut() {
                         lease_global.resume::<KestrelState<UdevData>>();
                     }
-                    data.handle
-                        .insert_idle(move |data| data.render(node, None, data.clock.now()));
+                    data.handle.insert_idle(move |data| {
+                        if let Some(backend) = data.backend_data.backends.get_mut(&node) {
+                            for surface in backend.surfaces.values_mut() {
+                                surface.schedule.unavailable = false;
+                                surface.schedule.dirty = true;
+                            }
+                        }
+                    });
                 }
             }
         })
@@ -590,12 +616,16 @@ pub fn run_udev(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
      * And run our loop
      */
 
+    let mut process_wakeups = crate::event_loop::ProcessWakeups::default();
     while state.running.load(Ordering::SeqCst) {
         state.xwayland_process.tick();
         state.shell_process.tick();
         state.lock_process.tick();
         state.portal_process.tick();
-        let result = event_loop.dispatch(Some(Duration::from_millis(16)), &mut state);
+        state.sync_shell_state();
+        process_wakeups.update(&state)?;
+        state.schedule_repaints();
+        let result = event_loop.dispatch(state.maintenance_timeout(), &mut state);
         if let Err(error) = result {
             return Err(format!("session event loop failed: {error}"));
         } else {
@@ -721,7 +751,7 @@ struct SurfaceData {
     fps_element: Option<FpsElement<MultiTexture>>,
     dmabuf_feedback: Option<SurfaceDmabufFeedback>,
     last_presentation_time: Option<Time<Monotonic>>,
-    vblank_throttle_timer: Option<RegistrationToken>,
+    schedule: scheduling::FrameSchedule,
 }
 
 impl Drop for SurfaceData {
@@ -987,6 +1017,16 @@ impl KestrelState<UdevData> {
         connector: connector::Info,
         crtc: crtc::Handle,
     ) {
+        self.connect_output(node, connector, crtc, &self.display_config.clone());
+    }
+
+    fn connect_output(
+        &mut self,
+        node: DrmNode,
+        connector: connector::Info,
+        crtc: crtc::Handle,
+        display_config: &luft_config::DisplayConfig,
+    ) {
         let device = if let Some(device) = self.backend_data.backends.get_mut(&node) {
             device
         } else {
@@ -1059,62 +1099,18 @@ impl KestrelState<UdevData> {
                 );
             }
         } else {
-            let display_config = luft_config::load_config()
-                .map(|loaded| loaded.config.display)
-                .unwrap_or_default();
             let configured = display_config.outputs.get(&output_name);
             if configured.is_some_and(|output| !output.enabled) {
                 info!(output = output_name, "output disabled by configuration");
                 return;
             }
-            let mode_id = configured
-                .filter(|output| {
-                    output.width.is_some()
-                        || output.height.is_some()
-                        || output.refresh_millihertz.is_some()
-                })
-                .and_then(|output| {
-                    connector.modes().iter().position(|mode| {
-                        let wl_mode = WlMode::from(*mode);
-                        output.width.is_none_or(|width| width == wl_mode.size.w)
-                            && output.height.is_none_or(|height| height == wl_mode.size.h)
-                            && output
-                                .refresh_millihertz
-                                .is_none_or(|refresh| refresh == wl_mode.refresh)
-                    })
-                })
-                .or_else(|| {
-                    connector
-                        .modes()
-                        .iter()
-                        .enumerate()
-                        .filter(|(_, mode)| mode.mode_type().contains(ModeTypeFlags::PREFERRED))
-                        .max_by_key(|(_, mode)| {
-                            let mode = WlMode::from(**mode);
-                            (
-                                i64::from(mode.size.w) * i64::from(mode.size.h),
-                                mode.refresh,
-                            )
-                        })
-                        .map(|(index, _)| index)
-                })
-                .or_else(|| {
-                    connector
-                        .modes()
-                        .iter()
-                        .enumerate()
-                        .max_by_key(|(_, mode)| {
-                            let mode = WlMode::from(**mode);
-                            (
-                                i64::from(mode.size.w) * i64::from(mode.size.h),
-                                mode.refresh,
-                            )
-                        })
-                        .map(|(index, _)| index)
-                })
-                .unwrap_or(0);
-
-            let drm_mode = connector.modes()[mode_id];
+            let drm_mode = match modes::select_mode(&connector, configured) {
+                Ok(mode) => mode,
+                Err(error) => {
+                    warn!(%error, "cannot configure output");
+                    return;
+                }
+            };
             let wl_mode = WlMode::from(drm_mode);
             let scale = OutputScale::Fractional(display_config.output_scale(&output_name));
 
@@ -1257,15 +1253,10 @@ impl KestrelState<UdevData> {
                 fps_element,
                 dmabuf_feedback,
                 last_presentation_time: None,
-                vblank_throttle_timer: None,
+                schedule: scheduling::FrameSchedule::new(),
             };
 
             device.surfaces.insert(crtc, surface);
-
-            // kick-off rendering
-            self.handle.insert_idle(move |state| {
-                state.render_surface(node, crtc, state.clock.now());
-            });
         }
     }
 
@@ -1281,6 +1272,7 @@ impl KestrelState<UdevData> {
             return;
         };
 
+        let mut removed_layers = Vec::new();
         if let Some(pos) = device
             .non_desktop_connectors
             .iter()
@@ -1290,12 +1282,22 @@ impl KestrelState<UdevData> {
             if let Some(leasing_state) = device.leasing_global.as_mut() {
                 leasing_state.withdraw_connector(connector.handle());
             }
-        } else if let Some(surface) = device.surfaces.remove(&crtc) {
+        } else if let Some(mut surface) = device.surfaces.remove(&crtc) {
+            if let Some(timer) = surface.schedule.timer.take() {
+                self.handle.remove(timer);
+            }
             crate::capture::stop_for_output(
                 &mut self.capture_sessions,
                 &mut self.pending_captures,
                 &surface.output,
             );
+            let mut map = smithay::desktop::layer_map_for_output(&surface.output);
+            removed_layers.extend(map.layers().cloned());
+            for layer in &removed_layers {
+                layer.layer_surface().send_close();
+                map.unmap_layer(layer);
+            }
+            drop(map);
             self.session_lock.output_removed(&surface.output);
             self.space.unmap_output(&surface.output);
             self.space.refresh();
@@ -1334,6 +1336,10 @@ impl KestrelState<UdevData> {
         {
             warn!(%error, "could not restore output modifiers after disconnect");
         }
+        for layer in removed_layers {
+            self.restore_layer_focus(&layer);
+        }
+        self.backend_data.request_redraw(None);
     }
 
     fn device_changed(&mut self, node: DrmNode) {
@@ -1444,10 +1450,6 @@ impl KestrelState<UdevData> {
             }
         };
 
-        if let Some(timer_token) = surface.vblank_throttle_timer.take() {
-            self.handle.remove(timer_token);
-        }
-
         let output = if let Some(output) = self.space.outputs().find(|o| {
             o.user_data().get::<UdevOutputId>()
                 == Some(&UdevOutputId {
@@ -1469,7 +1471,7 @@ impl KestrelState<UdevData> {
         };
 
         let tp = metadata.as_ref().and_then(|metadata| match metadata.time {
-            smithay::backend::drm::DrmEventTime::Monotonic(tp) => tp.is_zero().not().then_some(tp),
+            smithay::backend::drm::DrmEventTime::Monotonic(tp) => (!tp.is_zero()).then_some(tp),
             smithay::backend::drm::DrmEventTime::Realtime(_) => None,
         });
 
@@ -1489,42 +1491,9 @@ impl KestrelState<UdevData> {
             (self.clock.now(), wp_presentation_feedback::Kind::Vsync)
         };
 
-        let vblank_remaining_time = surface
-            .last_presentation_time
-            .map(|last_presentation_time| {
-                frame_duration.saturating_sub(Time::elapsed(&last_presentation_time, clock))
-            });
-
-        if let Some(vblank_remaining_time) = vblank_remaining_time
-            && vblank_remaining_time > frame_duration / 2
-        {
-            static WARN_ONCE: Once = Once::new();
-            WARN_ONCE.call_once(|| {
-                warn!(
-                    "display running faster than expected, throttling vblanks and disabling HwClock"
-                )
-            });
-            let throttled_time = tp
-                .map(|tp| tp.saturating_add(vblank_remaining_time))
-                .unwrap_or(Duration::ZERO);
-            let throttled_metadata = DrmEventMetadata {
-                sequence: seq,
-                time: DrmEventTime::Monotonic(throttled_time),
-            };
-            let timer_token = self
-                .handle
-                .insert_source(
-                    Timer::from_duration(vblank_remaining_time),
-                    move |_, _, data| {
-                        data.frame_finish(dev_id, crtc, &mut Some(throttled_metadata));
-                        TimeoutAction::Drop
-                    },
-                )
-                .expect("failed to register vblank throttle timer");
-            surface.vblank_throttle_timer = Some(timer_token);
-            return;
-        }
+        surface.schedule.presented(clock, frame_duration);
         surface.last_presentation_time = Some(clock);
+        surface.schedule.pending = false;
 
         let submit_result = surface
             .drm_output
@@ -1555,7 +1524,10 @@ impl KestrelState<UdevData> {
             Err(err) => {
                 warn!("Error during rendering: {:?}", err);
                 match err {
-                    SwapBuffersError::AlreadySwapped => true,
+                    SwapBuffersError::AlreadySwapped => {
+                        surface.schedule.pending = true;
+                        true
+                    }
                     // If the device has been deactivated do not reschedule, this will be done
                     // by session resume
                     SwapBuffersError::TemporaryFailure(err)
@@ -1564,15 +1536,20 @@ impl KestrelState<UdevData> {
                             Some(&DrmError::DeviceInactive)
                         ) =>
                     {
+                        surface.schedule.unavailable = true;
                         false
                     }
-                    SwapBuffersError::TemporaryFailure(err) => matches!(
-                        err.downcast_ref::<DrmError>(),
-                        Some(DrmError::Access(DrmAccessError {
-                            source,
-                            ..
-                        })) if source.kind() == io::ErrorKind::PermissionDenied
-                    ),
+                    SwapBuffersError::TemporaryFailure(err) => {
+                        let retry = !matches!(err.downcast_ref::<DrmError>(),
+                            Some(DrmError::Access(DrmAccessError { source, .. }))
+                                if source.kind() == io::ErrorKind::PermissionDenied);
+                        if retry {
+                            surface.schedule.retry(self.clock.now(), frame_duration);
+                        } else {
+                            surface.schedule.unavailable = true;
+                        }
+                        retry
+                    }
                     SwapBuffersError::ContextLost(err) => {
                         error!(%err, "rendering context lost; ending compositor session");
                         self.running.store(false, Ordering::SeqCst);
@@ -1582,84 +1559,9 @@ impl KestrelState<UdevData> {
             }
         };
 
-        if schedule_render {
-            let next_frame_target = clock + frame_duration;
-
-            // What are we trying to solve by introducing a delay here:
-            //
-            // Basically it is all about latency of client provided buffers.
-            // A client driven by frame callbacks will wait for a frame callback
-            // to repaint and submit a new buffer. As we send frame callbacks
-            // as part of the repaint in the compositor the latency would always
-            // be approx. 2 frames. By introducing a delay before we repaint in
-            // the compositor we can reduce the latency to approx. 1 frame + the
-            // remaining duration from the repaint to the next VBlank.
-            //
-            // With the delay it is also possible to further reduce latency if
-            // the client is driven by presentation feedback. As the presentation
-            // feedback is directly sent after a VBlank the client can submit a
-            // new buffer during the repaint delay that can hit the very next
-            // VBlank, thus reducing the potential latency to below one frame.
-            //
-            // Choosing a good delay is a topic on its own so we just implement
-            // a simple strategy here. We just split the duration between two
-            // VBlanks into two steps, one for the client repaint and one for the
-            // compositor repaint. Theoretically the repaint in the compositor should
-            // be faster so we give the client a bit more time to repaint. On a typical
-            // modern system the repaint in the compositor should not take more than 2ms
-            // so this should be safe for refresh rates up to at least 120 Hz. For 120 Hz
-            // this results in approx. 3.33ms time for repainting in the compositor.
-            // A too big delay could result in missing the next VBlank in the compositor.
-            //
-            // A more complete solution could work on a sliding window analyzing past repaints
-            // and do some prediction for the next repaint.
-            let repaint_delay = Duration::from_secs_f64(frame_duration.as_secs_f64() * 0.6f64);
-
-            let timer = if surface
-                .render_node
-                .map(|render_node| render_node != self.backend_data.primary_gpu)
-                .unwrap_or(true)
-            {
-                // However, if we need to do a copy, that might not be enough.
-                // (And without actual comparison to previous frames we cannot really know.)
-                // So lets ignore that in those cases to avoid thrashing performance.
-                trace!("scheduling repaint timer immediately on {:?}", crtc);
-                Timer::immediate()
-            } else {
-                trace!(
-                    "scheduling repaint timer with delay {:?} on {:?}",
-                    repaint_delay, crtc
-                );
-                Timer::from_duration(repaint_delay)
-            };
-
-            self.handle
-                .insert_source(timer, move |_, _, data| {
-                    data.render(dev_id, Some(crtc), next_frame_target);
-                    TimeoutAction::Drop
-                })
-                .expect("failed to schedule frame timer");
+        if !schedule_render {
+            surface.schedule.dirty = false;
         }
-    }
-
-    // If crtc is `Some()`, render it, else render all crtcs
-    fn render(&mut self, node: DrmNode, crtc: Option<crtc::Handle>, frame_target: Time<Monotonic>) {
-        let device_backend = match self.backend_data.backends.get_mut(&node) {
-            Some(backend) => backend,
-            None => {
-                error!("Trying to render on non-existent backend {}", node);
-                return;
-            }
-        };
-
-        if let Some(crtc) = crtc {
-            self.render_surface(node, crtc, frame_target);
-        } else {
-            let crtcs: Vec<_> = device_backend.surfaces.keys().copied().collect();
-            for crtc in crtcs {
-                self.render_surface(node, crtc, frame_target);
-            }
-        };
     }
 
     fn render_surface(&mut self, node: DrmNode, crtc: crtc::Handle, frame_target: Time<Monotonic>) {
@@ -1688,6 +1590,7 @@ impl KestrelState<UdevData> {
             .map(|surface| surface.wl_surface().clone());
         let session_locked = self.session_lock.is_active();
 
+        let animating = self.output_animating(&output);
         let device = if let Some(device) = self.backend_data.backends.get_mut(&node) {
             device
         } else {
@@ -1773,73 +1676,47 @@ impl KestrelState<UdevData> {
             self.session_lock.generation(),
             lock_surface.as_ref(),
         );
-        let reschedule = match result {
+        surface.schedule.record(start.elapsed());
+        surface.schedule.dirty |= animating;
+        match result {
             Ok((has_rendered, states)) => {
+                surface.schedule.pending = has_rendered;
                 let dmabuf_feedback = surface.dmabuf_feedback.clone();
                 self.post_repaint(&output, frame_target, dmabuf_feedback, &states);
-                !has_rendered
             }
-            Err(err) => {
-                warn!("Error during rendering: {:#?}", err);
-                match err {
-                    SwapBuffersError::AlreadySwapped => false,
-                    SwapBuffersError::TemporaryFailure(err) => match err.downcast_ref::<DrmError>()
-                    {
-                        Some(DrmError::DeviceInactive) => true,
-                        Some(DrmError::Access(DrmAccessError { source, .. })) => {
-                            source.kind() == io::ErrorKind::PermissionDenied
-                        }
-                        _ => false,
-                    },
-                    SwapBuffersError::ContextLost(err) => match err.downcast_ref::<DrmError>() {
-                        Some(DrmError::TestFailed(_)) => {
-                            // reset the complete state, disabling all connectors and planes in case we hit a test failed
-                            // most likely we hit this after a tty switch when a foreign master changed CRTC <-> connector bindings
-                            // and we run in a mismatch
-                            device
-                                .drm_output_manager
-                                .device_mut()
-                                .reset_state()
-                                .expect("failed to reset drm device");
-                            true
-                        }
-                        _ => {
-                            error!(%err, "rendering context lost; ending compositor session");
-                            self.running.store(false, Ordering::SeqCst);
-                            false
-                        }
-                    },
+            Err(SwapBuffersError::AlreadySwapped) => surface.schedule.pending = true,
+            Err(SwapBuffersError::TemporaryFailure(error)) => {
+                warn!(%error, "output temporarily unavailable");
+                let inactive = matches!(
+                    error.downcast_ref::<DrmError>(),
+                    Some(DrmError::DeviceInactive)
+                ) || matches!(error.downcast_ref::<DrmError>(), Some(DrmError::Access(DrmAccessError { source, .. })) if source.kind() == io::ErrorKind::PermissionDenied);
+                surface.schedule.unavailable = inactive;
+                if !inactive
+                    && let Some(mode) = output.current_mode().filter(|mode| mode.refresh > 0)
+                {
+                    surface.schedule.retry(
+                        self.clock.now(),
+                        Duration::from_nanos(1_000_000_000_000 / mode.refresh as u64),
+                    );
                 }
             }
-        };
-
-        if reschedule {
-            let output_refresh = match output.current_mode() {
-                Some(mode) => mode.refresh,
-                None => return,
-            };
-
-            // If reschedule is true we either hit a temporary failure or more likely rendering
-            // did not cause any damage on the output. In this case we just re-schedule a repaint
-            // after approx. one frame to re-test for damage.
-            let next_frame_target =
-                frame_target + Duration::from_nanos(1_000_000_000_000 / output_refresh as u64);
-            let reschedule_timeout =
-                Duration::from(next_frame_target).saturating_sub(self.clock.now().into());
-            trace!(
-                "reschedule repaint timer with delay {:?} on {:?}",
-                reschedule_timeout, crtc,
-            );
-            let timer = Timer::from_duration(reschedule_timeout);
-            self.handle
-                .insert_source(timer, move |_, _, data| {
-                    data.render(node, Some(crtc), next_frame_target);
-                    TimeoutAction::Drop
-                })
-                .expect("failed to schedule frame timer");
-        } else {
-            let elapsed = start.elapsed();
-            tracing::trace!(?elapsed, "rendered surface");
+            Err(SwapBuffersError::ContextLost(error)) => {
+                if matches!(
+                    error.downcast_ref::<DrmError>(),
+                    Some(DrmError::TestFailed(_))
+                ) {
+                    if let Err(error) = device.drm_output_manager.device_mut().reset_state() {
+                        error!(%error, "failed to reset DRM device");
+                        self.running.store(false, Ordering::SeqCst);
+                    } else {
+                        surface.schedule.dirty = true;
+                    }
+                } else {
+                    error!(%error, "rendering context lost; ending compositor session");
+                    self.running.store(false, Ordering::SeqCst);
+                }
+            }
         }
 
         profiling::finish_frame!();

@@ -102,6 +102,17 @@ fn json_error(error: serde_json::Error) -> io::Error {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum IpcRequest {
+    GetSettings,
+    ApplySettings {
+        original: Box<luft_config::LuftConfig>,
+        config: Box<luft_config::LuftConfig>,
+    },
+    ConfirmSettings {
+        id: u64,
+    },
+    RevertSettings {
+        id: u64,
+    },
     SubscribeShell,
     BeginCaptureConsent {
         request: CaptureConsentRequest,
@@ -165,11 +176,29 @@ pub enum DefaultAppKind {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum IpcResponse {
+    Settings {
+        config: Box<luft_config::LuftConfig>,
+        confirmation: Option<SettingsConfirmation>,
+    },
     ShellSnapshot(ShellSnapshot),
-    Outputs { outputs: Vec<OutputSummary> },
-    Accepted { revision: u64 },
-    CaptureConsent { status: CaptureConsentStatus },
-    Error { message: String },
+    Outputs {
+        outputs: Vec<OutputSummary>,
+    },
+    Accepted {
+        revision: u64,
+    },
+    CaptureConsent {
+        status: CaptureConsentStatus,
+    },
+    Error {
+        message: String,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SettingsConfirmation {
+    pub id: u64,
+    pub remaining_ms: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

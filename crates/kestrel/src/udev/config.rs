@@ -5,7 +5,52 @@ impl KestrelState<UdevData> {
         &mut self,
         config: &luft_config::DisplayConfig,
     ) -> Result<(), String> {
-        let connectors = self
+        let previous = self.output_configuration();
+        if let Err(error) = self.apply_outputs(config) {
+            if let Err(rollback) = self.apply_outputs(&previous) {
+                return Err(format!(
+                    "{error}; restoring the previous displays also failed: {rollback}"
+                ));
+            }
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    pub(super) fn output_configuration(&self) -> luft_config::DisplayConfig {
+        let mut config = self.display_config.clone();
+        for backend in self.backend_data.backends.values() {
+            for (connector, crtc) in backend.drm_scanner.crtcs() {
+                let name = format!(
+                    "{}-{}",
+                    connector.interface().as_str(),
+                    connector.interface_id()
+                );
+                let current = config.outputs.entry(name).or_default();
+                let surface = backend.surfaces.get(&crtc);
+                current.enabled = surface.is_some();
+                if let Some(surface) = surface {
+                    if let Some(mode) = surface.output.current_mode() {
+                        current.width = Some(mode.size.w);
+                        current.height = Some(mode.size.h);
+                        current.refresh_millihertz = Some(mode.refresh);
+                    }
+                    current.scale = Some(surface.output.current_scale().fractional_scale());
+                    if let Some(geometry) = self.space.output_geometry(&surface.output) {
+                        current.x = Some(geometry.loc.x);
+                        current.y = Some(geometry.loc.y);
+                    }
+                    current.adaptive_sync = surface
+                        .drm_output
+                        .with_compositor(|compositor| compositor.vrr_enabled());
+                }
+            }
+        }
+        config
+    }
+
+    fn apply_outputs(&mut self, config: &luft_config::DisplayConfig) -> Result<(), String> {
+        let mut connectors = self
             .backend_data
             .backends
             .iter()
@@ -51,6 +96,17 @@ impl KestrelState<UdevData> {
                 return Err(format!("unsupported mode for {name}"));
             }
         }
+        connectors.sort_by_key(|(_, connector, _)| {
+            let name = format!(
+                "{}-{}",
+                connector.interface().as_str(),
+                connector.interface_id()
+            );
+            config
+                .outputs
+                .get(&name)
+                .is_some_and(|output| !output.enabled)
+        });
         for (node, connector, crtc) in connectors {
             let name = format!(
                 "{}-{}",
@@ -70,7 +126,15 @@ impl KestrelState<UdevData> {
                 continue;
             }
             if !existing {
-                self.connector_connected(node, connector, crtc);
+                self.connect_output(node, connector, crtc, config);
+                if !self
+                    .backend_data
+                    .backends
+                    .get(&node)
+                    .is_some_and(|backend| backend.surfaces.contains_key(&crtc))
+                {
+                    return Err(format!("could not enable {name}"));
+                }
                 continue;
             }
             let backend = self.backend_data.backends.get_mut(&node).unwrap();
@@ -100,31 +164,8 @@ impl KestrelState<UdevData> {
                 elements.add_output(id, clear, render);
             }
             let surface = backend.surfaces.get_mut(&crtc).unwrap();
-            let mode = configured
-                .filter(|output| {
-                    output.width.is_some()
-                        || output.height.is_some()
-                        || output.refresh_millihertz.is_some()
-                })
-                .map(|output| {
-                    connector
-                        .modes()
-                        .iter()
-                        .copied()
-                        .find(|mode| {
-                            let mode = WlMode::from(*mode);
-                            output.width.is_none_or(|width| width == mode.size.w)
-                                && output.height.is_none_or(|height| height == mode.size.h)
-                                && output
-                                    .refresh_millihertz
-                                    .is_none_or(|refresh| refresh == mode.refresh)
-                        })
-                        .ok_or_else(|| format!("unsupported mode for {name}"))
-                })
-                .transpose()?;
-            if let Some(mode) = mode
-                && surface.output.current_mode() != Some(WlMode::from(mode))
-            {
+            let mode = super::modes::select_mode(&connector, configured)?;
+            if surface.output.current_mode() != Some(WlMode::from(mode)) {
                 surface
                     .drm_output
                     .use_mode(mode, &mut renderer, &elements)
@@ -132,6 +173,8 @@ impl KestrelState<UdevData> {
                 surface
                     .output
                     .change_current_state(Some(WlMode::from(mode)), None, None, None);
+                surface.schedule.reset_timing(&self.handle);
+                surface.last_presentation_time = None;
             }
             let adaptive = configured.is_some_and(|output| output.adaptive_sync);
             surface
@@ -163,6 +206,7 @@ impl KestrelState<UdevData> {
             );
             self.space.map_output(&surface.output, position);
             surface.drm_output.reset_buffers();
+            surface.schedule.dirty = true;
             self.session_lock.configure_output(&surface.output);
         }
         crate::shell::fixup_positions(&mut self.space, self.pointer.current_location());

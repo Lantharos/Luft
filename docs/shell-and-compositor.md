@@ -30,9 +30,20 @@ output owns its KMS compositor, damage history, redraw state, frame clock, and
 presentation lifecycle.
 
 Configured connector mode, position, scale, transform, and adaptive sync are
-applied when the output is created. Unconfigured outputs use their preferred
-mode and are arranged horizontally. Hotplug rebuilds the output graph; seat
-pause/resume pauses both input and DRM access.
+applied when the output is created. Unconfigured outputs use the highest refresh rate at their preferred
+resolution and are arranged horizontally. Hotplug rebuilds the output graph; seat
+pause/resume pauses both input and DRM access. Removing an output cancels its
+repaint timer, closes its layer surfaces, restores keyboard focus, and stops
+captures attached to it. With no enabled outputs, shell surfaces are released
+and wait for a display to return; notification and tray services stay running.
+
+Repaints are scheduled independently for each output from its current mode and
+actual page-flip timestamps. Render-time measurements and missed presentation
+deadlines adjust the scheduling allowance. There is no fixed 60 Hz compositor
+tick. Idle outputs sleep until damage, input, animation, capture, or a protocol
+deadline needs service. Child exits wake the event loop through process file
+descriptors; session maintenance uses its own deadlines. Offscreen clients with
+pending frame callbacks retain Smithay’s one-second callback throttle.
 
 Frame callbacks and FIFO/commit-timing barriers follow successful repaint.
 Presentation feedback follows the actual page-flip event. Fullscreen clients

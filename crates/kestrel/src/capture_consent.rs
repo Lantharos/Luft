@@ -184,6 +184,14 @@ impl CaptureConsentBroker {
             .collect()
     }
 
+    pub(crate) fn deadline(&self) -> Option<Instant> {
+        self.pending
+            .values()
+            .map(|pending| pending.deadline)
+            .chain(self.results.values().map(|result| result.expires_at))
+            .min()
+    }
+
     pub(crate) fn expire(&mut self) -> bool {
         let now = Instant::now();
         let expired = self

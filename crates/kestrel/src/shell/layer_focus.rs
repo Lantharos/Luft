@@ -80,7 +80,7 @@ impl<B: Backend> KestrelState<B> {
         self.shell_state_dirty = true;
     }
 
-    pub(super) fn restore_layer_focus(&mut self, layer: &LayerSurface) {
+    pub(crate) fn restore_layer_focus(&mut self, layer: &LayerSurface) {
         let Some(keyboard) = self.seat.get_keyboard() else {
             return;
         };

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { invoke, isAvailable } from "@lantharos/sabine";
-  import { initialSettingsPage, settingsPages, type SettingsConfig, type SettingsState, type ConnectedOutput } from "../lib/settings_model";
+  import { initialSettingsPage, settingsPages, type SettingsConfig, type SettingsResult, type ConnectedOutput } from "../lib/settings_model";
   import { settingsError } from "../lib/settings_validation";
   import Icon from "./Icon.svelte";
   import InputSettings from "./settings/InputSettings.svelte";
@@ -17,12 +17,48 @@
   let outputs = $state.raw<ConnectedOutput[]>([]);
   let outputsError = $state<string | null>(null);
   let busy = $state(false);
+  let confirmation = $state<SettingsResult["confirmation"]>(null);
+  let secondsLeft = $state(0);
   let error = $state("");
   let notice = $state("");
   const title = $derived(settingsPages.find((item) => item.id === page)?.label ?? "Settings");
   const dirty = $derived(config !== null && JSON.stringify(config) !== JSON.stringify(original));
 
-  onMount(() => { void load(); });
+  let confirmationTimer: ReturnType<typeof setInterval> | undefined;
+  onMount(() => {
+    void load();
+    return () => clearInterval(confirmationTimer);
+  });
+
+  function received(result: SettingsResult) {
+    clearInterval(confirmationTimer);
+    confirmation = result.confirmation;
+    outputs = result.outputs;
+    outputsError = result.outputs_error;
+    config = structuredClone(result.config);
+    if (!result.confirmation) {
+      original = result.config;
+      return;
+    }
+    const deadline = performance.now() + result.confirmation.remaining_ms;
+    secondsLeft = Math.ceil(result.confirmation.remaining_ms / 1000);
+    confirmationTimer = setInterval(() => {
+      secondsLeft = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+      if (secondsLeft === 0) { clearInterval(confirmationTimer); void load(); }
+    }, 250);
+  }
+
+  async function decide(action: "confirm" | "revert") {
+    if (!confirmation || busy) return;
+    busy = true;
+    error = "";
+    try {
+      received(await invoke<SettingsResult>(`settings.${action}`, { id: confirmation.id }));
+      notice = action === "confirm" ? "Settings saved." : "Previous settings restored.";
+    } catch (cause) {
+      error = cause instanceof Error ? cause.message : String(cause);
+    } finally { busy = false; }
+  }
 
   async function load() {
     busy = true;
@@ -30,11 +66,8 @@
     notice = "";
     try {
       if (!isAvailable()) throw new Error("Open Luft Settings from the desktop to read your settings.");
-      const state = await invoke<SettingsState>("settings.read", {});
-      original = state.config;
-      config = structuredClone(state.config);
-      outputs = state.outputs;
-      outputsError = state.outputs_error;
+      const state = await invoke<SettingsResult>("settings.read", {});
+      received(state);
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
     } finally {
@@ -43,7 +76,7 @@
   }
 
   async function save() {
-    if (!config || !original || busy || !dirty) return;
+    if (!config || !original || busy || confirmation || !dirty) return;
     error = settingsError(config, outputs) ?? "";
     notice = "";
     if (error) return;
@@ -51,10 +84,9 @@
     try {
       const next = JSON.parse(JSON.stringify(config)) as SettingsConfig;
       next.session.startup_apps = next.session.startup_apps.map((command) => command.trim()).filter(Boolean);
-      const saved = await invoke<SettingsConfig>("settings.save", { original, config: next });
-      original = saved;
-      config = structuredClone(saved);
-      notice = "Settings saved.";
+      const saved = await invoke<SettingsResult>("settings.save", { original, config: next });
+      received(saved);
+      notice = saved.confirmation ? "" : "Settings saved.";
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
     } finally {
@@ -99,7 +131,7 @@
     <header class="settings-page-heading"><h2>{title}</h2></header>
     <div class="settings-content" aria-busy={busy}>
       {#if config}
-        <fieldset disabled={busy}>
+        <fieldset disabled={busy || confirmation !== null}>
           {#if page === "appearance"}<AppearanceSettings bind:config />
           {:else if page === "display"}<DisplaySettings bind:display={config.display} {outputs} {outputsError} />
           {:else if page === "input"}<InputSettings bind:input={config.input} />
@@ -129,11 +161,17 @@
     <footer class="settings-footer">
       <div class="settings-feedback">
         {#if error}<p class="settings-error" role="alert">{error}</p>
+        {:else if confirmation}<p role="status">Keep these display settings? Reverting in {secondsLeft}s.</p>
         {:else}<p role="status">{busy ? "Working…" : dirty ? "Unsaved changes" : notice}</p>{/if}
       </div>
       <div class="settings-footer-actions">
+        {#if confirmation}
+          <button type="button" class="settings-button" disabled={busy} onclick={() => decide("revert")}>Revert</button>
+          <button type="button" class="settings-button is-primary" disabled={busy} onclick={() => decide("confirm")}>Keep Changes</button>
+        {:else}
         <button type="button" class="settings-button" disabled={busy} onclick={load}>Reload</button>
         <button type="button" class="settings-button is-primary" disabled={busy || !dirty} onclick={save}>Save Changes</button>
+        {/if}
       </div>
     </footer>
   </div>

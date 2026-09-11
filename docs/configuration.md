@@ -23,7 +23,7 @@ default_scale = 1.0
 scale = 1.25
 ```
 
-Luft picks the largest available mode at the highest refresh rate by default. Pin a mode when needed:
+Luft uses the highest advertised refresh rate at the monitor’s preferred resolution by default. If no preferred resolution is advertised, it chooses the largest available resolution. Pin a mode when needed:
 
 ```toml
 [display."DP-1"]
@@ -106,4 +106,4 @@ Set `panel.customized = true` with no `panel.pinned` entries to keep the panel a
 
 ## Settings
 
-Run `luft-shell --settings display` or open Settings from Quick Settings. Settings saves the full configuration and rejects a save when another process changed the file while it was being edited. Blank output x/y coordinates select automatic placement; explicit zero is preserved. The built-in Start menu and Settings app are used when their custom command fields are empty.
+Run `luft-shell --settings display` or open Settings from Quick Settings. Settings applies changes through the compositor and rejects a save when another process changed the file while it was being edited. Display changes must be confirmed with Keep Changes within 15 seconds before they are saved. Revert restores the previous setup immediately; the compositor also restores it automatically when confirmation expires, even if Settings has closed. Unsupported modes and disabling every connected display are rejected. Blank output x/y coordinates select automatic placement; explicit zero is preserved. The built-in Start menu and Settings app are used when their custom command fields are empty.

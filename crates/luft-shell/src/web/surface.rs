@@ -33,6 +33,7 @@ pub struct WebSurfaces {
     panel: WebSurface,
     prewarm_index: usize,
     prewarm_at: Instant,
+    output_available: bool,
 }
 
 impl WebSurfaces {
@@ -119,6 +120,7 @@ impl WebSurfaces {
             ),
             prewarm_index: 0,
             prewarm_at: Instant::now() + Duration::from_secs(1),
+            output_available: true,
         };
         surfaces
             .session_menu
@@ -211,7 +213,31 @@ impl WebSurfaces {
         self.capture_consent.set_visible(visible);
     }
 
+    pub(super) fn set_output_available(&mut self, available: bool) {
+        if self.output_available == available {
+            return;
+        }
+        self.output_available = available;
+        self.panel.set_output_available(available);
+        for surface in [
+            &mut self.panel_menu,
+            &mut self.session_menu,
+            &mut self.start_menu,
+            &mut self.quick,
+            &mut self.date,
+            &mut self.notification_toast,
+            &mut self.capture_consent,
+        ] {
+            surface.set_output_available(available);
+        }
+        self.prewarm_index = 0;
+        self.prewarm_at = Instant::now() + Duration::from_secs(1);
+    }
+
     pub fn tick(&mut self) {
+        if !self.output_available {
+            return;
+        }
         self.prewarm_next_surface();
         self.panel.tick_visibility();
         self.panel_menu.tick();

@@ -8,8 +8,8 @@ use super::{
     model::{WebShellSnapshot, WebShellSurface},
     surface_payload,
     surface_sizing::{
-        capture_consent_size, date_center_size, notification_toast_size, panel_menu_size,
-        panel_size, quick_settings_size, session_menu_size,
+        capture_consent_size, date_center_size, fit_popover, notification_toast_size,
+        panel_menu_size, panel_size, quick_settings_size, session_menu_size,
     },
 };
 use serde_json::Value;
@@ -84,7 +84,7 @@ impl WebSurfaces {
             ),
             start_menu: LazyWebSurface::new(
                 WebShellSurface::StartMenu,
-                (START_MENU_WIDTH, START_MENU_HEIGHT),
+                fit_popover(snapshot, (START_MENU_WIDTH, START_MENU_HEIGHT)),
                 &actions_tx,
                 &start_menu_snapshot,
                 frame_rate,
@@ -145,6 +145,8 @@ impl WebSurfaces {
                 snapshot_value,
                 WebShellSurface::SessionMenu,
             ));
+        self.start_menu
+            .resize(fit_popover(snapshot, (START_MENU_WIDTH, START_MENU_HEIGHT)));
         self.start_menu.evaluate_snapshot(&surface_payload::project(
             snapshot_value,
             WebShellSurface::StartMenu,

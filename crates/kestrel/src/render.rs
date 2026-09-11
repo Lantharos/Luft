@@ -189,6 +189,9 @@ where
         .user_data()
         .get::<FullscreenSurface>()
         .and_then(|f| f.get())
+        .filter(|window| {
+            space.element_location(window).is_some() && window.decoration_state().fullscreen
+        })
     {
         let output_scale = output.current_scale().fractional_scale();
         let motion_offsets =

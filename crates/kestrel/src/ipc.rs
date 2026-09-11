@@ -67,8 +67,8 @@ pub struct IpcSocket {
 }
 
 impl IpcSocket {
-    pub fn snapshot(&self) -> Option<ShellSnapshot> {
-        self.snapshot.clone()
+    pub fn snapshot(&self) -> Option<&ShellSnapshot> {
+        self.snapshot.as_ref()
     }
 
     pub fn has_shell_subscriber(&self) -> bool {
@@ -80,17 +80,16 @@ impl IpcSocket {
         })
     }
 
-    pub fn publish(&mut self, mut snapshot: ShellSnapshot) -> ShellSnapshot {
+    pub fn publish(&mut self, mut snapshot: ShellSnapshot) {
         if let Some(current) = &self.snapshot
             && current.without_revision_eq(&snapshot)
         {
-            return current.clone();
+            return;
         }
         snapshot.revision = self
             .snapshot
             .as_ref()
             .map_or(1, |current| current.revision.saturating_add(1));
-        self.snapshot = Some(snapshot.clone());
         if let Ok(mut subscribers) = self.subscribers.lock() {
             subscribers.retain(|subscriber| {
                 if !subscriber.alive.load(Ordering::Acquire)
@@ -110,7 +109,7 @@ impl IpcSocket {
                 }
             });
         }
-        snapshot
+        self.snapshot = Some(snapshot);
     }
 
     pub fn send_shell_command(&mut self, command: luft_ipc::ShellCommand) {
@@ -161,7 +160,7 @@ pub fn install<BackendData: Backend + 'static>(
                     && command.request == IpcRequest::SubscribeShell;
                 let mut response = state.handle_ipc(command.request, command.access);
                 response = if subscribing {
-                    IpcResponse::ShellSnapshot(state.sync_shell_state())
+                    IpcResponse::ShellSnapshot(state.sync_shell_state().clone())
                 } else if matches!(response, IpcResponse::Accepted { .. }) {
                     IpcResponse::Accepted {
                         revision: state.sync_shell_state().revision,

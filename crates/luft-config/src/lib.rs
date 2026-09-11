@@ -45,6 +45,15 @@ impl LuftConfig {
             }
         }
         self.display.validate()?;
+        if self.input.keyboard_layout.trim().is_empty()
+            || !(0..=1000).contains(&self.input.repeat_rate)
+            || !(0..=10000).contains(&self.input.repeat_delay)
+            || !(-1.0..=1.0).contains(&self.input.pointer_acceleration)
+        {
+            return Err(ConfigError::Validation(
+                "invalid keyboard repeat, layout, or pointer acceleration".into(),
+            ));
+        }
         if self.cursor.theme.trim().is_empty() {
             return Err(ConfigError::Validation(
                 "cursor theme must not be empty".to_string(),

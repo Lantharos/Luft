@@ -146,6 +146,8 @@ impl WebShellSnapshot {
                             .and_then(icon_data_uri)
                     });
                     icon_uri.map(|icon_uri| WebTrayItem {
+                        service: item.registration.service.clone(),
+                        path: item.registration.path.clone(),
                         title: item.title.clone(),
                         icon_uri: Some(icon_uri),
                         status: WebTrayStatus::from(item.status),

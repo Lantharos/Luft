@@ -17,7 +17,7 @@ impl Default for DefaultAppsConfig {
             file_manager: "rover".to_string(),
             browser: "google-chrome-stable".to_string(),
             settings: String::new(),
-            launcher: "vicinae".to_string(),
+            launcher: String::new(),
         }
     }
 }

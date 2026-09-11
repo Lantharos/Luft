@@ -121,6 +121,9 @@ pub enum IpcRequest {
     ActivateWindow {
         window: WindowId,
     },
+    ForceQuitWindow {
+        window: WindowId,
+    },
     CloseWindow {
         window: WindowId,
     },
@@ -146,6 +149,8 @@ pub enum IpcRequest {
     },
     RestartShell,
     LockSession,
+    SuspendSession,
+    LogoutSession,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -271,6 +276,7 @@ pub struct WindowSummary {
     pub workspace: WorkspaceId,
     pub state: WindowState,
     pub geometry: Rect,
+    pub can_force_quit: bool,
     pub is_active: bool,
     pub is_visible: bool,
     pub icon_uri: Option<String>,

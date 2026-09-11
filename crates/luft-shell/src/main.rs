@@ -3,6 +3,7 @@ mod color;
 mod ipc;
 mod panel;
 mod services;
+mod settings;
 mod theme;
 mod web;
 
@@ -16,6 +17,10 @@ use tracing::info;
 struct ShellArgs {
     #[arg(long)]
     once: bool,
+    #[arg(long)]
+    settings: Option<String>,
+    #[arg(long)]
+    launch_desktop: Option<std::path::PathBuf>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,11 +28,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if sabine::dispatch_host_mode_from_args(&raw_args) {
         return Ok(());
     }
+    let args = ShellArgs::parse();
+    if let Some(path) = &args.launch_desktop {
+        return apps::launch_desktop(path);
+    }
+    if let Some(page) = &args.settings {
+        return settings::run(page);
+    }
     sabine::adopt_inherited_wayland_broker()?;
 
     init_logging();
 
-    let args = ShellArgs::parse();
     let loaded = load_config()?;
     info!("luft shell configuration loaded");
 

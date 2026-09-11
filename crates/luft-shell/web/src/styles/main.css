@@ -248,6 +248,13 @@ img {
   transition: transform 145ms var(--ease-shell);
 }
 
+.status-indicators {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+}
+
 .status-cluster svg {
   width: 16px;
   height: 16px;

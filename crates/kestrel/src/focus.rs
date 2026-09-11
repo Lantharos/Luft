@@ -130,6 +130,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &MotionEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target().enter(seat, data, event)
     }
     fn motion(
@@ -138,6 +141,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &MotionEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target().motion(seat, data, event)
     }
     fn relative_motion(
@@ -146,6 +152,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &RelativeMotionEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .relative_motion(seat, data, event)
     }
@@ -155,6 +164,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &ButtonEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target().button(seat, data, event)
     }
     fn axis(
@@ -163,9 +175,15 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         frame: AxisFrame,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target().axis(seat, data, frame)
     }
     fn frame(&self, seat: &Seat<KestrelState<BackendData>>, data: &mut KestrelState<BackendData>) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target().frame(seat, data)
     }
     fn leave(
@@ -183,6 +201,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GestureSwipeBeginEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_swipe_begin(seat, data, event)
     }
@@ -192,6 +213,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GestureSwipeUpdateEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_swipe_update(seat, data, event)
     }
@@ -201,6 +225,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GestureSwipeEndEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_swipe_end(seat, data, event)
     }
@@ -210,6 +237,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GesturePinchBeginEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_pinch_begin(seat, data, event)
     }
@@ -219,6 +249,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GesturePinchUpdateEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_pinch_update(seat, data, event)
     }
@@ -228,6 +261,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GesturePinchEndEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_pinch_end(seat, data, event)
     }
@@ -237,6 +273,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GestureHoldBeginEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_hold_begin(seat, data, event)
     }
@@ -246,6 +285,9 @@ impl<BackendData: Backend> PointerTarget<KestrelState<BackendData>> for PointerF
         data: &mut KestrelState<BackendData>,
         event: &GestureHoldEndEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_pointer_target()
             .gesture_hold_end(seat, data, event)
     }
@@ -259,6 +301,9 @@ impl<BackendData: Backend> KeyboardTarget<KestrelState<BackendData>> for Keyboar
         keys: Vec<KeysymHandle<'_>>,
         serial: Serial,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_keyboard_target().enter(seat, data, keys, serial)
     }
     fn leave(
@@ -278,6 +323,9 @@ impl<BackendData: Backend> KeyboardTarget<KestrelState<BackendData>> for Keyboar
         serial: Serial,
         time: InputTime,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_keyboard_target()
             .key(seat, data, key, state, serial, time)
     }
@@ -288,6 +336,9 @@ impl<BackendData: Backend> KeyboardTarget<KestrelState<BackendData>> for Keyboar
         modifiers: ModifiersState,
         serial: Serial,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_keyboard_target()
             .modifiers(seat, data, modifiers, serial)
     }
@@ -300,6 +351,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         event: &smithay::input::touch::DownEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().down(seat, data, event)
     }
 
@@ -309,6 +363,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         event: &smithay::input::touch::UpEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().up(seat, data, event)
     }
 
@@ -318,6 +375,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         event: &smithay::input::touch::MotionEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().motion(seat, data, event)
     }
 
@@ -327,6 +387,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         marker: FrameMarker,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().frame(seat, data, marker)
     }
 
@@ -345,6 +408,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         event: &smithay::input::touch::ShapeEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().shape(seat, data, event)
     }
 
@@ -354,6 +420,9 @@ impl<BackendData: Backend> TouchTarget<KestrelState<BackendData>> for PointerFoc
         data: &mut KestrelState<BackendData>,
         event: &smithay::input::touch::OrientationEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_touch_target().orientation(seat, data, event)
     }
 
@@ -375,6 +444,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tablet: &smithay::input::tablet::Tablet,
         serial: Serial,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .proximity_in(seat, data, tool_descriptor, tablet, serial);
     }
@@ -396,6 +468,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         event: &smithay::input::tablet::tool::DownEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .down(seat, data, tool_descriptor, event);
     }
@@ -407,6 +482,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         event: &smithay::input::tablet::tool::UpEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .up(seat, data, tool_descriptor, event);
     }
@@ -418,6 +496,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         event: &smithay::input::tablet::tool::MotionEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .motion(seat, data, tool_descriptor, event);
     }
@@ -429,6 +510,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         event: &smithay::input::tablet::tool::ButtonEvent,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .button(seat, data, tool_descriptor, event);
     }
@@ -440,6 +524,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         frame: smithay::input::tablet::tool::AxisFrame,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .axis(seat, data, tool_descriptor, frame);
     }
@@ -451,6 +538,9 @@ impl<BackendData: Backend> TabletToolTarget<KestrelState<BackendData>> for Point
         tool_descriptor: &smithay::backend::input::TabletToolDescriptor,
         time: InputTime,
     ) {
+        if !data.session_lock.allows_input(self.wl_surface().as_deref()) {
+            return;
+        }
         self.inner_tablet_tool_target()
             .frame(seat, data, tool_descriptor, time);
     }

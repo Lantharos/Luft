@@ -28,7 +28,7 @@ use smithay::{
     input::{
         Seat, SeatHandler, SeatState,
         dnd::{DnDGrab, DndGrabHandler, DndTarget, GrabType, Source},
-        keyboard::{Keysym, LedState, ModifiersState, XkbConfig},
+        keyboard::{Keysym, LedState, ModifiersState},
         pointer::{CursorImageStatus, Focus, PointerHandle},
         tablet::TabletSeatHandler,
     },
@@ -135,6 +135,7 @@ pub struct ClientState {
     pub security_context: Option<SecurityContext>,
     pub privileged: bool,
     pub capture_privileged: bool,
+    pub xwayland_bridge: bool,
 }
 
 fn privileged_client(client: &Client) -> bool {
@@ -178,6 +179,10 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub ipc_socket: IpcSocket,
     pub nested: bool,
     pub primary_output: Option<String>,
+    pub input_config: luft_config::InputConfig,
+    pub display_config: luft_config::DisplayConfig,
+    pub compositor_config: luft_config::CompositorConfig,
+    pub workspace_config: luft_config::WorkspacesConfig,
     pub wallpaper: crate::wallpaper::Wallpaper,
     pub layer_motion: crate::layer_motion::LayerMotionState,
     pub layout: LayoutEngine,
@@ -218,6 +223,7 @@ pub struct KestrelState<BackendData: Backend + 'static> {
     pub background_effect_state: BackgroundEffectState,
     pub cursor_shape_state: CursorShapeManagerState,
     pub session_lock: crate::session_lock::SessionLock,
+    pub session: crate::session::SessionCoordinator,
     pub idle_inhibit_state: IdleInhibitManagerState,
     pub idle_notifier_state: IdleNotifierState<KestrelState<BackendData>>,
     pub idle_inhibitors: Vec<WlSurface>,
@@ -888,9 +894,18 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             let socket_name = source.socket_name().to_string_lossy().into_owned();
             handle
                 .insert_source(source, |client_stream, _, data| {
+                    let xwayland_bridge = rustix::net::sockopt::socket_peercred(&client_stream)
+                        .is_ok_and(|credentials| {
+                            Some(credentials.pid.as_raw_nonzero().get() as u32)
+                                == data.xwayland_process.pid()
+                        });
+                    let client_state = ClientState {
+                        xwayland_bridge,
+                        ..ClientState::default()
+                    };
                     if let Err(err) = data
                         .display_handle
-                        .insert_client(client_stream, Arc::new(ClientState::default()))
+                        .insert_client(client_stream, Arc::new(client_state))
                     {
                         warn!("Error adding wayland client: {}", err);
                     };
@@ -984,7 +999,11 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
 
         let pointer = seat.add_pointer();
         let keyboard = seat
-            .add_keyboard(XkbConfig::default(), 200, 25)
+            .add_keyboard(
+                crate::input_config::keyboard(&config.input),
+                config.input.repeat_delay,
+                config.input.repeat_rate,
+            )
             .expect("Failed to initialize the keyboard");
         keyboard.set_modifier_state(ModifiersState {
             num_lock: config.input.num_lock,
@@ -1022,6 +1041,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             shell_wayland_broker,
             shell_wayland_broker_key,
             ShellProcessConfig {
+                nested: runtime.nested,
                 enabled: runtime.start_shell,
                 app_wayland_socket: wayland_socket,
                 ipc_socket: ipc_path.clone(),
@@ -1035,6 +1055,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         let portal_process =
             crate::portal_process::PortalProcess::new(dh.clone(), ipc_path, portal_ipc_capability);
 
+        let session = crate::session::SessionCoordinator::install(&handle, !nested);
         KestrelState {
             backend_data,
             display_handle: dh,
@@ -1049,6 +1070,10 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             ipc_socket,
             nested,
             primary_output: config.display.primary.clone(),
+            input_config: config.input.clone(),
+            display_config: config.display.clone(),
+            compositor_config,
+            workspace_config: config.workspaces.clone(),
             wallpaper,
             layer_motion: crate::layer_motion::LayerMotionState::default(),
             layout: crate::policy::create_layout(),
@@ -1085,6 +1110,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
             background_effect_state,
             cursor_shape_state,
             session_lock,
+            session,
             idle_inhibit_state,
             idle_notifier_state,
             idle_inhibitors: Vec::new(),
@@ -1124,64 +1150,41 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
 
         #[allow(clippy::mutable_key_type)]
         let mut clients: HashMap<ClientId, Client> = HashMap::new();
-        self.space.elements().for_each(|window| {
-            window.with_surfaces(|surface, states| {
-                if let Some(mut commit_timer_state) = states
-                    .data_map
-                    .get::<CommitTimerBarrierStateUserData>()
-                    .map(|commit_timer| commit_timer.lock().unwrap())
-                {
-                    commit_timer_state.signal_until(frame_target);
-                    let client = surface.client().unwrap();
-                    clients.insert(client.id(), client);
+        {
+            let mut signal =
+                |surface: &WlSurface, states: &smithay::wayland::compositor::SurfaceData| {
+                    if surface_primary_scanout_output(surface, states)
+                        .is_some_and(|primary| primary != *output)
+                    {
+                        return;
+                    }
+                    let signaled = states
+                        .data_map
+                        .get::<CommitTimerBarrierStateUserData>()
+                        .is_some_and(|timer| timer.lock().unwrap().signal_until(frame_target));
+                    if signaled && let Some(client) = surface.client() {
+                        clients.insert(client.id(), client);
+                    }
+                };
+            if self.session_lock.is_active() {
+                if let Some(surface) = self.session_lock.surface_for_output(output) {
+                    with_surfaces_surface_tree(surface.wl_surface(), &mut signal);
                 }
-            });
-        });
-
-        let map = smithay::desktop::layer_map_for_output(output);
-        for layer_surface in map.layers() {
-            layer_surface.with_surfaces(|surface, states| {
-                if let Some(mut commit_timer_state) = states
-                    .data_map
-                    .get::<CommitTimerBarrierStateUserData>()
-                    .map(|commit_timer| commit_timer.lock().unwrap())
-                {
-                    commit_timer_state.signal_until(frame_target);
-                    let client = surface.client().unwrap();
-                    clients.insert(client.id(), client);
+            } else {
+                for window in self.space.elements_for_output(output) {
+                    window.with_surfaces(&mut signal);
                 }
-            });
-        }
-        // Drop the lock to the layer map before calling blocker_cleared, which might end up
-        // calling the commit handler which in turn again could access the layer map.
-        std::mem::drop(map);
-
-        if let CursorImageStatus::Surface(ref surface) = self.cursor_status {
-            with_surfaces_surface_tree(surface, |surface, states| {
-                if let Some(mut commit_timer_state) = states
-                    .data_map
-                    .get::<CommitTimerBarrierStateUserData>()
-                    .map(|commit_timer| commit_timer.lock().unwrap())
-                {
-                    commit_timer_state.signal_until(frame_target);
-                    let client = surface.client().unwrap();
-                    clients.insert(client.id(), client);
+                let map = smithay::desktop::layer_map_for_output(output);
+                for layer in map.layers() {
+                    layer.with_surfaces(&mut signal);
                 }
-            });
-        }
-
-        if let Some(surface) = self.dnd_icon.as_ref().map(|icon| &icon.surface) {
-            with_surfaces_surface_tree(surface, |surface, states| {
-                if let Some(mut commit_timer_state) = states
-                    .data_map
-                    .get::<CommitTimerBarrierStateUserData>()
-                    .map(|commit_timer| commit_timer.lock().unwrap())
-                {
-                    commit_timer_state.signal_until(frame_target);
-                    let client = surface.client().unwrap();
-                    clients.insert(client.id(), client);
+                if let Some(icon) = &self.dnd_icon {
+                    with_surfaces_surface_tree(&icon.surface, &mut signal);
                 }
-            });
+            }
+            if let CursorImageStatus::Surface(surface) = &self.cursor_status {
+                with_surfaces_surface_tree(surface, &mut signal);
+            }
         }
 
         let dh = self.display_handle.clone();
@@ -1221,7 +1224,7 @@ impl<BackendData: Backend + 'static> KestrelState<BackendData> {
         #[allow(clippy::mutable_key_type)]
         let mut clients: HashMap<ClientId, Client> = HashMap::new();
 
-        self.space.elements().for_each(|window| {
+        self.space.elements_for_output(output).for_each(|window| {
             window.with_surfaces(|surface, states| {
                 let primary_scanout_output = surface_primary_scanout_output(surface, states);
 
@@ -1508,4 +1511,14 @@ pub trait Backend {
     fn reset_buffers(&mut self, output: &Output);
     fn early_import(&mut self, surface: &WlSurface);
     fn update_led_state(&mut self, led_state: LedState);
+    fn configure_outputs(
+        _state: &mut KestrelState<Self>,
+        _config: &luft_config::DisplayConfig,
+    ) -> Result<(), String>
+    where
+        Self: Sized,
+    {
+        Ok(())
+    }
+    fn configure_input(&mut self, _config: &luft_config::InputConfig) {}
 }

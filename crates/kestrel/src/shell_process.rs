@@ -20,6 +20,7 @@ pub struct ShellProcessConfig {
     pub ipc_capability: String,
     pub xwayland_display: Option<String>,
     pub skip_startup_apps: bool,
+    pub nested: bool,
 }
 
 pub struct ShellProcess {
@@ -32,6 +33,7 @@ pub struct ShellProcess {
     ipc_capability: String,
     xwayland_display: Option<String>,
     skip_startup_apps: bool,
+    nested: bool,
     restart_at: Instant,
     started_at: Option<Instant>,
     failures: u32,
@@ -66,6 +68,7 @@ impl ShellProcess {
             ipc_capability: config.ipc_capability,
             xwayland_display: config.xwayland_display,
             skip_startup_apps: config.skip_startup_apps,
+            nested: config.nested,
             restart_at: Instant::now(),
             started_at: None,
             failures: 0,
@@ -114,6 +117,7 @@ impl ShellProcess {
             Ok(child) => {
                 info!(pid = child.id(), "started Luft shell");
                 self.child = Some(child);
+                self.skip_startup_apps = true;
                 self.started_at = Some(Instant::now());
             }
             Err(error) => {
@@ -177,6 +181,9 @@ impl ShellProcess {
     }
 
     fn publish_activation_environment(&self) {
+        if self.nested && env::var_os("LUFT_PRIVATE_DBUS").is_none() {
+            return;
+        }
         let mut names = vec![
             "WAYLAND_DISPLAY",
             "XDG_CURRENT_DESKTOP",
@@ -206,7 +213,7 @@ impl ShellProcess {
             Err(error) => warn!(%error, "failed to update D-Bus activation environment"),
         }
 
-        if env::var_os("LUFT_PRIVATE_DBUS").is_none() {
+        if !self.nested && env::var_os("LUFT_PRIVATE_DBUS").is_none() {
             let mut systemd = Command::new("systemctl");
             systemd.args(["--user", "import-environment"]).args(&names);
             for (name, value) in &environment {

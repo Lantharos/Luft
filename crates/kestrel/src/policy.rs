@@ -171,6 +171,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 .activate_window(window)
                 .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
+            IpcRequest::ForceQuitWindow { window } => self
+                .force_quit_window(window)
+                .map(|()| IpcResponse::Accepted { revision: 0 })
+                .unwrap_or_else(ipc_error),
             IpcRequest::CloseWindow { window } => self
                 .close_window(window)
                 .map(|()| IpcResponse::Accepted { revision: 0 })
@@ -205,9 +209,17 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 self.shell_process.restart();
                 IpcResponse::Accepted { revision: 0 }
             }
+            IpcRequest::SuspendSession => self
+                .request_suspend()
+                .map(|()| IpcResponse::Accepted { revision: 0 })
+                .unwrap_or_else(ipc_error),
+            IpcRequest::LogoutSession => {
+                self.running
+                    .store(false, std::sync::atomic::Ordering::SeqCst);
+                IpcResponse::Accepted { revision: 0 }
+            }
             IpcRequest::LockSession => self
-                .lock_process
-                .start()
+                .request_lock()
                 .map(|()| IpcResponse::Accepted { revision: 0 })
                 .unwrap_or_else(ipc_error),
             IpcRequest::Reload => self
@@ -233,31 +245,43 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         self.last_activity = std::time::Instant::now();
         self.idle_lock_sent = false;
         self.idle_suspend_sent = false;
-        let active = self.layout.active_workspace().clone();
-        let windows = self.layout.windows().cloned().collect::<Vec<_>>();
-        let mut layout = create_layout_from_config(config.clone());
-        if layout.workspaces().any(|workspace| workspace.id == active) {
-            layout
-                .switch_workspace(&active)
-                .map_err(|error| error.to_string())?;
-        }
-        let fallback_workspace = layout.active_workspace().clone();
-        for mut window in windows {
-            if !layout
-                .workspaces()
-                .any(|workspace| workspace.id == window.workspace)
-            {
-                window.workspace = fallback_workspace.clone();
+        if self.workspace_config != config.workspaces {
+            let active = self.layout.active_workspace().clone();
+            let windows = self.layout.windows().cloned().collect::<Vec<_>>();
+            let mut layout = create_layout_from_config(config.clone());
+            if layout.workspaces().any(|workspace| workspace.id == active) {
+                layout
+                    .switch_workspace(&active)
+                    .map_err(|error| error.to_string())?;
             }
-            layout
-                .register_window(window)
-                .map_err(|error| error.to_string())?;
+            let fallback_workspace = layout.active_workspace().clone();
+            for mut window in windows {
+                if !layout
+                    .workspaces()
+                    .any(|workspace| workspace.id == window.workspace)
+                {
+                    window.workspace = fallback_workspace.clone();
+                }
+                layout
+                    .register_window(window)
+                    .map_err(|error| error.to_string())?;
+            }
+            self.layout = layout;
+            self.workspace_config = config.workspaces.clone();
         }
-        self.layout = layout;
         self.xwayland_process
             .reconfigure(config.compositor.xwayland);
-        self.wallpaper = crate::wallpaper::Wallpaper::load(&config.compositor);
+        if self.compositor_config.background_image != config.compositor.background_image {
+            self.wallpaper = crate::wallpaper::Wallpaper::load(&config.compositor);
+        }
+        self.compositor_config = config.compositor.clone();
         if let Some(keyboard) = self.seat.get_keyboard() {
+            if self.input_config != config.input {
+                keyboard
+                    .set_xkb_config(self, crate::input_config::keyboard(&config.input))
+                    .map_err(|error| error.to_string())?;
+                keyboard.change_repeat_info(config.input.repeat_rate, config.input.repeat_delay);
+            }
             let mut modifiers = keyboard.modifier_state();
             if modifiers.num_lock != config.input.num_lock {
                 modifiers.num_lock = config.input.num_lock;
@@ -266,14 +290,24 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                 self.backend_data.update_led_state(keyboard.led_state());
             }
         }
+        if self.display_config != config.display {
+            BackendData::configure_outputs(self, &config.display)?;
+            self.display_config = config.display.clone();
+        }
+        self.input_config = config.input.clone();
+        self.backend_data.configure_input(&config.input);
         self.shell_process
             .set_xwayland_display(self.xwayland_process.display().map(str::to_owned));
         self.reconcile_workspace();
         Ok(())
     }
 
-    pub fn sync_shell_state(&mut self) -> ShellSnapshot {
+    pub fn sync_shell_state(&mut self) -> &ShellSnapshot {
         self.process_idle_actions();
+        if self.session_lock.needs_locker() {
+            self.lock_process.recover();
+        }
+        self.session.update(self.session_lock.is_secure());
         if self.capture_consent.expire() {
             self.shell_state_dirty = true;
         }
@@ -296,14 +330,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             && !policy_changed
             && !focus_changed
             && !process_changed
-            && let Some(snapshot) = self.ipc_socket.snapshot()
+            && self.ipc_socket.snapshot().is_some()
         {
-            return snapshot;
+            return self.ipc_socket.snapshot().unwrap();
         }
         let snapshot = self.shell_snapshot();
-        let snapshot = self.ipc_socket.publish(snapshot);
+        self.ipc_socket.publish(snapshot);
         self.shell_state_dirty = false;
-        snapshot
+        self.ipc_socket.snapshot().unwrap()
     }
 
     fn shell_focus_surface(
@@ -322,16 +356,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
         let idle_for = self.last_activity.elapsed();
         if !self.idle_lock_sent && self.idle_lock_after.is_some_and(|after| idle_for >= after) {
-            self.idle_lock_sent = self.lock_process.start().is_ok();
+            self.idle_lock_sent = self.request_lock().is_ok();
         }
         if !self.idle_suspend_sent
             && self
                 .idle_suspend_after
                 .is_some_and(|after| idle_for >= after)
         {
-            self.ipc_socket
-                .send_shell_command(luft_ipc::ShellCommand::Suspend);
-            self.idle_suspend_sent = true;
+            self.idle_suspend_sent = self.request_suspend().is_ok();
         }
     }
 
@@ -359,6 +391,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                     workspace: info.workspace.clone(),
                     state: info.state.clone(),
                     geometry: info.geometry,
+                    can_force_quit: crate::process_control::can_force_quit(window),
                     is_active,
                     is_visible,
                     icon_uri: None,
@@ -431,8 +464,13 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .window(id)
             .is_some_and(|window| window.state == WindowState::Hidden);
         if was_hidden {
+            let mode = self
+                .windows
+                .get(&id)
+                .map(|window| window.layout_mode())
+                .unwrap_or(WindowState::Floating);
             self.layout
-                .set_window_state(id, WindowState::Floating)
+                .set_window_state(id, mode)
                 .map_err(|error| error.to_string())?;
         }
         self.switch_workspace(workspace)?;
@@ -454,7 +492,10 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             }
         }
         self.space.raise_element(&window, true);
-        if let Some(keyboard) = self.seat.get_keyboard() {
+        if !self.session_lock.is_active()
+            && window.has_buffer()
+            && let Some(keyboard) = self.seat.get_keyboard()
+        {
             keyboard.set_focus(self, Some(window.into()), SERIAL_COUNTER.next_serial());
         }
         self.shell_state_dirty = true;
@@ -584,9 +625,12 @@ impl<BackendData: Backend> KestrelState<BackendData> {
             .get(&id)
             .cloned()
             .ok_or_else(|| format!("unknown window {}", id.0))?;
-        let rect = self
-            .window_rect(&window)
-            .ok_or_else(|| "window is not mapped".to_string())?;
+        if let Some(toplevel) = window.0.toplevel() {
+            toplevel.send_close();
+        }
+        let Some(rect) = self.window_rect(&window) else {
+            return Ok(());
+        };
         window.decoration_state().animation = Some(WindowAnimation {
             kind: WindowAnimationKind::Close,
             from: smithay_rect(rect),
@@ -603,9 +647,8 @@ impl<BackendData: Backend> KestrelState<BackendData> {
                             .decoration_state()
                             .animation
                             .is_some_and(|animation| animation.kind == WindowAnimationKind::Close)
-                        && let Some(toplevel) = window.0.toplevel()
                     {
-                        toplevel.send_close();
+                        window.decoration_state().animation = None;
                     }
                     TimeoutAction::Drop
                 },
@@ -657,7 +700,7 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         self.switch_workspace(workspace)
     }
 
-    fn reconcile_workspace(&mut self) {
+    pub(crate) fn reconcile_workspace(&mut self) {
         let active = self.layout.active_workspace().clone();
         let visible = self
             .layout
@@ -668,14 +711,14 @@ impl<BackendData: Backend> KestrelState<BackendData> {
 
         for (id, window) in &self.windows {
             let mapped = self.space.element_location(window).is_some();
-            if visible.contains(id) && !mapped {
+            if visible.contains(id) && window.has_buffer() && !mapped {
                 let location = self
                     .layout
                     .window(*id)
                     .map(|info| (info.geometry.x, info.geometry.y))
                     .unwrap_or_default();
                 self.space.map_element(window.clone(), location, false);
-            } else if !visible.contains(id) && mapped {
+            } else if (!visible.contains(id) || !window.has_buffer()) && mapped {
                 self.space.unmap_elem(window);
             }
         }
@@ -801,6 +844,11 @@ impl<BackendData: Backend> KestrelState<BackendData> {
         });
         info.pid = surface
             .client()
+            .filter(|client| {
+                client
+                    .get_data::<crate::ClientState>()
+                    .is_some_and(|state| !state.privileged && !state.xwayland_bridge)
+            })
             .and_then(|client| client.get_credentials(&self.display_handle).ok())
             .and_then(|credentials| credentials.pid.try_into().ok());
     }
@@ -815,6 +863,7 @@ fn ipc_request_allowed(request: &IpcRequest, access: IpcAccess) -> bool {
         IpcRequest::SubscribeShell
         | IpcRequest::ResolveCaptureConsent { .. }
         | IpcRequest::ActivateWindow { .. }
+        | IpcRequest::ForceQuitWindow { .. }
         | IpcRequest::CloseWindow { .. }
         | IpcRequest::MinimizeWindow { .. }
         | IpcRequest::ToggleMaximizeWindow { .. }
@@ -824,6 +873,8 @@ fn ipc_request_allowed(request: &IpcRequest, access: IpcAccess) -> bool {
         | IpcRequest::SetOutputScale { .. }
         | IpcRequest::RestartShell
         | IpcRequest::LockSession
+        | IpcRequest::SuspendSession
+        | IpcRequest::LogoutSession
         | IpcRequest::Reload => access == IpcAccess::Shell,
     }
 }

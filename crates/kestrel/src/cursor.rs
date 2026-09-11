@@ -1,4 +1,4 @@
-use std::{io::Read, time::Duration};
+use std::{collections::HashMap, io::Read, sync::Arc, time::Duration};
 
 use tracing::warn;
 use xcursor::{
@@ -9,7 +9,8 @@ use xcursor::{
 static FALLBACK_CURSOR_DATA: &[u8] = include_bytes!("../resources/cursor.rgba");
 
 pub struct Cursor {
-    icons: Vec<Image>,
+    icons: HashMap<String, Vec<Arc<Image>>>,
+    theme: CursorTheme,
     size: u32,
 }
 
@@ -24,7 +25,7 @@ impl Cursor {
             .unwrap_or(24);
 
         let theme = CursorTheme::load(&name);
-        let icons = load_icon(&theme)
+        let icons = load_icon(&theme, "default")
             .map_err(|err| warn!("Unable to load xcursor: {}, using fallback cursor", err))
             .unwrap_or_else(|_| {
                 vec![Image {
@@ -39,16 +40,29 @@ impl Cursor {
                 }]
             });
 
-        Cursor { icons, size }
+        Cursor {
+            icons: HashMap::from([("default".into(), icons.into_iter().map(Arc::new).collect())]),
+            theme,
+            size,
+        }
     }
 
-    pub fn get_image(&self, scale: u32, time: Duration) -> Image {
-        let size = self.size * scale;
-        frame(time.as_millis() as u32, size, &self.icons)
+    pub fn get_image(&mut self, name: &str, scale: u32, time: Duration) -> Arc<Image> {
+        if !self.icons.contains_key(name) {
+            let images = load_icon(&self.theme, name)
+                .map(|images| images.into_iter().map(Arc::new).collect())
+                .unwrap_or_else(|_| self.icons["default"].clone());
+            self.icons.insert(name.to_owned(), images);
+        }
+        frame(
+            time.as_millis() as u32,
+            self.size * scale,
+            &self.icons[name],
+        )
     }
 }
 
-fn nearest_images(size: u32, images: &[Image]) -> impl Iterator<Item = &Image> {
+fn nearest_images(size: u32, images: &[Arc<Image>]) -> impl Iterator<Item = &Arc<Image>> {
     // Follow the nominal size of the cursor to choose the nearest
     let nearest_image = images
         .iter()
@@ -60,7 +74,7 @@ fn nearest_images(size: u32, images: &[Image]) -> impl Iterator<Item = &Image> {
     })
 }
 
-fn frame(mut millis: u32, size: u32, images: &[Image]) -> Image {
+fn frame(mut millis: u32, size: u32, images: &[Arc<Image>]) -> Arc<Image> {
     let total = nearest_images(size, images).fold(0, |acc, image| acc + image.delay);
     if total == 0 {
         return nearest_images(size, images).next().unwrap().clone();
@@ -87,10 +101,12 @@ enum Error {
     Parse,
 }
 
-fn load_icon(theme: &CursorTheme) -> Result<Vec<Image>, Error> {
-    let icon_path = theme.load_icon("default").ok_or(Error::NoDefaultCursor)?;
+fn load_icon(theme: &CursorTheme, name: &str) -> Result<Vec<Image>, Error> {
+    let icon_path = theme.load_icon(name).ok_or(Error::NoDefaultCursor)?;
     let mut cursor_file = std::fs::File::open(icon_path)?;
     let mut cursor_data = Vec::new();
     cursor_file.read_to_end(&mut cursor_data)?;
-    parse_xcursor(&cursor_data).ok_or(Error::Parse)
+    parse_xcursor(&cursor_data)
+        .filter(|images| !images.is_empty())
+        .ok_or(Error::Parse)
 }

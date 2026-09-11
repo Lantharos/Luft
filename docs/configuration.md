@@ -38,7 +38,7 @@ adaptive_sync = true
 
 `transform` accepts `normal`, `rotate90`, `rotate180`, `rotate270`, `flipped`,
 `flipped90`, `flipped180`, or `flipped270`. Kestrel applies configured
-enablement, mode, position, scale, transform, and adaptive sync while creating
+enablement, mode, position, scale, transform, and adaptive sync when creating and reconfiguring
 the DRM output. The nested backend uses its host window's output settings.
 
 ## Input
@@ -50,6 +50,21 @@ navigation-mode keypad keys are preferred:
 ```toml
 [input]
 num_lock = false
+```
+
+Keyboard and pointer settings apply through XKB and libinput:
+
+```toml
+[input]
+keyboard_layout = "us"
+keyboard_variant = ""
+keyboard_options = "caps:escape"
+repeat_delay = 200
+repeat_rate = 25
+tap_to_click = true
+natural_scroll = false
+disable_while_typing = true
+pointer_acceleration = 0.0
 ```
 
 ## Cursor
@@ -69,7 +84,7 @@ inside it.
 
 ## Startup Apps
 
-Luft launches user desktop entries from `~/.config/autostart` once when the shell starts. Add explicit commands when you want startup apps that are not represented by desktop files:
+Luft discovers desktop entries in the user and system XDG autostart directories. User entries override system entries by filename, including Hidden entries. Shell recovery skips startup applications. Add explicit commands when you want startup apps that are not represented by desktop files:
 
 ```toml
 [session]
@@ -88,3 +103,7 @@ icon = "com.mitchellh.ghostty"
 ```
 
 Set `panel.customized = true` with no `panel.pinned` entries to keep the panel app list empty.
+
+## Settings
+
+Run `luft-shell --settings display` or open Settings from Quick Settings. Settings saves the full configuration and rejects a save when another process changed the file while it was being edited. Blank output x/y coordinates select automatic placement; explicit zero is preserved. The built-in Start menu and Settings app are used when their custom command fields are empty.

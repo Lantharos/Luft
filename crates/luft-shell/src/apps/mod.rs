@@ -4,7 +4,7 @@ mod desktop_entry;
 mod icon_theme;
 mod xdg;
 
-pub use desktop_entry::{AppEntry, discover_applications, discover_user_autostart};
+pub use desktop_entry::{AppEntry, discover_applications, discover_user_autostart, launch_desktop};
 pub(crate) use icon_theme::resolve_icon_path;
 
 use luft_config::{ConfigPaths, LuftConfig};
@@ -114,136 +114,20 @@ pub fn launcher_apps_from(applications: Vec<AppEntry>, fallback: &[PanelApp]) ->
 pub fn spawn_command(command: &str, xwayland_display: Option<&str>) -> io::Result<Child> {
     let command = normalize_launch_command(command);
     log_app_launch(&command);
-    let mut child = command_for_launch(&command);
+    let mut child = if let Some(path) = command.strip_prefix("desktop:") {
+        let mut child = Command::new(env::current_exe()?);
+        child.arg("--launch-desktop").arg(path);
+        silence_stdio(&mut child);
+        child
+    } else {
+        command_for_launch(&command)
+    };
     apply_app_environment(&mut child, xwayland_display);
     child.spawn()
 }
 
 pub(crate) fn normalize_launch_command(command: &str) -> String {
-    clean_exec_forwarding_tokens(&clean_exec_placeholders(
-        &percent_decode(command).unwrap_or_else(|| command.to_string()),
-    ))
-}
-
-fn percent_decode(value: &str) -> Option<String> {
-    if !value.as_bytes().contains(&b'%') {
-        return None;
-    }
-
-    let bytes = value.as_bytes();
-    let mut output = Vec::with_capacity(bytes.len());
-    let mut decoded_any = false;
-    let mut index = 0;
-    while index < bytes.len() {
-        if bytes[index] == b'%'
-            && index + 2 < bytes.len()
-            && let (Some(high), Some(low)) =
-                (hex_value(bytes[index + 1]), hex_value(bytes[index + 2]))
-        {
-            output.push((high << 4) | low);
-            decoded_any = true;
-            index += 3;
-            continue;
-        }
-        output.push(bytes[index]);
-        index += 1;
-    }
-
-    decoded_any.then(|| String::from_utf8_lossy(&output).into_owned())
-}
-
-fn hex_value(byte: u8) -> Option<u8> {
-    match byte {
-        b'0'..=b'9' => Some(byte - b'0'),
-        b'a'..=b'f' => Some(byte - b'a' + 10),
-        b'A'..=b'F' => Some(byte - b'A' + 10),
-        _ => None,
-    }
-}
-
-fn clean_exec_placeholders(command: &str) -> String {
-    let mut cleaned = String::new();
-    let mut chars = command.chars().peekable();
-
-    while let Some(ch) = chars.next() {
-        if ch != '%' {
-            cleaned.push(ch);
-            continue;
-        }
-
-        match chars.next() {
-            Some('%') => cleaned.push('%'),
-            Some('f' | 'F' | 'u' | 'U' | 'd' | 'D' | 'n' | 'N' | 'i' | 'c' | 'k' | 'm' | 'v') => {}
-            Some(other) => {
-                cleaned.push('%');
-                cleaned.push(other);
-            }
-            None => cleaned.push('%'),
-        }
-    }
-
-    cleaned.trim().to_string()
-}
-
-fn clean_exec_forwarding_tokens(command: &str) -> String {
-    if !command.contains("@@") {
-        return command.trim().to_string();
-    }
-
-    if let Some(words) = shell_words(command) {
-        return clean_forwarding_words(words)
-            .into_iter()
-            .map(|word| shell_quote_word(&word))
-            .collect::<Vec<_>>()
-            .join(" ");
-    }
-
-    clean_forwarding_words(
-        command
-            .split_whitespace()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>(),
-    )
-    .join(" ")
-}
-
-fn clean_forwarding_words(words: Vec<String>) -> Vec<String> {
-    let strips_file_forwarding = words.iter().any(|word| is_forwarding_token(word));
-    let mut forwarding_payload = false;
-    words
-        .into_iter()
-        .filter(|word| {
-            if is_forwarding_start(word) {
-                forwarding_payload = true;
-                return false;
-            }
-            if word == "@@" {
-                forwarding_payload = false;
-                return false;
-            }
-            if forwarding_payload {
-                return false;
-            }
-            !(strips_file_forwarding && word == "--file-forwarding")
-        })
-        .collect()
-}
-
-fn is_forwarding_token(word: &str) -> bool {
-    matches!(word, "@@" | "@@u" | "@@U" | "@@f" | "@@F")
-}
-
-fn is_forwarding_start(word: &str) -> bool {
-    matches!(word, "@@u" | "@@U" | "@@f" | "@@F")
-}
-
-fn shell_quote_word(word: &str) -> String {
-    if word.bytes().all(|byte| {
-        byte.is_ascii_alphanumeric() || matches!(byte, b'/' | b'.' | b'_' | b'-' | b'=')
-    }) {
-        return word.to_string();
-    }
-    format!("'{}'", word.replace('\'', "'\\''"))
+    command.trim().to_owned()
 }
 
 fn command_for_launch(command: &str) -> Command {
@@ -272,37 +156,12 @@ fn silence_stdio(command: &mut Command) {
 }
 
 fn shell_words(command: &str) -> Option<Vec<String>> {
-    let mut words = Vec::new();
-    let mut current = String::new();
-    let mut chars = command.chars().peekable();
-    let mut quote = None;
-
-    while let Some(ch) = chars.next() {
-        match (quote, ch) {
-            (Some('\''), '\'') | (Some('"'), '"') => quote = None,
-            (Some(_), ch) => current.push(ch),
-            (None, '\'' | '"') => quote = Some(ch),
-            (None, '\\') => current.push(chars.next()?),
-            (None, ch) if ch.is_whitespace() => {
-                if !current.is_empty() {
-                    words.push(std::mem::take(&mut current));
-                }
-            }
-            (None, ch @ (';' | '&' | '|' | '<' | '>' | '$' | '`' | '(' | ')' | '{' | '}')) => {
-                current.push(ch);
-                return None;
-            }
-            (None, ch) => current.push(ch),
-        }
-    }
-
-    if quote.is_some() {
+    if command.contains([';', '&', '|', '<', '>', '$', '`', '(', ')', '{', '}']) {
         return None;
     }
-    if !current.is_empty() {
-        words.push(current);
-    }
-    (!words.is_empty()).then_some(words)
+    shell_words::split(command)
+        .ok()
+        .filter(|words| !words.is_empty())
 }
 
 fn apply_app_environment(command: &mut Command, xwayland_display: Option<&str>) {
@@ -384,38 +243,4 @@ fn commands_match(left: &str, right: &str) -> bool {
 
 fn luft_wayland_display() -> Option<std::ffi::OsString> {
     env::var_os("LUFT_WAYLAND_DISPLAY").or_else(|| env::var_os("WAYLAND_DISPLAY"))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::normalize_launch_command;
-
-    #[test]
-    fn launch_command_decodes_percent_encoded_paths() {
-        assert_eq!(
-            normalize_launch_command(
-                "env DESKTOPINTEGRATION=1 %2Fhome%2Fkristof%2FAppImages%2Fcodex_desktop.appimage",
-            ),
-            "env DESKTOPINTEGRATION=1 /home/kristof/AppImages/codex_desktop.appimage",
-        );
-    }
-
-    #[test]
-    fn launch_command_leaves_desktop_exec_placeholders_to_clean_exec() {
-        assert_eq!(normalize_launch_command("ghostty %u"), "ghostty");
-    }
-
-    #[test]
-    fn launch_command_removes_flatpak_file_forwarding_tokens() {
-        assert_eq!(
-            normalize_launch_command(
-                "/usr/bin/flatpak run --branch=stable --file-forwarding app.id @@u %U @@",
-            ),
-            "/usr/bin/flatpak run --branch=stable app.id",
-        );
-        assert_eq!(
-            normalize_launch_command("/usr/bin/flatpak run app.id @@u /tmp/file @@"),
-            "/usr/bin/flatpak run app.id",
-        );
-    }
 }

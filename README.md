@@ -27,10 +27,10 @@ bun install
 bun run build
 ```
 
-Build the DRM/KMS session backend explicitly:
+The default build includes the DRM/KMS session backend. To build just the compositor:
 
 ```sh
-cargo build -p kestrel --features session-backend
+cargo build -p kestrel
 ```
 
 ## Run
@@ -38,7 +38,7 @@ cargo build -p kestrel --features session-backend
 Run the nested compositor inside an existing desktop session:
 
 ```sh
-cargo run -p kestrel -- --nested
+cargo run -p luft-session -- --nested
 ```
 
 Kestrel prints a `WAYLAND_DISPLAY` value. Use that socket from another terminal to launch clients:

@@ -81,6 +81,7 @@ impl WebShell {
         match load_config() {
             Ok(loaded) if loaded.config != self.config => {
                 self.apply_shell_config(loaded.config);
+                self.send_ipc(luft_ipc::IpcRequest::Reload);
                 true
             }
             Ok(_) => false,

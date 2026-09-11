@@ -9,7 +9,7 @@ pub(crate) const NOTIFICATION_TOAST_BODY_HEIGHT: i32 = 116;
 pub(crate) const NOTIFICATION_TOAST_ACTION_HEIGHT: i32 = 140;
 pub(crate) const DOCK_MENU_WIDTH: i32 = 228;
 pub(crate) const SESSION_MENU_WIDTH: i32 = 188;
-pub(crate) const SESSION_MENU_HEIGHT: i32 = 172;
+pub(crate) const SESSION_MENU_HEIGHT: i32 = 210;
 pub(crate) const SESSION_MENU_RIGHT_MARGIN: i32 = 16;
 pub(crate) const SESSION_MENU_TOP_OFFSET: i32 = 60;
 pub(crate) const DATE_CENTER_WIDTH: i32 = 360;
@@ -32,9 +32,12 @@ pub(crate) fn quick_settings_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
     if sliders > 0 {
         height += 14 + 8 + sliders * 56;
     }
-    (
-        QUICK_SETTINGS_WIDTH,
-        height.max(SESSION_MENU_TOP_OFFSET + SESSION_MENU_HEIGHT),
+    fit_popover(
+        snapshot,
+        (
+            QUICK_SETTINGS_WIDTH,
+            height.max(SESSION_MENU_TOP_OFFSET + SESSION_MENU_HEIGHT),
+        ),
     )
 }
 
@@ -43,7 +46,7 @@ pub(crate) fn capture_consent_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
         .capture_prompt
         .as_ref()
         .map_or(1, |prompt| prompt.outputs.len().clamp(1, 4)) as i32;
-    (CAPTURE_CONSENT_WIDTH, 248 + output_count * 72)
+    fit_popover(snapshot, (CAPTURE_CONSENT_WIDTH, 248 + output_count * 72))
 }
 
 pub(crate) fn session_menu_size() -> (i32, i32) {
@@ -63,7 +66,7 @@ pub(crate) fn notification_toast_size(snapshot: &WebShellSnapshot) -> (i32, i32)
             }
         },
     );
-    (NOTIFICATION_TOAST_WIDTH, height)
+    fit_popover(snapshot, (NOTIFICATION_TOAST_WIDTH, height))
 }
 
 pub(crate) fn date_center_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
@@ -72,7 +75,10 @@ pub(crate) fn date_center_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
         .saturating_sub(DATE_CENTER_VERTICAL_MARGIN)
         .max(1);
     let content_height = notification_center_height(&snapshot.notifications);
-    (DATE_CENTER_WIDTH, content_height.min(available_height))
+    fit_popover(
+        snapshot,
+        (DATE_CENTER_WIDTH, content_height.min(available_height)),
+    )
 }
 
 fn notification_center_height(notifications: &[WebNotification]) -> i32 {
@@ -121,7 +127,10 @@ pub(crate) fn panel_menu_size(snapshot: &WebShellSnapshot) -> (i32, i32) {
             i32::from(primary > 0) + i32::from(can_pin) + i32::from(danger > 0),
         )
     };
-    (DOCK_MENU_WIDTH, panel_menu_height(actions, groups))
+    fit_popover(
+        snapshot,
+        (DOCK_MENU_WIDTH, panel_menu_height(actions, groups)),
+    )
 }
 
 fn panel_menu_height(actions: i32, groups: i32) -> i32 {
@@ -178,4 +187,12 @@ fn command_name(command: &str) -> String {
         .unwrap_or_default()
         .trim_matches(['\'', '"'])
         .to_lowercase()
+}
+
+pub(crate) fn fit_popover(snapshot: &WebShellSnapshot, size: (i32, i32)) -> (i32, i32) {
+    (
+        size.0.min((snapshot.output_width - 24).max(1)),
+        size.1
+            .min((snapshot.output_height - PANEL_HEIGHT - 24).max(1)),
+    )
 }

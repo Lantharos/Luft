@@ -92,6 +92,7 @@ pub struct WebWindow {
     pub icon_uri: Option<String>,
     pub workspace: String,
     pub geometry: WebGeometry,
+    pub can_force_quit: bool,
     pub active: bool,
     pub visible: bool,
     pub state: WindowState,
@@ -115,6 +116,7 @@ impl From<&WindowSummary> for WebWindow {
                 width: window.geometry.width,
                 height: window.geometry.height,
             },
+            can_force_quit: window.can_force_quit,
             active: window.is_active,
             visible: window.is_visible,
             state: window.state.clone(),
@@ -195,6 +197,8 @@ pub struct WebBrightness {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WebTrayItem {
+    pub service: String,
+    pub path: String,
     pub title: String,
     pub icon_uri: Option<String>,
     pub status: WebTrayStatus,

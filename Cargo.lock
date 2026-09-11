@@ -25,19 +25,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
-name = "ahash"
-version = "0.8.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
-dependencies = [
- "cfg-if",
- "getrandom 0.3.4",
- "once_cell",
- "version_check",
- "zerocopy",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -339,7 +326,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "241b621213072e993be4f6f3a9e4b45f65b7e6faad43001be957184b7bb1824b"
 dependencies = [
  "atk-sys",
- "glib",
+ "glib 0.18.5",
  "libc",
 ]
 
@@ -349,8 +336,8 @@ version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5e48b684b0ca77d2bbadeef17424c2ea3c897d44d566a1617e7e8f30614d086"
 dependencies = [
- "glib-sys",
- "gobject-sys",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "system-deps 6.2.2",
 ]
@@ -512,7 +499,7 @@ checksum = "8ca26ef0159422fb77631dc9d17b102f253b876fe1586b03b803e63a309b4ee2"
 dependencies = [
  "bitflags",
  "cairo-sys-rs",
- "glib",
+ "glib 0.18.5",
  "libc",
  "once_cell",
  "thiserror 1.0.69",
@@ -524,7 +511,7 @@ version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "685c9fa8e590b8b3d678873528d83411db17242a73fccaed827770ea0fedda51"
 dependencies = [
- "glib-sys",
+ "glib-sys 0.18.1",
  "libc",
  "system-deps 6.2.2",
 ]
@@ -1366,8 +1353,8 @@ dependencies = [
  "cairo-rs",
  "gdk-pixbuf",
  "gdk-sys",
- "gio",
- "glib",
+ "gio 0.18.4",
+ "glib 0.18.5",
  "libc",
  "pango",
 ]
@@ -1379,8 +1366,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "50e1f5f1b0bfb830d6ccc8066d18db35c487b1b2b1e8589b5dfe9f07e8defaec"
 dependencies = [
  "gdk-pixbuf-sys",
- "gio",
- "glib",
+ "gio 0.18.4",
+ "glib 0.18.5",
  "libc",
  "once_cell",
 ]
@@ -1391,9 +1378,9 @@ version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9839ea644ed9c97a34d129ad56d38a25e6756f99f3a88e15cd39c20629caf7"
 dependencies = [
- "gio-sys",
- "glib-sys",
- "gobject-sys",
+ "gio-sys 0.18.1",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "system-deps 6.2.2",
 ]
@@ -1406,9 +1393,9 @@ checksum = "5c2d13f38594ac1e66619e188c6d5a1adb98d11b2fcf7894fc416ad76aa2f3f7"
 dependencies = [
  "cairo-sys-rs",
  "gdk-pixbuf-sys",
- "gio-sys",
- "glib-sys",
- "gobject-sys",
+ "gio-sys 0.18.1",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "pango-sys",
  "pkg-config",
@@ -1448,25 +1435,13 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
-dependencies = [
- "cfg-if",
- "libc",
- "r-efi 5.3.0",
- "wasip2",
-]
-
-[[package]]
-name = "getrandom"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
 dependencies = [
  "cfg-if",
  "libc",
- "r-efi 6.0.0",
+ "r-efi",
  "rand_core",
 ]
 
@@ -1480,8 +1455,8 @@ dependencies = [
  "futures-core",
  "futures-io",
  "futures-util",
- "gio-sys",
- "glib",
+ "gio-sys 0.18.1",
+ "glib 0.18.5",
  "libc",
  "once_cell",
  "pin-project-lite",
@@ -1490,16 +1465,71 @@ dependencies = [
 ]
 
 [[package]]
+name = "gio"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b399f4650bb52c051f3fdf49a234e8a27ab5725c8cd774556c55eee64b2c0350"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "futures-io",
+ "futures-util",
+ "gio-sys 0.22.9",
+ "glib 0.22.9",
+ "libc",
+ "pin-project-lite",
+ "smallvec",
+]
+
+[[package]]
 name = "gio-sys"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37566df850baf5e4cb0dfb78af2e4b9898d817ed9263d1090a2df958c64737d2"
 dependencies = [
- "glib-sys",
- "gobject-sys",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "system-deps 6.2.2",
  "winapi",
+]
+
+[[package]]
+name = "gio-sys"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c28739f914c15b87a9856000bed9cbd5b3a8afbca5e982d9a299e1601422cb5"
+dependencies = [
+ "glib-sys 0.22.9",
+ "gobject-sys 0.22.9",
+ "libc",
+ "system-deps 9.0.0",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "gio-unix"
+version = "0.22.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce8d768735e229742c135afa3d3326604088d2df0679901cdb05e791fe2fbe0a"
+dependencies = [
+ "gio 0.22.9",
+ "gio-unix-sys",
+ "glib 0.22.9",
+ "libc",
+]
+
+[[package]]
+name = "gio-unix-sys"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c01dbb58f92f67548d85e2209e073acc7ee04e107c7e04ee69b49e38b4933b4"
+dependencies = [
+ "gio-sys 0.22.9",
+ "glib-sys 0.22.9",
+ "gobject-sys 0.22.9",
+ "libc",
+ "system-deps 9.0.0",
 ]
 
 [[package]]
@@ -1515,9 +1545,9 @@ dependencies = [
 
 [[package]]
 name = "glam"
-version = "0.33.6"
+version = "0.33.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21fef0953c54fd3de2f44b743fbf77e044c81a25faee03636dfccc0d35135e23"
+checksum = "e762b9b188634fc508d4ec54b62ea3d352c43fd431d18d05d46f559f217f4725"
 
 [[package]]
 name = "glib"
@@ -1531,15 +1561,35 @@ dependencies = [
  "futures-executor",
  "futures-task",
  "futures-util",
- "gio-sys",
- "glib-macros",
- "glib-sys",
- "gobject-sys",
+ "gio-sys 0.18.1",
+ "glib-macros 0.18.5",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "memchr",
  "once_cell",
  "smallvec",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "glib"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18b9b8d350db41f690ec1b87109f202782748bbd8ab2f2ede17cb40d29e2838c"
+dependencies = [
+ "bitflags",
+ "futures-channel",
+ "futures-core",
+ "futures-executor",
+ "futures-task",
+ "futures-util",
+ "glib-macros 0.22.9",
+ "glib-sys 0.22.9",
+ "gobject-sys 0.22.9",
+ "libc",
+ "memchr",
+ "smallvec",
 ]
 
 [[package]]
@@ -1557,6 +1607,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "glib-macros"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9597c68fa7bdf4154a3079642cd21c4dccac0b0bdd2897d82861523bf91e7b9"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.4",
+]
+
+[[package]]
 name = "glib-sys"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1564,6 +1626,16 @@ checksum = "063ce2eb6a8d0ea93d2bf8ba1957e78dbab6be1c2220dd3daca57d5a9d869898"
 dependencies = [
  "libc",
  "system-deps 6.2.2",
+]
+
+[[package]]
+name = "glib-sys"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99b38907e67e40dec9b60f858bcada952598719cb512a13eb13d6cdcd16f8295"
+dependencies = [
+ "libc",
+ "system-deps 9.0.0",
 ]
 
 [[package]]
@@ -1629,9 +1701,20 @@ version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0850127b514d1c4a4654ead6dedadb18198999985908e6ffe4436f53c785ce44"
 dependencies = [
- "glib-sys",
+ "glib-sys 0.18.1",
  "libc",
  "system-deps 6.2.2",
+]
+
+[[package]]
+name = "gobject-sys"
+version = "0.22.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07595c9ba696bd9819cb6a8df39f08078f3dd679508fe052dd558492c2053834"
+dependencies = [
+ "glib-sys 0.22.9",
+ "libc",
+ "system-deps 9.0.0",
 ]
 
 [[package]]
@@ -1660,8 +1743,8 @@ dependencies = [
  "futures-channel",
  "gdk",
  "gdk-pixbuf",
- "gio",
- "glib",
+ "gio 0.18.4",
+ "glib 0.18.5",
  "gtk-sys",
  "gtk3-macros",
  "libc",
@@ -1679,9 +1762,9 @@ dependencies = [
  "cairo-sys-rs",
  "gdk-pixbuf-sys",
  "gdk-sys",
- "gio-sys",
- "glib-sys",
- "gobject-sys",
+ "gio-sys 0.18.1",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "pango-sys",
  "system-deps 6.2.2",
@@ -2090,6 +2173,7 @@ dependencies = [
  "tracing-subscriber",
  "xcursor",
  "xkbcommon 0.9.0",
+ "zbus",
 ]
 
 [[package]]
@@ -2155,7 +2239,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03589b9607c868cc7ae54c0b2a22c8dc03dd41692d48f2d7df73615c6a95dc0a"
 dependencies = [
- "glib",
+ "glib 0.18.5",
  "gtk",
  "gtk-sys",
  "libappindicator-sys",
@@ -2440,12 +2524,16 @@ name = "luft-shell"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "gio 0.22.9",
+ "gio-unix",
  "image",
  "luft-config",
  "luft-ipc",
+ "rustix 1.1.4",
  "sabine",
  "serde",
  "serde_json",
+ "shell-words",
  "time",
  "tracing",
  "tracing-subscriber",
@@ -2841,16 +2929,6 @@ checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
 
 [[package]]
 name = "orbclient"
-version = "0.3.55"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5df339f526ea9a60e371768d50efc2f2508c7203290731565d1f7a6f71d21747"
-dependencies = [
- "libc",
- "libredox",
-]
-
-[[package]]
-name = "orbclient"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb08138df30517916447489a70848de31244c40c7b520bcf5ebdc9db6299da59"
@@ -2892,8 +2970,8 @@ version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ca27ec1eb0457ab26f3036ea52229edbdb74dee1edd29063f5b9b010e7ebee4"
 dependencies = [
- "gio",
- "glib",
+ "gio 0.18.4",
+ "glib 0.18.5",
  "libc",
  "once_cell",
  "pango-sys",
@@ -2905,8 +2983,8 @@ version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "436737e391a843e5933d6d9aa102cb126d501e815b83601365a948a518555dc5"
 dependencies = [
- "glib-sys",
- "gobject-sys",
+ "glib-sys 0.18.1",
+ "gobject-sys 0.18.0",
  "libc",
  "system-deps 6.2.2",
 ]
@@ -3232,12 +3310,6 @@ dependencies = [
 
 [[package]]
 name = "r-efi"
-version = "5.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
-
-[[package]]
-name = "r-efi"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
@@ -3523,7 +3595,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "ashpd",
  "bytemuck",
@@ -3556,13 +3628,13 @@ dependencies = [
  "wayland-client",
  "wgpu",
  "windows",
- "winit 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit 0.31.0-beta.2",
 ]
 
 [[package]]
 name = "sabine-bridge"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "serde",
  "serde_json",
@@ -3571,9 +3643,10 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "sabine-bridge",
+ "sabine-runtime",
  "serde",
  "serde_json",
  "windows",
@@ -3582,19 +3655,19 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
  "raw-window-handle",
  "windows",
- "winit 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit 0.31.0-beta.2",
 ]
 
 [[package]]
 name = "sabine-runtime"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "libc",
  "serde",
@@ -3608,7 +3681,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.22.0"
-source = "git+https://github.com/Lantharos/Sabine.git?rev=a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767#a13a3c3d5514cf1a47b63ee1688f2fa0c2f19767"
+source = "git+https://github.com/Lantharos/Sabine.git?rev=3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e#3d3466c76d1a5eda01da42c0bb98ad8b263d7a9e"
 dependencies = [
  "base64",
  "clap",
@@ -3787,6 +3860,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "shell-words"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc6fe69c597f9c37bfeeeeeb33da3530379845f10be461a66d16d03eca2ded77"
+
+[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3880,7 +3959,7 @@ checksum = "b9be42f50aa861c555654aa3a37f52f4b1074bacf4e48fe0ef7fa584e80f1f0f"
 [[package]]
 name = "smithay"
 version = "0.7.0"
-source = "git+https://github.com/Smithay/smithay.git?rev=60aafc2b1a64395bd32ec93f41e6712a07544c34#60aafc2b1a64395bd32ec93f41e6712a07544c34"
+source = "git+https://github.com/Smithay/smithay.git?rev=13738f8f2cc18224c229e7e8309ccdaa34e92e2a#13738f8f2cc18224c229e7e8309ccdaa34e92e2a"
 dependencies = [
  "aliasable",
  "appendlist",
@@ -3926,7 +4005,7 @@ dependencies = [
  "wayland-protocols-wlr",
  "wayland-server",
  "wayland-sys",
- "winit 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit 0.31.0-beta.3",
  "xkbcommon 0.9.0",
 ]
 
@@ -3991,7 +4070,7 @@ dependencies = [
 [[package]]
 name = "smithay-drm-extras"
 version = "0.1.0"
-source = "git+https://github.com/Smithay/smithay.git?rev=60aafc2b1a64395bd32ec93f41e6712a07544c34#60aafc2b1a64395bd32ec93f41e6712a07544c34"
+source = "git+https://github.com/Smithay/smithay.git?rev=13738f8f2cc18224c229e7e8309ccdaa34e92e2a#13738f8f2cc18224c229e7e8309ccdaa34e92e2a"
 dependencies = [
  "drm",
  "libdisplay-info",
@@ -4169,6 +4248,19 @@ name = "system-deps"
 version = "7.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "396a35feb67335377e0251fcbc1092fc85c484bd4e3a7a54319399da127796e7"
+dependencies = [
+ "cfg-expr 0.20.9",
+ "heck 0.5.0",
+ "pkg-config",
+ "toml 1.1.5+spec-1.1.0",
+ "version-compare",
+]
+
+[[package]]
+name = "system-deps"
+version = "9.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a0dae2cbca1f0ff93795713cfe0a4c02f760e3c0b8ae2ab4ec4045808ff429f"
 dependencies = [
  "cfg-expr 0.20.9",
  "heck 0.5.0",
@@ -4747,15 +4839,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b"
 
 [[package]]
-name = "wasip2"
-version = "1.0.4+wasi-0.2.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b67efb37e106e55ce722a510d6b5f9c17f083e5fc79afc2badeb12cc313d9487"
-dependencies = [
- "wit-bindgen",
-]
-
-[[package]]
 name = "wasm-bindgen"
 version = "0.2.127"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4820,8 +4903,8 @@ dependencies = [
  "memmap2",
  "wayland-backend",
  "wayland-client",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
  "xkbcommon-dl",
 ]
 
@@ -5504,70 +5587,54 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 [[package]]
 name = "winit"
 version = "0.31.0-beta.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2879d2854d1a43e48f67322d4bd097afcb6eb8f8f775c8de0260a71aea1df1aa"
+source = "git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42#42366231b0d92480a933339bd5eaa7fba8106f42"
 dependencies = [
  "bitflags",
  "cfg_aliases",
  "cursor-icon",
- "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
  "libc",
  "raw-window-handle",
  "rustix 1.1.4",
  "smol_str",
  "tracing",
- "winit-android 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-appkit 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-orbital 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-uikit 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-wayland 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-web 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-win32 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-x11 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-android 0.31.0-beta.2",
+ "winit-appkit 0.31.0-beta.2",
+ "winit-common 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
+ "winit-orbital 0.31.0-beta.2",
+ "winit-uikit 0.31.0-beta.2",
+ "winit-wayland 0.31.0-beta.2",
+ "winit-web 0.31.0-beta.2",
+ "winit-win32 0.31.0-beta.2",
+ "winit-x11 0.31.0-beta.2",
 ]
 
 [[package]]
 name = "winit"
-version = "0.31.0-beta.2"
-source = "git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42#42366231b0d92480a933339bd5eaa7fba8106f42"
+version = "0.31.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f431156a3e4f0f1b35eaaf37674e55838e3652908c8088f570466274d1902e2b"
 dependencies = [
  "bitflags",
  "cfg_aliases",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc",
  "raw-window-handle",
  "rustix 1.1.4",
  "smol_str",
  "tracing",
- "winit-android 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-appkit 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-common 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-orbital 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-uikit 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-wayland 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-web 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-win32 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-x11 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
-]
-
-[[package]]
-name = "winit-android"
-version = "0.31.0-beta.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51d9c0d2cd93efec3a9f9ad819cfaf0834782403af7c0d248c784ec0c61761df"
-dependencies = [
- "android-activity",
- "bitflags",
- "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "ndk",
- "raw-window-handle",
- "smol_str",
- "tracing",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-android 0.31.0-beta.3",
+ "winit-appkit 0.31.0-beta.3",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
+ "winit-orbital 0.31.0-beta.3",
+ "winit-uikit 0.31.0-beta.3",
+ "winit-wayland 0.31.0-beta.3",
+ "winit-web 0.31.0-beta.3",
+ "winit-win32 0.31.0-beta.3",
+ "winit-x11 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5582,30 +5649,23 @@ dependencies = [
  "raw-window-handle",
  "smol_str",
  "tracing",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-appkit"
-version = "0.31.0-beta.2"
+name = "winit-android"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21310ca07851a49c348e0c2cc768e36b52ca65afda2c2354d78ed4b90074d8aa"
+checksum = "d5d60d944a564986b9311e325334cc22e7e4cf726dd0ff7475fd925404215af4"
 dependencies = [
+ "android-activity",
  "bitflags",
- "block2",
- "dispatch2",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "objc2",
- "objc2-app-kit",
- "objc2-core-foundation",
- "objc2-core-graphics",
- "objc2-core-video",
- "objc2-foundation",
+ "ndk",
  "raw-window-handle",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5626,24 +5686,31 @@ dependencies = [
  "raw-window-handle",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-common 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-common"
-version = "0.31.0-beta.2"
+name = "winit-appkit"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45375fbac4cbb77260d83a30b1f9d8105880dbac99a9ae97f56656694680ff69"
+checksum = "23343ec0ea7ac6aa72f38009a6ff66fb63bcf6395e0622fba72794d2a762ab42"
 dependencies = [
- "memmap2",
+ "bitflags",
+ "block2",
+ "dispatch2",
+ "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc2",
+ "objc2-app-kit",
  "objc2-core-foundation",
+ "objc2-core-graphics",
+ "objc2-core-video",
+ "objc2-foundation",
+ "raw-window-handle",
  "smol_str",
  "tracing",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "x11-dl",
- "xkbcommon-dl",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5658,24 +5725,28 @@ dependencies = [
  "objc2-foundation",
  "smol_str",
  "tracing",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-core 0.31.0-beta.2",
  "x11-dl",
  "xkbcommon-dl",
 ]
 
 [[package]]
-name = "winit-core"
-version = "0.31.0-beta.2"
+name = "winit-common"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4f0ccd7abb43740e2c6124ac7cae7d865ecec74eec63783e8922577ac232583"
+checksum = "e90422ff1c04502aaaac1dad1d099791c2bbb3fbb3f823019e0ce5cdeee04025"
 dependencies = [
- "bitflags",
- "cursor-icon",
+ "block2",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "keyboard-types 0.8.3",
- "raw-window-handle",
+ "memmap2",
+ "objc2",
+ "objc2-core-foundation",
+ "objc2-foundation",
  "smol_str",
- "web-time",
+ "tracing",
+ "winit-core 0.31.0-beta.3",
+ "x11-dl",
+ "xkbcommon-dl",
 ]
 
 [[package]]
@@ -5694,19 +5765,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "winit-orbital"
-version = "0.31.0-beta.2"
+name = "winit-core"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51ea1fb262e7209f265f12bd0cc792c399b14355675e65531e9c8a87db287d46"
+checksum = "b8af6307236c51847199950c15cf80e0481a250bb96ce9132f5026df4ad3d0f9"
 dependencies = [
  "bitflags",
+ "cursor-icon",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "orbclient 0.3.55",
+ "keyboard-types 0.8.3",
  "raw-window-handle",
- "redox_syscall 0.5.18",
  "smol_str",
- "tracing",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url",
+ "web-time",
 ]
 
 [[package]]
@@ -5717,33 +5788,29 @@ dependencies = [
  "bitflags",
  "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
  "libredox",
- "orbclient 0.4.5",
+ "orbclient",
  "raw-window-handle",
  "redox_event",
  "smol_str",
  "tracing",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-uikit"
-version = "0.31.0-beta.2"
+name = "winit-orbital"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "680a356e798837d8eb274d4556e83bceaf81698194e31aafc5cfb8a9f2fab643"
+checksum = "278a8ae837902a3bc95dd2fd696d680da33f32130eecc29905358c9089cf6c50"
 dependencies = [
  "bitflags",
- "block2",
- "dispatch2",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "objc2",
- "objc2-core-foundation",
- "objc2-foundation",
- "objc2-ui-kit",
+ "libredox",
+ "orbclient",
  "raw-window-handle",
+ "redox_event",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5762,34 +5829,29 @@ dependencies = [
  "raw-window-handle",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-common 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-wayland"
-version = "0.31.0-beta.2"
+name = "winit-uikit"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ce5afb2ba07da603f84b722c95f9f9396d2cedae3944fb6c0cda4a6f88de545"
+checksum = "83315a3ea1739c8466cf23d35e3b0a2cb20c9515d8857666b633afef484740b5"
 dependencies = [
- "ahash",
  "bitflags",
- "calloop",
- "cursor-icon",
+ "block2",
+ "dispatch2",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc",
- "memmap2",
+ "objc2",
+ "objc2-core-foundation",
+ "objc2-foundation",
+ "objc2-ui-kit",
  "raw-window-handle",
- "rustix 1.1.4",
- "smithay-client-toolkit 0.20.0",
  "smol_str",
  "tracing",
- "wayland-backend",
- "wayland-client",
- "wayland-protocols",
- "wayland-protocols-plasma",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5815,31 +5877,35 @@ dependencies = [
  "wayland-client",
  "wayland-protocols",
  "wayland-protocols-plasma",
- "winit-common 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-common 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-web"
-version = "0.31.0-beta.2"
+name = "winit-wayland"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c2490a953fb776fbbd5e295d54f1c3847f4f15b6c3929ec53c09acda6487a92"
+checksum = "8b64ceed06de0c45886eef05102106abe1413e703384e337bc57c7e95b71f803"
 dependencies = [
- "atomic-waker",
  "bitflags",
- "concurrent-queue",
+ "calloop",
  "cursor-icon",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "js-sys",
- "pin-project",
+ "foldhash",
+ "libc",
+ "memmap2",
+ "percent-encoding",
  "raw-window-handle",
+ "rustix 1.1.4",
+ "smithay-client-toolkit 0.21.1",
  "smol_str",
  "tracing",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "web-time",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
+ "wayland-protocols-plasma",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5861,24 +5927,30 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "web-time",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-win32"
-version = "0.31.0-beta.2"
+name = "winit-web"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "644ea78af0e858aa3b092e5d1c67c41995a98220c81813f1353b28bc8bb91eaa"
+checksum = "f539be45f95cc297bdfb80569aef38d925d64aec4133852a4d3fc5cb3660f1c9"
 dependencies = [
+ "atomic-waker",
  "bitflags",
+ "concurrent-queue",
  "cursor-icon",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "js-sys",
+ "pin-project",
  "raw-window-handle",
  "smol_str",
  "tracing",
- "unicode-segmentation",
- "windows-sys 0.59.0",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "web-time",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5895,31 +5967,26 @@ dependencies = [
  "unicode-segmentation",
  "url",
  "windows-sys 0.61.2",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
-name = "winit-x11"
-version = "0.31.0-beta.2"
+name = "winit-win32"
+version = "0.31.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa5b600756534c7041aa93cd0d244d44b09fca1b89e202bd1cd80dd9f3636c46"
+checksum = "25fb480c41df01d351f656cbf3ad74013f8a9d22bb5b2dcab59f9167e7a0b6ec"
 dependencies = [
  "bitflags",
- "bytemuck",
- "calloop",
  "cursor-icon",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc",
- "percent-encoding",
  "raw-window-handle",
- "rustix 1.1.4",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "winit-core 0.31.0-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "x11-dl",
- "x11rb",
- "xkbcommon-dl",
+ "unicode-segmentation",
+ "url",
+ "windows-sys 0.61.2",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
 ]
 
 [[package]]
@@ -5938,8 +6005,32 @@ dependencies = [
  "rustix 1.1.4",
  "smol_str",
  "tracing",
- "winit-common 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
- "winit-core 0.31.0-beta.2 (git+https://github.com/rust-windowing/winit?rev=42366231b0d92480a933339bd5eaa7fba8106f42)",
+ "winit-common 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
+ "x11-dl",
+ "x11rb",
+ "xkbcommon-dl",
+]
+
+[[package]]
+name = "winit-x11"
+version = "0.31.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb5746cd907e514b7895491a1c6f7d0cb70077f9e16928cd74ae6f987ffd96aa"
+dependencies = [
+ "bitflags",
+ "bytemuck",
+ "calloop",
+ "cursor-icon",
+ "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc",
+ "percent-encoding",
+ "raw-window-handle",
+ "rustix 1.1.4",
+ "smol_str",
+ "tracing",
+ "winit-common 0.31.0-beta.3",
+ "winit-core 0.31.0-beta.3",
  "x11-dl",
  "x11rb",
  "xkbcommon-dl",
@@ -5971,12 +6062,6 @@ checksum = "5d129932f4644ac2396cb456385cbf9e63b5b30c6e8dc4820bdca4eb082037a5"
 dependencies = [
  "winapi",
 ]
-
-[[package]]
-name = "wit-bindgen"
-version = "0.57.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
 name = "writeable"

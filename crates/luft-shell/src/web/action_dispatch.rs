@@ -51,14 +51,21 @@ impl WebShell {
                 icon,
             } => self.pin_panel_app(label, command, icon),
             WebShellAction::PanelUnpin { command } => self.unpin_panel_app(&command),
-            WebShellAction::PanelForceQuit { command } => self.force_quit_panel_app(command),
+            WebShellAction::PanelForceQuit { window } => {
+                self.close_panel_menu();
+                self.send_ipc(luft_ipc::IpcRequest::ForceQuitWindow {
+                    window: window_id(window),
+                });
+            }
             WebShellAction::PanelReorder { commands } => self.reorder_panel_apps(commands),
             WebShellAction::AppLaunch { command } => {
                 self.close_transient_popovers();
                 self.launch(command);
             }
-            WebShellAction::TrayActivate { index } => self.activate_tray(index, false),
-            WebShellAction::TrayMenu { index } => self.activate_tray(index, true),
+            WebShellAction::TrayActivate { service, path } => {
+                self.activate_tray(&service, &path, false)
+            }
+            WebShellAction::TrayMenu { service, path } => self.activate_tray(&service, &path, true),
             WebShellAction::QuickOpenSettings { page } => self.open_settings_page(page),
             WebShellAction::QuickSetVolume { percent } => {
                 let muted = self.status.audio.as_ref().is_some_and(|audio| audio.muted);
@@ -135,6 +142,7 @@ impl WebShell {
     pub(super) fn open_launcher(&mut self) {
         self.close_transient_popovers();
         if self.launcher_command.trim().is_empty() {
+            self.toggle_start_menu();
             return;
         }
         match spawn_command(
@@ -170,14 +178,24 @@ impl WebShell {
     }
 
     pub(super) fn run_session_command(&mut self, command: SessionCommand) {
-        if matches!(command, SessionCommand::Lock) {
+        if matches!(command, SessionCommand::Logout) {
             self.close_transient_popovers();
-            self.send_ipc(luft_ipc::IpcRequest::LockSession);
+            self.send_ipc(luft_ipc::IpcRequest::LogoutSession);
+            return;
+        }
+        if matches!(command, SessionCommand::Lock | SessionCommand::Suspend) {
+            self.close_transient_popovers();
+            self.send_ipc(if matches!(command, SessionCommand::Lock) {
+                luft_ipc::IpcRequest::LockSession
+            } else {
+                luft_ipc::IpcRequest::SuspendSession
+            });
             return;
         }
         let command = match command {
-            SessionCommand::Lock => unreachable!(),
-            SessionCommand::Suspend => self.config.session.suspend_command.clone(),
+            SessionCommand::Lock | SessionCommand::Suspend | SessionCommand::Logout => {
+                unreachable!()
+            }
             SessionCommand::Reboot => self.config.session.reboot_command.clone(),
             SessionCommand::PowerOff => self.config.session.poweroff_command.clone(),
         };

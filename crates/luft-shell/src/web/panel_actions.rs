@@ -3,8 +3,6 @@ use crate::{
     apps::{normalize_launch_command, spawn_command},
     panel::{self, PanelApp, panel_app_matches_window},
 };
-use std::path::Path;
-use std::process::Command;
 use tracing::{debug, warn};
 
 impl WebShell {
@@ -85,41 +83,6 @@ impl WebShell {
         }
     }
 
-    pub(super) fn force_quit_panel_app(&mut self, command: String) {
-        let command = normalize_launch_command(&command);
-        self.close_panel_menu();
-
-        let pids = self
-            .panel_app_for_command(&command)
-            .map(|app| self.window_pids_for_panel_app(&app))
-            .unwrap_or_default();
-        if !pids.is_empty() {
-            match Command::new("kill")
-                .arg("-TERM")
-                .args(pids.iter().map(u32::to_string))
-                .spawn()
-            {
-                Ok(child) => self.app_processes.push(LaunchedProcess::new(
-                    format!("kill -TERM {}", format_pids(&pids)),
-                    child,
-                )),
-                Err(error) => warn!(%error, command, "failed to terminate panel app windows"),
-            }
-            return;
-        }
-
-        let Some(program) = command_basename(&command) else {
-            return;
-        };
-        match Command::new("pkill").args(["-TERM", "-x", program]).spawn() {
-            Ok(child) => self.app_processes.push(LaunchedProcess::new(
-                format!("pkill -TERM -x {program}"),
-                child,
-            )),
-            Err(error) => warn!(%error, command, "failed to force quit panel app"),
-        }
-    }
-
     fn panel_app_for_command(&self, command: &str) -> Option<PanelApp> {
         self.panel_apps
             .iter()
@@ -133,19 +96,6 @@ impl WebShell {
                         PanelApp::new(app.name.clone(), app.command.clone(), app.icon_path.clone())
                     })
             })
-    }
-
-    fn window_pids_for_panel_app(&self, app: &PanelApp) -> Vec<u32> {
-        let mut pids = self
-            .model
-            .windows
-            .iter()
-            .filter(|window| panel_app_matches_window(app, window))
-            .filter_map(|window| window.pid)
-            .collect::<Vec<_>>();
-        pids.sort_unstable();
-        pids.dedup();
-        pids
     }
 
     fn ordered_panel_windows<'a>(&'a self, app: &PanelApp) -> Vec<&'a luft_ipc::WindowSummary> {
@@ -204,8 +154,12 @@ impl WebShell {
         self.surfaces.set_panel_menu_visible(false);
     }
 
-    pub(super) fn activate_tray(&self, index: usize, menu: bool) {
-        let Some(item) = self.tray.snapshot().items.get(index) else {
+    pub(super) fn activate_tray(&self, service: &str, path: &str, menu: bool) {
+        let Some(item) =
+            self.tray.snapshot().items.iter().find(|item| {
+                item.registration.service == service && item.registration.path == path
+            })
+        else {
             return;
         };
         if menu {
@@ -256,16 +210,4 @@ fn normalized_identifier(value: &str) -> String {
         .filter(|ch| ch.is_ascii_alphanumeric())
         .flat_map(char::to_lowercase)
         .collect()
-}
-
-fn command_basename(command: &str) -> Option<&str> {
-    let first = command.split_whitespace().next()?.trim_matches(['"', '\'']);
-    Path::new(first).file_name()?.to_str()
-}
-
-fn format_pids(pids: &[u32]) -> String {
-    pids.iter()
-        .map(u32::to_string)
-        .collect::<Vec<_>>()
-        .join(" ")
 }

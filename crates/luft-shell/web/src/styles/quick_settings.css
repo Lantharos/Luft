@@ -7,6 +7,8 @@
   height: 100%;
   padding: 16px;
   contain: layout paint;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .quick-header,

@@ -81,6 +81,13 @@ if ! command -v cargo >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v sabine >/dev/null 2>&1; then
+  echo "Install the Sabine CLI to prepare the shared CEF runtime before login" >&2
+  exit 1
+fi
+sabine runtime prepare
+sabine runtime doctor
+
 build_args=()
 target_dir="$ROOT/target/debug"
 if [[ "$PROFILE" == "release" ]]; then
@@ -93,7 +100,7 @@ bun install --frozen-lockfile
 bun run build
 
 cd "$ROOT"
-cargo build --locked "${build_args[@]}" \
+LUFT_SHELL_INSTALL_DATA_DIR="$DATA_DIR/shell" cargo build --locked "${build_args[@]}" \
   -p kestrel \
   -p luft-shell \
   -p luft-session \

@@ -23,16 +23,14 @@ fn main() -> ExitCode {
     if args.nested {
         #[cfg(feature = "nested")]
         {
-            kestrel::winit::run_winit(runtime);
-            return ExitCode::SUCCESS;
+            return backend_result(kestrel::winit::run_winit(runtime));
         }
         #[cfg(not(feature = "nested"))]
         tracing::error!("Kestrel was built without the nested backend");
     } else if args.session {
         #[cfg(feature = "session-backend")]
         {
-            kestrel::udev::run_udev(runtime);
-            return ExitCode::SUCCESS;
+            return backend_result(kestrel::udev::run_udev(runtime));
         }
         #[cfg(not(feature = "session-backend"))]
         tracing::error!("Kestrel was built without the session backend");
@@ -50,4 +48,14 @@ fn init_logging() {
         .compact()
         .with_env_filter(filter)
         .init();
+}
+
+fn backend_result(result: Result<(), String>) -> ExitCode {
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            tracing::error!(%error, "compositor stopped");
+            ExitCode::FAILURE
+        }
+    }
 }

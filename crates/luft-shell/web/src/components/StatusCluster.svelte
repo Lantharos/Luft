@@ -1,43 +1,30 @@
 <script lang="ts">
   import Icon from "./Icon.svelte";
   import { sendAction } from "../shell/bridge";
-  import type { ShellSnapshot } from "../shell/model";
+  import type { ShellSnapshot, TrayItem } from "../shell/model";
 
   let { snapshot, className }: { snapshot: ShellSnapshot; className: string } = $props();
 
-  function toggleSettings(event: MouseEvent) {
-    if (event.button !== 0) return;
-    if ((event.target as Element).closest(".tray-item")) return;
+  function activateTray(event: MouseEvent, item: TrayItem) {
     event.stopPropagation();
-    sendAction({ type: "toggle-quick-settings" });
+    sendAction({ type: "tray-activate", service: item.service, path: item.path });
   }
 
-  function activateTray(event: MouseEvent, index: number) {
-    event.stopPropagation();
-    sendAction({ type: "tray-activate", index });
-  }
-
-  function openTrayMenu(event: MouseEvent, index: number) {
+  function openTrayMenu(event: MouseEvent, item: TrayItem) {
     event.preventDefault();
     event.stopPropagation();
-    sendAction({ type: "tray-menu", index });
-  }
-
-  function keydown(event: KeyboardEvent) {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    sendAction({ type: "toggle-quick-settings" });
+    sendAction({ type: "tray-menu", service: item.service, path: item.path });
   }
 </script>
 
-<div class={className} role="button" tabindex="0" aria-label="Quick settings" onmousedown={toggleSettings} onkeydown={keydown}>
-  {#each snapshot.tray as item, index (item.title + index)}
+<div class={className}>
+  {#each snapshot.tray as item (item.service + item.path)}
     <button
       type="button"
       class="tray-item"
       aria-label={item.title}
-      onclick={(event) => activateTray(event, index)}
-      oncontextmenu={(event) => openTrayMenu(event, index)}
+      onclick={(event) => activateTray(event, item)}
+      oncontextmenu={(event) => openTrayMenu(event, item)}
     >
       {#if item.iconUri}
         <img src={item.iconUri} alt="" />
@@ -45,11 +32,13 @@
     </button>
   {/each}
 
-  <Icon name={snapshot.status.network?.wireless ? "wifi" : "network"} />
-  {#if snapshot.status.audio}
-    <Icon name="volume" />
-  {/if}
-  {#if snapshot.status.battery}
-    <Icon name="battery" />
-  {/if}
+  <button type="button" class="status-indicators" aria-label="Quick settings" onclick={() => sendAction({ type: "toggle-quick-settings" })}>
+    <Icon name={snapshot.status.network?.wireless ? "wifi" : "network"} />
+    {#if snapshot.status.audio}
+      <Icon name="volume" />
+    {/if}
+    {#if snapshot.status.battery}
+      <Icon name="battery" />
+    {/if}
+  </button>
 </div>

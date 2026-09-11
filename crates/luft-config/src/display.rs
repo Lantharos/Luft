@@ -44,8 +44,8 @@ impl DisplayConfig {
 pub struct OutputConfig {
     pub enabled: bool,
     pub scale: Option<f64>,
-    pub x: i32,
-    pub y: i32,
+    pub x: Option<i32>,
+    pub y: Option<i32>,
     pub width: Option<i32>,
     pub height: Option<i32>,
     pub refresh_millihertz: Option<i32>,
@@ -58,8 +58,8 @@ impl Default for OutputConfig {
         Self {
             enabled: true,
             scale: None,
-            x: 0,
-            y: 0,
+            x: None,
+            y: None,
             width: None,
             height: None,
             refresh_millihertz: None,

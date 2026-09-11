@@ -101,17 +101,19 @@ impl Backend for WinitData {
     fn update_led_state(&mut self, _led_state: LedState) {}
 }
 
-pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
-    let mut event_loop = EventLoop::try_new().unwrap();
-    let display = Display::new().unwrap();
+pub fn run_winit(runtime: crate::runtime::RuntimeOptions) -> Result<(), String> {
+    let mut event_loop =
+        EventLoop::try_new().map_err(|error| format!("could not create event loop: {error}"))?;
+    let display = Display::new().map_err(|error| {
+        format!("could not load the Wayland server library; install libwayland-server: {error}")
+    })?;
     let mut display_handle = display.handle();
 
     #[cfg_attr(not(feature = "egl"), allow(unused_mut))]
     let (mut backend, mut winit) = match winit::init::<GlesRenderer>() {
         Ok(ret) => ret,
         Err(err) => {
-            error!("Failed to initialize Winit backend: {}", err);
-            return;
+            return Err(format!("failed to initialize Winit backend: {err}"));
         }
     };
     let size = backend.window_size();
@@ -432,15 +434,15 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
                             Ok(()) => {
                                 *buffer_age = backend.buffer_age().unwrap_or(0);
                                 *buffer_age_size = backend.window_size();
+                                if let Some(generation) = state.session_lock.generation() {
+                                    state.session_lock.output_presented(&output, generation);
+                                }
                             }
                             Err(err) => warn!("Failed to submit buffer: {}", err),
                         }
                     }
                     if let Some(capture) = capture {
                         crate::capture::finish_framebuffer_copy(backend.renderer(), capture);
-                    }
-                    if session_locked {
-                        state.session_lock.output_cleared(&output);
                     }
 
                     #[cfg(feature = "debug")]
@@ -533,4 +535,5 @@ pub fn run_winit(runtime: crate::runtime::RuntimeOptions) {
         #[cfg(feature = "debug")]
         state.backend_data.fps.tick();
     }
+    Ok(())
 }

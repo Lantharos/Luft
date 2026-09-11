@@ -43,35 +43,16 @@ use crate::{
 
 mod element;
 mod grabs;
+pub(crate) mod layer_focus;
 mod rounded;
 pub(crate) mod ssd;
+mod window_lifecycle;
+mod window_mode;
 mod xdg;
 
 pub use self::element::*;
 pub use self::grabs::*;
 pub use self::rounded::*;
-
-fn fullscreen_output_geometry(
-    wl_surface: &WlSurface,
-    wl_output: Option<&wl_output::WlOutput>,
-    space: &mut Space<WindowElement>,
-) -> Option<Rectangle<i32, Logical>> {
-    // First test if a specific output has been requested
-    // if the requested output is not found ignore the request
-    wl_output
-        .and_then(Output::from_resource)
-        .or_else(|| {
-            let w = space.elements().find(|window| {
-                window
-                    .wl_surface()
-                    .map(|s| &*s == wl_surface)
-                    .unwrap_or(false)
-            });
-            w.and_then(|w| space.outputs_for_element(w).first().cloned())
-        })
-        .as_ref()
-        .and_then(|o| space.output_geometry(o))
-}
 
 #[derive(Default)]
 pub struct FullscreenSurface(RefCell<Option<WindowElement>>);
@@ -201,14 +182,17 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
                             .take()
                     });
 
-                    if let Some(buffer_offset) = buffer_offset {
-                        let current_loc = self.space.element_location(&window).unwrap();
+                    if let Some(buffer_offset) = buffer_offset
+                        && let Some(current_loc) = self.space.element_location(&window)
+                    {
                         self.space
                             .map_element(window, current_loc + buffer_offset, false);
                     }
                 }
             }
         }
+        xdg::handle_toplevel_commit(&mut self.space, surface);
+        self.commit_window(surface);
         self.popups.commit(surface);
 
         if matches!(&self.cursor_status, CursorImageStatus::Surface(cursor_surface) if cursor_surface == surface)
@@ -249,10 +233,12 @@ impl<BackendData: Backend> CompositorHandler for KestrelState<BackendData> {
         }
 
         if !unmaps_surface {
-            ensure_initial_configure(surface, &self.space, &mut self.popups);
+            let window = self.window_for_surface(surface);
+            ensure_initial_configure(surface, window, &self.space, &mut self.popups);
         }
         self.layer_motion
             .observe_surface_commit(surface, &self.space, std::time::Instant::now());
+        self.update_layer_focus(surface);
     }
 }
 
@@ -280,6 +266,12 @@ impl<BackendData: Backend> WlrLayerShellHandler for KestrelState<BackendData> {
         let Some(output) = wl_output
             .as_ref()
             .and_then(Output::from_resource)
+            .or_else(|| {
+                self.space
+                    .outputs()
+                    .find(|output| self.primary_output.as_deref() == Some(output.name().as_str()))
+                    .cloned()
+            })
             .or_else(|| self.space.outputs().next().cloned())
         else {
             tracing::warn!(namespace, "ignoring layer surface because no output exists");
@@ -292,23 +284,25 @@ impl<BackendData: Backend> WlrLayerShellHandler for KestrelState<BackendData> {
     }
 
     fn layer_destroyed(&mut self, surface: WlrLayerSurface) {
-        if let Some((mut map, layer)) = self.space.outputs().find_map(|o| {
-            let map = layer_map_for_output(o);
+        let layer = self.space.outputs().find_map(|output| {
+            let mut map = layer_map_for_output(output);
             let layer = map
                 .layers()
-                .find(|&layer| layer.layer_surface() == &surface)
-                .cloned();
-            layer.map(|layer| (map, layer))
-        }) {
+                .find(|layer| layer.layer_surface() == &surface)
+                .cloned()?;
             map.unmap_layer(&layer);
+            Some(layer)
+        });
+        if let Some(layer) = layer {
+            self.restore_layer_focus(&layer);
         }
     }
 }
 
 impl<BackendData: Backend> KestrelState<BackendData> {
     pub fn window_for_surface(&self, surface: &WlSurface) -> Option<WindowElement> {
-        self.space
-            .elements()
+        self.windows
+            .values()
             .find(|window| window.wl_surface().map(|s| &*s == surface).unwrap_or(false))
             .cloned()
     }
@@ -322,6 +316,7 @@ pub struct SurfaceData {
 
 fn ensure_initial_configure(
     surface: &WlSurface,
+    window: Option<WindowElement>,
     space: &Space<WindowElement>,
     popups: &mut PopupManager,
 ) {
@@ -337,11 +332,7 @@ fn ensure_initial_configure(
         |_, _, _| true,
     );
 
-    if let Some(window) = space
-        .elements()
-        .find(|window| window.wl_surface().map(|s| &*s == surface).unwrap_or(false))
-        .cloned()
-    {
+    if let Some(window) = window {
         // send the initial configure if relevant
         if let Some(toplevel) = window.0.toplevel() {
             let initial_configure_sent = with_states(surface, |states| {

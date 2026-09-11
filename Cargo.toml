@@ -18,12 +18,12 @@ license = "MIT"
 bitflags = "2.13.1"
 calloop = { version = "0.14.4", features = ["signals"] }
 clap = { version = "4.6.4", features = ["derive"] }
-glam = "0.33.2"
+glam = "0.33.7"
 input = "0.10.0"
 serde = { version = "1.0.229", features = ["derive", "rc"] }
 serde_json = "1.0.151"
-smithay = { git = "https://github.com/Smithay/smithay.git", rev = "60aafc2b1a64395bd32ec93f41e6712a07544c34", default-features = false, features = ["desktop", "wayland_frontend"] }
-smithay-drm-extras = { git = "https://github.com/Smithay/smithay.git", rev = "60aafc2b1a64395bd32ec93f41e6712a07544c34" }
+smithay = { git = "https://github.com/Smithay/smithay.git", rev = "13738f8f2cc18224c229e7e8309ccdaa34e92e2a", default-features = false, features = ["desktop", "wayland_frontend"] }
+smithay-drm-extras = { git = "https://github.com/Smithay/smithay.git", rev = "13738f8f2cc18224c229e7e8309ccdaa34e92e2a" }
 thiserror = "2.0.19"
 toml = "1.1.4"
 tracing = "0.1.44"

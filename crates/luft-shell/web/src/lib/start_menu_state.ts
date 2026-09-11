@@ -221,6 +221,14 @@ function startMenuCommands(snapshot: ShellSnapshot): StartMenuCommand[] {
       action: { type: "session-command", command: "lock" },
     },
     {
+      title: "Log Out",
+      detail: "End the current desktop session",
+      icon: "logout",
+      label: "Session",
+      keywords: ["logout", "log out", "sign out", "session"],
+      action: { type: "session-command", command: "logout" },
+    },
+    {
       title: "Suspend",
       detail: "Put the computer to sleep",
       icon: "moon",

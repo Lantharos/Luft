@@ -120,6 +120,7 @@ function surfaceFromRuntime(snapshot?: ShellSnapshot): ShellSurface {
 
 function isSurface(value: string | null): value is ShellSurface {
   return (
+    value === "settings" ||
     value === "panel" ||
     value === "panel-menu" ||
     value === "session-menu" ||

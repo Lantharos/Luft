@@ -6,7 +6,7 @@
   margin: 0 auto;
   overflow: hidden;
   overscroll-behavior: contain;
-  touch-action: pan-x;
+  touch-action: pan-y;
 }
 
 .start-menu-app-pages {
@@ -30,7 +30,10 @@
   gap: 12px 8px;
   min-width: 0;
   height: 100%;
-  padding: 0 4px;
+  padding: 6px 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 6px;
 }
 
 .start-menu-app {
@@ -41,7 +44,7 @@
   place-items: center;
   align-content: center;
   gap: 8px;
-  width: var(--start-menu-app-size);
+  width: min(100%, var(--start-menu-app-size));
   height: var(--start-menu-app-size);
   min-width: 0;
   min-height: 0;
@@ -100,6 +103,8 @@
   justify-content: center;
   gap: 9px;
   min-height: 34px;
+  min-width: 0;
+  max-width: 100%;
   margin: 4px auto 0;
 }
 
@@ -109,6 +114,8 @@
   justify-content: center;
   gap: 6px;
   min-height: 30px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .start-menu-page-control,
@@ -129,6 +136,7 @@
 .start-menu-page-control {
   width: 30px;
   height: 30px;
+  flex: 0 0 30px;
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -154,6 +162,7 @@
 .start-menu-page-dot {
   width: 30px;
   height: 30px;
+  flex: 0 0 30px;
 }
 
 .start-menu-page-dot span {
@@ -195,9 +204,9 @@
 
   .start-menu-app-page {
     --start-menu-app-size: 78px;
-    grid-template-columns: repeat(3, minmax(88px, 112px));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(var(--mobile-page-rows, 8), minmax(94px, 1fr));
-    padding-inline: 16px;
+    padding-inline: 4px;
   }
 
   .start-menu-app img,

@@ -1,0 +1,18 @@
+[package]
+name = "sushictl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Sushi boot diagnostics CLI"
+
+[[bin]]
+name = "sushictl"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+sushi.workspace = true

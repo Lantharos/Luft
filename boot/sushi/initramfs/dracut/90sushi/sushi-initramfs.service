@@ -1,0 +1,22 @@
+[Unit]
+Description=Sushi Boot Continuity Daemon
+Documentation=man:sushid(8)
+DefaultDependencies=no
+Conflicts=shutdown.target plymouth-start.service
+Before=systemd-ask-password-console.service cryptsetup-pre.target
+After=systemd-vconsole-setup.service sysinit.target
+ExecStartPre=/usr/lib/sushi/sushi-efi-state.sh
+ConditionPathExists=!/run/sushi/disabled
+ConditionKernelCommandLine=!rd.sushi=0
+ConditionVirtualization=!container
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sushid
+Restart=no
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=initrd.target

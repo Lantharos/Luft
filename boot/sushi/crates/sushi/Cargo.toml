@@ -1,0 +1,18 @@
+[package]
+name = "sushi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Sushi boot continuity library"
+
+[dependencies]
+anyhow.workspace = true
+bitflags.workspace = true
+drm.workspace = true
+libc.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true

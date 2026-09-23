@@ -1,0 +1,17 @@
+[package]
+name = "sushiboot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "sushiboot"
+path = "src/main.rs"
+
+[dependencies]
+libm = "0.2"
+log = { workspace = true }
+uefi = { version = "0.32", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
+
+[package.metadata.uefi]
+targets = ["x86_64-unknown-uefi"]

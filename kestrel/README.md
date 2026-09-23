@@ -5,12 +5,14 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 ## Current checkpoint
 
 - The engine and TypeScript UI compile against Fedora's GNOME 51 stack.
-- A headless Wayland session boots on a 1280×800 virtual monitor and produces screenshots of the panel, Start, quick settings, and power menu.
-- The panel reserves screen space, shows favorite and running apps, and opens animated shell surfaces.
+- The development launcher supports a visible nested session and isolated captures at 1280×800 and 1440×900.
+- The square, transparent 48px panel reserves the bottom edge. Its launcher and favorite/running apps stay centered against the monitor while live network, volume, and clock indicators sit on the right.
 - Start lists installed applications, filters them by name, and launches the selected app.
-- Quick settings expose Wi-Fi, volume, and brightness where the respective service or hardware is available.
+- Quick settings expose Wi-Fi and volume/brightness sliders where the respective service or hardware is available.
 - The notification center displays the existing message tray sources and can clear them.
 - The power menu delegates lock, suspend, log out, restart, and power off to the existing session action backend.
+- Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel blur has no tint overlay or rounded corners.
+- Start uses six equal app columns, keyboard search, and a compact account and power footer.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
 
 ## Work before a Luft session

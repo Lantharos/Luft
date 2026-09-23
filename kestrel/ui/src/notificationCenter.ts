@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
+import { blurSurface } from './surface.js';
 
 interface Notification {
   title: string;
@@ -27,24 +27,21 @@ export class NotificationCenter {
   constructor(private readonly tray: MessageTray) {
     this.actor = new St.BoxLayout({
       orientation: Clutter.Orientation.VERTICAL,
-      style_class: 'kestrel-popover',
+      name: 'kestrel-notifications',
+      style_class: 'kestrel-popover kestrel-notification-center',
       visible: false,
       reactive: true,
     });
-    this.actor.add_effect_with_name('backdrop', new Shell.BlurEffect({
-      mode: Shell.BlurMode.BACKGROUND,
-      radius: 34,
-      brightness: 0.76,
-    }));
+    blurSurface(this.actor, 20);
 
-    const header = new St.BoxLayout();
+    const header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
     header.add_child(new St.Label({
       text: 'Notifications',
       style_class: 'kestrel-title',
       x_expand: true,
     }));
     const clearButton = new St.Button({
-      style_class: 'kestrel-action',
+      style_class: 'kestrel-text-button',
       label: 'Clear all',
       can_focus: true,
     });
@@ -55,8 +52,9 @@ export class NotificationCenter {
     const scroll = new St.ScrollView({
       hscrollbar_policy: St.PolicyType.NEVER,
       vscrollbar_policy: St.PolicyType.AUTOMATIC,
+      height: 0,
+      y_expand: true,
     });
-    scroll.set_size(350, 470);
     scroll.child = this.list;
     this.actor.add_child(scroll);
 
@@ -78,8 +76,8 @@ export class NotificationCenter {
 
     if (notifications.length === 0) {
       this.list.add_child(new St.Label({
-        text: 'You’re all caught up',
-        style_class: 'kestrel-muted',
+        text: 'No notifications',
+        style_class: 'kestrel-empty',
       }));
       return;
     }

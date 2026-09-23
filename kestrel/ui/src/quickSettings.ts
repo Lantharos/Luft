@@ -1,126 +1,137 @@
 import Clutter from 'gi://Clutter';
 import Gvc from 'gi://Gvc';
 import NM from 'gi://NM';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
+import { Slider } from 'resource:///org/gnome/shell/ui/slider.js';
 
-interface BrightnessScale {
-  value: number;
-  stepUp(): void;
-  stepDown(): void;
-}
+import { blurSurface } from './surface.js';
 
-export interface BrightnessManager {
-  globalScale: BrightnessScale | null;
-}
+interface BrightnessScale { value: number; }
+export interface BrightnessManager { globalScale: BrightnessScale | null; }
 
 export class QuickSettings {
   readonly actor: St.BoxLayout;
-
   private readonly network = NM.Client.new(null);
   private readonly mixer = new Gvc.MixerControl({ name: 'Kestrel Volume Control' });
+  private readonly wirelessTitle = new St.Label({ style_class: 'kestrel-control-title' });
+  private readonly wirelessDetail = new St.Label({ style_class: 'kestrel-muted' });
   private readonly wirelessButton: St.Button;
-  private readonly volumeLabel = new St.Label({ style_class: 'kestrel-muted' });
-  private readonly brightnessLabel = new St.Label({ style_class: 'kestrel-muted' });
+  private readonly volume = new Slider(0);
+  private readonly brightnessSlider = new Slider(0);
+  private readonly volumeValue = new St.Label({ style_class: 'kestrel-value' });
+  private readonly brightnessValue = new St.Label({ style_class: 'kestrel-value' });
+  private readonly brightnessRow: St.BoxLayout;
+  private sink: Gvc.MixerStream | null = null;
+  private sinkSignals: number[] = [];
+  private syncing = false;
+  private networkIcon = 'network-wired-symbolic';
+  private volumeIcon = 'audio-volume-muted-symbolic';
 
-  constructor(private readonly brightness: BrightnessManager) {
+  constructor(
+    private readonly brightness: BrightnessManager,
+    private readonly statusChanged: (network: string, volume: string) => void,
+  ) {
     this.actor = new St.BoxLayout({
+      name: 'kestrel-quick-settings',
       orientation: Clutter.Orientation.VERTICAL,
-      style_class: 'kestrel-popover',
-      visible: false,
-      reactive: true,
+      style_class: 'kestrel-popover kestrel-quick-settings',
+      visible: false, reactive: true,
     });
-    this.actor.add_effect_with_name('backdrop', new Shell.BlurEffect({
-      mode: Shell.BlurMode.BACKGROUND,
-      radius: 34,
-      brightness: 0.76,
-    }));
+    blurSurface(this.actor, 28);
     this.actor.add_child(new St.Label({ text: 'Quick settings', style_class: 'kestrel-title' }));
 
-    this.wirelessButton = this.action('network-wireless-symbolic', '', () => {
-      this.network.wireless_set_enabled(!this.network.wireless_enabled);
-    });
+    const tile = new St.BoxLayout({ style_class: 'kestrel-network-content', x_expand: true });
+    tile.add_child(new St.Icon({ icon_name: 'network-wireless-symbolic', icon_size: 24, y_align: Clutter.ActorAlign.CENTER }));
+    const networkText = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, style_class: 'kestrel-network-text' });
+    networkText.add_child(this.wirelessTitle);
+    networkText.add_child(this.wirelessDetail);
+    tile.add_child(networkText);
+    this.wirelessButton = new St.Button({ style_class: 'kestrel-network-tile', child: tile, can_focus: true });
+    this.wirelessButton.connect('clicked', () => this.network.wireless_set_enabled(!this.network.wireless_enabled));
     this.actor.add_child(this.wirelessButton);
 
-    const volume = new St.BoxLayout({ style_class: 'kestrel-control-row' });
-    volume.add_child(new St.Icon({ icon_name: 'audio-volume-high-symbolic', icon_size: 20 }));
-    volume.add_child(this.volumeLabel);
-    volume.add_child(this.action('list-remove-symbolic', '', () => this.changeVolume(-0.08)));
-    volume.add_child(this.action('list-add-symbolic', '', () => this.changeVolume(0.08)));
-    this.actor.add_child(volume);
-
-    const brightnessRow = new St.BoxLayout({ style_class: 'kestrel-control-row' });
-    brightnessRow.add_child(new St.Icon({ icon_name: 'display-brightness-symbolic', icon_size: 20 }));
-    brightnessRow.add_child(this.brightnessLabel);
-    brightnessRow.add_child(this.action('list-remove-symbolic', '', () => {
-      this.brightness.globalScale?.stepDown();
-      this.refreshBrightness();
-    }));
-    brightnessRow.add_child(this.action('list-add-symbolic', '', () => {
-      this.brightness.globalScale?.stepUp();
-      this.refreshBrightness();
-    }));
-    this.actor.add_child(brightnessRow);
-
+    this.actor.add_child(this.control('Volume', 'audio-volume-high-symbolic', this.volume, this.volumeValue));
+    this.brightnessRow = this.control('Brightness', 'display-brightness-symbolic', this.brightnessSlider, this.brightnessValue);
+    this.actor.add_child(this.brightnessRow);
+    this.volume.connect('notify::value', () => {
+      if (this.syncing || !this.sink) return;
+      this.sink.set_volume(Math.round(this.volume.value * this.mixer.get_vol_max_norm()));
+      this.sink.push_volume();
+      if (this.sink.is_muted && this.volume.value > 0) this.sink.change_is_muted(false);
+      this.volumeValue.text = `${Math.round(this.volume.value * 100)}%`;
+    });
+    this.brightnessSlider.connect('notify::value', () => {
+      if (this.syncing || !this.brightness.globalScale) return;
+      this.brightness.globalScale.value = this.brightnessSlider.value;
+      this.brightnessValue.text = `${Math.round(this.brightnessSlider.value * 100)}%`;
+    });
     this.network.connect('notify::wireless-enabled', () => this.refreshWireless());
-    this.mixer.connect('default-sink-changed', () => this.refreshVolume());
-    this.mixer.connect('state-changed', () => this.refreshVolume());
+    this.network.connect('notify::primary-connection', () => this.refreshWireless());
+    this.mixer.connect('default-sink-changed', () => this.watchSink());
+    this.mixer.connect('state-changed', () => this.watchSink());
     this.mixer.open();
-
-    this.refreshWireless();
-    this.refreshVolume();
-    this.refreshBrightness();
+    this.refresh();
   }
 
   refresh(): void {
     this.refreshWireless();
     this.refreshVolume();
-    this.refreshBrightness();
+    const scale = this.brightness.globalScale;
+    this.brightnessRow.visible = scale !== null;
+    this.syncing = true;
+    this.brightnessSlider.value = scale?.value ?? 0;
+    this.brightnessValue.text = `${Math.round((scale?.value ?? 0) * 100)}%`;
+    this.syncing = false;
   }
 
   private refreshWireless(): void {
-    this.wirelessButton.set_label(this.network.wireless_enabled ? 'Wi-Fi on' : 'Wi-Fi off');
+    const enabled = this.network.wireless_enabled;
+    const primary = this.network.primary_connection;
+    this.networkIcon = primary?.get_connection_type() === '802-3-ethernet'
+      ? 'network-wired-symbolic'
+      : primary ? 'network-wireless-signal-excellent-symbolic' : 'network-wireless-offline-symbolic';
+    this.statusChanged(this.networkIcon, this.volumeIcon);
+    this.wirelessTitle.text = 'Wi-Fi';
+    const connection = this.network.active_connections.find(active => active.get_connection_type() === '802-11-wireless');
+    this.wirelessDetail.text = enabled ? connection?.get_id() ?? 'Not connected' : 'Off';
+    if (enabled) this.wirelessButton.add_style_pseudo_class('checked');
+    else this.wirelessButton.remove_style_pseudo_class('checked');
   }
 
-  private refreshVolume(): void {
-    const sink = this.mixer.get_default_sink();
-    const percent = sink ? Math.round(100 * sink.volume / this.mixer.get_vol_max_norm()) : 0;
-    this.volumeLabel.text = `Volume  ${percent}%`;
-  }
-
-  private refreshBrightness(): void {
-    const scale = this.brightness.globalScale;
-    this.brightnessLabel.text = scale
-      ? `Brightness  ${Math.round(scale.value * 100)}%`
-      : 'Brightness unavailable';
-  }
-
-  private changeVolume(amount: number): void {
-    const sink = this.mixer.get_default_sink();
-    if (!sink)
-      return;
-
-    const max = this.mixer.get_vol_max_norm();
-    sink.set_volume(Math.round(Math.max(0, Math.min(max, sink.volume + amount * max))));
-    sink.push_volume();
-    if (sink.is_muted && sink.volume > 0)
-      sink.change_is_muted(false);
+  private watchSink(): void {
+    for (const signal of this.sinkSignals) this.sink?.disconnect(signal);
+    this.sink = this.mixer.get_default_sink();
+    this.sinkSignals = this.sink ? [
+      this.sink.connect('notify::volume', () => this.refreshVolume()),
+      this.sink.connect('notify::is-muted', () => this.refreshVolume()),
+    ] : [];
     this.refreshVolume();
   }
 
-  private action(iconName: string, label: string, callback: () => void): St.Button {
-    const content = new St.BoxLayout({ y_align: Clutter.ActorAlign.CENTER });
-    content.add_child(new St.Icon({ icon_name: iconName, icon_size: 18 }));
-    if (label)
-      content.add_child(new St.Label({ text: label }));
+  private refreshVolume(): void {
+    const sink = this.sink;
+    const value = sink && !sink.is_muted ? Math.min(1, sink.volume / this.mixer.get_vol_max_norm()) : 0;
+    this.syncing = true;
+    this.volume.value = value;
+    this.syncing = false;
+    this.volumeValue.text = sink ? `${Math.round(value * 100)}%` : 'Unavailable';
+    this.volume.reactive = sink !== null;
+    this.volumeIcon = value === 0 ? 'audio-volume-muted-symbolic'
+      : value < 0.33 ? 'audio-volume-low-symbolic'
+        : value < 0.67 ? 'audio-volume-medium-symbolic' : 'audio-volume-high-symbolic';
+    this.statusChanged(this.networkIcon, this.volumeIcon);
+  }
 
-    const button = new St.Button({
-      style_class: 'kestrel-action',
-      child: content,
-      can_focus: true,
-      x_expand: Boolean(label),
-    });
-    button.connect('clicked', callback);
-    return button;
+  private control(title: string, icon: string, slider: Slider, value: St.Label): St.BoxLayout {
+    const section = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-slider-section' });
+    const header = new St.BoxLayout({ style_class: 'kestrel-slider-header' });
+    header.add_child(new St.Icon({ icon_name: icon, icon_size: 16 }));
+    header.add_child(new St.Label({ text: title, x_expand: true }));
+    header.add_child(value);
+    section.add_child(header);
+    slider.add_style_class_name('kestrel-slider');
+    slider.accessible_name = title;
+    section.add_child(slider);
+    return section;
   }
 }

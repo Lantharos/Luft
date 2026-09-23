@@ -25,19 +25,21 @@ meson setup kestrel/build kestrel/engine --prefix="$PWD/kestrel/install" -Dtests
 meson compile -C kestrel/build
 ```
 
-To capture the current virtual desktop:
+To open a visible nested session for interactive testing:
 
 ```bash
-mkdir -p docs/screenshots
-GSETTINGS_BACKEND=memory KESTREL_CAPTURE_DIR="$PWD/docs/screenshots" \
-  KESTREL_WINDOW_SCRIPT="$PWD/kestrel/tools/window.js" \
-  meson devenv -C kestrel/build \
-  dbus-run-session "$PWD/kestrel/build/src/gnome-shell" \
-  --headless --virtual-monitor 1280x800 \
-  --automation-script "$PWD/kestrel/tools/capture.js"
+kestrel/tools/session.sh nested
 ```
 
-This uses a private D-Bus session but can still load local notification history. The capture script does not save the notification view.
+The session opens in Mutter Development Kit. Click inside it to test Kestrel; its launcher button opens Start, and Super opens it when the devkit has keyboard shortcuts captured. Closing the devkit window ends the nested session. The launcher copies the host wallpaper, interface preferences, keyboard layout, and favorite apps into an isolated configuration under `kestrel/run`. The session has its own D-Bus bus and notification history.
+
+To capture the shell surfaces, keyboard search, and a test window:
+
+```bash
+kestrel/tools/session.sh capture
+```
+
+Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1280x800` for another size. The output includes the panel, Start, search, quick settings, notification center, power menu, a window, Start above a window, and a maximized window. The log reports panel geometry and the maximized work area.
 
 Rover and Sushi retain their own build commands in their READMEs. Their repository histories have been imported into this repository under their new paths.
 

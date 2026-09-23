@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
+import { blurSurface } from './surface.js';
 
 import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
 
@@ -13,11 +13,7 @@ export class PowerMenu {
   });
 
   constructor(private readonly close: () => void) {
-    this.actor.add_effect_with_name('backdrop', new Shell.BlurEffect({
-      mode: Shell.BlurMode.BACKGROUND,
-      radius: 34,
-      brightness: 0.76,
-    }));
+    blurSurface(this.actor, 20);
 
     const actions = SystemActions.getDefault();
     this.addAction('system-lock-screen-symbolic', 'Lock', () => actions.activateLockScreen());
@@ -28,12 +24,13 @@ export class PowerMenu {
   }
 
   private addAction(iconName: string, label: string, activate: () => void): void {
-    const row = new St.BoxLayout({ style_class: 'kestrel-power-row' });
-    row.add_child(new St.Icon({ icon_name: iconName, icon_size: 18 }));
-    row.add_child(new St.Label({ text: label }));
+    const row = new St.BoxLayout({ style_class: 'kestrel-power-row', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
+    row.add_child(new St.Icon({ icon_name: iconName, icon_size: 18, y_align: Clutter.ActorAlign.CENTER }));
+    row.add_child(new St.Label({ text: label, y_align: Clutter.ActorAlign.CENTER }));
     const button = new St.Button({
       style_class: 'kestrel-power-action',
       child: row,
+      x_align: Clutter.ActorAlign.FILL,
       can_focus: true,
     });
     button.connect('clicked', () => {

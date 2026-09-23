@@ -19,6 +19,7 @@ import * as ExtensionDownloader from './extensionDownloader.js';
 import * as InputMethod from '../misc/inputMethod.js';
 import * as Introspect from '../misc/introspect.js';
 import * as Keyboard from './keyboard.js';
+import * as InputSources from './status/keyboard.js';
 import * as KestrelUi from './kestrelUi.js';
 import * as MessageTray from './messageTray.js';
 import * as OsdWindow from './osdWindow.js';
@@ -251,6 +252,7 @@ async function _initializeUI() {
     messageTray = new MessageTray.MessageTray();
     panel = new Panel.Panel();
     keyboard = new Keyboard.KeyboardManager();
+    InputSources.getInputSourceManager().reload();
     notificationDaemon = new NotificationDaemon.NotificationDaemon();
     windowAttentionHandler = new WindowAttentionHandler.WindowAttentionHandler();
     componentManager = new Components.ComponentManager();
@@ -265,6 +267,7 @@ async function _initializeUI() {
     timeLimitsDispatcher = new TimeLimitsManager.TimeLimitsDispatcher(timeLimitsManager);
 
     global.connect('shutdown', () => {
+        KestrelUi.shutdown();
         // Block shutdown until the session history file has been written
         const loop = new GLib.MainLoop(null, false);
         const source = GLib.idle_source_new();

@@ -9,6 +9,8 @@ import { StartMenu } from './startMenu.js';
 import { QuickSettings, type BrightnessManager } from './quickSettings.js';
 import { NotificationCenter, type MessageTray } from './notificationCenter.js';
 import { PowerMenu } from './powerMenu.js';
+import { PANEL_HEIGHT, SURFACE_GAP } from './surface.js';
+import { animateActor } from './motion.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'power';
 
@@ -25,10 +27,6 @@ interface Context {
   layoutManager: LayoutManager;
   messageTray: MessageTray;
   brightnessManager: BrightnessManager;
-}
-
-interface AnimatedActor extends Clutter.Actor {
-  ease(params: Record<string, unknown>): void;
 }
 
 class KestrelUi {
@@ -65,7 +63,8 @@ class KestrelUi {
       notifications: () => this.toggle('notifications'),
     });
     this.start = new StartMenu(() => this.close(), () => this.openPowerMenu());
-    this.quick = new QuickSettings(context.brightnessManager);
+    this.quick = new QuickSettings(context.brightnessManager,
+      (network, volume) => this.panel.updateStatus(network, volume));
     this.notifications = new NotificationCenter(context.messageTray);
     this.power = new PowerMenu(() => this.close());
 
@@ -81,6 +80,12 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.quick.actor);
     context.layoutManager.addTopChrome(this.notifications.actor);
     context.layoutManager.addTopChrome(this.power.actor);
+    for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
+      const updateClip = () => actor.set_clip(0, 0, actor.width,
+        Math.max(0, actor.height + SURFACE_GAP - actor.translation_y));
+      for (const signal of ['notify::translation-y', 'notify::width', 'notify::height'] as const)
+        actor.connect(signal, updateClip);
+    }
 
     this.cover.connect('button-press-event', () => {
       this.close();
@@ -105,27 +110,27 @@ class KestrelUi {
 
     this.panel.place(monitor);
     this.cover.set_position(monitor.x, monitor.y);
-    this.cover.set_size(monitor.width, monitor.height);
-    this.start.actor.set_position(
-      Math.round(monitor.x + (monitor.width - 630) / 2),
-      monitor.y + monitor.height - 64 - 600 - 12,
-    );
-    this.start.actor.set_size(630, 600);
-    this.quick.actor.set_position(
-      monitor.x + monitor.width - 405 - 14,
-      monitor.y + monitor.height - 64 - 290 - 12,
-    );
-    this.quick.actor.set_size(405, 290);
-    this.notifications.actor.set_position(
-      monitor.x + monitor.width - 405 - 14,
-      monitor.y + monitor.height - 64 - 550 - 12,
-    );
-    this.notifications.actor.set_size(405, 550);
-    this.power.actor.set_position(
-      Math.round(monitor.x + (monitor.width - 630) / 2 + 630 - 220),
-      monitor.y + monitor.height - 64 - 325 - 12,
-    );
-    this.power.actor.set_size(220, 325);
+    this.cover.set_size(monitor.width, monitor.height - PANEL_HEIGHT);
+    const startWidth = Math.min(660, monitor.width - 24);
+    const bottom = monitor.y + monitor.height - PANEL_HEIGHT - SURFACE_GAP;
+    const startHeight = Math.min(600, monitor.height - PANEL_HEIGHT - 24);
+    this.start.actor.set_size(startWidth, startHeight);
+    this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
+
+    for (const [actor, width, fixedHeight] of [
+      [this.quick.actor, 360, 0],
+      [this.notifications.actor, 380, Math.min(520, startHeight)],
+      [this.power.actor, 216, 0],
+    ] as const) {
+      actor.width = width;
+      actor.height = -1;
+      const height = fixedHeight || actor.get_preferred_height(width)[1];
+      actor.height = height;
+      const right = actor === this.power.actor
+        ? this.start.actor.x + startWidth
+        : monitor.x + monitor.width - 12;
+      actor.set_position(Math.round(right - width), bottom - height);
+    }
   }
 
   private toggle(surface: Surface): void {
@@ -136,19 +141,23 @@ class KestrelUi {
 
     this.close();
     this.active = surface;
+    this.panel.setActive(surface);
     this.cover.show();
 
     const actor = this.actorFor(surface);
-    actor.opacity = 0;
-    actor.translation_y = 32;
+    if (!actor.visible) {
+      actor.opacity = 0;
+      actor.translation_y = 48;
+    }
     actor.show();
-    this.animate(actor, 255, 0, 250);
+    this.animate(actor, 255, 0, 280);
 
     if (surface === 'start') {
       this.start.clearSearch();
       this.start.focus();
     } else if (surface === 'quick') {
       this.quick.refresh();
+      this.place();
     } else if (surface === 'notifications') {
       this.notifications.refresh();
     }
@@ -157,6 +166,7 @@ class KestrelUi {
   private close(): void {
     const surface = this.active;
     this.active = null;
+    this.panel.setActive(null);
     this.cover.hide();
     if (!surface)
       return;
@@ -184,7 +194,7 @@ class KestrelUi {
     duration: number,
     onStopped?: () => void,
   ): void {
-    (actor as AnimatedActor).ease({
+    animateActor(actor, {
       opacity,
       translation_y: translationY,
       duration,
@@ -195,6 +205,12 @@ class KestrelUi {
 
   private openPowerMenu(): void {
     this.toggle('power');
+  }
+
+  shutdown(): void {
+    this.panel.shutdown();
+    this.stylesheetMonitor?.cancel();
+    this.context.layoutManager.panelBox.destroy();
   }
 
   showSurfaceForCapture(surface: Surface): void {
@@ -210,4 +226,8 @@ export function initialize(context: Context): void {
 
 export function showSurfaceForCapture(surface: Surface): void {
   currentUi.showSurfaceForCapture(surface);
+}
+
+export function shutdown(): void {
+  currentUi.shutdown();
 }

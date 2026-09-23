@@ -8,7 +8,7 @@ import secondary from './assets/luft-secondary.svg';
 import { animateActor } from './motion.js';
 
 export function createLauncher(activate: () => void): St.Button {
-  const mark = new St.Widget({ width: 28, height: 29, layout_manager: new Clutter.BinLayout() });
+  const mark = new St.Widget({ width: 24, height: 24, layout_manager: new Clutter.BinLayout() });
   const button = new St.Button({
     style_class: 'kestrel-task-button', child: mark,
     width: 40, height: 40, can_focus: true, track_hover: true, accessible_name: 'Start',
@@ -18,7 +18,7 @@ export function createLauncher(activate: () => void): St.Button {
   ] as const) {
     const icon = new St.Icon({
       gicon: Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(svg))),
-      icon_size: 28,
+      icon_size: 24,
     });
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);

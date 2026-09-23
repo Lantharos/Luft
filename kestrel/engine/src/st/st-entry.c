@@ -509,7 +509,7 @@ st_entry_allocate (ClutterActor          *actor,
 
   entry_h = CLAMP (pref_h, min_h, avail_h);
 
-  child_box.y1 = (int) (content_box.y1 + avail_h / 2 - entry_h / 2);
+  child_box.y1 = ceil (content_box.y1 + avail_h / 2 - entry_h / 2);
   child_box.y2 = child_box.y1 + entry_h;
 
   clutter_actor_allocate (priv->entry, &child_box);

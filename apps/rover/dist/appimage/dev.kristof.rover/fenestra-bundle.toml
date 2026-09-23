@@ -1,0 +1,6 @@
+format = "appimage"
+app_id = "dev.kristof.rover"
+name = "Rover"
+version = "0.1.0"
+binary = "rover"
+web_dist = "/home/kristof/dev/Desktop/rover/./build"

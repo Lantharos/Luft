@@ -105,17 +105,16 @@ export class ContextMenus {
     const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC });
     scroll.child = content;
     this.actor.add_child(scroll);
+    this.actor.show();
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
     this.shield.set_position(monitor.x, monitor.y);
     this.shield.set_size(monitor.width, monitor.height);
     this.shield.get_parent()!.set_child_above_sibling(this.shield, null);
     this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
-    this.actor.show();
     const height = this.actor.get_preferred_height(this.actor.width)[1];
-    this.actor.set_position(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8)),
-      Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8)));
+    this.actor.set_position(Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8))),
+      Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))));
     this.shield.show();
-    this.actor.show();
     this.actor.opacity = 0;
     this.actor.translation_y = 6;
     animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });

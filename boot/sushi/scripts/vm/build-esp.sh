@@ -27,14 +27,23 @@ timeout 5
 editor no
 EOF
 
+VM_PROFILE="${VM_PROFILE:-minimal}"
+
 if [[ "${LUKS:-0}" == "1" ]]; then
     echo "==> Building VM LUKS root disk (busybox inside LUKS2 on /dev/vda)"
     sudo "$ROOT/scripts/vm/build-luks-rootfs.sh" "$VM_DIR/rootfs.img"
     ROOT_KERNEL_ARG="root=/dev/mapper/root"
+    VM_TITLE="Sushi QEMU LUKS Test"
+elif [[ "$VM_PROFILE" == "fedora" ]]; then
+    echo "==> Building VM Fedora root disk (systemd + LightDM greeter)"
+    "$ROOT/scripts/vm/build-fedora-rootfs.sh" "$VM_DIR/rootfs.img"
+    ROOT_KERNEL_ARG="root=/dev/vda"
+    VM_TITLE="Sushi Fedora VM"
 else
     echo "==> Building VM root disk (busybox console)"
     "$ROOT/scripts/vm/build-rootfs.sh" "$VM_DIR/rootfs.img"
     ROOT_KERNEL_ARG="root=/dev/vda"
+    VM_TITLE="Sushi QEMU Test"
 fi
 
 echo "==> Building sushi test initramfs"
@@ -55,7 +64,7 @@ cp "$KERNEL" "$ESP/vmlinuz"
 cp "$INITRD" "$ESP/initramfs.img"
 
 cat > "$ESP/loader/entries/sushi-test.conf" <<EOF
-title Sushi QEMU Test
+title ${VM_TITLE}
 linux \\vmlinuz
 initrd \\initramfs.img
 options rd.sushi=1 rdinit=/usr/bin/sushid ${ROOT_KERNEL_ARG} rw loglevel=4 console=ttyS0,115200n8 console=tty1 fbcon.logo=0
@@ -64,6 +73,8 @@ EOF
 echo "==> ESP ready at $ESP"
 if [[ "${LUKS:-0}" == "1" ]]; then
     echo "    LUKS test disk: $VM_DIR/rootfs.img (passphrase: ${LUKS_PASSPHRASE:-sushi})"
+elif [[ "$VM_PROFILE" == "fedora" ]]; then
+    echo "    Fedora root: $VM_DIR/rootfs.img (greeter user: ${VM_USER:-sushi} / ${VM_PASSWORD:-sushi})"
 fi
 echo "    Root disk: $VM_DIR/rootfs.img (attach with virtio in run-qemu.sh)"
-echo "    Run: $ROOT/scripts/vm/run-qemu.sh"
+echo "    Run: VM_PROFILE=${VM_PROFILE} $ROOT/scripts/vm/run-qemu.sh"

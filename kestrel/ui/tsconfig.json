@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["@types/bun", "@girs/gjs", "@girs/clutter-51", "@girs/gio-2.0", "@girs/glib-2.0", "@girs/meta-51", "@girs/shell-51", "@girs/st-51"]
+  },
+  "include": ["src/**/*.ts", "build.ts"]
+}

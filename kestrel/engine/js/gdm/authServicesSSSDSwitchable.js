@@ -1,0 +1,639 @@
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+
+import * as Fido2TokenManager from './fido2TokenManager.js';
+import {logErrorUnlessCancelled} from '../misc/errorUtils.js';
+import * as SmartcardManager from './smartcardManager.js';
+import {AuthServices, Role} from './authServices.js';
+import {MessageType} from './userVerifier.js';
+import {SWITCHABLE_AUTHENTICATION_KEY} from './settings.js';
+
+const SWITCHABLE_AUTH_SERVICE_NAME = 'gdm-switchable-auth';
+
+const MechanismsStatus = {
+    WAITING: 0,
+    NOT_FOUND: 1,
+    FOUND: 2,
+};
+
+const PromptStatus = {
+    NONE: 0,
+    PASSWORD_PROMPT: 1,
+    PASSWORD_WAITING: 2,
+    CERT_LIST_PROMPT: 3,
+    PIN_PROMPT: 4,
+    PIN_WAITING: 5,
+    INSERT_KEY_PROMPT: 6,
+    TOUCH_PROMPT: 7,
+    WEB_LOGIN_INTRO_PROMPT: 8,
+    WEB_LOGIN_DIALOG_PROMPT: 9,
+    WEB_LOGIN_DIALOG_WAITING: 10,
+};
+
+export class AuthServicesSSSDSwitchable extends AuthServices {
+    static SupportedRoles = [
+        Role.PASSWORD,
+        Role.SMARTCARD,
+        Role.PASSKEY,
+        Role.WEB_LOGIN,
+    ];
+
+    static RoleToService = {
+        [Role.PASSWORD]: SWITCHABLE_AUTH_SERVICE_NAME,
+        [Role.SMARTCARD]: SWITCHABLE_AUTH_SERVICE_NAME,
+        [Role.PASSKEY]: SWITCHABLE_AUTH_SERVICE_NAME,
+        [Role.WEB_LOGIN]: SWITCHABLE_AUTH_SERVICE_NAME,
+    };
+
+    static {
+        GObject.registerClass(this);
+    }
+
+    static isEnabled(settings) {
+        return settings.get_boolean(SWITCHABLE_AUTHENTICATION_KEY);
+    }
+
+    constructor(params) {
+        super(params);
+
+        this._connectSmartcardManager();
+        this._connectFido2TokenManager();
+
+        this._mechanismsStatus = MechanismsStatus.WAITING;
+    }
+
+    async beginVerification(userName, userVerifierProxies) {
+        try {
+            await super.beginVerification(userName, userVerifierProxies);
+        } catch (e) {
+            if (e.serviceName !== SWITCHABLE_AUTH_SERVICE_NAME)
+                throw e;
+
+            this._mechanismsStatus = MechanismsStatus.NOT_FOUND;
+            this.emit('mechanisms-changed');
+        }
+    }
+
+    _handleAnswerQuery(serviceName, answer) {
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        if (this._selectedMechanism.role === Role.PASSWORD &&
+            this._resettingPassword) {
+            this._userVerifier.call_answer_query(serviceName,
+                answer,
+                this._cancellable).catch(logErrorUnlessCancelled);
+            return;
+        }
+
+        let response;
+        switch (this._selectedMechanism.role) {
+        case Role.PASSWORD:
+            response = this._formatResponse(answer);
+            this._sendResponse(response);
+            this._promptStatus = PromptStatus.PASSWORD_WAITING;
+            break;
+        case Role.SMARTCARD:
+            response = this._formatResponse(answer);
+            this._sendResponse(response);
+            this._promptStatus = PromptStatus.PIN_WAITING;
+            break;
+        case Role.PASSKEY:
+            response = this._formatResponse(answer);
+            this._sendResponse(response);
+
+            this._promptStatus = PromptStatus.TOUCH_PROMPT;
+            this.emit('show-choice-list', {
+                serviceName,
+                promptMessage: this._selectedMechanism.touchInstruction,
+            });
+            break;
+        }
+    }
+
+    _handleSelectMechanism() {
+        this._promptStatus = PromptStatus.NONE;
+
+        switch (this._selectedMechanism?.role) {
+        case Role.PASSWORD:
+            this._startPasswordLogin();
+            break;
+        case Role.SMARTCARD:
+            this._startSmartcardLogin();
+            break;
+        case Role.PASSKEY:
+            this._startFido2TokenLogin();
+            break;
+        case Role.WEB_LOGIN:
+            this._startWebLogin();
+            break;
+        }
+    }
+
+    _handleGetSupportedRoles() {
+        // When we couldn't get mechanisms (NOT_FOUND), we don't support any
+        // role so they cascade to lower-priority authServices.
+        if (this._mechanismsStatus === MechanismsStatus.NOT_FOUND)
+            return [];
+
+        return super._handleGetSupportedRoles();
+    }
+
+    _handleReset() {
+        this._savedMechanism = null;
+        this._mechanismsStatus = MechanismsStatus.WAITING;
+    }
+
+    _handleCancel() {
+        if (this._selectedMechanism) {
+            this._savedMechanism = this._selectedMechanism;
+            this._mechanismsStatus = MechanismsStatus.WAITING;
+        }
+    }
+
+    cancelRequested() {
+        if (!this._selectedMechanism)
+            return false;
+
+        switch (this._selectedMechanism.role) {
+        case Role.PASSWORD:
+            // Waiting for authentication response: soft reset
+            if (this._promptStatus === PromptStatus.PASSWORD_WAITING) {
+                this.emit('reset', {softReset: true});
+                return true;
+            }
+            // At password prompt: hard reset
+            return false;
+
+        case Role.SMARTCARD:
+            // Waiting for PIN verification response: soft reset
+            if (this._promptStatus === PromptStatus.PIN_WAITING) {
+                this.emit('reset', {softReset: true});
+                return true;
+            }
+            // At PIN entry after selecting from multiple certificates:
+            // step back to the certificate list
+            if (this._promptStatus === PromptStatus.PIN_PROMPT &&
+                this._selectedMechanism.certificates.length > 1) {
+                this._selectedSmartcard = null;
+                this._startSmartcardLogin();
+                return true;
+            }
+            // At certificate list or single-cert PIN: hard reset
+            return false;
+
+        case Role.PASSKEY:
+            // At touch confirmation after PIN submission: soft reset
+            // back to PIN entry (PIN response was already sent to SSSD)
+            if (this._promptStatus === PromptStatus.TOUCH_PROMPT) {
+                this.emit('reset', {softReset: true});
+                return true;
+            }
+            // At PIN entry or key insertion prompt: hard reset
+            return false;
+
+        case Role.WEB_LOGIN:
+            // At login dialog after "Done" clicked: soft reset to retry
+            if (this._promptStatus === PromptStatus.WEB_LOGIN_DIALOG_WAITING) {
+                this.emit('reset', {softReset: true});
+                return true;
+            }
+            // At login dialog with a login button available:
+            // step back to the login button
+            if (this._promptStatus === PromptStatus.WEB_LOGIN_DIALOG_PROMPT &&
+                this._selectedMechanism.initPrompt) {
+                this._startWebLogin();
+                return true;
+            }
+            // At login button or direct dialog (no initPrompt): hard reset
+            return false;
+
+        default:
+            return false;
+        }
+    }
+
+    _handleClear() {
+        this._mechanisms = null;
+        this._priorityList = null;
+        this._enabledMechanisms = null;
+        this._selectedMechanism = null;
+        this._selectedSmartcard = null;
+
+        this._resettingPassword = false;
+        this._promptStatus = PromptStatus.NONE;
+
+        this._clearWebLoginTimeout();
+    }
+
+    _handleOnCustomJSONRequest(serviceName, _protocol, _version, json) {
+        if (serviceName !== SWITCHABLE_AUTH_SERVICE_NAME)
+            return;
+
+        let requestObject;
+
+        if (this._mechanismsStatus !== MechanismsStatus.WAITING)
+            log('Received unexpected JSON message, something might be wrong');
+
+        try {
+            requestObject = JSON.parse(json);
+        } catch (e) {
+            logError(e);
+            return;
+        }
+
+        const {authSelection} = requestObject;
+        this._mechanisms = authSelection?.mechanisms ?? null;
+        this._priorityList = authSelection?.priority ?? null;
+        this._mechanismsStatus = this._mechanisms
+            ? MechanismsStatus.FOUND
+            : MechanismsStatus.NOT_FOUND;
+
+        this._updateEnabledMechanisms();
+    }
+
+    _handleUpdateEnabledMechanisms() {
+        this._enabledMechanisms.push(...Object.keys(this._mechanisms)
+            .map(id => ({
+                serviceName: SWITCHABLE_AUTH_SERVICE_NAME,
+                id,
+                ...this._mechanisms[id],
+            }))
+            // filter out mechanisms with roles that are not enabled
+            .filter(m => this._enabledRoles.includes(m.role)));
+
+        this._trackWebLoginTimeout();
+
+        const selectedMechanism =
+            this._enabledMechanisms
+                .find(m => this._savedMechanism?.role === m.role) ??
+            this._priorityList
+                ?.map(id => this._enabledMechanisms.find(m => m.id === id))[0] ??
+            this._enabledMechanisms[0];
+        this.selectMechanism(selectedMechanism);
+
+        this._savedMechanism = null;
+    }
+
+    _trackWebLoginTimeout() {
+        this._clearWebLoginTimeout();
+
+        const webLoginMechanism = this._enabledMechanisms
+            .find(m => m.role === Role.WEB_LOGIN);
+        if (!webLoginMechanism)
+            return;
+
+        const {timeout} = webLoginMechanism;
+        if (!timeout)
+            return;
+
+        this._webLoginTimeoutId = GLib.timeout_add_seconds_once(GLib.PRIORITY_DEFAULT,
+            timeout, () => {
+                if (this._selectedMechanism?.role !== Role.WEB_LOGIN)
+                    webLoginMechanism.needsRefresh = true;
+                else
+                    this.emit('reset', {softReset: true});
+
+                this._webLoginTimeoutId = 0;
+            });
+    }
+
+    _handleOnInfo(serviceName, info) {
+        if (!this._eventExpected())
+            return;
+
+        // sssd can't inform about expired password from JSON so it's needed
+        // to check the info message and handle the reset using the old flow
+        if (serviceName === this._selectedMechanism?.serviceName &&
+            this._selectedMechanism.role === Role.PASSWORD &&
+            info.includes('Password expired. Change your password now'))
+            this._resettingPassword = true;
+
+        if (serviceName === this._selectedMechanism?.serviceName) {
+            this.emit('queue-message', {
+                serviceName,
+                message: info,
+                messageType: MessageType.INFO,
+            });
+        }
+    }
+
+    _handleOnProblem(serviceName, problem) {
+        if (!this._eventExpected())
+            return;
+
+        if (serviceName === this._selectedMechanism?.serviceName) {
+            this.emit('queue-priority-message', {
+                serviceName,
+                message: problem,
+                messageType: MessageType.ERROR,
+            });
+        }
+    }
+
+    _handleOnInfoQuery() {
+        if (!this._eventExpected())
+            // eslint-disable-next-line no-useless-return
+            return;
+    }
+
+    _handleOnSecretInfoQuery(serviceName, secretQuestion) {
+        if (!this._eventExpected())
+            return;
+
+        if (serviceName === this._selectedMechanism?.serviceName &&
+            this._selectedMechanism.role === Role.PASSWORD &&
+            this._resettingPassword) {
+            this.emit('ask-question', {
+                serviceName,
+                question: secretQuestion,
+                secret: true,
+                answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+            });
+        }
+    }
+
+    _handleOnConversationStopped(serviceName) {
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        if (this._unavailableServices.has(serviceName))
+            return;
+
+        this._failCounter++;
+        this._verificationFailed(serviceName, true);
+    }
+
+    _handleOnServiceUnavailable(serviceName) {
+        if (serviceName !== SWITCHABLE_AUTH_SERVICE_NAME)
+            return;
+
+        this._mechanismsStatus = MechanismsStatus.NOT_FOUND;
+        this.emit('mechanisms-changed');
+    }
+
+    _handleCanStartService(serviceName) {
+        return serviceName === SWITCHABLE_AUTH_SERVICE_NAME &&
+            this._mechanismsStatus === MechanismsStatus.WAITING;
+    }
+
+    _formatResponse(answer) {
+        const {role, id, kerberos, cryptoChallenge} = this._selectedMechanism;
+
+        let response;
+        switch (role) {
+        case Role.PASSWORD: {
+            response = {password: answer};
+            break;
+        }
+        case Role.SMARTCARD: {
+            const {tokenName, moduleName, keyId, label} = this._selectedSmartcard;
+            response = {pin: answer, tokenName, moduleName, keyId, label};
+            break;
+        }
+        case Role.PASSKEY: {
+            response = {pin: answer, kerberos, cryptoChallenge};
+            break;
+        }
+        case Role.WEB_LOGIN: {
+            response = {};
+            break;
+        }
+        default:
+            throw new GObject.NotImplementedError(`formatResponse: ${role}`);
+        }
+
+        return {
+            authSelection: {
+                status: 'Ok',
+                [id]: response,
+            },
+        };
+    }
+
+    _sendResponse(response) {
+        const {serviceName} = this._selectedMechanism;
+
+        this._userVerifierCustomJSON.call_reply(
+            serviceName, JSON.stringify(response), this._cancellable).catch(logErrorUnlessCancelled);
+    }
+
+    _eventExpected() {
+        // If legacy PAM messages are received before receiving JSON PAM
+        // messages informing about mechanisms, then pam_unix is being
+        // used and the user is not supported by pam_sss using JSON.
+        // Fallback to legacy authentication services.
+        if (this._mechanismsStatus === MechanismsStatus.WAITING) {
+            this._mechanismsStatus = MechanismsStatus.NOT_FOUND;
+            this.emit('mechanisms-changed');
+            return false;
+        }
+
+        return true;
+    }
+
+    _startPasswordLogin() {
+        const {serviceName, prompt} = this._selectedMechanism;
+
+        this._promptStatus = PromptStatus.PASSWORD_PROMPT;
+        this.emit('ask-question', {
+            serviceName,
+            question: prompt,
+            secret: true,
+            answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+        });
+    }
+
+    _startSmartcardLogin() {
+        const {serviceName, certificates} = this._selectedMechanism;
+
+        if (certificates.length === 1) {
+            this._selectedSmartcard = certificates[0];
+            this._promptStatus = PromptStatus.PIN_PROMPT;
+            this.emit('ask-question', {
+                serviceName,
+                question: certificates[0].pinPrompt,
+                secret: true,
+                answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+            });
+            return;
+        }
+
+        const choiceList = {};
+        for (const cert of certificates)
+            choiceList[cert.keyId] = this._parseCertInstruction(cert.certInstruction);
+
+        const promptMessage = certificates.length === 0
+            ? _('Insert Smartcard')
+            : _('Select Identity');
+
+        this._promptStatus = PromptStatus.CERT_LIST_PROMPT;
+        this.emit('show-choice-list', {
+            serviceName,
+            promptMessage,
+            choiceList,
+            choiceHandler: key => {
+                if (serviceName !== this._selectedMechanism?.serviceName)
+                    return;
+
+                if (this._selectedMechanism.role === Role.SMARTCARD) {
+                    const cert = this._selectedMechanism.certificates.find(c => c.keyId === key);
+                    this._selectedSmartcard = cert;
+                    this._promptStatus = PromptStatus.PIN_PROMPT;
+                    this.emit('ask-question', {
+                        serviceName,
+                        question: cert.pinPrompt,
+                        secret: true,
+                        answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+                    });
+                }
+            },
+        });
+    }
+
+    _parseCertInstruction(certInstruction) {
+        // Currently sssd can't split cert data in a more granular way
+        // so it's parsed manually here
+        const [description, subject] = certInstruction.split('\n');
+
+        const fields = subject?.split(',').map(f => f.trim()) ?? [];
+        const commonName = fields.find(f => f.startsWith('CN='))?.substring(3);
+        const organization = fields.find(f => f.startsWith('O='))?.substring(2);
+
+        return {
+            title: commonName,
+            subtitle: description,
+            iconName: organization ? 'vcard-symbolic' : null,
+            iconTitle: organization ? _('Organization') : null,
+            iconSubtitle: organization,
+        };
+    }
+
+    _startFido2TokenLogin() {
+        const {
+            serviceName,
+            keyConnected, initInstruction,
+            pinPrompt, pinAttempts,
+        } = this._selectedMechanism;
+
+        if (!keyConnected) {
+            this._promptStatus = PromptStatus.INSERT_KEY_PROMPT;
+            this.emit('show-choice-list', {serviceName, promptMessage: initInstruction});
+            return;
+        }
+
+        this._promptStatus = PromptStatus.PIN_PROMPT;
+        this.emit('ask-question', {
+            serviceName,
+            question: pinPrompt,
+            secret: true,
+            answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+        });
+
+        if (pinAttempts <= 3 && pinAttempts > 0) {
+            const message = _('You have %d attempts left. If the passkey gets locked, you may not able to access your account.').format(pinAttempts);
+            this.emit('queue-message', {
+                serviceName,
+                message,
+                messageType: MessageType.INFO,
+            });
+        }
+    }
+
+    _startWebLogin() {
+        const {
+            serviceName,
+            initPrompt, linkPrompt,
+            uri, code, needsRefresh,
+        } = this._selectedMechanism;
+
+        if (!linkPrompt || !uri)
+            return;
+
+        if (needsRefresh) {
+            this.emit('reset', {softReset: true});
+            return;
+        }
+
+        const buttons = [{
+            default: true,
+            needsLoading: true,
+            label: _('Done'),
+            action: () => this._webLoginDone(),
+        }];
+
+        const showWebLogin = () => {
+            this._promptStatus = PromptStatus.WEB_LOGIN_DIALOG_PROMPT;
+            this.emit('web-login', {
+                serviceName,
+                message: linkPrompt,
+                url: uri,
+                code,
+                buttons,
+            });
+        };
+
+        if (initPrompt) {
+            this._promptStatus = PromptStatus.WEB_LOGIN_INTRO_PROMPT;
+            this.emit('show-button', {
+                serviceName,
+                label: initPrompt,
+                callback: showWebLogin,
+            });
+        } else {
+            showWebLogin();
+        }
+    }
+
+    _webLoginDone() {
+        if (this._selectedMechanism?.role !== Role.WEB_LOGIN)
+            return;
+
+        this._promptStatus = PromptStatus.WEB_LOGIN_DIALOG_WAITING;
+
+        const response = this._formatResponse();
+        this._sendResponse(response);
+
+        this._clearWebLoginTimeout();
+    }
+
+    _clearWebLoginTimeout() {
+        if (!this._webLoginTimeoutId)
+            return;
+
+        GLib.source_remove(this._webLoginTimeoutId);
+        this._webLoginTimeoutId = 0;
+    }
+
+    _connectSmartcardManager() {
+        this._smartcardManager = SmartcardManager.getSmartcardManager();
+        this._smartcardManager.connectObject(
+            'smartcard-inserted', () => this._onSmartcardChanged(),
+            'smartcard-removed', () => this._onSmartcardChanged(),
+            this);
+    }
+
+    _connectFido2TokenManager() {
+        this._fido2TokenManager = Fido2TokenManager.getFido2TokenManager();
+        this._fido2TokenManager.connectObject(
+            'fido2-token-inserted', () => this._onFido2TokenChanged(),
+            'fido2-token-removed', () => this._onFido2TokenChanged(),
+            this);
+    }
+
+    _onSmartcardChanged() {
+        if (!this._selectedMechanism ||
+            !this._enabledMechanisms.some(({role}) => role === Role.SMARTCARD))
+            return;
+
+        this.emit('reset', {softReset: true, reuseEntryText: true});
+    }
+
+    _onFido2TokenChanged() {
+        if (!this._selectedMechanism ||
+            !this._enabledMechanisms.some(({role}) => role === Role.PASSKEY))
+            return;
+
+        this.emit('reset', {softReset: true, reuseEntryText: true});
+    }
+}

@@ -1,0 +1,7 @@
+[rules.property_enum_convention]
+style = "legacy"
+
+[rules.property_switch_exhaustiveness]
+style = "legacy"
+readable_flags = ["ST_PARAM_READABLE", "ST_PARAM_READWRITE"]
+writable_flags = ["ST_PARAM_WRITABLE", "ST_PARAM_READWRITE"]

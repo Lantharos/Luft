@@ -6,8 +6,14 @@ ESP="$ROOT/vm/esp"
 ROOTFS="$ROOT/vm/rootfs.img"
 OVMF_CODE="${OVMF_CODE:-/usr/share/OVMF/OVMF_CODE.fd}"
 OVMF_VARS="${OVMF_VARS:-$ROOT/vm/OVMF_VARS.fd}"
-MEMORY="${MEMORY:-2048}"
-SMP="${SMP:-2}"
+VM_PROFILE="${VM_PROFILE:-minimal}"
+if [[ "$VM_PROFILE" == "fedora" ]]; then
+    MEMORY="${MEMORY:-4096}"
+    SMP="${SMP:-2}"
+else
+    MEMORY="${MEMORY:-2048}"
+    SMP="${SMP:-2}"
+fi
 HEADLESS="${HEADLESS:-0}"
 DISPLAY_BACKEND="${DISPLAY_BACKEND:-gtk}"
 # file = log only (type in the QEMU window). stdio = type in this terminal (Ctrl+C to quit).
@@ -61,8 +67,12 @@ else
     QEMU_ARGS+=(-display "$DISPLAY_BACKEND,show-cursor=on" -serial "file:$ROOT/vm/serial.log")
 fi
 
+echo "    Profile: $VM_PROFILE"
 echo "    ESP: $ESP"
 echo "    Root: $ROOTFS"
+if [[ "$VM_PROFILE" == "fedora" ]]; then
+    echo "    Greeter login: ${VM_USER:-sushi} / ${VM_PASSWORD:-sushi}"
+fi
 echo "    Close the QEMU window or Ctrl+C to stop"
 
 exec qemu-system-x86_64 "${QEMU_ARGS[@]}"

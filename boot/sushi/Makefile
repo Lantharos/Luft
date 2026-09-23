@@ -1,4 +1,4 @@
-.PHONY: build install dracut test vm-clean vm-build vm-build-luks vm-run vm-run-luks vm-run-luks-serial
+.PHONY: build install dracut test vm-clean vm-build vm-build-luks vm-build-fedora vm-run vm-run-luks vm-run-luks-serial vm-run-fedora
 
 build:
 	./scripts/build.sh
@@ -30,6 +30,10 @@ vm-build:
 vm-build-luks:
 	LUKS=1 ./scripts/vm/build-esp.sh
 
+# Fedora root (systemd + LightDM greeter + Openbox). First build needs sudo + network.
+vm-build-fedora:
+	VM_PROFILE=fedora ./scripts/vm/build-esp.sh
+
 # Plain ext4 root on /dev/vda — no crypttab, no passphrase prompt.
 vm-run: vm-build
 	./scripts/vm/run-qemu.sh
@@ -39,3 +43,6 @@ vm-run-luks: vm-build-luks
 
 vm-run-luks-serial: vm-build-luks
 	SERIAL=stdio ./scripts/vm/run-qemu.sh
+
+vm-run-fedora: vm-build-fedora
+	VM_PROFILE=fedora ./scripts/vm/run-qemu.sh

@@ -1,0 +1,16 @@
+bun = find_program('bun')
+
+kestrel_ui_js = custom_target('kestrel-ui',
+  input: files(
+    '../../../ui/src/kestrelUi.ts',
+    '../../../ui/src/panel.ts',
+    '../../../ui/src/startMenu.ts',
+    '../../../ui/src/quickSettings.ts',
+    '../../../ui/src/notificationCenter.ts',
+    '../../../ui/src/powerMenu.ts',
+    '../../../ui/src/upstream.d.ts',
+    '../../../ui/build.ts',
+  ),
+  output: 'kestrelUi.js',
+  command: [bun, files('../../../ui/build.ts'), '@OUTPUT@'],
+)

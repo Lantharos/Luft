@@ -8,15 +8,14 @@
   font-family: "Adwaita Sans";
 }
 
-.kestrel-taskbar { spacing: 0; }
+.kestrel-taskbar { spacing: 2px; }
 .kestrel-panel-status { spacing: 2px; }
 .kestrel-status-icons { spacing: 12px; }
 
 .kestrel-task-button {
   padding: 0;
-  border: 0 solid transparent;
-  border-bottom-width: 2px;
-  border-radius: 4px;
+  border: none;
+  border-radius: 12px;
   transition-duration: 160ms;
 }
 
@@ -28,23 +27,23 @@
   background-color: rgba(255, 255, 255, 0.10);
 }
 
-.kestrel-task-button.running { border-bottom-color: rgba(255, 255, 255, 0.5); }
+.kestrel-running-dot { width: 3px; height: 3px; margin-bottom: 3px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
+.kestrel-task-button:active .kestrel-running-dot { background-color: #ffffff; }
 .kestrel-task-button:active {
   background-color: rgba(255, 255, 255, 0.15);
-  border-bottom-color: #ffffff;
 }
 
 .kestrel-status-button {
   padding: 0 8px;
   height: 40px;
-  border-radius: 4px;
+  border-radius: 12px;
   transition-duration: 160ms;
 }
 .kestrel-status-button:active { background-color: rgba(255, 255, 255, 0.14); }
 .kestrel-clock { font-size: 12px; font-weight: 500; }
 
 .kestrel-popover {
-  background-color: rgba(0, 0, 0, 0.14);
+  background-color: transparent;
   color: #ffffff;
   font-family: "Adwaita Sans";
   border-radius: 20px;
@@ -61,14 +60,15 @@
 .kestrel-search {
   color: #ffffff;
   selection-background-color: rgba(255, 255, 255, 0.25);
-  background-color: rgba(0, 0, 0, 0.20);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: none;
+  border-radius: 12px;
   padding: 12px 14px;
   font-size: 14px;
 }
 .kestrel-search:focus {
-  border-color: rgba(255, 255, 255, 0.55);
+  background-color: rgba(255, 255, 255, 0.10);
+  border: none;
   box-shadow: none;
 }
 .kestrel-search StIcon { color: rgba(255, 255, 255, 0.7); padding-right: 8px; }
@@ -84,6 +84,7 @@
 .kestrel-app-label { font-size: 11px; max-width: 88px; text-align: center; }
 
 .kestrel-footer { padding: 14px 0 0; spacing: 12px; }
+.kestrel-avatar { border-radius: 16px; background-size: cover; }
 .kestrel-account { spacing: 12px; font-size: 13px; }
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
 .kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }

@@ -38,6 +38,7 @@ class KestrelUi {
   private readonly cover = new St.Widget({ reactive: true, visible: false });
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
+  private powerOpen = false;
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -82,8 +83,8 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.power.actor);
     for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
       const updateClip = () => actor.set_clip(0, 0, actor.width,
-        Math.max(0, actor.height + SURFACE_GAP - actor.translation_y));
-      for (const signal of ['notify::translation-y', 'notify::width', 'notify::height'] as const)
+        Math.max(0, this.panel.actor.y - actor.y - actor.translation_y));
+      for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
         actor.connect(signal, updateClip);
     }
 
@@ -93,7 +94,8 @@ class KestrelUi {
     });
     shellGlobal.stage.connect('key-press-event', (_stage, event) => {
       if (this.active && event.get_key_symbol() === Clutter.KEY_Escape) {
-        this.close();
+        if (this.powerOpen) this.closePower();
+        else this.close();
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -127,13 +129,17 @@ class KestrelUi {
       const height = fixedHeight || actor.get_preferred_height(width)[1];
       actor.height = height;
       const right = actor === this.power.actor
-        ? this.start.actor.x + startWidth
+        ? this.start.actor.x + startWidth - 24
         : monitor.x + monitor.width - 12;
-      actor.set_position(Math.round(right - width), bottom - height);
+      actor.set_position(Math.round(right - width), bottom - height - (actor === this.power.actor ? 82 : 0));
     }
   }
 
   private toggle(surface: Surface): void {
+    if (surface === 'power') {
+      this.openPowerMenu();
+      return;
+    }
     if (this.active === surface) {
       this.close();
       return;
@@ -144,26 +150,28 @@ class KestrelUi {
     this.panel.setActive(surface);
     this.cover.show();
 
-    const actor = this.actorFor(surface);
-    if (!actor.visible) {
-      actor.opacity = 0;
-      actor.translation_y = 48;
-    }
-    actor.show();
-    this.animate(actor, 255, 0, 280);
-
     if (surface === 'start') {
       this.start.clearSearch();
-      this.start.focus();
     } else if (surface === 'quick') {
       this.quick.refresh();
       this.place();
     } else if (surface === 'notifications') {
       this.notifications.refresh();
     }
+
+    const actor = this.actorFor(surface);
+    if (!actor.visible) {
+      actor.opacity = 255;
+      actor.translation_y = this.slideDistance(actor);
+    }
+    actor.show();
+    this.animate(actor, 0, 360);
+
+    if (surface === 'start') this.start.focus();
   }
 
   private close(): void {
+    this.closePower();
     const surface = this.active;
     this.active = null;
     this.panel.setActive(null);
@@ -172,7 +180,7 @@ class KestrelUi {
       return;
 
     const actor = this.actorFor(surface);
-    this.animate(actor, 0, 32, 180, () => {
+    this.animate(actor, this.slideDistance(actor), 280, () => {
       if (this.active !== surface)
         actor.hide();
     });
@@ -189,22 +197,48 @@ class KestrelUi {
 
   private animate(
     actor: Clutter.Actor,
-    opacity: number,
     translationY: number,
     duration: number,
     onStopped?: () => void,
   ): void {
     animateActor(actor, {
-      opacity,
       translation_y: translationY,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUART,
+      mode: translationY === 0
+        ? Clutter.AnimationMode.EASE_OUT_QUART
+        : Clutter.AnimationMode.EASE_IN_QUART,
       onStopped,
     });
   }
 
+  private slideDistance(actor: Clutter.Actor): number {
+    const monitor = this.context.layoutManager.primaryMonitor!;
+    return monitor.y + monitor.height - actor.y;
+  }
+
   private openPowerMenu(): void {
-    this.toggle('power');
+    if (this.powerOpen) {
+      this.closePower();
+      return;
+    }
+    if (this.active !== 'start') this.toggle('start');
+    this.powerOpen = true;
+    const actor = this.power.actor;
+    if (!actor.visible) {
+      actor.opacity = 255;
+      actor.translation_y = this.slideDistance(actor);
+    }
+    actor.show();
+    this.animate(actor, 0, 360);
+  }
+
+  private closePower(): void {
+    if (!this.powerOpen) return;
+    this.powerOpen = false;
+    const actor = this.power.actor;
+    this.animate(actor, this.slideDistance(actor), 280, () => {
+      if (!this.powerOpen) actor.hide();
+    });
   }
 
   shutdown(): void {

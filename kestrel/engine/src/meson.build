@@ -152,6 +152,7 @@ libshell_sources = [
   'shell-app-system.c',
   'shell-app-usage.c',
   'shell-blur-effect.c',
+  'shell-backdrop.c',
   'shell-camera-monitor.c',
   'shell-edge-drag-gesture.c',
   'shell-global.c',

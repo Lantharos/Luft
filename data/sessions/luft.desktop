@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Luft
-Comment=Luft Desktop Environment
-Exec=luft-session --session
-TryExec=luft-session
-Type=Application
-DesktopNames=Luft
-Keywords=wayland;desktop;session;

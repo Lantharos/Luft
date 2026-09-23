@@ -28,7 +28,7 @@
   background-color: rgba(255, 255, 255, 0.10);
 }
 
-.kestrel-running-dot { width: 3px; height: 3px; margin-bottom: 1px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
+.kestrel-running-dot { width: 3px; height: 3px; margin: 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
 .kestrel-task-button:active .kestrel-running-dot { background-color: #ffffff; }
 .kestrel-task-button:active {
   background-color: rgba(255, 255, 255, 0.15);
@@ -145,7 +145,7 @@
 .kestrel-icon-button { transition-duration: 120ms; }
 .kestrel-icon-button:active { background-color: rgba(255, 255, 255, 0.24); }
 
-.kestrel-app-scroll .vhandle {
+.kestrel-app-scroll .vhandle, .kestrel-context-menu .vhandle {
   background-color: rgba(255, 255, 255, 0.24);
   border: none;
   border-radius: 4px;
@@ -170,3 +170,8 @@
 .kestrel-control-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }
+
+.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 14px; background-color: rgba(20, 20, 24, 0.30); color: white; }
+.kestrel-context-action { padding: 10px 12px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
+.kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
+.kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }

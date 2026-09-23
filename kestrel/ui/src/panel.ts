@@ -8,6 +8,7 @@ import St from 'gi://St';
 import { blurSurface, PANEL_HEIGHT } from './surface.js';
 import { PanelLayout } from './panelLayout.js';
 import { Taskbar } from './taskbar.js';
+import type { ContextMenus } from './contextMenus.js';
 import { createLauncher } from './launcher.js';
 
 export interface Monitor {
@@ -28,7 +29,7 @@ export class KestrelPanel {
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
-  private readonly taskbar = new Taskbar(this.tracker);
+  private readonly taskbar: Taskbar;
   private readonly clock = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
   private readonly networkIcon = new St.Icon({ icon_name: 'network-wired-symbolic', icon_size: 16 });
   private readonly volumeIcon = new St.Icon({ icon_name: 'audio-volume-high-symbolic', icon_size: 16 });
@@ -38,7 +39,8 @@ export class KestrelPanel {
   private readonly clockButton: St.Button;
   private clockTimer = 0;
 
-  constructor(actions: PanelActions) {
+  constructor(actions: PanelActions, menus: ContextMenus) {
+    this.taskbar = new Taskbar(this.tracker, menus);
     this.actor = new St.Widget({
       name: 'kestrel-panel',
       style_class: 'kestrel-panel',
@@ -87,6 +89,22 @@ export class KestrelPanel {
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
       [this.tracker, this.tracker.connect('notify::focus-app', () => this.taskbar.updateFocus())],
     );
+    menus.bind(this.actor, () => [
+      { label: 'Open Start', run: actions.start },
+      { label: 'Quick settings', run: actions.quickSettings },
+      { label: 'Notifications', run: actions.notifications },
+      { label: 'Display settings', run: () => menus.settings('display') },
+      { label: 'Settings', run: () => menus.settings() },
+    ]);
+    menus.bind(this.clockButton, () => [
+      { label: 'Notifications', run: actions.notifications },
+      { label: 'Date and time settings', run: () => menus.settings('datetime') },
+    ]);
+    menus.bind(this.quickButton, () => [
+      { label: 'Quick settings', run: actions.quickSettings },
+      { label: 'Network settings', run: () => menus.settings('network') },
+      { label: 'Sound settings', run: () => menus.settings('sound') },
+    ]);
     this.refreshApps();
     this.clock.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
     this.refreshClock();

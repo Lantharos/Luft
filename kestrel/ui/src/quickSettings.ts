@@ -7,6 +7,7 @@ import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.
 
 import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
 import { styleControl } from './controlTile.js';
+import type { ContextMenus } from './contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { blurSurface } from './surface.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
@@ -35,6 +36,7 @@ export class QuickSettings {
     private readonly layoutChanged: () => void,
     close: () => void,
     statusChanged: (network: string, volume: string) => void,
+    private readonly menus: ContextMenus,
   ) {
     blurSurface(this.actor);
     this.actor.connect('destroy', () => {
@@ -59,6 +61,7 @@ export class QuickSettings {
     });
     header.add_child(settings);
     this.actor.add_child(header);
+    menus.bind(this.actor, () => [{ label: 'Settings', run: () => menus.settings() }]);
     this.actor.add_child(this.pages.actor);
     this.pages.body.add_child(this.content);
     this.pages.body.add_child(this.selectors);
@@ -66,12 +69,13 @@ export class QuickSettings {
     this.pages.body.connect('notify::height', () => this.queueLayout());
 
     source.ready.then(() => {
-      const indicators = [source._network, source._bluetooth, source._powerProfiles,
-        source._nightLight, source._doNotDisturb];
-      for (const indicator of indicators) {
+      const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._powerProfiles, 'power'],
+        [source._nightLight, 'display'], [source._doNotDisturb, 'notifications']] as const;
+      for (const [indicator, settingsPanel] of indicators) {
         for (const item of indicator?.quickSettingsItems ?? []) {
           this.adopt(item);
           styleControl(item);
+          menus.bind(item, () => [{ label: 'Settings', run: () => menus.settings(settingsPanel) }]);
           this.controls.push(item);
           item.connect('notify::visible', () => this.arrangeTiles());
         }
@@ -180,6 +184,7 @@ export class QuickSettings {
 
   private addSlider(title: string, item: QuickControl): void {
     this.adopt(item);
+    this.menus.bind(item, () => [{ label: `${title} settings`, run: () => this.menus.settings(title === 'Brightness' ? 'display' : 'sound') }]);
     const section = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-slider-section' });
     const header = new St.BoxLayout();
     header.add_child(new St.Label({ text: title, style_class: 'kestrel-section-title', x_expand: true }));

@@ -2,8 +2,10 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
+import Meta from 'gi://Meta';
 import St from 'gi://St';
 
+import { ContextMenus } from './contextMenus.js';
 import { KestrelPanel, type Monitor } from './panel.js';
 import { StartMenu } from './startMenu.js';
 import { QuickSettings } from './quickSettings.js';
@@ -31,6 +33,7 @@ interface Context {
 }
 
 class KestrelUi {
+  private readonly menus: ContextMenus;
   private readonly panel: KestrelPanel;
   private readonly start: StartMenu;
   private readonly quick: QuickSettings;
@@ -40,6 +43,7 @@ class KestrelUi {
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
   private powerOpen = false;
+  private desktopMenuSignal = 0;
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -59,16 +63,20 @@ class KestrelUi {
       });
     }
 
+    this.menus = new ContextMenus(() => context.layoutManager.primaryMonitor, () => this.close());
     this.panel = new KestrelPanel({
       start: () => this.toggle('start'),
       quickSettings: () => this.toggle('quick'),
       notifications: () => this.toggle('notifications'),
-    });
-    this.start = new StartMenu(() => this.close(), () => this.openPowerMenu());
+    }, this.menus);
+    this.start = new StartMenu(() => this.close(), () => this.openPowerMenu(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
-      (network, volume) => this.panel.updateStatus(network, volume));
-    this.notifications = new NotificationCenter(context.messageTray);
+      (network, volume) => this.panel.updateStatus(network, volume), this.menus);
+    this.notifications = new NotificationCenter(context.messageTray, this.menus);
     this.power = new PowerMenu(() => this.close());
+
+    context.layoutManager.addTopChrome(this.menus.shield);
+    context.layoutManager.addTopChrome(this.menus.actor);
 
     const panelParent = context.layoutManager.panelBox.get_parent()!;
     context.layoutManager.removeChrome(context.layoutManager.panelBox);
@@ -105,7 +113,20 @@ class KestrelUi {
       }
       return Clutter.EVENT_PROPAGATE;
     });
-    shellGlobal.display.connect('overlay-key', () => this.toggle('start'));
+    this.desktopMenuSignal = shellGlobal.stage.connect('captured-event', (_stage, event) => {
+      if (event.type() !== Clutter.EventType.BUTTON_PRESS || event.get_button() !== Clutter.BUTTON_SECONDARY)
+        return Clutter.EVENT_PROPAGATE;
+      const [x, y] = event.get_coords();
+      const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+      if (!(target instanceof Meta.BackgroundActor)) return Clutter.EVENT_PROPAGATE;
+      this.menus.open(target, [
+        { label: 'Change wallpaper', run: () => this.menus.settings('background') },
+        { label: 'Display settings', run: () => this.menus.settings('display') },
+        { label: 'Settings', run: () => this.menus.settings() },
+      ], x, y);
+      return Clutter.EVENT_STOP;
+    });
+    shellGlobal.display.connect('overlay-key' , () => this.toggle('start'));
     context.layoutManager.connect('monitors-changed', () => this.place());
     this.place();
   }
@@ -163,6 +184,7 @@ class KestrelUi {
     }
 
     const actor = this.actorFor(surface);
+    actor.get_parent()!.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
     this.place();
@@ -176,6 +198,7 @@ class KestrelUi {
   }
 
   private close(): void {
+    this.menus.close();
     this.closePower();
     this.quick.closeSubmenu();
     const surface = this.active;
@@ -230,6 +253,7 @@ class KestrelUi {
     if (this.active !== 'start') this.toggle('start');
     this.powerOpen = true;
     const actor = this.power.actor;
+    actor.get_parent()!.set_child_above_sibling(actor, null);
     if (!actor.visible) {
       actor.opacity = 255;
       actor.translation_y = this.powerDistance();
@@ -253,6 +277,7 @@ class KestrelUi {
   }
 
   shutdown(): void {
+    (global as unknown as Shell.Global).stage.disconnect(this.desktopMenuSignal);
     this.panel.shutdown();
     this.stylesheetMonitor?.cancel();
   }

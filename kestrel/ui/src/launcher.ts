@@ -23,8 +23,8 @@ export function createLauncher(activate: () => void): St.Button {
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);
     const update = () => {
-      const offset = button.pressed ? 0.2 : button.hover ? 1 : 0.45;
-      const scale = button.pressed ? 0.92 : button.hover ? 0.96 : 0.94;
+      const offset = button.pressed ? 0.2 : button.hover ? 1 : 0;
+      const scale = button.pressed ? 0.92 : button.hover ? 0.96 : 1;
       animateActor(icon, {
         translation_x: direction * offset, translation_y: direction * offset,
         rotation_angle_z: button.hover && !button.pressed ? direction * 5 : 0,
@@ -34,8 +34,6 @@ export function createLauncher(activate: () => void): St.Button {
     };
     button.connect('notify::hover', update);
     button.connect('notify::pressed', update);
-    icon.scale_x = icon.scale_y = 0.94;
-    icon.translation_x = icon.translation_y = direction * 0.45;
   }
   button.connect('clicked', activate);
   return button;

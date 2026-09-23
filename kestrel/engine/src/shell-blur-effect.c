@@ -21,6 +21,7 @@
 #include <mtk/mtk.h>
 
 #include "shell-blur-effect.h"
+#include "shell-backdrop.h"
 #include "shell-global.h"
 
 #include "shell-enum-types.h"
@@ -89,7 +90,7 @@ struct _ShellBlurEffect
   FramebufferData actor_fb;
   CacheFlags cache_flags;
 
-  FramebufferData background_fb;
+  GHashTable *backdrops;
   FramebufferData brightness_fb;
   int brightness_uniform;
   int surface_size_uniform;
@@ -285,21 +286,6 @@ update_brightness_fbo (ShellBlurEffect *self,
                      downscale_factor);
 }
 
-static gboolean
-update_background_fbo (ShellBlurEffect *self,
-                       unsigned int     width,
-                       unsigned int     height)
-{
-  if (self->tex_width == width &&
-      self->tex_height == height &&
-      self->background_fb.framebuffer)
-    {
-      return TRUE;
-    }
-
-  return update_fbo (&self->background_fb, width, height, 1.0);
-}
-
 static void
 clear_framebuffer_data (FramebufferData *fb_data)
 {
@@ -347,7 +333,7 @@ shell_blur_effect_set_actor (ClutterActorMeta *meta,
 
   /* clear out the previous state */
   clear_framebuffer_data (&self->actor_fb);
-  clear_framebuffer_data (&self->background_fb);
+  g_hash_table_remove_all (self->backdrops);
   clear_framebuffer_data (&self->brightness_fb);
 
   /* we keep a back pointer here, to avoid going through the ActorMeta */
@@ -476,26 +462,11 @@ paint_background (ShellBlurEffect     *self,
                   ClutterPaintContext *paint_context,
                   ClutterActorBox     *source_actor_box)
 {
-  g_autoptr (ClutterPaintNode) background_node = NULL;
-  g_autoptr (ClutterPaintNode) blit_node = NULL;
-  CoglFramebuffer *src;
-  float transformed_x;
-  float transformed_y;
-  float transformed_width;
-  float transformed_height;
+  CoglPipeline *pipeline = shell_backdrop_capture (self->backdrops, self->actor,
+                                                 paint_context, source_actor_box);
+  g_autoptr (ClutterPaintNode) background_node = clutter_pipeline_node_new (pipeline);
 
-  clutter_actor_box_get_origin (source_actor_box,
-                                &transformed_x,
-                                &transformed_y);
-  clutter_actor_box_get_size (source_actor_box,
-                              &transformed_width,
-                              &transformed_height);
-
-  /* Background layer node */
-  background_node =
-    clutter_layer_node_new_to_framebuffer (self->background_fb.framebuffer,
-                                           self->background_fb.pipeline);
-  clutter_paint_node_set_static_name (background_node, "ShellBlurEffect (background)");
+  clutter_paint_node_set_static_name (background_node, "ShellBlurEffect (backdrop)");
   clutter_paint_node_add_child (node, background_node);
   clutter_paint_node_add_rectangle (background_node,
                                     &(ClutterActorBox) {
@@ -503,18 +474,6 @@ paint_background (ShellBlurEffect     *self,
                                       self->tex_width / self->downscale_factor,
                                       self->tex_height / self->downscale_factor,
                                     });
-
-  /* Blit node */
-  src = clutter_paint_context_get_framebuffer (paint_context);
-  blit_node = clutter_blit_node_new (src);
-  clutter_paint_node_set_static_name (blit_node, "ShellBlurEffect (blit)");
-  clutter_paint_node_add_child (background_node, blit_node);
-  clutter_blit_node_add_blit_rectangle (CLUTTER_BLIT_NODE (blit_node),
-                                        transformed_x,
-                                        transformed_y,
-                                        0, 0,
-                                        transformed_width,
-                                        transformed_height);
 }
 
 static gboolean
@@ -533,9 +492,6 @@ update_framebuffers (ShellBlurEffect     *self,
 
   updated = update_actor_fbo (self, width, height, downscale_factor) &&
             update_brightness_fbo (self, width, height, downscale_factor);
-
-  if (self->mode == SHELL_BLUR_MODE_BACKGROUND)
-    updated = updated && update_background_fbo (self, width, height);
 
   self->tex_width = width;
   self->tex_height = height;
@@ -660,7 +616,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
           break;
 
         case SHELL_BLUR_MODE_BACKGROUND:
-          paint_opacity = 255;
+          paint_opacity = clutter_actor_get_paint_opacity (self->actor);
           break;
 
         default:
@@ -728,11 +684,11 @@ shell_blur_effect_finalize (GObject *object)
   ShellBlurEffect *self = (ShellBlurEffect *)object;
 
   clear_framebuffer_data (&self->actor_fb);
-  clear_framebuffer_data (&self->background_fb);
+  g_hash_table_remove_all (self->backdrops);
   clear_framebuffer_data (&self->brightness_fb);
 
   g_clear_object (&self->actor_fb.pipeline);
-  g_clear_object (&self->background_fb.pipeline);
+  g_clear_pointer (&self->backdrops, g_hash_table_unref);
   g_clear_object (&self->brightness_fb.pipeline);
 
   G_OBJECT_CLASS (shell_blur_effect_parent_class)->finalize (object);
@@ -853,7 +809,7 @@ shell_blur_effect_init (ShellBlurEffect *self)
   self->brightness = 1.f;
 
   self->actor_fb.pipeline = create_base_pipeline ();
-  self->background_fb.pipeline = create_base_pipeline ();
+  self->backdrops = shell_backdrop_cache_new ();
   self->brightness_fb.pipeline = create_brightness_pipeline ();
   self->brightness_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "brightness");
@@ -944,7 +900,7 @@ shell_blur_effect_set_mode (ShellBlurEffect *self,
   switch (mode)
     {
     case SHELL_BLUR_MODE_ACTOR:
-      clear_framebuffer_data (&self->background_fb);
+      g_hash_table_remove_all (self->backdrops);
       break;
 
     case SHELL_BLUR_MODE_BACKGROUND:

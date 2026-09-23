@@ -17,3 +17,12 @@ declare module 'resource:///org/gnome/shell/ui/slider.js' {
     value: number;
   }
 }
+
+declare module 'resource:///org/gnome/shell/ui/userWidget.js' {
+  import St from 'gi://St';
+  import AccountsService from 'gi://AccountsService';
+  export class Avatar extends St.Bin {
+    constructor(user: AccountsService.User, params: { styleClass: string; iconSize: number });
+    update(): void;
+  }
+}

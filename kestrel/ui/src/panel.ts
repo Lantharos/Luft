@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { blurSurface, PANEL_HEIGHT } from './surface.js';
@@ -44,7 +45,7 @@ export class KestrelPanel {
       reactive: true,
       layout_manager: new PanelLayout(),
     });
-    blurSurface(this.actor, 0, 1);
+    blurSurface(this.actor, 0);
 
     const center = new St.BoxLayout({
       name: 'kestrel-panel-center',
@@ -87,6 +88,7 @@ export class KestrelPanel {
       [this.tracker, this.tracker.connect('notify::focus-app', () => this.refreshFocus())],
     );
     this.refreshApps();
+    this.clock.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
     this.refreshClock();
     this.scheduleClock();
   }
@@ -120,7 +122,7 @@ export class KestrelPanel {
   }
 
   private refreshClock(): void {
-    const text = GLib.DateTime.new_now_local().format('%a %d %b  %H:%M') ?? '';
+    const text = GLib.DateTime.new_now_local().format('%d %b\n%H:%M') ?? '';
     if (this.clock.text !== text) this.clock.text = text;
   }
 
@@ -143,15 +145,25 @@ export class KestrelPanel {
       if (!apps.some(favorite => favorite.id === app.id)) apps.push(app);
     }
     for (const app of apps) {
+      const icon = app.create_icon_texture(24);
+      const content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+      icon.set_x_align(Clutter.ActorAlign.CENTER);
+      icon.set_y_align(Clutter.ActorAlign.CENTER);
+      content.add_child(icon);
+      if (app.state === Shell.AppState.RUNNING) {
+        content.add_child(new St.Widget({
+          style_class: 'kestrel-running-dot',
+          x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.END,
+        }));
+      }
       const button = new St.Button({
         style_class: 'kestrel-task-button',
-        child: app.create_icon_texture(24),
-        width: 36, height: 40,
+        child: content,
+        width: 40, height: 40,
         can_focus: true, track_hover: true,
         accessible_name: app.get_name(),
       });
-      liftIcon(button, button.child!);
-      if (app.state === Shell.AppState.RUNNING) button.add_style_class_name('running');
+      liftIcon(button, icon);
       button.connect('clicked', () => {
         const windows = app.get_windows();
         if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
@@ -175,7 +187,7 @@ export class KestrelPanel {
     const button = new St.Button({
       style_class: 'kestrel-task-button',
       child: new St.Icon({ icon_name: icon, icon_size: 18 }),
-      width: 36, height: 40,
+      width: 40, height: 40,
       can_focus: true, track_hover: true, accessible_name: label,
     });
     liftIcon(button, button.child!);

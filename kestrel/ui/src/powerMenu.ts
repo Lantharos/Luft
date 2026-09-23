@@ -6,6 +6,7 @@ import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.j
 
 export class PowerMenu {
   readonly actor = new St.BoxLayout({
+    name: 'kestrel-power',
     orientation: Clutter.Orientation.VERTICAL,
     style_class: 'kestrel-popover kestrel-power-menu',
     reactive: true,

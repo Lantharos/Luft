@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
@@ -6,6 +7,7 @@ import St from 'gi://St';
 
 import { blurSurface } from './surface.js';
 import { liftIcon } from './motion.js';
+import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
@@ -29,7 +31,11 @@ export class StartMenu {
       can_focus: true, x_expand: true,
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
-    this.search.get_clutter_text().connect('text-changed', () => this.refreshApps());
+    this.search.get_clutter_text().set_cursor_visible(false);
+    this.search.get_clutter_text().connect('text-changed', () => {
+      this.search.get_clutter_text().set_cursor_visible(this.search.get_text().length > 0);
+      this.refreshApps();
+    });
     this.search.get_clutter_text().connect('activate', () => {
       if (this.matches[0]) this.launch(this.matches[0]);
     });
@@ -47,7 +53,16 @@ export class StartMenu {
 
     const footer = new St.BoxLayout({ style_class: 'kestrel-footer' });
     const account = new St.BoxLayout({ style_class: 'kestrel-account', x_expand: true });
-    account.add_child(new St.Icon({ icon_name: 'avatar-default-symbolic', icon_size: 22, y_align: Clutter.ActorAlign.CENTER }));
+    const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
+    const avatar = new Avatar(user, { styleClass: 'kestrel-avatar', iconSize: 32 });
+    avatar.y_align = Clutter.ActorAlign.CENTER;
+    const signals = [
+      user.connect('notify::is-loaded', () => avatar.update()),
+      user.connect('changed', () => avatar.update()),
+    ];
+    avatar.connect('destroy', () => signals.forEach(signal => user.disconnect(signal)));
+    avatar.update();
+    account.add_child(avatar);
     account.add_child(new St.Label({
       text: GLib.get_real_name() || GLib.get_user_name(), y_align: Clutter.ActorAlign.CENTER,
     }));
@@ -65,7 +80,10 @@ export class StartMenu {
     this.loadApps();
   }
 
-  focus(): void { this.search.grab_key_focus(); }
+  focus(): void {
+    this.search.grab_key_focus();
+    this.search.get_clutter_text().set_cursor_visible(this.search.get_text().length > 0);
+  }
   clearSearch(): void { this.search.set_text(''); }
 
   private loadApps(): void {

@@ -65,13 +65,27 @@ export async function run() {
   await capture(`${output}/panel.png`);
   reportLayout();
 
-  global.display.emit('overlay-key');
   const start = actorNamed(global.stage, 'kestrel-start');
+  const entry = start.get_first_child();
+  const hintPositions = [];
+  const hintSignal = global.stage.connect('after-paint', () => {
+    if (entry.mapped) hintPositions.push(entry.get_hint_actor().x);
+  });
+  global.display.emit('overlay-key');
   console.log(`Kestrel Start opening position: ${start.y + start.translation_y}`);
   await pause(450);
+  global.stage.disconnect(hintSignal);
+  console.log(`Kestrel opening placeholder positions: ${[...new Set(hintPositions)].join(', ')}`);
   await capture(`${output}/start.png`);
   const pointer = global.stage.context.get_backend().get_default_seat()
     .create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
+  const launcher = actorNamed(global.stage, 'Start');
+  const [launcherX, launcherY] = launcher.get_transformed_position();
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), launcherX + 20, launcherY + 20);
+  await pause(200);
+  await capture(`${output}/launcher-hover.png`);
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);
+  await pause(200);
   const searchFocus = global.stage.get_key_focus();
   const caretStates = [];
   const caretImages = new Set();

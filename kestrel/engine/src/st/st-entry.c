@@ -495,11 +495,12 @@ st_entry_allocate (ClutterActor          *actor,
 
   if (priv->hint_actor)
     {
-      gint text_x;
+      float resource_scale = clutter_actor_get_resource_scale (priv->entry);
+      float text_padding = 2.f / resource_scale;
 
       hint_box = child_box;
-      clutter_text_get_layout_offsets (CLUTTER_TEXT (priv->entry), &text_x, NULL);
-      hint_box.x1 += text_x;
+      hint_box.x1 += text_padding;
+      hint_box.x2 -= text_padding;
 
       clutter_actor_get_preferred_width (priv->hint_actor, -1, &hint_min_w, &hint_w);
       clutter_actor_get_preferred_height (priv->hint_actor, -1, NULL, &hint_h);

@@ -1,0 +1,55 @@
+#!/usr/bin/bash
+# kernel-install(8) plugin — BLS entries for SushiBoot on the ESP.
+set -euo pipefail
+
+[[ "${KERNEL_INSTALL_LAYOUT:-}" == "sushi" ]] || exit 0
+
+: "${KERNEL_INSTALL_BOOT_ROOT:?}"
+: "${KERNEL_INSTALL_IMAGE:?}"
+: "${KERNEL_INSTALL_INITRD:?}"
+: "${KERNEL_INSTALL_VERSION:?}"
+
+ESP="${KERNEL_INSTALL_BOOT_ROOT}"
+ENTRY_DIR="${ESP}/loader/entries"
+ENTRY_ID="sushi-${KERNEL_INSTALL_VERSION}"
+VMLINUZ_NAME="vmlinuz-${KERNEL_INSTALL_VERSION}"
+INITRD_NAME="initramfs-${KERNEL_INSTALL_VERSION}.img"
+
+mkdir -p "${ENTRY_DIR}"
+
+install -m0644 "${KERNEL_INSTALL_IMAGE}" "${ESP}/${VMLINUZ_NAME}"
+install -m0644 "${KERNEL_INSTALL_INITRD}" "${ESP}/${INITRD_NAME}"
+
+# Merge host cmdline fragments (root=, etc.) with sushi defaults.
+SUSHI_OPTS="rd.sushi=1 fbcon.logo=0"
+if [[ -d /etc/kernel/cmdline.d ]]; then
+    for f in /etc/kernel/cmdline.d/*.conf; do
+        [[ -f "$f" ]] || continue
+        SUSHI_OPTS+=" $(grep -v '^#' "$f" | tr '\n' ' ')"
+    done
+fi
+if [[ -f /etc/kernel/cmdline ]]; then
+    SUSHI_OPTS+=" $(grep -v '^#' /etc/kernel/cmdline | tr '\n' ' ')"
+fi
+# Dedupe rd.sushi / fbcon.logo
+SUSHI_OPTS=$(echo "$SUSHI_OPTS" | tr -s ' ')
+
+cat > "${ENTRY_DIR}/${ENTRY_ID}.conf" <<EOF
+title Sushi Linux (${KERNEL_INSTALL_VERSION})
+linux \\${VMLINUZ_NAME}
+initrd \\${INITRD_NAME}
+options ${SUSHI_OPTS}
+EOF
+
+# First install: create loader.conf if missing.
+LOADER_CONF="${ESP}/loader/loader.conf"
+if [[ ! -f "${LOADER_CONF}" ]]; then
+    mkdir -p "${ESP}/loader"
+    cat > "${LOADER_CONF}" <<EOF
+default ${ENTRY_ID}
+timeout 5
+editor no
+EOF
+fi
+
+echo "sushi: installed BLS entry ${ENTRY_ID} on ${ESP}"

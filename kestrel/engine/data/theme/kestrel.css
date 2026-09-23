@@ -27,7 +27,7 @@
   background-color: rgba(255, 255, 255, 0.10);
 }
 
-.kestrel-running-dot { width: 3px; height: 3px; margin-bottom: 3px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
+.kestrel-running-dot { width: 3px; height: 3px; margin-bottom: 1px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
 .kestrel-task-button:active .kestrel-running-dot { background-color: #ffffff; }
 .kestrel-task-button:active {
   background-color: rgba(255, 255, 255, 0.15);

@@ -15,7 +15,7 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 - Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel and menu blur share the same brightness without a tint overlay. The panel has square corners.
 - Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with separate dots for running apps.
 - Main surfaces slide in over 300 ms and out over 230 ms. Power options reveal from the Start footer button over 200 ms and retract over 160 ms. Interrupted transitions reverse from their current position.
-- The launcher uses the original two-part Luft mark at the same 24px size as app icons, with its original proportions and a subtle split on hover, without scaling or rotating the two parts. Taskbar apps slide and fade in and out while their space expands or closes. Search has a text-aligned caret that blinks while focused; running dots sit beneath app icons.
+- The launcher uses the original two-part Luft mark at the same 28px size as app icons, with its original proportions and a subtle split on hover, without scaling or rotating the two parts. Taskbar apps slide and fade in and out while their space expands or closes. Search has a text-aligned caret that blinks while focused; running dots sit beneath app icons.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
 
 ## Work before a Luft session

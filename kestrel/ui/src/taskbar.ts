@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
+import { PANEL_ICON_SIZE } from './surface.js';
 import { animateActor, liftIcon } from './motion.js';
 
 interface AppItem {
@@ -64,7 +65,7 @@ export class Taskbar {
   }
 
   private create(app: Shell.App): AppItem {
-    const icon = app.create_icon_texture(24);
+    const icon = app.create_icon_texture(PANEL_ICON_SIZE);
     icon.set_x_align(Clutter.ActorAlign.CENTER);
     icon.set_y_align(Clutter.ActorAlign.CENTER);
     const content = new St.Widget({ layout_manager: new Clutter.BinLayout(), width: 40, height: 40 });

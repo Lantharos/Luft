@@ -298,7 +298,7 @@ class UnsafeModeIndicator extends SystemIndicator {
     }
 });
 
-const QuickSettings = GObject.registerClass(
+export const QuickSettings = GObject.registerClass(
 class QuickSettings extends PanelMenu.Button {
     constructor() {
         super(0.0, C_('System menu in the top bar', 'System'), true);
@@ -310,7 +310,8 @@ class QuickSettings extends PanelMenu.Button {
 
         this.setMenu(new QuickSettingsMenu(this, N_QUICK_SETTINGS_COLUMNS));
 
-        this._setupIndicators().catch(error =>
+        this.ready = this._setupIndicators();
+        this.ready.catch(error =>
             logError(error, 'Failed to setup quick settings'));
     }
 

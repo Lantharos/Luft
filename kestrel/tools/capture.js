@@ -72,6 +72,8 @@ export async function run() {
   await capture(`${output}/start.png`);
   const pointer = global.stage.context.get_backend().get_default_seat()
     .create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
+  const searchFocus = global.stage.get_key_focus();
+  global.stage.set_key_focus(null);
   await captureRenderedFrames(`${output}/start-hover.png`, async () => {
     for (const [x, y] of [[70, 160], [172, 250], [274, 340], [376, 160], [478, 250]]) {
       pointer.notify_absolute_motion(GLib.get_monotonic_time(), start.x + x, start.y + y);
@@ -89,6 +91,7 @@ export async function run() {
   await pause(1000);
   global.stage.disconnect(idleSignal);
   console.log(`Kestrel settled hover frames in one second: ${idleFrames}`);
+  global.stage.set_key_focus(searchFocus);
   const keyboard = global.stage.context.get_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
   for (const key of 'files') {
     keyboard.notify_keyval(GLib.get_monotonic_time(), key.charCodeAt(0), Clutter.KeyState.PRESSED);
@@ -100,6 +103,22 @@ export async function run() {
   showSurfaceForCapture('quick');
   await pause(450);
   await capture(`${output}/quick-settings.png`);
+  const quick = actorNamed(global.stage, 'kestrel-quick-settings');
+  const controls = [];
+  const collectControls = actor => {
+    if (actor.menu && actor.menuEnabled && actor.visible) controls.push(actor);
+    actor.get_children().forEach(collectControls);
+  };
+  collectControls(quick);
+  for (let index = 0; index < controls.length; index++) {
+    const control = controls[index];
+    control.menu.open();
+    await pause(400);
+    await capture(`${output}/quick-selector-${index + 1}.png`);
+    console.log(`Kestrel selector: ${control.title ?? control.slider?.accessible_name}, open=${control.menu.isOpen}, height=${quick.height}`);
+    control.menu.close({animate: false});
+    await pause(100);
+  }
 
   showSurfaceForCapture('notifications');
   await pause(450);

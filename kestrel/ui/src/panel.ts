@@ -8,6 +8,7 @@ import St from 'gi://St';
 import { blurSurface, PANEL_HEIGHT } from './surface.js';
 import { PanelLayout } from './panelLayout.js';
 import { liftIcon } from './motion.js';
+import { createLauncher } from './launcher.js';
 
 export interface Monitor {
   x: number;
@@ -53,7 +54,7 @@ export class KestrelPanel {
       x_align: Clutter.ActorAlign.CENTER,
       y_align: Clutter.ActorAlign.CENTER,
     });
-    this.startButton = this.iconButton('view-app-grid-symbolic', 'Start', actions.start);
+    this.startButton = createLauncher(actions.start);
     center.add_child(this.startButton);
     center.add_child(this.appButtons);
     this.actor.add_child(center);
@@ -88,7 +89,7 @@ export class KestrelPanel {
       [this.tracker, this.tracker.connect('notify::focus-app', () => this.refreshFocus())],
     );
     this.refreshApps();
-    this.clock.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+    this.clock.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
     this.refreshClock();
     this.scheduleClock();
   }
@@ -146,7 +147,7 @@ export class KestrelPanel {
     }
     for (const app of apps) {
       const icon = app.create_icon_texture(24);
-      const content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+      const content = new St.Widget({ layout_manager: new Clutter.BinLayout(), width: 40, height: 40 });
       icon.set_x_align(Clutter.ActorAlign.CENTER);
       icon.set_y_align(Clutter.ActorAlign.CENTER);
       content.add_child(icon);
@@ -183,15 +184,4 @@ export class KestrelPanel {
     }
   }
 
-  private iconButton(icon: string, label: string, action: () => void): St.Button {
-    const button = new St.Button({
-      style_class: 'kestrel-task-button',
-      child: new St.Icon({ icon_name: icon, icon_size: 18 }),
-      width: 40, height: 40,
-      can_focus: true, track_hover: true, accessible_name: label,
-    });
-    liftIcon(button, button.child!);
-    button.connect('clicked', action);
-    return button;
-  }
 }

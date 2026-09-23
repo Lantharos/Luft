@@ -39,7 +39,7 @@ To capture the shell surfaces, keyboard search, and a test window:
 kestrel/tools/session.sh capture
 ```
 
-Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1280x800` for another size. The output includes the panel, Start, search, quick settings, notification center, power menu, a window, Start above a window, and a maximized window. A hover capture reads the rendered framebuffer without repainting the scene; a complete-redraw reference is saved under `kestrel/run/cache` for comparison. The log reports panel geometry, idle frame count after hover, and the maximized work area.
+Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1280x800` for another size. The output includes the panel, Start, search, quick settings, notification center, power menu, available Quick Settings device selectors, a window, Start above a window, and a maximized window. A hover capture reads the rendered framebuffer without repainting the scene; a complete-redraw reference is saved under `kestrel/run/cache` for comparison. The log reports panel geometry, idle frame count after hover with search unfocused, and the maximized work area.
 
 Rover and Sushi retain their own build commands in their READMEs. Their repository histories have been imported into this repository under their new paths.
 

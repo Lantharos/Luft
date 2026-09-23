@@ -40,7 +40,7 @@
   transition-duration: 160ms;
 }
 .kestrel-status-button:active { background-color: rgba(255, 255, 255, 0.14); }
-.kestrel-clock { font-size: 12px; font-weight: 500; }
+.kestrel-clock { text-align: right; font-size: 12px; font-weight: 500; }
 
 .kestrel-popover {
   background-color: transparent;
@@ -59,6 +59,8 @@
 
 .kestrel-search {
   color: #ffffff;
+  caret-size: 1px;
+  caret-color: #ffffff;
   selection-background-color: rgba(255, 255, 255, 0.25);
   background-color: rgba(255, 255, 255, 0.07);
   border: none;
@@ -72,7 +74,7 @@
   box-shadow: none;
 }
 .kestrel-search StIcon { color: rgba(255, 255, 255, 0.7); padding-right: 8px; }
-.kestrel-search StLabel.hint-text { color: rgba(255, 255, 255, 0.65); }
+.kestrel-search StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-app-grid { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
@@ -89,20 +91,35 @@
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
 .kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }
 
-.kestrel-quick-settings { border-radius: 28px; spacing: 24px; }
-.kestrel-network-tile {
+.kestrel-quick-settings { border-radius: 20px; spacing: 16px; }
+.kestrel-quick-header { spacing: 12px; }
+.kestrel-quick-content { spacing: 18px; }
+.kestrel-quick-tiles { spacing: 8px; }
+.kestrel-quick-row { spacing: 8px; }
+.kestrel-slider-section { spacing: 4px; }
+.kestrel-quick-settings .quick-toggle,
+.kestrel-quick-settings .quick-toggle-has-menu {
+  min-width: 0; max-width: 1000px; min-height: 56px;
+  border-radius: 14px; color: #ffffff;
   background-color: rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  padding: 16px;
+  border: none; box-shadow: none;
 }
-.kestrel-network-tile:checked { background-color: rgba(255, 255, 255, 0.17); }
-.kestrel-network-tile:hover { background-color: rgba(255, 255, 255, 0.23); }
-.kestrel-network-content { spacing: 16px; }
-.kestrel-network-text { spacing: 4px; }
-.kestrel-control-title { font-size: 14px; font-weight: 600; }
-.kestrel-slider-section { spacing: 8px; }
-.kestrel-slider-header { spacing: 10px; font-size: 13px; }
-.kestrel-value { font-size: 12px; color: rgba(255, 255, 255, 0.7); min-width: 38px; text-align: right; }
+.kestrel-quick-settings .quick-toggle:hover,
+.kestrel-quick-settings .quick-toggle-menu-button:hover { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-quick-settings .quick-toggle:checked,
+.kestrel-quick-settings .quick-toggle-menu-button:checked { background-color: rgba(255, 255, 255, 0.20); color: #ffffff; }
+.kestrel-quick-settings .quick-toggle-has-menu .quick-toggle { border-radius: 14px 0 0 14px; }
+.kestrel-quick-settings .quick-toggle-menu-button { border-radius: 0 14px 14px 0; padding: 8px; background-color: transparent; color: #ffffff; }
+.kestrel-quick-settings .quick-toggle > StBoxLayout { padding: 10px; spacing: 10px; }
+.kestrel-quick-settings .quick-toggle-title { font-size: 12px; }
+.kestrel-quick-settings .quick-toggle-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
+.kestrel-quick-settings .quick-toggle-icon { icon-size: 18px; }
+.kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
+.kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
+.kestrel-quick-settings .quick-slider { padding: 0; }
+.kestrel-quick-settings .quick-slider .icon-button { border-radius: 10px; padding: 10px; background-color: transparent; }
+.kestrel-quick-settings .quick-slider .icon-button:hover { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-quick-settings .quick-slider .slider-bin { padding: 8px; }
 .kestrel-slider {
   height: 22px;
   color: #ffffff;
@@ -134,3 +151,5 @@
 .kestrel-icon-button:focus,
 .kestrel-text-button:focus,
 .kestrel-power-action:focus { background-color: rgba(255, 255, 255, 0.17); }
+
+.kestrel-quick-settings .quick-toggle-separator { background-color: rgba(255, 255, 255, 0.12); width: 1px; }

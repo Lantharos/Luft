@@ -10,14 +10,6 @@ declare module 'resource:///org/gnome/shell/misc/systemActions.js' {
   export function getDefault(): Actions;
 }
 
-declare module 'resource:///org/gnome/shell/ui/slider.js' {
-  import St from 'gi://St';
-  export class Slider extends St.DrawingArea {
-    constructor(value: number);
-    value: number;
-  }
-}
-
 declare module 'resource:///org/gnome/shell/ui/userWidget.js' {
   import St from 'gi://St';
   import AccountsService from 'gi://AccountsService';
@@ -25,4 +17,14 @@ declare module 'resource:///org/gnome/shell/ui/userWidget.js' {
     constructor(user: AccountsService.User, params: { styleClass: string; iconSize: number });
     update(): void;
   }
+}
+
+declare module '*.svg' {
+  const source: string;
+  export default source;
+}
+
+
+declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
+  export function createInputSlider(): import('./quickControls.js').QuickControl;
 }

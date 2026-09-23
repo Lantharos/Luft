@@ -6,11 +6,12 @@ import St from 'gi://St';
 
 import { KestrelPanel, type Monitor } from './panel.js';
 import { StartMenu } from './startMenu.js';
-import { QuickSettings, type BrightnessManager } from './quickSettings.js';
+import { QuickSettings } from './quickSettings.js';
 import { NotificationCenter, type MessageTray } from './notificationCenter.js';
 import { PowerMenu } from './powerMenu.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './surface.js';
 import { animateActor } from './motion.js';
+import type { QuickSettingsSource } from './quickControls.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'power';
 
@@ -26,7 +27,7 @@ interface LayoutManager {
 interface Context {
   layoutManager: LayoutManager;
   messageTray: MessageTray;
-  brightnessManager: BrightnessManager;
+  quickSettings: QuickSettingsSource;
 }
 
 class KestrelUi {
@@ -64,12 +65,14 @@ class KestrelUi {
       notifications: () => this.toggle('notifications'),
     });
     this.start = new StartMenu(() => this.close(), () => this.openPowerMenu());
-    this.quick = new QuickSettings(context.brightnessManager,
+    this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       (network, volume) => this.panel.updateStatus(network, volume));
     this.notifications = new NotificationCenter(context.messageTray);
     this.power = new PowerMenu(() => this.close());
 
+    const panelParent = context.layoutManager.panelBox.get_parent()!;
     context.layoutManager.removeChrome(context.layoutManager.panelBox);
+    panelParent.insert_child_at_index(context.layoutManager.panelBox, 0);
     context.layoutManager.panelBox.hide();
     context.layoutManager.addChrome(this.panel.actor, {
       affectsStruts: true,
@@ -83,7 +86,9 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.power.actor);
     for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
       const updateClip = () => actor.set_clip(0, 0, actor.width,
-        Math.max(0, this.panel.actor.y - actor.y - actor.translation_y));
+        Math.max(0, (actor === this.power.actor
+          ? Math.min(this.panel.actor.y, this.start.powerButton.get_transformed_position()[1])
+          : this.panel.actor.y) - actor.y - actor.translation_y));
       for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
         actor.connect(signal, updateClip);
     }
@@ -95,7 +100,7 @@ class KestrelUi {
     shellGlobal.stage.connect('key-press-event', (_stage, event) => {
       if (this.active && event.get_key_symbol() === Clutter.KEY_Escape) {
         if (this.powerOpen) this.closePower();
-        else this.close();
+        else if (this.active !== 'quick' || !this.quick.closeSubmenu()) this.close();
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -120,7 +125,7 @@ class KestrelUi {
     this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
 
     for (const [actor, width, fixedHeight] of [
-      [this.quick.actor, 360, 0],
+      [this.quick.actor, 420, this.quick.preferredHeight(420, startHeight)],
       [this.notifications.actor, 380, Math.min(520, startHeight)],
       [this.power.actor, 216, 0],
     ] as const) {
@@ -152,26 +157,27 @@ class KestrelUi {
 
     if (surface === 'start') {
       this.start.clearSearch();
-    } else if (surface === 'quick') {
-      this.quick.refresh();
-      this.place();
+
     } else if (surface === 'notifications') {
       this.notifications.refresh();
     }
 
     const actor = this.actorFor(surface);
-    if (!actor.visible) {
+    const opening = !actor.visible;
+    actor.show();
+    this.place();
+    if (opening) {
       actor.opacity = 255;
       actor.translation_y = this.slideDistance(actor);
     }
-    actor.show();
-    this.animate(actor, 0, 360);
+    this.animate(actor, 0, 300);
 
     if (surface === 'start') this.start.focus();
   }
 
   private close(): void {
     this.closePower();
+    this.quick.closeSubmenu();
     const surface = this.active;
     this.active = null;
     this.panel.setActive(null);
@@ -180,7 +186,7 @@ class KestrelUi {
       return;
 
     const actor = this.actorFor(surface);
-    this.animate(actor, this.slideDistance(actor), 280, () => {
+    this.animate(actor, this.slideDistance(actor), 230, () => {
       if (this.active !== surface)
         actor.hide();
     });
@@ -226,17 +232,22 @@ class KestrelUi {
     const actor = this.power.actor;
     if (!actor.visible) {
       actor.opacity = 255;
-      actor.translation_y = this.slideDistance(actor);
+      actor.translation_y = this.powerDistance();
     }
     actor.show();
-    this.animate(actor, 0, 360);
+    this.animate(actor, 0, 200);
+  }
+
+  private powerDistance(): number {
+    const [, y] = this.start.powerButton.get_transformed_position();
+    return y - this.power.actor.y;
   }
 
   private closePower(): void {
     if (!this.powerOpen) return;
     this.powerOpen = false;
     const actor = this.power.actor;
-    this.animate(actor, this.slideDistance(actor), 280, () => {
+    this.animate(actor, this.powerDistance(), 160, () => {
       if (!this.powerOpen) actor.hide();
     });
   }
@@ -244,7 +255,6 @@ class KestrelUi {
   shutdown(): void {
     this.panel.shutdown();
     this.stylesheetMonitor?.cancel();
-    this.context.layoutManager.panelBox.destroy();
   }
 
   showSurfaceForCapture(surface: Surface): void {

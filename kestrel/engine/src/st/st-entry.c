@@ -483,10 +483,23 @@ st_entry_allocate (ClutterActor          *actor,
       child_box.x2 = MAX (child_box.x1, child_box.x2 - icon_w - priv->spacing);
     }
 
+  clutter_actor_get_preferred_height (priv->entry, child_box.x2 - child_box.x1,
+                                      &min_h, &pref_h);
+
+  entry_h = CLAMP (pref_h, min_h, avail_h);
+
+  child_box.y1 = ceil (content_box.y1 + avail_h / 2 - entry_h / 2);
+  child_box.y2 = child_box.y1 + entry_h;
+
+  clutter_actor_allocate (priv->entry, &child_box);
+
   if (priv->hint_actor)
     {
-      /* now allocate the hint actor */
+      gint text_x;
+
       hint_box = child_box;
+      clutter_text_get_layout_offsets (CLUTTER_TEXT (priv->entry), &text_x, NULL);
+      hint_box.x1 += text_x;
 
       clutter_actor_get_preferred_width (priv->hint_actor, -1, &hint_min_w, &hint_w);
       clutter_actor_get_preferred_height (priv->hint_actor, -1, NULL, &hint_h);
@@ -503,16 +516,6 @@ st_entry_allocate (ClutterActor          *actor,
 
       clutter_actor_allocate (priv->hint_actor, &hint_box);
     }
-
-  clutter_actor_get_preferred_height (priv->entry, child_box.x2 - child_box.x1,
-                                      &min_h, &pref_h);
-
-  entry_h = CLAMP (pref_h, min_h, avail_h);
-
-  child_box.y1 = ceil (content_box.y1 + avail_h / 2 - entry_h / 2);
-  child_box.y2 = child_box.y1 + entry_h;
-
-  clutter_actor_allocate (priv->entry, &child_box);
 }
 
 static void

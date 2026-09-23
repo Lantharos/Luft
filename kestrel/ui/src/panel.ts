@@ -7,7 +7,7 @@ import St from 'gi://St';
 
 import { blurSurface, PANEL_HEIGHT } from './surface.js';
 import { PanelLayout } from './panelLayout.js';
-import { liftIcon } from './motion.js';
+import { Taskbar } from './taskbar.js';
 import { createLauncher } from './launcher.js';
 
 export interface Monitor {
@@ -28,12 +28,11 @@ export class KestrelPanel {
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
-  private readonly appButtons = new St.BoxLayout({ style_class: 'kestrel-taskbar' });
+  private readonly taskbar = new Taskbar(this.tracker);
   private readonly clock = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
   private readonly networkIcon = new St.Icon({ icon_name: 'network-wired-symbolic', icon_size: 16 });
   private readonly volumeIcon = new St.Icon({ icon_name: 'audio-volume-high-symbolic', icon_size: 16 });
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker, number][] = [];
-  private readonly buttons = new Map<string, St.Button>();
   private readonly startButton: St.Button;
   private readonly quickButton: St.Button;
   private readonly clockButton: St.Button;
@@ -56,7 +55,7 @@ export class KestrelPanel {
     });
     this.startButton = createLauncher(actions.start);
     center.add_child(this.startButton);
-    center.add_child(this.appButtons);
+    center.add_child(this.taskbar.actor);
     this.actor.add_child(center);
 
     const right = new St.BoxLayout({
@@ -86,7 +85,7 @@ export class KestrelPanel {
       [this.appSystem, this.appSystem.connect('app-state-changed', () => this.refreshApps())],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
-      [this.tracker, this.tracker.connect('notify::focus-app', () => this.refreshFocus())],
+      [this.tracker, this.tracker.connect('notify::focus-app', () => this.taskbar.updateFocus())],
     );
     this.refreshApps();
     this.clock.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
@@ -98,7 +97,6 @@ export class KestrelPanel {
     GLib.Source.remove(this.clockTimer);
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
     this.externalSignals.length = 0;
-    this.buttons.clear();
   }
 
   updateStatus(networkIcon: string, volumeIcon: string): void {
@@ -137,51 +135,12 @@ export class KestrelPanel {
   }
 
   private refreshApps(): void {
-    this.appButtons.destroy_all_children();
-    this.buttons.clear();
     const apps = this.favorites.get_strv('favorite-apps')
       .map(id => this.appSystem.lookup_app(id))
       .filter((app): app is Shell.App => app !== null);
     for (const app of this.appSystem.get_running()) {
       if (!apps.some(favorite => favorite.id === app.id)) apps.push(app);
     }
-    for (const app of apps) {
-      const icon = app.create_icon_texture(24);
-      const content = new St.Widget({ layout_manager: new Clutter.BinLayout(), width: 40, height: 40 });
-      icon.set_x_align(Clutter.ActorAlign.CENTER);
-      icon.set_y_align(Clutter.ActorAlign.CENTER);
-      content.add_child(icon);
-      if (app.state === Shell.AppState.RUNNING) {
-        content.add_child(new St.Widget({
-          style_class: 'kestrel-running-dot',
-          x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.END,
-        }));
-      }
-      const button = new St.Button({
-        style_class: 'kestrel-task-button',
-        child: content,
-        width: 40, height: 40,
-        can_focus: true, track_hover: true,
-        accessible_name: app.get_name(),
-      });
-      liftIcon(button, icon);
-      button.connect('clicked', () => {
-        const windows = app.get_windows();
-        if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
-        else app.activate();
-      });
-      this.buttons.set(app.id, button);
-      this.appButtons.add_child(button);
-    }
-    this.refreshFocus();
+    this.taskbar.update(apps);
   }
-
-  private refreshFocus(): void {
-    const focused = this.tracker.focus_app?.id;
-    for (const [id, button] of this.buttons) {
-      if (id === focused) button.add_style_pseudo_class('active');
-      else button.remove_style_pseudo_class('active');
-    }
-  }
-
 }

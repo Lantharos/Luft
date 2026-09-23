@@ -39,7 +39,7 @@ async function capture(path) {
 }
 
 function actorNamed(actor, name) {
-  if (actor.name === name) return actor;
+  if (actor.name === name || actor.accessible_name === name) return actor;
   for (const child of actor.get_children()) {
     const found = actorNamed(child, name);
     if (found) return found;
@@ -73,6 +73,17 @@ export async function run() {
   const pointer = global.stage.context.get_backend().get_default_seat()
     .create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
   const searchFocus = global.stage.get_key_focus();
+  const caretStates = [];
+  const caretImages = new Set();
+  for (let i = 0; i < 7; i++) {
+    caretStates.push(searchFocus.cursor_visible);
+    if (!caretImages.has(searchFocus.cursor_visible)) {
+      caretImages.add(searchFocus.cursor_visible);
+      await capture(`${GLib.getenv('XDG_CACHE_HOME')}/caret-${searchFocus.cursor_visible}.png`);
+    }
+    await pause(200);
+  }
+  console.log(`Kestrel caret visibility: ${caretStates.join(', ')}`);
   global.stage.set_key_focus(null);
   await captureRenderedFrames(`${output}/start-hover.png`, async () => {
     for (const [x, y] of [[70, 160], [172, 250], [274, 340], [376, 160], [478, 250]]) {
@@ -104,12 +115,27 @@ export async function run() {
   await pause(450);
   await capture(`${output}/quick-settings.png`);
   const quick = actorNamed(global.stage, 'kestrel-quick-settings');
+  const nextPage = actorNamed(quick, 'Next page');
+  if (nextPage?.is_mapped() && nextPage.reactive) {
+    nextPage.emit('clicked', Clutter.BUTTON_PRIMARY);
+    await pause(150);
+    await capture(`${GLib.getenv('XDG_CACHE_HOME')}/quick-next-page.png`);
+    console.log(`Kestrel next page: previous enabled=${actorNamed(quick, 'Previous page').reactive}`);
+    actorNamed(quick, 'Previous page').emit('clicked', Clutter.BUTTON_PRIMARY);
+  }
   const controls = [];
   const collectControls = actor => {
     if (actor.menu && actor.menuEnabled && actor.visible) controls.push(actor);
     actor.get_children().forEach(collectControls);
   };
   collectControls(quick);
+  if (controls.length) {
+    const [x, y] = controls[0].get_transformed_position();
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), x + 30, y + 25);
+    await pause(200);
+    await capture(`${GLib.getenv('XDG_CACHE_HOME')}/quick-hover.png`);
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);
+  }
   for (let index = 0; index < controls.length; index++) {
     const control = controls[index];
     control.menu.open();
@@ -145,6 +171,9 @@ export async function run() {
     showSurfaceForCapture('start');
     await pause(350);
     console.log(`Kestrel Start closed: visible=${start.visible}, position=${start.y + start.translation_y}`);
+    const widths = [];
+    const center = actorNamed(global.stage, 'kestrel-panel-center');
+    const sample = global.stage.connect('after-paint', () => widths.push(center.width));
     const app = Gio.Subprocess.new(['gjs', '-m', windowScript], Gio.SubprocessFlags.NONE);
     try {
       await pause(1100);
@@ -162,6 +191,10 @@ export async function run() {
       console.log(`Kestrel window work area: ${JSON.stringify({x, y, width, height})}`);
     } finally {
       app.force_exit();
+      await pause(400);
+      reportLayout();
+      global.stage.disconnect(sample);
+      console.log(`Kestrel taskbar animated widths: ${[...new Set(widths)].join(', ')}`);
     }
   }
 }

@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from './surface.js';
+import { blinkCaret } from './caret.js';
 import { liftIcon } from './motion.js';
 import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
 
@@ -32,6 +33,7 @@ export class StartMenu {
       can_focus: true, x_expand: true,
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
+    blinkCaret(this.search);
     this.search.get_clutter_text().connect('text-changed', () => {
       this.refreshApps();
     });

@@ -11,6 +11,7 @@ export interface ControlMenu {
 
 export interface QuickControl extends St.Button {
   menu?: ControlMenu;
+  _menuManager?: { removeMenu(menu: ControlMenu): void };
   slider?: St.Widget & { value: number };
 }
 

@@ -5,6 +5,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
+import { PagedPane } from './pagedPane.js';
 import { blurSurface } from './surface.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 
@@ -17,6 +18,8 @@ export class QuickSettings {
     name: 'kestrel-quick-settings', orientation: Clutter.Orientation.VERTICAL,
     style_class: 'kestrel-popover kestrel-quick-settings', visible: false, reactive: true,
   });
+  private readonly pages = new PagedPane();
+  private readonly back: St.Button;
   private readonly header = new St.BoxLayout({ style_class: 'kestrel-quick-header' });
   private readonly content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-content' });
   private readonly tiles = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-tiles' });
@@ -36,9 +39,16 @@ export class QuickSettings {
       if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
     });
     const header = this.header;
+    this.back = new St.Button({
+      style_class: 'kestrel-icon-button', accessible_name: 'Back to quick settings',
+      can_focus: true, track_hover: true, visible: false,
+      child: new St.Icon({ icon_name: 'go-previous-symbolic', icon_size: 18 }),
+    });
+    this.back.connect('clicked', () => this.closeSubmenu());
+    header.add_child(this.back);
     header.add_child(new St.Label({ text: 'Quick settings', style_class: 'kestrel-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER }));
     const settings = new St.Button({
-      style_class: 'kestrel-icon-button', accessible_name: 'Settings', can_focus: true,
+      style_class: 'kestrel-icon-button', accessible_name: 'Settings', can_focus: true, track_hover: true,
       child: new St.Icon({ icon_name: 'emblem-system-symbolic', icon_size: 20 }),
     });
     settings.connect('clicked', () => {
@@ -47,15 +57,11 @@ export class QuickSettings {
     });
     header.add_child(settings);
     this.actor.add_child(header);
-    const scroll = new St.ScrollView({
-      height: 0, y_expand: true, x_expand: true,
-      hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
-    });
-    scroll.child = this.content;
-    this.actor.add_child(scroll);
+    this.actor.add_child(this.pages.actor);
+    this.pages.body.add_child(this.content);
+    this.pages.body.add_child(this.selectors);
     this.content.add_child(this.tiles);
-    this.content.add_child(this.selectors);
-    this.content.connect('notify::height', () => this.queueLayout());
+    this.pages.body.connect('notify::height', () => this.queueLayout());
 
     source.ready.then(() => {
       const indicators = [source._network, source._bluetooth, source._powerProfiles,
@@ -97,8 +103,8 @@ export class QuickSettings {
   }
 
   preferredHeight(width: number, limit: number): number {
-    return Math.min(limit, this.content.get_preferred_height(width - 48)[1]
-      + this.header.get_preferred_height(width - 48)[1] + 64);
+    const header = this.header.get_preferred_height(width - 48)[1] + 64;
+    return this.pages.measure(width - 48, limit - header) + header;
   }
 
   closeSubmenu(): boolean {
@@ -109,9 +115,15 @@ export class QuickSettings {
   }
 
   private adopt(item: QuickControl): void {
+    const enableHover = (actor: Clutter.Actor) => {
+      if (actor instanceof St.Button) actor.track_hover = true;
+      actor.get_children().forEach(enableHover);
+    };
+    enableHover(item);
     detach(item);
     if (!item.menu) return;
     const menu = item.menu;
+    item._menuManager?.removeMenu(menu);
     menu.disconnectObject(this.source.menu);
     detach(menu.actor);
     menu.actor.clear_constraints();
@@ -125,8 +137,15 @@ export class QuickSettings {
       if (open) {
         if (this.activeMenu !== menu) this.closeSubmenu();
         this.activeMenu = menu;
+        this.content.hide();
+        this.back.show();
+        this.pages.reset();
+        menu.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
       } else if (this.activeMenu === menu) {
         this.activeMenu = null;
+        this.content.show();
+        this.back.hide();
+        this.pages.reset();
       }
       this.queueLayout();
     });

@@ -125,7 +125,7 @@ class KestrelUi {
     this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
 
     for (const [actor, width, fixedHeight] of [
-      [this.quick.actor, 420, this.quick.preferredHeight(420, startHeight)],
+      [this.quick.actor, 420, this.quick.preferredHeight(420, monitor.height - PANEL_HEIGHT - 24)],
       [this.notifications.actor, 380, Math.min(520, startHeight)],
       [this.power.actor, 216, 0],
     ] as const) {

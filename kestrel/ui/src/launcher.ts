@@ -2,14 +2,15 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { PANEL_ICON_SIZE } from './surface.js';
 
 import primary from './assets/luft-primary.svg';
 import secondary from './assets/luft-secondary.svg';
 import { animateActor } from './motion.js';
 
+const MARK_SIZE = 26;
+
 export function createLauncher(activate: () => void): St.Button {
-  const mark = new St.Widget({ width: PANEL_ICON_SIZE, height: PANEL_ICON_SIZE, layout_manager: new Clutter.BinLayout() });
+  const mark = new St.Widget({ width: MARK_SIZE, height: MARK_SIZE, layout_manager: new Clutter.BinLayout() });
   const button = new St.Button({
     style_class: 'kestrel-task-button', child: mark,
     width: 40, height: 40, can_focus: true, track_hover: true, accessible_name: 'Start',
@@ -17,7 +18,7 @@ export function createLauncher(activate: () => void): St.Button {
   for (const [svg, direction, pivotX, pivotY] of [[secondary, 1, 0.58, 0.69], [primary, -1, 0.4, 0.3]] as const) {
     const icon = new St.Icon({
       gicon: Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(svg))),
-      icon_size: PANEL_ICON_SIZE,
+      icon_size: MARK_SIZE,
     });
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);

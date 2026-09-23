@@ -5,6 +5,8 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
+import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
+import { styleControl } from './controlTile.js';
 import { PagedPane } from './pagedPane.js';
 import { blurSurface } from './surface.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
@@ -24,7 +26,7 @@ export class QuickSettings {
   private readonly content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-content' });
   private readonly tiles = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-tiles' });
   private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
-  private readonly controls: QuickControl[] = [];
+  private readonly controls: St.Button[] = [];
   private activeMenu: ControlMenu | null = null;
   private layoutLater = 0;
 
@@ -69,10 +71,18 @@ export class QuickSettings {
       for (const indicator of indicators) {
         for (const item of indicator?.quickSettingsItems ?? []) {
           this.adopt(item);
+          styleControl(item);
           this.controls.push(item);
           item.connect('notify::visible', () => this.arrangeTiles());
         }
       }
+      const lockBody = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-control-body', x_expand: true });
+      lockBody.add_child(new St.Icon({ icon_name: 'system-lock-screen-symbolic', icon_size: 22, x_align: Clutter.ActorAlign.START, height: 32 }));
+      lockBody.add_child(new St.Label({ text: 'Lock', style_class: 'kestrel-control-title' }));
+      lockBody.add_child(new St.Label({ text: 'Lock screen', style_class: 'kestrel-control-subtitle' }));
+      const lock = new St.Button({ style_class: 'kestrel-control', child: lockBody, visible: true, can_focus: true, track_hover: true });
+      lock.connect('clicked', () => { close(); SystemActions.getDefault().activateLockScreen(); });
+      this.controls.push(lock);
       this.arrangeTiles();
       this.addSlider('Sound output', source._volumeOutput.quickSettingsItems[0]);
       this.addSlider('Microphone', createInputSlider());
@@ -162,7 +172,7 @@ export class QuickSettings {
         item.x_expand = true;
         row.add_child(item);
       }
-      if (index + 1 === visible.length) row.add_child(new St.Widget({ x_expand: true }));
+
       this.tiles.add_child(row);
     }
     this.queueLayout();

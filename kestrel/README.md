@@ -15,7 +15,7 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 - Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel and menu blur share the same brightness without a tint overlay. The panel has square corners.
 - Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with separate dots for running apps.
 - Main surfaces slide in over 300 ms and out over 230 ms. Power options reveal from the Start footer button over 200 ms and retract over 160 ms. Interrupted transitions reverse from their current position.
-- The launcher uses the original two-part Luft mark at an optical size of 26px alongside 28px app icons, with its original proportions and a subtle split and opposing tilt on hover, without shrinking the two parts. Taskbar apps slide and fade in and out while their space expands or closes. The Start scrollbar is translucent, brightening on hover and drag. Search has a text-aligned caret that blinks while focused; running dots sit beneath app icons.
+- The launcher uses the original two-part Luft mark at an optical size of 26px alongside 28px app icons, with its original proportions and a subtle split and opposing tilt on hover, without shrinking the two parts. Taskbar apps slide and fade in and out while their space expands or closes. The Start scrollbar is translucent, brightening on hover and drag. Search has a text-aligned caret that blinks while focused; running dots have a dedicated position beneath app icons. Newly opened surfaces stack above those sliding closed.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
 
 ## Work before a Luft session
@@ -27,3 +27,7 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 5. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
 
 The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, suspend, or portal permission dialogs.
+
+### Context menus
+
+Right-click an app in Start or the panel for launch actions, open windows, pinning, window sizing, minimizing, and closing. The panel, clock, status area, desktop background, account area, Quick Settings controls, notifications, and search field offer relevant shortcuts. Menus also open with the Menu key or Shift+F10 on a focused control; Escape closes the menu and restores focus. Long app menus scroll within the screen.

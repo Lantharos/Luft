@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from './surface.js';
+import type { ContextMenus } from './contextMenus.js';
 import { blinkCaret } from './caret.js';
 import { liftIcon } from './motion.js';
 import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
@@ -20,7 +21,7 @@ export class StartMenu {
   private apps: Gio.AppInfo[] = [];
   private matches: Gio.AppInfo[] = [];
 
-  constructor(private readonly close: () => void, power: () => void) {
+  constructor(private readonly close: () => void, power: () => void, private readonly menus: ContextMenus) {
     this.actor = new St.BoxLayout({
       name: 'kestrel-start',
       orientation: Clutter.Orientation.VERTICAL,
@@ -34,6 +35,19 @@ export class StartMenu {
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
     blinkCaret(this.search);
+    menus.bind(this.search, () => {
+      const text = this.search.clutter_text;
+      const clipboard = St.Clipboard.get_default();
+      const copy = () => clipboard.set_text(St.ClipboardType.CLIPBOARD, text.get_selection());
+      return [
+        { label: 'Cut', enabled: text.get_selection().length > 0, run: () => { copy(); text.delete_selection(); } },
+        { label: 'Copy', enabled: text.get_selection().length > 0, run: copy },
+        { label: 'Paste', run: () => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, value) => {
+          if (value) { text.delete_selection(); text.insert_text(value, text.cursor_position); }
+        }) },
+        { label: 'Select all', run: () => text.set_selection(0, -1) },
+      ];
+    });
     this.search.get_clutter_text().connect('text-changed', () => {
       this.refreshApps();
     });
@@ -53,7 +67,7 @@ export class StartMenu {
     this.actor.add_child(scroller);
 
     const footer = new St.BoxLayout({ style_class: 'kestrel-footer' });
-    const account = new St.BoxLayout({ style_class: 'kestrel-account', x_expand: true });
+    const account = new St.BoxLayout({ style_class: 'kestrel-account', reactive: true, x_expand: true });
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
     const avatar = new Avatar(user, { styleClass: 'kestrel-avatar', iconSize: 32 });
     avatar.y_align = Clutter.ActorAlign.CENTER;
@@ -79,6 +93,12 @@ export class StartMenu {
 
     this.appSystem.connect('installed-changed', () => this.loadApps());
     this.loadApps();
+    menus.bind(this.actor, () => [
+      { label: 'Refresh apps', run: () => this.loadApps() },
+      { label: 'Settings', run: () => menus.settings() },
+    ]);
+    menus.bind(account, () => [{ label: 'Account settings', run: () => menus.settings('system') }]);
+    menus.bind(this.powerButton, () => [{ label: 'Power and session', run: power }]);
   }
 
   focus(): void {
@@ -127,6 +147,10 @@ export class StartMenu {
       can_focus: true, track_hover: true, accessible_name: app.get_display_name(),
     });
     liftIcon(button, content.get_first_child()!);
+    this.menus.bind(button, () => {
+      const shellApp = this.appSystem.lookup_app(app.get_id() ?? '');
+      return shellApp ? this.menus.appEntries(shellApp) : [{ label: 'Open', run: () => this.launch(app) }];
+    });
     button.connect('clicked', () => this.launch(app));
     return button;
   }

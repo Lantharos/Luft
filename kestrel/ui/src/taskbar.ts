@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
+import type { ContextMenus } from './contextMenus.js';
 import { PANEL_ICON_SIZE } from './surface.js';
 import { animateActor, liftIcon } from './motion.js';
 
@@ -16,7 +17,7 @@ export class Taskbar {
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
 
-  constructor(private readonly tracker: Shell.WindowTracker) {}
+  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus) {}
 
   update(apps: Shell.App[]): void {
     const wanted = new Set(apps.map(app => app.id));
@@ -66,13 +67,12 @@ export class Taskbar {
 
   private create(app: Shell.App): AppItem {
     const icon = app.create_icon_texture(PANEL_ICON_SIZE);
-    icon.set_x_align(Clutter.ActorAlign.CENTER);
-    icon.set_y_align(Clutter.ActorAlign.CENTER);
-    const content = new St.Widget({ layout_manager: new Clutter.BinLayout(), width: 40, height: 40 });
+    icon.set_position((40 - PANEL_ICON_SIZE) / 2, 5);
+    const content = new St.Widget({ width: 40, height: 40 });
     content.add_child(icon);
     const dot = new St.Widget({
       style_class: 'kestrel-running-dot',
-      x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.END,
+      x: 18.5, y: 36, width: 3, height: 3,
     });
     content.add_child(dot);
     const button = new St.Button({
@@ -80,6 +80,7 @@ export class Taskbar {
       can_focus: true, track_hover: true, accessible_name: app.get_name(),
     });
     liftIcon(button, icon);
+    this.menus.bind(button, () => this.menus.appEntries(app));
     button.connect('clicked', () => {
       const windows = app.get_windows();
       if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();

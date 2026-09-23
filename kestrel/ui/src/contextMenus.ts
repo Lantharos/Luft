@@ -1,0 +1,137 @@
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+import type { Monitor } from './panel.js';
+import { blurSurface } from './surface.js';
+import { animateActor } from './motion.js';
+
+export interface MenuEntry { label: string; enabled?: boolean; run(): void; }
+
+export class ContextMenus {
+  readonly shield = new St.Widget({ reactive: true, visible: false });
+  readonly actor = new St.BoxLayout({ name: 'kestrel-context-menu', style_class: 'kestrel-context-menu', orientation: Clutter.Orientation.VERTICAL, reactive: true, visible: false, width: 264 });
+  private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private source: Clutter.Actor | null = null;
+  private sourceDestroy = 0;
+
+  constructor(private readonly monitor: () => Monitor | null, private readonly dismissShell: () => void) {
+    blurSurface(this.actor, 14);
+    this.actor.connect('destroy', () => {
+      if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
+      this.source = null;
+      this.sourceDestroy = 0;
+    });
+    this.shield.connect('button-press-event', () => { this.close(); return Clutter.EVENT_STOP; });
+    this.actor.connect('key-press-event', (_actor, event) => {
+      const key = event.get_key_symbol();
+      if (key === Clutter.KEY_Escape) { this.close(); return Clutter.EVENT_STOP; }
+      if ([Clutter.KEY_Down, Clutter.KEY_Up, Clutter.KEY_Tab].includes(key)) {
+        this.actor.navigate_focus(null, key === Clutter.KEY_Up ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
+        return Clutter.EVENT_STOP;
+      }
+      return Clutter.EVENT_PROPAGATE;
+    });
+  }
+
+  bind(actor: Clutter.Actor, entries: () => MenuEntry[]): void {
+    actor.connect('button-press-event', (_actor, event) => {
+      if (event.get_button() !== Clutter.BUTTON_SECONDARY) return Clutter.EVENT_PROPAGATE;
+      const [x, y] = event.get_coords();
+      this.open(actor, entries(), x, y);
+      return Clutter.EVENT_STOP;
+    });
+    actor.connect('key-press-event', (_actor, event) => {
+      if (event.get_key_symbol() !== Clutter.KEY_Menu &&
+          !(event.get_key_symbol() === Clutter.KEY_F10 && (event.get_state() & Clutter.ModifierType.SHIFT_MASK)))
+        return Clutter.EVENT_PROPAGATE;
+      const [x, y] = actor.get_transformed_position();
+      this.open(actor, entries(), x, y);
+      return Clutter.EVENT_STOP;
+    });
+  }
+
+  appEntries(app: Shell.App): MenuEntry[] {
+    const launch = (action: () => void) => () => { this.dismissShell(); action(); };
+    const entries: MenuEntry[] = [{ label: 'Open', run: launch(() => app.activate()) }];
+    const info = app.get_app_info();
+    if (app.can_open_new_window() && !info?.list_actions().includes('new-window'))
+      entries.push({ label: 'New window', run: launch(() => app.open_new_window(-1)) });
+    for (const action of info?.list_actions() ?? [])
+      entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, (global as unknown as Shell.Global).get_current_time(), -1)) });
+    const windows = app.get_windows();
+    for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => window.activate((global as unknown as Shell.Global).get_current_time())) });
+    if (windows.length === 1) {
+      const window = windows[0];
+      if (window.can_minimize()) entries.push({ label: window.minimized ? 'Restore' : 'Minimize', run: () => {
+        if (window.minimized) window.unminimize(); else window.minimize();
+      } });
+      if (window.can_maximize()) entries.push({ label: window.is_maximized() ? 'Unmaximize' : 'Maximize', run: () => {
+        if (window.is_maximized()) window.unmaximize(); else window.maximize();
+      } });
+    }
+    if (!app.is_window_backed()) {
+      const pinned = this.favorites.get_strv('favorite-apps').includes(app.id);
+      entries.push({ label: pinned ? 'Unpin from panel' : 'Pin to panel', run: () => {
+        const ids = this.favorites.get_strv('favorite-apps');
+        this.favorites.set_strv('favorite-apps', pinned ? ids.filter(id => id !== app.id) : [...ids, app.id]);
+      } });
+    }
+    if (windows.length) entries.push({ label: windows.length === 1 ? 'Close window' : 'Close all windows', run: () => app.request_quit() });
+    return entries;
+  }
+
+  settings(panel = ''): void {
+    this.dismissShell();
+    const id = panel ? `gnome-${panel}-panel.desktop` : 'org.gnome.Settings.desktop';
+    Shell.AppSystem.get_default().lookup_app(id)?.activate();
+  }
+
+  open(source: Clutter.Actor, entries: MenuEntry[], x: number, y: number): void {
+    this.close();
+    if (!entries.length) return;
+    const monitor = this.monitor();
+    if (!monitor) return;
+    this.source = source;
+    this.sourceDestroy = source.connect('destroy', () => { this.source = null; this.sourceDestroy = 0; this.close(); });
+    this.actor.destroy_all_children();
+    const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
+    for (const entry of entries) {
+      const button = new St.Button({ style_class: 'kestrel-context-action', accessible_name: entry.label, can_focus: entry.enabled !== false, reactive: entry.enabled !== false, opacity: entry.enabled === false ? 110 : 255, track_hover: true, x_expand: true,
+        child: new St.Label({ text: entry.label, x_expand: true, x_align: Clutter.ActorAlign.START }) });
+      button.connect('clicked', () => { this.close(); entry.run(); });
+      content.add_child(button);
+    }
+    const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC });
+    scroll.child = content;
+    this.actor.add_child(scroll);
+    scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
+    this.shield.set_position(monitor.x, monitor.y);
+    this.shield.set_size(monitor.width, monitor.height);
+    this.shield.get_parent()!.set_child_above_sibling(this.shield, null);
+    this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
+    this.actor.show();
+    const height = this.actor.get_preferred_height(this.actor.width)[1];
+    this.actor.set_position(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8)),
+      Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8)));
+    this.shield.show();
+    this.actor.show();
+    this.actor.opacity = 0;
+    this.actor.translation_y = 6;
+    animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+  }
+
+  close(): void {
+    if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
+    const source = this.source;
+    this.source = null;
+    this.sourceDestroy = 0;
+    if (this.actor.visible) animateActor(this.actor, {
+      opacity: 0, translation_y: 6, duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      onComplete: () => { if (!this.source) this.actor.hide(); },
+    });
+    this.shield.hide();
+    if (source?.mapped) source.grab_key_focus();
+  }
+}

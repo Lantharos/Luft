@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
+import type { ContextMenus } from './contextMenus.js';
 import { blurSurface } from './surface.js';
 
 interface Notification {
@@ -24,7 +25,7 @@ export class NotificationCenter {
 
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
 
-  constructor(private readonly tray: MessageTray) {
+  constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus) {
     this.actor = new St.BoxLayout({
       orientation: Clutter.Orientation.VERTICAL,
       name: 'kestrel-notifications',
@@ -33,6 +34,10 @@ export class NotificationCenter {
       reactive: true,
     });
     blurSurface(this.actor, 20);
+    menus.bind(this.actor, () => [
+      { label: 'Clear all notifications', run: () => this.clear() },
+      { label: 'Notification settings', run: () => menus.settings('notifications') },
+    ]);
 
     const header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
     header.add_child(new St.Label({
@@ -83,11 +88,13 @@ export class NotificationCenter {
     }
 
     for (const { source, notification } of notifications) {
-      const item = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification' });
+      const item = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification', reactive: true, can_focus: true });
       item.add_child(new St.Label({ text: source.title, style_class: 'kestrel-muted' }));
       item.add_child(new St.Label({ text: notification.title, style_class: 'kestrel-section-title' }));
       if (notification.body)
         item.add_child(new St.Label({ text: notification.body, style_class: 'kestrel-muted' }));
+      this.menus.bind(item, () => [{ label: 'Dismiss', run: () => notification.destroy() },
+        { label: 'Notification settings', run: () => this.menus.settings('notifications') }]);
       this.list.add_child(item);
     }
   }

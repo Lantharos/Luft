@@ -6,6 +6,7 @@
 *.dwo
 
 # VM & QEMU artifacts (rebuilt by scripts/vm/*.sh)
+/vm/
 /vm/esp/
 /vm/staging/
 /vm/initramfs-root/

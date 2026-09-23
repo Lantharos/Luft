@@ -1,0 +1,450 @@
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+
+import * as FingerprintManager from './fingerprintManager.js';
+import {FingerprintReaderType} from './fingerprintManager.js';
+import {logErrorUnlessCancelled} from '../misc/errorUtils.js';
+import * as Settings from './settings.js';
+import * as SmartcardManager from './smartcardManager.js';
+import * as OVirt from './oVirt.js';
+import * as Vmware from './vmware.js';
+import {AuthServices, Role, RoleProperties} from './authServices.js';
+import {MessageType} from './userVerifier.js';
+
+const FINGERPRINT_ERROR_TIMEOUT_WAIT = 15;
+const FINGERPRINT_READY_TIMEOUT_MS = 500;
+
+const PASSWORD_SERVICE_NAME = 'gdm-password';
+const SMARTCARD_SERVICE_NAME = 'gdm-smartcard';
+const FINGERPRINT_SERVICE_NAME = 'gdm-fingerprint';
+
+const Mechanisms = [
+    {
+        serviceName: PASSWORD_SERVICE_NAME,
+        role: Role.PASSWORD,
+        name: _('Password'),
+        setting: Settings.PASSWORD_AUTHENTICATION_KEY,
+    },
+    {
+        serviceName: SMARTCARD_SERVICE_NAME,
+        role: Role.SMARTCARD,
+        name: _('Smartcard'),
+        setting: Settings.SMARTCARD_AUTHENTICATION_KEY,
+    },
+    {
+        serviceName: FINGERPRINT_SERVICE_NAME,
+        role: Role.FINGERPRINT,
+        name: _('Fingerprint'),
+        setting: Settings.FINGERPRINT_AUTHENTICATION_KEY,
+    },
+];
+
+export class AuthServicesLegacy extends AuthServices {
+    static SupportedRoles = [
+        Role.PASSWORD,
+        Role.SMARTCARD,
+        Role.FINGERPRINT,
+    ];
+
+    static RoleToService = {
+        [Role.PASSWORD]: PASSWORD_SERVICE_NAME,
+        [Role.SMARTCARD]: SMARTCARD_SERVICE_NAME,
+        [Role.FINGERPRINT]: FINGERPRINT_SERVICE_NAME,
+    };
+
+    static {
+        GObject.registerClass(this);
+    }
+
+    static isEnabled(settings) {
+        return settings.get_boolean(Settings.PASSWORD_AUTHENTICATION_KEY) ||
+            settings.get_boolean(Settings.FINGERPRINT_AUTHENTICATION_KEY) ||
+            settings.get_boolean(Settings.SMARTCARD_AUTHENTICATION_KEY);
+    }
+
+    constructor(params) {
+        super(params);
+
+        this._connectSmartcardManager();
+        this._connectFingerprintManager();
+
+        this._updateEnabledMechanisms();
+
+        this._credentialManagers = {};
+        this.addCredentialManager(OVirt.SERVICE_NAME, OVirt.getOVirtCredentialsManager());
+        this.addCredentialManager(Vmware.SERVICE_NAME, Vmware.getVmwareCredentialsManager());
+
+        this._fingerprintReadyTimeoutId = 0;
+    }
+
+    _handleAnswerQuery(serviceName, answer) {
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        if (this._selectedMechanism.role === Role.SMARTCARD)
+            this._smartcardInProgress = true;
+
+        this._userVerifier.call_answer_query(
+            serviceName, answer, this._cancellable).catch(logErrorUnlessCancelled);
+    }
+
+    _handleBeginVerification() {
+        this._fingerprintManager?.checkReaderType(this._cancellable);
+
+        this.emit('mechanisms-changed');
+    }
+
+    _handleSelectMechanism() {
+        if (this._selectedMechanism)
+            this.emit('reset', {softReset: true});
+    }
+
+    _handleNeedsUsername() {
+        // Username won't be needed when there's only one mechanism and is
+        // Smartcard, or if the selected mechanism is a credential manager
+        return !(this._enabledMechanisms.length === 1 &&
+            this._enabledMechanisms[0].role === Role.SMARTCARD ||
+            Object.keys(this._credentialManagers).includes(this._selectedMechanism?.serviceName));
+    }
+
+    _handleReset() {
+        this._selectedMechanism = null;
+    }
+
+    _handleClear() {
+        this._smartcardInProgress = false;
+        this._clearFingerprintSignalHandlers();
+    }
+
+    _clearFingerprintSignalHandlers() {
+        if (this._fingerprintFailedId) {
+            GLib.source_remove(this._fingerprintFailedId);
+            this._fingerprintFailedId = 0;
+        }
+        if (this._fingerprintReadyTimeoutId) {
+            GLib.source_remove(this._fingerprintReadyTimeoutId);
+            this._fingerprintReadyTimeoutId = 0;
+        }
+    }
+
+    _handleOnConversationStarted(serviceName) {
+        if (serviceName !== FINGERPRINT_SERVICE_NAME ||
+            this._fingerprintReadyTimeoutId !== 0)
+            return;
+
+        this._fingerprintReadyTimeoutId = GLib.timeout_add_once(
+            GLib.PRIORITY_DEFAULT,
+            FINGERPRINT_READY_TIMEOUT_MS,
+            () => {
+                this._fingerprintReadyTimeoutId = 0;
+                this._setFingerprintReady(true);
+            });
+    }
+
+    _setFingerprintReady(ready) {
+        const mechanism = this._enabledMechanisms.find(m =>
+            m.role === Role.FINGERPRINT);
+
+        if (!mechanism || mechanism.ready === ready)
+            return;
+
+        mechanism.ready = ready;
+
+        this.emit('mechanisms-changed');
+    }
+
+    _handleUpdateEnabledRoles() {
+        this._selectedMechanism = null;
+        this._updateEnabledMechanisms();
+    }
+
+    _handleUpdateEnabledMechanisms() {
+        this._enabledMechanisms.push(...Mechanisms.filter(m =>
+            this._enabledRoles.includes(m.role) &&
+            this._settings.get_boolean(m.setting)
+        ));
+
+        if (!this._fingerprintManager?.readerFound) {
+            this._enabledMechanisms = this._enabledMechanisms.filter(m =>
+                m.role !== Role.FINGERPRINT);
+        } else {
+            // Mark fingerprint as not ready until service confirms
+            // it's working for this user
+            this._setFingerprintReady(false);
+        }
+    }
+
+    _handleOnInfo(serviceName, info) {
+        if (serviceName === this._selectedMechanism?.serviceName) {
+            this.emit('queue-message', {
+                serviceName,
+                message: info,
+                messageType: MessageType.INFO,
+            });
+        } else if (serviceName === FINGERPRINT_SERVICE_NAME &&
+            this._enabledMechanisms.some(m => m.serviceName === serviceName)) {
+            // We don't show fingerprint messages directly since it's
+            // not the main auth service. Instead we use the messages
+            // as a cue to display our own message.
+            this.emit('queue-message', {
+                serviceName,
+                message: this._fingerprintManager?.readerType === FingerprintReaderType.SWIPE
+                    // Translators: this message is shown below the password entry field
+                    // to indicate the user can swipe their finger on the fingerprint reader
+                    ? _('(or swipe finger across reader)')
+                    // Translators: this message is shown below the password entry field
+                    // to indicate the user can place their finger on the fingerprint reader instead
+                    : _('(or place finger on reader)'),
+                messageType: MessageType.HINT,
+            });
+        }
+    }
+
+    _handleOnProblem(serviceName, problem) {
+        if (serviceName === this._selectedMechanism?.serviceName ||
+            (serviceName === FINGERPRINT_SERVICE_NAME &&
+            this._enabledMechanisms.some(m => m.serviceName === serviceName))) {
+            this.emit('queue-priority-message', {
+                serviceName,
+                message: problem,
+                messageType: MessageType.ERROR,
+                wiggle: serviceName === FINGERPRINT_SERVICE_NAME,
+            });
+        }
+
+        if (serviceName === FINGERPRINT_SERVICE_NAME &&
+            this._enabledMechanisms.some(m => m.serviceName === serviceName)) {
+            // pam_fprintd allows the user to retry multiple (maybe even infinite!
+            // times before failing the authentication conversation.
+            // We don't want this behavior to bypass the max-tries setting the user has set,
+            // so we count the problem messages to know how many times the user has failed.
+            // Once we hit the max number of failures we allow, it's time to failure the
+            // conversation from our side. We can't do that right away, however, because
+            // we may drop pending messages coming from pam_fprintd. In order to make sure
+            // the user sees everything, we queue the failure up to get handled in the
+            // near future, after we've finished up the current round of messages.
+            this._failCounter++;
+
+            if (this._canRetry())
+                return;
+
+            if (this._fingerprintFailedId)
+                GLib.source_remove(this._fingerprintFailedId);
+
+            this._fingerprintFailedId = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
+                FINGERPRINT_ERROR_TIMEOUT_WAIT, () => {
+                    this._fingerprintFailedId = 0;
+                    if (!this._cancellable.is_cancelled())
+                        this._verificationFailed(serviceName, false);
+                    return GLib.SOURCE_REMOVE;
+                });
+        }
+    }
+
+    _handleOnInfoQuery(serviceName, question) {
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        this.emit('ask-question', {
+            serviceName,
+            question,
+            answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+        });
+    }
+
+    _handleOnSecretInfoQuery(serviceName, secretQuestion) {
+        // Try to auto-fill with credential manager token first
+        if (this._tryCredentialManagerAutoFill(serviceName))
+            return;
+
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        this.emit('ask-question', {
+            serviceName,
+            question: secretQuestion,
+            secret: true,
+            answerHandler: answer => this._handleAnswerQuery(serviceName, answer),
+        });
+    }
+
+    _tryCredentialManagerAutoFill(serviceName) {
+        const credentialManager = this._credentialManagers[serviceName];
+        if (!credentialManager)
+            return false;
+
+        const token = credentialManager.token;
+        if (!token)
+            return false;
+
+        this._userVerifier.call_answer_query(
+            serviceName, token, this._cancellable).catch(logErrorUnlessCancelled);
+        return true;
+    }
+
+    _handleOnConversationStopped(serviceName) {
+        if (serviceName !== this._selectedMechanism?.serviceName &&
+            serviceName !== FINGERPRINT_SERVICE_NAME)
+            return;
+
+        // If the login failed with the preauthenticated oVirt credentials
+        // then discard the credentials and revert to default authentication
+        // mechanism.
+        if (this._credentialManagers[serviceName]) {
+            this._credentialManagers[serviceName].token = null;
+            this._selectedMechanism = null;
+            this._verificationFailed(serviceName, false);
+            return;
+        }
+
+        if (serviceName === FINGERPRINT_SERVICE_NAME) {
+            this._clearFingerprintSignalHandlers();
+            if (this._unavailableServices.has(serviceName))
+                this._setFingerprintReady(false);
+        }
+
+        if (this._unavailableServices.has(serviceName))
+            return;
+
+        // if the password service fails, then cancel everything.
+        // But if, e.g., fingerprint fails, still give
+        // password authentication a chance to succeed
+        if (serviceName === this._selectedMechanism?.serviceName)
+            this._failCounter++;
+
+        this._verificationFailed(serviceName, true);
+    }
+
+    _handleOnServiceUnavailable(serviceName, errorMessage) {
+        if (serviceName !== FINGERPRINT_SERVICE_NAME ||
+            !this._enabledMechanisms.some(m => m.serviceName === serviceName) ||
+            !errorMessage)
+            return;
+
+        this.emit('queue-message', {
+            serviceName,
+            message: errorMessage,
+            messageType: MessageType.ERROR,
+            wiggle: serviceName === FINGERPRINT_SERVICE_NAME,
+        });
+    }
+
+    _handleVerificationFailed(serviceName) {
+        if (serviceName === FINGERPRINT_SERVICE_NAME &&
+            this._enabledMechanisms.some(m => m.serviceName === serviceName) &&
+            this._fingerprintFailedId)
+            GLib.source_remove(this._fingerprintFailedId);
+    }
+
+    _handleOnVerificationComplete(serviceName) {
+        if (this._credentialManagers[serviceName])
+            this._credentialManagers[serviceName].token = null;
+    }
+
+    _handleOnChoiceListQuery(serviceName, promptMessage, list) {
+        if (serviceName !== this._selectedMechanism?.serviceName)
+            return;
+
+        const choiceList = {};
+        for (const [key, value] of Object.entries(list.deepUnpack()))
+            choiceList[key] = {title: value};
+
+        this.emit('show-choice-list', {
+            serviceName,
+            promptMessage,
+            choiceList,
+            choiceHandler: key => {
+                if (serviceName !== this._selectedMechanism?.serviceName)
+                    return;
+                this._userVerifierChoiceList.call_select_choice(
+                    serviceName, key, this._cancellable).catch(logErrorUnlessCancelled);
+            },
+        });
+    }
+
+    _handleGetCredentialManagerServices() {
+        return Object.keys(this._credentialManagers);
+    }
+
+    _handleCanStartService(serviceName) {
+        if (this._hasAnyCredentialManagerToken())
+            return this._credentialManagers[serviceName]?.token !== null;
+
+        return serviceName === this._selectedMechanism?.serviceName ||
+            (serviceName === FINGERPRINT_SERVICE_NAME &&
+            this._enabledMechanisms.some(m => m.serviceName === serviceName) &&
+            this._userName);
+    }
+
+    _hasAnyCredentialManagerToken() {
+        return Object.values(this._credentialManagers).some(cm => cm.token !== null);
+    }
+
+    addCredentialManager(serviceName, credentialManager) {
+        if (this._credentialManagers[serviceName])
+            return;
+
+        this._credentialManagers[serviceName] = credentialManager;
+        if (credentialManager.token)
+            this._onCredentialManagerAuthenticated(credentialManager);
+
+        credentialManager.connectObject(
+            'user-authenticated', () => this._onCredentialManagerAuthenticated(credentialManager),
+            this);
+    }
+
+    removeCredentialManager(serviceName) {
+        const credentialManager = this._credentialManagers[serviceName];
+        if (!credentialManager)
+            return;
+
+        credentialManager.disconnectObject(this);
+        delete this._credentialManagers[serviceName];
+
+        if (this._selectedMechanism?.serviceName === serviceName)
+            this.emit('reset');
+    }
+
+    _connectSmartcardManager() {
+        this._smartcardManager = SmartcardManager.getSmartcardManager();
+        this._smartcardManager.connectObject(
+            'smartcard-inserted', () => this._onSmartcardChanged(),
+            'smartcard-removed', () => this._onSmartcardChanged(),
+            this);
+    }
+
+    _connectFingerprintManager() {
+        if (!this._reauthOnly)
+            return;
+
+        this._fingerprintManager = FingerprintManager.getFingerprintManager();
+        this._fingerprintManager.connectObject(
+            'reader-type-changed', () => this._onFingerprintChanged(),
+            this);
+    }
+
+    _onSmartcardChanged() {
+        if (this._selectedMechanism?.role !== Role.SMARTCARD ||
+            this._smartcardInProgress && this._smartcardManager.hasInsertedTokens())
+            return;
+
+        this.emit('reset', {softReset: true});
+    }
+
+    _onFingerprintChanged() {
+        if (!this._enabledRoles.includes(Role.FINGERPRINT))
+            return;
+
+        this._updateEnabledMechanisms();
+        this.emit('reset', {softReset: true, reuseEntryText: true});
+    }
+
+    _onCredentialManagerAuthenticated(credentialManager) {
+        this._selectedMechanism = {
+            serviceName: credentialManager.service,
+            role: Role.PASSWORD,
+            ...RoleProperties[Role.PASSWORD],
+        };
+        this.emit('reset', {softReset: true});
+    }
+}

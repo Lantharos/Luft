@@ -1,0 +1,24 @@
+# Kestrel
+
+Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library and owns its panel, launcher, quick settings, notification center, and power menu in TypeScript. The imported engine retains GNOME Shell's C/St integration and the session services required for window management, authentication, screenshots, screencasts, and portals.
+
+## Current checkpoint
+
+- The engine and TypeScript UI compile against Fedora's GNOME 51 stack.
+- A headless Wayland session boots on a 1280×800 virtual monitor and produces screenshots of the panel, Start, quick settings, and power menu.
+- The panel reserves screen space, shows favorite and running apps, and opens animated shell surfaces.
+- Start lists installed applications, filters them by name, and launches the selected app.
+- Quick settings expose Wi-Fi, volume, and brightness where the respective service or hardware is available.
+- The notification center displays the existing message tray sources and can clear them.
+- The power menu delegates lock, suspend, log out, restart, and power off to the existing session action backend.
+- Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
+
+## Work before a Luft session
+
+1. Make Kestrel the actual shell entry point, remove unused GNOME UI modules and services, and rename the build/session identifiers that still say GNOME Shell. The current TypeScript UI is loaded by a reduced upstream `main.js` path and the upstream overview object is still constructed, though disabled in the user session.
+2. Complete keyboard and window switching behavior, focus handling, multi-monitor placement, animations, and notification interaction. Validate each with actual windows in a nested or disposable session.
+3. Supply Luft session and portal configuration, including screenshot, screencast, file chooser, settings, and secret handling, then exercise the portal calls from client apps.
+4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.
+5. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
+
+The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, suspend, or portal permission dialogs.

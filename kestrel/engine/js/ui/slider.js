@@ -1,0 +1,230 @@
+import Atk from 'gi://Atk';
+import Clutter from 'gi://Clutter';
+import GObject from 'gi://GObject';
+
+import * as BarLevel from './barLevel.js';
+
+const SLIDER_SCROLL_STEP = 0.02; /* Slider scrolling step in % */
+const SNAP_THRESHOLD = 0.04; /* Snap to marks within 4% */
+
+export class Slider extends BarLevel.BarLevel {
+    static [GObject.signals] = {
+        'drag-begin': {},
+        'drag-end': {},
+    };
+
+    static {
+        GObject.registerClass(this);
+
+        const bindingPool = this.get_binding_pool();
+
+        bindingPool.install_closure(
+            'left', Clutter.KEY_Left, 0,
+            obj => {
+                obj._moveLeft();
+                return Clutter.EVENT_STOP;
+            }
+        );
+        bindingPool.install_closure(
+            'right', Clutter.KEY_Right, 0,
+            obj => {
+                obj._moveRight();
+                return Clutter.EVENT_STOP;
+            }
+        );
+    }
+
+    _init(value) {
+        super._init({
+            value,
+            style_class: 'slider',
+            can_focus: true,
+            reactive: true,
+            track_hover: true,
+            hover: false,
+            accessible_role: Atk.Role.SLIDER,
+            x_expand: true,
+        });
+
+        this._releaseId = 0;
+        this._handleRadius = 0;
+
+        this._panGesture = new Clutter.PanGesture();
+        this._panGesture.set_begin_threshold(0);
+        this._panGesture.connect('recognize', this._onPanBegin.bind(this));
+        this._panGesture.connect('pan-update', this._onPanUpdate.bind(this));
+        this._panGesture.connect('end', this._onPanEnd.bind(this));
+        this.add_action(this._panGesture);
+
+        const smoothScrollController = new Clutter.ScrollController({
+            flags: Clutter.ScrollControllerFlags.PHYSICAL_DIRECTION |
+                Clutter.ScrollControllerFlags.SCROLL_HORIZONTAL,
+        });
+        smoothScrollController.connect('scroll', this._onScroll.bind(this));
+        this.add_action(smoothScrollController);
+
+        const discreteScrollController = new Clutter.ScrollController({
+            flags: Clutter.ScrollControllerFlags.DISCRETE |
+                Clutter.ScrollControllerFlags.SCROLL_VERTICAL,
+        });
+        discreteScrollController.connect('scroll', (_c, _sprite, _source, _dx, dy) => {
+            this.step(-dy);
+        });
+        this.add_action(discreteScrollController);
+
+        this._customAccessible.connect('get-minimum-increment', this._getMinimumIncrement.bind(this));
+
+        this._marks = new Set();
+        this._unsnappedValue = null;
+    }
+
+    addMark(value) {
+        this._marks.add(value);
+    }
+
+    clearMarks() {
+        this._marks.clear();
+    }
+
+    _snapToMark(value) {
+        for (const mark of this._marks) {
+            if (Math.abs(value - mark) < SNAP_THRESHOLD)
+                return mark;
+        }
+        return value;
+    }
+
+    vfunc_style_changed() {
+        super.vfunc_style_changed();
+
+        const themeNode = this.get_theme_node();
+        this._handleRadius =
+            Math.round(2 * themeNode.get_length('-slider-handle-radius')) / 2;
+    }
+
+    vfunc_repaint() {
+        super.vfunc_repaint();
+
+        // Add handle
+        const cr = this.get_context();
+        const themeNode = this.get_theme_node();
+        const [width, height] = this.get_surface_size();
+        const rtl = this.get_text_direction() === Clutter.TextDirection.RTL;
+
+        const handleY = height / 2;
+
+        let handleX = this._handleRadius +
+            (width - 2 * this._handleRadius) * this._value / this._maxValue;
+        if (rtl)
+            handleX = width - handleX;
+
+        const color = themeNode.get_foreground_color();
+        cr.setSourceColor(color);
+        cr.arc(handleX, handleY, this._handleRadius, 0, 2 * Math.PI);
+        cr.fill();
+        cr.$dispose();
+    }
+
+    _getPreferredHeight() {
+        const barHeight = super._getPreferredHeight();
+        const handleHeight = 2 * this._handleRadius;
+        return Math.max(barHeight, handleHeight);
+    }
+
+    _getPreferredWidth() {
+        const barWidth = super._getPreferredWidth();
+        const handleWidth = 2 * this._handleRadius;
+        return Math.max(barWidth, handleWidth);
+    }
+
+    _onPanBegin() {
+        this._grab = global.stage.grab(this);
+
+        // We need to emit 'drag-begin' before moving the handle to make
+        // sure that no 'notify::value' signal is emitted before this one.
+        this.emit('drag-begin');
+
+        const coords = this._panGesture.get_centroid();
+        this._moveHandle(coords.x, coords.y);
+        return Clutter.EVENT_STOP;
+    }
+
+    _onPanEnd() {
+        if (this._releaseId) {
+            this.disconnect(this._releaseId);
+            this._releaseId = 0;
+        }
+
+        if (this._grab) {
+            this._grab.dismiss();
+            this._grab = null;
+        }
+
+        this.emit('drag-end');
+    }
+
+    _onPanUpdate() {
+        const coords = this._panGesture.get_centroid();
+        this._moveHandle(coords.x, coords.y);
+    }
+
+    _applyDelta(delta) {
+        // Track unsnapped value to allow escaping snap zones when scrolling/using arrow keys.
+        // Without this, if the scroll step is smaller than the snap threshold,
+        // the slider gets stuck at the mark because each scroll snaps back.
+        const base = this._unsnappedValue ?? this._value;
+        const oldValue = this._value;
+        this._unsnappedValue = Math.clamp(base + delta, 0, this._maxValue);
+        this.value = this._snapToMark(this._unsnappedValue);
+        return this._value !== oldValue;
+    }
+
+    step(nSteps) {
+        return this._applyDelta(nSteps * SLIDER_SCROLL_STEP);
+    }
+
+    _onScroll(_controller, _sprite, _source, dx) {
+        let nSteps = 0;
+
+        nSteps = dx;
+        if (this.get_text_direction() === Clutter.TextDirection.RTL)
+            nSteps *= -1;
+
+        this.step(nSteps);
+    }
+
+    _moveLeft() {
+        const rtl = this.get_text_direction() === Clutter.TextDirection.RTL;
+        const delta = rtl ? 0.1 : -0.1;
+        this._applyDelta(delta);
+    }
+
+    _moveRight() {
+        const rtl = this.get_text_direction() === Clutter.TextDirection.RTL;
+        const delta = rtl ? -0.1 : 0.1;
+        this._applyDelta(delta);
+    }
+
+    _moveHandle(x, _y) {
+        const rtl = this.get_text_direction() === Clutter.TextDirection.RTL;
+        const width = this._barLevelWidth;
+
+        let relX = x;
+        if (rtl)
+            relX = width - relX;
+
+        let newvalue;
+        if (relX < this._handleRadius)
+            newvalue = 0;
+        else if (relX > width - this._handleRadius)
+            newvalue = 1;
+        else
+            newvalue = (relX - this._handleRadius) / (width - 2 * this._handleRadius);
+        this._unsnappedValue = newvalue * this._maxValue;
+        this.value = this._snapToMark(this._unsnappedValue);
+    }
+
+    _getMinimumIncrement() {
+        return 0.1;
+    }
+}

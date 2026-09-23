@@ -1,0 +1,14 @@
+data/.osk-layout-workbench
+po/gnome-shell.pot
+subprojects/gvc
+subprojects/jasmine-gjs
+subprojects/libshew
+*~
+*.patch
+*.sw?
+.buildconfig
+.eslintcache
+.vscode
+node_modules
+__pycache__
+.wraplock

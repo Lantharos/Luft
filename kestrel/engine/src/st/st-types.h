@@ -1,0 +1,42 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+/*
+ * Copyright 2009 Intel Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU Lesser General Public License,
+ * version 2.1, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined(ST_H_INSIDE) && !defined(ST_COMPILATION)
+#error "Only <st/st.h> can be included directly.h"
+#endif
+
+#pragma once
+
+#include <glib-object.h>
+#include <clutter/clutter.h>
+
+G_BEGIN_DECLS
+
+typedef enum {
+  ST_BACKGROUND_SIZE_AUTO,
+  ST_BACKGROUND_SIZE_CONTAIN,
+  ST_BACKGROUND_SIZE_COVER,
+  ST_BACKGROUND_SIZE_FIXED
+} StBackgroundSize;
+
+typedef enum {
+  ST_KEYNAV_FLAG_NONE = 0,
+  ST_KEYNAV_FLAG_WRAP_HORIZONTALLY = 1 << 0,
+  ST_KEYNAV_FLAG_WRAP_VERTICALLY = 1 << 1,
+} StKeynavFlags;
+
+G_END_DECLS

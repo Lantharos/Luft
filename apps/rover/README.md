@@ -2,6 +2,8 @@
 
 A modern, fast, and user-friendly file manager for Linux built with Sabine + SvelteKit.
 
+In the Luft monorepo, Rover lives at `apps/rover`. Run the commands below from that directory.
+
 ## Features
 
 - **Modern UI**: Compact dark interface with a native translucent sidebar on supported Wayland compositors

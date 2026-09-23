@@ -2,6 +2,8 @@
 
 Sushi is a Rust boot splash stack for Linux: an initramfs daemon that owns the display from early boot through disk unlock and pivot, optional UEFI pre-boot graphics, and a dracut module that replaces Plymouth.
 
+In the Luft monorepo, Sushi lives at `boot/sushi`. Run the commands below from that directory.
+
 ## Components
 
 | Crate / binary | Role |
@@ -43,6 +45,8 @@ Build the ESP, initramfs, and root disk, then boot:
 make vm-build    # or: ./scripts/vm/build-esp.sh
 make vm-run      # or: ./scripts/vm/run-qemu.sh
 ```
+
+For a Fedora root disk with a LightDM greeter and Openbox session, run `make vm-run-fedora`. This profile needs Podman and network access on its first build. It uses 4 GiB of guest memory by default and the `sushi` test account; `VM_USER`, `VM_PASSWORD`, `FEDORA_RELEASEVER`, and `ROOTFS_SIZE_MB` can be set in the environment. The generated disk and staging tree stay under the ignored `vm/` directory.
 
 `build-esp.sh` produces:
 

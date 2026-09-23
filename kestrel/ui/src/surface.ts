@@ -2,6 +2,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 export const PANEL_HEIGHT = 48;
+export const PANEL_ICON_SIZE = 28;
 export const SURFACE_GAP = 10;
 
 export function blurSurface(actor: St.Widget, corners = 20): void {

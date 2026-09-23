@@ -168,3 +168,13 @@
 .kestrel-quick-settings .popup-menu-item:active { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-icon-button { transition-duration: 120ms; }
 .kestrel-icon-button:active { background-color: rgba(255, 255, 255, 0.24); }
+
+.kestrel-app-scroll .vhandle {
+  background-color: rgba(255, 255, 255, 0.24);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  transition-duration: 120ms;
+}
+.kestrel-app-scroll .vhandle:hover { background-color: rgba(255, 255, 255, 0.40); }
+.kestrel-app-scroll .vhandle:active { background-color: rgba(255, 255, 255, 0.55); }

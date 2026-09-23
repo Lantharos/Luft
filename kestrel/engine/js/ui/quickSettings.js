@@ -14,7 +14,7 @@ import * as PopupMenu from './popupMenu.js';
 import {Slider} from './slider.js';
 
 const DIM_BRIGHTNESS = -0.4;
-export const POPUP_ANIMATION_TIME = 400;
+export const POPUP_ANIMATION_TIME = 240;
 
 export const QuickSettingsItem = GObject.registerClass({
     Properties: {
@@ -838,10 +838,10 @@ export const QuickSettingsMenu = class extends PopupMenu.PopupMenu {
         if (item.menu) {
             this._overlay.add_child(item.menu.actor);
 
-            item.menu.connect('open-state-changed', (m, isOpen) => {
+            item.menu.connectObject('open-state-changed', (m, isOpen) => {
                 this._setDimmed(isOpen);
                 this._activeMenu = isOpen ? item.menu : null;
-            });
+            }, this);
         }
     }
 

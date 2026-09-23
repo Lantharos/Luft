@@ -1,137 +1,176 @@
 import Clutter from 'gi://Clutter';
-import Gvc from 'gi://Gvc';
-import NM from 'gi://NM';
+import Shell from 'gi://Shell';
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
 import St from 'gi://St';
-import { Slider } from 'resource:///org/gnome/shell/ui/slider.js';
+import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
 import { blurSurface } from './surface.js';
+import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 
-interface BrightnessScale { value: number; }
-export interface BrightnessManager { globalScale: BrightnessScale | null; }
+interface TrackedIcon extends St.Icon {
+  connectObject(signal: string, callback: () => void, owner: Clutter.Actor): void;
+}
 
 export class QuickSettings {
-  readonly actor: St.BoxLayout;
-  private readonly network = NM.Client.new(null);
-  private readonly mixer = new Gvc.MixerControl({ name: 'Kestrel Volume Control' });
-  private readonly wirelessTitle = new St.Label({ style_class: 'kestrel-control-title' });
-  private readonly wirelessDetail = new St.Label({ style_class: 'kestrel-muted' });
-  private readonly wirelessButton: St.Button;
-  private readonly volume = new Slider(0);
-  private readonly brightnessSlider = new Slider(0);
-  private readonly volumeValue = new St.Label({ style_class: 'kestrel-value' });
-  private readonly brightnessValue = new St.Label({ style_class: 'kestrel-value' });
-  private readonly brightnessRow: St.BoxLayout;
-  private sink: Gvc.MixerStream | null = null;
-  private sinkSignals: number[] = [];
-  private syncing = false;
-  private networkIcon = 'network-wired-symbolic';
-  private volumeIcon = 'audio-volume-muted-symbolic';
+  readonly actor = new St.BoxLayout({
+    name: 'kestrel-quick-settings', orientation: Clutter.Orientation.VERTICAL,
+    style_class: 'kestrel-popover kestrel-quick-settings', visible: false, reactive: true,
+  });
+  private readonly header = new St.BoxLayout({ style_class: 'kestrel-quick-header' });
+  private readonly content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-content' });
+  private readonly tiles = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-tiles' });
+  private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
+  private readonly controls: QuickControl[] = [];
+  private activeMenu: ControlMenu | null = null;
+  private layoutLater = 0;
 
   constructor(
-    private readonly brightness: BrightnessManager,
-    private readonly statusChanged: (network: string, volume: string) => void,
+    private readonly source: QuickSettingsSource,
+    private readonly layoutChanged: () => void,
+    close: () => void,
+    statusChanged: (network: string, volume: string) => void,
   ) {
-    this.actor = new St.BoxLayout({
-      name: 'kestrel-quick-settings',
-      orientation: Clutter.Orientation.VERTICAL,
-      style_class: 'kestrel-popover kestrel-quick-settings',
-      visible: false, reactive: true,
+    blurSurface(this.actor);
+    this.actor.connect('destroy', () => {
+      if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
     });
-    blurSurface(this.actor, 28);
-    this.actor.add_child(new St.Label({ text: 'Quick settings', style_class: 'kestrel-title' }));
-
-    const tile = new St.BoxLayout({ style_class: 'kestrel-network-content', x_expand: true });
-    tile.add_child(new St.Icon({ icon_name: 'network-wireless-symbolic', icon_size: 24, y_align: Clutter.ActorAlign.CENTER }));
-    const networkText = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, style_class: 'kestrel-network-text' });
-    networkText.add_child(this.wirelessTitle);
-    networkText.add_child(this.wirelessDetail);
-    tile.add_child(networkText);
-    this.wirelessButton = new St.Button({ style_class: 'kestrel-network-tile', child: tile, can_focus: true });
-    this.wirelessButton.connect('clicked', () => this.network.wireless_set_enabled(!this.network.wireless_enabled));
-    this.actor.add_child(this.wirelessButton);
-
-    this.actor.add_child(this.control('Volume', 'audio-volume-high-symbolic', this.volume, this.volumeValue));
-    this.brightnessRow = this.control('Brightness', 'display-brightness-symbolic', this.brightnessSlider, this.brightnessValue);
-    this.actor.add_child(this.brightnessRow);
-    this.volume.connect('notify::value', () => {
-      if (this.syncing || !this.sink) return;
-      this.sink.set_volume(Math.round(this.volume.value * this.mixer.get_vol_max_norm()));
-      this.sink.push_volume();
-      if (this.sink.is_muted && this.volume.value > 0) this.sink.change_is_muted(false);
-      this.volumeValue.text = `${Math.round(this.volume.value * 100)}%`;
+    const header = this.header;
+    header.add_child(new St.Label({ text: 'Quick settings', style_class: 'kestrel-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER }));
+    const settings = new St.Button({
+      style_class: 'kestrel-icon-button', accessible_name: 'Settings', can_focus: true,
+      child: new St.Icon({ icon_name: 'emblem-system-symbolic', icon_size: 20 }),
     });
-    this.brightnessSlider.connect('notify::value', () => {
-      if (this.syncing || !this.brightness.globalScale) return;
-      this.brightness.globalScale.value = this.brightnessSlider.value;
-      this.brightnessValue.text = `${Math.round(this.brightnessSlider.value * 100)}%`;
+    settings.connect('clicked', () => {
+      Shell.AppSystem.get_default().lookup_app('org.gnome.Settings.desktop')?.activate();
+      close();
     });
-    this.network.connect('notify::wireless-enabled', () => this.refreshWireless());
-    this.network.connect('notify::primary-connection', () => this.refreshWireless());
-    this.mixer.connect('default-sink-changed', () => this.watchSink());
-    this.mixer.connect('state-changed', () => this.watchSink());
-    this.mixer.open();
-    this.refresh();
+    header.add_child(settings);
+    this.actor.add_child(header);
+    const scroll = new St.ScrollView({
+      height: 0, y_expand: true, x_expand: true,
+      hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
+    });
+    scroll.child = this.content;
+    this.actor.add_child(scroll);
+    this.content.add_child(this.tiles);
+    this.content.add_child(this.selectors);
+    this.content.connect('notify::height', () => this.queueLayout());
+
+    source.ready.then(() => {
+      const indicators = [source._network, source._bluetooth, source._powerProfiles,
+        source._nightLight, source._doNotDisturb];
+      for (const indicator of indicators) {
+        for (const item of indicator?.quickSettingsItems ?? []) {
+          this.adopt(item);
+          this.controls.push(item);
+          item.connect('notify::visible', () => this.arrangeTiles());
+        }
+      }
+      this.arrangeTiles();
+      this.addSlider('Sound output', source._volumeOutput.quickSettingsItems[0]);
+      this.addSlider('Microphone', createInputSlider());
+      this.addSlider('Brightness', source._brightness.quickSettingsItems[0]);
+      const networkIcons = source._network?.get_children() as TrackedIcon[] ?? [];
+      const volumeIcons = source._volumeOutput.get_children() as TrackedIcon[];
+      const updateStatus = () => statusChanged(
+        networkIcons.find(icon => icon.visible)?.icon_name ?? 'network-offline-symbolic',
+        volumeIcons.find(icon => icon.visible)?.icon_name ?? 'audio-volume-muted-symbolic',
+      );
+      for (const icon of [...networkIcons, ...volumeIcons]) {
+        icon.connectObject('notify::icon-name', updateStatus, this.actor);
+        icon.connectObject('notify::visible', updateStatus, this.actor);
+      }
+      updateStatus();
+      this.queueLayout();
+    }).catch(error => console.error('Quick settings could not initialize', error));
   }
 
-  refresh(): void {
-    this.refreshWireless();
-    this.refreshVolume();
-    const scale = this.brightness.globalScale;
-    this.brightnessRow.visible = scale !== null;
-    this.syncing = true;
-    this.brightnessSlider.value = scale?.value ?? 0;
-    this.brightnessValue.text = `${Math.round((scale?.value ?? 0) * 100)}%`;
-    this.syncing = false;
+  private queueLayout(): void {
+    if (this.layoutLater) return;
+    const laters = (global as unknown as Shell.Global).compositor.get_laters();
+    this.layoutLater = laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
+      this.layoutLater = 0;
+      this.layoutChanged();
+      return GLib.SOURCE_REMOVE;
+    });
   }
 
-  private refreshWireless(): void {
-    const enabled = this.network.wireless_enabled;
-    const primary = this.network.primary_connection;
-    this.networkIcon = primary?.get_connection_type() === '802-3-ethernet'
-      ? 'network-wired-symbolic'
-      : primary ? 'network-wireless-signal-excellent-symbolic' : 'network-wireless-offline-symbolic';
-    this.statusChanged(this.networkIcon, this.volumeIcon);
-    this.wirelessTitle.text = 'Wi-Fi';
-    const connection = this.network.active_connections.find(active => active.get_connection_type() === '802-11-wireless');
-    this.wirelessDetail.text = enabled ? connection?.get_id() ?? 'Not connected' : 'Off';
-    if (enabled) this.wirelessButton.add_style_pseudo_class('checked');
-    else this.wirelessButton.remove_style_pseudo_class('checked');
+  preferredHeight(width: number, limit: number): number {
+    return Math.min(limit, this.content.get_preferred_height(width - 48)[1]
+      + this.header.get_preferred_height(width - 48)[1] + 64);
   }
 
-  private watchSink(): void {
-    for (const signal of this.sinkSignals) this.sink?.disconnect(signal);
-    this.sink = this.mixer.get_default_sink();
-    this.sinkSignals = this.sink ? [
-      this.sink.connect('notify::volume', () => this.refreshVolume()),
-      this.sink.connect('notify::is-muted', () => this.refreshVolume()),
-    ] : [];
-    this.refreshVolume();
+  closeSubmenu(): boolean {
+    if (!this.activeMenu) return false;
+    this.activeMenu.close({ animate: false });
+    this.activeMenu = null;
+    return true;
   }
 
-  private refreshVolume(): void {
-    const sink = this.sink;
-    const value = sink && !sink.is_muted ? Math.min(1, sink.volume / this.mixer.get_vol_max_norm()) : 0;
-    this.syncing = true;
-    this.volume.value = value;
-    this.syncing = false;
-    this.volumeValue.text = sink ? `${Math.round(value * 100)}%` : 'Unavailable';
-    this.volume.reactive = sink !== null;
-    this.volumeIcon = value === 0 ? 'audio-volume-muted-symbolic'
-      : value < 0.33 ? 'audio-volume-low-symbolic'
-        : value < 0.67 ? 'audio-volume-medium-symbolic' : 'audio-volume-high-symbolic';
-    this.statusChanged(this.networkIcon, this.volumeIcon);
+  private adopt(item: QuickControl): void {
+    detach(item);
+    if (!item.menu) return;
+    const menu = item.menu;
+    menu.disconnectObject(this.source.menu);
+    detach(menu.actor);
+    menu.actor.clear_constraints();
+    this.selectors.add_child(menu.actor);
+    menu.actor.connect('notify::height', () => this.queueLayout());
+    menu.actor.connect('notify::visible', () => {
+      this.selectors.visible = this.selectors.get_children().some(child => child.visible);
+      this.queueLayout();
+    });
+    menu.connect('open-state-changed', (_menu, open: boolean) => {
+      if (open) {
+        if (this.activeMenu !== menu) this.closeSubmenu();
+        this.activeMenu = menu;
+      } else if (this.activeMenu === menu) {
+        this.activeMenu = null;
+      }
+      this.queueLayout();
+    });
   }
 
-  private control(title: string, icon: string, slider: Slider, value: St.Label): St.BoxLayout {
+  private arrangeTiles(): void {
+    for (const item of this.controls) detach(item);
+    this.tiles.destroy_all_children();
+    const visible = this.controls.filter(item => item.visible);
+    for (let index = 0; index < visible.length; index += 2) {
+      const row = new St.BoxLayout({ style_class: 'kestrel-quick-row' });
+      (row.layout_manager as Clutter.BoxLayout).homogeneous = true;
+      for (const item of visible.slice(index, index + 2)) {
+        item.x_expand = true;
+        row.add_child(item);
+      }
+      if (index + 1 === visible.length) row.add_child(new St.Widget({ x_expand: true }));
+      this.tiles.add_child(row);
+    }
+    this.queueLayout();
+  }
+
+  private addSlider(title: string, item: QuickControl): void {
+    this.adopt(item);
     const section = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-slider-section' });
-    const header = new St.BoxLayout({ style_class: 'kestrel-slider-header' });
-    header.add_child(new St.Icon({ icon_name: icon, icon_size: 16 }));
-    header.add_child(new St.Label({ text: title, x_expand: true }));
-    header.add_child(value);
+    const header = new St.BoxLayout();
+    header.add_child(new St.Label({ text: title, style_class: 'kestrel-section-title', x_expand: true }));
+    if (item.slider) {
+      const slider = item.slider;
+      const value = new St.Label({ style_class: 'kestrel-muted' });
+      const update = () => value.text = `${Math.round(slider.value * 100)}%`;
+      slider.connect('notify::value', update);
+      update();
+      header.add_child(value);
+    }
     section.add_child(header);
-    slider.add_style_class_name('kestrel-slider');
-    slider.accessible_name = title;
-    section.add_child(slider);
-    return section;
+    section.add_child(item);
+    item.slider?.add_style_class_name('kestrel-slider');
+    const sync = () => {
+      section.visible = item.visible;
+      this.queueLayout();
+    };
+    item.connect('notify::visible', sync);
+    this.content.add_child(section);
+    sync();
   }
 }

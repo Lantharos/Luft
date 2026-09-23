@@ -12,6 +12,7 @@ import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
 export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
+  readonly powerButton: St.Button;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly grid = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid' });
   private readonly title = new St.Label({ text: 'All apps', style_class: 'kestrel-section-title' });
@@ -31,9 +32,7 @@ export class StartMenu {
       can_focus: true, x_expand: true,
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
-    this.search.get_clutter_text().set_cursor_visible(false);
     this.search.get_clutter_text().connect('text-changed', () => {
-      this.search.get_clutter_text().set_cursor_visible(this.search.get_text().length > 0);
       this.refreshApps();
     });
     this.search.get_clutter_text().connect('activate', () => {
@@ -67,13 +66,13 @@ export class StartMenu {
       text: GLib.get_real_name() || GLib.get_user_name(), y_align: Clutter.ActorAlign.CENTER,
     }));
     footer.add_child(account);
-    const powerButton = new St.Button({
+    this.powerButton = new St.Button({
       style_class: 'kestrel-icon-button',
       child: new St.Icon({ icon_name: 'system-shutdown-symbolic', icon_size: 18 }),
       accessible_name: 'Power and session', can_focus: true,
     });
-    powerButton.connect('clicked', power);
-    footer.add_child(powerButton);
+    this.powerButton.connect('clicked', power);
+    footer.add_child(this.powerButton);
     this.actor.add_child(footer);
 
     this.appSystem.connect('installed-changed', () => this.loadApps());
@@ -82,7 +81,6 @@ export class StartMenu {
 
   focus(): void {
     this.search.grab_key_focus();
-    this.search.get_clutter_text().set_cursor_visible(this.search.get_text().length > 0);
   }
   clearSearch(): void { this.search.set_text(''); }
 

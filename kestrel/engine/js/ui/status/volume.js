@@ -366,8 +366,9 @@ class OutputStreamSlider extends StreamSlider {
 
 const InputStreamSlider = GObject.registerClass(
 class InputStreamSlider extends StreamSlider {
-    _init(control) {
+    _init(control, showWhenIdle = false) {
         super._init(control);
+        this._showWhenIdle = showWhenIdle;
 
         this.slider.accessible_name = _('Microphone');
 
@@ -427,7 +428,7 @@ class InputStreamSlider extends StreamSlider {
     }
 
     _shouldBeVisible() {
-        return super._shouldBeVisible() && this._showInput;
+        return super._shouldBeVisible() && (this._showWhenIdle || this._showInput);
     }
 });
 
@@ -560,3 +561,14 @@ class InputIndicator extends VolumeIndicator {
         this._input.stream = this._control.get_default_source();
     }
 });
+
+export function createInputSlider() {
+    const control = getMixerControl();
+    const slider = new InputStreamSlider(control, true);
+    const update = () => {
+        slider.stream = control.get_default_source();
+    };
+    control.connectObject('state-changed', update, 'default-source-changed', update, slider);
+    update();
+    return slider;
+}

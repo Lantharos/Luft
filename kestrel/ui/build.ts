@@ -11,6 +11,7 @@ await build({
   entryPoints: [join(import.meta.dir, 'src', 'kestrelUi.ts')],
   outfile: output,
   bundle: true,
+  loader: { '.svg': 'text' },
   format: 'esm',
   platform: 'neutral',
   target: 'es2022',

@@ -283,7 +283,9 @@ async function _initializeUI() {
 
     layoutManager.init();
     overview.init();
-    KestrelUi.initialize({layoutManager, messageTray, brightnessManager});
+    const quickSettings = new Panel.QuickSettings();
+    panel.addToStatusArea('quickSettings', quickSettings);
+    KestrelUi.initialize({layoutManager, messageTray, quickSettings});
 
     new PointerA11yTimeout.PointerA11yTimeout();
 

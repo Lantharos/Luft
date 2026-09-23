@@ -6,15 +6,16 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 
 - The engine and TypeScript UI compile against Fedora's GNOME 51 stack.
 - The development launcher supports a visible nested session and isolated captures at 1280×800 and 1440×900.
-- The square, transparent 48px panel reserves the bottom edge. Its launcher and favorite/running apps stay centered against the monitor while live network, volume, and stacked date/time indicators sit on the right.
+- The square, transparent 48px panel reserves the bottom edge. Its launcher and favorite/running apps stay centered against the monitor while live network, volume, and right-aligned, stacked date/time indicators sit on the right.
 - Start lists installed applications, filters them by name, and launches the selected app.
-- Quick settings expose Wi-Fi and volume/brightness sliders where the respective service or hardware is available.
+- Quick Settings provides network and Bluetooth controls, device selection for audio output and microphone input, brightness, Do Not Disturb, Night Light, power profiles, and a Settings shortcut. Controls follow the available hardware and services. Device selectors share the scrollable glass surface, with one selector open at a time. The microphone control remains available when a microphone is present, even without an active recording.
 - The notification center displays the existing message tray sources and can clear them.
 - The power menu opens above the Start footer, keeps Start visible, and delegates lock, suspend, log out, restart, and power off to the existing session action backend.
 - Backdrop capture updates only freshly painted regions in a separate cache for each display view. Partial damage schedules a repaint of the affected surface, and offscreen capture is clipped to valid pixels. Settled surfaces do not continuously redraw.
 - Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel and menu blur share the same brightness without a tint overlay. The panel has square corners.
 - Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with separate dots for running apps.
-- Menus slide from below the monitor and return fully offscreen on close. Interrupted transitions reverse from their current position.
+- Main surfaces slide in over 300 ms and out over 230 ms. Power options reveal from the Start footer button over 200 ms and retract over 160 ms. Interrupted transitions reverse from their current position.
+- The launcher uses the original two-part Luft mark with its opposing hover motion. Search retains its native blinking caret; running dots sit in a separate space beneath app icons.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
 
 ## Work before a Luft session

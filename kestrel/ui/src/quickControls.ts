@@ -4,12 +4,14 @@ import St from 'gi://St';
 export interface ControlMenu {
   actor: St.Widget;
   isOpen: boolean;
+  open(): void;
   connect(signal: string, callback: (menu: ControlMenu, open: boolean) => void): number;
   disconnectObject(object: object): void;
   close(params?: { animate: boolean }): void;
 }
 
 export interface QuickControl extends St.Button {
+  subtitle: string | null;
   menu?: ControlMenu;
   _menuManager?: { removeMenu(menu: ControlMenu): void };
   slider?: St.Widget & { value: number };

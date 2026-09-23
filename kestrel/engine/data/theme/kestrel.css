@@ -13,6 +13,7 @@
 .kestrel-status-icons { spacing: 12px; }
 
 .kestrel-task-button {
+  box-shadow: none;
   padding: 0;
   border: none;
   border-radius: 12px;
@@ -96,24 +97,7 @@
 .kestrel-quick-content { spacing: 18px; }
 .kestrel-quick-tiles { spacing: 8px; }
 .kestrel-quick-row { spacing: 8px; }
-.kestrel-slider-section { spacing: 4px; }
-.kestrel-quick-settings .quick-toggle,
-.kestrel-quick-settings .quick-toggle-has-menu {
-  min-width: 0; max-width: 1000px; min-height: 56px;
-  border-radius: 14px; color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.07);
-  border: none; box-shadow: none;
-}
-.kestrel-quick-settings .quick-toggle:hover,
-.kestrel-quick-settings .quick-toggle-menu-button:hover { background-color: rgba(255, 255, 255, 0.14); }
-.kestrel-quick-settings .quick-toggle:checked,
-.kestrel-quick-settings .quick-toggle-menu-button:checked { background-color: rgba(255, 255, 255, 0.20); color: #ffffff; }
-.kestrel-quick-settings .quick-toggle-has-menu .quick-toggle { border-radius: 14px 0 0 14px; }
-.kestrel-quick-settings .quick-toggle-menu-button { border-radius: 0 14px 14px 0; padding: 8px; background-color: transparent; color: #ffffff; }
-.kestrel-quick-settings .quick-toggle > StBoxLayout { padding: 10px; spacing: 10px; }
-.kestrel-quick-settings .quick-toggle-title { font-size: 12px; }
-.kestrel-quick-settings .quick-toggle-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
-.kestrel-quick-settings .quick-toggle-icon { icon-size: 18px; }
+.kestrel-slider-section { padding: 12px 0 0; spacing: 6px; }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
 .kestrel-quick-settings .quick-slider { padding: 0; }
@@ -152,16 +136,8 @@
 .kestrel-text-button:focus,
 .kestrel-power-action:focus { background-color: rgba(255, 255, 255, 0.17); }
 
-.kestrel-quick-settings .quick-toggle-separator { background-color: rgba(255, 255, 255, 0.12); width: 1px; }
-
 .kestrel-app-slots { spacing: 0; }
 .kestrel-page-navigation { spacing: 8px; font-size: 12px; }
-.kestrel-quick-settings .quick-toggle:checked:hover,
-.kestrel-quick-settings .quick-toggle-menu-button:checked:hover { background-color: rgba(255, 255, 255, 0.30); }
-.kestrel-quick-settings .quick-toggle:focus,
-.kestrel-quick-settings .quick-toggle-menu-button:focus { background-color: rgba(255, 255, 255, 0.24); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
-.kestrel-quick-settings .quick-toggle:active,
-.kestrel-quick-settings .quick-toggle-menu-button:active { background-color: rgba(255, 255, 255, 0.36); }
 .kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: 120ms; }
 .kestrel-quick-settings .popup-menu-item:hover,
 .kestrel-quick-settings .popup-menu-item:focus,
@@ -178,3 +154,19 @@
 }
 .kestrel-app-scroll .vhandle:hover { background-color: rgba(255, 255, 255, 0.40); }
 .kestrel-app-scroll .vhandle:active { background-color: rgba(255, 255, 255, 0.55); }
+
+.kestrel-task-button:hover, .kestrel-task-button:active, .kestrel-task-button:focus { box-shadow: none; }
+.kestrel-control {
+  padding: 14px; border: none; border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.07); color: white; box-shadow: none;
+  transition-duration: 140ms; min-width: 0;
+}
+.kestrel-control:checked { background-color: rgba(255, 255, 255, 0.17); }
+.kestrel-control:hover { background-color: rgba(255, 255, 255, 0.23); }
+.kestrel-control:active { background-color: rgba(255, 255, 255, 0.29); }
+.kestrel-control:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.kestrel-control-body { spacing: 3px; }
+.kestrel-control-title { font-size: 13px; font-weight: 600; }
+.kestrel-control-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
+.kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
+.kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }

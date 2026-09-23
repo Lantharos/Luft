@@ -129,6 +129,24 @@ export async function run() {
   await pause(450);
   await capture(`${output}/quick-settings.png`);
   const quick = actorNamed(global.stage, 'kestrel-quick-settings');
+  const findToggle = actor => actor.title === 'Do Not Disturb' ? actor : actor.get_children().map(findToggle).find(Boolean);
+  const quiet = findToggle(quick);
+  if (quiet?.is_mapped()) {
+    const initial = quiet.checked;
+    const [x, y] = quiet.get_transformed_position();
+    const clickQuiet = () => {
+      pointer.notify_absolute_motion(GLib.get_monotonic_time(), x + quiet.width / 2, y + quiet.height / 2);
+      pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
+      pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
+    };
+    clickQuiet();
+    await pause(150);
+    console.log(`Kestrel DND pointer toggle: ${initial} -> ${quiet.checked}`);
+    clickQuiet();
+    await pause(150);
+    console.log(`Kestrel DND restored: ${quiet.checked === initial}`);
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);
+  }
   const nextPage = actorNamed(quick, 'Next page');
   if (nextPage?.is_mapped() && nextPage.reactive) {
     nextPage.emit('clicked', Clutter.BUTTON_PRIMARY);

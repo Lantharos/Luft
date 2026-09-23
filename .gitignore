@@ -1,3 +1,5 @@
 /kestrel/build/
 /kestrel/install/
 /kestrel/ui/node_modules/
+
+/kestrel/run/

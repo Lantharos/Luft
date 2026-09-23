@@ -1,148 +1,135 @@
 .kestrel-panel {
-  background-color: rgba(18, 21, 28, 0.74);
-  color: #f4f5f7;
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
   font-family: "Adwaita Sans";
-  padding: 0 18px;
-  border-radius: 17px 17px 0 0;
 }
 
-.kestrel-panel-center {
-  spacing: 5px;
+.kestrel-taskbar { spacing: 0; }
+.kestrel-panel-status { spacing: 2px; }
+.kestrel-status-icons { spacing: 12px; }
+
+.kestrel-task-button {
+  padding: 0;
+  border: 0 solid transparent;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  transition-duration: 160ms;
 }
 
-.kestrel-panel-right {
-  spacing: 7px;
+.kestrel-task-button:hover,
+.kestrel-status-button:hover,
+.kestrel-icon-button:hover,
+.kestrel-text-button:hover,
+.kestrel-power-action:hover {
+  background-color: rgba(255, 255, 255, 0.10);
 }
 
-.kestrel-panel-button {
-  border-radius: 12px;
-  padding: 9px;
-  min-width: 24px;
-  min-height: 24px;
+.kestrel-task-button.running { border-bottom-color: rgba(255, 255, 255, 0.5); }
+.kestrel-task-button:active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-bottom-color: #ffffff;
 }
 
-.kestrel-panel-button:hover,
-.kestrel-panel-button:focus {
-  background-color: rgba(255, 255, 255, 0.13);
+.kestrel-status-button {
+  padding: 0 8px;
+  height: 40px;
+  border-radius: 4px;
+  transition-duration: 160ms;
 }
-
-.kestrel-panel-button-active {
-  background-color: rgba(255, 255, 255, 0.18);
-}
-
-.kestrel-panel-clock {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 8px;
-}
+.kestrel-status-button:active { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-clock { font-size: 12px; font-weight: 500; }
 
 .kestrel-popover {
-  background-color: rgba(23, 27, 35, 0.82);
-  color: #f3f5f8;
+  background-color: rgba(0, 0, 0, 0.14);
+  color: #ffffff;
   font-family: "Adwaita Sans";
   border-radius: 20px;
+  border: none;
   padding: 24px;
-  spacing: 18px;
+  spacing: 20px;
 }
 
-.kestrel-title {
-  font-size: 21px;
-  font-weight: 700;
-}
-
-.kestrel-section-title {
-  font-size: 14px;
-  font-weight: 650;
-}
+.kestrel-title { font-size: 18px; font-weight: 600; }
+.kestrel-section-title { font-size: 13px; font-weight: 600; }
+.kestrel-start .kestrel-section-title { padding: 0 10px; }
+.kestrel-start { spacing: 18px; }
 
 .kestrel-search {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 11px;
-  padding: 11px 14px;
+  color: #ffffff;
+  selection-background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.20);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 12px 14px;
   font-size: 14px;
 }
-
-.kestrel-app-grid {
-  spacing: 10px;
+.kestrel-search:focus {
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: none;
 }
+.kestrel-search StIcon { color: rgba(255, 255, 255, 0.7); padding-right: 8px; }
+.kestrel-search StLabel.hint-text { color: rgba(255, 255, 255, 0.65); }
 
-.kestrel-app-row {
-  spacing: 8px;
-}
-
-.kestrel-app-button {
-  border-radius: 12px;
-  padding: 12px 5px;
-  min-width: 85px;
-}
-
+.kestrel-app-grid { spacing: 4px; }
+.kestrel-app-row { spacing: 8px; }
+.kestrel-app-content { spacing: 9px; }
+.kestrel-app-button { border-radius: 10px; padding: 12px 0; height: 66px; }
 .kestrel-app-button:hover,
-.kestrel-app-button:focus {
-  background-color: rgba(255, 255, 255, 0.12);
-}
+.kestrel-app-button:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-app-button:active { background-color: rgba(255, 255, 255, 0.20); }
+.kestrel-app-label { font-size: 11px; max-width: 88px; text-align: center; }
 
-.kestrel-app-label {
-  font-size: 11px;
-  max-width: 82px;
-  text-align: center;
-}
+.kestrel-footer { padding: 14px 0 0; spacing: 12px; }
+.kestrel-account { spacing: 12px; font-size: 13px; }
+.kestrel-icon-button { padding: 11px; border-radius: 10px; }
+.kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }
 
-.kestrel-footer {
-  spacing: 10px;
-  padding-top: 12px;
+.kestrel-quick-settings { border-radius: 28px; spacing: 24px; }
+.kestrel-network-tile {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px;
 }
-
-.kestrel-control-row {
-  spacing: 12px;
-  padding: 6px 0;
+.kestrel-network-tile:checked { background-color: rgba(255, 255, 255, 0.17); }
+.kestrel-network-tile:hover { background-color: rgba(255, 255, 255, 0.23); }
+.kestrel-network-content { spacing: 16px; }
+.kestrel-network-text { spacing: 4px; }
+.kestrel-control-title { font-size: 14px; font-weight: 600; }
+.kestrel-slider-section { spacing: 8px; }
+.kestrel-slider-header { spacing: 10px; font-size: 13px; }
+.kestrel-value { font-size: 12px; color: rgba(255, 255, 255, 0.7); min-width: 38px; text-align: right; }
+.kestrel-slider {
+  height: 22px;
+  color: #ffffff;
+  -slider-handle-radius: 6px;
+  -barlevel-height: 4px;
+  -barlevel-background-color: rgba(255, 255, 255, 0.18);
+  -barlevel-active-background-color: #ffffff;
+  -barlevel-border-width: 0;
+  -barlevel-active-border-color: transparent;
+  -barlevel-border-color: transparent;
 }
-
-.kestrel-control-row .kestrel-muted {
-  width: 170px;
-}
-
-.kestrel-notification-list {
-  spacing: 10px;
-}
-
-.kestrel-action {
-  border-radius: 10px;
-  padding: 10px 12px;
-  background-color: rgba(255, 255, 255, 0.09);
-}
-
-.kestrel-action:hover,
-.kestrel-action:focus {
-  background-color: rgba(255, 255, 255, 0.16);
-}
-
+.kestrel-notification-header { spacing: 12px; }
+.kestrel-notification-list { spacing: 8px; }
 .kestrel-notification {
-  background-color: rgba(255, 255, 255, 0.09);
+  background-color: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 12px;
-  spacing: 5px;
+  padding: 14px;
+  spacing: 7px;
 }
+.kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
+.kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 48px 12px; text-align: center; }
 
-.kestrel-muted {
-  color: #b2bac6;
-  font-size: 12px;
-}
+.kestrel-power-menu { spacing: 2px; padding: 8px; }
+.kestrel-power-action { padding: 12px; border-radius: 12px; }
+.kestrel-power-row { spacing: 14px; font-size: 13px; }
 
-.kestrel-power-menu {
-  spacing: 3px;
-  padding: 12px;
-}
-
-.kestrel-power-action {
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.kestrel-power-action:hover,
-.kestrel-power-action:focus {
-  background-color: rgba(255, 255, 255, 0.13);
-}
-
-.kestrel-power-row {
-  spacing: 12px;
-}
+.kestrel-task-button:focus,
+.kestrel-status-button:focus,
+.kestrel-icon-button:focus,
+.kestrel-text-button:focus,
+.kestrel-power-action:focus { background-color: rgba(255, 255, 255, 0.17); }

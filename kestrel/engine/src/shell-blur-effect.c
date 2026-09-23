@@ -45,10 +45,20 @@
  */
 
 static const gchar *brightness_glsl_declarations =
-"uniform float brightness;                                                 \n";
+"uniform float brightness;                                                 \n"
+"uniform vec2 surface_size;                                                \n"
+"uniform float corner_radius;                                              \n";
 
 static const gchar *brightness_glsl =
-"  cogl_color_out.rgb *= brightness;                                       \n";
+"  cogl_color_out.rgb *= brightness;                                       \n"
+"  if (corner_radius > 0.0) {                                              \n"
+"    vec2 half_size = surface_size * 0.5;                                  \n"
+"    float r = min(corner_radius, min(half_size.x, half_size.y));            \n"
+"    vec2 p = abs(cogl_tex_coord_in[0].xy * surface_size - half_size);       \n"
+"    vec2 q = p - half_size + vec2(r);                                      \n"
+"    float d = length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - r;     \n"
+"    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d);                      \n"
+"  }                                                                      \n";
 
 #define MIN_DOWNSCALE_SIZE 256.f
 #define MAX_RADIUS 12.f
@@ -82,6 +92,9 @@ struct _ShellBlurEffect
   FramebufferData background_fb;
   FramebufferData brightness_fb;
   int brightness_uniform;
+  int surface_size_uniform;
+  int corner_radius_uniform;
+  float corner_radius;
 
   ShellBlurMode mode;
   float downscale_factor;
@@ -95,6 +108,7 @@ enum {
   PROP_0,
   PROP_RADIUS,
   PROP_BRIGHTNESS,
+  PROP_CORNER_RADIUS,
   PROP_MODE,
   N_PROPS
 };
@@ -157,6 +171,13 @@ update_brightness (ShellBlurEffect *self,
                    uint8_t          paint_opacity)
 {
   CoglColor color;
+  float size[2];
+
+  clutter_actor_get_size (self->actor, &size[0], &size[1]);
+  cogl_pipeline_set_uniform_float (self->brightness_fb.pipeline,
+                                  self->surface_size_uniform, 2, 1, size);
+  cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
+                               self->corner_radius_uniform, self->corner_radius);
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -735,6 +756,10 @@ shell_blur_effect_get_property (GObject    *object,
       g_value_set_float (value, self->brightness);
       break;
 
+    case PROP_CORNER_RADIUS:
+      g_value_set_float (value, self->corner_radius);
+      break;
+
     case PROP_MODE:
       g_value_set_enum (value, self->mode);
       break;
@@ -760,6 +785,16 @@ shell_blur_effect_set_property (GObject      *object,
 
     case PROP_BRIGHTNESS:
       shell_blur_effect_set_brightness (self, g_value_get_float (value));
+      break;
+
+    case PROP_CORNER_RADIUS:
+      if (self->corner_radius != g_value_get_float (value))
+        {
+          self->corner_radius = g_value_get_float (value);
+          if (self->actor)
+            clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
+          g_object_notify_by_pspec (object, properties[PROP_CORNER_RADIUS]);
+        }
       break;
 
     case PROP_MODE:
@@ -796,6 +831,11 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
                         0.f, 1.f, 1.f,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
+  properties[PROP_CORNER_RADIUS] =
+    g_param_spec_float ("corner-radius", NULL, NULL,
+                        0.f, G_MAXFLOAT, 0.f,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+
   properties[PROP_MODE] =
     g_param_spec_enum ("mode", NULL, NULL,
                        SHELL_TYPE_BLUR_MODE,
@@ -817,6 +857,10 @@ shell_blur_effect_init (ShellBlurEffect *self)
   self->brightness_fb.pipeline = create_brightness_pipeline ();
   self->brightness_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "brightness");
+  self->surface_size_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_size");
+  self->corner_radius_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "corner_radius");
 }
 
 ShellBlurEffect *

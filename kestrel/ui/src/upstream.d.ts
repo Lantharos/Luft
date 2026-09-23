@@ -9,3 +9,11 @@ declare module 'resource:///org/gnome/shell/misc/systemActions.js' {
 
   export function getDefault(): Actions;
 }
+
+declare module 'resource:///org/gnome/shell/ui/slider.js' {
+  import St from 'gi://St';
+  export class Slider extends St.DrawingArea {
+    constructor(value: number);
+    value: number;
+  }
+}

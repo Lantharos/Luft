@@ -112,16 +112,6 @@
         profile.
       </description>
     </key>
-    <key name="welcome-dialog-last-shown-version" type="s">
-      <default>''</default>
-      <summary>The last version the “Welcome to GNOME” dialog was shown for</summary>
-      <description>
-        This key determines for which version the “Welcome to GNOME” dialog was
-        last shown. An empty string represents the oldest possible version, and
-        a huge number will represent versions that do not exist yet. This huge
-        number can be used to effectively disable the dialog.
-      </description>
-    </key>
     <key name="app-picker-layout" type="aa{sv}">
       <default><![CDATA[
         @APP_GRID_APPS@
@@ -138,8 +128,6 @@
     <child name="keybindings" schema="org.gnome.shell.keybindings"/>
     <child name="app-switcher" schema="org.gnome.shell.app-switcher"/>
     <child name="window-switcher" schema="org.gnome.shell.window-switcher"/>
-    <child name="world-clocks" schema="org.gnome.shell.world-clocks"/>
-    <child name="weather" schema="org.gnome.shell.weather"/>
   </schema>
 
   <schema id="org.gnome.shell.keybindings" path="/org/gnome/shell/keybindings/"
@@ -316,33 +304,5 @@
     </key>
   </schema>
 
-  <schema id="org.gnome.shell.world-clocks" path="/org/gnome/shell/world-clocks/"
-          gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="locations" type="av">
-      <summary>Locations</summary>
-      <description>
-        The locations to show in world clocks
-      </description>
-      <default>[]</default>
-    </key>
-  </schema>
 
-  <schema id="org.gnome.shell.weather" path="/org/gnome/shell/weather/"
-          gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="automatic-location" type="b">
-      <summary>Automatic location</summary>
-      <description>
-        Whether to fetch the current location or not
-      </description>
-      <default>false</default>
-    </key>
-
-    <key name="locations" type="av">
-      <summary>Location</summary>
-      <description>
-        The location for which to show a forecast
-      </description>
-      <default>[]</default>
-    </key>
-  </schema>
 </schemalist>

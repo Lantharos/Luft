@@ -137,10 +137,10 @@ export class QuickSettings {
     };
     enableHover(item);
     detach(item);
+    if (item.show_on_set_parent) item.show();
     if (!item.menu) return;
     const menu = item.menu;
     item._menuManager?.removeMenu(menu);
-    menu.disconnectObject(this.source.menu);
     detach(menu.actor);
     menu.actor.clear_constraints();
     this.selectors.add_child(menu.actor);

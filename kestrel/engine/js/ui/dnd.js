@@ -114,6 +114,14 @@ class _Draggable extends Signals.EventEmitter {
         this._dragCancellable = true;
     }
 
+    get enabled() {
+        return this._dndGesture.enabled;
+    }
+
+    set enabled(enabled) {
+        this._dndGesture.enabled = enabled;
+    }
+
     _grabEvents(sprite) {
         const grab = Main.pushModal(_getEventHandlerActor(), {dismissShell: false});
         this._grab = grab;

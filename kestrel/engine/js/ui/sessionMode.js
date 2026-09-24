@@ -25,8 +25,6 @@ const _modes = {
         colorScheme: 'prefer-dark',
         themeResourceName: 'gnome-shell-theme.gresource',
         hasOverview: false,
-        showCalendarEvents: false,
-        showWelcomeDialog: false,
         allowSettings: false,
         allowScreencast: false,
         enabledExtensions: [],
@@ -58,7 +56,7 @@ const _modes = {
             : ['polkitAgent'],
         panel: {
             left: [],
-            center: ['dateMenu'],
+            center: ['clock'],
             right: ['dwellClick', 'keyboard', 'quickSettings'],
         },
         panelStyle: 'login-screen',
@@ -80,8 +78,6 @@ const _modes = {
 
     'user': {
         hasOverview: false,
-        showCalendarEvents: false,
-        showWelcomeDialog: false,
         allowSettings: true,
         allowScreencast: true,
         hasRunDialog: false,

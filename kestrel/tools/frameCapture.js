@@ -6,6 +6,9 @@ export async function captureRenderedFrames(path, action) {
   let snapshot = null;
   let texture = null;
   const signal = global.stage.connect('after-paint', (_stage, view) => {
+    const layout = view.layout;
+    const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+    if (layout.x !== monitor.x || layout.y !== monitor.y) return;
     const framebuffer = view.get_framebuffer();
     const width = framebuffer.get_width();
     const height = framebuffer.get_height();

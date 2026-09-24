@@ -91,6 +91,7 @@ struct _ShellBlurEffect
   CacheFlags cache_flags;
 
   GHashTable *backdrops;
+  CoglPipeline *last_backdrop;
   FramebufferData brightness_fb;
   int brightness_uniform;
   int surface_size_uniform;
@@ -281,6 +282,8 @@ update_brightness_fbo (ShellBlurEffect *self,
       return TRUE;
     }
 
+  self->cache_flags &= ~BLUR_APPLIED;
+
   return update_fbo (&self->brightness_fb,
                      width, height,
                      downscale_factor);
@@ -334,6 +337,7 @@ shell_blur_effect_set_actor (ClutterActorMeta *meta,
   /* clear out the previous state */
   clear_framebuffer_data (&self->actor_fb);
   g_hash_table_remove_all (self->backdrops);
+  g_clear_object (&self->last_backdrop);
   clear_framebuffer_data (&self->brightness_fb);
 
   /* we keep a back pointer here, to avoid going through the ActorMeta */
@@ -459,11 +463,8 @@ create_blur_nodes (ShellBlurEffect  *self,
 static void
 paint_background (ShellBlurEffect     *self,
                   ClutterPaintNode    *node,
-                  ClutterPaintContext *paint_context,
-                  ClutterActorBox     *source_actor_box)
+                  CoglPipeline        *pipeline)
 {
-  CoglPipeline *pipeline = shell_backdrop_capture (self->backdrops, self->actor,
-                                                 paint_context, source_actor_box);
   g_autoptr (ClutterPaintNode) background_node = clutter_pipeline_node_new (pipeline);
 
   clutter_paint_node_set_static_name (background_node, "ShellBlurEffect (backdrop)");
@@ -488,9 +489,13 @@ update_framebuffers (ShellBlurEffect     *self,
 
   clutter_actor_box_get_size (source_actor_box, &width, &height);
 
+  if (width <= 0 || height <= 0)
+    return FALSE;
+
   downscale_factor = calculate_downscale_factor (width, height, self->radius);
 
-  updated = update_actor_fbo (self, width, height, downscale_factor) &&
+  updated = (self->mode != SHELL_BLUR_MODE_ACTOR ||
+             update_actor_fbo (self, width, height, downscale_factor)) &&
             update_brightness_fbo (self, width, height, downscale_factor);
 
   self->tex_width = width;
@@ -572,7 +577,8 @@ paint_actor_offscreen (ShellBlurEffect         *self,
 
 static gboolean
 needs_repaint (ShellBlurEffect         *self,
-               ClutterEffectPaintFlags  flags)
+               ClutterEffectPaintFlags  flags,
+               gboolean                 background_changed)
 {
   gboolean actor_cached;
   gboolean blur_cached;
@@ -588,7 +594,7 @@ needs_repaint (ShellBlurEffect         *self,
       return actor_dirty || !blur_cached || !actor_cached;
 
     case SHELL_BLUR_MODE_BACKGROUND:
-      return TRUE;
+      return background_changed || !blur_cached;
     }
 
   return TRUE;
@@ -624,18 +630,25 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
           break;
         }
 
-      if (needs_repaint (self, flags))
+      CoglPipeline *backdrop = NULL;
+      ClutterActorBox source_actor_box;
+      gboolean background_changed = FALSE;
+
+      update_actor_box (self, paint_context, &source_actor_box);
+      if (!update_framebuffers (self, paint_context, &source_actor_box))
+        goto fail;
+
+      if (self->mode == SHELL_BLUR_MODE_BACKGROUND)
         {
-          ClutterActorBox source_actor_box;
+          backdrop = shell_backdrop_capture (self->backdrops, self->actor,
+                                             paint_context, &source_actor_box,
+                                             &background_changed);
+          background_changed |= backdrop != self->last_backdrop;
+          g_set_object (&self->last_backdrop, backdrop);
+        }
 
-          update_actor_box (self, paint_context, &source_actor_box);
-
-          /* Failing to create or update the offscreen framebuffers prevents
-           * the entire effect to be applied.
-           */
-          if (!update_framebuffers (self, paint_context, &source_actor_box))
-            goto fail;
-
+      if (needs_repaint (self, flags, background_changed))
+        {
           blur_node = create_blur_nodes (self, node, paint_opacity);
 
           switch (self->mode)
@@ -645,7 +658,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
               break;
 
             case SHELL_BLUR_MODE_BACKGROUND:
-              paint_background (self, blur_node, paint_context, &source_actor_box);
+              paint_background (self, blur_node, backdrop);
               break;
             }
         }
@@ -685,6 +698,7 @@ shell_blur_effect_finalize (GObject *object)
 
   clear_framebuffer_data (&self->actor_fb);
   g_hash_table_remove_all (self->backdrops);
+  g_clear_object (&self->last_backdrop);
   clear_framebuffer_data (&self->brightness_fb);
 
   g_clear_object (&self->actor_fb.pipeline);
@@ -901,11 +915,11 @@ shell_blur_effect_set_mode (ShellBlurEffect *self,
     {
     case SHELL_BLUR_MODE_ACTOR:
       g_hash_table_remove_all (self->backdrops);
+      g_clear_object (&self->last_backdrop);
       break;
 
     case SHELL_BLUR_MODE_BACKGROUND:
-    default:
-      /* Do nothing */
+      clear_framebuffer_data (&self->actor_fb);
       break;
     }
 

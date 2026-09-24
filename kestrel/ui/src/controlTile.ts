@@ -9,7 +9,7 @@ export function styleControl(item: QuickControl): void {
   const top = new St.BoxLayout({ x_expand: true });
   const icon = new St.Icon({ icon_size: 22, x_expand: true, x_align: Clutter.ActorAlign.START });
   item.bind_property('gicon', icon, 'gicon', GObject.BindingFlags.SYNC_CREATE);
-  item.bind_property('icon-name', icon, 'icon-name', GObject.BindingFlags.DEFAULT);
+  item.bind_property('icon-name', icon, 'icon-name', item.icon_name ? GObject.BindingFlags.SYNC_CREATE : GObject.BindingFlags.DEFAULT);
   top.add_child(icon);
   if (item.menu) {
     const more = new St.Button({

@@ -105,6 +105,9 @@ export class ContextMenus {
     for (const entry of entries) {
       const button = new St.Button({ style_class: 'kestrel-context-action', accessible_name: entry.label, can_focus: entry.enabled !== false, reactive: entry.enabled !== false, opacity: entry.enabled === false ? 110 : 255, track_hover: true, x_expand: true,
         child: new St.Label({ text: entry.label, x_expand: true, x_align: Clutter.ActorAlign.START }) });
+      button.connect('notify::hover', () => {
+        if (button.hover && this.source && !this.clearSelection) button.grab_key_focus();
+      });
       button.connect('clicked', () => { this.close(); entry.run(); });
       content.add_child(button);
     }

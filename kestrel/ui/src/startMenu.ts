@@ -15,9 +15,10 @@ export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
   readonly powerButton: St.Button;
+  private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly grid = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid' });
-  private readonly title = new St.Label({ text: 'All apps', style_class: 'kestrel-section-title' });
+  private readonly title = new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' });
   private scroller: St.ScrollView;
   private apps: Gio.AppInfo[] = [];
   private matches: Gio.AppInfo[] = [];
@@ -97,7 +98,12 @@ export class StartMenu {
     footer.add_child(this.powerButton);
     this.actor.add_child(footer);
 
-    this.appSystem.connect('installed-changed', () => this.loadApps());
+    const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
+    const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => this.refreshApps());
+    this.actor.connect('destroy', () => {
+      this.appSystem.disconnect(installedChanged);
+      this.favorites.disconnect(favoritesChanged);
+    });
     this.loadApps();
     menus.bind(this.actor, () => [
       { label: 'Refresh apps', run: () => this.loadApps() },
@@ -121,8 +127,11 @@ export class StartMenu {
   private refreshApps(): void {
     this.grid.destroy_all_children();
     const query = this.search.get_text().trim().toLocaleLowerCase();
-    this.matches = this.apps.filter(app => !query || app.get_display_name().toLocaleLowerCase().includes(query));
-    this.title.text = query ? 'Search results' : 'All apps';
+    const pinned = new Set(this.favorites.get_strv('favorite-apps'));
+    this.matches = this.apps.filter(app => query
+      ? app.get_display_name().toLocaleLowerCase().includes(query)
+      : !pinned.has(app.get_id() ?? ''));
+    this.title.text = query ? 'Search results' : 'Apps';
     if (!this.matches.length) {
       this.grid.add_child(new St.Label({ text: 'No apps found', style_class: 'kestrel-empty' }));
       return;

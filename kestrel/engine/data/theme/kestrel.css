@@ -29,8 +29,8 @@
 }
 
 .kestrel-running-dot { width: 3px; height: 3px; margin: 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
-.kestrel-task-button:active .kestrel-running-dot { background-color: #ffffff; }
-.kestrel-task-button:active {
+.kestrel-app-focused .kestrel-running-dot { background-color: #ffffff; }
+.kestrel-task-button:active, .kestrel-app-focused {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -278,3 +278,6 @@ StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(
 .screenshot-ui-show-pointer-button:checked { background-color: rgba(255, 255, 255, 0.22); color: white; }
 .screenshot-ui-shot-cast-button:checked { color: white; }
 .screenshot-ui-window-selector { background-color: rgba(20, 20, 24, 0.20); }
+
+.kestrel-task-button StIcon { icon-shadow: none; }
+.workspace-animation { background-color: transparent; }

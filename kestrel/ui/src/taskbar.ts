@@ -11,8 +11,9 @@ interface AppItem {
   icon: St.Bin;
   slot: St.Widget;
   button: St.Button;
-  dot: St.Widget;
+  dots: St.Widget[];
   removing: boolean;
+  windowsChanged: number;
 }
 
 export class Taskbar {
@@ -51,14 +52,17 @@ export class Taskbar {
         }
       }
       if (item.app !== app) {
+        item.app.disconnect(item.windowsChanged);
         item.app = app;
+        const currentItem = item;
+        item.windowsChanged = app.connect('windows-changed', () => this.updateDots(currentItem));
         item.icon.child = app.create_icon_texture(PANEL_ICON_SIZE);
       }
       item.button.accessible_name = app.get_name();
       item.removing = false;
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
-      item.dot.visible = app.state === Shell.AppState.RUNNING;
+      this.updateDots(item);
       animateActor(item.slot, { width: 42, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
       animateActor(item.button, { opacity: 255, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     });
@@ -68,9 +72,17 @@ export class Taskbar {
 
   updateFocus(): void {
     for (const [id, item] of this.items) {
-      if (id === this.tracker.focus_app?.id) item.button.add_style_pseudo_class('active');
-      else item.button.remove_style_pseudo_class('active');
+      if (id === this.tracker.focus_app?.id) item.button.add_style_class_name('kestrel-app-focused');
+      else item.button.remove_style_class_name('kestrel-app-focused');
     }
+  }
+
+  private updateDots(item: AppItem): void {
+    const count = Math.min(4, item.app.get_windows().filter(window => !window.skip_taskbar).length);
+    item.dots.forEach((dot, index) => {
+      dot.visible = index < count;
+      dot.x = (40 - (count * 3 + (count - 1) * 3)) / 2 + index * 6;
+    });
   }
 
   private create(app: Shell.App): AppItem {
@@ -78,18 +90,20 @@ export class Taskbar {
     icon.set_position((40 - PANEL_ICON_SIZE) / 2, 5);
     const content = new St.Widget({ width: 40, height: 40 });
     content.add_child(icon);
-    const dot = new St.Widget({
-      style_class: 'kestrel-running-dot',
-      x: 18.5, y: 36, width: 3, height: 3,
+    const dots = Array.from({ length: 4 }, () => {
+      const dot = new St.Widget({ style_class: 'kestrel-running-dot', y: 36, width: 3, height: 3, visible: false });
+      content.add_child(dot);
+      return dot;
     });
-    content.add_child(dot);
     const button = new St.Button({
       name: `kestrel-app-${app.id}`, style_class: 'kestrel-task-button', child: content, width: 40, height: 40,
       can_focus: true, track_hover: true, accessible_name: app.get_name(),
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    const item = { app, icon, slot, button, dot, removing: false };
+    const item = { app, icon, slot, button, dots, removing: false, windowsChanged: 0 };
+    item.windowsChanged = app.connect('windows-changed', () => this.updateDots(item));
+    button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);
     this.previews.bind(button, () => item.app);
     this.menus.bind(button, () => this.menus.appEntries(item.app));

@@ -11,8 +11,7 @@ export class Workspaces {
   private accumulated = 0;
 
   constructor(private readonly enabled: () => boolean, private readonly beforeSwitch: () => void) {
-    new Gio.Settings({ schema_id: 'org.gnome.mutter' }).set_boolean('dynamic-workspaces', false);
-    new Gio.Settings({ schema_id: 'org.gnome.desktop.wm.preferences' }).set_int('num-workspaces', 9);
+    new Gio.Settings({ schema_id: 'org.gnome.mutter' }).set_boolean('dynamic-workspaces', true);
   }
 
   switchTo(index: number): void {

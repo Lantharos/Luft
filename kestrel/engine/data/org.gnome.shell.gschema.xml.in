@@ -226,6 +226,10 @@
       <default>["&lt;Super&gt;9"]</default>
       <summary>Switch to workspace 9</summary>
     </key>
+    <key name="kestrel-workspace-10" type="as">
+      <default>["&lt;Super&gt;0"]</default>
+      <summary>Switch to workspace 10</summary>
+    </key>
     <key name="show-screenshot-ui" type="as">
       <default>["Print"]</default>
       <summary>Take a screenshot interactively</summary>

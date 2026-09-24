@@ -112,7 +112,7 @@ export class ContextMenus {
     scroll.child = content;
     this.actor.add_child(scroll);
     this.actor.show();
-    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 12)));
+    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 40)));
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
     const stage = (global as unknown as Shell.Global).stage;
     this.shield.set_position(0, 0);

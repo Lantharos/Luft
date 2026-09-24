@@ -39,7 +39,8 @@ export const UNDIM_TIME = 250;
 
 const ONE_SECOND = 1000; // in ms
 
-const MIN_NUM_WORKSPACES = 2;
+const MIN_NUM_WORKSPACES = 1;
+const MAX_NUM_WORKSPACES = 10;
 
 const WINDOW_DIMMER_EFFECT_NAME = 'gnome-shell-window-dimmer';
 
@@ -264,7 +265,7 @@ class WorkspaceTracker {
         }
 
         // If we don't have an empty workspace at the end, add one
-        if (!emptyWorkspaces[emptyWorkspaces.length - 1]) {
+        if (!emptyWorkspaces[emptyWorkspaces.length - 1] && workspaceManager.n_workspaces < MAX_NUM_WORKSPACES) {
             workspaceManager.append_new_workspace(false, global.get_current_time());
             emptyWorkspaces.push(true);
         }
@@ -276,8 +277,10 @@ class WorkspaceTracker {
         }
 
         const lastIndex = emptyWorkspaces.length - 1;
-        const lastEmptyIndex = emptyWorkspaces.lastIndexOf(false) + 1;
         const activeWorkspaceIndex = workspaceManager.get_active_workspace_index();
+        const lastEmptyIndex = emptyWorkspaces[activeWorkspaceIndex]
+            ? activeWorkspaceIndex
+            : emptyWorkspaces.lastIndexOf(false) + 1;
         emptyWorkspaces[activeWorkspaceIndex] = false;
 
         // Delete empty workspaces except for the last one; do it from the end
@@ -758,7 +761,7 @@ export class WindowManager {
             Shell.ActionMode.POPUP,
             this._toggleQuickSettings.bind(this));
 
-        for (let index = 1; index <= 9; index++) {
+        for (let index = 1; index <= 10; index++) {
             this.addKeybinding(`kestrel-workspace-${index}`,
                 new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
                 Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
@@ -905,7 +908,7 @@ export class WindowManager {
     insertWorkspace(pos) {
         const workspaceManager = global.workspace_manager;
 
-        if (!Meta.prefs_get_dynamic_workspaces())
+        if (!Meta.prefs_get_dynamic_workspaces() || workspaceManager.n_workspaces >= MAX_NUM_WORKSPACES)
             return;
 
         workspaceManager.append_new_workspace(false, global.get_current_time());

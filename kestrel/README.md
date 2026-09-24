@@ -16,7 +16,7 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 - The power menu opens above the Start footer, keeps Start visible, and delegates lock, suspend, log out, restart, and power off to the existing session action backend.
 - Backdrop capture updates only freshly painted regions in a separate cache for each display view. Partial damage schedules a repaint of the affected surface, and offscreen capture is clipped to valid pixels. Settled surfaces do not continuously redraw.
 - Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel and menu blur share the same brightness without a tint overlay. The panel has square corners.
-- Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with separate dots for running apps.
+- Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with up to four dots for each app’s open windows. A focused app keeps white dots independently of pointer presses.
 - Main surfaces slide in over 300 ms and out over 230 ms. Power options reveal from the Start footer button over 200 ms and retract over 160 ms. Interrupted transitions reverse from their current position.
 - The launcher uses the original two-part Luft mark at an optical size of 26px alongside 28px app icons, with its original proportions and a subtle split and opposing tilt on hover, without shrinking the two parts. Taskbar apps slide and fade in and out while their space expands or closes. The Start scrollbar is translucent, brightening on hover and drag. Search has a text-aligned caret that blinks while focused; running dots have a dedicated position beneath app icons. Newly opened surfaces stack above those sliding closed.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
@@ -37,7 +37,7 @@ Right-click an app in Start or the panel for launch actions, open windows, pinni
 
 ### Workspaces
 
-Kestrel uses nine fixed workspaces. Super+1 through Super+9 selects a workspace; Super+scroll or scrolling over the panel moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace the retained overview application shortcuts.
+Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total. Empty workspaces are removed as windows close or move. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace the retained overview application shortcuts.
 
 ### System dialogs
 

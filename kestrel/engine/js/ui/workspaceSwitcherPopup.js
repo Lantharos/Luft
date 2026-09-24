@@ -15,7 +15,6 @@ export const MonitorWorkspaceSwitcherPopup = GObject.registerClass(
 class MonitorWorkspaceSwitcherPopup extends Clutter.Actor {
     constructor(constraint) {
         super({
-            offscreen_redirect: Clutter.OffscreenRedirect.ALWAYS,
             x_expand: true,
             y_expand: true,
             x_align: Clutter.ActorAlign.CENTER,

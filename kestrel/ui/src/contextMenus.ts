@@ -29,7 +29,7 @@ export class ContextMenus {
       const key = event.get_key_symbol();
       if (key === Clutter.KEY_Escape) { this.close(); return Clutter.EVENT_STOP; }
       if ([Clutter.KEY_Down, Clutter.KEY_Up, Clutter.KEY_Tab].includes(key)) {
-        this.actor.navigate_focus(null, key === Clutter.KEY_Up ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
+        this.actor.navigate_focus((global as unknown as Shell.Global).stage.get_key_focus(), key === Clutter.KEY_Up ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -106,7 +106,9 @@ export class ContextMenus {
       const button = new St.Button({ style_class: 'kestrel-context-action', accessible_name: entry.label, can_focus: entry.enabled !== false, reactive: entry.enabled !== false, opacity: entry.enabled === false ? 110 : 255, track_hover: true, x_expand: true,
         child: new St.Label({ text: entry.label, x_expand: true, x_align: Clutter.ActorAlign.START }) });
       button.connect('notify::hover', () => {
-        if (button.hover && this.source && !this.clearSelection) button.grab_key_focus();
+        if (!this.source || this.clearSelection) return;
+        if (button.hover) button.grab_key_focus();
+        else if ((global as unknown as Shell.Global).stage.get_key_focus() === button) this.actor.grab_key_focus();
       });
       button.connect('clicked', () => { this.close(); entry.run(); });
       content.add_child(button);
@@ -115,7 +117,7 @@ export class ContextMenus {
     scroll.child = content;
     this.actor.add_child(scroll);
     this.actor.show();
-    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 40)));
+    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 56)));
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
     const stage = (global as unknown as Shell.Global).stage;
     this.shield.set_position(0, 0);
@@ -129,7 +131,7 @@ export class ContextMenus {
     this.actor.opacity = 0;
     this.actor.translation_y = 6;
     animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-    this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+    this.actor.grab_key_focus();
   }
 
   close(immediate = false): void {

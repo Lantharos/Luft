@@ -2032,7 +2032,7 @@ class CaptivePortalHandler extends Signals.EventEmitter {
             Gio.AppInfo.launch_default_for_uri(this._checkUri, context);
 
         Main.overview.hide();
-        Main.panel.closeCalendar();
+        Main.closeShellPopups();
     }
 
     _portalHelperStatusChanged(parameters) {

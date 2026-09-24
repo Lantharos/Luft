@@ -19,7 +19,7 @@ export class GridDrag {
 
   constructor(private readonly scroller: St.ScrollView, private readonly finished: () => void) {}
 
-  source(button: St.Button, item: DragItem, icon: () => Clutter.Actor): void {
+  source(button: St.Button, item: DragItem, icon: () => Clutter.Actor): { enabled: boolean } {
     const delegate = { ...item, getDragActor: icon, getDragActorSource: () => button.child.get_first_child() };
     (button as DelegateActor)._delegate = delegate;
     const draggable = DND.makeDraggable(button, { dragActorMaxSize: 48, dragActorOpacity: 220 });
@@ -45,6 +45,7 @@ export class GridDrag {
       this.scrollTimer = 0;
       GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => { this.finished(); return GLib.SOURCE_REMOVE; });
     });
+    return draggable;
   }
 
   target(actor: St.Widget, action: (source: DragItem, x: number) => (() => void) | null, mode: (source: DragItem, x: number) => string = () => 'drop-into'): void {

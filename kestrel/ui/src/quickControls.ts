@@ -23,7 +23,6 @@ interface Indicator extends St.BoxLayout {
 
 export interface QuickSettingsSource {
   ready: Promise<void>;
-  menu: object;
   _network: Indicator | null;
   _bluetooth: Indicator | null;
   _volumeOutput: Indicator;

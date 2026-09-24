@@ -16,6 +16,7 @@ export class StartMenu {
   readonly search: St.Entry;
   readonly powerButton: St.Button;
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private pinned = new Set(this.favorites.get_strv('favorite-apps'));
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;
   private apps: Gio.AppInfo[] = [];
@@ -96,7 +97,10 @@ export class StartMenu {
     this.actor.add_child(footer);
 
     const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
-    const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => this.refreshApps());
+    const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => {
+      this.pinned = new Set(this.favorites.get_strv('favorite-apps'));
+      this.refreshApps();
+    });
     this.actor.connect('destroy', () => {
       this.appSystem.disconnect(installedChanged);
       this.favorites.disconnect(favoritesChanged);
@@ -122,7 +126,7 @@ export class StartMenu {
   }
 
   private refreshApps(): void {
-    this.browser.update(this.apps, new Set(this.favorites.get_strv('favorite-apps')), this.search.get_text().trim().toLocaleLowerCase());
+    this.browser.update(this.apps, this.pinned, this.search.get_text().trim().toLocaleLowerCase());
   }
 
   private launch(app: Gio.AppInfo): void {

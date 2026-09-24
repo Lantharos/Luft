@@ -94,6 +94,9 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     await pause(1000);
     const windows = global.get_window_actors().map(actor => actor.meta_window);
     const window = windows.find(window => window.title === 'Kestrel window check 1');
+    for (const candidate of windows.filter(candidate => candidate.title.startsWith('Kestrel window check')))
+      candidate.move_to_monitor(global.display.get_primary_monitor());
+    await pause(400);
     require(global.workspace_manager.n_workspaces === 2, 'occupied workspace has one empty workspace');
     windows.find(window => window.title === 'Kestrel window check 2').change_workspace_by_index(1, false);
     await pause(400);

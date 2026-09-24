@@ -11,6 +11,7 @@ typedef struct
   CoglFramebuffer *framebuffer;
   CoglPipeline *pipeline;
   MtkRectangle geometry;
+  MtkRegion *valid;
 } Backdrop;
 
 static void
@@ -32,6 +33,7 @@ backdrop_free (gpointer data)
     g_object_weak_unref (G_OBJECT (backdrop->view), view_destroyed, backdrop);
   g_clear_object (&backdrop->framebuffer);
   g_clear_object (&backdrop->pipeline);
+  g_clear_pointer (&backdrop->valid, mtk_region_unref);
   g_free (backdrop);
 }
 
@@ -44,7 +46,8 @@ shell_backdrop_cache_new (void)
 static Backdrop *
 ensure_backdrop (GHashTable          *cache,
                  ClutterPaintContext *context,
-                 MtkRectangle        *geometry)
+                 MtkRectangle        *geometry,
+                 gboolean            *changed)
 {
   ClutterStageView *view = clutter_paint_context_get_stage_view (context);
   CoglFramebuffer *source = clutter_paint_context_get_framebuffer (context);
@@ -53,11 +56,20 @@ ensure_backdrop (GHashTable          *cache,
   if (!backdrop)
     {
       backdrop = g_new0 (Backdrop, 1);
+      backdrop->valid = mtk_region_create ();
       backdrop->cache = cache;
       backdrop->view = view;
       if (view)
         g_object_weak_ref (G_OBJECT (view), view_destroyed, backdrop);
       g_hash_table_insert (cache, view, backdrop);
+    }
+
+  *changed = !backdrop->framebuffer ||
+    !mtk_rectangle_equal (&backdrop->geometry, geometry);
+  if (*changed)
+    {
+      g_clear_pointer (&backdrop->valid, mtk_region_unref);
+      backdrop->valid = mtk_region_create ();
     }
 
   if (!backdrop->framebuffer ||
@@ -94,7 +106,8 @@ CoglPipeline *
 shell_backdrop_capture (GHashTable          *cache,
                         ClutterActor        *actor,
                         ClutterPaintContext *context,
-                        ClutterActorBox     *box)
+                        ClutterActorBox     *box,
+                        gboolean            *changed)
 {
   ClutterStageView *view = clutter_paint_context_get_stage_view (context);
   CoglFramebuffer *source = clutter_paint_context_get_framebuffer (context);
@@ -102,7 +115,7 @@ shell_backdrop_capture (GHashTable          *cache,
   MtkRectangle geometry = { box->x1, box->y1, box->x2 - box->x1, box->y2 - box->y1 };
   MtkRectangle framebuffer_bounds = { 0, 0,
     cogl_framebuffer_get_width (source), cogl_framebuffer_get_height (source) };
-  Backdrop *backdrop = ensure_backdrop (cache, context, &geometry);
+  Backdrop *backdrop = ensure_backdrop (cache, context, &geometry, changed);
   g_autoptr (MtkRegion) visible = mtk_region_create_rectangle (&geometry);
   g_autoptr (MtkRegion) captured = mtk_region_create ();
 
@@ -139,6 +152,7 @@ shell_backdrop_capture (GHashTable          *cache,
           rect.height = bottom - rect.y;
           mtk_region_union_rectangle (captured, &rect);
         }
+      mtk_region_subtract (backdrop->valid, captured);
       mtk_region_intersect (captured, visible);
     }
   else
@@ -151,10 +165,14 @@ shell_backdrop_capture (GHashTable          *cache,
       if (!cogl_framebuffer_blit_region (source, backdrop->framebuffer, captured,
                                         -geometry.x, -geometry.y, &error))
         g_warning ("Backdrop capture failed: %s", error->message);
-      mtk_region_subtract (visible, captured);
-      if (!mtk_region_is_empty (visible))
-        clutter_actor_queue_redraw (actor);
+      else
+        mtk_region_union (backdrop->valid, captured);
+      *changed = TRUE;
     }
+
+  mtk_region_subtract (visible, backdrop->valid);
+  if (!mtk_region_is_empty (visible))
+    clutter_actor_queue_redraw (actor);
 
   return backdrop->pipeline;
 }

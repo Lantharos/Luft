@@ -831,7 +831,7 @@ class MediaMessage extends Message {
             return;
 
         this._player.raise();
-        Main.panel.closeCalendar();
+        Main.closeShellPopups();
     }
 
     _applyPolicy() {

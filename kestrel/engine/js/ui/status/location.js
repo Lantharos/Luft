@@ -8,7 +8,6 @@ import St from 'gi://St';
 import * as Dialog from '../dialog.js';
 import * as ModalDialog from '../modalDialog.js';
 import * as PermissionStore from '../../misc/permissionStore.js';
-import {SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
 
@@ -205,22 +204,6 @@ const GeoclueAgent = GObject.registerClass({
         }
 
         this._permStoreProxy = proxy;
-    }
-});
-
-export const Indicator = GObject.registerClass(
-class Indicator extends SystemIndicator {
-    _init() {
-        super._init();
-
-        this._agent = getGeoclueAgent();
-
-        this._indicator = this._addIndicator();
-        this._indicator.icon_name = 'location-services-active-symbolic';
-        this._agent.bind_property('in-use',
-            this._indicator,
-            'visible',
-            GObject.BindingFlags.SYNC_CREATE);
     }
 });
 

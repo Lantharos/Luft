@@ -12,6 +12,10 @@ export class StartGrid {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
   private readonly layout = new StartLayout();
   private readonly drag: GridDrag;
+  private catalogDirty = false;
+  private catalog: Gio.AppInfo[] | null = null;
+  private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
+  private readonly searchNames = new Map<string, string>();
   private apps = new Map<string, Gio.AppInfo>();
   private pinned = new Set<string>();
   private query = '';
@@ -21,15 +25,25 @@ export class StartGrid {
 
   constructor(private readonly scroller: St.ScrollView, private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {
     scroller.child = this.actor;
+    this.actor.connect('destroy', () => {
+      for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
+      this.buttons.clear();
+    });
     this.drag = new GridDrag(scroller, () => this.render(false, true));
     this.drag.target(this.actor, source => this.query ? null : () => this.layout.move(source.id, this.folder));
   }
 
   update(apps: Gio.AppInfo[], pinned: Set<string>, query: string): void {
-    this.apps = new Map(apps.map(app => [app.get_id()!, app]));
+    if (apps !== this.catalog) {
+      this.catalog = apps;
+      this.apps = new Map(apps.map(app => [app.get_id()!, app]));
+      this.searchNames.clear();
+      for (const [id, app] of this.apps) this.searchNames.set(id, app.get_display_name().toLocaleLowerCase());
+      this.layout.sync([...this.apps.keys()]);
+      this.catalogDirty = true;
+    }
     this.pinned = pinned;
     this.query = query;
-    this.layout.sync([...this.apps.keys()]);
     if (!this.drag.active) this.render();
   }
 
@@ -48,11 +62,26 @@ export class StartGrid {
   }
 
   private render(animate = false, reorder = false): void {
-    const positions = new Map(this.actor.get_children().flatMap(row => row.get_children()).map(button => [button.name, button.get_transformed_position()]));
+    const positions = reorder
+      ? new Map(this.actor.get_children().flatMap(row => row.get_children()).map(button => [button.name, button.get_transformed_position()]))
+      : new Map<string, [number, number]>();
+    if (this.catalogDirty) {
+      for (const { actor } of this.buttons.values()) actor.destroy();
+      this.buttons.clear();
+      this.catalogDirty = false;
+    }
     if (this.folder && !this.layout.folder(this.folder)) this.folder = null;
+    for (const { actor } of this.buttons.values()) actor.get_parent()?.remove_child(actor);
     this.actor.destroy_all_children();
+    for (const [key, item] of this.buttons) {
+      const id = key;
+      if (!this.apps.has(id) && !this.layout.folder(id)) {
+        item.actor.destroy();
+        this.buttons.delete(key);
+      }
+    }
     const ids = this.query
-      ? [...this.apps].filter(([, app]) => app.get_display_name().toLocaleLowerCase().includes(this.query)).map(([id]) => id)
+      ? [...this.searchNames].filter(([, name]) => name.includes(this.query)).map(([id]) => id)
       : this.layout.items(this.folder).filter(id => this.visible(id));
     this.firstMatch = ids.length ? this.apps.get(ids[0]) : undefined;
     this.renderHeader();
@@ -61,7 +90,7 @@ export class StartGrid {
       const row = new St.BoxLayout({ style_class: 'kestrel-app-row' });
       for (let column = 0; column < 6; column++) {
         const id = ids[index + column];
-        const button = id ? this.button(id) : new St.Widget({ width: 92, x_expand: true });
+        const button = id ? this.cachedButton(id) : new St.Widget({ width: 92, x_expand: true });
         row.add_child(button);
         if (id && reorder) {
           const allocated = button.connect('notify::allocation', () => {
@@ -132,7 +161,23 @@ export class StartGrid {
     return preview;
   }
 
-  private button(id: string): St.Button {
+  private cachedButton(id: string): St.Button {
+    const folder = this.layout.folder(id);
+    const signature = folder ? JSON.stringify([folder.name, folder.apps.filter(app => this.visible(app)).slice(0, 4)]) : id;
+    const key = id;
+    const cached = this.buttons.get(key);
+    if (cached?.signature === signature) {
+      cached.draggable.enabled = !this.query;
+      return cached.actor;
+    }
+    cached?.actor.destroy();
+    const item = this.button(id);
+    item.draggable.enabled = !this.query;
+    this.buttons.set(key, { signature, ...item });
+    return item.actor;
+  }
+
+  private button(id: string): { actor: St.Button; draggable: { enabled: boolean } } {
     const folder = this.layout.folder(id);
     const app = this.apps.get(id);
     const label = folder?.name ?? app!.get_display_name();
@@ -165,15 +210,13 @@ export class StartGrid {
       if (this.folder && !this.query) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
       return entries;
     });
-    if (!this.query) {
-      this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));
-      const mode = (source: { folder: boolean }, x: number) => !this.folder && !source.folder && x > button.width * 0.25 && x < button.width * 0.75
-        ? 'drop-into' : x < button.width / 2 ? 'drop-before' : 'drop-after';
-      this.drag.target(button, (source, x) => source.id === id ? () => {} : () => {
-        if (mode(source, x) === 'drop-into') this.layout.combine(source.id, id);
-        else this.layout.move(source.id, this.folder, id, x >= button.width / 2);
-      }, mode);
-    }
-    return button;
+    const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));
+    const mode = (source: { folder: boolean }, x: number) => !this.folder && !source.folder && x > button.width * 0.25 && x < button.width * 0.75
+      ? 'drop-into' : x < button.width / 2 ? 'drop-before' : 'drop-after';
+    this.drag.target(button, (source, x) => source.id === id ? () => {} : () => {
+      if (mode(source, x) === 'drop-into') this.layout.combine(source.id, id);
+      else this.layout.move(source.id, this.folder, id, x >= button.width / 2);
+    }, mode);
+    return { actor: button, draggable };
   }
 }

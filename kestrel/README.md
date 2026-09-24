@@ -12,18 +12,28 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 - Lock and greeter modes hide the panel and dismiss all desktop surfaces immediately. Super and desktop context menus are unavailable while locked or while a system dialog holds focus. System dialogs dismiss open surfaces before taking focus.
 - The panel follows the primary display and hides for fullscreen windows and focused windows covering the entire display. Desktop context menus stay on the clicked display; outside-click dismissal covers all displays, and monitor changes dismiss surfaces before repositioning them.
 - Quick Settings provides network and Bluetooth controls, device selection for audio output and microphone input, brightness, Do Not Disturb, Night Light, power profiles, a Lock action, and a Settings shortcut. Compact glass controls place icons above their labels, with separate buttons for device details. Controls follow the available hardware and services. Device selectors open in an adaptive glass detail view with a Back button. The surface grows to fit available space; long lists use page buttons instead of scrollbars. The microphone control remains available when a microphone is present, even without an active recording.
-- The notification center displays the existing message tray sources and can clear them.
+- The notification center updates individual rows, batches notification bursts, and defers row construction while closed. Signal subscriptions follow the lifetime of their source and owning actor.
 - The power menu fits its rows with an even 8px inset, opens above the Start footer, keeps Start visible, and delegates lock, suspend, log out, restart, and power off to the existing session action backend.
-- Backdrop capture updates only freshly painted regions in a separate cache for each display view. Partial damage schedules a repaint of the affected surface, and offscreen capture is clipped to valid pixels. Settled surfaces do not continuously redraw.
+- Backdrop capture updates only freshly painted regions in a separate cache for each display view. Each cache tracks valid pixels; partial damage schedules another paint only for missing pixels. Unchanged captures can reuse the blurred output without allocating an actor-blur framebuffer, and offscreen capture is clipped to valid pixels. Settled surfaces do not continuously redraw.
 - Shell blur includes a rounded mask in its final shader pass, keeping menu corners clean without an extra offscreen pass. Panel and menu blur share the same brightness without a tint overlay. The panel has square corners.
 - Start uses six equal app columns, keyboard search, and a compact account and power footer with the AccountsService avatar when available. Panel hover highlights are inset and rounded, with up to four dots for each app’s open windows. A focused app keeps white dots independently of pointer presses.
 - Main surfaces slide in over 300 ms and out over 230 ms. Power options reveal from the Start footer button over 200 ms and retract over 160 ms. Interrupted transitions reverse from their current position.
 - The launcher uses the original two-part Luft mark at an optical size of 26px alongside 28px app icons, with its original proportions and a subtle split and opposing tilt on hover, without shrinking the two parts. Taskbar apps slide and fade in and out while their space expands or closes. The Start scrollbar is translucent, brightening on hover and drag. Search has a text-aligned caret that blinks while focused; running dots have a dedicated position beneath app icons. Newly opened surfaces stack above those sliding closed.
 - Set `KESTREL_CSS_PATH` to a local stylesheet when launching the shell to reload styles after each saved change.
 
+## Runtime scope
+
+Desktop Quick Settings owns only the device controls used by Kestrel. It does not construct a second native Quick Settings menu or duplicate microphone slider. The retained session panel supplies login and lock-screen controls; the desktop does not populate it.
+
+The legacy calendar, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for login, unlocking, user switching, and the Start avatar. Authentication, parental session restrictions, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
+
+### Performance workload
+
+Run `kestrel/tools/session.sh performance` to measure repeated search edits, app-button reuse, an 80-notification burst, row creation while hidden, and settled desktop paints. Search timings cover synchronous update work; they are not end-to-end display latency. The command uses an isolated headless session and exits when finished.
+
 ## Work before a Luft session
 
-1. Make Kestrel the actual shell entry point, remove unused GNOME UI modules and services, and rename the build/session identifiers that still say GNOME Shell. The current TypeScript UI is loaded by a reduced upstream `main.js` path and the upstream overview object is still constructed, though disabled in the user session.
+1. Make Kestrel the actual shell entry point and rename the build/session identifiers that still say GNOME Shell. The TypeScript UI is loaded by a reduced upstream `main.js` path. The retained overview coordinator is disabled; its app grid and window overview actors are not constructed.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
 3. Supply Luft session and portal configuration, including screenshot, screencast, file chooser, settings, and secret handling, then exercise the portal calls from client apps.
 4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.
@@ -36,6 +46,8 @@ The virtual session checks the build, JS startup, and captured rendering. It doe
 Drag an app onto the center of another app to create a folder, or onto an existing folder to add it. Drop beside an icon to rearrange apps or folders; insertion marks show the position. The grid scrolls when a dragged icon approaches its top or bottom edge.
 
 Open a folder to launch or rearrange its apps. Edit its name in the header. Drag an app onto the Apps breadcrumb to move it back out, or use its context menu. Right-click a folder to rename it or ungroup its apps. Empty folders disappear. Escape returns to Apps before closing Start.
+
+App buttons are reused across searches, folders, and reordering. Search names are indexed when the installed app catalog changes.
 
 Folder contents, names, and ordering are saved across sessions. Apps pinned to the panel stay hidden in the default grid and folder views, while search finds individual apps regardless of their folder or pin status.
 

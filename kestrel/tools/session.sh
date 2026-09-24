@@ -43,10 +43,12 @@ exec dbus-run-session -- bash -c '
     if [[ -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then
       args+=(--virtual-monitor "$KESTREL_CAPTURE_SECONDARY_SIZE")
     fi
+  elif [[ "$mode" == performance ]]; then
+    args=(--headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$root/kestrel/tools/performance.js")
   elif [[ "$mode" == nested ]]; then
     args=(--wayland --devkit)
   else
-    echo "Usage: kestrel/tools/session.sh [nested|capture]" >&2
+    echo "Usage: kestrel/tools/session.sh [nested|capture|performance]" >&2
     exit 2
   fi
   exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/gnome-shell" "${args[@]}"

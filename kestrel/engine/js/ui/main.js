@@ -8,7 +8,7 @@ import St from 'gi://St';
 
 import * as AccessDialog from './accessDialog.js';
 import * as AudioDeviceSelection from './audioDeviceSelection.js';
-import * as BreakManager from '../misc/breakManager.js';
+import {DesktopControls} from './desktopControls.js';
 import * as BrightnessManager from '../misc/brightnessManager.js';
 import * as Config from '../misc/config.js';
 import * as Components from './components.js';
@@ -28,7 +28,6 @@ import * as Overview from './overview.js';
 import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
 import * as RunDialog from './runDialog.js';
-import * as WelcomeDialog from './welcomeDialog.js';
 import * as Layout from './layout.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as LookingGlass from './lookingGlass.js';
@@ -48,12 +47,7 @@ import * as LocatePointer from './locatePointer.js';
 import * as PointerA11yTimeout from './pointerA11yTimeout.js';
 import {formatError} from '../misc/errorUtils.js';
 import * as ParentalControlsManager from '../misc/parentalControlsManager.js';
-import * as Util from '../misc/util.js';
 
-const WELCOME_DIALOG_LAST_SHOWN_VERSION = 'welcome-dialog-last-shown-version';
-// Make sure to mention the point release, otherwise it will show every time
-// until this version is current
-const WELCOME_DIALOG_LAST_TOUR_CHANGE = '40.beta';
 const LOG_DOMAIN = 'GNOME Shell';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
@@ -63,7 +57,6 @@ export let panel = null;
 export let overview = null;
 export let runDialog = null;
 export let lookingGlass = null;
-export let welcomeDialog = null;
 export let wm = null;
 export let messageTray = null;
 export let screenShield = null;
@@ -93,9 +86,6 @@ export let inputMethod = null;
 export let introspectService = null;
 export let locatePointer = null;
 export let endSessionDialog = null;
-export let breakManager = null;
-export let screenTimeDBus = null;
-export let breakManagerDispatcher = null;
 export let timeLimitsManager = null;
 export let timeLimitsDispatcher = null;
 export let brightnessManager = null;
@@ -133,8 +123,6 @@ function _sessionUpdated() {
             runDialog.close();
         if (lookingGlass)
             lookingGlass.close();
-        if (welcomeDialog)
-            welcomeDialog.close();
     }
 
     const remoteAccessController = global.backend.get_remote_access_controller();
@@ -259,11 +247,7 @@ async function _initializeUI() {
 
     introspectService = new Introspect.IntrospectService();
 
-    // Set up the global default break reminder manager and its D-Bus interface
-    breakManager = new BreakManager.BreakManager();
     timeLimitsManager = new TimeLimitsManager.TimeLimitsManager();
-    screenTimeDBus = new ShellDBus.ScreenTimeDBus(breakManager);
-    breakManagerDispatcher = new BreakManager.BreakDispatcher(breakManager);
     timeLimitsDispatcher = new TimeLimitsManager.TimeLimitsDispatcher(timeLimitsManager);
 
     global.connect('shutdown', () => {
@@ -283,8 +267,8 @@ async function _initializeUI() {
 
     layoutManager.init();
     overview.init();
-    const quickSettings = new Panel.QuickSettings();
-    panel.addToStatusArea('quickSettings', quickSettings);
+    const quickSettings = new DesktopControls();
+    global.connect('shutdown', () => quickSettings.destroy());
     KestrelUi.initialize({
         layoutManager, messageTray, quickSettings, sessionMode, screenShield,
         canInteract: () => actionMode === Shell.ActionMode.NORMAL,
@@ -370,8 +354,6 @@ async function _initializeUI() {
                 notify(
                     _('Logged in as a privileged user'),
                     _('Running a session as a privileged user should be avoided for security reasons. If possible, you should log in as a normal user.'));
-            } else if (sessionMode.showWelcomeDialog) {
-                _handleShowWelcomeScreen();
             }
         }
 
@@ -386,14 +368,6 @@ async function _initializeUI() {
             Scripting.runPerfScript(perfModule, perfOutput);
         }
     });
-}
-
-function _handleShowWelcomeScreen() {
-    const lastShownVersion = global.settings.get_string(WELCOME_DIALOG_LAST_SHOWN_VERSION);
-    if (Util.GNOMEversionCompare(WELCOME_DIALOG_LAST_TOUR_CHANGE, lastShownVersion) > 0) {
-        openWelcomeDialog();
-        global.settings.set_string(WELCOME_DIALOG_LAST_SHOWN_VERSION, Config.PACKAGE_VERSION);
-    }
 }
 
 async function _handleLockScreenWarning() {
@@ -836,13 +810,6 @@ export function openRunDialog() {
     runDialog.open();
 }
 
-export function openWelcomeDialog() {
-    if (welcomeDialog === null)
-        welcomeDialog = new WelcomeDialog.WelcomeDialog();
-
-    welcomeDialog.open();
-}
-
 /**
  * activateWindow:
  *
@@ -869,7 +836,7 @@ export function activateWindow(window, time, workspaceNum) {
     }
 
     overview.hide();
-    panel.closeCalendar();
+    KestrelUi.dismissImmediately();
 }
 
 /**
@@ -1080,4 +1047,9 @@ class AnimationsSettings {
         this._syncAnimationsEnabled();
         handle.connect('stopped', this._onRemoteAccessHandleStopped.bind(this));
     }
+}
+
+export function closeShellPopups() {
+    KestrelUi.dismissImmediately();
+    panel.closeQuickSettings();
 }

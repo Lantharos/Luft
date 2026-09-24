@@ -384,7 +384,7 @@ class FdoNotificationDaemonSource extends MessageTray.Source {
 
         this.app.activate();
         Main.overview.hide();
-        Main.panel.closeCalendar();
+        Main.closeShellPopups();
     }
 
     destroy() {
@@ -470,7 +470,7 @@ class GtkNotificationDaemonNotification extends MessageTray.Notification {
             this.source.emitActionInvoked(this.id, actionId, target);
 
         Main.overview.hide();
-        Main.panel.closeCalendar();
+        Main.closeShellPopups();
     }
 
     _onButtonClicked(button) {
@@ -544,7 +544,7 @@ class GtkNotificationDaemonAppSource extends MessageTray.Source {
     open() {
         this._app.activate();
         Main.overview.hide();
-        Main.panel.closeCalendar();
+        Main.closeShellPopups();
     }
 
     addNotification(notification) {

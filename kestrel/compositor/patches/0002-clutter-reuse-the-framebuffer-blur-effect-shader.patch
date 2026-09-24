@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 25 Sep 2026 01:05:33 +0200
+Subject: [PATCH 2/3] clutter: reuse the framebuffer blur effect shader
+
+---
+ clutter/clutter/clutter-paint-nodes.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index e3c324a0f664484c1e98f3d1c2676aa0342feaec..b54b39e0cb69f0a3547dca2c7338a9503ff7e34e 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1458,7 +1458,7 @@ add_blur_framebuffer_effect (CoglPipeline *pipeline,
+                              float         noise_width,
+                              float         noise_height)
+ {
+-  CoglSnippet *snippet;
++  static CoglSnippet *snippet;
+   int saturation_uniform;
+   int noise_uniform;
+   int noise_size_uniform;
+@@ -1466,11 +1466,11 @@ add_blur_framebuffer_effect (CoglPipeline *pipeline,
+   if (saturation == 1.0f && noise == 0.0f)
+     return;
+ 
+-  snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+-                              blur_framebuffer_effect_declarations,
+-                              blur_framebuffer_effect_source);
++  if (!snippet)
++    snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
++                                blur_framebuffer_effect_declarations,
++                                blur_framebuffer_effect_source);
+   cogl_pipeline_add_snippet (pipeline, snippet);
+-  g_object_unref (snippet);
+ 
+   saturation_uniform =
+     cogl_pipeline_get_uniform_location (pipeline,

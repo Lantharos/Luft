@@ -7,6 +7,10 @@ import { blurSurface, PANEL_HEIGHT } from './surface.js';
 import { animateActor } from './motion.js';
 import type { Monitor } from './panel.js';
 
+interface WindowIconApp extends Shell.App {
+  create_window_icon_texture(window: Meta.Window, size: number): Clutter.Actor;
+}
+
 export class WindowPreviews {
   readonly actor = new St.BoxLayout({ name: 'kestrel-window-previews', style_class: 'kestrel-window-previews', reactive: true, track_hover: true, visible: false });
   private timer = 0;
@@ -64,6 +68,10 @@ export class WindowPreviews {
       const card = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, width, style_class: 'kestrel-preview-card' });
       const header = new St.BoxLayout({ style_class: 'kestrel-preview-header' });
       const title = new St.Label({ text: window.title || app.get_name(), x_expand: true, y_align: Clutter.ActorAlign.CENTER });
+      const icon = (app as WindowIconApp).create_window_icon_texture(window, 16);
+      icon.y_align = Clutter.ActorAlign.CENTER;
+      icon.set_margin_right(6);
+      header.add_child(icon);
       header.add_child(title);
       const close = new St.Button({ style_class: 'kestrel-preview-close', can_focus: true, accessible_name: `Close ${window.title}`, child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
       close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));

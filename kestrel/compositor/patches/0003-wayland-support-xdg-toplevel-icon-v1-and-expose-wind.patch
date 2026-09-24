@@ -1,0 +1,722 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 25 Sep 2026 01:20:45 +0200
+Subject: [PATCH 3/3] wayland: support xdg-toplevel-icon-v1 and expose window
+ icons
+
+---
+ meson.build                                |   1 +
+ src/core/window-icon.c                     |  24 ++
+ src/core/window-private.h                  |   4 +
+ src/core/window.c                          |   8 +
+ src/meson.build                            |   7 +
+ src/meta/window.h                          |   4 +
+ src/wayland/meta-wayland-icon-pixels.c     | 129 ++++++++++
+ src/wayland/meta-wayland-icon-pixels.h     |   9 +
+ src/wayland/meta-wayland-surface-private.h |   2 +
+ src/wayland/meta-wayland-surface.c         |   9 +
+ src/wayland/meta-wayland-toplevel-icon.c   | 259 +++++++++++++++++++++
+ src/wayland/meta-wayland-toplevel-icon.h   |   6 +
+ src/wayland/meta-wayland-xdg-shell.c       |   6 +
+ src/wayland/meta-wayland.c                 |   2 +
+ 14 files changed, 470 insertions(+)
+ create mode 100644 src/core/window-icon.c
+ create mode 100644 src/wayland/meta-wayland-icon-pixels.c
+ create mode 100644 src/wayland/meta-wayland-icon-pixels.h
+ create mode 100644 src/wayland/meta-wayland-toplevel-icon.c
+ create mode 100644 src/wayland/meta-wayland-toplevel-icon.h
+
+diff --git a/meson.build b/meson.build
+index cdd13b683cfc6247c6bb28ed5e00790a85e99939..eb63333e8242b0e80fb7e83386d4e2d0feafcab6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -136,6 +136,7 @@ lcms2_dep = dependency('lcms2', version: lcms2_req)
+ libeis_dep = dependency('libeis-1.0', version: libei_req)
+ libei_dep = dependency('libei-1.0', version: libei_req)
+ gvdb_dep = dependency('gvdb')
++gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0')
+ libdisplay_info_dep = dependency('libdisplay-info', version: libdisplay_info_req)
+ libdrm_dep = dependency('libdrm', version: libdrm_req)
+ 
+diff --git a/src/core/window-icon.c b/src/core/window-icon.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf03ee7562642c59d596431f63792879e2f43a1d
+--- /dev/null
++++ b/src/core/window-icon.c
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "core/window-private.h"
++
++/**
++ * meta_window_get_toplevel_icon:
++ * @window: a #MetaWindow
++ *
++ * Returns: (transfer none) (nullable): the icon supplied by the toplevel
++ */
++GIcon *
++meta_window_get_toplevel_icon (MetaWindow *window)
++{
++  return window->toplevel_icon;
++}
++
++void
++meta_window_set_toplevel_icon (MetaWindow *window,
++                              GIcon      *icon)
++{
++  if (g_set_object (&window->toplevel_icon, icon))
++    g_object_notify (G_OBJECT (window), "toplevel-icon");
++}
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index 00abadac7fadbb3fcfc521db5b512ed27bbe0d0b..b21f287333476eb3b2a6af3be446f7d45e12e153 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -244,6 +244,7 @@ struct _MetaWindow
+   MetaWindowClientType client_type;
+   char *desc; /* used in debug spew */
+   char *title;
++  GIcon *toplevel_icon;
+ 
+   MetaWindowType type;
+ 
+@@ -956,3 +957,6 @@ void meta_window_set_target_monitor_from_number (MetaWindow *window,
+ void meta_window_notify_ready (MetaWindow *window);
+ 
+ gboolean meta_window_is_ready (MetaWindow *window);
++
++void meta_window_set_toplevel_icon (MetaWindow *window,
++                                   GIcon      *icon);
+diff --git a/src/core/window.c b/src/core/window.c
+index c84a3878fa7d872da825e6e4594e8cab589e1ff2..d8485ec8fca8b1b01f552cccdaefcf18daac34fc 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -205,6 +205,7 @@ enum
+   PROP_0,
+ 
+   PROP_TITLE,
++  PROP_TOPLEVEL_ICON,
+   PROP_DECORATED,
+   PROP_FULLSCREEN,
+   PROP_MAXIMIZED_HORIZONTALLY,
+@@ -387,6 +388,7 @@ meta_window_finalize (GObject *object)
+   MetaWindowPrivate *priv = meta_window_get_instance_private (window);
+ 
+   g_clear_object (&window->transient_for);
++  g_clear_object (&window->toplevel_icon);
+   g_clear_object (&window->cgroup_path);
+   g_clear_pointer (&window->preferred_logical_monitor,
+                    meta_logical_monitor_id_free);
+@@ -437,6 +439,9 @@ meta_window_get_property (GObject         *object,
+ 
+   switch (prop_id)
+     {
++    case PROP_TOPLEVEL_ICON:
++      g_value_set_object (value, window->toplevel_icon);
++      break;
+     case PROP_TITLE:
+       g_value_set_string (value, window->title);
+       break;
+@@ -582,6 +587,9 @@ meta_window_class_init (MetaWindowClass *klass)
+   klass->get_client_pid = meta_window_real_get_client_pid;
+   klass->get_gravity = meta_window_real_get_gravity;
+ 
++  obj_props[PROP_TOPLEVEL_ICON] =
++    g_param_spec_object ("toplevel-icon", NULL, NULL, G_TYPE_ICON,
++                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+   obj_props[PROP_TITLE] =
+     g_param_spec_string ("title", NULL, NULL,
+                          NULL,
+diff --git a/src/meson.build b/src/meson.build
+index d2897c28ff79b3940086069e96b843157b0b1456..00b8572753151a4c2a57393a1de67854ad9d2199 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -20,6 +20,7 @@ mutter_pkg_deps = [
+ ]
+ 
+ mutter_pkg_private_deps = [
++  gdk_pixbuf_dep,
+   colord_dep,
+   lcms2_dep,
+   gmodule_no_export_dep,
+@@ -369,6 +370,7 @@ mutter_sources = [
+   'core/util.c',
+   'core/util-private.h',
+   'core/window.c',
++  'core/window-icon.c',
+   'core/window-private.h',
+   'core/workspace.c',
+   'core/workspace-private.h',
+@@ -634,6 +636,10 @@ mutter_sources += [
+   'wayland/meta-wayland-xdg-session.h',
+   'wayland/meta-wayland-xdg-shell.c',
+   'wayland/meta-wayland-xdg-shell.h',
++  'wayland/meta-wayland-toplevel-icon.c',
++  'wayland/meta-wayland-toplevel-icon.h',
++  'wayland/meta-wayland-icon-pixels.c',
++  'wayland/meta-wayland-icon-pixels.h',
+   'wayland/meta-wayland-xdg-dialog.c',
+   'wayland/meta-wayland-xdg-dialog.h',
+   'wayland/meta-wayland-xdg-toplevel-tag.c',
+@@ -1039,6 +1045,7 @@ wayland_protocols = [
+   ['xdg-shell', 'stable', ],
+   ['xdg-system-bell', 'staging', 1, ],
+   ['xdg-toplevel-drag', 'staging', 1, ],
++  ['xdg-toplevel-icon', 'staging', 1, ],
+   ['xdg-toplevel-tag', 'staging', 1, ],
+ ]
+ 
+diff --git a/src/meta/window.h b/src/meta/window.h
+index f5b2883b9bfc4a105145c9bdc2adfb50efbc44fc..39c66fe51f0e88c5f7d3390a1eaba24a87ffc5f5 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -20,6 +20,7 @@
+ #pragma once
+ 
+ #include <glib-object.h>
++#include <gio/gio.h>
+ 
+ #include "meta/boxes.h"
+ #include "meta/meta-enums.h"
+@@ -91,6 +92,9 @@ typedef struct _MetaWindowClass   MetaWindowClass;
+ META_EXPORT
+ GType meta_window_get_type (void);
+ 
++META_EXPORT
++GIcon * meta_window_get_toplevel_icon (MetaWindow *window);
++
+ META_EXPORT
+ gboolean meta_window_has_focus (MetaWindow *window);
+ 
+diff --git a/src/wayland/meta-wayland-icon-pixels.c b/src/wayland/meta-wayland-icon-pixels.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..c49290a690b92242a08c5fa9b0858f6b3ae4be1b
+--- /dev/null
++++ b/src/wayland/meta-wayland-icon-pixels.c
+@@ -0,0 +1,129 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include <gdk-pixbuf/gdk-pixbuf.h>
++#include <stdint.h>
++#include <string.h>
++#include <wayland-server-core.h>
++
++#include "wayland/meta-wayland-icon-pixels.h"
++#include "wayland/meta-wayland-buffer.h"
++#include "compositor/meta-multi-texture-format-private.h"
++
++static GIcon *
++copy_packed_pixels (struct wl_shm_buffer *buffer)
++{
++  int width = wl_shm_buffer_get_width (buffer);
++  int size = MIN (width, 512);
++  uint32_t format = wl_shm_buffer_get_format (buffer);
++  gboolean has_alpha = format == WL_SHM_FORMAT_ARGB8888 ||
++    format == WL_SHM_FORMAT_ABGR8888;
++  gboolean blue_first = format == WL_SHM_FORMAT_ARGB8888 ||
++    format == WL_SHM_FORMAT_XRGB8888;
++  GdkPixbuf *pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, size, size);
++  int source_stride = wl_shm_buffer_get_stride (buffer);
++  int stride = gdk_pixbuf_get_rowstride (pixbuf);
++  uint8_t *dest = gdk_pixbuf_get_pixels (pixbuf);
++  const uint8_t *source;
++
++  wl_shm_buffer_begin_access (buffer);
++  source = wl_shm_buffer_get_data (buffer);
++  for (int y = 0; y < size; y++)
++    {
++      int source_y = (int64_t) y * width / size;
++      for (int x = 0; x < size; x++)
++        {
++          int source_x = (int64_t) x * width / size;
++          uint32_t pixel;
++          uint8_t *out = dest + y * stride + x * 4;
++          unsigned int alpha;
++          unsigned int red, green, blue;
++
++          memcpy (&pixel, source + (size_t) source_y * source_stride + source_x * 4, 4);
++          alpha = has_alpha ? pixel >> 24 : 255;
++          red = blue_first ? (pixel >> 16) & 255 : pixel & 255;
++          green = (pixel >> 8) & 255;
++          blue = blue_first ? pixel & 255 : (pixel >> 16) & 255;
++          out[0] = alpha ? MIN (255, (red * 255 + alpha / 2) / alpha) : 0;
++          out[1] = alpha ? MIN (255, (green * 255 + alpha / 2) / alpha) : 0;
++          out[2] = alpha ? MIN (255, (blue * 255 + alpha / 2) / alpha) : 0;
++          out[3] = alpha;
++        }
++    }
++  wl_shm_buffer_end_access (buffer);
++  return G_ICON (pixbuf);
++}
++
++static GIcon *
++convert_pixels (MetaWaylandCompositor *compositor,
++                struct wl_resource    *resource,
++                GError               **error)
++{
++  MetaWaylandBuffer *buffer = meta_wayland_buffer_from_resource (compositor, resource);
++  g_autoptr (MetaMultiTexture) texture = NULL;
++  g_autoptr (CoglTexture) output = NULL;
++  g_autoptr (CoglOffscreen) offscreen = NULL;
++  g_autoptr (CoglPipeline) pipeline = NULL;
++  g_autoptr (GdkPixbuf) pixbuf = NULL;
++  CoglContext *context;
++  CoglFramebuffer *framebuffer;
++  MetaMultiTextureCoefficients coeffs;
++  int size;
++
++  if (!meta_wayland_buffer_realize (buffer) ||
++      !meta_wayland_buffer_attach (buffer, &texture, error))
++    return NULL;
++
++  size = MIN (meta_multi_texture_get_width (texture), 512);
++  context = cogl_texture_get_context (meta_multi_texture_get_plane (texture, 0));
++  output = cogl_texture_2d_new_with_size (context, size, size);
++  offscreen = cogl_offscreen_new_with_texture (output);
++  framebuffer = COGL_FRAMEBUFFER (offscreen);
++  if (!cogl_framebuffer_allocate (framebuffer, error))
++    return NULL;
++  cogl_framebuffer_orthographic (framebuffer, 0, 0, size, size, -1, 1);
++  pipeline = cogl_pipeline_new (context);
++  for (int i = 0; i < meta_multi_texture_get_n_planes (texture); i++)
++    {
++      cogl_pipeline_set_layer_texture (pipeline, i, meta_multi_texture_get_plane (texture, i));
++      cogl_pipeline_set_layer_filters (pipeline, i, COGL_PIPELINE_FILTER_LINEAR,
++                                       COGL_PIPELINE_FILTER_LINEAR);
++      cogl_pipeline_set_layer_combine (pipeline, i, "RGBA = REPLACE (TEXTURE)", NULL);
++    }
++  coeffs = meta_multi_texture_is_simple (texture)
++    ? META_MULTI_TEXTURE_COEFFICIENTS_IDENTITY_FULL
++    : META_MULTI_TEXTURE_COEFFICIENTS_BT709_LIMITED;
++  meta_multi_texture_add_pipeline_sampling (texture, coeffs,
++                                            META_MULTI_TEXTURE_ALPHA_MODE_PREMULT_ELECTRICAL,
++                                            pipeline);
++  cogl_pipeline_set_blend (pipeline, "RGBA = ADD (SRC_COLOR, 0)", NULL);
++  cogl_framebuffer_draw_rectangle (framebuffer, pipeline, 0, 0, size, size);
++  pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, size, size);
++  if (!cogl_framebuffer_read_pixels (framebuffer, 0, 0, size, size,
++                                     COGL_PIXEL_FORMAT_RGBA_8888,
++                                     gdk_pixbuf_get_pixels (pixbuf)))
++    {
++      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Cannot read icon pixels");
++      return NULL;
++    }
++  return G_ICON (g_steal_pointer (&pixbuf));
++}
++
++GIcon *
++meta_wayland_icon_pixels_new (MetaWaylandCompositor *compositor,
++                             struct wl_resource    *resource,
++                             GError               **error)
++{
++  struct wl_shm_buffer *buffer = wl_shm_buffer_get (resource);
++
++  switch (wl_shm_buffer_get_format (buffer))
++    {
++    case WL_SHM_FORMAT_ARGB8888:
++    case WL_SHM_FORMAT_XRGB8888:
++    case WL_SHM_FORMAT_ABGR8888:
++    case WL_SHM_FORMAT_XBGR8888:
++      return copy_packed_pixels (buffer);
++    default:
++      return convert_pixels (compositor, resource, error);
++    }
++}
+diff --git a/src/wayland/meta-wayland-icon-pixels.h b/src/wayland/meta-wayland-icon-pixels.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..87d0133c5f2f03f31904804a331389dc23a664dc
+--- /dev/null
++++ b/src/wayland/meta-wayland-icon-pixels.h
+@@ -0,0 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <gio/gio.h>
++#include "wayland/meta-wayland-types.h"
++
++GIcon * meta_wayland_icon_pixels_new (MetaWaylandCompositor *compositor,
++                                     struct wl_resource    *resource,
++                                     GError               **error);
+diff --git a/src/wayland/meta-wayland-surface-private.h b/src/wayland/meta-wayland-surface-private.h
+index e08cca7f0702bb535dea5def83390e0c3b2213d5..ac9087640e06638be4a22c06a0b43e41116e5fe2 100644
+--- a/src/wayland/meta-wayland-surface-private.h
++++ b/src/wayland/meta-wayland-surface-private.h
+@@ -95,6 +95,8 @@ struct _MetaWaylandSurfaceState
+   gboolean opaque_region_set;
+   MtkRegion *background_blur_region;
+   gboolean background_blur_region_set;
++  GIcon *toplevel_icon;
++  gboolean toplevel_icon_set;
+ 
+   /* wl_surface.frame */
+   struct wl_list frame_callback_list;
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index ea70206874d507a2bc731f1185fdecb03f622925..c930c4c6f1d01c3635f7a98239df288aba36c87a 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -437,6 +437,8 @@ meta_wayland_surface_state_set_default (MetaWaylandSurfaceState *state)
+   state->opaque_region_set = FALSE;
+   state->background_blur_region = NULL;
+   state->background_blur_region_set = FALSE;
++  state->toplevel_icon = NULL;
++  state->toplevel_icon_set = FALSE;
+ 
+   state->surface_damage = mtk_region_create ();
+   state->buffer_damage = mtk_region_create ();
+@@ -489,6 +491,7 @@ meta_wayland_surface_state_clear (MetaWaylandSurfaceState *state)
+   MetaWaylandFrameCallback *cb, *next;
+ 
+   g_clear_object (&state->texture);
++  g_clear_object (&state->toplevel_icon);
+   g_clear_object (&state->drm_syncobj.acquire);
+   g_clear_object (&state->drm_syncobj.release);
+   g_clear_object (&state->color_state);
+@@ -569,6 +572,12 @@ meta_wayland_surface_state_merge_into (MetaWaylandSurfaceState *from,
+       to->opaque_region_set = TRUE;
+     }
+ 
++  if (from->toplevel_icon_set)
++    {
++      g_set_object (&to->toplevel_icon, from->toplevel_icon);
++      to->toplevel_icon_set = TRUE;
++    }
++
+   if (from->background_blur_region_set)
+     {
+       g_clear_pointer (&to->background_blur_region, mtk_region_unref);
+diff --git a/src/wayland/meta-wayland-toplevel-icon.c b/src/wayland/meta-wayland-toplevel-icon.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..495eb2727bc018d6a4373abc2c6cd6d5d6dc2591
+--- /dev/null
++++ b/src/wayland/meta-wayland-toplevel-icon.c
+@@ -0,0 +1,259 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include <wayland-server-core.h>
++
++#include "wayland/meta-wayland-toplevel-icon.h"
++#include "wayland/meta-wayland-icon-pixels.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-surface-private.h"
++#include "wayland/meta-wayland-xdg-shell.h"
++#include "xdg-toplevel-icon-v1-server-protocol.h"
++
++typedef struct
++{
++  struct wl_resource *resource;
++  MetaWaylandCompositor *compositor;
++  char *name;
++  GPtrArray *buffers;
++  GIcon *icon;
++  gboolean immutable;
++} ToplevelIcon;
++
++typedef struct
++{
++  ToplevelIcon *icon;
++  struct wl_resource *resource;
++  struct wl_listener destroy_listener;
++  int size;
++  int scale;
++} IconBuffer;
++
++static void
++buffer_destroyed (struct wl_listener *listener,
++                  void               *data)
++{
++  IconBuffer *buffer = wl_container_of (listener, buffer, destroy_listener);
++
++  wl_list_remove (&buffer->destroy_listener.link);
++  wl_list_init (&buffer->destroy_listener.link);
++  buffer->resource = NULL;
++  wl_resource_post_error (buffer->icon->resource, XDG_TOPLEVEL_ICON_V1_ERROR_NO_BUFFER,
++                           "Icon buffer destroyed before its icon");
++}
++
++static void
++icon_buffer_free (gpointer data)
++{
++  IconBuffer *buffer = data;
++
++  wl_list_remove (&buffer->destroy_listener.link);
++  g_free (buffer);
++}
++
++static void
++icon_free (struct wl_resource *resource)
++{
++  ToplevelIcon *icon = wl_resource_get_user_data (resource);
++
++  g_ptr_array_unref (icon->buffers);
++  g_clear_object (&icon->icon);
++  g_free (icon->name);
++  g_free (icon);
++}
++
++static void
++destroy_resource (struct wl_client   *client,
++                  struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static gboolean
++icon_is_mutable (ToplevelIcon *icon)
++{
++  if (!icon->immutable)
++    return TRUE;
++
++  wl_resource_post_error (icon->resource, XDG_TOPLEVEL_ICON_V1_ERROR_IMMUTABLE,
++                           "Cannot change an assigned toplevel icon");
++  return FALSE;
++}
++
++static void
++icon_set_name (struct wl_client   *client,
++               struct wl_resource *resource,
++               const char         *name)
++{
++  ToplevelIcon *icon = wl_resource_get_user_data (resource);
++
++  if (!icon_is_mutable (icon))
++    return;
++  g_free (icon->name);
++  icon->name = g_strdup (name);
++}
++
++static void
++icon_add_buffer (struct wl_client   *client,
++                 struct wl_resource *resource,
++                 struct wl_resource *buffer_resource,
++                 int32_t             scale)
++{
++  ToplevelIcon *icon = wl_resource_get_user_data (resource);
++  struct wl_shm_buffer *shm;
++  IconBuffer *buffer;
++  int size;
++
++  if (!icon_is_mutable (icon))
++    return;
++  shm = wl_shm_buffer_get (buffer_resource);
++  if (!shm || scale <= 0 || wl_shm_buffer_get_width (shm) != wl_shm_buffer_get_height (shm))
++    {
++      wl_resource_post_error (resource, XDG_TOPLEVEL_ICON_V1_ERROR_INVALID_BUFFER,
++                               "Icon buffers must be square wl_shm buffers with a positive scale");
++      return;
++    }
++  size = wl_shm_buffer_get_width (shm);
++  for (guint i = 0; i < icon->buffers->len; i++)
++    {
++      IconBuffer *previous = g_ptr_array_index (icon->buffers, i);
++      if (previous->size == size && previous->scale == scale)
++        {
++          g_ptr_array_remove_index (icon->buffers, i);
++          break;
++        }
++    }
++  buffer = g_new0 (IconBuffer, 1);
++  buffer->icon = icon;
++  buffer->resource = buffer_resource;
++  buffer->size = size;
++  buffer->scale = scale;
++  buffer->destroy_listener.notify = buffer_destroyed;
++  wl_resource_add_destroy_listener (buffer_resource, &buffer->destroy_listener);
++  g_ptr_array_add (icon->buffers, buffer);
++}
++
++static const struct xdg_toplevel_icon_v1_interface icon_implementation = {
++  .destroy = destroy_resource,
++  .set_name = icon_set_name,
++  .add_buffer = icon_add_buffer,
++};
++
++static void
++manager_create_icon (struct wl_client   *client,
++                     struct wl_resource *resource,
++                     uint32_t            id)
++{
++  ToplevelIcon *icon = g_new0 (ToplevelIcon, 1);
++
++  icon->resource = wl_resource_create (client, &xdg_toplevel_icon_v1_interface, 1, id);
++  if (!icon->resource)
++    {
++      g_free (icon);
++      wl_client_post_no_memory (client);
++      return;
++    }
++  icon->compositor = wl_resource_get_user_data (resource);
++  icon->buffers = g_ptr_array_new_with_free_func (icon_buffer_free);
++  wl_resource_set_implementation (icon->resource, &icon_implementation, icon, icon_free);
++}
++
++static int64_t
++buffer_score (IconBuffer *buffer)
++{
++  int64_t logical_size = buffer->size / buffer->scale;
++
++  return ABS (logical_size - 128) * 1024 - MIN (buffer->size, 512);
++}
++
++static gboolean
++resolve_icon (ToplevelIcon *icon)
++{
++  IconBuffer *best = NULL;
++
++  if (icon->immutable)
++    return TRUE;
++  icon->immutable = TRUE;
++  for (guint i = 0; i < icon->buffers->len; i++)
++    {
++      IconBuffer *buffer = g_ptr_array_index (icon->buffers, i);
++      if (!buffer->resource)
++        return FALSE;
++      if (!best || buffer_score (buffer) < buffer_score (best))
++        best = buffer;
++    }
++  if (best)
++    {
++      g_autoptr (GError) error = NULL;
++
++      icon->icon = meta_wayland_icon_pixels_new (icon->compositor, best->resource, &error);
++      if (!icon->icon)
++        {
++          wl_resource_post_error (icon->resource, XDG_TOPLEVEL_ICON_V1_ERROR_INVALID_BUFFER,
++                                   "Cannot read icon buffer: %s", error ? error->message : "unavailable storage");
++          return FALSE;
++        }
++    }
++  else if (icon->name && *icon->name)
++    {
++      icon->icon = g_themed_icon_new (icon->name);
++    }
++  return TRUE;
++}
++
++static void
++manager_set_icon (struct wl_client   *client,
++                  struct wl_resource *resource,
++                  struct wl_resource *toplevel_resource,
++                  struct wl_resource *icon_resource)
++{
++  MetaWaylandXdgToplevel *toplevel = wl_resource_get_user_data (toplevel_resource);
++  MetaWaylandSurface *surface;
++  MetaWaylandSurfaceState *pending;
++  ToplevelIcon *icon = icon_resource ? wl_resource_get_user_data (icon_resource) : NULL;
++
++  if (icon && !resolve_icon (icon))
++    return;
++  if (!toplevel)
++    return;
++  surface = meta_wayland_surface_role_get_surface (META_WAYLAND_SURFACE_ROLE (toplevel));
++  pending = meta_wayland_surface_get_pending_state (surface);
++  g_set_object (&pending->toplevel_icon, (icon ? icon->icon : NULL));
++  pending->toplevel_icon_set = TRUE;
++}
++
++static const struct xdg_toplevel_icon_manager_v1_interface manager_implementation = {
++  .destroy = destroy_resource,
++  .create_icon = manager_create_icon,
++  .set_icon = manager_set_icon,
++};
++
++static void
++bind_manager (struct wl_client *client,
++              void             *data,
++              uint32_t          version,
++              uint32_t          id)
++{
++  struct wl_resource *resource =
++    wl_resource_create (client, &xdg_toplevel_icon_manager_v1_interface, version, id);
++
++  if (!resource)
++    {
++      wl_client_post_no_memory (client);
++      return;
++    }
++  wl_resource_set_implementation (resource, &manager_implementation, data, NULL);
++  xdg_toplevel_icon_manager_v1_send_icon_size (resource, 32);
++  xdg_toplevel_icon_manager_v1_send_icon_size (resource, 64);
++  xdg_toplevel_icon_manager_v1_send_icon_size (resource, 128);
++  xdg_toplevel_icon_manager_v1_send_done (resource);
++}
++
++void
++meta_wayland_init_toplevel_icon (MetaWaylandCompositor *compositor)
++{
++  if (!wl_global_create (compositor->wayland_display,
++                         &xdg_toplevel_icon_manager_v1_interface, 1,
++                         compositor, bind_manager))
++    g_error ("Cannot register xdg-toplevel-icon-v1");
++}
+diff --git a/src/wayland/meta-wayland-toplevel-icon.h b/src/wayland/meta-wayland-toplevel-icon.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..ce9f1cc46f54ff0350b175f08e73187fe8779f64
+--- /dev/null
++++ b/src/wayland/meta-wayland-toplevel-icon.h
+@@ -0,0 +1,6 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "wayland/meta-wayland-types.h"
++
++void meta_wayland_init_toplevel_icon (MetaWaylandCompositor *compositor);
+diff --git a/src/wayland/meta-wayland-xdg-shell.c b/src/wayland/meta-wayland-xdg-shell.c
+index f191021c9542f5b78a7404ef784c5a528fad0dd5..271ebfbacd88d9f29d4d598ddec40cfcbc494b00 100644
+--- a/src/wayland/meta-wayland-xdg-shell.c
++++ b/src/wayland/meta-wayland-xdg-shell.c
+@@ -118,6 +118,7 @@ struct _MetaWaylandXdgToplevel
+   int max_width;
+   int max_height;
+   gboolean restored_from_session;
++  GIcon *toplevel_icon;
+ };
+ 
+ G_DEFINE_TYPE (MetaWaylandXdgToplevel,
+@@ -964,6 +965,9 @@ meta_wayland_xdg_toplevel_apply_state (MetaWaylandSurfaceRole  *surface_role,
+     meta_wayland_surface_role_get_surface (surface_role);
+   MetaWindow *window;
+ 
++  if (pending->toplevel_icon_set)
++    g_set_object (&xdg_toplevel->toplevel_icon, pending->toplevel_icon);
++
+   window = meta_wayland_surface_get_window (surface);
+   if (!window)
+     {
+@@ -987,6 +991,7 @@ meta_wayland_xdg_toplevel_apply_state (MetaWaylandSurfaceRole  *surface_role,
+   surface_role_class =
+     META_WAYLAND_SURFACE_ROLE_CLASS (meta_wayland_xdg_toplevel_parent_class);
+   surface_role_class->apply_state (surface_role, pending);
++  meta_window_set_toplevel_icon (window, xdg_toplevel->toplevel_icon);
+ 
+   if (!xdg_surface_priv->configure_sent)
+     {
+@@ -1210,6 +1215,7 @@ meta_wayland_xdg_toplevel_finalize (GObject *object)
+   MetaWaylandXdgToplevel *xdg_toplevel = META_WAYLAND_XDG_TOPLEVEL (object);
+ 
+   g_clear_pointer (&xdg_toplevel->resource, wl_resource_destroy);
++  g_clear_object (&xdg_toplevel->toplevel_icon);
+ 
+   G_OBJECT_CLASS (meta_wayland_xdg_toplevel_parent_class)->finalize (object);
+ }
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index c2f2484d063786b2eae283455c414d871164f374..7e761bba1cd0ca123cc5633f2c900227707ac41c 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -66,6 +66,7 @@
+ #include "wayland/meta-wayland-tablet-manager.h"
+ #include "wayland/meta-wayland-transaction.h"
+ #include "wayland/meta-wayland-xdg-dialog.h"
++#include "wayland/meta-wayland-toplevel-icon.h"
+ #include "wayland/meta-wayland-xdg-foreign.h"
+ #include "wayland/meta-wayland-xdg-session-manager.h"
+ #include "wayland/meta-wayland-xdg-toplevel-tag.h"
+@@ -1021,6 +1022,7 @@ meta_wayland_compositor_new (MetaContext *context)
+   meta_wayland_init_cursor_shape (compositor);
+   meta_wayland_init_color_representation (compositor);
+   meta_wayland_init_background_effect (compositor);
++  meta_wayland_init_toplevel_icon (compositor);
+   meta_wayland_init_fixes (compositor);
+ 
+ #ifdef HAVE_XWAYLAND

@@ -354,11 +354,13 @@ class KestrelUi {
     this.closingSelections.get(actor)?.();
     this.closingSelections.delete(actor);
     actor.get_parent()!.set_child_above_sibling(actor, null);
-    if (!actor.visible) {
+    const opening = !actor.visible;
+    actor.show();
+    this.place();
+    if (opening) {
       actor.opacity = 255;
       actor.translation_y = this.powerDistance();
     }
-    actor.show();
     this.animate(actor, 0, 200);
   }
 

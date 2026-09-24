@@ -1,0 +1,3 @@
+0001-compositor-round-window-surfaces-and-preserve-native.patch
+0002-clutter-reuse-the-framebuffer-blur-effect-shader.patch
+0003-wayland-support-xdg-toplevel-icon-v1-and-expose-wind.patch

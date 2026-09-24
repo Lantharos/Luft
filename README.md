@@ -5,7 +5,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | Directory | Purpose |
 | --- | --- |
 | `kestrel/engine` | GNOME Shell 51.0 fork using Kestrel’s local Mutter 51 build |
-| `kestrel/compositor` | Native window corners and the local Mutter build |
+| `kestrel/compositor` | Mutter patch series, window corners, and window icons |
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
 | `apps/rover` | Rover file manager and file chooser portal backend |
 | `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |

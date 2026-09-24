@@ -201,6 +201,10 @@ shell_app_get_icon (ShellApp *app)
   if (app->info)
     return g_app_info_get_icon (G_APP_INFO (app->info));
 
+  MetaWindow *window = window_backed_app_get_window (app);
+  if (window && meta_window_get_toplevel_icon (window))
+    return meta_window_get_toplevel_icon (window);
+
   if (!app->fallback_icon)
     app->fallback_icon = g_themed_icon_new ("application-x-executable");
 
@@ -246,6 +250,29 @@ shell_app_create_icon_texture (ShellApp   *app,
     st_widget_add_style_class_name (ST_WIDGET (ret), "fallback-app-icon");
 
   return ret;
+}
+
+/**
+ * shell_app_create_window_icon_texture:
+ * @app: the window's application
+ * @window: the window supplying the icon
+ * @size: logical icon size
+ *
+ * Returns: (transfer none): A floating #ClutterActor
+ */
+ClutterActor *
+shell_app_create_window_icon_texture (ShellApp   *app,
+                                      MetaWindow *window,
+                                      int         size)
+{
+  ClutterActor *icon = st_icon_new ();
+
+  st_icon_set_icon_size (ST_ICON (icon), size);
+  st_icon_set_fallback_icon_name (ST_ICON (icon), "application-x-executable");
+  if (app->info)
+    g_object_bind_property (app, "icon", icon, "fallback-gicon", G_BINDING_SYNC_CREATE);
+  g_object_bind_property (window, "toplevel-icon", icon, "gicon", G_BINDING_SYNC_CREATE);
+  return icon;
 }
 
 const char *
@@ -1107,6 +1134,15 @@ shell_app_ensure_busy_watch (ShellApp *app)
                                        g_object_ref (app));
 }
 
+static void
+shell_app_on_toplevel_icon_changed (MetaWindow *window,
+                                    GParamSpec *pspec,
+                                    ShellApp   *app)
+{
+  if (shell_app_is_window_backed (app))
+    g_object_notify (G_OBJECT (app), "icon");
+}
+
 void
 _shell_app_add_window (ShellApp        *app,
                        MetaWindow      *window)
@@ -1123,6 +1159,9 @@ _shell_app_add_window (ShellApp        *app,
   app->running_state->windows = g_slist_prepend (app->running_state->windows, g_object_ref (window));
   g_signal_connect_object (window, "notify::user-time", G_CALLBACK(shell_app_on_user_time_changed), app, 0);
   g_signal_connect_object (window, "notify::skip-taskbar", G_CALLBACK(shell_app_on_skip_taskbar_changed), app, 0);
+
+  g_signal_connect_object (window, "notify::toplevel-icon", G_CALLBACK (shell_app_on_toplevel_icon_changed), app, 0);
+  shell_app_on_toplevel_icon_changed (window, NULL, app);
 
   shell_app_update_app_actions (app, window);
   shell_app_ensure_busy_watch (app);
@@ -1161,6 +1200,8 @@ _shell_app_remove_window (ShellApp   *app,
   g_signal_handlers_disconnect_by_func (window, G_CALLBACK(shell_app_on_user_time_changed), app);
   g_signal_handlers_disconnect_by_func (window, G_CALLBACK(shell_app_on_skip_taskbar_changed), app);
 
+  g_signal_handlers_disconnect_by_func (window, G_CALLBACK (shell_app_on_toplevel_icon_changed), app);
+  shell_app_on_toplevel_icon_changed (window, NULL, app);
   g_object_unref (window);
 
   g_signal_emit (app, shell_app_signals[WINDOWS_CHANGED], 0);

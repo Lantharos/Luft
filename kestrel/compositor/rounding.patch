@@ -1,0 +1,435 @@
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1181,6 +1181,18 @@
+   res->pipeline = cogl_pipeline_copy (pipeline);
+ 
+   return (ClutterPaintNode *) res;
++}
++
++/**
++ * clutter_layer_node_get_pipeline:
++ * @node: a #ClutterLayerNode
++ *
++ * Returns: (transfer none): the layer's output pipeline
++ */
++CoglPipeline *
++clutter_layer_node_get_pipeline (ClutterLayerNode *node)
++{
++  return node->pipeline;
+ }
+ 
+ /*
+@@ -1446,7 +1458,7 @@
+                              float         noise_width,
+                              float         noise_height)
+ {
+-  CoglSnippet *snippet;
++  static CoglSnippet *snippet;
+   int saturation_uniform;
+   int noise_uniform;
+   int noise_size_uniform;
+@@ -1454,11 +1466,11 @@
+   if (saturation == 1.0f && noise == 0.0f)
+     return;
+ 
+-  snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+-                              blur_framebuffer_effect_declarations,
+-                              blur_framebuffer_effect_source);
++  if (!snippet)
++    snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
++                                blur_framebuffer_effect_declarations,
++                                blur_framebuffer_effect_source);
+   cogl_pipeline_add_snippet (pipeline, snippet);
+-  g_object_unref (snippet);
+ 
+   saturation_uniform =
+     cogl_pipeline_get_uniform_location (pipeline,
+--- a/clutter/clutter/clutter-paint-nodes.h
++++ b/clutter/clutter/clutter-paint-nodes.h
+@@ -129,6 +129,9 @@
+ GType clutter_layer_node_get_type (void);
+ 
+ CLUTTER_EXPORT
++CoglPipeline * clutter_layer_node_get_pipeline (ClutterLayerNode *node);
++
++CLUTTER_EXPORT
+ ClutterPaintNode * clutter_layer_node_new_to_framebuffer (CoglFramebuffer *framebuffer,
+                                                           CoglPipeline    *pipeline);
+ 
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -16,6 +16,8 @@
+  */
+ 
+ #include "config.h"
++
++#include "compositor/meta-window-corners.h"
+ 
+ #include "compositor/meta-background-effect.h"
+ 
+@@ -685,6 +687,23 @@
+   if (!blur_node)
+     return;
+ 
++  MetaWindowCorners corners = meta_window_corners_for_actor (actor);
++  if (corners.radius > 0)
++    {
++      graphene_rect_t bounds;
++      CoglPipeline *pipeline =
++        clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node));
++
++      graphene_matrix_transform_bounds (&framebuffer_transform.actor_to_framebuffer,
++                                         &corners.bounds, &bounds);
++      corners.bounds = bounds;
++      corners.bounds.origin.x -= source_rect.x;
++      corners.bounds.origin.y -= source_rect.y;
++      corners.radius *= framebuffer_transform.scale;
++      meta_window_corners_apply (&corners, pipeline,
++                                  source_rect.width, source_rect.height);
++    }
++
+   n_rects = mtk_region_num_rectangles (paint_region);
+   for (int i = 0; i < n_rects; i++)
+     {
+--- a/src/compositor/meta-shaped-texture-private.h
++++ b/src/compositor/meta-shaped-texture-private.h
+@@ -43,6 +43,7 @@
+                                             gboolean           is_y_inverted);
+ MtkRegion * meta_shaped_texture_get_opaque_region (MetaShapedTexture *stex);
+ gboolean meta_shaped_texture_is_opaque (MetaShapedTexture *stex);
++gboolean meta_shaped_texture_is_content_opaque (MetaShapedTexture *stex);
+ gboolean meta_shaped_texture_has_alpha (MetaShapedTexture *stex);
+ void meta_shaped_texture_set_transform (MetaShapedTexture    *stex,
+                                         MtkMonitorTransform  transform);
+@@ -79,3 +80,6 @@
+ void meta_shaped_texture_set_color_repr (MetaShapedTexture            *stex,
+                                          MetaMultiTextureAlphaMode     premult,
+                                          MetaMultiTextureCoefficients  coeffs);
++
++void meta_shaped_texture_sync_window_corners (MetaShapedTexture *stex,
++                                              ClutterActor      *actor);
+--- a/src/compositor/meta-shaped-texture.c
++++ b/src/compositor/meta-shaped-texture.c
+@@ -36,6 +36,7 @@
+ 
+ #include "compositor/meta-multi-texture-format-private.h"
+ #include "compositor/meta-shaped-texture-private.h"
++#include "compositor/meta-window-corners.h"
+ #include "core/boxes-private.h"
+ #include "mtk/mtk.h"
+ 
+@@ -100,6 +101,8 @@
+ 
+   /* The region containing only fully opaque pixels */
+   MtkRegion *opaque_region;
++  MtkRegion *rounded_opaque_region;
++  MetaWindowCorners corners;
+ 
+   /* MetaCullable regions, see that documentation for more details */
+   MtkRegion *clip_region;
+@@ -341,6 +344,7 @@
+   meta_shaped_texture_reset_pipelines (stex);
+ 
+   g_clear_pointer (&stex->opaque_region, mtk_region_unref);
++  g_clear_pointer (&stex->rounded_opaque_region, mtk_region_unref);
+   g_clear_pointer (&stex->clip_region, mtk_region_unref);
+ 
+   G_OBJECT_CLASS (meta_shaped_texture_parent_class)->dispose (object);
+@@ -714,6 +718,7 @@
+                   uint8_t              opacity)
+ {
+   int dst_width, dst_height;
++  MtkRegion *opaque_region = meta_shaped_texture_get_opaque_region (stex);
+   MtkRectangle content_rect;
+   gboolean use_opaque_region;
+   MtkRegion *blended_tex_region;
+@@ -799,7 +804,7 @@
+         }
+     }
+ 
+-  use_opaque_region = stex->opaque_region && opacity == 255;
++  use_opaque_region = opaque_region && opacity == 255;
+ 
+   if (use_opaque_region)
+     {
+@@ -808,7 +813,7 @@
+       else
+         blended_tex_region = mtk_region_create_rectangle (&content_rect);
+ 
+-      mtk_region_subtract (blended_tex_region, stex->opaque_region);
++      mtk_region_subtract (blended_tex_region, opaque_region);
+     }
+   else
+     {
+@@ -846,11 +851,11 @@
+       if (stex->clip_region)
+         {
+           region = mtk_region_copy (stex->clip_region);
+-          mtk_region_intersect (region, stex->opaque_region);
++          mtk_region_intersect (region, opaque_region);
+         }
+       else
+         {
+-          region = mtk_region_ref (stex->opaque_region);
++          region = mtk_region_ref (opaque_region);
+         }
+ 
+       if (!mtk_region_is_empty (region))
+@@ -924,6 +929,9 @@
+           cogl_pipeline_set_layer_texture (blended_pipeline, i, plane);
+           cogl_pipeline_set_layer_filters (blended_pipeline, i, min_filter, mag_filter);
+         }
++
++      meta_window_corners_apply (&stex->corners, blended_pipeline,
++                                  dst_width, dst_height);
+ 
+       cogl_color_init_from_4f (&color, opacity / 255.0f, opacity / 255.0f,
+                                opacity / 255.0f, opacity / 255.0f);
+@@ -1017,6 +1025,7 @@
+   if (stex->texture == NULL)
+     return;
+ 
++  meta_shaped_texture_sync_window_corners (stex, actor);
+   opacity = clutter_actor_get_paint_opacity (actor);
+   clutter_actor_get_content_box (actor, &alloc);
+ 
+@@ -1291,6 +1300,7 @@
+                                        MtkRegion         *opaque_region)
+ {
+   g_clear_pointer (&stex->opaque_region, mtk_region_unref);
++  g_clear_pointer (&stex->rounded_opaque_region, mtk_region_unref);
+   if (opaque_region)
+     stex->opaque_region = mtk_region_ref (opaque_region);
+ }
+@@ -1298,7 +1308,30 @@
+ MtkRegion *
+ meta_shaped_texture_get_opaque_region (MetaShapedTexture *stex)
+ {
+-  return stex->opaque_region;
++  if (!stex->opaque_region || stex->corners.radius == 0)
++    return stex->opaque_region;
++
++  if (!stex->rounded_opaque_region)
++    {
++      stex->rounded_opaque_region = mtk_region_copy (stex->opaque_region);
++      meta_window_corners_subtract_opaque (&stex->corners,
++                                           stex->rounded_opaque_region);
++    }
++  return stex->rounded_opaque_region;
++}
++
++void
++meta_shaped_texture_sync_window_corners (MetaShapedTexture *stex,
++                                         ClutterActor      *actor)
++{
++  MetaWindowCorners corners = meta_window_corners_for_actor (actor);
++
++  if (corners.radius == stex->corners.radius &&
++      graphene_rect_equal (&corners.bounds, &stex->corners.bounds))
++    return;
++
++  stex->corners = corners;
++  g_clear_pointer (&stex->rounded_opaque_region, mtk_region_unref);
+ }
+ 
+ gboolean
+@@ -1332,6 +1365,13 @@
+ 
+ gboolean
+ meta_shaped_texture_is_opaque (MetaShapedTexture *stex)
++{
++  return stex->corners.radius == 0 &&
++    meta_shaped_texture_is_content_opaque (stex);
++}
++
++gboolean
++meta_shaped_texture_is_content_opaque (MetaShapedTexture *stex)
+ {
+   MetaMultiTexture *multi_texture;
+   MtkRectangle opaque_rect;
+@@ -1467,7 +1507,7 @@
+ {
+   CoglTexture *cogl_texture;
+ 
+-  if (stex->mask_texture != NULL)
++  if (stex->mask_texture != NULL || stex->corners.radius > 0)
+     return TRUE;
+ 
+   if (meta_multi_texture_get_n_planes (stex->texture) > 1)
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -26,6 +26,7 @@
+ #include "compositor/meta-shaped-texture-private.h"
+ #include "compositor/meta-surface-content.h"
+ #include "compositor/meta-window-actor-private.h"
++#include "compositor/meta-window-corners.h"
+ #include "meta/compositor.h"
+ #include "meta/meta-shaped-texture.h"
+ 
+@@ -49,6 +50,9 @@
+   MetaSurfaceContent *content;
+ 
+   MtkRegion *input_region;
++  MtkRegion *rounded_input_region;
++  MetaWindowCorners input_corners;
++  MtkRectangle input_bounds;
+   MtkRegion *background_blur_region;
+   MtkRegion *background_blur_sample_region;
+   MetaBackgroundBlur *background_blur;
+@@ -180,21 +184,50 @@
+     }
+ }
+ 
++static MtkRegion *
++get_rounded_input_region (MetaSurfaceActor *self)
++{
++  MetaSurfaceActorPrivate *priv = meta_surface_actor_get_instance_private (self);
++  MetaWindowCorners corners = meta_window_corners_for_actor (CLUTTER_ACTOR (self));
++  MtkRectangle bounds = get_preferred_size_bounds (self);
++
++  if (corners.radius == 0)
++    return priv->input_region;
++
++  if (corners.radius != priv->input_corners.radius ||
++      !graphene_rect_equal (&corners.bounds, &priv->input_corners.bounds) ||
++      !mtk_rectangle_equal (&bounds, &priv->input_bounds))
++    g_clear_pointer (&priv->rounded_input_region, mtk_region_unref);
++
++  if (!priv->rounded_input_region)
++    {
++      priv->input_corners = corners;
++      priv->input_bounds = bounds;
++      priv->rounded_input_region = priv->input_region
++        ? mtk_region_copy (priv->input_region)
++        : mtk_region_create_rectangle (&bounds);
++      meta_window_corners_clip_input (&corners, priv->rounded_input_region);
++    }
++
++  return priv->rounded_input_region;
++}
++
+ static void
+ meta_surface_actor_pick (ClutterActor       *actor,
+                          ClutterPickContext *pick_context)
+ {
+   MetaSurfaceActor *self = META_SURFACE_ACTOR (actor);
+-  MetaSurfaceActorPrivate *priv =
+-    meta_surface_actor_get_instance_private (self);
++  MtkRegion *input_region;
+   ClutterActorIter iter;
+   ClutterActor *child;
+ 
+   if (!clutter_actor_should_pick (actor, pick_context))
+     return;
+ 
++  input_region = get_rounded_input_region (self);
++
+   /* If there is no region then use the regular pick */
+-  if (priv->input_region == NULL)
++  if (input_region == NULL)
+     {
+       ClutterActorClass *actor_class =
+         CLUTTER_ACTOR_CLASS (meta_surface_actor_parent_class);
+@@ -206,14 +239,14 @@
+       int n_rects;
+       int i;
+ 
+-      n_rects = mtk_region_num_rectangles (priv->input_region);
++      n_rects = mtk_region_num_rectangles (input_region);
+ 
+       for (i = 0; i < n_rects; i++)
+         {
+           MtkRectangle rect;
+           ClutterActorBox box;
+ 
+-          rect = mtk_region_get_rectangle (priv->input_region, i);
++          rect = mtk_region_get_rectangle (input_region, i);
+ 
+           box.x1 = rect.x;
+           box.y1 = rect.y;
+@@ -349,6 +382,7 @@
+ 
+   g_clear_pointer (&priv->pending_damage, mtk_region_unref);
+   g_clear_pointer (&priv->input_region, mtk_region_unref);
++  g_clear_pointer (&priv->rounded_input_region, mtk_region_unref);
+   g_clear_pointer (&priv->background_blur,
+                    meta_background_blur_destroy);
+   g_clear_pointer (&priv->background_blur_region, mtk_region_unref);
+@@ -417,7 +451,11 @@
+ gboolean
+ meta_surface_actor_is_opaque (MetaSurfaceActor *self)
+ {
+-  return META_SURFACE_ACTOR_GET_CLASS (self)->is_opaque (self);
++  MetaShapedTexture *texture = meta_surface_actor_get_texture (self);
++
++  meta_shaped_texture_sync_window_corners (texture, CLUTTER_ACTOR (self));
++  return meta_shaped_texture_is_opaque (texture) &&
++    META_SURFACE_ACTOR_GET_CLASS (self)->is_opaque (self);
+ }
+ 
+ static void
+@@ -437,6 +475,7 @@
+       MtkRegion *opaque_region;
+       g_autoptr (MtkRegion) effective_opaque_region = NULL;
+ 
++      meta_shaped_texture_sync_window_corners (texture, CLUTTER_ACTOR (surface_actor));
+       opaque_region = meta_shaped_texture_get_opaque_region (texture);
+       if (!opaque_region)
+         return;
+@@ -740,6 +779,7 @@
+     meta_surface_actor_get_instance_private (self);
+ 
+   g_clear_pointer (&priv->input_region, mtk_region_unref);
++  g_clear_pointer (&priv->rounded_input_region, mtk_region_unref);
+ 
+   if (region)
+     priv->input_region = mtk_region_ref (region);
+--- a/src/compositor/meta-window-actor-x11.c
++++ b/src/compositor/meta-window-actor-x11.c
+@@ -19,6 +19,8 @@
+  */
+ 
+ #include "config.h"
++
++#include "compositor/meta-window-corners.h"
+ 
+ #include "compositor/meta-window-actor-x11.h"
+ 
+@@ -404,7 +406,8 @@
+    * Do not add shadows to non-opaque (ARGB32) windows, as we can't easily
+    * generate shadows for them.
+    */
+-  if (!meta_window_actor_is_opaque (META_WINDOW_ACTOR (actor_x11)))
++  if (!meta_shaped_texture_is_content_opaque (
++        meta_window_actor_get_texture (META_WINDOW_ACTOR (actor_x11))))
+     return FALSE;
+ 
+   /*
+@@ -617,8 +620,14 @@
+ 
+       if (!actor_x11->shadow_shape)
+         {
+-          actor_x11->shadow_shape =
+-            meta_window_shape_new (actor_x11->shape_region);
++          MetaSurfaceActor *surface =
++            meta_window_actor_get_surface (META_WINDOW_ACTOR (actor_x11));
++          MetaWindowCorners corners =
++            meta_window_corners_for_actor (CLUTTER_ACTOR (surface));
++          g_autoptr (MtkRegion) shape = mtk_region_copy (actor_x11->shape_region);
++
++          meta_window_corners_clip_input (&corners, shape);
++          actor_x11->shadow_shape = meta_window_shape_new (shape);
+         }
+ 
+       get_shape_bounds (actor_x11, &shape_bounds);
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -291,6 +291,8 @@
+   'compositor/meta-plugin.c',
+   'compositor/meta-plugin-manager.c',
+   'compositor/meta-plugin-manager.h',
++  'compositor/meta-window-corners.c',
++  'compositor/meta-window-corners.h',
+   'compositor/meta-shaped-texture.c',
+   'compositor/meta-shaped-texture-private.h',
+   'compositor/meta-surface-actor.c',

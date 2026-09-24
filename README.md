@@ -4,7 +4,8 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 
 | Directory | Purpose |
 | --- | --- |
-| `kestrel/engine` | GNOME Shell 51.0 fork using the installed Mutter 51 compositor library |
+| `kestrel/engine` | GNOME Shell 51.0 fork using Kestrel’s local Mutter 51 build |
+| `kestrel/compositor` | Native window corners and the local Mutter build |
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
 | `apps/rover` | Rover file manager and file chooser portal backend |
 | `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |
@@ -14,16 +15,19 @@ Kestrel currently boots on a virtual Wayland monitor with its own bottom panel, 
 
 ## Build and capture Kestrel
 
-The engine currently targets Mutter and GNOME Shell 51.0. Install the matching distribution build dependencies, Meson, Ninja, GJS, and Bun. On Fedora, `dnf builddep gnome-shell` supplies the engine dependencies. The build only writes inside `kestrel/build` and the chosen installation prefix.
+The engine currently targets Mutter and GNOME Shell 51.0. Install the matching distribution build dependencies, Meson, Ninja, GJS, and Bun. On Fedora, `dnf builddep gnome-shell mutter` supplies the engine and compositor dependencies. The compositor is pinned to the matching 51.0 ABI and built locally; the host compositor is not replaced. Build output stays inside `kestrel/build`, `kestrel/run`, and the chosen installation prefix.
 
 ```bash
 cd kestrel/ui
 bun install --frozen-lockfile
 bun run check
 cd ../..
-meson setup kestrel/build kestrel/engine --prefix="$PWD/kestrel/install" -Dtests=false -Dextensions_tool=false -Dman=false
+kestrel/compositor/build.sh
+meson setup kestrel/build kestrel/engine -Dpkg_config_path="$PWD/kestrel/run/mutter-install/lib/pkgconfig" --prefix="$PWD/kestrel/install" -Dtests=false -Dextensions_tool=false -Dman=false
 meson compile -C kestrel/build
 ```
+
+For an existing build, rerun Meson setup with `--reconfigure --clearcache` and the same `pkg_config_path` before compiling.
 
 To open a visible nested session for interactive testing:
 

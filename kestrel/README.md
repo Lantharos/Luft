@@ -1,10 +1,10 @@
 # Kestrel
 
-Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library and owns its panel, launcher, quick settings, notification center, and power menu in TypeScript. The imported engine retains GNOME Shell's C/St integration and the session services required for window management, authentication, screenshots, screencasts, and portals.
+Kestrel is Luft's desktop shell. It uses a local Mutter 51 build with native window rounding and owns its panel, launcher, quick settings, notification center, and power menu in TypeScript. The imported engine retains GNOME Shell's C/St integration and the session services required for window management, authentication, screenshots, screencasts, and portals.
 
 ## Current checkpoint
 
-- The engine and TypeScript UI compile against Fedora's GNOME 51 stack.
+- The engine and TypeScript UI compile against the GNOME 51 stack. The session launcher uses the locally built compositor.
 - The development launcher supports a visible nested session and isolated captures at 1280×800 and 1440×900.
 - The square, transparent 48px panel reserves the bottom edge. Its launcher and favorite/running apps stay centered against the monitor while live network, volume, and right-aligned, stacked date/time indicators sit on the right.
 - Start’s default grid excludes apps pinned to the panel. Search includes every installed application, including pinned apps, and launches the selected result. Pinning or unpinning refreshes the grid immediately. Down moves from search into the app grid; arrows and Tab navigate controls, and focused apps scroll into view.
@@ -68,3 +68,13 @@ Retained dialogs, native menus, switchers, notification banners, volume and brig
 The capture command exercises audio selection and encrypted-volume password requests through D-Bus and cancels them without submitting credentials. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not authenticate through GDM. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
 
 The development launcher loads resources, typelibs, libraries, and schemas from the build directory, without depending on an installed temporary prefix.
+
+### Window corners and blur
+
+Application windows use 12px rounded corners, including maximized and tiled windows. Fullscreen content stays edge-to-edge, retaining the compositor’s direct-scanout eligibility. Desktop backgrounds, docks, and drag icons keep their own shapes. Existing client transparency and shadows are preserved.
+
+The corner mask runs in the surface’s existing draw pass. Window interiors retain opaque rendering and occlusion culling; only corner areas require blending. Wayland subsurfaces share their parent window’s corner geometry, and pointer hit regions follow the visible corners.
+
+Shell glass uses separable Gaussian blur, with horizontal and vertical passes, adaptive downscaling, and paired texture taps through GPU linear sampling. It does not use Dual Kawase. The backdrop cache tracks damaged regions per display, and shell text is drawn separately from the blurred background.
+
+Build the compositor with `kestrel/compositor/build.sh` before launching a development session. Source, build files, and installed libraries stay under `kestrel/run`; no host compositor packages are replaced. See [the compositor notes](compositor/README.md) for the patch boundary.

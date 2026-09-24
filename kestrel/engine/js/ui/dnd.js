@@ -115,7 +115,7 @@ class _Draggable extends Signals.EventEmitter {
     }
 
     _grabEvents(sprite) {
-        const grab = Main.pushModal(_getEventHandlerActor());
+        const grab = Main.pushModal(_getEventHandlerActor(), {dismissShell: false});
         this._grab = grab;
         this._sprite = sprite;
     }

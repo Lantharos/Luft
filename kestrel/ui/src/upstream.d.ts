@@ -40,3 +40,10 @@ declare module 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js' {
     display(index: number): void;
   }
 }
+
+declare module 'resource:///org/gnome/shell/ui/dnd.js' {
+  export enum DragMotionResult { NO_DROP, COPY_DROP, MOVE_DROP, CONTINUE }
+  export function makeDraggable(actor: import('gi://Clutter').default.Actor, params: object): { connect(signal: string, callback: (...args: any[]) => void): number };
+  export function addDragMonitor(monitor: object): void;
+  export function removeDragMonitor(monitor: object): void;
+}

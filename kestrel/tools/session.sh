@@ -6,6 +6,14 @@ mode="${1:-nested}"
 run="$root/kestrel/run"
 mkdir -p "$run"/{config,data,cache,state}
 
+compositor="$run/mutter-install/lib"
+if [[ ! -f "$compositor/libmutter-51.so" ]]; then
+  echo "Build Kestrel's compositor first: kestrel/compositor/build.sh" >&2
+  exit 1
+fi
+export LD_LIBRARY_PATH="$compositor:$compositor/mutter-51${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export GI_TYPELIB_PATH="$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+
 dconf dump /org/gnome/desktop/background/ > "$run/background.ini"
 dconf dump /org/gnome/desktop/interface/ > "$run/interface.ini"
 dconf dump /org/gnome/desktop/input-sources/ > "$run/input-sources.ini"

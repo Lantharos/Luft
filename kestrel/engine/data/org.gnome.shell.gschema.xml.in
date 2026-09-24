@@ -60,6 +60,10 @@
         load all extensions regardless of the versions they claim to support.
       </description>
     </key>
+    <key name="kestrel-start-layout" type="s">
+      <default>'{"items":[],"folders":{}}'</default>
+      <summary>Start app order and folders</summary>
+    </key>
     <key name="favorite-apps" type="as">
       <default>
         @DASH_APPS@

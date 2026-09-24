@@ -281,3 +281,13 @@ StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(
 
 .kestrel-task-button StIcon { icon-shadow: none; }
 .workspace-animation { background-color: transparent; }
+
+.kestrel-grid-header { spacing: 8px; min-height: 28px; }
+.kestrel-folder-back { padding: 4px 10px; border-radius: 8px; background-color: transparent; }
+.kestrel-folder-back:hover, .kestrel-folder-back:focus { background-color: rgba(255,255,255,0.12); }
+.kestrel-folder-name { background-color: transparent; border-color: transparent; padding: 4px 8px; font-size: 13px; }
+.kestrel-folder-name:focus { background-color: rgba(255,255,255,0.10); }
+.kestrel-folder-preview { padding: 3px; border-radius: 9px; background-color: rgba(255,255,255,0.13); }
+.kestrel-app-button.drop-into, .kestrel-folder-back.drop-into { background-color: rgba(255,255,255,0.25); }
+.kestrel-app-button.drop-before { box-shadow: inset 3px 0 rgba(255,255,255,0.75); }
+.kestrel-app-button.drop-after { box-shadow: inset -3px 0 rgba(255,255,255,0.75); }

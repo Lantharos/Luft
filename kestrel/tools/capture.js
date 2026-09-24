@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
 import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
+import {checkFolders} from './folderChecks.js';
 import {checkSession} from './sessionChecks.js';
 import {captureRenderedFrames} from './frameCapture.js';
 
@@ -297,4 +298,5 @@ export async function run() {
     }
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
+  await checkFolders({pause, capture, actorNamed, pointer, output});
 }

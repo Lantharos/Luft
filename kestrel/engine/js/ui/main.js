@@ -704,12 +704,14 @@ function _findModal(grab) {
  * @returns {Clutter.Grab} - the grab handle created
  */
 export function pushModal(actor, params = {}) {
-    const {actionMode: newActionMode} = {
+    const {actionMode: newActionMode, dismissShell} = {
         actionMode: Shell.ActionMode.NONE,
+        dismissShell: true,
         ...params,
     };
 
-    KestrelUi.dismissImmediately();
+    if (dismissShell)
+        KestrelUi.dismissImmediately();
     const grab = global.stage.grab(actor);
 
     if (modalCount === 0)

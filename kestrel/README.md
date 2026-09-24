@@ -31,6 +31,14 @@ Kestrel is Luft's desktop shell. It builds against the host Mutter 51 library an
 
 The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, suspend, or portal permission dialogs.
 
+### Start folders and app order
+
+Drag an app onto the center of another app to create a folder, or onto an existing folder to add it. Drop beside an icon to rearrange apps or folders; insertion marks show the position. The grid scrolls when a dragged icon approaches its top or bottom edge.
+
+Open a folder to launch or rearrange its apps. Edit its name in the header. Drag an app onto the Apps breadcrumb to move it back out, or use its context menu. Right-click a folder to rename it or ungroup its apps. Empty folders disappear. Escape returns to Apps before closing Start.
+
+Folder contents, names, and ordering are saved across sessions. Apps pinned to the panel stay hidden in the default grid and folder views, while search finds individual apps regardless of their folder or pin status.
+
 ### Context menus
 
 Right-click an app in Start or the panel for launch actions, open windows, pinning, window sizing, minimizing, and closing. The panel, clock, status area, desktop background, account area, Quick Settings controls, notifications, and search field offer relevant shortcuts. Menus also open with the Menu key or Shift+F10 on a focused control; Escape closes the menu and restores focus. Long app menus scroll within the screen.

@@ -49,7 +49,7 @@ The 12px radius is measured in logical window coordinates. Each Wayland subsurfa
 
 Only the blended pipeline receives the antialiased distance mask. Four small corner squares are removed from the opaque region so underlying pixels are drawn correctly; the remaining interior still uses unblended rendering. Native Xwayland shadows use the rounded shape without changing whether the client content qualifies for a shadow. Input cutouts are cached and refreshed when window geometry or the client input region changes. App-requested background blur uses the same mask on its existing output pass. Its effect shader is shared between frames. This adds no per-window offscreen framebuffer or continuous repaint source.
 
-Fullscreen surfaces bypass rounding, preserving edge-to-edge presentation and direct scanout eligibility. Native display scanout must be qualified on hardware; a nested session cannot demonstrate it.
+Maximized and fullscreen surfaces bypass rounding, preserving edge-to-edge presentation and direct scanout eligibility. Native display scanout must be qualified on hardware; a nested session cannot demonstrate it.
 
 ## Window icons
 

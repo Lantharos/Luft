@@ -1,3 +1,4 @@
+import {freezeSelection} from './kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
@@ -156,6 +157,8 @@ export const ModalDialog = GObject.registerClass({
     }
 
     open() {
+        this._clearClosingSelection?.();
+        this._clearClosingSelection = null;
         if (this.state === State.OPENED || this.state === State.OPENING)
             return true;
 
@@ -176,6 +179,7 @@ export const ModalDialog = GObject.registerClass({
     }
 
     close() {
+        this._clearClosingSelection ??= freezeSelection(this.dialogLayout);
         if (this.state === State.CLOSED || this.state === State.CLOSING)
             return;
 

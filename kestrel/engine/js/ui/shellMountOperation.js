@@ -374,7 +374,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
         this._errorMessageLabel = new St.Label({
             style_class: 'prompt-dialog-error-label',
-            opacity: 0,
+            visible: false,
         });
         this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._errorMessageLabel.clutter_text.line_wrap = true;
@@ -430,7 +430,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
         this._workSpinner.stop();
         this._passwordEntry.set_text('');
         this._errorMessageLabel.text = _('Sorry, that didn’t work. Please try again.');
-        this._errorMessageLabel.opacity = 255;
+        this._errorMessageLabel.show();
 
         wiggle(this._passwordEntry);
     }
@@ -451,11 +451,11 @@ const ShellMountPasswordDialog = GObject.registerClass({
             if (isNaN(pim)) {
                 this._pimEntry.set_text('');
                 this._errorMessageLabel.text = _('The PIM must be a number or empty');
-                this._errorMessageLabel.opacity = 255;
+                this._errorMessageLabel.show();
                 return;
             }
 
-            this._errorMessageLabel.opacity = 0;
+            this._errorMessageLabel.hide();
         }
 
         global.settings.set_boolean(REMEMBER_MOUNT_PASSWORD_KEY,

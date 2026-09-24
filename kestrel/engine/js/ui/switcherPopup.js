@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -406,6 +407,7 @@ export const SwitcherList = GObject.registerClass({
 }, class SwitcherList extends St.Widget {
     _init(squareItems) {
         super._init({style_class: 'switcher-list'});
+        styleSurface(this, 16);
 
         this._list = new St.BoxLayout({
             style_class: 'switcher-list-item-container',

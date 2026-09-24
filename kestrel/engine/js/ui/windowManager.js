@@ -9,7 +9,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as AltTab from './altTab.js';
-import * as AppFavorites from './appFavorites.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Dialog from './dialog.js';
 import * as WorkspaceSwitcherPopup from './workspaceSwitcherPopup.js';
 import * as InhibitShortcutsDialog from './inhibitShortcutsDialog.js';
@@ -758,128 +758,13 @@ export class WindowManager {
             Shell.ActionMode.POPUP,
             this._toggleQuickSettings.bind(this));
 
-        this.addKeybinding('switch-to-application-1',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-2',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-3',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-4',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-5',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-6',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-7',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-8',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('switch-to-application-9',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._switchToApplication.bind(this));
-
-        this.addKeybinding('open-new-window-application-1',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-2',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-3',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-4',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-5',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-6',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-7',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-8',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        this.addKeybinding('open-new-window-application-9',
-            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            this._openNewApplicationWindow.bind(this));
-
-        global.stage.connect('scroll-event', (stage, event) => {
-            const allowedModes = Shell.ActionMode.NORMAL;
-            if ((allowedModes & Main.actionMode) === 0)
-                return Clutter.EVENT_PROPAGATE;
-
-            if (this._workspaceAnimation.canHandleScrollEvent(event))
-                return Clutter.EVENT_PROPAGATE;
-
-            const {compositorModifiers} = global.display;
-            if ((event.get_state() & compositorModifiers) !== compositorModifiers)
-                return Clutter.EVENT_PROPAGATE;
-
-            return this.handleWorkspaceScroll(event);
-        });
+        for (let index = 1; index <= 9; index++) {
+            this.addKeybinding(`kestrel-workspace-${index}`,
+                new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+                Shell.ActionMode.NORMAL,
+                () => KestrelUi.switchWorkspace(index - 1));
+        }
 
         global.display.connect('show-resize-popup', this._showResizePopup.bind(this));
         global.display.connect('show-pad-osd', this._showPadOsd.bind(this));
@@ -1743,40 +1628,12 @@ export class WindowManager {
         Main.ctrlAltTabManager.popup(binding.is_reversed(), binding.get_name(), binding.get_mask());
     }
 
-    _allowFavoriteShortcuts() {
-        return Main.sessionMode.hasOverview;
-    }
-
-    _getNthFavoriteApp(n) {
-        if (!this._allowFavoriteShortcuts())
-            return null;
-
-        const apps = AppFavorites.getAppFavorites().getFavorites();
-        return apps[n];
-    }
-
-    _switchToApplication(display, window, event, binding) {
-        const [, , , target] = binding.get_name().split('-');
-        const app = this._getNthFavoriteApp(target - 1);
-        if (app) {
-            Main.overview.hide();
-            app.activate();
-        }
-    }
-
-    _openNewApplicationWindow(display, window, event, binding) {
-        const [, , , , target] = binding.get_name().split('-');
-        const app = this._getNthFavoriteApp(target - 1);
-        if (app)
-            app.open_new_window(-1);
-    }
-
     _toggleCalendar() {
-        Main.panel.toggleCalendar();
+        KestrelUi.toggleSurface('notifications');
     }
 
     _toggleQuickSettings() {
-        Main.panel.toggleQuickSettings();
+        KestrelUi.toggleSurface('quick');
     }
 
     _showWorkspaceSwitcher(display, window, event, binding) {

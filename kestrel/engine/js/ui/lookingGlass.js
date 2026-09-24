@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
@@ -611,6 +612,7 @@ export const Inspector = GObject.registerClass({
             orientation: Clutter.Orientation.HORIZONTAL,
             reactive: true,
         });
+        styleSurface(eventHandler);
         this._eventHandler = eventHandler;
         this.add_child(eventHandler);
         this._displayText = new St.Label({x_expand: true});
@@ -1420,6 +1422,7 @@ export class LookingGlass extends St.BoxLayout {
             reactive: true,
         });
 
+        styleSurface(this);
         this._borderPaintTarget = null;
         this._redBorderEffect = new RedBorderEffect();
 

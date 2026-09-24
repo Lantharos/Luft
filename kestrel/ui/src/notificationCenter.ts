@@ -25,7 +25,7 @@ export class NotificationCenter {
 
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
 
-  constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus) {
+  constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus, private readonly layoutChanged: () => void) {
     this.actor = new St.BoxLayout({
       orientation: Clutter.Orientation.VERTICAL,
       name: 'kestrel-notifications',
@@ -84,6 +84,7 @@ export class NotificationCenter {
         text: 'No notifications',
         style_class: 'kestrel-empty',
       }));
+      if (this.actor.visible) this.layoutChanged();
       return;
     }
 
@@ -97,6 +98,14 @@ export class NotificationCenter {
         { label: 'Notification settings', run: () => this.menus.settings('notifications') }]);
       this.list.add_child(item);
     }
+    if (this.actor.visible) this.layoutChanged();
+  }
+
+  preferredHeight(width: number, limit: number): number {
+    const theme = this.actor.get_theme_node();
+    const contentWidth = width - theme.get_horizontal_padding();
+    const header = this.actor.get_first_child()!.get_preferred_height(contentWidth)[1];
+    return Math.min(limit, header + this.list.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + theme.get_length('spacing'));
   }
 
   private watchSources(): void {

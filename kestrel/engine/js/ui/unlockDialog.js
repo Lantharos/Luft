@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import AccountsService from 'gi://AccountsService';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
@@ -252,6 +253,7 @@ const NotificationsBox = GObject.registerClass({
             style_class: 'unlock-dialog-notification-source',
             x_expand: true,
         });
+        styleSurface(obj.sourceBox, 16);
         this._showSource(source, obj, obj.sourceBox);
         this._notificationBox.insert_child_at_index(obj.sourceBox, this._players.size);
 

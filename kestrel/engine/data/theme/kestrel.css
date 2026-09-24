@@ -49,14 +49,14 @@
   font-family: "Adwaita Sans";
   border-radius: 20px;
   border: none;
-  padding: 24px;
-  spacing: 20px;
+  padding: 16px;
+  spacing: 12px;
 }
 
 .kestrel-title { font-size: 18px; font-weight: 600; }
 .kestrel-section-title { font-size: 13px; font-weight: 600; }
 .kestrel-start .kestrel-section-title { padding: 0 10px; }
-.kestrel-start { spacing: 18px; }
+.kestrel-start { padding: 20px; spacing: 14px; }
 
 .kestrel-search {
   color: #ffffff;
@@ -92,12 +92,12 @@
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
 .kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }
 
-.kestrel-quick-settings { border-radius: 20px; spacing: 16px; }
+.kestrel-quick-settings { border-radius: 20px; padding: 16px; spacing: 12px; }
 .kestrel-quick-header { spacing: 12px; }
-.kestrel-quick-content { spacing: 18px; }
+.kestrel-quick-content { spacing: 12px; }
 .kestrel-quick-tiles { spacing: 8px; }
 .kestrel-quick-row { spacing: 8px; }
-.kestrel-slider-section { padding: 12px 0 0; spacing: 6px; }
+.kestrel-slider-section { padding: 4px 0 0; spacing: 6px; }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
 .kestrel-quick-settings .quick-slider { padding: 0; }
@@ -124,7 +124,7 @@
   spacing: 7px;
 }
 .kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
-.kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 48px 12px; text-align: center; }
+.kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
 
 .kestrel-power-menu { spacing: 2px; padding: 8px; }
 .kestrel-power-action { padding: 12px; border-radius: 12px; }
@@ -172,20 +172,109 @@
 .kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }
 
 .kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 14px; background-color: rgba(20, 20, 24, 0.30); color: white; }
-.kestrel-context-action { padding: 10px 12px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
+.kestrel-context-action { padding: 9px 10px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
 
 .kestrel-window-previews {
-  padding: 6px;
-  border-radius: 16px;
+  padding: 4px;
+  border-radius: 12px;
   background-color: rgba(20, 20, 24, 0.30);
   color: white;
 }
 .kestrel-preview-row { spacing: 8px; }
-.kestrel-preview-card { padding: 4px; }
-.kestrel-preview-header { padding-left: 8px; font-size: 13px; }
-.kestrel-preview-close { padding: 10px; border-radius: 10px; background-color: transparent; box-shadow: none; }
+.kestrel-preview-card { padding: 0; }
+.kestrel-preview-header { padding-left: 6px; font-size: 13px; }
+.kestrel-preview-close { padding: 6px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-preview-close:hover, .kestrel-preview-close:focus { background-color: rgba(255, 100, 100, 0.4); }
-.kestrel-preview-window { padding: 4px; border-radius: 10px; background-color: transparent; box-shadow: none; }
+.kestrel-preview-window { padding: 2px; border-radius: 10px; background-color: transparent; box-shadow: none; }
 .kestrel-preview-window:hover, .kestrel-preview-window:focus { background-color: rgba(255, 255, 255, 0.16); }
+
+.kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.16); }
+
+.kestrel-glass {
+  background-color: rgba(20, 20, 24, 0.20);
+  background-image: none;
+  border: none;
+  border-radius: 20px;
+  box-shadow: none;
+  color: white;
+}
+.modal-dialog.kestrel-glass { padding: 20px; spacing: 16px; }
+.modal-dialog .modal-dialog-content-box { padding-top: 0; spacing: 12px; }
+.modal-dialog .modal-dialog-button-box { padding-top: 4px; spacing: 8px; }
+.message-dialog-content { spacing: 12px; }
+.prompt-dialog { width: 25em; }
+.prompt-dialog-password-entry { margin-left: 0; }
+.modal-dialog-button, .button, .icon-button, .notification-button,
+.audio-selection-device, .message-expand-button, .message-close-button,
+.message-collapse-button, .login-dialog-user-list-item, .login-dialog-user-list-item:focus {
+  background-color: rgba(255, 255, 255, 0.09);
+  background-image: none;
+  border: none;
+  border-radius: 10px;
+  box-shadow: none;
+  color: white;
+}
+.modal-dialog-button:hover, .modal-dialog-button:focus, .button:hover, .button:focus,
+.icon-button:hover, .icon-button:focus, .audio-selection-device:hover, .audio-selection-device:focus,
+.notification-button:hover, .notification-button:focus { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
+.modal-dialog-button:active, .button:active, .icon-button:active { background-color: rgba(255, 255, 255, 0.25); }
+StEntry { background-color: rgba(255, 255, 255, 0.09); color: white; border: 1px solid transparent; border-radius: 10px; box-shadow: none; padding: 10px 12px; }
+StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(255, 255, 255, 0.45); box-shadow: none; }
+.popup-menu-boxpointer, .candidate-popup-boxpointer, .keyboard-subkeys {
+  -arrow-base: 0; -arrow-rise: 0; -arrow-border-width: 0;
+  -arrow-background-color: transparent; -arrow-border-color: transparent;
+  -arrow-box-shadow: none;
+}
+.popup-menu { min-width: 0; }
+.popup-menu-content.kestrel-glass { padding: 6px; border-radius: 14px; }
+.popup-menu-item { padding: 9px 10px; border-radius: 9px; }
+.popup-menu-item:active, .popup-menu-item:checked, .popup-menu-item:hover, .popup-menu-item:focus { background-color: rgba(255, 255, 255, 0.16); color: white; }
+.popup-sub-menu, .popup-menu-section { background-color: transparent; box-shadow: none; }
+.switcher-list.kestrel-glass { padding: 8px; border-radius: 16px; }
+.switcher-list .item-box { padding: 8px; border-radius: 10px; }
+.switcher-list .item-box:selected, .switcher-list .item-box:outlined { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
+.workspace-switcher.kestrel-glass { padding: 10px; border-radius: 16px; margin-bottom: 64px; }
+.ws-switcher-indicator { background-color: rgba(255, 255, 255, 0.17); border: none; border-radius: 6px; }
+.ws-switcher-indicator:active { background-color: rgba(255, 255, 255, 0.75); }
+.osd-window.kestrel-glass { padding: 14px 18px; border-radius: 16px; }
+.osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 12px; box-shadow: none; }
+.message.kestrel-glass { border-radius: 16px; background-color: rgba(20, 20, 24, 0.20); }
+.message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
+.screenshot-ui-panel.kestrel-glass { padding: 12px; border-radius: 20px; }
+.screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 10px; }
+.screenshot-ui-type-button:hover, .screenshot-ui-shot-cast-button:hover,
+.screenshot-ui-type-button:checked, .screenshot-ui-shot-cast-button:checked { background-color: rgba(255, 255, 255, 0.18); }
+#keyboard { background-color: rgba(20, 20, 24, 0.20); border-radius: 16px 16px 0 0; box-shadow: none; }
+.keyboard-key { background-color: rgba(255, 255, 255, 0.12); border: none; border-radius: 8px; box-shadow: none; color: white; }
+.keyboard-key:hover, .keyboard-key:active { background-color: rgba(255, 255, 255, 0.26); }
+.popup-menu-content { background-color: transparent; border: none; box-shadow: none; padding: 6px; }
+.kestrel-preview-window.kestrel-closing-selection,
+.kestrel-context-action.kestrel-closing-selection,
+.popup-menu-item.kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.16); }
+.candidate-popup-content { background-color: transparent; border: none; box-shadow: none; }
+.candidate-box:selected { background-color: rgba(255, 255, 255, 0.18); border-radius: 8px; }
+.unlock-dialog .button, .unlock-dialog .icon-button, .unlock-dialog .login-dialog-prompt-entry,
+.login-dialog .button, .login-dialog .icon-button, .login-dialog .login-dialog-prompt-entry {
+  background-color: rgba(255, 255, 255, 0.10); border-radius: 10px; border-color: transparent; box-shadow: none;
+}
+.unlock-dialog .button:hover, .unlock-dialog .button:focus,
+.unlock-dialog .icon-button:hover, .unlock-dialog .icon-button:focus { background-color: rgba(255, 255, 255, 0.20); }
+.unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: rgba(20, 20, 24, 0.20); border-radius: 16px; padding: 12px; }
+.kestrel-glass .kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.18); }
+.prompt-dialog .prompt-dialog-error-label, .prompt-dialog .prompt-dialog-info-label,
+.prompt-dialog .prompt-dialog-null-label { padding: 4px 6px; margin: 0; }
+.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry { margin-left: 0; margin-right: 0; }
+#LookingGlassDialog, #LookingGlassAutoCompletionText { background-color: rgba(20, 20, 24, 0.20); border: none; box-shadow: none; color: white; }
+.lg-dialog .button { background-color: rgba(255, 255, 255, 0.10); }
+
+.kestrel-glass-radius-12 { border-radius: 12px; }
+.kestrel-glass-radius-14 { border-radius: 14px; }
+.kestrel-glass-radius-16 { border-radius: 16px; }
+.screenshot-ui-close-button, .screenshot-ui-show-pointer-button { background-color: rgba(255, 255, 255, 0.12); color: white; box-shadow: none; }
+.screenshot-ui-close-button:hover, .screenshot-ui-close-button:focus,
+.screenshot-ui-show-pointer-button:hover, .screenshot-ui-show-pointer-button:focus,
+.screenshot-ui-show-pointer-button:checked { background-color: rgba(255, 255, 255, 0.22); color: white; }
+.screenshot-ui-shot-cast-button:checked { color: white; }
+.screenshot-ui-window-selector { background-color: rgba(20, 20, 24, 0.20); }

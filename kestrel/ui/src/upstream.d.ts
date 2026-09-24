@@ -28,3 +28,15 @@ declare module '*.svg' {
 declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
   export function createInputSlider(): import('./quickControls.js').QuickControl;
 }
+
+declare module 'resource:///org/gnome/shell/ui/kestrelGlass.js' {
+  export function blurSurface(actor: import('gi://St').default.Widget, corners?: number): void;
+  export function freezeSelection(actor: import('gi://Clutter').default.Actor): () => void;
+}
+
+declare module 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js' {
+  export class WorkspaceSwitcherPopup extends import('gi://Clutter').default.Actor {
+    connect(signal: string, callback: () => void): number;
+    display(index: number): void;
+  }
+}

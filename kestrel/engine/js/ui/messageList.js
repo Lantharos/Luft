@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
@@ -480,6 +481,7 @@ export class Message extends St.Button {
             y_expand: false,
         });
 
+        styleSurface(this, 16);
         this.expanded = false;
         this._useBodyMarkup = false;
 

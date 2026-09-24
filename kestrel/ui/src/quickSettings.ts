@@ -117,8 +117,10 @@ export class QuickSettings {
   }
 
   preferredHeight(width: number, limit: number): number {
-    const header = this.header.get_preferred_height(width - 48)[1] + 64;
-    return this.pages.measure(width - 48, limit - header) + header;
+    const theme = this.actor.get_theme_node();
+    const contentWidth = width - theme.get_horizontal_padding();
+    const header = this.header.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + theme.get_length('spacing');
+    return this.pages.measure(contentWidth, limit - header) + header;
   }
 
   closeSubmenu(): boolean {

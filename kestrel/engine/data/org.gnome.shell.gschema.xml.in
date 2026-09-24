@@ -190,77 +190,41 @@
         Keybinding to focus the active notification.
       </description>
     </key>
-    <key name="switch-to-application-1" type="as">
+    <key name="kestrel-workspace-1" type="as">
       <default>["&lt;Super&gt;1"]</default>
-      <summary>Switch to application 1</summary>
+      <summary>Switch to workspace 1</summary>
     </key>
-    <key name="switch-to-application-2" type="as">
+    <key name="kestrel-workspace-2" type="as">
       <default>["&lt;Super&gt;2"]</default>
-      <summary>Switch to application 2</summary>
+      <summary>Switch to workspace 2</summary>
     </key>
-    <key name="switch-to-application-3" type="as">
+    <key name="kestrel-workspace-3" type="as">
       <default>["&lt;Super&gt;3"]</default>
-      <summary>Switch to application 3</summary>
+      <summary>Switch to workspace 3</summary>
     </key>
-    <key name="switch-to-application-4" type="as">
+    <key name="kestrel-workspace-4" type="as">
       <default>["&lt;Super&gt;4"]</default>
-      <summary>Switch to application 4</summary>
+      <summary>Switch to workspace 4</summary>
     </key>
-    <key name="switch-to-application-5" type="as">
+    <key name="kestrel-workspace-5" type="as">
       <default>["&lt;Super&gt;5"]</default>
-      <summary>Switch to application 5</summary>
+      <summary>Switch to workspace 5</summary>
     </key>
-    <key name="switch-to-application-6" type="as">
+    <key name="kestrel-workspace-6" type="as">
       <default>["&lt;Super&gt;6"]</default>
-      <summary>Switch to application 6</summary>
+      <summary>Switch to workspace 6</summary>
     </key>
-    <key name="switch-to-application-7" type="as">
+    <key name="kestrel-workspace-7" type="as">
       <default>["&lt;Super&gt;7"]</default>
-      <summary>Switch to application 7</summary>
+      <summary>Switch to workspace 7</summary>
     </key>
-    <key name="switch-to-application-8" type="as">
+    <key name="kestrel-workspace-8" type="as">
       <default>["&lt;Super&gt;8"]</default>
-      <summary>Switch to application 8</summary>
+      <summary>Switch to workspace 8</summary>
     </key>
-    <key name="switch-to-application-9" type="as">
+    <key name="kestrel-workspace-9" type="as">
       <default>["&lt;Super&gt;9"]</default>
-      <summary>Switch to application 9</summary>
-    </key>
-    <key name="open-new-window-application-1" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;1"]</default>
-      <summary>Open a new instance of application 1</summary>
-    </key>
-    <key name="open-new-window-application-2" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;2"]</default>
-      <summary>Open a new instance of application 2</summary>
-    </key>
-    <key name="open-new-window-application-3" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;3"]</default>
-      <summary>Open a new instance of application 3</summary>
-    </key>
-    <key name="open-new-window-application-4" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;4"]</default>
-      <summary>Open a new instance of application 4</summary>
-    </key>
-    <key name="open-new-window-application-5" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;5"]</default>
-      <summary>Open a new instance of application 5</summary>
-    </key>
-    <key name="open-new-window-application-6" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;6"]</default>
-      <summary>Open a new instance of application 6</summary>
-    </key>
-    <key name="open-new-window-application-7" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;7"]</default>
-      <summary>Open a new instance of application 7</summary>
-    </key>
-    <key name="open-new-window-application-8" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;8"]</default>
-      <summary>Open a new instance of application 8</summary>
-    </key>
-    <key name="open-new-window-application-9" type="as">
-      <default>["&lt;Super&gt;&lt;Control&gt;9"]</default>
-      <summary>Open a new instance of application 9</summary>
+      <summary>Switch to workspace 9</summary>
     </key>
     <key name="show-screenshot-ui" type="as">
       <default>["Print"]</default>

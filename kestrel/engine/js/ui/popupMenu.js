@@ -1,3 +1,4 @@
+import {freezeSelection} from './kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
@@ -1151,6 +1152,7 @@ export class PopupMenu extends PopupMenuBase {
      * @returns {bool} whether the open state changed
      */
     close(params) {
+        this._boxPointer._clearClosingSelection ??= freezeSelection(this.box);
         if (this._activeMenuItem)
             this._activeMenuItem.active = false;
 

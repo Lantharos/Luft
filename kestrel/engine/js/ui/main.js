@@ -285,7 +285,11 @@ async function _initializeUI() {
     overview.init();
     const quickSettings = new Panel.QuickSettings();
     panel.addToStatusArea('quickSettings', quickSettings);
-    KestrelUi.initialize({layoutManager, messageTray, quickSettings});
+    KestrelUi.initialize({
+        layoutManager, messageTray, quickSettings, sessionMode, screenShield,
+        canInteract: () => actionMode === Shell.ActionMode.NORMAL,
+        registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
+    });
 
     new PointerA11yTimeout.PointerA11yTimeout();
 
@@ -705,6 +709,7 @@ export function pushModal(actor, params = {}) {
         ...params,
     };
 
+    KestrelUi.dismissImmediately();
     const grab = global.stage.grab(actor);
 
     if (modalCount === 0)

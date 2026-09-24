@@ -7,6 +7,7 @@ import St from 'gi://St';
 
 import { blurSurface, PANEL_HEIGHT } from './surface.js';
 import { PanelLayout } from './panelLayout.js';
+import type { WindowPreviews } from './windowPreviews.js';
 import { Taskbar } from './taskbar.js';
 import type { ContextMenus } from './contextMenus.js';
 import { createLauncher } from './launcher.js';
@@ -39,8 +40,8 @@ export class KestrelPanel {
   private readonly clockButton: St.Button;
   private clockTimer = 0;
 
-  constructor(actions: PanelActions, menus: ContextMenus) {
-    this.taskbar = new Taskbar(this.tracker, menus);
+  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews) {
+    this.taskbar = new Taskbar(this.tracker, menus, previews);
     this.actor = new St.Widget({
       name: 'kestrel-panel',
       style_class: 'kestrel-panel',

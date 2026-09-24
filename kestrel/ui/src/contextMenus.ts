@@ -15,7 +15,7 @@ export class ContextMenus {
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
 
-  constructor(private readonly monitor: () => Monitor | null, private readonly dismissShell: () => void) {
+  constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
     blurSurface(this.actor, 14);
     this.actor.connect('destroy', () => {
       if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
@@ -88,9 +88,11 @@ export class ContextMenus {
   }
 
   open(source: Clutter.Actor, entries: MenuEntry[], x: number, y: number): void {
+    if (!this.enabled()) return;
+    this.beforeOpen();
     this.close();
     if (!entries.length) return;
-    const monitor = this.monitor();
+    const monitor = this.monitor(x, y);
     if (!monitor) return;
     this.source = source;
     this.sourceDestroy = source.connect('destroy', () => { this.source = null; this.sourceDestroy = 0; this.close(); });
@@ -107,8 +109,9 @@ export class ContextMenus {
     this.actor.add_child(scroll);
     this.actor.show();
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
-    this.shield.set_position(monitor.x, monitor.y);
-    this.shield.set_size(monitor.width, monitor.height);
+    const stage = (global as unknown as Shell.Global).stage;
+    this.shield.set_position(0, 0);
+    this.shield.set_size(stage.width, stage.height);
     this.shield.get_parent()!.set_child_above_sibling(this.shield, null);
     this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
     const height = this.actor.get_preferred_height(this.actor.width)[1];
@@ -121,12 +124,13 @@ export class ContextMenus {
     this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
-  close(): void {
+  close(immediate = false): void {
     if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
     const source = this.source;
     this.source = null;
     this.sourceDestroy = 0;
-    if (this.actor.visible) animateActor(this.actor, {
+    if (immediate) { this.actor.remove_all_transitions(); this.actor.hide(); }
+    else if (this.actor.visible) animateActor(this.actor, {
       opacity: 0, translation_y: 6, duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD,
       onComplete: () => { if (!this.source) this.actor.hide(); },
     });

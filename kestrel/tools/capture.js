@@ -128,8 +128,6 @@ export async function run() {
   await pause(150);
   await capture(`${output}/search.png`);
 
-  searchFocus.set_text('');
-  await pause(150);
   const files = actorNamed(start, 'Files');
   const [appX, appY] = files.get_transformed_position();
   pointer.notify_absolute_motion(GLib.get_monotonic_time(), appX + files.width / 2, appY + files.height / 2);
@@ -138,6 +136,11 @@ export async function run() {
   await pause(200);
   const contextMenu = actorNamed(global.stage, 'kestrel-context-menu');
   console.log(`Kestrel app context menu: ${contextMenu.visible}`);
+  const secondAction = contextMenu.get_first_child().child.get_children()[1];
+  const [actionX, actionY] = secondAction.get_transformed_position();
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), actionX + 20, actionY + secondAction.height / 2);
+  await pause(150);
+  if (global.stage.get_key_focus() !== secondAction) throw new Error('Menu focus did not follow pointer');
   await capture(`${output}/app-context-menu.png`);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.PRESSED);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.RELEASED);

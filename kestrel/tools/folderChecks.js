@@ -40,7 +40,7 @@ export async function checkFolders({pause, capture, actorNamed, pointer, output}
     dismissImmediately();
     toggleSurface('start');
     await pause(400);
-    let buttons = items();
+    let buttons = items().filter(button => !button.name.includes('folder:'));
     const first = buttons[0].name.replace('kestrel-start-item-', '');
     const second = buttons[1].name.replace('kestrel-start-item-', '');
     await drag(buttons[0], buttons[1]);

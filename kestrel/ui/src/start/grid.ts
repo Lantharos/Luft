@@ -93,15 +93,15 @@ export class StartGrid {
     this.header.destroy_all_children();
     const folder = !this.query && this.folder ? this.layout.folder(this.folder) : undefined;
     if (!folder) {
-      this.header.add_child(new St.Label({ text: this.query ? 'Search results' : 'Apps', style_class: 'kestrel-section-title' }));
+      this.header.add_child(new St.Label({ text: this.query ? 'Search results' : 'Apps', style_class: 'kestrel-section-title', y_align: Clutter.ActorAlign.START }));
       return;
     }
-    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', label: 'Apps', can_focus: true, track_hover: true });
+    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
     back.connect('clicked', () => this.home());
     this.drag.target(back, source => source.folder ? null : () => { this.layout.move(source.id, null); this.folder = null; });
     this.header.add_child(back);
-    this.header.add_child(new St.Icon({ icon_name: 'go-next-symbolic', icon_size: 12 }));
-    const name = new St.Entry({ name: 'kestrel-folder-name', hint_text: folder.name, style_class: 'kestrel-folder-name', can_focus: true, x_expand: true });
+    this.header.add_child(new St.Icon({ icon_name: 'go-next-symbolic', icon_size: 12, style_class: 'kestrel-folder-separator', y_align: Clutter.ActorAlign.START }));
+    const name = new St.Entry({ name: 'kestrel-folder-name', hint_text: folder.name, style_class: 'kestrel-folder-name', y_align: Clutter.ActorAlign.START, can_focus: true, x_expand: true });
     name.clutter_text.connect_after('key-focus-in', () => {
       if (!name.get_text()) name.set_text(folder.name);
     });

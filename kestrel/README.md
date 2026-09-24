@@ -71,7 +71,7 @@ The development launcher loads resources, typelibs, libraries, and schemas from 
 
 ### Window corners and blur
 
-Application windows use 12px rounded corners, including maximized and tiled windows. Fullscreen content stays edge-to-edge, retaining the compositor’s direct-scanout eligibility. Desktop backgrounds, docks, and drag icons keep their own shapes. Existing client transparency and shadows are preserved.
+Application windows use 12px rounded corners, including tiled windows. Maximized and fullscreen content stays edge-to-edge, retaining the compositor’s direct-scanout eligibility. Desktop backgrounds, docks, and drag icons keep their own shapes. Existing client transparency and shadows are preserved.
 
 The corner mask runs in the surface’s existing draw pass. Window interiors retain opaque rendering and occlusion culling; only corner areas require blending. Wayland subsurfaces share their parent window’s corner geometry, and pointer hit regions follow the visible corners.
 

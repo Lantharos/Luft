@@ -12,10 +12,10 @@ Subject: [PATCH 1/3] compositor: round window surfaces and preserve native
  src/compositor/meta-shaped-texture.c         |  52 +++++-
  src/compositor/meta-surface-actor.c          |  52 +++++-
  src/compositor/meta-window-actor-x11.c       |  15 +-
- src/compositor/meta-window-corners.c         | 181 +++++++++++++++++++
+ src/compositor/meta-window-corners.c         | 182 +++++++++++++++++++
  src/compositor/meta-window-corners.h         |  21 +++
  src/meson.build                              |   2 +
- 10 files changed, 346 insertions(+), 15 deletions(-)
+ 10 files changed, 347 insertions(+), 15 deletions(-)
  create mode 100644 src/compositor/meta-window-corners.c
  create mode 100644 src/compositor/meta-window-corners.h
 
@@ -434,10 +434,10 @@ index 9e16b2682ab6db61106a6b1cd86b9d6691d3fda5..ac370b22aa8f89425efe8f2e702282f1
        get_shape_bounds (actor_x11, &shape_bounds);
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..916153d66d8cdc6956674891ddc6b458e0207af3
+index 0000000000000000000000000000000000000000..c244a6b578f3003512c0ca861090dec534900096
 --- /dev/null
 +++ b/src/compositor/meta-window-corners.c
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,182 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -467,7 +467,8 @@ index 0000000000000000000000000000000000000000..916153d66d8cdc6956674891ddc6b458
 +    return corners;
 +
 +  window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (ancestor));
-+  if (!window || meta_window_is_fullscreen (window))
++  if (!window || meta_window_is_fullscreen (window) ||
++      meta_window_is_maximized (window))
 +    return corners;
 +
 +  switch (meta_window_get_window_type (window))

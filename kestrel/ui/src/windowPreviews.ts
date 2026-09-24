@@ -14,7 +14,7 @@ export class WindowPreviews {
   private windowSignals: [Meta.Window, number][] = [];
 
   constructor(private readonly monitor: () => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
-    blurSurface(this.actor, 16);
+    blurSurface(this.actor, 12);
     this.actor.connect('notify::hover', () => {
       if (this.actor.hover) this.cancelTimer();
       else this.schedule(() => this.close(), 180);
@@ -55,7 +55,7 @@ export class WindowPreviews {
     this.close();
     this.source = button;
     this.actor.destroy_all_children();
-    const width = Math.min(220, Math.floor((monitor.width - 40) / Math.min(windows.length, 4)) - 12);
+    const width = Math.min(204, Math.floor((monitor.width - 40) / Math.min(windows.length, 4)) - 12);
     const columns = Math.max(1, Math.floor((monitor.width - 24) / (width + 12)));
     const grid = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
     let row: St.BoxLayout;
@@ -70,9 +70,9 @@ export class WindowPreviews {
       header.add_child(close);
       card.add_child(header);
       const source = window.get_compositor_private() as Clutter.Actor | null;
-      const preview = new St.Widget({ width, height: 124, layout_manager: new Clutter.BinLayout() });
+      const preview = new St.Widget({ width, height: 116, layout_manager: new Clutter.BinLayout() });
       if (source) {
-        const scale = Math.min(width / source.width, 124 / source.height);
+        const scale = Math.min(width / source.width, 116 / source.height);
         preview.add_child(new Clutter.Clone({ source, width: Math.round(source.width * scale), height: Math.round(source.height * scale), x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER }));
       }
       const activate = new St.Button({ child: preview, can_focus: true, style_class: 'kestrel-preview-window', accessible_name: window.title || app.get_name() });

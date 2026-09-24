@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GDesktopEnums from 'gi://GDesktopEnums';
@@ -649,6 +650,7 @@ export const PadOsd = GObject.registerClass({
             reactive: true,
         });
 
+        styleSurface(this, 20);
         this.padDevice = padDevice;
         this._groupPads = [padDevice];
         this._settings = settings;

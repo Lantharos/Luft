@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -25,6 +26,7 @@ class Dialog extends St.Widget {
         this._pressedKey = null;
         this._buttonKeys = {};
         this._createDialog();
+        styleSurface(this._dialog);
         this.add_child(this._dialog);
 
         if (styleClass != null)

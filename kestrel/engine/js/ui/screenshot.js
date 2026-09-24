@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
@@ -75,6 +76,7 @@ export const Tooltip = GObject.registerClass(
 class Tooltip extends St.Label {
     _init(widget, params) {
         super._init(params);
+        styleSurface(this, 12);
 
         this._widget = widget;
         this._timeoutId = null;
@@ -1769,6 +1771,7 @@ export class ScreenshotUI extends St.Widget {
         this._shotButton.bind_property('checked', this._castButton, 'checked',
             GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.INVERT_BOOLEAN);
 
+        styleSurface(this._panel, 20);
         this._captureButton = new St.Button({style_class: 'screenshot-ui-capture-button'});
         this._captureButton.set_child(new St.Widget({
             style_class: 'screenshot-ui-capture-button-circle',

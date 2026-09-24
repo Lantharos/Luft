@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {showSurfaceForCapture, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
 export async function checkSession({pause, capture, actorNamed, pointer, keyboard, output}) {
   const key = symbol => {
@@ -32,7 +32,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   }
   const panel = actorNamed(global.stage, 'kestrel-panel');
   const start = actorNamed(global.stage, 'kestrel-start');
-  showSurfaceForCapture('start');
+  toggleSurface('start');
   await pause(350);
   key(Clutter.KEY_Down);
   await pause(100);
@@ -56,7 +56,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   for (const name of ['polkitAgent', 'keyring', 'networkAgent', 'automountManager'])
     require(!!Main.componentManager._allComponents[name], `${name} component loaded`);
 
-  showSurfaceForCapture('start');
+  toggleSurface('start');
   await pause(350);
   const audio = ['org.gnome.Shell.AudioDeviceSelection', '/org/gnome/Shell/AudioDeviceSelection', 'org.gnome.Shell.AudioDeviceSelection'];
   await call(...audio, 'Open', new GLib.Variant('(as)', [['headphones', 'headset', 'microphone']]));
@@ -78,10 +78,56 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(250);
   require(Main.modalCount === 0, 'password dialog cancels cleanly');
 
+  Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'}), 'Volume', 0.6, 1);
+  await pause(200);
+  await capture(`${output}/volume-osd.png`);
+  Main.osdWindowManager.hideAll();
+  await pause(200);
+  await Main.screenshotUI.open();
+  await pause(250);
+  await capture(`${output}/screenshot-controls.png`);
+  Main.screenshotUI.close(true);
+  await pause(250);
+
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+  await pause(80);
+  key(Clutter.KEY_2);
+  await pause(120);
+  await capture(`${output}/workspace-slide.png`);
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+  await pause(400);
+  require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+2 switches to workspace two');
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, panel.y + 24);
+  pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.DOWN, Clutter.ScrollSource.WHEEL);
+  await pause(500);
+  require(global.workspace_manager.get_active_workspace_index() === 2, 'panel scroll switches workspace');
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, 120);
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+  await pause(80);
+  pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.UP, Clutter.ScrollSource.WHEEL);
+  await pause(500);
+  require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+scroll switches workspace');
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+  await pause(350);
+  require(!actorNamed(global.stage, 'kestrel-start').visible, 'Super release after scrolling keeps Start closed');
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+  key(Clutter.KEY_1);
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+  await pause(500);
+  dismissImmediately();
+
   const app = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_WINDOW_SCRIPT'), '--multiple'], Gio.SubprocessFlags.NONE);
   try {
     await pause(1000);
     const window = global.get_window_actors().map(actor => actor.meta_window).find(window => window.title === 'Kestrel window check 1');
+    window.activate(global.get_current_time());
+    window.make_fullscreen();
+    await pause(400);
+    require(!panel.visible, 'panel stays below fullscreen windows');
+    await capture(`${output}/fullscreen.png`);
+    window.unmake_fullscreen();
+    await pause(400);
+    require(panel.visible, 'panel returns after fullscreen');
     const runningApp = Shell.WindowTracker.get_default().get_window_app(window);
     const button = actorNamed(panel, `kestrel-app-${runningApp.id}`);
     const [x, y] = button.get_transformed_position();

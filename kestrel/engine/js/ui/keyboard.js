@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -1043,6 +1044,7 @@ export const Keyboard = GObject.registerClass({
             text_direction: Clutter.TextDirection.LTR,
             orientation: Clutter.Orientation.VERTICAL,
         });
+        styleSurface(this, 16);
         this._focusInExtendedKeys = false;
         this._emojiActive = false;
 

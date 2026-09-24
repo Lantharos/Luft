@@ -1,3 +1,4 @@
+import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
@@ -22,6 +23,7 @@ class OsdMonitorLabel extends St.Widget {
             style_class: 'osd-monitor-label',
             text: label,
         });
+        styleSurface(this._label, 12);
         this._box.add_child(this._label);
 
         Main.uiGroup.add_child(this);

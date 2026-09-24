@@ -1,3 +1,4 @@
+import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
@@ -10,10 +11,11 @@ export interface MenuEntry { label: string; enabled?: boolean; run(): void; }
 
 export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
-  readonly actor = new St.BoxLayout({ name: 'kestrel-context-menu', style_class: 'kestrel-context-menu', orientation: Clutter.Orientation.VERTICAL, reactive: true, visible: false, width: 264 });
+  readonly actor = new St.BoxLayout({ name: 'kestrel-context-menu', style_class: 'kestrel-context-menu', orientation: Clutter.Orientation.VERTICAL, reactive: true, visible: false });
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
+  private clearSelection: (() => void) | null = null;
 
   constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
     blurSurface(this.actor, 14);
@@ -96,6 +98,8 @@ export class ContextMenus {
     if (!monitor) return;
     this.source = source;
     this.sourceDestroy = source.connect('destroy', () => { this.source = null; this.sourceDestroy = 0; this.close(); });
+    this.clearSelection?.();
+    this.clearSelection = null;
     this.actor.destroy_all_children();
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
     for (const entry of entries) {
@@ -108,6 +112,7 @@ export class ContextMenus {
     scroll.child = content;
     this.actor.add_child(scroll);
     this.actor.show();
+    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 12)));
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
     const stage = (global as unknown as Shell.Global).stage;
     this.shield.set_position(0, 0);
@@ -125,6 +130,7 @@ export class ContextMenus {
   }
 
   close(immediate = false): void {
+    if (this.actor.visible && !this.clearSelection) this.clearSelection = freezeSelection(this.actor);
     if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
     const source = this.source;
     this.source = null;

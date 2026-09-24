@@ -1,3 +1,4 @@
+import {styleSurface, freezeSelection} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -41,6 +42,7 @@ export const BoxPointer = GObject.registerClass({
         this._arrowOrigin = 0;
         this._arrowActor = null;
         this.bin = new St.Bin(binProperties);
+        styleSurface(this.bin, 14);
         this.add_child(this.bin);
         this._border = new St.DrawingArea();
         this._border.connect('repaint', this._drawBorder.bind(this));
@@ -72,6 +74,8 @@ export const BoxPointer = GObject.registerClass({
     }
 
     open(animate, onComplete) {
+        this._clearClosingSelection?.();
+        this._clearClosingSelection = null;
         const themeNode = this.get_theme_node();
         const rise = themeNode.get_length('-arrow-rise');
         const animationTime = animate & PopupAnimation.FULL ? POPUP_ANIMATION_TIME : 0;
@@ -128,6 +132,7 @@ export const BoxPointer = GObject.registerClass({
     }
 
     close(animate, onComplete) {
+        this._clearClosingSelection ??= freezeSelection(this.bin);
         if (!this.visible)
             return;
 

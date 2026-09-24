@@ -2,7 +2,8 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {showSurfaceForCapture} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
+import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
 import {checkSession} from './sessionChecks.js';
 import {captureRenderedFrames} from './frameCapture.js';
@@ -58,6 +59,7 @@ function reportLayout() {
 }
 
 export async function run() {
+  await disableHelperAutoExit();
   const output = GLib.getenv('KESTREL_CAPTURE_DIR');
   if (!output)
     throw new Error('KESTREL_CAPTURE_DIR is required');
@@ -147,9 +149,9 @@ export async function run() {
   console.log(`Kestrel keyboard context menu: ${contextMenu.visible}`);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.PRESSED);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.RELEASED);
-  showSurfaceForCapture('notifications');
+  toggleSurface('notifications');
   await pause(350);
-  showSurfaceForCapture('quick');
+  toggleSurface('quick');
   const quickSurface = actorNamed(global.stage, 'kestrel-quick-settings');
   const siblings = quickSurface.get_parent().get_children();
   console.log(`Kestrel opening surface above notifications: ${siblings.indexOf(quickSurface) > siblings.indexOf(actorNamed(global.stage, 'kestrel-notifications'))}`);
@@ -207,11 +209,11 @@ export async function run() {
     await pause(100);
   }
 
-  showSurfaceForCapture('notifications');
+  toggleSurface('notifications');
   await pause(450);
   await capture(`${output}/notification-center.png`);
 
-  showSurfaceForCapture('start');
+  toggleSurface('start');
   await pause(450);
   const powerButton = start.get_last_child().get_last_child();
   const [powerX, powerY] = powerButton.get_transformed_position();
@@ -229,7 +231,7 @@ export async function run() {
 
   const windowScript = GLib.getenv('KESTREL_WINDOW_SCRIPT');
   if (windowScript) {
-    showSurfaceForCapture('start');
+    toggleSurface('start');
     await pause(350);
     console.log(`Kestrel Start closed: visible=${start.visible}, position=${start.y + start.translation_y}`);
     const panelFiles = actorNamed(actorNamed(global.stage, 'kestrel-panel'), 'Files');
@@ -273,10 +275,10 @@ export async function run() {
         actor.get_children().forEach(reportDots);
       };
       reportDots(global.stage);
-      showSurfaceForCapture('start');
+      toggleSurface('start');
       await pause(450);
       await capture(`${output}/start-over-window.png`);
-      showSurfaceForCapture('start');
+      toggleSurface('start');
       const window = global.get_window_actors().find(actor => actor.meta_window.get_title() === 'Kestrel window check');
       window.meta_window.maximize();
       await pause(400);

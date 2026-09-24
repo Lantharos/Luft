@@ -175,3 +175,17 @@
 .kestrel-context-action { padding: 10px 12px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
+
+.kestrel-window-previews {
+  padding: 6px;
+  border-radius: 16px;
+  background-color: rgba(20, 20, 24, 0.30);
+  color: white;
+}
+.kestrel-preview-row { spacing: 8px; }
+.kestrel-preview-card { padding: 4px; }
+.kestrel-preview-header { padding-left: 8px; font-size: 13px; }
+.kestrel-preview-close { padding: 10px; border-radius: 10px; background-color: transparent; box-shadow: none; }
+.kestrel-preview-close:hover, .kestrel-preview-close:focus { background-color: rgba(255, 100, 100, 0.4); }
+.kestrel-preview-window { padding: 4px; border-radius: 10px; background-color: transparent; box-shadow: none; }
+.kestrel-preview-window:hover, .kestrel-preview-window:focus { background-color: rgba(255, 255, 255, 0.16); }

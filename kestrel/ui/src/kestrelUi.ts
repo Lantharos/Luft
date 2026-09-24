@@ -5,6 +5,8 @@ import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
+import { navigateWithKeyboard } from './keyboardNavigation.js';
+import { WindowPreviews } from './windowPreviews.js';
 import { ContextMenus } from './contextMenus.js';
 import { KestrelPanel, type Monitor } from './panel.js';
 import { StartMenu } from './startMenu.js';
@@ -19,21 +21,28 @@ type Surface = 'start' | 'quick' | 'notifications' | 'power';
 
 interface LayoutManager {
   primaryMonitor: Monitor | null;
+  monitors: Monitor[];
   panelBox: St.Widget;
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   addTopChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   removeChrome(actor: Clutter.Actor): void;
   connect(signal: string, callback: () => void): number;
+  disconnect(id: number): void;
 }
 
 interface Context {
   layoutManager: LayoutManager;
   messageTray: MessageTray;
   quickSettings: QuickSettingsSource;
+  sessionMode: { isLocked: boolean; isGreeter: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
+  screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
+  canInteract(): boolean;
+  registerPanel(actor: St.Widget): void;
 }
 
 class KestrelUi {
   private readonly menus: ContextMenus;
+  private readonly previews: WindowPreviews;
   private readonly panel: KestrelPanel;
   private readonly start: StartMenu;
   private readonly quick: QuickSettings;
@@ -43,7 +52,7 @@ class KestrelUi {
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
   private powerOpen = false;
-  private desktopMenuSignal = 0;
+  private readonly disconnectors: (() => void)[] = [];
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -63,12 +72,14 @@ class KestrelUi {
       });
     }
 
-    this.menus = new ContextMenus(() => context.layoutManager.primaryMonitor, () => this.close());
+    this.menus = new ContextMenus((x, y) => context.layoutManager.monitors.find(m => x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height) ?? null, () => this.close(), () => this.canInteract(), () => this.previews.close());
+    this.previews = new WindowPreviews(() => context.layoutManager.primaryMonitor, () => this.canInteract() && !this.menus.actor.visible, () => this.close());
+    context.layoutManager.addTopChrome(this.previews.actor);
     this.panel = new KestrelPanel({
       start: () => this.toggle('start'),
       quickSettings: () => this.toggle('quick'),
       notifications: () => this.toggle('notifications'),
-    }, this.menus);
+    }, this.menus, this.previews);
     this.start = new StartMenu(() => this.close(), () => this.openPowerMenu(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       (network, volume) => this.panel.updateStatus(network, volume), this.menus);
@@ -84,7 +95,7 @@ class KestrelUi {
     context.layoutManager.panelBox.hide();
     context.layoutManager.addChrome(this.panel.actor, {
       affectsStruts: true,
-      trackFullscreen: true,
+      trackFullscreen: false,
     });
 
     context.layoutManager.addTopChrome(this.cover);
@@ -105,7 +116,7 @@ class KestrelUi {
       this.close();
       return Clutter.EVENT_STOP;
     });
-    shellGlobal.stage.connect('key-press-event', (_stage, event) => {
+    this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
       if (this.active && event.get_key_symbol() === Clutter.KEY_Escape) {
         if (this.powerOpen) this.closePower();
         else if (this.active !== 'quick' || !this.quick.closeSubmenu()) this.close();
@@ -113,12 +124,13 @@ class KestrelUi {
       }
       return Clutter.EVENT_PROPAGATE;
     });
-    this.desktopMenuSignal = shellGlobal.stage.connect('captured-event', (_stage, event) => {
-      if (event.type() !== Clutter.EventType.BUTTON_PRESS || event.get_button() !== Clutter.BUTTON_SECONDARY)
+    this.watch(shellGlobal.stage, 'captured-event', (_stage, event) => {
+      if (!this.canInteract() || event.type() !== Clutter.EventType.BUTTON_PRESS)
         return Clutter.EVENT_PROPAGATE;
       const [x, y] = event.get_coords();
       const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
-      if (!(target instanceof Meta.BackgroundActor)) return Clutter.EVENT_PROPAGATE;
+      if (!this.previews.contains(target)) this.previews.close();
+      if (event.get_button() !== Clutter.BUTTON_SECONDARY || !(target instanceof Meta.BackgroundActor)) return Clutter.EVENT_PROPAGATE;
       this.menus.open(target, [
         { label: 'Change wallpaper', run: () => this.menus.settings('background') },
         { label: 'Display settings', run: () => this.menus.settings('display') },
@@ -126,9 +138,47 @@ class KestrelUi {
       ], x, y);
       return Clutter.EVENT_STOP;
     });
-    shellGlobal.display.connect('overlay-key' , () => this.toggle('start'));
-    context.layoutManager.connect('monitors-changed', () => this.place());
+    this.watch(shellGlobal.display, 'overlay-key', () => this.toggle('start'));
+    this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.syncSession());
+    this.watch(context.sessionMode, 'updated', () => this.syncSession());
+    if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
+    context.registerPanel(this.panel.actor);
+    for (const actor of [this.panel.actor, this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor, this.previews.actor])
+      navigateWithKeyboard(actor);
+    this.watch(context.layoutManager, 'monitors-changed', () => { this.dismissImmediately(); this.place(); this.syncSession(); });
     this.place();
+    this.syncSession();
+  }
+
+  private watch(object: { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void }, signal: string, callback: (...args: any[]) => any): void {
+    const id = object.connect(signal, callback);
+    this.disconnectors.push(() => object.disconnect(id));
+  }
+
+  private desktopAvailable(): boolean {
+    return this.context.sessionMode.hasWindows && !this.context.sessionMode.isLocked &&
+      !this.context.sessionMode.isGreeter && !this.context.screenShield?.active;
+  }
+
+  private canInteract(): boolean {
+    return this.desktopAvailable() && this.context.canInteract();
+  }
+
+  private syncSession(): void {
+    const available = this.desktopAvailable();
+    const display = (global as unknown as Shell.Global).display;
+    this.panel.actor.visible = available && !!this.context.layoutManager.primaryMonitor && !display.get_monitor_in_fullscreen(display.get_primary_monitor());
+    if (!available) this.dismissImmediately();
+  }
+
+  dismissImmediately(): void {
+    this.close();
+    this.menus.close(true);
+    this.previews.close();
+    for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
+      actor.remove_all_transitions();
+      actor.hide();
+    }
   }
 
   private place(): void {
@@ -137,8 +187,9 @@ class KestrelUi {
       return;
 
     this.panel.place(monitor);
-    this.cover.set_position(monitor.x, monitor.y);
-    this.cover.set_size(monitor.width, monitor.height - PANEL_HEIGHT);
+    this.cover.set_position(0, 0);
+    const stage = (global as unknown as Shell.Global).stage;
+    this.cover.set_size(stage.width, stage.height);
     const startWidth = Math.min(660, monitor.width - 24);
     const bottom = monitor.y + monitor.height - PANEL_HEIGHT - SURFACE_GAP;
     const startHeight = Math.min(600, monitor.height - PANEL_HEIGHT - 24);
@@ -162,6 +213,8 @@ class KestrelUi {
   }
 
   private toggle(surface: Surface): void {
+    if (!this.canInteract()) return;
+    this.previews.close();
     if (surface === 'power') {
       this.openPowerMenu();
       return;
@@ -175,6 +228,7 @@ class KestrelUi {
     this.active = surface;
     this.panel.setActive(surface);
     this.cover.show();
+    this.panel.actor.get_parent()!.set_child_above_sibling(this.panel.actor, this.cover);
 
     if (surface === 'start') {
       this.start.clearSearch();
@@ -195,6 +249,7 @@ class KestrelUi {
     this.animate(actor, 0, 300);
 
     if (surface === 'start') this.start.focus();
+    else actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
   private close(): void {
@@ -205,6 +260,11 @@ class KestrelUi {
     this.active = null;
     this.panel.setActive(null);
     this.cover.hide();
+    this.panel.actor.get_parent()!.set_child_below_sibling(this.panel.actor, (global as unknown as Shell.Global).top_window_group);
+    const stage = (global as unknown as Shell.Global).stage;
+    const focus = stage.get_key_focus();
+    if (focus && [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor].some(actor => actor.contains(focus)))
+      stage.set_key_focus(null);
     if (!surface)
       return;
 
@@ -277,7 +337,7 @@ class KestrelUi {
   }
 
   shutdown(): void {
-    (global as unknown as Shell.Global).stage.disconnect(this.desktopMenuSignal);
+    for (const disconnect of this.disconnectors) disconnect();
     this.panel.shutdown();
     this.stylesheetMonitor?.cancel();
   }
@@ -299,4 +359,8 @@ export function showSurfaceForCapture(surface: Surface): void {
 
 export function shutdown(): void {
   currentUi.shutdown();
+}
+
+export function dismissImmediately(): void {
+  currentUi?.dismissImmediately();
 }

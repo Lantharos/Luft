@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import {showSurfaceForCapture} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
+import {checkSession} from './sessionChecks.js';
 import {captureRenderedFrames} from './frameCapture.js';
 
 export const METRICS = {};
@@ -290,4 +291,5 @@ export async function run() {
       console.log(`Kestrel taskbar animated widths: ${[...new Set(widths)].join(', ')}`);
     }
   }
+  await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
 }

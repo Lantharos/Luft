@@ -1,11 +1,14 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
+import type { WindowPreviews } from './windowPreviews.js';
 import type { ContextMenus } from './contextMenus.js';
 import { PANEL_ICON_SIZE } from './surface.js';
 import { animateActor, liftIcon } from './motion.js';
 
 interface AppItem {
+  app: Shell.App;
+  icon: St.Bin;
   slot: St.Widget;
   button: St.Button;
   dot: St.Widget;
@@ -17,7 +20,7 @@ export class Taskbar {
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
 
-  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus) {}
+  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews) {}
 
   update(apps: Shell.App[]): void {
     const wanted = new Set(apps.map(app => app.id));
@@ -47,6 +50,11 @@ export class Taskbar {
           item.button.translation_y = 18;
         }
       }
+      if (item.app !== app) {
+        item.app = app;
+        item.icon.child = app.create_icon_texture(PANEL_ICON_SIZE);
+      }
+      item.button.accessible_name = app.get_name();
       item.removing = false;
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
@@ -66,7 +74,7 @@ export class Taskbar {
   }
 
   private create(app: Shell.App): AppItem {
-    const icon = app.create_icon_texture(PANEL_ICON_SIZE);
+    const icon = new St.Bin({ width: PANEL_ICON_SIZE, height: PANEL_ICON_SIZE, child: app.create_icon_texture(PANEL_ICON_SIZE) });
     icon.set_position((40 - PANEL_ICON_SIZE) / 2, 5);
     const content = new St.Widget({ width: 40, height: 40 });
     content.add_child(icon);
@@ -76,18 +84,23 @@ export class Taskbar {
     });
     content.add_child(dot);
     const button = new St.Button({
-      style_class: 'kestrel-task-button', child: content, width: 40, height: 40,
+      name: `kestrel-app-${app.id}`, style_class: 'kestrel-task-button', child: content, width: 40, height: 40,
       can_focus: true, track_hover: true, accessible_name: app.get_name(),
-    });
-    liftIcon(button, icon);
-    this.menus.bind(button, () => this.menus.appEntries(app));
-    button.connect('clicked', () => {
-      const windows = app.get_windows();
-      if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
-      else app.activate();
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    return { slot, button, dot, removing: false };
+    const item = { app, icon, slot, button, dot, removing: false };
+    liftIcon(button, icon);
+    this.previews.bind(button, () => item.app);
+    this.menus.bind(button, () => this.menus.appEntries(item.app));
+    button.connect('clicked', () => {
+      const app = item.app;
+      const windows = app.get_windows();
+      if (windows.length > 1) { this.previews.open(button, app, true); return; }
+      this.previews.close();
+      if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
+      else app.activate();
+    });
+    return item;
   }
 }

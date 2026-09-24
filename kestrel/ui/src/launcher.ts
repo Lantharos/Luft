@@ -12,7 +12,7 @@ const MARK_SIZE = 26;
 export function createLauncher(activate: () => void): St.Button {
   const mark = new St.Widget({ width: MARK_SIZE, height: MARK_SIZE, layout_manager: new Clutter.BinLayout() });
   const button = new St.Button({
-    style_class: 'kestrel-task-button', child: mark,
+    style_class: 'kestrel-task-button', child: mark, clip_to_allocation: true,
     width: 40, height: 40, can_focus: true, track_hover: true, accessible_name: 'Start',
   });
   for (const [svg, direction, pivotX, pivotY] of [[secondary, 1, 0.58, 0.69], [primary, -1, 0.4, 0.3]] as const) {

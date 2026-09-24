@@ -89,37 +89,42 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   Main.screenshotUI.close(true);
   await pause(250);
 
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
-  await pause(80);
-  key(Clutter.KEY_2);
-  await pause(120);
-  await capture(`${output}/workspace-slide.png`);
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
-  await pause(400);
-  require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+2 switches to workspace two');
-  pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, panel.y + 24);
-  pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.DOWN, Clutter.ScrollSource.WHEEL);
-  await pause(500);
-  require(global.workspace_manager.get_active_workspace_index() === 2, 'panel scroll switches workspace');
-  pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, 120);
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
-  await pause(80);
-  pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.UP, Clutter.ScrollSource.WHEEL);
-  await pause(500);
-  require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+scroll switches workspace');
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
-  await pause(350);
-  require(!actorNamed(global.stage, 'kestrel-start').visible, 'Super release after scrolling keeps Start closed');
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
-  key(Clutter.KEY_1);
-  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
-  await pause(500);
-  dismissImmediately();
-
   const app = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_WINDOW_SCRIPT'), '--multiple'], Gio.SubprocessFlags.NONE);
   try {
     await pause(1000);
-    const window = global.get_window_actors().map(actor => actor.meta_window).find(window => window.title === 'Kestrel window check 1');
+    const windows = global.get_window_actors().map(actor => actor.meta_window);
+    const window = windows.find(window => window.title === 'Kestrel window check 1');
+    require(global.workspace_manager.n_workspaces === 2, 'occupied workspace has one empty workspace');
+    windows.find(window => window.title === 'Kestrel window check 2').change_workspace_by_index(1, false);
+    await pause(400);
+    require(global.workspace_manager.n_workspaces === 3, 'second occupied workspace adds one empty workspace');
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+    await pause(80);
+    key(Clutter.KEY_2);
+    await pause(120);
+    await capture(`${output}/workspace-slide.png`);
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+    await pause(400);
+    require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+2 switches to workspace two');
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, panel.y + 24);
+    pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.DOWN, Clutter.ScrollSource.WHEEL);
+    await pause(500);
+    require(global.workspace_manager.get_active_workspace_index() === 2, 'panel scroll switches workspace');
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), 120, 120);
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+    await pause(80);
+    pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.UP, Clutter.ScrollSource.WHEEL);
+    await pause(500);
+    require(global.workspace_manager.get_active_workspace_index() === 1, 'Super+scroll switches workspace');
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+    await pause(350);
+    require(!actorNamed(global.stage, 'kestrel-start').visible, 'Super release after scrolling keeps Start closed');
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+    key(Clutter.KEY_1);
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+    await pause(500);
+    dismissImmediately();
+
     window.activate(global.get_current_time());
     window.make_fullscreen();
     await pause(400);
@@ -130,6 +135,14 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     require(panel.visible, 'panel returns after fullscreen');
     const runningApp = Shell.WindowTracker.get_default().get_window_app(window);
     const button = actorNamed(panel, `kestrel-app-${runningApp.id}`);
+    require(button.has_style_class_name('kestrel-app-focused'), 'focused app has persistent focus styling');
+    window.minimize();
+    await pause(250);
+    window.activate(global.get_current_time());
+    await pause(300);
+    require(button.has_style_class_name('kestrel-app-focused'), 'app focus styling returns after minimize and activation');
+    const dots = button.child.get_children().filter(actor => actor.has_style_class_name?.('kestrel-running-dot') && actor.visible);
+    require(dots.length === 2, 'two app windows show two running dots');
     const [x, y] = button.get_transformed_position();
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), x + 20, y + 20);
     await pause(550);
@@ -157,6 +170,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     await pause(200);
   } finally {
     app.force_exit();
-    await pause(300);
+    await pause(500);
+    require(global.workspace_manager.n_workspaces === 1, 'empty workspaces collapse after windows close');
   }
 }

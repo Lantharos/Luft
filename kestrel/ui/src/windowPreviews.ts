@@ -70,9 +70,9 @@ export class WindowPreviews {
       header.add_child(close);
       card.add_child(header);
       const source = window.get_compositor_private() as Clutter.Actor | null;
-      const preview = new St.Widget({ width, height: 116, layout_manager: new Clutter.BinLayout() });
+      const preview = new St.Widget({ width: width - 4, height: 116, layout_manager: new Clutter.BinLayout() });
       if (source) {
-        const scale = Math.min(width / source.width, 116 / source.height);
+        const scale = Math.min((width - 4) / source.width, 116 / source.height);
         preview.add_child(new Clutter.Clone({ source, width: Math.round(source.width * scale), height: Math.round(source.height * scale), x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER }));
       }
       const activate = new St.Button({ child: preview, can_focus: true, style_class: 'kestrel-preview-window', accessible_name: window.title || app.get_name() });
@@ -82,11 +82,14 @@ export class WindowPreviews {
       this.windowSignals.push([window, window.connect('notify::title', () => { title.text = window.title || app.get_name(); })]);
       this.windowSignals.push([window, window.connect('unmanaged', () => this.close())]);
     });
-    const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC });
+    const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.NEVER });
     scroll.child = grid;
     this.actor.add_child(scroll);
     this.actor.show();
-    scroll.height = Math.min(grid.get_preferred_height(-1)[1], monitor.height - PANEL_HEIGHT - 36);
+    const availableHeight = monitor.height - PANEL_HEIGHT - 36;
+    const naturalHeight = grid.get_preferred_height(-1)[1];
+    scroll.vscrollbar_policy = naturalHeight > availableHeight ? St.PolicyType.AUTOMATIC : St.PolicyType.NEVER;
+    scroll.height = Math.min(naturalHeight, availableHeight);
     const popupWidth = this.actor.get_preferred_width(-1)[1];
     const popupHeight = this.actor.get_preferred_height(popupWidth)[1];
     const [x] = button.get_transformed_position();

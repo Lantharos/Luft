@@ -78,7 +78,6 @@ class Dialog extends St.Widget {
         // mode accordingly so wrapped labels are handled correctly during
         // size requests.
         this._dialog.request_mode = Clutter.RequestMode.HEIGHT_FOR_WIDTH;
-        this._dialog.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
 
         this.contentLayout = new St.BoxLayout({
             orientation: Clutter.Orientation.VERTICAL,

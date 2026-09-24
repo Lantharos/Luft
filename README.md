@@ -31,7 +31,7 @@ To open a visible nested session for interactive testing:
 kestrel/tools/session.sh nested
 ```
 
-The session opens in Mutter Development Kit. Super+1 through Super+9 selects a workspace; Super+scroll or scrolling over the panel moves between adjacent workspaces with a slide transition. Click inside it to test Kestrel; its launcher button opens Start, and Super opens it when the devkit has keyboard shortcuts captured. Closing the devkit window ends the nested session. The launcher copies the host wallpaper, interface preferences, keyboard layout, and favorite apps into an isolated configuration under `kestrel/run`. The session has its own D-Bus bus and notification history.
+The session opens in Mutter Development Kit. Workspaces grow with open windows, keeping one empty workspace up to ten total. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces with a slide transition. Click inside it to test Kestrel; its launcher button opens Start, and Super opens it when the devkit has keyboard shortcuts captured. Closing the devkit window ends the nested session. The launcher copies the host wallpaper, interface preferences, keyboard layout, and favorite apps into an isolated configuration under `kestrel/run`. The session has its own D-Bus bus and notification history.
 
 To capture the shell surfaces, keyboard search, and a test window:
 

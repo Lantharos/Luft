@@ -73,7 +73,8 @@ class AccessDialog extends ModalDialog.ModalDialog {
         if (body) {
             const bodyLabel = new St.Label({
                 text: body,
-                x_align: Clutter.ActorAlign.CENTER,
+                x_expand: true,
+                style_class: 'message-dialog-description',
             });
             bodyLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             bodyLabel.clutter_text.line_wrap = true;

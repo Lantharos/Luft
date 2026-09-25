@@ -69,10 +69,6 @@
   .message-dialog-title {
     text-align: center;
     @extend %title_2;
-
-    &.lightweight {
-      @extend %title_4;
-    }
   }
   .message-dialog-description {
     text-align: center;
@@ -100,18 +96,6 @@
 .prompt-dialog {
   width: 28em;
 
-  .prompt-dialog-password-grid {
-    spacing-rows: $base_margin * 2;
-    spacing-columns: $base_margin;
-
-    .prompt-dialog-password-entry {
-      width: auto;
-      // 4px (spacing) + 16px (spinner-width)
-      &:ltr { margin-left: $base_margin+$base_icon_size; }
-      &:rtl { margin-right: $base_margin+$base_icon_size; }
-    }
-  }
-
   .prompt-dialog-password-layout {
     spacing: $base_margin * 2;
   }
@@ -122,8 +106,7 @@
   }
 
   .prompt-dialog-error-label,
-  .prompt-dialog-info-label,
-  .prompt-dialog-null-label {
+  .prompt-dialog-info-label {
     @extend %caption;
     text-align: center;
     padding: $base_padding * 1.5;

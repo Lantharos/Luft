@@ -364,14 +364,6 @@ export class Panel extends St.Widget {
         this._updateBox(panel.center, this._centerBox);
         this._updateBox(panel.right, this._rightBox);
 
-        if (panel.left.includes('clock'))
-            Main.messageTray.bannerAlignment = Clutter.ActorAlign.START;
-        else if (panel.right.includes('clock'))
-            Main.messageTray.bannerAlignment = Clutter.ActorAlign.END;
-        // Default to center if there is no clock
-        else
-            Main.messageTray.bannerAlignment = Clutter.ActorAlign.CENTER;
-
         if (this._sessionStyle)
             this.remove_style_class_name(this._sessionStyle);
 
@@ -461,19 +453,6 @@ export class Panel extends St.Widget {
         this.menuManager.addMenu(indicator.menu);
 
         indicator.menu._openChangedConnected = true;
-        indicator.menu.connectObject('open-state-changed',
-            (menu, isOpen) => {
-                let boxAlignment;
-                if (this._leftBox.contains(indicator.container))
-                    boxAlignment = Clutter.ActorAlign.START;
-                else if (this._centerBox.contains(indicator.container))
-                    boxAlignment = Clutter.ActorAlign.CENTER;
-                else if (this._rightBox.contains(indicator.container))
-                    boxAlignment = Clutter.ActorAlign.END;
-
-                if (boxAlignment === Main.messageTray.bannerAlignment)
-                    Main.messageTray.bannerBlocked = isOpen;
-            }, this);
     }
 
     _getDraggableWindowForPosition(stageX) {

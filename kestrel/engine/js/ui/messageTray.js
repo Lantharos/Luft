@@ -15,6 +15,8 @@ import * as SignalTracker from '../misc/signalTracker.js';
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 
 export const ANIMATION_TIME = 200;
+const BANNER_SHOW_TIME = 260;
+const BANNER_SLIDE_DISTANCE = 48;
 
 const NOTIFICATION_TIMEOUT = 4000;
 
@@ -736,18 +738,14 @@ export class MessageTray extends St.Widget {
             this._onStatusChanged(status);
         });
 
-        const constraint = new Layout.MonitorConstraint({primary: true});
-        Main.layoutManager.panelBox.bind_property('visible',
-            constraint, 'work-area',
-            GObject.BindingFlags.SYNC_CREATE);
-        this.add_constraint(constraint);
+        this.add_constraint(new Layout.MonitorConstraint({primary: true, work_area: true}));
 
         this._bannerBin = new St.Widget({
             name: 'notification-container',
             reactive: true,
             track_hover: true,
-            y_align: Clutter.ActorAlign.START,
-            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.END,
+            x_align: Clutter.ActorAlign.END,
             y_expand: true,
             x_expand: true,
             layout_manager: new Clutter.BinLayout(),
@@ -816,14 +814,6 @@ export class MessageTray extends St.Widget {
 
     _onDragEnd() {
         Shell.util_set_hidden_from_pick(this, false);
-    }
-
-    get bannerAlignment() {
-        return this._bannerBin.get_x_align();
-    }
-
-    set bannerAlignment(align) {
-        this._bannerBin.set_x_align(align);
     }
 
     _expireNotification() {
@@ -1129,7 +1119,7 @@ export class MessageTray extends St.Widget {
         this._bannerBin.add_child(this._banner);
 
         this._bannerBin.opacity = 0;
-        this._bannerBin.y = -this._banner.height;
+        this._bannerBin.translation_y = BANNER_SLIDE_DISTANCE;
         this.show();
 
         global.compositor.disable_unredirect();
@@ -1177,18 +1167,9 @@ export class MessageTray extends St.Widget {
         this._bannerBin.remove_all_transitions();
         this._bannerBin.ease({
             opacity: 255,
-            duration: ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        });
-        this._bannerBin.set_pivot_point(0.5, 0.5);
-        this._bannerBin.scale_x = 0.9;
-        this._bannerBin.scale_y = 0.9;
-        this._bannerBin.ease({
-            y: 0,
-            scale_x: 1,
-            scale_y: 1,
-            duration: ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_BACK,
+            translation_y: 0,
+            duration: BANNER_SHOW_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUART,
             onComplete: () => {
                 this._notificationState = State.SHOWN;
                 this._showNotificationCompleted();
@@ -1217,7 +1198,7 @@ export class MessageTray extends St.Widget {
 
     _notificationTimeout() {
         const [x, y] = global.get_pointer();
-        if (y < this._lastSeenMouseY - 10 && !this._notificationHovered) {
+        if (y > this._lastSeenMouseY + 10 && !this._notificationHovered) {
             // The mouse is moving towards the notification, so don't
             // hide it yet. (We just create a new timeout (and destroy
             // the old one) each time because the bookkeeping is
@@ -1250,13 +1231,9 @@ export class MessageTray extends St.Widget {
         this._notificationState = State.HIDING;
         this._bannerBin.ease({
             opacity: 0,
+            translation_y: BANNER_SLIDE_DISTANCE,
             duration,
-            mode: Clutter.AnimationMode.EASE_OUT_BACK,
-        });
-        this._bannerBin.ease({
-            y: -this._bannerBin.height,
-            duration,
-            mode: Clutter.AnimationMode.EASE_OUT_BACK,
+            mode: Clutter.AnimationMode.EASE_IN_QUAD,
             onStopped: () => {
                 this._notificationState = State.HIDDEN;
                 this._hideNotificationCompleted();

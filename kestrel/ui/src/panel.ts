@@ -41,7 +41,7 @@ export class KestrelPanel {
   private clockTimer = 0;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews);
+    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites);
     this.actor = new St.Widget({
       name: 'kestrel-panel',
       style_class: 'kestrel-panel',

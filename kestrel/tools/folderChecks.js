@@ -7,6 +7,8 @@ export async function checkFolders({pause, capture, actorNamed, pointer, output}
   const settings = new Gio.Settings({schema_id: 'org.gnome.shell'});
   const original = settings.get_string('kestrel-start-layout');
   const layout = () => JSON.parse(settings.get_string('kestrel-start-layout'));
+  const favorites = settings;
+  const savedFavorites = favorites.get_strv('favorite-apps');
   const require = (condition, label) => {
     if (!condition) throw new Error(`Start folder check failed: ${label}`);
     console.log(`Kestrel folder check: ${label}`);
@@ -68,8 +70,21 @@ export async function checkFolders({pause, capture, actorNamed, pointer, output}
     await capture(`${output}/start-folder.png`);
     await drag(items()[0], actorNamed(global.stage, 'kestrel-folder-back'));
     require(!layout().folders[folderId].apps.includes(extraId) && layout().items.includes(extraId), 'dragging to Apps moves an app out of its folder');
+
+    const panelApps = () => actorNamed(global.stage, 'kestrel-panel-center').get_last_child().get_children().map(slot => slot.get_first_child());
+    const back = actorNamed(global.stage, 'kestrel-folder-back');
+    if (back?.mapped) await click(back);
+    const unpinned = items().find(button => !button.name.includes('folder:'));
+    const unpinnedId = unpinned.name.replace('kestrel-start-item-', '');
+    await drag(unpinned, panelApps()[0], 0.1);
+    require(favorites.get_strv('favorite-apps')[0] === unpinnedId, 'dragging an app from Start pins it at the drop position');
+    dismissImmediately();
+    await pause(300);
+    await drag(panelApps()[0], panelApps()[2], 0.9);
+    require(favorites.get_strv('favorite-apps').indexOf(unpinnedId) === 2, 'panel apps can be reordered by dragging');
   } finally {
     dismissImmediately();
     settings.set_string('kestrel-start-layout', original);
+    favorites.set_strv('favorite-apps', savedFavorites);
   }
 }

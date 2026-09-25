@@ -316,6 +316,26 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .osd-window.kestrel-glass .osd-value { min-width: 38px; margin: 0; font-size: 13px; font-weight: 500; text-align: right; }
 .osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 12px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 16px; background-color: rgba(20, 20, 24, 0.20); }
+.notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
+.notification-banner .message-header { padding: 0 0 2px; }
+.notification-banner .message-source-title { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
+.notification-banner .event-time { font-size: 12px; color: rgba(255, 255, 255, 0.50); }
+.notification-banner .message-title { font-size: 14px; font-weight: 600; }
+.notification-banner .message-body { font-size: 13px; color: rgba(255, 255, 255, 0.78); }
+.notification-banner .message-close-button, .notification-banner .message-expand-button { padding: 5px; border-radius: 8px; background-color: transparent; }
+.notification-banner .message-close-button:hover, .notification-banner .message-expand-button:hover { background-color: rgba(255, 255, 255, 0.14); }
+.notification-banner .notification-buttons-bin { spacing: 6px; padding-top: 10px; }
+.notification-banner .notification-button { padding: 9px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; background-color: rgba(255, 255, 255, 0.10); }
+
+.unlock-dialog-clock { spacing: 4px; margin-top: 0; }
+.unlock-dialog-clock .unlock-dialog-clock-time { font-size: 112px; font-weight: 600; }
+.unlock-dialog-clock .unlock-dialog-clock-date { font-size: 20px; font-weight: 500; color: rgba(255, 255, 255, 0.85); }
+.unlock-dialog-clock .unlock-dialog-clock-hint { margin-top: 48px; padding: 0; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.60); background-color: transparent; }
+.unlock-dialog .user-widget.vertical { spacing: 16px; }
+.unlock-dialog .user-widget.vertical .user-icon { icon-size: 96px; }
+.unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.unlock-dialog .login-dialog-prompt-entry { padding: 13px 16px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.14); }
+.unlock-dialog .login-dialog-prompt-entry:focus { background-color: rgba(255, 255, 255, 0.20); }
 .message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
 .screenshot-ui-panel.kestrel-glass { padding: 12px; border-radius: 20px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 10px; }
@@ -364,6 +384,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-app-button.drop-into, .kestrel-folder-back.drop-into { background-color: rgba(255,255,255,0.25); }
 .kestrel-app-button.drop-before { box-shadow: inset 3px 0 rgba(255,255,255,0.75); }
 .kestrel-app-button.drop-after { box-shadow: inset -3px 0 rgba(255,255,255,0.75); }
+.kestrel-task-button.drop-before { box-shadow: inset 3px 0 rgba(255,255,255,0.75); }
+.kestrel-task-button.drop-after { box-shadow: inset -3px 0 rgba(255,255,255,0.75); }
 
 .kestrel-folder-separator { margin-top: 3px; }
 

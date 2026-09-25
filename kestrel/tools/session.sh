@@ -31,7 +31,7 @@ export LD_LIBRARY_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st:$root
 export GNOME_SHELL_DATADIR="$root/kestrel/build/data"
 export GSETTINGS_SCHEMA_DIR="$root/kestrel/build/data"
 export KESTREL_CSS_PATH="$root/kestrel/engine/data/theme/kestrel.css"
-unset GSETTINGS_BACKEND
+unset GSETTINGS_BACKEND GDK_BACKEND
 
 exec dbus-run-session -- bash -c '
   set -euo pipefail

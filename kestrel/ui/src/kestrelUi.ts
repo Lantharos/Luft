@@ -90,7 +90,7 @@ class KestrelUi {
     this.start = new StartMenu(() => this.close(), () => this.openPowerMenu(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       (network, volume) => this.panel.updateStatus(network, volume), this.menus);
-    this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place());
+    this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.power = new PowerMenu(() => this.close());
 
     context.layoutManager.addTopChrome(this.menus.shield);
@@ -202,7 +202,7 @@ class KestrelUi {
   dismissImmediately(): void {
     this.close();
     this.menus.close(true);
-    this.previews.close();
+    this.previews.close(true);
     this.panel.setActive(null);
     this.quick.closeSubmenu();
     for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
@@ -267,15 +267,13 @@ class KestrelUi {
     this.closingSelections.delete(openingActor);
     if (surface === 'start') {
       this.start.clearSearch();
-
-    } else if (surface === 'notifications') {
-      this.notifications.refresh();
     }
 
     const actor = this.actorFor(surface);
     actor.get_parent()!.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
+    if (surface === 'notifications') this.notifications.prepareOpen();
     this.place();
     if (opening) {
       actor.opacity = 255;
@@ -284,6 +282,7 @@ class KestrelUi {
     this.animate(actor, 0, 300);
 
     if (surface === 'start') this.start.focus();
+    else if (surface === 'notifications') this.notifications.focus();
     else actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
@@ -291,6 +290,7 @@ class KestrelUi {
     this.menus.close();
     this.closePower();
     const surface = this.active;
+    if (surface === 'notifications') this.notifications.freeze();
     if (surface) this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
     this.active = null;
     this.cover.hide();

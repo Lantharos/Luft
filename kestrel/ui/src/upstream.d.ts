@@ -47,3 +47,7 @@ declare module 'resource:///org/gnome/shell/ui/dnd.js' {
   export function addDragMonitor(monitor: object): void;
   export function removeDragMonitor(monitor: object): void;
 }
+
+declare module 'resource:///org/gnome/shell/misc/animationUtils.js' {
+  export function ensureActorVisibleInScrollView(scroll: import('gi://St').default.ScrollView, actor: import('gi://Clutter').default.Actor): void;
+}

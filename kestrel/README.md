@@ -86,3 +86,9 @@ Build the compositor with `kestrel/compositor/build.sh` before launching a devel
 Kestrel supports `xdg-toplevel-icon-v1` theme names and shared-memory images. Window-backed panel entries, window previews, and the window switcher update when the client supplies an icon. Installed application groups retain their desktop-entry icons. Clients must implement the protocol; app-ID and desktop-entry matching still determine grouping.
 
 Mutter changes are maintained as an ordered Git patch series with a pinned upstream commit. See the [compositor workflow](compositor/README.md) for editing, replay checks, and rebasing onto new releases.
+
+### Notifications and keyboard interaction
+
+Notifications are ordered by their latest update across applications. Cards open the notification, expose its actions, and offer a dismiss button and Delete shortcut. Resident actions keep the center open. Text wraps, keyboard focus follows dismissal, and offscreen controls scroll into view. Empty lists disable Clear all. Cards are reused during updates, created only when the center opens, and frozen during the closing animation.
+
+Escape in Start clears the current search, then leaves a folder, then closes the menu. The search caret follows the desktop blink preference and timeout. Up on a running panel app opens its window previews with the window action focused. Preview proportions follow window resizing; closing releases the clones after a short fade, while session dismissal removes them immediately.

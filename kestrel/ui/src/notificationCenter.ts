@@ -1,43 +1,31 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
+import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
+import { NotificationCard, type Notification, type NotificationSource, type SignalSource } from './notificationCard.js';
 import St from 'gi://St';
 import type { ContextMenus } from './contextMenus.js';
 import { blurSurface } from './surface.js';
 
-interface SignalSource {
-  connect(signal: string, callback: () => void): number;
-  connectObject(...args: any[]): void;
-  disconnectObject(owner: object): void;
-}
-
-interface Notification extends SignalSource {
-  title: string;
-  body: string;
-  destroy(): void;
-}
-
-interface Source extends SignalSource {
-  title: string;
-  notifications: Notification[];
-  connect(signal: string, callback: () => void): number;
-}
-
 export interface MessageTray extends SignalSource {
-  getSources(): Source[];
-  connect(signal: string, callback: () => void): number;
+  getSources(): NotificationSource[];
 }
 
 export class NotificationCenter {
   readonly actor: St.BoxLayout;
 
-  private readonly sources = new Set<Source>();
-  private readonly items = new Map<Notification, { actor: St.BoxLayout }>();
+  private readonly sources = new Set<NotificationSource>();
+  private readonly items = new Map<Notification, NotificationCard>();
+  private readonly clearButton = new St.Button({ style_class: 'kestrel-text-button', label: 'Clear all', can_focus: true });
   private refreshIdle = 0;
   private dirty = true;
+  private closing = false;
+  private first: NotificationCard | null = null;
+  private readonly scroll: St.ScrollView;
   private readonly empty = new St.Label({ text: 'No notifications', style_class: 'kestrel-empty' });
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
 
-  constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus, private readonly layoutChanged: () => void) {
+  constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus, private readonly layoutChanged: () => void, private readonly close: () => void) {
     this.actor = new St.BoxLayout({
       orientation: Clutter.Orientation.VERTICAL,
       name: 'kestrel-notifications',
@@ -47,7 +35,7 @@ export class NotificationCenter {
     });
     blurSurface(this.actor, 20);
     menus.bind(this.actor, () => [
-      { label: 'Clear all notifications', run: () => this.clear() },
+      { label: 'Clear all notifications', enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
       { label: 'Notification settings', run: () => menus.settings('notifications') },
     ]);
 
@@ -57,16 +45,11 @@ export class NotificationCenter {
       style_class: 'kestrel-title',
       x_expand: true,
     }));
-    const clearButton = new St.Button({
-      style_class: 'kestrel-text-button',
-      label: 'Clear all',
-      can_focus: true,
-    });
-    clearButton.connect('clicked', () => this.clear());
-    header.add_child(clearButton);
+    this.clearButton.connect('clicked', () => this.clear());
+    header.add_child(this.clearButton);
     this.actor.add_child(header);
 
-    const scroll = new St.ScrollView({
+    const scroll = this.scroll = new St.ScrollView({
       hscrollbar_policy: St.PolicyType.NEVER,
       vscrollbar_policy: St.PolicyType.AUTOMATIC,
       height: 0,
@@ -81,18 +64,18 @@ export class NotificationCenter {
       'source-removed', () => { this.watchSources(); this.invalidate(); },
       this.actor,
     );
-    this.actor.connect('notify::visible', () => { if (this.actor.visible) this.refresh(); });
     this.actor.connect('destroy', () => {
       if (this.refreshIdle) GLib.Source.remove(this.refreshIdle);
       this.sources.clear();
       this.items.clear();
+      this.first = null;
     });
     this.watchSources();
   }
 
   private invalidate(): void {
     this.dirty = true;
-    if (!this.actor.visible || this.refreshIdle) return;
+    if (!this.actor.visible || this.closing || this.refreshIdle) return;
     this.refreshIdle = GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
       this.refreshIdle = 0;
       if (this.actor.visible) this.refresh();
@@ -100,45 +83,51 @@ export class NotificationCenter {
     });
   }
 
+  prepareOpen(): void { this.closing = false; this.dirty = true; this.refresh(); }
+  freeze(): void { this.closing = true; }
+
   refresh(): void {
-    if (!this.dirty) return;
+    if (this.closing || !this.dirty) return;
     this.dirty = false;
     const notifications = this.tray.getSources()
       .flatMap(source => source.notifications.map(notification => ({ source, notification })))
-      .reverse();
+      .sort((a, b) => b.notification.datetime.compare(a.notification.datetime));
     const present = new Set(notifications.map(({ notification }) => notification));
+    const focus = (global as unknown as Shell.Global).stage.get_key_focus();
+    let focusRemoved = false;
     for (const [notification, item] of this.items) {
       if (present.has(notification)) continue;
+      focusRemoved ||= !!focus && item.actor.contains(focus);
       item.actor.destroy();
       this.items.delete(notification);
     }
+    this.first = null;
     this.empty.visible = notifications.length === 0;
+    this.clearButton.reactive = this.clearButton.can_focus = notifications.length > 0;
+    this.clearButton.opacity = notifications.length > 0 ? 255 : 100;
     for (const [index, { source, notification }] of notifications.entries()) {
       let item = this.items.get(notification);
       if (!item) {
-        const actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification', reactive: true, can_focus: true });
-        const sourceLabel = new St.Label({ text: source.title, style_class: 'kestrel-muted' });
-        const title = new St.Label({ text: notification.title, style_class: 'kestrel-section-title' });
-        const body = new St.Label({ text: notification.body, visible: !!notification.body, style_class: 'kestrel-muted' });
-        actor.add_child(sourceLabel);
-        actor.add_child(title);
-        actor.add_child(body);
-        const update = () => {
-          title.text = notification.title;
-          body.text = notification.body;
-          body.visible = !!notification.body;
-          this.invalidate();
-        };
-        notification.connectObject('notify::title', update, 'notify::body', update, actor);
-        this.menus.bind(actor, () => [{ label: 'Dismiss', run: () => notification.destroy() },
-          { label: 'Notification settings', run: () => this.menus.settings('notifications') }]);
-        item = { actor };
+        item = new NotificationCard(source, notification, this.menus, () => this.invalidate(), this.close,
+          actor => ensureActorVisibleInScrollView(this.scroll, actor));
         this.items.set(notification, item);
-        this.list.add_child(actor);
+        this.list.add_child(item.actor);
       }
+      if (index === 0) this.first = item;
+      item.refresh();
+      if (this.actor.visible) notification.acknowledged = true;
       if (this.list.get_child_at_index(index + 1) !== item.actor) this.list.set_child_at_index(item.actor, index + 1);
     }
+    if (focusRemoved) {
+      if (this.first) this.first.open.grab_key_focus();
+      else this.actor.grab_key_focus();
+    }
     if (this.actor.visible) this.layoutChanged();
+  }
+
+  focus(): void {
+    if (this.first) this.first.open.grab_key_focus();
+    else this.actor.grab_key_focus();
   }
 
   preferredHeight(width: number, limit: number): number {

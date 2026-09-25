@@ -88,7 +88,7 @@ export async function run() {
         const hiddenRowsCreated = added;
         toggleSurface('notifications');
         await pause(400);
-        const displayedRows = list.get_n_children() - 1;
+        const displayedRows = list.get_n_children();
         added = 0;
         for (const source of sources) source.notifications[0].title = 'Updated';
         await pause(100);

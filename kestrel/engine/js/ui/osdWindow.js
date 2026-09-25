@@ -50,6 +50,12 @@ class OsdWindow extends Clutter.Actor {
         });
         this._vbox.add_child(this._level);
 
+        this._value = new St.Label({
+            style_class: 'osd-value',
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._hbox.add_child(this._value);
+
         this._hideTimeoutId = 0;
         this._reset();
         Main.uiGroup.add_child(this);
@@ -72,7 +78,9 @@ class OsdWindow extends Clutter.Actor {
 
     setLevel(value) {
         this._level.visible = value != null;
+        this._value.visible = this._level.visible;
         if (this._level.visible) {
+            this._value.text = `${Math.round(value * 100)}%`;
             if (this.visible) {
                 this._level.ease_property('value', value, {
                     mode: Clutter.AnimationMode.EASE_OUT_QUAD,

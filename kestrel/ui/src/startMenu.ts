@@ -1,7 +1,5 @@
 import Clutter from 'gi://Clutter';
-import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -9,19 +7,21 @@ import { blurSurface } from './surface.js';
 import type { ContextMenus } from './contextMenus.js';
 import { blinkCaret } from './caret.js';
 import { StartGrid } from './start/grid.js';
-import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
+import { StartFooter } from './start/footer.js';
+
+const MINIMUM_HEIGHT = 360;
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
-  readonly powerButton: St.Button;
+  readonly footer: StartFooter;
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private pinned = new Set(this.favorites.get_strv('favorite-apps'));
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;
   private apps: Gio.AppInfo[] = [];
 
-  constructor(private readonly close: () => void, power: () => void, private readonly menus: ContextMenus) {
+  constructor(private readonly close: () => void, private readonly menus: ContextMenus) {
     this.actor = new St.BoxLayout({
       name: 'kestrel-start',
       orientation: Clutter.Orientation.VERTICAL,
@@ -51,6 +51,8 @@ export class StartMenu {
     this.search.get_clutter_text().connect('text-changed', () => {
       this.refreshApps();
     });
+    this.search.clutter_text.connect('key-focus-in', () => this.browser.setSearchFocused(true));
+    this.search.clutter_text.connect('key-focus-out', () => this.browser.setSearchFocused(false));
     this.search.clutter_text.connect('key-press-event', (_text, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Down) return Clutter.EVENT_PROPAGATE;
       return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
@@ -63,7 +65,6 @@ export class StartMenu {
       style_class: 'kestrel-app-scroll',
       hscrollbar_policy: St.PolicyType.NEVER,
       vscrollbar_policy: St.PolicyType.AUTOMATIC,
-      height: 0,
       x_expand: true, y_expand: true,
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
@@ -71,30 +72,8 @@ export class StartMenu {
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
 
-    const footer = new St.BoxLayout({ style_class: 'kestrel-footer' });
-    const account = new St.BoxLayout({ style_class: 'kestrel-account', reactive: true, x_expand: true });
-    const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
-    const avatar = new Avatar(user, { styleClass: 'kestrel-avatar', iconSize: 32 });
-    avatar.y_align = Clutter.ActorAlign.CENTER;
-    const signals = [
-      user.connect('notify::is-loaded', () => avatar.update()),
-      user.connect('changed', () => avatar.update()),
-    ];
-    avatar.connect('destroy', () => signals.forEach(signal => user.disconnect(signal)));
-    avatar.update();
-    account.add_child(avatar);
-    account.add_child(new St.Label({
-      text: GLib.get_real_name() || GLib.get_user_name(), y_align: Clutter.ActorAlign.CENTER,
-    }));
-    footer.add_child(account);
-    this.powerButton = new St.Button({
-      style_class: 'kestrel-icon-button',
-      child: new St.Icon({ icon_name: 'system-shutdown-symbolic', icon_size: 18 }),
-      accessible_name: 'Power and session', can_focus: true,
-    });
-    this.powerButton.connect('clicked', power);
-    footer.add_child(this.powerButton);
-    this.actor.add_child(footer);
+    this.footer = new StartFooter(close, menus);
+    this.actor.add_child(this.footer.actor);
 
     const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
     const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => {
@@ -110,19 +89,27 @@ export class StartMenu {
       { label: 'Refresh apps', run: () => this.loadApps() },
       { label: 'Settings', run: () => menus.settings() },
     ]);
-    menus.bind(account, () => [{ label: 'Account settings', run: () => menus.settings('system') }]);
-    menus.bind(this.powerButton, () => [{ label: 'Power and session', run: power }]);
   }
 
   focus(): void {
     this.search.grab_key_focus();
   }
   private back(): boolean {
+    if (this.footer.sessionOpen) { this.footer.setOpen(false); this.focus(); return true; }
     if (this.search.get_text()) { this.search.set_text(''); this.focus(); return true; }
     if (this.browser.home()) { this.focus(); return true; }
     return false;
   }
-  clearSearch(): void { this.browser.home(); this.search.set_text(''); }
+  reset(): void {
+    this.browser.home();
+    this.search.set_text('');
+    this.footer.setOpen(false, false);
+  }
+
+  fittedHeight(width: number, limit: number): number {
+    this.actor.height = -1;
+    return Math.min(limit, Math.max(MINIMUM_HEIGHT, this.actor.get_preferred_height(width)[1]));
+  }
 
   private loadApps(): void {
     this.apps = this.appSystem.get_installed().filter(app => app.should_show())

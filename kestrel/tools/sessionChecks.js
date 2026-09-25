@@ -78,7 +78,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(250);
   require(Main.modalCount === 0, 'password dialog cancels cleanly');
 
-  Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'}), 'Volume', 0.6, 1);
+  Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'}), null, 0.6, 1);
   await pause(200);
   await capture(`${output}/volume-osd.png`);
   Main.osdWindowManager.hideAll();

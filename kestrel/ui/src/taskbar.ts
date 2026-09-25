@@ -6,12 +6,16 @@ import type { ContextMenus } from './contextMenus.js';
 import { PANEL_ICON_SIZE } from './surface.js';
 import { animateActor, liftIcon } from './motion.js';
 
+const DOT_SIZE = 4;
+const DOT_GAP = 3;
+
 interface AppItem {
   app: Shell.App;
   icon: St.Bin;
   slot: St.Widget;
   button: St.Button;
   dots: St.Widget[];
+  focused: boolean;
   removing: boolean;
   windowsChanged: number;
 }
@@ -72,16 +76,25 @@ export class Taskbar {
 
   updateFocus(): void {
     for (const [id, item] of this.items) {
-      if (id === this.tracker.focus_app?.id) item.button.add_style_class_name('kestrel-app-focused');
+      const focused = id === this.tracker.focus_app?.id;
+      if (focused) item.button.add_style_class_name('kestrel-app-focused');
       else item.button.remove_style_class_name('kestrel-app-focused');
+      if (focused === item.focused) continue;
+      item.focused = focused;
+      this.updateDots(item, true);
     }
   }
 
-  private updateDots(item: AppItem): void {
+  private updateDots(item: AppItem, animate = false): void {
     const count = Math.min(4, item.app.get_windows().filter(window => !window.skip_taskbar).length);
+    const width = item.focused ? Math.min(DOT_SIZE * 3, Math.floor((32 - (count - 1) * DOT_GAP) / Math.max(1, count))) : DOT_SIZE;
+    const start = (40 - (count * width + (count - 1) * DOT_GAP)) / 2;
     item.dots.forEach((dot, index) => {
       dot.visible = index < count;
-      dot.x = (40 - (count * 3 + (count - 1) * 3)) / 2 + index * 6;
+      animateActor(dot, {
+        x: start + index * (width + DOT_GAP), width,
+        duration: animate && dot.visible ? 180 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART,
+      });
     });
   }
 
@@ -91,7 +104,7 @@ export class Taskbar {
     const content = new St.Widget({ width: 40, height: 40 });
     content.add_child(icon);
     const dots = Array.from({ length: 4 }, () => {
-      const dot = new St.Widget({ style_class: 'kestrel-running-dot', y: 36, width: 3, height: 3, visible: false });
+      const dot = new St.Widget({ style_class: 'kestrel-running-dot', y: 36, width: DOT_SIZE, height: DOT_SIZE, visible: false });
       content.add_child(dot);
       return dot;
     });
@@ -101,7 +114,7 @@ export class Taskbar {
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    const item = { app, icon, slot, button, dots, removing: false, windowsChanged: 0 };
+    const item = { app, icon, slot, button, dots, focused: false, removing: false, windowsChanged: 0 };
     item.windowsChanged = app.connect('windows-changed', () => this.updateDots(item));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);

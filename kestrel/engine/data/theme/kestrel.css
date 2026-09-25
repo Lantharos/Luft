@@ -29,7 +29,7 @@ stage { font-family: "Open Runde"; }
   background-color: rgba(255, 255, 255, 0.10);
 }
 
-.kestrel-running-dot { width: 3px; height: 3px; margin: 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.55); }
+.kestrel-running-dot { margin: 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.60); transition-duration: 180ms; }
 .kestrel-app-focused .kestrel-running-dot { background-color: #ffffff; }
 .kestrel-task-button:active, .kestrel-app-focused {
   background-color: rgba(255, 255, 255, 0.15);
@@ -53,7 +53,6 @@ stage { font-family: "Open Runde"; }
   spacing: 12px;
 }
 
-.kestrel-title { font-size: 18px; font-weight: 600; }
 .kestrel-section-title { font-size: 13px; font-weight: 600; }
 .kestrel-start .kestrel-section-title { padding: 0 10px; }
 .kestrel-start { padding: 20px; spacing: 14px; }
@@ -90,43 +89,79 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-app-grid { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
-.kestrel-app-content { spacing: 9px; }
-.kestrel-app-button { border-radius: 10px; padding: 12px 0; height: 66px; }
+.kestrel-app-content { spacing: 8px; }
+.kestrel-app-button { border-radius: 12px; padding: 12px 4px 8px; }
 .kestrel-app-button:hover,
 .kestrel-app-button:focus { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-app-button:active { background-color: rgba(255, 255, 255, 0.20); }
-.kestrel-app-label { font-size: 11px; max-width: 88px; text-align: center; }
+.kestrel-app-label { font-size: 12px; max-width: 84px; height: 30px; text-align: center; }
 
-.kestrel-footer { padding: 14px 0 0; spacing: 12px; }
+.kestrel-search-result { padding: 8px 10px; border-radius: 12px; transition-duration: 120ms; }
+.kestrel-search-result:hover { background-color: rgba(255, 255, 255, 0.09); }
+.kestrel-search-result:selected, .kestrel-search-result:focus { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-search-result:active { background-color: rgba(255, 255, 255, 0.20); }
+.kestrel-search-result-content { spacing: 12px; }
+.kestrel-search-result-name { font-size: 14px; font-weight: 500; }
+.kestrel-search-result-description { font-size: 12px; color: rgba(255, 255, 255, 0.60); }
+
+.kestrel-footer { padding: 12px 0 0; spacing: 8px; }
+.kestrel-footer .kestrel-icon-button:checked { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-session-actions { spacing: 4px; }
+.kestrel-session-action { padding: 9px 12px; min-width: 72px; border-radius: 10px; font-size: 12px; font-weight: 500; transition-duration: 120ms; }
+.kestrel-session-action:hover, .kestrel-session-action:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-session-action:active { background-color: rgba(255, 255, 255, 0.20); }
+.kestrel-session-action-content { spacing: 7px; }
 .kestrel-avatar { border-radius: 16px; background-size: cover; }
 .kestrel-account { spacing: 12px; font-size: 13px; }
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
 .kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }
 
-.kestrel-quick-settings { border-radius: 20px; padding: 16px; spacing: 12px; }
-.kestrel-quick-header { spacing: 12px; }
-.kestrel-quick-content { spacing: 12px; }
+.kestrel-quick-settings { border-radius: 20px; padding: 14px; spacing: 10px; }
+.kestrel-quick-content { spacing: 14px; }
 .kestrel-quick-tiles { spacing: 8px; }
 .kestrel-quick-row { spacing: 8px; }
-.kestrel-slider-section { padding: 4px 0 0; spacing: 6px; }
+.kestrel-quick-sliders { spacing: 2px; }
+.kestrel-quick-footer { spacing: 4px; padding-top: 2px; }
+.kestrel-quick-footer .kestrel-icon-button:checked { background-color: rgba(255, 255, 255, 0.16); }
+.kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 10px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
+.kestrel-quick-back:hover, .kestrel-quick-back:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-quick-back-content { spacing: 6px; }
+.kestrel-quick-power { spacing: 2px; }
+.kestrel-slider-value { min-width: 38px; text-align: right; font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
 .kestrel-quick-settings .quick-slider { padding: 0; }
-.kestrel-quick-settings .quick-slider .icon-button { border-radius: 10px; padding: 10px; background-color: transparent; }
+.kestrel-quick-settings .quick-slider .icon-button { width: 36px; height: 36px; padding: 0; border-radius: 10px; background-color: transparent; }
+.kestrel-slider-menu-space { width: 36px; }
 .kestrel-quick-settings .quick-slider .icon-button:hover { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-quick-settings .quick-slider .slider-bin { padding: 8px; }
 .kestrel-slider {
-  height: 22px;
+  height: 24px;
   color: #ffffff;
-  -slider-handle-radius: 6px;
-  -barlevel-height: 4px;
-  -barlevel-background-color: rgba(255, 255, 255, 0.18);
+  -slider-handle-radius: 8px;
+  -barlevel-height: 6px;
+  -barlevel-background-color: rgba(255, 255, 255, 0.16);
   -barlevel-active-background-color: #ffffff;
   -barlevel-border-width: 0;
   -barlevel-active-border-color: transparent;
   -barlevel-border-color: transparent;
 }
-.kestrel-notification-header { spacing: 12px; }
+.kestrel-notification-header { spacing: 12px; padding: 0 4px; }
+.kestrel-notification-empty { padding: 2px 4px 4px; font-size: 13px; color: rgba(255, 255, 255, 0.60); }
+.kestrel-notification-center { spacing: 14px; }
+
+.kestrel-calendar { spacing: 10px; }
+.kestrel-calendar-today { padding: 0 4px; }
+.kestrel-calendar-weekday { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.62); }
+.kestrel-calendar-date { font-size: 22px; font-weight: 600; }
+.kestrel-calendar-navigation { spacing: 2px; }
+.kestrel-calendar-month { padding: 7px 8px; border-radius: 9px; font-size: 13px; font-weight: 600; transition-duration: 120ms; }
+.kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-calendar-page { padding: 8px; }
+.kestrel-calendar-heading { padding: 2px 0 6px; font-size: 11px; font-weight: 500; text-align: center; color: rgba(255, 255, 255, 0.50); }
+.kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; }
+.kestrel-calendar-day:selected { background-color: rgba(255, 255, 255, 0.94); color: #15171a; font-weight: 600; }
+.kestrel-calendar-day:insensitive { color: rgba(255, 255, 255, 0.30); }
 .kestrel-notification-list { spacing: 8px; }
 .kestrel-notification {
   background-color: rgba(255, 255, 255, 0.06);
@@ -137,7 +172,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
 .kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
 
-.kestrel-power-menu { spacing: 2px; padding: 8px; }
 .kestrel-power-action { padding: 12px; border-radius: 12px; }
 .kestrel-power-row { spacing: 14px; font-size: 13px; }
 
@@ -172,10 +206,15 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   background-color: rgba(255, 255, 255, 0.07); color: white; box-shadow: none;
   transition-duration: 140ms; min-width: 0;
 }
-.kestrel-control:checked { background-color: rgba(255, 255, 255, 0.17); }
-.kestrel-control:hover { background-color: rgba(255, 255, 255, 0.23); }
-.kestrel-control:active { background-color: rgba(255, 255, 255, 0.29); }
+.kestrel-control:hover { background-color: rgba(255, 255, 255, 0.13); }
+.kestrel-control:active { background-color: rgba(255, 255, 255, 0.19); }
 .kestrel-control:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.kestrel-control:checked { background-color: rgba(255, 255, 255, 0.94); color: #15171a; }
+.kestrel-control:checked:hover { background-color: rgba(255, 255, 255, 0.86); }
+.kestrel-control:checked:active { background-color: rgba(255, 255, 255, 0.78); }
+.kestrel-control:checked:focus { box-shadow: inset 0 0 0 2px rgba(21, 23, 26, 0.35); }
+.kestrel-control:checked .kestrel-control-subtitle { color: rgba(21, 23, 26, 0.62); }
+.kestrel-control:checked .kestrel-control-more:hover { background-color: rgba(21, 23, 26, 0.10); }
 .kestrel-control-body { spacing: 3px; }
 .kestrel-control-title { font-size: 13px; font-weight: 600; }
 .kestrel-control-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
@@ -188,14 +227,14 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
 
 .kestrel-window-previews {
-  padding: 4px;
-  border-radius: 12px;
+  padding: 8px;
+  border-radius: 16px;
   background-color: rgba(20, 20, 24, 0.30);
   color: white;
 }
-.kestrel-preview-row { spacing: 8px; }
-.kestrel-preview-card { padding: 0; }
-.kestrel-preview-header { padding-left: 6px; font-size: 13px; }
+.kestrel-preview-row { spacing: 10px; }
+.kestrel-preview-card { padding: 0; spacing: 4px; }
+.kestrel-preview-header { padding-left: 6px; spacing: 8px; font-size: 13px; }
 .kestrel-preview-close { padding: 6px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-preview-close:hover, .kestrel-preview-close:focus { background-color: rgba(255, 100, 100, 0.4); }
 .kestrel-preview-window { padding: 2px; border-radius: 10px; background-color: transparent; box-shadow: none; }
@@ -266,13 +305,20 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .popup-menu-item { padding: 9px 10px; border-radius: 9px; }
 .popup-menu-item:active, .popup-menu-item:checked, .popup-menu-item:hover, .popup-menu-item:focus { background-color: rgba(255, 255, 255, 0.16); color: white; }
 .popup-sub-menu, .popup-menu-section { background-color: transparent; box-shadow: none; }
-.switcher-list.kestrel-glass { padding: 8px; border-radius: 16px; }
-.switcher-list .item-box { padding: 8px; border-radius: 10px; }
+.switcher-list.kestrel-glass { padding: 8px; border-radius: 18px; box-shadow: none; }
+.switcher-list .switcher-list-item-container { spacing: 4px; }
+.switcher-list .item-box { padding: 10px; border-radius: 12px; }
+.kestrel-switcher-window { spacing: 8px; }
+.kestrel-switcher-header { spacing: 8px; padding: 0 2px; }
+.kestrel-switcher-title { font-size: 13px; font-weight: 500; text-align: left; }
 .switcher-list .item-box:selected, .switcher-list .item-box:outlined { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
 .workspace-switcher.kestrel-glass { padding: 10px; border-radius: 16px; margin-bottom: 64px; }
 .ws-switcher-indicator { background-color: rgba(255, 255, 255, 0.17); border: none; border-radius: 6px; }
 .ws-switcher-indicator:active { background-color: rgba(255, 255, 255, 0.75); }
-.osd-window.kestrel-glass { padding: 14px 18px; border-radius: 16px; }
+.osd-window.kestrel-glass { padding: 10px 16px 10px 14px; border-radius: 16px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
+.osd-window.kestrel-glass StIcon { icon-size: 20px; }
+.osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; }
+.osd-window.kestrel-glass .osd-value { min-width: 38px; margin: 0; font-size: 13px; font-weight: 500; text-align: right; }
 .osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 12px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 16px; background-color: rgba(20, 20, 24, 0.20); }
 .message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }

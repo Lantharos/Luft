@@ -1574,41 +1574,40 @@ export class WindowManager {
     }
 
     _startSwitcher(display, window, event, binding) {
-        let constructor = null;
-        switch (binding.get_name()) {
+        const name = binding.get_name();
+        let createPopup = null;
+        switch (name) {
         case 'switch-applications':
         case 'switch-applications-backward':
         case 'switch-group':
         case 'switch-group-backward':
-            constructor = AltTab.AppSwitcherPopup;
-            break;
         case 'switch-windows':
         case 'switch-windows-backward':
-            constructor = AltTab.WindowSwitcherPopup;
+            createPopup = () => new AltTab.WindowSwitcherPopup(name);
             break;
         case 'cycle-windows':
         case 'cycle-windows-backward':
-            constructor = AltTab.WindowCyclerPopup;
+            createPopup = () => new AltTab.WindowCyclerPopup();
             break;
         case 'cycle-group':
         case 'cycle-group-backward':
-            constructor = AltTab.GroupCyclerPopup;
+            createPopup = () => new AltTab.GroupCyclerPopup();
             break;
         case 'switch-monitor':
-            constructor = SwitchMonitor.SwitchMonitorPopup;
+            createPopup = () => new SwitchMonitor.SwitchMonitorPopup();
             break;
         }
 
-        if (!constructor)
+        if (!createPopup)
             return;
 
         /* prevent a corner case where both tab and workspace switcher popups show up at once */
         if (this._workspaceSwitcherPopup != null)
             this._workspaceSwitcherPopup.destroy();
 
-        const tabPopup = new constructor();
+        const tabPopup = createPopup();
 
-        if (!tabPopup.show(binding.is_reversed(), binding.get_name(), binding.get_mask()))
+        if (!tabPopup.show(binding.is_reversed(), name, binding.get_mask()))
             tabPopup.destroy();
     }
 

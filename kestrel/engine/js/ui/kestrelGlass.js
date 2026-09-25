@@ -1,6 +1,9 @@
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+const EDGE_HIGHLIGHT = 0.14;
+const BRIGHT_DIM = 0.55;
+
 export function blurSurface(actor, corners = 20) {
     const theme = St.ThemeContext.get_for_stage(global.stage);
     const effect = new Shell.BlurEffect({
@@ -9,6 +12,8 @@ export function blurSurface(actor, corners = 20) {
         brightness: 1,
     });
     effect.set_property('corner-radius', corners);
+    effect.set_property('edge-highlight', EDGE_HIGHLIGHT);
+    effect.set_property('bright-dim', BRIGHT_DIM);
     actor.add_effect_with_name('backdrop', effect);
     const changed = theme.connect('notify::scale-factor', () => {
         effect.radius = 30 * theme.scale_factor;

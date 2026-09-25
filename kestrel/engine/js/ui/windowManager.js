@@ -25,8 +25,9 @@ import * as Main from './main.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 
-export const MINIMIZE_WINDOW_ANIMATION_TIME = 400;
-export const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_EXPO;
+const MINIMIZE_WINDOW_ANIMATION_TIME = 300;
+const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;
+const MINIMIZED_WINDOW_SCALE = 0.04;
 export const SHOW_WINDOW_ANIMATION_TIME = 150;
 export const DIALOG_SHOW_WINDOW_ANIMATION_TIME = 100;
 export const DESTROY_WINDOW_ANIMATION_TIME = 150;
@@ -1066,38 +1067,41 @@ export class WindowManager {
                 onStopped: () => this._minimizeWindowDone(shellwm, actor),
             });
         } else {
-            let xDest, yDest, xScale, yScale;
-            const [success, geom] = actor.meta_window.get_icon_geometry();
-            if (success) {
-                xDest = geom.x;
-                yDest = geom.y;
-                xScale = geom.width / actor.width;
-                yScale = geom.height / actor.height;
-            } else {
-                const monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
-                if (!monitor) {
-                    this._minimizeWindowDone();
-                    return;
-                }
-                xDest = monitor.x;
-                yDest = monitor.y;
-                if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL)
-                    xDest += monitor.width;
-                xScale = 0;
-                yScale = 0;
+            const target = this._minimizeTarget(actor);
+            if (!target) {
+                this._minimizeWindowDone(shellwm, actor);
+                return;
             }
 
             actor.ease({
                 opacity: 0,
-                scale_x: xScale,
-                scale_y: yScale,
-                x: xDest,
-                y: yDest,
+                scale_x: target.scale,
+                scale_y: target.scale,
+                x: target.x,
+                y: target.y,
                 duration: MINIMIZE_WINDOW_ANIMATION_TIME,
                 mode: MINIMIZE_WINDOW_ANIMATION_MODE,
                 onStopped: () => this._minimizeWindowDone(shellwm, actor),
             });
         }
+    }
+
+    _minimizeTarget(actor) {
+        const [hasIcon, icon] = actor.meta_window.get_icon_geometry();
+        const monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+        if (!hasIcon && !monitor)
+            return null;
+
+        const {x, y, width, height} = hasIcon
+            ? icon
+            : {x: monitor.x + monitor.width / 2, y: monitor.y + monitor.height, width: 0, height: 0};
+        const scale = Math.max(MINIMIZED_WINDOW_SCALE,
+            Math.min(width / actor.width, height / actor.height));
+        return {
+            x: x + width / 2 - actor.width * scale / 2,
+            y: y + height / 2 - actor.height * scale / 2,
+            scale,
+        };
     }
 
     _minimizeWindowDone(shellwm, actor) {
@@ -1137,30 +1141,22 @@ export class WindowManager {
                 onStopped: () => this._unminimizeWindowDone(shellwm, actor),
             });
         } else {
-            const [success, geom] = actor.meta_window.get_icon_geometry();
-            if (success) {
-                actor.set_position(geom.x, geom.y);
-                actor.set_scale(
-                    geom.width / actor.width,
-                    geom.height / actor.height);
-            } else {
-                const monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
-                if (!monitor) {
-                    actor.show();
-                    this._unminimizeWindowDone();
-                    return;
-                }
-                actor.set_position(monitor.x, monitor.y);
-                if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL)
-                    actor.x += monitor.width;
-                actor.set_scale(0, 0);
+            const target = this._minimizeTarget(actor);
+            if (!target) {
+                actor.show();
+                this._unminimizeWindowDone(shellwm, actor);
+                return;
             }
+            actor.set_position(target.x, target.y);
+            actor.set_scale(target.scale, target.scale);
+            actor.opacity = 0;
 
             const rect = actor.meta_window.get_buffer_rect();
             const [xDest, yDest] = [rect.x, rect.y];
 
             actor.show();
             actor.ease({
+                opacity: 255,
                 scale_x: 1,
                 scale_y: 1,
                 x: xDest,

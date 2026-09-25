@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { WindowPreviews } from './windowPreviews.js';
@@ -16,6 +17,7 @@ interface AppItem {
   button: St.Button;
   dots: St.Widget[];
   focused: boolean;
+  iconGeometry: Mtk.Rectangle | null;
   removing: boolean;
   windowsChanged: number;
 }
@@ -59,14 +61,14 @@ export class Taskbar {
         item.app.disconnect(item.windowsChanged);
         item.app = app;
         const currentItem = item;
-        item.windowsChanged = app.connect('windows-changed', () => this.updateDots(currentItem));
+        item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(currentItem));
         item.icon.child = app.create_icon_texture(PANEL_ICON_SIZE);
       }
       item.button.accessible_name = app.get_name();
       item.removing = false;
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
-      this.updateDots(item);
+      this.windowsChanged(item);
       animateActor(item.slot, { width: 42, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
       animateActor(item.button, { opacity: 255, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     });
@@ -83,6 +85,22 @@ export class Taskbar {
       item.focused = focused;
       this.updateDots(item, true);
     }
+  }
+
+  private windowsChanged(item: AppItem): void {
+    this.updateDots(item);
+    item.iconGeometry = null;
+    this.syncIconGeometry(item);
+  }
+
+  private syncIconGeometry(item: AppItem): void {
+    if (!item.button.mapped) return;
+    const [x, y] = item.button.get_transformed_position();
+    const [width, height] = item.button.get_transformed_size();
+    const geometry = new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) });
+    if (item.iconGeometry?.equal(geometry)) return;
+    item.iconGeometry = geometry;
+    for (const window of item.app.get_windows()) window.set_icon_geometry(geometry);
   }
 
   private updateDots(item: AppItem, animate = false): void {
@@ -114,8 +132,9 @@ export class Taskbar {
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    const item = { app, icon, slot, button, dots, focused: false, removing: false, windowsChanged: 0 };
-    item.windowsChanged = app.connect('windows-changed', () => this.updateDots(item));
+    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0 };
+    item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(item));
+    button.connect('notify::allocation', () => this.syncIconGeometry(item));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);
     this.previews.bind(button, () => item.app);

@@ -130,7 +130,7 @@ export class KestrelPanel {
 
   setActive(surface: string | null): void {
     for (const [button, active] of [
-      [this.startButton, surface === 'start' || surface === 'power'],
+      [this.startButton, surface === 'start'],
       [this.quickButton, surface === 'quick'],
       [this.clockButton, surface === 'notifications'],
     ] as const) {

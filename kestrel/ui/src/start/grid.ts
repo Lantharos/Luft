@@ -1,9 +1,11 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 import Shell from 'gi://Shell';
 import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
+import { SearchResults, rankMatches } from './searchResults.js';
 import { animateActor, liftIcon } from '../motion.js';
 import type { ContextMenus } from '../contextMenus.js';
 
@@ -12,6 +14,8 @@ export class StartGrid {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
   private readonly layout = new StartLayout();
   private readonly drag: GridDrag;
+  private readonly results: SearchResults;
+  private highlightFirst = true;
   private catalogDirty = false;
   private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
@@ -25,9 +29,11 @@ export class StartGrid {
 
   constructor(private readonly scroller: St.ScrollView, private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {
     scroller.child = this.actor;
+    this.results = new SearchResults(menus, launch, actor => this.reveal(actor));
     this.actor.connect('destroy', () => {
       for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
       this.buttons.clear();
+      this.results.destroy();
     });
     this.drag = new GridDrag(scroller, () => this.render(false, true));
     this.drag.target(this.actor, source => this.query ? null : () => this.layout.move(source.id, this.folder));
@@ -49,6 +55,18 @@ export class StartGrid {
 
   focusFirst(): boolean { return this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false); }
 
+  setSearchFocused(focused: boolean): void {
+    this.highlightFirst = focused;
+    if (this.query) this.results.select(focused && this.firstMatch ? this.results.row(this.firstMatch) : null);
+  }
+
+  private reveal(actor: St.Widget): void {
+    const [, y] = actor.get_transformed_position();
+    const [, top] = this.scroller.get_transformed_position();
+    if (y < top) this.scroller.vadjustment.value += y - top;
+    else if (y + actor.height > top + this.scroller.height) this.scroller.vadjustment.value += y + actor.height - top - this.scroller.height;
+  }
+
   home(): boolean {
     if (!this.folder) return false;
     this.folder = null;
@@ -68,10 +86,12 @@ export class StartGrid {
     if (this.catalogDirty) {
       for (const { actor } of this.buttons.values()) actor.destroy();
       this.buttons.clear();
+      this.results.destroy();
       this.catalogDirty = false;
     }
     if (this.folder && !this.layout.folder(this.folder)) this.folder = null;
     for (const { actor } of this.buttons.values()) actor.get_parent()?.remove_child(actor);
+    this.results.detach();
     this.actor.destroy_all_children();
     for (const [key, item] of this.buttons) {
       const id = key;
@@ -81,11 +101,18 @@ export class StartGrid {
       }
     }
     const ids = this.query
-      ? [...this.searchNames].filter(([, name]) => name.includes(this.query)).map(([id]) => id)
+      ? rankMatches(this.searchNames, this.query)
       : this.layout.items(this.folder).filter(id => this.visible(id));
     this.firstMatch = ids.length ? this.apps.get(ids[0]) : undefined;
     this.renderHeader();
     if (!ids.length) this.actor.add_child(new St.Label({ text: this.query ? 'No apps found' : 'No apps here', style_class: 'kestrel-empty' }));
+    if (this.query) {
+      for (const id of ids) this.actor.add_child(this.results.row(this.apps.get(id)!));
+      this.results.select(this.highlightFirst && this.firstMatch ? this.results.row(this.firstMatch) : null);
+      this.scroller.vadjustment.value = 0;
+      return;
+    }
+    this.results.select(null);
     for (let index = 0; index < ids.length; index += 6) {
       const row = new St.BoxLayout({ style_class: 'kestrel-app-row' });
       for (let column = 0; column < 6; column++) {
@@ -121,10 +148,8 @@ export class StartGrid {
     this.headerKey = key;
     this.header.destroy_all_children();
     const folder = !this.query && this.folder ? this.layout.folder(this.folder) : undefined;
-    if (!folder) {
-      this.header.add_child(new St.Label({ text: this.query ? 'Search results' : 'Apps', style_class: 'kestrel-section-title', y_align: Clutter.ActorAlign.START }));
-      return;
-    }
+    this.header.visible = !!folder;
+    if (!folder) return;
     const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
     back.connect('clicked', () => this.home());
     this.drag.target(back, source => source.folder ? null : () => { this.layout.move(source.id, null); this.folder = null; });
@@ -185,14 +210,14 @@ export class StartGrid {
     const icon = this.icon(id, 36);
     icon.x_align = Clutter.ActorAlign.CENTER;
     content.add_child(icon);
-    content.add_child(new St.Label({ text: label, style_class: 'kestrel-app-label', x_align: Clutter.ActorAlign.CENTER }));
+    const name = new St.Label({ text: label, style_class: 'kestrel-app-label', x_align: Clutter.ActorAlign.CENTER });
+    name.clutter_text.line_wrap = true;
+    name.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+    name.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+    name.clutter_text.line_alignment = Pango.Alignment.CENTER;
+    content.add_child(name);
     const button = new St.Button({ name: `kestrel-start-item-${id}`, style_class: 'kestrel-app-button', child: content, width: 92, x_expand: true, can_focus: true, track_hover: true, accessible_name: label });
-    button.connect('key-focus-in', () => {
-      const [, y] = button.get_transformed_position();
-      const [, top] = this.scroller.get_transformed_position();
-      if (y < top) this.scroller.vadjustment.value += y - top;
-      else if (y + button.height > top + this.scroller.height) this.scroller.vadjustment.value += y + button.height - top - this.scroller.height;
-    });
+    button.connect('key-focus-in', () => this.reveal(button));
     liftIcon(button, icon);
     button.connect('clicked', () => {
       if (this.drag.active) return;

@@ -6,6 +6,7 @@ import { NotificationCard, type Notification, type NotificationSource, type Sign
 import St from 'gi://St';
 import type { ContextMenus } from './contextMenus.js';
 import { blurSurface } from './surface.js';
+import { Calendar } from './calendar.js';
 
 export interface MessageTray extends SignalSource {
   getSources(): NotificationSource[];
@@ -22,8 +23,10 @@ export class NotificationCenter {
   private closing = false;
   private first: NotificationCard | null = null;
   private readonly scroll: St.ScrollView;
-  private readonly empty = new St.Label({ text: 'No notifications', style_class: 'kestrel-empty' });
+  private readonly empty = new St.Label({ text: 'No notifications', style_class: 'kestrel-notification-empty' });
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
+  private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
+  private readonly calendar = new Calendar();
 
   constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus, private readonly layoutChanged: () => void, private readonly close: () => void) {
     this.actor = new St.BoxLayout({
@@ -39,15 +42,15 @@ export class NotificationCenter {
       { label: 'Notification settings', run: () => menus.settings('notifications') },
     ]);
 
-    const header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
-    header.add_child(new St.Label({
+    this.header.add_child(new St.Label({
       text: 'Notifications',
-      style_class: 'kestrel-title',
+      style_class: 'kestrel-section-title',
       x_expand: true,
+      y_align: Clutter.ActorAlign.CENTER,
     }));
     this.clearButton.connect('clicked', () => this.clear());
-    header.add_child(this.clearButton);
-    this.actor.add_child(header);
+    this.header.add_child(this.clearButton);
+    this.actor.add_child(this.header);
 
     const scroll = this.scroll = new St.ScrollView({
       hscrollbar_policy: St.PolicyType.NEVER,
@@ -57,6 +60,7 @@ export class NotificationCenter {
     });
     scroll.child = this.list;
     this.actor.add_child(scroll);
+    this.actor.add_child(this.calendar.actor);
 
     this.list.add_child(this.empty);
     this.tray.connectObject(
@@ -83,7 +87,12 @@ export class NotificationCenter {
     });
   }
 
-  prepareOpen(): void { this.closing = false; this.dirty = true; this.refresh(); }
+  prepareOpen(): void {
+    this.closing = false;
+    this.dirty = true;
+    this.calendar.showToday();
+    this.refresh();
+  }
   freeze(): void { this.closing = true; }
 
   refresh(): void {
@@ -103,8 +112,7 @@ export class NotificationCenter {
     }
     this.first = null;
     this.empty.visible = notifications.length === 0;
-    this.clearButton.reactive = this.clearButton.can_focus = notifications.length > 0;
-    this.clearButton.opacity = notifications.length > 0 ? 255 : 100;
+    this.header.visible = notifications.length > 0;
     for (const [index, { source, notification }] of notifications.entries()) {
       let item = this.items.get(notification);
       if (!item) {
@@ -133,8 +141,10 @@ export class NotificationCenter {
   preferredHeight(width: number, limit: number): number {
     const theme = this.actor.get_theme_node();
     const contentWidth = width - theme.get_horizontal_padding();
-    const header = this.actor.get_first_child()!.get_preferred_height(contentWidth)[1];
-    return Math.min(limit, header + this.list.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + theme.get_length('spacing'));
+    const spacing = theme.get_length('spacing');
+    const header = this.header.visible ? this.header.get_preferred_height(contentWidth)[1] + spacing : 0;
+    const chrome = header + this.calendar.actor.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + spacing;
+    return Math.min(limit, chrome + this.list.get_preferred_height(contentWidth)[1]);
   }
 
   private watchSources(): void {

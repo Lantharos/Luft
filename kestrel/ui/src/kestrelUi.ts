@@ -14,12 +14,15 @@ import { KestrelPanel, type Monitor } from './panel.js';
 import { StartMenu } from './startMenu.js';
 import { QuickSettings } from './quickSettings.js';
 import { NotificationCenter, type MessageTray } from './notificationCenter.js';
-import { PowerMenu } from './powerMenu.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './surface.js';
 import { animateActor } from './motion.js';
 import type { QuickSettingsSource } from './quickControls.js';
 
-type Surface = 'start' | 'quick' | 'notifications' | 'power';
+type Surface = 'start' | 'quick' | 'notifications';
+
+const START_MAXIMUM_HEIGHT = 600;
+const OPEN_DURATION = 220;
+const CLOSE_DURATION = 160;
 
 interface LayoutManager {
   primaryMonitor: Monitor | null;
@@ -50,11 +53,10 @@ class KestrelUi {
   private readonly start: StartMenu;
   private readonly quick: QuickSettings;
   private readonly notifications: NotificationCenter;
-  private readonly power: PowerMenu;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
-  private powerOpen = false;
+  private startHeight = 0;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private focusWindow: Meta.Window | null = null;
   private focusSignals: number[] = [];
@@ -87,11 +89,10 @@ class KestrelUi {
       quickSettings: () => this.toggle('quick'),
       notifications: () => this.toggle('notifications'),
     }, this.menus, this.previews);
-    this.start = new StartMenu(() => this.close(), () => this.openPowerMenu(), this.menus);
+    this.start = new StartMenu(() => this.close(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       (network, volume) => this.panel.updateStatus(network, volume), this.menus);
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
-    this.power = new PowerMenu(() => this.close());
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -109,12 +110,9 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.start.actor);
     context.layoutManager.addTopChrome(this.quick.actor);
     context.layoutManager.addTopChrome(this.notifications.actor);
-    context.layoutManager.addTopChrome(this.power.actor);
-    for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
+    for (const actor of this.surfaces()) {
       const updateClip = () => actor.set_clip(0, 0, actor.width,
-        Math.max(0, (actor === this.power.actor
-          ? Math.min(this.panel.actor.y, this.start.powerButton.get_transformed_position()[1])
-          : this.panel.actor.y) - actor.y - actor.translation_y));
+        Math.max(0, this.panel.actor.y - actor.y - actor.translation_y));
       for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
         actor.connect(signal, updateClip);
     }
@@ -125,8 +123,7 @@ class KestrelUi {
     });
     this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
       if (this.active && event.get_key_symbol() === Clutter.KEY_Escape) {
-        if (this.powerOpen) this.closePower();
-        else if (this.active !== 'quick' || !this.quick.closeSubmenu()) this.close();
+        if (this.active !== 'quick' || !this.quick.closeSubmenu()) this.close();
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -158,7 +155,7 @@ class KestrelUi {
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panel.actor);
-    for (const actor of [this.panel.actor, this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor, this.previews.actor])
+    for (const actor of [this.panel.actor, ...this.surfaces(), this.previews.actor])
       navigateWithKeyboard(actor);
     this.watch(context.layoutManager, 'monitors-changed', () => { this.dismissImmediately(); this.place(); this.syncSession(); });
     this.place();
@@ -205,7 +202,7 @@ class KestrelUi {
     this.previews.close(true);
     this.panel.setActive(null);
     this.quick.closeSubmenu();
-    for (const actor of [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor]) {
+    for (const actor of this.surfaces()) {
       actor.remove_all_transitions();
       actor.hide();
       this.closingSelections.get(actor)?.();
@@ -224,33 +221,23 @@ class KestrelUi {
     this.cover.set_size(stage.width, stage.height);
     const startWidth = Math.min(660, monitor.width - 24);
     const bottom = monitor.y + monitor.height - PANEL_HEIGHT - SURFACE_GAP;
-    const startHeight = Math.min(600, monitor.height - PANEL_HEIGHT - 24);
+    const available = monitor.height - PANEL_HEIGHT - 24;
+    const startHeight = this.startHeight || Math.min(START_MAXIMUM_HEIGHT, available);
     this.start.actor.set_size(startWidth, startHeight);
     this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
 
-    for (const [actor, width, fixedHeight] of [
-      [this.quick.actor, 420, this.quick.preferredHeight(420, monitor.height - PANEL_HEIGHT - 24)],
-      [this.notifications.actor, 380, this.notifications.preferredHeight(380, Math.min(520, startHeight))],
-      [this.power.actor, 176, 0],
+    for (const [actor, width, height] of [
+      [this.quick.actor, 420, this.quick.preferredHeight(420, available)],
+      [this.notifications.actor, 380, this.notifications.preferredHeight(380, Math.min(640, available))],
     ] as const) {
-      actor.width = width;
-      actor.height = -1;
-      const height = fixedHeight || actor.get_preferred_height(width)[1];
-      actor.height = height;
-      const right = actor === this.power.actor
-        ? this.start.actor.x + startWidth - 24
-        : monitor.x + monitor.width - 12;
-      actor.set_position(Math.round(right - width), bottom - height - (actor === this.power.actor ? 82 : 0));
+      actor.set_size(width, height);
+      actor.set_position(Math.round(monitor.x + monitor.width - 12 - width), bottom - height);
     }
   }
 
   private toggle(surface: Surface): void {
     if (!this.canInteract()) return;
     this.previews.close();
-    if (surface === 'power') {
-      this.openPowerMenu();
-      return;
-    }
     if (this.active === surface) {
       this.close();
       return;
@@ -265,21 +252,24 @@ class KestrelUi {
     const openingActor = this.actorFor(surface);
     this.closingSelections.get(openingActor)?.();
     this.closingSelections.delete(openingActor);
-    if (surface === 'start') {
-      this.start.clearSearch();
-    }
+    if (surface === 'start') this.start.reset();
 
     const actor = this.actorFor(surface);
     actor.get_parent()!.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
     if (surface === 'notifications') this.notifications.prepareOpen();
+    if (surface === 'start') {
+      const monitor = this.context.layoutManager.primaryMonitor!;
+      this.startHeight = this.start.fittedHeight(Math.min(660, monitor.width - 24),
+        Math.min(START_MAXIMUM_HEIGHT, monitor.height - PANEL_HEIGHT - 24));
+    }
     this.place();
     if (opening) {
       actor.opacity = 255;
       actor.translation_y = this.slideDistance(actor);
     }
-    this.animate(actor, 0, 300);
+    this.animate(actor, 0, OPEN_DURATION);
 
     if (surface === 'start') this.start.focus();
     else if (surface === 'notifications') this.notifications.focus();
@@ -288,7 +278,6 @@ class KestrelUi {
 
   private close(): void {
     this.menus.close();
-    this.closePower();
     const surface = this.active;
     if (surface === 'notifications') this.notifications.freeze();
     if (surface) this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
@@ -297,13 +286,13 @@ class KestrelUi {
     this.panel.actor.get_parent()!.set_child_below_sibling(this.panel.actor, (global as unknown as Shell.Global).top_window_group);
     const stage = (global as unknown as Shell.Global).stage;
     const focus = stage.get_key_focus();
-    if (focus && [this.start.actor, this.quick.actor, this.notifications.actor, this.power.actor].some(actor => actor.contains(focus)))
+    if (focus && this.surfaces().some(actor => actor.contains(focus)))
       stage.set_key_focus(null);
     if (!surface)
       return;
 
     const actor = this.actorFor(surface);
-    this.animate(actor, this.slideDistance(actor), 230, () => {
+    this.animate(actor, this.slideDistance(actor), CLOSE_DURATION, () => {
       if (this.active === surface) return;
       actor.hide();
       this.closingSelections.get(actor)?.();
@@ -327,12 +316,15 @@ class KestrelUi {
 
   startOpen(): boolean { return this.active === 'start'; }
 
+  private surfaces(): St.BoxLayout[] {
+    return [this.start.actor, this.quick.actor, this.notifications.actor];
+  }
+
   private actorFor(surface: Surface): St.BoxLayout {
     switch (surface) {
       case 'start': return this.start.actor;
       case 'quick': return this.quick.actor;
       case 'notifications': return this.notifications.actor;
-      case 'power': return this.power.actor;
     }
   }
 
@@ -355,42 +347,6 @@ class KestrelUi {
   private slideDistance(actor: Clutter.Actor): number {
     const monitor = this.context.layoutManager.primaryMonitor!;
     return monitor.y + monitor.height - actor.y;
-  }
-
-  private openPowerMenu(): void {
-    if (this.powerOpen) {
-      this.closePower();
-      return;
-    }
-    if (this.active !== 'start') this.toggle('start');
-    this.powerOpen = true;
-    const actor = this.power.actor;
-    this.closingSelections.get(actor)?.();
-    this.closingSelections.delete(actor);
-    actor.get_parent()!.set_child_above_sibling(actor, null);
-    const opening = !actor.visible;
-    actor.show();
-    this.place();
-    if (opening) {
-      actor.opacity = 255;
-      actor.translation_y = this.powerDistance();
-    }
-    this.animate(actor, 0, 200);
-  }
-
-  private powerDistance(): number {
-    const [, y] = this.start.powerButton.get_transformed_position();
-    return y - this.power.actor.y;
-  }
-
-  private closePower(): void {
-    if (!this.powerOpen) return;
-    this.powerOpen = false;
-    const actor = this.power.actor;
-    this.closingSelections.set(actor, freezeSelection(actor));
-    this.animate(actor, this.powerDistance(), 160, () => {
-      if (!this.powerOpen) actor.hide();
-    });
   }
 
   shutdown(): void {

@@ -227,11 +227,12 @@ export async function run() {
   pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
   await pause(450);
   await capture(`${output}/power-menu.png`);
-  console.log(`Kestrel power submenu: start=${start.visible}, power=${actorNamed(global.stage, 'kestrel-power').visible}`);
+  const sessionActions = actorNamed(start, 'Power off').get_parent();
+  console.log(`Kestrel power options: start=${start.visible}, actions=${sessionActions.visible}`);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.PRESSED);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Escape, Clutter.KeyState.RELEASED);
   await pause(350);
-  console.log(`Kestrel submenu Escape: start=${start.visible}, power=${actorNamed(global.stage, 'kestrel-power').visible}`);
+  console.log(`Kestrel power options Escape: start=${start.visible}, actions=${sessionActions.visible}`);
 
   const windowScript = GLib.getenv('KESTREL_WINDOW_SCRIPT');
   if (windowScript) {

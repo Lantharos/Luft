@@ -1,4 +1,4 @@
-/* App Switcher */
+/* Window Switcher */
 
 // same as dash
 $switcher_padding: $base_padding * 2;
@@ -40,22 +40,6 @@ $switcher_radius: $modal_radius + $switcher_padding;
     }
   }
 
-  .separator {
-    width: 1px;
-    background: $borders_color;
-  }
-
-  // container of thumbnails
-  .thumbnail-box {
-    padding: 2px;
-    spacing: $base_padding;
-  }
-
-  // window thumbnail itself
-  .thumbnail {
-    width: 256px; // equal to THUMBNAIL_DEFAULT_SIZE in altTab.js
-    border-radius:$base_border_radius;
-  }
 }
 
 // arrow if app has multiple windows

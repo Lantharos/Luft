@@ -1,5 +1,6 @@
 declare module 'resource:///org/gnome/shell/misc/systemActions.js' {
-  interface Actions {
+  import GObject from 'gi://GObject';
+  interface Actions extends GObject.Object {
     activateLockScreen(): void;
     activateSuspend(): void;
     activateLogout(): void;

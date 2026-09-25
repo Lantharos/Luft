@@ -21,7 +21,7 @@ export class WindowPreviews {
   private clearSelection: (() => void) | null = null;
 
   constructor(private readonly monitor: () => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
-    blurSurface(this.actor, 12);
+    blurSurface(this.actor, 16);
     this.actor.connect('notify::hover', () => {
       if (this.actor.hover) this.cancelTimer();
       else this.schedule(() => this.closeUnlessFocused(), 180);

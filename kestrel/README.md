@@ -9,7 +9,7 @@ Kestrel is Luft's desktop shell. It uses a local Mutter 51 build with native win
 - The square, transparent 48px panel reserves the bottom edge. Its launcher and favorite/running apps stay centered against the monitor while live network, volume, and right-aligned, stacked date/time indicators sit on the right.
 - Start’s default grid excludes apps pinned to the panel. Search includes every installed application, including pinned apps, and lists matches with their descriptions. Names that start with the query rank first, then names with a word starting with it. The top match is highlighted while typing and Enter launches it. Pinning or unpinning refreshes the grid immediately. Down moves from search into the results or app grid; arrows and Tab navigate controls, and focused apps scroll into view.
 - Hovering a running taskbar app shows live window previews with activation and close controls. Clicking an app with multiple windows opens the same picker, and Up opens it from a focused taskbar button. Alt-Tab switches between windows with live previews, their titles, and app icons; Alt and the key above Tab limits the switcher to the focused app. Alt-Escape cycles windows, and Ctrl-Alt-Tab includes the Kestrel panel.
-- Lock and greeter modes hide the panel and dismiss all desktop surfaces immediately. Super and desktop context menus are unavailable while locked or while a system dialog holds focus. System dialogs dismiss open surfaces before taking focus.
+- Lock and greeter modes hide the panel and dismiss all desktop surfaces immediately. The lock screen shows a large clock and date over the blurred wallpaper, then the account picture, name, and password field once woken. Super and desktop context menus are unavailable while locked or while a system dialog holds focus. System dialogs dismiss open surfaces before taking focus.
 - The panel follows the primary display and hides for fullscreen windows and focused windows covering the entire display. Desktop context menus stay on the clicked display; outside-click dismissal covers all displays, and monitor changes dismiss surfaces before repositioning them.
 - Quick Settings provides network and Bluetooth controls, device selection for audio output and microphone input, brightness, Do Not Disturb, Night Light, and power profiles. Compact glass controls place icons above their labels, with separate buttons for device details; controls that are on turn brighter, and an odd final control spans the full width. Volume, microphone, and brightness each take a single row, and their percentage appears while the level changes. Settings and Lock sit along the bottom. Controls follow the available hardware and services. Device selectors open in an adaptive glass detail view with a Back button. The surface grows to fit available space; long lists use page buttons instead of scrollbars. The microphone control remains available when a microphone is present, even without an active recording.
 - The clock opens notifications above today’s date and a month calendar. The calendar follows the locale’s first weekday, pages between months, and returns to today from the month title. The notification center updates individual rows, batches notification bursts, and defers row construction while closed. Signal subscriptions follow the lifetime of their source and owning actor.
@@ -53,6 +53,8 @@ Open a folder to launch or rearrange its apps. Edit its name in the header. Drag
 
 App buttons are reused across searches, folders, and reordering. Search names are indexed when the installed app catalog changes.
 
+Drag an app from Start onto the panel to pin it where it is dropped, or drag panel apps to reorder them; running apps dropped among pinned apps are pinned in place.
+
 Folder contents, names, and ordering are saved across sessions. Apps pinned to the panel stay hidden in the default grid and folder views, while search finds individual apps regardless of their folder or pin status.
 
 ### Context menus
@@ -92,6 +94,8 @@ Kestrel supports `xdg-toplevel-icon-v1` theme names and shared-memory images. Wi
 Mutter changes are maintained as an ordered Git patch series with a pinned upstream commit. See the [compositor workflow](compositor/README.md) for editing, replay checks, and rebasing onto new releases.
 
 ### Notifications and keyboard interaction
+
+New notifications slide up above the clock at the bottom right and fade away after a few seconds. Hovering a banner keeps it open and reveals its actions. Banners wait while the notification center is open.
 
 Notifications are ordered by their latest update across applications. Cards open the notification, expose its actions, and offer a dismiss button and Delete shortcut. Resident actions keep the center open. Text wraps, keyboard focus follows dismissal, and offscreen controls scroll into view. Empty lists disable Clear all. Cards are reused during updates, created only when the center opens, and frozen during the closing animation.
 

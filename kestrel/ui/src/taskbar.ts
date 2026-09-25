@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -6,6 +7,8 @@ import type { WindowPreviews } from './windowPreviews.js';
 import type { ContextMenus } from './contextMenus.js';
 import { PANEL_ICON_SIZE } from './surface.js';
 import { animateActor, liftIcon } from './motion.js';
+import { TaskbarDrop } from './taskbarDrop.js';
+import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
@@ -26,8 +29,14 @@ export class Taskbar {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-app-slots' });
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
+  private readonly drop: TaskbarDrop;
 
-  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews) {}
+  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews, favorites: Gio.Settings) {
+    this.drop = new TaskbarDrop(this.actor, () => this.actor.get_children()
+      .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
+      .filter((item): item is AppItem => !!item)
+      .map(item => ({ id: item.app.id, slot: item.slot, button: item.button })), favorites);
+  }
 
   update(apps: Shell.App[]): void {
     const wanted = new Set(apps.map(app => app.id));
@@ -87,6 +96,21 @@ export class Taskbar {
     }
   }
 
+  private makeDraggable(item: AppItem): void {
+    (item.button as St.Button & { _delegate: object })._delegate = {
+      get id() { return item.app.id; },
+      folder: false,
+      getDragActor: () => item.app.create_icon_texture(PANEL_ICON_SIZE),
+      getDragActorSource: () => item.icon,
+    };
+    const draggable = DND.makeDraggable(item.button, { dragActorOpacity: 220 });
+    draggable.connect('drag-begin', () => {
+      this.previews.close();
+      item.button.opacity = 90;
+    });
+    draggable.connect('drag-end', () => { item.button.opacity = 255; });
+  }
+
   private windowsChanged(item: AppItem): void {
     this.updateDots(item);
     item.iconGeometry = null;
@@ -137,6 +161,7 @@ export class Taskbar {
     button.connect('notify::allocation', () => this.syncIconGeometry(item));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);
+    this.makeDraggable(item);
     this.previews.bind(button, () => item.app);
     this.menus.bind(button, () => this.menus.appEntries(item.app));
     button.connect('clicked', () => {

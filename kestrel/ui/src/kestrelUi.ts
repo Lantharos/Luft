@@ -299,6 +299,7 @@ class KestrelUi {
   private setActive(surface: Surface | null): void {
     const wasStart = this.active === 'start';
     this.active = surface;
+    this.context.messageTray.bannerBlocked = surface === 'notifications';
     if (wasStart !== (surface === 'start'))
       for (const watcher of startWatchers) watcher(surface === 'start');
   }

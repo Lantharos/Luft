@@ -9,6 +9,7 @@ import { blurSurface } from './surface.js';
 import { Calendar } from './calendar.js';
 
 export interface MessageTray extends SignalSource {
+  bannerBlocked: boolean;
   getSources(): NotificationSource[];
 }
 

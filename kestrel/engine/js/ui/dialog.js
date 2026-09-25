@@ -172,9 +172,18 @@ export const MessageDialogContent = GObject.registerClass({
             GObject.ParamFlags.READWRITE |
             GObject.ParamFlags.CONSTRUCT,
             null),
+        'icon-name': GObject.ParamSpec.string(
+            'icon-name', null, null,
+            GObject.ParamFlags.READWRITE |
+            GObject.ParamFlags.CONSTRUCT,
+            null),
     },
 }, class MessageDialogContent extends St.BoxLayout {
     _init(params) {
+        this._icon = new St.Icon({
+            style_class: 'message-dialog-icon',
+            x_align: Clutter.ActorAlign.START,
+        });
         this._title = new St.Label({style_class: 'message-dialog-title'});
         this._description = new St.Label({style_class: 'message-dialog-description'});
 
@@ -191,8 +200,22 @@ export const MessageDialogContent = GObject.registerClass({
             ...params,
         });
 
+        this.add_child(this._icon);
         this.add_child(this._title);
         this.add_child(this._description);
+    }
+
+    get titleActor() {
+        return this._title;
+    }
+
+    get iconName() {
+        return this._icon.icon_name;
+    }
+
+    set iconName(iconName) {
+        this._icon.set({icon_name: iconName, visible: !!iconName});
+        this.notify('icon-name');
     }
 
     get title() {

@@ -50,7 +50,11 @@ class KbdA11yDialog extends GObject.Object {
             return;
         }
 
-        const content = new Dialog.MessageDialogContent({title, description});
+        const content = new Dialog.MessageDialogContent({
+            title,
+            description,
+            iconName: 'preferences-desktop-accessibility-symbolic',
+        });
         dialog.contentLayout.add_child(content);
 
         dialog.addButton({

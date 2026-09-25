@@ -68,6 +68,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
 
         const content = new Dialog.MessageDialogContent({
             title: _('Allow inhibiting shortcuts'),
+            iconName: 'input-keyboard-symbolic',
             description: name
                 /* Translators: %s is an application name like "Settings" */
                 ? _('The app %s wants to inhibit shortcuts').format(name)

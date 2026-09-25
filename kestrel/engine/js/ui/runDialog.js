@@ -73,9 +73,9 @@ export class RunDialog extends ModalDialog.ModalDialog {
 
         const title = _('Run a Command');
 
-        const content = new Dialog.MessageDialogContent({title});
+        const content = new Dialog.MessageDialogContent({title, iconName: 'utilities-terminal-symbolic'});
         this.contentLayout.add_child(content);
-        const [labelActor] = content;
+        const labelActor = content.titleActor;
 
         const entry = new St.Entry({
             style_class: 'run-dialog-entry',

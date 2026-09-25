@@ -52,7 +52,11 @@ class AccessDialog extends ModalDialog.ModalDialog {
         const grantLabel = options['grant_label'] || _('Allow');
         const choices = options['choices'] || [];
 
-        const content = new Dialog.MessageDialogContent({title, description});
+        const content = new Dialog.MessageDialogContent({
+            title,
+            description,
+            iconName: options['icon'] || 'dialog-question-symbolic',
+        });
         this.contentLayout.add_child(content);
 
         this._choices = new Map();

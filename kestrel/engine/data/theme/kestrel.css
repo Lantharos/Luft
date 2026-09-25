@@ -24,8 +24,7 @@ stage { font-family: "Open Runde"; }
 .kestrel-task-button:hover,
 .kestrel-status-button:hover,
 .kestrel-icon-button:hover,
-.kestrel-text-button:hover,
-.kestrel-power-action:hover {
+.kestrel-text-button:hover {
   background-color: rgba(255, 255, 255, 0.10);
 }
 
@@ -122,11 +121,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-quick-row { spacing: 8px; }
 .kestrel-quick-sliders { spacing: 2px; }
 .kestrel-quick-footer { spacing: 4px; padding-top: 2px; }
-.kestrel-quick-footer .kestrel-icon-button:checked { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 10px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
 .kestrel-quick-back:hover, .kestrel-quick-back:focus { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-quick-back-content { spacing: 6px; }
-.kestrel-quick-power { spacing: 2px; }
 .kestrel-slider-value { min-width: 38px; text-align: right; font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
@@ -172,14 +169,11 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
 .kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
 
-.kestrel-power-action { padding: 12px; border-radius: 12px; }
-.kestrel-power-row { spacing: 14px; font-size: 13px; }
 
 .kestrel-task-button:focus,
 .kestrel-status-button:focus,
 .kestrel-icon-button:focus,
-.kestrel-text-button:focus,
-.kestrel-power-action:focus { background-color: rgba(255, 255, 255, 0.17); }
+.kestrel-text-button:focus { background-color: rgba(255, 255, 255, 0.17); }
 
 .kestrel-app-slots { spacing: 0; }
 .kestrel-page-navigation { spacing: 8px; font-size: 12px; }
@@ -209,12 +203,10 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control:hover { background-color: rgba(255, 255, 255, 0.13); }
 .kestrel-control:active { background-color: rgba(255, 255, 255, 0.19); }
 .kestrel-control:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
-.kestrel-control:checked { background-color: rgba(255, 255, 255, 0.94); color: #15171a; }
-.kestrel-control:checked:hover { background-color: rgba(255, 255, 255, 0.86); }
-.kestrel-control:checked:active { background-color: rgba(255, 255, 255, 0.78); }
-.kestrel-control:checked:focus { box-shadow: inset 0 0 0 2px rgba(21, 23, 26, 0.35); }
-.kestrel-control:checked .kestrel-control-subtitle { color: rgba(21, 23, 26, 0.62); }
-.kestrel-control:checked .kestrel-control-more:hover { background-color: rgba(21, 23, 26, 0.10); }
+.kestrel-control:checked { background-color: rgba(255, 255, 255, 0.26); }
+.kestrel-control:checked:hover { background-color: rgba(255, 255, 255, 0.32); }
+.kestrel-control:checked:active { background-color: rgba(255, 255, 255, 0.38); }
+.kestrel-control:checked .kestrel-control-subtitle { color: rgba(255, 255, 255, 0.85); }
 .kestrel-control-body { spacing: 3px; }
 .kestrel-control-title { font-size: 13px; font-weight: 600; }
 .kestrel-control-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
@@ -250,13 +242,15 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   box-shadow: none;
   color: white;
 }
-.modal-dialog.kestrel-glass { padding: 20px; spacing: 20px; min-width: 320px; }
+.modal-dialog.kestrel-glass { padding: 24px; spacing: 24px; min-width: 340px; }
 .modal-dialog .modal-dialog-content-box { padding-top: 0; spacing: 16px; max-width: 28em; }
 .modal-dialog .modal-dialog-button-box { padding-top: 0; spacing: 8px; }
-.modal-dialog .modal-dialog-button { padding: 11px 16px; font-size: 14px; font-weight: 500; }
-.modal-dialog .message-dialog-content { spacing: 12px; }
-.modal-dialog .message-dialog-title { text-align: left; font-size: 20px; font-weight: 600; }
-.modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: rgba(255, 255, 255, 0.82); }
+.modal-dialog .modal-dialog-button { padding: 11px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; background-color: rgba(255, 255, 255, 0.08); }
+.modal-dialog .modal-dialog-button:hover { background-color: rgba(255, 255, 255, 0.14); }
+.modal-dialog .message-dialog-content { spacing: 8px; }
+.modal-dialog .message-dialog-icon { icon-size: 22px; padding: 11px; margin-bottom: 8px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.10); color: #ffffff; }
+.modal-dialog .message-dialog-title { text-align: left; font-size: 19px; font-weight: 600; }
+.modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: rgba(255, 255, 255, 0.70); }
 .modal-dialog .dialog-list { spacing: 10px; }
 .modal-dialog .dialog-list-title { text-align: left; font-size: 13px; font-weight: 600; }
 .modal-dialog .dialog-list-box { spacing: 12px; }
@@ -266,6 +260,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .prompt-dialog, .access-dialog, .end-session-dialog { width: 28em; }
 .prompt-dialog .prompt-dialog-password-entry { width: auto; margin: 0; }
 .prompt-dialog .prompt-dialog-password-layout, .kestrel-dialog-form { spacing: 14px; }
+.message-dialog-content .prompt-dialog-password-layout, .message-dialog-content .kestrel-dialog-form { margin-top: 12px; }
 .kestrel-entry-field { spacing: 6px; }
 .kestrel-entry-label { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.82); }
 .kestrel-auth-feedback { spacing: 4px; }
@@ -372,9 +367,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-folder-separator { margin-top: 3px; }
 
-.modal-dialog .modal-dialog-button:default, .modal-dialog .modal-dialog-button.suggested-action { background-color: rgba(255, 255, 255, 0.18); }
-.modal-dialog .modal-dialog-button:default:hover, .modal-dialog .modal-dialog-button.suggested-action:hover { background-color: rgba(255, 255, 255, 0.26); }
-.modal-dialog .modal-dialog-button:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45); }
+.modal-dialog .modal-dialog-button:focus { background-color: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.modal-dialog .modal-dialog-button:default, .modal-dialog .modal-dialog-button.suggested-action { background-color: rgba(255, 255, 255, 0.24); font-weight: 600; }
+.modal-dialog .modal-dialog-button:default:hover, .modal-dialog .modal-dialog-button.suggested-action:hover { background-color: rgba(255, 255, 255, 0.32); }
 .modal-dialog .modal-dialog-button:insensitive { background-color: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.35); box-shadow: none; }
 
 .modal-dialog .check-box { padding: 6px 0; }

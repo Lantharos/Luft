@@ -12,6 +12,8 @@ import * as Main from './main.js';
 import * as Params from '../misc/params.js';
 
 const OPEN_AND_CLOSE_TIME = 100;
+const OPEN_RISE_TIME = 220;
+const OPEN_RISE_DISTANCE = 16;
 const FADE_OUT_DIALOG_TIME = 1000;
 
 /** @enum {number} */
@@ -136,6 +138,14 @@ export const ModalDialog = GObject.registerClass({
             this._lightbox.lightOn();
         this.opacity = 0;
         this.show();
+        if (this._shouldFadeIn) {
+            this.dialogLayout.translation_y = OPEN_RISE_DISTANCE;
+            this.dialogLayout.ease({
+                translation_y: 0,
+                duration: OPEN_RISE_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUART,
+            });
+        }
         this.ease({
             opacity: 255,
             duration: this._shouldFadeIn ? OPEN_AND_CLOSE_TIME : 0,

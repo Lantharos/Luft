@@ -9,8 +9,6 @@ import { blinkCaret } from './caret.js';
 import { StartGrid } from './start/grid.js';
 import { StartFooter } from './start/footer.js';
 
-const MINIMUM_HEIGHT = 360;
-
 export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
@@ -65,6 +63,7 @@ export class StartMenu {
       style_class: 'kestrel-app-scroll',
       hscrollbar_policy: St.PolicyType.NEVER,
       vscrollbar_policy: St.PolicyType.AUTOMATIC,
+      height: 0,
       x_expand: true, y_expand: true,
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
@@ -104,11 +103,6 @@ export class StartMenu {
     this.browser.home();
     this.search.set_text('');
     this.footer.setOpen(false, false);
-  }
-
-  fittedHeight(width: number, limit: number): number {
-    this.actor.height = -1;
-    return Math.min(limit, Math.max(MINIMUM_HEIGHT, this.actor.get_preferred_height(width)[1]));
   }
 
   private loadApps(): void {

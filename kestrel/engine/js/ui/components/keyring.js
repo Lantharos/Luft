@@ -22,7 +22,7 @@ class KeyringDialog extends ModalDialog.ModalDialog {
         this.prompt.connect('show-confirm', this._onShowConfirm.bind(this));
         this.prompt.connect('prompt-close', this._onHidePrompt.bind(this));
 
-        const content = new Dialog.MessageDialogContent();
+        const content = new Dialog.MessageDialogContent({iconName: 'dialog-password-symbolic'});
 
         this.prompt.bind_property('message',
             content, 'title', GObject.BindingFlags.SYNC_CREATE);

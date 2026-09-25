@@ -11,14 +11,12 @@ import type { ContextMenus } from './contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { blurSurface } from './surface.js';
-import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from './sessionActions.js';
+import { LOCK, bindAvailability } from './sessionActions.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 
 interface TrackedIcon extends St.Icon {
   connectObject(signal: string, callback: () => void, owner: Clutter.Actor): void;
 }
-
-type Subpage = ControlMenu | 'power';
 
 export class QuickSettings {
   readonly actor = new St.BoxLayout({
@@ -32,10 +30,8 @@ export class QuickSettings {
   private readonly tiles = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-tiles' });
   private readonly sliders = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-sliders' });
   private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
-  private readonly powerPage = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-power', visible: false });
-  private readonly powerButton: St.Button;
   private readonly controls: St.Button[] = [];
-  private subpage: Subpage | null = null;
+  private subpage: ControlMenu | null = null;
   private layoutLater = 0;
 
   constructor(
@@ -60,7 +56,6 @@ export class QuickSettings {
     this.actor.add_child(this.pages.actor);
     this.pages.body.add_child(this.content);
     this.pages.body.add_child(this.selectors);
-    this.selectors.add_child(this.powerPage);
     this.content.add_child(this.tiles);
     this.content.add_child(this.sliders);
     this.pages.body.connect('notify::height', () => this.queueLayout());
@@ -72,11 +67,7 @@ export class QuickSettings {
     const lock = this.footerButton(LOCK.icon, 'Lock screen', () => { this.close(); LOCK.run(); });
     bindAvailability(LOCK, lock);
     this.footer.add_child(lock);
-    this.footer.add_child(new St.Widget({ x_expand: true }));
-    this.powerButton = this.footerButton('system-shutdown-symbolic', 'Power options', () => this.togglePower());
-    this.footer.add_child(this.powerButton);
     this.actor.add_child(this.footer);
-    for (const action of POWER_ACTIONS) this.powerPage.add_child(this.powerRow(action));
 
     source.ready.then(() => {
       const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._powerProfiles, 'power'],
@@ -125,16 +116,6 @@ export class QuickSettings {
     return button;
   }
 
-  private powerRow(action: SessionAction): St.Button {
-    const row = new St.BoxLayout({ style_class: 'kestrel-power-row', x_expand: true });
-    row.add_child(new St.Icon({ icon_name: action.icon, icon_size: 18, y_align: Clutter.ActorAlign.CENTER }));
-    row.add_child(new St.Label({ text: action.label, y_align: Clutter.ActorAlign.CENTER }));
-    const button = new St.Button({ style_class: 'kestrel-power-action', child: row, x_expand: true, can_focus: true, track_hover: true });
-    button.connect('clicked', () => { this.close(); action.run(); });
-    bindAvailability(action, button);
-    return button;
-  }
-
   private queueLayout(): void {
     if (this.layoutLater) return;
     const laters = (global as unknown as Shell.Global).compositor.get_laters();
@@ -155,31 +136,16 @@ export class QuickSettings {
   }
 
   closeSubmenu(): boolean {
-    const subpage = this.subpage;
-    if (!subpage) return false;
-    if (subpage === 'power') this.showSubpage(null);
-    else subpage.close({ animate: false });
+    if (!this.subpage) return false;
+    this.subpage.close({ animate: false });
     return true;
   }
 
-  private togglePower(): void {
-    if (this.subpage === 'power') {
-      this.closeSubmenu();
-      return;
-    }
-    if (this.subpage) this.subpage.close({ animate: false });
-    this.showSubpage('power');
-    this.powerPage.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
-  }
-
-  private showSubpage(subpage: Subpage | null): void {
+  private showSubpage(subpage: ControlMenu | null): void {
     this.subpage = subpage;
-    this.powerPage.visible = subpage === 'power';
     this.selectors.visible = this.selectors.get_children().some(child => child.visible);
     this.content.visible = !subpage;
     this.back.visible = !!subpage;
-    if (subpage === 'power') this.powerButton.add_style_pseudo_class('checked');
-    else this.powerButton.remove_style_pseudo_class('checked');
     this.pages.reset();
     this.queueLayout();
   }
@@ -225,7 +191,6 @@ export class QuickSettings {
         item.x_expand = true;
         row.add_child(item);
       }
-      if (row.get_n_children() === 1) row.add_child(new St.Widget({ x_expand: true }));
       this.tiles.add_child(row);
     }
     this.queueLayout();

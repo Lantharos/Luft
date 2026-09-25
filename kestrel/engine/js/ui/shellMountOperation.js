@@ -254,7 +254,7 @@ class ShellMountQuestionDialog extends ModalDialog.ModalDialog {
 
         this._oldChoices = [];
 
-        this._content = new Dialog.MessageDialogContent();
+        this._content = new Dialog.MessageDialogContent({iconName: 'drive-harddisk-symbolic'});
         this.contentLayout.add_child(this._content);
     }
 
@@ -287,7 +287,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
         const disksApp = Shell.AppSystem.get_default().lookup_app('org.gnome.DiskUtility.desktop');
 
-        const content = new Dialog.MessageDialogContent({title, description});
+        const content = new Dialog.MessageDialogContent({title, description, iconName: 'channel-secure-symbolic'});
 
         const passwordFields = new St.BoxLayout({
             orientation: Clutter.Orientation.VERTICAL,
@@ -494,7 +494,7 @@ class ShellProcessesDialog extends ModalDialog.ModalDialog {
 
         this._oldChoices = [];
 
-        this._content = new Dialog.MessageDialogContent();
+        this._content = new Dialog.MessageDialogContent({iconName: 'drive-harddisk-symbolic'});
         this.contentLayout.add_child(this._content);
 
         this._applicationSection = new Dialog.ListSection();

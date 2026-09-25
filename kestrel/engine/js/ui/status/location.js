@@ -318,6 +318,7 @@ export const GeolocationDialog = GObject.registerClass({
 
         const content = new Dialog.MessageDialogContent({
             title: _('Allow location access'),
+            iconName: 'find-location-symbolic',
             /* Translators: %s is an application name */
             description: _('The app %s wants to access your location').format(name),
         });

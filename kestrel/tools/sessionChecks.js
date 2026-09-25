@@ -78,6 +78,15 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(250);
   require(Main.modalCount === 0, 'password dialog cancels cleanly');
 
+  const endSession = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'];
+  await call(...endSession, 'Open', new GLib.Variant('(uuuao)', [0, 0, 60, []]));
+  await pause(350);
+  require(Main.modalCount > 0, 'log out confirmation opens');
+  await capture(`${output}/end-session-dialog.png`);
+  await call(...endSession, 'Close', null);
+  await pause(250);
+  require(Main.modalCount === 0, 'log out confirmation closes');
+
   Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'}), null, 0.6, 1);
   await pause(200);
   await capture(`${output}/volume-osd.png`);

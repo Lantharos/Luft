@@ -44,6 +44,7 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
     _buildLayout() {
         const content = new Dialog.MessageDialogContent({
             title: _('Select Audio Device'),
+            iconName: 'audio-headphones-symbolic',
         });
 
         this._selectionBox = new St.BoxLayout({

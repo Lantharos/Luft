@@ -18,6 +18,15 @@ import * as ShellEntry from '../shellEntry.js';
 Gio._promisify(Shell.NetworkAgent.prototype, 'init_async');
 Gio._promisify(Shell.NetworkAgent.prototype, 'search_vpn_plugin');
 
+const CONNECTION_ICONS = {
+    '802-11-wireless': 'network-wireless-symbolic',
+    '802-3-ethernet': 'network-wired-symbolic',
+    'pppoe': 'network-wired-symbolic',
+    'gsm': 'network-cellular-symbolic',
+    'cdma': 'network-cellular-symbolic',
+    'bluetooth': 'bluetooth-active-symbolic',
+};
+
 const VPN_UI_GROUP = 'VPN Plugin UI';
 
 const NetworkSecretDialog = GObject.registerClass(
@@ -39,6 +48,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         const contentBox = new Dialog.MessageDialogContent({
             title: this._content.title,
             description: this._content.message,
+            iconName: this._content.iconName,
         });
 
         let initialFocusSet = false;
@@ -360,7 +370,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         let wirelessSetting;
         let ssid;
 
-        const content = { };
+        const content = {iconName: CONNECTION_ICONS[connectionType] ?? null};
         content.secrets = [];
 
         switch (connectionType) {

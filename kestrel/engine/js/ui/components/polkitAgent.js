@@ -43,7 +43,7 @@ const AuthenticationDialog = GObject.registerClass({
 
         const title = _('Authentication Required');
 
-        const headerContent = new Dialog.MessageDialogContent({title, description});
+        const headerContent = new Dialog.MessageDialogContent({title, description, iconName: 'security-high-symbolic'});
         this.contentLayout.add_child(headerContent);
 
         const bodyContent = new St.BoxLayout({

@@ -46,6 +46,7 @@ const EndSessionDialogIface = loadInterfaceXML('org.gnome.SessionManager.EndSess
 const logoutDialogContent = {
     subjectWithUser: C_('title', 'Log Out %s'),
     subject: C_('title', 'Log Out'),
+    iconName: 'system-log-out-symbolic',
     descriptionWithUser(user, seconds) {
         return ngettext(
             '%s will be logged out automatically in %d second',
@@ -100,7 +101,7 @@ const restartDialogContent = {
         signal: 'ConfirmedReboot',
         label: C_('button', 'Restart'),
     }],
-    iconName: 'view-refresh-symbolic',
+    iconName: 'system-reboot-symbolic',
     showOtherSessions: true,
 };
 
@@ -120,7 +121,7 @@ const restartUpdateDialogContent = {
     }],
     unusedFutureButtonForTranslation: C_('button', 'Install & Power Off'),
     unusedFutureCheckBoxForTranslation: C_('checkbox', 'Power off after updates are installed'),
-    iconName: 'view-refresh-symbolic',
+    iconName: 'system-reboot-symbolic',
     showOtherSessions: true,
 };
 
@@ -377,6 +378,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         if (!description)
             description = dialogContent.description(displayTime);
 
+        this._messageDialogContent.iconName = dialogContent.iconName;
         this._messageDialogContent.title = subject;
         this._messageDialogContent.description = description;
 

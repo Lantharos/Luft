@@ -20,7 +20,7 @@ import type { QuickSettingsSource } from './quickControls.js';
 
 type Surface = 'start' | 'quick' | 'notifications';
 
-const START_MAXIMUM_HEIGHT = 600;
+const START_HEIGHT = 600;
 const OPEN_DURATION = 220;
 const CLOSE_DURATION = 160;
 
@@ -56,7 +56,6 @@ class KestrelUi {
   private readonly cover = new St.Widget({ reactive: true, visible: false });
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
-  private startHeight = 0;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private focusWindow: Meta.Window | null = null;
   private focusSignals: number[] = [];
@@ -222,7 +221,7 @@ class KestrelUi {
     const startWidth = Math.min(660, monitor.width - 24);
     const bottom = monitor.y + monitor.height - PANEL_HEIGHT - SURFACE_GAP;
     const available = monitor.height - PANEL_HEIGHT - 24;
-    const startHeight = this.startHeight || Math.min(START_MAXIMUM_HEIGHT, available);
+    const startHeight = Math.min(START_HEIGHT, available);
     this.start.actor.set_size(startWidth, startHeight);
     this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
 
@@ -259,11 +258,6 @@ class KestrelUi {
     const opening = !actor.visible;
     actor.show();
     if (surface === 'notifications') this.notifications.prepareOpen();
-    if (surface === 'start') {
-      const monitor = this.context.layoutManager.primaryMonitor!;
-      this.startHeight = this.start.fittedHeight(Math.min(660, monitor.width - 24),
-        Math.min(START_MAXIMUM_HEIGHT, monitor.height - PANEL_HEIGHT - 24));
-    }
     this.place();
     if (opening) {
       actor.opacity = 255;

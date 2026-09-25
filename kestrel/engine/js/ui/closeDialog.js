@@ -40,7 +40,7 @@ export const CloseDialog = GObject.registerClass({
         const title = _('“%s” Is Not Responding').format(windowApp.get_name());
         const description = _('You may choose to wait a short while for it to ' +
                             'continue or force the app to quit entirely');
-        return new Dialog.MessageDialogContent({title, description});
+        return new Dialog.MessageDialogContent({title, description, iconName: 'dialog-warning-symbolic'});
     }
 
     _updateScale() {

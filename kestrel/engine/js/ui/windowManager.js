@@ -61,7 +61,7 @@ class DisplayChangeDialog extends ModalDialog.ModalDialog {
         const title = _('Keep these display settings?');
         const description = this._formatCountDown();
 
-        this._content = new Dialog.MessageDialogContent({title, description});
+        this._content = new Dialog.MessageDialogContent({title, description, iconName: 'video-display-symbolic'});
         this.contentLayout.add_child(this._content);
 
         /* Translators: this and the following message should be limited in length,

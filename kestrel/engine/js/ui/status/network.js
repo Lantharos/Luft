@@ -2031,7 +2031,6 @@ class CaptivePortalHandler extends Signals.EventEmitter {
         else
             Gio.AppInfo.launch_default_for_uri(this._checkUri, context);
 
-        Main.overview.hide();
         Main.closeShellPopups();
     }
 

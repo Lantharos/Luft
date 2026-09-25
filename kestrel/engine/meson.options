@@ -4,12 +4,6 @@ option('camera_monitor',
   description: 'Enable the camera monitor'
 )
 
-option('extensions_tool',
-  type: 'boolean',
-  value: true,
-  description: 'Build gnome-extensions CLI tool'
-)
-
 option('gtk_doc',
   type: 'boolean',
   value: false,

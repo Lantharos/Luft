@@ -4,25 +4,19 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as Signals from '../misc/signals.js';
 
 import * as Background from './background.js';
-import * as BackgroundMenu from './backgroundMenu.js';
 
-import * as DND from './dnd.js';
 import * as Main from './main.js';
 import * as Params from '../misc/params.js';
-import * as Ripples from './ripples.js';
 
 import {logErrorUnlessCancelled} from '../misc/errorUtils.js';
 
 export const STARTUP_ANIMATION_TIME = 500;
 export const BACKGROUND_FADE_ANIMATION_TIME = 1000;
 
-const HOT_CORNER_PRESSURE_THRESHOLD = 100; // pixels
-const HOT_CORNER_PRESSURE_TIMEOUT = 1000; // ms
 
 const SCREEN_TRANSITION_DELAY = 250; // ms
 const SCREEN_TRANSITION_DURATION = 500; // ms
@@ -179,7 +173,6 @@ const defaultParams = {
 
 export const LayoutManager = GObject.registerClass({
     Signals: {
-        'hot-corners-changed': {},
         'startup-complete': {},
         'startup-prepared': {},
         'monitors-changed': {},
@@ -194,12 +187,10 @@ export const LayoutManager = GObject.registerClass({
         this.primaryMonitor = null;
         this._primaryMonitorReadyResolver = null;
         this.primaryIndex = -1;
-        this.hotCorners = [];
 
         this._keyboardIndex = -1;
         this._rightPanelBarrier = null;
 
-        this._inOverview = false;
         this._updateRegionIdle = 0;
 
         this._trackedActors = [];
@@ -230,7 +221,6 @@ export const LayoutManager = GObject.registerClass({
                 global.stage.add_child(adoptedActor);
             }
 
-            this._destroyHotCorners();
             this._destroyPanelBarrier();
             this.uiGroup.destroy();
         });
@@ -241,17 +231,6 @@ export const LayoutManager = GObject.registerClass({
         // add the actor directly using uiGroup.add_child().
         global.stage.remove_child(global.top_window_group);
         this.uiGroup.add_child(global.top_window_group);
-
-        this.overviewGroup = new St.Widget({
-            name: 'overviewGroup',
-            visible: false,
-            reactive: true,
-            constraints: new Clutter.BindConstraint({
-                source: this.uiGroup,
-                coordinate: Clutter.BindCoordinate.ALL,
-            }),
-        });
-        this.addChrome(this.overviewGroup);
 
         this.screenShieldGroup = new St.Widget({
             name: 'screenShieldGroup',
@@ -314,13 +293,6 @@ export const LayoutManager = GObject.registerClass({
         global.window_group.set_child_below_sibling(this._backgroundGroup, null);
         this._bgManagers = [];
 
-        this._interfaceSettings = new Gio.Settings({
-            schema_id: 'org.gnome.desktop.interface',
-        });
-
-        this._interfaceSettings.connect('changed::enable-hot-corners',
-            this._updateHotCorners.bind(this));
-
         // Need to update struts on new workspaces when they are added
         const workspaceManager = global.workspace_manager;
         workspaceManager.connect('notify::n-workspaces',
@@ -351,21 +323,6 @@ export const LayoutManager = GObject.registerClass({
         this._doStartupAnimation().catch(logError);
     }
 
-    showOverview() {
-        this.overviewGroup.show();
-        this.screenTransition.hide();
-
-        this._inOverview = true;
-        this._updateVisibility();
-    }
-
-    hideOverview() {
-        this.overviewGroup.hide();
-        this.screenTransition.hide();
-
-        this._inOverview = false;
-        this._updateVisibility();
-    }
 
     _sessionUpdated() {
         this._updateVisibility();
@@ -419,75 +376,6 @@ export const LayoutManager = GObject.registerClass({
         }
     }
 
-    _destroyHotCorners() {
-        this.hotCorners.forEach(corner => corner?.destroy());
-        this.hotCorners = [];
-    }
-
-    _updateHotCorners() {
-        // destroy old hot corners
-        this._destroyHotCorners();
-
-        if (!this._interfaceSettings.get_boolean('enable-hot-corners')) {
-            this.emit('hot-corners-changed');
-            return;
-        }
-
-        const size = this.panelBox.height;
-
-        // build new hot corners
-        for (let i = 0; i < this.monitors.length; i++) {
-            const monitor = this.monitors[i];
-            const cornerX = this._rtl ? monitor.x + monitor.width : monitor.x;
-            const cornerY = monitor.y;
-
-            let haveTopLeftCorner = true;
-
-            if (i !== this.primaryIndex) {
-                // Check if we have a top left (right for RTL) corner.
-                // I.e. if there is no monitor directly above or to the left(right)
-                const besideX = this._rtl ? monitor.x + 1 : cornerX - 1;
-                const besideY = cornerY;
-                const aboveX = cornerX;
-                const aboveY = cornerY - 1;
-
-                for (let j = 0; j < this.monitors.length; j++) {
-                    if (i === j)
-                        continue;
-                    const otherMonitor = this.monitors[j];
-                    if (besideX >= otherMonitor.x &&
-                        besideX < otherMonitor.x + otherMonitor.width &&
-                        besideY >= otherMonitor.y &&
-                        besideY < otherMonitor.y + otherMonitor.height) {
-                        haveTopLeftCorner = false;
-                        break;
-                    }
-                    if (aboveX >= otherMonitor.x &&
-                        aboveX < otherMonitor.x + otherMonitor.width &&
-                        aboveY >= otherMonitor.y &&
-                        aboveY < otherMonitor.y + otherMonitor.height) {
-                        haveTopLeftCorner = false;
-                        break;
-                    }
-                }
-            }
-
-            if (haveTopLeftCorner) {
-                const corner = new HotCorner(this, monitor, cornerX, cornerY);
-                corner.setBarrierSize(size);
-                this.hotCorners.push(corner);
-            } else {
-                this.hotCorners.push(null);
-            }
-        }
-
-        this.emit('hot-corners-changed');
-    }
-
-    _addBackgroundMenu(bgManager) {
-        BackgroundMenu.addBackgroundMenu(bgManager.backgroundActor, this);
-    }
-
     _createBackgroundManager(monitorIndex) {
         const bgManager = new Background.BackgroundManager({
             container: this._backgroundGroup,
@@ -495,8 +383,9 @@ export const LayoutManager = GObject.registerClass({
             monitorIndex,
         });
 
-        bgManager.connect('changed', this._addBackgroundMenu.bind(this));
-        this._addBackgroundMenu(bgManager);
+        const makeReactive = () => (bgManager.backgroundActor.reactive = true);
+        bgManager.connect('changed', makeReactive);
+        makeReactive();
 
         return bgManager;
     }
@@ -588,12 +477,6 @@ export const LayoutManager = GObject.registerClass({
 
     _panelBoxChanged() {
         this._updatePanelBarrier();
-
-        const size = this.panelBox.height;
-        this.hotCorners.forEach(corner => {
-            if (corner)
-                corner.setBarrierSize(size);
-        });
     }
 
     _destroyPanelBarrier() {
@@ -624,7 +507,6 @@ export const LayoutManager = GObject.registerClass({
     _monitorsChanged() {
         this._updateMonitors();
         this._updateBoxes();
-        this._updateHotCorners();
         this._updateBackgrounds().catch(logError);
         this._updateFullscreen();
         this._updateVisibility();
@@ -761,16 +643,14 @@ export const LayoutManager = GObject.registerClass({
 
             const monitor = this.primaryMonitor;
 
-            if (!Main.sessionMode.hasOverview) {
-                const x = monitor.x + monitor.width / 2.0;
-                const y = monitor.y + monitor.height / 2.0;
+            const x = monitor.x + monitor.width / 2.0;
+            const y = monitor.y + monitor.height / 2.0;
 
-                this.uiGroup.set_pivot_point(
-                    x / global.screen_width,
-                    y / global.screen_height);
-                this.uiGroup.scale_x = this.uiGroup.scale_y = 0.75;
-                this.uiGroup.opacity = 0;
-            }
+            this.uiGroup.set_pivot_point(
+                x / global.screen_width,
+                y / global.screen_height);
+            this.uiGroup.scale_x = this.uiGroup.scale_y = 0.75;
+            this.uiGroup.opacity = 0;
 
             global.window_group.set_clip(monitor.x, monitor.y, monitor.width, monitor.height);
 
@@ -800,17 +680,13 @@ export const LayoutManager = GObject.registerClass({
     }
 
     async _startupAnimationSession() {
-        if (Main.sessionMode.hasOverview) {
-            await Main.overview.runStartupAnimation();
-        } else {
-            await this.uiGroup.easeAsync({
-                scale_x: 1,
-                scale_y: 1,
-                opacity: 255,
-                duration: STARTUP_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            }).catch(logErrorUnlessCancelled);
-        }
+        await this.uiGroup.easeAsync({
+            scale_x: 1,
+            scale_y: 1,
+            opacity: 255,
+            duration: STARTUP_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        }).catch(logErrorUnlessCancelled);
     }
 
     _startupAnimationComplete() {
@@ -982,7 +858,7 @@ export const LayoutManager = GObject.registerClass({
     }
 
     _updateVisibility() {
-        const windowsVisible = Main.sessionMode.hasWindows && !this._inOverview;
+        const windowsVisible = Main.sessionMode.hasWindows;
 
         global.window_group.visible = windowsVisible;
         global.top_window_group.visible = windowsVisible;
@@ -1132,111 +1008,6 @@ export const LayoutManager = GObject.registerClass({
     }
 });
 
-
-// HotCorner:
-//
-// This class manages a "hot corner" that can toggle switching to
-// overview.
-export const HotCorner = GObject.registerClass(
-class HotCorner extends Clutter.Actor {
-    _init(layoutManager, monitor, x, y) {
-        super._init();
-
-        this._monitor = monitor;
-
-        this._x = x;
-        this._y = y;
-
-        this._pressureBarrier = new PressureBarrier(
-            HOT_CORNER_PRESSURE_THRESHOLD,
-            HOT_CORNER_PRESSURE_TIMEOUT,
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
-        this._pressureBarrier.connect('trigger', this._toggleOverview.bind(this));
-
-        let px = 0.0;
-        let py = 0.0;
-        if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL) {
-            px = 1.0;
-            py = 0.0;
-        }
-
-        this._ripples = new Ripples.Ripples(px, py, 'ripple-box');
-        this._ripples.addTo(layoutManager.uiGroup);
-
-        this.connect('destroy', this._onDestroy.bind(this));
-    }
-
-    setBarrierSize(size) {
-        if (this._verticalBarrier) {
-            this._pressureBarrier.removeBarrier(this._verticalBarrier);
-            this._verticalBarrier.destroy();
-            this._verticalBarrier = null;
-        }
-
-        if (this._horizontalBarrier) {
-            this._pressureBarrier.removeBarrier(this._horizontalBarrier);
-            this._horizontalBarrier.destroy();
-            this._horizontalBarrier = null;
-        }
-
-        if (size > 0) {
-            if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL) {
-                this._verticalBarrier = new Meta.Barrier({
-                    backend: global.backend,
-                    x1: this._x, x2: this._x, y1: this._y, y2: this._y + size,
-                    directions: Meta.BarrierDirection.NEGATIVE_X,
-                });
-                this._horizontalBarrier = new Meta.Barrier({
-                    backend: global.backend,
-                    x1: this._x - size, x2: this._x, y1: this._y, y2: this._y,
-                    directions: Meta.BarrierDirection.POSITIVE_Y,
-                });
-            } else {
-                this._verticalBarrier = new Meta.Barrier({
-                    backend: global.backend,
-                    x1: this._x, x2: this._x, y1: this._y, y2: this._y + size,
-                    directions: Meta.BarrierDirection.POSITIVE_X,
-                });
-                this._horizontalBarrier = new Meta.Barrier({
-                    backend: global.backend,
-                    x1: this._x, x2: this._x + size, y1: this._y, y2: this._y,
-                    directions: Meta.BarrierDirection.POSITIVE_Y,
-                });
-            }
-
-            this._pressureBarrier.addBarrier(this._verticalBarrier);
-            this._pressureBarrier.addBarrier(this._horizontalBarrier);
-        }
-    }
-
-    _onDestroy() {
-        this.setBarrierSize(0);
-        this._pressureBarrier.destroy();
-        this._pressureBarrier = null;
-
-        this._ripples.destroy();
-    }
-
-    _toggleOverview() {
-        if (this._monitor.inFullscreen && !Main.overview.visible)
-            return;
-
-        if (Main.overview.shouldToggleByCornerOrButton()) {
-            Main.overview.toggle();
-            if (Main.overview.animationInProgress)
-                this._ripples.playAnimation(this._x, this._y);
-        }
-    }
-
-    handleDragOver(source, _actor, _x, _y, _time) {
-        if (source !== Main.xdndHandler)
-            return DND.DragMotionResult.CONTINUE;
-
-        this._toggleOverview();
-
-        return DND.DragMotionResult.CONTINUE;
-    }
-});
 
 export class PressureBarrier extends Signals.EventEmitter {
     constructor(threshold, timeout, actionMode) {

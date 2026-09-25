@@ -14,6 +14,7 @@
 #include <sys/resource.h>
 #endif
 #include <locale.h>
+#include <fontconfig/fontconfig.h>
 
 #include <gio/gio.h>
 #include <girepository/girepository.h>
@@ -358,6 +359,7 @@ shell_global_init (ShellGlobal *global)
   const char *datadir = g_getenv ("GNOME_SHELL_DATADIR");
   const char *shell_js = g_getenv("GNOME_SHELL_JS");
   g_autofree char *imagedir = NULL;
+  g_autofree char *fontdir = NULL;
   g_auto (GStrv) search_path = NULL;
   g_autofree char *path = NULL;
   const char *byteorder_string;
@@ -365,6 +367,10 @@ shell_global_init (ShellGlobal *global)
   if (!datadir)
     datadir = GNOME_SHELL_DATADIR;
   global->datadir = datadir;
+
+  fontdir = g_build_filename (datadir, "fonts", NULL);
+  if (!FcConfigAppFontAddDir (NULL, (const FcChar8 *) fontdir))
+    g_warning ("Failed to load the shell fonts from %s", fontdir);
 
   /* We make sure imagedir ends with a '/', since the JS won't have
    * access to g_build_filename() and so will end up just

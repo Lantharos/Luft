@@ -749,15 +749,8 @@ export class InputSourceManager extends Signals.EventEmitter {
         return this._inputSources[sourceIndexes[0]];
     }
 
-    _getCurrentWindow() {
-        if (Main.overview.visible)
-            return Main.overview;
-        else
-            return global.display.focus_window;
-    }
-
     _setPerWindowInputSource() {
-        const window = this._getCurrentWindow();
+        const window = global.display.focus_window;
         if (!window)
             return;
 
@@ -777,21 +770,15 @@ export class InputSourceManager extends Signals.EventEmitter {
         if (this._sourcesPerWindow && this._focusWindowNotifyId === 0) {
             this._focusWindowNotifyId = global.display.connect('notify::focus-window',
                 this._setPerWindowInputSource.bind(this));
-            Main.overview.connectObject(
-                'showing', this._setPerWindowInputSource.bind(this),
-                'hidden', this._setPerWindowInputSource.bind(this), this);
         } else if (!this._sourcesPerWindow && this._focusWindowNotifyId !== 0) {
             global.display.disconnect(this._focusWindowNotifyId);
             this._focusWindowNotifyId = 0;
-            Main.overview.disconnectObject(this);
 
             const windows = global.get_window_actors().map(w => w.meta_window);
             for (let i = 0; i < windows.length; ++i) {
                 delete windows[i]._inputSources;
                 delete windows[i]._currentSource;
             }
-            delete Main.overview._inputSources;
-            delete Main.overview._currentSource;
         }
     }
 
@@ -799,7 +786,7 @@ export class InputSourceManager extends Signals.EventEmitter {
         if (!this._sourcesPerWindow)
             return;
 
-        const window = this._getCurrentWindow();
+        const window = global.display.focus_window;
         if (!window)
             return;
 
@@ -1179,7 +1166,6 @@ class InputSourceIndicator extends PanelMenu.Button {
         const app =
             Shell.AppSystem.get_default().lookup_app('org.gnome.Tecla.desktop');
 
-        Main.overview.hide();
         app?.activate();
     }
 });

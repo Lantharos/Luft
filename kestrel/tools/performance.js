@@ -32,8 +32,20 @@ function buttons(root) {
     return result;
 }
 
+function processMetrics() {
+    const [, status] = GLib.file_get_contents('/proc/self/status');
+    const residentKb = Number(/VmRSS:\s+(\d+)/.exec(new TextDecoder().decode(status))[1]);
+    const [, stat] = GLib.file_get_contents('/proc/self/stat');
+    const fields = new TextDecoder().decode(stat).split(') ')[1].split(' ');
+    const [, uptime] = GLib.file_get_contents('/proc/uptime');
+    const startedSeconds = Number(fields[19]) / 100;
+    const runningSeconds = Number(new TextDecoder().decode(uptime).split(' ')[0]) - startedSeconds;
+    return {residentMemoryMb: Math.round(residentKb / 1024), secondsSinceLaunch: Number(runningSeconds.toFixed(2))};
+}
+
 export async function run() {
     await disableHelperAutoExit();
+    console.log(`Kestrel performance: ${JSON.stringify(processMetrics())}`);
     await pause(1000);
     toggleSurface('start');
     await pause(400);

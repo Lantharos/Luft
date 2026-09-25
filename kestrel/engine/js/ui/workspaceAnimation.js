@@ -360,17 +360,6 @@ export class WorkspaceAnimationController {
         this._movingWindow = null;
         this._switchData = null;
 
-        Main.overview.connect('showing', () => {
-            if (this._switchData) {
-                if (this._switchData.gestureActivated)
-                    this._finishWorkspaceSwitch(this._switchData);
-                this._swipeTracker.enabled = false;
-            }
-        });
-        Main.overview.connect('hiding', () => {
-            this._swipeTracker.enabled = true;
-        });
-
         const swipeTracker = new SwipeTracker.SwipeTracker(global.stage,
             Clutter.Orientation.HORIZONTAL,
             Shell.ActionMode.NORMAL,

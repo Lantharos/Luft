@@ -1023,8 +1023,7 @@ export class WindowManager {
     }
 
     _shouldAnimate() {
-        const overviewOpen = Main.overview.visible && !Main.overview.closing;
-        return !(overviewOpen || this._workspaceAnimation.gestureActive);
+        return !this._workspaceAnimation.gestureActive;
     }
 
     _shouldAnimateActor(actor, types) {
@@ -1348,19 +1347,7 @@ export class WindowManager {
         dimmer.setDimmed(false, this._shouldAnimate());
     }
 
-    _waitForOverviewToHide() {
-        if (!Main.overview.visible)
-            return Promise.resolve();
-
-        return new Promise(resolve => {
-            const id = Main.overview.connect('hidden', () => {
-                Main.overview.disconnect(id);
-                resolve();
-            });
-        });
-    }
-
-    async _mapWindow(shellwm, actor) {
+    _mapWindow(shellwm, actor) {
         actor._windowType = actor.meta_window.get_window_type();
         actor.meta_window.connectObject('notify::window-type', () => {
             const type = actor.meta_window.get_window_type();
@@ -1408,7 +1395,6 @@ export class WindowManager {
             actor.show();
             this._mapping.add(actor);
 
-            await this._waitForOverviewToHide();
             actor.ease({
                 opacity: 255,
                 scale_x: 1,
@@ -1428,7 +1414,6 @@ export class WindowManager {
             actor.show();
             this._mapping.add(actor);
 
-            await this._waitForOverviewToHide();
             actor.ease({
                 opacity: 255,
                 scale_x: 1,
@@ -1726,18 +1711,16 @@ export class WindowManager {
         else
             this.actionMoveWindow(window, newWs);
 
-        if (!Main.overview.visible) {
-            if (this._workspaceSwitcherPopup == null) {
-                this.blockWorkspaceUpdates();
-                this._workspaceSwitcherPopup = new WorkspaceSwitcherPopup.WorkspaceSwitcherPopup();
-                this._workspaceSwitcherPopup.connect('destroy', () => {
-                    this.unblockWorkspaceUpdates();
-                    this._workspaceSwitcherPopup = null;
-                    this._isWorkspacePrepended = false;
-                });
-            }
-            this._workspaceSwitcherPopup.display(newWs.index());
+        if (this._workspaceSwitcherPopup == null) {
+            this.blockWorkspaceUpdates();
+            this._workspaceSwitcherPopup = new WorkspaceSwitcherPopup.WorkspaceSwitcherPopup();
+            this._workspaceSwitcherPopup.connect('destroy', () => {
+                this.unblockWorkspaceUpdates();
+                this._workspaceSwitcherPopup = null;
+                this._isWorkspacePrepended = false;
+            });
         }
+        this._workspaceSwitcherPopup.display(newWs.index());
     }
 
     actionMoveWorkspace(workspace) {

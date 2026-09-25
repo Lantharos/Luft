@@ -4,18 +4,15 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as Config from '../misc/config.js';
-import * as ExtensionDownloader from './extensionDownloader.js';
-import * as ExtensionUtils from '../misc/extensionUtils.js';
 import * as Main from './main.js';
 import * as Screenshot from './screenshot.js';
 
 import {emitSignalToDestination} from '../misc/dbusUtils.js';
 import {loadInterfaceXML} from '../misc/fileUtils.js';
 import {DBusSenderChecker} from '../misc/util.js';
-import {ControlsState} from './overviewControls.js';
+import * as KestrelUi from './kestrelUi.js';
 
 const GnomeShellIface = loadInterfaceXML('org.gnome.Shell');
-const GnomeShellExtensionsIface = loadInterfaceXML('org.gnome.Shell.Extensions');
 const ScreenSaverIface = loadInterfaceXML('org.gnome.ScreenSaver');
 const BrightnessIface = loadInterfaceXML('org.gnome.Shell.Brightness');
 
@@ -30,7 +27,6 @@ export class GnomeShell {
             'org.freedesktop.impl.portal.desktop.gnome',
         ]);
 
-        this._extensionsService = new GnomeShellExtensions();
         this._screenshotService = new Screenshot.ScreenshotService();
 
         this._grabbedAccelerators = new Map();
@@ -45,11 +41,9 @@ export class GnomeShell {
                 this._emitAcceleratorDeactivated(action, device, timestamp);
             });
 
-        this._cachedOverviewVisible = false;
-        Main.overview.connect('showing',
-            this._checkOverviewVisibleChanged.bind(this));
-        Main.overview.connect('hidden',
-            this._checkOverviewVisibleChanged.bind(this));
+        KestrelUi.watchStart(visible => {
+            this._dbusImpl.emit_property_changed('OverviewActive', new GLib.Variant('b', visible));
+        });
     }
 
     /**
@@ -91,7 +85,7 @@ export class GnomeShell {
     }
 
     /**
-     * Focus the overview's search entry
+     * Open Start with its search entry focused
      *
      * @async
      * @param {...any} params - method parameters
@@ -106,7 +100,7 @@ export class GnomeShell {
             return;
         }
 
-        Main.overview.focusSearch();
+        KestrelUi.openStart();
         invocation.return_value(null);
     }
 
@@ -153,7 +147,7 @@ export class GnomeShell {
     }
 
     /**
-     * Focus specified app in the overview's app grid
+     * Open Start searching for the specified app
      *
      * @async
      * @param {string} id - an application ID
@@ -177,12 +171,12 @@ export class GnomeShell {
             return;
         }
 
-        Main.overview.selectApp(id);
+        KestrelUi.openStart(appSys.lookup_app(id).get_name());
         invocation.return_value(null);
     }
 
     /**
-     * Show the overview's app grid
+     * Open Start
      *
      * @async
      * @param {...any} params - method parameters
@@ -197,7 +191,7 @@ export class GnomeShell {
             return;
         }
 
-        Main.overview.show(ControlsState.APP_GRID);
+        KestrelUi.openStart();
         invocation.return_value(null);
     }
 
@@ -386,131 +380,23 @@ export class GnomeShell {
         invocation.return_value(null);
     }
 
-    _checkOverviewVisibleChanged() {
-        if (Main.overview.visible !== this._cachedOverviewVisible) {
-            this._cachedOverviewVisible = Main.overview.visible;
-            this._dbusImpl.emit_property_changed('OverviewActive', new GLib.Variant('b', this._cachedOverviewVisible));
-        }
-    }
-
     get Mode() {
         return global.session_mode;
     }
 
     get OverviewActive() {
-        return this._cachedOverviewVisible;
+        return KestrelUi.startOpen();
     }
 
     set OverviewActive(visible) {
         if (visible)
-            Main.overview.show();
+            KestrelUi.openStart();
         else
-            Main.overview.hide();
+            KestrelUi.dismissImmediately();
     }
 
     get ShellVersion() {
         return Config.PACKAGE_VERSION;
-    }
-}
-
-class GnomeShellExtensions {
-    constructor() {
-        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(GnomeShellExtensionsIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
-
-        this._userExtensionsEnabled = this.UserExtensionsEnabled;
-        global.settings.connect('changed::disable-user-extensions', () => {
-            if (this._userExtensionsEnabled === this.UserExtensionsEnabled)
-                return;
-
-            this._userExtensionsEnabled = this.UserExtensionsEnabled;
-            this._dbusImpl.emit_property_changed('UserExtensionsEnabled',
-                new GLib.Variant('b', this._userExtensionsEnabled));
-        });
-
-        Main.extensionManager.connect('extension-state-changed',
-            this._extensionStateChanged.bind(this));
-    }
-
-    ListExtensions() {
-        const out = {};
-        Main.extensionManager.getUuids().forEach(uuid => {
-            const dbusObj = this.GetExtensionInfo(uuid);
-            out[uuid] = dbusObj;
-        });
-        return out;
-    }
-
-    GetExtensionInfo(uuid) {
-        const extension = Main.extensionManager.lookup(uuid) || {};
-        return ExtensionUtils.serializeExtension(extension);
-    }
-
-    GetExtensionErrors(uuid) {
-        const extension = Main.extensionManager.lookup(uuid);
-        if (!extension)
-            return [];
-
-        if (!extension.errors)
-            return [];
-
-        return extension.errors;
-    }
-
-    InstallRemoteExtensionAsync([uuid], invocation) {
-        return ExtensionDownloader.installExtension(uuid, invocation);
-    }
-
-    UninstallExtension(uuid) {
-        return ExtensionDownloader.uninstallExtension(uuid);
-    }
-
-    EnableExtension(uuid) {
-        return Main.extensionManager.enableExtension(uuid);
-    }
-
-    DisableExtension(uuid) {
-        return Main.extensionManager.disableExtension(uuid);
-    }
-
-    LaunchExtensionPrefs(uuid) {
-        this.OpenExtensionPrefs(uuid, '', {});
-    }
-
-    OpenExtensionPrefs(uuid, parentWindow, options) {
-        Main.extensionManager.openExtensionPrefs(uuid, parentWindow, options);
-    }
-
-    ReloadExtensionAsync(params, invocation) {
-        invocation.return_error_literal(
-            Gio.DBusError,
-            Gio.DBusError.NOT_SUPPORTED,
-            'ReloadExtension is deprecated and does not work');
-    }
-
-    CheckForUpdates() {
-        ExtensionDownloader.checkForUpdates();
-    }
-
-    get ShellVersion() {
-        return Config.PACKAGE_VERSION;
-    }
-
-    get UserExtensionsEnabled() {
-        return !global.settings.get_boolean('disable-user-extensions');
-    }
-
-    set UserExtensionsEnabled(enable) {
-        global.settings.set_boolean('disable-user-extensions', !enable);
-    }
-
-    _extensionStateChanged(_, newState) {
-        const state = ExtensionUtils.serializeExtension(newState);
-        this._dbusImpl.emit_signal('ExtensionStateChanged',
-            new GLib.Variant('(sa{sv})', [newState.uuid, state]));
-
-        this._dbusImpl.emit_signal('ExtensionStatusChanged',
-            new GLib.Variant('(sis)', [newState.uuid, newState.state, newState.error]));
     }
 }
 

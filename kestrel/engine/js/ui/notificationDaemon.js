@@ -383,7 +383,6 @@ class FdoNotificationDaemonSource extends MessageTray.Source {
             return;
 
         this.app.activate();
-        Main.overview.hide();
         Main.closeShellPopups();
     }
 
@@ -469,7 +468,6 @@ class GtkNotificationDaemonNotification extends MessageTray.Notification {
         else
             this.source.emitActionInvoked(this.id, actionId, target);
 
-        Main.overview.hide();
         Main.closeShellPopups();
     }
 
@@ -543,7 +541,6 @@ class GtkNotificationDaemonAppSource extends MessageTray.Source {
 
     open() {
         this._app.activate();
-        Main.overview.hide();
         Main.closeShellPopups();
     }
 

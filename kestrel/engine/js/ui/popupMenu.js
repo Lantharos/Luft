@@ -705,7 +705,6 @@ export class PopupMenuBase extends Signals.EventEmitter {
                 return;
             }
 
-            Main.overview.hide();
             Main.panel.closeQuickSettings();
             app.activate();
         });

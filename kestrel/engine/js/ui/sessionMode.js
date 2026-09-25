@@ -24,10 +24,8 @@ const _modes = {
         stylesheetName: 'gnome-shell.css',
         colorScheme: 'prefer-dark',
         themeResourceName: 'gnome-shell-theme.gresource',
-        hasOverview: false,
         allowSettings: false,
         allowScreencast: false,
-        enabledExtensions: [],
         hasRunDialog: false,
         hasWorkspaces: false,
         hasWindows: false,
@@ -77,7 +75,6 @@ const _modes = {
     },
 
     'user': {
-        hasOverview: false,
         allowSettings: true,
         allowScreencast: true,
         hasRunDialog: false,

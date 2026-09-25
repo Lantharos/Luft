@@ -57,7 +57,6 @@ export class AppMenu extends PopupMenu.PopupMenu {
         this._newWindowItem = this.addAction(_('New Window'), () => {
             this._animateLaunch();
             this._app.open_new_window(-1);
-            Main.overview.hide();
         });
 
         this._actionSection = new PopupMenu.PopupMenuSection();
@@ -66,7 +65,6 @@ export class AppMenu extends PopupMenu.PopupMenu {
         this._onGpuMenuItem = this.addAction('', () => {
             this._animateLaunch();
             this._app.launch(0, -1, this._getNonDefaultLaunchGpu());
-            Main.overview.hide();
         });
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -91,7 +89,6 @@ export class AppMenu extends PopupMenu.PopupMenu {
                 'org.gtk.Actions', 'Activate',
                 new GLib.Variant('(sava{sv})', ['details', [args], null]),
                 null, 0, -1, null);
-            Main.overview.hide();
         });
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -237,7 +234,6 @@ export class AppMenu extends PopupMenu.PopupMenu {
                     this._animateLaunch();
 
                 this._app.launch_action(action, event.get_time(), -1);
-                Main.overview.hide();
             });
         });
 

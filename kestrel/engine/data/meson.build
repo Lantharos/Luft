@@ -25,6 +25,7 @@ data_resources = [
 ]
 
 install_subdir('sounds', install_dir: pkgdatadir)
+subdir('fonts')
 data_resources_targets = []
 foreach resource : data_resources
   name = resource.get('name')
@@ -90,11 +91,6 @@ if have_systemd
     output: 'org.gnome.Shell@.service',
     configuration: unitconf,
     install_dir: systemduserunitdir
-  )
-
-  install_data (
-    'org.gnome.Shell-disable-extensions.service',
-    install_dir: systemduserunitdir,
   )
 endif
 

@@ -1,6 +1,6 @@
 [Unit]
 Description=GNOME Shell
-OnFailure=org.gnome.Shell-disable-extensions.service gnome-session-shutdown.target
+OnFailure=gnome-session-shutdown.target
 OnFailureJobMode=replace-irreversibly
 CollectMode=inactive-or-failed
 RefuseManualStart=on

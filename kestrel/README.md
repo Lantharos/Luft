@@ -23,6 +23,10 @@ Kestrel is Luft's desktop shell. It uses a local Mutter 51 build with native win
 
 ## Runtime scope
 
+The GNOME overview, its app grid, dash, window picker, and search providers are not part of Kestrel, and neither is the GNOME extension system. The Shell D-Bus requests that opened the overview or app grid open Start instead, and a request to focus an app opens Start searching for it. Looking Glass loads the first time it is opened. The screenshot window picker has its own window layout.
+
+The shell ships Open Runde and registers it for its own UI at startup; applications keep the system fonts.
+
 Desktop Quick Settings owns only the device controls used by Kestrel. It does not construct a second native Quick Settings menu or duplicate microphone slider. The retained session panel supplies login and lock-screen controls; the desktop does not populate it.
 
 The legacy calendar, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for login, unlocking, user switching, and the Start avatar. Authentication, parental session restrictions, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
@@ -33,7 +37,7 @@ Run `kestrel/tools/session.sh performance` to measure repeated search edits, app
 
 ## Work before a Luft session
 
-1. Make Kestrel the actual shell entry point and rename the build/session identifiers that still say GNOME Shell. The TypeScript UI is loaded by a reduced upstream `main.js` path. The retained overview coordinator is disabled; its app grid and window overview actors are not constructed.
+1. Make Kestrel the actual shell entry point and rename the build/session identifiers that still say GNOME Shell. The TypeScript UI is loaded by a reduced upstream `main.js` path.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
 3. Supply Luft session and portal configuration, including screenshot, screencast, file chooser, settings, and secret handling, then exercise the portal calls from client apps.
 4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.
@@ -57,7 +61,7 @@ Right-click an app in Start or the panel for launch actions, open windows, pinni
 
 ### Workspaces
 
-Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total. Empty workspaces are removed as windows close or move. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace the retained overview application shortcuts.
+Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total. Empty workspaces are removed as windows close or move. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace GNOME's overview application shortcuts.
 
 ### System dialogs
 

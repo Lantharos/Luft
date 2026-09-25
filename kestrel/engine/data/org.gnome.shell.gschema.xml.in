@@ -11,55 +11,6 @@
         using the Alt-F2 dialog.
       </description>
     </key>
-    <key name="enabled-extensions" type="as">
-      <default>[]</default>
-      <summary>UUIDs of extensions to enable</summary>
-      <description>
-        GNOME Shell extensions have a UUID property; this key lists extensions
-        which should be loaded. Any extension that wants to be loaded needs
-        to be in this list. You can also manipulate this list with the
-        EnableExtension and DisableExtension D-Bus methods on org.gnome.Shell.
-      </description>
-    </key>
-    <key name="disabled-extensions" type="as">
-      <default>[]</default>
-      <summary>UUIDs of extensions to force disabling</summary>
-      <description>
-        GNOME Shell extensions have a UUID property; this key lists extensions
-        which should be disabled, even if loaded as part of the current mode.
-        You can also manipulate this list with the EnableExtension and
-        DisableExtension D-Bus methods on org.gnome.Shell.
-        This key takes precedence over the “enabled-extensions” setting.
-      </description>
-    </key>
-    <key name="disable-user-extensions" type="b">
-      <default>false</default>
-      <summary>Disable user extensions</summary>
-      <description>
-        Disable all extensions the user has enabled without affecting
-        the “enabled-extension” setting.
-      </description>
-    </key>
-    <key name="allow-extension-installation" type="b">
-      <default>true</default>
-      <summary>Allow extension installation</summary>
-      <description>
-        Allow users to install extensions in their home folder. If disabled,
-        the InstallRemoteExtension D-Bus method will fail, and extensions
-        are only loaded from system directories on startup.
-        It does not affect extensions that are already loaded, so a change
-        only takes full effect on the next login.
-      </description>
-    </key>
-    <key name="disable-extension-version-validation" type="b">
-      <default>false</default>
-      <summary>Disables the validation of extension version compatibility</summary>
-      <description>
-        GNOME Shell will only load extensions that claim to support the current
-        running version. Enabling this option will disable this check and try to
-        load all extensions regardless of the versions they claim to support.
-      </description>
-    </key>
     <key name="kestrel-start-layout" type="s">
       <default>'{"items":[],"folders":{}}'</default>
       <summary>Start app order and folders</summary>

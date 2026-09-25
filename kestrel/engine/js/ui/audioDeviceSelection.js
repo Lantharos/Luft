@@ -125,7 +125,6 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
         button.connect('clicked', () => {
             this.emit('device-selected', device);
             this.close();
-            Main.overview.hide();
         });
     }
 
@@ -139,7 +138,6 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
         }
 
         this.close();
-        Main.overview.hide();
         app.activate();
     }
 });

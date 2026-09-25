@@ -23,7 +23,7 @@ bun install --frozen-lockfile
 bun run check
 cd ../..
 kestrel/compositor/build.sh
-meson setup kestrel/build kestrel/engine -Dpkg_config_path="$PWD/kestrel/run/mutter-install/lib/pkgconfig" --prefix="$PWD/kestrel/install" -Dtests=false -Dextensions_tool=false -Dman=false
+meson setup kestrel/build kestrel/engine -Dpkg_config_path="$PWD/kestrel/run/mutter-install/lib/pkgconfig" --prefix="$PWD/kestrel/install" -Dtests=false -Dman=false
 meson compile -C kestrel/build
 ```
 

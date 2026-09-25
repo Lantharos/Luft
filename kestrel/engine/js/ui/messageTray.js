@@ -790,20 +790,6 @@ export class MessageTray extends St.Widget {
 
         Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
 
-        Main.overview.connect('window-drag-begin',
-            this._onDragBegin.bind(this));
-        Main.overview.connect('window-drag-cancelled',
-            this._onDragEnd.bind(this));
-        Main.overview.connect('window-drag-end',
-            this._onDragEnd.bind(this));
-
-        Main.overview.connect('item-drag-begin',
-            this._onDragBegin.bind(this));
-        Main.overview.connect('item-drag-cancelled',
-            this._onDragEnd.bind(this));
-        Main.overview.connect('item-drag-end',
-            this._onDragEnd.bind(this));
-
         Main.xdndHandler.connect('drag-begin',
             this._onDragBegin.bind(this));
         Main.xdndHandler.connect('drag-end',

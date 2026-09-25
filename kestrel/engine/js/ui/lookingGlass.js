@@ -1,7 +1,6 @@
 import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Graphene from 'gi://Graphene';
@@ -13,7 +12,6 @@ import * as Signals from '../misc/signals.js';
 import System from 'system';
 
 import * as History from '../misc/history.js';
-import {ExtensionState} from '../misc/extensionUtils.js';
 import * as PopupMenu from './popupMenu.js';
 import * as ShellEntry from './shellEntry.js';
 import {Slider} from './slider.js';
@@ -741,183 +739,6 @@ export const Inspector = GObject.registerClass({
     }
 });
 
-const Extensions = GObject.registerClass({
-}, class Extensions extends St.BoxLayout {
-    _init(lookingGlass) {
-        super._init({
-            orientation: Clutter.Orientation.VERTICAL,
-            name: 'LookingGlassExtensions',
-        });
-
-        this._lookingGlass = lookingGlass;
-        this._noExtensions = new St.Label({
-            style_class: 'lg-extensions-none',
-            text: _('No extensions installed'),
-        });
-        this._numExtensions = 0;
-        this._extensionsList = new St.BoxLayout({
-            orientation: Clutter.Orientation.VERTICAL,
-            style_class: 'lg-extensions-list',
-        });
-        this._extensionsList.add_child(this._noExtensions);
-        this.add_child(this._extensionsList);
-
-        Main.extensionManager.getUuids().forEach(uuid => {
-            this._loadExtension(null, uuid);
-        });
-
-        Main.extensionManager.connect('extension-loaded',
-            this._loadExtension.bind(this));
-    }
-
-    _loadExtension(o, uuid) {
-        const extension = Main.extensionManager.lookup(uuid);
-        // There can be cases where we create dummy extension metadata
-        // that's not really a proper extension. Don't bother with these.
-        if (!extension.metadata.name)
-            return;
-
-        const extensionDisplay = this._createExtensionDisplay(extension);
-        if (this._numExtensions === 0)
-            this._extensionsList.remove_child(this._noExtensions);
-
-        this._numExtensions++;
-        const {name} = extension.metadata;
-        const pos = [...this._extensionsList].findIndex(
-            dsp => dsp._extension.metadata.name.localeCompare(name) > 0);
-        this._extensionsList.insert_child_at_index(extensionDisplay, pos);
-    }
-
-    _onViewSource(actor) {
-        const extension = actor._extension;
-        const uri = extension.dir.get_uri();
-        Gio.app_info_launch_default_for_uri(uri, global.create_app_launch_context(0, -1));
-        this._lookingGlass.close();
-    }
-
-    _onWebPage(actor) {
-        const extension = actor._extension;
-        Gio.app_info_launch_default_for_uri(extension.metadata.url, global.create_app_launch_context(0, -1));
-        this._lookingGlass.close();
-    }
-
-    _onViewErrors(actor) {
-        const extension = actor._extension;
-        const shouldShow = !actor._isShowing;
-
-        if (shouldShow) {
-            const errors = extension.errors;
-            const errorDisplay = new St.BoxLayout({
-                orientation: Clutter.Orientation.VERTICAL,
-            });
-            if (errors && errors.length) {
-                for (let i = 0; i < errors.length; i++)
-                    errorDisplay.add_child(new St.Label({text: errors[i]}));
-            } else {
-                /* Translators: argument is an extension UUID. */
-                const message = _('%s has not emitted any errors').format(extension.uuid);
-                errorDisplay.add_child(new St.Label({text: message}));
-            }
-
-            actor._errorDisplay = errorDisplay;
-            actor._parentBox.add_child(errorDisplay);
-            actor.label = _('Hide Errors');
-        } else {
-            actor._errorDisplay.destroy();
-            actor._errorDisplay = null;
-            actor.label = _('Show Errors');
-        }
-
-        actor._isShowing = shouldShow;
-    }
-
-    _stateToString(extensionState) {
-        switch (extensionState) {
-        case ExtensionState.ACTIVE:
-            return _('Active');
-        case ExtensionState.INACTIVE:
-        case ExtensionState.INITIALIZED:
-            return _('Inactive');
-        case ExtensionState.ERROR:
-            return _('Error');
-        case ExtensionState.OUT_OF_DATE:
-            return _('Out of date');
-        case ExtensionState.DOWNLOADING:
-            return _('Downloading');
-        case ExtensionState.DEACTIVATING:
-            return _('Deactivating');
-        case ExtensionState.ACTIVATING:
-            return _('Activating');
-        }
-        return 'Unknown'; // Not translated, shouldn't appear
-    }
-
-    _createExtensionDisplay(extension) {
-        const box = new St.BoxLayout({
-            style_class: 'lg-extension',
-            orientation: Clutter.Orientation.VERTICAL,
-        });
-        box._extension = extension;
-        const name = new St.Label({
-            style_class: 'lg-extension-name',
-            text: extension.metadata.name,
-            x_expand: true,
-        });
-        box.add_child(name);
-        const description = new St.Label({
-            style_class: 'lg-extension-description',
-            text: extension.metadata.description || 'No description',
-            x_expand: true,
-        });
-        box.add_child(description);
-
-        const metaBox = new St.BoxLayout({style_class: 'lg-extension-meta'});
-        box.add_child(metaBox);
-        const state = new St.Label({
-            style_class: 'lg-extension-state',
-            text: this._stateToString(extension.state),
-        });
-        metaBox.add_child(state);
-
-        const viewsource = new St.Button({
-            reactive: true,
-            track_hover: true,
-            style_class: 'shell-link',
-            label: _('View Source'),
-        });
-        viewsource._extension = extension;
-        viewsource.connect('clicked', this._onViewSource.bind(this));
-        metaBox.add_child(viewsource);
-
-        if (extension.metadata.url) {
-            const webpage = new St.Button({
-                reactive: true,
-                track_hover: true,
-                style_class: 'shell-link',
-                label: _('Web Page'),
-            });
-            webpage._extension = extension;
-            webpage.connect('clicked', this._onWebPage.bind(this));
-            metaBox.add_child(webpage);
-        }
-
-        const viewerrors = new St.Button({
-            reactive: true,
-            track_hover: true,
-            style_class: 'shell-link',
-            label: _('Show Errors'),
-        });
-        viewerrors._extension = extension;
-        viewerrors._parentBox = box;
-        viewerrors._isShowing = false;
-        viewerrors.connect('clicked', this._onViewErrors.bind(this));
-        metaBox.add_child(viewerrors);
-
-        return box;
-    }
-});
-
-
 const ActorLink = GObject.registerClass({
     Signals: {
         'inspect-actor': {},
@@ -1528,8 +1349,6 @@ export class LookingGlass extends St.BoxLayout {
         this._windowList = new WindowList(this);
         notebook.appendPage('Windows', this._windowList);
 
-        this._extensions = new Extensions(this);
-        notebook.appendPage('Extensions', this._extensions);
 
         this._actorTreeViewer = new ActorTreeViewer(this);
         notebook.appendPage('Actors', this._actorTreeViewer);

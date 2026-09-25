@@ -131,8 +131,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification {
   background-color: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 14px;
-  spacing: 7px;
+  padding: 8px;
+  spacing: 4px;
 }
 .kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
 .kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
@@ -343,3 +343,12 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .audio-device-selection-dialog .audio-selection-device-label:rtl,
 .prompt-dialog .prompt-dialog-error-label:rtl, .prompt-dialog .prompt-dialog-info-label:rtl,
 .access-dialog:rtl { text-align: right; }
+
+.kestrel-notification-content { spacing: 6px; }
+.kestrel-notification-open { padding: 6px; border-radius: 8px; text-align: left; }
+.kestrel-notification-dismiss { padding: 8px; border-radius: 8px; }
+.kestrel-notification-actions { spacing: 6px; padding-top: 4px; }
+.kestrel-notification-action { padding: 10px 12px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.08); }
+.kestrel-notification-open:hover, .kestrel-notification-dismiss:hover, .kestrel-notification-action:hover { background-color: rgba(255, 255, 255, 0.13); }
+.kestrel-notification-open:focus, .kestrel-notification-dismiss:focus, .kestrel-notification-action:focus { background-color: rgba(255, 255, 255, 0.13); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.kestrel-notification-open:rtl { text-align: right; }

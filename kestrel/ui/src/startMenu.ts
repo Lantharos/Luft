@@ -68,7 +68,7 @@ export class StartMenu {
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
     this.actor.add_child(this.browser.header);
-    this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.browser.home() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
+    this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
 
     const footer = new St.BoxLayout({ style_class: 'kestrel-footer' });
@@ -116,6 +116,11 @@ export class StartMenu {
 
   focus(): void {
     this.search.grab_key_focus();
+  }
+  private back(): boolean {
+    if (this.search.get_text()) { this.search.set_text(''); this.focus(); return true; }
+    if (this.browser.home()) { this.focus(); return true; }
+    return false;
   }
   clearSearch(): void { this.browser.home(); this.search.set_text(''); }
 

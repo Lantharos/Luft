@@ -1,8 +1,6 @@
 import {styleSurface} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Meta from 'gi://Meta';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
@@ -118,7 +116,7 @@ class Dialog extends St.Widget {
     }
 
     addButton(buttonInfo) {
-        const {label, action, key} = buttonInfo;
+        const {label, action, key, reactive = true} = buttonInfo;
         const isDefault = buttonInfo['default'];
         let keys;
 
@@ -132,8 +130,8 @@ class Dialog extends St.Widget {
         const button = new St.Button({
             style_class: 'modal-dialog-button',
             button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.SECONDARY,
-            reactive: true,
-            can_focus: true,
+            reactive,
+            can_focus: reactive,
             x_expand: true,
             y_expand: true,
             label,
@@ -193,19 +191,8 @@ export const MessageDialogContent = GObject.registerClass({
             ...params,
         });
 
-        this.connect('notify::size', this._updateTitleStyle.bind(this));
-        this.connect('destroy', this._onDestroy.bind(this));
-
         this.add_child(this._title);
         this.add_child(this._description);
-    }
-
-    _onDestroy() {
-        if (this._updateTitleStyleLater) {
-            const laters = global.compositor.get_laters();
-            laters.remove(this._updateTitleStyleLater);
-            delete this._updateTitleStyleLater;
-        }
     }
 
     get title() {
@@ -216,34 +203,11 @@ export const MessageDialogContent = GObject.registerClass({
         return this._description.text;
     }
 
-    _updateTitleStyle() {
-        if (!this._title.mapped)
-            return;
-
-        this._title.ensure_style();
-        const [, titleNatWidth] = this._title.get_preferred_width(-1);
-
-        if (titleNatWidth > this.width) {
-            if (this._updateTitleStyleLater)
-                return;
-
-            const laters = global.compositor.get_laters();
-            this._updateTitleStyleLater = laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
-                this._updateTitleStyleLater = 0;
-                this._title.add_style_class_name('lightweight');
-                return GLib.SOURCE_REMOVE;
-            });
-        }
-    }
-
     set title(title) {
         if (this._title.text === title)
             return;
 
         _setLabel(this._title, title);
-
-        this._title.remove_style_class_name('lightweight');
-        this._updateTitleStyle();
 
         this.notify('title');
     }
@@ -326,6 +290,7 @@ export const ListSectionItem = GObject.registerClass({
 
         const textLayout = new St.BoxLayout({
             orientation: Clutter.Orientation.VERTICAL,
+            x_expand: true,
             y_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
         });
@@ -333,9 +298,11 @@ export const ListSectionItem = GObject.registerClass({
         this._title = new St.Label({style_class: 'dialog-list-item-title'});
 
         this._description = new St.Label({
-            style_class: 'dialog-list-item-title-description',
+            style_class: 'dialog-list-item-description',
         });
 
+        this._description.clutter_text.line_wrap = true;
+        this._description.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         textLayout.add_child(this._title);
         textLayout.add_child(this._description);
 
@@ -374,5 +341,39 @@ export const ListSectionItem = GObject.registerClass({
     set description(description) {
         _setLabel(this._description, description);
         this.notify('description');
+    }
+});
+
+export const EntryField = GObject.registerClass(
+class EntryField extends St.BoxLayout {
+    _init(entry, label, statusActor = null) {
+        super._init({
+            style_class: 'kestrel-entry-field',
+            orientation: Clutter.Orientation.VERTICAL,
+            x_expand: true,
+        });
+        this.label_actor = new St.Label({style_class: 'kestrel-entry-label'});
+        this.label_actor.clutter_text.line_wrap = true;
+        this.label_actor.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        if (statusActor) {
+            const heading = new St.BoxLayout();
+            this.label_actor.x_expand = true;
+            statusActor.y_align = Clutter.ActorAlign.CENTER;
+            heading.add_child(this.label_actor);
+            heading.add_child(statusActor);
+            this.add_child(heading);
+        } else {
+            this.add_child(this.label_actor);
+        }
+        entry.x_expand = true;
+        entry.x_align = Clutter.ActorAlign.FILL;
+        entry.label_actor = this.label_actor;
+        this.add_child(entry);
+        entry.bind_property('visible', this, 'visible', GObject.BindingFlags.SYNC_CREATE);
+        this.label = label;
+    }
+
+    set label(text) {
+        this.label_actor.text = text;
     }
 });

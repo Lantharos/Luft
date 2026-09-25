@@ -37,24 +37,24 @@ class KeyringDialog extends ModalDialog.ModalDialog {
         this._passwordEntry = new St.PasswordEntry({
             style_class: 'prompt-dialog-password-entry',
             can_focus: true,
-            x_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
         });
         ShellEntry.addContextMenu(this._passwordEntry);
         this._passwordEntry.clutter_text.connect('activate', this._onPasswordActivate.bind(this));
         this.prompt.bind_property('password-visible',
             this._passwordEntry, 'visible', GObject.BindingFlags.SYNC_CREATE);
-        passwordBox.add_child(this._passwordEntry);
+        passwordBox.add_child(new Dialog.EntryField(this._passwordEntry, _('Password')));
 
         this._confirmEntry = new St.PasswordEntry({
             style_class: 'prompt-dialog-password-entry',
             can_focus: true,
-            x_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
         });
         ShellEntry.addContextMenu(this._confirmEntry);
         this._confirmEntry.clutter_text.connect('activate', this._onConfirmActivate.bind(this));
         this.prompt.bind_property('confirm-visible',
             this._confirmEntry, 'visible', GObject.BindingFlags.SYNC_CREATE);
-        passwordBox.add_child(this._confirmEntry);
+        passwordBox.add_child(new Dialog.EntryField(this._confirmEntry, _('Confirm Password')));
 
         this.prompt.set_password_actor(this._passwordEntry.clutter_text);
         this.prompt.set_confirm_actor(this._confirmEntry.clutter_text);
@@ -75,9 +75,8 @@ class KeyringDialog extends ModalDialog.ModalDialog {
         warning.clutter_text.line_wrap = true;
         this.prompt.bind_property('warning',
             warning, 'text', GObject.BindingFlags.SYNC_CREATE);
-        this.prompt.connect('notify::warning-visible', () => {
-            warning.opacity = this.prompt.warning_visible ? 255 : 0;
-        });
+        this.prompt.bind_property('warning-visible',
+            warning, 'visible', GObject.BindingFlags.SYNC_CREATE);
         this.prompt.connect('notify::warning', () => {
             if (this._passwordEntry && this.prompt.warning !== '')
                 wiggle(this._passwordEntry);

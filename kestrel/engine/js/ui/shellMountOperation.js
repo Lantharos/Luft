@@ -289,15 +289,10 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
         const content = new Dialog.MessageDialogContent({title, description});
 
-        const passwordGridLayout = new Clutter.GridLayout({orientation: Clutter.Orientation.VERTICAL});
-        const passwordGrid = new St.Widget({
-            style_class: 'prompt-dialog-password-grid',
-            layout_manager: passwordGridLayout,
+        const passwordFields = new St.BoxLayout({
+            orientation: Clutter.Orientation.VERTICAL,
+            style_class: 'prompt-dialog-password-layout',
         });
-        passwordGridLayout.hookup_style(passwordGrid);
-
-        const rtl = passwordGrid.get_text_direction() === Clutter.TextDirection.RTL;
-        let curGridRow = 0;
 
         if (flags & Gio.AskPasswordFlags.TCRYPT) {
             this._hiddenVolume = new CheckBox.CheckBox(_('Hidden Volume'));
@@ -326,18 +321,13 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
             this._pimEntry = new St.PasswordEntry({
                 style_class: 'prompt-dialog-password-entry',
-                hint_text: _('PIM Number'),
                 can_focus: true,
                 x_expand: true,
             });
             this._pimEntry.clutter_text.connect('activate', this._onEntryActivate.bind(this));
             ShellEntry.addContextMenu(this._pimEntry);
 
-            if (rtl)
-                passwordGridLayout.attach(this._pimEntry, 1, curGridRow, 1, 1);
-            else
-                passwordGridLayout.attach(this._pimEntry, 0, curGridRow, 1, 1);
-            curGridRow += 1;
+            passwordFields.add_child(new Dialog.EntryField(this._pimEntry, _('PIM Number')));
         } else {
             this._hiddenVolume = null;
             this._systemVolume = null;
@@ -346,7 +336,6 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
         this._passwordEntry = new St.PasswordEntry({
             style_class: 'prompt-dialog-password-entry',
-            hint_text: _('Password'),
             can_focus: true,
             x_expand: true,
         });
@@ -358,16 +347,12 @@ const ShellMountPasswordDialog = GObject.registerClass({
             animate: true,
         });
 
-        if (rtl) {
-            passwordGridLayout.attach(this._workSpinner, 0, curGridRow, 1, 1);
-            passwordGridLayout.attach(this._passwordEntry, 1, curGridRow, 1, 1);
-        } else {
-            passwordGridLayout.attach(this._passwordEntry, 0, curGridRow, 1, 1);
-            passwordGridLayout.attach(this._workSpinner, 1, curGridRow, 1, 1);
-        }
-        curGridRow += 1;
+        passwordFields.add_child(new Dialog.EntryField(this._passwordEntry, _('Password'), this._workSpinner));
 
-        const warningBox = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL});
+        const warningBox = new St.BoxLayout({
+            orientation: Clutter.Orientation.VERTICAL,
+            x_expand: true,
+        });
 
         const capsLockWarning = new ShellEntry.CapsLockWarning();
         warningBox.add_child(capsLockWarning);
@@ -380,9 +365,8 @@ const ShellMountPasswordDialog = GObject.registerClass({
         this._errorMessageLabel.clutter_text.line_wrap = true;
         warningBox.add_child(this._errorMessageLabel);
 
-        passwordGridLayout.attach(warningBox, 0, curGridRow, 2, 1);
-
-        content.add_child(passwordGrid);
+        passwordFields.add_child(warningBox);
+        content.add_child(passwordFields);
 
         if (flags & Gio.AskPasswordFlags.SAVING_SUPPORTED) {
             this._rememberChoice = new CheckBox.CheckBox(_('Remember Password'));

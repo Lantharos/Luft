@@ -58,24 +58,35 @@
 .kestrel-start .kestrel-section-title { padding: 0 10px; }
 .kestrel-start { padding: 20px; spacing: 14px; }
 
-.kestrel-search {
+StEntry, .kestrel-search,
+.prompt-dialog .prompt-dialog-password-entry,
+.run-dialog .run-dialog-entry,
+.login-dialog .login-dialog-prompt-entry, .unlock-dialog .login-dialog-prompt-entry {
   color: #ffffff;
   caret-size: 1px;
   caret-color: #ffffff;
   selection-background-color: rgba(255, 255, 255, 0.25);
+  selected-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.07);
+  background-image: none;
   border: none;
   border-radius: 12px;
+  box-shadow: none;
   padding: 12px 14px;
   font-size: 14px;
 }
-.kestrel-search:focus {
-  background-color: rgba(255, 255, 255, 0.10);
+StEntry:hover { background-color: rgba(255, 255, 255, 0.09); }
+StEntry:focus, .kestrel-search:focus,
+.prompt-dialog .prompt-dialog-password-entry:focus,
+.run-dialog .run-dialog-entry:focus,
+.login-dialog .login-dialog-prompt-entry:focus, .unlock-dialog .login-dialog-prompt-entry:focus {
+  background-color: rgba(255, 255, 255, 0.13);
   border: none;
   box-shadow: none;
 }
+StEntry:insensitive { color: rgba(255, 255, 255, 0.45); background-color: rgba(255, 255, 255, 0.04); }
+StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-search StIcon { color: rgba(255, 255, 255, 0.7); padding-right: 6px; }
-.kestrel-search StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-app-grid { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
@@ -200,12 +211,37 @@
   box-shadow: none;
   color: white;
 }
-.modal-dialog.kestrel-glass { padding: 20px; spacing: 16px; }
-.modal-dialog .modal-dialog-content-box { padding-top: 0; spacing: 12px; }
-.modal-dialog .modal-dialog-button-box { padding-top: 4px; spacing: 8px; }
-.message-dialog-content { spacing: 12px; }
-.prompt-dialog { width: 25em; }
-.prompt-dialog-password-entry { margin-left: 0; }
+.modal-dialog.kestrel-glass { padding: 20px; spacing: 20px; min-width: 320px; }
+.modal-dialog .modal-dialog-content-box { padding-top: 0; spacing: 16px; max-width: 28em; }
+.modal-dialog .modal-dialog-button-box { padding-top: 0; spacing: 8px; }
+.modal-dialog .modal-dialog-button { padding: 11px 16px; font-size: 14px; font-weight: 500; }
+.modal-dialog .message-dialog-content { spacing: 12px; }
+.modal-dialog .message-dialog-title { text-align: left; font-size: 20px; font-weight: 600; }
+.modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: rgba(255, 255, 255, 0.82); }
+.modal-dialog .dialog-list { spacing: 10px; }
+.modal-dialog .dialog-list-title { text-align: left; font-size: 13px; font-weight: 600; }
+.modal-dialog .dialog-list-box { spacing: 12px; }
+.modal-dialog .dialog-list-item { spacing: 12px; }
+.modal-dialog .dialog-list-item-title { font-size: 14px; font-weight: 500; }
+.modal-dialog .dialog-list-item-description { font-size: 13px; color: rgba(255, 255, 255, 0.72); }
+.prompt-dialog, .access-dialog, .end-session-dialog { width: 28em; }
+.prompt-dialog .prompt-dialog-password-entry { width: auto; margin: 0; }
+.prompt-dialog .prompt-dialog-password-layout, .kestrel-dialog-form { spacing: 14px; }
+.kestrel-entry-field { spacing: 6px; }
+.kestrel-entry-label { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.82); }
+.kestrel-auth-feedback { spacing: 4px; }
+.polkit-dialog .prompt-dialog-password-layout { spacing: 6px; }
+.polkit-dialog .polkit-dialog-user-layout { spacing: 12px; margin: 0; text-align: left; }
+.polkit-dialog .polkit-dialog-user-label, .polkit-dialog .polkit-dialog-user-root-label { font-size: 14px; font-weight: 500; color: white; }
+.polkit-dialog .user-icon { icon-size: 36px; border-radius: 18px; }
+.audio-device-selection-dialog { width: 26em; min-width: 0; }
+.audio-device-selection-dialog .audio-selection-box { spacing: 8px; }
+.audio-device-selection-dialog .audio-selection-device { padding: 0; }
+.audio-device-selection-dialog .audio-selection-device-box { padding: 12px 14px; spacing: 14px; }
+.audio-device-selection-dialog .audio-selection-device-icon { icon-size: 28px; }
+.audio-device-selection-dialog .audio-selection-device-label { font-size: 14px; text-align: left; }
+.access-dialog { text-align: left; }
+.run-dialog { padding-bottom: 20px; }
 .modal-dialog-button, .button, .icon-button, .notification-button,
 .audio-selection-device, .message-expand-button, .message-close-button,
 .message-collapse-button, .login-dialog-user-list-item, .login-dialog-user-list-item:focus {
@@ -220,8 +256,6 @@
 .icon-button:hover, .icon-button:focus, .audio-selection-device:hover, .audio-selection-device:focus,
 .notification-button:hover, .notification-button:focus { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
 .modal-dialog-button:active, .button:active, .icon-button:active { background-color: rgba(255, 255, 255, 0.25); }
-StEntry { background-color: rgba(255, 255, 255, 0.09); color: white; border: 1px solid transparent; border-radius: 10px; box-shadow: none; padding: 10px 12px; }
-StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(255, 255, 255, 0.45); box-shadow: none; }
 .popup-menu-boxpointer, .candidate-popup-boxpointer, .keyboard-subkeys {
   -arrow-base: 0; -arrow-rise: 0; -arrow-border-width: 0;
   -arrow-background-color: transparent; -arrow-border-color: transparent;
@@ -255,17 +289,15 @@ StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(
 .popup-menu-item.kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.16); }
 .candidate-popup-content { background-color: transparent; border: none; box-shadow: none; }
 .candidate-box:selected { background-color: rgba(255, 255, 255, 0.18); border-radius: 8px; }
-.unlock-dialog .button, .unlock-dialog .icon-button, .unlock-dialog .login-dialog-prompt-entry,
-.login-dialog .button, .login-dialog .icon-button, .login-dialog .login-dialog-prompt-entry {
+.unlock-dialog .button, .unlock-dialog .icon-button,
+.login-dialog .button, .login-dialog .icon-button {
   background-color: rgba(255, 255, 255, 0.10); border-radius: 10px; border-color: transparent; box-shadow: none;
 }
 .unlock-dialog .button:hover, .unlock-dialog .button:focus,
 .unlock-dialog .icon-button:hover, .unlock-dialog .icon-button:focus { background-color: rgba(255, 255, 255, 0.20); }
 .unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: rgba(20, 20, 24, 0.20); border-radius: 16px; padding: 12px; }
 .kestrel-glass .kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.18); }
-.prompt-dialog .prompt-dialog-error-label, .prompt-dialog .prompt-dialog-info-label,
-.prompt-dialog .prompt-dialog-null-label { padding: 4px 6px; margin: 0; }
-.prompt-dialog .prompt-dialog-password-grid .prompt-dialog-password-entry { margin-left: 0; margin-right: 0; }
+.prompt-dialog .prompt-dialog-error-label, .prompt-dialog .prompt-dialog-info-label { padding: 8px 10px; margin: 0; text-align: left; border-radius: 8px; font-size: 13px; }
 #LookingGlassDialog, #LookingGlassAutoCompletionText { background-color: rgba(20, 20, 24, 0.20); border: none; box-shadow: none; color: white; }
 .lg-dialog .button { background-color: rgba(255, 255, 255, 0.10); }
 
@@ -293,3 +325,21 @@ StEntry:focus { background-color: rgba(255, 255, 255, 0.13); border-color: rgba(
 .kestrel-app-button.drop-after { box-shadow: inset -3px 0 rgba(255,255,255,0.75); }
 
 .kestrel-folder-separator { margin-top: 3px; }
+
+.modal-dialog .modal-dialog-button:default, .modal-dialog .modal-dialog-button.suggested-action { background-color: rgba(255, 255, 255, 0.18); }
+.modal-dialog .modal-dialog-button:default:hover, .modal-dialog .modal-dialog-button.suggested-action:hover { background-color: rgba(255, 255, 255, 0.26); }
+.modal-dialog .modal-dialog-button:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45); }
+.modal-dialog .modal-dialog-button:insensitive { background-color: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.35); box-shadow: none; }
+
+.modal-dialog .check-box { padding: 6px 0; }
+.modal-dialog .check-box StIcon { background-color: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.22); }
+.modal-dialog .check-box:checked StIcon { background-color: rgba(255, 255, 255, 0.22); border-color: transparent; color: white; }
+.modal-dialog .check-box:hover StIcon { background-color: rgba(255, 255, 255, 0.16); }
+.modal-dialog .check-box:checked:hover StIcon { background-color: rgba(255, 255, 255, 0.28); }
+.modal-dialog .check-box:focus StBin { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5); }
+
+.modal-dialog .message-dialog-title:rtl, .modal-dialog .message-dialog-description:rtl,
+.modal-dialog .dialog-list-title:rtl, .polkit-dialog .polkit-dialog-user-layout:rtl,
+.audio-device-selection-dialog .audio-selection-device-label:rtl,
+.prompt-dialog .prompt-dialog-error-label:rtl, .prompt-dialog .prompt-dialog-info-label:rtl,
+.access-dialog:rtl { text-align: right; }

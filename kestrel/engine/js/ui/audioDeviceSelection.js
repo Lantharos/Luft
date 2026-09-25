@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -49,7 +48,7 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
         this._selectionBox = new St.BoxLayout({
             style_class: 'audio-selection-box',
-            x_align: Clutter.ActorAlign.CENTER,
+            orientation: Clutter.Orientation.VERTICAL,
             x_expand: true,
         });
         content.add_child(this._selectionBox);
@@ -99,16 +98,8 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
     _addDevice(device) {
         const box = new St.BoxLayout({
             style_class: 'audio-selection-device-box',
-            orientation: Clutter.Orientation.VERTICAL,
+            x_expand: true,
         });
-        box.connect('notify::height', () => {
-            const laters = global.compositor.get_laters();
-            laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
-                box.width = box.height;
-                return GLib.SOURCE_REMOVE;
-            });
-        });
-
         const icon = new St.Icon({
             style_class: 'audio-selection-device-icon',
             icon_name: this._getDeviceIcon(device),
@@ -118,13 +109,15 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
         const label = new St.Label({
             style_class: 'audio-selection-device-label',
             text: this._getDeviceLabel(device),
-            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
         });
         box.add_child(label);
 
         const button = new St.Button({
             style_class: 'audio-selection-device',
             can_focus: true,
+            x_expand: true,
             child: box,
         });
         this._selectionBox.add_child(button);

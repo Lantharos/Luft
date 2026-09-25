@@ -48,18 +48,17 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 
             const entryParams = {
                 style_class: 'prompt-dialog-password-entry',
-                hint_text: secret.label,
                 text: secret.value,
                 can_focus: reactive,
                 reactive,
-                x_align: Clutter.ActorAlign.CENTER,
+                x_expand: true,
             };
             if (secret.password)
                 secret.entry = new St.PasswordEntry(entryParams);
             else
                 secret.entry = new St.Entry(entryParams);
             ShellEntry.addContextMenu(secret.entry);
-            contentBox.add_child(secret.entry);
+            contentBox.add_child(new Dialog.EntryField(secret.entry, secret.label));
 
             if (secret.validate)
                 secret.valid = secret.validate(secret);

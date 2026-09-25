@@ -148,6 +148,10 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     const runningApp = Shell.WindowTracker.get_default().get_window_app(window);
     const button = actorNamed(panel, `kestrel-app-${runningApp.id}`);
     require(button.has_style_class_name('kestrel-app-focused'), 'focused app has persistent focus styling');
+    const [hasIconGeometry, iconGeometry] = window.get_icon_geometry();
+    const [buttonX, buttonY] = button.get_transformed_position();
+    require(hasIconGeometry && iconGeometry.x === Math.round(buttonX) && iconGeometry.y === Math.round(buttonY),
+      'windows minimize toward their taskbar button');
     window.minimize();
     await pause(250);
     window.activate(global.get_current_time());

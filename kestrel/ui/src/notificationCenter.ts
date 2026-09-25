@@ -25,7 +25,6 @@ export class NotificationCenter {
   private closing = false;
   private first: NotificationCard | null = null;
   private readonly scroll: St.ScrollView;
-  private readonly empty = new St.Label({ text: 'No notifications', style_class: 'kestrel-notification-empty' });
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
   private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
   private readonly calendar = new Calendar();
@@ -67,7 +66,6 @@ export class NotificationCenter {
     this.actor.add_child(scroll);
     this.actor.add_child(this.calendar.actor);
 
-    this.list.add_child(this.empty);
     this.tray.connectObject(
       'source-added', () => { this.watchSources(); this.invalidate(); },
       'source-removed', () => { this.watchSources(); this.invalidate(); },
@@ -116,7 +114,7 @@ export class NotificationCenter {
       this.items.delete(notification);
     }
     this.first = null;
-    this.empty.visible = notifications.length === 0;
+    this.scroll.visible = notifications.length > 0;
     this.header.visible = notifications.length > 0;
     for (const [index, { source, notification }] of notifications.entries()) {
       let item = this.items.get(notification);
@@ -129,7 +127,7 @@ export class NotificationCenter {
       if (index === 0) this.first = item;
       item.refresh();
       if (this.actor.visible) notification.acknowledged = true;
-      if (this.list.get_child_at_index(index + 1) !== item.actor) this.list.set_child_at_index(item.actor, index + 1);
+      if (this.list.get_child_at_index(index) !== item.actor) this.list.set_child_at_index(item.actor, index);
     }
     if (focusRemoved) {
       if (this.first) this.first.open.grab_key_focus();
@@ -147,10 +145,14 @@ export class NotificationCenter {
     const theme = this.actor.get_theme_node();
     const contentWidth = width - theme.get_horizontal_padding();
     const spacing = theme.get_length('spacing');
-    const header = this.header.visible ? this.header.get_preferred_height(contentWidth)[1] + spacing : 0;
-    const media = this.media.actor.visible ? this.media.actor.get_preferred_height(contentWidth)[1] + spacing : 0;
-    const chrome = header + media + this.calendar.actor.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + spacing;
-    return Math.min(limit, chrome + this.list.get_preferred_height(contentWidth)[1]);
+    const height = (actor: Clutter.Actor) => actor.get_preferred_height(contentWidth)[1];
+    const parts = [
+      this.media.actor.visible ? height(this.media.actor) : null,
+      this.header.visible ? height(this.header) : null,
+      this.scroll.visible ? height(this.list) : null,
+      height(this.calendar.actor),
+    ].filter((part): part is number => part !== null);
+    return Math.min(limit, parts.reduce((sum, part) => sum + part, 0) + spacing * (parts.length - 1) + theme.get_vertical_padding());
   }
 
   private watchSources(): void {

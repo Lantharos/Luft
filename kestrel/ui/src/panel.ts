@@ -32,8 +32,7 @@ export class KestrelPanel {
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private readonly taskbar: Taskbar;
   private readonly clock = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
-  private readonly networkIcon = new St.Icon({ icon_name: 'network-wired-symbolic', icon_size: 16 });
-  private readonly volumeIcon = new St.Icon({ icon_name: 'audio-volume-high-symbolic', icon_size: 16 });
+  private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker, number][] = [];
   private readonly startButton: St.Button;
   private readonly quickButton: St.Button;
@@ -67,11 +66,8 @@ export class KestrelPanel {
       x_align: Clutter.ActorAlign.END,
       y_align: Clutter.ActorAlign.CENTER,
     });
-    const status = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
-    status.add_child(this.networkIcon);
-    status.add_child(this.volumeIcon);
     this.quickButton = new St.Button({
-      style_class: 'kestrel-status-button', child: status,
+      style_class: 'kestrel-status-button', child: this.statusIcons,
       can_focus: true, accessible_name: 'Quick settings',
     });
     this.quickButton.connect('clicked', actions.quickSettings);
@@ -118,9 +114,14 @@ export class KestrelPanel {
     this.externalSignals.length = 0;
   }
 
-  updateStatus(networkIcon: string, volumeIcon: string): void {
-    this.networkIcon.icon_name = networkIcon;
-    this.volumeIcon.icon_name = volumeIcon;
+  updateStatus(iconNames: string[]): void {
+    const icons = this.statusIcons.get_children() as St.Icon[];
+    iconNames.forEach((iconName, index) => {
+      const icon = icons[index] ?? new St.Icon({ icon_size: 16 });
+      if (!icon.get_parent()) this.statusIcons.add_child(icon);
+      icon.icon_name = iconName;
+    });
+    for (const icon of icons.slice(iconNames.length)) icon.destroy();
   }
 
   place(monitor: Monitor): void {

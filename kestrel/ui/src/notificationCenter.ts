@@ -7,6 +7,7 @@ import St from 'gi://St';
 import type { ContextMenus } from './contextMenus.js';
 import { blurSurface } from './surface.js';
 import { Calendar } from './calendar.js';
+import { MediaCard } from './media.js';
 
 export interface MessageTray extends SignalSource {
   bannerBlocked: boolean;
@@ -28,6 +29,7 @@ export class NotificationCenter {
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
   private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
   private readonly calendar = new Calendar();
+  private readonly media: MediaCard;
 
   constructor(private readonly tray: MessageTray, private readonly menus: ContextMenus, private readonly layoutChanged: () => void, private readonly close: () => void) {
     this.actor = new St.BoxLayout({
@@ -43,6 +45,8 @@ export class NotificationCenter {
       { label: 'Notification settings', run: () => menus.settings('notifications') },
     ]);
 
+    this.media = new MediaCard(() => { if (this.actor.visible) this.layoutChanged(); });
+    this.actor.add_child(this.media.actor);
     this.header.add_child(new St.Label({
       text: 'Notifications',
       style_class: 'kestrel-section-title',
@@ -144,7 +148,8 @@ export class NotificationCenter {
     const contentWidth = width - theme.get_horizontal_padding();
     const spacing = theme.get_length('spacing');
     const header = this.header.visible ? this.header.get_preferred_height(contentWidth)[1] + spacing : 0;
-    const chrome = header + this.calendar.actor.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + spacing;
+    const media = this.media.actor.visible ? this.media.actor.get_preferred_height(contentWidth)[1] + spacing : 0;
+    const chrome = header + media + this.calendar.actor.get_preferred_height(contentWidth)[1] + theme.get_vertical_padding() + spacing;
     return Math.min(limit, chrome + this.list.get_preferred_height(contentWidth)[1]);
   }
 

@@ -4,6 +4,8 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
 import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
 import {checkFolders} from './folderChecks.js';
 import {checkSession} from './sessionChecks.js';
@@ -300,4 +302,26 @@ export async function run() {
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
   await checkFolders({pause, capture, actorNamed, pointer, output});
+
+  const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
+  Main.messageTray.add(source);
+  const notification = new MessageTray.Notification({source, title: 'Ayesha', body: 'Are we still on for tomorrow? I booked the table for seven.'});
+  notification.addAction('Reply', () => {});
+  source.addNotification(notification);
+  await pause(600);
+  await capture(`${output}/notification-banner.png`);
+  source.destroy();
+  await pause(400);
+
+  Main.screenShield.lock(true);
+  await pause(1200);
+  pointer.notify_relative_motion(GLib.get_monotonic_time(), 30, 30);
+  await pause(1200);
+  await capture(`${output}/lock-screen.png`);
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_space, Clutter.KeyState.PRESSED);
+  keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_space, Clutter.KeyState.RELEASED);
+  await pause(1200);
+  await capture(`${output}/unlock-prompt.png`);
+  Main.screenShield.deactivate(false);
+  await pause(600);
 }

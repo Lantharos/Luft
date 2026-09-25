@@ -52,3 +52,27 @@ declare module 'resource:///org/gnome/shell/ui/dnd.js' {
 declare module 'resource:///org/gnome/shell/misc/animationUtils.js' {
   export function ensureActorVisibleInScrollView(scroll: import('gi://St').default.ScrollView, actor: import('gi://Clutter').default.Actor): void;
 }
+
+declare module 'resource:///org/gnome/shell/ui/mpris.js' {
+  import GObject from 'gi://GObject';
+  import Shell from 'gi://Shell';
+  export class MprisPlayer extends GObject.Object {
+    readonly status: string;
+    readonly trackTitle: string;
+    readonly trackArtists: string[];
+    readonly trackCoverUrl: string;
+    readonly canGoNext: boolean;
+    readonly canGoPrevious: boolean;
+    readonly app: Shell.App | null;
+    playPause(): void;
+    next(): void;
+    previous(): void;
+    raise(): void;
+    connectObject(...args: unknown[]): void;
+    disconnectObject(owner: object): void;
+  }
+  export class MprisSource extends GObject.Object {
+    readonly players: MprisPlayer[];
+    connectObject(...args: unknown[]): void;
+  }
+}

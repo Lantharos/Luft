@@ -2,10 +2,8 @@
 <gresources>
   <gresource prefix="/org/gnome/shell/theme">
     <file>gnome-shell-dark.css</file>
-    <file>gnome-shell-light.css</file>
     <file>gnome-shell-high-contrast.css</file>
     <file>kestrel.css</file>
     <file>pad-osd.css</file>
-    <file>workspace-placeholder.svg</file>
   </gresource>
 </gresources>

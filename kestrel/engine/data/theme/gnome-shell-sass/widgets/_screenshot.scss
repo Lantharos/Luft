@@ -14,9 +14,23 @@ $screenshot_ui_button_red: $red_4;
   spacing: $base_padding * 2;
 }
 
+$close_button_color: transparentize(lighten($system_bg_color, 7%), .02);
+
 .screenshot-ui-close-button {
-  @extend .window-close; // copy window close button
-  padding: $base_padding !important; // but with more padding
+  background-color: $close_button_color;
+  color: $system_fg_color;
+  border-radius: $forced_circular_radius;
+  height: $large_icon_size;
+  width: $large_icon_size;
+  transition-duration: 100ms;
+  border: 2px solid transparent;
+  padding: $base_padding;
+  @if $contrast == 'high' {
+    border-color: $hc_inset_color;
+  }
+  & StIcon { icon-size: $medium_icon_size; }
+  &:hover { background-color: lighten($close_button_color, 7%); }
+  &:active { background-color: lighten($close_button_color, 13%); }
   margin-top: $base_margin * 3;
   box-shadow: 0 2px 4px 0 $shadow_color;
   &.left { margin-left: $base_margin * 3;}

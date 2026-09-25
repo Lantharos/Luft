@@ -56,7 +56,7 @@ export class RunDialog extends ModalDialog.ModalDialog {
         this._updateEnableInternalCommands();
 
         this._internalCommands = {
-            'lg': () => Main.createLookingGlass().open(),
+            'lg': () => Main.createLookingGlass().then(lookingGlass => lookingGlass.open()).catch(logError),
 
             'debugexit': () => global.context.terminate(),
 

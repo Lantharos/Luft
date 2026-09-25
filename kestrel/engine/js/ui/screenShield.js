@@ -14,7 +14,6 @@ import * as OVirt from '../gdm/oVirt.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as Lightbox from './lightbox.js';
 import * as Main from './main.js';
-import * as Overview from './overview.js';
 import * as MessageTray from './messageTray.js';
 import * as ShellDBus from './shellDBus.js';
 import * as SmartcardManager from '../gdm/smartcardManager.js';
@@ -38,6 +37,7 @@ const LOCKED_STATE_STR = 'screenShield.locked';
 const STANDARD_FADE_TIME = 10000;
 const MANUAL_FADE_TIME = 300;
 const CURTAIN_SLIDE_TIME = 300;
+const SHIELD_ANIMATION_TIME = 250;
 
 /**
  * If you are setting org.gnome.desktop.session.idle-delay directly in dconf,
@@ -469,7 +469,7 @@ export class ScreenShield extends Signals.EventEmitter {
             this._lockDialogGroup.remove_all_transitions();
             this._lockDialogGroup.ease({
                 ...easeParams,
-                duration: Overview.ANIMATION_TIME,
+                duration: SHIELD_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => {
                     this._lockScreenShown({fadeToBlack, animateFade: true});
@@ -582,7 +582,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
         this._lockDialogGroup.ease({
             ...easeParams,
-            duration: Overview.ANIMATION_TIME,
+            duration: SHIELD_ANIMATION_TIME,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => this._completeDeactivate(),
         });

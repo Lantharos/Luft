@@ -257,7 +257,7 @@ class KestrelUi {
     }
 
     this.close();
-    this.active = surface;
+    this.setActive(surface);
     this.panel.setActive(surface);
     this.cover.show();
     this.panel.actor.get_parent()!.set_child_above_sibling(this.panel.actor, this.cover);
@@ -292,7 +292,7 @@ class KestrelUi {
     const surface = this.active;
     if (surface === 'notifications') this.notifications.freeze();
     if (surface) this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
-    this.active = null;
+    this.setActive(null);
     this.cover.hide();
     this.panel.actor.get_parent()!.set_child_below_sibling(this.panel.actor, (global as unknown as Shell.Global).top_window_group);
     const stage = (global as unknown as Shell.Global).stage;
@@ -312,6 +312,20 @@ class KestrelUi {
       if (!this.active) this.panel.setActive(null);
     });
   }
+
+  private setActive(surface: Surface | null): void {
+    const wasStart = this.active === 'start';
+    this.active = surface;
+    if (wasStart !== (surface === 'start'))
+      for (const watcher of startWatchers) watcher(surface === 'start');
+  }
+
+  openStart(query: string): void {
+    if (this.active !== 'start') this.toggle('start');
+    if (query && this.active === 'start') this.start.search.set_text(query);
+  }
+
+  startOpen(): boolean { return this.active === 'start'; }
 
   private actorFor(surface: Surface): St.BoxLayout {
     switch (surface) {
@@ -394,6 +408,7 @@ class KestrelUi {
 }
 
 let currentUi: KestrelUi;
+const startWatchers: ((visible: boolean) => void)[] = [];
 
 export function initialize(context: Context): void {
   currentUi = new KestrelUi(context);
@@ -412,3 +427,9 @@ export function dismissImmediately(): void {
 }
 
 export function switchWorkspace(index: number): void { currentUi?.switchWorkspace(index); }
+
+export function openStart(query = ''): void { currentUi?.openStart(query); }
+
+export function startOpen(): boolean { return currentUi?.startOpen() ?? false; }
+
+export function watchStart(watcher: (visible: boolean) => void): void { startWatchers.push(watcher); }

@@ -65,6 +65,7 @@ gnome_shell_deps = [
   libsystemd_dep,
   libpipewire_dep,
   pango_dep,
+  fontconfig_dep,
 ]
 
 if have_xwayland

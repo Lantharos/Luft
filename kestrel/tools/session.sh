@@ -42,7 +42,6 @@ exec dbus-run-session -- bash -c '
   dconf load /org/gnome/desktop/interface/ < "$run/interface.ini"
   dconf load /org/gnome/desktop/input-sources/ < "$run/input-sources.ini"
   dconf write /org/gnome/shell/favorite-apps "$(cat "$run/favorites.txt")"
-  dconf write /org/gnome/shell/disable-user-extensions true
   if [[ "$mode" == capture ]]; then
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"

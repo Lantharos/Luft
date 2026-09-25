@@ -40,7 +40,6 @@
     <file preprocess="xml-stripblanks">org.gnome.Shell.AudioDeviceSelection.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Brightness.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.ClocksIntegration.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.Extensions.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Introspect.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.HotplugSniffer.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.PerfHelper.xml</file>

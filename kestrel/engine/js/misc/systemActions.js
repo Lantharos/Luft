@@ -484,7 +484,6 @@ const SystemActions = GObject.registerClass({
         if (!this._actions.get(LOGOUT_ACTION_ID).available)
             throw new Error('The logout action is not available!');
 
-        Main.overview.hide();
         this._session.LogoutAsync(0).catch(logErrorUnlessCancelled);
     }
 
@@ -513,13 +512,6 @@ const SystemActions = GObject.registerClass({
         if (!this._actions.get(SCREENSHOT_UI_ACTION_ID).available)
             throw new Error('The screenshot UI action is not available!');
 
-        if (this._overviewHiddenId)
-            return;
-
-        this._overviewHiddenId = Main.overview.connect('hidden', () => {
-            Main.overview.disconnect(this._overviewHiddenId);
-            delete this._overviewHiddenId;
-            Screenshot.showScreenshotUI();
-        });
+        Screenshot.showScreenshotUI();
     }
 });

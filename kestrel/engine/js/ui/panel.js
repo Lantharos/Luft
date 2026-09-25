@@ -2,7 +2,6 @@ import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GnomeDesktop from 'gi://GnomeDesktop';
 import GObject from 'gi://GObject';
-import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
@@ -12,7 +11,6 @@ import * as PopupMenu from './popupMenu.js';
 import * as PanelMenu from './panelMenu.js';
 import {QuickSettingsMenu, SystemIndicator} from './quickSettings.js';
 import * as Main from './main.js';
-import * as Util from '../misc/util.js';
 
 import * as RemoteAccessStatus from './status/remoteAccess.js';
 import * as RFKillStatus from './status/rfkill.js';
@@ -210,13 +208,6 @@ export class Panel extends St.Widget {
             'recognize', this._onWindowDragGestureRecognize.bind(this));
         this.add_action_full(
             'window-drag', Clutter.EventPhase.TARGET, this._clickGesture);
-
-        Main.overview.connectObject('showing',
-            () => this.add_style_pseudo_class('overview'),
-            this);
-        Main.overview.connectObject('hiding',
-            () => this.remove_style_pseudo_class('overview'),
-            this);
 
         Main.layoutManager.panelBox.add_child(this);
         Main.ctrlAltTabManager.addGroup(this,

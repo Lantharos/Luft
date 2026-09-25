@@ -1,3 +1,5 @@
+stage { font-family: "Open Runde"; }
+
 .kestrel-panel {
   background-color: transparent;
   color: #ffffff;
@@ -5,7 +7,6 @@
   border-radius: 0;
   padding: 0;
   box-shadow: none;
-  font-family: "Adwaita Sans";
 }
 
 .kestrel-taskbar { spacing: 2px; }
@@ -46,7 +47,6 @@
 .kestrel-popover {
   background-color: transparent;
   color: #ffffff;
-  font-family: "Adwaita Sans";
   border-radius: 20px;
   border: none;
   padding: 16px;

@@ -15,7 +15,7 @@ import * as Layout from './layout.js';
 import * as Lightbox from './lightbox.js';
 import * as Main from './main.js';
 import * as MessageTray from './messageTray.js';
-import * as Workspace from './workspace.js';
+import {WindowGridLayout} from './windowLayout.js';
 
 Gio._promisify(Shell.Screenshot.prototype, 'pick_color');
 Gio._promisify(Shell.Screenshot.prototype, 'screenshot');
@@ -886,71 +886,6 @@ const UIAreaSelector = GObject.registerClass({
     }
 });
 
-const UIWindowSelectorLayout = GObject.registerClass(
-class UIWindowSelectorLayout extends Workspace.WorkspaceLayout {
-    _init(monitorIndex) {
-        super._init(null, monitorIndex, null);
-    }
-
-    vfunc_set_container(container) {
-        this._container = container;
-        this._syncWorkareaTracking();
-    }
-
-    vfunc_allocate(container, box) {
-        const containerBox = container.allocation;
-        const containerAllocationChanged =
-            this._lastBox === null || !this._lastBox.equal(containerBox);
-        this._lastBox = containerBox.copy();
-
-        let layoutChanged = false;
-        if (this._layout === null) {
-            this._layout = this._createBestLayout(this._workarea);
-            layoutChanged = true;
-        }
-
-        if (layoutChanged || containerAllocationChanged)
-            this._windowSlots = this._getWindowSlots(box.copy());
-
-        const childBox = new Clutter.ActorBox();
-
-        const nSlots = this._windowSlots.length;
-        for (let i = 0; i < nSlots; i++) {
-            const [x, y, width, height, child] = this._windowSlots[i];
-
-            childBox.set_origin(x, y);
-            childBox.set_size(width, height);
-
-            child.allocate(childBox);
-        }
-    }
-
-    addWindow(window) {
-        if (this._sortedWindows.includes(window))
-            return;
-
-        this._sortedWindows.push(window);
-
-        this._container.add_child(window);
-
-        this._layout = null;
-        this.layout_changed();
-    }
-
-    reset() {
-        for (const window of this._sortedWindows)
-            window.destroy();
-
-        this._sortedWindows = [];
-        this._windowSlots = [];
-        this._layout = null;
-    }
-
-    get windows() {
-        return this._sortedWindows;
-    }
-});
-
 const UIWindowSelectorWindowContent = GObject.registerClass(
 class UIWindowSelectorWindowContent extends Clutter.Actor {
     constructor(actor) {
@@ -1173,7 +1108,7 @@ class UIWindowSelector extends St.Widget {
 
         this._monitorIndex = monitorIndex;
 
-        this._layoutManager = new UIWindowSelectorLayout(monitorIndex);
+        this._layoutManager = new WindowGridLayout(monitorIndex);
 
         // Window screenshots
         this._container = new St.Widget({
@@ -2557,7 +2492,6 @@ export class ScreenshotUI extends St.Widget {
                 }
             });
 
-            Main.overview.hide();
             Main.closeShellPopups();
         }
 
@@ -2779,7 +2713,6 @@ function _storeScreenshot(bytes, pixbuf) {
                 logError(err, 'Error opening screenshot');
             }
 
-            Main.overview.hide();
             Main.closeShellPopups();
         });
     }

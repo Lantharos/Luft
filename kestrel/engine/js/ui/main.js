@@ -14,8 +14,6 @@ import * as Config from '../misc/config.js';
 import * as Components from './components.js';
 import * as CtrlAltTab from './ctrlAltTab.js';
 import * as EndSessionDialog from './endSessionDialog.js';
-import * as ExtensionSystem from './extensionSystem.js';
-import * as ExtensionDownloader from './extensionDownloader.js';
 import * as InputMethod from '../misc/inputMethod.js';
 import * as Introspect from '../misc/introspect.js';
 import * as Keyboard from './keyboard.js';
@@ -24,13 +22,11 @@ import * as KestrelUi from './kestrelUi.js';
 import * as MessageTray from './messageTray.js';
 import * as OsdWindow from './osdWindow.js';
 import * as OsdMonitorLabeler from './osdMonitorLabeler.js';
-import * as Overview from './overview.js';
 import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
 import * as RunDialog from './runDialog.js';
 import * as Layout from './layout.js';
 import * as LoginManager from '../misc/loginManager.js';
-import * as LookingGlass from './lookingGlass.js';
 import * as NotificationDaemon from './notificationDaemon.js';
 import * as WindowAttentionHandler from './windowAttentionHandler.js';
 import * as Screenshot from './screenshot.js';
@@ -52,9 +48,7 @@ const LOG_DOMAIN = 'GNOME Shell';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
 export let componentManager = null;
-export let extensionManager = null;
 export let panel = null;
-export let overview = null;
 export let runDialog = null;
 export let lookingGlass = null;
 export let wm = null;
@@ -218,7 +212,6 @@ async function _initializeUI() {
     ctrlAltTabManager = new CtrlAltTab.CtrlAltTabManager();
     osdWindowManager = new OsdWindow.OsdWindowManager();
     osdMonitorLabeler = new OsdMonitorLabeler.OsdMonitorLabeler();
-    overview = new Overview.Overview();
     kbdA11yDialog = new KbdA11yDialog.KbdA11yDialog();
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
@@ -266,7 +259,6 @@ async function _initializeUI() {
     });
 
     layoutManager.init();
-    overview.init();
     const quickSettings = new DesktopControls();
     global.connect('shutdown', () => quickSettings.destroy());
     KestrelUi.initialize({
@@ -310,10 +302,6 @@ async function _initializeUI() {
     });
 
     _startDate = new Date();
-
-    ExtensionDownloader.init();
-    extensionManager = new ExtensionSystem.ExtensionManager();
-    extensionManager.init();
 
     LoginManager.registerSessionWithGDM();
 
@@ -789,13 +777,15 @@ export function popModal(grab) {
 }
 
 /**
- * Creates the looking glass panel
+ * Loads and creates the looking glass panel on first use
  *
- * @returns {LookingGlass.LookingGlass}
+ * @returns {Promise<import('./lookingGlass.js').LookingGlass>}
  */
-export function createLookingGlass() {
-    if (lookingGlass == null)
-        lookingGlass = new LookingGlass.LookingGlass();
+export async function createLookingGlass() {
+    if (lookingGlass == null) {
+        const {LookingGlass} = await import('./lookingGlass.js');
+        lookingGlass = new LookingGlass();
+    }
 
     return lookingGlass;
 }
@@ -818,7 +808,7 @@ export function openRunDialog() {
  * @param {number=} workspaceNum  window's workspace number
  *
  * Activates @window, switching to its workspace first if necessary,
- * and switching out of the overview if it's currently active
+ * and dismissing any open shell surfaces
  */
 export function activateWindow(window, time, workspaceNum) {
     const workspaceManager = global.workspace_manager;
@@ -835,7 +825,6 @@ export function activateWindow(window, time, workspaceNum) {
         window.activate(time);
     }
 
-    overview.hide();
     KestrelUi.dismissImmediately();
 }
 

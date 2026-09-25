@@ -22,8 +22,6 @@
     <file>gdm/vmware.js</file>
     <file>gdm/webLogin.js</file>
 
-    <file>extensions/extension.js</file>
-    <file>extensions/sharedInternals.js</file>
 
     <file>misc/asyncMutex.js</file>
     <file>misc/animationUtils.js</file>
@@ -34,7 +32,6 @@
     <file>misc/dbusUtils.js</file>
     <file>misc/dependencies.js</file>
     <file>misc/errorUtils.js</file>
-    <file>misc/extensionUtils.js</file>
     <file>misc/fileUtils.js</file>
     <file>misc/gnomeSession.js</file>
     <file>misc/history.js</file>
@@ -58,28 +55,22 @@
     <file>ui/accessDialog.js</file>
     <file>ui/altTab.js</file>
     <file>ui/animation.js</file>
-    <file>ui/appDisplay.js</file>
     <file>ui/appFavorites.js</file>
     <file>ui/appMenu.js</file>
     <file>ui/audioDeviceSelection.js</file>
     <file>ui/background.js</file>
-    <file>ui/backgroundMenu.js</file>
     <file>ui/barLevel.js</file>
     <file>ui/boxpointer.js</file>
     <file>ui/checkBox.js</file>
     <file>ui/closeDialog.js</file>
     <file>ui/ctrlAltTab.js</file>
-    <file>ui/dash.js</file>
     <file>ui/dialog.js</file>
     <file>ui/dnd.js</file>
     <file>ui/endSessionDialog.js</file>
     <file>ui/environment.js</file>
-    <file>ui/extensionDownloader.js</file>
-    <file>ui/extensionSystem.js</file>
     <file>ui/focusCaretTracker.js</file>
     <file>ui/grabHelper.js</file>
     <file>ui/ibusCandidatePopup.js</file>
-    <file>ui/iconGrid.js</file>
     <file>ui/inhibitShortcutsDialog.js</file>
     <file>ui/init.js</file>
     <file>ui/kbdA11yDialog.js</file>
@@ -100,8 +91,6 @@
     <file>ui/notificationDaemon.js</file>
     <file>ui/osdMonitorLabeler.js</file>
     <file>ui/osdWindow.js</file>
-    <file>ui/overview.js</file>
-    <file>ui/overviewControls.js</file>
     <file>ui/padOsd.js</file>
     <file>ui/pageIndicators.js</file>
     <file>ui/panel.js</file>
@@ -111,14 +100,11 @@
     <file>ui/popupMenu.js</file>
     <file>ui/quickSettings.js</file>
     <file>ui/qrCode.js</file>
-    <file>ui/remoteSearch.js</file>
     <file>ui/ripples.js</file>
     <file>ui/runDialog.js</file>
     <file>ui/screenShield.js</file>
     <file>ui/screenshot.js</file>
     <file>ui/scripting.js</file>
-    <file>ui/search.js</file>
-    <file>ui/searchController.js</file>
     <file>ui/sessionMode.js</file>
     <file>ui/shellDBus.js</file>
     <file>ui/shellEntry.js</file>
@@ -131,13 +117,10 @@
     <file>ui/userWidget.js</file>
     <file>ui/windowAttentionHandler.js</file>
     <file>ui/windowManager.js</file>
+    <file>ui/windowLayout.js</file>
     <file>ui/windowMenu.js</file>
-    <file>ui/windowPreview.js</file>
-    <file>ui/workspace.js</file>
     <file>ui/workspaceAnimation.js</file>
-    <file>ui/workspacesView.js</file>
     <file>ui/workspaceSwitcherPopup.js</file>
-    <file>ui/workspaceThumbnail.js</file>
     <file>ui/xdndHandler.js</file>
 
     <file>ui/components.js</file>

@@ -22,7 +22,6 @@ const _modes = {
     'restrictive': {
         parentMode: null,
         stylesheetName: 'gnome-shell.css',
-        colorScheme: 'prefer-dark',
         themeResourceName: 'gnome-shell-theme.gresource',
         allowSettings: false,
         allowScreencast: false,

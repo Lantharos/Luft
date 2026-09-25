@@ -158,7 +158,6 @@ export async function start() {
     sessionMode.connect('updated', _sessionUpdated);
 
     St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
-    St.Settings.get().connect('notify::color-scheme', _loadDefaultStylesheet);
 
     // Initialize ParentalControlsManager before the UI
     ParentalControlsManager.getDefault();
@@ -406,40 +405,9 @@ function _getStylesheet(name) {
     return null;
 }
 
-/** @returns {string} */
-export function getStyleVariant() {
-    const {colorScheme} = St.Settings.get();
-    switch (sessionMode.colorScheme) {
-    case 'force-dark':
-        return 'dark';
-    case 'force-light':
-        return 'light';
-    case 'prefer-dark':
-        return colorScheme === St.SystemColorScheme.PREFER_LIGHT
-            ? 'light' : 'dark';
-    case 'prefer-light':
-        return colorScheme === St.SystemColorScheme.PREFER_DARK
-            ? 'dark' : 'light';
-    default:
-        return '';
-    }
-}
-
 function _getDefaultStylesheet() {
-    let stylesheet = null;
-    const name = sessionMode.stylesheetName;
-
-    // Look for a high-contrast variant first
-    if (St.Settings.get().high_contrast)
-        stylesheet = _getStylesheet(name.replace('.css', '-high-contrast.css'));
-
-    if (stylesheet === null)
-        stylesheet = _getStylesheet(name.replace('.css', `-${getStyleVariant()}.css`));
-
-    if (stylesheet == null)
-        stylesheet = _getStylesheet(name);
-
-    return stylesheet;
+    const variant = St.Settings.get().high_contrast ? 'high-contrast' : 'dark';
+    return _getStylesheet(sessionMode.stylesheetName.replace('.css', `-${variant}.css`));
 }
 
 function _loadDefaultStylesheet() {

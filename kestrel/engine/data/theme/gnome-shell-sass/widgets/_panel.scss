@@ -5,10 +5,9 @@ $privacy_indicator_color: if($variant == 'light', $orange_4, $orange_3);
 $recording_indicator_color: $red_4;
 
 $transparent_panel_fg_color: $light_1;    // always white for transparent lock screens
-$system_panel_fg_color: $system_fg_color; // always light for lockscreen, overview
 
 $panel_height: 2.2em;
-$panel_transition_duration: 250ms; // same as the overview transition duration
+$panel_transition_duration: 250ms;
 
 #panel {
   background-color: $panel_bg_color;
@@ -95,8 +94,7 @@ $panel_transition_duration: 250ms; // same as the overview transition duration
     }
   }
 
-  // transparent panel on overview, lock & login screens
-  &:overview,
+  // transparent panel on lock & login screens
   &.unlock-screen,
   &.login-screen {
     background-color: transparent;
@@ -122,22 +120,6 @@ $panel_transition_duration: 250ms; // same as the overview transition duration
       // clock
       &.clock-display {
         @include panel_button($fg:$transparent_panel_fg_color, $highlighted_child: true, $child_class: '.clock');
-      }
-    }
-  }
-
-  // use system text styles for overview panel
-  &:overview {
-    .panel-button {
-      @include panel_button($fg:$system_panel_fg_color);
-
-      &#panelActivities .workspace-dot {
-        background-color: $system_panel_fg_color;
-      }
-
-      // clock
-      &.clock-display {
-        @include panel_button($fg:$system_panel_fg_color, $highlighted_child: true, $child_class: '.clock');
       }
     }
   }

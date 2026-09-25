@@ -12,6 +12,7 @@ import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { blurSurface } from './surface.js';
 import { LOCK, bindAvailability } from './sessionActions.js';
+import { Battery, type BatteryState } from './battery.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 
 interface TrackedIcon extends St.Icon {
@@ -32,13 +33,16 @@ export class QuickSettings {
   private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
   private readonly controls: St.Button[] = [];
   private subpage: ControlMenu | null = null;
+  private readonly batteryLabel = new St.Label({ style_class: 'kestrel-quick-battery', x_expand: true, x_align: Clutter.ActorAlign.END, y_align: Clutter.ActorAlign.CENTER, visible: false });
+  private batteryState: BatteryState | null = null;
+  private updateStatus = () => {};
   private layoutLater = 0;
 
   constructor(
     private readonly source: QuickSettingsSource,
     private readonly layoutChanged: () => void,
     private readonly close: () => void,
-    statusChanged: (network: string, volume: string) => void,
+    statusChanged: (icons: string[]) => void,
     private readonly menus: ContextMenus,
   ) {
     blurSurface(this.actor);
@@ -67,7 +71,15 @@ export class QuickSettings {
     const lock = this.footerButton(LOCK.icon, 'Lock screen', () => { this.close(); LOCK.run(); });
     bindAvailability(LOCK, lock);
     this.footer.add_child(lock);
+    this.footer.add_child(this.batteryLabel);
     this.actor.add_child(this.footer);
+    const battery = new Battery(state => {
+      this.batteryState = state;
+      this.batteryLabel.visible = !!state;
+      if (state) this.batteryLabel.text = `${state.percentage}%`;
+      this.updateStatus();
+    });
+    this.actor.connect('destroy', () => battery.destroy());
 
     source.ready.then(() => {
       const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._powerProfiles, 'power'],
@@ -86,16 +98,20 @@ export class QuickSettings {
       this.addSlider('sound', createInputSlider());
       this.addSlider('display', source._brightness.quickSettingsItems[0]);
       const networkIcons = source._network?.get_children() as TrackedIcon[] ?? [];
+      const bluetoothIcons = source._bluetooth?.get_children() as TrackedIcon[] ?? [];
       const volumeIcons = source._volumeOutput.get_children() as TrackedIcon[];
-      const updateStatus = () => statusChanged(
-        networkIcons.find(icon => icon.visible)?.icon_name ?? 'network-offline-symbolic',
-        volumeIcons.find(icon => icon.visible)?.icon_name ?? 'audio-volume-muted-symbolic',
-      );
-      for (const icon of [...networkIcons, ...volumeIcons]) {
-        icon.connectObject('notify::icon-name', updateStatus, this.actor);
-        icon.connectObject('notify::visible', updateStatus, this.actor);
+      const visibleIcon = (icons: TrackedIcon[]) => icons.find(icon => icon.visible)?.icon_name;
+      this.updateStatus = () => statusChanged([
+        visibleIcon(networkIcons) ?? 'network-offline-symbolic',
+        visibleIcon(bluetoothIcons),
+        visibleIcon(volumeIcons) ?? 'audio-volume-muted-symbolic',
+        this.batteryState?.iconName,
+      ].filter((icon): icon is string => !!icon));
+      for (const icon of [...networkIcons, ...bluetoothIcons, ...volumeIcons]) {
+        icon.connectObject('notify::icon-name', this.updateStatus, this.actor);
+        icon.connectObject('notify::visible', this.updateStatus, this.actor);
       }
-      updateStatus();
+      this.updateStatus();
       this.queueLayout();
     }).catch(error => console.error('Quick settings could not initialize', error));
   }

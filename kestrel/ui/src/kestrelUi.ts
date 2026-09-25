@@ -90,7 +90,7 @@ class KestrelUi {
     }, this.menus, this.previews);
     this.start = new StartMenu(() => this.close(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
-      (network, volume) => this.panel.updateStatus(network, volume), this.menus);
+      icons => this.panel.updateStatus(icons), this.menus);
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
 
     context.layoutManager.addTopChrome(this.menus.shield);

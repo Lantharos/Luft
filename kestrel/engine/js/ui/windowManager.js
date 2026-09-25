@@ -22,12 +22,15 @@ import * as IBusManager from '../misc/ibusManager.js';
 import * as WorkspaceAnimation from './workspaceAnimation.js';
 
 import * as Main from './main.js';
+import {blurSurface} from './kestrelGlass.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 
 const MINIMIZE_WINDOW_ANIMATION_TIME = 300;
 const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;
 const MINIMIZED_WINDOW_SCALE = 0.04;
+const TILE_PREVIEW_GAP = 8;
+const TILE_PREVIEW_RADIUS = 16;
 export const SHOW_WINDOW_ANIMATION_TIME = 150;
 export const DIALOG_SHOW_WINDOW_ANIMATION_TIME = 100;
 export const DESTROY_WINDOW_ANIMATION_TIME = 150;
@@ -388,7 +391,8 @@ class WorkspaceTracker {
 export const TilePreview = GObject.registerClass(
 class TilePreview extends St.Widget {
     _init() {
-        super._init();
+        super._init({style_class: 'tile-preview'});
+        blurSurface(this, TILE_PREVIEW_RADIUS);
         global.window_group.add_child(this);
 
         this._reset();
@@ -413,8 +417,6 @@ class TilePreview extends St.Widget {
 
         const monitor = Main.layoutManager.monitors[monitorIndex];
 
-        this._updateStyle(monitor);
-
         if (!this._showing || changeMonitor) {
             const monitorRect = new Mtk.Rectangle({
                 x: monitor.x,
@@ -431,13 +433,13 @@ class TilePreview extends St.Widget {
         this._showing = true;
         this.show();
         this.ease({
-            x: tileRect.x,
-            y: tileRect.y,
-            width: tileRect.width,
-            height: tileRect.height,
+            x: tileRect.x + TILE_PREVIEW_GAP,
+            y: tileRect.y + TILE_PREVIEW_GAP,
+            width: tileRect.width - 2 * TILE_PREVIEW_GAP,
+            height: tileRect.height - 2 * TILE_PREVIEW_GAP,
             opacity: 255,
             duration: WINDOW_ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            mode: Clutter.AnimationMode.EASE_OUT_QUART,
         });
     }
 
@@ -458,18 +460,6 @@ class TilePreview extends St.Widget {
         this.hide();
         this._rect = null;
         this._monitorIndex = -1;
-    }
-
-    _updateStyle(monitor) {
-        const styles = ['tile-preview'];
-        if (this._monitorIndex === Main.layoutManager.primaryIndex)
-            styles.push('on-primary');
-        if (this._rect.x === monitor.x)
-            styles.push('tile-preview-left');
-        if (this._rect.x + this._rect.width === monitor.x + monitor.width)
-            styles.push('tile-preview-right');
-
-        this.style_class = styles.join(' ');
     }
 });
 

@@ -78,6 +78,23 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(250);
   require(Main.modalCount === 0, 'password dialog cancels cleanly');
 
+  const media = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_MEDIA_SCRIPT')], Gio.SubprocessFlags.NONE);
+  try {
+    await pause(1200);
+    toggleSurface('notifications');
+    await pause(450);
+    const mediaCard = actorNamed(global.stage, 'kestrel-notifications').get_first_child();
+    require(mediaCard.visible, 'media controls appear for a playing app');
+    await capture(`${output}/media-controls.png`);
+    actorNamed(mediaCard, 'Pause').emit('clicked', 1);
+    await pause(400);
+    require(!!actorNamed(mediaCard, 'Play'), 'media controls toggle playback');
+    dismissImmediately();
+  } finally {
+    media.force_exit();
+  }
+  await pause(300);
+
   const endSession = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'];
   await call(...endSession, 'Open', new GLib.Variant('(uuuao)', [0, 0, 60, []]));
   await pause(350);

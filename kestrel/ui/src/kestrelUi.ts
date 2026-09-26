@@ -4,6 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
+import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
 import { navigateWithKeyboard } from './keyboardNavigation.js';
@@ -20,9 +21,10 @@ import { animateActor } from './motion.js';
 import type { QuickSettingsSource } from './quickControls.js';
 import { AccentService } from './accent/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
+import { SnapLayouts } from './snapLayouts.js';
 import type { Rgb } from './accent/color.js';
 
-type Surface = 'start' | 'quick' | 'notifications' | 'clipboard';
+type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap';
 
 const START_HEIGHT = 600;
 const CLIPBOARD_WIDTH = 420;
@@ -37,6 +39,7 @@ interface LayoutManager {
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   addTopChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   removeChrome(actor: Clutter.Actor): void;
+  getWorkAreaForMonitor(index: number): Mtk.Rectangle;
   connect(signal: string, callback: () => void): number;
   disconnect(id: number): void;
 }
@@ -48,6 +51,7 @@ interface Context {
   sessionMode: { isLocked: boolean; isGreeter: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
   screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
+  snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   registerPanel(actor: St.Widget): void;
 }
 
@@ -61,6 +65,7 @@ class KestrelUi {
   private readonly quick: QuickSettings;
   private readonly notifications: NotificationCenter;
   private readonly clipboard: ClipboardPanel;
+  private readonly snapLayouts: SnapLayouts;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
@@ -97,6 +102,7 @@ class KestrelUi {
       icons => this.panels.primary.updateStatus(icons), this.menus);
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
+    this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -116,6 +122,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.quick.actor);
     context.layoutManager.addTopChrome(this.notifications.actor);
     context.layoutManager.addTopChrome(this.clipboard.actor);
+    context.layoutManager.addTopChrome(this.snapLayouts.actor);
     for (const actor of this.surfaces()) {
       const updateClip = () => actor.set_clip(0, 0, actor.width,
         Math.max(0, this.panels.forMonitor(this.surfaceMonitor()).actor.y - actor.y - actor.translation_y));
@@ -257,6 +264,9 @@ class KestrelUi {
     const clipboardHeight = this.clipboard.preferredHeight(CLIPBOARD_WIDTH, Math.min(CLIPBOARD_MAXIMUM_HEIGHT, available));
     this.clipboard.actor.set_size(CLIPBOARD_WIDTH, clipboardHeight);
     this.clipboard.actor.set_position(Math.round(monitor.x + (monitor.width - CLIPBOARD_WIDTH) / 2), bottom - clipboardHeight);
+    const [snapWidth, snapHeight] = this.snapLayouts.size();
+    this.snapLayouts.actor.set_size(snapWidth, snapHeight);
+    this.snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
   }
 
   private pointerMonitor(): Monitor {
@@ -268,6 +278,7 @@ class KestrelUi {
     if (!this.canInteract()) return;
     this.previews.close();
     if (surface === 'clipboard' && this.clipboard.empty) return;
+    if (surface === 'snap' && !this.snapLayouts.available) return;
     if (this.active === surface && this.surfaceMonitor() === monitor) {
       this.close();
       return;
@@ -297,6 +308,7 @@ class KestrelUi {
     actor.show();
     if (surface === 'notifications') this.notifications.prepareOpen();
     if (surface === 'clipboard') this.clipboard.prepareOpen();
+    if (surface === 'snap') this.snapLayouts.prepareOpen();
     this.place();
     if (opening) {
       actor.opacity = 255;
@@ -307,6 +319,7 @@ class KestrelUi {
     if (surface === 'start') this.start.focus();
     else if (surface === 'notifications') this.notifications.focus();
     else if (surface === 'clipboard') this.clipboard.focus();
+    else if (surface === 'snap') this.snapLayouts.focus();
     else actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
@@ -353,7 +366,7 @@ class KestrelUi {
   startOpen(): boolean { return this.active === 'start'; }
 
   private surfaces(): St.BoxLayout[] {
-    return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor];
+    return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor, this.snapLayouts.actor];
   }
 
   private actorFor(surface: Surface): St.BoxLayout {
@@ -362,6 +375,7 @@ class KestrelUi {
       case 'quick': return this.quick.actor;
       case 'notifications': return this.notifications.actor;
       case 'clipboard': return this.clipboard.actor;
+      case 'snap': return this.snapLayouts.actor;
     }
   }
 

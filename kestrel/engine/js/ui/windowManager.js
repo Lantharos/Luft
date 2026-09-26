@@ -23,6 +23,7 @@ import * as WorkspaceAnimation from './workspaceAnimation.js';
 
 import * as Main from './main.js';
 import {blurSurface} from './kestrelGlass.js';
+import {CornerSnap} from './cornerSnap.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 
@@ -516,6 +517,8 @@ export class WindowManager {
         });
 
         this._shellwm.connect('switch-workspace', this._switchWorkspace.bind(this));
+        this._tileRequest = null;
+        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this));
         this._shellwm.connect('show-tile-preview', this._showTilePreview.bind(this));
         this._shellwm.connect('hide-tile-preview', this._hideTilePreview.bind(this));
         this._shellwm.connect('show-window-menu', this._showWindowMenu.bind(this));
@@ -757,6 +760,12 @@ export class WindowManager {
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL,
             () => KestrelUi.toggleSurface('clipboard'));
+
+        this.addKeybinding('kestrel-snap-layouts',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('snap'));
 
         for (let index = 1; index <= 10; index++) {
             this.addKeybinding(`kestrel-workspace-${index}`,
@@ -1550,15 +1559,33 @@ export class WindowManager {
     }
 
     _showTilePreview(shellwm, window, tileRect, monitorIndex) {
-        if (!this._tilePreview)
-            this._tilePreview = new TilePreview();
-        this._tilePreview.open(window, tileRect, monitorIndex);
+        this._tileRequest = [window, tileRect, monitorIndex];
+        if (!this._cornerSnap.active)
+            this._openTilePreview(window, tileRect, monitorIndex);
     }
 
     _hideTilePreview() {
-        if (!this._tilePreview)
-            return;
-        this._tilePreview.close();
+        this._tileRequest = null;
+        if (!this._cornerSnap.active)
+            this._tilePreview?.close();
+    }
+
+    _openTilePreview(window, rect, monitorIndex) {
+        this._tilePreview ??= new TilePreview();
+        this._tilePreview.open(window, rect, monitorIndex);
+    }
+
+    _showCornerPreview(window, rect, monitorIndex) {
+        if (rect)
+            this._openTilePreview(window, rect, monitorIndex);
+        else if (this._tileRequest)
+            this._openTilePreview(...this._tileRequest);
+        else
+            this._tilePreview?.close();
+    }
+
+    snapWindow(window, rect) {
+        this._cornerSnap.snap(window, rect);
     }
 
     _showWindowMenu(shellwm, window, menu, rect) {

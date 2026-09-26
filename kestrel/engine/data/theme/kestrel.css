@@ -147,6 +147,11 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-header { spacing: 12px; padding: 0 4px; }
 .kestrel-notification-center { spacing: 14px; }
 
+.kestrel-snap-layouts { padding: 14px; }
+.kestrel-snap-card { border-radius: 12px; background-color: rgba(255, 255, 255, 0.06); }
+.kestrel-snap-zone { border-radius: 7px; background-color: rgba(255, 255, 255, 0.16); transition-duration: 100ms; }
+.kestrel-snap-zone:hover, .kestrel-snap-zone:focus { background-color: rgba(255, 255, 255, 0.46); }
+
 .kestrel-clipboard { padding: 10px; spacing: 6px; }
 .kestrel-clipboard-list { spacing: 4px; }
 .kestrel-clipboard-row { padding: 10px 12px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.06); transition-duration: 120ms; }

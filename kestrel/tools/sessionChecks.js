@@ -239,6 +239,35 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Alt_L, Clutter.KeyState.RELEASED);
     await pause(250);
     require(Main.modalCount === 0, 'Alt release accepts window selection');
+    const snapped = windows.find(candidate => candidate.title === 'Kestrel window check 1');
+    snapped.activate(global.get_current_time());
+    await pause(200);
+    toggleSurface('snap');
+    await pause(400);
+    const snapPicker = actorNamed(global.stage, 'kestrel-snap-layouts');
+    require(snapPicker.visible, 'Super+Z shows snap layouts for the focused window');
+    await capture(`${output}/snap-layouts.png`);
+    snapPicker.get_child_at_index(1).get_first_child().get_first_child().emit('clicked', 1);
+    await pause(400);
+    const area = Main.layoutManager.getWorkAreaForMonitor(snapped.get_monitor());
+    const quarter = snapped.get_frame_rect();
+    require(quarter.x === area.x && quarter.y === area.y && Math.abs(quarter.width - area.width / 2) <= 1 && Math.abs(quarter.height - area.height / 2) <= 1,
+      'snap layouts place the window in the chosen zone');
+    const [titleX, titleY] = [quarter.x + quarter.width / 2, quarter.y + 16];
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), titleX, titleY);
+    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
+    await pause(100);
+    for (let step = 1; step <= 16; step++) {
+      pointer.notify_absolute_motion(GLib.get_monotonic_time(), titleX + (area.x + area.width - 1 - titleX) * step / 16, titleY + (area.y + 1 - titleY) * step / 16);
+      await pause(30);
+    }
+    await pause(200);
+    await capture(`${output}/corner-snap.png`);
+    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
+    await pause(500);
+    const corner = snapped.get_frame_rect();
+    require(corner.y === area.y && Math.abs(corner.x - (area.x + area.width / 2)) <= 1 && Math.abs(corner.width - area.width / 2) <= 1,
+      'dragging a window into a corner snaps it to that quarter');
     keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
     await pause(100);
     keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Alt_L, Clutter.KeyState.PRESSED);

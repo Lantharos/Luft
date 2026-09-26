@@ -263,6 +263,7 @@ async function _initializeUI() {
     KestrelUi.initialize({
         layoutManager, messageTray, quickSettings, sessionMode, screenShield,
         canInteract: () => actionMode === Shell.ActionMode.NORMAL,
+        snapWindow: (window, rect) => wm.snapWindow(window, rect),
         registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
     });
 

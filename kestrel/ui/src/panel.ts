@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
@@ -26,6 +27,7 @@ export interface PanelActions {
   quickSettings(): void;
   notifications(): void;
   tasks(): void;
+  activateWindow(window: Meta.Window): void;
 }
 
 export class KestrelPanel {
@@ -44,7 +46,7 @@ export class KestrelPanel {
   private clockTimer = 0;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1);
+    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1, actions.activateWindow);
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',

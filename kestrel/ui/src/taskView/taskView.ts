@@ -24,7 +24,7 @@ export class TaskView {
   private signals: [GObject.Object, number][] = [];
   private rebuildSource = 0;
 
-  constructor(background: BackgroundFactory, private readonly dismiss: () => void) {
+  constructor(background: BackgroundFactory, private readonly dismiss: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 0);
     this.strip = new WorkspaceStrip(background);
     this.actor.add_child(this.windowLayer);
@@ -111,7 +111,7 @@ export class TaskView {
     const windows = shell.display.get_tab_list(Meta.TabList.NORMAL, workspace);
     this.cards = windows.map(window => new WindowCard(window, () => {
       this.dismiss();
-      window.activate(shell.get_current_time());
+      this.activateWindow(window);
     }, () => this.scheduleRebuild()));
     for (const card of this.cards) this.windowLayer.add_child(card.actor);
     this.strip.build(monitor);

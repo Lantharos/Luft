@@ -264,6 +264,7 @@ async function _initializeUI() {
         layoutManager, messageTray, quickSettings, sessionMode, screenShield,
         canInteract: () => actionMode === Shell.ActionMode.NORMAL,
         snapWindow: (window, rect) => wm.snapWindow(window, rect),
+        activateWindow: window => wm.activateWithSnapGroup(window),
         createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
         registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
     });

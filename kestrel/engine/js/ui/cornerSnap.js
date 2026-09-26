@@ -79,6 +79,30 @@ export class CornerSnap {
         this._snapped.set(window, {...restore, rect});
     }
 
+    /**
+     * @param {Meta.Window} window
+     * @returns {Meta.Window[]} windows arranged alongside it on its workspace and monitor, most recent first
+     */
+    group(window) {
+        const workspace = window.get_workspace();
+        const monitor = window.get_monitor();
+        const arranged = candidate => candidate.get_workspace() === workspace &&
+            candidate.get_monitor() === monitor &&
+            (this._snapped.get(candidate)?.rect?.equal(candidate.get_frame_rect()) ||
+             (candidate.maximized_vertically && !candidate.maximized_horizontally));
+        if (!arranged(window))
+            return [];
+
+        const members = [window];
+        for (const candidate of global.display.get_tab_list(Meta.TabList.NORMAL, workspace)) {
+            const frame = candidate.get_frame_rect();
+            if (!members.includes(candidate) && arranged(candidate) &&
+                !members.some(member => member.get_frame_rect().overlap(frame)))
+                members.push(candidate);
+        }
+        return members.slice(1);
+    }
+
     _begin(window, op) {
         if (!window || !MOVE_OPS.includes(op))
             return;

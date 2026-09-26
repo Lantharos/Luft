@@ -54,6 +54,7 @@ interface Context {
   screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
+  activateWindow(window: Meta.Window): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
 }
@@ -98,8 +99,8 @@ class KestrelUi {
     }
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
-    this.menus = new ContextMenus((x, y) => this.monitorAt(x, y), () => this.close(), () => this.canInteract(), () => this.previews.close());
-    this.previews = new WindowPreviews(actor => this.monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, () => this.close());
+    this.menus = new ContextMenus((x, y) => this.monitorAt(x, y), () => this.close(), () => this.canInteract(), () => this.previews.close(), context.activateWindow);
+    this.previews = new WindowPreviews(actor => this.monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, () => this.close(), context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);
     this.start = new StartMenu(() => this.close(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
@@ -107,7 +108,7 @@ class KestrelUi {
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
-    this.taskView = new TaskView(context.createBackground, () => this.close());
+    this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -121,6 +122,7 @@ class KestrelUi {
       quickSettings: () => this.toggle('quick', monitor()),
       notifications: () => this.toggle('notifications', monitor()),
       tasks: () => this.toggle('tasks', monitor()),
+      activateWindow: context.activateWindow,
     }), this.menus, this.previews);
 
     context.layoutManager.addTopChrome(this.cover);

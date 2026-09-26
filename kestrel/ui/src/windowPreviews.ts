@@ -20,7 +20,7 @@ export class WindowPreviews {
   private windowSignals: [Meta.Window | Clutter.Actor, number][] = [];
   private clearSelection: (() => void) | null = null;
 
-  constructor(private readonly monitorFor: (actor: Clutter.Actor) => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
+  constructor(private readonly monitorFor: (actor: Clutter.Actor) => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 16);
     this.actor.connect('notify::hover', () => {
       if (this.actor.hover) this.cancelTimer();
@@ -97,7 +97,7 @@ export class WindowPreviews {
         this.windowSignals.push([source, source.connect('notify::width', resize)], [source, source.connect('notify::height', resize)]);
       }
       const activate = new St.Button({ child: preview, can_focus: true, style_class: 'kestrel-preview-window', accessible_name: window.title || app.get_name() });
-      activate.connect('clicked', () => { this.close(); window.activate((global as unknown as Shell.Global).get_current_time()); });
+      activate.connect('clicked', () => { this.close(); this.activateWindow(window); });
       firstWindow ??= activate;
       for (const control of [activate, close]) control.connect('key-focus-in', () => ensureActorVisibleInScrollView(scroll, control));
       card.add_child(activate);

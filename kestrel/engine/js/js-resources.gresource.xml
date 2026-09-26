@@ -63,6 +63,7 @@
     <file>ui/boxpointer.js</file>
     <file>ui/checkBox.js</file>
     <file>ui/closeDialog.js</file>
+    <file>ui/cornerSnap.js</file>
     <file>ui/ctrlAltTab.js</file>
     <file>ui/dialog.js</file>
     <file>ui/dnd.js</file>

@@ -15,5 +15,6 @@ export function accentStylesheet(accent: Rgb): string {
 .modal-dialog.modal-dialog .modal-dialog-button:default { background-color: ${rgba(strong, 0.9)}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default:hover { background-color: ${rgba(strong, 1)}; }
 .modal-dialog.modal-dialog .check-box:checked StIcon { background-color: ${rgba(strong, 1)}; }
+.kestrel-snap-zone.kestrel-snap-zone:hover, .kestrel-snap-zone.kestrel-snap-zone:focus { background-color: ${rgba(accent, 0.75)}; }
 `;
 }

@@ -137,6 +137,10 @@
       <default>["&lt;Super&gt;v"]</default>
       <summary>Show clipboard history</summary>
     </key>
+    <key name="kestrel-snap-layouts" type="as">
+      <default>["&lt;Super&gt;z"]</default>
+      <summary>Show snap layouts for the focused window</summary>
+    </key>
     <key name="kestrel-workspace-1" type="as">
       <default>["&lt;Super&gt;1"]</default>
       <summary>Switch to workspace 1</summary>

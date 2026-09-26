@@ -89,7 +89,7 @@ Kestrel takes its accent color from the wallpaper's most vivid dominant hue and 
 
 ### Window snapping
 
-Dragging a window to the top edge maximizes it, and dragging it to the left or right edge fills that half of the display. Super and the arrow keys do the same. A glass preview inset from the target area shows where the window will land.
+Dragging a window to the top edge maximizes it, dragging it to the left or right edge fills that half of the display, and dragging it into a corner fills that quarter. Super and the arrow keys snap to halves and maximize. A glass preview inset from the target area shows where the window will land. Super+Z opens snap layouts for the focused window with halves, two-thirds splits, thirds, quarters, and mixed layouts; choosing an area places the window there. Dragging a window out of a quarter or layout area restores its earlier size.
 
 ### Window corners and blur
 

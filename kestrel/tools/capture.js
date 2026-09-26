@@ -10,6 +10,7 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {checkFolders} from './folderChecks.js';
 import {checkSession} from './sessionChecks.js';
 import {checkTray} from './trayChecks.js';
+import {checkTaskView} from './taskViewChecks.js';
 import {captureRenderedFrames} from './frameCapture.js';
 
 export const METRICS = {};
@@ -304,6 +305,7 @@ export async function run() {
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
   await checkFolders({pause, capture, actorNamed, pointer, output});
   await checkTray({pause, capture, actorNamed, pointer, output});
+  await checkTaskView({pause, capture, actorNamed, pointer, keyboard, output});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

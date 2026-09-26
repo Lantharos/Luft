@@ -1537,7 +1537,7 @@ export class WindowManager {
     }
 
     _switchWorkspace(shellwm, from, to, direction) {
-        if (!Main.sessionMode.hasWorkspaces || !this._shouldAnimate()) {
+        if (!Main.sessionMode.hasWorkspaces || !this._shouldAnimate() || KestrelUi.taskViewOpen()) {
             shellwm.completed_switch_workspace();
             return;
         }
@@ -1594,6 +1594,10 @@ export class WindowManager {
 
     _startSwitcher(display, window, event, binding) {
         const name = binding.get_name();
+        if (name === 'switch-applications' && binding.get_modifiers() & Clutter.ModifierType.SUPER_MASK) {
+            KestrelUi.toggleSurface('tasks');
+            return;
+        }
         let createPopup = null;
         switch (name) {
         case 'switch-applications':

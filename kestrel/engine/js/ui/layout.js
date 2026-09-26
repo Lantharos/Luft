@@ -866,6 +866,10 @@ export const LayoutManager = GObject.registerClass({
         this._trackedActors.forEach(this._updateActorVisibility.bind(this));
     }
 
+    createBackground(container, monitorIndex) {
+        return new Background.BackgroundManager({container, layoutManager: this, monitorIndex, controlPosition: false});
+    }
+
     getWorkAreaForMonitor(monitorIndex) {
         // Assume that all workspaces will have the same
         // struts and pick the first one.

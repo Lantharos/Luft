@@ -77,6 +77,16 @@ The capture command exercises audio selection, encrypted-volume password, and lo
 
 The development launcher loads resources, typelibs, libraries, and schemas from the build directory, without depending on an installed temporary prefix.
 
+### Wallpaper and accent color
+
+Wallpapers are decoded once and kept at the size of the largest display instead of their original resolution, so large photos do not hold full-resolution copies in memory. Centered and tiled wallpapers keep their original size.
+
+Kestrel takes its accent color from the wallpaper's most vivid dominant hue and uses it for toggles that are on, slider fills, the focused app's taskbar indicator, today's date in the calendar, and the default action in system dialogs. Other apps can follow the same color:
+
+- GTK and libadwaita apps follow the closest named GNOME accent color, which Kestrel sets in `org.gnome.desktop.interface accent-color`.
+- The exact color is available on the session bus as the `AccentColor` property of `dev.lantharos.Kestrel.Appearance` at `/dev/lantharos/Kestrel/Appearance` on `dev.lantharos.Kestrel`, with a `PropertiesChanged` signal when it changes.
+- `~/.config/kestrel/appearance.json` holds `accentColor`, a darker `accentStrongColor` for filled controls with white text, and `accentName`. `~/.config/kestrel/appearance.css` defines `--kestrel-accent` and `--kestrel-accent-strong` for web views.
+
 ### Window snapping
 
 Dragging a window to the top edge maximizes it, and dragging it to the left or right edge fills that half of the display. Super and the arrow keys do the same. A glass preview inset from the target area shows where the window will land.

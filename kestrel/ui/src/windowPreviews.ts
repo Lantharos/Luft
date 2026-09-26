@@ -20,7 +20,7 @@ export class WindowPreviews {
   private windowSignals: [Meta.Window | Clutter.Actor, number][] = [];
   private clearSelection: (() => void) | null = null;
 
-  constructor(private readonly monitor: () => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
+  constructor(private readonly monitorFor: (actor: Clutter.Actor) => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
     blurSurface(this.actor, 16);
     this.actor.connect('notify::hover', () => {
       if (this.actor.hover) this.cancelTimer();
@@ -55,7 +55,7 @@ export class WindowPreviews {
   open(button: St.Button, app: Shell.App, focus = false): void {
     this.cancelTimer();
     if (!this.enabled()) return;
-    const monitor = this.monitor();
+    const monitor = this.monitorFor(button);
     const windows = app.get_windows().filter(window => !window.skip_taskbar);
     if (!monitor || !windows.length) return;
     this.beforeOpen();

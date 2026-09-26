@@ -13,13 +13,14 @@ import type { ContextMenus } from './contextMenus.js';
 import { createLauncher } from './launcher.js';
 
 export interface Monitor {
+  index: number;
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-interface PanelActions {
+export interface PanelActions {
   start(): void;
   quickSettings(): void;
   notifications(): void;
@@ -35,14 +36,14 @@ export class KestrelPanel {
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker, number][] = [];
   private readonly startButton: St.Button;
-  private readonly quickButton: St.Button;
+  private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
   private clockTimer = 0;
 
-  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites);
+  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor, readonly primary: boolean) {
+    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor.index);
     this.actor = new St.Widget({
-      name: 'kestrel-panel',
+      name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
       reactive: true,
       layout_manager: new PanelLayout(),
@@ -50,7 +51,7 @@ export class KestrelPanel {
     blurSurface(this.actor, 0);
 
     const center = new St.BoxLayout({
-      name: 'kestrel-panel-center',
+      name: primary ? 'kestrel-panel-center' : null,
       style_class: 'kestrel-taskbar',
       x_align: Clutter.ActorAlign.CENTER,
       y_align: Clutter.ActorAlign.CENTER,
@@ -61,17 +62,24 @@ export class KestrelPanel {
     this.actor.add_child(center);
 
     const right = new St.BoxLayout({
-      name: 'kestrel-panel-status',
+      name: primary ? 'kestrel-panel-status' : null,
       style_class: 'kestrel-panel-status',
       x_align: Clutter.ActorAlign.END,
       y_align: Clutter.ActorAlign.CENTER,
     });
-    this.quickButton = new St.Button({
-      style_class: 'kestrel-status-button', child: this.statusIcons,
-      can_focus: true, accessible_name: 'Quick settings',
-    });
-    this.quickButton.connect('clicked', actions.quickSettings);
-    right.add_child(this.quickButton);
+    if (primary) {
+      this.quickButton = new St.Button({
+        style_class: 'kestrel-status-button', child: this.statusIcons,
+        can_focus: true, accessible_name: 'Quick settings',
+      });
+      this.quickButton.connect('clicked', actions.quickSettings);
+      right.add_child(this.quickButton);
+      menus.bind(this.quickButton, () => [
+        { label: 'Quick settings', run: actions.quickSettings },
+        { label: 'Network settings', run: () => menus.settings('network') },
+        { label: 'Sound settings', run: () => menus.settings('sound') },
+      ]);
+    }
     this.clockButton = new St.Button({
       style_class: 'kestrel-status-button', child: this.clock,
       can_focus: true, accessible_name: 'Notifications and date',
@@ -97,11 +105,6 @@ export class KestrelPanel {
       { label: 'Notifications', run: actions.notifications },
       { label: 'Date and time settings', run: () => menus.settings('datetime') },
     ]);
-    menus.bind(this.quickButton, () => [
-      { label: 'Quick settings', run: actions.quickSettings },
-      { label: 'Network settings', run: () => menus.settings('network') },
-      { label: 'Sound settings', run: () => menus.settings('sound') },
-    ]);
     this.refreshApps();
     this.clock.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
     this.refreshClock();
@@ -114,6 +117,11 @@ export class KestrelPanel {
     this.externalSignals.length = 0;
   }
 
+  destroy(): void {
+    this.shutdown();
+    this.actor.destroy();
+  }
+
   updateStatus(iconNames: string[]): void {
     const icons = this.statusIcons.get_children() as St.Icon[];
     iconNames.forEach((iconName, index) => {
@@ -124,9 +132,9 @@ export class KestrelPanel {
     for (const icon of icons.slice(iconNames.length)) icon.destroy();
   }
 
-  place(monitor: Monitor): void {
-    this.actor.set_position(monitor.x, monitor.y + monitor.height - PANEL_HEIGHT);
-    this.actor.set_size(monitor.width, PANEL_HEIGHT);
+  place(): void {
+    this.actor.set_position(this.monitor.x, this.monitor.y + this.monitor.height - PANEL_HEIGHT);
+    this.actor.set_size(this.monitor.width, PANEL_HEIGHT);
   }
 
   setActive(surface: string | null): void {
@@ -135,8 +143,8 @@ export class KestrelPanel {
       [this.quickButton, surface === 'quick'],
       [this.clockButton, surface === 'notifications'],
     ] as const) {
-      if (active) button.add_style_pseudo_class('active');
-      else button.remove_style_pseudo_class('active');
+      if (active) button?.add_style_pseudo_class('active');
+      else button?.remove_style_pseudo_class('active');
     }
   }
 

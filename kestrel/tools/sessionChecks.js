@@ -29,6 +29,17 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     require(menu.visible && menu.x >= secondary.x && menu.x + menu.width <= secondary.x + secondary.width, 'desktop context menu stays on secondary monitor');
     key(Clutter.KEY_Escape);
     await pause(150);
+    const secondaryPanel = actorNamed(global.stage, 'kestrel-secondary-panel');
+    require(secondaryPanel?.visible && secondaryPanel.x === secondary.x && secondaryPanel.y + secondaryPanel.height === secondary.y + secondary.height,
+      'secondary monitor has its own panel');
+    actorNamed(secondaryPanel, 'Start').emit('clicked', 1);
+    await pause(400);
+    const secondaryStart = actorNamed(global.stage, 'kestrel-start');
+    require(secondaryStart.visible && secondaryStart.x >= secondary.x && secondaryStart.x + secondaryStart.width <= secondary.x + secondary.width,
+      'Start opens on the monitor whose panel was used');
+    await capture(`${output}/secondary-start.png`);
+    dismissImmediately();
+    await pause(200);
   }
   const panel = actorNamed(global.stage, 'kestrel-panel');
   const start = actorNamed(global.stage, 'kestrel-start');
@@ -117,6 +128,19 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   } finally {
     media.force_exit();
   }
+  await pause(300);
+
+  const clipboard = St.Clipboard.get_default();
+  clipboard.set_text(St.ClipboardType.CLIPBOARD, 'https://lantharos.dev/kestrel');
+  await pause(150);
+  clipboard.set_text(St.ClipboardType.CLIPBOARD, 'Meet at the harbour at seven, the table is under Imeri.');
+  await pause(150);
+  toggleSurface('clipboard');
+  await pause(400);
+  const clipboardPanel = actorNamed(global.stage, 'kestrel-clipboard');
+  require(clipboardPanel.visible && clipboardPanel.get_first_child().child.get_n_children() === 2, 'clipboard history lists copied text');
+  await capture(`${output}/clipboard-history.png`);
+  key(Clutter.KEY_Escape);
   await pause(300);
 
   const endSession = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'];

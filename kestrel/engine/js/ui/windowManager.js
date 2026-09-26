@@ -752,6 +752,12 @@ export class WindowManager {
             Shell.ActionMode.POPUP,
             this._toggleQuickSettings.bind(this));
 
+        this.addKeybinding('kestrel-clipboard-history',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('clipboard'));
+
         for (let index = 1; index <= 10; index++) {
             this.addKeybinding(`kestrel-workspace-${index}`,
                 new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),

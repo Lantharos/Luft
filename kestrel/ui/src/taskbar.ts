@@ -31,7 +31,8 @@ export class Taskbar {
   private initialized = false;
   private readonly drop: TaskbarDrop;
 
-  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews, favorites: Gio.Settings) {
+  constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
+    favorites: Gio.Settings, private readonly monitorIndex: () => number) {
     this.drop = new TaskbarDrop(this.actor, () => this.actor.get_children()
       .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
       .filter((item): item is AppItem => !!item)
@@ -124,7 +125,10 @@ export class Taskbar {
     const geometry = new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) });
     if (item.iconGeometry?.equal(geometry)) return;
     item.iconGeometry = geometry;
-    for (const window of item.app.get_windows()) window.set_icon_geometry(geometry);
+    const monitor = this.monitorIndex();
+    for (const window of item.app.get_windows()) {
+      if (window.get_monitor() === monitor) window.set_icon_geometry(geometry);
+    }
   }
 
   private updateDots(item: AppItem, animate = false): void {

@@ -8,6 +8,7 @@ import type { ContextMenus } from './contextMenus.js';
 import { blinkCaret } from './caret.js';
 import { StartGrid } from './start/grid.js';
 import { StartFooter } from './start/footer.js';
+import { StartSearch } from './start/search/search.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
@@ -17,6 +18,7 @@ export class StartMenu {
   private pinned = new Set(this.favorites.get_strv('favorite-apps'));
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;
+  private readonly searchProvider: StartSearch;
   private apps: Gio.AppInfo[] = [];
 
   constructor(private readonly close: () => void, private readonly menus: ContextMenus) {
@@ -56,7 +58,7 @@ export class StartMenu {
       return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
     });
     this.search.get_clutter_text().connect('activate', () => {
-      if (this.browser.firstMatch) this.launch(this.browser.firstMatch);
+      this.browser.firstResult?.activate();
     });
     this.actor.add_child(this.search);
     const scroller = new St.ScrollView({
@@ -67,6 +69,7 @@ export class StartMenu {
       x_expand: true, y_expand: true,
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
+    this.searchProvider = new StartSearch(menus, app => this.launch(app), close);
     this.actor.add_child(this.browser.header);
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
@@ -77,7 +80,7 @@ export class StartMenu {
     const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
     const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => {
       this.pinned = new Set(this.favorites.get_strv('favorite-apps'));
-      this.refreshApps();
+      this.browser.update(this.apps, this.pinned);
     });
     this.actor.connect('destroy', () => {
       this.appSystem.disconnect(installedChanged);
@@ -106,13 +109,17 @@ export class StartMenu {
   }
 
   private loadApps(): void {
-    this.apps = this.appSystem.get_installed().filter(app => app.should_show())
+    const installed = this.appSystem.get_installed();
+    this.apps = installed.filter(app => app.should_show())
       .sort((a, b) => a.get_display_name().localeCompare(b.get_display_name()));
+    this.searchProvider.update(this.apps, installed);
+    this.browser.update(this.apps, this.pinned);
     this.refreshApps();
   }
 
   private refreshApps(): void {
-    this.browser.update(this.apps, this.pinned, this.search.get_text().trim().toLocaleLowerCase());
+    const text = this.search.get_text();
+    this.browser.showResults(text.trim() ? this.searchProvider.results(text) : null);
   }
 
   private launch(app: Gio.AppInfo): void {

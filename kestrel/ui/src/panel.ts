@@ -40,8 +40,8 @@ export class KestrelPanel {
   private readonly clockButton: St.Button;
   private clockTimer = 0;
 
-  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor, readonly primary: boolean) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor.index);
+  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
+    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1);
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
@@ -133,6 +133,7 @@ export class KestrelPanel {
   }
 
   place(): void {
+    if (!this.monitor) return;
     this.actor.set_position(this.monitor.x, this.monitor.y + this.monitor.height - PANEL_HEIGHT);
     this.actor.set_size(this.monitor.width, PANEL_HEIGHT);
   }

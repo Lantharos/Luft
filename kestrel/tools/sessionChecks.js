@@ -41,6 +41,30 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(100);
   require(start.contains(global.stage.get_key_focus()), 'Tab stays in Start');
 
+  const search = start.get_first_child();
+  const results = () => start.get_child_at_index(2).child;
+  const firstResult = () => results().get_first_child();
+  const resultTitle = () => firstResult().child.get_children()[1].get_first_child().text;
+  search.set_text('2*(3+18)');
+  await pause(100);
+  require(resultTitle() === '= 42', 'search evaluates calculations');
+  search.set_text('bluetooth');
+  await pause(100);
+  require(results().get_children().some(row => row.name === 'kestrel-search-setting:gnome-bluetooth-panel.desktop'),
+    'search finds settings pages');
+  const recentFile = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel-quarterly-report.txt']));
+  recentFile.replace_contents(new TextEncoder().encode('report'), null, false, Gio.FileCreateFlags.NONE, null);
+  const history = new GLib.BookmarkFile();
+  history.set_mime_type(recentFile.get_uri(), 'text/plain');
+  history.add_application(recentFile.get_uri(), 'kestrel-check', 'true %u');
+  history.set_modified_date_time(recentFile.get_uri(), GLib.DateTime.new_now_utc());
+  history.to_file(GLib.build_filenamev([GLib.get_user_data_dir(), 'recently-used.xbel']));
+  search.set_text('quarterly');
+  await pause(100);
+  require(resultTitle() === 'kestrel-quarterly-report.txt', 'search finds recent files');
+  await capture(`${output}/search-files.png`);
+  search.set_text('');
+
   Main.sessionMode.pushMode('unlock-dialog');
   try {
     await pause(200);

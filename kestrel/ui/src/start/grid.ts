@@ -5,7 +5,8 @@ import St from 'gi://St';
 import Shell from 'gi://Shell';
 import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
-import { SearchResults, rankMatches } from './searchResults.js';
+import { SearchResults } from './searchResults.js';
+import type { SearchItem } from './search/item.js';
 import { animateActor, liftIcon } from '../motion.js';
 import type { ContextMenus } from '../contextMenus.js';
 
@@ -19,37 +20,38 @@ export class StartGrid {
   private catalogDirty = false;
   private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
-  private readonly searchNames = new Map<string, string>();
   private apps = new Map<string, Gio.AppInfo>();
   private pinned = new Set<string>();
-  private query = '';
+  private searchItems: SearchItem[] | null = null;
   private folder: string | null = null;
   private headerKey: string | null = null;
-  firstMatch: Gio.AppInfo | undefined;
+  firstResult: SearchItem | undefined;
 
   constructor(private readonly scroller: St.ScrollView, private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {
     scroller.child = this.actor;
-    this.results = new SearchResults(menus, launch, actor => this.reveal(actor));
+    this.results = new SearchResults(menus, actor => this.reveal(actor));
     this.actor.connect('destroy', () => {
       for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
       this.buttons.clear();
       this.results.destroy();
     });
     this.drag = new GridDrag(scroller, () => this.render(false, true));
-    this.drag.target(this.actor, source => this.query ? null : () => this.layout.move(source.id, this.folder));
+    this.drag.target(this.actor, source => this.searchItems ? null : () => this.layout.move(source.id, this.folder));
   }
 
-  update(apps: Gio.AppInfo[], pinned: Set<string>, query: string): void {
+  update(apps: Gio.AppInfo[], pinned: Set<string>): void {
     if (apps !== this.catalog) {
       this.catalog = apps;
       this.apps = new Map(apps.map(app => [app.get_id()!, app]));
-      this.searchNames.clear();
-      for (const [id, app] of this.apps) this.searchNames.set(id, app.get_display_name().toLocaleLowerCase());
       this.layout.sync([...this.apps.keys()]);
       this.catalogDirty = true;
     }
     this.pinned = pinned;
-    this.query = query;
+    if (!this.drag.active) this.render();
+  }
+
+  showResults(items: SearchItem[] | null): void {
+    this.searchItems = items;
     if (!this.drag.active) this.render();
   }
 
@@ -57,7 +59,7 @@ export class StartGrid {
 
   setSearchFocused(focused: boolean): void {
     this.highlightFirst = focused;
-    if (this.query) this.results.select(focused && this.firstMatch ? this.results.row(this.firstMatch) : null);
+    if (this.searchItems) this.results.select(focused && this.firstResult ? this.results.row(this.firstResult) : null);
   }
 
   private reveal(actor: St.Widget): void {
@@ -100,18 +102,17 @@ export class StartGrid {
         this.buttons.delete(key);
       }
     }
-    const ids = this.query
-      ? rankMatches(this.searchNames, this.query)
-      : this.layout.items(this.folder).filter(id => this.visible(id));
-    this.firstMatch = ids.length ? this.apps.get(ids[0]) : undefined;
     this.renderHeader();
-    if (!ids.length) this.actor.add_child(new St.Label({ text: this.query ? 'No apps found' : 'No apps here', style_class: 'kestrel-empty' }));
-    if (this.query) {
-      for (const id of ids) this.actor.add_child(this.results.row(this.apps.get(id)!));
-      this.results.select(this.highlightFirst && this.firstMatch ? this.results.row(this.firstMatch) : null);
+    if (this.searchItems) {
+      this.firstResult = this.searchItems[0];
+      if (!this.firstResult) this.actor.add_child(new St.Label({ text: 'No results', style_class: 'kestrel-empty' }));
+      for (const item of this.searchItems) this.actor.add_child(this.results.row(item));
+      this.results.select(this.highlightFirst && this.firstResult ? this.results.row(this.firstResult) : null);
       this.scroller.vadjustment.value = 0;
       return;
     }
+    this.firstResult = undefined;
+    const ids = this.layout.items(this.folder).filter(id => this.visible(id));
     this.results.select(null);
     for (let index = 0; index < ids.length; index += 6) {
       const row = new St.BoxLayout({ style_class: 'kestrel-app-row' });
@@ -143,11 +144,11 @@ export class StartGrid {
   }
 
   private renderHeader(): void {
-    const key = this.query ? 'search' : this.folder ?? 'root';
+    const key = this.searchItems ? 'search' : this.folder ?? 'root';
     if (this.headerKey === key) return;
     this.headerKey = key;
     this.header.destroy_all_children();
-    const folder = !this.query && this.folder ? this.layout.folder(this.folder) : undefined;
+    const folder = !this.searchItems && this.folder ? this.layout.folder(this.folder) : undefined;
     this.header.visible = !!folder;
     if (!folder) return;
     const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
@@ -192,12 +193,12 @@ export class StartGrid {
     const key = id;
     const cached = this.buttons.get(key);
     if (cached?.signature === signature) {
-      cached.draggable.enabled = !this.query;
+      cached.draggable.enabled = !this.searchItems;
       return cached.actor;
     }
     cached?.actor.destroy();
     const item = this.button(id);
-    item.draggable.enabled = !this.query;
+    item.draggable.enabled = !this.searchItems;
     this.buttons.set(key, { signature, ...item });
     return item.actor;
   }
@@ -232,7 +233,7 @@ export class StartGrid {
       ];
       const shellApp = Shell.AppSystem.get_default().lookup_app(id);
       const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: 'Open', run: () => this.launch(app!) }];
-      if (this.folder && !this.query) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
+      if (this.folder && !this.searchItems) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
       return entries;
     });
     const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));

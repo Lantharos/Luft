@@ -17,6 +17,10 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
       }, -1]), null, Gio.DBusCallFlags.NONE, -1, null,
       (connection, result) => { try { resolve(connection.call_finish(result).deep_unpack()[0]); } catch (error) { reject(error); } });
   });
+  const clearAll = () => {
+    for (const source of Main.messageTray.getSources())
+      for (const notification of [...source.notifications]) notification.destroy();
+  };
   const descendants = actor => [actor, ...actor.get_children().flatMap(descendants)];
 
   const replies = [];
@@ -53,10 +57,28 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
     await pause(300);
     require(descendants(center).filter(actor => actor.get_style_class_name?.() === 'kestrel-notification-group').length === 1,
       'clearing a group removes only that app');
+
+    dismissImmediately();
+    clearAll();
+    await pause(300);
+    const bannerId = await notify('Chatter', 'Maya', 'Are you coming?', ['inline-reply', 'Reply']);
+    await pause(700);
+    const banner = descendants(global.stage).find(actor => actor.has_style_class_name?.('notification-banner'));
+    banner.expand(false);
+    await pause(200);
+    const replyButton = descendants(banner).find(actor => actor.label === 'Reply');
+    replyButton.emit('clicked', Clutter.BUTTON_PRIMARY);
+    await pause(200);
+    const bannerEntry = descendants(banner).find(actor => actor.has_style_class_name?.('notification-reply-entry'));
+    require(!!bannerEntry, 'banners offer an inline reply field');
+    await capture(`${output}/notification-banner-reply.png`);
+    bannerEntry.set_text('On my way');
+    bannerEntry.clutter_text.emit('activate');
+    await pause(300);
+    require(replies.some(([replied, text]) => replied === bannerId && text === 'On my way'), 'banner replies reach the app');
   } finally {
     Gio.DBus.session.signal_unsubscribe(subscription);
-    for (const source of Main.messageTray.getSources())
-      for (const notification of [...source.notifications]) notification.destroy();
+    clearAll();
     dismissImmediately();
   }
 }

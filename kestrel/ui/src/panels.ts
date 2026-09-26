@@ -21,7 +21,7 @@ export class PanelSet {
     private readonly menus: ContextMenus,
     private readonly previews: WindowPreviews,
   ) {
-    this.primary = this.create(() => this.primary.monitor, layoutManager.primaryMonitor!, true);
+    this.primary = this.create(() => layoutManager.primaryMonitor!, layoutManager.primaryMonitor, true);
     this.sync();
   }
 
@@ -30,7 +30,7 @@ export class PanelSet {
   }
 
   forMonitor(monitor: Monitor): KestrelPanel {
-    return this.all.find(panel => panel.monitor.index === monitor.index) ?? this.primary;
+    return this.all.find(panel => panel.monitor?.index === monitor.index) ?? this.primary;
   }
 
   contains(actor: Clutter.Actor | null): boolean {
@@ -56,14 +56,14 @@ export class PanelSet {
   }
 
   setActive(surface: string | null, monitor: Monitor | null): void {
-    for (const panel of this.all) panel.setActive(monitor && panel.monitor.index === monitor.index ? surface : null);
+    for (const panel of this.all) panel.setActive(monitor && panel.monitor?.index === monitor.index ? surface : null);
   }
 
   shutdown(): void {
     for (const panel of this.all) panel.shutdown();
   }
 
-  private create(monitor: () => Monitor, initial: Monitor, primary: boolean): KestrelPanel {
+  private create(monitor: () => Monitor, initial: Monitor | null, primary: boolean): KestrelPanel {
     const panel = new KestrelPanel(this.actions(monitor), this.menus, this.previews, initial, primary);
     this.layoutManager.addChrome(panel.actor, { affectsStruts: true, trackFullscreen: false });
     navigateWithKeyboard(panel.actor);

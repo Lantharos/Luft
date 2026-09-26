@@ -209,6 +209,10 @@ class KestrelUi {
     const frame = window && !window.minimized ? window.get_frame_rect() : null;
     for (const panel of this.panels.all) {
       const { monitor } = panel;
+      if (!monitor) {
+        panel.actor.visible = false;
+        continue;
+      }
       const coversMonitor = !!frame && frame.x <= monitor.x && frame.y <= monitor.y &&
         frame.x + frame.width >= monitor.x + monitor.width && frame.y + frame.height >= monitor.y + monitor.height;
       panel.actor.visible = available && !coversMonitor && !display.get_monitor_in_fullscreen(monitor.index);

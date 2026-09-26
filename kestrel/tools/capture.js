@@ -12,6 +12,7 @@ import {checkSession} from './sessionChecks.js';
 import {checkTray} from './trayChecks.js';
 import {checkTaskView} from './taskViewChecks.js';
 import {checkNotifications} from './notificationChecks.js';
+import {checkSnapGroups} from './snapGroupChecks.js';
 import {captureRenderedFrames} from './frameCapture.js';
 
 export const METRICS = {};
@@ -308,6 +309,7 @@ export async function run() {
   await checkTray({pause, capture, actorNamed, pointer, output});
   await checkTaskView({pause, capture, actorNamed, pointer, keyboard, output});
   await checkNotifications({pause, capture, actorNamed, output});
+  await checkSnapGroups({pause});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

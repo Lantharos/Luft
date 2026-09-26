@@ -1,6 +1,7 @@
 import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { Monitor } from './panel.js';
@@ -19,7 +20,7 @@ export class ContextMenus {
   private clearSelection: (() => void) | null = null;
   private anchor: { x: number; y: number; monitor: Monitor } | null = null;
 
-  constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
+  constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 14);
     this.actor.connect('destroy', () => {
       if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
@@ -64,7 +65,7 @@ export class ContextMenus {
     for (const action of info?.list_actions() ?? [])
       entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, (global as unknown as Shell.Global).get_current_time(), -1)) });
     const windows = app.get_windows();
-    for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => window.activate((global as unknown as Shell.Global).get_current_time())) });
+    for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => this.activateWindow(window)) });
     if (windows.length === 1) {
       const window = windows[0];
       if (window.can_minimize()) entries.push({ label: window.minimized ? 'Restore' : 'Minimize', run: () => {

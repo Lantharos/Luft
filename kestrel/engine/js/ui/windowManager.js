@@ -1538,6 +1538,15 @@ export class WindowManager {
             this._tilePreview?.close();
     }
 
+    activateWithSnapGroup(window) {
+        const time = global.get_current_time();
+        for (const member of this._cornerSnap.group(window).reverse()) {
+            member.unminimize();
+            member.raise();
+        }
+        window.activate(time);
+    }
+
     snapWindow(window, rect) {
         this._cornerSnap.snap(window, rect);
     }

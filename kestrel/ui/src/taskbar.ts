@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import type Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -32,7 +33,8 @@ export class Taskbar {
   private readonly drop: TaskbarDrop;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
-    favorites: Gio.Settings, private readonly monitorIndex: () => number) {
+    favorites: Gio.Settings, private readonly monitorIndex: () => number,
+    private readonly activateWindow: (window: Meta.Window) => void) {
     this.drop = new TaskbarDrop(this.actor, () => this.actor.get_children()
       .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
       .filter((item): item is AppItem => !!item)
@@ -174,6 +176,7 @@ export class Taskbar {
       if (windows.length > 1) { this.previews.open(button, app, true); return; }
       this.previews.close();
       if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
+      else if (windows.length === 1) this.activateWindow(windows[0]);
       else app.activate();
     });
     return item;

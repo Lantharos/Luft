@@ -364,7 +364,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog .login-dialog-prompt-entry { padding: 13px 16px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.14); }
 .unlock-dialog .login-dialog-prompt-entry:focus { background-color: rgba(255, 255, 255, 0.20); }
 .message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
-.screenshot-ui-panel.kestrel-glass { padding: 12px; border-radius: 20px; }
+.screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 18px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 10px; }
 .screenshot-ui-type-button:hover, .screenshot-ui-shot-cast-button:hover,
 .screenshot-ui-type-button:checked, .screenshot-ui-shot-cast-button:checked { background-color: rgba(255, 255, 255, 0.18); }
@@ -384,6 +384,12 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog .button:hover, .unlock-dialog .button:focus,
 .unlock-dialog .icon-button:hover, .unlock-dialog .icon-button:focus { background-color: rgba(255, 255, 255, 0.20); }
 .unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: rgba(20, 20, 24, 0.20); border-radius: 16px; padding: 12px; }
+.unlock-dialog-notifications-container { margin: 24px 24px 40px; spacing: 8px; }
+.unlock-dialog-notification-source StBoxLayout { spacing: 8px; }
+.unlock-dialog-notification-source .unlock-dialog-notification-label { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
+.unlock-dialog-notification-preview { spacing: 2px; padding-left: 12px; }
+.unlock-dialog-notification-preview-title { font-size: 14px; font-weight: 600; }
+.unlock-dialog-notification-preview-body { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
 .kestrel-glass .kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.18); }
 .prompt-dialog .prompt-dialog-error-label, .prompt-dialog .prompt-dialog-info-label { padding: 8px 10px; margin: 0; text-align: left; border-radius: 8px; font-size: 13px; }
 #LookingGlassDialog, #LookingGlassAutoCompletionText { background-color: rgba(20, 20, 24, 0.20); border: none; box-shadow: none; color: white; }
@@ -392,7 +398,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-glass-radius-12 { border-radius: 12px; }
 .kestrel-glass-radius-14 { border-radius: 14px; }
 .kestrel-glass-radius-16 { border-radius: 16px; }
-.screenshot-ui-close-button, .screenshot-ui-show-pointer-button { background-color: rgba(255, 255, 255, 0.12); color: white; box-shadow: none; }
+.screenshot-ui-close-button, .screenshot-ui-show-pointer-button { background-color: transparent; color: white; box-shadow: none; border-radius: 10px; }
 .screenshot-ui-close-button:hover, .screenshot-ui-close-button:focus,
 .screenshot-ui-show-pointer-button:hover, .screenshot-ui-show-pointer-button:focus,
 .screenshot-ui-show-pointer-button:checked { background-color: rgba(255, 255, 255, 0.22); color: white; }

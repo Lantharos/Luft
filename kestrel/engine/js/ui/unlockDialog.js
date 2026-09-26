@@ -39,6 +39,7 @@ const BLUR_BRIGHTNESS = 0.65;
 const BLUR_RADIUS = 90;
 
 const FIXED_PROMPT_HEIGHT = 550;
+const LOCK_SCREEN_PREVIEWS = 3;
 
 const NotificationsBox = GObject.registerClass({
     Signals: {'wake-up-screen': {}},
@@ -72,6 +73,11 @@ const NotificationsBox = GObject.registerClass({
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
+        this._shellSettings = new Gio.Settings({schema_id: 'org.gnome.shell'});
+        this._shellSettings.connectObject('changed::kestrel-lock-screen-content', () => {
+            for (const [source, obj] of this._sources)
+                this._detailedChanged(source, obj);
+        }, this);
 
         this._sources = new Map();
         Main.messageTray.getSources().forEach(source => {
@@ -142,6 +148,7 @@ const NotificationsBox = GObject.registerClass({
         const iconActor = new St.Icon({
             style_class: 'unlock-dialog-notification-icon',
             fallback_icon_name: 'application-x-executable',
+            y_align: Clutter.ActorAlign.START,
         });
         source.bind_property('icon', iconActor, 'gicon', GObject.BindingFlags.SYNC_CREATE);
         box.add_child(iconActor);
@@ -161,34 +168,35 @@ const NotificationsBox = GObject.registerClass({
             null);
         textBox.add_child(title);
 
-        let visible = false;
-        for (let i = 0; i < source.notifications.length; i++) {
-            const n = source.notifications[i];
-
-            if (n.acknowledged)
-                continue;
-
-            let body = '';
-            if (n.body) {
-                const bodyText = n.body.replace(/\n/g, ' ');
-                body = fixMarkup(bodyText, n.useBodyMarkup);
+        const unseen = source.notifications
+            .filter(notification => !notification.acknowledged)
+            .sort((a, b) => b.datetime.compare(a.datetime));
+        for (const notification of unseen.slice(0, LOCK_SCREEN_PREVIEWS)) {
+            const preview = new St.BoxLayout({
+                orientation: Clutter.Orientation.VERTICAL,
+                style_class: 'unlock-dialog-notification-preview',
+            });
+            const title = new St.Label({
+                style_class: 'unlock-dialog-notification-preview-title',
+                text: notification.title.replace(/\n/g, ' '),
+            });
+            preview.add_child(title);
+            if (notification.body) {
+                const body = new St.Label({style_class: 'unlock-dialog-notification-preview-body'});
+                body.clutter_text.set_markup(fixMarkup(notification.body.replace(/\n/g, ' '), notification.useBodyMarkup));
+                preview.add_child(body);
             }
-
-            const escapedTitle = fixMarkup(n.title, false);
-
-            const label = new St.Label({style_class: 'unlock-dialog-notification-count-text'});
-            label.clutter_text.set_markup(`<b>${escapedTitle}</b> ${body}`);
-            textBox.add_child(label);
-
-            visible = true;
+            textBox.add_child(preview);
         }
+        const visible = unseen.length > 0;
 
         box.visible = visible;
         return [title, null];
     }
 
     _shouldShowDetails(source) {
-        return source.policy.detailsInLockScreen ||
+        return (this._shellSettings.get_boolean('kestrel-lock-screen-content') && source.policy.showInLockScreen) ||
+               source.policy.detailsInLockScreen ||
                source.narrowestPrivacyScope === MessageTray.PrivacyScope.SYSTEM;
     }
 

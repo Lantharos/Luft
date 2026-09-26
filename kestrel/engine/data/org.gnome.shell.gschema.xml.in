@@ -11,6 +11,15 @@
         using the Alt-F2 dialog.
       </description>
     </key>
+    <key name="kestrel-lock-screen-content" type="b">
+      <default>true</default>
+      <summary>Show notification content on the lock screen</summary>
+      <description>
+        When enabled, the lock screen shows the titles and text of new
+        notifications. When disabled, only apps that allow it individually
+        show their content; other apps show their name and a count.
+      </description>
+    </key>
     <key name="kestrel-start-layout" type="s">
       <default>'{"items":[],"folders":{}}'</default>
       <summary>Start app order and folders</summary>

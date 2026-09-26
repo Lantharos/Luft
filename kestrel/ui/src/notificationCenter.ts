@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
@@ -15,8 +16,11 @@ export interface MessageTray extends SignalSource {
   getSources(): NotificationSource[];
 }
 
+const LOCK_SCREEN_CONTENT = 'kestrel-lock-screen-content';
+
 export class NotificationCenter {
   readonly actor: St.BoxLayout;
+  private readonly shellSettings = new Gio.Settings({ schema_id: 'org.gnome.shell' });
 
   private readonly sources = new Set<NotificationSource>();
   private readonly groups = new Map<NotificationSource, NotificationGroup>();
@@ -42,6 +46,8 @@ export class NotificationCenter {
     blurSurface(this.actor, 20);
     menus.bind(this.actor, () => [
       { label: 'Clear all notifications', enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
+      { label: 'Show message content on the lock screen', checked: this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT),
+        run: () => this.shellSettings.set_boolean(LOCK_SCREEN_CONTENT, !this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT)) },
       { label: 'Notification settings', run: () => menus.settings('notifications') },
     ]);
 

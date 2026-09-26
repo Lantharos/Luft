@@ -7,56 +7,35 @@ $screenshot_ui_button_red: $red_4;
 .screenshot-ui-panel {
   @extend %osd_panel;
   border-radius: $screenshot_ui_panel_border_radius;
-  padding: $screenshot_ui_panel_padding;
-  // Reduce the bottom padding a little to accommodate the large capture button.
-  padding-bottom: $screenshot_ui_panel_padding - $base_padding;
-  margin-bottom: 4em;
-  spacing: $base_padding * 2;
+  padding: $base_padding * 1.5;
+  margin-bottom: 64px;
+  spacing: $base_padding;
 }
 
-$close_button_color: transparentize(lighten($system_bg_color, 7%), .02);
-
-.screenshot-ui-close-button {
-  background-color: $close_button_color;
-  color: $system_fg_color;
-  border-radius: $forced_circular_radius;
-  height: $large_icon_size;
-  width: $large_icon_size;
-  transition-duration: 100ms;
-  border: 2px solid transparent;
-  padding: $base_padding;
-  @if $contrast == 'high' {
-    border-color: $hc_inset_color;
-  }
-  & StIcon { icon-size: $medium_icon_size; }
-  &:hover { background-color: lighten($close_button_color, 7%); }
-  &:active { background-color: lighten($close_button_color, 13%); }
-  margin-top: $base_margin * 3;
-  box-shadow: 0 2px 4px 0 $shadow_color;
-  &.left { margin-left: $base_margin * 3;}
-  &.right { margin-right: $base_margin * 3;}
+.screenshot-ui-separator {
+  width: 1px;
+  height: 24px;
+  margin: 0 $base_padding * 0.5;
+  background-color: transparentize($osd_fg_color, 0.85);
 }
 
+.screenshot-ui-type-button-container { spacing: $base_padding * 0.5; }
+
+.screenshot-ui-close-button,
 .screenshot-ui-type-button {
   @extend %osd_button_flat;
-  min-width: 48px;
-  padding: $base_padding * 2 $base_padding * 3;
-  border-radius: $screenshot_ui_panel_border_radius - $screenshot_ui_panel_padding;
-
-  .icon-label-button-container {
-    @extend %caption;
-    spacing: $scaled_padding;
-
-    > StIcon { icon-size: $large_icon_size;}
-  }
+  padding: $base_padding * 1.5;
+  border-radius: $base_border_radius * 1.5;
+  & StIcon { icon-size: $base_icon_size * 1.25; }
 }
 
 .screenshot-ui-capture-button {
-  width: $large_icon_size;
-  height: $large_icon_size;
+  width: 36px;
+  height: 36px;
+  margin: 0 $base_padding * 0.5;
   border-radius: $forced_circular_radius;
-  border: 4px $osd_fg_color;
-  padding: $base_margin;
+  border: 3px $osd_fg_color;
+  padding: 3px;
 
   .screenshot-ui-capture-button-circle {
     background-color: $osd_fg_color;
@@ -146,8 +125,8 @@ $close_button_color: transparentize(lighten($system_bg_color, 7%), .02);
   border-radius: $forced_circular_radius;
   background-color: white;
   box-shadow: 0 1px 3px 2px $shadow_color;
-  width: $medium_icon_size;
-  height: $medium_icon_size;
+  width: 14px;
+  height: 14px;
 }
 
 .screenshot-ui-window-selector {

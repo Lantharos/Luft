@@ -147,6 +147,14 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-header { spacing: 12px; padding: 0 4px; }
 .kestrel-notification-center { spacing: 14px; }
 
+.kestrel-clipboard { padding: 10px; spacing: 6px; }
+.kestrel-clipboard-list { spacing: 4px; }
+.kestrel-clipboard-row { padding: 10px 12px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.06); transition-duration: 120ms; }
+.kestrel-clipboard-row:hover { background-color: rgba(255, 255, 255, 0.11); }
+.kestrel-clipboard-row:focus, .kestrel-clipboard-row:active { background-color: rgba(255, 255, 255, 0.15); }
+.kestrel-clipboard-text { font-size: 13px; height: 34px; text-align: left; }
+.kestrel-clipboard-footer { padding: 0 2px; }
+
 .kestrel-media { spacing: 2px; padding: 8px; border-radius: 16px; background-color: rgba(255, 255, 255, 0.07); }
 .kestrel-media-open { padding: 0; border-radius: 10px; }
 .kestrel-media-details { spacing: 12px; }

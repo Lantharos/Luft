@@ -113,7 +113,7 @@
       </description>
     </key>
     <key name="toggle-message-tray" type="as">
-      <default>["&lt;Super&gt;v","&lt;Super&gt;m"]</default>
+      <default>["&lt;Super&gt;n","&lt;Super&gt;m"]</default>
       <summary>Keybinding to toggle the visibility of the notification list</summary>
       <description>
         Keybinding to toggle the visibility of the notification list.
@@ -127,11 +127,15 @@
       </description>
     </key>
     <key name="focus-active-notification" type="as">
-      <default>["&lt;Super&gt;n"]</default>
+      <default>[]</default>
       <summary>Keybinding to focus the active notification</summary>
       <description>
         Keybinding to focus the active notification.
       </description>
+    </key>
+    <key name="kestrel-clipboard-history" type="as">
+      <default>["&lt;Super&gt;v"]</default>
+      <summary>Show clipboard history</summary>
     </key>
     <key name="kestrel-workspace-1" type="as">
       <default>["&lt;Super&gt;1"]</default>

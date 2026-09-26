@@ -17,6 +17,8 @@ import { NotificationCenter, type MessageTray } from './notificationCenter.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './surface.js';
 import { animateActor } from './motion.js';
 import type { QuickSettingsSource } from './quickControls.js';
+import { AccentService } from './accent/service.js';
+import type { Rgb } from './accent/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications';
 
@@ -60,6 +62,7 @@ class KestrelUi {
   private focusWindow: Meta.Window | null = null;
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
+  readonly accent = new AccentService();
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -348,6 +351,7 @@ class KestrelUi {
     for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
     for (const disconnect of this.disconnectors) disconnect();
     this.panel.shutdown();
+    this.accent.destroy();
     this.stylesheetMonitor?.cancel();
   }
 
@@ -361,8 +365,17 @@ class KestrelUi {
 let currentUi: KestrelUi;
 const startWatchers: ((visible: boolean) => void)[] = [];
 
+let pendingWallpaper: Rgb[] | null = null;
+
 export function initialize(context: Context): void {
   currentUi = new KestrelUi(context);
+  if (pendingWallpaper) currentUi.accent.apply(pendingWallpaper);
+  pendingWallpaper = null;
+}
+
+export function wallpaperSampled(samples: Rgb[]): void {
+  if (currentUi) currentUi.accent.apply(samples);
+  else pendingWallpaper = samples;
 }
 
 export function toggleSurface(surface: Surface): void {

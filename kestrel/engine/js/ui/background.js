@@ -101,6 +101,8 @@ import * as Signals from '../misc/signals.js';
 
 import * as LoginManager from '../misc/loginManager.js';
 import * as Main from './main.js';
+import * as KestrelUi from './kestrelUi.js';
+import System from 'system';
 import * as Params from '../misc/params.js';
 
 const DEFAULT_BACKGROUND_COLOR = new Cogl.Color({red: 40, green: 40, blue: 40, alpha: 255});
@@ -232,26 +234,116 @@ function getBackgroundCache() {
     return _backgroundCache;
 }
 
+const SAMPLE_GRID = 48;
+
+const EIGHT_BIT_CHANNELS = new Map([
+    [Glycin.MemoryFormat.B8G8R8A8_PREMULTIPLIED, [2, 1, 0, 4]],
+    [Glycin.MemoryFormat.A8R8G8B8_PREMULTIPLIED, [1, 2, 3, 4]],
+    [Glycin.MemoryFormat.R8G8B8A8_PREMULTIPLIED, [0, 1, 2, 4]],
+    [Glycin.MemoryFormat.B8G8R8A8, [2, 1, 0, 4]],
+    [Glycin.MemoryFormat.A8R8G8B8, [1, 2, 3, 4]],
+    [Glycin.MemoryFormat.R8G8B8A8, [0, 1, 2, 4]],
+    [Glycin.MemoryFormat.A8B8G8R8, [3, 2, 1, 4]],
+    [Glycin.MemoryFormat.R8G8B8, [0, 1, 2, 3]],
+    [Glycin.MemoryFormat.B8G8R8, [2, 1, 0, 3]],
+]);
+
+function sampleColors({width, height, stride, format}, data) {
+    const channels = EIGHT_BIT_CHANNELS.get(format);
+    if (!channels)
+        return [];
+
+    const [red, green, blue, bytesPerPixel] = channels;
+    const samples = [];
+    for (let row = 0; row < SAMPLE_GRID; row++) {
+        const y = Math.floor((row + 0.5) * height / SAMPLE_GRID);
+        for (let column = 0; column < SAMPLE_GRID; column++) {
+            const offset = y * stride + Math.floor((column + 0.5) * width / SAMPLE_GRID) * bytesPerPixel;
+            samples.push([data[offset + red], data[offset + green], data[offset + blue]]);
+        }
+    }
+    return samples;
+}
+
+function displaySizes() {
+    return Main.layoutManager.monitors.map(({width, height, geometry_scale: scale}) =>
+        ({width: Math.ceil(width * scale), height: Math.ceil(height * scale)}));
+}
+
+function displaySignature() {
+    return displaySizes().map(({width, height}) => `${width}x${height}`).join(',');
+}
+
+function fittedSize(width, height, style) {
+    const {BackgroundStyle} = GDesktopEnums;
+    const sizes = displaySizes();
+    let scale;
+    switch (style) {
+    case BackgroundStyle.ZOOM:
+    case BackgroundStyle.STRETCHED:
+        scale = Math.max(...sizes.map(size => Math.max(size.width / width, size.height / height)));
+        break;
+    case BackgroundStyle.SCALED:
+        scale = Math.max(...sizes.map(size => Math.min(size.width / width, size.height / height)));
+        break;
+    case BackgroundStyle.SPANNED: {
+        const monitors = Main.layoutManager.monitors;
+        const factor = Math.max(...monitors.map(monitor => monitor.geometry_scale));
+        const spanWidth = Math.max(...monitors.map(monitor => monitor.x + monitor.width)) - Math.min(...monitors.map(monitor => monitor.x));
+        const spanHeight = Math.max(...monitors.map(monitor => monitor.y + monitor.height)) - Math.min(...monitors.map(monitor => monitor.y));
+        scale = Math.max(spanWidth * factor / width, spanHeight * factor / height);
+        break;
+    }
+    default:
+        return null;
+    }
+
+    if (scale >= 1)
+        return null;
+    return {width: Math.ceil(width * scale), height: Math.ceil(height * scale)};
+}
+
 class BackgroundTextureCache {
     constructor() {
         this._textures = new Map(); // uri -> {texture, colorState}
     }
 
-    async load(file, cancellable) {
-        const uri = file.get_uri();
+    async load(file, cancellable, style = GDesktopEnums.BackgroundStyle.NONE) {
+        const key = `${file.get_uri()} ${style} ${displaySignature()}`;
 
-        if (this._textures.has(uri))
-            return this._textures.get(uri);
+        if (this._textures.has(key))
+            return this._textures.get(key);
 
-        // Load image using glycin
         const [frameData, colorState] = await this._loadGlycinFrame(file, cancellable);
+        const data = frameData.bytes.get_data();
+        const samples = sampleColors(frameData, data);
+        const texture = this._fitTexture(this._createTexture(frameData, data),
+            fittedSize(frameData.width, frameData.height, style));
+        GLib.idle_add_once(GLib.PRIORITY_LOW, () => System.gc());
 
-        // Create CoglTexture from glycin frame data
-        const texture = this._createTexture(frameData);
-
-        const entry = {texture, colorState};
-        this._textures.set(uri, entry);
+        const entry = {texture, colorState, samples};
+        this._textures.set(key, entry);
         return entry;
+    }
+
+    _fitTexture(texture, size) {
+        if (!size)
+            return texture;
+
+        const ctx = global.stage.context.get_backend().get_cogl_context();
+        const fitted = Cogl.Texture2D.new_with_size(ctx, size.width, size.height);
+        fitted.set_components(texture.get_components());
+        const framebuffer = Cogl.Offscreen.new_with_texture(fitted);
+        framebuffer.allocate();
+        framebuffer.orthographic(0, 0, size.width, size.height, -1, 1);
+        framebuffer.clear4f(Cogl.BufferBit.COLOR, 0, 0, 0, 0);
+        const pipeline = Cogl.Pipeline.new(ctx);
+        pipeline.set_layer_texture(0, texture);
+        pipeline.set_layer_filters(0, Cogl.PipelineFilter.LINEAR_MIPMAP_LINEAR, Cogl.PipelineFilter.LINEAR);
+        pipeline.set_blend('RGBA = ADD (SRC_COLOR, 0)');
+        framebuffer.draw_rectangle(pipeline, 0, 0, size.width, size.height);
+        framebuffer.finish();
+        return fitted;
     }
 
     async _loadGlycinFrame(file, cancellable) {
@@ -340,11 +432,10 @@ class BackgroundTextureCache {
         }
     }
 
-    _createTexture(frameData) {
-        const {width, height, stride, bytes, format} = frameData;
+    _createTexture(frameData, data) {
+        const {width, height, stride, format} = frameData;
 
         const coglFormat = this._glyMemoryFormatToCogl(format);
-        const data = bytes.get_data();
         const clutterContext = global.stage.context;
         const clutterBackend = clutterContext.get_backend();
         const ctx = clutterBackend.get_cogl_context();
@@ -373,7 +464,11 @@ class BackgroundTextureCache {
     }
 
     purge(file) {
-        this._textures.delete(file.get_uri());
+        const uri = file.get_uri();
+        for (const key of this._textures.keys()) {
+            if (key.startsWith(`${uri} `))
+                this._textures.delete(key);
+        }
     }
 }
 
@@ -474,6 +569,8 @@ const Background = GObject.registerClass({
     updateResolution() {
         if (this._animation)
             this._refreshAnimation();
+        else if (this._file && this._displaySignature !== displaySignature())
+            this.emit('bg-changed');
     }
 
     _refreshAnimation() {
@@ -632,12 +729,15 @@ const Background = GObject.registerClass({
 
     async _loadImage(file) {
         this._watchFile(file);
+        this._displaySignature = displaySignature();
 
         const cache = getBackgroundTextureCache();
 
         try {
-            const {texture, colorState} = await cache.load(file, this._cancellable);
+            const {texture, colorState, samples} = await cache.load(file, this._cancellable, this._style);
             this.set_texture(texture, this._style, colorState);
+            if (this._settings.schema_id === BACKGROUND_SCHEMA)
+                KestrelUi.wallpaperSampled(samples);
             this._setLoaded();
         } catch (err) {
             if (!err.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))

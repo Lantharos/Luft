@@ -216,6 +216,7 @@ class FdoNotificationDaemon {
         });
         notification.clearActions();
         notification.disconnectObject(this);
+        notification.set({replyLabel: null, replyPlaceholder: null});
 
         let hasDefaultAction = false;
 
@@ -224,6 +225,13 @@ class FdoNotificationDaemon {
                 const [actionId, label] = [actions[i], actions[i + 1]];
                 if (actionId === 'default') {
                     hasDefaultAction = true;
+                } else if (actionId === 'inline-reply') {
+                    notification.set({
+                        replyLabel: label || _('Reply'),
+                        replyPlaceholder: hints['x-kde-reply-placeholder-text'] || _('Write a reply'),
+                    });
+                    notification.connectObject('replied', (_notification, text) =>
+                        this._emitReplied(id, text, invocation), this);
                 } else {
                     notification.addAction(label, () => {
                         this._emitActivationToken(source, id, invocation);
@@ -287,6 +295,7 @@ class FdoNotificationDaemon {
             'body-markup',
             // 'icon-multi',
             'icon-static',
+            'inline-reply',
             'persistence',
             'sound',
         ];
@@ -311,6 +320,11 @@ class FdoNotificationDaemon {
         const sender = invocation.get_sender();
         emitSignalToDestination(this._dbusImpl, sender, 'ActionInvoked',
             GLib.Variant.new('(us)', [id, action]));
+    }
+
+    _emitReplied(id, text, invocation) {
+        emitSignalToDestination(this._dbusImpl, invocation.get_sender(), 'NotificationReplied',
+            GLib.Variant.new('(us)', [id, text]));
     }
 
     _emitActivationToken(source, id, invocation) {

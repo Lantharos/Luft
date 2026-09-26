@@ -183,7 +183,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; }
 .kestrel-calendar-day:selected { background-color: rgba(255, 255, 255, 0.94); color: #15171a; font-weight: 600; }
 .kestrel-calendar-day:insensitive { color: rgba(255, 255, 255, 0.30); }
-.kestrel-notification-list { spacing: 8px; }
+.kestrel-notification-list { spacing: 14px; }
 .kestrel-notification {
   background-color: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
@@ -442,6 +442,16 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-open:hover, .kestrel-notification-dismiss:hover, .kestrel-notification-action:hover { background-color: rgba(255, 255, 255, 0.13); }
 .kestrel-notification-open:focus, .kestrel-notification-dismiss:focus, .kestrel-notification-action:focus { background-color: rgba(255, 255, 255, 0.13); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
 .kestrel-notification-open:rtl { text-align: right; }
+.kestrel-notification-group { spacing: 6px; }
+.kestrel-notification-group-list { spacing: 8px; }
+.kestrel-notification-group-header { spacing: 8px; padding: 0 0 0 6px; }
+.kestrel-notification-group-icon { icon-size: 16px; }
+.kestrel-notification-more { font-size: 12px; }
+.kestrel-notification-reply { spacing: 6px; }
+.kestrel-notification-reply-send, .notification-reply-send { padding: 9px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-notification-reply-send:hover, .notification-reply-send:hover,
+.kestrel-notification-reply-send:focus, .notification-reply-send:focus { background-color: rgba(255, 255, 255, 0.18); }
+.notification-banner .notification-reply { spacing: 6px; padding-top: 10px; }
 
 .kestrel-task-view { background-color: rgba(10, 10, 14, 0.28); color: #ffffff; }
 .kestrel-task-window { padding: 0; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: 140ms; }

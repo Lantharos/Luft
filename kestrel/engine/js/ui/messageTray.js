@@ -493,6 +493,12 @@ export class Notification extends GObject.Object {
         this.destroy();
     }
 
+    reply(text) {
+        this.emit('replied', text);
+        if (!this.resident && !this._destroyed)
+            this.destroy();
+    }
+
     destroy(reason = NotificationDestroyedReason.DISMISSED) {
         this.emit('destroy', reason);
 
@@ -691,11 +697,20 @@ GObject.registerClass({
             'is-transient', null, null,
             GObject.ParamFlags.READWRITE,
             false),
+        'reply-label': GObject.ParamSpec.string(
+            'reply-label', null, null,
+            GObject.ParamFlags.READWRITE,
+            null),
+        'reply-placeholder': GObject.ParamSpec.string(
+            'reply-placeholder', null, null,
+            GObject.ParamFlags.READWRITE,
+            null),
     },
     Signals: {
         'action-added': {param_types: [Action]},
         'action-removed': {param_types: [Action]},
         'activated': {},
+        'replied': {param_types: [GObject.TYPE_STRING]},
         'destroy': {param_types: [GObject.TYPE_UINT]},
     },
 }, Notification);

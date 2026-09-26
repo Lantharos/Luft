@@ -12,6 +12,8 @@ stage { font-family: "Open Runde"; }
 .kestrel-taskbar { spacing: 2px; }
 .kestrel-panel-status { spacing: 2px; }
 .kestrel-status-icons { spacing: 12px; }
+.kestrel-tray { spacing: 0; }
+.kestrel-tray-button { padding: 0 7px; }
 
 .kestrel-task-button {
   box-shadow: none;
@@ -239,6 +241,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-context-action { padding: 9px 10px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
+.kestrel-context-row { spacing: 10px; }
+.kestrel-context-icon { icon-size: 16px; width: 16px; }
+.kestrel-context-separator { height: 1px; margin: 4px 8px; background-color: rgba(255, 255, 255, 0.12); }
 
 .kestrel-window-previews {
   padding: 8px;

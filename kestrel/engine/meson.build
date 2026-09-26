@@ -1,4 +1,4 @@
-project('gnome-shell', 'c',
+project('kestrel', 'c',
   version: '51.0',
   meson_version: '>= 1.3.0',
   license: 'GPL-2.0-or-later',

@@ -86,12 +86,14 @@ install_data('00_org.gnome.shell.gschema.override', install_dir: schemadir)
 if have_systemd
   unitconf = configuration_data()
   unitconf.set('bindir', bindir)
+  unitconf.set('schemadir', schemadir)
   configure_file(
-    input: 'org.gnome.Shell@.service.in',
-    output: 'org.gnome.Shell@.service',
+    input: 'kestrel.service.in',
+    output: 'kestrel.service',
     configuration: unitconf,
     install_dir: systemduserunitdir
   )
+  subdir('session')
 endif
 
 # for unit tests - gnome.compile_schemas() only looks in srcdir

@@ -2,7 +2,8 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
-import { NotificationCard, type Notification, type NotificationSource, type SignalSource } from './notificationCard.js';
+import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
+import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
 import type { ContextMenus } from './contextMenus.js';
 import { blurSurface } from './surface.js';
@@ -18,7 +19,7 @@ export class NotificationCenter {
   readonly actor: St.BoxLayout;
 
   private readonly sources = new Set<NotificationSource>();
-  private readonly items = new Map<Notification, NotificationCard>();
+  private readonly groups = new Map<NotificationSource, NotificationGroup>();
   private readonly clearButton = new St.Button({ style_class: 'kestrel-text-button', label: 'Clear all', can_focus: true });
   private refreshIdle = 0;
   private dirty = true;
@@ -74,7 +75,7 @@ export class NotificationCenter {
     this.actor.connect('destroy', () => {
       if (this.refreshIdle) GLib.Source.remove(this.refreshIdle);
       this.sources.clear();
-      this.items.clear();
+      this.groups.clear();
       this.first = null;
     });
     this.watchSources();
@@ -101,35 +102,36 @@ export class NotificationCenter {
   refresh(): void {
     if (this.closing || !this.dirty) return;
     this.dirty = false;
-    const notifications = this.tray.getSources()
-      .flatMap(source => source.notifications.map(notification => ({ source, notification })))
-      .sort((a, b) => b.notification.datetime.compare(a.notification.datetime));
-    const present = new Set(notifications.map(({ notification }) => notification));
-    const focus = (global as unknown as Shell.Global).stage.get_key_focus();
-    let focusRemoved = false;
-    for (const [notification, item] of this.items) {
-      if (present.has(notification)) continue;
-      focusRemoved ||= !!focus && item.actor.contains(focus);
-      item.actor.destroy();
-      this.items.delete(notification);
+    const sources = this.tray.getSources()
+      .filter(source => source.notifications.length > 0)
+      .map(source => ({ source, newest: source.notifications.reduce((a, b) => a.datetime.compare(b.datetime) >= 0 ? a : b).datetime }))
+      .sort((a, b) => b.newest.compare(a.newest))
+      .map(({ source }) => source);
+    const present = new Set(sources);
+    const stage = (global as unknown as Shell.Global).stage;
+    const focus = stage.get_key_focus();
+    const focusInside = !!focus && this.actor.contains(focus);
+    for (const [source, group] of this.groups) {
+      if (present.has(source)) continue;
+      group.actor.destroy();
+      this.groups.delete(source);
     }
-    this.first = null;
-    this.scroll.visible = notifications.length > 0;
-    this.header.visible = notifications.length > 0;
-    for (const [index, { source, notification }] of notifications.entries()) {
-      let item = this.items.get(notification);
-      if (!item) {
-        item = new NotificationCard(source, notification, this.menus, () => this.invalidate(), this.close,
+    this.scroll.visible = sources.length > 0;
+    this.header.visible = sources.length > 0;
+    sources.forEach((source, index) => {
+      let group = this.groups.get(source);
+      if (!group) {
+        group = new NotificationGroup(source, this.menus, () => this.invalidate(), this.close,
           actor => ensureActorVisibleInScrollView(this.scroll, actor));
-        this.items.set(notification, item);
-        this.list.add_child(item.actor);
+        this.groups.set(source, group);
+        this.list.add_child(group.actor);
       }
-      if (index === 0) this.first = item;
-      item.refresh();
-      if (this.actor.visible) notification.acknowledged = true;
-      if (this.list.get_child_at_index(index) !== item.actor) this.list.set_child_at_index(item.actor, index);
-    }
-    if (focusRemoved) {
+      group.refresh(this.actor.visible);
+      if (this.list.get_child_at_index(index) !== group.actor) this.list.set_child_at_index(group.actor, index);
+    });
+    this.first = sources.length ? this.groups.get(sources[0])!.first : null;
+    const current = stage.get_key_focus();
+    if (focusInside && (!current || !current.mapped || !this.actor.contains(current))) {
       if (this.first) this.first.open.grab_key_focus();
       else this.actor.grab_key_focus();
     }

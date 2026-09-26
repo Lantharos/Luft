@@ -751,6 +751,10 @@ class NotificationMessage extends Message {
         this.notification.actions.forEach(action => {
             this._addAction(action);
         });
+
+        this._replyButton = null;
+        notification.connectObject('notify::reply-label', () => this._syncReply(), this);
+        this._syncReply();
     }
 
     on_close() {
@@ -766,15 +770,64 @@ class NotificationMessage extends Message {
         return true;
     }
 
+    _ensureButtonBox() {
+        if (this._buttonBox)
+            return;
+        this._buttonBox = new St.BoxLayout({
+            x_expand: true,
+            style_class: 'notification-buttons-bin',
+        });
+        this.setActionArea(this._buttonBox);
+        global.focus_manager.add_group(this._buttonBox);
+    }
+
+    _syncReply() {
+        this._replyButton?.destroy();
+        this._replyButton = null;
+        const label = this.notification?.replyLabel;
+        if (!label)
+            return;
+
+        this._ensureButtonBox();
+        this._replyButton = new St.Button({
+            style_class: 'notification-button',
+            x_expand: true,
+            label,
+        });
+        this._replyButton.connect('clicked', () => this._showReplyEntry());
+        this._buttonBox.insert_child_at_index(this._replyButton, 0);
+    }
+
+    _showReplyEntry() {
+        const entry = new St.Entry({
+            style_class: 'notification-reply-entry',
+            hint_text: this.notification.replyPlaceholder,
+            can_focus: true,
+            x_expand: true,
+        });
+        const send = new St.Button({
+            style_class: 'notification-reply-send',
+            icon_name: 'mail-send-symbolic',
+            accessible_name: _('Send'),
+            can_focus: true,
+        });
+        const submit = () => {
+            const text = entry.text.trim();
+            if (text)
+                this.notification?.reply(text);
+        };
+        entry.clutter_text.connect('activate', submit);
+        send.connect('clicked', submit);
+
+        const box = new St.BoxLayout({style_class: 'notification-reply', x_expand: true});
+        box.add_child(entry);
+        box.add_child(send);
+        this.setActionArea(box);
+        entry.grab_key_focus();
+    }
+
     _addAction(action) {
-        if (!this._buttonBox) {
-            this._buttonBox = new St.BoxLayout({
-                x_expand: true,
-                style_class: 'notification-buttons-bin',
-            });
-            this.setActionArea(this._buttonBox);
-            global.focus_manager.add_group(this._buttonBox);
-        }
+        this._ensureButtonBox();
 
         if (this._buttonBox.get_n_children() >= MAX_NOTIFICATION_BUTTONS)
             return;

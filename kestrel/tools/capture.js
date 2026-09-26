@@ -321,9 +321,21 @@ export async function run() {
 
   Main.screenShield.lock(true);
   await pause(1200);
+  const lockedSource = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
+  Main.messageTray.add(lockedSource);
+  lockedSource.addNotification(new MessageTray.Notification({source: lockedSource, title: 'Ayesha', body: 'Running ten minutes late.'}));
+  await pause(600);
+  const previews = [];
+  const collectPreviews = actor => {
+    if (actor.get_style_class_name?.() === 'unlock-dialog-notification-preview-title') previews.push(actor.text);
+    actor.get_children().forEach(collectPreviews);
+  };
+  collectPreviews(global.stage);
+  console.log(`Kestrel lock screen previews: ${previews.join(', ')}`);
   pointer.notify_relative_motion(GLib.get_monotonic_time(), 30, 30);
   await pause(1200);
   await capture(`${output}/lock-screen.png`);
+  lockedSource.destroy();
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_space, Clutter.KeyState.PRESSED);
   keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_space, Clutter.KeyState.RELEASED);
   await pause(1200);

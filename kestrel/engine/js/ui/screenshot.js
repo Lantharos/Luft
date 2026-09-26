@@ -4,7 +4,6 @@ import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
-import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
@@ -50,27 +49,6 @@ function getScreenshotNotificationSource() {
 
     return screenshotNotificationSource;
 }
-
-const IconLabelButton = GObject.registerClass(
-class IconLabelButton extends St.Button {
-    _init(iconName, label, params) {
-        super._init(params);
-
-        this._container = new St.BoxLayout({
-            orientation: Clutter.Orientation.VERTICAL,
-            style_class: 'icon-label-button-container',
-        });
-        this.set_child(this._container);
-
-        this._container.add_child(new St.Icon({icon_name: iconName}));
-        const labelActor = new St.Label({
-            text: label,
-            x_align: Clutter.ActorAlign.CENTER,
-        });
-        this.set({labelActor});
-        this._container.add_child(labelActor);
-    }
-});
 
 export const Tooltip = GObject.registerClass(
 class Tooltip extends St.Label {
@@ -1553,124 +1531,75 @@ export class ScreenshotUI extends St.Widget {
 
         this._panel = new St.BoxLayout({
             style_class: 'screenshot-ui-panel',
+            x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.END,
             y_expand: true,
-            orientation: Clutter.Orientation.VERTICAL,
             offscreen_redirect: Clutter.OffscreenRedirect.AUTOMATIC_FOR_OPACITY,
         });
+        styleSurface(this._panel, 20);
         this._primaryMonitorBin.add_child(this._panel);
 
-        this._closeButton = new St.Button({
-            style_class: 'screenshot-ui-close-button',
-            icon_name: 'preview-close-symbolic',
-        });
-        this._closeButton.add_constraint(new Clutter.BindConstraint({
-            source: this._panel,
-            coordinate: Clutter.BindCoordinate.POSITION,
-        }));
-        this._closeButton.add_constraint(new Clutter.AlignConstraint({
-            source: this._panel,
-            align_axis: Clutter.AlignAxis.Y_AXIS,
-            pivot_point: new Graphene.Point({x: -1, y: 0.5}),
-            factor: 0,
-        }));
-        this._closeButtonXAlignConstraint = new Clutter.AlignConstraint({
-            source: this._panel,
-            align_axis: Clutter.AlignAxis.X_AXIS,
-            pivot_point: new Graphene.Point({x: 0.5, y: -1}),
-        });
-        this._closeButton.add_constraint(this._closeButtonXAlignConstraint);
-        this._closeButton.connect('clicked', () => this.close());
-        this._primaryMonitorBin.add_child(this._closeButton);
+        for (const signal of ['drag-started', 'drag-ended']) {
+            this._areaSelector.connect(signal, () => this._panel.ease({
+                opacity: signal === 'drag-started' ? 100 : 255,
+                duration: 200,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            }));
+        }
 
-        this._areaSelector.connect('drag-started', () => {
-            this._panel.ease({
-                opacity: 100,
-                duration: 200,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
-            this._closeButton.ease({
-                opacity: 100,
-                duration: 200,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
-        });
-        this._areaSelector.connect('drag-ended', () => {
-            this._panel.ease({
-                opacity: 255,
-                duration: 200,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
-            this._closeButton.ease({
-                opacity: 255,
-                duration: 200,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
-        });
+        const addTooltip = (button, text) => this.add_child(new Tooltip(button, {
+            text,
+            style_class: 'screenshot-ui-tooltip',
+            visible: false,
+        }));
+        const addSeparator = () => this._panel.add_child(new St.Widget({
+            style_class: 'screenshot-ui-separator',
+            y_align: Clutter.ActorAlign.CENTER,
+        }));
 
-        this._typeButtonContainer = new St.Widget({
-            style_class: 'screenshot-ui-type-button-container',
-            layout_manager: new Clutter.BoxLayout({
-                spacing: 12,
-                homogeneous: true,
-            }),
-        });
+        this._typeButtonContainer = new St.BoxLayout({style_class: 'screenshot-ui-type-button-container'});
         this._panel.add_child(this._typeButtonContainer);
 
-        this._selectionButton = new IconLabelButton('screenshot-ui-area-symbolic', _('Selection'), {
+        this._selectionButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
+            icon_name: 'screenshot-ui-area-symbolic',
+            accessible_name: _('Area Selection'),
             checked: true,
-            x_expand: true,
         });
         this._selectionButton.connect('notify::checked',
             this._onSelectionButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._selectionButton);
+        addTooltip(this._selectionButton, _('Area Selection'));
 
-        this.add_child(new Tooltip(this._selectionButton, {
-            text: _('Area Selection'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
-
-        this._screenButton = new IconLabelButton('screenshot-ui-display-symbolic', _('Screen'), {
+        this._screenButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
+            icon_name: 'screenshot-ui-display-symbolic',
+            accessible_name: _('Screen Selection'),
             toggle_mode: true,
-            x_expand: true,
         });
         this._screenButton.connect('notify::checked',
             this._onScreenButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._screenButton);
+        addTooltip(this._screenButton, _('Screen Selection'));
 
-        this.add_child(new Tooltip(this._screenButton, {
-            text: _('Screen Selection'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
-
-        this._windowButton = new IconLabelButton('screenshot-ui-window-symbolic', _('Window'), {
+        this._windowButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
+            icon_name: 'screenshot-ui-window-symbolic',
+            accessible_name: _('Window Selection'),
             toggle_mode: true,
-            x_expand: true,
         });
         this._windowButton.connect('notify::checked',
             this._onWindowButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._windowButton);
+        addTooltip(this._windowButton, _('Window Selection'));
 
-        this.add_child(new Tooltip(this._windowButton, {
-            text: _('Window Selection'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
-
-        this._bottomRowContainer = new St.Widget({layout_manager: new Clutter.BinLayout()});
-        this._panel.add_child(this._bottomRowContainer);
+        addSeparator();
 
         this._shotCastContainer = new St.BoxLayout({
             style_class: 'screenshot-ui-shot-cast-container',
-            x_align: Clutter.ActorAlign.START,
-            x_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
         });
-        this._bottomRowContainer.add_child(this._shotCastContainer);
+        this._panel.add_child(this._shotCastContainer);
 
         this._shotButton = new St.Button({
             style_class: 'screenshot-ui-shot-cast-button',
@@ -1680,12 +1609,7 @@ export class ScreenshotUI extends St.Widget {
         this._shotButton.connect('notify::checked',
             this._onShotButtonToggled.bind(this));
         this._shotCastContainer.add_child(this._shotButton);
-
-        this.add_child(new Tooltip(this._shotButton, {
-            text: _('Take Screenshot'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
+        addTooltip(this._shotButton, _('Take Screenshot'));
 
         this._castButton = new St.Button({
             style_class: 'screenshot-ui-shot-cast-button',
@@ -1696,52 +1620,46 @@ export class ScreenshotUI extends St.Widget {
         this._castButton.connect('notify::checked',
             this._onCastButtonToggled.bind(this));
         this._shotCastContainer.add_child(this._castButton);
-
-        this.add_child(new Tooltip(this._castButton, {
-            text: _('Record Screen'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
+        addTooltip(this._castButton, _('Record Screen'));
 
         this._shotButton.bind_property('checked', this._castButton, 'checked',
             GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.INVERT_BOOLEAN);
-
-        styleSurface(this._panel, 20);
-        this._captureButton = new St.Button({style_class: 'screenshot-ui-capture-button'});
-        this._captureButton.set_child(new St.Widget({
-            style_class: 'screenshot-ui-capture-button-circle',
-            x_expand: true,
-            y_expand: true,
-        }));
-        this.add_child(new Tooltip(this._captureButton, {
-            /* Translators: since this string refers to an action,
-            it needs to be phrased as a verb. */
-            text: _('Capture'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
-        this._captureButton.connect('clicked',
-            () => this._onCaptureButtonClicked().catch(logError));
-        this._bottomRowContainer.add_child(this._captureButton);
-
-        this._showPointerButtonContainer = new St.BoxLayout({
-            x_align: Clutter.ActorAlign.END,
-            x_expand: true,
-        });
-        this._bottomRowContainer.add_child(this._showPointerButtonContainer);
 
         this._showPointerButton = new St.Button({
             style_class: 'screenshot-ui-show-pointer-button',
             icon_name: 'screenshot-ui-show-pointer-symbolic',
             toggle_mode: true,
+            y_align: Clutter.ActorAlign.CENTER,
         });
-        this._showPointerButtonContainer.add_child(this._showPointerButton);
+        this._panel.add_child(this._showPointerButton);
+        addTooltip(this._showPointerButton, _('Show Pointer'));
 
-        this.add_child(new Tooltip(this._showPointerButton, {
-            text: _('Show Pointer'),
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
+        addSeparator();
+
+        this._captureButton = new St.Button({
+            style_class: 'screenshot-ui-capture-button',
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._captureButton.set_child(new St.Widget({
+            style_class: 'screenshot-ui-capture-button-circle',
+            x_expand: true,
+            y_expand: true,
         }));
+        /* Translators: since this string refers to an action,
+        it needs to be phrased as a verb. */
+        addTooltip(this._captureButton, _('Capture'));
+        this._captureButton.connect('clicked',
+            () => this._onCaptureButtonClicked().catch(logError));
+        this._panel.add_child(this._captureButton);
+
+        this._closeButton = new St.Button({
+            style_class: 'screenshot-ui-close-button',
+            icon_name: 'window-close-symbolic',
+            accessible_name: _('Close'),
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._closeButton.connect('clicked', () => this.close());
+        this._panel.add_child(this._closeButton);
 
         this._showPointerButton.connect('notify::checked', () => {
             const state = this._showPointerButton.checked;
@@ -1853,21 +1771,6 @@ export class ScreenshotUI extends St.Widget {
             Main.sessionMode.hasWindows &&
             windows.length > 0 &&
             !this._castButton.checked;
-    }
-
-    _refreshButtonLayout() {
-        const buttonLayout = Meta.prefs_get_button_layout();
-
-        this._closeButton.remove_style_class_name('left');
-        this._closeButton.remove_style_class_name('right');
-
-        if (buttonLayout.left_buttons.includes(Meta.ButtonFunction.CLOSE)) {
-            this._closeButton.add_style_class_name('left');
-            this._closeButtonXAlignConstraint.factor = 0;
-        } else {
-            this._closeButton.add_style_class_name('right');
-            this._closeButtonXAlignConstraint.factor = 1;
-        }
     }
 
     _rebuildMonitorBins() {
@@ -2029,8 +1932,6 @@ export class ScreenshotUI extends St.Widget {
             this.close(true);
             return;
         }
-
-        this._refreshButtonLayout();
 
         this.remove_all_transitions();
         this.visible = true;

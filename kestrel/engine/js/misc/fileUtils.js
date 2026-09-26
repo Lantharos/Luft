@@ -1,6 +1,8 @@
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 
+import * as Config from './config.js';
+
 export {loadInterfaceXML} from './dbusUtils.js';
 
 /**
@@ -22,7 +24,7 @@ export function* collectFromDatadirs(subdir, includeUserDir) {
         dataDirs.unshift(GLib.get_user_data_dir());
 
     for (let i = 0; i < dataDirs.length; i++) {
-        const path = GLib.build_filenamev([dataDirs[i], 'gnome-shell', subdir]);
+        const path = GLib.build_filenamev([dataDirs[i], Config.PACKAGE_NAME, subdir]);
         const dir = Gio.File.new_for_path(path);
 
         let fileEnum;

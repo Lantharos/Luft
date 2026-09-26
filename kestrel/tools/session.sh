@@ -59,5 +59,5 @@ exec dbus-run-session -- bash -c '
     echo "Usage: kestrel/tools/session.sh [nested|capture|performance]" >&2
     exit 2
   fi
-  exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/gnome-shell" "${args[@]}"
+  exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" "${args[@]}"
 ' kestrel-session "$root" "$mode"

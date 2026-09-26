@@ -35,9 +35,15 @@ GNOME’s calendar server integration, event list, world clocks, weather integra
 
 Run `kestrel/tools/session.sh performance` to measure resident memory and time since launch once the shell is ready, repeated search edits, app-button reuse, an 80-notification burst, row creation while hidden, and settled desktop paints. Search timings cover synchronous update work; they are not end-to-end display latency. The command uses an isolated headless session and exits when finished.
 
+## Install as a login session
+
+`kestrel/tools/install.sh install` builds Kestrel and its Mutter into `/opt/kestrel` and links a Kestrel entry for the login screen, a `kestrel.service` user unit, and its gnome-session target into `/usr/local`. Nothing from the system GNOME installation is replaced. Pass a prefix as the second argument to install elsewhere; session entries are only linked for prefixes under `/opt` or `/usr`. `kestrel/tools/install.sh remove` removes the prefix and the links.
+
+The session runs `gnome-session --session=kestrel`, which starts the `kestrel` binary with Kestrel's settings schemas. It identifies as `Kestrel;GNOME`, so GNOME's portals and settings daemons serve it.
+
 ## Work before a Luft session
 
-1. Make Kestrel the actual shell entry point and rename the build/session identifiers that still say GNOME Shell. The TypeScript UI is loaded by a reduced upstream `main.js` path.
+1. Log into the Kestrel session on real hardware and qualify it end to end. The TypeScript UI is loaded by a reduced upstream `main.js` path.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
 3. Supply Luft session and portal configuration, including screenshot, screencast, file chooser, settings, and secret handling, then exercise the portal calls from client apps.
 4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.

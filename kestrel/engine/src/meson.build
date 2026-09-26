@@ -27,8 +27,8 @@ script_data.set('PYTHON', python.full_path())
 script_data.set('VERSION', meson.project_version())
 
 test_tool = configure_file(
-  input: 'gnome-shell-test-tool.in',
-  output: 'gnome-shell-test-tool',
+  input: 'kestrel-test-tool.in',
+  output: 'kestrel-test-tool',
   configuration: script_data,
   install_dir: bindir
 )
@@ -49,7 +49,7 @@ gnome_shell_cflags = [
   '-DGNOME_SHELL_PKGLIBDIR="@0@"'.format(pkglibdir)
 ]
 
-install_rpath = ':'.join([mutter_typelibdir, pkglibdir])
+install_rpath = ':'.join([mutter_dep.get_variable('libdir'), mutter_typelibdir, pkglibdir])
 
 gnome_shell_deps = [
   gio_unix_dep,
@@ -271,7 +271,7 @@ libshell_gir = gnome.generate_gir(libshell,
   kwargs: introspection_common,
 )
 
-gnome_shell_binary = executable('gnome-shell', 'main.c',
+gnome_shell_binary = executable('kestrel', 'main.c',
   c_args: gnome_shell_cflags + typelib_cflags,
   dependencies: gnome_shell_deps + [libshell_dep, libst_dep, mutter_dep],
   include_directories: [conf_inc],

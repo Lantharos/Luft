@@ -25,6 +25,7 @@ export interface PanelActions {
   start(): void;
   quickSettings(): void;
   notifications(): void;
+  tasks(): void;
 }
 
 export class KestrelPanel {
@@ -100,6 +101,7 @@ export class KestrelPanel {
     );
     menus.bind(this.actor, () => [
       { label: 'Open Start', run: actions.start },
+      { label: 'Show all windows', run: actions.tasks },
       { label: 'Quick settings', run: actions.quickSettings },
       { label: 'Notifications', run: actions.notifications },
       { label: 'Display settings', run: () => menus.settings('display') },

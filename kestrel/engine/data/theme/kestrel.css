@@ -442,3 +442,19 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-open:hover, .kestrel-notification-dismiss:hover, .kestrel-notification-action:hover { background-color: rgba(255, 255, 255, 0.13); }
 .kestrel-notification-open:focus, .kestrel-notification-dismiss:focus, .kestrel-notification-action:focus { background-color: rgba(255, 255, 255, 0.13); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
 .kestrel-notification-open:rtl { text-align: right; }
+
+.kestrel-task-view { background-color: rgba(10, 10, 14, 0.28); color: #ffffff; }
+.kestrel-task-window { padding: 0; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: 140ms; }
+.kestrel-task-window:hover, .kestrel-task-window:focus { background-color: rgba(255, 255, 255, 0.08); }
+.kestrel-task-header { spacing: 8px; padding: 0 4px 6px 6px; }
+.kestrel-task-title { font-size: 13px; font-weight: 500; }
+.kestrel-task-close { width: 24px; height: 24px; border-radius: 12px; padding: 0; background-color: rgba(255, 255, 255, 0.10); box-shadow: none; }
+.kestrel-task-close:hover { background-color: rgba(235, 70, 70, 0.9); }
+.kestrel-task-workspaces { spacing: 12px; }
+.kestrel-task-workspace { padding: 6px; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: 140ms; }
+.kestrel-task-workspace:hover, .kestrel-task-workspace:focus { background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-task-workspace:checked { background-color: rgba(255, 255, 255, 0.18); }
+.kestrel-task-workspace:drop { background-color: rgba(255, 255, 255, 0.28); }
+.kestrel-task-workspace-body { spacing: 6px; }
+.kestrel-task-thumbnail { border-radius: 8px; }
+.kestrel-task-workspace-label { font-size: 12px; }

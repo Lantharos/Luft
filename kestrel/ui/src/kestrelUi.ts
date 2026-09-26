@@ -22,9 +22,11 @@ import type { QuickSettingsSource } from './quickControls.js';
 import { AccentService } from './accent/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
 import { SnapLayouts } from './snapLayouts.js';
+import { TaskView } from './taskView/taskView.js';
 import type { Rgb } from './accent/color.js';
 
-type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap';
+type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
+type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const START_HEIGHT = 600;
 const CLIPBOARD_WIDTH = 420;
@@ -52,6 +54,7 @@ interface Context {
   screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
+  createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
 }
 
@@ -66,6 +69,7 @@ class KestrelUi {
   private readonly notifications: NotificationCenter;
   private readonly clipboard: ClipboardPanel;
   private readonly snapLayouts: SnapLayouts;
+  private readonly taskView: TaskView;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
   private stylesheetMonitor: Gio.FileMonitor | null = null;
   private active: Surface | null = null;
@@ -103,6 +107,7 @@ class KestrelUi {
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
+    this.taskView = new TaskView(context.createBackground, () => this.close());
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -115,6 +120,7 @@ class KestrelUi {
       start: () => this.toggle('start', monitor()),
       quickSettings: () => this.toggle('quick', monitor()),
       notifications: () => this.toggle('notifications', monitor()),
+      tasks: () => this.toggle('tasks', monitor()),
     }), this.menus, this.previews);
 
     context.layoutManager.addTopChrome(this.cover);
@@ -123,6 +129,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.notifications.actor);
     context.layoutManager.addTopChrome(this.clipboard.actor);
     context.layoutManager.addTopChrome(this.snapLayouts.actor);
+    context.layoutManager.addTopChrome(this.taskView.actor);
     for (const actor of this.surfaces()) {
       const updateClip = () => actor.set_clip(0, 0, actor.width,
         Math.max(0, this.panels.forMonitor(this.surfaceMonitor()).actor.y - actor.y - actor.translation_y));
@@ -168,7 +175,7 @@ class KestrelUi {
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panels.primary.actor);
-    for (const actor of [...this.surfaces(), this.previews.actor])
+    for (const actor of [...this.surfaces(), this.previews.actor, this.taskView.actor])
       navigateWithKeyboard(actor);
     this.watch(context.layoutManager, 'monitors-changed', () => {
       this.dismissImmediately();
@@ -226,6 +233,7 @@ class KestrelUi {
     this.previews.close(true);
     this.panels.setActive(null, null);
     this.quick.closeSubmenu();
+    this.taskView.close(true);
     for (const actor of this.surfaces()) {
       actor.remove_all_transitions();
       actor.hide();
@@ -300,6 +308,10 @@ class KestrelUi {
     this.panels.setActive(surface, monitor);
     this.cover.show();
     for (const panel of this.panels.all) panel.actor.get_parent()!.set_child_above_sibling(panel.actor, this.cover);
+    if (surface === 'tasks') {
+      this.taskView.open(monitor);
+      return;
+    }
 
     const openingActor = this.actorFor(surface);
     this.closingSelections.get(openingActor)?.();
@@ -331,15 +343,20 @@ class KestrelUi {
     this.menus.close();
     const surface = this.active;
     if (surface === 'notifications') this.notifications.freeze();
-    if (surface) this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
+    if (surface && surface !== 'tasks') this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
     this.setActive(null);
     this.cover.hide();
     for (const panel of this.panels.all)
       panel.actor.get_parent()!.set_child_below_sibling(panel.actor, (global as unknown as Shell.Global).top_window_group);
     const stage = (global as unknown as Shell.Global).stage;
     const focus = stage.get_key_focus();
-    if (focus && this.surfaces().some(actor => actor.contains(focus)))
+    if (focus && [...this.surfaces(), this.taskView.actor].some(actor => actor.contains(focus)))
       stage.set_key_focus(null);
+    if (surface === 'tasks') {
+      this.taskView.close();
+      this.panels.setActive(null, null);
+      return;
+    }
     if (!surface)
       return;
 
@@ -369,11 +386,13 @@ class KestrelUi {
 
   startOpen(): boolean { return this.active === 'start'; }
 
+  taskViewOpen(): boolean { return this.taskView.visible; }
+
   private surfaces(): St.BoxLayout[] {
     return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor, this.snapLayouts.actor];
   }
 
-  private actorFor(surface: Surface): St.BoxLayout {
+  private actorFor(surface: PanelSurface): St.BoxLayout {
     switch (surface) {
       case 'start': return this.start.actor;
       case 'quick': return this.quick.actor;
@@ -452,5 +471,7 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 export function openStart(query = ''): void { currentUi?.openStart(query); }
 
 export function startOpen(): boolean { return currentUi?.startOpen() ?? false; }
+
+export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
 
 export function watchStart(watcher: (visible: boolean) => void): void { startWatchers.push(watcher); }

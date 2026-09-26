@@ -6,8 +6,9 @@ import St from 'gi://St';
 import type { Monitor } from './panel.js';
 import { blurSurface } from './surface.js';
 import { animateActor } from './motion.js';
+import { menuContent, type MenuEntry } from './menuContent.js';
 
-export interface MenuEntry { label: string; enabled?: boolean; run(): void; }
+export type { MenuEntry } from './menuContent.js';
 
 export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
@@ -16,6 +17,7 @@ export class ContextMenus {
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
   private clearSelection: (() => void) | null = null;
+  private anchor: { x: number; y: number; monitor: Monitor } | null = null;
 
   constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void) {
     blurSurface(this.actor, 14);
@@ -100,38 +102,43 @@ export class ContextMenus {
     this.sourceDestroy = source.connect('destroy', () => { this.source = null; this.sourceDestroy = 0; this.close(); });
     this.clearSelection?.();
     this.clearSelection = null;
+    this.anchor = { x, y, monitor };
+    const stage = (global as unknown as Shell.Global).stage;
+    this.shield.set_position(0, 0);
+    this.shield.set_size(stage.width, stage.height);
+    this.shield.get_parent()!.set_child_above_sibling(this.shield, null);
+    this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
+    this.present(entries, []);
+    this.shield.show();
+    this.actor.opacity = 0;
+    this.actor.translation_y = 6;
+    animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    this.actor.grab_key_focus();
+  }
+
+  private present(entries: MenuEntry[], parents: MenuEntry[][]): void {
+    const { x, y, monitor } = this.anchor!;
     this.actor.destroy_all_children();
-    const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
-    for (const entry of entries) {
-      const button = new St.Button({ style_class: 'kestrel-context-action', accessible_name: entry.label, can_focus: entry.enabled !== false, reactive: entry.enabled !== false, opacity: entry.enabled === false ? 110 : 255, track_hover: true, x_expand: true,
-        child: new St.Label({ text: entry.label, x_expand: true, x_align: Clutter.ActorAlign.START }) });
-      button.connect('notify::hover', () => {
+    const content = menuContent(entries, {
+      activate: action => { this.close(); action.run(); },
+      open: group => this.present(group.children, [...parents, entries]),
+      back: parents.length ? () => this.present(parents.at(-1)!, parents.slice(0, -1)) : null,
+      hover: button => {
         if (!this.source || this.clearSelection) return;
         if (button.hover) button.grab_key_focus();
         else if ((global as unknown as Shell.Global).stage.get_key_focus() === button) this.actor.grab_key_focus();
-      });
-      button.connect('clicked', () => { this.close(); entry.run(); });
-      content.add_child(button);
-    }
+      },
+    });
     const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC });
     scroll.child = content;
     this.actor.add_child(scroll);
     this.actor.show();
     this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 56)));
     scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
-    const stage = (global as unknown as Shell.Global).stage;
-    this.shield.set_position(0, 0);
-    this.shield.set_size(stage.width, stage.height);
-    this.shield.get_parent()!.set_child_above_sibling(this.shield, null);
-    this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
     const height = this.actor.get_preferred_height(this.actor.width)[1];
     this.actor.set_position(Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8))),
       Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))));
-    this.shield.show();
-    this.actor.opacity = 0;
-    this.actor.translation_y = 6;
-    animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-    this.actor.grab_key_focus();
+    if (parents.length) this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
   close(immediate = false): void {

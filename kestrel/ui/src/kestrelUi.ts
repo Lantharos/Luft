@@ -145,7 +145,7 @@ class KestrelUi {
       if (event.type() === Clutter.EventType.SCROLL) {
         const [x, y] = event.get_coords();
         const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
-        if ((event.get_state() & (Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK)) || this.panels.contains(target))
+        if ((event.get_state() & (Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK)) || (this.panels.contains(target) && !this.panels.primary.tray?.contains(target)))
           return this.workspaces.scroll(event) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
       }
       if (!this.canInteract() || event.type() !== Clutter.EventType.BUTTON_PRESS)

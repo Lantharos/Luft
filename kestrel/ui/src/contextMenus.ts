@@ -17,6 +17,7 @@ export class ContextMenus {
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
+  private previousFocus: Clutter.Actor | null = null;
   private clearSelection: (() => void) | null = null;
   private anchor: { x: number; y: number; monitor: Monitor } | null = null;
 
@@ -104,6 +105,7 @@ export class ContextMenus {
     this.clearSelection?.();
     this.clearSelection = null;
     this.anchor = { x, y, monitor };
+    this.previousFocus = (global as unknown as Shell.Global).stage.get_key_focus();
     const stage = (global as unknown as Shell.Global).stage;
     this.shield.set_position(0, 0);
     this.shield.set_size(stage.width, stage.height);
@@ -145,7 +147,6 @@ export class ContextMenus {
   close(immediate = false): void {
     if (this.actor.visible && !this.clearSelection) this.clearSelection = freezeSelection(this.actor);
     if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
-    const source = this.source;
     this.source = null;
     this.sourceDestroy = 0;
     if (immediate) { this.actor.remove_all_transitions(); this.actor.hide(); }
@@ -154,6 +155,13 @@ export class ContextMenus {
       onComplete: () => { if (!this.source) this.actor.hide(); },
     });
     this.shield.hide();
-    if (source?.mapped) source.grab_key_focus();
+    const previous = this.previousFocus;
+    this.previousFocus = null;
+    if (previous?.mapped) previous.grab_key_focus();
+    else {
+      const stage = (global as unknown as Shell.Global).stage;
+      const focus = stage.get_key_focus();
+      if (focus && this.actor.contains(focus)) stage.set_key_focus(null);
+    }
   }
 }

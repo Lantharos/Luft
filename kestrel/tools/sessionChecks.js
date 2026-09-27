@@ -157,8 +157,12 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await capture(`${output}/volume-osd.png`);
   Main.osdWindowManager.hideAll();
   await pause(200);
-  await Main.screenshotUI.open();
-  await pause(250);
+  toggleSurface('quick');
+  await pause(400);
+  actorNamed(actorNamed(global.stage, 'kestrel-quick-settings'), 'Take screenshot').emit('clicked', 1);
+  await pause(400);
+  require(Main.screenshotUI.visible && !actorNamed(global.stage, 'kestrel-quick-settings').visible,
+    'Quick Settings opens the screenshot tool without itself in view');
   await capture(`${output}/screenshot-controls.png`);
   Main.screenshotUI.close(true);
   await pause(250);

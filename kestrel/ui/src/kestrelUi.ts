@@ -55,6 +55,7 @@ interface Context {
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   activateWindow(window: Meta.Window): void;
+  openScreenshot(): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
 }
@@ -104,7 +105,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.previews.actor);
     this.start = new StartMenu(() => this.close(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
-      icons => this.panels.primary.updateStatus(icons), this.menus);
+      icons => this.panels.primary.updateStatus(icons), this.menus, () => this.takeScreenshot());
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
@@ -227,6 +228,15 @@ class KestrelUi {
       panel.actor.visible = available && !coversMonitor && !display.get_monitor_in_fullscreen(monitor.index);
     }
     if (!available) this.dismissImmediately();
+  }
+
+  private takeScreenshot(): void {
+    this.dismissImmediately();
+    const stage = (global as unknown as Shell.Global).stage;
+    const painted = stage.connect('after-paint', () => {
+      stage.disconnect(painted);
+      this.context.openScreenshot();
+    });
   }
 
   dismissImmediately(): void {

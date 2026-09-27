@@ -38,9 +38,10 @@ exec dbus-run-session -- bash -c '
   root="$1"
   mode="$2"
   run="$root/kestrel/run"
-  dconf load /org/gnome/desktop/background/ < "$run/background.ini"
-  dconf load /org/gnome/desktop/interface/ < "$run/interface.ini"
-  dconf load /org/gnome/desktop/input-sources/ < "$run/input-sources.ini"
+  for section in background interface input-sources; do
+    dconf reset -f "/org/gnome/desktop/$section/"
+    dconf load "/org/gnome/desktop/$section/" < "$run/$section.ini"
+  done
   dconf write /org/gnome/shell/favorite-apps "$(cat "$run/favorites.txt")"
   if [[ "$mode" == capture ]]; then
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"

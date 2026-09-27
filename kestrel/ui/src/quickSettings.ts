@@ -44,6 +44,7 @@ export class QuickSettings {
     private readonly close: () => void,
     statusChanged: (icons: string[]) => void,
     private readonly menus: ContextMenus,
+    takeScreenshot: () => void,
   ) {
     blurSurface(this.actor);
     this.actor.connect('destroy', () => {
@@ -68,6 +69,7 @@ export class QuickSettings {
       Shell.AppSystem.get_default().lookup_app('org.gnome.Settings.desktop')?.activate();
       this.close();
     }));
+    this.footer.add_child(this.footerButton('camera-photo-symbolic', 'Take screenshot', takeScreenshot));
     const lock = this.footerButton(LOCK.icon, 'Lock screen', () => { this.close(); LOCK.run(); });
     bindAvailability(LOCK, lock);
     this.footer.add_child(lock);

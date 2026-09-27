@@ -37,6 +37,7 @@ export function freezeSelection(root) {
         }
         for (const child of actor.get_children()) visit(child, freeze);
     };
-    visit(root, true);
-    return () => visit(root, false);
+    const visitContents = freeze => root.get_children().forEach(child => visit(child, freeze));
+    visitContents(true);
+    return () => visitContents(false);
 }

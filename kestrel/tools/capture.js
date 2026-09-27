@@ -108,6 +108,7 @@ export async function run() {
     await pause(200);
   }
   console.log(`Kestrel caret visibility: ${caretStates.join(', ')}`);
+  if (!caretStates.includes(false)) throw new Error('Search caret did not blink');
   global.stage.set_key_focus(null);
   await captureRenderedFrames(`${output}/start-hover.png`, async () => {
     for (const [x, y] of [[70, 160], [172, 250], [274, 340], [376, 160], [478, 250]]) {

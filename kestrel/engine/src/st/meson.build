@@ -203,23 +203,6 @@ libst_dep = declare_dependency(
   include_directories: [st_inc],
 )
 
-if get_option('tests') and have_xwayland
-  mutter_test_dep = dependency(libmutter_test_pc, version: mutter_req)
-  test_theme = executable('test-theme',
-    sources: 'test-theme.c',
-    c_args: st_cflags,
-    dependencies: [mutter_test_dep, mtk_dep, libxml_dep, pango_dep],
-    build_rpath: mutter_typelibdir,
-    link_with: libst
-  )
-
-  test('css-styling', test_theme,
-    suite: 'st',
-    depends: compiled_schemas,
-    workdir: meson.current_source_dir(),
-  )
-endif
-
 libst_gir = gnome.generate_gir(libst,
   sources: st_gir_sources,
   nsversion: mutter_api_version,

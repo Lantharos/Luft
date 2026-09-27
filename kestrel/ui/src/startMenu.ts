@@ -21,7 +21,7 @@ export class StartMenu {
   private readonly searchProvider: StartSearch;
   private apps: Gio.AppInfo[] = [];
 
-  constructor(private readonly close: () => void, private readonly menus: ContextMenus) {
+  constructor(private readonly close: () => void, menus: ContextMenus) {
     this.actor = new St.BoxLayout({
       name: 'kestrel-start',
       orientation: Clutter.Orientation.VERTICAL,

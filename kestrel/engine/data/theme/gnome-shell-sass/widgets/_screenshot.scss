@@ -19,23 +19,23 @@ $screenshot_ui_button_red: $red_4;
   background-color: transparentize($osd_fg_color, 0.85);
 }
 
-.screenshot-ui-type-button-container { spacing: $base_padding * 0.5; }
 
 .screenshot-ui-close-button,
-.screenshot-ui-type-button {
+.screenshot-ui-type-button,
+.screenshot-ui-show-pointer-button {
   @extend %osd_button_flat;
-  padding: $base_padding * 1.5;
-  border-radius: $base_border_radius * 1.5;
-  & StIcon { icon-size: $base_icon_size * 1.25; }
+  padding: $base_padding $base_padding * 2;
+  border-radius: $forced_circular_radius;
+  & StIcon { icon-size: $base_icon_size; }
 }
 
 .screenshot-ui-capture-button {
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   margin: 0 $base_padding * 0.5;
   border-radius: $forced_circular_radius;
-  border: 3px $osd_fg_color;
-  padding: 3px;
+  border: 2px $osd_fg_color;
+  padding: 2px;
 
   .screenshot-ui-capture-button-circle {
     background-color: $osd_fg_color;
@@ -73,6 +73,7 @@ $screenshot_ui_button_red: $red_4;
   }
 }
 
+.screenshot-ui-type-button-container,
 .screenshot-ui-shot-cast-container {
   background-color: transparentize($osd_fg_color,0.9);
   border-radius: $forced_circular_radius;
@@ -102,10 +103,6 @@ $screenshot_ui_button_red: $red_4;
   &:insensitive { color: transparentize($osd_fg_color, 0.5);}
 }
 
-.screenshot-ui-show-pointer-button {
-  @extend %osd_button_flat;
-  @extend .icon-button;
-}
 
 .screenshot-ui-area-indicator-shade {
   background-color: rgba(0,0,0,.3);

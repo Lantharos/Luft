@@ -4,24 +4,6 @@ option('camera_monitor',
   description: 'Enable the camera monitor'
 )
 
-option('gtk_doc',
-  type: 'boolean',
-  value: false,
-  description: 'Build API reference'
-)
-
-option('man',
-  type: 'boolean',
-  value: true,
-  description: 'Generate man pages'
-)
-
-option('tests',
-  type: 'boolean',
-  value: true,
-  description: 'Enable tests'
-)
-
 option('networkmanager',
   type: 'boolean',
   value: true,

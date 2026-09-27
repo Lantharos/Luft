@@ -30,12 +30,11 @@ export class Taskbar {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-app-slots' });
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
-  private readonly drop: TaskbarDrop;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
     favorites: Gio.Settings, private readonly monitorIndex: () => number,
     private readonly activateWindow: (window: Meta.Window) => void) {
-    this.drop = new TaskbarDrop(this.actor, () => this.actor.get_children()
+    new TaskbarDrop(this.actor, () => this.actor.get_children()
       .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
       .filter((item): item is AppItem => !!item)
       .map(item => ({ id: item.app.id, slot: item.slot, button: item.button })), favorites);

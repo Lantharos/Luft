@@ -39,7 +39,7 @@ export class QuickSettings {
   private layoutLater = 0;
 
   constructor(
-    private readonly source: QuickSettingsSource,
+    source: QuickSettingsSource,
     private readonly layoutChanged: () => void,
     private readonly close: () => void,
     statusChanged: (icons: string[]) => void,

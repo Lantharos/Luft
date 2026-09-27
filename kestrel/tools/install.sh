@@ -29,8 +29,7 @@ case "$action" in
 
     (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
     meson setup "$build/engine" "$root/kestrel/engine" \
-      -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release \
-      -Dtests=false -Dman=false
+      -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
     meson compile -C "$build/engine"
     as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
     as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"

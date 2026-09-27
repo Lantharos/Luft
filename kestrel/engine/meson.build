@@ -16,7 +16,6 @@ clutter_pc = 'mutter-clutter-' + mutter_api_version
 cogl_pc = 'mutter-cogl-' + mutter_api_version
 mtk_pc = 'mutter-mtk-' + mutter_api_version
 libmutter_pc = 'libmutter-' + mutter_api_version
-libmutter_test_pc = 'libmutter-test-' + mutter_api_version
 
 gcr_req = '>= 3.90.0'
 gio_req = '>= 2.86.0'
@@ -150,10 +149,7 @@ else
   have_systemd = false
 endif
 
-have_asan_tests = get_option('b_sanitize') == 'address'
-
 mutter_typelibdir = mutter_dep.get_variable('typelibdir')
-mutter_pkglibdir = mutter_dep.get_variable('pkglibdir')
 python = find_program('python3')
 gjs = find_program('gjs')
 generate_app_list = find_program('build-aux/generate-app-list.py')
@@ -283,41 +279,9 @@ libshew = dependency('libshew',
   ]
 )
 
-if get_option('tests')
-  common_test_env = environment()
-  common_test_env.set('GSETTINGS_SCHEMA_DIR', meson.project_build_root() / 'data')
-  common_test_env.set('GSETTINGS_BACKEND', 'memory')
-  common_test_env.set('XDG_CURRENT_DESKTOP', '')
-  if have_asan_tests
-    asan_options = [
-      'halt_on_error=1',
-      'abort_on_error=1',
-      'detect_leaks=0',
-      'verify_asan_link_order=0',
-    ]
-    common_test_env.set('ASAN_OPTIONS', ':'.join(asan_options))
-    common_test_env.set('LD_PRELOAD', mutter_pkglibdir / 'libasan-preloader.so')
-  endif
-
-  jasmine = find_program('jasmine')
-
-  add_test_setup('default',
-    is_default: true,
-    env: common_test_env,
-  )
-endif
-
 subdir('data')
 subdir('js')
 subdir('src')
-
-if get_option('tests') and have_xwayland
-  subdir('tests')
-endif
-
-if get_option('gtk_doc')
-  subdir('docs/reference')
-endif
 
 gnome.post_install(
   glib_compile_schemas: true,
@@ -329,7 +293,6 @@ summary_options = {
   'camera_monitor': get_option('camera_monitor'),
   'networkmanager': get_option('networkmanager'),
   'systemd': get_option('systemd'),
-  'gtk_doc': get_option('gtk_doc'),
 }
 
 summary_build = {
@@ -345,10 +308,6 @@ summary_dirs = {
   'datadir': get_option('datadir'),
   'sysconfdir': get_option('sysconfdir'),
 }
-
-if get_option('man')
-  summary_dirs += { 'mandir': get_option('mandir') }
-endif
 
 summary(summary_dirs, section: 'Directories')
 summary(summary_build, section: 'Build Configuration')

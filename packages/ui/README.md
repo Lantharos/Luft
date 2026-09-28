@@ -75,11 +75,21 @@ After that, `appearance.translucent`, `appearance.accent` and `appearance.accent
 | `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials |
 | `Popover` | Floating panel anchored to a trigger; stays inside the window, flips above when there is no room below, and scrolls when it runs out of height |
 | `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at a pointer position; it closes when the window resizes or Escape is pressed inside it, and the app decides what an outside click does |
+| `MenuButton` | Button that opens a menu below it; `trigger` renders the button's content and `children` receives a `close` function for the items |
+| `VirtualScroller` | Scrolling list or grid that only renders the items in view, so it stays fast with tens of thousands of items. `layout` sets the item height and, for a grid, `minItemWidth`; `header` stays pinned above the items. Items passed while `stagger` is on fade in from top to bottom, and with `animateOrder` a reordered or filtered list moves its items to their new places. `scrollToIndex`, `indicesIn` and `metrics` help with keyboard navigation and rubber-band selection |
 | `GlassShell`, `WindowControls` | Window body and title bar buttons |
+
+`Segmented` also takes an `item` snippet to show icons instead of text; the option's `label` then becomes its accessible name.
 
 ## Classes
 
 `button` (with `primary`, `danger` and `large`), `plain-button`, `icon-button` (with `large`), `text-field`, `window-control`, `row-group`, `drag-region`, `soft-scroll` and `hidden-scroll` are available globally for markup that doesn't need a component.
+
+The `tooltip(text)` attachment shows a small label under an element after a short hover, and right away when moving between elements that have one:
+
+```svelte
+<button class="icon-button" aria-label="Back" {@attach tooltip('Back')}>…</button>
+```
 
 ## Tokens
 

@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends string | number">
+	import type { Snippet } from 'svelte';
+
 	interface Option {
 		value: T;
 		label: string;
@@ -9,23 +11,29 @@
 		value: T;
 		label: string;
 		onchange: (value: T) => void;
+		item?: Snippet<[Option]>;
 	}
 
-	let { options, value, label, onchange }: Props = $props();
+	let { options, value, label, onchange, item }: Props = $props();
 	let index = $derived(Math.max(0, options.findIndex((option) => option.value === value)));
 </script>
 
-<div class="segmented" role="radiogroup" aria-label={label} style:--count={options.length} style:--index={index}>
+<div class="segmented" class:compact={item} role="radiogroup" aria-label={label} style:--count={options.length} style:--index={index}>
 	<span class="indicator"></span>
 	{#each options as option (option.value)}
 		<button
 			type="button"
 			role="radio"
 			aria-checked={option.value === value}
+			aria-label={item ? option.label : undefined}
 			class:active={option.value === value}
 			onclick={() => onchange(option.value)}
 		>
-			{option.label}
+			{#if item}
+				{@render item(option)}
+			{:else}
+				{option.label}
+			{/if}
 		</button>
 	{/each}
 </div>
@@ -62,6 +70,13 @@
 		font-weight: 500;
 		color: var(--text-muted);
 		transition: color 180ms var(--ease);
+	}
+
+	.compact button {
+		display: grid;
+		min-height: 28px;
+		place-items: center;
+		padding-inline: 9px;
 	}
 
 	button.active,

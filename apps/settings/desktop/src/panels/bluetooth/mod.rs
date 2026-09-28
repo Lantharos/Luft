@@ -1,5 +1,6 @@
 mod actions;
 mod agent;
+mod rfkill;
 mod snapshot;
 mod watch;
 
@@ -26,6 +27,18 @@ struct Toggle {
 #[derive(Deserialize)]
 struct Device {
     device: String,
+}
+
+#[derive(Deserialize)]
+struct Trust {
+    device: String,
+    trusted: bool,
+}
+
+#[derive(Deserialize)]
+struct Visibility {
+    visible: bool,
+    timeout: u32,
 }
 
 #[derive(Deserialize)]
@@ -89,6 +102,13 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("bluetooth_forget", |Device { device }| {
             actions::forget(&device)
         })
+        .command("bluetooth_set_trusted", |Trust { device, trusted }| {
+            actions::set_trusted(&device, trusted)
+        })
+        .command(
+            "bluetooth_set_visible",
+            |Visibility { visible, timeout }| actions::set_visible(&adapter()?, visible, timeout),
+        )
         .command("bluetooth_answer", |Answer { id, value }| {
             agent::answer(id, value);
             Ok(())

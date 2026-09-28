@@ -8,7 +8,7 @@ use luft_app::dbus::objects::{self, failed};
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
-use super::{SERVICE, actions};
+use super::{SERVICE, actions, rfkill};
 
 pub const CHANGED: &str = "bluetooth.changed";
 
@@ -40,6 +40,7 @@ fn rules() -> zbus::Result<[zbus::MatchRule<'static>; 2]> {
 
 fn start(events: Events) {
     let (changes, refreshes) = mpsc::channel();
+    rfkill::watch(changes.clone());
     for rule in rules().into_iter().flatten() {
         let changes = changes.clone();
         std::thread::spawn(move || {

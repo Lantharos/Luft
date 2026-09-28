@@ -27,3 +27,18 @@ export const KIND_ICONS: Record<Kind, Component> = {
 	camera: Camera,
 	other: Bluetooth
 };
+
+export const KIND_LABELS: Record<Kind, string> = {
+	headphones: 'Headphones',
+	speaker: 'Speaker',
+	mouse: 'Mouse',
+	keyboard: 'Keyboard',
+	gamepad: 'Game controller',
+	phone: 'Phone',
+	computer: 'Computer',
+	tablet: 'Tablet',
+	display: 'Display',
+	printer: 'Printer',
+	camera: 'Camera',
+	other: 'Other device'
+};

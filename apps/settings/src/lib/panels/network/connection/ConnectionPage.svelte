@@ -8,7 +8,7 @@
 	import GeneralSection from './GeneralSection.svelte';
 	import IpSection from './IpSection.svelte';
 	import SecuritySection from './SecuritySection.svelte';
-	import { loadProfile, loadSecret, prepare, saveProfile, type Profile, type Target } from './profile';
+	import { loadProfile, loadSecret, macChoice, prepare, saveProfile, type Profile, type Target } from './profile';
 	import { checkProfile } from './validate';
 
 	interface Props {
@@ -25,12 +25,13 @@
 	let original = $state('');
 	let password = $state('');
 	let savedPassword = $state('');
+	let customMac = $state(false);
 	let saving = $state(false);
 	let problem = $state('');
 
 	let originalSecurity = $derived(original ? (JSON.parse(original) as Profile).wireless?.security : undefined);
 	let passwordNeeded = $derived(Boolean(profile?.wireless && profile.wireless.security !== originalSecurity));
-	let errors = $derived(profile ? checkProfile(profile, password, passwordNeeded) : {});
+	let errors = $derived(profile ? checkProfile(profile, { password, passwordNeeded, customMac }) : {});
 	let changed = $derived(Boolean(profile) && (JSON.stringify(profile) !== original || password !== savedPassword));
 	let ready = $derived(changed && !saving && Object.keys(errors).length === 0);
 
@@ -71,6 +72,7 @@
 		loadProfile(target.path)
 			.then((loaded) => {
 				original = JSON.stringify(loaded);
+				customMac = macChoice(loaded.kind, loaded.mac) === 'custom';
 				profile = loaded;
 			})
 			.catch((reason) => (problem = explain(reason)));
@@ -98,7 +100,7 @@
 		<IpSection family="ipv4" bind:ip={profile.ipv4} {errors} />
 		<IpSection family="ipv6" bind:ip={profile.ipv6} {errors} />
 		{#if profile.kind === 'wired' || profile.kind === 'wifi'}
-			<AdvancedSection bind:profile {errors} />
+			<AdvancedSection bind:profile bind:custom={customMac} {errors} />
 		{/if}
 		{#if target.kind === 'wifi'}
 			{@const ssid = target.ssid}

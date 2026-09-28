@@ -1,47 +1,38 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Row, Section, Select, TextField } from '@luft/ui';
-	import type { Profile } from './profile';
+	import { macChoice, type MacChoice, type Profile } from './profile';
 	import type { Errors } from './validate';
 
 	interface Props {
 		profile: Profile;
+		custom: boolean;
 		errors: Errors;
 	}
 
-	type Choice = 'builtin' | 'random' | 'stable' | 'custom';
-
-	const BUILTIN = ['', 'preserve', 'permanent'];
-	const WIFI_CHOICES: { value: Choice; label: string }[] = [
+	const WIFI_CHOICES: { value: MacChoice; label: string }[] = [
 		{ value: 'random', label: 'New address each time' },
 		{ value: 'stable', label: 'Same address for this network' },
 		{ value: 'builtin', label: 'Off' }
 	];
-	const WIRED_CHOICES: { value: Choice; label: string }[] = [
+	const WIRED_CHOICES: { value: MacChoice; label: string }[] = [
 		{ value: 'builtin', label: 'Built-in address' },
 		{ value: 'random', label: 'New address each time' },
 		{ value: 'stable', label: 'Same address for this network' },
 		{ value: 'custom', label: 'Custom address' }
 	];
 
-	let { profile = $bindable(), errors }: Props = $props();
+	let { profile = $bindable(), custom = $bindable(), errors }: Props = $props();
 
 	const original = untrack(() => profile.mac);
 
 	let wifi = $derived(profile.kind === 'wifi');
 	let mtu = $state(untrack(() => (profile.mtu ? String(profile.mtu) : '')));
-	let custom = $state(untrack(() => classify(profile.mac) === 'custom'));
-	let choice = $derived<Choice>(custom ? 'custom' : classify(profile.mac));
+	let choice = $derived<MacChoice>(custom ? 'custom' : macChoice(profile.kind, profile.mac));
 
-	function classify(mac: string): Choice {
-		if (BUILTIN.includes(mac)) return 'builtin';
-		if (mac === 'random' || mac === 'stable') return mac;
-		return wifi ? 'builtin' : 'custom';
-	}
-
-	function choose(next: Choice) {
+	function choose(next: MacChoice) {
 		custom = next === 'custom';
-		if (classify(original) === next) profile.mac = original;
+		if (macChoice(profile.kind, original) === next) profile.mac = original;
 		else if (next === 'builtin') profile.mac = 'permanent';
 		else profile.mac = custom ? '' : next;
 	}
@@ -64,7 +55,7 @@
 		{#if choice === 'custom'}
 			<Row title="Custom address">
 				<div class="w-[260px]">
-					<TextField label="Custom address" bind:value={profile.mac} placeholder="12:34:56:78:9A:BC" error={errors.mac} />
+					<TextField label="Custom address" bind:value={profile.mac} placeholder="12:34:56:78:9A:BC" error={errors.mac} live />
 				</div>
 			</Row>
 		{/if}

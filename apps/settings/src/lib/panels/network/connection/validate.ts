@@ -76,7 +76,13 @@ export function checkEnterprise(enterprise: Enterprise, errors: Errors) {
 	}
 }
 
-export function checkProfile(profile: Profile, password: string, passwordNeeded: boolean): Errors {
+interface Context {
+	password: string;
+	passwordNeeded: boolean;
+	customMac: boolean;
+}
+
+export function checkProfile(profile: Profile, { password, passwordNeeded, customMac }: Context): Errors {
 	const errors: Errors = {};
 	if (!profile.name.trim()) errors.name = 'Enter a name';
 	checkIp('ipv4', profile.ipv4, errors);
@@ -84,7 +90,7 @@ export function checkProfile(profile: Profile, password: string, passwordNeeded:
 	if (profile.kind === 'wired' || profile.kind === 'wifi') {
 		const [lowest, highest] = MTU_RANGE;
 		if (profile.mtu !== 0 && !(Number.isInteger(profile.mtu) && profile.mtu >= lowest && profile.mtu <= highest)) errors.mtu = `Use a number from ${lowest} to ${highest}, or leave it empty`;
-		if (!['', 'preserve', 'permanent', 'random', 'stable'].includes(profile.mac) && !isMac(profile.mac)) errors.mac = 'Enter an address like 12:34:56:78:9A:BC';
+		if (customMac && !isMac(profile.mac)) errors.mac = 'Enter an address like 12:34:56:78:9A:BC';
 	}
 	const wireless = profile.wireless;
 	if (wireless?.security === 'enterprise' && wireless.enterprise) checkEnterprise(wireless.enterprise, errors);

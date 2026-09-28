@@ -137,8 +137,6 @@ export async function start() {
     sessionMode = new SessionMode.SessionMode();
     sessionMode.connect('updated', _sessionUpdated);
 
-    KestrelUi.startSession();
-
     St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
 
     await _initializeUI();

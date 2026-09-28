@@ -1,0 +1,13 @@
+[Unit]
+Description=Kestrel session manager
+CollectMode=inactive-or-failed
+PartOf=kestrel-session.target
+Before=kestrel.service
+
+[Service]
+Slice=session.slice
+Type=dbus
+BusName=org.gnome.SessionManager
+ExecStart=@gjs@ -m @pkgdatadir@/kestrel-session.js
+Restart=on-failure
+TimeoutStopSec=5

@@ -2,14 +2,14 @@ import { build } from 'esbuild';
 import { writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
-const output = process.argv[2];
+const [entry, output] = process.argv.slice(2);
 
-if (!output) {
-  throw new Error('An output path is required');
+if (!entry || !output) {
+  throw new Error('An entry name and an output path are required');
 }
 
 const result = await build({
-  entryPoints: [join(import.meta.dir, 'src', 'kestrelUi.ts')],
+  entryPoints: [join(import.meta.dir, 'src', `${entry}.ts`)],
   outfile: output,
   bundle: true,
   metafile: true,

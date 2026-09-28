@@ -9,6 +9,7 @@ build="$root/kestrel/run/install-build"
 installed_links() {
   echo "share/wayland-sessions/kestrel.desktop"
   echo "share/xdg-desktop-portal/kestrel-portals.conf"
+  echo "share/xdg-desktop-portal/portals/kestrel.portal"
   echo "lib/systemd/user/app.slice.d/50-kestrel-oomd.conf"
   for unit in "$prefix"/lib/systemd/user/kestrel*; do
     echo "lib/systemd/user/$(basename "$unit")"

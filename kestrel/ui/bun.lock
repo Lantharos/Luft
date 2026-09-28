@@ -11,6 +11,7 @@
         "@girs/giounix-2.0": "5.4.0",
         "@girs/gjs": "5.4.0",
         "@girs/glib-2.0": "5.4.0",
+        "@girs/glibunix-2.0": "5.4.0",
         "@girs/meta-51": "5.4.0",
         "@girs/shell-51": "5.4.0",
         "@girs/st-51": "5.4.0",
@@ -102,6 +103,8 @@
     "@girs/gl-1.0": ["@girs/gl-1.0@5.4.0", "", { "dependencies": { "@girs/gjs": "^5.4.0", "@girs/gobject-2.0": "^5.4.0" } }, "sha512-ACSzvg+++bruwUCKoPrXYRq6AJkY30S3hfRY3QZoODk4NerCFND7nhtef4DYpt9M9d1H7/piJ5rOBW368wbe2g=="],
 
     "@girs/glib-2.0": ["@girs/glib-2.0@5.4.0", "", { "dependencies": { "@girs/gjs": "^5.4.0", "@girs/gobject-2.0": "^5.4.0" } }, "sha512-8n+bsqZIAPivdrZrqc1m0IaE5TXOrV3UYigqHh95saJIDRQilzVahx2iJhd9Pp/CAYSYWY7Qgg9h6kV4ymY/Xw=="],
+
+    "@girs/glibunix-2.0": ["@girs/glibunix-2.0@5.4.0", "", { "dependencies": { "@girs/gjs": "^5.4.0", "@girs/glib-2.0": "^5.4.0", "@girs/gobject-2.0": "^5.4.0" } }, "sha512-LYyENe8TOdRqEa/jYlneFASMP5PJIKxi7DvaPS65wOhp4uJoa16Txw/ueX/RvO/l/f6hxLINJEGfjnq1m7t2Bg=="],
 
     "@girs/gmodule-2.0": ["@girs/gmodule-2.0@5.4.0", "", { "dependencies": { "@girs/gjs": "^5.4.0", "@girs/glib-2.0": "^5.4.0", "@girs/gobject-2.0": "^5.4.0" } }, "sha512-Ya7jQzPViSRyw5P/ElI/9ngVHt82f5Cin6JYW4EQ3DazT28EjgYsJpwRwA64yI7FAuLvIiyosIvErr+ZR/tzDA=="],
 

@@ -5,6 +5,8 @@ RefuseManualStart=on
 RefuseManualStop=on
 PartOf=kestrel-session.target
 Before=kestrel-session.target
+Requires=kestrel-session-manager.service
+After=kestrel-session-manager.service
 
 AssertEnvironment=XDG_SESSION_TYPE=wayland
 

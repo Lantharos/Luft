@@ -6,6 +6,7 @@ import { perform, stopSession } from './system.js';
 
 export type EndAction = 'logout' | 'shutdown' | 'reboot';
 
+const SHELL = 'org.gnome.Shell';
 const DIALOG_PATH = '/org/gnome/SessionManager/EndSessionDialog';
 const DIALOG_INTERFACE = 'org.gnome.SessionManager.EndSessionDialog';
 const DIALOG_TYPES: Record<EndAction, number> = { logout: 0, shutdown: 1, reboot: 2 };
@@ -20,14 +21,14 @@ export class EndSession {
   request(action: EndAction, inhibitors: string[]): void {
     this.dismiss();
     const bus = Gio.DBus.session;
-    this.subscription = bus.signal_subscribe(bus.get_unique_name(), DIALOG_INTERFACE, null, DIALOG_PATH, null,
+    this.subscription = bus.signal_subscribe(SHELL, DIALOG_INTERFACE, null, DIALOG_PATH, null,
       Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, signal) => {
         if (signal === 'Closed') return;
         this.dismiss();
         const confirmed = CONFIRMATIONS[signal];
         if (confirmed) void this.finish(confirmed, true);
       });
-    bus.call(bus.get_unique_name()!, DIALOG_PATH, DIALOG_INTERFACE, 'Open',
+    bus.call(SHELL, DIALOG_PATH, DIALOG_INTERFACE, 'Open',
       new GLib.Variant('(uuuao)', [DIALOG_TYPES[action], 0, CONFIRM_SECONDS, inhibitors]), null, Gio.DBusCallFlags.NONE, -1, null)
       .catch(error => {
         this.dismiss();

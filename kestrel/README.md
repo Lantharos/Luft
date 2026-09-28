@@ -49,17 +49,17 @@ Apps that stop answering get the Not Responding dialog after the usual few secon
 
 ### Session
 
-The login screen starts `kestrel-session`, which hands the user's environment to systemd and starts `kestrel-session.target`; logging out stops the target and ends the session. Kestrel manages the session itself instead of gnome-session: it keeps track of apps that ask to keep the screen awake or to hold off logging out, marks the session idle after the configured delay so the screen dims and locks, and asks for confirmation before logging out, restarting, or powering off. Before ending the session it asks running apps whether they are ready and moves on as soon as they answer. Apps that talk to GNOME's session manager work unchanged.
+The login screen starts `kestrel-session`, which hands the user's environment to systemd and starts `kestrel-session.target`; logging out stops the target and ends the session. Kestrel's own session manager takes the place of gnome-session. It runs as a small process that starts before the shell, keeps track of apps that ask to keep the screen awake or to hold off logging out, marks the session idle after the configured delay so the screen dims and locks, and asks for confirmation before logging out, restarting, or powering off. Before ending the session it asks running apps whether they are ready and moves on as soon as they answer. Apps that talk to GNOME's session manager work unchanged.
 
 The target starts only the settings services Kestrel relies on: accessibility, display color and night light, automatic time zone, housekeeping, keyboard, media keys, power, printer notifications, airplane mode, screen saver requests from apps, and sound. The service for X11 app settings runs while Xwayland does. IBus provides input methods, and XDG autostart entries start with the session. Kestrel's own settings live under `dev.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can be used on the same account.
 
-File dialogs open in Rover; other portals use GNOME's backend for now. The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
+Kestrel's portal handles screenshots, color picking, permission prompts, and appearance, so apps follow Kestrel's light or dark style and pick up its accent color. File dialogs open in Rover, and screen sharing and the remaining portals use GNOME's backend for now. The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
 
 ## Work before a Luft session
 
 1. Log into the Kestrel session on real hardware and qualify it end to end. The TypeScript UI is loaded by a reduced upstream `main.js` path.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
-3. Replace GNOME's portal backend for screenshots, screencasts, settings, and access prompts, then exercise the portal calls from client apps.
+3. Replace GNOME's portal backend for screen sharing and global shortcuts, then exercise the portal calls from client apps.
 4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.
 5. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
 

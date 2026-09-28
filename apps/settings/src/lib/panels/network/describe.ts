@@ -42,6 +42,12 @@ export function signalLabel(strength: number) {
 
 export const speedLabel = (megabits: number) => (megabits >= 1000 ? `${megabits / 1000} Gb/s` : `${megabits} Mb/s`);
 
+export function bandLabel(frequency: number) {
+	if (frequency >= 5925) return `6 GHz · Channel ${(frequency - 5950) / 5}`;
+	if (frequency >= 4900) return `5 GHz · Channel ${(frequency - 5000) / 5}`;
+	return `2.4 GHz · Channel ${frequency === 2484 ? 14 : (frequency - 2407) / 5}`;
+}
+
 export function detailRows(details: Details): DetailRow[] {
 	const rows: DetailRow[] = [];
 	if (details.ipv4.length) rows.push(['IP address', details.ipv4.join('\n')]);

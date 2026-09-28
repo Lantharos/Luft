@@ -1,5 +1,7 @@
 mod actions;
 pub mod airplane;
+mod certificate;
+mod profile;
 mod saved;
 mod snapshot;
 mod watch;
@@ -43,6 +45,16 @@ struct Active {
 #[derive(Deserialize)]
 struct Ssid {
     ssid: String,
+}
+
+#[derive(Deserialize)]
+struct Connection {
+    path: String,
+}
+
+#[derive(Deserialize)]
+struct Choose {
+    purpose: certificate::Purpose,
 }
 
 fn objects() -> Result<Objects, String> {
@@ -91,5 +103,15 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("network_join", actions::join)
         .command("network_forget", |Ssid { ssid }| {
             actions::forget(&ssid, &objects()?)
+        })
+        .command("network_profile", |Connection { path }| {
+            profile::load(&path)
+        })
+        .command("network_profile_save", profile::save)
+        .command("network_profile_secret", |Connection { path }| {
+            profile::secret(&path)
+        })
+        .command("network_choose_certificate", |Choose { purpose }| {
+            certificate::choose(purpose)
         })
 }

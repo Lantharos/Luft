@@ -6,21 +6,14 @@ use serde::Deserialize;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath, Value};
 
+use super::profile::enterprise::Enterprise;
+use super::profile::settings::{Group, Settings, put};
+use super::profile::wireless::{self, Wireless};
+use super::profile::{Security, WIFI};
 use super::saved::{self, Kind};
 use super::{DEVICE, MANAGER, MANAGER_PATH, SERVICE, WIRELESS, watch};
 
 const ANY: &str = "/";
-const WEP_KEY: u32 = 1;
-
-#[derive(Deserialize, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-pub enum Security {
-    Open,
-    Owe,
-    Wep,
-    Psk,
-    Sae,
-}
 
 #[derive(Deserialize)]
 pub struct Join {
@@ -31,12 +24,13 @@ pub struct Join {
     password: String,
     #[serde(default)]
     hidden: bool,
+    enterprise: Option<Enterprise>,
 }
 
 #[derive(Deserialize)]
 pub struct Activate {
-    connection: Option<String>,
-    device: Option<String>,
+    pub connection: Option<String>,
+    pub device: Option<String>,
 }
 
 fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, String> {
@@ -90,45 +84,22 @@ pub fn disconnect(device: &str) -> Result<(), String> {
         .map_err(failed)
 }
 
-fn security_settings(
-    security: Security,
-    password: &str,
-) -> Option<HashMap<&'static str, Value<'_>>> {
-    let settings = match security {
-        Security::Open => return None,
-        Security::Owe => HashMap::from([("key-mgmt", Value::from("owe"))]),
-        Security::Psk => HashMap::from([
-            ("key-mgmt", Value::from("wpa-psk")),
-            ("psk", Value::from(password)),
-        ]),
-        Security::Sae => HashMap::from([
-            ("key-mgmt", Value::from("sae")),
-            ("psk", Value::from(password)),
-        ]),
-        Security::Wep => HashMap::from([
-            ("key-mgmt", Value::from("none")),
-            ("wep-key0", Value::from(password)),
-            ("wep-key-type", Value::from(WEP_KEY)),
-        ]),
-    };
-    Some(settings)
-}
-
 pub fn join(join: Join) -> Result<(), String> {
-    let mut wireless = HashMap::from([("ssid", Value::from(join.ssid.as_bytes()))]);
+    let mut wifi = Group::new();
+    put(&mut wifi, "ssid", join.ssid.into_bytes());
     if join.hidden {
-        wireless.insert("hidden", Value::from(true));
+        put(&mut wifi, "hidden", true);
     }
-    let mut settings = HashMap::from([
-        (
-            "connection",
-            HashMap::from([("type", Value::from("802-11-wireless"))]),
-        ),
-        ("802-11-wireless", wireless),
-    ]);
-    if let Some(security) = security_settings(join.security, &join.password) {
-        settings.insert("802-11-wireless-security", security);
-    }
+    let mut general = Group::new();
+    put(&mut general, "type", WIFI);
+    let mut settings =
+        Settings::from([("connection".to_owned(), general), (WIFI.to_owned(), wifi)]);
+    let wireless = Wireless {
+        security: join.security,
+        enterprise: join.enterprise,
+    };
+    let password = Some(join.password.as_str()).filter(|password| !password.is_empty());
+    wireless::store(&mut settings, &wireless, password);
     let (connection, _active): (OwnedObjectPath, OwnedObjectPath) = manager()?
         .call(
             "AddAndActivateConnection",

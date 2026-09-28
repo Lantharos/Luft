@@ -48,7 +48,7 @@ const panel = (
 
 export const PANEL_GROUPS: Panel[][] = [
 	[
-		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy'], () => import('./network/NetworkPanel.svelte')),
+		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy', 'dns', 'ip address', 'hardware address', 'metered'], () => import('./network/NetworkPanel.svelte')),
 		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker'], () => import('./bluetooth/BluetoothPanel.svelte'))
 	],
 	[

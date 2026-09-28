@@ -3,8 +3,9 @@ use std::net::Ipv6Addr;
 
 use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
-use zbus::zvariant::OwnedValue;
+use zbus::zvariant::{OwnedObjectPath, OwnedValue};
 
+use super::profile::Security;
 use super::saved::{self, Kind, Saved};
 use super::{ACCESS_POINT, ACTIVE, DEVICE, MANAGER, MANAGER_PATH, WIRED, WIRELESS};
 
@@ -33,17 +34,6 @@ pub enum Link {
     Unplugged,
 }
 
-#[derive(Serialize, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-pub enum Security {
-    Open,
-    Owe,
-    Wep,
-    Psk,
-    Sae,
-    Enterprise,
-}
-
 #[derive(Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Details {
@@ -56,6 +46,14 @@ pub struct Details {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Radio {
+    frequency: u32,
+    bssid: String,
+    bitrate: u32,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WifiNetwork {
     ssid: String,
     strength: u8,
@@ -63,6 +61,7 @@ pub struct WifiNetwork {
     saved: Option<String>,
     state: Link,
     details: Option<Details>,
+    radio: Option<Radio>,
 }
 
 #[derive(Serialize)]
@@ -78,6 +77,7 @@ pub struct Wifi {
 #[serde(rename_all = "camelCase")]
 pub struct Wired {
     device: String,
+    connection: Option<String>,
     name: String,
     state: Link,
     speed: Option<u32>,
@@ -186,14 +186,13 @@ fn wifi(objects: &Objects, saved: &[Saved]) -> Option<Wifi> {
     let manager = objects.get(MANAGER_PATH, MANAGER)?;
     let wireless = objects.get(device.path, WIRELESS)?;
     let state: u32 = device.get("State").unwrap_or(0);
-    let active_point = wireless.link("ActiveAccessPoint");
-    let active_ssid = active_point
-        .as_deref()
-        .and_then(|path| objects.get(path, ACCESS_POINT))
-        .and_then(|point| point.get::<Vec<u8>>("Ssid"));
+    let active_point = wireless
+        .link("ActiveAccessPoint")
+        .and_then(|path| objects.get(&path, ACCESS_POINT));
+    let active_ssid = active_point.and_then(|point| point.get::<Vec<u8>>("Ssid"));
     let mut networks: HashMap<Vec<u8>, WifiNetwork> = HashMap::new();
     for point in wireless
-        .get::<Vec<zbus::zvariant::OwnedObjectPath>>("AccessPoints")
+        .get::<Vec<OwnedObjectPath>>("AccessPoints")
         .unwrap_or_default()
         .iter()
         .filter_map(|path| objects.get(path, ACCESS_POINT))
@@ -223,6 +222,10 @@ fn wifi(objects: &Objects, saved: &[Saved]) -> Option<Wifi> {
                 Link::Disconnected
             },
             details: (current && state == ACTIVATED).then(|| details(objects, &device)),
+            radio: current
+                .then_some(active_point)
+                .flatten()
+                .map(|point| radio(&point, &wireless)),
         };
         networks.insert(ssid, network);
     }
@@ -240,12 +243,33 @@ fn wifi(objects: &Objects, saved: &[Saved]) -> Option<Wifi> {
     })
 }
 
+fn radio(point: &Object, wireless: &Object) -> Radio {
+    Radio {
+        frequency: point.get("Frequency").unwrap_or(0),
+        bssid: point.get("HwAddress").unwrap_or_default(),
+        bitrate: wireless.get::<u32>("Bitrate").unwrap_or(0) / 1000,
+    }
+}
+
+fn profile(objects: &Objects, device: &Object) -> Option<String> {
+    device
+        .link("ActiveConnection")
+        .and_then(|active| objects.get(&active, ACTIVE)?.link("Connection"))
+        .or_else(|| {
+            device
+                .get::<Vec<OwnedObjectPath>>("AvailableConnections")?
+                .first()
+                .map(ToString::to_string)
+        })
+}
+
 fn wired(objects: &Objects) -> Vec<Wired> {
     let mut wired: Vec<Wired> = devices(objects, ETHERNET)
         .map(|device| {
             let state = link(device.get("State").unwrap_or(0));
             Wired {
                 device: device.path.to_owned(),
+                connection: profile(objects, &device),
                 name: device.get("Interface").unwrap_or_default(),
                 state,
                 speed: objects
@@ -289,8 +313,7 @@ pub fn names(objects: &Objects) -> HashMap<String, String> {
         .implementing(ACTIVE)
         .flat_map(|active| {
             let name: String = active.get("Id").unwrap_or_default();
-            let devices: Vec<zbus::zvariant::OwnedObjectPath> =
-                active.get("Devices").unwrap_or_default();
+            let devices: Vec<OwnedObjectPath> = active.get("Devices").unwrap_or_default();
             let tunnel =
                 active.flag("Vpn") || active.get::<String>("Type").as_deref() == Some("wireguard");
             devices

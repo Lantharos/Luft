@@ -265,5 +265,29 @@
     </key>
   </schema>
 
-
+  <enum id="dev.lantharos.kestrel.notifications.DoNotDisturb">
+    <value value="0" nick="never"/>
+    <value value="1" nick="urgent"/>
+    <value value="2" nick="always"/>
+  </enum>
+  <schema id="dev.lantharos.kestrel.notifications.application"
+          gettext-domain="@GETTEXT_PACKAGE@">
+    <key name="during-do-not-disturb" enum="dev.lantharos.kestrel.notifications.DoNotDisturb">
+      <default>'urgent'</default>
+      <summary>Which notifications from the app show during Do Not Disturb</summary>
+      <description>
+        “never” keeps every notification quiet while Do Not Disturb is on,
+        “urgent” lets critical notifications through and “always” shows
+        banners and plays sounds as usual.
+      </description>
+    </key>
+    <key name="keep-in-list" type="b">
+      <default>true</default>
+      <summary>Keep the app’s notifications in the notification list</summary>
+      <description>
+        When disabled, notifications from the app are removed once their
+        banner closes, or right away when no banner is shown.
+      </description>
+    </key>
+  </schema>
 </schemalist>

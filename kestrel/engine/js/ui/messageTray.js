@@ -161,6 +161,12 @@ export const NotificationPolicy = GObject.registerClass({
         'details-in-lock-screen': GObject.ParamSpec.boolean(
             'details-in-lock-screen', null, null,
             GObject.ParamFlags.READABLE, false),
+        'during-do-not-disturb': GObject.ParamSpec.string(
+            'during-do-not-disturb', null, null,
+            GObject.ParamFlags.READABLE, 'urgent'),
+        'keep-in-list': GObject.ParamSpec.boolean(
+            'keep-in-list', null, null,
+            GObject.ParamFlags.READABLE, true),
     },
 }, class NotificationPolicy extends GObject.Object {
     /**
@@ -212,6 +218,14 @@ export const NotificationPolicy = GObject.registerClass({
     get detailsInLockScreen() {
         return false;
     }
+
+    get duringDoNotDisturb() {
+        return 'urgent';
+    }
+
+    get keepInList() {
+        return true;
+    }
 });
 
 export const NotificationGenericPolicy = GObject.registerClass({
@@ -235,10 +249,6 @@ export const NotificationGenericPolicy = GObject.registerClass({
             this.notify(key);
     }
 
-    get showBanners() {
-        return this._masterSettings.get_boolean('show-banners');
-    }
-
     get showInLockScreen() {
         return this._masterSettings.get_boolean('show-in-lock-screen');
     }
@@ -257,9 +267,14 @@ export const NotificationApplicationPolicy = GObject.registerClass({
             schema_id: 'org.gnome.desktop.notifications.application',
             path: `/org/gnome/desktop/notifications/application/${this._canonicalId}/`,
         });
+        this._rules = new Gio.Settings({
+            schema_id: 'dev.lantharos.kestrel.notifications.application',
+            path: `/dev/lantharos/kestrel/notifications/application/${this._canonicalId}/`,
+        });
 
         this._masterSettings.connect('changed', this._changed.bind(this));
         this._settings.connect('changed', this._changed.bind(this));
+        this._rules.connect('changed', this._changed.bind(this));
     }
 
     store() {
@@ -275,6 +290,7 @@ export const NotificationApplicationPolicy = GObject.registerClass({
     destroy() {
         this._masterSettings.run_dispose();
         this._settings.run_dispose();
+        this._rules.run_dispose();
 
         super.destroy();
     }
@@ -299,8 +315,7 @@ export const NotificationApplicationPolicy = GObject.registerClass({
     }
 
     get showBanners() {
-        return this._masterSettings.get_boolean('show-banners') &&
-            this._settings.get_boolean('show-banners');
+        return this._settings.get_boolean('show-banners');
     }
 
     get forceExpanded() {
@@ -314,6 +329,14 @@ export const NotificationApplicationPolicy = GObject.registerClass({
 
     get detailsInLockScreen() {
         return this._settings.get_boolean('details-in-lock-screen');
+    }
+
+    get duringDoNotDisturb() {
+        return this._rules.get_string('during-do-not-disturb');
+    }
+
+    get keepInList() {
+        return this._rules.get_boolean('keep-in-list');
     }
 });
 
@@ -749,6 +772,7 @@ export class MessageTray extends St.Widget {
         });
         this._busy = false;
         this._bannerBlocked = false;
+        this._notificationSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.notifications'});
         this._presence.connectSignal('StatusChanged', (proxy, senderName, [status]) => {
             this._onStatusChanged(status);
         });
@@ -923,11 +947,11 @@ export class MessageTray extends St.Widget {
         if (notification.acknowledged)
             return;
 
-        if (notification.urgency === Urgency.LOW)
+        if (!this._bannerAllowed(notification)) {
+            if (!notification.source.policy.keepInList)
+                this._discardSoon(notification);
             return;
-
-        if (!notification.source.policy.showBanners && notification.urgency !== Urgency.CRITICAL)
-            return;
+        }
 
         if (this._notification === notification) {
             // If a notification that is being shown is updated, we update
@@ -949,6 +973,29 @@ export class MessageTray extends St.Widget {
             }
         }
         this._updateState();
+    }
+
+    _bannerAllowed(notification) {
+        const {policy} = notification.source;
+        const urgent = notification.urgency === Urgency.CRITICAL;
+        if (notification.urgency === Urgency.LOW || (!policy.showBanners && !urgent))
+            return false;
+        if (this._notificationSettings.get_boolean('show-banners'))
+            return true;
+        return policy.duringDoNotDisturb === 'always' ||
+            (urgent && policy.duringDoNotDisturb === 'urgent');
+    }
+
+    _discardSoon(notification) {
+        let idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            idleId = 0;
+            notification.destroy(NotificationDestroyedReason.EXPIRED);
+            return GLib.SOURCE_REMOVE;
+        });
+        notification.connect('destroy', () => {
+            if (idleId)
+                GLib.source_remove(idleId);
+        });
     }
 
     _resetNotificationLeftTimeout() {
@@ -1260,7 +1307,7 @@ export class MessageTray extends St.Widget {
     _hideNotificationCompleted() {
         const notification = this._notification;
         this._notification = null;
-        if (!this._notificationRemoved && notification.isTransient)
+        if (!this._notificationRemoved && (notification.isTransient || !notification.source.policy.keepInList))
             notification.destroy(NotificationDestroyedReason.EXPIRED);
 
         this._pointerInNotification = false;

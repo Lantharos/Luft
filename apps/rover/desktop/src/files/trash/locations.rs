@@ -15,7 +15,7 @@ pub struct TrashLocation {
     pub path: String,
 }
 
-pub(super) fn trash_locations() -> Result<Vec<TrashLocation>, String> {
+pub(crate) fn trash_locations() -> Result<Vec<TrashLocation>, String> {
     let mut locations = vec![TrashLocation {
         name: "Home".to_string(),
         path: home_trash()?.to_string_lossy().into_owned(),

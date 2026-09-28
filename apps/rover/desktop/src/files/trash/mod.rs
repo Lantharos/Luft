@@ -11,7 +11,8 @@ use super::privileged::{os, remove_path, run_pkexec};
 use crate::history::{History, Step};
 use crate::text::{items, subject};
 pub use locations::TrashLocation;
-use locations::{parse_trashinfo, trash_locations};
+pub(crate) use locations::trash_locations;
+use locations::parse_trashinfo;
 pub use put::{Trashed, put, restore as restore_item};
 
 #[derive(Debug, Serialize)]

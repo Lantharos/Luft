@@ -3,6 +3,42 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+
+async function checkAppRules(require, pause) {
+  const general = new Gio.Settings({ schema_id: 'org.gnome.desktop.notifications' });
+  const rules = new Gio.Settings({
+    schema_id: 'dev.lantharos.kestrel.notifications.application',
+    path: '/dev/lantharos/kestrel/notifications/application/org-gnome-nautilus/',
+  });
+  const source = new MessageTray.Source({ title: 'Files', policy: new MessageTray.NotificationApplicationPolicy('org.gnome.Nautilus') });
+  Main.messageTray.add(source);
+  const send = urgency => {
+    const notification = new MessageTray.Notification({ source, title: 'Copy finished', urgency });
+    source.addNotification(notification);
+    return notification;
+  };
+  const bannered = notification => Main.messageTray._notification === notification || Main.messageTray._notificationQueue.includes(notification);
+  try {
+    general.set_boolean('show-banners', false);
+    require(!bannered(send(MessageTray.Urgency.NORMAL)) && bannered(send(MessageTray.Urgency.CRITICAL)),
+      'Do Not Disturb lets only urgent notifications through by default');
+    rules.set_string('during-do-not-disturb', 'never');
+    require(!bannered(send(MessageTray.Urgency.CRITICAL)), 'apps can stay quiet during Do Not Disturb');
+    rules.set_string('during-do-not-disturb', 'always');
+    require(bannered(send(MessageTray.Urgency.NORMAL)), 'apps can show everything during Do Not Disturb');
+    rules.set_string('during-do-not-disturb', 'never');
+    rules.set_boolean('keep-in-list', false);
+    const unlisted = send(MessageTray.Urgency.NORMAL);
+    await pause(100);
+    require(!source.notifications.includes(unlisted), 'notifications that skip the list go away when no banner shows');
+  } finally {
+    general.reset('show-banners');
+    rules.reset('during-do-not-disturb');
+    rules.reset('keep-in-list');
+    source.destroy();
+  }
+}
 
 export async function checkNotifications({pause, capture, actorNamed, output}) {
   const require = (condition, label) => {
@@ -76,6 +112,11 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
     bannerEntry.clutter_text.emit('activate');
     await pause(300);
     require(replies.some(([replied, text]) => replied === bannerId && text === 'On my way'), 'banner replies reach the app');
+
+    clearAll();
+    dismissImmediately();
+    await pause(300);
+    await checkAppRules(require, pause);
   } finally {
     Gio.DBus.session.signal_unsubscribe(subscription);
     clearAll();

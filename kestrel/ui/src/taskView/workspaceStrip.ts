@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
-import type { Monitor } from '../panel.js';
+import type { Monitor } from '../panel/panel.js';
 import type { WindowDragSource } from './windowCard.js';
 
 export const THUMBNAIL_HEIGHT = 84;

@@ -7,8 +7,8 @@ import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
 import { SearchResults } from './searchResults.js';
 import type { SearchItem } from './search/item.js';
-import { animateActor, liftIcon } from '../motion.js';
-import type { ContextMenus } from '../contextMenus.js';
+import { animateActor, liftIcon } from '../shared/motion.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 
 export class StartGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });

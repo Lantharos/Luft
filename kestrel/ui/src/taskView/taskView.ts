@@ -5,9 +5,9 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { animateActor } from '../motion.js';
-import type { Monitor } from '../panel.js';
-import { blurSurface, PANEL_HEIGHT } from '../surface.js';
+import { animateActor } from '../shared/motion.js';
+import type { Monitor } from '../panel/panel.js';
+import { blurSurface } from '../shared/surface.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
 import { WorkspaceStrip, type BackgroundFactory } from './workspaceStrip.js';
@@ -43,7 +43,7 @@ export class TaskView {
   open(monitor: Monitor): void {
     this.monitor = monitor;
     this.actor.set_position(monitor.x, monitor.y);
-    this.actor.set_size(monitor.width, monitor.height - PANEL_HEIGHT);
+    this.actor.set_size(monitor.width, monitor.height);
     const shell = global as unknown as Shell.Global;
     const manager = shell.workspace_manager;
     const rebuild = () => this.scheduleRebuild();
@@ -62,8 +62,7 @@ export class TaskView {
     this.windowLayer.set_scale(0.96, 0.96);
     animateActor(this.actor, { opacity: 255, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
     animateActor(this.windowLayer, { scale_x: 1, scale_y: 1, duration: 220, mode: Clutter.AnimationMode.EASE_OUT_QUART });
-    (this.cards[0]?.actor ?? this.strip.actor).grab_key_focus();
-    if (!this.cards.length) this.strip.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+    this.actor.grab_key_focus();
   }
 
   close(immediate = false): void {
@@ -106,6 +105,7 @@ export class TaskView {
     const shell = global as unknown as Shell.Global;
     const focused = shell.stage.get_key_focus();
     const focusedWindow = this.cards.find(card => card.actor === focused)?.window;
+    const focusInside = !!focused && this.actor.contains(focused);
     this.clearCards();
     const workspace = shell.workspace_manager.get_active_workspace();
     const windows = shell.display.get_tab_list(Meta.TabList.NORMAL, workspace);
@@ -117,7 +117,7 @@ export class TaskView {
     this.strip.build(monitor);
 
     const width = monitor.width;
-    const height = monitor.height - PANEL_HEIGHT;
+    const height = monitor.height;
     const [, stripWidth] = this.strip.actor.get_preferred_width(-1);
     const [, stripHeight] = this.strip.actor.get_preferred_height(stripWidth);
     const stripY = height - stripHeight - 20;
@@ -129,6 +129,6 @@ export class TaskView {
     this.cards.forEach((card, index) => card.place(slots[index]));
     const restore = this.cards.find(card => card.window === focusedWindow);
     if (restore) restore.actor.grab_key_focus();
-    else if (this.monitor && focused && !this.actor.contains(focused)) this.cards[0]?.actor.grab_key_focus();
+    else if (focusInside) this.actor.grab_key_focus();
   }
 }

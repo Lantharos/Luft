@@ -68,10 +68,11 @@ export class RecentFiles {
         const name = file.get_basename() ?? uri;
         const path = file.get_parent()?.get_path() ?? '';
         const mime = bookmarks.get_mime_type(uri);
+        const type = mime ? Gio.content_type_from_mime_type(mime) ?? mime : Gio.content_type_guess(name, null)[0];
         return {
           uri, name, key: name.toLocaleLowerCase(),
           folder: path.startsWith(home) ? `~${path.slice(home.length)}` : path,
-          icon: Gio.content_type_get_symbolic_icon(Gio.content_type_from_mime_type(mime) ?? mime),
+          icon: Gio.content_type_get_symbolic_icon(type),
         };
       });
   }

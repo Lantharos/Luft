@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import type { ContextMenus } from '../contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 import type { SearchItem } from './search/item.js';
 
 interface Row {

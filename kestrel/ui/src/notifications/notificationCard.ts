@@ -3,7 +3,7 @@ import type Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import type { ContextMenus } from './contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 
 export interface SignalSource {
   connectObject(...args: any[]): void;

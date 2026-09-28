@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
-import { navigateWithKeyboard } from './keyboardNavigation.js';
+import { navigateWithKeyboard } from '../shared/keyboardNavigation.js';
 import { KestrelPanel, type Monitor, type PanelActions } from './panel.js';
-import type { ContextMenus } from './contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 import type { WindowPreviews } from './windowPreviews.js';
 
 export interface PanelLayoutManager {

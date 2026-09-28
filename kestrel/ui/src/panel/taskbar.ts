@@ -5,9 +5,9 @@ import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { WindowPreviews } from './windowPreviews.js';
-import type { ContextMenus } from './contextMenus.js';
-import { PANEL_ICON_SIZE } from './surface.js';
-import { animateActor, liftIcon } from './motion.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
+import { PANEL_ICON_SIZE } from '../shared/surface.js';
+import { animateActor, liftIcon } from '../shared/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
@@ -24,6 +24,7 @@ interface AppItem {
   iconGeometry: Mtk.Rectangle | null;
   removing: boolean;
   windowsChanged: number;
+  draggable: { enabled: boolean };
 }
 
 export class Taskbar {
@@ -32,16 +33,20 @@ export class Taskbar {
   private initialized = false;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
-    favorites: Gio.Settings, private readonly monitorIndex: () => number,
+    private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
     private readonly activateWindow: (window: Meta.Window) => void) {
-    new TaskbarDrop(this.actor, () => this.actor.get_children()
-      .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
-      .filter((item): item is AppItem => !!item)
-      .map(item => ({ id: item.app.id, slot: item.slot, button: item.button })), favorites);
+    new TaskbarDrop(this.actor, () => {
+      const pinned = new Set(favorites.get_strv('favorite-apps'));
+      return this.actor.get_children()
+        .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
+        .filter((item): item is AppItem => !!item && pinned.has(item.app.id))
+        .map(item => ({ id: item.app.id, slot: item.slot, button: item.button }));
+    }, favorites);
   }
 
   update(apps: Shell.App[]): void {
     const wanted = new Set(apps.map(app => app.id));
+    const pinned = new Set(this.favorites.get_strv('favorite-apps'));
     for (const [id, item] of this.items) {
       if (wanted.has(id) || item.removing) continue;
       item.removing = true;
@@ -76,6 +81,7 @@ export class Taskbar {
         item.icon.child = app.create_icon_texture(PANEL_ICON_SIZE);
       }
       item.button.accessible_name = app.get_name();
+      item.draggable.enabled = pinned.has(app.id);
       item.removing = false;
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
@@ -98,7 +104,7 @@ export class Taskbar {
     }
   }
 
-  private makeDraggable(item: AppItem): void {
+  private makeDraggable(item: AppItem): { enabled: boolean } {
     (item.button as St.Button & { _delegate: object })._delegate = {
       get id() { return item.app.id; },
       folder: false,
@@ -111,6 +117,7 @@ export class Taskbar {
       item.button.opacity = 90;
     });
     draggable.connect('drag-end', () => { item.button.opacity = 255; });
+    return draggable;
   }
 
   private windowsChanged(item: AppItem): void {
@@ -161,12 +168,12 @@ export class Taskbar {
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0 };
+    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0, draggable: { enabled: false } };
+    item.draggable = this.makeDraggable(item);
     item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(item));
     button.connect('notify::allocation', () => this.syncIconGeometry(item));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);
-    this.makeDraggable(item);
     this.previews.bind(button, () => item.app);
     this.menus.bind(button, () => this.menus.appEntries(item.app));
     button.connect('clicked', () => {

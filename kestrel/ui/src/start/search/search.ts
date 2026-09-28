@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import type { ContextMenus } from '../../contextMenus.js';
+import type { ContextMenus } from '../../menus/contextMenus.js';
 import { AppIndex } from './apps.js';
 import { calculate } from './calculator.js';
 import { RecentFiles } from './files.js';

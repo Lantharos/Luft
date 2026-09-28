@@ -7,22 +7,25 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
-import { navigateWithKeyboard } from './keyboardNavigation.js';
-import { Workspaces } from './workspaces.js';
-import { WindowPreviews } from './windowPreviews.js';
-import { ContextMenus } from './contextMenus.js';
-import type { Monitor } from './panel.js';
-import { PanelSet } from './panels.js';
-import { StartMenu } from './startMenu.js';
-import { QuickSettings } from './quickSettings.js';
-import { NotificationCenter, type MessageTray } from './notificationCenter.js';
-import { PANEL_HEIGHT, SURFACE_GAP } from './surface.js';
-import { animateActor } from './motion.js';
-import type { QuickSettingsSource } from './quickControls.js';
+import { navigateWithKeyboard } from './shared/keyboardNavigation.js';
+import { Workspaces } from './windows/workspaces.js';
+import { WindowPreviews } from './panel/windowPreviews.js';
+import { ContextMenus } from './menus/contextMenus.js';
+import type { Monitor } from './panel/panel.js';
+import { PanelSet } from './panel/panels.js';
+import { StartMenu } from './start/startMenu.js';
+import { QuickSettings } from './quickSettings/quickSettings.js';
+import { NotificationCenter, type MessageTray } from './notifications/notificationCenter.js';
+import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
+import { animateActor } from './shared/motion.js';
+import type { QuickSettingsSource } from './quickSettings/quickControls.js';
 import { AccentService } from './accent/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
-import { SnapLayouts } from './snapLayouts.js';
+import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
+import { OomNotifier } from './memory/oomNotifier.js';
+import { coveredMonitors } from './panel/coverage.js';
+import { LaunchFeedback } from './windows/launchFeedback.js';
 import type { Rgb } from './accent/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
@@ -80,6 +83,8 @@ class KestrelUi {
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
   readonly accent = new AccentService();
+  private readonly oomNotifier = new OomNotifier();
+  private readonly launchFeedback = new LaunchFeedback();
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -214,19 +219,9 @@ class KestrelUi {
 
   private syncSession(): void {
     const available = this.desktopAvailable();
-    const display = (global as unknown as Shell.Global).display;
-    const window = display.focus_window;
-    const frame = window && !window.minimized ? window.get_frame_rect() : null;
-    for (const panel of this.panels.all) {
-      const { monitor } = panel;
-      if (!monitor) {
-        panel.actor.visible = false;
-        continue;
-      }
-      const coversMonitor = !!frame && frame.x <= monitor.x && frame.y <= monitor.y &&
-        frame.x + frame.width >= monitor.x + monitor.width && frame.y + frame.height >= monitor.y + monitor.height;
-      panel.actor.visible = available && !coversMonitor && !display.get_monitor_in_fullscreen(monitor.index);
-    }
+    const covered = coveredMonitors(this.context.layoutManager.monitors);
+    for (const panel of this.panels.all)
+      panel.actor.visible = !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index);
     if (!available) this.dismissImmediately();
   }
 
@@ -280,7 +275,7 @@ class KestrelUi {
 
     for (const [actor, width, height] of [
       [this.quick.actor, 420, this.quick.preferredHeight(420, available)],
-      [this.notifications.actor, 380, this.notifications.preferredHeight(380, Math.min(640, available))],
+      [this.notifications.actor, 380, this.notifications.preferredHeight(380, available)],
     ] as const) {
       actor.set_size(width, height);
       actor.set_position(Math.round(monitor.x + monitor.width - 12 - width), bottom - height);
@@ -322,6 +317,7 @@ class KestrelUi {
     for (const panel of this.panels.all) panel.actor.get_parent()!.set_child_above_sibling(panel.actor, this.cover);
     if (surface === 'tasks') {
       this.taskView.open(monitor);
+      this.syncSession();
       return;
     }
 
@@ -345,10 +341,7 @@ class KestrelUi {
     this.animate(actor, 0, OPEN_DURATION);
 
     if (surface === 'start') this.start.focus();
-    else if (surface === 'notifications') this.notifications.focus();
-    else if (surface === 'clipboard') this.clipboard.focus();
-    else if (surface === 'snap') this.snapLayouts.focus();
-    else actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+    else actor.grab_key_focus();
   }
 
   private close(): void {
@@ -367,6 +360,7 @@ class KestrelUi {
     if (surface === 'tasks') {
       this.taskView.close();
       this.panels.setActive(null, null);
+      this.syncSession();
       return;
     }
     if (!surface)
@@ -440,6 +434,8 @@ class KestrelUi {
     for (const disconnect of this.disconnectors) disconnect();
     this.panels.shutdown();
     this.accent.destroy();
+    this.oomNotifier.destroy();
+    this.launchFeedback.destroy();
     this.stylesheetMonitor?.cancel();
   }
 

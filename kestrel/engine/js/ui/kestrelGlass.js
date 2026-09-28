@@ -3,8 +3,9 @@ import St from 'gi://St';
 
 const EDGE_HIGHLIGHT = 0.14;
 const BRIGHT_DIM = 0.55;
+export const PILL = 999;
 
-export function blurSurface(actor, corners = 20) {
+export function blurSurface(actor, corners = 24) {
     const theme = St.ThemeContext.get_for_stage(global.stage);
     const effect = new Shell.BlurEffect({
         mode: Shell.BlurMode.BACKGROUND,
@@ -21,7 +22,7 @@ export function blurSurface(actor, corners = 20) {
     actor.connect('destroy', () => theme.disconnect(changed));
 }
 
-export function styleSurface(actor, corners = 20) {
+export function styleSurface(actor, corners = 24) {
     actor.add_style_class_name('kestrel-glass');
     actor.add_style_class_name(`kestrel-glass-radius-${corners}`);
     blurSurface(actor, corners);

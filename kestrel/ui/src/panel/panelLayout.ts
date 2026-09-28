@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 
-import { PANEL_HEIGHT } from './surface.js';
+import { PANEL_HEIGHT } from '../shared/surface.js';
 
 export const PanelLayout = GObject.registerClass(
   class PanelLayout extends Clutter.LayoutManager {

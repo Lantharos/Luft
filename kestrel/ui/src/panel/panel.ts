@@ -6,13 +6,13 @@ import Shell from 'gi://Shell';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import { blurSurface, PANEL_HEIGHT } from './surface.js';
+import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
 import { PanelLayout } from './panelLayout.js';
 import type { WindowPreviews } from './windowPreviews.js';
 import { Taskbar } from './taskbar.js';
-import type { ContextMenus } from './contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher } from './launcher.js';
-import { Tray } from './tray/tray.js';
+import { Tray } from '../tray/tray.js';
 
 export interface Monitor {
   index: number;

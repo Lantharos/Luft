@@ -50,30 +50,21 @@ function pixmapContent(pixmaps: GLib.Variant, size: number): St.ImageContent | n
   return content;
 }
 
-function monochrome(icon: St.Icon, enabled: boolean): void {
-  icon.clear_effects();
-  if (!enabled) return;
-  icon.add_effect(new Clutter.DesaturateEffect({ factor: 1 }));
-  const levels = new Clutter.BrightnessContrastEffect();
-  levels.set_brightness(0.5);
-  levels.set_contrast(0.6);
-  icon.add_effect(levels);
+export type TrayGlyph = Gio.Icon | St.ImageContent;
+
+export function resolveGlyph({ name, themePath, pixmaps }: IconSource): TrayGlyph | null {
+  const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+  return namedIcon(name, themePath) ?? (pixmaps ? pixmapContent(pixmaps, TRAY_ICON_SIZE * scale) : null);
 }
 
-export function applyTrayIcon(icon: St.Icon, { name, themePath, pixmaps }: IconSource): boolean {
-  const gicon = namedIcon(name, themePath);
-  if (gicon) {
-    const symbolic = name.endsWith('-symbolic');
-    icon.set({ content: null, gicon, width: -1, height: -1 });
-    icon.style = symbolic ? null : '-st-icon-style: regular;';
-    monochrome(icon, !symbolic);
-    return true;
+export function paintGlyph(icon: St.Icon, glyph: TrayGlyph, size: number): void {
+  if (glyph instanceof St.ImageContent) {
+    const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+    icon.set({ gicon: null, content: glyph, content_gravity: Clutter.ContentGravity.RESIZE_ASPECT,
+      width: size * scale, height: size * scale });
+    return;
   }
-  const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
-  const content = pixmaps ? pixmapContent(pixmaps, TRAY_ICON_SIZE * scale) : null;
-  if (!content) return false;
-  icon.set({ gicon: null, content, content_gravity: Clutter.ContentGravity.RESIZE_ASPECT,
-    width: TRAY_ICON_SIZE * scale, height: TRAY_ICON_SIZE * scale });
-  monochrome(icon, true);
-  return true;
+  const symbolic = glyph instanceof Gio.ThemedIcon && glyph.get_names().some(name => name.endsWith('-symbolic'));
+  icon.set({ content: null, gicon: glyph, icon_size: size, width: -1, height: -1 });
+  icon.style = symbolic ? null : '-st-icon-style: regular;';
 }

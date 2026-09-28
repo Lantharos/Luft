@@ -48,7 +48,7 @@ stage { font-family: "Open Runde"; }
 .kestrel-popover {
   background-color: transparent;
   color: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
   border: none;
   padding: 16px;
   spacing: 12px;
@@ -70,9 +70,9 @@ StEntry, .kestrel-search,
   background-color: rgba(255, 255, 255, 0.07);
   background-image: none;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   box-shadow: none;
-  padding: 12px 14px;
+  padding: 12px 16px;
   font-size: 14px;
 }
 StEntry:hover { background-color: rgba(255, 255, 255, 0.09); }
@@ -108,23 +108,23 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-footer { padding: 12px 0 0; spacing: 8px; }
 .kestrel-footer .kestrel-icon-button:checked { background-color: rgba(255, 255, 255, 0.14); }
 .kestrel-session-actions { spacing: 4px; }
-.kestrel-session-action { padding: 9px 12px; min-width: 72px; border-radius: 10px; font-size: 12px; font-weight: 500; transition-duration: 120ms; }
+.kestrel-session-action { padding: 9px 12px; min-width: 72px; border-radius: 999px; font-size: 12px; font-weight: 500; transition-duration: 120ms; }
 .kestrel-session-action:hover, .kestrel-session-action:focus { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-session-action:active { background-color: rgba(255, 255, 255, 0.20); }
 .kestrel-session-action-content { spacing: 7px; }
 .kestrel-avatar { border-radius: 16px; background-size: cover; }
 .kestrel-account { spacing: 12px; font-size: 13px; }
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
-.kestrel-text-button { padding: 8px 10px; border-radius: 8px; font-size: 12px; }
+.kestrel-text-button { padding: 8px 10px; border-radius: 999px; font-size: 12px; }
 
-.kestrel-quick-settings { border-radius: 20px; padding: 14px; spacing: 10px; }
+.kestrel-quick-settings { border-radius: 24px; padding: 14px; spacing: 10px; }
 .kestrel-quick-content { spacing: 14px; }
 .kestrel-quick-tiles { spacing: 8px; }
 .kestrel-quick-row { spacing: 8px; }
 .kestrel-quick-sliders { spacing: 2px; }
 .kestrel-quick-footer { spacing: 4px; padding-top: 2px; }
 .kestrel-quick-battery { padding-right: 8px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
-.kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 10px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
+.kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 999px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
 .kestrel-quick-back:hover, .kestrel-quick-back:focus { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-quick-back-content { spacing: 6px; }
 .kestrel-slider-value { min-width: 38px; text-align: right; font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
@@ -176,20 +176,15 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-calendar-weekday { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.62); }
 .kestrel-calendar-date { font-size: 22px; font-weight: 600; }
 .kestrel-calendar-navigation { spacing: 2px; }
-.kestrel-calendar-month { padding: 7px 8px; border-radius: 9px; font-size: 13px; font-weight: 600; transition-duration: 120ms; }
+.kestrel-calendar-month { padding: 7px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; transition-duration: 120ms; }
 .kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: rgba(255, 255, 255, 0.10); }
 .kestrel-calendar-page { padding: 8px; }
 .kestrel-calendar-heading { padding: 2px 0 6px; font-size: 11px; font-weight: 500; text-align: center; color: rgba(255, 255, 255, 0.50); }
 .kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; }
 .kestrel-calendar-day:selected { background-color: rgba(255, 255, 255, 0.94); color: #15171a; font-weight: 600; }
 .kestrel-calendar-day:insensitive { color: rgba(255, 255, 255, 0.30); }
-.kestrel-notification-list { spacing: 14px; }
-.kestrel-notification {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 8px;
-  spacing: 4px;
-}
+.kestrel-notification-list { spacing: 8px; }
+.kestrel-notification { spacing: 2px; }
 .kestrel-muted { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
 .kestrel-empty { color: rgba(255, 255, 255, 0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
 
@@ -237,8 +232,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }
 
-.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 14px; background-color: rgba(20, 20, 24, 0.30); color: white; }
-.kestrel-context-action { padding: 9px 10px; border-radius: 9px; background-color: transparent; box-shadow: none; font-size: 13px; }
+.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 18px; background-color: rgba(20, 20, 24, 0.30); color: white; }
+.kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
 .kestrel-context-row { spacing: 10px; }
@@ -247,7 +242,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-window-previews {
   padding: 8px;
-  border-radius: 16px;
+  border-radius: 20px;
   background-color: rgba(20, 20, 24, 0.30);
   color: white;
 }
@@ -265,14 +260,14 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   background-color: rgba(20, 20, 24, 0.20);
   background-image: none;
   border: none;
-  border-radius: 20px;
+  border-radius: 24px;
   box-shadow: none;
   color: white;
 }
 .modal-dialog.kestrel-glass { padding: 24px; spacing: 24px; min-width: 340px; }
 .modal-dialog .modal-dialog-content-box { padding-top: 0; spacing: 16px; max-width: 28em; }
 .modal-dialog .modal-dialog-button-box { padding-top: 0; spacing: 8px; }
-.modal-dialog .modal-dialog-button { padding: 11px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; background-color: rgba(255, 255, 255, 0.08); }
+.modal-dialog .modal-dialog-button { padding: 11px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; background-color: rgba(255, 255, 255, 0.08); }
 .modal-dialog .modal-dialog-button:hover { background-color: rgba(255, 255, 255, 0.14); }
 .modal-dialog .message-dialog-content { spacing: 8px; }
 .modal-dialog .message-dialog-icon { icon-size: 22px; padding: 11px; margin-bottom: 8px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.10); color: #ffffff; }
@@ -323,26 +318,26 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   -arrow-box-shadow: none;
 }
 .popup-menu { min-width: 0; }
-.popup-menu-content.kestrel-glass { padding: 6px; border-radius: 14px; }
-.popup-menu-item { padding: 9px 10px; border-radius: 9px; }
+.popup-menu-content.kestrel-glass { padding: 6px; border-radius: 18px; }
+.popup-menu-item { padding: 9px 10px; border-radius: 12px; }
 .popup-menu-item:active, .popup-menu-item:checked, .popup-menu-item:hover, .popup-menu-item:focus { background-color: rgba(255, 255, 255, 0.16); color: white; }
 .popup-sub-menu, .popup-menu-section { background-color: transparent; box-shadow: none; }
-.switcher-list.kestrel-glass { padding: 8px; border-radius: 18px; box-shadow: none; }
+.switcher-list.kestrel-glass { padding: 8px; border-radius: 22px; box-shadow: none; }
 .switcher-list .switcher-list-item-container { spacing: 4px; }
 .switcher-list .item-box { padding: 10px; border-radius: 12px; }
 .kestrel-switcher-window { spacing: 8px; }
 .kestrel-switcher-header { spacing: 8px; padding: 0 2px; }
 .kestrel-switcher-title { font-size: 13px; font-weight: 500; text-align: left; }
 .switcher-list .item-box:selected, .switcher-list .item-box:outlined { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
-.workspace-switcher.kestrel-glass { padding: 10px; border-radius: 16px; margin-bottom: 64px; }
-.ws-switcher-indicator { background-color: rgba(255, 255, 255, 0.17); border: none; border-radius: 6px; }
+.workspace-switcher.kestrel-glass { padding: 10px 14px; border-radius: 999px; margin-bottom: 64px; }
+.ws-switcher-indicator { background-color: rgba(255, 255, 255, 0.17); border: none; border-radius: 999px; }
 .ws-switcher-indicator:active { background-color: rgba(255, 255, 255, 0.75); }
-.osd-window.kestrel-glass { padding: 10px 16px 10px 14px; border-radius: 16px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
+.osd-window.kestrel-glass { padding: 10px 18px 10px 16px; border-radius: 999px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
 .osd-window.kestrel-glass StIcon { icon-size: 20px; }
 .osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; }
 .osd-window.kestrel-glass .osd-value { min-width: 38px; margin: 0; font-size: 13px; font-weight: 500; text-align: right; }
-.osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 12px; box-shadow: none; }
-.message.kestrel-glass { border-radius: 16px; background-color: rgba(20, 20, 24, 0.20); }
+.osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
+.message.kestrel-glass { border-radius: 20px; background-color: rgba(20, 20, 24, 0.20); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
 .notification-banner .message-header { padding: 0 0 2px; }
 .notification-banner .message-source-title { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
@@ -352,7 +347,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .notification-banner .message-close-button, .notification-banner .message-expand-button { padding: 5px; border-radius: 8px; background-color: transparent; }
 .notification-banner .message-close-button:hover, .notification-banner .message-expand-button:hover { background-color: rgba(255, 255, 255, 0.14); }
 .notification-banner .notification-buttons-bin { spacing: 6px; padding-top: 10px; }
-.notification-banner .notification-button { padding: 9px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; background-color: rgba(255, 255, 255, 0.10); }
+.notification-banner .notification-button { padding: 9px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: rgba(255, 255, 255, 0.10); }
 
 .unlock-dialog-clock { spacing: 4px; margin-top: 0; }
 .unlock-dialog-clock .unlock-dialog-clock-time { font-size: 112px; font-weight: 600; }
@@ -361,10 +356,10 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog .user-widget.vertical { spacing: 16px; }
 .unlock-dialog .user-widget.vertical .user-icon { icon-size: 96px; }
 .unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-.unlock-dialog .login-dialog-prompt-entry { padding: 13px 16px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.14); }
+.unlock-dialog .login-dialog-prompt-entry { padding: 13px 18px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.14); }
 .unlock-dialog .login-dialog-prompt-entry:focus { background-color: rgba(255, 255, 255, 0.20); }
 .message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
-.screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 18px; }
+.screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 999px; }
 .screenshot-ui-type-button:hover, .screenshot-ui-shot-cast-button:hover,
 .screenshot-ui-type-button:checked, .screenshot-ui-shot-cast-button:checked { background-color: rgba(255, 255, 255, 0.18); }
@@ -383,7 +378,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 }
 .unlock-dialog .button:hover, .unlock-dialog .button:focus,
 .unlock-dialog .icon-button:hover, .unlock-dialog .icon-button:focus { background-color: rgba(255, 255, 255, 0.20); }
-.unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: rgba(20, 20, 24, 0.20); border-radius: 16px; padding: 12px; }
+.unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: rgba(20, 20, 24, 0.20); border-radius: 20px; padding: 12px; }
 .unlock-dialog-notifications-container { margin: 24px 24px 40px; spacing: 8px; }
 .unlock-dialog-notification-source StBoxLayout { spacing: 8px; }
 .unlock-dialog-notification-source .unlock-dialog-notification-label { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
@@ -395,9 +390,11 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 #LookingGlassDialog, #LookingGlassAutoCompletionText { background-color: rgba(20, 20, 24, 0.20); border: none; box-shadow: none; color: white; }
 .lg-dialog .button { background-color: rgba(255, 255, 255, 0.10); }
 
-.kestrel-glass-radius-12 { border-radius: 12px; }
-.kestrel-glass-radius-14 { border-radius: 14px; }
 .kestrel-glass-radius-16 { border-radius: 16px; }
+.kestrel-glass-radius-18 { border-radius: 18px; }
+.kestrel-glass-radius-20 { border-radius: 20px; }
+.kestrel-glass-radius-22 { border-radius: 22px; }
+.kestrel-glass-radius-999 { border-radius: 999px; }
 .screenshot-ui-close-button, .screenshot-ui-show-pointer-button { background-color: transparent; color: white; box-shadow: none; border-radius: 999px; }
 .screenshot-ui-close-button:hover, .screenshot-ui-close-button:focus,
 .screenshot-ui-show-pointer-button:hover, .screenshot-ui-show-pointer-button:focus,
@@ -443,18 +440,18 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-content { spacing: 6px; }
 .kestrel-notification-open { padding: 6px; border-radius: 8px; text-align: left; }
 .kestrel-notification-dismiss { padding: 8px; border-radius: 8px; }
-.kestrel-notification-actions { spacing: 6px; padding-top: 4px; }
-.kestrel-notification-action { padding: 10px 12px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.08); }
+.kestrel-notification-actions { spacing: 6px; padding: 2px 6px 6px; }
+.kestrel-notification-action { padding: 10px 12px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.08); }
 .kestrel-notification-open:hover, .kestrel-notification-dismiss:hover, .kestrel-notification-action:hover { background-color: rgba(255, 255, 255, 0.13); }
 .kestrel-notification-open:focus, .kestrel-notification-dismiss:focus, .kestrel-notification-action:focus { background-color: rgba(255, 255, 255, 0.13); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
 .kestrel-notification-open:rtl { text-align: right; }
-.kestrel-notification-group { spacing: 6px; }
-.kestrel-notification-group-list { spacing: 8px; }
-.kestrel-notification-group-header { spacing: 8px; padding: 0 0 0 6px; }
+.kestrel-notification-group { spacing: 0; padding: 6px; border-radius: 18px; background-color: rgba(255, 255, 255, 0.06); }
+.kestrel-notification-group-list { spacing: 4px; }
+.kestrel-notification-group-header { spacing: 8px; padding: 6px; }
 .kestrel-notification-group-icon { icon-size: 16px; }
 .kestrel-notification-more { font-size: 12px; }
 .kestrel-notification-reply { spacing: 6px; }
-.kestrel-notification-reply-send, .notification-reply-send { padding: 9px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-notification-reply-send, .notification-reply-send { padding: 9px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.10); }
 .kestrel-notification-reply-send:hover, .notification-reply-send:hover,
 .kestrel-notification-reply-send:focus, .notification-reply-send:focus { background-color: rgba(255, 255, 255, 0.18); }
 .notification-banner .notification-reply { spacing: 6px; padding-top: 10px; }

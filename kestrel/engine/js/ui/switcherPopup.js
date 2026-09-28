@@ -407,7 +407,7 @@ export const SwitcherList = GObject.registerClass({
 }, class SwitcherList extends St.Widget {
     _init(squareItems) {
         super._init({style_class: 'switcher-list'});
-        styleSurface(this, 16);
+        styleSurface(this, 22);
 
         this._list = new St.BoxLayout({
             style_class: 'switcher-list-item-container',

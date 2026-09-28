@@ -19,6 +19,6 @@ export function navigateWithKeyboard(root: St.Widget): void {
       ? (key === Clutter.KEY_ISO_Left_Tab || event.get_state() & Clutter.ModifierType.SHIFT_MASK) ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD
       : directions.get(key);
     if (direction === undefined) return Clutter.EVENT_PROPAGATE;
-    return root.navigate_focus(focus, direction, tab) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+    return root.navigate_focus(focus === root ? null : focus, direction, tab) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
   });
 }

@@ -650,7 +650,7 @@ export const PadOsd = GObject.registerClass({
             reactive: true,
         });
 
-        styleSurface(this, 20);
+        styleSurface(this);
         this.padDevice = padDevice;
         this._groupPads = [padDevice];
         this._settings = settings;

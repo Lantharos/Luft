@@ -1,4 +1,4 @@
-import {styleSurface} from './kestrelGlass.js';
+import {styleSurface, PILL} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -25,7 +25,7 @@ class MonitorWorkspaceSwitcherPopup extends Clutter.Actor {
         this._list = new St.BoxLayout({
             style_class: 'workspace-switcher',
         });
-        styleSurface(this._list, 16);
+        styleSurface(this._list, PILL);
         this.add_child(this._list);
     }
 

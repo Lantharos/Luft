@@ -4,10 +4,10 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import type { Monitor } from './panel.js';
-import { blurSurface } from './surface.js';
-import { animateActor } from './motion.js';
-import { menuContent, type MenuEntry } from './menuContent.js';
+import type { Monitor } from '../panel/panel.js';
+import { blurSurface } from '../shared/surface.js';
+import { animateActor } from '../shared/motion.js';
+import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 
 export type { MenuEntry } from './menuContent.js';
 
@@ -22,7 +22,7 @@ export class ContextMenus {
   private anchor: { x: number; y: number; monitor: Monitor } | null = null;
 
   constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
-    blurSurface(this.actor, 14);
+    blurSurface(this.actor, 18);
     this.actor.connect('destroy', () => {
       if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
       this.source = null;
@@ -119,12 +119,18 @@ export class ContextMenus {
     this.actor.grab_key_focus();
   }
 
+  private async openGroup(group: MenuGroup, parents: MenuEntry[][]): Promise<void> {
+    const source = this.source;
+    const children = Array.isArray(group.children) ? group.children : await group.children();
+    if (this.source === source && this.actor.visible) this.present(children, parents);
+  }
+
   private present(entries: MenuEntry[], parents: MenuEntry[][]): void {
     const { x, y, monitor } = this.anchor!;
     this.actor.destroy_all_children();
     const content = menuContent(entries, {
       activate: action => { this.close(); action.run(); },
-      open: group => this.present(group.children, [...parents, entries]),
+      open: group => void this.openGroup(group, [...parents, entries]),
       back: parents.length ? () => this.present(parents.at(-1)!, parents.slice(0, -1)) : null,
       hover: button => {
         if (!this.source || this.clearSelection) return;
@@ -141,7 +147,7 @@ export class ContextMenus {
     const height = this.actor.get_preferred_height(this.actor.width)[1];
     this.actor.set_position(Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8))),
       Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))));
-    if (parents.length) this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
+    if (parents.length) this.actor.grab_key_focus();
   }
 
   close(immediate = false): void {

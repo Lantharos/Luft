@@ -3,12 +3,12 @@ import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { blurSurface } from './surface.js';
-import type { ContextMenus } from './contextMenus.js';
-import { blinkCaret } from './caret.js';
-import { StartGrid } from './start/grid.js';
-import { StartFooter } from './start/footer.js';
-import { StartSearch } from './start/search/search.js';
+import { blurSurface } from '../shared/surface.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
+import { blinkCaret } from '../shared/caret.js';
+import { StartGrid } from './grid.js';
+import { StartFooter } from './footer.js';
+import { StartSearch } from './search/search.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;

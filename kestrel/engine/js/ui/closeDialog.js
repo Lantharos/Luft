@@ -10,6 +10,7 @@ import * as Dialog from './dialog.js';
 const FROZEN_WINDOW_BRIGHTNESS = -0.3;
 const DIALOG_TRANSITION_TIME = 150;
 const ALIVE_TIMEOUT = 5000;
+const GAME_GRACE_TIMEOUT = 60000;
 
 export const CloseDialog = GObject.registerClass({
     Implements: [Meta.CloseDialog],
@@ -22,6 +23,7 @@ export const CloseDialog = GObject.registerClass({
         this._window = window;
         this._dialog = null;
         this._timeoutId = 0;
+        this._graceId = 0;
     }
 
     get window() {
@@ -109,10 +111,31 @@ export const CloseDialog = GObject.registerClass({
         this.response(Meta.CloseDialogResponse.FORCE_CLOSE);
     }
 
+    _isGame() {
+        const app = Shell.WindowTracker.get_default().get_window_app(this._window);
+        const categories = app?.get_app_info()?.get_categories() ?? '';
+        return this._window.is_fullscreen() ||
+            categories.split(';').includes('Game') ||
+            /^steam_app_/i.test(this._window.get_wm_class() ?? '');
+    }
+
     vfunc_show() {
-        if (this._dialog != null)
+        if (this._dialog != null || this._graceId)
             return;
 
+        if (this._isGame()) {
+            this._graceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, GAME_GRACE_TIMEOUT, () => {
+                this._graceId = 0;
+                this._present();
+                return GLib.SOURCE_REMOVE;
+            });
+            return;
+        }
+
+        this._present();
+    }
+
+    _present() {
         global.compositor.disable_unredirect();
 
         this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, ALIVE_TIMEOUT,
@@ -140,6 +163,11 @@ export const CloseDialog = GObject.registerClass({
     }
 
     vfunc_hide() {
+        if (this._graceId) {
+            GLib.source_remove(this._graceId);
+            this._graceId = 0;
+        }
+
         if (this._dialog == null)
             return;
 

@@ -7,10 +7,10 @@ import St from 'gi://St';
 import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
 import { styleControl } from './controlTile.js';
-import type { ContextMenus } from './contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
-import { blurSurface } from './surface.js';
+import { blurSurface } from '../shared/surface.js';
 import { LOCK, bindAvailability } from './sessionActions.js';
 import { Battery, type BatteryState } from './battery.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';

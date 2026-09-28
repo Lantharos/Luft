@@ -42,7 +42,7 @@ export const BoxPointer = GObject.registerClass({
         this._arrowOrigin = 0;
         this._arrowActor = null;
         this.bin = new St.Bin(binProperties);
-        styleSurface(this.bin, 14);
+        styleSurface(this.bin, 18);
         this.add_child(this.bin);
         this._border = new St.DrawingArea();
         this._border.connect('repaint', this._drawBorder.bind(this));

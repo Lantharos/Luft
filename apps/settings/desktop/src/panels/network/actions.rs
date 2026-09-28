@@ -4,10 +4,10 @@ use serde::Deserialize;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath, Value};
 
-use crate::dbus::objects::failed;
 use super::saved::{self, Kind};
 use super::{DEVICE, MANAGER, MANAGER_PATH, SERVICE, WIRELESS, watch};
 use crate::dbus;
+use crate::dbus::objects::failed;
 
 const ANY: &str = "/";
 const WEP_KEY: u32 = 1;

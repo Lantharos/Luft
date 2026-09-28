@@ -1,16 +1,20 @@
 <script lang="ts">
+	import { Segmented, VirtualScroller } from '@luft/ui';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import { enterDelay } from '$lib/file-manager/listing/entries';
+	import EmptyState from '$lib/components/pane/EmptyState.svelte';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { TrashLocation } from '$lib/types';
+	import type { TrashItem } from '$lib/types';
 	import { formatBytes, formatDate, plural } from '$lib/utils/format';
+	import { parentPath } from '$lib/utils/paths';
 
 	interface Props {
 		manager: FileManager;
 	}
 
 	let { manager }: Props = $props();
+
+	const LAYOUT = { itemHeight: 40, gap: 2, padding: { top: 2, right: 10, bottom: 24, left: 10 } };
+
 	let chosenLocation = $state<string | null>(null);
 
 	let locations = $derived(manager.trash.locations);
@@ -19,73 +23,52 @@
 	);
 	let items = $derived(manager.trash.items.filter((item) => item.trash_path === activeLocation));
 	let selectedIds = $derived(items.filter((item) => manager.selection.has(item.id)).map((item) => item.id));
+	let locationOptions = $derived(
+		locations.map((location) => ({ value: location.path, label: location.name === 'Home' ? 'Home' : location.name }))
+	);
 
-	function locationLabel(location: TrashLocation) {
-		return location.name === 'Home' ? 'Home trash' : location.name;
+	function select(item: TrashItem, event: MouseEvent) {
+		if (event.ctrlKey || event.metaKey || event.shiftKey) manager.toggleSelected(item.id);
+		else manager.selectOnly(item.id);
 	}
 </script>
 
-{#if locations.length > 1}
-	<div class="pb-2 pt-1">
-		<div class="soft-scroll inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-[rgba(245,245,242,0.055)] p-1">
-			{#each locations as location (location.path)}
-				<button
-					class={[
-						'min-h-8 shrink-0 rounded-full px-3 text-[13px] transition-[background-color,color] duration-200',
-						activeLocation === location.path
-							? 'bg-[var(--sidebar-active)] text-[var(--text)]'
-							: 'text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]'
-					]}
-					type="button"
-					onclick={() => (chosenLocation = location.path)}
-				>
-					{locationLabel(location)}
-				</button>
-			{/each}
-		</div>
-	</div>
-{/if}
-
-{#if items.length === 0}
-	<div class="empty-pane">
-		<Icon name="trash" size={42} />
-		<p>Trash is empty</p>
-	</div>
+{#if items.length === 0 && !manager.loading.active}
+	<EmptyState icon="trash" title="Trash is empty" />
 {:else}
-	<div class="flex items-center justify-between pb-2 pt-1 text-[13px] text-[var(--text-muted)]">
-		<span>{plural(items.length, 'item')}</span>
+	<div class="trash-bar">
+		{#if locationOptions.length > 1 && activeLocation}
+			<Segmented options={locationOptions} value={activeLocation} label="Trash location" onchange={(path) => (chosenLocation = path)} />
+		{:else}
+			<span>{plural(items.length, 'item')}</span>
+		{/if}
 		<div class="flex gap-2">
-			<button
-				class="button large"
-				type="button"
-				disabled={selectedIds.length === 0}
-				onclick={() => manager.actions.restoreTrash(selectedIds)}
-			>
+			<button class="button" type="button" disabled={selectedIds.length === 0} onclick={() => manager.actions.restoreTrash(selectedIds)}>
 				Restore
 			</button>
-			<button class="button large danger" type="button" onclick={() => manager.actions.emptyTrash(activeLocation)}>
-				Empty trash
-			</button>
+			<button class="button danger" type="button" onclick={() => manager.actions.emptyTrash(activeLocation)}>Empty trash</button>
 		</div>
 	</div>
-	<div class="grid gap-1">
-		{#each items as item, index (item.id)}
-			<button
-				class={['file-row', manager.selection.has(item.id) && 'selected-entry']}
-				style:animation-delay={enterDelay(index)}
-				type="button"
-				onclick={() => manager.toggleSelected(item.id)}
+	<VirtualScroller class="entry-scroller soft-scroll" {items} key={(item) => item.id} layout={LAYOUT} role="listbox" aria-label="Trash">
+		{#snippet children(item)}
+			<div
+				class={['entry list-grid list-row trash-row', manager.selection.has(item.id) && 'is-selected']}
+				role="option"
+				aria-selected={manager.selection.has(item.id)}
+				tabindex="-1"
+				onclick={(event) => select(item, event)}
+				onkeydown={(event) => event.key === 'Enter' && manager.toggleSelected(item.id)}
 			>
-				<EntryIcon name={item.is_dir ? 'folder' : 'file'} />
-				<div class="min-w-0 flex-1">
-					<div class="truncate text-[14px]">{item.name}</div>
-					<div class="truncate text-[12px] text-[var(--text-muted)]">{item.original_path}</div>
-				</div>
-				<span class="w-[88px] shrink-0 text-right text-[12px] text-[var(--text-muted)]">
-					{item.is_dir ? '' : formatBytes(item.size)}
+				<span class="list-name">
+					<EntryIcon name={item.is_dir ? 'folder' : 'file'} size={24} />
+					<span class="flex min-w-0 flex-col">
+						<span class="truncate">{item.name}</span>
+						<span class="truncate text-[12px] text-[var(--text-muted)]">{parentPath(item.original_path)}</span>
+					</span>
 				</span>
-				<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{formatDate(item.deleted_at)}</span>
-			</button>
-		{/each}
-	</div>
+				<span class="list-cell list-date">{formatDate(item.deleted_at)}</span>
+				<span class="list-cell list-size">{item.is_dir ? '' : formatBytes(item.size)}</span>
+			</div>
+		{/snippet}
+	</VirtualScroller>
 {/if}

@@ -1,99 +1,97 @@
+import type { VirtualRect } from '@luft/ui';
+
 type Point = { x: number; y: number };
-type Rect = { left: number; top: number; right: number; bottom: number };
-type Box = { pointerId: number; start: Point; current: Point; client: Point };
+
+export interface MarqueeSurface {
+	contentPoint(clientX: number, clientY: number): Point;
+	indicesIn(area: VirtualRect): number[];
+}
 
 export class Marquee {
-	box = $state.raw<Box | null>(null);
+	box = $state.raw<{ start: Point; current: Point } | null>(null);
 	style = $derived.by(() => {
 		if (!this.box) return '';
-		const rect = normalize(this.box);
-		return `left:${rect.left}px;top:${rect.top}px;width:${rect.right - rect.left}px;height:${rect.bottom - rect.top}px`;
+		const area = normalize(this.box.start, this.box.current);
+		return `left:${area.left}px;top:${area.top}px;width:${area.right - area.left}px;height:${area.bottom - area.top}px`;
 	});
 
-	#pane: () => HTMLElement | undefined;
+	#surface: () => MarqueeSurface | undefined;
+	#pathAt: (index: number) => string | undefined;
 	#onSelect: (paths: string[]) => void;
-	#items: { path: string; rect: Rect }[] = [];
+	#pointerId = -1;
+	#client: Point = { x: 0, y: 0 };
 	#base = new Set<string>();
-	#selected = '';
+	#signature = '';
 
-	constructor(pane: () => HTMLElement | undefined, onSelect: (paths: string[]) => void) {
-		this.#pane = pane;
+	constructor(
+		surface: () => MarqueeSurface | undefined,
+		pathAt: (index: number) => string | undefined,
+		onSelect: (paths: string[]) => void
+	) {
+		this.#surface = surface;
+		this.#pathAt = pathAt;
 		this.#onSelect = onSelect;
 	}
 
 	start = (event: PointerEvent, selection: Iterable<string>) => {
-		const pane = this.#pane();
-		if (!pane || event.button !== 0) return;
-		if (event.target instanceof Element && event.target.closest('button, input')) return;
+		const surface = this.#surface();
+		if (!surface || event.button !== 0) return;
+		if (event.target instanceof Element && event.target.closest('[data-entry-path], button, input')) return;
 		this.#base = event.ctrlKey || event.metaKey ? new Set(selection) : new Set();
-		this.#items = [...pane.querySelectorAll<HTMLElement>('[data-entry-path]')].map((element) => ({
-			path: element.dataset.entryPath!,
-			rect: contentRect(pane, element.getBoundingClientRect())
-		}));
-		const client = { x: event.clientX, y: event.clientY };
-		const point = contentPoint(pane, client);
-		this.box = { pointerId: event.pointerId, start: point, current: point, client };
-		this.#selected = '';
+		this.#pointerId = event.pointerId;
+		this.#client = { x: event.clientX, y: event.clientY };
+		const point = surface.contentPoint(event.clientX, event.clientY);
+		this.box = { start: point, current: point };
+		this.#signature = '';
 		this.#select();
-		pane.setPointerCapture(event.pointerId);
+		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
 		event.preventDefault();
 	};
 
 	move = (event: PointerEvent) => {
-		if (this.box?.pointerId !== event.pointerId) return;
+		if (event.pointerId !== this.#pointerId || !this.box) return;
 		this.#track({ x: event.clientX, y: event.clientY });
 	};
 
 	end = (event: PointerEvent) => {
-		if (this.box?.pointerId !== event.pointerId) return;
+		if (event.pointerId !== this.#pointerId || !this.box) return;
 		this.#track({ x: event.clientX, y: event.clientY });
-		this.#pane()?.releasePointerCapture(event.pointerId);
+		this.#pointerId = -1;
 		this.box = null;
-		this.#items = [];
 	};
 
 	scroll = () => {
-		if (this.box) this.#track(this.box.client);
+		if (this.box) this.#track(this.#client);
 	};
 
 	#track(client: Point) {
-		const pane = this.#pane();
-		if (!this.box || !pane) return;
-		this.box = { ...this.box, current: contentPoint(pane, client), client };
+		const surface = this.#surface();
+		if (!this.box || !surface) return;
+		this.#client = client;
+		this.box = { ...this.box, current: surface.contentPoint(client.x, client.y) };
 		this.#select();
 	}
 
 	#select() {
-		if (!this.box) return;
-		const area = normalize(this.box);
+		const surface = this.#surface();
+		if (!this.box || !surface) return;
 		const paths = new Set(this.#base);
-		for (const item of this.#items) if (intersects(item.rect, area)) paths.add(item.path);
+		for (const index of surface.indicesIn(normalize(this.box.start, this.box.current))) {
+			const path = this.#pathAt(index);
+			if (path) paths.add(path);
+		}
 		const signature = [...paths].join('\n');
-		if (signature === this.#selected) return;
-		this.#selected = signature;
+		if (signature === this.#signature) return;
+		this.#signature = signature;
 		this.#onSelect([...paths]);
 	}
 }
 
-function normalize(box: Box): Rect {
+function normalize(start: Point, current: Point): VirtualRect {
 	return {
-		left: Math.min(box.start.x, box.current.x),
-		top: Math.min(box.start.y, box.current.y),
-		right: Math.max(box.start.x, box.current.x),
-		bottom: Math.max(box.start.y, box.current.y)
+		left: Math.min(start.x, current.x),
+		top: Math.min(start.y, current.y),
+		right: Math.max(start.x, current.x),
+		bottom: Math.max(start.y, current.y)
 	};
-}
-
-function contentPoint(pane: HTMLElement, client: Point): Point {
-	const rect = pane.getBoundingClientRect();
-	return { x: client.x - rect.left + pane.scrollLeft, y: client.y - rect.top + pane.scrollTop };
-}
-
-function contentRect(pane: HTMLElement, rect: DOMRect): Rect {
-	const origin = contentPoint(pane, { x: rect.left, y: rect.top });
-	return { left: origin.x, top: origin.y, right: origin.x + rect.width, bottom: origin.y + rect.height };
-}
-
-function intersects(a: Rect, b: Rect) {
-	return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }

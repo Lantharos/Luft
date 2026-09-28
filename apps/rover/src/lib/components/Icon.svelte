@@ -10,7 +10,10 @@
 		| 'music' | 'archive' | 'code' | 'eye' | 'eye-off' | 'pin'
 		| 'refresh' | 'external-link' | 'package'
 		| 'check' | 'alert-circle' | 'edit' | 'pause' | 'play'
-		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save';
+		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save'
+		| 'clock' | 'panel-right' | 'more-horizontal' | 'chevron-left' | 'chevron-down'
+		| 'git-branch' | 'arrow-up' | 'columns-3' | 'link' | 'lock' | 'search' | 'minus' | 'folder-x'
+		| 'terminal' | 'info' | 'copy-plus' | 'package-open';
 </script>
 
 <script lang="ts">
@@ -218,5 +221,63 @@
 		<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
 		<polyline points="17 21 17 13 7 13 7 21" />
 		<polyline points="7 3 7 8 15 8" />
+	{:else if name === 'clock'}
+		<circle cx="12" cy="12" r="10" />
+		<polyline points="12 6 12 12 16 14" />
+	{:else if name === 'panel-right'}
+		<rect width="18" height="18" x="3" y="3" rx="2" />
+		<path d="M15 3v18" />
+	{:else if name === 'more-horizontal'}
+		<circle cx="12" cy="12" r="1" />
+		<circle cx="19" cy="12" r="1" />
+		<circle cx="5" cy="12" r="1" />
+	{:else if name === 'chevron-left'}
+		<path d="m15 18-6-6 6-6" />
+	{:else if name === 'chevron-down'}
+		<path d="m6 9 6 6 6-6" />
+	{:else if name === 'git-branch'}
+		<line x1="6" x2="6" y1="3" y2="15" />
+		<circle cx="18" cy="6" r="3" />
+		<circle cx="6" cy="18" r="3" />
+		<path d="M18 9a9 9 0 0 1-9 9" />
+	{:else if name === 'arrow-up'}
+		<path d="m5 12 7-7 7 7" />
+		<path d="M12 19V5" />
+	{:else if name === 'columns-3'}
+		<rect width="18" height="18" x="3" y="3" rx="2" />
+		<path d="M9 3v18" />
+		<path d="M15 3v18" />
+	{:else if name === 'link'}
+		<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+		<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+	{:else if name === 'lock'}
+		<rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+		<path d="M7 11V7a5 5 0 0 1 10 0v4" />
+	{:else if name === 'search'}
+		<circle cx="11" cy="11" r="8" />
+		<path d="m21 21-4.3-4.3" />
+	{:else if name === 'minus'}
+		<path d="M5 12h14" />
+	{:else if name === 'folder-x'}
+		<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+		<path d="m9.5 10.5 5 5" />
+		<path d="m14.5 10.5-5 5" />
+	{:else if name === 'terminal'}
+		<polyline points="4 17 10 11 4 5" />
+		<line x1="12" x2="20" y1="19" y2="19" />
+	{:else if name === 'info'}
+		<circle cx="12" cy="12" r="10" />
+		<path d="M12 16v-4" />
+		<path d="M12 8h.01" />
+	{:else if name === 'copy-plus'}
+		<line x1="15" x2="15" y1="12" y2="18" />
+		<line x1="12" x2="18" y1="15" y2="15" />
+		<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+		<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+	{:else if name === 'package-open'}
+		<path d="M12 22v-9" />
+		<path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.66 1.66 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z" />
+		<path d="M20 13v3.87a2.06 2.06 0 0 1-1.11 1.83l-6 3.08a1.93 1.93 0 0 1-1.78 0l-6-3.08A2.06 2.06 0 0 1 4 16.87V13" />
+		<path d="M21 12.43a1.93 1.93 0 0 0 0-3.36L8.83 2.2a1.64 1.64 0 0 0-1.63 0L3 4.57a1.93 1.93 0 0 0 0 3.36l12.18 6.86a1.64 1.64 0 0 0 1.63 0z" />
 	{/if}
 </svg>

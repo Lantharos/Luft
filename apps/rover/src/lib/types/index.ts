@@ -106,19 +106,14 @@ export interface PinnedFolder {
 	icon: string | null;
 }
 
-export interface FavoriteItem {
-	name: string;
-	path: string;
-	is_dir: boolean;
-}
-
 export interface Settings {
 	folderViewModes: Record<string, ViewMode>;
 	sortBy: SortBy;
 	sortAsc: boolean;
 	showHidden: boolean;
-	favorites: FavoriteItem[];
 	pinnedFolders: PinnedFolder[];
+	gridSize: number;
+	detailsOpen: boolean;
 }
 
 export interface AppState extends Appearance {
@@ -140,7 +135,7 @@ export interface Tab extends TabHistoryEntry {
 	historyIndex: number;
 }
 
-export type SidebarView = 'home' | 'favorites' | 'drives' | 'trash';
+export type SidebarView = 'home' | 'recent' | 'trash';
 export type ViewMode = 'list' | 'grid' | 'columns';
 export type SortBy = 'name' | 'size' | 'date' | 'type';
 

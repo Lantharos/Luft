@@ -6,10 +6,9 @@ import { isInside } from '$lib/utils/paths';
 
 export class DrivesState {
 	list = $state.raw<DriveInfo[]>([]);
-	readonly hidden = new SvelteSet<string>();
 	readonly ejecting = new SvelteSet<string>();
 
-	sidebar = $derived(this.list.filter((drive) => drive.is_removable && !this.hidden.has(drive.mount_point)));
+	ordered = $derived(this.list.toSorted((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)));
 
 	load = async () => {
 		if (!isDesktopRuntime()) return;
@@ -33,7 +32,16 @@ export class DrivesState {
 			.sort((a, b) => b.mount_point.length - a.mount_point.length)[0];
 	}
 
+	holding(path: string) {
+		return this.containing(path) ?? this.list.find((drive) => drive.mount_point === '/');
+	}
+
 	isMounted(drive: DriveInfo) {
 		return this.list.some((candidate) => candidate.mount_point === drive.mount_point);
 	}
+}
+
+function rank(drive: DriveInfo) {
+	if (drive.mount_point === '/') return 0;
+	return drive.is_removable ? 2 : 1;
 }

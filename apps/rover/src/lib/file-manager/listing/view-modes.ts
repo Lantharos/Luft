@@ -1,11 +1,7 @@
-import type { DriveInfo, Settings, UserDirs, ViewMode } from '$lib/types';
-import { isInside, trimTrailingSlash } from '$lib/utils/paths';
+import type { Settings, UserDirs, ViewMode } from '$lib/types';
+import { trimTrailingSlash } from '$lib/utils/paths';
 
 const GALLERY_DIRS: (keyof UserDirs)[] = ['pictures', 'videos'];
-
-export function isDrivePath(path: string, drives: DriveInfo[]) {
-	return drives.some((drive) => (drive.mount_point === '/' ? path === '/' : isInside(path, drive.mount_point)));
-}
 
 export function viewModeForPath(path: string, appSettings: Settings, dirs: UserDirs | null): ViewMode {
 	const normalized = trimTrailingSlash(path);

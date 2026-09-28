@@ -23,7 +23,3 @@ export function visibleEntries(items: FileEntry[], query: string) {
 	if (!normalized) return items;
 	return items.filter((entry) => entry.name.toLowerCase().includes(normalized));
 }
-
-export function enterDelay(index: number) {
-	return `${Math.min(index * 18, 140)}ms`;
-}

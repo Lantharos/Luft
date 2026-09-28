@@ -1,5 +1,5 @@
 import * as api from '$lib/api';
-import type { ChooserConfig, FavoriteItem, FileEntry } from '$lib/types';
+import type { ChooserConfig, FileEntry, PinnedFolder } from '$lib/types';
 import { joinPath } from '$lib/utils/paths';
 import type { FileManager } from './manager.svelte';
 
@@ -38,7 +38,7 @@ export class ChooserState {
 		if (this.accepts(entry)) void this.submit([entry.path]);
 	};
 
-	openFavorite = (favorite: FavoriteItem) => {
+	openFavorite = (favorite: PinnedFolder) => {
 		if (favorite.is_dir) return void this.#manager.navigate(favorite.path);
 		if (this.accepts(favorite)) void this.submit([favorite.path]);
 	};

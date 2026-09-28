@@ -1,9 +1,12 @@
 import type { ChooserState } from './chooser.svelte';
 import type { FileManager } from './manager.svelte';
+import { handleViewKey } from './view/keys';
+import type { ViewState } from './view/view-state.svelte';
 
 type KeyboardContext = {
 	manager: FileManager;
 	chooser: ChooserState | null;
+	view: ViewState;
 	focusSearch: () => void;
 };
 
@@ -24,7 +27,7 @@ export function handleKeydown(event: KeyboardEvent, context: KeyboardContext) {
 		if (!chooser) startRename(event, manager);
 		return;
 	}
-	if (isEditable(event.target)) return;
+	if (isEditable(event.target) || handleViewKey(event, context)) return;
 
 	if (chooser) return handleChooserKey(event, chooser, primary && key === 'a');
 	if (primary) return handleShortcut(event, manager, key);

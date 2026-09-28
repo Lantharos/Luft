@@ -1,12 +1,23 @@
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
 @import './styles/entries.css';
+@import './styles/views.css';
+@import './styles/chrome.css';
+@import './styles/sidebar.css';
+@import './styles/details.css';
 
 :root {
-	--selection: rgba(200, 182, 111, 0.2);
 	--folder: #c8b66f;
 	--file: #b8b8b0;
 	--media: #9fb7b5;
 	--code: #b5afa2;
 	--archive: #c2a98c;
+	--mono: 'Adwaita Mono', 'JetBrains Mono', 'Source Code Pro', ui-monospace, monospace;
+}
+
+.glass-shell {
+	--selection: color-mix(in oklab, var(--accent) 22%, transparent);
+	--selection-hover: color-mix(in oklab, var(--accent) 28%, transparent);
+	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
 }

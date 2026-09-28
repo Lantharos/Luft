@@ -7,8 +7,9 @@ const DEFAULT_SETTINGS: Settings = {
 	sortBy: 'name',
 	sortAsc: true,
 	showHidden: false,
-	favorites: [],
-	pinnedFolders: []
+	pinnedFolders: [],
+	gridSize: 88,
+	detailsOpen: false
 };
 
 class SettingsState {

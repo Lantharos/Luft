@@ -3,7 +3,7 @@
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import * as bookmarks from '$lib/file-manager/bookmarks';
 	import type { ContextMenuState, FileManager } from '$lib/file-manager/manager.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
 	import type { FileEntry } from '$lib/types';
 	import { primaryActionLabel } from '$lib/vcs/format';
 	import type { VcsState } from '$lib/vcs/state.svelte';
@@ -11,13 +11,13 @@
 	interface Props {
 		menu: ContextMenuState;
 		manager: FileManager;
+		view: ViewState;
 		vcs: VcsState;
 	}
 
-	let { menu, manager, vcs }: Props = $props();
+	let { menu, manager, view, vcs }: Props = $props();
 
 	let target = $derived(menu.target);
-	let isFavorite = $derived(Boolean(target && settings.value.favorites.some((favorite) => favorite.path === target.path)));
 	let isPinned = $derived(Boolean(target && bookmarks.isPinned(target.path)));
 	let offersVcs = $derived(Boolean(vcs.project && (!target || target.is_dir || vcs.statusFor(target.path, false))));
 	let primaryAction = $derived(primaryActionLabel(vcs.project));
@@ -51,6 +51,9 @@
 <ContextMenu at={menu} onclose={close}>
 	{#if target}
 		{@render item('external-link', 'Open', () => manager.openEntry(target))}
+		{#if !target.is_dir}
+			{@render item('eye', 'Quick Look', view.toggleQuickLook)}
+		{/if}
 		{#if offersVcs}
 			{@render item('code', target.is_dir ? 'View project changes' : 'View changes', () => viewChanges(target))}
 			{@render item('check', target.is_dir ? `${primaryAction} changes` : `${primaryAction} this file`, () => saveChanges(target))}
@@ -58,8 +61,7 @@
 		{#if target.is_dir}
 			{@render item('plus', 'Open in tab', () => manager.openTab(target.path))}
 		{/if}
-		{@render item(isFavorite ? 'check' : 'star', isFavorite ? 'Remove favorite' : 'Add favorite', () => manager.actions.toggleFavorite(target))}
-		{@render item(isPinned ? 'check' : 'pin', isPinned ? 'Remove from sidebar' : 'Pin to sidebar', () => bookmarks.togglePinned(target))}
+		{@render item('star', isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
 		<MenuSeparator />
 		{@render item('scissors', 'Cut', manager.actions.cut)}
 		{@render item('copy', 'Copy', manager.actions.copy)}

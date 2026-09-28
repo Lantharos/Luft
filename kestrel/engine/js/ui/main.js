@@ -263,6 +263,7 @@ async function _initializeUI() {
         snapWindow: (window, rect) => wm.snapWindow(window, rect),
         activateWindow: window => wm.activateWithSnapGroup(window),
         openScreenshot: () => screenshotUI.open().catch(logError),
+        stopScreencast: () => screenshotUI.stopScreencast(),
         createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
         registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
     });

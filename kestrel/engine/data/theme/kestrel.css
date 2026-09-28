@@ -49,6 +49,10 @@ stage { font-family: "Open Runde"; }
   transition-duration: 160ms;
 }
 .kestrel-status-button:active { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-privacy { height: 28px; padding: 0 10px; margin: 0 4px; border-radius: 999px; background-color: #ff9d42; color: #1c1206; }
+.kestrel-privacy:hover { background-color: #ffad61; }
+.kestrel-privacy:active, .kestrel-privacy:focus { background-color: #ffb877; }
+.kestrel-privacy-icons { spacing: 6px; }
 .kestrel-clock { text-align: right; font-size: 12px; font-weight: 500; }
 
 .kestrel-popover {
@@ -280,6 +284,11 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .modal-dialog .message-dialog-icon { icon-size: 22px; padding: 11px; margin-bottom: 8px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.10); color: #ffffff; }
 .modal-dialog .message-dialog-title { text-align: left; font-size: 19px; font-weight: 600; }
 .modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: rgba(255, 255, 255, 0.70); }
+.kestrel-shortcut-list { spacing: 4px; }
+.kestrel-shortcut-row { spacing: 16px; font-size: 14px; }
+.kestrel-shortcut-key { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: rgba(255, 255, 255, 0.08); transition-duration: 120ms; }
+.kestrel-shortcut-key:hover { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-shortcut-key:focus { background-color: rgba(255, 255, 255, 0.18); }
 .modal-dialog .dialog-list { spacing: 10px; }
 .modal-dialog .dialog-list-title { text-align: left; font-size: 13px; font-weight: 600; }
 .modal-dialog .dialog-list-box { spacing: 12px; }

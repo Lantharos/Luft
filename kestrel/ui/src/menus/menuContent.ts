@@ -17,7 +17,7 @@ export interface MenuHandlers {
 function slot(icon: MenuIcon | undefined, iconName: string | null): St.Icon {
   if (icon instanceof St.ImageContent)
     return new St.Icon({ style_class: 'kestrel-context-icon', content: icon, content_gravity: Clutter.ContentGravity.RESIZE_ASPECT, width: 16, height: 16 });
-  return new St.Icon({ style_class: 'kestrel-context-icon', gicon: icon ?? null, icon_name: icon ? null : iconName, icon_size: 16 });
+  return new St.Icon({ style_class: 'kestrel-context-icon', icon_size: 16, ...icon ? { gicon: icon } : { icon_name: iconName } });
 }
 
 function row(label: string, enabled: boolean, handlers: MenuHandlers, leading: St.Icon[], trailing: string | null): St.Button {

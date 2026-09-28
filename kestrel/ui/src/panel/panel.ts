@@ -14,6 +14,7 @@ import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher } from './launcher.js';
 import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './desktopPeek.js';
+import { PrivacyIndicator } from '../privacy/indicator.js';
 
 export interface Monitor {
   index: number;
@@ -29,6 +30,7 @@ export interface PanelActions {
   notifications(): void;
   tasks(): void;
   activateWindow(window: Meta.Window): void;
+  stopScreencast(): void;
 }
 
 export class KestrelPanel {
@@ -44,6 +46,7 @@ export class KestrelPanel {
   private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
   readonly tray: Tray | null = null;
+  private readonly privacy: PrivacyIndicator | null = null;
   private clockTimer = 0;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
@@ -74,6 +77,8 @@ export class KestrelPanel {
       y_align: Clutter.ActorAlign.CENTER,
     });
     if (primary) {
+      this.privacy = new PrivacyIndicator(menus, actions.stopScreencast);
+      right.add_child(this.privacy.actor);
       this.tray = new Tray(menus);
       right.add_child(this.tray.actor);
       this.quickButton = new St.Button({
@@ -123,6 +128,7 @@ export class KestrelPanel {
 
   shutdown(): void {
     this.tray?.shutdown();
+    this.privacy?.shutdown();
     this.taskbar.shutdown();
     GLib.Source.remove(this.clockTimer);
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);

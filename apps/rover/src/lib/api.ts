@@ -1,5 +1,6 @@
 import { invoke, listen } from '@lantharos/sabine';
 import type { AppState, DirectoryContents, DriveInfo, FileEntry, Operation, Settings, TrashContents } from './types';
+import type { FileDetails, OpenWithApps } from './types/details';
 import type { VcsRoot, VcsStatusEvent } from './vcs/types';
 
 export const appState = () => invoke<AppState>('app_state');
@@ -14,9 +15,15 @@ export const renameItem = (path: string, newName: string) => invoke<FileEntry>('
 export const copyItems = (sources: string[], destination: string) => invoke<string>('copy_items', { sources, destination });
 export const moveItems = (sources: string[], destination: string) => invoke<string>('move_items', { sources, destination });
 export const openWithDefault = (path: string) => invoke<void>('open_with_default', { path });
+export const fileDetails = (path: string) => invoke<FileDetails>('file_details', { path });
+export const appsForFile = (path: string) => invoke<OpenWithApps>('apps_for_file', { path });
+export const openWithApp = (path: string, app: string) => invoke<void>('open_with_app', { path, app });
 
 export const listDrives = () => invoke<DriveInfo[]>('list_drives');
 export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
+
+export const recentFiles = () => invoke<FileEntry[]>('recent_files');
+export const trashCount = () => invoke<number>('trash_count');
 
 export const listTrash = () => invoke<TrashContents>('list_trash');
 export const moveToTrash = (paths: string[]) => invoke<void>('move_to_trash', { paths });

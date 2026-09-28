@@ -4,11 +4,12 @@
 
 	interface Props {
 		name: EntryIconName;
-		density?: 'row' | 'grid';
+		size: number;
 		thumbnail?: string | null;
+		fit?: 'cover' | 'contain';
 	}
 
-	let { name, density = 'row', thumbnail = null }: Props = $props();
+	let { name, size, thumbnail = null, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
 	const TONES: Partial<Record<EntryIconName, string>> = {
@@ -25,7 +26,8 @@
 </script>
 
 <span
-	class={['entry-icon', `entry-icon--${density}`, showThumbnail ? 'entry-icon--thumbnail' : `entry-icon--${TONES[name] ?? 'file'}`]}
+	class={['entry-icon', showThumbnail ? `entry-icon--thumbnail entry-icon--${fit}` : `entry-icon--${TONES[name] ?? 'file'}`]}
+	style:--icon-size="{size}px"
 	aria-hidden="true"
 >
 	{#if showThumbnail}
@@ -39,6 +41,6 @@
 			onerror={() => (failedThumbnail = thumbnail)}
 		/>
 	{:else}
-		<Icon {name} size={density === 'grid' ? 38 : 21} />
+		<Icon {name} size={Math.round(Math.max(14, size * 0.46))} />
 	{/if}
 </span>

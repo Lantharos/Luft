@@ -1,7 +1,5 @@
 import * as api from '$lib/api';
 import { closeWindow } from '$lib/runtime';
-import { settings } from '$lib/state/settings.svelte';
-import type { FileEntry } from '$lib/types';
 import { isInside, parentPath } from '$lib/utils/paths';
 import type { FileManager } from './manager.svelte';
 
@@ -83,17 +81,6 @@ export class FileActions {
 	emptyTrash = async (trashPath: string | null) => {
 		await api.emptyTrash(trashPath).catch(this.#manager.notify);
 		await this.#manager.loadTrash();
-	};
-
-	toggleFavorite = (entry: FileEntry) => {
-		settings.update((current) => {
-			const others = current.favorites.filter((favorite) => favorite.path !== entry.path);
-			const exists = others.length !== current.favorites.length;
-			return {
-				...current,
-				favorites: exists ? others : [{ name: entry.name, path: entry.path, is_dir: entry.is_dir }, ...others]
-			};
-		});
 	};
 
 	#hideEntries(paths: string[]) {

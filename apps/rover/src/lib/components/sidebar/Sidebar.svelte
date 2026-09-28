@@ -1,0 +1,114 @@
+<script lang="ts">
+	import { SearchField } from '@luft/ui';
+	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
+	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
+	import { dropKey, TRASH_DROP_PATH } from '$lib/file-manager/drag/drop-targets';
+	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import { userFolders, type TrashCounter } from '$lib/file-manager/places.svelte';
+	import { isInside } from '$lib/utils/paths';
+	import DriveItem from './DriveItem.svelte';
+	import FavoritesGroup from './FavoritesGroup.svelte';
+	import SidebarItem from './SidebarItem.svelte';
+
+	interface Props {
+		manager: FileManager;
+		drag: DragController;
+		chooser: ChooserState | null;
+		trash: TrashCounter;
+	}
+
+	let { manager, drag, chooser, trash }: Props = $props();
+
+	let search = $state<SearchField>();
+
+	let folders = $derived(userFolders(manager.userDirs));
+	let placePaths = $derived(new Set([manager.homePath, ...folders.map((folder) => folder.path)]));
+	let browsing = $derived(manager.view === 'home');
+	let activeDrive = $derived.by(() => {
+		const path = manager.currentPath;
+		if (!browsing || placePaths.has(path) || isInside(path, manager.homePath)) return null;
+		return manager.drives.holding(path)?.mount_point ?? null;
+	});
+
+	export function focusSearch() {
+		search?.focus();
+	}
+
+	function key(path: string) {
+		return dropKey('sidebar', path);
+	}
+
+	function openInTab(event: MouseEvent, open: () => void) {
+		if (event.button !== 1) return;
+		event.preventDefault();
+		event.stopPropagation();
+		open();
+	}
+
+	function folderItem(path: string) {
+		return {
+			active: browsing && manager.currentPath === path,
+			dropping: drag.target?.key === key(path),
+			onclick: () => manager.navigate(path),
+			onauxclick: (event: MouseEvent) => openInTab(event, () => manager.openTab(path)),
+			ondragover: (event: DragEvent) => drag.overPath(event, path, key(path)),
+			ondragleave: drag.leave,
+			ondrop: (event: DragEvent) => drag.drop(event, path),
+			'data-drop-path': path,
+			'data-drop-key': key(path)
+		};
+	}
+</script>
+
+<aside class="glass-sidebar drag-region sidebar">
+	<div class="sidebar-search">
+		<SearchField bind:this={search} variant="sidebar" label="Search current folder" bind:value={manager.searchQuery} />
+	</div>
+
+	<nav class="sidebar-scroll hidden-scroll" aria-label="Places" data-no-drag>
+		<div class="sidebar-group">
+			<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />
+			<SidebarItem
+				icon="clock"
+				label="Recent"
+				active={manager.view === 'recent'}
+				onclick={() => manager.showView('recent')}
+				onauxclick={(event) => openInTab(event, () => manager.openViewInTab('recent'))}
+			/>
+			{#each folders as folder (folder.path)}
+				<SidebarItem icon={folder.icon} label={folder.label} {...folderItem(folder.path)} />
+			{/each}
+			{#if !chooser}
+				<SidebarItem
+					icon="trash"
+					label="Trash"
+					active={manager.view === 'trash'}
+					dropping={drag.target?.key === key(TRASH_DROP_PATH)}
+					onclick={() => manager.showView('trash')}
+					onauxclick={(event) => openInTab(event, () => manager.openViewInTab('trash'))}
+					ondragover={(event) => drag.overTrash(event, key(TRASH_DROP_PATH))}
+					ondragleave={drag.leave}
+					ondrop={(event) => drag.dropOnTrash(event)}
+					data-drop-key={key(TRASH_DROP_PATH)}
+					data-drop-trash=""
+				>
+					{#snippet trailing()}
+						{#if trash.count > 0}
+							<span class="sidebar-item__count">{trash.count}</span>
+						{/if}
+					{/snippet}
+				</SidebarItem>
+			{/if}
+		</div>
+
+		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} />
+
+		{#if manager.drives.ordered.length > 0}
+			<div class="sidebar-group">
+				{#each manager.drives.ordered as drive (drive.mount_point)}
+					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} />
+				{/each}
+			</div>
+		{/if}
+	</nav>
+</aside>

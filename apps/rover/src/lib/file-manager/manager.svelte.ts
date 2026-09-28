@@ -25,7 +25,7 @@ import { DrivesState } from './drives.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
 import { DelayedLoading } from './listing/loading.svelte';
 import { viewModeForPath } from './listing/view-modes';
-import { previewDrives, previewEntries, previewTrash, previewUserDirs } from './preview';
+import { previewDrives, previewEntries, previewRecent, previewTrash, previewUserDirs } from './preview';
 
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 
@@ -33,8 +33,7 @@ const DUPLICATE_EVENT_MS = 120;
 const NOTICE_MS = 4000;
 const VIEW_TITLES: Record<SidebarView, string> = {
 	home: 'Home',
-	favorites: 'Favorites',
-	drives: 'Drives',
+	recent: 'Recent',
 	trash: 'Trash'
 };
 const EMPTY_TRASH: TrashContents = { items: [], locations: [] };
@@ -61,7 +60,10 @@ export class FileManager {
 	operations = $state.raw<Operation[]>([]);
 
 	displayEntries = $derived(
-		visibleEntries(sortedEntries(this.entries, settings.value.sortBy, settings.value.sortAsc), this.searchQuery)
+		visibleEntries(
+			this.view === 'recent' ? this.entries : sortedEntries(this.entries, settings.value.sortBy, settings.value.sortAsc),
+			this.searchQuery
+		)
 	);
 	cuttingPaths = $derived(
 		new Set(this.clipboard.operation === 'cut' ? this.clipboard.items.map((item) => item.path) : [])
@@ -170,6 +172,19 @@ export class FileManager {
 		}
 	};
 
+	loadRecent = async () => {
+		const token = this.loading.start();
+		this.entries = [];
+		try {
+			const recent = isDesktopRuntime() ? await api.recentFiles() : previewRecent;
+			if (this.loading.isCurrent(token)) this.entries = recent;
+		} catch (caught) {
+			if (this.loading.isCurrent(token)) this.error = errorMessage(caught);
+		} finally {
+			this.loading.finish(token);
+		}
+	};
+
 	navigate = async (path: string) => {
 		this.tabs.navigate(this.#homeEntry(path));
 		await this.loadDirectory(path);
@@ -256,13 +271,6 @@ export class FileManager {
 		if (!this.selection.delete(path)) this.selection.add(path);
 	};
 
-	handleItemClick = (entry: FileEntry, event: MouseEvent) => {
-		if (event.ctrlKey || event.metaKey) return this.toggleSelected(entry.path);
-		const anchor = [...this.selection].at(-1);
-		if (event.shiftKey && anchor) return this.#selectRange(anchor, entry.path);
-		this.selectOnly(entry.path);
-	};
-
 	openEntry = (entry: Pick<FileEntry, 'path' | 'is_dir'>) => {
 		if (entry.is_dir) void this.navigate(entry.path);
 		else api.openWithDefault(entry.path).catch(this.notify);
@@ -347,7 +355,7 @@ export class FileManager {
 	#showListing(path: string, entries: FileEntry[]) {
 		this.currentPath = path;
 		this.entries = entries;
-		this.viewMode = viewModeForPath(path, settings.value, this.userDirs);
+		this.viewMode = this.viewMode === 'columns' ? 'columns' : viewModeForPath(path, settings.value, this.userDirs);
 		this.view = 'home';
 		this.searchQuery = '';
 		this.draft = null;
@@ -369,16 +377,8 @@ export class FileManager {
 		this.error = null;
 		this.selection.clear();
 		this.loading.cancel();
-		if (view === 'drives') await this.drives.load();
+		if (view === 'recent') await this.loadRecent();
 		if (view === 'trash') await this.loadTrash();
-	}
-
-	#selectRange(fromPath: string, toPath: string) {
-		const paths = this.displayEntries.map((entry) => entry.path);
-		const from = paths.indexOf(fromPath);
-		const to = paths.indexOf(toPath);
-		if (from === -1 || to === -1) return;
-		this.replaceSelection(paths.slice(Math.min(from, to), Math.max(from, to) + 1));
 	}
 }
 

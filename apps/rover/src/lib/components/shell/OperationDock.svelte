@@ -118,8 +118,8 @@
 				</div>
 				<div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(245,245,242,0.08)]">
 					<div
-						class="h-full rounded-full bg-[var(--text)] transition-[width] duration-200"
-						style:width={`${Math.max(2, Math.round(operation.progress * 100))}%`}
+						class="h-full origin-left rounded-full bg-[var(--accent)] transition-transform duration-200"
+						style:transform="scaleX({Math.max(0.02, operation.progress)})"
 					></div>
 				</div>
 				<div class="mt-2 flex items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">

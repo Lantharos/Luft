@@ -17,6 +17,16 @@ configure_file(
   install_mode: 'rwxr-xr-x',
 )
 
+managerconf = configuration_data()
+managerconf.set('gjs', gjs.full_path())
+managerconf.set('pkgdatadir', pkgdatadir)
+configure_file(
+  input: 'kestrel-session-manager.service.in',
+  output: 'kestrel-session-manager.service',
+  configuration: managerconf,
+  install_dir: systemduserunitdir,
+)
+
 settings_daemons = [
   ['a11y-settings', 'org.gnome.SettingsDaemon.A11ySettings', 'Accessibility settings', 'kestrel-session.target'],
   ['color', 'org.gnome.SettingsDaemon.Color', 'Display color and night light', 'kestrel-session.target'],
@@ -76,4 +86,5 @@ configure_file(
 )
 
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
+install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
 install_data('app-slice-oomd.conf', install_dir: systemduserunitdir / 'app.slice.d', rename: '50-kestrel-oomd.conf')

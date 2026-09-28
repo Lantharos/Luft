@@ -40,7 +40,12 @@ export function exportEnvironment(variables: Record<string, string>): void {
   }
 }
 
-export function watchActive(changed: (active: boolean) => void): () => void {
+export interface SessionState {
+  active: boolean;
+  locked: boolean;
+}
+
+export function watchSession(changed: (state: SessionState) => void): () => void {
   const cancellable = new Gio.Cancellable();
   let proxy: Gio.DBusProxy | null = null;
   Gio.DBusProxy.new_for_bus(Gio.BusType.SYSTEM, Gio.DBusProxyFlags.NONE, null, LOGIN1, '/org/freedesktop/login1/session/auto',
@@ -49,10 +54,13 @@ export function watchActive(changed: (active: boolean) => void): () => void {
         proxy = Gio.DBusProxy.new_for_bus_finish(result);
       } catch (error) {
         if (!(error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)))
-          console.warn(`Session activity is unavailable: ${error}`);
+          console.warn(`Session state is unavailable: ${error}`);
         return;
       }
-      const sync = () => changed(proxy!.get_cached_property('Active')?.get_boolean() ?? true);
+      const sync = () => changed({
+        active: proxy!.get_cached_property('Active')?.get_boolean() ?? true,
+        locked: proxy!.get_cached_property('LockedHint')?.get_boolean() ?? false,
+      });
       proxy.connect('g-properties-changed', sync);
       sync();
     });

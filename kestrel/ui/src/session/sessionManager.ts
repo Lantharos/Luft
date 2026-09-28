@@ -7,19 +7,12 @@ import { Inhibitors } from './inhibitors.js';
 import { BUS_NAME, InhibitFlags, MANAGER_PATH, MANAGER_XML } from './interfaces.js';
 import { Peers } from './peers.js';
 import { Presence } from './presence.js';
-import { availability, exportEnvironment, perform, watchActive } from './system.js';
+import { availability, exportEnvironment, perform, watchSession, type SessionState } from './system.js';
 
 const LOGOUT_NO_CONFIRMATION = 1;
 const LOGOUT_FORCE = 2;
-const SHARED_ENVIRONMENT = ['WAYLAND_DISPLAY', 'DISPLAY', 'XAUTHORITY'];
 
 type Invocation = Gio.DBusMethodInvocation;
-
-export interface LockState {
-  readonly locked: boolean;
-  connect(signal: 'locked-changed', callback: () => void): number;
-  disconnect(id: number): void;
-}
 
 export class SessionManager {
   private readonly exported: Gio.DBusExportedObject;
@@ -28,18 +21,11 @@ export class SessionManager {
   private readonly clients = new Clients((added, path) => this.exported.emit_signal(added ? 'ClientAdded' : 'ClientRemoved', new GLib.Variant('(o)', [path])));
   private readonly endSession = new EndSession(this.clients, () => this.exported.emit_signal('SessionOver', new GLib.Variant('()', [])));
   private readonly presence = new Presence();
-  private readonly stopWatchingActive: () => void;
-  private lockState: LockState | null = null;
-  private lockSignal = 0;
+  private readonly stopWatchingSession: () => void;
   private readonly nameId: number;
-  private active = true;
-  private readonly inhibitorWatchers = new Set<() => void>();
+  private state: SessionState = { active: true, locked: false };
 
   constructor() {
-    exportEnvironment(Object.fromEntries(SHARED_ENVIRONMENT.flatMap(name => {
-      const value = GLib.getenv(name);
-      return value ? [[name, value]] : [];
-    })));
     const manager = this;
     this.exported = Gio.DBusExportedObject.wrapJSObject(MANAGER_XML, {
       SetenvAsync: ([name, value]: [string, string], invocation: Invocation) => {
@@ -79,38 +65,24 @@ export class SessionManager {
       SessionName: 'kestrel',
       SessionClass: 'user',
       RestoreSupported: false,
-      get SessionIsActive() { return manager.active; },
-      get SessionIsLocked() { return manager.lockState?.locked ?? false; },
+      get SessionIsActive() { return manager.state.active; },
+      get SessionIsLocked() { return manager.state.locked; },
       get InhibitedActions() { return manager.inhibitors.flags; },
     });
     this.exported.export(Gio.DBus.session, MANAGER_PATH);
-    this.stopWatchingActive = watchActive(active => {
-      this.active = active;
-      this.exported.emit_property_changed('SessionIsActive', new GLib.Variant('b', active));
+    this.stopWatchingSession = watchSession(state => {
+      const previous = this.state;
+      this.state = state;
+      if (state.active !== previous.active) this.exported.emit_property_changed('SessionIsActive', new GLib.Variant('b', state.active));
+      if (state.locked !== previous.locked) this.exported.emit_property_changed('SessionIsLocked', new GLib.Variant('b', state.locked));
     });
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.REPLACE, () =>
       this.exported.emit_signal('SessionRunning', new GLib.Variant('()', [])), null);
   }
 
-  trackLock(lockState: LockState): void {
-    this.lockState = lockState;
-    this.lockSignal = lockState.connect('locked-changed', () =>
-      this.exported.emit_property_changed('SessionIsLocked', new GLib.Variant('b', lockState.locked)));
-  }
-
-  get keepingAwake(): boolean {
-    return !!(this.inhibitors.flags & InhibitFlags.IDLE);
-  }
-
-  watchInhibitors(changed: () => void): () => void {
-    this.inhibitorWatchers.add(changed);
-    return () => this.inhibitorWatchers.delete(changed);
-  }
-
   destroy(): void {
     Gio.bus_unown_name(this.nameId);
-    if (this.lockSignal) this.lockState!.disconnect(this.lockSignal);
-    this.stopWatchingActive();
+    this.stopWatchingSession();
     this.endSession.destroy();
     this.presence.destroy();
     this.inhibitors.destroy();
@@ -136,7 +108,6 @@ export class SessionManager {
   private inhibitorsChanged(added: boolean, path: string): void {
     this.exported.emit_signal(added ? 'InhibitorAdded' : 'InhibitorRemoved', new GLib.Variant('(o)', [path]));
     this.exported.emit_property_changed('InhibitedActions', new GLib.Variant('u', this.inhibitors.flags));
-    for (const changed of this.inhibitorWatchers) changed();
   }
 
   private forget(name: string): void {

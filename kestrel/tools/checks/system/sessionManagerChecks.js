@@ -28,9 +28,10 @@ export async function checkSessionManager({pause, pointer}) {
     (_connection, _sender, _path, _iface, signal) => events.push(signal));
   const inhibited = async () => (await call(MANAGER_PATH, MANAGER, 'IsInhibited', new GLib.Variant('(u)', [IDLE]), '(b)')).deep_unpack()[0];
 
-  const [owner] = (await Gio.DBus.session.call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner',
-    new GLib.Variant('(s)', [MANAGER]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null)).deep_unpack();
-  require(owner === Gio.DBus.session.get_unique_name(), 'Kestrel runs the session itself');
+  const [running] = (await call(MANAGER_PATH, MANAGER, 'IsSessionRunning', null, '(b)')).deep_unpack();
+  const [name] = (await call(MANAGER_PATH, 'org.freedesktop.DBus.Properties', 'Get',
+    new GLib.Variant('(ss)', [MANAGER, 'SessionName']), '(v)')).recursiveUnpack();
+  require(running && name === 'kestrel', 'Kestrel runs the session itself');
 
   const app = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_SESSION_CLIENT_SCRIPT'), '--inhibit', '--register'], Gio.SubprocessFlags.NONE);
   try {

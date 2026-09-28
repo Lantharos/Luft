@@ -4,6 +4,7 @@ BindsTo=graphical-session.target
 Before=graphical-session.target
 Wants=graphical-session-pre.target
 After=graphical-session-pre.target
+Requires=kestrel-session-manager.service
 BindsTo=kestrel.service
 After=kestrel.service
 Wants=xdg-desktop-autostart.target

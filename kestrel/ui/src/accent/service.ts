@@ -20,7 +20,7 @@ export class AccentService {
   private stylesheetLoaded = false;
   private accent = '';
 
-  constructor() {
+  constructor(private readonly changed: (color: Rgb) => void) {
     this.dbus.export(Gio.DBus.session, '/dev/lantharos/Kestrel/Appearance');
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, 'dev.lantharos.Kestrel', Gio.BusNameOwnerFlags.NONE, null, null);
   }
@@ -42,6 +42,7 @@ export class AccentService {
     if (this.interfaceSettings.settings_schema.has_key('accent-color'))
       this.interfaceSettings.set_string('accent-color', namedAccent(color));
     this.dbus.emit_property_changed('AccentColor', new GLib.Variant('s', hex));
+    this.changed(color);
     this.writeConfig(color);
   }
 

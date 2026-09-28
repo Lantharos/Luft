@@ -48,6 +48,8 @@ exec dbus-run-session -- bash -c '
   if [[ -s "$run/favorites.txt" ]]; then
     dconf write /dev/lantharos/kestrel/favorite-apps "$(cat "$run/favorites.txt")"
   fi
+  gjs -m "$root/kestrel/build/js/ui/kestrel-session.js" &
+  timeout 5 gdbus wait --session org.gnome.SessionManager
   if [[ "$mode" == capture ]]; then
     dconf reset /dev/lantharos/kestrel/quick-tile-order
     dconf reset /dev/lantharos/kestrel/quick-tiles-removed

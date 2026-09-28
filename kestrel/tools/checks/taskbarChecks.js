@@ -29,7 +29,7 @@ export async function checkTaskbar({pause, capture, actorNamed, pointer, output}
     const badge = withClass(button, 'kestrel-task-badge');
     const fill = withClass(button, 'kestrel-task-progress-fill');
     require(badge.visible && badge.text === '3', 'apps show their unread count');
-    require(fill.get_parent().visible && Math.abs(fill.width - 12) <= 1, 'apps show their progress');
+    require(fill.get_parent().visible && Math.abs(fill.width - fill.get_parent().width / 2) <= 1, 'apps show their progress');
     require(withClass(button, 'kestrel-task-attention').visible, 'apps asking for attention are highlighted');
     await capture(`${output}/taskbar-indicators.png`);
 

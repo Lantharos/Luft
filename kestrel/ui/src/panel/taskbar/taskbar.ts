@@ -68,6 +68,7 @@ export class Taskbar {
     const attention = this.tracker.focus_app !== item.app &&
       item.app.get_windows().some(window => window.demands_attention || window.urgent);
     item.indicators.update(launcherEntries.get(item.app.id), attention);
+    this.updateDots(item);
   }
 
   update(apps: Shell.App[]): void {
@@ -148,7 +149,6 @@ export class Taskbar {
   }
 
   private windowsChanged(item: AppItem): void {
-    this.updateDots(item);
     this.updateIndicator(item);
     item.iconGeometry = null;
     this.syncIconGeometry(item);
@@ -168,7 +168,7 @@ export class Taskbar {
   }
 
   private updateDots(item: AppItem, animate = false): void {
-    const count = Math.min(4, item.app.get_windows().filter(window => !window.skip_taskbar).length);
+    const count = item.indicators.showsProgress ? 0 : Math.min(4, item.app.get_windows().filter(window => !window.skip_taskbar).length);
     const width = item.focused ? Math.min(DOT_SIZE * 3, Math.floor((32 - (count - 1) * DOT_GAP) / Math.max(1, count))) : DOT_SIZE;
     const start = (40 - (count * width + (count - 1) * DOT_GAP)) / 2;
     item.dots.forEach((dot, index) => {

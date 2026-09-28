@@ -116,7 +116,6 @@
     <file>ui/switchMonitor.js</file>
     <file>ui/unlockDialog.js</file>
     <file>ui/userWidget.js</file>
-    <file>ui/windowAttentionHandler.js</file>
     <file>ui/windowManager.js</file>
     <file>ui/windowLayout.js</file>
     <file>ui/windowMenu.js</file>

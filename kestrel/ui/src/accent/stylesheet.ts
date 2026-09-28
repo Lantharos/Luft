@@ -12,6 +12,7 @@ export function accentStylesheet(accent: Rgb): string {
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${rgba(light, 1)}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${rgba(light, 1)}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${rgba(light, 1)}; }
+.kestrel-task-progress-fill.kestrel-task-progress-fill { background-color: ${rgba(light, 1)}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default { background-color: ${rgba(strong, 0.9)}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default:hover { background-color: ${rgba(strong, 1)}; }
 .modal-dialog.modal-dialog .check-box:checked StIcon { background-color: ${rgba(strong, 1)}; }

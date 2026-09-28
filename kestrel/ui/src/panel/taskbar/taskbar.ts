@@ -4,11 +4,13 @@ import type Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import type { WindowPreviews } from './windowPreviews.js';
-import type { ContextMenus } from '../menus/contextMenus.js';
-import { PANEL_ICON_SIZE } from '../shared/surface.js';
-import { animateActor, liftIcon } from '../shared/motion.js';
+import type { WindowPreviews } from '../windowPreviews.js';
+import type { ContextMenus } from '../../menus/contextMenus.js';
+import { PANEL_ICON_SIZE } from '../../shared/surface.js';
+import { animateActor, liftIcon } from '../../shared/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
+import { AppIndicators } from './appIndicators.js';
+import { launcherEntries } from './launcherEntries.js';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
 const DOT_SIZE = 4;
@@ -25,12 +27,14 @@ interface AppItem {
   removing: boolean;
   windowsChanged: number;
   draggable: { enabled: boolean };
+  indicators: AppIndicators;
 }
 
 export class Taskbar {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-app-slots' });
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
+  private readonly disconnectors: (() => void)[] = [];
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
     private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
@@ -42,6 +46,28 @@ export class Taskbar {
         .filter((item): item is AppItem => !!item && pinned.has(item.app.id))
         .map(item => ({ id: item.app.id, slot: item.slot, button: item.button }));
     }, favorites);
+    const display = (global as unknown as Shell.Global).display;
+    const refresh = () => this.updateIndicators();
+    const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];
+    this.disconnectors.push(
+      () => signals.forEach(id => display.disconnect(id)),
+      launcherEntries.watch(appId => { const item = this.items.get(appId); if (item) this.updateIndicator(item); }),
+    );
+  }
+
+  shutdown(): void {
+    for (const disconnect of this.disconnectors) disconnect();
+    this.disconnectors.length = 0;
+  }
+
+  private updateIndicators(): void {
+    for (const item of this.items.values()) this.updateIndicator(item);
+  }
+
+  private updateIndicator(item: AppItem): void {
+    const attention = this.tracker.focus_app !== item.app &&
+      item.app.get_windows().some(window => window.demands_attention || window.urgent);
+    item.indicators.update(launcherEntries.get(item.app.id), attention);
   }
 
   update(apps: Shell.App[]): void {
@@ -94,6 +120,7 @@ export class Taskbar {
   }
 
   updateFocus(): void {
+    this.updateIndicators();
     for (const [id, item] of this.items) {
       const focused = id === this.tracker.focus_app?.id;
       if (focused) item.button.add_style_class_name('kestrel-app-focused');
@@ -122,6 +149,7 @@ export class Taskbar {
 
   private windowsChanged(item: AppItem): void {
     this.updateDots(item);
+    this.updateIndicator(item);
     item.iconGeometry = null;
     this.syncIconGeometry(item);
   }
@@ -168,7 +196,8 @@ export class Taskbar {
     });
     const slot = new St.Widget({ width: 42, height: 40, clip_to_allocation: true });
     slot.add_child(button);
-    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0, draggable: { enabled: false } };
+    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0,
+      draggable: { enabled: false }, indicators: new AppIndicators(content) };
     item.draggable = this.makeDraggable(item);
     item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(item));
     button.connect('notify::allocation', () => this.syncIconGeometry(item));

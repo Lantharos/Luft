@@ -9,10 +9,11 @@ import St from 'gi://St';
 import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
 import { PanelLayout } from './panelLayout.js';
 import type { WindowPreviews } from './windowPreviews.js';
-import { Taskbar } from './taskbar.js';
+import { Taskbar } from './taskbar/taskbar.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher } from './launcher.js';
 import { Tray } from '../tray/tray.js';
+import { DesktopPeek } from './desktopPeek.js';
 
 export interface Monitor {
   index: number;
@@ -94,6 +95,7 @@ export class KestrelPanel {
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
     this.actor.add_child(right);
+    this.actor.add_child(new DesktopPeek().actor);
 
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => this.refreshApps())],
@@ -121,6 +123,7 @@ export class KestrelPanel {
 
   shutdown(): void {
     this.tray?.shutdown();
+    this.taskbar.shutdown();
     GLib.Source.remove(this.clockTimer);
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
     this.externalSignals.length = 0;

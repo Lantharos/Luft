@@ -70,7 +70,7 @@ export const PANEL_GROUPS: Panel[][] = [
 	],
 	[
 		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./datetime/DateTimePanel.svelte')),
-		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar'], () => import('./users/UsersPanel.svelte')),
+		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./users/UsersPanel.svelte')),
 		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./about/AboutPanel.svelte'))
 	]
 ];

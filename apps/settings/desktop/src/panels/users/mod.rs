@@ -1,3 +1,5 @@
+mod fingerprint;
+mod password;
 mod picture;
 
 use std::path::Path;
@@ -15,6 +17,7 @@ const ACCOUNTS: &str = "org.freedesktop.Accounts";
 const ACCOUNTS_PATH: &str = "/org/freedesktop/Accounts";
 const USER: &str = "org.freedesktop.Accounts.User";
 const ADMINISTRATOR: i32 = 1;
+const REGULAR_PASSWORD: i32 = 0;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +27,7 @@ struct User {
     picture: Option<String>,
     administrator: bool,
     automatic_login: bool,
+    has_password: bool,
 }
 
 #[derive(Serialize)]
@@ -42,7 +46,7 @@ struct AutomaticLogin {
     enabled: bool,
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
+pub fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
@@ -63,17 +67,22 @@ fn account(path: OwnedObjectPath) -> Result<Proxy<'static>, String> {
     Proxy::new(dbus::system()?, ACCOUNTS, path, USER).map_err(failed)
 }
 
-fn me() -> Result<Proxy<'static>, String> {
+pub fn me() -> Result<Proxy<'static>, String> {
     let uid = i64::from(unsafe { libc::getuid() });
     let path: OwnedObjectPath = accounts()?.call("FindUserById", &uid).map_err(explain)?;
     account(path)
 }
 
-fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
+pub fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
     me()?
         .call_with_flags::<_, _, ()>(method, MethodFlags::AllowInteractiveAuth.into(), body)
         .map(|_| ())
         .map_err(explain)
+}
+
+pub fn has_password(user: &Proxy) -> Result<bool, String> {
+    let mode: i32 = user.get_property("PasswordMode").map_err(failed)?;
+    Ok(mode == REGULAR_PASSWORD)
 }
 
 fn describe(user: &Proxy) -> Result<User, String> {
@@ -85,6 +94,7 @@ fn describe(user: &Proxy) -> Result<User, String> {
         picture: Path::new(&picture).is_file().then_some(picture),
         administrator: account_type == ADMINISTRATOR,
         automatic_login: user.get_property("AutomaticLogin").map_err(failed)?,
+        has_password: has_password(user)?,
     })
 }
 
@@ -107,7 +117,7 @@ fn choose_picture(_: Value) -> Result<bool, String> {
     Ok(true)
 }
 
-pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
+pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
         .command("users", |_: Value| users())
         .command("users_rename", |Rename { name }| {
@@ -117,4 +127,12 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
         .command("users_set_automatic_login", |AutomaticLogin { enabled }| {
             change("SetAutomaticLogin", &enabled)
         })
+        .command("users_change_password", password::change)
+        .command("users_fingerprints", |_: Value| Ok(fingerprint::list()))
+        .with("users_fingerprint_enroll", events, fingerprint::enroll)
+        .command("users_fingerprint_stop", |_: Value| {
+            fingerprint::stop();
+            Ok(())
+        })
+        .command("users_fingerprint_delete", fingerprint::delete)
 }

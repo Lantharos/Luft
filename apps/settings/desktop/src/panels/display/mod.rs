@@ -1,4 +1,5 @@
 mod apply;
+mod brightness;
 mod state;
 
 use std::sync::Once;
@@ -22,6 +23,7 @@ fn watch(events: &Events) {
                 return;
             };
             for _ in changes {
+                brightness::monitors_changed();
                 if let Ok(current) = state::current() {
                     events.emit(DISPLAYS_CHANGED, current);
                 }
@@ -37,4 +39,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             state::current()
         })
         .command("display_apply", apply::apply)
+        .with("display_brightness", events, |events, _: Value| {
+            brightness::current(events)
+        })
+        .with("display_set_brightness", events, brightness::set)
 }

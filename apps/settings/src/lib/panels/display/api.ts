@@ -50,3 +50,15 @@ export interface LogicalConfig {
 export const loadDisplays = () => invoke<Displays>('display_state');
 export const applyDisplays = (serial: number, logical: LogicalConfig[]) => invoke<void>('display_apply', { serial, logical });
 export const onDisplaysChanged = (callback: (state: Displays) => void) => listen<Displays>('display.changed', callback);
+
+export type BrightnessControl = { state: 'ready'; level: number } | { state: 'unresponsive' } | { state: 'unsupported' };
+export type ExternalBrightness = 'checking' | 'ready' | 'missing-tool' | 'needs-restart' | 'no-access';
+
+export interface Brightness {
+	displays: Record<string, BrightnessControl>;
+	external: ExternalBrightness;
+}
+
+export const loadBrightness = () => invoke<Brightness>('display_brightness');
+export const setBrightness = (connector: string, level: number) => invoke<void>('display_set_brightness', { connector, level });
+export const onBrightnessChanged = (callback: (brightness: Brightness) => void) => listen<Brightness>('display.brightness', callback);

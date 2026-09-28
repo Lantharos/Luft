@@ -4,11 +4,9 @@ use std::sync::{LazyLock, Mutex};
 use luft_app::dbus;
 use luft_app::dbus::objects::{Objects, failed};
 use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
 
+use super::profile::settings::{Settings, get};
 use super::{CONNECTION, SERVICE, SETTINGS};
-
-type Settings = HashMap<String, HashMap<String, OwnedValue>>;
 
 #[derive(Clone)]
 pub enum Kind {
@@ -26,24 +24,14 @@ pub struct Saved {
 
 static CACHE: LazyLock<Mutex<HashMap<String, Saved>>> = LazyLock::new(Mutex::default);
 
-fn value<T: TryFrom<OwnedValue>>(settings: &Settings, group: &str, key: &str) -> Option<T> {
-    settings
-        .get(group)?
-        .get(key)?
-        .try_clone()
-        .ok()?
-        .try_into()
-        .ok()
-}
-
 fn kind(settings: &Settings) -> Kind {
-    let kind: String = value(settings, "connection", "type").unwrap_or_default();
+    let kind: String = get(settings, "connection", "type").unwrap_or_default();
     match kind.as_str() {
         "802-11-wireless"
-            if value::<String>(settings, "802-11-wireless", "mode").as_deref() != Some("ap") =>
+            if get::<String>(settings, "802-11-wireless", "mode").as_deref() != Some("ap") =>
         {
             Kind::Wifi {
-                ssid: value(settings, "802-11-wireless", "ssid").unwrap_or_default(),
+                ssid: get(settings, "802-11-wireless", "ssid").unwrap_or_default(),
             }
         }
         "vpn" | "wireguard" => Kind::Vpn,
@@ -56,7 +44,7 @@ fn load(path: &str) -> Result<Saved, String> {
     let settings: Settings = connection.call("GetSettings", &()).map_err(failed)?;
     Ok(Saved {
         path: path.to_owned(),
-        name: value(&settings, "connection", "id").unwrap_or_default(),
+        name: get(&settings, "connection", "id").unwrap_or_default(),
         kind: kind(&settings),
     })
 }

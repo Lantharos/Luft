@@ -1,8 +1,8 @@
 import { invoke, listen } from '$lib/bridge';
+import type { Enterprise } from './connection/profile';
 
 export type Link = 'connected' | 'connecting' | 'disconnected' | 'unplugged';
 export type Security = 'open' | 'owe' | 'wep' | 'psk' | 'sae' | 'enterprise';
-export type JoinSecurity = Exclude<Security, 'enterprise'>;
 
 export interface Details {
 	ipv4: string[];
@@ -12,6 +12,12 @@ export interface Details {
 	mac: string;
 }
 
+export interface Radio {
+	frequency: number;
+	bssid: string;
+	bitrate: number;
+}
+
 export interface WifiNetwork {
 	ssid: string;
 	strength: number;
@@ -19,6 +25,7 @@ export interface WifiNetwork {
 	saved: string | null;
 	state: Link;
 	details: Details | null;
+	radio: Radio | null;
 }
 
 export interface Wifi {
@@ -30,6 +37,7 @@ export interface Wifi {
 
 export interface Wired {
 	device: string;
+	connection: string | null;
 	name: string;
 	state: Link;
 	speed: number | null;
@@ -64,13 +72,13 @@ export interface Failure {
 export interface Join {
 	device: string;
 	ssid: string;
-	security: JoinSecurity;
+	security: Security;
 	password?: string;
 	hidden?: boolean;
+	enterprise?: Enterprise;
 }
 
 export const needsPassword = (security: Security) => security === 'psk' || security === 'sae' || security === 'wep';
-export const minimumPassword = (security: Security) => (security === 'wep' ? 5 : 8);
 
 export const open = () => invoke<Network>('network_open');
 export const close = () => invoke<void>('network_close');

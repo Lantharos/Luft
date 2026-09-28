@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { accentFromSamples, namedAccent, toHex, withLightness, type Rgb } from './color.js';
+import { STRONG_TONE, accentFromSamples, namedAccent, toHex, withTone, type Rgb } from './color.js';
 import { accentStylesheet } from './stylesheet.js';
 
 const APPEARANCE_INTERFACE = `<node>
@@ -57,7 +57,7 @@ export class AccentService {
   private writeConfig(color: Rgb): void {
     GLib.mkdir_with_parents(this.configDirectory.get_path()!, 0o755);
     const hex = toHex(color);
-    const strong = toHex(withLightness(color, 0.42));
+    const strong = toHex(withTone(color, STRONG_TONE));
     const json = JSON.stringify({ accentColor: hex, accentStrongColor: strong, accentName: namedAccent(color) }, null, 2);
     const css = `:root {\n  --kestrel-accent: ${hex};\n  --kestrel-accent-strong: ${strong};\n}\n`;
     for (const [name, contents] of [['appearance.json', `${json}\n`], ['appearance.css', css]])

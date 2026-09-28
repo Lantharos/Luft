@@ -1,10 +1,10 @@
-import { withLightness, type Rgb } from './color.js';
+import { LIGHT_TONE, STRONG_TONE, withTone, type Rgb } from './color.js';
 
 const rgba = ([red, green, blue]: Rgb, alpha: number) => `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 
 export function accentStylesheet(accent: Rgb): string {
-  const strong = withLightness(accent, 0.42);
-  const light = withLightness(accent, 0.7);
+  const strong = withTone(accent, STRONG_TONE);
+  const light = withTone(accent, LIGHT_TONE);
   return `.kestrel-control.kestrel-control:checked { background-color: ${rgba(accent, 0.42)}; }
 .kestrel-control.kestrel-control:checked:hover { background-color: ${rgba(accent, 0.52)}; }
 .kestrel-control.kestrel-control:checked:active { background-color: ${rgba(accent, 0.6)}; }

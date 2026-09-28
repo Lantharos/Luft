@@ -5,10 +5,10 @@ import { canonical } from './accelerators.js';
 export interface StoredShortcut { description: string; shortcuts: string[] }
 export type AppShortcuts = Record<string, StoredShortcut>;
 
-const KEY = 'kestrel-global-shortcuts';
+const KEY = 'global-shortcuts';
 
 export class ShortcutStore {
-  private readonly settings = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
 
   app(appId: string): AppShortcuts {
     return this.all()[appId] ?? {};

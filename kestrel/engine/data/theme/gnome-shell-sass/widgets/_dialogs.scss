@@ -75,23 +75,6 @@
   }
 }
 
-/* Run Dialog */
-.run-dialog {
-  width: 24em;
-
-  // run dialog needs to override bottom padding
-  // to account for inexplicable extra padding
-  padding-bottom: $base_padding;
-
-  .run-dialog-entry {
-    padding: $base_padding * 2 $base_padding * 1.5;
-  }
-  .run-dialog-description {
-    @extend %caption;
-    color: darken($fg_color, 20%);
-  }
-}
-
 /* Password or Authentication Dialog */
 .prompt-dialog {
   width: 28em;

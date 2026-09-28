@@ -16,11 +16,11 @@ export interface MessageTray extends SignalSource {
   getSources(): NotificationSource[];
 }
 
-const LOCK_SCREEN_CONTENT = 'kestrel-lock-screen-content';
+const LOCK_SCREEN_CONTENT = 'lock-screen-content';
 
 export class NotificationCenter {
   readonly actor: St.BoxLayout;
-  private readonly shellSettings = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private readonly shellSettings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
 
   private readonly sources = new Set<NotificationSource>();
   private readonly groups = new Map<NotificationSource, NotificationGroup>();

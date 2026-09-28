@@ -73,8 +73,8 @@ const NotificationsBox = GObject.registerClass({
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
-        this._shellSettings = new Gio.Settings({schema_id: 'org.gnome.shell'});
-        this._shellSettings.connectObject('changed::kestrel-lock-screen-content', () => {
+        this._shellSettings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+        this._shellSettings.connectObject('changed::lock-screen-content', () => {
             for (const [source, obj] of this._sources)
                 this._detailedChanged(source, obj);
         }, this);
@@ -195,7 +195,7 @@ const NotificationsBox = GObject.registerClass({
     }
 
     _shouldShowDetails(source) {
-        return (this._shellSettings.get_boolean('kestrel-lock-screen-content') && source.policy.showInLockScreen) ||
+        return (this._shellSettings.get_boolean('lock-screen-content') && source.policy.showInLockScreen) ||
                source.policy.detailsInLockScreen ||
                source.narrowestPrivacyScope === MessageTray.PrivacyScope.SYSTEM;
     }
@@ -724,14 +724,6 @@ export const UnlockDialog = GObject.registerClass({
 
         this._updateUserSwitchVisibility();
 
-        // When parental controls session limits are enabled, the screen will be
-        // locked upon reaching the time limit. In those cases, tweak the lock screen,
-        // so that the children cannot unlock without parental supervision.
-        Main.timeLimitsManager.connectObject(
-            'notify::should-lock-session', () => this._updateAuthBlocked(),
-            this);
-        this._updateAuthBlocked();
-
         // Main Box
         const mainBox = new St.Widget();
         mainBox.add_constraint(new Layout.MonitorConstraint({primary: true}));
@@ -858,8 +850,6 @@ export const UnlockDialog = GObject.registerClass({
             this._authPrompt.updateSensitivity(
                 {sensitive: verificationStatus === AuthPromptStatus.NOT_VERIFYING});
         }
-
-        this._updateAuthBlocked();
     }
 
     _maybeDestroyAuthPrompt() {
@@ -1070,11 +1060,6 @@ export const UnlockDialog = GObject.registerClass({
             this._screenSaverSettings.get_boolean('user-switch-enabled') &&
             !this._lockdownSettings.get_boolean('disable-user-switching') &&
             this._promptBox.visible;
-    }
-
-    _updateAuthBlocked() {
-        this._authPrompt?.setAuthBlocked(
-            Main.timeLimitsManager.shouldLockSession);
     }
 
     cancel() {

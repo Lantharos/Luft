@@ -112,7 +112,6 @@ class ScreenshotItem extends QuickSettingsItem {
             style_class: 'icon-button',
             can_focus: true,
             icon_name: 'screenshooter-symbolic',
-            visible: !Main.sessionMode.isGreeter,
             accessible_name: _('Take Screenshot'),
         });
 

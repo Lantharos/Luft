@@ -12,12 +12,10 @@ import * as Main from '../ui/main.js';
 import * as Screenshot from '../ui/screenshot.js';
 
 const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
-const LOGIN_SCREEN_SCHEMA = 'org.gnome.login-screen';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
 const DISABLE_USER_SWITCH_KEY = 'disable-user-switching';
 const DISABLE_LOCK_SCREEN_KEY = 'disable-lock-screen';
 const DISABLE_LOG_OUT_KEY = 'disable-log-out';
-const DISABLE_RESTART_KEY = 'disable-restart-buttons';
 const RESTART_ENABLED_KEY = 'restart-enabled';
 const ALWAYS_SHOW_LOG_OUT_KEY = 'always-show-log-out';
 
@@ -157,7 +155,6 @@ const SystemActions = GObject.registerClass({
             available: true,
         });
 
-        this._loginScreenSettings = new Gio.Settings({schema_id: LOGIN_SCREEN_SCHEMA});
         this._lockdownSettings = new Gio.Settings({schema_id: LOCKDOWN_SCHEMA});
         this._orientationSettings = new Gio.Settings({schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen'});
         this._screenSaverSettings = new Gio.Settings({schema_id: SCREENSAVER_SCHEMA});
@@ -350,7 +347,7 @@ const SystemActions = GObject.registerClass({
     }
 
     _updateLockScreen() {
-        const showLock = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+        const showLock = !Main.sessionMode.isLocked;
         const allowLockScreen = !this._lockdownSettings.get_boolean(DISABLE_LOCK_SCREEN_KEY);
         this._actions.get(LOCK_SCREEN_ACTION_ID).available = showLock && allowLockScreen && LoginManager.canLock();
         this.notify('can-lock-screen');
@@ -371,9 +368,7 @@ const SystemActions = GObject.registerClass({
     _updatePowerOff() {
         const disabled = (Main.sessionMode.isLocked &&
                         !this._screenSaverSettings.get_boolean(RESTART_ENABLED_KEY)) ||
-                       (Main.sessionMode.isLocked && this._powerOffNeedsAuth) ||
-                       (Main.sessionMode.isGreeter &&
-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
+                       (Main.sessionMode.isLocked && this._powerOffNeedsAuth);
         this._actions.get(POWER_OFF_ACTION_ID).available = this._canHavePowerOff && !disabled;
         this.notify('can-power-off');
     }
@@ -393,9 +388,7 @@ const SystemActions = GObject.registerClass({
     _updateReboot() {
         const disabled = (Main.sessionMode.isLocked &&
                         !this._screenSaverSettings.get_boolean(RESTART_ENABLED_KEY)) ||
-                       (Main.sessionMode.isLocked && this._rebootNeedsAuth) ||
-                       (Main.sessionMode.isGreeter &&
-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
+                       (Main.sessionMode.isLocked && this._rebootNeedsAuth);
         this._actions.get(RESTART_ACTION_ID).available = this._canHaveReboot && !disabled;
         this.notify('can-restart');
     }
@@ -413,9 +406,7 @@ const SystemActions = GObject.registerClass({
     }
 
     _updateSuspend() {
-        const disabled = (Main.sessionMode.isLocked && this._suspendNeedsAuth) ||
-                       (Main.sessionMode.isGreeter &&
-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
+        const disabled = Main.sessionMode.isLocked && this._suspendNeedsAuth;
         this._actions.get(SUSPEND_ACTION_ID).available = this._canHaveSuspend && !disabled;
         this.notify('can-suspend');
     }
@@ -428,7 +419,7 @@ const SystemActions = GObject.registerClass({
     _updateSwitchUser() {
         const allowSwitch = !this._lockdownSettings.get_boolean(DISABLE_USER_SWITCH_KEY);
         const multiUser = this._userManager.can_switch() && this._userManager.has_multiple_users;
-        const shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+        const shouldShowInMode = !Main.sessionMode.isLocked;
 
         const visible = allowSwitch && multiUser && shouldShowInMode;
         this._actions.get(SWITCH_USER_ACTION_ID).available = visible;
@@ -443,7 +434,7 @@ const SystemActions = GObject.registerClass({
         const {systemAccount, localAccount} = this._user;
         const multiUser = this._userManager.has_multiple_users;
         const multiSession = Gdm.get_session_ids().length > 1;
-        const shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+        const shouldShowInMode = !Main.sessionMode.isLocked;
 
         const visible = allowLogout && (alwaysShow || multiUser || multiSession || systemAccount || !localAccount) && shouldShowInMode;
         this._actions.get(LOGOUT_ACTION_ID).available = visible;

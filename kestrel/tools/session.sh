@@ -17,7 +17,7 @@ export GI_TYPELIB_PATH="$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PAT
 dconf dump /org/gnome/desktop/background/ > "$run/background.ini"
 dconf dump /org/gnome/desktop/interface/ > "$run/interface.ini"
 dconf dump /org/gnome/desktop/input-sources/ > "$run/input-sources.ini"
-gsettings get org.gnome.shell favorite-apps > "$run/favorites.txt"
+dconf read /dev/lantharos/kestrel/favorite-apps > "$run/favorites.txt"
 
 export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export XDG_CONFIG_HOME="$run/config"
@@ -45,16 +45,18 @@ exec dbus-run-session -- bash -c '
     dconf reset -f "/org/gnome/desktop/$section/"
     dconf load "/org/gnome/desktop/$section/" < "$run/$section.ini"
   done
-  dconf write /org/gnome/shell/favorite-apps "$(cat "$run/favorites.txt")"
+  if [[ -s "$run/favorites.txt" ]]; then
+    dconf write /dev/lantharos/kestrel/favorite-apps "$(cat "$run/favorites.txt")"
+  fi
   if [[ "$mode" == capture ]]; then
-    dconf reset /org/gnome/shell/kestrel-quick-tile-order
-    dconf reset /org/gnome/shell/kestrel-quick-tiles-removed
+    dconf reset /dev/lantharos/kestrel/quick-tile-order
+    dconf reset /dev/lantharos/kestrel/quick-tiles-removed
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"
     export KESTREL_MEDIA_SCRIPT="$root/kestrel/tools/fixtures/mediaPlayer.js"
     export KESTREL_TRAY_SCRIPT="$root/kestrel/tools/fixtures/trayApp.js"
-    export KESTREL_INHIBITOR_SCRIPT="$root/kestrel/tools/fixtures/sessionInhibitor.js"
+    export KESTREL_SESSION_CLIENT_SCRIPT="$root/kestrel/tools/fixtures/sessionClient.js"
     export KESTREL_LAPTOP_SCRIPT="$root/kestrel/tools/fixtures/laptopServices.js"
     args=(--headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$root/kestrel/tools/capture.js")
     if [[ -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then

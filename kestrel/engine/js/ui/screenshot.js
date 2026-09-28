@@ -1690,7 +1690,7 @@ export class ScreenshotUI extends St.Widget {
 
         Main.wm.addKeybinding(
             'show-screenshot-ui',
-            new Gio.Settings({schema_id: 'org.gnome.shell.keybindings'}),
+            new Gio.Settings({schema_id: 'dev.lantharos.kestrel.keybindings'}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             uiModes,
             showScreenshotUI
@@ -1698,7 +1698,7 @@ export class ScreenshotUI extends St.Widget {
 
         Main.wm.addKeybinding(
             'show-screen-recording-ui',
-            new Gio.Settings({schema_id: 'org.gnome.shell.keybindings'}),
+            new Gio.Settings({schema_id: 'dev.lantharos.kestrel.keybindings'}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             restrictedModes,
             () => {
@@ -1711,7 +1711,7 @@ export class ScreenshotUI extends St.Widget {
 
         Main.wm.addKeybinding(
             'screenshot-window',
-            new Gio.Settings({schema_id: 'org.gnome.shell.keybindings'}),
+            new Gio.Settings({schema_id: 'dev.lantharos.kestrel.keybindings'}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT | Meta.KeyBindingFlags.PER_WINDOW,
             restrictedModes,
             async (_display, window, _event, _binding) => {
@@ -1729,7 +1729,7 @@ export class ScreenshotUI extends St.Widget {
 
         Main.wm.addKeybinding(
             'screenshot',
-            new Gio.Settings({schema_id: 'org.gnome.shell.keybindings'}),
+            new Gio.Settings({schema_id: 'dev.lantharos.kestrel.keybindings'}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             uiModes,
             async () => {

@@ -2228,9 +2228,6 @@ class Indicator extends SystemIndicator {
             return;
         }
 
-        if (Main.sessionMode.isGreeter)
-            return;
-
         let isPortal = this._client.connectivity === NM.ConnectivityState.PORTAL;
         // For testing, allow interpreting any value != FULL as PORTAL, because
         // LIMITED (no upstream route after the default gateway) is easy to obtain

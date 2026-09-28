@@ -113,7 +113,6 @@ export class ScreenShield extends Signals.EventEmitter {
         this._lockSettings.connect(`changed::${DISABLE_LOCK_KEY}`, this._syncInhibitor.bind(this));
 
         this._grab = null;
-        this._isGreeter = false;
         this._isActive = false;
         this._isLocked = false;
         this._inUnlockAnimation = false;
@@ -324,14 +323,6 @@ export class ScreenShield extends Signals.EventEmitter {
             this._setActive(true);
     }
 
-    showDialog() {
-        this._becomeModal();
-        this.actor.show();
-        this._isGreeter = Main.sessionMode.isGreeter;
-        this._isLocked = true;
-        this._ensureUnlockDialog(true);
-    }
-
     _hideLockScreenComplete() {
         this._lockScreenState = MessageTray.State.HIDDEN;
         this._lockScreenGroup.hide();
@@ -426,10 +417,7 @@ export class ScreenShield extends Signals.EventEmitter {
         }
 
         this._dialog.allowCancel = allowCancel;
-        if (this._isGreeter)
-            this._dialog.activate();
-        else
-            this._dialog.grab_key_focus();
+        this._dialog.grab_key_focus();
         return true;
     }
 
@@ -481,10 +469,7 @@ export class ScreenShield extends Signals.EventEmitter {
             this._lockScreenShown({fadeToBlack, animateFade: false});
         }
 
-        if (this._isGreeter)
-            this._dialog.activate();
-        else
-            this._dialog.grab_key_focus();
+        this._dialog.grab_key_focus();
     }
 
     _lockScreenShown(params) {
@@ -529,12 +514,6 @@ export class ScreenShield extends Signals.EventEmitter {
     }
 
     deactivate(animate) {
-        // block unlock via logind etc. if locked due to parental controls
-        if (Main.timeLimitsManager.shouldLockSession) {
-            this.lock(false);
-            return;
-        }
-
         if (this._dialog)
             this._dialog.finish(() => this._continueDeactivate(animate));
         else
@@ -549,20 +528,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
         this.emit('wake-up-screen');
 
-        if (this._isGreeter) {
-            // We don't want to "deactivate" any more than
-            // this. In particular, we don't want to drop
-            // the modal, hide ourselves or destroy the dialog
-            // But we do want to set isActive to false, so that
-            // gnome-session will reset the idle counter, and
-            // gnome-settings-daemon will stop blanking the screen
-
-            this._activationTime = 0;
-            this._setActive(false);
-            return;
-        }
-
-        if (this._dialog && !this._isGreeter)
+        if (this._dialog)
             this._dialog.popModal();
 
         if (this._grab) {
@@ -621,11 +587,8 @@ export class ScreenShield extends Signals.EventEmitter {
 
         this.actor.show();
 
-        if (Main.sessionMode.currentMode !== 'unlock-dialog') {
-            this._isGreeter = Main.sessionMode.isGreeter;
-            if (!this._isGreeter)
-                Main.sessionMode.pushMode('unlock-dialog');
-        }
+        if (Main.sessionMode.currentMode !== 'unlock-dialog')
+            Main.sessionMode.pushMode('unlock-dialog');
 
         this._resetLockScreen({
             animateLockScreen: animate,
@@ -682,10 +645,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
         this.activate(animate);
 
-        const lock = this._isGreeter
-            ? true
-            : user.password_mode !== AccountsService.UserPasswordMode.NONE;
-        this._setLocked(lock);
+        this._setLocked(user.password_mode !== AccountsService.UserPasswordMode.NONE);
     }
 
     // If the previous shell crashed, and gnome-session restarted us, then re-lock

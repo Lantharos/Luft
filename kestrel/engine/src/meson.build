@@ -12,9 +12,6 @@ introspection_common = {
 
 subdir('hotplug-sniffer')
 subdir('st')
-if have_xwayland
-  subdir('tray')
-endif
 
 script_data = configuration_data()
 script_data.set('bindir', bindir)
@@ -111,23 +108,12 @@ libshell_public_headers = [
   'shell-mount-operation.h',
   'shell-perf-log.h',
   'shell-screenshot.h',
-  'shell-square-bin.h',
   'shell-stack.h',
   'shell-time-change-source.h',
   'shell-util.h',
-  'shell-window-preview.h',
-  'shell-window-preview-layout.h',
   'shell-window-tracker.h',
   'shell-wm.h',
-  'shell-workspace-background.h'
 ]
-
-if have_xwayland
-  libshell_public_headers += [
-    'shell-tray-icon.h',
-    'shell-tray-manager.h',
-  ]
-endif
 
 if have_networkmanager
   libshell_public_headers += 'shell-network-agent.h'
@@ -140,12 +126,6 @@ libshell_private_headers = [
   'shell-global-private.h',
   'shell-wm-private.h'
 ]
-
-if have_xwayland
-  libshell_private_headers += [
-    'shell-tray-icon-private.h',
-  ]
-endif
 
 libshell_sources = [
   'gnome-shell-plugin.c',
@@ -167,23 +147,12 @@ libshell_sources = [
   'shell-screenshot.c',
   'shell-secure-text-buffer.c',
   'shell-secure-text-buffer.h',
-  'shell-square-bin.c',
   'shell-stack.c',
   'shell-time-change-source.c',
   'shell-util.c',
-  'shell-window-preview.c',
-  'shell-window-preview-layout.c',
   'shell-window-tracker.c',
   'shell-wm.c',
-  'shell-workspace-background.c'
 ]
-
-if have_xwayland
-  libshell_sources += [
-    'shell-tray-icon.c',
-    'shell-tray-manager.c',
-  ]
-endif
 
 if have_networkmanager
   libshell_sources += 'shell-network-agent.c'
@@ -221,17 +190,11 @@ dbus_generated += gnome.gdbus_codegen('switcheroo-control',
 
 libshell_no_gir_sources += dbus_generated
 
-libshell_link_with = []
-if have_xwayland
-  libshell_link_with += [libtray]
-endif
-
 libshell = library('shell-' + mutter_api_version,
   sources: libshell_gir_sources + libshell_no_gir_sources,
   dependencies: gnome_shell_deps + [libshell_menu_dep, libst_dep, mutter_dep, gnome_desktop_dep, m_dep, cairo_dep],
-  include_directories: [conf_inc, include_directories('tray')],
+  include_directories: [conf_inc],
   c_args: gnome_shell_cflags,
-  link_with: libshell_link_with,
   build_rpath: mutter_typelibdir,
   install_rpath: install_rpath,
   install_dir: pkglibdir,
@@ -241,7 +204,6 @@ libshell = library('shell-' + mutter_api_version,
 libshell_dep = declare_dependency(
   link_with: libshell,
   dependencies: [libst_dep, mutter_dep],
-  include_directories: [include_directories('tray')],
 )
 
 libshell_gir_includes = [

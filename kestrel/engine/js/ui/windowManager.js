@@ -25,7 +25,7 @@ import * as Main from './main.js';
 import {blurSurface} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
 
-export const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
+export const SHELL_KEYBINDINGS_SCHEMA = 'dev.lantharos.kestrel.keybindings';
 
 const MINIMIZE_WINDOW_ANIMATION_TIME = 300;
 const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;
@@ -760,20 +760,20 @@ export class WindowManager {
             Shell.ActionMode.POPUP,
             this._toggleQuickSettings.bind(this));
 
-        this.addKeybinding('kestrel-clipboard-history',
+        this.addKeybinding('clipboard-history',
             new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL,
             () => KestrelUi.toggleSurface('clipboard'));
 
-        this.addKeybinding('kestrel-snap-layouts',
+        this.addKeybinding('snap-layouts',
             new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL,
             () => KestrelUi.toggleSurface('snap'));
 
         for (let index = 1; index <= 10; index++) {
-            this.addKeybinding(`kestrel-workspace-${index}`,
+            this.addKeybinding(`workspace-${index}`,
                 new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
                 Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
                 Shell.ActionMode.NORMAL,
@@ -842,13 +842,8 @@ export class WindowManager {
     async _startX11Services(task) {
         let status = true;
         try {
-            await Shell.util_start_systemd_unit(
-                'gnome-session-x11-services-ready.target', 'fail', null);
+            await Shell.util_start_systemd_unit('kestrel-x11-services.target', 'fail', null);
         } catch (e) {
-            // Ignore NOT_SUPPORTED error, which indicates we are not systemd
-            // managed and gnome-session will have taken care of everything
-            // already.
-            // Note that we do log cancellation from here.
             if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_SUPPORTED)) {
                 log(`Error starting X11 services: ${e.message}`);
                 status = false;
@@ -860,13 +855,8 @@ export class WindowManager {
 
     async _stopX11Services(cancellable) {
         try {
-            await Shell.util_stop_systemd_unit(
-                'gnome-session-x11-services.target', 'fail', cancellable);
+            await Shell.util_stop_systemd_unit('kestrel-x11-services.target', 'fail', cancellable);
         } catch (e) {
-            // Ignore NOT_SUPPORTED error, which indicates we are not systemd
-            // managed and gnome-session will have taken care of everything
-            // already.
-            // Note that we do log cancellation from here.
             if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_SUPPORTED))
                 log(`Error stopping X11 services: ${e.message}`);
         }

@@ -27,6 +27,7 @@ import { OomNotifier } from './memory/oomNotifier.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
+import { SessionManager, type LockState } from './session/sessionManager.js';
 import type { Rgb } from './accent/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
@@ -54,8 +55,8 @@ interface Context {
   layoutManager: LayoutManager;
   messageTray: MessageTray;
   quickSettings: QuickSettingsSource;
-  sessionMode: { isLocked: boolean; isGreeter: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
-  screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
+  sessionMode: { isLocked: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
+  screenShield: (LockState & { active: boolean; connect(signal: string, callback: () => void): number }) | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   activateWindow(window: Meta.Window): void;
@@ -90,6 +91,7 @@ class KestrelUi {
   private readonly globalShortcuts = new GlobalShortcutsProvider();
 
   constructor(private readonly context: Context) {
+    if (context.screenShield) session.trackLock(context.screenShield);
     const shellGlobal = global as unknown as Shell.Global;
     const theme = St.ThemeContext.get_for_stage(shellGlobal.stage).get_theme();
     const cssPath = GLib.getenv('KESTREL_CSS_PATH');
@@ -113,7 +115,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.previews.actor);
     this.start = new StartMenu(() => this.close(), this.menus);
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
-      icons => this.panels.primary.updateStatus(icons), this.menus, () => this.takeScreenshot());
+      icons => this.panels.primary.updateStatus(icons), this.menus, () => this.takeScreenshot(), session);
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
@@ -204,8 +206,7 @@ class KestrelUi {
   }
 
   private desktopAvailable(): boolean {
-    return this.context.sessionMode.hasWindows && !this.context.sessionMode.isLocked &&
-      !this.context.sessionMode.isGreeter && !this.context.screenShield?.active;
+    return this.context.sessionMode.hasWindows && !this.context.sessionMode.isLocked && !this.context.screenShield?.active;
   }
 
   private canInteract(): boolean {
@@ -440,6 +441,7 @@ class KestrelUi {
     this.oomNotifier.destroy();
     this.launchFeedback.destroy();
     this.globalShortcuts.destroy();
+    session.destroy();
     this.stylesheetMonitor?.cancel();
   }
 
@@ -451,9 +453,14 @@ class KestrelUi {
 }
 
 let currentUi: KestrelUi;
+let session: SessionManager;
 const startWatchers: ((visible: boolean) => void)[] = [];
 
 let pendingWallpaper: Rgb[] | null = null;
+
+export function startSession(): void {
+  session = new SessionManager();
+}
 
 export function initialize(context: Context): void {
   currentUi = new KestrelUi(context);

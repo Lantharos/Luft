@@ -5,12 +5,15 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 action="${1:-install}"
 prefix="${2:-/opt/kestrel}"
 build="$root/kestrel/run/install-build"
-links=(
-  "share/wayland-sessions/kestrel.desktop"
-  "lib/systemd/user/kestrel.service"
-  "lib/systemd/user/gnome-session@kestrel.target.d"
-  "lib/systemd/user/app.slice.d/50-kestrel-oomd.conf"
-)
+
+installed_links() {
+  echo "share/wayland-sessions/kestrel.desktop"
+  echo "share/xdg-desktop-portal/kestrel-portals.conf"
+  echo "lib/systemd/user/app.slice.d/50-kestrel-oomd.conf"
+  for unit in "$prefix"/lib/systemd/user/kestrel*; do
+    echo "lib/systemd/user/$(basename "$unit")"
+  done
+}
 
 as_owner() {
   if [[ -w "$(dirname "$1")" ]]; then "${@:2}"; else sudo "${@:2}"; fi
@@ -36,17 +39,18 @@ case "$action" in
     as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
     if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then
-      for link in "${links[@]}"; do
+      installed_links | while read -r link; do
         sudo mkdir -p "/usr/local/$(dirname "$link")"
         sudo ln -sfn "$prefix/$link" "/usr/local/$link"
       done
+      systemctl --user daemon-reload
       echo "Kestrel is installed in $prefix and appears as a session on the login screen."
     else
       echo "Kestrel is installed in $prefix. Session entries are only linked for system prefixes."
     fi
     ;;
   remove)
-    for link in "${links[@]}"; do
+    installed_links | while read -r link; do
       [[ -L "/usr/local/$link" ]] && sudo rm "/usr/local/$link"
     done
     as_owner "$prefix" rm -rf "$prefix"

@@ -14,7 +14,7 @@ export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
   readonly footer: StartFooter;
-  private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private readonly favorites = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
   private pinned = new Set(this.favorites.get_strv('favorite-apps'));
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;

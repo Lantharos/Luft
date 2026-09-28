@@ -429,9 +429,6 @@ export const LayoutManager = GObject.registerClass({
 
         this._bgManagers = [];
 
-        if (Main.sessionMode.isGreeter)
-            return Promise.resolve();
-
         const cancellable = new Gio.Cancellable();
         this._bgLoadCancellable = cancellable;
 
@@ -636,50 +633,27 @@ export const LayoutManager = GObject.registerClass({
         // windows restore to the right size.
         this._updateRegions();
 
-        if (Main.sessionMode.isGreeter) {
-            this.panelBox.translation_y = -this.panelBox.height;
-        } else {
-            this.keyboardBox.hide();
+        this.keyboardBox.hide();
 
-            const monitor = this.primaryMonitor;
+        const monitor = this.primaryMonitor;
 
-            const x = monitor.x + monitor.width / 2.0;
-            const y = monitor.y + monitor.height / 2.0;
+        const x = monitor.x + monitor.width / 2.0;
+        const y = monitor.y + monitor.height / 2.0;
 
-            this.uiGroup.set_pivot_point(
-                x / global.screen_width,
-                y / global.screen_height);
-            this.uiGroup.scale_x = this.uiGroup.scale_y = 0.75;
-            this.uiGroup.opacity = 0;
+        this.uiGroup.set_pivot_point(
+            x / global.screen_width,
+            y / global.screen_height);
+        this.uiGroup.scale_x = this.uiGroup.scale_y = 0.75;
+        this.uiGroup.opacity = 0;
 
-            global.window_group.set_clip(monitor.x, monitor.y, monitor.width, monitor.height);
+        global.window_group.set_clip(monitor.x, monitor.y, monitor.width, monitor.height);
 
-            await this._updateBackgrounds();
-        }
+        await this._updateBackgrounds();
 
-        // Hack: Work around grab issue when testing greeter UI in nested
-        if (GLib.getenv('GDM_GREETER_TEST') === '1')
-            setTimeout(() => this.emit('startup-prepared'), 200);
-        else
-            this.emit('startup-prepared');
+        this.emit('startup-prepared');
     }
 
     async _startupAnimation() {
-        if (Main.sessionMode.isGreeter)
-            await this._startupAnimationGreeter();
-        else
-            await this._startupAnimationSession();
-    }
-
-    async _startupAnimationGreeter() {
-        await this.panelBox.easeAsync({
-            translation_y: 0,
-            duration: STARTUP_ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        }).catch(logErrorUnlessCancelled);
-    }
-
-    async _startupAnimationSession() {
         await this.uiGroup.easeAsync({
             scale_x: 1,
             scale_y: 1,
@@ -700,10 +674,8 @@ export const LayoutManager = GObject.registerClass({
 
         this.keyboardBox.show();
 
-        if (!Main.sessionMode.isGreeter) {
-            this._showSecondaryBackgrounds();
-            global.window_group.remove_clip();
-        }
+        this._showSecondaryBackgrounds();
+        global.window_group.remove_clip();
 
         this._queueUpdateRegions();
 

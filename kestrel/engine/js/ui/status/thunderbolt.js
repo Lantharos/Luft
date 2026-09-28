@@ -277,7 +277,7 @@ class Indicator extends SystemIndicator {
 
     /* Session callbacks */
     _sync() {
-        const active = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+        const active = !Main.sessionMode.isLocked;
         this._indicator.visible = active && this._client.probing;
     }
 
@@ -294,7 +294,7 @@ class Indicator extends SystemIndicator {
     /* AuthRobot callbacks */
     _onEnrollDevice(obj, device, policy) {
         /* only authorize new devices when in an unlocked user session */
-        const unlocked = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+        const unlocked = !Main.sessionMode.isLocked;
         /* and if we have the permission to do so, otherwise we trigger a PolKit dialog */
         const allowed = this._perm && this._perm.allowed;
 

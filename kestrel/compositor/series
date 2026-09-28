@@ -2,3 +2,4 @@
 0002-clutter-reuse-the-framebuffer-blur-effect-shader.patch
 0003-wayland-support-xdg-toplevel-icon-v1-and-expose-wind.patch
 0004-clutter-position-shell-text-with-fractional-glyph-ad.patch
+0005-wayland-treat-shell-assigned-desktop-windows-as-desk.patch

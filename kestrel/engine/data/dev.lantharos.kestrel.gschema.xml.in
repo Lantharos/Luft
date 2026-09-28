@@ -32,6 +32,16 @@
       <default>[]</default>
       <summary>Quick Settings tiles removed by the user</summary>
     </key>
+    <key name="live-wallpaper" type="s">
+      <default>''</default>
+      <summary>Video shown as a live wallpaper</summary>
+      <description>
+        URI of a video that plays behind the desktop. Kestrel sets the
+        org.gnome.desktop.background picture to a still frame of it, which
+        the lock screen and other surfaces use. Empty when the wallpaper is
+        a picture; choosing a picture clears it.
+      </description>
+    </key>
     <key name="global-shortcuts" type="s">
       <default>'{}'</default>
       <summary>Shortcuts that apps have registered through the global shortcuts portal</summary>

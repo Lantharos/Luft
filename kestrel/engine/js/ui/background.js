@@ -759,6 +759,9 @@ const Background = GObject.registerClass({
             return;
         }
 
+        if (this._cancellable.is_cancelled())
+            return;
+
         const contentType = info.get_content_type();
         if (contentType === 'application/xml')
             this._loadAnimation(file);

@@ -28,6 +28,7 @@ import { coveredMonitors } from './panel/coverage.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
+import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
 import type { Rgb } from './accent/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
@@ -90,6 +91,7 @@ class KestrelUi {
   private readonly oomNotifier = new OomNotifier();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly globalShortcuts = new GlobalShortcutsProvider();
+  private readonly liveWallpaper: LiveWallpaper;
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -120,6 +122,7 @@ class KestrelUi {
     this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
+    this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -193,6 +196,7 @@ class KestrelUi {
     this.watch(context.layoutManager, 'monitors-changed', () => {
       this.dismissImmediately();
       this.panels.sync();
+      this.liveWallpaper.monitorsChanged();
       this.place();
       this.syncSession();
     });
@@ -226,6 +230,7 @@ class KestrelUi {
     const covered = coveredMonitors(this.context.layoutManager.monitors);
     for (const panel of this.panels.all)
       panel.actor.visible = !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index);
+    this.liveWallpaper.sync(available && !this.taskView.visible);
     if (!available) this.dismissImmediately();
   }
 
@@ -438,6 +443,7 @@ class KestrelUi {
     for (const disconnect of this.disconnectors) disconnect();
     this.panels.shutdown();
     this.accent.destroy();
+    this.liveWallpaper.destroy();
     this.oomNotifier.destroy();
     this.launchFeedback.destroy();
     this.globalShortcuts.destroy();

@@ -57,7 +57,6 @@ configure_file(
 )
 
 keybinding_files = [
-  '50-kestrel-launchers.xml',
   '50-kestrel-screenshots.xml',
   '50-kestrel-system.xml',
 ]

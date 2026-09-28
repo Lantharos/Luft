@@ -22,9 +22,11 @@ chrono = "0.4.45"
 parking_lot = "0.12.5"
 open = "5.4.4"
 libc = "0.2"
-luft-app = { path = "../../../packages/app" }
+luft-app = { path = "../../../packages/app", features = ["apps"] }
 gio = "0.22.10"
 gio-unix = "0.22.8"
+imagesize = "0.15.0"
+roxmltree = "0.21.1"
 zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
 url = "2.5.8"
 percent-encoding = "2.3.2"

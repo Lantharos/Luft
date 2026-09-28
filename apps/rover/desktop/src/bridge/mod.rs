@@ -18,6 +18,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = register_trash(window, state);
     let window = register_vcs(window, state);
     let window = tools::register(window, state);
+    let window = crate::places::register(crate::inspect::register(window));
     register_app(window, state)
 }
 

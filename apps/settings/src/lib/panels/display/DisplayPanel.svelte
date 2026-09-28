@@ -3,6 +3,7 @@
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { applyDisplays, loadDisplays, onDisplaysChanged, type Displays } from './api';
 	import Arrangement from './Arrangement.svelte';
+	import BrightnessSection from './BrightnessSection.svelte';
 	import { commonResolutions, draftFrom, footprint, mirror, modeOf, monitorOf, toLogical, unmirror, type Draft } from './config';
 	import NightLight from './NightLight.svelte';
 	import OutputSettings from './OutputSettings.svelte';
@@ -25,6 +26,7 @@
 					.map((entry) => ({ ...footprint(displays!, entry), name: monitorOf(displays!, entry.connector).name, primary: entry.primary }))
 			: []
 	);
+	let active = $derived(displays?.monitors.filter((monitor) => displays!.logical.some((logical) => logical.monitors.includes(monitor.connector))) ?? []);
 	let choices = $derived(displays?.monitors.map((monitor) => ({ value: monitor.connector, label: monitor.name })) ?? []);
 
 	function receive(next: Displays) {
@@ -108,6 +110,8 @@
 			<button type="button" class="button primary" disabled={applying} onclick={apply}>Apply</button>
 		</div>
 	{/if}
+
+	<BrightnessSection monitors={active} />
 
 	{#if displays.nightLight}
 		<NightLight />

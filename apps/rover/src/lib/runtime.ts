@@ -1,4 +1,4 @@
-import { appWindow, isAvailable } from '@lantharos/sabine';
+import { appWindow, fileUrl, isAvailable } from '@lantharos/sabine';
 
 export function isDesktopRuntime() {
 	return typeof window !== 'undefined' && (isAvailable() || new URLSearchParams(window.location.search).has('sabine'));
@@ -6,7 +6,7 @@ export function isDesktopRuntime() {
 
 export function fileSource(path: string) {
 	if (!path.startsWith('/')) return path;
-	return `file://${path.split('/').map(encodeURIComponent).join('/')}`;
+	return fileUrl(path);
 }
 
 export function minimizeWindow() {

@@ -1,6 +1,5 @@
 use crate::drives;
 use crate::file_actions::{os, run_pkexec};
-use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs;
@@ -8,8 +7,6 @@ use std::io::Read;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
-
-const MAX_THUMBNAIL_BYTES: u64 = 24 * 1024 * 1024;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FileEntry {
@@ -317,23 +314,5 @@ pub fn open_with_default(path: String) -> Result<(), String> {
 
 pub fn get_thumbnail(path: String) -> Result<Option<String>, String> {
     let path_buf = PathBuf::from(&path);
-    if !path_buf.is_file() {
-        return Ok(None);
-    }
-
-    let Some(mime) = detect_image_mime(&path_buf) else {
-        return Ok(None);
-    };
-
-    let metadata = fs::metadata(&path_buf).map_err(|e| e.to_string())?;
-    if metadata.len() > MAX_THUMBNAIL_BYTES {
-        return Ok(Some(path));
-    }
-
-    let bytes = fs::read(&path_buf).map_err(|e| e.to_string())?;
-    Ok(Some(format!(
-        "data:{};base64,{}",
-        mime,
-        BASE64.encode(bytes)
-    )))
+    Ok((path_buf.is_file() && detect_image_mime(&path_buf).is_some()).then_some(path))
 }

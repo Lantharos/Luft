@@ -1,0 +1,74 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		title: string;
+		description?: string;
+		onclose: () => void;
+		children?: Snippet;
+		actions: Snippet;
+	}
+
+	let { title, description, onclose, children, actions }: Props = $props();
+
+	let panel = $state<HTMLDivElement>();
+
+	$effect(() => {
+		const field = panel?.querySelector<HTMLElement>('input, button');
+		field?.focus();
+	});
+</script>
+
+<svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
+
+<div class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
+	<div bind:this={panel} class="dialog" role="dialog" aria-modal="true" aria-label={title}>
+		<div class="flex flex-col gap-1.5">
+			<h2 class="text-[17px] font-semibold">{title}</h2>
+			{#if description}
+				<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">{description}</p>
+			{/if}
+		</div>
+		{#if children}
+			<div class="flex flex-col gap-3">{@render children()}</div>
+		{/if}
+		<div class="flex justify-end gap-2">{@render actions()}</div>
+	</div>
+</div>
+
+<style>
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: grid;
+		place-items: center;
+		background: rgba(8, 8, 7, 0.45);
+		animation: fade 180ms var(--ease);
+	}
+
+	.dialog {
+		display: flex;
+		width: min(420px, calc(100vw - 48px));
+		flex-direction: column;
+		gap: 20px;
+		padding: 22px;
+		border-radius: 24px;
+		background: var(--popover);
+		box-shadow: 0 24px 64px var(--shadow-soft);
+		animation: rise 220ms var(--ease);
+	}
+
+	@keyframes fade {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(8px) scale(0.98);
+		}
+	}
+</style>

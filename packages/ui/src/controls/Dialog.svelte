@@ -12,18 +12,37 @@
 
 	let { title, description, wide = false, onclose, children, actions }: Props = $props();
 
+	const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+
 	let panel = $state<HTMLDivElement>();
 
 	$effect(() => {
-		const field = panel?.querySelector<HTMLElement>('input, button');
-		field?.focus();
+		const previous = document.activeElement as HTMLElement | null;
+		panel?.focus();
+		return () => previous?.focus();
 	});
+
+	function trap(event: KeyboardEvent) {
+		if (event.key !== 'Tab' || !panel) return;
+		const focusable = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)];
+		if (!focusable.length) return event.preventDefault();
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		const active = document.activeElement;
+		if (event.shiftKey && (active === first || active === panel)) {
+			event.preventDefault();
+			last.focus();
+		} else if (!event.shiftKey && active === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	}
 </script>
 
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
 
 <div class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
-	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title}>
+	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap}>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="text-[17px] font-semibold">{title}</h2>
 			{#if description}
@@ -58,6 +77,7 @@
 		border-radius: 24px;
 		background: var(--popover);
 		box-shadow: 0 24px 64px var(--shadow-soft);
+		outline: none;
 		animation: rise 220ms var(--ease);
 	}
 

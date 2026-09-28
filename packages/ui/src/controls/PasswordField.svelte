@@ -6,6 +6,7 @@
 	interface Props {
 		value: string;
 		label: string;
+		showLabel?: boolean;
 		placeholder?: string;
 		error?: string;
 		autocomplete?: 'off' | 'current-password' | 'new-password';
@@ -15,7 +16,7 @@
 		onkeydown?: (event: KeyboardEvent) => void;
 	}
 
-	let { value = $bindable(), label, placeholder, error, autocomplete = 'off', disabled = false, live = false, onreveal, onkeydown }: Props = $props();
+	let { value = $bindable(), label, showLabel = false, placeholder, error, autocomplete = 'off', disabled = false, live = false, onreveal, onkeydown }: Props = $props();
 
 	let revealed = $state(false);
 
@@ -25,7 +26,7 @@
 	}
 </script>
 
-<TextField bind:value {label} {placeholder} {error} {autocomplete} {disabled} {live} {onkeydown} type={revealed ? 'text' : 'password'}>
+<TextField bind:value {label} {showLabel} {placeholder} {error} {autocomplete} {disabled} {live} {onkeydown} type={revealed ? 'text' : 'password'}>
 	{#snippet trailing()}
 		<button type="button" class="reveal" aria-label={revealed ? 'Hide password' : 'Show password'} {disabled} onclick={toggle}>
 			{#if revealed}

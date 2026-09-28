@@ -1,22 +1,17 @@
 import * as api from '$lib/api';
 import { isDesktopRuntime } from '$lib/runtime';
-import { absolutePath, groupChangedFiles, relativePath, statusOrder } from '$lib/vcs/format';
-import { providerFor } from '$lib/vcs/provider';
-import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject } from '$lib/vcs/types';
-import { SvelteMap } from 'svelte/reactivity';
+import { errorMessage } from '$lib/utils/format';
+import { absolutePath, relativePath } from '$lib/utils/paths';
+import { groupChangedFiles, statusOrder } from './format';
+import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject, VcsStatusEvent } from './types';
 
-const refreshDelay = 720;
-const pollDelay = 180;
-const vcsMetadataNames = ['.pig', '.git'];
+const REFRESH_DELAY_MS = 720;
 
-type VcsFolderEntry = {
-	name: string;
-};
+type StatusResult = Pick<VcsStatusEvent, 'project' | 'statuses' | 'error'>;
 
 export class VcsState {
-	project = $state<VcsProject | null>(null);
-	statuses = new SvelteMap<string, VcsFileStatus>();
-	isLoading = $state(false);
+	project = $state.raw<VcsProject | null>(null);
+	statuses = $state.raw(new Map<string, VcsFileStatus>());
 	error = $state<string | null>(null);
 	panelOpen = $state(false);
 	saveDialogOpen = $state(false);
@@ -26,247 +21,145 @@ export class VcsState {
 	isDiffLoading = $state(false);
 	busy = $state<VcsBusyState>(null);
 	lastResult = $state<string | null>(null);
-	private path = '';
-	private requestId = 0;
-	private refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-	get changedFiles(): VcsChangedFile[] {
-		return [...this.statuses.entries()]
-			.filter(([, status]) => status !== 'clean' && status !== 'ignored')
-			.map(([path, status]) => ({ path, status }))
-			.sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status) || a.path.localeCompare(b.path));
-	}
+	changedFiles = $derived(changedFiles(this.statuses));
+	changeGroups = $derived(groupChangedFiles(this.changedFiles));
+	folderStatuses = $derived(folderStatuses(this.changedFiles));
 
-	get changeGroups() {
-		return groupChangedFiles(this.changedFiles);
-	}
+	#path = '';
+	#generation = 0;
+	#refreshTimer: ReturnType<typeof setTimeout> | undefined;
+	#waiting = new Map<string, (result: StatusResult) => void>();
+	#arrived = new Map<string, StatusResult>();
 
-	open(path: string, entries: VcsFolderEntry[] = []) {
-		if (!path.startsWith('/')) {
-			this.clear();
-			return;
-		}
-		this.path = path;
-		if (this.project && pathInsideRoot(path, this.project.root)) {
-			if (path !== this.project.root && folderHasVisibleVcsMetadata(entries)) {
-				this.scheduleRefresh(true);
-				return;
-			}
-			const requestId = ++this.requestId;
-			this.cancelScheduledRefresh();
-			this.error = null;
-			this.isLoading = false;
-			if (path !== this.project.root) void this.detectNestedMetadata(path, requestId);
-			return;
-		}
-		this.scheduleRefresh();
-	}
+	open = async (path: string) => {
+		this.#path = path;
+		if (!isDesktopRuntime()) return;
+		const root = await api.vcsRoot(path).catch(() => null);
+		if (this.#path !== path) return;
+		if (!root) return this.clear();
+		if (this.project?.root !== root.root) this.#schedule(root.root);
+	};
 
-	clear() {
-		this.path = '';
-		this.requestId += 1;
-		this.cancelScheduledRefresh();
-		this.reset();
-	}
+	clear = () => {
+		this.#path = '';
+		this.#generation += 1;
+		clearTimeout(this.#refreshTimer);
+		this.project = null;
+		this.statuses = new Map();
+		this.diff = '';
+		this.diffPath = null;
+	};
 
-	openSaveDialog(files?: string[]) {
-		this.saveFiles = files ?? null;
-		this.saveDialogOpen = true;
-	}
+	refresh = () => {
+		if (this.project) this.#schedule(this.project.root);
+		else if (this.#path) void this.open(this.#path);
+	};
 
-	statusFor(path: string, isDir: boolean): VcsFileStatus | null {
+	receive = (event: VcsStatusEvent) => {
+		const resolve = this.#waiting.get(event.id);
+		if (!resolve) return void this.#arrived.set(event.id, event);
+		this.#waiting.delete(event.id);
+		resolve(event);
+	};
+
+	statusFor = (path: string, isDir: boolean): VcsFileStatus | null => {
 		if (!this.project) return null;
-		const rel = relativePath(this.project.root, path);
-		const exact = this.statuses.get(rel);
-		if (exact && exact !== 'clean') return exact;
-		if (!isDir) return null;
-		return this.folderStatus(rel);
-	}
+		const relative = relativePath(this.project.root, path);
+		return this.statuses.get(relative) ?? (isDir ? (this.folderStatuses.get(relative) ?? null) : null);
+	};
 
-	absolutePath(path: string) {
-		return this.project ? absolutePath(this.project.root, path) : path;
-	}
+	relativePath = (path: string) => (this.project ? relativePath(this.project.root, path) : path);
 
-	relativePath(path: string) {
-		return this.project ? relativePath(this.project.root, path) : path;
-	}
+	openSaveDialog = (files: string[] | null = null) => {
+		this.saveFiles = files;
+		this.saveDialogOpen = true;
+	};
 
-	async refreshNow(path = this.path, forceDetect = false) {
-		if (!path.startsWith('/') || !isDesktopRuntime()) {
-			this.reset();
-			return;
-		}
-		const requestId = ++this.requestId;
-		this.isLoading = true;
-		this.error = null;
-		try {
-			if (!forceDetect && this.project && pathInsideRoot(path, this.project.root)) {
-				await this.refreshProject(this.project.root, requestId);
-				return;
-			}
-			const ticket = await api.startVcsStatus(path);
-			await this.pollStatus(ticket.id, requestId);
-		} catch (caught) {
-			if (requestId !== this.requestId) return;
-			this.project = null;
-			this.setStatuses();
-			this.error = caught instanceof Error ? caught.message : String(caught);
-		} finally {
-			if (requestId === this.requestId) this.isLoading = false;
-		}
-	}
-
-	async loadDiff(path?: string) {
+	loadDiff = async (path: string | null = null) => {
 		if (!this.project) return;
 		this.isDiffLoading = true;
 		this.error = null;
-		this.diffPath = path ?? null;
+		this.diffPath = path;
 		try {
-			const provider = providerFor(this.project.kind);
-			this.diff = await provider.getDiff(this.project.root, path ? this.absolutePath(path) : undefined);
+			this.diff = await api.vcsDiff(this.project.root, path && absolutePath(this.project.root, path));
 		} catch (caught) {
 			this.diff = '';
-			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.error = errorMessage(caught);
 		} finally {
 			this.isDiffLoading = false;
 		}
-	}
+	};
 
-	async save(message: string, files: string[]) {
-		if (!this.project) return;
-		this.busy = 'save';
-		this.error = null;
-		try {
-			const provider = providerFor(this.project.kind);
-			await provider.save(this.project.root, message, files.map((path) => this.absolutePath(path)));
+	save = async (message: string, files: string[]) => {
+		const project = this.project;
+		if (!project) return;
+		await this.#run('save', async () => {
+			await api.saveVcs(project.root, message, files.map((path) => absolutePath(project.root, path)));
 			this.saveDialogOpen = false;
-			this.lastResult = this.project.kind === 'pig' ? 'Saved' : 'Committed';
-			await this.refreshNow(this.project.root);
-		} catch (caught) {
-			this.error = caught instanceof Error ? caught.message : String(caught);
-		} finally {
-			this.busy = null;
-		}
-	}
+			this.lastResult = project.kind === 'pig' ? 'Saved' : 'Committed';
+		});
+	};
 
-	async sync() {
-		if (!this.project) return;
-		this.busy = 'sync';
+	sync = async () => {
+		const project = this.project;
+		if (!project) return;
+		await this.#run('sync', async () => {
+			await api.syncVcs(project.root);
+			this.lastResult = 'Synced';
+		});
+	};
+
+	async #run(state: Exclude<VcsBusyState, null>, action: () => Promise<void>) {
+		this.busy = state;
 		this.error = null;
 		try {
-			const provider = providerFor(this.project.kind);
-			await provider.sync(this.project.root);
-			this.lastResult = 'Synced';
-			await this.refreshNow(this.project.root);
+			await action();
+			if (this.project) await this.#load(this.project.root);
 		} catch (caught) {
-			this.error = caught instanceof Error ? caught.message : String(caught);
+			this.error = errorMessage(caught);
 		} finally {
 			this.busy = null;
 		}
 	}
 
-	private scheduleRefresh(forceDetect = false) {
-		this.cancelScheduledRefresh();
-		this.refreshTimer = setTimeout(() => void this.refreshNow(this.path, forceDetect), refreshDelay);
+	#schedule(root: string) {
+		clearTimeout(this.#refreshTimer);
+		this.#refreshTimer = setTimeout(() => void this.#load(root), REFRESH_DELAY_MS);
 	}
 
-	private cancelScheduledRefresh() {
-		if (!this.refreshTimer) return;
-		clearTimeout(this.refreshTimer);
-		this.refreshTimer = null;
-	}
-
-	private async refreshProject(root: string, requestId: number) {
-		if (!this.project) return;
-		const provider = providerFor(this.project.kind);
-		const [project, statuses] = await Promise.all([provider.getProjectStatus(root), provider.getFileStatuses(root)]);
-		if (requestId !== this.requestId) return;
-		this.project = project;
-		this.setStatuses(statuses.entries());
-		this.clearStaleDiff();
-	}
-
-	private async detectNestedMetadata(path: string, requestId: number) {
-		if (!(await this.folderHasVcsMetadata(path))) return;
-		if (requestId !== this.requestId || path !== this.path) return;
-		await this.refreshNow(path, true);
-	}
-
-	private async folderHasVcsMetadata(path: string) {
-		for (const name of vcsMetadataNames) {
-			try {
-				await api.getFileInfo(absolutePath(path, name));
-				return true;
-			} catch {
-				continue;
-			}
+	async #load(root: string) {
+		const generation = ++this.#generation;
+		const id = await api.startVcsStatus(root).catch(() => null);
+		if (!id) return;
+		const result = this.#arrived.get(id) ?? (await new Promise<StatusResult>((resolve) => this.#waiting.set(id, resolve)));
+		this.#arrived.delete(id);
+		if (generation !== this.#generation) return;
+		this.error = result.error;
+		this.project = result.project;
+		this.statuses = new Map(Object.entries(result.statuses ?? {}));
+		if (this.diffPath && !this.statuses.has(this.diffPath)) {
+			this.diff = '';
+			this.diffPath = null;
 		}
-		return false;
-	}
-
-	private async pollStatus(jobId: string, requestId: number) {
-		while (true) {
-			await wait(pollDelay);
-			const update = await api.getVcsStatusResult(jobId);
-			if (!update.done) continue;
-			if (requestId !== this.requestId) return;
-			if (update.error) {
-				this.project = null;
-				this.setStatuses();
-				this.error = update.error;
-				return;
-			}
-			if (!update.result) {
-				this.reset();
-				return;
-			}
-			this.project = update.result.project;
-			this.setStatuses(Object.entries(update.result.statuses));
-			this.clearStaleDiff();
-			return;
-		}
-	}
-
-	private reset() {
-		this.project = null;
-		this.setStatuses();
-		this.diff = '';
-		this.diffPath = null;
-		this.isLoading = false;
-	}
-
-	private setStatuses(statuses?: Iterable<[string, VcsFileStatus]>) {
-		this.statuses.clear();
-		if (!statuses) return;
-		for (const [path, status] of statuses) this.statuses.set(path, status);
-	}
-
-	private clearStaleDiff() {
-		if (!this.diffPath || this.statuses.has(this.diffPath)) return;
-		this.diff = '';
-		this.diffPath = null;
-	}
-
-	private folderStatus(path: string) {
-		const prefix = path ? `${path}/` : '';
-		let best: VcsFileStatus | null = null;
-		for (const [candidate, status] of this.statuses) {
-			if (status === 'clean' || status === 'ignored') continue;
-			if (candidate !== path && !candidate.startsWith(prefix)) continue;
-			if (!best || statusOrder.indexOf(status) < statusOrder.indexOf(best)) best = status;
-		}
-		return best;
 	}
 }
 
-function wait(ms: number) {
-	return new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+function changedFiles(statuses: Map<string, VcsFileStatus>): VcsChangedFile[] {
+	return [...statuses]
+		.filter(([, status]) => status !== 'ignored')
+		.map(([path, status]) => ({ path, status }))
+		.sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status) || a.path.localeCompare(b.path));
 }
 
-function pathInsideRoot(path: string, root: string) {
-	return path === root || path.startsWith(`${root.replace(/\/$/, '')}/`);
-}
-
-function folderHasVisibleVcsMetadata(entries: VcsFolderEntry[]) {
-	return entries.some((entry) => vcsMetadataNames.includes(entry.name));
+function folderStatuses(files: VcsChangedFile[]) {
+	const folders = new Map<string, VcsFileStatus>();
+	for (const { path, status } of files) {
+		for (let slash = path.lastIndexOf('/'); slash > 0; slash = path.lastIndexOf('/', slash - 1)) {
+			const folder = path.slice(0, slash);
+			const current = folders.get(folder);
+			if (!current || statusOrder.indexOf(status) < statusOrder.indexOf(current)) folders.set(folder, status);
+		}
+	}
+	return folders;
 }

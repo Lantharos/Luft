@@ -1,17 +1,19 @@
-<script lang="ts">
-	type IconName =
+<script lang="ts" module>
+	export type IconName =
 		| 'home' | 'star' | 'hard-drive' | 'trash'
 		| 'download' | 'file-text' | 'image' | 'video'
-		| 'folder' | 'file' | 'chevron-right' | 'chevron-left'
-		| 'chevron-up' | 'folder-open' | 'monitor' | 'clock'
+		| 'folder' | 'file' | 'chevron-right'
+		| 'chevron-up' | 'folder-open' | 'monitor'
 		| 'arrow-left' | 'arrow-right' | 'search' | 'x'
 		| 'plus' | 'minus' | 'square' | 'scissors' | 'copy' | 'clipboard' | 'trash-2'
 		| 'list' | 'grid' | 'columns' | 'sort-asc' | 'sort-desc'
-		| 'music' | 'archive' | 'code' | 'settings' | 'eye' | 'eye-off' | 'pin'
-		| 'refresh' | 'external-link' | 'more-vertical' | 'package'
-		| 'check' | 'alert-circle' | 'info' | 'edit' | 'pause' | 'play'
+		| 'music' | 'archive' | 'code' | 'eye' | 'eye-off' | 'pin'
+		| 'refresh' | 'external-link' | 'package'
+		| 'check' | 'alert-circle' | 'edit' | 'pause' | 'play'
 		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save';
+</script>
 
+<script lang="ts">
 	interface Props {
 		name: IconName;
 		size?: number;
@@ -21,16 +23,17 @@
 	let { name, size = 20, class: className = '' }: Props = $props();
 </script>
 
-<svg 
-	width={size} 
-	height={size} 
-	viewBox="0 0 24 24" 
-	fill="none" 
-	stroke="currentColor" 
-	stroke-width="2" 
-	stroke-linecap="round" 
+<svg
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2"
+	stroke-linecap="round"
 	stroke-linejoin="round"
 	class={className}
+	aria-hidden="true"
 >
 	{#if name === 'home'}
 		<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
@@ -106,8 +109,6 @@
 		<line x1="9" x2="15" y1="15" y2="15" />
 	{:else if name === 'chevron-right'}
 		<path d="m9 18 6-6-6-6" />
-	{:else if name === 'chevron-left'}
-		<path d="m15 18-6-6 6-6" />
 	{:else if name === 'chevron-up'}
 		<path d="m18 15-6-6-6 6" />
 	{:else if name === 'arrow-left'}
@@ -185,9 +186,6 @@
 	{:else if name === 'code'}
 		<polyline points="16 18 22 12 16 6" />
 		<polyline points="8 6 2 12 8 18" />
-	{:else if name === 'settings'}
-		<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-		<circle cx="12" cy="12" r="3" />
 	{:else if name === 'eye'}
 		<path d="M2.06 12.35a1 1 0 0 1 0-.7C3.33 8.31 6.7 6 12 6s8.67 2.31 9.94 5.65a1 1 0 0 1 0 .7C20.67 15.69 17.3 18 12 18s-8.67-2.31-9.94-5.65Z" />
 		<circle cx="12" cy="12" r="3" />
@@ -205,9 +203,6 @@
 		<rect width="18" height="12" x="3" y="4" rx="2" />
 		<path d="M8 20h8" />
 		<path d="M12 16v4" />
-	{:else if name === 'clock'}
-		<circle cx="12" cy="12" r="10" />
-		<path d="M12 6v6l4 2" />
 	{:else if name === 'refresh'}
 		<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
 		<path d="M21 3v5h-5" />
@@ -217,20 +212,12 @@
 		<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
 		<polyline points="15 3 21 3 21 9" />
 		<line x1="10" x2="21" y1="14" y2="3" />
-	{:else if name === 'more-vertical'}
-		<circle cx="12" cy="12" r="1" />
-		<circle cx="12" cy="5" r="1" />
-		<circle cx="12" cy="19" r="1" />
 	{:else if name === 'check'}
 		<path d="M20 6 9 17l-5-5" />
 	{:else if name === 'alert-circle'}
 		<circle cx="12" cy="12" r="10" />
 		<line x1="12" x2="12" y1="8" y2="12" />
 		<line x1="12" x2="12.01" y1="16" y2="16" />
-	{:else if name === 'info'}
-		<circle cx="12" cy="12" r="10" />
-		<path d="M12 16v-4" />
-		<path d="M12 8h.01" />
 	{:else if name === 'edit'}
 		<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
 		<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />

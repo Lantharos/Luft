@@ -1,37 +1,69 @@
+use std::env;
 use std::sync::Arc;
 
 use parking_lot::RwLock;
+use serde::Serialize;
 
-use crate::{chooser, launch_args, operations_queue, settings, vcs, APP_NAME};
+use crate::APP_NAME;
+use crate::events::Events;
+use crate::files::entries::{self, UserDirs};
+use crate::files::operations::OperationsQueue;
+use crate::files::watch::DirectoryWatcher;
+use crate::integration::chooser::{ChooserConfig, ChooserSession};
+use crate::integration::launch_args;
+use crate::settings::Settings;
 
 #[derive(Clone)]
-pub(crate) struct RoverState {
-    pub(crate) queue: operations_queue::OperationsQueue,
-    pub(crate) settings: Arc<RwLock<settings::Settings>>,
-    pub(crate) chooser: Arc<chooser::ChooserState>,
-    pub(crate) vcs_jobs: vcs::VcsJobs,
-    pub(crate) launch_paths: Vec<String>,
+pub struct RoverState {
+    pub events: Events,
+    pub queue: OperationsQueue,
+    pub watcher: DirectoryWatcher,
+    pub settings: Arc<RwLock<Settings>>,
+    pub chooser: Option<Arc<ChooserSession>>,
+    launch_paths: Arc<Vec<String>>,
+    user_dirs: Arc<Option<UserDirs>>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppState {
+    chooser: Option<ChooserConfig>,
+    launch_paths: Vec<String>,
+    settings: Settings,
+    user_dirs: Option<UserDirs>,
+    translucent: bool,
 }
 
 impl RoverState {
-    pub(crate) fn new(args: &[String]) -> Self {
+    pub fn new() -> Self {
+        let events = Events::default();
+        let user_dirs = entries::user_dirs().ok();
         Self {
-            queue: operations_queue::OperationsQueue::new(),
-            settings: Arc::new(RwLock::new(settings::Settings::load_or_default())),
-            chooser: Arc::new(chooser::ChooserState::new(
-                chooser::ChooserSession::from_environment(),
-            )),
-            vcs_jobs: vcs::VcsJobs::default(),
-            launch_paths: launch_args::paths(args),
+            queue: OperationsQueue::new(events.clone()),
+            watcher: DirectoryWatcher::new(events.clone()),
+            settings: Arc::new(RwLock::new(Settings::load(user_dirs.as_ref()))),
+            chooser: ChooserSession::from_environment().map(Arc::new),
+            launch_paths: Arc::new(launch_args::current_process()),
+            user_dirs: Arc::new(user_dirs),
+            events,
         }
     }
 
-    pub(crate) fn title(&self) -> String {
-        let config = self.chooser.config();
-        if config.active && !config.title.is_empty() {
-            config.title
-        } else {
-            APP_NAME.to_string()
+    pub fn title(&self) -> String {
+        self.chooser
+            .as_ref()
+            .map(|session| session.config.title.clone())
+            .filter(|title| !title.is_empty())
+            .unwrap_or_else(|| APP_NAME.to_string())
+    }
+
+    pub fn app_state(&self) -> AppState {
+        AppState {
+            chooser: self.chooser.as_ref().map(|session| session.config.clone()),
+            launch_paths: self.launch_paths.to_vec(),
+            settings: self.settings.read().clone(),
+            user_dirs: self.user_dirs.as_ref().clone(),
+            translucent: env::var_os("WAYLAND_DISPLAY").is_some(),
         }
     }
 }

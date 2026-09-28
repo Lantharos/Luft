@@ -1,12 +1,9 @@
 import { appWindow, fileUrl, isAvailable } from '@lantharos/sabine';
 
-export function isDesktopRuntime() {
-	return typeof window !== 'undefined' && (isAvailable() || new URLSearchParams(window.location.search).has('sabine'));
-}
+export const isDesktopRuntime = isAvailable;
 
-export function fileSource(path: string) {
-	if (!path.startsWith('/')) return path;
-	return fileUrl(path);
+export function localFileSource(path: string, modified: number | null) {
+	return `${fileUrl(path)}?v=${modified ?? 0}`;
 }
 
 export function minimizeWindow() {
@@ -19,8 +16,4 @@ export function toggleMaximizeWindow() {
 
 export function closeWindow() {
 	if (isDesktopRuntime()) appWindow.close();
-}
-
-export function startWindowDrag() {
-	if (isDesktopRuntime()) appWindow.startDrag();
 }

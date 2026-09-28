@@ -5,13 +5,29 @@ use std::path::PathBuf;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
-use crate::path_codec;
+use crate::files::entries::UserDirs;
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ViewMode {
+    List,
+    Grid,
+    Columns,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum SortBy {
+    Name,
+    Size,
+    Date,
+    Type,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PinnedFolder {
     pub name: String,
     pub path: String,
-    #[serde(default)]
     pub is_dir: bool,
     pub icon: Option<String>,
 }
@@ -24,136 +40,83 @@ pub struct FavoriteItem {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct Settings {
-    pub view_mode: String, // "list" | "grid" | "columns"
-    #[serde(default)]
-    pub folder_view_modes: HashMap<String, String>,
-    pub sort_by: String, // "name" | "size" | "date" | "type"
+    pub folder_view_modes: HashMap<String, ViewMode>,
+    pub sort_by: SortBy,
     pub sort_asc: bool,
     pub show_hidden: bool,
-    pub preview_panel: bool,
-
-    pub confirm_delete: bool,
-    pub confirm_trash: bool,
-    pub single_click_open: bool,
-
-    pub sidebar_width: u32,
-    pub icon_size: u32,
-
     pub favorites: Vec<FavoriteItem>,
     pub pinned_folders: Vec<PinnedFolder>,
-    #[serde(default)]
-    pub sidebar_bookmarks_initialized: bool,
-    pub recent_paths: Vec<String>,
 }
 
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            view_mode: "list".to_string(),
             folder_view_modes: HashMap::new(),
-            sort_by: "name".to_string(),
+            sort_by: SortBy::Name,
             sort_asc: true,
             show_hidden: false,
-            preview_panel: false,
-            confirm_delete: true,
-            confirm_trash: false,
-            single_click_open: false,
-            sidebar_width: 270,
-            icon_size: 48,
             favorites: Vec::new(),
             pinned_folders: Vec::new(),
-            sidebar_bookmarks_initialized: false,
-            recent_paths: Vec::new(),
         }
     }
 }
 
 impl Settings {
-    fn config_path() -> PathBuf {
-        let config_dir = dirs::config_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("rover");
-
-        fs::create_dir_all(&config_dir).ok();
-        config_dir.join("settings.json")
-    }
-
-    pub fn load_or_default() -> Self {
-        let path = Self::config_path();
-
-        let mut settings = if let Ok(content) = fs::read_to_string(&path) {
-            serde_json::from_str(&content).unwrap_or_default()
-        } else {
-            Self::default()
+    pub fn load(dirs: Option<&UserDirs>) -> Self {
+        let Some(path) = settings_path() else {
+            return Self::default();
         };
-        path_codec::normalize_settings(&mut settings);
-        settings
+        match fs::read_to_string(&path) {
+            Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
+            Err(_) => Self {
+                pinned_folders: dirs.map(default_bookmarks).unwrap_or_default(),
+                ..Self::default()
+            },
+        }
     }
 
-    pub fn save(&self) -> Result<(), String> {
-        let path = Self::config_path();
-        let mut settings = self.clone();
-        path_codec::normalize_settings(&mut settings);
-        let content = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
-        fs::write(&path, content).map_err(|e| e.to_string())
+    fn save(&self) -> Result<(), String> {
+        let path = settings_path().ok_or("Could not find the configuration folder")?;
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+        }
+        let content = serde_json::to_vec_pretty(self).map_err(|error| error.to_string())?;
+        let staging = path.with_extension("json.partial");
+        fs::write(&staging, content)
+            .and_then(|()| fs::rename(&staging, &path))
+            .map_err(|error| error.to_string())
     }
 }
 
-pub fn get_settings(settings: &RwLock<Settings>) -> Settings {
-    let mut settings = settings.read().clone();
-    path_codec::normalize_settings(&mut settings);
-    settings
+pub fn update_settings(next: Settings, settings: &RwLock<Settings>) -> Result<(), String> {
+    let mut current = settings.write();
+    *current = next;
+    current.save()
 }
 
-pub fn update_settings(
-    mut new_settings: Settings,
-    settings: &RwLock<Settings>,
-) -> Result<(), String> {
-    path_codec::normalize_settings(&mut new_settings);
-    let mut s = settings.write();
-    *s = new_settings;
-    s.save()
+fn settings_path() -> Option<PathBuf> {
+    dirs::config_dir().map(|config| config.join("rover").join("settings.json"))
 }
 
-pub fn add_favorite(mut item: FavoriteItem, settings: &RwLock<Settings>) -> Result<(), String> {
-    item.path = path_codec::normalize_path(item.path);
-    let mut s = settings.write();
-
-    if s.favorites.iter().any(|f| f.path == item.path) {
-        return Ok(());
-    }
-
-    s.favorites.push(item);
-    s.save()
-}
-
-pub fn remove_favorite(path: String, settings: &RwLock<Settings>) -> Result<(), String> {
-    let path = path_codec::normalize_path(path);
-    let mut s = settings.write();
-    s.favorites.retain(|f| f.path != path);
-    s.save()
-}
-
-pub fn add_pinned_folder(
-    mut folder: PinnedFolder,
-    settings: &RwLock<Settings>,
-) -> Result<(), String> {
-    folder.path = path_codec::normalize_path(folder.path);
-    let mut s = settings.write();
-
-    if s.pinned_folders.iter().any(|f| f.path == folder.path) {
-        return Ok(());
-    }
-
-    s.pinned_folders.push(folder);
-    s.save()
-}
-
-pub fn remove_pinned_folder(path: String, settings: &RwLock<Settings>) -> Result<(), String> {
-    let path = path_codec::normalize_path(path);
-    let mut s = settings.write();
-    s.pinned_folders.retain(|f| f.path != path);
-    s.save()
+fn default_bookmarks(dirs: &UserDirs) -> Vec<PinnedFolder> {
+    [
+        ("Desktop", &dirs.desktop, "monitor"),
+        ("Downloads", &dirs.downloads, "download"),
+        ("Documents", &dirs.documents, "file-text"),
+        ("Pictures", &dirs.pictures, "image"),
+        ("Music", &dirs.music, "music"),
+        ("Videos", &dirs.videos, "video"),
+    ]
+    .into_iter()
+    .filter_map(|(name, path, icon)| {
+        Some(PinnedFolder {
+            name: name.to_string(),
+            path: path.clone()?,
+            is_dir: true,
+            icon: Some(icon.to_string()),
+        })
+    })
+    .collect()
 }

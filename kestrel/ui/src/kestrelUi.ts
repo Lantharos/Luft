@@ -175,7 +175,7 @@ class KestrelUi {
       if (!this.previews.contains(target)) this.previews.close();
       if (event.get_button() !== Clutter.BUTTON_SECONDARY || !(target instanceof Meta.BackgroundActor)) return Clutter.EVENT_PROPAGATE;
       this.menus.open(target, [
-        { label: 'Change wallpaper', run: () => this.menus.settings('background') },
+        { label: 'Change wallpaper', run: () => this.menus.settings('appearance') },
         { label: 'Display settings', run: () => this.menus.settings('display') },
         { label: 'Settings', run: () => this.menus.settings() },
       ], x, y);

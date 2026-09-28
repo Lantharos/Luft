@@ -8,6 +8,7 @@ import type { Monitor } from '../panel/panel.js';
 import { blurSurface } from '../shared/surface.js';
 import { animateActor } from '../shared/motion.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
+import { openSettings, type SettingsPageId } from '../settings/pages.js';
 
 export type { MenuEntry } from './menuContent.js';
 
@@ -97,10 +98,9 @@ export class ContextMenus {
     return entries;
   }
 
-  settings(panel = ''): void {
+  settings(page: SettingsPageId | null = null): void {
     this.dismissShell();
-    const id = panel ? `gnome-${panel}-panel.desktop` : 'org.gnome.Settings.desktop';
-    Shell.AppSystem.get_default().lookup_app(id)?.activate();
+    openSettings(page);
   }
 
   open(source: Clutter.Actor, entries: MenuEntry[], x: number, y: number): void {

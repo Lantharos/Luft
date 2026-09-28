@@ -1,10 +1,8 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import type GioUnix from 'gi://GioUnix';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
@@ -15,6 +13,7 @@ import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher } from './launcher.js';
 import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './desktopPeek.js';
+import { PanelClock } from './clock.js';
 import { PrivacyIndicator } from '../privacy/indicator.js';
 
 function systemMonitor(): Shell.App | null {
@@ -48,7 +47,7 @@ export class KestrelPanel {
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly favorites = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
   private readonly taskbar: Taskbar;
-  private readonly clock = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
+  private readonly clock = new PanelClock();
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker, number][] = [];
   private readonly startButton: St.Button;
@@ -56,7 +55,6 @@ export class KestrelPanel {
   private readonly clockButton: St.Button;
   readonly tray: Tray | null = null;
   private readonly privacy: PrivacyIndicator | null = null;
-  private clockTimer = 0;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1, actions.activateWindow);
@@ -102,7 +100,7 @@ export class KestrelPanel {
       ]);
     }
     this.clockButton = new St.Button({
-      style_class: 'kestrel-status-button', child: this.clock,
+      style_class: 'kestrel-status-button', child: this.clock.actor,
       can_focus: true, accessible_name: 'Notifications and date',
     });
     this.clockButton.connect('clicked', actions.notifications);
@@ -129,16 +127,13 @@ export class KestrelPanel {
       { label: 'Date and time settings', run: () => menus.settings('datetime') },
     ]);
     this.refreshApps();
-    this.clock.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
-    this.refreshClock();
-    this.scheduleClock();
   }
 
   shutdown(): void {
     this.tray?.shutdown();
     this.privacy?.shutdown();
     this.taskbar.shutdown();
-    GLib.Source.remove(this.clockTimer);
+    this.clock.destroy();
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
     this.externalSignals.length = 0;
   }
@@ -173,20 +168,6 @@ export class KestrelPanel {
       if (active) button?.add_style_pseudo_class('active');
       else button?.remove_style_pseudo_class('active');
     }
-  }
-
-  private refreshClock(): void {
-    const text = GLib.DateTime.new_now_local().format('%d %b\n%H:%M') ?? '';
-    if (this.clock.text !== text) this.clock.text = text;
-  }
-
-  private scheduleClock(): void {
-    const seconds = 60 - GLib.DateTime.new_now_local().get_second();
-    this.clockTimer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, () => {
-      this.refreshClock();
-      this.scheduleClock();
-      return GLib.SOURCE_REMOVE;
-    });
   }
 
   private refreshApps(): void {

@@ -105,10 +105,9 @@ export class StartMenu {
   }
 
   private loadApps(): void {
-    const installed = this.appSystem.get_installed();
-    this.apps = installed.filter(app => app.should_show())
+    this.apps = this.appSystem.get_installed().filter(app => app.should_show())
       .sort((a, b) => a.get_display_name().localeCompare(b.get_display_name()));
-    this.searchProvider.update(this.apps, installed);
+    this.searchProvider.update(this.apps);
     this.browser.update(this.apps, this.pinned);
     this.refreshApps();
   }

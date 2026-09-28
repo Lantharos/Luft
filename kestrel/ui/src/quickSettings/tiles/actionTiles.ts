@@ -1,21 +1,21 @@
 import Gio from 'gi://Gio';
-import Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import { label } from '../../shortcuts/accelerators.js';
 import { Battery, type BatteryState } from '../battery.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
+import { openSettings, type SettingsPageId } from '../../settings/pages.js';
 import { actionTile, type ActionTile } from './controlTile.js';
 
 export interface Tile {
   id: string;
   actor: St.Button;
-  settingsPanel: string | null;
+  settingsPanel: SettingsPageId | null;
 }
 
 export interface ActionHandlers {
   takeScreenshot(): void;
-  openSettings(panel?: string): void;
+  openSettings(page: SettingsPageId): void;
   close(): void;
 }
 
@@ -50,7 +50,7 @@ export class ActionTiles {
     showShortcut(screenshot, 'dev.lantharos.kestrel.keybindings', 'show-screenshot-ui', this.settings);
     const settings = actionTile('emblem-system-symbolic', 'Settings', () => {
       handlers.close();
-      Shell.AppSystem.get_default().lookup_app('org.gnome.Settings.desktop')?.activate();
+      openSettings();
     });
     showShortcut(settings, 'org.gnome.settings-daemon.plugins.media-keys', 'control-center', this.settings);
     const lock = actionTile(LOCK.icon, 'Lock', () => {

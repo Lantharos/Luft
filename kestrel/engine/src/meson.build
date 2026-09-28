@@ -12,6 +12,7 @@ introspection_common = {
 
 subdir('hotplug-sniffer')
 subdir('st')
+subdir('wallpaper')
 
 script_data = configuration_data()
 script_data.set('bindir', bindir)

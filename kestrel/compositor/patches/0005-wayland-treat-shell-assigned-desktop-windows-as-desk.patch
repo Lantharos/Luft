@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 29 Sep 2026 00:40:31 +0200
+Subject: [PATCH 5/5] wayland: treat shell-assigned desktop windows as desktop
+ backgrounds
+
+Wayland has no desktop window type of its own, so a Wayland window only
+becomes a desktop window when the shell assigns the type, for surfaces
+that draw the desktop background. Such windows never take keyboard focus,
+including as the fallback when the last regular window closes, and their
+configure bounds cover the whole monitor rather than its work area so
+clients size them to the full display.
+---
+ src/core/window.c                 | 15 +++++++++------
+ src/wayland/meta-window-wayland.c |  2 +-
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index d8485ec8fca8b1b01f552cccdaefcf18daac34fc..99424b25ea9b03421f4887934918a7ff3f156496 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -8193,14 +8193,17 @@ meta_window_calculate_bounds (MetaWindow *window,
+   main_monitor = meta_window_get_main_logical_monitor (window);
+   if (main_monitor)
+     {
+-      MtkRectangle work_area;
++      MtkRectangle area;
+ 
+-      meta_window_get_work_area_for_logical_monitor (window,
+-                                                     main_monitor,
+-                                                     &work_area);
++      if (window->type == META_WINDOW_DESKTOP)
++        area = meta_logical_monitor_get_layout (main_monitor);
++      else
++        meta_window_get_work_area_for_logical_monitor (window,
++                                                       main_monitor,
++                                                       &area);
+ 
+-      *bounds_width = work_area.width;
+-      *bounds_height = work_area.height;
++      *bounds_width = area.width;
++      *bounds_height = area.height;
+       return TRUE;
+     }
+   else
+diff --git a/src/wayland/meta-window-wayland.c b/src/wayland/meta-window-wayland.c
+index daa7162f72032edc7b00fb43cf324e7d25951ff6..deb8b8cde4fd6cba41e0a54b63e60c7068a8a4a5 100644
+--- a/src/wayland/meta-window-wayland.c
++++ b/src/wayland/meta-window-wayland.c
+@@ -965,7 +965,7 @@ meta_window_wayland_shortcuts_inhibited (MetaWindow         *window,
+ static gboolean
+ meta_window_wayland_is_focusable (MetaWindow *window)
+ {
+-  return window->input;
++  return window->input && window->type != META_WINDOW_DESKTOP;
+ }
+ 
+ static gboolean

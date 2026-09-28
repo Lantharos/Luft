@@ -14,6 +14,7 @@ import {checkTaskView} from './checks/desktop/taskViewChecks.js';
 import {checkNotifications} from './checks/desktop/notificationChecks.js';
 import {checkSnapGroups} from './checks/desktop/snapGroupChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
+import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
@@ -317,6 +318,7 @@ export async function run() {
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSessionManager({pause, pointer});
   await checkPortal({pause});
+  await checkLiveWallpaper({pause, actorNamed});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

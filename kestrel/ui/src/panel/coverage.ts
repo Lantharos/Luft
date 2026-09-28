@@ -32,3 +32,18 @@ export function coveredMonitors(monitors: Monitor[]): Set<number> {
   }
   return covered;
 }
+
+function coversWorkArea(window: Meta.Window, workspace: Meta.Workspace, monitor: Monitor): boolean {
+  const frame = window.get_frame_rect();
+  const area = workspace.get_work_area_for_monitor(monitor.index);
+  return window.get_monitor() === monitor.index && (window.is_fullscreen() ||
+    (frame.x <= area.x && frame.y <= area.y && frame.x + frame.width >= area.x + area.width && frame.y + frame.height >= area.y + area.height));
+}
+
+export function visibleWallpaperMonitors(monitors: Monitor[]): Set<number> {
+  const workspace = (global as unknown as Shell.Global).workspace_manager.get_active_workspace();
+  const windows = workspace.list_windows().filter(window => onScreen(window, workspace) && opaque(window));
+  return new Set(monitors
+    .filter(monitor => !windows.some(window => coversWorkArea(window, workspace, monitor)))
+    .map(monitor => monitor.index));
+}

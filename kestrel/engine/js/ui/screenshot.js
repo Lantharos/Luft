@@ -1104,6 +1104,7 @@ class UIWindowSelector extends St.Widget {
             const workspaceManager = global.workspace_manager;
             const activeWorkspace = workspaceManager.get_active_workspace();
             if (window.is_override_redirect() ||
+                window.get_window_type() === Meta.WindowType.DESKTOP ||
                 !window.located_on_workspace(activeWorkspace) ||
                 window.get_monitor() !== this._monitorIndex)
                 continue;

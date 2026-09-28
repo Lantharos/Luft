@@ -122,3 +122,7 @@ declare module 'resource:///org/gnome/shell/ui/dialog.js' {
     constructor(params: { title: string; description?: string; icon_name?: string });
   }
 }
+
+declare module 'resource:///org/gnome/shell/misc/config.js' {
+  export const LIBEXECDIR: string;
+}

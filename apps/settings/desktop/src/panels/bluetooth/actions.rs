@@ -2,10 +2,10 @@ use zbus::blocking::Proxy;
 use zbus::zvariant::ObjectPath;
 
 use super::network::airplane;
-use crate::dbus::objects::failed;
 use super::snapshot::Adapter;
 use super::{ADAPTER, DEVICE, SERVICE};
 use crate::dbus;
+use crate::dbus::objects::failed;
 
 fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, String> {
     Proxy::new(dbus::system()?, SERVICE, path, interface).map_err(failed)

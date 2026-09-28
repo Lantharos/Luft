@@ -7,9 +7,9 @@ use tokio::sync::oneshot;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedValue};
 
-use crate::dbus::objects::failed;
 use super::{DEVICE, SERVICE};
 use crate::dbus;
+use crate::dbus::objects::failed;
 use crate::events::Events;
 
 pub const REQUEST: &str = "bluetooth.request";

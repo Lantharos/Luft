@@ -5,9 +5,9 @@ use std::sync::mpsc::{self, Sender};
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
-use crate::dbus::objects::{self, failed};
 use super::{SERVICE, actions};
 use crate::dbus;
+use crate::dbus::objects::{self, failed};
 use crate::events::Events;
 
 pub const CHANGED: &str = "bluetooth.changed";

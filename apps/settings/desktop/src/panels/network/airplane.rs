@@ -4,8 +4,8 @@ use std::sync::mpsc::Sender;
 use serde::Serialize;
 use zbus::blocking::Proxy;
 
-use crate::dbus::objects::failed;
 use crate::dbus;
+use crate::dbus::objects::failed;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

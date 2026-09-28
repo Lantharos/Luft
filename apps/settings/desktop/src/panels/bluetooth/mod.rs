@@ -10,8 +10,8 @@ use serde_json::Value;
 use super::network;
 use crate::bridge::Commands;
 use crate::dbus;
-use crate::events::Events;
 use crate::dbus::objects::Objects;
+use crate::events::Events;
 use snapshot::{Adapter, Bluetooth};
 
 const SERVICE: &str = "org.bluez";

@@ -4,9 +4,9 @@ use std::sync::{LazyLock, Mutex};
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
 
-use crate::dbus::objects::{Objects, failed};
 use super::{CONNECTION, SERVICE, SETTINGS};
 use crate::dbus;
+use crate::dbus::objects::{Objects, failed};
 
 type Settings = HashMap<String, HashMap<String, OwnedValue>>;
 

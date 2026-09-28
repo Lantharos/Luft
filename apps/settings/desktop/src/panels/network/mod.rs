@@ -10,8 +10,8 @@ use serde_json::Value;
 
 use crate::bridge::Commands;
 use crate::dbus;
-use crate::events::Events;
 use crate::dbus::objects::Objects;
+use crate::events::Events;
 use snapshot::Network;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";

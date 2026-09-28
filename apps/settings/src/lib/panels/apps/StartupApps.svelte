@@ -1,11 +1,7 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { AppIcon, ItemRow, Row, Section, Switch } from '@luft/ui';
 	import AddStartupDialog from './AddStartupDialog.svelte';
-	import AppIcon from './AppIcon.svelte';
-	import ItemRow from './ItemRow.svelte';
 	import { addStartup, setStartup, startupApps, type StartupApp } from './api';
 
 	let apps = $state<StartupApp[]>([]);

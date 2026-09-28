@@ -1,9 +1,5 @@
 <script lang="ts">
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Segmented from '$lib/components/controls/Segmented.svelte';
-	import Slider from '$lib/components/controls/Slider.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Section, Segmented, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import TimePicker from './TimePicker.svelte';

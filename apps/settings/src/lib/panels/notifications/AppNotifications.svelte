@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { AppIcon, ItemRow, Switch } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
-	import AppIcon from '../apps/AppIcon.svelte';
-	import ItemRow from '../apps/ItemRow.svelte';
 	import AppNotificationsDialog from './AppNotificationsDialog.svelte';
 	import { APP_KEYS, APP_SCHEMA, type AppOptions, type NotifyingApp } from './api';
 

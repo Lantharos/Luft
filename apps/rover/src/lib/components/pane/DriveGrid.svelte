@@ -60,7 +60,7 @@
 				</div>
 			</div>
 			<div class="mt-4 h-2 overflow-hidden rounded-full bg-[var(--control)]">
-				<div class="h-full rounded-full bg-[var(--accent)]" style:width={`${usage(drive)}%`}></div>
+				<div class="h-full rounded-full bg-[var(--text)]" style:width={`${usage(drive)}%`}></div>
 			</div>
 			<div class="mt-2 flex justify-between text-[12px] text-[var(--text-muted)]">
 				<span>{formatBytes(drive.available_space)} free</span>

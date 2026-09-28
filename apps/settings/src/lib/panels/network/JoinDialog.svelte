@@ -2,8 +2,7 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import { untrack } from 'svelte';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import Segmented from '$lib/components/controls/Segmented.svelte';
+	import { Dialog, Segmented } from '@luft/ui';
 	import { forget, join, minimumPassword, needsPassword, onChanged, onFailed, type JoinSecurity } from './api';
 
 	interface Props {

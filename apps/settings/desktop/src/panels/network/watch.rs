@@ -3,15 +3,15 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Sender};
 use std::sync::{LazyLock, Mutex, OnceLock};
 
+use luft_app::Events;
+use luft_app::dbus;
+use luft_app::dbus::objects::{self, failed};
 use serde::Serialize;
 use zbus::Message;
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
 use super::{CONNECTION, DEVICE, MANAGER_PATH, SERVICE, airplane, saved, snapshot};
-use crate::dbus;
-use crate::dbus::objects::{self, failed};
-use crate::events::Events;
 
 pub const CHANGED: &str = "network.changed";
 pub const FAILED: &str = "network.failed";

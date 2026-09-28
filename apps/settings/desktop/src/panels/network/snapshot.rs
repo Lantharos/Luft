@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::net::Ipv6Addr;
 
+use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
 use zbus::zvariant::OwnedValue;
 
 use super::saved::{self, Kind, Saved};
 use super::{ACCESS_POINT, ACTIVE, DEVICE, MANAGER, MANAGER_PATH, WIRED, WIRELESS};
-use crate::dbus::objects::{Object, Objects};
 
 const ETHERNET: u32 = 1;
 const WIFI: u32 = 2;

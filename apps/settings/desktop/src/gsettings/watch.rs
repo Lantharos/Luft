@@ -4,10 +4,10 @@ use std::sync::{Arc, Mutex};
 
 use gio::glib;
 use gio::prelude::*;
+use luft_app::Events;
 use serde::Serialize;
 
 use super::{Location, open};
-use crate::events::Events;
 
 pub const SETTINGS_CHANGED: &str = "settings.changed";
 

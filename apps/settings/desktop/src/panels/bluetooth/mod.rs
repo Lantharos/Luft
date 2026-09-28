@@ -3,15 +3,14 @@ mod agent;
 mod snapshot;
 mod watch;
 
+use luft_app::dbus;
+use luft_app::dbus::objects::Objects;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
 
 use super::network;
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::dbus::objects::Objects;
-use crate::events::Events;
 use snapshot::{Adapter, Bluetooth};
 
 const SERVICE: &str = "org.bluez";
@@ -72,8 +71,8 @@ fn close(events: &Events, _: Value) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("bluetooth_open", events, open)
-        .with_events("bluetooth_close", events, close)
+        .with("bluetooth_open", events, open)
+        .with("bluetooth_close", events, close)
         .command("bluetooth_set_powered", |Toggle { enabled }| {
             actions::set_powered(&adapter()?, enabled)
         })

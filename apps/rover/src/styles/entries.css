@@ -52,7 +52,7 @@
 	.drive-tile {
 		padding: 14px;
 		box-shadow: inset 0 1px 0 var(--hairline);
-		background: color-mix(in srgb, var(--surface) 86%, transparent);
+		background: color-mix(in srgb, var(--raised) 86%, transparent);
 	}
 
 	.drive-tile:active {
@@ -77,7 +77,7 @@
 	.column-row:hover,
 	.grid-tile:hover,
 	.drive-tile:hover {
-		background: var(--surface-soft);
+		background: var(--surface-hover);
 		color: var(--text);
 	}
 
@@ -205,7 +205,7 @@
 	.entry-icon--thumbnail {
 		overflow: hidden;
 		padding: 0;
-		background: var(--surface-soft);
+		background: var(--surface-hover);
 		color: transparent;
 	}
 
@@ -246,6 +246,28 @@
 		text-align: center;
 		font-size: 12px;
 		line-height: 16px;
+	}
+
+	.table-head {
+		text-align: left;
+		font-size: 12px;
+		color: var(--text-muted);
+	}
+
+	.table-head:hover {
+		color: var(--text);
+	}
+
+	.empty-pane {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		color: var(--text-muted);
+		font-size: 14px;
+		text-wrap: pretty;
 	}
 }
 

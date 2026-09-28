@@ -3,11 +3,9 @@ mod icons;
 pub(crate) mod info;
 mod startup;
 
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
-
-use crate::bridge::Commands;
-use crate::events::Events;
 
 pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window

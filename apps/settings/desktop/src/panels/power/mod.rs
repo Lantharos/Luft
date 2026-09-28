@@ -4,14 +4,12 @@ mod properties;
 
 use std::sync::Once;
 
+use luft_app::dbus;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::{Connection, MessageIterator};
-
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::events::Events;
 
 pub const POWER_CHANGED: &str = "power.changed";
 
@@ -95,6 +93,6 @@ fn set_profile(Profile { profile }: Profile) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("power_state", events, state)
+        .with("power_state", events, state)
         .command("power_set_profile", set_profile)
 }

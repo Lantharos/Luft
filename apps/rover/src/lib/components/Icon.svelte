@@ -4,8 +4,8 @@
 		| 'download' | 'file-text' | 'image' | 'video'
 		| 'folder' | 'file' | 'chevron-right'
 		| 'chevron-up' | 'folder-open' | 'monitor'
-		| 'arrow-left' | 'arrow-right' | 'search' | 'x'
-		| 'plus' | 'minus' | 'square' | 'scissors' | 'copy' | 'clipboard' | 'trash-2'
+		| 'arrow-left' | 'arrow-right' | 'x'
+		| 'plus' | 'scissors' | 'copy' | 'clipboard' | 'trash-2'
 		| 'list' | 'grid' | 'columns' | 'sort-asc' | 'sort-desc'
 		| 'music' | 'archive' | 'code' | 'eye' | 'eye-off' | 'pin'
 		| 'refresh' | 'external-link' | 'package'
@@ -117,24 +117,17 @@
 	{:else if name === 'arrow-right'}
 		<path d="M5 12h14" />
 		<path d="m12 5 7 7-7 7" />
-	{:else if name === 'search'}
-		<circle cx="11" cy="11" r="8" />
-		<path d="m21 21-4.3-4.3" />
 	{:else if name === 'x'}
 		<path d="M18 6 6 18" />
 		<path d="m6 6 12 12" />
 	{:else if name === 'plus'}
 		<path d="M5 12h14" />
 		<path d="M12 5v14" />
-	{:else if name === 'minus'}
-		<path d="M5 12h14" />
 	{:else if name === 'pause'}
 		<rect width="4" height="16" x="6" y="4" rx="1" />
 		<rect width="4" height="16" x="14" y="4" rx="1" />
 	{:else if name === 'play'}
 		<polygon points="6 3 20 12 6 21 6 3" />
-	{:else if name === 'square'}
-		<rect width="14" height="14" x="5" y="5" rx="2" />
 	{:else if name === 'scissors'}
 		<circle cx="6" cy="6" r="3" />
 		<path d="M8.12 8.12 12 12" />

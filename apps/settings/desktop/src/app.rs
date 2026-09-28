@@ -1,21 +1,19 @@
 use std::collections::HashMap;
 
+use luft_app::{Appearance, Commands, Events};
 use sabine::{BridgeError, SabineWindow};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::bridge::Commands;
-use crate::events::Events;
 use crate::gsettings::{self, Location, Watcher};
-use crate::kestrel::{self, Accent};
 
 pub const PAGE_SCHEME: &str = "kestrel-settings:";
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct AppState {
-    translucent: bool,
-    accent: Option<Accent>,
+    #[serde(flatten)]
+    appearance: Appearance,
     page: Option<String>,
 }
 
@@ -55,8 +53,7 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
     window
         .command("app_state", |_: Value| {
             Ok(AppState {
-                translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
-                accent: kestrel::accent().ok().flatten(),
+                appearance: Appearance::current(),
                 page: std::env::args()
                     .skip(1)
                     .find(|argument| argument.starts_with(PAGE_SCHEME)),

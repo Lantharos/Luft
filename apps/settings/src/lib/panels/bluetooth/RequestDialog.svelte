@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Dialog from '$lib/components/controls/Dialog.svelte';
+	import { Dialog } from '@luft/ui';
 	import { answer, cancelPairing, type PairingRequest } from './api';
 
 	interface Props {

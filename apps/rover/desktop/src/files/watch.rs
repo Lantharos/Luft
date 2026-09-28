@@ -7,10 +7,11 @@ use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 
+use luft_app::Events;
 use parking_lot::Mutex;
 use serde::Serialize;
 
-use crate::events::{DIRECTORY_CHANGED, Events};
+use crate::events::DIRECTORY_CHANGED;
 
 const QUIET_PERIOD_MS: i32 = 150;
 const MAX_LATENCY: Duration = Duration::from_millis(600);

@@ -34,7 +34,7 @@
 						'min-h-8 shrink-0 rounded-full px-3 text-[13px] transition-[background-color,color] duration-200',
 						activeLocation === location.path
 							? 'bg-[var(--sidebar-active)] text-[var(--text)]'
-							: 'text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--text)]'
+							: 'text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]'
 					]}
 					type="button"
 					onclick={() => (chosenLocation = location.path)}
@@ -56,14 +56,14 @@
 		<span>{plural(items.length, 'item')}</span>
 		<div class="flex gap-2">
 			<button
-				class="command-button"
+				class="button large"
 				type="button"
 				disabled={selectedIds.length === 0}
 				onclick={() => manager.actions.restoreTrash(selectedIds)}
 			>
 				Restore
 			</button>
-			<button class="danger-button" type="button" onclick={() => manager.actions.emptyTrash(activeLocation)}>
+			<button class="button large danger" type="button" onclick={() => manager.actions.emptyTrash(activeLocation)}>
 				Empty trash
 			</button>
 		</div>

@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import AppIcon from './AppIcon.svelte';
-	import SearchField from './SearchField.svelte';
+	import { AppIcon, Dialog, SearchField } from '@luft/ui';
 	import { installedApps, matches, type App } from './api';
 
 	interface Props {

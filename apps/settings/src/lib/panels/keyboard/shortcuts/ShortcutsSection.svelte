@@ -1,9 +1,7 @@
 <script lang="ts">
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import Search from '@lucide/svelte/icons/search';
-	import IconButton from '$lib/components/controls/IconButton.svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
+	import { IconButton, Row, Section } from '@luft/ui';
 	import type { Category } from '../api';
 	import { labels } from './accelerator';
 	import ShortcutButton from './ShortcutButton.svelte';

@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { WindowControls } from '@luft/ui';
 	import Icon from '$lib/components/Icon.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { tabDropKey } from '$lib/file-manager/drag/drop-targets';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { closeWindow, minimizeWindow, toggleMaximizeWindow } from '$lib/runtime';
 	import type { Tab } from '$lib/types';
 
 	interface Props {
@@ -47,7 +47,7 @@
 						? 'bg-[rgba(200,182,111,0.16)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)]'
 						: manager.tabs.activeId === tab.id
 							? 'bg-[var(--control)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)]'
-							: 'text-[var(--text-muted)] opacity-75 hover:bg-[var(--surface-soft)] hover:text-[var(--text)] hover:opacity-100'
+							: 'text-[var(--text-muted)] opacity-75 hover:bg-[var(--surface-hover)] hover:text-[var(--text)] hover:opacity-100'
 				]}
 				role="group"
 				ondragover={(event) => drag.overTab(event, tab)}
@@ -85,7 +85,7 @@
 		{/each}
 
 		<button
-			class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[var(--text-muted)] transition-[background-color,color,transform] duration-150 hover:bg-[var(--surface-soft)] hover:text-[var(--text)] active:scale-[0.96]"
+			class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[var(--text-muted)] transition-[background-color,color,transform] duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--text)] active:scale-[0.96]"
 			type="button"
 			aria-label="New tab"
 			onclick={() => manager.openTab()}
@@ -94,15 +94,5 @@
 		</button>
 	</div>
 
-	<div class="flex h-8 shrink-0 items-center gap-1">
-		<button class="window-control" type="button" aria-label="Minimize" onclick={minimizeWindow}>
-			<Icon name="minus" size={15} />
-		</button>
-		<button class="window-control" type="button" aria-label="Maximize" onclick={toggleMaximizeWindow}>
-			<Icon name="square" size={14} />
-		</button>
-		<button class="window-control" type="button" aria-label="Close" onclick={closeWindow}>
-			<Icon name="x" size={15} />
-		</button>
-	</div>
+	<WindowControls />
 </header>

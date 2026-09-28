@@ -15,7 +15,7 @@
 	const SECONDARY =
 		'bg-[var(--control)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] hover:bg-[var(--control-hover)] focus-visible:bg-[var(--control-hover)]';
 	const PRIMARY =
-		'bg-[var(--accent)] text-[var(--text-inverse)] shadow-[inset_0_1px_0_rgba(255,255,255,0.32)] hover:brightness-95 focus-visible:brightness-95';
+		'bg-[var(--text)] text-[var(--text-inverse)] shadow-[inset_0_1px_0_rgba(255,255,255,0.32)] hover:brightness-95 focus-visible:brightness-95';
 
 	let config = $derived(chooser.config);
 	let selectionText = $derived.by(() => {

@@ -1,6 +1,6 @@
 # Rover
 
-Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft monorepo it lives at `apps/rover`; run the commands below from that directory.
+Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft monorepo it lives at `apps/rover`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -22,10 +22,10 @@ The sidebar uses the compositor's background blur on Wayland compositors that su
 
 ## Development
 
-Rover uses Sabine's shared Chromium runtime. The first launch prepares it when needed.
+Rover uses Sabine's shared Chromium runtime. The first launch prepares it when needed. Its controls, styles and window setup come from `packages/ui` and `packages/app`, so install dependencies once from the repository root:
 
 ```bash
-bun install
+bun install              # from the repository root
 bun run desktop:dev      # Vite dev server and the native window
 bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
@@ -94,8 +94,7 @@ rover/
 │   │   ├── utils/             formatting, paths and file kinds
 │   │   └── vcs/               version control state
 │   ├── routes/+page.svelte    window layout
-│   └── styles/                shared component styles
-├── static/fonts/              Open Runde
+│   └── styles/                file list, grid and drive styles
 └── desktop/src/
     ├── bridge/                bridge command registration
     ├── drives/                mounts, drive info and mount watching
@@ -108,4 +107,4 @@ rover/
 
 ## License
 
-MIT. Open Runde is licensed under the SIL Open Font License, included in `static/fonts/OFL.txt`.
+MIT. Open Runde is licensed under the SIL Open Font License, included in `packages/ui/fonts/OFL.txt`.

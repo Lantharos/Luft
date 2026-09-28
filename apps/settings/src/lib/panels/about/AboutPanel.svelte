@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
+	import { Dialog, Row, Section } from '@luft/ui';
 	import { binaryBytes, bytes } from '$lib/format';
 	import { about, rename, type About } from './api';
 

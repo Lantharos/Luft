@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SearchField } from '@luft/ui';
 	import Icon from '$lib/components/Icon.svelte';
 	import * as bookmarks from '$lib/file-manager/bookmarks';
 	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
@@ -28,7 +29,7 @@
 		{ view: 'trash', label: 'Trash', icon: 'trash' }
 	] as const;
 
-	let searchInput = $state<HTMLInputElement>();
+	let search = $state<SearchField>();
 	let bookmarkDropActive = $state(false);
 	let movingBookmark = $state<string | null>(null);
 	let bookmarkInsertBefore = $state<string | null>(null);
@@ -36,8 +37,7 @@
 	let navigableViews = $derived(PRIMARY_NAV.filter((item) => !(chooser && item.view === 'trash')));
 
 	export function focusSearch() {
-		searchInput?.focus();
-		searchInput?.select();
+		search?.focus();
 	}
 
 	function rowClasses(active: boolean, dropping = false) {
@@ -162,23 +162,9 @@
 	}
 </script>
 
-<aside class="rover-sidebar drag-region flex w-[260px] shrink-0 flex-col px-2.5 pb-4 pt-3" data-effect={manager.translucent ? 'translucent' : 'opaque'}>
-	<div class="px-0.5 pb-3 pt-1">
-		<label
-			class="sidebar-search flex h-11 items-center gap-3 rounded-full bg-[var(--sidebar-control)] px-3.5 text-[var(--sidebar-text-muted)] shadow-[inset_0_1px_0_var(--hairline)] hover:bg-[var(--sidebar-control-hover)] hover:text-[var(--text)]"
-			data-no-drag
-		>
-			<Icon name="search" size={17} />
-			<input
-				bind:this={searchInput}
-				class="min-w-0 flex-1 bg-transparent text-[15px] text-[var(--text)] outline-none placeholder:text-[var(--sidebar-text-muted)]"
-				type="text"
-				value={manager.searchQuery}
-				placeholder="Search current folder"
-				aria-label="Search current folder"
-				oninput={(event) => (manager.searchQuery = event.currentTarget.value)}
-			/>
-		</label>
+<aside class="glass-sidebar drag-region px-2.5 pt-3 pb-4">
+	<div class="px-0.5 pt-1 pb-3">
+		<SearchField bind:this={search} variant="sidebar" large label="Search current folder" bind:value={manager.searchQuery} />
 	</div>
 
 	<nav class="flex flex-col gap-1 p-0.5" aria-label="Main locations" data-no-drag>

@@ -7,9 +7,10 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 
+use luft_app::Events;
 use serde::Serialize;
 
-use crate::events::{Events, VCS_STATUS};
+use crate::events::VCS_STATUS;
 
 static NEXT_STATUS_ID: AtomicU64 = AtomicU64::new(1);
 

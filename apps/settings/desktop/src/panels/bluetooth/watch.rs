@@ -2,13 +2,13 @@ use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Sender};
 
+use luft_app::Events;
+use luft_app::dbus;
+use luft_app::dbus::objects::{self, failed};
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
 use super::{SERVICE, actions};
-use crate::dbus;
-use crate::dbus::objects::{self, failed};
-use crate::events::Events;
 
 pub const CHANGED: &str = "bluetooth.changed";
 

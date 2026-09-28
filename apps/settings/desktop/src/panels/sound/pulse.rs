@@ -9,12 +9,12 @@ use libpulse_binding::context::introspect::Introspector;
 use libpulse_binding::context::subscribe::{Facility, InterestMaskSet, Operation};
 use libpulse_binding::proplist::UpdateMode;
 use libpulse_binding::volume::ChannelVolumes;
+use luft_app::Events;
 
 use super::meter::Meter;
 use super::model::{ALERT_STREAM, Alert, App, Device, State, scaled};
 use super::service::Command;
 use super::{Direction, Target};
-use crate::events::Events;
 
 const SOUND_CHANGED: &str = "sound.changed";
 const INITIAL_QUERIES: usize = 5;

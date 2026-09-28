@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
+use luft_app::dbus;
+use luft_app::dbus::objects::{Objects, failed};
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
 
 use super::{CONNECTION, SERVICE, SETTINGS};
-use crate::dbus;
-use crate::dbus::objects::{Objects, failed};
 
 type Settings = HashMap<String, HashMap<String, OwnedValue>>;
 

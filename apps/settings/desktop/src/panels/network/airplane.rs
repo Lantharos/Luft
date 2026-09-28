@@ -1,11 +1,10 @@
 use std::sync::OnceLock;
 use std::sync::mpsc::Sender;
 
+use luft_app::dbus;
+use luft_app::dbus::objects::failed;
 use serde::Serialize;
 use zbus::blocking::Proxy;
-
-use crate::dbus;
-use crate::dbus::objects::failed;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

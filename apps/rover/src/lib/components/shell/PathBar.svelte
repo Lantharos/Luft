@@ -130,7 +130,7 @@
 	}
 
 	.path-segment:hover:not(.path-segment--ghost):not(.path-segment--drop) {
-		background: var(--surface-soft);
+		background: var(--surface-hover);
 		color: var(--text);
 	}
 

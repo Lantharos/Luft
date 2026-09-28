@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
+	import { Row, Section } from '@luft/ui';
 	import CustomDialog from './CustomDialog.svelte';
 	import Keys from './Keys.svelte';
 	import type { CustomBinding, ShortcutStore } from './store.svelte';

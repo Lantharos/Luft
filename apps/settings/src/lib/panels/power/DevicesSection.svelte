@@ -10,8 +10,7 @@
 	import Speaker from '@lucide/svelte/icons/speaker';
 	import SquareMousePointer from '@lucide/svelte/icons/square-mouse-pointer';
 	import Tablet from '@lucide/svelte/icons/tablet';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
+	import { Row, Section } from '@luft/ui';
 	import type { Device, DeviceKind } from './api';
 	import Level from './Level.svelte';
 

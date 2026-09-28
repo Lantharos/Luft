@@ -2,11 +2,8 @@
 	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Lock from '@lucide/svelte/icons/lock';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import ActionRow from '$lib/components/controls/ActionRow.svelte';
+	import { ActionRow, IconButton, Row, Section } from '@luft/ui';
 	import DetailsDialog from './DetailsDialog.svelte';
-	import IconButton from '$lib/components/controls/IconButton.svelte';
 	import JoinDialog from './JoinDialog.svelte';
 	import { activate, disconnect, forget, join, needsPassword, onFailed, type JoinSecurity, type Wifi, type WifiNetwork } from './api';
 	import { detailRows, isSecured, linkLabel, securityLabel, signalIcon, signalLabel, type DetailRow } from './describe';

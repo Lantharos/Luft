@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
+use luft_app::dbus;
 use zbus::blocking::{MessageIterator, Proxy};
 use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
-
-use crate::dbus;
 
 const PORTAL: &str = "org.freedesktop.portal.Desktop";
 const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";

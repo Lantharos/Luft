@@ -1,7 +1,6 @@
 @layer components {
-	.settings-shell {
-		display: grid;
-		grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+	.glass-shell {
+		display: flex;
 		height: 100vh;
 		background: var(--app-bg);
 		border-radius: var(--window-radius);
@@ -9,42 +8,47 @@
 		overflow: hidden;
 	}
 
-	.settings-shell[data-effect='translucent'] {
+	.glass-shell[data-effect='translucent'] {
 		background: transparent;
 	}
 
-	.settings-sidebar {
+	.glass-sidebar {
 		display: flex;
+		width: var(--sidebar-width);
 		min-height: 0;
+		flex: none;
 		flex-direction: column;
-		gap: 14px;
-		padding: 16px 12px 16px;
 		background: var(--sidebar-solid);
 		color: var(--sidebar-text);
 	}
 
-	.settings-sidebar[data-effect='translucent'] {
-		background: rgba(18, 18, 17, 0.34);
+	[data-effect='translucent'] .glass-sidebar {
 		--sidebar-text: rgba(255, 255, 255, 0.86);
 		--sidebar-text-muted: rgba(255, 255, 255, 0.62);
 		--sidebar-control: rgba(255, 255, 255, 0.1);
 		--sidebar-control-hover: rgba(255, 255, 255, 0.14);
 		--sidebar-active: rgba(255, 255, 255, 0.16);
+		background: var(--sidebar-glass);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
 	}
 
-	.settings-content {
+	.glass-content {
 		display: flex;
 		min-width: 0;
 		min-height: 0;
+		flex: 1;
 		flex-direction: column;
 		background: var(--content);
+		color: var(--text);
 	}
 
 	.drag-region {
 		-webkit-app-region: drag;
+		cursor: default;
 	}
 
+	.drag-region button,
+	.drag-region input,
 	[data-no-drag] {
 		-webkit-app-region: no-drag;
 	}
@@ -56,31 +60,5 @@
 	.soft-scroll {
 		scrollbar-width: thin;
 		scrollbar-color: rgba(245, 245, 242, 0.14) transparent;
-	}
-
-	.group {
-		display: flex;
-		flex-direction: column;
-		border-radius: var(--radius-group);
-		background: var(--surface);
-		overflow: hidden;
-	}
-
-	.group > * + * {
-		box-shadow: inset 0 1px 0 var(--hairline);
-	}
-
-	.section-title {
-		padding: 0 6px 8px;
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--text-soft);
-	}
-
-	.section-description {
-		padding: 0 6px 10px;
-		margin-top: -4px;
-		font-size: 13px;
-		color: var(--text-muted);
 	}
 }

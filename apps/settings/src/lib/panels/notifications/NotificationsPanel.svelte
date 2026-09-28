@@ -1,9 +1,6 @@
 <script lang="ts">
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, SearchField, Section, Switch } from '@luft/ui';
 	import { schemaInstalled, useSettings } from '$lib/state/gsettings.svelte';
-	import SearchField from '../apps/SearchField.svelte';
 	import { matches } from '../apps/api';
 	import AppNotifications from './AppNotifications.svelte';
 	import MessageContent from './MessageContent.svelte';

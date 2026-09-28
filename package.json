@@ -1,0 +1,5 @@
+{
+	"name": "luft",
+	"private": true,
+	"workspaces": ["apps/rover", "apps/settings", "packages/*"]
+}

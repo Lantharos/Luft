@@ -1,7 +1,7 @@
+use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
 
 use super::{ADAPTER, BATTERY, DEVICE};
-use crate::dbus::objects::{Object, Objects};
 
 const BLOCKED: &str = "off-blocked";
 

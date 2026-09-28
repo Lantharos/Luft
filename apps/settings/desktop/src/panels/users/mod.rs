@@ -2,16 +2,14 @@ mod picture;
 
 use std::path::Path;
 
+use luft_app::dbus;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
 use zbus::zvariant::{DynamicType, OwnedObjectPath};
-
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::events::Events;
 
 const ACCOUNTS: &str = "org.freedesktop.Accounts";
 const ACCOUNTS_PATH: &str = "/org/freedesktop/Accounts";

@@ -4,11 +4,7 @@
 	import MicOff from '@lucide/svelte/icons/mic-off';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Select from '$lib/components/controls/Select.svelte';
-	import Slider from '$lib/components/controls/Slider.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import {

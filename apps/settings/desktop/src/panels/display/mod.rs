@@ -3,11 +3,9 @@ mod state;
 
 use std::sync::Once;
 
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
-
-use crate::bridge::Commands;
-use crate::events::Events;
 
 const DISPLAYS_CHANGED: &str = "display.changed";
 
@@ -34,7 +32,7 @@ fn watch(events: &Events) {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("display_state", events, |events, _: Value| {
+        .with("display_state", events, |events, _: Value| {
             watch(events);
             state::current()
         })

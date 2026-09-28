@@ -2,8 +2,10 @@ use std::fs::File;
 use std::os::fd::AsRawFd;
 use std::thread;
 
+use luft_app::Events;
+
 use super::mounts::MOUNTS_FILE;
-use crate::events::{DRIVES_CHANGED, Events};
+use crate::events::DRIVES_CHANGED;
 
 pub fn watch_mounts(events: Events) {
     let Ok(mounts) = File::open(MOUNTS_FILE) else {

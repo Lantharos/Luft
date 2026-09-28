@@ -4,15 +4,13 @@ use std::io::ErrorKind;
 use std::sync::Once;
 
 use gio::prelude::*;
+use luft_app::dbus;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
-
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::events::Events;
 
 pub const PERMISSIONS_CHANGED: &str = "privacy.permissions";
 
@@ -198,7 +196,7 @@ fn clear_history(_: Value) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("privacy_permissions", events, permissions)
+        .with("privacy_permissions", events, permissions)
         .command("privacy_set_permission", set_permission)
         .command("privacy_clear_history", clear_history)
 }

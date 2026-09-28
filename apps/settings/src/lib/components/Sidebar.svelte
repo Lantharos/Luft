@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Search from '@lucide/svelte/icons/search';
+	import { SearchField } from '@luft/ui';
 	import { PANEL_GROUPS, searchPanels, type Panel } from '$lib/panels/registry';
 	import { app } from '$lib/state/app.svelte';
 
@@ -25,11 +25,8 @@
 	</button>
 {/snippet}
 
-<aside class="settings-sidebar drag-region" data-effect={app.translucent ? 'translucent' : 'solid'}>
-	<label class="search" data-no-drag>
-		<Search size={16} class="shrink-0 text-[var(--sidebar-text-muted)]" />
-		<input type="search" placeholder="Search settings" bind:value={app.query} onkeydown={openFirst} />
-	</label>
+<aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
+	<SearchField variant="sidebar" label="Search settings" bind:value={app.query} onkeydown={openFirst} />
 	<nav class="hidden-scroll flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" data-no-drag>
 		{#each results as group, index (index)}
 			<div class="flex flex-col gap-0.5">
@@ -45,40 +42,6 @@
 </aside>
 
 <style>
-	.search {
-		display: flex;
-		height: 38px;
-		flex: none;
-		align-items: center;
-		gap: 8px;
-		border-radius: var(--radius-pill);
-		background: var(--sidebar-control);
-		padding-inline: 12px;
-		transition: background-color 160ms var(--ease);
-	}
-
-	.search:hover,
-	.search:focus-within {
-		background: var(--sidebar-control-hover);
-	}
-
-	.search input {
-		min-width: 0;
-		flex: 1;
-		background: transparent;
-		font-size: 13px;
-		outline: none;
-		color: var(--sidebar-text);
-	}
-
-	.search input::placeholder {
-		color: var(--sidebar-text-muted);
-	}
-
-	.search input::-webkit-search-cancel-button {
-		display: none;
-	}
-
 	.nav-item {
 		display: flex;
 		height: 38px;

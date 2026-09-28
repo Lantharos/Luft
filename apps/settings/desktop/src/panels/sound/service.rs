@@ -11,10 +11,10 @@ use libpulse_binding::mainloop::api::Mainloop as _;
 use libpulse_binding::mainloop::events::io::FlagSet as IoFlags;
 use libpulse_binding::mainloop::standard::{IterateResult, Mainloop};
 use libpulse_binding::proplist::{Proplist, properties};
+use luft_app::Events;
 
 use super::pulse::Pulse;
 use super::{AlertVolume, Balance, DefaultDevice, Meter, Mute, Volume};
-use crate::events::Events;
 
 const APP_ID: &str = "dev.lantharos.settings";
 const UNAVAILABLE: &str = "Sound isn't available right now";

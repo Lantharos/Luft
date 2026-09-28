@@ -29,7 +29,7 @@
 	function navButton(disabled: boolean) {
 		return [
 			'grid h-9 w-9 shrink-0 place-items-center rounded-full text-[var(--text-muted)] transition-[background-color,color,transform,opacity] duration-150',
-			disabled ? 'opacity-35' : 'hover:bg-[var(--surface-soft)] hover:text-[var(--text)] active:scale-[0.96]'
+			disabled ? 'opacity-35' : 'hover:bg-[var(--surface-hover)] hover:text-[var(--text)] active:scale-[0.96]'
 		];
 	}
 </script>
@@ -57,22 +57,22 @@
 	<div class="flex min-h-10 items-center justify-between gap-3">
 		<div class="flex min-w-0 items-center gap-1">
 			{#if !chooserMode}
-				<button class="command-button" type="button" onclick={() => manager.startCreate('folder')}>
+				<button class="button large" type="button" onclick={() => manager.startCreate('folder')}>
 					<Icon name="folder-plus" size={16} />
 					<span>New folder</span>
 				</button>
-				<button class="tool-button" type="button" aria-label="New file" onclick={() => manager.startCreate('file')}>
+				<button class="icon-button large" type="button" aria-label="New file" onclick={() => manager.startCreate('file')}>
 					<Icon name="file-plus" size={16} />
 				</button>
 				<div class="mx-1 h-5 w-px bg-[var(--hairline)]"></div>
-				<button class="tool-button" type="button" aria-label="Cut" disabled={nothingSelected} onclick={manager.actions.cut}>
+				<button class="icon-button large" type="button" aria-label="Cut" disabled={nothingSelected} onclick={manager.actions.cut}>
 					<Icon name="scissors" size={16} />
 				</button>
-				<button class="tool-button" type="button" aria-label="Copy" disabled={nothingSelected} onclick={manager.actions.copy}>
+				<button class="icon-button large" type="button" aria-label="Copy" disabled={nothingSelected} onclick={manager.actions.copy}>
 					<Icon name="copy" size={16} />
 				</button>
 				<button
-					class="tool-button"
+					class="icon-button large"
 					type="button"
 					aria-label="Paste"
 					disabled={manager.clipboard.items.length === 0}
@@ -81,7 +81,7 @@
 					<Icon name="clipboard" size={16} />
 				</button>
 				<button
-					class="tool-button"
+					class="icon-button large"
 					type="button"
 					aria-label="Move to trash"
 					disabled={nothingSelected}
@@ -90,7 +90,7 @@
 					<Icon name="trash-2" size={16} />
 				</button>
 				<button
-					class={['tool-button', settings.value.showHidden && 'bg-[var(--sidebar-active)] text-[var(--text)]']}
+					class={['icon-button large', settings.value.showHidden && 'bg-[var(--sidebar-active)] text-[var(--text)]']}
 					type="button"
 					aria-pressed={settings.value.showHidden}
 					aria-label={settings.value.showHidden ? 'Hide hidden files' : 'Show hidden files'}
@@ -103,7 +103,7 @@
 
 		<div class="flex shrink-0 items-center gap-1">
 			{#if vcs.project}
-				<button class="command-button max-w-[280px]" type="button" onclick={() => (vcs.panelOpen = !vcs.panelOpen)}>
+				<button class="button large max-w-[280px]" type="button" onclick={() => (vcs.panelOpen = !vcs.panelOpen)}>
 					<Icon name="code" size={16} />
 					<span class="truncate">{projectSummary(vcs.project)}</span>
 				</button>
@@ -117,7 +117,7 @@
 						class={[
 							'grid h-8 w-8 place-items-center rounded-full transition-[background-color,color,transform] duration-150 active:scale-[0.96]',
 							manager.viewMode === mode.value
-								? 'bg-[var(--surface)] text-[var(--text)] shadow-[0_1px_2px_var(--shadow-faint)]'
+								? 'bg-[var(--raised)] text-[var(--text)] shadow-[0_1px_2px_var(--shadow-faint)]'
 								: 'text-[var(--text-muted)] hover:text-[var(--text)]'
 						]}
 						type="button"

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
+	import { Dialog } from '@luft/ui';
 	import { typesText } from './accelerator';
 	import KeyCapture from './KeyCapture.svelte';
 	import type { CustomBinding, ShortcutStore } from './store.svelte';

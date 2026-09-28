@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Row from '$lib/components/controls/Row.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Switch } from '@luft/ui';
 	import { onPermissionsChanged, permissions, setPermission, type AppPermission, type PermissionKind } from './api';
 
 	interface Props {

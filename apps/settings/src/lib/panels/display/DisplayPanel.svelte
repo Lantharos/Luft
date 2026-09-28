@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Select from '$lib/components/controls/Select.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { applyDisplays, loadDisplays, onDisplaysChanged, type Displays } from './api';
 	import Arrangement from './Arrangement.svelte';
 	import { commonResolutions, draftFrom, footprint, mirror, modeOf, monitorOf, toLogical, unmirror, type Draft } from './config';

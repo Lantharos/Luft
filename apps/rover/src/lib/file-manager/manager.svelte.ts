@@ -1,4 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
+import { appearance } from '@luft/ui';
 import * as api from '$lib/api';
 import { isDesktopRuntime } from '$lib/runtime';
 import { settings } from '$lib/state/settings.svelte';
@@ -47,7 +48,6 @@ export class FileManager {
 
 	view = $state<SidebarView>('home');
 	userDirs = $state.raw<UserDirs | null>(null);
-	translucent = $state(false);
 	currentPath = $state('');
 	entries = $state.raw<FileEntry[]>([]);
 	trash = $state.raw<TrashContents>(EMPTY_TRASH);
@@ -108,7 +108,7 @@ export class FileManager {
 	start = async (state: AppState, startPath?: string) => {
 		settings.value = state.settings;
 		this.userDirs = state.userDirs;
-		this.translucent = state.translucent;
+		appearance.start(state);
 		void this.drives.load();
 		const path = startPath ?? this.homePath;
 		this.tabs.open(this.#homeEntry(path));

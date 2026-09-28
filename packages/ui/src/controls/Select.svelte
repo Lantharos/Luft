@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends string | number">
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Popover from '../menus/Popover.svelte';
 
 	interface Option {
 		value: T;
@@ -16,28 +17,18 @@
 		onchange: (value: T) => void;
 	}
 
-	const GAP = 6;
-	const MAX_HEIGHT = 320;
+	const MIN_WIDTH = 200;
 
 	let { options, value, label, placeholder = 'Choose', disabled = false, onchange }: Props = $props();
 
 	let trigger = $state<HTMLButtonElement>();
 	let open = $state(false);
 	let highlighted = $state(0);
-	let position = $state({ left: 0, top: 0, width: 0, above: false });
 
 	let selected = $derived(options.find((option) => option.value === value));
 
 	function show() {
 		if (disabled || !options.length) return;
-		const box = trigger!.getBoundingClientRect();
-		const above = window.innerHeight - box.bottom < Math.min(MAX_HEIGHT, options.length * 36 + 12) && box.top > window.innerHeight / 2;
-		position = {
-			left: box.left,
-			top: above ? box.top - GAP : box.bottom + GAP,
-			width: Math.max(box.width, 200),
-			above
-		};
 		highlighted = Math.max(0, options.findIndex((option) => option.value === value));
 		open = true;
 	}
@@ -71,8 +62,6 @@
 	}
 </script>
 
-<svelte:window onblur={() => (open = false)} onresize={() => (open = false)} />
-
 <button
 	bind:this={trigger}
 	type="button"
@@ -89,18 +78,8 @@
 	<ChevronDown size={16} class="chevron" />
 </button>
 
-{#if open}
-	<div class="backdrop" role="presentation" onpointerdown={() => (open = false)}></div>
-	<div
-		class="popover soft-scroll"
-		class:above={position.above}
-		role="listbox"
-		aria-label={label}
-		style:left="{position.left}px"
-		style:top="{position.top}px"
-		style:min-width="{position.width}px"
-		style:max-height="{MAX_HEIGHT}px"
-	>
+{#if open && trigger}
+	<Popover anchor={trigger} {label} role="listbox" minWidth={MIN_WIDTH} onclose={() => (open = false)}>
 		{#each options as option, index (option.value)}
 			<button
 				type="button"
@@ -117,7 +96,7 @@
 				{/if}
 			</button>
 		{/each}
-	</div>
+	</Popover>
 {/if}
 
 <style>
@@ -156,34 +135,10 @@
 		transform: rotate(180deg);
 	}
 
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: 40;
-	}
-
-	.popover {
-		position: fixed;
-		z-index: 41;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		overflow-y: auto;
-		padding: 6px;
-		border-radius: 18px;
-		background: var(--popover);
-		box-shadow: 0 12px 40px var(--shadow-soft);
-		animation: open 160ms var(--ease);
-	}
-
-	.popover.above {
-		transform: translateY(-100%);
-		animation-name: open-above;
-	}
-
 	.option {
 		display: flex;
 		min-height: 34px;
+		flex: none;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
@@ -201,19 +156,5 @@
 
 	.option[aria-selected='true'] {
 		color: var(--text);
-	}
-
-	@keyframes open {
-		from {
-			opacity: 0;
-			transform: translateY(-4px);
-		}
-	}
-
-	@keyframes open-above {
-		from {
-			opacity: 0;
-			transform: translateY(calc(-100% + 4px));
-		}
 	}
 </style>

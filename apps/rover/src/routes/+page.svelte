@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { events as sabineEvents } from '@lantharos/sabine';
+	import { GlassShell } from '@luft/ui';
 	import * as api from '$lib/api';
 	import FilePane from '$lib/components/pane/FilePane.svelte';
 	import AppHeader from '$lib/components/shell/AppHeader.svelte';
 	import ChooserBar from '$lib/components/shell/ChooserBar.svelte';
-	import ContextMenu from '$lib/components/shell/ContextMenu.svelte';
+	import FileContextMenu from '$lib/components/shell/FileContextMenu.svelte';
 	import OperationDock from '$lib/components/shell/OperationDock.svelte';
 	import PathToolbar from '$lib/components/shell/PathToolbar.svelte';
 	import Sidebar from '$lib/components/shell/Sidebar.svelte';
@@ -74,10 +75,10 @@
 />
 
 <div class="h-[100dvh] w-screen min-w-[800px] overflow-hidden bg-transparent text-[var(--text)]">
-	<main class="rover-shell flex h-full overflow-hidden" data-effect={manager.translucent ? 'translucent' : 'opaque'}>
+	<GlassShell class="h-full select-none [--sidebar-width:260px]">
 		<Sidebar bind:this={sidebar} {manager} {drag} {chooser} />
 
-		<section class="content-pane relative flex min-w-0 flex-1 flex-col">
+		<main class="glass-content relative isolate">
 			<AppHeader {manager} {drag} />
 
 			{#if manager.view === 'home'}
@@ -94,15 +95,15 @@
 			{:else}
 				<StatusBar {manager} {vcs} />
 			{/if}
-		</section>
-	</main>
+		</main>
+	</GlassShell>
 </div>
 
 <OperationDock operations={manager.operations} />
 
 {#if manager.contextMenu && !chooser}
 	{#key manager.contextMenu}
-		<ContextMenu menu={manager.contextMenu} {manager} {vcs} />
+		<FileContextMenu menu={manager.contextMenu} {manager} {vcs} />
 	{/key}
 {/if}
 

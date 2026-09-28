@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Row from '$lib/components/controls/Row.svelte';
-	import Select from '$lib/components/controls/Select.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Select, Switch } from '@luft/ui';
 	import type { Displays } from './api';
 	import {
 		ORIENTATIONS,

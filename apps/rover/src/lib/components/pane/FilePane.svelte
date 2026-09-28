@@ -61,7 +61,7 @@
 	{#if manager.loading.skeleton}
 		<div class="loading-skeleton grid gap-2 pt-2">
 			{#each Array.from({ length: 9 }, (_, index) => index) as index (index)}
-				<div class="h-11 rounded-full bg-[var(--surface-soft)]" style:opacity={0.36 + index * 0.04}></div>
+				<div class="h-11 rounded-full bg-[var(--surface-hover)]" style:opacity={0.36 + index * 0.04}></div>
 			{/each}
 		</div>
 	{:else if manager.error}

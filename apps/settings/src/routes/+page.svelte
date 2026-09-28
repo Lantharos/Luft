@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { isAvailable } from '@lantharos/sabine';
-	import Sidebar from '$lib/components/shell/Sidebar.svelte';
-	import WindowControls from '$lib/components/shell/WindowControls.svelte';
+	import { GlassShell, WindowControls } from '@luft/ui';
+	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { PANELS } from '$lib/panels/registry';
 	import { app } from '$lib/state/app.svelte';
 
@@ -19,14 +19,9 @@
 	});
 </script>
 
-<div
-	class="settings-shell"
-	data-effect={app.translucent ? 'translucent' : 'solid'}
-	style:--accent={app.accent ?? undefined}
-	style:--accent-text={app.accentText ?? undefined}
->
+<GlassShell>
 	<Sidebar />
-	<main class="settings-content">
+	<main class="glass-content">
 		<header class="drag-region flex h-[60px] flex-none items-center justify-between gap-4 pr-4 pl-8">
 			<h1 class="truncate text-[20px] font-semibold">{panel.title}</h1>
 			<WindowControls />
@@ -39,4 +34,4 @@
 			</div>
 		</div>
 	</main>
-</div>
+</GlassShell>

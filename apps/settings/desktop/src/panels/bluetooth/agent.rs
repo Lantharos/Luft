@@ -2,15 +2,15 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{LazyLock, Mutex};
 
+use luft_app::Events;
+use luft_app::dbus;
+use luft_app::dbus::objects::failed;
 use serde::Serialize;
 use tokio::sync::oneshot;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedValue};
 
 use super::{DEVICE, SERVICE};
-use crate::dbus;
-use crate::dbus::objects::failed;
-use crate::events::Events;
 
 pub const REQUEST: &str = "bluetooth.request";
 pub const CANCEL: &str = "bluetooth.cancel";

@@ -1,14 +1,12 @@
 use std::ffi::CString;
 use std::fs;
 
+use luft_app::dbus;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::Proxy;
-
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::events::Events;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

@@ -3,9 +3,7 @@
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
-	import IconButton from '$lib/components/controls/IconButton.svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
+	import { IconButton, Row, Section } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import AddSourceDialog from './AddSourceDialog.svelte';
 	import { layouts as readLayouts, type Layout } from './api';

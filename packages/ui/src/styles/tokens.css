@@ -1,0 +1,38 @@
+@theme {
+	--font-sans: 'Open Runde', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+	color-scheme: dark;
+	--app-bg: #111110;
+	--content: #121211;
+	--raised: #1a1a18;
+	--surface: rgba(245, 245, 242, 0.04);
+	--surface-hover: rgba(245, 245, 242, 0.065);
+	--control: #252522;
+	--control-hover: #31312e;
+	--popover: #1c1c1a;
+	--sidebar-solid: #181817;
+	--sidebar-active: rgba(245, 245, 242, 0.09);
+	--sidebar-text: var(--text-soft);
+	--sidebar-text-muted: var(--text-muted);
+	--sidebar-control: rgba(245, 245, 242, 0.06);
+	--sidebar-control-hover: rgba(245, 245, 242, 0.085);
+	--sidebar-glass: rgba(18, 18, 17, 0.34);
+	--text: #f3f3ef;
+	--text-soft: #c9c9c3;
+	--text-muted: #8f8f88;
+	--text-inverse: #181817;
+	--accent: #c8b66f;
+	--accent-text: #181817;
+	--danger: #e0aaaa;
+	--success: #a6c9a8;
+	--hairline: rgba(245, 245, 242, 0.07);
+	--shadow-soft: rgba(0, 0, 0, 0.32);
+	--shadow-faint: rgba(0, 0, 0, 0.22);
+	--radius-pill: 999px;
+	--radius-group: 18px;
+	--window-radius: 16px;
+	--sidebar-width: 280px;
+	--ease: cubic-bezier(0.2, 0, 0, 1);
+}

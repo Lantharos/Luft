@@ -3,3 +3,5 @@
 /kestrel/ui/node_modules/
 
 /kestrel/run/
+
+node_modules/

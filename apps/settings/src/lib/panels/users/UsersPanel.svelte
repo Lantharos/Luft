@@ -1,11 +1,6 @@
 <script lang="ts">
 	import Camera from '@lucide/svelte/icons/camera';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
-	import ItemRow from '../apps/ItemRow.svelte';
-	import Avatar from './Avatar.svelte';
+	import { Avatar, Dialog, ItemRow, Row, Section, Switch } from '@luft/ui';
 	import { accountType, choosePicture, displayName, rename, setAutomaticLogin, users, type Users } from './api';
 
 	let accounts = $state<Users | null>(null);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Clock from '@lucide/svelte/icons/clock';
+	import { Popover } from '@luft/ui';
 
 	interface Props {
 		value: number;
@@ -8,7 +9,6 @@
 		onchange: (value: number) => void;
 	}
 
-	const GAP = 6;
 	const POPOVER_HEIGHT = 260;
 	const MINUTES_PER_DAY = 24 * 60;
 	const NUDGE_MINUTES = 15;
@@ -19,7 +19,6 @@
 
 	let trigger = $state<HTMLButtonElement>();
 	let open = $state(false);
-	let position = $state({ left: 0, top: 0, above: false });
 
 	let total = $derived(Math.round(value * 60) % MINUTES_PER_DAY);
 	let hour = $derived(Math.floor(total / 60));
@@ -33,13 +32,6 @@
 	function set(minutes: number) {
 		const wrapped = (minutes + MINUTES_PER_DAY) % MINUTES_PER_DAY;
 		if (wrapped !== total) onchange(wrapped / 60);
-	}
-
-	function show() {
-		const box = trigger!.getBoundingClientRect();
-		const above = window.innerHeight - box.bottom < POPOVER_HEIGHT && box.top > window.innerHeight / 2;
-		position = { left: box.left, top: above ? box.top - GAP : box.bottom + GAP, above };
-		open = true;
 	}
 
 	function keydown(event: KeyboardEvent) {
@@ -59,8 +51,6 @@
 	}
 </script>
 
-<svelte:window onblur={() => (open = false)} onresize={() => (open = false)} />
-
 <button
 	bind:this={trigger}
 	type="button"
@@ -69,31 +59,32 @@
 	aria-haspopup="dialog"
 	aria-expanded={open}
 	aria-label="{label}, {timeLabel(hour, minute)}"
-	onclick={() => (open ? (open = false) : show())}
+	onclick={() => (open = !open)}
 	onkeydown={keydown}
 >
 	<span class="tabular-nums">{timeLabel(hour, minute)}</span>
 	<Clock size={15} class="text-[var(--text-muted)]" />
 </button>
 
-{#if open}
-	<div class="backdrop" role="presentation" onpointerdown={() => (open = false)}></div>
-	<div class="popover" class:above={position.above} role="dialog" aria-label={label} style:left="{position.left}px" style:top="{position.top}px">
-		<div class="column soft-scroll" role="listbox" aria-label="Hour" {@attach centerSelected}>
-			{#each HOURS as option (option)}
-				<button type="button" role="option" aria-selected={option === hour} onclick={() => set(option * 60 + minute)}>
-					{hourLabel(option)}
-				</button>
-			{/each}
+{#if open && trigger}
+	<Popover anchor={trigger} {label} role="dialog" maxHeight={POPOVER_HEIGHT} onclose={() => (open = false)}>
+		<div class="columns">
+			<div class="column soft-scroll" role="listbox" aria-label="Hour" {@attach centerSelected}>
+				{#each HOURS as option (option)}
+					<button type="button" role="option" aria-selected={option === hour} onclick={() => set(option * 60 + minute)}>
+						{hourLabel(option)}
+					</button>
+				{/each}
+			</div>
+			<div class="column soft-scroll" role="listbox" aria-label="Minute" {@attach centerSelected}>
+				{#each MINUTES as option (option)}
+					<button type="button" role="option" aria-selected={option === minute} onclick={() => set(hour * 60 + option)}>
+						{pad(option)}
+					</button>
+				{/each}
+			</div>
 		</div>
-		<div class="column soft-scroll" role="listbox" aria-label="Minute" {@attach centerSelected}>
-			{#each MINUTES as option (option)}
-				<button type="button" role="option" aria-selected={option === minute} onclick={() => set(hour * 60 + option)}>
-					{pad(option)}
-				</button>
-			{/each}
-		</div>
-	</div>
+	</Popover>
 {/if}
 
 <style>
@@ -118,28 +109,11 @@
 		background: var(--control-hover);
 	}
 
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: 40;
-	}
-
-	.popover {
-		position: fixed;
-		z-index: 41;
+	.columns {
 		display: flex;
+		height: 248px;
+		min-height: 0;
 		gap: 4px;
-		height: 260px;
-		padding: 6px;
-		border-radius: 18px;
-		background: var(--popover);
-		box-shadow: 0 12px 40px var(--shadow-soft);
-		animation: open 160ms var(--ease);
-	}
-
-	.popover.above {
-		transform: translateY(-100%);
-		animation-name: open-above;
 	}
 
 	.column {
@@ -168,19 +142,5 @@
 	.column button[aria-selected='true'] {
 		background: var(--accent);
 		color: var(--accent-text);
-	}
-
-	@keyframes open {
-		from {
-			opacity: 0;
-			transform: translateY(-4px);
-		}
-	}
-
-	@keyframes open-above {
-		from {
-			opacity: 0;
-			transform: translateY(calc(-100% + 4px));
-		}
 	}
 </style>

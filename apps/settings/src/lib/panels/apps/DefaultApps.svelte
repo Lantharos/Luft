@@ -8,10 +8,7 @@
 	import Image from '@lucide/svelte/icons/image';
 	import Mail from '@lucide/svelte/icons/mail';
 	import Music from '@lucide/svelte/icons/music';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Select from '$lib/components/controls/Select.svelte';
-	import AppIcon from './AppIcon.svelte';
+	import { AppIcon, Row, Section, Select } from '@luft/ui';
 	import { defaults, setDefault, type Category, type Handler } from './api';
 
 	const CATEGORIES: Record<Category, { title: string; icon: Component }> = {

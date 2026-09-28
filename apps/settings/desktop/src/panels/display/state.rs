@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
+use luft_app::dbus;
 use serde::Serialize;
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
-
-use crate::dbus;
 
 pub type Properties = HashMap<String, OwnedValue>;
 pub type MonitorSpec = (String, String, String, String);

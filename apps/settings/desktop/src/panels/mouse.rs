@@ -1,10 +1,8 @@
 use std::fs;
 
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
-
-use crate::bridge::Commands;
-use crate::events::Events;
 
 const UDEV_DATA: &str = "/run/udev/data";
 const INPUT_DEVICE_PREFIX: &str = "c13:";

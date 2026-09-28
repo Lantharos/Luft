@@ -1,11 +1,6 @@
 <script lang="ts">
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Segmented from '$lib/components/controls/Segmented.svelte';
-	import Select from '$lib/components/controls/Select.svelte';
-	import Slider from '$lib/components/controls/Slider.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Section, Segmented, Select, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { chooseImage, wallpapers, type Wallpaper } from './api';

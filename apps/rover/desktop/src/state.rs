@@ -1,11 +1,10 @@
-use std::env;
 use std::sync::Arc;
 
+use luft_app::{Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
 
 use crate::APP_NAME;
-use crate::events::Events;
 use crate::files::entries::{self, UserDirs};
 use crate::files::operations::OperationsQueue;
 use crate::files::watch::DirectoryWatcher;
@@ -31,7 +30,8 @@ pub struct AppState {
     launch_paths: Vec<String>,
     settings: Settings,
     user_dirs: Option<UserDirs>,
-    translucent: bool,
+    #[serde(flatten)]
+    appearance: Appearance,
 }
 
 impl RoverState {
@@ -63,7 +63,7 @@ impl RoverState {
             launch_paths: self.launch_paths.to_vec(),
             settings: self.settings.read().clone(),
             user_dirs: self.user_dirs.as_ref().clone(),
-            translucent: env::var_os("WAYLAND_DISPLAY").is_some(),
+            appearance: Appearance::current(),
         }
     }
 }

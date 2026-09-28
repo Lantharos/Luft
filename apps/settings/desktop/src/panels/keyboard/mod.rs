@@ -4,12 +4,10 @@ mod shortcuts;
 use std::collections::HashMap;
 
 use gio::prelude::*;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
-
-use crate::bridge::Commands;
-use crate::events::Events;
 
 #[derive(Deserialize)]
 struct Apps {

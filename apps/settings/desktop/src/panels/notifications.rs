@@ -1,13 +1,12 @@
 use std::collections::HashSet;
 
 use gio::prelude::*;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
 
 use super::apps::info::App;
-use crate::bridge::Commands;
-use crate::events::Events;
 
 const SCHEMA: &str = "org.gnome.desktop.notifications";
 const APPLICATION_SCHEMA: &str = "org.gnome.desktop.notifications.application";

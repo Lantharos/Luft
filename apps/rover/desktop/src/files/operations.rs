@@ -2,10 +2,11 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
+use luft_app::Events;
 use parking_lot::{Mutex, RwLock};
 use serde::Serialize;
 
-use crate::events::{Events, OPERATIONS_CHANGED};
+use crate::events::OPERATIONS_CHANGED;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;

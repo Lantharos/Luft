@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
+	import { Dialog } from '@luft/ui';
 	import type { DetailRow } from './describe';
 
 	interface Props {

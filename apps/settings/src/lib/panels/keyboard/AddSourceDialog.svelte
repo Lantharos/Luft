@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
+	import { Dialog } from '@luft/ui';
 	import type { Layout } from './api';
 
 	interface Props {

@@ -2,10 +2,8 @@ use sabine::{BridgeError, SabineWindow};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
-use crate::events::Events;
-
 pub type Handler<Req, Res> = fn(Req) -> Result<Res, String>;
-pub type EventHandler<Req, Res> = fn(&Events, Req) -> Result<Res, String>;
+pub type ContextHandler<C, Req, Res> = fn(&C, Req) -> Result<Res, String>;
 
 pub trait Commands {
     fn command<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
@@ -14,12 +12,16 @@ pub trait Commands {
         handler: Handler<Req, Res>,
     ) -> Self;
 
-    fn with_events<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
+    fn with<C, Req, Res>(
         self,
         name: &str,
-        events: &Events,
-        handler: EventHandler<Req, Res>,
-    ) -> Self;
+        context: &C,
+        handler: ContextHandler<C, Req, Res>,
+    ) -> Self
+    where
+        C: Clone + Send + Sync + 'static,
+        Req: DeserializeOwned + 'static,
+        Res: Serialize + 'static;
 }
 
 impl Commands for SabineWindow {
@@ -33,15 +35,20 @@ impl Commands for SabineWindow {
         })
     }
 
-    fn with_events<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
+    fn with<C, Req, Res>(
         self,
         name: &str,
-        events: &Events,
-        handler: EventHandler<Req, Res>,
-    ) -> Self {
-        let events = events.clone();
+        context: &C,
+        handler: ContextHandler<C, Req, Res>,
+    ) -> Self
+    where
+        C: Clone + Send + Sync + 'static,
+        Req: DeserializeOwned + 'static,
+        Res: Serialize + 'static,
+    {
+        let context = context.clone();
         self.bridge_typed(name, move |request| {
-            handler(&events, request).map_err(BridgeError::new)
+            handler(&context, request).map_err(BridgeError::new)
         })
     }
 }

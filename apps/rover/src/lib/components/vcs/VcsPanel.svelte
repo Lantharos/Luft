@@ -29,7 +29,7 @@
 
 {#if vcs.panelOpen && vcs.project}
 	<aside
-		class="flex h-full w-[400px] min-w-[340px] max-w-[42vw] shrink-0 flex-col bg-[var(--surface)] text-[var(--text)] shadow-[inset_1px_0_0_var(--hairline),inset_0_1px_0_var(--hairline)]"
+		class="flex h-full w-[400px] min-w-[340px] max-w-[42vw] shrink-0 flex-col bg-[var(--raised)] text-[var(--text)] shadow-[inset_1px_0_0_var(--hairline),inset_0_1px_0_var(--hairline)]"
 		aria-label="Version Control"
 	>
 		<header class="flex h-12 shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
@@ -38,7 +38,7 @@
 				<div class="truncate text-[12px] text-[var(--text-muted)]">{projectSummary(vcs.project)}</div>
 			</div>
 			<button
-				class="tool-button h-8 min-h-8 w-8 min-w-8"
+				class="icon-button"
 				type="button"
 				aria-label="Collapse version control"
 				onclick={() => (vcs.panelOpen = false)}
@@ -72,7 +72,7 @@
 
 			<div class="flex flex-wrap items-center gap-2">
 				<button
-					class="command-button"
+					class="button large"
 					type="button"
 					disabled={vcs.project.changedCount === 0 || Boolean(vcs.busy)}
 					onclick={() => vcs.openSaveDialog()}
@@ -80,11 +80,11 @@
 					<Icon name="check" size={16} />
 					<span>{primaryActionLabel(vcs.project)}</span>
 				</button>
-				<button class="command-button" type="button" disabled={Boolean(vcs.busy)} onclick={() => vcs.sync()}>
+				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={() => vcs.sync()}>
 					<Icon name="refresh" size={16} />
 					<span>Sync</span>
 				</button>
-				<button class="tool-button" type="button" aria-label="Refresh VCS status" onclick={vcs.refresh}>
+				<button class="icon-button large" type="button" aria-label="Refresh VCS status" onclick={vcs.refresh}>
 					<Icon name="refresh" size={16} />
 				</button>
 			</div>
@@ -111,7 +111,7 @@
 									{#each group.files as file (file.path)}
 										<button
 											class={[
-												'flex min-h-9 min-w-0 items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color] duration-150 hover:bg-[var(--surface-soft)] hover:text-[var(--text)]',
+												'flex min-h-9 min-w-0 items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color] duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--text)]',
 												vcs.diffPath === file.path ? 'bg-[var(--selection)] text-[var(--text)]' : ''
 											]}
 											type="button"

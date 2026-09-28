@@ -4,14 +4,13 @@ mod saved;
 mod snapshot;
 mod watch;
 
+use luft_app::dbus;
+use luft_app::dbus::objects::Objects;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::dbus::objects::Objects;
-use crate::events::Events;
 use snapshot::Network;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";
@@ -67,7 +66,7 @@ fn open(events: &Events, _: Value) -> Result<Network, String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("network_open", events, open)
+        .with("network_open", events, open)
         .command("network_close", |_: Value| {
             watch::close();
             Ok(())

@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Dialog, Row, Switch } from '@luft/ui';
 	import type { SettingsGroup } from '$lib/state/gsettings.svelte';
 	import type { AppOptions, NotifyingApp } from './api';
 
@@ -23,7 +21,7 @@
 {/snippet}
 
 <Dialog title={app.name} description={off ? 'Notifications from this app are turned off.' : undefined} {onclose}>
-	<div class="group">
+	<div class="row-group">
 		<Row title="Allow notifications">
 			{@render toggle('enable', 'Allow notifications', false)}
 		</Row>

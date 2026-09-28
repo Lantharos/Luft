@@ -5,11 +5,8 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { onMount } from 'svelte';
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { IconButton, Row, Section, Switch } from '@luft/ui';
 	import DetailsDialog from './DetailsDialog.svelte';
-	import IconButton from '$lib/components/controls/IconButton.svelte';
 	import WifiSection from './WifiSection.svelte';
 	import { activate, close, deactivate, disconnect, onChanged, onFailed, open, setAirplane, setWifi, type Network, type Vpn, type Wifi, type Wired } from './api';
 	import { detailRows, linkLabel, speedLabel } from './describe';

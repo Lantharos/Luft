@@ -19,11 +19,9 @@ fn proxy() -> Result<Proxy<'static>, String> {
     Proxy::new(dbus::session()?, DESTINATION, PATH, INTERFACE).map_err(|error| error.to_string())
 }
 
-pub fn accent() -> Result<Option<Accent>, String> {
-    let color = proxy()?.get_property::<String>("AccentColor").ok();
-    Ok(color
-        .filter(|color| !color.is_empty())
-        .map(|color| Accent { color }))
+pub fn accent() -> Option<Accent> {
+    let color = proxy().ok()?.get_property::<String>("AccentColor").ok()?;
+    (!color.is_empty()).then_some(Accent { color })
 }
 
 pub fn watch_accent(events: Events) {

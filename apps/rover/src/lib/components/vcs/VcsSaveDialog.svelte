@@ -45,12 +45,12 @@
 	<div class="fixed inset-0 z-[90] grid place-items-center bg-black/28 px-4">
 		<button class="absolute inset-0 h-full w-full" type="button" aria-label="Cancel" onclick={close}></button>
 		<section
-			class="relative z-10 flex max-h-[min(680px,calc(100dvh-32px))] w-[520px] max-w-full flex-col rounded-[18px] bg-[var(--surface)] text-[var(--text)] shadow-[0_24px_80px_var(--shadow-soft),inset_0_1px_0_var(--hairline)]"
+			class="relative z-10 flex max-h-[min(680px,calc(100dvh-32px))] w-[520px] max-w-full flex-col rounded-[18px] bg-[var(--raised)] text-[var(--text)] shadow-[0_24px_80px_var(--shadow-soft),inset_0_1px_0_var(--hairline)]"
 			aria-label={`${actionLabel} changes`}
 		>
 			<header class="flex h-[52px] shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
 				<div class="text-[14px] font-medium">{actionLabel} changes</div>
-				<button class="tool-button" type="button" aria-label="Close" onclick={close}>
+				<button class="icon-button large" type="button" aria-label="Close" onclick={close}>
 					<Icon name="x" size={16} />
 				</button>
 			</header>
@@ -76,7 +76,7 @@
 					<div class="soft-scroll max-h-[280px] overflow-auto rounded-[14px] bg-[var(--content)] p-1 shadow-[inset_0_0_0_1px_var(--hairline)]">
 						{#each files as file (file.path)}
 							<button
-								class="flex min-h-10 w-full items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color,opacity] duration-150 hover:bg-[var(--surface-soft)] hover:text-[var(--text)]"
+								class="flex min-h-10 w-full items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color,opacity] duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
 								type="button"
 								aria-pressed={selected.includes(file.path)}
 								onclick={() => toggle(file.path)}
@@ -84,7 +84,7 @@
 								<span
 									class={[
 										'grid h-5 w-5 shrink-0 place-items-center rounded-[7px] shadow-[inset_0_0_0_1px_var(--hairline)]',
-										selected.includes(file.path) ? 'bg-[var(--accent)] text-[var(--text-inverse)]' : 'bg-[var(--control)]'
+										selected.includes(file.path) ? 'bg-[var(--text)] text-[var(--text-inverse)]' : 'bg-[var(--control)]'
 									]}
 								>
 									{#if selected.includes(file.path)}
@@ -106,8 +106,8 @@
 			</div>
 
 			<footer class="flex shrink-0 justify-end gap-2 px-4 py-4 shadow-[inset_0_1px_0_var(--hairline)]">
-				<button class="command-button" type="button" disabled={Boolean(vcs.busy)} onclick={close}>Cancel</button>
-				<button class="command-button" type="button" disabled={!canSubmit} onclick={submit}>
+				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={close}>Cancel</button>
+				<button class="button large" type="button" disabled={!canSubmit} onclick={submit}>
 					{vcs.busy === 'save' ? `${actionLabel}...` : actionLabel}
 				</button>
 			</footer>

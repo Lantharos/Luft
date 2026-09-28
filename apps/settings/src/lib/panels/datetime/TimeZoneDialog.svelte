@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
+	import { Dialog } from '@luft/ui';
 	import { setTimezone, type Zone } from './api';
 	import { city, country, offsetLabel, offsetMinutes, shortTime } from './zones';
 

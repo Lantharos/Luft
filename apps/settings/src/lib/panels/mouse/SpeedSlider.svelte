@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Slider from '$lib/components/controls/Slider.svelte';
+	import { Slider } from '@luft/ui';
 
 	interface Props {
 		label: string;

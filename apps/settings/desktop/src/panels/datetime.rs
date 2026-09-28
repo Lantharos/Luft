@@ -2,14 +2,12 @@ use std::collections::HashMap;
 use std::fs;
 use std::sync::Once;
 
+use luft_app::dbus;
+use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::Proxy;
-
-use crate::bridge::Commands;
-use crate::dbus;
-use crate::events::Events;
 
 pub const CLOCK_CHANGED: &str = "datetime.changed";
 
@@ -144,7 +142,7 @@ fn set_time(Time { usec }: Time) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with_events("datetime_clock", events, clock)
+        .with("datetime_clock", events, clock)
         .command("datetime_zones", zones)
         .command("datetime_set_timezone", set_timezone)
         .command("datetime_set_automatic", set_automatic)

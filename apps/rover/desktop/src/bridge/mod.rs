@@ -1,8 +1,7 @@
 mod params;
 
-use sabine::{BridgeError, SabineWindow};
-use serde::Serialize;
-use serde::de::DeserializeOwned;
+use luft_app::Commands;
+use sabine::SabineWindow;
 
 use crate::drives;
 use crate::files::{entries, transfer, trash};
@@ -12,47 +11,6 @@ use crate::settings;
 use crate::state::RoverState;
 use crate::vcs;
 use params::*;
-
-type Handler<Req, Res> = fn(&RoverState, Req) -> Result<Res, String>;
-
-trait Commands {
-    fn command<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
-        self,
-        name: &str,
-        handler: fn(Req) -> Result<Res, String>,
-    ) -> Self;
-
-    fn stateful<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
-        self,
-        name: &str,
-        state: &RoverState,
-        handler: Handler<Req, Res>,
-    ) -> Self;
-}
-
-impl Commands for SabineWindow {
-    fn command<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
-        self,
-        name: &str,
-        handler: fn(Req) -> Result<Res, String>,
-    ) -> Self {
-        self.bridge_typed(name, move |request| {
-            handler(request).map_err(BridgeError::new)
-        })
-    }
-
-    fn stateful<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
-        self,
-        name: &str,
-        state: &RoverState,
-        handler: Handler<Req, Res>,
-    ) -> Self {
-        let state = state.clone();
-        self.bridge_typed(name, move |request| {
-            handler(&state, request).map_err(BridgeError::new)
-        })
-    }
-}
 
 pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = register_files(window, state);
@@ -66,7 +24,7 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("list_directory", |Listing { path, show_hidden }| {
             entries::list_directory(path, show_hidden)
         })
-        .stateful("watch_directory", state, |state, Path { path }| {
+        .with("watch_directory", state, |state, Path { path }| {
             state.watcher.watch(path)
         })
         .command("get_file_info", |Path { path }| {
@@ -81,7 +39,7 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("rename_item", |Rename { path, new_name }| {
             entries::rename_item(path, new_name)
         })
-        .stateful(
+        .with(
             "copy_items",
             state,
             |state,
@@ -90,7 +48,7 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                  destination,
              }| { transfer::copy_items(sources, destination, &state.queue) },
         )
-        .stateful(
+        .with(
             "move_items",
             state,
             |state,
@@ -111,30 +69,30 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
 fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
         .command("list_trash", |Empty {}| trash::list_trash())
-        .stateful("move_to_trash", state, |state, Paths { paths }| {
+        .with("move_to_trash", state, |state, Paths { paths }| {
             trash::move_to_trash(paths, &state.queue)
         })
-        .stateful("restore_from_trash", state, |state, Ids { ids }| {
+        .with("restore_from_trash", state, |state, Ids { ids }| {
             trash::restore(ids, &state.queue)
         })
-        .stateful("delete_permanently", state, |state, Ids { ids }| {
+        .with("delete_permanently", state, |state, Ids { ids }| {
             trash::delete_permanently(ids, &state.queue)
         })
         .command("empty_trash", |TrashLocation { trash_path }| {
             trash::empty_trash(trash_path)
         })
-        .stateful("list_operations", state, |state, Empty {}| {
+        .with("list_operations", state, |state, Empty {}| {
             Ok(state.queue.operations())
         })
-        .stateful("cancel_operation", state, |state, Id { id }| {
+        .with("cancel_operation", state, |state, Id { id }| {
             state.queue.cancel(&id);
             Ok(())
         })
-        .stateful("pause_operation", state, |state, Id { id }| {
+        .with("pause_operation", state, |state, Id { id }| {
             state.queue.pause(&id);
             Ok(())
         })
-        .stateful("resume_operation", state, |state, Id { id }| {
+        .with("resume_operation", state, |state, Id { id }| {
             state.queue.resume(&id);
             Ok(())
         })
@@ -143,7 +101,7 @@ fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {
 fn register_vcs(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
         .command("vcs_root", |Path { path }| Ok(vcs::root(path)))
-        .stateful("vcs_status", state, |state, VcsRoot { root }| {
+        .with("vcs_status", state, |state, VcsRoot { root }| {
             Ok(vcs::start_status(root, state.events.clone()))
         })
         .command("vcs_diff", |VcsDiff { root, file_path }| {
@@ -162,7 +120,7 @@ fn register_vcs(window: SabineWindow, state: &RoverState) -> SabineWindow {
 
 fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
-        .stateful("app_state", state, |state, Empty {}| Ok(state.app_state()))
+        .with("app_state", state, |state, Empty {}| Ok(state.app_state()))
         .command(
             "resolve_arguments",
             |Arguments {
@@ -176,20 +134,20 @@ fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
                 ))
             },
         )
-        .stateful(
+        .with(
             "update_settings",
             state,
             |state, SettingsUpdate { settings }| {
                 settings::update_settings(settings, &state.settings)
             },
         )
-        .stateful("accept_chooser", state, |state, Paths { paths }| {
+        .with("accept_chooser", state, |state, Paths { paths }| {
             chooser(state)?.respond(ChooserResponse {
                 accepted: true,
                 paths,
             })
         })
-        .stateful("cancel_chooser", state, |state, Empty {}| {
+        .with("cancel_chooser", state, |state, Empty {}| {
             chooser(state)?.respond(ChooserResponse::default())
         })
 }

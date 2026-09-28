@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Dialog from '$lib/components/controls/Dialog.svelte';
-	import Segmented from '$lib/components/controls/Segmented.svelte';
+	import { Dialog, Segmented } from '@luft/ui';
 	import { setTime } from './api';
 	import Calendar from './Calendar.svelte';
 	import TimeStepper from './TimeStepper.svelte';

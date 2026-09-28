@@ -1,0 +1,15 @@
+[package]
+name = "luft-app"
+version = "0.1.0"
+description = "Native bootstrap shared by Luft apps"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.90"
+
+[dependencies]
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.30" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", default-features = false, features = ["rt-multi-thread", "sync"] }
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

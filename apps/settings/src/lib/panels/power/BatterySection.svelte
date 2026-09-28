@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Row from '$lib/components/controls/Row.svelte';
-	import Section from '$lib/components/controls/Section.svelte';
-	import Switch from '$lib/components/controls/Switch.svelte';
+	import { Row, Section, Switch } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import type { Battery } from './api';
 	import { duration } from './duration';

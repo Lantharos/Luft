@@ -1,3 +1,5 @@
+import type { Appearance } from '@luft/ui';
+
 export interface FileEntry {
 	name: string;
 	path: string;
@@ -119,12 +121,11 @@ export interface Settings {
 	pinnedFolders: PinnedFolder[];
 }
 
-export interface AppState {
+export interface AppState extends Appearance {
 	chooser: ChooserConfig | null;
 	launchPaths: string[];
 	settings: Settings;
 	userDirs: UserDirs | null;
-	translucent: boolean;
 }
 
 export interface TabHistoryEntry {

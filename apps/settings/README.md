@@ -1,6 +1,6 @@
 # Settings
 
-Settings is the system settings app for Luft, built with Sabine and SvelteKit. It lives at `apps/settings`; run the commands below from that directory.
+Settings is the system settings app for Luft, built with Sabine and SvelteKit. It lives at `apps/settings`; run the commands below from that directory unless noted otherwise.
 
 ## Pages
 
@@ -25,8 +25,10 @@ The sidebar uses the compositor's background blur on Wayland compositors that su
 
 ## Development
 
+Settings shares its controls, styles and window setup with the other Luft apps through `packages/ui` and `packages/app`, so install dependencies once from the repository root:
+
 ```bash
-bun install
+bun install              # from the repository root
 bun run desktop:dev      # Vite dev server and the native window
 bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary

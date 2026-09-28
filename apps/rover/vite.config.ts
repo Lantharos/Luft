@@ -1,9 +1,10 @@
+import { luftFonts } from '@luft/ui/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit()],
+	plugins: [luftFonts(), tailwindcss(), sveltekit()],
 	clearScreen: false,
 	build: {
 		rolldownOptions: {

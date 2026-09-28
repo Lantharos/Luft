@@ -5,8 +5,7 @@ use libpulse_binding::context::Context;
 use libpulse_binding::def::BufferAttr;
 use libpulse_binding::sample::{Format, Spec};
 use libpulse_binding::stream::{FlagSet, PeekResult, Stream};
-
-use crate::events::Events;
+use luft_app::Events;
 
 const SOUND_LEVEL: &str = "sound.level";
 const UPDATES_PER_SECOND: u32 = 25;

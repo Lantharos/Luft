@@ -118,7 +118,7 @@
 				</div>
 				<div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(245,245,242,0.08)]">
 					<div
-						class="h-full rounded-full bg-[var(--accent)] transition-[width] duration-200"
+						class="h-full rounded-full bg-[var(--text)] transition-[width] duration-200"
 						style:width={`${Math.max(2, Math.round(operation.progress * 100))}%`}
 					></div>
 				</div>
@@ -127,15 +127,15 @@
 					{#if isActive(operation)}
 						<div class="flex shrink-0 items-center gap-1">
 							{#if operation.status === 'InProgress'}
-								<button class="tool-button h-8 min-h-8 w-8 min-w-8" type="button" aria-label="Pause" onclick={() => api.pauseOperation(operation.id)}>
+								<button class="icon-button" type="button" aria-label="Pause" onclick={() => api.pauseOperation(operation.id)}>
 									<Icon name="pause" size={14} />
 								</button>
 							{:else}
-								<button class="tool-button h-8 min-h-8 w-8 min-w-8" type="button" aria-label="Resume" onclick={() => api.resumeOperation(operation.id)}>
+								<button class="icon-button" type="button" aria-label="Resume" onclick={() => api.resumeOperation(operation.id)}>
 									<Icon name="play" size={14} />
 								</button>
 							{/if}
-							<button class="tool-button h-8 min-h-8 w-8 min-w-8" type="button" aria-label="Cancel" onclick={() => api.cancelOperation(operation.id)}>
+							<button class="icon-button" type="button" aria-label="Cancel" onclick={() => api.cancelOperation(operation.id)}>
 								<Icon name="x" size={14} />
 							</button>
 						</div>

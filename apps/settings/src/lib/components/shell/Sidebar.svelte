@@ -94,7 +94,7 @@
 	}
 
 	.nav-item:hover {
-		background: var(--sidebar-active);
+		background: var(--sidebar-control);
 		color: var(--text);
 	}
 

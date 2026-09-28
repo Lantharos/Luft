@@ -84,7 +84,9 @@ pub fn build_window(window: SabineWindow, args: &[String]) -> SabineResult<Sabin
             .single_instance(SingleInstancePolicy::FocusExisting);
     }
 
-    window = window.security(ContentSecurity::default());
+    window = window
+        .security(ContentSecurity::default())
+        .local_files(true);
 
     Ok(register_commands(window, state))
 }

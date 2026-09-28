@@ -1,6 +1,5 @@
 mod actions;
 pub mod airplane;
-pub mod objects;
 mod saved;
 mod snapshot;
 mod watch;
@@ -12,7 +11,7 @@ use serde_json::Value;
 use crate::bridge::Commands;
 use crate::dbus;
 use crate::events::Events;
-use objects::Objects;
+use crate::dbus::objects::Objects;
 use snapshot::Network;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";

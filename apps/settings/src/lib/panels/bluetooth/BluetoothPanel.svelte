@@ -7,8 +7,8 @@
 	import Row from '$lib/components/controls/Row.svelte';
 	import Section from '$lib/components/controls/Section.svelte';
 	import Switch from '$lib/components/controls/Switch.svelte';
-	import ActionRow from '$lib/panels/network/ActionRow.svelte';
-	import IconButton from '$lib/panels/network/IconButton.svelte';
+	import ActionRow from '$lib/components/controls/ActionRow.svelte';
+	import IconButton from '$lib/components/controls/IconButton.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import {
 		close,

@@ -8,7 +8,7 @@ use zbus::Message;
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
-use super::objects::{self, failed};
+use crate::dbus::objects::{self, failed};
 use super::{CONNECTION, DEVICE, MANAGER_PATH, SERVICE, airplane, saved, snapshot};
 use crate::dbus;
 use crate::events::Events;

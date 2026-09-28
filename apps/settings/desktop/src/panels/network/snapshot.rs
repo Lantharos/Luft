@@ -4,7 +4,7 @@ use std::net::Ipv6Addr;
 use serde::Serialize;
 use zbus::zvariant::OwnedValue;
 
-use super::objects::{Object, Objects};
+use crate::dbus::objects::{Object, Objects};
 use super::saved::{self, Kind, Saved};
 use super::{ACCESS_POINT, ACTIVE, DEVICE, MANAGER, MANAGER_PATH, WIRED, WIRELESS};
 

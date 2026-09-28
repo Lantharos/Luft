@@ -7,7 +7,7 @@ use tokio::sync::oneshot;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedValue};
 
-use super::network::objects::failed;
+use crate::dbus::objects::failed;
 use super::{DEVICE, SERVICE};
 use crate::dbus;
 use crate::events::Events;

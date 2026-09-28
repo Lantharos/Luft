@@ -238,4 +238,3 @@ where
 {
     OwnedValue::try_from(Value::from(value)).expect("URI lists always fit in a D-Bus variant")
 }
-

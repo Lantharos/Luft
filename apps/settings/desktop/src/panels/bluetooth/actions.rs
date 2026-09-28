@@ -84,25 +84,31 @@ pub fn forget(device: &str) -> Result<(), String> {
         .map_err(explain)
 }
 
+pub fn set_trusted(device: &str, trusted: bool) -> Result<(), String> {
+    proxy(device, DEVICE)?
+        .set_property("Trusted", trusted)
+        .map_err(failed)
+}
+
+pub fn set_visible(adapter: &Adapter, visible: bool, timeout: u32) -> Result<(), String> {
+    let proxy = proxy(&adapter.path, ADAPTER)?;
+    proxy
+        .set_property("DiscoverableTimeout", timeout)
+        .map_err(failed)?;
+    proxy.set_property("Discoverable", visible).map_err(failed)
+}
+
 pub fn browse(adapter: &Adapter) {
-    if !adapter.powered {
-        return;
-    }
-    let Ok(proxy) = proxy(&adapter.path, ADAPTER) else {
-        return;
-    };
-    if !adapter.discovering {
+    if adapter.powered
+        && !adapter.discovering
+        && let Ok(proxy) = proxy(&adapter.path, ADAPTER)
+    {
         let _ = proxy.call_method("StartDiscovery", &());
-    }
-    if !adapter.discoverable {
-        let _ = proxy.set_property("Discoverable", true);
     }
 }
 
 pub fn stop_browsing(adapter: &Adapter) {
-    let Ok(proxy) = proxy(&adapter.path, ADAPTER) else {
-        return;
-    };
-    let _ = proxy.call_method("StopDiscovery", &());
-    let _ = proxy.set_property("Discoverable", false);
+    if let Ok(proxy) = proxy(&adapter.path, ADAPTER) {
+        let _ = proxy.call_method("StopDiscovery", &());
+    }
 }

@@ -1,9 +1,11 @@
 <script lang="ts">
 	import BluetoothIcon from '@lucide/svelte/icons/bluetooth';
+	import Eye from '@lucide/svelte/icons/eye';
+	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import Trash from '@lucide/svelte/icons/trash';
 	import { onMount } from 'svelte';
-	import { ActionRow, Dialog, IconButton, Row, Section, Switch } from '@luft/ui';
+	import { ActionRow, Dialog, IconButton, Row, Section, Select, Switch } from '@luft/ui';
+	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import {
 		close,
@@ -16,6 +18,8 @@
 		open,
 		pair,
 		setPowered,
+		setTrusted,
+		setVisible,
 		type Adapter,
 		type Bluetooth,
 		type Device,
@@ -31,21 +35,53 @@
 		pairing: 'Pairing…'
 	};
 
+	const VISIBILITY = [
+		{ value: 180, label: 'For 3 minutes' },
+		{ value: 600, label: 'For 10 minutes' },
+		{ value: 1800, label: 'For 30 minutes' },
+		{ value: 0, label: 'Until turned off' }
+	];
+
 	let bluetooth = $state<Bluetooth | null>(null);
 	let request = $state<PairingRequest | null>(null);
 	let forgetting = $state<Device | null>(null);
+	let inspecting = $state<string | null>(null);
 	let busy = $state<Record<string, Busy>>({});
 	let problems = $state<Record<string, string>>({});
 
 	let adapter = $derived(bluetooth?.adapter ?? null);
+	let inspected = $derived(bluetooth?.paired.find((device) => device.path === inspecting));
 
 	function explain(reason: unknown) {
 		return reason instanceof Error ? reason.message : String(reason);
 	}
 
 	function adapterSummary(adapter: Adapter) {
-		if (!adapter.powered) return 'Off';
-		return adapter.discoverable ? `Visible to nearby devices as “${adapter.name}”` : 'On';
+		if (bluetooth?.hardwareBlocked) return 'Turned off with a hardware switch';
+		return adapter.powered ? 'On' : 'Off';
+	}
+
+	function visibilityOptions(adapter: Adapter) {
+		const timeout = adapter.discoverableTimeout;
+		if (VISIBILITY.some((option) => option.value === timeout)) return VISIBILITY;
+		return [...VISIBILITY, { value: timeout, label: `For ${Math.round(timeout / 60)} minutes` }];
+	}
+
+	async function changeVisibility(visible: boolean, timeout: number) {
+		delete problems.visibility;
+		try {
+			await setVisible(visible, timeout);
+		} catch {
+			problems.visibility = "Couldn't change whether this computer is visible";
+		}
+	}
+
+	async function trust(device: Device, trusted: boolean) {
+		try {
+			await setTrusted(device.path, trusted);
+		} catch (reason) {
+			problems[device.path] = explain(reason);
+		}
 	}
 
 	function receive(next: PairingRequest) {
@@ -87,6 +123,11 @@
 		}
 	}
 
+	function startForget(device: Device) {
+		inspecting = null;
+		forgetting = device;
+	}
+
 	async function confirmForget(device: Device) {
 		forgetting = null;
 		try {
@@ -100,7 +141,7 @@
 		const stops = [onChanged((next) => (bluetooth = next)), onRequest(receive), onCancel(() => (request = null))];
 		open()
 			.then((initial) => (bluetooth = initial))
-			.catch(() => (bluetooth = { adapter: null, paired: [], nearby: [] }));
+			.catch(() => (bluetooth = { adapter: null, hardwareBlocked: false, paired: [], nearby: [] }));
 		return () => {
 			for (const stop of stops) stop();
 			void close();
@@ -116,8 +157,23 @@
 				icon={BluetoothIcon}
 				description={problems.adapter ?? adapterSummary(adapter)}
 			>
-				<Switch label="Bluetooth" checked={adapter.powered} onchange={power} />
+				<Switch label="Bluetooth" checked={adapter.powered} disabled={bluetooth.hardwareBlocked} onchange={power} />
 			</Row>
+			{#if adapter.powered}
+				<Row
+					title="Visible to nearby devices"
+					icon={Eye}
+					description={problems.visibility ?? (adapter.discoverable ? `Shown as “${adapter.name}”` : 'Lets phones and other computers find this one to pair')}
+				>
+					<Select
+						label="Stay visible"
+						options={visibilityOptions(adapter)}
+						value={adapter.discoverableTimeout}
+						onchange={(timeout) => changeVisibility(adapter.discoverable, timeout)}
+					/>
+					<Switch label="Visible to nearby devices" checked={adapter.discoverable} onchange={(on) => changeVisibility(on, adapter.discoverableTimeout)} />
+				</Row>
+			{/if}
 		</Section>
 
 		{#if bluetooth.paired.length}
@@ -137,7 +193,7 @@
 							{/if}
 						{/snippet}
 						{#snippet actions()}
-							<IconButton icon={Trash} label="Forget" onclick={() => (forgetting = device)} />
+							<IconButton icon={Info} label="Device details" onclick={() => (inspecting = device.path)} />
 						{/snippet}
 					</ActionRow>
 				{/each}
@@ -167,6 +223,10 @@
 				{/each}
 			</Section>
 		{/if}
+	{:else if bluetooth.hardwareBlocked}
+		<Section>
+			<Row title="Bluetooth is turned off with a hardware switch" description="Use the switch or key on your computer to turn it back on" icon={BluetoothIcon} />
+		</Section>
 	{:else}
 		<Section>
 			<Row title="No Bluetooth adapter found" description="Plug in an adapter to connect wireless devices" icon={BluetoothIcon} />
@@ -178,6 +238,18 @@
 	{#key request.id}
 		<RequestDialog {request} onclose={() => (request = null)} />
 	{/key}
+{/if}
+
+{#if inspected}
+	{@const device = inspected}
+	<DeviceDialog
+		{device}
+		busy={Boolean(busy[device.path])}
+		ontrust={(trusted) => trust(device, trusted)}
+		ontoggle={() => toggle(device)}
+		onforget={() => startForget(device)}
+		onclose={() => (inspecting = null)}
+	/>
 {/if}
 
 {#if forgetting}

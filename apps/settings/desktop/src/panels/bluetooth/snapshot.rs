@@ -12,7 +12,8 @@ pub struct Adapter {
     pub powered: bool,
     pub blocked: bool,
     pub discovering: bool,
-    pub discoverable: bool,
+    discoverable: bool,
+    discoverable_timeout: u32,
     name: String,
 }
 
@@ -38,8 +39,10 @@ enum Kind {
 pub struct Device {
     path: String,
     name: String,
+    address: String,
     kind: Kind,
     connected: bool,
+    trusted: bool,
     battery: Option<u8>,
 }
 
@@ -47,6 +50,7 @@ pub struct Device {
 #[serde(rename_all = "camelCase")]
 pub struct Bluetooth {
     pub adapter: Option<Adapter>,
+    hardware_blocked: bool,
     paired: Vec<Device>,
     nearby: Vec<Device>,
 }
@@ -72,8 +76,10 @@ fn device(objects: &Objects, device: &Object, name: String) -> Device {
     Device {
         path: device.path.to_owned(),
         name,
+        address: device.get("Address").unwrap_or_default(),
         kind: kind(&device.get::<String>("Icon").unwrap_or_default()),
         connected: device.flag("Connected"),
+        trusted: device.flag("Trusted"),
         battery: objects
             .get(device.path, BATTERY)
             .and_then(|battery| battery.get("Percentage")),
@@ -87,6 +93,7 @@ fn adapter(object: Object) -> Adapter {
         blocked: object.get::<String>("PowerState").as_deref() == Some(BLOCKED),
         discovering: object.flag("Discovering"),
         discoverable: object.flag("Discoverable"),
+        discoverable_timeout: object.get("DiscoverableTimeout").unwrap_or(0),
         name: object.get("Alias").unwrap_or_default(),
     }
 }
@@ -118,6 +125,7 @@ pub fn build(objects: &Objects) -> Bluetooth {
     nearby.sort_by_cached_key(|device| device.name.to_lowercase());
     Bluetooth {
         adapter,
+        hardware_blocked: super::rfkill::hard_blocked(),
         paired,
         nearby,
     }

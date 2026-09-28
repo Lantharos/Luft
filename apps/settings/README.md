@@ -5,7 +5,7 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 ## Pages
 
 - Network: Wi-Fi, wired connections, VPN and proxy, with per-connection settings for IP addresses, DNS, routes, metered data, hardware addresses and work or school Wi-Fi sign-in
-- Bluetooth: pairing, connecting and forgetting devices
+- Bluetooth: pairing, connecting and forgetting devices, visibility to nearby devices, and device details such as battery and automatic connection
 - Displays: arrangement, resolution, refresh rate, scale and night light
 - Sound: output and input devices, volumes and alert sounds
 - Power: power mode, battery, screen blanking and suspend

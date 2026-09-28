@@ -43,6 +43,10 @@ export class TileGrid {
     return this.tiles;
   }
 
+  get animating(): boolean {
+    return !!this.actor.get_transition('height');
+  }
+
   get openMenu(): ControlMenu | null {
     return this.expanded ? this.menus.get(this.expanded)! : null;
   }
@@ -196,7 +200,7 @@ export class TileGrid {
 
     const total = Math.max(0, y - GAP);
     if (animate) {
-      animateActor(this.actor, { height: total, ...MOVE, delay });
+      animateActor(this.actor, { height: total, ...MOVE, delay, onStopped: () => this.events.resized() });
     } else {
       this.actor.remove_transition('height');
       this.actor.height = total;

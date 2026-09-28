@@ -15,7 +15,9 @@ const MIN_WIDTH = 176;
 const MAX_WIDTH = 420;
 const TRAILING_SPACE = 84;
 const SLIDE_DISTANCE = 40;
-const PAGE_MOTION = { duration: 220, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
+const RESIZE = { duration: 160, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
+const SLIDE_OUT = { duration: 120, mode: Clutter.AnimationMode.EASE_IN_QUAD };
+const SLIDE_IN = { duration: 200, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
 
 export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
@@ -161,14 +163,16 @@ export class ContextMenus {
       y: Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))),
     };
     if (direction) {
+      const growing = height >= this.actor.height;
+      const slideDelay = growing ? RESIZE.duration : 0;
       for (const old of previous) {
         old.reactive = false;
-        animateActor(old, { translation_x: -direction * SLIDE_DISTANCE, opacity: 0, ...PAGE_MOTION, onStopped: () => old.destroy() });
+        animateActor(old, { translation_x: -direction * SLIDE_DISTANCE, opacity: 0, ...SLIDE_OUT, delay: slideDelay, onStopped: () => old.destroy() });
       }
       page.translation_x = direction * SLIDE_DISTANCE;
       page.opacity = 0;
-      animateActor(page, { translation_x: 0, opacity: 255, ...PAGE_MOTION });
-      animateActor(this.actor, { ...position, width, height, ...PAGE_MOTION });
+      animateActor(page, { translation_x: 0, opacity: 255, ...SLIDE_IN, delay: slideDelay + SLIDE_OUT.duration / 2 });
+      animateActor(this.actor, { ...position, width, height, ...RESIZE, delay: growing ? 0 : SLIDE_OUT.duration + SLIDE_IN.duration / 2 });
       this.actor.grab_key_focus();
       return;
     }

@@ -128,7 +128,7 @@ export class QuickSettings {
     const contentWidth = width - theme.get_horizontal_padding();
     const chrome = theme.get_vertical_padding();
     this.grid.setWidth(contentWidth - this.scroll.body.get_theme_node().get_horizontal_padding());
-    return this.scroll.measure(contentWidth, limit - chrome) + chrome;
+    return this.scroll.measure(contentWidth, limit - chrome, !this.grid.animating) + chrome;
   }
 
   closeSubmenu(animate = true): boolean {
@@ -263,7 +263,7 @@ export class QuickSettings {
     const chevron = item._menuButton?.child;
     chevron?.set_pivot_point(0.5, 0.5);
     menu.connect('open-state-changed', (_menu, open: boolean) => {
-      if (chevron) animateActor(chevron, { rotation_angle_z: open ? 90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      if (chevron) animateActor(chevron, { rotation_angle_z: open ? -90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
       if (open) this.menuOpened(menu);
       else this.menuClosed(menu);
     });

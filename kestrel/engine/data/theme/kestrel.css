@@ -179,9 +179,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-media-control:insensitive { color: rgba(255, 255, 255, 0.30); }
 
 .kestrel-calendar { spacing: 10px; }
-.kestrel-calendar-today { padding: 0 4px; }
-.kestrel-calendar-weekday { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.62); }
-.kestrel-calendar-date { font-size: 22px; font-weight: 600; }
 .kestrel-calendar-navigation { spacing: 2px; }
 .kestrel-calendar-month { padding: 7px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; transition-duration: 120ms; }
 .kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: rgba(255, 255, 255, 0.10); }
@@ -244,7 +241,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }
 
-.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 18px; background-color: rgba(20, 20, 24, 0.30); color: rgba(255, 255, 255, 0.86); }
+.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 18px; background-color: transparent; color: rgba(255, 255, 255, 0.86); }
 .kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; font-weight: 500; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }

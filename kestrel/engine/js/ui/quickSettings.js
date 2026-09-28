@@ -227,7 +227,7 @@ export const QuickMenuToggle = GObject.registerClass({
             this._menuButton, 'checked',
             GObject.BindingFlags.SYNC_CREATE);
         contents.connect('clicked', (o, button) => this.emit('clicked', button));
-        this._menuButton.connect('clicked', () => this.menu.open());
+        this._menuButton.connect('clicked', () => this.menu.toggle());
         this._menuButton.connect('popup-menu', () => this.emit('popup-menu'));
         contents.connect('popup-menu', () => this.emit('popup-menu'));
         this.connect('popup-menu', () => {
@@ -352,7 +352,7 @@ export const QuickSlider = GObject.registerClass({
         this.bind_property('menu-enabled',
             this._menuButton, 'visible',
             GObject.BindingFlags.SYNC_CREATE);
-        this._menuButton.connect('clicked', () => this.menu.open());
+        this._menuButton.connect('clicked', () => this.menu.toggle());
         this.slider.connect('popup-menu', () => {
             if (this.menuEnabled)
                 this.menu.open();

@@ -5,24 +5,15 @@ import St from 'gi://St';
 const WEEKS = 6;
 const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
 const weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
-const weekdayTitle = new Intl.DateTimeFormat(undefined, { weekday: 'long' });
-const dateTitle = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'long' });
 
 export class Calendar {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar' });
-  private readonly weekday = new St.Label({ style_class: 'kestrel-calendar-weekday' });
-  private readonly date = new St.Label({ style_class: 'kestrel-calendar-date' });
   private readonly month = new St.Button({ style_class: 'kestrel-calendar-month', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.START });
   private readonly days: St.Label[] = [];
   private readonly weekStart = Shell.util_get_week_start();
   private shown = new Date();
 
   constructor() {
-    const today = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar-today' });
-    today.add_child(this.weekday);
-    today.add_child(this.date);
-    this.actor.add_child(today);
-
     const navigation = new St.BoxLayout({ style_class: 'kestrel-calendar-navigation' });
     this.month.connect('clicked', () => this.showToday());
     navigation.add_child(this.month);
@@ -47,8 +38,6 @@ export class Calendar {
 
   showToday(): void {
     const now = new Date();
-    this.weekday.text = weekdayTitle.format(now);
-    this.date.text = dateTitle.format(now);
     this.shown = new Date(now.getFullYear(), now.getMonth(), 1);
     this.render();
   }

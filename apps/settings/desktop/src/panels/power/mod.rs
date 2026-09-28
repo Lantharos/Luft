@@ -1,4 +1,6 @@
 mod battery;
+mod keyboard;
+mod limit;
 mod profiles;
 mod properties;
 
@@ -22,6 +24,7 @@ static WATCH: Once = Once::new();
 struct PowerState {
     battery: Option<battery::Battery>,
     devices: Vec<battery::Device>,
+    keyboard: Option<keyboard::Keyboard>,
     profiles: Option<profiles::Profiles>,
     can_hibernate: bool,
 }
@@ -29,6 +32,17 @@ struct PowerState {
 #[derive(Deserialize)]
 struct Profile {
     profile: String,
+}
+
+#[derive(Deserialize)]
+struct ChargeLimit {
+    enabled: bool,
+}
+
+#[derive(Deserialize)]
+struct Keyboard {
+    id: String,
+    level: i32,
 }
 
 fn failed(error: impl std::fmt::Display) -> String {
@@ -54,6 +68,7 @@ fn read() -> Result<PowerState, String> {
     Ok(PowerState {
         battery,
         devices,
+        keyboard: keyboard::read(connection).ok().flatten(),
         profiles: profiles::read(connection).ok(),
         can_hibernate: can_hibernate(connection),
     })
@@ -91,8 +106,18 @@ fn set_profile(Profile { profile }: Profile) -> Result<(), String> {
     profiles::set(dbus::system()?, &profile)
 }
 
+fn set_charge_limit(ChargeLimit { enabled }: ChargeLimit) -> Result<(), String> {
+    limit::set(dbus::system()?, enabled)
+}
+
+fn set_keyboard(Keyboard { id, level }: Keyboard) -> Result<(), String> {
+    keyboard::set(dbus::system()?, &id, level)
+}
+
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
         .with("power_state", events, state)
         .command("power_set_profile", set_profile)
+        .command("power_set_charge_limit", set_charge_limit)
+        .command("power_set_keyboard", set_keyboard)
 }

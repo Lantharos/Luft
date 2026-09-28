@@ -10,6 +10,7 @@ import { styleControl } from './controlTile.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
+import { KeepAwake } from './keepAwake.js';
 import { animateActor } from '../shared/motion.js';
 import { blurSurface } from '../shared/surface.js';
 import { LOCK, bindAvailability } from './sessionActions.js';
@@ -38,6 +39,7 @@ export class QuickSettings {
   private readonly batteryLabel = new St.Label({ style_class: 'kestrel-quick-battery', x_expand: true, x_align: Clutter.ActorAlign.END, y_align: Clutter.ActorAlign.CENTER, visible: false });
   private batteryState: BatteryState | null = null;
   private updateStatus = () => {};
+  private readonly keepAwake = new KeepAwake(() => this.updateStatus());
   private layoutLater = 0;
 
   constructor(
@@ -83,7 +85,10 @@ export class QuickSettings {
       if (state) this.batteryLabel.text = `${state.percentage}%`;
       this.updateStatus();
     });
-    this.actor.connect('destroy', () => battery.destroy());
+    this.actor.connect('destroy', () => {
+      battery.destroy();
+      this.keepAwake.destroy();
+    });
 
     source.ready.then(() => {
       const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._powerProfiles, 'power'],
@@ -106,6 +111,7 @@ export class QuickSettings {
       const volumeIcons = source._volumeOutput.get_children() as TrackedIcon[];
       const visibleIcon = (icons: TrackedIcon[]) => icons.find(icon => icon.visible)?.icon_name;
       this.updateStatus = () => statusChanged([
+        this.keepAwake.active ? 'view-reveal-symbolic' : undefined,
         visibleIcon(networkIcons) ?? 'network-offline-symbolic',
         visibleIcon(bluetoothIcons),
         visibleIcon(volumeIcons) ?? 'audio-volume-muted-symbolic',

@@ -26,6 +26,7 @@ import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
+import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import type { Rgb } from './accent/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
@@ -59,6 +60,7 @@ interface Context {
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   activateWindow(window: Meta.Window): void;
   openScreenshot(): void;
+  stopScreencast(): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
 }
@@ -85,6 +87,7 @@ class KestrelUi {
   readonly accent = new AccentService();
   private readonly oomNotifier = new OomNotifier();
   private readonly launchFeedback = new LaunchFeedback();
+  private readonly globalShortcuts = new GlobalShortcutsProvider();
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -129,6 +132,7 @@ class KestrelUi {
       notifications: () => this.toggle('notifications', monitor()),
       tasks: () => this.toggle('tasks', monitor()),
       activateWindow: context.activateWindow,
+      stopScreencast: context.stopScreencast,
     }), this.menus, this.previews);
 
     context.layoutManager.addTopChrome(this.cover);
@@ -436,6 +440,7 @@ class KestrelUi {
     this.accent.destroy();
     this.oomNotifier.destroy();
     this.launchFeedback.destroy();
+    this.globalShortcuts.destroy();
     this.stylesheetMonitor?.cancel();
   }
 

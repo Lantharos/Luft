@@ -49,6 +49,7 @@ exec dbus-run-session -- bash -c '
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"
     export KESTREL_MEDIA_SCRIPT="$root/kestrel/tools/fixtures/mediaPlayer.js"
     export KESTREL_TRAY_SCRIPT="$root/kestrel/tools/fixtures/trayApp.js"
+    export KESTREL_INHIBITOR_SCRIPT="$root/kestrel/tools/fixtures/sessionInhibitor.js"
     args=(--headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$root/kestrel/tools/capture.js")
     if [[ -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then
       args+=(--virtual-monitor "$KESTREL_CAPTURE_SECONDARY_SIZE")

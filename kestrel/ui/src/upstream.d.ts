@@ -27,6 +27,12 @@ declare module '*.svg' {
 
 
 declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
+  interface MixerStream { get_application_id(): string | null }
+  export function getMixerControl(): {
+    get_source_outputs(): MixerStream[];
+    connect(signal: string, callback: () => void): number;
+    disconnect(id: number): void;
+  };
   export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
 }
 
@@ -86,4 +92,33 @@ declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
     addNotification(notification: Notification): void;
   }
   export function getSystemSource(): Source;
+}
+
+declare module 'resource:///org/gnome/shell/ui/status/location.js' {
+  export function getGeoclueAgent(): {
+    readonly inUse: boolean;
+    connect(signal: string, callback: () => void): number;
+    disconnect(id: number): void;
+  };
+}
+
+declare module 'resource:///org/gnome/shell/ui/modalDialog.js' {
+  import St from 'gi://St';
+  import Clutter from 'gi://Clutter';
+  export class ModalDialog extends St.Widget {
+    constructor(params?: { styleClass?: string; destroyOnClose?: boolean });
+    readonly contentLayout: St.BoxLayout;
+    setButtons(buttons: { label: string; action: () => void; key?: number; isDefault?: boolean }[]): void;
+    open(): boolean;
+    close(): void;
+    connect(signal: 'closed', callback: () => void): number;
+    connect(signal: 'captured-event', callback: (actor: Clutter.Actor, event: Clutter.Event) => boolean): number;
+  }
+}
+
+declare module 'resource:///org/gnome/shell/ui/dialog.js' {
+  import St from 'gi://St';
+  export class MessageDialogContent extends St.BoxLayout {
+    constructor(params: { title: string; description?: string; icon_name?: string });
+  }
 }

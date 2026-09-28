@@ -24,6 +24,10 @@
       <default>'{"items":[],"folders":{}}'</default>
       <summary>Start app order and folders</summary>
     </key>
+    <key name="kestrel-global-shortcuts" type="s">
+      <default>'{}'</default>
+      <summary>Shortcuts that apps have registered through the global shortcuts portal</summary>
+    </key>
     <key name="favorite-apps" type="as">
       <default>
         @DASH_APPS@

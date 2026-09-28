@@ -16,7 +16,7 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-pub fn open_file(title: &str, filter: Filter) -> Result<Option<String>, String> {
+fn choose(title: &str, filter: Filter, multiple: bool) -> Result<Vec<String>, String> {
     let connection = dbus::session()?;
     let chooser = Proxy::new(
         connection,
@@ -50,6 +50,7 @@ pub fn open_file(title: &str, filter: Filter) -> Result<Option<String>, String> 
     let mut options: HashMap<&str, Value> = HashMap::new();
     options.insert("handle_token", Value::from(token.as_str()));
     options.insert("filters", Value::from(vec![(filter.name, patterns)]));
+    options.insert("multiple", Value::from(multiple));
     let _: OwnedObjectPath = chooser
         .call("OpenFile", &("", title, options))
         .map_err(failed)?;
@@ -60,14 +61,21 @@ pub fn open_file(title: &str, filter: Filter) -> Result<Option<String>, String> 
     let (response, results): (u32, HashMap<String, OwnedValue>) =
         message.body().deserialize().map_err(failed)?;
     if response != 0 {
-        return Ok(None);
+        return Ok(Vec::new());
     }
-    let uris = results
+    Ok(results
         .get("uris")
         .cloned()
         .map(Vec::<String>::try_from)
         .transpose()
         .map_err(failed)?
-        .unwrap_or_default();
-    Ok(uris.into_iter().next())
+        .unwrap_or_default())
+}
+
+pub fn open_file(title: &str, filter: Filter) -> Result<Option<String>, String> {
+    Ok(choose(title, filter, false)?.into_iter().next())
+}
+
+pub fn open_files(title: &str, filter: Filter) -> Result<Vec<String>, String> {
+    choose(title, filter, true)
 }

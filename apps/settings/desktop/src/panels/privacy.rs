@@ -95,7 +95,7 @@ fn store() -> Result<Proxy<'static>, String> {
 }
 
 fn app_name(id: &str) -> String {
-    gio::DesktopAppInfo::new(&format!("{id}.desktop"))
+    gio_unix::DesktopAppInfo::new(&format!("{id}.desktop"))
         .map(|info| info.display_name().to_string())
         .unwrap_or_else(|| id.to_owned())
 }

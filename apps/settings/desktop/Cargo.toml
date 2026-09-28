@@ -12,7 +12,9 @@ name = "settings_lib"
 
 [dependencies]
 dirs = "7.0.0"
-gio = "0.21.5"
+gio = "0.22.10"
+gio-unix = "0.22.8"
+gstreamer = "0.25.4"
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp"] }
 jxl-oxide = { version = "0.12.6", features = ["image"] }
 libc = "0.2.189"

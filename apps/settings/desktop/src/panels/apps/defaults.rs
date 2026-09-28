@@ -122,7 +122,7 @@ pub fn set(Choice { category, app }: Choice) -> Result<(), String> {
         .iter()
         .find(|known| known.id == category)
         .ok_or("This kind of app can't be chosen")?;
-    let app = gio::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
+    let app = gio_unix::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
     let supported = app.supported_types();
     let failed = |error: gio::glib::Error| error.to_string();
     app.set_as_default_for_type(representative(category))

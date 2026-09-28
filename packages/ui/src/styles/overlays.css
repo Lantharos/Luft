@@ -1,0 +1,23 @@
+@layer components {
+	.tooltip {
+		position: fixed;
+		z-index: 120;
+		max-width: 280px;
+		padding: 5px 10px;
+		border-radius: 10px;
+		background: var(--popover);
+		color: var(--text);
+		font-size: 12px;
+		line-height: 16px;
+		box-shadow: 0 8px 24px var(--shadow-soft);
+		pointer-events: none;
+		animation: tooltip-in 120ms var(--ease);
+	}
+}
+
+@keyframes tooltip-in {
+	from {
+		opacity: 0;
+		scale: 0.97;
+	}
+}

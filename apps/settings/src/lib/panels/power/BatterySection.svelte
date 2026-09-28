@@ -3,7 +3,7 @@
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
-	import { duration, watts } from './format';
+	import { duration, wattHours, watts } from './format';
 	import Level from './Level.svelte';
 
 	const LOW_LEVEL = 10;
@@ -41,7 +41,7 @@
 		{/snippet}
 	</Row>
 	{#if battery.capacity && health !== null}
-		<Row title="Battery health" description="Holds {watts(battery.capacity.full, 'h')} of the {watts(battery.capacity.design, 'h')} it held when new">
+		<Row title="Battery health" description="Holds {wattHours(battery.capacity.full)} of the {wattHours(battery.capacity.design)} it held when new">
 			<span class="tabular-nums">{Math.round(Math.min(health, 100))}%</span>
 		</Row>
 	{/if}

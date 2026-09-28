@@ -14,11 +14,59 @@
 	<KeyListEntry name="focus-active-notification"
                       description="Focus the active notification"/>
 
-	<KeyListEntry name="toggle-overview"
-                      description="Show the overview"/>
+	<KeyListEntry name="clipboard-history"
+                      description="Show clipboard history"/>
 
-	<KeyListEntry name="toggle-application-view"
-                      description="Show all apps"/>
+	<KeyListEntry name="snap-layouts"
+                      description="Show snap layouts for the focused window"/>
+
+	<KeyListEntry name="screen-brightness-up"
+                      description="Increase screen brightness"/>
+
+	<KeyListEntry name="screen-brightness-down"
+                      description="Decrease screen brightness"/>
+
+	<KeyListEntry name="screen-brightness-cycle"
+                      description="Cycle screen brightness"/>
+
+	<KeyListEntry name="screen-brightness-up-monitor"
+                      description="Increase brightness of the current display"/>
+
+	<KeyListEntry name="screen-brightness-down-monitor"
+                      description="Decrease brightness of the current display"/>
+
+	<KeyListEntry name="screen-brightness-cycle-monitor"
+                      description="Cycle brightness of the current display"/>
+
+	<KeyListEntry name="workspace-1"
+                      description="Switch to workspace 1"/>
+
+	<KeyListEntry name="workspace-2"
+                      description="Switch to workspace 2"/>
+
+	<KeyListEntry name="workspace-3"
+                      description="Switch to workspace 3"/>
+
+	<KeyListEntry name="workspace-4"
+                      description="Switch to workspace 4"/>
+
+	<KeyListEntry name="workspace-5"
+                      description="Switch to workspace 5"/>
+
+	<KeyListEntry name="workspace-6"
+                      description="Switch to workspace 6"/>
+
+	<KeyListEntry name="workspace-7"
+                      description="Switch to workspace 7"/>
+
+	<KeyListEntry name="workspace-8"
+                      description="Switch to workspace 8"/>
+
+	<KeyListEntry name="workspace-9"
+                      description="Switch to workspace 9"/>
+
+	<KeyListEntry name="workspace-10"
+                      description="Switch to workspace 10"/>
 
 </KeyListEntries>
 

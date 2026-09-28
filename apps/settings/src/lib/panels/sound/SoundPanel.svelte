@@ -15,12 +15,15 @@
 		setDefault,
 		setMeter,
 		setMute,
+		setPort,
 		setVolume,
 		startSound,
 		type Device,
 		type Direction,
 		type Sound
 	} from './api';
+	import AppsSection from './AppsSection.svelte';
+	import DevicesSection from './DevicesSection.svelte';
 	import LevelMeter from './LevelMeter.svelte';
 	import VolumeRow from './VolumeRow.svelte';
 
@@ -60,10 +63,20 @@
 	});
 </script>
 
-{#snippet devicePicker(direction: Direction, devices: Device[], current: string)}
+{#snippet devicePicker(direction: Direction, devices: Device[], current: Device)}
 	{#if devices.length > 1}
 		<Row title="Device">
-			<Select label="{direction === 'output' ? 'Output' : 'Input'} device" options={choices(devices)} value={current} onchange={(name) => setDefault(direction, name)} />
+			<Select label="{direction === 'output' ? 'Output' : 'Input'} device" options={choices(devices)} value={current.name} onchange={(name) => setDefault(direction, name)} />
+		</Row>
+	{/if}
+	{#if current.ports.length > 1 && current.port}
+		<Row title="Connection">
+			<Select
+				label="{direction === 'output' ? 'Output' : 'Input'} connection"
+				options={current.ports.map((port) => ({ value: port.name, label: port.description }))}
+				value={current.port}
+				onchange={(port) => setPort(direction, current.index, port)}
+			/>
 		</Row>
 	{/if}
 {/snippet}
@@ -71,7 +84,7 @@
 {#if sound}
 	<Section title="Output">
 		{#if output}
-			{@render devicePicker('output', sound.outputs, output.name)}
+			{@render devicePicker('output', sound.outputs, output)}
 			<VolumeRow
 				title="Volume"
 				volume={output.volume}
@@ -100,7 +113,7 @@
 
 	<Section title="Input">
 		{#if input}
-			{@render devicePicker('input', sound.inputs, input.name)}
+			{@render devicePicker('input', sound.inputs, input)}
 			<VolumeRow
 				title="Volume"
 				volume={input.volume}
@@ -118,22 +131,11 @@
 		{/if}
 	</Section>
 
-	<Section title="Apps">
-		{#each sound.apps as app (app.index)}
-			<VolumeRow
-				title={app.name}
-				volume={app.volume}
-				muted={app.muted}
-				{max}
-				icon={Volume2}
-				mutedIcon={VolumeX}
-				onvolume={(volume) => setVolume('app', app.index, volume)}
-				onmute={(muted) => setMute('app', app.index, muted)}
-			/>
-		{:else}
-			<Row title="Apps playing sound show up here" />
-		{/each}
-	</Section>
+	{#if sound.cards.length}
+		<DevicesSection cards={sound.cards} />
+	{/if}
+
+	<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
 
 	<Section title="Alerts">
 		<Row title="Alert sounds" description="Plays a sound for notifications and other events">

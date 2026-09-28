@@ -1,3 +1,4 @@
+mod card;
 mod meter;
 mod model;
 mod pulse;
@@ -52,6 +53,25 @@ pub struct Balance {
 }
 
 #[derive(Deserialize)]
+pub struct Port {
+    direction: Direction,
+    index: u32,
+    port: String,
+}
+
+#[derive(Deserialize)]
+pub struct Profile {
+    card: u32,
+    profile: String,
+}
+
+#[derive(Deserialize)]
+pub struct MoveApp {
+    index: u32,
+    output: u32,
+}
+
+#[derive(Deserialize)]
 pub struct AlertVolume {
     volume: f64,
 }
@@ -77,6 +97,15 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .with("sound_set_balance", events, |events, request| {
             service::send(events, Command::SetBalance(request))
+        })
+        .with("sound_set_port", events, |events, request| {
+            service::send(events, Command::SetPort(request))
+        })
+        .with("sound_set_profile", events, |events, request| {
+            service::send(events, Command::SetProfile(request))
+        })
+        .with("sound_move_app", events, |events, request| {
+            service::send(events, Command::MoveApp(request))
         })
         .with("sound_set_alert_volume", events, |events, request| {
             service::send(events, Command::SetAlertVolume(request))

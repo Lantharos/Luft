@@ -12,13 +12,15 @@
 		mutedIcon: Component;
 		onvolume: (volume: number) => void;
 		onmute: (muted: boolean) => void;
+		controls?: Snippet;
 		children?: Snippet;
 	}
 
-	let { title, volume, muted, max, icon: Icon, mutedIcon: MutedIcon, onvolume, onmute, children }: Props = $props();
+	let { title, volume, muted, max, icon: Icon, mutedIcon: MutedIcon, onvolume, onmute, controls, children }: Props = $props();
 </script>
 
 <Row {title}>
+	{@render controls?.()}
 	<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
 	<button type="button" class="mute" class:muted aria-pressed={muted} aria-label={muted ? `Unmute ${title}` : `Mute ${title}`} onclick={() => onmute(!muted)}>
 		{#if muted}

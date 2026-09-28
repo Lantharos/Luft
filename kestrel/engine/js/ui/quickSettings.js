@@ -440,7 +440,21 @@ class QuickToggleMenu extends PopupMenu.PopupMenuBase {
             visible: !!subtitle,
         });
 
-        this._header.show();
+        this._headerSet = true;
+        this._syncHeader();
+    }
+
+    get hosted() {
+        return this._hosted ?? false;
+    }
+
+    set hosted(hosted) {
+        this._hosted = hosted;
+        this._syncHeader();
+    }
+
+    _syncHeader() {
+        this._header.visible = !!this._headerSet && !this.hosted;
     }
 
     addHeaderSuffix(actor) {
@@ -463,6 +477,9 @@ class QuickToggleMenu extends PopupMenu.PopupMenuBase {
     open(params = {}) {
         if (!super.open(params))
             return false;
+
+        if (this.hosted)
+            return true;
 
         const previousHeight = this.actor.height;
         this.actor.height = -1;
@@ -499,6 +516,9 @@ class QuickToggleMenu extends PopupMenu.PopupMenuBase {
     close(params = {}) {
         if (!super.close(params))
             return false;
+
+        if (this.hosted)
+            return true;
 
         const {animate = true} = params;
         const {opacity} = this.box;

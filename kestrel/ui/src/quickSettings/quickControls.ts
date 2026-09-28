@@ -4,6 +4,7 @@ import St from 'gi://St';
 export interface ControlMenu {
   actor: St.Widget;
   isOpen: boolean;
+  hosted?: boolean;
   open(): void;
   connect(signal: string, callback: (menu: ControlMenu, open: boolean) => void): number;
   disconnectObject(object: object): void;
@@ -11,6 +12,7 @@ export interface ControlMenu {
 }
 
 export interface QuickControl extends St.Button {
+  title?: string | null;
   subtitle: string | null;
   menu?: ControlMenu;
   _menuManager?: { removeMenu(menu: ControlMenu): void };

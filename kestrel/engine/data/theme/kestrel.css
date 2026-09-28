@@ -129,16 +129,10 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-quick-settings { border-radius: 24px; padding: 14px; spacing: 10px; }
 .kestrel-quick-content { spacing: 14px; }
-.kestrel-quick-tiles { spacing: 8px; }
-.kestrel-quick-row { spacing: 8px; }
 .kestrel-quick-sliders { spacing: 2px; }
-.kestrel-quick-footer { spacing: 4px; padding-top: 2px; }
-.kestrel-quick-battery { padding-right: 8px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
-.kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 999px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
-.kestrel-quick-back:hover, .kestrel-quick-back:focus { background-color: rgba(255, 255, 255, 0.12); }
-.kestrel-quick-back-content { spacing: 6px; }
 .kestrel-slider-value { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #ffffff; background-color: rgba(28, 28, 32, 0.92); }
 .kestrel-quick-settings .quick-toggle-menu.kestrel-inline-menu { margin: 2px 0 4px; }
+.kestrel-quick-settings .kestrel-tile-menu .quick-toggle-menu { margin: 0; }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
 .kestrel-quick-settings .quick-slider { padding: 0; }
@@ -243,6 +237,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control:checked:active { background-color: rgba(255, 255, 255, 0.38); }
 .kestrel-control:checked .kestrel-control-subtitle { color: rgba(255, 255, 255, 0.85); }
 .kestrel-control-body { spacing: 3px; }
+.kestrel-control-top { height: 32px; }
 .kestrel-control-title { font-size: 13px; font-weight: 600; }
 .kestrel-control-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }

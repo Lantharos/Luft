@@ -318,7 +318,7 @@ export async function run() {
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
-  await checkQuickTiles({pause, capture, actorNamed, output});
+  await checkQuickTiles({pause, capture, actorNamed, pointer, output});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

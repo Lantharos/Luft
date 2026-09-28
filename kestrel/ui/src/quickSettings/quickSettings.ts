@@ -6,19 +6,26 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
-import { styleControl } from './controlTile.js';
-import type { ContextMenus } from '../menus/contextMenus.js';
+import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { KeepAwake } from './keepAwake.js';
 import { animateActor } from '../shared/motion.js';
 import { blurSurface } from '../shared/surface.js';
-import { LOCK, bindAvailability } from './sessionActions.js';
-import { Battery, type BatteryState } from './battery.js';
+import type { BatteryState } from './battery.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
+import { styleControl } from './tiles/controlTile.js';
+import { ActionTiles, type Tile } from './tiles/actionTiles.js';
+import { TileGrid } from './tiles/tileGrid.js';
+import { TileDrag } from './tiles/tileDrag.js';
+import { TileLayout } from './tiles/tileLayout.js';
 
 interface TrackedIcon extends St.Icon {
   connectObject(signal: string, callback: () => void, owner: Clutter.Actor): void;
+}
+
+interface RegisteredTile extends Tile {
+  name(): string;
 }
 
 export class QuickSettings {
@@ -27,16 +34,14 @@ export class QuickSettings {
     style_class: 'kestrel-popover kestrel-quick-settings', visible: false, reactive: true,
   });
   private readonly pages = new PagedPane();
-  private readonly back: St.Button;
-  private readonly footer = new St.BoxLayout({ style_class: 'kestrel-quick-footer' });
   private readonly content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-content' });
-  private readonly tiles = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-tiles' });
   private readonly sliders = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-sliders' });
-  private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
-  private readonly controls: St.Button[] = [];
-  private subpage: ControlMenu | null = null;
-  private inline: ControlMenu | null = null;
-  private readonly batteryLabel = new St.Label({ style_class: 'kestrel-quick-battery', x_expand: true, x_align: Clutter.ActorAlign.END, y_align: Clutter.ActorAlign.CENTER, visible: false });
+  private readonly grid: TileGrid;
+  private readonly drag: TileDrag;
+  private readonly layoutStore = new TileLayout();
+  private readonly tiles: RegisteredTile[] = [];
+  private readonly actions: ActionTiles;
+  private openMenu: ControlMenu | null = null;
   private batteryState: BatteryState | null = null;
   private updateStatus = () => {};
   private readonly keepAwake = new KeepAwake(() => this.updateStatus());
@@ -45,66 +50,49 @@ export class QuickSettings {
   constructor(
     source: QuickSettingsSource,
     private readonly layoutChanged: () => void,
-    private readonly close: () => void,
+    close: () => void,
     statusChanged: (icons: string[]) => void,
     private readonly menus: ContextMenus,
     takeScreenshot: () => void,
   ) {
     blurSurface(this.actor);
-    this.actor.connect('destroy', () => {
-      if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
+    this.grid = new TileGrid({
+      resized: () => this.queueLayout(),
+      menuOpened: menu => this.menuOpened(menu),
+      menuClosed: menu => this.menuClosed(menu),
     });
-    this.back = new St.Button({
-      style_class: 'kestrel-quick-back', accessible_name: 'Back to quick settings',
-      can_focus: true, track_hover: true, visible: false, x_align: Clutter.ActorAlign.START,
-      child: this.labelledIcon('go-previous-symbolic', 'Back'),
-    });
-    this.back.connect('clicked', () => this.closeSubmenu());
-    this.actor.add_child(this.back);
-    menus.bind(this.actor, () => [{ label: 'Settings', run: () => menus.settings() }]);
-    this.actor.add_child(this.pages.actor);
-    this.pages.body.add_child(this.content);
-    this.pages.body.add_child(this.selectors);
-    this.content.add_child(this.tiles);
-    this.content.add_child(this.sliders);
-    this.pages.body.connect('notify::height', () => this.queueLayout());
-
-    this.footer.add_child(this.footerButton('emblem-system-symbolic', 'Settings', () => {
-      Shell.AppSystem.get_default().lookup_app('org.gnome.Settings.desktop')?.activate();
-      this.close();
-    }));
-    this.footer.add_child(this.footerButton('camera-photo-symbolic', 'Take screenshot', takeScreenshot));
-    const lock = this.footerButton(LOCK.icon, 'Lock screen', () => { this.close(); LOCK.run(); });
-    bindAvailability(LOCK, lock);
-    this.footer.add_child(lock);
-    this.footer.add_child(this.batteryLabel);
-    this.actor.add_child(this.footer);
-    const battery = new Battery(state => {
+    this.drag = new TileDrag(this.grid, () => this.saveOrder());
+    this.actions = new ActionTiles({ takeScreenshot, openSettings: panel => menus.settings(panel), close }, state => {
       this.batteryState = state;
-      this.batteryLabel.visible = !!state;
-      if (state) this.batteryLabel.text = `${state.percentage}%`;
       this.updateStatus();
     });
     this.actor.connect('destroy', () => {
-      battery.destroy();
+      if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
+      this.actions.destroy();
       this.keepAwake.destroy();
     });
+    menus.bind(this.actor, () => this.surfaceMenu());
+    this.actor.add_child(this.pages.actor);
+    this.pages.body.add_child(this.content);
+    this.content.add_child(this.grid.actor);
+    this.content.add_child(this.sliders);
+    this.pages.body.connect('notify::height', () => this.queueLayout());
 
     source.ready.then(() => {
-      const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._rfkill, 'wifi'],
-        [source._powerProfiles, 'power'], [source._caffeine, 'power'], [source._nightLight, 'display'],
-        [source._darkMode, 'background'], [source._doNotDisturb, 'notifications'], [source._backlight, 'power'],
-        [source._autoRotate, 'display']] as const;
-      for (const [indicator, settingsPanel] of indicators) {
-        for (const item of indicator?.quickSettingsItems ?? []) {
-          this.adopt(item);
-          styleControl(item);
-          menus.bind(item, () => [{ label: 'Settings', run: () => menus.settings(settingsPanel) }]);
-          this.controls.push(item);
-          item.connect('notify::visible', () => this.arrangeTiles());
-        }
+      const indicators = [['network', source._network, 'network'], ['bluetooth', source._bluetooth, 'bluetooth'],
+        ['airplane', source._rfkill, 'wifi'], ['power', source._powerProfiles, 'power'], ['keep-awake', source._caffeine, 'power'],
+        ['night-light', source._nightLight, 'display'], ['dark-style', source._darkMode, 'background'],
+        ['do-not-disturb', source._doNotDisturb, 'notifications'], ['keyboard', source._backlight, 'power'],
+        ['rotation', source._autoRotate, 'display']] as const;
+      for (const [key, indicator, settingsPanel] of indicators) {
+        (indicator?.quickSettingsItems ?? []).forEach((item, index) => {
+          this.adoptTile(item);
+          this.register({ id: `${key}-${index}`, actor: item, settingsPanel, name: () => item.title ?? key });
+        });
       }
-      this.arrangeTiles();
+      for (const tile of this.actions.tiles)
+        this.register({ ...tile, name: () => tile.id === 'battery' ? 'Battery' : tile.actor.accessible_name });
+      this.arrangeTiles(false);
       this.addSlider('sound', source._volumeOutput.quickSettingsItems[0]);
       this.addSlider('sound', createInputSlider());
       this.addSlider('display', source._brightness.quickSettingsItems[0]);
@@ -130,20 +118,20 @@ export class QuickSettings {
     }).catch(error => console.error('Quick settings could not initialize', error));
   }
 
-  private labelledIcon(icon: string, label: string): St.BoxLayout {
-    const box = new St.BoxLayout({ style_class: 'kestrel-quick-back-content' });
-    box.add_child(new St.Icon({ icon_name: icon, icon_size: 16, y_align: Clutter.ActorAlign.CENTER }));
-    box.add_child(new St.Label({ text: label, y_align: Clutter.ActorAlign.CENTER }));
-    return box;
+  preferredHeight(width: number, limit: number): number {
+    const theme = this.actor.get_theme_node();
+    const contentWidth = width - theme.get_horizontal_padding();
+    const chrome = theme.get_vertical_padding();
+    this.grid.setWidth(contentWidth);
+    return this.pages.measure(contentWidth, limit - chrome) + chrome;
   }
 
-  private footerButton(icon: string, label: string, activate: () => void): St.Button {
-    const button = new St.Button({
-      style_class: 'kestrel-icon-button', accessible_name: label, can_focus: true, track_hover: true,
-      child: new St.Icon({ icon_name: icon, icon_size: 18 }),
-    });
-    button.connect('clicked', activate);
-    return button;
+  closeSubmenu(animate = true): boolean {
+    const open = this.openMenu;
+    if (!open) return false;
+    if (open === this.grid.openMenu) this.grid.collapse(animate);
+    else open.close({ animate });
+    return true;
   }
 
   private queueLayout(): void {
@@ -156,32 +144,78 @@ export class QuickSettings {
     });
   }
 
-  preferredHeight(width: number, limit: number): number {
-    const theme = this.actor.get_theme_node();
-    const contentWidth = width - theme.get_horizontal_padding();
-    const spacing = theme.get_length('spacing');
-    const back = this.back.visible ? this.back.get_preferred_height(contentWidth)[1] + spacing : 0;
-    const chrome = back + this.footer.get_preferred_height(contentWidth)[1] + spacing + theme.get_vertical_padding();
-    return this.pages.measure(contentWidth, limit - chrome) + chrome;
+  private register(tile: RegisteredTile): void {
+    this.tiles.push(tile);
+    this.menus.bind(tile.actor, () => this.tileMenu(tile));
+    tile.actor.connect('notify::visible', () => this.grid.refresh());
+    this.drag.attach(tile.actor);
+    const menu = (tile.actor as QuickControl).menu;
+    if (menu) this.grid.addMenu(tile.actor, menu);
   }
 
-  closeSubmenu(): boolean {
-    const open = this.subpage ?? this.inline;
-    if (!open) return false;
-    open.close({ animate: !!this.inline });
-    return true;
+  private arrangeTiles(animate: boolean): void {
+    const removed = this.layoutStore.removed;
+    const byId = new Map(this.tiles.map(tile => [tile.id, tile]));
+    const order = this.layoutStore.order(this.tiles.map(tile => tile.id));
+    this.grid.setTiles(order.filter(id => !removed.has(id)).map(id => byId.get(id)!.actor), animate);
   }
 
-  private showSubpage(subpage: ControlMenu | null): void {
-    this.subpage = subpage;
-    this.selectors.visible = this.selectors.get_children().some(child => child.visible);
-    this.content.visible = !subpage;
-    this.back.visible = !!subpage;
-    this.pages.reset();
+  private saveOrder(): void {
+    const placed = this.grid.order.map(actor => this.tiles.find(tile => tile.actor === actor)!.id);
+    const removed = this.layoutStore.order(this.tiles.map(tile => tile.id)).filter(id => !placed.includes(id));
+    this.layoutStore.saveOrder([...placed, ...removed]);
+  }
+
+  private tileMenu(tile: RegisteredTile): MenuEntry[] {
+    const entries: MenuEntry[] = [];
+    if (tile.settingsPanel) entries.push({ label: 'Settings', run: () => this.menus.settings(tile.settingsPanel!) });
+    entries.push({
+      label: 'Remove from Quick Settings', run: () => {
+        this.layoutStore.remove(tile.id);
+        this.arrangeTiles(true);
+      },
+    });
+    return entries;
+  }
+
+  private surfaceMenu(): MenuEntry[] {
+    const entries: MenuEntry[] = [{ label: 'Settings', run: () => this.menus.settings() }];
+    const removed = this.layoutStore.removed;
+    const addable = this.tiles.filter(tile => removed.has(tile.id) && tile.actor.visible);
+    if (addable.length) {
+      entries.push({
+        label: 'Add to Quick Settings',
+        children: addable.map(tile => ({
+          label: tile.name(), run: () => {
+            this.layoutStore.restore(tile.id);
+            this.arrangeTiles(true);
+          },
+        })),
+      });
+    }
+    if (this.layoutStore.customized) {
+      entries.push({
+        label: 'Reset Quick Settings', run: () => {
+          this.layoutStore.reset();
+          this.arrangeTiles(true);
+        },
+      });
+    }
+    return entries;
+  }
+
+  private menuOpened(menu: ControlMenu): void {
+    if (this.openMenu && this.openMenu !== menu) this.closeSubmenu();
+    this.openMenu = menu;
     this.queueLayout();
   }
 
-  private adopt(item: QuickControl, inline = false): void {
+  private menuClosed(menu: ControlMenu): void {
+    if (this.openMenu === menu) this.openMenu = null;
+    this.queueLayout();
+  }
+
+  private prepare(item: QuickControl): ControlMenu | null {
     const enableHover = (actor: Clutter.Actor) => {
       if (actor instanceof St.Button) actor.track_hover = true;
       actor.get_children().forEach(enableHover);
@@ -189,61 +223,20 @@ export class QuickSettings {
     enableHover(item);
     detach(item);
     if (item.show_on_set_parent) item.show();
-    if (!item.menu) return;
-    const menu = item.menu;
-    item._menuManager?.removeMenu(menu);
-    detach(menu.actor);
-    menu.actor.clear_constraints();
-    menu.actor.connect('notify::height', () => this.queueLayout());
-    if (inline) {
-      menu.actor.add_style_class_name('kestrel-inline-menu');
-      const chevron = item._menuButton?.child;
-      chevron?.set_pivot_point(0.5, 0.5);
-      menu.connect('open-state-changed', (_menu, open: boolean) => {
-        if (chevron) animateActor(chevron, { rotation_angle_z: open ? 90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-        if (open) {
-          this.closeSubmenu();
-          this.inline = menu;
-        } else if (this.inline === menu) {
-          this.inline = null;
-        }
-        this.queueLayout();
-      });
-      return;
-    }
-    this.selectors.add_child(menu.actor);
-    menu.actor.connect('notify::visible', () => {
-      this.selectors.visible = this.selectors.get_children().some(child => child.visible);
-      this.queueLayout();
-    });
-    menu.connect('open-state-changed', (_menu, open: boolean) => {
-      if (open) {
-        if (this.subpage !== menu) this.closeSubmenu();
-        this.showSubpage(menu);
-      } else if (this.subpage === menu) {
-        this.showSubpage(null);
-      }
-    });
+    if (!item.menu) return null;
+    item._menuManager?.removeMenu(item.menu);
+    detach(item.menu.actor);
+    item.menu.actor.clear_constraints();
+    return item.menu;
   }
 
-  private arrangeTiles(): void {
-    for (const item of this.controls) detach(item);
-    this.tiles.destroy_all_children();
-    const visible = this.controls.filter(item => item.visible);
-    for (let index = 0; index < visible.length; index += 2) {
-      const row = new St.BoxLayout({ style_class: 'kestrel-quick-row' });
-      (row.layout_manager as Clutter.BoxLayout).homogeneous = true;
-      for (const item of visible.slice(index, index + 2)) {
-        item.x_expand = true;
-        row.add_child(item);
-      }
-      this.tiles.add_child(row);
-    }
-    this.queueLayout();
+  private adoptTile(item: QuickControl): void {
+    this.prepare(item);
+    styleControl(item);
   }
 
   private addSlider(settingsPanel: string, item: QuickControl): void {
-    this.adopt(item, true);
+    const menu = this.prepare(item);
     this.menus.bind(item, () => [{ label: 'Settings', run: () => this.menus.settings(settingsPanel) }]);
     if (item.slider) {
       item.slider.add_style_class_name('kestrel-slider');
@@ -254,6 +247,16 @@ export class QuickSettings {
     item.get_child()!.add_child(menuSpace);
     item.connect('notify::visible', () => this.queueLayout());
     this.sliders.add_child(item);
-    if (item.menu) this.sliders.add_child(item.menu.actor);
+    if (!menu) return;
+    menu.actor.add_style_class_name('kestrel-inline-menu');
+    menu.actor.connect('notify::height', () => this.queueLayout());
+    const chevron = item._menuButton?.child;
+    chevron?.set_pivot_point(0.5, 0.5);
+    menu.connect('open-state-changed', (_menu, open: boolean) => {
+      if (chevron) animateActor(chevron, { rotation_angle_z: open ? 90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      if (open) this.menuOpened(menu);
+      else this.menuClosed(menu);
+    });
+    this.sliders.add_child(menu.actor);
   }
 }

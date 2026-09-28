@@ -2,10 +2,15 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 const BATTERY_TYPE = 2;
+const STATUSES: Record<number, BatteryStatus> = { 1: 'charging', 4: 'full', 5: 'plugged' };
+
+export type BatteryStatus = 'charging' | 'full' | 'plugged' | 'discharging';
 
 export interface BatteryState {
   iconName: string;
   percentage: number;
+  status: BatteryStatus;
+  secondsLeft: number;
 }
 
 export class Battery {
@@ -37,6 +42,8 @@ export class Battery {
     this.changed(present ? {
       iconName: this.property<string>('IconName') || 'battery-missing-symbolic',
       percentage: Math.round(this.property<number>('Percentage') ?? 0),
+      status: STATUSES[this.property<number>('State') ?? 0] ?? 'discharging',
+      secondsLeft: Number(this.property<number | bigint>('TimeToEmpty') ?? 0),
     } : null);
   }
 

@@ -243,7 +243,7 @@ class KestrelUi {
     this.menus.close(true);
     this.previews.close(true);
     this.panels.setActive(null, null);
-    this.quick.closeSubmenu();
+    this.quick.closeSubmenu(false);
     this.taskView.close(true);
     for (const actor of this.surfaces()) {
       actor.remove_all_transitions();
@@ -376,7 +376,7 @@ class KestrelUi {
       actor.hide();
       this.closingSelections.get(actor)?.();
       this.closingSelections.delete(actor);
-      if (surface === 'quick') this.quick.closeSubmenu();
+      if (surface === 'quick') this.quick.closeSubmenu(false);
       if (!this.active) this.panels.setActive(null, null);
     });
   }

@@ -10,6 +10,7 @@ import { styleControl } from './controlTile.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { PagedPane } from './pagedPane.js';
 import { attachSliderValue } from './sliderValue.js';
+import { animateActor } from '../shared/motion.js';
 import { blurSurface } from '../shared/surface.js';
 import { LOCK, bindAvailability } from './sessionActions.js';
 import { Battery, type BatteryState } from './battery.js';
@@ -33,6 +34,7 @@ export class QuickSettings {
   private readonly selectors = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, visible: false });
   private readonly controls: St.Button[] = [];
   private subpage: ControlMenu | null = null;
+  private inline: ControlMenu | null = null;
   private readonly batteryLabel = new St.Label({ style_class: 'kestrel-quick-battery', x_expand: true, x_align: Clutter.ActorAlign.END, y_align: Clutter.ActorAlign.CENTER, visible: false });
   private batteryState: BatteryState | null = null;
   private updateStatus = () => {};
@@ -154,8 +156,9 @@ export class QuickSettings {
   }
 
   closeSubmenu(): boolean {
-    if (!this.subpage) return false;
-    this.subpage.close({ animate: false });
+    const open = this.subpage ?? this.inline;
+    if (!open) return false;
+    open.close({ animate: !!this.inline });
     return true;
   }
 
@@ -168,7 +171,7 @@ export class QuickSettings {
     this.queueLayout();
   }
 
-  private adopt(item: QuickControl): void {
+  private adopt(item: QuickControl, inline = false): void {
     const enableHover = (actor: Clutter.Actor) => {
       if (actor instanceof St.Button) actor.track_hover = true;
       actor.get_children().forEach(enableHover);
@@ -181,8 +184,24 @@ export class QuickSettings {
     item._menuManager?.removeMenu(menu);
     detach(menu.actor);
     menu.actor.clear_constraints();
-    this.selectors.add_child(menu.actor);
     menu.actor.connect('notify::height', () => this.queueLayout());
+    if (inline) {
+      menu.actor.add_style_class_name('kestrel-inline-menu');
+      const chevron = item._menuButton?.child;
+      chevron?.set_pivot_point(0.5, 0.5);
+      menu.connect('open-state-changed', (_menu, open: boolean) => {
+        if (chevron) animateActor(chevron, { rotation_angle_z: open ? 90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+        if (open) {
+          this.closeSubmenu();
+          this.inline = menu;
+        } else if (this.inline === menu) {
+          this.inline = null;
+        }
+        this.queueLayout();
+      });
+      return;
+    }
+    this.selectors.add_child(menu.actor);
     menu.actor.connect('notify::visible', () => {
       this.selectors.visible = this.selectors.get_children().some(child => child.visible);
       this.queueLayout();
@@ -191,7 +210,6 @@ export class QuickSettings {
       if (open) {
         if (this.subpage !== menu) this.closeSubmenu();
         this.showSubpage(menu);
-        menu.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
       } else if (this.subpage === menu) {
         this.showSubpage(null);
       }
@@ -215,16 +233,17 @@ export class QuickSettings {
   }
 
   private addSlider(settingsPanel: string, item: QuickControl): void {
-    this.adopt(item);
+    this.adopt(item, true);
     this.menus.bind(item, () => [{ label: 'Settings', run: () => this.menus.settings(settingsPanel) }]);
     if (item.slider) {
       item.slider.add_style_class_name('kestrel-slider');
-      attachSliderValue(item, item.slider);
+      attachSliderValue(item.slider);
     }
     const menuSpace = new St.Widget({ style_class: 'kestrel-slider-menu-space' });
     item.bind_property('menu-enabled', menuSpace, 'visible', GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN);
     item.get_child()!.add_child(menuSpace);
     item.connect('notify::visible', () => this.queueLayout());
     this.sliders.add_child(item);
+    if (item.menu) this.sliders.add_child(item.menu.actor);
   }
 }

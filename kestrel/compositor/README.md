@@ -1,6 +1,6 @@
 # Kestrel compositor
 
-Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the official repository, release, and exact base commit; `series` lists the patches in application order. The stack contains window rounding, framebuffer blur shader reuse, and `xdg-toplevel-icon-v1` support.
+Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the official repository, release, and exact base commit; `series` lists the patches in application order. The stack contains window rounding, framebuffer blur shader reuse, `xdg-toplevel-icon-v1` support, and fractional glyph advances for shell text.
 
 ## Build
 

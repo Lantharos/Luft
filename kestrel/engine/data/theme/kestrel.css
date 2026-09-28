@@ -127,7 +127,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-quick-back { padding: 6px 12px 6px 8px; border-radius: 999px; font-size: 13px; font-weight: 500; transition-duration: 120ms; }
 .kestrel-quick-back:hover, .kestrel-quick-back:focus { background-color: rgba(255, 255, 255, 0.12); }
 .kestrel-quick-back-content { spacing: 6px; }
-.kestrel-slider-value { min-width: 38px; text-align: right; font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
+.kestrel-slider-value { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #ffffff; background-color: rgba(28, 28, 32, 0.92); }
+.kestrel-quick-settings .quick-toggle-menu.kestrel-inline-menu { margin: 2px 0 4px; }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: rgba(255, 255, 255, 0.06); box-shadow: none; color: #ffffff; }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
 .kestrel-quick-settings .quick-slider { padding: 0; }
@@ -335,7 +336,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .osd-window.kestrel-glass { padding: 10px 18px 10px 16px; border-radius: 999px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
 .osd-window.kestrel-glass StIcon { icon-size: 20px; }
 .osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; }
-.osd-window.kestrel-glass .osd-value { min-width: 38px; margin: 0; font-size: 13px; font-weight: 500; text-align: right; }
 .osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 20px; background-color: rgba(20, 20, 24, 0.20); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }

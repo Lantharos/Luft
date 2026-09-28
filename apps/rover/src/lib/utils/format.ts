@@ -10,7 +10,7 @@ const DAY_MS = 86_400_000;
 const time = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 const dayInYear = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 const dayWithYear = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-const fullDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeStyle: 'short' });
+const fullDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 export function formatDate(timestamp: number | null) {
 	if (!timestamp) return '';

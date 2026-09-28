@@ -7,6 +7,7 @@
 	import type { FileEntry } from '$lib/types';
 	import { entryIcon } from '$lib/utils/file-kinds';
 	import { previewKind } from '$lib/utils/kinds';
+	import MediaControls from './MediaControls.svelte';
 	import TextPreview from './TextPreview.svelte';
 
 	interface Props {
@@ -18,6 +19,10 @@
 	let { entry, full = false, onmedia }: Props = $props();
 
 	let failed = $state(false);
+	let paused = $state(true);
+	let currentTime = $state(0);
+	let duration = $state(0);
+	let muted = $state(false);
 	let kind = $derived(isDesktopRuntime() && !failed ? previewKind(entry) : 'none');
 	let source = $derived(localFileSource(entry.path, entry.modified));
 	let iconSize = $derived(full ? 144 : 96);
@@ -33,22 +38,42 @@
 {#if kind === 'image'}
 	<img class="preview-image" src={source} alt="" decoding="async" draggable="false" onload={reportMedia} onerror={() => (failed = true)} />
 {:else if kind === 'video'}
-	<!-- svelte-ignore a11y_media_has_caption -->
-	<video
-		class="preview-image"
-		src={full ? source : `${source}#t=0.1`}
-		controls={full}
-		autoplay={full}
-		muted={!full}
-		preload="metadata"
-		playsinline
-		onloadedmetadata={reportMedia}
-		onerror={() => (failed = true)}
-	></video>
+	<div class="preview-player">
+		<!-- svelte-ignore a11y_media_has_caption, a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+		<video
+			class="preview-image"
+			src={full ? source : `${source}#t=0.1`}
+			autoplay={full}
+			preload="metadata"
+			playsinline
+			bind:paused
+			bind:currentTime
+			bind:duration
+			bind:muted
+			onclick={() => full && (paused = !paused)}
+			onloadedmetadata={reportMedia}
+			onerror={() => (failed = true)}
+		></video>
+		{#if full}
+			<MediaControls bind:paused bind:currentTime {duration} bind:muted />
+		{/if}
+	</div>
 {:else if kind === 'audio'}
 	<div class="preview-stack">
 		<EntryIcon name="music" size={iconSize} />
-		<audio class={full ? 'preview-audio' : 'hidden'} src={source} controls={full} autoplay={full} preload="metadata" onloadedmetadata={reportMedia}></audio>
+		<audio
+			src={source}
+			autoplay={full}
+			preload="metadata"
+			bind:paused
+			bind:currentTime
+			bind:duration
+			bind:muted
+			onloadedmetadata={reportMedia}
+		></audio>
+		{#if full}
+			<div class="preview-audio"><MediaControls bind:paused bind:currentTime {duration} bind:muted /></div>
+		{/if}
 	</div>
 {:else if kind === 'text' || kind === 'markdown'}
 	<TextPreview {entry} markdown={kind === 'markdown'} {full} />

@@ -8,6 +8,8 @@ use serde::Serialize;
 
 use super::privileged::{is_permission_error, os, run_pkexec};
 use crate::drives;
+use crate::history::{History, Step};
+use crate::text::quoted;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct FileEntry {
@@ -70,7 +72,7 @@ pub fn get_file_info(path: String) -> Result<FileEntry, String> {
     file_entry(Path::new(&path)).map_err(|error| error.to_string())
 }
 
-pub fn create_file(path: String, name: String) -> Result<FileEntry, String> {
+pub fn create_file(path: String, name: String, history: &History) -> Result<FileEntry, String> {
     let file_path = PathBuf::from(path).join(name);
     match fs::OpenOptions::new()
         .write(true)
@@ -86,10 +88,15 @@ pub fn create_file(path: String, name: String) -> Result<FileEntry, String> {
         }
         Err(error) => return Err(error.to_string()),
     }
+    record_created(&file_path, history);
     file_entry(&file_path).map_err(|error| error.to_string())
 }
 
-pub fn create_directory(path: String, name: String) -> Result<FileEntry, String> {
+pub fn create_directory(
+    path: String,
+    name: String,
+    history: &History,
+) -> Result<FileEntry, String> {
     let dir_path = PathBuf::from(path).join(name);
     match fs::create_dir(&dir_path) {
         Ok(()) => {}
@@ -101,10 +108,11 @@ pub fn create_directory(path: String, name: String) -> Result<FileEntry, String>
         }
         Err(error) => return Err(error.to_string()),
     }
+    record_created(&dir_path, history);
     file_entry(&dir_path).map_err(|error| error.to_string())
 }
 
-pub fn rename_item(path: String, new_name: String) -> Result<FileEntry, String> {
+pub fn rename_item(path: String, new_name: String, history: &History) -> Result<FileEntry, String> {
     let old_path = PathBuf::from(path);
     let parent = old_path.parent().ok_or("Cannot rename the root folder")?;
     let new_path = parent.join(new_name);
@@ -127,7 +135,29 @@ pub fn rename_item(path: String, new_name: String) -> Result<FileEntry, String> 
         }
         Err(error) => return Err(error.to_string()),
     }
+    history.record(
+        format!("Renamed {} to {}", quoted(&old_path), quoted(&new_path)),
+        format!(
+            "Renamed {} back to {}",
+            quoted(&new_path),
+            quoted(&old_path)
+        ),
+        vec![Step::Moved {
+            from: old_path,
+            to: new_path.clone(),
+        }],
+        false,
+    );
     file_entry(&new_path).map_err(|error| error.to_string())
+}
+
+fn record_created(path: &Path, history: &History) {
+    history.record(
+        format!("Created {}", quoted(path)),
+        format!("Moved {} to the trash", quoted(path)),
+        vec![Step::Created(path.to_path_buf())],
+        false,
+    );
 }
 
 pub fn user_dirs() -> Result<UserDirs, String> {
@@ -149,7 +179,7 @@ pub fn open_with_default(path: String) -> Result<(), String> {
     open::that_detached(&path).map_err(|error| error.to_string())
 }
 
-fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
+pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
     let metadata = fs::symlink_metadata(path)?;
     let target = if metadata.is_symlink() {
         fs::metadata(path).ok()

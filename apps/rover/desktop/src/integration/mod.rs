@@ -2,6 +2,7 @@ pub mod chooser;
 pub mod file_manager_bus;
 pub mod launch_args;
 pub mod portal;
+pub mod terminal;
 
 use std::env;
 use std::fs;

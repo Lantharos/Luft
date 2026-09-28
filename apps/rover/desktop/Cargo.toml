@@ -16,7 +16,6 @@ serde_json = "1.0.151"
 serde = { version = "1.0.229", features = ["derive"] }
 tokio = { version = "1.53.1", features = ["rt", "process", "macros"] }
 walkdir = "2.5.0"
-trash = "5.2.9"
 dirs = "7.0.0"
 mime_guess = "2.0.5"
 chrono = "0.4.45"
@@ -24,6 +23,23 @@ parking_lot = "0.12.5"
 open = "5.4.4"
 libc = "0.2"
 luft-app = { path = "../../../packages/app" }
+gio = "0.22.10"
+gio-unix = "0.22.8"
 zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
 url = "2.5.8"
 percent-encoding = "2.3.2"
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "qoi", "tga", "pnm", "rayon"] }
+fast_image_resize = "6.1.0"
+png = "0.18.1"
+md-5 = "0.11.0"
+ignore = "0.4.33"
+regex = "1.13.1"
+memchr = "2.8.3"
+zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64", "bzip2", "zstd", "lzma", "xz", "chrono"] }
+tar = "0.4.46"
+zstd = { version = "0.14.0", features = ["zstdmt"] }
+flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
+bzip2 = "0.6.1"
+liblzma = "0.4.8"
+sevenz-rust2 = { version = "0.23.0", default-features = false, features = ["bzip2", "deflate", "ppmd", "util", "zstd"] }
+uzers = "0.12.2"

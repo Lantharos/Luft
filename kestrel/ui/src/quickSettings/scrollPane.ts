@@ -19,8 +19,9 @@ export class ScrollPane {
     this.actor.connect('destroy', () => stage.disconnect(focusSignal));
   }
 
-  measure(width: number, limit: number): number {
+  measure(width: number, limit: number, settled: boolean): number {
     const natural = this.body.get_preferred_height(width)[1];
+    this.actor.vscrollbar_policy = settled && natural > limit ? St.PolicyType.AUTOMATIC : St.PolicyType.EXTERNAL;
     this.actor.height = Math.max(0, Math.min(natural, limit));
     return this.actor.height;
   }

@@ -101,6 +101,14 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
     await pause(500);
     require(keyboard.width < grid().width / 2 + 1, 'closing options returns the tile to the grid');
 
+    const volume = descendants(quick).find(actor => actor.slider && actor.menu && actor.menuEnabled);
+    volume._menuButton.emit('clicked', 1);
+    await pause(400);
+    require(volume.menu.isOpen, 'the device chevron opens the device list');
+    volume._menuButton.emit('clicked', 1);
+    await pause(400);
+    require(!volume.menu.isOpen, 'the same chevron closes it again');
+
     const [first, second] = grid().get_children().filter(actor => actor.has_style_class_name?.('kestrel-control') && actor.visible)
       .sort((a, b) => a.y - b.y || a.x - b.x);
     const [fromX, fromY] = center(first);

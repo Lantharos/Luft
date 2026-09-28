@@ -78,17 +78,9 @@ export const PANEL_GROUPS: Panel[][] = [
 export const PANELS = PANEL_GROUPS.flat();
 export const DEFAULT_PANEL: PanelId = 'network';
 
-const ALIASES: Record<string, PanelId> = {
-	wifi: 'network',
-	background: 'appearance',
-	system: 'users',
-	'universal-access': 'appearance'
-};
-
 export function resolvePanel(target: string): PanelId | null {
 	const name = target.replace(/^kestrel-settings:(\/\/)?/, '').split(/[/?#]/)[0].toLowerCase();
-	if (PANELS.some((panel) => panel.id === name)) return name as PanelId;
-	return ALIASES[name] ?? null;
+	return PANELS.find((panel) => panel.id === name)?.id ?? null;
 }
 
 export function searchPanels(query: string): Panel[] {

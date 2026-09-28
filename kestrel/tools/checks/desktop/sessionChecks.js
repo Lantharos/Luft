@@ -61,7 +61,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   require(resultTitle() === '= 42', 'search evaluates calculations');
   search.set_text('bluetooth');
   await pause(100);
-  require(results().get_children().some(row => row.name === 'kestrel-search-setting:gnome-bluetooth-panel.desktop'),
+  require(results().get_children().some(row => row.name === 'kestrel-search-setting:bluetooth'),
     'search finds settings pages');
   const recentFile = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel-quarterly-report.txt']));
   recentFile.replace_contents(new TextEncoder().encode('report'), null, false, Gio.FileCreateFlags.NONE, null);

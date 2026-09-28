@@ -1,139 +1,111 @@
 # Rover
 
-A modern, fast, and user-friendly file manager for Linux built with Sabine + SvelteKit.
-
-In the Luft monorepo, Rover lives at `apps/rover`. Run the commands below from that directory.
+Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft monorepo it lives at `apps/rover`; run the commands below from that directory.
 
 ## Features
 
-- **Modern UI**: Compact dark interface with a native translucent sidebar on supported Wayland compositors
-- **Tab Support**: Open multiple folders in tabs
-- **Drives View**: Windows-style drives/volumes overview with usage info
-- **Trash Management**: Full trash support with restore and permanent delete
-- **Favorites**: Pin files and folders from the context menu for quick access
-- **Sidebar Bookmarks**: Drop files or folders into the sidebar and remove pinned entries inline
-- **Native Drag and Drop**: Move files within Rover or drag them between Rover and other desktop apps
-- **File Previews**: Inline image thumbnails with dedicated package and AppImage icons
-- **Per-Folder Views**: Table, list, and gallery choices are remembered per folder
-- **Marquee Selection**: Drag through empty space to select multiple files
-- **Inline Editing**: Create and rename files directly in the file list
-- **Editable Path Bar**: Click the current path to type a destination directly
-- **Hidden Files Toggle**: Show or hide dotfiles without leaving the current folder
-- **Keyboard Shortcuts**: Full keyboard navigation support
-- **Search**: Quick file search within current directory
-- **Custom Window**: Sabine OSR window with native controls, rounded input regions, and a translucent sidebar on supported compositors
-- **File Chooser Portal**: Rover can register as the xdg-desktop-portal file picker for apps that use the Linux portal picker
+- Tabs with their own back and forward history
+- List, grid and table views, remembered per folder
+- Image thumbnails, loaded straight from disk
+- Folders refresh on their own when files change, including changes made by other apps
+- Copy and move run in the background with progress, pause and cancel, and never overwrite an existing file
+- Drag and drop within Rover and to or from other apps
+- Trash across the home folder and mounted drives, with restore
+- Favorites and a sidebar you can pin files and folders to, reorder and prune
+- Drives overview with usage, and eject for removable drives
+- Git and Pig status badges, diffs, commits and sync for the folder you are in
+- Inline create and rename, marquee selection and an editable path bar
+- A file chooser for apps that use the xdg-desktop-portal picker
+- `org.freedesktop.FileManager1`, so "Show in folder" in other apps opens Rover
 
-## Prerequisites
-
-Rover uses Sabine's shared Chromium runtime and service. The first launch prepares the runtime when needed, and later launches reuse it.
+The sidebar uses the compositor's background blur on Wayland compositors that support `ext-background-effect-v1`, and falls back to a solid surface elsewhere. The rest of the window stays opaque.
 
 ## Development
 
+Rover uses Sabine's shared Chromium runtime. The first launch prepares it when needed.
+
 ```bash
-# Install dependencies
 bun install
-
-# Run in development mode
-bun run desktop:dev
-
-# Build for production
-bun run desktop:build
+bun run desktop:dev      # Vite dev server and the native window
+bun run check            # svelte-check
+bun run desktop:build    # production web build and release binary
 ```
 
-Sidebar translucency is configured through Sabine window regions. Rover keeps the main content opaque and uses compositor-backed blur only for the sidebar surface where available.
+Images are loaded through Sabine's local file access, which only works from the packaged app origin, so thumbnails appear in production builds and bundles but not while running against the Vite dev server.
+
+Opening the Vite server in a regular browser shows the interface with sample data, which is handy for styling work.
 
 ## Install
 
-Rover has a `Sabine.toml`, so Sabine can detect the app id, icon, web build, and source launch command from the repo root:
+Rover has a `Sabine.toml`, so Sabine picks up the app id, icon, web build and launch command from the project:
 
 ```bash
 sabine install .
 ```
 
-Update the installed desktop entry and staged web/icon assets from the repo root with:
+The installed desktop entry accepts paths. Opening a folder shows it; opening a file shows its folder with the file selected. If Rover is already running, the path opens in a new tab of the existing window.
 
-```bash
-sabine update
-```
+## File chooser portal
 
-The installed desktop entry accepts paths. Opening a folder with Rover opens that folder; opening a file opens its parent folder and selects the file. If Rover is already running, the path opens in a new tab in the existing window and Sabine focuses that window.
-
-## File Picker Portal
-
-Rover includes an xdg-desktop-portal FileChooser backend. The local installer writes the portal descriptor and D-Bus activation file for the current user.
-
-To prefer Rover for portal file pickers in your user session:
+Rover ships an xdg-desktop-portal FileChooser backend. To use it as the picker for your session:
 
 ```bash
 desktop/target/debug/rover --install-file-chooser-portal
 systemctl --user restart xdg-desktop-portal.service
 ```
 
-The same command also works from an AppImage or local build, using the executable path that ran the command.
+This writes the portal descriptor, the D-Bus activation file and a `portals.conf` preference for the current user, pointing at the executable that ran the command, so it works the same from a bundle or a local build.
 
-## Show in Folder (FileManager1 D-Bus)
+## Show in folder
 
-Many apps (browsers, chat clients, download managers) call `org.freedesktop.FileManager1.ShowItems` over D-Bus for "Show in Folder" / "Open Containing Folder" actions. Without a service registered for that bus name the call silently fails and the calling app may surface an error.
-
-Rover ships a D-Bus service that implements `org.freedesktop.FileManager1` and routes `ShowItems`, `ShowFolders`, and the legacy `OpenFolder` into the existing window. To install it for the current user:
+Apps call `org.freedesktop.FileManager1` over D-Bus for "Show in folder" and "Open containing folder". To let Rover answer those calls:
 
 ```bash
 desktop/target/debug/rover --install-file-manager-bus
 ```
 
-The installer writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service` pointing at the running binary. D-Bus will auto-start the service on the first call and keep it running for the session. New `ShowItems` calls are forwarded via Sabine's single-instance activation, so they reuse the existing window.
+This writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service`. D-Bus starts the service on the first call. `ShowItems` opens the containing folder with the item selected, and `ShowFolders` opens the folders themselves, in the running window when there is one. To hand the name back to another file manager, remove that service file.
 
-To hand the bus name back to another file manager (for example, Nautilus), just remove the service file:
-
-```bash
-rm ~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
-```
-
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+C` | Copy selected |
-| `Ctrl+X` | Cut selected |
-| `Ctrl+V` | Paste |
+| `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | Copy, cut and paste |
 | `Ctrl+A` | Select all |
-| `Ctrl+T` | New tab |
-| `Ctrl+W` | Close tab |
-| `Delete` | Move to trash |
+| `Ctrl+F` | Search the current folder |
+| `Ctrl+T` / `Ctrl+W` | New tab, close tab |
 | `F2` | Rename |
-| `Backspace` | Go up one directory |
-| Mouse Back/Forward | Navigate folder history |
-| `Escape` | Clear selection |
+| `F5` | Refresh |
+| `Delete` | Move to trash, or delete for good inside the trash |
+| `Backspace` | Go to the parent folder |
+| `Escape` | Clear the selection |
+| Mouse back and forward | Folder history |
 
-## Project Structure
+## Project layout
 
 ```
 rover/
-├── src/                    # Frontend (SvelteKit)
+├── src/
 │   ├── lib/
-│   │   ├── api.ts          # Sabine bridge wrappers
-│   │   ├── components/     # Svelte components
-│   │   │   └── file-manager/ # File manager UI shell
-│   │   ├── file-manager/   # File manager state and list helpers
-│   │   ├── stores/         # Svelte stores for state
-│   │   ├── types/          # TypeScript types
-│   │   └── utils/          # Utility functions
-│   └── routes/
-│       └── +page.svelte    # Main application UI
-├── desktop/                # Sabine backend (Rust)
-│   └── src/
-│       ├── lib.rs          # Sabine window and bridge setup
-│       ├── fs_ops.rs       # File system operations
-│       ├── drives.rs       # Drive/mount detection
-│       ├── trash_manager.rs # Trash operations
-│       ├── portal_backend.rs # xdg-desktop-portal FileChooser backend
-│       ├── chooser.rs      # Portal-launched picker session state
-│       ├── operations_queue.rs # File op queue
-│       └── settings.rs     # User settings
-└── package.json
+│   │   ├── api.ts             bridge commands and events
+│   │   ├── components/        pane, shell and version control components
+│   │   ├── file-manager/      navigation, actions, drag and drop, chooser
+│   │   ├── state/             settings and tabs
+│   │   ├── utils/             formatting, paths and file kinds
+│   │   └── vcs/               version control state
+│   ├── routes/+page.svelte    window layout
+│   └── styles/                shared component styles
+├── static/fonts/              Open Runde
+└── desktop/src/
+    ├── bridge/                bridge command registration
+    ├── drives/                mounts, drive info and mount watching
+    ├── files/                 listing, transfers, trash, operations and folder watching
+    ├── integration/           file chooser portal, FileManager1 and launch paths
+    ├── vcs/                   Git and Pig
+    ├── settings.rs
+    └── state.rs
 ```
 
 ## License
 
-MIT
+MIT. Open Runde is licensed under the SIL Open Font License, included in `static/fonts/OFL.txt`.

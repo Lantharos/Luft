@@ -1,233 +1,54 @@
 import { invoke, listen } from '@lantharos/sabine';
-import type {
-	DirectoryContents,
-	FileEntry,
-	UserDirs,
-	DriveList,
-	DriveInfo,
-	TrashContents,
-	QueueStatus,
-	Settings,
-	FavoriteItem,
-	PinnedFolder,
-	BackgroundEffectStatus,
-	ChooserConfig
-} from './types';
-import type { VcsFileStatus, VcsJobTicket, VcsJobUpdate, VcsProject } from './vcs/types';
+import type { AppState, DirectoryContents, DriveInfo, FileEntry, Operation, Settings, TrashContents } from './types';
+import type { VcsRoot, VcsStatusEvent } from './vcs/types';
 
-export async function listenBridgeEvent<T>(name: string, callback: (payload: T) => void): Promise<() => void> {
-	return listen(name, callback);
-}
+export const appState = () => invoke<AppState>('app_state');
+export const updateSettings = (settings: Settings) => invoke<void>('update_settings', { settings });
 
-function filePath(path: string): string {
-	const trimmed = path.trim();
-	if (!/%[0-9a-f]{2}/i.test(trimmed)) return trimmed;
-	try {
-		const decoded = decodeURIComponent(trimmed);
-		return decoded.startsWith('/') ? decoded : trimmed;
-	} catch {
-		return trimmed;
-	}
-}
+export const listDirectory = (path: string, showHidden: boolean) => invoke<DirectoryContents>('list_directory', { path, showHidden });
+export const watchDirectory = (path: string) => invoke<void>('watch_directory', { path });
+export const getFileInfo = (path: string) => invoke<FileEntry>('get_file_info', { path });
+export const createFile = (path: string, name: string) => invoke<FileEntry>('create_file', { path, name });
+export const createDirectory = (path: string, name: string) => invoke<FileEntry>('create_directory', { path, name });
+export const renameItem = (path: string, newName: string) => invoke<FileEntry>('rename_item', { path, newName });
+export const copyItems = (sources: string[], destination: string) => invoke<string>('copy_items', { sources, destination });
+export const moveItems = (sources: string[], destination: string) => invoke<string>('move_items', { sources, destination });
+export const openWithDefault = (path: string) => invoke<void>('open_with_default', { path });
 
-function filePaths(paths: string[]): string[] {
-	return paths.map(filePath);
-}
+export const listDrives = () => invoke<DriveInfo[]>('list_drives');
+export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
 
-function favoriteItem(item: FavoriteItem): FavoriteItem {
-	return { ...item, path: filePath(item.path) };
-}
+export const listTrash = () => invoke<TrashContents>('list_trash');
+export const moveToTrash = (paths: string[]) => invoke<void>('move_to_trash', { paths });
+export const restoreFromTrash = (ids: string[]) => invoke<void>('restore_from_trash', { ids });
+export const deletePermanently = (ids: string[]) => invoke<void>('delete_permanently', { ids });
+export const emptyTrash = (trashPath: string | null) => invoke<void>('empty_trash', { trashPath });
 
-function pinnedFolder(folder: PinnedFolder): PinnedFolder {
-	return { ...folder, path: filePath(folder.path) };
-}
+export const listOperations = () => invoke<Operation[]>('list_operations');
+export const cancelOperation = (id: string) => invoke<void>('cancel_operation', { id });
+export const pauseOperation = (id: string) => invoke<void>('pause_operation', { id });
+export const resumeOperation = (id: string) => invoke<void>('resume_operation', { id });
 
-function appSettings(settings: Settings): Settings {
-	return {
-		...settings,
-		folderViewModes: Object.fromEntries(Object.entries(settings.folderViewModes).map(([path, mode]) => [filePath(path), mode])),
-		favorites: settings.favorites.map(favoriteItem),
-		pinnedFolders: settings.pinnedFolders.map(pinnedFolder),
-		recentPaths: filePaths(settings.recentPaths)
-	};
-}
+export const vcsRoot = (path: string) => invoke<VcsRoot | null>('vcs_root', { path });
+export const startVcsStatus = (root: string) => invoke<string>('vcs_status', { root });
+export const vcsDiff = (root: string, filePath: string | null) => invoke<string>('vcs_diff', { root, filePath });
+export const saveVcs = (root: string, message: string, files: string[] | null) => invoke<void>('vcs_save', { root, message, files });
+export const syncVcs = (root: string) => invoke<void>('vcs_sync', { root });
 
-export async function listDirectory(path: string, showHidden: boolean = false): Promise<DirectoryContents> {
-	return invoke('list_directory', { path: filePath(path), showHidden });
-}
+export const resolveArguments = (activation: SingleInstanceActivation) => invoke<string[]>('resolve_arguments', activation);
 
-export async function getFileInfo(path: string): Promise<FileEntry> {
-	return invoke('get_file_info', { path: filePath(path) });
-}
+export const acceptChooser = (paths: string[]) => invoke<void>('accept_chooser', { paths });
+export const cancelChooser = () => invoke<void>('cancel_chooser');
 
-export async function createFile(path: string, name: string): Promise<FileEntry> {
-	return invoke('create_file', { path: filePath(path), name });
-}
+export type SingleInstanceActivation = {
+	arguments: string[];
+	workingDirectory: string | null;
+};
 
-export async function createDirectory(path: string, name: string): Promise<FileEntry> {
-	return invoke('create_directory', { path: filePath(path), name });
-}
-
-export async function renameItem(path: string, newName: string): Promise<FileEntry> {
-	return invoke('rename_item', { path: filePath(path), newName });
-}
-
-export async function copyItems(sources: string[], destination: string): Promise<string> {
-	return invoke('copy_items', { sources: filePaths(sources), destination: filePath(destination) });
-}
-
-export async function moveItems(sources: string[], destination: string): Promise<string> {
-	return invoke('move_items', { sources: filePaths(sources), destination: filePath(destination) });
-}
-
-export async function deleteItems(paths: string[]): Promise<string> {
-	return invoke('delete_items', { paths: filePaths(paths) });
-}
-
-export async function getHomeDir(): Promise<string> {
-	return invoke('get_home_dir');
-}
-
-export async function getUserDirs(): Promise<UserDirs> {
-	return invoke('get_user_dirs');
-}
-
-export async function getLaunchPaths(): Promise<string[]> {
-	return invoke('get_launch_paths');
-}
-
-export async function readTextFile(path: string, maxBytes?: number): Promise<string> {
-	return invoke('read_text_file', { path: filePath(path), maxBytes });
-}
-
-export async function openWithDefault(path: string): Promise<void> {
-	return invoke('open_with_default', { path: filePath(path) });
-}
-
-export async function getThumbnail(path: string): Promise<string | null> {
-	return invoke('get_thumbnail', { path: filePath(path) });
-}
-
-// Drives
-export async function listDrives(): Promise<DriveList> {
-	return invoke('list_drives');
-}
-
-export async function getDriveInfo(mountPoint: string): Promise<DriveInfo> {
-	return invoke('get_drive_info', { mountPoint: filePath(mountPoint) });
-}
-
-export async function ejectDrive(mountPoint: string): Promise<void> {
-	return invoke('eject_drive', { mountPoint: filePath(mountPoint) });
-}
-
-// Trash
-export async function listTrash(): Promise<TrashContents> {
-	return invoke('list_trash');
-}
-
-export async function moveToTrash(paths: string[]): Promise<void> {
-	return invoke('move_to_trash', { paths: filePaths(paths) });
-}
-
-export async function restoreFromTrash(ids: string[]): Promise<void> {
-	return invoke('restore_from_trash', { ids });
-}
-
-export async function deletePermanently(ids: string[]): Promise<void> {
-	return invoke('delete_permanently', { ids });
-}
-
-export async function emptyTrash(trashPath?: string): Promise<void> {
-	return invoke('empty_trash', { trashPath: trashPath ? filePath(trashPath) : null });
-}
-
-// Operations queue
-export async function getQueueStatus(): Promise<QueueStatus> {
-	return invoke('get_queue_status');
-}
-
-export async function cancelOperation(id: string): Promise<void> {
-	return invoke('cancel_operation', { id });
-}
-
-export async function pauseOperation(id: string): Promise<void> {
-	return invoke('pause_operation', { id });
-}
-
-export async function resumeOperation(id: string): Promise<void> {
-	return invoke('resume_operation', { id });
-}
-
-// Settings
-export async function getSettings(): Promise<Settings> {
-	return appSettings(await invoke<Settings>('get_settings'));
-}
-
-export async function updateSettings(newSettings: Settings): Promise<void> {
-	return invoke('update_settings', { newSettings: appSettings(newSettings) });
-}
-
-export async function addFavorite(item: FavoriteItem): Promise<void> {
-	return invoke('add_favorite', { item: favoriteItem(item) });
-}
-
-export async function removeFavorite(path: string): Promise<void> {
-	return invoke('remove_favorite', { path: filePath(path) });
-}
-
-export async function addPinnedFolder(folder: PinnedFolder): Promise<void> {
-	return invoke('add_pinned_folder', { folder: pinnedFolder(folder) });
-}
-
-export async function removePinnedFolder(path: string): Promise<void> {
-	return invoke('remove_pinned_folder', { path: filePath(path) });
-}
-
-export async function getBackgroundEffectStatus(): Promise<BackgroundEffectStatus> {
-	return invoke('get_background_effect_status');
-}
-
-export async function getChooserConfig(): Promise<ChooserConfig> {
-	return invoke('get_chooser_config');
-}
-
-export async function acceptChooser(paths: string[]): Promise<void> {
-	return invoke('accept_chooser', { paths: filePaths(paths) });
-}
-
-export async function cancelChooser(): Promise<void> {
-	return invoke('cancel_chooser');
-}
-
-export async function detectVcs(path: string): Promise<VcsProject | null> {
-	return invoke('vcs_detect', { path: filePath(path) });
-}
-
-export async function startVcsStatus(path: string): Promise<VcsJobTicket> {
-	return invoke('vcs_start_status', { path: filePath(path) });
-}
-
-export async function getVcsStatusResult(jobId: string): Promise<VcsJobUpdate> {
-	return invoke('vcs_status_result', { jobId });
-}
-
-export async function getVcsProjectStatus(root: string): Promise<VcsProject> {
-	return invoke('vcs_project_status', { root: filePath(root) });
-}
-
-export async function getVcsFileStatuses(root: string): Promise<Record<string, VcsFileStatus>> {
-	return invoke('vcs_file_statuses', { root: filePath(root) });
-}
-
-export async function getVcsDiff(root: string, targetPath?: string): Promise<string> {
-	return invoke('vcs_diff', { root: filePath(root), filePath: targetPath ? filePath(targetPath) : null });
-}
-
-export async function saveVcs(root: string, message: string, files?: string[]): Promise<void> {
-	return invoke('vcs_save', { root: filePath(root), message, files: files ? filePaths(files) : null });
-}
-
-export async function syncVcs(root: string): Promise<void> {
-	return invoke('vcs_sync', { root: filePath(root) });
-}
+export const events = {
+	operations: (callback: (operations: Operation[]) => void) => listen('rover.operations', callback),
+	drives: (callback: () => void) => listen('rover.drives', callback),
+	directory: (callback: (event: { path: string }) => void) => listen('rover.directory', callback),
+	vcsStatus: (callback: (event: VcsStatusEvent) => void) => listen('rover.vcs', callback),
+	activation: (callback: (activation: SingleInstanceActivation) => void) => listen('singleInstance.activate', callback)
+};

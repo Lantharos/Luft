@@ -1,39 +1,54 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+struct Command {
+    flag: &'static str,
+    run: fn() -> Result<(), String>,
+    success: Option<&'static str>,
+    failure: &'static str,
+}
+
+const COMMANDS: [Command; 4] = [
+    Command {
+        flag: "--portal-backend",
+        run: rover_lib::run_portal_backend,
+        success: None,
+        failure: "Rover file chooser portal failed",
+    },
+    Command {
+        flag: "--install-file-chooser-portal",
+        run: rover_lib::install_file_chooser_portal,
+        success: Some("Rover file chooser portal installed for this user."),
+        failure: "Could not install the Rover file chooser portal",
+    },
+    Command {
+        flag: "--file-manager-bus",
+        run: rover_lib::run_file_manager_bus,
+        success: None,
+        failure: "Rover file manager bus failed",
+    },
+    Command {
+        flag: "--install-file-manager-bus",
+        run: rover_lib::install_file_manager_bus,
+        success: Some("Rover file manager bus installed for this user."),
+        failure: "Could not install the Rover file manager bus",
+    },
+];
 
 fn main() {
-    let args = std::env::args().collect::<Vec<_>>();
-    if args.iter().any(|arg| arg == "--portal-backend") {
-        if let Err(error) = rover_lib::run_portal_backend() {
-            eprintln!("rover portal backend failed: {}", error);
-            std::process::exit(1);
-        }
-        return;
-    }
-    if args
+    let args: Vec<String> = std::env::args().collect();
+    let Some(command) = COMMANDS
         .iter()
-        .any(|arg| arg == "--install-file-chooser-portal")
-    {
-        if let Err(error) = rover_lib::install_file_chooser_portal() {
-            eprintln!("failed to install Rover file chooser portal: {}", error);
+        .find(|command| args.iter().any(|arg| arg == command.flag))
+    else {
+        rover_lib::run_app();
+    };
+    match (command.run)() {
+        Ok(()) => {
+            if let Some(success) = command.success {
+                println!("{success}");
+            }
+        }
+        Err(error) => {
+            eprintln!("{}: {error}", command.failure);
             std::process::exit(1);
         }
-        println!("Rover file chooser portal installed for this user.");
-        return;
     }
-    if args.iter().any(|arg| arg == "--file-manager-bus") {
-        if let Err(error) = rover_lib::run_file_manager_bus() {
-            eprintln!("Rover file manager bus failed: {}", error);
-            std::process::exit(1);
-        }
-        return;
-    }
-    if args.iter().any(|arg| arg == "--install-file-manager-bus") {
-        if let Err(error) = rover_lib::install_file_manager_bus_service() {
-            eprintln!("failed to install Rover file manager bus: {}", error);
-            std::process::exit(1);
-        }
-        println!("Rover file manager bus installed for this user.");
-        return;
-    }
-    sabine::SabineWindow::main(move |window| rover_lib::build_window(window, &args));
 }

@@ -208,6 +208,11 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-app-slots { spacing: 0; }
 .kestrel-page-navigation { spacing: 8px; font-size: 12px; }
 .kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: 120ms; }
+.kestrel-quick-settings .keyboard-brightness-level { spacing: 6px; font-size: 13px; }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button { padding: 10px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.08); transition-duration: 120ms; }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:hover { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:checked { background-color: rgba(255, 255, 255, 0.26); }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:checked:hover { background-color: rgba(255, 255, 255, 0.32); }
 .kestrel-quick-settings .popup-menu-item:hover,
 .kestrel-quick-settings .popup-menu-item:focus,
 .kestrel-quick-settings .popup-menu-item:active { background-color: rgba(255, 255, 255, 0.16); }

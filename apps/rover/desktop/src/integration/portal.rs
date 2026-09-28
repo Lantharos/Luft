@@ -13,7 +13,7 @@ use super::chooser::{
     ACCEPT_LABEL_ENV, CURRENT_FOLDER_ENV, CURRENT_NAME_ENV, ChooserMode, ChooserResponse,
     DIRECTORY_ENV, FILES_ENV, MODE_ENV, MULTIPLE_ENV, RESPONSE_ENV, TITLE_ENV,
 };
-use super::{config_dir, data_dir, install_dbus_service, serve_dbus, write_file};
+use super::{data_dir, install_dbus_service, serve_dbus, write_file};
 
 const BUS_NAME: &str = "org.freedesktop.impl.portal.desktop.rover";
 const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
@@ -104,10 +104,7 @@ pub fn install() -> Result<(), String> {
     write_file(
         &data_dir()?.join("xdg-desktop-portal/portals/rover.portal"),
         &format!("[portal]\nDBusName={BUS_NAME}\nInterfaces={FILE_CHOOSER_INTERFACE};\nUseIn=*;\n"),
-    )?;
-    let config_path = config_dir()?.join("xdg-desktop-portal/portals.conf");
-    let config = preferred_portal_config(&fs::read_to_string(&config_path).unwrap_or_default());
-    write_file(&config_path, &config)
+    )
 }
 
 async fn run_chooser(
@@ -242,25 +239,3 @@ where
     OwnedValue::try_from(Value::from(value)).expect("URI lists always fit in a D-Bus variant")
 }
 
-fn preferred_portal_config(current: &str) -> String {
-    let key = format!("{FILE_CHOOSER_INTERFACE}=");
-    let line = format!("{key}rover;*");
-    if current.contains(&key) {
-        return current
-            .lines()
-            .map(|existing| {
-                if existing.trim_start().starts_with(&key) {
-                    line.as_str()
-                } else {
-                    existing
-                }
-            })
-            .collect::<Vec<_>>()
-            .join("\n")
-            + "\n";
-    }
-    if current.contains("[preferred]") {
-        return current.replacen("[preferred]", &format!("[preferred]\n{line}"), 1);
-    }
-    format!("[preferred]\n{line}\n{current}")
-}

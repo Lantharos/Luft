@@ -42,10 +42,6 @@ fn data_dir() -> Result<PathBuf, String> {
     dirs::data_dir().ok_or_else(|| "Could not find the user data folder".to_string())
 }
 
-fn config_dir() -> Result<PathBuf, String> {
-    dirs::config_dir().ok_or_else(|| "Could not find the user configuration folder".to_string())
-}
-
 fn write_file(path: &Path, contents: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;

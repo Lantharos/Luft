@@ -54,7 +54,7 @@ desktop/target/debug/rover --install-file-chooser-portal
 systemctl --user restart xdg-desktop-portal.service
 ```
 
-This writes the portal descriptor, the D-Bus activation file and a `portals.conf` preference for the current user, pointing at the executable that ran the command, so it works the same from a bundle or a local build.
+This writes the portal descriptor and the D-Bus activation file for the current user, pointing at the executable that ran the command, so it works the same from a bundle or a local build. Kestrel already prefers Rover for file dialogs; on other desktops, add `org.freedesktop.impl.portal.FileChooser=rover;*` under `[preferred]` in `~/.config/xdg-desktop-portal/portals.conf`.
 
 ## Show in folder
 

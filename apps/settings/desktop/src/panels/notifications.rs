@@ -11,10 +11,13 @@ use super::apps::info::App;
 const SCHEMA: &str = "org.gnome.desktop.notifications";
 const APPLICATION_SCHEMA: &str = "org.gnome.desktop.notifications.application";
 const APPLICATION_PATH: &str = "/org/gnome/desktop/notifications/application";
+const RULES_PATH: &str = "/dev/lantharos/kestrel/notifications/application";
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct NotifyingApp {
     path: String,
+    rules_path: String,
     #[serde(flatten)]
     app: App,
 }
@@ -28,8 +31,11 @@ fn notifying_apps() -> Vec<NotifyingApp> {
             let path = format!("{APPLICATION_PATH}/{child}/");
             let id = gio::Settings::with_path(APPLICATION_SCHEMA, &path).string("application-id");
             let app = App::by_id(&id)?;
-            seen.insert(app.id.clone())
-                .then_some(NotifyingApp { path, app })
+            seen.insert(app.id.clone()).then(|| NotifyingApp {
+                path,
+                rules_path: format!("{RULES_PATH}/{child}/"),
+                app,
+            })
         })
         .collect();
     apps.sort_by_cached_key(|entry| entry.app.name.to_lowercase());

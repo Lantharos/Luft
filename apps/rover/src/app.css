@@ -143,7 +143,7 @@
 		--sidebar-text-muted: rgba(255, 255, 255, 0.74);
 		--sidebar-control: rgba(255, 255, 255, 0.1);
 		--sidebar-control-hover: rgba(255, 255, 255, 0.14);
-		background: transparent;
+		background: rgba(18, 18, 17, 0.34);
 		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
 	}
 

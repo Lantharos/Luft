@@ -33,7 +33,9 @@ struct Wallpaper {
 fn is_image(path: &Path) -> bool {
     path.extension()
         .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| IMAGE_EXTENSIONS.contains(&extension.to_ascii_lowercase().as_str()))
+        .is_some_and(|extension| {
+            IMAGE_EXTENSIONS.contains(&extension.to_ascii_lowercase().as_str())
+        })
 }
 
 fn collect(directory: &Path, depth: usize, found: &mut Vec<PathBuf>) {
@@ -70,22 +72,33 @@ fn described() -> Vec<Wallpaper> {
             let Ok(xml) = fs::read_to_string(entry.path()) else {
                 continue;
             };
-            let Ok(document) = roxmltree::Document::parse_with_options(&xml, roxmltree::ParsingOptions { allow_dtd: true, ..Default::default() }) else {
+            let Ok(document) = roxmltree::Document::parse_with_options(
+                &xml,
+                roxmltree::ParsingOptions {
+                    allow_dtd: true,
+                    ..Default::default()
+                },
+            ) else {
                 continue;
             };
-            for node in document.descendants().filter(|node| node.has_tag_name("wallpaper") && node.attribute("deleted") != Some("true")) {
+            for node in document.descendants().filter(|node| {
+                node.has_tag_name("wallpaper") && node.attribute("deleted") != Some("true")
+            }) {
                 let text = |tag: &str| {
                     node.children()
                         .find(|child| child.has_tag_name(tag))
                         .and_then(|child| child.text())
                         .map(|text| text.trim().to_owned())
                 };
-                let Some(path) = text("filename").filter(|path| is_image(Path::new(path)) && Path::new(path).exists()) else {
+                let Some(path) = text("filename")
+                    .filter(|path| is_image(Path::new(path)) && Path::new(path).exists())
+                else {
                     continue;
                 };
                 wallpapers.push(Wallpaper {
                     name: text("name").unwrap_or_else(|| display_name(Path::new(&path))),
-                    dark_path: text("filename-dark").filter(|dark| is_image(Path::new(dark)) && Path::new(dark).exists()),
+                    dark_path: text("filename-dark")
+                        .filter(|dark| is_image(Path::new(dark)) && Path::new(dark).exists()),
                     path,
                 });
             }
@@ -95,7 +108,9 @@ fn described() -> Vec<Wallpaper> {
 }
 
 fn display_name(path: &Path) -> String {
-    path.file_stem().map(|stem| stem.to_string_lossy().replace(['-', '_'], " ")).unwrap_or_default()
+    path.file_stem()
+        .map(|stem| stem.to_string_lossy().replace(['-', '_'], " "))
+        .unwrap_or_default()
 }
 
 fn wallpapers() -> Result<Vec<Wallpaper>, String> {
@@ -111,7 +126,10 @@ fn wallpapers() -> Result<Vec<Wallpaper>, String> {
     loose.dedup();
     for path in loose {
         let path_text = path.to_string_lossy().into_owned();
-        if wallpapers.iter().any(|wallpaper| wallpaper.path == path_text || wallpaper.dark_path.as_deref() == Some(path_text.as_str())) {
+        if wallpapers.iter().any(|wallpaper| {
+            wallpaper.path == path_text
+                || wallpaper.dark_path.as_deref() == Some(path_text.as_str())
+        }) {
             continue;
         }
         wallpapers.push(Wallpaper {
@@ -126,7 +144,8 @@ fn wallpapers() -> Result<Vec<Wallpaper>, String> {
 fn decode(source: &Path, extension: &str) -> Result<image::DynamicImage, String> {
     if extension == "jxl" {
         let file = fs::File::open(source).map_err(|error| error.to_string())?;
-        let decoder = jxl_oxide::integration::JxlDecoder::new(file).map_err(|error| error.to_string())?;
+        let decoder =
+            jxl_oxide::integration::JxlDecoder::new(file).map_err(|error| error.to_string())?;
         return image::DynamicImage::from_decoder(decoder).map_err(|error| error.to_string());
     }
     image::open(source).map_err(|error| error.to_string())

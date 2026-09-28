@@ -57,7 +57,9 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
             Ok(AppState {
                 translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
                 accent: kestrel::accent().ok().flatten(),
-                page: std::env::args().skip(1).find(|argument| argument.starts_with(PAGE_SCHEME)),
+                page: std::env::args()
+                    .skip(1)
+                    .find(|argument| argument.starts_with(PAGE_SCHEME)),
             })
         })
         .command(

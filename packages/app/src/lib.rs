@@ -1,3 +1,5 @@
+#[cfg(feature = "apps")]
+pub mod apps;
 mod bridge;
 pub mod dbus;
 mod events;

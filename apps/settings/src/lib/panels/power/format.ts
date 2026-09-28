@@ -14,6 +14,8 @@ export function durationOptions(seconds: number[], current: number) {
 	return [...values.map((value) => ({ value, label: duration(value) })), { value: 0, label: 'Never' }];
 }
 
-export function watts(value: number, suffix = '') {
-	return `${value < 10 ? value.toFixed(1) : Math.round(value)} W${suffix}`;
+export function watts(value: number) {
+	return `${value < 10 ? value.toFixed(1) : Math.round(value)} W`;
 }
+
+export const wattHours = (value: number) => `${Number(value.toFixed(1))} Wh`;

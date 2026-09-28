@@ -2,11 +2,13 @@ export { appearance, type Appearance } from './appearance.svelte';
 
 export { default as Dialog } from './controls/Dialog.svelte';
 export { default as IconButton } from './controls/IconButton.svelte';
+export { default as PasswordField } from './controls/PasswordField.svelte';
 export { default as SearchField } from './controls/SearchField.svelte';
 export { default as Segmented } from './controls/Segmented.svelte';
 export { default as Select } from './controls/Select.svelte';
 export { default as Slider } from './controls/Slider.svelte';
 export { default as Switch } from './controls/Switch.svelte';
+export { default as TextField } from './controls/TextField.svelte';
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';

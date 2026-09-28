@@ -24,7 +24,7 @@
 	}
 
 	.settings-sidebar[data-effect='translucent'] {
-		background: transparent;
+		background: rgba(18, 18, 17, 0.34);
 		--sidebar-text: rgba(255, 255, 255, 0.86);
 		--sidebar-text-muted: rgba(255, 255, 255, 0.62);
 		--sidebar-control: rgba(255, 255, 255, 0.1);

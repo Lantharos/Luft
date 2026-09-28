@@ -1,9 +1,5 @@
-import GLib from 'gi://GLib';
 import * as Signals from '../misc/signals.js';
 
-import * as FileUtils from '../misc/fileUtils.js';
-
-import {LoginDialog}  from '../gdm/loginDialog.js';
 import {UnlockDialog} from '../ui/unlockDialog.js';
 
 import * as Config from '../misc/config.js';
@@ -25,13 +21,11 @@ const _modes = {
         themeResourceName: 'gnome-shell-theme.gresource',
         allowSettings: false,
         allowScreencast: false,
-        hasRunDialog: false,
         hasWorkspaces: false,
         hasWindows: false,
         hasNotifications: false,
         hasWmMenus: false,
         isLocked: false,
-        isGreeter: false,
         isPrimary: false,
         unlockDialog: null,
         components: [],
@@ -41,22 +35,6 @@ const _modes = {
             right: [],
         },
         panelStyle: null,
-    },
-
-    'gdm': {
-        hasNotifications: true,
-        isGreeter: true,
-        isPrimary: true,
-        unlockDialog: LoginDialog,
-        components: Config.HAVE_NETWORKMANAGER
-            ? ['networkAgent', 'polkitAgent']
-            : ['polkitAgent'],
-        panel: {
-            left: [],
-            center: ['clock'],
-            right: ['dwellClick', 'keyboard', 'quickSettings'],
-        },
-        panelStyle: 'login-screen',
     },
 
     'unlock-dialog': {
@@ -76,7 +54,6 @@ const _modes = {
     'user': {
         allowSettings: true,
         allowScreencast: true,
-        hasRunDialog: false,
         hasWorkspaces: true,
         hasWindows: true,
         hasWmMenus: true,
@@ -93,65 +70,11 @@ const _modes = {
     },
 };
 
-function _loadMode(file, info) {
-    const name = info.get_name();
-    const suffix = name.indexOf('.json');
-    const modeName = suffix === -1 ? name : name.slice(0, suffix);
-
-    if (Object.prototype.hasOwnProperty.call(_modes, modeName))
-        return;
-
-    let fileContent, success_, newMode;
-    try {
-        [success_, fileContent] = file.load_contents(null);
-        const decoder = new TextDecoder();
-        newMode = JSON.parse(decoder.decode(fileContent));
-    } catch {
-        return;
-    }
-
-    _modes[modeName] = {};
-    const  excludedProps = ['unlockDialog'];
-    for (const prop in _modes[DEFAULT_MODE]) {
-        if (newMode[prop] !== undefined &&
-            !excludedProps.includes(prop))
-            _modes[modeName][prop] = newMode[prop];
-    }
-    _modes[modeName]['isPrimary'] = true;
-}
-
-/**
- * Loads external session modes from the system data directories.
- */
-function _loadModes() {
-    for (const {file, info} of FileUtils.collectFromDatadirs('modes', false))
-        _loadMode(file, info);
-}
-
-export function listModes() {
-    _loadModes();
-    const loop = new GLib.MainLoop(null, false);
-    const id = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-        const names = Object.getOwnPropertyNames(_modes);
-        for (let i = 0; i < names.length; i++) {
-            if (_modes[names[i]].isPrimary)
-                print(names[i]);
-        }
-        loop.quit();
-    });
-    GLib.Source.set_name_by_id(id, '[gnome-shell] listModes');
-    loop.run();
-}
-
 export class SessionMode extends Signals.EventEmitter {
     constructor() {
         super();
 
-        _loadModes();
-        const isPrimary = _modes[global.session_mode] &&
-                         _modes[global.session_mode].isPrimary;
-        const mode = isPrimary ? global.session_mode : 'user';
-        this._modeStack = [mode];
+        this._modeStack = ['user'];
         this._sync();
     }
 

@@ -24,7 +24,6 @@ import * as OsdWindow from './osdWindow.js';
 import * as OsdMonitorLabeler from './osdMonitorLabeler.js';
 import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
-import * as RunDialog from './runDialog.js';
 import * as Layout from './layout.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as NotificationDaemon from './notificationDaemon.js';
@@ -33,7 +32,6 @@ import * as ScreenShield from './screenShield.js';
 import * as SessionMode from './sessionMode.js';
 import * as ShellDBus from './shellDBus.js';
 import * as ShellMountOperation from './shellMountOperation.js';
-import * as TimeLimitsManager from '../misc/timeLimitsManager.js';
 import * as WindowManager from './windowManager.js';
 import * as Magnifier from './magnifier.js';
 import * as XdndHandler from './xdndHandler.js';
@@ -41,15 +39,12 @@ import * as KbdA11yDialog from './kbdA11yDialog.js';
 import * as LocatePointer from './locatePointer.js';
 import * as PointerA11yTimeout from './pointerA11yTimeout.js';
 import {formatError} from '../misc/errorUtils.js';
-import * as ParentalControlsManager from '../misc/parentalControlsManager.js';
 
 const LOG_DOMAIN = 'GNOME Shell';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
 export let componentManager = null;
 export let panel = null;
-export let runDialog = null;
-export let lookingGlass = null;
 export let wm = null;
 export let messageTray = null;
 export let screenShield = null;
@@ -78,8 +73,6 @@ export let inputMethod = null;
 export let introspectService = null;
 export let locatePointer = null;
 export let endSessionDialog = null;
-export let timeLimitsManager = null;
-export let timeLimitsDispatcher = null;
 export let brightnessManager = null;
 export let brightnessDBus = null;
 
@@ -105,17 +98,6 @@ function _sessionUpdated() {
         Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
 
     wm.allowKeybinding('locate-pointer-key', Shell.ActionMode.ALL);
-
-    wm.setCustomKeybindingHandler('panel-run-dialog',
-        Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-        sessionMode.hasRunDialog ? openRunDialog : null);
-
-    if (!sessionMode.hasRunDialog) {
-        if (runDialog)
-            runDialog.close();
-        if (lookingGlass)
-            lookingGlass.close();
-    }
 
     const remoteAccessController = global.backend.get_remote_access_controller();
     if (remoteAccessController && !global.backend.is_headless()) {
@@ -155,10 +137,9 @@ export async function start() {
     sessionMode = new SessionMode.SessionMode();
     sessionMode.connect('updated', _sessionUpdated);
 
-    St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
+    KestrelUi.startSession();
 
-    // Initialize ParentalControlsManager before the UI
-    ParentalControlsManager.getDefault();
+    St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
 
     await _initializeUI();
 
@@ -236,23 +217,7 @@ async function _initializeUI() {
 
     introspectService = new Introspect.IntrospectService();
 
-    timeLimitsManager = new TimeLimitsManager.TimeLimitsManager();
-    timeLimitsDispatcher = new TimeLimitsManager.TimeLimitsDispatcher(timeLimitsManager);
-
-    global.connect('shutdown', () => {
-        KestrelUi.shutdown();
-        // Block shutdown until the session history file has been written
-        const loop = new GLib.MainLoop(null, false);
-        const source = GLib.idle_source_new();
-        source.set_callback(() => {
-            timeLimitsManager.shutdown()
-                .catch(e => console.warn(`Failed to stop time limits manager: ${e.message}`))
-                .finally(() => loop.quit());
-            return GLib.SOURCE_REMOVE;
-        });
-        source.attach(loop.get_context());
-        loop.run();
-    });
+    global.connect('shutdown', () => KestrelUi.shutdown());
 
     layoutManager.init();
     const quickSettings = new DesktopControls();
@@ -277,8 +242,6 @@ async function _initializeUI() {
     global.context.connect('notify::unsafe-mode', () => {
         if (!global.context.unsafe_mode)
             return; // we're safe
-        if (lookingGlass?.isOpen)
-            return; // assume user action
 
         const source = MessageTray.getSystemSource();
         const notification = new MessageTray.Notification({
@@ -306,12 +269,6 @@ async function _initializeUI() {
 
     LoginManager.registerSessionWithGDM();
 
-    if (sessionMode.isGreeter && screenShield) {
-        layoutManager.connect('startup-prepared', () => {
-            screenShield.showDialog();
-        });
-    }
-
     let Scripting;
     let perfModule;
     const {automationScript} = global;
@@ -329,13 +286,10 @@ async function _initializeUI() {
         if (screenShield)
             screenShield.lockIfWasLocked();
 
-        if (sessionMode.currentMode !== 'gdm' &&
-            sessionMode.currentMode !== 'initial-setup') {
-            GLib.log_structured(LOG_DOMAIN, GLib.LogLevelFlags.LEVEL_MESSAGE, {
-                'MESSAGE': `GNOME Shell started at ${_startDate}`,
-                'MESSAGE_ID': GNOMESHELL_STARTED_MESSAGE_ID,
-            });
-        }
+        GLib.log_structured(LOG_DOMAIN, GLib.LogLevelFlags.LEVEL_MESSAGE, {
+            'MESSAGE': `Kestrel started at ${_startDate}`,
+            'MESSAGE_ID': GNOMESHELL_STARTED_MESSAGE_ID,
+        });
 
         if (!perfModule) {
             const credentials = new Gio.Credentials();
@@ -346,9 +300,7 @@ async function _initializeUI() {
             }
         }
 
-        if (sessionMode.currentMode !== 'gdm' &&
-            sessionMode.currentMode !== 'initial-setup')
-            _handleLockScreenWarning();
+        _handleLockScreenWarning();
 
         LoginManager.registerDisplayWithGDM();
 
@@ -744,30 +696,6 @@ export function popModal(grab) {
     layoutManager.modalEnded();
     global.compositor.enable_unredirect();
     actionMode = Shell.ActionMode.NORMAL;
-}
-
-/**
- * Loads and creates the looking glass panel on first use
- *
- * @returns {Promise<import('./lookingGlass.js').LookingGlass>}
- */
-export async function createLookingGlass() {
-    if (lookingGlass == null) {
-        const {LookingGlass} = await import('./lookingGlass.js');
-        lookingGlass = new LookingGlass();
-    }
-
-    return lookingGlass;
-}
-
-/**
- * Opens the run dialog
- */
-export function openRunDialog() {
-    if (runDialog == null)
-        runDialog = new RunDialog.RunDialog();
-
-    runDialog.open();
 }
 
 /**

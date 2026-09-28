@@ -47,7 +47,7 @@ export class ActionTiles {
 
   constructor(handlers: ActionHandlers, batteryChanged: (state: BatteryState | null) => void) {
     const screenshot = actionTile('camera-photo-symbolic', 'Screenshot', handlers.takeScreenshot);
-    showShortcut(screenshot, 'org.gnome.shell.keybindings', 'show-screenshot-ui', this.settings);
+    showShortcut(screenshot, 'dev.lantharos.kestrel.keybindings', 'show-screenshot-ui', this.settings);
     const settings = actionTile('emblem-system-symbolic', 'Settings', () => {
       handlers.close();
       Shell.AppSystem.get_default().lookup_app('org.gnome.Settings.desktop')?.activate();

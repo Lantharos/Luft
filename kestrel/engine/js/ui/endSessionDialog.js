@@ -302,9 +302,6 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         if (this._softwareOfflineUpdatesProxy !== null)
             return;
 
-        if (Main.sessionMode.isGreeter)
-            return;
-
         try {
             this._softwareOfflineUpdatesProxy = await SoftwareOfflineUpdatesProxy.newAsync(
                 Gio.DBus.session, 'org.gnome.Software', '/org/gnome/Software/OfflineUpdates');

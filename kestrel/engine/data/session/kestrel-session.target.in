@@ -1,0 +1,10 @@
+[Unit]
+Description=Kestrel session
+BindsTo=graphical-session.target
+Before=graphical-session.target
+Wants=graphical-session-pre.target
+After=graphical-session-pre.target
+BindsTo=kestrel.service
+After=kestrel.service
+Wants=xdg-desktop-autostart.target
+Wants=org.freedesktop.IBus.session.generic.service @services@

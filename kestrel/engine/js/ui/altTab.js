@@ -167,7 +167,7 @@ const CyclerPopup = GObject.registerClass({
 export const GroupCyclerPopup = GObject.registerClass(
 class GroupCyclerPopup extends CyclerPopup {
     _init() {
-        this._settings = new Gio.Settings({schema_id: 'org.gnome.shell.app-switcher'});
+        this._settings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel.app-switcher'});
         super._init();
     }
 
@@ -201,7 +201,7 @@ export const WindowSwitcherPopup = GObject.registerClass(
 class WindowSwitcherPopup extends SwitcherPopup.SwitcherPopup {
     _init(bindingName) {
         super._init();
-        this._settings = new Gio.Settings({schema_id: 'org.gnome.shell.window-switcher'});
+        this._settings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel.window-switcher'});
         this._switcherList = new WindowSwitcher(this._getWindowList(bindingName.startsWith('switch-group')));
         this._items = this._switcherList.cards;
     }
@@ -261,7 +261,7 @@ class WindowSwitcherPopup extends SwitcherPopup.SwitcherPopup {
 export const WindowCyclerPopup = GObject.registerClass(
 class WindowCyclerPopup extends CyclerPopup {
     _init() {
-        this._settings = new Gio.Settings({schema_id: 'org.gnome.shell.window-switcher'});
+        this._settings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel.window-switcher'});
         super._init();
     }
 

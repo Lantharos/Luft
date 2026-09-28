@@ -10,7 +10,7 @@ import * as SignalTracker from '../misc/signalTracker.js';
 const SCALE_VALUE_N_STEPS = 20;
 const SCALE_VALUE_CHANGE_EPSILON = 0.001;
 
-const KEYBINDING_SCHEMA = 'org.gnome.shell.keybindings';
+const KEYBINDING_SCHEMA = 'dev.lantharos.kestrel.keybindings';
 const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
 
 class MonitorId {

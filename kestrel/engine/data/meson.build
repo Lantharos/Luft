@@ -57,9 +57,9 @@ configure_file(
 )
 
 keybinding_files = [
-  '50-gnome-shell-launchers.xml',
-  '50-gnome-shell-screenshots.xml',
-  '50-gnome-shell-system.xml',
+  '50-kestrel-launchers.xml',
+  '50-kestrel-screenshots.xml',
+  '50-kestrel-system.xml',
 ]
 
 install_data(keybinding_files, install_dir: keysdir)
@@ -76,12 +76,12 @@ schemaconf.set('APP_GRID_APPS', run_command(
   check: true,
 ).stdout())
 schema = configure_file(
-  input: 'org.gnome.shell.gschema.xml.in',
-  output: 'org.gnome.shell.gschema.xml',
+  input: 'dev.lantharos.kestrel.gschema.xml.in',
+  output: 'dev.lantharos.kestrel.gschema.xml',
   configuration: schemaconf,
   install_dir: schemadir
 )
-install_data('00_org.gnome.shell.gschema.override', install_dir: schemadir)
+install_data('00_dev.lantharos.kestrel.gschema.override', install_dir: schemadir)
 
 if have_systemd
   unitconf = configuration_data()

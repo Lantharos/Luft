@@ -1,3 +1,10 @@
 #!/bin/sh
 export XDG_DATA_DIRS="@datadir@${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
-exec gnome-session --session=kestrel "$@"
+export IBUS_DAEMON_ARGS="--panel disable"
+
+systemctl --user reset-failed
+dbus-update-activation-environment --systemd --all
+
+systemctl --user start --wait kestrel-session.target &
+trap 'systemctl --user stop kestrel-session.target' HUP INT TERM
+wait $!

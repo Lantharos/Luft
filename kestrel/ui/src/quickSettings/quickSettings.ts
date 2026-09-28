@@ -9,7 +9,7 @@ import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
-import { KeepAwake } from './keepAwake.js';
+import type { SessionManager } from '../session/sessionManager.js';
 import { animateActor } from '../shared/motion.js';
 import { blurSurface } from '../shared/surface.js';
 import type { BatteryState } from './battery.js';
@@ -46,7 +46,6 @@ export class QuickSettings {
   private openMenu: ControlMenu | null = null;
   private batteryState: BatteryState | null = null;
   private updateStatus = () => {};
-  private readonly keepAwake = new KeepAwake(() => this.updateStatus());
   private layoutLater = 0;
   private revealTimer = 0;
 
@@ -57,6 +56,7 @@ export class QuickSettings {
     statusChanged: (icons: string[]) => void,
     private readonly menus: ContextMenus,
     takeScreenshot: () => void,
+    session: SessionManager,
   ) {
     blurSurface(this.actor);
     this.grid = new TileGrid({
@@ -69,11 +69,12 @@ export class QuickSettings {
       this.batteryState = state;
       this.updateStatus();
     });
+    const stopWatchingInhibitors = session.watchInhibitors(() => this.updateStatus());
     this.actor.connect('destroy', () => {
       if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
-      this.keepAwake.destroy();
+      stopWatchingInhibitors();
     });
     menus.bind(this.actor, () => this.surfaceMenu());
     this.scroll.body.add_style_class_name('kestrel-quick-scroll-body');
@@ -107,7 +108,7 @@ export class QuickSettings {
       const volumeIcons = source._volumeOutput.get_children() as TrackedIcon[];
       const visibleIcon = (icons: TrackedIcon[]) => icons.find(icon => icon.visible)?.icon_name;
       this.updateStatus = () => statusChanged([
-        this.keepAwake.active ? 'view-reveal-symbolic' : undefined,
+        session.keepingAwake ? 'view-reveal-symbolic' : undefined,
         visibleIcon(airplaneIcons),
         visibleIcon(networkIcons) ?? 'network-offline-symbolic',
         visibleIcon(bluetoothIcons),

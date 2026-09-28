@@ -53,14 +53,3 @@ if (Config.HAVE_NETWORKMANAGER) {
 } else {
     console.debug('GNOME Shell was compiled without Network Manager support');
 }
-
-/**
- * Runtime optional dependencies
- */
-
-try {
-    // Malcontent is optional, so catch any errors loading it
-    gi.require('Malcontent', '0');
-} catch {
-    console.debug('Malcontent is not available, parental controls integration will be disabled.');
-}

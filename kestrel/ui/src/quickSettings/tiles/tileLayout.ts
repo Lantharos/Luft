@@ -1,10 +1,10 @@
 import Gio from 'gi://Gio';
 
-const ORDER = 'kestrel-quick-tile-order';
-const REMOVED = 'kestrel-quick-tiles-removed';
+const ORDER = 'quick-tile-order';
+const REMOVED = 'quick-tiles-removed';
 
 export class TileLayout {
-  private readonly settings = new Gio.Settings({ schema_id: 'org.gnome.shell' });
+  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
 
   order(defaults: string[]): string[] {
     const stored = this.settings.get_strv(ORDER).filter(id => defaults.includes(id));

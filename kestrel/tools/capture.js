@@ -7,16 +7,17 @@ import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-import {checkFolders} from './checks/folderChecks.js';
-import {checkSession} from './checks/sessionChecks.js';
-import {checkTray} from './checks/trayChecks.js';
-import {checkTaskView} from './checks/taskViewChecks.js';
-import {checkNotifications} from './checks/notificationChecks.js';
-import {checkSnapGroups} from './checks/snapGroupChecks.js';
-import {checkTaskbar} from './checks/taskbarChecks.js';
-import {checkPanelStatus} from './checks/panelStatusChecks.js';
-import {checkShortcuts} from './checks/shortcutChecks.js';
-import {checkQuickTiles} from './checks/quickTileChecks.js';
+import {checkFolders} from './checks/desktop/folderChecks.js';
+import {checkSession} from './checks/desktop/sessionChecks.js';
+import {checkTray} from './checks/desktop/trayChecks.js';
+import {checkTaskView} from './checks/desktop/taskViewChecks.js';
+import {checkNotifications} from './checks/desktop/notificationChecks.js';
+import {checkSnapGroups} from './checks/desktop/snapGroupChecks.js';
+import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
+import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
+import {checkShortcuts} from './checks/system/shortcutChecks.js';
+import {checkQuickTiles} from './checks/system/quickTileChecks.js';
+import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
@@ -251,7 +252,7 @@ export async function run() {
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.RELEASED);
     await pause(180);
     await capture(`${output}/panel-context-menu.png`);
-    const favorites = new Gio.Settings({schema_id: 'org.gnome.shell'});
+    const favorites = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
     const savedFavorites = favorites.get_strv('favorite-apps');
     const unpin = actorNamed(contextMenu, 'Unpin from panel');
     const [unpinX, unpinY] = unpin.get_transformed_position();
@@ -313,6 +314,7 @@ export async function run() {
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
+  await checkSessionManager({pause, pointer});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

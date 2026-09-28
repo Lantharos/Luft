@@ -1,23 +1,17 @@
 [Unit]
 Description=Kestrel
-OnFailure=gnome-session-shutdown.target
-OnFailureJobMode=replace-irreversibly
 CollectMode=inactive-or-failed
 RefuseManualStart=on
 RefuseManualStop=on
-
-After=gnome-session-manager.target
-
-Requisite=gnome-session-initialized.target
-PartOf=gnome-session-initialized.target
-Before=gnome-session-initialized.target
+PartOf=kestrel-session.target
+Before=kestrel-session.target
 
 AssertEnvironment=XDG_SESSION_TYPE=wayland
 
 [Service]
 Slice=session.slice
 Type=notify
-ExecStart=@bindir@/kestrel --mode=user
+ExecStart=@bindir@/kestrel
 Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
 # unset some environment variables that were set by the shell and won't work now that the shell is gone
 ExecStopPost=-systemctl --user unset-environment GNOME_SETUP_DISPLAY WAYLAND_DISPLAY DISPLAY XAUTHORITY

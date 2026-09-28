@@ -37,8 +37,6 @@ extern GType gnome_shell_plugin_get_type (void);
 #define WM_NAME "GNOME Shell"
 #define GNOME_WM_KEYBINDINGS "Mutter,GNOME Shell"
 
-static gboolean is_gdm_mode = FALSE;
-static char *session_mode = NULL;
 static int caught_signal = 0;
 static gboolean force_animations = FALSE;
 static char *script_path = NULL;
@@ -468,43 +466,12 @@ dump_gjs_stack_on_signal (int signo)
 }
 
 static gboolean
-list_modes (const char  *option_name,
-            const char  *value,
-            gpointer     data,
-            GError     **error)
-{
-  ShellGlobal *global;
-  GjsContext *context;
-  uint8_t status;
-
-  /* Many of our imports require global to be set, so rather than
-   * tayloring our imports carefully here to avoid that dependency,
-   * we just set it. */
-  g_log_set_writer_func (shut_up, NULL, NULL);
-
-  _shell_global_init (NULL);
-  global = shell_global_get ();
-  context = _shell_global_get_gjs_context (global);
-
-  shell_introspection_init ();
-
-  if (!gjs_context_eval_module_file (context,
-                                     "resource:///org/gnome/shell/ui/listModes.js",
-                                     &status,
-                                     NULL))
-      g_message ("Retrieving list of available modes failed.");
-
-  g_object_unref (context);
-  exit (status);
-}
-
-static gboolean
 print_version (const gchar    *option_name,
                const gchar    *value,
                gpointer        data,
                GError        **error)
 {
-  g_print ("GNOME Shell %s\n", VERSION);
+  g_print ("Kestrel %s\n", VERSION);
   exit (0);
 }
 
@@ -513,24 +480,6 @@ GOptionEntry gnome_shell_options[] = {
     "version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
     print_version,
     N_("Print version"),
-    NULL
-  },
-  {
-    "gdm-mode", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE,
-    &is_gdm_mode,
-    N_("Mode used by GDM for login screen"),
-    NULL
-  },
-  {
-    "mode", 0, 0, G_OPTION_ARG_STRING,
-    &session_mode,
-    N_("Use a specific mode, e.g. “gdm” for login screen"),
-    "MODE"
-  },
-  {
-    "list-modes", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-    list_modes,
-    N_("List possible modes"),
     NULL
   },
   {
@@ -618,8 +567,6 @@ main (int argc, char **argv)
                                    GETTEXT_PACKAGE);
   meta_context_add_option_group (context, gi_repository_get_option_group ());
 
-  session_mode = (char *) g_getenv ("GNOME_SHELL_SESSION_MODE");
-
   if (!meta_context_configure (context, &argc, &argv, &error))
     {
       g_printerr ("Failed to configure: %s\n", error->message);
@@ -632,9 +579,6 @@ main (int argc, char **argv)
   init_signal_handlers (context);
   cwd = g_get_current_dir ();
   change_to_home_directory ();
-
-  if (session_mode == NULL)
-    session_mode = is_gdm_mode ? (char *)"gdm" : (char *)"user";
 
   dump_gjs_stack_on_signal (SIGABRT);
   dump_gjs_stack_on_signal (SIGFPE);
@@ -654,7 +598,7 @@ main (int argc, char **argv)
    * GjsContext will iterate the default main loop to
    * resolve internal modules.
    */
-  _shell_global_init ("session-mode", session_mode,
+  _shell_global_init ("session-mode", "user",
                       "force-animations", force_animations,
                       "automation-script", automation_script,
                       NULL);

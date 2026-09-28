@@ -12,7 +12,7 @@ import * as Main from './main.js';
 import * as MessageList from './messageList.js';
 import * as SignalTracker from '../misc/signalTracker.js';
 
-const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
+const SHELL_KEYBINDINGS_SCHEMA = 'dev.lantharos.kestrel.keybindings';
 
 export const ANIMATION_TIME = 200;
 const BANNER_SHOW_TIME = 260;

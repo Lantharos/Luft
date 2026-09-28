@@ -144,29 +144,6 @@ $_gdm_dialog_width: 25em;
   height: 4em;
 }
 
-.conflicting-session-dialog-content {
-  spacing: 20px;
-
-  .conflicting-session-dialog-title {
-    text-align: center;
-    @extend %title_2;
-    margin-bottom: 5px;
-  }
-
-  .conflicting-session-dialog-desc {
-    text-align: center;
-  }
-
-  .conflicting-session-dialog-desc-warning {
-    text-align: center;
-    color: $warning_color;
-    background-color: transparentize($warning_color, 0.9);
-    padding: $base_padding * 1.5;
-    border-radius: $base_border_radius;
-    margin: $base_margin 0;
-  }
-}
-
 .login-dialog-logo-bin {
   margin: 3em 0;
 }
@@ -500,30 +477,6 @@ $_gdm_dialog_width: 25em;
 }
 
 // Parental controls
-.parental-controls-shield {
-  spacing: 0.75em;
-
-  .parental-controls-shield-title {
-    margin-top: 0.6em;
-    @extend %title_4;
-    text-align: center;
-  }
-
-  .parental-controls-shield-description {
-    text-align: center;
-  }
-
-  .parental-controls-shield-button {
-    margin-top: 0.85em;
-    @extend %lockscreen_button;
-    @extend %title_4;
-    padding: $base_margin * 4 $base_margin * 11;
-    color: $_gdm_fg;
-    background-color: transparentize($_gdm_fg, .9);
-    border-radius: $forced_circular_radius;
-  }
-}
-
 // Notifications
 #unlockDialogNotifications {
   > .vhandle, > .hhandle {

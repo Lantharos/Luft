@@ -11,7 +11,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |
 | `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
 
-Kestrel currently boots on a virtual Wayland monitor with its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. The shell still uses GNOME's session plumbing and several upstream JS services, so this is a working integration checkpoint rather than a distributable desktop session. The remaining work is tracked in [Kestrel's roadmap](kestrel/README.md).
+Kestrel currently boots on a virtual Wayland monitor with its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. The shell runs its own session but still relies on several GNOME settings services and GNOME's portal backend, so this is a working integration checkpoint rather than a distributable desktop session. The remaining work is tracked in [Kestrel's roadmap](kestrel/README.md).
 
 ## Build and capture Kestrel
 

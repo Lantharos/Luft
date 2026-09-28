@@ -1,0 +1,288 @@
+<schemalist>
+  <schema id="dev.lantharos.kestrel" path="/dev/lantharos/kestrel/"
+          gettext-domain="@GETTEXT_PACKAGE@">
+    <key name="development-tools" type="b">
+      <default>true</default>
+      <summary>
+        Enable internal tools useful for developers and testers from Alt-F2
+      </summary>
+      <description>
+        Allows access to internal debugging and monitoring tools
+        using the Alt-F2 dialog.
+      </description>
+    </key>
+    <key name="lock-screen-content" type="b">
+      <default>true</default>
+      <summary>Show notification content on the lock screen</summary>
+      <description>
+        When enabled, the lock screen shows the titles and text of new
+        notifications. When disabled, only apps that allow it individually
+        show their content; other apps show their name and a count.
+      </description>
+    </key>
+    <key name="start-layout" type="s">
+      <default>'{"items":[],"folders":{}}'</default>
+      <summary>Start app order and folders</summary>
+    </key>
+    <key name="quick-tile-order" type="as">
+      <default>[]</default>
+      <summary>Order of the Quick Settings tiles</summary>
+    </key>
+    <key name="quick-tiles-removed" type="as">
+      <default>[]</default>
+      <summary>Quick Settings tiles removed by the user</summary>
+    </key>
+    <key name="global-shortcuts" type="s">
+      <default>'{}'</default>
+      <summary>Shortcuts that apps have registered through the global shortcuts portal</summary>
+    </key>
+    <key name="favorite-apps" type="as">
+      <default>
+        @DASH_APPS@
+      </default>
+      <summary>List of desktop file IDs for favorite applications</summary>
+      <description>
+        The applications corresponding to these identifiers
+        will be displayed in the favorites area.
+      </description>
+    </key>
+    <key name="command-history" type="as">
+      <default>[]</default>
+      <summary>History for command (Alt-F2) dialog</summary>
+    </key>
+    <key name="looking-glass-history" type="as">
+      <default>[]</default>
+      <!-- Translators: looking glass is a debugger and inspector tool, see https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/docs/looking-glass.md -->
+      <summary>History for the looking glass dialog</summary>
+    </key>
+    <key name="always-show-log-out" type="b">
+      <default>false</default>
+      <summary>Always show the “Log Out” action in the system menu</summary>
+      <description>
+        This key overrides the automatic hiding of the “Log out” action in the
+        system menu for logged-in situations where there is a single, local,
+        non-system user and only a single available session type (e.g. GNOME on
+        Wayland).
+      </description>
+    </key>
+    <key name="remember-mount-password" type="b">
+      <default>false</default>
+      <summary>Whether to remember password for mounting encrypted or remote filesystems</summary>
+      <description>
+        The shell will request a password when an encrypted device or a
+        remote filesystem is mounted.  If the password can be saved for
+        future use a “Remember Password” checkbox will be present.
+        This key sets the default state of the checkbox.
+      </description>
+    </key>
+    <key name="last-selected-power-profile" type="s">
+      <default>"power-saver"</default>
+      <summary>The last selected non-default power profile</summary>
+      <description>
+        Some systems support more than two power profiles. In order to still support
+        toggling between two profiles, this key records the last selected non-default
+        profile.
+      </description>
+    </key>
+    <key name="app-picker-layout" type="aa{sv}">
+      <default><![CDATA[
+        @APP_GRID_APPS@
+      ]]></default>
+      <summary>Layout of the app picker</summary>
+      <description>
+        Layout of the app picker. Each entry in the array is a page. Pages are
+        stored in the order they appear in GNOME Shell. Each page contains an
+        “application id” → 'data' pair. Currently, the following values are
+        stored as 'data':
+          • “position”: the position of the application icon in the page
+      </description>
+    </key>
+    <child name="keybindings" schema="dev.lantharos.kestrel.keybindings"/>
+    <child name="app-switcher" schema="dev.lantharos.kestrel.app-switcher"/>
+    <child name="window-switcher" schema="dev.lantharos.kestrel.window-switcher"/>
+  </schema>
+
+  <schema id="dev.lantharos.kestrel.keybindings" path="/dev/lantharos/kestrel/keybindings/"
+          gettext-domain="@GETTEXT_PACKAGE@">
+    <key name="shift-overview-up" type="as">
+      <default>["&lt;Super&gt;&lt;Alt&gt;Up"]</default>
+      <summary>Keybinding to shift between overview states</summary>
+      <description>
+        Keybinding to shift between session, window picker and app grid
+      </description>
+    </key>
+    <key name="shift-overview-down" type="as">
+      <default>["&lt;Super&gt;&lt;Alt&gt;Down"]</default>
+      <summary>Keybinding to shift between overview states</summary>
+      <description>
+        Keybinding to shift between app grid, window picker and session
+      </description>
+    </key>
+    <key name="toggle-application-view" type="as">
+      <default>["&lt;Super&gt;a"]</default>
+      <summary>Keybinding to open the “Show Applications” view</summary>
+      <description>
+        Keybinding to open the “Show Applications” view of the Activities
+        Overview.
+      </description>
+    </key>
+    <key name="toggle-overview" type="as">
+      <default>[]</default>
+      <summary>Keybinding to open the overview</summary>
+      <description>
+        Keybinding to open the Activities Overview.
+      </description>
+    </key>
+    <key name="toggle-message-tray" type="as">
+      <default>["&lt;Super&gt;n","&lt;Super&gt;m"]</default>
+      <summary>Keybinding to toggle the visibility of the notification list</summary>
+      <description>
+        Keybinding to toggle the visibility of the notification list.
+      </description>
+    </key>
+    <key name="toggle-quick-settings" type="as">
+      <default>["&lt;Super&gt;s"]</default>
+      <summary>Keybinding to toggle the quick settings menu</summary>
+      <description>
+        Keybinding to toggle the quick settings menu.
+      </description>
+    </key>
+    <key name="focus-active-notification" type="as">
+      <default>[]</default>
+      <summary>Keybinding to focus the active notification</summary>
+      <description>
+        Keybinding to focus the active notification.
+      </description>
+    </key>
+    <key name="clipboard-history" type="as">
+      <default>["&lt;Super&gt;v"]</default>
+      <summary>Show clipboard history</summary>
+    </key>
+    <key name="snap-layouts" type="as">
+      <default>["&lt;Super&gt;z"]</default>
+      <summary>Show snap layouts for the focused window</summary>
+    </key>
+    <key name="workspace-1" type="as">
+      <default>["&lt;Super&gt;1"]</default>
+      <summary>Switch to workspace 1</summary>
+    </key>
+    <key name="workspace-2" type="as">
+      <default>["&lt;Super&gt;2"]</default>
+      <summary>Switch to workspace 2</summary>
+    </key>
+    <key name="workspace-3" type="as">
+      <default>["&lt;Super&gt;3"]</default>
+      <summary>Switch to workspace 3</summary>
+    </key>
+    <key name="workspace-4" type="as">
+      <default>["&lt;Super&gt;4"]</default>
+      <summary>Switch to workspace 4</summary>
+    </key>
+    <key name="workspace-5" type="as">
+      <default>["&lt;Super&gt;5"]</default>
+      <summary>Switch to workspace 5</summary>
+    </key>
+    <key name="workspace-6" type="as">
+      <default>["&lt;Super&gt;6"]</default>
+      <summary>Switch to workspace 6</summary>
+    </key>
+    <key name="workspace-7" type="as">
+      <default>["&lt;Super&gt;7"]</default>
+      <summary>Switch to workspace 7</summary>
+    </key>
+    <key name="workspace-8" type="as">
+      <default>["&lt;Super&gt;8"]</default>
+      <summary>Switch to workspace 8</summary>
+    </key>
+    <key name="workspace-9" type="as">
+      <default>["&lt;Super&gt;9"]</default>
+      <summary>Switch to workspace 9</summary>
+    </key>
+    <key name="workspace-10" type="as">
+      <default>["&lt;Super&gt;0"]</default>
+      <summary>Switch to workspace 10</summary>
+    </key>
+    <key name="show-screenshot-ui" type="as">
+      <default>["Print"]</default>
+      <summary>Take a screenshot interactively</summary>
+    </key>
+    <key name="show-screen-recording-ui" type="as">
+      <default>["&lt;Ctrl&gt;&lt;Shift&gt;&lt;Alt&gt;R"]</default>
+      <summary>Record a screencast interactively</summary>
+    </key>
+    <key name="screenshot-window" type="as">
+      <default>["&lt;Alt&gt;Print"]</default>
+      <summary>Take a screenshot of a window</summary>
+    </key>
+    <key name="screenshot" type="as">
+      <default>["&lt;Shift&gt;Print"]</default>
+      <summary>Take a screenshot</summary>
+    </key>
+    <key name="screen-brightness-up" type="as">
+      <default>['XF86MonBrightnessUp']</default>
+      <summary>Screen brightness up</summary>
+    </key>
+    <key name="screen-brightness-up-monitor" type="as">
+      <default>['&lt;Shift&gt;XF86MonBrightnessUp']</default>
+      <summary>Screen brightness up on current monitor</summary>
+    </key>
+    <key name="screen-brightness-down" type="as">
+      <default>['XF86MonBrightnessDown']</default>
+      <summary>Screen brightness down</summary>
+    </key>
+    <key name="screen-brightness-down-monitor" type="as">
+      <default>['&lt;Shift&gt;XF86MonBrightnessDown']</default>
+      <summary>Screen brightness down on current monitor</summary>
+    </key>
+    <key name="screen-brightness-cycle" type="as">
+      <default>['XF86MonBrightnessCycle']</default>
+      <summary>Screen brightness cycle</summary>
+    </key>
+    <key name="screen-brightness-cycle-monitor" type="as">
+      <default>['&lt;Shift&gt;XF86MonBrightnessCycle']</default>
+      <summary>Screen brightness cycle on current monitor</summary>
+    </key>
+  </schema>
+
+  <schema id="dev.lantharos.kestrel.app-switcher"
+          path="/dev/lantharos/kestrel/app-switcher/"
+          gettext-domain="@GETTEXT_PACKAGE@">
+    <key type="b" name="current-workspace-only">
+      <default>false</default>
+      <summary>Limit switcher to current workspace.</summary>
+      <description>
+	If true, only applications that have windows on the current workspace are shown in the switcher.
+	Otherwise, all applications are included.
+      </description>
+    </key>
+  </schema>
+
+  <enum id="dev.lantharos.kestrel.window-switcher.AppIconMode">
+    <value value="1" nick="thumbnail-only"/>
+    <value value="2" nick="app-icon-only"/>
+    <value value="3" nick="both"/>
+  </enum>
+  <schema id="dev.lantharos.kestrel.window-switcher"
+          path="/dev/lantharos/kestrel/window-switcher/"
+          gettext-domain="@GETTEXT_PACKAGE@">
+    <key name="app-icon-mode" enum="dev.lantharos.kestrel.window-switcher.AppIconMode">
+      <default>'both'</default>
+      <summary>The application icon mode.</summary>
+      <description>
+	Configures how the windows are shown in the switcher. Valid possibilities
+	are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only”
+	(shows only the application icon) or “both”.
+      </description>
+    </key>
+    <key type="b" name="current-workspace-only">
+      <default>true</default>
+      <summary>Limit switcher to current workspace.</summary>
+      <description>
+	If true, only windows from the current workspace are shown in the switcher.
+	Otherwise, all windows are included.
+      </description>
+    </key>
+  </schema>
+
+
+</schemalist>

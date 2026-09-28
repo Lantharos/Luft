@@ -5,8 +5,8 @@ export interface Folder { name: string; apps: string[]; }
 interface Layout { items: string[]; folders: Record<string, Folder>; }
 
 export class StartLayout {
-  private readonly settings = new Gio.Settings({ schema_id: 'org.gnome.shell' });
-  private layout: Layout = JSON.parse(this.settings.get_string('kestrel-start-layout'));
+  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private layout: Layout = JSON.parse(this.settings.get_string('start-layout'));
 
   folder(id: string): Folder | undefined { return this.layout.folders[id]; }
   items(folder: string | null = null): string[] { return folder ? this.folder(folder)?.apps ?? [] : this.layout.items; }
@@ -72,6 +72,6 @@ export class StartLayout {
 
   private save(): void {
     this.prune();
-    this.settings.set_string('kestrel-start-layout', JSON.stringify(this.layout));
+    this.settings.set_string('start-layout', JSON.stringify(this.layout));
   }
 }

@@ -56,7 +56,7 @@ export class DesktopPeek {
       animateActor(actor, { opacity: peeking ? 0 : 255, duration: immediate ? 0 : PEEK_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
   }
 
-  private toggleDesktop(): void {
+  toggleDesktop(): void {
     const shell = global as unknown as Shell.Global;
     const shown = desktopWindows().map(([, window]) => window).filter(window => !window.minimized && window.window_type === Meta.WindowType.NORMAL);
     if (shown.length) {

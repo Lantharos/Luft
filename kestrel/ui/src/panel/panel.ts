@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type GioUnix from 'gi://GioUnix';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import Pango from 'gi://Pango';
@@ -16,6 +17,15 @@ import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './desktopPeek.js';
 import { PrivacyIndicator } from '../privacy/indicator.js';
 
+function systemMonitor(): Shell.App | null {
+  const appSystem = Shell.AppSystem.get_default();
+  const info = appSystem.get_installed().find(app => {
+    const categories = (app as GioUnix.DesktopAppInfo).get_categories()?.split(';') ?? [];
+    return categories.includes('System') && categories.includes('Monitor');
+  });
+  return info ? appSystem.lookup_app(info.get_id()!) : null;
+}
+
 export interface Monitor {
   index: number;
   x: number;
@@ -28,7 +38,6 @@ export interface PanelActions {
   start(): void;
   quickSettings(): void;
   notifications(): void;
-  tasks(): void;
   activateWindow(window: Meta.Window): void;
   stopScreencast(): void;
 }
@@ -88,7 +97,6 @@ export class KestrelPanel {
       this.quickButton.connect('clicked', actions.quickSettings);
       right.add_child(this.quickButton);
       menus.bind(this.quickButton, () => [
-        { label: 'Quick settings', run: actions.quickSettings },
         { label: 'Network settings', run: () => menus.settings('network') },
         { label: 'Sound settings', run: () => menus.settings('sound') },
       ]);
@@ -100,7 +108,8 @@ export class KestrelPanel {
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
     this.actor.add_child(right);
-    this.actor.add_child(new DesktopPeek().actor);
+    const peek = new DesktopPeek();
+    this.actor.add_child(peek.actor);
 
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => this.refreshApps())],
@@ -108,16 +117,15 @@ export class KestrelPanel {
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
       [this.tracker, this.tracker.connect('notify::focus-app', () => this.taskbar.updateFocus())],
     );
-    menus.bind(this.actor, () => [
-      { label: 'Open Start', run: actions.start },
-      { label: 'Show all windows', run: actions.tasks },
-      { label: 'Quick settings', run: actions.quickSettings },
-      { label: 'Notifications', run: actions.notifications },
-      { label: 'Display settings', run: () => menus.settings('display') },
-      { label: 'Settings', run: () => menus.settings() },
-    ]);
+    menus.bind(this.actor, () => {
+      const monitor = systemMonitor();
+      return [
+        { label: 'Show desktop', run: () => peek.toggleDesktop() },
+        ...monitor ? [{ label: 'System monitor', run: () => monitor.activate() }] : [],
+        { label: 'Settings', run: () => menus.settings() },
+      ];
+    });
     menus.bind(this.clockButton, () => [
-      { label: 'Notifications', run: actions.notifications },
       { label: 'Date and time settings', run: () => menus.settings('datetime') },
     ]);
     this.refreshApps();

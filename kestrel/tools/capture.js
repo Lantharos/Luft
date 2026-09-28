@@ -148,7 +148,9 @@ export async function run() {
   await pause(200);
   const contextMenu = actorNamed(global.stage, 'kestrel-context-menu');
   console.log(`Kestrel app context menu: ${contextMenu.visible}`);
-  const secondAction = contextMenu.get_first_child().child.get_children()[1];
+  const menuActions = actor => [actor, ...actor.get_children().flatMap(menuActions)]
+    .filter(child => child.has_style_class_name?.('kestrel-context-action'));
+  const secondAction = menuActions(contextMenu)[1];
   const [actionX, actionY] = secondAction.get_transformed_position();
   pointer.notify_absolute_motion(GLib.get_monotonic_time(), actionX + 20, actionY + secondAction.height / 2);
   await pause(150);
@@ -192,14 +194,6 @@ export async function run() {
     await pause(150);
     console.log(`Kestrel DND restored: ${quiet.checked === initial}`);
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);
-  }
-  const nextPage = actorNamed(quick, 'Next page');
-  if (nextPage?.is_mapped() && nextPage.reactive) {
-    nextPage.emit('clicked', Clutter.BUTTON_PRIMARY);
-    await pause(150);
-    await capture(`${GLib.getenv('XDG_CACHE_HOME')}/quick-next-page.png`);
-    console.log(`Kestrel next page: previous enabled=${actorNamed(quick, 'Previous page').reactive}`);
-    actorNamed(quick, 'Previous page').emit('clicked', Clutter.BUTTON_PRIMARY);
   }
   const controls = [];
   const collectControls = actor => {

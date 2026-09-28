@@ -130,7 +130,6 @@ class KestrelUi {
       start: () => this.toggle('start', monitor()),
       quickSettings: () => this.toggle('quick', monitor()),
       notifications: () => this.toggle('notifications', monitor()),
-      tasks: () => this.toggle('tasks', monitor()),
       activateWindow: context.activateWindow,
       stopScreencast: context.stopScreencast,
     }), this.menus, this.previews);

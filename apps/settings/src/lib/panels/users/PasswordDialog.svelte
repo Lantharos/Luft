@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog, PasswordField } from '@luft/ui';
-	import { changePassword, type User } from './api';
+	import { changePassword, type PasswordOutcome, type User } from './api';
 	import { MINIMUM_LENGTH, measure } from './strength';
 
 	interface Props {
@@ -8,17 +8,27 @@
 		onclose: () => void;
 	}
 
+	const REJECTIONS: Record<Exclude<PasswordOutcome, 'changed' | 'wrongPassword'>, string> = {
+		tooShort: 'This password is too short',
+		tooSimilar: 'This is too similar to your current password',
+		dictionaryWord: 'This is based on a dictionary word. Try something less common.',
+		tooSimple: 'This is too simple. Make it longer or mix in more kinds of characters.',
+		rejected: 'This password wasn’t accepted. Try a different one.'
+	};
+
 	let { user, onclose }: Props = $props();
 
 	let current = $state('');
 	let password = $state('');
 	let confirmation = $state('');
-	let rejected = $state<string | null>(null);
+	let rejectedCurrent = $state<string | null>(null);
+	let rejection = $state<{ password: string; message: string } | null>(null);
 	let problem = $state('');
 	let busy = $state(false);
 
 	let strength = $derived(password ? measure(password, [user.userName, ...user.realName.split(/\s+/)]) : null);
-	let wrong = $derived(current === rejected ? 'That isn’t your current password' : '');
+	let wrong = $derived(current === rejectedCurrent ? 'That isn’t your current password' : '');
+	let refused = $derived(rejection?.password === password ? rejection.message : '');
 	let mismatch = $derived(confirmation.length >= password.length && confirmation !== password ? 'The passwords don’t match' : '');
 	let ready = $derived(!busy && (!user.hasPassword || current.length > 0) && password.length >= MINIMUM_LENGTH && confirmation === password);
 
@@ -29,7 +39,8 @@
 		try {
 			const outcome = await changePassword(user.hasPassword ? current : null, password);
 			if (outcome === 'changed') return onclose();
-			rejected = current;
+			if (outcome === 'wrongPassword') rejectedCurrent = current;
+			else rejection = { password, message: REJECTIONS[outcome] };
 		} catch (reason) {
 			problem = reason instanceof Error ? reason.message : String(reason);
 		}
@@ -43,14 +54,14 @@
 
 <Dialog
 	title={user.hasPassword ? 'Change your password' : 'Set a password'}
-	description="You’ll use it to sign in and unlock this computer. You might be asked to confirm with an administrator password."
+	description="You’ll use it to sign in and unlock this computer."
 	{onclose}
 >
 	{#if user.hasPassword}
-		<PasswordField label="Current password" bind:value={current} placeholder="Current password" autocomplete="current-password" error={wrong} live onkeydown={enter} />
+		<PasswordField label="Current password" showLabel bind:value={current} autocomplete="current-password" error={wrong} live onkeydown={enter} />
 	{/if}
 	<div class="flex flex-col gap-2">
-		<PasswordField label="New password" bind:value={password} placeholder="New password" autocomplete="new-password" onkeydown={enter} />
+		<PasswordField label="New password" showLabel bind:value={password} placeholder="At least 8 characters" autocomplete="new-password" error={refused} live onkeydown={enter} />
 		{#if strength}
 			<div class="flex flex-col gap-1.5 px-1">
 				<div class="meter" aria-hidden="true">
@@ -62,7 +73,7 @@
 			</div>
 		{/if}
 	</div>
-	<PasswordField label="Confirm new password" bind:value={confirmation} placeholder="Confirm new password" autocomplete="new-password" error={mismatch} live onkeydown={enter} />
+	<PasswordField label="Confirm" showLabel bind:value={confirmation} placeholder="Type it again" autocomplete="new-password" error={mismatch} live onkeydown={enter} />
 	{#if problem}
 		<p class="text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}

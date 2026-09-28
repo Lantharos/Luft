@@ -27,7 +27,7 @@ export interface EnrollProgress {
 	done: boolean;
 }
 
-export type PasswordOutcome = 'changed' | 'wrongPassword';
+export type PasswordOutcome = 'changed' | 'wrongPassword' | 'tooShort' | 'tooSimilar' | 'dictionaryWord' | 'tooSimple' | 'rejected';
 
 export const users = () => invoke<Users>('users');
 export const rename = (name: string) => invoke<void>('users_rename', { name });

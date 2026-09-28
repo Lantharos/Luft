@@ -46,7 +46,7 @@ struct AutomaticLogin {
     enabled: bool,
 }
 
-pub fn failed(error: impl std::fmt::Display) -> String {
+fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
@@ -67,20 +67,20 @@ fn account(path: OwnedObjectPath) -> Result<Proxy<'static>, String> {
     Proxy::new(dbus::system()?, ACCOUNTS, path, USER).map_err(failed)
 }
 
-pub fn me() -> Result<Proxy<'static>, String> {
+fn me() -> Result<Proxy<'static>, String> {
     let uid = i64::from(unsafe { libc::getuid() });
     let path: OwnedObjectPath = accounts()?.call("FindUserById", &uid).map_err(explain)?;
     account(path)
 }
 
-pub fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
+fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
     me()?
         .call_with_flags::<_, _, ()>(method, MethodFlags::AllowInteractiveAuth.into(), body)
         .map(|_| ())
         .map_err(explain)
 }
 
-pub fn has_password(user: &Proxy) -> Result<bool, String> {
+fn has_password(user: &Proxy) -> Result<bool, String> {
     let mode: i32 = user.get_property("PasswordMode").map_err(failed)?;
     Ok(mode == REGULAR_PASSWORD)
 }

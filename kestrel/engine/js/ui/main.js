@@ -28,7 +28,6 @@ import * as RunDialog from './runDialog.js';
 import * as Layout from './layout.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as NotificationDaemon from './notificationDaemon.js';
-import * as WindowAttentionHandler from './windowAttentionHandler.js';
 import * as Screenshot from './screenshot.js';
 import * as ScreenShield from './screenShield.js';
 import * as SessionMode from './sessionMode.js';
@@ -55,7 +54,6 @@ export let wm = null;
 export let messageTray = null;
 export let screenShield = null;
 export let notificationDaemon = null;
-export let windowAttentionHandler = null;
 export let ctrlAltTabManager = null;
 export let padOsdService = null;
 export let osdWindowManager = null;
@@ -234,7 +232,6 @@ async function _initializeUI() {
     keyboard = new Keyboard.KeyboardManager();
     InputSources.getInputSourceManager().reload();
     notificationDaemon = new NotificationDaemon.NotificationDaemon();
-    windowAttentionHandler = new WindowAttentionHandler.WindowAttentionHandler();
     componentManager = new Components.ComponentManager();
 
     introspectService = new Introspect.IntrospectService();

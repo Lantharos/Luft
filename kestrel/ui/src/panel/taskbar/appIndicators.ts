@@ -5,10 +5,10 @@ import { animateActor } from '../../shared/motion.js';
 import type { LauncherEntry } from './launcherEntries.js';
 
 const BUTTON_SIZE = 40;
-const PROGRESS_WIDTH = 24;
-const PROGRESS_Y = 31;
+const PROGRESS_WIDTH = 28;
+const PROGRESS_Y = 35;
 const FLASHES = 3;
-const SETTLED_OPACITY = 170;
+const SETTLED_OPACITY = 190;
 
 export class AppIndicators {
   readonly attention = new St.Widget({ style_class: 'kestrel-task-attention', width: BUTTON_SIZE, height: BUTTON_SIZE, opacity: 0, visible: false });
@@ -23,6 +23,10 @@ export class AppIndicators {
     this.progress.add_child(this.fill);
     content.add_child(this.progress);
     content.add_child(this.badge);
+  }
+
+  get showsProgress(): boolean {
+    return this.progress.visible;
   }
 
   update(entry: LauncherEntry, attention: boolean): void {

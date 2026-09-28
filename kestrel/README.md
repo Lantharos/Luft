@@ -67,7 +67,7 @@ Open a folder to launch or rearrange its apps. Edit its name in the header. Drag
 
 App buttons are reused across searches, folders, and reordering. Search names are indexed when the installed app catalog changes.
 
-Taskbar buttons show what apps report through the launcher entry D-Bus interface used by Discord, Telegram, Firefox, and other apps: an unread count in a small red pill at the top right and a progress bar along the bottom of the icon in the accent color. Apps whose windows ask for attention, or that mark themselves urgent, flash an amber highlight three times and keep it until they are focused. Counts and progress clear when the app exits.
+Taskbar buttons show what apps report through the launcher entry D-Bus interface used by Discord, Telegram, Firefox, and other apps: an unread count in a small red pill at the top right and a progress bar beneath the icon in the accent color. Apps whose windows ask for attention, or that mark themselves urgent, flash an orange highlight three times and keep it until they are focused, instead of posting an "is ready" notification. While an app reports progress, the bar replaces its window dots beneath the icon. Counts and progress clear when the app exits.
 
 Resting the pointer on the far right edge of the panel fades every window on the current desktop away to show the desktop, and moving off brings them back. Clicking the edge minimizes those windows; clicking again restores them.
 

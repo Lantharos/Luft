@@ -11,9 +11,16 @@ import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 
 export type { MenuEntry } from './menuContent.js';
 
+const MIN_WIDTH = 176;
+const MAX_WIDTH = 420;
+const TRAILING_SPACE = 84;
+const SLIDE_DISTANCE = 40;
+const PAGE_MOTION = { duration: 220, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
+
 export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
   readonly actor = new St.BoxLayout({ name: 'kestrel-context-menu', style_class: 'kestrel-context-menu', orientation: Clutter.Orientation.VERTICAL, reactive: true, visible: false });
+  private readonly viewport = new St.Widget({ layout_manager: new Clutter.BinLayout(), clip_to_allocation: true, x_expand: true, y_expand: true });
   private readonly favorites = new Gio.Settings({ schema_id: 'org.gnome.shell' });
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
@@ -23,6 +30,7 @@ export class ContextMenus {
 
   constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 18);
+    this.actor.add_child(this.viewport);
     this.actor.connect('destroy', () => {
       if (this.source && this.sourceDestroy) this.source.disconnect(this.sourceDestroy);
       this.source = null;
@@ -94,10 +102,9 @@ export class ContextMenus {
   }
 
   open(source: Clutter.Actor, entries: MenuEntry[], x: number, y: number): void {
-    if (!this.enabled()) return;
+    if (!this.enabled() || !entries.length) return;
     this.beforeOpen();
     this.close();
-    if (!entries.length) return;
     const monitor = this.monitor(x, y);
     if (!monitor) return;
     this.source = source;
@@ -122,32 +129,53 @@ export class ContextMenus {
   private async openGroup(group: MenuGroup, parents: MenuEntry[][]): Promise<void> {
     const source = this.source;
     const children = Array.isArray(group.children) ? group.children : await group.children();
-    if (this.source === source && this.actor.visible) this.present(children, parents);
+    if (this.source === source && this.actor.visible) this.present(children, parents, 1);
   }
 
-  private present(entries: MenuEntry[], parents: MenuEntry[][]): void {
+  private present(entries: MenuEntry[], parents: MenuEntry[][], direction = 0): void {
     const { x, y, monitor } = this.anchor!;
-    this.actor.destroy_all_children();
     const content = menuContent(entries, {
       activate: action => { this.close(); action.run(); },
       open: group => void this.openGroup(group, [...parents, entries]),
-      back: parents.length ? () => this.present(parents.at(-1)!, parents.slice(0, -1)) : null,
+      back: parents.length ? () => this.present(parents.at(-1)!, parents.slice(0, -1), -1) : null,
       hover: button => {
         if (!this.source || this.clearSelection) return;
         if (button.hover) button.grab_key_focus();
         else if ((global as unknown as Shell.Global).stage.get_key_focus() === button) this.actor.grab_key_focus();
       },
     });
-    const scroll = new St.ScrollView({ hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC });
-    scroll.child = content;
-    this.actor.add_child(scroll);
+    const page = new St.ScrollView({
+      hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC, child: content,
+      x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.START,
+    });
+    const previous = this.viewport.get_children();
+    this.viewport.add_child(page);
     this.actor.show();
-    this.actor.width = Math.min(monitor.width - 16, Math.max(144, Math.min(420, content.get_preferred_width(-1)[1] + 56)));
-    scroll.height = Math.min(content.get_preferred_height(this.actor.width - 12)[1], monitor.height - 40);
-    const height = this.actor.get_preferred_height(this.actor.width)[1];
-    this.actor.set_position(Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - this.actor.width - 8))),
-      Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))));
-    if (parents.length) this.actor.grab_key_focus();
+    const theme = this.actor.get_theme_node();
+    const width = Math.min(monitor.width - 16, Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, content.get_preferred_width(-1)[1] + TRAILING_SPACE)));
+    const innerWidth = width - theme.get_horizontal_padding();
+    page.set_size(innerWidth, Math.min(content.get_preferred_height(innerWidth)[1], monitor.height - 40));
+    const height = page.height + theme.get_vertical_padding();
+    const position = {
+      x: Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - width - 8))),
+      y: Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))),
+    };
+    if (direction) {
+      for (const old of previous) {
+        old.reactive = false;
+        animateActor(old, { translation_x: -direction * SLIDE_DISTANCE, opacity: 0, ...PAGE_MOTION, onStopped: () => old.destroy() });
+      }
+      page.translation_x = direction * SLIDE_DISTANCE;
+      page.opacity = 0;
+      animateActor(page, { translation_x: 0, opacity: 255, ...PAGE_MOTION });
+      animateActor(this.actor, { ...position, width, height, ...PAGE_MOTION });
+      this.actor.grab_key_focus();
+      return;
+    }
+    for (const old of previous) old.destroy();
+    for (const property of ['x', 'y', 'width', 'height']) this.actor.remove_transition(property);
+    this.actor.set_size(width, height);
+    this.actor.set_position(position.x, position.y);
   }
 
   close(immediate = false): void {

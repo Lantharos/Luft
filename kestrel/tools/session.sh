@@ -47,6 +47,8 @@ exec dbus-run-session -- bash -c '
   done
   dconf write /org/gnome/shell/favorite-apps "$(cat "$run/favorites.txt")"
   if [[ "$mode" == capture ]]; then
+    dconf reset /org/gnome/shell/kestrel-quick-tile-order
+    dconf reset /org/gnome/shell/kestrel-quick-tiles-removed
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"

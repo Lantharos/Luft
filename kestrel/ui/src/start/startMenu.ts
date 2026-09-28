@@ -87,10 +87,6 @@ export class StartMenu {
       this.favorites.disconnect(favoritesChanged);
     });
     this.loadApps();
-    menus.bind(this.actor, () => [
-      { label: 'Refresh apps', run: () => this.loadApps() },
-      { label: 'Settings', run: () => menus.settings() },
-    ]);
   }
 
   focus(): void {

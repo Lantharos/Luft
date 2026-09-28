@@ -127,7 +127,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-icon-button { padding: 11px; border-radius: 10px; }
 .kestrel-text-button { padding: 8px 10px; border-radius: 999px; font-size: 12px; }
 
-.kestrel-quick-settings { border-radius: 24px; padding: 14px; spacing: 10px; }
+.kestrel-quick-settings { border-radius: 24px; padding: 14px 4px 14px 14px; spacing: 10px; }
+.kestrel-quick-scroll-body { padding-right: 10px; }
+.kestrel-quick-settings StScrollBar { min-width: 6px; }
 .kestrel-quick-content { spacing: 14px; }
 .kestrel-quick-sliders { spacing: 2px; }
 .kestrel-slider-value { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #ffffff; background-color: rgba(28, 28, 32, 0.92); }
@@ -200,7 +202,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-text-button:focus { background-color: rgba(255, 255, 255, 0.17); }
 
 .kestrel-app-slots { spacing: 0; }
-.kestrel-page-navigation { spacing: 8px; font-size: 12px; }
 .kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: 120ms; }
 .kestrel-quick-settings .keyboard-brightness-level { spacing: 6px; font-size: 13px; }
 .kestrel-quick-settings .keyboard-brightness-level .icon-button { padding: 10px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.08); transition-duration: 120ms; }
@@ -243,8 +244,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
 .kestrel-control-more:hover { background-color: rgba(255, 255, 255, 0.15); }
 
-.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 18px; background-color: rgba(20, 20, 24, 0.30); color: white; }
-.kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; }
+.kestrel-context-menu { padding: 6px; spacing: 2px; border-radius: 18px; background-color: rgba(20, 20, 24, 0.30); color: rgba(255, 255, 255, 0.86); }
+.kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; font-weight: 500; }
 .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: rgba(255, 255, 255, 0.16); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
 .kestrel-context-row { spacing: 10px; }

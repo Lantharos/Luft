@@ -7,7 +7,7 @@ import St from 'gi://St';
 import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
 
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
-import { PagedPane } from './pagedPane.js';
+import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { KeepAwake } from './keepAwake.js';
 import { animateActor } from '../shared/motion.js';
@@ -19,6 +19,8 @@ import { ActionTiles, type Tile } from './tiles/actionTiles.js';
 import { TileGrid } from './tiles/tileGrid.js';
 import { TileDrag } from './tiles/tileDrag.js';
 import { TileLayout } from './tiles/tileLayout.js';
+
+const REVEAL_AFTER = 320;
 
 interface TrackedIcon extends St.Icon {
   connectObject(signal: string, callback: () => void, owner: Clutter.Actor): void;
@@ -33,7 +35,7 @@ export class QuickSettings {
     name: 'kestrel-quick-settings', orientation: Clutter.Orientation.VERTICAL,
     style_class: 'kestrel-popover kestrel-quick-settings', visible: false, reactive: true,
   });
-  private readonly pages = new PagedPane();
+  private readonly scroll = new ScrollPane();
   private readonly content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-content' });
   private readonly sliders = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-quick-sliders' });
   private readonly grid: TileGrid;
@@ -46,6 +48,7 @@ export class QuickSettings {
   private updateStatus = () => {};
   private readonly keepAwake = new KeepAwake(() => this.updateStatus());
   private layoutLater = 0;
+  private revealTimer = 0;
 
   constructor(
     source: QuickSettingsSource,
@@ -68,15 +71,17 @@ export class QuickSettings {
     });
     this.actor.connect('destroy', () => {
       if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
+      if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
       this.keepAwake.destroy();
     });
     menus.bind(this.actor, () => this.surfaceMenu());
-    this.actor.add_child(this.pages.actor);
-    this.pages.body.add_child(this.content);
+    this.scroll.body.add_style_class_name('kestrel-quick-scroll-body');
+    this.actor.add_child(this.scroll.actor);
+    this.scroll.body.add_child(this.content);
     this.content.add_child(this.grid.actor);
     this.content.add_child(this.sliders);
-    this.pages.body.connect('notify::height', () => this.queueLayout());
+    this.scroll.body.connect('notify::height', () => this.queueLayout());
 
     source.ready.then(() => {
       const indicators = [['network', source._network, 'network'], ['bluetooth', source._bluetooth, 'bluetooth'],
@@ -93,9 +98,9 @@ export class QuickSettings {
       for (const tile of this.actions.tiles)
         this.register({ ...tile, name: () => tile.id === 'battery' ? 'Battery' : tile.actor.accessible_name });
       this.arrangeTiles(false);
-      this.addSlider('sound', source._volumeOutput.quickSettingsItems[0]);
-      this.addSlider('sound', createInputSlider());
-      this.addSlider('display', source._brightness.quickSettingsItems[0]);
+      this.addSlider(source._volumeOutput.quickSettingsItems[0]);
+      this.addSlider(createInputSlider());
+      this.addSlider(source._brightness.quickSettingsItems[0]);
       const networkIcons = source._network?.get_children() as TrackedIcon[] ?? [];
       const bluetoothIcons = source._bluetooth?.get_children() as TrackedIcon[] ?? [];
       const airplaneIcons = source._rfkill.get_children() as TrackedIcon[];
@@ -122,8 +127,8 @@ export class QuickSettings {
     const theme = this.actor.get_theme_node();
     const contentWidth = width - theme.get_horizontal_padding();
     const chrome = theme.get_vertical_padding();
-    this.grid.setWidth(contentWidth);
-    return this.pages.measure(contentWidth, limit - chrome) + chrome;
+    this.grid.setWidth(contentWidth - this.scroll.body.get_theme_node().get_horizontal_padding());
+    return this.scroll.measure(contentWidth, limit - chrome) + chrome;
   }
 
   closeSubmenu(animate = true): boolean {
@@ -170,7 +175,7 @@ export class QuickSettings {
     const entries: MenuEntry[] = [];
     if (tile.settingsPanel) entries.push({ label: 'Settings', run: () => this.menus.settings(tile.settingsPanel!) });
     entries.push({
-      label: 'Remove from Quick Settings', run: () => {
+      label: 'Remove', run: () => {
         this.layoutStore.remove(tile.id);
         this.arrangeTiles(true);
       },
@@ -179,12 +184,12 @@ export class QuickSettings {
   }
 
   private surfaceMenu(): MenuEntry[] {
-    const entries: MenuEntry[] = [{ label: 'Settings', run: () => this.menus.settings() }];
+    const entries: MenuEntry[] = [];
     const removed = this.layoutStore.removed;
     const addable = this.tiles.filter(tile => removed.has(tile.id) && tile.actor.visible);
     if (addable.length) {
       entries.push({
-        label: 'Add to Quick Settings',
+        label: 'Add',
         children: addable.map(tile => ({
           label: tile.name(), run: () => {
             this.layoutStore.restore(tile.id);
@@ -195,7 +200,7 @@ export class QuickSettings {
     }
     if (this.layoutStore.customized) {
       entries.push({
-        label: 'Reset Quick Settings', run: () => {
+        label: 'Reset', run: () => {
           this.layoutStore.reset();
           this.arrangeTiles(true);
         },
@@ -208,6 +213,12 @@ export class QuickSettings {
     if (this.openMenu && this.openMenu !== menu) this.closeSubmenu();
     this.openMenu = menu;
     this.queueLayout();
+    if (this.revealTimer) GLib.Source.remove(this.revealTimer);
+    this.revealTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, REVEAL_AFTER, () => {
+      this.revealTimer = 0;
+      if (menu.isOpen) this.scroll.reveal(menu.actor);
+      return GLib.SOURCE_REMOVE;
+    });
   }
 
   private menuClosed(menu: ControlMenu): void {
@@ -235,9 +246,8 @@ export class QuickSettings {
     styleControl(item);
   }
 
-  private addSlider(settingsPanel: string, item: QuickControl): void {
+  private addSlider(item: QuickControl): void {
     const menu = this.prepare(item);
-    this.menus.bind(item, () => [{ label: 'Settings', run: () => this.menus.settings(settingsPanel) }]);
     if (item.slider) {
       item.slider.add_style_class_name('kestrel-slider');
       attachSliderValue(item.slider);

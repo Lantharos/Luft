@@ -33,6 +33,10 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
     await pause(300);
   };
   const menu = actorNamed(global.stage, 'kestrel-context-menu');
+  const surfaceCorner = () => {
+    const [x, y] = quick.get_transformed_position();
+    return [x + 20, y + 8];
+  };
   const colorScheme = interfaceSettings.get_string('color-scheme');
 
   const services = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_LAPTOP_SCRIPT')], Gio.SubprocessFlags.NONE);
@@ -42,6 +46,8 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
     toggleSurface('quick');
     await pause(450);
     require(['Keep Awake', 'Dark Style', 'Airplane Mode', 'Keyboard Backlight'].every(title => tile(title)?.visible), 'quick settings show every available tile');
+    await clickAt(...surfaceCorner(), Clutter.BUTTON_SECONDARY);
+    require(!menu.visible, 'quick settings has no context menu until the layout is customized');
     await capture(`${output}/quick-settings-tiles.png`);
 
     const keepAwake = tile('Keep Awake');
@@ -59,6 +65,9 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
     require(keepAwake.width === grid().width && hourY > keepAwake.get_transformed_position()[1] + keepAwake.height,
       'options open inline beneath a full-width tile');
     require(quick.visible && !actorNamed(quick, 'Back to quick settings'), 'options stay in the same view');
+    const scroller = withClass(quick, 'kestrel-app-scroll')[0];
+    require(scroller.vadjustment.upper > scroller.vadjustment.page_size && hourY < scroller.get_transformed_position()[1] + scroller.height,
+      'long quick settings scroll to show the open options');
     await capture(`${output}/keep-awake-menu.png`);
     hour.activate(null);
     await pause(400);
@@ -108,12 +117,11 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
     require(first.x > second.x && shellSettings.get_strv('kestrel-quick-tile-order').length > 0, 'dragging a tile moves it and remembers the order');
 
     await clickAt(...center(dark), Clutter.BUTTON_SECONDARY);
-    await clickAt(...center(actorNamed(menu, 'Remove from Quick Settings')));
+    await clickAt(...center(actorNamed(menu, 'Remove')));
     await pause(150);
     require(!dark.get_parent() && shellSettings.get_strv('kestrel-quick-tiles-removed').includes('dark-style-0'), 'tiles can be removed from Quick Settings');
-    const [panelX, panelY] = quick.get_transformed_position();
-    await clickAt(panelX + 20, panelY + 8, Clutter.BUTTON_SECONDARY);
-    for (const label of ['Add to Quick Settings', 'Dark Style'])
+    await clickAt(...surfaceCorner(), Clutter.BUTTON_SECONDARY);
+    for (const label of ['Add', 'Dark Style'])
       await clickAt(...center(actorNamed(menu, label)));
     await pause(200);
     require(dark.get_parent() === grid() && dark.visible, 'removed tiles can be added back');

@@ -24,7 +24,7 @@ impl App {
     }
 
     pub fn by_id(id: &str) -> Option<Self> {
-        Self::from_info(&gio::DesktopAppInfo::new(id)?)
+        Self::from_info(&gio_unix::DesktopAppInfo::new(id)?)
     }
 }
 

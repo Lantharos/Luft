@@ -18,7 +18,7 @@ fn app_names(Apps { ids }: Apps) -> Result<HashMap<String, String>, String> {
     Ok(ids
         .into_iter()
         .filter_map(|id| {
-            let info = gio::DesktopAppInfo::new(&format!("{id}.desktop"))?;
+            let info = gio_unix::DesktopAppInfo::new(&format!("{id}.desktop"))?;
             Some((id, info.name().to_string()))
         })
         .collect())

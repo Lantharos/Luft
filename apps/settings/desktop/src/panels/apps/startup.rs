@@ -72,32 +72,32 @@ fn entries_in(directory: &Path) -> impl Iterator<Item = OsString> {
         })
 }
 
-fn belongs_to_session(info: &gio::DesktopAppInfo) -> bool {
+fn belongs_to_session(info: &gio_unix::DesktopAppInfo) -> bool {
     info.shows_in(None) && !info.boolean(HIDDEN_UNDER_SYSTEMD) && !info.has_key(PHASE)
 }
 
-fn listed_by_system(info: &gio::DesktopAppInfo) -> bool {
+fn listed_by_system(info: &gio_unix::DesktopAppInfo) -> bool {
     belongs_to_session(info) && !info.is_hidden() && !info.is_nodisplay()
 }
 
-fn runs(info: &gio::DesktopAppInfo) -> bool {
+fn runs(info: &gio_unix::DesktopAppInfo) -> bool {
     !info.is_hidden() && (!info.has_key(ENABLED) || info.boolean(ENABLED))
 }
 
-fn installed(info: &gio::DesktopAppInfo) -> bool {
+fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
     glib::find_program_in_path(info.executable()).is_some()
 }
 
 fn entry(user: &Path, name: OsString) -> Option<Entry> {
     let system = system_file(&name);
     if let Some(system) = &system
-        && !listed_by_system(&gio::DesktopAppInfo::from_filename(system)?)
+        && !listed_by_system(&gio_unix::DesktopAppInfo::from_filename(system)?)
     {
         return None;
     }
     let user = user.join(&name);
     let effective = if user.is_file() { user } else { system? };
-    let info = gio::DesktopAppInfo::from_filename(effective)?;
+    let info = gio_unix::DesktopAppInfo::from_filename(effective)?;
     if !belongs_to_session(&info) || !installed(&info) {
         return None;
     }
@@ -143,7 +143,7 @@ pub fn set(Toggle { id, enabled }: Toggle) -> Result<(), String> {
     let system = system_file(&OsString::from(&id));
     if enabled
         && let Some(system) = &system
-        && gio::DesktopAppInfo::from_filename(system).is_some_and(|info| runs(&info))
+        && gio_unix::DesktopAppInfo::from_filename(system).is_some_and(|info| runs(&info))
     {
         return if user.exists() {
             fs::remove_file(&user).map_err(failed)
@@ -165,7 +165,7 @@ pub fn set(Toggle { id, enabled }: Toggle) -> Result<(), String> {
 }
 
 pub fn add(Addition { app }: Addition) -> Result<(), String> {
-    let info = gio::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
+    let info = gio_unix::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
     let file = load(
         &info
             .filename()

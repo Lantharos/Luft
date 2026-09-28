@@ -31,6 +31,12 @@ stage { font-family: "Open Runde"; }
 }
 
 .kestrel-running-dot { margin: 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.60); transition-duration: 180ms; }
+.kestrel-task-attention { border-radius: 12px; background-color: rgba(255, 168, 64, 0.42); }
+.kestrel-task-badge { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background-color: #e5484d; color: #ffffff; font-size: 10px; font-weight: 700; text-align: center; }
+.kestrel-task-progress { height: 4px; border-radius: 999px; background-color: rgba(0, 0, 0, 0.55); }
+.kestrel-task-progress-fill { height: 4px; border-radius: 999px; background-color: #ffffff; }
+.kestrel-peek { width: 8px; padding: 0; border-radius: 0; background-color: transparent; box-shadow: none; transition-duration: 150ms; }
+.kestrel-peek:hover { background-color: rgba(255, 255, 255, 0.10); }
 .kestrel-app-focused .kestrel-running-dot { background-color: #ffffff; }
 .kestrel-task-button:active, .kestrel-app-focused {
   background-color: rgba(255, 255, 255, 0.15);

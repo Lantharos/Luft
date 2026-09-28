@@ -13,6 +13,7 @@ import {checkTray} from './checks/trayChecks.js';
 import {checkTaskView} from './checks/taskViewChecks.js';
 import {checkNotifications} from './checks/notificationChecks.js';
 import {checkSnapGroups} from './checks/snapGroupChecks.js';
+import {checkTaskbar} from './checks/taskbarChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
@@ -311,6 +312,7 @@ export async function run() {
   await checkTaskView({pause, capture, actorNamed, pointer, keyboard, output});
   await checkNotifications({pause, capture, actorNamed, output});
   await checkSnapGroups({pause});
+  await checkTaskbar({pause, capture, actorNamed, pointer, output});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

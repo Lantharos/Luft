@@ -54,7 +54,7 @@ impl RoverState {
             measurements: Measurements::new(events.clone()),
             queue,
             watcher: DirectoryWatcher::new(events.clone()),
-            settings: Arc::new(RwLock::new(Settings::load(user_dirs.as_ref()))),
+            settings: Arc::new(RwLock::new(Settings::load())),
             chooser: ChooserSession::from_environment().map(Arc::new),
             launch_paths: Arc::new(launch_args::current_process()),
             user_dirs: Arc::new(user_dirs),

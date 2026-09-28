@@ -4,15 +4,20 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 
 ## Features
 
-- Tabs with their own back and forward history
-- List, grid and table views, remembered per folder
+- Tabs with their own back and forward history; the tab bar shows up once a second tab is open
+- List, grid and column views, remembered per folder. The list sorts from its column headers, the grid zooms from small icons to large previews, and columns show where you are and what is inside the selected folder
+- Folders with tens of thousands of files open and scroll smoothly, since only what is on screen is drawn
+- A sidebar with Home, Recent, your Desktop, Documents, Downloads, Music, Pictures and Videos folders, Trash with the number of items in it, Favorites and drives
+- A details pane with a large preview, the kind, size, dates, image dimensions, media length, location, version control state and the apps that can open the file
+- Quick Look on `Space` for images, video, audio, text and code, Markdown and PDFs, moving between files with the arrow keys
+- Full keyboard navigation, including range selection and jumping to a file by typing its name
 - Image thumbnails, loaded straight from disk
 - Folders refresh on their own when files change, including changes made by other apps
 - Copy and move run in the background with progress, pause and cancel, and never overwrite an existing file
 - Drag and drop within Rover and to or from other apps
 - Trash across the home folder and mounted drives, with restore
-- Favorites and a sidebar you can pin files and folders to, reorder and prune
-- Drives overview with usage, and eject for removable drives
+- Favorites you can add from the context menu or by dropping files on the sidebar, and reorder by dragging
+- Drives with their usage in the sidebar, and eject for removable drives
 - Git and Pig status badges, diffs, commits and sync for the folder you are in
 - Inline create and rename, marquee selection and an editable path bar
 - A file chooser for apps that use the xdg-desktop-portal picker
@@ -72,6 +77,19 @@ This writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
 |----------|--------|
 | `Ctrl+C` / `Ctrl+X` / `Ctrl+V` | Copy, cut and paste |
 | `Ctrl+A` | Select all |
+| Arrow keys, `Home`, `End`, `Page Up`, `Page Down` | Move through files; hold `Shift` to select a range |
+| Typing a name | Jump to the first file that starts with it |
+| `Enter` | Open |
+| `Space` | Quick Look |
+| `Ctrl+Space` | Add or remove the focused file from the selection |
+| `Ctrl+1` / `Ctrl+2` / `Ctrl+3` | List, grid and column view |
+| `Ctrl++` / `Ctrl+-` / `Ctrl+0`, or `Ctrl` and the wheel | Grid icon size |
+| `Alt+P` | Show or hide the details pane |
+| `Ctrl+L` | Type a location |
+| `Ctrl+H` | Show hidden files |
+| `Ctrl+Shift+N` | New folder |
+| `Alt+Left` / `Alt+Right` / `Alt+Up` | Back, forward and parent folder |
+| `Alt+Down` | Open the focused folder |
 | `Ctrl+F` | Search the current folder |
 | `Ctrl+T` / `Ctrl+W` | New tab, close tab |
 | `F2` | Rename |
@@ -88,18 +106,20 @@ rover/
 ├── src/
 │   ├── lib/
 │   │   ├── api.ts             bridge commands and events
-│   │   ├── components/        pane, shell and version control components
-│   │   ├── file-manager/      navigation, actions, drag and drop, chooser
+│   │   ├── components/        toolbar, sidebar, views, details, previews, shell and version control
+│   │   ├── file-manager/      navigation, view state and keys, previews, actions, drag and drop, chooser
 │   │   ├── state/             settings and tabs
 │   │   ├── utils/             formatting, paths and file kinds
 │   │   └── vcs/               version control state
 │   ├── routes/+page.svelte    window layout
-│   └── styles/                file list, grid and drive styles
+│   └── styles/                views, sidebar, toolbar and preview styles
 └── desktop/src/
     ├── bridge/                bridge command registration
     ├── drives/                mounts, drive info and mount watching
     ├── files/                 listing, transfers, trash, operations and folder watching
+    ├── inspect/               file details and open with
     ├── integration/           file chooser portal, FileManager1 and launch paths
+    ├── places/                recent files and trash count
     ├── vcs/                   Git and Pig
     ├── settings.rs
     └── state.rs

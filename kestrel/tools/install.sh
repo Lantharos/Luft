@@ -9,6 +9,7 @@ links=(
   "share/wayland-sessions/kestrel.desktop"
   "lib/systemd/user/kestrel.service"
   "lib/systemd/user/gnome-session@kestrel.target.d"
+  "lib/systemd/user/app.slice.d/50-kestrel-oomd.conf"
 )
 
 as_owner() {

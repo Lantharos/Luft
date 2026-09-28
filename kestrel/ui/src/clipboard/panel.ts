@@ -4,8 +4,8 @@ import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import type { ContextMenus } from '../contextMenus.js';
-import { blurSurface } from '../surface.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
+import { blurSurface } from '../shared/surface.js';
 import { ClipboardHistory } from './history.js';
 
 const PASTE_DELAY_MS = 120;
@@ -49,10 +49,6 @@ export class ClipboardPanel {
     this.refresh();
   }
 
-  focus(): void {
-    this.list.get_first_child()?.grab_key_focus();
-  }
-
   preferredHeight(width: number, limit: number): number {
     const theme = this.actor.get_theme_node();
     const contentWidth = width - theme.get_horizontal_padding();
@@ -83,7 +79,7 @@ export class ClipboardPanel {
     row.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
       this.history.remove(text);
-      this.focus();
+      this.list.get_first_child()?.grab_key_focus();
       return Clutter.EVENT_STOP;
     });
     row.connect('key-focus-in', () => {

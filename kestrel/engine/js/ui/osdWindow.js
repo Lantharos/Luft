@@ -1,4 +1,4 @@
-import {styleSurface} from './kestrelGlass.js';
+import {styleSurface, PILL} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -29,7 +29,7 @@ class OsdWindow extends Clutter.Actor {
         this._hbox = new St.BoxLayout({
             style_class: 'osd-window',
         });
-        styleSurface(this._hbox, 16);
+        styleSurface(this._hbox, PILL);
         this.add_child(this._hbox);
 
         this._icon = new St.Icon({y_expand: true});

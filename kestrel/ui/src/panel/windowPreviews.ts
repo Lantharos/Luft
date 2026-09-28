@@ -3,8 +3,8 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { blurSurface, PANEL_HEIGHT } from './surface.js';
-import { animateActor } from './motion.js';
+import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
+import { animateActor } from '../shared/motion.js';
 import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
 import type { Monitor } from './panel.js';
@@ -21,7 +21,7 @@ export class WindowPreviews {
   private clearSelection: (() => void) | null = null;
 
   constructor(private readonly monitorFor: (actor: Clutter.Actor) => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
-    blurSurface(this.actor, 16);
+    blurSurface(this.actor, 20);
     this.actor.connect('notify::hover', () => {
       if (this.actor.hover) this.cancelTimer();
       else this.schedule(() => this.closeUnlessFocused(), 180);

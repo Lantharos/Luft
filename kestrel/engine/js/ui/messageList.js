@@ -481,7 +481,7 @@ export class Message extends St.Button {
             y_expand: false,
         });
 
-        styleSurface(this, 16);
+        styleSurface(this, 20);
         this.expanded = false;
         this._useBodyMarkup = false;
 

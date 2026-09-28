@@ -27,7 +27,7 @@ declare module '*.svg' {
 
 
 declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
-  export function createInputSlider(): import('./quickControls.js').QuickControl;
+  export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
 }
 
 declare module 'resource:///org/gnome/shell/ui/kestrelGlass.js' {
@@ -75,4 +75,15 @@ declare module 'resource:///org/gnome/shell/ui/mpris.js' {
     readonly players: MprisPlayer[];
     connectObject(...args: unknown[]): void;
   }
+}
+
+declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
+  import Gio from 'gi://Gio';
+  export class Notification {
+    constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon });
+  }
+  export class Source {
+    addNotification(notification: Notification): void;
+  }
+  export function getSystemSource(): Source;
 }

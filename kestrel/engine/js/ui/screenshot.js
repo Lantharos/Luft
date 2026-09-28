@@ -1,4 +1,4 @@
-import {styleSurface} from './kestrelGlass.js';
+import {styleSurface, PILL} from './kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
@@ -54,7 +54,7 @@ export const Tooltip = GObject.registerClass(
 class Tooltip extends St.Label {
     _init(widget, params) {
         super._init(params);
-        styleSurface(this, 12);
+        styleSurface(this, PILL);
 
         this._widget = widget;
         this._timeoutId = null;
@@ -1536,7 +1536,7 @@ export class ScreenshotUI extends St.Widget {
             y_expand: true,
             offscreen_redirect: Clutter.OffscreenRedirect.AUTOMATIC_FOR_OPACITY,
         });
-        styleSurface(this._panel, 20);
+        styleSurface(this._panel, PILL);
         this._primaryMonitorBin.add_child(this._panel);
 
         for (const signal of ['drag-started', 'drag-ended']) {

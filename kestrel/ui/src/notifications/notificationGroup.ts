@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import type { ContextMenus } from './contextMenus.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
 const COLLAPSED_COUNT = 2;

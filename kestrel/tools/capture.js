@@ -7,13 +7,13 @@ import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-import {checkFolders} from './folderChecks.js';
-import {checkSession} from './sessionChecks.js';
-import {checkTray} from './trayChecks.js';
-import {checkTaskView} from './taskViewChecks.js';
-import {checkNotifications} from './notificationChecks.js';
-import {checkSnapGroups} from './snapGroupChecks.js';
-import {captureRenderedFrames} from './frameCapture.js';
+import {checkFolders} from './checks/folderChecks.js';
+import {checkSession} from './checks/sessionChecks.js';
+import {checkTray} from './checks/trayChecks.js';
+import {checkTaskView} from './checks/taskViewChecks.js';
+import {checkNotifications} from './checks/notificationChecks.js';
+import {checkSnapGroups} from './checks/snapGroupChecks.js';
+import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
 

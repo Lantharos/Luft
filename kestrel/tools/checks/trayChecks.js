@@ -20,16 +20,18 @@ export async function checkTray({pause, capture, actorNamed, pointer, output}) {
   try {
     await pause(1000);
     const tray = actorNamed(global.stage, 'kestrel-tray');
-    const item = tray.get_first_child();
-    require(item?.visible && item.accessible_name === 'Chatter', 'tray shows an app icon with its title');
+    require(tray?.visible && tray.child.get_n_children() === 1, 'tray shows one grouped button with an app preview');
     await capture(`${output}/tray.png`);
 
-    await click(item);
-    require(item.accessible_name === 'Chatter open', 'clicking a tray icon activates the app');
-
     const menu = actorNamed(global.stage, 'kestrel-context-menu');
-    await click(item, Clutter.BUTTON_SECONDARY);
-    require(menu.visible && !!actorNamed(menu, 'Open Chatter') && !actorNamed(menu, 'Hidden'), 'tray menu lists the visible app actions');
+    const openApp = async () => {
+      await click(tray);
+      await click(actorNamed(menu, 'Chatter'));
+    };
+    await click(tray);
+    require(menu.visible && !!actorNamed(menu, 'Chatter'), 'the tray panel lists apps by name');
+    await click(actorNamed(menu, 'Chatter'));
+    require(!!actorNamed(menu, 'Open Chatter') && !!actorNamed(menu, 'Mute') && !actorNamed(menu, 'Hidden'), 'an app opens into its own actions');
     await click(actorNamed(menu, 'Status'));
     require(!!actorNamed(menu, 'Away') && !!actorNamed(menu, 'Back'), 'tray submenus open in place');
     await capture(`${output}/tray-menu.png`);
@@ -37,13 +39,18 @@ export async function checkTray({pause, capture, actorNamed, pointer, output}) {
     await click(actorNamed(menu, 'Mute'));
     await pause(200);
     require(!menu.visible, 'choosing a tray action closes the menu');
-    await click(item, Clutter.BUTTON_SECONDARY);
+    await openApp();
     const checked = descendants(actorNamed(menu, 'Mute')).some(actor => actor.icon_name === 'object-select-symbolic');
     require(checked, 'tray menu reflects toggled items');
+    await click(actorNamed(menu, 'Open Chatter'));
+    await pause(300);
+    await click(tray);
+    require(!!actorNamed(menu, 'Chatter open'), 'Open activates the app');
+    await click(actorNamed(menu, 'Chatter open'));
     await click(actorNamed(menu, 'Quit'));
   } finally {
     app.force_exit();
   }
   await pause(500);
-  require(!actorNamed(global.stage, 'kestrel-tray').get_n_children(), 'tray icons leave with their app');
+  require(!actorNamed(global.stage, 'kestrel-tray').visible, 'the tray hides when its last app exits');
 }

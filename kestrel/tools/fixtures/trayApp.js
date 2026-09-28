@@ -54,7 +54,7 @@ const item = {
 const menu = {
   GetLayout() {
     return [1, node(0, {'children-display': text('submenu')}, [
-      node(1, {label: text('_Open Chatter')}),
+      node(1, {label: text('_Show conversations')}),
       node(2, {label: text('Mute'), 'toggle-type': text('checkmark'), 'toggle-state': new GLib.Variant('i', muted ? 1 : 0)}),
       node(3, {type: text('separator')}),
       node(4, {label: text('Status'), 'children-display': text('submenu')}, [

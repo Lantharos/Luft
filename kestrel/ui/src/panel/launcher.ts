@@ -3,9 +3,9 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import primary from './assets/luft-primary.svg';
-import secondary from './assets/luft-secondary.svg';
-import { animateActor } from './motion.js';
+import primary from '../assets/luft-primary.svg';
+import secondary from '../assets/luft-secondary.svg';
+import { animateActor } from '../shared/motion.js';
 
 const MARK_SIZE = 26;
 

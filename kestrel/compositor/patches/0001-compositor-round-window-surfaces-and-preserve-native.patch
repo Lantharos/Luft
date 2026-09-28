@@ -434,7 +434,7 @@ index 9e16b2682ab6db61106a6b1cd86b9d6691d3fda5..ac370b22aa8f89425efe8f2e702282f1
        get_shape_bounds (actor_x11, &shape_bounds);
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..c244a6b578f3003512c0ca861090dec534900096
+index 0000000000000000000000000000000000000000..efd589144408507135251b5cc957e473e481ed90
 --- /dev/null
 +++ b/src/compositor/meta-window-corners.c
 @@ -0,0 +1,182 @@
@@ -511,7 +511,7 @@ index 0000000000000000000000000000000000000000..c244a6b578f3003512c0ca861090dec5
 +                                           bounds.size.width * x_scale,
 +                                           bounds.size.height * y_scale);
 +    }
-+  corners.radius = MIN (12.0f * scale,
++  corners.radius = MIN (15.0f * scale,
 +                         MIN (corners.bounds.size.width,
 +                              corners.bounds.size.height) / 2.0f);
 +  return corners;

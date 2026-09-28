@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { animateActor } from './motion.js';
+import { animateActor } from '../shared/motion.js';
 
 const VISIBLE_AFTER_CHANGE_MS = 900;
 

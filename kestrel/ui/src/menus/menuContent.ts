@@ -2,8 +2,9 @@ import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
-export interface MenuAction { label: string; enabled?: boolean; checked?: boolean; icon?: Gio.Icon | null; run(): void; }
-export interface MenuGroup { label: string; enabled?: boolean; icon?: Gio.Icon | null; children: MenuEntry[]; }
+export type MenuIcon = Gio.Icon | St.ImageContent | null;
+export interface MenuAction { label: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
+export interface MenuGroup { label: string; enabled?: boolean; icon?: MenuIcon; children: MenuEntry[] | (() => Promise<MenuEntry[]>); }
 export type MenuEntry = MenuAction | MenuGroup | 'separator';
 
 export interface MenuHandlers {
@@ -13,7 +14,9 @@ export interface MenuHandlers {
   hover(button: St.Button): void;
 }
 
-function slot(icon: Gio.Icon | null | undefined, iconName: string | null): St.Icon {
+function slot(icon: MenuIcon | undefined, iconName: string | null): St.Icon {
+  if (icon instanceof St.ImageContent)
+    return new St.Icon({ style_class: 'kestrel-context-icon', content: icon, content_gravity: Clutter.ContentGravity.RESIZE_ASPECT, width: 16, height: 16 });
   return new St.Icon({ style_class: 'kestrel-context-icon', gicon: icon ?? null, icon_name: icon ? null : iconName, icon_size: 16 });
 }
 

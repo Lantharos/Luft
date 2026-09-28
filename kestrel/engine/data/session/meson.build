@@ -19,3 +19,4 @@ configure_file(
 
 install_data('kestrel.session', install_dir: datadir / 'gnome-session' / 'sessions')
 install_data('session.conf', install_dir: systemduserunitdir / 'gnome-session@kestrel.target.d')
+install_data('app-slice-oomd.conf', install_dir: systemduserunitdir / 'app.slice.d', rename: '50-kestrel-oomd.conf')

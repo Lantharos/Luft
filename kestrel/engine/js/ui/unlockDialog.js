@@ -261,7 +261,7 @@ const NotificationsBox = GObject.registerClass({
             style_class: 'unlock-dialog-notification-source',
             x_expand: true,
         });
-        styleSurface(obj.sourceBox, 16);
+        styleSurface(obj.sourceBox, 20);
         this._showSource(source, obj, obj.sourceBox);
         this._notificationBox.insert_child_at_index(obj.sourceBox, this._players.size);
 

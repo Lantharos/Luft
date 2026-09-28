@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { MenuEntry } from '../contextMenus.js';
+import type { MenuEntry } from '../menus/contextMenus.js';
 import { busCall } from './bus.js';
 
 const MENU_INTERFACE = 'com.canonical.dbusmenu';

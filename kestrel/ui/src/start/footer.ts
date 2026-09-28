@@ -4,9 +4,9 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
 
-import { animateActor } from '../motion.js';
-import type { ContextMenus } from '../contextMenus.js';
-import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../sessionActions.js';
+import { animateActor } from '../shared/motion.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
+import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
 
 const SWAP_DURATION = 180;
 const SWAP_DISTANCE = 16;

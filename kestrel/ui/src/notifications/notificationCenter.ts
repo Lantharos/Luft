@@ -6,8 +6,8 @@ import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
-import type { ContextMenus } from './contextMenus.js';
-import { blurSurface } from './surface.js';
+import type { ContextMenus } from '../menus/contextMenus.js';
+import { blurSurface } from '../shared/surface.js';
 import { Calendar } from './calendar.js';
 import { MediaCard } from './media.js';
 
@@ -43,7 +43,7 @@ export class NotificationCenter {
       visible: false,
       reactive: true,
     });
-    blurSurface(this.actor, 20);
+    blurSurface(this.actor);
     menus.bind(this.actor, () => [
       { label: 'Clear all notifications', enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
       { label: 'Show message content on the lock screen', checked: this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT),
@@ -142,11 +142,6 @@ export class NotificationCenter {
       else this.actor.grab_key_focus();
     }
     if (this.actor.visible) this.layoutChanged();
-  }
-
-  focus(): void {
-    if (this.first) this.first.open.grab_key_focus();
-    else this.actor.grab_key_focus();
   }
 
   preferredHeight(width: number, limit: number): number {

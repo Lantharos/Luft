@@ -4,7 +4,7 @@ import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { blurSurface } from './surface.js';
+import { blurSurface } from '../shared/surface.js';
 
 type Zone = [x: number, y: number, width: number, height: number];
 
@@ -63,10 +63,6 @@ export class SnapLayouts {
 
   prepareOpen(): void {
     this.window = (global as unknown as Shell.Global).display.focus_window;
-  }
-
-  focus(): void {
-    this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false);
   }
 
   private card(layout: Zone[]): St.Widget {

@@ -234,6 +234,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-control:checked:hover { background-color: rgba(255, 255, 255, 0.32); }
 .kestrel-control:checked:active { background-color: rgba(255, 255, 255, 0.38); }
 .kestrel-control:checked .kestrel-control-subtitle { color: rgba(255, 255, 255, 0.85); }
+.kestrel-control.kestrel-control-lifted { background-color: rgba(255, 255, 255, 0.20); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28); }
+.kestrel-control.kestrel-control-lifted:checked { background-color: rgba(255, 255, 255, 0.34); }
 .kestrel-control-body { spacing: 3px; }
 .kestrel-control-top { height: 32px; }
 .kestrel-control-title { font-size: 13px; font-weight: 600; }

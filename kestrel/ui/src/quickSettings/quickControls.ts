@@ -29,8 +29,13 @@ export interface QuickSettingsSource {
   _volumeOutput: Indicator;
   _brightness: Indicator;
   _powerProfiles: Indicator;
+  _caffeine: Indicator;
   _nightLight: Indicator;
+  _darkMode: Indicator;
   _doNotDisturb: Indicator;
+  _rfkill: Indicator;
+  _backlight: Indicator;
+  _autoRotate: Indicator;
 }
 
 export function detach(actor: Clutter.Actor): void {

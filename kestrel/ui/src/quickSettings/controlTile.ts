@@ -27,7 +27,7 @@ export function styleControl(item: QuickControl): void {
   body.add_child(title);
   const subtitle = new St.Label({ style_class: 'kestrel-control-subtitle', x_align: Clutter.ActorAlign.START });
   const updateSubtitle = () => {
-    subtitle.text = item.subtitle || (item.checked ? 'On' : item.toggle_mode ? 'Off' : 'Options');
+    subtitle.text = item.subtitle || (item.checked ? 'On' : 'Off');
   };
   item.connect('notify::subtitle', updateSubtitle);
   item.connect('notify::checked', updateSubtitle);

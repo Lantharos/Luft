@@ -16,6 +16,7 @@ import {checkSnapGroups} from './checks/snapGroupChecks.js';
 import {checkTaskbar} from './checks/taskbarChecks.js';
 import {checkPanelStatus} from './checks/panelStatusChecks.js';
 import {checkShortcuts} from './checks/shortcutChecks.js';
+import {checkQuickTiles} from './checks/quickTileChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
@@ -317,6 +318,7 @@ export async function run() {
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
+  await checkQuickTiles({pause, capture, actorNamed, output});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
   Main.messageTray.add(source);

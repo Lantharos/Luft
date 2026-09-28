@@ -30,7 +30,7 @@ export async function checkPanelStatus({pause, capture, actorNamed, pointer, out
       new GLib.Variant('(a{sv})', [{}]), '(o)').deep_unpack();
     call(session, 'org.gnome.Mutter.ScreenCast.Session', 'Start', null, null);
     new GLib.MainLoop(null, false).run();`], Gio.SubprocessFlags.NONE);
-  const inhibitor = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_INHIBITOR_SCRIPT')], Gio.SubprocessFlags.NONE);
+  const inhibitor = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_INHIBITOR_SCRIPT'), '--app'], Gio.SubprocessFlags.NONE);
   try {
     await pause(1200);
     const panel = actorNamed(global.stage, 'kestrel-panel');

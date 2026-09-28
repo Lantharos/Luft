@@ -91,8 +91,10 @@ export class QuickSettings {
     });
 
     source.ready.then(() => {
-      const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._powerProfiles, 'power'],
-        [source._nightLight, 'display'], [source._doNotDisturb, 'notifications']] as const;
+      const indicators = [[source._network, 'network'], [source._bluetooth, 'bluetooth'], [source._rfkill, 'wifi'],
+        [source._powerProfiles, 'power'], [source._caffeine, 'power'], [source._nightLight, 'display'],
+        [source._darkMode, 'background'], [source._doNotDisturb, 'notifications'], [source._backlight, 'power'],
+        [source._autoRotate, 'display']] as const;
       for (const [indicator, settingsPanel] of indicators) {
         for (const item of indicator?.quickSettingsItems ?? []) {
           this.adopt(item);
@@ -108,16 +110,18 @@ export class QuickSettings {
       this.addSlider('display', source._brightness.quickSettingsItems[0]);
       const networkIcons = source._network?.get_children() as TrackedIcon[] ?? [];
       const bluetoothIcons = source._bluetooth?.get_children() as TrackedIcon[] ?? [];
+      const airplaneIcons = source._rfkill.get_children() as TrackedIcon[];
       const volumeIcons = source._volumeOutput.get_children() as TrackedIcon[];
       const visibleIcon = (icons: TrackedIcon[]) => icons.find(icon => icon.visible)?.icon_name;
       this.updateStatus = () => statusChanged([
         this.keepAwake.active ? 'view-reveal-symbolic' : undefined,
+        visibleIcon(airplaneIcons),
         visibleIcon(networkIcons) ?? 'network-offline-symbolic',
         visibleIcon(bluetoothIcons),
         visibleIcon(volumeIcons) ?? 'audio-volume-muted-symbolic',
         this.batteryState?.iconName,
       ].filter((icon): icon is string => !!icon));
-      for (const icon of [...networkIcons, ...bluetoothIcons, ...volumeIcons]) {
+      for (const icon of [...airplaneIcons, ...networkIcons, ...bluetoothIcons, ...volumeIcons]) {
         icon.connectObject('notify::icon-name', this.updateStatus, this.actor);
         icon.connectObject('notify::visible', this.updateStatus, this.actor);
       }

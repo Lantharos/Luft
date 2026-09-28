@@ -1,6 +1,7 @@
 pub mod entries;
 pub mod operations;
 pub mod privileged;
+pub mod rename;
 pub mod transfer;
 pub mod trash;
 pub mod watch;
@@ -9,6 +10,35 @@ use std::ffi::CString;
 use std::io;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
+
+use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, percent_encode};
+
+const URI_PATH: &AsciiSet = &NON_ALPHANUMERIC
+    .remove(b'!')
+    .remove(b'$')
+    .remove(b'&')
+    .remove(b'\'')
+    .remove(b'(')
+    .remove(b')')
+    .remove(b'*')
+    .remove(b'+')
+    .remove(b',')
+    .remove(b'-')
+    .remove(b'.')
+    .remove(b'/')
+    .remove(b':')
+    .remove(b'=')
+    .remove(b'@')
+    .remove(b'_')
+    .remove(b'~');
+
+pub(crate) fn uri_path(path: &Path) -> String {
+    percent_encode(path.as_os_str().as_bytes(), URI_PATH).to_string()
+}
+
+pub(crate) fn file_uri(path: &Path) -> String {
+    format!("file://{}", uri_path(path))
+}
 
 pub(crate) fn rename_no_replace(from: &Path, to: &Path) -> io::Result<()> {
     match renameat2_no_replace(from, to) {

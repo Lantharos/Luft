@@ -1,10 +1,16 @@
+mod archives;
 mod bridge;
 mod drives;
 mod events;
 mod files;
+mod history;
 mod integration;
+mod properties;
+mod search;
 mod settings;
 mod state;
+mod text;
+mod thumbnails;
 mod vcs;
 
 use luft_app::GlassWindow;

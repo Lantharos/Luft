@@ -1,15 +1,18 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::mpsc::{self, RecvTimeoutError, Sender};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use luft_app::Events;
 use parking_lot::{Mutex, RwLock};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::events::OPERATIONS_CHANGED;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;
+const DECISION_POLL_INTERVAL: Duration = Duration::from_millis(150);
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq)]
 pub enum OperationType {
@@ -17,6 +20,8 @@ pub enum OperationType {
     Move,
     Delete,
     Trash,
+    Compress,
+    Extract,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq)]
@@ -34,9 +39,41 @@ pub enum OperationPhase {
     Copying,
     Moving,
     Deleting,
+    Compressing,
+    Extracting,
     Finalizing,
     Completed,
     SafeToEject,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ConflictItem {
+    pub path: String,
+    pub name: String,
+    pub is_dir: bool,
+    pub size: u64,
+    pub modified: Option<i64>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Conflict {
+    pub source: ConflictItem,
+    pub target: ConflictItem,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub enum Resolution {
+    Replace,
+    Merge,
+    Skip,
+    KeepBoth,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Decision {
+    pub resolution: Resolution,
+    pub apply_to_all: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -53,6 +90,7 @@ pub struct Operation {
     pub total_bytes: u64,
     pub items_processed: usize,
     pub total_items: usize,
+    pub conflict: Option<Conflict>,
     pub error: Option<String>,
     pub started_at: i64,
     pub completed_at: Option<i64>,
@@ -71,6 +109,7 @@ pub struct OperationsQueue {
 
 struct Inner {
     operations: RwLock<Vec<Operation>>,
+    decisions: Mutex<HashMap<String, Sender<Decision>>>,
     events: Events,
     last_emit: Mutex<Instant>,
     next_id: AtomicU64,
@@ -81,6 +120,7 @@ impl OperationsQueue {
         Self {
             inner: Arc::new(Inner {
                 operations: RwLock::new(Vec::new()),
+                decisions: Mutex::new(HashMap::new()),
                 events,
                 last_emit: Mutex::new(Instant::now()),
                 next_id: AtomicU64::new(1),
@@ -116,6 +156,7 @@ impl OperationsQueue {
                 total_bytes: 0,
                 items_processed: 0,
                 total_items: total_items.max(1),
+                conflict: None,
                 error: None,
                 started_at: now,
                 completed_at: None,
@@ -174,6 +215,33 @@ impl OperationsQueue {
             operation.total_items = total_items.max(1);
             operation.progress = 0.0;
         });
+    }
+
+    pub fn ask(&self, id: &str, conflict: Conflict) -> Result<Decision, String> {
+        let (sender, receiver) = mpsc::channel();
+        self.inner.decisions.lock().insert(id.to_string(), sender);
+        self.update(id, true, |operation| operation.conflict = Some(conflict));
+        let decision = loop {
+            match receiver.recv_timeout(DECISION_POLL_INTERVAL) {
+                Ok(decision) => break Ok(decision),
+                Err(RecvTimeoutError::Timeout)
+                    if self.status(id) != Some(OperationStatus::Cancelled) => {}
+                Err(_) => break Err("Operation cancelled".to_string()),
+            }
+        };
+        self.inner.decisions.lock().remove(id);
+        self.update(id, true, |operation| operation.conflict = None);
+        decision
+    }
+
+    pub fn decide(&self, id: &str, decision: Decision) -> Result<(), String> {
+        self.inner
+            .decisions
+            .lock()
+            .get(id)
+            .ok_or("This question was already answered")?
+            .send(decision)
+            .map_err(|_| "The operation has already finished".to_string())
     }
 
     pub fn finish<T>(&self, id: &str, result: Result<T, String>) -> Result<T, String> {

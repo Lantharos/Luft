@@ -68,8 +68,7 @@ After that, `appearance.translucent`, `appearance.accent` and `appearance.accent
 | --- | --- |
 | `Switch`, `Slider`, `Select`, `Segmented` | Form controls; each takes a `label` for assistive technology and reports changes through `onchange` |
 | `SearchField` | Search input; `variant="sidebar"` for the sidebar, `large` for a taller field, `focus()` to focus and select |
-| `TextField`, `PasswordField` | Text inputs that show an `error` below the field once it has been left, or right away with `live`; `invalid` marks the field without a message, and `touched` can be bound to show the message elsewhere. `PasswordField` adds a show and hide button and calls `onreveal` before showing the value |
-| `Dialog` | Modal with a title, optional description, body and an `actions` snippet; `wide` for longer forms, and the body scrolls when it runs out of height |
+| `Dialog` | Modal with a title, optional description, body and an `actions` snippet |
 | `IconButton` | Round icon-only button taking a Lucide icon |
 | `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists and the rows inside them |
 | `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials |

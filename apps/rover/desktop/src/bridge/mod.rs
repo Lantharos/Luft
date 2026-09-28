@@ -1,4 +1,5 @@
 mod params;
+mod tools;
 
 use luft_app::Commands;
 use sabine::SabineWindow;
@@ -16,6 +17,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = register_files(window, state);
     let window = register_trash(window, state);
     let window = register_vcs(window, state);
+    let window = tools::register(window, state);
     register_app(window, state)
 }
 
@@ -30,14 +32,16 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("get_file_info", |Path { path }| {
             entries::get_file_info(path)
         })
-        .command("create_file", |NewEntry { path, name }| {
-            entries::create_file(path, name)
+        .with("create_file", state, |state, NewEntry { path, name }| {
+            entries::create_file(path, name, &state.history)
         })
-        .command("create_directory", |NewEntry { path, name }| {
-            entries::create_directory(path, name)
-        })
-        .command("rename_item", |Rename { path, new_name }| {
-            entries::rename_item(path, new_name)
+        .with(
+            "create_directory",
+            state,
+            |state, NewEntry { path, name }| entries::create_directory(path, name, &state.history),
+        )
+        .with("rename_item", state, |state, Rename { path, new_name }| {
+            entries::rename_item(path, new_name, &state.history)
         })
         .with(
             "copy_items",
@@ -46,7 +50,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
              Transfer {
                  sources,
                  destination,
-             }| { transfer::copy_items(sources, destination, &state.queue) },
+             }| {
+                transfer::copy_items(sources, destination, &state.queue, &state.history)
+            },
         )
         .with(
             "move_items",
@@ -55,7 +61,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
              Transfer {
                  sources,
                  destination,
-             }| { transfer::move_items(sources, destination, &state.queue) },
+             }| {
+                transfer::move_items(sources, destination, &state.queue, &state.history)
+            },
         )
         .command("open_with_default", |Path { path }| {
             entries::open_with_default(path)
@@ -70,10 +78,10 @@ fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
         .command("list_trash", |Empty {}| trash::list_trash())
         .with("move_to_trash", state, |state, Paths { paths }| {
-            trash::move_to_trash(paths, &state.queue)
+            trash::move_to_trash(paths, &state.queue, &state.history)
         })
         .with("restore_from_trash", state, |state, Ids { ids }| {
-            trash::restore(ids, &state.queue)
+            trash::restore(ids, &state.queue, &state.history)
         })
         .with("delete_permanently", state, |state, Ids { ids }| {
             trash::delete_permanently(ids, &state.queue)

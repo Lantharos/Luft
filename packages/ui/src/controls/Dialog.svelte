@@ -4,13 +4,12 @@
 	interface Props {
 		title: string;
 		description?: string;
-		wide?: boolean;
 		onclose: () => void;
 		children?: Snippet;
 		actions: Snippet;
 	}
 
-	let { title, description, wide = false, onclose, children, actions }: Props = $props();
+	let { title, description, onclose, children, actions }: Props = $props();
 
 	let panel = $state<HTMLDivElement>();
 
@@ -23,7 +22,7 @@
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
 
 <div class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
-	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title}>
+	<div bind:this={panel} class="dialog" role="dialog" aria-modal="true" aria-label={title}>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="text-[17px] font-semibold">{title}</h2>
 			{#if description}
@@ -31,7 +30,7 @@
 			{/if}
 		</div>
 		{#if children}
-			<div class="body soft-scroll">{@render children()}</div>
+			<div class="flex flex-col gap-3">{@render children()}</div>
 		{/if}
 		<div class="flex justify-end gap-2">{@render actions()}</div>
 	</div>
@@ -51,7 +50,6 @@
 	.dialog {
 		display: flex;
 		width: min(420px, calc(100vw - 48px));
-		max-height: calc(100vh - 48px);
 		flex-direction: column;
 		gap: 20px;
 		padding: 22px;
@@ -59,19 +57,6 @@
 		background: var(--popover);
 		box-shadow: 0 24px 64px var(--shadow-soft);
 		animation: rise 220ms var(--ease);
-	}
-
-	.wide {
-		width: min(560px, calc(100vw - 48px));
-	}
-
-	.body {
-		display: flex;
-		min-height: 0;
-		flex-direction: column;
-		gap: 12px;
-		overflow-x: hidden;
-		overflow-y: auto;
 	}
 
 	@keyframes fade {

@@ -13,7 +13,7 @@ const PATH: &str = "/org/freedesktop/UPower/PowerProfiles";
 pub struct Profiles {
     active: String,
     available: Vec<String>,
-    degraded: Option<String>,
+    degraded: Vec<String>,
 }
 
 pub fn read(connection: &Connection) -> Result<Profiles, String> {
@@ -31,8 +31,13 @@ pub fn read(connection: &Connection) -> Result<Profiles, String> {
             .unwrap_or_default(),
         available,
         degraded: properties
-            .get::<String>("PerformanceDegraded")
-            .filter(|reason| !reason.is_empty()),
+            .get::<&str>("PerformanceDegraded")
+            .unwrap_or_default()
+            .split(',')
+            .map(str::trim)
+            .filter(|reason| !reason.is_empty())
+            .map(str::to_owned)
+            .collect(),
     })
 }
 

@@ -11,13 +11,14 @@ use libpulse_binding::proplist::UpdateMode;
 use libpulse_binding::volume::ChannelVolumes;
 use luft_app::Events;
 
+use super::card::Card;
 use super::meter::Meter;
 use super::model::{ALERT_STREAM, Alert, App, Device, State, scaled};
 use super::service::Command;
 use super::{Direction, Target};
 
 const SOUND_CHANGED: &str = "sound.changed";
-const INITIAL_QUERIES: usize = 5;
+const INITIAL_QUERIES: usize = 6;
 
 type Done = Box<dyn FnOnce(&Pulse)>;
 
@@ -68,6 +69,7 @@ impl Pulse {
             InterestMaskSet::SINK
                 | InterestMaskSet::SOURCE
                 | InterestMaskSet::SINK_INPUT
+                | InterestMaskSet::CARD
                 | InterestMaskSet::SERVER,
             |_| {},
         );
@@ -97,6 +99,7 @@ impl Pulse {
         self.load_outputs(finish());
         self.load_inputs(finish());
         self.load_apps(finish());
+        self.load_cards(finish());
         self.load_alert(finish());
     }
 
@@ -114,6 +117,7 @@ impl Pulse {
                 Facility::Sink => drop(state.outputs.remove(&index)),
                 Facility::Source => drop(state.inputs.remove(&index)),
                 Facility::SinkInput => drop(state.apps.remove(&index)),
+                Facility::Card => drop(state.cards.remove(&index)),
                 _ => return,
             }
             drop(state);
@@ -123,6 +127,7 @@ impl Pulse {
             Facility::Sink => self.update_output(index),
             Facility::Source => self.update_input(index),
             Facility::SinkInput => self.update_app(index),
+            Facility::Card => self.update_card(index),
             Facility::Server => self.load_server(Box::new(|pulse| {
                 pulse.publish();
                 pulse.sync_meter();
@@ -201,6 +206,20 @@ impl Pulse {
             });
     }
 
+    fn load_cards(&self, done: Done) {
+        let pulse = self.clone();
+        let mut done = once(done);
+        let mut found = BTreeMap::new();
+        self.introspect()
+            .get_card_info_list(move |result| match result {
+                ListResult::Item(info) => drop(found.insert(info.index, Card::from_info(info))),
+                ListResult::End | ListResult::Error => {
+                    pulse.state.borrow_mut().cards = std::mem::take(&mut found);
+                    done(&pulse);
+                }
+            });
+    }
+
     fn load_alert(&self, done: Done) {
         let mut restore = self.restore.borrow_mut();
         let Some(restore) = restore.as_mut() else {
@@ -262,6 +281,18 @@ impl Pulse {
             });
     }
 
+    fn update_card(&self, index: u32) {
+        let pulse = self.clone();
+        self.introspect()
+            .get_card_info_by_index(index, move |result| match result {
+                ListResult::Item(info) => {
+                    let card = Card::from_info(info);
+                    pulse.state.borrow_mut().cards.insert(info.index, card);
+                }
+                ListResult::End | ListResult::Error => pulse.publish(),
+            });
+    }
+
     fn sync_meter(&self) {
         let source = self.state.borrow().default_input.clone();
         let mut meter = self.meter.borrow_mut();
@@ -305,6 +336,14 @@ impl Pulse {
         match direction {
             Direction::Output => context.set_default_sink(name, |_| {}),
             Direction::Input => context.set_default_source(name, |_| {}),
+        };
+    }
+
+    fn set_port(&self, direction: Direction, index: u32, port: &str) {
+        let mut introspect = self.introspect();
+        match direction {
+            Direction::Output => introspect.set_sink_port_by_index(index, port, None),
+            Direction::Input => introspect.set_source_port_by_index(index, port, None),
         };
     }
 
@@ -354,6 +393,17 @@ impl Pulse {
                 self.set_mute(request.target, request.index, request.muted)
             }
             Command::SetBalance(request) => self.set_balance(request.index, request.balance),
+            Command::SetPort(request) => {
+                self.set_port(request.direction, request.index, &request.port)
+            }
+            Command::SetProfile(request) => {
+                self.introspect()
+                    .set_card_profile_by_index(request.card, &request.profile, None);
+            }
+            Command::MoveApp(request) => {
+                self.introspect()
+                    .move_sink_input_by_index(request.index, request.output, None);
+            }
             Command::SetAlertVolume(request) => self.set_alert_volume(request.volume),
             Command::Meter(request) => {
                 self.metering.set(request.enabled);

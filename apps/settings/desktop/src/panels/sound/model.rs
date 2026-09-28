@@ -7,6 +7,8 @@ use libpulse_binding::proplist::properties;
 use libpulse_binding::volume::{ChannelVolumes, Volume};
 use serde::Serialize;
 
+use super::card::{Card, CardView, Choice, Ports};
+
 pub const ALERT_STREAM: &str = "sink-input-by-media-role:event";
 
 pub struct Device {
@@ -15,12 +17,14 @@ pub struct Device {
     pub volume: ChannelVolumes,
     pub map: Map,
     muted: bool,
+    ports: Ports,
 }
 
 pub struct App {
     name: String,
     pub volume: ChannelVolumes,
     muted: bool,
+    output: u32,
 }
 
 pub struct Alert {
@@ -36,6 +40,7 @@ pub struct State {
     pub outputs: BTreeMap<u32, Device>,
     pub inputs: BTreeMap<u32, Device>,
     pub apps: BTreeMap<u32, App>,
+    pub cards: BTreeMap<u32, Card>,
     pub default_output: String,
     pub default_input: String,
     pub alert: Option<Alert>,
@@ -47,6 +52,7 @@ pub struct Snapshot<'a> {
     outputs: Vec<DeviceView<'a>>,
     inputs: Vec<DeviceView<'a>>,
     apps: Vec<AppView<'a>>,
+    cards: Vec<CardView<'a>>,
     default_output: &'a str,
     default_input: &'a str,
     alert_volume: Option<f64>,
@@ -60,6 +66,8 @@ struct DeviceView<'a> {
     volume: f64,
     muted: bool,
     balance: Option<f32>,
+    port: Option<&'a str>,
+    ports: &'a [Choice],
 }
 
 #[derive(Serialize)]
@@ -68,6 +76,7 @@ struct AppView<'a> {
     name: &'a str,
     volume: f64,
     muted: bool,
+    output: u32,
 }
 
 pub fn fraction(volume: &ChannelVolumes) -> f64 {
@@ -90,6 +99,7 @@ impl Device {
             volume: info.volume,
             map: info.channel_map,
             muted: info.mute,
+            ports: Ports::of_sink(&info.ports, info.active_port.as_deref()),
         }
     }
 
@@ -103,6 +113,7 @@ impl Device {
             volume: info.volume,
             map: info.channel_map,
             muted: info.mute,
+            ports: Ports::of_source(&info.ports, info.active_port.as_deref()),
         })
     }
 
@@ -117,6 +128,8 @@ impl Device {
                 .map
                 .can_balance()
                 .then(|| self.volume.get_balance(&self.map)),
+            port: self.ports.active.as_deref(),
+            ports: &self.ports.choices,
         }
     }
 }
@@ -135,6 +148,7 @@ impl App {
             name,
             volume: info.volume,
             muted: info.mute,
+            output: info.sink,
         })
     }
 
@@ -144,6 +158,7 @@ impl App {
             name: &self.name,
             volume: fraction(&self.volume),
             muted: self.muted,
+            output: self.output,
         }
     }
 }
@@ -189,6 +204,12 @@ impl State {
                 .apps
                 .iter()
                 .map(|(index, app)| app.view(*index))
+                .collect(),
+            cards: self
+                .cards
+                .iter()
+                .filter(|(_, card)| card.selectable())
+                .map(|(index, card)| card.view(*index))
                 .collect(),
             default_output: &self.default_output,
             default_input: &self.default_input,

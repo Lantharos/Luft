@@ -14,7 +14,7 @@ use libpulse_binding::proplist::{Proplist, properties};
 use luft_app::Events;
 
 use super::pulse::Pulse;
-use super::{AlertVolume, Balance, DefaultDevice, Meter, Mute, Volume};
+use super::{AlertVolume, Balance, DefaultDevice, Meter, MoveApp, Mute, Port, Profile, Volume};
 
 const APP_ID: &str = "dev.lantharos.settings";
 const UNAVAILABLE: &str = "Sound isn't available right now";
@@ -25,6 +25,9 @@ pub enum Command {
     SetVolume(Volume),
     SetMute(Mute),
     SetBalance(Balance),
+    SetPort(Port),
+    SetProfile(Profile),
+    MoveApp(MoveApp),
     SetAlertVolume(AlertVolume),
     Meter(Meter),
 }

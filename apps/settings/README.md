@@ -6,12 +6,12 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 
 - Network: Wi-Fi, wired connections, VPN and proxy, with per-connection settings for IP addresses, DNS, routes, metered data, hardware addresses and work or school Wi-Fi sign-in
 - Bluetooth: pairing, connecting and forgetting devices, visibility to nearby devices, and device details such as battery and automatic connection
-- Displays: arrangement, resolution, refresh rate, scale and night light
-- Sound: output and input devices, volumes and alert sounds
-- Power: power mode, battery, screen blanking and suspend
+- Displays: arrangement, resolution, refresh rate, scale, brightness and night light
+- Sound: output and input devices, connections and device profiles, volumes, which output each app plays on and alert sounds
+- Power: power mode, battery health and charge limit, keyboard backlight, screen blanking and suspend
 - Keyboard: input sources, repeat and shortcuts
 - Mouse and touchpad: speed, scrolling and tap to click
-- Notifications: do not disturb and per-app notifications
+- Notifications: do not disturb and per-app notifications, including which apps may still notify you during do not disturb
 - Apps: default apps and what each app is allowed to do
 - Privacy: location, file history, screen lock and trash cleanup
 - Users: your account picture, name, password and fingerprints
@@ -20,6 +20,8 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 - About: device name, hardware and system versions
 
 Settings reads and writes the same settings as the desktop, so changes made elsewhere show up right away.
+
+Brightness for external displays needs [ddcutil](https://www.ddcutil.com). Its package lets your account reach the displays after you log in again; without it, Displays explains what's missing. Built-in screens are adjusted through the desktop and need nothing extra.
 
 The sidebar uses the compositor's background blur on Wayland compositors that support `ext-background-effect-v1`, and falls back to a solid surface elsewhere.
 

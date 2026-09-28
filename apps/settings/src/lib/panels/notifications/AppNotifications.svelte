@@ -3,16 +3,18 @@
 	import { AppIcon, ItemRow, Switch } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import AppNotificationsDialog from './AppNotificationsDialog.svelte';
-	import { APP_KEYS, APP_SCHEMA, type AppOptions, type NotifyingApp } from './api';
+	import { APP_KEYS, APP_SCHEMA, RULES_KEYS, RULES_SCHEMA, type AppOptions, type AppRules, type NotifyingApp } from './api';
 
 	interface Props {
 		app: NotifyingApp;
 		lockScreen: boolean;
+		hasRules: boolean;
 	}
 
-	let { app, lockScreen }: Props = $props();
+	let { app, lockScreen, hasRules }: Props = $props();
 
 	const options = useSettings<AppOptions>(APP_SCHEMA, APP_KEYS, untrack(() => app.path));
+	const rules = untrack(() => hasRules) ? useSettings<AppRules>(RULES_SCHEMA, RULES_KEYS, untrack(() => app.rulesPath)) : null;
 
 	let open = $state(false);
 	let enabled = $derived(options.values.enable ?? true);
@@ -35,5 +37,5 @@
 </ItemRow>
 
 {#if open}
-	<AppNotificationsDialog {app} {options} {lockScreen} onclose={() => (open = false)} />
+	<AppNotificationsDialog {app} {options} {rules} {lockScreen} onclose={() => (open = false)} />
 {/if}

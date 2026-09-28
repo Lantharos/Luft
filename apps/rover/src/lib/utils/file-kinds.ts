@@ -7,7 +7,7 @@ const EXTENSION_ICONS: Record<EntryIconName, string[]> = {
 	file: [],
 	image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'avif', 'heic', 'heif', 'tif', 'tiff'],
 	video: ['mp4', 'webm', 'mkv', 'avi', 'mov', 'wmv', 'flv'],
-	music: ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma', 'opus'],
+	music: ['mp3', 'wav', 'ogg', 'oga', 'flac', 'aac', 'm4a', 'm4b', 'wma', 'opus', 'weba'],
 	archive: ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'zst'],
 	'file-text': ['pdf', 'doc', 'docx', 'odt', 'rtf', 'xls', 'xlsx', 'ods', 'csv', 'ppt', 'pptx', 'odp'],
 	package: ['appimage', 'deb', 'rpm', 'flatpak', 'snap'],

@@ -46,6 +46,10 @@
 		padding-inline: 4px;
 	}
 
+	.path-trail.is-clipped {
+		mask-image: linear-gradient(to right, transparent, black 32px);
+	}
+
 	.path-crumb {
 		display: inline-flex;
 		height: 26px;

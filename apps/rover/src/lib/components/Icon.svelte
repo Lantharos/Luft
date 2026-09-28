@@ -12,6 +12,7 @@
 		| 'check' | 'alert-circle' | 'edit' | 'pause' | 'play'
 		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save'
 		| 'clock' | 'panel-right' | 'more-horizontal' | 'chevron-left' | 'chevron-down'
+		| 'volume' | 'volume-x'
 		| 'git-branch' | 'arrow-up' | 'columns-3' | 'link' | 'lock' | 'search' | 'minus' | 'folder-x'
 		| 'terminal' | 'info' | 'copy-plus' | 'package-open';
 </script>
@@ -235,6 +236,14 @@
 		<path d="m15 18-6-6 6-6" />
 	{:else if name === 'chevron-down'}
 		<path d="m6 9 6 6 6-6" />
+	{:else if name === 'volume'}
+		<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+		<path d="M16 9a5 5 0 0 1 0 6" />
+		<path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+	{:else if name === 'volume-x'}
+		<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+		<line x1="22" x2="16" y1="9" y2="15" />
+		<line x1="16" x2="22" y1="9" y2="15" />
 	{:else if name === 'git-branch'}
 		<line x1="6" x2="6" y1="3" y2="15" />
 		<circle cx="18" cy="6" r="3" />

@@ -24,6 +24,7 @@
 
 	let trail = $state<HTMLDivElement>();
 	let draft = $state('');
+	let clipped = $state(false);
 
 	let root = $derived.by((): Crumb => {
 		const path = manager.currentPath;
@@ -39,7 +40,9 @@
 	});
 
 	$effect(() => {
-		if (crumbs.length > 0 && trail) trail.scrollLeft = trail.scrollWidth;
+		if (crumbs.length === 0 || !trail) return;
+		trail.scrollLeft = trail.scrollWidth;
+		clipped = trail.scrollLeft > 0;
 	});
 
 	$effect(() => {
@@ -89,7 +92,13 @@
 			onblur={() => (view.editingPath = false)}
 		/>
 	{:else}
-		<div bind:this={trail} class="path-trail hidden-scroll" role="group" aria-label="Location">
+		<div
+			bind:this={trail}
+			class={['path-trail hidden-scroll', clipped && 'is-clipped']}
+			role="group"
+			aria-label="Location"
+			onscroll={() => (clipped = (trail?.scrollLeft ?? 0) > 0)}
+		>
 			{#each crumbs as crumb, index (crumb.path || crumb.label)}
 				{@const accepts = acceptsDrops && Boolean(crumb.path) && drag.canDropOn(crumb.path)}
 				{#if index > 0}

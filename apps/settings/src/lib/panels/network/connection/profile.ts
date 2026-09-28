@@ -8,6 +8,7 @@ export type Metered = 'automatic' | 'yes' | 'no';
 export type Family = 'ipv4' | 'ipv6';
 export type EapMethod = 'peap' | 'ttls' | 'tls';
 export type Purpose = 'authority' | 'client' | 'key';
+export type MacChoice = 'builtin' | 'random' | 'stable' | 'custom';
 
 export interface Route {
 	destination: string;
@@ -76,6 +77,14 @@ export const chooseCertificate = (purpose: Purpose) =>
 	invoke<string | null>('network_choose_certificate', { purpose }, { timeoutMs: WAIT_FOR_PERMISSION });
 
 export type Target = { kind: 'wifi'; path: string; ssid: string } | { kind: 'wired'; path: string; device: string } | { kind: 'vpn'; path: string };
+
+const BUILTIN_MACS = ['', 'preserve', 'permanent'];
+
+export function macChoice(kind: Kind, mac: string): MacChoice {
+	if (BUILTIN_MACS.includes(mac)) return 'builtin';
+	if (mac === 'random' || mac === 'stable') return mac;
+	return kind === 'wifi' ? 'builtin' : 'custom';
+}
 
 export const configurable = (method: string) => method === 'auto' || method === 'dhcp' || method === 'manual';
 

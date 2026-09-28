@@ -14,3 +14,4 @@ root = "."
 dist = "build"
 entry = "build/index.html"
 build = "bun run build"
+local_files = true

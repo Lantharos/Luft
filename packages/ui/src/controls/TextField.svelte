@@ -5,6 +5,7 @@
 	interface Props {
 		value: string;
 		label: string;
+		showLabel?: boolean;
 		placeholder?: string;
 		error?: string;
 		invalid?: boolean;
@@ -21,6 +22,7 @@
 	let {
 		value = $bindable(),
 		label,
+		showLabel = false,
 		placeholder,
 		error = '',
 		invalid = false,
@@ -34,6 +36,8 @@
 		trailing
 	}: Props = $props();
 
+	const id = $props.id();
+
 	let input = $state<HTMLInputElement>();
 	let shown = $derived((live || touched) && (invalid || Boolean(error)));
 
@@ -43,9 +47,13 @@
 </script>
 
 <div class="field">
+	{#if showLabel}
+		<label class="label" for={id}>{label}</label>
+	{/if}
 	<div class="control">
 		<input
 			bind:this={input}
+			{id}
 			class="text-field"
 			class:invalid={shown}
 			class:padded={trailing}
@@ -55,7 +63,7 @@
 			{autocomplete}
 			{disabled}
 			spellcheck="false"
-			aria-label={label}
+			aria-label={showLabel ? undefined : label}
 			aria-invalid={Boolean(shown)}
 			bind:value
 			onblur={() => (touched = true)}
@@ -82,8 +90,19 @@
 		position: relative;
 	}
 
+	.label {
+		padding-inline: 4px;
+		font-size: 13px;
+		color: var(--text-soft);
+	}
+
 	.text-field {
 		color: var(--text);
+		box-shadow: inset 0 0 0 1px var(--hairline);
+	}
+
+	.text-field:focus {
+		box-shadow: inset 0 0 0 1.5px var(--accent);
 	}
 
 	.text-field:disabled {

@@ -4,7 +4,7 @@ use std::sync::{LazyLock, Mutex};
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
 
-use super::objects::{Objects, failed};
+use crate::dbus::objects::{Objects, failed};
 use super::{CONNECTION, SERVICE, SETTINGS};
 use crate::dbus;
 

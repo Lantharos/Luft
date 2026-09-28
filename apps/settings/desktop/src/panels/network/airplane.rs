@@ -4,7 +4,7 @@ use std::sync::mpsc::Sender;
 use serde::Serialize;
 use zbus::blocking::Proxy;
 
-use super::objects::failed;
+use crate::dbus::objects::failed;
 use crate::dbus;
 
 #[derive(Serialize)]

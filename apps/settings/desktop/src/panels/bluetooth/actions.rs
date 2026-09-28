@@ -2,7 +2,7 @@ use zbus::blocking::Proxy;
 use zbus::zvariant::ObjectPath;
 
 use super::network::airplane;
-use super::network::objects::failed;
+use crate::dbus::objects::failed;
 use super::snapshot::Adapter;
 use super::{ADAPTER, DEVICE, SERVICE};
 use crate::dbus;

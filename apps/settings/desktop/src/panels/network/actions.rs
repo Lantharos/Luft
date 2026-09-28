@@ -4,7 +4,7 @@ use serde::Deserialize;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{ObjectPath, OwnedObjectPath, Value};
 
-use super::objects::failed;
+use crate::dbus::objects::failed;
 use super::saved::{self, Kind};
 use super::{DEVICE, MANAGER, MANAGER_PATH, SERVICE, WIRELESS, watch};
 use crate::dbus;
@@ -139,7 +139,7 @@ pub fn join(join: Join) -> Result<(), String> {
     Ok(())
 }
 
-pub fn forget(ssid: &str, objects: &super::objects::Objects) -> Result<(), String> {
+pub fn forget(ssid: &str, objects: &crate::dbus::objects::Objects) -> Result<(), String> {
     saved::all(objects)
         .into_iter()
         .filter(

@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use super::network::objects::{Object, Objects};
+use crate::dbus::objects::{Object, Objects};
 use super::{ADAPTER, BATTERY, DEVICE};
 
 const BLOCKED: &str = "off-blocked";

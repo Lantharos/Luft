@@ -5,7 +5,7 @@ use std::sync::mpsc::{self, Sender};
 use zbus::blocking::MessageIterator;
 use zbus::message::Type;
 
-use super::network::objects::{self, failed};
+use crate::dbus::objects::{self, failed};
 use super::{SERVICE, actions};
 use crate::dbus;
 use crate::events::Events;

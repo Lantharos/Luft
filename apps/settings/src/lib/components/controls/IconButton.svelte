@@ -4,13 +4,14 @@
 	interface Props {
 		icon: Component;
 		label: string;
+		disabled?: boolean;
 		onclick: () => void;
 	}
 
-	let { icon: Icon, label, onclick }: Props = $props();
+	let { icon: Icon, label, disabled = false, onclick }: Props = $props();
 </script>
 
-<button type="button" class="icon-button" aria-label={label} title={label} {onclick}>
+<button type="button" class="icon-button" aria-label={label} title={label} {disabled} {onclick}>
 	<Icon size={18} />
 </button>
 
@@ -23,15 +24,21 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
-		transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
+		transition-property: background-color, color, opacity, transform;
+		transition-duration: 160ms;
+		transition-timing-function: var(--ease);
 	}
 
-	.icon-button:hover {
+	.icon-button:hover:not(:disabled) {
 		background: var(--surface-hover);
 		color: var(--text);
 	}
 
-	.icon-button:active {
+	.icon-button:active:not(:disabled) {
 		transform: scale(0.94);
+	}
+
+	.icon-button:disabled {
+		opacity: 0.3;
 	}
 </style>

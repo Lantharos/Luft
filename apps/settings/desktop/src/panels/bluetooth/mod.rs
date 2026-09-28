@@ -11,7 +11,7 @@ use super::network;
 use crate::bridge::Commands;
 use crate::dbus;
 use crate::events::Events;
-use network::objects::Objects;
+use crate::dbus::objects::Objects;
 use snapshot::{Adapter, Bluetooth};
 
 const SERVICE: &str = "org.bluez";

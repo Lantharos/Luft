@@ -1,3 +1,5 @@
+pub mod objects;
+
 use std::sync::OnceLock;
 
 use zbus::blocking::Connection;

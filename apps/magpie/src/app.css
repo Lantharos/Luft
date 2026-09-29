@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+
+.stage {
+	color-scheme: dark;
+	--text: #f3f3ef;
+	--text-soft: #c9c9c3;
+	--text-muted: #9a9a93;
+	--control: rgba(28, 28, 26, 0.78);
+	--control-hover: rgba(46, 46, 43, 0.9);
+	--surface-hover: rgba(245, 245, 242, 0.1);
+	--popover: #1c1c1a;
+	--content: #121211;
+	--raised: #1a1a18;
+	--hairline: rgba(245, 245, 242, 0.07);
+	--shadow-soft: rgba(0, 0, 0, 0.4);
+	background: #0b0b0a;
+	color: var(--text);
+}
+
+.floating-bar {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	border-radius: var(--radius-pill);
+	background: var(--control);
+	padding: 4px;
+	box-shadow: 0 8px 28px var(--shadow-soft);
+	backdrop-filter: blur(18px);
+}
+
+.fade-idle {
+	transition: opacity 240ms var(--ease);
+}
+
+.idle .fade-idle {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.idle.immersive {
+	cursor: none;
+}
+
+.glass-shell.fullscreen {
+	--window-radius: 0px;
+}

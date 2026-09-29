@@ -8,9 +8,7 @@ use image::RgbaImage;
 use md5::{Digest, Md5};
 use serde::Deserialize;
 
-use crate::files::file_uri;
-
-const FAIL_FOLDER: &str = concat!("fail/rover-", env!("CARGO_PKG_VERSION"));
+const FAIL_FOLDER: &str = concat!("fail/luft-", env!("CARGO_PKG_VERSION"));
 const PNG_SIGNATURE: &[u8; 8] = b"\x89PNG\r\n\x1a\n";
 const URI_KEY: &str = "Thumb::URI";
 const MTIME_KEY: &str = "Thumb::MTime";
@@ -60,7 +58,7 @@ impl Source {
         if !metadata.is_file() {
             return None;
         }
-        let uri = file_uri(&path);
+        let uri = gio::glib::filename_to_uri(&path, None).ok()?.to_string();
         let hash = Md5::digest(uri.as_bytes())
             .iter()
             .map(|byte| format!("{byte:02x}"))
@@ -160,7 +158,7 @@ fn read_text(mut reader: impl Read + Seek, mut visit: impl FnMut(&str, &str)) ->
 fn write(path: &Path, source: &Source, image: &RgbaImage) -> Result<(), String> {
     let folder = path.parent().ok_or("Invalid thumbnail path")?;
     fs::create_dir_all(folder).map_err(|error| error.to_string())?;
-    let temporary = folder.join(format!(".{}.rover-{}", source.hash, std::process::id()));
+    let temporary = folder.join(format!(".{}.luft-{}", source.hash, std::process::id()));
     let result = encode(&temporary, source, image)
         .and_then(|()| fs::rename(&temporary, path).map_err(|error| error.to_string()));
     if result.is_err() {
@@ -185,7 +183,7 @@ fn encode(path: &Path, source: &Source, image: &RgbaImage) -> Result<(), String>
         (URI_KEY, source.uri.clone()),
         (MTIME_KEY, source.mtime.to_string()),
         ("Thumb::Size", source.bytes.to_string()),
-        ("Software", "Rover".to_string()),
+        ("Software", "Luft".to_string()),
     ];
     for (key, value) in text {
         encoder

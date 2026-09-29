@@ -1,7 +1,6 @@
 mod app;
 mod gsettings;
 mod panels;
-mod portal;
 
 use luft_app::{Events, GlassWindow};
 use sabine::SabineWindow;

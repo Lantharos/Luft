@@ -4,6 +4,7 @@ mod bridge;
 pub mod dbus;
 mod events;
 mod kestrel;
+pub mod portal;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;
 mod scheme;

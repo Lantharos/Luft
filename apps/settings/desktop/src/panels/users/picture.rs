@@ -6,8 +6,7 @@ use std::time::UNIX_EPOCH;
 use gio::prelude::*;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageDecoder, ImageReader};
-
-use crate::portal::{self, Filter};
+use luft_app::portal::{self, Filter};
 
 const EXTENSIONS: [&str; 4] = ["jpg", "jpeg", "png", "webp"];
 const SIZE: u32 = 512;

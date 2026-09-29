@@ -1,4 +1,5 @@
 use luft_app::Commands;
+use luft_app::thumbnails::ThumbnailSize;
 use sabine::SabineWindow;
 use serde::Deserialize;
 
@@ -11,7 +12,6 @@ use crate::integration::terminal;
 use crate::properties;
 use crate::search::Query;
 use crate::state::RoverState;
-use crate::thumbnails::ThumbnailSize;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]

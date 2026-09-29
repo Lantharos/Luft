@@ -1,3 +1,5 @@
+import * as tools from '$lib/features/actions';
+import { history } from '$lib/features/history.svelte';
 import type { ChooserState } from './chooser.svelte';
 import type { FileManager } from './manager.svelte';
 import { handleViewKey } from './view/keys';
@@ -15,21 +17,32 @@ export function handleKeydown(event: KeyboardEvent, context: KeyboardContext) {
 	const primary = event.ctrlKey || event.metaKey;
 	const key = event.key.toLowerCase();
 
-	if (primary && !event.altKey && !event.shiftKey && key === 'f') {
+	if (document.querySelector('[aria-modal="true"]')) return;
+	if (primary && !event.altKey && key === 'f') {
 		event.preventDefault();
-		return context.focusSearch();
+		return event.shiftKey ? tools.searchHere(manager) : context.focusSearch();
 	}
 	if (event.key === 'F5') {
 		event.preventDefault();
 		return void manager.refresh();
 	}
 	if (event.key === 'F2') {
-		if (!chooser) startRename(event, manager);
+		if (chooser) return;
+		if (manager.selection.size > 1) tools.rename(manager, tools.selection(manager));
+		else startRename(event, manager);
 		return;
 	}
 	if (isEditable(event.target) || handleViewKey(event, context)) return;
 
 	if (chooser) return handleChooserKey(event, chooser, primary && key === 'a');
+	if (primary && (key === 'z' || key === 'y')) {
+		event.preventDefault();
+		return key === 'y' || event.shiftKey ? history.redo() : history.undo();
+	}
+	if (event.altKey && event.key === 'Enter' && manager.selection.size > 0) {
+		event.preventDefault();
+		return tools.showProperties(manager, tools.selection(manager));
+	}
 	if (primary) return handleShortcut(event, manager, key);
 	if (event.key === 'Delete') void manager.actions.trashSelected();
 	if (event.key === 'Backspace') manager.goUp();

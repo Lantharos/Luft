@@ -4,6 +4,7 @@
 	import { GlassShell } from '@luft/ui';
 	import * as api from '$lib/api';
 	import DetailsPane from '$lib/components/details/DetailsPane.svelte';
+	import DialogHost from '$lib/components/dialogs/DialogHost.svelte';
 	import FilePane from '$lib/components/pane/FilePane.svelte';
 	import QuickLook from '$lib/components/preview/QuickLook.svelte';
 	import ChooserBar from '$lib/components/shell/ChooserBar.svelte';
@@ -137,5 +138,6 @@
 		{/if}
 
 		<VcsSaveDialog {vcs} />
+		<DialogHost {manager} />
 	</GlassShell>
 </div>

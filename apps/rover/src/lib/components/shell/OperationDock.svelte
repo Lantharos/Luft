@@ -47,17 +47,25 @@
 		const destination = operation.destination_label ? ` to ${operation.destination_label}` : '';
 		if (operation.status === 'Completed') {
 			if (operation.phase === 'SafeToEject') return 'Safe to eject';
-			return { Copy: 'Copied', Move: 'Moved', Trash: 'Moved to trash', Delete: 'Deleted' }[operation.op_type];
+			return { Copy: 'Copied', Move: 'Moved', Trash: 'Moved to trash', Delete: 'Deleted', Compress: 'Compressed', Extract: 'Extracted' }[
+				operation.op_type
+			];
 		}
 		if (operation.phase === 'Finalizing') return `Finalizing writes${destination}`;
 		if (operation.phase === 'Preparing') return 'Preparing';
-		return { Copy: `Copying${destination}`, Move: `Moving${destination}`, Trash: 'Moving to trash', Delete: 'Deleting' }[
-			operation.op_type
-		];
+		return {
+			Copy: `Copying${destination}`,
+			Move: `Moving${destination}`,
+			Trash: 'Moving to trash',
+			Delete: 'Deleting',
+			Compress: 'Compressing',
+			Extract: 'Extracting'
+		}[operation.op_type];
 	}
 
-	function icon(operation: Operation): 'trash-2' | 'upload' | 'copy' | 'check' | 'usb' {
+	function icon(operation: Operation): 'trash-2' | 'upload' | 'copy' | 'check' | 'usb' | 'archive' {
 		if (operation.phase === 'SafeToEject') return 'check';
+		if (operation.op_type === 'Compress' || operation.op_type === 'Extract') return 'archive';
 		if (operation.phase === 'Finalizing' && operation.destination_is_removable) return 'usb';
 		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return 'trash-2';
 		return operation.op_type === 'Move' ? 'upload' : 'copy';

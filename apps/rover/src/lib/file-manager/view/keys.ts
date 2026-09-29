@@ -24,7 +24,6 @@ const DIRECTIONS: Record<string, Direction> = {
 };
 
 export function handleViewKey(event: KeyboardEvent, context: ViewKeyContext) {
-	if (document.querySelector('[aria-modal="true"]')) return false;
 	const action = viewKeyAction(event, context);
 	if (!action) return false;
 	event.preventDefault();

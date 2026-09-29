@@ -1,4 +1,5 @@
 import type { Appearance } from '@luft/ui';
+import type { Conflict } from '$lib/features/types';
 
 export interface FileEntry {
 	name: string;
@@ -64,9 +65,18 @@ export interface TrashContents {
 	locations: TrashLocation[];
 }
 
-export type OperationType = 'Copy' | 'Move' | 'Delete' | 'Trash';
+export type OperationType = 'Copy' | 'Move' | 'Delete' | 'Trash' | 'Compress' | 'Extract';
 export type OperationStatus = 'InProgress' | 'Paused' | 'Completed' | 'Failed' | 'Cancelled';
-export type OperationPhase = 'Preparing' | 'Copying' | 'Moving' | 'Deleting' | 'Finalizing' | 'Completed' | 'SafeToEject';
+export type OperationPhase =
+	| 'Preparing'
+	| 'Copying'
+	| 'Moving'
+	| 'Deleting'
+	| 'Compressing'
+	| 'Extracting'
+	| 'Finalizing'
+	| 'Completed'
+	| 'SafeToEject';
 
 export interface Operation {
 	id: string;
@@ -81,6 +91,7 @@ export interface Operation {
 	total_bytes: number;
 	items_processed: number;
 	total_items: number;
+	conflict: Conflict | null;
 	error: string | null;
 	started_at: number;
 	completed_at: number | null;

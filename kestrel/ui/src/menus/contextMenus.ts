@@ -24,7 +24,7 @@ export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
   readonly actor = new St.BoxLayout({ name: 'kestrel-context-menu', style_class: 'kestrel-context-menu', orientation: Clutter.Orientation.VERTICAL, reactive: true, visible: false });
   private readonly viewport = new St.Widget({ layout_manager: new Clutter.BinLayout(), clip_to_allocation: true, x_expand: true, y_expand: true });
-  private readonly favorites = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private source: Clutter.Actor | null = null;
   private sourceDestroy = 0;
   private previousFocus: Clutter.Actor | null = null;

@@ -5,7 +5,7 @@ use luft_app::apps::{self, App};
 use luft_app::dbus;
 use zbus::blocking::Proxy;
 
-const OWN_ID: &str = "dev.lantharos.magpie";
+const OWN_ID: &str = "com.lantharos.magpie";
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()

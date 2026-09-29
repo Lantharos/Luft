@@ -9,9 +9,9 @@ use crate::events::Events;
 
 pub const PALETTE_CHANGED: &str = "kestrel.palette";
 
-const DESTINATION: &str = "dev.lantharos.Kestrel";
-const PATH: &str = "/dev/lantharos/Kestrel/Appearance";
-const INTERFACE: &str = "dev.lantharos.Kestrel.Appearance";
+const DESTINATION: &str = "com.lantharos.Kestrel";
+const PATH: &str = "/com/lantharos/Kestrel/Appearance";
+const INTERFACE: &str = "com.lantharos.Kestrel.Appearance";
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

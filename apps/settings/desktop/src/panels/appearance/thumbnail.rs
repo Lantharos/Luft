@@ -37,7 +37,7 @@ fn cached_path(source: &Path) -> Result<PathBuf, String> {
         .hash(&mut hasher);
     Ok(dirs::cache_dir()
         .ok_or("There is no cache folder")?
-        .join("dev.lantharos.settings")
+        .join("com.lantharos.settings")
         .join("wallpapers")
         .join(format!("{:016x}.jpg", hasher.finish())))
 }

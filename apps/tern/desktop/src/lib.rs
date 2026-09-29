@@ -13,7 +13,7 @@ use state::TernState;
 
 pub use desktop::entry::install as install_desktop_entry;
 
-const APP_ID: &str = "dev.lantharos.tern";
+const APP_ID: &str = "com.lantharos.tern";
 const WINDOW_RADIUS: i32 = 16;
 
 pub fn run_app() -> ! {

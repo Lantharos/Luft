@@ -3,7 +3,7 @@
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { powerState } from '../power/api';
 
-	const kestrel = useSettings<{ 'live-wallpaper-on-battery': boolean }>('dev.lantharos.kestrel', ['live-wallpaper-on-battery']);
+	const kestrel = useSettings<{ 'live-wallpaper-on-battery': boolean }>('com.lantharos.kestrel', ['live-wallpaper-on-battery']);
 
 	let hasBattery = $state(false);
 

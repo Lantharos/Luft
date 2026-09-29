@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 
 const KEYBINDING_SCHEMAS = [
   'org.gnome.desktop.wm.keybindings',
-  'dev.lantharos.kestrel.keybindings',
+  'com.lantharos.kestrel.keybindings',
   'org.gnome.mutter.keybindings',
   'org.gnome.mutter.wayland.keybindings',
   'org.gnome.settings-daemon.plugins.media-keys',

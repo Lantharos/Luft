@@ -35,7 +35,7 @@ export async function checkShortcuts({pause, capture, pointer, keyboard, output}
   const descendants = actor => [actor, ...actor.get_children().flatMap(descendants)];
   const same = (actual, expected) => JSON.stringify(actual) === JSON.stringify(expected);
 
-  new Gio.Settings({schema_id: 'dev.lantharos.kestrel'}).reset('global-shortcuts');
+  new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).reset('global-shortcuts');
   const voice = await bind('discord', [
     ['mute', 'Toggle mute', '<ctrl><alt>m'],
     ['deafen', 'Toggle deafen', '<super>v'],

@@ -1,5 +1,5 @@
 [app]
-id = "dev.lantharos.settings"
+id = "com.lantharos.settings"
 name = "Settings"
 version = "0.1.0"
 icon = "static/favicon.svg"

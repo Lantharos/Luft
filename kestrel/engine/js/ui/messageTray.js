@@ -12,7 +12,7 @@ import * as Main from './main.js';
 import * as MessageList from './messageList.js';
 import * as SignalTracker from '../misc/signalTracker.js';
 
-const SHELL_KEYBINDINGS_SCHEMA = 'dev.lantharos.kestrel.keybindings';
+const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
 
 export const ANIMATION_TIME = 200;
 const BANNER_SHOW_TIME = 260;
@@ -268,8 +268,8 @@ export const NotificationApplicationPolicy = GObject.registerClass({
             path: `/org/gnome/desktop/notifications/application/${this._canonicalId}/`,
         });
         this._rules = new Gio.Settings({
-            schema_id: 'dev.lantharos.kestrel.notifications.application',
-            path: `/dev/lantharos/kestrel/notifications/application/${this._canonicalId}/`,
+            schema_id: 'com.lantharos.kestrel.notifications.application',
+            path: `/com/lantharos/kestrel/notifications/application/${this._canonicalId}/`,
         });
 
         this._masterSettings.connect('changed', this._changed.bind(this));

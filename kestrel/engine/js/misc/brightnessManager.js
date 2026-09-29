@@ -14,7 +14,7 @@ import {
     SCALE_VALUE_N_STEPS,
 } from './brightnessScales.js';
 
-const KEYBINDING_SCHEMA = 'dev.lantharos.kestrel.keybindings';
+const KEYBINDING_SCHEMA = 'com.lantharos.kestrel.keybindings';
 const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
 
 class MonitorId {

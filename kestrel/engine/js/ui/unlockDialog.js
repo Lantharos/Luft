@@ -73,7 +73,7 @@ const NotificationsBox = GObject.registerClass({
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
-        this._shellSettings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+        this._shellSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
         this._shellSettings.connectObject('changed::lock-screen-content', () => {
             for (const [source, obj] of this._sources)
                 this._detailedChanged(source, obj);

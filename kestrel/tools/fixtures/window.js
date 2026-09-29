@@ -1,6 +1,6 @@
 import Gtk from 'gi://Gtk?version=4.0';
 
-const app = new Gtk.Application({ application_id: 'dev.lantharos.Kestrel.WindowCapture' });
+const app = new Gtk.Application({ application_id: 'com.lantharos.Kestrel.WindowCapture' });
 
 app.connect('activate', () => {
   for (let index = 0; index < (ARGV.includes('--multiple') ? 2 : 1); index++) {

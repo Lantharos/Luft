@@ -4,7 +4,7 @@ const ORDER = 'quick-tile-order';
 const REMOVED = 'quick-tiles-removed';
 
 export class TileLayout {
-  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
 
   order(defaults: string[]): string[] {
     const stored = this.settings.get_strv(ORDER).filter(id => defaults.includes(id));

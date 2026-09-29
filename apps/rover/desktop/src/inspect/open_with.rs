@@ -2,7 +2,7 @@ use gio::prelude::*;
 use luft_app::apps::App;
 use serde::Serialize;
 
-const OWN_APP_PREFIX: &str = "dev.kristof.rover";
+const OWN_APP_PREFIX: &str = "com.lantharos.rover";
 
 #[derive(Serialize)]
 pub struct OpenWith {

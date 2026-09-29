@@ -45,7 +45,7 @@ export async function checkLiveWallpaper({pause, actorNamed}) {
     return file;
   };
   const video = await makeVideo('ball', 'light');
-  const kestrel = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
   const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const colorScheme = interfaceSettings.get_string('color-scheme');

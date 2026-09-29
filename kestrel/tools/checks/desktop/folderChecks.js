@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
 export async function checkFolders({pause, capture, actorNamed, pointer, output}) {
-  const settings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const original = settings.get_string('start-layout');
   const layout = () => JSON.parse(settings.get_string('start-layout'));
   const favorites = settings;

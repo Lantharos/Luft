@@ -25,7 +25,7 @@ import * as Main from './main.js';
 import {blurBackdrop} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
 
-export const SHELL_KEYBINDINGS_SCHEMA = 'dev.lantharos.kestrel.keybindings';
+export const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
 
 const MINIMIZE_WINDOW_ANIMATION_TIME = 300;
 const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;

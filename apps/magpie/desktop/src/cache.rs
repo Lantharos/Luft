@@ -7,7 +7,7 @@ use std::time::SystemTime;
 pub fn folder(name: &str) -> Result<PathBuf, String> {
     let folder = dirs::cache_dir()
         .ok_or("There is no cache folder")?
-        .join("dev.lantharos.magpie")
+        .join("com.lantharos.magpie")
         .join(name);
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     Ok(folder)

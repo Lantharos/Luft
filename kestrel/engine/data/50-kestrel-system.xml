@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<KeyListEntries schema="dev.lantharos.kestrel.keybindings"
+<KeyListEntries schema="com.lantharos.kestrel.keybindings"
                 group="system"
                 name="System"
                 wm_name="GNOME Shell"

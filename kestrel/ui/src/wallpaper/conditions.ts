@@ -16,7 +16,7 @@ const PROFILES: Source = { bus: Gio.BusType.SYSTEM, name: 'org.freedesktop.UPowe
 
 export class PlaybackConditions {
   private readonly proxies = new Map<Source, Gio.DBusProxy>();
-  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly disconnectors: (() => void)[] = [];
   private readonly cancellable = new Gio.Cancellable();
 

@@ -61,7 +61,7 @@ fn square(source: &Path) -> Result<PathBuf, String> {
         .hash(&mut hasher);
     let cache = dirs::cache_dir()
         .ok_or("There is no cache folder")?
-        .join("dev.lantharos.settings")
+        .join("com.lantharos.settings")
         .join("pictures");
     let target = cache.join(format!("{:016x}.png", hasher.finish()));
     if !target.exists() {

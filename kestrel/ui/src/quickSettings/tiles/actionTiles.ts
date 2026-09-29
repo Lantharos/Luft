@@ -46,7 +46,7 @@ export class ActionTiles {
 
   constructor(handlers: ActionHandlers, batteryChanged: (state: BatteryState | null) => void) {
     const screenshot = actionTile('camera-photo-symbolic', 'Screenshot', handlers.takeScreenshot);
-    showShortcut(screenshot, 'dev.lantharos.kestrel.keybindings', 'show-screenshot-ui', this.settings);
+    showShortcut(screenshot, 'com.lantharos.kestrel.keybindings', 'show-screenshot-ui', this.settings);
     const settings = actionTile('emblem-system-symbolic', 'Settings', () => {
       handlers.close();
       openSettings();

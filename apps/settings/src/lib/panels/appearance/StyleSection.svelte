@@ -23,7 +23,7 @@
 	];
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
-	const kestrel = useSettings<Kestrel>('dev.lantharos.kestrel', ['dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
+	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
 	let schedule = $derived(kestrel.values['dark-schedule'] ?? 'off');

@@ -15,7 +15,7 @@ use super::{DEVICE, SERVICE};
 pub const REQUEST: &str = "bluetooth.request";
 pub const CANCEL: &str = "bluetooth.cancel";
 
-const PATH: &str = "/dev/lantharos/Settings/BluetoothAgent";
+const PATH: &str = "/com/lantharos/Settings/BluetoothAgent";
 const CAPABILITY: &str = "KeyboardDisplay";
 
 #[derive(Serialize, Clone, Copy)]

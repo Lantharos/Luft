@@ -17,7 +17,7 @@ const WINDOW: GlassWindow = GlassWindow {
     size: (1180, 780),
     min_size: (640, 460),
     sidebar_width: 280,
-    single_instance: Some("dev.lantharos.magpie"),
+    single_instance: Some("com.lantharos.magpie"),
 };
 
 pub fn run_app() -> ! {

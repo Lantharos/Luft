@@ -75,7 +75,7 @@ impl Root {
 
     #[zbus(property)]
     fn desktop_entry(&self) -> &str {
-        "dev.lantharos.magpie"
+        "com.lantharos.magpie"
     }
 
     #[zbus(property)]

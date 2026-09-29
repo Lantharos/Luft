@@ -116,7 +116,7 @@ fn file_uri(path: &str) -> String {
 }
 
 pub fn track_path(track: u32) -> ObjectPath<'static> {
-    ObjectPath::try_from(format!("/dev/lantharos/magpie/track/{track}"))
+    ObjectPath::try_from(format!("/com/lantharos/magpie/track/{track}"))
         .expect("track numbers form a valid object path")
 }
 

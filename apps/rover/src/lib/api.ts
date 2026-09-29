@@ -8,6 +8,7 @@ export const updateSettings = (settings: Settings) => invoke<void>('update_setti
 
 export const listDirectory = (path: string, showHidden: boolean) => invoke<DirectoryContents>('list_directory', { path, showHidden });
 export const watchDirectory = (path: string) => invoke<void>('watch_directory', { path });
+export const listFolders = (path: string) => invoke<string[]>('list_folders', { path });
 export const getFileInfo = (path: string) => invoke<FileEntry>('get_file_info', { path });
 export const createFile = (path: string, name: string) => invoke<FileEntry>('create_file', { path, name });
 export const createDirectory = (path: string, name: string) => invoke<FileEntry>('create_directory', { path, name });

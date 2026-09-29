@@ -3,11 +3,19 @@ import { listen } from '@lantharos/sabine';
 const PALETTE_CHANGED = 'kestrel.palette';
 const SCHEME_CHANGED = 'appearance.scheme';
 
+export interface TerminalColors {
+	light: Record<string, string>;
+	dark: Record<string, string>;
+}
+
 export interface Palette {
 	accent: string;
 	pureBlack: boolean;
 	colors: Record<string, string>;
+	terminal: TerminalColors;
 }
+
+const TERMINAL_HUES = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
 
 export type Scheme = 'dark' | 'light';
 
@@ -30,6 +38,7 @@ class AppearanceState {
 	scheme = $state<Scheme>('dark');
 	pureBlack = $state(false);
 	colors = $state<Record<string, string>>({});
+	terminal = $state<TerminalColors>({ light: {}, dark: {} });
 
 	start(initial: Appearance) {
 		this.translucent = initial.translucent;
@@ -46,7 +55,12 @@ class AppearanceState {
 		this.accent = palette.accent;
 		this.pureBlack = palette.pureBlack;
 		this.colors = palette.colors;
-		document.documentElement.toggleAttribute('data-black', palette.pureBlack);
+		this.terminal = palette.terminal;
+		const root = document.documentElement;
+		root.toggleAttribute('data-black', palette.pureBlack);
+		for (const scheme of ['light', 'dark'] as const) {
+			TERMINAL_HUES.forEach((hue, index) => root.style.setProperty(`--kestrel-${scheme}-${hue}`, palette.terminal[scheme][`color${index + 1}`]));
+		}
 	}
 }
 

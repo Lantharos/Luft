@@ -60,7 +60,7 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black.
+After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper.
 
 The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
 
@@ -113,7 +113,7 @@ const html = await highlight(source, 'src/main.rs');
 <pre class="font-mono"><code>{@html html}</code></pre>
 ```
 
-The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent and the light and dark palettes. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
+The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent, the wallpaper palette and the light and dark styles. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
 
 | Export | Use |
 | --- | --- |

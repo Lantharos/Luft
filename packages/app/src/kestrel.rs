@@ -19,6 +19,13 @@ pub struct Palette {
     accent: String,
     pure_black: bool,
     colors: HashMap<String, String>,
+    terminal: TerminalColors,
+}
+
+#[derive(Serialize)]
+pub struct TerminalColors {
+    light: HashMap<String, String>,
+    dark: HashMap<String, String>,
 }
 
 pub fn palette() -> Option<Palette> {
@@ -29,6 +36,10 @@ pub fn palette() -> Option<Palette> {
         accent,
         pure_black: proxy.get_property("PureBlack").ok()?,
         colors: proxy.get_property("Colors").ok()?,
+        terminal: TerminalColors {
+            light: proxy.get_property("LightTerminalColors").ok()?,
+            dark: proxy.get_property("DarkTerminalColors").ok()?,
+        },
     })
 }
 

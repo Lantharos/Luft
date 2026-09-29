@@ -1,0 +1,23 @@
+if [[ -n ${TERN_ZDOTDIR+set} ]]; then
+	ZDOTDIR=$TERN_ZDOTDIR
+	unset TERN_ZDOTDIR
+else
+	unset ZDOTDIR
+fi
+
+if [[ -r ${ZDOTDIR:-$HOME}/.zshenv ]]; then
+	source ${ZDOTDIR:-$HOME}/.zshenv
+fi
+
+if [[ -o interactive ]]; then
+	autoload -Uz add-zsh-hook
+	__tern_precmd() {
+		local exit_status=$?
+		print -n "\e]133;D;${exit_status}\a\e]7;file://${HOST}${PWD//\%/%25}\a\e]133;A\a"
+	}
+	__tern_preexec() {
+		print -n "\e]133;C\a"
+	}
+	add-zsh-hook precmd __tern_precmd
+	add-zsh-hook preexec __tern_preexec
+fi

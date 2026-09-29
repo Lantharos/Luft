@@ -3,6 +3,7 @@
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import * as features from '$lib/features/api';
 	import { dialogs } from '$lib/features/dialogs.svelte';
+	import { folderCounts } from '$lib/features/folder-counts.svelte';
 	import { history } from '$lib/features/history.svelte';
 	import { search } from '$lib/features/search.svelte';
 	import { thumbnailSize, thumbnails } from '$lib/features/thumbnails.svelte';
@@ -32,6 +33,7 @@
 		const unsubscribe = [
 			features.events.history(history.receive),
 			features.events.thumbnails(thumbnails.receive),
+			features.events.counts(folderCounts.receive),
 			features.events.search(search.receive)
 		];
 		void features.historyState().then(history.receive);

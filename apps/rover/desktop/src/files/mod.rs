@@ -1,3 +1,4 @@
+pub mod counts;
 pub mod entries;
 pub mod folders;
 pub mod operations;

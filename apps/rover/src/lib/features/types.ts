@@ -75,3 +75,7 @@ export interface Renaming {
 	path: string;
 	name: string;
 }
+
+export interface CountBatch {
+	items: { path: string; count: number | null }[];
+}

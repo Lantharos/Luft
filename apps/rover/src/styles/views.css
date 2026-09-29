@@ -23,7 +23,7 @@
 
 	.list-grid {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 150px 76px 132px;
+		grid-template-columns: var(--list-columns);
 		align-items: center;
 		column-gap: 16px;
 		padding-inline: 10px;
@@ -56,6 +56,45 @@
 		justify-content: flex-end;
 	}
 
+	.list-heading[data-column] {
+		position: relative;
+		cursor: grab;
+	}
+
+	.list-heading.is-moving {
+		z-index: 1;
+		cursor: grabbing;
+		color: var(--text);
+		background: var(--content);
+	}
+
+	.list-resize {
+		position: absolute;
+		top: 7px;
+		bottom: 7px;
+		left: -14px;
+		width: 12px;
+		cursor: col-resize;
+	}
+
+	.list-resize::after {
+		content: '';
+		position: absolute;
+		inset: 0 5px;
+		border-radius: var(--radius-pill);
+		background: var(--hairline);
+		opacity: 0;
+		transition: opacity 140ms var(--ease);
+	}
+
+	.list-header:hover .list-resize::after {
+		opacity: 1;
+	}
+
+	.list-resize:hover::after {
+		background: var(--text-muted);
+	}
+
 	.list-row {
 		font-size: 13px;
 	}
@@ -85,24 +124,21 @@
 		color: var(--text-soft);
 	}
 
-	@container (max-width: 620px) {
-		.list-grid {
-			grid-template-columns: minmax(0, 1fr) 150px 76px;
-		}
-
-		.list-kind {
-			display: none;
-		}
+	.list-group {
+		display: flex;
+		height: 100%;
+		align-items: flex-end;
+		gap: 8px;
+		padding: 0 10px 7px;
+		color: var(--text-soft);
+		font-size: 12.5px;
+		font-weight: 500;
 	}
 
-	@container (max-width: 460px) {
-		.list-grid {
-			grid-template-columns: minmax(0, 1fr) 76px;
-		}
-
-		.list-date {
-			display: none;
-		}
+	.list-group__count {
+		color: var(--text-muted);
+		font-weight: 400;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.grid-tile {
@@ -248,5 +284,9 @@
 @container (max-width: 460px) {
 	.trash-row {
 		grid-template-columns: minmax(0, 1fr) 76px;
+	}
+
+	.trash-row .list-date {
+		display: none;
 	}
 }

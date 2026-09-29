@@ -22,6 +22,29 @@ pub enum SortBy {
     Type,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum GroupBy {
+    None,
+    Kind,
+    Date,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ListColumnId {
+    Date,
+    Size,
+    Kind,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListColumn {
+    pub id: ListColumnId,
+    pub width: u32,
+    pub visible: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PinnedFolder {
     pub name: String,
@@ -40,6 +63,8 @@ pub struct Settings {
     pub pinned_folders: Vec<PinnedFolder>,
     pub grid_size: u32,
     pub details_open: bool,
+    pub list_columns: Vec<ListColumn>,
+    pub group_by: GroupBy,
 }
 
 impl Default for Settings {
@@ -52,6 +77,24 @@ impl Default for Settings {
             pinned_folders: Vec::new(),
             grid_size: 88,
             details_open: false,
+            list_columns: vec![
+                ListColumn {
+                    id: ListColumnId::Date,
+                    width: 150,
+                    visible: true,
+                },
+                ListColumn {
+                    id: ListColumnId::Size,
+                    width: 84,
+                    visible: true,
+                },
+                ListColumn {
+                    id: ListColumnId::Kind,
+                    width: 132,
+                    visible: true,
+                },
+            ],
+            group_by: GroupBy::None,
         }
     }
 }

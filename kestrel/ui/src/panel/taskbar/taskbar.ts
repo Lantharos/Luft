@@ -11,6 +11,7 @@ import { animateActor, liftIcon } from '../../shared/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
+import { appKey, launchHistory } from '../../shared/launchHistory.js';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
 const DOT_SIZE = 4;
@@ -212,7 +213,10 @@ export class Taskbar {
       this.previews.close();
       if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
       else if (windows.length === 1) this.activateWindow(windows[0]);
-      else app.activate();
+      else {
+        launchHistory.record(appKey(app.id));
+        app.activate();
+      }
     });
     return item;
   }

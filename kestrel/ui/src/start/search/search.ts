@@ -2,22 +2,34 @@ import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { ContextMenus } from '../../menus/contextMenus.js';
-import { AppIndex, rank } from './apps.js';
+import { appKey, launchHistory } from '../../shared/launchHistory.js';
+import { indexApps, type AppEntry } from './apps.js';
 import { openSettings, SETTINGS_PAGES, type SettingsPage } from '../../settings/pages.js';
+import { byRelevance, rank, type Match, type Searchable } from './ranking.js';
 import { calculate } from './calculator.js';
 import { RecentFiles } from './files.js';
 import type { SearchItem } from './item.js';
 
 const SETTINGS_LIMIT = 4;
 const FILES_LIMIT = 5;
-const SEARCHABLE_PAGES = SETTINGS_PAGES.map(page => ({
+
+interface PageEntry extends Searchable {
+  page: SettingsPage;
+}
+
+const SEARCHABLE_PAGES: PageEntry[] = SETTINGS_PAGES.map(page => ({
   page,
+  key: settingKey(page),
   name: page.title.toLocaleLowerCase(),
   keywords: page.keywords,
 }));
 
+function settingKey(page: SettingsPage): string {
+  return `setting:${page.id}`;
+}
+
 export class StartSearch {
-  private readonly apps = new AppIndex();
+  private apps: AppEntry[] = [];
   private readonly files = new RecentFiles();
 
   constructor(
@@ -27,7 +39,7 @@ export class StartSearch {
   ) {}
 
   update(apps: Gio.AppInfo[]): void {
-    this.apps.update(apps);
+    this.apps = indexApps(apps);
   }
 
   results(text: string): SearchItem[] {
@@ -35,8 +47,12 @@ export class StartSearch {
     const items: SearchItem[] = [];
     const result = calculate(query);
     if (result !== null) items.push(this.calculation(text.trim(), result));
-    for (const app of this.apps.search(query)) items.push(this.app(app));
-    for (const { page } of rank(SEARCHABLE_PAGES, query).slice(0, SETTINGS_LIMIT)) items.push(this.setting(page));
+    const launches = launchHistory.weigher();
+    const matches: Match<AppEntry | PageEntry>[] = [
+      ...rank(this.apps, query, launches),
+      ...rank(SEARCHABLE_PAGES, query, launches).slice(0, SETTINGS_LIMIT),
+    ];
+    for (const { entry } of matches.sort(byRelevance)) items.push('app' in entry ? this.app(entry.app) : this.setting(entry.page));
     for (const file of this.files.search(query, FILES_LIMIT)) {
       items.push({
         key: `file:${file.uri}`, title: file.name, description: file.folder, icon: file.icon,
@@ -52,7 +68,7 @@ export class StartSearch {
 
   private app(app: Gio.AppInfo): SearchItem {
     return {
-      key: `app:${app.get_id()}`, title: app.get_display_name(), description: app.get_description() ?? '',
+      key: appKey(app.get_id()!), title: app.get_display_name(), description: app.get_description() ?? '',
       icon: app.get_icon() ?? Gio.ThemedIcon.new('application-x-executable'),
       activate: () => this.launch(app),
       menu: () => {
@@ -64,9 +80,10 @@ export class StartSearch {
 
   private setting(page: SettingsPage): SearchItem {
     return {
-      key: `setting:${page.id}`, title: page.title, description: 'Settings',
+      key: settingKey(page), title: page.title, description: 'Settings',
       icon: Gio.ThemedIcon.new(page.icon),
       activate: () => {
+        launchHistory.record(settingKey(page));
         this.close();
         openSettings(page.id);
       },

@@ -1,6 +1,9 @@
 [app]
 id = "com.lantharos.tern"
 name = "Tern"
+generic_name = "Terminal"
+categories = ["System", "TerminalEmulator"]
+keywords = ["terminal", "console", "shell", "command line", "command prompt", "cmd", "powershell", "prompt", "cli", "tty", "bash", "zsh", "fish", "xterm", "konsole", "ptyxis"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

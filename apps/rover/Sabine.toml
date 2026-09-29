@@ -1,6 +1,9 @@
 [app]
 id = "com.lantharos.rover"
 name = "Rover"
+generic_name = "File Manager"
+categories = ["System", "Utility", "Core", "FileManager"]
+keywords = ["files", "file manager", "file explorer", "explorer", "finder", "folders", "directories", "browse", "documents", "drives", "disks", "trash", "nautilus", "dolphin", "thunar", "nemo"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

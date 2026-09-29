@@ -3,7 +3,7 @@
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import * as tools from '$lib/features/actions';
 	import { isArchive } from '$lib/features/archives';
-	import * as bookmarks from '$lib/file-manager/bookmarks';
+	import * as bookmarks from '$lib/file-manager/places/bookmarks';
 	import type { ContextMenuState, FileManager } from '$lib/file-manager/manager.svelte';
 	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
 	import type { FileEntry } from '$lib/types';

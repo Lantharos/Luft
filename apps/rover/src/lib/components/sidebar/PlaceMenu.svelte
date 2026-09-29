@@ -2,9 +2,9 @@
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import { showPathProperties } from '$lib/features/actions';
-	import * as bookmarks from '$lib/file-manager/bookmarks';
+	import * as bookmarks from '$lib/file-manager/places/bookmarks';
 	import type { FileManager, PlaceMenuState, SidebarPlace } from '$lib/file-manager/manager.svelte';
-	import type { TrashCounter } from '$lib/file-manager/places.svelte';
+	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
 
 	interface Props {
 		menu: PlaceMenuState;

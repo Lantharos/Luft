@@ -22,7 +22,7 @@
 	import { handleKeydown } from '$lib/file-manager/keyboard';
 	import { FileManager } from '$lib/file-manager/manager.svelte';
 	import { openActivation, openLaunchPaths } from '$lib/file-manager/open-targets';
-	import { TrashCounter } from '$lib/file-manager/places.svelte';
+	import { TrashCounter } from '$lib/file-manager/places/places.svelte';
 	import { setEntryContext } from '$lib/file-manager/view/entry-props';
 	import { ViewState } from '$lib/file-manager/view/view-state.svelte';
 	import { isDesktopRuntime } from '$lib/runtime';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import * as bookmarks from '$lib/file-manager/bookmarks';
+	import * as bookmarks from '$lib/file-manager/places/bookmarks';
 	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dataTransferPaths } from '$lib/file-manager/drag/data-transfer';

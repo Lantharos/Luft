@@ -25,7 +25,7 @@ import type {
 import { errorMessage } from '$lib/utils/format';
 import { basename, parentPath, pathSegments, trimTrailingSlash } from '$lib/utils/paths';
 import { FileActions } from './actions';
-import { DrivesState } from './drives.svelte';
+import { DrivesState } from './places/drives.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
 import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';

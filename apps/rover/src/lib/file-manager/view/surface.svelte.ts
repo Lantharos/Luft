@@ -28,7 +28,9 @@ export class EntrySurface {
 		this.viewport = {
 			columns: () => this.scroller?.metrics().columns ?? 1,
 			pageRows: () => this.scroller?.metrics().pageRows ?? 1,
-			reveal: (index, center) => this.scroller?.scrollToIndex(index + this.offset, center ? 'center' : 'nearest')
+			reveal: (index, center) => this.scroller?.scrollToIndex(index + this.offset, center ? 'center' : 'nearest'),
+			scrollTop: () => this.scroller?.element()?.scrollTop ?? 0,
+			scrollTo: (top) => this.scroller?.element()?.scrollTo({ top })
 		};
 	}
 

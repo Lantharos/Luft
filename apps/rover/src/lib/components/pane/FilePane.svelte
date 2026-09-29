@@ -24,7 +24,6 @@
 	let lastKey = '';
 	let lastEntries: FileEntry[] = [];
 	let lastCreating = false;
-	let lastPath = '';
 
 	$effect.pre(() => {
 		const key = listingKey;
@@ -40,11 +39,8 @@
 	});
 
 	$effect(() => {
-		const path = manager.currentPath;
-		untrack(() => {
-			if (lastPath && path !== lastPath && manager.view === 'home') view.followListing(lastPath, path);
-			lastPath = path;
-		});
+		const arrival = manager.arrival;
+		if (arrival) untrack(() => view.arrive(arrival));
 	});
 
 	$effect(() => {

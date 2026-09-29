@@ -49,7 +49,7 @@ export function handleKeydown(event: KeyboardEvent, context: KeyboardContext) {
 	if (event.key === 'Escape') {
 		manager.selection.clear();
 		manager.draft = null;
-		manager.contextMenu = null;
+		manager.closeMenus();
 	}
 }
 

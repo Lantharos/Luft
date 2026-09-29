@@ -6,7 +6,7 @@
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dataTransferPaths } from '$lib/file-manager/drag/data-transfer';
 	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import { settings } from '$lib/state/settings.svelte';
 	import type { PinnedFolder } from '$lib/types';
 	import SidebarItem from './SidebarItem.svelte';
@@ -17,9 +17,10 @@
 		chooser: ChooserState | null;
 		hidden: Set<string>;
 		onopentab: (event: MouseEvent, open: () => void) => void;
+		onmenu: (event: MouseEvent, place: SidebarPlace) => void;
 	}
 
-	let { manager, drag, chooser, hidden, onopentab }: Props = $props();
+	let { manager, drag, chooser, hidden, onopentab, onmenu }: Props = $props();
 
 	const BOOKMARK_ICONS = new Set<IconName>(['monitor', 'download', 'file-text', 'image', 'music', 'video', 'archive', 'code', 'package']);
 
@@ -128,6 +129,7 @@
 			draggable="true"
 			onclick={() => open(bookmark)}
 			onauxclick={(event) => onopentab(event, () => (bookmark.is_dir ? manager.openTab(bookmark.path) : manager.openEntry(bookmark)))}
+			oncontextmenu={(event) => onmenu(event, { kind: 'favorite', bookmark })}
 			ondragstart={(event) => startMoving(event, bookmark.path)}
 			ondragover={(event) => rowDragOver(event, bookmark)}
 			ondragleave={drag.leave}

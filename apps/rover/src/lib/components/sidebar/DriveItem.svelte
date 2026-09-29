@@ -3,7 +3,7 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import type { DriveInfo } from '$lib/types';
 	import { formatBytes } from '$lib/utils/format';
 	import SidebarItem from './SidebarItem.svelte';
@@ -14,9 +14,10 @@
 		drag: DragController;
 		active: boolean;
 		onopentab: (event: MouseEvent, open: () => void) => void;
+		onmenu: (event: MouseEvent, place: SidebarPlace) => void;
 	}
 
-	let { drive, manager, drag, active, onopentab }: Props = $props();
+	let { drive, manager, drag, active, onopentab, onmenu }: Props = $props();
 
 	const NEARLY_FULL = 0.9;
 
@@ -36,6 +37,7 @@
 	disabled={ejecting}
 	onclick={() => manager.navigate(drive.mount_point)}
 	onauxclick={(event) => onopentab(event, () => manager.openTab(drive.mount_point))}
+	oncontextmenu={(event) => onmenu(event, { kind: 'drive', drive })}
 	ondragover={(event) => drag.overPath(event, drive.mount_point, key)}
 	ondragleave={drag.leave}
 	ondrop={(event) => drag.drop(event, drive.mount_point)}

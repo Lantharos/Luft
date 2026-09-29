@@ -82,7 +82,7 @@ pub fn show_in_folder(Target { path }: Target) -> Result<(), String> {
 
 pub fn open_link(Link { uri }: Link) -> Result<(), String> {
     if !LINK_SCHEMES.iter().any(|scheme| uri.starts_with(scheme)) {
-        return Err("Only web and mail links open outside Wren".into());
+        return Err("Only web and mail links open outside Draft".into());
     }
     Proxy::new(
         dbus::session()?,

@@ -710,6 +710,23 @@ version = "0.1.2"
 source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
 
 [[package]]
+name = "draft"
+version = "0.1.0"
+dependencies = [
+ "chardetng",
+ "dirs",
+ "encoding_rs",
+ "ignore",
+ "luft-app",
+ "notify",
+ "parking_lot",
+ "sabine",
+ "serde",
+ "serde_json",
+ "zbus",
+]
+
+[[package]]
 name = "drm"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4369,23 +4386,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"
 dependencies = [
  "memchr",
-]
-
-[[package]]
-name = "wren"
-version = "0.1.0"
-dependencies = [
- "chardetng",
- "dirs",
- "encoding_rs",
- "ignore",
- "luft-app",
- "notify",
- "parking_lot",
- "sabine",
- "serde",
- "serde_json",
- "zbus",
 ]
 
 [[package]]

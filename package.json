@@ -1,5 +1,5 @@
 {
 	"name": "luft",
 	"private": true,
-	"workspaces": ["apps/magpie", "apps/rover", "apps/settings", "apps/tern", "apps/wren", "packages/*"]
+	"workspaces": ["apps/draft", "apps/magpie", "apps/rover", "apps/settings", "apps/tern", "packages/*"]
 }

@@ -71,7 +71,7 @@ fn replace(target: &Path, bytes: &[u8], id: u64) -> Result<Stat, String> {
         .file_name()
         .ok_or("Not a file path")?
         .to_string_lossy();
-    let staging = folder.join(format!(".{name}.wren-{}-{id}", std::process::id()));
+    let staging = folder.join(format!(".{name}.draft-{}-{id}", std::process::id()));
     let permissions = fs::metadata(target)
         .ok()
         .map(|metadata| metadata.permissions());

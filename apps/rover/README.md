@@ -9,7 +9,7 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 - Folders with tens of thousands of files open and scroll smoothly, since only what is on screen is drawn
 - A sidebar with Home, Recent, your Desktop, Documents, Downloads, Music, Pictures and Videos folders, Trash with the number of items in it, Favorites and drives. Right-click any of them to open it in a new tab, eject a drive, remove a favorite, empty the trash or see its properties
 - A details pane with a large preview, the kind, size, dates, image dimensions, media length, location, version control state and the apps that can open the file
-- Quick Look on `Space` for images, video, audio, text and code, Markdown and PDFs, moving between files with the arrow keys
+- Quick Look on `Space` for images, video, audio, text and code, Markdown and PDFs, moving between files with the arrow keys. Code is highlighted in Quick Look and the details pane
 - Full keyboard navigation, including range selection and jumping to a file by typing its name
 - Thumbnails for images, videos, PDFs, fonts, office documents and anything else your installed thumbnailers handle, shared with other apps through the standard thumbnail cache and made only for the files on screen. Fonts and images with transparency sit on a light backdrop so they stay readable
 - Search inside the current folder and everything below it, by name or by what text files contain, narrowed by kind, date and size, with results showing up as they are found
@@ -143,4 +143,4 @@ rover/
 
 ## License
 
-MIT. Open Runde is licensed under the SIL Open Font License, included in `packages/ui/fonts/OFL.txt`.
+MIT. Open Runde and Maple Mono are licensed under the SIL Open Font License, included in `packages/ui/fonts/OFL.txt` and `packages/ui/fonts/MapleMono-OFL.txt`.

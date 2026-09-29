@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { highlight } from '@luft/ui/code';
 	import * as api from '$lib/api';
 	import { renderMarkdown } from '$lib/file-manager/inspect/markdown';
 	import { loadText, type TextPreview } from '$lib/file-manager/inspect/text';
@@ -13,11 +14,25 @@
 	let { entry, markdown, full }: Props = $props();
 
 	const PANE_LINES = 60;
+	const HIGHLIGHT_LIMIT = 64 * 1024;
 	const WEB_LINK = /^https?:\/\//i;
 
 	let result = $state.raw<TextPreview | null>(null);
+	let highlighted = $state.raw<{ html: string; rest: string } | null>(null);
 	let text = $derived(result && 'text' in result ? (full ? result.text : result.text.split('\n', PANE_LINES).join('\n')) : '');
 	let html = $derived(markdown && text ? renderMarkdown(text, entry.path) : '');
+
+	$effect(() => {
+		highlighted = null;
+		if (markdown || !text) return;
+		const code = text;
+		const cut = code.length > HIGHLIGHT_LIMIT ? code.lastIndexOf('\n', HIGHLIGHT_LIMIT) + 1 || HIGHLIGHT_LIMIT : code.length;
+		let current = true;
+		void highlight(code.slice(0, cut), entry.name).then((html) => {
+			if (current) highlighted = { html, rest: code.slice(cut) };
+		});
+		return () => (current = false);
+	});
 
 	$effect(() => {
 		const controller = new AbortController();
@@ -44,5 +59,5 @@
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>{@html html}</article>
 {:else if result}
-	<pre class={['preview-code', full ? 'is-full' : 'is-compact']}>{text}{#if full && result.truncated}<span class="preview-code__more">…</span>{/if}</pre>
+	<pre class={['preview-code', full ? 'is-full' : 'is-compact']}>{#if highlighted}{@html highlighted.html}{highlighted.rest}{:else}{text}{/if}{#if full && result.truncated}<span class="preview-code__more">…</span>{/if}</pre>
 {/if}

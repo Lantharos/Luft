@@ -37,3 +37,29 @@
 	--sidebar-width: 280px;
 	--ease: cubic-bezier(0.2, 0, 0, 1);
 }
+
+:root[data-scheme='light'] {
+	color-scheme: light;
+	--app-bg: #f3f3f0;
+	--content: #fbfbf9;
+	--raised: #ffffff;
+	--surface: rgba(27, 27, 25, 0.04);
+	--surface-hover: rgba(27, 27, 25, 0.065);
+	--control: #ebebe7;
+	--control-hover: #e1e1dc;
+	--popover: #ffffff;
+	--sidebar-solid: #eeeeea;
+	--sidebar-active: rgba(27, 27, 25, 0.08);
+	--sidebar-control: rgba(27, 27, 25, 0.05);
+	--sidebar-control-hover: rgba(27, 27, 25, 0.08);
+	--sidebar-glass: rgba(246, 246, 243, 0.5);
+	--text: #1b1b19;
+	--text-soft: #3e3e3a;
+	--text-muted: #75756e;
+	--text-inverse: #f7f7f4;
+	--danger: #b4413c;
+	--success: #3f7a4a;
+	--hairline: rgba(27, 27, 25, 0.08);
+	--shadow-soft: rgba(27, 27, 25, 0.14);
+	--shadow-faint: rgba(27, 27, 25, 0.08);
+}

@@ -6,6 +6,7 @@ use serde::Serialize;
 
 use crate::events::Events;
 use crate::kestrel::{self, Accent};
+use crate::scheme::{self, Scheme};
 
 const WINDOW_RADIUS: i32 = 16;
 const CONTROL_SIZE: i32 = 28;
@@ -64,6 +65,7 @@ impl GlassWindow<'_> {
 pub struct Appearance {
     translucent: bool,
     accent: Option<Accent>,
+    scheme: Scheme,
 }
 
 impl Appearance {
@@ -71,6 +73,7 @@ impl Appearance {
         Self {
             translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
             accent: kestrel::accent(),
+            scheme: scheme::current(),
         }
     }
 }
@@ -88,6 +91,7 @@ pub fn run(
                 events.attach(emitter);
             }
             kestrel::watch_accent(events.clone());
+            scheme::watch(events.clone());
             started(events);
         },
     )

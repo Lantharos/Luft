@@ -9,6 +9,10 @@
 			"svelte": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
+		"./code": {
+			"types": "./src/code/index.ts",
+			"default": "./src/code/index.ts"
+		},
 		"./styles.css": "./src/styles/index.css",
 		"./vite": "./vite.js"
 	},
@@ -16,7 +20,13 @@
 		"check": "svelte-check --tsgo --tsconfig ./tsconfig.json"
 	},
 	"dependencies": {
+		"@codemirror/lang-html": "^6.4.12",
+		"@codemirror/lang-markdown": "^6.5.2",
+		"@codemirror/language": "^6.12.4",
+		"@codemirror/language-data": "^6.5.2",
 		"@lantharos/sabine": "github:Lantharos/Sabine#v0.31",
+		"@lezer/common": "^1.5.3",
+		"@lezer/highlight": "^1.2.5",
 		"@lucide/svelte": "^1.48.0"
 	},
 	"peerDependencies": {

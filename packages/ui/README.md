@@ -60,7 +60,15 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes.
+After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style.
+
+The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
+
+```ts
+$effect(() => {
+	document.documentElement.dataset.scheme = appearance.scheme;
+});
+```
 
 ## Components
 
@@ -91,9 +99,33 @@ The `tooltip(text)` attachment shows a small label under an element after a shor
 <button class="icon-button" aria-label="Back" {@attach tooltip('Back')}>…</button>
 ```
 
+## Code highlighting
+
+`@luft/ui/code` highlights code with the same colors everywhere, whether it's a preview or an editor. Grammars load the first time a language is used, so importing the module costs almost nothing up front:
+
+```ts
+import { highlight } from '@luft/ui/code';
+
+const html = await highlight(source, 'src/main.rs');
+```
+
+```svelte
+<pre class="font-mono"><code>{@html html}</code></pre>
+```
+
+The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent and the light and dark palettes. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
+
+| Export | Use |
+| --- | --- |
+| `highlight(code, nameOrPath)` | Highlighted HTML for a string of code |
+| `findLanguage(nameOrPath)` | The matching language description, or `null` |
+| `loadLanguage(nameOrPath)` | Loads and returns the language support for editors, or `null` |
+| `languages` | Every known language, sorted by name, for language pickers |
+| `codeHighlighter` | The tag to class mapping behind `hl-*`, for CodeMirror's `syntaxHighlighting` |
+
 ## Tokens
 
-Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark only. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
+Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default and light under `data-scheme="light"`. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
 
 ## Checks
 

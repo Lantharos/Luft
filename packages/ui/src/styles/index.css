@@ -4,5 +4,6 @@
 @import './controls.css';
 @import './shell.css';
 @import './overlays.css';
+@import './code.css';
 
 @source '../';

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { NativeVideo } from '@lantharos/sabine';
+	import { canPlayNatively, decodeFailed, NativeVideoSurface } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import { onDestroy } from 'svelte';
 	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '$lib/api';
@@ -10,7 +12,7 @@
 	import { mediaSession, type MediaOwner } from '$lib/playback/session';
 	import { volume } from '$lib/playback/volume.svelte';
 	import CantShow from '$lib/shell/CantShow.svelte';
-	import { explain } from './codecs';
+	import { explain, playable } from './codecs';
 	import { FramePreview } from './frame-preview';
 	import { savedPosition, savePosition } from './positions';
 	import { CueClock, parseSubtitles, plainCues } from './subtitles.svelte';
@@ -20,15 +22,25 @@
 	const SEEK_STEP = 5;
 	const LONG_SEEK_STEP = 10;
 	const VOLUME_STEP = 0.05;
+	const MEDIA_EVENTS = {
+		loadedmetadata: restore,
+		timeupdate: progress,
+		play: playing,
+		pause: playing,
+		seeked: () => mediaSession.update(owner),
+		ratechange: () => ((rate = media!.playbackRate), mediaSession.update(owner)),
+		ended: remember
+	};
 
 	let { item }: { item: Item } = $props();
 
 	const source = $derived(fileSource(item.path, item.modified));
-	const frames = $derived(new FramePreview(source));
 	const clock = new CueClock();
 	const track = Math.floor(Math.random() * 1e9);
 
 	let video = $state<HTMLVideoElement>();
+	let native = $state(false);
+	let player = $state.raw<NativeVideo | null>(null);
 	let paused = $state(true);
 	let time = $state(0);
 	let duration = $state(0);
@@ -39,6 +51,8 @@
 	let problem = $state<string | null>(null);
 	let lastSaved = 0;
 
+	let media = $derived(native ? (player ?? undefined) : video);
+	let frames = $derived(native ? null : new FramePreview(source));
 	let current = $derived(library.current?.path === item.path);
 
 	const owner: MediaOwner = {
@@ -51,7 +65,7 @@
 			art: null,
 			path: item.path,
 			length: Number.isFinite(duration) && duration > 0 ? duration : null,
-			position: video?.currentTime ?? 0,
+			position: media?.currentTime ?? 0,
 			rate,
 			volume: volume.muted ? 0 : volume.level,
 			shuffle: false,
@@ -60,32 +74,53 @@
 			canPrevious: library.hasPrevious
 		}),
 		handle: (action: MediaAction) => {
-			if (!video) return;
-			if (action.action === 'play') void video.play();
-			else if (action.action === 'pause' || action.action === 'stop') video.pause();
-			else if (action.action === 'toggle') void (video.paused ? video.play() : video.pause());
+			if (!media) return;
+			if (action.action === 'play') void media.play();
+			else if (action.action === 'pause' || action.action === 'stop') media.pause();
+			else if (action.action === 'toggle') toggle();
 			else if (action.action === 'next') library.step(1);
 			else if (action.action === 'previous') library.step(-1);
-			else if (action.action === 'seek') seek(video.currentTime + action.value);
+			else if (action.action === 'seek') seek(media.currentTime + action.value);
 			else if (action.action === 'position') seek(action.value);
 			else if (action.action === 'volume') volume.level = action.value;
-			else if (action.action === 'rate') video.playbackRate = action.value;
+			else if (action.action === 'rate') media.playbackRate = action.value;
 		}
 	};
 
 	$effect(() => {
-		api.videoInfo(item.path).then((found) => (info = found));
+		api.videoInfo(item.path).then((found) => {
+			info = found;
+			if (!playable(found) && canPlayNatively()) native = true;
+		});
 	});
 
 	$effect(() => {
-		if (!video) return;
-		video.volume = volume.level;
-		video.muted = volume.muted;
+		const target = player;
+		if (!target) return;
+		const events = Object.entries(MEDIA_EVENTS) as [keyof typeof MEDIA_EVENTS, () => void][];
+		for (const [name, handler] of events) target.addEventListener(name, handler);
+		return () => events.forEach(([name, handler]) => target.removeEventListener(name, handler));
+	});
+
+	$effect(() => {
+		const preview = frames;
+		return () => preview?.destroy();
+	});
+
+	$effect(() => {
+		chrome.seeThrough = native;
+		return () => (chrome.seeThrough = false);
+	});
+
+	$effect(() => {
+		if (!media) return;
+		media.volume = volume.level;
+		media.muted = volume.muted;
 		volume.save();
 	});
 
 	$effect(() => {
-		if (!current) video?.pause();
+		if (!current) media?.pause();
 	});
 
 	$effect(() => {
@@ -93,16 +128,16 @@
 	});
 
 	function keydown(event: KeyboardEvent) {
-		if (!video) return false;
+		if (!media) return false;
 		const primary = event.ctrlKey || event.metaKey;
 		const { key } = event;
-		if (key === ' ' || key === 'k') void (video.paused ? video.play() : video.pause());
+		if (key === ' ' || key === 'k') toggle();
 		else if (primary && key === 'ArrowRight') library.step(1);
 		else if (primary && key === 'ArrowLeft') library.step(-1);
-		else if (key === 'ArrowRight') seek(video.currentTime + SEEK_STEP);
-		else if (key === 'ArrowLeft') seek(video.currentTime - SEEK_STEP);
-		else if (key === 'l') seek(video.currentTime + LONG_SEEK_STEP);
-		else if (key === 'j') seek(video.currentTime - LONG_SEEK_STEP);
+		else if (key === 'ArrowRight') seek(media.currentTime + SEEK_STEP);
+		else if (key === 'ArrowLeft') seek(media.currentTime - SEEK_STEP);
+		else if (key === 'l') seek(media.currentTime + LONG_SEEK_STEP);
+		else if (key === 'j') seek(media.currentTime - LONG_SEEK_STEP);
 		else if (key === 'Home') seek(0);
 		else if (key === 'ArrowUp') volume.level = Math.min(1, volume.level + VOLUME_STEP);
 		else if (key === 'ArrowDown') volume.level = Math.max(0, volume.level - VOLUME_STEP);
@@ -116,31 +151,40 @@
 		if (current) chrome.watching = false;
 		remember();
 		clock.detach();
-		frames.destroy();
 		mediaSession.release(owner);
 	});
 
+	function toggle() {
+		if (!media) return;
+		if (media.paused) void media.play();
+		else media.pause();
+	}
+
 	function seek(next: number) {
-		if (!video) return;
-		video.currentTime = Math.min(Math.max(0, next), duration || next);
-		time = video.currentTime;
+		if (!media) return;
+		media.currentTime = Math.min(Math.max(0, next), duration || next);
+		time = media.currentTime;
 	}
 
 	function remember() {
-		if (video && duration) savePosition(item, video.currentTime, duration);
+		if (media && duration) savePosition(item, media.currentTime, duration);
 	}
 
 	function restore() {
-		duration = video!.duration;
+		duration = media!.duration;
 		const saved = savedPosition(item);
 		if (saved) seek(saved);
-		if (current) void video!.play().catch(() => {});
+		if (current) void media!.play().catch(() => {});
 	}
 
 	function progress() {
-		time = video!.currentTime;
-		const ranges = video!.buffered;
-		buffered = ranges.length ? ranges.end(ranges.length - 1) : 0;
+		time = media!.currentTime;
+		if (media instanceof HTMLMediaElement) {
+			const ranges = media.buffered;
+			buffered = ranges.length ? ranges.end(ranges.length - 1) : 0;
+		} else {
+			buffered = duration;
+		}
 		if (performance.now() - lastSaved > SAVE_EVERY_MS) {
 			lastSaved = performance.now();
 			remember();
@@ -148,7 +192,7 @@
 	}
 
 	function playing() {
-		paused = video!.paused;
+		paused = media!.paused;
 		chrome.watching = !paused;
 		if (!paused) mediaSession.claim(owner);
 		else mediaSession.update(owner);
@@ -157,17 +201,17 @@
 
 	async function chooseSubtitle(next: SubtitleTrack | null) {
 		subtitle = next;
-		if (!next || !video) return clock.detach();
+		if (!next || !media) return clock.detach();
 		const cues: Cue[] = next.path
 			? parseSubtitles(await fetch(fileSource(next.path)).then((response) => response.text()))
 			: plainCues(await api.subtitleCues(item.path, next.id));
-		if (subtitle === next) clock.attach(video, cues);
+		if (subtitle === next && media) clock.attach(media, cues);
 	}
 
 	function failed() {
-		const code = video?.error?.code;
-		const unsupported = code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED || code === MediaError.MEDIA_ERR_DECODE;
-		problem = unsupported ? explain(info) : "This video can't be played.";
+		const undecodable = decodeFailed(video!);
+		if (undecodable && canPlayNatively()) native = true;
+		else problem = undecodable ? explain(info) : "This video can't be played.";
 	}
 
 	function pictureInPicture() {
@@ -180,26 +224,37 @@
 	{#if problem}
 		<CantShow {item} message={problem} detail="It may still open in another app." />
 	{:else}
-		<!-- svelte-ignore a11y_media_has_caption -->
-		<video
-			bind:this={video}
-			src={source}
-			playsinline
-			preload="auto"
-			onloadedmetadata={restore}
-			ontimeupdate={progress}
-			onprogress={progress}
-			onplay={playing}
-			onpause={playing}
-			onseeked={() => mediaSession.update(owner)}
-			onratechange={() => ((rate = video!.playbackRate), mediaSession.update(owner))}
-			onended={remember}
-			onerror={failed}
-			onclick={() => (video!.paused ? video!.play() : video!.pause())}
-			ondblclick={() => chrome.setFullscreen(!chrome.fullscreen)}
-		></video>
+		{#if native}
+			<NativeVideoSurface
+				class="surface"
+				src={source}
+				bind:player
+				onfail={() => (problem = "This video can't be played.")}
+				onclick={toggle}
+				ondblclick={() => chrome.setFullscreen(!chrome.fullscreen)}
+			/>
+		{:else}
+			<!-- svelte-ignore a11y_media_has_caption -->
+			<video
+				bind:this={video}
+				src={source}
+				playsinline
+				preload="auto"
+				onloadedmetadata={restore}
+				ontimeupdate={progress}
+				onprogress={progress}
+				onplay={playing}
+				onpause={playing}
+				onseeked={MEDIA_EVENTS.seeked}
+				onratechange={MEDIA_EVENTS.ratechange}
+				onended={remember}
+				onerror={failed}
+				onclick={toggle}
+				ondblclick={() => chrome.setFullscreen(!chrome.fullscreen)}
+			></video>
+		{/if}
 		{#if paused}
-			<button type="button" class="big-play" aria-label="Play" onclick={() => video?.play()}>
+			<button type="button" class="big-play" aria-label="Play" onclick={() => media?.play()}>
 				<Play size={30} fill="currentColor" />
 			</button>
 		{/if}
@@ -208,7 +263,7 @@
 		{/if}
 		<div class="controls fade-idle">
 			<VideoControls
-				bind:paused={() => paused, (value) => (value ? video?.pause() : void video?.play())}
+				bind:paused={() => paused, (value) => (value ? media?.pause() : void media?.play())}
 				{time}
 				{duration}
 				{buffered}
@@ -216,9 +271,9 @@
 				{frames}
 				tracks={info?.subtitles ?? []}
 				track={subtitle}
-				pictureInPicture={document.pictureInPictureEnabled}
+				pictureInPicture={!native && document.pictureInPictureEnabled}
 				onseek={seek}
-				onrate={(next) => video && (video.playbackRate = next)}
+				onrate={(next) => media && (media.playbackRate = next)}
 				ontrack={chooseSubtitle}
 				onpicture={pictureInPicture}
 			/>
@@ -232,11 +287,15 @@
 		inset: 0;
 	}
 
-	video {
+	video,
+	.player :global(.surface) {
 		position: absolute;
 		inset: 0;
 		height: 100%;
 		width: 100%;
+	}
+
+	video {
 		object-fit: contain;
 	}
 

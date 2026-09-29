@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+
+.glass-shell {
+	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
+	--editor-selection: color-mix(in oklab, var(--accent) 28%, transparent);
+	--editor-selection-match: color-mix(in oklab, var(--accent) 13%, transparent);
+	--editor-search-match: color-mix(in oklab, var(--accent) 24%, transparent);
+	--editor-search-current: color-mix(in oklab, var(--accent) 44%, transparent);
+	--editor-bracket: color-mix(in oklab, var(--accent) 18%, transparent);
+	--editor-bracket-line: color-mix(in oklab, var(--accent) 55%, transparent);
+	--editor-active-line: rgba(245, 245, 242, 0.03);
+	--editor-gutter: color-mix(in oklab, var(--text-muted) 72%, transparent);
+	--editor-scrollbar: rgba(245, 245, 242, 0.16);
+}
+
+[data-scheme='light'] .glass-shell {
+	--editor-selection: color-mix(in oklab, var(--accent) 32%, transparent);
+	--editor-active-line: rgba(27, 27, 25, 0.035);
+	--editor-scrollbar: rgba(27, 27, 25, 0.2);
+}

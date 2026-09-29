@@ -1,0 +1,55 @@
+[app]
+id = "dev.lantharos.wren"
+name = "Wren"
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = [
+	"text/plain",
+	"text/markdown",
+	"text/x-log",
+	"text/csv",
+	"text/css",
+	"text/x-scss",
+	"text/javascript",
+	"text/vnd.trolltech.linguist",
+	"application/json",
+	"application/xml",
+	"application/toml",
+	"application/yaml",
+	"application/sql",
+	"application/x-desktop",
+	"text/rust",
+	"text/x-python",
+	"text/x-go",
+	"text/x-csrc",
+	"text/x-chdr",
+	"text/x-c++src",
+	"text/x-c++hdr",
+	"text/x-java",
+	"text/x-kotlin",
+	"text/x-lua",
+	"text/x-shellscript",
+	"application/x-fishscript",
+	"application/x-ruby",
+	"application/x-php",
+	"application/vnd.dart",
+	"text/x-makefile",
+	"text/x-dockerfile",
+	"text/x-cmake",
+	"text/x-patch",
+	"text/x-nix",
+	"text/x-elixir",
+	"text/x-haskell",
+]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+dev_port = 5176
+build = "bun run build"
+local_files = true

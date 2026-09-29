@@ -60,7 +60,7 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style.
+After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black.
 
 The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
 
@@ -125,7 +125,7 @@ The second argument is either a language name or alias, such as `rust`, `ts` or 
 
 ## Tokens
 
-Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default and light under `data-scheme="light"`. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
+Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default, black under `data-black` unless the light palette is on, and light under `data-scheme="light"`. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
 
 ## Checks
 

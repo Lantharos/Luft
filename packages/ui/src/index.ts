@@ -1,4 +1,4 @@
-export { appearance, type Appearance, type Scheme } from './appearance.svelte';
+export { appearance, type Appearance, type Palette, type Scheme } from './appearance.svelte';
 
 export { default as Checkbox } from './controls/Checkbox.svelte';
 export { default as Dialog } from './controls/Dialog.svelte';

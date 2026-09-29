@@ -5,7 +5,7 @@ use sabine::{
 use serde::Serialize;
 
 use crate::events::Events;
-use crate::kestrel::{self, Accent};
+use crate::kestrel::{self, Palette};
 use crate::scheme::{self, Scheme};
 
 const WINDOW_RADIUS: i32 = 16;
@@ -64,7 +64,7 @@ impl GlassWindow<'_> {
 #[derive(Serialize)]
 pub struct Appearance {
     translucent: bool,
-    accent: Option<Accent>,
+    palette: Option<Palette>,
     scheme: Scheme,
 }
 
@@ -72,7 +72,7 @@ impl Appearance {
     pub fn current() -> Self {
         Self {
             translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
-            accent: kestrel::accent(),
+            palette: kestrel::palette(),
             scheme: scheme::current(),
         }
     }
@@ -90,7 +90,7 @@ pub fn run(
             if let Some(emitter) = process.bridge_event_emitter() {
                 events.attach(emitter);
             }
-            kestrel::watch_accent(events.clone());
+            kestrel::watch_palette(events.clone());
             scheme::watch(events.clone());
             started(events);
         },

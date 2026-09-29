@@ -38,6 +38,17 @@
 	--ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
+:root[data-black]:not([data-scheme='light']) {
+	--app-bg: #000000;
+	--content: #000000;
+	--raised: #0b0b0b;
+	--control: #1a1a19;
+	--control-hover: #252523;
+	--popover: #0f0f0e;
+	--sidebar-solid: #000000;
+	--sidebar-glass: #000000;
+}
+
 :root[data-scheme='light'] {
 	color-scheme: light;
 	--app-bg: #f3f3f0;

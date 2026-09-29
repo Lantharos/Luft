@@ -1,11 +1,11 @@
 <schemalist>
-  <enum id="dev.lantharos.kestrel.DarkSchedule">
+  <enum id="com.lantharos.kestrel.DarkSchedule">
     <value nick="off" value="0"/>
     <value nick="sunset" value="1"/>
     <value nick="custom" value="2"/>
   </enum>
 
-  <schema id="dev.lantharos.kestrel" path="/dev/lantharos/kestrel/"
+  <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="development-tools" type="b">
       <default>true</default>
@@ -59,7 +59,7 @@
         wallpaper is a picture; choosing a picture for dark mode clears it.
       </description>
     </key>
-    <key name="dark-schedule" enum="dev.lantharos.kestrel.DarkSchedule">
+    <key name="dark-schedule" enum="com.lantharos.kestrel.DarkSchedule">
       <default>'off'</default>
       <summary>When the dark style turns on by itself</summary>
       <description>
@@ -170,12 +170,12 @@
           • “position”: the position of the application icon in the page
       </description>
     </key>
-    <child name="keybindings" schema="dev.lantharos.kestrel.keybindings"/>
-    <child name="app-switcher" schema="dev.lantharos.kestrel.app-switcher"/>
-    <child name="window-switcher" schema="dev.lantharos.kestrel.window-switcher"/>
+    <child name="keybindings" schema="com.lantharos.kestrel.keybindings"/>
+    <child name="app-switcher" schema="com.lantharos.kestrel.app-switcher"/>
+    <child name="window-switcher" schema="com.lantharos.kestrel.window-switcher"/>
   </schema>
 
-  <schema id="dev.lantharos.kestrel.keybindings" path="/dev/lantharos/kestrel/keybindings/"
+  <schema id="com.lantharos.kestrel.keybindings" path="/com/lantharos/kestrel/keybindings/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="toggle-message-tray" type="as">
       <default>["&lt;Super&gt;n","&lt;Super&gt;m"]</default>
@@ -288,8 +288,8 @@
     </key>
   </schema>
 
-  <schema id="dev.lantharos.kestrel.app-switcher"
-          path="/dev/lantharos/kestrel/app-switcher/"
+  <schema id="com.lantharos.kestrel.app-switcher"
+          path="/com/lantharos/kestrel/app-switcher/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key type="b" name="current-workspace-only">
       <default>false</default>
@@ -301,15 +301,15 @@
     </key>
   </schema>
 
-  <enum id="dev.lantharos.kestrel.window-switcher.AppIconMode">
+  <enum id="com.lantharos.kestrel.window-switcher.AppIconMode">
     <value value="1" nick="thumbnail-only"/>
     <value value="2" nick="app-icon-only"/>
     <value value="3" nick="both"/>
   </enum>
-  <schema id="dev.lantharos.kestrel.window-switcher"
-          path="/dev/lantharos/kestrel/window-switcher/"
+  <schema id="com.lantharos.kestrel.window-switcher"
+          path="/com/lantharos/kestrel/window-switcher/"
           gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="app-icon-mode" enum="dev.lantharos.kestrel.window-switcher.AppIconMode">
+    <key name="app-icon-mode" enum="com.lantharos.kestrel.window-switcher.AppIconMode">
       <default>'both'</default>
       <summary>The application icon mode.</summary>
       <description>
@@ -328,14 +328,14 @@
     </key>
   </schema>
 
-  <enum id="dev.lantharos.kestrel.notifications.DoNotDisturb">
+  <enum id="com.lantharos.kestrel.notifications.DoNotDisturb">
     <value value="0" nick="never"/>
     <value value="1" nick="urgent"/>
     <value value="2" nick="always"/>
   </enum>
-  <schema id="dev.lantharos.kestrel.notifications.application"
+  <schema id="com.lantharos.kestrel.notifications.application"
           gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="during-do-not-disturb" enum="dev.lantharos.kestrel.notifications.DoNotDisturb">
+    <key name="during-do-not-disturb" enum="com.lantharos.kestrel.notifications.DoNotDisturb">
       <default>'urgent'</default>
       <summary>Which notifications from the app show during Do Not Disturb</summary>
       <description>

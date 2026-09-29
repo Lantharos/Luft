@@ -24,7 +24,7 @@ pub use integration::file_manager_bus::{
 pub use integration::portal::{install as install_file_chooser_portal, run as run_portal_backend};
 
 const APP_NAME: &str = "Rover";
-const APP_ID: &str = "dev.kristof.rover";
+const APP_ID: &str = "com.lantharos.rover";
 
 pub fn run_app() -> ! {
     let state = RoverState::new();

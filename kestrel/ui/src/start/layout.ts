@@ -5,7 +5,7 @@ export interface Folder { name: string; apps: string[]; }
 interface Layout { items: string[]; folders: Record<string, Folder>; }
 
 export class StartLayout {
-  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private layout: Layout = JSON.parse(this.settings.get_string('start-layout'));
 
   folder(id: string): Folder | undefined { return this.layout.folders[id]; }

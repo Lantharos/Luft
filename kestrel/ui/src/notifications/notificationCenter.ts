@@ -21,7 +21,7 @@ const LOCK_SCREEN_CONTENT = 'lock-screen-content';
 
 export class NotificationCenter {
   readonly actor: St.BoxLayout;
-  private readonly shellSettings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly shellSettings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
 
   private readonly sources = new Set<NotificationSource>();
   private readonly groups = new Map<NotificationSource, NotificationGroup>();

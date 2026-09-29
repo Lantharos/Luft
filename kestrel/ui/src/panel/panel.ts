@@ -46,7 +46,7 @@ export class KestrelPanel {
   readonly actor: St.Widget;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
-  private readonly favorites = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly taskbar: Taskbar;
   private readonly clock = new PanelClock();
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });

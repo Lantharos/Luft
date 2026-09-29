@@ -75,12 +75,12 @@ schemaconf.set('APP_GRID_APPS', run_command(
   check: true,
 ).stdout())
 schema = configure_file(
-  input: 'dev.lantharos.kestrel.gschema.xml.in',
-  output: 'dev.lantharos.kestrel.gschema.xml',
+  input: 'com.lantharos.kestrel.gschema.xml.in',
+  output: 'com.lantharos.kestrel.gschema.xml',
   configuration: schemaconf,
   install_dir: schemadir
 )
-install_data('00_dev.lantharos.kestrel.gschema.override', install_dir: schemadir)
+install_data('00_com.lantharos.kestrel.gschema.override', install_dir: schemadir)
 
 if have_systemd
   unitconf = configuration_data()

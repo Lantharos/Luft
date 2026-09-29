@@ -16,7 +16,7 @@ const DARK: Mode = { live: 'live-wallpaper-dark', picture: 'picture-uri-dark' };
 const MODES = [LIGHT, DARK];
 
 export class LiveWallpaper {
-  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly background = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly conditions = new PlaybackConditions(() => this.sync());

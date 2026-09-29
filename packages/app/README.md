@@ -18,7 +18,7 @@ const WINDOW: GlassWindow = GlassWindow {
     size: (1040, 720),
     min_size: (760, 520),
     sidebar_width: 280,
-    single_instance: Some("dev.lantharos.settings"),
+    single_instance: Some("com.lantharos.settings"),
 };
 
 pub fn run_app() -> ! {

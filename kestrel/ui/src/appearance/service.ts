@@ -13,7 +13,7 @@ import { accentStylesheet } from './stylesheet.js';
 import { AppThemes } from './themes/appThemes.js';
 
 const APPEARANCE_INTERFACE = `<node>
-  <interface name="dev.lantharos.Kestrel.Appearance">
+  <interface name="com.lantharos.Kestrel.Appearance">
     <property name="AccentColor" type="s" access="read"/>
     <property name="Dark" type="b" access="read"/>
     <property name="PureBlack" type="b" access="read"/>
@@ -36,7 +36,7 @@ export class AppearanceService {
   private readonly stylesheet = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', 'accent.css']));
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
-  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(APPEARANCE_INTERFACE, this);
   private readonly nameId: number;
   private readonly signalIds: [Gio.Settings, number][];
@@ -50,8 +50,8 @@ export class AppearanceService {
   private writing = Promise.resolve();
 
   constructor(private readonly changed: (color: Rgb) => void) {
-    this.dbus.export(Gio.DBus.session, '/dev/lantharos/Kestrel/Appearance');
-    this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, 'dev.lantharos.Kestrel', Gio.BusNameOwnerFlags.NONE, null, null);
+    this.dbus.export(Gio.DBus.session, '/com/lantharos/Kestrel/Appearance');
+    this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.lantharos.Kestrel', Gio.BusNameOwnerFlags.NONE, null, null);
     setSolidSurfaces(this.settings.get_boolean('pure-black'));
     this.signalIds = [
       [this.interfaceSettings, this.interfaceSettings.connect('changed::color-scheme', () => this.update())],

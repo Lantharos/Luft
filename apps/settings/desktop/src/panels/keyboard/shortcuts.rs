@@ -6,12 +6,12 @@ use serde::Serialize;
 
 const SCHEMAS: [&str; 5] = [
     "org.gnome.desktop.wm.keybindings",
-    "dev.lantharos.kestrel.keybindings",
+    "com.lantharos.kestrel.keybindings",
     "org.gnome.mutter.keybindings",
     "org.gnome.mutter.wayland.keybindings",
     "org.gnome.settings-daemon.plugins.media-keys",
 ];
-const KESTREL: &str = "dev.lantharos.kestrel.keybindings";
+const KESTREL: &str = "com.lantharos.kestrel.keybindings";
 const DESCRIPTIONS: &str = "gnome-control-center/keybindings";
 
 #[derive(Serialize, Clone, Copy)]

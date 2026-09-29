@@ -19,8 +19,8 @@ const contrast = (first, second) => {
 };
 
 function readProperty(name) {
-  return new Promise((resolve, reject) => Gio.DBus.session.call('dev.lantharos.Kestrel', '/dev/lantharos/Kestrel/Appearance',
-    'org.freedesktop.DBus.Properties', 'Get', new GLib.Variant('(ss)', ['dev.lantharos.Kestrel.Appearance', name]),
+  return new Promise((resolve, reject) => Gio.DBus.session.call('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance',
+    'org.freedesktop.DBus.Properties', 'Get', new GLib.Variant('(ss)', ['com.lantharos.Kestrel.Appearance', name]),
     new GLib.VariantType('(v)'), Gio.DBusCallFlags.NONE, -1, null, (connection, result) => {
       try {
         resolve(connection.call_finish(result).recursiveUnpack()[0]);
@@ -43,7 +43,7 @@ export async function checkAppearance({pause, capture, output}) {
     if (!condition) throw new Error(`Kestrel appearance check failed: ${label}`);
     console.log(`Kestrel appearance check: ${label}`);
   };
-  const settings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const colorScheme = interfaceSettings.get_string('color-scheme');
   const gtk4 = configFile('gtk-4.0', 'gtk.css');

@@ -8,8 +8,8 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 async function checkAppRules(require, pause) {
   const general = new Gio.Settings({ schema_id: 'org.gnome.desktop.notifications' });
   const rules = new Gio.Settings({
-    schema_id: 'dev.lantharos.kestrel.notifications.application',
-    path: '/dev/lantharos/kestrel/notifications/application/org-gnome-nautilus/',
+    schema_id: 'com.lantharos.kestrel.notifications.application',
+    path: '/com/lantharos/kestrel/notifications/application/org-gnome-nautilus/',
   });
   const source = new MessageTray.Source({ title: 'Files', policy: new MessageTray.NotificationApplicationPolicy('org.gnome.Nautilus') });
   Main.messageTray.add(source);

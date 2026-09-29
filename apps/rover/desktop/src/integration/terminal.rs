@@ -7,7 +7,7 @@ use std::thread;
 use gio::prelude::*;
 
 const TERMINAL_CATEGORY: &str = "TerminalEmulator";
-const TERN: &str = "dev.lantharos.tern.desktop";
+const TERN: &str = "com.lantharos.tern.desktop";
 const KNOWN: [&str; 12] = [
     "ptyxis",
     "kgx",

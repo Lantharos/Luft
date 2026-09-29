@@ -17,7 +17,7 @@ export GI_TYPELIB_PATH="$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PAT
 dconf dump /org/gnome/desktop/background/ > "$run/background.ini"
 dconf dump /org/gnome/desktop/interface/ > "$run/interface.ini"
 dconf dump /org/gnome/desktop/input-sources/ > "$run/input-sources.ini"
-dconf read /dev/lantharos/kestrel/favorite-apps > "$run/favorites.txt"
+dconf read /com/lantharos/kestrel/favorite-apps > "$run/favorites.txt"
 
 export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export XDG_CONFIG_HOME="$run/config"
@@ -46,15 +46,15 @@ exec dbus-run-session -- bash -c '
     dconf load "/org/gnome/desktop/$section/" < "$run/$section.ini"
   done
   if [[ -s "$run/favorites.txt" ]]; then
-    dconf write /dev/lantharos/kestrel/favorite-apps "$(cat "$run/favorites.txt")"
+    dconf write /com/lantharos/kestrel/favorite-apps "$(cat "$run/favorites.txt")"
   fi
   gjs -m "$root/kestrel/build/js/ui/kestrel-session.js" &
   timeout 5 gdbus wait --session org.gnome.SessionManager
   if [[ "$mode" == capture ]]; then
-    dconf reset /dev/lantharos/kestrel/quick-tile-order
-    dconf reset /dev/lantharos/kestrel/quick-tiles-removed
-    dconf reset /dev/lantharos/kestrel/live-wallpaper
-    dconf reset /dev/lantharos/kestrel/live-wallpaper-dark
+    dconf reset /com/lantharos/kestrel/quick-tile-order
+    dconf reset /com/lantharos/kestrel/quick-tiles-removed
+    dconf reset /com/lantharos/kestrel/live-wallpaper
+    dconf reset /com/lantharos/kestrel/live-wallpaper-dark
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"

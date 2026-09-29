@@ -7,7 +7,7 @@ const MEDIA_KEYS = 'org.gnome.settings-daemon.plugins.media-keys';
 const CUSTOM_SCHEMA = `${MEDIA_KEYS}.custom-keybinding`;
 const CUSTOM_ROOT = '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/';
 const CUSTOM_KEYS = ['name', 'command', 'binding'] as const;
-const KESTREL = 'dev.lantharos.kestrel';
+const KESTREL = 'com.lantharos.kestrel';
 
 type Accelerators = Record<string, string[]>;
 type Registered = Record<string, Record<string, { description: string; shortcuts: string[] }>>;

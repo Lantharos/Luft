@@ -257,7 +257,7 @@ export async function run() {
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.RELEASED);
     await pause(180);
     await capture(`${output}/panel-context-menu.png`);
-    const favorites = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+    const favorites = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
     const savedFavorites = favorites.get_strv('favorite-apps');
     const unpin = actorNamed(contextMenu, 'Unpin from panel');
     const [unpinX, unpinY] = unpin.get_transformed_position();

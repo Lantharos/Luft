@@ -11,7 +11,7 @@ use luft_app::apps::App;
 const SCHEMA: &str = "org.gnome.desktop.notifications";
 const APPLICATION_SCHEMA: &str = "org.gnome.desktop.notifications.application";
 const APPLICATION_PATH: &str = "/org/gnome/desktop/notifications/application";
-const RULES_PATH: &str = "/dev/lantharos/kestrel/notifications/application";
+const RULES_PATH: &str = "/com/lantharos/kestrel/notifications/application";
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

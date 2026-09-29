@@ -15,7 +15,7 @@ export async function checkQuickTiles({pause, capture, actorNamed, pointer, outp
   const subtitle = control => withClass(control, 'kestrel-control-subtitle')[0].text;
   const panel = actorNamed(global.stage, 'kestrel-panel');
   const statusShows = name => descendants(actorNamed(panel, 'Quick settings')).some(actor => actor.visible && actor.icon_name === name);
-  const shellSettings = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+  const shellSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const grid = () => withClass(quick, 'kestrel-control')[0].get_parent();
   const center = actor => {

@@ -401,7 +401,7 @@ shell_global_init (ShellGlobal *global)
   (void) g_mkdir_with_parents (path, 0700);
   global->runtime_state_path = g_file_new_for_path (path);
 
-  global->settings = g_settings_new ("dev.lantharos.kestrel");
+  global->settings = g_settings_new ("com.lantharos.kestrel");
 
   if (shell_js)
     {

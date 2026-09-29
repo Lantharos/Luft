@@ -1,5 +1,5 @@
 [app]
-id = "dev.lantharos.tern"
+id = "com.lantharos.tern"
 name = "Tern"
 version = "0.1.0"
 icon = "static/favicon.svg"

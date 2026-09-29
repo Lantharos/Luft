@@ -51,7 +51,7 @@ Apps that stop answering get the Not Responding dialog after the usual few secon
 
 The login screen starts `kestrel-session`, which hands the user's environment to systemd and starts `kestrel-session.target`; logging out stops the target and ends the session. Kestrel's own session manager takes the place of gnome-session. It runs as a small process that starts before the shell, keeps track of apps that ask to keep the screen awake or to hold off logging out, marks the session idle after the configured delay so the screen dims and locks, and asks for confirmation before logging out, restarting, or powering off. Before ending the session it asks running apps whether they are ready and moves on as soon as they answer. Apps that talk to GNOME's session manager work unchanged.
 
-The target starts only the settings services Kestrel relies on: accessibility, display color and night light, automatic time zone, housekeeping, keyboard, media keys, power, printer notifications, airplane mode, screen saver requests from apps, and sound. The service for X11 app settings runs while Xwayland does. IBus provides input methods, and XDG autostart entries start with the session. Kestrel's own settings live under `dev.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can be used on the same account.
+The target starts only the settings services Kestrel relies on: accessibility, display color and night light, automatic time zone, housekeeping, keyboard, media keys, power, printer notifications, airplane mode, screen saver requests from apps, and sound. The service for X11 app settings runs while Xwayland does. IBus provides input methods, and XDG autostart entries start with the session. Kestrel's own settings live under `com.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can be used on the same account.
 
 Kestrel's portal handles screenshots, color picking, permission prompts, and appearance, so apps follow Kestrel's light or dark style and pick up its accent color. File dialogs open in Rover, and screen sharing and the remaining portals use GNOME's backend for now. The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
 
@@ -142,7 +142,7 @@ Terminals get their own sixteen colors: the usual red, green, yellow, blue, mage
 
 #### Reading the palette
 
-On the session bus, `dev.lantharos.Kestrel` exports `dev.lantharos.Kestrel.Appearance` at `/dev/lantharos/Kestrel/Appearance` with these read-only properties, and emits `PropertiesChanged` when they change:
+On the session bus, `com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Appearance` at `/com/lantharos/Kestrel/Appearance` with these read-only properties, and emits `PropertiesChanged` when they change:
 
 | Property | Type | Value |
 | --- | --- | --- |
@@ -177,7 +177,7 @@ Terminal colors are keyed `foreground`, `background`, `cursor`, `cursorText`, `s
 
 ### Matching other apps
 
-Match other apps to the wallpaper in Settings (`theme-apps` in `dev.lantharos.kestrel`) generates colors for apps that Kestrel does not draw, and updates them shortly after the palette changes. Kestrel only writes inside a block that starts with a `Kestrel wallpaper colors` comment, or files named Kestrel, so anything else in these files is left alone. Turning it off removes the blocks and files again.
+Match other apps to the wallpaper in Settings (`theme-apps` in `com.lantharos.kestrel`) generates colors for apps that Kestrel does not draw, and updates them shortly after the palette changes. Kestrel only writes inside a block that starts with a `Kestrel wallpaper colors` comment, or files named Kestrel, so anything else in these files is left alone. Turning it off removes the blocks and files again.
 
 - GTK 4 and libadwaita: a block at the top of `~/.config/gtk-4.0/gtk.css` sets the accent, window, view, header bar, sidebar, card, dialog and popover colors for both styles. Apps pick it up when they next start and switch between light and dark on their own.
 - GTK 3: a block at the top of `~/.config/gtk-3.0/gtk.css` defines the same named colors for the current style, which themes such as adw-gtk3 use.
@@ -186,15 +186,15 @@ Match other apps to the wallpaper in Settings (`theme-apps` in `dev.lantharos.ke
 
 ### Dark style schedule
 
-Settings can switch the dark style on and off by itself (`dark-schedule` in `dev.lantharos.kestrel`): `sunset` goes dark at sunset and light at sunrise, and `custom` uses `dark-schedule-from` and `dark-schedule-to`, in hours of local time. For sunset and sunrise Kestrel asks for the city-level location once when the schedule starts and after each resume, when location services are on; until then, or without them, it uses the main city of the time zone, and falls back to the custom hours when neither is known. Kestrel sets a single timer for the next change instead of checking the time, catches up on changes it slept through after a resume, and leaves a style you picked yourself in place until the next change.
+Settings can switch the dark style on and off by itself (`dark-schedule` in `com.lantharos.kestrel`): `sunset` goes dark at sunset and light at sunrise, and `custom` uses `dark-schedule-from` and `dark-schedule-to`, in hours of local time. For sunset and sunrise Kestrel asks for the city-level location once when the schedule starts and after each resume, when location services are on; until then, or without them, it uses the main city of the time zone, and falls back to the custom hours when neither is known. Kestrel sets a single timer for the next change instead of checking the time, catches up on changes it slept through after a resume, and leaves a style you picked yourself in place until the next change.
 
 ### Pure black
 
-Pure black (`pure-black` in `dev.lantharos.kestrel`) is for OLED displays. Kestrel's panel, Start, Quick Settings, notifications, menus, dialogs, and other glass surfaces turn solid black and stop blurring what is behind them; surfaces inside other surfaces, such as notifications in the notification center, are a very dark grey so they stay apart. Luft apps turn their dark backgrounds black, and the generated dark colors for other apps use black surfaces.
+Pure black (`pure-black` in `com.lantharos.kestrel`) is for OLED displays. Kestrel's panel, Start, Quick Settings, notifications, menus, dialogs, and other glass surfaces turn solid black and stop blurring what is behind them; surfaces inside other surfaces, such as notifications in the notification center, are a very dark grey so they stay apart. Luft apps turn their dark backgrounds black, and the generated dark colors for other apps use black surfaces.
 
 ### Live wallpapers
 
-A video can be the wallpaper. Set `live-wallpaper` in `dev.lantharos.kestrel` to its URI for the light style, or `live-wallpaper-dark` for the dark style, or pick a video under Appearance in Settings. Kestrel starts `kestrel-wallpaper`, a small GTK and GStreamer player, which opens one borderless window per display. Kestrel marks those windows as desktop windows, sizes each to its display, and keeps them below every app window, out of the taskbar, Alt+Tab, the all-windows view, window previews, and window screenshots. They never take keyboard focus, clicks pass through them to the desktop, so the desktop menu keeps working, and they are never scanned out directly, so the panel stays on screen in front of them on an empty desktop.
+A video can be the wallpaper. Set `live-wallpaper` in `com.lantharos.kestrel` to its URI for the light style, or `live-wallpaper-dark` for the dark style, or pick a video under Appearance in Settings. Kestrel starts `kestrel-wallpaper`, a small GTK and GStreamer player, which opens one borderless window per display. Kestrel marks those windows as desktop windows, sizes each to its display, and keeps them below every app window, out of the taskbar, Alt+Tab, the all-windows view, window previews, and window screenshots. They never take keyboard focus, clicks pass through them to the desktop, so the desktop menu keeps working, and they are never scanned out directly, so the panel stays on screen in front of them on an empty desktop.
 
 Videos are decoded by the GPU (VA-API, or NVDEC on NVIDIA) and handed to GTK as GL textures, so frames never pass through the CPU. The video loops without a gap and without sound, and follows the Fit setting. Playback pauses, holding the current frame, while a maximized or fullscreen window covers its display, while the all-windows view is open, while the screen is locked or off, on battery power unless Play videos on battery is on under Appearance in Settings (`live-wallpaper-on-battery`), and in power saver mode, and resumes where it left off. If the player stops unexpectedly, Kestrel starts it again after a short wait, up to three times in a row; after that, the still frame stays until another wallpaper is chosen or the session restarts.
 

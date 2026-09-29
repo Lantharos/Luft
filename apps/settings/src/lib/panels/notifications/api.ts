@@ -21,9 +21,9 @@ export type AppRules = {
 	'keep-in-list': boolean;
 };
 
-export const KESTREL_SCHEMA = 'dev.lantharos.kestrel';
+export const KESTREL_SCHEMA = 'com.lantharos.kestrel';
 export const APP_SCHEMA = 'org.gnome.desktop.notifications.application';
-export const RULES_SCHEMA = 'dev.lantharos.kestrel.notifications.application';
+export const RULES_SCHEMA = 'com.lantharos.kestrel.notifications.application';
 export const RULES_KEYS: (keyof AppRules)[] = ['during-do-not-disturb', 'keep-in-list'];
 export const APP_KEYS: (keyof AppOptions)[] = ['enable', 'show-banners', 'enable-sound-alerts', 'show-in-lock-screen', 'details-in-lock-screen'];
 

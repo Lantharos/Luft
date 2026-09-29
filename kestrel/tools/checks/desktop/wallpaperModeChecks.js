@@ -10,7 +10,7 @@ async function readAccent() {
 
 export async function checkWallpaperModes({pause, require, wallpapers, video, darkPicture}) {
   const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-  const kestrel = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
+  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
   const lightLive = kestrel.get_string('live-wallpaper');
   const lightStill = background.get_string('picture-uri');

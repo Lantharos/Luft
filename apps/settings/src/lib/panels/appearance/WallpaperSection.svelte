@@ -28,7 +28,7 @@
 	];
 
 	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark', 'picture-options']);
-	const kestrel = useSettings<Kestrel>('dev.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark']);
+	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark']);
 	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
 
 	let found = $state<Wallpaper[] | null>(null);

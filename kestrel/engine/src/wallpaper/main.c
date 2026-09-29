@@ -6,7 +6,7 @@
 #include "still.h"
 #include "surfaces.h"
 
-#define APPLICATION_ID "dev.lantharos.kestrel.Wallpaper"
+#define APPLICATION_ID "com.lantharos.kestrel.Wallpaper"
 
 typedef struct
 {

@@ -153,7 +153,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   -barlevel-active-border-color: transparent;
   -barlevel-border-color: transparent;
 }
-.kestrel-notification-header { spacing: 12px; padding: 0 4px; }
+.kestrel-notification-header { spacing: 12px; padding: 4px 4px 0; }
 .kestrel-notification-center { spacing: 14px; }
 
 .kestrel-snap-layouts { padding: 14px; }
@@ -354,7 +354,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 20px; background-color: rgba(20, 20, 24, 0.20); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
-.notification-banner .message-header { padding: 0 0 2px; }
+.notification-banner .message-header { padding: 0 0 8px; }
+.notification-banner .message-header .message-header-content { min-height: 0; padding-bottom: 0; }
+.notification-banner .message-box { padding: 0; }
 .notification-banner .message-source-title { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
 .notification-banner .event-time { font-size: 12px; color: rgba(255, 255, 255, 0.50); }
 .notification-banner .message-title { font-size: 14px; font-weight: 600; }
@@ -463,8 +465,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-notification-group { spacing: 0; padding: 6px; border-radius: 18px; background-color: rgba(255, 255, 255, 0.06); }
 .kestrel-notification-group-list { spacing: 4px; }
 .kestrel-notification-group-header { spacing: 8px; padding: 6px; }
+.kestrel-notification-group-header .kestrel-notification-dismiss { padding: 6px; }
 .kestrel-notification-group-icon { icon-size: 16px; }
-.kestrel-notification-more { font-size: 12px; }
+.kestrel-notification-more { padding: 6px 10px; font-size: 12px; }
 .kestrel-notification-reply { spacing: 6px; }
 .kestrel-notification-reply-send, .notification-reply-send { padding: 9px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.10); }
 .kestrel-notification-reply-send:hover, .notification-reply-send:hover,

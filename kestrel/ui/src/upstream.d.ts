@@ -36,6 +36,13 @@ declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
   export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
 }
 
+declare module 'resource:///org/gnome/shell/ui/headerLayout.js' {
+  import Clutter from 'gi://Clutter';
+  export class HeaderLayout extends Clutter.BoxLayout {
+    overhang(actor: Clutter.Actor): void;
+  }
+}
+
 declare module 'resource:///org/gnome/shell/ui/kestrelGlass.js' {
   export function blurSurface(actor: import('gi://St').default.Widget, corners?: number): void;
   export function freezeSelection(actor: import('gi://Clutter').default.Actor): () => void;

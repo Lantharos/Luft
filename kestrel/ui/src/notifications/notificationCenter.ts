@@ -6,6 +6,7 @@ import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
+import { HeaderLayout } from 'resource:///org/gnome/shell/ui/headerLayout.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { blurSurface } from '../shared/surface.js';
 import { Calendar } from './calendar.js';
@@ -31,7 +32,8 @@ export class NotificationCenter {
   private first: NotificationCard | null = null;
   private readonly scroll: St.ScrollView;
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
-  private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', y_align: Clutter.ActorAlign.CENTER });
+  private readonly headerLayout = new HeaderLayout();
+  private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', layout_manager: this.headerLayout });
   private readonly calendar = new Calendar();
   private readonly media: MediaCard;
 
@@ -61,6 +63,7 @@ export class NotificationCenter {
     }));
     this.clearButton.connect('clicked', () => this.clear());
     this.header.add_child(this.clearButton);
+    this.headerLayout.overhang(this.clearButton);
     this.actor.add_child(this.header);
 
     const scroll = this.scroll = new St.ScrollView({

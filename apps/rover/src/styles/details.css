@@ -160,25 +160,6 @@
 		border-radius: 8px;
 	}
 
-	.media-controls {
-		display: flex;
-		width: min(640px, 100%);
-		flex: none;
-		align-items: center;
-		gap: 10px;
-		border-radius: var(--radius-pill);
-		background: var(--control);
-		padding: 4px 8px;
-	}
-
-	.media-controls__time {
-		min-width: 38px;
-		color: var(--text-muted);
-		font-size: 12px;
-		font-variant-numeric: tabular-nums;
-		text-align: center;
-	}
-
 	.preview-document {
 		height: 100%;
 		width: 100%;

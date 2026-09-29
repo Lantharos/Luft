@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
+	import { MediaControls } from '@luft/ui';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import type { MediaInfo } from '$lib/file-manager/inspect/details.svelte';
 	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
@@ -7,7 +8,6 @@
 	import type { FileEntry } from '$lib/types';
 	import { entryIcon, mayBeTransparent } from '$lib/utils/file-kinds';
 	import { previewKind } from '$lib/utils/kinds';
-	import MediaControls from './MediaControls.svelte';
 	import TextPreview from './TextPreview.svelte';
 
 	interface Props {

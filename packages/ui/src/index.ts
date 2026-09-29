@@ -26,6 +26,11 @@ export { default as ItemRow } from './rows/ItemRow.svelte';
 export { default as Row } from './rows/Row.svelte';
 export { default as Section } from './rows/Section.svelte';
 
+export { formatClock } from './playback/clock';
+export { default as MediaControls } from './playback/MediaControls.svelte';
+export { default as SeekBar } from './playback/SeekBar.svelte';
+export { default as VolumeControl } from './playback/VolumeControl.svelte';
+
 export { default as GlassShell } from './shell/GlassShell.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
 

@@ -1,6 +1,9 @@
 [app]
 id = "com.lantharos.draft"
 name = "Draft"
+generic_name = "Text Editor"
+categories = ["Utility", "TextEditor", "Development"]
+keywords = ["text editor", "notepad", "editor", "code editor", "code", "notes", "plain text", "write", "markdown", "ide", "programming", "gedit", "textedit", "kate", "wordpad"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

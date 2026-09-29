@@ -1,6 +1,9 @@
 [app]
 id = "com.lantharos.magpie"
 name = "Magpie"
+generic_name = "Media Viewer"
+categories = ["AudioVideo", "Audio", "Video", "Player", "Graphics", "Viewer"]
+keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "media player", "loupe", "totem", "showtime", "evince", "papers", "vlc"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

@@ -1,6 +1,9 @@
 [app]
 id = "com.lantharos.settings"
 name = "Settings"
+generic_name = "Settings"
+categories = ["Settings", "System"]
+keywords = ["preferences", "control panel", "control center", "system settings", "system preferences", "configuration", "options", "setup"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

@@ -1,6 +1,4 @@
 mod defaults;
-mod icons;
-pub(crate) mod info;
 mod startup;
 
 use luft_app::{Commands, Events};

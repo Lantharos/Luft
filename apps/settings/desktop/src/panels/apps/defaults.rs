@@ -1,7 +1,7 @@
 use gio::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::info::{self, App};
+use luft_app::apps::{self, App};
 
 struct Category {
     id: &'static str,
@@ -105,7 +105,7 @@ pub fn list() -> Vec<Handler> {
                 .iter()
                 .filter_map(App::from_info)
                 .collect();
-            info::sort_by_name(&mut apps);
+            apps::sort_by_name(&mut apps);
             Handler {
                 category: category.id,
                 apps,

@@ -1993,6 +1993,9 @@ checksum = "7f66e8d5d03f609abc3a39e6f08e4164ebf1447a732906d39eb9b99b7919ef39"
 name = "luft-app"
 version = "0.1.0"
 dependencies = [
+ "dirs",
+ "gio",
+ "gio-unix",
  "sabine",
  "serde",
  "serde_json",

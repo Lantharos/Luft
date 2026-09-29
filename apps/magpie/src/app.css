@@ -1,13 +1,6 @@
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
 
-head,
-script,
-style,
-title {
-	display: none;
-}
-
 .stage {
 	color-scheme: dark;
 	--text: #f3f3ef;
@@ -21,8 +14,17 @@ title {
 	--raised: #1a1a18;
 	--hairline: rgba(245, 245, 242, 0.07);
 	--shadow-soft: rgba(0, 0, 0, 0.4);
-	background: #0b0b0a;
+	--stage: #0b0b0a;
+	background: var(--stage);
 	color: var(--text);
+}
+
+.stage.see-through {
+	background: transparent;
+}
+
+.stage.see-through .header:not(.overlay) {
+	background: var(--stage);
 }
 
 .floating-bar {

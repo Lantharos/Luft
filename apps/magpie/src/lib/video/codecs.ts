@@ -18,13 +18,22 @@ const PROBES: Record<string, string> = {
 	'Dolby Digital Plus': 'audio/mp4; codecs="ec-3"'
 };
 
-function playable(codec: string) {
+function supported(codec: string) {
 	const probe = PROBES[codec];
 	return probe ? document.createElement('video').canPlayType(probe) !== '' : false;
 }
 
+function unsupported(info: VideoInfo | null) {
+	return [info?.video, info?.audio].filter((codec): codec is string => Boolean(codec) && !supported(codec!));
+}
+
+/** Whether Chromium can decode every stream Magpie found in the file. */
+export function playable(info: VideoInfo) {
+	return unsupported(info).length === 0;
+}
+
 export function explain(info: VideoInfo | null) {
-	const unsupported = [info?.video, info?.audio].filter((codec): codec is string => Boolean(codec) && !playable(codec!));
-	if (!unsupported.length) return "This video can't be played.";
-	return `This video uses ${unsupported.join(' and ')}, which Magpie can't play.`;
+	const unplayable = unsupported(info);
+	if (!unplayable.length) return "This video can't be played.";
+	return `This video uses ${unplayable.join(' and ')}, which Magpie can't play.`;
 }

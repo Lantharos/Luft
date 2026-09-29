@@ -25,7 +25,8 @@ Opening another file while Magpie is running switches to it. Songs opened while 
 - Play, position with frame previews, volume, speed, picture in picture and fullscreen
 - Subtitles from `.srt` and `.vtt` files next to the video (`Movie.srt`, `Movie.en.vtt`) and text subtitles inside MKV and MP4 files
 - Each video remembers where you stopped
-- VP9, AV1, VP8 and Theora play with Opus, Vorbis, FLAC and MP3 sound. For anything else, such as H.264, HEVC or AAC, Magpie names the format it can't play and offers the other apps that can
+- VP9, AV1, VP8 and Theora play with Opus, Vorbis, FLAC and MP3 sound in the page. H.264, HEVC, AAC and the other formats GStreamer supports play through the system's decoders with the same controls, using the graphics card where it can; frame previews and picture in picture are only available for the first group
+- When a video can't be played at all, Magpie names the format and offers the other apps that can
 
 ## Music
 

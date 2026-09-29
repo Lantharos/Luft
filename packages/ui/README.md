@@ -87,9 +87,12 @@ $effect(() => {
 | `VirtualScroller` | Scrolling list or grid that only renders the items in view, so it stays fast with tens of thousands of items. `layout` sets the item height and, for a grid, `minItemWidth`; `header` stays pinned above the items. Items passed while `stagger` is on fade in from top to bottom, and with `animateOrder` a reordered or filtered list moves its items to their new places. `scrollToIndex`, `indicesIn` and `metrics` help with keyboard navigation and rubber-band selection |
 | `MediaControls` | Play, position, time and volume in one bar for a video or audio element; bind `paused`, `currentTime`, `muted` and `volume`, pass `buffered` to show what has loaded, a `preview` snippet to show something above the position under the pointer, and children for extra buttons at the end |
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own, for players with their own layout. `SeekBar` reports every position while dragging through `onseek`, and `onscrub` says when dragging starts and stops |
+| `NativeVideoSurface` | Plays `src` through Sabine's native video, for formats Chromium can't decode, and fills its own box with it. Bind `player` to control playback, pass `cutout` when opaque content lies beneath, and handle `onfail` |
 | `GlassShell`, `WindowControls` | Window body and title bar buttons |
 
 `formatClock(seconds)` turns a duration into `1:05` or `1:02:05`.
+
+For native video, `canPlayNatively()` says whether the window can use it and `decodeFailed(media)` whether a `<video>` stopped because Chromium can't decode its source. `MediaState` turns a native player into reactive `paused`, `currentTime`, `duration`, `muted`, `volume`, `width` and `height`, with setters to bind `MediaControls` to.
 
 `Segmented` also takes an `item` snippet to show icons instead of text; the option's `label` then becomes its accessible name.
 

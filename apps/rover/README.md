@@ -4,14 +4,14 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 
 ## Features
 
-- Tabs with their own back and forward history; the tab bar shows up once a second tab is open
-- List, grid and column views, remembered per folder. The list sorts from its column headers, the grid zooms from small icons to large previews, and columns show where you are and what is inside the selected folder
+- Tabs with their own back and forward history that brings back each folder's scroll position and selection; the tab bar shows up once a second tab is open
+- List, grid and column views, remembered per folder. The list sorts from its column headers, whose columns can be resized, dragged into a different order and shown or hidden from their right-click menu; folders show how many items they hold, and the list can be grouped by kind or date. The grid zooms from small icons to large previews, and columns show where you are and what is inside the selected folder
 - Folders with tens of thousands of files open and scroll smoothly, since only what is on screen is drawn
-- A sidebar with Home, Recent, your Desktop, Documents, Downloads, Music, Pictures and Videos folders, Trash with the number of items in it, Favorites and drives
+- A sidebar with Home, Recent, your Desktop, Documents, Downloads, Music, Pictures and Videos folders, Trash with the number of items in it, Favorites and drives. Right-click any of them to open it in a new tab, eject a drive, remove a favorite, empty the trash or see its properties
 - A details pane with a large preview, the kind, size, dates, image dimensions, media length, location, version control state and the apps that can open the file
 - Quick Look on `Space` for images, video, audio, text and code, Markdown and PDFs, moving between files with the arrow keys
 - Full keyboard navigation, including range selection and jumping to a file by typing its name
-- Thumbnails for images, videos, PDFs, fonts, office documents and anything else your installed thumbnailers handle, shared with other apps through the standard thumbnail cache and made only for the files on screen
+- Thumbnails for images, videos, PDFs, fonts, office documents and anything else your installed thumbnailers handle, shared with other apps through the standard thumbnail cache and made only for the files on screen. Fonts and images with transparency sit on a light backdrop so they stay readable
 - Search inside the current folder and everything below it, by name or by what text files contain, narrowed by kind, date and size, with results showing up as they are found
 - Folders refresh on their own when files change, including changes made by other apps
 - Copy and move run in the background with progress, pause and cancel. When a name is already taken, Rover shows both items side by side and lets you replace, skip, keep both or merge folders, for one item or all of them
@@ -20,12 +20,12 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 - Compress to zip or tar.zst, and extract zip, tar (plain, gz, bz2, xz and zst), 7z and single compressed files
 - A properties window with the kind, size (counted in the background for folders), location, dates, owner, editable permissions and the default app for the file type
 - Duplicate, copy path and open a terminal in a folder from the context menu
-- Drag and drop within Rover and to or from other apps
+- Drag and drop within Rover and to or from other apps. Holding a dragged file over a folder, in the views or the sidebar, opens it
 - Trash across the home folder and mounted drives, with restore
 - Favorites you can add from the context menu or by dropping files on the sidebar, and reorder by dragging
 - Drives with their usage in the sidebar, and eject for removable drives
 - Git and Pig status badges, diffs, commits and sync for the folder you are in
-- Inline create and rename, marquee selection and an editable path bar
+- Inline create and rename, marquee selection and an editable path bar that completes folder names with `Tab`
 - A file chooser for apps that use the xdg-desktop-portal picker
 - `org.freedesktop.FileManager1`, so "Show in folder" in other apps opens Rover
 
@@ -92,6 +92,7 @@ This writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
 | `Ctrl++` / `Ctrl+-` / `Ctrl+0`, or `Ctrl` and the wheel | Grid icon size |
 | `Alt+P` | Show or hide the details pane |
 | `Ctrl+L` | Type a location |
+| `Tab` / `Shift+Tab` while typing a location | Complete a folder name, or step through the matching folders |
 | `Ctrl+H` | Show hidden files |
 | `Ctrl+Shift+N` | New folder |
 | `Alt+Left` / `Alt+Right` / `Alt+Up` | Back, forward and parent folder |
@@ -116,8 +117,8 @@ rover/
 │   ├── lib/
 │   │   ├── api.ts             bridge commands and events
 │   │   ├── components/        toolbar, sidebar, views, details, previews, dialogs, shell and version control
-│   │   ├── features/          search, thumbnails, undo, batch rename and archive state
-│   │   ├── file-manager/      navigation, view state and keys, previews, actions, drag and drop, chooser
+│   │   ├── features/          search, on-screen thumbnails and folder counts, undo, batch rename and archive state
+│   │   ├── file-manager/      navigation, location completion, view state and keys, list columns and groups, previews, actions, drag and drop, chooser
 │   │   ├── state/             settings and tabs
 │   │   ├── utils/             formatting, paths and file kinds
 │   │   └── vcs/               version control state
@@ -127,7 +128,7 @@ rover/
     ├── archives/              compressing and extracting
     ├── bridge/                bridge command registration
     ├── drives/                mounts, drive info and mount watching
-    ├── files/                 listing, transfers and conflicts, trash, renaming, operations and folder watching
+    ├── files/                 listing, folder item counts, transfers and conflicts, trash, renaming, operations and folder watching
     ├── history/               undo and redo
     ├── inspect/               file details and open with
     ├── integration/           file chooser portal, FileManager1, terminals and launch paths

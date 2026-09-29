@@ -16,11 +16,16 @@ export interface Match<T extends Searchable> {
   score: number;
 }
 
+function startsWord(text: string, query: string): boolean {
+  const index = text.indexOf(query);
+  return index === 0 || (index > 0 && WORD_START.test(text[index - 1]));
+}
+
 function tier({ name, keywords }: Searchable, query: string): Tier | null {
   const index = name.indexOf(query);
   if (index === 0) return Tier.Prefix;
   if (index > 0 && WORD_START.test(name[index - 1])) return Tier.WordStart;
-  if (keywords.some(keyword => keyword.startsWith(query))) return Tier.Keyword;
+  if (keywords.some(keyword => startsWord(keyword, query))) return Tier.Keyword;
   if (index > 0) return Tier.Substring;
   return null;
 }

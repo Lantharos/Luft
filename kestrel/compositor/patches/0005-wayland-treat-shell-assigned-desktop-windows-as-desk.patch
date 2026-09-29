@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 29 Sep 2026 00:40:31 +0200
-Subject: [PATCH 5/5] wayland: treat shell-assigned desktop windows as desktop
+Subject: [PATCH 5/6] wayland: treat shell-assigned desktop windows as desktop
  backgrounds
 
 Wayland has no desktop window type of its own, so a Wayland window only
@@ -10,11 +10,31 @@ that draw the desktop background. Such windows never take keyboard focus,
 including as the fallback when the last regular window closes, and their
 configure bounds cover the whole monitor rather than its work area so
 clients size them to the full display.
----
- src/core/window.c                 | 15 +++++++++------
- src/wayland/meta-window-wayland.c |  2 +-
- 2 files changed, 10 insertions(+), 7 deletions(-)
 
+A desktop window also never becomes a view's top window. It fills its
+monitor and is opaque, so on a workspace without other windows it would
+otherwise qualify for direct scanout and variable refresh rate, and
+scanning it out would hide the shell's panels and popups drawn above it.
+---
+ src/compositor/meta-compositor-view.c |  3 ++-
+ src/core/window.c                     | 15 +++++++++------
+ src/wayland/meta-window-wayland.c     |  2 +-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/compositor/meta-compositor-view.c b/src/compositor/meta-compositor-view.c
+index ded69b3d78e07224688a36c78d10d605fd89bbb4..d7c76dae7551315ba2bc7d441964dfcbf37b1443 100644
+--- a/src/compositor/meta-compositor-view.c
++++ b/src/compositor/meta-compositor-view.c
+@@ -73,7 +73,8 @@ find_top_window_actor_on_view (ClutterStageView *stage_view,
+       MtkRectangle buffer_rect;
+       MtkRectangle view_layout;
+ 
+-      if (!window->visible_to_compositor)
++      if (!window->visible_to_compositor ||
++          window->type == META_WINDOW_DESKTOP)
+         continue;
+ 
+       meta_window_get_buffer_rect (window, &buffer_rect);
 diff --git a/src/core/window.c b/src/core/window.c
 index d8485ec8fca8b1b01f552cccdaefcf18daac34fc..99424b25ea9b03421f4887934918a7ff3f156496 100644
 --- a/src/core/window.c

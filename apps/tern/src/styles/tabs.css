@@ -1,0 +1,79 @@
+@layer components {
+	.tab-bar {
+		display: flex;
+		height: 52px;
+		flex: none;
+		align-items: center;
+		gap: 6px;
+		padding: 0 16px 0 10px;
+	}
+
+	.tab-list {
+		display: flex;
+		min-width: 0;
+		flex: 1;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.tab {
+		display: flex;
+		height: 32px;
+		min-width: 0;
+		max-width: 220px;
+		flex: 1 1 0;
+		align-items: center;
+		border-radius: var(--radius-pill);
+		color: var(--text-muted);
+		transition:
+			background-color 140ms var(--ease),
+			color 140ms var(--ease);
+	}
+
+	.tab:hover {
+		background: var(--surface-hover);
+		color: var(--text-soft);
+	}
+
+	.tab.is-active {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.tab.is-ringing {
+		color: var(--accent);
+	}
+
+	.tab-main {
+		display: flex;
+		height: 100%;
+		min-width: 0;
+		flex: 1;
+		align-items: center;
+		padding-left: 14px;
+		font-size: 13px;
+	}
+
+	.tab-close {
+		display: grid;
+		height: 22px;
+		width: 22px;
+		margin-right: 5px;
+		flex: none;
+		place-items: center;
+		border-radius: var(--radius-pill);
+		opacity: 0;
+		transition:
+			opacity 140ms var(--ease),
+			background-color 140ms var(--ease);
+	}
+
+	.tab:hover .tab-close,
+	.tab.is-active .tab-close {
+		opacity: 1;
+	}
+
+	.tab-close:hover {
+		background: var(--surface-hover);
+	}
+}

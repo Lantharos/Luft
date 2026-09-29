@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+@import '@xterm/xterm/css/xterm.css';
+@import './styles/terminal.css';
+@import './styles/tabs.css';

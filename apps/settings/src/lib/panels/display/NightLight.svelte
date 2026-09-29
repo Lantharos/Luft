@@ -2,7 +2,7 @@
 	import { Row, Section, Segmented, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
-	import TimePicker from './TimePicker.svelte';
+	import TimePicker from '$lib/components/TimePicker.svelte';
 
 	type Color = {
 		'night-light-enabled': boolean;

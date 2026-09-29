@@ -25,6 +25,7 @@
 	let trail = $state<HTMLDivElement>();
 	let draft = $state('');
 	let clipped = $state(false);
+	let trailWidth = $state(0);
 
 	let root = $derived.by((): Crumb => {
 		const path = manager.currentPath;
@@ -40,7 +41,7 @@
 	});
 
 	$effect(() => {
-		if (crumbs.length === 0 || !trail) return;
+		if (crumbs.length === 0 || !trail || trailWidth === 0) return;
 		trail.scrollLeft = trail.scrollWidth;
 		clipped = trail.scrollLeft > 0;
 	});
@@ -94,6 +95,7 @@
 	{:else}
 		<div
 			bind:this={trail}
+			bind:clientWidth={trailWidth}
 			class={['path-trail hidden-scroll', clipped && 'is-clipped']}
 			role="group"
 			aria-label="Location"

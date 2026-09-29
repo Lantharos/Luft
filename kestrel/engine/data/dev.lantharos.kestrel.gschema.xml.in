@@ -1,4 +1,10 @@
 <schemalist>
+  <enum id="dev.lantharos.kestrel.DarkSchedule">
+    <value nick="off" value="0"/>
+    <value nick="sunset" value="1"/>
+    <value nick="custom" value="2"/>
+  </enum>
+
   <schema id="dev.lantharos.kestrel" path="/dev/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="development-tools" type="b">
@@ -40,6 +46,44 @@
         org.gnome.desktop.background picture to a still frame of it, which
         the lock screen and other surfaces use. Empty when the wallpaper is
         a picture; choosing a picture clears it.
+      </description>
+    </key>
+    <key name="dark-schedule" enum="dev.lantharos.kestrel.DarkSchedule">
+      <default>'off'</default>
+      <summary>When the dark style turns on by itself</summary>
+      <description>
+        'sunset' switches to dark at sunset and back to light at sunrise,
+        using the location when location services are on and the time
+        zone's main city otherwise. 'custom' uses dark-schedule-from and
+        dark-schedule-to. Choosing a style by hand lasts until the next
+        change in the schedule.
+      </description>
+    </key>
+    <key name="dark-schedule-from" type="d">
+      <range min="0" max="23.99"/>
+      <default>20.0</default>
+      <summary>Hour, in local time, when a custom schedule turns the dark style on</summary>
+    </key>
+    <key name="dark-schedule-to" type="d">
+      <range min="0" max="23.99"/>
+      <default>7.0</default>
+      <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
+    </key>
+    <key name="pure-black" type="b">
+      <default>false</default>
+      <summary>Use true black for dark surfaces</summary>
+      <description>
+        Makes Kestrel's surfaces, Luft apps and the dark colors generated
+        for other apps fully black, which saves power on OLED displays.
+      </description>
+    </key>
+    <key name="theme-apps" type="b">
+      <default>false</default>
+      <summary>Color other apps from the wallpaper</summary>
+      <description>
+        Generates colors from the wallpaper palette for GTK 4, GTK 3, Qt,
+        KDE and Ghostty in the user's configuration directory. Turning it
+        off removes everything that was generated.
       </description>
     </key>
     <key name="global-shortcuts" type="s">

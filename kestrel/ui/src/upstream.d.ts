@@ -39,6 +39,14 @@ declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
 declare module 'resource:///org/gnome/shell/ui/kestrelGlass.js' {
   export function blurSurface(actor: import('gi://St').default.Widget, corners?: number): void;
   export function freezeSelection(actor: import('gi://Clutter').default.Actor): () => void;
+  export function setSolidSurfaces(enabled: boolean): void;
+}
+
+declare module 'resource:///org/gnome/shell/misc/loginManager.js' {
+  export function getLoginManager(): {
+    connect(signal: 'prepare-for-sleep', callback: (manager: unknown, aboutToSuspend: boolean) => void): number;
+    disconnect(id: number): void;
+  };
 }
 
 declare module 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js' {

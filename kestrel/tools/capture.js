@@ -20,6 +20,7 @@ import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
 import {checkPortal} from './checks/system/portalChecks.js';
+import {checkAppearance} from './checks/system/appearanceChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
@@ -318,6 +319,7 @@ export async function run() {
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSessionManager({pause, pointer});
   await checkPortal({pause});
+  await checkAppearance({pause, capture, output});
   await checkLiveWallpaper({pause, actorNamed});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});

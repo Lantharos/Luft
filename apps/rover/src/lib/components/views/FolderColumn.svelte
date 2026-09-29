@@ -3,7 +3,7 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
-	import { thumbnailSource } from '$lib/file-manager/listing/thumbnails';
+	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import type { FolderColumnModel } from '$lib/file-manager/view/columns.svelte';
 	import { entryClasses, entryContext, entryProps } from '$lib/file-manager/view/entry-props';
 	import { EntrySurface } from '$lib/file-manager/view/surface.svelte';
@@ -66,7 +66,7 @@
 >
 	{#snippet children(entry)}
 		<div class={[classes(entry), 'column-row']} {...entryProps(entry, context, select)}>
-			<EntryIcon name={entryIcon(entry)} size={20} thumbnail={thumbnailSource(entry)} />
+			<EntryIcon name={entryIcon(entry)} size={20} {...thumbnailOf(entry)} />
 			<EntryName {entry} manager={manager} class="truncate" />
 			<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} />
 			{#if entry.is_dir}

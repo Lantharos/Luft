@@ -5,7 +5,7 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import { entryContext } from '$lib/file-manager/view/entry-props';
-	import { thumbnailSource } from '$lib/file-manager/listing/thumbnails';
+	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import { entryIcon } from '$lib/utils/file-kinds';
 	import { formatBytes } from '$lib/utils/format';
 	import { kindLabel } from '$lib/utils/kinds';
@@ -35,7 +35,7 @@
 	>
 		<div class="quicklook" role="dialog" aria-label={`Preview of ${entry.name}`} in:pop out:fade={{ duration: 120 }}>
 			<header class="quicklook-header">
-				<EntryIcon name={entryIcon(entry)} size={28} thumbnail={thumbnailSource(entry)} />
+				<EntryIcon name={entryIcon(entry)} size={28} {...thumbnailOf(entry)} />
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-[14px] font-medium text-[var(--text)]">{entry.name}</p>
 					<p class="truncate text-[12px] text-[var(--text-muted)]">

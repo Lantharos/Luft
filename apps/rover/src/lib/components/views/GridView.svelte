@@ -4,7 +4,7 @@
 	import { on } from 'svelte/events';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
-	import { thumbnailSource } from '$lib/file-manager/listing/thumbnails';
+	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import { entryClasses, entryContext, entryProps } from '$lib/file-manager/view/entry-props';
 	import { EntrySurface } from '$lib/file-manager/view/surface.svelte';
 	import { entryIcon } from '$lib/utils/file-kinds';
@@ -69,7 +69,7 @@
 	{#snippet children(entry)}
 		<div class={[entryClasses(entry, context), 'grid-tile']} {...entryProps(entry, context)}>
 			<span class="grid-art" style:height="{size}px">
-				<EntryIcon name={entryIcon(entry)} {size} thumbnail={thumbnailSource(entry)} fit="contain" />
+				<EntryIcon name={entryIcon(entry)} {size} {...thumbnailOf(entry)} fit="contain" />
 				<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} density="grid" />
 			</span>
 			<EntryName {entry} manager={context.manager} class="grid-name" fieldClass="inline-name-field--grid" />

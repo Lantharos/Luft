@@ -4,7 +4,7 @@
 	import FilePreview from '$lib/components/preview/FilePreview.svelte';
 	import { EntryDetails } from '$lib/file-manager/inspect/details.svelte';
 	import { detailRows, tildePath, type DetailRow } from '$lib/file-manager/inspect/rows';
-	import { thumbnailSource } from '$lib/file-manager/listing/thumbnails';
+	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import { entryContext } from '$lib/file-manager/view/entry-props';
 	import type { FileEntry } from '$lib/types';
 	import { entryIcon } from '$lib/utils/file-kinds';
@@ -81,7 +81,7 @@
 		<div class="details-preview details-stack">
 			{#each selected.slice(0, STACK_SIZE) as item, index (item.path)}
 				<span class="details-stack__item" style:--index={index}>
-					<EntryIcon name={entryIcon(item)} size={88} thumbnail={thumbnailSource(item)} />
+					<EntryIcon name={entryIcon(item)} size={88} {...thumbnailOf(item)} />
 				</span>
 			{/each}
 		</div>

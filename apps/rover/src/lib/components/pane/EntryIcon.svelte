@@ -6,10 +6,11 @@
 		name: EntryIconName;
 		size: number;
 		thumbnail?: string | null;
+		backdrop?: boolean;
 		fit?: 'cover' | 'contain';
 	}
 
-	let { name, size, thumbnail = null, fit = 'cover' }: Props = $props();
+	let { name, size, thumbnail = null, backdrop = false, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
 	const TONES: Partial<Record<EntryIconName, string>> = {
@@ -32,7 +33,7 @@
 >
 	{#if showThumbnail}
 		<img
-			class="entry-thumbnail"
+			class={['entry-thumbnail', backdrop && 'has-backdrop']}
 			src={thumbnail}
 			alt=""
 			loading="lazy"

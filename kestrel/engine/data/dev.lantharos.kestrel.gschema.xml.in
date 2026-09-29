@@ -97,6 +97,14 @@
         off removes everything that was generated.
       </description>
     </key>
+    <key name="live-wallpaper-on-battery" type="b">
+      <default>false</default>
+      <summary>Keep live wallpapers playing on battery power</summary>
+      <description>
+        When disabled, live wallpapers pause on their still frame while the
+        computer runs on battery.
+      </description>
+    </key>
     <key name="global-shortcuts" type="s">
       <default>'{}'</default>
       <summary>Shortcuts that apps have registered through the global shortcuts portal</summary>

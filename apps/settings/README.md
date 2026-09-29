@@ -15,7 +15,7 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 - Apps: default apps and what each app is allowed to do
 - Privacy: location, file history, screen lock and trash cleanup
 - Users: your account picture, name, password and fingerprints
-- Appearance: light and dark style with a sunset or custom schedule, Pure black for OLED displays, the colors picked from the wallpaper and whether other apps and terminals take them on, wallpaper and window translucency. Wallpapers are the pictures and videos in the Wallpapers folder in Pictures, and the one you pick belongs to the style that is on, so light and dark each keep their own; videos play as live wallpapers on Kestrel
+- Appearance: light and dark style with a sunset or custom schedule, Pure black for OLED displays, the colors picked from the wallpaper and whether other apps and terminals take them on, wallpaper and window translucency. Wallpapers are the pictures and videos in the Wallpapers folder in Pictures, and the one you pick belongs to the style that is on, so light and dark each keep their own; videos play as live wallpapers on Kestrel, and on laptops a switch decides whether they keep playing on battery
 - Date and time: time zone, automatic time and clock format
 - About: device name, hardware and system versions
 

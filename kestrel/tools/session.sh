@@ -54,6 +54,7 @@ exec dbus-run-session -- bash -c '
     dconf reset /dev/lantharos/kestrel/quick-tile-order
     dconf reset /dev/lantharos/kestrel/quick-tiles-removed
     dconf reset /dev/lantharos/kestrel/live-wallpaper
+    dconf reset /dev/lantharos/kestrel/live-wallpaper-dark
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"

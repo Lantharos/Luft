@@ -40,12 +40,23 @@
     </key>
     <key name="live-wallpaper" type="s">
       <default>''</default>
-      <summary>Video shown as a live wallpaper</summary>
+      <summary>Video shown as a live wallpaper in light mode</summary>
       <description>
-        URI of a video that plays behind the desktop. Kestrel sets the
-        org.gnome.desktop.background picture to a still frame of it, which
-        the lock screen and other surfaces use. Empty when the wallpaper is
-        a picture; choosing a picture clears it.
+        URI of a video that plays behind the desktop while the light style
+        is active. Kestrel sets the org.gnome.desktop.background picture-uri
+        to a still frame of it, which the lock screen and other surfaces use.
+        Empty when the light wallpaper is a picture; choosing a picture for
+        light mode clears it.
+      </description>
+    </key>
+    <key name="live-wallpaper-dark" type="s">
+      <default>''</default>
+      <summary>Video shown as a live wallpaper in dark mode</summary>
+      <description>
+        URI of a video that plays behind the desktop while the dark style
+        is active. Kestrel sets the org.gnome.desktop.background
+        picture-uri-dark to a still frame of it. Empty when the dark
+        wallpaper is a picture; choosing a picture for dark mode clears it.
       </description>
     </key>
     <key name="dark-schedule" enum="dev.lantharos.kestrel.DarkSchedule">

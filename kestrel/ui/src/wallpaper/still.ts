@@ -26,20 +26,17 @@ function extract(uri: string, still: Gio.File): Promise<boolean> {
   }));
 }
 
-function removeStillsExcept(kept: Gio.File): void {
+export function keepStills(uris: string[]): void {
+  const kept = uris.map(stillFor);
   const children = STILLS.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
   for (const info of children) {
     const child = STILLS.get_child(info.get_name());
-    if (!child.equal(kept)) child.delete(null);
+    if (!kept.some(still => still.equal(child))) child.delete(null);
   }
 }
 
-export async function showStill(uri: string, background: Gio.Settings, current: () => boolean): Promise<void> {
+export async function prepareStill(uri: string): Promise<string | null> {
   const still = stillFor(uri);
-  if (!still.query_exists(null) && !(await extract(uri, still))) return;
-  if (!current()) return;
-  removeStillsExcept(still);
-  for (const key of ['picture-uri', 'picture-uri-dark']) {
-    if (background.get_string(key) !== still.get_uri()) background.set_string(key, still.get_uri());
-  }
+  if (!still.query_exists(null) && !(await extract(uri, still))) return null;
+  return still.get_uri();
 }

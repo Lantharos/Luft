@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Row, Section, Segmented, Select, Slider, Switch } from '@luft/ui';
+	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
+	import StyleSection from './StyleSection.svelte';
 	import WallpaperSection from './WallpaperSection.svelte';
 
 	type Interface = {
-		'color-scheme': string;
 		'text-scaling-factor': number;
 		'enable-animations': boolean;
 		'cursor-size': number;
@@ -19,27 +19,10 @@
 		{ value: 96, label: 'Largest' }
 	];
 
-	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'text-scaling-factor', 'enable-animations', 'cursor-size']);
-
-	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
+	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'enable-animations', 'cursor-size']);
 </script>
 
-<Section title="Style">
-	<Row title="Appearance" description="Apps that follow the system switch between light and dark with it">
-		<Segmented
-			label="Style"
-			options={[
-				{ value: 'light', label: 'Light' },
-				{ value: 'dark', label: 'Dark' }
-			]}
-			value={dark ? 'dark' : 'light'}
-			onchange={(style) => desktop.set('color-scheme', style === 'dark' ? 'prefer-dark' : 'default')}
-		/>
-	</Row>
-	<Row title="Accent color" description="Picked from your wallpaper and used across the desktop and apps">
-		<span class="h-6 w-6 rounded-full" style:background="var(--accent)"></span>
-	</Row>
-</Section>
+<StyleSection />
 
 <WallpaperSection />
 

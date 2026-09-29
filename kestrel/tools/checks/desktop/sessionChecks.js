@@ -139,7 +139,6 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(400);
   const clipboardPanel = actorNamed(global.stage, 'kestrel-clipboard');
   require(clipboardPanel.visible && clipboardPanel.get_first_child().child.get_n_children() === 2, 'clipboard history lists copied text');
-  await capture(`${output}/clipboard-history.png`);
   key(Clutter.KEY_Escape);
   await pause(300);
 

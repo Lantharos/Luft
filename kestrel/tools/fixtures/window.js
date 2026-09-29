@@ -10,7 +10,13 @@ app.connect('activate', () => {
       default_width: 680,
       default_height: 420,
   });
-  window.set_child(new Gtk.Label({ label: 'A window managed by Kestrel' }));
+  if (ARGV.includes('--entry')) {
+    const entry = new Gtk.Entry({ margin_top: 160, margin_start: 120, margin_end: 120, valign: Gtk.Align.START });
+    entry.connect('changed', () => { window.title = `Kestrel entry: ${entry.text}`; });
+    window.set_child(entry);
+  } else {
+    window.set_child(new Gtk.Label({ label: 'A window managed by Kestrel' }));
+  }
   window.present();
   }
 });

@@ -27,6 +27,7 @@ export const InputMethod = GObject.registerClass({
         this._hints = 0;
         this._purpose = 0;
         this._currentFocus = null;
+        this._cursorRect = null;
         this._preeditStr = '';
         this._preeditPos = 0;
         this._preeditAnchor = 0;
@@ -51,6 +52,14 @@ export const InputMethod = GObject.registerClass({
 
     get currentFocus() {
         return this._currentFocus;
+    }
+
+    get caret() {
+        if (!this._currentFocus || !this._cursorRect)
+            return null;
+        const {window, x, y} = this._cursorWindow;
+        const frame = window?.get_frame_rect() ?? {x, y};
+        return {...this._cursorRect, x: this._cursorRect.x + frame.x - x, y: this._cursorRect.y + frame.y - y};
     }
 
     _updateCapabilities() {
@@ -279,6 +288,7 @@ export const InputMethod = GObject.registerClass({
 
     vfunc_focus_out() {
         this._currentFocus = null;
+        this._cursorRect = null;
         if (this._context) {
             this._fullReset();
             this._context.focus_out();
@@ -309,11 +319,14 @@ export const InputMethod = GObject.registerClass({
     }
 
     vfunc_set_cursor_location(rect) {
+        this._cursorRect = {
+            x: rect.get_x(), y: rect.get_y(),
+            width: rect.get_width(), height: rect.get_height(),
+        };
+        const window = global.display.focus_window;
+        const {x, y} = window?.get_frame_rect() ?? {x: 0, y: 0};
+        this._cursorWindow = {window, x, y};
         if (this._context) {
-            this._cursorRect = {
-                x: rect.get_x(), y: rect.get_y(),
-                width: rect.get_width(), height: rect.get_height(),
-            };
             this._context.set_cursor_location(
                 this._cursorRect.x, this._cursorRect.y,
                 this._cursorRect.width, this._cursorRect.height);

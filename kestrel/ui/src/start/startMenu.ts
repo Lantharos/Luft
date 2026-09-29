@@ -9,6 +9,7 @@ import { blinkCaret } from '../shared/caret.js';
 import { StartGrid } from './grid.js';
 import { StartFooter } from './footer.js';
 import { StartSearch } from './search/search.js';
+import { appKey, launchHistory } from '../shared/launchHistory.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
@@ -118,6 +119,7 @@ export class StartMenu {
   }
 
   private launch(app: Gio.AppInfo): void {
+    launchHistory.record(appKey(app.get_id()!));
     const shellApp = this.appSystem.lookup_app(app.get_id() ?? '');
     if (shellApp) shellApp.activate();
     else app.launch([], null);

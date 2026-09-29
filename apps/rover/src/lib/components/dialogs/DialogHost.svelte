@@ -10,6 +10,7 @@
 	import { isDesktopRuntime } from '$lib/runtime';
 	import { settings } from '$lib/state/settings.svelte';
 	import CompressDialog from './archive/CompressDialog.svelte';
+	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import ConflictDialog from './conflict/ConflictDialog.svelte';
 	import PropertiesDialog from './properties/PropertiesDialog.svelte';
 	import BatchRenameDialog from './rename/BatchRenameDialog.svelte';
@@ -57,6 +58,9 @@
 	<BatchRenameDialog entries={dialog.entries} siblings={manager.entries} onclose={dialogs.close} />
 {:else if dialog?.kind === 'compress'}
 	<CompressDialog entries={dialog.entries} destination={dialog.destination} onclose={dialogs.close} />
+{:else if dialog?.kind === 'empty-trash'}
+	{@const { trashPath, emptied } = dialog}
+	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(emptied)} onclose={dialogs.close} />
 {/if}
 
 {#if search.open}

@@ -2,6 +2,7 @@
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import { showPathProperties } from '$lib/features/actions';
+	import { dialogs } from '$lib/features/dialogs.svelte';
 	import * as bookmarks from '$lib/file-manager/places/bookmarks';
 	import type { FileManager, PlaceMenuState, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
@@ -41,9 +42,8 @@
 		return manager.openTab(path!);
 	}
 
-	async function emptyTrash() {
-		await manager.actions.emptyTrash(null);
-		await trash.refresh();
+	function emptyTrash() {
+		dialogs.emptyTrash(null, trash.refresh);
 	}
 </script>
 

@@ -1,17 +1,19 @@
 import { listen } from '@lantharos/sabine';
 
-const ACCENT_CHANGED = 'kestrel.accent';
+const PALETTE_CHANGED = 'kestrel.palette';
 const SCHEME_CHANGED = 'appearance.scheme';
 
-interface Accent {
-	color: string;
+export interface Palette {
+	accent: string;
+	pureBlack: boolean;
+	colors: Record<string, string>;
 }
 
 export type Scheme = 'dark' | 'light';
 
 export interface Appearance {
 	translucent: boolean;
-	accent: Accent | null;
+	palette: Palette | null;
 	scheme: Scheme;
 }
 
@@ -26,16 +28,25 @@ class AppearanceState {
 	accent = $state<string | null>(null);
 	accentText = $derived(this.accent ? readableOn(this.accent) : null);
 	scheme = $state<Scheme>('dark');
+	pureBlack = $state(false);
+	colors = $state<Record<string, string>>({});
 
 	start(initial: Appearance) {
 		this.translucent = initial.translucent;
-		this.accent = initial.accent?.color ?? null;
 		this.scheme = initial.scheme;
+		if (initial.palette) this.receive(initial.palette);
 		const stops = [
-			listen<Accent>(ACCENT_CHANGED, ({ color }) => (this.accent = color)),
+			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
 			listen<Scheme>(SCHEME_CHANGED, (scheme) => (this.scheme = scheme))
 		];
 		return () => stops.forEach((stop) => stop());
+	}
+
+	private receive(palette: Palette) {
+		this.accent = palette.accent;
+		this.pureBlack = palette.pureBlack;
+		this.colors = palette.colors;
+		document.documentElement.toggleAttribute('data-black', palette.pureBlack);
 	}
 }
 

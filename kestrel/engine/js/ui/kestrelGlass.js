@@ -5,7 +5,26 @@ const EDGE_HIGHLIGHT = 0.14;
 const BRIGHT_DIM = 0.55;
 export const PILL = 999;
 
-export function blurSurface(actor, corners = 24) {
+const solidSurfaces = new Set();
+let solid = false;
+
+function makeSolid({actor, effect, corners}, enabled) {
+    effect.enabled = !enabled;
+    for (const name of ['kestrel-solid', `kestrel-solid-${corners}`]) {
+        if (enabled)
+            actor.add_style_class_name(name);
+        else
+            actor.remove_style_class_name(name);
+    }
+}
+
+export function setSolidSurfaces(enabled) {
+    solid = enabled;
+    for (const surface of solidSurfaces)
+        makeSolid(surface, enabled);
+}
+
+export function blurBackdrop(actor, corners) {
     const theme = St.ThemeContext.get_for_stage(global.stage);
     const effect = new Shell.BlurEffect({
         mode: Shell.BlurMode.BACKGROUND,
@@ -20,6 +39,15 @@ export function blurSurface(actor, corners = 24) {
         effect.radius = 30 * theme.scale_factor;
     });
     actor.connect('destroy', () => theme.disconnect(changed));
+    return effect;
+}
+
+export function blurSurface(actor, corners = 24) {
+    const surface = {actor, effect: blurBackdrop(actor, corners), corners};
+    solidSurfaces.add(surface);
+    if (solid)
+        makeSolid(surface, true);
+    actor.connect('destroy', () => solidSurfaces.delete(surface));
 }
 
 export function styleSurface(actor, corners = 24) {

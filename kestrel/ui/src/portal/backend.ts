@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { Rgb } from '../accent/color.js';
+import type { Rgb } from '../appearance/color.js';
 import { SCREENSHOT_XML, ScreenshotPortal } from './screenshot.js';
 import { SETTINGS_XML, SettingsPortal } from './settings.js';
 

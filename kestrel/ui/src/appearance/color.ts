@@ -2,10 +2,14 @@ export type Rgb = [number, number, number];
 type Oklab = [number, number, number];
 type Oklch = [number, number, number];
 
-export const ACCENT_TONE = 0.72;
-export const STRONG_TONE = 0.5;
-export const LIGHT_TONE = 0.8;
+export interface TonalPalette {
+  hue: number;
+  chroma: number;
+}
 
+export type Seed = TonalPalette;
+
+const ACCENT_TONE = 0.72;
 const HUE_BINS = 36;
 const HUE_WINDOW = 18;
 const MIN_LIGHTNESS = 0.25;
@@ -78,10 +82,30 @@ function gamutChroma(lightness: number, chroma: number, hue: number): number {
   return low;
 }
 
+const clampedLinear = (lightness: number, chroma: number, hue: number) =>
+  oklchToLinear([lightness, gamutChroma(lightness, chroma, hue), hue]).map(channel => Math.min(1, Math.max(0, channel)));
+
+const linearLuminance = ([red, green, blue]: number[]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+
 function fromOklch([lightness, chroma, hue]: Oklch): Rgb {
-  const linear = oklchToLinear([lightness, gamutChroma(lightness, chroma, hue), hue]);
-  return linear.map(channel => fromLinear(Math.min(1, Math.max(0, channel)))) as Rgb;
+  return clampedLinear(lightness, chroma, hue).map(fromLinear) as Rgb;
 }
+
+function withLuminance(hue: number, chroma: number, luminance: number): Rgb {
+  if (luminance <= 0) return [0, 0, 0];
+  if (luminance >= 1) return [255, 255, 255];
+  let low = 0, high = 1;
+  for (let step = 0; step < 24; step++) {
+    const middle = (low + high) / 2;
+    if (linearLuminance(clampedLinear(middle, chroma, hue)) < luminance) low = middle;
+    else high = middle;
+  }
+  return fromOklch([(low + high) / 2, chroma, hue]);
+}
+
+const luminanceOfTone = (tone: number) => tone > 8 ? ((tone + 16) / 116) ** 3 : tone / 903.2962962;
+
+export const atTone = ({ hue, chroma }: TonalPalette, tone: number): Rgb => withLuminance(hue, chroma, luminanceOfTone(tone));
 
 const hueDistance = (first: number, second: number) => {
   const difference = Math.abs(first - second) % 360;
@@ -90,11 +114,6 @@ const hueDistance = (first: number, second: number) => {
 
 export function toHex(color: Rgb): string {
   return `#${color.map(channel => channel.toString(16).padStart(2, '0')).join('')}`;
-}
-
-export function withTone(color: Rgb, tone: number): Rgb {
-  const [, chroma, hue] = toOklch(color);
-  return fromOklch([tone, chroma, hue]);
 }
 
 function dominantHue(colors: Oklch[]): number {
@@ -106,12 +125,12 @@ function dominantHue(colors: Oklch[]): number {
   return (best + 0.5) * 360 / HUE_BINS;
 }
 
-export function accentFromSamples(samples: Rgb[]): Rgb {
+export function seedFromSamples(samples: Rgb[]): Seed {
   const colors = samples.map(toOklch).filter(([lightness]) => lightness >= MIN_LIGHTNESS);
   const vivid = colors.filter(([, chroma]) => chroma >= MIN_CHROMA);
   if (!vivid.length) {
     const [a, b] = colors.map(oklabFromOklch).reduce(([sumA, sumB], [, a, b]) => [sumA + a, sumB + b], [0, 0]);
-    return fromOklch([ACCENT_TONE, NEUTRAL_CHROMA, hueOf(a, b)]);
+    return { hue: hueOf(a, b), chroma: NEUTRAL_CHROMA };
   }
   const center = dominantHue(vivid);
   let sumA = 0, sumB = 0, sumChroma = 0, sumWeight = 0;
@@ -124,13 +143,15 @@ export function accentFromSamples(samples: Rgb[]): Rgb {
     sumChroma += color[1] * weight;
     sumWeight += weight;
   }
-  const hue = hueOf(sumA, sumB);
-  const chroma = Math.min(ACCENT_CHROMA_CEILING, Math.max(ACCENT_CHROMA_FLOOR, sumChroma / sumWeight));
-  return fromOklch([ACCENT_TONE, chroma, hue]);
+  return {
+    hue: hueOf(sumA, sumB),
+    chroma: Math.min(ACCENT_CHROMA_CEILING, Math.max(ACCENT_CHROMA_FLOOR, sumChroma / sumWeight)),
+  };
 }
 
-export function namedAccent(color: Rgb): string {
-  const [, chroma, hue] = toOklch(color);
+export const accentColor = ({ hue, chroma }: Seed): Rgb => fromOklch([ACCENT_TONE, chroma, hue]);
+
+export function namedAccent({ hue, chroma }: Seed): string {
   if (chroma < ACCENT_CHROMA_FLOOR / 2) return 'slate';
   return NAMED_ACCENTS.reduce((best, entry) =>
     hueDistance(hue, toOklch(entry[1])[2]) < hueDistance(hue, toOklch(best[1])[2]) ? entry : best)[0];

@@ -19,7 +19,7 @@ import { NotificationCenter, type MessageTray } from './notifications/notificati
 import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
 import type { QuickSettingsSource } from './quickSettings/quickControls.js';
-import { AccentService } from './accent/service.js';
+import { AppearanceService } from './appearance/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
 import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
@@ -29,7 +29,7 @@ import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
-import type { Rgb } from './accent/color.js';
+import type { Rgb } from './appearance/color.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
@@ -87,7 +87,7 @@ class KestrelUi {
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private readonly portal = new PortalBackend();
-  readonly accent = new AccentService(color => this.portal.setAccent(color));
+  readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
   private readonly oomNotifier = new OomNotifier();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly globalShortcuts = new GlobalShortcutsProvider();
@@ -442,7 +442,7 @@ class KestrelUi {
     for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
     for (const disconnect of this.disconnectors) disconnect();
     this.panels.shutdown();
-    this.accent.destroy();
+    this.appearance.destroy();
     this.liveWallpaper.destroy();
     this.oomNotifier.destroy();
     this.launchFeedback.destroy();
@@ -465,12 +465,12 @@ let pendingWallpaper: Rgb[] | null = null;
 
 export function initialize(context: Context): void {
   currentUi = new KestrelUi(context);
-  if (pendingWallpaper) currentUi.accent.apply(pendingWallpaper);
+  if (pendingWallpaper) currentUi.appearance.apply(pendingWallpaper);
   pendingWallpaper = null;
 }
 
 export function wallpaperSampled(samples: Rgb[]): void {
-  if (currentUi) currentUi.accent.apply(samples);
+  if (currentUi) currentUi.appearance.apply(samples);
   else pendingWallpaper = samples;
 }
 

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { Rgb } from '../accent/color.js';
+import type { Rgb } from '../appearance/color.js';
 
 export const SETTINGS_XML = `<node><interface name="org.freedesktop.impl.portal.Settings">
   <method name="ReadAll"><arg type="as" direction="in"/><arg type="a{sa{sv}}" direction="out"/></method>

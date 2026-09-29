@@ -105,7 +105,7 @@ Single-row surfaces and controls are pills: the volume and brightness OSD, the w
 
 Modal dialogs rise in as they open and use a symbolic icon for their purpose above stable, left-aligned headings, with shared action buttons where the default action stands out. Authentication shows a small account row above the password field. Wi-Fi, VPN, keyring, and encrypted-drive forms keep their field labels visible while typing; inputs share the Start menu's glass treatment, caret, selection, and focus styling. Password visibility controls and accessible labels remain available. Audio-device choices use full-width rows. Session warnings and permission dialogs use the same typography and list styling.
 
-The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, a live wallpaper that pauses under a maximized window and ends when a picture is chosen, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not authenticate through GDM. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
+The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, the wallpaper palette and its contrast, colors for other apps written next to existing styles and removed again, Start in Pure black, a custom dark style schedule, a live wallpaper that pauses under a maximized window and ends when a picture is chosen, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not authenticate through GDM. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
 
 The development launcher loads resources, typelibs, libraries, and schemas from the build directory, without depending on an installed temporary prefix.
 
@@ -113,11 +113,84 @@ The development launcher loads resources, typelibs, libraries, and schemas from 
 
 Wallpapers are decoded once and kept at the size of the largest display instead of their original resolution, so large photos do not hold full-resolution copies in memory. Centered and tiled wallpapers keep their original size.
 
-Kestrel takes its accent color from the wallpaper's most vivid dominant hue and uses it for toggles that are on, slider fills, the focused app's taskbar indicator, today's date in the calendar, and the default action in system dialogs. Other apps can follow the same color:
+Kestrel takes its accent color from the wallpaper's most vivid dominant hue and uses it for toggles that are on, slider fills, the focused app's taskbar indicator, today's date in the calendar, and the default action in system dialogs. GTK and libadwaita apps also follow the closest named GNOME accent color, which Kestrel sets in `org.gnome.desktop.interface accent-color`.
 
-- GTK and libadwaita apps follow the closest named GNOME accent color, which Kestrel sets in `org.gnome.desktop.interface accent-color`.
-- The exact color is available on the session bus as the `AccentColor` property of `dev.lantharos.Kestrel.Appearance` at `/dev/lantharos/Kestrel/Appearance` on `dev.lantharos.Kestrel`, with a `PropertiesChanged` signal when it changes.
-- `~/.config/kestrel/appearance.json` holds `accentColor`, a darker `accentStrongColor` for filled controls with white text, and `accentName`. `~/.config/kestrel/appearance.css` defines `--kestrel-accent` and `--kestrel-accent-strong` for web views.
+### Wallpaper palette
+
+From the accent's hue and colorfulness Kestrel builds a full set of colors for light and for dark, recalculated whenever the wallpaper, the style, or Pure black changes. Every role sits at a fixed tone, measured as perceived lightness from 0 (black) to 100 (white), so the same role always has the same contrast whatever the wallpaper:
+
+| Role | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `primary`, `secondary`, `tertiary`, `error` | 40 | 80 | Filled controls, links, highlights. Secondary is a quieter version of the accent, tertiary turns its hue by 60°, error is a fixed red |
+| `onPrimary`, `onSecondary`, `onTertiary`, `onError` | 100 | 20 | Text and icons on the color above |
+| `primaryContainer` and the other `…Container` roles | 90 | 30 | Softer fills, such as selected rows |
+| `onPrimaryContainer` and the other `on…Container` roles | 10 | 90 | Text and icons on a container |
+| `surface` | 98 | 6 | Window background |
+| `surfaceDim`, `surfaceBright` | 87, 98 | 6, 24 | Backgrounds that sit lower or higher than `surface` |
+| `surfaceContainerLowest` … `surfaceContainerHighest` | 100, 96, 94, 92, 90 | 4, 10, 12, 17, 22 | Cards, sidebars, popovers and fields from lowest to highest |
+| `onSurface` | 10 | 90 | Main text |
+| `surfaceVariant`, `onSurfaceVariant` | 90, 30 | 30, 80 | Secondary surfaces and secondary text |
+| `outline` | 50 | 60 | Borders that need to be seen, such as field outlines |
+| `outlineVariant` | 80 | 30 | Decorative dividers |
+| `inverseSurface`, `inverseOnSurface`, `inversePrimary` | 20, 95, 80 | 90, 20, 40 | Tooltips and snackbars that stand out from the window |
+
+Surfaces carry a faint tint of the accent. With Pure black on, the dark `surface`, `surfaceDim` and `surfaceContainerLowest` are `#000000` and the other containers step up from there (`surfaceContainerLow` 4, `surfaceContainer` 8, `surfaceContainerHigh` 12, `surfaceContainerHighest` 17, `surfaceBright` 18).
+
+Contrast is guaranteed by the tones: `onSurface`, `onSurfaceVariant`, `primary`, `secondary`, `tertiary` and `error` reach at least 4.5:1 against every surface and container of their scheme, every `on…` role reaches at least 4.5:1 against its color, and `outline` reaches at least 3:1 against every surface. `outlineVariant` is decorative and has no contrast guarantee.
+
+Terminals get their own sixteen colors: the usual red, green, yellow, blue, magenta and cyan, each nudged up to 15° toward the accent's hue, plus black and white from the tinted neutrals. Against the terminal background, the foreground and colors 1 to 6, 8 and 9 to 14 reach at least 4.5:1 in both schemes, and so do 7 and 15 in dark. Color 0 is meant for backgrounds, and 7 and 15 are light greys in the light scheme. The cursor uses `primary` with `onPrimary` text, and selections use `primaryContainer` with `onPrimaryContainer` text.
+
+#### Reading the palette
+
+On the session bus, `dev.lantharos.Kestrel` exports `dev.lantharos.Kestrel.Appearance` at `/dev/lantharos/Kestrel/Appearance` with these read-only properties, and emits `PropertiesChanged` when they change:
+
+| Property | Type | Value |
+| --- | --- | --- |
+| `AccentColor` | `s` | The wallpaper accent, `#rrggbb` |
+| `Dark` | `b` | Whether the dark style is on |
+| `PureBlack` | `b` | Whether Pure black is on |
+| `Colors` | `a{ss}` | Every role above for the current style, by name |
+| `TerminalColors` | `a{ss}` | Terminal colors for the current style |
+| `LightColors`, `DarkColors` | `a{ss}` | Roles for each style, whichever is on |
+| `LightTerminalColors`, `DarkTerminalColors` | `a{ss}` | Terminal colors for each style |
+
+Terminal colors are keyed `foreground`, `background`, `cursor`, `cursorText`, `selectionBackground`, `selectionForeground` and `color0` to `color15`. All values are `#rrggbb`.
+
+`~/.config/kestrel/appearance.json` holds the same data for apps that would rather read a file, and is rewritten shortly after each change:
+
+```json
+{
+  "accentColor": "#6f9bf2",
+  "accentName": "blue",
+  "dark": true,
+  "pureBlack": false,
+  "colors": { "primary": "#a9c7ff", "onPrimary": "#07305f", "surface": "#10141a", "…": "…" },
+  "terminal": { "foreground": "#e0e2ea", "background": "#10141a", "color0": "#2d3138", "…": "…" },
+  "schemes": {
+    "light": { "colors": { "…": "…" }, "terminal": { "…": "…" } },
+    "dark": { "colors": { "…": "…" }, "terminal": { "…": "…" } }
+  }
+}
+```
+
+`colors` and `terminal` follow the current style. Terminal apps can read `terminal` from this file, or `TerminalColors` over D-Bus to follow changes live. `~/.config/kestrel/appearance.css` defines `--kestrel-accent` and every role as a kebab-case custom property, such as `--kestrel-primary` and `--kestrel-on-surface-variant`, with the dark values inside `@media (prefers-color-scheme: dark)`, for web views.
+
+### Matching other apps
+
+Match other apps to the wallpaper in Settings (`theme-apps` in `dev.lantharos.kestrel`) generates colors for apps that Kestrel does not draw, and updates them shortly after the palette changes. Kestrel only writes inside a block that starts with a `Kestrel wallpaper colors` comment, or files named Kestrel, so anything else in these files is left alone. Turning it off removes the blocks and files again.
+
+- GTK 4 and libadwaita: a block at the top of `~/.config/gtk-4.0/gtk.css` sets the accent, window, view, header bar, sidebar, card, dialog and popover colors for both styles. Apps pick it up when they next start and switch between light and dark on their own.
+- GTK 3: a block at the top of `~/.config/gtk-3.0/gtk.css` defines the same named colors for the current style, which themes such as adw-gtk3 use.
+- Qt: `~/.config/qt6ct/colors/Kestrel.conf` is a palette for qt6ct, and `~/.local/share/color-schemes/Kestrel.colors` is a KDE color scheme. Choose Kestrel in qt6ct, with `QT_QPA_PLATFORMTHEME=qt6ct`, or in KDE's color settings. Both follow the current style.
+- Ghostty: `Kestrel Light` and `Kestrel Dark` themes in `~/.config/ghostty/themes`, and a block at the top of the Ghostty config that selects them with `theme = light:Kestrel Light,dark:Kestrel Dark`. Colors set further down the config still win. Running Ghostty windows reload when the colors change (Ghostty 1.2 or newer).
+
+### Dark style schedule
+
+Settings can switch the dark style on and off by itself (`dark-schedule` in `dev.lantharos.kestrel`): `sunset` goes dark at sunset and light at sunrise, and `custom` uses `dark-schedule-from` and `dark-schedule-to`, in hours of local time. For sunset and sunrise Kestrel asks for the city-level location once when the schedule starts and after each resume, when location services are on; until then, or without them, it uses the main city of the time zone, and falls back to the custom hours when neither is known. Kestrel sets a single timer for the next change instead of checking the time, catches up on changes it slept through after a resume, and leaves a style you picked yourself in place until the next change.
+
+### Pure black
+
+Pure black (`pure-black` in `dev.lantharos.kestrel`) is for OLED displays. Kestrel's panel, Start, Quick Settings, notifications, menus, dialogs, and other glass surfaces turn solid black and stop blurring what is behind them; surfaces inside other surfaces, such as notifications in the notification center, are a very dark grey so they stay apart. Luft apps turn their dark backgrounds black, and the generated dark colors for other apps use black surfaces.
 
 ### Live wallpapers
 

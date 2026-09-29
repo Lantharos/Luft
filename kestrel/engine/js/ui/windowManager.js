@@ -22,7 +22,7 @@ import * as IBusManager from '../misc/ibusManager.js';
 import * as WorkspaceAnimation from './workspaceAnimation.js';
 
 import * as Main from './main.js';
-import {blurSurface} from './kestrelGlass.js';
+import {blurBackdrop} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'dev.lantharos.kestrel.keybindings';
@@ -398,7 +398,7 @@ export const TilePreview = GObject.registerClass(
 class TilePreview extends St.Widget {
     _init() {
         super._init({style_class: 'tile-preview'});
-        blurSurface(this, TILE_PREVIEW_RADIUS);
+        blurBackdrop(this, TILE_PREVIEW_RADIUS);
         global.window_group.add_child(this);
 
         this._reset();

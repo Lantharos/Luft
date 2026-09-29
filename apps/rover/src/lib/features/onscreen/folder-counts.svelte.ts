@@ -3,9 +3,9 @@ import { previewEntries } from '$lib/file-manager/preview';
 import { isDesktopRuntime } from '$lib/runtime';
 import { settings } from '$lib/state/settings.svelte';
 import type { FileEntry } from '$lib/types';
-import * as api from './api';
-import { OnScreen } from './on-screen';
-import type { CountBatch } from './types';
+import * as api from '../api';
+import { OnScreen } from './tracker';
+import type { CountBatch } from '../types';
 
 const REMEMBERED = 2000;
 

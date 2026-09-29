@@ -3,7 +3,7 @@
 	import type { Attachment } from 'svelte/attachments';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
-	import { folderCounts } from '$lib/features/folder-counts.svelte';
+	import { folderCounts } from '$lib/features/onscreen/folder-counts.svelte';
 	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import { DRAFT_PATH } from '$lib/file-manager/view/draft';
 	import { entryClasses, entryContext, entryProps } from '$lib/file-manager/view/entry-props';

@@ -3,9 +3,9 @@ import { SvelteMap } from 'svelte/reactivity';
 import { isDesktopRuntime, localFileSource } from '$lib/runtime';
 import type { FileEntry } from '$lib/types';
 import { isImage } from '$lib/utils/file-kinds';
-import * as api from './api';
-import { OnScreen } from './on-screen';
-import type { ThumbnailBatch, ThumbnailSize } from './types';
+import * as api from '../api';
+import { OnScreen } from './tracker';
+import type { ThumbnailBatch, ThumbnailSize } from '../types';
 
 const SIZES: [number, ThumbnailSize][] = [
 	[128, 'normal'],

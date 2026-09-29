@@ -1,4 +1,4 @@
-import { thumbnails } from '$lib/features/thumbnails.svelte';
+import { thumbnails } from '$lib/features/onscreen/thumbnails.svelte';
 import type { FileEntry } from '$lib/types';
 import { mayBeTransparent } from '$lib/utils/file-kinds';
 

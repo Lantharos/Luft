@@ -15,12 +15,12 @@ export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
 
 export { default as ContextMenu } from './menus/ContextMenu.svelte';
-export { default as MenuItem } from './menus/MenuItem.svelte';
 export { default as MenuButton } from './menus/MenuButton.svelte';
+export { default as MenuItem } from './menus/MenuItem.svelte';
 export { default as MenuSeparator } from './menus/MenuSeparator.svelte';
 export { default as Popover } from './menus/Popover.svelte';
-
 export { tooltip } from './menus/tooltip';
+
 export { default as ActionRow } from './rows/ActionRow.svelte';
 export { default as ItemRow } from './rows/ItemRow.svelte';
 export { default as Row } from './rows/Row.svelte';

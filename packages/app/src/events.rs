@@ -11,10 +11,10 @@ impl Events {
         let _ = self.0.set(emitter);
     }
 
-    pub fn emit(&self, name: &str, payload: impl Serialize) {
+    pub fn emit(&self, name: &str, payload: impl Serialize) -> bool {
         let (Some(emitter), Ok(payload)) = (self.0.get(), serde_json::to_value(payload)) else {
-            return;
+            return false;
         };
-        emitter.emit(name, payload);
+        emitter.emit(name, payload)
     }
 }

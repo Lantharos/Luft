@@ -14,6 +14,7 @@
 	};
 	type Kestrel = {
 		'live-wallpaper': string;
+		'live-wallpaper-dark': string;
 	};
 
 	const FIT_OPTIONS = [
@@ -26,12 +27,16 @@
 	];
 
 	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark', 'picture-options']);
-	const kestrel = useSettings<Kestrel>('dev.lantharos.kestrel', ['live-wallpaper']);
+	const kestrel = useSettings<Kestrel>('dev.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark']);
+	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
 
 	let found = $state<Wallpaper[] | null>(null);
 
-	let live = $derived(kestrel.values['live-wallpaper'] ?? '');
-	let current = $derived(uriToPath(live || (background.values['picture-uri'] ?? '')));
+	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
+	let pictureKey = $derived<'picture-uri' | 'picture-uri-dark'>(dark ? 'picture-uri-dark' : 'picture-uri');
+	let liveKey = $derived<keyof Kestrel>(dark ? 'live-wallpaper-dark' : 'live-wallpaper');
+	let live = $derived(kestrel.values[liveKey] ?? '');
+	let current = $derived(uriToPath(live || (background.values[pictureKey] ?? '')));
 	let available = $derived(
 		current && found && !found.some((wallpaper) => wallpaper.path === current)
 			? [{ path: current, name: 'Current wallpaper', live: !!live }, ...found]
@@ -49,19 +54,18 @@
 	async function choose(wallpaper: Wallpaper) {
 		const uri = pathToUri(wallpaper.path);
 		if (wallpaper.live) {
-			await kestrel.set('live-wallpaper', uri);
+			await kestrel.set(liveKey, uri);
 			return;
 		}
-		await background.set('picture-uri', uri);
-		await background.set('picture-uri-dark', uri);
-		await kestrel.set('live-wallpaper', '');
+		await background.set(pictureKey, uri);
+		await kestrel.set(liveKey, '');
 	}
 
 	void wallpapers().then((list) => (found = list));
 	onDestroy(onWallpapersChanged((list) => (found = list)));
 </script>
 
-<Section title="Wallpaper">
+<Section title="Wallpaper" description={dark ? 'Shown while the dark style is on' : 'Shown while the light style is on'}>
 	{#if found?.length === 0}
 		<p class="empty">Images and videos in the Wallpapers folder in your Pictures show up here.</p>
 	{/if}

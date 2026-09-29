@@ -5,7 +5,9 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const VIDEO = 'videotestsrc pattern=ball num-buffers=90 ! video/x-raw,width=1280,height=720,framerate=30/1 ! x264enc ! mp4mux';
+import {checkWallpaperModes} from './wallpaperModeChecks.js';
+
+const VIDEO = 'num-buffers=90 ! video/x-raw,width=1280,height=720,framerate=30/1 ! x264enc ! mp4mux';
 
 function run(argv) {
   const process = Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
@@ -37,12 +39,19 @@ export async function checkLiveWallpaper({pause, actorNamed}) {
     return frames;
   };
 
-  const video = Gio.File.new_for_path(`${GLib.getenv('XDG_CACHE_HOME')}/live-wallpaper-check.mp4`);
-  await run(['gst-launch-1.0', '-q', ...VIDEO.split(' '), '!', 'filesink', `location=${video.get_path()}`]);
+  const makeVideo = async (pattern, name) => {
+    const file = Gio.File.new_for_path(`${GLib.getenv('XDG_CACHE_HOME')}/live-wallpaper-${name}.mp4`);
+    await run(['gst-launch-1.0', '-q', 'videotestsrc', `pattern=${pattern}`, ...VIDEO.split(' '), '!', 'filesink', `location=${file.get_path()}`]);
+    return file;
+  };
+  const video = await makeVideo('ball', 'light');
   const kestrel = new Gio.Settings({schema_id: 'dev.lantharos.kestrel'});
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+  const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+  const colorScheme = interfaceSettings.get_string('color-scheme');
   const picture = background.get_string('picture-uri');
   const darkPicture = background.get_string('picture-uri-dark');
+  interfaceSettings.set_string('color-scheme', 'default');
 
   kestrel.set_string('live-wallpaper', video.get_uri());
   await pause(2500);
@@ -60,6 +69,7 @@ export async function checkLiveWallpaper({pause, actorNamed}) {
     !descendants(panel).some(actor => actor.name?.includes('Wallpaper')), 'the video stays out of the taskbar and window switchers');
   const still = background.get_string('picture-uri');
   require(still !== picture && Gio.File.new_for_uri(still).query_exists(null), 'the lock screen and task view get a still frame');
+  require(background.get_string('picture-uri-dark') === darkPicture, 'the dark wallpaper stays as it was');
   const [x, y] = [monitors[0].x + monitors[0].width / 2, monitors[0].y + monitors[0].height / 2];
   require(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y) instanceof Meta.BackgroundActor, 'clicks pass through the video to the desktop');
   require(await framesPerSecond(monitors[0]) >= 10, 'the video plays');
@@ -89,9 +99,12 @@ export async function checkLiveWallpaper({pause, actorNamed}) {
   await pause(600);
   require(!actors.some(actor => actor.meta_window === global.display.focus_window), 'the video never takes focus');
 
+  await checkWallpaperModes({pause, require, wallpapers, video: makeVideo, darkPicture});
+
   background.set_string('picture-uri', picture);
   background.set_string('picture-uri-dark', darkPicture);
   await pause(900);
-  require(kestrel.get_string('live-wallpaper') === '' && wallpapers().length === 0, 'choosing a picture ends the live wallpaper');
+  require(kestrel.get_string('live-wallpaper') === '' && wallpapers().every(actor => actor.opacity === 0), 'choosing a picture ends the live wallpaper');
+  interfaceSettings.set_string('color-scheme', colorScheme);
   video.delete(null);
 }

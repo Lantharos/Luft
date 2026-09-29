@@ -5,6 +5,7 @@
 	import { Row, Section, Select } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { addWallpapers, onWallpapersChanged, openFolder, wallpapers, type Wallpaper } from './api';
+	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
 	import WallpaperTile from './WallpaperTile.svelte';
 
 	type Background = {
@@ -82,6 +83,7 @@
 	<Row title="Fit" description="How wallpapers that don't match the display's shape are shown">
 		<Select label="Fit" options={FIT_OPTIONS} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
 	</Row>
+	<LiveWallpaperOnBattery />
 </Section>
 
 <style>

@@ -16,11 +16,14 @@ const PROFILES: Source = { bus: Gio.BusType.SYSTEM, name: 'org.freedesktop.UPowe
 
 export class PlaybackConditions {
   private readonly proxies = new Map<Source, Gio.DBusProxy>();
+  private readonly settings = new Gio.Settings({ schema_id: 'dev.lantharos.kestrel' });
   private readonly disconnectors: (() => void)[] = [];
   private readonly cancellable = new Gio.Cancellable();
 
   constructor(private readonly changed: () => void) {
     for (const source of [DISPLAY, POWER, PROFILES]) this.watch(source);
+    const id = this.settings.connect('changed::live-wallpaper-on-battery', () => this.changed());
+    this.disconnectors.push(() => this.settings.disconnect(id));
   }
 
   private watch(source: Source): void {
@@ -45,7 +48,7 @@ export class PlaybackConditions {
 
   get allowed(): boolean {
     return !DISPLAY_OFF_MODES.includes(this.property<number>(DISPLAY, 'PowerSaveMode') ?? 0) &&
-      !this.property<boolean>(POWER, 'OnBattery') &&
+      (this.settings.get_boolean('live-wallpaper-on-battery') || !this.property<boolean>(POWER, 'OnBattery')) &&
       this.property<string>(PROFILES, 'ActiveProfile') !== 'power-saver';
   }
 

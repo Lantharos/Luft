@@ -1,6 +1,6 @@
 # @luft/ui
 
-The shared look of Luft's apps: design tokens, base styles, the Open Runde font, window chrome and the controls Rover and Settings are built from. Components ship as Svelte source, so apps compile them together with their own code.
+The shared look of Luft's apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome and the controls Rover and Settings are built from. Components ship as Svelte source, so apps compile them together with their own code.
 
 ## Setup
 
@@ -29,7 +29,7 @@ export default defineConfig({
 });
 ```
 
-Preload the regular weight in `app.html` so text shows up without waiting for the font:
+Preload the regular weight in `app.html` so text shows up without waiting for the font, and do the same for `MapleMono-NF-Regular.woff2` in apps that show code from the start:
 
 ```html
 <link rel="preload" href="/fonts/OpenRunde-Regular.woff2" as="font" type="font/woff2" crossorigin />
@@ -93,7 +93,7 @@ The `tooltip(text)` attachment shows a small label under an element after a shor
 
 ## Tokens
 
-Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`. The palette is dark only. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
+Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark only. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
 
 ## Checks
 
@@ -103,4 +103,4 @@ bun run check
 
 ## License
 
-Open Runde is licensed under the SIL Open Font License, included in `fonts/OFL.txt`.
+Open Runde is licensed under the SIL Open Font License, included in `fonts/OFL.txt`. Maple Mono is licensed under the SIL Open Font License, included in `fonts/MapleMono-OFL.txt`.

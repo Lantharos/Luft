@@ -21,3 +21,35 @@
 	font-display: block;
 	src: url('/fonts/OpenRunde-Semibold.woff2') format('woff2');
 }
+
+@font-face {
+	font-family: 'Maple Mono NF';
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url('/fonts/MapleMono-NF-Regular.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Maple Mono NF';
+	font-style: italic;
+	font-weight: 400;
+	font-display: block;
+	src: url('/fonts/MapleMono-NF-Italic.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Maple Mono NF';
+	font-style: normal;
+	font-weight: 600 700;
+	font-display: block;
+	src: url('/fonts/MapleMono-NF-Bold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Maple Mono NF';
+	font-style: italic;
+	font-weight: 600 700;
+	font-display: block;
+	src: url('/fonts/MapleMono-NF-BoldItalic.woff2') format('woff2');
+}

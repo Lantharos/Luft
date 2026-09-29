@@ -134,13 +134,28 @@ export interface AppState extends Appearance {
 	userDirs: UserDirs | null;
 }
 
-export interface TabHistoryEntry {
+export interface ViewMemory {
+	scroll: number;
+	selection: string[];
+	cursor: string | null;
+}
+
+export interface TabPlace {
 	path: string;
 	title: string;
 	view: SidebarView;
 }
 
-export interface Tab extends TabHistoryEntry {
+export interface TabHistoryEntry extends TabPlace {
+	memory?: ViewMemory;
+}
+
+export interface Arrival {
+	from: string;
+	memory: ViewMemory | null;
+}
+
+export interface Tab extends TabPlace {
 	id: string;
 	history: TabHistoryEntry[];
 	historyIndex: number;

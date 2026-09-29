@@ -45,8 +45,8 @@ export function showProperties(manager: FileManager, entries: FileEntry[]) {
 	dialogs.properties(entries);
 }
 
-export function showFolderProperties(manager: FileManager) {
-	getFileInfo(manager.currentPath)
+export function showPathProperties(manager: FileManager, path: string) {
+	getFileInfo(path)
 		.then((entry) => dialogs.properties([entry]))
 		.catch(manager.notify);
 }

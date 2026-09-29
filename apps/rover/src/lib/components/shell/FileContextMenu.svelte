@@ -91,7 +91,7 @@
 		<MenuSeparator />
 		{@render item('search', 'Search in this folder', () => tools.searchHere(manager))}
 		{@render item('terminal', 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
-		{@render item('info', 'Properties', () => tools.showFolderProperties(manager))}
+		{@render item('info', 'Properties', () => tools.showPathProperties(manager, manager.currentPath))}
 		{#if offersVcs}
 			<MenuSeparator />
 			{@render item('code', 'View project changes', () => viewChanges(null))}

@@ -11,6 +11,7 @@
 	import FileContextMenu from '$lib/components/shell/FileContextMenu.svelte';
 	import OperationDock from '$lib/components/shell/OperationDock.svelte';
 	import StatusBar from '$lib/components/shell/StatusBar.svelte';
+	import PlaceMenu from '$lib/components/sidebar/PlaceMenu.svelte';
 	import Sidebar from '$lib/components/sidebar/Sidebar.svelte';
 	import TabStrip from '$lib/components/toolbar/TabStrip.svelte';
 	import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
@@ -92,7 +93,7 @@
 
 	function dismissContextMenu(event: Event) {
 		if (event.target instanceof Element && event.target.closest('[role="menu"]')) return;
-		manager.contextMenu = null;
+		manager.closeMenus();
 	}
 </script>
 
@@ -103,6 +104,7 @@
 	oncontextmenu={dismissContextMenu}
 	onfocus={refreshOnFocus}
 	onmouseup={manager.handleNavigationButton}
+	onpointermove={drag.settle}
 />
 
 <div class="h-[100dvh] w-screen min-w-[800px] overflow-hidden bg-transparent text-[var(--text)]">
@@ -134,6 +136,11 @@
 		{#if manager.contextMenu && !chooser}
 			{#key manager.contextMenu}
 				<FileContextMenu menu={manager.contextMenu} {manager} {view} {vcs} />
+			{/key}
+		{/if}
+		{#if manager.placeMenu && !chooser}
+			{#key manager.placeMenu}
+				<PlaceMenu menu={manager.placeMenu} {manager} {trash} />
 			{/key}
 		{/if}
 

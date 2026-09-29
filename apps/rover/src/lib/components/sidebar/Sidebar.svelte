@@ -3,7 +3,7 @@
 	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dropKey, TRASH_DROP_PATH } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import { userFolders, type TrashCounter } from '$lib/file-manager/places.svelte';
 	import { isInside } from '$lib/utils/paths';
 	import DriveItem from './DriveItem.svelte';
@@ -45,8 +45,14 @@
 		open();
 	}
 
+	function showMenu(event: MouseEvent, place: SidebarPlace) {
+		if (chooser) event.preventDefault();
+		else manager.openPlaceMenu(event, place);
+	}
+
 	function folderItem(path: string) {
 		return {
+			oncontextmenu: (event: MouseEvent) => showMenu(event, { kind: 'folder', path }),
 			active: browsing && manager.currentPath === path,
 			dropping: drag.target?.key === key(path),
 			onclick: () => manager.navigate(path),
@@ -74,6 +80,7 @@
 				active={manager.view === 'recent'}
 				onclick={() => manager.showView('recent')}
 				onauxclick={(event) => openInTab(event, () => manager.openViewInTab('recent'))}
+				oncontextmenu={(event) => showMenu(event, { kind: 'recent' })}
 			/>
 			{#each folders as folder (folder.path)}
 				<SidebarItem icon={folder.icon} label={folder.label} {...folderItem(folder.path)} />
@@ -86,6 +93,7 @@
 					dropping={drag.target?.key === key(TRASH_DROP_PATH)}
 					onclick={() => manager.showView('trash')}
 					onauxclick={(event) => openInTab(event, () => manager.openViewInTab('trash'))}
+					oncontextmenu={(event) => showMenu(event, { kind: 'trash' })}
 					ondragover={(event) => drag.overTrash(event, key(TRASH_DROP_PATH))}
 					ondragleave={drag.leave}
 					ondrop={(event) => drag.dropOnTrash(event)}
@@ -101,12 +109,12 @@
 			{/if}
 		</div>
 
-		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} />
+		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} onmenu={showMenu} />
 
 		{#if manager.drives.ordered.length > 0}
 			<div class="sidebar-group">
 				{#each manager.drives.ordered as drive (drive.mount_point)}
-					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} />
+					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
 			</div>
 		{/if}

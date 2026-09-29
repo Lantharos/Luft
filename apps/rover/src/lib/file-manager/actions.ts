@@ -80,7 +80,7 @@ export class FileActions {
 
 	emptyTrash = async (trashPath: string | null) => {
 		await api.emptyTrash(trashPath).catch(this.#manager.notify);
-		await this.#manager.loadTrash();
+		if (this.#manager.view === 'trash') await this.#manager.loadTrash();
 	};
 
 	#hideEntries(paths: string[]) {

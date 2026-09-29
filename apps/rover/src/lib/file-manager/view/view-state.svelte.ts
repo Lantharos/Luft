@@ -1,6 +1,6 @@
 import { tick } from 'svelte';
 import { settings } from '$lib/state/settings.svelte';
-import type { FileEntry } from '$lib/types';
+import type { Arrival, FileEntry, ViewMemory } from '$lib/types';
 import { isInside, joinPath, trimTrailingSlash } from '$lib/utils/paths';
 import type { ChooserState } from '../chooser.svelte';
 import type { FileManager } from '../manager.svelte';
@@ -11,6 +11,8 @@ export interface Viewport {
 	columns(): number;
 	pageRows(): number;
 	reveal(index: number, center?: boolean): void;
+	scrollTop(): number;
+	scrollTo(top: number): void;
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'first' | 'last' | 'page-up' | 'page-down';
@@ -39,6 +41,7 @@ export class ViewState {
 		this.#chooser = chooser;
 		this.indexByPath = $derived(new Map(manager.displayEntries.map((entry, index) => [entry.path, index])));
 		this.focused = $derived(this.#entryAt(this.cursor));
+		manager.captureViewWith(this.#capture);
 	}
 
 	get detailsOpen() {
@@ -161,10 +164,30 @@ export class ViewState {
 		this.quickLook = true;
 	};
 
-	followListing = (previous: string, current: string) => {
+	arrive = ({ from, memory }: Arrival) => {
 		this.cursor = null;
 		this.#anchor = null;
 		this.quickLook = false;
+		if (memory) this.#recall(memory);
+		else if (this.#manager.view === 'home') this.#followUp(from, this.#manager.currentPath);
+	};
+
+	#capture = (): ViewMemory | null => {
+		if (!this.#viewport) return null;
+		return { scroll: this.#viewport.scrollTop(), selection: [...this.#manager.selection], cursor: this.cursor };
+	};
+
+	#recall(memory: ViewMemory) {
+		const selection = memory.selection.filter((path) => this.indexByPath.has(path));
+		if (selection.length > 0) this.select(selection);
+		if (memory.cursor && this.indexByPath.has(memory.cursor)) {
+			this.cursor = memory.cursor;
+			this.#anchor = memory.cursor;
+		}
+		void tick().then(() => this.#viewport?.scrollTo(memory.scroll));
+	}
+
+	#followUp(previous: string, current: string) {
 		const base = trimTrailingSlash(current);
 		if (previous === current || !isInside(previous, base)) return;
 		const [child] = previous.slice(base.length).split('/').filter(Boolean);
@@ -175,7 +198,7 @@ export class ViewState {
 		this.cursor = path;
 		this.#anchor = path;
 		void tick().then(() => this.#viewport?.reveal(index, true));
-	};
+	}
 
 	#offset(direction: Direction, count: number) {
 		const columns = this.#manager.viewMode === 'grid' ? (this.#viewport?.columns() ?? 1) : 1;

@@ -6,10 +6,13 @@ import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from './data
 import { dropKey, dropTargetFromPoint, TRASH_DROP_PATH, tabDropKey, type DropTarget } from './drop-targets';
 
 const TAB_SWITCH_DELAY_MS = 450;
+const SPRING_DELAY_MS = 700;
+const SPRING_SCOPES = ['entry:', 'sidebar:', 'pathbar:'];
 
 export class DragController {
 	#manager: FileManager;
 	#pendingTab: { id: string; timer: ReturnType<typeof setTimeout> } | null = null;
+	#spring: { key: string; timer: ReturnType<typeof setTimeout> } | null = null;
 	#committed = false;
 
 	dragging = $state(false);
@@ -39,6 +42,11 @@ export class DragController {
 		this.paths = [];
 		this.target = null;
 		this.#clearHoverTab();
+		this.#relaxSpring();
+	};
+
+	settle = () => {
+		if (this.dragging) this.end();
 	};
 
 	leave = () => {
@@ -47,7 +55,7 @@ export class DragController {
 
 	overEntry = (event: DragEvent, entry?: FileEntry, key?: string) => {
 		if (!this.#carriesPaths(event)) return;
-		if (entry && (!entry.is_dir || (this.dragging && this.#manager.selection.has(entry.path)))) return;
+		if (entry && (!entry.is_dir || (this.dragging && this.paths.includes(entry.path)))) return;
 		const path = entry?.path ?? this.#manager.currentPath;
 		this.#accept(event, { path, key: key ?? dropKey('path', path) }, this.#dropEffect(event));
 	};
@@ -102,6 +110,7 @@ export class DragController {
 		if (event.phase !== 'drop') {
 			this.target = target && accepts(target, event.paths) ? target : null;
 			this.#scheduleTabSwitch(target?.tabId ?? null);
+			this.#prime(this.target);
 			return;
 		}
 		const internal = event.internal || this.dragging;
@@ -126,6 +135,29 @@ export class DragController {
 		event.stopPropagation();
 		this.target = target;
 		if (event.dataTransfer) event.dataTransfer.dropEffect = effect;
+		this.#prime(target);
+	}
+
+	#prime(target: DropTarget | null) {
+		const manager = this.#manager;
+		const springs = target && SPRING_SCOPES.some((scope) => target.key.startsWith(scope));
+		const here = target && manager.view === 'home' && target.path === manager.currentPath;
+		if (!springs || here) return this.#relaxSpring();
+		const { key, path } = target;
+		if (this.#spring?.key === key) return;
+		this.#relaxSpring();
+		this.#spring = {
+			key,
+			timer: setTimeout(() => {
+				this.#spring = null;
+				if (this.target?.key === key) void manager.navigate(path);
+			}, SPRING_DELAY_MS)
+		};
+	}
+
+	#relaxSpring() {
+		if (this.#spring) clearTimeout(this.#spring.timer);
+		this.#spring = null;
 	}
 
 	#claim() {

@@ -6,16 +6,19 @@ import { settings } from '$lib/state/settings.svelte';
 import { Tabs } from '$lib/state/tabs.svelte';
 import type {
 	AppState,
+	Arrival,
 	ClipboardState,
 	DriveInfo,
 	FileEntry,
 	InlineDraft,
 	Operation,
+	PinnedFolder,
 	SidebarView,
 	SortBy,
 	TabHistoryEntry,
 	TrashContents,
 	UserDirs,
+	ViewMemory,
 	ViewMode
 } from '$lib/types';
 import { errorMessage } from '$lib/utils/format';
@@ -28,6 +31,13 @@ import { viewModeForPath } from './listing/view-modes';
 import { previewDrives, previewEntries, previewRecent, previewTrash, previewUserDirs } from './preview';
 
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
+export type SidebarPlace =
+	| { kind: 'folder'; path: string }
+	| { kind: 'favorite'; bookmark: PinnedFolder }
+	| { kind: 'drive'; drive: DriveInfo }
+	| { kind: 'recent' }
+	| { kind: 'trash' };
+export type PlaceMenuState = { x: number; y: number; place: SidebarPlace };
 
 const DUPLICATE_EVENT_MS = 120;
 const NOTICE_MS = 4000;
@@ -55,9 +65,11 @@ export class FileManager {
 	viewMode = $state<ViewMode>('list');
 	draft = $state<InlineDraft | null>(null);
 	contextMenu = $state<ContextMenuState | null>(null);
+	placeMenu = $state.raw<PlaceMenuState | null>(null);
 	clipboard = $state.raw<ClipboardState>({ items: [], operation: null });
 	notice = $state<string | null>(null);
 	operations = $state.raw<Operation[]>([]);
+	arrival = $state.raw<Arrival | null>(null);
 
 	displayEntries = $derived(
 		visibleEntries(
@@ -70,10 +82,16 @@ export class FileManager {
 	);
 	pathSegments = $derived(pathSegments(this.currentPath));
 
-	#lastContextMenu = { x: 0, y: 0, path: null as string | null, at: 0 };
+	#lastContextMenu = { x: 0, y: 0, key: null as unknown, at: 0 };
 	#lastNavigationButton = { button: 0, at: 0 };
 	#noticeTimer: ReturnType<typeof setTimeout> | undefined;
 	#finishedOperations = new Set<string>();
+	#capture: () => ViewMemory | null = () => null;
+	#recalling: ViewMemory | null = null;
+
+	captureViewWith = (capture: () => ViewMemory | null) => {
+		this.#capture = capture;
+	};
 
 	notify = (caught: unknown) => {
 		this.notice = errorMessage(caught);
@@ -177,7 +195,9 @@ export class FileManager {
 		this.entries = [];
 		try {
 			const recent = isDesktopRuntime() ? await api.recentFiles() : previewRecent;
-			if (this.loading.isCurrent(token)) this.entries = recent;
+			if (!this.loading.isCurrent(token)) return;
+			this.entries = recent;
+			this.#arrive('');
 		} catch (caught) {
 			if (this.loading.isCurrent(token)) this.error = errorMessage(caught);
 		} finally {
@@ -186,45 +206,52 @@ export class FileManager {
 	};
 
 	navigate = async (path: string) => {
+		this.#remember();
 		this.tabs.navigate(this.#homeEntry(path));
 		await this.loadDirectory(path);
 	};
 
 	showView = async (view: SidebarView) => {
 		if (view === 'home') return this.navigate(this.homePath);
+		this.#remember();
 		this.tabs.navigate({ path: this.currentPath || this.homePath, title: VIEW_TITLES[view], view });
 		await this.#enterView(view);
 	};
 
 	openTab = async (path = this.currentPath || this.homePath) => {
+		this.#remember();
 		this.tabs.open(this.#homeEntry(path));
 		await this.loadDirectory(path);
 	};
 
 	openViewInTab = async (view: SidebarView) => {
 		if (view === 'home') return this.openTab(this.homePath);
+		this.#remember();
 		this.tabs.open({ path: this.currentPath || this.homePath, title: VIEW_TITLES[view], view });
 		await this.#enterView(view);
 	};
 
 	switchTab = (id: string) => {
+		this.#remember();
 		this.tabs.activeId = id;
-		if (this.tabs.active) void this.#restore(this.tabs.active);
+		if (this.tabs.current) void this.#restore(this.tabs.current);
 	};
 
 	closeTab = (id: string) => {
 		if (this.tabs.list.length === 1) return this.actions.closeWindow();
 		const wasActive = this.tabs.activeId === id;
 		this.tabs.close(id);
-		if (wasActive && this.tabs.active) void this.#restore(this.tabs.active);
+		if (wasActive && this.tabs.current) void this.#restore(this.tabs.current);
 	};
 
 	goBack = () => {
+		this.#remember();
 		const entry = this.tabs.back();
 		if (entry) void this.#restore(entry);
 	};
 
 	goForward = () => {
+		this.#remember();
 		const entry = this.tabs.forward();
 		if (entry) void this.#restore(entry);
 	};
@@ -277,21 +304,36 @@ export class FileManager {
 	};
 
 	openContextMenu = (event: MouseEvent, entry?: FileEntry) => {
+		if (this.#repeatedMenu(event, entry?.path ?? null)) return;
+		if (entry && !this.selection.has(entry.path)) this.selectOnly(entry.path);
+		this.placeMenu = null;
+		this.contextMenu = { x: event.clientX, y: event.clientY, target: entry ?? null };
+	};
+
+	openPlaceMenu = (event: MouseEvent, place: SidebarPlace) => {
+		if (this.#repeatedMenu(event, place)) return;
+		this.contextMenu = null;
+		this.placeMenu = { x: event.clientX, y: event.clientY, place };
+	};
+
+	closeMenus = () => {
+		this.contextMenu = null;
+		this.placeMenu = null;
+	};
+
+	#repeatedMenu(event: MouseEvent, key: unknown) {
 		event.preventDefault();
 		event.stopPropagation();
-		const path = entry?.path ?? null;
 		const previous = this.#lastContextMenu;
 		const now = performance.now();
-		const duplicate =
+		const repeated =
 			now - previous.at < DUPLICATE_EVENT_MS &&
 			Math.abs(event.clientX - previous.x) < 2 &&
 			Math.abs(event.clientY - previous.y) < 2 &&
-			previous.path === path;
-		if (duplicate) return;
-		this.#lastContextMenu = { x: event.clientX, y: event.clientY, path, at: now };
-		if (entry && !this.selection.has(entry.path)) this.selectOnly(entry.path);
-		this.contextMenu = { x: event.clientX, y: event.clientY, target: entry ?? null };
-	};
+			previous.key === key;
+		if (!repeated) this.#lastContextMenu = { x: event.clientX, y: event.clientY, key, at: now };
+		return repeated;
+	}
 
 	handleNavigationButton = (event: MouseEvent) => {
 		if (event.button !== 3 && event.button !== 4) return;
@@ -352,18 +394,31 @@ export class FileManager {
 		return { path, title: path === this.homePath ? 'Home' : basename(path) || '/', view: 'home' };
 	}
 
+	#remember() {
+		this.#recalling = null;
+		if (this.view !== 'trash') this.tabs.remember(this.#capture());
+	}
+
+	#arrive(from: string) {
+		this.arrival = { from, memory: this.#recalling };
+		this.#recalling = null;
+	}
+
 	#showListing(path: string, entries: FileEntry[]) {
+		const from = this.currentPath;
 		this.currentPath = path;
 		this.entries = entries;
 		this.viewMode = this.viewMode === 'columns' ? 'columns' : viewModeForPath(path, settings.value, this.userDirs);
 		this.view = 'home';
 		this.searchQuery = '';
 		this.draft = null;
-		this.contextMenu = null;
+		this.closeMenus();
 		this.selection.clear();
+		this.#arrive(from);
 	}
 
 	async #restore(entry: TabHistoryEntry) {
+		this.#recalling = entry.view === 'trash' ? null : (entry.memory ?? null);
 		if (entry.view === 'home') return this.loadDirectory(entry.path);
 		this.currentPath = entry.path;
 		await this.#enterView(entry.view);
@@ -373,7 +428,7 @@ export class FileManager {
 		this.view = view;
 		this.searchQuery = '';
 		this.draft = null;
-		this.contextMenu = null;
+		this.closeMenus();
 		this.error = null;
 		this.selection.clear();
 		this.loading.cancel();

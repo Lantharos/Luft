@@ -95,8 +95,16 @@ pub struct Vpn {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Known {
+    connection: String,
+    ssid: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Network {
     pub wifi: Option<Wifi>,
+    known: Vec<Known>,
     wired: Vec<Wired>,
     vpns: Vec<Vpn>,
     airplane: Option<super::airplane::Airplane>,
@@ -308,6 +316,21 @@ fn vpns(objects: &Objects, saved: &[Saved]) -> Vec<Vpn> {
     vpns
 }
 
+fn known(saved: &[Saved]) -> Vec<Known> {
+    let mut known: Vec<Known> = saved
+        .iter()
+        .filter_map(|saved| match &saved.kind {
+            Kind::Wifi { ssid } => Some(Known {
+                connection: saved.path.clone(),
+                ssid: String::from_utf8_lossy(ssid).into_owned(),
+            }),
+            _ => None,
+        })
+        .collect();
+    known.sort_by_key(|network| network.ssid.to_lowercase());
+    known
+}
+
 pub fn names(objects: &Objects) -> HashMap<String, String> {
     objects
         .implementing(ACTIVE)
@@ -329,6 +352,7 @@ pub fn build(objects: &Objects) -> Network {
     let saved = saved::all(objects);
     Network {
         wifi: wifi(objects, &saved),
+        known: known(&saved),
         wired: wired(objects),
         vpns: vpns(objects, &saved),
         airplane: super::airplane::state(),

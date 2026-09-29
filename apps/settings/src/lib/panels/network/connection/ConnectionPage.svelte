@@ -2,7 +2,7 @@
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { onMount } from 'svelte';
 	import { IconButton, Row, Section } from '@luft/ui';
-	import { forget, type Network } from '../api';
+	import { forget, remove, type Network } from '../api';
 	import AdvancedSection from './AdvancedSection.svelte';
 	import DetailsSection from './DetailsSection.svelte';
 	import GeneralSection from './GeneralSection.svelte';
@@ -67,6 +67,16 @@
 		onclose();
 	}
 
+	async function removeConnection() {
+		problem = '';
+		try {
+			await remove(target.path);
+			onclose();
+		} catch (reason) {
+			problem = explain(reason);
+		}
+	}
+
 	onMount(() => {
 		root?.scrollIntoView({ block: 'start' });
 		loadProfile(target.path)
@@ -107,6 +117,15 @@
 			<Section>
 				<Row title="Forget this network" description="Removes its password and settings from this computer">
 					<button type="button" class="button danger" onclick={() => forgetNetwork(ssid)}>Forget</button>
+				</Row>
+			</Section>
+		{:else}
+			<Section>
+				<Row
+					title={target.kind === 'vpn' ? 'Remove this VPN' : 'Remove this connection'}
+					description="Deletes its settings from this computer"
+				>
+					<button type="button" class="button danger" onclick={removeConnection}>Remove</button>
 				</Row>
 			</Section>
 		{/if}

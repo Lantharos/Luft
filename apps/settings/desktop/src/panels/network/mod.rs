@@ -4,6 +4,7 @@ mod certificate;
 mod profile;
 mod saved;
 mod snapshot;
+mod vpn;
 mod watch;
 
 use luft_app::dbus;
@@ -50,6 +51,11 @@ struct Ssid {
 #[derive(Deserialize)]
 struct Connection {
     path: String,
+}
+
+#[derive(Deserialize)]
+struct PrivateKey {
+    key: String,
 }
 
 #[derive(Deserialize)]
@@ -104,6 +110,15 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("network_forget", |Ssid { ssid }| {
             actions::forget(&ssid, &objects()?)
         })
+        .command("network_remove", |Connection { path }| saved::delete(&path))
+        .command("network_vpn_import", |_: Value| vpn::import())
+        .command("network_wireguard_keys", |_: Value| {
+            vpn::wireguard::generate()
+        })
+        .command("network_wireguard_public_key", |PrivateKey { key }| {
+            vpn::wireguard::public_key(&key)
+        })
+        .command("network_wireguard_add", vpn::wireguard::add)
         .command("network_profile", |Connection { path }| {
             profile::load(&path)
         })

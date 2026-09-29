@@ -113,7 +113,7 @@ const html = await highlight(source, 'src/main.rs');
 <pre class="font-mono"><code>{@html html}</code></pre>
 ```
 
-The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent, the wallpaper palette and the light and dark styles. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
+The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent, the wallpaper palette and the light and dark styles. Besides CodeMirror's own collection it knows Svelte and log files, where timestamps, levels and numbers stand out. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
 
 | Export | Use |
 | --- | --- |

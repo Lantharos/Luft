@@ -13,9 +13,16 @@ const svelte = LanguageDescription.of({
 	load: () => import('@codemirror/lang-html').then((module) => module.html())
 });
 
+const log = LanguageDescription.of({
+	name: 'Log',
+	extensions: ['log'],
+	load: () => import('./log').then((module) => module.log)
+});
+
 export const languages: readonly LanguageDescription[] = [
 	...known.map((language) => (language.name === 'Markdown' ? markdown : language)),
-	svelte
+	svelte,
+	log
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 function basename(path: string) {

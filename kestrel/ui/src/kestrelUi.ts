@@ -21,6 +21,7 @@ import { animateActor } from './shared/motion.js';
 import type { QuickSettingsSource } from './quickSettings/quickControls.js';
 import { AppearanceService } from './appearance/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
+import type { Box } from './clipboard/placement.js';
 import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
@@ -65,6 +66,7 @@ interface Context {
   stopScreencast(): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
+  caret(): Box | null;
 }
 
 class KestrelUi {
@@ -119,7 +121,7 @@ class KestrelUi {
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       icons => this.panels.primary.updateStatus(icons), this.menus, () => this.takeScreenshot());
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
-    this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place());
+    this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place(), context.caret);
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
@@ -289,9 +291,7 @@ class KestrelUi {
       actor.set_size(width, height);
       actor.set_position(Math.round(monitor.x + monitor.width - 12 - width), bottom - height);
     }
-    const clipboardHeight = this.clipboard.preferredHeight(CLIPBOARD_WIDTH, Math.min(CLIPBOARD_MAXIMUM_HEIGHT, available));
-    this.clipboard.actor.set_size(CLIPBOARD_WIDTH, clipboardHeight);
-    this.clipboard.actor.set_position(Math.round(monitor.x + (monitor.width - CLIPBOARD_WIDTH) / 2), bottom - clipboardHeight);
+    this.clipboard.place(CLIPBOARD_WIDTH, Math.min(CLIPBOARD_MAXIMUM_HEIGHT, available), this.context.layoutManager.getWorkAreaForMonitor(monitor.index));
     const [snapWidth, snapHeight] = this.snapLayouts.size();
     this.snapLayouts.actor.set_size(snapWidth, snapHeight);
     this.snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
@@ -306,6 +306,7 @@ class KestrelUi {
     if (!this.canInteract()) return;
     this.previews.close();
     if (surface === 'clipboard' && this.clipboard.empty) return;
+    if (surface === 'clipboard') monitor = this.active === surface ? this.surfaceMonitor() : this.monitorAt(...this.clipboard.locate()) ?? monitor;
     if (surface === 'snap' && !this.snapLayouts.available) return;
     if (this.active === surface && this.surfaceMonitor() === monitor) {
       this.close();
@@ -344,7 +345,7 @@ class KestrelUi {
     if (surface === 'snap') this.snapLayouts.prepareOpen();
     this.place();
     if (opening) {
-      actor.opacity = 255;
+      actor.opacity = actor === this.clipboard.actor ? 0 : 255;
       actor.translation_y = this.slideDistance(actor);
     }
     this.animate(actor, 0, OPEN_DURATION);
@@ -425,6 +426,7 @@ class KestrelUi {
   ): void {
     animateActor(actor, {
       translation_y: translationY,
+      ...actor === this.clipboard.actor ? { opacity: translationY === 0 ? 255 : 0 } : {},
       duration,
       mode: translationY === 0
         ? Clutter.AnimationMode.EASE_OUT_QUART
@@ -434,6 +436,7 @@ class KestrelUi {
   }
 
   private slideDistance(actor: Clutter.Actor): number {
+    if (actor === this.clipboard.actor) return this.clipboard.slideDistance;
     const monitor = this.surfaceMonitor();
     return monitor.y + monitor.height - actor.y;
   }

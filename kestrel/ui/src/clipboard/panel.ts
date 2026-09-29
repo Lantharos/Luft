@@ -7,8 +7,10 @@ import St from 'gi://St';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { blurSurface } from '../shared/surface.js';
 import { ClipboardHistory } from './history.js';
+import { boxCenter, findAnchor, placeNear, type Anchor, type Box } from './placement.js';
 
 const PASTE_DELAY_MS = 120;
+const SLIDE_DISTANCE = 8;
 
 export class ClipboardPanel {
   readonly actor = new St.BoxLayout({
@@ -22,8 +24,15 @@ export class ClipboardPanel {
   private readonly history: ClipboardHistory;
   private dirty = true;
   private keyboard: Clutter.VirtualInputDevice | null = null;
+  private anchor: Anchor | null = null;
+  private above = false;
 
-  constructor(private readonly menus: ContextMenus, private readonly close: () => void, private readonly layoutChanged: () => void) {
+  constructor(
+    private readonly menus: ContextMenus,
+    private readonly close: () => void,
+    private readonly layoutChanged: () => void,
+    private readonly caret: () => Box | null,
+  ) {
     blurSurface(this.actor);
     this.history = new ClipboardHistory(() => {
       this.dirty = true;
@@ -49,7 +58,25 @@ export class ClipboardPanel {
     this.refresh();
   }
 
-  preferredHeight(width: number, limit: number): number {
+  locate(): [number, number] {
+    this.anchor = findAnchor(this.caret());
+    return boxCenter(this.anchor.box);
+  }
+
+  get slideDistance(): number {
+    return this.above ? SLIDE_DISTANCE : -SLIDE_DISTANCE;
+  }
+
+  place(width: number, limit: number, area: Box): void {
+    if (!this.anchor) return;
+    const height = this.preferredHeight(width, limit);
+    const { x, y, above } = placeNear(this.anchor, width, height, area);
+    this.above = above;
+    this.actor.set_size(width, height);
+    this.actor.set_position(x, y);
+  }
+
+  private preferredHeight(width: number, limit: number): number {
     const theme = this.actor.get_theme_node();
     const contentWidth = width - theme.get_horizontal_padding();
     const footer = this.actor.get_last_child()!.get_preferred_height(contentWidth)[1];

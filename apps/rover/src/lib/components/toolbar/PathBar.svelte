@@ -2,9 +2,11 @@
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dropKey } from '$lib/file-manager/drag/drop-targets';
+	import { PathCompletion } from '$lib/file-manager/location/completion.svelte';
+	import { expandHome } from '$lib/file-manager/location/expand';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import { isInside, pathSegments } from '$lib/utils/paths';
+	import { isInside, pathSegments, trimTrailingSlash } from '$lib/utils/paths';
 
 	interface Props {
 		manager: FileManager;
@@ -21,6 +23,8 @@
 		recent: { path: '', label: 'Recent', icon: 'clock' },
 		trash: { path: '', label: 'Trash', icon: 'trash' }
 	};
+
+	const completion = new PathCompletion(() => manager.homePath);
 
 	let trail = $state<HTMLDivElement>();
 	let draft = $state('');
@@ -48,6 +52,7 @@
 
 	$effect(() => {
 		if (view.editingPath) draft = manager.currentPath || manager.homePath;
+		else completion.forget();
 	});
 
 	function focusInput(input: HTMLInputElement) {
@@ -57,16 +62,28 @@
 
 	function commit() {
 		view.editingPath = false;
-		const next = draft.trim();
+		const next = trimTrailingSlash(expandHome(draft.trim(), manager.homePath));
 		if (next && next !== manager.currentPath) void manager.navigate(next);
 	}
 
+	async function complete(backwards: boolean) {
+		const typed = draft;
+		const completed = await completion.complete(typed, backwards);
+		if (completed !== null && draft === typed) draft = completed;
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key !== 'Enter' && event.key !== 'Escape') return;
+		if (event.key !== 'Enter' && event.key !== 'Escape' && event.key !== 'Tab') return;
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.key === 'Enter') commit();
+		if (event.key === 'Tab') void complete(event.shiftKey);
+		else if (event.key === 'Enter') commit();
+		else if (completion.candidates.length > 0) completion.reset();
 		else view.editingPath = false;
+	}
+
+	function choose(name: string) {
+		draft = completion.choose(name);
 	}
 
 	function open(path: string) {
@@ -88,10 +105,29 @@
 			aria-label="Location"
 			spellcheck="false"
 			autocomplete="off"
-			oninput={(event) => (draft = event.currentTarget.value)}
+			oninput={(event) => {
+				draft = event.currentTarget.value;
+				completion.reset();
+			}}
 			onkeydown={handleKeydown}
 			onblur={() => (view.editingPath = false)}
 		/>
+		{#if completion.candidates.length > 0}
+			<div class="path-candidates soft-scroll" role="listbox" aria-label="Matching folders" tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
+				{#each completion.candidates as name, index (name)}
+					<button
+						class={['path-candidate', index === completion.index && 'is-active']}
+						type="button"
+						role="option"
+						aria-selected={index === completion.index}
+						onclick={() => choose(name)}
+					>
+						<Icon name="folder" size={15} />
+						<span class="truncate">{name}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
 	{:else}
 		<div
 			bind:this={trail}

@@ -5,7 +5,7 @@ use luft_app::Commands;
 use sabine::SabineWindow;
 
 use crate::drives;
-use crate::files::{entries, transfer, trash};
+use crate::files::{entries, folders, transfer, trash};
 use crate::integration::chooser::{ChooserResponse, ChooserSession};
 use crate::integration::launch_args;
 use crate::settings;
@@ -30,6 +30,7 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .with("watch_directory", state, |state, Path { path }| {
             state.watcher.watch(path)
         })
+        .command("list_folders", |Path { path }| folders::list_folders(path))
         .command("get_file_info", |Path { path }| {
             entries::get_file_info(path)
         })

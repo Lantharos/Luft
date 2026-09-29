@@ -1,4 +1,5 @@
 pub mod entries;
+pub mod folders;
 pub mod operations;
 pub mod privileged;
 pub mod rename;

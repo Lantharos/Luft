@@ -7,6 +7,10 @@ function seconds(hours: string | undefined, minutes: string, secs: string, fract
 	return Number(hours ?? 0) * 3600 + Number(minutes) * 60 + Number(secs) + Number(fraction.padEnd(3, '0')) / 1000;
 }
 
+export function plainCues(cues: Cue[]) {
+	return cues.map((cue) => ({ ...cue, text: cue.text.replace(MARKUP, '').trim() }));
+}
+
 export function parseSubtitles(text: string): Cue[] {
 	const cues: Cue[] = [];
 	for (const block of text.replace(/\r/g, '').split(/\n{2,}/)) {

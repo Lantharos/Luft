@@ -21,7 +21,7 @@
 	import MusicView from '$lib/music/MusicView.svelte';
 	import NowPlaying from '$lib/music/NowPlaying.svelte';
 	import { player } from '$lib/music/player.svelte';
-	import { trackArtist, trackTitle } from '$lib/music/queue';
+	import { trackTitle } from '$lib/music/queue';
 	import QueueList from '$lib/music/QueueList.svelte';
 	import PhotoActions from '$lib/photo/PhotoActions.svelte';
 	import { slideshow } from '$lib/photo/slideshow.svelte';
@@ -40,13 +40,13 @@
 	let immersive = $derived(chrome.fullscreen || slideshow.running || chrome.watching);
 	let browsing = $derived(!item && chrome.mode === 'library' && library.folder !== null);
 	let title = $derived.by(() => {
-		if (library.group === 'audio' && player.track) return trackTitle(player.track);
+		if (library.group === 'audio' && player.track) return player.track.album ?? trackTitle(player.track);
 		if (browsing) return folderTitle(library.folder!, library.places);
 		return item?.name ?? 'Magpie';
 	});
 	let subtitle = $derived.by(() => {
 		if (browsing) return library.items.length ? plural(library.items.length, 'item', 'items') : null;
-		if (library.group === 'audio') return player.track ? trackArtist(player.track) : null;
+		if (library.group === 'audio') return player.queue.length > 1 ? `${player.position + 1} of ${player.queue.length}` : null;
 		if (library.group === 'document') return documentState.pages ? `Page ${documentState.page} of ${documentState.pages}` : null;
 		if (library.group === 'visual' && library.siblings.length > 1) return `${library.index + 1} of ${library.siblings.length}`;
 		return null;

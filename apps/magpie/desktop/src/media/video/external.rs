@@ -25,6 +25,7 @@ pub fn find(video: &Path) -> Vec<SubtitleTrack> {
                 return None;
             }
             let label = rest.trim_start_matches('.').to_string();
+            let file_name = path.file_name()?.to_string_lossy().into_owned();
             let language = (2..=3)
                 .contains(&label.len())
                 .then(|| label.to_lowercase())
@@ -34,7 +35,7 @@ pub fn find(video: &Path) -> Vec<SubtitleTrack> {
                 });
             Some(SubtitleTrack {
                 id: format!("file:{}", path.to_string_lossy()),
-                label: (!label.is_empty()).then_some(label),
+                label: Some(if label.is_empty() { file_name } else { label }),
                 language,
                 path: Some(path.to_string_lossy().into_owned()),
             })

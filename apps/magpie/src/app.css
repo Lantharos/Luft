@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
 
+head,
+script,
+style,
+title {
+	display: none;
+}
+
 .stage {
 	color-scheme: dark;
 	--text: #f3f3ef;

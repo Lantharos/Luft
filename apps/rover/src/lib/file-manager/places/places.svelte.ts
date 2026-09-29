@@ -3,7 +3,7 @@ import type { IconName } from '$lib/components/Icon.svelte';
 import { isDesktopRuntime } from '$lib/runtime';
 import type { Operation, UserDirs } from '$lib/types';
 import { basename } from '$lib/utils/paths';
-import { previewTrash } from './preview';
+import { previewTrash } from '../preview';
 
 export type Place = { path: string; label: string; icon: IconName };
 

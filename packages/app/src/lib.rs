@@ -4,6 +4,9 @@ mod bridge;
 pub mod dbus;
 mod events;
 mod kestrel;
+#[cfg(feature = "thumbnails")]
+pub mod thumbnails;
+mod scheme;
 mod window;
 
 pub use bridge::Commands;

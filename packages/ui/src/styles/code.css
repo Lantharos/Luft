@@ -1,0 +1,142 @@
+:root,
+.glass-shell {
+	--syntax-comment: #7e7e77;
+	--syntax-keyword: color-mix(in oklab, var(--accent) 72%, #f3f3ef);
+	--syntax-string: #b3c89a;
+	--syntax-regexp: #d4a6c4;
+	--syntax-constant: #e0a987;
+	--syntax-function: #9cc0d6;
+	--syntax-type: #8ec5b6;
+	--syntax-definition: #ecece6;
+	--syntax-property: #cfc8b8;
+	--syntax-tag: #e3a39c;
+	--syntax-attribute: #d9bb8d;
+	--syntax-operator: #b3b3ab;
+	--syntax-punctuation: #8f8f88;
+	--syntax-meta: #a8a8a0;
+	--syntax-inserted: #a6c9a8;
+	--syntax-deleted: #e0aaaa;
+	--syntax-link: var(--accent);
+}
+
+:root[data-scheme='light'],
+[data-scheme='light'] .glass-shell {
+	--syntax-comment: #8a8a82;
+	--syntax-keyword: color-mix(in oklab, var(--accent) 55%, #1b1b19);
+	--syntax-string: #4d7a36;
+	--syntax-regexp: #92478a;
+	--syntax-constant: #b0582b;
+	--syntax-function: #26699a;
+	--syntax-type: #17786a;
+	--syntax-definition: #1b1b19;
+	--syntax-property: #5d5446;
+	--syntax-tag: #b1433b;
+	--syntax-attribute: #8c6421;
+	--syntax-operator: #5f5f59;
+	--syntax-punctuation: #7a7a73;
+	--syntax-meta: #6e6e67;
+	--syntax-inserted: #3f7a4a;
+	--syntax-deleted: #b4413c;
+	--syntax-link: color-mix(in oklab, var(--accent) 55%, #1b1b19);
+}
+
+@layer components {
+	.hl-comment {
+		color: var(--syntax-comment);
+		font-style: italic;
+	}
+
+	.hl-keyword {
+		color: var(--syntax-keyword);
+	}
+
+	.hl-string {
+		color: var(--syntax-string);
+	}
+
+	.hl-regexp {
+		color: var(--syntax-regexp);
+	}
+
+	.hl-constant {
+		color: var(--syntax-constant);
+	}
+
+	.hl-function {
+		color: var(--syntax-function);
+	}
+
+	.hl-type {
+		color: var(--syntax-type);
+	}
+
+	.hl-definition {
+		color: var(--syntax-definition);
+	}
+
+	.hl-property {
+		color: var(--syntax-property);
+	}
+
+	.hl-tag {
+		color: var(--syntax-tag);
+	}
+
+	.hl-attribute {
+		color: var(--syntax-attribute);
+	}
+
+	.hl-operator {
+		color: var(--syntax-operator);
+	}
+
+	.hl-punctuation {
+		color: var(--syntax-punctuation);
+	}
+
+	.hl-meta {
+		color: var(--syntax-meta);
+	}
+
+	.hl-heading {
+		color: var(--syntax-definition);
+		font-weight: 700;
+	}
+
+	.hl-emphasis {
+		font-style: italic;
+	}
+
+	.hl-strong {
+		font-weight: 700;
+	}
+
+	.hl-strikethrough {
+		text-decoration: line-through;
+	}
+
+	.hl-link {
+		color: var(--syntax-link);
+		text-decoration: underline;
+		text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+		text-underline-offset: 3px;
+	}
+
+	.hl-monospace,
+	.hl-quote {
+		color: var(--syntax-property);
+	}
+
+	.hl-inserted {
+		color: var(--syntax-inserted);
+	}
+
+	.hl-deleted,
+	.hl-invalid {
+		color: var(--syntax-deleted);
+	}
+
+	.hl-changed {
+		color: var(--syntax-constant);
+	}
+}

@@ -29,7 +29,7 @@ pub fn run_app() -> ! {
 
 `GlassWindow::apply` makes the window frameless and translucent, blurs the sidebar (`sidebar_width` must match the web side's `--sidebar-width`), keeps the content opaque, rounds the input region and places the minimize, maximize and close hit areas where `WindowControls` draws them. With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event.
 
-`luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's accent color. The last closure runs at the same point, for any other watchers the app needs.
+`luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's accent color and the desktop's light or dark style. The last closure runs at the same point, for any other watchers the app needs.
 
 ## Startup state
 
@@ -45,7 +45,7 @@ struct AppState {
 AppState { appearance: Appearance::current() }
 ```
 
-Accent changes arrive on the page as `kestrel.accent` events, which `@luft/ui`'s `appearance` store listens for.
+`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting. Accent changes arrive on the page as `kestrel.accent` events and style changes as `appearance.scheme` events, which `@luft/ui`'s `appearance` store listens for.
 
 ## Commands
 

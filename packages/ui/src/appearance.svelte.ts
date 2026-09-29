@@ -1,14 +1,18 @@
 import { listen } from '@lantharos/sabine';
 
 const ACCENT_CHANGED = 'kestrel.accent';
+const SCHEME_CHANGED = 'appearance.scheme';
 
 interface Accent {
 	color: string;
 }
 
+export type Scheme = 'dark' | 'light';
+
 export interface Appearance {
 	translucent: boolean;
 	accent: Accent | null;
+	scheme: Scheme;
 }
 
 function readableOn(hex: string) {
@@ -21,11 +25,17 @@ class AppearanceState {
 	translucent = $state(false);
 	accent = $state<string | null>(null);
 	accentText = $derived(this.accent ? readableOn(this.accent) : null);
+	scheme = $state<Scheme>('dark');
 
 	start(initial: Appearance) {
 		this.translucent = initial.translucent;
 		this.accent = initial.accent?.color ?? null;
-		return listen<Accent>(ACCENT_CHANGED, ({ color }) => (this.accent = color));
+		this.scheme = initial.scheme;
+		const stops = [
+			listen<Accent>(ACCENT_CHANGED, ({ color }) => (this.accent = color)),
+			listen<Scheme>(SCHEME_CHANGED, (scheme) => (this.scheme = scheme))
+		];
+		return () => stops.forEach((stop) => stop());
 	}
 }
 

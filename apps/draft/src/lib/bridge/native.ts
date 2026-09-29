@@ -44,7 +44,7 @@ export const native: Backend = {
 	openLink: (uri) => invoke('open_link', { uri }),
 	takeOpenedFiles: async () => (await app.takeOpenUrls()).map(pathOf).filter((path) => path !== null),
 	onFilesOpened: (callback) => events.openUrlsAvailable(callback),
-	onFilesChanged: (callback) => listen<{ paths: string[] }>('wren.files', ({ paths }) => callback(paths)),
+	onFilesChanged: (callback) => listen<{ paths: string[] }>('draft.files', ({ paths }) => callback(paths)),
 	onFilesDropped: (callback) => events.fileDrag((drag) => drag.phase === 'drop' && !drag.internal && callback(drag.paths)),
 	onActivation: (callback) => listen<Activation>('singleInstance.activate', callback)
 };

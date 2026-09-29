@@ -1,5 +1,5 @@
 [package]
-name = "wren"
+name = "draft"
 version = "0.1.0"
 description = "A text and code editor for Luft"
 authors = ["Kristof"]
@@ -8,7 +8,7 @@ edition = "2024"
 rust-version = "1.90"
 
 [lib]
-name = "wren_lib"
+name = "draft_lib"
 
 [dependencies]
 chardetng = "1.0.0"

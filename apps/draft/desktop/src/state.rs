@@ -7,7 +7,7 @@ use crate::launch;
 use crate::store;
 
 #[derive(Clone)]
-pub struct WrenState {
+pub struct DraftState {
     pub events: Events,
     pub watcher: Watcher,
     pub writes: Writes,
@@ -23,7 +23,7 @@ pub struct AppState {
     folders: Vec<String>,
 }
 
-impl WrenState {
+impl DraftState {
     pub fn new() -> Self {
         let events = Events::default();
         Self {

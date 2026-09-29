@@ -1,4 +1,4 @@
-export const SAMPLE_HOME = '/home/wren';
+export const SAMPLE_HOME = '/home/draft';
 export const SAMPLE_FOLDER = `${SAMPLE_HOME}/projects/heron`;
 
 const README = `# Heron

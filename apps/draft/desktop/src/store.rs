@@ -35,7 +35,7 @@ fn failed(error: impl std::fmt::Display) -> String {
 fn config() -> Result<PathBuf, String> {
     Ok(dirs::config_dir()
         .ok_or("Could not find the configuration folder")?
-        .join("wren"))
+        .join("draft"))
 }
 
 fn path(name: Name) -> Result<PathBuf, String> {
@@ -50,7 +50,7 @@ fn path(name: Name) -> Result<PathBuf, String> {
 pub fn backups() -> Result<PathBuf, String> {
     let folder = dirs::state_dir()
         .ok_or("Could not find the state folder")?
-        .join("wren")
+        .join("draft")
         .join("backups");
     fs::create_dir_all(&folder).map_err(failed)?;
     Ok(folder)

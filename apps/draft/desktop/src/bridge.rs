@@ -5,10 +5,10 @@ use serde_json::Value;
 use crate::desktop;
 use crate::files::{self, encoding, index, listing};
 use crate::launch;
-use crate::state::{self, WrenState};
+use crate::state::{self, DraftState};
 use crate::store;
 
-pub fn register(window: SabineWindow, state: &WrenState) -> SabineWindow {
+pub fn register(window: SabineWindow, state: &DraftState) -> SabineWindow {
     window
         .command("app_state", |_: Value| state::app_state())
         .command("activation_folders", launch::activation_folders)

@@ -1,6 +1,6 @@
 [app]
-id = "dev.lantharos.wren"
-name = "Wren"
+id = "dev.lantharos.draft"
+name = "Draft"
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

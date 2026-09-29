@@ -1,20 +1,20 @@
-# Wren
+# Draft
 
-Wren is a text and code editor for Luft, built with Sabine and SvelteKit on top of CodeMirror. It lives at `apps/wren`; run the commands below from that directory unless noted otherwise.
+Draft is a text and code editor for Luft, built with Sabine and SvelteKit on top of CodeMirror. It lives at `apps/draft`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
-- Started on its own, Wren shows a folder as a tree in the sidebar, with a field to jump to any file in it. Hide it with `Ctrl+B` when you want the whole window for text
+- Started on its own, Draft shows a folder as a tree in the sidebar, with a field to jump to any file in it. Hide it with `Ctrl+B` when you want the whole window for text
 - Opened with files, for example as the default editor or from Rover, it is just the editor and its tabs. Opening a folder later brings the sidebar in
-- Syntax highlighting for well over a hundred languages, each loaded the first time you open a file that needs it. Wren picks the language from the file name or, for scripts without an extension, from the `#!` line, and you can change it from the status bar
+- Syntax highlighting for well over a hundred languages, each loaded the first time you open a file that needs it. Draft picks the language from the file name or, for scripts without an extension, from the `#!` line, and you can change it from the status bar
 - Line numbers, a highlighted current line, matching brackets, automatic indentation, closing brackets and folding
 - Multiple cursors: `Ctrl`-click to add one, `Ctrl+Alt+↑`/`↓` to add them above or below, `Ctrl+D` to select the next occurrence and `Ctrl+Shift+L` to select them all. Hold `Alt` and drag for a rectangular selection
 - Find and replace with case, whole word and regular expression options and a running count of matches
 - Indentation is detected from each file's content and shown in the status bar, where you can switch between tabs and spaces or change the width. New files use the default you pick with Change Default Indentation
 - Tabs you can reorder by dragging, with a dot on the ones that have unsaved changes
 - Save and Save As through the desktop's file chooser. Files are written in place of the old one only once they are complete, keeping their permissions, and saving through a link writes to the file it points to
-- Files that change on disk reload on their own when you have no unsaved changes. When you do, Wren asks whether to reload or keep your version, and tells you when a file was deleted
-- The open folder, open files, cursors and scroll positions come back the next time you start Wren, with windows opened for files keeping their own set of tabs. Unsaved changes, including untitled documents, are kept too, so closing the window never loses work
+- Files that change on disk reload on their own when you have no unsaved changes. When you do, Draft asks whether to reload or keep your version, and tells you when a file was deleted
+- The open folder, open files, cursors and scroll positions come back the next time you start Draft, with windows opened for files keeping their own set of tabs. Unsaved changes, including untitled documents, are kept too, so closing the window never loses work
 - Large files such as 50 MB logs open in well under a second and stay smooth to scroll and edit. Files over 10 MB open as plain text, and picking a language from the status bar highlights them anyway
 - The encoding and line endings of every file are detected and kept when saving. The status bar shows both and lets you reopen a file in another encoding, save it in one, or switch between LF and CRLF
 - A command palette on `Ctrl+Shift+P` and quick open on `Ctrl+P`, both with fuzzy matching. Type `>` in quick open for commands or `:` for a line number
@@ -26,7 +26,7 @@ The sidebar uses the compositor's background blur on Wayland compositors that su
 
 ## Development
 
-Wren shares its controls, fonts, syntax colors and window setup with the other Luft apps through `packages/ui` and `packages/app`, so install dependencies once from the repository root:
+Draft shares its controls, fonts, syntax colors and window setup with the other Luft apps through `packages/ui` and `packages/app`, so install dependencies once from the repository root:
 
 ```bash
 bun install              # from the repository root
@@ -45,7 +45,7 @@ Opening the Vite server in a regular browser shows the interface with a sample p
 sabine install .
 ```
 
-The installed desktop entry registers Wren for plain text, Markdown, logs, JSON, YAML, TOML and the common source code types. It accepts files and folders: files open in tabs and a folder becomes the one shown in the sidebar. If Wren is already running, they open in the existing window.
+The installed desktop entry registers Draft for plain text, Markdown, logs, JSON, YAML, TOML and the common source code types. It accepts files and folders: files open in tabs and a folder becomes the one shown in the sidebar. If Draft is already running, they open in the existing window.
 
 ## Keyboard shortcuts
 
@@ -77,7 +77,7 @@ The installed desktop entry registers Wren for plain text, Markdown, logs, JSON,
 ## Project layout
 
 ```
-wren/
+draft/
 ├── src/
 │   ├── lib/
 │   │   ├── app.svelte.ts      startup and the actions shared by the interface

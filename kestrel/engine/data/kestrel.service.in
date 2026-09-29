@@ -7,6 +7,8 @@ PartOf=kestrel-session.target
 Before=kestrel-session.target
 Requires=kestrel-session-manager.service
 After=kestrel-session-manager.service
+Wants=xdg-desktop-autostart.target
+Before=xdg-desktop-autostart.target
 
 AssertEnvironment=XDG_SESSION_TYPE=wayland
 

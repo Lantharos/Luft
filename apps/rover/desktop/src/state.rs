@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
+use luft_app::thumbnails::Thumbnails;
 use luft_app::{Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
 
 use crate::APP_NAME;
+use crate::events::THUMBNAILS_READY;
 use crate::files::counts::FolderCounts;
 use crate::files::entries::{self, UserDirs};
 use crate::files::operations::OperationsQueue;
@@ -15,7 +17,6 @@ use crate::integration::launch_args;
 use crate::properties::Measurements;
 use crate::search::Search;
 use crate::settings::Settings;
-use crate::thumbnails::Thumbnails;
 
 #[derive(Clone)]
 pub struct RoverState {
@@ -51,7 +52,7 @@ impl RoverState {
         let queue = OperationsQueue::new(events.clone());
         Self {
             history: History::new(events.clone(), queue.clone()),
-            thumbnails: Thumbnails::new(events.clone()),
+            thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
             counts: FolderCounts::new(events.clone()),
             search: Search::new(events.clone()),
             measurements: Measurements::new(events.clone()),

@@ -62,3 +62,24 @@ window
 ## D-Bus
 
 `dbus::session()` and `dbus::system()` return cached blocking zbus connections. They run on a dedicated Tokio runtime with one worker thread, because bridge handlers aren't called from inside a runtime and zbus needs one. `dbus::objects` reads `ObjectManager` trees and debounces bursts of change signals.
+
+## File chooser
+
+`portal::open_file` and `portal::open_files` show the desktop's file chooser through the `org.freedesktop.portal.FileChooser` portal and return the chosen `file://` URIs, or nothing when the chooser is closed:
+
+```rust
+use luft_app::portal::{self, Filter};
+
+let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["*.png".into()] })?;
+```
+
+## Thumbnails
+
+With the `thumbnails` feature, `thumbnails::Thumbnails` makes thumbnails for files in the shared freedesktop thumbnail cache, so other apps reuse them and the other way round. Common image formats are decoded in process; everything else goes through the thumbnailers installed on the system, such as those for videos, PDFs and fonts. Work runs on a few low priority threads, and each request replaces the previous one, so asking for the files currently on screen keeps the queue short while scrolling:
+
+```rust
+let thumbnails = Thumbnails::new(events.clone(), "my-app.thumbnails");
+thumbnails.request(paths, ThumbnailSize::Large);
+```
+
+Finished thumbnails arrive on the page in batches under the given event name, each item with the file's `path`, its `thumbnail` path or `null` when none could be made, and the file's `modified` time. Files that can't be thumbnailed are remembered in the cache so they aren't tried again until they change.

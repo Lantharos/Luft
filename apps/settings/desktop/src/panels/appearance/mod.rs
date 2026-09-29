@@ -3,11 +3,11 @@ mod thumbnail;
 
 use std::sync::Once;
 
+use luft_app::portal::{self, Filter};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
 
-use crate::portal::{self, Filter};
 use library::Wallpaper;
 
 static WATCH: Once = Once::new();

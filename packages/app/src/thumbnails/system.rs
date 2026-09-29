@@ -227,7 +227,7 @@ fn scratch_file() -> PathBuf {
     static NEXT: AtomicU64 = AtomicU64::new(0);
     let folder = dirs::runtime_dir().unwrap_or_else(env::temp_dir);
     folder.join(format!(
-        "rover-thumbnail-{}-{}.png",
+        "luft-thumbnail-{}-{}.png",
         std::process::id(),
         NEXT.fetch_add(1, Ordering::Relaxed)
     ))

@@ -9,11 +9,27 @@ rust-version = "1.90"
 
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
+thumbnails = [
+    "dep:dirs",
+    "dep:fast_image_resize",
+    "dep:gio",
+    "dep:image",
+    "dep:libc",
+    "dep:md-5",
+    "dep:parking_lot",
+    "dep:png",
+]
 
 [dependencies]
 dirs = { version = "7.0.0", optional = true }
+fast_image_resize = { version = "6.1.0", optional = true }
 gio = { version = "0.22.10", optional = true }
 gio-unix = { version = "0.22.8", optional = true }
+image = { version = "0.25.10", optional = true, default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "qoi", "tga", "pnm"] }
+libc = { version = "0.2.189", optional = true }
+md-5 = { version = "0.11.0", optional = true }
+parking_lot = { version = "0.12.5", optional = true }
+png = { version = "0.18.1", optional = true }
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.31" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"

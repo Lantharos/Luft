@@ -12,7 +12,6 @@ mod search;
 mod settings;
 mod state;
 mod text;
-mod thumbnails;
 mod vcs;
 
 use luft_app::GlassWindow;

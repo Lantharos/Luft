@@ -38,10 +38,6 @@ pub(crate) fn uri_path(path: &Path) -> String {
     percent_encode(path.as_os_str().as_bytes(), URI_PATH).to_string()
 }
 
-pub(crate) fn file_uri(path: &Path) -> String {
-    format!("file://{}", uri_path(path))
-}
-
 pub(crate) fn rename_no_replace(from: &Path, to: &Path) -> io::Result<()> {
     match renameat2_no_replace(from, to) {
         Err(error) if error.raw_os_error() == Some(libc::EINVAL) => {

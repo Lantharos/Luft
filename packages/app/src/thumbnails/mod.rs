@@ -12,11 +12,10 @@ use std::sync::{Arc, Once, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use luft_app::Events;
 use parking_lot::{Condvar, Mutex};
 use serde::Serialize;
 
-use crate::events::THUMBNAILS_READY;
+use crate::events::Events;
 pub use cache::ThumbnailSize;
 use generate::Ready;
 use system::Registry;
@@ -60,7 +59,7 @@ struct Inner {
 }
 
 impl Thumbnails {
-    pub fn new(events: Events) -> Self {
+    pub fn new(events: Events, ready_event: &'static str) -> Self {
         let (results, receiver) = mpsc::channel();
         let inner = Arc::new(Inner {
             state: Mutex::default(),
@@ -69,7 +68,7 @@ impl Thumbnails {
             registry: OnceLock::new(),
             workers: Once::new(),
         });
-        thread::spawn(move || emit_batches(&receiver, &events));
+        thread::spawn(move || emit_batches(&receiver, &events, ready_event));
         Self { inner }
     }
 
@@ -140,7 +139,7 @@ impl Inner {
     }
 }
 
-fn emit_batches(receiver: &Receiver<Ready>, events: &Events) {
+fn emit_batches(receiver: &Receiver<Ready>, events: &Events, ready_event: &str) {
     while let Ok(first) = receiver.recv() {
         let mut items = vec![first];
         let deadline = Instant::now() + BATCH_WINDOW;
@@ -151,6 +150,6 @@ fn emit_batches(receiver: &Receiver<Ready>, events: &Events) {
                 Err(RecvTimeoutError::Disconnected) => return,
             }
         }
-        events.emit(THUMBNAILS_READY, Batch { items });
+        events.emit(ready_event, Batch { items });
     }
 }

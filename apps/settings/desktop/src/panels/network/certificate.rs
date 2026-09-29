@@ -1,7 +1,6 @@
 use gio::prelude::*;
+use luft_app::portal::{self, Filter};
 use serde::Deserialize;
-
-use crate::portal::{self, Filter};
 
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]

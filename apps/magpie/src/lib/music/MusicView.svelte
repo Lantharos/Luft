@@ -7,6 +7,7 @@
 	import Shuffle from '@lucide/svelte/icons/shuffle';
 	import SkipBack from '@lucide/svelte/icons/skip-back';
 	import SkipForward from '@lucide/svelte/icons/skip-forward';
+	import { untrack } from 'svelte';
 	import type { Item } from '$lib/api';
 	import { library } from '$lib/library/library.svelte';
 	import { volume } from '$lib/playback/volume.svelte';
@@ -23,13 +24,11 @@
 
 	$effect(() => {
 		const path = item.path;
-		if (player.track?.path === path) return;
-		if (player.has(path)) player.jumpTo(path);
-		else
-			void player.load(
-				library.siblings.map((sibling) => sibling.path),
-				path
-			);
+		untrack(() => {
+			if (player.track?.path === path) return;
+			if (player.has(path)) player.jumpTo(path);
+			else void player.load(library.siblings.map((sibling) => sibling.path), path);
+		});
 	});
 
 	$effect(() => {

@@ -13,7 +13,7 @@
 	import { explain } from './codecs';
 	import { FramePreview } from './frame-preview';
 	import { savedPosition, savePosition } from './positions';
-	import { CueClock, parseSubtitles } from './subtitles.svelte';
+	import { CueClock, parseSubtitles, plainCues } from './subtitles.svelte';
 	import VideoControls from './VideoControls.svelte';
 
 	const SAVE_EVERY_MS = 5000;
@@ -160,7 +160,7 @@
 		if (!next || !video) return clock.detach();
 		const cues: Cue[] = next.path
 			? parseSubtitles(await fetch(fileSource(next.path)).then((response) => response.text()))
-			: await api.subtitleCues(item.path, next.id);
+			: plainCues(await api.subtitleCues(item.path, next.id));
 		if (subtitle === next) clock.attach(video, cues);
 	}
 

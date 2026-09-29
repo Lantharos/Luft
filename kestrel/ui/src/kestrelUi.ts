@@ -25,6 +25,7 @@ import type { Box } from './clipboard/placement.js';
 import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
+import { BatteryWarnings } from './power/batteryWarnings.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
@@ -91,6 +92,7 @@ class KestrelUi {
   private readonly portal = new PortalBackend();
   readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
   private readonly oomNotifier = new OomNotifier();
+  private readonly batteryWarnings = new BatteryWarnings();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly globalShortcuts = new GlobalShortcutsProvider();
   private readonly liveWallpaper: LiveWallpaper;
@@ -448,6 +450,7 @@ class KestrelUi {
     this.appearance.destroy();
     this.liveWallpaper.destroy();
     this.oomNotifier.destroy();
+    this.batteryWarnings.destroy();
     this.launchFeedback.destroy();
     this.globalShortcuts.destroy();
     this.portal.destroy();

@@ -6,6 +6,7 @@ import { Battery, type BatteryState } from '../battery.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
 import { openSettings, type SettingsPageId } from '../../settings/pages.js';
 import { actionTile, type ActionTile } from './controlTile.js';
+import { shortDuration } from '../../shared/duration.js';
 
 export interface Tile {
   id: string;
@@ -35,9 +36,7 @@ const BATTERY_STATUS = { charging: 'Charging', full: 'Fully charged', plugged: '
 function batterySubtitle(state: BatteryState): string {
   if (state.status !== 'discharging') return BATTERY_STATUS[state.status];
   if (!state.secondsLeft) return 'On battery';
-  const hours = Math.floor(state.secondsLeft / 3600);
-  const minutes = Math.round((state.secondsLeft % 3600) / 60);
-  return `${hours ? `${hours} h ` : ''}${minutes} min left`;
+  return `${shortDuration(state.secondsLeft)} left`;
 }
 
 export class ActionTiles {

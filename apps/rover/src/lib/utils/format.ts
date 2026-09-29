@@ -25,14 +25,6 @@ export function formatFullDate(timestamp: number | null) {
 	return timestamp ? fullDate.format(new Date(timestamp * 1000)) : '';
 }
 
-export function formatClock(seconds: number) {
-	const whole = Math.round(seconds);
-	const hours = Math.floor(whole / 3600);
-	const minutes = Math.floor((whole % 3600) / 60);
-	const rest = String(whole % 60).padStart(2, '0');
-	return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${rest}` : `${minutes}:${rest}`;
-}
-
 export function formatDuration(seconds: number) {
 	const rounded = Math.max(1, Math.round(seconds));
 	const minutes = Math.floor(rounded / 60);

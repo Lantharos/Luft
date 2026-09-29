@@ -85,7 +85,11 @@ $effect(() => {
 | `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at a pointer position; it closes when the window resizes or Escape is pressed inside it, and the app decides what an outside click does |
 | `MenuButton` | Button that opens a menu below it; `trigger` renders the button's content and `children` receives a `close` function for the items |
 | `VirtualScroller` | Scrolling list or grid that only renders the items in view, so it stays fast with tens of thousands of items. `layout` sets the item height and, for a grid, `minItemWidth`; `header` stays pinned above the items. Items passed while `stagger` is on fade in from top to bottom, and with `animateOrder` a reordered or filtered list moves its items to their new places. `scrollToIndex`, `indicesIn` and `metrics` help with keyboard navigation and rubber-band selection |
+| `MediaControls` | Play, position, time and volume in one bar for a video or audio element; bind `paused`, `currentTime`, `muted` and `volume`, pass `buffered` to show what has loaded, a `preview` snippet to show something above the position under the pointer, and children for extra buttons at the end |
+| `SeekBar`, `VolumeControl` | The position and volume parts on their own, for players with their own layout. `SeekBar` reports every position while dragging through `onseek`, and `onscrub` says when dragging starts and stops |
 | `GlassShell`, `WindowControls` | Window body and title bar buttons |
+
+`formatClock(seconds)` turns a duration into `1:05` or `1:02:05`.
 
 `Segmented` also takes an `item` snippet to show icons instead of text; the option's `label` then becomes its accessible name.
 

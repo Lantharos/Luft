@@ -1,6 +1,7 @@
+import { formatClock } from '@luft/ui';
 import type { FileEntry } from '$lib/types';
 import type { FileDetails } from '$lib/types/details';
-import { formatBytes, formatClock, formatFullDate, plural } from '$lib/utils/format';
+import { formatBytes, formatFullDate, plural } from '$lib/utils/format';
 import { parentPath } from '$lib/utils/paths';
 import { statusLabel } from '$lib/vcs/format';
 import type { VcsState } from '$lib/vcs/state.svelte';

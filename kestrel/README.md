@@ -232,6 +232,8 @@ When an app uses the camera or microphone, shares the screen, or reads your loca
 
 Bluetooth devices that were connected when the adapter turned off, at login, or before the computer went to sleep reconnect once Bluetooth is back, as long as they are paired and trusted. Kestrel waits a moment, then tries each device a few more times with growing pauses over about three minutes before leaving it alone. Disconnecting a device, from Quick Settings or anywhere else, takes it off the list.
 
+Kestrel warns when the laptop battery, or a UPS powering the computer, reaches 20%, 10%, and 5%, and when a mouse, keyboard, headset, controller, or other connected device reaches 20% and 10%, naming the device. Each warning shows once per discharge and clears when charging starts. These replace the low battery notifications from the power service; its final notice before the computer hibernates or powers off, and the UPS power notice, stay as they are.
+
 ### Global shortcuts
 
 Apps that register shortcuts through the global shortcuts portal, such as Discord and OBS, get their preferred keys right away, without a confirmation prompt, as long as nothing else uses them. A key stays unassigned when the shell, the window manager, or media keys already use it, when another app holds it, or when it would type a character. Apps keep their shortcuts across restarts. When an app asks to change them, a dialog lists each shortcut; choose one and press the new keys, or Backspace to clear it.

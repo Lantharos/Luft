@@ -100,8 +100,12 @@ declare module 'resource:///org/gnome/shell/ui/mpris.js' {
 
 declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
   import Gio from 'gi://Gio';
+  export const Urgency: { LOW: number; NORMAL: number; HIGH: number; CRITICAL: number };
+  export const PrivacyScope: { USER: number; SYSTEM: number };
   export class Notification {
-    constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon });
+    constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon; urgency?: number; privacyScope?: number });
+    connect(signal: 'destroy', callback: () => void): number;
+    destroy(): void;
   }
   export class Source {
     addNotification(notification: Notification): void;

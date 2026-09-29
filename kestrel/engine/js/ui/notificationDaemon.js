@@ -3,6 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
+import * as Gettext from 'gettext';
 
 import * as Config from '../misc/config.js';
 import {emitSignalToDestination} from '../misc/dbusUtils.js';
@@ -24,6 +25,14 @@ const NotificationClosedReason = {
     APP_CLOSED: 3,
     UNDEFINED: 4,
 };
+
+const POWER_WARNING_ICONS = ['battery-low-symbolic', 'battery-caution-symbolic'];
+
+function isLowBatteryWarning(summary, hints) {
+    return hints['desktop-entry'] === 'gnome-power-panel' &&
+        POWER_WARNING_ICONS.includes(hints['image-path']) &&
+        summary !== Gettext.dgettext('gnome-settings-daemon', 'UPS Discharging');
+}
 
 /** @enum {number} */
 const Urgency = {
@@ -146,6 +155,9 @@ class FdoNotificationDaemon {
         }
 
         hints = {urgency: Urgency.NORMAL, ...hints};
+
+        if (isLowBatteryWarning(summary, hints))
+            return invocation.return_value(GLib.Variant.new('(u)', [this._nextNotificationId++]));
 
         // Be compatible with the various hints for image data and image path
         // 'image-data' and 'image-path' are the latest name of these hints, introduced in 1.2

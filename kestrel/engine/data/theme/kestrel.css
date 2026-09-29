@@ -54,6 +54,7 @@ stage { font-family: "Open Runde"; }
 .kestrel-privacy:active, .kestrel-privacy:focus { background-color: #ffb877; }
 .kestrel-privacy-icons { spacing: 6px; }
 .kestrel-clock { text-align: right; font-size: 12px; font-weight: 500; }
+.kestrel-input-source-label { min-width: 20px; text-align: center; font-size: 12px; font-weight: 500; }
 
 .kestrel-popover {
   background-color: transparent;
@@ -249,6 +250,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-context-action:active { background-color: rgba(255, 255, 255, 0.24); }
 .kestrel-context-row { spacing: 10px; }
 .kestrel-context-icon { icon-size: 16px; width: 16px; }
+.kestrel-context-detail { color: rgba(255, 255, 255, 0.55); font-size: 12px; }
 .kestrel-context-separator { height: 1px; margin: 4px 8px; background-color: rgba(255, 255, 255, 0.12); }
 
 .kestrel-window-previews {
@@ -344,6 +346,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-switcher-window { spacing: 8px; }
 .kestrel-switcher-header { spacing: 8px; padding: 0 2px; }
 .kestrel-switcher-title { font-size: 13px; font-weight: 500; text-align: left; }
+.input-source-switcher-symbol { width: 104px; height: 72px; font-size: 28px; font-weight: 600; }
+.input-source-switcher-name { padding: 0 6px 4px; font-size: 13px; font-weight: 500; }
 .switcher-list .item-box:selected, .switcher-list .item-box:outlined { background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
 .workspace-switcher.kestrel-glass { padding: 10px 14px; border-radius: 999px; margin-bottom: 64px; }
 .ws-switcher-indicator { background-color: rgba(255, 255, 255, 0.17); border: none; border-radius: 999px; }

@@ -15,6 +15,7 @@ import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './desktopPeek.js';
 import { PanelClock } from './clock.js';
 import { PrivacyIndicator } from '../privacy/indicator.js';
+import { InputSourceIndicator } from '../inputSources/indicator.js';
 
 function systemMonitor(): Shell.App | null {
   const appSystem = Shell.AppSystem.get_default();
@@ -53,8 +54,9 @@ export class KestrelPanel {
   private readonly startButton: St.Button;
   private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
-  readonly tray: Tray | null = null;
+  private readonly tray: Tray | null = null;
   private readonly privacy: PrivacyIndicator | null = null;
+  private readonly inputSource: InputSourceIndicator | null = null;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1, actions.activateWindow);
@@ -88,6 +90,8 @@ export class KestrelPanel {
       right.add_child(this.privacy.actor);
       this.tray = new Tray(menus);
       right.add_child(this.tray.actor);
+      this.inputSource = new InputSourceIndicator(menus);
+      right.add_child(this.inputSource.actor);
       this.quickButton = new St.Button({
         style_class: 'kestrel-status-button', child: this.statusIcons,
         can_focus: true, accessible_name: 'Quick settings',
@@ -132,6 +136,7 @@ export class KestrelPanel {
   shutdown(): void {
     this.tray?.shutdown();
     this.privacy?.shutdown();
+    this.inputSource?.shutdown();
     this.taskbar.shutdown();
     this.clock.destroy();
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
@@ -141,6 +146,10 @@ export class KestrelPanel {
   destroy(): void {
     this.shutdown();
     this.actor.destroy();
+  }
+
+  handlesScroll(actor: Clutter.Actor | null): boolean {
+    return !!this.tray?.contains(actor) || !!this.inputSource?.contains(actor);
   }
 
   updateStatus(iconNames: string[]): void {

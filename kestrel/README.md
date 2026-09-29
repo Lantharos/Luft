@@ -234,6 +234,10 @@ Bluetooth devices that were connected when the adapter turned off, at login, or 
 
 Kestrel warns when the laptop battery, or a UPS powering the computer, reaches 20%, 10%, and 5%, and when a mouse, keyboard, headset, controller, or other connected device reaches 20% and 10%, naming the device. Each warning shows once per discharge and clears when charging starts. These replace the low battery notifications from the power service; its final notice before the computer hibernates or powers off, and the UPS power notice, stay as they are.
 
+### Input sources
+
+With more than one keyboard layout or input method, the current one shows beside the status icons on the primary display, such as EN or DE. Input methods with modes, such as Mozc, show the current mode instead, for example あ for Hiragana or A for direct input, and the label also appears for a single input method that has options. Clicking or right-clicking it lists the input sources with the current one checked, then the input method's own options, such as Mozc's input mode and tools, then Show keyboard layout when a layout viewer is installed, and Keyboard settings. Scrolling over it moves to the next or previous input source. Super+Space switches with a popup showing each source's label and name, and the panel follows every switch and mode change as it happens.
+
 ### Global shortcuts
 
 Apps that register shortcuts through the global shortcuts portal, such as Discord and OBS, get their preferred keys right away, without a confirmation prompt, as long as nothing else uses them. A key stays unassigned when the shell, the window manager, or media keys already use it, when another app holds it, or when it would type a character. Apps keep their shortcuts across restarts. When an app asks to change them, a dialog lists each shortcut; choose one and press the new keys, or Backspace to clear it.

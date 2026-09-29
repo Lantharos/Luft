@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import IBus from 'gi://IBus';
 import Meta from 'gi://Meta';
+import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as Gettext from 'gettext';
@@ -42,7 +43,7 @@ export class InputSource extends Signals.EventEmitter {
         this.type = type;
         this.id = id;
         this.displayName = displayName;
-        this._shortName = shortName;
+        this._shortName = shortName.toUpperCase();
         this.index = index;
 
         this.properties = null;
@@ -111,7 +112,7 @@ class InputSourcePopup extends SwitcherPopup.SwitcherPopup {
 const InputSourceSwitcher = GObject.registerClass(
 class InputSourceSwitcher extends SwitcherPopup.SwitcherList {
     _init(items) {
-        super._init(true);
+        super._init(false);
 
         for (let i = 0; i < items.length; i++)
             this._addIcon(items[i]);
@@ -133,9 +134,11 @@ class InputSourceSwitcher extends SwitcherPopup.SwitcherList {
         box.add_child(symbol);
 
         const text = new St.Label({
+            style_class: 'input-source-switcher-name',
             text: item.displayName,
             x_align: Clutter.ActorAlign.CENTER,
         });
+        text.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         box.add_child(text);
 
         this.addItem(box, text);

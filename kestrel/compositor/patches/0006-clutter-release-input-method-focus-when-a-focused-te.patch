@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 29 Sep 2026 19:24:18 +0200
+Subject: [PATCH 6/6] clutter: release input method focus when a focused text
+ is destroyed
+
+Actors being destroyed never get key-focus-out, so a ClutterText destroyed
+while it had key focus left the input method pointing at it. The next
+surrounding text request from the input method, such as after switching
+input sources, read the freed text.
+---
+ clutter/clutter/pango/clutter-text.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/clutter/clutter/pango/clutter-text.c b/clutter/clutter/pango/clutter-text.c
+index c7566e30f1e5f801bb1d7737166cf0f3632bdde5..efdd9aeba698ec11b8d47880ea6831a725af9398 100644
+--- a/clutter/clutter/pango/clutter-text.c
++++ b/clutter/clutter/pango/clutter-text.c
+@@ -1952,6 +1952,9 @@ clutter_text_dispose (GObject *gobject)
+ 
+   g_clear_handle_id (&priv->password_hint_id, mtk_source_remove);
+ 
++  if (clutter_input_focus_is_focused (priv->input_focus))
++    clutter_input_method_focus_out (clutter_backend_get_input_method (backend));
++
+   clutter_text_set_buffer (self, NULL);
+   clutter_text_set_input_interceptor (self, NULL);
+ 

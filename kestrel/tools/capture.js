@@ -17,6 +17,7 @@ import {checkSnapGroups} from './checks/desktop/snapGroupChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
+import {checkInputSources} from './checks/system/inputSourceChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
@@ -317,6 +318,7 @@ export async function run() {
   await checkSnapGroups({pause});
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
+  await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSessionManager({pause, pointer});

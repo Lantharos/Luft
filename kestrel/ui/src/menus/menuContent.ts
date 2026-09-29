@@ -3,7 +3,7 @@ import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
 export type MenuIcon = Gio.Icon | St.ImageContent | null;
-export interface MenuAction { label: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
+export interface MenuAction { label: string; detail?: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
 export interface MenuGroup { label: string; enabled?: boolean; icon?: MenuIcon; children: MenuEntry[] | (() => Promise<MenuEntry[]>); }
 export type MenuEntry = MenuAction | MenuGroup | 'separator';
 
@@ -20,10 +20,11 @@ function slot(icon: MenuIcon | undefined, iconName: string | null): St.Icon {
   return new St.Icon({ style_class: 'kestrel-context-icon', icon_size: 16, ...icon ? { gicon: icon } : { icon_name: iconName } });
 }
 
-function row(label: string, enabled: boolean, handlers: MenuHandlers, leading: St.Icon[], trailing: string | null): St.Button {
+function row(label: string, enabled: boolean, handlers: MenuHandlers, leading: St.Icon[], trailing: string | null, detail?: string): St.Button {
   const box = new St.BoxLayout({ style_class: 'kestrel-context-row', x_expand: true });
   for (const icon of leading) box.add_child(icon);
   box.add_child(new St.Label({ text: label, x_expand: true, x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.CENTER }));
+  if (detail) box.add_child(new St.Label({ style_class: 'kestrel-context-detail', text: detail, y_align: Clutter.ActorAlign.CENTER }));
   if (trailing) box.add_child(new St.Icon({ style_class: 'kestrel-context-icon', icon_name: trailing, icon_size: 16 }));
   const button = new St.Button({ style_class: 'kestrel-context-action', accessible_name: label, can_focus: enabled, reactive: enabled,
     opacity: enabled ? 255 : 110, track_hover: true, x_expand: true, child: box });
@@ -52,7 +53,7 @@ export function menuContent(entries: MenuEntry[], handlers: MenuHandlers): St.Bo
       ...icons ? [slot(entry.icon, null)] : [],
     ];
     const group = 'children' in entry;
-    const button = row(entry.label, entry.enabled !== false, handlers, leading, group ? 'go-next-symbolic' : null);
+    const button = row(entry.label, entry.enabled !== false, handlers, leading, group ? 'go-next-symbolic' : null, group ? undefined : entry.detail);
     button.connect('clicked', () => group ? handlers.open(entry) : handlers.activate(entry));
     content.add_child(button);
   }

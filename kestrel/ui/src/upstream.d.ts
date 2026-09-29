@@ -145,3 +145,31 @@ declare module 'resource:///org/gnome/shell/ui/dialog.js' {
 declare module 'resource:///org/gnome/shell/misc/config.js' {
   export const LIBEXECDIR: string;
 }
+
+declare module 'resource:///org/gnome/shell/ui/status/keyboard.js' {
+  import type IBus from 'gi://IBus';
+  export interface InputSource {
+    readonly displayName: string;
+    readonly shortName: string;
+    readonly properties: IBus.PropList | null;
+    activate(interactive: boolean): void;
+  }
+  interface KeyboardManager {
+    readonly shortName: string;
+    readonly displayName: string;
+    isLocked(): boolean;
+    isExternal(): boolean;
+  }
+  interface InputSourceManager {
+    readonly currentSource: InputSource | null;
+    readonly inputSources: Record<number, InputSource>;
+    readonly keyboardManager: KeyboardManager;
+    connectObject(...args: unknown[]): void;
+    disconnectObject(owner: object): void;
+  }
+  export function getInputSourceManager(): InputSourceManager;
+}
+
+declare module 'resource:///org/gnome/shell/misc/ibusManager.js' {
+  export function getIBusManager(): { activateProperty(key: string, state: number): void };
+}

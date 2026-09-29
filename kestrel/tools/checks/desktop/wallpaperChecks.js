@@ -77,6 +77,12 @@ export async function checkLiveWallpaper({pause, actorNamed}) {
     window.meta_window.unmaximize();
     await pause(600);
     require(await framesPerSecond(covered) >= 10, 'the video resumes once uncovered');
+    const manager = global.workspace_manager;
+    manager.get_workspace_by_index(1).activate(global.get_current_time());
+    await pause(800);
+    require(manager.get_active_workspace_index() === 1 && panel.visible && panel.mapped, 'the panel stays on an empty workspace in front of the video');
+    manager.get_workspace_by_index(0).activate(global.get_current_time());
+    await pause(800);
   } finally {
     app.force_exit();
   }

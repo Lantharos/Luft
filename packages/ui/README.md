@@ -50,7 +50,7 @@ Preload the regular weight in `app.html` so text shows up without waiting for th
 </GlassShell>
 ```
 
-On translucent windows the sidebar lets the compositor's blur through with a light tint (`--sidebar-glass`). The sidebar is `--sidebar-width` wide, 280px by default; override the variable on the shell if the app's native blur region uses a different width. `WindowControls` sits where the native side expects the minimize, maximize and close hit areas, so keep 16px of padding to its right.
+On translucent windows the sidebar lets the compositor's blur through with a light tint (`--sidebar-glass`). The sidebar is `--sidebar-width` wide, 280px by default; override the variable on the shell if the app's native blur region uses a different width. `WindowControls` sits where the native side expects the minimize, maximize and close hit areas, so keep 16px of padding to its right. Pass `onclose` to run something first, such as saving state, and close the window from there.
 
 Feed the store from the app's startup state, which the native side builds with `luft_app::Appearance`:
 

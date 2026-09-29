@@ -29,6 +29,8 @@ pub fn run_app() -> ! {
 
 `GlassWindow::apply` makes the window frameless and translucent, blurs the sidebar (`sidebar_width` must match the web side's `--sidebar-width`), keeps the content opaque, rounds the input region and places the minimize, maximize and close hit areas where `WindowControls` draws them. With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event.
 
+The close button normally closes the window straight away. Apps that need to finish something first, such as writing unsaved work somewhere safe, use `apply_with_page_close` instead: the page's close button then receives the click, and `WindowControls`' `onclose` decides when to close.
+
 `luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's wallpaper palette and the desktop's light or dark style. The last closure runs at the same point, for any other watchers the app needs.
 
 ## Startup state

@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
+import { HeaderLayout } from 'resource:///org/gnome/shell/ui/headerLayout.js';
 
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
@@ -10,14 +11,15 @@ export class NotificationGroup {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-group' });
   private readonly cards = new Map<Notification, NotificationCard>();
   private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-group-list' });
-  private readonly icon = new St.Icon({ icon_size: 16, style_class: 'kestrel-notification-group-icon' });
+  private readonly icon = new St.Icon({ icon_size: 16, style_class: 'kestrel-notification-group-icon', y_align: Clutter.ActorAlign.CENTER });
   private readonly title = new St.Label({ style_class: 'kestrel-muted', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   private readonly more = new St.Button({ style_class: 'kestrel-text-button kestrel-notification-more', can_focus: true, visible: false });
   private expanded = false;
 
   constructor(private readonly source: NotificationSource, private readonly menus: ContextMenus, private readonly changed: () => void,
     private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void) {
-    const header = new St.BoxLayout({ style_class: 'kestrel-notification-group-header' });
+    const layout = new HeaderLayout();
+    const header = new St.BoxLayout({ style_class: 'kestrel-notification-group-header', layout_manager: layout });
     header.add_child(this.icon);
     header.add_child(this.title);
     this.more.connect('clicked', () => {
@@ -29,6 +31,8 @@ export class NotificationGroup {
       accessible_name: `Clear notifications from ${source.title}`, child: new St.Icon({ icon_name: 'edit-clear-all-symbolic', icon_size: 16 }) });
     clear.connect('clicked', () => { for (const notification of [...source.notifications]) notification.destroy(); });
     header.add_child(clear);
+    layout.overhang(this.more);
+    layout.overhang(clear);
     this.actor.add_child(header);
     this.actor.add_child(this.list);
     source.connectObject('notify::title', changed, 'notify::icon', changed, this.actor);

@@ -1,4 +1,5 @@
 import {styleSurface} from './kestrelGlass.js';
+import {HeaderLayout} from './headerLayout.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
@@ -357,6 +358,7 @@ class MessageHeader extends St.BoxLayout {
         super({
             style_class: 'message-header',
             x_expand: true,
+            layout_manager: new HeaderLayout(),
         });
 
         const sourceIconEffect = new Clutter.DesaturateEffect();
@@ -394,6 +396,8 @@ class MessageHeader extends St.BoxLayout {
             y_align: Clutter.ActorAlign.CENTER,
         });
         this.add_child(this.closeButton);
+        this.layout_manager.overhang(this.expandButton);
+        this.layout_manager.overhang(this.closeButton);
 
         const sourceTitle = new St.Label({
             style_class: 'message-source-title',

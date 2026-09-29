@@ -58,6 +58,13 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
       for (const notification of [...source.notifications]) notification.destroy();
   };
   const descendants = actor => [actor, ...actor.get_children().flatMap(descendants)];
+  const squareInset = (card, headerClass) => {
+    const header = descendants(card).find(actor => actor.has_style_class_name?.(headerClass));
+    const first = header.get_children().find(child => child.visible);
+    const [cardX, cardY] = card.get_transformed_position();
+    const [x, y] = first.get_transformed_position();
+    return Math.round(x - cardX) === Math.round(y - cardY);
+  };
 
   const replies = [];
   const subscription = Gio.DBus.session.signal_subscribe(null, 'org.freedesktop.Notifications', 'NotificationReplied',
@@ -77,6 +84,7 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
     const chatter = groups[0];
     const cards = descendants(chatter).filter(actor => actor.get_style_class_name?.() === 'kestrel-notification');
     require(cards.filter(card => card.visible).length === 2 && !!actorNamed(chatter, '1 more'), 'larger groups collapse to the newest notifications');
+    require(squareInset(chatter, 'kestrel-notification-group-header'), 'the app name sits as far from the top of a group as from its side');
     await capture(`${output}/notification-groups.png`);
 
     actorNamed(chatter, 'Reply').emit('clicked', Clutter.BUTTON_PRIMARY);
@@ -100,6 +108,7 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
     const bannerId = await notify('Chatter', 'Maya', 'Are you coming?', ['inline-reply', 'Reply']);
     await pause(700);
     const banner = descendants(global.stage).find(actor => actor.has_style_class_name?.('notification-banner'));
+    require(squareInset(banner, 'message-header'), 'the app name sits as far from the top of a banner as from its side');
     banner.expand(false);
     await pause(200);
     const replyButton = descendants(banner).find(actor => actor.label === 'Reply');

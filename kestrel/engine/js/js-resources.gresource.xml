@@ -61,6 +61,7 @@
     <file>ui/environment.js</file>
     <file>ui/focusCaretTracker.js</file>
     <file>ui/grabHelper.js</file>
+    <file>ui/headerLayout.js</file>
     <file>ui/ibusCandidatePopup.js</file>
     <file>ui/inhibitShortcutsDialog.js</file>
     <file>ui/init.js</file>

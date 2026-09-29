@@ -5,10 +5,14 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as Main from '../ui/main.js';
-import * as SignalTracker from '../misc/signalTracker.js';
-
-const SCALE_VALUE_N_STEPS = 20;
-const SCALE_VALUE_CHANGE_EPSILON = 0.001;
+import {DdcDisplays} from './ddcutil.js';
+import {
+    activeBacklights,
+    BacklightBrightnessScale,
+    BrightnessScale,
+    DdcBrightnessScale,
+    SCALE_VALUE_N_STEPS,
+} from './brightnessScales.js';
 
 const KEYBINDING_SCHEMA = 'dev.lantharos.kestrel.keybindings';
 const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
@@ -129,6 +133,8 @@ export const BrightnessManager = GObject.registerClass({
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.ALL,
             this._screenBrightnessCycleCurrentMonitor.bind(this));
+
+        this._ddc = new DdcDisplays(() => this._rebuildScales());
 
         const monitorManager = global.backend.get_monitor_manager();
         monitorManager.connectObject('monitors-changed',
@@ -252,13 +258,22 @@ export const BrightnessManager = GObject.registerClass({
     }
 
     _monitorsChanged() {
-        const monitors = global.backend
-            .get_monitor_manager()
+        const withoutBacklight = global.backend.get_monitor_manager()
             .get_logical_monitors()
-            .filter(lm => {
-                return lm.get_monitors()
-                    .some(m => m.get_backlight() && m.is_active());
-            });
+            .filter(lm => activeBacklights(lm).length === 0);
+        this._ddc.detect(withoutBacklight.flatMap(lm => lm.get_monitors().filter(m => m.is_active())));
+        this._rebuildScales();
+    }
+
+    _createScale(monitor, brightnesses) {
+        if (activeBacklights(monitor).length > 0)
+            return new BacklightBrightnessScale(monitor, brightnesses.get(monitor));
+        const displays = this._ddc.displaysFor(monitor);
+        return displays.length > 0 ? new DdcBrightnessScale(monitor, displays) : null;
+    }
+
+    _rebuildScales() {
+        const monitors = global.backend.get_monitor_manager().get_logical_monitors();
 
         this._monitorScales.values().forEach(scale => scale.destroy());
         this._monitorScales.clear();
@@ -266,8 +281,9 @@ export const BrightnessManager = GObject.registerClass({
         const brightnesses = this._getSavedBrightnesses(monitors);
 
         for (const monitor of monitors) {
-            const initialValue = brightnesses.get(monitor);
-            const scale = new MonitorBrightnessScale(monitor, initialValue);
+            const scale = this._createScale(monitor, brightnesses);
+            if (!scale)
+                continue;
             scale._scaleChanged = true;
 
             scale.connectObject(
@@ -283,7 +299,7 @@ export const BrightnessManager = GObject.registerClass({
             this._monitorScales.set(monitor, scale);
         }
 
-        if (monitors.length === 0) {
+        if (this._monitorScales.size === 0) {
             this._globalScale = null;
         } else if (!this._globalScale) {
             // Handle scales with just a few steps
@@ -403,149 +419,5 @@ export const BrightnessManager = GObject.registerClass({
             null,
             osdMonitors
         );
-    }
-});
-
-export const BrightnessScale = GObject.registerClass({
-    Properties: {
-        'value': GObject.ParamSpec.float(
-            'value', null, null,
-            GObject.ParamFlags.READWRITE,
-            0, 1.0, 1.0),
-    },
-    Signals: {
-        'destroy': {},
-    },
-}, class BrightnessScale extends GObject.Object {
-    constructor(name, value = 1.0, nSteps = SCALE_VALUE_N_STEPS) {
-        super();
-
-        this._name = name;
-        this._value = value;
-        this._nSteps = nSteps;
-    }
-
-    get name() {
-        return this._name;
-    }
-
-    get value() {
-        return this._value;
-    }
-
-    set value(value) {
-        this._setValue(value);
-    }
-
-    get nSteps() {
-        return this._nSteps;
-    }
-
-    stepUp() {
-        this._setValue(Math.min(1.0, this._value + (1.0 / this._nSteps)));
-    }
-
-    stepDown() {
-        this._setValue(Math.max(0.0, this._value - (1.0 / this._nSteps)));
-    }
-
-    cycleUp() {
-        if (Math.abs(1.0 - this._value) < SCALE_VALUE_CHANGE_EPSILON)
-            this._setValue(0.0);
-        else
-            this.stepUp();
-    }
-
-    _setValue(value) {
-        this._value = Math.clamp(value, 0.0, 1.0);
-        this.notify('value');
-    }
-
-    destroy() {
-        this.emit('destroy');
-    }
-});
-SignalTracker.registerDestroyableType(BrightnessScale);
-
-const MonitorBrightnessScale = GObject.registerClass({
-    Signals: {
-        'backlights-changed': {},
-    },
-}, class MonitorBrightnessScale extends BrightnessScale {
-    constructor(monitor, initialValue = -1.0) {
-        const name = monitor.get_monitors()[0].get_display_name();
-
-        // Handle backlights with just a few steps
-        const maxSteps = Math.max(...monitor.get_monitors()
-            .filter(m => m.get_backlight() && m.is_active())
-            .map(m => {
-                const b = m.get_backlight();
-                return b.brightnessMax - b.brightnessMin;
-            }));
-        const nSteps = Math.min(maxSteps, SCALE_VALUE_N_STEPS);
-
-        super(name, initialValue >= 0 ? initialValue : 1.0, nSteps);
-
-        this._monitor = monitor;
-        this._currentBacklightBrightness = -1;
-        this._scaleFactor = 1.0;
-
-        if (initialValue >= 0)
-            this.setBacklight(initialValue);
-        else
-            this.syncWithBacklight();
-
-        for (const backlight of this._getBacklights()) {
-            backlight.connectObject('notify::brightness', () => {
-                this.emit('backlights-changed');
-            }, this);
-        }
-    }
-
-    get monitor() {
-        return this._monitor;
-    }
-
-    _getBacklights() {
-        return this._monitor.get_monitors()
-            .filter(m => m.get_backlight() && m.is_active())
-            .map(m => m.get_backlight());
-    }
-
-    _getRelativeBrightness(backlight) {
-        const {brightness, brightnessMin: min, brightnessMax: max} = backlight;
-        return (brightness - min) / (max - min);
-    }
-
-    _setRelativeBrightness(backlight, brightness) {
-        const {brightnessMin: min, brightnessMax: max} = backlight;
-        backlight.brightness = min + ((max - min) * brightness);
-    }
-
-    syncWithBacklight() {
-        const [backlight] = this._getBacklights();
-
-        if (backlight.brightness === this._currentBacklightBrightness)
-            return false;
-        this._currentBacklightBrightness = backlight.brightness;
-
-        this.value = this._getRelativeBrightness(backlight);
-        return true;
-    }
-
-    syncWithScale(globalScale) {
-        this.value = globalScale.value * this._scaleFactor;
-    }
-
-    setBacklight(brightness) {
-        const backlights = this._getBacklights();
-        for (const backlight of backlights)
-            this._setRelativeBrightness(backlight, brightness);
-
-        this._currentBacklightBrightness = backlights[0].brightness;
-    }
-
-    updateScaleFactor(max) {
-        this._scaleFactor = this.value / max;
     }
 });

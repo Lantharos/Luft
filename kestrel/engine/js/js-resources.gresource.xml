@@ -21,10 +21,12 @@
 
     <file>misc/animationUtils.js</file>
     <file>misc/brightnessManager.js</file>
+    <file>misc/brightnessScales.js</file>
     <file>misc/config.js</file>
     <file>misc/dateUtils.js</file>
     <file>misc/dbusErrors.js</file>
     <file>misc/dbusUtils.js</file>
+    <file>misc/ddcutil.js</file>
     <file>misc/dependencies.js</file>
     <file>misc/errorUtils.js</file>
     <file>misc/fileUtils.js</file>

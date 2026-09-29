@@ -182,7 +182,7 @@ Match other apps to the wallpaper in Settings (`theme-apps` in `dev.lantharos.ke
 - GTK 4 and libadwaita: a block at the top of `~/.config/gtk-4.0/gtk.css` sets the accent, window, view, header bar, sidebar, card, dialog and popover colors for both styles. Apps pick it up when they next start and switch between light and dark on their own.
 - GTK 3: a block at the top of `~/.config/gtk-3.0/gtk.css` defines the same named colors for the current style, which themes such as adw-gtk3 use.
 - Qt: `~/.config/qt6ct/colors/Kestrel.conf` is a palette for qt6ct, and `~/.local/share/color-schemes/Kestrel.colors` is a KDE color scheme. Choose Kestrel in qt6ct, with `QT_QPA_PLATFORMTHEME=qt6ct`, or in KDE's color settings. Both follow the current style.
-- Ghostty: `Kestrel Light` and `Kestrel Dark` themes in `~/.config/ghostty/themes`, and a block at the top of the Ghostty config that selects them with `theme = light:Kestrel Light,dark:Kestrel Dark`. Colors set further down the config still win. Running Ghostty windows reload when the colors change (Ghostty 1.2 or newer).
+- Ghostty, when it is installed: `Kestrel Light` and `Kestrel Dark` themes in `~/.config/ghostty/themes`, and a block at the top of the Ghostty config that selects them with `theme = light:Kestrel Light,dark:Kestrel Dark`. Colors set further down the config still win. Running Ghostty windows reload when the colors change (Ghostty 1.2 or newer).
 
 ### Dark style schedule
 

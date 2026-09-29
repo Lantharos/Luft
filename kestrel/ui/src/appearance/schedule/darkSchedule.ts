@@ -11,7 +11,6 @@ interface Transition {
 }
 
 const DAY_MS = 86400000;
-const SCHEDULE_KEYS = ['dark-schedule', 'dark-schedule-from', 'dark-schedule-to'];
 
 function sunTransitions(coordinates: Coordinates, now: number): Transition[] {
   const today = dayNumber(now);
@@ -42,7 +41,10 @@ export class DarkSchedule {
   private evaluatedAt = 0;
 
   constructor(private readonly settings: Gio.Settings, private readonly interfaceSettings: Gio.Settings) {
-    this.settingsIds = SCHEDULE_KEYS.map(key => settings.connect(`changed::${key}`, () => this.start()));
+    this.settingsIds = [
+      settings.connect('changed::dark-schedule', () => this.start()),
+      ...['dark-schedule-from', 'dark-schedule-to'].map(key => settings.connect(`changed::${key}`, () => this.evaluate(true))),
+    ];
     this.sleepId = getLoginManager().connect('prepare-for-sleep', (_manager, aboutToSuspend) => {
       if (!aboutToSuspend) this.resume();
     });

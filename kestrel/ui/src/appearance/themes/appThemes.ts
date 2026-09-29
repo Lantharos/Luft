@@ -42,7 +42,7 @@ export class AppThemes {
       writeBlock(this.gtk3, CSS_MARKERS, gtk3Css(colors, dark)),
       writeChanged(this.qt6ct, qtPalette(colors)),
       writeChanged(this.kde, kdeColorScheme(colors)),
-      this.applyGhostty(palette),
+      ...GLib.find_program_in_path('ghostty') ? [this.applyGhostty(palette)] : [],
     ]);
   }
 
@@ -50,8 +50,17 @@ export class AppThemes {
     await Promise.all([
       removeBlock(this.gtk4, CSS_MARKERS),
       removeBlock(this.gtk3, CSS_MARKERS),
+      removeFile(this.qt6ct),
+      removeFile(this.kde),
+      this.removeGhostty(),
+    ]);
+  }
+
+  private async removeGhostty(): Promise<void> {
+    await Promise.all([
       ...this.ghosttyConfigs.map(file => removeBlock(file, CONFIG_MARKERS)),
-      ...[this.qt6ct, this.kde, this.ghosttyThemes.light, this.ghosttyThemes.dark].map(removeFile),
+      removeFile(this.ghosttyThemes.light),
+      removeFile(this.ghosttyThemes.dark),
     ]);
   }
 

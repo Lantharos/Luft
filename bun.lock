@@ -9,7 +9,7 @@
       "name": "rover",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.30",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.31",
         "markdown-it": "^15.0.2",
       },
       "devDependencies": {
@@ -30,7 +30,7 @@
       "name": "settings",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.30",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.31",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.48.0",
@@ -51,7 +51,7 @@
       "name": "@luft/ui",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.30",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.31",
         "@lucide/svelte": "^1.48.0",
       },
       "devDependencies": {
@@ -79,7 +79,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#a33b75e", {}, "Lantharos-Sabine-a33b75e", "sha512-kNXbrynhLxZh4XRhvNOqcB/g+XQXUFJuca6kAdyLe0nhGK2unJlfSrFJtXv392zI6f8aWNLO88P0MsmX0mGEmg=="],
+    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#0247230", {}, "Lantharos-Sabine-0247230", "sha512-F0YIIOvH/ZJBzLM0SQqEBMrWHwWd4mmYeUk7joHp0DaCIE6iHxBMlhJUH77TJghNV71DXJHCvY5M601uKQCShQ=="],
 
     "@lucide/svelte": ["@lucide/svelte@1.48.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-bLimVDjehxu3fpu9XEUpqEkBk2sJAHAT2sVcLHhlM70EdNsXuj9ZnYENWv5xgw3+05h4i5TirAxTiTgnZZf8gw=="],
 

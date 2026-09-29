@@ -11,12 +11,20 @@ pub struct App {
 }
 
 impl App {
-    pub fn from_info(info: &impl IsA<gio::AppInfo>) -> Option<Self> {
-        Some(Self {
-            id: info.id()?.to_string(),
+    pub fn new(id: String, info: &impl IsA<gio::AppInfo>) -> Self {
+        Self {
+            id,
             name: info.name().to_string(),
             icon: info.icon().and_then(|icon| icon_path(&icon)),
-        })
+        }
+    }
+
+    pub fn from_info(info: &impl IsA<gio::AppInfo>) -> Option<Self> {
+        Some(Self::new(info.id()?.to_string(), info))
+    }
+
+    pub fn by_id(id: &str) -> Option<Self> {
+        Self::from_info(&gio_unix::DesktopAppInfo::new(id)?)
     }
 }
 
@@ -27,4 +35,8 @@ pub fn icon_path(icon: &gio::Icon) -> Option<String> {
         icon.downcast_ref::<gio::FileIcon>()?.file().path()
     };
     path.map(|path| path.to_string_lossy().into_owned())
+}
+
+pub fn sort_by_name(apps: &mut [App]) {
+    apps.sort_by_cached_key(|app| app.name.to_lowercase());
 }

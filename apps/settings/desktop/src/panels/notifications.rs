@@ -6,7 +6,7 @@ use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
 
-use super::apps::info::App;
+use luft_app::apps::App;
 
 const SCHEMA: &str = "org.gnome.desktop.notifications";
 const APPLICATION_SCHEMA: &str = "org.gnome.desktop.notifications.application";

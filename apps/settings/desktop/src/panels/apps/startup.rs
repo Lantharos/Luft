@@ -7,7 +7,7 @@ use gio::glib;
 use gio::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::info::{self, App};
+use luft_app::apps::{self, App};
 
 const GROUP: &str = "Desktop Entry";
 const HIDDEN: &str = "Hidden";
@@ -182,6 +182,6 @@ pub fn installed_apps() -> Vec<App> {
         .filter(|app| app.should_show())
         .filter_map(App::from_info)
         .collect();
-    info::sort_by_name(&mut apps);
+    apps::sort_by_name(&mut apps);
     apps
 }

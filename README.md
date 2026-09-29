@@ -11,7 +11,6 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `apps/rover` | Rover file manager and file chooser portal backend |
 | `apps/settings` | System settings app |
 | `apps/tern` | Tern terminal |
-| `apps/tern` | Tern terminal |
 | `apps/wren` | Wren text and code editor |
 | `packages/ui` | Styles, window chrome, and controls shared by the apps |
 | `packages/app` | Native window, accent, and D-Bus setup shared by the apps |

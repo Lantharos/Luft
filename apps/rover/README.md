@@ -11,9 +11,15 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 - A details pane with a large preview, the kind, size, dates, image dimensions, media length, location, version control state and the apps that can open the file
 - Quick Look on `Space` for images, video, audio, text and code, Markdown and PDFs, moving between files with the arrow keys
 - Full keyboard navigation, including range selection and jumping to a file by typing its name
-- Image thumbnails, loaded straight from disk
+- Thumbnails for images, videos, PDFs, fonts, office documents and anything else your installed thumbnailers handle, shared with other apps through the standard thumbnail cache and made only for the files on screen
+- Search inside the current folder and everything below it, by name or by what text files contain, narrowed by kind, date and size, with results showing up as they are found
 - Folders refresh on their own when files change, including changes made by other apps
-- Copy and move run in the background with progress, pause and cancel, and never overwrite an existing file
+- Copy and move run in the background with progress, pause and cancel. When a name is already taken, Rover shows both items side by side and lets you replace, skip, keep both or merge folders, for one item or all of them
+- Undo and redo for renaming, moving, copying, creating, trashing and restoring, with a small prompt to undo right after something is moved or trashed
+- Rename many files at once by replacing text, numbering them or changing their case, with a live preview
+- Compress to zip or tar.zst, and extract zip, tar (plain, gz, bz2, xz and zst), 7z and single compressed files
+- A properties window with the kind, size (counted in the background for folders), location, dates, owner, editable permissions and the default app for the file type
+- Duplicate, copy path and open a terminal in a folder from the context menu
 - Drag and drop within Rover and to or from other apps
 - Trash across the home folder and mounted drives, with restore
 - Favorites you can add from the context menu or by dropping files on the sidebar, and reorder by dragging
@@ -36,7 +42,7 @@ bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
 ```
 
-Images are loaded through Sabine's local file access, which only works from the packaged app origin, so thumbnails appear in production builds and bundles but not while running against the Vite dev server.
+Thumbnails are loaded through Sabine's local file access, which only works from the packaged app origin, so they appear in production builds and bundles but not while running against the Vite dev server.
 
 Opening the Vite server in a regular browser shows the interface with sample data, which is handy for styling work.
 
@@ -90,9 +96,12 @@ This writes `~/.local/share/dbus-1/services/org.freedesktop.FileManager1.service
 | `Ctrl+Shift+N` | New folder |
 | `Alt+Left` / `Alt+Right` / `Alt+Up` | Back, forward and parent folder |
 | `Alt+Down` | Open the focused folder |
-| `Ctrl+F` | Search the current folder |
+| `Ctrl+F` | Filter the current folder |
+| `Ctrl+Shift+F` | Search this folder and everything inside it |
+| `Ctrl+Z` / `Ctrl+Shift+Z` or `Ctrl+Y` | Undo and redo |
 | `Ctrl+T` / `Ctrl+W` | New tab, close tab |
-| `F2` | Rename |
+| `F2` | Rename, or rename all selected files at once |
+| `Alt+Enter` | Properties |
 | `F5` | Refresh |
 | `Delete` | Move to trash, or delete for good inside the trash |
 | `Backspace` | Go to the parent folder |
@@ -106,7 +115,8 @@ rover/
 ├── src/
 │   ├── lib/
 │   │   ├── api.ts             bridge commands and events
-│   │   ├── components/        toolbar, sidebar, views, details, previews, shell and version control
+│   │   ├── components/        toolbar, sidebar, views, details, previews, dialogs, shell and version control
+│   │   ├── features/          search, thumbnails, undo, batch rename and archive state
 │   │   ├── file-manager/      navigation, view state and keys, previews, actions, drag and drop, chooser
 │   │   ├── state/             settings and tabs
 │   │   ├── utils/             formatting, paths and file kinds
@@ -114,12 +124,17 @@ rover/
 │   ├── routes/+page.svelte    window layout
 │   └── styles/                views, sidebar, toolbar and preview styles
 └── desktop/src/
+    ├── archives/              compressing and extracting
     ├── bridge/                bridge command registration
     ├── drives/                mounts, drive info and mount watching
-    ├── files/                 listing, transfers, trash, operations and folder watching
+    ├── files/                 listing, transfers and conflicts, trash, renaming, operations and folder watching
+    ├── history/               undo and redo
     ├── inspect/               file details and open with
-    ├── integration/           file chooser portal, FileManager1 and launch paths
+    ├── integration/           file chooser portal, FileManager1, terminals and launch paths
     ├── places/                recent files and trash count
+    ├── properties/            permissions, default apps and folder sizes
+    ├── search/                recursive search
+    ├── thumbnails/            thumbnail cache, thumbnailers and image scaling
     ├── vcs/                   Git and Pig
     ├── settings.rs
     └── state.rs

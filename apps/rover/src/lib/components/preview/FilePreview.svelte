@@ -2,10 +2,10 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import type { MediaInfo } from '$lib/file-manager/inspect/details.svelte';
-	import { thumbnailSource } from '$lib/file-manager/listing/thumbnails';
+	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
 	import { isDesktopRuntime, localFileSource } from '$lib/runtime';
 	import type { FileEntry } from '$lib/types';
-	import { entryIcon } from '$lib/utils/file-kinds';
+	import { entryIcon, mayBeTransparent } from '$lib/utils/file-kinds';
 	import { previewKind } from '$lib/utils/kinds';
 	import MediaControls from './MediaControls.svelte';
 	import TextPreview from './TextPreview.svelte';
@@ -36,7 +36,7 @@
 </script>
 
 {#if kind === 'image'}
-	<img class="preview-image" src={source} alt="" decoding="async" draggable="false" onload={reportMedia} onerror={() => (failed = true)} />
+	<img class={['preview-image', mayBeTransparent(entry) && 'has-backdrop']} src={source} alt="" decoding="async" draggable="false" onload={reportMedia} onerror={() => (failed = true)} />
 {:else if kind === 'video'}
 	<div class="preview-player">
 		<!-- svelte-ignore a11y_media_has_caption, a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
@@ -81,6 +81,6 @@
 	<iframe class="preview-document" src={fileUrl(entry.path)} title={entry.name}></iframe>
 {:else}
 	<div class="preview-stack">
-		<EntryIcon name={entryIcon(entry)} size={iconSize} thumbnail={thumbnailSource(entry)} fit="contain" />
+		<EntryIcon name={entryIcon(entry)} size={iconSize} {...thumbnailOf(entry)} fit="contain" />
 	</div>
 {/if}

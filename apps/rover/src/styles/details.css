@@ -126,6 +126,11 @@
 		object-fit: contain;
 	}
 
+	.preview-image.has-backdrop {
+		border-radius: 8px;
+		background: var(--thumbnail-backdrop);
+	}
+
 	.preview-stack {
 		display: flex;
 		flex-direction: column;

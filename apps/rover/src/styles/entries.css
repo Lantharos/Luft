@@ -121,6 +121,10 @@
 		outline-offset: -1px;
 	}
 
+	.entry-thumbnail.has-backdrop {
+		background: var(--thumbnail-backdrop);
+	}
+
 	.inline-name-field {
 		min-width: 0;
 		flex: 1;

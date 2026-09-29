@@ -22,6 +22,8 @@ const ICON_BY_EXTENSION = new Map(
 	Object.entries(EXTENSION_ICONS).flatMap(([icon, extensions]) => extensions.map((extension) => [extension, icon as EntryIconName]))
 );
 
+const TRANSPARENT_EXTENSIONS = new Set(['png', 'apng', 'svg', 'gif', 'webp', 'ico', 'avif', 'ttf', 'otf', 'ttc', 'woff', 'woff2', 'pfb']);
+
 const PACKAGE_MIME_TYPES = new Set([
 	'application/vnd.appimage',
 	'application/x-appimage',
@@ -40,6 +42,10 @@ function extensionOf(name: string) {
 
 export function isImage(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
 	return entry.mime_type?.startsWith('image/') || ICON_BY_EXTENSION.get(extensionOf(entry.name)) === 'image';
+}
+
+export function mayBeTransparent(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
+	return Boolean(entry.mime_type?.startsWith('font/')) || TRANSPARENT_EXTENSIONS.has(extensionOf(entry.name));
 }
 
 export function entryIcon(entry: Pick<FileEntry, 'name' | 'is_dir' | 'mime_type'>): EntryIconName {

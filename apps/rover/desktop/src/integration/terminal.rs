@@ -7,6 +7,7 @@ use std::thread;
 use gio::prelude::*;
 
 const TERMINAL_CATEGORY: &str = "TerminalEmulator";
+const TERN: &str = "dev.lantharos.tern.desktop";
 const KNOWN: [&str; 12] = [
     "ptyxis",
     "kgx",
@@ -45,10 +46,11 @@ pub fn open(path: &str) -> Result<(), String> {
 }
 
 fn candidates() -> Vec<PathBuf> {
-    let mut programs: Vec<PathBuf> = env::var_os("TERMINAL")
-        .map(PathBuf::from)
+    let mut programs: Vec<PathBuf> = gio_unix::DesktopAppInfo::new(TERN)
+        .map(|tern| tern.executable())
         .into_iter()
         .collect();
+    programs.extend(env::var_os("TERMINAL").map(PathBuf::from));
     programs.push(PathBuf::from("xdg-terminal-exec"));
     programs.extend(
         gio::AppInfo::all()
@@ -95,7 +97,7 @@ fn launch(program: &Path, folder: &Path) -> Result<(), String> {
             "--new-window".into(),
             format!("--working-directory={folder_argument}"),
         ],
-        "gnome-terminal" | "kgx" | "xfce4-terminal" | "tilix" | "ghostty" | "foot" => {
+        "tern" | "gnome-terminal" | "kgx" | "xfce4-terminal" | "tilix" | "ghostty" | "foot" => {
             vec![format!("--working-directory={folder_argument}")]
         }
         "konsole" => vec!["--workdir".into(), folder_argument.into_owned()],

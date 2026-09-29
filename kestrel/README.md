@@ -97,6 +97,8 @@ Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total
 
 The retained session components provide polkit authentication, keyring prompts, NetworkManager Wi-Fi and VPN credentials, and removable-volume prompts. The shell also exposes device-access permission dialogs, audio-device selection, mount password and question dialogs, logout and shutdown confirmation, screenshot and screencast selection, and accessibility prompts. Authentication and lock-screen verification continue to use the existing system backends.
 
+When an app asks to receive the desktop's own keyboard shortcuts, for example to record one, Kestrel asks first and remembers the answer. Luft's apps are trusted without asking. The app only receives the shortcuts while its window is focused, and Super+Escape returns them to the desktop.
+
 Retained dialogs, native menus, switchers, notification banners, volume and brightness OSDs, screenshot controls, keyboard and input-method popups, lock notifications, and developer panels share Kestrel’s transparent blur treatment. Native menu arrows are removed. Volume and brightness OSDs are a slim pill-shaped bar. Context menus fit their labels, and closing surfaces retain their selection highlight through the animation. Quick Settings, notifications, and window previews use compact content-based sizing.
 
 The screenshot tool is a single pill-shaped glass bar above the panel: area, screen, and window modes grouped in one pill, the photo and video switch in another, the pointer toggle, a compact capture button, and close, with a tooltip on each. Selection handles are small dots on the selection outline.

@@ -1,5 +1,6 @@
 export { appearance, type Appearance } from './appearance.svelte';
 
+export { default as Checkbox } from './controls/Checkbox.svelte';
 export { default as Dialog } from './controls/Dialog.svelte';
 export { default as IconButton } from './controls/IconButton.svelte';
 export { default as PasswordField } from './controls/PasswordField.svelte';

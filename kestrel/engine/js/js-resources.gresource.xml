@@ -122,6 +122,7 @@
     <file>ui/status/autoRotate.js</file>
     <file>ui/status/backlight.js</file>
     <file>ui/status/bluetooth.js</file>
+    <file>ui/status/bluetoothReconnect.js</file>
     <file>ui/status/brightness.js</file>
     <file>ui/status/caffeine.js</file>
     <file>ui/status/camera.js</file>

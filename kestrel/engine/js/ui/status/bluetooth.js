@@ -13,6 +13,7 @@ import * as PopupMenu from '../popupMenu.js';
 import {QuickMenuToggle, SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
+import {Reconnector} from './bluetoothReconnect.js';
 
 const {AdapterState} = GnomeBluetooth;
 
@@ -84,6 +85,7 @@ const BtClient = GObject.registerClass({
         this._adapter = null;
 
         this._deviceNotifyConnected = new Set();
+        this._reconnector = new Reconnector(this._client);
 
         const deviceStore = this._client.get_devices();
         for (let i = 0; i < deviceStore.get_n_items(); i++)
@@ -142,6 +144,8 @@ const BtClient = GObject.registerClass({
 
     async toggleDevice(device) {
         const connect = !device.connected;
+        if (!connect)
+            this._reconnector.forget(device.address);
         console.debug(`${connect
             ? 'Connect' : 'Disconnect'} device "${device.name}"`);
 
@@ -191,7 +195,12 @@ const BtClient = GObject.registerClass({
         device.connect('notify::alias', () => this._queueDevicesChanged());
         device.connect('notify::paired', () => this._queueDevicesChanged());
         device.connect('notify::trusted', () => this._queueDevicesChanged());
-        device.connect('notify::connected', () => this._queueDevicesChanged());
+        device.connect('notify::connected', () => {
+            this._reconnector.connectionChanged(device);
+            this._queueDevicesChanged();
+        });
+        if (device.connected)
+            this._reconnector.connectionChanged(device);
 
         this._deviceNotifyConnected.add(path);
     }

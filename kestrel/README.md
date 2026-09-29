@@ -228,6 +228,10 @@ Apps that use StatusNotifierItem, such as Discord, Steam, Nextcloud, and 1Passwo
 
 When an app uses the camera or microphone, shares the screen, or reads your location, an orange button appears beside the tray with an icon for each. Clicking it lists what is in use: apps using the camera or microphone appear by name with options to mute the microphone or close the app, and there are entries to stop screen sharing or a screen recording and to turn off location services. The button leaves once nothing is in use. An eye beside the network icon means an app, such as a video player or a presentation, or Keep Awake in Quick Settings, is keeping the screen from sleeping. An airplane appears beside it while Airplane Mode is on.
 
+### Devices and battery
+
+Bluetooth devices that were connected when the adapter turned off, at login, or before the computer went to sleep reconnect once Bluetooth is back, as long as they are paired and trusted. Kestrel waits a moment, then tries each device a few more times with growing pauses over about three minutes before leaving it alone. Disconnecting a device, from Quick Settings or anywhere else, takes it off the list.
+
 ### Global shortcuts
 
 Apps that register shortcuts through the global shortcuts portal, such as Discord and OBS, get their preferred keys right away, without a confirmation prompt, as long as nothing else uses them. A key stays unassigned when the shell, the window manager, or media keys already use it, when another app holds it, or when it would type a character. Apps keep their shortcuts across restarts. When an app asks to change them, a dialog lists each shortcut; choose one and press the new keys, or Backspace to clear it.

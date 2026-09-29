@@ -5,6 +5,7 @@ use parking_lot::RwLock;
 use serde::Serialize;
 
 use crate::APP_NAME;
+use crate::files::counts::FolderCounts;
 use crate::files::entries::{self, UserDirs};
 use crate::files::operations::OperationsQueue;
 use crate::files::watch::DirectoryWatcher;
@@ -23,6 +24,7 @@ pub struct RoverState {
     pub watcher: DirectoryWatcher,
     pub history: History,
     pub thumbnails: Thumbnails,
+    pub counts: FolderCounts,
     pub search: Search,
     pub measurements: Measurements,
     pub settings: Arc<RwLock<Settings>>,
@@ -50,6 +52,7 @@ impl RoverState {
         Self {
             history: History::new(events.clone(), queue.clone()),
             thumbnails: Thumbnails::new(events.clone()),
+            counts: FolderCounts::new(events.clone()),
             search: Search::new(events.clone()),
             measurements: Measurements::new(events.clone()),
             queue,

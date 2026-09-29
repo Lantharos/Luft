@@ -3,7 +3,7 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import { settings } from '$lib/state/settings.svelte';
-	import type { SortBy } from '$lib/types';
+	import type { GroupBy, SortBy } from '$lib/types';
 
 	interface Props {
 		manager: FileManager;
@@ -17,6 +17,19 @@
 		{ value: 'size', label: 'Size' },
 		{ value: 'type', label: 'Kind' }
 	];
+
+	const GROUPS: { value: GroupBy; label: string }[] = [
+		{ value: 'none', label: 'Don’t group' },
+		{ value: 'kind', label: 'Group by kind' },
+		{ value: 'date', label: 'Group by date' }
+	];
+
+	let groupable = $derived(manager.viewMode === 'list');
+
+	function group(value: GroupBy, close: () => void) {
+		manager.setGroupBy(value);
+		close();
+	}
 
 	function choose(value: SortBy, close: () => void) {
 		if (value !== settings.value.sortBy) manager.setSortBy(value);
@@ -51,5 +64,16 @@
 				{/if}
 			</MenuItem>
 		{/each}
+		{#if groupable}
+			<MenuSeparator />
+			{#each GROUPS as option (option.value)}
+				<MenuItem checked={settings.value.groupBy === option.value} onclick={() => group(option.value, close)}>
+					<span class="flex-1">{option.label}</span>
+					{#if settings.value.groupBy === option.value}
+						<Icon name="check" size={14} />
+					{/if}
+				</MenuItem>
+			{/each}
+		{/if}
 	{/snippet}
 </MenuButton>

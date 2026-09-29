@@ -117,6 +117,15 @@ export interface PinnedFolder {
 	icon: string | null;
 }
 
+export type ListColumnId = 'date' | 'size' | 'kind';
+export type GroupBy = 'none' | 'kind' | 'date';
+
+export interface ListColumn {
+	id: ListColumnId;
+	width: number;
+	visible: boolean;
+}
+
 export interface Settings {
 	folderViewModes: Record<string, ViewMode>;
 	sortBy: SortBy;
@@ -125,6 +134,8 @@ export interface Settings {
 	pinnedFolders: PinnedFolder[];
 	gridSize: number;
 	detailsOpen: boolean;
+	listColumns: ListColumn[];
+	groupBy: GroupBy;
 }
 
 export interface AppState extends Appearance {

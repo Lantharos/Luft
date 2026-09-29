@@ -1,6 +1,12 @@
 import * as api from '$lib/api';
 import { isDesktopRuntime } from '$lib/runtime';
-import type { Settings } from '$lib/types';
+import type { ListColumn, Settings } from '$lib/types';
+
+export const DEFAULT_LIST_COLUMNS: ListColumn[] = [
+	{ id: 'date', width: 150, visible: true },
+	{ id: 'size', width: 84, visible: true },
+	{ id: 'kind', width: 132, visible: true }
+];
 
 const DEFAULT_SETTINGS: Settings = {
 	folderViewModes: {},
@@ -9,7 +15,9 @@ const DEFAULT_SETTINGS: Settings = {
 	showHidden: false,
 	pinnedFolders: [],
 	gridSize: 88,
-	detailsOpen: false
+	detailsOpen: false,
+	listColumns: DEFAULT_LIST_COLUMNS,
+	groupBy: 'none'
 };
 
 class SettingsState {

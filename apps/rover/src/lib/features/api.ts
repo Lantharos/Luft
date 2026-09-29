@@ -8,6 +8,7 @@ import type {
 	Resolution,
 	SearchQuery,
 	SearchUpdate,
+	CountBatch,
 	ThumbnailBatch,
 	ThumbnailSize
 } from './types';
@@ -25,6 +26,7 @@ export const compressItems = (paths: string[], destination: string, name: string
 	invoke<string>('compress_items', { paths, destination, name, format });
 export const extractArchives = (paths: string[], destination: string) => invoke<string>('extract_archives', { paths, destination });
 
+export const countItems = (paths: string[], showHidden: boolean) => invoke<void>('count_items', { paths, showHidden });
 export const requestThumbnails = (paths: string[], size: ThumbnailSize) => invoke<void>('request_thumbnails', { paths, size });
 
 export const startSearch = (query: SearchQuery) => invoke<number>('start_search', { query });
@@ -41,6 +43,7 @@ export const cancelMeasure = (id: number) => invoke<void>('cancel_measure', { id
 export const events = {
 	history: (callback: (state: HistoryState) => void) => listen('rover.history', callback),
 	thumbnails: (callback: (batch: ThumbnailBatch) => void) => listen('rover.thumbnails', callback),
+	counts: (callback: (batch: CountBatch) => void) => listen('rover.counts', callback),
 	search: (callback: (update: SearchUpdate) => void) => listen('rover.search', callback),
 	measure: (callback: (measurement: Measurement) => void) => listen('rover.measure', callback)
 };

@@ -42,8 +42,10 @@ export function formatDuration(seconds: number) {
 	return `${hours}h ${minutes % 60}m`;
 }
 
+const whole = new Intl.NumberFormat();
+
 export function plural(count: number, singular: string, pluralForm = `${singular}s`) {
-	return `${count} ${count === 1 ? singular : pluralForm}`;
+	return `${whole.format(count)} ${count === 1 ? singular : pluralForm}`;
 }
 
 export function errorMessage(caught: unknown) {

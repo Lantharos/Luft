@@ -10,6 +10,7 @@ import type {
 	ClipboardState,
 	DriveInfo,
 	FileEntry,
+	GroupBy,
 	InlineDraft,
 	Operation,
 	PinnedFolder,
@@ -26,6 +27,7 @@ import { basename, parentPath, pathSegments, trimTrailingSlash } from '$lib/util
 import { FileActions } from './actions';
 import { DrivesState } from './drives.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
+import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';
 import { viewModeForPath } from './listing/view-modes';
 import { previewDrives, previewEntries, previewRecent, previewTrash, previewUserDirs } from './preview';
@@ -71,12 +73,19 @@ export class FileManager {
 	operations = $state.raw<Operation[]>([]);
 	arrival = $state.raw<Arrival | null>(null);
 
-	displayEntries = $derived(
-		visibleEntries(
-			this.view === 'recent' ? this.entries : sortedEntries(this.entries, settings.value.sortBy, settings.value.sortAsc),
-			this.searchQuery
+	grouping = $derived(this.view === 'recent' || this.viewMode === 'list' ? settings.value.groupBy : 'none');
+	#grouped = $derived(
+		groupEntries(
+			visibleEntries(
+				this.view === 'recent' ? this.entries : sortedEntries(this.entries, settings.value.sortBy, settings.value.sortAsc),
+				this.searchQuery
+			),
+			this.grouping,
+			this.view !== 'recent' && settings.value.sortBy === 'date' && settings.value.sortAsc
 		)
 	);
+	displayEntries = $derived(this.#grouped.entries);
+	sections = $derived(this.#grouped.sections);
 	cuttingPaths = $derived(
 		new Set(this.clipboard.operation === 'cut' ? this.clipboard.items.map((item) => item.path) : [])
 	);
@@ -271,6 +280,10 @@ export class FileManager {
 			sortBy,
 			sortAsc: current.sortBy === sortBy ? !current.sortAsc : true
 		}));
+	};
+
+	setGroupBy = (groupBy: GroupBy) => {
+		settings.update((current) => ({ ...current, groupBy }));
 	};
 
 	setViewMode = (mode: ViewMode) => {

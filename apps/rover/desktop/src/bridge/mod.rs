@@ -31,6 +31,14 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
             state.watcher.watch(path)
         })
         .command("list_folders", |Path { path }| folders::list_folders(path))
+        .with(
+            "count_items",
+            state,
+            |state, Counting { paths, show_hidden }| {
+                state.counts.request(paths, show_hidden);
+                Ok(())
+            },
+        )
         .command("get_file_info", |Path { path }| {
             entries::get_file_info(path)
         })

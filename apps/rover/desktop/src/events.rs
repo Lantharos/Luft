@@ -6,3 +6,4 @@ pub const HISTORY_CHANGED: &str = "rover.history";
 pub const THUMBNAILS_READY: &str = "rover.thumbnails";
 pub const SEARCH_RESULTS: &str = "rover.search";
 pub const MEASURE_PROGRESS: &str = "rover.measure";
+pub const FOLDER_COUNTS: &str = "rover.counts";

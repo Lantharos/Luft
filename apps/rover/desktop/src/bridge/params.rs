@@ -18,6 +18,13 @@ pub struct Listing {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Counting {
+    pub paths: Vec<String>,
+    pub show_hidden: bool,
+}
+
+#[derive(Deserialize)]
 pub struct NewEntry {
     pub path: String,
     pub name: String,

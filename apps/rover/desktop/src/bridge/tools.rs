@@ -28,7 +28,6 @@ struct BatchRename {
 
 #[derive(Deserialize)]
 struct ThumbnailRequest {
-    directory: String,
     paths: Vec<String>,
     size: ThumbnailSize,
 }
@@ -146,20 +145,11 @@ fn register_discovery(window: SabineWindow, state: &RoverState) -> SabineWindow 
         .with(
             "request_thumbnails",
             state,
-            |state,
-             ThumbnailRequest {
-                 directory,
-                 paths,
-                 size,
-             }| {
-                state.thumbnails.request(directory, paths, size);
+            |state, ThumbnailRequest { paths, size }| {
+                state.thumbnails.request(paths, size);
                 Ok(())
             },
         )
-        .with("cancel_thumbnails", state, |state, Empty {}| {
-            state.thumbnails.cancel();
-            Ok(())
-        })
         .with("start_search", state, |state, SearchRequest { query }| {
             state.search.start(query)
         })

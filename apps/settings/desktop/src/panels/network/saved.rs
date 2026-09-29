@@ -4,6 +4,7 @@ use std::sync::{LazyLock, Mutex};
 use luft_app::dbus;
 use luft_app::dbus::objects::{Objects, failed};
 use zbus::blocking::Proxy;
+use zbus::proxy::MethodFlags;
 
 use super::profile::settings::{Settings, get};
 use super::{CONNECTION, SERVICE, SETTINGS};
@@ -79,7 +80,7 @@ pub fn invalidate(path: &str) {
 pub fn delete(path: &str) -> Result<(), String> {
     Proxy::new(dbus::system()?, SERVICE, path, CONNECTION)
         .map_err(failed)?
-        .call_method("Delete", &())
+        .call_with_flags::<_, _, ()>("Delete", MethodFlags::AllowInteractiveAuth.into(), &())
         .map(|_| ())
         .map_err(failed)
 }

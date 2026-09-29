@@ -1,5 +1,5 @@
 pub mod enterprise;
-mod ip;
+pub mod ip;
 mod reapply;
 pub mod settings;
 pub mod wireless;
@@ -85,7 +85,7 @@ fn metered(value: Option<i32>) -> Metered {
     }
 }
 
-fn explain(error: zbus::Error) -> String {
+pub fn explain(error: zbus::Error) -> String {
     match &error {
         zbus::Error::MethodError(name, _, _) if name.ends_with("PermissionDenied") => {
             "You don't have permission to change this connection".to_owned()
@@ -122,7 +122,7 @@ pub fn load(path: &str) -> Result<Profile, String> {
     })
 }
 
-fn owner() -> Vec<String> {
+pub fn owner() -> Vec<String> {
     vec![format!(
         "user:{}:",
         gio::glib::user_name().to_string_lossy()

@@ -1,16 +1,18 @@
 <script lang="ts">
 	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 	import Globe from '@lucide/svelte/icons/globe';
+	import History from '@lucide/svelte/icons/history';
 	import Plane from '@lucide/svelte/icons/plane';
 	import Settings from '@lucide/svelte/icons/settings';
-	import Shield from '@lucide/svelte/icons/shield';
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { onMount } from 'svelte';
 	import { IconButton, Row, Section, Switch } from '@luft/ui';
 	import ConnectionPage from './connection/ConnectionPage.svelte';
 	import type { Target } from './connection/profile';
 	import ProxyDialog from './ProxyDialog.svelte';
-	import WifiSection from './WifiSection.svelte';
+	import VpnSection from './vpn/VpnSection.svelte';
+	import KnownNetworks from './wifi/KnownNetworks.svelte';
+	import WifiSection from './wifi/WifiSection.svelte';
 	import { activate, close, deactivate, disconnect, onChanged, onFailed, open, setAirplane, setWifi, type Network, type Vpn, type Wifi, type Wired } from './api';
 	import { linkLabel, speedLabel } from './describe';
 	import { proxyLabel, useProxy } from './proxy.svelte';
@@ -26,11 +28,12 @@
 
 	let network = $state<Network | null>(null);
 	let editing = $state<Editing | null>(null);
+	let browsingKnown = $state(false);
 	let proxying = $state(false);
 	let problems = $state<Record<string, string>>({});
 
 	let wifi = $derived(network?.wifi ?? null);
-	let empty = $derived(network && !network.wifi && !network.airplane && !network.wired.length && !network.vpns.length);
+	let empty = $derived(network && !network.wifi && !network.airplane && !network.wired.length);
 
 	function wifiSummary(wifi: Wifi) {
 		if (!wifi.hardwareEnabled) return 'Turned off by a hardware switch';
@@ -43,10 +46,6 @@
 		if (problems[wired.device]) return problems[wired.device];
 		if (wired.state === 'connected' && wired.speed) return `Connected · ${speedLabel(wired.speed)}`;
 		return linkLabel(wired.state);
-	}
-
-	function vpnSummary(vpn: Vpn) {
-		return problems[vpn.connection] ?? (vpn.state === 'disconnected' ? undefined : linkLabel(vpn.state));
 	}
 
 	async function attempt(key: string, action: () => Promise<void>) {
@@ -89,8 +88,10 @@
 
 {#if network && editing}
 	<ConnectionPage target={editing.target} title={editing.title} {network} onclose={() => (editing = null)} />
+{:else if network && browsingKnown}
+	<KnownNetworks {network} onconfigure={(target, title) => (editing = { target, title })} onclose={() => (browsingKnown = false)} />
 {:else if network}
-	{#if wifi || network.airplane}
+	{#if wifi || network.airplane || network.known.length}
 		<Section>
 			{#if wifi}
 				<Row title="Wi‑Fi" icon={WifiIcon} description={wifiSummary(wifi)}>
@@ -106,6 +107,14 @@
 				>
 					<Switch label="Airplane mode" checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={setAirplane} />
 				</Row>
+			{/if}
+			{#if network.known.length}
+				<Row
+					title="Known networks"
+					icon={History}
+					description={network.known.length === 1 ? '1 saved network' : `${network.known.length} saved networks`}
+					onclick={() => (browsingKnown = true)}
+				/>
 			{/if}
 		</Section>
 	{/if}
@@ -137,20 +146,7 @@
 		</Section>
 	{/if}
 
-	{#if network.vpns.length}
-		<Section title="VPN">
-			{#each network.vpns as vpn (vpn.connection)}
-				<Row title={vpn.name} icon={Shield} description={vpnSummary(vpn)}>
-					<IconButton
-						icon={Settings}
-						label="Connection settings"
-						onclick={() => (editing = { target: { kind: 'vpn', path: vpn.connection }, title: vpn.name })}
-					/>
-					<Switch label={vpn.name} checked={vpn.state !== 'disconnected'} onchange={(on) => toggleVpn(vpn, on)} />
-				</Row>
-			{/each}
-		</Section>
-	{/if}
+	<VpnSection vpns={network.vpns} {problems} ontoggle={toggleVpn} onconfigure={(target, title) => (editing = { target, title })} />
 
 	{#if empty}
 		<Section>

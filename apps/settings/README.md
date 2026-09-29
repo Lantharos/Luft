@@ -4,7 +4,7 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 
 ## Pages
 
-- Network: Wi-Fi, wired connections, VPN and proxy, with per-connection settings for IP addresses, DNS, routes, metered data, hardware addresses and work or school Wi-Fi sign-in
+- Network: Wi-Fi, wired connections, VPN and proxy, with per-connection settings for IP addresses, DNS, routes, metered data, hardware addresses and work or school Wi-Fi sign-in. Known networks lists every saved Wi-Fi network, including ones out of range, to change or forget. VPNs can be imported from WireGuard, OpenVPN and other configuration files your installed VPN plugins understand, or set up by hand for WireGuard with a freshly generated key, and VPN and wired connections can be removed
 - Bluetooth: pairing, connecting and forgetting devices, visibility to nearby devices, and device details such as battery and automatic connection
 - Displays: arrangement, resolution, refresh rate, scale, brightness and night light
 - Sound: output and input devices, connections and device profiles, volumes, which output each app plays on and alert sounds

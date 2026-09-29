@@ -51,6 +51,11 @@ export interface Vpn {
 	state: Link;
 }
 
+export interface Known {
+	connection: string;
+	ssid: string;
+}
+
 export interface Airplane {
 	enabled: boolean;
 	hardware: boolean;
@@ -58,6 +63,7 @@ export interface Airplane {
 
 export interface Network {
 	wifi: Wifi | null;
+	known: Known[];
 	wired: Wired[];
 	vpns: Vpn[];
 	airplane: Airplane | null;
@@ -78,6 +84,31 @@ export interface Join {
 	enterprise?: Enterprise;
 }
 
+export interface WireGuardPeer {
+	publicKey: string;
+	presharedKey: string;
+	endpoint: string;
+	allowedIps: string[];
+	keepalive: number | null;
+}
+
+export interface WireGuard {
+	name: string;
+	privateKey: string;
+	addresses: string[];
+	dns: string[];
+	mtu: number | null;
+	listenPort: number | null;
+	peers: WireGuardPeer[];
+}
+
+export interface WireGuardKeys {
+	privateKey: string;
+	publicKey: string;
+}
+
+const WAIT_FOR_PERSON = 300_000;
+
 export const needsPassword = (security: Security) => security === 'psk' || security === 'sae' || security === 'wep';
 
 export const open = () => invoke<Network>('network_open');
@@ -90,6 +121,11 @@ export const deactivate = (active: string) => invoke<void>('network_deactivate',
 export const disconnect = (device: string) => invoke<void>('network_disconnect', { device });
 export const join = (request: Join) => invoke<void>('network_join', { ...request });
 export const forget = (ssid: string) => invoke<void>('network_forget', { ssid });
+export const remove = (path: string) => invoke<void>('network_remove', { path }, { timeoutMs: WAIT_FOR_PERSON });
+export const importVpn = () => invoke<boolean>('network_vpn_import', {}, { timeoutMs: WAIT_FOR_PERSON });
+export const wireGuardKeys = () => invoke<WireGuardKeys>('network_wireguard_keys');
+export const wireGuardPublicKey = (key: string) => invoke<string>('network_wireguard_public_key', { key });
+export const addWireGuard = (config: WireGuard) => invoke<void>('network_wireguard_add', { ...config }, { timeoutMs: WAIT_FOR_PERSON });
 
 export const onChanged = (callback: (network: Network) => void) => listen<Network>('network.changed', callback);
 export const onFailed = (callback: (failure: Failure) => void) => listen<Failure>('network.failed', callback);

@@ -90,6 +90,10 @@ fn address(text: &str) -> Result<Entry, String> {
     ]))
 }
 
+pub fn address_data(texts: &[String]) -> Result<Vec<Entry>, String> {
+    texts.iter().map(|text| address(text)).collect()
+}
+
 fn route(route: &Route) -> Result<Entry, String> {
     let (destination, prefix) = split(&route.destination)?;
     let mut entry = HashMap::from([
@@ -110,12 +114,7 @@ pub fn store(group: &mut Group, ip: &Ip) -> Result<(), String> {
         group.remove(key);
     }
     put(group, "method", ip.method.clone());
-    let addresses = ip
-        .addresses
-        .iter()
-        .map(|text| address(text))
-        .collect::<Result<Vec<_>, _>>()?;
-    put(group, "address-data", addresses);
+    put(group, "address-data", address_data(&ip.addresses)?);
     let routes = ip.routes.iter().map(route).collect::<Result<Vec<_>, _>>()?;
     put(group, "route-data", routes);
     put_text(group, "gateway", &ip.gateway);

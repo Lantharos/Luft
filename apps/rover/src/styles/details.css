@@ -199,7 +199,7 @@
 		margin: 0;
 		padding: 20px 24px;
 		color: var(--text-soft);
-		font-family: var(--mono);
+		font-family: var(--font-mono);
 		font-size: 12.5px;
 		line-height: 1.6;
 		tab-size: 4;
@@ -271,7 +271,7 @@
 		border-radius: 5px;
 		background: var(--surface-hover);
 		padding: 0.1em 0.35em;
-		font-family: var(--mono);
+		font-family: var(--font-mono);
 		font-size: 0.9em;
 	}
 

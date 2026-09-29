@@ -9,7 +9,7 @@ pub const SCHEME_CHANGED: &str = "appearance.scheme";
 
 const NAMESPACE: &str = "org.freedesktop.appearance";
 const KEY: &str = "color-scheme";
-const PREFER_LIGHT: u32 = 2;
+const PREFER_DARK: u32 = 1;
 
 #[derive(Clone, Copy, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -21,10 +21,10 @@ pub enum Scheme {
 impl Scheme {
     fn from_portal(value: OwnedValue) -> Option<Self> {
         let preference = u32::try_from(value).ok()?;
-        Some(if preference == PREFER_LIGHT {
-            Self::Light
-        } else {
+        Some(if preference == PREFER_DARK {
             Self::Dark
+        } else {
+            Self::Light
         })
     }
 }

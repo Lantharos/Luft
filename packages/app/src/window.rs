@@ -27,6 +27,18 @@ pub struct GlassWindow<'a> {
 
 impl GlassWindow<'_> {
     pub fn apply(&self, window: SabineWindow) -> SabineWindow {
+        self.build(window, &CONTROL_OFFSETS)
+    }
+
+    pub fn apply_with_page_close(&self, window: SabineWindow) -> SabineWindow {
+        self.build(window, &CONTROL_OFFSETS[..2])
+    }
+
+    fn build(
+        &self,
+        window: SabineWindow,
+        controls: &[(SabineWindowControlAction, i32)],
+    ) -> SabineWindow {
         let mut window = window
             .title(self.title)
             .size(self.size.0, self.size.1)
@@ -45,7 +57,7 @@ impl GlassWindow<'_> {
             ))
             .input_region(WindowRegion::adaptive_rounded_rect(WINDOW_RADIUS));
 
-        for (action, offset) in CONTROL_OFFSETS {
+        for &(action, offset) in controls {
             window = window.control_region(
                 action,
                 WindowRegionRect::new(offset, CONTROL_TOP, CONTROL_SIZE, CONTROL_SIZE),

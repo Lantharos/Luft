@@ -44,7 +44,7 @@
 	}
 
 	function emptyTrash() {
-		dialogs.emptyTrash(null, trash.refresh);
+		dialogs.emptyTrash(null);
 	}
 </script>
 

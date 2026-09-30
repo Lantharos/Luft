@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
 	import * as features from '$lib/features/api';
 	import { dialogs } from '$lib/features/dialogs.svelte';
 	import { folderCounts } from '$lib/features/onscreen/folder-counts.svelte';
@@ -19,9 +20,10 @@
 
 	interface Props {
 		manager: FileManager;
+		trash: TrashCounter;
 	}
 
-	let { manager }: Props = $props();
+	let { manager, trash }: Props = $props();
 
 	const LIST_ICON_PIXELS = 32;
 
@@ -59,8 +61,8 @@
 {:else if dialog?.kind === 'compress'}
 	<CompressDialog entries={dialog.entries} destination={dialog.destination} onclose={dialogs.close} />
 {:else if dialog?.kind === 'empty-trash'}
-	{@const { trashPath, emptied } = dialog}
-	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(emptied)} onclose={dialogs.close} />
+	{@const trashPath = dialog.trashPath}
+	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(trash.refresh)} onclose={dialogs.close} />
 {/if}
 
 {#if search.open}

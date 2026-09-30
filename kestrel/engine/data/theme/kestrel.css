@@ -170,6 +170,30 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-clipboard-text { font-size: 13px; height: 34px; text-align: left; }
 .kestrel-clipboard-footer { padding: 0 2px; }
 
+.kestrel-emoji { padding: 12px; spacing: 8px; }
+.kestrel-emoji-header-row { spacing: 6px; }
+.kestrel-emoji-search { padding: 10px 14px; }
+.kestrel-emoji-caret { width: 1px; height: 17px; background-color: #ffffff; }
+.kestrel-emoji-tabs { spacing: 0; }
+.kestrel-emoji-tab { height: 34px; border-radius: 10px; color: rgba(255, 255, 255, 0.60); transition-duration: 120ms; }
+.kestrel-emoji-tab:hover { background-color: rgba(255, 255, 255, 0.09); color: #ffffff; }
+.kestrel-emoji-tab:checked { color: #ffffff; }
+.kestrel-emoji-tab:focus { background-color: rgba(255, 255, 255, 0.15); color: #ffffff; }
+.kestrel-emoji-tab-glyph { font-size: 14px; font-weight: 700; }
+.kestrel-emoji-tab-track { height: 3px; }
+.kestrel-emoji-tab-indicator { width: 14px; height: 3px; border-radius: 2px; background-color: #ffffff; }
+.kestrel-emoji-tone-button { width: 38px; height: 38px; border-radius: 999px; }
+.kestrel-emoji-tone { font-size: 18px; color: #ffffff; }
+.kestrel-emoji-grid StScrollBar { min-width: 6px; }
+.kestrel-emoji-tones .kestrel-emoji-tab:checked { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-emoji-cell { border-radius: 10px; font-size: 26px; transition-duration: 100ms; }
+.kestrel-emoji-cell:hover { background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-emoji-cell:selected { background-color: rgba(255, 255, 255, 0.20); }
+.kestrel-emoji-character { font-size: 20px; }
+.kestrel-emoji-kaomoji { font-size: 13px; padding: 0 6px; }
+.kestrel-emoji-header { padding: 12px 4px 0; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.60); }
+.kestrel-emoji-name { padding: 0 4px; height: 16px; font-size: 12px; color: rgba(255, 255, 255, 0.65); }
+
 .kestrel-media { spacing: 2px; padding: 8px; border-radius: 16px; background-color: rgba(255, 255, 255, 0.07); }
 .kestrel-media-open { padding: 0; border-radius: 10px; }
 .kestrel-media-details { spacing: 12px; }

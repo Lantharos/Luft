@@ -17,6 +17,9 @@
 	<KeyListEntry name="clipboard-history"
                       description="Show clipboard history"/>
 
+	<KeyListEntry name="emoji-picker"
+                      description="Insert emoji"/>
+
 	<KeyListEntry name="snap-layouts"
                       description="Show snap layouts for the focused window"/>
 

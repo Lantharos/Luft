@@ -766,6 +766,12 @@ export class WindowManager {
             Shell.ActionMode.NORMAL,
             () => KestrelUi.toggleSurface('clipboard'));
 
+        this.addKeybinding('emoji-picker',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('emoji'));
+
         this.addKeybinding('snap-layouts',
             new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,

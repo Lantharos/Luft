@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import IBus from 'gi://IBus';
+import Meta from 'gi://Meta';
 
 import {logErrorUnlessCancelled} from './errorUtils.js';
 import * as Keyboard from '../ui/status/keyboard.js';
@@ -36,6 +37,8 @@ export const InputMethod = GObject.registerClass({
         this._surroundingText = null;
         this._surroundingTextCursor = null;
         this._surroundingTextAnchor = null;
+        this._keyInterceptor = null;
+        this._interceptedKeys = new Set();
         this._ibus = IBus.Bus.new_async();
         this._ibus.connect('connected', this._onConnected.bind(this));
         this._ibus.connect('disconnected', this._clear.bind(this));
@@ -60,6 +63,20 @@ export const InputMethod = GObject.registerClass({
         const {window, x, y} = this._cursorWindow;
         const frame = window?.get_frame_rect() ?? {x, y};
         return {...this._cursorRect, x: this._cursorRect.x + frame.x - x, y: this._cursorRect.y + frame.y - y};
+    }
+
+    interceptKeys(interceptor) {
+        this._keyInterceptor = interceptor;
+    }
+
+    _interceptKey(event) {
+        const keycode = event.get_key_code();
+        if (event.type() === Clutter.EventType.KEY_RELEASE)
+            return this._interceptedKeys.delete(keycode);
+        if (!this._keyInterceptor?.(event))
+            return false;
+        this._interceptedKeys.add(keycode);
+        return true;
     }
 
     _updateCapabilities() {
@@ -415,6 +432,10 @@ export const InputMethod = GObject.registerClass({
     }
 
     vfunc_filter_key_event(event) {
+        if (global.display.get_keybinding_action(event.get_key_code(), event.get_state()) !== Meta.KeyBindingAction.NONE)
+            return false;
+        if (this._interceptKey(event))
+            return true;
         if (!this._context)
             return false;
         if (!this._currentSource)

@@ -28,6 +28,7 @@ systemd_req = '>= 246'
 gnome_desktop_req = '>= 40'
 pipewire_req = '>= 0.3.49'
 pango_req = '>= 1.46.0'
+harfbuzz_req = '>= 13.0.0'
 json_glib_req = '>= 1.6'
 rsvg_req = '>= 2.46'
 glycin_req = '>= 2.0'
@@ -86,6 +87,8 @@ schemas_dep = dependency('gsettings-desktop-schemas', version: schemas_req)
 gnome_desktop_dep = dependency('gnome-desktop-4', version: gnome_desktop_req)
 pango_dep = dependency('pango', version: pango_req)
 fontconfig_dep = dependency('fontconfig')
+harfbuzz_dep = dependency('harfbuzz', version: harfbuzz_req)
+harfbuzz_raster_dep = dependency('harfbuzz-raster', version: harfbuzz_req)
 json_glib_dep = dependency('json-glib-1.0', version: json_glib_req)
 rsvg_dep = dependency('librsvg-2.0', version: rsvg_req)
 glycin_dep = dependency('glycin-2', version: glycin_req)

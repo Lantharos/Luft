@@ -88,6 +88,45 @@ async function measureStartOpening(label) {
     await pause(400);
 }
 
+async function measureEmojiOpening(label) {
+    const opened = GLib.get_monotonic_time();
+    let firstFrame = 0;
+    const painted = global.stage.connect('after-paint', () => {
+        firstFrame ||= GLib.get_monotonic_time();
+    });
+    toggleSurface('emoji');
+    const toggleMs = (GLib.get_monotonic_time() - opened) / 1000;
+    await pause(600);
+    global.stage.disconnect(painted);
+    console.log(`Kestrel performance: ${JSON.stringify({
+        emojiOpening: label,
+        toggleMs: Number(toggleMs.toFixed(2)),
+        firstFrameMs: Number(((firstFrame - opened) / 1000).toFixed(2)),
+        ...processMetrics(),
+    })}`);
+}
+
+async function measureEmojiSearch() {
+    const search = find(global.stage, actor => actor.has_style_class_name?.('kestrel-emoji-search'));
+    const durations = [];
+    for (let round = 0; round < 10; round++) {
+        for (const query of ['p', 'pa', 'par', 'part', 'party', 'h', 'he', 'heart', 'smiling face', '']) {
+            const before = GLib.get_monotonic_time();
+            search.set_text(query);
+            durations.push((GLib.get_monotonic_time() - before) / 1000);
+            await pause(16);
+        }
+    }
+    durations.sort((a, b) => a - b);
+    console.log(`Kestrel performance: ${JSON.stringify({
+        emojiSearchUpdates: durations.length,
+        emojiSearchMedianMs: durations[Math.floor(durations.length / 2)],
+        emojiSearchP95Ms: durations[Math.floor(durations.length * 0.95)],
+    })}`);
+    dismissImmediately();
+    await pause(400);
+}
+
 async function longestStall(during) {
     let last = GLib.get_monotonic_time();
     let longest = 0;
@@ -114,6 +153,11 @@ export async function run() {
     await disableHelperAutoExit();
     console.log(`Kestrel performance: ${JSON.stringify(processMetrics())}`);
     await pause(1000);
+    await measureEmojiOpening('first');
+    dismissImmediately();
+    await pause(400);
+    await measureEmojiOpening('again');
+    await measureEmojiSearch();
     await measureStartOpening('first');
     await measureStartOpening('again');
     const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

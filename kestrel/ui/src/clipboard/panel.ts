@@ -6,11 +6,15 @@ import St from 'gi://St';
 
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { blurSurface } from '../shared/surface.js';
-import { ClipboardHistory } from './history.js';
-import { boxCenter, findAnchor, placeNear, type Anchor, type Box } from './placement.js';
+import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../shared/placement.js';
+import type { TextInput } from '../shared/textInput.js';
+import { ClipboardHistory, TEXT_MIME_TYPES } from './history.js';
 
 const PASTE_DELAY_MS = 120;
+const RESTORE_DELAY_MS = 500;
 const SLIDE_DISTANCE = 8;
+const WIDTH = 420;
+const MAXIMUM_HEIGHT = 480;
 
 export class ClipboardPanel {
   readonly actor = new St.BoxLayout({
@@ -31,7 +35,7 @@ export class ClipboardPanel {
     private readonly menus: ContextMenus,
     private readonly close: () => void,
     private readonly layoutChanged: () => void,
-    private readonly caret: () => Box | null,
+    private readonly input: TextInput,
   ) {
     blurSurface(this.actor);
     this.history = new ClipboardHistory(() => {
@@ -50,16 +54,17 @@ export class ClipboardPanel {
     this.actor.connect('destroy', () => this.history.destroy());
   }
 
-  get empty(): boolean {
-    return this.history.entries.length === 0;
+  get available(): boolean {
+    return this.history.entries.length > 0;
   }
 
-  prepareOpen(): void {
+  open(): void {
     this.refresh();
+    this.actor.grab_key_focus();
   }
 
   locate(): [number, number] {
-    this.anchor = findAnchor(this.caret());
+    this.anchor = findAnchor(this.input.caret);
     return boxCenter(this.anchor.box);
   }
 
@@ -67,12 +72,12 @@ export class ClipboardPanel {
     return this.above ? SLIDE_DISTANCE : -SLIDE_DISTANCE;
   }
 
-  place(width: number, limit: number, area: Box): void {
+  place(limit: number, area: Box): void {
     if (!this.anchor) return;
-    const height = this.preferredHeight(width, limit);
-    const { x, y, above } = placeNear(this.anchor, width, height, area);
+    const height = heightNear(this.anchor, area, this.preferredHeight(WIDTH, Math.min(limit, MAXIMUM_HEIGHT)));
+    const { x, y, above } = placeNear(this.anchor, WIDTH, height, area);
     this.above = above;
-    this.actor.set_size(width, height);
+    this.actor.set_size(WIDTH, height);
     this.actor.set_position(x, y);
   }
 
@@ -127,9 +132,31 @@ export class ClipboardPanel {
     St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, text);
   }
 
+  pasteWithoutKeeping(text: string): void {
+    const clipboard = St.Clipboard.get_default();
+    const mimetypes = clipboard.get_mimetypes(St.ClipboardType.CLIPBOARD);
+    const paste = (restore: () => void) => {
+      this.history.quietly(() => this.copy(text));
+      this.sendPaste(() => GLib.timeout_add(GLib.PRIORITY_DEFAULT, RESTORE_DELAY_MS, () => {
+        this.history.quietly(restore);
+        return GLib.SOURCE_REMOVE;
+      }));
+    };
+    const [mimetype] = mimetypes;
+    if (mimetypes.some(type => TEXT_MIME_TYPES.includes(type)))
+      clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, previous) => paste(() => this.copy(previous ?? '')));
+    else if (mimetype)
+      clipboard.get_content(St.ClipboardType.CLIPBOARD, mimetype, (_clipboard, bytes) => paste(() => clipboard.set_content(St.ClipboardType.CLIPBOARD, mimetype, bytes)));
+    else paste(() => {});
+  }
+
   private paste(text: string): void {
     this.copy(text);
     this.close();
+    this.sendPaste();
+  }
+
+  private sendPaste(sent?: () => void): void {
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, PASTE_DELAY_MS, () => {
       const shellGlobal = global as unknown as Shell.Global;
       const app = Shell.WindowTracker.get_default().focus_app;
@@ -140,6 +167,7 @@ export class ClipboardPanel {
       const time = GLib.get_monotonic_time();
       for (const key of keys) keyboard.notify_keyval(time, key, Clutter.KeyState.PRESSED);
       for (const key of keys.reverse()) keyboard.notify_keyval(time, key, Clutter.KeyState.RELEASED);
+      sent?.();
       return GLib.SOURCE_REMOVE;
     });
   }

@@ -271,7 +271,7 @@ async function _initializeUI() {
         stopScreencast: () => screenshotUI.stopScreencast(),
         createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
         registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
-        caret: () => inputMethod.caret,
+        inputMethod,
     });
 
     new PointerA11yTimeout.PointerA11yTimeout();

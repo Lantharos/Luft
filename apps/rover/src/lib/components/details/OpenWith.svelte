@@ -24,7 +24,7 @@
 
 {#snippet choice(app: AppChoice, primary: boolean)}
 	<button class={['open-with__app', primary && 'is-default']} type="button" onclick={() => open(app)}>
-		<AppIcon icon={app.icon} size={primary ? 28 : 22} />
+		<AppIcon icon={app.icon} id={app.id} size={primary ? 28 : 22} />
 		<span class="min-w-0 flex-1 truncate">{app.name}</span>
 		{#if primary}
 			<span class="text-[12px] text-[var(--text-muted)]">Open</span>

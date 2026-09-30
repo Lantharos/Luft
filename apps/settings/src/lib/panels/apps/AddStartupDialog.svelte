@@ -23,7 +23,7 @@
 	<div class="list soft-scroll">
 		{#each shown as app (app.id)}
 			<button type="button" class="app" onclick={() => onadd(app.id)}>
-				<AppIcon icon={app.icon} size={28} />
+				<AppIcon icon={app.icon} id={app.id} size={28} />
 				<span class="truncate">{app.name}</span>
 			</button>
 		{:else}

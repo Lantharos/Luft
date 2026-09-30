@@ -46,7 +46,7 @@
 		{@const current = handler.apps.find((app) => app.id === handler.current)}
 		<Row title={category.title} icon={category.icon}>
 			{#if current}
-				<AppIcon icon={current.icon} size={24} />
+				<AppIcon icon={current.icon} id={current.id} size={24} />
 			{/if}
 			<Select
 				label={category.title}

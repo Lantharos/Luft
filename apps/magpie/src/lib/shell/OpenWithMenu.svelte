@@ -24,7 +24,7 @@
 						void api.openWith(path, app.id);
 					}}
 				>
-					<AppIcon icon={app.icon} size={20} />
+					<AppIcon icon={app.icon} id={app.id} size={20} />
 					<span class="truncate">{app.name}</span>
 				</MenuItem>
 			{/each}

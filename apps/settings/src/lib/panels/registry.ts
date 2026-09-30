@@ -59,7 +59,7 @@ export const PANEL_GROUPS: Panel[][] = [
 		panel('power', 'Power & Battery', BatteryCharging, ['battery', 'sleep', 'suspend', 'power mode', 'screen blank', 'lid'], () => import('./power/PowerPanel.svelte'))
 	],
 	[
-		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'text size', 'animations'], () => import('./appearance/AppearancePanel.svelte')),
+		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'app icons', 'tinted', 'text size', 'animations'], () => import('./appearance/AppearancePanel.svelte')),
 		panel('notifications', 'Notifications', Bell, ['do not disturb', 'banners', 'lock screen', 'apps'], () => import('./notifications/NotificationsPanel.svelte'))
 	],
 	[

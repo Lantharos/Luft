@@ -31,7 +31,7 @@
 
 <ItemRow title={app.name} description={options.loaded ? summary : undefined} onclick={() => (open = true)}>
 	{#snippet leading()}
-		<AppIcon icon={app.icon} />
+		<AppIcon icon={app.icon} id={app.id} />
 	{/snippet}
 	<Switch label="Notifications from {app.name}" checked={enabled} onchange={(on) => options.set('enable', on)} />
 </ItemRow>

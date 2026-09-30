@@ -19,22 +19,9 @@ def print_as_array(ids):
     print(',\n'.join(mapped_ids))
     print(']')
 
-def print_as_pages(ids):
-    mapped_ids = []
-    for i, id in enumerate(ids):
-        mapped_ids.append(f"  '{id}': <{{'position': <{i}>}}>")
-
-    print('[{')
-    print(',\n'.join(mapped_ids))
-    print('}]')
-
 parser = argparse.ArgumentParser()
-parser.add_argument('--pages', action='store_true')
 parser.add_argument('file')
 args = parser.parse_args()
 
 ids = read_app_ids(args.file)
-if args.pages:
-    print_as_pages(ids)
-else:
-    print_as_array(ids)
+print_as_array(ids)

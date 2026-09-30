@@ -5,7 +5,6 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
 import Polkit from 'gi://Polkit';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Config from '../../misc/config.js';
@@ -64,16 +63,8 @@ function ssidToLabel(ssid) {
     return label;
 }
 
-function launchSettingsPanel(panel, ...args) {
-    const param = new GLib.Variant('av',
-        [new GLib.Variant('(sav)', [panel, args.map(s => new GLib.Variant('s', s))])]);
-
-    const app = Shell.AppSystem.get_default()
-        .lookup_app('org.gnome.Settings.desktop');
-
-    app.activate_action('launch-panel', param, 0, -1, null).catch(error => {
-        log(`Failed to launch Settings panel: ${error.message}`);
-    });
+function openNetworkSettings() {
+    Gio.AppInfo.launch_default_for_uri('kestrel-settings:network', null);
 }
 
 class ItemSorter {
@@ -695,10 +686,7 @@ class NMModemDeviceItem extends NMDeviceItem {
     }
 
     _autoConnect() {
-        if (this.wwanPanelSupported)
-            launchSettingsPanel('wwan', 'show-device', this._device.udi);
-        else
-            launchSettingsPanel('network', 'connect-3g', this._device.get_path());
+        openNetworkSettings();
     }
 
     _sessionUpdated() {
@@ -947,8 +935,7 @@ const WirelessNetwork = GObject.registerClass({
         if (conn) {
             this._device.client.activate_connection_async(conn, this._device, null, null, null);
         } else if (!this.canAutoconnect()) {
-            launchSettingsPanel('wifi', 'connect-8021x-wifi',
-                this._getDeviceDBusPath(), ap.get_path());
+            openNetworkSettings();
         } else {
             conn = new NM.SimpleConnection();
             const permission = Polkit.Permission.new_sync('org.freedesktop.NetworkManager.settings.modify.system', null, null);

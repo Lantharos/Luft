@@ -70,10 +70,6 @@ schemaconf.set('DASH_APPS', run_command(
   generate_app_list, 'default-apps/dash.txt',
   check: true,
 ).stdout())
-schemaconf.set('APP_GRID_APPS', run_command(
-  generate_app_list, '--pages', 'default-apps/app-grid.txt',
-  check: true,
-).stdout())
 schema = configure_file(
   input: 'com.lantharos.kestrel.gschema.xml.in',
   output: 'com.lantharos.kestrel.gschema.xml',

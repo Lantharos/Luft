@@ -137,7 +137,7 @@ class SettingsItem extends QuickSettingsItem {
         });
 
         this._settingsApp = Shell.AppSystem.get_default().lookup_app(
-            'org.gnome.Settings.desktop');
+            'com.lantharos.settings.desktop');
 
         if (!this._settingsApp)
             console.warn('Missing required core component Settings, expect trouble…');

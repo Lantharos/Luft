@@ -21,7 +21,7 @@
 		rate: number;
 		tracks: SubtitleTrack[];
 		track: SubtitleTrack | null;
-		frames: FramePreview;
+		frames: FramePreview | null;
 		pictureInPicture: boolean;
 		onseek: (time: number) => void;
 		onrate: (rate: number) => void;
@@ -38,6 +38,10 @@
 	}
 </script>
 
+{#snippet framePreview(at: number)}
+	<div class="frame" {@attach (node) => void (frames!.request(at), node.append(frames!.canvas))}></div>
+{/snippet}
+
 <MediaControls
 	class="video-controls"
 	bind:paused
@@ -46,10 +50,8 @@
 	{buffered}
 	bind:volume={volume.level}
 	bind:muted={volume.muted}
+	preview={frames ? framePreview : undefined}
 >
-	{#snippet preview(at)}
-		<div class="frame" {@attach (node) => void (frames.request(at), node.append(frames.canvas))}></div>
-	{/snippet}
 	{#if tracks.length}
 		<MenuButton class="icon-button" label="Subtitles" align="end" {@attach tooltip('Subtitles')}>
 			{#snippet trigger()}<Captions size={17} class={track ? 'text-[var(--accent)]' : ''} />{/snippet}

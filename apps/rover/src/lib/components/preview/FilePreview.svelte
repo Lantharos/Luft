@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
-	import { MediaControls } from '@luft/ui';
+	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
 	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
 	import type { MediaInfo } from '$lib/file-manager/inspect/details.svelte';
 	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
@@ -8,6 +8,7 @@
 	import type { FileEntry } from '$lib/types';
 	import { entryIcon, mayBeTransparent } from '$lib/utils/file-kinds';
 	import { previewKind } from '$lib/utils/kinds';
+	import NativePreview from './NativePreview.svelte';
 	import TextPreview from './TextPreview.svelte';
 
 	interface Props {
@@ -19,6 +20,7 @@
 	let { entry, full = false, onmedia }: Props = $props();
 
 	let failed = $state(false);
+	let native = $state(false);
 	let paused = $state(true);
 	let currentTime = $state(0);
 	let duration = $state(0);
@@ -33,10 +35,19 @@
 		const video = media instanceof HTMLVideoElement ? media : null;
 		onmedia?.({ width: video?.videoWidth || null, height: video?.videoHeight || null, duration: Number.isFinite(media.duration) ? media.duration : null });
 	}
+
+	function videoFailed(event: Event) {
+		if (full && decodeFailed(event.currentTarget as HTMLVideoElement) && canPlayNatively()) native = true;
+		else failed = true;
+	}
 </script>
 
 {#if kind === 'image'}
 	<img class={['preview-image', mayBeTransparent(entry) && 'has-backdrop']} src={source} alt="" decoding="async" draggable="false" onload={reportMedia} onerror={() => (failed = true)} />
+{:else if kind === 'video' && native}
+	<div class="preview-player">
+		<NativePreview {source} {onmedia} onfail={() => (failed = true)} />
+	</div>
 {:else if kind === 'video'}
 	<div class="preview-player">
 		<!-- svelte-ignore a11y_media_has_caption, a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
@@ -52,7 +63,7 @@
 			bind:muted
 			onclick={() => full && (paused = !paused)}
 			onloadedmetadata={reportMedia}
-			onerror={() => (failed = true)}
+			onerror={videoFailed}
 		></video>
 		{#if full}
 			<MediaControls bind:paused bind:currentTime {duration} bind:muted />

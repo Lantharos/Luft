@@ -95,7 +95,15 @@
 		{#if !viewer}
 			<Sidebar />
 		{/if}
-		<main class={['glass-content relative isolate', library.group === 'visual' && 'stage', chrome.idle && 'idle', immersive && 'immersive']}>
+		<main
+			class={[
+				'glass-content relative isolate',
+				library.group === 'visual' && 'stage',
+				chrome.seeThrough && 'see-through',
+				chrome.idle && 'idle',
+				immersive && 'immersive'
+			]}
+		>
 			<Header {title} {subtitle} overlay={chrome.fullscreen}>
 				{#snippet actions()}
 					<NowPlaying />

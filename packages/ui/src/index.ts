@@ -28,6 +28,9 @@ export { default as Section } from './rows/Section.svelte';
 
 export { formatClock } from './playback/clock';
 export { default as MediaControls } from './playback/MediaControls.svelte';
+export { MediaState } from './playback/media-state.svelte';
+export { canPlayNatively, decodeFailed } from './playback/native';
+export { default as NativeVideoSurface } from './playback/NativeVideoSurface.svelte';
 export { default as SeekBar } from './playback/SeekBar.svelte';
 export { default as VolumeControl } from './playback/VolumeControl.svelte';
 

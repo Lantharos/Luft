@@ -47,9 +47,7 @@
 			}
 			return;
 		}
-		if (event.key === 'Escape') {
-			open = false;
-		} else if (event.key === 'ArrowDown') {
+		if (event.key === 'ArrowDown') {
 			highlighted = (highlighted + 1) % options.length;
 		} else if (event.key === 'ArrowUp') {
 			highlighted = (highlighted - 1 + options.length) % options.length;

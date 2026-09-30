@@ -17,12 +17,19 @@
 
 	let placement = $state<AnchorPlacement | null>(null);
 
+	function closeOnEscape(event: KeyboardEvent) {
+		if (event.key !== 'Escape') return;
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		onclose();
+	}
+
 	function place(popover: HTMLElement) {
 		placement = besideAnchor(anchor.getBoundingClientRect(), { width: popover.offsetWidth, height: popover.offsetHeight }, maxHeight, align);
 	}
 </script>
 
-<svelte:window onblur={onclose} onresize={onclose} />
+<svelte:window onblur={onclose} onresize={onclose} onkeydowncapture={closeOnEscape} />
 
 <div class="backdrop" role="presentation" onpointerdown={onclose}></div>
 <div

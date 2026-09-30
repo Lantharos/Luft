@@ -7,6 +7,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `kestrel/engine` | GNOME Shell 51.0 fork using Kestrel’s local Mutter 51 build |
 | `kestrel/compositor` | Mutter patch series, window corners, and window icons |
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
+| `apps/barometer` | Barometer system monitor and task manager |
 | `apps/draft` | Draft text and code editor |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |
 | `apps/rover` | Rover file manager and file chooser portal backend |
@@ -53,7 +54,7 @@ Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1
 
 Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
 
-Draft, Magpie, Rover, Settings, Tern, and Sushi keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Barometer, Draft, Magpie, Rover, Settings, Tern, and Sushi keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
 
 ## Source and licenses
 

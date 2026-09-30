@@ -1,0 +1,83 @@
+<script lang="ts">
+	import type { MemorySample } from '$lib/backend/types';
+	import { bytes, percent, share } from '$lib/format';
+	import Chart from '$lib/resources/common/Chart.svelte';
+	import Facts from '$lib/resources/common/Facts.svelte';
+	import Meter from '$lib/resources/common/Meter.svelte';
+	import Page from '$lib/resources/common/Page.svelte';
+	import Stats from '$lib/resources/common/Stats.svelte';
+	import { monitor } from '$lib/state/monitor.svelte';
+
+	const SWAP_KINDS: Record<string, string> = { compressed: 'Compressed in memory', partition: 'Partition', file: 'File' };
+
+	let memory = $derived(monitor.latest?.memory);
+	let used = $derived(memory ? memory.total - memory.available : 0);
+	let swapUsed = $derived(memory ? memory.swapTotal - memory.swapFree : 0);
+
+	const inUse = (sample: MemorySample) => sample.total - sample.available;
+</script>
+
+<Page title="Memory" detail={memory ? `${bytes(memory.total)} installed` : null}>
+	<Chart
+		title="In use"
+		tall
+		max={memory?.total ?? 1}
+		lines={[{ values: monitor.ticks.map((tick) => inUse(tick.memory)) }]}
+		legend={[{ label: 'Now', value: memory ? `${bytes(used)} (${percent(share(used, memory.total))})` : '–' }]}
+		scale={(max) => bytes(max)}
+	/>
+
+	{#if memory}
+		<section class="flex flex-col gap-3">
+			<h2 class="px-1 text-[13px] font-medium text-[var(--text-soft)]">Composition</h2>
+			<Meter
+				label="Memory composition"
+				total={memory.total}
+				segments={[
+					{ label: 'In use', value: used, display: bytes(used), tone: 'accent' },
+					{ label: 'Cache', value: memory.available - memory.free, display: bytes(memory.available - memory.free), tone: 'soft' },
+					{ label: 'Free', value: memory.free, display: bytes(memory.free), tone: 'empty' }
+				]}
+			/>
+		</section>
+
+		<Stats
+			stats={[
+				{ label: 'In use', value: bytes(used), detail: `of ${bytes(memory.total)}` },
+				{ label: 'Available', value: bytes(memory.available) },
+				{ label: 'Apps', value: bytes(memory.anon), detail: 'Private memory of programs' },
+				{ label: 'Cached files', value: bytes(memory.cached + memory.buffers) },
+				{ label: 'Shared', value: bytes(memory.shared) },
+				{ label: 'Kernel', value: bytes(memory.kernel) },
+				{ label: 'Waiting to be written', value: bytes(memory.dirty) },
+				{ label: 'Committed', value: bytes(memory.committed), detail: 'Promised to programs' }
+			]}
+		/>
+
+		{#if memory.swapTotal > 0}
+			<Chart
+				title="Swap"
+				max={memory.swapTotal}
+				lines={[{ values: monitor.ticks.map((tick) => tick.memory.swapTotal - tick.memory.swapFree), tone: 'soft' }]}
+				legend={[{ label: 'Now', value: `${bytes(swapUsed)} of ${bytes(memory.swapTotal)}`, tone: 'soft' }]}
+				scale={(max) => bytes(max)}
+			/>
+		{/if}
+
+		<Facts
+			title="Swap and compression"
+			facts={[
+				...(memory.swaps ?? []).map((swap) => ({ label: `${swap.name} · ${SWAP_KINDS[swap.kind] ?? swap.kind}`, value: `${bytes(swap.used)} of ${bytes(swap.size)}` })),
+				{ label: 'Swapped back in', value: memory.swapCached ? bytes(memory.swapCached) : null },
+				{
+					label: 'Compressed',
+					value: memory.compressed ? `${bytes(memory.compressed.stored)} stored in ${bytes(memory.compressed.size)}` : null
+				},
+				{
+					label: 'Compression ratio',
+					value: memory.compressed && memory.compressed.size ? `${(memory.compressed.stored / memory.compressed.size).toFixed(1)}×` : null
+				}
+			]}
+		/>
+	{/if}
+</Page>

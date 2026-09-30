@@ -60,7 +60,7 @@ export class ClipboardPanel {
 
   open(): void {
     this.refresh();
-    this.actor.grab_key_focus();
+    this.list.get_first_child()!.grab_key_focus();
   }
 
   locate(): [number, number] {

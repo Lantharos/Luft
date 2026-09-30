@@ -96,6 +96,10 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       press(Clutter.KEY_Return);
       await pause(300);
       require(window.title === 'Kestrel entry: 🎉🎉👋🏼', 'people emoji are inserted with the chosen skin tone');
+      press(Clutter.KEY_Right);
+      press(Clutter.KEY_Return);
+      await pause(300);
+      require(window.title === 'Kestrel entry: 🎉🎉👋🏼🎉', 'arrow keys move between emoji while typing still searches');
 
       press(Clutter.KEY_Super_L, Clutter.KEY_period);
       await pause(300);
@@ -105,20 +109,22 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       await pause(300);
       type('ok');
       await pause(300);
-      require(!panel.visible && window.title === 'Kestrel entry: 🎉🎉👋🏼ok', 'Escape closes the panel and typing reaches the app again');
+      require(!panel.visible && window.title === 'Kestrel entry: 🎉🎉👋🏼🎉ok', 'Escape closes the panel and typing reaches the app again');
     } finally {
       app.force_exit();
     }
     await pause(400);
 
     St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, KEPT);
-    const x11App = launch(['GDK_BACKEND', 'x11']);
+    const x11App = launch(['GDK_BACKEND', 'x11'], ['GTK_IM_MODULE', 'ibus']);
     try {
       await waitFor(() => global.display.focus_window?.get_client_type() === Meta.WindowClientType.X11);
       await pause(300);
       const window = global.display.focus_window;
+      const caret = Main.inputMethod.caret;
       await openFromKeyboard(Clutter.KEY_semicolon);
       require(panel.visible && panel.contains(global.stage.get_key_focus()), 'Super+; opens the panel for an X11 app, which has no text input support');
+      require(!!caret && Math.abs(panel.y - (caret.y + caret.height)) <= 12 && Math.abs(panel.x - caret.x) <= 12, 'the panel opens just below the text cursor of an X11 app');
       type('rocket');
       await pause(200);
       press(Clutter.KEY_Return);

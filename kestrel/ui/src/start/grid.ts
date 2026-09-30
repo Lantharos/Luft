@@ -17,7 +17,6 @@ export class StartGrid {
   private readonly layout = new StartLayout();
   private readonly drag: GridDrag;
   private readonly results: SearchResults;
-  private highlightFirst = true;
   private catalogDirty = false;
   private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
@@ -57,11 +56,6 @@ export class StartGrid {
   }
 
   focusFirst(): boolean { return this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false); }
-
-  setSearchFocused(focused: boolean): void {
-    this.highlightFirst = focused;
-    if (this.searchItems) this.results.select(focused && this.firstResult ? this.results.row(this.firstResult) : null);
-  }
 
   private reveal(actor: St.Widget): void {
     const [, y] = actor.get_transformed_position();
@@ -108,13 +102,11 @@ export class StartGrid {
       this.firstResult = this.searchItems[0];
       if (!this.firstResult) this.actor.add_child(new St.Label({ text: 'No results', style_class: 'kestrel-empty' }));
       for (const item of this.searchItems) this.actor.add_child(this.results.row(item));
-      this.results.select(this.highlightFirst && this.firstResult ? this.results.row(this.firstResult) : null);
       this.scroller.vadjustment.value = 0;
       return;
     }
     this.firstResult = undefined;
     const ids = this.layout.items(this.folder).filter(id => this.visible(id));
-    this.results.select(null);
     for (let index = 0; index < ids.length; index += 6) {
       const row = new St.BoxLayout({ style_class: 'kestrel-app-row' });
       for (let column = 0; column < 6; column++) {

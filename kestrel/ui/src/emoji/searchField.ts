@@ -24,7 +24,6 @@ export class SearchField {
       changed(text.text);
       this.moveCaret();
     });
-    text.connect('notify::cursor-position', () => this.moveCaret());
     this.entry.connect('notify::allocation', () => this.moveCaret());
     this.entry.connect('button-press-event', () => {
       pressed();
@@ -56,34 +55,13 @@ export class SearchField {
   edit(event: Clutter.Event): boolean {
     const text = this.entry.clutter_text;
     const control = (event.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
-    const length = [...text.text].length;
-    const position = text.cursor_position < 0 ? length : text.cursor_position;
-    switch (event.get_key_symbol()) {
-    case Clutter.KEY_BackSpace:
-      if (control) text.delete_text(0, position);
-      else if (position > 0) text.delete_text(position - 1, position);
-      break;
-    case Clutter.KEY_Delete:
-    case Clutter.KEY_KP_Delete:
-      if (position < length) text.delete_text(position, position + 1);
-      break;
-    case Clutter.KEY_Left:
-      text.cursor_position = Math.max(0, position - 1);
-      break;
-    case Clutter.KEY_Right:
-      text.cursor_position = Math.min(length, position + 1);
-      break;
-    case Clutter.KEY_Home:
-      text.cursor_position = 0;
-      break;
-    case Clutter.KEY_End:
-      text.cursor_position = -1;
-      break;
-    default: {
+    if (event.get_key_symbol() === Clutter.KEY_BackSpace) {
+      const length = [...text.text].length;
+      text.delete_text(control ? 0 : Math.max(0, length - 1), length);
+    } else {
       const character = event.get_key_unicode();
       if (control || !character || /\p{Cc}/u.test(character)) return false;
-      text.insert_unichar(character);
-    }
+      text.insert_text(character, -1);
     }
     this.restartBlink();
     return true;
@@ -96,7 +74,7 @@ export class SearchField {
   private moveCaret(): void {
     const text = this.entry.clutter_text;
     if (!this.actor.mapped) return;
-    const [, x] = text.position_to_coords(text.cursor_position < 0 ? [...text.text].length : text.cursor_position);
+    const [, x] = text.position_to_coords([...text.text].length);
     this.caret.translation_x = text.get_allocation_box().x1 + x;
     this.restartBlink();
   }

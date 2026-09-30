@@ -23,6 +23,7 @@ import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
 import {checkPortal} from './checks/system/portalChecks.js';
 import {checkAppearance} from './checks/system/appearanceChecks.js';
+import {checkCursor} from './checks/system/cursorChecks.js';
 import {checkAppIcons} from './checks/system/appIconChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
@@ -325,6 +326,7 @@ export async function run() {
   await checkSessionManager({pause, pointer});
   await checkPortal({pause});
   await checkAppearance({pause, capture, output});
+  await checkCursor({pause, pointer});
   await checkAppIcons({pause, capture, actorNamed, output});
   await checkLiveWallpaper({pause, actorNamed});
 

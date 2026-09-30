@@ -4,3 +4,4 @@
 0004-clutter-position-shell-text-with-fractional-glyph-ad.patch
 0005-wayland-treat-shell-assigned-desktop-windows-as-desk.patch
 0006-clutter-release-input-method-focus-when-a-focused-te.patch
+0007-backends-let-cursor-implementations-decline-a-cursor.patch

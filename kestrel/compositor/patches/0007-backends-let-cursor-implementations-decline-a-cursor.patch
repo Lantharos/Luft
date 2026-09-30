@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 30 Sep 2026 17:38:24 +0200
+Subject: [PATCH 7/7] backends: let cursor implementations decline a cursor
+
+The cursor theme always built its cursors with the highest priority
+implementation. A shell that draws scalable cursors then replaced every
+Xcursor theme with its own fallback. Implementations that are initable
+can now fail to initialize, and the next one in priority order is tried,
+so Xcursor themes keep working next to scalable ones.
+---
+ src/backends/meta-cursor-theme.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/backends/meta-cursor-theme.c b/src/backends/meta-cursor-theme.c
+index 36431184d3a50d1e56d00f22d4138cead15c37ee..60763d8de34b71f58818f5e0446927853c6def7c 100644
+--- a/src/backends/meta-cursor-theme.c
++++ b/src/backends/meta-cursor-theme.c
+@@ -155,7 +155,13 @@ meta_cursor_theme_get_cursor (MetaCursorTheme   *cursor_theme,
+                                  "size", meta_prefs_get_cursor_size (),
+                                  NULL);
+ 
+-          g_assert (cursor != NULL);
++          if (G_IS_INITABLE (cursor) &&
++              !g_initable_init (G_INITABLE (cursor), NULL, NULL))
++            {
++              g_clear_object (&cursor);
++              continue;
++            }
++
+           break;
+         }
+ 

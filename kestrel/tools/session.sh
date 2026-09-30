@@ -25,6 +25,7 @@ export XDG_CONFIG_HOME="$session/config"
 export XDG_DATA_HOME="$session/data"
 export XDG_CACHE_HOME="$session/cache"
 export XDG_STATE_HOME="$session/state"
+export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
 mkdir -p "$session/data/dbus-1/services"
 printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=/bin/false\n' > "$session/data/dbus-1/services/org.freedesktop.portal.Documents.service"
 export GVFS_DISABLE_FUSE=1
@@ -67,6 +68,7 @@ dbus-run-session -- bash -c '
     export KESTREL_TRAY_SCRIPT="$root/kestrel/tools/fixtures/trayApp.js"
     export KESTREL_SESSION_CLIENT_SCRIPT="$root/kestrel/tools/fixtures/sessionClient.js"
     export KESTREL_LAPTOP_SCRIPT="$root/kestrel/tools/fixtures/laptopServices.js"
+    export KESTREL_X11_CURSOR_SCRIPT="$root/kestrel/tools/fixtures/x11Cursor.js"
     args=(--headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$root/kestrel/tools/capture.js")
     if [[ -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then
       args+=(--virtual-monitor "$KESTREL_CAPTURE_SECONDARY_SIZE")

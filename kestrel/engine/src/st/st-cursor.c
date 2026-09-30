@@ -29,6 +29,8 @@
 
 #define FALLBACK_THEME_NAME "Adwaita"
 
+#define XCURSOR_DEFAULT_PATH "~/.local/share/icons:~/.icons:/usr/share/icons:/usr/share/pixmaps"
+
 typedef struct _StCursorFrame StCursorFrame;
 
 struct _StCursorFrame
@@ -53,7 +55,11 @@ struct _StCursor
   gboolean texture_invalidated;
 };
 
+static void st_cursor_initable_iface_init (GInitableIface *iface);
+
 G_DEFINE_FINAL_TYPE_WITH_CODE (StCursor, st_cursor, META_TYPE_CURSOR,
+                               G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                      st_cursor_initable_iface_init)
                                g_io_extension_point_implement (META_CURSOR_EXTENSION_POINT_NAME,
                                                                g_define_type_id, "svg-cursor", 99))
 
@@ -208,42 +214,88 @@ load_cursor (StCursor  *cursor,
   return TRUE;
 }
 
+static gboolean
+has_xcursor_theme (const char *theme_name)
+{
+  const char *search_path = g_getenv ("XCURSOR_PATH");
+  g_auto (GStrv) dirs = g_strsplit (search_path ? search_path : XCURSOR_DEFAULT_PATH, ":", -1);
+  char **dir;
+
+  for (dir = dirs; *dir; dir++)
+    {
+      g_autofree char *root = g_str_has_prefix (*dir, "~/") ?
+        g_build_filename (g_get_home_dir (), *dir + 2, NULL) :
+        g_strdup (*dir);
+      g_autofree char *cursors = g_build_filename (root, theme_name, "cursors", NULL);
+
+      if (g_file_test (cursors, G_FILE_TEST_IS_DIR))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
 static void
-ensure_cursor (StCursor *cursor)
+load_cursor_or_fallback (StCursor *cursor,
+                         GFile    *file)
 {
   ClutterCursorType cursor_type =
     clutter_cursor_get_cursor_type (CLUTTER_CURSOR (cursor));
-  g_autoptr (GFile) file = NULL;
+  g_autoptr (GFile) fallback_file = NULL;
+  g_autoptr (GFile) fallback = NULL;
   g_autoptr (GError) error = NULL;
 
-  if (cursor_type == CLUTTER_CURSOR_NONE)
+  if (file && load_cursor (cursor, file, &error))
     return;
+
+  g_warning ("Could not load cursor '%s': %s",
+             clutter_cursor_type_to_name (cursor_type),
+             error ? error->message : "No file found");
+
+  g_clear_error (&error);
+  g_array_set_size (cursor->frames, 0);
+
+  fallback = g_file_new_for_uri (RESOURCE_CURSOR_THEME_URI_BASE);
+
+  if (!check_metadata_exists (cursor, FALLBACK_THEME_NAME,
+                              fallback, &fallback_file) ||
+      !load_cursor (cursor, fallback_file, &error))
+    {
+      g_error ("Could not load fallback for '%s': %s",
+               clutter_cursor_type_to_name (cursor_type),
+               error ? error->message : "No file found");
+    }
+}
+
+static gboolean
+st_cursor_initable_init (GInitable     *initable,
+                         GCancellable  *cancellable,
+                         GError       **error)
+{
+  StCursor *cursor = ST_CURSOR (initable);
+  const char *theme_name = meta_cursor_get_theme_name (META_CURSOR (cursor));
+  g_autoptr (GFile) file = NULL;
+
+  if (clutter_cursor_get_cursor_type (CLUTTER_CURSOR (cursor)) == CLUTTER_CURSOR_NONE)
+    return TRUE;
 
   file = find_cursor_metadata (cursor);
 
-  if (!file || !load_cursor (cursor, file, &error))
+  if (!file && has_xcursor_theme (theme_name))
     {
-      g_autoptr (GFile) fallback = NULL;
-
-      g_warning ("Could not load cursor '%s': %s",
-                 clutter_cursor_type_to_name (cursor_type),
-                 error ? error->message : "No file found");
-
-      g_clear_object (&file);
-      g_clear_error (&error);
-      g_array_set_size (cursor->frames, 0);
-
-      fallback = g_file_new_for_uri (RESOURCE_CURSOR_THEME_URI_BASE);
-
-      if (!check_metadata_exists (cursor, FALLBACK_THEME_NAME,
-                                  fallback, &file) ||
-          !load_cursor (cursor, file, &error))
-        {
-          g_error ("Could not load fallback for '%s': %s",
-                   clutter_cursor_type_to_name (cursor_type),
-                   error ? error->message : "No file found");
-        }
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                   "Cursor theme '%s' only has Xcursor images", theme_name);
+      return FALSE;
     }
+
+  load_cursor_or_fallback (cursor, file);
+  return TRUE;
+}
+
+static void
+st_cursor_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = st_cursor_initable_init;
 }
 
 static cairo_surface_t *
@@ -296,16 +348,6 @@ create_texture_for_frame (StCursor      *cursor,
                                         cairo_image_surface_get_stride (frame->surface),
                                         cairo_image_surface_get_data (frame->surface),
                                         NULL);
-}
-
-static void
-st_cursor_constructed (GObject *object)
-{
-  StCursor *cursor = ST_CURSOR (object);
-
-  G_OBJECT_CLASS (st_cursor_parent_class)->constructed (object);
-
-  ensure_cursor (cursor);
 }
 
 static void
@@ -483,7 +525,6 @@ st_cursor_class_init (StCursorClass *klass)
   ClutterCursorClass *clutter_cursor_class = CLUTTER_CURSOR_CLASS (klass);
 
   object_class->finalize = st_cursor_finalize;
-  object_class->constructed = st_cursor_constructed;
 
   clutter_cursor_class->get_geometry = st_cursor_get_geometry;
   clutter_cursor_class->get_data = st_cursor_get_data;

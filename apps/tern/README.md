@@ -35,10 +35,9 @@ The interface only runs inside the native window, since every terminal is backed
 
 ```bash
 sabine install .
-desktop/target/debug/tern --install-desktop-entry
 ```
 
-The first command installs Tern. The second registers it as a terminal, so the Start menu files it with system tools, and launchers that look for a terminal, such as `xdg-terminal-exec`, find it. It points the entry at the executable that ran the command. Rover opens folders in Tern when it is installed.
+Installing registers Tern as a terminal, so the Start menu files it with system tools and finds it when you search for a console or shell, and launchers that look for a terminal, such as `xdg-terminal-exec`, find it. Rover opens folders in Tern when it is installed.
 
 ## Command line
 

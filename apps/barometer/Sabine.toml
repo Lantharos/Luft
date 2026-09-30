@@ -1,0 +1,19 @@
+[app]
+id = "com.lantharos.barometer"
+name = "Barometer"
+generic_name = "System Monitor"
+categories = ["System", "Monitor"]
+keywords = ["task manager", "system monitor", "activity monitor", "resources", "processes", "cpu", "processor", "memory", "ram", "swap", "gpu", "graphics", "vram", "disk", "drive", "network", "battery", "temperature", "usage", "performance", "htop", "top", "kill", "end task", "force quit"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"
+local_files = true

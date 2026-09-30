@@ -24,6 +24,7 @@ const KEYBOARD_REST_TIME = KEYBOARD_ANIMATION_TIME * 2;
 const A11Y_APPLICATIONS_SCHEMA = 'org.gnome.desktop.a11y.applications';
 const SHOW_KEYBOARD = 'screen-keyboard-enabled';
 const EMOJI_PAGE_SEPARATION = 32;
+const SKIN_TONES = ['\u{1F3FB}', '\u{1F3FC}', '\u{1F3FD}', '\u{1F3FE}', '\u{1F3FF}'];
 
 /* KeyContainer puts keys in a grid where a 1:1 key takes this size */
 const KEY_SIZE = 2;
@@ -759,15 +760,15 @@ const EmojiSelection = GObject.registerClass({
         });
 
         this._sections = [
-            {first: 'grinning face', label: '🙂️'},
-            {first: 'selfie', label: '👍️'},
-            {first: 'monkey face', label: '🌷️'},
-            {first: 'grapes', label: '🍴️'},
-            {first: 'globe showing Europe-Africa', label: '✈️'},
-            {first: 'jack-o-lantern', label: '🏃️'},
-            {first: 'muted speaker', label: '🔔️'},
-            {first: 'ATM sign', label: '❤️'},
-            {first: 'chequered flag', label: '🚩️'},
+            {group: 'smileys', label: '🙂️'},
+            {group: 'people', label: '👍️'},
+            {group: 'nature', label: '🌷️'},
+            {group: 'food', label: '🍴️'},
+            {group: 'travel', label: '✈️'},
+            {group: 'activities', label: '🏃️'},
+            {group: 'objects', label: '🔔️'},
+            {group: 'symbols', label: '❤️'},
+            {group: 'flags', label: '🚩️'},
         ];
 
         this._gridLayout = gridLayout;
@@ -825,44 +826,18 @@ const EmojiSelection = GObject.registerClass({
             this._emojiPager.delta / this._emojiPager.width);
     }
 
-    _findSection(emoji) {
-        for (let i = 0; i < this._sections.length; i++) {
-            if (this._sections[i].first === emoji)
-                return this._sections[i];
-        }
-
-        return null;
-    }
-
     _populateSections() {
         const file = Gio.File.new_for_uri('resource:///org/gnome/shell/osk-layouts/emoji.json');
         const [success_, contents] = file.load_contents(null);
+        const groups = new Map(JSON.parse(new TextDecoder().decode(contents)).map(({group, emoji}) => [group, emoji]));
 
-        const emoji = JSON.parse(new TextDecoder().decode(contents));
-
-        let variants = [];
-        let currentKey = 0;
-        let currentSection = null;
-
-        for (let i = 0; i < emoji.length; i++) {
-            /* Group variants of a same emoji so they appear on the key popover */
-            if (emoji[i].name.startsWith(emoji[currentKey].name)) {
-                variants.push(emoji[i].char);
-                if (i < emoji.length - 1)
-                    continue;
-            }
-
-            const newSection = this._findSection(emoji[currentKey].name);
-            if (newSection != null) {
-                currentSection = newSection;
-                currentSection.keys = [];
-            }
-
-            /* Create the key */
-            const label = emoji[currentKey].char + String.fromCharCode(0xFE0F);
-            currentSection.keys.push({label, variants});
-            currentKey = i;
-            variants = [];
+        for (const section of this._sections) {
+            section.keys = groups.get(section.group).map(entry => {
+                if (typeof entry === 'string')
+                    return {label: entry, variants: []};
+                const [label, light] = entry;
+                return {label, variants: [label, ...SKIN_TONES.map(tone => light.replaceAll(SKIN_TONES[0], tone))]};
+            });
         }
     }
 

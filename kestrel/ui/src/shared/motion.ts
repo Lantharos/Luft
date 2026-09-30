@@ -5,8 +5,16 @@ interface EasingActor extends Clutter.Actor {
   ease(params: Record<string, unknown>): void;
 }
 
+interface EasingAdjustment extends St.Adjustment {
+  ease(target: number, params: Record<string, unknown>): void;
+}
+
 export function animateActor(actor: Clutter.Actor, params: Record<string, unknown>): void {
   (actor as EasingActor).ease(params);
+}
+
+export function animateAdjustment(adjustment: St.Adjustment, target: number, params: Record<string, unknown>): void {
+  (adjustment as EasingAdjustment).ease(target, params);
 }
 
 export function liftIcon(button: St.Button, icon: Clutter.Actor): void {

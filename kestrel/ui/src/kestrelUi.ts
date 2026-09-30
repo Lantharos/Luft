@@ -3,7 +3,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
 import { navigateWithKeyboard } from './shared/keyboardNavigation.js';
@@ -14,14 +13,14 @@ import type { Monitor } from './panel/panel.js';
 import { PanelSet } from './panel/panels.js';
 import { StartMenu } from './start/startMenu.js';
 import { QuickSettings } from './quickSettings/quickSettings.js';
-import { NotificationCenter, type MessageTray } from './notifications/notificationCenter.js';
+import { NotificationCenter } from './notifications/notificationCenter.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
 import { loadKestrelStylesheet } from './shared/stylesheet.js';
-import type { QuickSettingsSource } from './quickSettings/quickControls.js';
 import { AppearanceService } from './appearance/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
-import type { Box } from './clipboard/placement.js';
+import { EmojiPanel } from './emoji/panel.js';
+import type { CaretPopup, Context } from './context.js';
 import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
@@ -38,42 +37,12 @@ import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
 
-type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
+type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const START_HEIGHT = 600;
-const CLIPBOARD_WIDTH = 420;
-const CLIPBOARD_MAXIMUM_HEIGHT = 480;
 const OPEN_DURATION = 220;
 const CLOSE_DURATION = 160;
-
-interface LayoutManager {
-  primaryMonitor: Monitor | null;
-  monitors: Monitor[];
-  panelBox: St.Widget;
-  addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
-  addTopChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
-  removeChrome(actor: Clutter.Actor): void;
-  getWorkAreaForMonitor(index: number): Mtk.Rectangle;
-  connect(signal: string, callback: () => void): number;
-  disconnect(id: number): void;
-}
-
-interface Context {
-  layoutManager: LayoutManager;
-  messageTray: MessageTray;
-  quickSettings: QuickSettingsSource;
-  sessionMode: { isLocked: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
-  screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
-  canInteract(): boolean;
-  snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
-  activateWindow(window: Meta.Window): void;
-  openScreenshot(): void;
-  stopScreencast(): void;
-  createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
-  registerPanel(actor: St.Widget): void;
-  caret(): Box | null;
-}
 
 class KestrelUi {
   private readonly menus: ContextMenus;
@@ -85,6 +54,7 @@ class KestrelUi {
   private readonly quick: QuickSettings;
   private readonly notifications: NotificationCenter;
   private readonly clipboard: ClipboardPanel;
+  private readonly emoji: EmojiPanel;
   private readonly snapLayouts: SnapLayouts;
   private readonly taskView: TaskView;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
@@ -115,7 +85,8 @@ class KestrelUi {
     this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
       icons => this.panels.primary.updateStatus(icons), this.menus, () => this.takeScreenshot());
     this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
-    this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place(), context.caret);
+    this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place(), context.inputMethod);
+    this.emoji = new EmojiPanel(context.inputMethod, () => this.close(), text => this.clipboard.pasteWithoutKeeping(text));
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
@@ -140,6 +111,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.quick.actor);
     context.layoutManager.addTopChrome(this.notifications.actor);
     context.layoutManager.addTopChrome(this.clipboard.actor);
+    context.layoutManager.addTopChrome(this.emoji.actor);
     context.layoutManager.addTopChrome(this.snapLayouts.actor);
     context.layoutManager.addTopChrome(this.taskView.actor);
     for (const actor of this.surfaces()) {
@@ -285,7 +257,8 @@ class KestrelUi {
       actor.set_size(width, height);
       actor.set_position(Math.round(monitor.x + monitor.width - 12 - width), bottom - height);
     }
-    this.clipboard.place(CLIPBOARD_WIDTH, Math.min(CLIPBOARD_MAXIMUM_HEIGHT, available), this.context.layoutManager.getWorkAreaForMonitor(monitor.index));
+    for (const popup of [this.clipboard, this.emoji])
+      popup.place(available, this.context.layoutManager.getWorkAreaForMonitor(monitor.index));
     const [snapWidth, snapHeight] = this.snapLayouts.size();
     this.snapLayouts.actor.set_size(snapWidth, snapHeight);
     this.snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
@@ -299,8 +272,9 @@ class KestrelUi {
   private toggle(surface: Surface, monitor = this.pointerMonitor()): void {
     if (!this.canInteract()) return;
     this.previews.close();
-    if (surface === 'clipboard' && this.clipboard.empty) return;
-    if (surface === 'clipboard') monitor = this.active === surface ? this.surfaceMonitor() : this.monitorAt(...this.clipboard.locate()) ?? monitor;
+    const popup = this.popupFor(surface);
+    if (popup && !popup.available) return;
+    if (popup) monitor = this.active === surface ? this.surfaceMonitor() : this.monitorAt(...popup.locate()) ?? monitor;
     if (surface === 'snap' && !this.snapLayouts.available) return;
     if (this.active === surface && this.surfaceMonitor() === monitor) {
       this.close();
@@ -335,17 +309,17 @@ class KestrelUi {
     const opening = !actor.visible;
     actor.show();
     if (surface === 'notifications') this.notifications.prepareOpen();
-    if (surface === 'clipboard') this.clipboard.prepareOpen();
+    popup?.open();
     if (surface === 'snap') this.snapLayouts.prepareOpen();
     this.place();
     if (opening) {
-      actor.opacity = actor === this.clipboard.actor ? 0 : 255;
+      actor.opacity = popup ? 0 : 255;
       actor.translation_y = this.slideDistance(actor);
     }
     this.animate(actor, 0, OPEN_DURATION);
 
     if (surface === 'start') this.start.focus();
-    else actor.grab_key_focus();
+    else if (!popup) actor.grab_key_focus();
   }
 
   private close(): void {
@@ -354,6 +328,7 @@ class KestrelUi {
     if (surface === 'notifications') this.notifications.freeze();
     if (surface && surface !== 'tasks') this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
     this.setActive(null);
+    this.popupFor(surface)?.closed?.();
     this.cover.hide();
     for (const panel of this.panels.all)
       panel.actor.get_parent()!.set_child_below_sibling(panel.actor, (global as unknown as Shell.Global).top_window_group);
@@ -399,7 +374,15 @@ class KestrelUi {
   taskViewOpen(): boolean { return this.taskView.visible; }
 
   private surfaces(): St.BoxLayout[] {
-    return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor, this.snapLayouts.actor];
+    return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor, this.emoji.actor, this.snapLayouts.actor];
+  }
+
+  private popupFor(surface: Surface | null): CaretPopup | null {
+    return surface === 'clipboard' ? this.clipboard : surface === 'emoji' ? this.emoji : null;
+  }
+
+  private popupActor(actor: Clutter.Actor): CaretPopup | null {
+    return [this.clipboard, this.emoji].find(popup => popup.actor === actor) ?? null;
   }
 
   private actorFor(surface: PanelSurface): St.BoxLayout {
@@ -408,6 +391,7 @@ class KestrelUi {
       case 'quick': return this.quick.actor;
       case 'notifications': return this.notifications.actor;
       case 'clipboard': return this.clipboard.actor;
+      case 'emoji': return this.emoji.actor;
       case 'snap': return this.snapLayouts.actor;
     }
   }
@@ -420,7 +404,7 @@ class KestrelUi {
   ): void {
     animateActor(actor, {
       translation_y: translationY,
-      ...actor === this.clipboard.actor ? { opacity: translationY === 0 ? 255 : 0 } : {},
+      ...this.popupActor(actor) ? { opacity: translationY === 0 ? 255 : 0 } : {},
       duration,
       mode: translationY === 0
         ? Clutter.AnimationMode.EASE_OUT_QUART
@@ -430,7 +414,8 @@ class KestrelUi {
   }
 
   private slideDistance(actor: Clutter.Actor): number {
-    if (actor === this.clipboard.actor) return this.clipboard.slideDistance;
+    const popup = this.popupActor(actor);
+    if (popup) return popup.slideDistance;
     const monitor = this.surfaceMonitor();
     return monitor.y + monitor.height - actor.y;
   }

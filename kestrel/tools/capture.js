@@ -9,7 +9,8 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
 import {checkFolders} from './checks/desktop/folderChecks.js';
 import {checkSession} from './checks/desktop/sessionChecks.js';
-import {checkClipboardPlacement} from './checks/desktop/clipboardChecks.js';
+import {checkClipboardPlacement} from './checks/input/clipboardChecks.js';
+import {checkEmoji} from './checks/input/emojiChecks.js';
 import {checkTray} from './checks/desktop/trayChecks.js';
 import {checkTaskView} from './checks/desktop/taskViewChecks.js';
 import {checkNotifications} from './checks/desktop/notificationChecks.js';
@@ -17,7 +18,7 @@ import {checkSnapGroups} from './checks/desktop/snapGroupChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
-import {checkInputSources} from './checks/system/inputSourceChecks.js';
+import {checkInputSources} from './checks/input/inputSourceChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
@@ -317,6 +318,7 @@ export async function run() {
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
   await checkClipboardPlacement({pause, capture, actorNamed, keyboard, output});
+  await checkEmoji({pause, capture, actorNamed, keyboard, output});
   await checkFolders({pause, capture, actorNamed, pointer, output});
   await checkTray({pause, capture, actorNamed, pointer, output});
   await checkTaskView({pause, capture, actorNamed, pointer, keyboard, output});

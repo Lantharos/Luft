@@ -11,6 +11,15 @@
     <value nick="clear" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.SkinTone">
+    <value nick="none" value="0"/>
+    <value nick="light" value="1"/>
+    <value nick="medium-light" value="2"/>
+    <value nick="medium" value="3"/>
+    <value nick="medium-dark" value="4"/>
+    <value nick="dark" value="5"/>
+  </enum>
+
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="development-tools" type="b">
@@ -131,6 +140,14 @@
       <default>'{}'</default>
       <summary>Shortcuts that apps have registered through the global shortcuts portal</summary>
     </key>
+    <key name="emoji-recent" type="as">
+      <default>[]</default>
+      <summary>Emoji, symbols and kaomoji picked most recently, newest first</summary>
+    </key>
+    <key name="emoji-skin-tone" enum="com.lantharos.kestrel.SkinTone">
+      <default>'none'</default>
+      <summary>Skin tone used for emoji of people and hands</summary>
+    </key>
     <key name="favorite-apps" type="as">
       <default>
         @DASH_APPS@
@@ -210,6 +227,10 @@
     <key name="clipboard-history" type="as">
       <default>["&lt;Super&gt;v"]</default>
       <summary>Show clipboard history</summary>
+    </key>
+    <key name="emoji-picker" type="as">
+      <default>["&lt;Super&gt;period","&lt;Super&gt;semicolon"]</default>
+      <summary>Insert emoji</summary>
     </key>
     <key name="snap-layouts" type="as">
       <default>["&lt;Super&gt;z"]</default>

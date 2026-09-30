@@ -56,8 +56,7 @@
 		cursor: default;
 	}
 
-	.drag-region button,
-	.drag-region input,
+	.drag-region :is(button, input, textarea, select, a, label, [role='button'], [role='tab'], [role='treeitem'], [role='option'], [contenteditable], [draggable='true']),
 	[data-no-drag] {
 		-webkit-app-region: no-drag;
 	}

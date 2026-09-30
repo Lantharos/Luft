@@ -9,13 +9,13 @@
 </script>
 
 <aside class="glass-sidebar drag-region sidebar">
-	<button type="button" class="quick-open" data-no-drag onclick={() => app.showQuickOpen()}>
+	<button type="button" class="quick-open" onclick={() => app.showQuickOpen()}>
 		<Search size={15} />
 		<span class="flex-1 truncate text-left">Go to file</span>
 		<kbd>Ctrl P</kbd>
 	</button>
 
-	<div class="sidebar-body" data-no-drag>
+	<div class="sidebar-body">
 		{#if workspace.tree.root}
 			<FileTree />
 		{:else}

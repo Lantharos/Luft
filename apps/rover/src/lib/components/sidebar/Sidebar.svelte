@@ -5,6 +5,7 @@
 	import { dropKey, TRASH_DROP_PATH } from '$lib/file-manager/drag/drop-targets';
 	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import { userFolders, type TrashCounter } from '$lib/file-manager/places/places.svelte';
+	import { settings } from '$lib/state/settings.svelte';
 	import { isInside } from '$lib/utils/paths';
 	import DriveItem from './DriveItem.svelte';
 	import FavoritesGroup from './FavoritesGroup.svelte';
@@ -21,8 +22,10 @@
 
 	let search = $state<SearchField>();
 
-	let folders = $derived(userFolders(manager.userDirs));
-	let placePaths = $derived(new Set([manager.homePath, ...folders.map((folder) => folder.path)]));
+	let hidden = $derived(new Set(settings.value.hiddenPlaces));
+	let folders = $derived(userFolders(manager.userDirs).filter((folder) => !hidden.has(folder.path)));
+	let showHome = $derived(!hidden.has(manager.homePath));
+	let placePaths = $derived(new Set([...(showHome ? [manager.homePath] : []), ...folders.map((folder) => folder.path)]));
 	let browsing = $derived(manager.view === 'home');
 	let activeDrive = $derived.by(() => {
 		const path = manager.currentPath;
@@ -71,9 +74,11 @@
 		<SearchField bind:this={search} variant="sidebar" label="Search current folder" bind:value={manager.searchQuery} />
 	</div>
 
-	<nav class="sidebar-scroll hidden-scroll" aria-label="Places" data-no-drag>
+	<nav class="sidebar-scroll hidden-scroll" aria-label="Places">
 		<div class="sidebar-group">
-			<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />
+			{#if showHome}
+				<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />
+			{/if}
 			<SidebarItem
 				icon="clock"
 				label="Recent"

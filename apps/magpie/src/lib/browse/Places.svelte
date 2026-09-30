@@ -17,7 +17,7 @@
 	}
 </script>
 
-<nav class="flex flex-col gap-0.5" data-no-drag>
+<nav class="flex flex-col gap-0.5">
 	{#each library.places as location (location.place)}
 		{@const Icon = ICONS[location.place]}
 		<button

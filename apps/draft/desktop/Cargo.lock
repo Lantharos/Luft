@@ -109,7 +109,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -120,7 +120,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -147,7 +147,7 @@ version = "0.38.0+1.3.281"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bb44936d800fea8f016d7f2311c6a4f97aebd5dc86f09906139ec848cf3a46f"
 dependencies = [
- "libloading",
+ "libloading 0.8.9",
 ]
 
 [[package]]
@@ -650,7 +650,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -680,7 +680,7 @@ version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab8ecd87370524b461f8557c119c405552c396ed91fc0a8eec68679eab26f94a"
 dependencies = [
- "libloading",
+ "libloading 0.8.9",
 ]
 
 [[package]]
@@ -848,7 +848,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1104,7 +1104,7 @@ dependencies = [
  "once_cell",
  "thiserror 2.0.21",
  "windows-sys 0.59.0",
- "x11rb",
+ "x11rb 0.13.2",
  "xkeysym",
 ]
 
@@ -1126,6 +1126,18 @@ name = "glow"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29038e1c483364cc6bb3cf78feee1816002e127c331a1eec55a4d202b9e1adb5"
+dependencies = [
+ "js-sys",
+ "slotmap",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "glow"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "263218b0ba2b0715c3370fb04674f5f8aa331594b521c94ff0a8e4a8472d1386"
 dependencies = [
  "js-sys",
  "slotmap",
@@ -1552,7 +1564,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6aae1df220ece3c0ada96b8153459b67eebe9ae9212258bb0134ae60416fdf76"
 dependencies = [
  "libc",
- "libloading",
+ "libloading 0.8.9",
  "pkg-config",
 ]
 
@@ -1612,6 +1624,16 @@ name = "libloading"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
+dependencies = [
+ "cfg-if",
+ "windows-link",
+]
+
+[[package]]
+name = "libloading"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "754ca22de805bb5744484a5b151a9e1a8e837d5dc232c2d7d8c2e3492edc8b60"
 dependencies = [
  "cfg-if",
  "windows-link",
@@ -1800,7 +1822,7 @@ dependencies = [
  "once_cell",
  "png",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2496,7 +2518,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2542,8 +2564,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "ashpd",
  "base64",
@@ -2552,10 +2574,13 @@ dependencies = [
  "futures-util",
  "getrandom 0.4.3",
  "global-hotkey",
+ "glow 0.18.0",
  "glyphon",
  "image",
+ "khronos-egl",
  "ksni",
  "libc",
+ "libloading 0.9.0",
  "mach2",
  "objc2",
  "objc2-app-kit",
@@ -2579,15 +2604,19 @@ dependencies = [
  "toml",
  "tray-icon",
  "url",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
  "wgpu",
  "windows",
  "winit",
+ "x11rb 0.14.0",
 ]
 
 [[package]]
 name = "sabine-bridge"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "serde",
  "serde_json",
@@ -2595,8 +2624,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -2607,20 +2636,21 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
  "raw-window-handle",
  "windows",
  "winit",
+ "x11-dl",
 ]
 
 [[package]]
 name = "sabine-runtime"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "bzip2",
  "libc",
@@ -2635,8 +2665,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.31.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.31#023eb98cde8819eadf7c5f1b13a46c8758fecec8"
+version = "0.32.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
 dependencies = [
  "base64",
  "clap",
@@ -2932,7 +2962,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2964,7 +2994,7 @@ dependencies = [
  "wayland-sys",
  "web-sys",
  "windows-sys 0.61.2",
- "x11rb",
+ "x11rb 0.13.2",
 ]
 
 [[package]]
@@ -3079,7 +3109,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3164,7 +3194,7 @@ checksum = "a90a0ca3ee6a69f2ad28fd11621a4c3f03b371f366be500b64df260c4ffbafb4"
 dependencies = [
  "as-raw-xcb-connection",
  "ctor",
- "libloading",
+ "libloading 0.8.9",
  "pkg-config",
  "tracing",
 ]
@@ -3312,7 +3342,7 @@ dependencies = [
  "once_cell",
  "png",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3344,7 +3374,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3807,14 +3837,14 @@ dependencies = [
  "bytemuck",
  "cfg-if",
  "cfg_aliases",
- "glow",
+ "glow 0.17.0",
  "glutin_wgl_sys",
  "gpu-allocator",
  "hashbrown 0.17.1",
  "js-sys",
  "khronos-egl",
  "libc",
- "libloading",
+ "libloading 0.8.9",
  "log",
  "naga",
  "naga-types",
@@ -3880,7 +3910,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4375,7 +4405,7 @@ dependencies = [
  "winit-common",
  "winit-core",
  "x11-dl",
- "x11rb",
+ "x11rb 0.13.2",
  "xkbcommon-dl",
 ]
 
@@ -4414,11 +4444,22 @@ dependencies = [
  "as-raw-xcb-connection",
  "gethostname",
  "libc",
- "libloading",
+ "libloading 0.8.9",
  "once_cell",
  "rustix 1.1.5",
- "x11rb-protocol",
+ "x11rb-protocol 0.13.2",
  "xcursor",
+]
+
+[[package]]
+name = "x11rb"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a8885a854a8bfdf87a301e53e41b17c5f8f33639903131338b997b1eb614f44"
+dependencies = [
+ "gethostname",
+ "rustix 1.1.5",
+ "x11rb-protocol 0.14.0",
 ]
 
 [[package]]
@@ -4426,6 +4467,12 @@ name = "x11rb-protocol"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
+
+[[package]]
+name = "x11rb-protocol"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "acf4d1bc32aa46eec18caa634ec3cf4c05bfa151f12b93b510b15190f69a1ca8"
 
 [[package]]
 name = "xcursor"

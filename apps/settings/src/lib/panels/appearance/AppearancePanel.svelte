@@ -2,6 +2,7 @@
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
+	import AppIconsSection from './AppIconsSection.svelte';
 	import StyleSection from './StyleSection.svelte';
 	import WallpaperSection from './WallpaperSection.svelte';
 
@@ -25,6 +26,8 @@
 <StyleSection />
 
 <WallpaperSection />
+
+<AppIconsSection />
 
 <Section title="Text and motion">
 	<Row title="Text size" description="Makes text larger or smaller across apps">

@@ -38,7 +38,7 @@
 
 {#if apps && choices.length > 0}
 	<div class="flex items-center gap-3">
-		<AppIcon icon={apps.default?.icon ?? null} size={28} />
+		<AppIcon icon={apps.default?.icon ?? null} id={apps.default?.id} size={28} />
 		<Select
 			label="Opens with"
 			placeholder="Choose an app"

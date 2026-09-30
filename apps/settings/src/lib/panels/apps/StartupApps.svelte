@@ -33,7 +33,7 @@
 	{#each apps as app (app.id)}
 		<ItemRow title={app.name}>
 			{#snippet leading()}
-				<AppIcon icon={app.icon} />
+				<AppIcon icon={app.icon} id={app.id} />
 			{/snippet}
 			<Switch label="Open {app.name} when you sign in" checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
 		</ItemRow>

@@ -15,6 +15,7 @@
 		overscan?: number;
 		stagger?: boolean;
 		animateOrder?: boolean;
+		stableOrder?: boolean;
 		header?: Snippet;
 		overlay?: Snippet;
 		children: Snippet<[T, number]>;
@@ -27,6 +28,7 @@
 		overscan = 4,
 		stagger = false,
 		animateOrder = false,
+		stableOrder = false,
 		header,
 		overlay,
 		children,
@@ -49,8 +51,10 @@
 	const lastRow = $derived(Math.min(geometry.rows - 1, geometry.rowAt(scrollTop - headerHeight + viewport) + overscan));
 	const start = $derived(firstRow * geometry.columns);
 	const visible = $derived(width > 0 ? items.slice(start, Math.min(items.length, (lastRow + 1) * geometry.columns)) : []);
+	const placed = $derived(stableOrder ? keepOrder(visible) : visible.map((item, offset) => ({ item, index: start + offset })));
 
 	const elements = new Map<string, HTMLElement>();
+	let domOrder: string[] = [];
 	let rendered = new Map<string, Rendered>();
 	let renderedItems: T[] = [];
 	let ghostId = 0;
@@ -67,6 +71,14 @@
 			renderedItems = items;
 		});
 	});
+
+	function keepOrder(list: T[]) {
+		const indices = new Map(list.map((item, offset) => [key(item), { item, index: start + offset }]));
+		const kept = domOrder.filter((itemKey) => indices.has(itemKey));
+		const known = new Set(kept);
+		domOrder = [...kept, ...indices.keys().filter((itemKey) => !known.has(itemKey))];
+		return domOrder.map((itemKey) => indices.get(itemKey)!);
+	}
 
 	export function scrollToIndex(index: number, align: Align = 'nearest') {
 		if (!scroller || index < 0 || index >= items.length) return;
@@ -168,16 +180,16 @@
 		<div bind:this={headerBox} class="virtual-header" bind:offsetHeight={headerHeight}>{@render header()}</div>
 	{/if}
 	<div bind:this={content} class="virtual-content" style:height="{geometry.height}px">
-		{#each visible as item, offset (key(item))}
-			{@const position = geometry.position(start + offset)}
+		{#each placed as { item, index } (key(item))}
+			{@const position = geometry.position(index)}
 			<div
 				class="virtual-item"
 				style:transform="translate3d({position.x}px, {position.y}px, 0)"
 				style:width="{geometry.itemWidth}px"
 				style:height="{geometry.itemHeight}px"
-				{@attach (node) => untrack(() => track(node, key(item), start + offset))}
+				{@attach (node) => untrack(() => track(node, key(item), index))}
 			>
-				{@render children(item, start + offset)}
+				{@render children(item, index)}
 			</div>
 		{/each}
 		{#each ghosts as ghost (ghost.id)}

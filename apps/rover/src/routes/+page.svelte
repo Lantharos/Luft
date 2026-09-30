@@ -145,6 +145,6 @@
 		{/if}
 
 		<VcsSaveDialog {vcs} />
-		<DialogHost {manager} />
+		<DialogHost {manager} {trash} />
 	</GlassShell>
 </div>

@@ -9,8 +9,8 @@
 	let { onconfirm, onclose }: Props = $props();
 
 	function confirm() {
-		onclose();
 		onconfirm();
+		onclose();
 	}
 </script>
 

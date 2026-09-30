@@ -11,8 +11,6 @@ use luft_app::GlassWindow;
 use sabine::{SabineLifecyclePolicy, SabineWindow, WindowRegion};
 use state::TernState;
 
-pub use desktop::entry::install as install_desktop_entry;
-
 const APP_ID: &str = "com.lantharos.tern";
 const WINDOW_RADIUS: i32 = 16;
 

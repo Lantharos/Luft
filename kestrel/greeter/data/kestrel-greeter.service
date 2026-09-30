@@ -1,0 +1,34 @@
+[Unit]
+Description=Kestrel login screen settings
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Greeter1
+ExecStart=@libexecdir@/kestrel-greeter-service
+UMask=0022
+StateDirectory=kestrel-greeter
+StateDirectoryMode=0755
+ReadWritePaths=-/etc/greetd
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=

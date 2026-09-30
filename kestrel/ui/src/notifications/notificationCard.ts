@@ -27,6 +27,7 @@ export interface Notification extends SignalSource {
 export interface NotificationSource extends SignalSource {
   title: string;
   icon: Gio.Icon | null;
+  policy?: { id?: string };
   notifications: Notification[];
 }
 

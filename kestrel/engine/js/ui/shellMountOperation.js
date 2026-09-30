@@ -9,6 +9,7 @@ import St from 'gi://St';
 import * as Animation from './animation.js';
 import * as CheckBox from './checkBox.js';
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as MessageTray from './messageTray.js';
 import * as ModalDialog from './modalDialog.js';
 import * as Params from '../misc/params.js';
@@ -514,7 +515,7 @@ class ShellProcessesDialog extends ModalDialog.ModalDialog {
                 return;
 
             const listItem = new Dialog.ListSectionItem({
-                icon_actor: app.create_icon_texture(LIST_ITEM_ICON_SIZE),
+                icon_actor: KestrelUi.appIcon(app, LIST_ITEM_ICON_SIZE),
                 title: app.get_name(),
             });
             this._applicationSection.list.add_child(listItem);

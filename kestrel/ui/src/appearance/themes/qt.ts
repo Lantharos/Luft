@@ -1,3 +1,4 @@
+import { fromHex } from '../color.js';
 import type { Colors } from '../palette.js';
 
 export const QT_SCHEME_NAME = 'Kestrel';
@@ -35,7 +36,7 @@ export function qtPalette(colors: Colors): string {
   return `[ColorScheme]\nactive_colors=${active}\ninactive_colors=${active}\ndisabled_colors=${qtRoles(colors, true).join(', ')}\n`;
 }
 
-const rgb = (hex: string) => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)).join(',');
+const rgb = (hex: string) => fromHex(hex).join(',');
 
 interface KdeGroup {
   background: string;

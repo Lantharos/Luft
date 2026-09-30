@@ -69,7 +69,7 @@ export class StartSearch {
   private app(app: Gio.AppInfo): SearchItem {
     return {
       key: appKey(app.get_id()!), title: app.get_display_name(), description: app.get_description() ?? '',
-      icon: app.get_icon() ?? Gio.ThemedIcon.new('application-x-executable'),
+      icon: app,
       activate: () => this.launch(app),
       menu: () => {
         const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id()!);

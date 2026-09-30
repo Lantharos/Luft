@@ -1,4 +1,6 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
@@ -43,10 +45,94 @@ function processMetrics() {
     return {residentMemoryMb: Math.round(residentKb / 1024), secondsSinceLaunch: Number(runningSeconds.toFixed(2))};
 }
 
+function startIcons(start) {
+    const icons = [];
+    const collect = actor => {
+        if (actor instanceof St.Icon) icons.push(actor);
+        actor.get_children().forEach(collect);
+    };
+    buttons(start).forEach(collect);
+    return icons;
+}
+
+const iconLoaded = icon => icon.get_children().some(child => child.content && child.opacity > 0);
+
+async function measureStartOpening(label) {
+    const start = find(global.stage, actor => actor.name === 'kestrel-start');
+    const frames = [];
+    let iconsReadyMs = null;
+    const opened = GLib.get_monotonic_time();
+    const painted = global.stage.connect('after-paint', () => {
+        const now = GLib.get_monotonic_time();
+        frames.push(now);
+        if (iconsReadyMs === null && startIcons(start).every(iconLoaded))
+            iconsReadyMs = (now - opened) / 1000;
+    });
+    toggleSurface('start');
+    const toggleMs = (GLib.get_monotonic_time() - opened) / 1000;
+    await pause(1500);
+    global.stage.disconnect(painted);
+    const opening = frames.filter(time => time - opened < 500_000);
+    const intervals = opening.slice(1).map((time, index) => (time - opening[index]) / 1000);
+    const firstFrameMs = frames.length ? (frames[0] - opened) / 1000 : null;
+    console.log(`Kestrel performance: ${JSON.stringify({
+        startOpening: label,
+        toggleMs: Number(toggleMs.toFixed(2)),
+        firstFrameMs: firstFrameMs && Number(firstFrameMs.toFixed(2)),
+        iconsReadyMs: iconsReadyMs && Number(iconsReadyMs.toFixed(2)),
+        icons: startIcons(start).length,
+        longestFrameMs: Number(Math.max(...intervals).toFixed(2)),
+        ...processMetrics(),
+    })}`);
+    dismissImmediately();
+    await pause(400);
+}
+
+async function longestStall(during) {
+    let last = GLib.get_monotonic_time();
+    let longest = 0;
+    const tick = GLib.timeout_add(GLib.PRIORITY_HIGH, 2, () => {
+        const now = GLib.get_monotonic_time();
+        longest = Math.max(longest, now - last);
+        last = now;
+        return GLib.SOURCE_CONTINUE;
+    });
+    await during();
+    GLib.source_remove(tick);
+    return Number((longest / 1000).toFixed(2));
+}
+
+async function measureRestyle(settings, style) {
+    const longestStallMs = await longestStall(async () => {
+        settings.set_string('app-icon-style', style);
+        await pause(1000);
+    });
+    console.log(`Kestrel performance: ${JSON.stringify({restyle: style, longestStallMs})}`);
+}
+
 export async function run() {
     await disableHelperAutoExit();
     console.log(`Kestrel performance: ${JSON.stringify(processMetrics())}`);
     await pause(1000);
+    await measureStartOpening('first');
+    await measureStartOpening('again');
+    const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+    try {
+        for (const style of ['tinted', 'clear']) {
+            settings.set_string('app-icon-style', style);
+            await pause(1500);
+            await measureStartOpening(`${style} first`);
+            await measureStartOpening(`${style} again`);
+        }
+        toggleSurface('start');
+        await pause(600);
+        await measureRestyle(settings, 'tinted');
+        await measureRestyle(settings, 'clear');
+    } finally {
+        settings.reset('app-icon-style');
+        dismissImmediately();
+        await pause(400);
+    }
     toggleSurface('start');
     await pause(400);
     const start = find(global.stage, actor => actor.name === 'kestrel-start');

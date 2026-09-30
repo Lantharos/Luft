@@ -6,6 +6,7 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 import Shell from 'gi://Shell';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as SwitcherPopup from './switcherPopup.js';
 
@@ -302,7 +303,7 @@ class WindowCard extends St.BoxLayout {
 
         const header = new St.BoxLayout({style_class: 'kestrel-switcher-header', width: PREVIEW_WIDTH});
         const icon = app
-            ? app.create_window_icon_texture(window, TITLE_ICON_SIZE)
+            ? KestrelUi.windowIcon(app, window, TITLE_ICON_SIZE)
             : new St.Icon({icon_name: 'application-x-executable', icon_size: TITLE_ICON_SIZE});
         icon.y_align = Clutter.ActorAlign.CENTER;
         header.add_child(icon);

@@ -3,6 +3,8 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
+import { appIcons } from '../appearance/icons/appIcons.js';
+
 const SYSTEMD = 'org.freedesktop.systemd1';
 const UNIT_PATH = '/org/freedesktop/systemd1/unit/';
 const APP_UNIT = /^app-(?:gnome|flatpak)-(.+)-\d+\.(?:scope|service)$/;
@@ -43,7 +45,7 @@ export class OomNotifier {
       source,
       title: `${name} was closed to free memory`,
       body: `The system was running out of memory, so ${name} was stopped to keep everything else responsive.${size}`,
-      gicon: app?.get_icon() ?? new Gio.ThemedIcon({ name: 'dialog-warning-symbolic' }),
+      gicon: app ? appIcons.gicon(app) : new Gio.ThemedIcon({ name: 'dialog-warning-symbolic' }),
     }));
   }
 }

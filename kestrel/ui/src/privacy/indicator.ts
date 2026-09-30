@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 
+import { appIcons } from '../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
@@ -74,7 +75,7 @@ export class PrivacyIndicator {
     if (app) actions.push({ label: `Close ${name}`, run: () => app.request_quit() });
     return {
       label: `${name} · ${user.kind === 'camera' ? 'Camera' : user.muted ? 'Microphone muted' : 'Microphone'}`,
-      icon: app?.get_icon() ?? icon(ICONS[user.kind]),
+      icon: app ? appIcons.gicon(app) : icon(ICONS[user.kind]),
       children: actions,
     };
   }

@@ -72,7 +72,7 @@ stage { font-family: "Open Runde"; }
 StEntry, .kestrel-search,
 .prompt-dialog .prompt-dialog-password-entry,
 .run-dialog .run-dialog-entry,
-.login-dialog .login-dialog-prompt-entry, .unlock-dialog .login-dialog-prompt-entry {
+.unlock-dialog .login-dialog-prompt-entry {
   color: #ffffff;
   caret-size: 1px;
   caret-color: #ffffff;
@@ -90,7 +90,7 @@ StEntry:hover { background-color: rgba(255, 255, 255, 0.09); }
 StEntry:focus, .kestrel-search:focus,
 .prompt-dialog .prompt-dialog-password-entry:focus,
 .run-dialog .run-dialog-entry:focus,
-.login-dialog .login-dialog-prompt-entry:focus, .unlock-dialog .login-dialog-prompt-entry:focus {
+.unlock-dialog .login-dialog-prompt-entry:focus {
   background-color: rgba(255, 255, 255, 0.13);
   border: none;
   box-shadow: none;
@@ -318,7 +318,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .run-dialog { padding-bottom: 20px; }
 .modal-dialog-button, .button, .icon-button, .notification-button,
 .audio-selection-device, .message-expand-button, .message-close-button,
-.message-collapse-button, .login-dialog-user-list-item, .login-dialog-user-list-item:focus {
+.message-collapse-button {
   background-color: rgba(255, 255, 255, 0.09);
   background-image: none;
   border: none;
@@ -379,6 +379,21 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
 .unlock-dialog .login-dialog-prompt-entry { padding: 13px 18px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.14); }
 .unlock-dialog .login-dialog-prompt-entry:focus { background-color: rgba(255, 255, 255, 0.20); }
+.unlock-dialog .login-dialog-default-button-well { margin-right: 6px; }
+.unlock-dialog .login-dialog-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; background-color: rgba(255, 255, 255, 0.16); transition-duration: 160ms; }
+.unlock-dialog .login-dialog-button.next-button:hover { background-color: rgba(255, 255, 255, 0.24); }
+.unlock-dialog .login-dialog-message { margin-top: 4px; font-size: 13px; color: rgba(255, 255, 255, 0.78); }
+.unlock-dialog .login-dialog-message-warning { color: #ffffff; font-weight: 500; }
+.kestrel-greeter-users { spacing: 4px; margin: 28px; }
+.kestrel-greeter-user { padding: 6px 16px 6px 6px; border-radius: 999px; transition-duration: 160ms; }
+.kestrel-greeter-user:hover, .kestrel-greeter-user:focus { background-color: rgba(255, 255, 255, 0.10); }
+.kestrel-greeter-user:checked { background-color: rgba(255, 255, 255, 0.16); }
+.kestrel-greeter-user-content { spacing: 12px; }
+.kestrel-greeter-user-name { font-size: 14px; font-weight: 500; }
+.kestrel-greeter-avatar { width: 32px; height: 32px; border-radius: 999px; background-size: cover; background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-greeter-controls { spacing: 2px; margin: 28px; }
+.kestrel-greeter-control { color: rgba(255, 255, 255, 0.86); }
+.kestrel-greeter-session-label { font-size: 13px; font-weight: 500; }
 .message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
 .screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 999px; }
@@ -393,8 +408,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .popup-menu-item.kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.16); }
 .candidate-popup-content { background-color: transparent; border: none; box-shadow: none; }
 .candidate-box:selected { background-color: rgba(255, 255, 255, 0.18); border-radius: 8px; }
-.unlock-dialog .button, .unlock-dialog .icon-button,
-.login-dialog .button, .login-dialog .icon-button {
+.unlock-dialog .button, .unlock-dialog .icon-button {
   background-color: rgba(255, 255, 255, 0.10); border-radius: 10px; border-color: transparent; box-shadow: none;
 }
 .unlock-dialog .button:hover, .unlock-dialog .button:focus,

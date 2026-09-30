@@ -198,11 +198,6 @@ class ShutdownItem extends QuickSettingsItem {
             Main.panel.closeQuickSettings();
         });
 
-        this._addSystemAction(_('Switch User…'), 'can-switch-user', () => {
-            this._systemActions.activateSwitchUser();
-            Main.panel.closeQuickSettings();
-        });
-
         // Whether shutdown is available or not depends on both lockdown
         // settings (disable-log-out) and Polkit policy - the latter doesn't
         // notify, so we update the item each time we become visible or

@@ -381,13 +381,6 @@ Clutter.Actor.prototype.toString = function () {
     return St.describe_actor(this);
 };
 
-Gio.File.prototype.touch_async = function (callback) {
-    Shell.util_touch_file_async(this, callback);
-};
-Gio.File.prototype.touch_finish = function (result) {
-    return Shell.util_touch_file_finish(this, result);
-};
-
 const origToString = Object.prototype.toString;
 Object.prototype.toString = function () {
     const base = origToString.call(this);

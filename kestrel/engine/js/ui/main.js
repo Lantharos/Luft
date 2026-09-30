@@ -25,7 +25,6 @@ import * as OsdMonitorLabeler from './osdMonitorLabeler.js';
 import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
 import * as Layout from './layout.js';
-import * as LoginManager from '../misc/loginManager.js';
 import * as NotificationDaemon from './notificationDaemon.js';
 import * as Screenshot from './screenshot.js';
 import * as ScreenShield from './screenShield.js';
@@ -85,9 +84,6 @@ let _iconResource = null;
 let _workspacesAdjustment = null;
 let _workspaceAdjustmentRegistry = null;
 
-Gio._promisify(Gio.File.prototype, 'delete_async');
-Gio._promisify(Gio.File.prototype, 'touch_async');
-
 let _remoteAccessInhibited = false;
 
 function _sessionUpdated() {
@@ -125,11 +121,6 @@ export async function start() {
         console.error(...args);
     };
 
-    // Chain up async errors reported from C
-    global.connect('notify-error', (global, msg, detail) => {
-        notifyError(msg, detail);
-    });
-
     const currentDesktop = GLib.getenv('XDG_CURRENT_DESKTOP');
     if (!currentDesktop || !currentDesktop.split(':').includes('GNOME'))
         GioUnix.DesktopAppInfo.set_desktop_env('GNOME');
@@ -138,6 +129,16 @@ export async function start() {
     sessionMode.connect('updated', _sessionUpdated);
 
     St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
+
+    if (sessionMode.isGreeter) {
+        await _initializeGreeter();
+        _sessionUpdated();
+        return;
+    }
+
+    global.connect('notify-error', (global, msg, detail) => {
+        notifyError(msg, detail);
+    });
 
     await _initializeUI();
 
@@ -152,6 +153,48 @@ export async function start() {
         bus => bus.unwatch_name(watchId));
 
     _sessionUpdated();
+}
+
+async function _loadAutomation() {
+    const {automationScript} = global;
+    if (!automationScript)
+        return null;
+
+    const Scripting = await import('./scripting.js');
+    const automation = await import(automationScript.get_uri());
+    automation.init?.();
+    return () => Scripting.runPerfScript(automation, GLib.getenv('SHELL_PERF_OUTPUT'));
+}
+
+async function _initializeGreeter() {
+    global.connect('notify-error', (_global, msg, detail) => console.warn(`${msg}: ${detail}`));
+
+    reloadThemeResource();
+    _loadIcons();
+    _loadDefaultStylesheet();
+
+    new AnimationsSettings();
+
+    layoutManager = new Layout.LayoutManager();
+    uiGroup = layoutManager.uiGroup;
+    ctrlAltTabManager = new CtrlAltTab.CtrlAltTabManager();
+    osdWindowManager = new OsdWindow.OsdWindowManager();
+    wm = new WindowManager.WindowManager();
+    InputSources.getInputSourceManager().reload();
+
+    layoutManager.init();
+    KestrelUi.startGreeter({
+        layoutManager,
+        pushModal: actor => pushModal(actor, {actionMode: Shell.ActionMode.LOGIN_SCREEN}),
+    });
+
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
+        Shell.util_sd_notify();
+        global.context.notify_ready();
+    });
+
+    const runAutomation = await _loadAutomation();
+    layoutManager.connect('startup-complete', () => runAutomation?.());
 }
 
 /** @private */
@@ -193,8 +236,7 @@ async function _initializeUI() {
     magnifier = new Magnifier.Magnifier();
     locatePointer = new LocatePointer.LocatePointer();
 
-    if (LoginManager.canLock())
-        screenShield = new ScreenShield.ScreenShield();
+    screenShield = new ScreenShield.ScreenShield();
 
     inputMethod = new InputMethod.InputMethod();
     global.stage.context.get_backend().set_input_method(inputMethod);
@@ -266,17 +308,7 @@ async function _initializeUI() {
 
     _startDate = new Date();
 
-    LoginManager.registerSessionWithGDM();
-
-    let Scripting;
-    let perfModule;
-    const {automationScript} = global;
-    if (automationScript) {
-        Scripting = await import('./scripting.js');
-        perfModule = await import(automationScript.get_uri());
-        if (perfModule.init)
-            perfModule.init();
-    }
+    const runAutomation = await _loadAutomation();
 
     layoutManager.connect('startup-complete', () => {
         if (actionMode === Shell.ActionMode.NONE)
@@ -290,7 +322,7 @@ async function _initializeUI() {
             'MESSAGE_ID': GNOMESHELL_STARTED_MESSAGE_ID,
         });
 
-        if (!perfModule) {
+        if (!runAutomation) {
             const credentials = new Gio.Credentials();
             if (credentials.get_unix_user() === 0) {
                 notify(
@@ -299,41 +331,8 @@ async function _initializeUI() {
             }
         }
 
-        _handleLockScreenWarning();
-
-        LoginManager.registerDisplayWithGDM();
-
-        if (perfModule) {
-            const perfOutput = GLib.getenv('SHELL_PERF_OUTPUT');
-            Scripting.runPerfScript(perfModule, perfOutput);
-        }
+        runAutomation?.();
     });
-}
-
-async function _handleLockScreenWarning() {
-    const path = `${global.userdatadir}/lock-warning-shown`;
-    const file = Gio.File.new_for_path(path);
-
-    const hasLockScreen = screenShield !== null;
-    if (hasLockScreen) {
-        try {
-            await file.delete_async(0, null);
-        } catch (e) {
-            if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND))
-                logError(e);
-        }
-    } else {
-        try {
-            if (!await file.touch_async())
-                return;
-        } catch (e) {
-            logError(e);
-        }
-
-        notify(
-            _('Screen Lock disabled'),
-            _('Screen Locking requires the GNOME display manager'));
-    }
 }
 
 function _getStylesheet(name) {

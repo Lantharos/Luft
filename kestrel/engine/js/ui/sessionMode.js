@@ -1,6 +1,6 @@
 import * as Signals from '../misc/signals.js';
 
-import {UnlockDialog} from '../ui/unlockDialog.js';
+import {UnlockDialog} from './lockScreen/unlockDialog.js';
 
 import * as Config from '../misc/config.js';
 
@@ -26,6 +26,7 @@ const _modes = {
         hasNotifications: false,
         hasWmMenus: false,
         isLocked: false,
+        isGreeter: false,
         isPrimary: false,
         unlockDialog: null,
         components: [],
@@ -35,6 +36,11 @@ const _modes = {
             right: [],
         },
         panelStyle: null,
+    },
+
+    'greeter': {
+        isGreeter: true,
+        isPrimary: true,
     },
 
     'unlock-dialog': {
@@ -74,7 +80,7 @@ export class SessionMode extends Signals.EventEmitter {
     constructor() {
         super();
 
-        this._modeStack = ['user'];
+        this._modeStack = [global.session_mode];
         this._sync();
     }
 

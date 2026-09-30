@@ -1,7 +1,6 @@
 import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
@@ -18,6 +17,7 @@ import { QuickSettings } from './quickSettings/quickSettings.js';
 import { NotificationCenter, type MessageTray } from './notifications/notificationCenter.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
+import { loadKestrelStylesheet } from './shared/stylesheet.js';
 import type { QuickSettingsSource } from './quickSettings/quickControls.js';
 import { AppearanceService } from './appearance/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
@@ -31,7 +31,9 @@ import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
+import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
 import type { Rgb } from './appearance/color.js';
+import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
@@ -83,7 +85,7 @@ class KestrelUi {
   private readonly snapLayouts: SnapLayouts;
   private readonly taskView: TaskView;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
-  private stylesheetMonitor: Gio.FileMonitor | null = null;
+  private readonly stylesheetMonitor: Gio.FileMonitor | null;
   private active: Surface | null = null;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private focusWindow: Meta.Window | null = null;
@@ -96,24 +98,11 @@ class KestrelUi {
   private readonly launchFeedback = new LaunchFeedback();
   private readonly globalShortcuts = new GlobalShortcutsProvider();
   private readonly liveWallpaper: LiveWallpaper;
+  private readonly loginWallpaper = new LoginWallpaper();
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
-    const theme = St.ThemeContext.get_for_stage(shellGlobal.stage).get_theme();
-    const cssPath = GLib.getenv('KESTREL_CSS_PATH');
-    const stylesheet = cssPath
-      ? Gio.File.new_for_path(cssPath)
-      : Gio.File.new_for_uri('resource:///org/gnome/shell/theme/kestrel.css');
-    theme.load_stylesheet(stylesheet);
-    if (cssPath) {
-      this.stylesheetMonitor = stylesheet.monitor_file(Gio.FileMonitorFlags.NONE, null);
-      this.stylesheetMonitor.connect('changed', (_monitor, _file, _otherFile, event) => {
-        if (event !== Gio.FileMonitorEvent.CHANGES_DONE_HINT)
-          return;
-        theme.unload_stylesheet(stylesheet);
-        theme.load_stylesheet(stylesheet);
-      });
-    }
+    this.stylesheetMonitor = loadKestrelStylesheet();
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
     this.menus = new ContextMenus((x, y) => this.monitorAt(x, y), () => this.close(), () => this.canInteract(), () => this.previews.close(), context.activateWindow);
@@ -449,6 +438,7 @@ class KestrelUi {
     this.panels.shutdown();
     this.appearance.destroy();
     this.liveWallpaper.destroy();
+    this.loginWallpaper.destroy();
     this.oomNotifier.destroy();
     this.batteryWarnings.destroy();
     this.launchFeedback.destroy();
@@ -465,6 +455,7 @@ class KestrelUi {
 }
 
 let currentUi: KestrelUi;
+let greeter: Greeter | null = null;
 const startWatchers: ((visible: boolean) => void)[] = [];
 
 let pendingWallpaper: Rgb[] | null = null;
@@ -475,8 +466,13 @@ export function initialize(context: Context): void {
   pendingWallpaper = null;
 }
 
+export function startGreeter(context: GreeterContext): void {
+  greeter = new Greeter(context);
+}
+
 export function wallpaperSampled(samples: Rgb[]): void {
   if (currentUi) currentUi.appearance.apply(samples);
+  else if (greeter) greeter.wallpaperSampled(samples);
   else pendingWallpaper = samples;
 }
 

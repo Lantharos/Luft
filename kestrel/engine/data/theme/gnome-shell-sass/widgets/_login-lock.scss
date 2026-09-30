@@ -3,7 +3,6 @@ $_gdm_fg: $system_fg_color;
 $_gdm_dialog_width: 25em;
 
 // common style for login and lockscreen
-.login-dialog,
 .unlock-dialog {
   color: $_gdm_fg;
 
@@ -43,36 +42,14 @@ $_gdm_dialog_width: 25em;
   }
 }
 
-// GDM Login Dialog
-// uses dark grey system styles
-.login-dialog {
-  .login-dialog-prompt-entry {
-    @extend %system_entry;
-  }
-}
-
-.login-dialog-bottom-button-group {
-  padding: 32px;
-  spacing: 16px;
-}
-
 // buttons on login screen
 .login-dialog-button {
   &.next-button,
-  &.a11y-button,
-  &.cancel-button,
-  &.switch-user-button,
-  &.login-dialog-auth-menu-button,
-  &.login-dialog-session-list-button {
+  &.cancel-button {
     @extend .icon-button;
     @extend %system_button;
 
     padding: to_em(16px);
-  }
-
-  &.next-button {
-    background-color: transparent !important;
-    padding: 0;
   }
 
   &.cancel-button {
@@ -81,350 +58,17 @@ $_gdm_dialog_width: 25em;
   }
 }
 
-.login-dialog-auth-menu-button-popup {
-  padding: $base_padding * 3;
-  margin-right: $base_padding * 2;
-
-  .login-dialog-auth-menu-item-section {
-    padding-top: $base_padding;
-
-    &:first-child {
-      padding-top: 0;
-    }
-
-    &-label {
-      @include fontsize($base_font_size - 1);
-      font-weight: bold;
-      color: $fg_color;
-    }
-  }
-
-  .login-dialog-auth-menu-item-icon {
-    color: $fg_color;
-    icon-size: $scalable_icon_size;
-    margin-right: $base_margin * 2;
-  }
-
-  .login-dialog-auth-menu-item-box {
-    spacing: $base_padding * .5;
-
-    &-name {
-      color: $fg_color;
-      @include fontsize($base_font_size);
-      font-weight: bold;
-    }
-
-    &-description {
-      color: $fg_color;
-      @include fontsize($base_font_size - 1);
-    }
-  }
-}
-
-.login-dialog-auth-menu-button-indicator {
-  background-color: transparent !important;
-  margin: 32px;
-
-  .login-dialog-auth-menu-button-indicator-icons {
-     spacing: $base_padding * 3;
-
-    .login-dialog-auth-menu-button-indicator-icon {
-      icon-size: 2em;
-    }
-  }
-
-  .login-dialog-auth-menu-button-indicator-description {
-    @include fontsize($base_font_size);
-    font-weight: normal;
-    margin-left: $base_padding * 2;
-  }
-}
-
 .login-dialog-button-box {
   height: 4em;
-}
-
-.login-dialog-logo-bin {
-  margin: 3em 0;
-}
-
-.login-dialog-banner-view {
-  max-width: $_gdm_dialog_width;
-
-  .login-dialog-banner {
-    color: darken($_gdm_fg,10%);
-  }
 }
 
 .login-dialog-message {
   text-align: center;
 }
 
-.login-dialog-message-hint, .login-dialog-message {
+.login-dialog-message {
   color: darken($_gdm_fg, 10%);
   min-height: 2.75em;
-}
-
-.login-dialog-user-selection-box {
-  // padding to ensure the box doesn't overlap the panel
-  padding-top: 4em;
-  padding-bottom: 8em;
-}
-
-.login-dialog-not-listed-label {
-  @extend %heading;
-  padding: $base_padding;
-}
-
-.login-dialog-not-listed-button {
-  // use button styling
-  @extend %button_common;
-  @include button(normal, $tc:$_gdm_fg, $c:$_gdm_bg, $style: flat, $always_dark: true);
-  &:focus { @include button(focus, $tc:$_gdm_fg, $c:$_gdm_bg, $style: flat, $always_dark: true);}
-  &:hover { @include button(hover, $tc:$_gdm_fg, $c:$_gdm_bg, $style: flat, $always_dark: true);}
-  &:active { @include button(active, $tc:$_gdm_fg, $c:$_gdm_bg, $style: flat, $always_dark: true);}
-
-  padding: 0 $base_padding;
-  margin: $base_padding;
-}
-
-// Authentication methods list
-.login-dialog-auth-list-view {
-  -st-vfade-offset: 3em;
-  max-height: 13em;
-}
-
-.login-dialog-auth-list {
-  spacing: $base_padding * 1.5;
-}
-
-.login-dialog {
-  .login-dialog-auth-list-title,
-  .login-dialog-auth-list-item {
-    @include login_dialog_item_button($style:card);
-    border-radius: $base_border_radius * 1.5;
-  }
-
-  .login-dialog-auth-list-title {
-    background-color: transparentize($_gdm_fg, .98) !important;
-    color: $_gdm_fg !important;
-    margin: 0.5em $base_margin * 5;
-  }
-
-  .login-dialog-auth-list-item {
-    min-height: 3em;
-    padding: $base_padding * 1.5;
-    margin-bottom: $base_margin;
-    margin-right: $base_margin;
-
-    &.compact {
-      min-height: 1.3em;
-    }
-  }
-}
-
-.unlock-dialog {
-  .login-dialog-auth-list-item,
-  .login-dialog-auth-list-title {
-    @extend %lockscreen_button;
-    border-radius: $base_border_radius * 1.5;
-    min-height: 3em;
-    padding: $base_padding * 1.5;
-    margin-bottom: $base_margin;
-    margin-right: $base_margin;
-
-    &.compact {
-      min-height: 1.3em;
-    }
-  }
-
-  .login-dialog-auth-list-title {
-    background-color: transparentize($_gdm_fg, .85) !important;
-    color: $_gdm_fg !important;
-    margin: 0.5em $base_margin * 5;
-    padding: 0;
-  }
-}
-
-.login-dialog-auth-list-title-label {
-  @extend %title_4;
-  padding: $base_padding;
-  text-align: center;
-}
-
-.login-dialog-auth-list-item-title,
-.login-dialog-auth-list-item-subtitle {
-  @extend %heading;
-  text-align: center;
-  padding: $base_padding * 0.3 2em;
-}
-
-.login-dialog-auth-list-item-title {
-  color: $_gdm_fg;
-}
-
-.login-dialog-auth-list-item-subtitle {
-  color: darken($_gdm_fg, 20%);
-  font-weight: 500;
-}
-
-.login-dialog-item-icon {
-  width: 1.3em;
-  height: 1.3em;
-  color: $_gdm_fg;
-  padding: $base_padding * 0.7 $base_padding;
-  border-radius: $base_border_radius;
-
-  &:hover {
-    background-color: $system_bg_color;
-  }
-
-  &-popup {
-    &.popup-menu {
-      min-width: 0;
-    }
-
-    &-box &-labels {
-      spacing: $base_padding * 0.5;
-      @extend %heading;
-      text-align: center;
-
-      & > :first-child {
-        color: darken($fg_color, 30%);
-        font-weight: 500;
-      }
-
-      & > :last-child {
-        color: $fg_color;
-      }
-    }
-  }
-}
-
-// User list
-.login-dialog-user-list-view {
-  width: $_gdm_dialog_width;
-  -st-vfade-offset: 3em;
-
-  .login-dialog-user-list {
-    margin: 0 $base_margin * 2; // margin to account for scrollbar
-    spacing: $base_padding * 2;
-
-    .login-dialog-user-list-item {
-      @include login_dialog_item_button();
-      border-radius: $modal_radius;
-      padding: $base_padding * 1.5;
-
-      // create border for indicating logged in user
-      .user-icon {
-        border: 2px solid transparent;
-      }
-
-      .login-dialog-timed-login-indicator {
-        height: 2px;
-        margin-top: $base_padding;
-        background-color: transparentize($_gdm_fg, .3);
-      }
-
-      &:logged-in {
-        // color border for logged-in user
-        .user-icon {
-          border-color: -st-accent-color;
-          StIcon {
-            background-color: st-transparentize(-st-accent-color, .7);
-          }
-        }
-      }
-    }
-  }
-}
-
-.web-login-spinner {
-  background-color: rgba(0, 0, 0, 0.5);
-  border: 5px rgba(0, 0, 0, 0.0);
-  border-radius: 50px;
-}
-
-.web-login-title-label {
-  @include fontsize($base_font_size);
-  color: darken($_gdm_fg,30%);
-  text-align: center;
-}
-
-.web-login-url-label {
-  @include fontsize($base_font_size);
-  @extend %monospace;
-  color: $_gdm_fg;
-  text-align: center;
-
-  &.web-login-url-label-long {
-    @include fontsize($base_font_size - 2);
-  }
-}
-
-.web-login-code-title-label {
-  @include fontsize($base_font_size);
-  color: $_gdm_fg;
-  text-align: center;
-}
-
-.web-login-code-label {
-  @include fontsize($base_font_size);
-  color: $_gdm_fg;
-  font-weight: bold;
-  text-align: center;
-}
-
-.web-login-prompt {
-  padding-top: $base_padding;
-  padding-bottom: $base_padding;
-  padding-left: $base_padding * 4.5;
-  padding-right: $base_padding * 4.5;
-  spacing: 1.75em;
-}
-
-.unlock-dialog {
-  .web-login-title-label,
-  .web-login-url-label,
-  .web-login-url-label-long,
-  .web-login-code-title-label,
-  .web-login-code-label,
-  .web-login-prompt {
-    color: $_gdm_fg !important;
-  }
-}
-
-@mixin login-buttons($context){
-  .login-button,
-  .web-login-prompt-button {
-    @if $context == 'login' { @include login_dialog_item_button(); }
-    @if $context == 'unlock' { @extend %lockscreen_button; }
-    @include fontsize($base_font_size + 2);
-    color: $_gdm_fg;
-    text-align: center;
-    font-weight: bold;
-    border-radius: $base_border_radius * 4;
-  }
-
-  .login-button {
-    padding: 0;
-    margin: 0.2em $base_margin * 5;
-    min-width: 12em;
-  }
-
-  .web-login-prompt-button {
-    padding: $base_padding * 2.5 $base_padding * 4;
-    margin: $base_margin * 6 $base_margin * 2;
-    min-width: 8em;
-  }
-}
-
-.login-dialog {
-  @include login-buttons(login);
-}
-
-.unlock-dialog {
-  @include login-buttons(unlock);
 }
 
 // Screen Shield

@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import { getInputSourceManager, type InputSource } from 'resource:///org/gnome/shell/ui/status/keyboard.js';
 
@@ -19,7 +18,7 @@ export class InputSourceIndicator {
   private readonly manager = getInputSourceManager();
   private readonly steps = new ScrollSteps();
 
-  constructor(private readonly menus: ContextMenus) {
+  constructor(private readonly menus: ContextMenus, private readonly extraEntries: () => MenuEntry[]) {
     this.actor = new St.Button({
       name: 'kestrel-input-source', style_class: 'kestrel-status-button', child: this.label,
       can_focus: true, visible: false, button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.SECONDARY,
@@ -78,10 +77,8 @@ export class InputSourceIndicator {
     }));
     const properties = propertyEntries(current?.source?.properties ?? null);
     if (properties.length) entries.push('separator', ...properties);
-    entries.push('separator');
-    const layout = Shell.AppSystem.get_default().lookup_app('org.gnome.Tecla.desktop');
-    if (layout) entries.push({ label: 'Show keyboard layout', run: () => layout.activate() });
-    entries.push({ label: 'Keyboard settings', run: () => this.menus.settings('keyboard') });
+    const extras = this.extraEntries();
+    if (extras.length) entries.push('separator', ...extras);
     const [x, y] = this.actor.get_transformed_position();
     this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
   }

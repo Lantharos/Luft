@@ -5,4 +5,3 @@ Exec=@bindir@/kestrel-session
 TryExec=@bindir@/kestrel
 Type=Application
 DesktopNames=Kestrel;GNOME
-X-GDM-SessionRegisters=true

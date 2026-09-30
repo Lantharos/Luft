@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/org/gnome/shell">
-    <file>gdm/authList.js</file>
-    <file>gdm/authMenuButton.js</file>
-    <file>gdm/authPrompt.js</file>
-    <file>gdm/authServices.js</file>
-    <file>gdm/authServicesLegacy.js</file>
-    <file>gdm/authServicesSSSDSwitchable.js</file>
-    <file>gdm/batch.js</file>
-    <file>gdm/credentialManager.js</file>
-    <file>gdm/fingerprintManager.js</file>
-    <file>gdm/oVirt.js</file>
-    <file>gdm/fido2TokenManager.js</file>
-    <file>gdm/settings.js</file>
-    <file>gdm/smartcardManager.js</file>
-    <file>gdm/userVerifier.js</file>
-    <file>gdm/vmware.js</file>
-    <file>gdm/webLogin.js</file>
-
+    <file>auth/authentication.js</file>
+    <file>auth/authPrompt.js</file>
+    <file>auth/greetd.js</file>
 
     <file>misc/animationUtils.js</file>
     <file>misc/brightnessManager.js</file>
@@ -91,7 +77,6 @@
     <file>ui/pointerA11yTimeout.js</file>
     <file>ui/popupMenu.js</file>
     <file>ui/quickSettings.js</file>
-    <file>ui/qrCode.js</file>
     <file>ui/ripples.js</file>
     <file>ui/screenShield.js</file>
     <file>ui/screenshot.js</file>
@@ -104,7 +89,11 @@
     <file>ui/swipeTracker.js</file>
     <file>ui/switcherPopup.js</file>
     <file>ui/switchMonitor.js</file>
-    <file>ui/unlockDialog.js</file>
+    <file>ui/lockScreen/backdrop.js</file>
+    <file>ui/lockScreen/clock.js</file>
+    <file>ui/lockScreen/notifications.js</file>
+    <file>ui/lockScreen/pages.js</file>
+    <file>ui/lockScreen/unlockDialog.js</file>
     <file>ui/userWidget.js</file>
     <file>ui/windowManager.js</file>
     <file>ui/windowLayout.js</file>

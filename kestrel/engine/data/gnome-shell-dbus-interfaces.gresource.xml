@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/org/gnome/shell/dbus-interfaces">
-    <file preprocess="xml-stripblanks">net.reactivated.Fprint.Device.xml</file>
-    <file preprocess="xml-stripblanks">net.reactivated.Fprint.Manager.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.bolt1.Device.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.bolt1.Manager.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.DBus.xml</file>

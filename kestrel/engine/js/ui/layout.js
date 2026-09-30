@@ -421,6 +421,9 @@ export const LayoutManager = GObject.registerClass({
     }
 
     async _updateBackgrounds() {
+        if (Main.sessionMode.isGreeter)
+            return;
+
         this._bgLoadCancellable?.cancel();
         this._bgLoadCancellable = null;
 

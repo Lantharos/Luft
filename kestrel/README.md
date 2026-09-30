@@ -109,6 +109,8 @@ If the login screen doesn't appear, press Ctrl+Alt+F3 for a text console, sign i
 
 `kestrel/tools/session.sh greeter` runs the login screen in a headless session against a stand-in for greetd with scripted sign-ins (a correct password, a wrong one, notes and warnings along the way, and a second step), stand-ins for the account, login and locale services, and the settings service itself running as a normal user. It checks the people list, password entry, wrong passwords, typed usernames, switching people with their wallpapers and accent colors, the session picker, keyboard layouts, larger text, and power, then signs in and confirms the chosen session starts and is remembered. It saves `login-clock.png`, `login-users.png`, `login-password.png`, `login-wrong-password.png`, `login-switch-user.png`, `login-session-picker.png`, `login-power-menu.png`, and `login-second-factor.png`, and reports the login screen's resident memory and processor use while idle. `kestrel/tools/session.sh capture` runs it after the desktop checks.
 
+Test sessions keep their settings, caches and app data in `kestrel/run` by default. Set `KESTREL_SESSION_DIR` to a folder of its own to start from a clean profile or to run several sessions side by side, and `KESTREL_CAPTURE_DIR` to keep their screenshots out of `docs/screenshots`.
+
 ## Work before a Luft session
 
 1. Log into the Kestrel session on real hardware and qualify it end to end. The TypeScript UI is loaded by a reduced upstream `main.js` path.

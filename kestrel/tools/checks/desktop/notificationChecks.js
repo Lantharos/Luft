@@ -70,6 +70,7 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
   const subscription = Gio.DBus.session.signal_subscribe(null, 'org.freedesktop.Notifications', 'NotificationReplied',
     '/org/freedesktop/Notifications', null, Gio.DBusSignalFlags.NONE, (...args) => replies.push(args[5].deep_unpack()));
   try {
+    clearAll();
     await notify('Weather', 'Rain later', 'Showers expected from 4 pm.');
     await notify('Chatter', 'Noor', 'Did you see the draft?');
     await notify('Chatter', 'Sam', 'Pushed the fix.');
@@ -80,8 +81,9 @@ export async function checkNotifications({pause, capture, actorNamed, output}) {
     await pause(450);
     const center = actorNamed(global.stage, 'kestrel-notifications');
     const groups = descendants(center).filter(actor => actor.get_style_class_name?.() === 'kestrel-notification-group');
-    require(groups.length === 2, 'notifications are grouped by app');
-    const chatter = groups[0];
+    const groupsOf = app => groups.filter(group => !!actorNamed(group, `Clear notifications from ${app}`));
+    const [chatter] = groupsOf('Chatter');
+    require(groups.length === 2 && groupsOf('Chatter').length === 1 && groupsOf('Weather').length === 1, 'notifications are grouped by app');
     const cards = descendants(chatter).filter(actor => actor.get_style_class_name?.() === 'kestrel-notification');
     require(cards.filter(card => card.visible).length === 2 && !!actorNamed(chatter, '1 more'), 'larger groups collapse to the newest notifications');
     require(squareInset(chatter, 'kestrel-notification-group-header'), 'the app name sits as far from the top of a group as from its side');

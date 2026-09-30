@@ -4,13 +4,16 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 tools="$root/kestrel/tools"
 fixtures="$tools/fixtures/greeter"
-run="$root/kestrel/run/greeter"
+run="${KESTREL_SESSION_DIR:-$root/kestrel/run}/greeter"
 events="$run/events.jsonl"
+socket_dir="$(mktemp -d -p "${XDG_RUNTIME_DIR:-/tmp}" kestrel-greetd.XXXXXX)"
+socket="$socket_dir/greetd.sock"
 pids=()
 
 cleanup() {
   for pid in "${pids[@]}"; do kill "$pid" 2>/dev/null || true; done
   wait "${pids[@]}" 2>/dev/null || true
+  rm -rf "$socket_dir"
 }
 trap cleanup EXIT
 
@@ -46,15 +49,15 @@ pids+=($!)
 "$root/kestrel/greeter/target/release/kestrel-greeter-service" --unprivileged \
   --state-dir "$run/state" --greetd-config "$run/greetd.toml" &
 pids+=($!)
-gjs -m "$fixtures/greetd.js" "$run/greetd.sock" "$events" &
+gjs -m "$fixtures/greetd.js" "$socket" "$events" &
 pids+=($!)
 wait_for 'gdbus introspect --system --dest org.freedesktop.Accounts --object-path /org/freedesktop/Accounts >/dev/null 2>&1'
 wait_for 'gdbus introspect --system --dest com.lantharos.Greeter1 --object-path /com/lantharos/Greeter1 >/dev/null 2>&1'
-wait_for '[[ -S "$run/greetd.sock" ]]'
+wait_for '[[ -S "$socket" ]]'
 
 gjs -m "$tools/checks/greeter/loginSettings.js" "$run/images" "$run/state"
 
-export GREETD_SOCK="$run/greetd.sock"
+export GREETD_SOCK="$socket"
 export KESTREL_GREETER_STATE_DIR="$run/state"
 export KESTREL_GREETER_EVENTS="$events"
 export KESTREL_GREETER_IMAGES="$run/images"

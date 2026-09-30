@@ -20,6 +20,9 @@ import * as SwitcherPopup from '../switcherPopup.js';
 export const INPUT_SOURCE_TYPE_XKB = 'xkb';
 export const INPUT_SOURCE_TYPE_IBUS = 'ibus';
 
+const LOCALE_BUS_NAME = 'org.freedesktop.locale1';
+const LOCALE_BUS_PATH = '/org/freedesktop/locale1';
+
 export const LayoutMenuItem = GObject.registerClass(
 class LayoutMenuItem extends PopupMenu.PopupBaseMenuItem {
     _init(displayName, shortName) {
@@ -190,6 +193,80 @@ class InputSourceSettings extends Signals.EventEmitter {
     }
 }
 
+class InputSourceSystemSettings extends InputSourceSettings {
+    constructor() {
+        super();
+
+        this._layouts = '';
+        this._variants = '';
+        this._options = '';
+        this._model = '';
+
+        this._reload();
+
+        Gio.DBus.system.signal_subscribe(LOCALE_BUS_NAME,
+            'org.freedesktop.DBus.Properties',
+            'PropertiesChanged',
+            LOCALE_BUS_PATH,
+            null,
+            Gio.DBusSignalFlags.NONE,
+            this._reload.bind(this));
+    }
+
+    async _reload() {
+        let props;
+        try {
+            const result = await Gio.DBus.system.call(
+                LOCALE_BUS_NAME,
+                LOCALE_BUS_PATH,
+                'org.freedesktop.DBus.Properties',
+                'GetAll',
+                new GLib.Variant('(s)', [LOCALE_BUS_NAME]),
+                null, Gio.DBusCallFlags.NONE, -1, null);
+            [props] = result.deepUnpack();
+        } catch {
+            log(`Could not get properties from ${LOCALE_BUS_NAME}`);
+            return;
+        }
+
+        const layouts = props['X11Layout'].unpack();
+        const variants = props['X11Variant'].unpack();
+        const options = props['X11Options'].unpack();
+        const model = props['X11Model'].unpack();
+
+        if (layouts !== this._layouts || variants !== this._variants) {
+            this._layouts = layouts;
+            this._variants = variants;
+            this._emitInputSourcesChanged();
+        }
+        if (options !== this._options) {
+            this._options = options;
+            this._emitKeyboardOptionsChanged();
+        }
+        if (model !== this._model) {
+            this._model = model;
+            this._emitKeyboardModelChanged();
+        }
+    }
+
+    get inputSources() {
+        const layouts = this._layouts.split(',');
+        const variants = this._variants.split(',');
+        return layouts.filter(Boolean).map((layout, index) => ({
+            type: INPUT_SOURCE_TYPE_XKB,
+            id: variants[index] ? `${layout}+${variants[index]}` : layout,
+        }));
+    }
+
+    get keyboardOptions() {
+        return this._options.split(',');
+    }
+
+    get keyboardModel() {
+        return this._model;
+    }
+}
+
 class InputSourceSessionSettings extends InputSourceSettings {
     constructor() {
         super();
@@ -276,7 +353,9 @@ export class InputSourceManager extends Signals.EventEmitter {
                 Meta.KeyBindingFlags.IS_REVERSED,
                 Shell.ActionMode.ALL,
                 this._switchInputSource.bind(this));
-        this._settings = new InputSourceSessionSettings();
+        this._settings = Main.sessionMode.isGreeter
+            ? new InputSourceSystemSettings()
+            : new InputSourceSessionSettings();
         this._settings.connect('input-sources-changed', this._inputSourcesChanged.bind(this));
         this._settings.connect('keyboard-options-changed', this._keyboardOptionsChanged.bind(this));
         this._settings.connect('keyboard-model-changed', this._keyboardModelChanged.bind(this));

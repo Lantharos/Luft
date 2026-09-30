@@ -1,19 +1,15 @@
 import AccountsService from 'gi://AccountsService';
-import Clutter from 'gi://Clutter';
-import Gdm from 'gi://Gdm';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import {logErrorUnlessCancelled} from './errorUtils.js';
 import * as GnomeSession from './gnomeSession.js';
-import * as LoginManager from './loginManager.js';
 import * as Main from '../ui/main.js';
 import * as Screenshot from '../ui/screenshot.js';
 
 const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
-const DISABLE_USER_SWITCH_KEY = 'disable-user-switching';
 const DISABLE_LOCK_SCREEN_KEY = 'disable-lock-screen';
 const DISABLE_LOG_OUT_KEY = 'disable-log-out';
 const RESTART_ENABLED_KEY = 'restart-enabled';
@@ -24,7 +20,6 @@ const RESTART_ACTION_ID          = 'restart';
 const LOCK_SCREEN_ACTION_ID      = 'lock-screen';
 const LOGOUT_ACTION_ID           = 'logout';
 const SUSPEND_ACTION_ID          = 'suspend';
-const SWITCH_USER_ACTION_ID      = 'switch-user';
 const LOCK_ORIENTATION_ACTION_ID = 'lock-orientation';
 const SCREENSHOT_UI_ACTION_ID    = 'open-screenshot-ui';
 
@@ -56,10 +51,6 @@ const SystemActions = GObject.registerClass({
             false),
         'can-lock-screen': GObject.ParamSpec.boolean(
             'can-lock-screen', null, null,
-            GObject.ParamFlags.READABLE,
-            false),
-        'can-switch-user': GObject.ParamSpec.boolean(
-            'can-switch-user', null, null,
             GObject.ParamFlags.READABLE,
             false),
         'can-logout': GObject.ParamSpec.boolean(
@@ -131,14 +122,6 @@ const SystemActions = GObject.registerClass({
             keywords: tokenizeKeywords(_('suspend;sleep')),
             available: false,
         });
-        this._actions.set(SWITCH_USER_ACTION_ID, {
-            // Translators: The name of the switch user action in search
-            name: C_('search-result', 'Switch User'),
-            iconName: 'system-switch-user-symbolic',
-            // Translators: A list of keywords that match the switch user action, separated by semicolons
-            keywords: tokenizeKeywords(_('switch user')),
-            available: false,
-        });
         this._actions.set(LOCK_ORIENTATION_ACTION_ID, {
             name: '',
             iconName: '',
@@ -165,20 +148,18 @@ const SystemActions = GObject.registerClass({
         this._userManager = AccountsService.UserManager.get_default();
 
         this._userManager.connect('notify::is-loaded',
-            () => this._updateMultiUser());
+            () => this._updateLogout());
         this._userManager.connect('notify::has-multiple-users',
-            () => this._updateMultiUser());
+            () => this._updateLogout());
         this._userManager.connect('user-added',
-            () => this._updateMultiUser());
+            () => this._updateLogout());
         this._userManager.connect('user-removed',
-            () => this._updateMultiUser());
+            () => this._updateLogout());
 
         this._user = this._userManager.get_user(GLib.get_user_name());
 
         this._user.connect('notify::is-loaded', () => this._updateLogout());
 
-        this._lockdownSettings.connect(`changed::${DISABLE_USER_SWITCH_KEY}`,
-            () => this._updateSwitchUser());
         this._lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`,
             () => this._updateLogout());
         global.settings.connect(`changed::${ALWAYS_SHOW_LOG_OUT_KEY}`,
@@ -230,10 +211,6 @@ const SystemActions = GObject.registerClass({
         return this._actions.get(LOCK_SCREEN_ACTION_ID).available;
     }
 
-    get canSwitchUser() {
-        return this._actions.get(SWITCH_USER_ACTION_ID).available;
-    }
-
     get canLogout() {
         return this._actions.get(LOGOUT_ACTION_ID).available;
     }
@@ -278,7 +255,7 @@ const SystemActions = GObject.registerClass({
         this._updatePowerOff();
         this._updateReboot();
         this._updateSuspend();
-        this._updateMultiUser();
+        this._updateLogout();
     }
 
     forceUpdate() {
@@ -334,9 +311,6 @@ const SystemActions = GObject.registerClass({
         case SUSPEND_ACTION_ID:
             this.activateSuspend();
             break;
-        case SWITCH_USER_ACTION_ID:
-            this.activateSwitchUser();
-            break;
         case LOCK_ORIENTATION_ACTION_ID:
             this.activateLockOrientation();
             break;
@@ -349,7 +323,7 @@ const SystemActions = GObject.registerClass({
     _updateLockScreen() {
         const showLock = !Main.sessionMode.isLocked;
         const allowLockScreen = !this._lockdownSettings.get_boolean(DISABLE_LOCK_SCREEN_KEY);
-        this._actions.get(LOCK_SCREEN_ACTION_ID).available = showLock && allowLockScreen && LoginManager.canLock();
+        this._actions.get(LOCK_SCREEN_ACTION_ID).available = showLock && allowLockScreen;
         this.notify('can-lock-screen');
     }
 
@@ -411,32 +385,14 @@ const SystemActions = GObject.registerClass({
         this.notify('can-suspend');
     }
 
-    _updateMultiUser() {
-        this._updateLogout();
-        this._updateSwitchUser();
-    }
-
-    _updateSwitchUser() {
-        const allowSwitch = !this._lockdownSettings.get_boolean(DISABLE_USER_SWITCH_KEY);
-        const multiUser = this._userManager.can_switch() && this._userManager.has_multiple_users;
-        const shouldShowInMode = !Main.sessionMode.isLocked;
-
-        const visible = allowSwitch && multiUser && shouldShowInMode;
-        this._actions.get(SWITCH_USER_ACTION_ID).available = visible;
-        this.notify('can-switch-user');
-
-        return visible;
-    }
-
     _updateLogout() {
         const allowLogout = !this._lockdownSettings.get_boolean(DISABLE_LOG_OUT_KEY);
         const alwaysShow = global.settings.get_boolean(ALWAYS_SHOW_LOG_OUT_KEY);
         const {systemAccount, localAccount} = this._user;
         const multiUser = this._userManager.has_multiple_users;
-        const multiSession = Gdm.get_session_ids().length > 1;
         const shouldShowInMode = !Main.sessionMode.isLocked;
 
-        const visible = allowLogout && (alwaysShow || multiUser || multiSession || systemAccount || !localAccount) && shouldShowInMode;
+        const visible = allowLogout && (alwaysShow || multiUser || systemAccount || !localAccount) && shouldShowInMode;
         this._actions.get(LOGOUT_ACTION_ID).available = visible;
         this.notify('can-logout');
 
@@ -456,19 +412,6 @@ const SystemActions = GObject.registerClass({
             throw new Error('The lock-screen action is not available!');
 
         Main.screenShield.lock(true);
-    }
-
-    activateSwitchUser() {
-        if (!this._actions.get(SWITCH_USER_ACTION_ID).available)
-            throw new Error('The switch-user action is not available!');
-
-        if (Main.screenShield)
-            Main.screenShield.lock(false);
-
-        Clutter.threads_add_repaint_func(Clutter.RepaintFlags.POST_PAINT, () => {
-            Gdm.goto_login_session_sync(null);
-            return false;
-        });
     }
 
     activateLogout() {

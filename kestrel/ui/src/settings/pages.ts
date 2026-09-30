@@ -3,7 +3,7 @@ import type Shell from 'gi://Shell';
 
 export type SettingsPageId =
   | 'network' | 'bluetooth' | 'display' | 'sound' | 'power' | 'appearance' | 'notifications'
-  | 'keyboard' | 'mouse' | 'apps' | 'privacy' | 'datetime' | 'users' | 'about';
+  | 'keyboard' | 'mouse' | 'apps' | 'privacy' | 'datetime' | 'users' | 'login' | 'about';
 
 export interface SettingsPage {
   id: SettingsPageId;
@@ -26,6 +26,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   { id: 'privacy', title: 'Privacy & Security', icon: 'preferences-system-privacy-symbolic', keywords: ['screen lock', 'location', 'camera', 'microphone', 'history'] },
   { id: 'datetime', title: 'Date & Time', icon: 'preferences-system-time-symbolic', keywords: ['time zone', 'clock', '24-hour'] },
   { id: 'users', title: 'Users', icon: 'system-users-symbolic', keywords: ['account', 'name', 'picture', 'avatar'] },
+  { id: 'login', title: 'Login Screen', icon: 'system-lock-screen-symbolic', keywords: ['sign in', 'automatic login', 'session', 'wallpaper'] },
   { id: 'about', title: 'About', icon: 'help-about-symbolic', keywords: ['device name', 'system', 'hardware', 'memory'] },
 ];
 

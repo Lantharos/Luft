@@ -7,6 +7,7 @@ import * as Signals from './signals.js';
 import {logErrorUnlessCancelled} from './errorUtils.js';
 
 import * as IBusCandidatePopup from '../ui/ibusCandidatePopup.js';
+import * as Main from '../ui/main.js';
 
 Gio._promisify(IBus.Bus.prototype,
     'list_engines_async', 'list_engines_async_finish');
@@ -96,6 +97,8 @@ class IBusManager extends Signals.EventEmitter {
     }
 
     async _queueSpawn() {
+        if (Main.sessionMode.isGreeter)
+            return;
         const isSystemdService = await this._ibusSystemdServiceExists();
         if (!isSystemdService)
             this._spawn([]);

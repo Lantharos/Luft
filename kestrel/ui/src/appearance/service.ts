@@ -1,7 +1,5 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
-import St from 'gi://St';
 import { setSolidSurfaces } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 
 import { accentColor, namedAccent, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
@@ -9,7 +7,7 @@ import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
 import { userFile, writeText } from './files.js';
 import { buildPalette, type Palette } from './palette.js';
 import { DarkSchedule } from './schedule/darkSchedule.js';
-import { accentStylesheet } from './stylesheet.js';
+import { AccentStylesheet, accentStylesheet } from './stylesheet.js';
 import { AppThemes } from './themes/appThemes.js';
 
 const APPEARANCE_INTERFACE = `<node>
@@ -33,7 +31,7 @@ const PROPERTIES: [string, string][] = [
 const PERSIST_DELAY = 400;
 
 export class AppearanceService {
-  private readonly stylesheet = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', 'accent.css']));
+  private readonly stylesheet = new AccentStylesheet('accent.css');
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -42,7 +40,6 @@ export class AppearanceService {
   private readonly signalIds: [Gio.Settings, number][];
   private readonly themes = new AppThemes();
   private readonly schedule: DarkSchedule;
-  private stylesheetCss = '';
   private seed: Seed | null = null;
   private appearance: Appearance | null = null;
   private published = '';
@@ -62,10 +59,6 @@ export class AppearanceService {
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
     ];
     this.schedule = new DarkSchedule(this.settings, this.interfaceSettings);
-  }
-
-  private get theme(): St.Theme {
-    return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).get_theme();
   }
 
   private get palette(): Palette | null {
@@ -105,8 +98,7 @@ export class AppearanceService {
     const published = JSON.stringify(this.appearance);
     if (published === this.published) return;
     this.published = published;
-    const css = accentStylesheet(this.appearance.accentColor, this.appearance.palette);
-    if (css !== this.stylesheetCss) this.loadStylesheet(css);
+    this.stylesheet.load(accentStylesheet(this.appearance.accentColor, this.appearance.palette));
     if (this.appearance.accentColor !== previousAccent) {
       if (this.interfaceSettings.settings_schema.has_key('accent-color'))
         this.interfaceSettings.set_string('accent-color', this.appearance.accentName);
@@ -115,14 +107,6 @@ export class AppearanceService {
     for (const [name, signature] of PROPERTIES)
       this.dbus.emit_property_changed(name, new GLib.Variant(signature, this[name as keyof this]));
     this.schedulePersist();
-  }
-
-  private loadStylesheet(css: string): void {
-    GLib.mkdir_with_parents(this.stylesheet.get_parent()!.get_path()!, 0o700);
-    this.stylesheet.replace_contents(new TextEncoder().encode(css), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-    if (this.stylesheetCss) this.theme.unload_stylesheet(this.stylesheet);
-    this.theme.load_stylesheet(this.stylesheet);
-    this.stylesheetCss = css;
   }
 
   private schedulePersist(): void {
@@ -150,6 +134,6 @@ export class AppearanceService {
     this.schedule.destroy();
     Gio.bus_unown_name(this.nameId);
     this.dbus.unexport();
-    if (this.stylesheetCss) this.theme.unload_stylesheet(this.stylesheet);
+    this.stylesheet.unload();
   }
 }

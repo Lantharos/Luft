@@ -12,6 +12,7 @@ introspection_common = {
 
 subdir('hotplug-sniffer')
 subdir('st')
+subdir('authenticate')
 subdir('wallpaper')
 
 script_data = configuration_data()

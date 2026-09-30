@@ -10,13 +10,11 @@ import St from 'gi://St';
 import * as Signals from '../misc/signals.js';
 
 import * as GnomeSession from '../misc/gnomeSession.js';
-import * as OVirt from '../gdm/oVirt.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as Lightbox from './lightbox.js';
 import * as Main from './main.js';
 import * as MessageTray from './messageTray.js';
 import * as ShellDBus from './shellDBus.js';
-import * as SmartcardManager from '../gdm/smartcardManager.js';
 
 import {adjustAnimationTime} from '../misc/animationUtils.js';
 
@@ -88,16 +86,6 @@ export class ScreenShield extends Signals.EventEmitter {
         });
 
         this._screenSaverDBus = new ShellDBus.ScreenSaverDBus(this);
-
-        this._smartcardManager = SmartcardManager.getSmartcardManager();
-        this._smartcardManager.connect('smartcard-inserted',
-            (manager, token) => {
-                if (this._isLocked && token.UsedToLogin)
-                    this._activateDialog();
-            });
-
-        this._credentialManagers = {};
-        this.addCredentialManager(OVirt.SERVICE_NAME, OVirt.getOVirtCredentialsManager());
 
         this._loginManager = LoginManager.getLoginManager();
         this._loginManager.connect('prepare-for-sleep',
@@ -177,15 +165,6 @@ export class ScreenShield extends Signals.EventEmitter {
 
         if (this._loginSession)
             this._loginSession.SetLockedHintAsync(locked).catch(logError);
-    }
-
-    _activateDialog() {
-        if (this._isLocked) {
-            this._ensureUnlockDialog(true /* allowCancel */);
-            this._dialog.activate();
-        } else {
-            this.deactivate(true /* animate */);
-        }
     }
 
     _maybeCancelDialog() {
@@ -412,6 +391,7 @@ export class ScreenShield extends Signals.EventEmitter {
             }
 
             this._dialog.connect('failed', this._onUnlockFailed.bind(this));
+            this._dialog.connect('unlocked', () => this.deactivate(true));
             this._wakeUpScreenId = this._dialog.connect(
                 'wake-up-screen', this._wakeUpScreen.bind(this));
         }
@@ -604,26 +584,6 @@ export class ScreenShield extends Signals.EventEmitter {
         // blank during the animation.
         // This is not a problem for the idle fade case, because we
         // activate without animation in that case.
-    }
-
-    addCredentialManager(serviceName, credentialManager) {
-        if (this._credentialManagers[serviceName])
-            return;
-
-        this._credentialManagers[serviceName] = credentialManager;
-        credentialManager.connectObject('user-authenticated', () => {
-            if (this._isLocked)
-                this._activateDialog();
-        }, this);
-    }
-
-    removeCredentialManager(serviceName) {
-        const credentialManager = this._credentialManagers[serviceName];
-        if (!credentialManager)
-            return;
-
-        credentialManager.disconnectObject(this);
-        delete this._credentialManagers[serviceName];
     }
 
     lock(animate) {

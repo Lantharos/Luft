@@ -90,7 +90,13 @@ export class KestrelPanel {
       right.add_child(this.privacy.actor);
       this.tray = new Tray(menus);
       right.add_child(this.tray.actor);
-      this.inputSource = new InputSourceIndicator(menus);
+      this.inputSource = new InputSourceIndicator(menus, () => {
+        const layout = Shell.AppSystem.get_default().lookup_app('org.gnome.Tecla.desktop');
+        return [
+          ...layout ? [{ label: 'Show keyboard layout', run: () => layout.activate() }] : [],
+          { label: 'Keyboard settings', run: () => menus.settings('keyboard') },
+        ];
+      });
       right.add_child(this.inputSource.actor);
       this.quickButton = new St.Button({
         style_class: 'kestrel-status-button', child: this.statusIcons,

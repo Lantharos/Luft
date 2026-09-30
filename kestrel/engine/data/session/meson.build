@@ -10,6 +10,14 @@ configure_file(
 )
 
 configure_file(
+  input: 'kestrel-greeter.in',
+  output: 'kestrel-greeter',
+  configuration: sessionconf,
+  install_dir: bindir,
+  install_mode: 'rwxr-xr-x',
+)
+
+configure_file(
   input: 'kestrel-session.in',
   output: 'kestrel-session',
   configuration: sessionconf,

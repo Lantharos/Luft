@@ -1058,11 +1058,11 @@ export class BackgroundManager extends Signals.EventEmitter {
         });
 
         this._container.add_child(backgroundActor);
+        this._container.set_child_below_sibling(backgroundActor, null);
 
         if (this._controlPosition) {
             const monitor = this._layoutManager.monitors[this._monitorIndex];
             backgroundActor.set_position(monitor.x, monitor.y);
-            this._container.set_child_below_sibling(backgroundActor, null);
         }
 
         let changeSignalId = background.connect('bg-changed', () => {

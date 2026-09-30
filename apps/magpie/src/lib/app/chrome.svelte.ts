@@ -34,6 +34,7 @@ class Chrome {
 	fullscreen = $state(false);
 	idle = $state(false);
 	watching = $state(false);
+	seeThrough = $state(false);
 	toast = $state<{ id: number; text: string } | null>(null);
 
 	#idleTimer: ReturnType<typeof setTimeout> | undefined;

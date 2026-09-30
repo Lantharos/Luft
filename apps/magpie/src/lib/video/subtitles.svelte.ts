@@ -33,13 +33,16 @@ export function parseSubtitles(text: string): Cue[] {
 	return cues.sort((a, b) => a.start - b.start);
 }
 
+/** A media element or native video the cues follow. */
+type Timeline = Pick<HTMLMediaElement, 'currentTime' | 'paused' | 'playbackRate'> & EventTarget;
+
 export class CueClock {
 	text = $state('');
 	#cues: Cue[] = [];
-	#media: HTMLMediaElement | null = null;
+	#media: Timeline | null = null;
 	#timer: ReturnType<typeof setTimeout> | undefined;
 
-	attach(media: HTMLMediaElement, cues: Cue[]) {
+	attach(media: Timeline, cues: Cue[]) {
 		this.detach();
 		this.#media = media;
 		this.#cues = cues;

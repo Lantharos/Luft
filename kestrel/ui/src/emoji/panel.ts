@@ -15,14 +15,18 @@ import { annotate, EmojiIndex } from './search.js';
 import { SearchField } from './searchField.js';
 import { TabStrip, TonePicker } from './strips.js';
 
-type Zone = 'search' | 'tone' | 'tabs' | 'tones' | 'grid';
+type Zone = 'grid' | 'tone' | 'tabs' | 'tones';
 
-const ZONES: readonly Zone[] = ['search', 'tone', 'tabs', 'grid'];
+const ZONES: readonly Zone[] = ['grid', 'tone', 'tabs'];
 const PREFERRED_HEIGHT = 452;
 const SLIDE_DISTANCE = 8;
 const FADE_DURATION = 160;
 const INDEX_DELAY_SECONDS = 5;
 const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
+const NAVIGATION_KEYS = [
+  Clutter.KEY_Left, Clutter.KEY_Right, Clutter.KEY_Up, Clutter.KEY_Down,
+  Clutter.KEY_Page_Up, Clutter.KEY_Page_Down, Clutter.KEY_Home, Clutter.KEY_End,
+];
 
 function capitalize(text: string): string {
   return text.charAt(0).toLocaleUpperCase() + text.slice(1);
@@ -35,7 +39,7 @@ export class EmojiPanel {
   });
   readonly available = true;
   private readonly preferences = new EmojiPreferences(() => { this.browsing = null; });
-  private readonly search = new SearchField(text => this.query(text), () => this.setZone('search'));
+  private readonly search = new SearchField(text => this.query(text), () => this.setZone('grid'));
   private readonly empty = new St.Label({ text: 'No results', style_class: 'kestrel-empty', visible: false, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.START });
   private readonly footer = new St.Label({ style_class: 'kestrel-emoji-name', x_expand: true });
   private readonly grid = new EmojiGrid({
@@ -48,7 +52,7 @@ export class EmojiPanel {
   private tabs: TabStrip | null = null;
   private tones: TonePicker | null = null;
   private browsing: GridLayout | null = null;
-  private zone: Zone = 'search';
+  private zone: Zone = 'grid';
   private hovered: string | null = null;
   private intercepting = false;
   private anchor: Anchor | null = null;
@@ -102,7 +106,7 @@ export class EmojiPanel {
     this.closeTones(false);
     this.tones!.show(this.preferences.tone);
     this.hover(null);
-    this.setZone('search');
+    this.setZone('grid');
     if (!this.intercepting) {
       this.actor.grab_key_focus();
       return;
@@ -155,15 +159,14 @@ export class EmojiPanel {
   }
 
   private query(text: string): void {
-    if (!text.trim()) {
+    if (text.trim()) {
+      const layout = new GridLayout([{ title: null, tab: null, items: this.index!.search(text) }]);
+      this.grid.show(layout, this.preferences.tone);
+      this.empty.visible = !layout.cells.length;
+    } else {
       this.showBrowsing();
-      this.updateFooter();
-      return;
     }
-    const layout = new GridLayout([{ title: null, tab: null, items: this.index!.search(text) }]);
-    this.grid.show(layout, this.preferences.tone);
-    this.grid.select(layout.cells[0] ?? null);
-    this.empty.visible = !layout.cells.length;
+    if (this.zone === 'grid') this.grid.select(this.grid.firstVisibleCell());
     this.updateFooter();
   }
 
@@ -187,32 +190,28 @@ export class EmojiPanel {
     } else if (key === Clutter.KEY_Tab || key === Clutter.KEY_ISO_Left_Tab) {
       const backward = key === Clutter.KEY_ISO_Left_Tab || (event.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
       if (this.zone === 'tones') this.closeTones(false);
-      const zones = ZONES.filter(zone => zone !== 'grid' || this.grid.cells.length);
-      const current = zones.indexOf(this.zone === 'tones' ? 'tone' : this.zone);
-      this.setZone(zones[(current + (backward ? zones.length - 1 : 1)) % zones.length]);
+      const current = ZONES.indexOf(this.zone === 'tones' ? 'tone' : this.zone);
+      this.setZone(ZONES[(current + (backward ? ZONES.length - 1 : 1)) % ZONES.length]);
     } else if (ENTER_KEYS.includes(key)) {
       this.activate();
-    } else if (!this.navigate(key) && this.search.edit(event)) {
-      this.setZone('search');
+    } else if (!this.navigate(key) && this.search.edit(event) && this.zone !== 'grid') {
+      if (this.zone === 'tones') this.closeTones(false);
+      this.setZone('grid');
     }
   }
 
   private navigate(key: number): boolean {
     switch (this.zone) {
-    case 'search':
-      if (key === Clutter.KEY_Down && this.grid.cells.length) this.setZone('grid');
-      return key === Clutter.KEY_Down || key === Clutter.KEY_Up;
     case 'tone':
       if (key === Clutter.KEY_space) this.toggleTones(true);
       else if (key === Clutter.KEY_Down) this.setZone('tabs');
-      else if (key === Clutter.KEY_Left) this.setZone('search');
-      else return key === Clutter.KEY_Up || key === Clutter.KEY_Right;
+      else return key === Clutter.KEY_Up || key === Clutter.KEY_Left || key === Clutter.KEY_Right;
       return true;
     case 'tones':
       return this.moveFocus(key, this.tones!.focusedIndex, this.tones!.options.get_n_children(), index => this.tones!.focus(index),
         () => this.chooseTone(this.tones!.focusedIndex));
     case 'tabs':
-      if (key === Clutter.KEY_Up) this.setZone('search');
+      if (key === Clutter.KEY_Up) this.setZone('tone');
       else if (key === Clutter.KEY_Down) this.setZone('grid');
       else return this.moveFocus(key, this.tabs!.focusedIndex, this.tabs!.tabs.length, index => this.tabs!.focus(index),
         () => this.openTab(this.tabs!.focusedIndex));
@@ -235,10 +234,7 @@ export class EmojiPanel {
   private moveSelection(key: number): boolean {
     const cells = this.grid.cells;
     const cell = this.grid.selection;
-    if (!cell) {
-      this.grid.select(this.grid.firstVisibleCell());
-      return true;
-    }
+    if (!cell) return NAVIGATION_KEYS.includes(key);
     let next: Cell | undefined;
     switch (key) {
     case Clutter.KEY_Left: next = cells[cell.index - 1]; break;
@@ -252,7 +248,7 @@ export class EmojiPanel {
     default: return false;
     }
     if (next) this.grid.select(next);
-    else if (key === Clutter.KEY_Up) this.setZone(this.search.text ? 'search' : 'tabs');
+    else if (key === Clutter.KEY_Up && !this.search.text) this.setZone('tabs');
     this.updateFooter();
     return true;
   }
@@ -266,12 +262,12 @@ export class EmojiPanel {
 
   private setZone(zone: Zone): void {
     this.zone = zone;
-    this.search.setActive(zone === 'search');
+    this.search.setActive(zone === 'grid');
     this.tones!.focusButton(zone === 'tone');
     this.tabs!.focus(zone === 'tabs' ? Math.max(0, this.tabs!.currentIndex) : -1);
     if (zone === 'tones') this.tones!.focus(this.preferences.tone);
     if (zone === 'grid' && !this.grid.selection) this.grid.select(this.grid.firstVisibleCell());
-    if (zone !== 'grid' && !this.search.text) this.grid.select(null);
+    if (zone !== 'grid') this.grid.select(null);
     this.updateFooter();
   }
 
@@ -279,6 +275,7 @@ export class EmojiPanel {
     if (this.search.text) this.search.clear();
     this.grid.scrollTo(this.tabs!.tabs[index]);
     this.tabs!.setCurrent(this.tabs!.tabs[index]);
+    if (this.zone === 'grid') this.grid.select(this.grid.firstVisibleCell());
   }
 
   private toggleTones(fromKeyboard: boolean): void {

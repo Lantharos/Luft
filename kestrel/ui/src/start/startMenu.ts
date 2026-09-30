@@ -52,8 +52,6 @@ export class StartMenu {
     this.search.get_clutter_text().connect('text-changed', () => {
       this.refreshApps();
     });
-    this.search.clutter_text.connect('key-focus-in', () => this.browser.setSearchFocused(true));
-    this.search.clutter_text.connect('key-focus-out', () => this.browser.setSearchFocused(false));
     this.search.clutter_text.connect('key-press-event', (_text, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Down) return Clutter.EVENT_PROPAGATE;
       return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;

@@ -160,8 +160,10 @@ export class EmojiGrid {
     const row = this.layout.rows[cell.row];
     const previous = this.layout.rows[cell.row - 1];
     const top = previous?.title ? previous.y : row.y;
-    if (top < adjustment.value) adjustment.value = top;
-    else if (row.y + row.height > adjustment.value + adjustment.page_size) adjustment.value = row.y + row.height - adjustment.page_size;
+    const value = adjustment.get_transition('value') ? this.scrollTarget : adjustment.value;
+    if (top >= value && row.y + row.height <= value + adjustment.page_size) return;
+    adjustment.remove_transition('value');
+    adjustment.value = top < value ? top : row.y + row.height - adjustment.page_size;
   }
 
   private refresh(): void {

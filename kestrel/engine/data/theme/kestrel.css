@@ -110,7 +110,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-search-result { padding: 8px 10px; border-radius: 12px; transition-duration: 120ms; }
 .kestrel-search-result:hover { background-color: rgba(255, 255, 255, 0.09); }
-.kestrel-search-result:selected, .kestrel-search-result:focus { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-search-result:focus { background-color: rgba(255, 255, 255, 0.14); }
 .kestrel-search-result:active { background-color: rgba(255, 255, 255, 0.20); }
 .kestrel-search-result-content { spacing: 12px; }
 .kestrel-search-result-name { font-size: 14px; font-weight: 500; }

@@ -17,7 +17,6 @@ interface Row {
 
 export class SearchResults {
   private readonly rows = new Map<string, Row>();
-  private selected: St.Button | null = null;
 
   constructor(
     private readonly menus: ContextMenus,
@@ -37,12 +36,6 @@ export class SearchResults {
     row.description.visible = !!item.description;
     row.actor.accessible_name = item.title;
     return row.actor;
-  }
-
-  select(row: St.Button | null): void {
-    this.selected?.remove_style_pseudo_class('selected');
-    this.selected = row;
-    row?.add_style_pseudo_class('selected');
   }
 
   detach(): void {
@@ -73,10 +66,7 @@ export class SearchResults {
     });
     const row: Row = { actor, icon, title, description, item };
     actor.connect('clicked', () => row.item.activate());
-    actor.connect('key-focus-in', () => {
-      this.select(null);
-      this.reveal(actor);
-    });
+    actor.connect('key-focus-in', () => this.reveal(actor));
     this.menus.bind(actor, () => row.item.menu?.() ?? [{ label: 'Open', run: () => row.item.activate() }]);
     return row;
   }

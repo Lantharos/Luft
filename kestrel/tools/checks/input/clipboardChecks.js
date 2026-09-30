@@ -33,10 +33,9 @@ export async function checkClipboardPlacement({pause, capture, actorNamed, keybo
       'clipboard history opens just below the text cursor');
     await capture(`${output}/clipboard-history.png`);
 
-    key(Clutter.KEY_Down);
     key(Clutter.KEY_Return);
     await pause(700);
-    require(!panel.visible && window.title === `Kestrel entry: ${PASTED}`, 'choosing an entry pastes it into the field');
+    require(!panel.visible && window.title === `Kestrel entry: ${PASTED}`, 'Enter pastes the latest entry into the field');
 
     window.move_frame(true, frame.x, Main.layoutManager.primaryMonitor.height - frame.height + 120);
     await pause(500);

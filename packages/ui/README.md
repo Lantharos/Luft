@@ -60,7 +60,7 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper.
+After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper. `appearance.appIcons` holds the app icon style Kestrel draws with, its colors, and the folder of app glyphs, which `AppIcon` uses.
 
 The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
 
@@ -80,7 +80,7 @@ $effect(() => {
 | `Dialog` | Modal with a title, optional description, body and an `actions` snippet; `wide` for longer forms, and the body scrolls when it runs out of height |
 | `IconButton` | Round icon-only button taking a Lucide icon |
 | `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists and the rows inside them |
-| `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials |
+| `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials. Give `AppIcon` the app's desktop `id` as well as its `icon` and it follows the desktop's app icon style; `style` shows one style regardless of the setting, for previews |
 | `Popover` | Floating panel anchored to a trigger; stays inside the window, flips above when there is no room below, and scrolls when it runs out of height |
 | `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at a pointer position; it closes when the window resizes or Escape is pressed inside it, and the app decides what an outside click does |
 | `MenuButton` | Button that opens a menu below it; `trigger` renders the button's content and `children` receives a `close` function for the items |

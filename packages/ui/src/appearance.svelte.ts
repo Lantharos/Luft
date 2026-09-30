@@ -8,11 +8,28 @@ export interface TerminalColors {
 	dark: Record<string, string>;
 }
 
+export type AppIconStyle = 'default' | 'tinted' | 'clear';
+
+export interface AppIconPaint {
+	plate: string;
+	ink: string;
+	shade: string;
+	rim: number;
+}
+
+export interface AppIcons {
+	style: AppIconStyle;
+	glyphs: string;
+	tinted: AppIconPaint;
+	clear: AppIconPaint;
+}
+
 export interface Palette {
 	accent: string;
 	pureBlack: boolean;
 	colors: Record<string, string>;
 	terminal: TerminalColors;
+	appIcons: AppIcons;
 }
 
 const TERMINAL_HUES = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
@@ -39,6 +56,7 @@ class AppearanceState {
 	pureBlack = $state(false);
 	colors = $state<Record<string, string>>({});
 	terminal = $state<TerminalColors>({ light: {}, dark: {} });
+	appIcons = $state<AppIcons | null>(null);
 
 	start(initial: Appearance) {
 		this.translucent = initial.translucent;
@@ -56,6 +74,7 @@ class AppearanceState {
 		this.pureBlack = palette.pureBlack;
 		this.colors = palette.colors;
 		this.terminal = palette.terminal;
+		this.appIcons = palette.appIcons;
 		const root = document.documentElement;
 		root.toggleAttribute('data-black', palette.pureBlack);
 		for (const scheme of ['light', 'dark'] as const) {

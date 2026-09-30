@@ -23,13 +23,13 @@ Kestrel is Luft's desktop shell. It uses a local Mutter 51 build with native win
 
 ## Runtime scope
 
-The GNOME overview, its app grid, dash, window picker, and search providers are not part of Kestrel, and neither is the GNOME extension system. The Shell D-Bus requests that opened the overview or app grid open Start instead, and a request to focus an app opens Start searching for it. The run dialog, Looking Glass, the login screen greeter, screen time limits, and parental controls are not part of Kestrel either. The screenshot window picker has its own window layout.
+The GNOME overview, its app grid, dash, window picker, and search providers are not part of Kestrel, and neither is the GNOME extension system. The Shell D-Bus requests that opened the overview or app grid open Start instead, and a request to focus an app opens Start searching for it. The run dialog, Looking Glass, screen time limits, and parental controls are not part of Kestrel either. The screenshot window picker has its own window layout.
 
 The shell ships Open Runde and registers it for its own UI at startup; applications keep the system fonts. Shell text keeps fractional glyph advances instead of rounding each letter to whole pixels, so spacing matches GTK 4 apps.
 
 Desktop Quick Settings owns only the device controls used by Kestrel. It does not construct a second native Quick Settings menu or duplicate microphone slider. The retained session panel supplies login and lock-screen controls; the desktop does not populate it.
 
-GNOME’s calendar server integration, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for login, unlocking, user switching, and the Start avatar. Authentication, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
+GNOME’s calendar server integration, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for the login screen, unlocking, and the Start avatar. Authentication, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
 
 ### Performance workload
 
@@ -37,7 +37,7 @@ Run `kestrel/tools/session.sh performance` to measure resident memory and time s
 
 ## Install as a login session
 
-`kestrel/tools/install.sh install` builds Kestrel and its Mutter into `/opt/kestrel` and links a Kestrel entry for the login screen, its systemd user units, and its portal preferences into `/usr/local`. Nothing from the system GNOME installation is replaced. Pass a prefix as the second argument to install elsewhere; session entries are only linked for prefixes under `/opt` or `/usr`. `kestrel/tools/install.sh remove` removes the prefix and the links.
+`kestrel/tools/install.sh install` builds Kestrel and its Mutter into `/opt/kestrel` and links a Kestrel entry for the login screen, its systemd user units, and its portal preferences into `/usr/local`. It also installs the login screen's settings service with its D-Bus and polkit files and the `/var/lib/kestrel-greeter` directory. Nothing from the system GNOME installation is replaced. Pass a prefix as the second argument to install elsewhere; session entries are only linked for prefixes under `/opt` or `/usr`. `kestrel/tools/install.sh remove` removes the prefix and the links.
 
 ### Memory pressure
 
@@ -55,12 +55,66 @@ The target starts only the settings services Kestrel relies on: accessibility, d
 
 Kestrel's portal handles screenshots, color picking, permission prompts, and appearance, so apps follow Kestrel's light or dark style and pick up its accent color. File dialogs open in Rover, and screen sharing and the remaining portals use GNOME's backend for now. The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
 
+## Login screen
+
+Kestrel is also the login screen. It runs on [greetd](https://git.sr.ht/~kennylevinsen/greetd), a small login daemon that leaves the look entirely to the greeter, so it can start any session installed on the computer: Kestrel, other Wayland desktops, and X11 desktops when `startx` is installed. greetd runs `kestrel-greeter`, which starts Kestrel in its login mode: the compositor with the login screen and nothing else, so no panel, apps, notifications, or session services.
+
+It looks and moves like the lock screen and shares its code. It opens on the large clock and date over the blurred wallpaper. A click, a key, or a swipe brings up the people on this computer at the bottom left with their account pictures, and the person who signed in most recently is already chosen, so typing starts their password right away. Choosing someone else crossfades to their wallpaper and accent color. Accounts hidden in Settings, and accounts the computer doesn't list, sign in with Another account, which asks for a username first; Back returns to it.
+
+Sign-in follows whatever the computer's sign-in rules ask for: a password, a verification code or other second step, a fingerprint, and any notes along the way, which appear under the field, with warnings in brighter text. A second step shows Back to start over. A wrong password shakes the field and says so, and the field is ready for another try. Caps Lock shows a warning while typing a password. After two minutes without input the screen returns to the clock.
+
+At the bottom right are the session, the keyboard layout when there is more than one, accessibility, and power. The session picker lists every installed session and starts with the one each person used last. Accessibility turns on larger text and, when Orca is installed, the screen reader. Power offers Suspend, Restart, and Power off.
+
+### Wallpaper and settings
+
+Each person's own wallpaper appears when they are chosen. Kestrel keeps a copy for the login screen up to date whenever the wallpaper or the light and dark style changes; for live wallpapers it is the still frame. The login screen takes its accent color from the wallpaper the same way the desktop does. Settings can instead show one picture for everyone.
+
+The Login Screen page in Settings chooses between everyone's own wallpaper and one picture for everyone, whether people are listed and who is left out, the session that starts by default, and which account signs in automatically when the computer starts.
+
+The settings are kept by `kestrel-greeter-service`, which answers on the system bus as `com.lantharos.Greeter1`. It starts when it is needed and quits after a minute without requests. Everyone can update their own login wallpaper without a password while signed in at the computer; everything else asks for an administrator. Wallpapers arrive as open files, never as paths, and are stored as pictures of at most 3840 pixels on the long side in `/var/lib/kestrel-greeter`, which the login screen reads directly. Automatic login is written as the `initial_session` in greetd's `/etc/greetd/config.toml`, which greetd runs once after each boot. The last session each person used is remembered in AccountsService, the same place GDM kept it, so earlier choices carry over.
+
+### Lock screen
+
+The lock screen checks passwords itself with the system's `login` sign-in rules, through a small helper that speaks greetd's protocol, so the lock screen and login screen share the same prompt. It works the same under greetd, GDM, or no display manager. greetd runs one session at a time, so the lock screen has no Switch User.
+
+### Switching to the Kestrel login screen
+
+Install greetd and Kestrel first:
+
+```bash
+sudo dnf install greetd
+kestrel/tools/install.sh install
+```
+
+Then point greetd at the login screen, keeping its original configuration, and switch display managers:
+
+```bash
+sudo cp /etc/greetd/config.toml /etc/greetd/config.toml.orig
+sudo cp /opt/kestrel/share/kestrel/greetd.toml /etc/greetd/config.toml
+sudo systemctl disable gdm && sudo systemctl enable greetd
+systemctl reboot
+```
+
+To go back to GDM:
+
+```bash
+sudo systemctl disable greetd && sudo systemctl enable gdm
+sudo cp /etc/greetd/config.toml.orig /etc/greetd/config.toml
+systemctl reboot
+```
+
+If the login screen doesn't appear, press Ctrl+Alt+F3 for a text console, sign in there, and run the commands to go back to GDM. If no console answers either, press E on the boot menu entry, add `systemd.unit=multi-user.target` to the end of the line that starts with `linux`, and press Ctrl+X to boot to a text console for this boot only.
+
+### Trying it without switching
+
+`kestrel/tools/session.sh greeter` runs the login screen in a headless session against a stand-in for greetd with scripted sign-ins (a correct password, a wrong one, notes and warnings along the way, and a second step), stand-ins for the account, login and locale services, and the settings service itself running as a normal user. It checks the people list, password entry, wrong passwords, typed usernames, switching people with their wallpapers and accent colors, the session picker, keyboard layouts, larger text, and power, then signs in and confirms the chosen session starts and is remembered. It saves `login-clock.png`, `login-users.png`, `login-password.png`, `login-wrong-password.png`, `login-switch-user.png`, `login-session-picker.png`, `login-power-menu.png`, and `login-second-factor.png`, and reports the login screen's resident memory and processor use while idle. `kestrel/tools/session.sh capture` runs it after the desktop checks.
+
 ## Work before a Luft session
 
 1. Log into the Kestrel session on real hardware and qualify it end to end. The TypeScript UI is loaded by a reduced upstream `main.js` path.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
 3. Replace GNOME's portal backend for screen sharing and global shortcuts, then exercise the portal calls from client apps.
-4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and GDM handoff under a real login session.
+4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and the greetd handoff under a real login session.
 5. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
 
 The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, suspend, or portal permission dialogs.
@@ -107,7 +161,7 @@ Single-row surfaces and controls are pills: the volume and brightness OSD, the w
 
 Modal dialogs rise in as they open and use a symbolic icon for their purpose above stable, left-aligned headings, with shared action buttons where the default action stands out. Authentication shows a small account row above the password field. Wi-Fi, VPN, keyring, and encrypted-drive forms keep their field labels visible while typing; inputs share the Start menu's glass treatment, caret, selection, and focus styling. Password visibility controls and accessible labels remain available. Audio-device choices use full-width rows. Session warnings and permission dialogs use the same typography and list styling.
 
-The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, the wallpaper palette and its contrast, colors for other apps written next to existing styles and removed again, Start in Pure black, a custom dark style schedule, a live wallpaper that pauses under a maximized window, keeps the panel in front of it on an empty desktop, follows the light and dark style with a video of its own for each, and ends when a picture is chosen, clipboard history opening at the text cursor of a GTK field and pasting into it, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not authenticate through GDM. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
+The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, the wallpaper palette and its contrast, colors for other apps written next to existing styles and removed again, Start in Pure black, a custom dark style schedule, a live wallpaper that pauses under a maximized window, keeps the panel in front of it on an empty desktop, follows the light and dark style with a video of its own for each, and ends when a picture is chosen, clipboard history opening at the text cursor of a GTK field and pasting into it, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not enter a real password. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
 
 The development launcher loads resources, typelibs, libraries, and schemas from the build directory, without depending on an installed temporary prefix.
 

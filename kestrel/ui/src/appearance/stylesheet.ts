@@ -23,8 +23,8 @@ export function accentStylesheet(accent: string, { light, dark }: Palette): stri
 .modal-dialog.modal-dialog .modal-dialog-button:default:hover { background-color: ${strong}; }
 .modal-dialog.modal-dialog .check-box:checked StIcon { background-color: ${strong}; }
 .kestrel-snap-zone.kestrel-snap-zone:hover, .kestrel-snap-zone.kestrel-snap-zone:focus { background-color: ${rgba(accent, 0.75)}; }
-.login-dialog-button.next-button.next-button { background-color: ${rgba(bright, 0.9)}; color: ${dark.colors.onPrimary}; }
-.login-dialog-button.next-button.next-button:hover { background-color: ${bright}; }
+.login-dialog-button.next-button.next-button { background-color: ${rgba(strong, 0.9)}; color: ${light.colors.onPrimary}; }
+.login-dialog-button.next-button.next-button:hover { background-color: ${strong}; }
 .kestrel-greeter-user.kestrel-greeter-user:checked { background-color: ${rgba(accent, 0.34)}; }
 `;
 }

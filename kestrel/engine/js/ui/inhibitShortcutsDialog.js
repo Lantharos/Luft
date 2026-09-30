@@ -9,7 +9,6 @@ import * as Dialog from './dialog.js';
 import * as ModalDialog from './modalDialog.js';
 import * as PermissionStore from '../misc/permissionStore.js';
 
-const APP_ALLOWLIST = ['org.gnome.Settings.desktop'];
 const LUFT_APP_PREFIX = 'com.lantharos.';
 const APP_PERMISSIONS_TABLE = 'gnome';
 const APP_PERMISSIONS_ID = 'shortcuts-inhibitor';
@@ -47,8 +46,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
 
     get _trusted() {
         const appId = this._app?.get_id();
-        return APP_ALLOWLIST.includes(appId) ||
-            [appId, this._window.get_wm_class()].some(id => id?.startsWith(LUFT_APP_PREFIX));
+        return [appId, this._window.get_wm_class()].some(id => id?.startsWith(LUFT_APP_PREFIX));
     }
 
     _shouldUsePermStore() {

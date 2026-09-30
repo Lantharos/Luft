@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { appWindow } from '@lantharos/sabine';
 	import { fromEvent } from './accelerator';
 	import Keys from './Keys.svelte';
 
@@ -48,13 +49,21 @@
 		held = modifiers(event);
 	}
 
+	function stop() {
+		recording = false;
+	}
+
 	$effect(() => {
 		if (!recording) return;
 		window.addEventListener('keydown', keydown, true);
 		window.addEventListener('keyup', keyup, true);
+		window.addEventListener('blur', stop);
+		void appWindow.inhibitShortcuts(true).catch(() => {});
 		return () => {
 			window.removeEventListener('keydown', keydown, true);
 			window.removeEventListener('keyup', keyup, true);
+			window.removeEventListener('blur', stop);
+			void appWindow.inhibitShortcuts(false).catch(() => {});
 		};
 	});
 </script>

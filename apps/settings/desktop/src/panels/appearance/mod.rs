@@ -1,3 +1,4 @@
+mod cursors;
 mod library;
 mod thumbnail;
 
@@ -31,7 +32,7 @@ fn add_wallpapers(_: Value) -> Result<(), String> {
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window
+    cursors::register(window, events)
         .with("appearance_wallpapers", events, wallpapers)
         .command("appearance_thumbnail", thumbnail::thumbnail)
         .command("appearance_add_wallpapers", add_wallpapers)

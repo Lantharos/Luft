@@ -27,6 +27,7 @@ import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
 import { coveredMonitors } from './panel/coverage.js';
+import { systemMonitor } from './panel/systemMonitor.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
 import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
@@ -491,6 +492,8 @@ export function dismissImmediately(): void {
 }
 
 export function switchWorkspace(index: number): void { currentUi?.switchWorkspace(index); }
+
+export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
 export function openStart(query = ''): void { currentUi?.openStart(query); }
 

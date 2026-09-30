@@ -137,7 +137,7 @@ Folder contents, names, and ordering are saved across sessions. Apps pinned to t
 
 ### Context menus
 
-Right-click an app in Start or the panel for launch actions, open windows, pinning, window sizing, minimizing, and closing. The panel offers Show desktop, a system monitor when one is installed, and Settings; the clock, status area, desktop background, account area, Quick Settings tiles, notifications, and search field offer relevant shortcuts. Submenus slide in from the side and Back slides them out; a menu that grows resizes before its content slides, and one that shrinks slides first. Menus also open with the Menu key or Shift+F10 on a focused control; Escape closes the menu and returns focus to where it was before the menu opened. Long app menus scroll within the screen.
+Right-click an app in Start or the panel for launch actions, open windows, pinning, window sizing, minimizing, and closing. The panel offers Show desktop, a system monitor when one is installed, and Settings; the clock, status area, desktop background, account area, Quick Settings tiles, notifications, and search field offer relevant shortcuts. Submenus slide in from the side and Back slides them out; a menu that grows resizes before its content slides, and one that shrinks slides first. Menus also open with the Menu key or Shift+F10 on a focused control; Escape closes the menu and returns focus to where it was before the menu opened. Long app menus scroll within the screen. Ctrl+Shift+Esc opens the system monitor, Barometer when it is installed, from anywhere.
 
 ### All windows
 

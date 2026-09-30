@@ -603,7 +603,7 @@ shell_util_systemd_call (const char           *command,
   res = sd_pid_get_user_unit (getpid (), &self_unit);
 
   if (res == -ENODATA ||
-      (res >= 0 && !g_str_has_prefix (self_unit, "org.gnome.Shell")))
+      (res >= 0 && g_strcmp0 (self_unit, "kestrel.service") != 0))
     {
       g_task_return_new_error (task,
                                G_IO_ERROR,

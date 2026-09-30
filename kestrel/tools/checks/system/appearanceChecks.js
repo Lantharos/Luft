@@ -48,9 +48,11 @@ export async function checkAppearance({pause, capture, output}) {
   const colorScheme = interfaceSettings.get_string('color-scheme');
   const gtk4 = configFile('gtk-4.0', 'gtk.css');
   const gtk3 = configFile('gtk-3.0', 'gtk.css');
+  const ghosttyThemes = GLib.find_program_in_path('ghostty')
+    ? [configFile('ghostty', 'themes', 'Kestrel Light'), configFile('ghostty', 'themes', 'Kestrel Dark')]
+    : [];
   const generated = [
-    configFile('ghostty', 'themes', 'Kestrel Light'),
-    configFile('ghostty', 'themes', 'Kestrel Dark'),
+    ...ghosttyThemes,
     configFile('qt6ct', 'colors', 'Kestrel.conf'),
     dataFile('color-schemes', 'Kestrel.colors'),
   ];

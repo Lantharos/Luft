@@ -10,6 +10,7 @@ Tern is the terminal for the Luft desktop, built with Sabine and SvelteKit. In t
 - Find with match case and regular expressions, with every match highlighted
 - Links in the output open with `Ctrl` and a click, including links that programs mark up themselves, such as `ls --hyperlink`
 - Programs can copy to the clipboard, which editors and multiplexers over SSH rely on
+- Programs can also read the clipboard once you allow it in Preferences; it stays off because programs on other computers can ask too
 - Pasting text with several lines, or text that looks risky, asks first and shows what is about to be pasted
 - Before closing a tab or pane with a program still running, Tern asks
 - A bell shows as a soft flash instead of a sound

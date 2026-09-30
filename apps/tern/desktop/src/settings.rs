@@ -32,6 +32,7 @@ pub struct Settings {
     pub scheme: SchemePreference,
     pub shell: Option<String>,
     pub copy_on_select: bool,
+    pub clipboard_reads: bool,
 }
 
 impl Default for Settings {
@@ -46,6 +47,7 @@ impl Default for Settings {
             scheme: SchemePreference::System,
             shell: None,
             copy_on_select: false,
+            clipboard_reads: false,
         }
     }
 }

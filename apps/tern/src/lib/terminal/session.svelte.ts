@@ -5,6 +5,7 @@ import { UnicodeGraphemesAddon } from '@xterm/addon-unicode-graphemes';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal, type ITheme } from '@xterm/xterm';
 import { openLink, pty } from '$lib/api';
+import { settings } from '$lib/state/settings.svelte';
 import type { CursorStyle, LaunchRequest } from '$lib/types';
 import { InputQueue } from './input';
 import { ShellIntegration, type FinishedCommand } from './integration';
@@ -32,7 +33,7 @@ export interface SessionEvents {
 }
 
 const clipboard: IClipboardProvider = {
-	readText: () => '',
+	readText: () => (settings.current.clipboardReads ? navigator.clipboard.readText() : ''),
 	writeText: (_, text) => navigator.clipboard.writeText(text)
 };
 

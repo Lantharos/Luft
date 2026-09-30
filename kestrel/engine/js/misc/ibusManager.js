@@ -23,7 +23,8 @@ Gio._promisify(Shell, 'util_systemd_unit_exists');
 _checkIBusVersion(1, 5, 2);
 
 let _ibusManager = null;
-const IBUS_SYSTEMD_SERVICE = 'org.freedesktop.IBus.session.GNOME.service';
+const IBUS_SYSTEMD_SERVICE = 'org.freedesktop.IBus.session.generic.service';
+const X11_ENVIRONMENT = ['DISPLAY', 'XAUTHORITY'];
 
 const TYPING_BOOSTER_ENGINE = 'typing-booster';
 
@@ -132,8 +133,32 @@ class IBusManager extends Signals.EventEmitter {
 
     async restartDaemon(extraArgs = []) {
         const isSystemdService = await this._ibusSystemdServiceExists();
-        if (!isSystemdService)
+        if (isSystemdService)
+            await this._restartSystemdService(extraArgs);
+        else
             this._spawn(['-r', ...extraArgs]);
+    }
+
+    async _restartSystemdService(extraArgs) {
+        const x11 = X11_ENVIRONMENT.filter(name => GLib.getenv(name));
+        const environment = [
+            `IBUS_DAEMON_ARGS=${['--panel', 'disable', ...extraArgs].join(' ')}`,
+            ...x11.map(name => `${name}=${GLib.getenv(name)}`),
+        ];
+        const unset = X11_ENVIRONMENT.filter(name => !x11.includes(name));
+        try {
+            await this._callSystemd('UnsetAndSetEnvironment', new GLib.Variant('(asas)', [unset, environment]));
+            await this._callSystemd('RestartUnit', new GLib.Variant('(ss)', [IBUS_SYSTEMD_SERVICE, 'replace']));
+        } catch (e) {
+            logError(e, 'Failed to restart the input method service');
+        }
+    }
+
+    _callSystemd(method, parameters) {
+        return Gio.DBus.session.call(
+            'org.freedesktop.systemd1', '/org/freedesktop/systemd1',
+            'org.freedesktop.systemd1.Manager', method, parameters,
+            null, Gio.DBusCallFlags.NONE, -1, null);
     }
 
     _clear() {

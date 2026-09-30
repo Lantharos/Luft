@@ -5,6 +5,7 @@ mod bluetooth;
 mod datetime;
 mod display;
 mod keyboard;
+mod login;
 mod mouse;
 mod network;
 mod notifications;
@@ -30,5 +31,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = privacy::register(window, events);
     let window = datetime::register(window, events);
     let window = users::register(window, events);
+    let window = login::register(window, events);
     about::register(window, events)
 }

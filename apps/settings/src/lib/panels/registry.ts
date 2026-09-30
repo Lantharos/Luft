@@ -6,6 +6,7 @@ import CalendarClock from '@lucide/svelte/icons/calendar-clock';
 import Info from '@lucide/svelte/icons/info';
 import Keyboard from '@lucide/svelte/icons/keyboard';
 import LayoutGrid from '@lucide/svelte/icons/layout-grid';
+import LogIn from '@lucide/svelte/icons/log-in';
 import Monitor from '@lucide/svelte/icons/monitor';
 import Mouse from '@lucide/svelte/icons/mouse';
 import Palette from '@lucide/svelte/icons/palette';
@@ -28,6 +29,7 @@ export type PanelId =
 	| 'privacy'
 	| 'datetime'
 	| 'users'
+	| 'login'
 	| 'about';
 
 export interface Panel {
@@ -71,6 +73,7 @@ export const PANEL_GROUPS: Panel[][] = [
 	[
 		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./datetime/DateTimePanel.svelte')),
 		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./users/UsersPanel.svelte')),
+		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./login/LoginPanel.svelte')),
 		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./about/AboutPanel.svelte'))
 	]
 ];

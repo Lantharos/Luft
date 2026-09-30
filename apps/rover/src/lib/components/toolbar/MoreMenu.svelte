@@ -3,7 +3,8 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import { GRID_SIZES, type ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import { userFolders } from '$lib/file-manager/places/places.svelte';
+	import { setPlaceHidden, settings } from '$lib/state/settings.svelte';
 
 	interface Props {
 		manager: FileManager;
@@ -16,6 +17,11 @@
 	let browsing = $derived(manager.view === 'home');
 	let smallest = $derived(view.gridSize <= GRID_SIZES[0]);
 	let largest = $derived(view.gridSize >= GRID_SIZES[GRID_SIZES.length - 1]);
+	let hiddenPlaces = $derived.by(() => {
+		const hidden = new Set(settings.value.hiddenPlaces);
+		const places = [{ path: manager.homePath, label: 'Home', icon: 'home' as const }, ...userFolders(manager.userDirs)];
+		return places.filter((place) => hidden.has(place.path));
+	});
 
 	function run(action: () => unknown, close: () => void) {
 		close();
@@ -56,6 +62,15 @@
 			<span class="flex-1">Details</span>
 			{@render shortcut('Alt+P')}
 		</MenuItem>
+		{#if hiddenPlaces.length > 0}
+			<MenuSeparator />
+			{#each hiddenPlaces as place (place.path)}
+				<MenuItem onclick={() => run(() => setPlaceHidden(place.path, false), close)}>
+					<Icon name={place.icon} size={16} />
+					<span class="flex-1">Show {place.label} in sidebar</span>
+				</MenuItem>
+			{/each}
+		{/if}
 		<MenuSeparator />
 		{#if !chooser}
 			<MenuItem onclick={() => run(() => manager.openTab(), close)}>

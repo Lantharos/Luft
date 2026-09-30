@@ -41,6 +41,19 @@ export type SidebarPlace =
 	| { kind: 'trash' };
 export type PlaceMenuState = { x: number; y: number; place: SidebarPlace };
 
+function placeKey(place: SidebarPlace): string {
+	switch (place.kind) {
+		case 'folder':
+			return `folder:${place.path}`;
+		case 'favorite':
+			return `favorite:${place.bookmark.path}`;
+		case 'drive':
+			return `drive:${place.drive.mount_point}`;
+		default:
+			return place.kind;
+	}
+}
+
 const DUPLICATE_EVENT_MS = 120;
 const NOTICE_MS = 4000;
 const VIEW_TITLES: Record<SidebarView, string> = {
@@ -91,7 +104,7 @@ export class FileManager {
 	);
 	pathSegments = $derived(pathSegments(this.currentPath));
 
-	#lastContextMenu = { x: 0, y: 0, key: null as unknown, at: 0 };
+	#lastContextMenu = { x: 0, y: 0, key: null as string | null, at: 0 };
 	#lastNavigationButton = { button: 0, at: 0 };
 	#noticeTimer: ReturnType<typeof setTimeout> | undefined;
 	#finishedOperations = new Set<string>();
@@ -324,7 +337,7 @@ export class FileManager {
 	};
 
 	openPlaceMenu = (event: MouseEvent, place: SidebarPlace) => {
-		if (this.#repeatedMenu(event, place)) return;
+		if (this.#repeatedMenu(event, placeKey(place))) return;
 		this.contextMenu = null;
 		this.placeMenu = { x: event.clientX, y: event.clientY, place };
 	};
@@ -334,7 +347,7 @@ export class FileManager {
 		this.placeMenu = null;
 	};
 
-	#repeatedMenu(event: MouseEvent, key: unknown) {
+	#repeatedMenu(event: MouseEvent, key: string | null) {
 		event.preventDefault();
 		event.stopPropagation();
 		const previous = this.#lastContextMenu;

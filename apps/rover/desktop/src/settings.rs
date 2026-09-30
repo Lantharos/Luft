@@ -65,6 +65,7 @@ pub struct Settings {
     pub details_open: bool,
     pub list_columns: Vec<ListColumn>,
     pub group_by: GroupBy,
+    pub hidden_places: Vec<String>,
 }
 
 impl Default for Settings {
@@ -95,6 +96,7 @@ impl Default for Settings {
                 },
             ],
             group_by: GroupBy::None,
+            hidden_places: Vec::new(),
         }
     }
 }

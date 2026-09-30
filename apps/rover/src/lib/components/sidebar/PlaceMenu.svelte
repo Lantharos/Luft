@@ -6,6 +6,7 @@
 	import * as bookmarks from '$lib/file-manager/places/bookmarks';
 	import type { FileManager, PlaceMenuState, SidebarPlace } from '$lib/file-manager/manager.svelte';
 	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
+	import { setPlaceHidden } from '$lib/state/settings.svelte';
 
 	interface Props {
 		menu: PlaceMenuState;
@@ -27,8 +28,8 @@
 	}
 
 	function run(action: () => unknown) {
-		manager.placeMenu = null;
 		void action();
+		manager.placeMenu = null;
 	}
 
 	function open() {
@@ -62,6 +63,10 @@
 	{#if place.kind === 'drive' && place.drive.is_removable}
 		{@const drive = place.drive}
 		{@render item('eject', 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mount_point))}
+	{/if}
+	{#if place.kind === 'folder'}
+		{@const folder = place.path}
+		{@render item('eye-off', 'Remove from sidebar', () => setPlaceHidden(folder, true))}
 	{/if}
 	{#if place.kind === 'favorite'}
 		{@const bookmark = place.bookmark}

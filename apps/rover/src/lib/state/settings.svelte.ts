@@ -17,7 +17,8 @@ const DEFAULT_SETTINGS: Settings = {
 	gridSize: 88,
 	detailsOpen: false,
 	listColumns: DEFAULT_LIST_COLUMNS,
-	groupBy: 'none'
+	groupBy: 'none',
+	hiddenPlaces: []
 };
 
 class SettingsState {
@@ -45,3 +46,10 @@ class SettingsState {
 }
 
 export const settings = new SettingsState();
+
+export function setPlaceHidden(path: string, hidden: boolean) {
+	settings.update((current) => ({
+		...current,
+		hiddenPlaces: hidden ? [...current.hiddenPlaces, path] : current.hiddenPlaces.filter((place) => place !== path)
+	}));
+}

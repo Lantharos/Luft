@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div class="hidden-scroll flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" role="tablist" aria-label="Open files" data-no-drag>
+<div class="hidden-scroll flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" role="tablist" aria-label="Open files">
 	{#each workspace.documents as document (document.id)}
 		{@const active = document === workspace.active}
 		<div

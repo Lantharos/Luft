@@ -28,6 +28,7 @@ import {checkAppIcons} from './checks/system/appIconChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
+const FILE_MANAGER = 'com.lantharos.rover.desktop';
 
 function pause(milliseconds) {
   return new Promise(resolve => {
@@ -79,6 +80,9 @@ function reportLayout() {
 
 export async function run() {
   await disableHelperAutoExit();
+  const pinned = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  if (!pinned.get_strv('favorite-apps').includes(FILE_MANAGER))
+    pinned.set_strv('favorite-apps', [FILE_MANAGER, ...pinned.get_strv('favorite-apps')]);
   const output = GLib.getenv('KESTREL_CAPTURE_DIR');
   if (!output)
     throw new Error('KESTREL_CAPTURE_DIR is required');
@@ -148,7 +152,7 @@ export async function run() {
   await pause(150);
   await capture(`${output}/search.png`);
 
-  const files = actorNamed(start, 'Files');
+  const files = actorNamed(start, 'Rover');
   const [appX, appY] = files.get_transformed_position();
   pointer.notify_absolute_motion(GLib.get_monotonic_time(), appX + files.width / 2, appY + files.height / 2);
   pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.PRESSED);
@@ -252,7 +256,7 @@ export async function run() {
     toggleSurface('start');
     await pause(350);
     console.log(`Kestrel Start closed: visible=${start.visible}, position=${start.y + start.translation_y}`);
-    const panelFiles = actorNamed(actorNamed(global.stage, 'kestrel-panel'), 'Files');
+    const panelFiles = actorNamed(actorNamed(global.stage, 'kestrel-panel'), 'Rover');
     const [panelX, panelY] = panelFiles.get_transformed_position();
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), panelX + 20, panelY + 20);
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.PRESSED);
@@ -267,7 +271,7 @@ export async function run() {
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
     await pause(220);
-    console.log(`Kestrel context unpin: ${!favorites.get_strv('favorite-apps').includes('org.gnome.Nautilus.desktop')}`);
+    console.log(`Kestrel context unpin: ${!favorites.get_strv('favorite-apps').includes(FILE_MANAGER)}`);
     favorites.set_strv('favorite-apps', savedFavorites);
     await pause(250);
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);

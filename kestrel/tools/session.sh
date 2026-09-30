@@ -36,7 +36,11 @@ export GSETTINGS_SCHEMA_DIR="$root/kestrel/build/data"
 export KESTREL_CSS_PATH="$root/kestrel/engine/data/theme/kestrel.css"
 unset GSETTINGS_BACKEND GDK_BACKEND
 
-exec dbus-run-session -- bash -c '
+if [[ "$mode" == greeter ]]; then
+  exec "$root/kestrel/tools/greeter.sh"
+fi
+
+dbus-run-session -- bash -c '
   set -euo pipefail
   root="$1"
   mode="$2"
@@ -71,8 +75,12 @@ exec dbus-run-session -- bash -c '
   elif [[ "$mode" == nested ]]; then
     args=(--wayland --devkit)
   else
-    echo "Usage: kestrel/tools/session.sh [nested|capture|performance]" >&2
+    echo "Usage: kestrel/tools/session.sh [nested|capture|performance|greeter]" >&2
     exit 2
   fi
   exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" "${args[@]}"
 ' kestrel-session "$root" "$mode"
+
+if [[ "$mode" == capture ]]; then
+  exec "$root/kestrel/tools/greeter.sh"
+fi

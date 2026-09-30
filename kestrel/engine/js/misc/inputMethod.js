@@ -6,6 +6,7 @@ import IBus from 'gi://IBus';
 import Meta from 'gi://Meta';
 
 import {logErrorUnlessCancelled} from './errorUtils.js';
+import * as IBusManager from './ibusManager.js';
 import * as Keyboard from '../ui/status/keyboard.js';
 import * as Main from '../ui/main.js';
 
@@ -59,10 +60,17 @@ export const InputMethod = GObject.registerClass({
 
     get caret() {
         if (!this._currentFocus || !this._cursorRect)
-            return null;
+            return this._x11Caret();
         const {window, x, y} = this._cursorWindow;
         const frame = window?.get_frame_rect() ?? {x, y};
         return {...this._cursorRect, x: this._cursorRect.x + frame.x - x, y: this._cursorRect.y + frame.y - y};
+    }
+
+    _x11Caret() {
+        const window = global.display.focus_window;
+        if (window?.get_client_type() !== Meta.WindowClientType.X11)
+            return null;
+        return IBusManager.getIBusManager().caret;
     }
 
     interceptKeys(interceptor) {

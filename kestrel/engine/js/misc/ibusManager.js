@@ -66,6 +66,7 @@ class IBusManager extends Signals.EventEmitter {
         this._candidatePopup = new IBusCandidatePopup.CandidatePopup();
 
         this._panelService = null;
+        this._caret = null;
         this._engines = new Map();
         this._ready = false;
         this._registerPropertiesId = 0;
@@ -161,6 +162,10 @@ class IBusManager extends Signals.EventEmitter {
             null, Gio.DBusCallFlags.NONE, -1, null);
     }
 
+    get caret() {
+        return this._caret;
+    }
+
     _clear() {
         if (this._cancellable) {
             this._cancellable.cancel();
@@ -176,6 +181,7 @@ class IBusManager extends Signals.EventEmitter {
             this._panelService.destroy();
 
         this._panelService = null;
+        this._caret = null;
         this._candidatePopup.setPanelService(null);
         this._engines.clear();
         this._ready = false;
@@ -224,13 +230,18 @@ class IBusManager extends Signals.EventEmitter {
         this._panelService.connect('update-property', this._updateProperty.bind(this));
         this._panelService.connect('set-cursor-location', (ps, x, y, w, h) => {
             const cursorLocation = {x, y, width: w, height: h};
+            this._caret = cursorLocation;
             this.emit('set-cursor-location', cursorLocation);
         });
         this._panelService.connect('focus-in', (panel, path) => {
+            this._caret = null;
             if (!GLib.str_has_suffix(path, '/InputContext_1'))
                 this.emit('focus-in');
         });
-        this._panelService.connect('focus-out', () => this.emit('focus-out'));
+        this._panelService.connect('focus-out', () => {
+            this._caret = null;
+            this.emit('focus-out');
+        });
 
         try {
             // IBus versions older than 1.5.10 have a bug which

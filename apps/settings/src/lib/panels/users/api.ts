@@ -7,7 +7,6 @@ export interface User {
 	realName: string;
 	picture: string | null;
 	administrator: boolean;
-	automaticLogin: boolean;
 	hasPassword: boolean;
 }
 
@@ -32,7 +31,6 @@ export type PasswordOutcome = 'changed' | 'wrongPassword' | 'tooShort' | 'tooSim
 export const users = () => invoke<Users>('users');
 export const rename = (name: string) => invoke<void>('users_rename', { name });
 export const choosePicture = () => invoke<boolean>('users_choose_picture', undefined, { timeoutMs: WAIT_FOR_PERMISSION });
-export const setAutomaticLogin = (enabled: boolean) => invoke<void>('users_set_automatic_login', { enabled }, { timeoutMs: WAIT_FOR_PERMISSION });
 export const changePassword = (current: string | null, password: string) =>
 	invoke<PasswordOutcome>('users_change_password', { current, password }, { timeoutMs: WAIT_FOR_PERMISSION });
 

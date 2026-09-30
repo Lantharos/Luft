@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Camera from '@lucide/svelte/icons/camera';
-	import { Avatar, Dialog, ItemRow, Row, Section, Switch, TextField } from '@luft/ui';
+	import { Avatar, Dialog, ItemRow, Row, Section, TextField } from '@luft/ui';
 	import FingerprintSection from './FingerprintSection.svelte';
 	import PasswordDialog from './PasswordDialog.svelte';
-	import { accountType, choosePicture, displayName, rename, setAutomaticLogin, users, type Users } from './api';
+	import { accountType, choosePicture, displayName, rename, users, type Users } from './api';
 
 	let accounts = $state<Users | null>(null);
 	let version = $state(0);
@@ -70,9 +70,6 @@
 			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? 'Change' : 'Set password'}</button>
 		</Row>
 		<Row title="Account type"><span>{accountType(me)}</span></Row>
-		<Row title="Automatic login" description="Sign in without a password when this computer starts">
-			<Switch label="Automatic login" checked={me.automaticLogin} onchange={(on) => attempt(() => setAutomaticLogin(on))} />
-		</Row>
 	</Section>
 
 	{#if problem}

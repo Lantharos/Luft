@@ -26,7 +26,6 @@ struct User {
     real_name: String,
     picture: Option<String>,
     administrator: bool,
-    automatic_login: bool,
     has_password: bool,
 }
 
@@ -39,11 +38,6 @@ struct Users {
 #[derive(Deserialize)]
 struct Rename {
     name: String,
-}
-
-#[derive(Deserialize)]
-struct AutomaticLogin {
-    enabled: bool,
 }
 
 fn failed(error: impl std::fmt::Display) -> String {
@@ -93,7 +87,6 @@ fn describe(user: &Proxy) -> Result<User, String> {
         real_name: user.get_property("RealName").map_err(failed)?,
         picture: Path::new(&picture).is_file().then_some(picture),
         administrator: account_type == ADMINISTRATOR,
-        automatic_login: user.get_property("AutomaticLogin").map_err(failed)?,
         has_password: has_password(user)?,
     })
 }
@@ -124,9 +117,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             change("SetRealName", &name.trim())
         })
         .command("users_choose_picture", choose_picture)
-        .command("users_set_automatic_login", |AutomaticLogin { enabled }| {
-            change("SetAutomaticLogin", &enabled)
-        })
         .command("users_change_password", password::change)
         .command("users_fingerprints", |_: Value| Ok(fingerprint::list()))
         .with("users_fingerprint_enroll", events, fingerprint::enroll)

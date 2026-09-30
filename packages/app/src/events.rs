@@ -17,4 +17,10 @@ impl Events {
         };
         emitter.emit(name, payload)
     }
+
+    pub fn emit_bytes(&self, name: &str, bytes: &[u8]) -> bool {
+        self.0
+            .get()
+            .is_some_and(|emitter| emitter.emit_bytes(name, bytes))
+    }
 }

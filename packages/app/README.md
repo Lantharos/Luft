@@ -33,6 +33,8 @@ The close button normally closes the window straight away. Apps that need to fin
 
 `luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's wallpaper palette and the desktop's light or dark style. The last closure runs at the same point, for any other watchers the app needs.
 
+`Events::emit` sends a JSON event to the page and `Events::emit_bytes` sends raw bytes, which the page receives as a `Uint8Array`. Use bytes for large or frequent updates that would be wasteful as JSON.
+
 ## Startup state
 
 Flatten `Appearance` into the app's startup state so the page knows whether the window is translucent and which accent to use:

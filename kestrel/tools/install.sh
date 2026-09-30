@@ -16,6 +16,12 @@ installed_links() {
   done
 }
 
+check_runtime() {
+  if ! gst-inspect-1.0 gtk4paintablesink >/dev/null 2>&1; then
+    echo "Live wallpapers need the GStreamer GTK 4 video sink. On Fedora: sudo dnf install gstreamer1-plugin-gtk4" >&2
+  fi
+}
+
 as_owner() {
   if [[ -w "$(dirname "$1")" ]]; then "${@:2}"; else sudo "${@:2}"; fi
 }
@@ -46,6 +52,7 @@ case "$action" in
       done
       systemctl --user daemon-reload
       echo "Kestrel is installed in $prefix and appears as a session on the login screen."
+      check_runtime
     else
       echo "Kestrel is installed in $prefix. Session entries are only linked for system prefixes."
     fi

@@ -1,6 +1,7 @@
 #include <gio/gunixinputstream.h>
 #include <gst/gst.h>
 #include <gtk/gtk.h>
+#include <sysexits.h>
 
 #include "player.h"
 #include "still.h"
@@ -55,6 +56,13 @@ share_decoded_frames_with_gtk (void)
   g_setenv ("GST_GL_API", "opengl3", TRUE);
 }
 
+static gboolean
+has_video_sink (void)
+{
+  g_autoptr (GstElementFactory) factory = gst_element_factory_find ("gtk4paintablesink");
+  return factory != NULL;
+}
+
 static int
 play (const char *uri)
 {
@@ -92,5 +100,10 @@ main (int    argc,
   g_set_prgname (APPLICATION_ID);
   gtk_init ();
   gst_init (NULL, NULL);
+  if (!has_video_sink ())
+    {
+      g_printerr ("kestrel-wallpaper: live wallpapers need the GStreamer GTK 4 video sink (gtk4paintablesink)\n");
+      return EX_UNAVAILABLE;
+    }
   return play (argv[1]);
 }

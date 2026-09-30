@@ -10,6 +10,7 @@ import { animateActor } from '../shared/motion.js';
 
 const FADE_DURATION = 400;
 const SIGTERM = 15;
+const UNAVAILABLE_EXIT_STATUS = 69;
 const RESTART_DELAYS_MS = [1000, 5000, 20000];
 const STABLE_AFTER_US = 2 * 60 * GLib.USEC_PER_SEC;
 const BUILD_DIRECTORY = GLib.getenv('GNOME_SHELL_BUILDDIR');
@@ -58,6 +59,10 @@ export class Renderer {
       try {
         process.wait_finish(result);
       } catch {
+        return;
+      }
+      if (process.get_if_exited() && process.get_exit_status() === UNAVAILABLE_EXIT_STATUS) {
+        console.warn('Live wallpapers need the GStreamer GTK 4 video sink, so the still frame stays in place');
         return;
       }
       this.restart();

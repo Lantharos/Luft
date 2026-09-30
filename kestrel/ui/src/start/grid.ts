@@ -8,6 +8,7 @@ import { GridDrag } from './drag.js';
 import { SearchResults } from './searchResults.js';
 import type { SearchItem } from './search/item.js';
 import { animateActor, liftIcon } from '../shared/motion.js';
+import { appIcon } from '../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 
 export class StartGrid {
@@ -173,14 +174,14 @@ export class StartGrid {
 
   private icon(id: string, size: number): St.Widget {
     const folder = this.layout.folder(id);
-    if (!folder) return new St.Icon({ gicon: this.apps.get(id)!.get_icon(), icon_size: size });
+    if (!folder) return appIcon(this.apps.get(id)!, size);
     const preview = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-folder-preview', width: size, height: size });
     const ids = folder.apps.filter(app => this.visible(app)).slice(0, 4);
     for (let index = 0; index < 4; index += 2) {
       const row = new St.BoxLayout({ x_expand: true, y_expand: true });
       for (let column = 0; column < 2; column++) {
         const app = this.apps.get(ids[index + column]);
-        row.add_child(app ? new St.Icon({ gicon: app.get_icon(), icon_size: Math.floor((size - 8) / 2), x_expand: true, y_expand: true }) : new St.Widget({ x_expand: true, y_expand: true }));
+        row.add_child(app ? appIcon(app, Math.floor((size - 8) / 2), { x_expand: true, y_expand: true }) : new St.Widget({ x_expand: true, y_expand: true }));
       }
       preview.add_child(row);
     }

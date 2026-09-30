@@ -28,6 +28,7 @@ import UPower from 'gi://UPowerGlib';
 import * as CheckBox from './checkBox.js';
 import * as Dialog from './dialog.js';
 import * as GnomeSession from '../misc/gnomeSession.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as LoginManager from '../misc/loginManager.js';
 import * as Main from './main.js';
 import * as ModalDialog from './modalDialog.js';
@@ -583,7 +584,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         if (app && flags & GnomeSession.InhibitFlags.LOGOUT) {
             const [description] = inhibitor.GetReasonSync();
             const listItem = new Dialog.ListSectionItem({
-                icon_actor: app.create_icon_texture(_ITEM_ICON_SIZE),
+                icon_actor: KestrelUi.appIcon(app, _ITEM_ICON_SIZE),
                 title: app.get_name(),
                 description,
             });

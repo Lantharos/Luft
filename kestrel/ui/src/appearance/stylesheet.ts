@@ -3,10 +3,10 @@ import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { fromHex } from './color.js';
 import type { Palette } from './palette.js';
 
-const rgba = (hex: string, alpha: number) =>
-  `rgba(${[1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)).join(', ')}, ${alpha})`;
+const rgba = (hex: string, alpha: number) => `rgba(${fromHex(hex).join(', ')}, ${alpha})`;
 
 export function accentStylesheet(accent: string, { light, dark }: Palette): string {
   const strong = light.colors.primary;

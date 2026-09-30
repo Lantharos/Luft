@@ -5,6 +5,12 @@
     <value nick="custom" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.AppIconStyle">
+    <value nick="default" value="0"/>
+    <value nick="tinted" value="1"/>
+    <value nick="clear" value="2"/>
+  </enum>
+
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="development-tools" type="b">
@@ -95,6 +101,22 @@
         Generates colors from the wallpaper palette for GTK 4, GTK 3, Qt,
         KDE and Ghostty in the user's configuration directory. Turning it
         off removes everything that was generated.
+      </description>
+    </key>
+    <key name="app-icon-style" enum="com.lantharos.kestrel.AppIconStyle">
+      <default>'default'</default>
+      <summary>How app icons are drawn</summary>
+      <description>
+        Default shows each app's own colors. Tinted draws a single-color
+        glyph on a plain plate, and Clear draws a light glyph on glass.
+      </description>
+    </key>
+    <key name="app-icon-tint" type="s">
+      <default>''</default>
+      <summary>Color of tinted app icons</summary>
+      <description>
+        A color such as #3584e4 for tinted app icons. Empty uses the
+        wallpaper's accent color.
       </description>
     </key>
     <key name="live-wallpaper-on-battery" type="b">

@@ -4,13 +4,10 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
+import { windowIcon } from '../appearance/icons/appIcons.js';
 import type { Rect } from './grid.js';
 
 export const CARD_HEADER = 30;
-
-interface WindowIconApp extends Shell.App {
-  create_window_icon_texture(window: Meta.Window, size: number): Clutter.Actor;
-}
 
 export interface WindowDragSource { window: Meta.Window; }
 
@@ -22,9 +19,9 @@ export class WindowCard {
   private readonly signals: number[] = [];
 
   constructor(readonly window: Meta.Window, activate: () => void, changed: () => void) {
-    const app = Shell.WindowTracker.get_default().get_window_app(window) as WindowIconApp | null;
+    const app = Shell.WindowTracker.get_default().get_window_app(window);
     const header = new St.BoxLayout({ style_class: 'kestrel-task-header', height: CARD_HEADER });
-    const icon = app ? app.create_window_icon_texture(window, 16) : new St.Icon({ icon_name: 'application-x-executable-symbolic', icon_size: 16 });
+    const icon = app ? windowIcon(app, window, 16) : new St.Icon({ icon_name: 'application-x-executable-symbolic', icon_size: 16 });
     icon.y_align = Clutter.ActorAlign.CENTER;
     header.add_child(icon);
     this.title = new St.Label({ style_class: 'kestrel-task-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });

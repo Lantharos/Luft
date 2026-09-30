@@ -35,6 +35,8 @@ import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
 import type { Rgb } from './appearance/color.js';
 import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
+export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
+
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
 

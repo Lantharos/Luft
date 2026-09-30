@@ -161,7 +161,7 @@ Single-row surfaces and controls are pills: the volume and brightness OSD, the w
 
 Modal dialogs rise in as they open and use a symbolic icon for their purpose above stable, left-aligned headings, with shared action buttons where the default action stands out. Authentication shows a small account row above the password field. Wi-Fi, VPN, keyring, and encrypted-drive forms keep their field labels visible while typing; inputs share the Start menu's glass treatment, caret, selection, and focus styling. Password visibility controls and accessible labels remain available. Audio-device choices use full-width rows. Session warnings and permission dialogs use the same typography and list styling.
 
-The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, the wallpaper palette and its contrast, colors for other apps written next to existing styles and removed again, Start in Pure black, a custom dark style schedule, a live wallpaper that pauses under a maximized window, keeps the panel in front of it on an empty desktop, follows the light and dark style with a video of its own for each, and ends when a picture is chosen, clipboard history opening at the text cursor of a GTK field and pasting into it, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not enter a real password. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
+The capture command exercises audio selection, encrypted-volume password, and log out confirmation requests through D-Bus and cancels them without submitting credentials. It records a notification banner, media controls driven by a test player, a tray icon and its menu from a test app, the all-windows view with windows moved between desktops, grouped notifications and an inline reply, per-app Do Not Disturb and notification list rules, snapped windows returning together, taskbar counts, progress, and attention with desktop peek, the privacy button and its menu during a screen share, the keep-awake eye, Keep Awake, Dark Style, Airplane Mode, and Keyboard Backlight tiles against stand-in system services, global shortcuts from registration through the shortcut dialog, the wallpaper palette and its contrast, colors for other apps written next to existing styles and removed again, app icons in each style on two wallpapers in light and dark, Start in Pure black, a custom dark style schedule, a live wallpaper that pauses under a maximized window, keeps the panel in front of it on an empty desktop, follows the light and dark style with a video of its own for each, and ends when a picture is chosen, clipboard history opening at the text cursor of a GTK field and pasting into it, and the lock screen and unlock prompt. It also checks keyboard navigation, lock-mode visibility, blocked Super activation, live window previews, Alt-Tab with real client windows, workspace shortcuts and scrolling, fullscreen panel visibility, volume OSDs, and screenshot controls. Lock-mode checks do not enter a real password. A nested session shares the host login session, so its polkit agent cannot register alongside the host agent; polkit authentication, keyring unlock, network credential submission, and password unlock still require qualification in a dedicated Kestrel login session.
 
 The development launcher loads resources, typelibs, libraries, and schemas from the build directory, without depending on an installed temporary prefix.
 
@@ -209,6 +209,7 @@ On the session bus, `com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Appea
 | `TerminalColors` | `a{ss}` | Terminal colors for the current style |
 | `LightColors`, `DarkColors` | `a{ss}` | Roles for each style, whichever is on |
 | `LightTerminalColors`, `DarkTerminalColors` | `a{ss}` | Terminal colors for each style |
+| `AppIcons` | `a{ss}` | The app icon style and its colors, described under App icons |
 
 Terminal colors are keyed `foreground`, `background`, `cursor`, `cursorText`, `selectionBackground`, `selectionForeground` and `color0` to `color15`. All values are `#rrggbb`.
 
@@ -247,6 +248,26 @@ Settings can switch the dark style on and off by itself (`dark-schedule` in `com
 ### Pure black
 
 Pure black (`pure-black` in `com.lantharos.kestrel`) is for OLED displays. Kestrel's panel, Start, Quick Settings, notifications, menus, dialogs, and other glass surfaces turn solid black and stop blurring what is behind them; surfaces inside other surfaces, such as notifications in the notification center, are a very dark grey so they stay apart. Luft apps turn their dark backgrounds black, and the generated dark colors for other apps use black surfaces.
+
+### App icons
+
+App icons can keep their own colors or take on the wallpaper (`app-icon-style` in `com.lantharos.kestrel`, under Appearance in Settings):
+
+- Default shows every app's own icon.
+- Tinted draws each app as a single-color glyph on a plain rounded plate: a near-black plate with a light accent glyph in the dark style, and a near-white plate with a dark accent glyph in the light style. The glyph sits at tone 82 on a tone 12 plate in dark and at tone 38 on a tone 95 plate in light, so it always reaches at least 4.5:1. `app-icon-tint` replaces the wallpaper accent with a color of your choice, such as `#3584e4`.
+- Clear draws a near-white glyph on a faint white plate with the same bright top edge as Kestrel's glass, over whatever surface the icon sits on.
+
+The style covers the taskbar, Start and its search results and folders, Alt+Tab, Ctrl+Alt+Tab, the all-windows view, window previews, notification groups and banners, the media card, the camera and microphone menu, and the apps listed when logging out or unmounting a drive. Other apps' own windows keep their icons.
+
+Each glyph comes from the first of these that exists:
+
+1. A symbolic icon named after the app, `<desktop id>-symbolic` or the app's `Icon` name followed by `-symbolic`, from the icon theme or the app itself. Luft's own apps have one.
+2. A glyph drawn for Kestrel for common apps: 1Password, Blender, Chrome and Chromium, Claude, Discord, Figma, Firefox, Ghostty, GIMP, Helium, OBS Studio, Raffi, Spotify, Steam, Telegram, Thunderbird, VS Code and VSCodium, and Zed, whether installed as packages, Flatpaks or Snaps.
+3. The app's own icon turned into two tones. When the icon sits on a solid plate of one color, the plate is dropped so only the symbol remains; the rest of the icon keeps its light and dark parts, mapped from a darker to a lighter shade of the glyph color.
+
+Every icon is drawn once per size, style and color on a background thread and kept as a texture, so showing icons costs the same as with the apps' own colors. Changing the wallpaper, style, tint or light and dark style redraws the icons on screen first and the hidden ones a few at a time while the desktop is idle.
+
+Luft apps draw other apps' icons in the same style. Kestrel keeps a two-tone glyph for every installed app in `~/.cache/kestrel/app-glyphs`, named after the desktop ID, with the glyph's lightness in the color channels and its coverage in alpha. `AppIcons` on the Appearance interface holds `style`, the `glyphs` folder, and `plate`, `ink`, `shade` and `rim` for `tinted` and `clear`, keyed as `tinted-plate`, `clear-rim` and so on; colors are `#rrggbbaa`, and `rim` is the strength of the top edge from 0 to 1.
 
 ### Live wallpapers
 

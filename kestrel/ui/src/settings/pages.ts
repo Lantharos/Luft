@@ -18,7 +18,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   { id: 'display', title: 'Displays', icon: 'video-display-symbolic', keywords: ['monitor', 'screen', 'resolution', 'scale', 'refresh rate', 'night light'] },
   { id: 'sound', title: 'Sound', icon: 'audio-speakers-symbolic', keywords: ['audio', 'volume', 'speakers', 'microphone', 'output', 'input'] },
   { id: 'power', title: 'Power & Battery', icon: 'battery-full-charging-symbolic', keywords: ['battery', 'sleep', 'suspend', 'power mode', 'screen blank'] },
-  { id: 'appearance', title: 'Appearance', icon: 'preferences-desktop-appearance-symbolic', keywords: ['wallpaper', 'background', 'dark', 'light', 'accent', 'text size'] },
+  { id: 'appearance', title: 'Appearance', icon: 'preferences-desktop-appearance-symbolic', keywords: ['wallpaper', 'background', 'dark', 'light', 'accent', 'app icons', 'tinted', 'text size'] },
   { id: 'notifications', title: 'Notifications', icon: 'preferences-system-notifications-symbolic', keywords: ['do not disturb', 'banners', 'lock screen'] },
   { id: 'keyboard', title: 'Keyboard', icon: 'input-keyboard-symbolic', keywords: ['input sources', 'layout', 'shortcuts', 'language'] },
   { id: 'mouse', title: 'Mouse & Touchpad', icon: 'input-mouse-symbolic', keywords: ['pointer', 'scroll', 'touchpad', 'tap to click'] },

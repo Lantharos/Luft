@@ -3,6 +3,9 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import type { SearchItem } from './search/item.js';
+import { appIcons, type IconApp } from '../appearance/icons/appIcons.js';
+
+const isApp = (icon: SearchItem['icon']): icon is IconApp => 'get_id' in icon;
 
 interface Row {
   actor: St.Button;
@@ -28,7 +31,7 @@ export class SearchResults {
       this.rows.set(item.key, row);
     }
     row.item = item;
-    row.icon.gicon = item.icon;
+    if (!isApp(item.icon)) row.icon.gicon = item.icon;
     row.title.text = item.title;
     row.description.text = item.description;
     row.description.visible = !!item.description;
@@ -54,6 +57,7 @@ export class SearchResults {
   private build(item: SearchItem): Row {
     const content = new St.BoxLayout({ style_class: 'kestrel-search-result-content', x_expand: true });
     const icon = new St.Icon({ icon_size: 32, y_align: Clutter.ActorAlign.CENTER });
+    if (isApp(item.icon)) appIcons.bind(icon, item.icon);
     content.add_child(icon);
     const text = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     const title = new St.Label({ style_class: 'kestrel-search-result-name' });

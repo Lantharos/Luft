@@ -1,7 +1,9 @@
 import Clutter from 'gi://Clutter';
+import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import { HeaderLayout } from 'resource:///org/gnome/shell/ui/headerLayout.js';
 
+import { appIcons, sourceApp } from '../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
@@ -14,10 +16,13 @@ export class NotificationGroup {
   private readonly icon = new St.Icon({ icon_size: 16, style_class: 'kestrel-notification-group-icon', y_align: Clutter.ActorAlign.CENTER });
   private readonly title = new St.Label({ style_class: 'kestrel-muted', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   private readonly more = new St.Button({ style_class: 'kestrel-text-button kestrel-notification-more', can_focus: true, visible: false });
+  private readonly app: Shell.App | null;
   private expanded = false;
 
   constructor(private readonly source: NotificationSource, private readonly menus: ContextMenus, private readonly changed: () => void,
     private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void) {
+    this.app = sourceApp(source);
+    if (this.app) appIcons.bind(this.icon, this.app);
     const layout = new HeaderLayout();
     const header = new St.BoxLayout({ style_class: 'kestrel-notification-group-header', layout_manager: layout });
     header.add_child(this.icon);
@@ -55,8 +60,8 @@ export class NotificationGroup {
       this.cards.delete(notification);
     }
     this.title.text = this.source.title;
-    this.icon.gicon = this.source.icon;
-    this.icon.visible = !!this.source.icon;
+    if (!this.app) this.icon.gicon = this.source.icon;
+    this.icon.visible = !!this.app || !!this.source.icon;
     const hidden = notifications.length - COLLAPSED_COUNT;
     if (hidden <= 0) this.expanded = false;
     this.more.visible = hidden > 0;

@@ -8,10 +8,7 @@ import { animateActor } from '../shared/motion.js';
 import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
 import type { Monitor } from './panel.js';
-
-interface WindowIconApp extends Shell.App {
-  create_window_icon_texture(window: Meta.Window, size: number): Clutter.Actor;
-}
+import { windowIcon } from '../appearance/icons/appIcons.js';
 
 export class WindowPreviews {
   readonly actor = new St.BoxLayout({ name: 'kestrel-window-previews', style_class: 'kestrel-window-previews', reactive: true, track_hover: true, visible: false });
@@ -73,7 +70,7 @@ export class WindowPreviews {
       const card = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, width, style_class: 'kestrel-preview-card' });
       const header = new St.BoxLayout({ style_class: 'kestrel-preview-header' });
       const title = new St.Label({ text: window.title || app.get_name(), x_expand: true, y_align: Clutter.ActorAlign.CENTER });
-      const icon = (app as WindowIconApp).create_window_icon_texture(window, 16);
+      const icon = windowIcon(app, window, 16);
       icon.y_align = Clutter.ActorAlign.CENTER;
       icon.set_margin_right(6);
       header.add_child(icon);

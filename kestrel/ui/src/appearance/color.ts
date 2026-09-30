@@ -151,6 +151,13 @@ export function seedFromSamples(samples: Rgb[]): Seed {
 
 export const accentColor = ({ hue, chroma }: Seed): Rgb => fromOklch([ACCENT_TONE, chroma, hue]);
 
+export const fromHex = (hex: string): Rgb => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)) as Rgb;
+
+export function seedFromColor(color: Rgb): Seed {
+  const [, chroma, hue] = toOklch(color);
+  return { hue, chroma: Math.min(ACCENT_CHROMA_CEILING, chroma) };
+}
+
 export function namedAccent({ hue, chroma }: Seed): string {
   if (chroma < ACCENT_CHROMA_FLOOR / 2) return 'slate';
   return NAMED_ACCENTS.reduce((best, entry) =>

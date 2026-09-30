@@ -10,6 +10,7 @@ import Graphene from 'gi://Graphene';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as MessageTray from './messageTray.js';
 import * as Mpris from './mpris.js';
@@ -413,10 +414,11 @@ class MessageHeader extends St.BoxLayout {
             // source doesn't have a name
             (bind, value) => [true, value === null || value === '' ? _('Unknown App') : value],
             null);
-        source.bind_property('icon',
-            sourceIcon,
-            'gicon',
-            GObject.BindingFlags.SYNC_CREATE);
+        const app = KestrelUi.sourceApp(source);
+        if (app)
+            KestrelUi.appIcons.bind(sourceIcon, app);
+        else
+            source.bind_property('icon', sourceIcon, 'gicon', GObject.BindingFlags.SYNC_CREATE);
 
         this.timeLabel = new TimeLabel();
         headerContent.add_child(this.timeLabel);

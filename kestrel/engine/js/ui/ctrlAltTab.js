@@ -4,6 +4,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as SwitcherPopup from './switcherPopup.js';
 import * as Params from '../misc/params.js';
@@ -95,7 +96,7 @@ export class CtrlAltTabManager {
                     iconName = 'shell-focus-desktop-symbolic';
                 } else {
                     const app = windowTracker.get_window_app(windows[i]);
-                    icon = app.create_icon_texture(POPUP_APPICON_SIZE);
+                    icon = KestrelUi.appIcon(app, POPUP_APPICON_SIZE);
                 }
 
                 items.push({

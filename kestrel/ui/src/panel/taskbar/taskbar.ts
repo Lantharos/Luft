@@ -7,6 +7,7 @@ import St from 'gi://St';
 import type { WindowPreviews } from '../windowPreviews.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { PANEL_ICON_SIZE } from '../../shared/surface.js';
+import { appIcon } from '../../appearance/icons/appIcons.js';
 import { animateActor, liftIcon } from '../../shared/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
@@ -106,7 +107,8 @@ export class Taskbar {
         item.app = app;
         const currentItem = item;
         item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(currentItem));
-        item.icon.child = app.create_icon_texture(PANEL_ICON_SIZE);
+        item.icon.child.destroy();
+        item.icon.child = appIcon(app, PANEL_ICON_SIZE);
       }
       item.button.accessible_name = app.get_name();
       item.draggable.enabled = pinned.has(app.id);
@@ -137,7 +139,7 @@ export class Taskbar {
     (item.button as St.Button & { _delegate: object })._delegate = {
       get id() { return item.app.id; },
       folder: false,
-      getDragActor: () => item.app.create_icon_texture(PANEL_ICON_SIZE),
+      getDragActor: () => appIcon(item.app, PANEL_ICON_SIZE),
       getDragActorSource: () => item.icon,
     };
     const draggable = DND.makeDraggable(item.button, { dragActorOpacity: 220 });
@@ -182,7 +184,7 @@ export class Taskbar {
   }
 
   private create(app: Shell.App): AppItem {
-    const icon = new St.Bin({ width: PANEL_ICON_SIZE, height: PANEL_ICON_SIZE, child: app.create_icon_texture(PANEL_ICON_SIZE) });
+    const icon = new St.Bin({ width: PANEL_ICON_SIZE, height: PANEL_ICON_SIZE, child: appIcon(app, PANEL_ICON_SIZE) });
     icon.set_position((40 - PANEL_ICON_SIZE) / 2, 5);
     const content = new St.Widget({ width: 40, height: 40 });
     content.add_child(icon);

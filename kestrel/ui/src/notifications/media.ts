@@ -4,6 +4,8 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 import { MprisSource, type MprisPlayer } from 'resource:///org/gnome/shell/ui/mpris.js';
 
+import { appIcon } from '../appearance/icons/appIcons.js';
+
 const COVER_SIZE = 48;
 
 export class MediaCard {
@@ -93,9 +95,8 @@ export class MediaCard {
     }
     this.cover.style = null;
     this.cover.child?.destroy();
-    const icon = player.app?.get_icon();
-    this.cover.child = icon
-      ? new St.Icon({ gicon: icon, icon_size: 32, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER })
+    this.cover.child = player.app
+      ? appIcon(player.app, 32, { x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER })
       : new St.Icon({ icon_name: 'audio-x-generic-symbolic', icon_size: 22, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
   }
 }

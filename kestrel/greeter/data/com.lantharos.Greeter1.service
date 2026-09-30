@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Greeter1
+Exec=@libexecdir@/kestrel-greeter-service
+User=root
+SystemdService=kestrel-greeter.service

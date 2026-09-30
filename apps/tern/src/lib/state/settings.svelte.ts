@@ -13,7 +13,8 @@ const DEFAULTS: Settings = {
 	opacity: 0.86,
 	scheme: 'system',
 	shell: null,
-	copyOnSelect: false
+	copyOnSelect: false,
+	clipboardReads: false
 };
 
 export const FONT_SIZES = { min: 8, max: 32 };

@@ -13,6 +13,7 @@ export interface Settings {
 	scheme: SchemePreference;
 	shell: string | null;
 	copyOnSelect: boolean;
+	clipboardReads: boolean;
 }
 
 export interface LaunchRequest {

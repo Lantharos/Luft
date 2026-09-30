@@ -99,6 +99,9 @@
 		<Row title="Copy selected text" description="Copies text as soon as you select it.">
 			<Switch label="Copy selected text" checked={settings.current.copyOnSelect} onchange={(copyOnSelect) => settings.update({ copyOnSelect })} />
 		</Row>
+		<Row title="Let programs read the clipboard" description="Programs in the terminal, including ones on other computers over SSH, can read what you copied.">
+			<Switch label="Let programs read the clipboard" checked={settings.current.clipboardReads} onchange={(clipboardReads) => settings.update({ clipboardReads })} />
+		</Row>
 	</Section>
 
 	{#snippet actions()}

@@ -377,11 +377,12 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog .user-widget.vertical { spacing: 16px; }
 .unlock-dialog .user-widget.vertical .user-icon { icon-size: 96px; }
 .unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-.unlock-dialog .login-dialog-prompt-entry { padding: 13px 18px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.14); }
+.unlock-dialog .login-dialog-prompt-entry { padding: 13px 46px 13px 18px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.14); }
 .unlock-dialog .login-dialog-prompt-entry:focus { background-color: rgba(255, 255, 255, 0.20); }
 .unlock-dialog .login-dialog-default-button-well { margin-right: 6px; }
-.unlock-dialog .login-dialog-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; background-color: rgba(255, 255, 255, 0.16); transition-duration: 160ms; }
-.unlock-dialog .login-dialog-button.next-button:hover { background-color: rgba(255, 255, 255, 0.24); }
+.login-dialog-button.next-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; transition-duration: 160ms; }
+.login-dialog-button.next-button { background-color: rgba(255, 255, 255, 0.16); }
+.login-dialog-button.next-button:hover { background-color: rgba(255, 255, 255, 0.24); }
 .unlock-dialog .login-dialog-message { margin-top: 4px; font-size: 13px; color: rgba(255, 255, 255, 0.78); }
 .unlock-dialog .login-dialog-message-warning { color: #ffffff; font-weight: 500; }
 .kestrel-greeter-users { spacing: 4px; margin: 28px; }

@@ -32,13 +32,13 @@ $_gdm_dialog_width: 25em;
   .login-dialog-prompt-entry {
     border-radius: $base_border_radius * 1.5;
     // Make room for button-well inside entry
-    :ltr { padding-right: 2.5em; }
-    :rtl { padding-left: 2.5em; }
+    &:ltr { padding-right: 2.5em; }
+    &:rtl { padding-left: 2.5em; }
   }
 
   .login-dialog-default-button-well {
-    :ltr { margin-right: 0.5em; }
-    :rtl { margin-left: 0.5em; }
+    &:ltr { margin-right: 0.5em; }
+    &:rtl { margin-left: 0.5em; }
   }
 }
 

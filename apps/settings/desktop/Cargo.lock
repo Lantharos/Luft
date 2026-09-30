@@ -722,7 +722,7 @@ checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 [[package]]
 name = "dpi"
 version = "0.1.2"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 
 [[package]]
 name = "drm"
@@ -2975,8 +2975,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "ashpd",
  "base64",
@@ -3026,8 +3026,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "serde",
  "serde_json",
@@ -3035,8 +3035,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -3047,8 +3047,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
@@ -3060,8 +3060,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "bzip2",
  "libc",
@@ -3076,8 +3076,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.32.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.32#da6de441497e917146db634290941ebfee7b3842"
+version = "0.33.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.33#f7e995624b957637d5201cf1421bea6854ae298d"
 dependencies = [
  "base64",
  "clap",
@@ -4647,12 +4647,12 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 [[package]]
 name = "winit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "cfg_aliases",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "libc",
  "raw-window-handle",
  "rustix 1.1.5",
@@ -4673,11 +4673,11 @@ dependencies = [
 [[package]]
 name = "winit-android"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "android-activity",
  "bitflags",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "ndk",
  "raw-window-handle",
  "smol_str",
@@ -4688,12 +4688,12 @@ dependencies = [
 [[package]]
 name = "winit-appkit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "block2",
  "dispatch2",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "objc2",
  "objc2-app-kit",
  "objc2-core-foundation",
@@ -4710,10 +4710,10 @@ dependencies = [
 [[package]]
 name = "winit-common"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "block2",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "memmap2",
  "objc2",
  "objc2-core-foundation",
@@ -4728,11 +4728,11 @@ dependencies = [
 [[package]]
 name = "winit-core"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "keyboard-types 0.8.3",
  "raw-window-handle",
  "smol_str",
@@ -4742,10 +4742,10 @@ dependencies = [
 [[package]]
 name = "winit-orbital"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "libredox",
  "orbclient",
  "raw-window-handle",
@@ -4758,12 +4758,12 @@ dependencies = [
 [[package]]
 name = "winit-uikit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "block2",
  "dispatch2",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "objc2",
  "objc2-core-foundation",
  "objc2-foundation",
@@ -4778,12 +4778,12 @@ dependencies = [
 [[package]]
 name = "winit-wayland"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "calloop",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "foldhash",
  "libc",
  "memmap2",
@@ -4805,13 +4805,13 @@ dependencies = [
 [[package]]
 name = "winit-web"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "atomic-waker",
  "bitflags",
  "concurrent-queue",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "js-sys",
  "pin-project",
  "raw-window-handle",
@@ -4827,11 +4827,11 @@ dependencies = [
 [[package]]
 name = "winit-win32"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "percent-encoding",
  "raw-window-handle",
  "smol_str",
@@ -4845,13 +4845,13 @@ dependencies = [
 [[package]]
 name = "winit-x11"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0#8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0"
+source = "git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906#207dc9e55467f9af10868d7d0d241c1145af2906"
 dependencies = [
  "bitflags",
  "bytemuck",
  "calloop",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/rust-windowing/winit?rev=8b5f46d4be7d29f5b0ed91f4343b78d8c2668bd0)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=207dc9e55467f9af10868d7d0d241c1145af2906)",
  "libc",
  "percent-encoding",
  "raw-window-handle",

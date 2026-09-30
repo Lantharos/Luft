@@ -13,7 +13,7 @@
 		"desktop:bundle": "sabine bundle . --release"
 	},
 	"dependencies": {
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.32",
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
 		"@xterm/addon-clipboard": "^0.2.0",
 		"@xterm/addon-fit": "^0.11.0",
 		"@xterm/addon-search": "^0.16.0",

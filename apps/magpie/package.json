@@ -15,7 +15,7 @@
 		"desktop:bundle": "sabine bundle . --release"
 	},
 	"dependencies": {
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.32",
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
 		"pdfjs-dist": "^6.3.289"
 	},
 	"devDependencies": {

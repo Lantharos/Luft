@@ -1,4 +1,4 @@
-import { isAvailable } from '@lantharos/sabine';
+import { appWindow, isAvailable } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
 import { connect } from '$lib/backend';
 import type { Backend, Devices } from '$lib/backend/types';
@@ -6,12 +6,6 @@ import { monitor } from './monitor.svelte';
 import { processes } from './processes.svelte';
 import { settings } from './settings.svelte';
 import { usage } from './usage.svelte';
-
-declare global {
-	interface Window {
-		__sabineLifecycleSet?: (state: string, reason: string) => void;
-	}
-}
 
 const DISK_COLUMNS = ['read', 'write', 'readTotal', 'writeTotal'];
 const GPU_COLUMNS = ['gpu', 'vram', 'encoder', 'decoder'];
@@ -23,9 +17,8 @@ function hasPage(devices: Devices, page: string) {
 class AppStore {
 	page = $state('apps');
 	backend = $state.raw<Backend | null>(null);
-	#lifecycle = $state(true);
 	#shown = $state(true);
-	visible = $derived(this.#lifecycle && this.#shown && this.backend !== null);
+	visible = $derived(this.#shown && this.backend !== null);
 
 	async start() {
 		const backend = await connect();
@@ -73,7 +66,11 @@ class AppStore {
 	}
 
 	#watchVisibility() {
-		window.__sabineLifecycleSet = (state) => (this.#lifecycle = state === 'active');
+		if (isAvailable()) {
+			this.#shown = appWindow.visible;
+			appWindow.onVisibilityChanged(({ visible }) => (this.#shown = visible));
+			return;
+		}
 		this.#shown = document.visibilityState === 'visible';
 		document.addEventListener('visibilitychange', () => (this.#shown = document.visibilityState === 'visible'));
 	}

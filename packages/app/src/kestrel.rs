@@ -20,6 +20,42 @@ pub struct Palette {
     pure_black: bool,
     colors: HashMap<String, String>,
     terminal: TerminalColors,
+    app_icons: AppIcons,
+}
+
+#[derive(Serialize)]
+pub struct AppIcons {
+    style: String,
+    glyphs: String,
+    tinted: IconPaint,
+    clear: IconPaint,
+}
+
+#[derive(Serialize)]
+pub struct IconPaint {
+    plate: String,
+    ink: String,
+    shade: String,
+    rim: f64,
+}
+
+impl AppIcons {
+    fn from_map(mut map: HashMap<String, String>) -> Option<Self> {
+        let mut paint = |style: &str| {
+            Some(IconPaint {
+                plate: map.remove(&format!("{style}-plate"))?,
+                ink: map.remove(&format!("{style}-ink"))?,
+                shade: map.remove(&format!("{style}-shade"))?,
+                rim: map.remove(&format!("{style}-rim"))?.parse().ok()?,
+            })
+        };
+        Some(Self {
+            tinted: paint("tinted")?,
+            clear: paint("clear")?,
+            style: map.remove("style")?,
+            glyphs: map.remove("glyphs")?,
+        })
+    }
 }
 
 #[derive(Serialize)]
@@ -40,6 +76,7 @@ pub fn palette() -> Option<Palette> {
             light: proxy.get_property("LightTerminalColors").ok()?,
             dark: proxy.get_property("DarkTerminalColors").ok()?,
         },
+        app_icons: AppIcons::from_map(proxy.get_property("AppIcons").ok()?)?,
     })
 }
 

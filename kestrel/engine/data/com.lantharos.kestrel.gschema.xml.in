@@ -215,6 +215,10 @@
       <default>["&lt;Super&gt;z"]</default>
       <summary>Show snap layouts for the focused window</summary>
     </key>
+    <key name="system-monitor" type="as">
+      <default>["&lt;Control&gt;&lt;Shift&gt;Escape"]</default>
+      <summary>Open the system monitor</summary>
+    </key>
     <key name="workspace-1" type="as">
       <default>["&lt;Super&gt;1"]</default>
       <summary>Switch to workspace 1</summary>

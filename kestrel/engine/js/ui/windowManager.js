@@ -772,6 +772,13 @@ export class WindowManager {
             Shell.ActionMode.NORMAL,
             () => KestrelUi.toggleSurface('snap'));
 
+        this.addKeybinding('system-monitor',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.POPUP,
+            () => KestrelUi.openSystemMonitor());
+
         for (let index = 1; index <= 10; index++) {
             this.addKeybinding(`workspace-${index}`,
                 new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),

@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import type GioUnix from 'gi://GioUnix';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -16,15 +15,7 @@ import { DesktopPeek } from './desktopPeek.js';
 import { PanelClock } from './clock.js';
 import { PrivacyIndicator } from '../privacy/indicator.js';
 import { InputSourceIndicator } from '../inputSources/indicator.js';
-
-function systemMonitor(): Shell.App | null {
-  const appSystem = Shell.AppSystem.get_default();
-  const info = appSystem.get_installed().find(app => {
-    const categories = (app as GioUnix.DesktopAppInfo).get_categories()?.split(';') ?? [];
-    return categories.includes('System') && categories.includes('Monitor');
-  });
-  return info ? appSystem.lookup_app(info.get_id()!) : null;
-}
+import { systemMonitor } from './systemMonitor.js';
 
 export interface Monitor {
   index: number;

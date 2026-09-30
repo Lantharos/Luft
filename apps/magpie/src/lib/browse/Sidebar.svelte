@@ -25,7 +25,7 @@
 
 <aside class="glass-sidebar sidebar" class:collapsed={!open} aria-hidden={!open} inert={!open}>
 	<div class="inner drag-region">
-		<div class="flex-none px-3 pt-[60px] pb-3">
+		<div class="flex-none p-3">
 			<Places />
 		</div>
 		{#if library.current}

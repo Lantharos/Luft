@@ -26,11 +26,13 @@
 #include "st-private.h"
 #include "st-settings.h"
 #include "st-icon-theme.h"
+#include "st-styled-icon-private.h"
 #include <math.h>
 #include <string.h>
 #include <glib.h>
 
 #define CACHE_PREFIX_ICON "icon:"
+#define CACHE_PREFIX_STYLED_ICON CACHE_PREFIX_ICON "styled:"
 #define CACHE_PREFIX_FILE "file:"
 #define CACHE_PREFIX_FILE_FOR_CAIRO "file-for-cairo:"
 
@@ -52,6 +54,8 @@ typedef struct {
 
   StIconInfo *icon_info;
   StIconColors *colors;
+  StStyledIcon *styled;
+  gboolean glyph;
   GFile *file;
   CoglContext *cogl_context;
 } AsyncTextureLoadData;
@@ -105,6 +109,7 @@ texture_load_data_free (gpointer p)
 
   g_clear_object (&data->icon_info);
   g_clear_pointer (&data->colors, st_icon_colors_unref);
+  g_clear_object (&data->styled);
   g_clear_object (&data->file);
   g_clear_pointer (&data->key, g_free);
 
@@ -180,9 +185,9 @@ st_texture_cache_class_init (StTextureCacheClass *klass)
                   G_TYPE_NONE, 1, G_TYPE_FILE);
 }
 
-/* Evicts all cached textures for named icons */
 static void
-st_texture_cache_evict_icons (StTextureCache *cache)
+evict_with_prefix (StTextureCache *cache,
+                   const char     *prefix)
 {
   GHashTableIter iter;
   gpointer key;
@@ -191,15 +196,20 @@ st_texture_cache_evict_icons (StTextureCache *cache)
   g_hash_table_iter_init (&iter, cache->keyed_cache);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      const char *cache_key = key;
-
-      /* This is too conservative - it takes out all cached textures
-       * for GIcons even when they aren't named icons, but it's not
-       * worth the complexity of parsing the key and calling
-       * g_icon_new_for_string(); icon theme changes aren't normal */
-      if (g_str_has_prefix (cache_key, CACHE_PREFIX_ICON))
+      if (g_str_has_prefix (key, prefix))
         g_hash_table_iter_remove (&iter);
     }
+}
+
+/* Evicts all cached textures for named icons */
+static void
+st_texture_cache_evict_icons (StTextureCache *cache)
+{
+  /* This is too conservative - it takes out all cached textures
+   * for GIcons even when they aren't named icons, but it's not
+   * worth the complexity of parsing the key and calling
+   * g_icon_new_for_string(); icon theme changes aren't normal */
+  evict_with_prefix (cache, CACHE_PREFIX_ICON);
 }
 
 static void
@@ -763,7 +773,7 @@ finish_texture_load (AsyncTextureLoadData *data,
         }
     }
 
-  if (data->icon_info)
+  if (data->icon_info && !data->styled)
     st_image_content_set_is_symbolic (ST_IMAGE_CONTENT (image),
                                       st_icon_info_is_symbolic (data->icon_info));
 
@@ -804,6 +814,17 @@ on_icon_loaded (GObject      *source,
 }
 
 static void
+on_styled_icon_loaded (GObject      *source,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  GdkPixbuf *pixbuf;
+  pixbuf = _st_styled_icon_render_finish (result, NULL);
+  finish_texture_load (user_data, pixbuf);
+  g_clear_object (&pixbuf);
+}
+
+static void
 on_pixbuf_loaded (GObject      *source,
                   GAsyncResult *result,
                   gpointer      user_data)
@@ -833,6 +854,12 @@ load_texture_async (StTextureCache       *cache,
       g_task_set_task_data (task, data, NULL);
       g_task_run_in_thread (task, load_pixbuf_thread);
       g_object_unref (task);
+    }
+  else if (data->styled)
+    {
+      _st_styled_icon_render_async (data->styled, cache, data->icon_info, data->glyph,
+                                    data->width, ceilf (data->paint_scale * data->resource_scale),
+                                    NULL, cache->cancellable, on_styled_icon_loaded, data);
     }
   else if (data->icon_info)
     {
@@ -948,6 +975,55 @@ ensure_request (StTextureCache        *cache,
   return had_pending;
 }
 
+static ClutterActor *
+load_styled_icon (StTextureCache *cache,
+                  StStyledIcon   *icon,
+                  int             size,
+                  int             paint_scale,
+                  float           resource_scale)
+{
+  AsyncTextureLoadData *request;
+  ClutterActor *actor = create_invisible_actor ();
+  int scale = ceilf (paint_scale * resource_scale);
+  g_autofree char *icon_string = g_icon_to_string (G_ICON (icon));
+  g_autofree char *key = g_strdup_printf (CACHE_PREFIX_STYLED_ICON "%s,size=%d,scale=%d",
+                                          icon_string ? icon_string : "", size, scale);
+  StTextureCachePolicy policy = icon_string ? ST_TEXTURE_CACHE_POLICY_FOREVER
+                                            : ST_TEXTURE_CACHE_POLICY_NONE;
+
+  clutter_actor_set_content_gravity (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
+  clutter_actor_set_size (actor, size * paint_scale, size * paint_scale);
+  if (!ensure_request (cache, key, policy, &request, actor))
+    {
+      ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
+      gboolean glyph;
+      StIconInfo *info = _st_styled_icon_lookup (icon, cache->icon_theme, size, scale, &glyph);
+
+      if (info == NULL)
+        {
+          g_hash_table_remove (cache->outstanding_requests, key);
+          texture_load_data_free (request);
+          g_object_unref (actor);
+          return NULL;
+        }
+
+      request->cache = cache;
+      request->key = g_steal_pointer (&key);
+      request->policy = policy;
+      request->icon_info = info;
+      request->styled = g_object_ref (icon);
+      request->glyph = glyph;
+      request->width = request->height = size;
+      request->paint_scale = paint_scale;
+      request->resource_scale = resource_scale;
+      request->cogl_context = clutter_backend_get_cogl_context (backend);
+
+      load_texture_async (cache, request);
+    }
+
+  return actor;
+}
+
 /**
  * st_texture_cache_load_gicon:
  * @cache: A #StTextureCache
@@ -985,6 +1061,9 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
   StIconLookupFlags lookup_flags;
 
   actor_size = size * paint_scale;
+
+  if (ST_IS_STYLED_ICON (icon))
+    return load_styled_icon (cache, ST_STYLED_ICON (icon), size, paint_scale, resource_scale);
 
   if (ST_IS_IMAGE_CONTENT (icon))
     {
@@ -1444,4 +1523,50 @@ gboolean
 st_texture_cache_rescan_icon_theme (StTextureCache *cache)
 {
   return st_icon_theme_rescan_if_needed (cache->icon_theme);
+}
+
+void
+st_texture_cache_evict_styled_icons (StTextureCache *cache)
+{
+  evict_with_prefix (cache, CACHE_PREFIX_STYLED_ICON);
+}
+
+/**
+ * st_texture_cache_save_styled_icon_async:
+ * @cancellable: (nullable):
+ * @callback: (scope async):
+ */
+void
+st_texture_cache_save_styled_icon_async (StTextureCache      *cache,
+                                         StStyledIcon        *icon,
+                                         int                  size,
+                                         const char          *path,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data)
+{
+  gboolean glyph;
+  g_autoptr (StIconInfo) info = _st_styled_icon_lookup (icon, cache->icon_theme, size, 1, &glyph);
+
+  if (info == NULL)
+    {
+      g_task_report_new_error (cache, callback, user_data,
+                               st_texture_cache_save_styled_icon_async,
+                               ST_ICON_THEME_ERROR, ST_ICON_THEME_NOT_FOUND,
+                               "The icon was not found");
+      return;
+    }
+
+  _st_styled_icon_render_async (icon, cache, info, glyph, size, 1, path,
+                                cancellable, callback, user_data);
+}
+
+gboolean
+st_texture_cache_save_styled_icon_finish (StTextureCache  *cache,
+                                          GAsyncResult    *result,
+                                          GError         **error)
+{
+  g_autoptr (GdkPixbuf) pixbuf = g_task_propagate_pointer (G_TASK (result), error);
+
+  return pixbuf != NULL;
 }

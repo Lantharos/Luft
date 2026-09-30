@@ -4,7 +4,8 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 mode="${1:-nested}"
 run="$root/kestrel/run"
-mkdir -p "$run"/{config,data,cache,state}
+session="${KESTREL_SESSION_DIR:-$run}"
+mkdir -p "$session"/{config,data,cache,state}
 
 compositor="$run/mutter-install/lib"
 if [[ ! -f "$compositor/libmutter-51.so" ]]; then
@@ -14,18 +15,18 @@ fi
 export LD_LIBRARY_PATH="$compositor:$compositor/mutter-51${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export GI_TYPELIB_PATH="$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
 
-dconf dump /org/gnome/desktop/background/ > "$run/background.ini"
-dconf dump /org/gnome/desktop/interface/ > "$run/interface.ini"
-dconf dump /org/gnome/desktop/input-sources/ > "$run/input-sources.ini"
-dconf read /com/lantharos/kestrel/favorite-apps > "$run/favorites.txt"
+dconf dump /org/gnome/desktop/background/ > "$session/background.ini"
+dconf dump /org/gnome/desktop/interface/ > "$session/interface.ini"
+dconf dump /org/gnome/desktop/input-sources/ > "$session/input-sources.ini"
+dconf read /com/lantharos/kestrel/favorite-apps > "$session/favorites.txt"
 
 export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-export XDG_CONFIG_HOME="$run/config"
-export XDG_DATA_HOME="$run/data"
-export XDG_CACHE_HOME="$run/cache"
-export XDG_STATE_HOME="$run/state"
-mkdir -p "$run/data/dbus-1/services"
-printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=/bin/false\n' > "$run/data/dbus-1/services/org.freedesktop.portal.Documents.service"
+export XDG_CONFIG_HOME="$session/config"
+export XDG_DATA_HOME="$session/data"
+export XDG_CACHE_HOME="$session/cache"
+export XDG_STATE_HOME="$session/state"
+mkdir -p "$session/data/dbus-1/services"
+printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=/bin/false\n' > "$session/data/dbus-1/services/org.freedesktop.portal.Documents.service"
 export GVFS_DISABLE_FUSE=1
 glib-compile-schemas "$root/kestrel/build/data"
 export GNOME_SHELL_BUILDDIR="$root/kestrel/build/src"
@@ -44,13 +45,13 @@ dbus-run-session -- bash -c '
   set -euo pipefail
   root="$1"
   mode="$2"
-  run="$root/kestrel/run"
+  session="$3"
   for section in background interface input-sources; do
     dconf reset -f "/org/gnome/desktop/$section/"
-    dconf load "/org/gnome/desktop/$section/" < "$run/$section.ini"
+    dconf load "/org/gnome/desktop/$section/" < "$session/$section.ini"
   done
-  if [[ -s "$run/favorites.txt" ]]; then
-    dconf write /com/lantharos/kestrel/favorite-apps "$(cat "$run/favorites.txt")"
+  if [[ -s "$session/favorites.txt" ]]; then
+    dconf write /com/lantharos/kestrel/favorite-apps "$(cat "$session/favorites.txt")"
   fi
   gjs -m "$root/kestrel/build/js/ui/kestrel-session.js" &
   timeout 5 gdbus wait --session org.gnome.SessionManager
@@ -79,7 +80,7 @@ dbus-run-session -- bash -c '
     exit 2
   fi
   exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" "${args[@]}"
-' kestrel-session "$root" "$mode"
+' kestrel-session "$root" "$mode" "$session"
 
 if [[ "$mode" == capture ]]; then
   exec "$root/kestrel/tools/greeter.sh"

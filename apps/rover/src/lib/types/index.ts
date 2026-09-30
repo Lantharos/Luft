@@ -136,6 +136,7 @@ export interface Settings {
 	detailsOpen: boolean;
 	listColumns: ListColumn[];
 	groupBy: GroupBy;
+	hiddenPlaces: string[];
 }
 
 export interface AppState extends Appearance {

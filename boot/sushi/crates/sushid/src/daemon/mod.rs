@@ -124,7 +124,7 @@ impl Daemon {
         if daemon.held.is_none() {
             daemon.take_terminal();
         }
-        daemon.look.loader.fade_to(1.0, daemon.now());
+        daemon.settle_loader(daemon.now());
         Ok(daemon)
     }
 
@@ -289,7 +289,12 @@ impl Daemon {
         }
         self.fading_prompt = self.unlock.take().map(|unlock| unlock.prompt);
         self.look.prompt.fade_to(0.0, now);
-        self.look.loader.fade_to(1.0, now);
+        self.settle_loader(now);
+    }
+
+    fn settle_loader(&mut self, now: f32) {
+        let covered = self.unlock.is_some() || self.notice.is_some() || self.activity.is_showing();
+        self.look.loader.fade_to(if covered { 0.0 } else { 1.0 }, now);
     }
 
     fn handle_keys(&mut self) {

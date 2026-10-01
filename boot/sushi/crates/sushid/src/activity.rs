@@ -1,5 +1,5 @@
 use sushi::control::Mode;
-use sushi::scene::Status;
+use sushi::scene::{Progress, Status};
 
 use crate::screen::Fader;
 
@@ -100,8 +100,13 @@ impl Activity {
         }
     }
 
+    pub fn is_showing(&self) -> bool {
+        title(self.mode).is_some()
+    }
+
     pub fn is_animating(&self, now: f32) -> bool {
-        !self.alpha.settled(now) || !self.bar.settled(now)
+        let waiting = self.progress.is_none() && self.alpha.value(now) > 0.0;
+        waiting || !self.alpha.settled(now) || !self.bar.settled(now)
     }
 
     pub fn status(&self, now: f32) -> Option<(Status, f32)> {
@@ -113,7 +118,10 @@ impl Activity {
         };
         let status = Status {
             title,
-            progress: self.progress.map(|_| self.bar.value(now)),
+            progress: match self.progress {
+                Some(_) => Progress::Known(self.bar.value(now)),
+                None => Progress::Waiting(now),
+            },
             note,
             detail: self.detail.clone(),
         };

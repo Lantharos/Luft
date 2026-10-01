@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-disk="$root/vm/root.img"
+disk="${SUSHI_VM:-$root/vm}/root.img"
 out="$(mktemp -d)"
 trap 'rm -rf "$out"' EXIT
 

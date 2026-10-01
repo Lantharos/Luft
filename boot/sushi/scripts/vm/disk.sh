@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-vm="$root/vm"
+vm="${SUSHI_VM:-$root/vm}"
 tree="$vm/tree"
 esp="$vm/esp"
 disk="$vm/root.img"

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-vm="$root/vm"
+vm="${SUSHI_VM:-$root/vm}"
 tree="$vm/tree"
 release="${FEDORA_RELEASE:-45}"
 user="${VM_USER:-sushi}"

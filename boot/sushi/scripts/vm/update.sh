@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-tree="$root/vm/tree"
+tree="${SUSHI_VM:-$root/vm}/tree"
 packages=(vim-enhanced tree which nano)
 
 podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "

@@ -170,7 +170,7 @@ export class AccessDialogDBus {
         const [handle, appId, parentWindow_, title, description, body, options] = params;
         // We probably want to use parentWindow and global.display.focus_window
         // for this check in the future
-        if (appId && `${appId}.desktop` !== this._windowTracker.focus_app.id) {
+        if (appId && `${appId}.desktop` !== this._windowTracker.focus_app?.id) {
             invocation.return_error_literal(
                 Gio.DBusError,
                 Gio.DBusError.ACCESS_DENIED,

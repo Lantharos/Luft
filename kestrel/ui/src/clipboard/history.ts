@@ -6,7 +6,7 @@ import St from 'gi://St';
 import System from 'system';
 
 import { ClipboardImageFiles } from './imageFiles.js';
-import { createThumbnail, type Thumbnail } from './thumbnail.js';
+import { createThumbnail, type Thumbnail, type ThumbnailBounds } from './thumbnail.js';
 
 const HISTORY_LIMIT = 25;
 const IMAGE_LIMIT = 8;
@@ -14,6 +14,7 @@ const TEXT_LIMIT = 20000;
 const IMAGE_BYTE_LIMIT = 16 * 1024 * 1024;
 const PREFERRED_IMAGE_TYPE = 'image/png';
 const SENSITIVE_MIME_TYPE = 'x-kde-passwordManagerHint';
+const THUMBNAIL_BOUNDS: ThumbnailBounds = { width: 388, height: 128, radius: 6 };
 export const TEXT_MIME_TYPES = ['text/plain;charset=utf-8', 'UTF8_STRING', 'text/plain', 'STRING'];
 
 interface TextEntry {
@@ -113,7 +114,7 @@ export class ClipboardHistory {
       this.remember(known);
       return;
     }
-    const thumbnail = await createThumbnail(bytes);
+    const thumbnail = await createThumbnail(bytes, THUMBNAIL_BOUNDS);
     if (thumbnail) this.remember({ kind: 'image', id, mimeType, file: await this.images.save(id, bytes), thumbnail, copied });
     GLib.idle_add(GLib.PRIORITY_LOW, () => {
       System.gc();

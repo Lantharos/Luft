@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import type St from 'gi://St';
 
-import { label } from '../../shortcuts/accelerators.js';
+import { label } from '../../portal/shortcuts/accelerators.js';
 import { Battery, type BatteryState } from '../battery.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
 import { openSettings, type SettingsPageId } from '../../settings/pages.js';

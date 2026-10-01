@@ -17,7 +17,15 @@ function openFiles(files: string[]) {
 	if (path) navigation.open({ page: 'file', path });
 }
 
+const SEARCH = 'schelf:search?';
+
 function openPage(argumentsList: (string | null)[]) {
+	const search = argumentsList.find((argument) => argument?.startsWith(SEARCH));
+	if (search) {
+		navigation.query = decodeURIComponent(search.slice(SEARCH.length));
+		navigation.search(navigation.query);
+		return;
+	}
 	const route = argumentsList.map((argument) => PAGES[argument ?? '']).find(Boolean);
 	if (route) navigation.open(route);
 }

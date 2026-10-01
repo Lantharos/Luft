@@ -110,6 +110,7 @@ declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
   export class Notification {
     constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon; urgency?: number; privacyScope?: number });
     connect(signal: 'destroy', callback: () => void): number;
+    addAction(label: string, callback: () => void): void;
     destroy(): void;
   }
   export class Source {

@@ -1,0 +1,17 @@
+[Unit]
+Description=Kestrel graphics watchdog
+DefaultDependencies=no
+After=dbus.service
+SurviveFinalKillSignal=yes
+
+[Service]
+ExecStart=@libexecdir@/kestrel-watchdog
+StateDirectory=kestrel-watchdog
+UMask=0022
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native

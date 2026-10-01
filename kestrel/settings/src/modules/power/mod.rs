@@ -184,7 +184,6 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         None => None,
     };
 
-    power.inhibitors.take_power_keys().await;
     power.inhibitors.hold_sleep().await;
     power.inhibitors.sync_lid().await;
     power.hold_power_saver().await;

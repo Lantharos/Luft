@@ -85,7 +85,7 @@ dbus-run-session -- bash -c '
   timeout 5 gdbus wait --session com.lantharos.KestrelChecks.Authenticator
   timeout 10 bash -c "until [[ \"\$(lpstat -d 2> /dev/null)\" == *Office* ]]; do sleep 0.1; done"
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local "$root/kestrel/settings/target/release/kestrel-settings" \
-    --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,xsettings &
+    --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings &
   timeout 5 gdbus wait --session com.lantharos.Settings
   if [[ "$mode" == capture ]]; then
     dconf reset /com/lantharos/kestrel/quick-tile-order

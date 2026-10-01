@@ -5,6 +5,9 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 const CHECKS = 'com.lantharos.KestrelChecks';
 const DIM_DELAY = 24;
 const SUSPEND_DELAY = 4;
+const STUCK_SECONDS = 24;
+const RECOVERY_SECONDS = 7;
+const POWER_KEYS = 'Inhibit handle-power-key:handle-suspend-key:handle-hibernate-key block';
 
 function systemCalls() {
   const bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
@@ -33,7 +36,7 @@ export async function checkPower({pause, pointer}) {
   const startup = takeCalls();
   require(startup.includes('Inhibit sleep delay') && startup.includes('Inhibit handle-lid-switch block'),
     'the session gets a moment to lock before sleeping and decides lid closing itself');
-  require(startup.includes('Inhibit handle-power-key:handle-suspend-key:handle-hibernate-key block'), 'the desktop decides what the power keys do');
+  require(startup.includes(POWER_KEYS), 'the desktop decides what the power keys do');
 
   let app = null;
   try {
@@ -62,4 +65,14 @@ export async function checkPower({pause, pointer}) {
     session.reset('idle-delay');
     wake();
   }
+
+  const [waitMs, recovering] = (await Gio.DBus.session.call('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Health',
+    'com.lantharos.Kestrel.Health', 'Check', null, new GLib.VariantType('(tb)'), Gio.DBusCallFlags.NONE, -1, null)).deep_unpack();
+  require(waitMs === 0 && !recovering, 'Kestrel tells the watchdog that its frames reach the screen');
+  takeCalls();
+  GLib.usleep(STUCK_SECONDS * GLib.USEC_PER_SEC);
+  await pause(RECOVERY_SECONDS * 1000);
+  const afterStall = takeCalls();
+  require(afterStall.includes(`Report ${new Gio.Credentials().get_unix_pid()}`), 'a stuck Kestrel is reported to the system watchdog');
+  require(afterStall.includes(POWER_KEYS), 'the power keys return to the desktop once Kestrel answers again');
 }

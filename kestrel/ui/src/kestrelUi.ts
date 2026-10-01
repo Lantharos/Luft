@@ -25,6 +25,8 @@ import type { CaretPopup, Context } from './context.js';
 import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
+import { Health } from './health/health.js';
+import { notifyAboutIncidents } from './health/incidents.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
 import { PlugSounds } from './power/plugSounds.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
@@ -75,6 +77,7 @@ class KestrelUi {
   readonly appearance: AppearanceService;
   private readonly keyring: KeyringPrompter;
   private readonly oomNotifier = new OomNotifier();
+  private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
@@ -107,6 +110,10 @@ class KestrelUi {
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
     this.mediaKeys = new MediaKeys(context, () => this.openStart(''));
+    const startup = context.layoutManager.connect('startup-complete', () => {
+      context.layoutManager.disconnect(startup);
+      void notifyAboutIncidents();
+    });
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -450,6 +457,7 @@ class KestrelUi {
     this.farewell.destroy();
     this.mediaKeys.destroy();
     this.oomNotifier.destroy();
+    this.health.destroy();
     this.batteryWarnings.destroy();
     this.plugSounds.destroy();
     this.launchFeedback.destroy();

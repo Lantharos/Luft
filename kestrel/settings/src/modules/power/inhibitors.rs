@@ -16,7 +16,6 @@ pub struct Inhibitors {
     lid: Option<OwnedFd>,
     lid_check_at: Option<Instant>,
     sleep: Option<OwnedFd>,
-    power_keys: Option<OwnedFd>,
     power_saver: Option<u32>,
 }
 
@@ -28,7 +27,6 @@ impl Inhibitors {
             lid: None,
             lid_check_at: None,
             sleep: None,
-            power_keys: None,
             power_saver: None,
         }
     }
@@ -40,16 +38,6 @@ impl Inhibitors {
             .await
             .inspect_err(|error| eprintln!("Couldn't hold off {what}: {error}"))
             .ok()
-    }
-
-    pub async fn take_power_keys(&mut self) {
-        self.power_keys = self
-            .inhibit(
-                "handle-power-key:handle-suspend-key:handle-hibernate-key",
-                "The desktop decides what the power keys do",
-                "block",
-            )
-            .await;
     }
 
     pub async fn hold_sleep(&mut self) {

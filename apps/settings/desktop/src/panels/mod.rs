@@ -5,6 +5,7 @@ mod bluetooth;
 mod datetime;
 mod display;
 mod keyboard;
+mod keyring;
 mod login;
 mod mouse;
 mod network;
@@ -36,6 +37,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = privacy::register(window, events);
     let window = passkeys::register(window, events);
     let window = security::register(window, events);
+    let window = keyring::register(window, events);
     let window = datetime::register(window, events);
     let window = users::register(window, events);
     let window = login::register(window, events);

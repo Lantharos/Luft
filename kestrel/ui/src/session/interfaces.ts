@@ -1,5 +1,6 @@
 export const BUS_NAME = 'org.gnome.SessionManager';
 export const MANAGER_PATH = '/org/gnome/SessionManager';
+export const FAREWELL_DURATION = 250;
 
 export const InhibitFlags = { LOGOUT: 1, SWITCH: 2, SUSPEND: 4, IDLE: 8, AUTOMOUNT: 16 };
 export const ActionAvailability = { UNAVAILABLE: 0, BLOCKED: 1, CHALLENGE: 2, AVAILABLE: 3 };

@@ -65,13 +65,19 @@ Sign-in follows whatever the computer's sign-in rules ask for: a password, a ver
 
 At the bottom right are the session, the keyboard layout when there is more than one, accessibility, and power. The session picker lists every installed session and starts with the one each person used last. Accessibility turns on larger text and, when Orca is installed, the screen reader. Power offers Suspend, Restart, and Power off.
 
+### From boot to desktop
+
+The login screen and the desktop hand the screen to each other without it going black or showing text. When the computer starts with [Sushi](../boot/sushi/README.md), the login screen's first frame shows the firmware logo exactly where Sushi left it, and the clock and wallpaper fade in over it. Signing in fades the login screen down to the blurred wallpaper, and the desktop starts from that same blurred wallpaper before it settles into place, so the two read as one motion. Signing out fades the desktop to black, and the login screen comes up from black.
+
+The login screen starts in the same display mode as the desktop: Kestrel copies your display arrangement to the login screen whenever you change it, so the monitor doesn't switch modes when you sign in. Whatever the login screen and the sessions it starts print goes to the journal, never to the screen.
+
 ### Wallpaper and settings
 
 Each person's own wallpaper appears when they are chosen. Kestrel keeps a copy for the login screen up to date whenever the wallpaper or the light and dark style changes; for live wallpapers it is the still frame. The login screen takes its accent color from the wallpaper the same way the desktop does. Settings can instead show one picture for everyone.
 
 The Login Screen page in Settings chooses between everyone's own wallpaper and one picture for everyone, whether people are listed and who is left out, the session that starts by default, and which account signs in automatically when the computer starts.
 
-The settings are kept by `kestrel-greeter-service`, which answers on the system bus as `com.lantharos.Greeter1`. It starts when it is needed and quits after a minute without requests. Everyone can update their own login wallpaper without a password while signed in at the computer; everything else asks for an administrator. Wallpapers arrive as open files, never as paths, and are stored as pictures of at most 3840 pixels on the long side in `/var/lib/kestrel-greeter`, which the login screen reads directly. Automatic login is written as the `initial_session` in greetd's `/etc/greetd/config.toml`, which greetd runs once after each boot. The last session each person used is remembered in AccountsService, the same place GDM kept it, so earlier choices carry over.
+The settings are kept by `kestrel-greeter-service`, which answers on the system bus as `com.lantharos.Greeter1`. It starts when it is needed and quits after a minute without requests. Everyone can update their own login wallpaper and the display arrangement without a password while signed in at the computer; everything else asks for an administrator. Wallpapers arrive as open files, never as paths, and are stored as pictures of at most 3840 pixels on the long side in `/var/lib/kestrel-greeter`, which the login screen reads directly. Display arrangements arrive the same way and are kept as `/var/lib/kestrel-greeter/display/monitors.xml`. Automatic login is written as the `initial_session` in greetd's `/etc/greetd/config.toml`, which greetd runs once after each boot. The last session each person used is remembered in AccountsService, the same place GDM kept it, so earlier choices carry over.
 
 ### Lock screen
 
@@ -86,7 +92,7 @@ sudo dnf install greetd
 kestrel/tools/install.sh install
 ```
 
-Then point greetd at the login screen, keeping its original configuration, and switch display managers:
+Then point greetd at the login screen, keeping its original configuration, and switch display managers. The login screen runs on the seventh virtual terminal, so it never shares one with the text console:
 
 ```bash
 sudo cp /etc/greetd/config.toml /etc/greetd/config.toml.orig

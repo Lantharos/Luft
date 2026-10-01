@@ -28,7 +28,7 @@ import { UserList } from './userList.js';
 const IDLE_TIMEOUT = 2 * 60 * 1000;
 const ACCOUNTS_TIMEOUT = 1000;
 const SWITCH_DURATION = 140;
-const FINISH_DURATION = 400;
+const FINISH_DURATION = 250;
 
 export interface GreeterContext {
   layoutManager: {
@@ -62,6 +62,7 @@ export class Greeter {
   private readonly dialog = new St.Widget({ name: 'kestrel-greeter', style_class: 'unlock-dialog kestrel-greeter', reactive: true, x_expand: true, y_expand: true });
   private readonly stack = new Shell.Stack();
   private readonly promptBox = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
+  private readonly main = new St.Widget({ layout_manager: new GreeterLayout(), constraints: new MonitorConstraint({ primary: true }) });
   private readonly appearance = new LoginAppearance();
   private readonly authentication = new Authentication(connectGreetd);
   private readonly prompt = new AuthPrompt(this.authentication);
@@ -85,11 +86,10 @@ export class Greeter {
     this.menus = new ContextMenus(monitorAt, () => {}, () => !this.finishing, () => {}, () => {});
     this.controls = new GreeterControls(this.menus, this.sessions, session => this.useSession(session));
 
-    const main = new St.Widget({ layout_manager: new GreeterLayout(), constraints: new MonitorConstraint({ primary: true }) });
-    main.add_child(this.stack);
-    main.add_child(this.userList.actor);
-    main.add_child(this.controls.actor);
-    this.dialog.add_child(main);
+    this.main.add_child(this.stack);
+    this.main.add_child(this.userList.actor);
+    this.main.add_child(this.controls.actor);
+    this.dialog.add_child(this.main);
 
     this.promptBox.add_child(this.prompt);
     this.stack.add_child(this.promptBox);
@@ -209,6 +209,20 @@ export class Greeter {
     this.controls.showSession(session);
   }
 
+  private terminateOnceShown(): void {
+    const stage = shell().stage;
+    let painted = 0;
+    const id = stage.connect('after-paint', () => {
+      if (++painted < 2) {
+        stage.queue_redraw();
+        return;
+      }
+      stage.disconnect(id);
+      shell().context.terminate();
+    });
+    stage.queue_redraw();
+  }
+
   private async finish(): Promise<void> {
     const user = this.prompt.userName!;
     const session = this.session;
@@ -223,9 +237,9 @@ export class Greeter {
       return;
     }
     this.controls.shutdown();
-    animateActor(this.dialog, {
+    animateActor(this.main, {
       opacity: 0, duration: FINISH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD,
-      onComplete: () => shell().context.terminate(),
+      onComplete: () => this.terminateOnceShown(),
     });
   }
 }

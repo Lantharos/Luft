@@ -7,6 +7,8 @@
 
 	let { operation, large = false }: { operation: Operation; large?: boolean } = $props();
 	const value = $derived(percent(operation));
+
+	$effect(() => operations.showInline(operation.id));
 </script>
 
 <div class="progress" class:large role="progressbar" aria-label={operation.title} aria-valuenow={value ?? undefined} aria-valuemin={0} aria-valuemax={100}>

@@ -33,7 +33,7 @@
 		navigation.search(navigation.query);
 	}
 
-	const running = $derived(operations.running);
+	const running = $derived(operations.running && !operations.isInline(operations.running.id) ? operations.running : null);
 	const remaining = $derived(operations.pending);
 </script>
 

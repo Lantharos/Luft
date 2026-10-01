@@ -12,10 +12,13 @@ mod notifications;
 mod power;
 mod privacy;
 mod sound;
+mod updates;
 mod users;
 
 use luft_app::Events;
 use sabine::SabineWindow;
+
+pub use updates::{CHECK_ARGUMENT, check_in_background};
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = network::register(window, events);
@@ -32,5 +35,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = datetime::register(window, events);
     let window = users::register(window, events);
     let window = login::register(window, events);
+    let window = updates::register(window, events);
     about::register(window, events)
 }

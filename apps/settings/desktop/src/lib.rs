@@ -15,7 +15,15 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
     single_instance: Some("com.lantharos.settings"),
 };
 
-pub fn run_app() -> ! {
+pub fn run() {
+    if std::env::args().any(|argument| argument == panels::CHECK_ARGUMENT) {
+        panels::check_in_background();
+    } else {
+        run_app();
+    }
+}
+
+fn run_app() -> ! {
     let events = Events::default();
     let watcher = Watcher::start();
     luft_app::run(

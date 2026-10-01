@@ -10,6 +10,7 @@ import LogIn from '@lucide/svelte/icons/log-in';
 import Monitor from '@lucide/svelte/icons/monitor';
 import Mouse from '@lucide/svelte/icons/mouse';
 import Palette from '@lucide/svelte/icons/palette';
+import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 import Shield from '@lucide/svelte/icons/shield';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
@@ -30,6 +31,7 @@ export type PanelId =
 	| 'datetime'
 	| 'users'
 	| 'login'
+	| 'updates'
 	| 'about';
 
 export interface Panel {
@@ -74,6 +76,7 @@ export const PANEL_GROUPS: Panel[][] = [
 		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./datetime/DateTimePanel.svelte')),
 		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./users/UsersPanel.svelte')),
 		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./login/LoginPanel.svelte')),
+		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'security', 'restart and install', 'packages', 'automatic updates'], () => import('./updates/UpdatesPanel.svelte')),
 		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./about/AboutPanel.svelte'))
 	]
 ];

@@ -1,3 +1,3 @@
 fn main() {
-    settings_lib::run_app();
+    settings_lib::run();
 }

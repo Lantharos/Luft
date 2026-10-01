@@ -19,6 +19,7 @@ export interface SigningKey {
 	reason: string;
 	protection: 'tpm' | 'disk' | '';
 	driverKeyEnrolled: boolean;
+	missed: number;
 }
 
 export interface Startup {

@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Result};
 use rustix::event::{PollFd, PollFlags, Timespec, poll};
 use sushi::config::Config;
-use sushi::control;
+use sushi::control::{self, KeyEnrollment};
 use sushi::display::{Card, ModeHints};
 use sushi::password::PasswordRequests;
 use sushi::plymouth::{self, Client};
@@ -62,7 +62,7 @@ pub struct Daemon {
     unlock: Option<Unlock>,
     fading_prompt: Option<Prompt>,
     answered: Answered,
-    enrollment_code: Option<String>,
+    key_enrollment: Option<KeyEnrollment>,
     notice: Option<Shown>,
     fading_notice: Option<sushi::scene::Notice>,
     root: Option<PathBuf>,
@@ -112,7 +112,7 @@ impl Daemon {
             unlock: None,
             fading_prompt: None,
             answered: Answered::default(),
-            enrollment_code: None,
+            key_enrollment: None,
             notice: None,
             fading_notice: None,
             root: None,
@@ -294,7 +294,9 @@ impl Daemon {
 
     fn settle_loader(&mut self, now: f32) {
         let covered = self.unlock.is_some() || self.notice.is_some() || self.activity.is_showing();
-        self.look.loader.fade_to(if covered { 0.0 } else { 1.0 }, now);
+        self.look
+            .loader
+            .fade_to(if covered { 0.0 } else { 1.0 }, now);
     }
 
     fn handle_keys(&mut self) {

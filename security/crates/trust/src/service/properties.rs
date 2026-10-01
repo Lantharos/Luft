@@ -32,6 +32,8 @@ pub fn signing_key(key: &SigningKey) -> Dict {
         ("Reason", key.reason.as_str().into()),
         ("Protection", key.protection.into()),
         ("DriverKeyEnrolled", key.driver_key_enrolled.into()),
+        ("Missed", key.missed.into()),
+        ("MissedThisBoot", key.missed_this_boot.into()),
     ])
 }
 

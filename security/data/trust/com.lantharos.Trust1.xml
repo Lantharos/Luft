@@ -10,7 +10,10 @@
 
     SigningKey: State (s: "none", "pending" until the next restart adds it, "enrolled"),
       Available (b), Reason (s, why a key can't be made here), Protection (s: "tpm" or "disk"),
-      DriverKeyEnrolled (b, the key that signs drivers built on this computer).
+      DriverKeyEnrolled (b, the key that signs drivers built on this computer),
+      Missed (u, restarts that went by without the key being added since it was requested; after three,
+      it is no longer requested again by itself and State goes back to "none"),
+      MissedThisBoot (b, the restart that started this boot was one of them).
 
     Startup: Installed (b, the signed startup is on the EFI system partition and in the firmware's boot list),
       Measured (b, this boot came through it and recorded what started), Available (b), Reason (s).

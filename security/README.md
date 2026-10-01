@@ -21,7 +21,9 @@ Every piece is checked against a signature before it runs, and nothing can be ch
 
 The key is made on the computer the first time it's needed. Its private half never leaves the computer and is never stored in the clear: it is sealed with `systemd-creds` against the TPM and a secret only root can read, in `/var/lib/luft-trust`. A copy of the disk, or the disk in another computer, can't open it. It is unsealed into a private folder under `/run/luft-trust` only while something is being signed, and removed right after. On a computer without a usable TPM, a key is only made once the disk is encrypted, so that it is at least protected by the disk's passphrase; without either, Settings explains why no key can be made.
 
-Shim only trusts keys you confirm in person. Adding the key asks shim to enroll it at the next restart, using a one-time code of eight digits. Before restarting, Sushi shows what will happen and what to type, and waits for Enter. After the restart, shim's blue key management screen waits ten seconds for a key press; then choose Enroll MOK, Continue, Yes, type the code, and choose Reboot. If the screen times out, nothing is added and the key can be requested again.
+Shim only trusts keys you confirm in person. Adding the key asks shim to enroll it at the next restart, using a one-time code of eight digits. Before restarting, Sushi shows what will happen and what to type, and waits for Enter. After the restart, shim's blue key management screen waits ten seconds for a key press; then choose Enroll MOK, Continue, Yes, type the code, and choose Reboot.
+
+Shim forgets the request once its screen has been shown, whether the key was added or not. So at every startup `luft-trust` compares what it asked for, kept in `/var/lib/luft-trust`, with the keys shim actually trusts. If the screen timed out, Continue boot was chosen, or the code was typed wrong three times, it asks shim again with a new code. Sushi then shows the steps again at the next restart, saying that the key wasn't added last time, and a notification after signing in says the same. After three restarts without the key, it stops asking by itself; Settings says so and offers to try again. Cancelling withdraws the request and stops the retries.
 
 The key signs SushiBoot, the kernel images (a kernel-install plugin signs each new kernel as it is installed), and kernel modules built by DKMS. Drivers built with akmods, such as NVIDIA's, keep their own key, which akmods made and which Settings shows next to Luft's: akmods builds modules as an unprivileged user that can read that key, so it must never be able to sign what starts the computer.
 
@@ -63,7 +65,7 @@ Without a usable TPM, encryption works with a passphrase instead, asked for by S
 ```bash
 luft-trust status                    # Secure Boot, the TPM, the key, the startup and the disk
 luft-trust secure-boot enroll        # make the key and ask shim to trust it at the next restart
-luft-trust secure-boot cancel        # withdraw that before restarting
+luft-trust secure-boot cancel        # withdraw that, including any retries
 luft-trust startup install           # SushiBoot, signed kernel images and the Luft boot entry
 luft-trust startup uninstall         # remove them again; Fedora's entry is untouched
 luft-trust tpm enroll [--pin]        # let the TPM unlock an encrypted disk

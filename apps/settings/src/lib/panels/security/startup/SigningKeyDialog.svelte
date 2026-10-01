@@ -38,7 +38,7 @@
 			<span>{half}</span>
 		{/each}
 	</div>
-	<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">If you miss it, your computer starts as usual and you can add the key again from here.</p>
+	<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">If you miss it, your computer starts as usual and the steps show again at the next restart, with a new code.</p>
 	{#if error}
 		<p class="text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}

@@ -55,8 +55,8 @@ export function publishSecurity(publish, calls) {
   publish(TRUST, {
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
-    SigningKey: variants({State: 's', Available: 'b', Reason: 's', Protection: 's', DriverKeyEnrolled: 'b'},
-      {State: 'enrolled', Available: true, Reason: '', Protection: 'tpm', DriverKeyEnrolled: true}),
+    SigningKey: variants({State: 's', Available: 'b', Reason: 's', Protection: 's', DriverKeyEnrolled: 'b', Missed: 'u', MissedThisBoot: 'b'},
+      {State: 'enrolled', Available: true, Reason: '', Protection: 'tpm', DriverKeyEnrolled: true, Missed: 0, MissedThisBoot: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's'}, {Installed: true, Measured: true, Available: true, Reason: ''}),
     Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b'},
       {Device: '/dev/nvme0n1p3', Encrypted: true, State: 'on', Progress: 0, Remaining: 0, Unlock: ['tpm', 'pin', 'recovery-key'],

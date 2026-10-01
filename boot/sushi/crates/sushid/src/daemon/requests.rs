@@ -44,17 +44,19 @@ impl Daemon {
                 self.settle_loader(self.now());
                 self.reclaim();
                 match self
-                    .enrollment_code
+                    .key_enrollment
                     .take()
                     .filter(|_| mode == Mode::Shutdown)
                 {
-                    Some(code) => self.show_notice(notice::key_enrollment(&code), stream),
+                    Some(enrollment) => {
+                        self.show_notice(notice::key_enrollment(&enrollment), stream)
+                    }
                     None => reply(stream, "ok"),
                 }
             }
             Command::Status => reply(stream, self.status()),
-            Command::KeyEnrollmentNotice(code) => {
-                self.enrollment_code = code;
+            Command::KeyEnrollmentNotice(enrollment) => {
+                self.key_enrollment = enrollment;
                 reply(stream, "ok");
             }
         }

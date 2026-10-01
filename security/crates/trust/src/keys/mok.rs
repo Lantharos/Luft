@@ -2,14 +2,14 @@ use std::path::Path;
 
 use anyhow::Result;
 
+use super::request::Request;
 use super::{Unsealed, certificate_der, has_signing_key};
-use crate::paths;
 use crate::system::command::Tool;
 use crate::system::efi;
 use crate::system::secret::Secret;
 
 const DRIVER_KEY: &str = "/etc/pki/akmods/certs/public_key.der";
-const CODE: &str = "enrollment-code";
+const AUTOMATIC_ATTEMPTS: u32 = 3;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Enrollment {
@@ -59,11 +59,16 @@ fn one_time_code() -> Result<String> {
 
 pub fn request() -> Result<String> {
     if enrollment() == Enrollment::Pending
-        && let Ok(code) = std::fs::read_to_string(paths::state(CODE))
+        && let Some(request) = Request::load()
+        && let Some(code) = request.code.clone()
     {
-        show_on_restart(Some(&code));
+        show_on_restart(&request);
         return Ok(code);
     }
+    ask_shim(Request::default())
+}
+
+fn ask_shim(mut request: Request) -> Result<String> {
     let code = one_time_code()?;
     let scratch = Unsealed::empty()?;
     let hash = Tool::new("mokutil")
@@ -77,27 +82,47 @@ pub fn request() -> Result<String> {
         .arg("--hash-file")
         .arg(&hash_file)
         .status()?;
-    paths::write_private(&paths::state(CODE), code.as_bytes())?;
-    show_on_restart(Some(&code));
+    request.code = Some(code.clone());
+    request.save()?;
+    show_on_restart(&request);
     Ok(code)
+}
+
+pub fn follow_up() -> Result<()> {
+    let Some(mut request) = Request::load() else {
+        return Ok(());
+    };
+    match enrollment() {
+        Enrollment::Enrolled => Request::forget(),
+        Enrollment::Pending => show_on_restart(&request),
+        Enrollment::None if request.code.is_some() => {
+            request.count_miss();
+            if request.missed < AUTOMATIC_ATTEMPTS {
+                ask_shim(request)?;
+            } else {
+                request.code = None;
+                request.save()?;
+            }
+        }
+        Enrollment::None => {}
+    }
+    Ok(())
 }
 
 pub fn cancel() -> Result<()> {
     if enrollment() == Enrollment::Pending {
         Tool::new("mokutil").arg("--revoke-import").status()?;
     }
-    forget_code();
-    show_on_restart(None);
+    Request::forget();
+    show_on_restart(&Request::default());
     Ok(())
 }
 
-pub fn forget_code() {
-    let _ = std::fs::remove_file(paths::state(CODE));
-}
-
-fn show_on_restart(code: Option<&str>) {
-    let notice = match code {
-        Some(code) => Tool::new("sushictl").args(["notice", "key-enrollment", code]),
+fn show_on_restart(request: &Request) {
+    let notice = match &request.code {
+        Some(code) => Tool::new("sushictl")
+            .args(["notice", "key-enrollment", code])
+            .args((request.missed > 0).then_some("--again")),
         None => Tool::new("sushictl").args(["notice", "clear"]),
     };
     let _ = notice.status();

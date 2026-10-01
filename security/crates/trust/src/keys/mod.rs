@@ -1,5 +1,6 @@
 mod certificate;
 pub mod mok;
+pub mod request;
 mod unsealed;
 
 use std::path::PathBuf;

@@ -1,0 +1,166 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 1 Oct 2026 05:39:17 +0200
+Subject: [PATCH 8/8] native: remove cursor framebuffers instead of closing
+ them
+
+Framebuffers are closed rather than removed so the last frame stays on
+screen when the compositor exits and the next one takes over without a
+modeset. Cursor framebuffers were closed the same way, which left the
+pointer of an exited compositor floating over that frame, and over a
+splash screen that only sets its primary plane. Cursor buffers are now
+removed, which turns the cursor plane off and keeps the primary plane
+and CRTC as they were.
+---
+ src/backends/native/meta-cursor-renderer-native.c |  7 +++++--
+ src/backends/native/meta-drm-buffer-dumb.c        | 13 +++++++------
+ src/backends/native/meta-drm-buffer-dumb.h        | 11 ++++++-----
+ src/backends/native/meta-drm-buffer.c             | 13 ++++++++++---
+ src/backends/native/meta-drm-buffer.h             |  1 +
+ src/backends/native/meta-render-device.c          |  1 +
+ src/tests/meta-kms-test-utils.c                   |  1 +
+ 7 files changed, 31 insertions(+), 16 deletions(-)
+
+diff --git a/src/backends/native/meta-cursor-renderer-native.c b/src/backends/native/meta-cursor-renderer-native.c
+index 7269212a1c6fbd3e75f9191e3f2d943cf7f57656..20374e06f745d6d480d868a76cf4c27c3e0d69fe 100644
+--- a/src/backends/native/meta-cursor-renderer-native.c
++++ b/src/backends/native/meta-cursor-renderer-native.c
+@@ -570,7 +570,8 @@ create_cursor_drm_buffer_gbm (MetaGpuKms         *gpu_kms,
+       return NULL;
+     }
+ 
+-  flags = META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS;
++  flags = (META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS |
++           META_DRM_BUFFER_FLAG_CURSOR);
+   buffer_gbm = meta_drm_buffer_gbm_new_take (device_file, bo, flags, error);
+   if (!buffer_gbm)
+     {
+@@ -600,6 +601,7 @@ create_cursor_drm_buffer_dumb (MetaGpuKms      *gpu_kms,
+   buffer_dumb = meta_drm_buffer_dumb_new (device_file,
+                                           cursor_width, cursor_height,
+                                           format,
++                                          META_DRM_BUFFER_FLAG_CURSOR,
+                                           error);
+   if (!buffer_dumb)
+     return NULL;
+@@ -1210,7 +1212,8 @@ realize_cursor_sprite_from_wl_buffer_for_crtc (MetaCursorRenderer *renderer,
+           return FALSE;
+         }
+ 
+-      flags = META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS;
++      flags = (META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS |
++               META_DRM_BUFFER_FLAG_CURSOR);
+       buffer_gbm = meta_drm_buffer_gbm_new_take (device_file, bo, flags,
+                                                  &error);
+       if (!buffer_gbm)
+diff --git a/src/backends/native/meta-drm-buffer-dumb.c b/src/backends/native/meta-drm-buffer-dumb.c
+index d169e761a8ecae771aa43fd43e4e50c6b51f1c37..a4f49b974aff7a40b1d50548e07f2c4404910096 100644
+--- a/src/backends/native/meta-drm-buffer-dumb.c
++++ b/src/backends/native/meta-drm-buffer-dumb.c
+@@ -329,17 +329,18 @@ err_ioctl:
+ }
+ 
+ MetaDrmBufferDumb *
+-meta_drm_buffer_dumb_new (MetaDeviceFile  *device_file,
+-                          int              width,
+-                          int              height,
+-                          uint32_t         format,
+-                          GError         **error)
++meta_drm_buffer_dumb_new (MetaDeviceFile      *device_file,
++                          int                  width,
++                          int                  height,
++                          uint32_t             format,
++                          MetaDrmBufferFlags   flags,
++                          GError             **error)
+ {
+   MetaDrmBufferDumb *buffer_dumb;
+ 
+   buffer_dumb = g_object_new (META_TYPE_DRM_BUFFER_DUMB,
+                               "device-file", device_file,
+-                              "flags", META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS,
++                              "flags", flags | META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS,
+                               NULL);
+ 
+   if (!init_dumb_buffer (buffer_dumb, width, height, format, error))
+diff --git a/src/backends/native/meta-drm-buffer-dumb.h b/src/backends/native/meta-drm-buffer-dumb.h
+index 1dca4026a85aae9c323adda181780d69761c78e8..6255eee4b2f90306777e39af216664924a88d896 100644
+--- a/src/backends/native/meta-drm-buffer-dumb.h
++++ b/src/backends/native/meta-drm-buffer-dumb.h
+@@ -29,11 +29,12 @@ G_DECLARE_FINAL_TYPE (MetaDrmBufferDumb,
+                       MetaDrmBuffer)
+ 
+ META_EXPORT_TEST
+-MetaDrmBufferDumb * meta_drm_buffer_dumb_new (MetaDeviceFile  *device,
+-                                              int              width,
+-                                              int              height,
+-                                              uint32_t         format,
+-                                              GError         **error);
++MetaDrmBufferDumb * meta_drm_buffer_dumb_new (MetaDeviceFile      *device,
++                                              int                  width,
++                                              int                  height,
++                                              uint32_t             format,
++                                              MetaDrmBufferFlags   flags,
++                                              GError             **error);
+ 
+ int meta_drm_buffer_dumb_ensure_dmabuf_fd (MetaDrmBufferDumb  *buffer_dumb,
+                                            GError            **error);
+diff --git a/src/backends/native/meta-drm-buffer.c b/src/backends/native/meta-drm-buffer.c
+index 1c83984c94f655a05f5552075c4957391a4658bc..fa919b5d3c9b0ce485ffa66cc4f5d9142a769e4f 100644
+--- a/src/backends/native/meta-drm-buffer.c
++++ b/src/backends/native/meta-drm-buffer.c
+@@ -183,9 +183,16 @@ meta_drm_buffer_release_fb_id (MetaDrmBuffer *buffer)
+   int ret;
+ 
+   fd = meta_device_file_get_fd (priv->device_file);
+-  ret = drmModeCloseFB (fd, priv->fb_id);
+-  if (ret == -EINVAL)
+-    ret = drmModeRmFB (fd, priv->fb_id);
++  if (priv->flags & META_DRM_BUFFER_FLAG_CURSOR)
++    {
++      ret = drmModeRmFB (fd, priv->fb_id);
++    }
++  else
++    {
++      ret = drmModeCloseFB (fd, priv->fb_id);
++      if (ret == -EINVAL)
++        ret = drmModeRmFB (fd, priv->fb_id);
++    }
+   if (ret != 0)
+     g_warning ("drmModeRmFB: %s", g_strerror (-ret));
+ 
+diff --git a/src/backends/native/meta-drm-buffer.h b/src/backends/native/meta-drm-buffer.h
+index 2419e03265fd9ae061a089aa5e50ea2682b90d63..0503f677948adbc0c3e345c78ffcd366dd0d66c5 100644
+--- a/src/backends/native/meta-drm-buffer.h
++++ b/src/backends/native/meta-drm-buffer.h
+@@ -30,6 +30,7 @@ typedef enum _MetaDrmBufferFlags
+ {
+   META_DRM_BUFFER_FLAG_NONE = 0,
+   META_DRM_BUFFER_FLAG_DISABLE_MODIFIERS = 1 << 0,
++  META_DRM_BUFFER_FLAG_CURSOR = 1 << 1,
+ } MetaDrmBufferFlags;
+ 
+ #define META_TYPE_DRM_BUFFER (meta_drm_buffer_get_type ())
+diff --git a/src/backends/native/meta-render-device.c b/src/backends/native/meta-render-device.c
+index eb92c3a810ffa220eb094718dd689a296e1719d1..f4fa5b8ee28306d15907d19d0fd8fae845c03d91 100644
+--- a/src/backends/native/meta-render-device.c
++++ b/src/backends/native/meta-render-device.c
+@@ -361,6 +361,7 @@ meta_render_device_allocate_dumb_buf (MetaRenderDevice  *render_device,
+   buffer_dumb = meta_drm_buffer_dumb_new (priv->device_file,
+                                           width, height,
+                                           format,
++                                          META_DRM_BUFFER_FLAG_NONE,
+                                           error);
+   if (!buffer_dumb)
+     return NULL;
+diff --git a/src/tests/meta-kms-test-utils.c b/src/tests/meta-kms-test-utils.c
+index b14604b60286492b219e872470a7fd9be1c0ba43..08e6f40d6704998f4a05061f73fa8e0d37b09229 100644
+--- a/src/tests/meta-kms-test-utils.c
++++ b/src/tests/meta-kms-test-utils.c
+@@ -138,6 +138,7 @@ meta_create_test_dumb_buffer (MetaKmsDevice *device,
+   dumb_buffer = meta_drm_buffer_dumb_new (device_file,
+                                           width, height,
+                                           DRM_FORMAT_XRGB8888,
++                                          META_DRM_BUFFER_FLAG_NONE,
+                                           NULL);
+   g_assert_nonnull (dumb_buffer);
+ 

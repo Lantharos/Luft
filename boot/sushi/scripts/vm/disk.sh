@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+vm="$root/vm"
+tree="$vm/tree"
+esp="$vm/esp"
+disk="$vm/root.img"
+passphrase="${VM_PASSWORD:-sushi-vm}"
+size_mb="${ROOT_SIZE_MB:-8192}"
+
+"$root/scripts/vm/tree.sh"
+stage="$vm/sushi"
+rm -rf "$stage"
+"$root/scripts/build.sh" "$stage"
+
+podman unshare sh -c "
+  cp -a '$stage/.' '$tree/'
+  echo 'LABEL=luft-root / ext4 defaults 0 1' > '$tree/etc/fstab'
+  echo virtio_gpu > '$tree/etc/modules-load.d/virtio-gpu.conf'
+  mkdir -p '$tree/etc/dracut.conf.d'
+  printf '%s\n' 'add_dracutmodules+=\" sushi crypt \"' 'omit_drivers+=\" virtio_gpu \"' > '$tree/etc/dracut.conf.d/90-sushi-vm.conf'
+"
+kernel="$(ls "$tree/lib/modules")"
+podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
+  systemctl enable sushi.service sushi-quit.service
+  dracut --quiet --force --no-hostonly --kver '$kernel' /boot/sushi-initramfs.img
+"
+
+rm -rf "$esp"
+mkdir -p "$esp/EFI/BOOT" "$esp/loader/entries"
+cp "$root/target/x86_64-unknown-uefi/release/sushiboot.efi" "$esp/EFI/BOOT/BOOTX64.EFI"
+podman unshare sh -c "cat '$tree/lib/modules/$kernel/vmlinuz' > '$esp/vmlinuz'; cat '$tree/boot/sushi-initramfs.img' > '$esp/initramfs.img'"
+
+rm -f "$disk"
+truncate -s "${size_mb}M" "$disk"
+fs_mb=$size_mb
+[[ "${LUKS:-0}" == 1 ]] && fs_mb=$((size_mb - 32))
+podman unshare mkfs.ext4 -q -F -L luft-root -d "$tree" "$disk" "${fs_mb}M"
+unlock=""
+if [[ "${LUKS:-0}" == 1 ]]; then
+  printf '%s' "$passphrase" | cryptsetup reencrypt --encrypt --disable-locks --type luks2 --reduce-device-size 32M \
+    --batch-mode --key-file - "$disk"
+  unlock="rd.luks.uuid=$(cryptsetup luksUUID --disable-locks "$disk")"
+fi
+
+options="root=LABEL=luft-root rw $unlock sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false"
+options+=" rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5 selinux=0 console=ttyS0,115200 console=tty0"
+printf 'timeout %s\ndefault luft\n' "${MENU_TIMEOUT:-0}" > "$esp/loader/loader.conf"
+printf 'title Luft\nlinux /vmlinuz\ninitrd /initramfs.img\noptions %s\n' "$options" > "$esp/loader/entries/luft.conf"
+printf 'title Luft without the splash\nlinux /vmlinuz\ninitrd /initramfs.img\noptions %s\n' "${options/ sushi / }" > "$esp/loader/entries/plain.conf"

@@ -26,6 +26,7 @@ pub struct View<'a> {
     pub list: List,
     pub selected: usize,
     pub countdown: Option<f32>,
+    pub notice: Option<String>,
 }
 
 fn fitted(title: &str, size: f32, room: f32) -> String {
@@ -68,6 +69,9 @@ impl View<'_> {
     fn hint(&self) -> Option<String> {
         if self.list == List::Previous {
             return Some(String::from("Press Esc to go back"));
+        }
+        if self.notice.is_some() {
+            return self.notice.clone();
         }
         let seconds = libm::ceilf(self.countdown?).max(1.0) as u32;
         Some(if seconds == 1 {

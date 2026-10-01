@@ -10,7 +10,8 @@ import * as Layout from '../layout.js';
 import * as Main from '../main.js';
 import {Authentication} from '../../auth/authentication.js';
 import {AuthPrompt} from '../../auth/authPrompt.js';
-import {spawnAuthenticator} from '../../auth/greetd.js';
+import {FingerprintAuthentication} from '../../auth/fingerprint.js';
+import {connectAuthenticator} from '../../auth/greetd.js';
 import {LockBackdrop} from './backdrop.js';
 import {Clock} from './clock.js';
 import {NotificationsBox} from './notifications.js';
@@ -80,7 +81,13 @@ export const UnlockDialog = GObject.registerClass({
 
         this._userName = GLib.get_user_name();
         this._user = AccountsService.UserManager.get_default().get_user(this._userName);
-        this._authentication = new Authentication(async () => spawnAuthenticator());
+        this._authentication = new Authentication(connectAuthenticator);
+        this._fingerprint = new FingerprintAuthentication();
+        this._fingerprint.connect('hint', (_, hint) => this._authPrompt?.setHint(hint));
+        this._fingerprint.connect('succeeded', () => {
+            this._authentication.cancel();
+            this._authPrompt?.succeed();
+        });
         this._authPrompt = null;
 
         this._stack = new Shell.Stack();
@@ -129,10 +136,14 @@ export const UnlockDialog = GObject.registerClass({
 
         this._authPrompt = new AuthPrompt(this._authentication);
         this._authPrompt.connect('cancelled', () => this._fail());
-        this._authPrompt.connect('succeeded', () => this.emit('unlocked'));
+        this._authPrompt.connect('succeeded', () => {
+            this._fingerprint.cancel();
+            this.emit('unlocked');
+        });
         this._authPrompt.setUser(this._user);
         this._promptBox.add_child(this._authPrompt);
         this._authPrompt.begin(this._userName);
+        this._fingerprint.begin(this._userName);
     }
 
     _destroyAuthPrompt() {
@@ -144,6 +155,7 @@ export const UnlockDialog = GObject.registerClass({
             this.grab_key_focus();
 
         this._authentication.cancel();
+        this._fingerprint.cancel();
         this._authPrompt.destroy();
         this._authPrompt = null;
     }
@@ -157,6 +169,7 @@ export const UnlockDialog = GObject.registerClass({
         this.popModal();
         this._idleMonitor.remove_watch(this._idleWatchId);
         this._authentication.destroy();
+        this._fingerprint.destroy();
     }
 
     cancel() {

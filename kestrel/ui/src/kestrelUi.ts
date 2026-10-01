@@ -18,6 +18,7 @@ import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
 import { loadKestrelStylesheets } from './shared/stylesheet.js';
 import { AppearanceService } from './appearance/service.js';
+import { KeyringPrompter } from './keyring/prompter.js';
 import { ClipboardPanel } from './clipboard/panel.js';
 import { EmojiPanel } from './emoji/panel.js';
 import type { CaretPopup, Context } from './context.js';
@@ -72,6 +73,7 @@ class KestrelUi {
   private readonly portal: PortalBackend;
   private readonly passkeys: PasskeyPrompts;
   readonly appearance: AppearanceService;
+  private readonly keyring: KeyringPrompter;
   private readonly oomNotifier = new OomNotifier();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly plugSounds = new PlugSounds();
@@ -88,6 +90,7 @@ class KestrelUi {
     this.portal = new PortalBackend(context);
     this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
+    this.keyring = new KeyringPrompter(context);
     this.stylesheetMonitors = loadKestrelStylesheets();
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
@@ -438,6 +441,7 @@ class KestrelUi {
     for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
     for (const disconnect of this.disconnectors) disconnect();
     this.panels.shutdown();
+    this.keyring.destroy();
     this.appearance.destroy();
     this.liveWallpaper.destroy();
     this.loginWallpaper.destroy();

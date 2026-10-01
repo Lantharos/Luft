@@ -10,6 +10,8 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {checkBackdrops} from './checks/desktop/backdropChecks.js';
 import {checkFolders} from './checks/desktop/folderChecks.js';
 import {checkSession} from './checks/desktop/sessionChecks.js';
+import {checkKeyring} from './checks/keyring/prompterChecks.js';
+import {checkUnlock} from './checks/lockScreen/unlockChecks.js';
 import {checkClipboardPlacement} from './checks/input/clipboardChecks.js';
 import {checkClipboardImages} from './checks/input/clipboardImageChecks.js';
 import {checkEmoji} from './checks/input/emojiChecks.js';
@@ -323,6 +325,7 @@ export async function run() {
     }
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
+  await checkKeyring({pause, capture, output, pointer, keyboard});
   await checkBackdrops({pause});
   await checkClipboardPlacement({pause, capture, actorNamed, keyboard, output});
   await checkClipboardImages({pause, capture, actorNamed, keyboard, output});
@@ -381,4 +384,5 @@ export async function run() {
   await capture(`${output}/unlock-prompt.png`);
   Main.screenShield.deactivate(false);
   await pause(600);
+  await checkUnlock({pause, capture, output, pointer, keyboard});
 }

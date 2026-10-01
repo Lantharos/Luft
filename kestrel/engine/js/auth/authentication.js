@@ -1,9 +1,10 @@
 import * as Signals from '../misc/signals.js';
 
 export class Authentication extends Signals.EventEmitter {
-    constructor(openChannel) {
+    constructor(openChannel, sessionOptions = {}) {
         super();
         this._openChannel = openChannel;
+        this._sessionOptions = sessionOptions;
         this._channel = null;
         this._queue = Promise.resolve();
         this._generation = 0;
@@ -15,7 +16,7 @@ export class Authentication extends Signals.EventEmitter {
         this._run(++this._generation, async channel => {
             await this._closeSession(channel);
             this._configuring = true;
-            return channel.request({type: 'create_session', username: userName});
+            return channel.request({type: 'create_session', username: userName, ...this._sessionOptions});
         });
     }
 
@@ -25,7 +26,7 @@ export class Authentication extends Signals.EventEmitter {
 
     cancel() {
         const generation = ++this._generation;
-        if (this._busy && this._channel?.abort) {
+        if (this._busy && this._channel?.abortable) {
             this._dropChannel(this._channel);
             return;
         }
@@ -57,10 +58,7 @@ export class Authentication extends Signals.EventEmitter {
     }
 
     _dropChannel(channel) {
-        if (channel.abort)
-            channel.abort();
-        else
-            channel.close();
+        channel.close();
         if (this._channel === channel) {
             this._channel = null;
             this._configuring = false;

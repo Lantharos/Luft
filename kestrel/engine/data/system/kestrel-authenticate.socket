@@ -1,0 +1,11 @@
+[Unit]
+Description=Kestrel unlock authentication
+
+[Socket]
+ListenStream=/run/kestrel/authenticate
+SocketMode=0666
+Accept=yes
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

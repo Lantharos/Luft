@@ -70,13 +70,19 @@ dbus-run-session -- bash -c '
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" gjs -m "$root/kestrel/tools/fixtures/systemBus.js" &
   timeout 5 gdbus wait --address "$KESTREL_SYSTEM_BUS" com.lantharos.KestrelChecks
   runtime="${XDG_RUNTIME_DIR:-/tmp}/kestrel-$(printf "%s" "$session" | sha1sum | cut -c1-12)"
-  export PIPEWIRE_RUNTIME_DIR="$runtime-pipewire" CUPS_SERVER="$runtime-cups.sock"
+  export PIPEWIRE_RUNTIME_DIR="$runtime-pipewire" CUPS_SERVER="$runtime-cups.sock" KESTREL_AUTHENTICATE_SOCK="$runtime-authenticate.sock"
+  export KESTREL_APP_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}/ka-$(printf "%s" "$session" | sha1sum | cut -c1-8)"
   mkdir -p "$PIPEWIRE_RUNTIME_DIR"
+  mkdir -m 700 -p "$KESTREL_APP_RUNTIME_DIR"
+  rm -f "$KESTREL_AUTHENTICATE_SOCK"
   pipewire -c "$root/kestrel/tools/fixtures/services/pipewire.conf" &
   pipewire_pid=$!
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" "$root/kestrel/tools/fixtures/services/printServer.sh" "$session/cups" "$CUPS_SERVER" &
   print_server_pid=$!
-  trap "kill $system_bus_PID $pipewire_pid $print_server_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\"" EXIT
+  gjs -m "$root/kestrel/tools/fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK" &
+  authenticator_pid=$!
+  trap "kill $system_bus_PID $pipewire_pid $print_server_pid $authenticator_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\" \"$KESTREL_APP_RUNTIME_DIR\" \"$KESTREL_AUTHENTICATE_SOCK\"" EXIT
+  timeout 5 gdbus wait --session com.lantharos.KestrelChecks.Authenticator
   timeout 10 bash -c "until [[ \"\$(lpstat -d 2> /dev/null)\" == *Office* ]]; do sleep 0.1; done"
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local "$root/kestrel/settings/target/release/kestrel-settings" \
     --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,xsettings &

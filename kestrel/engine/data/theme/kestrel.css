@@ -308,6 +308,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .modal-dialog .modal-dialog-button:hover { background-color: rgba(255, 255, 255, 0.14); }
 .modal-dialog .message-dialog-content { spacing: 8px; }
 .modal-dialog .message-dialog-icon { icon-size: 22px; padding: 11px; margin-bottom: 8px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.10); color: #ffffff; }
+.modal-dialog .kestrel-keyring-app-icon { margin-bottom: 8px; }
 .modal-dialog .message-dialog-title { text-align: left; font-size: 19px; font-weight: 600; }
 .modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: rgba(255, 255, 255, 0.70); }
 .kestrel-shortcut-list { spacing: 4px; }

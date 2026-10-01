@@ -9,6 +9,11 @@ import { DynamicLauncherPortal } from './apps/dynamicLauncher.js';
 import { EmailPortal } from './apps/email.js';
 import { NotificationPortal } from './apps/notification.js';
 import { ScreenshotPortal } from './capture/screenshot.js';
+import { PrintPortal } from './print/print.js';
+import { ClipboardPortal } from './sharing/clipboard.js';
+import { InputCapturePortal } from './sharing/inputCapture.js';
+import { RemoteDesktopPortal } from './sharing/remoteDesktop.js';
+import { ScreenCastPortal } from './sharing/screenCast.js';
 import { GlobalShortcutsPortal } from './shortcuts/globalShortcuts.js';
 import { AccountPortal } from './system/account.js';
 import { InhibitPortal } from './system/inhibit.js';
@@ -35,12 +40,17 @@ export class PortalBackend {
       new AccountPortal(),
       new AppChooserPortal(),
       new BackgroundPortal(),
+      new ClipboardPortal(),
       new DynamicLauncherPortal(),
       new EmailPortal(),
       new GlobalShortcutsPortal(context.keybindings),
       new InhibitPortal(context.screenShield),
+      new InputCapturePortal(),
       new LockdownPortal(),
       new NotificationPortal(),
+      new PrintPortal(),
+      new RemoteDesktopPortal(),
+      new ScreenCastPortal(),
       new ScreenshotPortal(),
       new UsbPortal(),
       new WallpaperPortal(),

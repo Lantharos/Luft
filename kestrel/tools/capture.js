@@ -338,7 +338,7 @@ export async function run() {
   await checkMediaKeys({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSessionManager({pause, pointer});
-  await checkPortal({pause, capture, output, pointer});
+  await checkPortal({pause, capture, output, pointer, keyboard});
   await checkAppearance({pause, capture, output});
   await checkCursor({pause, pointer});
   await checkNightLight({pause});

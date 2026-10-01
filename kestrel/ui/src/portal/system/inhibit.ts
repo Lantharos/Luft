@@ -48,7 +48,7 @@ export class InhibitPortal {
   readonly dbus = Gio.DBusExportedObject.wrapJSObject(INHIBIT_XML, this);
   private readonly monitors = new Set<MonitorSession>();
   private client: Promise<string> | null = null;
-  private clientSignals = 0;
+  private signals: number[] = [];
   private state = RUNNING;
 
   constructor(private readonly screenLock: ScreenLock | null) {
@@ -89,17 +89,21 @@ export class InhibitPortal {
 
   destroy(): void {
     for (const monitor of this.monitors) monitor.close();
-    if (this.clientSignals) Gio.DBus.session.signal_unsubscribe(this.clientSignals);
+    for (const id of this.signals) Gio.DBus.session.signal_unsubscribe(id);
     void this.client?.then(path => callManager('UnregisterClient', new GLib.Variant('(o)', [path])));
   }
 
   private async registerClient(): Promise<string> {
     const [path] = (await callManager('RegisterClient', new GLib.Variant('(ss)', ['org.freedesktop.portal', '']), '(o)')).deep_unpack() as [string];
-    this.clientSignals = Gio.DBus.session.signal_subscribe(SESSION_MANAGER[0], CLIENT_INTERFACE, null, path, null, Gio.DBusSignalFlags.NONE,
-      (_connection, _sender, _path, _iface, signal) => {
-        if (signal === 'QueryEndSession') this.queryEnd();
-        else if (signal === 'EndSession') this.end();
-      });
+    this.signals = [
+      Gio.DBus.session.signal_subscribe(SESSION_MANAGER[0], CLIENT_INTERFACE, null, path, null, Gio.DBusSignalFlags.NONE,
+        (_connection, _sender, _path, _iface, signal) => {
+          if (signal === 'QueryEndSession') this.queryEnd();
+          else if (signal === 'EndSession') this.end();
+        }),
+      Gio.DBus.session.signal_subscribe(SESSION_MANAGER[0], SESSION_MANAGER[2], 'SessionRunning', SESSION_MANAGER[1], null, Gio.DBusSignalFlags.NONE,
+        () => this.resume()),
+    ];
     return path;
   }
 
@@ -108,6 +112,11 @@ export class InhibitPortal {
     this.state = QUERY_END;
     this.announce();
     this.answerQuery();
+  }
+
+  private resume(): void {
+    this.state = RUNNING;
+    this.announce();
   }
 
   private end(): void {

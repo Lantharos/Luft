@@ -2685,7 +2685,6 @@ export class ScreenshotService {
         this._screenShooter = new Map();
         this._senderChecker = new DBusSenderChecker([
             'org.freedesktop.impl.portal.desktop.kestrel',
-            'org.freedesktop.impl.portal.desktop.gnome',
         ]);
 
         this._lockdownSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.lockdown'});

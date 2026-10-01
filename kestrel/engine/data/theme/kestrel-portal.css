@@ -27,3 +27,31 @@
 .kestrel-portal-avatar { icon-size: 40px; border-radius: 20px; }
 .kestrel-portal-launcher { spacing: 14px; }
 .kestrel-portal-launcher-icon { icon-size: 48px; }
+
+.kestrel-portal-sharing { width: 32em; }
+.kestrel-portal-sources { spacing: 14px; }
+.kestrel-portal-thumbnail { border-radius: 8px; background-color: rgba(255, 255, 255, 0.06); }
+.kestrel-portal-thumbnail-icon { icon-size: 22px; color: rgba(255, 255, 255, 0.82); }
+
+.kestrel-print-dialog { width: 30em; }
+.kestrel-print-body { spacing: 8px; }
+.kestrel-print-printer { margin-bottom: 4px; }
+.kestrel-print-field { spacing: 16px; min-height: 36px; }
+.kestrel-print-field-label { font-size: 14px; }
+.kestrel-print-segments { padding: 3px; spacing: 2px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.07); }
+.kestrel-print-segment { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); transition-duration: 120ms; }
+.kestrel-print-segment:hover { background-color: rgba(255, 255, 255, 0.08); color: white; }
+.kestrel-print-segment:focus { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.kestrel-print-segment:checked { background-color: rgba(255, 255, 255, 0.22); color: white; }
+.kestrel-print-stepper { spacing: 4px; }
+.kestrel-print-step { width: 32px; height: 32px; border-radius: 999px; background-color: rgba(255, 255, 255, 0.07); color: white; transition-duration: 120ms; }
+.kestrel-print-step StIcon { icon-size: 14px; }
+.kestrel-print-step:hover, .kestrel-print-step:focus { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-print-step:insensitive { background-color: rgba(255, 255, 255, 0.03); color: rgba(255, 255, 255, 0.3); }
+.kestrel-print-count { width: 3.2em; padding: 7px 8px; font-size: 13px; font-weight: 500; }
+.kestrel-print-pick { padding: 8px 10px 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: rgba(255, 255, 255, 0.07); color: white; transition-duration: 120ms; }
+.kestrel-print-pick:hover, .kestrel-print-pick:focus { background-color: rgba(255, 255, 255, 0.14); }
+.kestrel-print-pick-box { spacing: 6px; }
+.kestrel-print-pick-arrow { icon-size: 14px; color: rgba(255, 255, 255, 0.62); }
+.kestrel-print-ranges { padding: 9px 14px; font-size: 13px; }
+.kestrel-print-field-label:rtl { text-align: right; }

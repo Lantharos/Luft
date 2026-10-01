@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { appName } from '../core/apps.js';
+import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 
@@ -39,7 +39,7 @@ export class DynamicLauncherPortal {
     const site = option<number>(options, 'launcher_type') === WEB_APPLICATION ? siteOf(option<string>(options, 'target')) : null;
     respond(invocation, await openDialog(handle, {
       title: site ? 'Add this website to your apps?' : 'Add this to your apps?',
-      description: site ? `${site} will open in its own window from Start.` : `${appName(appId)} wants to add an app to Start.`,
+      description: site ? `${site} will open in its own window from Start.` : `${appNames(appId).subject} wants to add an app to Start.`,
       icon: 'list-add-symbolic',
     }, dialog => {
       const editable = option<boolean>(options, 'editable_name') ?? true;

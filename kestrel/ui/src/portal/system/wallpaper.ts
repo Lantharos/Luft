@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import { createThumbnail } from '../../clipboard/thumbnail.js';
-import { appName } from '../core/apps.js';
+import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { ENDED, SUCCESS, option, type Invocation, type Options } from '../core/request.js';
 
@@ -41,7 +41,7 @@ async function confirm(handle: string, appId: string, bytes: GLib.Bytes): Promis
   if (!preview) return ENDED;
   const [response] = await openDialog(handle, {
     title: 'Set as your wallpaper?',
-    description: `${appName(appId)} wants to change your wallpaper. It's used in light and dark style and on the lock screen.`,
+    description: `${appNames(appId).subject} wants to change your wallpaper. It's used in light and dark style and on the lock screen.`,
     icon: 'preferences-desktop-wallpaper-symbolic',
   }, dialog => {
     dialog.content.add_child(new St.Widget({ content: preview.content, width: preview.width, height: preview.height, x_align: Clutter.ActorAlign.CENTER }));

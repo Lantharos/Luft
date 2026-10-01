@@ -425,6 +425,7 @@ dependencies = [
  "glib",
  "pulseaudio",
  "rustix",
+ "serde",
  "tokio",
  "tzf-rs",
  "x11rb",

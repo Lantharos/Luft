@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
 
-import { appName } from '../core/apps.js';
+import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 import { row } from '../core/rows.js';
@@ -29,10 +29,10 @@ export class AccountPortal {
 
   async GetUserInformationAsync([handle, appId, , options]: [string, string, string, Options], invocation: Invocation): Promise<void> {
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
-    const app = appName(appId);
+    const app = appNames(appId);
     respond(invocation, await openDialog(handle, {
-      title: `Share your name and picture with ${app}?`,
-      description: option<string>(options, 'reason') || `${app} will see the name and picture of your account.`,
+      title: `Share your name and picture with ${app.object}?`,
+      description: option<string>(options, 'reason') || `${app.subject} will see the name and picture of your account.`,
       icon: 'avatar-default-symbolic',
     }, dialog => {
       const avatar = new Avatar(user, { styleClass: 'kestrel-portal-avatar', iconSize: 40 });

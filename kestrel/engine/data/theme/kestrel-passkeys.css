@@ -1,0 +1,7 @@
+.kestrel-passkey-dialog .kestrel-portal-content { spacing: 12px; }
+.kestrel-passkey-fingerprint { spacing: 12px; padding: 10px 6px 10px 14px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.07); }
+.kestrel-passkey-fingerprint-icon { icon-size: 28px; color: white; }
+.kestrel-passkey-fingerprint-label { font-size: 14px; font-weight: 500; color: white; }
+.kestrel-passkey-password { width: auto; margin: 0; }
+.kestrel-passkey-status { padding: 0 4px; font-size: 13px; color: rgba(255, 255, 255, 0.72); }
+.kestrel-passkey-fingerprint-label:rtl, .kestrel-passkey-status:rtl { text-align: right; }

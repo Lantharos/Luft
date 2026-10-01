@@ -31,6 +31,7 @@ import { coveredMonitors } from './panel/coverage.js';
 import { systemMonitor } from './panel/systemMonitor.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
 import { PortalBackend } from './portal/backend.js';
+import { PasskeyPrompts } from './passkeys/service.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
 import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
 import { LoginDisplays } from './session/loginScreen/displays.js';
@@ -69,6 +70,7 @@ class KestrelUi {
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private readonly portal: PortalBackend;
+  private readonly passkeys: PasskeyPrompts;
   readonly appearance: AppearanceService;
   private readonly oomNotifier = new OomNotifier();
   private readonly batteryWarnings = new BatteryWarnings();
@@ -84,6 +86,7 @@ class KestrelUi {
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
     this.portal = new PortalBackend(context);
+    this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.stylesheetMonitors = loadKestrelStylesheets();
 
@@ -447,6 +450,7 @@ class KestrelUi {
     this.plugSounds.destroy();
     this.launchFeedback.destroy();
     this.portal.destroy();
+    this.passkeys.destroy();
     for (const monitor of this.stylesheetMonitors) monitor.cancel();
   }
 

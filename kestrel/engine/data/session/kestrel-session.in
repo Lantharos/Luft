@@ -1,4 +1,10 @@
 #!/bin/sh
+if [ -z "$KESTREL_LOGIN_SHELL" ]; then
+  export KESTREL_LOGIN_SHELL=1
+  exec "${SHELL:-/bin/sh}" -l -c "exec '$0'"
+fi
+unset KESTREL_LOGIN_SHELL
+
 export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export IBUS_DAEMON_ARGS="--panel disable"
 

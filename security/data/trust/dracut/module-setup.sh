@@ -18,6 +18,7 @@ installkernel() {
 install() {
     inst_multiple trustctl systemd-creds cryptsetup udevadm
     inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
+    inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"
     $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-encrypt.service
     if [[ -f /var/lib/trustd/stage/plan.json ]]; then
         local file

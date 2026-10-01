@@ -128,10 +128,14 @@ declare module 'resource:///org/gnome/shell/ui/status/location.js' {
 declare module 'resource:///org/gnome/shell/ui/modalDialog.js' {
   import St from 'gi://St';
   import Clutter from 'gi://Clutter';
+  export interface ButtonInfo { label: string; action: () => void; key?: number; default?: boolean; reactive?: boolean }
   export class ModalDialog extends St.Widget {
     constructor(params?: { styleClass?: string; destroyOnClose?: boolean });
     readonly contentLayout: St.BoxLayout;
-    setButtons(buttons: { label: string; action: () => void; key?: number; isDefault?: boolean }[]): void;
+    setButtons(buttons: ButtonInfo[]): void;
+    addButton(button: ButtonInfo): St.Button;
+    clearButtons(): void;
+    setInitialKeyFocus(actor: Clutter.Actor): void;
     open(): boolean;
     close(): void;
     connect(signal: 'closed', callback: () => void): number;

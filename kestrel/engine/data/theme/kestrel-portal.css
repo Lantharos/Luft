@@ -1,0 +1,25 @@
+.kestrel-portal-dialog { width: 28em; }
+.kestrel-portal-dialog .message-dialog-content { margin-bottom: 0; }
+.kestrel-portal-content { spacing: 8px; }
+
+.kestrel-portal-list { spacing: 6px; }
+.kestrel-portal-scroll { max-height: 22em; }
+.kestrel-portal-row { padding: 10px 14px; border-radius: 14px; background-color: rgba(255, 255, 255, 0.07); color: white; transition-duration: 120ms; }
+.kestrel-portal-row:hover { background-color: rgba(255, 255, 255, 0.13); }
+.kestrel-portal-row:focus { background-color: rgba(255, 255, 255, 0.13); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.kestrel-portal-row:checked { background-color: rgba(255, 255, 255, 0.22); }
+.kestrel-portal-row-box { spacing: 12px; }
+.kestrel-portal-row-icon { icon-size: 28px; }
+.kestrel-portal-row-text { spacing: 1px; }
+.kestrel-portal-row-title { font-size: 14px; font-weight: 500; }
+.kestrel-portal-row-subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.62); }
+.kestrel-portal-row-check { icon-size: 16px; color: white; }
+
+.kestrel-portal-field { spacing: 6px; }
+.kestrel-portal-label { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.82); }
+.kestrel-portal-note { font-size: 13px; color: rgba(255, 255, 255, 0.62); }
+
+.kestrel-portal-link { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: transparent; color: rgba(255, 255, 255, 0.82); }
+.kestrel-portal-link:hover, .kestrel-portal-link:focus { background-color: rgba(255, 255, 255, 0.10); color: white; }
+
+.kestrel-portal-row-title:rtl, .kestrel-portal-row-subtitle:rtl, .kestrel-portal-label:rtl, .kestrel-portal-note:rtl { text-align: right; }

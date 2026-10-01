@@ -62,7 +62,7 @@ export async function recordShortcuts(appId: string, current: AppShortcuts, unav
     let result: AppShortcuts | null = null;
     dialog.setButtons([
       { label: 'Cancel', action: () => dialog.close(), key: Clutter.KEY_Escape },
-      { label: 'Save', action: () => { result = edited; dialog.close(); }, isDefault: true },
+      { label: 'Save', action: () => { result = edited; dialog.close(); }, default: true },
     ]);
     dialog.connect('closed', () => resolve(result));
     dialog.open();

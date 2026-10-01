@@ -72,7 +72,7 @@ pub fn load() -> Option<Incident> {
         kernel: summary.kernel,
         kernel_messages: Vec::new(),
         nvidia_smi: None,
-        restart: Restart::Emergency,
+        restart: Restart::Graceful,
         suggestions: Vec::new(),
         boot_notice_done: false,
     })

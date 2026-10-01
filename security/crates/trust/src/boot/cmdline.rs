@@ -3,9 +3,18 @@ use std::path::Path;
 use anyhow::Result;
 
 use crate::paths;
-use crate::system::command::Tool;
 
 const FILE: &str = "/etc/kernel/cmdline";
+const RESCUE_DROPS: [&str; 6] = [
+    "quiet",
+    "rhgb",
+    "loglevel",
+    "systemd.show_status",
+    "sushi",
+    "systemd.unit",
+];
+const RESCUE: &str = "systemd.unit=rescue.target";
+const SHELL_WITHOUT_PASSWORD: &str = "systemd.setenv=SYSTEMD_SULOGIN_FORCE=1";
 
 pub fn read() -> String {
     std::fs::read_to_string(FILE)
@@ -27,10 +36,10 @@ fn key(argument: &str) -> &str {
     argument.split_once('=').map_or(argument, |(key, _)| key)
 }
 
-pub fn with(line: &str, add: &[String], remove: &[&str]) -> String {
+pub fn with<S: AsRef<str>>(line: &str, add: &[String], remove: &[S]) -> String {
     let mut words: Vec<String> = line
         .split_whitespace()
-        .filter(|word| !remove.contains(&key(word)))
+        .filter(|word| !remove.iter().any(|removed| removed.as_ref() == key(word)))
         .filter(|word| !add.iter().any(|added| added == word))
         .map(str::to_owned)
         .collect();
@@ -38,31 +47,27 @@ pub fn with(line: &str, add: &[String], remove: &[&str]) -> String {
     words.join(" ")
 }
 
-pub fn change(add: &[String], remove: &[&str]) -> Result<()> {
-    let updated = with(&read(), add, remove);
-    paths::write_private(Path::new(FILE), format!("{updated}\n").as_bytes())?;
-    std::fs::set_permissions(FILE, std::os::unix::fs::PermissionsExt::from_mode(0o644))?;
-    if Path::new("/usr/sbin/grubby").exists() || Path::new("/usr/bin/grubby").exists() {
-        let removals: Vec<&str> = remove
-            .iter()
-            .copied()
-            .filter(|key| !add.iter().any(|added| self::key(added) == *key))
-            .collect();
-        let mut grubby = Tool::new("grubby").arg("--update-kernel=ALL");
-        if !add.is_empty() {
-            grubby = grubby.arg(format!("--args={}", add.join(" ")));
-        }
-        if !removals.is_empty() {
-            grubby = grubby.arg(format!("--remove-args={}", removals.join(" ")));
-        }
-        grubby.status()?;
+pub fn rescue(line: &str, encrypted: bool) -> String {
+    let mut add = vec![RESCUE.to_owned()];
+    if encrypted {
+        add.push(SHELL_WITHOUT_PASSWORD.to_owned());
     }
+    with(line, &add, &RESCUE_DROPS)
+}
+
+pub fn write(line: &str) -> Result<()> {
+    paths::write_private(Path::new(FILE), format!("{line}\n").as_bytes())?;
+    std::fs::set_permissions(FILE, std::os::unix::fs::PermissionsExt::from_mode(0o644))?;
     Ok(())
+}
+
+pub fn change(add: &[String], remove: &[&str]) -> Result<()> {
+    write(&with(&read(), add, remove))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::with;
+    use super::{rescue, with};
 
     #[test]
     fn replaces_arguments_by_key() {
@@ -74,6 +79,19 @@ mod tests {
                 &["rd.luks.uuid", "rd.luks.options"]
             ),
             "root=UUID=1 ro rhgb quiet rd.luks.uuid=luks-new"
+        );
+    }
+
+    #[test]
+    fn rescue_starts_the_rescue_target_with_messages() {
+        let line = "root=UUID=1 ro rd.luks.uuid=luks-1 sushi quiet loglevel=3";
+        assert_eq!(
+            rescue(line, true),
+            "root=UUID=1 ro rd.luks.uuid=luks-1 systemd.unit=rescue.target systemd.setenv=SYSTEMD_SULOGIN_FORCE=1"
+        );
+        assert_eq!(
+            rescue(line, false),
+            "root=UUID=1 ro rd.luks.uuid=luks-1 systemd.unit=rescue.target"
         );
     }
 }

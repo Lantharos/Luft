@@ -5,9 +5,9 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 action="${1:-}"
 manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
-trial_suffix=-sushi-trial
 units="sushi.service sushi-quit.service sushi-shutdown.service"
 arguments="sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5"
+names="sushi plymouth.enable fbcon"
 
 usage() {
   cat <<'EOF'
@@ -23,16 +23,20 @@ EOF
   exit 2
 }
 
-default_entry() {
-  sudo grubby --default-kernel
-}
-
-entry_file() {
-  sudo grubby --info="$1" | sed -n 's/^id="\(.*\)"$/\1/p' | head -1
+kernel_arguments() {
+  command -v trustctl >/dev/null || {
+    echo "Luft's signed startup keeps the kernel command line. Install it first (security/README.md)." >&2
+    exit 1
+  }
+  sudo trustctl startup arguments "$@"
 }
 
 rebuild_initramfs() {
-  sudo dracut --force --kver "$(uname -r)"
+  if command -v trustctl >/dev/null; then
+    sudo trustctl startup rebuild
+  else
+    sudo dracut --force --kver "$(uname -r)"
+  fi
 }
 
 install_files() {
@@ -52,32 +56,17 @@ install_files() {
   rebuild_initramfs
 }
 
-remove_trial_entry() {
-  local entries=/boot/loader/entries
-  sudo find "$entries" -name "*$trial_suffix.conf" -delete
-}
-
 try_once() {
-  remove_trial_entry
-  local kernel id trial
-  kernel="$(default_entry)"
-  id="$(entry_file "$kernel")"
-  trial="$id$trial_suffix"
-  sudo sed -e "s/^title \(.*\)$/title \1 with Sushi/" -e "s/^options \(.*\)$/options \1 $arguments/" \
-    "/boot/loader/entries/$id.conf" | sudo tee "/boot/loader/entries/$trial.conf" >/dev/null
-  sudo grub2-reboot "$trial"
-  echo "The next boot uses Sushi once. Restart when you're ready."
+  kernel_arguments --once --add "$arguments"
 }
 
 enable_everywhere() {
-  remove_trial_entry
-  sudo grubby --update-kernel=ALL --args="$arguments"
+  kernel_arguments --add "$arguments"
   echo "Sushi now shows on every boot."
 }
 
 disable_everywhere() {
-  remove_trial_entry
-  sudo grubby --update-kernel=ALL --remove-args="sushi plymouth.enable=0 fbcon=vc:0-5"
+  kernel_arguments --remove "$names"
   echo "Plymouth shows on every boot again."
 }
 

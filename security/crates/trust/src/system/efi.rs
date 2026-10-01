@@ -5,6 +5,7 @@ const MOK_VARIABLES: &str = "/sys/firmware/efi/mok-variables";
 const GLOBAL: &str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
 const SHIM: &str = "605dab50-e046-4300-abb6-3dd810dd8b23";
 const STUB: &str = "4a67b082-0a4c-41cf-b6c7-440b29bb8c4f";
+const NON_VOLATILE_BOOT_RUNTIME: u32 = 0x7;
 const X509: [u8; 16] = [
     0xa1, 0x59, 0xc0, 0xa5, 0xe4, 0x94, 0xa7, 0x4a, 0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72,
 ];
@@ -54,6 +55,33 @@ pub fn secure_boot() -> SecureBoot {
 
 pub fn measured_uki() -> bool {
     variable("StubPcrKernelImage", STUB).is_some()
+}
+
+fn text(data: &[u8]) -> String {
+    let units: Vec<u16> = data
+        .as_chunks::<2>()
+        .0
+        .iter()
+        .map(|pair| u16::from_le_bytes(*pair))
+        .take_while(|unit| *unit != 0)
+        .collect();
+    String::from_utf16_lossy(&units)
+}
+
+pub fn boot_loader() -> Option<String> {
+    variable("LoaderInfo", STUB).map(|data| text(&data))
+}
+
+pub fn set_oneshot_entry(id: &str) -> std::io::Result<()> {
+    let path = format!("{VARIABLES}/LoaderEntryOneShot-{STUB}");
+    if let Ok(existing) = std::fs::File::open(&path) {
+        let flags = rustix::fs::ioctl_getflags(&existing)?;
+        rustix::fs::ioctl_setflags(&existing, flags - rustix::fs::IFlags::IMMUTABLE)?;
+        std::fs::remove_file(&path)?;
+    }
+    let mut data = NON_VOLATILE_BOOT_RUNTIME.to_le_bytes().to_vec();
+    data.extend(id.encode_utf16().chain([0]).flat_map(u16::to_le_bytes));
+    std::fs::write(path, data)
 }
 
 pub fn requested_certificates() -> Vec<Vec<u8>> {

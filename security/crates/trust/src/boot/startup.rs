@@ -2,55 +2,36 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Result, bail};
 
+use crate::disk;
 use crate::keys::{self, Unsealed, mok};
-use crate::system::command::Tool;
+use crate::paths;
+use crate::system::efi;
 
 use super::esp::{self, Esp};
 use super::kernels::{self, Kernel};
-use super::uki;
+use super::uki::{self, Lines};
+use super::{cmdline, entries, images, sign};
 
 const BOOT_MENU: &str = "/usr/lib/sushi/efi/SushiBoot.efi";
 const SIGNED_MENU: &str = "EFI/sushi/SushiBoot.efi";
-const MENU_LOADER_PATH: &str = "\\EFI\\sushi\\SushiBoot.efi ";
-const IMAGES: &str = "EFI/Linux";
-const LABEL: &str = "Luft";
+const CERTIFICATE: &str = "EFI/sushi/luft-secure-boot.cer";
 const LOADER_CONF: &str = "loader/loader.conf";
-const IMAGE_ROOM: u64 = 96 << 20;
+const TRIAL: &str = "trial";
 
-fn image_name(version: &str) -> String {
-    format!("luft-{version}.efi")
+pub fn installed() -> bool {
+    esp::find().is_ok_and(|esp| esp.file(SIGNED_MENU).exists())
 }
 
-fn image(esp: &Esp, version: &str) -> PathBuf {
-    esp.file(IMAGES).join(image_name(version))
-}
-
-fn boot_entry() -> Option<String> {
-    let entries = Tool::new("efibootmgr").output().ok()?;
-    entries.lines().find_map(|line| {
-        let (number, rest) = line.strip_prefix("Boot")?.split_once(' ')?;
-        let label = rest.trim_start_matches('*').trim_start();
-        let number = number.trim_end_matches('*');
-        (label.split('\t').next()? == LABEL && number.len() == 4).then(|| number.to_owned())
+fn is_sushiboot(path: &Path) -> bool {
+    std::fs::read(path).is_ok_and(|data| {
+        data.windows(b"\nsushiboot,".len())
+            .any(|window| window == b"\nsushiboot,")
     })
 }
 
-pub fn installed() -> bool {
-    esp::find().is_ok_and(|esp| esp.file(SIGNED_MENU).exists()) && boot_entry().is_some()
-}
-
-fn room_for_images(esp: &Esp) -> bool {
-    let needed = IMAGE_ROOM * kernels::installed().len().max(1) as u64;
-    let present: u64 = std::fs::read_dir(esp.file(IMAGES))
-        .into_iter()
-        .flatten()
-        .flatten()
-        .filter(|entry| entry.file_name().to_string_lossy().starts_with("luft-"))
-        .filter_map(|entry| entry.metadata().ok())
-        .map(|metadata| metadata.len())
-        .sum();
-    rustix::fs::statvfs(&esp.path)
-        .is_ok_and(|space| space.f_bavail * space.f_frsize + present >= needed)
+pub fn grub_removed(esp: &Esp) -> bool {
+    esp.shim_second_stage()
+        .is_some_and(|stage| !stage.exists() || is_sushiboot(&stage))
 }
 
 pub fn unavailable_reason() -> Option<&'static str> {
@@ -60,7 +41,9 @@ pub fn unavailable_reason() -> Option<&'static str> {
     let Ok(esp) = esp::find() else {
         return Some("This computer doesn't start from an EFI system partition.");
     };
-    if !room_for_images(&esp) {
+    if let Some(newest) = images::wanted().first()
+        && !images::room_for(&esp, images::estimate(newest, &newest.initrd()))
+    {
         return Some("The EFI system partition is too full for the signed startup files.");
     }
     match mok::enrollment() {
@@ -69,36 +52,77 @@ pub fn unavailable_reason() -> Option<&'static str> {
     }
 }
 
-fn initrd_for(kernel: &Kernel, built: Option<&Path>) -> Result<PathBuf> {
+fn lines(trial: Option<String>) -> Lines {
+    let main = cmdline::read();
+    let encrypted = disk::status().is_some_and(|disk| disk.encrypted);
+    Lines {
+        rescue: cmdline::rescue(&main, encrypted),
+        main,
+        trial,
+    }
+}
+
+fn initrd_for(
+    esp: &Esp,
+    keys: &Unsealed,
+    kernel: &Kernel,
+    built: Option<&Path>,
+) -> Result<PathBuf> {
     if let Some(built) = built.filter(|path| path.exists()) {
         return Ok(built.to_owned());
     }
-    if !kernel.initrd().exists() {
-        kernel.rebuild_initrd()?;
+    if kernel.initrd().exists() {
+        return Ok(kernel.initrd());
     }
+    let image = images::path(esp, &kernel.version);
+    if image.exists() {
+        let extracted = keys.scratch(&format!("initrd-{}", kernel.version));
+        uki::extract_initrd(&image, &extracted)?;
+        return Ok(extracted);
+    }
+    kernel.rebuild_initrd()?;
     Ok(kernel.initrd())
 }
 
-pub fn add(kernel: &Kernel, built_initrd: Option<&Path>) -> Result<()> {
+fn build(
+    esp: &Esp,
+    keys: &Unsealed,
+    kernel: &Kernel,
+    built: Option<&Path>,
+    lines: &Lines,
+) -> Result<()> {
+    let initrd = initrd_for(esp, keys, kernel, built)?;
+    images::make_room(esp, &kernel.version, images::estimate(kernel, &initrd))?;
+    uki::build(
+        kernel,
+        &initrd,
+        &images::path(esp, &kernel.version),
+        keys,
+        lines,
+    )
+}
+
+pub fn add(kernel: &Kernel, built: Option<&Path>) -> Result<()> {
     if !installed() {
+        return Ok(());
+    }
+    let wanted = images::wanted();
+    if !wanted.iter().any(|kept| kept.version == kernel.version) {
         return Ok(());
     }
     let esp = esp::find()?;
     let keys = keys::unseal()?;
-    uki::build(
-        kernel,
-        &initrd_for(kernel, built_initrd)?,
-        &image(&esp, &kernel.version),
-        &keys,
-    )?;
+    images::keep_only(&esp, &wanted);
+    build(&esp, &keys, kernel, built, &lines(None))?;
     rustix::fs::sync();
     Ok(())
 }
 
 pub fn remove(version: &str) -> Result<()> {
     if let Ok(esp) = esp::find() {
-        let _ = std::fs::remove_file(image(&esp, version));
+        images::remove(&esp, version);
     }
+    let _ = std::fs::remove_file(Kernel::named(version).initrd());
     Ok(())
 }
 
@@ -108,33 +132,28 @@ pub fn rebuild_images(rebuild_initrds: bool) -> Result<()> {
     rebuild_with(&esp, &keys, rebuild_initrds)
 }
 
+pub fn rebuild_boot_files() -> Result<()> {
+    let rebuilt = if installed() {
+        rebuild_images(true)
+    } else {
+        kernels::rebuild_all_initrds()
+    };
+    rustix::fs::sync();
+    rebuilt
+}
+
 fn rebuild_with(esp: &Esp, keys: &Unsealed, rebuild_initrds: bool) -> Result<()> {
-    let kernels = kernels::installed();
-    for kernel in &kernels {
+    let wanted = images::wanted();
+    images::keep_only(esp, &wanted);
+    let lines = lines(None);
+    for kernel in &wanted {
         if rebuild_initrds {
             kernel.rebuild_initrd()?;
         }
-        uki::build(
-            kernel,
-            &initrd_for(kernel, None)?,
-            &image(esp, &kernel.version),
-            keys,
-        )?;
+        build(esp, keys, kernel, None, &lines)?;
     }
-    let current: Vec<String> = kernels
-        .iter()
-        .map(|kernel| image_name(&kernel.version))
-        .collect();
-    for stale in std::fs::read_dir(esp.file(IMAGES))
-        .into_iter()
-        .flatten()
-        .flatten()
-    {
-        let name = stale.file_name().to_string_lossy().into_owned();
-        if name.starts_with("luft-") && name.ends_with(".efi") && !current.contains(&name) {
-            let _ = std::fs::remove_file(stale.path());
-        }
-    }
+    let _ = std::fs::remove_file(paths::state(TRIAL));
+    rustix::fs::sync();
     Ok(())
 }
 
@@ -148,34 +167,19 @@ pub fn install() -> Result<()> {
     };
     let keys = keys::unseal()?;
     rebuild_with(&esp, &keys, true)?;
-    super::sign::efi_binary(Path::new(BOOT_MENU), &esp.file(SIGNED_MENU), &keys)?;
-    esp::write(&esp.file(LOADER_CONF), loader_conf(&esp).as_bytes())?;
-    remove_boot_entry()?;
-    rustix::fs::sync();
-    Tool::new("efibootmgr")
-        .arg("--create")
-        .arg("--disk")
-        .arg(format!("/dev/{}", esp.disk))
-        .arg("--part")
-        .arg(esp.partition.to_string())
-        .args([
-            "--label",
-            LABEL,
-            "--loader",
-            &shim,
-            "--unicode",
-            MENU_LOADER_PATH,
-        ])
-        .status()
-}
-
-fn remove_boot_entry() -> Result<()> {
-    if let Some(number) = boot_entry() {
-        Tool::new("efibootmgr")
-            .args(["--bootnum", &number, "--delete-bootnum"])
-            .status()?;
+    sign::efi_binary(Path::new(BOOT_MENU), &esp.file(SIGNED_MENU), &keys)?;
+    esp::write(
+        &esp.file(CERTIFICATE),
+        &std::fs::read(keys::certificate_der())?,
+    )?;
+    if grub_removed(&esp)
+        && let Some(stage) = esp.shim_second_stage()
+    {
+        sign::efi_binary(Path::new(BOOT_MENU), &stage, &keys)?;
     }
-    Ok(())
+    esp::write(&esp.file(LOADER_CONF), loader_conf(&esp).as_bytes())?;
+    rustix::fs::sync();
+    entries::create(&esp, &shim)
 }
 
 fn loader_conf(esp: &Esp) -> String {
@@ -196,21 +200,77 @@ fn loader_conf(esp: &Esp) -> String {
 }
 
 pub fn uninstall() -> Result<()> {
-    remove_boot_entry()?;
     let esp = esp::find()?;
+    if grub_removed(&esp) {
+        bail!(
+            "GRUB has been removed, so Luft's startup is how this computer starts. Put GRUB back before removing it."
+        );
+    }
+    entries::remove()?;
     let _ = std::fs::remove_file(esp.file(SIGNED_MENU));
-    remove_images(&esp);
+    let _ = std::fs::remove_file(esp.file(CERTIFICATE));
+    images::keep_only(&esp, &[]);
     Ok(())
 }
 
-fn remove_images(esp: &Esp) {
-    for image in std::fs::read_dir(esp.file(IMAGES))
-        .into_iter()
-        .flatten()
-        .flatten()
-    {
-        if image.file_name().to_string_lossy().starts_with("luft-") {
-            let _ = std::fs::remove_file(image.path());
+pub fn arguments(add: &[String], remove: &[String], once: bool) -> Result<String> {
+    let line = cmdline::with(&cmdline::read(), add, remove);
+    if add.is_empty() && remove.is_empty() {
+        return Ok(line);
+    }
+    if once {
+        try_once(&line)?;
+    } else {
+        cmdline::write(&line)?;
+        if installed() {
+            rebuild_images(false)?;
         }
     }
+    Ok(line)
+}
+
+fn try_once(line: &str) -> Result<()> {
+    if !efi::boot_loader().is_some_and(|loader| loader.starts_with("SushiBoot")) {
+        bail!(
+            "Trying a command line once needs the computer to have started through Luft's startup."
+        );
+    }
+    let Some(kernel) = images::wanted().into_iter().next() else {
+        bail!("No kernel is installed.");
+    };
+    let esp = esp::find()?;
+    let keys = keys::unseal()?;
+    build(&esp, &keys, &kernel, None, &lines(Some(line.to_owned())))?;
+    paths::write_private(&paths::state(TRIAL), kernel.version.as_bytes())?;
+    efi::set_oneshot_entry(&format!("{}@{}", images::name(&kernel.version), uki::TRIAL))?;
+    rustix::fs::sync();
+    Ok(())
+}
+
+fn finish_trial(esp: &Esp) -> Result<()> {
+    let Ok(version) = std::fs::read_to_string(paths::state(TRIAL)) else {
+        return Ok(());
+    };
+    let kernel = Kernel::named(version.trim());
+    if images::path(esp, &kernel.version).exists() && kernel.image.exists() {
+        let keys = keys::unseal()?;
+        build(esp, &keys, &kernel, None, &lines(None))?;
+        rustix::fs::sync();
+    }
+    std::fs::remove_file(paths::state(TRIAL))?;
+    Ok(())
+}
+
+pub fn follow_up() -> Result<()> {
+    if !installed() {
+        return Ok(());
+    }
+    let esp = esp::find()?;
+    finish_trial(&esp)?;
+    if entries::luft().is_none()
+        && let Some(shim) = esp.shim()
+    {
+        entries::create(&esp, &shim)?;
+    }
+    Ok(())
 }

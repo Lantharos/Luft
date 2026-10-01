@@ -51,7 +51,7 @@ sushictl notice clear
 | `sushi` | Display handling (DRM/KMS), console and keyboard, password requests, the control socket, Plymouth's client protocol |
 | `sushid` | The splash itself |
 | `sushictl` | Talks to `sushid` |
-| `sushiboot` | An optional UEFI boot menu drawn with the same scene |
+| `sushiboot` | The UEFI boot menu Luft starts through, drawn with the same scene |
 | `sushi-bootctl` | Installs SushiBoot on the EFI system partition |
 
 `data/` holds the systemd units, the drop-ins for greetd, Plymouth's boot units and the console password agent, the dracut module, and the default configuration.
@@ -61,16 +61,14 @@ sushictl notice clear
 Sushi installs next to Plymouth. Both are in the initramfs, and the kernel command line decides which one runs, so Plymouth stays as a fallback until you're happy with Sushi. Keep the `plymouth` package installed either way: its `plymouth` tool is what updaters use to report progress, and Sushi answers it.
 
 ```bash
-boot/sushi/scripts/install.sh install   # build, install, rebuild the initramfs
+boot/sushi/scripts/install.sh install   # build, install, rebuild the initramfs and signed images
 boot/sushi/scripts/install.sh try       # use Sushi for the next boot only
 boot/sushi/scripts/install.sh enable    # use Sushi on every boot
 boot/sushi/scripts/install.sh disable   # back to Plymouth on every boot
 boot/sushi/scripts/install.sh remove    # take Sushi off the computer entirely
 ```
 
-`try` adds a boot entry with Sushi turned on and tells GRUB to use it once. If anything goes wrong, restarting brings back the usual entry. `enable` and `disable` change the arguments of every installed kernel, and kernels installed later inherit them.
-
-The script needs `sudo`, `grubby`, and `grub2-reboot`, which Fedora has by default.
+On Luft the kernel command line is part of the signed startup images, so these go through `trustctl startup arguments` (see `security/README.md`). `try` starts the next boot once with Sushi's arguments added; if anything goes wrong, restarting brings back the usual startup. `enable` and `disable` change the arguments in every signed image, and kernels installed later inherit them. The script needs `sudo` and Luft's signed startup.
 
 ### Kernel arguments
 
@@ -88,7 +86,7 @@ These are what `try` and `enable` add:
 
 `rd.systemd.show_status` isn't needed: systemd reads `systemd.show_status` in the initramfs too.
 
-Keep the firmware's boot menu and GRUB's menu hidden so nothing draws between the firmware logo and Sushi. On Fedora that's GRUB's default after a successful boot.
+Keep the firmware's boot menu hidden so nothing draws between the firmware logo and Sushi. SushiBoot draws nothing unless a key is held while it starts.
 
 ### The login screen
 
@@ -131,15 +129,28 @@ sudo plymouth display-message --text="Upgrading firefox"
 
 ## SushiBoot
 
-SushiBoot is an optional UEFI boot menu. It reads [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries from every EFI system partition, finds Windows and other installed boot loaders, and draws the menu below the firmware logo. With `timeout 0` in `loader/loader.conf` it starts the default entry without showing anything; holding any key while it starts shows the menu.
+SushiBoot is the boot menu Luft starts through. It reads [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries and unified kernel images from every EFI system partition, finds Windows and other installed systems, and draws the menu below the firmware logo. With `timeout 0` in `loader/loader.conf` it starts the default entry without showing anything; holding any key while it starts shows the menu.
+
+The menu has, in order:
+
+- the newest unified kernel image of each system in `EFI/Linux`, titled with the system's name,
+- the extra profiles of that image that have a title, such as Rescue,
+- Previous versions, listing the older images by kernel version (Esc goes back),
+- Boot Loader Specification entries,
+- other systems on the partition: Windows Boot Manager, and for every other vendor folder in `EFI` its shim, or its GRUB or systemd-boot when there's no shim,
+- Firmware settings, when the firmware can be asked to open its own settings at the next start.
+
+A loader that turns out to be SushiBoot itself, such as Fedora's `grubx64.efi` once Luft has taken GRUB's place, is left out, so no entry starts the menu again.
+
+Entries have the identifiers systemd-boot uses: an image's file name, with `@` and the profile's ID for multi-profile images, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`. `default` in `loader.conf` takes patterns such as `luft-*`, which matches the newest image. SushiBoot reports itself, its entries and the one it started through the Boot Loader Interface variables, and honors `LoaderEntryDefault` and `LoaderEntryOneShot`, so `bootctl status` and `bootctl list` show what started, and `bootctl set-oneshot ID` chooses the next start.
+
+With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so shim can start it, and shim then checks everything SushiBoot starts against the same keys. SushiBoot has no command line editor, and with Secure Boot on it passes nothing but a profile number to what it starts: entries that start a kernel directly are left out, since no signature covers their command line or initramfs, and the options of other entries are dropped. On Luft, `trustctl startup install` signs it with the computer's own Luft key; see `security/README.md` for the whole startup.
+
+`sushi-bootctl` installs SushiBoot unsigned on a computer without Secure Boot:
 
 ```bash
 sudo sushi-bootctl install --esp /boot/efi --efi-entry
 ```
-
-Unified kernel images in `EFI/Linux` are listed by the system name and kernel version inside them, newest first, and `default` in `loader.conf` accepts patterns such as `luft-*`, which picks the newest match.
-
-With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so it can be started by shim, which then checks everything SushiBoot starts against the same keys. On Luft, `trustctl startup install` signs it with the computer's own Luft key and adds a boot entry that starts it through Fedora's shim (see `security/README.md`). On a computer that boots through shim and GRUB, the splash works without SushiBoot.
 
 ## Development
 

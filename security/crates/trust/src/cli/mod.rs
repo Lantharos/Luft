@@ -83,6 +83,20 @@ enum StartupAction {
     Remove {
         version: String,
     },
+    /// Rebuild the initramfs and signed images after changing what goes into them
+    Rebuild,
+    /// Show or change the kernel command line inside the signed images
+    Arguments {
+        /// Arguments to add, such as quiet or loglevel=3
+        #[arg(long, value_name = "ARGUMENTS")]
+        add: Vec<String>,
+        /// Arguments to take out, by name, such as loglevel
+        #[arg(long, value_name = "NAMES")]
+        remove: Vec<String>,
+        /// Start with the changed command line at the next restart only
+        #[arg(long)]
+        once: bool,
+    },
 }
 
 #[derive(Subcommand)]
@@ -162,6 +176,22 @@ fn startup(action: StartupAction) -> Result<()> {
             startup::add(&Kernel::named(&version), initrd.as_deref())
         }
         StartupAction::Remove { version } => startup::remove(&version),
+        StartupAction::Rebuild => startup::rebuild_boot_files(),
+        StartupAction::Arguments { add, remove, once } => {
+            let words = |values: Vec<String>| -> Vec<String> {
+                values
+                    .iter()
+                    .flat_map(|value| value.split_whitespace().map(str::to_owned))
+                    .collect()
+            };
+            let changing = !add.is_empty() || !remove.is_empty();
+            let line = startup::arguments(&words(add), &words(remove), once)?;
+            println!("{line}");
+            if changing && once {
+                println!("The next restart starts with this command line once.");
+            }
+            Ok(())
+        }
     }
 }
 

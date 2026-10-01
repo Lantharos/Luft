@@ -1,13 +1,14 @@
 [Unit]
-Description=@description@
+Description=Kestrel settings
 CollectMode=inactive-or-failed
-PartOf=@target@
-After=kestrel.service
+PartOf=kestrel-session.target
+Before=kestrel.service
 
 [Service]
 Slice=session.slice
 Type=dbus
-ExecStart=@binary@
-BusName=@busname@
+BusName=com.lantharos.Settings
+Environment=GIO_USE_VFS=local
+ExecStart=@libexecdir@/kestrel-settings
 Restart=on-failure
 TimeoutStopSec=5

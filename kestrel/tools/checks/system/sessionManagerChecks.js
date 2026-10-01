@@ -47,6 +47,16 @@ export async function checkSessionManager({pause, pointer}) {
   await pause(600);
   require(!await inhibited() && events.includes('InhibitorRemoved') && events.includes('ClientRemoved'), 'apps that quit release the session');
 
+  const player = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_SESSION_CLIENT_SCRIPT'), '--screensaver'], Gio.SubprocessFlags.NONE);
+  try {
+    await pause(1200);
+    require(await inhibited(), 'apps using the freedesktop screen saver interface keep the session awake');
+  } finally {
+    player.force_exit();
+  }
+  await pause(600);
+  require(!await inhibited(), 'the screen saver request ends with the app');
+
   await call(MANAGER_PATH, MANAGER, 'Logout', new GLib.Variant('(u)', [0]), null);
   await pause(600);
   require(Main.modalCount > 0, 'logging out asks for confirmation');

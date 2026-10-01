@@ -36,6 +36,10 @@ declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
   export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
 }
 
+declare module 'resource:///org/gnome/shell/misc/util.js' {
+  export function spawnCommandLine(commandLine: string): void;
+}
+
 declare module 'resource:///org/gnome/shell/ui/headerLayout.js' {
   import Clutter from 'gi://Clutter';
   export class HeaderLayout extends Clutter.BoxLayout {

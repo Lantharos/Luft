@@ -48,6 +48,7 @@ export const DIM_TIME = 500;
 export const UNDIM_TIME = 250;
 
 const ONE_SECOND = 1000; // in ms
+const X11_SETTINGS_TIMEOUT_MS = 10000;
 
 const MIN_NUM_WORKSPACES = 1;
 const MAX_NUM_WORKSPACES = 10;
@@ -803,13 +804,11 @@ export class WindowManager {
         global.display.connect('init-xserver', (display, task) => {
             IBusManager.getIBusManager().restartDaemon(['--xim']);
 
-            this._startX11Services(task);
+            this._shareSettingsWithX11(task);
 
             return true;
         });
         global.display.connect('x11-display-closing', () => {
-            this._stopX11Services(null);
-
             IBusManager.getIBusManager().restartDaemon();
         });
 
@@ -852,26 +851,16 @@ export class WindowManager {
         });
     }
 
-    async _startX11Services(task) {
-        let status = true;
+    async _shareSettingsWithX11(task) {
         try {
-            await Shell.util_start_systemd_unit('kestrel-x11-services.target', 'fail', null);
+            await Gio.DBus.session.call('com.lantharos.Settings', '/com/lantharos/Settings',
+                'com.lantharos.Settings.Xwayland', 'Start',
+                new GLib.Variant('(ss)', [GLib.getenv('GNOME_SETUP_DISPLAY'), GLib.getenv('XAUTHORITY')]),
+                null, Gio.DBusCallFlags.NO_AUTO_START, X11_SETTINGS_TIMEOUT_MS, null);
         } catch (e) {
-            if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_SUPPORTED)) {
-                log(`Error starting X11 services: ${e.message}`);
-                status = false;
-            }
+            log(`X11 apps start without the desktop settings: ${e.message}`);
         } finally {
-            task.return_boolean(status);
-        }
-    }
-
-    async _stopX11Services(cancellable) {
-        try {
-            await Shell.util_stop_systemd_unit('kestrel-x11-services.target', 'fail', cancellable);
-        } catch (e) {
-            if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_SUPPORTED))
-                log(`Error stopping X11 services: ${e.message}`);
+            task.return_boolean(true);
         }
     }
 

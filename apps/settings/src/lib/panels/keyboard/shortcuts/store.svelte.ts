@@ -3,9 +3,9 @@ import { SettingsGroup, schemaInstalled } from '$lib/state/gsettings.svelte';
 import { appNames, resetSetting, shortcutEntries, writeSetting, type Category, type ShortcutEntry } from '../api';
 import { canonical, sameAccelerators } from './accelerator';
 
-const MEDIA_KEYS = 'org.gnome.settings-daemon.plugins.media-keys';
-const CUSTOM_SCHEMA = `${MEDIA_KEYS}.custom-keybinding`;
-const CUSTOM_ROOT = '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/';
+const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
+const CUSTOM_SCHEMA = 'com.lantharos.kestrel.custom-keybinding';
+const CUSTOM_ROOT = '/com/lantharos/kestrel/media-keys/custom-keybindings/';
 const CUSTOM_KEYS = ['name', 'command', 'binding'] as const;
 const KESTREL = 'com.lantharos.kestrel';
 

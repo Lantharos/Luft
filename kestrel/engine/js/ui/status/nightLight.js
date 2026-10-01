@@ -27,9 +27,9 @@ class NightLightToggle extends QuickToggle {
             GObject.BindingFlags.SYNC_CREATE);
 
         this._settings = new Gio.Settings({
-            schema_id: 'org.gnome.settings-daemon.plugins.color',
+            schema_id: 'com.lantharos.kestrel.night-light',
         });
-        this._settings.bind('night-light-enabled',
+        this._settings.bind('enabled',
             this, 'checked',
             Gio.SettingsBindFlags.DEFAULT);
     }

@@ -10,6 +10,7 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {checkFolders} from './checks/desktop/folderChecks.js';
 import {checkSession} from './checks/desktop/sessionChecks.js';
 import {checkClipboardPlacement} from './checks/input/clipboardChecks.js';
+import {checkClipboardImages} from './checks/input/clipboardImageChecks.js';
 import {checkEmoji} from './checks/input/emojiChecks.js';
 import {checkTray} from './checks/desktop/trayChecks.js';
 import {checkTaskView} from './checks/desktop/taskViewChecks.js';
@@ -19,12 +20,15 @@ import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
 import {checkInputSources} from './checks/input/inputSourceChecks.js';
+import {checkMediaKeys} from './checks/input/mediaKeyChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
 import {checkPortal} from './checks/system/portalChecks.js';
 import {checkAppearance} from './checks/system/appearanceChecks.js';
 import {checkCursor} from './checks/system/cursorChecks.js';
+import {checkNightLight} from './checks/system/nightLightChecks.js';
+import {checkPower} from './checks/system/powerChecks.js';
 import {checkAppIcons} from './checks/system/appIconChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
@@ -318,6 +322,7 @@ export async function run() {
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
   await checkClipboardPlacement({pause, capture, actorNamed, keyboard, output});
+  await checkClipboardImages({pause, capture, actorNamed, keyboard, output});
   await checkEmoji({pause, capture, actorNamed, keyboard, output});
   await checkFolders({pause, capture, actorNamed, pointer, output});
   await checkTray({pause, capture, actorNamed, pointer, output});
@@ -328,11 +333,14 @@ export async function run() {
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
+  await checkMediaKeys({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSessionManager({pause, pointer});
   await checkPortal({pause});
   await checkAppearance({pause, capture, output});
   await checkCursor({pause, pointer});
+  await checkNightLight({pause});
+  await checkPower({pause, pointer});
   await checkAppIcons({pause, capture, actorNamed, output});
   await checkLiveWallpaper({pause, actorNamed});
 

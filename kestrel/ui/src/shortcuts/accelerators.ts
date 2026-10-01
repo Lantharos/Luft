@@ -1,12 +1,15 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
+const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
+const CUSTOM_KEYBINDINGS = 'custom-keybindings';
+const CUSTOM_KEYBINDING = 'com.lantharos.kestrel.custom-keybinding';
 const KEYBINDING_SCHEMAS = [
   'org.gnome.desktop.wm.keybindings',
   'com.lantharos.kestrel.keybindings',
   'org.gnome.mutter.keybindings',
   'org.gnome.mutter.wayland.keybindings',
-  'org.gnome.settings-daemon.plugins.media-keys',
+  MEDIA_KEYS,
 ];
 const MODIFIERS: Record<string, string> = {
   ctrl: 'ctrl', control: 'ctrl', primary: 'ctrl', shift: 'shift', alt: 'alt', mod1: 'alt',
@@ -47,9 +50,13 @@ export function reservedAccelerators(): Set<string> {
     if (!schema) continue;
     const settings = new Gio.Settings({ settings_schema: schema });
     for (const key of schema.list_keys()) {
-      if (schema.get_key(key).get_value_type().dup_string() !== 'as') continue;
+      if (key === CUSTOM_KEYBINDINGS || schema.get_key(key).get_value_type().dup_string() !== 'as') continue;
       for (const accelerator of settings.get_strv(key)) if (accelerator) reserved.add(canonical(accelerator));
     }
+  }
+  for (const path of new Gio.Settings({ schema_id: MEDIA_KEYS }).get_strv(CUSTOM_KEYBINDINGS)) {
+    const accelerator = new Gio.Settings({ schema_id: CUSTOM_KEYBINDING, path }).get_string('binding');
+    if (accelerator) reserved.add(canonical(accelerator));
   }
   return reserved;
 }

@@ -42,25 +42,6 @@ function installTheme() {
   };
 }
 
-function unitValue(unit, group, key) {
-  const file = new GLib.KeyFile();
-  file.load_from_file(`${GLib.getenv('GNOME_SHELL_DATADIR')}/session/${unit}`, GLib.KeyFileFlags.NONE);
-  return file.get_string(group, key);
-}
-
-function startX11Services() {
-  return unitValue('kestrel-x11-services.target', 'Unit', 'Wants').split(' ').map(service => ({
-    process: Gio.Subprocess.new(GLib.shell_parse_argv(unitValue(service, 'Service', 'ExecStart'))[1], Gio.SubprocessFlags.NONE),
-    busName: unitValue(service, 'Service', 'BusName'),
-  }));
-}
-
-function nameOwned(name) {
-  const [owned] = Gio.DBus.session.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
-    new GLib.Variant('(s)', [name]), new GLib.VariantType('(b)'), Gio.DBusCallFlags.NONE, -1, null).deep_unpack();
-  return owned;
-}
-
 async function xResources() {
   const [output] = await Gio.Subprocess.new(['xrdb', '-query'], Gio.SubprocessFlags.STDOUT_PIPE).communicate_utf8_async(null, null);
   return Object.fromEntries(output.split('\n').filter(Boolean).map(line => line.split(':\t')));
@@ -76,10 +57,10 @@ async function waitForState(lines, wanted) {
     for (;;) {
       const [line] = await lines.read_line_async(GLib.PRIORITY_DEFAULT, cancellable);
       const state = JSON.parse(new TextDecoder().decode(line));
-      if (state.theme === wanted.theme && state.size === wanted.size) return true;
+      if (state.theme === wanted.theme && state.size === wanted.size) return state;
     }
   } catch (error) {
-    if (error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) return false;
+    if (error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) return null;
     throw error;
   } finally {
     if (!cancellable.is_cancelled()) GLib.source_remove(timer);
@@ -100,7 +81,6 @@ export async function checkCursor({pause, pointer}) {
   const tracker = global.backend.get_cursor_tracker();
   const spriteSize = () => tracker.get_sprite()?.get_width();
   const removeTheme = installTheme();
-  const services = [];
   let client = null;
   try {
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), 20, 20);
@@ -111,13 +91,11 @@ export async function checkCursor({pause, pointer}) {
     await pause(300);
     require(spriteSize() === 48, 'the pointer takes the chosen size');
 
-    services.push(...startX11Services());
-    for (let attempt = 0; attempt < 50 && !services.every(({busName}) => nameOwned(busName)); attempt++) await pause(100);
-    require(services.every(({busName}) => nameOwned(busName)), 'the services for X11 apps start from the session units');
-
     client = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_X11_CURSOR_SCRIPT')], Gio.SubprocessFlags.STDOUT_PIPE);
     const lines = new Gio.DataInputStream({base_stream: client.get_stdout_pipe()});
-    require(await waitForState(lines, {theme: THEME, size: 48}), 'X11 apps start with the same theme and size');
+    const started = await waitForState(lines, {theme: THEME, size: 48});
+    require(started, 'X11 apps start with the same theme and size');
+    require(started.imModule === 'ibus', 'X11 apps type through IBus');
     let resources = await xResources();
     require(resources['Xcursor.theme'] === THEME && resources['Xcursor.size'] === '48', 'X resources carry the theme and size for apps without X settings');
 
@@ -128,7 +106,6 @@ export async function checkCursor({pause, pointer}) {
     require(resources['Xcursor.theme'] === 'Adwaita' && resources['Xcursor.size'] === '32', 'X resources follow a new theme and size');
   } finally {
     client?.force_exit();
-    for (const {process} of services) process.force_exit();
     choose(saved);
     removeTheme();
     await pause(300);

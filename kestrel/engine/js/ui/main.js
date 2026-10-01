@@ -272,6 +272,11 @@ async function _initializeUI() {
         createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
         registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
         inputMethod,
+        keybindings: {
+            add: (name, settings, flags, modes, handler) => wm.addKeybinding(name, settings, flags, modes, handler),
+            allow: (name, modes) => wm.allowKeybinding(name, modes),
+        },
+        showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
     });
 
     new PointerA11yTimeout.PointerA11yTimeout();

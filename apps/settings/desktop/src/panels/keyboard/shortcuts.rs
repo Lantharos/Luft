@@ -9,7 +9,7 @@ const SCHEMAS: [&str; 5] = [
     "com.lantharos.kestrel.keybindings",
     "org.gnome.mutter.keybindings",
     "org.gnome.mutter.wayland.keybindings",
-    "org.gnome.settings-daemon.plugins.media-keys",
+    "com.lantharos.kestrel.media-keys",
 ];
 const KESTREL: &str = "com.lantharos.kestrel.keybindings";
 const DESCRIPTIONS: &str = "gnome-control-center/keybindings";

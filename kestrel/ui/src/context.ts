@@ -1,5 +1,7 @@
 import type Clutter from 'gi://Clutter';
+import type Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
+import type Shell from 'gi://Shell';
 import type Mtk from 'gi://Mtk';
 import type St from 'gi://St';
 
@@ -31,6 +33,11 @@ interface LayoutManager {
   disconnect(id: number): void;
 }
 
+export interface Keybindings {
+  add(name: string, settings: Gio.Settings, flags: Meta.KeyBindingFlags, modes: Shell.ActionMode, handler: () => void): void;
+  allow(name: string, modes: Shell.ActionMode): void;
+}
+
 export interface Context {
   layoutManager: LayoutManager;
   messageTray: MessageTray;
@@ -45,4 +52,6 @@ export interface Context {
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
   registerPanel(actor: St.Widget): void;
   inputMethod: TextInput;
+  keybindings: Keybindings;
+  showOsd(icon: Gio.Icon, label: string | null, level: number | null, maxLevel: number): void;
 }

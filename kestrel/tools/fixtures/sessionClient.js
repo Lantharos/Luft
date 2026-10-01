@@ -15,6 +15,11 @@ function call(path, iface, method, parameters, replyType) {
 if (ARGV.includes('--inhibit'))
   call(MANAGER_PATH, MANAGER, 'Inhibit', new GLib.Variant('(susu)', ['org.gnome.Showtime', 0, 'Playing a video', IDLE]), '(u)');
 
+if (ARGV.includes('--screensaver')) {
+  Gio.DBus.session.call_sync('org.freedesktop.ScreenSaver', '/org/freedesktop/ScreenSaver', 'org.freedesktop.ScreenSaver', 'Inhibit',
+    new GLib.Variant('(ss)', ['firefox', 'Playing a video']), new GLib.VariantType('(u)'), Gio.DBusCallFlags.NONE, -1, null);
+}
+
 if (ARGV.includes('--register')) {
   const [client] = call(MANAGER_PATH, MANAGER, 'RegisterClient', new GLib.Variant('(ss)', ['org.gnome.TextEditor', '']), '(o)').deep_unpack();
   Gio.DBus.session.signal_subscribe(MANAGER, `${MANAGER}.ClientPrivate`, null, client, null, Gio.DBusSignalFlags.NONE,

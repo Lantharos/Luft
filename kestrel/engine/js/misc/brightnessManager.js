@@ -15,7 +15,7 @@ import {
 } from './brightnessScales.js';
 
 const KEYBINDING_SCHEMA = 'com.lantharos.kestrel.keybindings';
-const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
+const POWER_SCHEMA = 'com.lantharos.kestrel.power';
 
 class MonitorId {
     constructor(options) {
@@ -82,8 +82,6 @@ export const BrightnessManager = GObject.registerClass({
         this._globalScale = null;
         this._monitorScales = new Map();
 
-        // This is still being used in the power plugin for the keyboard backlight
-        // so we just use that setting here
         const powerSettings = new Gio.Settings({schema_id: POWER_SCHEMA});
         this._dimmingTarget = powerSettings.get_int('idle-brightness') / 100;
         this._dimmingEnabled = false;

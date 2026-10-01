@@ -51,12 +51,12 @@ export class ActionTiles {
       handlers.close();
       openSettings();
     });
-    showShortcut(settings, 'org.gnome.settings-daemon.plugins.media-keys', 'control-center', this.settings);
+    showShortcut(settings, 'com.lantharos.kestrel.media-keys', 'control-center', this.settings);
     const lock = actionTile(LOCK.icon, 'Lock', () => {
       handlers.close();
       LOCK.run();
     });
-    showShortcut(lock, 'org.gnome.settings-daemon.plugins.media-keys', 'screensaver', this.settings);
+    showShortcut(lock, 'com.lantharos.kestrel.media-keys', 'screensaver', this.settings);
     bindAvailability(LOCK, lock.actor);
     const battery = actionTile('battery-missing-symbolic', 'Battery', () => handlers.openSettings('power'));
     battery.actor.visible = false;

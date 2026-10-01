@@ -32,7 +32,7 @@
 	};
 
 	const session = useSettings<{ 'idle-delay': number }>('org.gnome.desktop.session', ['idle-delay']);
-	const power = useSettings<Power>('org.gnome.settings-daemon.plugins.power', [
+	const power = useSettings<Power>('com.lantharos.kestrel.power', [
 		'idle-dim',
 		'sleep-inactive-ac-type',
 		'sleep-inactive-ac-timeout',

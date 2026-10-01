@@ -2684,7 +2684,6 @@ export class ScreenshotService {
 
         this._screenShooter = new Map();
         this._senderChecker = new DBusSenderChecker([
-            'org.gnome.SettingsDaemon.MediaKeys',
             'org.freedesktop.impl.portal.desktop.kestrel',
             'org.freedesktop.impl.portal.desktop.gnome',
         ]);

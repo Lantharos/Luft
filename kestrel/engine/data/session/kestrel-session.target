@@ -7,4 +7,4 @@ After=graphical-session-pre.target
 Requires=kestrel-session-manager.service
 BindsTo=kestrel.service
 After=kestrel.service
-Wants=org.freedesktop.IBus.session.generic.service @services@
+Wants=org.freedesktop.IBus.session.generic.service kestrel-settings.service

@@ -1,0 +1,20 @@
+[package]
+name = "kestrel-settings"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
+gio = "0.22.10"
+glib = { version = "0.22.10", features = ["v2_68"] }
+pulseaudio = "0.3.1"
+rustix = { version = "1.1.5", features = ["fs", "process"] }
+tokio = { version = "1.53.1", default-features = false, features = ["rt", "macros", "time", "sync", "signal", "net", "io-util", "process"] }
+tzf-rs = { version = "2.1.2", default-features = false, features = ["bundled"] }
+x11rb = "0.14.0"
+zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

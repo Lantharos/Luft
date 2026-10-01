@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KeyListEntries schema="com.lantharos.kestrel.media-keys"
+                group="sound-media"
+                name="Sound and Media"
+                wm_name="GNOME Shell"
+                package="gnome-shell">
+
+	<KeyListEntry name="volume-mute"
+                      description="Mute or unmute the sound"/>
+
+	<KeyListEntry name="volume-down"
+                      description="Turn the volume down"/>
+
+	<KeyListEntry name="volume-up"
+                      description="Turn the volume up"/>
+
+	<KeyListEntry name="volume-mute-quiet"
+                      hidden="true"
+                      description="Mute or unmute without a sound"/>
+
+	<KeyListEntry name="volume-down-quiet"
+                      hidden="true"
+                      description="Turn the volume down without a sound"/>
+
+	<KeyListEntry name="volume-up-quiet"
+                      hidden="true"
+                      description="Turn the volume up without a sound"/>
+
+	<KeyListEntry name="volume-down-precise"
+                      hidden="true"
+                      description="Turn the volume down a little"/>
+
+	<KeyListEntry name="volume-up-precise"
+                      hidden="true"
+                      description="Turn the volume up a little"/>
+
+	<KeyListEntry name="mic-mute"
+                      description="Mute or unmute the microphone"/>
+
+	<KeyListEntry name="play"
+                      description="Play or pause"/>
+
+	<KeyListEntry name="pause"
+                      description="Pause playback"/>
+
+	<KeyListEntry name="stop"
+                      description="Stop playback"/>
+
+	<KeyListEntry name="previous"
+                      description="Previous track"/>
+
+	<KeyListEntry name="next"
+                      description="Next track"/>
+
+	<KeyListEntry name="playback-rewind"
+                      description="Skip back in the track"/>
+
+	<KeyListEntry name="playback-forward"
+                      description="Skip ahead in the track"/>
+
+	<KeyListEntry name="playback-repeat"
+                      description="Repeat the playlist or not"/>
+
+	<KeyListEntry name="playback-random"
+                      description="Shuffle or not"/>
+
+	<KeyListEntry name="eject"
+                      description="Eject the disc"/>
+
+</KeyListEntries>

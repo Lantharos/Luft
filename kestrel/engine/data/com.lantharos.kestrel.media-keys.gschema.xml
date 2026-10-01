@@ -1,0 +1,228 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.media-keys" path="/com/lantharos/kestrel/media-keys/">
+    <key name="volume-mute" type="as">
+      <default>['XF86AudioMute']</default>
+      <summary>Mute or unmute the sound</summary>
+    </key>
+    <key name="volume-down" type="as">
+      <default>['XF86AudioLowerVolume', '&lt;Ctrl&gt;XF86AudioLowerVolume']</default>
+      <summary>Turn the volume down</summary>
+    </key>
+    <key name="volume-up" type="as">
+      <default>['XF86AudioRaiseVolume', '&lt;Ctrl&gt;XF86AudioRaiseVolume']</default>
+      <summary>Turn the volume up</summary>
+    </key>
+    <key name="volume-mute-quiet" type="as">
+      <default>['&lt;Alt&gt;XF86AudioMute']</default>
+      <summary>Mute or unmute without a sound</summary>
+    </key>
+    <key name="volume-down-quiet" type="as">
+      <default>['&lt;Alt&gt;XF86AudioLowerVolume', '&lt;Alt&gt;&lt;Ctrl&gt;XF86AudioLowerVolume']</default>
+      <summary>Turn the volume down without a sound</summary>
+    </key>
+    <key name="volume-up-quiet" type="as">
+      <default>['&lt;Alt&gt;XF86AudioRaiseVolume', '&lt;Alt&gt;&lt;Ctrl&gt;XF86AudioRaiseVolume']</default>
+      <summary>Turn the volume up without a sound</summary>
+    </key>
+    <key name="volume-down-precise" type="as">
+      <default>['&lt;Shift&gt;XF86AudioLowerVolume', '&lt;Ctrl&gt;&lt;Shift&gt;XF86AudioLowerVolume']</default>
+      <summary>Turn the volume down a little</summary>
+    </key>
+    <key name="volume-up-precise" type="as">
+      <default>['&lt;Shift&gt;XF86AudioRaiseVolume', '&lt;Ctrl&gt;&lt;Shift&gt;XF86AudioRaiseVolume']</default>
+      <summary>Turn the volume up a little</summary>
+    </key>
+    <key name="mic-mute" type="as">
+      <default>['XF86AudioMicMute']</default>
+      <summary>Mute or unmute the microphone</summary>
+    </key>
+    <key name="play" type="as">
+      <default>['XF86AudioPlay', '&lt;Ctrl&gt;XF86AudioPlay']</default>
+      <summary>Play or pause</summary>
+    </key>
+    <key name="pause" type="as">
+      <default>['XF86AudioPause']</default>
+      <summary>Pause playback</summary>
+    </key>
+    <key name="stop" type="as">
+      <default>['XF86AudioStop']</default>
+      <summary>Stop playback</summary>
+    </key>
+    <key name="previous" type="as">
+      <default>['XF86AudioPrev', '&lt;Ctrl&gt;XF86AudioPrev']</default>
+      <summary>Previous track</summary>
+    </key>
+    <key name="next" type="as">
+      <default>['XF86AudioNext', '&lt;Ctrl&gt;XF86AudioNext']</default>
+      <summary>Next track</summary>
+    </key>
+    <key name="playback-rewind" type="as">
+      <default>['XF86AudioRewind']</default>
+      <summary>Skip back in the track</summary>
+    </key>
+    <key name="playback-forward" type="as">
+      <default>['XF86AudioForward']</default>
+      <summary>Skip ahead in the track</summary>
+    </key>
+    <key name="playback-repeat" type="as">
+      <default>['XF86AudioRepeat']</default>
+      <summary>Repeat the playlist or not</summary>
+    </key>
+    <key name="playback-random" type="as">
+      <default>['XF86AudioRandomPlay']</default>
+      <summary>Shuffle or not</summary>
+    </key>
+    <key name="keyboard-brightness-up" type="as">
+      <default>['XF86KbdBrightnessUp']</default>
+      <summary>Brighten the keyboard</summary>
+    </key>
+    <key name="keyboard-brightness-down" type="as">
+      <default>['XF86KbdBrightnessDown']</default>
+      <summary>Dim the keyboard</summary>
+    </key>
+    <key name="keyboard-brightness-toggle" type="as">
+      <default>['XF86KbdLightOnOff']</default>
+      <summary>Turn the keyboard light on or off</summary>
+    </key>
+    <key name="touchpad-toggle" type="as">
+      <default>['XF86TouchpadToggle', '&lt;Ctrl&gt;&lt;Super&gt;XF86TouchpadToggle']</default>
+      <summary>Turn the touchpad on or off</summary>
+    </key>
+    <key name="touchpad-on" type="as">
+      <default>['XF86TouchpadOn']</default>
+      <summary>Turn the touchpad on</summary>
+    </key>
+    <key name="touchpad-off" type="as">
+      <default>['XF86TouchpadOff']</default>
+      <summary>Turn the touchpad off</summary>
+    </key>
+    <key name="rotate-video-lock" type="as">
+      <default>['&lt;Super&gt;o', 'XF86RotationLockToggle']</default>
+      <summary>Lock or unlock the screen rotation</summary>
+    </key>
+    <key name="battery-status" type="as">
+      <default>['XF86Battery']</default>
+      <summary>Show the battery level</summary>
+    </key>
+    <key name="rfkill" type="as">
+      <default>['XF86WLAN', 'XF86UWB', 'XF86RFKill']</default>
+      <summary>Turn airplane mode on or off</summary>
+    </key>
+    <key name="rfkill-bluetooth" type="as">
+      <default>['XF86Bluetooth']</default>
+      <summary>Turn Bluetooth on or off</summary>
+    </key>
+    <key name="eject" type="as">
+      <default>['XF86Eject']</default>
+      <summary>Eject the disc</summary>
+    </key>
+    <key name="www" type="as">
+      <default>['XF86WWW']</default>
+      <summary>Open the web browser</summary>
+    </key>
+    <key name="email" type="as">
+      <default>['XF86Mail']</default>
+      <summary>Open the email app</summary>
+    </key>
+    <key name="calculator" type="as">
+      <default>['XF86Calculator']</default>
+      <summary>Open the calculator</summary>
+    </key>
+    <key name="media" type="as">
+      <default>['XF86AudioMedia']</default>
+      <summary>Open the music player</summary>
+    </key>
+    <key name="home" type="as">
+      <default>['XF86Explorer']</default>
+      <summary>Open the home folder</summary>
+    </key>
+    <key name="search" type="as">
+      <default>['XF86Search']</default>
+      <summary>Search</summary>
+    </key>
+    <key name="control-center" type="as">
+      <default>['XF86Tools']</default>
+      <summary>Open Settings</summary>
+    </key>
+    <key name="screensaver" type="as">
+      <default>['&lt;Super&gt;l', 'XF86ScreenSaver']</default>
+      <summary>Lock the screen</summary>
+    </key>
+    <key name="logout" type="as">
+      <default>['&lt;Control&gt;&lt;Alt&gt;Delete']</default>
+      <summary>Log out</summary>
+    </key>
+    <key name="reboot" type="as">
+      <default>@as []</default>
+      <summary>Restart</summary>
+    </key>
+    <key name="shutdown" type="as">
+      <default>@as []</default>
+      <summary>Power off</summary>
+    </key>
+    <key name="power" type="as">
+      <default>['XF86PowerOff']</default>
+      <summary>Power button</summary>
+    </key>
+    <key name="suspend" type="as">
+      <default>['XF86Sleep']</default>
+      <summary>Suspend button</summary>
+    </key>
+    <key name="hibernate" type="as">
+      <default>['XF86Suspend', 'XF86Hibernate']</default>
+      <summary>Hibernate button</summary>
+    </key>
+    <key name="magnifier" type="as">
+      <default>['&lt;Alt&gt;&lt;Super&gt;8']</default>
+      <summary>Turn the magnifier on or off</summary>
+    </key>
+    <key name="screenreader" type="as">
+      <default>['&lt;Alt&gt;&lt;Super&gt;s']</default>
+      <summary>Turn the screen reader on or off</summary>
+    </key>
+    <key name="on-screen-keyboard" type="as">
+      <default>@as []</default>
+      <summary>Show or hide the on-screen keyboard</summary>
+    </key>
+    <key name="increase-text-size" type="as">
+      <default>@as []</default>
+      <summary>Make text larger</summary>
+    </key>
+    <key name="decrease-text-size" type="as">
+      <default>@as []</default>
+      <summary>Make text smaller</summary>
+    </key>
+    <key name="toggle-contrast" type="as">
+      <default>@as []</default>
+      <summary>Turn high contrast on or off</summary>
+    </key>
+    <key name="magnifier-zoom-in" type="as">
+      <default>['&lt;Alt&gt;&lt;Super&gt;equal']</default>
+      <summary>Zoom the magnifier in</summary>
+    </key>
+    <key name="magnifier-zoom-out" type="as">
+      <default>['&lt;Alt&gt;&lt;Super&gt;minus']</default>
+      <summary>Zoom the magnifier out</summary>
+    </key>
+    <key name="custom-keybindings" type="as">
+      <default>[]</default>
+      <summary>Paths of your own shortcuts</summary>
+      <description>Each path holds a com.lantharos.kestrel.custom-keybinding with a name, a command and a binding.</description>
+    </key>
+  </schema>
+
+  <schema id="com.lantharos.kestrel.custom-keybinding">
+    <key name="name" type="s">
+      <default>''</default>
+      <summary>Name of the shortcut</summary>
+    </key>
+    <key name="command" type="s">
+      <default>''</default>
+      <summary>Command the shortcut runs</summary>
+    </key>
+    <key name="binding" type="s">
+      <default>''</default>
+      <summary>Keys that run the shortcut</summary>
+    </key>
+  </schema>
+</schemalist>

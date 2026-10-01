@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KeyListEntries schema="com.lantharos.kestrel.media-keys"
+                group="launchers"
+                name="Launchers"
+                wm_name="GNOME Shell"
+                package="gnome-shell">
+
+	<KeyListEntry name="www"
+                      description="Open the web browser"/>
+
+	<KeyListEntry name="email"
+                      description="Open the email app"/>
+
+	<KeyListEntry name="calculator"
+                      description="Open the calculator"/>
+
+	<KeyListEntry name="media"
+                      description="Open the music player"/>
+
+	<KeyListEntry name="home"
+                      description="Open the home folder"/>
+
+	<KeyListEntry name="search"
+                      description="Search"/>
+
+	<KeyListEntry name="control-center"
+                      description="Open Settings"/>
+
+</KeyListEntries>

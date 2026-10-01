@@ -1,5 +1,0 @@
-[Unit]
-Description=Kestrel services for X11 apps
-PartOf=kestrel-session.target
-After=kestrel.service
-Wants=@services@

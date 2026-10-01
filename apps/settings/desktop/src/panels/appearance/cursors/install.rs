@@ -145,7 +145,7 @@ mod tests {
             &icons.join("hicolor/index.theme"),
             "[Icon Theme]\nName=Hicolor\nDirectories=48x48/apps\n",
         );
-        let user = UserThemes::at(icons.clone(), scratch.path().join("record.json"), Vec::new());
+        let user = UserThemes::at(icons.clone(), Vec::new());
         let archive_path = scratch.path().join("download.tar");
         archive_of(
             &[
@@ -176,5 +176,30 @@ mod tests {
         assert!(app_icon.is_file());
         user.remove("hicolor-2").unwrap();
         assert!(!icons.join("hicolor-2").exists());
+    }
+
+    #[test]
+    fn only_folders_holding_nothing_but_cursors_can_be_removed() {
+        let scratch = tempfile::tempdir().unwrap();
+        let icons = scratch.path().join("icons");
+        write(&icons.join("WhiteSur-cursors/index.theme"), "[Icon Theme]\nName=WhiteSur\n");
+        write(&icons.join("WhiteSur-cursors/cursors/left_ptr"), "Xcur");
+        let mixed_icon = icons.join("Papirus/48x48/apps/app.png");
+        write(&icons.join("Papirus/cursors/left_ptr"), "Xcur");
+        write(&mixed_icon, "png");
+        let listed_icon = icons.join("Listed/cursors/left_ptr");
+        write(&listed_icon, "Xcur");
+        write(
+            &icons.join("Listed/index.theme"),
+            "[Icon Theme]\nName=Listed\nDirectories=scalable/apps\n",
+        );
+        let user = UserThemes::at(icons.clone(), Vec::new());
+
+        assert!(user.remove("Papirus").is_err());
+        assert!(user.remove("Listed").is_err());
+        assert!(user.remove("../icons").is_err());
+        assert!(mixed_icon.is_file() && listed_icon.is_file());
+        user.remove("WhiteSur-cursors").unwrap();
+        assert!(!icons.join("WhiteSur-cursors").exists());
     }
 }

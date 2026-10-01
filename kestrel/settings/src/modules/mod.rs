@@ -7,6 +7,7 @@ mod printers;
 mod rfkill;
 mod sound;
 mod timezone;
+mod usb_protection;
 mod xsettings;
 
 use crate::context::Context;
@@ -22,11 +23,12 @@ pub enum Module {
     Rfkill,
     Sound,
     Timezone,
+    UsbProtection,
     Xsettings,
 }
 
 impl Module {
-    pub const ALL: [Self; 10] = [
+    pub const ALL: [Self; 11] = [
         Self::A11y,
         Self::Housekeeping,
         Self::Keyboard,
@@ -36,6 +38,7 @@ impl Module {
         Self::Rfkill,
         Self::Sound,
         Self::Timezone,
+        Self::UsbProtection,
         Self::Xsettings,
     ];
 
@@ -54,6 +57,7 @@ impl Module {
             Self::Rfkill => "rfkill",
             Self::Sound => "sound",
             Self::Timezone => "timezone",
+            Self::UsbProtection => "usb-protection",
             Self::Xsettings => "xsettings",
         }
     }
@@ -69,6 +73,7 @@ impl Module {
             Self::Rfkill => rfkill::start(context).await,
             Self::Sound => sound::start(context).await,
             Self::Timezone => timezone::start(context).await,
+            Self::UsbProtection => usb_protection::start(context).await,
             Self::Xsettings => xsettings::start(context).await,
         };
         if let Err(error) = started {

@@ -1,0 +1,23 @@
+[package]
+name = "schelf"
+version = "0.1.0"
+description = "Apps for Luft"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "schelf_lib"
+
+[dependencies]
+dirs = "7.0.0"
+flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
+gio = "0.22.10"
+gio-unix = "0.22.8"
+luft-app = { path = "../../../packages/app", features = ["apps"] }
+luft-software = { path = "../../../packages/software" }
+quick-xml = "0.42.0"
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.33" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.151", features = ["raw_value"] }

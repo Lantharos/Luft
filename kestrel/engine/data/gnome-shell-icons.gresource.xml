@@ -53,6 +53,7 @@
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.draft-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.magpie-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.rover-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.schelf-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.settings-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.tern-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-1password-symbolic.svg</file>

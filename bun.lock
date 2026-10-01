@@ -98,6 +98,27 @@
         "vite": "^8.3.1",
       },
     },
+    "apps/schelf": {
+      "name": "schelf",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.48.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/adapter-static": "^3.0.10",
+        "@sveltejs/kit": "^2.70.3",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.3",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.1",
+      },
+    },
     "apps/settings": {
       "name": "settings",
       "version": "0.1.0",
@@ -566,6 +587,8 @@
     "rover": ["rover@workspace:apps/rover"],
 
     "sade": ["sade@1.8.1", "", { "dependencies": { "mri": "^1.1.0" } }, "sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A=="],
+
+    "schelf": ["schelf@workspace:apps/schelf"],
 
     "set-cookie-parser": ["set-cookie-parser@3.1.2", "", {}, "sha512-5/r/lTwbJ3zQ+qwdUFZYeRNqda7P5HD8zQKqlSjdGt1/S0cjLAphHusj4Y58ahDtWn/g32xrIS58/ikOvwl0Lw=="],
 

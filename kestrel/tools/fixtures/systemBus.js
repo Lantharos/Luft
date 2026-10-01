@@ -11,8 +11,18 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Suspend"><arg type="b" direction="in"/></method>
   <method name="Hibernate"><arg type="b" direction="in"/></method>
   <method name="PowerOff"><arg type="b" direction="in"/></method>
+  <method name="GetUser"><arg type="u" direction="in"/><arg type="o" direction="out"/></method>
   <property name="LidClosed" type="b" access="read"/>
   <signal name="PrepareForSleep"><arg type="b"/></signal>
+</interface></node>`;
+const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
+  <property name="Display" type="(so)" access="read"/>
+</interface></node>`;
+const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
+  <property name="Active" type="b" access="read"/>
+</interface></node>`;
+const WATCHDOG = `<node><interface name="com.lantharos.Kestrel.Watchdog1">
+  <method name="Report"><arg type="t" direction="in"/><arg type="u" direction="in"/></method>
 </interface></node>`;
 const UPOWER = `<node><interface name="org.freedesktop.UPower">
   <property name="OnBattery" type="b" access="read"/>
@@ -62,8 +72,12 @@ publish(LOGIN, {
   Suspend: () => calls.push('Suspend'),
   Hibernate: () => calls.push('Hibernate'),
   PowerOff: () => calls.push('PowerOff'),
+  GetUser: () => '/org/freedesktop/login1/user/self',
   LidClosed: false,
 }, '/org/freedesktop/login1');
+publish(LOGIN_USER, {Display: ['c1', '/org/freedesktop/login1/session/c1']}, '/org/freedesktop/login1/user/self');
+publish(LOGIN_SESSION, {Active: true}, '/org/freedesktop/login1/session/c1');
+publish(WATCHDOG, {Report: (_stalledMs, compositor) => calls.push(`Report ${compositor}`)}, '/com/lantharos/Kestrel/Watchdog1');
 
 publish(UPOWER, {OnBattery: false}, '/org/freedesktop/UPower');
 publish(DEVICE, {WarningLevel: 1}, '/org/freedesktop/UPower/devices/DisplayDevice');
@@ -82,6 +96,6 @@ publish(CALLS, {Take: () => calls.splice(0)}, '/com/lantharos/KestrelChecks');
 publishSecurity(publish, calls);
 
 for (const name of ['org.freedesktop.login1', 'org.freedesktop.UPower', 'org.freedesktop.hostname1', 'org.freedesktop.systemd1',
-  'org.freedesktop.locale1', 'com.lantharos.KestrelChecks', ...SECURITY_NAMES])
+  'org.freedesktop.locale1', 'com.lantharos.Kestrel.Watchdog1', 'com.lantharos.KestrelChecks', ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

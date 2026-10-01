@@ -8,6 +8,7 @@ tree="$vm/tree"
 build="$vm/kestrel"
 prefix="$build/prefix"
 greeter_data="$luft/kestrel/greeter/data"
+watchdog_data="$luft/kestrel/watchdog/data"
 
 python3 "$luft/kestrel/compositor/patches.py" prepare
 if [[ ! -f "$build/compositor/build.ninja" ]]; then
@@ -30,6 +31,8 @@ cargo build --release --manifest-path "$luft/kestrel/greeter/Cargo.toml"
 install -Dm755 "$luft/kestrel/greeter/target/release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
 cargo build --release --manifest-path "$luft/kestrel/settings/Cargo.toml"
 install -Dm755 "$luft/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
+cargo build --release --manifest-path "$luft/kestrel/watchdog/Cargo.toml"
+install -Dm755 "$luft/kestrel/watchdog/target/release/kestrel-watchdog" "$prefix/libexec/kestrel-watchdog"
 
 libraries="$(find "$prefix" -type f \( -name '*.so*' -o -path '*/bin/*' -o -path '*/libexec/*' \) -exec sh -c 'file "$1" | grep -q ELF && ldd "$1"' _ {} \; 2>/dev/null |
   awk '/=> \//{print $3}' | grep -v "^$prefix" | sort -u)"
@@ -50,7 +53,15 @@ place "$greeter_data/kestrel-greeter.service" /usr/lib/systemd/system/kestrel-gr
 place "$greeter_data/com.lantharos.greeter.policy" /usr/share/polkit-1/actions/com.lantharos.greeter.policy
 place "$greeter_data/kestrel-greeter.tmpfiles" /usr/lib/tmpfiles.d/kestrel-greeter.conf
 place "$greeter_data/greetd.toml" /etc/greetd/config.toml
-printf '[Service]\nProtectHome=no\n' | install -Dm644 /dev/stdin "$stage/etc/systemd/system/kestrel-greeter.service.d/home.conf"
+place "$watchdog_data/com.lantharos.Kestrel.Watchdog1.conf" /etc/dbus-1/system.d/com.lantharos.Kestrel.Watchdog1.conf
+place "$watchdog_data/com.lantharos.Kestrel.Watchdog1.service" /usr/share/dbus-1/system-services/com.lantharos.Kestrel.Watchdog1.service
+place "$watchdog_data/kestrel-watchdog.service" /usr/lib/systemd/system/kestrel-watchdog.service
+place "$watchdog_data/kestrel-incident.service" /usr/lib/systemd/system/kestrel-incident.service
+mkdir -p "$stage/etc/systemd/system/graphical.target.wants"
+ln -sfn /usr/lib/systemd/system/kestrel-incident.service "$stage/etc/systemd/system/graphical.target.wants/kestrel-incident.service"
+for service in kestrel-greeter kestrel-watchdog; do
+  printf '[Service]\nProtectHome=no\n' | install -Dm644 /dev/stdin "$stage/etc/systemd/system/$service.service.d/home.conf"
+done
 for link in share/wayland-sessions/kestrel.desktop share/xdg-desktop-portal/kestrel-portals.conf \
   share/xdg-desktop-portal/portals/kestrel.portal lib/systemd/user/app.slice.d/50-kestrel-oomd.conf \
   $(cd "$prefix" && ls lib/systemd/user/kestrel*); do

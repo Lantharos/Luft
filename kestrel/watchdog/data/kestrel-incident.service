@@ -1,0 +1,18 @@
+[Unit]
+Description=Explain a restart after the graphics driver stopped responding
+DefaultDependencies=no
+After=local-fs.target sushi.service
+Before=display-manager.service greetd.service sushi-quit.service
+ConditionPathExistsGlob=|/var/lib/kestrel-watchdog/incidents/*.json
+ConditionPathExistsGlob=|/sys/firmware/efi/efivars/KestrelIncident-*
+
+[Service]
+Type=oneshot
+ExecStart=@libexecdir@/kestrel-watchdog boot
+StateDirectory=kestrel-watchdog
+RuntimeDirectory=kestrel-watchdog
+UMask=0022
+TimeoutStartSec=6min
+
+[Install]
+WantedBy=graphical.target

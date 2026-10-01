@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Kestrel.Watchdog1
+Exec=@libexecdir@/kestrel-watchdog
+User=root
+SystemdService=kestrel-watchdog.service

@@ -11,6 +11,7 @@ pub trait Login {
     fn suspend(&self, interactive: bool) -> zbus::Result<()>;
     fn hibernate(&self, interactive: bool) -> zbus::Result<()>;
     fn power_off(&self, interactive: bool) -> zbus::Result<()>;
+    fn get_user(&self, uid: u32) -> zbus::Result<OwnedObjectPath>;
 
     #[zbus(property)]
     fn lid_closed(&self) -> zbus::Result<bool>;

@@ -79,7 +79,7 @@ $effect(() => {
 | `TextField`, `PasswordField` | Text inputs that show an `error` below the field once it has been left, or right away with `live`; `invalid` marks the field without a message, and `touched` can be bound to show the message elsewhere. `PasswordField` adds a show and hide button and calls `onreveal` before showing the value |
 | `Dialog` | Modal with a title, optional description, body and an `actions` snippet; `wide` for longer forms, and the body scrolls when it runs out of height |
 | `IconButton` | Round icon-only button taking a Lucide icon |
-| `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists and the rows inside them |
+| `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists and the rows inside them. Titles stay on one line and end in an ellipsis when they run out of room; `truncate` does the same for a `Row`'s description, and `expanded` turns a clickable `Row` into a disclosure whose arrow points down while open |
 | `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials. Give `AppIcon` the app's desktop `id` as well as its `icon` and it follows the desktop's app icon style; `style` shows one style regardless of the setting, for previews |
 | `Popover` | Floating panel anchored to a trigger; stays inside the window, flips above when there is no room below, and scrolls when it runs out of height |
 | `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at a pointer position; it closes when the window resizes or Escape is pressed inside it, and the app decides what an outside click does |
@@ -98,7 +98,7 @@ For native video, `canPlayNatively()` says whether the window can use it and `de
 
 ## Classes
 
-`button` (with `primary`, `danger` and `large`), `plain-button`, `icon-button` (with `large`), `text-field`, `window-control`, `row-group`, `drag-region`, `soft-scroll` and `hidden-scroll` are available globally for markup that doesn't need a component.
+`button` (with `primary`, `danger` and `large`), `plain-button`, `icon-button` (with `large`), `text-field`, `window-control`, `row-group`, `drag-region`, `soft-scroll`, `hidden-scroll` and `scroll-fade` are available globally for markup that doesn't need a component. `scroll-fade` fades a vertical scroller's top edge once it has scrolled away from the top and its bottom edge while there is more below; every sidebar list uses it.
 
 The `tooltip(text)` attachment shows a small label under an element after a short hover, and right away when moving between elements that have one:
 

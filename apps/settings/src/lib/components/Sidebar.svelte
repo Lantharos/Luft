@@ -27,7 +27,7 @@
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
 	<SearchField variant="sidebar" label="Search settings" bind:value={app.query} onkeydown={openFirst} />
-	<nav class="hidden-scroll flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
 		{#each results as group, index (index)}
 			<div class="flex flex-col gap-0.5">
 				{#each group as panel (panel.id)}

@@ -18,7 +18,7 @@
 	}
 </script>
 
-<VirtualScroller bind:this={scroller} class="hidden-scroll min-h-0 flex-1" items={library.siblings} key={(item) => item.path} layout={LAYOUT}>
+<VirtualScroller bind:this={scroller} class="hidden-scroll scroll-fade min-h-0 flex-1" items={library.siblings} key={(item) => item.path} layout={LAYOUT}>
 	{#snippet children(item, index)}
 		{@const thumbnail = thumbnails.source(item)}
 		<button

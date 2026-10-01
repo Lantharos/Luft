@@ -74,7 +74,7 @@
 		<SearchField bind:this={search} variant="sidebar" label="Search current folder" bind:value={manager.searchQuery} />
 	</div>
 
-	<nav class="sidebar-scroll hidden-scroll" aria-label="Places">
+	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places">
 		<div class="sidebar-group">
 			{#if showHome}
 				<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />

@@ -43,7 +43,7 @@
 	}
 </script>
 
-<VirtualScroller bind:this={scroller} class="hidden-scroll min-h-0 flex-1" items={numbers} key={(pageNumber) => `${pageNumber}`} {layout}>
+<VirtualScroller bind:this={scroller} class="hidden-scroll scroll-fade min-h-0 flex-1" items={numbers} key={(pageNumber) => `${pageNumber}`} {layout}>
 	{#snippet children(pageNumber)}
 		<button
 			type="button"

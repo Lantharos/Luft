@@ -106,6 +106,9 @@ import * as KestrelUi from './kestrelUi.js';
 import System from 'system';
 import * as Params from '../misc/params.js';
 
+Gio._promisify(Glycin.Loader.prototype, 'load_async');
+Gio._promisify(Glycin.Image.prototype, 'next_frame_async');
+
 const DEFAULT_BACKGROUND_COLOR = new Cogl.Color({red: 0, green: 0, blue: 0, alpha: 255});
 
 const BACKGROUND_SCHEMA = 'org.gnome.desktop.background';
@@ -396,8 +399,8 @@ class BackgroundTextureCache {
             Glycin.MemoryFormatSelection.R32G32B32A32_FLOAT
         );
 
-        const image = loader.load();
-        const frame = image.next_frame();
+        const image = await loader.load_async(cancellable);
+        const frame = await image.next_frame_async(cancellable);
 
         const width = frame.get_width();
         const height = frame.get_height();

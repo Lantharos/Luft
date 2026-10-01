@@ -37,11 +37,11 @@
 			<Switch label="Connect automatically" checked={profile.autoconnect} onchange={(on) => (profile.autoconnect = on)} />
 		</Row>
 	{/if}
-	<Row title="Available to everyone" description="Anyone who signs in to this computer can use this connection">
+	<Row title="Available to everyone" description="Anyone who signs in here can use it">
 		<Switch label="Available to everyone" checked={profile.allUsers} onchange={(on) => (profile.allUsers = on)} />
 	</Row>
 	{#if physical}
-		<Row title="Metered connection" description="Apps and updates hold back on large downloads when a connection is metered">
+		<Row title="Metered connection" description="Apps and updates hold back on large downloads">
 			<Select label="Metered connection" options={METERED} value={profile.metered} onchange={(metered) => (profile.metered = metered)} />
 		</Row>
 	{/if}

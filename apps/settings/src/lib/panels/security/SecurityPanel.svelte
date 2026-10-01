@@ -2,56 +2,65 @@
 	import { onDestroy } from 'svelte';
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import { firmware } from '$lib/panels/updates/api';
-	import EncryptionSection from './encryption/EncryptionSection.svelte';
 	import UnlockDialog from './encryption/UnlockDialog.svelte';
+	import UnlockSection from './encryption/UnlockSection.svelte';
 	import { unlockPrompt } from './encryption/unlock.svelte';
+	import AccessPage from './keyring/access/AccessPage.svelte';
+	import { KeyringState } from './keyring/state.svelte';
 	import KeyringSection from './KeyringSection.svelte';
-	import OverviewSection from './overview/OverviewSection.svelte';
 	import PasskeysSection from './PasskeysSection.svelte';
-	import StartupSection from './startup/StartupSection.svelte';
+	import ProtectionsSection from './protections/ProtectionsSection.svelte';
 	import { SecurityState } from './state.svelte';
 	import { summarize } from './summary';
-	import UsbSection from './UsbSection.svelte';
 
 	const security = new SecurityState();
+	const keyring = new KeyringState();
 
-	let firmwareUpdates = $state<number | null>(null);
+	let browsingAccess = $state(false);
 
-	let summary = $derived(security.trust ? summarize(security.trust, firmwareUpdates) : null);
+	let summary = $derived(security.trust && summarize(security.trust, security.firmwareUpdates));
+	let disk = $derived(security.trust?.disk);
+	let access = $derived(keyring.current && !keyring.current.locked ? keyring.current.access : null);
+	let protections = $derived(Boolean(security.trust || security.host || security.firmwareUpdates || security.usb));
+
+	$effect(() => {
+		if (!access) browsingAccess = false;
+	});
 
 	void security.start();
-	firmware()
-		.then((devices) => (firmwareUpdates = devices.length))
-		.catch(() => (firmwareUpdates = 0));
-	onDestroy(() => security.stop());
+	void keyring.load();
+	onDestroy(() => {
+		security.stop();
+		keyring.stop();
+	});
 </script>
 
-{#if summary}
-	{@const Icon = summary.safe ? ShieldCheck : ShieldAlert}
-	<div class="flex items-center gap-4 px-2 pb-1">
-		<span class="plate" class:safe={summary.safe}><Icon size={26} strokeWidth={1.75} /></span>
-		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<span class="text-[26px] font-semibold">{summary.headline}</span>
-			<span class="text-[14px] text-[var(--text-muted)]">{summary.sentence}</span>
+{#if browsingAccess && access}
+	<AccessPage {access} refresh={keyring.load} onclose={() => (browsingAccess = false)} />
+{:else}
+	{#if summary}
+		{@const Icon = summary.safe ? ShieldCheck : ShieldAlert}
+		<div class="flex items-center gap-4 px-2 pb-1">
+			<span class="plate" class:safe={summary.safe}><Icon size={26} strokeWidth={1.75} /></span>
+			<div class="flex min-w-0 flex-1 flex-col gap-1">
+				<span class="truncate text-[26px] font-semibold">{summary.headline}</span>
+				<span class="truncate text-[14px] text-[var(--text-muted)]">{summary.sentence}</span>
+			</div>
 		</div>
-	</div>
-{/if}
-
-{#if security.loaded}
-	<OverviewSection trust={security.trust} host={security.host} {firmwareUpdates} />
-
-	{#if security.trust}
-		<EncryptionSection trust={security.trust} />
-		<StartupSection trust={security.trust} />
 	{/if}
 
-	{#if security.usb}
-		<UsbSection {security} usb={security.usb} />
-	{/if}
+	{#if security.loaded}
+		{#if protections}
+			<ProtectionsSection {security} />
+		{/if}
 
-	<KeyringSection />
-	<PasskeysSection />
+		{#if security.trust && disk?.encrypted && disk.state !== 'decrypting'}
+			<UnlockSection trust={security.trust} />
+		{/if}
+
+		<KeyringSection {keyring} fingerprintReader={security.fingerprintReader} onaccess={() => (browsingAccess = true)} />
+		<PasskeysSection fingerprintReader={security.fingerprintReader} />
+	{/if}
 {/if}
 
 {#if unlockPrompt.request}

@@ -5,6 +5,7 @@
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
+	import SubPage from '$lib/components/SubPage.svelte';
 	import { percent } from '$lib/format';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import {
@@ -39,10 +40,16 @@
 
 	let sound = $state<Sound | null>(null);
 	let level = $state(0);
+	let page = $state<'apps' | 'devices' | null>(null);
 
 	let max = $derived(alerts.values['allow-volume-above-100-percent'] ? LOUD_MAX : 1);
 	let output = $derived(sound?.outputs.find((device) => device.name === sound?.defaultOutput));
 	let input = $derived(sound?.inputs.find((device) => device.name === sound?.defaultInput));
+	let playing = $derived(sound?.apps.length ?? 0);
+
+	$effect(() => {
+		if (page === 'apps' && !playing) page = null;
+	});
 
 	const choices = (devices: Device[]) => devices.map((device) => ({ value: device.name, label: device.description }));
 
@@ -81,9 +88,17 @@
 	{/if}
 {/snippet}
 
-{#if sound}
-	<Section title="Output">
-		{#if output}
+{#if sound && page === 'apps'}
+	<SubPage title="App volumes" back="Sound" onclose={() => (page = null)}>
+		<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
+	</SubPage>
+{:else if sound && page === 'devices'}
+	<SubPage title="Device profiles" back="Sound" onclose={() => (page = null)}>
+		<DevicesSection cards={sound.cards} />
+	</SubPage>
+{:else if sound}
+	{#if output}
+		<Section title="Output">
 			{@render devicePicker('output', sound.outputs, output)}
 			<VolumeRow
 				title="Volume"
@@ -103,16 +118,14 @@
 					{/snippet}
 				</Row>
 			{/if}
-		{:else}
-			<Row title="No speakers or headphones found" />
-		{/if}
-		<Row title="Allow louder than 100%" description="Sound can distort at higher volumes">
-			<Switch label="Allow louder than 100%" checked={max > 1} onchange={(on) => alerts.set('allow-volume-above-100-percent', on)} />
-		</Row>
-	</Section>
+			<Row title="Allow louder than 100%" description="Sound can distort at higher volumes">
+				<Switch label="Allow louder than 100%" checked={max > 1} onchange={(on) => alerts.set('allow-volume-above-100-percent', on)} />
+			</Row>
+		</Section>
+	{/if}
 
-	<Section title="Input">
-		{#if input}
+	{#if input}
+		<Section title="Input">
 			{@render devicePicker('input', sound.inputs, input)}
 			<VolumeRow
 				title="Volume"
@@ -126,16 +139,19 @@
 			>
 				<LevelMeter level={input.muted ? 0 : level} />
 			</VolumeRow>
-		{:else}
-			<Row title="No microphones found" />
-		{/if}
-	</Section>
-
-	{#if sound.cards.length}
-		<DevicesSection cards={sound.cards} />
+		</Section>
 	{/if}
 
-	<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
+	{#if playing || sound.cards.length}
+		<Section>
+			{#if playing}
+				<Row title="App volumes" description="{playing} {playing === 1 ? 'app is' : 'apps are'} playing sound" onclick={() => (page = 'apps')} />
+			{/if}
+			{#if sound.cards.length}
+				<Row title="Device profiles" description="Choose how each sound device is used" onclick={() => (page = 'devices')} />
+			{/if}
+		</Section>
+	{/if}
 
 	<Section title="Alerts">
 		<Row title="Alert sounds" description="Plays a sound for notifications and other events">

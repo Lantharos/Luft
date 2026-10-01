@@ -15,10 +15,7 @@ const WRONG_KEY: &str = "com.lantharos.Trust1.Error.WrongKey";
 #[derive(Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Tpm {
-    present: bool,
-    version: String,
     usable: bool,
-    reason: String,
 }
 
 #[derive(Serialize, Default)]
@@ -26,9 +23,6 @@ pub struct Tpm {
 pub struct SigningKey {
     state: String,
     available: bool,
-    reason: String,
-    protection: String,
-    driver_key_enrolled: bool,
     missed: u32,
 }
 
@@ -38,7 +32,6 @@ pub struct Startup {
     installed: bool,
     measured: bool,
     available: bool,
-    reason: String,
 }
 
 #[derive(Serialize, Default)]
@@ -95,10 +88,7 @@ fn group(properties: &Map, name: &str) -> Map {
 
 fn tpm(map: &Map) -> Tpm {
     Tpm {
-        present: flag(map, "Present"),
-        version: text(map, "Version"),
         usable: flag(map, "Usable"),
-        reason: text(map, "Reason"),
     }
 }
 
@@ -106,9 +96,6 @@ fn signing_key(map: &Map) -> SigningKey {
     SigningKey {
         state: text(map, "State"),
         available: flag(map, "Available"),
-        reason: text(map, "Reason"),
-        protection: text(map, "Protection"),
-        driver_key_enrolled: flag(map, "DriverKeyEnrolled"),
         missed: get(map, "Missed").unwrap_or_default(),
     }
 }
@@ -118,7 +105,6 @@ fn startup(map: &Map) -> Startup {
         installed: flag(map, "Installed"),
         measured: flag(map, "Measured"),
         available: flag(map, "Available"),
-        reason: text(map, "Reason"),
     }
 }
 

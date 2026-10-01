@@ -34,7 +34,7 @@
 </script>
 
 <Section>
-	<Row title="Night light" description="Shifts colors warmer in the evening, which is easier on your eyes">
+	<Row title="Night light" description="Warmer colors in the evening, easier on your eyes">
 		<Switch label="Night light" checked={enabled} onchange={(on) => color.set('enabled', on)} />
 	</Row>
 	{#if enabled}

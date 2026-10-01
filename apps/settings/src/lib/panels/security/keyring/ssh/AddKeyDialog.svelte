@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, Switch, TextField } from '@luft/ui';
-	import { generateKey, problem } from './api';
+	import { generateKey, problem } from '../api';
 
 	interface Props {
 		chipKeys: boolean;

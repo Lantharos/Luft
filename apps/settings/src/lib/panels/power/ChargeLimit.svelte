@@ -11,7 +11,7 @@
 	let description = $derived.by(() => {
 		if (failed) return "The limit couldn't be changed. Try again.";
 		if (limit.elsewhere) {
-			if (limit.applied === null) return 'Another app turned the limit off, so the battery charges fully';
+			if (limit.applied === null) return 'Another app turned it off, so the battery charges fully';
 			return enabled ? `Another app changed the limit to ${limit.applied}%` : `Another app stops charging at ${limit.applied}%`;
 		}
 		if (enabled) return limit.stopsAt === null ? 'Your computer decides when to stop charging' : `Stops charging at ${limit.stopsAt}%`;
@@ -39,5 +39,5 @@
 		<Switch label="Limit charging" checked={enabled} onchange={toggle} />
 	</Row>
 {:else if limit.applied !== null}
-	<Row title="Charging stops at {limit.applied}%" description="Another app on this computer sets this limit. You can change it there." />
+	<Row title="Charging stops at {limit.applied}%" description="Set by another app on this computer" />
 {/if}

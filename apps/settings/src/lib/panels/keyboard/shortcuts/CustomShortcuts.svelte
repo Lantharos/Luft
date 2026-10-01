@@ -12,7 +12,7 @@
 
 <Section title="Custom shortcuts" description="Run a command or open an app with a key combination">
 	{#each store.custom as binding (binding.id)}
-		<Row title={binding.name || 'Untitled'} description={binding.command} onclick={() => (editing = binding)}>
+		<Row title={binding.name || 'Untitled'} description={binding.command} truncate onclick={() => (editing = binding)}>
 			<Keys accelerators={binding.accelerators} />
 		</Row>
 	{/each}

@@ -24,6 +24,7 @@
 			description={[device.current ? `${device.current} → ${device.version}` : device.version, device.size ? bytes(device.size) : null, device.restart ? 'Finishes when you restart' : null]
 				.filter(Boolean)
 				.join(' · ')}
+			truncate
 		>
 			{#if installing}
 				<span>{activity.progress?.fraction != null ? `${Math.round(activity.progress.fraction * 100)}%` : 'Installing…'}</span>

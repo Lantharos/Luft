@@ -3,6 +3,7 @@
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { ActionRow, IconButton, Row, Section } from '@luft/ui';
+	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
 	import { activate, join, needsPassword, onFailed, type Security, type Wifi, type WifiNetwork } from '../api';
@@ -25,8 +26,11 @@
 	let { wifi, onconfigure }: Props = $props();
 
 	let joining = $state<Joining | null>(null);
+	let expanded = $state(false);
 	let attempt: string | null = null;
 	let problems = $state<Record<string, string>>({});
+
+	let shown = $derived(expanded ? wifi.networks : wifi.networks.slice(0, COLLAPSED));
 
 	function describe(network: WifiNetwork) {
 		if (problems[network.ssid]) return problems[network.ssid];
@@ -83,7 +87,7 @@
 </script>
 
 <Section title="Wi‑Fi networks">
-	{#each wifi.networks as network (network.ssid)}
+	{#each shown as network (network.ssid)}
 		<ActionRow
 			title={network.ssid}
 			description={describe(network)}
@@ -108,6 +112,9 @@
 	{:else}
 		<Row title="Looking for networks…" />
 	{/each}
+	{#if wifi.networks.length > COLLAPSED}
+		<MoreRow hidden={wifi.networks.length - COLLAPSED} bind:expanded />
+	{/if}
 	<Row title="Connect to a hidden network" onclick={() => (joining = {})} />
 </Section>
 

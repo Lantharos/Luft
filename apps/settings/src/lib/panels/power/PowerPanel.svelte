@@ -104,7 +104,7 @@
 
 {#if profiles && profileOptions.length > 1}
 	<Section title="Power mode">
-		<Row title="Mode" description={profileDescription}>
+		<Row title="Mode" description={profileDescription} truncate>
 			<Segmented label="Power mode" options={profileOptions} value={profiles.active} onchange={chooseProfile} />
 		</Row>
 		{#if state?.battery}

@@ -66,7 +66,7 @@
 			<span class="max-w-[220px] truncate">{me.realName}</span>
 			<button type="button" class="button" onclick={startRename}>Change</button>
 		</Row>
-		<Row title="Password" description={me.hasPassword ? 'Used to sign in and unlock this computer' : 'No password is set'}>
+		<Row title="Password" description="Used to sign in and unlock this computer">
 			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? 'Change' : 'Set password'}</button>
 		</Row>
 		<Row title="Account type"><span>{accountType(me)}</span></Row>

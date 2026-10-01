@@ -76,17 +76,17 @@
 </Section>
 
 <Section title="Location">
-	<Row title="Location services" description="Lets apps find where you are for maps, weather, and your time zone">
+	<Row title="Location services" description="Lets apps find where you are, for maps, weather and time zones">
 		<Switch label="Location services" checked={locating} onchange={(on) => location.set('enabled', on)} />
 	</Row>
-	<AppPermissions kind="location" disabled={!locating} empty="No apps have asked for your location" />
+	<AppPermissions kind="location" disabled={!locating} />
 </Section>
 
 <Section title="Camera">
 	<Row title="Allow apps to use the camera">
 		<Switch label="Allow apps to use the camera" checked={camera} onchange={(on) => privacy.set('disable-camera', !on)} />
 	</Row>
-	<AppPermissions kind="camera" disabled={!camera} empty="No apps have asked to use the camera" />
+	<AppPermissions kind="camera" disabled={!camera} />
 </Section>
 
 <Section title="Microphone">
@@ -125,7 +125,7 @@
 			onchange={(on) => privacy.set('remove-old-trash-files', on)}
 		/>
 	</Row>
-	<Row title="Delete temporary files automatically" description="Your own files in the temporary folders that nothing has used lately">
+	<Row title="Delete temporary files automatically" description="Your files in temporary folders that nothing has used lately">
 		<Switch
 			label="Delete temporary files automatically"
 			checked={privacy.values['remove-old-temp-files'] ?? false}
@@ -144,7 +144,7 @@
 </Section>
 
 {#if clearing}
-	<Dialog title="Clear file history?" description="Apps will no longer show the files you opened recently. The files themselves stay where they are." onclose={() => (clearing = false)}>
+	<Dialog title="Clear file history?" description="Apps will no longer show the files you opened recently. The files stay where they are." onclose={() => (clearing = false)}>
 		{#snippet actions()}
 			<button type="button" class="button" onclick={() => (clearing = false)}>Cancel</button>
 			<button type="button" class="button danger" onclick={clear}>Clear history</button>

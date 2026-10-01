@@ -116,7 +116,7 @@
 		/>
 	</div>
 </Row>
-<Row title="Anonymous identity" description="Sent before the secure connection is set up. Leave empty unless your network asks for it.">
+<Row title="Anonymous identity" description="Leave empty unless your network asks for it">
 	<div class="w-[260px]">
 		<TextField label="Anonymous identity" bind:value={enterprise.anonymousIdentity} placeholder="Optional" />
 	</div>

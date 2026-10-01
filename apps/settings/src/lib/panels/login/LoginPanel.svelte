@@ -90,11 +90,11 @@
 
 	<Section title="Signing in">
 		{#if screen.sessions.length > 1}
-			<Row title="Default session" description="Starts when someone signs in, unless they've picked another">
+			<Row title="Default session" description="Used unless someone picks another">
 				<Select label="Default session" options={sessions} value={screen.defaultSession} onchange={(session) => attempt('signing-in', () => setDefaultSession(session))} />
 			</Row>
 		{/if}
-		<Row title="Automatic login" description="Sign in without a password when this computer starts">
+		<Row title="Automatic login" description="Signs in without a password at startup">
 			<Select label="Automatic login" options={automaticLogins} value={screen.automaticLogin} onchange={(user) => attempt('signing-in', () => setAutomaticLogin(user))} />
 		</Row>
 	</Section>

@@ -5,12 +5,14 @@
 	interface Props {
 		kind: PermissionKind;
 		disabled: boolean;
-		empty: string;
 	}
 
-	let { kind, disabled, empty }: Props = $props();
+	let { kind, disabled }: Props = $props();
 
 	let apps = $state<AppPermission[]>([]);
+	let expanded = $state(false);
+
+	let allowed = $derived(apps.filter((app) => app.allowed).length);
 
 	$effect(() => {
 		void permissions(kind).then((list) => (apps = list));
@@ -29,10 +31,13 @@
 	}
 </script>
 
-{#each apps as app (app.id)}
-	<Row title={app.name} {disabled}>
-		<Switch label={app.name} checked={app.allowed} {disabled} onchange={(allowed) => toggle(app, allowed)} />
-	</Row>
-{:else}
-	<p class="px-4 py-3.5 text-[13px] text-[var(--text-muted)]">{empty}</p>
-{/each}
+{#if apps.length}
+	<Row title="Apps that asked" description="{allowed} of {apps.length} allowed" {disabled} {expanded} onclick={() => (expanded = !expanded)} />
+	{#if expanded}
+		{#each apps as app (app.id)}
+			<Row title={app.name} {disabled}>
+				<Switch label={app.name} checked={app.allowed} {disabled} onchange={(allowed) => toggle(app, allowed)} />
+			</Row>
+		{/each}
+	{/if}
+{/if}

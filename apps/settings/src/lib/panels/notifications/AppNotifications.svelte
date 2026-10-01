@@ -19,7 +19,7 @@
 	let open = $state(false);
 	let enabled = $derived(options.values.enable ?? true);
 	let summary = $derived.by(() => {
-		if (!enabled) return 'Off';
+		if (!enabled) return undefined;
 		const banners = options.values['show-banners'];
 		const locked = lockScreen && options.values['show-in-lock-screen'];
 		if (banners && locked) return 'Banners and lock screen';

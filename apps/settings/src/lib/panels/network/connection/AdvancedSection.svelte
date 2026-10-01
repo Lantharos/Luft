@@ -45,7 +45,7 @@
 
 <Section title="Advanced">
 	{#if wifi}
-		<Row title="Private address" description="Uses a different hardware address on this network so it’s harder to track your device">
+		<Row title="Private address" description="Makes this computer harder to track on this network">
 			<Select label="Private address" options={WIFI_CHOICES} value={choice} onchange={choose} />
 		</Row>
 	{:else}

@@ -2,6 +2,7 @@
 	import Download from '@lucide/svelte/icons/download';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import { Dialog, Row, Section, Select } from '@luft/ui';
+	import MoreRow from '$lib/components/MoreRow.svelte';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
 	import { cursors } from './cursors.svelte';
@@ -26,12 +27,22 @@
 		{ value: 96, label: 'Largest' }
 	];
 
+	const COLLAPSED = 6;
+
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['cursor-theme', 'cursor-size']);
 
 	let removing = $state<CursorTheme | null>(null);
 	let problem = $state('');
+	let expanded = $state(false);
 
 	let current = $derived(desktop.values['cursor-theme'] ?? 'Adwaita');
+	let themes = $derived(cursors.themes ?? []);
+	let shown = $derived.by(() => {
+		if (expanded) return themes;
+		const first = themes.slice(0, COLLAPSED);
+		const chosen = themes.find((theme) => theme.name === current);
+		return !chosen || first.includes(chosen) ? first : [...first.slice(0, -1), chosen];
+	});
 
 	async function remove(theme: CursorTheme) {
 		removing = null;
@@ -55,10 +66,13 @@
 		<p class="px-4 pt-3.5 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
 	<div class="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-2 p-3">
-		{#each cursors.themes ?? [] as theme (theme.name)}
+		{#each shown as theme (theme.name)}
 			<CursorTile {theme} selected={theme.name === current} onselect={() => desktop.set('cursor-theme', theme.name)} onremove={() => (removing = theme)} />
 		{/each}
 	</div>
+	{#if themes.length > COLLAPSED}
+		<MoreRow hidden={themes.length - COLLAPSED} bind:expanded />
+	{/if}
 	<Row title="Size">
 		<Select label="Cursor size" options={SIZES} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
 	</Row>

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
 	import { ago } from '$lib/panels/updates/time';
-	import { clearHistory, type AccessEvent } from './api';
-	import ConfirmDialog from './ConfirmDialog.svelte';
-	import { happened } from './describe';
+	import { clearHistory, type AccessEvent } from '../api';
+	import ConfirmDialog from '../ConfirmDialog.svelte';
+	import { happened } from '../describe';
 
 	const COLLAPSED = 5;
 
@@ -23,7 +23,7 @@
 <Section title="Recent access">
 	{#each shown as event, index (index)}
 		<div class="flex items-baseline gap-3 px-4 py-2.5">
-			<span class="min-w-0 flex-1 text-[13px] text-[var(--text-soft)]">{happened(event)}</span>
+			<span class="min-w-0 flex-1 truncate text-[13px] text-[var(--text-soft)]">{happened(event)}</span>
 			<span class="shrink-0 text-[12.5px] text-[var(--text-muted)]">{ago(event.time)}</span>
 		</div>
 	{/each}

@@ -8,11 +8,12 @@
 	import { accountLabel, deletePasskey, onPasskeys, passkeys, siteLabel, type Passkey, type Passkeys } from './passkeys/api';
 	import RenameDialog from './passkeys/RenameDialog.svelte';
 
-	const PROTECTION = {
-		chip: 'Saved on this computer and sealed by its security chip. Each sign-in needs your fingerprint or password.',
-		password: 'Saved on this computer and encrypted with your password, because there’s no security chip to seal them with. Each sign-in needs your fingerprint or password.',
-		unavailable: 'Your keyring is locked, so your passkeys can’t be shown right now.'
+	const SEALED = {
+		chip: 'Sealed by this computer’s security chip.',
+		password: 'Encrypted with your password.'
 	};
+
+	let { fingerprintReader }: { fingerprintReader: boolean } = $props();
 
 	let current = $state<Passkeys | null>(null);
 	let renaming = $state<Passkey | null>(null);
@@ -28,6 +29,11 @@
 
 	async function load() {
 		current = await passkeys().catch(() => null);
+	}
+
+	function protection({ protection }: Passkeys) {
+		if (protection === 'unavailable') return 'Unlock your keyring to see your passkeys.';
+		return `${SEALED[protection]} Each sign-in asks for your ${fingerprintReader ? 'fingerprint or password' : 'password'}.`;
 	}
 
 	function details(passkey: Passkey) {
@@ -51,18 +57,18 @@
 </script>
 
 {#if current}
-	<Section title="Passkeys" description={PROTECTION[current.protection]}>
+	<Section title="Passkeys" description={protection(current)}>
 		{#if !current.ready && current.protection !== 'unavailable'}
-			<Row title="Browsers can’t reach your passkeys right now" description="They’ll be back once the passkey service for browsers is running." />
+			<Row title="Browsers can’t reach your passkeys" description="They’re back once the passkey service is running" />
 		{/if}
 		{#each sorted as passkey (passkey.id)}
-			<Row title={siteLabel(passkey)} description={details(passkey)} icon={KeyRound}>
+			<Row title={siteLabel(passkey)} description={details(passkey)} icon={KeyRound} truncate>
 				<IconButton icon={Pencil} label="Rename passkey for {siteLabel(passkey)}" onclick={() => (renaming = passkey)} />
 				<IconButton icon={Trash} label="Remove passkey for {siteLabel(passkey)}" onclick={() => (removing = passkey)} />
 			</Row>
 		{:else}
 			{#if current.protection !== 'unavailable'}
-				<Row title="No passkeys yet" description="When a site offers to create a passkey, it’s saved here and works in every browser on this computer." />
+				<Row title="No passkeys yet" description="Ones that sites create are saved here for every browser" />
 			{/if}
 		{/each}
 	</Section>
@@ -80,7 +86,7 @@
 	{@const passkey = removing}
 	<Dialog
 		title="Remove this passkey?"
-		description="You won’t be able to sign in to {siteLabel(passkey)} with it anymore. Make sure you have another way to sign in first."
+		description="You won’t be able to sign in to {siteLabel(passkey)} with it anymore, so make sure you have another way in."
 		onclose={() => (removing = null)}
 	>
 		{#snippet actions()}

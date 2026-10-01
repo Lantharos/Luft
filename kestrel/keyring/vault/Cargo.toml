@@ -1,0 +1,21 @@
+[package]
+name = "luft-keyring-vault"
+description = "Luft Keyring's encrypted storage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+argon2 = { version = "0.6.0", features = ["zeroize"] }
+chacha20poly1305 = { version = "0.11.0", default-features = false, features = ["alloc", "zeroize"] }
+ciborium = "0.2.2"
+getrandom.workspace = true
+hkdf = "0.13.0"
+luft-keyring-wire.workspace = true
+rustix.workspace = true
+serde.workspace = true
+sha2 = "0.11.0"
+zeroize.workspace = true
+
+[dev-dependencies]
+tempfile = "3.27.0"

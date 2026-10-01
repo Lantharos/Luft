@@ -1,0 +1,30 @@
+[workspace]
+resolver = "3"
+members = ["daemon", "pam", "unlock", "vault", "wire"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[workspace.dependencies]
+luft-keyring-vault = { path = "vault" }
+luft-keyring-wire = { path = "wire" }
+getrandom = "0.4.3"
+postcard = { version = "1.1.3", default-features = false, features = ["use-std"] }
+rustix = { version = "1.1.5", features = ["fs", "mm", "net", "process", "pipe"] }
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.53.1", default-features = false, features = ["rt", "macros", "time", "sync", "net", "io-util", "signal", "fs"] }
+zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
+zeroize = { version = "1.9.0", features = ["serde", "derive"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3

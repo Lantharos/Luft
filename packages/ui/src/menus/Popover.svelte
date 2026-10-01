@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { besideAnchor, type Align, type AnchorPlacement } from './placement';
+	import { topLayer } from './topLayer';
 
 	interface Props {
 		anchor: HTMLElement;
@@ -31,8 +32,9 @@
 
 <svelte:window onblur={onclose} onresize={onclose} onkeydowncapture={closeOnEscape} />
 
-<div class="backdrop" role="presentation" onpointerdown={onclose}></div>
+<div {@attach topLayer} class="backdrop" role="presentation" onpointerdown={onclose}></div>
 <div
+	{@attach topLayer}
 	{@attach place}
 	class="popover soft-scroll"
 	class:placed={placement}
@@ -52,14 +54,21 @@
 	.backdrop {
 		position: fixed;
 		inset: 0;
-		z-index: 40;
+		width: auto;
+		height: auto;
+		margin: 0;
+		border: 0;
+		padding: 0;
+		background: transparent;
 	}
 
 	.popover {
 		position: fixed;
-		top: 0;
-		z-index: 41;
+		inset: 0 auto auto 0;
 		display: flex;
+		margin: 0;
+		border: 0;
+		color: inherit;
 		max-width: calc(100vw - 20px);
 		flex-direction: column;
 		gap: 2px;

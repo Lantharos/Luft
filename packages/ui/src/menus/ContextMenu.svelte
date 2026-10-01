@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { atPoint, type Point, type PointPlacement } from './placement';
+	import { topLayer } from './topLayer';
 
 	interface Props {
 		at: Point;
@@ -22,6 +23,7 @@
 <svelte:window onresize={onclose} />
 
 <div
+	{@attach topLayer}
 	{@attach place}
 	class="menu soft-scroll"
 	class:placed={placement}
@@ -41,8 +43,11 @@
 <style>
 	.menu {
 		position: fixed;
-		z-index: 80;
+		inset: auto;
 		display: flex;
+		margin: 0;
+		border: 0;
+		color: inherit;
 		max-height: calc(100vh - 20px);
 		min-width: 196px;
 		max-width: calc(100vw - 20px);

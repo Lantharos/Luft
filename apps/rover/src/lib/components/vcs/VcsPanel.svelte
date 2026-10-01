@@ -90,7 +90,7 @@
 			</div>
 
 			{#if vcs.error}
-				<div class="rounded-[14px] bg-[rgba(224,170,170,0.12)] px-3 py-2 text-[12px] text-[var(--danger)]">
+				<div class="rounded-[14px] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-[12px] text-[var(--danger)]">
 					{vcs.error}
 				</div>
 			{/if}

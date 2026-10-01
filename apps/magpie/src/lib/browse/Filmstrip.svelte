@@ -99,7 +99,7 @@
 		width: 64px;
 		overflow: hidden;
 		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.06);
+		background: color-mix(in oklab, var(--ink) 6%, transparent);
 		opacity: 0.72;
 		transition:
 			opacity 160ms var(--ease),

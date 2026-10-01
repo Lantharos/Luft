@@ -25,12 +25,12 @@
 		place-items: center;
 		border-radius: 999px;
 		padding-inline: 5px;
-		background: rgba(245, 245, 242, 0.08);
+		background: color-mix(in oklab, var(--ink) 8%, transparent);
 		color: var(--text-soft);
 		font-size: 10px;
 		font-weight: 650;
 		line-height: 1;
-		box-shadow: inset 0 0 0 1px rgba(245, 245, 242, 0.1);
+		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 10%, transparent);
 	}
 
 	.vcs-badge--grid {
@@ -41,18 +41,18 @@
 
 	.vcs-badge--added,
 	.vcs-badge--untracked {
-		background: rgba(166, 201, 168, 0.14);
+		background: color-mix(in oklab, var(--success) 14%, transparent);
 		color: var(--success);
 	}
 
 	.vcs-badge--deleted,
 	.vcs-badge--conflicted {
-		background: rgba(224, 170, 170, 0.14);
+		background: color-mix(in oklab, var(--danger) 14%, transparent);
 		color: var(--danger);
 	}
 
 	.vcs-badge--renamed {
-		background: rgba(159, 183, 181, 0.16);
+		background: color-mix(in oklab, var(--media) 16%, transparent);
 		color: var(--media);
 	}
 </style>

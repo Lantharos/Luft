@@ -1,19 +1,19 @@
 :root,
 .glass-shell {
-	--syntax-comment: #7e7e77;
-	--syntax-keyword: color-mix(in oklab, var(--accent) 72%, #f3f3ef);
+	--syntax-comment: var(--text-muted);
+	--syntax-keyword: color-mix(in oklab, var(--accent) 72%, var(--ink));
 	--syntax-string: var(--kestrel-dark-green, #b3c89a);
 	--syntax-regexp: var(--kestrel-dark-magenta, #d4a6c4);
 	--syntax-constant: var(--kestrel-dark-yellow, #e0a987);
 	--syntax-function: var(--kestrel-dark-blue, #9cc0d6);
 	--syntax-type: var(--kestrel-dark-cyan, #8ec5b6);
-	--syntax-definition: #ecece6;
-	--syntax-property: #cfc8b8;
+	--syntax-definition: var(--ink);
+	--syntax-property: var(--text-soft);
 	--syntax-tag: var(--kestrel-dark-red, #e3a39c);
-	--syntax-attribute: #d9bb8d;
-	--syntax-operator: #b3b3ab;
-	--syntax-punctuation: #8f8f88;
-	--syntax-meta: #a8a8a0;
+	--syntax-attribute: var(--secondary);
+	--syntax-operator: var(--text-soft);
+	--syntax-punctuation: var(--text-muted);
+	--syntax-meta: var(--text-muted);
 	--syntax-inserted: var(--kestrel-dark-green, #a6c9a8);
 	--syntax-deleted: var(--kestrel-dark-red, #e0aaaa);
 	--syntax-link: var(--accent);
@@ -21,23 +21,23 @@
 
 :root[data-scheme='light'],
 [data-scheme='light'] .glass-shell {
-	--syntax-comment: #8a8a82;
-	--syntax-keyword: color-mix(in oklab, var(--accent) 55%, #1b1b19);
+	--syntax-comment: var(--text-muted);
+	--syntax-keyword: color-mix(in oklab, var(--accent) 55%, var(--ink));
 	--syntax-string: var(--kestrel-light-green, #4d7a36);
 	--syntax-regexp: var(--kestrel-light-magenta, #92478a);
 	--syntax-constant: var(--kestrel-light-yellow, #b0582b);
 	--syntax-function: var(--kestrel-light-blue, #26699a);
 	--syntax-type: var(--kestrel-light-cyan, #17786a);
-	--syntax-definition: #1b1b19;
-	--syntax-property: #5d5446;
+	--syntax-definition: var(--ink);
+	--syntax-property: var(--text-soft);
 	--syntax-tag: var(--kestrel-light-red, #b1433b);
-	--syntax-attribute: #8c6421;
-	--syntax-operator: #5f5f59;
-	--syntax-punctuation: #7a7a73;
-	--syntax-meta: #6e6e67;
+	--syntax-attribute: var(--secondary);
+	--syntax-operator: var(--text-soft);
+	--syntax-punctuation: var(--text-muted);
+	--syntax-meta: var(--text-muted);
 	--syntax-inserted: var(--kestrel-light-green, #3f7a4a);
 	--syntax-deleted: var(--kestrel-light-red, #b4413c);
-	--syntax-link: color-mix(in oklab, var(--accent) 55%, #1b1b19);
+	--syntax-link: color-mix(in oklab, var(--accent) 55%, var(--ink));
 }
 
 @layer components {

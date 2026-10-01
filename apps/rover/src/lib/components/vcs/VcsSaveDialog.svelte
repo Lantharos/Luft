@@ -60,7 +60,7 @@
 					<span class="text-[12px] text-[var(--text-muted)]">Message</span>
 					<input
 						{@attach (input) => input.focus()}
-						class="h-11 rounded-[14px] bg-[var(--control)] px-3 text-[14px] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] duration-150 focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_rgba(245,245,242,0.18)]"
+						class="h-11 rounded-[14px] bg-[var(--control)] px-3 text-[14px] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] duration-150 focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_18%,transparent)]"
 						value={message}
 						placeholder="Describe your changes"
 						oninput={(event) => (message = event.currentTarget.value)}
@@ -99,7 +99,7 @@
 				</div>
 
 				{#if vcs.error}
-					<div class="rounded-[14px] bg-[rgba(224,170,170,0.12)] px-3 py-2 text-[12px] text-[var(--danger)]">
+					<div class="rounded-[14px] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-[12px] text-[var(--danger)]">
 						{vcs.error}
 					</div>
 				{/if}

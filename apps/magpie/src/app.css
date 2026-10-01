@@ -3,16 +3,19 @@
 
 .stage {
 	color-scheme: dark;
-	--text: #f3f3ef;
-	--text-soft: #c9c9c3;
-	--text-muted: #9a9a93;
-	--control: rgba(28, 28, 26, 0.78);
-	--control-hover: rgba(46, 46, 43, 0.9);
-	--surface-hover: rgba(245, 245, 242, 0.1);
-	--popover: #1c1c1a;
-	--content: #121211;
-	--raised: #1a1a18;
-	--hairline: rgba(245, 245, 242, 0.07);
+	--ink: var(--kestrel-dark-on-surface, #f3f3ef);
+	--text: var(--ink);
+	--text-soft: var(--kestrel-dark-on-surface-variant, #c9c9c3);
+	--text-muted: var(--kestrel-dark-outline, #9a9a93);
+	--control: color-mix(in oklab, var(--kestrel-dark-surface-container, #1c1c1a) 78%, transparent);
+	--control-hover: color-mix(in oklab, var(--kestrel-dark-surface-container-highest, #2e2e2b) 90%, transparent);
+	--surface-hover: color-mix(in oklab, var(--ink) 10%, transparent);
+	--popover: var(--kestrel-dark-surface-container, #1c1c1a);
+	--content: var(--kestrel-dark-surface, #121211);
+	--raised: var(--kestrel-dark-surface-container-low, #1a1a18);
+	--hairline: color-mix(in oklab, var(--ink) 7%, transparent);
+	--accent: var(--kestrel-dark-primary, #f3f3ef);
+	--accent-text: var(--kestrel-dark-on-primary, #181817);
 	--shadow-soft: rgba(0, 0, 0, 0.4);
 	--stage: #0b0b0a;
 	background: var(--stage);

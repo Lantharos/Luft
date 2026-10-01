@@ -45,7 +45,7 @@
 		gap: 14px;
 		padding: 6px 6px 6px 16px;
 		border-radius: var(--radius-pill);
-		background: rgba(28, 28, 25, 0.9);
+		background: color-mix(in oklab, var(--popover) 90%, transparent);
 		box-shadow: 0 16px 48px var(--shadow-soft), inset 0 1px 0 var(--hairline);
 		backdrop-filter: blur(24px);
 		font-size: 13px;

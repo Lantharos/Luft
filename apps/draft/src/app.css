@@ -8,13 +8,13 @@
 	--editor-search-current: color-mix(in oklab, var(--accent) 44%, transparent);
 	--editor-bracket: color-mix(in oklab, var(--accent) 18%, transparent);
 	--editor-bracket-line: color-mix(in oklab, var(--accent) 55%, transparent);
-	--editor-active-line: rgba(245, 245, 242, 0.03);
+	--editor-active-line: color-mix(in oklab, var(--ink) 3%, transparent);
 	--editor-gutter: color-mix(in oklab, var(--text-muted) 72%, transparent);
-	--editor-scrollbar: rgba(245, 245, 242, 0.16);
+	--editor-scrollbar: color-mix(in oklab, var(--ink) 16%, transparent);
 }
 
 [data-scheme='light'] .glass-shell {
 	--editor-selection: color-mix(in oklab, var(--accent) 32%, transparent);
-	--editor-active-line: rgba(27, 27, 25, 0.035);
-	--editor-scrollbar: rgba(27, 27, 25, 0.2);
+	--editor-active-line: color-mix(in oklab, var(--ink) 3.5%, transparent);
+	--editor-scrollbar: color-mix(in oklab, var(--ink) 20%, transparent);
 }

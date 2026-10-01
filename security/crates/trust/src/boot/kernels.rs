@@ -6,6 +6,14 @@ use anyhow::{Context, Result};
 use crate::system::command::Tool;
 
 const MODULES: &str = "/usr/lib/modules";
+const GRAPHICS: &str = "kernel/drivers/gpu";
+const NVIDIA: [&str; 5] = [
+    "nvidia",
+    "nvidia_drm",
+    "nvidia_modeset",
+    "nvidia_uvm",
+    "nvidia_peermem",
+];
 
 #[derive(Clone, Debug)]
 pub struct Kernel {
@@ -36,6 +44,42 @@ impl Kernel {
                     self.version
                 )
             })
+    }
+
+    fn graphics_drivers(&self) -> Vec<String> {
+        let mut drivers: Vec<String> = NVIDIA.iter().map(|name| (*name).to_owned()).collect();
+        module_names(
+            &Path::new(MODULES).join(&self.version).join(GRAPHICS),
+            &mut drivers,
+        );
+        drivers
+    }
+
+    pub fn build_signed_initrd(&self, output: &Path, splash_is_sushi: bool) -> Result<()> {
+        let mut dracut = Tool::new("dracut")
+            .args(["--force", "--quiet", "--kver", &self.version])
+            .arg("--omit-drivers")
+            .arg(self.graphics_drivers().join(" "));
+        if splash_is_sushi {
+            dracut = dracut.args(["--omit", "plymouth"]);
+        }
+        dracut.arg(output).status().with_context(|| {
+            format!(
+                "The startup files for Linux {} couldn't be built.",
+                self.version
+            )
+        })
+    }
+}
+
+fn module_names(folder: &Path, names: &mut Vec<String>) {
+    for entry in std::fs::read_dir(folder).into_iter().flatten().flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            module_names(&path, names);
+        } else if let Some((name, _)) = entry.file_name().to_string_lossy().split_once(".ko") {
+            names.push(name.replace('-', "_"));
+        }
     }
 }
 

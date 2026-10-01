@@ -17,6 +17,7 @@ const SIGNED_MENU: &str = "EFI/sushi/SushiBoot.efi";
 const CERTIFICATE: &str = "EFI/sushi/luft-secure-boot.cer";
 const LOADER_CONF: &str = "loader/loader.conf";
 const TRIAL: &str = "trial";
+const SPLASH: &str = "sushi";
 
 pub fn installed() -> bool {
     esp::find().is_ok_and(|esp| esp.file(SIGNED_MENU).exists())
@@ -62,47 +63,32 @@ fn lines(trial: Option<String>) -> Lines {
     }
 }
 
-fn initrd_for(
-    esp: &Esp,
-    keys: &Unsealed,
-    kernel: &Kernel,
-    built: Option<&Path>,
-) -> Result<PathBuf> {
-    if let Some(built) = built.filter(|path| path.exists()) {
-        return Ok(built.to_owned());
-    }
-    if kernel.initrd().exists() {
-        return Ok(kernel.initrd());
-    }
+fn initrd_for(esp: &Esp, keys: &Unsealed, kernel: &Kernel, fresh: bool) -> Result<PathBuf> {
+    let initrd = keys.scratch(&format!("initrd-{}", kernel.version));
     let image = images::path(esp, &kernel.version);
-    if image.exists() {
-        let extracted = keys.scratch(&format!("initrd-{}", kernel.version));
-        uki::extract_initrd(&image, &extracted)?;
-        return Ok(extracted);
+    if !fresh && image.exists() {
+        uki::extract_initrd(&image, &initrd)?;
+    } else {
+        kernel.build_signed_initrd(&initrd, cmdline::has(&cmdline::read(), SPLASH))?;
     }
-    kernel.rebuild_initrd()?;
-    Ok(kernel.initrd())
+    Ok(initrd)
 }
 
-fn build(
-    esp: &Esp,
-    keys: &Unsealed,
-    kernel: &Kernel,
-    built: Option<&Path>,
-    lines: &Lines,
-) -> Result<()> {
-    let initrd = initrd_for(esp, keys, kernel, built)?;
+fn build(esp: &Esp, keys: &Unsealed, kernel: &Kernel, fresh: bool, lines: &Lines) -> Result<()> {
+    let initrd = initrd_for(esp, keys, kernel, fresh)?;
     images::make_room(esp, &kernel.version, images::estimate(kernel, &initrd))?;
-    uki::build(
+    let built = uki::build(
         kernel,
         &initrd,
         &images::path(esp, &kernel.version),
         keys,
         lines,
-    )
+    );
+    let _ = std::fs::remove_file(&initrd);
+    built
 }
 
-pub fn add(kernel: &Kernel, built: Option<&Path>) -> Result<()> {
+pub fn add(kernel: &Kernel) -> Result<()> {
     if !installed() {
         return Ok(());
     }
@@ -113,7 +99,7 @@ pub fn add(kernel: &Kernel, built: Option<&Path>) -> Result<()> {
     let esp = esp::find()?;
     let keys = keys::unseal()?;
     images::keep_only(&esp, &wanted);
-    build(&esp, &keys, kernel, built, &lines(None))?;
+    build(&esp, &keys, kernel, true, &lines(None))?;
     rustix::fs::sync();
     Ok(())
 }
@@ -122,7 +108,6 @@ pub fn remove(version: &str) -> Result<()> {
     if let Ok(esp) = esp::find() {
         images::remove(&esp, version);
     }
-    let _ = std::fs::remove_file(Kernel::named(version).initrd());
     Ok(())
 }
 
@@ -133,13 +118,14 @@ pub fn rebuild_images(rebuild_initrds: bool) -> Result<()> {
 }
 
 pub fn rebuild_boot_files() -> Result<()> {
-    let rebuilt = if installed() {
-        rebuild_images(true)
-    } else {
-        kernels::rebuild_all_initrds()
-    };
+    if !esp::find().is_ok_and(|esp| grub_removed(&esp)) {
+        kernels::rebuild_all_initrds()?;
+    }
+    if installed() {
+        rebuild_images(true)?;
+    }
     rustix::fs::sync();
-    rebuilt
+    Ok(())
 }
 
 fn rebuild_with(esp: &Esp, keys: &Unsealed, rebuild_initrds: bool) -> Result<()> {
@@ -147,10 +133,7 @@ fn rebuild_with(esp: &Esp, keys: &Unsealed, rebuild_initrds: bool) -> Result<()>
     images::keep_only(esp, &wanted);
     let lines = lines(None);
     for kernel in &wanted {
-        if rebuild_initrds {
-            kernel.rebuild_initrd()?;
-        }
-        build(esp, keys, kernel, None, &lines)?;
+        build(esp, keys, kernel, rebuild_initrds, &lines)?;
     }
     let _ = std::fs::remove_file(paths::state(TRIAL));
     rustix::fs::sync();
@@ -214,7 +197,8 @@ pub fn uninstall() -> Result<()> {
 }
 
 pub fn arguments(add: &[String], remove: &[String], once: bool) -> Result<String> {
-    let line = cmdline::with(&cmdline::read(), add, remove);
+    let current = cmdline::read();
+    let line = cmdline::with(&current, add, remove);
     if add.is_empty() && remove.is_empty() {
         return Ok(line);
     }
@@ -223,7 +207,7 @@ pub fn arguments(add: &[String], remove: &[String], once: bool) -> Result<String
     } else {
         cmdline::write(&line)?;
         if installed() {
-            rebuild_images(false)?;
+            rebuild_images(cmdline::has(&current, SPLASH) != cmdline::has(&line, SPLASH))?;
         }
     }
     Ok(line)
@@ -240,7 +224,7 @@ fn try_once(line: &str) -> Result<()> {
     };
     let esp = esp::find()?;
     let keys = keys::unseal()?;
-    build(&esp, &keys, &kernel, None, &lines(Some(line.to_owned())))?;
+    build(&esp, &keys, &kernel, false, &lines(Some(line.to_owned())))?;
     paths::write_private(&paths::state(TRIAL), kernel.version.as_bytes())?;
     efi::set_oneshot_entry(&format!("{}@{}", images::name(&kernel.version), uki::TRIAL))?;
     rustix::fs::sync();
@@ -254,7 +238,7 @@ fn finish_trial(esp: &Esp) -> Result<()> {
     let kernel = Kernel::named(version.trim());
     if images::path(esp, &kernel.version).exists() && kernel.image.exists() {
         let keys = keys::unseal()?;
-        build(esp, &keys, &kernel, None, &lines(None))?;
+        build(esp, &keys, &kernel, false, &lines(None))?;
         rustix::fs::sync();
     }
     std::fs::remove_file(paths::state(TRIAL))?;

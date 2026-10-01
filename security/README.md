@@ -15,7 +15,11 @@ Luft's device security services: device trust (Secure Boot, the TPM and disk enc
 
 Every piece is checked against a signature before it runs, and nothing can be changed at startup, including the kernel command line.
 
-Signed images are kept for the three newest installed kernels. SushiBoot shows the newest at the top and the others under Previous versions. A kernel-install plugin builds and signs the image for each kernel as it is installed and deletes it when the kernel is removed. When the EFI system partition runs short of room, an image being rebuilt makes room by going first, a new kernel's image makes room by removing the oldest previous versions, and the newest image is never removed to make room for an older one. An image is the kernel plus its initramfs, so it's around 60 MB on a plain system and close to 200 MB when the initramfs carries NVIDIA's firmware; a 600 MB partition then holds two or three.
+Signed images are kept for the three newest installed kernels. SushiBoot shows the newest at the top and the others under Previous versions. A kernel-install plugin builds and signs the image for each kernel as it is installed and deletes it when the kernel is removed. When the EFI system partition runs short of room, an image being rebuilt makes room by going first, a new kernel's image makes room by removing the oldest previous versions, and the newest image is never removed to make room for an older one.
+
+The images get an initramfs of their own, made for this one job: finding and unlocking the system disk. Graphics drivers and their firmware stay out of it, since the firmware's framebuffer carries the splash until the real driver loads after the switch to the installed system, and so does Plymouth while Sushi is the splash. With an NVIDIA card that matters most: dracut would otherwise add nouveau and around 100 MB of GPU firmware, making each image close to 190 MB instead of about 80 MB. Changing only the command line reuses the initramfs already inside each image.
+
+To have a graphics driver in the initramfs anyway, ask dracut for it in `/etc/dracut.conf.d`, for example `force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "` (with underscores), and run `sudo trustctl startup rebuild`. dracut keeps drivers it's explicitly asked for, so the signed images include it, and fewer previous versions fit.
 
 Until GRUB is removed, Fedora's own entry still starts shim and GRUB. That works as before, but the TPM won't unlock the disk that way, so it asks for the recovery key.
 

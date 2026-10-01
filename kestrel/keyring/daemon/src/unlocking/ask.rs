@@ -76,7 +76,10 @@ impl Daemon {
                 entered = self.prompter.password(&handle, &prompt) => entered,
                 _ = unlocked.wait_for(|unlocked| *unlocked) => break true,
             };
-            let Some(password) = entered else { break false };
+            let Some(password) = entered else {
+                eprintln!("The unlock prompt was closed without a password");
+                break false;
+            };
             if !exists
                 && authenticate::available()
                 && authenticate::authenticate(Mode::Password, Some(&password)).await

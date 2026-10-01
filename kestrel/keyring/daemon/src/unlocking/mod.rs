@@ -36,12 +36,21 @@ impl Daemon {
         });
         let daemon = self.clone();
         tokio::spawn(async move {
+            let mut warned = false;
             loop {
                 let (sender, mut events) = mpsc::unbounded_channel();
-                if link::attach(sender).await.is_ok() {
-                    while let Some(Event::Unlock(unlock)) = events.recv().await {
-                        daemon.clone().receive(unlock).await;
+                match link::attach(sender).await {
+                    Ok(()) => {
+                        warned = false;
+                        while let Some(Event::Unlock(unlock)) = events.recv().await {
+                            daemon.clone().receive(unlock).await;
+                        }
                     }
+                    Err(error) if !warned => {
+                        eprintln!("Signing in can't unlock the keyring: {error}");
+                        warned = true;
+                    }
+                    Err(_) => {}
                 }
                 tokio::time::sleep(REATTACH_DELAY).await;
             }
@@ -87,6 +96,7 @@ impl Daemon {
             return;
         }
         self.signing_in.send_replace(false);
+        eprintln!("Signing in left the keyring locked: {problem:?}");
         let daemon = self.clone();
         tokio::spawn(async move {
             match problem {
@@ -178,10 +188,10 @@ impl Daemon {
         self.changed.notify_one();
         let daemon = self.clone();
         tokio::spawn(async move {
+            daemon.seal_if_needed().await;
             if let Some(password) = password {
                 daemon.rewrap(&password).await;
             }
-            daemon.seal_if_needed().await;
         });
     }
 
@@ -215,7 +225,7 @@ impl Daemon {
             return;
         }
         let wrapped = self.keyring.lock().await.has_chip_wrap();
-        let stale = self.reseal.swap(false, Ordering::Relaxed);
+        let stale = self.reseal.load(Ordering::Relaxed);
         match status.seal {
             Some(_) if wrapped && !stale => {}
             Some(seal) if seal.pin => {
@@ -247,6 +257,7 @@ impl Daemon {
             .set_chip_wrap(Some(wrap))
             .map_err(|error| Problem::Failed(error.to_string()))?;
         drop(keyring);
+        self.reseal.store(false, Ordering::Relaxed);
         self.refresh_chip().await;
         Ok(())
     }

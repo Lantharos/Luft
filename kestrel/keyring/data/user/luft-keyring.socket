@@ -1,0 +1,13 @@
+[Unit]
+Description=Luft Keyring SSH agent
+Before=kestrel.service
+
+[Socket]
+ListenStream=%t/luft-keyring/ssh
+DirectoryMode=0700
+SocketMode=0600
+Service=luft-keyring.service
+ExecStartPost=-/usr/bin/systemctl --user set-environment SSH_AUTH_SOCK=%t/luft-keyring/ssh
+
+[Install]
+WantedBy=kestrel-session.target

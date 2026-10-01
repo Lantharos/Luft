@@ -1,0 +1,33 @@
+[Unit]
+Description=Luft Keyring unlock service
+Requires=luft-keyring-unlock.socket
+
+[Service]
+ExecStart=@libexecdir@/luft-keyring-unlock --keyring @libexecdir@/luft-keyring
+Environment=TSS2_LOG=all+none
+StateDirectory=luft-keyring
+StateDirectoryMode=0700
+UMask=0077
+DevicePolicy=closed
+DeviceAllow=/dev/tpmrm0 rw
+CapabilityBoundingSet=CAP_SYS_PTRACE
+NoNewPrivileges=yes
+PrivateNetwork=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+LimitCORE=0

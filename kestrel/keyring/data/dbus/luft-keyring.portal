@@ -1,0 +1,3 @@
+[portal]
+DBusName=com.lantharos.Keyring1
+Interfaces=org.freedesktop.impl.portal.Secret;

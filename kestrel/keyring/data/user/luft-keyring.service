@@ -1,0 +1,14 @@
+[Unit]
+Description=Luft Keyring
+CollectMode=inactive-or-failed
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.secrets
+ExecStart=@libexecdir@/luft-keyring
+Slice=session.slice
+Restart=on-failure
+LimitCORE=0
+
+[Install]
+WantedBy=kestrel-session.target

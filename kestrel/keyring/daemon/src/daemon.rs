@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
@@ -26,13 +27,14 @@ pub struct Daemon {
     pub fingerprints: AtomicBool,
     pub unlocked: watch::Sender<bool>,
     pub screen_locked: AtomicBool,
-    pub changed: Notify,
+    pub changed: Arc<Notify>,
     pub objects: Mutex<BTreeSet<Target>>,
     pub dismissed: std::sync::Mutex<Option<Instant>>,
 }
 
 impl Daemon {
     pub fn new(connection: Connection, keyring: Keyring) -> Self {
+        let changed = keyring.changes.clone();
         Self {
             prompter: Prompter::new(connection.clone()),
             connection,
@@ -47,7 +49,7 @@ impl Daemon {
             fingerprints: AtomicBool::new(false),
             unlocked: watch::Sender::new(false),
             screen_locked: AtomicBool::new(false),
-            changed: Notify::new(),
+            changed,
             objects: Mutex::default(),
             dismissed: std::sync::Mutex::default(),
         }

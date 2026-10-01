@@ -31,6 +31,14 @@ pub async fn publish(daemon: &Daemon) {
     let _ = status.pin_changed(emitter).await;
     let _ = status.lock_with_screen_changed(emitter).await;
     let _ = status.pending_imports_changed(emitter).await;
+    if let Ok(access) = daemon
+        .connection
+        .object_server()
+        .interface::<_, super::Access>(PATH)
+        .await
+    {
+        let _ = super::Access::changed(access.signal_emitter()).await;
+    }
 }
 
 fn chip_name(chip: &Chip) -> &'static str {
@@ -47,6 +55,13 @@ fn chip_name(chip: &Chip) -> &'static str {
 
 impl Status {
     async fn sealed(&self) -> Option<bool> {
+        if self
+            .daemon
+            .reseal
+            .load(std::sync::atomic::Ordering::Relaxed)
+        {
+            return None;
+        }
         let chip = self.daemon.chip.lock().await.clone()?;
         let seal = chip.seal.filter(|_| chip.chip == Chip::Ready)?;
         self.daemon
@@ -64,10 +79,9 @@ impl Status {
         self.daemon.lock().await;
     }
 
-    async fn unlock(&self) -> bool {
-        self.daemon
-            .ensure_unlocked(&crate::identity::App::unknown(), true)
-            .await
+    async fn unlock(&self, #[zbus(header)] header: Header<'_>) -> bool {
+        let (_, app) = self.daemon.caller(&header).await;
+        self.daemon.ensure_unlocked(&app, true).await
     }
 
     async fn set_pin(

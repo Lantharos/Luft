@@ -3,6 +3,9 @@ mod formats;
 mod import;
 
 use std::path::PathBuf;
+use std::sync::Arc;
+
+use tokio::sync::Notify;
 
 use luft_keyring_vault::{
     AuditLog, ChipWrap, Contents, Error, Header, MasterKey, PasswordWrap, Record, Stored, now,
@@ -44,6 +47,7 @@ struct Unlocked {
 }
 
 pub struct Keyring {
+    pub changes: Arc<Notify>,
     paths: Paths,
     header: Option<Header>,
     unlocked: Option<Unlocked>,
@@ -54,6 +58,7 @@ impl Keyring {
     pub fn open(paths: Paths) -> Result<Self, Error> {
         let header = Stored::load(&paths.vault())?.map(|stored| stored.header);
         Ok(Self {
+            changes: Arc::default(),
             paths,
             header,
             unlocked: None,
@@ -144,6 +149,7 @@ impl Keyring {
             &unlocked.key,
             &unlocked.contents,
         )?;
+        self.changes.notify_one();
         Ok(result)
     }
 
@@ -187,6 +193,7 @@ impl Keyring {
             action,
             target: target.to_owned(),
         };
+        self.changes.notify_one();
         if let Err(error) = self.audit().append(key, &record) {
             eprintln!("Couldn't add to the access history: {error}");
         }

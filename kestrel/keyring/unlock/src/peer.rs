@@ -27,22 +27,29 @@ impl Verifier {
     pub fn identify(&self, socket: RawFd) -> Peer {
         match peer_uid(socket) {
             Some(0) => Peer::Root,
-            Some(user) if self.is_keyring(socket, user).is_some() => Peer::Keyring(user),
-            _ => Peer::Stranger,
+            Some(user) => match self.is_keyring(socket, user) {
+                Ok(()) => Peer::Keyring(user),
+                Err(reason) => {
+                    eprintln!("Refused a connection from user {user}: {reason}");
+                    Peer::Stranger
+                }
+            },
+            None => Peer::Stranger,
         }
     }
 
-    fn is_keyring(&self, socket: RawFd, user: u32) -> Option<()> {
-        let pidfd = peer_pidfd(socket)?;
-        let pid = pid_of(&pidfd)?;
+    fn is_keyring(&self, socket: RawFd, user: u32) -> Result<(), &'static str> {
+        let pidfd = peer_pidfd(socket).ok_or("its process can't be identified")?;
+        let pid = pid_of(&pidfd).ok_or("its process has no ID")?;
         let process = open_at(
             None,
             &format!("/proc/{pid}"),
             libc::O_PATH | libc::O_DIRECTORY,
-        )?;
-        alive(&pidfd)?;
+        )
+        .ok_or("its process can't be opened")?;
+        alive(&pidfd, pid).ok_or("its process ended")?;
 
-        let status = read_at(&process, c"status")?;
+        let status = read_at(&process, c"status").ok_or("its status can't be read")?;
         let status = String::from_utf8_lossy(&status);
         let field = |name: &str| {
             status
@@ -50,34 +57,53 @@ impl Verifier {
                 .find_map(|line| line.strip_prefix(name))
                 .map(str::split_whitespace)
         };
-        field("Uid:")?
-            .all(|id| id.parse() == Ok(user))
-            .then_some(())?;
-        field("TracerPid:")?.eq(["0"]).then_some(())?;
+        let same_user = field("Uid:").is_some_and(|mut ids| ids.all(|id| id.parse() == Ok(user)));
+        check(same_user, "it changed its user IDs")?;
+        check(
+            field("TracerPid:").is_some_and(|tracer| tracer.eq(["0"])),
+            "it is being traced",
+        )?;
 
-        let binary = fs::metadata(&self.daemon).ok()?;
-        (binary.uid() == 0 && binary.permissions().mode() & 0o022 == 0).then_some(())?;
-        let running = File::from(open_at(Some(&process), "exe", libc::O_PATH)?)
-            .metadata()
-            .ok()?;
-        (running.dev() == binary.dev() && running.ino() == binary.ino()).then_some(())?;
+        let binary =
+            fs::metadata(&self.daemon).map_err(|_| "the keyring program isn't installed")?;
+        check(
+            binary.uid() == 0 && binary.permissions().mode() & 0o022 == 0,
+            "the keyring program isn't protected by root",
+        )?;
+        let running = open_at(Some(&process), "exe", libc::O_PATH)
+            .and_then(|exe| File::from(exe).metadata().ok())
+            .ok_or("its program can't be read")?;
+        check(
+            running.dev() == binary.dev() && running.ino() == binary.ino(),
+            "it isn't the keyring program",
+        )?;
 
-        let cgroup = String::from_utf8(read_at(&process, c"cgroup")?).ok()?;
-        let path = cgroup.lines().find_map(|line| line.strip_prefix("0::"))?;
+        let cgroup = read_at(&process, c"cgroup")
+            .and_then(|cgroup| String::from_utf8(cgroup).ok())
+            .unwrap_or_default();
+        let path = cgroup
+            .lines()
+            .find_map(|line| line.strip_prefix("0::"))
+            .unwrap_or_default();
         let manager = format!("/user.slice/user-{user}.slice/user@{user}.service/");
-        (path.starts_with(&manager) && path.rsplit('/').next() == Some(UNIT)).then_some(())?;
+        check(
+            path.starts_with(&manager) && path.rsplit('/').next() == Some(UNIT),
+            "it doesn't run as the keyring service",
+        )?;
 
-        let environment = read_at(&process, c"environ")?;
-        let mut variables = environment.split(|byte| *byte == 0);
-        variables
-            .all(|variable| {
-                !LOADER_VARIABLES
-                    .iter()
-                    .any(|name| variable.starts_with(name))
-            })
-            .then_some(())?;
-        alive(&pidfd)
+        let environment = read_at(&process, c"environ").ok_or("its environment can't be read")?;
+        let preloaded = environment.split(|byte| *byte == 0).any(|variable| {
+            LOADER_VARIABLES
+                .iter()
+                .any(|name| variable.starts_with(name))
+        });
+        check(!preloaded, "it was started with extra libraries")?;
+        alive(&pidfd, pid).ok_or("its process ended")
     }
+}
+
+fn check(condition: bool, reason: &'static str) -> Result<(), &'static str> {
+    if condition { Ok(()) } else { Err(reason) }
 }
 
 fn peer_uid(socket: RawFd) -> Option<u32> {
@@ -122,17 +148,8 @@ fn pid_of(pidfd: &OwnedFd) -> Option<u32> {
         .filter(|pid| *pid > 0)
 }
 
-fn alive(pidfd: &OwnedFd) -> Option<()> {
-    let result = unsafe {
-        libc::syscall(
-            libc::SYS_pidfd_send_signal,
-            pidfd.as_raw_fd(),
-            0,
-            std::ptr::null::<libc::siginfo_t>(),
-            0,
-        )
-    };
-    (result == 0).then_some(())
+fn alive(pidfd: &OwnedFd, pid: u32) -> Option<()> {
+    (pid_of(pidfd) == Some(pid)).then_some(())
 }
 
 fn open_at(directory: Option<&OwnedFd>, path: &str, flags: libc::c_int) -> Option<OwnedFd> {

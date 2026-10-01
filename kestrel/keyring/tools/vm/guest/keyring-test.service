@@ -1,0 +1,11 @@
+[Unit]
+Description=Luft Keyring end-to-end test
+After=greetd.service luft-keyring-unlock.socket kestrel-authenticate.socket
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/keyring-test/orchestrate.py
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target

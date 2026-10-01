@@ -181,7 +181,9 @@ impl Access {
             .await
             .audit()
             .clear()
-            .map_err(|error| fdo::Error::Failed(error.to_string()))
+            .map_err(|error| fdo::Error::Failed(error.to_string()))?;
+        self.daemon.changed.notify_one();
+        Ok(())
     }
 
     #[zbus(signal)]

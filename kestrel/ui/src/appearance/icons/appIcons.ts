@@ -47,7 +47,7 @@ class AppIcons {
   private readonly bound = new Map<St.Icon, IconApp>();
   private readonly hidden = new Set<St.Icon>();
   private readonly listeners = new Set<() => void>();
-  private wallpaper: { seed: Seed; dark: boolean } | null = null;
+  private accent: { seed: Seed; dark: boolean } | null = null;
   private restyleId = 0;
   style = this.settings.get_string('app-icon-style') as IconStyle;
   paints: Record<PaintedStyle, Paint> | null = null;
@@ -57,8 +57,8 @@ class AppIcons {
     this.settings.connect('changed::app-icon-tint', () => this.refresh());
   }
 
-  setWallpaper(seed: Seed, dark: boolean): void {
-    this.wallpaper = { seed, dark };
+  setAccent(seed: Seed, dark: boolean): void {
+    this.accent = { seed, dark };
     this.refresh();
   }
 
@@ -91,8 +91,8 @@ class AppIcons {
   private refresh(): void {
     const style = this.settings.get_string('app-icon-style') as IconStyle;
     const tint = this.settings.get_string('app-icon-tint');
-    const seed = tint ? seedFromColor(fromHex(tint)) : this.wallpaper?.seed;
-    const painted = seed ? paints(seed, this.wallpaper?.dark ?? true) : null;
+    const seed = tint ? seedFromColor(fromHex(tint)) : this.accent?.seed;
+    const painted = seed ? paints(seed, this.accent?.dark ?? true) : null;
     if (style === this.style && JSON.stringify(painted) === JSON.stringify(this.paints)) return;
     const restyle = style !== 'default' || this.style !== 'default';
     this.style = style;

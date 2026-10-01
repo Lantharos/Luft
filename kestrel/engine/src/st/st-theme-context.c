@@ -28,17 +28,8 @@
 #include "st-theme-context.h"
 #include "st-theme-node-private.h"
 
-#define ACCENT_COLOR_BLUE   "#3584e4"
-#define ACCENT_COLOR_TEAL   "#2190a4"
-#define ACCENT_COLOR_GREEN  "#3a944a"
-#define ACCENT_COLOR_YELLOW "#c88800"
-#define ACCENT_COLOR_ORANGE "#ed5b00"
-#define ACCENT_COLOR_RED    "#e62d42"
-#define ACCENT_COLOR_PINK   "#d56199"
-#define ACCENT_COLOR_PURPLE "#9141ac"
-#define ACCENT_COLOR_SLATE  "#6f8396"
-
-#define ACCENT_FG_COLOR     "#ffffff"
+#define DEFAULT_ACCENT_COLOR    "#3584e4"
+#define DEFAULT_ACCENT_FG_COLOR "#ffffff"
 
 struct _StThemeContext {
   GObject parent;
@@ -85,7 +76,6 @@ static PangoFontDescription *get_interface_font_description (void);
 static void on_font_name_changed (StSettings     *settings,
                                   GParamSpec     *pspec,
                                   StThemeContext *context);
-static void update_accent_colors (StThemeContext *context);
 static void on_icon_theme_changed (StTextureCache *cache,
                                    StThemeContext *context);
 static void st_theme_context_changed (StThemeContext *context);
@@ -107,9 +97,6 @@ st_theme_context_finalize (GObject *object)
 
   g_signal_handlers_disconnect_by_func (st_settings_get (),
                                         (gpointer) on_font_name_changed,
-                                        context);
-  g_signal_handlers_disconnect_by_func (st_settings_get (),
-                                        (gpointer) update_accent_colors,
                                         context);
   g_signal_handlers_disconnect_by_func (st_texture_cache_get_default (),
                                        (gpointer) on_icon_theme_changed,
@@ -178,10 +165,6 @@ st_theme_context_init (StThemeContext *context)
                     "notify::font-name",
                     G_CALLBACK (on_font_name_changed),
                     context);
-  g_signal_connect_swapped (st_settings_get (),
-                            "notify::accent-color",
-                            G_CALLBACK (update_accent_colors),
-                            context);
   g_signal_connect (st_texture_cache_get_default (),
                     "icon-theme-changed",
                     G_CALLBACK (on_icon_theme_changed),
@@ -192,7 +175,8 @@ st_theme_context_init (StThemeContext *context)
                                           g_object_unref, NULL);
   context->scale_factor = 1;
 
-  update_accent_colors (context);
+  cogl_color_from_string (&context->accent_color, DEFAULT_ACCENT_COLOR);
+  cogl_color_from_string (&context->accent_fg_color, DEFAULT_ACCENT_FG_COLOR);
 }
 
 static void
@@ -241,63 +225,6 @@ get_interface_font_description (void)
 
   g_object_get (settings, "font-name", &font_name, NULL);
   return pango_font_description_from_string (font_name);
-}
-
-static void
-update_accent_colors (StThemeContext *context)
-{
-  StSettings *settings = st_settings_get ();
-  StSystemAccentColor accent_color;
-
-  g_object_get (settings, "accent-color", &accent_color, NULL);
-
-  switch (accent_color)
-    {
-    case ST_SYSTEM_ACCENT_COLOR_BLUE:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_BLUE);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_TEAL:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_TEAL);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_GREEN:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_GREEN);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_YELLOW:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_YELLOW);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_ORANGE:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_ORANGE);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_RED:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_RED);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_PINK:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_PINK);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_PURPLE:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_PURPLE);
-      break;
-
-    case ST_SYSTEM_ACCENT_COLOR_SLATE:
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_SLATE);
-      break;
-
-    default:
-      g_warning ("Unsupported accent color: %d", accent_color);
-      cogl_color_from_string (&context->accent_color, ACCENT_COLOR_BLUE);
-      break;
-    }
-
-  cogl_color_from_string (&context->accent_fg_color, ACCENT_FG_COLOR);
-
-  st_theme_context_changed (context);
 }
 
 static void
@@ -512,6 +439,31 @@ st_theme_context_get_accent_color (StThemeContext *context,
 
   if (fg_color)
     memcpy (fg_color, &context->accent_fg_color, sizeof (CoglColor));
+}
+
+/**
+ * st_theme_context_set_accent_color:
+ * @context: a #StThemeContext
+ * @color: the accent color
+ * @fg_color: the color of text and icons drawn on the accent color
+ *
+ * Sets the accent color that `-st-accent-color` and `-st-accent-fg-color`
+ * resolve to.
+ */
+void
+st_theme_context_set_accent_color (StThemeContext  *context,
+                                   const CoglColor *color,
+                                   const CoglColor *fg_color)
+{
+  g_return_if_fail (ST_IS_THEME_CONTEXT (context));
+
+  if (cogl_color_equal (&context->accent_color, color) &&
+      cogl_color_equal (&context->accent_fg_color, fg_color))
+    return;
+
+  context->accent_color = *color;
+  context->accent_fg_color = *fg_color;
+  st_theme_context_changed (context);
 }
 
 /**

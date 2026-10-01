@@ -52,6 +52,9 @@ void                        st_theme_context_set_font         (StThemeContext   
                                                                const PangoFontDescription *font);
 const PangoFontDescription *st_theme_context_get_font         (StThemeContext             *context);
 
+void                        st_theme_context_set_accent_color (StThemeContext             *context,
+                                                               const CoglColor            *color,
+                                                               const CoglColor            *fg_color);
 void                        st_theme_context_get_accent_color (StThemeContext             *context,
                                                                CoglColor                  *color,
                                                                CoglColor                  *fg_color);

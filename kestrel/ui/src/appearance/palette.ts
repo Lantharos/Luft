@@ -1,4 +1,4 @@
-import { atTone, toHex, type Rgb, type Seed, type TonalPalette } from './color.js';
+import { atTone, isNeutral, toHex, type Rgb, type Seed, type TonalPalette } from './color.js';
 import { terminalColors } from './terminal.js';
 
 type PaletteName = 'primary' | 'secondary' | 'tertiary' | 'error' | 'neutral' | 'neutralVariant';
@@ -57,6 +57,14 @@ const PURE_BLACK_TONES: Partial<Record<Role, number>> = {
   surfaceContainerHighest: 17,
 };
 
+const MONOCHROME_TONES: Partial<Record<Role, [light: number, dark: number]>> = {
+  primary: [10, 100],
+  onPrimary: [100, 10],
+  primaryContainer: [25, 85],
+  onPrimaryContainer: [100, 0],
+  inversePrimary: [100, 10],
+};
+
 export interface Scheme {
   colors: Colors;
   terminal: Record<string, string>;
@@ -79,7 +87,9 @@ function tonalPalettes({ hue, chroma }: Seed): Record<PaletteName, TonalPalette>
 }
 
 function scheme(palettes: Record<PaletteName, TonalPalette>, seed: Seed, dark: boolean, pureBlack: boolean): Scheme {
-  const colors = Object.fromEntries(Object.entries(ROLES).map(([role, [palette, light, darkTone]]) => {
+  const overrides = isNeutral(seed) ? MONOCHROME_TONES : {};
+  const colors = Object.fromEntries(Object.entries(ROLES).map(([role, [palette, ...tones]]) => {
+    const [light, darkTone] = overrides[role as Role] ?? tones;
     const tone = dark ? (pureBlack ? PURE_BLACK_TONES[role as Role] : undefined) ?? darkTone : light;
     return [role, atTone(palettes[palette], tone)];
   })) as Record<Role, Rgb>;
@@ -87,7 +97,7 @@ function scheme(palettes: Record<PaletteName, TonalPalette>, seed: Seed, dark: b
     Object.fromEntries(Object.entries(entries).map(([key, color]) => [key, toHex(color)]));
   return {
     colors: hex(colors) as Colors,
-    terminal: hex(terminalColors(colors, palettes.neutral, palettes.neutralVariant, seed.hue, dark)),
+    terminal: hex(terminalColors(colors, palettes.neutral, palettes.neutralVariant, seed, dark)),
   };
 }
 

@@ -5,6 +5,11 @@
     <value nick="custom" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.Accent">
+    <value nick="wallpaper" value="0"/>
+    <value nick="white" value="1"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.AppIconStyle">
     <value nick="default" value="0"/>
     <value nick="tinted" value="1"/>
@@ -103,6 +108,15 @@
         for other apps fully black, which saves power on OLED displays.
       </description>
     </key>
+    <key name="accent" enum="com.lantharos.kestrel.Accent">
+      <default>'wallpaper'</default>
+      <summary>Accent color of the desktop and apps</summary>
+      <description>
+        Wallpaper picks the accent from the wallpaper, and turns white when
+        the wallpaper has hardly any color. White keeps the accent white in
+        the dark style and black in the light style.
+      </description>
+    </key>
     <key name="theme-apps" type="b">
       <default>false</default>
       <summary>Color other apps from the wallpaper</summary>
@@ -125,7 +139,7 @@
       <summary>Color of tinted app icons</summary>
       <description>
         A color such as #3584e4 for tinted app icons. Empty uses the
-        wallpaper's accent color.
+        accent color.
       </description>
     </key>
     <key name="live-wallpaper-on-battery" type="b">

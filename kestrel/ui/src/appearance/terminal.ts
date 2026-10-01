@@ -1,4 +1,4 @@
-import { atTone, type Rgb, type TonalPalette } from './color.js';
+import { atTone, isNeutral, type Rgb, type Seed, type TonalPalette } from './color.js';
 import type { Role } from './palette.js';
 
 const ANSI_HUES = [25, 145, 95, 255, 330, 200];
@@ -15,9 +15,9 @@ function harmonize(hue: number, towards: number): number {
   return (hue + Math.sign(difference) * Math.min(Math.abs(difference) / 2, HARMONIZE_LIMIT) + 360) % 360;
 }
 
-export function terminalColors(colors: Record<Role, Rgb>, neutral: TonalPalette, neutralVariant: TonalPalette, seedHue: number, dark: boolean): Record<string, Rgb> {
+export function terminalColors(colors: Record<Role, Rgb>, neutral: TonalPalette, neutralVariant: TonalPalette, seed: Seed, dark: boolean): Record<string, Rgb> {
   const tones = dark ? TONES.dark : TONES.light;
-  const hues = ANSI_HUES.map(hue => harmonize(hue, seedHue));
+  const hues = isNeutral(seed) ? ANSI_HUES : ANSI_HUES.map(hue => harmonize(hue, seed.hue));
   const ansi = [
     atTone(neutral, tones.black),
     ...hues.map(hue => atTone({ hue, chroma: ANSI_CHROMA }, tones.normal)),

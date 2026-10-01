@@ -11,6 +11,7 @@ mod network;
 mod notifications;
 mod power;
 mod privacy;
+mod security;
 mod sound;
 mod updates;
 mod users;
@@ -32,6 +33,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = mouse::register(window, events);
     let window = apps::register(window, events);
     let window = privacy::register(window, events);
+    let window = security::register(window, events);
     let window = datetime::register(window, events);
     let window = users::register(window, events);
     let window = login::register(window, events);

@@ -49,7 +49,7 @@ function readLines(stream, onLine) {
   next();
 }
 
-const sleep = milliseconds => new Promise(resolve => GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {
+export const sleep = milliseconds => new Promise(resolve => GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {
   resolve();
   return GLib.SOURCE_REMOVE;
 }));

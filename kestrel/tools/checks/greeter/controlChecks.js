@@ -1,4 +1,17 @@
 import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
+
+function brightnessAtCenter() {
+  const screenshot = new Shell.Screenshot();
+  return new Promise((resolve, reject) => screenshot.pick_color(global.stage.width / 2, global.stage.height / 2, (source, result) => {
+    try {
+      const [, color] = source.pick_color_finish(result);
+      resolve(Math.max(color.red, color.green, color.blue));
+    } catch (error) {
+      reject(error);
+    }
+  }));
+}
 
 export async function checkControls({pause, capture, events, find, visible, require, click, output}) {
   const menu = find('kestrel-context-menu');
@@ -29,4 +42,11 @@ export async function checkControls({pause, capture, events, find, visible, requ
   await click(find('Suspend', menu));
   require(events().some(event => event.type === 'power' && event.action === 'suspend'), 'suspend asks the system to suspend');
   await pause(300);
+
+  await click(find('kestrel-greeter-power'));
+  await click(find('Power off', menu), 450);
+  require(events().some(event => event.type === 'power' && event.action === 'power-off') && await brightnessAtCenter() < 4,
+    'powering off fades the login screen to black before asking the system');
+  await pause(700);
+  require(await brightnessAtCenter() > 20, 'the login screen comes back when the system refuses to power off');
 }

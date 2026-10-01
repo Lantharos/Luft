@@ -505,13 +505,16 @@ GOptionEntry gnome_shell_options[] = {
 };
 
 static gboolean
-on_sigterm (gpointer user_data)
+on_termination_signal (gpointer user_data)
 {
+  static gboolean terminating = FALSE;
   MetaContext *context = META_CONTEXT (user_data);
 
-  meta_context_terminate (context);
+  if (!terminating)
+    meta_context_terminate (context);
+  terminating = TRUE;
 
-  return G_SOURCE_REMOVE;
+  return G_SOURCE_CONTINUE;
 }
 
 static void
@@ -531,8 +534,9 @@ init_signal_handlers (MetaContext *context)
     g_warning ("Failed to register SIGXFSZ handler: %s", g_strerror (errno));
 #endif
 
-  g_unix_signal_add (SIGINT, on_sigterm, context);
-  g_unix_signal_add (SIGTERM, on_sigterm, context);
+  g_unix_signal_add (SIGINT, on_termination_signal, context);
+  g_unix_signal_add (SIGTERM, on_termination_signal, context);
+  g_unix_signal_add (SIGHUP, on_termination_signal, context);
 }
 
 static void

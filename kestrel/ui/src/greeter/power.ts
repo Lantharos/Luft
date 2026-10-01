@@ -2,11 +2,12 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../menus/contextMenus.js';
+import { Blackout } from '../session/farewell.js';
 
 const ACTIONS = [
-  { label: 'Suspend', method: 'Suspend', check: 'CanSuspend' },
-  { label: 'Restart', method: 'Reboot', check: 'CanReboot' },
-  { label: 'Power off', method: 'PowerOff', check: 'CanPowerOff' },
+  { label: 'Suspend', method: 'Suspend', check: 'CanSuspend', fadeOut: false },
+  { label: 'Restart', method: 'Reboot', check: 'CanReboot', fadeOut: true },
+  { label: 'Power off', method: 'PowerOff', check: 'CanPowerOff', fadeOut: true },
 ];
 
 function callLogind(method: string, parameters: GLib.Variant | null): Promise<GLib.Variant> {
@@ -23,6 +24,7 @@ function callLogind(method: string, parameters: GLib.Variant | null): Promise<GL
 }
 
 export class PowerActions {
+  private readonly blackout = new Blackout();
   private available: typeof ACTIONS = [];
 
   async load(): Promise<void> {
@@ -34,8 +36,17 @@ export class PowerActions {
   entries(): MenuEntry[] {
     return this.available.map(action => ({
       label: action.label,
-      run: () => void callLogind(action.method, new GLib.Variant('(b)', [false]))
-        .catch(error => console.warn(`${action.label} did not start: ${error}`)),
+      run: () => void this.perform(action),
     }));
+  }
+
+  private async perform(action: typeof ACTIONS[number]): Promise<void> {
+    if (action.fadeOut) await this.blackout.fade();
+    try {
+      await callLogind(action.method, new GLib.Variant('(b)', [false]));
+    } catch (error) {
+      this.blackout.lift();
+      console.warn(`${action.label} did not start: ${error}`);
+    }
   }
 }

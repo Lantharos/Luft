@@ -98,7 +98,13 @@ publish('org.freedesktop.login1.Manager', {
   CanPowerOff: () => 'yes',
   Suspend: () => record({type: 'power', action: 'suspend'}),
   Reboot: () => record({type: 'power', action: 'reboot'}),
-  PowerOff: () => record({type: 'power', action: 'power-off'}),
+  PowerOffAsync: (_parameters, invocation) => {
+    record({type: 'power', action: 'power-off'});
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+      invocation.return_dbus_error('org.freedesktop.login1.BlockedByInhibitorLock', 'Powering off is inhibited');
+      return GLib.SOURCE_REMOVE;
+    });
+  },
 }, '/org/freedesktop/login1');
 
 publish('org.freedesktop.locale1', {

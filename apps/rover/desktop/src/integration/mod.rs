@@ -8,7 +8,8 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use zbus::{connection, object_server::Interface};
+use futures_util::StreamExt;
+use zbus::{MessageStream, connection, object_server::Interface};
 
 fn serve_dbus<I: Interface>(bus_name: &str, object_path: &str, interface: I) -> Result<(), String> {
     let runtime = tokio::runtime::Builder::new_current_thread()
@@ -16,14 +17,16 @@ fn serve_dbus<I: Interface>(bus_name: &str, object_path: &str, interface: I) -> 
         .build()
         .map_err(|error| error.to_string())?;
     runtime.block_on(async {
-        let _connection = connection::Builder::session()
+        let connection = connection::Builder::session()
             .and_then(|builder| builder.name(bus_name))
             .and_then(|builder| builder.serve_at(object_path, interface))
             .map_err(|error| error.to_string())?
             .build()
             .await
             .map_err(|error| error.to_string())?;
-        std::future::pending::<Result<(), String>>().await
+        let mut messages = MessageStream::from(&connection);
+        while messages.next().await.is_some() {}
+        Ok(())
     })
 }
 

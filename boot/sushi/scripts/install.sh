@@ -35,15 +35,17 @@ rebuild_initramfs() {
 }
 
 install_files() {
-  local stage
+  local stage files file
   stage="$(mktemp -d)"
-  trap 'rm -rf "$stage"' RETURN
+  files="$(mktemp)"
+  trap 'rm -rf "$stage" "$files"' RETURN
   "$root/scripts/build.sh" "$stage"
-  (cd "$stage" && find . -type f -o -type l) | sed 's|^\.||' | sort > "$stage.list"
-  sudo cp -a --no-preserve=ownership "$stage/." /
-  sudo install -Dm644 "$stage.list" "$manifest"
-  rm -f "$stage.list"
-  printf 'add_dracutmodules+=" sushi "\n' | sudo install -Dm644 /dev/stdin "$dracut_config"
+  (cd "$stage" && find . -type f | sed 's|^\.||' | sort) > "$files"
+  while IFS= read -r file; do
+    sudo install -DZ -o root -g root -m "$(stat -c %a "$stage$file")" "$stage$file" "$file"
+  done < "$files"
+  sudo install -DZ -m644 "$files" "$manifest"
+  printf 'add_dracutmodules+=" sushi "\n' | sudo install -DZ -m644 /dev/stdin "$dracut_config"
   sudo systemctl daemon-reload
   sudo systemctl enable sushi.service sushi-quit.service
   rebuild_initramfs

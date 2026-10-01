@@ -4,28 +4,27 @@
 extern crate alloc;
 
 mod bgrt;
-mod chainload;
 mod entries;
-mod linux_boot;
-mod loader_conf;
+mod files;
+mod loader;
 mod menu;
 mod screen;
-mod uki;
-mod volume;
+mod start;
 
 #[used]
 #[unsafe(link_section = ".sbat")]
 static SBAT: [u8; 139] = *b"sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md\nsushiboot,1,Luft,sushiboot,1,https://github.com/Lantharos/Luft\n";
 
-use entries::BootKind;
-use linux_boot::LinuxEntry;
-use uefi::boot::{self, SearchType};
+use uefi::boot::{self, OpenProtocolAttributes, OpenProtocolParams, ScopedProtocol, SearchType};
 use uefi::prelude::*;
 use uefi::proto::console::gop::GraphicsOutput;
 use uefi::proto::loaded_image::LoadedImage;
 use uefi::{Handle, Identify};
 
-use crate::screen::Screen;
+use entries::Catalog;
+use loader::{conf, vars};
+use screen::Screen;
+use start::firmware;
 
 fn graphics_handle() -> Option<Handle> {
     boot::get_handle_for_protocol::<GraphicsOutput>()
@@ -38,6 +37,16 @@ fn graphics_handle() -> Option<Handle> {
         })
 }
 
+fn shared_graphics(handle: Handle) -> Option<ScopedProtocol<GraphicsOutput>> {
+    let params = OpenProtocolParams {
+        handle,
+        agent: boot::image_handle(),
+        controller: None,
+    };
+    unsafe { boot::open_protocol::<GraphicsOutput>(params, OpenProtocolAttributes::GetProtocol) }
+        .ok()
+}
+
 #[entry]
 fn efi_main() -> Status {
     uefi::helpers::init().expect("the UEFI helpers start once");
@@ -48,42 +57,28 @@ fn efi_main() -> Status {
         return Status::LOAD_ERROR;
     };
 
-    let mut found = entries::collect_all(device);
-    if found.is_empty() {
-        found.push(entries::fallback_entry(device));
-    }
-    let config = loader_conf::load(device);
-    let screen = graphics_handle()
-        .and_then(|handle| boot::open_protocol_exclusive::<GraphicsOutput>(handle).ok())
-        .map(Screen::new);
-    let chosen = match screen {
-        Some(mut screen) => menu::choose(&mut screen, &found, &config),
-        None => config
-            .default_id
-            .as_deref()
-            .and_then(|id| entries::find_index_by_id(&found, id))
-            .unwrap_or(0),
+    let catalog = Catalog::collect(device, firmware::secure_boot());
+    let Some(first) = catalog.first() else {
+        return Status::NOT_FOUND;
     };
+    vars::describe(&catalog);
+    let config = conf::load(device);
+    let default = [vars::take_oneshot(), vars::chosen_default(), config.default]
+        .iter()
+        .flatten()
+        .find_map(|pattern| catalog.find(pattern))
+        .unwrap_or(first);
+    let chosen = graphics_handle()
+        .and_then(shared_graphics)
+        .map(Screen::new)
+        .map_or(default, |mut screen| {
+            menu::choose(&mut screen, &catalog, default, config.timeout)
+        });
 
-    let entry = &found[chosen];
+    let entry = &catalog.entries[chosen];
+    vars::selected(&entry.id);
     log::info!("SushiBoot: starting {}", entry.title);
-    let started = match &entry.kind {
-        BootKind::Linux {
-            linux,
-            initrd,
-            options,
-        } => linux_boot::preload_kernel(entry.volume, linux).and_then(|kernel| {
-            linux_boot::start_preloaded(
-                kernel,
-                &LinuxEntry {
-                    initrd: initrd.as_deref(),
-                    cmdline: options,
-                },
-            )
-        }),
-        BootKind::Efi { efi, .. } => chainload::start_efi(entry.volume, efi),
-    };
-    match started {
+    match start::start(entry) {
         Ok(()) => Status::SUCCESS,
         Err(error) => {
             log::error!("SushiBoot: {} did not start: {error:?}", entry.title);

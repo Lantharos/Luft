@@ -43,11 +43,6 @@ enum Commands {
         #[arg(long)]
         esp: Option<PathBuf>,
     },
-    /// Add a Windows Boot Manager BLS entry (if bootmgfw.efi exists).
-    AddWindows {
-        #[arg(long)]
-        esp: Option<PathBuf>,
-    },
 }
 
 fn main() -> Result<()> {
@@ -56,7 +51,6 @@ fn main() -> Result<()> {
         Commands::Install { esp, efi_entry } => cmd_install(esp, efi_entry),
         Commands::List { esp } => cmd_list(esp),
         Commands::SetDefault { id, esp } => cmd_set_default(&id, esp),
-        Commands::AddWindows { esp } => cmd_add_windows(esp),
     }
 }
 
@@ -127,21 +121,6 @@ fn cmd_set_default(id: &str, esp: Option<PathBuf>) -> Result<()> {
     let conf = read_loader_conf(&conf_path);
     write_loader_conf(&conf_path, Some(id), conf.timeout_secs)?;
     println!("Default boot entry: {id}");
-    Ok(())
-}
-
-fn cmd_add_windows(esp: Option<PathBuf>) -> Result<()> {
-    let esp = resolve_esp(esp)?;
-    let win_efi = esp.join("EFI/Microsoft/Boot/bootmgfw.efi");
-    if !win_efi.is_file() {
-        bail!("Windows bootloader not found at {}", win_efi.display());
-    }
-    let entry_path = esp.join(ENTRIES_DIR).join("windows.conf");
-    fs::create_dir_all(entry_path.parent().unwrap())?;
-    let mut f = fs::File::create(&entry_path)?;
-    writeln!(f, "title Windows Boot Manager")?;
-    writeln!(f, "efi \\\\EFI\\\\Microsoft\\\\Boot\\\\bootmgfw.efi")?;
-    println!("Wrote {}", entry_path.display());
     Ok(())
 }
 

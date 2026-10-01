@@ -4,12 +4,14 @@ extern crate alloc;
 
 mod bmp;
 pub mod loader;
+mod notice;
 mod prompt;
 mod scene;
 mod status;
 pub mod text;
 
 pub use bmp::decode_bmp;
+pub use notice::Notice;
 pub use prompt::{Prompt, is_shaking};
 pub use scene::{Scene, Visuals};
 pub use status::Status;

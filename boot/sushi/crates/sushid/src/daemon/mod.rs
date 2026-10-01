@@ -19,9 +19,10 @@ use sushi::terminal::Terminal;
 use sushi::uevent::CardEvents;
 
 use crate::activity::Activity;
+use crate::notice::Shown;
 use crate::screen::{Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
-use crate::unlock::{Typed, Unlock};
+use crate::unlock::{Answered, Typed, Unlock};
 
 const FRAME: Duration = Duration::from_micros(16_667);
 const WATCH_INTERVAL: Duration = Duration::from_millis(16);
@@ -60,7 +61,10 @@ pub struct Daemon {
     activity: Activity,
     unlock: Option<Unlock>,
     fading_prompt: Option<Prompt>,
-    last_answered: Option<String>,
+    answered: Answered,
+    enrollment_code: Option<String>,
+    notice: Option<Shown>,
+    fading_notice: Option<sushi::scene::Notice>,
     root: Option<PathBuf>,
     quit: bool,
 }
@@ -102,11 +106,15 @@ impl Daemon {
                 logo: Fader::at(1.0),
                 loader: Fader::at(0.0),
                 prompt: Fader::at(0.0),
+                notice: Fader::at(0.0),
             },
             activity: Activity::new(),
             unlock: None,
             fading_prompt: None,
-            last_answered: None,
+            answered: Answered::default(),
+            enrollment_code: None,
+            notice: None,
+            fading_notice: None,
             root: None,
             quit: false,
             config,
@@ -129,7 +137,9 @@ impl Daemon {
         self.draw();
         notify_ready();
         while !self.quit {
-            self.wait();
+            if self.wait() {
+                self.reopen_terminal();
+            }
             self.handle_commands();
             self.handle_plymouth();
             self.handle_switches();
@@ -155,7 +165,7 @@ impl Daemon {
                 let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
                 if self.look.is_animating(now, prompt) || self.activity.is_animating(now) {
                     Some(FRAME)
-                } else if self.unlock.is_some() {
+                } else if self.unlock.is_some() || self.notice.is_some() {
                     Some(CAPS_LOCK_INTERVAL)
                 } else {
                     None
@@ -166,7 +176,7 @@ impl Daemon {
         }
     }
 
-    fn wait(&self) {
+    fn wait(&self) -> bool {
         let timeout = self.next_wakeup().map(|wait| Timespec {
             tv_sec: wait.as_secs() as i64,
             tv_nsec: wait.subsec_nanos() as i64,
@@ -177,7 +187,8 @@ impl Daemon {
             PollFd::new(&self.requests, PollFlags::IN),
             PollFd::new(&self.signals, PollFlags::IN),
         ];
-        if let (Some(terminal), Some(_)) = (&self.terminal, &self.unlock) {
+        let typing = self.terminal.is_some() && (self.unlock.is_some() || self.notice.is_some());
+        if let Some(terminal) = self.terminal.as_ref().filter(|_| typing) {
             fds.push(PollFd::from_borrowed_fd(terminal.as_fd(), PollFlags::IN));
         }
         if let Some(server) = &self.plymouth {
@@ -188,6 +199,19 @@ impl Daemon {
             );
         }
         let _ = poll(&mut fds, timeout.as_ref());
+        typing
+            && fds[4]
+                .revents()
+                .intersects(PollFlags::HUP | PollFlags::ERR | PollFlags::NVAL)
+    }
+
+    fn reopen_terminal(&mut self) {
+        eprintln!("The console hung up, opening it again");
+        self.terminal = None;
+        self.take_terminal();
+        if let Some(terminal) = &self.terminal {
+            let _ = terminal.listen();
+        }
     }
 
     fn handle_switches(&mut self) {
@@ -244,8 +268,8 @@ impl Daemon {
             self.close_prompt();
         }
         if self.unlock.is_none()
-            && let Some(unlock) =
-                Unlock::next(&self.requests, self.last_answered.as_deref(), self.now())
+            && self.notice.is_none()
+            && let Some(unlock) = Unlock::next(&self.requests, &self.answered, self.now())
         {
             if let Some(terminal) = &self.terminal {
                 let _ = terminal.listen();
@@ -269,12 +293,21 @@ impl Daemon {
     }
 
     fn handle_keys(&mut self) {
+        if self.notice.is_some() {
+            let pressed_enter = self
+                .terminal
+                .as_mut()
+                .is_some_and(|terminal| terminal.keys().contains(&sushi::terminal::Key::Enter));
+            if pressed_enter || self.notice.as_ref().is_some_and(Shown::expired) {
+                self.dismiss_notice();
+            }
+            return;
+        }
         let (Some(terminal), Some(unlock)) = (&mut self.terminal, &mut self.unlock) else {
             return;
         };
-        unlock.prompt.caps_lock = terminal.caps_lock();
-        if let Typed::Answered = unlock.type_keys(terminal) {
-            self.last_answered = Some(unlock.id().to_owned());
+        unlock.set_caps_lock(terminal.caps_lock());
+        if let Typed::Answered = unlock.type_keys(terminal, &mut self.answered) {
             self.close_prompt();
         }
     }
@@ -283,6 +316,9 @@ impl Daemon {
         let now = self.now();
         if self.fading_prompt.is_some() && self.look.prompt.settled(now) {
             self.fading_prompt = None;
+        }
+        if self.fading_notice.is_some() && self.look.notice.settled(now) {
+            self.fading_notice = None;
         }
         match std::mem::replace(&mut self.phase, Phase::Holding) {
             Phase::Leaving(pending) if self.look.settled(now) || self.screen.is_none() => {
@@ -335,8 +371,13 @@ impl Daemon {
         let now = self.now();
         let status = self.activity.status(now);
         let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
+        let notice = self
+            .notice
+            .as_ref()
+            .map(|shown| &shown.notice)
+            .or(self.fading_notice.as_ref());
         if let Some(screen) = &mut self.screen
-            && let Err(error) = screen.draw(&self.look, now, prompt, status)
+            && let Err(error) = screen.draw(&self.look, now, prompt, status, notice)
         {
             eprintln!("Lost {}: {error}", screen.path().display());
             self.screen = None;

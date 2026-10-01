@@ -6,6 +6,9 @@ use std::time::Duration;
 use sushi::config::Config;
 use sushi::control::{Command, Mode};
 use sushi::plymouth::{Client, Request, Response};
+use sushi::scene::Notice;
+
+use crate::notice::{self, Shown};
 
 use super::{Daemon, Pending, Phase, hints, listen_for_plymouth_clients};
 
@@ -39,9 +42,20 @@ impl Daemon {
             Command::Show(mode) => {
                 self.activity.set_mode(mode, self.now());
                 self.reclaim();
-                reply(stream, "ok");
+                match self
+                    .enrollment_code
+                    .take()
+                    .filter(|_| mode == Mode::Shutdown)
+                {
+                    Some(code) => self.show_notice(notice::key_enrollment(&code), stream),
+                    None => reply(stream, "ok"),
+                }
             }
             Command::Status => reply(stream, self.status()),
+            Command::KeyEnrollmentNotice(code) => {
+                self.enrollment_code = code;
+                reply(stream, "ok");
+            }
         }
     }
 
@@ -122,6 +136,34 @@ impl Daemon {
         match pending {
             Pending::Control(stream) => reply(stream, "ok"),
             Pending::Plymouth(client) => self.respond(client, Response::Ack),
+        }
+    }
+
+    fn show_notice(&mut self, shown: Notice, stream: UnixStream) {
+        eprintln!("Explaining the key enrollment screen before restarting");
+        let now = self.now();
+        self.take_terminal();
+        if let Some(terminal) = &self.terminal {
+            let _ = terminal.listen();
+        }
+        self.look.loader.fade_to(0.0, now);
+        self.look.notice.fade_to(1.0, now);
+        self.notice = Some(Shown::new(shown, stream));
+    }
+
+    pub(super) fn dismiss_notice(&mut self) {
+        let Some(mut shown) = self.notice.take() else {
+            return;
+        };
+        let now = self.now();
+        if let Some(terminal) = &self.terminal {
+            terminal.stop_listening();
+        }
+        self.look.notice.fade_to(0.0, now);
+        self.look.loader.fade_to(1.0, now);
+        self.fading_notice = Some(shown.notice.clone());
+        if let Some(stream) = shown.dismiss() {
+            reply(stream, "ok");
         }
     }
 

@@ -16,6 +16,7 @@ pub enum Mode {
     Updates,
     Upgrade,
     Firmware,
+    Encrypting,
 }
 
 impl Mode {
@@ -26,6 +27,7 @@ impl Mode {
             Self::Updates => "updates",
             Self::Upgrade => "system-upgrade",
             Self::Firmware => "firmware-upgrade",
+            Self::Encrypting => "encrypting",
         }
     }
 }
@@ -40,6 +42,7 @@ impl FromStr for Mode {
             "updates" => Self::Updates,
             "system-upgrade" => Self::Upgrade,
             "firmware-upgrade" => Self::Firmware,
+            "encrypting" => Self::Encrypting,
             _ => return Err(format!("{name} isn't something the splash can show")),
         })
     }
@@ -52,6 +55,7 @@ pub enum Command {
     UpdateRoot(PathBuf),
     Show(Mode),
     Status,
+    KeyEnrollmentNotice(Option<String>),
 }
 
 impl Command {
@@ -63,6 +67,16 @@ impl Command {
             "update-root" => Self::UpdateRoot(PathBuf::from(words.next()?)),
             "show" => Self::Show(words.next()?.parse().ok()?),
             "status" => Self::Status,
+            "notice" => match words.next()? {
+                "key-enrollment" => Self::KeyEnrollmentNotice(Some(
+                    words
+                        .next()
+                        .filter(|code| code.bytes().all(|byte| byte.is_ascii_digit()))?
+                        .to_owned(),
+                )),
+                "clear" => Self::KeyEnrollmentNotice(None),
+                _ => return None,
+            },
             _ => return None,
         };
         words.next().is_none().then_some(command)
@@ -75,6 +89,8 @@ impl Command {
             Self::UpdateRoot(root) => format!("update-root {}", root.display()),
             Self::Show(mode) => format!("show {}", mode.name()),
             Self::Status => "status".into(),
+            Self::KeyEnrollmentNotice(Some(code)) => format!("notice key-enrollment {code}"),
+            Self::KeyEnrollmentNotice(None) => "notice clear".into(),
         }
     }
 }
@@ -100,6 +116,8 @@ mod tests {
             Command::Status,
             Command::UpdateRoot("/sysroot".into()),
             Command::Show(Mode::Updates),
+            Command::KeyEnrollmentNotice(Some("48217730".into())),
+            Command::KeyEnrollmentNotice(None),
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));
         }

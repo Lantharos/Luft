@@ -10,6 +10,7 @@ use uefi::proto::media::file::{File, FileAttribute, FileInfo, FileMode, FileType
 use uefi::proto::media::fs::SimpleFileSystem;
 use uefi::{CString16, Handle};
 
+use crate::uki;
 use crate::volume::{self, EspVolume};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -151,6 +152,7 @@ fn scan_uki_directory(
         let Ok(FileType::Dir(mut directory)) = dir.into_type() else {
             continue;
         };
+        let mut images = Vec::new();
         while let Ok(Some(info)) = directory.read_entry_boxed() {
             let name = info.file_name().to_string();
             if !name.to_ascii_lowercase().ends_with(".efi") {
@@ -160,11 +162,23 @@ fn scan_uki_directory(
             if mark_seen(seen, vol.handle, &path) {
                 continue;
             }
-            let stem = name.trim_end_matches(".efi");
-            let title = format!("Linux UKI ({stem})");
-            let id = entry_id(vol, stem);
+            let stem = name.trim_end_matches(".efi").to_string();
+            let title = CString16::try_from(name.as_str())
+                .ok()
+                .and_then(|cname| {
+                    directory
+                        .open(&cname, FileMode::Read, FileAttribute::empty())
+                        .ok()
+                })
+                .and_then(|file| file.into_regular_file())
+                .and_then(|mut file| uki::title(&mut file))
+                .unwrap_or_else(|| format!("Linux ({stem})"));
+            images.push((stem, title, path));
+        }
+        images.sort_by(|a, b| newest_first(&a.0, &b.0));
+        for (stem, title, path) in images {
             out.push(BootEntry {
-                id,
+                id: entry_id(vol, &stem),
                 title: display_title(&title, vol, multi),
                 volume: vol.handle,
                 kind: BootKind::Efi {
@@ -361,10 +375,71 @@ pub fn fallback_entry(device: Handle) -> BootEntry {
     }
 }
 
+fn natural_parts(text: &str) -> Vec<(bool, &str)> {
+    let mut parts = Vec::new();
+    let mut start = 0;
+    let bytes = text.as_bytes();
+    for index in 1..=bytes.len() {
+        if index == bytes.len() || bytes[index].is_ascii_digit() != bytes[start].is_ascii_digit() {
+            parts.push((bytes[start].is_ascii_digit(), &text[start..index]));
+            start = index;
+        }
+    }
+    parts
+}
+
+fn newest_first(a: &str, b: &str) -> core::cmp::Ordering {
+    for (left, right) in natural_parts(a).into_iter().zip(natural_parts(b)) {
+        let order = match (left, right) {
+            ((true, l), (true, r)) => l
+                .parse::<u64>()
+                .unwrap_or(0)
+                .cmp(&r.parse::<u64>().unwrap_or(0)),
+            ((_, l), (_, r)) => l.cmp(r),
+        };
+        if order.is_ne() {
+            return order.reverse();
+        }
+    }
+    b.len().cmp(&a.len())
+}
+
+fn matches_pattern(pattern: &str, text: &str) -> bool {
+    match pattern.split_once('*') {
+        None => pattern == text,
+        Some((prefix, rest)) => {
+            text.starts_with(prefix)
+                && (0..=text.len() - prefix.len())
+                    .any(|skip| matches_pattern(rest, &text[prefix.len() + skip..]))
+        }
+    }
+}
+
 pub fn find_index_by_id(entries: &[BootEntry], id: &str) -> Option<usize> {
+    if id.contains('*') {
+        let pattern = entry_slug(id);
+        return entries.iter().position(|entry| {
+            matches_pattern(
+                &pattern,
+                entry.id.split_once('-').map_or("", |(_, slug)| slug),
+            )
+        });
+    }
     if let Some(idx) = entries.iter().position(|e| e.id == id) {
         return Some(idx);
     }
     let suffix = format!("-{id}");
     entries.iter().position(|e| e.id.ends_with(&suffix))
+}
+
+fn entry_slug(id: &str) -> String {
+    id.chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '*' {
+                c
+            } else {
+                '-'
+            }
+        })
+        .collect()
 }

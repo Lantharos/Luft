@@ -9,7 +9,7 @@ user="${VM_USER:-sushi}"
 password="${VM_PASSWORD:-sushi-vm}"
 
 packages=(
-  systemd systemd-udev dracut "kernel-core${KERNEL:+-$KERNEL}" "kernel-modules-core${KERNEL:+-$KERNEL}" kbd
+  systemd systemd-udev dracut kernel-core kernel-modules-core kbd
   cryptsetup e2fsprogs util-linux passwd shadow-utils sudo
   dbus-broker dbus-daemon systemd-pam polkit accountsservice greetd
   gnome-shell xorg-x11-server-Xwayland mesa-dri-drivers

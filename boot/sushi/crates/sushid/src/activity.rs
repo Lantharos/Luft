@@ -42,6 +42,7 @@ fn title(mode: Mode) -> Option<String> {
             }),
         ),
         Mode::Firmware => Some("Updating firmware".to_owned()),
+        Mode::Encrypting => Some("Encrypting your device".to_owned()),
     }
 }
 

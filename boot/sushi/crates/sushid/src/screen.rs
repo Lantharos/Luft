@@ -5,7 +5,7 @@ use rustix::fs::{XattrFlags, getxattr, setxattr};
 use sushi::control;
 use sushi::display::{Card, Display, ModeHints};
 use sushi::render::Logo;
-use sushi::scene::{FADE_SECONDS, Prompt, Rect, Scene, Status, Visuals, ease, is_shaking};
+use sushi::scene::{FADE_SECONDS, Notice, Prompt, Rect, Scene, Status, Visuals, ease, is_shaking};
 
 const SELINUX_LABEL: &str = "security.selinux";
 const LOGIN_SCREEN_RUNTIME_TYPE: &str = "xdm_var_run_t";
@@ -50,11 +50,15 @@ pub struct Look {
     pub logo: Fader,
     pub loader: Fader,
     pub prompt: Fader,
+    pub notice: Fader,
 }
 
 impl Look {
     pub fn settled(&self, now: f32) -> bool {
-        self.logo.settled(now) && self.loader.settled(now) && self.prompt.settled(now)
+        self.logo.settled(now)
+            && self.loader.settled(now)
+            && self.prompt.settled(now)
+            && self.notice.settled(now)
     }
 
     pub fn is_animating(&self, now: f32, prompt: Option<&Prompt>) -> bool {
@@ -71,6 +75,8 @@ struct Shown {
     prompt: f32,
     content: Option<Prompt>,
     status: Option<(Status, f32)>,
+    notice: f32,
+    notice_content: Option<Notice>,
 }
 
 pub struct Screen {
@@ -131,6 +137,7 @@ impl Screen {
         now: f32,
         prompt: Option<&Prompt>,
         status: Option<(Status, f32)>,
+        notice: Option<&Notice>,
     ) -> io::Result<()> {
         let next = Shown {
             logo: look.logo.value(now),
@@ -138,6 +145,8 @@ impl Screen {
             prompt: look.prompt.value(now),
             content: prompt.cloned(),
             status,
+            notice: look.notice.value(now),
+            notice_content: notice.cloned(),
         };
         let visuals = Visuals {
             seconds: now,
@@ -145,6 +154,10 @@ impl Screen {
             loader: next.loader,
             prompt: prompt.map(|prompt| (prompt, next.prompt)),
             status: next.status.as_ref().map(|(status, alpha)| (status, *alpha)),
+            notice: next
+                .notice_content
+                .as_ref()
+                .map(|notice| (notice, next.notice)),
         };
         let first = self.shown.is_none();
         for (index, scene) in self.scenes.iter().enumerate() {
@@ -228,6 +241,9 @@ fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
     }
     if shown.status != next.status {
         areas.push(scene.status_area());
+    }
+    if shown.notice != next.notice || shown.notice_content != next.notice_content {
+        areas.push(scene.notice_area());
     }
     areas
 }

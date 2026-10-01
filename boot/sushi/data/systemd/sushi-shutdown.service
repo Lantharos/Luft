@@ -11,6 +11,7 @@ Before=systemd-reboot.service systemd-poweroff.service systemd-halt.service syst
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=-/usr/bin/sushictl show shutdown
+TimeoutStartSec=6min
 
 [Install]
 WantedBy=reboot.target poweroff.target halt.target kexec.target

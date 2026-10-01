@@ -2,6 +2,7 @@ use alloc::sync::Arc;
 
 use tiny_skia::{Color, Pixmap, PixmapPaint, Transform};
 
+use crate::notice::{self, Notice};
 use crate::prompt::{self, Prompt};
 use crate::status::{self, Status};
 use crate::{FirmwareLogo, Layout, Rect, loader};
@@ -13,6 +14,7 @@ pub struct Visuals<'a> {
     pub loader: f32,
     pub prompt: Option<(&'a Prompt, f32)>,
     pub status: Option<(&'a Status, f32)>,
+    pub notice: Option<(&'a Notice, f32)>,
 }
 
 pub struct Scene {
@@ -50,6 +52,10 @@ impl Scene {
 
     pub fn status_area(&self) -> Rect {
         status::bounds(&self.layout)
+    }
+
+    pub fn notice_area(&self) -> Rect {
+        notice::bounds(&self.layout)
     }
 
     pub fn render(&self, area: Rect, visuals: &Visuals) -> Option<Pixmap> {
@@ -94,6 +100,9 @@ impl Scene {
         }
         if let Some((status, alpha)) = visuals.status {
             status::draw(&mut canvas, &self.layout, origin, status, alpha);
+        }
+        if let Some((notice, alpha)) = visuals.notice {
+            notice::draw(&mut canvas, &self.layout, origin, notice, alpha);
         }
         Some(pixmap)
     }

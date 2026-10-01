@@ -1,5 +1,7 @@
 mod activity;
+mod ask;
 mod daemon;
+mod notice;
 mod screen;
 mod signals;
 mod unlock;

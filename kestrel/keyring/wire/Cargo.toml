@@ -1,0 +1,15 @@
+[package]
+name = "luft-keyring-wire"
+description = "Messages between Luft Keyring's sign-in module, its unlock service and the keyring"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+tokio = ["dep:tokio"]
+
+[dependencies]
+postcard.workspace = true
+serde.workspace = true
+tokio = { workspace = true, optional = true }
+zeroize.workspace = true

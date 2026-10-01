@@ -64,7 +64,9 @@ export KESTREL_GREETER_IMAGES="$run/images"
 export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
 export GSETTINGS_BACKEND=memory
 export XDG_DATA_DIRS="$run/data:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-export XDG_CONFIG_HOME="$run/config" XDG_CACHE_HOME="$run/cache" XDG_STATE_HOME="$run/state-home"
+cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(printf '%s' "$run" | sha1sum | cut -c1-12)"
+ln -sfn "$run/cache" "$cache_link"
+export XDG_CONFIG_HOME="$run/config" XDG_CACHE_HOME="$cache_link" XDG_STATE_HOME="$run/state-home"
 mkdir -p "$KESTREL_CAPTURE_DIR"
 
 dbus-run-session -- meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" --greeter \

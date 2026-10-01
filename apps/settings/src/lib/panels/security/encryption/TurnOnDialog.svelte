@@ -120,7 +120,7 @@
 			<div class="flex items-center gap-4 px-1">
 				<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 					<span class="text-[14px] font-medium">Also ask for a PIN</span>
-					<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Adds a step when the computer starts, and keeps the disk locked even if someone takes the whole computer.</span>
+					<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Adds a step when the computer starts, and keeps the disk locked even if someone takes the whole computer. It starts being asked once encryption finishes.</span>
 				</div>
 				<Switch label="Also ask for a PIN" checked={usePin} onchange={(on) => (usePin = on)} />
 			</div>

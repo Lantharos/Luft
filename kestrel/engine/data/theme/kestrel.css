@@ -167,6 +167,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-clipboard-row:hover { background-color: rgba(255, 255, 255, 0.11); }
 .kestrel-clipboard-row:focus, .kestrel-clipboard-row:active { background-color: rgba(255, 255, 255, 0.15); }
 .kestrel-clipboard-text { font-size: 13px; height: 34px; text-align: left; }
+.kestrel-clipboard-image { padding: 6px; }
 .kestrel-clipboard-footer { padding: 0 2px; }
 
 .kestrel-emoji { padding: 12px; spacing: 8px; }

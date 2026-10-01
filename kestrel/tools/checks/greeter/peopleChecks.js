@@ -13,9 +13,11 @@ export async function checkPeople(tools) {
   const {pause, capture, events, find, visible, styled, require, press, type, click, output, state} = tools;
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 
-  await press(Clutter.KEY_Return, 900);
+  await press(Clutter.KEY_space, 900);
   const users = find('kestrel-greeter-users');
   require(visible(users) && visible(find('kestrel-greeter-controls')), 'waking the screen shows the people and controls');
+  require(promptState(tools).entry.text === '', 'the key that wakes the screen is not typed into the field');
+  require(global.stage.context.get_backend().get_default_seat().get_keymap().get_num_lock_state(), 'Num Lock is on, as the last session left it');
   const rows = styled('kestrel-greeter-user', users);
   require(rows.map(row => row.accessible_name).join(', ') === 'Ayesha Khan, Sam Rivera, Another account',
     'people are listed by name with a way to type a hidden account');

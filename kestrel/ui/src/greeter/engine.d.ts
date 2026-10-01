@@ -29,7 +29,6 @@ declare module 'resource:///org/gnome/shell/auth/authPrompt.js' {
     begin(userName: string): void;
     cancel(): void;
     focus(): void;
-    startPreemptiveInput(unichar: string): void;
     connect(signal: 'cancelled' | 'succeeded', callback: () => void): number;
     connect(signal: 'user-name', callback: (prompt: AuthPrompt, name: string) => void): number;
     connect(signal: 'loading', callback: (prompt: AuthPrompt, busy: boolean) => void): number;
@@ -61,7 +60,7 @@ declare module 'resource:///org/gnome/shell/ui/lockScreen/pages.js' {
       actionMode: Shell.ActionMode;
       preparePrompt(): void;
       clockShown(): void;
-      startTyping(unichar: string): void;
+      focusPrompt(): void;
     });
     readonly promptShown: boolean;
     showClock(): void;

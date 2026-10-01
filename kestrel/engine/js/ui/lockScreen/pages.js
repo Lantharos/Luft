@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import * as Main from '../main.js';
@@ -8,16 +7,16 @@ import * as SwipeTracker from '../swipeTracker.js';
 const CROSSFADE_TIME = 300;
 const FADE_OUT_TRANSLATION = 200;
 const FADE_OUT_SCALE = 0.3;
-const MODIFIER_KEYS = [Clutter.KEY_Shift_L, Clutter.KEY_Shift_R, Clutter.KEY_Shift_Lock, Clutter.KEY_Caps_Lock];
+const MODIFIER_KEYS = [Clutter.KEY_Shift_L, Clutter.KEY_Shift_R, Clutter.KEY_Shift_Lock, Clutter.KEY_Caps_Lock, Clutter.KEY_Num_Lock];
 
 export class LockPages {
-    constructor({actor, clock, prompt, companions, actionMode, preparePrompt, clockShown, startTyping}) {
+    constructor({actor, clock, prompt, companions, actionMode, preparePrompt, clockShown, focusPrompt}) {
         this._clock = clock;
         this._prompt = prompt;
         this._companions = companions;
         this._preparePrompt = preparePrompt;
         this._clockShown = clockShown;
-        this._startTyping = startTyping;
+        this._focusPrompt = focusPrompt;
         this._activePage = null;
 
         clock.set_pivot_point(0.5, 0.5);
@@ -87,14 +86,13 @@ export class LockPages {
         if (this._activePage === this._prompt || this._prompt.visible)
             return Clutter.EVENT_PROPAGATE;
 
-        const [, keyval, , unichar] = this._keyController.get_key();
+        const [, keyval] = this._keyController.get_key();
         if (MODIFIER_KEYS.includes(keyval))
             return Clutter.EVENT_PROPAGATE;
 
         this.showPrompt();
-        if (GLib.unichar_isprint(unichar))
-            this._startTyping(unichar);
-        return Clutter.EVENT_PROPAGATE;
+        this._focusPrompt();
+        return Clutter.EVENT_STOP;
     }
 
     _swipeBegin(tracker, monitor) {

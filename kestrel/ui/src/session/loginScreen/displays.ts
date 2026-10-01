@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { sendToLoginScreen } from '../shared/loginScreen.js';
+import { sendToLoginScreen } from './send.js';
 
 const SYNC_DELAY = 1500;
 

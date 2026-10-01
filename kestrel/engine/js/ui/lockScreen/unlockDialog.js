@@ -97,7 +97,7 @@ export const UnlockDialog = GObject.registerClass({
             actionMode: Shell.ActionMode.UNLOCK_SCREEN,
             preparePrompt: () => this._ensureAuthPrompt(),
             clockShown: () => this._destroyAuthPrompt(),
-            startTyping: unichar => this._authPrompt.startPreemptiveInput(unichar),
+            focusPrompt: () => this._authPrompt.focus(),
         });
 
         this.allowCancel = false;

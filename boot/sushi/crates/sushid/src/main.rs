@@ -1,6 +1,8 @@
 mod activity;
 mod ask;
+mod crossfade;
 mod daemon;
+mod firmware;
 mod notice;
 mod screen;
 mod signals;

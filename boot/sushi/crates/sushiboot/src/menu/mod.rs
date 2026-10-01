@@ -86,13 +86,13 @@ pub fn choose(
         };
         let layout = screen.scene.layout;
         screen.draw(
-            view.area(&layout),
+            screen.scene.project(view.area(&layout)),
             &Visuals {
                 seconds: shown,
                 logo: 1.0,
                 ..Visuals::default()
             },
-            |canvas, origin| view.draw(canvas, &layout, origin, alpha),
+            |canvas, transform| view.draw(canvas, &layout, transform, alpha),
         );
         if leaving.is_some_and(|since| shown - since >= FADE_SECONDS) {
             return chosen.unwrap_or(default);

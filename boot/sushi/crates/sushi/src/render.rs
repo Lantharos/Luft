@@ -33,15 +33,17 @@ impl Logo {
         })
     }
 
-    pub fn on_screen(&self, width: u32, height: u32) -> (Arc<Pixmap>, FirmwareLogo) {
-        let placement = FirmwareLogo {
-            x: self.x,
-            y: self.y,
-            width: self.image.width(),
-            height: self.image.height(),
-            screen_width: width,
-            screen_height: height,
-        };
+    pub fn drawn_on(
+        &self,
+        framebuffer: (u32, u32),
+        monitor: Option<(u32, u32)>,
+    ) -> (Arc<Pixmap>, FirmwareLogo) {
+        let placement = FirmwareLogo::infer(
+            (self.x, self.y),
+            (self.image.width(), self.image.height()),
+            framebuffer,
+            monitor,
+        );
         (self.image.clone(), placement)
     }
 }

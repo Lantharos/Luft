@@ -24,6 +24,13 @@ fi
 disks=(-drive "file=fat:rw:$vm/esp,format=raw" -drive "file=$vm/root.img,format=raw,if=virtio")
 [[ -f "$vm/disk.img" ]] && disks=(-drive "file=$vm/disk.img,format=raw,if=virtio")
 
+if [[ -d "$vm/esp/EFI/sushi" ]]; then
+  graphics=()
+  [[ -n "${FRAMEBUFFER:-}" ]] && graphics+=("framebuffer $FRAMEBUFFER")
+  [[ "${EDID:-1}" == 1 ]] && graphics+=("monitor ${XRES:-1920}x${YRES:-1080}")
+  printf '%s\n' "${graphics[@]}" > "$vm/esp/vm-display.conf"
+fi
+
 tpm=()
 case "${TPM:-}" in
   2 | 1.2)
@@ -40,6 +47,9 @@ case "${TPM:-}" in
     ;;
 esac
 
+gpu=(-device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}")
+[[ "${GPU:-}" == vga ]] && gpu=(-device "VGA,xres=${XRES:-1920},yres=${YRES:-1080},vgamem_mb=64")
+
 display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
 [[ "${HEADLESS:-0}" == 1 ]] && display=(-display none)
 
@@ -49,7 +59,7 @@ qemu-system-x86_64 \
   -drive "if=pflash,format=$format,file=$vars" \
   "${disks[@]}" \
   "${tpm[@]}" \
-  -device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}" \
+  "${gpu[@]}" \
   -device virtio-keyboard-pci -device virtio-tablet-pci -device qemu-xhci,id=usb \
   -serial "unix:$vm/serial.sock,server=on,wait=off" \
   -qmp "unix:$vm/qmp.sock,server=on,wait=off" \

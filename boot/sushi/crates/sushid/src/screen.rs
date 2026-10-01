@@ -4,8 +4,10 @@ use std::path::Path;
 use rustix::fs::{XattrFlags, getxattr, setxattr};
 use sushi::control;
 use sushi::display::{Card, Display, ModeHints};
-use sushi::render::Logo;
 use sushi::scene::{FADE_SECONDS, Notice, Prompt, Rect, Scene, Status, Visuals, ease, is_shaking};
+
+use crate::crossfade::Crossfade;
+use crate::firmware::Firmware;
 
 const SELINUX_LABEL: &str = "security.selinux";
 const LOGIN_SCREEN_RUNTIME_TYPE: &str = "xdm_var_run_t";
@@ -83,40 +85,38 @@ pub struct Screen {
     display: Display,
     scenes: Vec<Scene>,
     shown: Option<Shown>,
+    crossfade: Option<Crossfade>,
 }
 
 impl Screen {
-    pub fn new(display: Display, logo: Option<&Logo>, firmware_size: (u32, u32)) -> Self {
-        let scenes = display
+    pub fn new(display: Display, firmware: &Firmware, previous: Option<Scene>) -> Self {
+        let monitor = firmware.stretched_over(&display);
+        let logo = firmware.logo_on(&display);
+        let scenes: Vec<Scene> = display
             .sizes()
             .into_iter()
-            .map(|(width, height)| {
-                Scene::new(
-                    width,
-                    height,
-                    logo.map(|logo| logo.on_screen(firmware_size.0, firmware_size.1)),
-                )
-            })
+            .map(|size| Scene::new(size, monitor.unwrap_or(size), logo.clone()))
             .collect();
+        let crossfade = previous.and_then(|previous| Crossfade::between(&previous, &scenes));
         Self {
             display,
             scenes,
             shown: None,
+            crossfade,
         }
     }
 
-    pub fn refresh(
-        self,
-        hints: &ModeHints,
-        logo: Option<&Logo>,
-        firmware_size: (u32, u32),
-    ) -> io::Result<Self> {
+    pub fn refresh(self, hints: &ModeHints, firmware: &Firmware) -> io::Result<Self> {
         let (display, changed) = self.display.refresh(hints)?;
         Ok(if changed {
-            Self::new(display, logo, firmware_size)
+            Self::new(display, firmware, self.scenes.into_iter().next())
         } else {
             Self { display, ..self }
         })
+    }
+
+    pub fn is_crossfading(&self) -> bool {
+        self.crossfade.is_some()
     }
 
     pub fn invalidate(&mut self) {
@@ -160,16 +160,32 @@ impl Screen {
                 .map(|notice| (notice, next.notice)),
         };
         let first = self.shown.is_none();
+        let progress = self
+            .crossfade
+            .as_mut()
+            .map(|crossfade| crossfade.progress(now));
         for (index, scene) in self.scenes.iter().enumerate() {
-            let areas = match &self.shown {
-                None => vec![scene.everything()],
-                Some(shown) => damage(scene, shown, &next, now),
+            let areas = match (&self.shown, &self.crossfade) {
+                (None, _) => vec![scene.everything()],
+                (Some(_), Some(crossfade)) => {
+                    crossfade.area(index, scene, &visuals).into_iter().collect()
+                }
+                (Some(shown), None) => damage(scene, shown, &next, now),
             };
             for area in areas {
-                if let Some(pixmap) = scene.render(area, &visuals) {
+                let pixmap = match (&self.crossfade, progress) {
+                    (Some(crossfade), Some(progress)) if progress < 1.0 => {
+                        crossfade.render(index, scene, area, &visuals, progress)
+                    }
+                    _ => scene.render(area, &visuals),
+                };
+                if let Some(pixmap) = pixmap {
                     self.display.blit(index, area, &pixmap);
                 }
             }
+        }
+        if progress.is_some_and(|progress| progress >= 1.0) {
+            self.crossfade = None;
         }
         self.shown = Some(next);
         if first {
@@ -179,7 +195,7 @@ impl Screen {
     }
 
     pub fn share_logo_placement(&self) {
-        let placement = self.scenes.first().and_then(|scene| scene.layout.logo);
+        let placement = self.scenes.first().and_then(Scene::logo_area);
         match placement {
             Some(logo) => {
                 let _ = std::fs::write(
@@ -200,6 +216,10 @@ impl Screen {
 
     pub fn into_card(self) -> Card {
         self.display.into_card()
+    }
+
+    pub fn into_parts(self) -> (Option<Scene>, Card) {
+        (self.scenes.into_iter().next(), self.display.into_card())
     }
 }
 
@@ -225,7 +245,7 @@ fn let_login_screen_read(path: &str) {
 fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
     let mut areas = Vec::new();
     if shown.logo != next.logo
-        && let Some(logo) = scene.layout.logo
+        && let Some(logo) = scene.logo_area()
     {
         areas.push(logo);
     }

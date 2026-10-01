@@ -14,11 +14,12 @@ use sushi::display::{Card, ModeHints};
 use sushi::password::PasswordRequests;
 use sushi::plymouth::{self, Client};
 use sushi::render::Logo;
-use sushi::scene::Prompt;
+use sushi::scene::{Prompt, Scene};
 use sushi::terminal::Terminal;
 use sushi::uevent::CardEvents;
 
 use crate::activity::Activity;
+use crate::firmware::Firmware;
 use crate::notice::Shown;
 use crate::screen::{Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
@@ -45,8 +46,9 @@ pub struct Daemon {
     config: Config,
     hints: ModeHints,
     logo: Option<Logo>,
-    firmware_size: Option<(u32, u32)>,
+    firmware: Option<Firmware>,
     screen: Option<Screen>,
+    previous: Option<Scene>,
     held: Option<Card>,
     terminal: Option<Terminal>,
     signals: VtSignals,
@@ -90,8 +92,9 @@ impl Daemon {
         let hints = hints(&config);
         let mut daemon = Self {
             logo: Logo::from_firmware(),
-            firmware_size: None,
+            firmware: None,
             screen: None,
+            previous: None,
             held: None,
             terminal: None,
             signals: VtSignals::catch().context("catching console switches")?,
@@ -163,7 +166,10 @@ impl Daemon {
             Phase::Splash if self.screen.is_none() => self.held.as_ref().map(|_| WATCH_INTERVAL),
             Phase::Splash => {
                 let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
-                if self.look.is_animating(now, prompt) || self.activity.is_animating(now) {
+                if self.look.is_animating(now, prompt)
+                    || self.activity.is_animating(now)
+                    || self.screen.as_ref().is_some_and(Screen::is_crossfading)
+                {
                     Some(FRAME)
                 } else if self.unlock.is_some() || self.notice.is_some() {
                     Some(CAPS_LOCK_INTERVAL)
@@ -388,7 +394,7 @@ impl Daemon {
             && let Err(error) = screen.draw(&self.look, now, prompt, status, notice)
         {
             eprintln!("Lost {}: {error}", screen.path().display());
-            self.screen = None;
+            self.forget_screen();
         }
     }
 }

@@ -1,7 +1,7 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use tiny_skia::PixmapMut;
+use tiny_skia::{PixmapMut, Transform};
 
 use crate::{Layout, Rect, text};
 
@@ -45,18 +45,13 @@ pub fn bounds(layout: &Layout) -> Rect {
     }
 }
 
-pub fn draw(
-    pixmap: &mut PixmapMut,
-    layout: &Layout,
-    origin: (i32, i32),
-    notice: &Notice,
-    alpha: f32,
-) {
+pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, view: Transform, notice: &Notice, alpha: f32) {
     let scale = layout.scale;
-    let center = layout.loader_center.0 - origin.0 as f32;
-    let mut baseline = top(layout) - origin.1 as f32;
+    let center = layout.loader_center.0;
+    let mut baseline = top(layout);
     text::centered(
         pixmap,
+        view,
         &notice.title,
         (center, baseline),
         TITLE_SIZE * scale,
@@ -66,6 +61,7 @@ pub fn draw(
     for line in &notice.body {
         text::centered(
             pixmap,
+            view,
             line,
             (center, baseline),
             BODY_SIZE * scale,
@@ -85,6 +81,7 @@ pub fn draw(
         let number = core::str::from_utf8(&number).unwrap_or_default();
         text::draw(
             pixmap,
+            view,
             number,
             (left, baseline),
             BODY_SIZE * scale,
@@ -92,6 +89,7 @@ pub fn draw(
         );
         text::draw(
             pixmap,
+            view,
             step,
             (left + NUMBER_GAP * scale, baseline),
             BODY_SIZE * scale,
@@ -102,6 +100,7 @@ pub fn draw(
     baseline += 30.0 * scale - STEP_LINE * scale + 14.0 * scale;
     text::centered(
         pixmap,
+        view,
         &notice.footer,
         (center, baseline),
         FOOTER_SIZE * scale,

@@ -3,7 +3,6 @@
 
 extern crate alloc;
 
-mod bgrt;
 mod entries;
 mod files;
 mod loader;
@@ -59,9 +58,10 @@ fn efi_main() -> Status {
         .flatten()
         .find_map(|pattern| catalog.find(pattern))
         .unwrap_or(first);
-    let mut screen = graphics_handle()
-        .and_then(|handle| protocol::shared::<GraphicsOutput>(handle).ok())
-        .map(Screen::new);
+    let mut screen = graphics_handle().and_then(|handle| {
+        let gop = protocol::shared::<GraphicsOutput>(handle).ok()?;
+        Some(Screen::new(handle, gop))
+    });
     let mut chosen = match screen.as_mut() {
         Some(screen) => menu::choose(screen, &catalog, default, config.timeout, None),
         None => default,
@@ -69,11 +69,9 @@ fn efi_main() -> Status {
     loop {
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
-        log::info!("SushiBoot: starting {}", entry.title);
-        let Err(error) = start::start(entry) else {
+        if start::start(entry).is_ok() {
             return Status::SUCCESS;
-        };
-        log::error!("SushiBoot: {} did not start: {error:?}", entry.title);
+        }
         let Some(screen) = screen.as_mut() else {
             return Status::LOAD_ERROR;
         };

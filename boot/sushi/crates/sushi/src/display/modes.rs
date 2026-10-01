@@ -42,6 +42,16 @@ impl ModeHints {
         self.arrangements.is_empty()
     }
 
+    pub fn only_size(&self) -> Option<(u32, u32)> {
+        let mut sizes = self
+            .arrangements
+            .iter()
+            .flatten()
+            .map(|wanted| (u32::from(wanted.width), u32::from(wanted.height)));
+        let first = sizes.next()?;
+        sizes.all(|size| size == first).then_some(first)
+    }
+
     fn parse(text: &str) -> Self {
         let arrangements = blocks(text, "configuration")
             .into_iter()

@@ -12,10 +12,18 @@ In the Luft monorepo, Sushi lives at `boot/sushi`. Run the commands below from t
    - With a TPM PIN, it says "Enter your PIN"; a security key's PIN is asked for by name too.
    - When the TPM doesn't unlock a disk it normally unlocks, Sushi asks for the recovery key (or the passphrase, if the disk has one) and says why in a sentence: something about how the computer starts has changed, the TPM isn't responding, or the PIN didn't work. Recovery keys can be typed with or without their dashes, and Sushi counts the characters as they're typed.
 3. When the system switches from the initramfs to the installed system, Sushi keeps running and keeps the splash on screen.
-4. When the graphics driver loads and replaces the firmware framebuffer, Sushi redraws on the new device as soon as the system has finished setting the device up. If a display arrangement was saved by the login screen, Sushi uses that mode, so the monitor only switches modes once.
+4. When the graphics driver loads and replaces the firmware framebuffer, Sushi redraws on the new device as soon as the system has finished setting the device up. If a display arrangement was saved by the login screen, Sushi uses that mode, so the monitor only switches modes once. When the splash looked different on the firmware framebuffer, it crossfades to the new picture instead of jumping.
 5. When the login screen starts, Sushi fades the spinner out, leaves the logo on screen, and lets go of the display. The login screen's first frame shows the same logo before its own interface fades in.
 6. Sushi then stays in the background holding the display open, so that when one session ends and the next begins (signing in, signing out), the last frame stays on screen instead of the kernel's text console taking over.
 7. When the computer restarts or shuts down, Sushi takes the display back the moment the login screen or session lets go of it, clears the pointer and anything else they left on screen, and shows the logo and spinner until the computer turns off.
+
+### When the firmware doesn't use the monitor's own resolution
+
+Some firmware hands over a framebuffer smaller than the monitor, such as 1024×768 on a 3440×1440 ultrawide, and the monitor stretches it to fill the screen. SushiBoot avoids this by switching to the monitor's resolution before Linux starts (see [SushiBoot](#sushiboot)). When Linux still starts on a stretched framebuffer, for example through GRUB, Sushi draws the splash so it looks right once stretched:
+
+- The firmware only records where it drew its logo, not on which screen. Firmware centers its logo, so twice the logo's distance from the left edge plus its width gives the width of the screen it was drawn on, and the monitor gives the height. Sushi then scales the logo into the framebuffer at the same place on the monitor.
+- When the monitor's shape is known, the spinner and text are drawn squeezed by exactly as much as the monitor will stretch them, so they come out round and centered. Sushi learns the monitor's resolution from its EDID, when the framebuffer device has one, or from the saved display arrangement, which the initramfs carries for this. If neither is available, Sushi draws square pixels.
+- When the graphics driver takes over at the monitor's resolution, the splash crossfades from how it looked on the stretched framebuffer to the sharp one.
 
 ## Updates
 
@@ -119,7 +127,7 @@ With Kestrel's login screen, set greetd to the seventh virtual terminal (`vt = 7
 monitors = /var/lib/kestrel-greeter/display/monitors.xml
 ```
 
-Kestrel copies your display arrangement there whenever you change it, and Sushi and the login screen both start in that mode.
+Kestrel copies your display arrangement there whenever you change it, and Sushi and the login screen both start in that mode. The initramfs carries a copy, so Sushi knows the monitor's shape before the graphics driver loads; the copy is refreshed whenever the initramfs is rebuilt.
 
 ### NVIDIA
 
@@ -165,6 +173,8 @@ A loader that turns out to be SushiBoot itself, such as Fedora's `grubx64.efi` o
 
 Entries have the identifiers systemd-boot uses: an image's file name, with `@` and the profile's ID for multi-profile images, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`. `default` in `loader.conf` takes patterns such as `luft-*`, which matches the newest image. SushiBoot reports itself, its entries and the one it started through the Boot Loader Interface variables, and honors `LoaderEntryDefault` and `LoaderEntryOneShot`, so `bootctl status` and `bootctl list` show what started, and `bootctl set-oneshot ID` chooses the next start.
 
+Before showing anything, SushiBoot asks the graphics firmware which monitor is connected (its EDID) and switches to the monitor's own resolution, so Linux starts on a framebuffer the monitor shows unscaled, and the graphics driver later takes it over without changing modes. The firmware logo is drawn again in the new resolution, and the menu uses it too. Only resolutions the monitor lists are used: when the firmware doesn't offer the monitor's own resolution, SushiBoot takes the largest one the monitor lists, preferring its shape, and when the firmware doesn't describe the monitor, SushiBoot keeps the resolution the firmware chose.
+
 With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so shim can start it, and shim then checks everything SushiBoot starts against the same keys. SushiBoot has no command line editor, and with Secure Boot on it passes nothing but a profile number to what it starts: entries that start a kernel directly are left out, since no signature covers their command line or initramfs, and the options of other entries are dropped. On Luft, `trustctl startup install` signs it with the computer's own Luft key; see `security/README.md` for the whole startup.
 
 `sushi-bootctl` installs SushiBoot unsigned on a computer without Secure Boot:
@@ -182,7 +192,7 @@ make check    # formatting, clippy for Linux and UEFI, tests
 
 ### Virtual machine
 
-The VM is a Fedora 45 system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. The firmware framebuffer starts the boot; the virtio GPU driver loads after the switch to the installed system and replaces it, the same way the NVIDIA driver does on real hardware. The VM's udev takes half a second to finish setting up each new display device, so programs that open the device too early run into SELinux the way they would on a slow machine. Nothing on the host is installed or changed, and no step needs `sudo`.
+The VM is a Fedora 45 system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. A small program in `scripts/vm/display` stands in for a graphics card's own firmware on the way: it describes the monitor to SushiBoot and can hand over a framebuffer of another size. The firmware framebuffer starts the boot; the virtio GPU driver loads after the switch to the installed system and replaces it, the same way the NVIDIA driver does on real hardware. The VM's udev takes half a second to finish setting up each new display device, so programs that open the device too early run into SELinux the way they would on a slow machine. Nothing on the host is installed or changed, and no step needs `sudo`.
 
 ```bash
 scripts/vm/tree.sh       # Fedora root tree (first run downloads packages)
@@ -203,11 +213,16 @@ Everything lives in `vm/`; set `SUSHI_VM` to another folder to keep a second mac
 | `SECURE_BOOT=1` | OVMF with Secure Boot on and Microsoft's keys enrolled, so only signed boot loaders start |
 | `TPM=2` | A software TPM 2.0 (swtpm) whose state stays in `tpm2/` next to the disk, like a TPM soldered to the board |
 | `TPM=1.2` | An old TPM 1.2 instead |
+| `XRES=3440 YRES=1440` | The monitor's resolution (1920×1080 by default) |
+| `GPU=vga` | QEMU's standard VGA instead of virtio. Its firmware driver reads the monitor's EDID and starts at its resolution, which virtio's can't above 1920×1080; Linux's bochs driver then takes over after the switch to the installed system |
+| `FRAMEBUFFER=1024x768` | Hand SushiBoot a framebuffer of this size, the way some firmware does |
+| `EDID=0` | Don't describe the monitor to SushiBoot, so it keeps the framebuffer it was given, as GRUB would |
 
 `scripts/vm/record.py` boots the VM without a window, types at given times, answers prompts on the serial console, and saves every frame, which is how the hand-overs are checked frame by frame:
 
 ```bash
 scripts/vm/record.py /tmp/frames --seconds 40 --type "16:sushi-vm"
+GPU=vga XRES=3440 YRES=1440 FRAMEBUFFER=1024x768 EDID=0 scripts/vm/record.py /tmp/frames --seconds 20   # a stretched start
 scripts/vm/frames.py /tmp/frames        # when the screen went black, froze, or changed resolution
 scripts/vm/journal.sh -b 0 -u sushi    # the VM's journal, read from its disk after it shuts down
 ```

@@ -6,8 +6,12 @@ use std::path::{Path, PathBuf};
 
 use drm::control::{Device as ControlDevice, framebuffer};
 use drm::{ClientCapability, Device};
+use sushi_scene::Monitor;
 
 const DRM_IOCTL_MODE_CLOSEFB: libc::c_ulong = 0xC008_64D0;
+const SYSFS: &str = "/sys/class/drm";
+const FIRMWARE_FRAMEBUFFER_DRIVERS: [&str; 4] =
+    ["simple-framebuffer", "efidrm", "vesadrm", "ofdrm"];
 
 #[repr(C)]
 struct CloseFb {
@@ -56,13 +60,42 @@ impl Card {
         unsafe { libc::ioctl(self.file.as_raw_fd(), DRM_IOCTL_MODE_CLOSEFB, &mut request) };
     }
 
+    fn name(&self) -> &str {
+        self.path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or_default()
+    }
+
+    fn device(&self) -> PathBuf {
+        Path::new(SYSFS).join(self.name()).join("device")
+    }
+
+    pub fn is_firmware_framebuffer(&self) -> bool {
+        std::fs::read_link(self.device().join("driver")).is_ok_and(|driver| {
+            FIRMWARE_FRAMEBUFFER_DRIVERS
+                .iter()
+                .any(|name| driver.ends_with(name))
+        })
+    }
+
     pub fn is_boot_display(&self) -> bool {
-        let Some(name) = self.path.file_name() else {
-            return false;
-        };
-        let device = Path::new("/sys/class/drm").join(name).join("device");
-        std::fs::read_to_string(device.join("boot_vga")).is_ok_and(|value| value.trim() == "1")
-            || std::fs::read_link(device.join("driver"))
-                .is_ok_and(|driver| driver.ends_with("simple-framebuffer"))
+        std::fs::read_to_string(self.device().join("boot_vga"))
+            .is_ok_and(|value| value.trim() == "1")
+            || self.is_firmware_framebuffer()
+    }
+
+    pub fn monitor(&self) -> Option<Monitor> {
+        let prefix = format!("{}-", self.name());
+        std::fs::read_dir(SYSFS)
+            .ok()?
+            .flatten()
+            .filter(|entry| entry.file_name().to_string_lossy().starts_with(&prefix))
+            .map(|entry| entry.path())
+            .filter(|connector| {
+                std::fs::read_to_string(connector.join("status"))
+                    .is_ok_and(|status| status.trim() == "connected")
+            })
+            .find_map(|connector| Monitor::from_edid(&std::fs::read(connector.join("edid")).ok()?))
     }
 }

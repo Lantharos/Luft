@@ -13,9 +13,8 @@ path = "src/main.rs"
 
 [dependencies]
 libm = "0.2.16"
-log = "0.4.34"
 sushi-scene.workspace = true
-uefi = { version = "0.41.0", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
+uefi = { version = "0.41.0", features = ["alloc", "global_allocator", "panic_handler"] }
 
 [lints]
 workspace = true

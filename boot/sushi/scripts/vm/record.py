@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-VM = ROOT / "vm"
+VM = Path(os.environ.get("SUSHI_VM", ROOT / "vm"))
 
 KEYS = {
     " ": "spc", "-": "minus", "=": "equal", ".": "dot", ",": "comma", "/": "slash", ";": "semicolon",

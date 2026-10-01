@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-vm="$root/vm"
+vm="${SUSHI_VM:-$root/vm}"
 ovmf=/usr/share/edk2/ovmf
 
 [[ -f "$vm/root.img" ]] || "$root/scripts/vm/disk.sh"
@@ -18,7 +18,7 @@ exec qemu-system-x86_64 \
   -drive "file=fat:rw:$vm/esp,format=raw" \
   -drive "file=$vm/root.img,format=raw,if=virtio" \
   -device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}" \
-  -device virtio-keyboard-pci -device virtio-tablet-pci \
+  -device virtio-keyboard-pci -device virtio-tablet-pci -device qemu-xhci,id=usb \
   -serial "unix:$vm/serial.sock,server=on,wait=off" \
   -qmp "unix:$vm/qmp.sock,server=on,wait=off" \
   -pidfile "$vm/qemu.pid" \

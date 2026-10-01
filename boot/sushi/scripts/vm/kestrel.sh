@@ -3,7 +3,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 luft="$(cd "$root/../.." && pwd)"
-vm="$root/vm"
+vm="${SUSHI_VM:-$root/vm}"
 tree="$vm/tree"
 build="$vm/kestrel"
 prefix="$build/prefix"

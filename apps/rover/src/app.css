@@ -8,11 +8,11 @@
 
 :root {
 	--folder: var(--accent);
-	--file: #b8b8b0;
-	--media: #9fb7b5;
-	--code: #b5afa2;
-	--archive: #c2a98c;
-	--thumbnail-backdrop: #e4e3dc;
+	--file: var(--text-soft);
+	--media: var(--tertiary);
+	--code: var(--secondary);
+	--archive: color-mix(in oklab, var(--accent) 45%, var(--secondary));
+	--thumbnail-backdrop: var(--kestrel-light-surface-container-highest, #e4e3dc);
 }
 
 .glass-shell {

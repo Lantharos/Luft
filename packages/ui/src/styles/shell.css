@@ -67,10 +67,10 @@
 
 	.soft-scroll {
 		scrollbar-width: thin;
-		scrollbar-color: rgba(245, 245, 242, 0.14) transparent;
+		scrollbar-color: color-mix(in oklab, var(--ink) 14%, transparent) transparent;
 	}
 
 	[data-scheme='light'] .soft-scroll {
-		scrollbar-color: rgba(27, 27, 25, 0.18) transparent;
+		scrollbar-color: color-mix(in oklab, var(--ink) 18%, transparent) transparent;
 	}
 }

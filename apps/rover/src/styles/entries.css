@@ -29,7 +29,7 @@
 	}
 
 	.entry.is-trail {
-		background: rgba(245, 245, 242, 0.08);
+		background: color-mix(in oklab, var(--ink) 8%, transparent);
 		color: var(--text);
 	}
 
@@ -63,7 +63,7 @@
 		flex: none;
 		place-items: center;
 		border-radius: calc(var(--icon-size) * 0.28);
-		background: rgba(245, 245, 242, 0.045);
+		background: color-mix(in oklab, var(--ink) 4.5%, transparent);
 		color: var(--file);
 	}
 
@@ -117,7 +117,7 @@
 		max-width: 100%;
 		border-radius: 6px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
-		outline: 1px solid rgba(255, 255, 255, 0.08);
+		outline: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
 		outline-offset: -1px;
 	}
 

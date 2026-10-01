@@ -109,11 +109,11 @@
 	<div class="pointer-events-none fixed bottom-4 right-4 z-40 flex w-[360px] max-w-[calc(100%-32px)] flex-col gap-2">
 		{#each visible as operation (operation.id)}
 			<section
-				class="pointer-events-auto rounded-[18px] bg-[rgba(28,28,25,0.86)] p-3 text-[13px] shadow-[0_20px_60px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] backdrop-blur-2xl"
+				class="pointer-events-auto rounded-[18px] bg-[color-mix(in_oklab,var(--popover)_86%,transparent)] p-3 text-[13px] shadow-[0_20px_60px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] backdrop-blur-2xl"
 				aria-label={`${title(operation)} operation`}
 			>
 				<div class="flex items-center gap-3">
-					<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[rgba(245,245,242,0.08)] text-[var(--text-soft)]">
+					<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)] text-[var(--text-soft)]">
 						<Icon name={icon(operation)} size={17} />
 					</div>
 					<div class="min-w-0 flex-1">
@@ -124,7 +124,7 @@
 						<div class="mt-0.5 truncate text-[12px] text-[var(--text-muted)]">{subject(operation)}</div>
 					</div>
 				</div>
-				<div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(245,245,242,0.08)]">
+				<div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)]">
 					<div
 						class="h-full origin-left rounded-full bg-[var(--accent)] transition-transform duration-200"
 						style:transform="scaleX({Math.max(0.02, operation.progress)})"

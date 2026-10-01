@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
+	import Swatches from '$lib/components/Swatches.svelte';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { installedApps, type App } from '../apps/api';
 
@@ -25,13 +26,14 @@
 		{ value: '#d56199', label: 'Pink' },
 		{ value: '#9141ac', label: 'Purple' },
 		{ value: '#6f8396', label: 'Slate' }
-	];
+	].map((tint) => ({ ...tint, color: tint.value }));
 
 	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
 
 	let installed = $state<App[]>([]);
 	let style = $derived(kestrel.values['app-icon-style'] ?? 'default');
 	let tint = $derived(kestrel.values['app-icon-tint'] ?? '');
+	let tints = $derived([{ value: '', label: 'Accent color', color: appearance.accent ?? 'var(--accent)' }, ...TINTS]);
 	let preview = $derived.by(() => {
 		const byId = new Map(installed.map((app) => [app.id, app]));
 		const favorites = (kestrel.values['favorite-apps'] ?? []).map((id) => byId.get(id)).filter((app) => app !== undefined);
@@ -57,13 +59,8 @@
 		{/each}
 	</div>
 	{#if style === 'tinted'}
-		<Row title="Tint" description="The first color follows your wallpaper">
-			<div class="flex gap-1.5" role="radiogroup" aria-label="Tint">
-				<button type="button" role="radio" class="swatch" class:selected={!tint} aria-checked={!tint} aria-label="Wallpaper" style:background={appearance.accent ?? 'var(--accent)'} onclick={() => kestrel.set('app-icon-tint', '')}></button>
-				{#each TINTS as option (option.value)}
-					<button type="button" role="radio" class="swatch" class:selected={tint === option.value} aria-checked={tint === option.value} aria-label={option.label} style:background={option.value} onclick={() => kestrel.set('app-icon-tint', option.value)}></button>
-				{/each}
-			</div>
+		<Row title="Tint" description="The first color follows your accent color">
+			<Swatches label="Tint" options={tints} value={tint} onchange={(value) => kestrel.set('app-icon-tint', value)} />
 		</Row>
 	{/if}
 </Section>
@@ -92,16 +89,5 @@
 		border-radius: 12px;
 		padding: 10px 12px;
 		background: #181817;
-	}
-
-	.swatch {
-		height: 24px;
-		width: 24px;
-		border-radius: 999px;
-		transition: box-shadow 180ms var(--ease);
-	}
-
-	.swatch.selected {
-		box-shadow: 0 0 0 2px var(--content), 0 0 0 4px var(--text);
 	}
 </style>

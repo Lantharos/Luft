@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { appearance, Row, Section, Segmented, Switch } from '@luft/ui';
+	import Swatches from '$lib/components/Swatches.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 
 	type Schedule = 'off' | 'sunset' | 'custom';
+	type Accent = 'wallpaper' | 'white';
 	type Interface = {
 		'color-scheme': string;
 		'clock-format': string;
 	};
 	type Kestrel = {
+		accent: Accent;
 		'dark-schedule': Schedule;
 		'dark-schedule-from': number;
 		'dark-schedule-to': number;
@@ -23,12 +26,16 @@
 	];
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
-	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
+	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
 	let schedule = $derived(kestrel.values['dark-schedule'] ?? 'off');
 	let twelveHour = $derived(desktop.values['clock-format'] === '12h');
-	let swatches = $derived([appearance.accent ?? 'var(--accent)', appearance.colors.secondary, appearance.colors.tertiary].filter(Boolean));
+	let accent = $derived(kestrel.values.accent ?? 'wallpaper');
+	let accents = $derived<{ value: Accent; label: string; color: string }[]>([
+		{ value: 'wallpaper', label: 'Wallpaper', color: appearance.wallpaperAccent ?? 'var(--accent)' },
+		{ value: 'white', label: 'White', color: '#ffffff' }
+	]);
 </script>
 
 <Section title="Style">
@@ -60,12 +67,11 @@
 	<Row title="Pure black" description="Dark backgrounds turn fully black, which saves power on OLED displays">
 		<Switch label="Pure black" checked={kestrel.values['pure-black'] ?? false} onchange={(on) => kestrel.set('pure-black', on)} />
 	</Row>
-	<Row title="Wallpaper colors" description="Picked from your wallpaper and used across the desktop and apps">
-		<div class="flex gap-1.5">
-			{#each swatches as color, index (index)}
-				<span class="h-6 w-6 rounded-full" style:background={color}></span>
-			{/each}
-		</div>
+	<Row
+		title="Accent color"
+		description={accent === 'white' ? 'White in the dark style and black in the light style' : 'Picked from your wallpaper, and white when it has hardly any color'}
+	>
+		<Swatches label="Accent color" options={accents} value={accent} onchange={(value) => kestrel.set('accent', value)} />
 	</Row>
 	<Row title="Match other apps to the wallpaper" description="Other apps and terminals take on the same colors">
 		<Switch label="Match other apps to the wallpaper" checked={kestrel.values['theme-apps'] ?? false} onchange={(on) => kestrel.set('theme-apps', on)} />

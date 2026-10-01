@@ -1,7 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 	<rect width="64" height="64" rx="14" fill="#181817"/>
-	<clipPath id="card"><rect x="11" y="15" width="42" height="34" rx="7"/></clipPath>
-	<rect x="11" y="15" width="42" height="34" rx="7" fill="#f3f3ef"/>
-	<path clip-path="url(#card)" d="M9 51V41l14-13 10 9 6-5 16 15v4Z" fill="#8f8f88"/>
-	<circle cx="41" cy="25" r="4" fill="#8f8f88"/>
+	<g fill="#f3f3ef"><path d="M18 15H46A7 7 0 0 1 53 22V42A7 7 0 0 1 46 49H18A7 7 0 0 1 11 42V22A7 7 0 0 1 18 15ZM18.5 19.5A3 3 0 0 0 15.5 22.5V41.5A3 3 0 0 0 18.5 44.5H45.5A3 3 0 0 0 48.5 41.5V22.5A3 3 0 0 0 45.5 19.5Z" fill-rule="evenodd"/></g><g fill="#8f8f88"><path d="M19 41L26.5 33.5L32 39L37 34L45 41Z"/><circle cx="40" cy="26.5" r="3"/></g>
 </svg>

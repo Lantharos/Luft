@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.UsbProtection1
+Exec=@libexecdir@/luft-usb-protection
+User=root
+SystemdService=luft-usb-protection.service

@@ -1,18 +1,17 @@
 [package]
 name = "sushid"
+description = "The Sushi boot splash daemon"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
-description = "Sushi initramfs splash daemon"
-
-[[bin]]
-name = "sushid"
-path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true
 libc.workspace = true
-serde_json.workspace = true
+rustix.workspace = true
 sushi.workspace = true
+
+[lints]
+workspace = true

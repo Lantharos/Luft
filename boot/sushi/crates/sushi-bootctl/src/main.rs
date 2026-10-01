@@ -5,7 +5,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 
 const SUSHI_EFI_REL: &str = "EFI/sushi/SushiBoot.efi";
@@ -13,7 +13,11 @@ const LOADER_CONF: &str = "loader/loader.conf";
 const ENTRIES_DIR: &str = "loader/entries";
 
 #[derive(Parser)]
-#[command(name = "sushi-bootctl", version, about = "Install and manage SushiBoot")]
+#[command(
+    name = "sushi-bootctl",
+    version,
+    about = "Install and manage SushiBoot"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -97,7 +101,9 @@ fn cmd_install(esp: Option<PathBuf>, sign: bool, efi_entry: bool) -> Result<()> 
 
     println!("Sushi boot stack installed.");
     println!("  Next: sudo dracut --force --regenerate-all");
-    println!("  Rollback: kernel cmdline rd.sushi=0");
+    println!(
+        "  Rollback: sushi-bootctl uninstall, or pick another entry in the firmware boot menu"
+    );
     Ok(())
 }
 
@@ -158,9 +164,17 @@ fn cmd_sign(esp: Option<PathBuf>) -> Result<()> {
     let esp = resolve_esp(esp)?;
     let efi = esp.join(SUSHI_EFI_REL);
     if !efi.is_file() {
-        bail!("{} not found — run sushi-bootctl install first", efi.display());
+        bail!(
+            "{} not found — run sushi-bootctl install first",
+            efi.display()
+        );
     }
-    if !Command::new("sbctl").arg("--help").output().map(|o| o.status.success()).unwrap_or(false) {
+    if !Command::new("sbctl")
+        .arg("--help")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+    {
         bail!("sbctl not found. Install: sudo dnf install sbctl");
     }
     let status = Command::new("sbctl")
@@ -168,7 +182,9 @@ fn cmd_sign(esp: Option<PathBuf>) -> Result<()> {
         .status()
         .context("sbctl sign")?;
     if !status.success() {
-        bail!("sbctl sign failed (enroll keys with: sudo sbctl create-keys && sudo sbctl enroll -m)");
+        bail!(
+            "sbctl sign failed (enroll keys with: sudo sbctl create-keys && sudo sbctl enroll -m)"
+        );
     }
     println!("Signed {}", efi.display());
     Ok(())
@@ -262,28 +278,56 @@ fn install_kernel_layout() -> Result<()> {
     )?;
     fs::write(
         conf_dir.join("cmdline.d/50-sushi.conf"),
-        "rd.sushi=1 fbcon.logo=0\n",
+        "sushi plymouth.enable=0\n",
     )?;
     println!("Installed /etc/kernel/install.conf.d/50-sushi.conf (layout=sushi)");
     Ok(())
 }
 
-fn create_efi_boot_entry(_esp: &Path) -> Result<()> {
-    if !Command::new("efibootmgr")
-        .arg("--version")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
-    {
-        println!("efibootmgr not found — skip UEFI boot entry (set firmware boot path manually)");
-        return Ok(());
-    }
+fn esp_partition(esp: &Path) -> Result<(String, String)> {
+    let mounts = fs::read_to_string("/proc/self/mounts")?;
+    let source = mounts
+        .lines()
+        .map(|line| line.split_whitespace().collect::<Vec<_>>())
+        .find(|fields| fields.len() > 1 && Path::new(fields[1]) == esp)
+        .map(|fields| fields[0].to_string())
+        .context("the ESP is not mounted")?;
+    let name = Path::new(&source)
+        .file_name()
+        .and_then(|name| name.to_str())
+        .context("the ESP has no device name")?;
+    let block = Path::new("/sys/class/block").join(name);
+    let partition = fs::read_to_string(block.join("partition"))?
+        .trim()
+        .to_string();
+    let disk = fs::canonicalize(&block)?
+        .parent()
+        .and_then(|parent| parent.file_name())
+        .and_then(|name| name.to_str())
+        .map(|disk| format!("/dev/{disk}"))
+        .context("the ESP's disk was not found")?;
+    Ok((disk, partition))
+}
+
+fn create_efi_boot_entry(esp: &Path) -> Result<()> {
+    let (disk, partition) = esp_partition(esp)?;
     let status = Command::new("efibootmgr")
-        .args(["-c", "-L", "Sushi", "-l", r"\\EFI\\sushi\\SushiBoot.efi"])
+        .args([
+            "--create",
+            "--disk",
+            &disk,
+            "--part",
+            &partition,
+            "--label",
+            "Sushi",
+            "--loader",
+            r"\EFI\sushi\SushiBoot.efi",
+        ])
         .status()
-        .context("efibootmgr")?;
-    if status.success() {
-        println!("Created UEFI boot entry 'Sushi'");
+        .context("efibootmgr is required to add a firmware boot entry")?;
+    if !status.success() {
+        bail!("efibootmgr could not add the boot entry");
     }
+    println!("Added the Sushi firmware boot entry");
     Ok(())
 }

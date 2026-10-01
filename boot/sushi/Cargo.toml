@@ -1,38 +1,47 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = [
     "crates/sushi",
+    "crates/sushi-scene",
     "crates/sushid",
     "crates/sushictl",
     "crates/sushi-bootctl",
     "crates/sushiboot",
 ]
+default-members = [
+    "crates/sushi",
+    "crates/sushi-scene",
+    "crates/sushid",
+    "crates/sushictl",
+    "crates/sushi-bootctl",
+]
 
 [workspace.package]
-version = "0.1.0"
-edition = "2021"
+version = "0.2.0"
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/Lantharos/Luft"
-rust-version = "1.75"
+rust-version = "1.98"
 
 [workspace.dependencies]
 sushi = { path = "crates/sushi" }
+sushi-scene = { path = "crates/sushi-scene" }
 
-anyhow = "1"
-bitflags = { version = "2", features = ["serde"] }
-clap = { version = "4", features = ["derive"] }
-drm = "0.12"
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+drm = "0.15.0"
 libc = "0.2"
-log = "0.4"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-thiserror = "2"
-uuid = { version = "1", features = ["v4", "serde"] }
+rustix = { version = "1.1.5", features = ["event", "fs", "mm", "net", "process", "termios", "time"] }
+tiny-skia = { version = "0.12.0", default-features = false }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
 
 [profile.release]
 lto = true
 codegen-units = 1
 strip = true
 panic = "abort"
-
-[profile.release.package.sushiboot]

@@ -1,0 +1,12 @@
+[Unit]
+Description=Carry the boot splash into the system
+DefaultDependencies=no
+ConditionPathExists=/etc/initrd-release
+ConditionKernelCommandLine=sushi
+After=sushi.service
+Before=initrd-switch-root.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/usr/bin/sushictl update-root /sysroot

@@ -1,0 +1,16 @@
+[package]
+name = "sushi-scene"
+description = "The boot scene, Luft mark and loader shared by every Sushi stage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ab_glyph = { version = "0.2.32", default-features = false, features = ["libm"] }
+libm = "0.2.16"
+tiny-skia = { workspace = true, features = ["no-std-float"] }
+
+[lints]
+workspace = true

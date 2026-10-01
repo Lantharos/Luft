@@ -1,0 +1,20 @@
+[Unit]
+Description=Boot splash
+Documentation=https://github.com/Lantharos/Luft/tree/main/boot/sushi
+DefaultDependencies=no
+Wants=systemd-vconsole-setup.service
+After=systemd-vconsole-setup.service
+Before=systemd-ask-password-console.path cryptsetup-pre.target shutdown.target
+Conflicts=shutdown.target plymouth-start.service
+ConditionKernelCommandLine=sushi
+ConditionVirtualization=!container
+IgnoreOnIsolate=true
+
+[Service]
+Type=notify
+ExecStart=@/usr/bin/sushid @sushid
+KillMode=mixed
+SendSIGKILL=no
+
+[Install]
+WantedBy=sysinit.target

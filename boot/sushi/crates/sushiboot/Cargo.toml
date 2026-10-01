@@ -1,17 +1,21 @@
 [package]
 name = "sushiboot"
+description = "A minimal UEFI boot menu that keeps the firmware logo on screen"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [[bin]]
 name = "sushiboot"
 path = "src/main.rs"
 
 [dependencies]
-libm = "0.2"
-log = { workspace = true }
-uefi = { version = "0.32", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
+libm = "0.2.16"
+log = "0.4.34"
+sushi-scene.workspace = true
+uefi = { version = "0.41.0", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
 
-[package.metadata.uefi]
-targets = ["x86_64-unknown-uefi"]
+[lints]
+workspace = true

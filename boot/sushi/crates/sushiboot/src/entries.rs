@@ -39,7 +39,7 @@ struct SeenKey {
 }
 
 /// Scan every ESP for bootable operating systems.
-pub fn collect_all(boot_device: Handle) -> (Vec<BootEntry>, usize) {
+pub fn collect_all(boot_device: Handle) -> Vec<BootEntry> {
     let volumes = volume::enumerate_esp_volumes(boot_device);
     let esp_count = volumes.len();
     let multi = esp_count > 1;
@@ -52,26 +52,36 @@ pub fn collect_all(boot_device: Handle) -> (Vec<BootEntry>, usize) {
         scan_uki_directory(vol, multi, &mut out, &mut seen);
     }
 
-    (out, esp_count)
+    out
 }
 
-fn scan_bls_entries(vol: &EspVolume, multi: bool, out: &mut Vec<BootEntry>, seen: &mut Vec<SeenKey>) {
+fn scan_bls_entries(
+    vol: &EspVolume,
+    multi: bool,
+    out: &mut Vec<BootEntry>,
+    seen: &mut Vec<SeenKey>,
+) {
     let Ok(mut fs) = boot::open_protocol_exclusive::<SimpleFileSystem>(vol.handle) else {
         return;
     };
     let Ok(mut root) = fs.open_volume() else {
         return;
     };
-    for dir_path in [
+    read_bls_dir(
+        &mut root,
         uefi::cstr16!("\\loader\\entries"),
-        uefi::cstr16!("loader\\entries"),
-    ] {
-        read_bls_dir(&mut root, dir_path, vol, multi, out, seen);
-    }
+        vol,
+        multi,
+        out,
+        seen,
+    );
 }
 
 const KNOWN_OS_BOOTLOADERS: &[(&str, &str)] = &[
-    ("\\EFI\\Microsoft\\Boot\\bootmgfw.efi", "Windows Boot Manager"),
+    (
+        "\\EFI\\Microsoft\\Boot\\bootmgfw.efi",
+        "Windows Boot Manager",
+    ),
     ("\\EFI\\Microsoft\\Boot\\memtest.efi", "Windows Memory Test"),
     ("\\EFI\\Fedora\\grubx64.efi", "Fedora (GRUB)"),
     ("\\EFI\\fedora\\shim.efi", "Fedora (shim)"),
@@ -122,7 +132,12 @@ fn scan_known_efi_bootloaders(
     }
 }
 
-fn scan_uki_directory(vol: &EspVolume, multi: bool, out: &mut Vec<BootEntry>, seen: &mut Vec<SeenKey>) {
+fn scan_uki_directory(
+    vol: &EspVolume,
+    multi: bool,
+    out: &mut Vec<BootEntry>,
+    seen: &mut Vec<SeenKey>,
+) {
     let Ok(mut fs) = boot::open_protocol_exclusive::<SimpleFileSystem>(vol.handle) else {
         return;
     };
@@ -193,8 +208,7 @@ fn read_bls_dir(
         let Some((title, kind)) = parse_bls_file(&mut directory, &cname) else {
             continue;
         };
-        let path_key = bls_primary_path(&kind);
-        if mark_seen(seen, vol.handle, &path_key) {
+        if mark_seen(seen, vol.handle, &format!("\\loader\\entries\\{name}")) {
             continue;
         }
         out.push(BootEntry {
@@ -203,13 +217,6 @@ fn read_bls_dir(
             volume: vol.handle,
             kind,
         });
-    }
-}
-
-fn bls_primary_path(kind: &BootKind) -> String {
-    match kind {
-        BootKind::Linux { linux, .. } => normalize_path_key(linux),
-        BootKind::Efi { efi, .. } => normalize_path_key(efi),
     }
 }
 
@@ -249,7 +256,10 @@ fn mark_seen(seen: &mut Vec<SeenKey>, volume: Handle, path: &str) -> bool {
         volume,
         path: normalize_path_key(path),
     };
-    if seen.iter().any(|s| s.volume == key.volume && s.path == key.path) {
+    if seen
+        .iter()
+        .any(|s| s.volume == key.volume && s.path == key.path)
+    {
         return true;
     }
     seen.push(key);
@@ -278,7 +288,9 @@ fn parse_bls_file(
     directory: &mut uefi::proto::media::file::Directory,
     name: &uefi::CStr16,
 ) -> Option<(String, BootKind)> {
-    let file = directory.open(name, FileMode::Read, FileAttribute::empty()).ok()?;
+    let file = directory
+        .open(name, FileMode::Read, FileAttribute::empty())
+        .ok()?;
     let FileType::Regular(mut regular) = file.into_type().ok()? else {
         return None;
     };

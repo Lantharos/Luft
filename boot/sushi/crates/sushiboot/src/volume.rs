@@ -9,7 +9,7 @@ use uefi::boot::{self, HandleBuffer, SearchType};
 use uefi::proto::media::file::{File, FileAttribute, FileMode, FileType};
 use uefi::proto::media::fs::SimpleFileSystem;
 use uefi::proto::media::partition::PartitionInfo;
-use uefi::{Char16, CString16, Handle, Identify};
+use uefi::{CString16, Char16, Handle, Identify};
 
 #[derive(Clone, Debug)]
 pub struct EspVolume {
@@ -59,10 +59,10 @@ fn scan_handles(handles: &HandleBuffer, boot_device: Handle) -> Vec<EspVolume> {
 }
 
 fn volume_is_esp(handle: Handle) -> bool {
-    if let Ok(pi) = boot::open_protocol_exclusive::<PartitionInfo>(handle) {
-        if pi.is_system() {
-            return true;
-        }
+    if let Ok(pi) = boot::open_protocol_exclusive::<PartitionInfo>(handle)
+        && pi.is_system()
+    {
+        return true;
     }
     has_efi_tree(handle)
 }
@@ -78,10 +78,14 @@ fn has_efi_tree(handle: Handle) -> bool {
         let Ok(cpath) = CString16::try_from(path) else {
             continue;
         };
-        if let Ok(dir) = root.open(&cpath, FileMode::Read, FileAttribute::DIRECTORY) {
-            if dir.into_type().ok().map(|t| matches!(t, FileType::Dir(_))).unwrap_or(false) {
-                return true;
-            }
+        if let Ok(dir) = root.open(&cpath, FileMode::Read, FileAttribute::DIRECTORY)
+            && dir
+                .into_type()
+                .ok()
+                .map(|t| matches!(t, FileType::Dir(_)))
+                .unwrap_or(false)
+        {
+            return true;
         }
     }
     false
@@ -114,4 +118,3 @@ fn char16_name(buf: &[Char16; 36]) -> String {
     }
     out.trim().to_string()
 }
-

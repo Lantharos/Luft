@@ -112,7 +112,7 @@ impl Item {
         &self,
         session: ObjectPath<'_>,
         #[zbus(header)] header: Header<'_>,
-    ) -> Result<Secret, SecretError> {
+    ) -> Result<(Secret,), SecretError> {
         let (sender, _) = self.daemon.caller(&header).await;
         let transfer = self
             .daemon
@@ -132,7 +132,7 @@ impl Item {
             &item.content_type,
         );
         keyring.record(&app, Action::Read, &item.label);
-        Ok(secret)
+        Ok((secret,))
     }
 
     async fn set_secret(

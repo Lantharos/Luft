@@ -24,9 +24,9 @@ as_root() {
 place() {
   local source="$1" target="$destination$2" mode="$3"
   if [[ "$source" == "$release/"* ]]; then
-    as_root install -D -m "$mode" "$source" "$target"
+    as_root install -DZ -m "$mode" "$source" "$target"
   else
-    sed "s|@libexecdir@|$prefix/libexec|g" "$source" | as_root install -D -m "$mode" /dev/stdin "$target"
+    sed "s|@libexecdir@|$prefix/libexec|g" "$source" | as_root install -DZ -m "$mode" /dev/stdin "$target"
   fi
   [[ -n "$destination" ]] || as_root restorecon "$target"
 }

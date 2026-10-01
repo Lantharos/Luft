@@ -19,12 +19,12 @@ greeter_files() {
 
 install_greeter() {
   cargo build --release --manifest-path "$root/kestrel/greeter/Cargo.toml"
-  sudo install -D -m755 "$root/kestrel/greeter/target/release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
+  sudo install -DZ -m755 "$root/kestrel/greeter/target/release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
   greeter_files | while read -r source target; do
     sed -e "s|@libexecdir@|$prefix/libexec|g" -e "s|@bindir@|$prefix/bin|g" "$greeter_data/$source" \
-      | sudo install -D -m644 /dev/stdin "$target"
+      | sudo install -DZ -m644 /dev/stdin "$target"
   done
-  sed "s|@bindir@|$prefix/bin|g" "$greeter_data/greetd.toml" | sudo install -D -m644 /dev/stdin "$prefix/share/kestrel/greetd.toml"
+  sed "s|@bindir@|$prefix/bin|g" "$greeter_data/greetd.toml" | sudo install -DZ -m644 /dev/stdin "$prefix/share/kestrel/greetd.toml"
   sudo systemd-tmpfiles --create kestrel-greeter.conf
   sudo systemctl daemon-reload
   sudo systemctl reload dbus-broker.service
@@ -39,6 +39,25 @@ remove_greeter() {
   greeter_files | while read -r _ target; do sudo rm -f "$target"; done
   sudo systemctl daemon-reload
   sudo systemctl reload dbus-broker.service
+}
+
+authenticator_units() {
+  echo kestrel-authenticate.socket
+  echo kestrel-authenticate@.service
+}
+
+install_authenticator() {
+  authenticator_units | while read -r unit; do
+    sudo install -DZ -m644 "$prefix/lib/systemd/system/$unit" "/usr/local/lib/systemd/system/$unit"
+  done
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now kestrel-authenticate.socket
+}
+
+remove_authenticator() {
+  sudo systemctl disable --now kestrel-authenticate.socket || true
+  authenticator_units | while read -r unit; do sudo rm -f "/usr/local/lib/systemd/system/$unit"; done
+  sudo systemctl daemon-reload
 }
 
 installed_links() {
@@ -93,6 +112,7 @@ case "$action" in
       done
       install_greeter
       install_keyring
+      install_authenticator
       systemctl --user daemon-reload
       echo "Kestrel is installed in $prefix and appears as a session on the login screen."
       echo "The Kestrel login screen is ready to use with greetd; see Login screen in kestrel/README.md to switch to it."
@@ -106,6 +126,7 @@ case "$action" in
       [[ -L "/usr/local/$link" ]] && sudo rm "/usr/local/$link"
     done
     remove_greeter
+    remove_authenticator
     remove_keyring
     as_owner "$prefix" rm -rf "$prefix"
     echo "Kestrel was removed from $prefix."

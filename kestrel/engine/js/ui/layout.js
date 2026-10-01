@@ -203,6 +203,7 @@ export const LayoutManager = GObject.registerClass({
     Signals: {
         'startup-complete': {},
         'startup-prepared': {},
+        'first-frame': {},
         'monitors-changed': {},
         'system-modal-opened': {},
     },
@@ -601,7 +602,7 @@ export const LayoutManager = GObject.registerClass({
                 global.stage.disconnect(id);
                 resolve();
             });
-        });
+        }).then(() => this.emit('first-frame'));
 
         try {
             await this._prepareStartupAnimation();

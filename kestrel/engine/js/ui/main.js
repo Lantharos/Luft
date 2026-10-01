@@ -259,25 +259,27 @@ async function _initializeUI() {
 
     global.connect('shutdown', () => KestrelUi.shutdown());
 
-    layoutManager.init();
-    const quickSettings = new DesktopControls();
-    global.connect('shutdown', () => quickSettings.destroy());
-    KestrelUi.initialize({
-        layoutManager, messageTray, quickSettings, sessionMode, screenShield,
-        canInteract: () => actionMode === Shell.ActionMode.NORMAL,
-        snapWindow: (window, rect) => wm.snapWindow(window, rect),
-        activateWindow: window => wm.activateWithSnapGroup(window),
-        openScreenshot: () => screenshotUI.open().catch(logError),
-        stopScreencast: () => screenshotUI.stopScreencast(),
-        createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
-        registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
-        inputMethod,
-        keybindings: {
-            add: (name, settings, flags, modes, handler) => wm.addKeybinding(name, settings, flags, modes, handler),
-            allow: (name, modes) => wm.allowKeybinding(name, modes),
-        },
-        showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
+    layoutManager.connect('first-frame', () => {
+        const quickSettings = new DesktopControls();
+        global.connect('shutdown', () => quickSettings.destroy());
+        KestrelUi.initialize({
+            layoutManager, messageTray, quickSettings, sessionMode, screenShield,
+            canInteract: () => actionMode === Shell.ActionMode.NORMAL,
+            snapWindow: (window, rect) => wm.snapWindow(window, rect),
+            activateWindow: window => wm.activateWithSnapGroup(window),
+            openScreenshot: () => screenshotUI.open().catch(logError),
+            stopScreencast: () => screenshotUI.stopScreencast(),
+            createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
+            registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
+            inputMethod,
+            keybindings: {
+                add: (name, settings, flags, modes, handler) => wm.addKeybinding(name, settings, flags, modes, handler),
+                allow: (name, modes) => wm.allowKeybinding(name, modes),
+            },
+            showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
+        });
     });
+    layoutManager.init();
 
     new PointerA11yTimeout.PointerA11yTimeout();
 

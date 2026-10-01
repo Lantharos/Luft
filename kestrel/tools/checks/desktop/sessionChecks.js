@@ -15,6 +15,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     if (!condition) throw new Error(`Kestrel session check failed: ${label}`);
     console.log(`Kestrel session check: ${label}`);
   };
+  const descendants = actor => [actor, ...actor.get_children().flatMap(descendants)];
   const call = (name, path, iface, method, args) => new Promise((resolve, reject) => {
     Gio.DBus.session.call(name, path, iface, method, args, null, Gio.DBusCallFlags.NONE, 5000, null,
       (connection, result) => { try { resolve(connection.call_finish(result)); } catch (error) { reject(error); } });
@@ -107,6 +108,16 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   await pause(250);
   require(Main.modalCount > 0, 'encrypted volume password dialog opens');
   await capture(`${output}/volume-password-dialog.png`);
+  const passwordEntry = descendants(global.stage).find(actor => actor instanceof St.PasswordEntry && actor.mapped);
+  const [entryX, entryY] = passwordEntry.get_transformed_position();
+  pointer.notify_absolute_motion(GLib.get_monotonic_time(), entryX + 40, entryY + passwordEntry.height / 2);
+  pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.PRESSED);
+  pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_SECONDARY, Clutter.ButtonState.RELEASED);
+  await pause(300);
+  require(passwordEntry.menu.isOpen, 'right-clicking a password field offers to show the text');
+  await capture(`${output}/password-menu.png`);
+  key(Clutter.KEY_Escape);
+  await pause(200);
   key(Clutter.KEY_Escape);
   await request;
   await call(...mount, 'Close', null);
@@ -242,6 +253,15 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
     keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Alt_L, Clutter.KeyState.RELEASED);
     await pause(250);
     require(Main.modalCount === 0, 'Alt release accepts window selection');
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Alt_L, Clutter.KeyState.PRESSED);
+    key(Clutter.KEY_space);
+    keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Alt_L, Clutter.KeyState.RELEASED);
+    await pause(350);
+    const windowMenu = descendants(global.stage).find(actor => actor.has_style_class_name?.('window-menu') && actor.mapped);
+    require(!!windowMenu, 'Alt+Space opens the window menu');
+    await capture(`${output}/window-menu.png`);
+    key(Clutter.KEY_Escape);
+    await pause(250);
     const snapped = windows.find(candidate => candidate.title === 'Kestrel window check 1');
     snapped.activate(global.get_current_time());
     await pause(200);

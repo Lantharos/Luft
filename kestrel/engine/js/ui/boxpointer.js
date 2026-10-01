@@ -35,8 +35,6 @@ export const BoxPointer = GObject.registerClass({
     _init(arrowSide, binProperties) {
         super._init();
 
-        this.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
-
         this._arrowSide = arrowSide;
         this._userArrowSide = arrowSide;
         this._arrowOrigin = 0;

@@ -36,8 +36,9 @@ on_visible_connectors (GObject      *commands,
     }
 
   connectors = g_strsplit (line, " ", -1);
+  if (wallpaper_player_set_playing (wallpaper->player, connectors[0] != NULL))
+    wallpaper_surfaces_hold_frames (wallpaper->surfaces);
   wallpaper_surfaces_set_live (wallpaper->surfaces, (const char * const *) connectors);
-  wallpaper_player_set_playing (wallpaper->player, connectors[0] != NULL);
   read_visible_connectors (wallpaper);
 }
 

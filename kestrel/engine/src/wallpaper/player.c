@@ -4,21 +4,27 @@
 
 #include <gst/gst.h>
 
+#define RELEASE_AFTER_SECONDS 10
+
 struct _WallpaperPlayer
 {
   GstElement *pipeline;
   GdkPaintable *paintable;
   gboolean prerolled;
   gboolean playing;
+  gboolean released;
+  gint64 position;
+  guint release_id;
 };
 
 static void
-loop_from_start (WallpaperPlayer *player,
-                 GstSeekFlags     flags)
+seek (WallpaperPlayer *player,
+      gint64           position,
+      GstSeekFlags     flags)
 {
   gst_element_seek (player->pipeline, 1.0, GST_FORMAT_TIME,
                     flags | GST_SEEK_FLAG_SEGMENT,
-                    GST_SEEK_TYPE_SET, 0,
+                    GST_SEEK_TYPE_SET, position,
                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 }
 
@@ -42,12 +48,12 @@ on_message (GstBus     *bus,
       if (!player->prerolled)
         {
           player->prerolled = TRUE;
-          loop_from_start (player, GST_SEEK_FLAG_FLUSH);
+          seek (player, player->position, GST_SEEK_FLAG_FLUSH);
           apply_state (player);
         }
       break;
     case GST_MESSAGE_SEGMENT_DONE:
-      loop_from_start (player, GST_SEEK_FLAG_NONE);
+      seek (player, 0, GST_SEEK_FLAG_NONE);
       break;
     case GST_MESSAGE_ERROR:
       {
@@ -111,14 +117,43 @@ wallpaper_player_get_paintable (WallpaperPlayer *player)
   return player->paintable;
 }
 
-void
+static void
+release_decoder (gpointer data)
+{
+  WallpaperPlayer *player = data;
+
+  player->release_id = 0;
+  if (!gst_element_query_position (player->pipeline, GST_FORMAT_TIME, &player->position))
+    player->position = 0;
+  gst_element_set_state (player->pipeline, GST_STATE_NULL);
+  player->prerolled = FALSE;
+  player->released = TRUE;
+}
+
+gboolean
 wallpaper_player_set_playing (WallpaperPlayer *player,
                               gboolean         playing)
 {
+  gboolean restarting = playing && player->released;
+
   if (player->playing == playing)
-    return;
+    return FALSE;
 
   player->playing = playing;
-  if (player->prerolled)
-    apply_state (player);
+  g_clear_handle_id (&player->release_id, g_source_remove);
+  if (!playing)
+    player->release_id = g_timeout_add_seconds_once (RELEASE_AFTER_SECONDS,
+                                                     release_decoder, player);
+
+  if (restarting)
+    {
+      player->released = FALSE;
+      gst_element_set_state (player->pipeline, GST_STATE_PAUSED);
+    }
+  else if (player->prerolled)
+    {
+      apply_state (player);
+    }
+
+  return restarting;
 }

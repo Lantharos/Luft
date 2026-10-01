@@ -48,7 +48,7 @@
 	}
 </script>
 
-<div class="flex min-h-[68px] shrink-0 items-center justify-between gap-3 bg-[var(--content)] px-5 py-3 shadow-[0_-1px_0_var(--hairline)]">
+<div class="chooser-bar flex min-h-[68px] shrink-0 items-center justify-between gap-3 px-5 py-3">
 	<div class="flex min-w-0 flex-1 items-center gap-3 text-[13px] text-[var(--text-muted)]">
 		<div class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--control)] text-[var(--text-soft)] shadow-[inset_0_1px_0_var(--hairline)]">
 			<Icon name={icon} size={18} />

@@ -1,0 +1,20 @@
+[package]
+name = "luft-software"
+version = "0.1.0"
+description = "Apps, system updates and offline updates shared by Luft's software tools"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.90"
+
+[dependencies]
+backhand = { version = "0.25.5", default-features = false, features = ["xz", "gzip", "zstd", "lz4"] }
+dirs = "7.0.0"
+glob = "0.3.4"
+libc = "0.2.189"
+luft-app = { path = "../app", features = ["apps"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha1 = "0.11.0"
+ureq = { version = "3.4.2", features = ["platform-verifier"] }
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

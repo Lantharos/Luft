@@ -13,11 +13,35 @@ const SMALLEST_GOOD_SIZE: u32 = 48;
 const EXTENSIONS: [&str; 2] = ["svg", "png"];
 const FLATPAK_EXPORTS: &str = "/var/lib/flatpak/exports/share";
 const PIXMAPS: &str = "/usr/share/pixmaps";
+const FALLBACK_DIRECTORIES: [&str; 7] = [
+    "scalable", "512x512", "256x256", "128x128", "96x96", "64x64", "48x48",
+];
 
 static INDEX: OnceLock<HashMap<String, PathBuf>> = OnceLock::new();
 
 pub fn lookup(name: &str) -> Option<PathBuf> {
-    INDEX.get_or_init(build).get(name).cloned()
+    INDEX
+        .get_or_init(build)
+        .get(name)
+        .cloned()
+        .or_else(|| installed_since(name))
+}
+
+fn installed_since(name: &str) -> Option<PathBuf> {
+    let bases = icon_bases();
+    FALLBACK_DIRECTORIES.iter().find_map(|directory| {
+        bases.iter().find_map(|base| {
+            EXTENSIONS
+                .iter()
+                .map(|extension| {
+                    base.join(FALLBACK_THEME)
+                        .join(directory)
+                        .join("apps")
+                        .join(format!("{name}.{extension}"))
+                })
+                .find(|path| path.exists())
+        })
+    })
 }
 
 fn build() -> HashMap<String, PathBuf> {

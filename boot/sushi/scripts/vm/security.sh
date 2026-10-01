@@ -10,4 +10,4 @@ stage="$vm/security"
 rm -rf "$stage"
 "$luft/security/scripts/build.sh" "$stage"
 podman unshare cp -a "$stage/." "$tree/"
-podman run --rm --security-opt label=disable --rootfs "$tree" systemctl enable luft-usb-protection.service luft-trust.service
+podman run --rm --security-opt label=disable --rootfs "$tree" systemctl enable luft-usb-protection.service trustd.service

@@ -21,5 +21,5 @@ pub fn tpm_refused_this_boot() -> bool {
     };
     let cryptsetup = messages("systemd-cryptsetup");
     REFUSALS.iter().any(|refusal| cryptsetup.contains(refusal))
-        || messages("luft-trust").contains(STAGE_REFUSED)
+        || messages("trustd").contains(STAGE_REFUSED)
 }

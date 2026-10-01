@@ -1,0 +1,17 @@
+#!/usr/bin/sh
+COMMAND="$1"
+KERNEL_VERSION="$2"
+
+command -v trustctl >/dev/null || exit 0
+
+case "$COMMAND" in
+    add)
+        if [ -n "$KERNEL_INSTALL_STAGING_AREA" ] && [ -f "$KERNEL_INSTALL_STAGING_AREA/initrd" ]; then
+            exec trustctl startup add "$KERNEL_VERSION" --initrd "$KERNEL_INSTALL_STAGING_AREA/initrd"
+        fi
+        exec trustctl startup add "$KERNEL_VERSION"
+        ;;
+    remove)
+        exec trustctl startup remove "$KERNEL_VERSION"
+        ;;
+esac

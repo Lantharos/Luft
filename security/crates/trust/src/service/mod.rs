@@ -15,7 +15,15 @@ pub const NAME: &str = "com.lantharos.Trust1";
 pub const PATH: &str = "/com/lantharos/Trust1";
 const IDLE_TIMEOUT: Duration = Duration::from_secs(60);
 
-pub async fn serve() -> zbus::Result<()> {
+pub fn run() -> anyhow::Result<()> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(serve())?;
+    Ok(())
+}
+
+async fn serve() -> zbus::Result<()> {
     if let Err(error) = tokio::task::spawn_blocking(keys::mok::follow_up)
         .await
         .expect("following up on the key enrollment doesn't panic")

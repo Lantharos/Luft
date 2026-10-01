@@ -11,7 +11,7 @@ use crate::system::command::Tool;
 use crate::system::secret::Secret;
 use crate::system::{blocks, keyring};
 
-const HEADERS: &str = "/boot/luft-trust";
+const HEADERS: &str = "/boot/trustd";
 
 fn boot_filesystem(disk: &SystemDisk) -> Result<String> {
     let boot = blocks::mount_at("/boot")

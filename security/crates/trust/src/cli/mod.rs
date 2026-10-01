@@ -12,11 +12,11 @@ use crate::disk::keys;
 use crate::system::command::Tool;
 use crate::system::secret::Secret;
 use crate::system::tpm;
-use crate::{actions, disk, service};
+use crate::{actions, disk};
 
 #[derive(Parser)]
 #[command(
-    name = "luft-trust",
+    name = "trustctl",
     version,
     about = "Secure Boot signing, TPM disk unlock and device encryption"
 )]
@@ -27,8 +27,6 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Answer Settings on the system bus
-    Serve,
     /// Show Secure Boot, the TPM, the signed startup and the disk
     Status,
     /// Luft's Secure Boot key
@@ -129,11 +127,6 @@ enum EncryptionAction {
 impl Cli {
     pub fn run(self) -> Result<()> {
         match self.command {
-            Command::Serve => tokio::runtime::Builder::new_current_thread()
-                .enable_all()
-                .build()?
-                .block_on(service::serve())
-                .map_err(Into::into),
             Command::Status => {
                 report::status();
                 Ok(())
@@ -243,7 +236,7 @@ fn encryption(action: EncryptionAction) -> Result<()> {
         EncryptionAction::Off => {
             disk::turn_off(&ask::unlock_key()?)?;
             Tool::new("systemctl")
-                .args(["start", "luft-trust.service"])
+                .args(["start", "trustd.service"])
                 .status()?;
             println!("Decrypting in the background. You can keep using the computer.");
             Ok(())

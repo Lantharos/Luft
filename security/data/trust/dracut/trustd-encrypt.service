@@ -1,7 +1,7 @@
 [Unit]
 Description=Start encrypting the system disk
 DefaultDependencies=no
-ConditionPathExists=/etc/luft-trust/stage/plan.json
+ConditionPathExists=/etc/trustd/stage/plan.json
 Wants=tpm2.target
 After=systemd-udev-trigger.service tpm2.target sushi.service systemd-pcrphase-initrd.service
 Before=cryptsetup.target initrd-root-device.target sysroot.mount
@@ -9,6 +9,6 @@ Before=cryptsetup.target initrd-root-device.target sysroot.mount
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/luft-trust encryption initrd
-SyslogIdentifier=luft-trust
+ExecStart=/usr/bin/trustctl encryption initrd
+SyslogIdentifier=trustd
 TimeoutSec=infinity

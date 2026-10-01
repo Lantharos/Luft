@@ -14,7 +14,7 @@ use crate::system::secret::Secret;
 const PLAN: &str = "plan.json";
 const SEALED: &str = "recovery-key.cred";
 const BOXED: &str = "recovery-key.box";
-const SEALED_NAME: &str = "luft-trust.stage";
+const SEALED_NAME: &str = "trustd.stage";
 const SALT: usize = 16;
 const NONCE: usize = 24;
 

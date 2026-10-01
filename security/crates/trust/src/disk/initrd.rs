@@ -13,8 +13,8 @@ use crate::system::secret::Secret;
 
 const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const ATTEMPTS: usize = 5;
-pub const RESULT: &str = "/run/luft-trust/encryption-result";
-const BOOT: &str = "/run/luft-trust/boot";
+pub const RESULT: &str = "/run/trustd/encryption-result";
+const BOOT: &str = "/run/trustd/boot";
 
 fn splash(mode: &str) {
     let _ = Tool::new("sushictl").args(["show", mode]).status();
@@ -33,7 +33,7 @@ fn wait_for(device: &Path) -> Result<()> {
 
 fn ask(id: &str, message: &str) -> Result<Secret> {
     Tool::new("systemd-ask-password")
-        .arg(format!("--id=luft-trust:{id}"))
+        .arg(format!("--id=trustd:{id}"))
         .arg("--timeout=0")
         .arg(message)
         .output_bytes()

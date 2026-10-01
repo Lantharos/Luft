@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 check() {
-    require_binaries luft-trust cryptsetup || return 1
+    require_binaries trustctl cryptsetup || return 1
     return 0
 }
 
@@ -16,13 +16,13 @@ installkernel() {
 }
 
 install() {
-    inst_multiple luft-trust systemd-creds cryptsetup udevadm
-    inst_simple "$moddir/luft-trust-encrypt.service" "$systemdsystemunitdir/luft-trust-encrypt.service"
-    $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target luft-trust-encrypt.service
-    if [[ -f /var/lib/luft-trust/stage/plan.json ]]; then
+    inst_multiple trustctl systemd-creds cryptsetup udevadm
+    inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
+    $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-encrypt.service
+    if [[ -f /var/lib/trustd/stage/plan.json ]]; then
         local file
-        for file in /var/lib/luft-trust/stage/*; do
-            inst_simple "$file" "/etc/luft-trust/stage/${file##*/}"
+        for file in /var/lib/trustd/stage/*; do
+            inst_simple "$file" "/etc/trustd/stage/${file##*/}"
         done
     fi
 }

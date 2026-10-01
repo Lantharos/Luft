@@ -4,7 +4,7 @@ Luft's device security services: device trust (Secure Boot, the TPM and disk enc
 
 ## Device trust
 
-`luft-trust` looks after how the computer starts and how the disk is protected: Luft's own Secure Boot key, a signed way to start the computer, unlocking the disk with the TPM, and encrypting or decrypting the disk in place. Settings shows all of it on its Security page; the same things are available from the command line.
+`trustd` looks after how the computer starts and how the disk is protected: Luft's own Secure Boot key, a signed way to start the computer, unlocking the disk with the TPM, and encrypting or decrypting the disk in place. Settings shows all of it on its Security page; `trustctl` does the same from the command line.
 
 ### How the computer starts
 
@@ -19,11 +19,11 @@ Every piece is checked against a signature before it runs, and nothing can be ch
 
 ### The Luft Secure Boot key
 
-The key is made on the computer the first time it's needed. Its private half never leaves the computer and is never stored in the clear: it is sealed with `systemd-creds` against the TPM and a secret only root can read, in `/var/lib/luft-trust`. A copy of the disk, or the disk in another computer, can't open it. It is unsealed into a private folder under `/run/luft-trust` only while something is being signed, and removed right after. On a computer without a usable TPM, a key is only made once the disk is encrypted, so that it is at least protected by the disk's passphrase; without either, Settings explains why no key can be made.
+The key is made on the computer the first time it's needed. Its private half never leaves the computer and is never stored in the clear: it is sealed with `systemd-creds` against the TPM and a secret only root can read, in `/var/lib/trustd`. A copy of the disk, or the disk in another computer, can't open it. It is unsealed into a private folder under `/run/trustd` only while something is being signed, and removed right after. On a computer without a usable TPM, a key is only made once the disk is encrypted, so that it is at least protected by the disk's passphrase; without either, Settings explains why no key can be made.
 
 Shim only trusts keys you confirm in person. Adding the key asks shim to enroll it at the next restart, using a one-time code of eight digits. Before restarting, Sushi shows what will happen and what to type, and waits for Enter. After the restart, shim's blue key management screen waits ten seconds for a key press; then choose Enroll MOK, Continue, Yes, type the code, and choose Reboot.
 
-Shim forgets the request once its screen has been shown, whether the key was added or not. So at every startup `luft-trust` compares what it asked for, kept in `/var/lib/luft-trust`, with the keys shim actually trusts. If the screen timed out, Continue boot was chosen, or the code was typed wrong three times, it asks shim again with a new code. Sushi then shows the steps again at the next restart, saying that the key wasn't added last time, and a notification after signing in says the same. After three restarts without the key, it stops asking by itself; Settings says so and offers to try again. Cancelling withdraws the request and stops the retries.
+Shim forgets the request once its screen has been shown, whether the key was added or not. So at every startup `trustd` compares what it asked for, kept in `/var/lib/trustd`, with the keys shim actually trusts. If the screen timed out, Continue boot was chosen, or the code was typed wrong three times, it asks shim again with a new code. Sushi then shows the steps again at the next restart, saying that the key wasn't added last time, and a notification after signing in says the same. After three restarts without the key, it stops asking by itself; Settings says so and offers to try again. Cancelling withdraws the request and stops the retries.
 
 The key signs SushiBoot, the kernel images (a kernel-install plugin signs each new kernel as it is installed), and kernel modules built by DKMS. Drivers built with akmods, such as NVIDIA's, keep their own key, which akmods made and which Settings shows next to Luft's: akmods builds modules as an unprivileged user that can read that key, so it must never be able to sign what starts the computer.
 
@@ -56,26 +56,26 @@ Then:
 
 LUKS2 keeps a journal of the area it is working on, so a crash or power cut at any point loses nothing: the next start finishes the interrupted step and the background work continues where it stopped. Until encryption finishes, the startup files themselves carry what is needed to open the disk, so a restart in the middle unlocks the same way.
 
-Turning encryption off decrypts in place in the background the same way. The encryption header is moved to `/boot/luft-trust` meanwhile, so the start of the disk can be put back, and the startup files know where to find it. When decryption finishes, the header, the recovery key copy and the TPM link are removed.
+Turning encryption off decrypts in place in the background the same way. The encryption header is moved to `/boot/trustd` meanwhile, so the start of the disk can be put back, and the startup files know where to find it. When decryption finishes, the header, the recovery key copy and the TPM link are removed.
 
 Without a usable TPM, encryption works with a passphrase instead, asked for by Sushi at every startup. The recovery key is then protected with that passphrase for the one restart that starts encrypting, and isn't kept afterwards.
 
 ### Command line
 
 ```bash
-luft-trust status                    # Secure Boot, the TPM, the key, the startup and the disk
-luft-trust secure-boot enroll        # make the key and ask shim to trust it at the next restart
-luft-trust secure-boot cancel        # withdraw that, including any retries
-luft-trust startup install           # SushiBoot, signed kernel images and the Luft boot entry
-luft-trust startup uninstall         # remove them again; Fedora's entry is untouched
-luft-trust tpm enroll [--pin]        # let the TPM unlock an encrypted disk
-luft-trust tpm remove
-luft-trust recovery-key show|replace
-luft-trust encryption check|on|off
-luft-trust sign efi IN OUT           # sign an EFI program with the Luft key
+trustctl status                    # Secure Boot, the TPM, the key, the startup and the disk
+trustctl secure-boot enroll        # make the key and ask shim to trust it at the next restart
+trustctl secure-boot cancel        # withdraw that, including any retries
+trustctl startup install           # SushiBoot, signed kernel images and the Luft boot entry
+trustctl startup uninstall         # remove them again; Fedora's entry is untouched
+trustctl tpm enroll [--pin]        # let the TPM unlock an encrypted disk
+trustctl tpm remove
+trustctl recovery-key show|replace
+trustctl encryption check|on|off
+trustctl sign efi IN OUT           # sign an EFI program with the Luft key
 ```
 
-They need root. `luft-trust.service` starts at boot to continue encrypting or decrypting, and otherwise stops after a minute without requests.
+They need root. `trustd.service` starts at boot to continue encrypting or decrypting, and otherwise stops after a minute without requests.
 
 ### D-Bus
 
@@ -132,4 +132,4 @@ security/scripts/install.sh remove    # stop and remove them
 
 `security/scripts/build.sh DESTDIR` builds and stages the files without installing them. In the Sushi VM, `boot/sushi/scripts/vm/security.sh` puts them in the VM's root tree before `disk.sh`.
 
-Installing changes nothing about how the computer starts or how the disk is protected; each of those is a separate step in Settings or on the command line. Removing the services keeps `/var/lib/luft-trust`, which holds the sealed keys and, on an encrypted disk, the recovery key copy. Run `luft-trust startup uninstall` first if you want the Luft boot entry gone as well; an encrypted disk keeps working with Fedora's own startup, asking for its recovery key or passphrase.
+Installing changes nothing about how the computer starts or how the disk is protected; each of those is a separate step in Settings or on the command line. Removing the services keeps `/var/lib/trustd`, which holds the sealed keys and, on an encrypted disk, the recovery key copy. Run `trustctl startup uninstall` first if you want the Luft boot entry gone as well; an encrypted disk keeps working with Fedora's own startup, asking for its recovery key or passphrase.

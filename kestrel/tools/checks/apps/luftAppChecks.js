@@ -3,6 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {LuftApp, startSabineService, waitFor} from './luftApp.js';
+import {checkSettingsPages} from './settingsPages.js';
 
 const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'barometer', 'schelf'];
 const TRANSLUCENT = {tern: 40};
@@ -75,25 +76,6 @@ async function checkApp(name, {palette, styles, require, output}) {
   }
 }
 
-const onSurface = (frame, palette) => frame.share(palette.dark.surface, OPAQUE) >= SURFACE_SHARE;
-const SETTINGS_PAGES = [
-  {page: 'updates', loaded: onSurface},
-  {page: 'security', loaded: (frame, palette) => frame.count(palette.dark.primary, ACCENT_TOLERANCE) >= ACCENT_SAMPLES},
-];
-
-async function checkSettingsPage({page, loaded}, settingsHome, {palette, styles, require, output}) {
-  styles.interface.set_string('color-scheme', 'prefer-dark');
-  const app = new LuftApp('settings', [`kestrel-settings:${page}`]);
-  try {
-    await app.open();
-    const shown = await app.settle(frame => loaded(frame, palette));
-    shown.save(`${output}/settings-${page}.png`);
-    require(loaded(shown, palette) && !shown.same(settingsHome), `settings opens straight to ${page} from a kestrel-settings link`);
-  } finally {
-    await app.close();
-  }
-}
-
 export async function checkLuftApps({output}) {
   const require = (condition, label) => {
     if (!condition) throw new Error(`Kestrel Luft app check failed: ${label}`);
@@ -117,7 +99,7 @@ export async function checkLuftApps({output}) {
     const context = {palette, styles, require, output};
     const darkFrames = {};
     for (const name of APPS) darkFrames[name] = await checkApp(name, context);
-    for (const page of SETTINGS_PAGES) await checkSettingsPage(page, darkFrames.settings, context);
+    await checkSettingsPages(darkFrames.settings, context);
   } finally {
     styles.interface.set_string('color-scheme', saved.scheme);
     styles.kestrel.set_boolean('pure-black', saved.pureBlack);

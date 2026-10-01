@@ -30,6 +30,9 @@ export XDG_STATE_HOME="$session/state"
 export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
 mkdir -p "$session/data/dbus-1/services"
 printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=%s -m %s %s\n' "$(command -v gjs)" "$root/kestrel/tools/fixtures/documentPortal.js" "$session/documents" > "$session/data/dbus-1/services/org.freedesktop.portal.Documents.service"
+for name in com.lantharos.Keyring1 org.freedesktop.secrets; do
+  printf '[D-BUS Service]\nName=%s\nExec=/usr/bin/false\n' "$name" > "$session/data/dbus-1/services/$name.service"
+done
 mkdir -p "$session/data/xdg-desktop-portal/portals" "$session/config/xdg-desktop-portal"
 ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-desktop-portal/portals/kestrel.portal"
 ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
@@ -49,7 +52,10 @@ fi
 
 cargo build --release --quiet --manifest-path "$root/kestrel/settings/Cargo.toml"
 
-dbus-run-session -- bash -c '
+scope="kestrel-session-$(printf '%s' "$session" | sha1sum | cut -c1-12)"
+trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true' EXIT
+
+systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$scope" dbus-run-session -- bash -c '
   set -euo pipefail
   root="$1"
   mode="$2"
@@ -116,5 +122,5 @@ dbus-run-session -- bash -c '
 ' kestrel-session "$root" "$mode" "$session"
 
 if [[ "$mode" == capture ]]; then
-  exec "$root/kestrel/tools/greeter.sh"
+  "$root/kestrel/tools/greeter.sh"
 fi

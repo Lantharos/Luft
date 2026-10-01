@@ -5,6 +5,8 @@ use anyhow::{Context, Result};
 use crate::system::blocks;
 
 const MOUNTS: [&str; 3] = ["/boot/efi", "/efi", "/boot"];
+const SHIM: &str = "shimx64.efi";
+const SHIM_SECOND_STAGE: &str = "grubx64.efi";
 
 pub struct Esp {
     pub path: PathBuf,
@@ -36,14 +38,23 @@ impl Esp {
         self.path.join(relative)
     }
 
-    pub fn shim(&self) -> Option<String> {
+    fn shim_vendor(&self) -> Option<String> {
         let vendors = std::fs::read_dir(self.path.join("EFI")).ok()?;
         vendors.flatten().find_map(|vendor| {
             let name = vendor.file_name().to_string_lossy().into_owned();
-            let shim = vendor.path().join("shimx64.efi");
-            (!name.eq_ignore_ascii_case("BOOT") && shim.exists())
-                .then(|| format!("\\EFI\\{name}\\shimx64.efi"))
+            (!name.eq_ignore_ascii_case("BOOT") && vendor.path().join(SHIM).exists())
+                .then_some(name)
         })
+    }
+
+    pub fn shim(&self) -> Option<String> {
+        self.shim_vendor()
+            .map(|vendor| format!("\\EFI\\{vendor}\\{SHIM}"))
+    }
+
+    pub fn shim_second_stage(&self) -> Option<PathBuf> {
+        self.shim_vendor()
+            .map(|vendor| self.path.join("EFI").join(vendor).join(SHIM_SECOND_STAGE))
     }
 }
 

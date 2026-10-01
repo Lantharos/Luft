@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use access::Idle;
 
-use crate::keys;
+use crate::{boot, keys};
 
 pub use interface::Trust;
 
@@ -29,6 +29,12 @@ async fn serve() -> zbus::Result<()> {
         .expect("following up on the key enrollment doesn't panic")
     {
         eprintln!("Couldn't follow up on adding Luft's key: {error:#}");
+    }
+    if let Err(error) = tokio::task::spawn_blocking(boot::startup::follow_up)
+        .await
+        .expect("following up on the startup doesn't panic")
+    {
+        eprintln!("Couldn't follow up on Luft's startup: {error:#}");
     }
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()?

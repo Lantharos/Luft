@@ -8,14 +8,87 @@ Luft's device security services: device trust (Secure Boot, the TPM and disk enc
 
 ### How the computer starts
 
-Fedora starts through shim, which Microsoft signs, then GRUB and the kernel, all signed by Fedora. Luft keeps that path and adds its own next to it:
-
-1. The firmware starts Fedora's shim from a boot entry called Luft.
+1. The firmware starts Fedora's shim, which Microsoft signs, from a boot entry called Luft.
 2. Shim starts SushiBoot, Luft's boot menu, signed with this computer's Luft key.
 3. SushiBoot starts a unified kernel image: the kernel, its initramfs and its command line in one file, signed with the same key. The newest one starts by default; holding a key while SushiBoot starts shows the menu.
 4. The kernel image's stub records what it started in the TPM, and the TPM releases the disk key only if the computer started this way.
 
-Every piece is checked against a signature before it runs, and nothing can be changed at startup, including the kernel command line. Fedora's own entry stays in the firmware's boot list as a fallback. Starting through it works as before, but the TPM won't unlock the disk, so it asks for the recovery key.
+Every piece is checked against a signature before it runs, and nothing can be changed at startup, including the kernel command line.
+
+Signed images are kept for the three newest installed kernels. SushiBoot shows the newest at the top and the others under Previous versions. A kernel-install plugin builds and signs the image for each kernel as it is installed and deletes it when the kernel is removed. When the EFI system partition runs short of room, an image being rebuilt makes room by going first, a new kernel's image makes room by removing the oldest previous versions, and the newest image is never removed to make room for an older one. An image is the kernel plus its initramfs, so it's around 60 MB on a plain system and close to 200 MB when the initramfs carries NVIDIA's firmware; a 600 MB partition then holds two or three.
+
+Until GRUB is removed, Fedora's own entry still starts shim and GRUB. That works as before, but the TPM won't unlock the disk that way, so it asks for the recovery key.
+
+### Rescue
+
+Every image also holds a Rescue profile, shown under the newest version. It starts the system into `rescue.target` with messages on screen and the splash off.
+
+The rescue command line is signed like the normal one, but no PCR 11 policy is signed for it, so the TPM never unlocks the disk in rescue: it asks for the recovery key or the passphrase. Rescue is for when something is wrong, possibly the TPM link itself (a firmware update that changed what Secure Boot measures, say), so it must not depend on the TPM. Anyone who can type the recovery key can read the disk anyway, so once the disk is unlocked this way, rescue opens a root shell even though Fedora locks the root account. If root has a password, it asks for that as usual. On a disk that isn't encrypted, rescue asks for root's password and is no way around it.
+
+### The kernel command line
+
+The command line is inside the signed images, built from `/etc/kernel/cmdline`, and changed with `trustctl`:
+
+```bash
+trustctl startup arguments                                   # show it
+trustctl startup arguments --add "quiet loglevel=3"         # add arguments and rebuild every image
+trustctl startup arguments --remove "quiet loglevel"        # take arguments out by name
+trustctl startup arguments --once --add "systemd.log_level=debug"   # for the next start only
+```
+
+`--once` adds a signed profile with the changed command line to the newest image and asks SushiBoot to start it once, through the `LoaderEntryOneShot` variable of the Boot Loader Interface. The TPM unlocks it as usual. At that start `trustd` takes the profile out again, so the start after it is the usual one whether it worked or not.
+
+SushiBoot has no command line editor, and with Secure Boot on it never hands a command line of its own to anything it starts. It ignores boot entries that start a kernel directly, whose command line and initramfs no signature covers, and drops the options of entries that start EFI programs. The only thing it tells a kernel image is which of its signed profiles to start. A command line typed at the boot menu could start the system with `init=/bin/sh`, skipping the login screen and everything after it, so changing it takes root on the running system, which signs the images again.
+
+### Starting without GRUB
+
+Once the signed startup has started the computer, GRUB can go:
+
+```bash
+security/scripts/remove-grub.sh
+```
+
+The script changes nothing unless this start went through SushiBoot and a signed image (`trustctl status` shows `this boot: yes`). It offers to make a recovery stick first, then works out exactly what dnf would remove and stops if that includes anything besides GRUB's packages, grubby, os-prober, the rescue initramfs configuration, the 32-bit shim and the installer, which needs GRUB. Then it:
+
+1. Builds and installs `luft-startup`, a small package that takes GRUB's place. Fedora's shim package requires `grub2-efi-x64` and akmods requires `grubby`, so it provides both names, replaces the GRUB packages, and keeps them from returning with updates; dnf's settings exclude them as well. It also sets kernel-install's layout to `other` with `trustd` as the initramfs generator, so kernel-install leaves `/boot` alone and only the plugin builds the initramfs and the signed image.
+2. Saves GRUB's settings and boot entries to `/var/lib/trustd/grub-DATE.tar.gz` and removes them, along with the rescue images in `/boot`.
+3. Runs `trustctl startup install`, which now also signs SushiBoot as `\EFI\fedora\grubx64.efi`, the program shim starts when nothing else is asked for.
+
+After that every way of starting shim ends in SushiBoot: the Luft entry, Fedora's entry, and `\EFI\BOOT\BOOTX64.EFI`, which firmware starts when it has no boot entries. Shim updates replace shim, MokManager and the fallback program, which belong to the shim package, and leave `grubx64.efi` alone. Kernel updates go through the plugin as before.
+
+### When the firmware forgets its settings
+
+Firmware that loses its boot entries, after a reset or some firmware updates, starts `\EFI\BOOT\BOOTX64.EFI`. Shim's fallback program there recreates Fedora's entry from `\EFI\fedora\BOOTX64.CSV` and restarts, shim starts SushiBoot, and the TPM still unlocks the disk. At that start `trustd` puts the Luft entry back at the front of the boot order.
+
+Some firmware also clears shim's list of keys when its settings are reset to defaults. Shim then refuses SushiBoot with "Verification failed: (0x1A) Security Violation". Choose OK, press a key for MOK management, and choose Enroll key from disk, the EFI system partition, `EFI`, `sushi`, `luft-secure-boot.cer`, Continue, Yes and Reboot. `trustd` keeps that copy of the key's certificate on the partition for this. With the same keys back, the TPM unlocks the disk again.
+
+### Recovery stick and putting GRUB back
+
+`security/scripts/recovery-stick.sh` writes a Fedora Workstation live image to a USB stick. It downloads the image for this Fedora release, or the one before while a release isn't out yet, checks it against Fedora's signed checksums, and reads the stick back after writing. It can also write an image that's already downloaded. The stick starts with Secure Boot on and needs no Luft key.
+
+To put GRUB back on a computer that still starts:
+
+```bash
+sudo dnf swap luft-startup grub2-efi-x64
+sudo dnf install grub2-tools grubby
+sudo tar -C / -xzf /var/lib/trustd/grub-DATE.tar.gz boot/grub2 boot/efi/EFI/fedora/grub.cfg
+for kernel in /usr/lib/modules/*/vmlinuz; do sudo kernel-install add "$(basename "$(dirname "$kernel")")" "$kernel"; done
+```
+
+Removing `luft-startup` brings back kernel-install's usual layout and lifts dnf's exclusions, GRUB takes `\EFI\fedora\grubx64.efi` back, and kernel-install writes GRUB's boot entries again. The Luft entry keeps working next to it; `trustctl startup uninstall` removes it.
+
+When the computer doesn't start, start it from the recovery stick, open a terminal, mount the installed system and run the same commands inside it. With the partitions of a default Fedora install on an NVMe disk:
+
+```bash
+sudo cryptsetup open /dev/nvme0n1p3 root      # only if the disk is encrypted; asks for the recovery key
+sudo mount -o subvol=root /dev/mapper/root /mnt   # or /dev/nvme0n1p3 when it isn't encrypted
+sudo mount /dev/nvme0n1p2 /mnt/boot
+sudo mount /dev/nvme0n1p1 /mnt/boot/efi
+for fs in dev proc sys run; do sudo mount --rbind /$fs /mnt/$fs; done
+sudo chroot /mnt
+```
+
+If the firmware lost Fedora's entry as well, add it back from inside: `efibootmgr --create --disk /dev/nvme0n1 --part 1 --label Fedora --loader '\EFI\fedora\shimx64.efi'`.
 
 ### The Luft Secure Boot key
 
@@ -33,6 +106,8 @@ The TPM releases the disk key only when two things match:
 
 - PCR 7, the Secure Boot state: whether Secure Boot is on, which keys the firmware trusts, and which certificates vouched for what started (here, the Luft key). Booting anything else, turning Secure Boot off or adding a key to the firmware changes it.
 - PCR 11, the unified kernel image itself, through a policy signed with a second key of Luft's (kept the same way as the Secure Boot key). Each new kernel image comes with a signature for what it will measure, so kernel and initramfs updates keep unlocking without touching the disk. The signature only covers the initramfs, so even root can't make the TPM release the key once the system is running.
+
+In the initramfs, unlocking waits until the step that marks entering the initramfs has been added to PCR 11, so the signed policy is never checked against an unfinished measurement.
 
 This combination survives kernel updates and ordinary firmware updates, which change the firmware's own measurements (PCR 0 to 2) that aren't used. What changes PCR 7 is rare and worth a second look: a revocation update to the firmware's forbidden list, a new Secure Boot key, or starting some other way. Then the startup screen asks for the recovery key and explains why, and Settings offers to link the TPM again. `systemd-pcrlock` could follow those changes on its own, but it is still marked experimental, and the disk key shouldn't depend on it.
 
@@ -67,7 +142,9 @@ trustctl status                    # Secure Boot, the TPM, the key, the startup 
 trustctl secure-boot enroll        # make the key and ask shim to trust it at the next restart
 trustctl secure-boot cancel        # withdraw that, including any retries
 trustctl startup install           # SushiBoot, signed kernel images and the Luft boot entry
-trustctl startup uninstall         # remove them again; Fedora's entry is untouched
+trustctl startup uninstall         # remove them again while GRUB is still installed
+trustctl startup rebuild           # rebuild the initramfs and the signed images
+trustctl startup arguments         # show or change the kernel command line (see above)
 trustctl tpm enroll [--pin]        # let the TPM unlock an encrypted disk
 trustctl tpm remove
 trustctl recovery-key show|replace
@@ -75,7 +152,7 @@ trustctl encryption check|on|off
 trustctl sign efi IN OUT           # sign an EFI program with the Luft key
 ```
 
-They need root. `trustd.service` starts at boot to continue encrypting or decrypting, and otherwise stops after a minute without requests.
+They need root. `trustd.service` starts at boot to continue encrypting or decrypting, to put the Luft boot entry back if the firmware lost it, and to take out a profile started with `--once`; otherwise it stops after a minute without requests.
 
 ### D-Bus
 
@@ -132,4 +209,4 @@ security/scripts/install.sh remove    # stop and remove them
 
 `security/scripts/build.sh DESTDIR` builds and stages the files without installing them. In the Sushi VM, `boot/sushi/scripts/vm/security.sh` puts them in the VM's root tree before `disk.sh`.
 
-Installing changes nothing about how the computer starts or how the disk is protected; each of those is a separate step in Settings or on the command line. Removing the services keeps `/var/lib/trustd`, which holds the sealed keys and, on an encrypted disk, the recovery key copy. Run `trustctl startup uninstall` first if you want the Luft boot entry gone as well; an encrypted disk keeps working with Fedora's own startup, asking for its recovery key or passphrase.
+Installing changes nothing about how the computer starts or how the disk is protected; each of those is a separate step in Settings or on the command line. Removing the services keeps `/var/lib/trustd`, which holds the sealed keys and, on an encrypted disk, the recovery key copy. While GRUB is installed, run `trustctl startup uninstall` first if you want the Luft boot entry gone as well; an encrypted disk keeps working with Fedora's own startup, asking for its recovery key or passphrase. Once GRUB is removed, the signed startup is how the computer starts, and `trustd` has to stay.

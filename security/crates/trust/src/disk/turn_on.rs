@@ -2,7 +2,7 @@ use anyhow::{Context, Result, bail};
 
 use super::state::{Change, Mode, Plan};
 use super::{SystemDisk, keys, preflight, stage};
-use crate::boot::{kernels, startup};
+use crate::boot::startup::rebuild_boot_files;
 use crate::errors::Unsupported;
 use crate::system::blocks;
 use crate::system::command::Tool;
@@ -107,14 +107,4 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         let _ = rebuild_boot_files();
     }
     prepared
-}
-
-pub fn rebuild_boot_files() -> Result<()> {
-    let rebuilt = if startup::installed() {
-        startup::rebuild_images(true)
-    } else {
-        kernels::rebuild_all_initrds()
-    };
-    rustix::fs::sync();
-    rebuilt
 }

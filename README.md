@@ -18,7 +18,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `packages/ui` | Styles, window chrome, and controls shared by the apps |
 | `packages/app` | Native window, accent, and D-Bus setup shared by the apps |
 | `packages/software` | Apps, system updates, Flatpak, AppImages and offline updates shared by Schelf and Settings |
-| `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |
+| `boot/sushi` | Sushi splash, initramfs integration, and SushiBoot, the boot menu Luft starts through |
 | `security` | Device trust (Secure Boot signing, TPM disk unlock, device encryption) and USB protection while locked |
 | `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
 

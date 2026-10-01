@@ -8,9 +8,9 @@ use serde::Deserialize;
 
 use super::initrd::RESULT;
 use super::state::{self, Change, Mode, Plan};
-use super::turn_on::rebuild_boot_files;
 use super::{SystemDisk, keys, luks, stage};
 use crate::boot::cmdline;
+use crate::boot::startup::rebuild_boot_files;
 use crate::errors::NeedsKey;
 use crate::system::secret::Secret;
 use crate::system::{keyring, power};

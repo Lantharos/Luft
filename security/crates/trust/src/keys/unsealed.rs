@@ -26,6 +26,10 @@ impl Unsealed {
         Ok(path)
     }
 
+    pub fn scratch(&self, name: &str) -> PathBuf {
+        self.directory.join(name)
+    }
+
     pub fn signing_key(&self) -> PathBuf {
         self.directory.join("secure-boot.key")
     }

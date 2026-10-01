@@ -3,9 +3,9 @@ use std::path::PathBuf;
 use anyhow::{Context, Result, bail};
 
 use super::state::{Change, Mode, Plan};
-use super::turn_on::rebuild_boot_files;
 use super::{SystemDisk, keys, luks, stage, state};
 use crate::boot::cmdline;
+use crate::boot::startup::rebuild_boot_files;
 use crate::errors::{Busy, Unsupported};
 use crate::system::command::Tool;
 use crate::system::secret::Secret;

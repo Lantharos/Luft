@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { appName } from '../core/apps.js';
+import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { SUCCESS, respond, type Invocation, type Options } from '../core/request.js';
 import { list, row } from '../core/rows.js';
@@ -33,10 +33,10 @@ export class UsbPortal {
   readonly version = 1;
 
   async AcquireDevicesAsync([handle, , appId, devices]: [string, string, string, Device[], Options], invocation: Invocation): Promise<void> {
-    const app = appName(appId);
+    const app = appNames(appId);
     respond(invocation, await openDialog(handle, {
-      title: devices.length > 1 ? `Let ${app} use these devices?` : `Let ${app} use this device?`,
-      description: `${app} will be able to talk to the device directly while it's plugged in.`,
+      title: devices.length > 1 ? `Let ${app.object} use these devices?` : `Let ${app.object} use this device?`,
+      description: `${app.subject} will be able to talk to the device directly while it's plugged in.`,
       icon: 'media-removable-symbolic',
     }, dialog => {
       const rows = devices.map(device => row({ icon: 'media-removable-symbolic', ...describe(device), checked: true }));

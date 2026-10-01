@@ -26,7 +26,6 @@ const DialogResponse = {
 const ALLOWED_SENDERS = [
     'org.gnome.RemoteDesktop.Handover',
     'org.freedesktop.portal.Desktop',
-    'org.freedesktop.impl.portal.desktop.gnome',
 ];
 
 const AccessDialog = GObject.registerClass(

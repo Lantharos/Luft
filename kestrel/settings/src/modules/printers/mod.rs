@@ -1,6 +1,7 @@
 mod cups;
 mod ipp;
 mod messages;
+mod printing;
 
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
@@ -14,6 +15,7 @@ use crate::context::Context;
 use crate::shared::notify::{self, Notification, URGENCY_CRITICAL, URGENCY_NORMAL};
 use cups::{Cups, LEASE_SECONDS};
 use messages::{CONNECTING, PROCESSING};
+use printing::Printing;
 
 const NOTIFIER: &str = "org.cups.cupsd.Notifier";
 const RETRY: Duration = Duration::from_secs(300);
@@ -50,6 +52,11 @@ struct Printers {
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
+    context
+        .session
+        .object_server()
+        .at(printing::PATH, Printing::new())
+        .await?;
     let rule = MatchRule::builder()
         .msg_type(Type::Signal)
         .interface(NOTIFIER)?

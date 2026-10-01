@@ -59,13 +59,13 @@ Housekeeping happens there too: thumbnails past the age and size limits are remo
 
 Power management lives in the service as well. After half the screen blank delay without use the screen and keyboard light dim, and once the screen locks it turns off after half a minute. After the chosen time without use, the computer suspends, hibernates, logs out, or powers off, with a notification shortly before, unless an app keeps the session awake. Plugging the charger in or out plays a short sound, and plugging it in keeps a dimmed screen awake for a moment. The service holds off sleep until the screen is locked, keeps the computer awake with the lid closed while an external monitor is connected, decides what the power keys do, switches to the power saver mode when the battery runs low, and follows the light sensor with the screen brightness when there is one. The keyboard light is adjusted through `com.lantharos.Settings.KeyboardLight`, and these settings live under `com.lantharos.kestrel.power`.
 
-Airplane mode comes from the service too, on `com.lantharos.Settings.Rfkill`: it switches every radio, or only Bluetooth, through the kernel's radio switches and turns mobile broadband off with them. While the session is active, the radio keys go to the desktop instead of the kernel. For printing, the service asks the printing service for updates and shows when your documents print, finish, stop, or fail, when a printer you print to needs paper, toner, or attention or can't be reached, and when a printer is added to the computer.
+Airplane mode comes from the service too, on `com.lantharos.Settings.Rfkill`: it switches every radio, or only Bluetooth, through the kernel's radio switches and turns mobile broadband off with them. While the session is active, the radio keys go to the desktop instead of the kernel. For printing, the service lists the printers with what each one can do and sends documents to them on `com.lantharos.Settings.Printing`, asks the printing service for updates, and shows when your documents print, finish, stop, or fail, when a printer you print to needs paper, toner, or attention or can't be reached, and when a printer is added to the computer.
 
 The shell handles the media and hardware keys itself, under `com.lantharos.kestrel.media-keys`: volume and microphone keys with their on-screen levels and a short sound, playback keys for the app that plays media, keyboard light, touchpad, rotation lock, airplane mode, battery, eject, app launchers, Lock, Log out and the power keys, accessibility toggles, and your own shortcuts, which Settings adds under the same schema. The rotation lock lives under `com.lantharos.kestrel.touchscreen`, where the compositor reads it too. A headset plugged into a combined jack asks what it is.
 
 The test sessions run the service against a stand-in for the system services, so its power handling is checked without the real computer suspending. IBus provides input methods, and XDG autostart entries start with the session. Kestrel's own settings live under `com.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can be used on the same account. Kestrel doesn't need gnome-settings-daemon or any of its settings.
 
-Kestrel's portal handles screenshots, color picking, permission prompts, and appearance, so apps follow Kestrel's light or dark style and pick up its accent color. File dialogs open in Rover, and screen sharing and the remaining portals use GNOME's backend for now. The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
+Kestrel answers apps' portal requests itself, as described under [Portals](#portals). The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
 
 ## Login screen
 
@@ -133,11 +133,10 @@ Test sessions keep their settings, caches and app data in `kestrel/run` by defau
 
 1. Log into the Kestrel session on real hardware and qualify it end to end. The TypeScript UI is loaded by a reduced upstream `main.js` path.
 2. Qualify monitor hotplug and mixed display scaling on hardware, and complete notification actions and persistent preferences.
-3. Replace GNOME's portal backend for screen sharing and global shortcuts, then exercise the portal calls from client apps.
-4. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and the greetd handoff under a real login session.
-5. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
+3. Verify polkit, keyring, network credentials, lock and unlock, OSD, accessibility, and the greetd handoff under a real login session.
+4. Package Kestrel with a pinned Mutter ABI for Luft, review runtime dependencies, and test on a disposable machine before making it a selectable default session.
 
-The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, suspend, or portal permission dialogs.
+The virtual session checks the build, JS startup, and captured rendering. It does not validate a physical display, login manager, or suspend.
 
 ### Start folders and app order
 
@@ -348,7 +347,31 @@ With more than one keyboard layout or input method, the current one shows beside
 
 ### Global shortcuts
 
-Apps that register shortcuts through the global shortcuts portal, such as Discord and OBS, get their preferred keys right away, without a confirmation prompt, as long as nothing else uses them. A key stays unassigned when the shell, the window manager, or media keys already use it, when another app holds it, or when it would type a character. Apps keep their shortcuts across restarts. When an app asks to change them, a dialog lists each shortcut; choose one and press the new keys, or Backspace to clear it.
+Apps that register shortcuts through the global shortcuts portal, such as Discord and OBS, get their preferred keys right away, without a confirmation prompt, as long as nothing else uses them. A key stays unassigned when the shell, the window manager, or media keys already use it, when another app holds it, or when it would type a character. Apps keep their shortcuts across restarts, and hear about a shortcut both when it's pressed and when it's released, so push to talk works. When an app asks to change them, a dialog lists each shortcut; choose one and press the new keys, or Backspace to clear it.
+
+### Portals
+
+Kestrel is the portal backend for its session, so apps reach Kestrel's own dialogs and services through xdg-desktop-portal and the GNOME and GTK portal backends aren't needed. `kestrel-portals.conf` sends everything to Kestrel except file dialogs, which open in Rover, and stored secrets, which come from oo7. What apps can ask for:
+
+- Appearance: the light or dark style, high contrast, reduced motion and Kestrel's exact accent color. Sandboxed apps read the same interface, font, cursor, mouse, sound, input source, window button and accessibility settings as the rest of the desktop, and reload their fonts when fonts are added or removed.
+- Screenshots of the whole screen, an area, or the active window, the screenshot tool itself when the app wants you to choose, and the color under the pointer. Permission prompts, such as the one before an app's first screenshot, only appear for the app you're using.
+- Opening a file or link in another app: the list starts with your last choice and refreshes when an app is installed while it's open. Clicking the selected app again opens it, and Find an App searches Schelf.
+- Your name and picture, after you choose to share them.
+- USB devices, where you can leave out any device before allowing the rest.
+- A new wallpaper, previewed first when the app asks for that. The picture is copied to `~/.local/share/backgrounds` and used for both styles.
+- Adding an app or website to Start under a name you can change. Schelf can add them without asking.
+- Writing an email in your mail app, with recipients, subject, text and attachments filled in.
+- Notifications, which join the notification center; clicking one opens the app.
+- Global shortcuts, described above.
+- Sharing the screen: the picker lists screens and windows, most recently shared first, with a small live preview of each window, and offers a new virtual screen when the app asks for one. Apps that want to remember the choice can skip the picker next time; screens are recognized by the monitor and windows by their app and title. A share shows in the privacy indicator, whose Stop ends it for the app.
+- Remote control, which asks which of the keyboard, pointer and touchscreen the app may use and which screens it sees, and can share the clipboard both ways.
+- Input capture, for apps that share one keyboard and mouse between computers, which asks first and hands over the pointer when it crosses the screen edges the app chose.
+- Printing, with a choice of printer, copies, pages, paper, orientation, two-sided printing and color, showing only what the chosen printer can do. Apps that set up the job before rendering it, such as GTK apps, print right away once you confirm, and the dialog says so when no printer is set up.
+- Keeping the session from going idle, suspending or ending, and following whether the session is ending or the screen is locked. Sandboxed apps may keep running in the background, and the portal knows which of them still have windows open.
+
+Printing, saving files, opening other apps, location, the camera, the microphone and sound can be turned off for apps under `org.gnome.desktop.lockdown`, `org.gnome.desktop.privacy` and `org.gnome.system.location`.
+
+The capture drives every portal the way xdg-desktop-portal does and saves the dialogs as `portal-*.png`. Test sessions run their own PipeWire and a print server with an office and a label printer, so screen sharing and printing never reach the real ones.
 
 ### Clipboard history
 

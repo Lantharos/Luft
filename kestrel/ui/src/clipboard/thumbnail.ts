@@ -75,6 +75,7 @@ function render(frame: Gly.Frame, bounds: ThumbnailBounds): Thumbnail {
   pipeline.set_uniform_1f(pipeline.get_uniform_location('corner_radius'), Math.min(bounds.radius * scale, pixelWidth / 2, pixelHeight / 2));
   framebuffer.draw_rectangle(pipeline, 0, 0, pixelWidth, pixelHeight);
   framebuffer.flush();
+  source.get_texture()!.run_dispose();
 
   return { content: Clutter.TextureContent.new_from_texture(texture, null), width, height, imageWidth, imageHeight };
 }

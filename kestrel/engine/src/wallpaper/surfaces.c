@@ -10,6 +10,7 @@ struct _WallpaperSurfaces
   GPtrArray *windows;
   GStrv live;
   gboolean ready;
+  gboolean holding;
 };
 
 static GtkContentFit
@@ -37,6 +38,9 @@ sync_playback (WallpaperSurfaces *surfaces,
                GtkWindow         *window)
 {
   g_autoptr (GdkPaintable) frame = NULL;
+
+  if (surfaces->holding)
+    return;
 
   if (g_strv_contains ((const char * const *) surfaces->live, gtk_window_get_title (window)))
     {
@@ -126,6 +130,26 @@ on_first_frame (GdkPaintable      *paintable,
       sync_playback (surfaces, surfaces->windows->pdata[index]);
       gtk_window_present (surfaces->windows->pdata[index]);
     }
+}
+
+static void
+on_frames_again (GdkPaintable      *paintable,
+                 WallpaperSurfaces *surfaces)
+{
+  g_signal_handlers_disconnect_by_func (paintable, on_frames_again, surfaces);
+  surfaces->holding = FALSE;
+  for (guint index = 0; index < surfaces->windows->len; index++)
+    sync_playback (surfaces, surfaces->windows->pdata[index]);
+}
+
+void
+wallpaper_surfaces_hold_frames (WallpaperSurfaces *surfaces)
+{
+  if (surfaces->holding)
+    return;
+
+  surfaces->holding = TRUE;
+  g_signal_connect (surfaces->paintable, "invalidate-contents", G_CALLBACK (on_frames_again), surfaces);
 }
 
 WallpaperSurfaces *

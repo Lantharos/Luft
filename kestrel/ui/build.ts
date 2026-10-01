@@ -17,7 +17,7 @@ const result = await build({
   format: 'esm',
   platform: 'neutral',
   target: 'es2022',
-  external: ['gi://*', 'resource:///*', 'cairo', 'gettext', 'console'],
+  external: ['gi://*', 'resource:///*', 'cairo', 'gettext', 'console', 'system'],
 });
 
 const sources = Object.keys(result.metafile.inputs).map(input => resolve(input).replaceAll(' ', '\\ '));

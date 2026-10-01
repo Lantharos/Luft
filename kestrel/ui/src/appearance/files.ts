@@ -12,7 +12,7 @@ export interface Markers {
 
 export const userFile = (base: string, ...parts: string[]) => Gio.File.new_for_path(GLib.build_filenamev([base, ...parts]));
 
-const missing = (error: unknown) => error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND);
+export const missing = (error: unknown) => error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND);
 
 export async function readText(file: Gio.File): Promise<string | null> {
   try {

@@ -8,13 +8,31 @@ import type { ContextMenus } from '../menus/contextMenus.js';
 import { blurSurface } from '../shared/surface.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../shared/placement.js';
 import type { TextInput } from '../shared/textInput.js';
-import { ClipboardHistory, TEXT_MIME_TYPES } from './history.js';
+import { ClipboardHistory, TEXT_MIME_TYPES, type ClipboardEntry } from './history.js';
+import type { Thumbnail } from './thumbnail.js';
 
 const PASTE_DELAY_MS = 120;
 const RESTORE_DELAY_MS = 500;
 const SLIDE_DISTANCE = 8;
 const WIDTH = 420;
 const MAXIMUM_HEIGHT = 480;
+
+function textContent(text: string): Partial<St.Button.ConstructorProps> {
+  const label = new St.Label({ text: text.trim().replace(/\s+/g, ' '), style_class: 'kestrel-clipboard-text', x_expand: true, x_align: Clutter.ActorAlign.FILL });
+  label.clutter_text.line_wrap = true;
+  label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+  label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+  label.clutter_text.line_alignment = Pango.Alignment.LEFT;
+  return { child: label, style_class: 'kestrel-clipboard-row', accessible_name: label.text };
+}
+
+function imageContent({ content, width, height, imageWidth, imageHeight }: Thumbnail): Partial<St.Button.ConstructorProps> {
+  return {
+    child: new Clutter.Actor({ content, width, height, x_expand: true, x_align: Clutter.ActorAlign.START }),
+    style_class: 'kestrel-clipboard-row kestrel-clipboard-image',
+    accessible_name: `Image, ${imageWidth} × ${imageHeight}`,
+  };
+}
 
 export class ClipboardPanel {
   readonly actor = new St.BoxLayout({
@@ -93,24 +111,19 @@ export class ClipboardPanel {
     if (!this.dirty) return;
     this.dirty = false;
     this.list.destroy_all_children();
-    for (const text of this.history.entries) this.list.add_child(this.row(text));
+    for (const entry of this.history.entries) this.list.add_child(this.row(entry));
     if (this.actor.visible) this.layoutChanged();
   }
 
-  private row(text: string): St.Button {
-    const label = new St.Label({ text: text.trim().replace(/\s+/g, ' '), style_class: 'kestrel-clipboard-text', x_expand: true, x_align: Clutter.ActorAlign.FILL });
-    label.clutter_text.line_wrap = true;
-    label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-    label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-    label.clutter_text.line_alignment = Pango.Alignment.LEFT;
+  private row(entry: ClipboardEntry): St.Button {
     const row = new St.Button({
-      style_class: 'kestrel-clipboard-row', child: label, x_expand: true,
-      can_focus: true, track_hover: true, accessible_name: label.text,
+      x_expand: true, can_focus: true, track_hover: true,
+      ...entry.kind === 'text' ? textContent(entry.text) : imageContent(entry.thumbnail),
     });
-    row.connect('clicked', () => this.paste(text));
+    row.connect('clicked', () => this.paste(entry));
     row.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
-      this.history.remove(text);
+      this.history.remove(entry);
       this.list.get_first_child()?.grab_key_focus();
       return Clutter.EVENT_STOP;
     });
@@ -121,9 +134,9 @@ export class ClipboardPanel {
       else if (y + row.height > top + this.scroll.height) this.scroll.vadjustment.value += y + row.height - top - this.scroll.height;
     });
     this.menus.bind(row, () => [
-      { label: 'Paste', run: () => this.paste(text) },
-      { label: 'Copy', run: () => { this.copy(text); this.close(); } },
-      { label: 'Remove', run: () => this.history.remove(text) },
+      { label: 'Paste', run: () => this.paste(entry) },
+      { label: 'Copy', run: () => { void this.history.put(entry); this.close(); } },
+      { label: 'Remove', run: () => this.history.remove(entry) },
     ]);
     return row;
   }
@@ -153,10 +166,9 @@ export class ClipboardPanel {
     else paste(() => {});
   }
 
-  private paste(text: string): void {
-    this.copy(text);
+  private paste(entry: ClipboardEntry): void {
     this.close();
-    this.sendPaste();
+    void this.history.put(entry).then(() => this.sendPaste());
   }
 
   private sendPaste(sent?: () => void): void {

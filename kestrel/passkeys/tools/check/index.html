@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Passkey check</title>
+<script type="module">
+const step = new URLSearchParams(location.search).get('step');
+const random = (length) => crypto.getRandomValues(new Uint8Array(length));
+const report = (result) => fetch('/result', { method: 'POST', body: JSON.stringify({ step, ...result }) });
+
+function rawSignature(der) {
+  const bytes = new Uint8Array(der);
+  const integer = (offset) => {
+    const length = bytes[offset + 1];
+    const value = bytes.slice(offset + 2, offset + 2 + length);
+    const trimmed = value[0] === 0 ? value.slice(1) : value;
+    const padded = new Uint8Array(32);
+    padded.set(trimmed, 32 - trimmed.length);
+    return { padded, next: offset + 2 + length };
+  };
+  const r = integer(2);
+  const s = integer(r.next);
+  return new Uint8Array([...r.padded, ...s.padded]);
+}
+
+async function create() {
+  const credential = await navigator.credentials.create({ publicKey: {
+    rp: { id: location.hostname, name: 'Passkey check' },
+    user: { id: new TextEncoder().encode('sushi'), name: 'sushi@localhost', displayName: 'Sushi' },
+    challenge: random(32),
+    pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+    authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
+    extensions: { credProps: true, prf: {} },
+    timeout: 180000,
+  } });
+  const data = new Uint8Array(credential.response.getAuthenticatorData());
+  const extensions = credential.getClientExtensionResults();
+  return { ok: true, id: credential.id, publicKey: btoa(String.fromCharCode(...new Uint8Array(credential.response.getPublicKey()))), flags: data[32], transports: credential.response.getTransports(), discoverable: extensions.credProps?.rk ?? null, prf: extensions.prf?.enabled ?? null };
+}
+
+async function get() {
+  const challenge = random(32);
+  const credential = await navigator.credentials.get({ publicKey: {
+    rpId: location.hostname, challenge, userVerification: 'required', timeout: 180000,
+    extensions: { prf: { eval: { first: new Uint8Array(32) } } },
+  } });
+  const response = credential.response;
+  const data = new Uint8Array(response.authenticatorData);
+  const created = (await (await fetch('/results')).text()).split('\n').filter(Boolean).map((line) => JSON.parse(line))
+    .find((result) => result.step === 'create' && result.id === credential.id);
+  const spki = Uint8Array.from(atob(created?.publicKey ?? ''), (character) => character.charCodeAt(0));
+  const key = await crypto.subtle.importKey('spki', spki, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+  const clientHash = new Uint8Array(await crypto.subtle.digest('SHA-256', response.clientDataJSON));
+  const verified = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, rawSignature(response.signature), new Uint8Array([...data, ...clientHash]));
+  return {
+    ok: true, id: credential.id, flags: data[32], counter: new DataView(data.buffer).getUint32(33), verified,
+    user: new TextDecoder().decode(response.userHandle), prf: Boolean(credential.getClientExtensionResults().prf?.results?.first),
+  };
+}
+
+document.body.textContent = `Running ${step}`;
+(step === 'create' ? create() : get())
+  .then(report, (error) => report({ ok: false, error: `${error.name}: ${error.message}` }))
+  .then(() => { document.body.textContent = `Finished ${step}`; });
+</script>

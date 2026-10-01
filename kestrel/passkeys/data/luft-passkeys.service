@@ -1,0 +1,14 @@
+[Unit]
+Description=Passkeys
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Passkeys
+ExecStart=@libexecdir@/luft-passkeys
+Restart=on-failure
+Slice=session.slice
+
+[Install]
+WantedBy=graphical-session.target

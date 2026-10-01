@@ -7,6 +7,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `kestrel/engine` | GNOME Shell 51.0 fork using Kestrel’s local Mutter 51 build |
 | `kestrel/compositor` | Mutter patch series, window corners, and window icons |
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
+| `kestrel/passkeys` | Passkeys kept in Luft Keyring and confirmed through Kestrel, offered to every browser as a security key |
 | `apps/barometer` | Barometer system monitor and task manager |
 | `apps/draft` | Draft text and code editor |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |

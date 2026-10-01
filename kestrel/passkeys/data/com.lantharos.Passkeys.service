@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Passkeys
+Exec=@libexecdir@/luft-passkeys
+SystemdService=luft-passkeys.service

@@ -1,0 +1,10 @@
+[package]
+name = "luft-passkeys-relay"
+description = "Presents the signed-in person's passkeys to browsers as a security key"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+getrandom = "0.4.3"
+rustix = { version = "1.1.5", features = ["event", "fs", "net", "stdio"] }

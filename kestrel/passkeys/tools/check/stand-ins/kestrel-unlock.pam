@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth       substack     password-auth
+auth       optional     pam_luft_keyring.so
+account    include      password-auth

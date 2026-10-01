@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Keyring1
+Exec=@libexecdir@/luft-keyring
+SystemdService=luft-keyring.service

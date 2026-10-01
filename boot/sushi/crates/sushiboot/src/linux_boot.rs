@@ -5,13 +5,13 @@ use alloc::vec::Vec;
 use core::mem::MaybeUninit;
 
 use uefi::boot::{self, LoadImageSource};
+use uefi::boot::{AllocateType, MemoryType};
 use uefi::proto::BootPolicy;
 use uefi::proto::device_path::build::{self, media::FilePath};
 use uefi::proto::device_path::{DevicePath, DeviceSubType, LoadedImageDevicePath};
 use uefi::proto::loaded_image::LoadedImage;
 use uefi::proto::media::file::{File, FileAttribute, FileInfo, FileMode, FileType};
 use uefi::proto::media::fs::SimpleFileSystem;
-use uefi::table::boot::{AllocateType, MemoryType};
 use uefi::{CString16, Handle};
 
 pub struct LinuxEntry<'a> {
@@ -25,10 +25,8 @@ pub fn preload_kernel(volume: Handle, linux_path: &str) -> uefi::Result<Handle> 
         .map(|boot| boot == volume)
         .unwrap_or(true);
 
-    if on_boot_esp {
-        if let Ok(image) = load_via_device_path(linux_path) {
-            return Ok(image);
-        }
+    if on_boot_esp && let Ok(image) = load_via_device_path(linux_path) {
+        return Ok(image);
     }
 
     load_image_from_volume(volume, linux_path).or_else(|_| {
@@ -130,7 +128,7 @@ pub fn start_preloaded(image: Handle, entry: &LinuxEntry<'_>) -> uefi::Result<()
 }
 
 fn load_via_buffer(kernel: &[u8]) -> uefi::Result<Handle> {
-    let pages = (kernel.len() + 4095) / 4096;
+    let pages = kernel.len().div_ceil(4096);
     let addr = boot::allocate_pages(AllocateType::AnyPages, MemoryType::LOADER_DATA, pages)?;
     unsafe {
         core::ptr::copy_nonoverlapping(kernel.as_ptr(), addr.as_ptr(), kernel.len());
@@ -202,6 +200,3 @@ fn normalize_path(path: &str) -> String {
         alloc::format!("\\{normalized}")
     }
 }
-
-
-

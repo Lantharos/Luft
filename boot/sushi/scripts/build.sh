@@ -1,59 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$ROOT"
+root="$(cd "$(dirname "$0")/.." && pwd)"
+destdir="${1:-}"
 
-PROFILE="${PROFILE:-release}"
+cargo build --release --manifest-path "$root/Cargo.toml"
+cargo build --release --manifest-path "$root/Cargo.toml" -p sushiboot --target x86_64-unknown-uefi
 
-echo "==> Building sushi workspace (${PROFILE})"
-cargo build --workspace --exclude sushiboot --profile "$PROFILE" -p sushid -p sushictl -p sushi-bootctl
+[[ -n "$destdir" ]] || exit 0
 
-if [[ -d "target/${PROFILE}" ]]; then
-    BIN_DIR="target/${PROFILE}"
-else
-    BIN_DIR="target/$(uname -m)-unknown-linux-gnu/${PROFILE}"
-fi
-
-if [[ -z "${DESTDIR:-}" ]]; then
-    echo "==> Build complete (set DESTDIR=... or sudo make install to install)"
-    exit 0
-fi
-
-install -d "${DESTDIR}/usr/bin"
-install -d "${DESTDIR}/usr/lib/sushi/themes/default"
-install -d "${DESTDIR}/usr/lib/kernel/install.d"
-install -d "${DESTDIR}/etc/sushi"
-install -d "${DESTDIR}/usr/lib/dracut/modules.d/90sushi"
-
-install -m 0755 "$BIN_DIR/sushid" "${DESTDIR}/usr/bin/sushid"
-install -m 0755 "$BIN_DIR/sushictl" "${DESTDIR}/usr/bin/sushictl"
-install -m 0755 "$BIN_DIR/sushi-bootctl" "${DESTDIR}/usr/bin/sushi-bootctl"
-install -m 0755 "$ROOT/scripts/kernel-install/90-sushi.install" \
-    "${DESTDIR}/usr/lib/kernel/install.d/90-sushi.install"
-install -m 0755 "$ROOT/scripts/sushi-sign.sh" "${DESTDIR}/usr/lib/sushi/sushi-sign.sh"
-install -m 0644 "$ROOT/themes/default/logo.txt" "${DESTDIR}/usr/lib/sushi/themes/default/logo.txt"
-install -m 0644 "$ROOT/initramfs/dracut/90sushi/sushi.conf" "${DESTDIR}/etc/sushi/sushi.conf"
-
-cp -a "$ROOT/initramfs/dracut/90sushi/." "${DESTDIR}/usr/lib/dracut/modules.d/90sushi/"
-
-if command -v rustup >/dev/null 2>&1; then
-    if rustup target list --installed | grep -q x86_64-unknown-uefi; then
-        echo "==> Building SushiBoot.efi"
-        SUSHI_UEFI_RUSTFLAGS='-C link-arg=-Wl,--subsystem,efi_application'
-        RUSTFLAGS="$SUSHI_UEFI_RUSTFLAGS" cargo build -p sushiboot --profile "$PROFILE" \
-            --target x86_64-unknown-uefi \
-            -Z build-std=core,alloc \
-            -Z build-std-features=compiler-builtins-mem 2>/dev/null \
-            || echo "SushiBoot.efi build skipped (install uefi target: rustup target add x86_64-unknown-uefi)"
-        if [[ -f "target/x86_64-unknown-uefi/${PROFILE}/sushiboot.efi" ]]; then
-            install -d "${DESTDIR}/usr/lib/sushi/efi"
-            install -m 0644 "target/x86_64-unknown-uefi/${PROFILE}/sushiboot.efi" \
-                "${DESTDIR}/usr/lib/sushi/efi/SushiBoot.efi"
-        fi
-    fi
-fi
-
-echo "==> Done"
-echo "    dracut: omit plymouth, add sushi — then dracut -f"
-echo "    cmdline: rd.sushi=1 (default on when module installed)"
+release="$root/target/release"
+units="$destdir/usr/lib/systemd/system"
+install -Dm755 "$release/sushid" "$destdir/usr/bin/sushid"
+install -Dm755 "$release/sushictl" "$destdir/usr/bin/sushictl"
+install -Dm755 "$release/sushi-bootctl" "$destdir/usr/bin/sushi-bootctl"
+install -Dm644 "$root/target/x86_64-unknown-uefi/release/sushiboot.efi" "$destdir/usr/lib/sushi/efi/SushiBoot.efi"
+for unit in "$root"/data/systemd/*.service; do
+  install -Dm644 "$unit" "$units/$(basename "$unit")"
+done
+for dropin in "$root"/data/drop-ins/*/*.conf; do
+  install -Dm644 "$dropin" "$units/$(basename "$(dirname "$dropin")")/$(basename "$dropin")"
+done
+install -Dm755 "$root/data/dracut/module-setup.sh" "$destdir/usr/lib/dracut/modules.d/90sushi/module-setup.sh"
+install -Dm755 "$root/data/kernel-install/90-sushi.install" "$destdir/usr/lib/kernel/install.d/90-sushi.install"
+install -Dm644 "$root/data/sushi.conf" "$destdir/etc/sushi/sushi.conf"

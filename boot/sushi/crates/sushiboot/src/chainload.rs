@@ -1,7 +1,7 @@
 //! Chainload another UEFI application (e.g. Windows bootmgfw.efi).
 
-use uefi::boot;
 use uefi::Handle;
+use uefi::boot;
 
 use crate::linux_boot;
 

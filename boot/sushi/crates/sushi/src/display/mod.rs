@@ -1,237 +1,171 @@
-//! Display backend abstraction for Sushi.
+mod card;
+mod modes;
+mod output;
 
-pub mod drm;
-pub mod fb;
+use std::io;
+use std::path::{Path, PathBuf};
 
-use anyhow::Result;
-use thiserror::Error;
+use drm::Device;
+use drm::control::{Device as ControlDevice, Mode, ResourceHandles, connector, crtc};
+use sushi_scene::Rect;
+use sushi_scene::tiny_skia::Pixmap;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PixelFormat {
-    Argb8888,
-    Xrgb8888,
-    Bgra8888,
+pub use card::Card;
+pub use modes::ModeHints;
+pub use output::Output;
+
+pub struct Display {
+    card: Card,
+    outputs: Vec<Output>,
 }
 
-#[derive(Clone)]
-pub struct FrameBuffer {
-    pub width: u32,
-    pub height: u32,
-    pub stride: u32,
-    pub format: PixelFormat,
-    pub pixels: Vec<u8>,
+struct Planned {
+    connector: connector::Handle,
+    crtc: crtc::Handle,
+    mode: Mode,
 }
 
-impl FrameBuffer {
-    pub fn new(width: u32, height: u32, format: PixelFormat) -> Self {
-        let bpp = 4;
-        let stride = width * bpp;
-        Self {
-            width,
-            height,
-            stride,
-            format,
-            pixels: vec![0u8; (stride * height) as usize],
+fn plan(card: &Card, hints: &ModeHints) -> io::Result<Vec<Planned>> {
+    let resources = card.resource_handles()?;
+    let connected: Vec<connector::Info> = resources
+        .connectors()
+        .iter()
+        .filter_map(|handle| card.get_connector(*handle, true).ok())
+        .filter(|info| info.state() == connector::State::Connected && !info.modes().is_empty())
+        .collect();
+    let names: Vec<String> = connected.iter().map(ToString::to_string).collect();
+    let mut plan: Vec<Planned> = Vec::new();
+    for info in &connected {
+        let taken: Vec<crtc::Handle> = plan.iter().map(|planned| planned.crtc).collect();
+        let crtc = pick_crtc(card, &resources, info, &taken);
+        let mode = hints.choose(&info.to_string(), &names, info.modes());
+        if let (Some(crtc), Some(mode)) = (crtc, mode) {
+            plan.push(Planned {
+                connector: info.handle(),
+                crtc,
+                mode,
+            });
         }
     }
-
-    pub fn put_pixel(&mut self, x: u32, y: u32, color: u32) {
-        if x >= self.width || y >= self.height {
-            return;
-        }
-        let offset = (y * self.stride + x * 4) as usize;
-        if offset + 4 > self.pixels.len() {
-            return;
-        }
-        let a = ((color >> 24) & 0xff) as u8;
-        let r = ((color >> 16) & 0xff) as u8;
-        let g = ((color >> 8) & 0xff) as u8;
-        let b = (color & 0xff) as u8;
-        let bytes = match self.format {
-            PixelFormat::Xrgb8888 => [b, g, r, 0x00],
-            PixelFormat::Bgra8888 => [b, g, r, a],
-            PixelFormat::Argb8888 => [b, g, r, a],
-        };
-        self.pixels[offset..offset + 4].copy_from_slice(&bytes);
+    if plan.is_empty() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "no connected display",
+        ));
     }
-
-    /// Alpha-blend a single framebuffer pixel (no sub-pixel spreading).
-    pub fn put_pixel_alpha(&mut self, x: u32, y: u32, r: u8, g: u8, b: u8, a: u8) {
-        self.blend_pixel_opaque(x, y, r, g, b, a);
-    }
-
-    /// Alpha-blend a pixel over the existing framebuffer contents.
-    pub fn blend_pixel(&mut self, x: f32, y: f32, r: u8, g: u8, b: u8, a: u8) {
-        if a == 0 {
-            return;
-        }
-        let xi = x.floor() as i32;
-        let yi = y.floor() as i32;
-        let fx = x - xi as f32;
-        let fy = y - yi as f32;
-        let corners = [
-            (0, 0, (1.0 - fx) * (1.0 - fy)),
-            (1, 0, fx * (1.0 - fy)),
-            (0, 1, (1.0 - fx) * fy),
-            (1, 1, fx * fy),
-        ];
-        for (dx, dy, weight) in corners {
-            if weight <= 0.0 {
-                continue;
-            }
-            let px = xi + dx;
-            let py = yi + dy;
-            if px < 0 || py < 0 || px >= self.width as i32 || py >= self.height as i32 {
-                continue;
-            }
-            let alpha = (a as f32 * weight).round().clamp(0.0, 255.0) as u8;
-            self.blend_pixel_opaque(px as u32, py as u32, r, g, b, alpha);
-        }
-    }
-
-    fn blend_pixel_opaque(&mut self, x: u32, y: u32, r: u8, g: u8, b: u8, a: u8) {
-        if a == 0 {
-            return;
-        }
-        if a == 255 {
-            self.put_pixel(
-                x,
-                y,
-                ((255u32) << 24) | ((r as u32) << 16) | ((g as u32) << 8) | (b as u32),
-            );
-            return;
-        }
-        let offset = (y * self.stride + x * 4) as usize;
-        if offset + 4 > self.pixels.len() {
-            return;
-        }
-        let (dst_b, dst_g, dst_r) = match self.format {
-            PixelFormat::Xrgb8888 | PixelFormat::Bgra8888 | PixelFormat::Argb8888 => (
-                self.pixels[offset],
-                self.pixels[offset + 1],
-                self.pixels[offset + 2],
-            ),
-        };
-        let inv = 255u16 - a as u16;
-        let out_r = ((r as u16 * a as u16 + dst_r as u16 * inv) / 255) as u8;
-        let out_g = ((g as u16 * a as u16 + dst_g as u16 * inv) / 255) as u8;
-        let out_b = ((b as u16 * a as u16 + dst_b as u16 * inv) / 255) as u8;
-        let bytes = match self.format {
-            PixelFormat::Xrgb8888 => [out_b, out_g, out_r, 0x00],
-            PixelFormat::Bgra8888 => [out_b, out_g, out_r, 255],
-            PixelFormat::Argb8888 => [out_b, out_g, out_r, 255],
-        };
-        self.pixels[offset..offset + 4].copy_from_slice(&bytes);
-    }
-
-    pub fn fill_rect(&mut self, x: i32, y: i32, w: u32, h: u32, color: u32) {
-        let x0 = x.max(0) as u32;
-        let y0 = y.max(0) as u32;
-        if x0 >= self.width || y0 >= self.height || w == 0 || h == 0 {
-            return;
-        }
-        let x1 = x.saturating_add(w as i32).min(self.width as i32) as u32;
-        let y1 = y.saturating_add(h as i32).min(self.height as i32) as u32;
-        let fill_w = x1.saturating_sub(x0);
-        if fill_w == 0 {
-            return;
-        }
-
-        let bytes = match self.format {
-            PixelFormat::Xrgb8888 => {
-                let r = ((color >> 16) & 0xff) as u8;
-                let g = ((color >> 8) & 0xff) as u8;
-                let b = (color & 0xff) as u8;
-                [b, g, r, 0x00]
-            }
-            PixelFormat::Bgra8888 | PixelFormat::Argb8888 => {
-                let a = ((color >> 24) & 0xff) as u8;
-                let r = ((color >> 16) & 0xff) as u8;
-                let g = ((color >> 8) & 0xff) as u8;
-                let b = (color & 0xff) as u8;
-                [b, g, r, a]
-            }
-        };
-
-        let row_len = (fill_w * 4) as usize;
-        for py in y0..y1 {
-            let row_start = (py * self.stride) as usize + (x0 * 4) as usize;
-            let row_end = row_start + row_len;
-            if row_end > self.pixels.len() {
-                break;
-            }
-            self.pixels[row_start..row_start + 4].copy_from_slice(&bytes);
-            let mut filled = 4usize;
-            while filled < row_len {
-                let chunk = filled.min(row_len - filled);
-                self.pixels
-                    .copy_within(row_start..row_start + chunk, row_start + filled);
-                filled += chunk;
-            }
-        }
-    }
+    Ok(plan)
 }
 
-#[derive(Debug, Error)]
-pub enum DisplayError {
-    #[error("no display backend available")]
-    NoBackend,
-    #[error("display acquire failed: {0}")]
-    AcquireFailed(String),
-    #[error("display present failed: {0}")]
-    PresentFailed(String),
+pub fn cards() -> Vec<PathBuf> {
+    let mut cards: Vec<PathBuf> = std::fs::read_dir("/dev/dri")
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.starts_with("card"))
+        })
+        .collect();
+    cards.sort();
+    cards
 }
 
-pub trait DisplayBackend: Send {
-    fn name(&self) -> &'static str;
-    fn width(&self) -> u32;
-    fn height(&self) -> u32;
-    fn format(&self) -> PixelFormat;
-    fn map_frame(&mut self) -> Result<&mut FrameBuffer>;
-    fn present(&mut self) -> Result<()>;
-    fn blit(&mut self, frame: &FrameBuffer) -> Result<()>;
-    /// Copy the live scanout buffer into the draw shadow (fbdev only).
-    fn import_scanout(&mut self) -> bool {
-        false
-    }
+fn pick_crtc(
+    card: &Card,
+    resources: &ResourceHandles,
+    info: &connector::Info,
+    taken: &[crtc::Handle],
+) -> Option<crtc::Handle> {
+    let current = info
+        .current_encoder()
+        .and_then(|encoder| card.get_encoder(encoder).ok())
+        .and_then(|encoder| encoder.crtc())
+        .filter(|crtc| !taken.contains(crtc));
+    current.or_else(|| {
+        info.encoders()
+            .iter()
+            .filter_map(|encoder| card.get_encoder(*encoder).ok())
+            .flat_map(|encoder| resources.filter_crtcs(encoder.possible_crtcs()))
+            .find(|crtc| !taken.contains(crtc))
+    })
 }
 
-pub struct DisplayManager {
-    backend: Box<dyn DisplayBackend>,
-}
-
-impl DisplayManager {
-    pub fn from_backend(backend: Box<dyn DisplayBackend>) -> Self {
-        Self { backend }
+impl Display {
+    pub fn find(hints: &ModeHints) -> Option<Self> {
+        let mut candidates: Vec<Card> = cards()
+            .iter()
+            .filter_map(|path| Card::open(path).ok())
+            .collect();
+        candidates.sort_by_key(|card| !card.is_boot_display());
+        candidates
+            .into_iter()
+            .find_map(|card| Self::take(card, hints).ok())
     }
 
-    pub fn backend_name(&self) -> &'static str {
-        self.backend.name()
+    pub fn open(path: &Path, hints: &ModeHints) -> io::Result<Self> {
+        Self::take(Card::open(path)?, hints)
     }
 
-    pub fn dimensions(&self) -> (u32, u32) {
-        (self.backend.width(), self.backend.height())
+    fn take(card: Card, hints: &ModeHints) -> io::Result<Self> {
+        card.acquire_master_lock()?;
+        let plan = plan(&card, hints)?;
+        Self::build(card, plan)
     }
 
-    pub fn render<F>(&mut self, draw: F) -> Result<()>
-    where
-        F: FnOnce(&mut FrameBuffer),
-    {
-        let frame = self.backend.map_frame()?;
-        draw(frame);
-        self.backend.present()
+    fn build(card: Card, plan: Vec<Planned>) -> io::Result<Self> {
+        let outputs = plan
+            .into_iter()
+            .map(|planned| Output::create(&card, planned.connector, planned.crtc, planned.mode))
+            .collect::<io::Result<Vec<_>>>()?;
+        Ok(Self { card, outputs })
     }
 
-    /// True when the backend mirrored the visible framebuffer into the draw buffer.
-    pub fn import_scanout(&mut self) -> bool {
-        self.backend.import_scanout()
+    pub fn refresh(self, hints: &ModeHints) -> io::Result<(Self, bool)> {
+        let plan = plan(&self.card, hints)?;
+        let unchanged = plan.len() == self.outputs.len()
+            && plan.iter().zip(&self.outputs).all(|(planned, output)| {
+                planned.connector == output.connector && planned.mode == output.mode
+            });
+        if unchanged {
+            return Ok((self, false));
+        }
+        Ok((Self::build(self.into_card(), plan)?, true))
     }
 
-    pub fn try_handoff(&mut self, new_backend: Box<dyn DisplayBackend>, frame: &FrameBuffer) -> Result<()> {
-        let mut new = new_backend;
-        new.blit(frame)?;
-        new.present()?;
-        self.backend = new;
-        Ok(())
+    pub fn path(&self) -> &Path {
+        self.card.path()
+    }
+
+    pub fn sizes(&self) -> Vec<(u32, u32)> {
+        self.outputs.iter().map(Output::size).collect()
+    }
+
+    pub fn show(&self) -> io::Result<()> {
+        self.outputs
+            .iter()
+            .try_for_each(|output| output.show(&self.card))
+    }
+
+    pub fn blit(&mut self, output: usize, area: Rect, pixmap: &Pixmap) {
+        self.outputs[output].blit(&self.card, area, pixmap);
+    }
+
+    pub fn release_master(&self) {
+        let _ = self.card.release_master_lock();
+    }
+
+    pub fn replaced(&self) -> bool {
+        self.outputs
+            .iter()
+            .all(|output| !output.is_on_screen(&self.card))
+    }
+
+    pub fn into_card(self) -> Card {
+        for output in self.outputs {
+            output.release(&self.card);
+        }
+        self.card
     }
 }

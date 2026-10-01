@@ -1,13 +1,15 @@
 [package]
 name = "sushi-bootctl"
+description = "Install and manage SushiBoot"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-
-[[bin]]
-name = "sushi-bootctl"
-path = "src/main.rs"
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-anyhow = { workspace = true }
-clap = { workspace = true }
+anyhow.workspace = true
+clap.workspace = true
+
+[lints]
+workspace = true

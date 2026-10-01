@@ -2,10 +2,10 @@
 
 use alloc::string::{String, ToString};
 
+use uefi::Handle;
 use uefi::boot;
 use uefi::proto::media::file::{File, FileAttribute, FileInfo, FileMode, FileType};
 use uefi::proto::media::fs::SimpleFileSystem;
-use uefi::Handle;
 
 #[derive(Clone, Debug)]
 pub struct LoaderConfig {
@@ -47,7 +47,9 @@ fn read_conf(
     root: &mut uefi::proto::media::file::Directory,
     path: &uefi::CStr16,
 ) -> Option<LoaderConfig> {
-    let file = root.open(path, FileMode::Read, FileAttribute::empty()).ok()?;
+    let file = root
+        .open(path, FileMode::Read, FileAttribute::empty())
+        .ok()?;
     let FileType::Regular(mut regular) = file.into_type().ok()? else {
         return None;
     };

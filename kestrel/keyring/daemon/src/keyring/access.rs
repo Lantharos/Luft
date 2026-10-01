@@ -30,7 +30,13 @@ pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> 
     match rule {
         Some(rule) if rule.allowed => Decision::Allowed,
         Some(_) => Decision::Denied,
-        None if item.unclaimed => Decision::Claim,
+        None if item.unclaimed && app.may_claim(app_hint(item).as_deref()) => Decision::Claim,
         None => Decision::Ask,
     }
+}
+
+pub fn app_hint(item: &Item) -> Option<String> {
+    item.attributes
+        .get("application")
+        .map(|application| application.to_lowercase())
 }

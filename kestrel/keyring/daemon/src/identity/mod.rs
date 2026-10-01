@@ -1,14 +1,21 @@
 mod desktop;
 mod process;
+mod program;
 
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Mutex;
 
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 
+use desktop::Entry;
 use process::Process;
+pub use program::Program;
+use program::versionless;
+
+const UNBRANDED_CHROMIUM: &str = "chromium";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -24,6 +31,28 @@ pub struct App {
     pub icon: String,
     pub kind: Kind,
     pub executable: String,
+    names: Vec<String>,
+    claims: bool,
+    chromium: bool,
+    lineage: Option<Lineage>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct Lineage {
+    program: String,
+    versionless: String,
+    entry: Option<Entry>,
+}
+
+impl Lineage {
+    fn includes(&self, program: &str) -> bool {
+        program == self.program
+            || versionless(program) == self.versionless
+            || self
+                .entry
+                .as_ref()
+                .is_some_and(|entry| entry.runs(&Program::parse(program)))
+    }
 }
 
 impl App {
@@ -34,6 +63,10 @@ impl App {
             icon: String::new(),
             kind: Kind::Host,
             executable: String::new(),
+            names: Vec::new(),
+            claims: false,
+            chromium: false,
+            lineage: None,
         }
     }
 
@@ -46,7 +79,9 @@ impl App {
                 .map_or_else(|| id.to_owned(), |entry| entry.name.clone()),
             icon: id.to_owned(),
             kind: Kind::Flatpak,
-            executable: String::new(),
+            names: id_names(id, entry.as_ref()),
+            claims: true,
+            ..Self::unknown()
         }
     }
 
@@ -54,9 +89,36 @@ impl App {
         match key.split_once(':') {
             Some(("flatpak", id)) => Self::flatpak(id),
             Some(("app", id)) => luft(id, String::new()),
-            Some(("exe", path)) => host(path, None),
+            Some(("desktop", id)) => Self {
+                key: key.to_owned(),
+                name: desktop::find(id).map_or_else(|| id.to_owned(), |entry| entry.name),
+                icon: id.to_owned(),
+                ..Self::unknown()
+            },
+            Some(("exe", program)) => Self {
+                key: key.to_owned(),
+                name: Program::parse(program).label(),
+                ..Self::unknown()
+            },
             _ => Self::unknown(),
         }
+    }
+
+    pub fn may_claim(&self, hint: Option<&str>) -> bool {
+        self.claims
+            && hint.is_none_or(|hint| {
+                self.names.iter().any(|name| name == hint)
+                    || self.chromium && hint == UNBRANDED_CHROMIUM
+            })
+    }
+
+    pub fn succeeds(&self, key: &str) -> bool {
+        key != self.key
+            && key.strip_prefix("exe:").is_some_and(|program| {
+                self.lineage
+                    .as_ref()
+                    .is_some_and(|lineage| lineage.includes(program))
+            })
     }
 }
 
@@ -114,8 +176,14 @@ fn classify(process: &Process) -> App {
     if let Some(id) = luft_app_id(&executable) {
         return luft(&id, executable);
     }
-    let program = process.program(&executable);
-    host(&program, process.unit_app_id().as_deref())
+    let program = process.program(executable);
+    let entry = process
+        .unit_app_id()
+        .and_then(|id| desktop::find(&id))
+        .filter(|entry| entry.runs(&program))
+        .or_else(|| desktop::find(&program.name()).filter(|entry| entry.runs(&program)));
+    let inspecting = program.is_inspector() || program.interpreted() && process.has_terminal();
+    host(program, entry, !inspecting)
 }
 
 fn luft_app_id(executable: &str) -> Option<String> {
@@ -126,32 +194,62 @@ fn luft_app_id(executable: &str) -> Option<String> {
 }
 
 fn luft(id: &str, executable: String) -> App {
-    let name = desktop::find(id).map_or_else(
-        || id.trim_start_matches("com.lantharos.").to_owned(),
-        |entry| entry.name,
-    );
+    let entry = desktop::find(id);
     App {
         key: format!("app:{id}"),
-        name,
+        name: entry.as_ref().map_or_else(
+            || id.trim_start_matches("com.lantharos.").to_owned(),
+            |entry| entry.name.clone(),
+        ),
         icon: id.to_owned(),
         kind: Kind::Luft,
         executable,
+        names: id_names(id, entry.as_ref()),
+        claims: true,
+        ..App::unknown()
     }
 }
 
-fn host(program: &str, unit_app: Option<&str>) -> App {
-    let binary = program.split_whitespace().next().unwrap_or(program);
-    let base = binary.rsplit('/').next().unwrap_or(binary);
-    let entry = unit_app
-        .and_then(desktop::find)
-        .filter(|entry| entry.runs(base));
+fn host(program: Program, entry: Option<Entry>, claims: bool) -> App {
+    let text = program.text();
+    let key = match &entry {
+        Some(entry) => format!("desktop:{}", entry.id),
+        None => format!("exe:{}", versionless(&text)),
+    };
+    let mut names = vec![program.name()];
+    names.extend(entry.iter().flat_map(Entry::names));
     App {
-        key: format!("exe:{program}"),
+        key,
         name: entry
             .as_ref()
-            .map_or_else(|| base.to_owned(), |entry| entry.name.clone()),
-        icon: entry.map(|entry| entry.id).unwrap_or_default(),
+            .map_or_else(|| program.label(), |entry| entry.name.clone()),
+        icon: entry
+            .as_ref()
+            .map(|entry| entry.id.clone())
+            .unwrap_or_default(),
         kind: Kind::Host,
-        executable: binary.to_owned(),
+        chromium: !program.interpreted() && is_chromium(&program.executable),
+        executable: program.executable,
+        names,
+        claims,
+        lineage: Some(Lineage {
+            versionless: versionless(&text),
+            program: text,
+            entry,
+        }),
     }
+}
+
+fn id_names(id: &str, entry: Option<&Entry>) -> Vec<String> {
+    entry.map_or_else(
+        || desktop::id_names(id).to_vec(),
+        |entry| entry.names().collect(),
+    )
+}
+
+fn is_chromium(executable: &str) -> bool {
+    Path::new(executable).parent().is_some_and(|folder| {
+        folder.join("chrome_100_percent.pak").is_file()
+            && !folder.join("resources/app.asar").exists()
+    })
 }

@@ -51,6 +51,16 @@ def read():
         return
 
 
+def store():
+    _, session = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "OpenSession", "(sv)", ("plain", GLib.Variant("s", "")))
+    label, secret = sys.argv[2], sys.argv[3]
+    pairs = sys.argv[4:]
+    properties = {"org.freedesktop.Secret.Item.Label": GLib.Variant("s", label),
+                  "org.freedesktop.Secret.Item.Attributes": GLib.Variant("a{ss}", dict(zip(pairs[::2], pairs[1::2])))}
+    call(SECRETS, "/org/freedesktop/secrets/aliases/default", "org.freedesktop.Secret.Collection", "CreateItem", "(a{sv}(oayays)b)",
+         (properties, (session, b"", secret.encode(), "text/plain"), True))
+
+
 def created():
     unlocked, locked = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "SearchItems", "(a{ss})", (attributes(),))
     path = (unlocked + locked)[0]
@@ -126,6 +136,8 @@ def keyring_import():
 action = sys.argv[1]
 if action == "read":
     read()
+elif action == "store":
+    store()
 elif action == "created":
     created()
 elif action == "lock":

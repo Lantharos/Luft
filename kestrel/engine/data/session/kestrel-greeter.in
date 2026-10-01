@@ -1,4 +1,5 @@
 #!/bin/sh
 export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export XDG_CONFIG_DIRS="/var/lib/kestrel-greeter/display:${XDG_CONFIG_DIRS:-/etc/xdg}"
 export GSETTINGS_BACKEND=memory
 exec dbus-run-session -- @bindir@/kestrel --greeter --wayland --display-server --no-x11

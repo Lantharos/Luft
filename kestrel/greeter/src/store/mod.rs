@@ -1,4 +1,5 @@
 mod config;
+mod displays;
 mod wallpaper;
 
 use std::fs;
@@ -6,11 +7,13 @@ use std::io;
 use std::path::PathBuf;
 
 pub use config::Config;
+pub use displays::prepare as prepare_displays;
 pub use wallpaper::prepare as prepare_wallpaper;
 
 use crate::files::{self, write_atomically};
 
 const WALLPAPER: &str = "wallpaper.jpg";
+const DISPLAYS: &str = "display/monitors.xml";
 
 pub struct Store {
     root: PathBuf,
@@ -61,6 +64,10 @@ impl Store {
             .join(uid.to_string())
             .join(WALLPAPER);
         write_atomically(&path, jpeg)
+    }
+
+    pub fn save_displays(&self, arrangement: &[u8]) -> io::Result<()> {
+        write_atomically(&self.root.join(DISPLAYS), arrangement)
     }
 
     fn config_path(&self) -> PathBuf {

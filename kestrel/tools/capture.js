@@ -31,6 +31,7 @@ import {checkCursor} from './checks/system/cursorChecks.js';
 import {checkNightLight} from './checks/system/nightLightChecks.js';
 import {checkPower} from './checks/system/powerChecks.js';
 import {checkAppIcons} from './checks/system/appIconChecks.js';
+import {checkLuftApps} from './checks/apps/luftAppChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
 export const METRICS = {};
@@ -344,6 +345,7 @@ export async function run() {
   await checkNightLight({pause});
   await checkPower({pause, pointer});
   await checkAppIcons({pause, capture, actorNamed, output});
+  await checkLuftApps({output});
   await checkLiveWallpaper({pause, actorNamed});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});

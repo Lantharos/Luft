@@ -28,6 +28,9 @@ trait Session {
 
     #[zbus(property)]
     fn locked_hint(&self) -> zbus::Result<bool>;
+
+    #[zbus(property)]
+    fn user(&self) -> zbus::Result<(u32, OwnedObjectPath)>;
 }
 
 struct ActiveSession {
@@ -131,4 +134,24 @@ pub async fn watch_unlocked(connection: &Connection) -> zbus::Result<watch::Rece
         }
     });
     Ok(receiver)
+}
+
+pub async fn active_user(connection: &Connection) -> zbus::Result<Option<u32>> {
+    let (_, path) = SeatProxy::builder(connection)
+        .cache_properties(CacheProperties::No)
+        .build()
+        .await?
+        .active_session()
+        .await?;
+    if path.as_str() == NO_SESSION {
+        return Ok(None);
+    }
+    let (uid, _) = SessionProxy::builder(connection)
+        .path(path)?
+        .cache_properties(CacheProperties::No)
+        .build()
+        .await?
+        .user()
+        .await?;
+    Ok(Some(uid))
 }

@@ -18,6 +18,7 @@ pub struct Protection {
     unlocked: bool,
     guarding: bool,
     held: BTreeMap<String, String>,
+    unclaimed: Vec<Device>,
 }
 
 impl Protection {
@@ -27,6 +28,7 @@ impl Protection {
             unlocked,
             guarding: false,
             held: BTreeMap::new(),
+            unclaimed: Vec::new(),
         };
         let waiting: Vec<String> = usb::waiting().collect();
         if protection.should_guard() {
@@ -50,6 +52,10 @@ impl Protection {
 
     pub fn held(&self) -> Vec<Device> {
         self.held.clone().into_iter().collect()
+    }
+
+    pub fn take_released(&mut self) -> Vec<Device> {
+        std::mem::take(&mut self.unclaimed)
     }
 
     pub fn set_enabled(&mut self, enabled: bool) -> io::Result<Change> {
@@ -109,10 +115,13 @@ impl Protection {
         }
         self.guarding = guarding;
         if guarding {
+            self.unclaimed.clear();
             usb::hold_new_devices();
             Vec::new()
         } else {
-            self.release()
+            let released = self.release();
+            self.unclaimed.extend_from_slice(&released);
+            released
         }
     }
 

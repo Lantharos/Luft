@@ -7,6 +7,7 @@ use zbus::{Connection, interface};
 
 use crate::error::Error;
 use crate::protection::{Change, Device, Protection};
+use crate::seat;
 
 pub const NAME: &str = "com.lantharos.UsbProtection1";
 pub const PATH: &str = "/com/lantharos/UsbProtection1";
@@ -67,6 +68,18 @@ impl UsbProtection {
         }
         let change = self.protection.lock().await.set_enabled(enabled)?;
         Ok(self.announce(&emitter, change).await?)
+    }
+
+    async fn take_released(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<Vec<Device>, Error> {
+        let caller = access::caller_uid(connection, &header).await?;
+        if caller.is_none() || caller != seat::active_user(connection).await? {
+            return Err(Error::not_authorized());
+        }
+        Ok(self.protection.lock().await.take_released())
     }
 
     #[zbus(signal)]

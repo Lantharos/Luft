@@ -12,28 +12,29 @@ const SETTINGS_ACTION: &str = "settings";
     default_path = "/com/lantharos/UsbProtection1"
 )]
 trait UsbProtection {
+    fn take_released(&self) -> zbus::Result<Vec<(String, String)>>;
+
     #[zbus(signal)]
     fn released(&self, devices: Vec<(String, String)>) -> zbus::Result<()>;
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let mut released = UsbProtectionProxy::new(&context.system)
-        .await?
-        .receive_released()
-        .await?;
+    let protection = UsbProtectionProxy::new(&context.system).await?;
+    let mut released = protection.receive_released().await?;
     let mut actions = NotificationsProxy::new(&context.session)
         .await?
         .receive_action_invoked()
         .await?;
     let session = context.session.clone();
     tokio::spawn(async move {
-        let mut notification = 0;
+        if let Err(error) = notify::server_ready(&session).await {
+            eprintln!("Couldn't wait for the notification server: {error}");
+        }
+        let mut notification = announce_released(&session, &protection, 0).await;
         loop {
             tokio::select! {
-                Some(signal) = released.next() => {
-                    if let Ok(args) = signal.args() {
-                        notification = announce(&session, &args.devices, notification).await;
-                    }
+                Some(_) = released.next() => {
+                    notification = announce_released(&session, &protection, notification).await;
                 }
                 Some(action) = actions.next() => {
                     if action.args().is_ok_and(|args| args.id == notification && args.action_key == SETTINGS_ACTION) {
@@ -44,6 +45,21 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         }
     });
     Ok(())
+}
+
+async fn announce_released(
+    session: &Connection,
+    protection: &UsbProtectionProxy<'_>,
+    replaces: u32,
+) -> u32 {
+    match protection.take_released().await {
+        Ok(devices) if !devices.is_empty() => announce(session, &devices, replaces).await,
+        Ok(_) => replaces,
+        Err(error) => {
+            eprintln!("Couldn't collect the devices connected while locked: {error}");
+            replaces
+        }
+    }
 }
 
 fn describe(devices: &[(String, String)]) -> (String, &'static str) {

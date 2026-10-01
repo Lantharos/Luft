@@ -27,7 +27,7 @@ export async function openDialog(handle: string, spec: DialogSpec, build: (dialo
   return new Promise(resolve => {
     const modal = new ModalDialog({ styleClass: `kestrel-portal-dialog ${spec.styleClass ?? ''}` });
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });
-    modal.contentLayout.add_child(new MessageDialogContent({ title: spec.title, description: spec.description, icon_name: spec.icon }));
+    modal.contentLayout.add_child(new MessageDialogContent({ title: spec.title, icon_name: spec.icon, ...spec.description && { description: spec.description } }));
     modal.contentLayout.add_child(content);
 
     let outcome: Outcome = [CANCELLED, {}];

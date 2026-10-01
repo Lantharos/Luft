@@ -30,7 +30,6 @@ import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { systemMonitor } from './panel/systemMonitor.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
-import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
 import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
@@ -69,13 +68,12 @@ class KestrelUi {
   private focusWindow: Meta.Window | null = null;
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
-  private readonly portal = new PortalBackend();
-  readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
+  private readonly portal: PortalBackend;
+  readonly appearance: AppearanceService;
   private readonly oomNotifier = new OomNotifier();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
-  private readonly globalShortcuts = new GlobalShortcutsProvider();
   private readonly liveWallpaper: LiveWallpaper;
   private readonly loginWallpaper = new LoginWallpaper();
   private readonly loginDisplays = new LoginDisplays();
@@ -85,6 +83,8 @@ class KestrelUi {
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
+    this.portal = new PortalBackend(context);
+    this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.stylesheetMonitors = loadKestrelStylesheets();
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
@@ -446,7 +446,6 @@ class KestrelUi {
     this.batteryWarnings.destroy();
     this.plugSounds.destroy();
     this.launchFeedback.destroy();
-    this.globalShortcuts.destroy();
     this.portal.destroy();
     for (const monitor of this.stylesheetMonitors) monitor.cancel();
   }

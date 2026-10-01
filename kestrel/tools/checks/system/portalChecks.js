@@ -1,6 +1,9 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {checkAppPortals} from '../portal/appChecks.js';
+import {checkSystemPortals} from '../portal/systemChecks.js';
+
 const BACKEND = 'org.freedesktop.impl.portal.desktop.kestrel';
 const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 
@@ -9,7 +12,7 @@ function call(iface, method, parameters, replyType) {
     Gio.DBusCallFlags.NONE, -1, null);
 }
 
-export async function checkPortal({pause}) {
+export async function checkPortal({pause, capture, output, pointer}) {
   const require = (condition, label) => {
     if (!condition) throw new Error(`Kestrel portal check failed: ${label}`);
     console.log(`Kestrel portal check: ${label}`);
@@ -44,4 +47,7 @@ export async function checkPortal({pause}) {
   require(response === 0 && !!file?.query_exists(null), 'apps can take a screenshot');
   file.delete(null);
   await pause(300);
+
+  await checkAppPortals({pause, capture, output, pointer});
+  await checkSystemPortals({pause, capture, output, pointer});
 }

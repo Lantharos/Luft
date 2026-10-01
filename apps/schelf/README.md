@@ -25,7 +25,7 @@ AppImages that carry update information are kept up to date: Schelf reads the ad
 
 Schelf opens `.flatpakref`, `.flatpakrepo`, `.rpm` and `.AppImage` files. Each one gets a page explaining what it is before anything is installed. Flatpak apps and sources are added for your account. Packages from a file need an administrator's permission, since your software sources haven't checked them.
 
-`schelf:updates` and `schelf:installed` open those pages directly, which is how Settings sends you to your app updates.
+`schelf:updates` and `schelf:installed` open those pages directly, which is how Settings sends you to your app updates. `schelf:search?` followed by what to look for opens a search, which is how the desktop helps you find an app for a file nothing installed can open.
 
 ## Where apps go
 

@@ -12,7 +12,7 @@ In the Luft monorepo, Sushi lives at `boot/sushi`. Run the commands below from t
 4. When the graphics driver loads and replaces the firmware framebuffer, Sushi redraws on the new device as soon as the system has finished setting the device up. If a display arrangement was saved by the login screen, Sushi uses that mode, so the monitor only switches modes once.
 5. When the login screen starts, Sushi fades the spinner out, leaves the logo on screen, and lets go of the display. The login screen's first frame shows the same logo before its own interface fades in.
 6. Sushi then stays in the background holding the display open, so that when one session ends and the next begins (signing in, signing out), the last frame stays on screen instead of the kernel's text console taking over.
-7. When the computer restarts or shuts down, Sushi takes the display back the moment the login screen or session lets go of it, and shows the logo and spinner until the computer turns off.
+7. When the computer restarts or shuts down, Sushi takes the display back the moment the login screen or session lets go of it, clears the pointer and anything else they left on screen, and shows the logo and spinner until the computer turns off.
 
 ## Updates
 

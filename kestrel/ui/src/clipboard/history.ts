@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import System from 'system';
 
+import { whenGraphicsRestored } from '../shared/graphics.js';
 import { ClipboardImageFiles } from './imageFiles.js';
 import { createThumbnail, type Thumbnail, type ThumbnailBounds } from './thumbnail.js';
 
@@ -28,7 +29,7 @@ interface ImageEntry {
   readonly id: string;
   readonly mimeType: string;
   readonly file: Gio.File;
-  readonly thumbnail: Thumbnail;
+  thumbnail: Thumbnail;
   copied: number;
 }
 
@@ -48,6 +49,7 @@ export class ClipboardHistory {
   private readonly clipboard = St.Clipboard.get_default();
   private readonly selection = (global as unknown as Shell.Global).display.get_selection();
   private readonly ownerChanged: number;
+  private readonly stopWatchingGraphics = whenGraphicsRestored(() => void this.redrawThumbnails());
   private quiet = false;
 
   constructor(private readonly changed: () => void) {
@@ -122,6 +124,15 @@ export class ClipboardHistory {
     });
   }
 
+  private async redrawThumbnails(): Promise<void> {
+    for (const item of this.items) {
+      if (item.kind !== 'image') continue;
+      const thumbnail = await createThumbnail(await this.images.load(item.file), THUMBNAIL_BOUNDS);
+      if (thumbnail) item.thumbnail = thumbnail;
+    }
+    this.changed();
+  }
+
   private remember(entry: ClipboardEntry): void {
     const others = this.items.filter(item => !sameEntry(item, entry));
     const newer = others.filter(item => item.copied > entry.copied);
@@ -139,6 +150,7 @@ export class ClipboardHistory {
 
   destroy(): void {
     this.selection.disconnect(this.ownerChanged);
+    this.stopWatchingGraphics();
     for (const item of this.items)
       if (item.kind === 'image') this.images.discard(item.file);
   }

@@ -16,6 +16,7 @@
  */
 
 #include "st-spinner-content.h"
+#include "st-private.h"
 
 #include <cairo.h>
 
@@ -67,6 +68,7 @@ struct _StSpinnerContent
 };
 
 static void st_spinner_content_iface_init (ClutterContentInterface *iface);
+static void st_spinner_content_invalidate (ClutterContent *content);
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (StSpinnerContent, st_spinner_content, G_TYPE_OBJECT,
                                G_IMPLEMENT_INTERFACE (CLUTTER_TYPE_CONTENT,
@@ -178,6 +180,12 @@ st_spinner_content_paint_content (ClutterContent      *content,
 {
   StSpinnerContent *spinner = ST_SPINNER_CONTENT (content);
   ClutterPaintNode *node;
+
+  if (_st_texture_is_defunct (spinner->texture))
+    {
+      g_clear_object (&spinner->texture);
+      st_spinner_content_invalidate (content);
+    }
 
   if (spinner->buffer == NULL)
     return;

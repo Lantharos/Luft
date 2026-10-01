@@ -320,6 +320,11 @@ st_theme_context_get_for_stage (ClutterStage *stage)
                             "resolution-changed",
                             G_CALLBACK (st_theme_context_changed),
                             context);
+  g_signal_connect_object (clutter_backend_get_graphics_recovery_context (context->clutter_backend),
+                           "graphics-restored",
+                           G_CALLBACK (_st_texture_cache_reload_graphics),
+                           st_texture_cache_get_default (),
+                           G_CONNECT_SWAPPED);
 
   return context;
 }

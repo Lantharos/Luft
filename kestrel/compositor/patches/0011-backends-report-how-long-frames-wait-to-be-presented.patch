@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 1 Oct 2026 20:51:40 +0200
+Subject: [PATCH 11/12] backends: report how long frames wait to be presented
+
+A watchdog outside the compositor can tell a display that stopped presenting from an idle one by asking how long the oldest frame handed to a physical display has been waiting for presentation.
+---
+ clutter/clutter/clutter-frame-clock.c | 17 ++++++++++++++
+ clutter/clutter/clutter-frame-clock.h |  3 +++
+ src/backends/meta-backend.c           | 33 +++++++++++++++++++++++++++
+ src/meta/meta-backend.h               |  3 +++
+ 4 files changed, 56 insertions(+)
+
+diff --git a/clutter/clutter/clutter-frame-clock.c b/clutter/clutter/clutter-frame-clock.c
+index d72247a7ff91e52a10d74cd1c541f9c456270478..a9191133edebbf199780c1ed449f46fc3f7da0cc 100644
+--- a/clutter/clutter/clutter-frame-clock.c
++++ b/clutter/clutter/clutter-frame-clock.c
+@@ -251,6 +251,23 @@ clutter_frame_clock_get_refresh_rate (ClutterFrameClock *frame_clock)
+   return frame_clock->refresh_rate;
+ }
+ 
++/**
++ * clutter_frame_clock_get_presentation_wait_us:
++ * @frame_clock: a #ClutterFrameClock
++ *
++ * Returns: how long the oldest dispatched frame has been waiting to be
++ *   presented, in microseconds, or 0 when no frame is waiting.
++ */
++int64_t
++clutter_frame_clock_get_presentation_wait_us (ClutterFrameClock *frame_clock)
++{
++  if (!frame_clock->next_presentation)
++    return 0;
++
++  return g_get_monotonic_time () -
++         frame_clock->next_presentation->dispatch_time_us;
++}
++
+ static void
+ clutter_frame_clock_set_refresh_rate (ClutterFrameClock *frame_clock,
+                                       float              refresh_rate)
+diff --git a/clutter/clutter/clutter-frame-clock.h b/clutter/clutter/clutter-frame-clock.h
+index 0fc4ec4af2a471ea61728ec3dcd2be4e3d1b984f..e52fe1018e948833d250b00484b73e23993e7c82 100644
+--- a/clutter/clutter/clutter-frame-clock.h
++++ b/clutter/clutter/clutter-frame-clock.h
+@@ -132,6 +132,9 @@ void clutter_frame_clock_remove_timeline (ClutterFrameClock *frame_clock,
+ CLUTTER_EXPORT
+ float clutter_frame_clock_get_refresh_rate (ClutterFrameClock *frame_clock);
+ 
++CLUTTER_EXPORT
++int64_t clutter_frame_clock_get_presentation_wait_us (ClutterFrameClock *frame_clock);
++
+ void clutter_frame_clock_record_flip_time (ClutterFrameClock *frame_clock,
+                                            int64_t            flip_time_us);
+ 
+diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
+index ff85fd84c42eb70c98265159ecc0c64b7cd584cb..958f0843741d398100189ed68fb7d21f0bc77cc2 100644
+--- a/src/backends/meta-backend.c
++++ b/src/backends/meta-backend.c
+@@ -55,6 +55,7 @@
+ #include "backends/meta-barrier-private.h"
+ #include "backends/meta-color-manager-private.h"
+ #include "backends/meta-cursor-renderer.h"
++#include "backends/meta-renderer-view.h"
+ #include "backends/meta-cursor-theme.h"
+ #include "backends/meta-cursor-tracker-private.h"
+ #include "backends/meta-dbus-session-watcher.h"
+@@ -88,6 +89,7 @@
+ #endif
+ 
+ #include "backends/native/meta-backend-native.h"
++#include "backends/native/meta-crtc-virtual.h"
+ 
+ #include "backends/meta-launcher.h"
+ #include "backends/meta-udev.h"
+@@ -1513,6 +1515,37 @@ meta_backend_get_last_input_device (MetaBackend *backend)
+   return priv->current_device;
+ }
+ 
++/**
++ * meta_backend_get_presentation_wait_us:
++ * @backend: a #MetaBackend
++ *
++ * Returns: how long the oldest frame handed to a physical display has been
++ *   waiting to be presented, in microseconds, or 0 when none is waiting.
++ */
++int64_t
++meta_backend_get_presentation_wait_us (MetaBackend *backend)
++{
++  MetaRenderer *renderer = meta_backend_get_renderer (backend);
++  int64_t wait_us = 0;
++  GList *l;
++
++  for (l = meta_renderer_get_views (renderer); l; l = l->next)
++    {
++      MetaRendererView *view = l->data;
++      ClutterFrameClock *frame_clock;
++
++      if (META_IS_CRTC_VIRTUAL (meta_renderer_view_get_crtc (view)))
++        continue;
++
++      frame_clock =
++        clutter_stage_view_get_frame_clock (CLUTTER_STAGE_VIEW (view));
++      wait_us = MAX (wait_us,
++                     clutter_frame_clock_get_presentation_wait_us (frame_clock));
++    }
++
++  return wait_us;
++}
++
+ MetaIdleManager *
+ meta_backend_get_idle_manager (MetaBackend *backend)
+ {
+diff --git a/src/meta/meta-backend.h b/src/meta/meta-backend.h
+index fba51a560052a8ee080218c59d8d33dfcf27fac0..47a634b0826ef667951ced61f223409c67805dda 100644
+--- a/src/meta/meta-backend.h
++++ b/src/meta/meta-backend.h
+@@ -103,3 +103,6 @@ MetaLogicalMonitor * meta_backend_get_current_logical_monitor (MetaBackend *back
+ 
+ META_EXPORT
+ ClutterInputDevice * meta_backend_get_last_input_device (MetaBackend *backend);
++
++META_EXPORT
++int64_t meta_backend_get_presentation_wait_us (MetaBackend *backend);

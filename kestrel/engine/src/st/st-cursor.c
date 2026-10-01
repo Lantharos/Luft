@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "st-cursor.h"
+#include "st-private.h"
 
 #include <librsvg/rsvg.h>
 #include <json-glib/json-glib.h>
@@ -438,7 +439,7 @@ st_cursor_get_texture (ClutterCursor *clutter_cursor)
   g_assert (cursor->current_frame < cursor->frames->len);
   frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
 
-  if (cursor->texture_invalidated)
+  if (cursor->texture_invalidated || _st_texture_is_defunct (frame->texture))
     {
       st_cursor_get_data (clutter_cursor, NULL);
       g_clear_object (&frame->texture);

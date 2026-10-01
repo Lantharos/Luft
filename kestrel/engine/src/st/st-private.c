@@ -236,10 +236,16 @@ _st_set_text_from_style (ClutterText *text,
 CoglPipeline *
 _st_create_texture_pipeline (CoglTexture *src_texture)
 {
-  static CoglPipeline *texture_pipeline_template = NULL;
+  static CoglPipelineKey texture_pipeline_key = "st-create-texture-pipeline";
+  CoglContext *ctx;
+  CoglPipeline *texture_pipeline_template;
   CoglPipeline *pipeline;
 
   g_return_val_if_fail (src_texture != NULL, NULL);
+
+  ctx = cogl_texture_get_context (src_texture);
+  texture_pipeline_template = cogl_context_get_named_pipeline (ctx,
+                                                               &texture_pipeline_key);
 
   /* The only state used in the pipeline that would affect the shader
      generation is the texture type on the layer. Therefore we create
@@ -249,16 +255,15 @@ _st_create_texture_pipeline (CoglTexture *src_texture)
      pipeline ancestry instead of resorting to the shader cache. */
   if (G_UNLIKELY (texture_pipeline_template == NULL))
     {
-      CoglContext *ctx = cogl_texture_get_context (src_texture);
-
       texture_pipeline_template = cogl_pipeline_new (ctx);
       cogl_pipeline_set_layer_null_texture (texture_pipeline_template, 0);
+      cogl_context_set_named_pipeline (ctx,
+                                       &texture_pipeline_key,
+                                       texture_pipeline_template);
     }
 
   pipeline = cogl_pipeline_copy (texture_pipeline_template);
-
-  if (src_texture != NULL)
-    cogl_pipeline_set_layer_texture (pipeline, 0, src_texture);
+  cogl_pipeline_set_layer_texture (pipeline, 0, src_texture);
 
   return pipeline;
 }
@@ -427,7 +432,8 @@ _st_create_shadow_pipeline (StShadow            *shadow_spec,
 
   static CoglPipelineKey texture_pipeline_key =
     "st-create-shadow-pipeline-saturate-alpha";
-  static CoglPipeline *shadow_pipeline_template = NULL;
+  static CoglPipelineKey shadow_pipeline_key = "st-create-shadow-pipeline";
+  CoglPipeline *shadow_pipeline_template;
 
   g_return_val_if_fail (shadow_spec != NULL, NULL);
   g_return_val_if_fail (src_texture != NULL, NULL);
@@ -511,6 +517,8 @@ _st_create_shadow_pipeline (StShadow            *shadow_spec,
   clutter_paint_context_pop_color_state (nested_paint_context);
   clutter_paint_context_destroy (nested_paint_context);
 
+  shadow_pipeline_template = cogl_context_get_named_pipeline (cogl_context,
+                                                              &shadow_pipeline_key);
   if (G_UNLIKELY (shadow_pipeline_template == NULL))
     {
       shadow_pipeline_template = cogl_pipeline_new (cogl_context);
@@ -521,6 +529,9 @@ _st_create_shadow_pipeline (StShadow            *shadow_spec,
       cogl_pipeline_set_layer_combine (shadow_pipeline_template, 0,
                                        "RGBA = MODULATE (CONSTANT, TEXTURE[A])",
                                        NULL);
+      cogl_context_set_named_pipeline (cogl_context,
+                                       &shadow_pipeline_key,
+                                       shadow_pipeline_template);
     }
 
   pipeline = cogl_pipeline_copy (shadow_pipeline_template);

@@ -769,6 +769,7 @@ st_entry_paint_node (ClutterActor        *actor,
       clutter_actor_box_get_size (&allocation, &width, &height);
 
       if (priv->text_shadow_pipeline == NULL ||
+          _st_pipeline_is_defunct (priv->text_shadow_pipeline) ||
           width != priv->shadow_width ||
           height != priv->shadow_height)
         {

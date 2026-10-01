@@ -220,6 +220,13 @@ on_icon_theme_changed (StIconTheme    *icon_theme,
   g_signal_emit (self, signals[ICON_THEME_CHANGED], 0);
 }
 
+void
+_st_texture_cache_reload_graphics (StTextureCache *cache)
+{
+  g_hash_table_remove_all (cache->keyed_cache);
+  g_signal_emit (cache, signals[ICON_THEME_CHANGED], 0);
+}
+
 static void
 st_texture_cache_init (StTextureCache *self)
 {

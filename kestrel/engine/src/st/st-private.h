@@ -27,6 +27,7 @@
 #include "st-widget.h"
 #include "st-bin.h"
 #include "st-shadow.h"
+#include "st-texture-cache.h"
 
 G_BEGIN_DECLS
 
@@ -53,6 +54,20 @@ void _st_set_text_from_style (ClutterText *text,
                               StThemeNode *theme_node);
 
 CoglPipeline * _st_create_texture_pipeline (CoglTexture *src_texture);
+
+void _st_texture_cache_reload_graphics (StTextureCache *cache);
+
+static inline gboolean
+_st_pipeline_is_defunct (CoglPipeline *pipeline)
+{
+  return pipeline && cogl_context_is_defunct (cogl_pipeline_get_context (pipeline));
+}
+
+static inline gboolean
+_st_texture_is_defunct (CoglTexture *texture)
+{
+  return texture && cogl_context_is_defunct (cogl_texture_get_context (texture));
+}
 
 /* Helper for widgets which need to draw additional shadows */
 CoglPipeline * _st_create_shadow_pipeline (StShadow            *shadow_spec,

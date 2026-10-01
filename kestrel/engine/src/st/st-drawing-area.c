@@ -33,6 +33,7 @@
  */
 
 #include "st-drawing-area.h"
+#include "st-private.h"
 
 #include <cairo.h>
 #include <math.h>
@@ -91,6 +92,12 @@ st_drawing_area_paint_node (ClutterActor        *actor,
   StDrawingArea *area = ST_DRAWING_AREA (actor);
   StDrawingAreaPrivate *priv = st_drawing_area_get_instance_private (area);
   ClutterPaintNode *node;
+
+  if (_st_texture_is_defunct (priv->texture))
+    {
+      g_clear_object (&priv->texture);
+      st_drawing_area_queue_repaint (area);
+    }
 
   if (priv->buffer == NULL)
     return;

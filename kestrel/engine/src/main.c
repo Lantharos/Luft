@@ -585,6 +585,8 @@ main (int argc, char **argv)
     }
 
   meta_context_set_plugin_gtype (context, gnome_shell_plugin_get_type ());
+  meta_context_enable_cogl_display_features (context,
+                                             COGL_DISPLAY_FEATURE_RESET_NOTIFICATION);
   meta_context_set_gnome_wm_keybindings (context, GNOME_WM_KEYBINDINGS);
 
   init_signal_handlers (context);

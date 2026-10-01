@@ -211,6 +211,9 @@ st_image_content_paint_content (ClutterContent      *content,
   StImageContent *image_content = ST_IMAGE_CONTENT (content);
   ClutterPaintNode *node;
 
+  if (_st_texture_is_defunct (image_content->texture))
+    g_clear_object (&image_content->texture);
+
   if (image_content->texture == NULL)
     return;
 

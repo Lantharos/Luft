@@ -132,6 +132,17 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       const clipboard = await new Promise(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
       require(!panel.visible && window.title === 'Kestrel entry: 🚀' && clipboard === KEPT,
         'an X11 app gets the emoji pasted and the clipboard keeps its content');
+
+      const picture = new Uint8Array(256 * 1024).map((_, index) => index * 31);
+      St.Clipboard.get_default().set_content(St.ClipboardType.CLIPBOARD, 'image/png', new GLib.Bytes(picture));
+      await openFromKeyboard(Clutter.KEY_semicolon);
+      type('rocket');
+      await pause(200);
+      press(Clutter.KEY_Return);
+      await pause(900);
+      const kept = await new Promise(resolve => St.Clipboard.get_default().get_content(St.ClipboardType.CLIPBOARD, 'image/png', (_clipboard, bytes) => resolve(bytes?.toArray())));
+      require(window.title === 'Kestrel entry: 🚀🚀' && kept?.length === picture.length && kept.every((value, index) => value === picture[index]),
+        'a picture on the clipboard survives pasting an emoji into an X11 app');
     } finally {
       x11App.force_exit();
     }

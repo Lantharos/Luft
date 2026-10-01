@@ -58,7 +58,7 @@ dbus-run-session -- bash -c '
   fi
   gjs -m "$root/kestrel/build/js/ui/kestrel-session.js" &
   timeout 5 gdbus wait --session org.gnome.SessionManager
-  coproc system_bus { dbus-daemon --session --nofork --print-address; }
+  coproc system_bus { exec dbus-daemon --session --nofork --print-address; }
   trap "kill $system_bus_PID" EXIT
   read -r KESTREL_SYSTEM_BUS <&"${system_bus[0]}"
   export KESTREL_SYSTEM_BUS

@@ -24,7 +24,9 @@ fn image_at(bytes: &[u8], position: usize) -> Option<RgbaImage> {
     let start = position + IMAGE_HEADER;
     let pixels = bytes.get(start..start + width as usize * height as usize * 4)?;
     let rgba = pixels
-        .chunks_exact(4)
+        .as_chunks::<4>()
+        .0
+        .iter()
         .flat_map(|bgra| match bgra[3] {
             0 => [0; 4],
             alpha => [

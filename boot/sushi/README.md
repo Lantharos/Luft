@@ -142,6 +142,16 @@ scripts/vm/run.sh        # boot it in a window
 
 Everything lives in `vm/`; set `SUSHI_VM` to another folder to keep a second machine next to it. `LUKS=1 scripts/vm/disk.sh` encrypts the root disk (the passphrase is `sushi-vm`, as is the password of the `sushi` account). `MENU_TIMEOUT=3` shows SushiBoot's menu.
 
+`LAYOUT=fedora scripts/vm/disk.sh` builds the disk the way Fedora's installer does instead: one GPT disk with an EFI system partition holding Fedora's shim and GRUB, `/boot` on its own ext4 partition with the kernels and boot entries, and a btrfs root partition with `root` and `home` subvolumes. The firmware finds shim on its own and adds a Fedora entry on the first start, as on a fresh install. `KERNEL=7.2.7-300.fc45 scripts/vm/tree.sh` installs a specific kernel, which leaves room to test a kernel update later.
+
+`run.sh` takes a few switches for the machine itself:
+
+| Variable | Effect |
+|----------|--------|
+| `SECURE_BOOT=1` | OVMF with Secure Boot on and Microsoft's keys enrolled, so only signed boot loaders start |
+| `TPM=2` | A software TPM 2.0 (swtpm) whose state stays in `tpm2/` next to the disk, like a TPM soldered to the board |
+| `TPM=1.2` | An old TPM 1.2 instead |
+
 `scripts/vm/record.py` boots the VM without a window, types at given times, answers prompts on the serial console, and saves every frame, which is how the hand-overs are checked frame by frame:
 
 ```bash

@@ -19,7 +19,7 @@ podman unshare sh -c "
   cp -a '$stage/.' '$tree/'
   echo 'LABEL=luft-root / ext4 defaults 0 1' > '$tree/etc/fstab'
   mkdir -p '$tree/etc/dracut.conf.d'
-  printf '%s\n' 'add_dracutmodules+=\" sushi crypt \"' 'omit_drivers+=\" virtio_gpu \"' > '$tree/etc/dracut.conf.d/90-sushi-vm.conf'
+  printf '%s\n' 'add_dracutmodules+=\" sushi crypt tpm2-tss \"' 'omit_drivers+=\" virtio_gpu \"' > '$tree/etc/dracut.conf.d/90-sushi-vm.conf'
   echo '$HOME /opt' > '$contexts/file_contexts.subs'
   echo 'SUBSYSTEM==\"drm\", KERNEL==\"card[0-9]*\", ACTION==\"add\", PROGRAM=\"/usr/bin/sleep 0.5\"' > '$tree/etc/udev/rules.d/50-slow-drm.rules'
 "
@@ -29,6 +29,7 @@ podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
   dracut --quiet --force --no-hostonly --kver '$kernel'
 "
 podman unshare setfiles -r "$tree" "$contexts/file_contexts" "$tree"
+[[ "${LAYOUT:-}" == fedora ]] && exec "$root/scripts/vm/fedora.sh" "$kernel"
 
 rm -rf "$esp"
 mkdir -p "$esp/EFI/BOOT" "$esp/loader/entries"

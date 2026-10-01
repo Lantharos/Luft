@@ -16,7 +16,7 @@ import { QuickSettings } from './quickSettings/quickSettings.js';
 import { NotificationCenter } from './notifications/notificationCenter.js';
 import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
-import { loadKestrelStylesheet } from './shared/stylesheet.js';
+import { loadKestrelStylesheets } from './shared/stylesheet.js';
 import { AppearanceService } from './appearance/service.js';
 import { ClipboardPanel } from './clipboard/panel.js';
 import { EmojiPanel } from './emoji/panel.js';
@@ -63,7 +63,7 @@ class KestrelUi {
   private readonly snapLayouts: SnapLayouts;
   private readonly taskView: TaskView;
   private readonly cover = new St.Widget({ reactive: true, visible: false });
-  private readonly stylesheetMonitor: Gio.FileMonitor | null;
+  private readonly stylesheetMonitors: Gio.FileMonitor[];
   private active: Surface | null = null;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private focusWindow: Meta.Window | null = null;
@@ -85,7 +85,7 @@ class KestrelUi {
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
-    this.stylesheetMonitor = loadKestrelStylesheet();
+    this.stylesheetMonitors = loadKestrelStylesheets();
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
     this.menus = new ContextMenus((x, y) => this.monitorAt(x, y), () => this.close(), () => this.canInteract(), () => this.previews.close(), context.activateWindow);
@@ -448,7 +448,7 @@ class KestrelUi {
     this.launchFeedback.destroy();
     this.globalShortcuts.destroy();
     this.portal.destroy();
-    this.stylesheetMonitor?.cancel();
+    for (const monitor of this.stylesheetMonitors) monitor.cancel();
   }
 
   switchWorkspace(index: number): void { this.workspaces.switchTo(index); }

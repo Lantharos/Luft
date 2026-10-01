@@ -4,6 +4,7 @@
     <file>gnome-shell-dark.css</file>
     <file>gnome-shell-high-contrast.css</file>
     <file>kestrel.css</file>
+    <file>kestrel-portal.css</file>
     <file>pad-osd.css</file>
   </gresource>
 </gresources>

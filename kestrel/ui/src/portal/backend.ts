@@ -1,33 +1,39 @@
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 
 import type { Rgb } from '../appearance/color.js';
-import { SCREENSHOT_XML, ScreenshotPortal } from './screenshot.js';
-import { SETTINGS_XML, SettingsPortal } from './settings.js';
+import { SettingsPortal } from './appearance/settings.js';
+import { ScreenshotPortal } from './capture/screenshot.js';
 
 const BUS_NAME = 'org.freedesktop.impl.portal.desktop.kestrel';
 const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 
+interface Portal {
+  readonly dbus: Gio.DBusExportedObject;
+  destroy?(): void;
+}
+
 export class PortalBackend {
-  private readonly screenshot = Gio.DBusExportedObject.wrapJSObject(SCREENSHOT_XML, new ScreenshotPortal());
-  private readonly settingsPortal = new SettingsPortal((key, value) =>
-    this.settings.emit_signal('SettingChanged', new GLib.Variant('(ssv)', ['org.freedesktop.appearance', key, value])));
-  private readonly settings = Gio.DBusExportedObject.wrapJSObject(SETTINGS_XML, this.settingsPortal);
+  private readonly settings = new SettingsPortal();
+  private readonly portals: Portal[] = [
+    this.settings,
+    new ScreenshotPortal(),
+  ];
   private readonly nameId: number;
 
   constructor() {
-    this.screenshot.export(Gio.DBus.session, PORTAL_PATH);
-    this.settings.export(Gio.DBus.session, PORTAL_PATH);
+    for (const portal of this.portals) portal.dbus.export(Gio.DBus.session, PORTAL_PATH);
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.NONE, null, null);
   }
 
   setAccent(accent: Rgb): void {
-    this.settingsPortal.setAccent(accent);
+    this.settings.setAccent(accent);
   }
 
   destroy(): void {
     Gio.bus_unown_name(this.nameId);
-    this.screenshot.unexport();
-    this.settings.unexport();
+    for (const portal of this.portals) {
+      portal.dbus.unexport();
+      portal.destroy?.();
+    }
   }
 }

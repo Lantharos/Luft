@@ -55,7 +55,7 @@ pub fn bounds(layout: &Layout) -> Rect {
     }
 }
 
-fn fill_pill(pixmap: &mut PixmapMut, area: Option<SkRect>, alpha: f32, shift: Transform) {
+fn fill_pill(pixmap: &mut PixmapMut, area: Option<SkRect>, alpha: f32, view: Transform) {
     let Some(shape) = area.and_then(crate::pill) else {
         return;
     };
@@ -64,7 +64,7 @@ fn fill_pill(pixmap: &mut PixmapMut, area: Option<SkRect>, alpha: f32, shift: Tr
         ..Paint::default()
     };
     paint.set_color_rgba8(255, 255, 255, libm::roundf(alpha * 255.0) as u8);
-    pixmap.fill_path(&shape, &paint, FillRule::Winding, shift, None);
+    pixmap.fill_path(&shape, &paint, FillRule::Winding, view, None);
 }
 
 fn filled_span(progress: Progress, width: f32, height: f32) -> Option<(f32, f32)> {
@@ -87,7 +87,7 @@ fn filled_span(progress: Progress, width: f32, height: f32) -> Option<(f32, f32)
 fn draw_bar(
     pixmap: &mut PixmapMut,
     layout: &Layout,
-    origin: (i32, i32),
+    view: Transform,
     progress: Progress,
     alpha: f32,
 ) {
@@ -95,44 +95,38 @@ fn draw_bar(
     let (width, height) = (BAR_WIDTH * scale, BAR_HEIGHT * scale);
     let left = layout.loader_center.0 - width / 2.0;
     let top = lines(layout).bar - height / 2.0;
-    let shift = Transform::from_translate(-origin.0 as f32, -origin.1 as f32);
     fill_pill(
         pixmap,
         SkRect::from_xywh(left, top, width, height),
         0.18 * alpha,
-        shift,
+        view,
     );
     if let Some((offset, length)) = filled_span(progress, width, height) {
         fill_pill(
             pixmap,
             SkRect::from_xywh(left + offset, top, length, height),
             0.92 * alpha,
-            shift,
+            view,
         );
     }
 }
 
-pub fn draw(
-    pixmap: &mut PixmapMut,
-    layout: &Layout,
-    origin: (i32, i32),
-    status: &Status,
-    alpha: f32,
-) {
+pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, view: Transform, status: &Status, alpha: f32) {
     let scale = layout.scale;
     let lines = lines(layout);
-    let center = layout.loader_center.0 - origin.0 as f32;
-    let at = |baseline: f32| (center, baseline - origin.1 as f32);
+    let at = |baseline: f32| (layout.loader_center.0, baseline);
     text::centered(
         pixmap,
+        view,
         &status.title,
         at(lines.title),
         TITLE_SIZE * scale,
         0.92 * alpha,
     );
-    draw_bar(pixmap, layout, origin, status.progress, alpha);
+    draw_bar(pixmap, layout, view, status.progress, alpha);
     text::centered(
         pixmap,
+        view,
         &status.note,
         at(lines.note),
         NOTE_SIZE * scale,
@@ -141,6 +135,7 @@ pub fn draw(
     if let Some(detail) = &status.detail {
         text::centered(
             pixmap,
+            view,
             detail,
             at(lines.detail),
             NOTE_SIZE * scale,

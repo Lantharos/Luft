@@ -2,15 +2,19 @@
 
 extern crate alloc;
 
-mod bmp;
+mod image;
 pub mod loader;
+mod logo;
+mod monitor;
 mod notice;
 mod prompt;
 mod scene;
 mod status;
 pub mod text;
 
-pub use bmp::decode_bmp;
+pub use image::decode_bmp;
+pub use logo::FirmwareLogo;
+pub use monitor::Monitor;
 pub use notice::Notice;
 pub use prompt::{Prompt, is_shaking};
 pub use scene::{Scene, Visuals};
@@ -62,43 +66,6 @@ impl Rect {
             y,
             width: (self.right().max(other.right()) - x) as u32,
             height: (self.bottom().max(other.bottom()) - y) as u32,
-        }
-    }
-}
-
-/// Where the firmware drew its logo, and on which screen size.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FirmwareLogo {
-    pub x: i32,
-    pub y: i32,
-    pub width: u32,
-    pub height: u32,
-    pub screen_width: u32,
-    pub screen_height: u32,
-}
-
-impl FirmwareLogo {
-    pub fn placed_on(&self, width: u32, height: u32) -> Rect {
-        if width == self.screen_width && height == self.screen_height {
-            return Rect {
-                x: self.x,
-                y: self.y,
-                width: self.width,
-                height: self.height,
-            };
-        }
-        let centered = (self.x * 2 + self.width as i32 - self.screen_width as i32).abs() <= 2;
-        let x = if centered {
-            (width as i32 - self.width as i32) / 2
-        } else {
-            (self.x as i64 * width as i64 / self.screen_width.max(1) as i64) as i32
-        };
-        let y = (self.y as i64 * height as i64 / self.screen_height.max(1) as i64) as i32;
-        Rect {
-            x,
-            y,
-            width: self.width,
-            height: self.height,
         }
     }
 }

@@ -446,7 +446,6 @@ name = "sushiboot"
 version = "0.2.0"
 dependencies = [
  "libm",
- "log",
  "sushi-scene",
  "uefi",
 ]

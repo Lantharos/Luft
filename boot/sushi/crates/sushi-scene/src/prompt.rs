@@ -89,35 +89,31 @@ pub fn is_shaking(prompt: &Prompt, seconds: f32) -> bool {
 pub fn draw(
     pixmap: &mut PixmapMut,
     layout: &Layout,
-    origin: (i32, i32),
+    view: Transform,
     prompt: &Prompt,
     seconds: f32,
     alpha: f32,
 ) {
     let geometry = geometry(layout);
     let scale = geometry.scale;
-    let shift = Transform::from_translate(
-        -origin.0 as f32 + shake_offset(prompt, seconds, scale),
-        -origin.1 as f32,
-    );
-    let center = layout.loader_center.0 - origin.0 as f32;
+    let shift = view.pre_translate(shake_offset(prompt, seconds, scale), 0.0);
+    let center = layout.loader_center.0;
     let lines = prompt.explanation.len().min(MOST_LINES);
 
     text::centered(
         pixmap,
+        view,
         &prompt.title,
-        (center, title_baseline(&geometry, lines) - origin.1 as f32),
+        (center, title_baseline(&geometry, lines)),
         TITLE_SIZE * scale,
         0.92 * alpha,
     );
     for (index, line) in prompt.explanation.iter().take(MOST_LINES).enumerate() {
         text::centered(
             pixmap,
+            view,
             line,
-            (
-                center,
-                explanation_baseline(&geometry, lines, index) - origin.1 as f32,
-            ),
+            (center, explanation_baseline(&geometry, lines, index)),
             EXPLANATION_SIZE * scale,
             0.6 * alpha,
         );
@@ -140,11 +136,9 @@ pub fn draw(
     if prompt.typed == 0 {
         text::draw(
             pixmap,
+            shift,
             &prompt.placeholder,
-            (
-                first_x + shift.tx,
-                dot_y + NOTE_SIZE * scale * 0.36 + shift.ty,
-            ),
+            (first_x, dot_y + NOTE_SIZE * scale * 0.36),
             15.0 * scale,
             0.5 * alpha,
         );
@@ -166,8 +160,9 @@ pub fn draw(
     if let Some((note, brightness)) = &prompt.note {
         text::centered(
             pixmap,
+            view,
             note,
-            (center, geometry.note_baseline - origin.1 as f32),
+            (center, geometry.note_baseline),
             NOTE_SIZE * scale,
             brightness * alpha,
         );

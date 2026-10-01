@@ -1,0 +1,21 @@
+[package]
+name = "vm-display"
+description = "Plays the part of a graphics card's firmware in the Sushi VM: hands over a chosen framebuffer and describes the monitor"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "vm-display"
+path = "src/main.rs"
+
+[dependencies]
+log = "0.4.34"
+uefi = { version = "0.41.0", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
+
+[workspace]
+
+[profile.release]
+lto = true
+panic = "abort"

@@ -53,19 +53,15 @@ fn push_arc(path: &mut PathBuilder, (cx, cy): (f32, f32), radius: f32, start: f3
     }
 }
 
-pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, origin: (i32, i32), seconds: f32, alpha: f32) {
+pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, view: Transform, seconds: f32, alpha: f32) {
     if alpha <= 0.0 {
         return;
     }
     let scale = layout.scale;
-    let center = (
-        layout.loader_center.0 - origin.0 as f32,
-        layout.loader_center.1 - origin.1 as f32,
-    );
     let radius = layout.loader_size / 2.0 - INSET * scale;
     let (start, sweep) = arc(seconds);
     let mut path = PathBuilder::new();
-    push_arc(&mut path, center, radius, start, sweep);
+    push_arc(&mut path, layout.loader_center, radius, start, sweep);
     let Some(path) = path.finish() else { return };
 
     let mut paint = Paint {
@@ -83,5 +79,5 @@ pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, origin: (i32, i32), seconds
         line_cap: LineCap::Round,
         ..Stroke::default()
     };
-    pixmap.stroke_path(&path, &paint, &stroke, Transform::identity(), None);
+    pixmap.stroke_path(&path, &paint, &stroke, view, None);
 }

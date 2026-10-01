@@ -38,6 +38,7 @@ pub fn width(text: &str, size: f32) -> f32 {
 
 pub fn centered(
     pixmap: &mut PixmapMut,
+    view: Transform,
     line: &str,
     (center, baseline): (f32, f32),
     size: f32,
@@ -45,6 +46,7 @@ pub fn centered(
 ) {
     draw(
         pixmap,
+        view,
         line,
         (center - width(line, size) / 2.0, baseline),
         size,
@@ -52,7 +54,14 @@ pub fn centered(
     );
 }
 
-pub fn draw(pixmap: &mut PixmapMut, text: &str, (x, baseline): (f32, f32), size: f32, alpha: f32) {
+pub fn draw(
+    pixmap: &mut PixmapMut,
+    view: Transform,
+    text: &str,
+    (x, baseline): (f32, f32),
+    size: f32,
+    alpha: f32,
+) {
     let font = font();
     let factor = font.as_scaled(scale(size)).h_scale_factor();
     let mut path = PathBuilder::new();
@@ -107,11 +116,5 @@ pub fn draw(pixmap: &mut PixmapMut, text: &str, (x, baseline): (f32, f32), size:
         255,
         libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
     );
-    pixmap.fill_path(
-        &path,
-        &paint,
-        FillRule::Winding,
-        Transform::identity(),
-        None,
-    );
+    pixmap.fill_path(&path, &paint, FillRule::Winding, view, None);
 }

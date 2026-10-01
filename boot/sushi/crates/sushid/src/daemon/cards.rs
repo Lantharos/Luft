@@ -3,7 +3,7 @@ use std::path::Path;
 use sushi::display::{Card, Display};
 use sushi::uevent::CardEvent;
 
-use super::{Daemon, Phase, Screen};
+use super::{Daemon, Firmware, Phase, Screen};
 
 impl Daemon {
     pub(super) fn find_display(&mut self) {
@@ -27,20 +27,35 @@ impl Daemon {
     }
 
     fn adopt(&mut self, display: Display) {
-        eprintln!(
-            "Showing the splash on {} at {:?}",
-            display.path().display(),
-            display.sizes()
-        );
-        let size = *self.firmware_size.get_or_insert_with(|| display.sizes()[0]);
-        self.held = None;
-        let old = self
-            .screen
-            .replace(Screen::new(display, self.logo.as_ref(), size));
-        if let Some(old) = old {
-            drop(old.into_card());
+        let firmware = self
+            .firmware
+            .get_or_insert_with(|| Firmware::left_on(&display, self.logo.take(), &self.hints));
+        match firmware.stretched_over(&display) {
+            Some((width, height)) => eprintln!(
+                "Showing the splash on {} at {:?}, stretched by the monitor to {width}×{height}",
+                display.path().display(),
+                display.sizes()
+            ),
+            None => eprintln!(
+                "Showing the splash on {} at {:?}",
+                display.path().display(),
+                display.sizes()
+            ),
         }
+        self.held = None;
+        if let Some(old) = self.screen.take() {
+            let (scene, card) = old.into_parts();
+            drop(card);
+            self.previous = scene;
+        }
+        self.screen = Some(Screen::new(display, firmware, self.previous.take()));
         self.take_terminal();
+    }
+
+    pub(super) fn forget_screen(&mut self) {
+        if let Some(screen) = self.screen.take() {
+            self.previous = screen.into_parts().0;
+        }
     }
 
     pub(super) fn handle_cards(&mut self) {
@@ -51,15 +66,17 @@ impl Daemon {
                     if self.shows(&path)
                         && matches!(self.phase, Phase::Splash | Phase::Leaving(_)) =>
                 {
-                    let size = self.firmware_size.unwrap_or_default();
-                    self.screen = self.screen.take().and_then(|screen| {
-                        screen.refresh(&self.hints, self.logo.as_ref(), size).ok()
-                    });
+                    if let Some(firmware) = &self.firmware {
+                        self.screen = self
+                            .screen
+                            .take()
+                            .and_then(|screen| screen.refresh(&self.hints, firmware).ok());
+                    }
                 }
                 CardEvent::Removed(path) => {
                     if self.shows(&path) {
                         eprintln!("{} went away", path.display());
-                        self.screen = None;
+                        self.forget_screen();
                     }
                     if self.held.as_ref().is_some_and(|card| card.path() == path) {
                         self.held = None;

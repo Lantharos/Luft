@@ -214,6 +214,7 @@ impl Daemon {
             Phase::Leaving(pending) => pending.into_iter().for_each(|waiter| self.finish(waiter)),
             Phase::Waiting(_) | Phase::Holding => {
                 eprintln!("Taking the display back");
+                self.previous = None;
                 if let Some(screen) = self.screen.take() {
                     self.held = Some(screen.into_card());
                 }

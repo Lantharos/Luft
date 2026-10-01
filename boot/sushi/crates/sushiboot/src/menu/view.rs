@@ -105,11 +105,11 @@ impl View<'_> {
         }
     }
 
-    pub fn draw(&self, canvas: &mut PixmapMut, layout: &Layout, origin: (i32, i32), alpha: f32) {
+    pub fn draw(&self, canvas: &mut PixmapMut, layout: &Layout, view: Transform, alpha: f32) {
         let scale = layout.scale;
         let area = self.area(layout);
-        let left = (area.x - origin.0) as f32;
-        let top = (area.y - origin.1) as f32;
+        let left = area.x as f32;
+        let top = area.y as f32;
         let width = area.width as f32 - 1.0;
         let row_height = ROW_HEIGHT * scale;
         let first = self.selected.saturating_sub(VISIBLE_ROWS - 1);
@@ -124,19 +124,14 @@ impl View<'_> {
                     ..Paint::default()
                 };
                 paint.set_color_rgba8(255, 255, 255, (0.16 * alpha * 255.0) as u8);
-                canvas.fill_path(
-                    &shape,
-                    &paint,
-                    FillRule::Winding,
-                    Transform::identity(),
-                    None,
-                );
+                canvas.fill_path(&shape, &paint, FillRule::Winding, view, None);
             }
             let size = TITLE_SIZE * scale;
             let title = fitted(self.title(index), size, width - 2.0 * ROW_PADDING * scale);
             let brightness = if index == self.selected { 1.0 } else { 0.72 };
             text::centered(
                 canvas,
+                view,
                 &title,
                 (left + width / 2.0, y + row_height / 2.0 + size * 0.36),
                 size,
@@ -148,6 +143,7 @@ impl View<'_> {
             let baseline = top + shown as f32 * row_height + 34.0 * scale;
             text::centered(
                 canvas,
+                view,
                 &hint,
                 (left + width / 2.0, baseline),
                 size,

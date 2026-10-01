@@ -143,6 +143,10 @@ impl Display {
         self.card.path()
     }
 
+    pub fn card(&self) -> &Card {
+        &self.card
+    }
+
     pub fn sizes(&self) -> Vec<(u32, u32)> {
         self.outputs.iter().map(Output::size).collect()
     }

@@ -2,6 +2,7 @@ pub mod config;
 pub mod control;
 pub mod display;
 pub mod luks;
+pub mod notice_file;
 pub mod password;
 pub mod plymouth;
 pub mod render;

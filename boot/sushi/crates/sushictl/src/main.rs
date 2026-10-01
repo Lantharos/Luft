@@ -27,7 +27,7 @@ enum Action {
     Show { mode: Mode },
     /// Print whether the splash is showing, handing over, or holding the display between sessions
     Status,
-    /// Explain the key enrollment screen at the next restart, with the one-time code to type there, or clear it
+    /// Explain the key enrollment screen at the next restart, or show a notice from a file now and wait until it's dismissed
     Notice {
         #[command(subcommand)]
         notice: Notice,
@@ -43,6 +43,10 @@ enum Notice {
         again: bool,
     },
     Clear,
+    /// Show the notice described in a file and print the key that dismissed it, if it offered one
+    Show {
+        file: PathBuf,
+    },
 }
 
 fn main() -> ExitCode {
@@ -58,13 +62,20 @@ fn main() -> ExitCode {
         Action::Notice {
             notice: Notice::Clear,
         } => Command::KeyEnrollmentNotice(None),
+        Action::Notice {
+            notice: Notice::Show { file },
+        } => Command::ShowNotice(file),
     };
     let wait = match command {
-        Command::Show(Mode::Shutdown) => NOTICE_WAIT,
+        Command::Show(Mode::Shutdown) | Command::ShowNotice(_) => NOTICE_WAIT,
         _ => Duration::from_secs(5),
     };
     match control::send(&command, wait) {
         Ok(reply) if reply == "ok" => ExitCode::SUCCESS,
+        Ok(reply) if reply.starts_with("key ") => {
+            println!("{}", &reply["key ".len()..]);
+            ExitCode::SUCCESS
+        }
         Ok(reply) if command == Command::Status => {
             println!("{reply}");
             ExitCode::SUCCESS

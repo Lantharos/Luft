@@ -5,8 +5,8 @@ use std::time::Duration;
 
 use sushi::config::Config;
 use sushi::control::{Command, Mode};
+use sushi::notice_file::NoticeFile;
 use sushi::plymouth::{Client, Request, Response};
-use sushi::scene::Notice;
 
 use crate::notice::{self, Shown};
 
@@ -49,7 +49,8 @@ impl Daemon {
                     .filter(|_| mode == Mode::Shutdown)
                 {
                     Some(enrollment) => {
-                        self.show_notice(notice::key_enrollment(&enrollment), stream)
+                        eprintln!("Explaining the key enrollment screen before restarting");
+                        self.show_notice(Shown::new(notice::key_enrollment(&enrollment), stream))
                     }
                     None => reply(stream, "ok"),
                 }
@@ -59,6 +60,19 @@ impl Daemon {
                 self.key_enrollment = enrollment;
                 reply(stream, "ok");
             }
+            Command::ShowNotice(path) if matches!(self.phase, Phase::Splash) => {
+                match NoticeFile::load(&path) {
+                    Ok(file) => {
+                        eprintln!("Showing the notice in {}", path.display());
+                        self.show_notice(Shown::counting_down(file, stream));
+                    }
+                    Err(error) => reply(
+                        stream,
+                        &format!("Couldn't read {}: {error}", path.display()),
+                    ),
+                }
+            }
+            Command::ShowNotice(_) => reply(stream, "The splash isn't on screen"),
         }
     }
 
@@ -143,8 +157,7 @@ impl Daemon {
         }
     }
 
-    fn show_notice(&mut self, shown: Notice, stream: UnixStream) {
-        eprintln!("Explaining the key enrollment screen before restarting");
+    fn show_notice(&mut self, shown: Shown) {
         let now = self.now();
         self.take_terminal();
         if let Some(terminal) = &self.terminal {
@@ -152,10 +165,10 @@ impl Daemon {
         }
         self.look.loader.fade_to(0.0, now);
         self.look.notice.fade_to(1.0, now);
-        self.notice = Some(Shown::new(shown, stream));
+        self.notice = Some(shown);
     }
 
-    pub(super) fn dismiss_notice(&mut self) {
+    pub(super) fn dismiss_notice(&mut self, answer: &str) {
         let Some(mut shown) = self.notice.take() else {
             return;
         };
@@ -167,7 +180,7 @@ impl Daemon {
         self.settle_loader(now);
         self.fading_notice = Some(shown.notice.clone());
         if let Some(stream) = shown.dismiss() {
-            reply(stream, "ok");
+            reply(stream, answer);
         }
     }
 

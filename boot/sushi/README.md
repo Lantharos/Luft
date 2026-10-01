@@ -41,6 +41,25 @@ sushictl notice key-enrollment 48217730 --again   # the same, after the key wasn
 sushictl notice clear
 ```
 
+### Explaining something before the login screen
+
+Other parts of the system can put a short explanation on screen while the computer starts, in place of the spinner and before the login screen. Kestrel uses this after the computer had to restart because the graphics driver stopped responding. The notice is described in a small text file, one field per line:
+
+```text
+title Your computer restarted because the graphics driver stopped responding
+line It happened today at 20:10.
+step Turn on Above 4G Decoding and Resizable BAR in the firmware settings
+footer Press F to open the firmware settings, or Enter to continue. Continuing in {seconds} seconds.
+countdown 20
+key f
+```
+
+`line` and `step` can repeat; steps are numbered. `{seconds}` in the footer counts down, and the notice goes away by itself when it reaches zero. `key` lets a letter dismiss the notice as well as Enter.
+
+```bash
+sushictl notice show /run/example/notice   # waits until the notice is gone, and prints the letter if one dismissed it
+```
+
 `plymouth quit` returns to the text console, as it does with Plymouth, which is what the emergency and rescue shells rely on.
 
 ## Components

@@ -53,7 +53,7 @@ export class AccentStylesheet {
   private css = '';
 
   constructor(name: string) {
-    this.file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', name]));
+    this.file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!, name]));
   }
 
   private get context(): AccentThemeContext {

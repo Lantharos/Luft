@@ -458,7 +458,7 @@ class KestrelUi {
   }
 }
 
-let currentUi: KestrelUi;
+let currentUi: KestrelUi | null = null;
 let greeter: Greeter | null = null;
 const startWatchers: ((visible: boolean) => void)[] = [];
 
@@ -481,11 +481,11 @@ export function wallpaperSampled(samples: Rgb[]): void {
 }
 
 export function toggleSurface(surface: Surface): void {
-  currentUi.toggleSurface(surface);
+  currentUi?.toggleSurface(surface);
 }
 
 export function shutdown(): void {
-  currentUi.shutdown();
+  currentUi?.shutdown();
 }
 
 export function dismissImmediately(): void {

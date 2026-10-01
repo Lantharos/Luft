@@ -33,13 +33,10 @@
 
 #define SHELL_INVERT_LIGHTNESS_EFFECT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), SHELL_TYPE_INVERT_LIGHTNESS_EFFECT, ShellInvertLightnessEffectClass))
 #define SHELL_IS_INVERT_EFFECT_CLASS(klass)           (G_TYPE_CHECK_CLASS_TYPE ((klass), SHELL_TYPE_INVERT_LIGHTNESS_EFFECT))
-#define SHELL_INVERT_LIGHTNESS_EFFECT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), SHELL_TYPE_INVERT_LIGHTNESS_EFFEC, ShellInvertLightnessEffectClass))
 
 #include "shell-invert-lightness-effect.h"
 
 #include <cogl/cogl.h>
-
-#include "shell-global.h"
 
 struct _ShellInvertLightnessEffect
 {
@@ -51,8 +48,6 @@ struct _ShellInvertLightnessEffect
 struct _ShellInvertLightnessEffectClass
 {
   ClutterOffscreenEffectClass parent_class;
-
-  CoglPipeline *base_pipeline;
 };
 
 /* Lightness inversion in GLSL.
@@ -75,10 +70,44 @@ G_DEFINE_TYPE (ShellInvertLightnessEffect,
                CLUTTER_TYPE_OFFSCREEN_EFFECT);
 
 static CoglPipeline *
+create_base_pipeline (CoglContext *ctx)
+{
+  static CoglPipelineKey base_pipeline_key = "shell-invert-lightness-effect";
+  CoglPipeline *base_pipeline =
+    cogl_context_get_named_pipeline (ctx, &base_pipeline_key);
+
+  if (G_UNLIKELY (base_pipeline == NULL))
+    {
+      CoglSnippet *snippet;
+
+      base_pipeline = cogl_pipeline_new (ctx);
+
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_TEXTURE_LOOKUP,
+                                  NULL,
+                                  NULL);
+      cogl_snippet_set_replace (snippet, invert_lightness_source);
+      cogl_pipeline_add_layer_snippet (base_pipeline, 0, snippet);
+      g_object_unref (snippet);
+
+      cogl_pipeline_set_layer_null_texture (base_pipeline, 0);
+      cogl_context_set_named_pipeline (ctx, &base_pipeline_key, base_pipeline);
+    }
+
+  return base_pipeline;
+}
+
+static CoglPipeline *
 shell_glsl_effect_create_pipeline (ClutterOffscreenEffect *effect,
                                    CoglTexture            *texture)
 {
   ShellInvertLightnessEffect *self = SHELL_INVERT_LIGHTNESS_EFFECT (effect);
+  CoglContext *ctx = cogl_texture_get_context (texture);
+
+  if (!self->pipeline || cogl_pipeline_get_context (self->pipeline) != ctx)
+    {
+      g_clear_object (&self->pipeline);
+      self->pipeline = cogl_pipeline_copy (create_base_pipeline (ctx));
+    }
 
   cogl_pipeline_set_layer_texture (self->pipeline, 0, texture);
 
@@ -110,33 +139,6 @@ shell_invert_lightness_effect_class_init (ShellInvertLightnessEffectClass *klass
 static void
 shell_invert_lightness_effect_init (ShellInvertLightnessEffect *self)
 {
-  ShellInvertLightnessEffectClass *klass;
-  klass = SHELL_INVERT_LIGHTNESS_EFFECT_GET_CLASS (self);
-
-  if (G_UNLIKELY (klass->base_pipeline == NULL))
-    {
-      CoglSnippet *snippet;
-      ShellGlobal *global = shell_global_get ();
-      ClutterStage *stage = shell_global_get_stage (global);
-      ClutterContext *clutter_context =
-        clutter_actor_get_context (CLUTTER_ACTOR (stage));
-      ClutterBackend *backend =
-        clutter_context_get_backend (clutter_context);
-      CoglContext *ctx = clutter_backend_get_cogl_context (backend);
-
-      klass->base_pipeline = cogl_pipeline_new (ctx);
-
-      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_TEXTURE_LOOKUP,
-                                  NULL,
-                                  NULL);
-      cogl_snippet_set_replace (snippet, invert_lightness_source);
-      cogl_pipeline_add_layer_snippet (klass->base_pipeline, 0, snippet);
-      g_object_unref (snippet);
-
-      cogl_pipeline_set_layer_null_texture (klass->base_pipeline, 0);
-    }
-
-  self->pipeline = cogl_pipeline_copy (klass->base_pipeline);
 }
 
 /**

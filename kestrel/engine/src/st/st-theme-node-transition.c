@@ -248,7 +248,8 @@ setup_framebuffers (StThemeNodeTransition *transition,
   GError *catch_error = NULL;
 
   /* template pipeline to avoid unnecessary shader compilation */
-  static CoglPipeline *pipeline_template = NULL;
+  static CoglPipelineKey pipeline_key = "st-theme-node-transition";
+  CoglPipeline *pipeline_template;
 
   width  = ceilf ((transition->offscreen_box.x2 - transition->offscreen_box.x1) * resource_scale);
   height = ceilf ((transition->offscreen_box.y2 - transition->offscreen_box.y1) * resource_scale);
@@ -288,6 +289,7 @@ setup_framebuffers (StThemeNodeTransition *transition,
 
   if (transition->pipeline == NULL)
     {
+      pipeline_template = cogl_context_get_named_pipeline (ctx, &pipeline_key);
       if (G_UNLIKELY (pipeline_template == NULL))
         {
           pipeline_template = cogl_pipeline_new (ctx);
@@ -304,6 +306,7 @@ setup_framebuffers (StThemeNodeTransition *transition,
                                            "RGBA = MODULATE (PREVIOUS, "
                                                             "PRIMARY)",
                                            NULL);
+          cogl_context_set_named_pipeline (ctx, &pipeline_key, pipeline_template);
         }
       transition->pipeline = cogl_pipeline_copy (pipeline_template);
     }

@@ -2772,6 +2772,47 @@ st_theme_node_paint_outline (StThemeNode           *node,
 }
 
 static gboolean
+st_theme_node_paint_state_is_defunct (StThemeNodePaintState *state)
+{
+  int corner_id;
+
+  if (_st_pipeline_is_defunct (state->box_shadow_pipeline) ||
+      _st_pipeline_is_defunct (state->prerendered_pipeline) ||
+      _st_texture_is_defunct (state->prerendered_texture))
+    return TRUE;
+
+  for (corner_id = 0; corner_id < 4; corner_id++)
+    {
+      if (_st_pipeline_is_defunct (state->corner_pipeline[corner_id]))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+st_theme_node_drop_defunct_resources (StThemeNode           *node,
+                                      StThemeNodePaintState *state)
+{
+  if (st_theme_node_paint_state_is_defunct (state))
+    st_theme_node_paint_state_free (state);
+
+  if (st_theme_node_paint_state_is_defunct (&node->cached_state))
+    {
+      st_theme_node_paint_state_free (&node->cached_state);
+      node->cached_textures = FALSE;
+      node->rendered_once = FALSE;
+    }
+
+  if (_st_pipeline_is_defunct (node->border_slices_pipeline))
+    st_theme_node_invalidate_border_image (node);
+
+  if (_st_pipeline_is_defunct (node->background_pipeline) ||
+      _st_pipeline_is_defunct (node->background_shadow_pipeline))
+    st_theme_node_invalidate_background_image (node);
+}
+
+static gboolean
 st_theme_node_needs_new_box_shadow_for_size (StThemeNodePaintState *state,
                                              StThemeNode           *node,
                                              float                  width,
@@ -2835,6 +2876,8 @@ st_theme_node_paint (StThemeNode           *node,
 
   if (width <= 0 || height <= 0 || resource_scale <= 0.0f)
     return;
+
+  st_theme_node_drop_defunct_resources (node, state);
 
   /* Check whether we need to recreate the textures of the paint
    * state, either because :

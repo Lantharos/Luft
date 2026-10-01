@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../menus/contextMenus.js';
+import { whenGraphicsRestored } from '../shared/graphics.js';
 import { busCall } from './bus.js';
 import { DBusMenu } from './dbusMenu.js';
 import { resolveGlyph, type TrayGlyph } from './icon.js';
@@ -18,6 +19,7 @@ export class TrayItem {
   visible = false;
   private readonly cancellable = new Gio.Cancellable();
   private readonly subscriptions: number[];
+  private readonly stopWatchingGraphics = whenGraphicsRestored(() => this.scheduleRefresh());
   private properties: Record<string, GLib.Variant> = {};
   private refreshSource = 0;
 
@@ -54,6 +56,7 @@ export class TrayItem {
 
   shutdown(): void {
     this.cancellable.cancel();
+    this.stopWatchingGraphics();
     if (this.refreshSource) GLib.Source.remove(this.refreshSource);
     this.refreshSource = 0;
     for (const id of this.subscriptions) Gio.DBus.session.signal_unsubscribe(id);

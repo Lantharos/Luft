@@ -4,6 +4,8 @@ Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the 
 
 Mutter reads the rotation lock from `com.lantharos.kestrel.touchscreen` and the night light color temperature from `com.lantharos.Settings.NightLight`, which `kestrel-settings` provides, so it needs none of gnome-settings-daemon's settings or services. Color profiles that ask for a screen brightness no longer try to set it through gnome-settings-daemon, which stopped offering that interface.
 
+The stack also carries recovery from GPU resets, taken from GNOME/mutter!5247 by Toluwaleke Ogundipe. The GL context is created with reset notification; when the driver reports that it was lost, Mutter waits for the reset to finish, creates new EGL and Cogl contexts and restores what it owns, including windows, backgrounds, cursors, text and effects. Kestrel's shell recreates its own textures from the `graphics-restored` signal of the backend's graphics recovery context. Texture contents from a lost context draw nothing until they are replaced, and the backend reports how long the oldest frame handed to a physical display has been waiting to be presented, which Kestrel's watchdog uses to tell a stuck display from an idle one.
+
 ## Build
 
 From the repository root:

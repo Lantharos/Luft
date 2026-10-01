@@ -131,21 +131,28 @@ enum {
 
 static GParamSpec *properties [N_PROPS] = { NULL, };
 
-static CoglPipeline*
-create_base_pipeline (void)
+static CoglContext *
+get_cogl_context (void)
 {
-  static CoglPipeline *base_pipeline = NULL;
+  ShellGlobal *global = shell_global_get ();
+  ClutterStage *stage = shell_global_get_stage (global);
+  ClutterContext *clutter_context =
+    clutter_actor_get_context (CLUTTER_ACTOR (stage));
+  ClutterBackend *backend =
+    clutter_context_get_backend (clutter_context);
+
+  return clutter_backend_get_cogl_context (backend);
+}
+
+static CoglPipeline*
+create_base_pipeline (CoglContext *ctx)
+{
+  static CoglPipelineKey base_pipeline_key = "shell-blur-effect-base";
+  CoglPipeline *base_pipeline =
+    cogl_context_get_named_pipeline (ctx, &base_pipeline_key);
 
   if (G_UNLIKELY (base_pipeline == NULL))
     {
-      ShellGlobal *global = shell_global_get ();
-      ClutterStage *stage = shell_global_get_stage (global);
-      ClutterContext *clutter_context =
-        clutter_actor_get_context (CLUTTER_ACTOR (stage));
-      ClutterBackend *backend =
-        clutter_context_get_backend (clutter_context);
-      CoglContext *ctx = clutter_backend_get_cogl_context (backend);
-
       base_pipeline = cogl_pipeline_new (ctx);
       cogl_pipeline_set_layer_null_texture (base_pipeline, 0);
       cogl_pipeline_set_layer_filters (base_pipeline,
@@ -155,30 +162,81 @@ create_base_pipeline (void)
       cogl_pipeline_set_layer_wrap_mode (base_pipeline,
                                          0,
                                          COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+      cogl_context_set_named_pipeline (ctx, &base_pipeline_key, base_pipeline);
     }
 
   return cogl_pipeline_copy (base_pipeline);
 }
 
 static CoglPipeline*
-create_brightness_pipeline (void)
+create_brightness_pipeline (CoglContext *ctx)
 {
-  static CoglPipeline *brightness_pipeline = NULL;
+  static CoglPipelineKey brightness_pipeline_key = "shell-blur-effect-brightness";
+  CoglPipeline *brightness_pipeline =
+    cogl_context_get_named_pipeline (ctx, &brightness_pipeline_key);
 
   if (G_UNLIKELY (brightness_pipeline == NULL))
     {
       CoglSnippet *snippet;
 
-      brightness_pipeline = create_base_pipeline ();
+      brightness_pipeline = create_base_pipeline (ctx);
 
       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
                                   brightness_glsl_declarations,
                                   brightness_glsl);
       cogl_pipeline_add_snippet (brightness_pipeline, snippet);
       g_object_unref (snippet);
+      cogl_context_set_named_pipeline (ctx,
+                                       &brightness_pipeline_key,
+                                       brightness_pipeline);
     }
 
   return cogl_pipeline_copy (brightness_pipeline);
+}
+
+static void
+create_pipelines (ShellBlurEffect *self,
+                  CoglContext     *ctx)
+{
+  self->actor_fb.pipeline = create_base_pipeline (ctx);
+  self->brightness_fb.pipeline = create_brightness_pipeline (ctx);
+  self->brightness_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "brightness");
+  self->surface_size_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_size");
+  self->corner_radius_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "corner_radius");
+  self->edge_highlight_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "edge_highlight");
+  self->bright_dim_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "bright_dim");
+}
+
+static void
+clear_graphics (ShellBlurEffect *self)
+{
+  g_clear_object (&self->actor_fb.texture);
+  g_clear_object (&self->actor_fb.framebuffer);
+  g_clear_object (&self->actor_fb.pipeline);
+  g_clear_object (&self->brightness_fb.texture);
+  g_clear_object (&self->brightness_fb.framebuffer);
+  g_clear_object (&self->brightness_fb.pipeline);
+  g_hash_table_remove_all (self->backdrops);
+  g_clear_object (&self->last_backdrop);
+  self->cache_flags = 0;
+}
+
+static void
+ensure_pipelines (ShellBlurEffect *self)
+{
+  CoglContext *ctx = get_cogl_context ();
+
+  if (self->actor_fb.pipeline &&
+      cogl_pipeline_get_context (self->actor_fb.pipeline) == ctx)
+    return;
+
+  clear_graphics (self);
+  create_pipelines (self, ctx);
 }
 
 
@@ -234,13 +292,7 @@ update_fbo (FramebufferData *data,
             unsigned int     height,
             float            downscale_factor)
 {
-  ShellGlobal *global = shell_global_get ();
-  ClutterStage *stage = shell_global_get_stage (global);
-  ClutterContext *clutter_context =
-    clutter_actor_get_context (CLUTTER_ACTOR (stage));
-  ClutterBackend *backend =
-    clutter_context_get_backend (clutter_context);
-  CoglContext *ctx = clutter_backend_get_cogl_context (backend);
+  CoglContext *ctx = get_cogl_context ();
 
   g_clear_object (&data->texture);
   g_clear_object (&data->framebuffer);
@@ -633,6 +685,8 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
     {
       g_autoptr (ClutterPaintNode) blur_node = NULL;
 
+      ensure_pipelines (self);
+
       switch (self->mode)
         {
         case SHELL_BLUR_MODE_ACTOR:
@@ -710,18 +764,20 @@ fail:
 }
 
 static void
+shell_blur_effect_unrealize (ClutterEffect *effect)
+{
+  clear_graphics (SHELL_BLUR_EFFECT (effect));
+
+  CLUTTER_EFFECT_CLASS (shell_blur_effect_parent_class)->unrealize (effect);
+}
+
+static void
 shell_blur_effect_finalize (GObject *object)
 {
   ShellBlurEffect *self = (ShellBlurEffect *)object;
 
-  clear_framebuffer_data (&self->actor_fb);
-  g_hash_table_remove_all (self->backdrops);
-  g_clear_object (&self->last_backdrop);
-  clear_framebuffer_data (&self->brightness_fb);
-
-  g_clear_object (&self->actor_fb.pipeline);
+  clear_graphics (self);
   g_clear_pointer (&self->backdrops, g_hash_table_unref);
-  g_clear_object (&self->brightness_fb.pipeline);
 
   G_OBJECT_CLASS (shell_blur_effect_parent_class)->finalize (object);
 }
@@ -836,6 +892,7 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
   meta_class->set_actor = shell_blur_effect_set_actor;
 
   effect_class->paint_node = shell_blur_effect_paint_node;
+  effect_class->unrealize = shell_blur_effect_unrealize;
 
   properties[PROP_RADIUS] =
     g_param_spec_int ("radius", NULL, NULL,
@@ -878,19 +935,8 @@ shell_blur_effect_init (ShellBlurEffect *self)
   self->radius = 0;
   self->brightness = 1.f;
 
-  self->actor_fb.pipeline = create_base_pipeline ();
   self->backdrops = shell_backdrop_cache_new ();
-  self->brightness_fb.pipeline = create_brightness_pipeline ();
-  self->brightness_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "brightness");
-  self->surface_size_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_size");
-  self->corner_radius_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "corner_radius");
-  self->edge_highlight_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "edge_highlight");
-  self->bright_dim_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "bright_dim");
+  create_pipelines (self, get_cogl_context ());
 }
 
 ShellBlurEffect *

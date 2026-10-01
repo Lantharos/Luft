@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 30 Sep 2026 17:38:24 +0200
-Subject: [PATCH 7/9] backends: let cursor implementations decline a cursor
+Subject: [PATCH 07/12] backends: let cursor implementations decline a cursor
 
 The cursor theme always built its cursors with the highest priority
 implementation. A shell that draws scalable cursors then replaced every

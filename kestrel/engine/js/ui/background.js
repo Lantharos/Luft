@@ -326,11 +326,16 @@ function textureKey(file, style) {
     return `${file.get_uri()} ${style} ${displaySignature()}`;
 }
 
+function graphicsRecovery() {
+    return global.stage.context.get_backend().get_graphics_recovery_context();
+}
+
 class BackgroundTextureCache {
     constructor() {
         this._textures = new Map();
         this._holders = new Map();
         this._settings = new Gio.Settings({schema_id: BACKGROUND_SCHEMA});
+        graphicsRecovery().connect('graphics-restored', () => this._textures.clear());
     }
 
     async load(file, cancellable, style = GDesktopEnums.BackgroundStyle.NONE) {
@@ -588,6 +593,9 @@ const Background = GObject.registerClass({
         this._interfaceSettings.connectObject(`changed::${COLOR_SCHEME_KEY}`,
             this._emitChangedSignal.bind(this), this);
 
+        graphicsRecovery().connectObject('graphics-restored',
+            this._emitChangedSignal.bind(this), this);
+
         this._load();
     }
 
@@ -608,6 +616,7 @@ const Background = GObject.registerClass({
         LoginManager.getLoginManager().disconnectObject(this);
         this._settings.disconnectObject(this);
         this._interfaceSettings.disconnectObject(this);
+        graphicsRecovery().disconnectObject(this);
         getBackgroundTextureCache().release(this);
 
         if (this._changedIdleId) {

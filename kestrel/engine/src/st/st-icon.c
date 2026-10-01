@@ -88,10 +88,27 @@ static GIcon *default_gicon = NULL;
 #define IMAGE_MISSING_ICON_NAME "image-missing"
 #define DEFAULT_ICON_SIZE 48
 
+static gboolean
+st_icon_lost_texture (StIcon *icon)
+{
+  ClutterContent *content;
+  CoglTexture *texture;
+
+  if (icon->priv->icon_texture == NULL)
+    return FALSE;
+
+  content = clutter_actor_get_content (icon->priv->icon_texture);
+  if (!ST_IS_IMAGE_CONTENT (content))
+    return FALSE;
+
+  texture = st_image_content_get_texture (ST_IMAGE_CONTENT (content));
+  return texture == NULL || _st_texture_is_defunct (texture);
+}
+
 static void
 on_icon_theme_changed (StIcon *icon)
 {
-  if (icon->priv->is_themed)
+  if (icon->priv->is_themed || st_icon_lost_texture (icon))
     st_icon_update (icon);
 }
 
@@ -416,6 +433,7 @@ st_icon_update_shadow_pipeline (StIcon              *icon,
       clutter_actor_box_get_size (&box, &width, &height);
 
       if (priv->shadow_pipeline == NULL ||
+          _st_pipeline_is_defunct (priv->shadow_pipeline) ||
           priv->shadow_size.width != width ||
           priv->shadow_size.height != height)
         {

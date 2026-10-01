@@ -231,6 +231,7 @@ st_label_paint_node (ClutterActor        *actor,
       height *= resource_scale;
 
       if (priv->text_shadow_pipeline == NULL ||
+          _st_pipeline_is_defunct (priv->text_shadow_pipeline) ||
           width != priv->shadow_width ||
           height != priv->shadow_height)
         {

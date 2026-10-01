@@ -13,6 +13,8 @@ drm.workspace = true
 drm-ffi = "0.9.1"
 libc.workspace = true
 rustix.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 sushi-scene.workspace = true
 tiny-skia = { workspace = true, features = ["std", "simd"] }
 

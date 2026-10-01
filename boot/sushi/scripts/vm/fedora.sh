@@ -47,7 +47,8 @@ podman unshare sh -c "
   printf '%s\n' 'title Fedora Linux ($kernel)' 'version $kernel' 'linux /vmlinuz-$kernel' \
     'initrd /initramfs-$kernel.img' 'options $options' 'grub_users \$grub_users' 'grub_arg --unrestricted' \
     'grub_class fedora' > '$tree/boot/loader/entries/$machine_id-$kernel.conf'
-  printf '%s\n' 'set timeout=0' 'insmod part_gpt' 'insmod ext2' 'search --no-floppy --fs-uuid --set=root $boot_uuid' \
+  printf '%s\n' 'set timeout=0' 'function load_video { set gfxpayload=keep; }' 'insmod part_gpt' 'insmod ext2' \
+    'search --no-floppy --fs-uuid --set=root $boot_uuid' \
     'insmod blscfg' 'blscfg' > '$tree/boot/grub2/grub.cfg'
   printf '%s\n' 'search --no-floppy --fs-uuid --set=dev $boot_uuid' 'set prefix=(\$dev)/grub2' \
     'export \$prefix' 'configfile \$prefix/grub.cfg' > '$tree/boot/efi/EFI/fedora/grub.cfg'

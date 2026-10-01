@@ -10,7 +10,12 @@ mod linux_boot;
 mod loader_conf;
 mod menu;
 mod screen;
+mod uki;
 mod volume;
+
+#[used]
+#[unsafe(link_section = ".sbat")]
+static SBAT: [u8; 139] = *b"sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md\nsushiboot,1,Luft,sushiboot,1,https://github.com/Lantharos/Luft\n";
 
 use entries::BootKind;
 use linux_boot::LinuxEntry;

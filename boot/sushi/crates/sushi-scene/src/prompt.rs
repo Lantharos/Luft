@@ -1,13 +1,17 @@
 use alloc::string::String;
+use alloc::vec::Vec;
 
 use tiny_skia::{FillRule, Paint, PathBuilder, PixmapMut, Rect as SkRect, Transform};
 
 use crate::{Layout, Rect, text};
 
-const FIELD_WIDTH: f32 = 320.0;
+const FIELD_WIDTH: f32 = 340.0;
 const FIELD_HEIGHT: f32 = 46.0;
 const TITLE_SIZE: f32 = 17.0;
+const EXPLANATION_SIZE: f32 = 14.0;
 const NOTE_SIZE: f32 = 13.0;
+const LINE_HEIGHT: f32 = 20.0;
+const MOST_LINES: usize = 3;
 const DOT_RADIUS: f32 = 3.5;
 const DOT_SPACING: f32 = 14.0;
 const PADDING: f32 = 20.0;
@@ -16,15 +20,15 @@ const SHAKE_SECONDS: f32 = 0.42;
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Prompt {
     pub title: String,
+    pub explanation: Vec<String>,
+    pub placeholder: String,
     pub typed: usize,
-    pub caps_lock: bool,
-    pub rejected: bool,
+    pub note: Option<(String, f32)>,
     pub shake_started: Option<f32>,
 }
 
 struct Geometry {
     field: SkRect,
-    title_baseline: f32,
     note_baseline: f32,
     scale: f32,
 }
@@ -36,16 +40,26 @@ fn geometry(layout: &Layout) -> Geometry {
     let field = SkRect::from_xywh(cx - width / 2.0, cy - height / 2.0, width, height)
         .expect("the field has a size");
     Geometry {
-        title_baseline: field.top() - 20.0 * scale,
         note_baseline: field.bottom() + 30.0 * scale,
         field,
         scale,
     }
 }
 
+fn explanation_baseline(geometry: &Geometry, lines: usize, index: usize) -> f32 {
+    geometry.field.top()
+        - 20.0 * geometry.scale
+        - (lines - 1 - index) as f32 * LINE_HEIGHT * geometry.scale
+}
+
+fn title_baseline(geometry: &Geometry, lines: usize) -> f32 {
+    let gap = if lines == 0 { 20.0 } else { 32.0 };
+    geometry.field.top() - (gap + lines as f32 * LINE_HEIGHT) * geometry.scale
+}
+
 pub fn bounds(layout: &Layout) -> Rect {
     let geometry = geometry(layout);
-    let top = geometry.title_baseline - TITLE_SIZE * geometry.scale * 1.4;
+    let top = title_baseline(&geometry, MOST_LINES) - TITLE_SIZE * geometry.scale * 1.4;
     let bottom = geometry.note_baseline + NOTE_SIZE * geometry.scale * 0.6;
     Rect {
         x: 0,
@@ -87,14 +101,27 @@ pub fn draw(
         -origin.1 as f32,
     );
     let center = layout.loader_center.0 - origin.0 as f32;
+    let lines = prompt.explanation.len().min(MOST_LINES);
 
     text::centered(
         pixmap,
         &prompt.title,
-        (center, geometry.title_baseline - origin.1 as f32),
+        (center, title_baseline(&geometry, lines) - origin.1 as f32),
         TITLE_SIZE * scale,
         0.92 * alpha,
     );
+    for (index, line) in prompt.explanation.iter().take(MOST_LINES).enumerate() {
+        text::centered(
+            pixmap,
+            line,
+            (
+                center,
+                explanation_baseline(&geometry, lines, index) - origin.1 as f32,
+            ),
+            EXPLANATION_SIZE * scale,
+            0.6 * alpha,
+        );
+    }
 
     let field = geometry.field;
     let mut paint = Paint {
@@ -113,7 +140,7 @@ pub fn draw(
     if prompt.typed == 0 {
         text::draw(
             pixmap,
-            "Passphrase",
+            &prompt.placeholder,
             (
                 first_x + shift.tx,
                 dot_y + NOTE_SIZE * scale * 0.36 + shift.ty,
@@ -136,14 +163,7 @@ pub fn draw(
         }
     }
 
-    let note = if prompt.rejected {
-        Some(("That passphrase didn't work. Try again.", 1.0))
-    } else if prompt.caps_lock {
-        Some(("Caps Lock is on", 0.7))
-    } else {
-        None
-    };
-    if let Some((note, brightness)) = note {
+    if let Some((note, brightness)) = &prompt.note {
         text::centered(
             pixmap,
             note,

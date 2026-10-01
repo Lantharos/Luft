@@ -36,6 +36,22 @@ pub fn width(text: &str, size: f32) -> f32 {
         .map_or(0.0, |(id, at)| at + font.h_advance(id))
 }
 
+pub fn centered(
+    pixmap: &mut PixmapMut,
+    line: &str,
+    (center, baseline): (f32, f32),
+    size: f32,
+    alpha: f32,
+) {
+    draw(
+        pixmap,
+        line,
+        (center - width(line, size) / 2.0, baseline),
+        size,
+        alpha,
+    );
+}
+
 pub fn draw(pixmap: &mut PixmapMut, text: &str, (x, baseline): (f32, f32), size: f32, alpha: f32) {
     let font = font();
     let factor = font.as_scaled(scale(size)).h_scale_factor();

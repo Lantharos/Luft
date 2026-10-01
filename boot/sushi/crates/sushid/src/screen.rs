@@ -1,10 +1,14 @@
 use std::io;
 use std::path::Path;
 
+use rustix::fs::{XattrFlags, getxattr, setxattr};
 use sushi::control;
 use sushi::display::{Card, Display, ModeHints};
 use sushi::render::Logo;
-use sushi::scene::{FADE_SECONDS, Prompt, Rect, Scene, Visuals, ease, is_shaking};
+use sushi::scene::{FADE_SECONDS, Prompt, Rect, Scene, Status, Visuals, ease, is_shaking};
+
+const SELINUX_LABEL: &str = "security.selinux";
+const LOGIN_SCREEN_RUNTIME_TYPE: &str = "xdm_var_run_t";
 
 #[derive(Clone, Copy, Debug)]
 pub struct Fader {
@@ -66,6 +70,7 @@ struct Shown {
     loader: f32,
     prompt: f32,
     content: Option<Prompt>,
+    status: Option<(Status, f32)>,
 }
 
 pub struct Screen {
@@ -120,18 +125,26 @@ impl Screen {
         &self.display
     }
 
-    pub fn draw(&mut self, look: &Look, now: f32, prompt: Option<&Prompt>) -> io::Result<()> {
+    pub fn draw(
+        &mut self,
+        look: &Look,
+        now: f32,
+        prompt: Option<&Prompt>,
+        status: Option<(Status, f32)>,
+    ) -> io::Result<()> {
         let next = Shown {
             logo: look.logo.value(now),
             loader: look.loader.value(now),
             prompt: look.prompt.value(now),
             content: prompt.cloned(),
+            status,
         };
         let visuals = Visuals {
             seconds: now,
             logo: next.logo,
             loader: next.loader,
             prompt: prompt.map(|prompt| (prompt, next.prompt)),
+            status: next.status.as_ref().map(|(status, alpha)| (status, *alpha)),
         };
         let first = self.shown.is_none();
         for (index, scene) in self.scenes.iter().enumerate() {
@@ -160,6 +173,7 @@ impl Screen {
                     control::LOGO_PLACEMENT,
                     format!("{} {} {} {}\n", logo.x, logo.y, logo.width, logo.height),
                 );
+                let_login_screen_read(control::LOGO_PLACEMENT);
             }
             None => {
                 let _ = std::fs::remove_file(control::LOGO_PLACEMENT);
@@ -174,6 +188,25 @@ impl Screen {
     pub fn into_card(self) -> Card {
         self.display.into_card()
     }
+}
+
+fn let_login_screen_read(path: &str) {
+    let mut label = [0u8; 256];
+    let Ok(length) = getxattr(path, SELINUX_LABEL, &mut label[..]) else {
+        return;
+    };
+    let label = String::from_utf8_lossy(&label[..length]);
+    let mut fields: Vec<&str> = label.trim_end_matches('\0').splitn(4, ':').collect();
+    if fields.len() < 3 {
+        return;
+    }
+    fields[2] = LOGIN_SCREEN_RUNTIME_TYPE;
+    let _ = setxattr(
+        path,
+        SELINUX_LABEL,
+        fields.join(":").as_bytes(),
+        XattrFlags::empty(),
+    );
 }
 
 fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
@@ -192,6 +225,9 @@ fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
         .is_some_and(|prompt| is_shaking(prompt, now));
     if shown.prompt != next.prompt || shown.content != next.content || shaking {
         areas.push(scene.prompt_area());
+    }
+    if shown.status != next.status {
+        areas.push(scene.status_area());
     }
     areas
 }

@@ -6,11 +6,13 @@ mod bmp;
 pub mod loader;
 mod prompt;
 mod scene;
+mod status;
 pub mod text;
 
 pub use bmp::decode_bmp;
 pub use prompt::{Prompt, is_shaking};
 pub use scene::{Scene, Visuals};
+pub use status::Status;
 pub use tiny_skia;
 
 use tiny_skia::{Path, PathBuilder};

@@ -72,16 +72,6 @@ pub fn is_shaking(prompt: &Prompt, seconds: f32) -> bool {
         .is_some_and(|started| seconds - started < SHAKE_SECONDS)
 }
 
-fn centered(pixmap: &mut PixmapMut, line: &str, center: f32, baseline: f32, size: f32, alpha: f32) {
-    text::draw(
-        pixmap,
-        line,
-        (center - text::width(line, size) / 2.0, baseline),
-        size,
-        alpha,
-    );
-}
-
 pub fn draw(
     pixmap: &mut PixmapMut,
     layout: &Layout,
@@ -98,11 +88,10 @@ pub fn draw(
     );
     let center = layout.loader_center.0 - origin.0 as f32;
 
-    centered(
+    text::centered(
         pixmap,
         &prompt.title,
-        center,
-        geometry.title_baseline - origin.1 as f32,
+        (center, geometry.title_baseline - origin.1 as f32),
         TITLE_SIZE * scale,
         0.92 * alpha,
     );
@@ -155,11 +144,10 @@ pub fn draw(
         None
     };
     if let Some((note, brightness)) = note {
-        centered(
+        text::centered(
             pixmap,
             note,
-            center,
-            geometry.note_baseline - origin.1 as f32,
+            (center, geometry.note_baseline - origin.1 as f32),
             NOTE_SIZE * scale,
             brightness * alpha,
         );

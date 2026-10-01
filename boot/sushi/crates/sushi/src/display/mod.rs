@@ -93,25 +93,30 @@ fn pick_crtc(
 }
 
 impl Display {
-    pub fn find(hints: &ModeHints) -> Option<Self> {
+    pub fn find(hints: &ModeHints) -> Result<Self, Option<Card>> {
         let mut candidates: Vec<Card> = cards()
             .iter()
             .filter_map(|path| Card::open(path).ok())
             .collect();
         candidates.sort_by_key(|card| !card.is_boot_display());
-        candidates
-            .into_iter()
-            .find_map(|card| Self::take(card, hints).ok())
+        let mut busy = None;
+        for card in candidates {
+            match Self::take(card, hints) {
+                Ok(display) => return Ok(display),
+                Err(card) => busy = busy.or(card),
+            }
+        }
+        Err(busy)
     }
 
-    pub fn open(path: &Path, hints: &ModeHints) -> io::Result<Self> {
-        Self::take(Card::open(path)?, hints)
-    }
-
-    fn take(card: Card, hints: &ModeHints) -> io::Result<Self> {
-        card.acquire_master_lock()?;
-        let plan = plan(&card, hints)?;
-        Self::build(card, plan)
+    pub fn take(card: Card, hints: &ModeHints) -> Result<Self, Option<Card>> {
+        match card.acquire_master_lock() {
+            Ok(()) => {}
+            Err(error) if error.raw_os_error() == Some(libc::EBUSY) => return Err(Some(card)),
+            Err(_) => return Err(None),
+        }
+        let plan = plan(&card, hints).map_err(|_| None)?;
+        Self::build(card, plan).map_err(|_| None)
     }
 
     fn build(card: Card, plan: Vec<Planned>) -> io::Result<Self> {

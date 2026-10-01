@@ -1,20 +1,24 @@
-use std::io::{BufRead, BufReader, Write};
+mod cards;
+mod requests;
+
 use std::os::fd::AsFd;
 use std::os::unix::net::{UnixListener, UnixStream};
-use std::path::Path;
+use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use rustix::event::{PollFd, PollFlags, Timespec, poll};
 use sushi::config::Config;
-use sushi::control::{self, Command};
-use sushi::display::{Card, Display, ModeHints};
+use sushi::control;
+use sushi::display::{Card, ModeHints};
 use sushi::password::PasswordRequests;
+use sushi::plymouth::{self, Client};
 use sushi::render::Logo;
 use sushi::scene::Prompt;
 use sushi::terminal::Terminal;
-use sushi::uevent::{CardEvent, CardEvents};
+use sushi::uevent::CardEvents;
 
+use crate::activity::Activity;
 use crate::screen::{Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
 use crate::unlock::{Typed, Unlock};
@@ -26,9 +30,14 @@ const WAIT_LIMIT: Duration = Duration::from_secs(30);
 
 enum Phase {
     Splash,
-    Leaving(UnixStream),
+    Leaving(Vec<Pending>),
     Waiting(Instant),
     Holding,
+}
+
+enum Pending {
+    Control(UnixStream),
+    Plymouth(Client),
 }
 
 pub struct Daemon {
@@ -44,12 +53,15 @@ pub struct Daemon {
     requests: PasswordRequests,
     events: CardEvents,
     listener: UnixListener,
+    plymouth: Option<plymouth::Server>,
     started: Instant,
     phase: Phase,
     look: Look,
+    activity: Activity,
     unlock: Option<Unlock>,
     fading_prompt: Option<Prompt>,
     last_answered: Option<String>,
+    root: Option<PathBuf>,
     quit: bool,
 }
 
@@ -62,25 +74,28 @@ fn listen() -> Result<UnixListener> {
     Ok(listener)
 }
 
+fn listen_for_plymouth_clients() -> Option<plymouth::Server> {
+    plymouth::Server::listen()
+        .inspect_err(|error| eprintln!("Plymouth clients can't reach the splash: {error}"))
+        .ok()
+}
+
 impl Daemon {
     pub fn start() -> Result<Self> {
         let config = Config::load();
         let hints = hints(&config);
-        let terminal = Terminal::open().ok();
-        if let Some(terminal) = &terminal {
-            terminal.hold();
-        }
         let mut daemon = Self {
             logo: Logo::from_firmware(),
             firmware_size: None,
             screen: None,
             held: None,
-            terminal,
+            terminal: None,
             signals: VtSignals::catch().context("catching console switches")?,
             away: false,
             requests: PasswordRequests::watch().context("watching password requests")?,
             events: CardEvents::open().context("watching displays")?,
             listener: listen()?,
+            plymouth: listen_for_plymouth_clients(),
             started: Instant::now(),
             phase: Phase::Splash,
             look: Look {
@@ -88,15 +103,18 @@ impl Daemon {
                 loader: Fader::at(0.0),
                 prompt: Fader::at(0.0),
             },
+            activity: Activity::new(),
             unlock: None,
             fading_prompt: None,
             last_answered: None,
+            root: None,
             quit: false,
             config,
             hints,
         };
-        if let Some(display) = Display::find(&daemon.hints) {
-            daemon.adopt(display);
+        daemon.find_display();
+        if daemon.held.is_none() {
+            daemon.take_terminal();
         }
         daemon.look.loader.fade_to(1.0, daemon.now());
         Ok(daemon)
@@ -106,21 +124,6 @@ impl Daemon {
         self.started.elapsed().as_secs_f32()
     }
 
-    fn adopt(&mut self, display: Display) {
-        eprintln!(
-            "Showing the splash on {} at {:?}",
-            display.path().display(),
-            display.sizes()
-        );
-        let size = *self.firmware_size.get_or_insert_with(|| display.sizes()[0]);
-        let old = self
-            .screen
-            .replace(Screen::new(display, self.logo.as_ref(), size));
-        if let Some(old) = old {
-            drop(old.into_card());
-        }
-    }
-
     pub fn run(mut self) -> Result<()> {
         self.refresh_unlock();
         self.draw();
@@ -128,8 +131,10 @@ impl Daemon {
         while !self.quit {
             self.wait();
             self.handle_commands();
+            self.handle_plymouth();
             self.handle_switches();
             self.handle_cards();
+            self.retake();
             self.requests.drain();
             self.refresh_unlock();
             self.handle_keys();
@@ -145,13 +150,10 @@ impl Daemon {
         let now = self.now();
         match &self.phase {
             Phase::Leaving(_) => Some(FRAME),
+            Phase::Splash if self.screen.is_none() => self.held.as_ref().map(|_| WATCH_INTERVAL),
             Phase::Splash => {
-                let prompt = self
-                    .unlock
-                    .as_ref()
-                    .map(|unlock| &unlock.prompt)
-                    .or(self.fading_prompt.as_ref());
-                if self.screen.is_some() && self.look.is_animating(now, prompt) {
+                let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
+                if self.look.is_animating(now, prompt) || self.activity.is_animating(now) {
                     Some(FRAME)
                 } else if self.unlock.is_some() {
                     Some(CAPS_LOCK_INTERVAL)
@@ -178,64 +180,14 @@ impl Daemon {
         if let (Some(terminal), Some(_)) = (&self.terminal, &self.unlock) {
             fds.push(PollFd::from_borrowed_fd(terminal.as_fd(), PollFlags::IN));
         }
+        if let Some(server) = &self.plymouth {
+            fds.extend(
+                server
+                    .fds()
+                    .map(|fd| PollFd::from_borrowed_fd(fd, PollFlags::IN)),
+            );
+        }
         let _ = poll(&mut fds, timeout.as_ref());
-    }
-
-    fn handle_commands(&mut self) {
-        while let Ok((stream, _)) = self.listener.accept() {
-            let _ = stream.set_nonblocking(false);
-            let _ = stream.set_read_timeout(Some(Duration::from_secs(1)));
-            let mut line = String::new();
-            if BufReader::new(&stream).read_line(&mut line).is_err() {
-                continue;
-            }
-            match Command::parse(&line) {
-                Some(command) => self.handle(command, stream),
-                None => reply(stream, "unknown command"),
-            }
-        }
-    }
-
-    fn handle(&mut self, command: Command, stream: UnixStream) {
-        match command {
-            Command::Deactivate => self.deactivate(stream),
-            Command::Quit => {
-                self.leave_to_text();
-                reply(stream, "ok");
-            }
-            Command::UpdateRoot(root) => match enter_root(&root) {
-                Ok(()) => {
-                    self.config = Config::load();
-                    self.hints = hints(&self.config);
-                    eprintln!("Moved into {}", root.display());
-                    reply(stream, "ok");
-                }
-                Err(error) => reply(stream, &error.to_string()),
-            },
-            Command::Status => reply(stream, self.status()),
-        }
-    }
-
-    fn status(&self) -> &'static str {
-        match self.phase {
-            Phase::Splash => "showing",
-            Phase::Leaving(_) => "leaving",
-            Phase::Waiting(_) => "waiting",
-            Phase::Holding => "holding",
-        }
-    }
-
-    fn deactivate(&mut self, stream: UnixStream) {
-        if !matches!(self.phase, Phase::Splash) {
-            reply(stream, "ok");
-            return;
-        }
-        eprintln!("Handing the display over");
-        let now = self.now();
-        self.unlock = None;
-        self.look.loader.fade_to(0.0, now);
-        self.look.prompt.fade_to(0.0, now);
-        self.phase = Phase::Leaving(stream);
     }
 
     fn handle_switches(&mut self) {
@@ -250,6 +202,7 @@ impl Daemon {
                     if !matches!(self.phase, Phase::Splash) {
                         terminal.give_back();
                         self.terminal = None;
+                        self.away = false;
                     }
                 }
                 Switch::Return => {
@@ -263,6 +216,15 @@ impl Daemon {
         }
     }
 
+    fn take_terminal(&mut self) {
+        if self.terminal.is_none() && matches!(self.phase, Phase::Splash) {
+            self.terminal = Terminal::open().ok();
+            if let Some(terminal) = &self.terminal {
+                terminal.hold();
+            }
+        }
+    }
+
     fn leave_to_text(&mut self) {
         eprintln!("Returning to the text console");
         if let Some(terminal) = self.terminal.take() {
@@ -270,46 +232,8 @@ impl Daemon {
         }
         drop(self.screen.take().map(Screen::into_card));
         self.held = None;
+        self.plymouth = None;
         self.quit = true;
-    }
-
-    fn handle_cards(&mut self) {
-        for event in self.events.drain() {
-            match (&self.phase, event) {
-                (Phase::Splash | Phase::Leaving(_), CardEvent::Added(path)) => {
-                    if let Ok(display) = Display::open(&path, &self.hints) {
-                        self.adopt(display);
-                    }
-                }
-                (Phase::Splash | Phase::Leaving(_), CardEvent::Changed(path))
-                    if self.shows(&path) =>
-                {
-                    let size = self.firmware_size.unwrap_or_default();
-                    self.screen = self.screen.take().and_then(|screen| {
-                        screen.refresh(&self.hints, self.logo.as_ref(), size).ok()
-                    });
-                }
-                (_, CardEvent::Removed(path)) => {
-                    if self.shows(&path) {
-                        eprintln!("{} went away", path.display());
-                        self.screen = None;
-                    }
-                    if self.held.as_ref().is_some_and(|card| card.path() == path) {
-                        self.held = None;
-                    }
-                }
-                (Phase::Holding, CardEvent::Added(path)) if self.held.is_none() => {
-                    self.held = Card::open(&path).ok();
-                }
-                _ => {}
-            }
-        }
-    }
-
-    fn shows(&self, path: &Path) -> bool {
-        self.screen
-            .as_ref()
-            .is_some_and(|screen| screen.path() == path)
     }
 
     fn refresh_unlock(&mut self) {
@@ -361,7 +285,7 @@ impl Daemon {
             self.fading_prompt = None;
         }
         match std::mem::replace(&mut self.phase, Phase::Holding) {
-            Phase::Leaving(stream) if self.look.settled(now) || self.screen.is_none() => {
+            Phase::Leaving(pending) if self.look.settled(now) || self.screen.is_none() => {
                 self.draw();
                 if let Some(screen) = &self.screen {
                     screen.share_logo_placement();
@@ -371,7 +295,7 @@ impl Daemon {
                     terminal.clear();
                 }
                 let _ = std::fs::remove_file(control::PID_FILE);
-                reply(stream, "ok");
+                pending.into_iter().for_each(|waiter| self.finish(waiter));
                 eprintln!("Released the display to the next program");
                 self.phase = Phase::Waiting(Instant::now());
             }
@@ -391,8 +315,10 @@ impl Daemon {
                         since.elapsed().as_millis()
                     );
                     let _ = std::fs::remove_file(control::LOGO_PLACEMENT);
-                    self.terminal = None;
-                    self.held = self.screen.take().map(Screen::into_card);
+                    self.plymouth = None;
+                    if let Some(screen) = self.screen.take() {
+                        self.held = Some(screen.into_card());
+                    }
                     self.phase = Phase::Holding;
                 } else {
                     self.phase = Phase::Waiting(since);
@@ -407,17 +333,22 @@ impl Daemon {
             return;
         }
         let now = self.now();
-        let prompt = self
-            .unlock
-            .as_ref()
-            .map(|unlock| &unlock.prompt)
-            .or(self.fading_prompt.as_ref());
+        let status = self.activity.status(now);
+        let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
         if let Some(screen) = &mut self.screen
-            && screen.draw(&self.look, now, prompt).is_err()
+            && let Err(error) = screen.draw(&self.look, now, prompt, status)
         {
+            eprintln!("Lost {}: {error}", screen.path().display());
             self.screen = None;
         }
     }
+}
+
+fn shown_prompt<'a>(unlock: &'a Option<Unlock>, fading: &'a Option<Prompt>) -> Option<&'a Prompt> {
+    unlock
+        .as_ref()
+        .map(|unlock| &unlock.prompt)
+        .or(fading.as_ref())
 }
 
 fn hints(config: &Config) -> ModeHints {
@@ -446,13 +377,4 @@ fn notify_ready() {
     if let (Ok(sender), Ok(address)) = (UnixDatagram::unbound(), address) {
         let _ = sender.send_to_addr(b"READY=1", &address);
     }
-}
-
-fn reply(mut stream: UnixStream, message: &str) {
-    let _ = stream.write_all(format!("{message}\n").as_bytes());
-}
-
-fn enter_root(root: &Path) -> std::io::Result<()> {
-    rustix::process::chroot(root)?;
-    std::env::set_current_dir("/")
 }

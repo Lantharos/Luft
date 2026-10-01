@@ -1,3 +1,4 @@
+mod activity;
 mod daemon;
 mod screen;
 mod signals;

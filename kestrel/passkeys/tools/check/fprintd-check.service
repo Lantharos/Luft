@@ -1,0 +1,11 @@
+[Unit]
+Description=Fingerprint reader stand-in for passkey checks
+
+[Service]
+Type=dbus
+BusName=net.reactivated.Fprint
+RuntimeDirectory=fprintd-check
+ExecStart=/usr/bin/python3 /usr/local/share/passkeys-check/fprintd.py
+
+[Install]
+WantedBy=multi-user.target

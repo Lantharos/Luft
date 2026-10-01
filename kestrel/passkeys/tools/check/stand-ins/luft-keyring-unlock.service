@@ -1,0 +1,6 @@
+[Unit]
+Description=Luft Keyring unlocking
+
+[Service]
+ExecStart=@libexecdir@/luft-keyring-unlock --keyring @libexecdir@/luft-keyring
+StateDirectory=luft-keyring

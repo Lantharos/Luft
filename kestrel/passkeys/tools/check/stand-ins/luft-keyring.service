@@ -1,0 +1,9 @@
+[Unit]
+Description=Luft Keyring
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.secrets
+ExecStart=@libexecdir@/luft-keyring
+Restart=on-failure

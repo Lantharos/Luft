@@ -1,0 +1,19 @@
+[package]
+name = "luft-usb-protection"
+description = "Holds back USB devices connected while nobody is signed in and unlocked"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+access.workspace = true
+anyhow.workspace = true
+futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
+rustix = { workspace = true, features = ["net"] }
+tokio = { workspace = true, features = ["net"] }
+zbus.workspace = true
+
+[lints]
+workspace = true

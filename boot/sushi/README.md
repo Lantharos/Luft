@@ -136,6 +136,7 @@ The VM is a Fedora 45 system built with Podman, with greetd and Kestrel's login 
 ```bash
 scripts/vm/tree.sh       # Fedora root tree (first run downloads packages)
 scripts/vm/kestrel.sh    # build Kestrel into the tree
+scripts/vm/security.sh   # build Luft's device security services into the tree
 scripts/vm/disk.sh       # install Sushi, build the initramfs, root disk and ESP
 scripts/vm/run.sh        # boot it in a window
 ```

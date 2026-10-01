@@ -28,6 +28,8 @@ meson install -C "$build/engine" --no-rebuild --quiet
 glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 cargo build --release --manifest-path "$luft/kestrel/greeter/Cargo.toml"
 install -Dm755 "$luft/kestrel/greeter/target/release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
+cargo build --release --manifest-path "$luft/kestrel/settings/Cargo.toml"
+install -Dm755 "$luft/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
 
 libraries="$(find "$prefix" -type f \( -name '*.so*' -o -path '*/bin/*' -o -path '*/libexec/*' \) -exec sh -c 'file "$1" | grep -q ELF && ldd "$1"' _ {} \; 2>/dev/null |
   awk '/=> \//{print $3}' | grep -v "^$prefix" | sort -u)"

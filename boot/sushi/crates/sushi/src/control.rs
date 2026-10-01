@@ -62,6 +62,7 @@ pub enum Command {
     Show(Mode),
     Status,
     KeyEnrollmentNotice(Option<KeyEnrollment>),
+    ShowNotice(PathBuf),
 }
 
 impl Command {
@@ -86,6 +87,7 @@ impl Command {
                     },
                 })),
                 "clear" => Self::KeyEnrollmentNotice(None),
+                "show" => Self::ShowNotice(PathBuf::from(words.next()?)),
                 _ => return None,
             },
             _ => return None,
@@ -105,6 +107,7 @@ impl Command {
                 if *again { " again" } else { "" }
             ),
             Self::KeyEnrollmentNotice(None) => "notice clear".into(),
+            Self::ShowNotice(path) => format!("notice show {}", path.display()),
         }
     }
 }
@@ -139,6 +142,7 @@ mod tests {
                 again: true,
             })),
             Command::KeyEnrollmentNotice(None),
+            Command::ShowNotice("/run/kestrel-watchdog/notice".into()),
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));
         }

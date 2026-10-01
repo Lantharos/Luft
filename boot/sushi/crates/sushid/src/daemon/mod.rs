@@ -300,13 +300,14 @@ impl Daemon {
     }
 
     fn handle_keys(&mut self) {
-        if self.notice.is_some() {
-            let pressed_enter = self
+        if let Some(shown) = &mut self.notice {
+            let keys = self
                 .terminal
                 .as_mut()
-                .is_some_and(|terminal| terminal.keys().contains(&sushi::terminal::Key::Enter));
-            if pressed_enter || self.notice.as_ref().is_some_and(Shown::expired) {
-                self.dismiss_notice();
+                .map(Terminal::keys)
+                .unwrap_or_default();
+            if let Some(answer) = shown.answer(&keys) {
+                self.dismiss_notice(&answer);
             }
             return;
         }

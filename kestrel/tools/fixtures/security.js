@@ -34,7 +34,7 @@ const FWUPD = `<node><interface name="org.freedesktop.fwupd">
   <method name="GetHostSecurityAttrs"><arg type="aa{sv}" direction="out"/></method>
 </interface></node>`;
 
-const RECOVERY_KEY = 'K7M2QX9D-4HTW8NPA-V3RC6FJE-Z5BY2LUG-9QDN4XKT-7WAP3MHC-E6JV8RFZ-2UGL5YSB';
+const RECOVERY_KEY = 'bfgdekjl-vtictulg-gcjginrv-hcddchdu-ihruiigb-bednnflv-hluincci-cdktjdrh';
 const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
 const CONTACT_MAKER = 1 << 11;

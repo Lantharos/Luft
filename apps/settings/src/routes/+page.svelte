@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { isAvailable } from '@lantharos/sabine';
-	import { GlassShell, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, WindowControls } from '@luft/ui';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { PANELS } from '$lib/panels/registry';
 	import { app } from '$lib/state/app.svelte';
@@ -11,6 +11,10 @@
 
 	onMount(() => {
 		if (isAvailable()) void app.start();
+	});
+
+	$effect(() => {
+		document.documentElement.dataset.scheme = appearance.scheme;
 	});
 
 	$effect(() => {

@@ -86,9 +86,13 @@ pub fn cancel() -> Result<()> {
     if enrollment() == Enrollment::Pending {
         Tool::new("mokutil").arg("--revoke-import").status()?;
     }
-    let _ = std::fs::remove_file(paths::state(CODE));
+    forget_code();
     show_on_restart(None);
     Ok(())
+}
+
+pub fn forget_code() {
+    let _ = std::fs::remove_file(paths::state(CODE));
 }
 
 fn show_on_restart(code: Option<&str>) {

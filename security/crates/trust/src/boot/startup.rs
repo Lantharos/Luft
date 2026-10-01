@@ -15,6 +15,7 @@ const MENU_LOADER_PATH: &str = "\\EFI\\sushi\\SushiBoot.efi ";
 const IMAGES: &str = "EFI/Linux";
 const LABEL: &str = "Luft";
 const LOADER_CONF: &str = "loader/loader.conf";
+const IMAGE_ROOM: u64 = 96 << 20;
 
 fn image_name(version: &str) -> String {
     format!("luft-{version}.efi")
@@ -38,12 +39,29 @@ pub fn installed() -> bool {
     esp::find().is_ok_and(|esp| esp.file(SIGNED_MENU).exists()) && boot_entry().is_some()
 }
 
+fn room_for_images(esp: &Esp) -> bool {
+    let needed = IMAGE_ROOM * kernels::installed().len().max(1) as u64;
+    let present: u64 = std::fs::read_dir(esp.file(IMAGES))
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|entry| entry.file_name().to_string_lossy().starts_with("luft-"))
+        .filter_map(|entry| entry.metadata().ok())
+        .map(|metadata| metadata.len())
+        .sum();
+    rustix::fs::statvfs(&esp.path)
+        .is_ok_and(|space| space.f_bavail * space.f_frsize + present >= needed)
+}
+
 pub fn unavailable_reason() -> Option<&'static str> {
     if !Path::new(BOOT_MENU).exists() {
         return Some("Luft's boot menu isn't installed.");
     }
-    if esp::find().is_err() {
+    let Ok(esp) = esp::find() else {
         return Some("This computer doesn't start from an EFI system partition.");
+    };
+    if !room_for_images(&esp) {
+        return Some("The EFI system partition is too full for the signed startup files.");
     }
     match mok::enrollment() {
         mok::Enrollment::Enrolled => None,
@@ -72,7 +90,9 @@ pub fn add(kernel: &Kernel, built_initrd: Option<&Path>) -> Result<()> {
         &initrd_for(kernel, built_initrd)?,
         &image(&esp, &kernel.version),
         &keys,
-    )
+    )?;
+    rustix::fs::sync();
+    Ok(())
 }
 
 pub fn remove(version: &str) -> Result<()> {
@@ -126,11 +146,13 @@ pub fn install() -> Result<()> {
     let Some(shim) = esp.shim() else {
         bail!("Fedora's shim isn't on the EFI system partition.");
     };
+    mok::forget_code();
     let keys = keys::unseal()?;
     rebuild_with(&esp, &keys, true)?;
     super::sign::efi_binary(Path::new(BOOT_MENU), &esp.file(SIGNED_MENU), &keys)?;
     esp::write(&esp.file(LOADER_CONF), loader_conf(&esp).as_bytes())?;
     remove_boot_entry()?;
+    rustix::fs::sync();
     Tool::new("efibootmgr")
         .arg("--create")
         .arg("--disk")

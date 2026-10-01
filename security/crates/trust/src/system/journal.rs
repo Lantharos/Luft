@@ -1,10 +1,12 @@
 use super::command::Tool;
 
-const REFUSALS: [&str; 4] = [
+const REFUSALS: [&str; 6] = [
     "TPM2 operation failed, falling back",
     "TPM2 PIN unlock failed",
     "No TPM2 metadata matching the current system state",
     "No TPM2 hardware discovered",
+    "Failed to load PCR signature",
+    "Failed to unseal secret using TPM2",
 ];
 
 pub const STAGE_REFUSED: &str = "The TPM didn't release the disk key";

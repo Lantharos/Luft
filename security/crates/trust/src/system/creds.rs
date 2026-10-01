@@ -1,3 +1,4 @@
+use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 
 use anyhow::Result;
@@ -27,6 +28,11 @@ impl Protection {
     }
 }
 
+fn private(path: &Path) -> Result<()> {
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))?;
+    Ok(())
+}
+
 pub fn seal(name: &str, secret: &Secret, protection: Protection, path: &Path) -> Result<()> {
     Tool::new("systemd-creds")
         .arg("encrypt")
@@ -36,7 +42,8 @@ pub fn seal(name: &str, secret: &Secret, protection: Protection, path: &Path) ->
         .arg("-")
         .arg(path)
         .input(secret)
-        .status()
+        .status()?;
+    private(path)
 }
 
 pub fn seal_for_startup(
@@ -55,7 +62,8 @@ pub fn seal_for_startup(
         .arg("-")
         .arg(path)
         .input(secret)
-        .status()
+        .status()?;
+    private(path)
 }
 
 pub fn unseal(name: &str, path: &Path) -> Result<Secret> {

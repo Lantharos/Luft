@@ -9,6 +9,7 @@ ExecStart=/usr/bin/luft-trust serve
 SyslogIdentifier=luft-trust
 PrivateTmp=yes
 ProtectHome=read-only
+KeyringMode=shared
 NoNewPrivileges=yes
 LockPersonality=yes
 RestrictRealtime=yes

@@ -157,8 +157,7 @@ fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
 }
 
 fn finish_decrypting(plan: &Plan) -> Result<()> {
-    state::set_crypttab(&plan.mapping(), None)?;
-    cmdline::change(&[], &["rd.luks.uuid", "rd.luks.data", "rd.luks.options"])?;
+    stage::remove();
     rebuild_boot_files()?;
     if let Some(header) = &plan.header {
         let _ = std::fs::remove_file(header);

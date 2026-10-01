@@ -28,6 +28,7 @@ pub struct Plan {
     pub partuuid: String,
     pub mode: Mode,
     pub header: Option<PathBuf>,
+    pub boot_uuid: Option<String>,
 }
 
 impl Plan {

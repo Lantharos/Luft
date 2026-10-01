@@ -19,6 +19,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `packages/app` | Native window, accent, and D-Bus setup shared by the apps |
 | `packages/software` | Apps, system updates, Flatpak, AppImages and offline updates shared by Schelf and Settings |
 | `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |
+| `security` | Device trust (Secure Boot signing, TPM disk unlock, device encryption) and USB protection while locked |
 | `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
 
 Kestrel currently boots on a virtual Wayland monitor with its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. The shell runs its own session but still relies on several GNOME settings services and GNOME's portal backend, so this is a working integration checkpoint rather than a distributable desktop session. The remaining work is tracked in [Kestrel's roadmap](kestrel/README.md).
@@ -57,7 +58,7 @@ Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1
 
 Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
 
-Barometer, Draft, Magpie, Rover, Schelf, Settings, Tern, and Sushi keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Barometer, Draft, Magpie, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
 
 ## Source and licenses
 

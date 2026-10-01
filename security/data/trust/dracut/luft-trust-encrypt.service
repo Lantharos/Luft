@@ -3,7 +3,7 @@ Description=Start encrypting the system disk
 DefaultDependencies=no
 ConditionPathExists=/etc/luft-trust/stage/plan.json
 Wants=tpm2.target
-After=systemd-udev-trigger.service tpm2.target sushi.service
+After=systemd-udev-trigger.service tpm2.target sushi.service systemd-pcrphase-initrd.service
 Before=cryptsetup.target initrd-root-device.target sysroot.mount
 
 [Service]

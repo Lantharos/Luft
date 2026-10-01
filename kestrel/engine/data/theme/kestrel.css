@@ -71,7 +71,6 @@ stage { font-family: "Open Runde"; }
 
 StEntry, .kestrel-search,
 .prompt-dialog .prompt-dialog-password-entry,
-.run-dialog .run-dialog-entry,
 .unlock-dialog .login-dialog-prompt-entry {
   color: #ffffff;
   caret-size: 1px;
@@ -89,7 +88,6 @@ StEntry, .kestrel-search,
 StEntry:hover { background-color: rgba(255, 255, 255, 0.09); }
 StEntry:focus, .kestrel-search:focus,
 .prompt-dialog .prompt-dialog-password-entry:focus,
-.run-dialog .run-dialog-entry:focus,
 .unlock-dialog .login-dialog-prompt-entry:focus {
   background-color: rgba(255, 255, 255, 0.13);
   border: none;
@@ -153,6 +151,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
   -barlevel-border-width: 0;
   -barlevel-active-border-color: transparent;
   -barlevel-border-color: transparent;
+  -barlevel-overdrive-color: #e5484d;
 }
 .kestrel-notification-header { spacing: 12px; padding: 4px 4px 0; }
 .kestrel-notification-center { spacing: 14px; }
@@ -339,7 +338,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .audio-device-selection-dialog .audio-selection-device-icon { icon-size: 28px; }
 .audio-device-selection-dialog .audio-selection-device-label { font-size: 14px; text-align: left; }
 .access-dialog { text-align: left; }
-.run-dialog { padding-bottom: 20px; }
 .modal-dialog-button, .button, .icon-button, .notification-button,
 .audio-selection-device, .message-expand-button, .message-close-button,
 .message-collapse-button {
@@ -378,7 +376,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .ws-switcher-indicator:active { background-color: rgba(255, 255, 255, 0.75); }
 .osd-window.kestrel-glass { padding: 10px 18px 10px 16px; border-radius: 999px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
 .osd-window.kestrel-glass StIcon { icon-size: 20px; }
-.osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; }
+.osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; -barlevel-overdrive-color: #e5484d; }
 .osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 20px; background-color: rgba(20, 20, 24, 0.20); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
@@ -432,7 +430,10 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-context-action.kestrel-closing-selection,
 .popup-menu-item.kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.16); }
 .candidate-popup-content { background-color: transparent; border: none; box-shadow: none; }
-.candidate-box:selected { background-color: rgba(255, 255, 255, 0.18); border-radius: 8px; }
+.candidate-box { border-radius: 10px; }
+.candidate-box:hover { background-color: rgba(255, 255, 255, 0.10); color: white; }
+.candidate-box:selected { background-color: rgba(255, 255, 255, 0.18); color: white; }
+.select-area-rubberband { background-color: rgba(255, 255, 255, 0.10); border: 2px solid white; }
 .unlock-dialog .button, .unlock-dialog .icon-button {
   background-color: rgba(255, 255, 255, 0.10); border-radius: 10px; border-color: transparent; box-shadow: none;
 }
@@ -447,8 +448,6 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .unlock-dialog-notification-preview-body { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
 .kestrel-glass .kestrel-closing-selection { background-color: rgba(255, 255, 255, 0.18); }
 .prompt-dialog .prompt-dialog-error-label, .prompt-dialog .prompt-dialog-info-label { padding: 8px 10px; margin: 0; text-align: left; border-radius: 8px; font-size: 13px; }
-#LookingGlassDialog, #LookingGlassAutoCompletionText { background-color: rgba(20, 20, 24, 0.20); border: none; box-shadow: none; color: white; }
-.lg-dialog .button { background-color: rgba(255, 255, 255, 0.10); }
 
 .kestrel-glass-radius-16 { border-radius: 16px; }
 .kestrel-glass-radius-18 { border-radius: 18px; }

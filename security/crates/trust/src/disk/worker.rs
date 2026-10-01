@@ -119,9 +119,12 @@ fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
     let device = plan.partition();
     let header =
         luks::read(&device, None, disk.size())?.context("The disk lost its encryption header")?;
-    if !header.has(luks::RECOVERY) {
+    let header = if header.has(luks::RECOVERY) {
+        header
+    } else {
         keys::add_recovery_token(&device, 0)?;
-    }
+        luks::read(&device, None, disk.size())?.context("The disk lost its encryption header")?
+    };
     let options = match plan.mode {
         Mode::Tpm => {
             keys::enroll_tpm(&device, key, &keys::pin_kept_for_later())?;

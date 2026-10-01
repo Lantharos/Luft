@@ -2,6 +2,7 @@
 	import { Dialog, Row, Section } from '@luft/ui';
 	import { binaryBytes, bytes } from '$lib/format';
 	import { about, rename, type About } from './api';
+	import RecentProblems from './RecentProblems.svelte';
 
 	let info = $state<About | null>(null);
 	let renaming = $state(false);
@@ -72,6 +73,8 @@
 		<Row title="Kernel"><span>{info.kernel}</span></Row>
 		<Row title="Hostname"><span>{info.hostname}</span></Row>
 	</Section>
+
+	<RecentProblems />
 {/if}
 
 {#if renaming}

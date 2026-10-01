@@ -1,3 +1,5 @@
+mod problems;
+
 use std::ffi::CString;
 use std::fs;
 
@@ -185,4 +187,8 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
         .command("about", |_: Value| about())
         .command("about_rename", rename)
+        .command("about_problems", |_: Value| problems::problems())
+        .command("about_firmware_restart", |_: Value| {
+            problems::restart_to_firmware()
+        })
 }

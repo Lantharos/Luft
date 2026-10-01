@@ -7,6 +7,7 @@ prefix="${2:-/opt/kestrel}"
 build="$root/kestrel/run/install-build"
 
 greeter_data="$root/kestrel/greeter/data"
+source "$root/kestrel/keyring/tools/install.sh"
 
 greeter_files() {
   echo "com.lantharos.Greeter1.conf /etc/dbus-1/system.d/com.lantharos.Greeter1.conf"
@@ -91,6 +92,7 @@ case "$action" in
         sudo ln -sfn "$prefix/$link" "/usr/local/$link"
       done
       install_greeter
+      install_keyring
       systemctl --user daemon-reload
       echo "Kestrel is installed in $prefix and appears as a session on the login screen."
       echo "The Kestrel login screen is ready to use with greetd; see Login screen in kestrel/README.md to switch to it."
@@ -104,6 +106,7 @@ case "$action" in
       [[ -L "/usr/local/$link" ]] && sudo rm "/usr/local/$link"
     done
     remove_greeter
+    remove_keyring
     as_owner "$prefix" rm -rf "$prefix"
     echo "Kestrel was removed from $prefix."
     ;;

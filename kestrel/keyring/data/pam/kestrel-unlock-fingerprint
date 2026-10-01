@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth       substack    fingerprint-auth
+-auth      optional    @pamdir@/pam_luft_keyring.so
+account    include     fingerprint-auth

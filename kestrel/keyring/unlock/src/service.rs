@@ -6,8 +6,8 @@ use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::{Duration, Instant};
 
 use luft_keyring_wire::{
-    Event, Grant, GrantReason, Problem, Reply, Request, Seal, Secret, Status, Unlock, read_async,
-    write_async,
+    Chip, Event, Grant, GrantReason, Problem, Reply, Request, Seal, Secret, Status, Unlock,
+    read_async, write_async,
 };
 use tokio::io::AsyncReadExt;
 use tokio::net::UnixStream;
@@ -135,7 +135,10 @@ impl Service {
     fn unseal(&self, user: u32, pin: Option<&Secret>) -> Result<Secret, Problem> {
         let blob = self.seals.load(user).ok_or(Problem::NotSealed)?;
         if blob.pin && pin.is_none() {
-            return Err(Problem::NeedsPin);
+            return Err(match self.chip.state() {
+                Chip::Ready => Problem::NeedsPin,
+                state => Problem::NoChip(state),
+            });
         }
         let key = self
             .chip

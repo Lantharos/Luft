@@ -65,7 +65,9 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .request_name_with_flags(manage::NAME, RequestNameFlags::DoNotQueue.into())
         .await?;
     daemon.start_unlocking().await;
-    ssh::start(&daemon)?;
+    if let Err(error) = ssh::start(&daemon) {
+        eprintln!("The SSH agent couldn't start: {error}");
+    }
     watch::start(&daemon).await?;
     std::future::pending::<()>().await;
     Ok(())

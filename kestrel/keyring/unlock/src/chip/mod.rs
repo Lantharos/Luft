@@ -74,9 +74,10 @@ impl Chip {
                 Problem::Failed("this seal has no PIN".into())
             });
         }
-        let object = self
-            .load(&blob.public, &blob.private)
-            .map_err(|_| Problem::PolicyChanged)?;
+        let object = self.load(&blob.public, &blob.private).map_err(|error| {
+            eprintln!("The security chip couldn't load a seal: {error}");
+            Problem::PolicyChanged
+        })?;
         let result = self.unseal_loaded(object, pin);
         let _ = self.context.flush_context(object.into());
         result
@@ -198,6 +199,7 @@ fn problem(error: tss_esapi::Error) -> Problem {
     let tss_esapi::Error::Tss2Error(code) = error else {
         return failed(error);
     };
+    eprintln!("The security chip refused: {error}");
     match code.kind() {
         Some(Tss2ResponseCodeKind::PolicyFail | Tss2ResponseCodeKind::Value) => {
             Problem::PolicyChanged

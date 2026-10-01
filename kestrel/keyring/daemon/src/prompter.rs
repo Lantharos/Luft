@@ -11,6 +11,8 @@ const NAME: &str = "com.lantharos.Kestrel";
 const PATH: &str = "/com/lantharos/Kestrel/KeyringPrompter";
 const INTERFACE: &str = "com.lantharos.Kestrel.KeyringPrompter";
 
+const PATIENCE_STEP: std::time::Duration = std::time::Duration::from_millis(250);
+const PATIENCE_STEPS: u32 = 240;
 const CHOSEN: u32 = 0;
 const REFUSED: u32 = 1;
 
@@ -85,7 +87,25 @@ impl Prompter {
         format!("keyring-{}", self.next.fetch_add(1, Ordering::Relaxed))
     }
 
+    async fn shown(&self) -> bool {
+        let Ok(bus) = zbus::fdo::DBusProxy::new(&self.connection).await else {
+            return false;
+        };
+        let name = zbus::names::BusName::from_static_str(NAME).expect("a valid bus name");
+        for _ in 0..PATIENCE_STEPS {
+            if bus.name_has_owner(name.clone()).await.unwrap_or(false) {
+                return true;
+            }
+            tokio::time::sleep(PATIENCE_STEP).await;
+        }
+        eprintln!("Kestrel isn't there to ask");
+        false
+    }
+
     pub async fn access(&self, handle: &str, request: &Request<'_>) -> Answer {
+        if !self.shown().await {
+            return Answer::Dismissed;
+        }
         let reply = self
             .connection
             .call_method(
@@ -121,6 +141,9 @@ impl Prompter {
         handle: &str,
         request: &Request<'_>,
     ) -> Option<Zeroizing<Vec<u8>>> {
+        if !self.shown().await {
+            return None;
+        }
         let (reader, writer) = rustix::pipe::pipe_with(rustix::pipe::PipeFlags::CLOEXEC).ok()?;
         let reply = self
             .connection
@@ -133,7 +156,10 @@ impl Prompter {
             )
             .await;
         drop(writer);
-        let response = reply.ok()?.body().deserialize::<u32>().ok()?;
+        let reply = reply
+            .inspect_err(|error| eprintln!("Kestrel couldn't ask for a password: {error}"))
+            .ok()?;
+        let response = reply.body().deserialize::<u32>().ok()?;
         if response != CHOSEN {
             return None;
         }

@@ -11,11 +11,13 @@ firmware=(-machine q35,accel=kvm)
 code="$ovmf/OVMF_CODE.fd"
 vars="$vm/OVMF_VARS.fd"
 template="$ovmf/OVMF_VARS.fd"
+format=raw
 if [[ "${SECURE_BOOT:-0}" == 1 ]]; then
   firmware=(-machine q35,accel=kvm,smm=on -global driver=cfi.pflash01,property=secure,value=on)
-  code="$ovmf/OVMF_CODE.secboot.fd"
-  vars="$vm/OVMF_VARS.secboot.fd"
-  template="$ovmf/OVMF_VARS.secboot.fd"
+  code="$ovmf/OVMF_CODE_4M.secboot.qcow2"
+  vars="$vm/OVMF_VARS_4M.secboot.qcow2"
+  template="$ovmf/OVMF_VARS_4M.secboot.qcow2"
+  format=qcow2
 fi
 [[ -f "$vars" ]] || cp "$template" "$vars"
 
@@ -41,8 +43,8 @@ display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
 
 exec qemu-system-x86_64 \
   "${firmware[@]}" -cpu host -smp 4 -m 4096 \
-  -drive "if=pflash,format=raw,readonly=on,file=$code" \
-  -drive "if=pflash,format=raw,file=$vars" \
+  -drive "if=pflash,format=$format,readonly=on,file=$code" \
+  -drive "if=pflash,format=$format,file=$vars" \
   "${disks[@]}" \
   "${tpm[@]}" \
   -device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}" \

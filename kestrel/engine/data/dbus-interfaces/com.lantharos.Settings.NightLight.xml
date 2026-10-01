@@ -1,5 +1,5 @@
 <node>
-  <interface name="org.gnome.SettingsDaemon.Color">
+  <interface name="com.lantharos.Settings.NightLight">
     <property name="DisabledUntilTomorrow" type="b" access="readwrite"/>
     <property name="NightLightActive" type="b" access="read"/>
   </interface>

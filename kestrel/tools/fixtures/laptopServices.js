@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-const RFKILL = `<node><interface name="org.gnome.SettingsDaemon.Rfkill">
+const RFKILL = `<node><interface name="com.lantharos.Settings.Rfkill">
   <property name="AirplaneMode" type="b" access="readwrite"/>
   <property name="HasAirplaneMode" type="b" access="read"/>
   <property name="HardwareAirplaneMode" type="b" access="read"/>
@@ -22,7 +22,7 @@ function exportWritable(xml, path, name, type, initial, constants) {
   exported.export(Gio.DBus.session, path);
 }
 
-exportWritable(RFKILL, '/org/gnome/SettingsDaemon/Rfkill', 'AirplaneMode', 'b', false,
+exportWritable(RFKILL, '/com/lantharos/Settings/Rfkill', 'AirplaneMode', 'b', false,
   { HasAirplaneMode: true, HardwareAirplaneMode: false, ShouldShowAirplaneMode: true });
-Gio.bus_own_name_on_connection(Gio.DBus.session, 'org.gnome.SettingsDaemon.Rfkill', Gio.BusNameOwnerFlags.NONE, null, null);
+Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.lantharos.Settings.Rfkill', Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

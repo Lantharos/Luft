@@ -31,9 +31,9 @@
     <file preprocess="xml-stripblanks">org.gnome.SessionManager.Inhibitor.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.SessionManager.Presence.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.SessionManager.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.SettingsDaemon.Color.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.SettingsDaemon.Power.Keyboard.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.SettingsDaemon.Rfkill.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Settings.NightLight.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Settings.KeyboardLight.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Settings.Rfkill.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.AudioDeviceSelection.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Brightness.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Introspect.xml</file>

@@ -13,8 +13,8 @@ pub struct Airplane {
     hardware: bool,
 }
 
-const SERVICE: &str = "org.gnome.SettingsDaemon.Rfkill";
-const PATH: &str = "/org/gnome/SettingsDaemon/Rfkill";
+const SERVICE: &str = "com.lantharos.Settings.Rfkill";
+const PATH: &str = "/com/lantharos/Settings/Rfkill";
 
 static RFKILL: OnceLock<Proxy<'static>> = OnceLock::new();
 

@@ -17,10 +17,10 @@ import {Reconnector} from './bluetoothReconnect.js';
 
 const {AdapterState} = GnomeBluetooth;
 
-const BUS_NAME = 'org.gnome.SettingsDaemon.Rfkill';
-const OBJECT_PATH = '/org/gnome/SettingsDaemon/Rfkill';
+const BUS_NAME = 'com.lantharos.Settings.Rfkill';
+const OBJECT_PATH = '/com/lantharos/Settings/Rfkill';
 
-const RfkillManagerInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Rfkill');
+const RfkillManagerInterface = loadInterfaceXML('com.lantharos.Settings.Rfkill');
 const rfkillManagerInfo = Gio.DBusInterfaceInfo.new_for_xml(RfkillManagerInterface);
 
 Gio._promisify(GnomeBluetooth.Client.prototype, 'connect_service');

@@ -1,8 +1,8 @@
 use tokio::sync::mpsc;
 use zbus::{fdo, interface};
 
-pub const NAME: &str = "org.gnome.SettingsDaemon.Color";
-pub const PATH: &str = "/org/gnome/SettingsDaemon/Color";
+pub const NAME: &str = "com.lantharos.Settings.NightLight";
+pub const PATH: &str = "/com/lantharos/Settings/NightLight";
 const LONGEST_PREVIEW: u32 = 120;
 
 pub enum Command {
@@ -19,7 +19,7 @@ pub struct Color {
     pub commands: mpsc::UnboundedSender<Command>,
 }
 
-#[interface(name = "org.gnome.SettingsDaemon.Color")]
+#[interface(name = "com.lantharos.Settings.NightLight")]
 impl Color {
     fn night_light_preview(&self, duration: u32) -> fdo::Result<()> {
         if duration == 0 || duration > LONGEST_PREVIEW {

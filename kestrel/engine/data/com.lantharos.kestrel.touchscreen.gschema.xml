@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.touchscreen" path="/com/lantharos/kestrel/touchscreen/">
+    <key name="orientation-lock" type="b">
+      <default>false</default>
+      <summary>Keep the screen from rotating</summary>
+      <description>When on, the screen stays in its current orientation instead of following the accelerometer.</description>
+    </key>
+  </schema>
+</schemalist>

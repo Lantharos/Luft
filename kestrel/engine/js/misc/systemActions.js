@@ -139,7 +139,7 @@ const SystemActions = GObject.registerClass({
         });
 
         this._lockdownSettings = new Gio.Settings({schema_id: LOCKDOWN_SCHEMA});
-        this._orientationSettings = new Gio.Settings({schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen'});
+        this._orientationSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.touchscreen'});
         this._screenSaverSettings = new Gio.Settings({schema_id: SCREENSAVER_SCHEMA});
 
         this._session = new GnomeSession.SessionManager();

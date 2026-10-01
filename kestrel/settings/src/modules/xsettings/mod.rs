@@ -1,6 +1,7 @@
 mod display;
 mod gtk;
 mod modules;
+mod resources;
 mod snapshot;
 mod wire;
 
@@ -79,8 +80,15 @@ struct Xwayland {
 impl Xwayland {
     async fn start(&self, display: &str, authority: &str) -> fdo::Result<()> {
         let snapshot = self.snapshots.borrow().clone();
+        let resources = tokio::task::spawn_blocking(resources::load)
+            .await
+            .unwrap_or_default();
         let connection = Display::connect(display, Path::new(authority))
-            .and_then(|mut connection| connection.apply(&snapshot).map(|()| connection))
+            .and_then(|mut connection| {
+                connection.merge_resources(&resources)?;
+                connection.apply(&snapshot)?;
+                Ok(connection)
+            })
             .map_err(|error| {
                 fdo::Error::Failed(format!("Couldn't serve settings to X11 apps: {error}"))
             })?;

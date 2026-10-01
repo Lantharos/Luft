@@ -24,7 +24,7 @@ class RotationToggle extends QuickToggle {
             GObject.BindingFlags.SYNC_CREATE);
 
         this._settings = new Gio.Settings({
-            schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen',
+            schema_id: 'com.lantharos.kestrel.touchscreen',
         });
         this._settings.bind('orientation-lock',
             this, 'checked',

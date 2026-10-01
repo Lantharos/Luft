@@ -125,7 +125,7 @@
 			onchange={(on) => privacy.set('remove-old-trash-files', on)}
 		/>
 	</Row>
-	<Row title="Delete temporary files automatically">
+	<Row title="Delete temporary files automatically" description="Your own files in the temporary folders that nothing has used lately">
 		<Switch
 			label="Delete temporary files automatically"
 			checked={privacy.values['remove-old-temp-files'] ?? false}

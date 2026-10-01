@@ -5,10 +5,10 @@ import type { Context } from '../context.js';
 
 type ShowOsd = Context['showOsd'];
 
-const RFKILL = 'org.gnome.SettingsDaemon.Rfkill';
-const RFKILL_PATH = '/org/gnome/SettingsDaemon/Rfkill';
-const KEYBOARD = 'org.gnome.SettingsDaemon.Power';
-const KEYBOARD_PATH = '/org/gnome/SettingsDaemon/Power';
+const RFKILL = 'com.lantharos.Settings.Rfkill';
+const RFKILL_PATH = '/com/lantharos/Settings/Rfkill';
+const KEYBOARD = 'com.lantharos.Settings.KeyboardLight';
+const KEYBOARD_PATH = '/com/lantharos/Settings/KeyboardLight';
 const UPOWER = 'org.freedesktop.UPower';
 const DISPLAY_DEVICE = '/org/freedesktop/UPower/devices/DisplayDevice';
 const BATTERY_KINDS = new Set([2, 3]);
@@ -28,7 +28,7 @@ async function properties(bus: Gio.DBusConnection, name: string, path: string, i
 
 export class DeviceKeys {
   private readonly touchpad = new Gio.Settings({ schema_id: 'org.gnome.desktop.peripherals.touchpad' });
-  private readonly touchscreen = new Gio.Settings({ schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen' });
+  private readonly touchscreen = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.touchscreen' });
   private radioPressedAt = 0;
 
   constructor(private readonly showOsd: ShowOsd) {}
@@ -49,7 +49,7 @@ export class DeviceKeys {
 
   async keyboardBrightness(step: KeyboardStep): Promise<void> {
     try {
-      const reply = await Gio.DBus.session.call(KEYBOARD, KEYBOARD_PATH, `${KEYBOARD}.Keyboard`, step, null,
+      const reply = await Gio.DBus.session.call(KEYBOARD, KEYBOARD_PATH, KEYBOARD, step, null,
         new GLib.VariantType('(i)'), Gio.DBusCallFlags.NONE, -1, null);
       const [percentage] = reply.deep_unpack() as [number];
       this.showOsd(icon('keyboard-brightness-symbolic'), null, percentage / 100, 1);

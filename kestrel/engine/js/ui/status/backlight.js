@@ -12,10 +12,10 @@ import {Slider} from '../slider.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
 
-const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
-const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
+const BUS_NAME = 'com.lantharos.Settings.KeyboardLight';
+const OBJECT_PATH = '/com/lantharos/Settings/KeyboardLight';
 
-const BrightnessInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Keyboard');
+const BrightnessInterface = loadInterfaceXML('com.lantharos.Settings.KeyboardLight');
 const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
 
 const SliderItem = GObject.registerClass({

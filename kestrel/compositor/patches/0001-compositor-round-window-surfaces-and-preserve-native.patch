@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Fri, 25 Sep 2026 01:05:33 +0200
-Subject: [PATCH 1/8] compositor: round window surfaces and preserve native
+Subject: [PATCH 1/9] compositor: round window surfaces and preserve native
  shadows
 
 ---

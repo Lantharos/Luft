@@ -7,6 +7,7 @@ import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
+import {checkBackdrops} from './checks/desktop/backdropChecks.js';
 import {checkFolders} from './checks/desktop/folderChecks.js';
 import {checkSession} from './checks/desktop/sessionChecks.js';
 import {checkClipboardPlacement} from './checks/input/clipboardChecks.js';
@@ -321,6 +322,7 @@ export async function run() {
     }
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
+  await checkBackdrops({pause});
   await checkClipboardPlacement({pause, capture, actorNamed, keyboard, output});
   await checkClipboardImages({pause, capture, actorNamed, keyboard, output});
   await checkEmoji({pause, capture, actorNamed, keyboard, output});

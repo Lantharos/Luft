@@ -37,6 +37,7 @@
     <file>ui/animation.js</file>
     <file>ui/audioDeviceSelection.js</file>
     <file>ui/background.js</file>
+    <file>ui/backgroundStore.js</file>
     <file>ui/barLevel.js</file>
     <file>ui/boxpointer.js</file>
     <file>ui/checkBox.js</file>

@@ -11,7 +11,8 @@ import Monitor from '@lucide/svelte/icons/monitor';
 import Mouse from '@lucide/svelte/icons/mouse';
 import Palette from '@lucide/svelte/icons/palette';
 import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-import Shield from '@lucide/svelte/icons/shield';
+import Hand from '@lucide/svelte/icons/hand';
+import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import Wifi from '@lucide/svelte/icons/wifi';
@@ -28,6 +29,7 @@ export type PanelId =
 	| 'mouse'
 	| 'apps'
 	| 'privacy'
+	| 'security'
 	| 'datetime'
 	| 'users'
 	| 'login'
@@ -70,13 +72,14 @@ export const PANEL_GROUPS: Panel[][] = [
 	],
 	[
 		panel('apps', 'Apps', LayoutGrid, ['default apps', 'browser', 'startup', 'autostart'], () => import('./apps/AppsPanel.svelte')),
-		panel('privacy', 'Privacy & Security', Shield, ['screen lock', 'location', 'camera', 'microphone', 'recent files', 'trash'], () => import('./privacy/PrivacyPanel.svelte'))
+		panel('privacy', 'Privacy', Hand, ['screen lock', 'location', 'camera', 'microphone', 'recent files', 'file history', 'trash', 'temporary files'], () => import('./privacy/PrivacyPanel.svelte')),
+		panel('security', 'Security', ShieldCheck, ['secure boot', 'tpm', 'encryption', 'disk encryption', 'bitlocker', 'luks', 'recovery key', 'pin', 'firmware', 'hardware security', 'signing key', 'usb', 'passwords', 'keyring', 'passkeys'], () => import('./security/SecurityPanel.svelte'))
 	],
 	[
 		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./datetime/DateTimePanel.svelte')),
 		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./users/UsersPanel.svelte')),
 		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./login/LoginPanel.svelte')),
-		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'security', 'restart and install', 'packages', 'automatic updates'], () => import('./updates/UpdatesPanel.svelte')),
+		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'restart and install', 'packages', 'automatic updates', 'security updates'], () => import('./updates/UpdatesPanel.svelte')),
 		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./about/AboutPanel.svelte'))
 	]
 ];

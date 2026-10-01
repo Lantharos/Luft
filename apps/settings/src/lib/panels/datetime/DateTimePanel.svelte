@@ -88,7 +88,7 @@
 <Section>
 	<Row
 		title="Set the time zone automatically"
-		description={automaticZone && !location.values.enabled ? 'Turn on location services in Privacy & Security to use this' : 'Follows your location when you travel'}
+		description={automaticZone && !location.values.enabled ? 'Turn on location services in Privacy to use this' : 'Follows your location when you travel'}
 	>
 		<Switch label="Set the time zone automatically" checked={automaticZone} onchange={(on) => datetime.set('automatic-timezone', on)} />
 	</Row>

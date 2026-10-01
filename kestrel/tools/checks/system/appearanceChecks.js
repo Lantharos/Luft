@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import St from 'gi://St';
 import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
 const ROLES = ['primary', 'onPrimary', 'secondary', 'tertiary', 'error', 'surface', 'onSurface', 'surfaceContainerHighest', 'onSurfaceVariant', 'outline'];
@@ -94,6 +95,23 @@ export async function checkAppearance({pause, capture, output}) {
     settings.set_boolean('pure-black', false);
     await pause(300);
 
+    settings.set_string('accent', 'white');
+    await pause(400);
+    const [light, dark] = [await readProperty('LightColors'), await readProperty('DarkColors')];
+    require(await readProperty('AccentColor') === '#ffffff' && dark.primary === '#ffffff' && contrast(light.primary, light.surface) >= 4.5 &&
+      contrast(dark.onPrimary, dark.primary) >= 4.5 && contrast(light.onPrimary, light.primary) >= 4.5,
+    'a white accent stays readable in both styles');
+    const [shellAccent, shellForeground] = St.ThemeContext.get_for_stage(global.stage).get_accent_color();
+    require(shellAccent.to_string().startsWith('#ffffff') && contrast(shellForeground.to_string().slice(0, 7), '#ffffff') >= 4.5,
+      'the shell draws dark text on a white accent');
+    toggleSurface('quick');
+    await pause(500);
+    await capture(`${output}/quick-settings-white-accent.png`);
+    toggleSurface('quick');
+    await pause(300);
+    settings.reset('accent');
+    await pause(300);
+
     const hour = GLib.DateTime.new_now_local().get_hour();
     settings.set_double('dark-schedule-from', (hour + 23) % 24);
     settings.set_double('dark-schedule-to', (hour + 1) % 24);
@@ -106,7 +124,7 @@ export async function checkAppearance({pause, capture, output}) {
     await pause(300);
     require(interfaceSettings.get_string('color-scheme') === 'default', 'the light style returns outside the scheduled hours');
   } finally {
-    for (const key of ['theme-apps', 'pure-black', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to']) settings.reset(key);
+    for (const key of ['theme-apps', 'pure-black', 'accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to']) settings.reset(key);
     interfaceSettings.set_string('color-scheme', colorScheme);
     await pause(1200);
     gtk4.delete(null);

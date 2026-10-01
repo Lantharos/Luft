@@ -14,9 +14,13 @@ const HUE_BINS = 36;
 const HUE_WINDOW = 18;
 const MIN_LIGHTNESS = 0.25;
 const MIN_CHROMA = 0.035;
+const MIN_VIVID_SHARE = 0.05;
 const ACCENT_CHROMA_FLOOR = 0.07;
 const ACCENT_CHROMA_CEILING = 0.2;
-const NEUTRAL_CHROMA = 0.02;
+const WHITE: Rgb = [255, 255, 255];
+const INK: Rgb = [24, 24, 23];
+
+export const NEUTRAL: Seed = { hue: 0, chroma: 0 };
 
 const NAMED_ACCENTS: [string, Rgb][] = [
   ['blue', [53, 132, 228]], ['teal', [33, 144, 164]], ['green', [58, 148, 74]],
@@ -128,10 +132,7 @@ function dominantHue(colors: Oklch[]): number {
 export function seedFromSamples(samples: Rgb[]): Seed {
   const colors = samples.map(toOklch).filter(([lightness]) => lightness >= MIN_LIGHTNESS);
   const vivid = colors.filter(([, chroma]) => chroma >= MIN_CHROMA);
-  if (!vivid.length) {
-    const [a, b] = colors.map(oklabFromOklch).reduce(([sumA, sumB], [, a, b]) => [sumA + a, sumB + b], [0, 0]);
-    return { hue: hueOf(a, b), chroma: NEUTRAL_CHROMA };
-  }
+  if (vivid.length <= colors.length * MIN_VIVID_SHARE) return NEUTRAL;
   const center = dominantHue(vivid);
   let sumA = 0, sumB = 0, sumChroma = 0, sumWeight = 0;
   for (const color of vivid) {
@@ -149,7 +150,16 @@ export function seedFromSamples(samples: Rgb[]): Seed {
   };
 }
 
-export const accentColor = ({ hue, chroma }: Seed): Rgb => fromOklch([ACCENT_TONE, chroma, hue]);
+export const isNeutral = ({ chroma }: Seed) => chroma === 0;
+
+export const accentColor = (seed: Seed): Rgb => isNeutral(seed) ? WHITE : fromOklch([ACCENT_TONE, seed.chroma, seed.hue]);
+
+const contrast = (first: Rgb, second: Rgb) => {
+  const [lighter, darker] = [first, second].map(color => linearLuminance(color.map(toLinear))).sort((a, b) => b - a);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+export const readableOn = (background: Rgb): Rgb => contrast(background, WHITE) >= contrast(background, INK) ? WHITE : INK;
 
 export const fromHex = (hex: string): Rgb => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)) as Rgb;
 

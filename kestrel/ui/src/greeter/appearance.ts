@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 
-import { accentColor, seedFromSamples, toHex, type Rgb } from '../appearance/color.js';
+import { seedFromSamples, type Rgb } from '../appearance/color.js';
 import { buildPalette } from '../appearance/palette.js';
-import { AccentStylesheet, accentStylesheet } from '../appearance/stylesheet.js';
+import { AccentStylesheet } from '../appearance/stylesheet.js';
 import { stateFile } from './config.js';
 
 export class LoginAppearance {
@@ -24,6 +24,6 @@ export class LoginAppearance {
 
   wallpaperSampled(samples: Rgb[]): void {
     const seed = seedFromSamples(samples);
-    this.stylesheet.load(accentStylesheet(toHex(accentColor(seed)), buildPalette(seed, false)));
+    this.stylesheet.apply(seed, buildPalette(seed, false));
   }
 }

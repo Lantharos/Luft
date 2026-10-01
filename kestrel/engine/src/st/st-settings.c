@@ -31,7 +31,6 @@
 #define KEY_DRAG_THRESHOLD        "drag-threshold"
 #define KEY_FONT_NAME             "font-name"
 #define KEY_COLOR_SCHEME          "color-scheme"
-#define KEY_ACCENT_COLOR          "accent-color"
 #define KEY_HIGH_CONTRAST         "high-contrast"
 #define KEY_REDUCED_MOTION        "reduced-motion"
 #define KEY_GTK_ICON_THEME        "icon-theme"
@@ -45,7 +44,6 @@ enum {
   PROP_DRAG_THRESHOLD,
   PROP_FONT_NAME,
   PROP_COLOR_SCHEME,
-  PROP_ACCENT_COLOR,
   PROP_HIGH_CONTRAST,
   PROP_REDUCED_MOTION,
   PROP_GTK_ICON_THEME,
@@ -78,7 +76,6 @@ struct _StSettings
   double slow_down_factor;
   StReducedMotion reduced_motion;
   StSystemColorScheme color_scheme;
-  StSystemAccentColor accent_color;
 };
 
 G_DEFINE_TYPE (StSettings, st_settings, G_TYPE_OBJECT)
@@ -140,14 +137,6 @@ st_settings_get_color_scheme (StSettings *settings)
   g_return_val_if_fail (ST_IS_SETTINGS (settings), ST_SYSTEM_COLOR_SCHEME_DEFAULT);
 
   return settings->color_scheme;
-}
-
-StSystemAccentColor
-st_settings_get_accent_color (StSettings *settings)
-{
-  g_return_val_if_fail (ST_IS_SETTINGS (settings), ST_SYSTEM_ACCENT_COLOR_BLUE);
-
-  return settings->accent_color;
 }
 
 gboolean
@@ -297,9 +286,6 @@ st_settings_get_property (GObject    *object,
     case PROP_COLOR_SCHEME:
       g_value_set_enum (value, settings->color_scheme);
       break;
-    case PROP_ACCENT_COLOR:
-      g_value_set_enum (value, settings->accent_color);
-      break;
     case PROP_MAGNIFIER_ACTIVE:
       g_value_set_boolean (value, settings->magnifier_active);
       break;
@@ -399,16 +385,6 @@ st_settings_class_init (StSettingsClass *klass)
                                                 ST_PARAM_READABLE);
 
   /**
-   * StSettings:accent-color:
-   *
-   * The current accent color.
-   */
-  props[PROP_ACCENT_COLOR] = g_param_spec_enum ("accent-color", NULL, NULL,
-                                                ST_TYPE_SYSTEM_ACCENT_COLOR,
-                                                ST_SYSTEM_ACCENT_COLOR_BLUE,
-                                                ST_PARAM_READABLE);
-
-  /**
    * StSettings:magnifier-active:
    *
    * Whether the accessibility magnifier is active.
@@ -471,11 +447,6 @@ on_interface_settings_changed (GSettings   *g_settings,
       settings->color_scheme = g_settings_get_enum (g_settings, key);
       g_object_notify_by_pspec (G_OBJECT (settings),
                                 props[PROP_COLOR_SCHEME]);
-    }
-  else if (g_str_equal (key, KEY_ACCENT_COLOR))
-    {
-      settings->accent_color = g_settings_get_enum (g_settings, key);
-      g_object_notify_by_pspec (G_OBJECT (settings), props[PROP_ACCENT_COLOR]);
     }
 }
 
@@ -565,8 +536,6 @@ st_settings_init (StSettings *settings)
                                                     KEY_GTK_ICON_THEME);
   settings->color_scheme = g_settings_get_enum (settings->interface_settings,
                                                 KEY_COLOR_SCHEME);
-  settings->accent_color = g_settings_get_enum (settings->interface_settings,
-                                                KEY_ACCENT_COLOR);
   settings->drag_threshold = g_settings_get_int (settings->mouse_settings,
                                                  KEY_DRAG_THRESHOLD);
   settings->magnifier_active = g_settings_get_boolean (settings->a11y_applications_settings,

@@ -177,7 +177,9 @@ The development launcher loads resources, typelibs, libraries, and schemas from 
 
 Wallpapers are decoded once and kept at the size of the largest display instead of their original resolution, so large photos do not hold full-resolution copies in memory. Centered and tiled wallpapers keep their original size.
 
-Kestrel takes its accent color from the wallpaper's most vivid dominant hue and uses it for toggles that are on, slider fills, the focused app's taskbar indicator, today's date in the calendar, and the default action in system dialogs. GTK and libadwaita apps also follow the closest named GNOME accent color, which Kestrel sets in `org.gnome.desktop.interface accent-color`.
+Kestrel takes its accent color from the wallpaper's most vivid dominant hue. When hardly any of the wallpaper has color, such as a black and white photo, the accent is white instead of a washed-out grey. Choosing White under Appearance in Settings (`accent` in `com.lantharos.kestrel`) keeps it white whatever the wallpaper.
+
+The accent fills toggles that are on, slider fills, switches, check boxes, the focused app's taskbar indicator, today's date in the calendar and the default action in system dialogs, and tints focus rings and selected text. Text and icons on the accent are dark or white, whichever reads better, so with a white accent the quick settings toggles that are on turn white with dark text. Apps that read the `accent-color` portal setting get the exact color. GTK and libadwaita apps that only know GNOME's named accents follow the closest one, which Kestrel sets in `org.gnome.desktop.interface accent-color`; for white that is slate, unless other apps are matched to the wallpaper.
 
 ### Wallpaper palette
 
@@ -198,11 +200,11 @@ From the accent's hue and colorfulness Kestrel builds a full set of colors for l
 | `outlineVariant` | 80 | 30 | Decorative dividers |
 | `inverseSurface`, `inverseOnSurface`, `inversePrimary` | 20, 95, 80 | 90, 20, 40 | Tooltips and snackbars that stand out from the window |
 
-Surfaces carry a faint tint of the accent. With Pure black on, the dark `surface`, `surfaceDim` and `surfaceContainerLowest` are `#000000` and the other containers step up from there (`surfaceContainerLow` 4, `surfaceContainer` 8, `surfaceContainerHigh` 12, `surfaceContainerHighest` 17, `surfaceBright` 18).
+Surfaces carry a faint tint of the accent. A white accent makes the whole palette black and white: surfaces are plain greys, and the accent roles flip between the styles so they stay readable, with `primary`, `onPrimary`, `primaryContainer`, `onPrimaryContainer` and `inversePrimary` at 10, 100, 25, 100 and 100 in light and at 100, 10, 85, 0 and 10 in dark. With Pure black on, the dark `surface`, `surfaceDim` and `surfaceContainerLowest` are `#000000` and the other containers step up from there (`surfaceContainerLow` 4, `surfaceContainer` 8, `surfaceContainerHigh` 12, `surfaceContainerHighest` 17, `surfaceBright` 18).
 
 Contrast is guaranteed by the tones: `onSurface`, `onSurfaceVariant`, `primary`, `secondary`, `tertiary` and `error` reach at least 4.5:1 against every surface and container of their scheme, every `on…` role reaches at least 4.5:1 against its color, and `outline` reaches at least 3:1 against every surface. `outlineVariant` is decorative and has no contrast guarantee.
 
-Terminals get their own sixteen colors: the usual red, green, yellow, blue, magenta and cyan, each nudged up to 15° toward the accent's hue, plus black and white from the tinted neutrals. Against the terminal background, the foreground and colors 1 to 6, 8 and 9 to 14 reach at least 4.5:1 in both schemes, and so do 7 and 15 in dark. Color 0 is meant for backgrounds, and 7 and 15 are light greys in the light scheme. The cursor uses `primary` with `onPrimary` text, and selections use `primaryContainer` with `onPrimaryContainer` text.
+Terminals get their own sixteen colors: the usual red, green, yellow, blue, magenta and cyan, each nudged up to 15° toward the accent's hue unless the accent is white, plus black and white from the tinted neutrals. Against the terminal background, the foreground and colors 1 to 6, 8 and 9 to 14 reach at least 4.5:1 in both schemes, and so do 7 and 15 in dark. Color 0 is meant for backgrounds, and 7 and 15 are light greys in the light scheme. The cursor uses `primary` with `onPrimary` text, and selections use `primaryContainer` with `onPrimaryContainer` text.
 
 #### Reading the palette
 
@@ -210,7 +212,8 @@ On the session bus, `com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Appea
 
 | Property | Type | Value |
 | --- | --- | --- |
-| `AccentColor` | `s` | The wallpaper accent, `#rrggbb` |
+| `AccentColor` | `s` | The accent, `#rrggbb` |
+| `WallpaperAccentColor` | `s` | The accent the wallpaper gives, also while White is chosen |
 | `Dark` | `b` | Whether the dark style is on |
 | `PureBlack` | `b` | Whether Pure black is on |
 | `Colors` | `a{ss}` | Every role above for the current style, by name |
@@ -262,7 +265,7 @@ Pure black (`pure-black` in `com.lantharos.kestrel`) is for OLED displays. Kestr
 App icons can keep their own colors or take on the wallpaper (`app-icon-style` in `com.lantharos.kestrel`, under Appearance in Settings):
 
 - Default shows every app's own icon.
-- Tinted draws each app as a single-color glyph on a plain rounded plate: a near-black plate with a light accent glyph in the dark style, and a near-white plate with a dark accent glyph in the light style. The glyph sits at tone 82 on a tone 12 plate in dark and at tone 38 on a tone 95 plate in light, so it always reaches at least 4.5:1. `app-icon-tint` replaces the wallpaper accent with a color of your choice, such as `#3584e4`.
+- Tinted draws each app as a single-color glyph on a plain rounded plate: a near-black plate with a light accent glyph in the dark style, and a near-white plate with a dark accent glyph in the light style. The glyph sits at tone 82 on a tone 12 plate in dark and at tone 38 on a tone 95 plate in light, so it always reaches at least 4.5:1. `app-icon-tint` replaces the accent with a color of your choice, such as `#3584e4`.
 - Clear draws a near-white glyph on a faint white plate with the same bright top edge as Kestrel's glass, over whatever surface the icon sits on.
 
 The style covers the taskbar, Start and its search results and folders, Alt+Tab, Ctrl+Alt+Tab, the all-windows view, window previews, notification groups and banners, the media card, the camera and microphone menu, and the apps listed when logging out or unmounting a drive. Other apps' own windows keep their icons.

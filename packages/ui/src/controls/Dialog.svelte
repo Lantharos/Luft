@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { topLayer } from '../menus/topLayer';
 
 	interface Props {
 		title: string;
@@ -41,7 +42,7 @@
 
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
 
-<div class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
+<div {@attach topLayer} class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
 	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap}>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="text-[17px] font-semibold">{title}</h2>
@@ -60,7 +61,12 @@
 	.overlay {
 		position: fixed;
 		inset: 0;
-		z-index: 50;
+		width: auto;
+		height: auto;
+		margin: 0;
+		border: 0;
+		padding: 0;
+		color: inherit;
 		display: grid;
 		place-items: center;
 		background: rgba(8, 8, 7, 0.45);

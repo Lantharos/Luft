@@ -147,6 +147,8 @@ if get_option('systemd')
   systemd_dep = dependency('systemd', version: systemd_req)
   systemduserunitdir = systemd_dep.get_variable('systemduserunitdir',
     pkgconfig_define: ['prefix', prefix])
+  systemunitdir = systemd_dep.get_variable('systemdsystemunitdir',
+    pkgconfig_define: ['prefix', prefix])
   have_systemd = true
 else
   have_systemd = false

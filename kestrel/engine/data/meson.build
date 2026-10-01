@@ -102,6 +102,7 @@ if have_systemd
     install_dir: systemduserunitdir
   )
   subdir('session')
+  subdir('system')
 endif
 
 # for unit tests - gnome.compile_schemas() only looks in srcdir

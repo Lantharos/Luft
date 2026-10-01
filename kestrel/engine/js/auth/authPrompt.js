@@ -51,7 +51,7 @@ export const AuthPrompt = GObject.registerClass({
             'question', (_, text, secret) => this._onQuestion(text, secret),
             'message', (_, text, isError) => this._onMessage(text, isError),
             'failed', (_, authError, description) => this._onFailed(authError, description),
-            'succeeded', () => this._onSucceeded(),
+            'succeeded', () => this.succeed(),
             this);
 
         this._userWell = new St.Bin({x_expand: true});
@@ -139,6 +139,16 @@ export const AuthPrompt = GObject.registerClass({
         this._message.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         inputWell.add_child(this._message);
 
+        this._hint = new St.Label({
+            style_class: 'login-dialog-message login-dialog-hint',
+            visible: false,
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
+        });
+        this._hint.clutter_text.line_wrap = true;
+        this._hint.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        inputWell.insert_child_above(this._hint, row);
+
         this._setBusy(false);
         this._updateBackButton();
         this.connect('destroy', () => this._clearEntries());
@@ -203,6 +213,22 @@ export const AuthPrompt = GObject.registerClass({
 
     focus() {
         this._entry.grab_key_focus();
+    }
+
+    setHint(hint) {
+        this._hint.visible = !!hint;
+        if (!hint)
+            return;
+        this._hint.text = hint;
+        this.get_accessible().emit('notification', hint, Atk.Live.POLITE);
+    }
+
+    succeed() {
+        this._question = null;
+        this._stopSpinner();
+        this.reactive = false;
+        this._entryArea.ease({opacity: 0, duration: FADE_TIME, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
+        this.emit('succeeded');
     }
 
     _updateBackButton() {
@@ -289,14 +315,6 @@ export const AuthPrompt = GObject.registerClass({
         this._stalled = false;
         this._retrying = true;
         this._authentication.begin(this._userName);
-    }
-
-    _onSucceeded() {
-        this._question = null;
-        this._stopSpinner();
-        this.reactive = false;
-        this._entryArea.ease({opacity: 0, duration: FADE_TIME, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
-        this.emit('succeeded');
     }
 
     _setBusy(busy) {

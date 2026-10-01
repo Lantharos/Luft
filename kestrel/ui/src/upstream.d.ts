@@ -76,6 +76,7 @@ declare module 'resource:///org/gnome/shell/ui/dnd.js' {
 
 declare module 'resource:///org/gnome/shell/misc/animationUtils.js' {
   export function ensureActorVisibleInScrollView(scroll: import('gi://St').default.ScrollView, actor: import('gi://Clutter').default.Actor): void;
+  export function wiggle(actor: import('gi://Clutter').default.Actor): void;
 }
 
 declare module 'resource:///org/gnome/shell/ui/mpris.js' {
@@ -147,7 +148,27 @@ declare module 'resource:///org/gnome/shell/ui/dialog.js' {
   import St from 'gi://St';
   export class MessageDialogContent extends St.BoxLayout {
     constructor(params: { title: string; description?: string; icon_name?: string });
+    title: string;
+    description: string;
+    iconName: string;
   }
+  export class EntryField extends St.BoxLayout {
+    constructor(entry: St.Entry, label: string, statusActor?: import('gi://Clutter').default.Actor | null);
+    set label(text: string);
+  }
+}
+
+declare module 'resource:///org/gnome/shell/ui/checkBox.js' {
+  import St from 'gi://St';
+  export class CheckBox extends St.Button {
+    constructor(label?: string);
+  }
+}
+
+declare module 'resource:///org/gnome/shell/ui/shellEntry.js' {
+  import St from 'gi://St';
+  export function addContextMenu(entry: St.Entry, params?: object): void;
+  export class CapsLockWarning extends St.Label {}
 }
 
 declare module 'resource:///org/gnome/shell/misc/config.js' {

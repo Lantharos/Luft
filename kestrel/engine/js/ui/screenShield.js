@@ -329,9 +329,11 @@ export class ScreenShield extends Signals.EventEmitter {
         this._hidePointer();
     }
 
-    _hideLockScreen(animate) {
-        if (this._lockScreenState === MessageTray.State.HIDDEN)
+    _hideLockScreen(animate, onHidden = null) {
+        if (this._lockScreenState === MessageTray.State.HIDDEN) {
+            onHidden?.();
             return;
+        }
 
         this._lockScreenState = MessageTray.State.HIDING;
 
@@ -357,7 +359,10 @@ export class ScreenShield extends Signals.EventEmitter {
             ...easeParams,
             duration,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            onComplete: () => this._hideLockScreenComplete(),
+            onComplete: () => {
+                this._hideLockScreenComplete();
+                onHidden?.();
+            },
         });
 
         this._showPointer();
@@ -493,8 +498,6 @@ export class ScreenShield extends Signals.EventEmitter {
     }
 
     _continueDeactivate(animate) {
-        this._hideLockScreen(animate);
-
         if (Main.sessionMode.currentMode === 'unlock-dialog')
             Main.sessionMode.popMode('unlock-dialog');
 
@@ -510,20 +513,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
         this._longLightbox.lightOff();
         this._shortLightbox.lightOff();
-
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
-
-        const easeParams = useMotion
-            ? {translation_y: -global.screen_height}
-            : {opacity: 0};
-
-        this._lockDialogGroup.ease({
-            ...easeParams,
-            duration: SHIELD_ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            onComplete: () => this._completeDeactivate(),
-        });
+        this._hideLockScreen(animate, () => this._completeDeactivate());
     }
 
     _completeDeactivate() {

@@ -3,6 +3,7 @@
   <gresource prefix="/org/gnome/shell">
     <file>auth/authentication.js</file>
     <file>auth/authPrompt.js</file>
+    <file>auth/fingerprint.js</file>
     <file>auth/greetd.js</file>
 
     <file>misc/animationUtils.js</file>

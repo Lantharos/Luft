@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { events as sabineEvents } from '@lantharos/sabine';
-	import { GlassShell } from '@luft/ui';
+	import { appearance, GlassShell } from '@luft/ui';
 	import * as api from '$lib/api';
 	import DetailsPane from '$lib/components/details/DetailsPane.svelte';
 	import DialogHost from '$lib/components/dialogs/DialogHost.svelte';
@@ -44,6 +44,10 @@
 		}
 	});
 	let sidebar = $state<{ focusSearch: () => void }>();
+
+	$effect(() => {
+		document.documentElement.dataset.scheme = appearance.scheme;
+	});
 
 	onMount(() => {
 		if (!isDesktopRuntime()) return manager.startPreview();

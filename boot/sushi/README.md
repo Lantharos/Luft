@@ -139,7 +139,7 @@ sudo sushi-bootctl install --esp /boot/efi --efi-entry
 
 Unified kernel images in `EFI/Linux` are listed by the system name and kernel version inside them, newest first, and `default` in `loader.conf` accepts patterns such as `luft-*`, which picks the newest match.
 
-With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so it can be started by shim, which then checks everything SushiBoot starts against the same keys. On Luft, `luft-trust startup install` signs it with the computer's own Luft key and adds a boot entry that starts it through Fedora's shim (see `security/README.md`). On a computer that boots through shim and GRUB, the splash works without SushiBoot.
+With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so it can be started by shim, which then checks everything SushiBoot starts against the same keys. On Luft, `trustctl startup install` signs it with the computer's own Luft key and adds a boot entry that starts it through Fedora's shim (see `security/README.md`). On a computer that boots through shim and GRUB, the splash works without SushiBoot.
 
 ## Development
 

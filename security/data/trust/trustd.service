@@ -5,8 +5,8 @@ After=local-fs.target
 [Service]
 Type=dbus
 BusName=com.lantharos.Trust1
-ExecStart=/usr/bin/luft-trust serve
-SyslogIdentifier=luft-trust
+ExecStart=@libexecdir@/trustd
+SyslogIdentifier=trustd
 PrivateTmp=yes
 ProtectHome=read-only
 KeyringMode=shared

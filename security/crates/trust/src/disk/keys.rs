@@ -13,9 +13,9 @@ use crate::system::{efi, tpm};
 
 const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
 const ESCROW: &str = "recovery-key.cred";
-const ESCROW_NAME: &str = "luft-trust.recovery-key";
+const ESCROW_NAME: &str = "trustd.recovery-key";
 const PIN: &str = "pin.cred";
-const PIN_NAME: &str = "luft-trust.pin";
+const PIN_NAME: &str = "trustd.pin";
 
 pub fn generate_recovery_key() -> Result<Secret> {
     let mut bytes = [0u8; 32];

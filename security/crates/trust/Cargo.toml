@@ -1,5 +1,5 @@
 [package]
-name = "luft-trust"
+name = "trustd"
 description = "Secure Boot signing, TPM disk unlock and device encryption for Luft"
 version.workspace = true
 edition.workspace = true

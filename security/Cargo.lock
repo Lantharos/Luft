@@ -508,24 +508,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
 
 [[package]]
-name = "luft-trust"
-version = "0.1.0"
-dependencies = [
- "access",
- "anyhow",
- "argon2",
- "chacha20poly1305",
- "clap",
- "getrandom",
- "libc",
- "rustix",
- "serde",
- "serde_json",
- "tokio",
- "zbus",
-]
-
-[[package]]
 name = "luft-usb-protection"
 version = "0.1.0"
 dependencies = [
@@ -894,6 +876,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "trustd"
+version = "0.1.0"
+dependencies = [
+ "access",
+ "anyhow",
+ "argon2",
+ "chacha20poly1305",
+ "clap",
+ "getrandom",
+ "libc",
+ "rustix",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zbus",
 ]
 
 [[package]]

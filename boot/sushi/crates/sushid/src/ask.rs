@@ -60,7 +60,7 @@ fn has_tpm() -> bool {
 impl Ask {
     pub fn of(request: &Request, pin_answered: bool) -> Self {
         let message = request.message.as_str();
-        if request.id.starts_with("luft-trust:recovery:") {
+        if request.id.starts_with("trustd:recovery:") {
             return Self::Fallback {
                 why: Why::Changed,
                 accepts: Accepts::RecoveryKey,

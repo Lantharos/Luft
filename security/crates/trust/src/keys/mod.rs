@@ -16,8 +16,8 @@ pub use unsealed::Unsealed;
 
 const SIGNING_KEY: &str = "secure-boot.key.cred";
 const PCR_KEY: &str = "pcr.key.cred";
-const SIGNING_NAME: &str = "luft-trust.secure-boot";
-const PCR_NAME: &str = "luft-trust.pcr";
+const SIGNING_NAME: &str = "trustd.secure-boot";
+const PCR_NAME: &str = "trustd.pcr";
 const PROTECTION: &str = "protection";
 const DKMS: &str = "/etc/dkms/framework.conf.d";
 
@@ -100,11 +100,11 @@ fn sign_modules_built_by_dkms() -> Result<()> {
     }
     std::fs::create_dir_all(folder)?;
     let settings = format!(
-        "mok_signing_key={}\nmok_certificate={}\nsign_file=/usr/libexec/luft-trust/sign-module\n",
+        "mok_signing_key={}\nmok_certificate={}\nsign_file=/usr/libexec/trustd-sign-module\n",
         paths::state(SIGNING_KEY).display(),
         certificate_der().display()
     );
-    std::fs::write(folder.join("luft-trust.conf"), settings)?;
+    std::fs::write(folder.join("trustd.conf"), settings)?;
     Ok(())
 }
 

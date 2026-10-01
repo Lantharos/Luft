@@ -12,7 +12,7 @@ const OWNER_ONLY: libc::c_long = 0x3f3f_0000;
 const LIFETIME_SECONDS: libc::c_long = 15 * 60;
 
 fn description(name: &str) -> CString {
-    CString::new(format!("luft-trust:{name}")).expect("key names have no NUL bytes")
+    CString::new(format!("trustd:{name}")).expect("key names have no NUL bytes")
 }
 
 fn find(name: &str) -> Option<libc::c_long> {

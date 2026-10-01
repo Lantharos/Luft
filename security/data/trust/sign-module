@@ -1,2 +1,2 @@
 #!/usr/bin/sh
-exec luft-trust sign module "$@"
+exec trustctl sign module "$@"

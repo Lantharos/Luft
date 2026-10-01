@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-pub const STATE: &str = "/var/lib/luft-trust";
-pub const RUNTIME: &str = "/run/luft-trust";
-pub const STAGE: &str = "/var/lib/luft-trust/stage";
-pub const INITRD_STAGE: &str = "/etc/luft-trust/stage";
+pub const STATE: &str = "/var/lib/trustd";
+pub const RUNTIME: &str = "/run/trustd";
+pub const STAGE: &str = "/var/lib/trustd/stage";
+pub const INITRD_STAGE: &str = "/etc/trustd/stage";
 
 pub fn state(name: &str) -> PathBuf {
     PathBuf::from(STATE).join(name)

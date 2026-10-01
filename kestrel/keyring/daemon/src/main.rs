@@ -3,6 +3,7 @@ mod daemon;
 mod identity;
 mod keyring;
 mod manage;
+mod passkeys;
 mod portal;
 mod prompter;
 mod secrets;

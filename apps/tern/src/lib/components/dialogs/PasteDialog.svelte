@@ -10,13 +10,15 @@
 	let { review, onclose }: Props = $props();
 
 	function paste() {
+		const { session, text } = review;
 		onclose();
-		review.session.paste(review.text);
+		session.paste(text);
 	}
 
 	function cancel() {
+		const { session } = review;
 		onclose();
-		review.session.focus();
+		session.focus();
 	}
 </script>
 

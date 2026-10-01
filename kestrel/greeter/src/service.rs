@@ -133,6 +133,21 @@ impl Greeter {
         Ok(self.store.save_user_wallpaper(uid, &jpeg)?)
     }
 
+    async fn set_displays(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        arrangement: OwnedFd,
+    ) -> Result<(), Error> {
+        let _active = self.idle.hold();
+        self.access
+            .authorize(connection, &header, SET_APPEARANCE)
+            .await?;
+        let arrangement = store::prepare_displays(arrangement.into())?;
+        let _writing = self.writing.lock().await;
+        Ok(self.store.save_displays(&arrangement)?)
+    }
+
     async fn set_shared_wallpaper(
         &self,
         #[zbus(connection)] connection: &Connection,

@@ -1,3 +1,4 @@
 d /var/lib/kestrel-greeter 0755 root root -
 d /var/lib/kestrel-greeter/shared 0755 root root -
 d /var/lib/kestrel-greeter/users 0755 root root -
+d /var/lib/kestrel-greeter/display 0755 root root -

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
-const STYLESHEETS = ['kestrel.css', 'kestrel-portal.css'];
+const STYLESHEETS = ['kestrel.css', 'kestrel-portal.css', 'kestrel-passkeys.css'];
 
 function watch(theme: St.Theme, stylesheet: Gio.File): Gio.FileMonitor {
   const monitor = stylesheet.monitor_file(Gio.FileMonitorFlags.NONE, null);

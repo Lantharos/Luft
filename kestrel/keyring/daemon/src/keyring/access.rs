@@ -19,7 +19,7 @@ pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> 
     if item
         .attributes
         .get("xdg:schema")
-        .is_some_and(|schema| schema == PORTAL_SCHEMA)
+        .is_some_and(|schema| schema == PORTAL_SCHEMA || schema == crate::passkeys::SCHEMA)
     {
         return Decision::Denied;
     }

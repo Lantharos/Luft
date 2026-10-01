@@ -26,6 +26,9 @@ pub async fn serve(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     server.at(PATH, Access { daemon: daemon() }).await?;
     server.at(PATH, AppSecrets { daemon: daemon() }).await?;
     server.at(PATH, ssh::Ssh { daemon: daemon() }).await?;
+    server
+        .at(PATH, crate::passkeys::Passkeys { daemon: daemon() })
+        .await?;
     Ok(())
 }
 

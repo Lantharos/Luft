@@ -127,6 +127,8 @@ def exercise(root, home, environment, script, requests, started):
     check(setup.get("confirm") is True, "setting up without the sign-in service asks to confirm the password")
     check(lookup(environment, "service", "mail.example.org") == "mail-pass", "a secret from oo7's file comes back")
     check(lookup(environment, "network", "home") == "hunter2", "every item of the old keyring came along")
+    found = subprocess.run(["secret-tool", "search", "--all", "network", "home"], env=environment, capture_output=True, timeout=60)
+    check(b"secret = hunter2" in found.stdout and b"returned type" not in found.stderr, "an item hands its secret back in one piece, as Chromium-based apps read it")
 
     vault = open(os.path.join(home, ".local/share/luft-keyring/vault"), "rb").read()
     check(b"gh-token" not in vault and b"GitHub" not in vault, "secrets and labels are encrypted on disk")

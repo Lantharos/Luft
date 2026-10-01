@@ -7,7 +7,10 @@ In the Luft monorepo, Sushi lives at `boot/sushi`. Run the commands below from t
 ## What a boot looks like
 
 1. The firmware draws its logo. Sushi draws the same logo in the same place, so the first frame it shows is identical to what's already there, then fades a spinner in underneath.
-2. If the disk is encrypted, the spinner gives way to a passphrase field. A wrong passphrase shakes the field and says so; Caps Lock shows a warning. Keys are read through the console keymap, so the layout set in `/etc/vconsole.conf` applies.
+2. If the disk is encrypted, the spinner gives way to a passphrase field. A wrong passphrase shakes the field and says so; Caps Lock shows a warning. Keys are read through the console keymap, so the layout set in `/etc/vconsole.conf` applies. Sushi reads the disk's LUKS header to know how it unlocks:
+   - When the TPM unlocks the disk, nothing is asked at all.
+   - With a TPM PIN, it says "Enter your PIN"; a security key's PIN is asked for by name too.
+   - When the TPM doesn't unlock a disk it normally unlocks, Sushi asks for the recovery key (or the passphrase, if the disk has one) and says why in a sentence: something about how the computer starts has changed, the TPM isn't responding, or the PIN didn't work. Recovery keys can be typed with or without their dashes, and Sushi counts the characters as they're typed.
 3. When the system switches from the initramfs to the installed system, Sushi keeps running and keeps the splash on screen.
 4. When the graphics driver loads and replaces the firmware framebuffer, Sushi redraws on the new device as soon as the system has finished setting the device up. If a display arrangement was saved by the login screen, Sushi uses that mode, so the monitor only switches modes once.
 5. When the login screen starts, Sushi fades the spinner out, leaves the logo on screen, and lets go of the display. The login screen's first frame shows the same logo before its own interface fades in.
@@ -24,7 +27,18 @@ Sushi understands the commands of Plymouth's `plymouth` tool, so anything that r
 
 When the updater restarts the computer, the text fades out and the logo and spinner stay until the computer restarts.
 
-Requests that need someone at the keyboard, like Plymouth password prompts, are declined; disk passphrases still go through Sushi's own prompt. `plymouth quit` returns to the text console, as it does with Plymouth, which is what the emergency and rescue shells rely on.
+Requests that need someone at the keyboard, like Plymouth password prompts, are declined; disk passphrases still go through Sushi's own prompt.
+
+While a disk is being encrypted in place, the few seconds before the system is mounted show "Encrypting your device" in place of the spinner, with a bar that slides until the step is done; `sushictl show encrypting` shows the same screen.
+
+### Adding a Secure Boot key
+
+Shim asks in person before it trusts a new key, on a blue screen that appears right after the firmware and waits only ten seconds. When a key is waiting for that screen, the next restart first shows what to expect: press a key when the screen appears, choose Enroll MOK, Continue and Yes, type the one-time code, and choose Reboot. Sushi holds the restart on that screen until Enter is pressed, for up to four minutes.
+
+```bash
+sushictl notice key-enrollment 48217730   # explain the screen at the next restart, with this code
+sushictl notice clear
+``` `plymouth quit` returns to the text console, as it does with Plymouth, which is what the emergency and rescue shells rely on.
 
 ## Components
 
@@ -120,7 +134,9 @@ SushiBoot is an optional UEFI boot menu. It reads [Boot Loader Specification](ht
 sudo sushi-bootctl install --esp /boot/efi --efi-entry
 ```
 
-With Secure Boot on, SushiBoot has to be signed with a key the firmware trusts (`sushi-bootctl sign` uses `sbctl`). On a computer that boots through shim and GRUB, the splash works without SushiBoot.
+Unified kernel images in `EFI/Linux` are listed by the system name and kernel version inside them, newest first, and `default` in `loader.conf` accepts patterns such as `luft-*`, which picks the newest match.
+
+With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so it can be started by shim, which then checks everything SushiBoot starts against the same keys. On Luft, `luft-trust startup install` signs it with the computer's own Luft key and adds a boot entry that starts it through Fedora's shim (see `security/README.md`). On a computer that boots through shim and GRUB, the splash works without SushiBoot.
 
 ## Development
 
@@ -143,7 +159,7 @@ scripts/vm/run.sh        # boot it in a window
 
 Everything lives in `vm/`; set `SUSHI_VM` to another folder to keep a second machine next to it. `LUKS=1 scripts/vm/disk.sh` encrypts the root disk (the passphrase is `sushi-vm`, as is the password of the `sushi` account). `MENU_TIMEOUT=3` shows SushiBoot's menu.
 
-`LAYOUT=fedora scripts/vm/disk.sh` builds the disk the way Fedora's installer does instead: one GPT disk with an EFI system partition holding Fedora's shim and GRUB, `/boot` on its own ext4 partition with the kernels and boot entries, and a btrfs root partition with `root` and `home` subvolumes. The firmware finds shim on its own and adds a Fedora entry on the first start, as on a fresh install. `KERNEL=7.2.7-300.fc45 scripts/vm/tree.sh` installs a specific kernel, which leaves room to test a kernel update later.
+`LAYOUT=fedora scripts/vm/disk.sh` builds the disk the way Fedora's installer does instead: one GPT disk with an EFI system partition holding Fedora's shim and GRUB, `/boot` on its own ext4 partition with the kernels and boot entries, and a btrfs root partition with `root` and `home` subvolumes. The firmware finds shim on its own and adds a Fedora entry on the first start, as on a fresh install.
 
 `run.sh` takes a few switches for the machine itself:
 

@@ -29,8 +29,6 @@ enum Commands {
     Install {
         #[arg(long, help = "ESP mount point (default: /boot/efi)")]
         esp: Option<PathBuf>,
-        #[arg(long, help = "Sign SushiBoot.efi with sbctl if keys exist")]
-        sign: bool,
         #[arg(long, help = "Create a UEFI boot manager entry via efibootmgr")]
         efi_entry: bool,
     },
@@ -50,29 +48,19 @@ enum Commands {
         #[arg(long)]
         esp: Option<PathBuf>,
     },
-    /// Sign SushiBoot.efi with sbctl (MOK / custom Secure Boot key).
-    Sign {
-        #[arg(long)]
-        esp: Option<PathBuf>,
-    },
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
-        Commands::Install {
-            esp,
-            sign,
-            efi_entry,
-        } => cmd_install(esp, sign, efi_entry),
+        Commands::Install { esp, efi_entry } => cmd_install(esp, efi_entry),
         Commands::List { esp } => cmd_list(esp),
         Commands::SetDefault { id, esp } => cmd_set_default(&id, esp),
         Commands::AddWindows { esp } => cmd_add_windows(esp),
-        Commands::Sign { esp } => cmd_sign(esp),
     }
 }
 
-fn cmd_install(esp: Option<PathBuf>, sign: bool, efi_entry: bool) -> Result<()> {
+fn cmd_install(esp: Option<PathBuf>, efi_entry: bool) -> Result<()> {
     let esp = resolve_esp(esp)?;
     let efi_src = find_sushiboot_efi()?;
     let efi_dest = esp.join(SUSHI_EFI_REL);
@@ -92,9 +80,6 @@ fn cmd_install(esp: Option<PathBuf>, sign: bool, efi_entry: bool) -> Result<()> 
 
     install_kernel_layout()?;
 
-    if sign {
-        cmd_sign(Some(esp.clone()))?;
-    }
     if efi_entry {
         create_efi_boot_entry(&esp)?;
     }
@@ -157,36 +142,6 @@ fn cmd_add_windows(esp: Option<PathBuf>) -> Result<()> {
     writeln!(f, "title Windows Boot Manager")?;
     writeln!(f, "efi \\\\EFI\\\\Microsoft\\\\Boot\\\\bootmgfw.efi")?;
     println!("Wrote {}", entry_path.display());
-    Ok(())
-}
-
-fn cmd_sign(esp: Option<PathBuf>) -> Result<()> {
-    let esp = resolve_esp(esp)?;
-    let efi = esp.join(SUSHI_EFI_REL);
-    if !efi.is_file() {
-        bail!(
-            "{} not found — run sushi-bootctl install first",
-            efi.display()
-        );
-    }
-    if !Command::new("sbctl")
-        .arg("--help")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
-    {
-        bail!("sbctl not found. Install: sudo dnf install sbctl");
-    }
-    let status = Command::new("sbctl")
-        .args(["sign", "-s", &efi.to_string_lossy()])
-        .status()
-        .context("sbctl sign")?;
-    if !status.success() {
-        bail!(
-            "sbctl sign failed (enroll keys with: sudo sbctl create-keys && sudo sbctl enroll -m)"
-        );
-    }
-    println!("Signed {}", efi.display());
     Ok(())
 }
 

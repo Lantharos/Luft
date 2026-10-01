@@ -32,8 +32,10 @@ case "${TPM:-}" in
     version=(--tpm2)
     device=tpm-crb
     [[ "$TPM" == 1.2 ]] && version=() && device=tpm-tis
-    swtpm socket "${version[@]}" --tpmstate "dir=$state" --ctrl "type=unixio,path=$state/swtpm.sock" \
-      --pid "file=$state/swtpm.pid" --terminate --daemon
+    rm -f "$state/swtpm.sock"
+    swtpm socket "${version[@]}" --tpmstate "dir=$state" --ctrl "type=unixio,path=$state/swtpm.sock" --terminate &
+    trap "kill $! 2>/dev/null" EXIT
+    until [[ -S "$state/swtpm.sock" ]]; do sleep 0.05; done
     tpm=(-chardev "socket,id=tpm,path=$state/swtpm.sock" -tpmdev emulator,id=tpm0,chardev=tpm -device "$device,tpmdev=tpm0")
     ;;
 esac
@@ -41,7 +43,7 @@ esac
 display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
 [[ "${HEADLESS:-0}" == 1 ]] && display=(-display none)
 
-exec qemu-system-x86_64 \
+qemu-system-x86_64 \
   "${firmware[@]}" -cpu host -smp 4 -m 4096 \
   -drive "if=pflash,format=$format,readonly=on,file=$code" \
   -drive "if=pflash,format=$format,file=$vars" \

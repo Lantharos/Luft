@@ -36,6 +36,10 @@ fn key(argument: &str) -> &str {
     argument.split_once('=').map_or(argument, |(key, _)| key)
 }
 
+pub fn has(line: &str, wanted: &str) -> bool {
+    line.split_whitespace().any(|word| key(word) == wanted)
+}
+
 pub fn with<S: AsRef<str>>(line: &str, add: &[String], remove: &[S]) -> String {
     let mut words: Vec<String> = line
         .split_whitespace()

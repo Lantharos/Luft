@@ -76,8 +76,6 @@ enum StartupAction {
     /// Build the signed image for a newly installed kernel (used by kernel-install)
     Add {
         version: String,
-        #[arg(long)]
-        initrd: Option<PathBuf>,
     },
     /// Remove a kernel's signed image (used by kernel-install)
     Remove {
@@ -172,9 +170,7 @@ fn startup(action: StartupAction) -> Result<()> {
     match action {
         StartupAction::Install => startup::install(),
         StartupAction::Uninstall => startup::uninstall(),
-        StartupAction::Add { version, initrd } => {
-            startup::add(&Kernel::named(&version), initrd.as_deref())
-        }
+        StartupAction::Add { version } => startup::add(&Kernel::named(&version)),
         StartupAction::Remove { version } => startup::remove(&version),
         StartupAction::Rebuild => startup::rebuild_boot_files(),
         StartupAction::Arguments { add, remove, once } => {

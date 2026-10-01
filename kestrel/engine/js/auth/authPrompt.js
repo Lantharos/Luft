@@ -201,12 +201,6 @@ export const AuthPrompt = GObject.registerClass({
         this.emit('cancelled');
     }
 
-    startPreemptiveInput(unichar) {
-        this._entry.grab_key_focus();
-        if (unichar)
-            this._entry.clutter_text.insert_unichar(unichar);
-    }
-
     focus() {
         this._entry.grab_key_focus();
     }

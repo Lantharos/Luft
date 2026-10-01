@@ -81,6 +81,7 @@ export class Greeter {
 
   constructor(context: GreeterContext) {
     loadKestrelStylesheet();
+    this.matchNumLock();
     const monitorAt = (x: number, y: number) =>
       context.layoutManager.monitors.find(monitor => x >= monitor.x && y >= monitor.y && x < monitor.x + monitor.width && y < monitor.y + monitor.height) ?? null;
     this.menus = new ContextMenus(monitorAt, () => {}, () => !this.finishing, () => {}, () => {});
@@ -104,7 +105,7 @@ export class Greeter {
       actionMode: Shell.ActionMode.LOGIN_SCREEN,
       preparePrompt: () => this.begin(),
       clockShown: () => this.stop(),
-      startTyping: unichar => this.prompt.startPreemptiveInput(unichar),
+      focusPrompt: () => this.prompt.focus(),
     });
 
     this.prompt.connect('user-name', (_prompt, name) => this.enterUserName(name));
@@ -128,6 +129,15 @@ export class Greeter {
       if (!this.backdrop) this.choose(null);
       return GLib.SOURCE_REMOVE;
     });
+  }
+
+  private matchNumLock(): void {
+    const seat = shell().stage.context.get_backend().get_default_seat();
+    if (seat.get_keymap().get_num_lock_state() === this.config.numLock) return;
+    const keyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+    const time = GLib.get_monotonic_time();
+    keyboard.notify_keyval(time, Clutter.KEY_Num_Lock, Clutter.KeyState.PRESSED);
+    keyboard.notify_keyval(time, Clutter.KEY_Num_Lock, Clutter.KeyState.RELEASED);
   }
 
   wallpaperSampled(samples: Rgb[]): void {

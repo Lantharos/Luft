@@ -5,9 +5,10 @@ export interface GreeterConfig {
   showUsers: boolean;
   hiddenUsers: string[];
   defaultSession: string;
+  numLock: boolean;
 }
 
-const DEFAULTS: GreeterConfig = { showUsers: true, hiddenUsers: [], defaultSession: '' };
+const DEFAULTS: GreeterConfig = { showUsers: true, hiddenUsers: [], defaultSession: '', numLock: true };
 
 export const STATE_DIRECTORY = GLib.getenv('KESTREL_GREETER_STATE_DIR') ?? '/var/lib/kestrel-greeter';
 

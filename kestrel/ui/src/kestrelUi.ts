@@ -32,7 +32,8 @@ import { GlobalShortcutsProvider } from './shortcuts/provider.js';
 import { PortalBackend } from './portal/backend.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
 import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
-import { LoginDisplays } from './session/loginDisplays.js';
+import { LoginDisplays } from './session/loginScreen/displays.js';
+import { LoginNumLock } from './session/loginScreen/numLock.js';
 import { Farewell } from './session/farewell.js';
 import type { Rgb } from './appearance/color.js';
 import { Greeter, type GreeterContext } from './greeter/greeter.js';
@@ -75,6 +76,7 @@ class KestrelUi {
   private readonly liveWallpaper: LiveWallpaper;
   private readonly loginWallpaper = new LoginWallpaper();
   private readonly loginDisplays = new LoginDisplays();
+  private readonly loginNumLock = new LoginNumLock();
   private readonly farewell = new Farewell();
 
   constructor(private readonly context: Context) {
@@ -432,6 +434,7 @@ class KestrelUi {
     this.liveWallpaper.destroy();
     this.loginWallpaper.destroy();
     this.loginDisplays.destroy();
+    this.loginNumLock.destroy();
     this.farewell.destroy();
     this.oomNotifier.destroy();
     this.batteryWarnings.destroy();

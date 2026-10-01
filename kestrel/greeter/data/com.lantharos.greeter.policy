@@ -6,8 +6,8 @@
   <vendor_url>https://github.com/Lantharos</vendor_url>
 
   <action id="com.lantharos.greeter.set-appearance">
-    <description>Change your login screen wallpaper</description>
-    <message>Authentication is required to change your login screen wallpaper</message>
+    <description>Share your wallpaper, displays and keyboard state with the login screen</description>
+    <message>Authentication is required to share your settings with the login screen</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>

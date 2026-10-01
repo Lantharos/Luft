@@ -148,6 +148,19 @@ impl Greeter {
         Ok(self.store.save_displays(&arrangement)?)
     }
 
+    async fn set_num_lock(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        on: bool,
+    ) -> Result<(), Error> {
+        let _active = self.idle.hold();
+        self.access
+            .authorize(connection, &header, SET_APPEARANCE)
+            .await?;
+        self.change_config(|config| config.num_lock = on).await
+    }
+
     async fn set_shared_wallpaper(
         &self,
         #[zbus(connection)] connection: &Connection,

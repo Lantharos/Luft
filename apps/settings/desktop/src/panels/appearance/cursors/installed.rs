@@ -1,4 +1,3 @@
-use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -6,7 +5,6 @@ use gio::glib;
 
 use super::themes;
 
-const RECORD: [&str; 2] = ["com.lantharos.settings", "cursor-themes.json"];
 const RESERVED: [&str; 8] = [
     "hicolor",
     "locolor",
@@ -24,7 +22,6 @@ const NOT_REMOVABLE: &str = "This theme can't be removed";
 
 pub struct UserThemes {
     icons: PathBuf,
-    record: PathBuf,
     neighbors: Vec<PathBuf>,
 }
 
@@ -76,87 +73,57 @@ impl UserThemes {
             .into_iter()
             .filter(|root| root != &icons)
             .collect();
-        Ok(Self {
-            record: RECORD.iter().fold(data, |path, part| path.join(part)),
-            icons,
-            neighbors,
-        })
+        Ok(Self { icons, neighbors })
     }
 
     #[cfg(test)]
-    pub fn at(icons: PathBuf, record: PathBuf, neighbors: Vec<PathBuf>) -> Self {
-        Self {
-            icons,
-            record,
-            neighbors,
-        }
+    pub fn at(icons: PathBuf, neighbors: Vec<PathBuf>) -> Self {
+        Self { icons, neighbors }
     }
 
     pub fn icons(&self) -> &Path {
         &self.icons
     }
 
-    pub fn recorded(&self) -> BTreeSet<String> {
-        fs::read_to_string(&self.record)
-            .ok()
-            .and_then(|text| serde_json::from_str(&text).ok())
-            .unwrap_or_default()
-    }
-
-    fn save(&self, names: &BTreeSet<String>) -> Result<(), String> {
-        if let Some(folder) = self.record.parent() {
-            fs::create_dir_all(folder).map_err(|error| error.to_string())?;
-        }
-        let text = serde_json::to_string(names).map_err(|error| error.to_string())?;
-        fs::write(&self.record, text).map_err(|error| error.to_string())
-    }
-
-    pub fn owns(&self, recorded: &BTreeSet<String>, dir: &Path) -> bool {
+    pub fn removable(&self, dir: &Path) -> bool {
         let Some(name) = dir.file_name().map(|name| name.to_string_lossy()) else {
             return false;
         };
         dir.parent() == Some(self.icons.as_path())
             && valid(&name)
-            && recorded.contains(name.as_ref())
             && only_cursors(dir)
     }
 
     pub fn remove(&self, name: &str) -> Result<(), String> {
-        let mut recorded = self.recorded();
         let dir = self.icons.join(name);
-        if !valid(name) || !self.owns(&recorded, &dir) {
+        if !self.removable(&dir) {
             return Err(NOT_REMOVABLE.into());
         }
-        fs::remove_dir_all(&dir).map_err(|error| error.to_string())?;
-        recorded.remove(name);
-        self.save(&recorded)
+        fs::remove_dir_all(&dir).map_err(|error| error.to_string())
     }
 
     pub fn adopt(&self, theme: &Path, wanted: &str) -> Result<String, String> {
-        let mut recorded = self.recorded();
-        let name = self.free_name(&recorded, wanted)?;
+        let name = self.free_name(wanted)?;
         let target = self.icons.join(&name);
         if fs::symlink_metadata(&target).is_ok() {
             fs::remove_dir_all(&target).map_err(|error| error.to_string())?;
         }
         fs::rename(theme, &target).map_err(|error| error.to_string())?;
-        recorded.insert(name.clone());
-        self.save(&recorded)?;
         Ok(name)
     }
 
-    fn free_name(&self, recorded: &BTreeSet<String>, wanted: &str) -> Result<String, String> {
+    fn free_name(&self, wanted: &str) -> Result<String, String> {
         let base = base_name(wanted);
         std::iter::once(base.clone())
             .chain((2..=MAX_SUFFIX).map(|number| format!("{base}-{number}")))
-            .find(|name| self.available(recorded, name))
+            .find(|name| self.available(name))
             .ok_or_else(|| format!("There's no free name for “{base}” in the icons folder"))
     }
 
-    fn available(&self, recorded: &BTreeSet<String>, name: &str) -> bool {
+    fn available(&self, name: &str) -> bool {
         let target = self.icons.join(name);
         valid(name)
-            && (fs::symlink_metadata(&target).is_err() || self.owns(recorded, &target))
+            && (fs::symlink_metadata(&target).is_err() || self.removable(&target))
             && self.neighbors.iter().all(|root| {
                 let other = root.join(name);
                 !other.exists() || only_cursors(&other)

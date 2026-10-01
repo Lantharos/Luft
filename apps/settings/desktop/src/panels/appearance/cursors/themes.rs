@@ -54,7 +54,6 @@ fn title(dir: &Path, name: &str) -> String {
 
 pub fn list() -> Vec<Theme> {
     let user = UserThemes::new().ok();
-    let recorded = user.as_ref().map(UserThemes::recorded).unwrap_or_default();
     let mut seen = HashSet::new();
     let mut themes = Vec::new();
     for root in search_path() {
@@ -74,7 +73,7 @@ pub fn list() -> Vec<Theme> {
             themes.push(Theme {
                 title: title(&dir, &name),
                 path: dir.to_string_lossy().into_owned(),
-                removable: user.as_ref().is_some_and(|user| user.owns(&recorded, &dir)),
+                removable: user.as_ref().is_some_and(|user| user.removable(&dir)),
                 name,
             });
         }

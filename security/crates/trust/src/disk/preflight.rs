@@ -182,6 +182,25 @@ fn space(disk: &SystemDisk) -> Result<String, String> {
     Ok("There's room for the encryption header.".to_owned())
 }
 
+const TOOLS: [(&str, &str); 3] = [
+    ("/usr/lib/systemd/systemd-cryptsetup", "systemd-cryptsetup"),
+    ("/usr/sbin/cryptsetup", "cryptsetup"),
+    ("/usr/bin/ukify", "systemd-ukify"),
+];
+
+fn tools() -> Result<String, String> {
+    let missing: Vec<&str> = TOOLS
+        .iter()
+        .filter(|(path, _)| !Path::new(path).exists())
+        .map(|(_, package)| *package)
+        .collect();
+    if missing.is_empty() {
+        Ok("Everything needed to unlock the disk at startup is installed.".to_owned())
+    } else {
+        Err(format!("Install {} first.", missing.join(" and ")))
+    }
+}
+
 fn plugged_in() -> Result<String, String> {
     if power::on_battery() {
         Err(
@@ -226,6 +245,7 @@ pub fn check() -> Vec<Check> {
         checks.push(verdict("shared", shared(&disk)));
         checks.push(verdict("space", space(&disk)));
     }
+    checks.push(verdict("tools", tools()));
     checks.push(verdict("power", plugged_in()));
     checks.push(verdict("unlock", unlocking()));
     checks

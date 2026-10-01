@@ -322,22 +322,51 @@ function fittedSize(width, height, style) {
     return {width: Math.ceil(width * scale), height: Math.ceil(height * scale)};
 }
 
+function textureKey(file, style) {
+    return `${file.get_uri()} ${style} ${displaySignature()}`;
+}
+
 class BackgroundTextureCache {
     constructor() {
-        this._textures = new Map(); // uri -> {texture, colorState}
+        this._textures = new Map();
+        this._holders = new Map();
+        this._settings = new Gio.Settings({schema_id: BACKGROUND_SCHEMA});
     }
 
     async load(file, cancellable, style = GDesktopEnums.BackgroundStyle.NONE) {
-        const key = `${file.get_uri()} ${style} ${displaySignature()}`;
+        const key = textureKey(file, style);
 
         if (this._textures.has(key))
             return this._textures.get(key);
 
         const stored = await storeKey(file, style, cancellable);
-        const entry = await this._loadStored(stored, cancellable) ??
-            await this._decode(file, style, stored, cancellable);
+        const entry = {
+            key,
+            ...await this._loadStored(stored, cancellable) ?? await this._decode(file, style, stored, cancellable),
+        };
         this._textures.set(key, entry);
         return entry;
+    }
+
+    hold(holder, entries) {
+        this._holders.set(holder, entries.map(entry => entry.key));
+        this._dropUnused();
+    }
+
+    release(holder) {
+        if (this._holders.delete(holder))
+            this._dropUnused();
+    }
+
+    _dropUnused() {
+        const style = this._settings.get_enum(BACKGROUND_STYLE_KEY);
+        const wallpapers = [PICTURE_URI_KEY, PICTURE_URI_DARK_KEY].map(name =>
+            textureKey(Gio.File.new_for_commandline_arg(this._settings.get_string(name)), style));
+        const used = new Set([...wallpapers, ...[...this._holders.values()].flat()]);
+        for (const key of this._textures.keys()) {
+            if (!used.has(key))
+                this._textures.delete(key);
+        }
     }
 
     async _loadStored(key, cancellable) {
@@ -579,6 +608,7 @@ const Background = GObject.registerClass({
         LoginManager.getLoginManager().disconnectObject(this);
         this._settings.disconnectObject(this);
         this._interfaceSettings.disconnectObject(this);
+        getBackgroundTextureCache().release(this);
 
         if (this._changedIdleId) {
             GLib.source_remove(this._changedIdleId);
@@ -694,6 +724,7 @@ const Background = GObject.registerClass({
                 })
             );
 
+            cache.hold(this, entries);
             const textures = entries.map(e => e.texture);
             const colorState = entries[0]?.colorState || null;
 
@@ -772,7 +803,9 @@ const Background = GObject.registerClass({
         const cache = getBackgroundTextureCache();
 
         try {
-            const {texture, colorState, samples} = await cache.load(file, this._cancellable, this._style);
+            const entry = await cache.load(file, this._cancellable, this._style);
+            cache.hold(this, [entry]);
+            const {texture, colorState, samples} = entry;
             this.set_texture(texture, this._style, colorState);
             if (this._settings.schema_id === BACKGROUND_SCHEMA)
                 KestrelUi.wallpaperSampled(samples);

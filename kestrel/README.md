@@ -187,7 +187,7 @@ The development launcher loads resources, typelibs, libraries, and schemas from 
 
 ### Wallpaper and accent color
 
-Wallpapers are decoded once and kept at the size of the largest display instead of their original resolution, so large photos do not hold full-resolution copies in memory. Centered and tiled wallpapers keep their original size.
+Wallpapers are decoded once and kept at the size of the largest display instead of their original resolution, so large photos do not hold full-resolution copies in memory. Centered and tiled wallpapers keep their original size. Only the wallpapers on screen and the current light and dark wallpapers stay in memory, so switching between light and dark is immediate; earlier wallpapers are let go and come back from the stored copy described below.
 
 Kestrel also keeps that copy on disk, together with the blurred wallpaper behind the lock screen, the login screen and the first moment after signing in, in `~/.cache/kestrel/backgrounds`. Both are written whenever the wallpaper or the display arrangement changes, so signing in, locking the screen and the login screen show the wallpaper straight away instead of decoding the picture and blurring it again. The stored copies are exactly what would be drawn otherwise. Pictures with more than 8 bits per channel or their own color description are decoded as before.
 

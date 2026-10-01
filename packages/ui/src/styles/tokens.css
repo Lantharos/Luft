@@ -24,8 +24,10 @@
 	--text-soft: #c9c9c3;
 	--text-muted: #8f8f88;
 	--text-inverse: #181817;
-	--accent: #c8b66f;
-	--accent-text: #181817;
+	--accent: var(--kestrel-dark-primary, #f3f3ef);
+	--accent-text: var(--kestrel-dark-on-primary, #181817);
+	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
 	--danger: #e0aaaa;
 	--success: #a6c9a8;
 	--hairline: rgba(245, 245, 242, 0.07);
@@ -68,6 +70,8 @@
 	--text-soft: #3e3e3a;
 	--text-muted: #75756e;
 	--text-inverse: #f7f7f4;
+	--accent: var(--kestrel-light-primary, #1b1b19);
+	--accent-text: var(--kestrel-light-on-primary, #f7f7f4);
 	--danger: #b4413c;
 	--success: #3f7a4a;
 	--hairline: rgba(27, 27, 25, 0.08);

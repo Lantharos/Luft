@@ -37,7 +37,7 @@ Preload the regular weight in `app.html` so text shows up without waiting for th
 
 ## Window shell
 
-`GlassShell` is the rounded, frameless window body. It reads the shared `appearance` store, marks itself `data-effect="translucent"` or `"solid"`, and applies the desktop accent color. Put a `.glass-sidebar` and a `.glass-content` inside it:
+`GlassShell` is the rounded, frameless window body. It reads the shared `appearance` store, and marks itself `data-effect="translucent"` or `"solid"`. Put a `.glass-sidebar` and a `.glass-content` inside it:
 
 ```svelte
 <GlassShell>
@@ -60,7 +60,7 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent`, `appearance.accent` and `appearance.accentText` stay current as Kestrel's accent changes, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's wallpaper palette for the current style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README), and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper. `appearance.appIcons` holds the app icon style Kestrel draws with, its colors, and the folder of app glyphs, which `AppIcon` uses.
+After that, `appearance.translucent` and `appearance.accent` stay current as Kestrel's accent changes, `appearance.wallpaperAccent` holds the accent the wallpaper gives on its own, and `appearance.scheme` follows the desktop's light or dark style. `appearance.colors` holds Kestrel's palette for the light and the dark style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README). Every role also becomes a `--kestrel-light-…` and `--kestrel-dark-…` variable on the root element, such as `--kestrel-dark-on-primary`, and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper. `appearance.appIcons` holds the app icon style Kestrel draws with, its colors, and the folder of app glyphs, which `AppIcon` uses.
 
 The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
 
@@ -132,7 +132,7 @@ The second argument is either a language name or alias, such as `rust`, `ts` or 
 
 ## Tokens
 
-Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default, black under `data-black` unless the light palette is on, and light under `data-scheme="light"`. `--accent` and `--accent-text` follow the desktop accent inside `GlassShell`.
+Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` is Open Runde and `--font-mono` is Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default, black under `data-black` unless the light palette is on, and light under `data-scheme="light"`. `--accent` is the palette's `primary` for the style in use and `--accent-text` its `onPrimary`, for text and icons on the accent; `--accent-soft` and `--accent-line` are a faint fill and an outline in the accent. Without Kestrel the accent is white in the dark palette and black in the light one.
 
 ## Checks
 

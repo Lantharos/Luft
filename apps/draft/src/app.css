@@ -2,8 +2,6 @@
 @import '@luft/ui/styles.css';
 
 .glass-shell {
-	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
-	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
 	--editor-selection: color-mix(in oklab, var(--accent) 28%, transparent);
 	--editor-selection-match: color-mix(in oklab, var(--accent) 13%, transparent);
 	--editor-search-match: color-mix(in oklab, var(--accent) 24%, transparent);

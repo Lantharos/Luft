@@ -49,7 +49,7 @@ struct AppState {
 AppState { appearance: Appearance::current() }
 ```
 
-`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting, and Kestrel's palette as `palette`: the accent, whether Pure black is on, the palette roles for the current style, the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. Palette changes arrive on the page as `kestrel.palette` events and style changes as `appearance.scheme` events, which `@luft/ui`'s `appearance` store listens for.
+`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting, and Kestrel's palette as `palette`: the accent, the accent the wallpaper gives on its own, whether Pure black is on, the palette roles and the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. Palette changes arrive on the page as `kestrel.palette` events and style changes as `appearance.scheme` events, which `@luft/ui`'s `appearance` store listens for.
 
 ## Commands
 

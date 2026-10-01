@@ -72,6 +72,12 @@ pub fn write(plan: &Plan, recovery: &Secret, passphrase: Option<&Secret>) -> Res
     Ok(())
 }
 
+pub fn write_plan(plan: &Plan) -> Result<()> {
+    paths::ensure_private(STAGE)?;
+    paths::write_private(&paths::stage(PLAN), serde_json::to_string(plan)?.as_bytes())?;
+    Ok(())
+}
+
 pub fn remove() {
     let _ = std::fs::remove_dir_all(STAGE);
 }

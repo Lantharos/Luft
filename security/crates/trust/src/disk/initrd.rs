@@ -3,8 +3,8 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 
-use super::state::{Mode, Plan};
-use super::{keys, stage};
+use super::state::{Change, Mode, Plan};
+use super::{keys, luks, stage};
 use crate::paths::{self, INITRD_STAGE};
 use crate::system::command::Tool;
 use crate::system::journal::STAGE_REFUSED;
@@ -14,6 +14,7 @@ use crate::system::secret::Secret;
 const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const ATTEMPTS: usize = 5;
 pub const RESULT: &str = "/run/luft-trust/encryption-result";
+const BOOT: &str = "/run/luft-trust/boot";
 
 fn splash(mode: &str) {
     let _ = Tool::new("sushictl").args(["show", mode]).status();
@@ -33,7 +34,7 @@ fn wait_for(device: &Path) -> Result<()> {
 fn ask(id: &str, message: &str) -> Result<Secret> {
     Tool::new("systemd-ask-password")
         .arg(format!("--id=luft-trust:{id}"))
-        .args(["--timeout=0", "--no-output-on-error"])
+        .arg("--timeout=0")
         .arg(message)
         .output_bytes()
         .map(|mut answer| {
@@ -132,31 +133,72 @@ fn record(result: &str) {
     let _ = std::fs::write(RESULT, result);
 }
 
-pub fn run() -> Result<()> {
-    let Some(plan) = stage::plan_in(Path::new(INITRD_STAGE)) else {
+fn attach(plan: &Plan, device: &Path, header: Option<&Path>) -> Result<()> {
+    let mut options = vec!["discard".to_owned()];
+    if plan.mode == Mode::Tpm {
+        options.push("tpm2-device=auto".to_owned());
+    }
+    if let Some(header) = header {
+        options.push(format!("header={}", header.display()));
+    }
+    Tool::new("/usr/lib/systemd/systemd-cryptsetup")
+        .arg("attach")
+        .arg(plan.mapping())
+        .arg(device)
+        .arg("none")
+        .arg(options.join(","))
+        .status()
+        .context("The disk couldn't be opened")
+}
+
+fn still_decrypting(header: &Path, device: &Path) -> bool {
+    let size = crate::system::blocks::kernel_name(device)
+        .map_or(0, |name| crate::system::blocks::size_bytes(&name));
+    luks::read(device, Some(header), size)
+        .is_ok_and(|header| header.is_some_and(|header| header.reencrypting.is_some()))
+}
+
+fn open_while_decrypting(plan: &Plan, device: &Path) -> Result<()> {
+    if current_uuid(device).as_deref() == Some(plan.uuid.as_str()) {
+        return attach(plan, device, None);
+    }
+    let (Some(boot), Some(header)) = (&plan.boot_uuid, &plan.header) else {
         return Ok(());
     };
-    let device = plan.partition();
-    wait_for(&device)?;
+    let boot_device = Path::new("/dev/disk/by-uuid").join(boot);
+    wait_for(&boot_device)?;
+    std::fs::create_dir_all(BOOT)?;
+    Tool::new("mount").arg(&boot_device).arg(BOOT).status()?;
+    let inside = Path::new(BOOT).join(header.strip_prefix("/boot").unwrap_or(header));
+    let opened = if still_decrypting(&inside, device) {
+        attach(plan, device, Some(&inside))
+    } else {
+        Ok(())
+    };
+    let _ = Tool::new("umount").arg(BOOT).status();
+    opened
+}
+
+fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
     let mut passphrase = None;
-    let key = match current_uuid(&device) {
+    let key = match current_uuid(device) {
         None => {
-            let key = match recovery_key(&plan, None, &mut passphrase) {
+            let key = match recovery_key(plan, None, &mut passphrase) {
                 Ok(key) => key,
                 Err(error) => {
                     record("failed");
                     return Err(error);
                 }
             };
-            start_encrypting(&plan, &device, &key)?;
+            start_encrypting(plan, device, &key)?;
             key
         }
-        Some(uuid) if uuid == plan.uuid => recovery_key(&plan, Some(&device), &mut passphrase)?,
+        Some(uuid) if uuid == plan.uuid => recovery_key(plan, Some(device), &mut passphrase)?,
         Some(_) => return Ok(()),
     };
     Tool::new("cryptsetup")
         .args(["open", "--key-file", "-"])
-        .arg(&device)
+        .arg(device)
         .arg(plan.mapping())
         .input(&key)
         .status()
@@ -167,4 +209,16 @@ pub fn run() -> Result<()> {
     }
     record("started");
     Ok(())
+}
+
+pub fn run() -> Result<()> {
+    let Some(plan) = stage::plan_in(Path::new(INITRD_STAGE)) else {
+        return Ok(());
+    };
+    let device = plan.partition();
+    wait_for(&device)?;
+    match plan.change {
+        Change::Encrypt => open_while_encrypting(&plan, &device),
+        Change::Decrypt => open_while_decrypting(&plan, &device),
+    }
 }

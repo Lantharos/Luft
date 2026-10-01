@@ -83,6 +83,7 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
             .context("The system partition has no PARTUUID.")?,
         mode,
         header: None,
+        boot_uuid: None,
     };
     stage::write(
         &plan,
@@ -109,9 +110,11 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
 }
 
 pub fn rebuild_boot_files() -> Result<()> {
-    if startup::installed() {
+    let rebuilt = if startup::installed() {
         startup::rebuild_images(true)
     } else {
         kernels::rebuild_all_initrds()
-    }
+    };
+    rustix::fs::sync();
+    rebuilt
 }

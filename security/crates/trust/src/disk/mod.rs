@@ -35,10 +35,8 @@ impl SystemDisk {
             blocks::kernel_name(&root.source).context("The system disk couldn't be found.")?;
         let crypt = blocks::dm_uuid(&name).is_some_and(|uuid| uuid.starts_with("CRYPT-LUKS2"));
         let (partition, mapping) = if crypt {
-            let partition = blocks::slaves(&name)
-                .into_iter()
-                .next()
-                .context("The encrypted disk has no partition under it.")?;
+            let partition =
+                underneath(&name).context("The encrypted disk has no partition under it.")?;
             (partition, blocks::dm_name(&name))
         } else {
             (name, None)
@@ -63,6 +61,15 @@ impl SystemDisk {
             .filter(|plan| plan.change == Change::Decrypt)
             .and_then(|plan| plan.header);
         luks::read(&self.device(), detached.as_deref(), self.size())
+    }
+}
+
+fn underneath(name: &str) -> Option<String> {
+    let below = blocks::slaves(name).into_iter().next()?;
+    if blocks::dm_uuid(&below).is_some() {
+        underneath(&below)
+    } else {
+        Some(below)
     }
 }
 
@@ -125,7 +132,17 @@ pub fn status() -> Option<DiskStatus> {
         encrypted: header.is_some(),
         state,
         progress,
-        unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
+        unlock: match (&plan, &header) {
+            (Some(plan), Some(_)) if plan.change == Change::Encrypt => vec![
+                match plan.mode {
+                    state::Mode::Tpm => "tpm",
+                    state::Mode::Passphrase => "passphrase",
+                },
+                "recovery-key",
+            ],
+            (_, Some(header)) => unlock_methods(header),
+            _ => Vec::new(),
+        },
         recovery_key_stored: keys::has_escrow(),
         tpm_refused: header
             .as_ref()

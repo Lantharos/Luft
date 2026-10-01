@@ -108,7 +108,7 @@ The keyring is an SSH agent on `$XDG_RUNTIME_DIR/luft-keyring/ssh`, and Kestrel 
 
 ## Building on the keyring
 
-The vault crate holds the file format and the data every part of the keyring shares, in `Contents`: Secret Service collections and items, app access rules, apps' own secrets, SSH keys and preferences. A new kind of data, such as passkeys, gets its own field there and its own module and D-Bus interface in the daemon, next to `ssh` and `manage`. The daemon offers what such a module needs:
+The vault crate holds the file format and the data every part of the keyring shares, in `Contents`: Secret Service collections and items, app access rules, apps' own secrets, SSH keys and preferences. A new kind of data gets its own place there and its own module and D-Bus interface in the daemon, next to `ssh` and `manage`. Passkeys work this way: they live in a collection only Luft Passkeys may use, with the `passkeys` module answering it. The daemon offers what such a module needs:
 
 - `Daemon::ensure_unlocked` unlocks the keyring, prompting when needed.
 - `Keyring::edit` changes the contents and saves the vault, and `Keyring::record` adds to the access history.

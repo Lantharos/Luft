@@ -1,5 +1,5 @@
 import type { ITheme } from '@xterm/xterm';
-import type { Scheme, TerminalColors } from '@luft/ui';
+import type { Scheme, SchemeColors } from '@luft/ui';
 
 type Colors = Record<string, string>;
 
@@ -24,13 +24,13 @@ const ANSI = [
 
 const ansi = (colors: string[]) => Object.fromEntries(colors.map((color, index) => [`color${index}`, color]));
 
-export const LUFT_COLORS: TerminalColors = {
+export const LUFT_COLORS: SchemeColors = {
 	dark: {
 		foreground: '#e4e4de',
 		background: '#121211',
-		cursor: '#c8b66f',
+		cursor: '#f3f3ef',
 		cursorText: '#181817',
-		selectionBackground: '#4a4430',
+		selectionBackground: '#3c3c39',
 		selectionForeground: '#f3f3ef',
 		...ansi([
 			'#2c2c29', '#e58c84', '#7aba7c', '#bda750', '#73aceb', '#cf8ec9', '#39bcc3', '#c9c9c3',
@@ -40,9 +40,9 @@ export const LUFT_COLORS: TerminalColors = {
 	light: {
 		foreground: '#2a2a27',
 		background: '#fbfbf9',
-		cursor: '#6b5a00',
+		cursor: '#1b1b19',
 		cursorText: '#ffffff',
-		selectionBackground: '#ece3c0',
+		selectionBackground: '#dcdcd6',
 		selectionForeground: '#1b1b19',
 		...ansi([
 			'#2a2a27', '#aa4844', '#317f38', '#7f6a00', '#296eb4', '#944c8f', '#007b80', '#c2c2bb',

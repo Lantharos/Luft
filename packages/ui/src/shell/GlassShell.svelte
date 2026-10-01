@@ -14,8 +14,6 @@
 <div
 	class={['glass-shell', className]}
 	data-effect={appearance.translucent ? 'translucent' : 'solid'}
-	style:--accent={appearance.accent ?? undefined}
-	style:--accent-text={appearance.accentText ?? undefined}
 >
 	{@render children()}
 </div>

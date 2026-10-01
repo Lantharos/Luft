@@ -1,3 +1,5 @@
+import { appearance } from '@luft/ui';
+
 export type Tone = 'accent' | 'soft';
 
 export interface Line {
@@ -86,9 +88,7 @@ export function draw(canvas: HTMLCanvasElement, lines: Line[], frame: Frame) {
 let colors: { key: string; values: Record<Tone, string> } | null = null;
 
 function palette(element: Element): Record<Tone, string> {
-	const root = document.documentElement;
-	const shell = element.closest<HTMLElement>('.glass-shell');
-	const key = `${root.dataset.scheme}|${root.hasAttribute('data-black')}|${shell?.style.cssText ?? ''}`;
+	const key = `${document.documentElement.dataset.scheme}|${appearance.accent}`;
 	if (colors?.key !== key) {
 		const style = getComputedStyle(element);
 		const values = Object.fromEntries(Object.entries(TONES).map(([tone, variable]) => [tone, style.getPropertyValue(variable).trim()])) as Record<Tone, string>;

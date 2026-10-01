@@ -7,7 +7,7 @@
 @import './styles/details.css';
 
 :root {
-	--folder: #c8b66f;
+	--folder: var(--accent);
 	--file: #b8b8b0;
 	--media: #9fb7b5;
 	--code: #b5afa2;
@@ -18,6 +18,4 @@
 .glass-shell {
 	--selection: color-mix(in oklab, var(--accent) 22%, transparent);
 	--selection-hover: color-mix(in oklab, var(--accent) 28%, transparent);
-	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
-	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
 }

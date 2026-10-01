@@ -17,9 +17,10 @@ const INTERFACE: &str = "com.lantharos.Kestrel.Appearance";
 #[serde(rename_all = "camelCase")]
 pub struct Palette {
     accent: String,
+    wallpaper_accent: String,
     pure_black: bool,
-    colors: HashMap<String, String>,
-    terminal: TerminalColors,
+    colors: Schemes,
+    terminal: Schemes,
     app_icons: AppIcons,
 }
 
@@ -59,9 +60,18 @@ impl AppIcons {
 }
 
 #[derive(Serialize)]
-pub struct TerminalColors {
+pub struct Schemes {
     light: HashMap<String, String>,
     dark: HashMap<String, String>,
+}
+
+impl Schemes {
+    fn read(proxy: &Proxy, prefix: &str) -> Option<Self> {
+        Some(Self {
+            light: proxy.get_property(&format!("Light{prefix}")).ok()?,
+            dark: proxy.get_property(&format!("Dark{prefix}")).ok()?,
+        })
+    }
 }
 
 pub fn palette() -> Option<Palette> {
@@ -70,12 +80,10 @@ pub fn palette() -> Option<Palette> {
     (!accent.is_empty()).then_some(())?;
     Some(Palette {
         accent,
+        wallpaper_accent: proxy.get_property("WallpaperAccentColor").ok()?,
         pure_black: proxy.get_property("PureBlack").ok()?,
-        colors: proxy.get_property("Colors").ok()?,
-        terminal: TerminalColors {
-            light: proxy.get_property("LightTerminalColors").ok()?,
-            dark: proxy.get_property("DarkTerminalColors").ok()?,
-        },
+        colors: Schemes::read(&proxy, "Colors")?,
+        terminal: Schemes::read(&proxy, "TerminalColors")?,
         app_icons: AppIcons::from_map(proxy.get_property("AppIcons").ok()?)?,
     })
 }

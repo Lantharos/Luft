@@ -3,7 +3,7 @@ import { listen } from '@lantharos/sabine';
 const PALETTE_CHANGED = 'kestrel.palette';
 const SCHEME_CHANGED = 'appearance.scheme';
 
-export interface TerminalColors {
+export interface SchemeColors {
 	light: Record<string, string>;
 	dark: Record<string, string>;
 }
@@ -26,13 +26,15 @@ export interface AppIcons {
 
 export interface Palette {
 	accent: string;
+	wallpaperAccent: string;
 	pureBlack: boolean;
-	colors: Record<string, string>;
-	terminal: TerminalColors;
+	colors: SchemeColors;
+	terminal: SchemeColors;
 	appIcons: AppIcons;
 }
 
 const TERMINAL_HUES = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
+const SCHEMES = ['light', 'dark'] as const;
 
 export type Scheme = 'dark' | 'light';
 
@@ -42,20 +44,16 @@ export interface Appearance {
 	scheme: Scheme;
 }
 
-function readableOn(hex: string) {
-	const [red, green, blue] = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
-	const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-	return luminance > 0.5 ? '#181817' : '#f7f7f4';
-}
+const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
 class AppearanceState {
 	translucent = $state(false);
 	accent = $state<string | null>(null);
-	accentText = $derived(this.accent ? readableOn(this.accent) : null);
+	wallpaperAccent = $state<string | null>(null);
 	scheme = $state<Scheme>('dark');
 	pureBlack = $state(false);
-	colors = $state<Record<string, string>>({});
-	terminal = $state<TerminalColors>({ light: {}, dark: {} });
+	colors = $state<SchemeColors>({ light: {}, dark: {} });
+	terminal = $state<SchemeColors>({ light: {}, dark: {} });
 	appIcons = $state<AppIcons | null>(null);
 
 	start(initial: Appearance) {
@@ -71,13 +69,15 @@ class AppearanceState {
 
 	private receive(palette: Palette) {
 		this.accent = palette.accent;
+		this.wallpaperAccent = palette.wallpaperAccent;
 		this.pureBlack = palette.pureBlack;
 		this.colors = palette.colors;
 		this.terminal = palette.terminal;
 		this.appIcons = palette.appIcons;
 		const root = document.documentElement;
 		root.toggleAttribute('data-black', palette.pureBlack);
-		for (const scheme of ['light', 'dark'] as const) {
+		for (const scheme of SCHEMES) {
+			for (const [role, color] of Object.entries(palette.colors[scheme])) root.style.setProperty(`--kestrel-${scheme}-${kebab(role)}`, color);
 			TERMINAL_HUES.forEach((hue, index) => root.style.setProperty(`--kestrel-${scheme}-${hue}`, palette.terminal[scheme][`color${index + 1}`]));
 		}
 	}

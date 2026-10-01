@@ -44,7 +44,7 @@
 				/>
 			{/snippet}
 		</Row>
-		<Row title="Animations" description="Windows, menus, and panels move instead of appearing instantly">
+		<Row title="Animations" description="Windows and menus move instead of appearing instantly">
 			<Switch label="Animations" checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
 		</Row>
 	</Section>

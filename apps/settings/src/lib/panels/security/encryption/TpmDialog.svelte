@@ -16,13 +16,13 @@
 
 	const COPY: Record<TpmMode, { title: string; description: string; action: string }> = {
 		setup: {
-			title: 'Unlock with the TPM',
-			description: 'The TPM, a security chip in your computer, unlocks the disk by itself when the computer starts, so you no longer type a passphrase first.',
+			title: 'Unlock with the security chip',
+			description: 'The security chip in your computer unlocks the disk by itself at startup, so you no longer type a passphrase first.',
 			action: 'Set up'
 		},
 		add: {
 			title: 'Add a PIN',
-			description: 'You’ll type it each time the computer starts, before you sign in. The disk stays locked without it, even if someone takes the whole computer.',
+			description: 'You’ll type it each time the computer starts. Without it, the disk stays locked, even if someone takes the whole computer.',
 			action: 'Add PIN'
 		},
 		change: {
@@ -31,8 +31,8 @@
 			action: 'Change PIN'
 		},
 		relink: {
-			title: 'Link the TPM again',
-			description: 'Type the PIN you’d like to use when the computer starts.',
+			title: 'Link the security chip again',
+			description: 'Type the PIN you’d like to use at startup.',
 			action: 'Link again'
 		}
 	};
@@ -68,7 +68,7 @@
 		<div class="flex items-center gap-4 px-1">
 			<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 				<span class="text-[14px] font-medium">Also ask for a PIN</span>
-				<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Adds a step when the computer starts.</span>
+				<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Adds a step at startup.</span>
 			</div>
 			<Switch label="Also ask for a PIN" checked={usePin} onchange={(on) => (usePin = on)} />
 		</div>

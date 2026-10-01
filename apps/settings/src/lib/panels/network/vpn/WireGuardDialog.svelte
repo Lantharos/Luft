@@ -103,7 +103,7 @@
 		<Row title="Name">
 			<div class="w-[260px]"><TextField label="Name" bind:value={name} placeholder="Home VPN" error={errors.name} /></div>
 		</Row>
-		<Row title="Private key" description={publicKey ? `Your public key is ${publicKey}` : 'Its public key shows up here, to share with the server'}>
+		<Row title="Private key" description={publicKey ? `Public key ${publicKey}` : 'Its public key shows up here to share'} truncate>
 			<div class="flex w-[260px] flex-col items-end gap-2">
 				<PasswordField label="Private key" bind:value={privateKey} error={errors.privateKey} />
 				<div class="flex gap-2">

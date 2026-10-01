@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MonitorX from '@lucide/svelte/icons/monitor-x';
 	import { ActionRow, Dialog, Section } from '@luft/ui';
+	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
 	import { problems, restartToFirmware, type Problem } from './api';
 
 	const AFTERMATH: Record<Problem['restart'], string> = {
@@ -13,6 +14,7 @@
 
 	let list = $state<Problem[]>([]);
 	let open = $state<Problem | null>(null);
+	let expanded = $state(false);
 	let error = $state('');
 
 	async function restart() {
@@ -28,7 +30,7 @@
 
 {#if list.length}
 	<Section title="Recent problems">
-		{#each list as problem (problem.id)}
+		{#each expanded ? list : list.slice(0, COLLAPSED) as problem (problem.id)}
 			<ActionRow
 				icon={MonitorX}
 				title="The graphics driver stopped responding"
@@ -39,6 +41,9 @@
 				}}
 			/>
 		{/each}
+		{#if list.length > COLLAPSED}
+			<MoreRow hidden={list.length - COLLAPSED} bind:expanded />
+		{/if}
 	</Section>
 {/if}
 

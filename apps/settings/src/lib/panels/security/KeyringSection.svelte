@@ -1,45 +1,26 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import KeyRound from '@lucide/svelte/icons/key-round';
 	import { Row, Section } from '@luft/ui';
-	import AccessSection from './keyring/AccessSection.svelte';
-	import { keyring, onKeyring, type Keyring } from './keyring/api';
-	import HistorySection from './keyring/HistorySection.svelte';
-	import SshSection from './keyring/SshSection.svelte';
+	import SshSection from './keyring/ssh/SshSection.svelte';
+	import type { KeyringState } from './keyring/state.svelte';
 	import StatusSection from './keyring/StatusSection.svelte';
-	import StoresSection from './keyring/StoresSection.svelte';
 
-	let current = $state<Keyring | null | undefined>();
-
-	const stop = onKeyring((next) => (current = next));
-	onDestroy(stop);
-
-	async function load() {
-		current = await keyring().catch(() => null);
+	interface Props {
+		keyring: KeyringState;
+		fingerprintReader: boolean;
+		onaccess: () => void;
 	}
 
-	void load();
+	let { keyring, fingerprintReader, onaccess }: Props = $props();
 </script>
 
-{#if current === null}
+{#if keyring.current === null}
 	<Section title="Passwords and keys">
-		<Row title="Your keyring isn’t running" description="Your saved passwords and keys show up here once it starts" icon={KeyRound} />
+		<Row title="Your keyring isn’t running" description="Your passwords and keys show up here once it starts" />
 	</Section>
-{:else if current}
-	<StatusSection keyring={current} refresh={load} />
+{:else if keyring.current}
+	<StatusSection keyring={keyring.current} {fingerprintReader} refresh={keyring.load} {onaccess} />
 
-	{#if current.access}
-		<AccessSection apps={current.access.apps} locked={current.locked} refresh={load} />
-		{#if current.access.stores.length}
-			<StoresSection stores={current.access.stores} refresh={load} />
-		{/if}
-	{/if}
-
-	{#if current.ssh}
-		<SshSection ssh={current.ssh} refresh={load} />
-	{/if}
-
-	{#if current.access?.history.length}
-		<HistorySection history={current.access.history} refresh={load} />
+	{#if keyring.current.ssh}
+		<SshSection ssh={keyring.current.ssh} refresh={keyring.load} />
 	{/if}
 {/if}

@@ -119,6 +119,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("users_choose_picture", choose_picture)
         .command("users_change_password", password::change)
         .command("users_fingerprints", |_: Value| Ok(fingerprint::list()))
+        .command("users_fingerprint_reader", |_: Value| {
+            Ok(fingerprint::reader_present())
+        })
         .with("users_fingerprint_enroll", events, fingerprint::enroll)
         .command("users_fingerprint_stop", |_: Value| {
             fingerprint::stop();

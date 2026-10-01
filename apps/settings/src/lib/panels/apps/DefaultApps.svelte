@@ -24,6 +24,8 @@
 
 	let handlers = $state<Handler[]>([]);
 
+	let choosable = $derived(handlers.filter((handler) => handler.apps.length));
+
 	async function load() {
 		handlers = await defaults();
 	}
@@ -41,7 +43,7 @@
 </script>
 
 <Section title="Default apps" description="Used when you open links, files, and folders">
-	{#each handlers as handler (handler.category)}
+	{#each choosable as handler (handler.category)}
 		{@const category = CATEGORIES[handler.category]}
 		{@const current = handler.apps.find((app) => app.id === handler.current)}
 		<Row title={category.title} icon={category.icon}>
@@ -50,8 +52,7 @@
 			{/if}
 			<Select
 				label={category.title}
-				placeholder={handler.apps.length ? 'Choose' : 'None installed'}
-				disabled={!handler.apps.length}
+				placeholder="Choose"
 				options={handler.apps.map((app) => ({ value: app.id, label: app.name }))}
 				value={handler.current ?? ''}
 				onchange={(app) => choose(handler, app)}

@@ -7,11 +7,11 @@
 	import Trash from '@lucide/svelte/icons/trash';
 	import { IconButton, Row, Section, Switch } from '@luft/ui';
 	import { ago } from '$lib/panels/updates/time';
-	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from './api';
+	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
 	import AddKeyDialog from './AddKeyDialog.svelte';
-	import ConfirmDialog from './ConfirmDialog.svelte';
-	import { kind } from './describe';
-	import { Runner } from './runner.svelte';
+	import ConfirmDialog from '../ConfirmDialog.svelte';
+	import { kind } from '../describe';
+	import { Runner } from '../runner.svelte';
 
 	const COPIED_FOR = 2000;
 
@@ -49,9 +49,9 @@
 	}
 </script>
 
-<Section title="SSH keys" description="Keys for signing in to servers over SSH, kept safe in your keyring.">
+<Section title="SSH keys" description="Keys for signing in to servers, kept safe in your keyring.">
 	{#each sorted as key (key.fingerprint)}
-		<Row title={label(key)} description={details(key)} icon={KeyRound}>
+		<Row title={label(key)} description={details(key)} icon={KeyRound} truncate>
 			<IconButton
 				icon={copied === key.fingerprint ? Check : Copy}
 				label="Copy the public key of {label(key)}"
@@ -73,7 +73,7 @@
 	{/each}
 	<Row title="Add a key" icon={Plus} onclick={() => (adding = true)} />
 	{#if ssh.socket}
-		<Row title="Use these keys with SSH" description="Point SSH at them with {environment}" icon={Terminal}>
+		<Row title="Use these keys with SSH" description="Copy the line that points SSH at them" icon={Terminal}>
 			<IconButton icon={copied === 'socket' ? Check : Copy} label="Copy {environment}" onclick={() => copy('socket', async () => `export ${environment}`)} />
 		</Row>
 	{/if}

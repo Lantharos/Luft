@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { onMount } from 'svelte';
-	import { IconButton, Row, Section } from '@luft/ui';
+	import { Row, Section } from '@luft/ui';
+	import SubPage from '$lib/components/SubPage.svelte';
 	import { forget, remove, type Network } from '../api';
 	import AdvancedSection from './AdvancedSection.svelte';
 	import DetailsSection from './DetailsSection.svelte';
@@ -20,7 +20,6 @@
 
 	let { target, title, network, onclose }: Props = $props();
 
-	let root = $state<HTMLDivElement>();
 	let profile = $state<Profile | null>(null);
 	let original = $state('');
 	let password = $state('');
@@ -78,7 +77,6 @@
 	}
 
 	onMount(() => {
-		root?.scrollIntoView({ block: 'start' });
 		loadProfile(target.path)
 			.then((loaded) => {
 				original = JSON.stringify(loaded);
@@ -89,12 +87,10 @@
 	});
 </script>
 
-<div bind:this={root} class="flex scroll-mt-4 flex-col gap-7">
-	<div class="-mb-2 flex items-center gap-3">
-		<IconButton icon={ArrowLeft} label="Back to Network" onclick={onclose} />
-		<h2 class="min-w-0 flex-1 truncate text-[17px] font-semibold">{title}</h2>
+<SubPage {title} back="Network" {onclose}>
+	{#snippet actions()}
 		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? 'Saving…' : 'Save'}</button>
-	</div>
+	{/snippet}
 
 	{#if problem}
 		<p class="-my-3 px-2 text-[13px] text-[var(--danger)]">{problem}</p>
@@ -130,4 +126,4 @@
 			</Section>
 		{/if}
 	{/if}
-</div>
+</SubPage>

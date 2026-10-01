@@ -69,17 +69,11 @@
 {/if}
 
 <Section>
-	<Row
-		title="Set the time automatically"
-		description={clock && !clock.canAutomatic ? "This computer can't set its time automatically" : 'Keeps the clock accurate using the internet'}
-	>
-		<Switch
-			label="Set the time automatically"
-			checked={clock?.automatic ?? false}
-			disabled={!clock?.canAutomatic}
-			onchange={toggleAutomatic}
-		/>
-	</Row>
+	{#if clock?.canAutomatic}
+		<Row title="Set the time automatically" description="Keeps the clock accurate using the internet">
+			<Switch label="Set the time automatically" checked={clock.automatic} onchange={toggleAutomatic} />
+		</Row>
+	{/if}
 	<Row title="Date and time" disabled={!clock || clock.automatic} onclick={() => (editing = 'time')}>
 		<span class="tabular-nums">{shortFormat.format(now)}</span>
 	</Row>

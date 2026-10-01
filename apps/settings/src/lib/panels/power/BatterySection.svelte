@@ -32,6 +32,14 @@
 		}
 	});
 	let health = $derived(battery.capacity ? (battery.capacity.full / battery.capacity.design) * 100 : null);
+	let wear = $derived(
+		[
+			battery.capacity && `${wattHours(battery.capacity.full)} of ${wattHours(battery.capacity.design)} when new`,
+			battery.cycles.length && `${battery.cycles.join(' and ')} charge cycles`
+		]
+			.filter(Boolean)
+			.join(' · ')
+	);
 </script>
 
 <Section title="Battery">
@@ -40,14 +48,11 @@
 			<Level level={battery.level} low={battery.charge === 'discharging' && battery.level <= LOW_LEVEL} />
 		{/snippet}
 	</Row>
-	{#if battery.capacity && health !== null}
-		<Row title="Battery health" description="Holds {wattHours(battery.capacity.full)} of the {wattHours(battery.capacity.design)} it held when new">
-			<span class="tabular-nums">{Math.round(Math.min(health, 100))}%</span>
-		</Row>
-	{/if}
-	{#if battery.cycles.length}
-		<Row title="Charge cycles" description="How many times the battery has been used up and charged again">
-			<span class="tabular-nums">{battery.cycles.join(' and ')}</span>
+	{#if wear}
+		<Row title="Battery health" description={wear}>
+			{#if health !== null}
+				<span class="tabular-nums">{Math.round(Math.min(health, 100))}%</span>
+			{/if}
 		</Row>
 	{/if}
 	<Row title="Show percentage" description="Shows the battery level next to the battery icon">

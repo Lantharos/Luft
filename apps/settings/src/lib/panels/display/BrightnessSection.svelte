@@ -5,12 +5,12 @@
 	import { loadBrightness, onBrightnessChanged, setBrightness, type Brightness, type ExternalBrightness, type Monitor } from './api';
 
 	const SETUP: Partial<Record<ExternalBrightness, string>> = {
-		'missing-tool': 'Install ddcutil to change the brightness of external displays from here.',
-		'needs-restart': 'Restart your computer to finish setting up brightness control for external displays.',
-		'no-access': "Your account isn't allowed to adjust external displays yet. Logging out and back in usually fixes this. If it doesn't, your account needs access to the i2c devices your displays are connected through."
+		'missing-tool': 'Install ddcutil to change their brightness here',
+		'needs-restart': 'Restart to finish setting up their brightness',
+		'no-access': 'Sign out and back in to change their brightness here'
 	};
-	const UNSUPPORTED = "This display doesn't accept brightness changes from the computer. Turning on DDC/CI in the display's own menu might help.";
-	const UNRESPONSIVE = "This display isn't responding right now. Settings will try again shortly.";
+	const UNSUPPORTED = 'Turn on DDC/CI in the display’s menu to change it here';
+	const UNRESPONSIVE = 'Not responding right now, trying again shortly';
 	const SETTLED = 0.02;
 	const HOLD = 1500;
 

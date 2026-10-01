@@ -80,7 +80,7 @@
 		</button>
 	</div>
 	<Row title="Wallpapers folder" description="Pictures › Wallpapers" icon={FolderOpen} onclick={openFolder} />
-	<Row title="Fit" description="How wallpapers that don't match the display's shape are shown">
+	<Row title="Fit" description="For wallpapers that don’t match the display’s shape">
 		<Select label="Fit" options={FIT_OPTIONS} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
 	</Row>
 	<LiveWallpaperOnBattery />

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
-	import { hasTouchpad } from './api';
+	import { pointers, type Pointers } from './api';
 	import SpeedSlider from './SpeedSlider.svelte';
 	import TouchpadSection from './TouchpadSection.svelte';
 
@@ -14,40 +14,48 @@
 
 	const mouse = useSettings<Mouse>('org.gnome.desktop.peripherals.mouse', ['left-handed', 'speed', 'accel-profile', 'natural-scroll']);
 
-	let touchpad = $state(false);
+	let found = $state<Pointers | null>(null);
 
-	void hasTouchpad().then((present) => (touchpad = present));
+	void pointers().then((present) => (found = present));
 </script>
 
-<Section title="Mouse">
-	<Row title="Primary button" description="The button you click to select things">
-		<Segmented
-			label="Primary button"
-			options={[
-				{ value: 'left', label: 'Left' },
-				{ value: 'right', label: 'Right' }
-			]}
-			value={mouse.values['left-handed'] ? 'right' : 'left'}
-			onchange={(button) => mouse.set('left-handed', button === 'right')}
-		/>
-	</Row>
-	<Row title="Pointer speed">
-		{#snippet below()}
-			<SpeedSlider label="Pointer speed" value={mouse.values.speed ?? 0} onchange={(speed) => mouse.set('speed', speed)} />
-		{/snippet}
-	</Row>
-	<Row title="Mouse acceleration" description="The pointer travels farther when you move the mouse quickly">
-		<Switch
-			label="Mouse acceleration"
-			checked={mouse.values['accel-profile'] !== 'flat'}
-			onchange={(on) => mouse.set('accel-profile', on ? 'default' : 'flat')}
-		/>
-	</Row>
-	<Row title="Natural scrolling" description="Scrolling moves the content instead of the view">
-		<Switch label="Natural scrolling" checked={mouse.values['natural-scroll'] ?? false} onchange={(on) => mouse.set('natural-scroll', on)} />
-	</Row>
-</Section>
+{#if found?.mouse}
+	<Section title="Mouse">
+		<Row title="Primary button" description="The button you click to select things">
+			<Segmented
+				label="Primary button"
+				options={[
+					{ value: 'left', label: 'Left' },
+					{ value: 'right', label: 'Right' }
+				]}
+				value={mouse.values['left-handed'] ? 'right' : 'left'}
+				onchange={(button) => mouse.set('left-handed', button === 'right')}
+			/>
+		</Row>
+		<Row title="Pointer speed">
+			{#snippet below()}
+				<SpeedSlider label="Pointer speed" value={mouse.values.speed ?? 0} onchange={(speed) => mouse.set('speed', speed)} />
+			{/snippet}
+		</Row>
+		<Row title="Mouse acceleration" description="The pointer travels farther when you move the mouse quickly">
+			<Switch
+				label="Mouse acceleration"
+				checked={mouse.values['accel-profile'] !== 'flat'}
+				onchange={(on) => mouse.set('accel-profile', on ? 'default' : 'flat')}
+			/>
+		</Row>
+		<Row title="Natural scrolling" description="Scrolling moves the content instead of the view">
+			<Switch label="Natural scrolling" checked={mouse.values['natural-scroll'] ?? false} onchange={(on) => mouse.set('natural-scroll', on)} />
+		</Row>
+	</Section>
+{/if}
 
-{#if touchpad}
+{#if found?.touchpad}
 	<TouchpadSection />
+{/if}
+
+{#if found && !found.mouse && !found.touchpad}
+	<Section>
+		<Row title="No mouse or touchpad found" description="Connect a mouse to change how it works" />
+	</Section>
 {/if}

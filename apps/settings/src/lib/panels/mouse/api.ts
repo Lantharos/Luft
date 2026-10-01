@@ -1,3 +1,8 @@
 import { invoke } from '$lib/bridge';
 
-export const hasTouchpad = () => invoke<boolean>('mouse_has_touchpad');
+export interface Pointers {
+	mouse: boolean;
+	touchpad: boolean;
+}
+
+export const pointers = () => invoke<Pointers>('mouse_pointers');

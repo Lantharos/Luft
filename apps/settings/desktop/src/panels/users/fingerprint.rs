@@ -59,6 +59,15 @@ fn reader() -> Option<Proxy<'static>> {
     Proxy::new(system, SERVICE, path, DEVICE).ok()
 }
 
+pub fn reader_present() -> bool {
+    let Ok(system) = dbus::system() else {
+        return false;
+    };
+    Proxy::new(system, SERVICE, MANAGER_PATH, MANAGER)
+        .and_then(|manager| manager.call::<_, _, Vec<OwnedObjectPath>>("GetDevices", &()))
+        .is_ok_and(|devices| !devices.is_empty())
+}
+
 fn call(
     reader: &Proxy,
     method: &str,

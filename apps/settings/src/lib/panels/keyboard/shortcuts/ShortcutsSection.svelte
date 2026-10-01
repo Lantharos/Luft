@@ -1,6 +1,5 @@
 <script lang="ts">
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import Search from '@lucide/svelte/icons/search';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import type { Category } from '../api';
 	import { labels } from './accelerator';
@@ -10,6 +9,7 @@
 	interface Props {
 		store: ShortcutStore;
 		onrecord: (binding: Binding) => void;
+		query: string;
 	}
 
 	const CATEGORIES: [Category, string][] = [
@@ -21,9 +21,7 @@
 	];
 	const collator = new Intl.Collator(undefined, { numeric: true });
 
-	let { store, onrecord }: Props = $props();
-
-	let query = $state('');
+	let { store, onrecord, query }: Props = $props();
 
 	let needle = $derived(query.trim().toLowerCase());
 
@@ -44,14 +42,6 @@
 	}
 </script>
 
-<div class="flex items-center justify-between gap-4 pt-3 pl-1.5">
-	<h2 class="text-[17px] font-semibold">Keyboard shortcuts</h2>
-	<label class="search">
-		<Search size={16} class="shrink-0 text-[var(--text-muted)]" />
-		<input bind:value={query} placeholder="Search shortcuts" aria-label="Search shortcuts" />
-	</label>
-</div>
-
 {#each categories as group (group.title)}
 	<Section title={group.title}>
 		{#each group.bindings as binding (binding.id)}
@@ -66,7 +56,7 @@
 {/each}
 
 {#if apps.length}
-	<Section title="App shortcuts" description="Shortcuts that apps asked for, which work even when the app isn't in front">
+	<Section title="App shortcuts" description="Ones apps asked for, which work even when the app isn’t in front">
 		{#each apps as binding (binding.id)}
 			<Row title={binding.name} description={binding.appName}>
 				<ShortcutButton accelerators={binding.accelerators} label={binding.name} onclick={() => onrecord(binding)} />
@@ -78,33 +68,3 @@
 {#if needle && !categories.length && !apps.length}
 	<p class="px-2 text-[14px] text-[var(--text-muted)]">No shortcuts match “{query.trim()}”</p>
 {/if}
-
-<style>
-	.search {
-		display: flex;
-		height: 36px;
-		width: 260px;
-		align-items: center;
-		gap: 10px;
-		border-radius: var(--radius-pill);
-		background: var(--surface);
-		padding-inline: 14px;
-		transition: box-shadow 160ms var(--ease);
-	}
-
-	.search:focus-within {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	input {
-		min-width: 0;
-		flex: 1;
-		background: transparent;
-		font-size: 13.5px;
-		outline: none;
-	}
-
-	input::placeholder {
-		color: var(--text-muted);
-	}
-</style>

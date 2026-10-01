@@ -22,7 +22,7 @@
 
 <Dialog
 	title="Turn off device encryption?"
-	description="Your files are decrypted in the background while you keep working. Afterwards, anyone who takes out the disk can read what’s on it, and your recovery key is no longer needed."
+	description="Your files are decrypted in the background while you work. Afterwards, anyone who takes out the disk can read it."
 	onclose={() => !busy && onclose()}
 >
 	{#if error}

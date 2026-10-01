@@ -15,7 +15,7 @@
 	let { device, busy, ontrust, ontoggle, onforget, onclose }: Props = $props();
 </script>
 
-<Dialog title={device.name} description={device.connected ? 'Connected' : 'Not connected'} {onclose}>
+<Dialog title={device.name} description={device.connected ? 'Connected' : undefined} {onclose}>
 	<dl class="details">
 		<dt>Type</dt>
 		<dd>{KIND_LABELS[device.kind]}</dd>
@@ -27,9 +27,9 @@
 		<dd class="select-text">{device.address}</dd>
 	</dl>
 	<div class="flex items-center justify-between gap-4 pt-1">
-		<div class="flex flex-col gap-0.5">
+		<div class="flex min-w-0 flex-col gap-0.5">
 			<span class="text-[14px] font-medium">Connect automatically</span>
-			<span class="text-[12.5px] text-[var(--text-muted)]">Let {device.name} connect whenever it’s nearby</span>
+			<span class="text-[12.5px] text-[var(--text-muted)]">Whenever it’s nearby</span>
 		</div>
 		<Switch label="Connect automatically" checked={device.trusted} onchange={ontrust} />
 	</div>

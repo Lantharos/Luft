@@ -5,7 +5,7 @@
 	let { cards }: { cards: Card[] } = $props();
 </script>
 
-<Section title="Devices">
+<Section description="How each sound device is used, such as stereo or surround">
 	{#each cards as card (card.index)}
 		<Row title={card.description}>
 			<Select

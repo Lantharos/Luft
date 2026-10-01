@@ -37,15 +37,14 @@
 
 	function wifiSummary(wifi: Wifi) {
 		if (!wifi.hardwareEnabled) return 'Turned off by a hardware switch';
-		if (!wifi.enabled) return 'Off';
-		const connected = wifi.networks.find((candidate) => candidate.state === 'connected');
-		return connected ? `Connected to ${connected.ssid}` : 'Not connected';
+		const connected = wifi.enabled && wifi.networks.find((candidate) => candidate.state === 'connected');
+		return connected ? `Connected to ${connected.ssid}` : undefined;
 	}
 
 	function wiredSummary(wired: Wired) {
 		if (problems[wired.device]) return problems[wired.device];
 		if (wired.state === 'connected' && wired.speed) return `Connected · ${speedLabel(wired.speed)}`;
-		return linkLabel(wired.state);
+		return wired.state === 'disconnected' ? undefined : linkLabel(wired.state);
 	}
 
 	async function attempt(key: string, action: () => Promise<void>) {
@@ -94,7 +93,7 @@
 	{#if wifi || network.airplane || network.known.length}
 		<Section>
 			{#if wifi}
-				<Row title="Wi‑Fi" icon={WifiIcon} description={wifiSummary(wifi)}>
+				<Row title="Wi‑Fi" icon={WifiIcon} description={wifiSummary(wifi)} truncate>
 					<Switch label="Wi‑Fi" checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
 				</Row>
 			{/if}
@@ -103,7 +102,7 @@
 				<Row
 					title="Airplane mode"
 					icon={Plane}
-					description={airplane.hardware ? 'Turned on by a hardware switch' : 'Turns off Wi‑Fi, Bluetooth, and mobile broadband'}
+					description={airplane.hardware ? 'Turned on by a hardware switch' : 'Turns off every wireless connection'}
 				>
 					<Switch label="Airplane mode" checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={setAirplane} />
 				</Row>
@@ -156,7 +155,7 @@
 
 	{#if proxy.available}
 		<Section>
-			<Row title="Proxy" icon={Globe} description={proxyLabel(proxy.mode)} onclick={() => (proxying = true)} />
+			<Row title="Proxy" icon={Globe} description={proxy.mode === 'none' ? undefined : proxyLabel(proxy.mode)} onclick={() => (proxying = true)} />
 		</Section>
 	{/if}
 {/if}

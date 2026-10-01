@@ -73,18 +73,18 @@
 	const titles: Record<Step, string> = $derived({
 		check: blocked ? 'Device encryption can’t be turned on yet' : 'Turn on device encryption',
 		key: 'Save your recovery key',
-		unlock: tpm.usable ? 'Unlocking when the computer starts' : 'Choose a passphrase',
+		unlock: tpm.usable ? 'Unlocking at startup' : 'Choose a passphrase',
 		summary: 'Ready to encrypt'
 	});
 
 	const descriptions: Record<Step, string> = $derived({
 		check: blocked
 			? 'Take care of what’s marked below, then try again.'
-			: 'Encryption keeps your files private if this computer is lost or stolen. Without the right key, nobody can read the disk.',
-		key: 'If the disk ever can’t unlock by itself, for example after a hardware repair, this key is the way back in. Keep it somewhere other than this computer.',
+			: 'Your files stay private if this computer is lost or stolen. Without the right key, nobody can read the disk.',
+		key: 'If the disk ever can’t unlock by itself, such as after a repair, this key gets you back in. Keep it somewhere other than this computer.',
 		unlock: tpm.usable
-			? 'The TPM, a security chip in your computer, unlocks the disk by itself when the computer starts, so signing in stays the same.'
-			: 'This computer doesn’t have a TPM that can unlock the disk by itself, so it asks for this passphrase every time it starts.',
+			? 'The security chip unlocks the disk by itself at startup, so signing in stays the same.'
+			: 'This computer can’t unlock the disk by itself, so it asks for this passphrase every time it starts.',
 		summary: 'Here’s what happens next.'
 	});
 </script>
@@ -120,7 +120,7 @@
 			<div class="flex items-center gap-4 px-1">
 				<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 					<span class="text-[14px] font-medium">Also ask for a PIN</span>
-					<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Adds a step when the computer starts, and keeps the disk locked even if someone takes the whole computer. It starts being asked once encryption finishes.</span>
+					<span class="text-[12.5px] leading-snug text-[var(--text-muted)]">Keeps the disk locked even if someone takes the computer. It’s asked once encryption finishes.</span>
 				</div>
 				<Switch label="Also ask for a PIN" checked={usePin} onchange={(on) => (usePin = on)} />
 			</div>

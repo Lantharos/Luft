@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AppIcon, ItemRow, Section } from '@luft/ui';
-	import { forgetApp, type AppStore } from './api';
-	import ConfirmDialog from './ConfirmDialog.svelte';
+	import { forgetApp, type AppStore } from '../api';
+	import ConfirmDialog from '../ConfirmDialog.svelte';
 
 	let { stores, refresh }: { stores: AppStore[]; refresh: () => Promise<void> } = $props();
 
@@ -15,7 +15,7 @@
 	}
 </script>
 
-<Section title="App sign-ins" description="Some apps keep their own sign-ins here, where only that app can read them.">
+<Section title="App sign-ins" description="Sign-ins some apps keep here, where only that app can read them.">
 	{#each stores as store (store.key)}
 		<ItemRow title={store.name} description={saved(store.secrets)}>
 			{#snippet leading()}

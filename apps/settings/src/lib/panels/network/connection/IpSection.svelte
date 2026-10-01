@@ -96,7 +96,7 @@
 				<Switch label="Automatic routes" checked={ip.automaticRoutes} onchange={(on) => (ip.automaticRoutes = on)} />
 			</Row>
 		{/if}
-		<Row title="Routes" description="Send traffic for specific networks through a router you choose">
+		<Row title="Routes" description="Send traffic for some networks through another router">
 			{#snippet below()}
 				{#each ip.routes as route, index (route)}
 					<RouteRow bind:route={ip.routes[index]} {family} {index} {errors} onremove={() => ip.routes.splice(index, 1)} />

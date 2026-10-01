@@ -75,15 +75,15 @@
 
 <div class="flex items-center gap-4 px-2 pb-1">
 	<div class="flex min-w-0 flex-1 flex-col gap-1">
-		<span class="text-[26px] font-semibold">{headline}</span>
-		<span class="text-[14px] text-[var(--text-muted)]">{error ?? subline}</span>
+		<span class="truncate text-[26px] font-semibold">{headline}</span>
+		<span class="truncate text-[14px] text-[var(--text-muted)]">{error ?? subline}</span>
 	</div>
 	<button type="button" class="button" disabled={checking || downloading} onclick={checkNow}>{checking ? 'Checking…' : 'Check now'}</button>
 </div>
 
 {#if info?.results && !info.results.success && recently(info.results.finished)}
 	<Section>
-		<Row title="The last updates couldn't be installed" description={info.results.error ?? 'Your system was left as it was.'} />
+		<Row title="The last updates couldn't be installed" description={info.results.error ?? 'Your system was left as it was'} truncate />
 	</Section>
 {/if}
 
@@ -121,7 +121,7 @@
 <Section title="Apps">
 	<Row
 		title="App updates"
-		description={apps === null ? 'Looking for updates to your apps…' : apps ? `${apps} ${apps === 1 ? 'app has an update' : 'apps have updates'} in Schelf` : 'Your apps are up to date'}
+		description={apps === null ? 'Looking for updates to your apps…' : apps ? `${apps} ${apps === 1 ? 'app has an update' : 'apps have updates'} in Schelf` : 'Managed in Schelf'}
 		onclick={openApps}
 	/>
 </Section>

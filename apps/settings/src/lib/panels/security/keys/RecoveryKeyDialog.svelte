@@ -9,8 +9,8 @@
 		onclose: () => void;
 	}
 
-	const SHOWN = 'Type it if your computer ever asks for a recovery key when it starts. Keep a copy somewhere other than this computer.';
-	const FRESH = 'Your previous key no longer works. Keep this one somewhere other than this computer, such as on paper or in a password manager.';
+	const SHOWN = 'Type it if your computer ever asks for a recovery key at startup. Keep a copy somewhere other than this computer.';
+	const FRESH = 'Your previous key no longer works. Keep this one on paper or in a password manager.';
 
 	let { key, fresh = false, description = fresh ? FRESH : SHOWN, onclose }: Props = $props();
 

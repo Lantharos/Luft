@@ -25,6 +25,12 @@
 		{ value: 'custom', label: 'Custom' }
 	];
 
+	const SCHEDULE_NOTES: Record<Schedule, string | undefined> = {
+		off: undefined,
+		sunset: 'Follows sunset and sunrise where you are',
+		custom: 'Picking a style lasts until the next switch'
+	};
+
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
 	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
 
@@ -39,7 +45,7 @@
 </script>
 
 <Section title="Style">
-	<Row title="Appearance" description="Apps that follow the system switch between light and dark with it">
+	<Row title="Appearance" description="Apps that follow the system switch with it">
 		<Segmented
 			label="Style"
 			options={[
@@ -52,7 +58,7 @@
 	</Row>
 	<Row
 		title="Switch to dark automatically"
-		description={schedule === 'sunset' ? 'Follows sunset and sunrise where you are' : 'Choosing a style yourself lasts until the next switch'}
+		description={SCHEDULE_NOTES[schedule]}
 	>
 		<Segmented label="Switch to dark automatically" options={SCHEDULES} value={schedule} onchange={(value) => kestrel.set('dark-schedule', value)} />
 	</Row>
@@ -64,12 +70,12 @@
 			<TimePicker label="Light from" {twelveHour} value={kestrel.values['dark-schedule-to'] ?? 7} onchange={(hours) => kestrel.set('dark-schedule-to', hours)} />
 		</Row>
 	{/if}
-	<Row title="Pure black" description="Dark backgrounds turn fully black, which saves power on OLED displays">
+	<Row title="Pure black" description="Fully black dark backgrounds, which save power on OLED">
 		<Switch label="Pure black" checked={kestrel.values['pure-black'] ?? false} onchange={(on) => kestrel.set('pure-black', on)} />
 	</Row>
 	<Row
 		title="Accent color"
-		description={accent === 'white' ? 'White in the dark style and black in the light style' : 'Picked from your wallpaper, and white when it has hardly any color'}
+		description={accent === 'white' ? 'White in the dark style, black in the light style' : 'Picked from your wallpaper'}
 	>
 		<Swatches label="Accent color" options={accents} value={accent} onchange={(value) => kestrel.set('accent', value)} />
 	</Row>

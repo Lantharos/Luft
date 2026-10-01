@@ -5,6 +5,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { ActionRow, Dialog, IconButton, Row, Section, Select, Switch } from '@luft/ui';
+	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import {
@@ -47,18 +48,15 @@
 	let forgetting = $state<Device | null>(null);
 	let inspecting = $state<string | null>(null);
 	let busy = $state<Record<string, Busy>>({});
+	let expanded = $state(false);
 	let problems = $state<Record<string, string>>({});
 
 	let adapter = $derived(bluetooth?.adapter ?? null);
 	let inspected = $derived(bluetooth?.paired.find((device) => device.path === inspecting));
+	let nearby = $derived(bluetooth ? (expanded ? bluetooth.nearby : bluetooth.nearby.slice(0, COLLAPSED)) : []);
 
 	function explain(reason: unknown) {
 		return reason instanceof Error ? reason.message : String(reason);
-	}
-
-	function adapterSummary(adapter: Adapter) {
-		if (bluetooth?.hardwareBlocked) return 'Turned off with a hardware switch';
-		return adapter.powered ? 'On' : 'Off';
 	}
 
 	function visibilityOptions(adapter: Adapter) {
@@ -92,8 +90,8 @@
 	function status(device: Device) {
 		if (problems[device.path]) return problems[device.path];
 		if (busy[device.path]) return BUSY_LABELS[busy[device.path]];
-		const battery = device.battery === null ? '' : ` · ${device.battery}% battery`;
-		return device.connected ? `Connected${battery}` : `Not connected${battery}`;
+		if (!device.connected) return undefined;
+		return device.battery === null ? 'Connected' : `Connected · ${device.battery}% battery`;
 	}
 
 	async function perform(device: Device, state: Busy, action: (path: string) => Promise<void>) {
@@ -155,7 +153,7 @@
 			<Row
 				title="Bluetooth"
 				icon={BluetoothIcon}
-				description={problems.adapter ?? adapterSummary(adapter)}
+				description={problems.adapter ?? (bluetooth.hardwareBlocked ? 'Turned off with a hardware switch' : undefined)}
 			>
 				<Switch label="Bluetooth" checked={adapter.powered} disabled={bluetooth.hardwareBlocked} onchange={power} />
 			</Row>
@@ -163,7 +161,8 @@
 				<Row
 					title="Visible to nearby devices"
 					icon={Eye}
-					description={problems.visibility ?? (adapter.discoverable ? `Shown as “${adapter.name}”` : 'Lets phones and other computers find this one to pair')}
+					description={problems.visibility ?? (adapter.discoverable ? `Shown as “${adapter.name}”` : 'Lets phones and computers find this one')}
+					truncate
 				>
 					<Select
 						label="Stay visible"
@@ -202,7 +201,7 @@
 
 		{#if adapter.powered}
 			<Section title="Nearby devices">
-				{#each bluetooth.nearby as device (device.path)}
+				{#each nearby as device (device.path)}
 					<ActionRow
 						title={device.name}
 						description={problems[device.path] ?? (busy[device.path] ? BUSY_LABELS[busy[device.path]] : undefined)}
@@ -217,15 +216,18 @@
 						{/snippet}
 					</ActionRow>
 				{:else}
-					<Row title="Looking for devices…" description="Make sure the device you want to add is in pairing mode">
+					<Row title="Looking for devices…" description="Put the device you want to add in pairing mode">
 						<LoaderCircle size={16} class="animate-spin" />
 					</Row>
 				{/each}
+				{#if bluetooth.nearby.length > COLLAPSED}
+					<MoreRow hidden={bluetooth.nearby.length - COLLAPSED} bind:expanded />
+				{/if}
 			</Section>
 		{/if}
 	{:else if bluetooth.hardwareBlocked}
 		<Section>
-			<Row title="Bluetooth is turned off with a hardware switch" description="Use the switch or key on your computer to turn it back on" icon={BluetoothIcon} />
+			<Row title="Bluetooth is off with a hardware switch" description="Use the switch or key on your computer to turn it on" icon={BluetoothIcon} />
 		</Section>
 	{:else}
 		<Section>

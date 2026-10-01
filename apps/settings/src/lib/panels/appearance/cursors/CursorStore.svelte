@@ -1,9 +1,8 @@
 <script lang="ts">
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { onMount } from 'svelte';
-	import { IconButton, Row, SearchField, Section, Segmented } from '@luft/ui';
+	import { Row, SearchField, Section, Segmented } from '@luft/ui';
+	import SubPage from '$lib/components/SubPage.svelte';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import { browseCursors, type Order, type StorePage } from './api';
 	import StoreItem from './StoreItem.svelte';
@@ -24,7 +23,7 @@
 
 	const desktop = useSettings<{ 'cursor-theme': string }>('org.gnome.desktop.interface', ['cursor-theme']);
 
-	let root = $state<HTMLDivElement>();
+	let subPage = $state<ReturnType<typeof SubPage>>();
 	let search = $state('');
 	let query = $state('');
 	let order = $state<Order>('popular');
@@ -50,7 +49,7 @@
 
 	function turn(to: number) {
 		page = to;
-		root?.scrollIntoView({ block: 'start' });
+		subPage?.reveal();
 	}
 
 	$effect(() => {
@@ -65,16 +64,9 @@
 	$effect(() => {
 		void load(query, order, page);
 	});
-
-	onMount(() => root?.scrollIntoView({ block: 'start' }));
 </script>
 
-<div bind:this={root} class="flex scroll-mt-4 flex-col gap-7">
-	<div class="-mb-2 flex items-center gap-3">
-		<IconButton icon={ArrowLeft} label="Back to Appearance" onclick={onclose} />
-		<h2 class="min-w-0 flex-1 truncate text-[17px] font-semibold">Get cursors</h2>
-	</div>
-
+<SubPage bind:this={subPage} title="Get cursors" back="Appearance" {onclose}>
 	<div class="flex items-center gap-3">
 		<div class="min-w-0 flex-1">
 			<SearchField bind:value={search} label="Search cursors" />
@@ -129,7 +121,7 @@
 			</button>
 		</div>
 	{/if}
-</div>
+</SubPage>
 
 <style>
 	.results {

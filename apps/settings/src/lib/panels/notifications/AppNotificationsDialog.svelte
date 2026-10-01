@@ -27,7 +27,7 @@
 	<Switch {label} {disabled} checked={options.values[key] ?? true} onchange={(on) => options.set(key, on)} />
 {/snippet}
 
-<Dialog title={app.name} description={off ? 'Notifications from this app are turned off.' : undefined} {onclose}>
+<Dialog title={app.name} {onclose}>
 	<div class="row-group">
 		<Row title="Allow notifications">
 			{@render toggle('enable', 'Allow notifications', false)}
@@ -39,7 +39,7 @@
 			{@render toggle('enable-sound-alerts', 'Sound', off)}
 		</Row>
 		{#if rules}
-			<Row title="Allow during Do Not Disturb" description="Urgent ones are things like alarms and calls" disabled={off}>
+			<Row title="Allow during Do Not Disturb" description="Urgent means alarms and calls" disabled={off}>
 				<Select
 					label="Allow during Do Not Disturb"
 					options={DO_NOT_DISTURB}
@@ -48,7 +48,7 @@
 					onchange={(value) => rules.set('during-do-not-disturb', value)}
 				/>
 			</Row>
-			<Row title="Keep in the notification list" description="When off, notifications go away once their banner closes" disabled={off}>
+			<Row title="Keep in the notification list" description="Otherwise they go once their banner closes" disabled={off}>
 				<Switch
 					label="Keep in the notification list"
 					disabled={off}

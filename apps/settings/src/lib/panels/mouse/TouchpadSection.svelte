@@ -79,7 +79,7 @@
 			/>
 		</div>
 	</Row>
-	<Row title="Disable while typing" description="Ignores the touchpad while you type so the pointer doesn't jump" disabled={off}>
+	<Row title="Disable while typing" description="So the pointer doesn’t jump while you type" disabled={off}>
 		<Switch
 			label="Disable while typing"
 			disabled={off}

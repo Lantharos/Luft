@@ -74,7 +74,7 @@
 {#if live}
 	{@const current = live}
 	<Section>
-		<Row title="Status" description={linkLabel(current.state)}>
+		<Row title={linkLabel(current.state)}>
 			{#if current.state === 'disconnected'}
 				<button type="button" class="button" disabled={busy} onclick={() => run(current.connect)}>Connect</button>
 			{:else if current.state !== 'unplugged'}

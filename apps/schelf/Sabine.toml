@@ -1,0 +1,27 @@
+[app]
+id = "com.lantharos.schelf"
+name = "Schelf"
+generic_name = "App Store"
+categories = ["System", "PackageManager"]
+keywords = ["store", "app store", "software", "apps", "applications", "install", "uninstall", "updates", "flathub", "flatpak", "appimage", "packages", "rpm", "dnf", "gnome software", "discover", "gear lever"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = [
+	"application/vnd.flatpak.ref",
+	"application/vnd.flatpak.repo",
+	"application/x-rpm",
+	"application/vnd.appimage",
+	"application/x-iso9660-appimage",
+	"x-scheme-handler/schelf"
+]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"
+local_files = true

@@ -11,10 +11,12 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `apps/draft` | Draft text and code editor |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |
 | `apps/rover` | Rover file manager and file chooser portal backend |
+| `apps/schelf` | Schelf app store for Flathub, Fedora and AppImages |
 | `apps/settings` | System settings app |
 | `apps/tern` | Tern terminal |
 | `packages/ui` | Styles, window chrome, and controls shared by the apps |
 | `packages/app` | Native window, accent, and D-Bus setup shared by the apps |
+| `packages/software` | Apps, system updates, Flatpak, AppImages and offline updates shared by Schelf and Settings |
 | `boot/sushi` | Sushi splash, initramfs integration, and UEFI boot tools |
 | `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
 
@@ -54,7 +56,7 @@ Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1
 
 Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
 
-Barometer, Draft, Magpie, Rover, Settings, Tern, and Sushi keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Barometer, Draft, Magpie, Rover, Schelf, Settings, Tern, and Sushi keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
 
 ## Source and licenses
 

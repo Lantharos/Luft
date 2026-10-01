@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+
+@layer components {
+	.skeleton {
+		border-radius: 14px;
+		background: var(--surface);
+		animation: pulse 1.6s var(--ease) infinite;
+	}
+
+	@keyframes pulse {
+		50% {
+			opacity: 0.55;
+		}
+	}
+}

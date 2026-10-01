@@ -19,8 +19,10 @@ KEYS = {
 
 
 class Machine:
-    def __init__(self, frames: Path):
+    def __init__(self, frames: Path, script: list[tuple[str, str]]):
         self.frames = frames
+        self.script = script
+        self.heard = ""
         self.started = time.monotonic()
         self.lock = threading.Lock()
         self.serial_log = open(frames / "serial.log", "wb")
@@ -62,6 +64,11 @@ class Machine:
         while chunk := self.serial.recv(4096):
             self.serial_log.write(chunk)
             self.serial_log.flush()
+            self.heard += chunk.decode(errors="replace")
+            while self.script and self.script[0][0] in self.heard:
+                pattern, command = self.script.pop(0)
+                self.heard = self.heard.split(pattern, 1)[1]
+                self.serial_run(command)
 
     def type(self, text: str):
         for character in text:
@@ -79,7 +86,12 @@ class Machine:
     def serial_run(self, line: str):
         self.serial.sendall(line.encode() + b"\n")
 
+    def running(self) -> bool:
+        return self.qemu.poll() is None
+
     def stop(self):
+        if not self.running():
+            return
         self.command("system_powerdown")
         try:
             self.qemu.wait(timeout=60)
@@ -94,21 +106,24 @@ def main():
     parser.add_argument("--seconds", type=float, default=60)
     parser.add_argument("--interval", type=float, default=0.05)
     parser.add_argument("--type", action="append", default=[], help="SECONDS:TEXT, a trailing newline is added")
-    parser.add_argument("--serial", action="append", default=[], help="SECONDS:COMMAND for the serial console")
+    parser.add_argument(
+        "--serial", action="append", default=[],
+        help="TEXT=>COMMAND: once TEXT appears on the serial console after the previous command, send COMMAND",
+    )
     options = parser.parse_args()
     options.frames.mkdir(parents=True, exist_ok=True)
 
-    actions = sorted(
-        [(float(at), "type", text.replace("\\n", "\n") + "\n") for at, text in (item.split(":", 1) for item in options.type)]
-        + [(float(at), "serial", command) for at, command in (item.split(":", 1) for item in options.serial)]
-    )
-    machine = Machine(options.frames)
+    typing = sorted((float(at), text.replace("\\n", "\n") + "\n") for at, text in (item.split(":", 1) for item in options.type))
+    script = [tuple(item.split("=>", 1)) for item in options.serial]
+    machine = Machine(options.frames, script)
     try:
-        while machine.now() < options.seconds:
-            while actions and actions[0][0] <= machine.now():
-                _, kind, payload = actions.pop(0)
-                threading.Thread(target=machine.type if kind == "type" else machine.serial_run, args=(payload,), daemon=True).start()
-            machine.shoot()
+        while machine.now() < options.seconds and machine.running():
+            while typing and typing[0][0] <= machine.now():
+                threading.Thread(target=machine.type, args=(typing.pop(0)[1],), daemon=True).start()
+            try:
+                machine.shoot()
+            except (OSError, ValueError):
+                break
             time.sleep(options.interval)
     finally:
         machine.stop()

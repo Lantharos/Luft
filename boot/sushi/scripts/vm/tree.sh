@@ -14,19 +14,19 @@ packages=(
   dbus-broker dbus-daemon systemd-pam polkit accountsservice greetd
   gnome-shell xorg-x11-server-Xwayland mesa-dri-drivers
   glibc-langpack-en procps-ng less gnome-backgrounds
+  selinux-policy-targeted plymouth dnf5 fedora-repos
 )
 
-if [[ -f "$vm/.tree-ready" ]]; then
-  exit 0
-fi
-
-if [[ ! -f "$vm/.tree-packages" ]]; then
-  podman unshare rm -rf "$tree"
+if [[ "$(cat "$vm/.tree-packages" 2>/dev/null)" != "${packages[*]}" ]]; then
   mkdir -p "$tree"
   podman run --rm --security-opt label=disable -v "$tree:/installroot" "registry.fedoraproject.org/fedora:$release" \
     dnf install -y --releasever="$release" --installroot=/installroot --use-host-config \
     --setopt=install_weak_deps=False --nodocs "${packages[@]}"
-  touch "$vm/.tree-packages"
+  echo "${packages[*]}" > "$vm/.tree-packages"
+fi
+
+if [[ -f "$vm/.tree-ready" ]]; then
+  exit 0
 fi
 
 podman run --rm --security-opt label=disable --rootfs "$tree" bash -c "

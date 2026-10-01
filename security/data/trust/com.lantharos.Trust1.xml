@@ -1,0 +1,73 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Trust1">
+  <!--
+    Device trust: Secure Boot, the TPM, the signed startup and disk encryption.
+
+    SecureBoot: "on", "off", "setup" (no platform key, anything boots) or "unsupported" (no UEFI).
+
+    Tpm: Present (b), Version (s, "2.0" or "1.2"), Usable (b), Reason (s, why it can't be used, empty when usable).
+
+    SigningKey: State (s: "none", "pending" until the next restart adds it, "enrolled"),
+      Available (b), Reason (s, why a key can't be made here), Protection (s: "tpm" or "disk"),
+      DriverKeyEnrolled (b, the key that signs drivers built on this computer).
+
+    Startup: Installed (b, the signed startup is on the EFI system partition and in the firmware's boot list),
+      Measured (b, this boot came through it and recorded what started), Available (b), Reason (s).
+
+    Disk: Device (s), Encrypted (b), State (s: "off", "starting" until the restart, "encrypting",
+      "decrypting", "on"), Progress (d, 0 to 1 while encrypting or decrypting), Remaining (t, seconds, 0 when unknown),
+      Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
+      RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
+      at the last startup, so the recovery key or passphrase was needed).
+
+    Methods that change the disk take "unlock": a passphrase or recovery key typed by the person, or "" to use
+    the recovery key kept sealed by the TPM.
+  -->
+  <interface name="com.lantharos.Trust1">
+    <property name="SecureBoot" type="s" access="read"/>
+    <property name="Tpm" type="a{sv}" access="read"/>
+    <property name="SigningKey" type="a{sv}" access="read"/>
+    <property name="Startup" type="a{sv}" access="read"/>
+    <property name="Disk" type="a{sv}" access="read"/>
+
+    <method name="GenerateRecoveryKey">
+      <arg name="key" type="s" direction="out"/>
+    </method>
+    <!-- Each check: id, passed, a sentence for people. -->
+    <method name="CheckEncryption">
+      <arg name="checks" type="a(sbs)" direction="out"/>
+    </method>
+    <!-- pin: "" for none. passphrase: only without a usable TPM, "" otherwise. Takes effect at the next restart. -->
+    <method name="TurnOnEncryption">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="pin" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <method name="TurnOffEncryption">
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <!-- Links the TPM again, adds, changes or removes the PIN (pin ""). Returns a new recovery key when the disk had none. -->
+    <method name="SetUpTpmUnlock">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="pin" type="s" direction="in"/>
+      <arg name="recovery_key" type="s" direction="out"/>
+    </method>
+    <method name="RemoveTpmUnlock">
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <method name="ShowRecoveryKey">
+      <arg name="key" type="s" direction="out"/>
+    </method>
+    <method name="ReplaceRecoveryKey">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="key" type="s" direction="out"/>
+    </method>
+    <!-- Returns the one-time code to type in the key enrollment screen after the restart. -->
+    <method name="EnrollSigningKey">
+      <arg name="code" type="s" direction="out"/>
+    </method>
+    <method name="CancelSigningKeyEnrollment"/>
+    <method name="InstallSignedStartup"/>
+  </interface>
+</node>

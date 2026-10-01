@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Trust1
+Exec=/usr/bin/luft-trust serve
+User=root
+SystemdService=luft-trust.service

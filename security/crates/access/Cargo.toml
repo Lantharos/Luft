@@ -1,0 +1,15 @@
+[package]
+name = "access"
+description = "Polkit checks and idle tracking shared by Luft's system services"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+tokio.workspace = true
+zbus.workspace = true
+
+[lints]
+workspace = true

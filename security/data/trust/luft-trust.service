@@ -1,0 +1,18 @@
+[Unit]
+Description=Device trust: Secure Boot signing, TPM disk unlock and device encryption
+After=local-fs.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Trust1
+ExecStart=/usr/bin/luft-trust serve
+SyslogIdentifier=luft-trust
+PrivateTmp=yes
+ProtectHome=read-only
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictRealtime=yes
+TimeoutStopSec=5min
+
+[Install]
+WantedBy=multi-user.target

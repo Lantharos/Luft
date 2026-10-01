@@ -100,6 +100,7 @@ import Meta from 'gi://Meta';
 import * as Signals from '../misc/signals.js';
 
 import * as LoginManager from '../misc/loginManager.js';
+import * as BackgroundStore from './backgroundStore.js';
 import * as Main from './main.js';
 import * as KestrelUi from './kestrelUi.js';
 import System from 'system';
@@ -274,6 +275,21 @@ function displaySignature() {
     return displaySizes().map(({width, height}) => `${width}x${height}`).join(',');
 }
 
+async function storeKey(file, style, cancellable) {
+    return `${await BackgroundStore.identify(file, cancellable)} ${style} ${displaySignature()}`;
+}
+
+function packSamples(samples) {
+    return Uint8Array.from(samples.flat());
+}
+
+function unpackSamples(metadata) {
+    const samples = [];
+    for (let i = 0; i + 2 < metadata.length; i += 3)
+        samples.push([metadata[i], metadata[i + 1], metadata[i + 2]]);
+    return samples;
+}
+
 function fittedSize(width, height, style) {
     const {BackgroundStyle} = GDesktopEnums;
     const sizes = displaySizes();
@@ -314,6 +330,19 @@ class BackgroundTextureCache {
         if (this._textures.has(key))
             return this._textures.get(key);
 
+        const stored = await storeKey(file, style, cancellable);
+        const entry = await this._loadStored(stored, cancellable) ??
+            await this._decode(file, style, stored, cancellable);
+        this._textures.set(key, entry);
+        return entry;
+    }
+
+    async _loadStored(key, cancellable) {
+        const stored = await BackgroundStore.load(key, GLib.PRIORITY_LOW, cancellable);
+        return stored && {texture: stored.texture, colorState: null, samples: unpackSamples(stored.metadata)};
+    }
+
+    async _decode(file, style, storedKey, cancellable) {
         const [frameData, colorState] = await this._loadGlycinFrame(file, cancellable);
         const data = frameData.bytes.get_data();
         const samples = sampleColors(frameData, data);
@@ -321,9 +350,9 @@ class BackgroundTextureCache {
             fittedSize(frameData.width, frameData.height, style));
         GLib.idle_add_once(GLib.PRIORITY_LOW, () => System.gc());
 
-        const entry = {texture, colorState, samples};
-        this._textures.set(key, entry);
-        return entry;
+        if (!colorState && EIGHT_BIT_CHANNELS.has(frameData.format))
+            BackgroundStore.store(storedKey, () => texture, packSamples(samples));
+        return {texture, colorState, samples};
     }
 
     _fitTexture(texture, size) {
@@ -579,6 +608,12 @@ const Background = GObject.registerClass({
 
         this._removeAnimationTimeout();
         this._updateAnimation();
+    }
+
+    storeKey(cancellable) {
+        if (!this._file || this._file.get_basename().endsWith('.xml'))
+            return Promise.resolve(null);
+        return storeKey(this._file, this._style, cancellable);
     }
 
     _setLoaded() {

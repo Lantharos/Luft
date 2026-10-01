@@ -596,9 +596,16 @@ export const LayoutManager = GObject.registerClass({
 
         this._systemBackground.show();
         global.stage.show();
+        const firstFrame = new Promise(resolve => {
+            const id = global.stage.connect('after-paint', () => {
+                global.stage.disconnect(id);
+                resolve();
+            });
+        });
 
         try {
             await this._prepareStartupAnimation();
+            await firstFrame;
             await this._startupAnimation();
         } catch (e) {
             logError(e);
@@ -686,6 +693,9 @@ export const LayoutManager = GObject.registerClass({
 
         this._systemBackground.destroy();
         this._systemBackground = null;
+
+        this._backdropStore = new LockBackdrop({offscreen: true});
+        global.stage.insert_child_below(this._backdropStore.actor, null);
 
         this._startingUp = false;
 

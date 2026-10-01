@@ -5,6 +5,7 @@ pub mod dbus;
 mod events;
 mod kestrel;
 pub mod portal;
+pub mod secrets;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;
 mod scheme;

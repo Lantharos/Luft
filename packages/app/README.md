@@ -77,6 +77,20 @@ use luft_app::portal::{self, Filter};
 let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["*.png".into()] })?;
 ```
 
+## Secrets
+
+`secrets` keeps tokens, API keys and sign-ins in Luft Keyring where only the app that stored them can read them back, without prompts. Other apps are told there's nothing there.
+
+```rust
+use luft_app::secrets;
+
+secrets::store("account-token", token.as_bytes())?;
+let token: Option<Vec<u8>> = secrets::load("account-token")?;
+secrets::delete("account-token")?;
+```
+
+`secrets::register(window)` adds `secrets_store({name, value})`, `secrets_load({name})` and `secrets_delete({name})` bridge commands for text secrets, for apps whose page handles sign-in itself.
+
 ## Thumbnails
 
 With the `thumbnails` feature, `thumbnails::Thumbnails` makes thumbnails for files in the shared freedesktop thumbnail cache, so other apps reuse them and the other way round. Common image formats are decoded in process; everything else goes through the thumbnailers installed on the system, such as those for videos, PDFs and fonts. Work runs on a few low priority threads, and each request replaces the previous one, so asking for the files currently on screen keeps the queue short while scrolling:

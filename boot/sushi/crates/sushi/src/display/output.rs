@@ -131,7 +131,21 @@ impl Output {
             (0, 0),
             &[self.connector],
             Some(self.mode),
-        )
+        )?;
+        self.hide_other_planes(card);
+        Ok(())
+    }
+
+    fn hide_other_planes(&self, card: &Card) {
+        let planes = card.plane_handles().unwrap_or_default();
+        for plane in planes {
+            let shown_here = card.get_plane(plane).is_ok_and(|info| {
+                info.crtc() == Some(self.crtc) && info.framebuffer() != Some(self.framebuffer)
+            });
+            if shown_here {
+                let _ = card.set_plane(plane, self.crtc, None, 0, (0, 0, 0, 0), (0, 0, 0, 0));
+            }
+        }
     }
 
     pub fn is_on_screen(&self, card: &Card) -> bool {

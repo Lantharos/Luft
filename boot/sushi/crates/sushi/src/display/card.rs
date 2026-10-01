@@ -4,8 +4,8 @@ use std::os::fd::{AsFd, AsRawFd, BorrowedFd};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 
-use drm::Device;
 use drm::control::{Device as ControlDevice, framebuffer};
+use drm::{ClientCapability, Device};
 
 const DRM_IOCTL_MODE_CLOSEFB: libc::c_ulong = 0xC008_64D0;
 
@@ -36,10 +36,12 @@ impl Card {
             .write(true)
             .custom_flags(libc::O_CLOEXEC)
             .open(path)?;
-        Ok(Self {
+        let card = Self {
             file,
             path: path.to_owned(),
-        })
+        };
+        card.set_client_capability(ClientCapability::UniversalPlanes, true)?;
+        Ok(card)
     }
 
     pub fn path(&self) -> &Path {

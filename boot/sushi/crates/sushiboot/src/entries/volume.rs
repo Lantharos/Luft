@@ -8,6 +8,7 @@ use uefi::proto::media::partition::PartitionInfo;
 use uefi::{Handle, Identify};
 
 use crate::files::Volume;
+use crate::protocol;
 
 pub struct EspVolume {
     pub handle: Handle,
@@ -46,12 +47,12 @@ pub fn enumerate(boot_device: Handle) -> Vec<EspVolume> {
 }
 
 fn is_esp(handle: Handle) -> bool {
-    boot::open_protocol_exclusive::<PartitionInfo>(handle).is_ok_and(|info| info.is_system())
+    protocol::shared::<PartitionInfo>(handle).is_ok_and(|info| info.is_system())
         || Volume::open(handle).is_some_and(|mut volume| !volume.list("\\EFI").is_empty())
 }
 
 fn label(handle: Handle) -> Option<String> {
-    let info = boot::open_protocol_exclusive::<PartitionInfo>(handle).ok()?;
+    let info = protocol::shared::<PartitionInfo>(handle).ok()?;
     let units = info.gpt_partition_entry()?.partition_name;
     let name: String = units
         .iter()

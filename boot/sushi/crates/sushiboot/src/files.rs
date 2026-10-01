@@ -3,12 +3,14 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-use uefi::boot::{self, ScopedProtocol};
+use uefi::boot::ScopedProtocol;
 use uefi::proto::media::file::{
     Directory, File, FileAttribute, FileInfo, FileMode, FileType, RegularFile,
 };
 use uefi::proto::media::fs::SimpleFileSystem;
 use uefi::{CString16, Handle};
+
+use crate::protocol;
 
 pub struct Volume {
     _fs: ScopedProtocol<SimpleFileSystem>,
@@ -39,7 +41,7 @@ pub fn read_to_end(file: &mut RegularFile) -> Option<Vec<u8>> {
 
 impl Volume {
     pub fn open(handle: Handle) -> Option<Self> {
-        let mut fs = boot::open_protocol_exclusive::<SimpleFileSystem>(handle).ok()?;
+        let mut fs = protocol::shared::<SimpleFileSystem>(handle).ok()?;
         let root = fs.open_volume().ok()?;
         Some(Self { _fs: fs, root })
     }

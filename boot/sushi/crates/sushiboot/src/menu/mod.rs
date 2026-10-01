@@ -1,5 +1,6 @@
 mod view;
 
+use alloc::format;
 use core::time::Duration;
 
 use sushi_scene::{FADE_SECONDS, Visuals, ease};
@@ -45,10 +46,26 @@ fn main_row(catalog: &Catalog, entry: usize) -> usize {
         .unwrap_or(0)
 }
 
-pub fn choose(screen: &mut Screen, catalog: &Catalog, default: usize, timeout: u32) -> usize {
-    let asked = read_key().is_some();
-    if catalog.main.len() < 2 || (timeout == 0 && !asked) {
+pub fn choose(
+    screen: &mut Screen,
+    catalog: &Catalog,
+    default: usize,
+    timeout: u32,
+    failed: Option<&str>,
+) -> usize {
+    let asked = read_key().is_some() || failed.is_some();
+    if failed.is_none() && (catalog.main.len() < 2 || (timeout == 0 && !asked)) {
         return default;
+    }
+    if failed.is_some() {
+        screen.draw(
+            screen.scene.everything(),
+            &Visuals {
+                logo: 1.0,
+                ..Visuals::default()
+            },
+            |_, _| {},
+        );
     }
 
     let mut view = View {
@@ -56,6 +73,7 @@ pub fn choose(screen: &mut Screen, catalog: &Catalog, default: usize, timeout: u
         list: List::Main,
         selected: main_row(catalog, default),
         countdown: (!asked).then_some(timeout as f32),
+        notice: failed.map(|title| format!("{title} didn't start")),
     };
     let mut chosen = None;
     let mut shown = 0.0f32;

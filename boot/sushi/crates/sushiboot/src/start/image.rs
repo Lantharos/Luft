@@ -4,29 +4,27 @@ use core::mem::MaybeUninit;
 use uefi::boot::{self, AllocateType, LoadImageSource, MemoryType};
 use uefi::proto::BootPolicy;
 use uefi::proto::device_path::build::{self, media::FilePath};
-use uefi::proto::device_path::{DevicePath, DeviceSubType};
+use uefi::proto::device_path::{DevicePath, DeviceSubType, DeviceType};
 use uefi::proto::loaded_image::LoadedImage;
 use uefi::{CString16, Handle, Status};
 
 use crate::files::{self, Volume};
+use crate::protocol;
 
 fn resources() -> uefi::Error {
     uefi::Error::from(Status::OUT_OF_RESOURCES)
 }
 
 fn load_from_path(volume: Handle, path: &str) -> uefi::Result<Handle> {
-    let volume_path = boot::open_protocol_exclusive::<DevicePath>(volume)?;
+    let volume_path = protocol::shared::<DevicePath>(volume)?;
     let name = CString16::try_from(files::efi_path(path).as_str())
         .map_err(|_| uefi::Error::from(Status::INVALID_PARAMETER))?;
     let mut buffer = [MaybeUninit::uninit(); 1024];
     let mut builder = build::DevicePathBuilder::with_buf(&mut buffer);
-    for node in volume_path.node_iter() {
-        if matches!(
-            node.sub_type(),
-            DeviceSubType::END_ENTIRE | DeviceSubType::END_INSTANCE
-        ) {
-            break;
-        }
+    for node in volume_path
+        .node_iter()
+        .take_while(|node| node.full_type() != (DeviceType::END, DeviceSubType::END_INSTANCE))
+    {
         builder = builder.push(&node).map_err(|_| resources())?;
     }
     let full = builder
@@ -76,7 +74,7 @@ fn utf16(text: &str) -> Vec<u8> {
 pub fn start(image: Handle, options: &str) -> uefi::Result<()> {
     let encoded = utf16(options);
     if !options.is_empty() {
-        let mut loaded = boot::open_protocol_exclusive::<LoadedImage>(image)?;
+        let mut loaded = protocol::shared::<LoadedImage>(image)?;
         unsafe {
             loaded.set_load_options(encoded.as_ptr(), encoded.len() as u32);
         }

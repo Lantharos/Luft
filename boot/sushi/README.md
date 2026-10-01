@@ -159,6 +159,8 @@ The menu has, in order:
 - other systems on the partition: Windows Boot Manager, and for every other vendor folder in `EFI` its shim, or its GRUB or systemd-boot when there's no shim,
 - Firmware settings, when the firmware can be asked to open its own settings at the next start.
 
+If the chosen entry doesn't start, for example because its kernel is missing, the menu comes back saying so, and another entry can be chosen.
+
 A loader that turns out to be SushiBoot itself, such as Fedora's `grubx64.efi` once Luft has taken GRUB's place, is left out, so no entry starts the menu again.
 
 Entries have the identifiers systemd-boot uses: an image's file name, with `@` and the profile's ID for multi-profile images, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`. `default` in `loader.conf` takes patterns such as `luft-*`, which matches the newest image. SushiBoot reports itself, its entries and the one it started through the Boot Loader Interface variables, and honors `LoaderEntryDefault` and `LoaderEntryOneShot`, so `bootctl status` and `bootctl list` show what started, and `bootctl set-oneshot ID` chooses the next start.

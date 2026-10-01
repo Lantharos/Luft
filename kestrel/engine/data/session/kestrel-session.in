@@ -1,5 +1,5 @@
 #!/bin/sh
-export XDG_DATA_DIRS="@datadir@${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export IBUS_DAEMON_ARGS="--panel disable"
 
 systemctl --user reset-failed

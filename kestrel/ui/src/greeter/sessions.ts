@@ -73,7 +73,7 @@ export function availableSessions(): Session[] {
 
 export function sessionCommand(session: Session): { command: string[]; environment: string[] } {
   return {
-    command: session.type === 'x11' ? ['startx', '/usr/bin/env', session.exec] : [session.exec],
+    command: ['systemd-cat', `--identifier=${session.id}`, ...session.type === 'x11' ? ['startx', '/usr/bin/env', session.exec] : [session.exec]],
     environment: [
       `XDG_SESSION_TYPE=${session.type}`,
       `XDG_SESSION_DESKTOP=${session.id}`,

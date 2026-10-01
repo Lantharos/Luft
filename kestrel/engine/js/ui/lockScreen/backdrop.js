@@ -48,6 +48,12 @@ export class LockBackdrop {
             this.actor.add_child(widget);
         });
         this._updateEffects();
+        this.loaded = Promise.all(this._managers.map(manager => new Promise(resolve => {
+            const id = manager.connect('loaded', () => {
+                manager.disconnect(id);
+                resolve();
+            });
+        })));
     }
 
     _updateEffects() {

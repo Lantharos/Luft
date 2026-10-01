@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { Clients } from './clients.js';
+import { FAREWELL_DURATION } from './interfaces.js';
 import { perform, stopSession } from './system.js';
 
 export type EndAction = 'logout' | 'shutdown' | 'reboot';
@@ -16,7 +17,7 @@ const CONFIRM_SECONDS = 60;
 export class EndSession {
   private subscription = 0;
 
-  constructor(private readonly clients: Clients, private readonly over: () => void) {}
+  constructor(private readonly clients: Clients, private readonly over: () => void, private readonly resumed: () => void) {}
 
   request(action: EndAction, inhibitors: string[]): void {
     this.dismiss();
@@ -42,11 +43,16 @@ export class EndSession {
       await this.clients.endSession();
     }
     this.over();
+    await new Promise(resolve => GLib.timeout_add(GLib.PRIORITY_DEFAULT, FAREWELL_DURATION, () => {
+      resolve(null);
+      return GLib.SOURCE_REMOVE;
+    }));
     try {
       if (action === 'logout') await stopSession();
       else await perform(action === 'shutdown' ? 'PowerOff' : 'Reboot');
     } catch (error) {
       console.error(`Could not end the session: ${error}`);
+      this.resumed();
     }
   }
 

@@ -19,7 +19,9 @@ export class SessionManager {
   private readonly peers = new Peers(name => this.forget(name));
   private readonly inhibitors = new Inhibitors((added, path) => this.inhibitorsChanged(added, path));
   private readonly clients = new Clients((added, path) => this.exported.emit_signal(added ? 'ClientAdded' : 'ClientRemoved', new GLib.Variant('(o)', [path])));
-  private readonly endSession = new EndSession(this.clients, () => this.exported.emit_signal('SessionOver', new GLib.Variant('()', [])));
+  private readonly endSession = new EndSession(this.clients,
+    () => this.exported.emit_signal('SessionOver', new GLib.Variant('()', [])),
+    () => this.exported.emit_signal('SessionRunning', new GLib.Variant('()', [])));
   private readonly presence = new Presence();
   private readonly stopWatchingSession: () => void;
   private readonly nameId: number;

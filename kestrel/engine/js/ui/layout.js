@@ -1,4 +1,6 @@
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
+import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -8,6 +10,7 @@ import St from 'gi://St';
 import * as Signals from '../misc/signals.js';
 
 import * as Background from './background.js';
+import {LockBackdrop} from './lockScreen/backdrop.js';
 
 import * as Main from './main.js';
 import * as Params from '../misc/params.js';
@@ -15,11 +18,36 @@ import * as Params from '../misc/params.js';
 import {logErrorUnlessCancelled} from '../misc/errorUtils.js';
 
 export const STARTUP_ANIMATION_TIME = 500;
+const STARTUP_SCALE = 0.94;
+const SPLASH_LOGO_PLACEMENT = '/run/sushi/logo';
+const FIRMWARE_LOGO = '/sys/firmware/acpi/bgrt/image';
 export const BACKGROUND_FADE_ANIMATION_TIME = 1000;
 
 
 const SCREEN_TRANSITION_DELAY = 250; // ms
 const SCREEN_TRANSITION_DURATION = 500; // ms
+
+function firmwareLogo(monitor) {
+    try {
+        const [, placement] = GLib.file_get_contents(SPLASH_LOGO_PLACEMENT);
+        const [x, y, width, height] = new TextDecoder().decode(placement).trim().split(' ').map(Number);
+        const pixbuf = GdkPixbuf.Pixbuf.new_from_file(FIRMWARE_LOGO);
+        const content = St.ImageContent.new_with_preferred_size(pixbuf.width, pixbuf.height);
+        content.set_bytes(global.stage.context.get_backend().get_cogl_context(), pixbuf.read_pixel_bytes(),
+            pixbuf.has_alpha ? Cogl.PixelFormat.RGBA_8888 : Cogl.PixelFormat.RGB_888,
+            pixbuf.width, pixbuf.height, pixbuf.rowstride);
+        const scale = monitor.geometry_scale;
+        return new Clutter.Actor({
+            content,
+            x: monitor.x + x / scale,
+            y: monitor.y + y / scale,
+            width: width / scale,
+            height: height / scale,
+        });
+    } catch {
+        return null;
+    }
+}
 
 export const MonitorConstraint = GObject.registerClass({
     Properties: {
@@ -582,40 +610,26 @@ export const LayoutManager = GObject.registerClass({
     async _loadBackground() {
         await this._ensurePrimaryMonitor();
 
-        this._systemBackground = new Background.SystemBackground();
+        if (Main.sessionMode.isGreeter) {
+            const background = new Background.SystemBackground();
+            background.add_constraint(new Clutter.BindConstraint({
+                source: global.stage,
+                coordinate: Clutter.BindCoordinate.ALL,
+            }));
+            this._systemBackground = new Clutter.Actor();
+            this._systemBackground.add_child(background);
+            const logo = firmwareLogo(this.primaryMonitor);
+            if (logo)
+                this._systemBackground.add_child(logo);
+            await new Promise(resolve => background.connect('loaded', resolve));
+        } else {
+            const backdrop = new LockBackdrop();
+            this._systemBackground = backdrop.actor;
+            await backdrop.loaded;
+        }
         this._systemBackground.hide();
-
         global.stage.insert_child_below(this._systemBackground, null);
-
-        const constraint = new Clutter.BindConstraint({
-            source: global.stage,
-            coordinate: Clutter.BindCoordinate.ALL,
-        });
-        this._systemBackground.add_constraint(constraint);
-
-        const {promise, resolve} = Promise.withResolvers();
-        const signalId = this._systemBackground.connect('loaded', () => {
-            this._systemBackground.disconnect(signalId);
-            resolve();
-        });
-
-        await promise;
     }
-
-    // Startup Animations
-    //
-    // We have two different animations, depending on whether we're a greeter
-    // or a normal session.
-    //
-    // In the greeter, we want to animate the panel from the top, and smoothly
-    // fade the login dialog on top of whatever plymouth left on screen which
-    // we get as a still frame background before drawing anything else.
-    //
-    // Here we just have the code to animate the panel, and fade up the background.
-    // The login dialog animation is handled by modalDialog.js
-    //
-    // When starting a normal user session, we want to grow it out of the middle
-    // of the screen.
 
     async _prepareStartupAnimation() {
         await this._ensurePrimaryMonitor();
@@ -646,7 +660,7 @@ export const LayoutManager = GObject.registerClass({
         this.uiGroup.set_pivot_point(
             x / global.screen_width,
             y / global.screen_height);
-        this.uiGroup.scale_x = this.uiGroup.scale_y = 0.75;
+        this.uiGroup.scale_x = this.uiGroup.scale_y = STARTUP_SCALE;
         this.uiGroup.opacity = 0;
 
         global.window_group.set_clip(monitor.x, monitor.y, monitor.width, monitor.height);

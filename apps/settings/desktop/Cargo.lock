@@ -3436,6 +3436,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tar",
+ "tempfile",
  "tokio",
  "ureq",
  "x25519-dalek",

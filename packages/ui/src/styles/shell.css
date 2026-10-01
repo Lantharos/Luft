@@ -1,3 +1,27 @@
+@property --scroll-fade-top {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --scroll-fade-bottom {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+@keyframes scroll-fade-top {
+	to {
+		--scroll-fade-top: var(--scroll-fade-size);
+	}
+}
+
+@keyframes scroll-fade-bottom {
+	from {
+		--scroll-fade-bottom: var(--scroll-fade-size);
+	}
+}
+
 @layer components {
 	.glass-shell {
 		display: flex;
@@ -63,6 +87,24 @@
 
 	.hidden-scroll {
 		scrollbar-width: none;
+	}
+
+	.scroll-fade {
+		--scroll-fade-size: 28px;
+		mask-image: linear-gradient(
+			to bottom,
+			transparent,
+			#000 var(--scroll-fade-top),
+			#000 calc(100% - var(--scroll-fade-bottom)),
+			transparent
+		);
+		animation:
+			scroll-fade-top linear both,
+			scroll-fade-bottom linear both;
+		animation-timeline: scroll(self), scroll(self);
+		animation-range:
+			0 var(--scroll-fade-size),
+			calc(100% - var(--scroll-fade-size)) 100%;
 	}
 
 	.soft-scroll {

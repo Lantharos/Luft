@@ -15,7 +15,7 @@
 	});
 </script>
 
-<VirtualScroller bind:this={scroller} class="hidden-scroll min-h-0 flex-1" items={ordered} key={(entry) => `${entry.index}`} layout={LAYOUT}>
+<VirtualScroller bind:this={scroller} class="hidden-scroll scroll-fade min-h-0 flex-1" items={ordered} key={(entry) => `${entry.index}`} layout={LAYOUT}>
 	{#snippet children({ index, track })}
 		<button type="button" class="song" class:current={index === player.index} onclick={() => player.jump(index)}>
 			<Artwork art={track.art} size={36} radius={7} />

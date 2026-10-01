@@ -31,7 +31,7 @@
 			<ChevronsDownUp size={14} />
 		</button>
 	</div>
-	<VirtualScroller class="hidden-scroll min-h-0 flex-1" items={tree.rows} key={(row) => row.entry.path} layout={{ itemHeight: ROW_HEIGHT }}>
+	<VirtualScroller class="hidden-scroll scroll-fade min-h-0 flex-1" items={tree.rows} key={(row) => row.entry.path} layout={{ itemHeight: ROW_HEIGHT }}>
 		{#snippet children(row)}
 			<button
 				type="button"

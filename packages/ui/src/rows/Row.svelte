@@ -7,12 +7,14 @@
 		description?: string;
 		icon?: Component;
 		disabled?: boolean;
+		truncate?: boolean;
+		expanded?: boolean;
 		onclick?: () => void;
 		children?: Snippet;
 		below?: Snippet;
 	}
 
-	let { title, description, icon: Icon, disabled = false, onclick, children, below }: Props = $props();
+	let { title, description, icon: Icon, disabled = false, truncate = false, expanded, onclick, children, below }: Props = $props();
 </script>
 
 {#snippet content()}
@@ -23,14 +25,14 @@
 		<div class="text">
 			<span class="title">{title}</span>
 			{#if description}
-				<span class="description">{description}</span>
+				<span class="description" class:truncate>{description}</span>
 			{/if}
 		</div>
 		{#if children}
 			<div class="trailing">{@render children()}</div>
 		{/if}
 		{#if onclick}
-			<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)]" />
+			<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)] transition-transform duration-200 {expanded ? 'rotate-90' : ''}" />
 		{/if}
 	</div>
 	{#if below}
@@ -39,7 +41,7 @@
 {/snippet}
 
 {#if onclick}
-	<button type="button" class="row interactive" {disabled} {onclick}>{@render content()}</button>
+	<button type="button" class="row interactive" aria-expanded={expanded} {disabled} {onclick}>{@render content()}</button>
 {:else}
 	<div class="row" class:disabled>{@render content()}</div>
 {/if}
@@ -87,6 +89,13 @@
 		flex: 1;
 		flex-direction: column;
 		gap: 2px;
+	}
+
+	.title,
+	.truncate {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.title {

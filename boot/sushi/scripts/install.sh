@@ -6,6 +6,7 @@ action="${1:-}"
 manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
 trial_suffix=-sushi-trial
+units="sushi.service sushi-quit.service sushi-shutdown.service"
 arguments="sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5"
 
 usage() {
@@ -47,7 +48,7 @@ install_files() {
   sudo install -DZ -m644 "$files" "$manifest"
   printf 'add_dracutmodules+=" sushi "\n' | sudo install -DZ -m644 /dev/stdin "$dracut_config"
   sudo systemctl daemon-reload
-  sudo systemctl enable sushi.service sushi-quit.service
+  sudo systemctl enable $units
   rebuild_initramfs
 }
 
@@ -82,7 +83,7 @@ disable_everywhere() {
 
 remove_everything() {
   disable_everywhere
-  sudo systemctl disable sushi.service sushi-quit.service
+  sudo systemctl disable $units
   sudo rm -f "$dracut_config"
   if [[ -f "$manifest" ]]; then
     xargs -a "$manifest" sudo rm -f

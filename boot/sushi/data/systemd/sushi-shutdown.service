@@ -1,0 +1,16 @@
+[Unit]
+Description=Show the splash while the computer shuts down
+DefaultDependencies=no
+ConditionKernelCommandLine=sushi
+ConditionVirtualization=!container
+Wants=sushi.service
+After=sushi.service
+Before=systemd-reboot.service systemd-poweroff.service systemd-halt.service systemd-kexec.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/usr/bin/sushictl show shutdown
+
+[Install]
+WantedBy=reboot.target poweroff.target halt.target kexec.target

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Luft</vendor>
+  <vendor_url>https://github.com/Lantharos</vendor_url>
+
+  <action id="com.lantharos.trust.check">
+    <description>Check whether the disk can be encrypted</description>
+    <message>Authentication is required to check the disk</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.trust.manage-encryption">
+    <description>Change how the disk is encrypted and unlocked</description>
+    <message>Authentication is required to change the disk's encryption</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.trust.show-recovery-key">
+    <description>Show the disk's recovery key</description>
+    <message>Authentication is required to show the recovery key</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.trust.manage-secure-boot">
+    <description>Change Secure Boot keys and how the computer starts</description>
+    <message>Authentication is required to change how the computer starts</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

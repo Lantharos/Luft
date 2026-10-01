@@ -1,0 +1,25 @@
+[package]
+name = "luft-trust"
+description = "Secure Boot signing, TPM disk unlock and device encryption for Luft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+access.workspace = true
+anyhow.workspace = true
+argon2 = "0.6.0"
+chacha20poly1305 = "0.11.0"
+clap.workspace = true
+getrandom = "0.4.3"
+libc = "0.2.189"
+rustix = { workspace = true, features = ["termios", "stdio"] }
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+zbus.workspace = true
+
+[lints]
+workspace = true

@@ -29,6 +29,11 @@ install_greeter() {
   sudo systemctl reload dbus-broker.service
 }
 
+install_settings() {
+  cargo build --release --manifest-path "$root/kestrel/settings/Cargo.toml"
+  as_owner "$prefix" install -DZ -m755 "$root/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
+}
+
 remove_greeter() {
   greeter_files | while read -r _ target; do sudo rm -f "$target"; done
   sudo systemctl daemon-reload
@@ -74,10 +79,13 @@ case "$action" in
     meson setup "$build/engine" "$root/kestrel/engine" \
       -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
     meson compile -C "$build/engine"
+    as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"
     as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
+    install_settings
     as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
     if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then
+      [[ -d /usr/local/lib/systemd/user ]] && find /usr/local/lib/systemd/user -maxdepth 1 -name 'kestrel*' -xtype l -exec sudo rm {} +
       installed_links | while read -r link; do
         sudo mkdir -p "/usr/local/$(dirname "$link")"
         sudo ln -sfn "$prefix/$link" "/usr/local/$link"

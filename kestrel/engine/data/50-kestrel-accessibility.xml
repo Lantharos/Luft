@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KeyListEntries schema="com.lantharos.kestrel.media-keys"
+                group="accessibility"
+                name="Accessibility"
+                wm_name="GNOME Shell"
+                package="gnome-shell">
+
+	<KeyListEntry name="magnifier"
+                      description="Turn the magnifier on or off"/>
+
+	<KeyListEntry name="screenreader"
+                      description="Turn the screen reader on or off"/>
+
+	<KeyListEntry name="on-screen-keyboard"
+                      description="Show or hide the on-screen keyboard"/>
+
+	<KeyListEntry name="increase-text-size"
+                      description="Make text larger"/>
+
+	<KeyListEntry name="decrease-text-size"
+                      description="Make text smaller"/>
+
+	<KeyListEntry name="toggle-contrast"
+                      description="Turn high contrast on or off"/>
+
+	<KeyListEntry name="magnifier-zoom-in"
+                      description="Zoom the magnifier in"/>
+
+	<KeyListEntry name="magnifier-zoom-out"
+                      description="Zoom the magnifier out"/>
+
+</KeyListEntries>

@@ -57,7 +57,11 @@ configure_file(
 )
 
 keybinding_files = [
+  '50-kestrel-accessibility.xml',
+  '50-kestrel-hardware.xml',
+  '50-kestrel-launchers.xml',
   '50-kestrel-screenshots.xml',
+  '50-kestrel-sound-media.xml',
   '50-kestrel-system.xml',
 ]
 
@@ -76,6 +80,15 @@ schema = configure_file(
   configuration: schemaconf,
   install_dir: schemadir
 )
+settings_schemas = []
+foreach name : ['media-keys', 'night-light', 'power']
+  settings_schemas += configure_file(
+    input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
+    output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
+    copy: true,
+    install_dir: schemadir,
+  )
+endforeach
 install_data('00_com.lantharos.kestrel.gschema.override', install_dir: schemadir)
 
 if have_systemd
@@ -93,7 +106,7 @@ endif
 
 # for unit tests - gnome.compile_schemas() only looks in srcdir
 compiled_schemas = custom_target('compile-schemas',
-  input: schema,
+  input: [schema, settings_schemas],
   output: 'gschemas.compiled',
   command: [find_program('glib-compile-schemas'), '--strict', data_builddir],
 )

@@ -1,0 +1,32 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.night-light" path="/com/lantharos/kestrel/night-light/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Warm the display at night</summary>
+    </key>
+    <key name="temperature" type="u">
+      <range min="1700" max="4700"/>
+      <default>2700</default>
+      <summary>Color temperature at night in Kelvin</summary>
+      <description>Lower values are warmer.</description>
+    </key>
+    <key name="schedule-automatic" type="b">
+      <default>true</default>
+      <summary>Follow sunset and sunrise</summary>
+      <description>When off, the night light follows the start and end times instead.</description>
+    </key>
+    <key name="schedule-from" type="d">
+      <default>20.0</default>
+      <summary>Start time in hours after midnight</summary>
+    </key>
+    <key name="schedule-to" type="d">
+      <default>6.0</default>
+      <summary>End time in hours after midnight</summary>
+    </key>
+    <key name="last-coordinates" type="(dd)">
+      <default>(91.0, 181.0)</default>
+      <summary>Latitude and longitude last used for sunset and sunrise</summary>
+      <description>The default is out of range, which stands for an unknown place.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KeyListEntries schema="com.lantharos.kestrel.media-keys"
+                group="hardware"
+                name="System"
+                wm_name="GNOME Shell"
+                package="gnome-shell">
+
+	<KeyListEntry name="screensaver"
+                      description="Lock the screen"/>
+
+	<KeyListEntry name="logout"
+                      description="Log out"/>
+
+	<KeyListEntry name="reboot"
+                      description="Restart"/>
+
+	<KeyListEntry name="shutdown"
+                      description="Power off"/>
+
+	<KeyListEntry name="power"
+                      hidden="true"
+                      description="Power button"/>
+
+	<KeyListEntry name="suspend"
+                      hidden="true"
+                      description="Suspend button"/>
+
+	<KeyListEntry name="hibernate"
+                      hidden="true"
+                      description="Hibernate button"/>
+
+	<KeyListEntry name="keyboard-brightness-up"
+                      description="Brighten the keyboard"/>
+
+	<KeyListEntry name="keyboard-brightness-down"
+                      description="Dim the keyboard"/>
+
+	<KeyListEntry name="keyboard-brightness-toggle"
+                      description="Turn the keyboard light on or off"/>
+
+	<KeyListEntry name="touchpad-toggle"
+                      description="Turn the touchpad on or off"/>
+
+	<KeyListEntry name="touchpad-on"
+                      hidden="true"
+                      description="Turn the touchpad on"/>
+
+	<KeyListEntry name="touchpad-off"
+                      hidden="true"
+                      description="Turn the touchpad off"/>
+
+	<KeyListEntry name="rotate-video-lock"
+                      description="Lock or unlock the screen rotation"/>
+
+	<KeyListEntry name="battery-status"
+                      hidden="true"
+                      description="Show the battery level"/>
+
+	<KeyListEntry name="rfkill"
+                      description="Turn airplane mode on or off"/>
+
+	<KeyListEntry name="rfkill-bluetooth"
+                      hidden="true"
+                      description="Turn Bluetooth on or off"/>
+
+</KeyListEntries>

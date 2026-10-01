@@ -7,6 +7,7 @@ import { Inhibitors } from './inhibitors.js';
 import { BUS_NAME, InhibitFlags, MANAGER_PATH, MANAGER_XML } from './interfaces.js';
 import { Peers } from './peers.js';
 import { Presence } from './presence.js';
+import { ScreenSaver } from './screenSaver.js';
 import { availability, exportEnvironment, perform, watchSession, type SessionState } from './system.js';
 
 const LOGOUT_NO_CONFIRMATION = 1;
@@ -23,6 +24,13 @@ export class SessionManager {
     () => this.exported.emit_signal('SessionOver', new GLib.Variant('()', [])),
     () => this.exported.emit_signal('SessionRunning', new GLib.Variant('()', [])));
   private readonly presence = new Presence();
+  private readonly screenSaver = new ScreenSaver({
+    inhibit: (sender, appId, reason) => {
+      this.peers.watch(sender);
+      return this.inhibitors.add(sender, appId, reason, InhibitFlags.IDLE, '/');
+    },
+    uninhibit: cookie => this.inhibitors.remove(cookie),
+  });
   private readonly stopWatchingSession: () => void;
   private readonly nameId: number;
   private state: SessionState = { active: true, locked: false };
@@ -85,6 +93,7 @@ export class SessionManager {
   destroy(): void {
     Gio.bus_unown_name(this.nameId);
     this.stopWatchingSession();
+    this.screenSaver.destroy();
     this.endSession.destroy();
     this.presence.destroy();
     this.inhibitors.destroy();

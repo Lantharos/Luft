@@ -22,7 +22,6 @@ export class GnomeShell {
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
 
         this._senderChecker = new DBusSenderChecker([
-            'org.gnome.SettingsDaemon.MediaKeys',
             'org.freedesktop.impl.portal.desktop.gnome',
         ]);
 

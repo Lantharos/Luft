@@ -25,6 +25,8 @@ import { SnapLayouts } from './windows/snapLayouts.js';
 import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
+import { PlugSounds } from './power/plugSounds.js';
+import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { systemMonitor } from './panel/systemMonitor.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
@@ -71,6 +73,7 @@ class KestrelUi {
   readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
   private readonly oomNotifier = new OomNotifier();
   private readonly batteryWarnings = new BatteryWarnings();
+  private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly globalShortcuts = new GlobalShortcutsProvider();
   private readonly liveWallpaper: LiveWallpaper;
@@ -78,6 +81,7 @@ class KestrelUi {
   private readonly loginDisplays = new LoginDisplays();
   private readonly loginNumLock = new LoginNumLock();
   private readonly farewell = new Farewell();
+  private readonly mediaKeys: MediaKeys;
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -96,6 +100,7 @@ class KestrelUi {
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
+    this.mediaKeys = new MediaKeys(context, () => this.openStart(''));
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
@@ -436,8 +441,10 @@ class KestrelUi {
     this.loginDisplays.destroy();
     this.loginNumLock.destroy();
     this.farewell.destroy();
+    this.mediaKeys.destroy();
     this.oomNotifier.destroy();
     this.batteryWarnings.destroy();
+    this.plugSounds.destroy();
     this.launchFeedback.destroy();
     this.globalShortcuts.destroy();
     this.portal.destroy();

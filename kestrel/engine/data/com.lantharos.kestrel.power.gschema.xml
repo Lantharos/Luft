@@ -1,0 +1,58 @@
+<schemalist>
+  <enum id="com.lantharos.kestrel.PowerAction">
+    <value nick="blank" value="0"/>
+    <value nick="suspend" value="1"/>
+    <value nick="shutdown" value="2"/>
+    <value nick="hibernate" value="3"/>
+    <value nick="interactive" value="4"/>
+    <value nick="nothing" value="5"/>
+    <value nick="logout" value="6"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.PowerButtonAction">
+    <value nick="nothing" value="0"/>
+    <value nick="suspend" value="1"/>
+    <value nick="hibernate" value="2"/>
+    <value nick="interactive" value="3"/>
+  </enum>
+
+  <schema id="com.lantharos.kestrel.power" path="/com/lantharos/kestrel/power/">
+    <key name="idle-dim" type="b">
+      <default>true</default>
+      <summary>Dim the screen when the computer isn't being used</summary>
+    </key>
+    <key name="idle-brightness" type="i">
+      <range min="0" max="100"/>
+      <default>30</default>
+      <summary>Brightness of a dimmed screen and keyboard in percent</summary>
+    </key>
+    <key name="sleep-inactive-ac-type" enum="com.lantharos.kestrel.PowerAction">
+      <default>'suspend'</default>
+      <summary>What happens after a while without use while plugged in</summary>
+    </key>
+    <key name="sleep-inactive-ac-timeout" type="i">
+      <default>900</default>
+      <summary>Seconds without use before acting while plugged in</summary>
+    </key>
+    <key name="sleep-inactive-battery-type" enum="com.lantharos.kestrel.PowerAction">
+      <default>'suspend'</default>
+      <summary>What happens after a while without use on battery</summary>
+    </key>
+    <key name="sleep-inactive-battery-timeout" type="i">
+      <default>900</default>
+      <summary>Seconds without use before acting on battery</summary>
+    </key>
+    <key name="power-button-action" enum="com.lantharos.kestrel.PowerButtonAction">
+      <default>'suspend'</default>
+      <summary>What the power button does</summary>
+    </key>
+    <key name="power-saver-profile-on-low-battery" type="b">
+      <default>true</default>
+      <summary>Switch to the power saver mode when the battery is low</summary>
+    </key>
+    <key name="ambient-enabled" type="b">
+      <default>true</default>
+      <summary>Follow the light around the computer with the screen brightness</summary>
+    </key>
+  </schema>
+</schemalist>

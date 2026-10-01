@@ -42,6 +42,8 @@ if [[ "$mode" == greeter ]]; then
   exec "$root/kestrel/tools/greeter.sh"
 fi
 
+cargo build --release --quiet --manifest-path "$root/kestrel/settings/Cargo.toml"
+
 dbus-run-session -- bash -c '
   set -euo pipefail
   root="$1"
@@ -56,6 +58,15 @@ dbus-run-session -- bash -c '
   fi
   gjs -m "$root/kestrel/build/js/ui/kestrel-session.js" &
   timeout 5 gdbus wait --session org.gnome.SessionManager
+  coproc system_bus { dbus-daemon --session --nofork --print-address; }
+  trap "kill $system_bus_PID" EXIT
+  read -r KESTREL_SYSTEM_BUS <&"${system_bus[0]}"
+  export KESTREL_SYSTEM_BUS
+  DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" gjs -m "$root/kestrel/tools/fixtures/systemBus.js" &
+  timeout 5 gdbus wait --address "$KESTREL_SYSTEM_BUS" com.lantharos.KestrelChecks
+  DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local "$root/kestrel/settings/target/release/kestrel-settings" \
+    --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,xsettings &
+  timeout 5 gdbus wait --session com.lantharos.Settings
   if [[ "$mode" == capture ]]; then
     dconf reset /com/lantharos/kestrel/quick-tile-order
     dconf reset /com/lantharos/kestrel/quick-tiles-removed
@@ -81,7 +92,7 @@ dbus-run-session -- bash -c '
     echo "Usage: kestrel/tools/session.sh [nested|capture|performance|greeter]" >&2
     exit 2
   fi
-  exec meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" "${args[@]}"
+  meson devenv -C "$root/kestrel/build" "$root/kestrel/build/src/kestrel" "${args[@]}"
 ' kestrel-session "$root" "$mode" "$session"
 
 if [[ "$mode" == capture ]]; then

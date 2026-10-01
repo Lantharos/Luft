@@ -9,6 +9,9 @@
     Held: devices held back so far, as (id, name), id being the sysfs device name such as "3-2".
 
     Released is emitted after unlocking, with the devices that were held back and are now available.
+    The service also remembers them until TakeReleased returns them to the person signed in at the
+    computer, so a session that starts after the unlock can still announce them. The list is cleared
+    when devices start waiting again.
   -->
   <interface name="com.lantharos.UsbProtection1">
     <property name="Enabled" type="b" access="read"/>
@@ -16,6 +19,9 @@
     <property name="Held" type="a(ss)" access="read"/>
     <method name="SetEnabled">
       <arg name="enabled" type="b" direction="in"/>
+    </method>
+    <method name="TakeReleased">
+      <arg name="devices" type="a(ss)" direction="out"/>
     </method>
     <signal name="Released">
       <arg name="devices" type="a(ss)"/>

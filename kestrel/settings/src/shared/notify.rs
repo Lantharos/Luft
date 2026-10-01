@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
+use futures_util::StreamExt;
+use zbus::fdo::DBusProxy;
 use zbus::zvariant::Value;
 use zbus::{Connection, proxy};
 
@@ -73,6 +75,19 @@ impl Notification<'_> {
             )
             .await
     }
+}
+
+pub async fn server_ready(session: &Connection) -> zbus::Result<()> {
+    let notifications = NotificationsProxy::new(session).await?;
+    let mut owners = notifications.inner().receive_owner_changed().await?;
+    let present = DBusProxy::new(session)
+        .await?
+        .name_has_owner(notifications.inner().destination().as_ref())
+        .await?;
+    if !present {
+        while owners.next().await.is_some_and(|owner| owner.is_none()) {}
+    }
+    Ok(())
 }
 
 pub async fn close(session: &Connection, id: u32) {

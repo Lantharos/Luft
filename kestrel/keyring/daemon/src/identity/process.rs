@@ -2,8 +2,9 @@ use std::ffi::CString;
 use std::fs::File;
 use std::io::Read;
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+use std::path::Path;
 
-const INTERPRETERS: [&str; 7] = ["python", "perl", "ruby", "node", "bash", "sh", "bun"];
+use super::program::{Program, is_interpreter};
 
 pub struct Process {
     directory: OwnedFd,
@@ -90,15 +91,8 @@ impl Process {
         Some(link.strip_suffix(" (deleted)").unwrap_or(&link).to_owned())
     }
 
-    pub fn program(&self, executable: &str) -> String {
-        let base = executable.rsplit('/').next().unwrap_or(executable);
-        let interpreted = INTERPRETERS.iter().any(|interpreter| {
-            base.strip_prefix(interpreter).is_some_and(|rest| {
-                rest.chars()
-                    .all(|character| character.is_ascii_digit() || character == '.')
-            })
-        });
-        let script = interpreted
+    pub fn program(&self, executable: String) -> Program {
+        let script = is_interpreter(&executable)
             .then(|| self.read("cmdline"))
             .flatten()
             .and_then(|cmdline| {
@@ -108,10 +102,32 @@ impl Process {
                     .find(|argument| !argument.is_empty() && !argument.starts_with(b"-"))
                     .and_then(|argument| String::from_utf8(argument.to_vec()).ok())
             });
-        match script {
-            Some(script) => format!("{executable} {script}"),
-            None => executable.to_owned(),
-        }
+        let image = self.image(&executable);
+        Program::new(executable, script, image)
+    }
+
+    fn image(&self, executable: &str) -> Option<String> {
+        let mount = self.environment("APPDIR")?;
+        Path::new(executable)
+            .starts_with(&mount)
+            .then(|| self.environment("APPIMAGE"))
+            .flatten()
+    }
+
+    fn environment(&self, name: &str) -> Option<String> {
+        let environ = self.read("environ")?;
+        environ.split(|byte| *byte == 0).find_map(|entry| {
+            let value = entry.strip_prefix(name.as_bytes())?.strip_prefix(b"=")?;
+            String::from_utf8(value.to_vec()).ok()
+        })
+    }
+
+    pub fn has_terminal(&self) -> bool {
+        let stat = self.read("stat").unwrap_or_default();
+        String::from_utf8_lossy(&stat)
+            .rsplit_once(')')
+            .and_then(|(_, fields)| fields.split_whitespace().nth(4)?.parse::<i32>().ok())
+            .is_some_and(|terminal| terminal != 0)
     }
 
     pub fn unit_app_id(&self) -> Option<String> {

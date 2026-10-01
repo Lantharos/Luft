@@ -70,9 +70,17 @@ Every request is tied to the app that made it:
 
 - **Sandboxed apps** are recognized by their Flatpak ID, which the sandbox guarantees.
 - **Luft apps** are recognized by their `com.lantharos.*` ID.
-- **Other apps** are recognized by their program, and for scripts by the interpreter and the script.
+- **Other apps** are recognized by their launcher entry. Discord started from `discord.desktop` is Discord, whichever folder its updater put the program in this week. The entry has to start that program, either by its path or by its name, the way `/usr/bin/discord` starts `~/.config/discord/app-1.0.160/Discord`, so commands run in a terminal stay themselves instead of becoming the terminal. Apps started some other way are matched to the entry named after their program.
+- **Programs without an entry** are recognized by their path, with version numbers in folder names left out, so `app-1.0.160` and `app-1.0.161` are the same app. An AppImage is recognized by the AppImage file rather than the temporary folder it runs from, and a script by its interpreter and the script.
 
-An app may always use what it saved itself. Anything else needs your permission: the keyring reports those items as locked to that app, and when it asks to unlock them, Kestrel shows "Allow Firefox to use “github.com”?" with the choice to remember it. Choices you remember are kept in the vault, listed in Settings under Apps with access, and can be taken back there. Items brought in from GNOME Keyring or oo7 don't know who saved them, so the first app that uses each one becomes its owner; after that, everyone else is asked.
+When an app is recognized better than before, for example after it gets a launcher entry, what it saved and the choices you made for it move along without asking.
+
+An app may always use what it saved itself. Anything else needs your permission: the keyring reports those items as locked to that app, and when it asks to unlock them, Kestrel shows "Allow Firefox to use “github.com”?" with the choice to remember it. Choices you remember are kept in the vault, listed in Settings under Apps with access, and can be taken back there.
+
+Items brought in from GNOME Keyring or oo7 don't know who saved them, so they go to the first app that uses them, with two exceptions:
+
+- **Items that name their app** go only to that app. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`, and only an app with that name, by launcher entry, Flatpak ID or program, takes it. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`, so any Chromium-based browser can take those. Every other app is asked.
+- **Keyring tools never take items.** `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens.
 
 Secrets that sandboxed apps keep through the Secret portal are never shown to other apps. A Flatpak gets the same portal secret it got from GNOME Keyring or oo7, because those items are brought in unchanged and looked up the same way, by the app's ID.
 
@@ -157,5 +165,5 @@ To go back, `kestrel/keyring/tools/switch.sh off` restores the previous login ru
 ## Testing
 
 - `cargo test` covers the vault format and, against a throwaway `swtpm`, sealing, PIN lockout, Secure Boot changes and chip-held signing keys.
-- `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` runs the keyring on a private session bus with a scratch home and a stand-in for Kestrel's prompts. It brings in keyrings made by real GNOME Keyring and oo7, then checks `secret-tool`, per-app access, locking, apps' own secrets, the portal and the SSH agent with `ssh-add` and `ssh-keygen -Y sign`.
+- `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` runs the keyring on a private session bus with a scratch home and a stand-in for Kestrel's prompts. It brings in keyrings made by real GNOME Keyring and oo7, then checks `secret-tool`, per-app access, locking, apps' own secrets, the portal and the SSH agent with `ssh-add` and `ssh-keygen -Y sign`, and that apps keep their items when they update, move or run as AppImages. Apps started from a launcher entry run in scopes of your user manager through `systemd-run --user`.
 - `tools/vm/build.sh` builds a small Fedora machine with the keyring, the lock screen's authentication service and a stand-in fingerprint reader. `tools/vm/run.sh tpm` then signs in through greetd with a password and with a fingerprint against a software TPM, unlocks through the lock screen's socket, uses `sudo`, changes the Secure Boot state, and sets and uses a PIN. `run.sh gone` boots the same disk without the chip and `run.sh none` starts fresh without one. SELinux is enforcing throughout and every denial fails the run.

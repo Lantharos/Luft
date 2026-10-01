@@ -38,7 +38,8 @@ impl Daemon {
         if self.granted.contains(app, item) {
             return true;
         }
-        let keyring = self.keyring.lock().await;
+        let mut keyring = self.keyring.lock().await;
+        keyring.adopt(app);
         let Some(contents) = keyring.contents() else {
             return false;
         };
@@ -62,6 +63,7 @@ impl Daemon {
         let mut labels = Vec::new();
         {
             let mut keyring = self.keyring.lock().await;
+            keyring.adopt(app);
             let Some(contents) = keyring.contents() else {
                 return allowed;
             };

@@ -1,6 +1,7 @@
 mod access;
 mod formats;
 mod import;
+mod ownership;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -173,6 +174,30 @@ impl Keyring {
         )?;
         self.header = Some(header);
         Ok(())
+    }
+
+    pub fn adopt(&mut self, app: &crate::identity::App) {
+        let Some(contents) = self.contents() else {
+            return;
+        };
+        let previous = ownership::predecessors(contents, app);
+        if previous.is_empty() {
+            return;
+        }
+        if let Err(error) =
+            self.edit(|contents| ownership::hand_over(contents, &previous, &app.key))
+        {
+            eprintln!("Couldn't carry an app's access over: {error}");
+        }
+    }
+
+    pub fn release_misclaimed(&mut self) {
+        if !self.contents().is_some_and(ownership::has_misclaimed) {
+            return;
+        }
+        if let Err(error) = self.edit(ownership::release_misclaimed) {
+            eprintln!("Couldn't release items a keyring tool claimed: {error}");
+        }
     }
 
     pub fn audit(&self) -> AuditLog {

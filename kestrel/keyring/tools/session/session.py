@@ -9,6 +9,7 @@ import time
 import gi
 
 from agent import exercise_agent
+from ownership import exercise_ownership
 
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
@@ -81,7 +82,8 @@ def main():
 def run(root):
     gnome = old_keyring(root, "gnome", ["gnome-keyring-daemon", "--unlock", "--foreground", "--components=secrets"], LOGIN,
                         [("GitHub", "gh-token", ["service", "github.com", "user", "kristof"]),
-                         ("Wi-Fi", "hunter2", ["network", "home"])])
+                         ("Wi-Fi", "hunter2", ["network", "home"]),
+                         ("Parley Safe Storage", "parley-key", ["application", "parley"])])
     oo7 = old_keyring(root, "oo7", ["/usr/libexec/oo7-daemon", "--login"], LOGIN,
                       [("Mail", "mail-pass", ["service", "mail.example.org"])])
     work = old_keyring(root, "work", ["/usr/libexec/oo7-daemon", "--login"], "work pass",
@@ -123,6 +125,8 @@ def run(root):
 
 def exercise(root, home, environment, script, requests, started):
     check(lookup(environment, "service", "github.com", "user", "kristof") == "gh-token", "a secret from gnome-keyring's file comes back after setup")
+    check([entry["request"]["title"] for entry in requests("access")] == ["Allow secret-tool to use “GitHub”?"],
+          "a keyring tool is asked before it uses an imported item")
     setup = requests("password")[0]["request"]
     check(setup.get("confirm") is True, "setting up without the sign-in service asks to confirm the password")
     check(lookup(environment, "service", "mail.example.org") == "mail-pass", "a secret from oo7's file comes back")
@@ -137,9 +141,17 @@ def exercise(root, home, environment, script, requests, started):
                                              "com.lantharos.Keyring1", "/com/lantharos/Keyring1", "com.lantharos.Keyring1", None)
     check(service.get_cached_property("PendingImports").unpack() == ["Work"], "a keyring with another password waits to be brought in")
     check(service.get_cached_property("Locked").unpack() is False, "the keyring reports itself unlocked")
-    check(service.get_cached_property("ItemCount").unpack() == 3, "the keyring counts its items")
+    check(service.get_cached_property("ItemCount").unpack() == 4, "the keyring counts its items")
 
     reader = [sys.executable, os.path.join(HERE, "reader.py")]
+    stranger = os.path.join(root, "stranger")
+    shutil.copy(sys.executable, stranger)
+    asked = len(requests("access"))
+    claimed = subprocess.run([stranger, os.path.join(HERE, "reader.py"), "read", "service", "github.com"], env=environment,
+                             capture_output=True, timeout=60)
+    check(claimed.stdout.decode() == "gh-token" and len(requests("access")) == asked,
+          "the first app to use an imported item takes it without being asked")
+
     def read_as_other_app(*attributes):
         result = subprocess.run([*reader, "read", *attributes], env=environment, capture_output=True, timeout=60)
         return result.stdout.decode()
@@ -166,8 +178,6 @@ def exercise(root, home, environment, script, requests, started):
 
     sealed = subprocess.run([*reader, "app-secrets"], env=environment, capture_output=True, timeout=60)
     check(sealed.stdout.decode() == "stored:account-token|loaded:account-token|listed:account-token", "an app stores and reads back its own secret")
-    stranger = os.path.join(root, "stranger")
-    shutil.copy(sys.executable, stranger)
     other = subprocess.run([stranger, os.path.join(HERE, "reader.py"), "app-load"], env=environment, capture_output=True, timeout=60)
     check(other.stdout.decode() == "missing", "another app can't read an app's sealed secret")
 
@@ -177,6 +187,8 @@ def exercise(root, home, environment, script, requests, started):
     check(denied == "AccessDenied", "only the desktop portal may ask for sandboxed apps' secrets")
 
     exercise_agent(root, environment, check, script, requests)
+    exercise_ownership(root, home, environment, check, script, requests,
+                       lambda: subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30))
 
     script(passwords=["work pass"], access="allow")
     imported = subprocess.run([*reader, "import", "Work"], env=environment, capture_output=True, timeout=60)

@@ -183,6 +183,7 @@ impl Daemon {
     }
 
     pub async fn unlocked_now(self: &Arc<Self>, password: Option<Secret>) {
+        self.keyring.lock().await.release_misclaimed();
         self.signing_in.send_replace(false);
         self.unlocked.send_replace(true);
         self.changed.notify_one();

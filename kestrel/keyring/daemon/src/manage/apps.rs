@@ -27,6 +27,7 @@ impl AppSecrets {
         if !self.daemon.ensure_unlocked(&app, true).await {
             return Err(fdo::Error::Failed("The keyring is locked".into()));
         }
+        self.daemon.keyring.lock().await.adopt(&app);
         Ok(app)
     }
 }

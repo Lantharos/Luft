@@ -41,6 +41,7 @@ impl Daemon {
             },
             Command::Show(mode) => {
                 self.activity.set_mode(mode, self.now());
+                self.settle_loader(self.now());
                 self.reclaim();
                 match self
                     .enrollment_code
@@ -75,6 +76,7 @@ impl Daemon {
             Request::ChangeMode(name) => {
                 if let Ok(mode) = name.parse::<Mode>() {
                     self.activity.set_mode(mode, now);
+                    self.settle_loader(now);
                 }
                 Response::Ack
             }
@@ -160,7 +162,7 @@ impl Daemon {
             terminal.stop_listening();
         }
         self.look.notice.fade_to(0.0, now);
-        self.look.loader.fade_to(1.0, now);
+        self.settle_loader(now);
         self.fading_notice = Some(shown.notice.clone());
         if let Some(stream) = shown.dismiss() {
             reply(stream, "ok");
@@ -206,7 +208,7 @@ impl Daemon {
                 self.retake();
             }
         }
-        self.look.loader.fade_to(1.0, self.now());
+        self.settle_loader(self.now());
         if self.plymouth.is_none() {
             self.plymouth = listen_for_plymouth_clients();
         }

@@ -8,11 +8,19 @@ const TITLE_SIZE: f32 = 17.0;
 const NOTE_SIZE: f32 = 13.0;
 const BAR_WIDTH: f32 = 240.0;
 const BAR_HEIGHT: f32 = 4.0;
+const SWEEP_SECONDS: f32 = 1.6;
+const SWEEP_SHARE: f32 = 0.3;
 
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Progress {
+    Known(f32),
+    Waiting(f32),
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Status {
     pub title: String,
-    pub progress: Option<f32>,
+    pub progress: Progress,
     pub note: String,
     pub detail: Option<String>,
 }
@@ -26,12 +34,12 @@ struct Lines {
 
 fn lines(layout: &Layout) -> Lines {
     let scale = layout.scale;
-    let below_loader = layout.loader_center.1 + layout.loader_size / 2.0;
+    let title = layout.loader_center.1 - 30.0 * scale;
     Lines {
-        title: below_loader + 48.0 * scale,
-        bar: below_loader + 70.0 * scale,
-        note: below_loader + 100.0 * scale,
-        detail: below_loader + 124.0 * scale,
+        title,
+        bar: title + 22.0 * scale,
+        note: title + 52.0 * scale,
+        detail: title + 76.0 * scale,
     }
 }
 
@@ -59,11 +67,28 @@ fn fill_pill(pixmap: &mut PixmapMut, area: Option<SkRect>, alpha: f32, shift: Tr
     pixmap.fill_path(&shape, &paint, FillRule::Winding, shift, None);
 }
 
+fn filled_span(progress: Progress, width: f32, height: f32) -> Option<(f32, f32)> {
+    match progress {
+        Progress::Known(done) => {
+            let filled = width * done.clamp(0.0, 1.0);
+            (filled > 0.0).then(|| (0.0, filled.max(height)))
+        }
+        Progress::Waiting(seconds) => {
+            let sweep = width * SWEEP_SHARE;
+            let cycles = seconds / SWEEP_SECONDS;
+            let travel = crate::ease(cycles - libm::floorf(cycles));
+            let start = (width + sweep) * travel - sweep;
+            let (from, to) = (start.max(0.0), (start + sweep).min(width));
+            (to - from >= height).then_some((from, to - from))
+        }
+    }
+}
+
 fn draw_bar(
     pixmap: &mut PixmapMut,
     layout: &Layout,
     origin: (i32, i32),
-    progress: f32,
+    progress: Progress,
     alpha: f32,
 ) {
     let scale = layout.scale;
@@ -77,11 +102,10 @@ fn draw_bar(
         0.18 * alpha,
         shift,
     );
-    let filled = width * progress.clamp(0.0, 1.0);
-    if filled > 0.0 {
+    if let Some((offset, length)) = filled_span(progress, width, height) {
         fill_pill(
             pixmap,
-            SkRect::from_xywh(left, top, filled.max(height), height),
+            SkRect::from_xywh(left + offset, top, length, height),
             0.92 * alpha,
             shift,
         );
@@ -106,9 +130,7 @@ pub fn draw(
         TITLE_SIZE * scale,
         0.92 * alpha,
     );
-    if let Some(progress) = status.progress {
-        draw_bar(pixmap, layout, origin, progress, alpha);
-    }
+    draw_bar(pixmap, layout, origin, status.progress, alpha);
     text::centered(
         pixmap,
         &status.note,

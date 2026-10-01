@@ -14,7 +14,7 @@ pub use bmp::decode_bmp;
 pub use notice::Notice;
 pub use prompt::{Prompt, is_shaking};
 pub use scene::{Scene, Visuals};
-pub use status::Status;
+pub use status::{Progress, Status};
 pub use tiny_skia;
 
 use tiny_skia::{Path, PathBuilder};

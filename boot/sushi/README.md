@@ -33,12 +33,15 @@ While a disk is being encrypted in place, the few seconds before the system is m
 
 ### Adding a Secure Boot key
 
-Shim asks in person before it trusts a new key, on a blue screen that appears right after the firmware and waits only ten seconds. When a key is waiting for that screen, the next restart first shows what to expect: press a key when the screen appears, choose Enroll MOK, Continue and Yes, type the one-time code, and choose Reboot. Sushi holds the restart on that screen until Enter is pressed, for up to four minutes.
+Shim asks in person before it trusts a new key, on a blue screen that appears right after the firmware and waits only ten seconds. When a key is waiting for that screen, the next restart first shows what to expect: press a key when the screen appears, choose Enroll MOK, Continue and Yes, type the one-time code, and choose Reboot. Sushi holds the restart on that screen until Enter is pressed, for up to four minutes. When the key wasn't added at the last restart and a new code was asked for, the screen starts by saying so.
 
 ```bash
-sushictl notice key-enrollment 48217730   # explain the screen at the next restart, with this code
+sushictl notice key-enrollment 48217730           # explain the screen at the next restart, with this code
+sushictl notice key-enrollment 48217730 --again   # the same, after the key wasn't added last time
 sushictl notice clear
-``` `plymouth quit` returns to the text console, as it does with Plymouth, which is what the emergency and rescue shells rely on.
+```
+
+`plymouth quit` returns to the text console, as it does with Plymouth, which is what the emergency and rescue shells rely on.
 
 ## Components
 

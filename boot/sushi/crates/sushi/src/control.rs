@@ -49,13 +49,19 @@ impl FromStr for Mode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KeyEnrollment {
+    pub code: String,
+    pub again: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     Deactivate,
     Quit,
     UpdateRoot(PathBuf),
     Show(Mode),
     Status,
-    KeyEnrollmentNotice(Option<String>),
+    KeyEnrollmentNotice(Option<KeyEnrollment>),
 }
 
 impl Command {
@@ -68,12 +74,17 @@ impl Command {
             "show" => Self::Show(words.next()?.parse().ok()?),
             "status" => Self::Status,
             "notice" => match words.next()? {
-                "key-enrollment" => Self::KeyEnrollmentNotice(Some(
-                    words
+                "key-enrollment" => Self::KeyEnrollmentNotice(Some(KeyEnrollment {
+                    code: words
                         .next()
                         .filter(|code| code.bytes().all(|byte| byte.is_ascii_digit()))?
                         .to_owned(),
-                )),
+                    again: match words.next() {
+                        Some("again") => true,
+                        Some(_) => return None,
+                        None => false,
+                    },
+                })),
                 "clear" => Self::KeyEnrollmentNotice(None),
                 _ => return None,
             },
@@ -89,7 +100,10 @@ impl Command {
             Self::UpdateRoot(root) => format!("update-root {}", root.display()),
             Self::Show(mode) => format!("show {}", mode.name()),
             Self::Status => "status".into(),
-            Self::KeyEnrollmentNotice(Some(code)) => format!("notice key-enrollment {code}"),
+            Self::KeyEnrollmentNotice(Some(KeyEnrollment { code, again })) => format!(
+                "notice key-enrollment {code}{}",
+                if *again { " again" } else { "" }
+            ),
             Self::KeyEnrollmentNotice(None) => "notice clear".into(),
         }
     }
@@ -116,7 +130,14 @@ mod tests {
             Command::Status,
             Command::UpdateRoot("/sysroot".into()),
             Command::Show(Mode::Updates),
-            Command::KeyEnrollmentNotice(Some("48217730".into())),
+            Command::KeyEnrollmentNotice(Some(KeyEnrollment {
+                code: "48217730".into(),
+                again: false,
+            })),
+            Command::KeyEnrollmentNotice(Some(KeyEnrollment {
+                code: "48217730".into(),
+                again: true,
+            })),
             Command::KeyEnrollmentNotice(None),
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));

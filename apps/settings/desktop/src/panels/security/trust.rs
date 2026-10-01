@@ -29,6 +29,7 @@ pub struct SigningKey {
     reason: String,
     protection: String,
     driver_key_enrolled: bool,
+    missed: u32,
 }
 
 #[derive(Serialize, Default)]
@@ -108,6 +109,7 @@ fn signing_key(map: &Map) -> SigningKey {
         reason: text(map, "Reason"),
         protection: text(map, "Protection"),
         driver_key_enrolled: flag(map, "DriverKeyEnrolled"),
+        missed: get(map, "Missed").unwrap_or_default(),
     }
 }
 

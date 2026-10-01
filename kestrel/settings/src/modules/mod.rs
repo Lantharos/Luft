@@ -5,12 +5,13 @@ mod night_light;
 mod power;
 mod printers;
 mod rfkill;
+mod security;
 mod sound;
 mod timezone;
-mod usb_protection;
 mod xsettings;
 
 use crate::context::Context;
+use security::{signing_key, usb_protection};
 
 #[derive(Clone, Copy)]
 pub enum Module {
@@ -21,6 +22,7 @@ pub enum Module {
     Power,
     Printers,
     Rfkill,
+    SigningKey,
     Sound,
     Timezone,
     UsbProtection,
@@ -28,7 +30,7 @@ pub enum Module {
 }
 
 impl Module {
-    pub const ALL: [Self; 11] = [
+    pub const ALL: [Self; 12] = [
         Self::A11y,
         Self::Housekeeping,
         Self::Keyboard,
@@ -36,6 +38,7 @@ impl Module {
         Self::Power,
         Self::Printers,
         Self::Rfkill,
+        Self::SigningKey,
         Self::Sound,
         Self::Timezone,
         Self::UsbProtection,
@@ -55,6 +58,7 @@ impl Module {
             Self::Power => "power",
             Self::Printers => "printers",
             Self::Rfkill => "rfkill",
+            Self::SigningKey => "signing-key",
             Self::Sound => "sound",
             Self::Timezone => "timezone",
             Self::UsbProtection => "usb-protection",
@@ -71,6 +75,7 @@ impl Module {
             Self::Power => power::start(context).await,
             Self::Printers => printers::start(context).await,
             Self::Rfkill => rfkill::start(context).await,
+            Self::SigningKey => signing_key::start(context).await,
             Self::Sound => sound::start(context).await,
             Self::Timezone => timezone::start(context).await,
             Self::UsbProtection => usb_protection::start(context).await,

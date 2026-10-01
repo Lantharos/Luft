@@ -1,5 +1,6 @@
 use crate::boot::startup;
 use crate::disk::{self, DiskStatus};
+use crate::keys::request::Request;
 use crate::keys::{self, mok};
 use crate::system::efi::{self, SecureBoot};
 use crate::system::tpm::{self, Tpm};
@@ -10,6 +11,8 @@ pub struct SigningKey {
     pub reason: String,
     pub protection: &'static str,
     pub driver_key_enrolled: bool,
+    pub missed: u32,
+    pub missed_this_boot: bool,
 }
 
 pub struct Startup {
@@ -33,12 +36,15 @@ pub fn signing_key(disk_encrypted: bool) -> SigningKey {
     } else {
         keys::protection(disk_encrypted).map(|_| ())
     };
+    let request = Request::load().unwrap_or_default();
     SigningKey {
         enrollment: mok::enrollment(),
         available: possible.is_ok() || keys::has_signing_key(),
         reason: possible.err().unwrap_or_default().to_owned(),
         protection: keys::stored_protection().map_or("", |protection| protection.name()),
         driver_key_enrolled: mok::driver_key_enrolled(),
+        missed: request.missed,
+        missed_this_boot: request.missed_this_boot(),
     }
 }
 

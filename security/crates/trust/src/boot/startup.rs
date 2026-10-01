@@ -146,7 +146,6 @@ pub fn install() -> Result<()> {
     let Some(shim) = esp.shim() else {
         bail!("Fedora's shim isn't on the EFI system partition.");
     };
-    mok::forget_code();
     let keys = keys::unseal()?;
     rebuild_with(&esp, &keys, true)?;
     super::sign::efi_binary(Path::new(BOOT_MENU), &esp.file(SIGNED_MENU), &keys)?;

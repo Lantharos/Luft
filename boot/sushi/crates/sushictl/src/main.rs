@@ -4,8 +4,9 @@ use std::time::Duration;
 
 use clap::{Parser, Subcommand};
 
+use sushi::control::{self, Command, KeyEnrollment, Mode};
+
 const NOTICE_WAIT: Duration = Duration::from_secs(300);
-use sushi::control::{self, Command, Mode};
 
 #[derive(Parser)]
 #[command(name = "sushictl", version, about = "Control the Sushi boot splash")]
@@ -35,7 +36,12 @@ enum Action {
 
 #[derive(Subcommand)]
 enum Notice {
-    KeyEnrollment { code: String },
+    KeyEnrollment {
+        code: String,
+        /// Say that the key wasn't added at the last restart
+        #[arg(long)]
+        again: bool,
+    },
     Clear,
 }
 
@@ -47,8 +53,8 @@ fn main() -> ExitCode {
         Action::Show { mode } => Command::Show(mode),
         Action::Status => Command::Status,
         Action::Notice {
-            notice: Notice::KeyEnrollment { code },
-        } => Command::KeyEnrollmentNotice(Some(code)),
+            notice: Notice::KeyEnrollment { code, again },
+        } => Command::KeyEnrollmentNotice(Some(KeyEnrollment { code, again })),
         Action::Notice {
             notice: Notice::Clear,
         } => Command::KeyEnrollmentNotice(None),

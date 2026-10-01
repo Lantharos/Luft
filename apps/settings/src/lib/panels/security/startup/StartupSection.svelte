@@ -13,10 +13,15 @@
 	let startup = $derived(trust.startup);
 	let enrolled = $derived(key.state === 'enrolled');
 
+	let pending = $derived(key.state === 'pending');
+	let missed = $derived(key.missed > 0);
+
 	const keyDescription = $derived.by(() => {
 		if (enrolled) return 'Secure Boot trusts Luft’s startup and the drivers built on this computer';
 		if (!key.available) return key.reason;
-		if (key.state === 'pending') return 'Waiting for you to add it on the blue screen when the computer restarts';
+		if (pending && missed) return 'It wasn’t added at the last restart, so the steps show again when you restart';
+		if (pending) return 'Waiting for you to add it on the blue screen when the computer restarts';
+		if (missed) return 'It wasn’t added after a few restarts. Try again whenever you’re ready';
 		return 'Lets Secure Boot trust Luft’s startup and the drivers built on this computer';
 	});
 
@@ -44,10 +49,11 @@
 	<Row title="Luft’s signing key" description={keyDescription}>
 		{#if enrolled}
 			<span>Added</span>
-		{:else if key.state === 'pending'}
+		{:else if pending}
+			<button type="button" class="button" disabled={busy} onclick={addKey}>Show steps</button>
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelSigningKey)}>Cancel</button>
 		{:else if key.available}
-			<button type="button" class="button" disabled={busy} onclick={addKey}>Add key</button>
+			<button type="button" class="button" disabled={busy} onclick={addKey}>{missed ? 'Try again' : 'Add key'}</button>
 		{/if}
 	</Row>
 	<Row title="Signed startup" description={startupDescription} disabled={!startup.installed && !enrolled}>

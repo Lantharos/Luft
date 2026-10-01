@@ -1,6 +1,7 @@
 use std::os::unix::net::UnixStream;
 use std::time::{Duration, Instant};
 
+use sushi::control::KeyEnrollment;
 use sushi::scene::Notice;
 
 const LIMIT: Duration = Duration::from_secs(240);
@@ -16,17 +17,23 @@ fn spaced(code: &str) -> String {
     format!("{first} {second}")
 }
 
-pub fn key_enrollment(code: &str) -> Notice {
+pub fn key_enrollment(enrollment: &KeyEnrollment) -> Notice {
+    let retry = enrollment
+        .again
+        .then(|| "Luft's key wasn't added last time. Let's try again.".to_owned());
     Notice {
         title: "One more step after the restart".to_owned(),
-        body: vec![
-            "A blue screen will ask about adding a key. It only waits 10 seconds,".to_owned(),
-            "so press any key as soon as it appears. Then:".to_owned(),
-        ],
+        body: retry
+            .into_iter()
+            .chain([
+                "A blue screen will ask about adding a key. It only waits 10 seconds,".to_owned(),
+                "so press any key as soon as it appears. Then:".to_owned(),
+            ])
+            .collect(),
         steps: vec![
             "Choose Enroll MOK, then Continue".to_owned(),
             "Choose Yes".to_owned(),
-            format!("Type {} and press Enter", spaced(code)),
+            format!("Type {} and press Enter", spaced(&enrollment.code)),
             "Choose Reboot".to_owned(),
         ],
         footer: "Press Enter to restart".to_owned(),

@@ -32,6 +32,16 @@ pub fn status() {
             format!(", kept by the {}", key.protection)
         }
     );
+    if key.missed > 0 {
+        println!(
+            "                   not added at the last {}",
+            if key.missed == 1 {
+                "restart".to_owned()
+            } else {
+                format!("{} restarts", key.missed)
+            }
+        );
+    }
     if !key.reason.is_empty() {
         println!("                   {}", key.reason);
     }

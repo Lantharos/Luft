@@ -6,10 +6,10 @@ import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
 
-const BUS_NAME = 'org.gnome.SettingsDaemon.Rfkill';
-const OBJECT_PATH = '/org/gnome/SettingsDaemon/Rfkill';
+const BUS_NAME = 'com.lantharos.Settings.Rfkill';
+const OBJECT_PATH = '/com/lantharos/Settings/Rfkill';
 
-const RfkillManagerInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Rfkill');
+const RfkillManagerInterface = loadInterfaceXML('com.lantharos.Settings.Rfkill');
 const rfkillManagerInfo = Gio.DBusInterfaceInfo.new_for_xml(RfkillManagerInterface);
 
 const RfkillManager = GObject.registerClass({

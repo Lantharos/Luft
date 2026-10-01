@@ -5,8 +5,8 @@ use zbus::interface;
 
 use super::device::{BLUETOOTH, Block, Switch, WWAN};
 
-pub const NAME: &str = "org.gnome.SettingsDaemon.Rfkill";
-pub const PATH: &str = "/org/gnome/SettingsDaemon/Rfkill";
+pub const NAME: &str = "com.lantharos.Settings.Rfkill";
+pub const PATH: &str = "/com/lantharos/Settings/Rfkill";
 const FIXED_CHASSIS: [&str; 4] = ["desktop", "server", "vm", "container"];
 
 pub enum Request {
@@ -78,7 +78,7 @@ pub struct Radios {
     pub requests: mpsc::UnboundedSender<Request>,
 }
 
-#[interface(name = "org.gnome.SettingsDaemon.Rfkill")]
+#[interface(name = "com.lantharos.Settings.Rfkill")]
 impl Radios {
     #[zbus(property)]
     fn airplane_mode(&self) -> bool {

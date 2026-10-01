@@ -13,7 +13,7 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 - Mouse and touchpad: speed, scrolling and tap to click
 - Notifications: do not disturb and per-app notifications, including which apps may still notify you during do not disturb
 - Apps: default apps and what each app is allowed to do
-- Privacy: location, file history, screen lock and trash cleanup
+- Privacy: location, file history, screen lock and cleanup of old trash and temporary files
 - Users: your account picture, name, password and fingerprints
 - Login Screen: whether everyone sees their own wallpaper or one shared picture, whether people are listed to pick from and who is left out of the list, the session that starts by default, and which account signs in automatically when the computer starts
 - Appearance: light and dark style with a sunset or custom schedule, Pure black for OLED displays, an accent color picked from the wallpaper or plain white, whether other apps and terminals take on the colors, app icons in their own colors, tinted with the accent or a chosen color, or clear, with a preview of your pinned apps in each, the cursor theme and size, wallpaper and window translucency. Wallpapers are the pictures and videos in the Wallpapers folder in Pictures, and the one you pick belongs to the style that is on, so light and dark each keep their own; videos play as live wallpapers on Kestrel, and on laptops a switch decides whether they keep playing on battery

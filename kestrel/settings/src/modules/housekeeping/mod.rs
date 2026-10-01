@@ -1,5 +1,6 @@
 mod disk_space;
 mod mounts;
+mod temp;
 mod thumbnails;
 mod trash;
 
@@ -37,21 +38,32 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         let mut warning = 0;
         let mut warned_path = PathBuf::new();
         let mut thumbnails_due = Some(Instant::now() + SETTLE);
+        let mut temp_due = Some(Instant::now() + SETTLE);
         let mut daily = interval_at(Instant::now() + DAILY, DAILY);
         let mut hourly = interval_at(Instant::now() + HOURLY, HOURLY);
         let mut disk_check = interval(DISK_CHECK);
         loop {
             tokio::select! {
                 (schema, _) = settings.changed() => {
+                    let due = Some(Instant::now() + SETTLE);
                     if schema == THUMBNAILS {
-                        thumbnails_due = Some(Instant::now() + SETTLE);
+                        thumbnails_due = due;
+                    } else {
+                        temp_due = due;
                     }
                 }
                 () = sleep_until(thumbnails_due.unwrap_or_else(Instant::now)), if thumbnails_due.is_some() => {
                     thumbnails_due = None;
                     purge_thumbnails(&settings).await;
                 }
-                _ = daily.tick() => purge_thumbnails(&settings).await,
+                () = sleep_until(temp_due.unwrap_or_else(Instant::now)), if temp_due.is_some() => {
+                    temp_due = None;
+                    purge_temp(&settings).await;
+                }
+                _ = daily.tick() => {
+                    purge_thumbnails(&settings).await;
+                    purge_temp(&settings).await;
+                }
                 _ = hourly.tick() => purge_trash(&settings).await,
                 _ = disk_check.tick() => {
                     if let Some(low) = disk_space.check() {
@@ -99,6 +111,16 @@ async fn purge_trash(settings: &Schemas) {
         return;
     };
     let _ = tokio::task::spawn_blocking(move || trash::purge(&trash::directories(), &cutoff)).await;
+}
+
+async fn purge_temp(settings: &Schemas) {
+    if !settings.get::<bool>(PRIVACY, "remove-old-temp-files") {
+        return;
+    }
+    let days = settings.get::<u32>(PRIVACY, "old-files-age");
+    let changed_before = glib::real_time() / 1_000_000 - i64::from(days) * 24 * 60 * 60;
+    let _ = tokio::task::spawn_blocking(move || temp::purge(&temp::directories(), changed_before))
+        .await;
 }
 
 fn analyzer_path() -> PathBuf {

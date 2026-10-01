@@ -6,10 +6,10 @@ import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
 
-const BUS_NAME = 'org.gnome.SettingsDaemon.Color';
-const OBJECT_PATH = '/org/gnome/SettingsDaemon/Color';
+const BUS_NAME = 'com.lantharos.Settings.NightLight';
+const OBJECT_PATH = '/com/lantharos/Settings/NightLight';
 
-const ColorInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Color');
+const ColorInterface = loadInterfaceXML('com.lantharos.Settings.NightLight');
 const colorInfo = Gio.DBusInterfaceInfo.new_for_xml(ColorInterface);
 
 const NightLightToggle = GObject.registerClass(

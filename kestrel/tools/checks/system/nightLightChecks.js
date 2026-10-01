@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-const COLOR = 'org.gnome.SettingsDaemon.Color';
-const COLOR_PATH = '/org/gnome/SettingsDaemon/Color';
+const COLOR = 'com.lantharos.Settings.NightLight';
+const COLOR_PATH = '/com/lantharos/Settings/NightLight';
 const NEUTRAL = 6500;
 const WARM = 3000;
 const SETTLE_MS = 8000;

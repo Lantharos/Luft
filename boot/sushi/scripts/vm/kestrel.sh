@@ -35,7 +35,7 @@ packages="$(echo "$libraries" | xargs rpm -qf --qf '%{NAME}\n' | sort -u)"
 podman run --rm --security-opt label=disable -v "$tree:/installroot" "registry.fedoraproject.org/fedora:45" \
   dnf install -y -q --releasever=45 --installroot=/installroot --use-host-config --setopt=install_weak_deps=False --nodocs \
   $packages libadwaita gcr gnome-desktop4 gnome-bluetooth-libs glycin-libs NetworkManager-libnm libnma-gtk4 polkit-libs \
-  librsvg2 libsoup3 upower-libs gstreamer1 ibus-libs geoclue2-libs libgudev at-spi2-core gnome-settings-daemon python3-gobject
+  librsvg2 libsoup3 upower-libs gstreamer1 ibus-libs geoclue2-libs libgudev at-spi2-core python3-gobject
 
 stage="$build/system"
 rm -rf "$stage"

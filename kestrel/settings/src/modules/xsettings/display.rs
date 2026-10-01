@@ -89,6 +89,10 @@ impl Display {
         })
     }
 
+    pub fn merge_resources(&self, resources: &[(String, String)]) -> Result<(), Failure> {
+        self.write_resources(resources)
+    }
+
     pub fn apply(&mut self, snapshot: &Snapshot) -> Result<(), Failure> {
         if self.table.update(&snapshot.values) {
             let encoded = self.table.encode();
@@ -108,7 +112,7 @@ impl Display {
         Ok(())
     }
 
-    fn write_resources(&self, resources: &[(&str, String)]) -> Result<(), Failure> {
+    fn write_resources(&self, resources: &[(impl AsRef<str>, String)]) -> Result<(), Failure> {
         let current = self
             .connection
             .get_property(
@@ -124,14 +128,14 @@ impl Display {
             .lines()
             .filter(|line| {
                 let key = line.split(':').next().unwrap_or_default();
-                !resources.iter().any(|(name, _)| *name == key)
+                !resources.iter().any(|(name, _)| name.as_ref() == key)
             })
             .map(str::to_owned)
             .collect();
         lines.extend(
             resources
                 .iter()
-                .map(|(name, value)| format!("{name}:\t{value}")),
+                .map(|(name, value)| format!("{}:\t{value}", name.as_ref())),
         );
         let text = lines.join("\n") + "\n";
         self.connection.change_property8(

@@ -6,8 +6,8 @@ use zbus::{Connection, fdo, interface};
 
 use super::proxies::KbdBacklightProxy;
 
-pub const NAME: &str = "org.gnome.SettingsDaemon.Power";
-pub const PATH: &str = "/org/gnome/SettingsDaemon/Power";
+pub const NAME: &str = "com.lantharos.Settings.KeyboardLight";
+pub const PATH: &str = "/com/lantharos/Settings/KeyboardLight";
 
 pub enum IdleChange {
     Dim(i32),
@@ -151,7 +151,7 @@ impl Keyboard {
     }
 }
 
-#[interface(name = "org.gnome.SettingsDaemon.Power.Keyboard")]
+#[interface(name = "com.lantharos.Settings.KeyboardLight")]
 impl Keyboard {
     #[zbus(property)]
     async fn brightness(&self) -> i32 {

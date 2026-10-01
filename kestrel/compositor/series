@@ -6,3 +6,4 @@
 0006-clutter-release-input-method-focus-when-a-focused-te.patch
 0007-backends-let-cursor-implementations-decline-a-cursor.patch
 0008-native-remove-cursor-framebuffers-instead-of-closing.patch
+0009-backends-follow-Kestrel-s-settings-service-instead-o.patch

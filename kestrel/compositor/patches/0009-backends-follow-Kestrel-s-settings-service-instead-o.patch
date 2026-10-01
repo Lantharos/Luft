@@ -1,0 +1,528 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 1 Oct 2026 07:13:28 +0200
+Subject: [PATCH 9/9] backends: follow Kestrel's settings service instead of
+ GNOME's
+
+Read the touchscreen rotation lock from com.lantharos.kestrel.touchscreen
+and the night light color temperature from
+com.lantharos.Settings.NightLight, so Mutter no longer needs any of
+gnome-settings-daemon's schemas or services. The brightness profile
+request to org.gnome.SettingsDaemon.Power.Screen is removed along with
+the unused optional build dependency, since nothing provides that
+interface anymore.
+---
+ .../com.lantharos.Settings.NightLight.xml     |   5 +
+ .../org.gnome.SettingsDaemon.Color.xml        |   7 --
+ .../org.gnome.SettingsDaemon.Power.Screen.xml |   5 -
+ meson.build                                   |   1 -
+ src/backends/meta-color-device.c              |  16 ---
+ src/backends/meta-color-manager.c             | 107 ++++--------------
+ src/backends/meta-color-manager.h             |   3 -
+ src/backends/meta-color-profile.c             |  13 ---
+ src/backends/meta-color-profile.h             |   4 -
+ src/backends/meta-orientation-manager.c       |   2 +-
+ src/meson.build                               |  12 +-
+ src/tests/color-management-tests.c            |  18 +--
+ .../{gsd-color.py => night-light.py}          |   6 +-
+ src/tests/mutter_dbusrunner.py                |   2 +-
+ 14 files changed, 45 insertions(+), 156 deletions(-)
+ create mode 100644 data/dbus-interfaces/com.lantharos.Settings.NightLight.xml
+ delete mode 100644 data/dbus-interfaces/org.gnome.SettingsDaemon.Color.xml
+ delete mode 100644 data/dbus-interfaces/org.gnome.SettingsDaemon.Power.Screen.xml
+ rename src/tests/dbusmock-templates/{gsd-color.py => night-light.py} (90%)
+
+diff --git a/data/dbus-interfaces/com.lantharos.Settings.NightLight.xml b/data/dbus-interfaces/com.lantharos.Settings.NightLight.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..11d6fbb47580ba360c0fd4eb71ab3da115b2166f
+--- /dev/null
++++ b/data/dbus-interfaces/com.lantharos.Settings.NightLight.xml
+@@ -0,0 +1,5 @@
++<node>
++  <interface name="com.lantharos.Settings.NightLight">
++    <property name="Temperature" type="u" access="read"/>
++  </interface>
++</node>
+diff --git a/data/dbus-interfaces/org.gnome.SettingsDaemon.Color.xml b/data/dbus-interfaces/org.gnome.SettingsDaemon.Color.xml
+deleted file mode 100644
+index ead0096b8b6aeaae9471880a6b17d0c5f49eacc6..0000000000000000000000000000000000000000
+--- a/data/dbus-interfaces/org.gnome.SettingsDaemon.Color.xml
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<node>
+-  <interface name="org.gnome.SettingsDaemon.Color">
+-    <property name="DisabledUntilTomorrow" type="b" access="readwrite"/>
+-    <property name="NightLightActive" type="b" access="read"/>
+-    <property name="Temperature" type="u" access="readwrite"/>
+-  </interface>
+-</node>
+diff --git a/data/dbus-interfaces/org.gnome.SettingsDaemon.Power.Screen.xml b/data/dbus-interfaces/org.gnome.SettingsDaemon.Power.Screen.xml
+deleted file mode 100644
+index 05e4b8dc01556e13f2fd37f05ad7b7fb0a70e375..0000000000000000000000000000000000000000
+--- a/data/dbus-interfaces/org.gnome.SettingsDaemon.Power.Screen.xml
++++ /dev/null
+@@ -1,5 +0,0 @@
+-<node>
+-  <interface name="org.gnome.SettingsDaemon.Power.Screen">
+-    <property name="Brightness" type="i" access="readwrite"/>
+-  </interface>
+-</node>
+diff --git a/meson.build b/meson.build
+index eb63333e8242b0e80fb7e83386d4e2d0feafcab6..09b04d7eea54d8c345b8e43f6e28e0a2057190fd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -127,7 +127,6 @@ gthread_dep = dependency('gobject-2.0', version: glib_req)
+ gtk4_dep = dependency('gtk4', version: gtk4_req, required: false)
+ libadwaita_dep = dependency('libadwaita-1', required: false)
+ gmodule_no_export_dep = dependency('gmodule-no-export-2.0', version: glib_req)
+-gnome_settings_daemon_dep = dependency('gnome-settings-daemon', required: false)
+ xkbcommon_dep = dependency('xkbcommon', version: xkbcommon_req)
+ xkbregistry_dep = dependency('xkbregistry')
+ atk_dep = dependency('atk', version: atk_req)
+diff --git a/src/backends/meta-color-device.c b/src/backends/meta-color-device.c
+index 2006fddcdb3ac29ec514477da24b46bc9a8f73fd..d929a0d11a0fc40dae768693161b753e04984ba9 100644
+--- a/src/backends/meta-color-device.c
++++ b/src/backends/meta-color-device.c
+@@ -1526,22 +1526,6 @@ update_white_point (MetaColorDevice *color_device)
+                             : "(none)",
+               temperature);
+ 
+-  if (color_profile && meta_monitor_is_builtin (monitor))
+-    {
+-      const char *brightness_profile;
+-
+-      brightness_profile =
+-        meta_color_profile_get_brightness_profile (color_profile);
+-      if (brightness_profile)
+-        {
+-          meta_topic (META_DEBUG_COLOR,
+-                      "Setting brightness to %s%% from brightness profile",
+-                      brightness_profile);
+-          meta_color_manager_set_brightness (color_manager,
+-                                             atoi (brightness_profile));
+-        }
+-    }
+-
+   lut_size = meta_monitor_get_gamma_lut_size (monitor);
+   if (lut_size > 0)
+     {
+diff --git a/src/backends/meta-color-manager.c b/src/backends/meta-color-manager.c
+index 6962ce0aac720e367846c947327baf55c268b8cd..d941e0ed8ab1cec42a17e5bdf302ef35e642c564 100644
+--- a/src/backends/meta-color-manager.c
++++ b/src/backends/meta-color-manager.c
+@@ -56,8 +56,7 @@
+ #include "backends/meta-monitor-private.h"
+ 
+ #include "meta-dbus-color-manager.h"
+-#include "meta-dbus-gsd-color.h"
+-#include "meta-dbus-gsd-power-screen.h"
++#include "meta-dbus-night-light.h"
+ 
+ #define DEFAULT_TEMPERATURE 6500 /* Kelvin */
+ 
+@@ -96,8 +95,7 @@ typedef struct _MetaColorManagerPrivate
+ 
+   GHashTable *devices;
+ 
+-  MetaDBusSettingsDaemonColor *gsd_color;
+-  MetaDBusSettingsDaemonPowerScreen *gsd_power_screen;
++  MetaDBusSettingsNightLight *night_light;
+ 
+   gboolean is_ready;
+ 
+@@ -313,13 +311,13 @@ update_temperature (MetaColorManager *color_manager)
+     meta_color_manager_get_instance_private (color_manager);
+   unsigned int temperature;
+ 
+-  temperature = meta_dbus_settings_daemon_color_get_temperature (priv->gsd_color);
++  temperature = meta_dbus_settings_night_light_get_temperature (priv->night_light);
+   if (temperature == 0 || priv->temperature == temperature)
+     return;
+ 
+   if (temperature < 1000 || temperature > 10000)
+     {
+-      g_warning ("Invalid temperature from gsd-color: %u K", temperature);
++      g_warning ("Invalid night light temperature: %u K", temperature);
+       return;
+     }
+ 
+@@ -329,76 +327,46 @@ update_temperature (MetaColorManager *color_manager)
+ }
+ 
+ static void
+-on_temperature_changed (MetaDBusSettingsDaemonColor *gsd_color,
+-                        GParamSpec                  *pspec,
+-                        MetaColorManager            *color_manager)
++on_temperature_changed (MetaDBusSettingsNightLight *night_light,
++                        GParamSpec                 *pspec,
++                        MetaColorManager           *color_manager)
+ {
+   update_temperature (color_manager);
+ }
+ 
+ static void
+-on_gsd_color_ready (GObject      *source_object,
+-                    GAsyncResult *res,
+-                    gpointer      user_data)
++on_night_light_ready (GObject      *source_object,
++                      GAsyncResult *res,
++                      gpointer      user_data)
+ {
+   MetaColorManager *color_manager = META_COLOR_MANAGER (user_data);
+   MetaColorManagerPrivate *priv =
+     meta_color_manager_get_instance_private (color_manager);
+-  MetaDBusSettingsDaemonColor *gsd_color;
++  MetaDBusSettingsNightLight *night_light;
+   g_autoptr (GError) error = NULL;
+ 
+-  gsd_color =
+-    meta_dbus_settings_daemon_color_proxy_new_for_bus_finish (res, &error);
+-  if (!gsd_color)
++  night_light =
++    meta_dbus_settings_night_light_proxy_new_for_bus_finish (res, &error);
++  if (!night_light)
+     {
+       if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+         return;
+ 
+-      g_warning ("Failed to create gsd-color D-Bus proxy: %s", error->message);
++      g_warning ("Failed to create night light D-Bus proxy: %s", error->message);
+       return;
+     }
+ 
+   meta_topic (META_DEBUG_COLOR,
+-              "Connection to org.gnome.SettingsDaemon.Color established");
+-  priv->gsd_color = gsd_color;
++              "Connection to com.lantharos.Settings.NightLight established");
++  priv->night_light = night_light;
+ 
+-  g_signal_connect (gsd_color, "notify::temperature",
++  g_signal_connect (night_light, "notify::temperature",
+                     G_CALLBACK (on_temperature_changed),
+                     color_manager);
+ 
+   update_temperature (color_manager);
+ }
+ 
+-static void
+-on_gsd_power_screen_ready (GObject      *source_object,
+-                           GAsyncResult *res,
+-                           gpointer      user_data)
+-{
+-  MetaColorManager *color_manager = META_COLOR_MANAGER (user_data);
+-  MetaColorManagerPrivate *priv =
+-    meta_color_manager_get_instance_private (color_manager);
+-  MetaDBusSettingsDaemonPowerScreen *gsd_power_screen;
+-  g_autoptr (GError) error = NULL;
+-
+-  gsd_power_screen =
+-    meta_dbus_settings_daemon_power_screen_proxy_new_for_bus_finish (res,
+-                                                                     &error);
+-  if (!gsd_power_screen)
+-    {
+-      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+-        return;
+-
+-      g_warning ("Failed to create gsd-power-screen D-Bus proxy: %s", error->message);
+-      return;
+-    }
+-
+-  meta_topic (META_DEBUG_COLOR,
+-              "Connection to org.gnome.SettingsDaemon.PowerScreen established");
+-  priv->gsd_power_screen = gsd_power_screen;
+-
+-  update_device_properties (color_manager);
+-}
+-
+ static gboolean
+ handle_calibrate_monitor (MetaDBusColorManager  *api,
+                           GDBusMethodInvocation *invocation,
+@@ -469,22 +437,13 @@ meta_color_manager_constructed (GObject *object)
+   cd_client_connect (priv->cd_client, priv->cancellable, cd_client_connect_cb,
+                      color_manager);
+ 
+-  meta_dbus_settings_daemon_color_proxy_new_for_bus (
++  meta_dbus_settings_night_light_proxy_new_for_bus (
+     G_BUS_TYPE_SESSION,
+     G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
+-    "org.gnome.SettingsDaemon.Color",
+-    "/org/gnome/SettingsDaemon/Color",
++    "com.lantharos.Settings.NightLight",
++    "/com/lantharos/Settings/NightLight",
+     priv->cancellable,
+-    on_gsd_color_ready,
+-    color_manager);
+-
+-  meta_dbus_settings_daemon_power_screen_proxy_new_for_bus (
+-    G_BUS_TYPE_SESSION,
+-    G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
+-    "org.gnome.SettingsDaemon.Power.Screen",
+-    "/org/gnome/SettingsDaemon/Power",
+-    priv->cancellable,
+-    on_gsd_power_screen_ready,
++    on_night_light_ready,
+     color_manager);
+ 
+   update_devices (color_manager);
+@@ -512,8 +471,7 @@ meta_color_manager_dispose (GObject *object)
+   g_cancellable_cancel (priv->cancellable);
+   g_clear_object (&priv->cancellable);
+   g_clear_pointer (&priv->devices, g_hash_table_unref);
+-  g_clear_object (&priv->gsd_power_screen);
+-  g_clear_object (&priv->gsd_color);
++  g_clear_object (&priv->night_light);
+   g_clear_object (&priv->color_store);
+   g_clear_pointer (&priv->lcms_context, cmsDeleteContext);
+   g_clear_object (&priv->session_manager);
+@@ -685,25 +643,6 @@ meta_color_manager_get_temperature (MetaColorManager *color_manager)
+   return priv->temperature;
+ }
+ 
+-void
+-meta_color_manager_set_brightness (MetaColorManager *color_manager,
+-                                   int               brightness)
+-{
+-  MetaColorManagerPrivate *priv =
+-    meta_color_manager_get_instance_private (color_manager);
+-
+-  if (!priv->gsd_power_screen)
+-    {
+-      meta_topic (META_DEBUG_COLOR,
+-                  "No org.gnome.SettingsDaemon.Power.Screen service available, "
+-                  "not setting brightness");
+-      return;
+-    }
+-
+-  meta_dbus_settings_daemon_power_screen_set_brightness (priv->gsd_power_screen,
+-                                                         brightness);
+-}
+-
+ unsigned int
+ meta_color_manager_get_default_temperature (MetaColorManager *color_manager)
+ {
+diff --git a/src/backends/meta-color-manager.h b/src/backends/meta-color-manager.h
+index bd90826a206079ff11dff390a43a32189a4a5be5..7df95b3e86aa3b237183d387ff63a7b0cf8dfc3e 100644
+--- a/src/backends/meta-color-manager.h
++++ b/src/backends/meta-color-manager.h
+@@ -35,7 +35,4 @@ META_EXPORT_TEST
+ MetaColorDevice * meta_color_manager_get_color_device (MetaColorManager *color_manager,
+                                                        MetaMonitor      *monitor);
+ 
+-void meta_color_manager_set_brightness (MetaColorManager *color_manager,
+-                                        int               brightness);
+-
+ unsigned int meta_color_manager_get_default_temperature (MetaColorManager *color_manager);
+diff --git a/src/backends/meta-color-profile.c b/src/backends/meta-color-profile.c
+index 0d94463584ba70a7a502fbc2d0c9161c146999b6..e8f03eaa3a505e9df981476a913ed39ebca0edb0 100644
+--- a/src/backends/meta-color-profile.c
++++ b/src/backends/meta-color-profile.c
+@@ -379,12 +379,6 @@ meta_color_profile_get_file_path (MetaColorProfile *color_profile)
+                                    CD_PROFILE_PROPERTY_FILENAME);
+ }
+ 
+-const char *
+-meta_color_profile_get_brightness_profile (MetaColorProfile *color_profile)
+-{
+-  return color_profile->calibration->brightness_profile;
+-}
+-
+ static void
+ set_blackbody_color_for_temperature (CdColorRGB   *blackbody_color,
+                                      unsigned int  temperature)
+@@ -530,7 +524,6 @@ meta_color_calibration_new (CdIcc          *cd_icc,
+   MetaColorCalibration *color_calibration;
+   cmsHPROFILE lcms_profile;
+   const cmsToneCurve **vcgt;
+-  const char *brightness_profile;
+ 
+   color_calibration = g_new0 (MetaColorCalibration, 1);
+ 
+@@ -544,11 +537,6 @@ meta_color_calibration_new (CdIcc          *cd_icc,
+       color_calibration->vcgt[2] = cmsDupToneCurve (vcgt[2]);
+     }
+ 
+-  brightness_profile =
+-    cd_icc_get_metadata_item (cd_icc, CD_PROFILE_METADATA_SCREEN_BRIGHTNESS);
+-  if (brightness_profile)
+-    color_calibration->brightness_profile = g_strdup (brightness_profile);
+-
+   if (adaptation_matrix)
+     {
+       color_calibration->has_adaptation_matrix = TRUE;
+@@ -562,6 +550,5 @@ void
+ meta_color_calibration_free (MetaColorCalibration *color_calibration)
+ {
+   cmsFreeToneCurveTriple (color_calibration->vcgt);
+-  g_free (color_calibration->brightness_profile);
+   g_free (color_calibration);
+ }
+diff --git a/src/backends/meta-color-profile.h b/src/backends/meta-color-profile.h
+index cd68b2f9edc6c70c85283583ce00bf4f63b572a5..b3f137fb5fb1eeb9dcc3d6fb8d5bbb66e3a1ac7c 100644
+--- a/src/backends/meta-color-profile.h
++++ b/src/backends/meta-color-profile.h
+@@ -32,8 +32,6 @@ typedef struct _MetaColorCalibration
+ 
+   gboolean has_adaptation_matrix;
+   CdMat3x3 adaptation_matrix;
+-
+-  char *brightness_profile;
+ } MetaColorCalibration;
+ 
+ #define META_TYPE_COLOR_PROFILE (meta_color_profile_get_type ())
+@@ -65,8 +63,6 @@ const char * meta_color_profile_get_id (MetaColorProfile *color_profile);
+ META_EXPORT_TEST
+ const char * meta_color_profile_get_file_path (MetaColorProfile *color_profile);
+ 
+-const char * meta_color_profile_get_brightness_profile (MetaColorProfile *color_profile);
+-
+ MetaGammaLut * meta_color_profile_generate_gamma_lut (MetaColorProfile *color_profile,
+                                                       unsigned int      temperature,
+                                                       size_t            lut_size);
+diff --git a/src/backends/meta-orientation-manager.c b/src/backends/meta-orientation-manager.c
+index 5ca61e0f936f102b135a561b4841f465096a2973..6b4730bb72081aad2f5eb826bb452947c23ffe27 100644
+--- a/src/backends/meta-orientation-manager.c
++++ b/src/backends/meta-orientation-manager.c
+@@ -77,7 +77,7 @@ struct _MetaOrientationManager
+ 
+ G_DEFINE_TYPE (MetaOrientationManager, meta_orientation_manager, G_TYPE_OBJECT)
+ 
+-#define CONF_SCHEMA "org.gnome.settings-daemon.peripherals.touchscreen"
++#define CONF_SCHEMA "com.lantharos.kestrel.touchscreen"
+ #define ORIENTATION_LOCK_KEY "orientation-lock"
+ 
+ MtkMonitorTransform
+diff --git a/src/meson.build b/src/meson.build
+index 00b8572753151a4c2a57393a1de67854ad9d2199..ec55803f10cd13cac6d8619aaeadd5eda7d1ef59 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -24,7 +24,6 @@ mutter_pkg_private_deps = [
+   colord_dep,
+   lcms2_dep,
+   gmodule_no_export_dep,
+-  gnome_settings_daemon_dep,
+   xkbcommon_dep,
+   xkbregistry_dep,
+   libeis_dep,
+@@ -960,14 +959,9 @@ dbus_interfaces += [
+     'prefix': 'org.freedesktop.',
+   },
+   {
+-    'name': 'meta-dbus-gsd-color',
+-    'interface': 'org.gnome.SettingsDaemon.Color.xml',
+-    'prefix': 'org.gnome.',
+-  },
+-  {
+-    'name': 'meta-dbus-gsd-power-screen',
+-    'interface': 'org.gnome.SettingsDaemon.Power.Screen.xml',
+-    'prefix': 'org.gnome.',
++    'name': 'meta-dbus-night-light',
++    'interface': 'com.lantharos.Settings.NightLight.xml',
++    'prefix': 'com.lantharos.',
+   },
+ ]
+ 
+diff --git a/src/tests/color-management-tests.c b/src/tests/color-management-tests.c
+index 79683021292852d820b1bbc415e8df83dc943a79..2c55a59134bada3668f13ff4abb001df52766a43 100644
+--- a/src/tests/color-management-tests.c
++++ b/src/tests/color-management-tests.c
+@@ -287,7 +287,7 @@ add_colord_system_profile (const char *cd_profile_id,
+ }
+ 
+ static GDBusProxy *
+-get_gsd_color_mock_proxy (void)
++get_night_light_mock_proxy (void)
+ {
+   GDBusProxy *proxy;
+   g_autoptr (GError) error = NULL;
+@@ -297,13 +297,13 @@ get_gsd_color_mock_proxy (void)
+                                    G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
+                                    G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                    NULL,
+-                                   "org.gnome.SettingsDaemon.Color",
+-                                   "/org/gnome/SettingsDaemon/Color",
++                                   "com.lantharos.Settings.NightLight",
++                                   "/com/lantharos/Settings/NightLight",
+                                    "org.freedesktop.DBus.Mock",
+                                    NULL, &error);
+   if (!proxy)
+     {
+-      g_error ("Failed to find mocked gsd-color service, %s",
++      g_error ("Failed to find mocked night light service, %s",
+                error->message);
+     }
+ 
+@@ -318,7 +318,7 @@ set_night_light_temperature (unsigned int temperature)
+   GVariantBuilder params_builder;
+   g_autoptr (GVariant) result = NULL;
+ 
+-  proxy = get_gsd_color_mock_proxy ();
++  proxy = get_night_light_mock_proxy ();
+ 
+   g_variant_builder_init (&params_builder, G_VARIANT_TYPE ("(u)"));
+   g_variant_builder_add (&params_builder, "u", temperature);
+@@ -329,7 +329,7 @@ set_night_light_temperature (unsigned int temperature)
+                                    G_DBUS_CALL_FLAGS_NO_AUTO_START, -1, NULL,
+                                    &error);
+   if (!result)
+-    g_error ("Failed to set gsd-color temperature devices: %s", error->message);
++    g_error ("Failed to set night light temperature: %s", error->message);
+ }
+ 
+ static void
+@@ -340,7 +340,7 @@ set_night_light_active (gboolean active)
+   GVariantBuilder params_builder;
+   g_autoptr (GVariant) result = NULL;
+ 
+-  proxy = get_gsd_color_mock_proxy ();
++  proxy = get_night_light_mock_proxy ();
+ 
+   g_variant_builder_init (&params_builder, G_VARIANT_TYPE ("(b)"));
+   g_variant_builder_add (&params_builder, "b", active);
+@@ -1567,8 +1567,8 @@ assert_gamma_lut_scales (MetaCrtcTest *crtc_test,
+  * carried over between tests. Every test below picks temperatures no other
+  * test leaves behind, so each change reliably triggers an update.
+  *
+- * Note that only the Temperature property is followed: gsd-color reports the
+- * default temperature when Night Light is inactive.
++ * Note that only the Temperature property is followed: the night light
++ * service reports the default temperature when Night Light is inactive.
+  */
+ static gboolean
+ on_calibration_wait_timeout (gpointer user_data)
+diff --git a/src/tests/dbusmock-templates/gsd-color.py b/src/tests/dbusmock-templates/night-light.py
+similarity index 90%
+rename from src/tests/dbusmock-templates/gsd-color.py
+rename to src/tests/dbusmock-templates/night-light.py
+index 953e206015b61dbf37083f0e0af54bf68dd0e254..c8565ddc7c16d4e9d37d07e2a88458037bf8ae76 100644
+--- a/src/tests/dbusmock-templates/gsd-color.py
++++ b/src/tests/dbusmock-templates/night-light.py
+@@ -1,4 +1,4 @@
+-'''gsd-color proxy mock template
++'''Night light mock template
+ '''
+ 
+ # This program is free software; you can redistribute it and/or modify it under
+@@ -15,8 +15,8 @@ import os
+ from dbusmock import MOCK_IFACE
+ 
+ 
+-BUS_NAME = 'org.gnome.SettingsDaemon.Color'
+-MAIN_OBJ = '/org/gnome/SettingsDaemon/Color'
++BUS_NAME = 'com.lantharos.Settings.NightLight'
++MAIN_OBJ = '/com/lantharos/Settings/NightLight'
+ MAIN_IFACE = BUS_NAME
+ SYSTEM_BUS = False
+ 
+diff --git a/src/tests/mutter_dbusrunner.py b/src/tests/mutter_dbusrunner.py
+index c4ac095920d79601b6679b59441a197a525300fc..2cd36894a9d3476df6831c94e6a5f43cd18300d7 100644
+--- a/src/tests/mutter_dbusrunner.py
++++ b/src/tests/mutter_dbusrunner.py
+@@ -77,7 +77,7 @@ class MutterDBusRunner(DBusTestCase):
+ 
+         klass.start_from_local_template('localed')
+         klass.start_from_local_template('colord')
+-        klass.start_from_local_template('gsd-color')
++        klass.start_from_local_template('night-light')
+         klass.start_from_local_template('rtkit')
+         klass.start_from_local_template('screensaver')
+         klass.start_from_local_template('logind', {

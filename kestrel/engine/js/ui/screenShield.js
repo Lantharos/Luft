@@ -37,14 +37,6 @@ const MANUAL_FADE_TIME = 300;
 const CURTAIN_SLIDE_TIME = 300;
 const SHIELD_ANIMATION_TIME = 250;
 
-/**
- * If you are setting org.gnome.desktop.session.idle-delay directly in dconf,
- * rather than through System Settings, you also need to set
- * org.gnome.settings-daemon.plugins.power.sleep-display-ac and
- * org.gnome.settings-daemon.plugins.power.sleep-display-battery to the same value.
- * This will ensure that the screen blanks at the right time when it fades out.
- * https://bugzilla.gnome.org/show_bug.cgi?id=668703 explains the dependency.
- */
 export class ScreenShield extends Signals.EventEmitter {
     constructor() {
         super();
@@ -580,7 +572,7 @@ export class ScreenShield extends Signals.EventEmitter {
         // screen is effectively visible and the screen is locked, but
         // the DBus interface reports the screensaver is off.
         // This is because when we emit ActiveChanged(true),
-        // gnome-settings-daemon blanks the screen, and we don't want
+        // kestrel-settings blanks the screen, and we don't want
         // blank during the animation.
         // This is not a problem for the idle fade case, because we
         // activate without animation in that case.

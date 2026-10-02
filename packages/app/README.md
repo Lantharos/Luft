@@ -91,6 +91,10 @@ secrets::delete("account-token")?;
 
 `secrets::register(window)` adds `secrets_store({name, value})`, `secrets_load({name})` and `secrets_delete({name})` bridge commands for text secrets, for apps whose page handles sign-in itself.
 
+## Fonts
+
+With the `fonts` feature, `fonts::installed()` lists every font face fontconfig knows about, with its family, style, PostScript name, face index and file. `fonts::user_folder()` is the user's own fonts folder, `~/.local/share/fonts`, and `fonts::belongs_to_user` tells whether a font file lives there or in `~/.fonts`. After adding files to the folder, `fonts::refresh()` rebuilds its fontconfig cache so other apps see them. `fonts::remove` moves font files to the trash and refreshes the cache, and refuses anything outside the user's own font folders.
+
 ## Thumbnails
 
 With the `thumbnails` feature, `thumbnails::Thumbnails` makes thumbnails for files in the shared freedesktop thumbnail cache, so other apps reuse them and the other way round. Common image formats are decoded in process; everything else goes through the thumbnailers installed on the system, such as those for videos, PDFs and fonts. Work runs on a few low priority threads, and each request replaces the previous one, so asking for the files currently on screen keeps the queue short while scrolling:

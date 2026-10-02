@@ -3,6 +3,8 @@ pub mod apps;
 mod bridge;
 pub mod dbus;
 mod events;
+#[cfg(feature = "fonts")]
+pub mod fonts;
 mod kestrel;
 pub mod portal;
 pub mod secrets;

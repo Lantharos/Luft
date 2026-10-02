@@ -10,6 +10,8 @@ introspection_common = {
   'fatal_warnings': get_option('werror'),
 }
 
+install_rpath = ':'.join([mutter_dep.get_variable('libdir'), mutter_typelibdir, pkglibdir])
+
 subdir('hotplug-sniffer')
 subdir('st')
 subdir('authenticate')
@@ -47,8 +49,6 @@ gnome_shell_cflags = [
   '-DGNOME_SHELL_DATADIR="@0@"'.format(pkgdatadir),
   '-DGNOME_SHELL_PKGLIBDIR="@0@"'.format(pkglibdir)
 ]
-
-install_rpath = ':'.join([mutter_dep.get_variable('libdir'), mutter_typelibdir, pkglibdir])
 
 gnome_shell_deps = [
   gio_unix_dep,

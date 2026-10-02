@@ -64,6 +64,8 @@ impl Transfer {
 }
 
 fn agree(peer: &[u8]) -> Result<(Transfer, Vec<u8>), Unsupported> {
+    let significant = peer.iter().position(|&byte| byte != 0).unwrap_or(peer.len());
+    let peer = &peer[significant..];
     if peer.is_empty() || peer.len() > GROUP_BYTES {
         return Err(Unsupported);
     }

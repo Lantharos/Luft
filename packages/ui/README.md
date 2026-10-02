@@ -100,6 +100,8 @@ For native video, `canPlayNatively()` says whether the window can use it and `de
 
 `button` (with `primary`, `danger` and `large`), `plain-button`, `icon-button` (with `large`), `text-field`, `window-control`, `row-group`, `drag-region`, `soft-scroll`, `hidden-scroll` and `scroll-fade` are available globally for markup that doesn't need a component. `scroll-fade` fades a vertical scroller's top edge once it has scrolled away from the top and its bottom edge while there is more below; every sidebar list uses it.
 
+The `topLayer` attachment puts an element in the browser's top layer, above everything else in the window, for overlays that aren't built from `Dialog` or `Popover`.
+
 The `tooltip(text)` attachment shows a small label under an element after a short hover, and right away when moving between elements that have one:
 
 ```svelte

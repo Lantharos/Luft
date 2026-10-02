@@ -297,8 +297,24 @@ impl Session {
         }
     }
 
+    fn passed(&mut self, input: Input) {
+        match input {
+            Input::Text(character) => {
+                remember(&mut self.before, character.encode_utf8(&mut [0; 4]))
+            }
+            Input::Space => remember(&mut self.before, " "),
+            Input::BackSpace => {
+                self.before.pop();
+            }
+            _ => self.before.clear(),
+        }
+    }
+
     pub fn feed(&mut self, engine: &Engine, learned: &mut Learned, input: Input) -> Response {
         let handled = self.handle(engine, learned, input);
+        if !handled {
+            self.passed(input);
+        }
         Response {
             handled,
             commit: std::mem::take(&mut self.committed),

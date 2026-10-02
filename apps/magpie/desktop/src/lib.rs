@@ -3,6 +3,7 @@ mod bridge;
 mod cache;
 mod events;
 mod folder;
+mod font;
 mod launch;
 mod media;
 mod mpris;

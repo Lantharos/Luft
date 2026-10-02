@@ -2,6 +2,7 @@
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import type { Item } from '$lib/api';
+	import FontSample from '$lib/font/FontSample.svelte';
 	import { library } from '$lib/library/library.svelte';
 	import { thumbnails } from '$lib/library/thumbnails.svelte';
 
@@ -32,6 +33,8 @@
 		>
 			{#if thumbnail}
 				<img src={thumbnail} alt="" draggable="false" decoding="async" />
+			{:else if item.kind === 'font'}
+				<span class="grid h-full place-items-center"><FontSample path={item.path} /></span>
 			{/if}
 			{#if item.kind === 'video'}
 				<span class="video"><Play size={12} fill="currentColor" /></span>

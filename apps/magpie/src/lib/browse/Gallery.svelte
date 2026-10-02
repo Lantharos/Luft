@@ -5,6 +5,7 @@
 	import Music from '@lucide/svelte/icons/music';
 	import Play from '@lucide/svelte/icons/play';
 	import type { Folder as FolderEntry, Item } from '$lib/api';
+	import FontSample from '$lib/font/FontSample.svelte';
 	import { library } from '$lib/library/library.svelte';
 	import { thumbnails } from '$lib/library/thumbnails.svelte';
 
@@ -40,6 +41,8 @@
 							<Music size={36} strokeWidth={1.5} />
 						{:else if entry.item.kind === 'document'}
 							<FileText size={36} strokeWidth={1.5} />
+						{:else if entry.item.kind === 'font'}
+							<FontSample path={entry.item.path} />
 						{/if}
 						{#if entry.item.kind === 'video'}
 							<span class="video"><Play size={12} fill="currentColor" /></span>

@@ -1,7 +1,7 @@
 import { call, on } from './bridge';
 import type { Appearance } from '@luft/ui';
 
-export type Kind = 'image' | 'video' | 'audio' | 'document';
+export type Kind = 'image' | 'video' | 'audio' | 'document' | 'font';
 
 export interface Item {
 	path: string;
@@ -126,6 +126,47 @@ export type MediaAction =
 	| { action: 'shuffle'; value: boolean }
 	| { action: 'repeat'; value: Repeat };
 
+export interface FontAxis {
+	tag: string;
+	name: string;
+	min: number;
+	default: number;
+	max: number;
+}
+
+export interface FontInstance {
+	name: string;
+	coordinates: [string, number][];
+}
+
+export interface FontFace {
+	index: number;
+	family: string;
+	style: string;
+	postscript: string | null;
+	fullName: string | null;
+	weight: number;
+	italic: boolean;
+	version: string | null;
+	designer: string | null;
+	manufacturer: string | null;
+	license: string | null;
+	licenseUrl: string | null;
+	copyright: string | null;
+	sample: string | null;
+	glyphs: number;
+	characters: [number, number][];
+	axes: FontAxis[];
+	instances: FontInstance[];
+}
+
+export interface FontFile {
+	format: string;
+	faces: FontFace[];
+}
+
+export type FontStatus = 'missing' | 'system' | 'user';
+
 export interface Activation {
 	arguments: string[];
 	workingDirectory: string | null;
@@ -146,6 +187,12 @@ export const otherApps = (path: string) => call<App[]>('other_apps', { path });
 export const openWith = (path: string, app: string) => call<void>('open_with', { path, app });
 export const openUri = (uri: string) => call<void>('open_uri', { uri });
 export const showInFolder = (path: string) => call<void>('show_in_folder', { path });
+
+export const fontInfo = (path: string) => call<FontFile>('font_info', { path });
+export const fontSource = (path: string, index: number) => call<string>('font_source', { path, index });
+export const fontStatus = (path: string) => call<FontStatus>('font_status', { path });
+export const installFont = (path: string) => call<FontStatus>('font_install', { path });
+export const removeFont = (path: string) => call<FontStatus>('font_remove', { path });
 
 export const audioTags = (paths: string[]) => call<Tags[]>('audio_tags', { paths });
 export const videoInfo = (path: string) => call<VideoInfo>('video_info', { path });

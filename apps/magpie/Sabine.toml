@@ -3,7 +3,7 @@ id = "com.lantharos.magpie"
 name = "Magpie"
 generic_name = "Media Viewer"
 categories = ["AudioVideo", "Audio", "Video", "Player", "Graphics", "Viewer"]
-keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "media player", "loupe", "totem", "showtime", "evince", "papers", "vlc"]
+keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "fonts", "font viewer", "typeface", "media player", "loupe", "totem", "showtime", "evince", "papers", "vlc", "gnome-font-viewer"]
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
@@ -49,7 +49,15 @@ mime_types = [
 	"audio/x-m4a",
 	"audio/webm",
 	"audio/x-matroska",
-	"application/pdf"
+	"application/pdf",
+	"font/ttf",
+	"font/otf",
+	"font/collection",
+	"font/woff",
+	"font/woff2",
+	"application/x-font-ttf",
+	"application/x-font-otf",
+	"application/font-woff"
 ]
 
 [install]

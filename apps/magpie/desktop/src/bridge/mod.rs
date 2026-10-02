@@ -11,12 +11,13 @@ use crate::folder::{self, kinds};
 use crate::media::{tags, video};
 use crate::mpris::Playback;
 use crate::state::MagpieState;
-use crate::{apps, launch, photo};
+use crate::{apps, font, launch, photo};
 use params::*;
 
 pub fn register(window: SabineWindow, state: &MagpieState) -> SabineWindow {
     let window = register_app(window, state);
     let window = register_media(window, state);
+    let window = register_fonts(window);
     register_files(window, state)
 }
 
@@ -38,7 +39,7 @@ fn register_app(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         )
         .command("choose_file", |Empty {}| {
             let filter = Filter {
-                name: "Photos, videos, music and documents",
+                name: "Photos, videos, music, documents and fonts",
                 patterns: kinds::patterns(),
             };
             let chosen = portal::open_file("Open", filter)?;
@@ -106,4 +107,23 @@ fn register_media(window: SabineWindow, state: &MagpieState) -> SabineWindow {
             state.mpris.update(playback)
         })
         .with("media_clear", state, |state, Empty {}| state.mpris.clear())
+}
+
+fn register_fonts(window: SabineWindow) -> SabineWindow {
+    window
+        .command("font_info", |Path { path }| {
+            font::info(FilePath::new(&path))
+        })
+        .command("font_source", |FontFace { path, index }| {
+            font::source(FilePath::new(&path), index)
+        })
+        .command("font_status", |Path { path }| {
+            font::status(FilePath::new(&path))
+        })
+        .command("font_install", |Path { path }| {
+            font::install(FilePath::new(&path))
+        })
+        .command("font_remove", |Path { path }| {
+            font::remove(FilePath::new(&path))
+        })
 }

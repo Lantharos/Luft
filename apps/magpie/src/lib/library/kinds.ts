@@ -1,8 +1,8 @@
 import type { Item, Kind } from '$lib/api';
 
-export type Group = 'visual' | 'audio' | 'document';
+export type Group = 'visual' | 'audio' | 'document' | 'font';
 
-const GROUPS: Record<Kind, Group> = { image: 'visual', video: 'visual', audio: 'audio', document: 'document' };
+const GROUPS: Record<Kind, Group> = { image: 'visual', video: 'visual', audio: 'audio', document: 'document', font: 'font' };
 
 export function groupOf(kind: Kind): Group {
 	return GROUPS[kind];

@@ -85,6 +85,13 @@ function pdf(event: KeyboardEvent, primary: boolean) {
 	return true;
 }
 
+function font(event: KeyboardEvent) {
+	const { key } = event;
+	if (key !== 'ArrowRight' && key !== 'ArrowLeft') return false;
+	library.step(key === 'ArrowRight' ? 1 : -1);
+	return true;
+}
+
 export function handleKeydown(event: KeyboardEvent) {
 	if (event.defaultPrevented) return;
 	const primary = event.ctrlKey || event.metaKey;
@@ -94,6 +101,7 @@ export function handleKeydown(event: KeyboardEvent) {
 		common(event, primary) ||
 		(library.current?.kind === 'image' && photo(event, primary)) ||
 		(library.group === 'audio' && music(event, primary)) ||
-		(library.group === 'document' && pdf(event, primary));
+		(library.group === 'document' && pdf(event, primary)) ||
+		(library.group === 'font' && font(event));
 	if (handled) event.preventDefault();
 }

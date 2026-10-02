@@ -1,6 +1,6 @@
 # Magpie
 
-Magpie shows photos, videos, music and PDFs on the Luft desktop. It is built with Sabine and SvelteKit and lives at `apps/magpie` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
+Magpie shows photos, videos, music, PDFs and fonts on the Luft desktop. It is built with Sabine and SvelteKit and lives at `apps/magpie` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
 
 ## Two ways in
 
@@ -40,11 +40,20 @@ Opening another file while Magpie is running switches to it. Songs opened while 
 - PDFs with selectable text, links, search, zoom, fit width and fit page
 - Page thumbnails in the sidebar, or in a panel you can show when a PDF was opened directly
 
+## Fonts
+
+- TrueType, OpenType, font collections, WOFF and WOFF2 open directly
+- A large sample in the font, a sample text you can type into at any size, and the same text at several sizes below it
+- Every character the font covers, in a grid; click one to copy it
+- Family, style, weight, version, designer, maker, copyright and license, along with the file's format and size
+- Collections let you pick any of their faces, and variable fonts get a slider for each axis plus their named styles
+- Install puts the font in your fonts folder (`~/.local/share/fonts`) and makes it available to every app right away; WOFF and WOFF2 files are unpacked into regular font files on the way. Fonts that are already on the computer show as installed, and the ones in your own fonts folder can be removed again, which moves them to the trash
+
 ## Keyboard shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Left` / `Right` | Previous and next photo; seek in videos and music |
+| `Left` / `Right` | Previous and next photo or font; seek in videos and music |
 | `Page Up` / `Page Down` | Previous and next item |
 | `Ctrl+Left` / `Ctrl+Right` | Previous and next video or song |
 | `Space` | Play or pause |
@@ -83,7 +92,7 @@ Formats beyond what Chromium shows need the `glycin-loaders` package and `bwrap`
 sabine install .
 ```
 
-The desktop entry registers Magpie for the image, video, audio and PDF types it can show.
+The desktop entry registers Magpie for the image, video, audio, PDF and font types it can show.
 
 ## Project layout
 
@@ -95,6 +104,7 @@ magpie/
 │   │   ├── app/                window state, shortcuts and opening files
 │   │   ├── browse/             sidebar, places, folder gallery and thumbnail strip
 │   │   ├── document/           PDF viewer, search and page thumbnails
+│   │   ├── font/               font view, samples, characters, details and installing
 │   │   ├── library/            the open folder, navigation and thumbnails
 │   │   ├── music/              player, queue and music view
 │   │   ├── photo/              loading, WebGL drawing, zoom and gestures, details
@@ -105,6 +115,7 @@ magpie/
 ├── vite/                       PDF assets and the browser preview
 └── desktop/src/
     ├── folder/                 listing, kinds, places and folder watching
+    ├── font/                   font reading, collection faces and installing
     ├── media/                  tags, covers, video streams and subtitles
     ├── mpris/                  MPRIS player
     ├── photo/                  native decoding, metadata and wallpaper

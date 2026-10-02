@@ -2,7 +2,7 @@
 	import { Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import * as api from '$lib/api';
-	import type { AccountConfig, Discovery, Provider, Server } from '$lib/api';
+	import type { AccountConfig, Provider, Server } from '$lib/api';
 	import { mail } from '$lib/mail/mail.svelte';
 	import { toasts } from '$lib/shell/toasts.svelte';
 	import ServerFields from './ServerFields.svelte';
@@ -37,7 +37,11 @@
 		if (!VALID.test(email.trim())) return (error = 'Enter your full email address');
 		error = '';
 		busy = true;
-		const found: Discovery = await api.discover(email.trim()).finally(() => (busy = false));
+		const found = await api
+			.discover(email.trim())
+			.catch((failure: unknown) => ((error = failure instanceof Error ? failure.message : String(failure)), null))
+			.finally(() => (busy = false));
+		if (!found) return;
 		username = found.username || email.trim();
 		oauth = found.oauth;
 		if (found.jmap) {

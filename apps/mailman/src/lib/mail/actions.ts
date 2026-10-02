@@ -50,7 +50,8 @@ async function restore(moves: { id: number; mailbox: number }[]) {
 }
 
 export async function refreshAll() {
-	await Promise.all([list.load(), mail.refresh(), reader.refresh()]);
+	await mail.refresh();
+	await Promise.all([list.load(), reader.refresh()]);
 }
 
 export function move(kind: Mover, threads: number[]) {

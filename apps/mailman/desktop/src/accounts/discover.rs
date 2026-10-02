@@ -117,8 +117,17 @@ fn autoconfig(agent: &ureq::Agent, domain: &str, email: &str) -> Option<Discover
         ),
         format!("https://autoconfig.thunderbird.net/v1.1/{domain}"),
     ];
-    urls.iter()
-        .find_map(|url| fetch(agent, url).and_then(|xml| from_ispdb(&xml, email)))
+    std::thread::scope(|scope| {
+        let lookups: Vec<_> = urls
+            .iter()
+            .map(|url| {
+                scope.spawn(move || fetch(agent, url).and_then(|xml| from_ispdb(&xml, email)))
+            })
+            .collect();
+        lookups
+            .into_iter()
+            .find_map(|lookup| lookup.join().ok().flatten())
+    })
 }
 
 struct Dns {
@@ -221,6 +230,17 @@ fn from_srv(dns: &Dns, domain: &str, email: &str) -> Option<Discovery> {
     })
 }
 
+fn from_dns(agent: &ureq::Agent, domain: &str, email: &str) -> Option<Discovery> {
+    let dns = Dns::new()?;
+    if let Some(found) = from_srv(&dns, domain, email) {
+        return Some(found);
+    }
+    let mx = dns.mx(domain)?;
+    let mut found = autoconfig(agent, &registrable(&mx), email)?;
+    found.oauth = found.oauth.or_else(|| provider_for(&mx));
+    Some(found)
+}
+
 pub fn discover(email: &str) -> Discovery {
     let email = email.trim().to_lowercase();
     let domain = email.rsplit('@').next().unwrap_or_default().to_owned();
@@ -234,20 +254,13 @@ pub fn discover(email: &str) -> Discovery {
     let agent = agent();
     let known =
         GOOGLE_DOMAINS.contains(&domain.as_str()) || MICROSOFT_DOMAINS.contains(&domain.as_str());
-    if let Some(found) = autoconfig(&agent, &domain, &email) {
+    let found = std::thread::scope(|scope| {
+        let dns = (!known).then(|| scope.spawn(|| from_dns(&agent, &domain, &email)));
+        autoconfig(&agent, &domain, &email)
+            .or_else(|| dns.and_then(|lookup| lookup.join().ok().flatten()))
+    });
+    if let Some(found) = found {
         return found;
-    }
-    if !known && let Some(dns) = Dns::new() {
-        if let Some(found) = from_srv(&dns, &domain, &email) {
-            return found;
-        }
-        if let Some(mx) = dns.mx(&domain) {
-            let provider = registrable(&mx);
-            if let Some(mut found) = autoconfig(&agent, &provider, &email) {
-                found.oauth = found.oauth.or_else(|| provider_for(&mx));
-                return found;
-            }
-        }
     }
     Discovery {
         imap: Some(Server {

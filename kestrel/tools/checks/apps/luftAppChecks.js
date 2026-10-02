@@ -7,11 +7,11 @@ import {checkFontViewer} from './fontViewer.js';
 import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
 
-const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'barometer', 'schelf', 'keys'];
+const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'mailman', 'barometer', 'schelf', 'keys'];
 const TRANSLUCENT = {tern: 40};
 const OPAQUE = 2;
 const SURFACE_SHARE = 0.5;
-const ACCENTED = ['rover', 'magpie'];
+const ACCENTED = ['rover', 'magpie', 'mailman'];
 const ACCENT_TOLERANCE = 6;
 const ACCENT_SAMPLES = 20;
 const PURE_BLACK = '#000000';

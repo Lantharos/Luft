@@ -1,0 +1,20 @@
+[app]
+id = "com.lantharos.mailman"
+name = "Mailman"
+generic_name = "Mail"
+categories = ["Network", "Email", "Office"]
+keywords = ["mail", "email", "e-mail", "inbox", "imap", "smtp", "jmap", "gmail", "outlook", "fastmail", "newsletter", "thunderbird", "evolution", "geary"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["x-scheme-handler/mailto", "message/rfc822"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"
+local_files = true

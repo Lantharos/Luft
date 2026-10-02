@@ -1,0 +1,38 @@
+[package]
+name = "mailman"
+version = "0.1.0"
+description = "Mail for Luft"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.93"
+
+[lib]
+name = "mailman_lib"
+
+[dependencies]
+ammonia = "4.2.0"
+base64 = "0.23.1"
+crossbeam-channel = "0.5.15"
+dirs = "7.0.0"
+gio = "0.22.10"
+hickory-resolver = "0.26.3"
+lol_html = "3.0.1"
+lettre = { version = "0.11.23", default-features = false, features = ["smtp-transport", "rustls", "ring", "rustls-platform-verifier", "hostname"] }
+luft-app = { path = "../../../packages/app", features = ["apps"] }
+mail-builder = "1.0.0"
+mail-parser = "0.11.9"
+parking_lot = "0.12.5"
+rand = "0.10.3"
+roxmltree = "0.21.1"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+rustls = { version = "0.23.32", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rustls-platform-verifier = "0.7.1"
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.33" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tokio = { version = "1.53.1", default-features = false, features = ["rt", "time"] }
+ureq = { version = "3.4.2", features = ["platform-verifier", "json"] }
+url = "2.5.8"
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

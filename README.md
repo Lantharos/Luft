@@ -12,6 +12,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `apps/draft` | Draft text and code editor |
 | `apps/keys` | Keys, for your own keyboard layouts and input methods |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |
+| `apps/mailman` | Mailman mail client for IMAP, SMTP and JMAP accounts |
 | `apps/rover` | Rover file manager and file chooser portal backend |
 | `apps/schelf` | Schelf app store for Flathub, Fedora and AppImages |
 | `apps/settings` | System settings app |
@@ -59,7 +60,7 @@ Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1
 
 Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
 
-Barometer, Draft, Keys, Magpie, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Barometer, Draft, Keys, Magpie, Mailman, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
 
 ## Source and licenses
 

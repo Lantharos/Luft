@@ -23,6 +23,18 @@ To have a graphics driver in the initramfs anyway, ask dracut for it in `/etc/dr
 
 Until GRUB is removed, Fedora's own entry still starts shim and GRUB. That works as before, but the TPM won't unlock the disk that way, so it asks for the recovery key.
 
+### When a new kernel doesn't start
+
+Every newly signed image gets three tries. A new kernel's image starts with them, and so does an image signed again, for example after the command line or the initramfs changed, because what it starts isn't the same as before. Taking a `--once` profile in and out (see below) changes nothing about the main profile and keeps the count where it was.
+
+The count is part of the file name, the way systemd-boot does it: `luft-VERSION+3.efi` hasn't started yet, and SushiBoot renames it to `luft-VERSION+2-1.efi` (two tries left, one used) just before starting it. Once Kestrel's login screen is showing, or the desktop when signing in happens automatically, Kestrel tells `trustd`, which renames the image to `luft-VERSION.efi`: it works, and isn't counted any more. Only starts of the main profile count; Rescue and `--once` profiles never use up a try or mark an image as working.
+
+So the tries run out without anyone at the keyboard, the signed command line restarts the computer when starting fails: `panic=10` restarts ten seconds after a kernel panic, and `rd.shell=0 rd.emergency=reboot` restarts when the initramfs can't continue, such as when the system disk never appears, instead of waiting at an emergency shell that a locked root account can't use anyway. They're added to the main and `--once` lines unless `/etc/kernel/cmdline` sets them itself, and left out of Rescue so its messages stay on screen.
+
+When an image has no tries left, SushiBoot starts the newest one that has, and lists the one that didn't start under Previous versions, where it can still be chosen by hand. At that start `trustd` notes which version didn't start, and after signing in Kestrel says so in a notification, once. The image is renamed to `luft-VERSION+0.efi`, so it isn't reported again, and stays out of the way until it is signed again, for example by the next `trustctl startup rebuild`, which gives it three new tries. A newer kernel gets its own tries as usual. `trustctl status` shows the version that didn't start for the rest of that boot.
+
+The TPM unlocks the disk the same way whichever image starts: each image carries the signed PCR 11 policy for itself, and the file name isn't measured.
+
 ### Rescue
 
 Every image also holds a Rescue profile, shown under the newest version. It starts the system into `rescue.target` with messages on screen and the splash off.
@@ -68,7 +80,7 @@ It offers to make a recovery stick, then works out exactly what dnf would remove
 
 After that every way of starting shim ends in SushiBoot: the Luft entry, Fedora's entry, and `\EFI\BOOT\BOOTX64.EFI`, which firmware starts when it has no boot entries. Shim updates replace shim, MokManager and the fallback program, which belong to the shim package, and leave `grubx64.efi` alone. Kernel updates go through the plugin as before and leave nothing in `/boot` but what the kernel package itself puts there.
 
-If a new kernel doesn't start, hold any key while the computer starts and choose the version before it under Previous versions, or Rescue. From a running system, `sudo bootctl set-oneshot luft-VERSION.efi@main` starts that version once.
+If a new kernel doesn't start, the computer goes back to the version before it after three tries (see [When a new kernel doesn't start](#when-a-new-kernel-doesnt-start)). To get there sooner, hold any key while the computer starts and choose the version before it under Previous versions, or Rescue. From a running system, `sudo bootctl set-oneshot luft-VERSION.efi@main` starts that version once.
 
 Other desktops that relied on GNOME's portals, such as niri, lose them; Kestrel provides its own.
 
@@ -168,11 +180,11 @@ trustctl encryption check|on|off
 trustctl sign efi IN OUT           # sign an EFI program with the Luft key
 ```
 
-They need root. `trustd.service` starts at boot to continue encrypting or decrypting, to put the Luft boot entry back if the firmware lost it, and to take out a profile started with `--once`; otherwise it stops after a minute without requests.
+They need root. `trustd.service` starts at boot to continue encrypting or decrypting, to put the Luft boot entry back if the firmware lost it, to take out a profile started with `--once`, and to note an image that ran out of tries; otherwise it stops after a minute without requests.
 
 ### D-Bus
 
-`com.lantharos.Trust1` on the system bus, described in `data/trust/com.lantharos.Trust1.xml`. Reading the state is open to everyone. Checking whether the disk can be encrypted needs `com.lantharos.trust.check`, changing encryption or unlocking needs `com.lantharos.trust.manage-encryption`, showing the recovery key needs `com.lantharos.trust.show-recovery-key` (every time), and the Secure Boot key and startup need `com.lantharos.trust.manage-secure-boot`.
+`com.lantharos.Trust1` on the system bus, described in `data/trust/com.lantharos.Trust1.xml`. Reading the state is open to everyone. Checking whether the disk can be encrypted needs `com.lantharos.trust.check`, changing encryption or unlocking needs `com.lantharos.trust.manage-encryption`, showing the recovery key needs `com.lantharos.trust.show-recovery-key` (every time), and the Secure Boot key and startup need `com.lantharos.trust.manage-secure-boot`. `StartupFinished`, which the login screen and the desktop call once they're up, is open to everyone: all it does is mark the image this boot started from as working.
 
 ### A shim of Luft's own
 

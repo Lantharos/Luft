@@ -16,7 +16,9 @@
       MissedThisBoot (b, the restart that started this boot was one of them).
 
     Startup: Installed (b, the signed startup is on the EFI system partition and in the firmware's boot list),
-      Measured (b, this boot came through it and recorded what started), Available (b), Reason (s).
+      Measured (b, this boot came through it and recorded what started), Available (b), Reason (s),
+      FailedVersion (s, the kernel version whose image didn't start this boot's last tries, so the version
+      before it started instead; "" when nothing failed).
 
     Disk: Device (s), Encrypted (b), State (s: "off", "starting" until the restart, "encrypting",
       "decrypting", "on"), Progress (d, 0 to 1 while encrypting or decrypting), Remaining (t, seconds, 0 when unknown),
@@ -72,5 +74,8 @@
     </method>
     <method name="CancelSigningKeyEnrollment"/>
     <method name="InstallSignedStartup"/>
+    <!-- Called by the login screen or the session once it is up. Open to everyone: it only records that the
+         image this boot started from works, so its tries stop counting down. -->
+    <method name="StartupFinished"/>
   </interface>
 </node>

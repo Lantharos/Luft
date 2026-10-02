@@ -58,6 +58,12 @@ pub fn status() {
         yes_no(status.startup.installed),
         yes_no(status.startup.measured)
     );
+    if !status.startup.failed_version.is_empty() {
+        println!(
+            "                   Linux {} didn't start, so the version before it started instead.",
+            status.startup.failed_version
+        );
+    }
     match &status.disk {
         Some(disk) => {
             println!("Disk               {} {}", disk.device, disk.state);

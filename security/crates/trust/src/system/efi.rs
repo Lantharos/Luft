@@ -72,6 +72,10 @@ pub fn boot_loader() -> Option<String> {
     variable("LoaderInfo", STUB).map(|data| text(&data))
 }
 
+pub fn selected_entry() -> Option<String> {
+    variable("LoaderEntrySelected", STUB).map(|data| text(&data))
+}
+
 pub fn set_oneshot_entry(id: &str) -> std::io::Result<()> {
     let path = format!("{VARIABLES}/LoaderEntryOneShot-{STUB}");
     if let Ok(existing) = std::fs::File::open(&path) {

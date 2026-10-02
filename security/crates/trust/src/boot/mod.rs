@@ -5,4 +5,5 @@ mod images;
 pub mod kernels;
 pub mod sign;
 pub mod startup;
+pub mod tries;
 mod uki;

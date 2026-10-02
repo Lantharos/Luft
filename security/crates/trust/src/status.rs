@@ -1,4 +1,4 @@
-use crate::boot::startup;
+use crate::boot::{startup, tries};
 use crate::disk::{self, DiskStatus};
 use crate::keys::request::Request;
 use crate::keys::{self, mok};
@@ -20,6 +20,7 @@ pub struct Startup {
     pub measured: bool,
     pub available: bool,
     pub reason: String,
+    pub failed_version: String,
 }
 
 pub struct Status {
@@ -55,6 +56,7 @@ pub fn startup() -> Startup {
         measured: efi::measured_uki(),
         available: reason.is_none(),
         reason: reason.unwrap_or_default().to_owned(),
+        failed_version: tries::failed_version(),
     }
 }
 

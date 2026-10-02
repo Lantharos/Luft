@@ -47,7 +47,7 @@ fn efi_main() -> Status {
         return Status::LOAD_ERROR;
     };
 
-    let catalog = Catalog::collect(device, firmware::secure_boot());
+    let mut catalog = Catalog::collect(device, firmware::secure_boot());
     let Some(first) = catalog.first() else {
         return Status::NOT_FOUND;
     };
@@ -67,6 +67,7 @@ fn efi_main() -> Status {
         None => default,
     };
     loop {
+        catalog.record_attempt(chosen);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
         if start::start(entry).is_ok() {

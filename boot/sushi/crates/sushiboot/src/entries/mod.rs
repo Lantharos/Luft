@@ -2,6 +2,7 @@ mod bls;
 mod images;
 mod loaders;
 mod pe;
+mod tries;
 mod volume;
 
 use alloc::format;
@@ -12,6 +13,7 @@ use uefi::Handle;
 
 use crate::files::Volume;
 use crate::start::firmware;
+use tries::Tries;
 
 pub enum Action {
     Linux {
@@ -31,6 +33,7 @@ pub struct BootEntry {
     pub title: String,
     pub volume: Handle,
     pub action: Action,
+    pub tries: Option<Tries>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -104,6 +107,7 @@ impl Catalog {
                 title: String::from("Firmware settings"),
                 volume: boot_device,
                 action: Action::FirmwareSetup,
+                tries: None,
             });
             catalog.main.push(Row::Entry(index));
         }
@@ -120,6 +124,26 @@ impl Catalog {
             Row::Entry(index) => Some(*index),
             Row::Previous => self.previous.first().copied(),
         })
+    }
+
+    pub fn record_attempt(&mut self, index: usize) {
+        let entry = &self.entries[index];
+        let (Some(tries), Action::Efi { path, .. }) = (entry.tries, &entry.action) else {
+            return;
+        };
+        let Some((renamed, attempted)) = tries::record_attempt(entry.volume, path, tries) else {
+            return;
+        };
+        let (volume, previous) = (entry.volume, path.clone());
+        for other in &mut self.entries {
+            if let Action::Efi { path, .. } = &mut other.action
+                && other.volume == volume
+                && *path == previous
+            {
+                path.clone_from(&renamed);
+            }
+        }
+        self.entries[index].tries = Some(attempted);
     }
 
     pub fn find(&self, pattern: &str) -> Option<usize> {

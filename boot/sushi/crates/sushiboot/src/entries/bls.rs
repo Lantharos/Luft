@@ -30,6 +30,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Vec<Boot
                     title: origin.title(&title),
                     volume: origin.handle,
                     action,
+                    tries: None,
                 },
             ))
         })

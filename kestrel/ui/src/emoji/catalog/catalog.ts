@@ -1,8 +1,9 @@
 import Gio from 'gi://Gio';
 
-import { CHARACTERS, KAOMOJI, type Named } from './extras.js';
+import { codepointOf, loadCharacters, type Character } from './characters.js';
+import { KAOMOJI } from './kaomoji.js';
 
-export type Kind = 'emoji' | 'character' | 'kaomoji';
+export type Kind = 'emoji' | 'character' | 'space' | 'kaomoji';
 
 export interface Tab {
   readonly id: string;
@@ -20,14 +21,17 @@ export interface Section {
 
 export interface Item {
   readonly text: string;
+  readonly face: string;
   readonly toned: string | null;
   readonly kind: Kind;
   readonly order: number;
   name: string;
+  aliases: string[];
   keywords: string;
 }
 
 type Entry = string | [string, string];
+type Fields = Omit<Item, 'order'>;
 
 const LIGHT_TONE = '\u{1F3FB}';
 export const SKIN_TONES = ['', LIGHT_TONE, '\u{1F3FC}', '\u{1F3FD}', '\u{1F3FE}', '\u{1F3FF}'];
@@ -56,6 +60,20 @@ export function annotationKey(text: string): string {
   return text.replace(/[\u{FE0E}\u{FE0F}]/gu, '');
 }
 
+export function describe(item: Item): string {
+  const name = item.name.charAt(0).toLocaleUpperCase() + item.name.slice(1);
+  return item.kind === 'character' || item.kind === 'space' ? `${name} · ${codepointOf(item.text)}` : name;
+}
+
+function emoji(entry: Entry): Fields {
+  const [text, toned] = typeof entry === 'string' ? [entry, null] : entry;
+  return { text, face: text, toned, kind: 'emoji', name: '', aliases: [], keywords: '' };
+}
+
+function character({ text, name, label, aliases }: Character): Fields {
+  return { text, face: label ?? text, toned: null, kind: label ? 'space' : 'character', name, aliases, keywords: '' };
+}
+
 export class Catalog {
   readonly tabs: Tab[] = [];
   readonly items: Item[] = [];
@@ -64,14 +82,14 @@ export class Catalog {
   constructor() {
     const file = Gio.File.new_for_uri('resource:///org/gnome/shell/osk-layouts/emoji.json');
     const groups: { group: string; emoji: Entry[] }[] = JSON.parse(new TextDecoder().decode(file.load_contents(null)[1]));
-    const emoji = new Map(groups.map(({ group, emoji }) => [group, emoji]));
-    for (const [id, title] of EMOJI_TABS) {
-      const tab = this.tab(id, title, { icon: ICONS[id] });
-      this.section(tab, title, emoji.get(id)!.map(entry => typeof entry === 'string' ? [entry, null] : entry), 'emoji');
+    const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
+    for (const [id, title] of EMOJI_TABS) this.section(this.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
+    for (const { id, title, glyph, sections } of loadCharacters()) {
+      const tab = this.tab(id, title, { glyph });
+      for (const section of sections) this.section(tab, section.title, section.characters.map(character));
     }
-    const characters = this.tab('characters', 'Special characters', { glyph: 'Ω' });
-    for (const [title, entries] of CHARACTERS) this.named(characters, title, entries, 'character');
-    this.named(this.tab('kaomoji', 'Kaomoji', { glyph: ';)' }), 'Kaomoji', KAOMOJI, 'kaomoji');
+    const kaomoji = this.tab('kaomoji', 'Kaomoji', { glyph: ';)' });
+    this.section(kaomoji, 'Kaomoji', KAOMOJI.map(([text, name, keywords = '']) => ({ text, face: text, toned: null, kind: 'kaomoji', name, aliases: [], keywords })));
   }
 
   find(text: string): Item | undefined {
@@ -84,23 +102,14 @@ export class Catalog {
     return tab;
   }
 
-  private named(tab: Tab, title: string, entries: readonly Named[], kind: Kind): void {
-    const section = this.section(tab, title, entries.map(([text]) => [text, null]), kind);
-    section.items.forEach((item, index) => {
-      item.name = entries[index][1];
-      item.keywords = entries[index][2] ?? '';
-    });
+  private section(tab: Tab, title: string, fields: Fields[]): void {
+    tab.sections.push({ title, tab, items: fields.map(field => this.byText.get(field.text) ?? this.add(field)) });
   }
 
-  private section(tab: Tab, title: string, entries: [string, string | null][], kind: Kind): Section {
-    const section: Section = { title, tab, items: [] };
-    for (const [text, toned] of entries) {
-      const item: Item = { text, toned, kind, order: this.items.length, name: '', keywords: '' };
-      section.items.push(item);
-      this.items.push(item);
-      this.byText.set(text, item);
-    }
-    tab.sections.push(section);
-    return section;
+  private add({ text, face, toned, kind, name, aliases, keywords }: Fields): Item {
+    const item: Item = { text, face, toned, kind, order: this.items.length, name, aliases, keywords };
+    this.items.push(item);
+    this.byText.set(item.text, item);
+    return item;
   }
 }

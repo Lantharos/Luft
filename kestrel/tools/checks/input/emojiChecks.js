@@ -24,6 +24,10 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
     .filter(actor => actor.has_style_class_name?.('kestrel-emoji-cell') && actor.visible)
     .sort((a, b) => a.y - b.y || a.x - b.x);
   const firstResult = () => cells()[0]?.accessible_name;
+  const erase = text => [...text].forEach(() => press(Clutter.KEY_BackSpace));
+  const footer = () => descendants(panel).find(actor => actor.has_style_class_name?.('kestrel-emoji-name'))?.text;
+  const currentTab = () => descendants(panel).find(actor => actor.has_style_class_name?.('kestrel-emoji-category') && actor.has_style_pseudo_class('checked'));
+  const readClipboard = () => new Promise(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
   const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const openFromKeyboard = async symbol => {
     const pressed = GLib.get_monotonic_time();
@@ -101,6 +105,42 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       await pause(300);
       require(window.title === 'Kestrel entry: 🎉🎉👋🏼🎉', 'arrow keys move between emoji while typing still searches');
 
+      for (const [query, name] of [['em dash', 'em dash'], ['euro', 'euro sign'], ['alpha', 'greek small letter alpha'], ['e acute', 'latin small letter e with acute']]) {
+        type(query);
+        await pause(200);
+        require(firstResult() === name, `searching for ${query} finds ${name} first`);
+        erase(query);
+      }
+      type('copyright');
+      await pause(200);
+      require(cells().slice(0, 2).map(cell => cell.accessible_name).sort().join() === 'copyright,copyright sign', 'search results mix emoji and symbols');
+      erase('copyright');
+      type('degree');
+      await pause(250);
+      require(firstResult() === 'degree sign' && footer() === 'Degree sign · U+00B0', 'searching for degree finds ° first and shows its name and code point');
+      await capture(`${output}/emoji-picker-symbol-search.png`);
+      press(Clutter.KEY_Return);
+      await pause(300);
+      require(window.title === 'Kestrel entry: 🎉🎉👋🏼🎉°', 'Enter inserts a symbol into the field');
+
+      press(Clutter.KEY_Tab);
+      press(Clutter.KEY_Tab);
+      for (let step = 0; step < 9; step++) press(Clutter.KEY_Right);
+      press(Clutter.KEY_Return);
+      await pause(500);
+      require(currentTab()?.accessible_name === 'Common symbols', 'the symbol tabs are reachable from the keyboard');
+      await capture(`${output}/emoji-picker-symbols.png`);
+      press(Clutter.KEY_Down);
+      await pause(100);
+      require(footer() === 'Copyright sign · U+00A9', 'moving into the grid selects the first symbol of the tab');
+      press(Clutter.KEY_Return);
+      await pause(300);
+      require(window.title === 'Kestrel entry: 🎉🎉👋🏼🎉°©', 'a symbol picked from its tab goes into the field');
+      type('x');
+      erase('x');
+      await pause(200);
+      require(settings.get_strv('emoji-recent').slice(0, 2).join() === '©,°' && firstResult() === 'copyright sign', 'picked symbols lead the recently used list');
+
       press(Clutter.KEY_Super_L, Clutter.KEY_period);
       await pause(300);
       require(!panel.visible, 'the shortcut closes the panel again while it is open');
@@ -109,7 +149,7 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       await pause(300);
       type('ok');
       await pause(300);
-      require(!panel.visible && window.title === 'Kestrel entry: 🎉🎉👋🏼🎉ok', 'Escape closes the panel and typing reaches the app again');
+      require(!panel.visible && window.title === 'Kestrel entry: 🎉🎉👋🏼🎉°©ok', 'Escape closes the panel and typing reaches the app again');
     } finally {
       app.force_exit();
     }
@@ -129,8 +169,7 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       await pause(200);
       press(Clutter.KEY_Return);
       await pause(900);
-      const clipboard = await new Promise(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
-      require(!panel.visible && window.title === 'Kestrel entry: 🚀' && clipboard === KEPT,
+      require(!panel.visible && window.title === 'Kestrel entry: 🚀' && await readClipboard() === KEPT,
         'an X11 app gets the emoji pasted and the clipboard keeps its content');
 
       const picture = new Uint8Array(256 * 1024).map((_, index) => index * 31);
@@ -143,6 +182,14 @@ export async function checkEmoji({pause, capture, actorNamed, keyboard, output})
       const kept = await new Promise(resolve => St.Clipboard.get_default().get_content(St.ClipboardType.CLIPBOARD, 'image/png', (_clipboard, bytes) => resolve(bytes?.toArray())));
       require(window.title === 'Kestrel entry: 🚀🚀' && kept?.length === picture.length && kept.every((value, index) => value === picture[index]),
         'a picture on the clipboard survives pasting an emoji into an X11 app');
+
+      St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, KEPT);
+      await openFromKeyboard(Clutter.KEY_semicolon);
+      type('em dash');
+      await pause(200);
+      press(Clutter.KEY_Return);
+      await pause(900);
+      require(window.title === 'Kestrel entry: 🚀🚀—' && await readClipboard() === KEPT, 'an X11 app gets a symbol pasted and the clipboard keeps its content');
     } finally {
       x11App.force_exit();
     }

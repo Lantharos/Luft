@@ -1,11 +1,11 @@
 import Clutter from 'gi://Clutter';
-import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { animateAdjustment } from '../shared/motion.js';
-import { EmojiImages } from './images.js';
-import { withTone, type Item, type Kind, type Tab } from './catalog.js';
+import { animateAdjustment } from '../../shared/motion.js';
+import { withTone, type Item, type Tab } from '../catalog/catalog.js';
+import { CellView } from './cellView.js';
+import { GlyphImages, GlyphRenderer } from './images.js';
 import { CELL_SIZE, COLUMNS, GridLayout, HEADER_HEIGHT, type Cell } from './layout.js';
 
 const OVERSCAN = CELL_SIZE * 2;
@@ -13,53 +13,12 @@ const SCROLLBAR_GUTTER = 10;
 export const GRID_WIDTH = COLUMNS * CELL_SIZE + SCROLLBAR_GUTTER;
 const SCROLL_DURATION = 320;
 const EMOJI_SIZE = 26;
-const STYLES = { emoji: 'kestrel-emoji-cell', character: 'kestrel-emoji-cell kestrel-emoji-character', kaomoji: 'kestrel-emoji-cell kestrel-emoji-kaomoji' };
+const CHARACTER_SIZE = 20;
 
 interface Events {
   hovered(item: Item | null): void;
   activated(cell: Cell): void;
   scrolled(tab: Tab | null): void;
-}
-
-class CellView {
-  private readonly label = new St.Label({ x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
-  private readonly image = new Clutter.Actor({ x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
-  readonly actor = new St.Bin({ reactive: true, track_hover: true, child: this.label });
-  cell: Cell | null = null;
-  private text = '';
-  private kind: Kind | null = null;
-
-  constructor() {
-    this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-  }
-
-  bind(cell: Cell, text: string, image: Clutter.Content | null, y: number, selected: boolean): void {
-    this.cell = cell;
-    this.show(text, image);
-    if (this.kind !== cell.item.kind) this.actor.style_class = STYLES[this.kind = cell.item.kind];
-    if (this.actor.accessible_name !== cell.item.name) this.actor.accessible_name = cell.item.name;
-    this.actor.set_position(cell.column * CELL_SIZE, y);
-    this.actor.set_size(cell.span * CELL_SIZE, CELL_SIZE);
-    this.setSelected(selected);
-    this.actor.show();
-  }
-
-  show(text: string, image: Clutter.Content | null): void {
-    if (image && this.image.content !== image) {
-      const [, width, height] = image.get_preferred_size();
-      this.image.content = image;
-      this.image.set_size(width, height);
-    } else if (!image && this.text !== text) {
-      this.label.text = this.text = text;
-    }
-    const child = image ? this.image : this.label;
-    if (this.actor.child !== child) this.actor.child = child;
-  }
-
-  setSelected(selected: boolean): void {
-    if (selected) this.actor.add_style_pseudo_class('selected');
-    else this.actor.remove_style_pseudo_class('selected');
-  }
 }
 
 export class EmojiGrid {
@@ -74,7 +33,8 @@ export class EmojiGrid {
   private readonly views = new Map<number, CellView>();
   private readonly spareViews: CellView[] = [];
   private readonly reusable = new Map<Item, CellView>();
-  private readonly images = new EmojiImages(EMOJI_SIZE);
+  private readonly emojiImages = new GlyphImages(GlyphRenderer.new_for_emoji(), EMOJI_SIZE);
+  private characterImages: GlyphImages | null = null;
   private readonly themeContext = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
   private readonly headers = new Map<number, St.Label>();
   private readonly spareHeaders: St.Label[] = [];
@@ -191,9 +151,21 @@ export class EmojiGrid {
   }
 
   private face(item: Item): [string, Clutter.Content | null] {
-    const text = withTone(item, this.tone);
-    if (item.kind !== 'emoji') return [text, null];
-    return [text, this.images.get(text, this.themeContext.scale_factor * this.actor.get_resource_scale())];
+    const scale = this.themeContext.scale_factor * this.actor.get_resource_scale();
+    if (item.kind === 'emoji') {
+      const text = withTone(item, this.tone);
+      return [text, this.emojiImages.get(text, scale)];
+    }
+    if (item.kind === 'character') return [item.face, this.characters.get(item.text, scale)];
+    return [item.face, null];
+  }
+
+  private get characters(): GlyphImages {
+    if (!this.characterImages) {
+      const theme = this.actor.get_theme_node();
+      this.characterImages = new GlyphImages(GlyphRenderer.new_for_text(theme.get_font().get_family()!, theme.get_foreground_color()), CHARACTER_SIZE);
+    }
+    return this.characterImages;
   }
 
   private bindView(cell: Cell): void {

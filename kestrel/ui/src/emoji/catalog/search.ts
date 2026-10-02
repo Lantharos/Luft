@@ -107,11 +107,16 @@ export class SearchIndex {
     const query = { phrase, phraseWord: `${phrase} `, prefixes, words: prefixes.map(prefix => `${prefix} `) };
     const candidates = this.previous.phrase && phrase.startsWith(this.previous.phrase)
       ? this.previous.entries
-      : this.byInitial.get(String.fromCodePoint(prefixes[0].codePointAt(1)!)) ?? [];
+      : this.rarestBucket(prefixes);
     const found = candidates.filter(entry => containsAll(entry.words, prefixes));
     this.previous = { phrase, entries: found };
     const count = this.items.length;
     const keys = Float64Array.from(found, entry => score(entry, query) * count + entry.item.order).sort();
     return Array.from(keys, key => this.items[key % count]);
+  }
+
+  private rarestBucket(prefixes: readonly string[]): Entry[] {
+    const buckets = prefixes.map(prefix => this.byInitial.get(String.fromCodePoint(prefix.codePointAt(1)!)) ?? []);
+    return buckets.reduce((rarest, bucket) => bucket.length < rarest.length ? bucket : rarest);
   }
 }

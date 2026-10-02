@@ -5,10 +5,9 @@ import St from 'gi://St';
 import { animateAdjustment } from '../../shared/motion.js';
 import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
-import { GlyphImages, GlyphRenderer } from './images.js';
+import { GlyphImages, GlyphRenderer, type Glyph } from './images.js';
 import { CELL_SIZE, COLUMNS, GridLayout, HEADER_HEIGHT, type Cell } from './layout.js';
 
-const OVERSCAN = CELL_SIZE * 2;
 const SCROLLBAR_GUTTER = 10;
 export const GRID_WIDTH = COLUMNS * CELL_SIZE + SCROLLBAR_GUTTER;
 const SCROLL_DURATION = 320;
@@ -47,6 +46,7 @@ export class EmojiGrid {
   constructor(private readonly events: Events, private readonly maximumHeight: number) {
     this.content.add_child(this.spacer);
     this.actor.vadjustment.connect('notify::value', () => this.refresh());
+    this.actor.vadjustment.connect('notify::page-size', () => this.refresh());
     this.actor.connect('resource-scale-changed', () => this.redraw());
     this.themeContext.connect('notify::scale-factor', () => this.redraw());
   }
@@ -73,8 +73,6 @@ export class EmojiGrid {
     this.actor.vadjustment.remove_transition('value');
     this.actor.vadjustment.value = 0;
     this.refresh();
-    for (const view of this.reusable.values()) this.retire(view);
-    this.reusable.clear();
   }
 
   setTone(tone: number): void {
@@ -127,12 +125,13 @@ export class EmojiGrid {
   }
 
   private refresh(): void {
-    const { value } = this.actor.vadjustment;
+    const { value, page_size: pageSize } = this.actor.vadjustment;
     const rows = this.layout.rows;
-    const first = rows.length ? this.layout.firstRowAt(Math.max(0, value - OVERSCAN)) : 0;
+    const first = rows.length ? this.layout.firstRowAt(value) : 0;
+    const bottom = value + (pageSize || this.maximumHeight);
     const cells: Cell[] = [];
     const titled: number[] = [];
-    for (let index = first; index < rows.length && rows[index].y < value + this.maximumHeight + OVERSCAN; index++) {
+    for (let index = first; index < rows.length && rows[index].y < bottom; index++) {
       if (rows[index].title) titled.push(index);
       cells.push(...rows[index].cells);
     }
@@ -140,18 +139,22 @@ export class EmojiGrid {
     const wantedHeaders = new Set(titled);
     for (const index of [...this.views.keys()]) if (!wantedCells.has(index)) this.releaseView(index);
     for (const index of [...this.headers.keys()]) if (!wantedHeaders.has(index)) this.releaseHeader(index);
-    for (const cell of cells) if (!this.views.has(cell.index)) this.bindView(cell);
+    this.bindViews(cells.filter(cell => !this.views.has(cell.index)));
     for (const index of titled) if (!this.headers.has(index)) this.bindHeader(index);
     const tab = rows.length ? rows[this.layout.firstRowAt(value + 1)].tab : null;
     if (tab !== this.tab) this.events.scrolled(this.tab = tab);
   }
 
   private redraw(): void {
-    for (const view of this.views.values()) view.show(...this.face(view.cell!.item));
+    const scale = this.scale();
+    for (const view of this.views.values()) view.show(...this.face(view.cell!.item, scale));
   }
 
-  private face(item: Item): [string, Clutter.Content | null] {
-    const scale = this.themeContext.scale_factor * this.actor.get_resource_scale();
+  private scale(): number {
+    return this.themeContext.scale_factor * this.actor.get_resource_scale();
+  }
+
+  private face(item: Item, scale: number): [string, Glyph | null] {
     if (item.kind === 'emoji') {
       const text = withTone(item, this.tone);
       return [text, this.emojiImages.get(text, scale)];
@@ -168,10 +171,23 @@ export class EmojiGrid {
     return this.characterImages;
   }
 
-  private bindView(cell: Cell): void {
-    const view = this.reusable.get(cell.item) ?? this.spareViews.pop() ?? this.createView();
-    this.reusable.delete(cell.item);
-    view.bind(cell, ...this.face(cell.item), this.layout.rows[cell.row].y, cell === this.selected);
+  private bindViews(cells: readonly Cell[]): void {
+    const scale = this.scale();
+    const unmatched = cells.filter(cell => {
+      const view = this.reusable.get(cell.item);
+      if (!view) return true;
+      this.reusable.delete(cell.item);
+      this.bindView(cell, view, scale);
+      return false;
+    });
+    const leftovers = this.reusable.values();
+    for (const cell of unmatched) this.bindView(cell, leftovers.next().value ?? this.spareViews.pop() ?? this.createView(), scale);
+    for (const view of leftovers) this.retire(view);
+    this.reusable.clear();
+  }
+
+  private bindView(cell: Cell, view: CellView, scale: number): void {
+    view.bind(cell, ...this.face(cell.item, scale), this.layout.rows[cell.row].y, cell === this.selected);
     this.views.set(cell.index, view);
     if (view.actor.hover) this.events.hovered(cell.item);
   }
@@ -182,9 +198,7 @@ export class EmojiGrid {
   }
 
   private retire(view: CellView): void {
-    view.actor.hide();
-    view.setSelected(false);
-    view.cell = null;
+    view.release();
     this.spareViews.push(view);
   }
 

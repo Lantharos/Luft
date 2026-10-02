@@ -158,7 +158,7 @@ Sign out and sign in with your password once; that brings in your old keyrings a
 sudo dnf remove pam_oo7 oo7-portal oo7-daemon gnome-keyring-pam
 ```
 
-`gnome-keyring` itself is still needed by `niri` and `NetworkManager-vpnc-gnome`; it stays installed but idle in Kestrel.
+`gnome-keyring` itself stays installed but idle in Kestrel. `security/scripts/remove-grub-and-gnome.sh` removes it together with the other GNOME services Kestrel replaces; `NetworkManager-vpnc-gnome` goes with it, and niri loses its keyring.
 
 To go back, `kestrel/keyring/tools/switch.sh off` restores the previous login rules, removes the keyring's activation files and SELinux module, and stops the unlock service. GNOME Keyring takes over again after you sign out and back in, with its own files exactly as they were. Your Luft Keyring stays in `~/.local/share/luft-keyring`.
 

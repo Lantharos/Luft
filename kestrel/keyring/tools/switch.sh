@@ -46,7 +46,7 @@ your passwords from GNOME Keyring and oo7 are brought in, and from then on a fin
 
 Once you're happy with it, these packages are no longer needed:
   sudo dnf remove pam_oo7 oo7-portal oo7-daemon gnome-keyring-pam
-gnome-keyring itself is still required by niri and NetworkManager-vpnc-gnome; it stays idle in Kestrel.
+gnome-keyring itself stays idle in Kestrel; security/scripts/remove-grub-and-gnome.sh removes it with GNOME's other services.
 DONE
 }
 

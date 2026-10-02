@@ -4,10 +4,10 @@ mod apps;
 mod bluetooth;
 mod datetime;
 mod display;
+mod hardware;
 mod keyboard;
 mod keyring;
 mod login;
-mod mouse;
 mod network;
 mod notifications;
 mod passkeys;
@@ -24,6 +24,7 @@ use sabine::SabineWindow;
 pub use updates::{CHECK_ARGUMENT, check_in_background};
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    let window = hardware::register(window, events);
     let window = network::register(window, events);
     let window = bluetooth::register(window, events);
     let window = display::register(window, events);
@@ -32,7 +33,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = appearance::register(window, events);
     let window = notifications::register(window, events);
     let window = keyboard::register(window, events);
-    let window = mouse::register(window, events);
     let window = apps::register(window, events);
     let window = privacy::register(window, events);
     let window = passkeys::register(window, events);

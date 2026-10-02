@@ -110,6 +110,10 @@ class Frame {
     return other?.bytes.compare(this.bytes) === 0;
   }
 
+  looksLike(other) {
+    return this._pixels.length === other._pixels.length && this._pixels.every((value, index) => value === other._pixels[index]);
+  }
+
   save(path) {
     GLib.file_set_contents(path, this.bytes.toArray());
   }
@@ -157,17 +161,17 @@ export class LuftApp {
     return (GLib.get_monotonic_time() - started) / 1000;
   }
 
-  async frame() {
+  async frame(area = this.window.get_frame_rect()) {
     const stream = Gio.MemoryOutputStream.new_resizable();
-    await screenshotArea(this.window.get_frame_rect(), stream);
+    await screenshotArea(area, stream);
     return new Frame(stream.steal_as_bytes());
   }
 
-  async settle(condition) {
+  async settle(condition, area) {
     const deadline = GLib.get_monotonic_time() + SETTLE_TIMEOUT * 1000;
     let previous = null;
     for (;;) {
-      const current = await this.frame();
+      const current = await this.frame(area);
       if ((current.same(previous) && condition(current)) || GLib.get_monotonic_time() > deadline) return current;
       previous = current;
       await sleep(50);

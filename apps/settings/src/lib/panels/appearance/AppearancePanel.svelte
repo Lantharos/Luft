@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Row, Section, Slider, Switch } from '@luft/ui';
 	import { percent } from '$lib/format';
+	import { app } from '$lib/state/app.svelte';
 	import { useSettings } from '$lib/state/gsettings.svelte';
 	import AppIconsSection from './AppIconsSection.svelte';
 	import CursorSection from './cursors/CursorSection.svelte';
 	import CursorStore from './cursors/CursorStore.svelte';
+	import FontsPage from './fonts/FontsPage.svelte';
 	import StyleSection from './StyleSection.svelte';
 	import WallpaperSection from './WallpaperSection.svelte';
 
@@ -15,11 +17,13 @@
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'enable-animations']);
 
-	let browsing = $state(false);
+	const close = () => (app.section = null);
 </script>
 
-{#if browsing}
-	<CursorStore onclose={() => (browsing = false)} />
+{#if app.section === 'cursors'}
+	<CursorStore onclose={close} />
+{:else if app.section === 'fonts'}
+	<FontsPage onclose={close} />
 {:else}
 	<StyleSection />
 
@@ -27,7 +31,7 @@
 
 	<AppIconsSection />
 
-	<CursorSection onbrowse={() => (browsing = true)} />
+	<CursorSection onbrowse={() => (app.section = 'cursors')} />
 
 	<Section title="Text and motion">
 		<Row title="Text size" description="Makes text larger or smaller across apps">
@@ -44,6 +48,7 @@
 				/>
 			{/snippet}
 		</Row>
+		<Row title="Fonts" description="Preview the fonts on this computer and remove ones you added" onclick={() => (app.section = 'fonts')} />
 		<Row title="Animations" description="Windows and menus move instead of appearing instantly">
 			<Switch label="Animations" checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
 		</Row>

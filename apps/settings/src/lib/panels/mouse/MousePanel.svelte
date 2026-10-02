@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
 	import { useSettings } from '$lib/state/gsettings.svelte';
-	import { pointers, type Pointers } from './api';
+	import { hardware } from '$lib/state/hardware.svelte';
 	import SpeedSlider from './SpeedSlider.svelte';
 	import TouchpadSection from './TouchpadSection.svelte';
 
@@ -13,13 +13,9 @@
 	};
 
 	const mouse = useSettings<Mouse>('org.gnome.desktop.peripherals.mouse', ['left-handed', 'speed', 'accel-profile', 'natural-scroll']);
-
-	let found = $state<Pointers | null>(null);
-
-	void pointers().then((present) => (found = present));
 </script>
 
-{#if found?.mouse}
+{#if hardware.present?.mouse}
 	<Section title="Mouse">
 		<Row title="Primary button" description="The button you click to select things">
 			<Segmented
@@ -50,12 +46,7 @@
 	</Section>
 {/if}
 
-{#if found?.touchpad}
+{#if hardware.present?.touchpad}
 	<TouchpadSection />
 {/if}
 
-{#if found && !found.mouse && !found.touchpad}
-	<Section>
-		<Row title="No mouse or touchpad found" description="Connect a mouse to change how it works" />
-	</Section>
-{/if}

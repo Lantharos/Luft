@@ -1,4 +1,5 @@
 mod cursors;
+mod fonts;
 mod library;
 mod thumbnail;
 
@@ -37,4 +38,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("appearance_thumbnail", thumbnail::thumbnail)
         .command("appearance_add_wallpapers", add_wallpapers)
         .command("appearance_open_folder", |_: Value| library::open_folder())
+        .command("appearance_fonts", fonts::list)
+        .command("appearance_font_open", fonts::open)
+        .command("appearance_font_remove", fonts::remove)
 }

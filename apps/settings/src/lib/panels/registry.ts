@@ -16,6 +16,7 @@ import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import Wifi from '@lucide/svelte/icons/wifi';
+import type { Hardware } from '$lib/state/hardware.svelte';
 
 export type PanelId =
 	| 'network'
@@ -36,39 +37,54 @@ export type PanelId =
 	| 'updates'
 	| 'about';
 
+interface Needs {
+	present: (hardware: Hardware) => boolean;
+	missing: string;
+}
+
 export interface Panel {
 	id: PanelId;
-	title: string;
+	title: string | ((hardware: Hardware) => string);
 	icon: Component;
 	keywords: string[];
 	load: () => Promise<{ default: Component }>;
+	needs?: Needs;
 }
 
 const panel = (
 	id: PanelId,
-	title: string,
+	title: Panel['title'],
 	icon: Component,
 	keywords: string[],
-	load: Panel['load']
-): Panel => ({ id, title, icon, keywords, load });
+	load: Panel['load'],
+	needs?: Needs
+): Panel => ({ id, title, icon, keywords, load, needs });
+
+const pointerTitle = ({ mouse, touchpad }: Hardware) => (mouse && touchpad ? 'Mouse & Touchpad' : touchpad ? 'Touchpad' : 'Mouse');
 
 export const PANEL_GROUPS: Panel[][] = [
 	[
 		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy', 'dns', 'ip address', 'hardware address', 'metered'], () => import('./network/NetworkPanel.svelte')),
-		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker', 'visible', 'discoverable'], () => import('./bluetooth/BluetoothPanel.svelte'))
+		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker', 'visible', 'discoverable'], () => import('./bluetooth/BluetoothPanel.svelte'), {
+			present: (hardware) => hardware.bluetooth,
+			missing: 'This computer has no Bluetooth adapter'
+		})
 	],
 	[
 		panel('display', 'Displays', Monitor, ['monitor', 'screen', 'resolution', 'scale', 'refresh rate', 'night light', 'arrangement'], () => import('./display/DisplayPanel.svelte')),
 		panel('sound', 'Sound', Volume2, ['audio', 'volume', 'speakers', 'microphone', 'output', 'input', 'alerts'], () => import('./sound/SoundPanel.svelte')),
-		panel('power', 'Power & Battery', BatteryCharging, ['battery', 'sleep', 'suspend', 'power mode', 'screen blank', 'lid'], () => import('./power/PowerPanel.svelte'))
+		panel('power', (hardware) => (hardware.battery ? 'Power & Battery' : 'Power'), BatteryCharging, ['battery', 'sleep', 'suspend', 'power mode', 'screen blank', 'lid'], () => import('./power/PowerPanel.svelte'))
 	],
 	[
-		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'app icons', 'tinted', 'cursor', 'pointer', 'mouse pointer', 'cursor size', 'text size', 'animations'], () => import('./appearance/AppearancePanel.svelte')),
+		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'app icons', 'tinted', 'cursor', 'pointer', 'mouse pointer', 'cursor size', 'text size', 'animations', 'fonts', 'typefaces', 'install fonts'], () => import('./appearance/AppearancePanel.svelte')),
 		panel('notifications', 'Notifications', Bell, ['do not disturb', 'banners', 'lock screen', 'apps'], () => import('./notifications/NotificationsPanel.svelte'))
 	],
 	[
 		panel('keyboard', 'Keyboard', Keyboard, ['input sources', 'layout', 'shortcuts', 'repeat', 'language'], () => import('./keyboard/KeyboardPanel.svelte')),
-		panel('mouse', 'Mouse & Touchpad', Mouse, ['pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad'], () => import('./mouse/MousePanel.svelte'))
+		panel('mouse', pointerTitle, Mouse, ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad'], () => import('./mouse/MousePanel.svelte'), {
+			present: (hardware) => hardware.mouse || hardware.touchpad,
+			missing: 'No mouse or touchpad is connected'
+		})
 	],
 	[
 		panel('apps', 'Apps', LayoutGrid, ['default apps', 'browser', 'startup', 'autostart'], () => import('./apps/AppsPanel.svelte')),
@@ -87,13 +103,36 @@ export const PANEL_GROUPS: Panel[][] = [
 export const PANELS = PANEL_GROUPS.flat();
 export const DEFAULT_PANEL: PanelId = 'network';
 
-export function resolvePanel(target: string): PanelId | null {
-	const name = target.replace(/^kestrel-settings:(\/\/)?/, '').split(/[/?#]/)[0].toLowerCase();
-	return PANELS.find((panel) => panel.id === name)?.id ?? null;
+export interface Link {
+	panel: PanelId;
+	section: string | null;
 }
 
-export function searchPanels(query: string): Panel[] {
+export function resolveLink(target: string): Link | null {
+	const [name, section] = target
+		.replace(/^kestrel-settings:(\/\/)?/, '')
+		.split(/[?#]/)[0]
+		.toLowerCase()
+		.split('/');
+	const panel = PANELS.find((candidate) => candidate.id === name);
+	return panel ? { panel: panel.id, section: section || null } : null;
+}
+
+export function titleOf(panel: Panel, hardware: Hardware) {
+	return typeof panel.title === 'string' ? panel.title : panel.title(hardware);
+}
+
+export function isShown(panel: Panel, hardware: Hardware) {
+	return panel.needs?.present(hardware) ?? true;
+}
+
+export function shownGroups(hardware: Hardware) {
+	return PANEL_GROUPS.map((group) => group.filter((panel) => isShown(panel, hardware)));
+}
+
+export function searchPanels(query: string, hardware: Hardware): Panel[] {
 	const needle = query.trim().toLowerCase();
-	if (!needle) return PANELS;
-	return PANELS.filter((panel) => [panel.title, ...panel.keywords].some((term) => term.toLowerCase().includes(needle)));
+	return PANELS.filter(
+		(panel) => isShown(panel, hardware) && [titleOf(panel, hardware), ...panel.keywords].some((term) => term.toLowerCase().includes(needle))
+	);
 }

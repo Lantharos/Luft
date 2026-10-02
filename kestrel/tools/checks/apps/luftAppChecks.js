@@ -3,6 +3,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {LuftApp, startSabineService, waitFor} from './luftApp.js';
+import {checkFontViewer} from './fontViewer.js';
+import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
 
 const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'barometer', 'schelf'];
@@ -76,7 +78,7 @@ async function checkApp(name, {palette, styles, require, output}) {
   }
 }
 
-export async function checkLuftApps({output}) {
+export async function checkLuftApps({output, pointer}) {
   const require = (condition, label) => {
     if (!condition) throw new Error(`Kestrel Luft app check failed: ${label}`);
     console.log(`Kestrel Luft app check: ${label}`);
@@ -96,10 +98,12 @@ export async function checkLuftApps({output}) {
     styles.kestrel.set_boolean('pure-black', false);
     await showTestWallpaper(background);
     const palette = {dark: await readAppearance('DarkColors'), light: await readAppearance('LightColors')};
-    const context = {palette, styles, require, output};
+    const context = {palette, styles, require, output, pointer};
     const darkFrames = {};
     for (const name of APPS) darkFrames[name] = await checkApp(name, context);
     await checkSettingsPages(darkFrames.settings, context);
+    await checkSettingsHardware(context);
+    await checkFontViewer(darkFrames.magpie, context);
   } finally {
     styles.interface.set_string('color-scheme', saved.scheme);
     styles.kestrel.set_boolean('pure-black', saved.pureBlack);

@@ -182,7 +182,10 @@ mod tests {
     fn only_folders_holding_nothing_but_cursors_can_be_removed() {
         let scratch = tempfile::tempdir().unwrap();
         let icons = scratch.path().join("icons");
-        write(&icons.join("WhiteSur-cursors/index.theme"), "[Icon Theme]\nName=WhiteSur\n");
+        write(
+            &icons.join("WhiteSur-cursors/index.theme"),
+            "[Icon Theme]\nName=WhiteSur\n",
+        );
         write(&icons.join("WhiteSur-cursors/cursors/left_ptr"), "Xcur");
         let mixed_icon = icons.join("Papirus/48x48/apps/app.png");
         write(&icons.join("Papirus/cursors/left_ptr"), "Xcur");

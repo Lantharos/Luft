@@ -5,12 +5,12 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 ## Pages
 
 - Network: Wi-Fi, wired connections, VPN and proxy, with per-connection settings for IP addresses, DNS, routes, metered data, hardware addresses and work or school Wi-Fi sign-in. Known networks lists every saved Wi-Fi network, including ones out of range, to change or forget. VPNs can be imported from WireGuard, OpenVPN and other configuration files your installed VPN plugins understand, or set up by hand for WireGuard with a freshly generated key, and VPN and wired connections can be removed
-- Bluetooth: pairing, connecting and forgetting devices, visibility to nearby devices, and device details such as battery and automatic connection
+- Bluetooth: pairing, connecting and forgetting devices, visibility to nearby devices, and device details such as battery and automatic connection. The page is only there when the computer has a Bluetooth adapter, or one turned off with a hardware switch, and shows up as soon as a USB adapter is plugged in
 - Displays: arrangement, resolution, refresh rate, scale, brightness and night light
 - Sound: output and input devices, connections, volumes and alert sounds, with app volumes, including which output each app plays on, and device profiles on pages of their own
-- Power: power mode, battery health and charge limit, keyboard backlight, screen blanking and suspend
+- Power: power mode, battery health and charge limit, keyboard backlight, screen blanking and suspend. On computers without a battery the page is called Power and leaves out everything about the battery
 - Keyboard: input sources and repeat, with every keyboard shortcut, app shortcuts and your own on a page of their own
-- Mouse and touchpad: speed, scrolling and tap to click, each shown when that kind of device is connected
+- Mouse and touchpad: speed, scrolling and tap to click, each shown when that kind of device is connected. The page is named after what is connected, and only appears once a mouse or touchpad is, including one plugged in while Settings is open
 - Notifications: do not disturb, the lock screen, and a page for per-app notifications, including which apps may still notify you during do not disturb
 - Apps: default apps and what each app is allowed to do
 - Privacy: location, file history, screen lock and cleanup of old trash and temporary files
@@ -21,6 +21,8 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 - Date and time: time zone, automatic time and clock format
 - Updates: updates for the system itself, such as the kernel, drivers, libraries and services, summed up in a sentence with their size, and listed in full by area when you want the details. They download in the background and install the next time you restart, with the boot splash showing the progress; restarting from the power menu offers to install them too. Firmware updates for your hardware appear here when the device maker publishes them. App updates are handled in Schelf, and Updates shows how many are waiting there. It also shows when updates were last checked for and how the last install went, and lets you choose whether to look for updates every day, every week or only when you check, and whether to download them automatically
 - About: device name, hardware and system versions, and recent problems: when the computer had to restart because the graphics driver stopped responding, what happened and what can keep it from happening again, with a restart straight into the firmware settings when that's what it takes
+
+Fonts opens a page listing every font family on the computer, each written in its own font, with a search. Clicking a family opens it in Magpie, and families you installed yourself, which live in `~/.local/share/fonts`, can be removed from there; they go to the trash.
 
 Cursor themes are the ones in `~/.local/share/icons`, `~/.icons` and `/usr/share/icons` that have a `cursors` folder, each shown with its arrow, hand, text, busy and resize cursors. Themes put in the icons folder by hand show up the next time the window is focused. Get more cursors browses the Cursors category on [GNOME-Look](https://www.gnome-look.org/browse?cat=107): pick a download and Settings unpacks it, keeps only the folders that hold nothing but a cursor theme, and installs them in `~/.local/share/icons`. A theme never takes the place of an icon theme: if its folder name belongs to one, such as `hicolor` or `Adwaita`, it gets a free name like `hicolor-2` instead. Themes in that folder that hold nothing but cursors can be removed again. Downloads are limited to 128 MB and 512 MB once unpacked, and archives can't write outside their own folder.
 
@@ -49,4 +51,4 @@ bun run desktop:build    # production web build and release binary
 sabine install .
 ```
 
-This registers the `kestrel-settings:` link scheme, which Kestrel uses to open a specific page, for example `kestrel-settings:bluetooth`. If Settings is already open, the link switches the existing window to that page.
+This registers the `kestrel-settings:` link scheme, which Kestrel uses to open a specific page, for example `kestrel-settings:bluetooth`. A few pages within pages have links of their own: `kestrel-settings:appearance/fonts` and `kestrel-settings:appearance/cursors`. If Settings is already open, the link switches the existing window to that page. A link to a page for hardware the computer doesn't have, such as Bluetooth without an adapter, explains that in a line instead.

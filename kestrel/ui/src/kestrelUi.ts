@@ -27,6 +27,7 @@ import { TaskView } from './taskView/taskView.js';
 import { OomNotifier } from './memory/oomNotifier.js';
 import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
+import { confirmStartup, notifyAboutFailedStartup } from './health/startup.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
 import { PlugSounds } from './power/plugSounds.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
@@ -113,6 +114,7 @@ class KestrelUi {
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();
+      void confirmStartup().then(notifyAboutFailedStartup);
     });
 
     context.layoutManager.addTopChrome(this.menus.shield);
@@ -487,6 +489,7 @@ export function initialize(context: Context): void {
 
 export function startGreeter(context: GreeterContext): Promise<void> {
   greeter = new Greeter(context);
+  void greeter.wallpaperShown.then(confirmStartup);
   return greeter.wallpaperShown;
 }
 

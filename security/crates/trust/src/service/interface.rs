@@ -336,4 +336,15 @@ impl Trust {
         self.authorize(connection, &header, SECURE_BOOT).await?;
         self.run(&emitter, boot::startup::install).await
     }
+
+    async fn startup_finished(&self) -> Result<(), Error> {
+        let _activity = self.idle.hold();
+        let _busy = self.busy.lock().await;
+        tokio::task::spawn_blocking(boot::tries::mark_good)
+            .await
+            .map_err(|_| {
+                Error::Failed("The startup couldn't be marked as working.".to_owned())
+            })??;
+        Ok(())
+    }
 }

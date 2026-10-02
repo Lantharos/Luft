@@ -43,6 +43,7 @@ pub fn startup(startup: &Startup) -> Dict {
         ("Measured", startup.measured.into()),
         ("Available", startup.available.into()),
         ("Reason", startup.reason.as_str().into()),
+        ("FailedVersion", startup.failed_version.as_str().into()),
     ])
 }
 

@@ -75,8 +75,8 @@ check_images() {
   printf '%s\n' "${versions[@]}" | grep -qxF "$running" ||
     stop "Linux $running isn't one of the three newest kernels. Restart into the newest one and run this again."
   for version in "${versions[@]}"; do
-    image="$esp/EFI/Linux/luft-$version.efi"
-    sudo test -f "$image" || stop "There's no signed image for Linux $version. Run 'sudo trustctl startup rebuild' and run this again."
+    image="$(sudo find "$esp/EFI/Linux" -maxdepth 1 \( -name "luft-$version.efi" -o -name "luft-$version+*.efi" \) -print -quit)"
+    [[ -n "$image" ]] || stop "There's no signed image for Linux $version. Run 'sudo trustctl startup rebuild' and run this again."
     sudo sbverify --cert "$certificate" "$image" >/dev/null 2>&1 ||
       stop "The image for Linux $version isn't signed with this computer's Luft key. Run 'sudo trustctl startup rebuild' and run this again."
     echo "Linux $version: signed image present"

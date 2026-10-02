@@ -10,7 +10,7 @@ use crate::system::efi;
 use super::esp::{self, Esp};
 use super::kernels::{self, Kernel};
 use super::uki::{self, Lines};
-use super::{cmdline, entries, images, sign};
+use super::{cmdline, entries, images, sign, tries};
 
 const BOOT_MENU: &str = "/usr/lib/sushi/efi/SushiBoot.efi";
 const SIGNED_MENU: &str = "EFI/sushi/SushiBoot.efi";
@@ -54,38 +54,57 @@ pub fn unavailable_reason() -> Option<&'static str> {
 }
 
 fn lines(trial: Option<String>) -> Lines {
-    let main = cmdline::read();
+    let line = cmdline::read();
     let encrypted = disk::status().is_some_and(|disk| disk.encrypted);
     Lines {
-        rescue: cmdline::rescue(&main, encrypted),
-        main,
-        trial,
+        rescue: cmdline::rescue(&line, encrypted),
+        main: cmdline::restarting_when_starting_fails(&line),
+        trial: trial
+            .as_deref()
+            .map(cmdline::restarting_when_starting_fails),
     }
 }
 
 fn initrd_for(esp: &Esp, keys: &Unsealed, kernel: &Kernel, fresh: bool) -> Result<PathBuf> {
     let initrd = keys.scratch(&format!("initrd-{}", kernel.version));
-    let image = images::path(esp, &kernel.version);
-    if !fresh && image.exists() {
-        uki::extract_initrd(&image, &initrd)?;
-    } else {
-        kernel.build_signed_initrd(&initrd, cmdline::has(&cmdline::read(), SPLASH))?;
+    match images::find(esp, &kernel.version) {
+        Some(image) if !fresh => uki::extract_initrd(&image.path, &initrd)?,
+        _ => kernel.build_signed_initrd(&initrd, cmdline::has(&cmdline::read(), SPLASH))?,
     }
     Ok(initrd)
 }
 
-fn build(esp: &Esp, keys: &Unsealed, kernel: &Kernel, fresh: bool, lines: &Lines) -> Result<()> {
+fn build(
+    esp: &Esp,
+    keys: &Unsealed,
+    kernel: &Kernel,
+    fresh: bool,
+    lines: &Lines,
+    output: &Path,
+) -> Result<()> {
     let initrd = initrd_for(esp, keys, kernel, fresh)?;
     images::make_room(esp, &kernel.version, images::estimate(kernel, &initrd))?;
-    let built = uki::build(
-        kernel,
-        &initrd,
-        &images::path(esp, &kernel.version),
-        keys,
-        lines,
-    );
+    let built = uki::build(kernel, &initrd, output, keys, lines);
     let _ = std::fs::remove_file(&initrd);
-    built
+    built?;
+    images::remove_except(esp, &kernel.version, Some(output));
+    Ok(())
+}
+
+fn build_untried(
+    esp: &Esp,
+    keys: &Unsealed,
+    kernel: &Kernel,
+    fresh: bool,
+    lines: &Lines,
+) -> Result<()> {
+    let output = images::untried(esp, &kernel.version);
+    build(esp, keys, kernel, fresh, lines, &output)
+}
+
+fn rebuild_profiles(esp: &Esp, keys: &Unsealed, kernel: &Kernel, lines: &Lines) -> Result<()> {
+    let output = images::current(esp, &kernel.version);
+    build(esp, keys, kernel, false, lines, &output)
 }
 
 pub fn add(kernel: &Kernel) -> Result<()> {
@@ -99,7 +118,7 @@ pub fn add(kernel: &Kernel) -> Result<()> {
     let esp = esp::find()?;
     let keys = keys::unseal()?;
     images::keep_only(&esp, &wanted);
-    build(&esp, &keys, kernel, true, &lines(None))?;
+    build_untried(&esp, &keys, kernel, true, &lines(None))?;
     rustix::fs::sync();
     Ok(())
 }
@@ -133,7 +152,7 @@ fn rebuild_with(esp: &Esp, keys: &Unsealed, rebuild_initrds: bool) -> Result<()>
     images::keep_only(esp, &wanted);
     let lines = lines(None);
     for kernel in &wanted {
-        build(esp, keys, kernel, rebuild_initrds, &lines)?;
+        build_untried(esp, keys, kernel, rebuild_initrds, &lines)?;
     }
     let _ = std::fs::remove_file(paths::state(TRIAL));
     rustix::fs::sync();
@@ -224,7 +243,7 @@ fn try_once(line: &str) -> Result<()> {
     };
     let esp = esp::find()?;
     let keys = keys::unseal()?;
-    build(&esp, &keys, &kernel, false, &lines(Some(line.to_owned())))?;
+    rebuild_profiles(&esp, &keys, &kernel, &lines(Some(line.to_owned())))?;
     paths::write_private(&paths::state(TRIAL), kernel.version.as_bytes())?;
     efi::set_oneshot_entry(&format!("{}@{}", images::name(&kernel.version), uki::TRIAL))?;
     rustix::fs::sync();
@@ -236,9 +255,9 @@ fn finish_trial(esp: &Esp) -> Result<()> {
         return Ok(());
     };
     let kernel = Kernel::named(version.trim());
-    if images::path(esp, &kernel.version).exists() && kernel.image.exists() {
+    if images::find(esp, &kernel.version).is_some() && kernel.image.exists() {
         let keys = keys::unseal()?;
-        build(esp, &keys, &kernel, false, &lines(None))?;
+        rebuild_profiles(esp, &keys, &kernel, &lines(None))?;
         rustix::fs::sync();
     }
     std::fs::remove_file(paths::state(TRIAL))?;
@@ -256,5 +275,5 @@ pub fn follow_up() -> Result<()> {
     {
         entries::create(&esp, &shim)?;
     }
-    Ok(())
+    tries::note_failures(&esp)
 }

@@ -13,6 +13,7 @@ const RESCUE_DROPS: [&str; 6] = [
     "sushi",
     "systemd.unit",
 ];
+const RESTART_WHEN_STARTING_FAILS: [&str; 3] = ["panic=10", "rd.shell=0", "rd.emergency=reboot"];
 const RESCUE: &str = "systemd.unit=rescue.target";
 const SHELL_WITHOUT_PASSWORD: &str = "systemd.setenv=SYSTEMD_SULOGIN_FORCE=1";
 
@@ -49,6 +50,15 @@ pub fn with<S: AsRef<str>>(line: &str, add: &[String], remove: &[S]) -> String {
         .collect();
     words.extend(add.iter().cloned());
     words.join(" ")
+}
+
+pub fn restarting_when_starting_fails(line: &str) -> String {
+    let missing: Vec<String> = RESTART_WHEN_STARTING_FAILS
+        .iter()
+        .filter(|argument| !has(line, key(argument)))
+        .map(|argument| (*argument).to_owned())
+        .collect();
+    with(line, &missing, &[] as &[&str])
 }
 
 pub fn rescue(line: &str, encrypted: bool) -> String {

@@ -4,6 +4,8 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 use uefi::boot::ScopedProtocol;
+use uefi::data_types::Align;
+use uefi::mem::AlignedBuffer;
 use uefi::proto::media::file::{
     Directory, File, FileAttribute, FileInfo, FileMode, FileType, RegularFile,
 };
@@ -63,6 +65,33 @@ impl Volume {
 
     pub fn read(&mut self, path: &str) -> Option<Vec<u8>> {
         read_to_end(&mut self.file(path)?)
+    }
+
+    pub fn rename(&mut self, path: &str, name: &str) -> Option<()> {
+        let mut file = self
+            .root
+            .open(&path16(path)?, FileMode::ReadWrite, FileAttribute::empty())
+            .ok()?
+            .into_regular_file()?;
+        let info = file.get_boxed_info::<FileInfo>().ok()?;
+        let name = CString16::try_from(name).ok()?;
+        let mut storage = AlignedBuffer::from_size_align(
+            size_of_val(&*info) + name.num_bytes(),
+            FileInfo::alignment(),
+        )
+        .ok()?;
+        let renamed = FileInfo::new(
+            storage.as_slice_mut(),
+            info.file_size(),
+            info.physical_size(),
+            *info.create_time(),
+            *info.last_access_time(),
+            *info.modification_time(),
+            info.attribute(),
+            &name,
+        )
+        .ok()?;
+        file.set_info(renamed).ok()
     }
 
     pub fn list(&mut self, path: &str) -> Vec<Listed> {

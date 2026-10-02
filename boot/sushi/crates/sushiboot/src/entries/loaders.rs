@@ -62,6 +62,7 @@ fn entry(origin: &Origin, id: &str, title: &str, path: String) -> BootEntry {
             path,
             options: String::new(),
         },
+        tries: None,
     }
 }
 

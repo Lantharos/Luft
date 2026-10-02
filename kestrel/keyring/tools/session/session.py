@@ -10,6 +10,7 @@ import gi
 
 from agent import exercise_agent
 from ownership import exercise_ownership
+from seal import seal_off_system_services
 
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
@@ -71,6 +72,7 @@ def old_keyring(root, name, command, password, items):
 
 
 def main():
+    seal_off_system_services()
     root = tempfile.mkdtemp(prefix="luft-keyring-")
     try:
         run(root)

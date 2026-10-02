@@ -133,6 +133,8 @@ Kestrel copies your display arrangement there whenever you change it, and Sushi 
 
 Keep `nvidia-drm.fbdev=1` (the default with current drivers). Without it, the driver turns every screen off whenever a program lets go of the display, which undoes the hand-over. Sushi doesn't need the NVIDIA driver in the initramfs; it follows the screen when the driver loads later.
 
+The NVIDIA driver can't take over the picture the firmware left on screen: the first time anything sets a display mode on it, the driver switches the display off and on again, and the monitor goes dark while it picks the signal back up, for longer when the refresh rate changes too. Sushi draws on the new device the moment it appears and sets the mode the login screen will use, so this happens once per start and never again at the login screen or when signing in.
+
 ## sushictl
 
 ```bash

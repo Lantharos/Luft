@@ -10,11 +10,11 @@
 	import { toasts } from '$lib/shell/toasts.svelte';
 
 	interface Props {
-		message: number;
+		source: api.PartSource;
 		attachments: Attachment[];
 	}
 
-	let { message, attachments }: Props = $props();
+	let { source, attachments }: Props = $props();
 
 	let shown = $derived(attachments.filter((attachment) => !attachment.inline));
 
@@ -25,7 +25,7 @@
 	}
 
 	async function save(index: number) {
-		const path = await api.saveAttachment(message, index).catch(toasts.fail);
+		const path = await api.saveAttachment(source, index).catch(toasts.fail);
 		if (path) toasts.show('Saved', { action: { label: 'Open', run: () => void api.openUri(`file://${path}`) } });
 	}
 </script>
@@ -35,7 +35,7 @@
 		{#each shown as attachment (attachment.index)}
 			{@const Icon = icon(attachment.mime)}
 			<div class="attachment">
-				<button type="button" class="open" onclick={() => void api.openAttachment(message, attachment.index).catch(toasts.fail)}>
+				<button type="button" class="open" onclick={() => void api.openAttachment(source, attachment.index).catch(toasts.fail)}>
 					<Icon size={17} class="flex-none text-[var(--text-muted)]" />
 					<span class="min-w-0 truncate">{attachment.name}</span>
 					<span class="flex-none text-[12px] text-[var(--text-muted)]">{size(attachment.size)}</span>

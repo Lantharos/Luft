@@ -43,6 +43,8 @@
 					<ThreadRow
 						{row}
 						selected={list.selected === row.thread}
+						chosen={list.chosen.has(row.thread)}
+						onchoose={(range) => list.choose(row.thread, range)}
 						onopen={() => (row.draft && list.view === 'drafts' ? void composer.reopen(row.id) : void openThread(row.thread))}
 						onarchive={() => actions.move('archive', [row.thread])}
 						ontrash={() => actions.move(list.view === 'trash' ? 'deleteForever' : 'trash', [row.thread])}

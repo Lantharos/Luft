@@ -6,6 +6,7 @@
 	import { longDate } from '$lib/app/format';
 	import { composer } from '$lib/compose/composer.svelte';
 	import { mail } from '$lib/mail/mail.svelte';
+	import Attachments from './Attachments.svelte';
 	import MailBody from './MailBody.svelte';
 
 	interface Props {
@@ -50,7 +51,10 @@
 				{#if opened.rendered.remote.length && !images}
 					<button type="button" class="plain-button self-start" onclick={() => (images = true)}>Show pictures</button>
 				{/if}
-				<div class="pl-12"><MailBody rendered={opened.rendered} {images} bind:quotes expandQuotes /></div>
+				<div class="pl-12">
+					<MailBody rendered={opened.rendered} {images} bind:quotes expandQuotes />
+					<Attachments source={{ file: path }} attachments={opened.rendered.attachments} />
+				</div>
 			</article>
 			{#if mail.accounts.length}
 				<button type="button" class="button self-start" onclick={reply}><Reply size={16} />Reply</button>

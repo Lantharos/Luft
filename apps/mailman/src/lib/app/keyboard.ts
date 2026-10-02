@@ -25,6 +25,7 @@ const KEYS: Record<string, string> = {
 	o: 'open',
 	Escape: 'close',
 	';': 'expand',
+	x: 'choose',
 	R: 'sync',
 	'?': 'shortcuts'
 };

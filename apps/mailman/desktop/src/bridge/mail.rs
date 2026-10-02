@@ -41,12 +41,16 @@ fn body(state: &MailmanState, Id { id }: Id) -> Result<Option<render::Rendered>,
         .ok_or_else(|| "This message can't be read".into())
 }
 
-fn raw_attachment(state: &MailmanState, id: i64, index: u32) -> Result<(String, Vec<u8>), String> {
-    let raw = state
-        .store
-        .body(id)?
-        .ok_or("This message hasn't arrived yet")?;
-    render::attachment(&raw, index).ok_or_else(|| "That attachment is gone".into())
+fn raw_attachment(state: &MailmanState, part: &Part) -> Result<(String, Vec<u8>), String> {
+    let raw = match (&part.file, part.id) {
+        (Some(file), _) => std::fs::read(file).map_err(|error| error.to_string())?,
+        (None, Some(id)) => state
+            .store
+            .body(id)?
+            .ok_or("This message hasn't arrived yet")?,
+        (None, None) => return Err("That attachment is gone".into()),
+    };
+    render::attachment(&raw, part.index).ok_or_else(|| "That attachment is gone".into())
 }
 
 fn remote_images(state: &MailmanState, Urls { urls }: Urls) -> Result<(), String> {
@@ -75,9 +79,15 @@ fn safe_name(name: &str) -> String {
     }
 }
 
-fn open_attachment(state: &MailmanState, Part { id, index }: Part) -> Result<(), String> {
-    let (name, bytes) = raw_attachment(state, id, index)?;
-    let folder = cache_folder().join("attachments").join(id.to_string());
+fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
+    let (name, bytes) = raw_attachment(state, &part)?;
+    let source = part
+        .file
+        .clone()
+        .unwrap_or_else(|| part.id.unwrap_or_default().to_string());
+    let folder = cache_folder()
+        .join("attachments")
+        .join(format!("{:x}", digest(&source)));
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(safe_name(&name));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
@@ -86,11 +96,8 @@ fn open_attachment(state: &MailmanState, Part { id, index }: Part) -> Result<(),
         .map_err(|error| error.to_string())
 }
 
-fn save_attachment(
-    state: &MailmanState,
-    Part { id, index }: Part,
-) -> Result<Option<String>, String> {
-    let (name, bytes) = raw_attachment(state, id, index)?;
+fn save_attachment(state: &MailmanState, part: Part) -> Result<Option<String>, String> {
+    let (name, bytes) = raw_attachment(state, &part)?;
     let name = safe_name(&name);
     let downloads = dirs::download_dir();
     let chooser = FileChooser {
@@ -172,11 +179,6 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("screen", state, |state, Verdict { address, verdict }| {
             state.store.set_verdict(&address, &verdict)
         })
-        .with(
-            "recategorize",
-            state,
-            |state, Recategorize { ids, category }| state.store.categorize(&ids, &category),
-        )
         .with("open_attachment", state, open_attachment)
         .with("save_attachment", state, save_attachment)
         .with("contacts", state, |state, Query { query }| {

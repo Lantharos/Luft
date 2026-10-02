@@ -182,11 +182,10 @@ async function _initializeGreeter() {
     wm = new WindowManager.WindowManager();
     InputSources.getInputSourceManager().reload();
 
-    layoutManager.init();
-    KestrelUi.startGreeter({
+    layoutManager.init(KestrelUi.startGreeter({
         layoutManager,
         pushModal: actor => pushModal(actor, {actionMode: Shell.ActionMode.LOGIN_SCREEN}),
-    });
+    }));
 
     GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
         Shell.util_sd_notify();

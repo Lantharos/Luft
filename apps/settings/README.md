@@ -9,7 +9,7 @@ Settings is the system settings app for Luft, built with Sabine and SvelteKit. I
 - Displays: arrangement, resolution, refresh rate, scale, brightness and night light
 - Sound: output and input devices, connections, volumes and alert sounds, with app volumes, including which output each app plays on, and device profiles on pages of their own
 - Power: power mode, battery health and charge limit, keyboard backlight, screen blanking and suspend. On computers without a battery the page is called Power and leaves out everything about the battery
-- Keyboard: input sources and repeat, with every keyboard shortcut, app shortcuts and your own on a page of their own
+- Keyboard: input sources and repeat, with every keyboard shortcut, app shortcuts and your own on a page of their own. Input sources are keyboard layouts, including your own, and input methods, including the ones made in Keys. When Keys is installed, layouts and input methods made in it have an edit button that opens them there, and the page has rows to make a new layout from the first one in the list, make an input method, or open Keys
 - Mouse and touchpad: speed, scrolling and tap to click, each shown when that kind of device is connected. The page is named after what is connected, and only appears once a mouse or touchpad is, including one plugged in while Settings is open
 - Notifications: do not disturb, the lock screen, and a page for per-app notifications, including which apps may still notify you during do not disturb
 - Apps: default apps and what each app is allowed to do

@@ -194,7 +194,7 @@ libst = shared_library('st-' + mutter_api_version,
     rsvg_dep,
   ],
   build_rpath: mutter_typelibdir,
-  install_rpath: mutter_typelibdir,
+  install_rpath: install_rpath,
   install_dir: pkglibdir,
   install: true
 )

@@ -95,6 +95,7 @@ case "$action" in
       -Dcogl_tests=false -Dclutter_tests=false -Dmutter_tests=false -Dinstalled_tests=false
     meson compile -C "$build/compositor"
     as_owner "$prefix" meson install -C "$build/compositor" --no-rebuild
+    as_owner "$prefix" rm -f "$prefix/bin/mutter"
 
     (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
     meson setup "$build/engine" "$root/kestrel/engine" \

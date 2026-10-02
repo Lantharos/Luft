@@ -91,7 +91,7 @@
 						<Ellipsis size={16} />
 					</button>
 				{/if}
-				<Attachments message={message.id} attachments={rendered.attachments} />
+				<Attachments source={{ id: message.id }} attachments={rendered.attachments} />
 			{:else if failure}
 				<p class="text-[13px] text-[var(--danger)]">{failure}</p>
 			{:else}

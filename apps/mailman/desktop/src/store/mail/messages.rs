@@ -214,20 +214,6 @@ impl Store {
         })
     }
 
-    pub fn categorize(&self, ids: &[i64], category: &str) -> Result<(), String> {
-        self.writing(|connection| {
-            let transaction = connection.transaction()?;
-            {
-                let mut update = transaction
-                    .prepare_cached("UPDATE messages SET category = ?2 WHERE id = ?1")?;
-                for id in ids {
-                    update.execute(params![id, category])?;
-                }
-            }
-            transaction.commit()
-        })
-    }
-
     pub fn wake_snoozed(&self) -> Result<Vec<i64>, String> {
         self.writing(|connection| {
             connection

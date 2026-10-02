@@ -23,14 +23,16 @@ export interface Shell {
 	showShortcuts: () => void;
 }
 
-function target() {
-	return reader.thread ?? list.selected;
+function targets() {
+	if (list.chosen.size) return list.targets();
+	const thread = reader.thread ?? list.selected;
+	return thread === null ? [] : [thread];
 }
 
-function onThread(run: (thread: number) => void) {
+function onThreads(run: (threads: number[]) => void) {
 	return () => {
-		const thread = target();
-		if (thread !== null) run(thread);
+		const threads = targets();
+		if (threads.length) run(threads);
 	};
 }
 
@@ -59,26 +61,28 @@ export function commands(shell: Shell): Command[] {
 		.map((mailbox) => ({ id: `go-mailbox:${mailbox.id}`, title: `Go to ${mailbox.name}`, run: () => navigate(`mailbox:${mailbox.id}`) }));
 	const moves = mail.mailboxes
 		.filter((mailbox) => mailbox.selectable && !mailbox.role)
-		.map((mailbox) => ({ id: `move-${mailbox.id}`, title: `Move to ${mailbox.name}`, run: onThread((thread) => actions.moveTo(mailbox.id, [thread])) }));
-	const selectedRow = () => list.rows.find((row) => row.thread === target());
+		.map((mailbox) => ({ id: `move-${mailbox.id}`, title: `Move to ${mailbox.name}`, run: onThreads((threads) => actions.moveTo(mailbox.id, threads)) }));
+	const starred = (threads: number[]) => threads.every((thread) => list.rows.find((row) => row.thread === thread)?.flagged);
 	return [
 		{ id: 'compose', title: 'Write a message', keys: 'C', run: () => composer.start() },
 		{ id: 'search', title: 'Search mail', keys: '/', run: shell.focusSearch },
-		{ id: 'archive', title: 'Archive', keys: 'E', run: onThread((thread) => actions.move('archive', [thread])) },
-		{ id: 'trash', title: 'Delete', keys: '#', run: onThread((thread) => actions.move(list.view === 'trash' ? 'deleteForever' : 'trash', [thread])) },
+		{ id: 'archive', title: 'Archive', keys: 'E', run: onThreads((threads) => actions.move('archive', threads)) },
+		{ id: 'trash', title: 'Delete', keys: '#', run: onThreads((threads) => actions.move(list.view === 'trash' ? 'deleteForever' : 'trash', threads)) },
 		{ id: 'later', title: 'Later…', keys: 'B', run: shell.later },
-		{ id: 'star', title: 'Star or unstar', keys: 'S', run: onThread((thread) => void actions.setStar([thread], !selectedRow()?.flagged)) },
-		{ id: 'unread', title: 'Mark as unread', keys: 'Shift U', run: onThread((thread) => void actions.setRead([thread], false)) },
-		{ id: 'read', title: 'Mark as read', keys: 'Shift I', run: onThread((thread) => void actions.setRead([thread], true)) },
+		{ id: 'star', title: 'Star or unstar', keys: 'S', run: onThreads((threads) => void actions.setStar(threads, !starred(threads))) },
+		{ id: 'unread', title: 'Mark as unread', keys: 'Shift U', run: onThreads((threads) => void actions.setRead(threads, false)) },
+		{ id: 'read', title: 'Mark as read', keys: 'Shift I', run: onThreads((threads) => void actions.setRead(threads, true)) },
 		{ id: 'reply', title: 'Reply', keys: 'R', run: replyTo(false) },
 		{ id: 'reply-all', title: 'Reply all', keys: 'A', run: replyTo(true) },
 		{ id: 'forward', title: 'Forward', keys: 'F', run: () => void opened().then((found) => found && composer.forward(found.latest, found.rendered)) },
-		{ id: 'junk', title: 'Report junk', keys: '!', run: onThread((thread) => actions.move('spam', [thread])) },
-		{ id: 'inbox', title: 'Move to Inbox', keys: 'Shift V', run: onThread((thread) => actions.move('inbox', [thread])) },
+		{ id: 'junk', title: 'Report junk', keys: '!', run: onThreads((threads) => actions.move('spam', threads)) },
+		{ id: 'inbox', title: 'Move to Inbox', keys: 'Shift V', run: onThreads((threads) => actions.move('inbox', threads)) },
+		{ id: 'choose', title: 'Select or unselect the conversation', keys: 'X', run: () => list.selected !== null && list.choose(list.selected) },
+		{ id: 'choose-all', title: 'Select every conversation shown', run: () => list.rows.forEach((row) => list.chosen.add(row.thread)) },
 		{ id: 'next', title: 'Next conversation', keys: 'J', run: () => step(1) },
 		{ id: 'previous', title: 'Previous conversation', keys: 'K', run: () => step(-1) },
 		{ id: 'open', title: 'Open conversation', keys: 'Enter', run: open },
-		{ id: 'close', title: 'Back to the list', keys: 'Esc', run: () => reader.close() },
+		{ id: 'close', title: 'Back to the list', keys: 'Esc', run: () => (list.chosen.size ? list.chosen.clear() : reader.close()) },
 		{ id: 'expand', title: 'Expand all messages', keys: ';', run: () => reader.expandAll() },
 		...views,
 		...folders,

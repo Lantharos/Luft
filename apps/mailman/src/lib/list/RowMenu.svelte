@@ -13,7 +13,7 @@
 
 	let { row, at, onclose }: Props = $props();
 
-	let threads = $derived([row.thread]);
+	let threads = $derived(list.chosen.has(row.thread) ? [...list.chosen] : [row.thread]);
 	let folders = $derived(mail.mailboxes.filter((mailbox) => mailbox.account === row.account && mailbox.selectable && !mailbox.role));
 
 	function run(action: () => void) {

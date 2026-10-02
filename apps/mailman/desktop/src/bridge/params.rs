@@ -89,7 +89,8 @@ pub struct Verdict {
 
 #[derive(Deserialize)]
 pub struct Part {
-    pub id: i64,
+    pub id: Option<i64>,
+    pub file: Option<String>,
     pub index: u32,
 }
 
@@ -129,12 +130,6 @@ pub struct Template {
     pub id: Option<i64>,
     pub name: String,
     pub body: String,
-}
-
-#[derive(Deserialize)]
-pub struct Recategorize {
-    pub ids: Vec<i64>,
-    pub category: String,
 }
 
 #[derive(Deserialize)]

@@ -13,6 +13,7 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 - Bundles keep newsletters, receipts and updates out of the inbox. They are summed up at its top with who sent them, and each has its own view
 - Unsubscribe from a newsletter with one click, using the sender's one-click unsubscribe where it offers one
 - Later sets a conversation aside until a time you pick, then puts it back at the top of the inbox, unread
+- Select several conversations to archive, delete, move, star or set them aside together
 - Undo for archiving, deleting, moving and setting aside, and for sending: messages wait a few seconds before they leave, long enough to take them back
 - Send later, and a reminder that brings a sent message back to the inbox if nobody replies
 - Conversation view that hides quoted history and signatures behind a small button, and collapses long threads
@@ -31,7 +32,8 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 |----------|--------|
 | `J` / `K` | Next and previous conversation |
 | `Enter` / `O` | Open the conversation |
-| `Esc` | Back to the list |
+| `X` | Select the conversation, to act on several at once; `Shift`+click selects a range |
+| `Esc` | Clear the selection, or go back to the list |
 | `E` | Archive |
 | `#` | Delete |
 | `B` | Set aside for later |

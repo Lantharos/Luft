@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
 	import Archive from '@lucide/svelte/icons/archive';
+	import Check from '@lucide/svelte/icons/check';
 	import Clock from '@lucide/svelte/icons/clock';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
 	import Star from '@lucide/svelte/icons/star';
@@ -11,14 +12,16 @@
 	interface Props {
 		row: ThreadRow;
 		selected: boolean;
+		chosen: boolean;
 		onopen: () => void;
+		onchoose: (range: boolean) => void;
 		onarchive: () => void;
 		ontrash: () => void;
 		onlater: (anchor: HTMLElement) => void;
 		onmenu: (event: MouseEvent) => void;
 	}
 
-	let { row, selected, onopen, onarchive, ontrash, onlater, onmenu }: Props = $props();
+	let { row, selected, chosen, onopen, onchoose, onarchive, ontrash, onlater, onmenu }: Props = $props();
 
 	let unread = $derived(row.unread > 0);
 	let name = $derived(row.draft && row.count === 1 ? 'Draft' : row.senderName || row.sender);
@@ -33,18 +36,23 @@
 <div
 	class="row"
 	class:selected
+	class:chosen
 	class:unread
 	role="option"
-	aria-selected={selected}
+	aria-selected={selected || chosen}
 	tabindex="-1"
-	onclick={onopen}
+	onclick={(event) => (event.shiftKey || event.ctrlKey || event.metaKey ? onchoose(event.shiftKey) : onopen())}
 	oncontextmenu={(event) => {
 		event.preventDefault();
 		onmenu(event);
 	}}
 	onkeydown={(event) => event.key === 'Enter' && onopen()}
 >
-	<span class="dot" aria-hidden="true"></span>
+	{#if chosen}
+		<span class="check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span>
+	{:else}
+		<span class="dot" aria-hidden="true"></span>
+	{/if}
 	<div class="min-w-0 flex-1">
 		<div class="flex items-baseline gap-2">
 			<span class="sender truncate">{name}</span>
@@ -95,6 +103,22 @@
 
 	.row.selected {
 		background: var(--surface-hover);
+	}
+
+	.row.chosen {
+		background: var(--accent-soft);
+	}
+
+	.check {
+		display: grid;
+		height: 15px;
+		width: 15px;
+		flex: none;
+		place-items: center;
+		margin: 3px -4px 0;
+		border-radius: 50%;
+		background: var(--accent);
+		color: var(--accent-text);
 	}
 
 	.dot {

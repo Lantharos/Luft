@@ -49,6 +49,7 @@
 	let showReader = $derived(wide || reader.thread !== null);
 	let title = $derived(list.searching ? 'Search' : viewLabel(list.view, mail.mailboxes));
 	let subtitle = $derived.by(() => {
+		if (list.chosen.size) return `${list.chosen.size} selected`;
 		if (list.searching) return plural(list.total, 'result', 'results');
 		const unread = list.rows.filter((row) => row.unread > 0).length;
 		if (list.view === 'inbox' && unread) return plural(unread, 'unread', 'unread');

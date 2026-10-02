@@ -65,9 +65,9 @@ export const allowImages = (address: string, allowed: boolean) => call<void>('al
 export const imagesAllowed = (email: string) => call<boolean>('images_allowed', { email });
 export const act = (action: Action, target: { threads?: number[]; ids?: number[] }) => call<{ moves: Placement[] }>('act', { ...action, ...target });
 export const screen = (address: string, verdict: 'approved' | 'denied') => call<void>('screen', { address, verdict });
-export const recategorize = (ids: number[], category: string) => call<void>('recategorize', { ids, category });
-export const openAttachment = (id: number, index: number) => call<void>('open_attachment', { id, index }, LONG);
-export const saveAttachment = (id: number, index: number) => call<string | null>('save_attachment', { id, index }, FOREVER);
+export type PartSource = { id: number } | { file: string };
+export const openAttachment = (source: PartSource, index: number) => call<void>('open_attachment', { ...source, index }, LONG);
+export const saveAttachment = (source: PartSource, index: number) => call<string | null>('save_attachment', { ...source, index }, FOREVER);
 export const contacts = (query: string) => call<Address[]>('contacts', { query });
 export const openMessageFile = (path: string) => call<OpenedFile>('open_message_file', { path });
 export const openUri = (uri: string) => call<void>('open_uri', { uri });

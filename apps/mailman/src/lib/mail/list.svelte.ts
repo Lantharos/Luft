@@ -1,3 +1,4 @@
+import { SvelteSet } from 'svelte/reactivity';
 import * as api from '$lib/api';
 import type { ThreadRow } from '$lib/api';
 import { mail } from './mail.svelte';
@@ -27,6 +28,8 @@ class ThreadList {
 	selected = $state<number | null>(null);
 	loading = $state(false);
 	summaries = $state.raw<Summary[]>([]);
+	chosen = new SvelteSet<number>();
+	private anchor: number | null = null;
 
 	items = $derived<Item[]>([
 		...this.summaries.map((summary) => ({ kind: 'summary' as const, summary })),
@@ -40,6 +43,7 @@ class ThreadList {
 	private fetchingMore = false;
 
 	async open(view: string) {
+		this.chosen.clear();
 		this.view = view;
 		this.query = '';
 		this.selected = null;
@@ -48,6 +52,7 @@ class ThreadList {
 	}
 
 	async search(query: string) {
+		this.chosen.clear();
 		this.query = query;
 		this.selected = null;
 		await this.load();
@@ -98,6 +103,24 @@ class ThreadList {
 		this.selected = thread;
 	}
 
+	choose(thread: number, range = false) {
+		const anchor = this.anchor === null ? -1 : this.rows.findIndex((row) => row.thread === this.anchor);
+		const index = this.rows.findIndex((row) => row.thread === thread);
+		if (range && anchor >= 0 && index >= 0) {
+			for (const row of this.rows.slice(Math.min(anchor, index), Math.max(anchor, index) + 1)) this.chosen.add(row.thread);
+		} else if (this.chosen.has(thread)) {
+			this.chosen.delete(thread);
+		} else {
+			this.chosen.add(thread);
+		}
+		this.anchor = thread;
+	}
+
+	targets() {
+		if (this.chosen.size) return [...this.chosen];
+		return this.selected === null ? [] : [this.selected];
+	}
+
 	step(offset: number) {
 		if (!this.rows.length) return null;
 		const index = this.index < 0 ? (offset > 0 ? 0 : this.rows.length - 1) : Math.min(this.rows.length - 1, Math.max(0, this.index + offset));
@@ -108,6 +131,7 @@ class ThreadList {
 
 	remove(threads: number[]) {
 		const gone = new Set(threads);
+		for (const thread of threads) this.chosen.delete(thread);
 		const index = this.index;
 		const remaining = this.rows.filter((row) => !gone.has(row.thread));
 		if (this.selected !== null && gone.has(this.selected)) {

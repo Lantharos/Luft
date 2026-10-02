@@ -63,7 +63,7 @@
 				onremove={remove}
 			/>
 		{/snippet}
-		<div class="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-8">
+		<div class="grid items-start gap-8 min-[1100px]:grid-cols-[minmax(0,1fr)_340px]">
 			<div class="flex min-w-0 flex-col gap-7">
 				<section class="flex flex-col gap-4">
 					<Segmented label="What to edit" options={tables} value={table} onchange={(value) => (table = value)} />
@@ -93,7 +93,7 @@
 				</section>
 				<MethodDetails editor={current} />
 			</div>
-			<section class="sticky top-2 flex flex-col gap-2">
+			<section class="flex flex-col gap-2 min-[1100px]:sticky min-[1100px]:top-2">
 				<h2 class="px-1.5 text-[14px] font-semibold text-[var(--text-soft)]">Try it</h2>
 				<TryMethod />
 			</section>

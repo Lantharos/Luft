@@ -44,21 +44,33 @@ trustctl startup arguments --once --add "systemd.log_level=debug"   # for the ne
 
 SushiBoot has no command line editor, and with Secure Boot on it never hands a command line of its own to anything it starts. It ignores boot entries that start a kernel directly, whose command line and initramfs no signature covers, and drops the options of entries that start EFI programs. The only thing it tells a kernel image is which of its signed profiles to start. A command line typed at the boot menu could start the system with `init=/bin/sh`, skipping the login screen and everything after it, so changing it takes root on the running system, which signs the images again.
 
-### Starting without GRUB
+### Starting without GRUB and GNOME's services
 
-Once the signed startup has started the computer, GRUB can go:
+Once the signed startup has started the computer and Kestrel is your desktop, GRUB can go, together with the GNOME services Kestrel replaces (Mutter, gnome-settings-daemon, the GNOME and GTK portals, GNOME Keyring and oo7):
 
 ```bash
-security/scripts/remove-grub.sh
+security/scripts/remove-grub-and-gnome.sh
 ```
 
-The script changes nothing unless this start went through SushiBoot and a signed image (`trustctl status` shows `this boot: yes`). It offers to make a recovery stick first, then works out exactly what dnf would remove and stops if that includes anything besides GRUB's packages, grubby, os-prober, the rescue initramfs configuration, the 32-bit shim and the installer, which needs GRUB. Then it:
+It asks for your password through `sudo`. Before changing anything it checks that:
 
-1. Builds and installs `luft-startup`, a small package that takes GRUB's place. Fedora's shim package requires `grub2-efi-x64` and akmods requires `grubby`, so it provides both names, replaces the GRUB packages, and keeps them from returning with updates; dnf's settings exclude them as well. It also sets kernel-install's layout to `other` with `trustd` as the initramfs generator, so kernel-install leaves `/boot` alone and only the plugin builds the initramfs and the signed image.
-2. Saves GRUB's settings and boot entries to `/var/lib/trustd/grub-DATE.tar.gz` and removes them, along with the rescue images in `/boot`.
-3. Runs `trustctl startup install`, which now also signs SushiBoot as `\EFI\fedora\grubx64.efi`, the program shim starts when nothing else is asked for.
+- this start went through SushiBoot and a signed image, with Secure Boot on and the Luft key enrolled,
+- the signed images of the running kernel and the ones before it are on the EFI system partition and signed with the Luft key, so there is a previous version to go back to,
+- `\EFI\BOOT\BOOTX64.EFI` is Fedora's shim with its fallback program, and the Luft boot entry exists,
+- Kestrel runs on its own Mutter, answers apps' portal requests, and Luft Keyring is your keyring.
 
-After that every way of starting shim ends in SushiBoot: the Luft entry, Fedora's entry, and `\EFI\BOOT\BOOTX64.EFI`, which firmware starts when it has no boot entries. Shim updates replace shim, MokManager and the fallback program, which belong to the shim package, and leave `grubx64.efi` alone. Kernel updates go through the plugin as before.
+It offers to make a recovery stick, then works out exactly what dnf would remove and stops if that includes anything besides GRUB's packages, grubby, os-prober, the rescue initramfs configuration, the 32-bit shim, the installer (which needs GRUB), the GNOME services above and what only exists for them, or anything Kestrel uses. Packages that only GNOME's services asked for but Kestrel needs, such as libeis, libinput and the location and sensor services, are marked as wanted on their own, so a later `dnf autoremove` leaves them alone. Nothing else is removed along the way. Then it:
+
+1. Builds and installs `luft-startup`, a small package that takes GRUB's place. Fedora's shim package requires `grub2-efi-x64`, akmods requires `grubby` and the NVIDIA driver requires `/usr/bin/grubby`, so it provides all three and replaces the GRUB packages, the 32-bit shim and the rescue initramfs configuration, keeping them from returning with updates; dnf's settings exclude them as well. Its `grubby` changes the command line of the signed images through `trustctl startup arguments` (`grubby --update-kernel=ALL --args=... --remove-args=...`) and names the newest kernel for `--default-kernel`. It also sets kernel-install's layout to `other` with `trustd` as the initramfs generator, so kernel-install leaves `/boot` alone and only the plugin builds the initramfs and the signed image.
+2. Removes the GNOME services in the same transaction.
+3. Saves GRUB's settings and boot entries to `/var/lib/trustd/grub-DATE.tar.gz` and removes them, along with the rescue images and GRUB's initramfs files in `/boot`.
+4. Runs `trustctl startup install`, which now also signs SushiBoot as `\EFI\fedora\grubx64.efi`, the program shim starts when nothing else is asked for, then checks the result.
+
+After that every way of starting shim ends in SushiBoot: the Luft entry, Fedora's entry, and `\EFI\BOOT\BOOTX64.EFI`, which firmware starts when it has no boot entries. Shim updates replace shim, MokManager and the fallback program, which belong to the shim package, and leave `grubx64.efi` alone. Kernel updates go through the plugin as before and leave nothing in `/boot` but what the kernel package itself puts there.
+
+If a new kernel doesn't start, hold any key while the computer starts and choose the version before it under Previous versions, or Rescue. From a running system, `sudo bootctl set-oneshot luft-VERSION.efi@main` starts that version once.
+
+Other desktops that relied on GNOME's portals, such as niri, lose them; Kestrel provides its own.
 
 ### When the firmware forgets its settings
 

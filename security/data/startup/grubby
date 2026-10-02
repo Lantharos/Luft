@@ -1,0 +1,59 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'USAGE'
+On Luft every kernel starts with the same signed command line, so this grubby
+changes that line and shows the newest kernel, and nothing else:
+
+  grubby --update-kernel=ALL --args="ARGS" --remove-args="ARGS"
+  grubby --default-kernel
+USAGE
+  exit 1
+}
+
+newest_kernel() {
+  local images=(/usr/lib/modules/*/vmlinuz)
+  printf '%s\n' "${images[@]}" | awk -F/ '{print $5}' | sort -V | tail -1
+}
+
+key() {
+  printf '%s' "${1%%=*}"
+}
+
+change_arguments() {
+  local current add=() remove=() word present
+  current="$(trustctl startup arguments)"
+  for word in $1; do
+    [[ " $current " == *" $word "* ]] && continue
+    [[ "$word" == *=* ]] && remove+=("$(key "$word")")
+    add+=("$word")
+  done
+  for word in $2; do
+    for present in $current; do
+      [[ "$(key "$present")" == "$(key "$word")" ]] && remove+=("$(key "$word")") && break
+    done
+  done
+  ((${#add[@]} + ${#remove[@]})) || return 0
+  trustctl startup arguments ${add[*]:+--add "${add[*]}"} ${remove[*]:+--remove "${remove[*]}"} >/dev/null
+}
+
+update=false
+args=""
+remove_args=""
+while (($#)); do
+  case "$1" in
+    --update-kernel=*) update=true ;;
+    --update-kernel) update=true; shift ;;
+    --args=*) args="${1#*=}" ;;
+    --args) args="${2:-}"; shift ;;
+    --remove-args=*) remove_args="${1#*=}" ;;
+    --remove-args) remove_args="${2:-}"; shift ;;
+    --default-kernel) echo "/boot/vmlinuz-$(newest_kernel)"; exit 0 ;;
+    *) usage ;;
+  esac
+  shift
+done
+
+$update || usage
+change_arguments "$args" "$remove_args"

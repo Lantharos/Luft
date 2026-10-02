@@ -165,8 +165,17 @@ fn capacity(packs: &[Pack]) -> Option<Capacity> {
     (full > 0.0 && design > 0.0).then_some(Capacity { full, design })
 }
 
+fn is_battery(display: &Properties) -> bool {
+    is(display, "IsPresent") && display.get::<u32>("Type") == Some(TYPE_BATTERY)
+}
+
+pub fn present(connection: &Connection) -> bool {
+    Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE)
+        .is_ok_and(|display| is_battery(&display))
+}
+
 fn battery(display: &Properties, packs: &[Pack]) -> Option<Battery> {
-    if !is(display, "IsPresent") || display.get::<u32>("Type") != Some(TYPE_BATTERY) {
+    if !is_battery(display) {
         return None;
     }
     Some(Battery {

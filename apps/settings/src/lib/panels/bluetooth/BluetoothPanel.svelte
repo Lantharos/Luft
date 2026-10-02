@@ -229,10 +229,6 @@
 		<Section>
 			<Row title="Bluetooth is off with a hardware switch" description="Use the switch or key on your computer to turn it on" icon={BluetoothIcon} />
 		</Section>
-	{:else}
-		<Section>
-			<Row title="No Bluetooth adapter found" description="Plug in an adapter to connect wireless devices" icon={BluetoothIcon} />
-		</Section>
 	{/if}
 {/if}
 

@@ -89,9 +89,7 @@ impl UserThemes {
         let Some(name) = dir.file_name().map(|name| name.to_string_lossy()) else {
             return false;
         };
-        dir.parent() == Some(self.icons.as_path())
-            && valid(&name)
-            && only_cursors(dir)
+        dir.parent() == Some(self.icons.as_path()) && valid(&name) && only_cursors(dir)
     }
 
     pub fn remove(&self, name: &str) -> Result<(), String> {

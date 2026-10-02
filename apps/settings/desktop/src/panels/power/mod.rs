@@ -62,6 +62,10 @@ fn can_hibernate(connection: &Connection) -> bool {
         .is_ok_and(|answer| matches!(answer.as_str(), "yes" | "challenge"))
 }
 
+pub fn has_battery() -> bool {
+    dbus::system().is_ok_and(battery::present)
+}
+
 fn read() -> Result<PowerState, String> {
     let connection = dbus::system()?;
     let (battery, devices) = battery::read(connection).unwrap_or_default();

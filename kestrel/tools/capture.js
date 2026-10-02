@@ -348,7 +348,7 @@ export async function run() {
   await checkNightLight({pause});
   await checkPower({pause, pointer});
   await checkAppIcons({pause, capture, actorNamed, output});
-  await checkLuftApps({output});
+  await checkLuftApps({output, pointer});
   await checkLiveWallpaper({pause, actorNamed});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});

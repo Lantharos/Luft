@@ -1,6 +1,6 @@
 mod actions;
 mod agent;
-mod rfkill;
+pub mod rfkill;
 mod snapshot;
 mod watch;
 
@@ -10,6 +10,7 @@ use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+use zbus::names::BusName;
 
 use super::network;
 use snapshot::{Adapter, Bluetooth};
@@ -53,6 +54,25 @@ fn bluetooth() -> Result<Bluetooth, String> {
         SERVICE,
         "/",
     )?))
+}
+
+pub fn present() -> bool {
+    if rfkill::hard_blocked() {
+        return true;
+    }
+    let Ok(connection) = dbus::system() else {
+        return false;
+    };
+    let running = zbus::blocking::fdo::DBusProxy::new(connection)
+        .ok()
+        .and_then(|bus| {
+            bus.name_has_owner(BusName::from_static_str(SERVICE).ok()?)
+                .ok()
+        })
+        .unwrap_or(false);
+    running
+        && Objects::fetch(connection, SERVICE, "/")
+            .is_ok_and(|objects| objects.implementing(ADAPTER).next().is_some())
 }
 
 fn adapter() -> Result<Adapter, String> {

@@ -1,13 +1,15 @@
 import { appearance } from '@luft/ui';
 import { appState, onActivated } from '$lib/bridge';
-import { DEFAULT_PANEL, resolvePanel, type PanelId } from '$lib/panels/registry';
+import { DEFAULT_PANEL, resolveLink, type PanelId } from '$lib/panels/registry';
+import { hardware } from './hardware.svelte';
 
 class AppStore {
 	panel = $state<PanelId>(DEFAULT_PANEL);
+	section = $state<string | null>(null);
 	query = $state('');
 
 	async start() {
-		const state = await appState();
+		const [state] = await Promise.all([appState(), hardware.start()]);
 		appearance.start(state);
 		if (state.page) this.open(state.page);
 		onActivated(({ arguments: args }) => {
@@ -17,11 +19,11 @@ class AppStore {
 	}
 
 	open(target: string) {
-		const panel = resolvePanel(target);
-		if (panel) {
-			this.panel = panel;
-			this.query = '';
-		}
+		const link = resolveLink(target);
+		if (!link) return;
+		this.panel = link.panel;
+		this.section = link.section;
+		this.query = '';
 	}
 }
 

@@ -14,6 +14,8 @@
 	import DocumentView from '$lib/document/DocumentView.svelte';
 	import PageThumbnails from '$lib/document/PageThumbnails.svelte';
 	import { documentState } from '$lib/document/state.svelte';
+	import FontActions from '$lib/font/FontActions.svelte';
+	import FontView from '$lib/font/FontView.svelte';
 	import { plural } from '$lib/library/format';
 	import { library } from '$lib/library/library.svelte';
 	import { folderTitle } from '$lib/library/places';
@@ -48,7 +50,7 @@
 		if (browsing) return library.items.length ? plural(library.items.length, 'item', 'items') : null;
 		if (library.group === 'audio') return player.queue.length > 1 ? `${player.position + 1} of ${player.queue.length}` : null;
 		if (library.group === 'document') return documentState.pages ? `Page ${documentState.page} of ${documentState.pages}` : null;
-		if (library.group === 'visual' && library.siblings.length > 1) return `${library.index + 1} of ${library.siblings.length}`;
+		if ((library.group === 'visual' || library.group === 'font') && library.siblings.length > 1) return `${library.index + 1} of ${library.siblings.length}`;
 		return null;
 	});
 
@@ -107,13 +109,15 @@
 			<Header {title} {subtitle} overlay={chrome.fullscreen}>
 				{#snippet actions()}
 					<NowPlaying />
-					{#if viewer && library.group}
+					{#if viewer && library.group && library.group !== 'font'}
 						<PanelToggle group={library.group} />
 					{/if}
 					{#if item?.kind === 'image'}
 						<PhotoActions />
 					{:else if library.group === 'document'}
 						<DocumentActions />
+					{:else if library.group === 'font'}
+						<FontActions />
 					{:else if item}
 						<MoreMenu />
 					{/if}
@@ -136,6 +140,8 @@
 							<DocumentView {item} />
 						{/key}
 					</div>
+				{:else if item && library.group === 'font'}
+					<div class="min-w-0 flex-1"><FontView {item} /></div>
 				{:else if browsing}
 					<div class="flex min-w-0 flex-1 flex-col"><Gallery /></div>
 				{:else}

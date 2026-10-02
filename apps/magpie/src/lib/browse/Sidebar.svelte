@@ -15,6 +15,7 @@
 	let summary = $derived.by(() => {
 		if (library.group === 'audio') return plural(player.queue.length, 'song', 'songs');
 		if (library.group === 'document') return documentState.pages ? plural(documentState.pages, 'page', 'pages') : '';
+		if (library.group === 'font') return plural(library.siblings.length, 'font', 'fonts');
 		const photos = library.siblings.filter((item) => item.kind === 'image').length;
 		const videos = library.siblings.length - photos;
 		if (!videos) return plural(photos, 'photo', 'photos');
@@ -33,7 +34,7 @@
 				<p class="truncate text-[13px] font-semibold text-[var(--text)]">{title}</p>
 				<p class="truncate text-[12px] text-[var(--sidebar-text-muted)]">{summary}</p>
 			</header>
-			{#if library.group === 'visual'}
+			{#if library.group === 'visual' || library.group === 'font'}
 				<FolderGrid />
 			{:else if library.group === 'audio'}
 				<QueueList />

@@ -9,6 +9,7 @@ pub enum Kind {
     Video,
     Audio,
     Document,
+    Font,
 }
 
 const BROWSER_IMAGES: [&str; 13] = [
@@ -21,6 +22,7 @@ const NATIVE_IMAGES: [&str; 16] = [
 const VIDEOS: [&str; 9] = [
     "mp4", "m4v", "webm", "mkv", "mov", "ogv", "3gp", "avi", "ts",
 ];
+const FONTS: [&str; 6] = ["ttf", "otf", "ttc", "otc", "woff", "woff2"];
 const AUDIO: [&str; 11] = [
     "mp3", "flac", "ogg", "oga", "opus", "wav", "m4a", "aac", "weba", "mka", "m4b",
 ];
@@ -43,6 +45,8 @@ pub fn kind(path: &Path) -> Option<Kind> {
         Some(Kind::Audio)
     } else if extension == "pdf" {
         Some(Kind::Document)
+    } else if FONTS.contains(&extension) {
+        Some(Kind::Font)
     } else {
         None
     }
@@ -59,6 +63,7 @@ pub fn patterns() -> Vec<String> {
         .chain(&VIDEOS)
         .chain(&AUDIO)
         .chain(&["pdf"])
+        .chain(&FONTS)
         .map(|extension| format!("*.{extension}"))
         .collect()
 }

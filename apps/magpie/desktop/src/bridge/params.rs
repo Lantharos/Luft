@@ -43,3 +43,9 @@ pub struct OpenWith {
 pub struct Uri {
     pub uri: String,
 }
+
+#[derive(Deserialize)]
+pub struct FontFace {
+    pub path: String,
+    pub index: u32,
+}

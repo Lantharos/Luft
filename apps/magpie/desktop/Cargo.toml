@@ -18,11 +18,14 @@ glycin = { version = "4.0.0", default-features = false, features = ["tokio"] }
 imagesize = "0.15.0"
 kamadak-exif = "0.6.1"
 lofty = "0.25.4"
-luft-app = { path = "../../../packages/app", features = ["apps", "thumbnails"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "thumbnails"] }
 matroska-demuxer = "0.8.1"
 parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.33" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+skrifa = "0.47"
 tokio = { version = "1.53.1", default-features = false, features = ["rt-multi-thread"] }
+write-fonts = "0.53"
+wuff = "0.2.9"
 zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

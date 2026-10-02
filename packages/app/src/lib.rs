@@ -5,6 +5,8 @@ pub mod dbus;
 mod events;
 #[cfg(feature = "fonts")]
 pub mod fonts;
+#[cfg(feature = "ibus")]
+pub mod ibus;
 mod kestrel;
 pub mod portal;
 pub mod secrets;

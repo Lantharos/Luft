@@ -65,7 +65,7 @@ window
 
 ## D-Bus
 
-`dbus::session()` and `dbus::system()` return cached blocking zbus connections. They run on a dedicated Tokio runtime with one worker thread, because bridge handlers aren't called from inside a runtime and zbus needs one. `dbus::objects` reads `ObjectManager` trees and debounces bursts of change signals.
+`dbus::session()` and `dbus::system()` return cached blocking zbus connections, and `dbus::at(address)` opens a new one to any other bus, such as IBus's. They run on a dedicated Tokio runtime with one worker thread, because bridge handlers aren't called from inside a runtime and zbus needs one. `dbus::objects` reads `ObjectManager` trees and debounces bursts of change signals.
 
 ## File chooser
 
@@ -105,3 +105,7 @@ thumbnails.request(paths, ThumbnailSize::Large);
 ```
 
 Finished thumbnails arrive on the page in batches under the given event name, each item with the file's `path`, its `thumbnail` path or `null` when none could be made, and the file's `modified` time. Files that can't be thumbnailed are remembered in the cache so they aren't tried again until they change.
+
+## IBus
+
+With the `ibus` feature, `ibus::address()` finds the address of the session's IBus daemon the same way IBus's own library does: from `IBUS_ADDRESS`, the file named by `IBUS_ADDRESS_FILE`, or the file IBus writes for the current display under `~/.config/ibus/bus`. Connect to it with zbus to list input methods or to serve one.

@@ -51,6 +51,7 @@
     <file preprocess="xml-stripblanks">scalable/actions/shell-focus-windows-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.barometer-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.draft-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.keys-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.magpie-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.rover-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.schelf-symbolic.svg</file>

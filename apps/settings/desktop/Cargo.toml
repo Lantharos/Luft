@@ -24,7 +24,7 @@ jxl-oxide = { version = "0.12.6", features = ["image"] }
 libc = "0.2.189"
 liblzma = "0.4.8"
 libpulse-binding = "2.30.1"
-luft-app = { path = "../../../packages/app", features = ["apps", "fonts"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "ibus"] }
 luft-software = { path = "../../../packages/software" }
 roxmltree = "0.21.1"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.33" }

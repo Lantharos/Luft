@@ -5,6 +5,13 @@ export type Category = 'system' | 'windows' | 'workspaces' | 'screenshots' | 'me
 export interface Layout {
 	id: string;
 	name: string;
+	custom: boolean;
+}
+
+export interface InputMethod {
+	id: string;
+	name: string;
+	language: string;
 }
 
 export interface ShortcutEntry {
@@ -21,6 +28,9 @@ interface Location {
 }
 
 export const layouts = () => invoke<Layout[]>('keyboard_layouts');
+export const inputMethods = () => invoke<InputMethod[]>('keyboard_input_methods');
+export const keysInstalled = () => invoke<boolean>('keyboard_keys_installed');
+export const openKeys = (link: string) => invoke<void>('keyboard_open_keys', { link });
 export const shortcutEntries = () => invoke<ShortcutEntry[]>('keyboard_shortcuts');
 export const appNames = (ids: string[]) => invoke<Record<string, string>>('keyboard_app_names', { ids });
 export const writeSetting = (location: Location, key: string, value: unknown) => invoke<void>('settings_write', { ...location, key, value });

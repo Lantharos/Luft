@@ -2,24 +2,23 @@
 	import { tick } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import { Dialog } from '@luft/ui';
-	import type { Layout } from './api';
+	import type { Source } from './sources';
 
 	interface Props {
-		layouts: Layout[];
-		added: string[];
-		onadd: (layout: Layout) => void;
+		sources: Source[];
+		onadd: (source: Source) => void;
 		onclose: () => void;
 	}
 
-	let { layouts, added, onadd, onclose }: Props = $props();
+	let { sources, onadd, onclose }: Props = $props();
 
 	let query = $state('');
-	let selected = $state<Layout | null>(null);
+	let selected = $state<Source | null>(null);
 	let list = $state<HTMLDivElement>();
 
 	let results = $derived.by(() => {
 		const needle = query.trim().toLowerCase();
-		return layouts.filter((layout) => !added.includes(layout.id) && (!needle || layout.name.toLowerCase().includes(needle)));
+		return sources.filter((source) => !needle || source.name.toLowerCase().includes(needle));
 	});
 
 	async function move(step: number) {
@@ -38,21 +37,23 @@
 	}
 </script>
 
-<Dialog title="Add an input source" description="Pick the keyboard layout you want to type with." {onclose}>
-	<input class="text-field" bind:value={query} placeholder="Search languages and layouts" onkeydown={keydown} />
-	<div bind:this={list} class="soft-scroll -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label="Layouts">
-		{#each results as layout (layout.id)}
+<Dialog title="Add an input source" description="Pick the keyboard layout or input method you want to type with." {onclose}>
+	<input class="text-field" bind:value={query} placeholder="Search languages, layouts and input methods" onkeydown={keydown} />
+	<div bind:this={list} class="soft-scroll -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label="Input sources">
+		{#each results as source (`${source.type}:${source.id}`)}
 			<button
 				type="button"
 				role="option"
-				aria-selected={selected === layout}
+				aria-selected={selected === source}
 				class="option"
-				onclick={() => (selected = layout)}
-				ondblclick={() => onadd(layout)}
+				onclick={() => (selected = source)}
+				ondblclick={() => onadd(source)}
 			>
-				<span class="truncate">{layout.name}</span>
-				{#if selected === layout}
+				<span class="truncate">{source.name}</span>
+				{#if selected === source}
 					<Check size={16} class="shrink-0" />
+				{:else if source.type === 'ibus'}
+					<span class="shrink-0 text-[12px] text-[var(--text-muted)]">Input method</span>
 				{/if}
 			</button>
 		{:else}

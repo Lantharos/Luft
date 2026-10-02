@@ -1,3 +1,4 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GnomeDesktop from 'gi://GnomeDesktop';
 import Meta from 'gi://Meta';
@@ -8,6 +9,9 @@ export const DEFAULT_LOCALE = 'en_US';
 export const DEFAULT_LAYOUT = 'us';
 export const DEFAULT_VARIANT = '';
 
+const USER_LAYOUT_FOLDERS = ['symbols', 'rules'];
+const USER_LAYOUT_SETTLE_MS = 250;
+
 let _xkbInfo = null;
 
 /**
@@ -17,6 +21,30 @@ export function getXkbInfo() {
     if (_xkbInfo == null)
         _xkbInfo = new GnomeDesktop.XkbInfo();
     return _xkbInfo;
+}
+
+/**
+ * @param {(xkbInfo: GnomeDesktop.XkbInfo) => void} callback
+ * @returns {Gio.FileMonitor[]}
+ */
+export function watchUserLayouts(callback) {
+    let pending = 0;
+    const settled = () => {
+        pending = 0;
+        _xkbInfo = new GnomeDesktop.XkbInfo();
+        callback(_xkbInfo);
+        return GLib.SOURCE_REMOVE;
+    };
+    return USER_LAYOUT_FOLDERS.map(folder => {
+        const path = GLib.build_filenamev([GLib.get_user_config_dir(), 'xkb', folder]);
+        const monitor = Gio.File.new_for_path(path).monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES, null);
+        monitor.connect('changed', () => {
+            if (pending)
+                GLib.source_remove(pending);
+            pending = GLib.timeout_add(GLib.PRIORITY_DEFAULT, USER_LAYOUT_SETTLE_MS, settled);
+        });
+        return monitor;
+    });
 }
 
 let _keyboardManager = null;
@@ -167,6 +195,14 @@ class KeyboardManager extends Signals.EventEmitter {
             return;
 
         this._doApply(this._current.id).catch(logError);
+    }
+
+    /**
+     * @param {GnomeDesktop.XkbInfo} xkbInfo
+     */
+    reloadLayouts(xkbInfo) {
+        this._xkbInfo = xkbInfo;
+        this._currentKeymap = null;
     }
 
     /**

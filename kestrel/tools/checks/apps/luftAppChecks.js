@@ -7,7 +7,7 @@ import {checkFontViewer} from './fontViewer.js';
 import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
 
-const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'barometer', 'schelf'];
+const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'barometer', 'schelf', 'keys'];
 const TRANSLUCENT = {tern: 40};
 const OPAQUE = 2;
 const SURFACE_SHARE = 0.5;

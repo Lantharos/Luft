@@ -12,6 +12,8 @@ import * as Main from '../ui/main.js';
 Gio._promisify(IBus.Bus.prototype,
     'list_engines_async', 'list_engines_async_finish');
 Gio._promisify(IBus.Bus.prototype,
+    'list_active_engines_async', 'list_active_engines_async_finish');
+Gio._promisify(IBus.Bus.prototype,
     'request_name_async', 'request_name_async_finish');
 Gio._promisify(IBus.Bus.prototype,
     'get_global_engine_async', 'get_global_engine_async_finish');
@@ -29,6 +31,7 @@ const X11_ENVIRONMENT = ['DISPLAY', 'XAUTHORITY'];
 const TYPING_BOOSTER_ENGINE = 'typing-booster';
 
 const FALLBACK_ENGINE_ID = 'xkb:us::eng';
+const ENGINES_SETTLE_MS = 200;
 
 function _checkIBusVersion(requiredMajor, requiredMinor, requiredMicro) {
     if ((IBus.MAJOR_VERSION > requiredMajor) ||
@@ -72,6 +75,9 @@ class IBusManager extends Signals.EventEmitter {
         this._registerPropertiesId = 0;
         this._currentEngineName = null;
         this._preloadEnginesId = 0;
+        this._enginesChangedId = 0;
+        this._nameOwnerChangedId = 0;
+        this._connection = null;
 
         this._ibus = IBus.Bus.new_async();
         this._ibus.connect('connected', this._onConnected.bind(this));
@@ -180,6 +186,16 @@ class IBusManager extends Signals.EventEmitter {
         if (this._panelService)
             this._panelService.destroy();
 
+        if (this._enginesChangedId) {
+            GLib.source_remove(this._enginesChangedId);
+            this._enginesChangedId = 0;
+        }
+
+        if (this._nameOwnerChangedId) {
+            this._connection.signal_unsubscribe(this._nameOwnerChangedId);
+            this._nameOwnerChangedId = 0;
+        }
+
         this._panelService = null;
         this._caret = null;
         this._candidatePopup.setPanelService(null);
@@ -193,22 +209,54 @@ class IBusManager extends Signals.EventEmitter {
 
     _onConnected() {
         this._cancellable = new Gio.Cancellable();
+        this._connection = this._ibus.get_connection();
+        this._nameOwnerChangedId = this._connection.signal_subscribe(null,
+            'org.freedesktop.DBus', 'NameOwnerChanged', '/org/freedesktop/DBus',
+            null, Gio.DBusSignalFlags.NONE, this._nameOwnerChanged.bind(this));
         this._initEngines(this._cancellable);
         this._initPanelService(this._cancellable);
     }
 
+    async _listEngines(cancellable) {
+        const [installed, registered] = await Promise.all([
+            this._ibus.list_engines_async(-1, cancellable),
+            this._ibus.list_active_engines_async(-1, cancellable),
+        ]);
+        return new Map([...installed, ...registered].map(engine => [engine.get_name(), engine]));
+    }
+
     async _initEngines(cancellable) {
         try {
-            const enginesList =
-                await this._ibus.list_engines_async(-1, cancellable);
-            for (let i = 0; i < enginesList.length; ++i) {
-                const name = enginesList[i].get_name();
-                this._engines.set(name, enginesList[i]);
-            }
+            this._engines = await this._listEngines(cancellable);
             this._updateReadiness();
         } catch (e) {
             if (logErrorUnlessCancelled(e))
                 this._clear();
+        }
+    }
+
+    _nameOwnerChanged(connection, sender, path, iface, signal, parameters) {
+        const [name] = parameters.deepUnpack();
+        if (name.startsWith(':') || this._enginesChangedId)
+            return;
+
+        this._enginesChangedId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, ENGINES_SETTLE_MS, () => {
+            this._enginesChangedId = 0;
+            this._refreshEngines(this._cancellable);
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    async _refreshEngines(cancellable) {
+        const names = engines => [...engines.keys()].sort().join();
+        try {
+            const engines = await this._listEngines(cancellable);
+            if (names(engines) === names(this._engines))
+                return;
+            this._engines = engines;
+            this.emit('engines-changed');
+        } catch (e) {
+            logErrorUnlessCancelled(e);
         }
     }
 

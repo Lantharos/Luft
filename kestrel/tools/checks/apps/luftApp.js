@@ -1,6 +1,7 @@
 import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import IBus from 'gi://IBus';
 import Shell from 'gi://Shell';
 
 import {prepareHome} from './home.js';
@@ -26,6 +27,8 @@ function launcher(flags, manifest = null) {
   launcher.setenv('XDG_RUNTIME_DIR', GLib.getenv('KESTREL_APP_RUNTIME_DIR'), true);
   launcher.setenv('WAYLAND_DISPLAY', GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')]), true);
   if (manifest) launcher.setenv('SABINE_MANIFEST_PATH', manifest, true);
+  const ibus = IBus.get_address();
+  if (ibus) launcher.setenv('IBUS_ADDRESS', ibus, true);
   launcher.set_cwd(home);
   return launcher;
 }

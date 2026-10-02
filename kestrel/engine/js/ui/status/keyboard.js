@@ -364,10 +364,16 @@ export class InputSourceManager extends Signals.EventEmitter {
         this._xkbInfo = KeyboardManager.getXkbInfo();
         this._keyboardManager = KeyboardManager.getKeyboardManager();
         this._keyboardManager.connect('keymap-changed', this._keymapChanged.bind(this));
+        if (!Main.sessionMode.isGreeter)
+            this._userLayoutMonitors = KeyboardManager.watchUserLayouts(this._userLayoutsChanged.bind(this));
 
         this._ibusReady = false;
         this._ibusManager = IBusManager.getIBusManager();
         this._ibusManager.connect('ready', this._ibusReadyCallback.bind(this));
+        this._ibusManager.connect('engines-changed', () => {
+            if (this._ibusReady)
+                this._inputSourcesChanged();
+        });
         this._ibusManager.connect('properties-registered', this._ibusPropertiesRegistered.bind(this));
         this._ibusManager.connect('property-updated', this._ibusPropertyUpdated.bind(this));
         this._ibusManager.connect('set-content-type', this._ibusSetContentType.bind(this));
@@ -388,6 +394,12 @@ export class InputSourceManager extends Signals.EventEmitter {
         this._keyboardManager.setKeyboardModel(this._settings.keyboardModel);
         this._inputSourcesChanged();
         this._reloading = false;
+    }
+
+    _userLayoutsChanged(xkbInfo) {
+        this._xkbInfo = xkbInfo;
+        this._keyboardManager.reloadLayouts(xkbInfo);
+        this.reload();
     }
 
     _ibusReadyCallback(im, ready) {
@@ -602,7 +614,7 @@ export class InputSourceManager extends Signals.EventEmitter {
                     if (textdomain !== '')
                         longName = Gettext.dgettext(textdomain, longName);
                     exists = true;
-                    displayName = `${language} (${longName})`;
+                    displayName = code === 'other' ? longName : `${language} (${longName})`;
                     shortName = this._makeEngineShortName(engineDesc);
                 }
             }

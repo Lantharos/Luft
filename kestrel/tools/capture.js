@@ -33,6 +33,7 @@ import {checkCursor} from './checks/system/cursorChecks.js';
 import {checkNightLight} from './checks/system/nightLightChecks.js';
 import {checkPower} from './checks/system/powerChecks.js';
 import {checkAppIcons} from './checks/system/appIconChecks.js';
+import {checkKeys} from './checks/apps/keysChecks.js';
 import {checkLuftApps} from './checks/apps/luftAppChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
@@ -338,6 +339,7 @@ export async function run() {
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});
+  await checkKeys({pause, capture, keyboard, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkMediaKeys({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});

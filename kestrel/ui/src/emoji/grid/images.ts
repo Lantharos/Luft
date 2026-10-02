@@ -1,19 +1,21 @@
 import type Clutter from 'gi://Clutter';
+import type Cogl from 'gi://Cogl';
 import Shell from 'gi://Shell';
 
 const CACHE_LIMIT = 512;
 
-interface EmojiRenderer {
+export interface GlyphRenderer {
   render(text: string, size: number, scale: number): Clutter.Content | null;
 }
 
-const { EmojiRenderer } = Shell as unknown as { EmojiRenderer: new () => EmojiRenderer };
+export const { GlyphRenderer } = Shell as unknown as {
+  GlyphRenderer: { new_for_emoji(): GlyphRenderer; new_for_text(family: string, color: Cogl.Color): GlyphRenderer };
+};
 
-export class EmojiImages {
-  private readonly renderer = new EmojiRenderer();
+export class GlyphImages {
   private readonly cache = new Map<string, Clutter.Content | null>();
 
-  constructor(private readonly size: number) {}
+  constructor(private readonly renderer: GlyphRenderer, private readonly size: number) {}
 
   get(text: string, scale: number): Clutter.Content | null {
     const key = `${scale} ${text}`;

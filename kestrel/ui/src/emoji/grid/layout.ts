@@ -1,4 +1,4 @@
-import type { Item, Section, Tab } from './catalog.js';
+import type { Item, Section, Tab } from '../catalog/catalog.js';
 
 export const COLUMNS = 9;
 export const CELL_SIZE = 40;
@@ -41,7 +41,7 @@ export class GridLayout {
       let row = this.addRow(null, group.tab, CELL_SIZE);
       let column = 0;
       for (const item of group.items) {
-        const span = item.kind === 'kaomoji' ? WIDE_SPAN : 1;
+        const span = item.kind === 'kaomoji' || item.kind === 'space' ? WIDE_SPAN : 1;
         if (column + span > COLUMNS) {
           row = this.addRow(null, group.tab, CELL_SIZE);
           column = 0;

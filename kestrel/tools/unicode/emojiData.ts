@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const SOURCE = process.argv[2] ?? 'https://unicode.org/Public/emoji/latest/emoji-test.txt';
-const OUTPUT = join(import.meta.dir, '../engine/data/emoji.json');
+const OUTPUT = join(import.meta.dir, '../../engine/data/emoji.json');
 const GROUPS = new Map([
   ['Smileys & Emotion', 'smileys'],
   ['People & Body', 'people'],

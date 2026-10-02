@@ -175,6 +175,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-emoji-search { padding: 10px 14px; }
 .kestrel-emoji-caret { width: 1px; height: 17px; background-color: #ffffff; }
 .kestrel-emoji-tabs { spacing: 0; }
+.kestrel-emoji-tab-scroll { -st-hfade-offset: 24px; }
+.kestrel-emoji-category { width: 41px; }
 .kestrel-emoji-tab { height: 34px; border-radius: 10px; color: rgba(255, 255, 255, 0.60); transition-duration: 120ms; }
 .kestrel-emoji-tab:hover { background-color: rgba(255, 255, 255, 0.09); color: #ffffff; }
 .kestrel-emoji-tab:checked { color: #ffffff; }
@@ -189,8 +191,8 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-emoji-cell { border-radius: 10px; font-size: 26px; transition-duration: 100ms; }
 .kestrel-emoji-cell:hover { background-color: rgba(255, 255, 255, 0.10); }
 .kestrel-emoji-cell:selected { background-color: rgba(255, 255, 255, 0.20); }
-.kestrel-emoji-character { font-size: 20px; }
-.kestrel-emoji-kaomoji { font-size: 13px; padding: 0 6px; }
+.kestrel-emoji-wide { font-size: 13px; padding: 0 6px; }
+.kestrel-emoji-space { color: rgba(255, 255, 255, 0.65); }
 .kestrel-emoji-header { padding: 12px 4px 0; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.60); }
 .kestrel-emoji-name { padding: 0 4px; height: 16px; font-size: 12px; color: rgba(255, 255, 255, 0.65); }
 

@@ -7,13 +7,15 @@ import { blurSurface } from '../shared/surface.js';
 import { animateActor } from '../shared/motion.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../shared/placement.js';
 import type { TextInput } from '../shared/textInput.js';
-import { Catalog, withTone } from './catalog.js';
-import { EmojiGrid, GRID_WIDTH } from './grid.js';
-import { GridLayout, type Cell } from './layout.js';
+import { annotate } from './catalog/annotations.js';
+import { Catalog, describe, withTone } from './catalog/catalog.js';
+import { SearchIndex } from './catalog/search.js';
+import { SearchField } from './controls/searchField.js';
+import { TabStrip } from './controls/tabStrip.js';
+import { TonePicker } from './controls/tonePicker.js';
+import { EmojiGrid, GRID_WIDTH } from './grid/grid.js';
+import { GridLayout, type Cell } from './grid/layout.js';
 import { EmojiPreferences } from './preferences.js';
-import { annotate, EmojiIndex } from './search.js';
-import { SearchField } from './searchField.js';
-import { TabStrip, TonePicker } from './strips.js';
 
 type Zone = 'grid' | 'tone' | 'tabs' | 'tones';
 
@@ -22,15 +24,12 @@ const PREFERRED_HEIGHT = 452;
 const SLIDE_DISTANCE = 8;
 const FADE_DURATION = 160;
 const INDEX_DELAY_SECONDS = 5;
+const INDEX_CHUNK = 500;
 const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
 const NAVIGATION_KEYS = [
   Clutter.KEY_Left, Clutter.KEY_Right, Clutter.KEY_Up, Clutter.KEY_Down,
   Clutter.KEY_Page_Up, Clutter.KEY_Page_Down, Clutter.KEY_Home, Clutter.KEY_End,
 ];
-
-function capitalize(text: string): string {
-  return text.charAt(0).toLocaleUpperCase() + text.slice(1);
-}
 
 export class EmojiPanel {
   readonly actor = new St.BoxLayout({
@@ -43,12 +42,12 @@ export class EmojiPanel {
   private readonly empty = new St.Label({ text: 'No results', style_class: 'kestrel-empty', visible: false, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.START });
   private readonly footer = new St.Label({ style_class: 'kestrel-emoji-name', x_expand: true });
   private readonly grid = new EmojiGrid({
-    hovered: item => this.hover(item ? item.name : null),
+    hovered: item => this.hover(item ? describe(item) : null),
     activated: cell => this.insert(cell),
     scrolled: tab => this.tabs?.setCurrent(tab),
   }, PREFERRED_HEIGHT);
   private catalog: Catalog | null = null;
-  private index: EmojiIndex | null = null;
+  private index: SearchIndex | null = null;
   private tabs: TabStrip | null = null;
   private tones: TonePicker | null = null;
   private browsing: GridLayout | null = null;
@@ -130,8 +129,14 @@ export class EmojiPanel {
     if (this.indexing) GLib.Source.remove(this.indexing);
     this.indexing = 0;
     const catalog = this.catalog = new Catalog();
-    annotate(catalog.items);
-    this.index = new EmojiIndex(catalog.items);
+    annotate(catalog);
+    const index = this.index = new SearchIndex(catalog.items);
+    this.indexing = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+      index.extend(INDEX_CHUNK);
+      if (!index.complete) return GLib.SOURCE_CONTINUE;
+      this.indexing = 0;
+      return GLib.SOURCE_REMOVE;
+    });
     const hovered = (title: string | null) => this.hover(title);
     this.tabs = new TabStrip(catalog.tabs, { hovered, activated: index => this.openTab(index) });
     this.tones = new TonePicker({ hovered, activated: tone => this.chooseTone(tone), toggled: () => this.toggleTones(false) });
@@ -308,12 +313,13 @@ export class EmojiPanel {
     });
   }
 
-  private hover(name: string | null): void {
-    this.hovered = name;
+  private hover(description: string | null): void {
+    this.hovered = description;
     this.updateFooter();
   }
 
   private updateFooter(): void {
-    this.footer.text = capitalize(this.hovered ?? this.grid.selection?.item.name ?? '');
+    const selected = this.grid.selection?.item;
+    this.footer.text = this.hovered ?? (selected ? describe(selected) : '');
   }
 }

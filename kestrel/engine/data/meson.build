@@ -42,6 +42,8 @@ foreach resource : data_resources
   )
 endforeach
 
+fs.copyfile('characters.json', install: true, install_dir: pkgdatadir)
+
 cursor_theme_resource = gnome.compile_resources(
   'gnome-shell-cursor-theme',
   'gnome-shell-cursor-theme.gresource.xml',

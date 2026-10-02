@@ -12,6 +12,7 @@ export class LoginAppearance {
 
   constructor() {
     new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' }).set_string('color-scheme', 'prefer-dark');
+    this.background.set_string('primary-color', '#000000');
   }
 
   showWallpaperOf(uid: number | null): void {

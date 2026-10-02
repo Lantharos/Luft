@@ -346,10 +346,10 @@ export const LayoutManager = GObject.registerClass({
     }
 
     // This is called by Main after everything else is constructed
-    init() {
+    init(interfaceReady = Promise.resolve()) {
         Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
 
-        this._doStartupAnimation().catch(logError);
+        this._doStartupAnimation(interfaceReady).catch(logError);
     }
 
 
@@ -592,7 +592,7 @@ export const LayoutManager = GObject.registerClass({
         return this._keyboardIndex;
     }
 
-    async _doStartupAnimation() {
+    async _doStartupAnimation(interfaceReady) {
         await this._loadBackground();
 
         this._systemBackground.show();
@@ -607,6 +607,7 @@ export const LayoutManager = GObject.registerClass({
         try {
             await this._prepareStartupAnimation();
             await firstFrame;
+            await interfaceReady;
             await this._startupAnimation();
         } catch (e) {
             logError(e);

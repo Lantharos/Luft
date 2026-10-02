@@ -485,8 +485,9 @@ export function initialize(context: Context): void {
   pendingWallpaper = null;
 }
 
-export function startGreeter(context: GreeterContext): void {
+export function startGreeter(context: GreeterContext): Promise<void> {
   greeter = new Greeter(context);
+  return greeter.wallpaperShown;
 }
 
 export function wallpaperSampled(samples: Rgb[]): void {

@@ -74,6 +74,8 @@ export class Greeter {
   private readonly controls: GreeterControls;
   private readonly pages: LockPages;
   private backdrop: LockBackdrop | null = null;
+  private showWallpaper!: () => void;
+  readonly wallpaperShown = new Promise<void>(resolve => (this.showWallpaper = resolve));
   private selected: AccountsService.User | null = null;
   private session: Session | null = null;
   private started = false;
@@ -161,6 +163,7 @@ export class Greeter {
     if (!this.backdrop) {
       this.backdrop = new LockBackdrop();
       this.dialog.insert_child_at_index(this.backdrop.actor, 0);
+      void this.backdrop.loaded.then(this.showWallpaper);
     }
     this.useSession(this.preferredSession(user));
     const restart = this.started;

@@ -40,6 +40,7 @@ declare module 'resource:///org/gnome/shell/ui/lockScreen/backdrop.js' {
   import type Clutter from 'gi://Clutter';
   export class LockBackdrop {
     readonly actor: Clutter.Actor;
+    readonly loaded: Promise<void>;
   }
 }
 

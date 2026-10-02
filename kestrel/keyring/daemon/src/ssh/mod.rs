@@ -68,6 +68,9 @@ fn bind() -> std::io::Result<std::os::unix::net::UnixListener> {
             .create(folder)?;
         std::fs::set_permissions(folder, std::fs::Permissions::from_mode(0o700))?;
     }
+    if std::os::unix::net::UnixStream::connect(&path).is_ok() {
+        return Err(std::io::ErrorKind::AddrInUse.into());
+    }
     let _ = std::fs::remove_file(&path);
     std::os::unix::net::UnixListener::bind(path)
 }

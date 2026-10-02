@@ -9,9 +9,14 @@ pub struct Context<'a> {
     pub changed: &'a dyn Fn(),
 }
 
+pub struct Synced {
+    pub inserted: Vec<Inserted>,
+    pub more: bool,
+}
+
 pub trait Remote: Send {
     fn folders(&mut self, context: &Context) -> Result<Vec<Mailbox>, String>;
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String>;
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Synced, String>;
     fn bodies(
         &mut self,
         mailbox: &Mailbox,

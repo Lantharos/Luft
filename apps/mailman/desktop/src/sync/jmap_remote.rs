@@ -10,11 +10,11 @@ use serde_json::{Map, Value, json};
 
 use super::idle::Push;
 use super::ops::{self, Operation};
-use super::remote::{Context, Remote};
+use super::remote::{Context, Remote, Synced};
 use crate::accounts::Login;
 use crate::mail::envelope;
 use crate::protocols::jmap::{self, CORE, Client, MAIL, SUBMISSION};
-use crate::store::{Flag, Flags, Inserted, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
+use crate::store::{Flag, Flags, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
 
 const WINDOW: usize = 2000;
 const BATCH: usize = 200;
@@ -232,9 +232,12 @@ impl Remote for JmapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Synced, String> {
         if self.state.is_some() && mailbox.state == self.state {
-            return Ok(Vec::new());
+            return Ok(Synced {
+                inserted: Vec::new(),
+                more: false,
+            });
         }
         let (ids, complete) = self.ids_in(&mailbox.remote)?;
         let local: HashSet<String> = context.store.remotes(mailbox.id)?.into_iter().collect();
@@ -290,7 +293,10 @@ impl Remote for JmapRemote {
         context
             .store
             .save_mailbox_state(mailbox.id, None, None, self.state.as_deref())?;
-        Ok(inserted)
+        Ok(Synced {
+            inserted,
+            more: false,
+        })
     }
 
     fn bodies(

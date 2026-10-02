@@ -140,10 +140,7 @@ impl Dns {
     fn srv(&self, name: &str) -> Option<(String, u16)> {
         let lookup = self
             .runtime
-            .block_on(tokio::time::timeout(
-                TIMEOUT,
-                self.resolver.srv_lookup(name),
-            ))
+            .block_on(async { tokio::time::timeout(TIMEOUT, self.resolver.srv_lookup(name)).await })
             .ok()?
             .ok()?;
         lookup
@@ -161,10 +158,9 @@ impl Dns {
     fn mx(&self, domain: &str) -> Option<String> {
         let lookup = self
             .runtime
-            .block_on(tokio::time::timeout(
-                TIMEOUT,
-                self.resolver.mx_lookup(domain),
-            ))
+            .block_on(async {
+                tokio::time::timeout(TIMEOUT, self.resolver.mx_lookup(domain)).await
+            })
             .ok()?
             .ok()?;
         lookup

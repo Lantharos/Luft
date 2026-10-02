@@ -4,13 +4,13 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
 use super::ops::{self, Operation};
-use super::remote::{Context, Remote};
+use super::remote::{Context, Remote, Synced};
 use crate::accounts::{Account, Login};
 use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
 use crate::protocols::smtp;
-use crate::store::{Flags, Inserted, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
+use crate::store::{Flags, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
 
 const WINDOW: usize = 2000;
 const HEADER_BATCH: usize = 200;
@@ -63,8 +63,9 @@ impl ImapRemote {
         context: &Context,
         mailbox: &Mailbox,
         mut wanted: Vec<u32>,
-    ) -> Result<Vec<Inserted>, String> {
+    ) -> Result<Synced, String> {
         wanted.sort_unstable_by(|a, b| b.cmp(a));
+        let more = wanted.len() > WINDOW;
         wanted.truncate(WINDOW);
         let mut inserted = Vec::new();
         for batch in wanted.chunks(HEADER_BATCH) {
@@ -77,7 +78,7 @@ impl ImapRemote {
             )?);
             (context.changed)();
         }
-        Ok(inserted)
+        Ok(Synced { inserted, more })
     }
 
     fn reconcile(
@@ -187,7 +188,7 @@ impl Remote for ImapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Synced, String> {
         let known = mailbox
             .validity
             .zip(mailbox.modseq)
@@ -203,14 +204,14 @@ impl Remote for ImapRemote {
         let resumed = valid && known.is_some() && self.qresync;
         let wanted = self.reconcile(context, mailbox, &selected, resumed)?;
         (context.changed)();
-        let inserted = self.fetch_new(context, mailbox, wanted)?;
+        let synced = self.fetch_new(context, mailbox, wanted)?;
         context.store.save_mailbox_state(
             mailbox.id,
             Some(selected.uidvalidity as i64),
             selected.highest_modseq.map(|modseq| modseq as i64),
             None,
         )?;
-        Ok(inserted)
+        Ok(synced)
     }
 
     fn bodies(

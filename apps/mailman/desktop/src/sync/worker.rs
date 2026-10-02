@@ -6,12 +6,12 @@ use serde::Serialize;
 
 use super::Shared;
 use super::ops::Operation;
-use super::remote::{self, Context, Remote};
+use super::remote::{self, Context, Remote, Synced};
 use crate::accounts::Account;
 use crate::events::{CHANGED, OUTBOX, STATUS};
 use crate::mail::{envelope, render};
 use crate::store::Store;
-use crate::store::{Fetched, Inserted, Mailbox, Outgoing, Role, now};
+use crate::store::{Fetched, Mailbox, Outgoing, Role, now};
 
 const POLL: Duration = Duration::from_secs(5 * 60);
 const PREFETCH_BATCH: usize = 25;
@@ -51,6 +51,7 @@ pub fn spawn(account: Account, shared: Shared) -> Sender<Job> {
                 shared,
                 remote: None,
                 prefetch: VecDeque::new(),
+                backfill: VecDeque::new(),
             }
             .run(receiver)
         })
@@ -63,6 +64,7 @@ struct Worker {
     shared: Shared,
     remote: Option<Box<dyn Remote>>,
     prefetch: VecDeque<Mailbox>,
+    backfill: VecDeque<Mailbox>,
 }
 
 fn order(mailbox: &Mailbox) -> u8 {
@@ -83,14 +85,16 @@ impl Worker {
         loop {
             let job = match next.take() {
                 Some(job) => job,
-                None if !self.prefetch.is_empty() => match jobs.try_recv() {
-                    Ok(job) => job,
-                    Err(TryRecvError::Empty) => {
-                        self.prefetch_step();
-                        continue;
+                None if !self.prefetch.is_empty() || !self.backfill.is_empty() => {
+                    match jobs.try_recv() {
+                        Ok(job) => job,
+                        Err(TryRecvError::Empty) => {
+                            self.idle_step();
+                            continue;
+                        }
+                        Err(TryRecvError::Disconnected) => return,
                     }
-                    Err(TryRecvError::Disconnected) => return,
-                },
+                }
                 None => match jobs.recv_timeout(POLL) {
                     Ok(job) => job,
                     Err(RecvTimeoutError::Timeout) => Job::Sync,
@@ -181,8 +185,11 @@ impl Worker {
     }
 
     fn sync_mailbox(&mut self, mailbox: &Mailbox) -> Result<(), String> {
-        let inserted: Vec<Inserted> =
+        let Synced { inserted, more } =
             self.with_remote(|remote, context| remote.sync(context, mailbox))?;
+        if more && !self.backfill.iter().any(|queued| queued.id == mailbox.id) {
+            self.backfill.push_back(mailbox.clone());
+        }
         if mailbox.role == Some(Role::Inbox) && !inserted.is_empty() {
             let since = (now() - NOTIFY_WINDOW).max(self.account.added);
             let ids: Vec<i64> = inserted.iter().map(|message| message.id).collect();
@@ -227,6 +234,16 @@ impl Worker {
         let bodies = self.with_remote(|remote, _| remote.bodies(mailbox, wanted))?;
         keep(&self.shared.store, &bodies)?;
         Ok(bodies.len())
+    }
+
+    fn idle_step(&mut self) {
+        let Some(mailbox) = self.backfill.pop_front() else {
+            return self.prefetch_step();
+        };
+        if let Err(error) = self.sync_mailbox(&mailbox) {
+            self.remote = None;
+            self.status("error", Some(error));
+        }
     }
 
     fn prefetch_step(&mut self) {

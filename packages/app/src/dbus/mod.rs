@@ -40,3 +40,12 @@ pub fn system() -> Result<&'static Connection, String> {
 pub fn session() -> Result<&'static Connection, String> {
     cached(&SESSION, zbus::Connection::session())
 }
+
+pub fn at(address: &str) -> Result<Connection, String> {
+    let _context = RUNTIME.enter();
+    let builder = zbus::connection::Builder::address(address).map_err(|error| error.to_string())?;
+    RUNTIME
+        .block_on(builder.build())
+        .map(Connection::from)
+        .map_err(|error| error.to_string())
+}

@@ -1,0 +1,20 @@
+[app]
+id = "com.lantharos.keys"
+name = "Keys"
+generic_name = "Keyboard Layouts"
+categories = ["Settings", "Utility"]
+keywords = ["keyboard", "layout", "keyboard layout", "input method", "ime", "xkb", "keymap", "dead keys", "compose", "transliteration", "typing", "characters", "accents", "language"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["x-scheme-handler/kestrel-keys"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"
+local_files = true

@@ -10,6 +10,7 @@ rust-version = "1.90"
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
 fonts = ["dep:dirs", "dep:gio"]
+ibus = ["dep:dirs"]
 thumbnails = [
     "dep:dirs",
     "dep:fast_image_resize",

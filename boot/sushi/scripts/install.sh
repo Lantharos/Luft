@@ -46,6 +46,7 @@ install_files() {
   trap 'rm -rf "$stage" "$files"' RETURN
   "$root/scripts/build.sh" "$stage"
   (cd "$stage" && find . -type f | sed 's|^\.||' | sort) > "$files"
+  [[ -f "$manifest" ]] && comm -23 <(sort "$manifest") "$files" | xargs -r sudo rm -f
   while IFS= read -r file; do
     sudo install -DZ -o root -g root -m "$(stat -c %a "$stage$file")" "$stage$file" "$file"
   done < "$files"

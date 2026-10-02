@@ -79,7 +79,6 @@ sushictl notice show /run/example/notice   # waits until the notice is gone, and
 | `sushid` | The splash itself |
 | `sushictl` | Talks to `sushid` |
 | `sushiboot` | The UEFI boot menu Luft starts through, drawn with the same scene |
-| `sushi-bootctl` | Installs SushiBoot on the EFI system partition |
 
 `data/` holds the systemd units, the drop-ins for greetd, Plymouth's boot units and the console password agent, the dracut module, and the default configuration.
 
@@ -178,12 +177,6 @@ Entries have the identifiers systemd-boot uses: an image's file name, with `@` a
 Before showing anything, SushiBoot asks the graphics firmware which monitor is connected (its EDID) and switches to the monitor's own resolution, so Linux starts on a framebuffer the monitor shows unscaled, and the graphics driver later takes it over without changing modes. The firmware logo is drawn again in the new resolution, and the menu uses it too. Only resolutions the monitor lists are used: when the firmware doesn't offer the monitor's own resolution, SushiBoot takes the largest one the monitor lists, preferring its shape, and when the firmware doesn't describe the monitor, SushiBoot keeps the resolution the firmware chose.
 
 With Secure Boot on, SushiBoot has to be signed with a key the firmware or shim trusts. It carries an SBAT section, so shim can start it, and shim then checks everything SushiBoot starts against the same keys. SushiBoot has no command line editor, and with Secure Boot on it passes nothing but a profile number to what it starts: entries that start a kernel directly are left out, since no signature covers their command line or initramfs, and the options of other entries are dropped. On Luft, `trustctl startup install` signs it with the computer's own Luft key; see `security/README.md` for the whole startup.
-
-`sushi-bootctl` installs SushiBoot unsigned on a computer without Secure Boot:
-
-```bash
-sudo sushi-bootctl install --esp /boot/efi --efi-entry
-```
 
 ## Development
 

@@ -10,12 +10,14 @@ use crate::actions::formatting::Format;
 use crate::actions::{drive, encryption, formatting, mounting, partitions};
 use crate::images::{self, Imaging};
 use crate::launch;
+use crate::space::Explorer;
 use crate::udisks::{self, snapshot};
 
 #[derive(Clone, Default)]
 pub struct State {
     pub events: Events,
     pub imaging: Imaging,
+    pub explorer: Explorer,
 }
 
 #[derive(Serialize)]
@@ -114,6 +116,11 @@ struct Drive {
 }
 
 #[derive(Deserialize)]
+struct Place {
+    path: Vec<String>,
+}
+
+#[derive(Deserialize)]
 struct CreateImage {
     block: String,
     path: String,
@@ -128,7 +135,28 @@ struct RestoreImage {
 pub fn register(window: SabineWindow, state: &State) -> SabineWindow {
     let window = register_volumes(window);
     let window = register_encryption(window);
+    let window = register_space(window, state);
     register_drives(window, state)
+}
+
+fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
+    window
+        .with("space_scan", state, |state, Folder { path }| {
+            state.explorer.start(&state.events, &path)
+        })
+        .with("space_view", state, |state, Place { path }| {
+            state.explorer.view(path)
+        })
+        .with("space_trash", state, |state, Place { path }| {
+            state.explorer.trash(path)
+        })
+        .with("space_show", state, |state, Place { path }| {
+            state.explorer.show(path)
+        })
+        .with("space_stop", state, |state, _: Value| {
+            state.explorer.stop();
+            Ok(())
+        })
 }
 
 fn register_volumes(window: SabineWindow) -> SabineWindow {

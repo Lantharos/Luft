@@ -12,7 +12,11 @@ export type OpenDialog =
 	| { kind: 'startup'; volume: Volume }
 	| { kind: 'restore'; drive: Drive; block: string; target: string; image: ChosenImage }
 	| { kind: 'save-image'; block: string; name: string }
-	| { kind: 'write-image'; image: ChosenImage };
+	| { kind: 'write-image'; image: ChosenImage }
+	| { kind: 'details'; drive: Drive; volume: Volume }
+	| { kind: 'drive'; drive: Drive }
+	| { kind: 'health'; drive: Drive }
+	| { kind: 'trash'; path: string[]; name: string; size: number; folder: boolean };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);

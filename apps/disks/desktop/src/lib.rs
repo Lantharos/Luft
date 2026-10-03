@@ -2,6 +2,7 @@ mod actions;
 mod bridge;
 mod images;
 mod launch;
+mod space;
 mod udisks;
 
 use luft_app::GlassWindow;

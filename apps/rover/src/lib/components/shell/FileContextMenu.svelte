@@ -79,6 +79,9 @@
 		{/if}
 		{#if target.is_dir}
 			{@render item('terminal', 'Open in terminal', () => tools.openTerminal(manager, target.path))}
+			{#if manager.drives.manageable}
+				{@render item('chart-pie', 'See what’s using space', () => tools.exploreSpace(manager, target.path))}
+			{/if}
 		{/if}
 		{@render item('info', 'Properties', () => tools.showProperties(manager, targets))}
 		<MenuSeparator />
@@ -91,6 +94,9 @@
 		<MenuSeparator />
 		{@render item('search', 'Search in this folder', () => tools.searchHere(manager))}
 		{@render item('terminal', 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
+		{#if manager.drives.manageable}
+			{@render item('chart-pie', 'See what’s using space', () => tools.exploreSpace(manager, manager.currentPath))}
+		{/if}
 		{@render item('info', 'Properties', () => tools.showPathProperties(manager, manager.currentPath))}
 		{#if offersVcs}
 			<MenuSeparator />

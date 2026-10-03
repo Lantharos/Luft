@@ -4,6 +4,7 @@ import * as api from '$lib/api';
 import type { Drive, ImageProgress, Segment, Support } from '$lib/api';
 import { dialogs } from '$lib/dialogs/dialogs.svelte';
 import { errorText } from '$lib/format';
+import { space } from './space.svelte';
 
 const NOTICE_MS = 6000;
 
@@ -15,14 +16,14 @@ class Disks {
 	drives = $state.raw<Drive[]>([]);
 	formats = $state.raw<Support[]>([]);
 	driveId = $state<string | null>(null);
-	segmentId = $state<string | null>(null);
+	current = $state<string | null>(null);
+	hovered = $state<string | null>(null);
 	image = $state.raw<ImageProgress | null>(null);
 	notice = $state<string | null>(null);
 	loaded = $state(false);
 	readonly busy = new SvelteSet<string>();
 
 	drive = $derived(this.drives.find((drive) => drive.id === this.driveId) ?? this.drives[0] ?? null);
-	segment = $derived(this.drive?.segments.find((segment) => segmentKey(segment) === this.segmentId) ?? this.drive?.segments[0] ?? null);
 
 	#noticeTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -31,6 +32,7 @@ class Disks {
 		appearance.start(state);
 		api.events.changed(({ drives }) => (this.drives = drives));
 		api.events.image((progress) => this.#imageProgress(progress));
+		space.listen();
 		api.events.activated(({ arguments: args }) => void this.#locate(args));
 		const [{ drives }, formats] = await Promise.all([api.snapshot(), api.formats()]);
 		this.drives = drives;
@@ -41,7 +43,13 @@ class Disks {
 
 	select(drive: string, segment: string | null = null) {
 		this.driveId = drive;
-		this.segmentId = segment;
+		this.current = segment;
+		this.hovered = null;
+		space.close();
+	}
+
+	explore(path: string, name: string) {
+		void space.open(path, name).catch((caught) => this.fail(caught));
 	}
 
 	support(filesystem: string) {
@@ -82,6 +90,7 @@ class Disks {
 		const located = await api.locate(args).catch(() => null);
 		if (located?.target) this.select(located.target.drive, located.target.block);
 		if (located?.image) dialogs.open({ kind: 'write-image', image: located.image });
+		if (located?.space) this.explore(located.space, located.space.split('/').filter(Boolean).at(-1) ?? located.space);
 	}
 }
 

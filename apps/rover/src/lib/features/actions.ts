@@ -25,6 +25,10 @@ export function openTerminal(manager: FileManager, path: string) {
 	api.openTerminal(path).catch(manager.notify);
 }
 
+export function exploreSpace(manager: FileManager, path: string) {
+	api.exploreSpace(path).catch(manager.notify);
+}
+
 export function extract(manager: FileManager, entries: FileEntry[]) {
 	api.extractArchives(
 		entries.map((entry) => entry.path),

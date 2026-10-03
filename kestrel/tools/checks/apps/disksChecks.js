@@ -7,10 +7,11 @@ import {LuftApp, sleep, waitFor} from './luftApp.js';
 const LOADING = 800;
 const CHECKS = 'com.lantharos.KestrelChecks';
 const AT = {
-  unmount: [409, 253], mount: [332, 253], format: [501, 253], more: [566, 253], erase: [660, 507],
-  saveImage: [440, 351], save: [698, 472], done: [990, 166], safelyRemove: [943, 85],
-  wdc: [130, 157], seagate: [130, 100], unlock: [334, 249], free: [900, 166], newPartition: [960, 249], create: [690, 560],
-  quickTest: [860, 640], firstDrive: [560, 338], next: [686, 465], write: [666, 419],
+  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 459], save: [698, 472], done: [1001, 310],
+  format: [900, 550], erase: [660, 507], safelyRemove: [943, 85],
+  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [974, 275], create: [692, 574],
+  health: [600, 360], quickTest: [327, 496], firstDrive: [560, 338], next: [686, 465], write: [666, 419],
+  largest: [1009, 467], trash: [860, 565], confirmTrash: [671, 417],
 };
 
 function systemCalls() {
@@ -52,14 +53,6 @@ class Driver {
     await sleep(LOADING / 2);
   }
 
-  async scroll(steps) {
-    const frame = this.app.window.get_frame_rect();
-    this.pointer.notify_absolute_motion(GLib.get_monotonic_time(), frame.x + frame.width * 0.6, frame.y + frame.height / 2);
-    for (let step = 0; step < steps; step++)
-      this.pointer.notify_discrete_scroll(GLib.get_monotonic_time(), Clutter.ScrollDirection.DOWN, Clutter.ScrollSource.WHEEL);
-    return this.shown('scrolled');
-  }
-
   async shown(name) {
     await sleep(LOADING);
     const frame = await this.app.settle(() => true);
@@ -81,7 +74,7 @@ const read = path => GLib.file_get_contents(path)[1];
 const same = (a, b) => a.length === b.length && a.every((value, index) => value === b[index]);
 
 async function checkRemovable(driver, {require, output}) {
-  const {app} = driver;
+  await driver.click('more');
   await driver.click('unmount');
   require(await driver.called(['udisks Unmount /dev/sdb1'], 'unmounting'), 'disks opens on the drive holding a mounted folder and unmounts it');
   await driver.click('mount');
@@ -104,6 +97,7 @@ async function checkRemovable(driver, {require, output}) {
   require(true, 'disks saves a partition as a disk image byte for byte');
   await driver.click('done');
 
+  await driver.click('more');
   const format = await driver.click('format');
   format.save(`${output}/disks-format-dark.png`);
   await driver.click('erase');
@@ -123,7 +117,6 @@ async function checkEncrypted(driver, {require, output}) {
   require(await driver.called(['udisks Unlock /dev/sda1'], 'unlocking'), 'disks unlocks an encrypted partition with its passphrase');
   (await driver.shown('unlocked')).save(`${output}/disks-unlocked-dark.png`);
 
-  await driver.click('free');
   const create = await driver.click('newPartition');
   create.save(`${output}/disks-new-partition-dark.png`);
   await driver.click('create');
@@ -132,7 +125,7 @@ async function checkEncrypted(driver, {require, output}) {
 
 async function checkHealth(driver, {require, output}) {
   await driver.click('seagate');
-  const health = await driver.scroll(10);
+  const health = await driver.click('health');
   health.save(`${output}/disks-health-dark.png`);
   await driver.click('quickTest');
   require(await driver.called(['udisks SelftestStart short Seagate_Barracuda'], 'testing'), 'disks starts a quick self-test on a failing drive');
@@ -158,6 +151,65 @@ async function checkWriteImage(image, {styles, require, output, pointer}) {
   }
 }
 
+function writeSpaceFixture() {
+  const root = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
+  const write = (name, bytes) => {
+    const path = GLib.build_filenamev([root, name]);
+    GLib.mkdir_with_parents(GLib.path_get_dirname(path), 0o755);
+    GLib.file_set_contents(path, new Uint8Array(bytes).fill(1));
+  };
+  write('Videos/trip.mov', 48 << 20);
+  write('Videos/raw/take-1.mov', 24 << 20);
+  write('Music/album/track.flac', 16 << 20);
+  for (let index = 0; index < 40; index++) write(`Notes/note-${index}.md`, 2048);
+  return root;
+}
+
+function children(folder) {
+  const names = [];
+  if (!folder.query_exists(null)) return names;
+  const entries = folder.enumerate_children('standard::name,standard::type', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+  for (let info = entries.next_file(null); info; info = entries.next_file(null)) names.push(info);
+  return names;
+}
+
+function remove(file) {
+  for (const info of children(file)) {
+    const child = file.get_child(info.get_name());
+    if (info.get_file_type() === Gio.FileType.DIRECTORY) remove(child);
+    else child.delete(null);
+  }
+  file.delete(null);
+}
+
+function trashedVideos() {
+  const trash = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), 'Trash', 'files']));
+  return children(trash).filter(info => info.get_name().startsWith('Videos')).length;
+}
+
+async function checkSpace({styles, require, output, pointer}) {
+  styles.interface.set_string('color-scheme', 'prefer-dark');
+  const root = writeSpaceFixture();
+  const videos = GLib.build_filenamev([root, 'Videos']);
+  const before = trashedVideos();
+  const app = new LuftApp('disks', [`disks-space://${root}`]);
+  try {
+    await app.open();
+    const driver = new Driver(app, {pointer, output});
+    (await driver.shown('space')).save(`${output}/disks-space-dark.png`);
+    await driver.click('largest');
+    await driver.click('trash');
+    await driver.click('confirmTrash');
+    await waitFor(() => !GLib.file_test(videos, GLib.FileTest.EXISTS) && trashedVideos() === before + 1, 5000,
+      () => 'the largest folder never reached the trash');
+    require(true, 'disks measures a folder and moves its largest folder to the trash');
+    (await driver.shown('space-trashed')).save(`${output}/disks-space-trashed-dark.png`);
+  } finally {
+    await app.close();
+    remove(Gio.File.new_for_path(root));
+  }
+}
+
 export async function checkDisks(context) {
   const {styles, output} = context;
   styles.interface.set_string('color-scheme', 'prefer-dark');
@@ -174,4 +226,5 @@ export async function checkDisks(context) {
     await app.close();
   }
   await checkWriteImage(image, context);
+  await checkSpace(context);
 }

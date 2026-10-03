@@ -4,18 +4,19 @@ Disks shows the drives in your computer and the ones you plug in, and lets you l
 
 ## Features
 
-- Every drive in the sidebar, with its partitions drawn to scale and the free space between them. Selecting a partition shows its format, size and how much of it is used, where it is mounted, its device and UUID
+- Every drive in the sidebar, drawn as one bar with its partitions to scale, how full each one is, and the free space between them. Below it, each partition takes one line with its name, format, size and free space, and the one action it most likely needs, such as Open, Mount or Unlock. Everything else is in its menu, and clicking a partition shows the rest: where it is mounted, its device, UUID and partition type
 - Mount, unmount and open partitions in Rover, rename them, and choose whether one mounts every time the computer starts
+- See what's using space on a partition, or in any folder from Rover: Disks measures it in the background, filling in as it goes, and shows the folders and largest files as a map of rectangles sized by what they take up, with a sorted list underneath. Click a folder to go into it, show anything in Rover, or move it to the trash. Measuring stays on the partition it starts on, counts hard-linked files once, and gets through a folder of two million files in about a quarter of a second on a fast SSD once they have been read before
 - Format a partition or a whole drive by what you will use it with: "All computers" gives exFAT, which Windows, Mac and Linux, cameras and TVs read, "Linux only" gives ext4, and Btrfs, NTFS and FAT32 are a choice away. Formatting can overwrite the old data so it can't be recovered
 - New partitions in free space, resizing into the free space after a partition or shrinking a mounted one down to what it holds, and deleting partitions
 - Encrypted partitions: unlock and lock them, change the passphrase, and encrypt a partition while formatting it. Passphrases you choose to remember are kept in Luft Keyring, so unlocking later needs no typing
-- Health in plain words for SATA and NVMe drives, such as "Healthy" or "This drive reports that it is failing", with the temperature, how long the drive has been running, and quick and full self-tests
+- Health in plain words for SATA and NVMe drives, such as "Healthy" or "Failing", in one line under the partitions. Clicking it shows the temperature, how long the drive has been running, unreadable sectors, and quick and full self-tests
 - Save a drive or partition as a disk image, and write an image back, with progress. Opening an `.iso` or `.img` file with Disks offers to write it to a drive, which is how you make a bootable USB stick
 - Safely remove USB drives: everything on them is unmounted and locked, then the drive is powered off
 
 Anything that erases data asks first, naming the drive and what will be lost. The drive the running system lives on can be looked at but not changed, and so can any partition the system is using, such as the one mounted at `/` or `/boot`; the other partitions on that drive and its free space work as usual.
 
-Changes go through UDisks, so the desktop asks for your password when an action needs it. Rover opens a drive here from "Manage drive…" in a drive's menu, and Settings opens it from Storage in About. Disks also takes a path when it starts and selects the drive and partition holding it, for example `disks /run/media/you/USB` or `disks /dev/sdb`.
+Changes go through UDisks, so the desktop asks for your password when an action needs it. Rover opens a drive here from "Manage drive…" in a drive's menu, and Settings opens it from Storage in About. Disks also takes a path when it starts and selects the drive and partition holding it, for example `disks /run/media/you/USB` or `disks /dev/sdb`, and `disks disks-space:///home/you/Videos` opens what's using space in that folder.
 
 ## Development
 
@@ -28,7 +29,7 @@ bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
 ```
 
-`kestrel/tools/session.sh capture` opens Disks on a stand-in UDisks with an NVMe system drive, an encrypted hard drive, a failing one and a USB stick, and goes through mounting, formatting, unlocking, new partitions, self-tests, safe removal and disk images without touching a real drive.
+`kestrel/tools/session.sh capture` opens Disks on a stand-in UDisks with an NVMe system drive, an encrypted hard drive, a failing one and a USB stick, and goes through mounting, formatting, unlocking, new partitions, self-tests, safe removal and disk images without touching a real drive. It also measures a folder it makes in the test home and moves its largest folder to the trash.
 
 ## Install
 
@@ -43,14 +44,15 @@ disks/
 ├── src/
 │   ├── lib/
 │   │   ├── api.ts            bridge commands and events
-│   │   ├── components/       sidebar, partition map, partition details, actions and health
-│   │   ├── dialogs/          format, new partition, resize, unlock, passphrase, startup and disk image dialogs
-│   │   └── state/            drives, selection and running actions
+│   │   ├── components/       sidebar, the drive's bar and partition list, actions, and the space map and list
+│   │   ├── dialogs/          details, health, format, new partition, resize, unlock, passphrase, startup and disk image dialogs
+│   │   └── state/            drives, running actions and what's being measured
 │   └── routes/+page.svelte   window layout
 └── desktop/src/
     ├── udisks/               drives, partitions, free space, health and watching for changes
     ├── actions/              mounting, formatting, partitions, encryption and drives
     ├── images/               saving and writing disk images
+    ├── space/                measuring what's using space, in parallel
     └── launch.rs             finding the drive for a path given at startup
 ```
 

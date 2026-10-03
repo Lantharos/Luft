@@ -27,16 +27,6 @@
 
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="development-tools" type="b">
-      <default>true</default>
-      <summary>
-        Enable internal tools useful for developers and testers from Alt-F2
-      </summary>
-      <description>
-        Allows access to internal debugging and monitoring tools
-        using the Alt-F2 dialog.
-      </description>
-    </key>
     <key name="lock-screen-content" type="b">
       <default>true</default>
       <summary>Show notification content on the lock screen</summary>
@@ -171,15 +161,6 @@
         The applications corresponding to these identifiers
         will be displayed in the favorites area.
       </description>
-    </key>
-    <key name="command-history" type="as">
-      <default>[]</default>
-      <summary>History for command (Alt-F2) dialog</summary>
-    </key>
-    <key name="looking-glass-history" type="as">
-      <default>[]</default>
-      <!-- Translators: looking glass is a debugger and inspector tool, see https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/docs/looking-glass.md -->
-      <summary>History for the looking glass dialog</summary>
     </key>
     <key name="always-show-log-out" type="b">
       <default>false</default>
@@ -349,23 +330,9 @@
     </key>
   </schema>
 
-  <enum id="com.lantharos.kestrel.window-switcher.AppIconMode">
-    <value value="1" nick="thumbnail-only"/>
-    <value value="2" nick="app-icon-only"/>
-    <value value="3" nick="both"/>
-  </enum>
   <schema id="com.lantharos.kestrel.window-switcher"
           path="/com/lantharos/kestrel/window-switcher/"
           gettext-domain="@GETTEXT_PACKAGE@">
-    <key name="app-icon-mode" enum="com.lantharos.kestrel.window-switcher.AppIconMode">
-      <default>'both'</default>
-      <summary>The application icon mode.</summary>
-      <description>
-	Configures how the windows are shown in the switcher. Valid possibilities
-	are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only”
-	(shows only the application icon) or “both”.
-      </description>
-    </key>
     <key type="b" name="current-workspace-only">
       <default>true</default>
       <summary>Limit switcher to current workspace.</summary>

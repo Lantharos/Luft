@@ -18,7 +18,6 @@
     <file>misc/errorUtils.js</file>
     <file>misc/fileUtils.js</file>
     <file>misc/gnomeSession.js</file>
-    <file>misc/history.js</file>
     <file>misc/ibusManager.js</file>
     <file>misc/inputMethod.js</file>
     <file>misc/introspect.js</file>
@@ -27,7 +26,6 @@
     <file>misc/loginManager.js</file>
     <file>misc/mobileProviders.js</file>
     <file>misc/modemManager.js</file>
-    <file>misc/objectManager.js</file>
     <file>misc/params.js</file>
     <file>misc/permissionStore.js</file>
     <file>misc/signals.js</file>

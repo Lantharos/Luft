@@ -13,7 +13,6 @@ split_version = meson.project_version().split('.')
 mutter_api_version = '51'
 
 clutter_pc = 'mutter-clutter-' + mutter_api_version
-cogl_pc = 'mutter-cogl-' + mutter_api_version
 mtk_pc = 'mutter-mtk-' + mutter_api_version
 libmutter_pc = 'libmutter-' + mutter_api_version
 
@@ -44,18 +43,12 @@ bindir = join_paths(prefix, get_option('bindir'))
 datadir = join_paths(prefix, get_option('datadir'))
 libdir = join_paths(prefix, get_option('libdir'))
 libexecdir = join_paths(prefix, get_option('libexecdir'))
-mandir = join_paths(prefix, get_option('mandir'))
-sysconfdir = join_paths(prefix, get_option('sysconfdir'))
 
 pkgdatadir = join_paths(datadir, meson.project_name())
 pkglibdir = join_paths(libdir, meson.project_name())
 
-autostartdir = join_paths(sysconfdir, 'xdg', 'autostart')
-desktopdir = join_paths(datadir, 'applications')
-icondir = join_paths(datadir, 'icons')
 ifacedir = join_paths(datadir, 'dbus-1', 'interfaces')
 localedir = join_paths(datadir, 'locale')
-metainfodir = join_paths(datadir, 'metainfo')
 schemadir = join_paths(datadir, 'glib-2.0', 'schemas')
 servicedir = join_paths(datadir, 'dbus-1', 'services')
 
@@ -77,7 +70,6 @@ gtk_dep = dependency('gtk4', version: gtk_req)
 libxml_dep = dependency('libxml-2.0')
 clutter_dep = dependency(clutter_pc, version: mutter_req)
 mtk_dep = dependency(mtk_pc, version: mutter_req)
-cogl_dep = dependency(cogl_pc, version: mutter_req)
 mutter_dep = dependency(libmutter_pc, version: mutter_req)
 polkit_dep = dependency('polkit-agent-1', version: polkit_req)
 schemas_dep = dependency('gsettings-desktop-schemas', version: schemas_req)
@@ -87,31 +79,23 @@ harfbuzz_dep = dependency('harfbuzz', version: harfbuzz_req)
 harfbuzz_raster_dep = dependency('harfbuzz-raster', version: harfbuzz_req)
 json_glib_dep = dependency('json-glib-1.0', version: json_glib_req)
 rsvg_dep = dependency('librsvg-2.0', version: rsvg_req)
-glycin_dep = dependency('glycin-2', version: glycin_req)
+dependency('glycin-2', version: glycin_req)
 xkbregistry_dep = dependency('xkbregistry')
 
 have_fonts = mutter_dep.get_variable('have_fonts') == 'true'
 have_xwayland = mutter_dep.get_variable('have_xwayland') == 'true'
 if have_xwayland
   x11_dep = dependency('x11')
-  xext_dep = dependency('xext')
-  xfixes_dep = dependency('xfixes')
 endif
 
 if not have_fonts
   error('Shell requires mutter to be built with fonts rendering support')
 endif
 
-
-nm_deps = []
-if get_option('networkmanager')
-  nm_deps += dependency('libnm', version: nm_req)
-  nm_deps += dependency('libsecret-1', version: secret_req)
-
-  have_networkmanager = true
-else
-  have_networkmanager = false
-endif
+nm_deps = [
+  dependency('libnm', version: nm_req),
+  dependency('libsecret-1', version: secret_req),
+]
 
 if get_option('camera_monitor')
   libpipewire_dep = dependency('libpipewire-0.3', version: pipewire_req)
@@ -121,33 +105,14 @@ else
   have_pipewire = false
 endif
 
-libsystemd_dep = dependency('libsystemd', version: systemd_req, required: false)
-
-if not libsystemd_dep.found()
-  libsystemd_dep = dependency('libelogind', required: false)
-endif
-
-if not libsystemd_dep.found()
-  error('No libsystemd provider found: tried libsystemd and libelogind')
-endif
-
-if get_option('systemd')
-  if libsystemd_dep.name() == 'libelogind'
-    error('systemd option conflicts with elogind libsystemd provider')
-  endif
-
-  systemd_dep = dependency('systemd', version: systemd_req)
-  systemduserunitdir = systemd_dep.get_variable('systemduserunitdir',
-    pkgconfig_define: ['prefix', prefix])
-  systemunitdir = systemd_dep.get_variable('systemdsystemunitdir',
-    pkgconfig_define: ['prefix', prefix])
-  have_systemd = true
-else
-  have_systemd = false
-endif
+libsystemd_dep = dependency('libsystemd', version: systemd_req)
+systemd_dep = dependency('systemd', version: systemd_req)
+systemduserunitdir = systemd_dep.get_variable('systemduserunitdir',
+  pkgconfig_define: ['prefix', prefix])
+systemunitdir = systemd_dep.get_variable('systemdsystemunitdir',
+  pkgconfig_define: ['prefix', prefix])
 
 mutter_typelibdir = mutter_dep.get_variable('typelibdir')
-python = find_program('python3')
 gjs = find_program('gjs')
 generate_app_list = find_program('build-aux/generate-app-list.py')
 
@@ -160,12 +125,9 @@ cdata.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 cdata.set_quoted('VERSION', meson.project_version())
 cdata.set_quoted('PACKAGE_VERSION', meson.project_version())
 
-cdata.set('HAVE_NETWORKMANAGER', have_networkmanager)
 cdata.set('HAVE_PIPEWIRE', have_pipewire)
-cdata.set('HAVE_SYSTEMD', have_systemd)
 cdata.set('HAVE_XWAYLAND', have_xwayland)
 
-cdata.set('HAVE_FDWALK', cc.has_function('fdwalk'))
 cdata.set('HAVE_MALLINFO', cc.has_function('mallinfo'))
 cdata.set('HAVE_MALLINFO2', cc.has_function('mallinfo2'))
 cdata.set('HAVE_SYS_RESOURCE_H', cc.has_header('sys/resource.h'))
@@ -176,10 +138,6 @@ cdata.set('HAVE_EXE_INTROSPECTION',
 )
 cdata.set('HAVE__NL_TIME_FIRST_WEEKDAY',
   cc.has_header_symbol('langinfo.h', '_NL_TIME_FIRST_WEEKDAY')
-)
-
-cdata.set('HAVE_FDWALK',
-          cc.has_function('fdwalk')
 )
 
 polkit_has_autocleanup = cc.compiles(
@@ -270,12 +228,6 @@ libgvc = subproject('gvc',
 )
 libgvc_gir = libgvc.get_variable('libgvc_gir')
 
-libshew = dependency('libshew',
-  default_options: [
-    'package_name=@0@'.format(meson.project_name()),
-  ]
-)
-
 subdir('data')
 subdir('js')
 subdir('src')
@@ -288,8 +240,6 @@ gnome.post_install(
 summary_options = {
   'have_xwayland': have_xwayland,
   'camera_monitor': get_option('camera_monitor'),
-  'networkmanager': get_option('networkmanager'),
-  'systemd': get_option('systemd'),
 }
 
 summary_build = {

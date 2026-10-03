@@ -4,7 +4,6 @@ import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
-import * as Config from '../misc/config.js';
 import * as CtrlAltTab from './ctrlAltTab.js';
 import * as PopupMenu from './popupMenu.js';
 import * as PanelMenu from './panelMenu.js';
@@ -22,7 +21,6 @@ import * as SystemStatus from './status/system.js';
 import {ATIndicator} from './status/accessibility.js';
 import {InputSourceIndicator} from './status/keyboard.js';
 import {DwellClickIndicator} from './status/dwellClick.js';
-import {ScreenRecordingIndicator, ScreenSharingIndicator} from './status/remoteAccess.js';
 
 const N_QUICK_SETTINGS_COLUMNS = 2;
 
@@ -58,14 +56,9 @@ class QuickSettings extends PanelMenu.Button {
     }
 
     async _setupIndicators() {
-        if (Config.HAVE_NETWORKMANAGER) {
-            /** @type {import('./status/network.js')} */
-            const NetworkStatus = await import('./status/network.js');
-
-            this._network = new NetworkStatus.Indicator();
-        } else {
-            this._network = null;
-        }
+        /** @type {import('./status/network.js')} */
+        const NetworkStatus = await import('./status/network.js');
+        this._network = new NetworkStatus.Indicator();
 
         this._bluetooth = new BluetoothStatus.Indicator();
         this._system = new SystemStatus.Indicator();
@@ -85,8 +78,7 @@ class QuickSettings extends PanelMenu.Button {
 
         // append all other indicators
         this._indicators.add_child(this._brightness);
-        if (this._network)
-            this._indicators.add_child(this._network);
+        this._indicators.add_child(this._network);
         this._indicators.add_child(this._bluetooth);
         this._indicators.add_child(this._rfkill);
         this._indicators.add_child(this._volumeOutput);
@@ -106,8 +98,7 @@ class QuickSettings extends PanelMenu.Button {
 
         this._addItemsBefore(this._camera.quickSettingsItems, sibling);
         this._addItemsBefore(this._remoteAccess.quickSettingsItems, sibling);
-        if (this._network)
-            this._addItemsBefore(this._network.quickSettingsItems, sibling);
+        this._addItemsBefore(this._network.quickSettingsItems, sibling);
         this._addItemsBefore(this._bluetooth.quickSettingsItems, sibling);
         this._addItemsBefore(this._rfkill.quickSettingsItems, sibling);
         this._addItemsBefore(this._unsafeMode.quickSettingsItems, sibling);
@@ -138,8 +129,6 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'a11y': ATIndicator,
     'keyboard': InputSourceIndicator,
     'dwellClick': DwellClickIndicator,
-    'screenRecording': ScreenRecordingIndicator,
-    'screenSharing': ScreenSharingIndicator,
 };
 
 export class Panel extends St.Widget {

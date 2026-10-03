@@ -133,12 +133,6 @@ $submenu_bg_color: if($variant == 'light', darken($menu_bg_color, 17%),  lighten
   }
 }
 
-// desktop background menu
-.background-menu {
-  -boxpointer-gap: 0px;
-  -arrow-rise: 0px; // hide the beak on the menu
-}
-
 // right-click (and panel) app menu
 .app-menu {
   max-width: 27.25em;

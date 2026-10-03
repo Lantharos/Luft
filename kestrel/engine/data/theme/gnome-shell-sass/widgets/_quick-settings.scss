@@ -238,35 +238,3 @@ $quick_toggle_checked_separator_color: if(
 
   .button:checked { @extend %default_button; }
 }
-
-// background apps
-
-.background-apps-quick-toggle {
-  min-height: to_em(40px);
-  background-color: transparent;
-
-  & StIcon { icon-size: $scalable_icon_size !important; }
-}
-
-.background-app-item {
-  & .title { @extend %heading; }
-  & .subtitle { @extend %caption; }
-  & .popup-menu-icon {
-    icon-size: $large_icon_size !important;
-    -st-icon-style: regular !important;
-  }
-  & .icon-button {
-    padding: $base_padding;
-
-    // override some background colors since it's a button on an already styled background
-    // FIXME: may need a generic drawing method for button in menu item in future
-    background-color: transparentize($fg_color, 0.87);
-    &:hover { background-color: transparentize($fg_color, 0.78);}
-    &:active { background-color: transparentize($fg_color, 0.69);}
-  }
-  & .spinner {
-    padding: $base_padding;
-  }
-
-  &.popup-inactive-menu-item { color: $fg_color; }
-}

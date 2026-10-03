@@ -3,15 +3,3 @@ option('camera_monitor',
   value: true,
   description: 'Enable the camera monitor'
 )
-
-option('networkmanager',
-  type: 'boolean',
-  value: true,
-  description: 'Enable NetworkManager support'
-)
-
-option('systemd',
-  type: 'boolean',
-  value: true,
-  description: 'Enable systemd integration'
-)

@@ -2,7 +2,6 @@
 // a.k.a. the panel
 
 $privacy_indicator_color: if($variant == 'light', $orange_4, $orange_3);
-$recording_indicator_color: $red_4;
 
 $transparent_panel_fg_color: $light_1;    // always white for transparent lock screens
 
@@ -57,26 +56,6 @@ $panel_transition_duration: 250ms;
       }
     }
 
-    // screen activity indicators
-    &.screen-recording-indicator,
-    &.screen-sharing-indicator {
-      StBoxLayout {
-        spacing: $scaled_padding;
-      }
-
-      StIcon {
-        icon-size: $scalable_icon_size;
-      }
-    }
-
-    &.screen-recording-indicator {
-      @include panel_button($bg:$recording_indicator_color, $fg:$_base_color_light, $style: filled);
-    }
-
-    &.screen-sharing-indicator {
-      @include panel_button($bg:$privacy_indicator_color, $fg:$_base_color_light, $style: filled);
-    }
-
     // clock
     &.clock-display {
       // The clock display needs to have the background on .clock because
@@ -87,10 +66,6 @@ $panel_transition_duration: 250ms;
       .clock {
         // the highlighted child
       }
-
-      .messages-indicator {
-        icon-size: $scalable_icon_size;
-      }
     }
   }
 
@@ -98,17 +73,6 @@ $panel_transition_duration: 250ms;
   &.unlock-screen,
   &.login-screen {
     background-color: transparent;
-
-    // unfortunate duplication to keep indicator style in these states
-    .panel-button {
-      &.screen-recording-indicator {
-        @include panel_button($bg:$recording_indicator_color, $fg:$_base_color_light, $style: filled);
-      }
-
-      &.screen-sharing-indicator {
-        @include panel_button($bg:$privacy_indicator_color, $fg:$_base_color_light, $style: filled);
-      }
-    }
   }
 
   // use transparent text styles for lock & login screen panels
@@ -135,13 +99,4 @@ $panel_transition_duration: 250ms;
 
   // important privacy related indicators
   .privacy-indicator { color: $privacy_indicator_color; }
-}
-
-// Clock
-.clock-display-box {
-  spacing: 2px;
-  .clock {
-    padding-left: $scaled_padding * 2;
-    padding-right: $scaled_padding * 2;
-  }
 }

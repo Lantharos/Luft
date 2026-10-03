@@ -17,23 +17,6 @@ subdir('st')
 subdir('authenticate')
 subdir('wallpaper')
 
-script_data = configuration_data()
-script_data.set('bindir', bindir)
-script_data.set('datadir', datadir)
-script_data.set('libdir', libdir)
-script_data.set('libexecdir', libexecdir)
-script_data.set('pkgdatadir', pkgdatadir)
-script_data.set('pkglibdir', pkglibdir)
-script_data.set('PYTHON', python.full_path())
-script_data.set('VERSION', meson.project_version())
-
-test_tool = configure_file(
-  input: 'kestrel-test-tool.in',
-  output: 'kestrel-test-tool',
-  configuration: script_data,
-  install_dir: bindir
-)
-
 typelib_cflags = [
   '-DMUTTER_TYPELIB_DIR="@0@"'.format(mutter_typelibdir),
   '-DSHELL_TYPELIB_DIR="@0@"'.format(pkglibdir),
@@ -64,13 +47,12 @@ gnome_shell_deps = [
   libpipewire_dep,
   pango_dep,
   fontconfig_dep,
+  nm_deps,
 ]
 
 if have_xwayland
   gnome_shell_deps += x11_dep
 endif
-
-gnome_shell_deps += nm_deps
 
 libshell_menu_sources = [
   'gtkactionmuxer.h',
@@ -105,6 +87,7 @@ libshell_public_headers = [
   'shell-invert-lightness-effect.h',
   'shell-action-modes.h',
   'shell-mount-operation.h',
+  'shell-network-agent.h',
   'shell-perf-log.h',
   'shell-screenshot.h',
   'shell-stack.h',
@@ -116,10 +99,6 @@ libshell_public_headers = [
   'shell-wm.h',
   'shell-xkb-info.h',
 ]
-
-if have_networkmanager
-  libshell_public_headers += 'shell-network-agent.h'
-endif
 
 libshell_private_headers = [
   'shell-app-private.h',
@@ -142,6 +121,7 @@ libshell_sources = [
   'shell-global.c',
   'shell-invert-lightness-effect.c',
   'shell-mount-operation.c',
+  'shell-network-agent.c',
   'shell-perf-log.c',
   'shell-polkit-authentication-agent.c',
   'shell-polkit-authentication-agent.h',
@@ -155,10 +135,6 @@ libshell_sources = [
   'shell-wm.c',
   'shell-xkb-info.c',
 ]
-
-if have_networkmanager
-  libshell_sources += 'shell-network-agent.c'
-endif
 
 libshell_private_sources = [
   'shell-app-cache.c',
@@ -213,14 +189,8 @@ libshell_gir_includes = [
   'Meta-@0@'.format(mutter_api_version),
   'GioUnix-2.0',
   'PolkitAgent-1.0',
-  'GdkPixbuf-2.0'
-]
-
-if have_networkmanager
-  libshell_gir_includes += ['NM-1.0']
-endif
-
-libshell_gir_includes += [
+  'GdkPixbuf-2.0',
+  'NM-1.0',
   libgvc_gir[0],
   libst_gir[0]
 ]
@@ -241,11 +211,4 @@ gnome_shell_binary = executable('kestrel', 'main.c',
   build_rpath: mutter_typelibdir,
   install_rpath: install_rpath,
   install: true
-)
-
-run_test = executable('run-js-test', 'run-js-test.c',
-  dependencies: [gio_dep, gi_dep, gjs_dep, libshell_dep],
-  c_args: typelib_cflags,
-  include_directories: [conf_inc],
-  build_rpath: mutter_typelibdir,
 )

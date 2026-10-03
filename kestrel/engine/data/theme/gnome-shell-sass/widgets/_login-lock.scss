@@ -136,11 +136,6 @@ $_gdm_dialog_width: 25em;
   width: $_message_list_width;
   background-color: transparent;
 
-  .summary-notification-stack-scrollview {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
   .message,
   .unlock-dialog-notification-source {
     padding: $base_margin * 3 $base_margin * 4;

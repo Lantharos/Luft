@@ -276,12 +276,3 @@ export function registerDestroyableType(gtype) {
 
     destroyableTypes.push(gtype);
 }
-
-/**
- * A debug function that can be used to inspect signal trackers at run time
- *
- * @returns {Map<object, SignalTracker>}
- */
-export function debugGetSignalTrackers() {
-    return SignalManager.getDefault()._signalTrackers;
-}

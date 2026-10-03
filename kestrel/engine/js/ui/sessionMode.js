@@ -2,17 +2,12 @@ import * as Signals from '../misc/signals.js';
 
 import {UnlockDialog} from './lockScreen/unlockDialog.js';
 
-import * as Config from '../misc/config.js';
-
 const DEFAULT_MODE = 'restrictive';
 
 const USER_SESSION_COMPONENTS = [
     'polkitAgent',
-    'autorunManager', 'automountManager',
+    'autorunManager', 'automountManager', 'networkAgent',
 ];
-
-if (Config.HAVE_NETWORKMANAGER)
-    USER_SESSION_COMPONENTS.push('networkAgent');
 
 const _modes = {
     'restrictive': {
@@ -46,9 +41,7 @@ const _modes = {
     'unlock-dialog': {
         isLocked: true,
         unlockDialog: undefined,
-        components: Config.HAVE_NETWORKMANAGER
-            ? ['networkAgent', 'polkitAgent']
-            : ['polkitAgent'],
+        components: ['networkAgent', 'polkitAgent'],
         panel: {
             left: [],
             center: [],

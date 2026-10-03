@@ -55,9 +55,6 @@ const MAX_NUM_WORKSPACES = 10;
 
 const WINDOW_DIMMER_EFFECT_NAME = 'gnome-shell-window-dimmer';
 
-Gio._promisify(Shell, 'util_start_systemd_unit');
-Gio._promisify(Shell, 'util_stop_systemd_unit');
-
 const DisplayChangeDialog = GObject.registerClass(
 class DisplayChangeDialog extends ModalDialog.ModalDialog {
     _init(wm) {

@@ -6,6 +6,7 @@ import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import * as KestrelUi from '../kestrelUi.js';
 import * as Layout from '../layout.js';
 import * as Main from '../main.js';
 import {Authentication} from '../../auth/authentication.js';
@@ -22,10 +23,11 @@ const FIXED_PROMPT_HEIGHT = 550;
 
 const UnlockDialogLayout = GObject.registerClass(
 class UnlockDialogLayout extends Clutter.LayoutManager {
-    _init(stack, notifications) {
+    _init(stack, notifications, controls) {
         super._init();
         this._stack = stack;
         this._notifications = notifications;
+        this._controls = controls;
     }
 
     vfunc_get_preferred_width(container, forHeight) {
@@ -57,6 +59,13 @@ class UnlockDialogLayout extends Clutter.LayoutManager {
         actorBox.y1 = stackY;
         actorBox.y2 = stackY + stackHeight;
         this._stack.allocate(actorBox);
+
+        const [, , controlsWidth, controlsHeight] = this._controls.get_preferred_size();
+        actorBox.x1 = width - controlsWidth;
+        actorBox.y1 = height - controlsHeight;
+        actorBox.x2 = width;
+        actorBox.y2 = height;
+        this._controls.allocate(actorBox);
     }
 });
 
@@ -95,12 +104,13 @@ export const UnlockDialog = GObject.registerClass({
         this._stack.add_child(this._promptBox);
         this._clock = new Clock();
         this._stack.add_child(this._clock);
+        this._controls = KestrelUi.lockControls();
 
         this._pages = new LockPages({
             actor: this,
             clock: this._clock,
             prompt: this._promptBox,
-            companions: [],
+            companions: [this._controls.actor],
             actionMode: Shell.ActionMode.UNLOCK_SCREEN,
             preparePrompt: () => this._ensureAuthPrompt(),
             clockShown: () => this._destroyAuthPrompt(),
@@ -118,7 +128,8 @@ export const UnlockDialog = GObject.registerClass({
         mainBox.add_constraint(new Layout.MonitorConstraint({primary: true}));
         mainBox.add_child(this._stack);
         mainBox.add_child(this._notificationsBox);
-        mainBox.layout_manager = new UnlockDialogLayout(this._stack, this._notificationsBox);
+        mainBox.add_child(this._controls.actor);
+        mainBox.layout_manager = new UnlockDialogLayout(this._stack, this._notificationsBox, this._controls.actor);
         this.add_child(mainBox);
 
         this._idleMonitor = global.backend.get_core_idle_monitor();
@@ -167,6 +178,7 @@ export const UnlockDialog = GObject.registerClass({
 
     _onDestroy() {
         this.popModal();
+        this._controls.destroy();
         this._idleMonitor.remove_watch(this._idleWatchId);
         this._authentication.destroy();
         this._fingerprint.destroy();

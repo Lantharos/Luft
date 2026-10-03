@@ -5,6 +5,7 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checker, descendants} from '../portal/backend.js';
+import {checkLockControls} from './controlsChecks.js';
 
 const require = checker('unlock');
 const AUTHENTICATOR = ['com.lantharos.KestrelChecks.Authenticator', '/com/lantharos/KestrelChecks/Authenticator', 'com.lantharos.KestrelChecks.Authenticator'];
@@ -74,6 +75,7 @@ export async function checkUnlock({pause, capture, output, pointer, keyboard}) {
   await lockAndWake();
   require(await drawn(capture), 'the lock screen shows again after unlocking with a finger');
   require(hint() === null, 'without enrolled fingers the unlock prompt only asks for the password');
+  await checkLockControls({pause, capture, output, keyboard});
   await tryWrongPassword();
   require(Main.screenShield.locked && shown(WRONG_PASSWORD), 'a wrong password keeps the session locked');
   type(PASSWORD);

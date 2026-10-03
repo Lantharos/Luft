@@ -1,17 +1,3 @@
-.quick-settings {
-  padding: $base_padding * 3;
-  border-radius: $modal_radius * 2.25;
-
-  .icon-button, .button {
-    padding: $base_padding * 1.75;
-  }
-}
-
-.quick-settings-grid {
-  spacing-rows: $base_padding * 2;
-  spacing-columns: $base_padding * 2;
-}
-
 .quick-toggle, .quick-toggle-has-menu {
   border-radius: $forced_circular_radius;
   min-width: 12em;
@@ -200,20 +186,6 @@ $quick_toggle_checked_separator_color: if(
 }
 
 .quick-toggle-menu-container {
-}
-
-.quick-settings-system-item {
-  & > StBoxLayout { spacing: $base_padding * 2; }
-
-  & .power-item {
-    min-height: 0;
-    min-width: 0;
-
-    &:insensitive {
-      @include button(normal);
-      background-color: transparent;
-    }
-  }
 }
 
 .nm-network-item {

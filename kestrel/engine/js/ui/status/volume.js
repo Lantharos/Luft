@@ -506,61 +506,6 @@ class OutputIndicator extends VolumeIndicator {
     }
 });
 
-export const InputIndicator = GObject.registerClass(
-class InputIndicator extends VolumeIndicator {
-    constructor() {
-        super();
-
-        this._control = getMixerControl();
-        this._control.connectObject(
-            'state-changed', () => this._onControlStateChanged(),
-            'default-source-changed', () => this._readInput(),
-            this);
-
-        this._input = new InputStreamSlider(this._control);
-        this._input.connect('stream-updated', () => {
-            const icon = this._input.getIcon();
-
-            if (icon)
-                this._indicator.icon_name = icon;
-            this._updatePrivacyIndicator();
-        });
-
-        this._input.bind_property('visible',
-            this._indicator, 'visible',
-            GObject.BindingFlags.SYNC_CREATE);
-
-        this.quickSettingsItems.push(this._input);
-
-        this._onControlStateChanged();
-    }
-
-    _onScroll(_source, _dx, dy) {
-        this._handleScroll(this._input, dy);
-    }
-
-    _updatePrivacyIndicator() {
-        if (!this._input.stream)
-            return;
-
-        // Muted microphone doesn't need privacy indicator (no privacy concern)
-        const {isMuted} = this._input.stream;
-        if (isMuted)
-            this._indicator.remove_style_class_name('privacy-indicator');
-        else
-            this._indicator.add_style_class_name('privacy-indicator');
-    }
-
-    _onControlStateChanged() {
-        if (this._control.get_state() === Gvc.MixerControlState.READY)
-            this._readInput();
-    }
-
-    _readInput() {
-        this._input.stream = this._control.get_default_source();
-    }
-});
-
 export function createInputSlider() {
     const control = getMixerControl();
     const slider = new InputStreamSlider(control, true);

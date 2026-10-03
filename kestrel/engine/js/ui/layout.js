@@ -217,7 +217,6 @@ export const LayoutManager = GObject.registerClass({
         this.primaryIndex = -1;
 
         this._keyboardIndex = -1;
-        this._rightPanelBarrier = null;
 
         this._updateRegionIdle = 0;
 
@@ -249,7 +248,6 @@ export const LayoutManager = GObject.registerClass({
                 global.stage.add_child(adoptedActor);
             }
 
-            this._destroyPanelBarrier();
             this.uiGroup.destroy();
         });
 
@@ -271,17 +269,6 @@ export const LayoutManager = GObject.registerClass({
             }),
         });
         this.addChrome(this.screenShieldGroup);
-
-        this.panelBox = new St.BoxLayout({
-            name: 'panelBox',
-            orientation: Clutter.Orientation.VERTICAL,
-        });
-        this.addChrome(this.panelBox, {
-            affectsStruts: true,
-            trackFullscreen: true,
-        });
-        this.panelBox.connect('notify::allocation',
-            this._panelBoxChanged.bind(this));
 
         this.modalDialogGroup = new St.Widget({
             name: 'modalDialogGroup',
@@ -497,39 +484,7 @@ export const LayoutManager = GObject.registerClass({
         if (!this.primaryMonitor)
             return;
 
-        this.panelBox.set_position(this.primaryMonitor.x, this.primaryMonitor.y);
-        this.panelBox.set_size(this.primaryMonitor.width, -1);
-
         this.keyboardIndex = this.primaryIndex;
-    }
-
-    _panelBoxChanged() {
-        this._updatePanelBarrier();
-    }
-
-    _destroyPanelBarrier() {
-        if (this._rightPanelBarrier) {
-            this._rightPanelBarrier.destroy();
-            this._rightPanelBarrier = null;
-        }
-    }
-
-    _updatePanelBarrier() {
-        this._destroyPanelBarrier();
-
-        if (!this.primaryMonitor)
-            return;
-
-        if (this.panelBox.height) {
-            const primary = this.primaryMonitor;
-
-            this._rightPanelBarrier = new Meta.Barrier({
-                backend: global.backend,
-                x1: primary.x + primary.width, y1: primary.y,
-                x2: primary.x + primary.width, y2: primary.y + this.panelBox.height,
-                directions: Meta.BarrierDirection.NEGATIVE_X,
-            });
-        }
     }
 
     _monitorsChanged() {

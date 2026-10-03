@@ -53,7 +53,7 @@ export class LayoutEditor {
 		for (const symbol of Object.values(this.layout.keys).flat()) {
 			if (symbol.kind === 'dead' && !this.dead(symbol.keysym) && !seen.has(symbol.keysym)) seen.set(symbol.keysym, symbol);
 		}
-		return [...seen.values()];
+		return [...seen.values()].sort((left, right) => standardName(left.keysym).localeCompare(standardName(right.keysym)));
 	}
 
 	dead(keysym: string | null) {

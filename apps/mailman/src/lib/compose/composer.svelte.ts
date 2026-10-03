@@ -5,7 +5,7 @@ import { mail } from '$lib/mail/mail.svelte';
 import { reader } from '$lib/reader/reader.svelte';
 import { toasts } from '$lib/shell/toasts.svelte';
 import { escapeHtml, signatureHtml } from './html';
-import { sendingFor, type Sending } from './identity';
+import { ownIdentity, sendingFor, type Sending } from './identity';
 import { parseMailto } from './mailto';
 
 export interface Attachment extends Attached {
@@ -92,13 +92,13 @@ class Composer {
 	}
 
 	reply(message: Message, rendered: Rendered | null, all: boolean) {
-		const own = new Set(mail.accounts.map((account) => account.email));
+		const isOwn = (address: string) => mail.accounts.some((account) => account.email === address) || ownIdentity(address, mail.identities) !== null;
 		const recipients = message.recipients;
 		const from = { name: message.senderName, address: message.sender };
 		const replyTo = recipients.replyTo?.length ? recipients.replyTo : [from];
-		const sentByMe = own.has(message.sender);
+		const sentByMe = isOwn(message.sender);
 		const to = sentByMe ? recipients.to : replyTo;
-		const others = all ? [...(sentByMe ? [] : recipients.to), ...recipients.cc].filter((address) => !own.has(address.address) && !to.some((existing) => existing.address === address.address)) : [];
+		const others = all ? [...(sentByMe ? [] : recipients.to), ...recipients.cc].filter((address) => !isOwn(address.address) && !to.some((existing) => existing.address === address.address)) : [];
 		const references = [...message.references.split(/\s+/).filter(Boolean), ...(message.messageId ? [message.messageId] : [])];
 		this.start({
 			...this.sendingFrom(mail.account(message.account) ? message.account : this.defaultAccount(), sendingFor(message, mail.identities)),

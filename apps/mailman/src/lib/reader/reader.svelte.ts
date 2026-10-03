@@ -12,7 +12,7 @@ class Reader {
 	failures = new SvelteMap<number, string>();
 
 	subject = $derived(this.messages.at(-1)?.subject || this.messages[0]?.subject || '');
-	latest = $derived(this.messages.at(-1) ?? null);
+	latest = $derived(this.messages.findLast((message) => !message.draft) ?? this.messages.at(-1) ?? null);
 
 	private loading = new Map<number, Promise<Rendered | null>>();
 	private waiting = new Map<number, (error: string | null) => void>();

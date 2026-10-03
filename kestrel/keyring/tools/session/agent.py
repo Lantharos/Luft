@@ -30,7 +30,7 @@ def as_settings(root):
     return [settings, os.path.join(HERE, "manager.py")]
 
 
-def exercise_agent(root, environment, check, script, requests):
+def exercise_agent(root, environment, check, script, requests, lock, login):
     environment = dict(environment, SSH_AUTH_SOCK=os.path.join(environment["XDG_RUNTIME_DIR"], "luft-keyring/ssh"))
     folder = os.path.join(root, "ssh")
     os.makedirs(folder)
@@ -42,6 +42,23 @@ def exercise_agent(root, environment, check, script, requests):
         check(signs(environment, folder, key + ".pub", kind), f"the agent signs with an added {kind} key")
     listed = subprocess.run(["ssh-add", "-l"], env=environment, capture_output=True, text=True).stdout
     check("ed25519 key" in listed and "ecdsa key" in listed, "the agent lists the keys it keeps")
+
+    def public_keys():
+        return subprocess.run(["ssh-add", "-L"], env=environment, capture_output=True, text=True, timeout=60).stdout
+
+    lock()
+    script(passwords=[login], access="allow")
+    asked = len(requests("password"))
+    check("ed25519 key" in public_keys() and len(requests("password")) == asked + 1,
+          "listing keys while the keyring is locked asks for the password, then lists them")
+    lock()
+    script(passwords=[], access="allow")
+    asked = len(requests("password"))
+    check("no identities" in public_keys() and len(requests("password")) == asked + 1, "a dismissed unlock lists no keys")
+    check("no identities" in public_keys() and len(requests("password")) == asked + 1, "listing again right after a dismissal doesn't ask again")
+    script(passwords=[login], access="allow")
+    subprocess.run(["secret-tool", "lookup", "network", "home"], env=environment, capture_output=True, timeout=60)
+    check("ed25519 key" in public_keys(), "keys are listed again once the keyring is unlocked")
 
     confirmed = os.path.join(folder, "confirmed")
     subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "careful key", "-f", confirmed], check=True)

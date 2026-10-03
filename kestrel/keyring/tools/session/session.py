@@ -37,38 +37,20 @@ def scratch_home(root, name):
     return home, environment
 
 
-def wait_for_name(name, present=True):
+def wait_for_name(name):
     bus = Gio.bus_get_sync(Gio.BusType.SESSION)
     for _ in range(100):
         owner = bus.call_sync("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "NameHasOwner",
                               GLib.Variant("(s)", (name,)), None, Gio.DBusCallFlags.NONE, -1, None).unpack()[0]
-        if owner == present:
+        if owner:
             return
         time.sleep(0.1)
-    raise SystemExit(f"{name} never {'appeared' if present else 'went away'}")
-
-
-def store(environment, label, secret, *attributes):
-    subprocess.run(["secret-tool", "store", "--label", label, *attributes], input=secret.encode(), env=environment, check=True)
+    raise SystemExit(f"{name} never appeared")
 
 
 def lookup(environment, *attributes):
     result = subprocess.run(["secret-tool", "lookup", *attributes], env=environment, capture_output=True, timeout=60)
     return result.stdout.decode()
-
-
-def old_keyring(root, name, command, password, items):
-    home, environment = scratch_home(root, name)
-    daemon = subprocess.Popen(command, stdin=subprocess.PIPE, env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    daemon.stdin.write(password.encode())
-    daemon.stdin.close()
-    wait_for_name("org.freedesktop.secrets")
-    for label, secret, attributes in items:
-        store(environment, label, secret, *attributes)
-    daemon.terminate()
-    daemon.wait()
-    wait_for_name("org.freedesktop.secrets", present=False)
-    return os.path.join(home, ".local/share/keyrings")
 
 
 def main():
@@ -82,22 +64,17 @@ def main():
 
 
 def run(root):
-    gnome = old_keyring(root, "gnome", ["gnome-keyring-daemon", "--unlock", "--foreground", "--components=secrets"], LOGIN,
-                        [("GitHub", "gh-token", ["service", "github.com", "user", "kristof"]),
-                         ("Wi-Fi", "hunter2", ["network", "home"]),
-                         ("Parley Safe Storage", "parley-key", ["application", "parley"])])
-    oo7 = old_keyring(root, "oo7", ["/usr/libexec/oo7-daemon", "--login"], LOGIN,
-                      [("Mail", "mail-pass", ["service", "mail.example.org"])])
-    work = old_keyring(root, "work", ["/usr/libexec/oo7-daemon", "--login"], "work pass",
-                       [("VPN", "vpn-pass", ["service", "vpn.work"])])
-    check(os.path.exists(os.path.join(gnome, "login.keyring")), "gnome-keyring wrote its old binary keyring")
+    fixtures = os.path.join(HERE, "fixtures")
+    gnome = os.path.join(fixtures, "gnome-keyring.keyring")
+    with open(gnome, "rb") as fixture:
+        check(fixture.read(18) == b"GnomeKeyring\n\r\0\n\0\0", "the gnome-keyring fixture is its old binary keyring")
 
     home, environment = scratch_home(root, "person")
     keyrings = os.path.join(home, ".local/share/keyrings")
     os.makedirs(os.path.join(keyrings, "v1"))
-    shutil.copy(os.path.join(gnome, "login.keyring"), keyrings)
-    shutil.copy(os.path.join(oo7, "v1/login.keyring"), os.path.join(keyrings, "v1"))
-    shutil.copy(os.path.join(work, "v1/login.keyring"), os.path.join(keyrings, "v1/Work.keyring"))
+    shutil.copy(gnome, os.path.join(keyrings, "login.keyring"))
+    shutil.copy(os.path.join(fixtures, "oo7-login.keyring"), os.path.join(keyrings, "v1/login.keyring"))
+    shutil.copy(os.path.join(fixtures, "oo7-work.keyring"), os.path.join(keyrings, "v1/Work.keyring"))
 
     plan = os.path.join(root, "prompter.json")
     prompts = os.path.join(root, "prompts.log")
@@ -146,6 +123,10 @@ def exercise(root, home, environment, script, requests, started):
     check(service.get_cached_property("ItemCount").unpack() == 4, "the keyring counts its items")
 
     reader = [sys.executable, os.path.join(HERE, "reader.py")]
+
+    def lock():
+        subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30)
+
     stranger = os.path.join(root, "stranger")
     shutil.copy(sys.executable, stranger)
     asked = len(requests("access"))
@@ -170,7 +151,7 @@ def exercise(root, home, environment, script, requests, started):
     created = subprocess.run([*reader, "created", "service", "github.com"], env=environment, capture_output=True, timeout=60)
     check(0 < int(created.stdout or 0) <= started, "imported items keep the time they were made")
 
-    subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30)
+    lock()
     check(service.call_sync("org.freedesktop.DBus.Properties.Get", GLib.Variant("(ss)", ("com.lantharos.Keyring1", "Locked")),
                             Gio.DBusCallFlags.NONE, -1, None).unpack()[0] is True, "locking takes effect")
     script(passwords=["nope", LOGIN], access="allow")
@@ -188,9 +169,8 @@ def exercise(root, home, environment, script, requests, started):
     check(len(bytes.fromhex(first)) == 64 and first == second, "sandboxed apps get the same secret through the portal every time")
     check(denied == "AccessDenied", "only the desktop portal may ask for sandboxed apps' secrets")
 
-    exercise_agent(root, environment, check, script, requests)
-    exercise_ownership(root, home, environment, check, script, requests,
-                       lambda: subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30))
+    exercise_agent(root, environment, check, script, requests, lock, LOGIN)
+    exercise_ownership(root, home, environment, check, script, requests, lock)
 
     script(passwords=["work pass"], access="allow")
     imported = subprocess.run([*reader, "import", "Work"], env=environment, capture_output=True, timeout=60)

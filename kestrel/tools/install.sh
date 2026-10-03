@@ -83,6 +83,9 @@ check_runtime() {
   if ! command -v greetd >/dev/null 2>&1; then
     echo "The login screen runs on greetd. On Fedora: sudo dnf install greetd" >&2
   fi
+  if [[ ! -d /usr/share/unicode/cldr/common/annotations ]]; then
+    echo "Emoji search needs the emoji names. On Fedora: sudo dnf install cldr-emoji-annotation" >&2
+  fi
 }
 
 as_owner() {

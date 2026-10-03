@@ -73,7 +73,7 @@ export async function checkNetworkSignIn({output}) {
     const url = `http://127.0.0.1:${PORT}/`;
     const app = new LuftApp('signin', [`kestrel-signin:?network=${encodeURIComponent('Harbor Hotel')}&url=${encodeURIComponent(url)}`]);
     await app.open();
-    const shows = frame => frame.share(PAGE_COLOR, 3) > 0.5;
+    const shows = frame => frame.share([PAGE_COLOR], 3) > 0.5;
     const dark = await app.settle(shows);
     dark.save(`${output}/signin-dark.png`);
     require(shows(dark), 'the network’s sign-in page opens in its own window');

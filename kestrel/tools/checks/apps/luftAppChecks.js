@@ -12,6 +12,7 @@ import {checkSettingsPages} from './settingsPages.js';
 const APPS = ['rover', 'settings', 'disks', 'draft', 'tern', 'magpie', 'mailman', 'barometer', 'schelf', 'keys'];
 const TRANSLUCENT = {tern: 40};
 const OPAQUE = 2;
+const SURFACES = ['surface', 'surfaceContainerLowest', 'surfaceContainerLow', 'surfaceContainer', 'surfaceContainerHigh', 'surfaceContainerHighest'];
 const SURFACE_SHARE = 0.5;
 const ACCENTED = ['rover', 'magpie', 'mailman'];
 const ACCENT_TOLERANCE = 6;
@@ -53,26 +54,27 @@ async function showTestWallpaper(background) {
 
 async function checkApp(name, {palette, styles, require, output}) {
   const tolerance = TRANSLUCENT[name] ?? OPAQUE;
-  const covers = surface => frame => frame.share(surface, tolerance) >= SURFACE_SHARE;
-  const accented = accent => frame => frame.count(accent, ACCENT_TOLERANCE) >= ACCENT_SAMPLES;
+  const covers = colors => frame => frame.share(colors, tolerance) >= SURFACE_SHARE;
+  const surfaces = colors => SURFACES.map(role => colors[role]);
+  const accented = accent => frame => frame.count([accent], ACCENT_TOLERANCE) >= ACCENT_SAMPLES;
   const accentShown = ACCENTED.includes(name);
   styles.interface.set_string('color-scheme', 'prefer-dark');
   const app = new LuftApp(name);
   try {
     const opened = await app.open();
-    const dark = await app.settle(covers(palette.dark.surface));
+    const dark = await app.settle(covers(surfaces(palette.dark)));
     dark.save(`${output}/${name}-dark.png`);
-    require(covers(palette.dark.surface)(dark), `${name} opens in ${Math.round(opened)} ms on the dark palette surface`);
+    require(covers(surfaces(palette.dark))(dark), `${name} opens in ${Math.round(opened)} ms on the dark palette surface`);
     if (accentShown) require(accented(palette.dark.primary)(dark), `${name} draws the dark accent`);
 
     styles.kestrel.set_boolean('pure-black', true);
-    require(covers(PURE_BLACK)(await app.settle(covers(PURE_BLACK))), `${name} turns pure black with the desktop`);
+    require(covers([PURE_BLACK])(await app.settle(covers([PURE_BLACK]))), `${name} turns pure black with the desktop`);
     styles.kestrel.set_boolean('pure-black', false);
 
     styles.interface.set_string('color-scheme', 'prefer-light');
-    const light = await app.settle(covers(palette.light.surface));
+    const light = await app.settle(covers(surfaces(palette.light)));
     light.save(`${output}/${name}-light.png`);
-    require(covers(palette.light.surface)(light), `${name} follows the desktop into the light style`);
+    require(covers(surfaces(palette.light))(light), `${name} follows the desktop into the light style`);
     if (accentShown) require(accented(palette.light.primary)(light), `${name} draws the light accent`);
     return dark;
   } finally {

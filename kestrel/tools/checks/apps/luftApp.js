@@ -91,22 +91,22 @@ class Frame {
     this._pixels = this._pixbuf.get_pixels();
   }
 
-  count(hex, tolerance) {
-    const target = channels(hex);
+  count(colors, tolerance) {
+    const targets = colors.map(channels);
     const [stride, size] = [this._pixbuf.get_rowstride(), this._pixbuf.get_n_channels()];
     let matches = 0;
     for (let y = 0; y < this._pixbuf.get_height(); y += SAMPLE_STEP) {
       for (let x = 0; x < this._pixbuf.get_width(); x += SAMPLE_STEP) {
         const offset = y * stride + x * size;
-        if (target.every((value, channel) => Math.abs(this._pixels[offset + channel] - value) <= tolerance)) matches++;
+        if (targets.some(target => target.every((value, channel) => Math.abs(this._pixels[offset + channel] - value) <= tolerance))) matches++;
       }
     }
     return matches;
   }
 
-  share(hex, tolerance) {
+  share(colors, tolerance) {
     const samples = Math.ceil(this._pixbuf.get_width() / SAMPLE_STEP) * Math.ceil(this._pixbuf.get_height() / SAMPLE_STEP);
-    return this.count(hex, tolerance) / samples;
+    return this.count(colors, tolerance) / samples;
   }
 
   same(other) {

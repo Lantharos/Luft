@@ -71,7 +71,7 @@ async function checkTabs(app, preview, {require, output, pointer}) {
 
 async function checkSample({name, source, tabs, install}, home, context) {
   const {palette, styles, require, output} = context;
-  const covers = surface => frame => frame.share(surface, 2) >= 0.5;
+  const covers = surface => frame => frame.share([surface], 2) >= 0.5;
   styles.interface.set_string('color-scheme', 'prefer-dark');
   const app = new LuftApp('magpie', [copySample(source)]);
   try {

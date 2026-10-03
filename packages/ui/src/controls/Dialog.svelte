@@ -16,10 +16,11 @@
 	const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
 	let panel = $state<HTMLDivElement>();
+	let actionBar = $state<HTMLDivElement>();
 
 	$effect(() => {
 		const previous = document.activeElement as HTMLElement | null;
-		panel?.focus();
+		(actionBar?.querySelector<HTMLElement>('.primary:not(:disabled)') ?? panel)?.focus();
 		return () => previous?.focus();
 	});
 
@@ -53,7 +54,7 @@
 		{#if children}
 			<div class="body soft-scroll">{@render children()}</div>
 		{/if}
-		<div class="flex justify-end gap-2">{@render actions()}</div>
+		<div bind:this={actionBar} class="flex justify-end gap-2">{@render actions()}</div>
 	</div>
 </div>
 

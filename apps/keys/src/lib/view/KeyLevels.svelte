@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { tooltip } from '@luft/ui';
 	import { typedLevel } from '#lib/keyboard/board.js';
-	import { describe, LEVEL_NAMES, shown } from '#lib/keyboard/describe.js';
+	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
 	import type { DeadKey, Levels } from '#lib/layout/api.js';
 
 	interface Props {
@@ -24,13 +25,12 @@
 	});
 </script>
 
-<div class="grid gap-2" style:grid-template-columns="repeat({shownLevels.length}, minmax(0, 1fr))">
+<div class="flex justify-center gap-2">
 	{#each shownLevels as index (index)}
 		{@const symbol = typed[index]}
-		<div class="slot" class:current={level === index} aria-label="{LEVEL_NAMES[index]}: {names[index]}">
-			<span class="text-[12px] text-[var(--text-muted)]">{LEVEL_NAMES[index]}</span>
+		<div class="slot" class:current={level === index} role="img" aria-label="{LEVEL_NAMES[index]}: {names[index]}" {@attach tooltip(names[index])}>
 			<span class="glyph" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
-			<span class="truncate text-[12px] text-[var(--text-soft)] first-letter:uppercase">{names[index]}</span>
+			<span class="level">{LEVEL_SHORT_NAMES[index]}</span>
 		</div>
 	{/each}
 </div>
@@ -38,26 +38,36 @@
 <style>
 	.slot {
 		display: flex;
-		min-width: 0;
+		width: 96px;
 		flex-direction: column;
-		gap: 6px;
+		align-items: center;
+		gap: 4px;
 		border-radius: 16px;
-		background: var(--surface);
-		padding: 12px 14px;
-		transition: box-shadow 140ms var(--ease);
+		padding: 10px 8px 8px;
+		transition: background-color 140ms var(--ease);
 	}
 
 	.slot.current {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
+		background: var(--surface-hover);
 	}
 
 	.glyph {
-		height: 38px;
+		height: 34px;
+		max-width: 100%;
 		overflow: hidden;
-		font-size: 30px;
-		line-height: 38px;
+		font-size: 28px;
+		line-height: 34px;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+	}
+
+	.level {
+		font-size: 12px;
+		color: var(--text-muted);
+	}
+
+	.current .level {
+		color: var(--text-soft);
 	}
 
 	.dead {
@@ -65,6 +75,6 @@
 	}
 
 	.named {
-		font-size: 15px;
+		font-size: 14px;
 	}
 </style>

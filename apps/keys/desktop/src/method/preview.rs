@@ -25,6 +25,7 @@ pub struct Pick {
 pub struct Press {
     keysym: Option<String>,
     text: Option<String>,
+    before: String,
 }
 
 #[derive(Serialize)]
@@ -45,8 +46,16 @@ impl Preview {
         typing.session.reset();
     }
 
-    pub fn press(&self, Press { keysym, text }: Press) -> Result<Shown, String> {
+    pub fn press(
+        &self,
+        Press {
+            keysym,
+            text,
+            before,
+        }: Press,
+    ) -> Result<Shown, String> {
         self.with(|engine, session, learned| {
+            session.surrounding(&before);
             let input = match (text.and_then(|text| text.chars().next()), keysym) {
                 (Some(character), _) => Input::from_text(character, engine.compose()),
                 (None, Some(name)) => Input::from_keysym(

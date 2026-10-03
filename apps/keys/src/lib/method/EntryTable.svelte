@@ -19,6 +19,7 @@
 	const ROW = 44;
 	const GAP = 2;
 	const TALLEST = 420;
+	const SEARCH_FROM = 8;
 
 	let query = $state('');
 	let scroller = $state<VirtualHandle>();
@@ -44,20 +45,21 @@
 </script>
 
 <div class="flex flex-col gap-3">
-	<div class="flex items-center gap-2" data-own-undo>
-		<div class="flex-1">
-			<SearchField label="Search" bind:value={query} />
-		</div>
-		<button type="button" class="button" onclick={() => void addRow()}><Plus size={16} />{add}</button>
-	</div>
 	{#if rows.length}
-		<div class="columns px-3 text-[12px] text-[var(--text-muted)]" class:context>
-			<span>You type</span>
-			<span></span>
-			<span>You get</span>
-			{#if context}
-				<span>Only after</span>
+		<div class="columns heading" class:context data-own-undo>
+			{#if rows.length >= SEARCH_FROM}
+				<div class="search">
+					<SearchField label="Search" bind:value={query} />
+				</div>
+			{:else}
+				<span>You type</span>
+				<span></span>
+				<span>You get</span>
+				{#if context}
+					<span>Only after</span>
+				{/if}
 			{/if}
+			<button type="button" class="icon-button" aria-label={add} {@attach tooltip(add)} onclick={() => void addRow()}><Plus size={18} /></button>
 		</div>
 		<VirtualScroller
 			bind:this={scroller}
@@ -73,23 +75,26 @@
 					class:context
 					class:repeated={repeated.has(row.uid)}
 					data-uid={row.uid}
-					{@attach repeated.has(row.uid) ? tooltip('Another entry has the same keys, so only the last one is used') : undefined}
+					{@attach repeated.has(row.uid) ? tooltip('Same keys as another entry, only the last one is used') : undefined}
 				>
 					<input class="cell font-mono" value={row.keys} spellcheck="false" aria-label="You type" placeholder="a'" oninput={edit(row, 'keys')} />
 					<ArrowRight size={15} class="text-[var(--text-muted)]" />
 					<input class="cell" value={row.text} spellcheck="false" aria-label="You get" placeholder="á" oninput={edit(row, 'text')} />
 					{#if context}
-						<input class="cell font-mono" value={row.after} spellcheck="false" aria-label="Only after" placeholder="Anything" oninput={edit(row, 'after')} />
+						<input class="cell font-mono" value={row.after} spellcheck="false" aria-label="Only after" placeholder="Anywhere" oninput={edit(row, 'after')} />
 					{/if}
 					<IconButton icon={X} label="Remove" onclick={() => editor.remove(table, row.uid)} />
 				</div>
 			{/snippet}
 		</VirtualScroller>
 		{#if !shown.length}
-			<p class="px-1.5 text-[13px] text-[var(--text-muted)]">Nothing matches “{query.trim()}”</p>
+			<p class="px-3 text-[13px] text-[var(--text-muted)]">No matches</p>
 		{/if}
 	{:else}
-		<p class="px-1.5 text-[13px] leading-relaxed text-[var(--text-muted)]">{empty}</p>
+		<div class="flex flex-col items-center gap-4 pt-16 text-center">
+			<p class="text-[15px] text-[var(--text-soft)]">{empty}</p>
+			<button type="button" class="button" onclick={() => void addRow()}><Plus size={16} />{add}</button>
+		</div>
 	{/if}
 </div>
 
@@ -105,6 +110,18 @@
 		grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1.2fr) minmax(0, 0.9fr) 32px;
 	}
 
+	.heading {
+		min-height: 36px;
+		padding-inline: 12px 4px;
+		font-size: 12.5px;
+		color: var(--text-muted);
+	}
+
+	.search {
+		grid-column: 1 / -2;
+		margin-left: -8px;
+	}
+
 	.row {
 		height: 100%;
 		border-radius: 14px;
@@ -117,8 +134,18 @@
 		background: var(--surface);
 	}
 
-	.row.repeated {
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--danger) 55%, transparent);
+	.row :global(.icon-button) {
+		opacity: 0;
+		transition: opacity 120ms var(--ease);
+	}
+
+	.row:hover :global(.icon-button),
+	.row:focus-within :global(.icon-button) {
+		opacity: 1;
+	}
+
+	.row.repeated .cell:first-child {
+		color: var(--danger);
 	}
 
 	.cell {

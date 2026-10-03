@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
+	import ShapeItems from '#lib/keyboard/ShapeItems.svelte';
 	import Page from '#lib/shell/Page.svelte';
 	import SourceActions from '#lib/shell/SourceActions.svelte';
 	import UndoButtons from '#lib/shell/UndoButtons.svelte';
@@ -10,6 +11,7 @@
 	import DeadKeysPane from './dead/DeadKeysPane.svelte';
 	import { LayoutEditor, type Tab } from './editor.svelte';
 	import KeysPane from './keys/KeysPane.svelte';
+	import KeysToolbar from './keys/KeysToolbar.svelte';
 	import LayoutSettings from './settings/LayoutSettings.svelte';
 
 	interface Props {
@@ -27,7 +29,6 @@
 
 	let editor = $state<LayoutEditor | null>(null);
 	let baseName = $state('');
-
 
 	onMount(() => {
 		openLayout(id)
@@ -76,10 +77,19 @@
 					{ label: 'Export for Windows', run: () => exportLayout(id, 'klc') }
 				]}
 				onremove={remove}
-			/>
+			>
+				{#snippet menu(close)}
+					<ShapeItems value={current.geometry} onchange={(geometry) => current.setGeometry(geometry)} {close} />
+				{/snippet}
+			</SourceActions>
 		{/snippet}
-		<div class="w-[400px] max-w-full">
-			<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<div class="w-[320px] max-w-full">
+				<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+			</div>
+			{#if current.tab === 'keys'}
+				<KeysToolbar editor={current} />
+			{/if}
 		</div>
 		{#if current.tab === 'keys'}
 			<KeysPane editor={current} />

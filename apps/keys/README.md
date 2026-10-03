@@ -4,21 +4,21 @@ Keys makes your own keyboard layouts and input methods for Luft. It is built wit
 
 ## Layouts
 
-A new layout starts from any layout the computer already has, or from one you made before. Its page has three parts: Keys, Dead keys and Settings, which Ctrl+1, Ctrl+2 and Ctrl+3 switch between. Every change can be undone and redone with the arrows at the top or Ctrl+Z and Ctrl+Shift+Z, and is saved as you make it.
+A new layout starts from any layout the computer already has, or from one you made before. Its page has three parts: Keys, Dead keys and Settings, which Ctrl+1, Ctrl+2 and Ctrl+3 switch between. Every change can be undone and redone with the arrows at the top or Ctrl+Z and Ctrl+Shift+Z, and is saved as you make it. Exporting, deleting the layout and the shape of the keyboard drawing are in the menu at the top.
 
 ### Keys
 
-Every key of the letter block is shown on a keyboard drawn to the shape you pick: ANSI, ISO or JIS. Each key shows what it types alone, with Shift, with AltGr and with Shift and AltGr, or just one of these levels when you pick it above the keyboard. Dead keys and the Compose key are set apart.
+Every key of the letter block is shown on a keyboard drawn to the shape you pick: ANSI, ISO or JIS. Each key shows what it types alone, with Shift, with AltGr and with Shift and AltGr, or just one of these levels when you pick it next to the tabs. Dead keys and the Compose key are set apart.
 
-Pick a key with the mouse, or press it while the keyboard has focus. Below the keyboard, each of the four levels can be typed straight into, cleared with Backspace, or chosen from a search over characters and emoji by name. The same search offers your own dead keys, a new one, the standard dead keys, the Compose key, and any key by its XKB name, such as `ISO_Level3_Shift`. Escape goes back to the keyboard.
+Pick a key with the mouse, or press it while the keyboard has focus, and a small panel opens next to it with its four levels laid out the way they sit on the key. Each level can be typed straight into, cleared with Backspace, or chosen from a search over characters and emoji by name; hovering one shows the name of its character. The same search offers your own dead keys, a new one, the standard dead keys, the Compose key, and any key by its XKB name, such as `ISO_Level3_Shift`. Escape closes the panel and goes back to the keyboard.
 
-The field under the keyboard types with the layout as it is in the editor, dead keys included, before anything is saved. Below it, Keys points out what's worth a second look: keys that type nothing, characters on more than one key, dead keys that aren't on a key, results that can't be reached or clash, and AltGr and Compose sharing a key. Each one opens the place to fix it.
+The field under the keyboard types with the layout as it is in the editor, dead keys included, before anything is saved. It is an ordinary text field otherwise: the caret, selection, Backspace, the arrows and pasting all work as usual, and the input method you're typing with stays out of it, so it shows exactly what the layout types. When something is worth a second look, a small count appears next to the tabs: keys that type nothing, characters on more than one key, dead keys that aren't on a key, results that can't be reached or clash, and AltGr and Compose sharing a key. Each one opens the place to fix it.
 
 ### Dead keys
 
 A dead key types nothing by itself and changes the key that comes after it. Each dead key you make has its own table, the way Windows layouts do it: a goes to ž, z goes to ž, s goes to š, and so on, with any result you like, even several characters. A result can also lead into another dead key, whose table then applies to the next key. Space, or the dead key pressed twice, types the dead key's own character, and a key without a result types that character followed by the key. The symbol it shows on the keyboard and its name are yours to choose.
 
-The table is a searchable grid; Add capitals fills in the capital letter for every small letter that doesn't have one yet, and the Try it field shows what the dead key makes of each key you press, chains included. Put on a key takes you to the keyboard to choose where it goes.
+The table is a grid, searchable once it grows long. The field above it treats every key you press as if it came after the dead key, so you can see what it makes of each one, chains included; a dead key still waiting for its next key is underlined. The pencil next to the dead key's name changes its name, the symbol it shows on the keyboard and what it types with Space. The keyboard button takes you to the keyboard to choose where it goes, and the menu next to it has Add capitals, which fills in the capital letter for every small letter that doesn't have one yet, and removes the dead key.
 
 Dead keys that come from the layout you started from, such as the acute accent in English (US, intl.), keep working as before and use the computer's standard table. Keys shows that table, and Make an editable copy turns it into a dead key of your own, on the same keys.
 
@@ -26,7 +26,7 @@ Most apps use changes to dead keys right away, including GTK and X11 apps, apps 
 
 ### Settings
 
-Besides the name, the short name on the panel and the language, a layout can move AltGr to another key, put Compose on a key, and change what Caps Lock does. These travel with the layout, so they change when you switch to it.
+Besides the name, the short name on the panel and the language code, such as `de` or `cs`, a layout can move AltGr to another key, put Compose on a key, and change what Caps Lock does. These travel with the layout, so they change when you switch to it.
 
 ### Where layouts are kept
 
@@ -38,7 +38,7 @@ Layouts can be brought in from an XKB symbols file, a complete `.xkb` keymap or 
 
 ## Viewing a layout
 
-Any layout can be opened just to look at it, whether it came with the computer or you made it, on the same keyboard drawn to the shape of yours. Pressing a key lights it up and shows what it types at each level; holding Shift or AltGr, or clicking them, brings forward what every key types with them, dead keys and the Compose key included. A layout that came with the computer can be copied into a new one to change, and one of your own opens in the editor.
+Any layout can be opened just to look at it, whether it came with the computer or you made it, on the same keyboard drawn to the shape of yours. Pressing a key lights it up and shows what it types at each level below the keyboard, with the names of the characters on hover; holding Shift or AltGr, or clicking them, brings forward what every key types with them, dead keys and the Compose key included. A layout that came with the computer can be copied into a new one to change, and one of your own opens in the editor.
 
 Show keyboard layout in Kestrel's input source menu opens Keys this way on the layout you're typing with, in a window of its own without the list of your layouts.
 
@@ -50,7 +50,7 @@ An input method changes what you type as you type it, through IBus. Its page has
 - Words offer choices while you type, such as `ni` giving 你 and 尼. Space takes the highlighted choice and its number takes any other; when nothing matches the whole reading, the longest part that does is offered and the rest stays to be typed. Words you pick often move up, if Learn from your choices is on.
 - Sequences start with a key of your choice, such as Compose or `;`, followed by a few keys, such as `a` and `e` for æ.
 
-Entries with the same keys are marked, since only the last one is used. The Try it field next to the entries types with the input method as it is in the editor, with the same choices Kestrel shows. Dead keys and the Compose key work inside an input method too: what they make goes through its replacements and words like any other character.
+Entries with the same keys are marked, since only the last one is used. The field next to the entries types with the input method as it is in the editor, with the same choices Kestrel shows and the text being composed underlined, and works like any other text field around it. Dead keys and the Compose key work inside an input method too: what they make goes through its replacements and words like any other character.
 
 Input methods are kept in `~/.config/keys/input-methods/<name>.toml`, a plain file you can share:
 

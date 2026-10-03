@@ -19,7 +19,7 @@
 	}
 </script>
 
-{#snippet group(title: string, kind: Kind, items: Item[], empty: string, add: string)}
+{#snippet group(title: string, kind: Kind, items: Item[], add: string)}
 	<section class="flex flex-col gap-0.5">
 		<div class="flex h-8 items-center justify-between pr-1 pl-3">
 			<h2 class="text-[13px] font-medium text-[var(--sidebar-text-muted)]">{title}</h2>
@@ -38,16 +38,14 @@
 				<span class="mark">{item.mark}</span>
 				<span class="truncate">{item.name}</span>
 			</button>
-		{:else}
-			<p class="px-3 py-1.5 text-[13px] text-[var(--sidebar-text-muted)]">{empty}</p>
 		{/each}
 	</section>
 {/snippet}
 
 <aside class="glass-sidebar drag-region px-3 py-4">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto">
-		{@render group('Layouts', 'layout', layouts, 'Layouts you make show up here', 'New layout')}
-		{@render group('Input methods', 'method', methods, 'Input methods you make show up here', 'New input method')}
+		{@render group('Layouts', 'layout', layouts, 'New layout')}
+		{@render group('Input methods', 'method', methods, 'New input method')}
 	</nav>
 </aside>
 

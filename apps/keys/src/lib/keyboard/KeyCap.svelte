@@ -37,7 +37,7 @@
 	{/if}
 {/snippet}
 
-<button type="button" class="cap" class:selected class:pressed aria-pressed={selected} onclick={onselect} {onkeydown}>
+<button type="button" class="cap" class:selected class:pressed aria-pressed={selected} tabindex={selected ? 0 : -1} onclick={onselect} {onkeydown}>
 	{#if layer !== null && layered !== null}
 		{@const symbol = levels[layered]}
 		{#if symbol.kind !== 'empty'}

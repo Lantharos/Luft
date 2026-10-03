@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { describe, LEVEL_NAMES, shown } from '#lib/keyboard/describe.js';
+	import PenLine from '@lucide/svelte/icons/pen-line';
+	import { tooltip } from '@luft/ui';
+	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
 	import { describeText, EMPTY, type Symbol } from '../api';
 	import type { LayoutEditor } from '../editor.svelte';
 	import SymbolPicker from './SymbolPicker.svelte';
@@ -10,6 +12,8 @@
 	}
 
 	let { editor, onescape }: Props = $props();
+
+	const ARRANGED = [1, 3, 0, 2];
 
 	let slots = $state<HTMLButtonElement[]>([]);
 	let picking = $state<number | null>(null);
@@ -61,23 +65,24 @@
 	}
 </script>
 
-<div class="grid grid-cols-4 gap-2">
-	{#each levels as symbol, level (level)}
+<div class="grid grid-cols-2 gap-1" role="group" aria-label="What the key types">
+	{#each ARRANGED as level (level)}
+		{@const symbol = levels[level]}
 		<div class="slot" class:current={editor.level === level} class:placing={editor.placing}>
 			<button
 				bind:this={slots[level]}
 				type="button"
 				class="pick"
 				aria-label="{LEVEL_NAMES[level]}: {names[level]}"
+				{@attach tooltip(names[level] ? `${LEVEL_NAMES[level]}: ${names[level]}` : LEVEL_NAMES[level])}
 				onclick={() => open(level)}
 				onkeydown={(event) => void keydown(event, level)}
 			>
-				<span class="text-[12px] text-[var(--text-muted)]">{LEVEL_NAMES[level]}</span>
+				<span class="level">{LEVEL_SHORT_NAMES[level]}</span>
 				<span class="glyph" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
-				<span class="truncate text-[12px] text-[var(--text-soft)] first-letter:uppercase">{names[level]}</span>
 			</button>
 			{#if symbol.kind === 'dead' && editor.dead(symbol.keysym)}
-				<button type="button" class="edit" onclick={() => editDead(symbol)}>Edit</button>
+				<button type="button" class="edit" aria-label="Edit {names[level]}" {@attach tooltip('Edit dead key')} onclick={() => editDead(symbol)}><PenLine size={13} /></button>
 			{/if}
 		</div>
 	{/each}
@@ -92,11 +97,8 @@
 	.slot {
 		position: relative;
 		min-width: 0;
-		border-radius: 16px;
-		background: var(--surface);
-		transition:
-			background-color 140ms var(--ease),
-			box-shadow 140ms var(--ease);
+		border-radius: 14px;
+		transition: background-color 140ms var(--ease);
 	}
 
 	.slot:hover {
@@ -109,12 +111,13 @@
 
 	.pick {
 		display: flex;
+		height: 64px;
 		width: 100%;
 		min-width: 0;
 		flex-direction: column;
-		gap: 6px;
-		border-radius: 16px;
-		padding: 12px 14px;
+		justify-content: space-between;
+		border-radius: 14px;
+		padding: 8px 10px;
 		text-align: left;
 		outline: none;
 	}
@@ -124,27 +127,20 @@
 		box-shadow: inset 0 0 0 1.5px var(--accent);
 	}
 
-	.edit {
-		position: absolute;
-		top: 8px;
-		right: 8px;
-		border-radius: var(--radius-pill);
-		padding: 3px 10px;
-		font-size: 12px;
-		color: var(--text-soft);
-		transition: background-color 140ms var(--ease);
+	.level {
+		font-size: 11.5px;
+		color: var(--text-muted);
 	}
 
-	.edit:hover {
-		background: var(--control);
-		color: var(--text);
+	.current .level {
+		color: var(--text-soft);
 	}
 
 	.glyph {
-		height: 38px;
+		height: 28px;
 		overflow: hidden;
-		font-size: 30px;
-		line-height: 38px;
+		font-size: 24px;
+		line-height: 28px;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
@@ -154,6 +150,26 @@
 	}
 
 	.named {
-		font-size: 15px;
+		font-size: 13px;
+	}
+
+	.edit {
+		position: absolute;
+		top: 6px;
+		right: 6px;
+		display: grid;
+		height: 24px;
+		width: 24px;
+		place-items: center;
+		border-radius: var(--radius-pill);
+		color: var(--text-muted);
+		transition:
+			background-color 140ms var(--ease),
+			color 140ms var(--ease);
+	}
+
+	.edit:hover {
+		background: var(--control);
+		color: var(--text);
 	}
 </style>

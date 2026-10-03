@@ -9,10 +9,16 @@ import {getInputSourceManager} from 'resource:///org/gnome/shell/ui/status/keybo
 
 import {prepareHome} from './home.js';
 import {checkDeadKeys} from './keysDeadKeys.js';
+import {tryFieldChecker} from './keysTry.js';
 import {LuftApp, sleep, startSabineService, waitFor} from './luftApp.js';
 
 const KEY_A = 30;
 const KEY_E = 18;
+const KEY_X = 45;
+const KEY_TAB = 15;
+const KEY_BACKSPACE = 14;
+const KEY_SPACE = 57;
+const KEY_LEFT = 105;
 const KEY_APOSTROPHE = 40;
 const KEY_RIGHTALT = 100;
 const KEY_LEFTCTRL = 29;
@@ -103,12 +109,15 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
     keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.PRESSED);
     keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.RELEASED);
   });
-  const click = async actor => {
-    const [x, y] = actor.get_transformed_position();
-    pointer.notify_absolute_motion(GLib.get_monotonic_time(), x + actor.width / 2, y + actor.height / 2);
+  const clickAt = async (x, y) => {
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), x, y);
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
     await pause(300);
+  };
+  const click = async actor => {
+    const [x, y] = actor.get_transformed_position();
+    await clickAt(x + actor.width / 2, y + actor.height / 2);
   };
   const keyval = symbol => {
     keyboard.notify_keyval(GLib.get_monotonic_time(), symbol, Clutter.KeyState.PRESSED);
@@ -142,6 +151,7 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
     await waitFor(condition, timeout, () => `Kestrel Keys check failed: ${label}`);
     console.log(`Kestrel Keys check: ${label}`);
   };
+  const tryFieldHolds = tryFieldChecker({keyboard, pause, waitFor});
   const typeInto = async (window, act, expected, label) => {
     window.activate(global.get_current_time());
     await pause(300);
@@ -167,11 +177,12 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       const symbols = GLib.build_filenamev([GLib.get_user_config_dir(), 'xkb/symbols', id]);
       require(exists(symbols) && read(symbols).includes('include "us(intl)"'), `a new layout starts from an existing one and is written to ~/.config/xkb as ${id}`);
       await sleep(1500);
+      await shoot(keys, 'keys-layout');
       key(KEY_A);
       await pause(300);
       await pick('small a with ring above');
       await reached(() => read(symbols).includes('replace key <AC01> { type[Group1] = "FOUR_LEVEL", [ aring,'), 'pressing a key picks it and a character found by name is assigned to it', SAVED);
-      await shoot(keys, 'keys-layout');
+      await shoot(keys, 'keys-inspector');
       const tab = async (code, name) => {
         keyboard.notify_key(GLib.get_monotonic_time(), KEY_LEFTCTRL, Clutter.KeyState.PRESSED);
         key(code);
@@ -203,6 +214,15 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
         await reached(() => read(symbols).includes('[ idotless,'), 'a second change is saved too', SAVED);
         await pause(800);
         await typeInto(window, () => key(KEY_A), 'åéı', 'changing the layout in Keys switches the running keymap live');
+
+        keys.window.activate(global.get_current_time());
+        await pause(300);
+        keyval(Clutter.KEY_Escape);
+        await pause(300);
+        key(KEY_TAB);
+        await pause(300);
+        [KEY_E, KEY_A, KEY_E, KEY_LEFT, KEY_APOSTROPHE, KEY_E, KEY_BACKSPACE, KEY_APOSTROPHE, KEY_SPACE, KEY_X].forEach(key);
+        await tryFieldHolds("eı'xe", 'the Try it field types with the edited layout, dead keys and Space included, at the caret');
       } finally {
         wayland.process.force_exit();
       }
@@ -231,6 +251,18 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       await pause(600);
       useSources([['ibus', engine], ['xkb', 'us']]);
       await pause(1500);
+
+      methods.window.activate(global.get_current_time());
+      await pause(300);
+      const frame = methods.window.get_frame_rect();
+      await clickAt(frame.x + frame.width - 200, frame.y + 120);
+      type('ni');
+      await pause(400);
+      await shoot(methods, 'keys-method-try');
+      type("2a' ");
+      key(KEY_LEFT);
+      type('x');
+      await tryFieldHolds('尼xá', 'the input method’s Try it field picks words, replaces and types at the caret while it is the input source too');
       const entry = await openEntry();
       try {
         const {window} = entry;

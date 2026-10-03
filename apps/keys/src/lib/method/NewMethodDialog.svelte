@@ -31,11 +31,7 @@
 	}
 </script>
 
-<Dialog
-	title="New input method"
-	description="Give it a name, then add replacements, words to choose from, or sequences. You can also bring one in from a file, including m17n and IBus table files."
-	{onclose}
->
+<Dialog title="New input method" {onclose}>
 	<TextField label="Name" showLabel bind:value={name} placeholder="My input method" onkeydown={keydown} />
 	{#snippet actions()}
 		<button type="button" class="plain-button mr-auto" onclick={() => void run(importMethod)}>Import a file</button>

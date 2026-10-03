@@ -39,7 +39,7 @@
 		<input class="base" value={pair.base} spellcheck="false" aria-label="Key" placeholder="a" oninput={setBase} />
 		<ArrowRight size={14} class="flex-none text-[var(--text-muted)]" />
 		{#if next}
-			<span class="result chained truncate" title="Leads into {next.name}">{next.symbol} {next.name}</span>
+			<span class="result chained truncate" {@attach tooltip(`Leads into ${next.name}`)}>{next.symbol}</span>
 		{:else}
 			<input
 				class="result"
@@ -95,7 +95,6 @@
 		align-items: center;
 		gap: 6px;
 		border-radius: 14px;
-		background: var(--surface);
 		padding-inline: 6px;
 		transition:
 			background-color 120ms var(--ease),
@@ -107,8 +106,8 @@
 		background: var(--surface-hover);
 	}
 
-	.cell.problem {
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--danger) 55%, transparent);
+	.cell.problem .base {
+		color: var(--danger);
 	}
 
 	.base,
@@ -144,8 +143,9 @@
 	}
 
 	.chained {
-		font-size: 13px;
 		color: var(--secondary);
+		text-decoration: underline 1.5px var(--accent);
+		text-underline-offset: 5px;
 	}
 
 	.cell :global(.more) {

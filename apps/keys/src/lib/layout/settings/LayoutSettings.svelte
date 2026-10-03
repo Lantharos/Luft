@@ -44,40 +44,43 @@
 	let capsTaken = $derived(options.compose === 'caps' ? 'Compose' : editor.usesThirdLevel && options.altgr === 'caps' ? 'AltGr' : '');
 </script>
 
-<Section title="Details">
+<Section>
 	<Row title="Name">
 		<div class="w-[300px]">
 			<TextField label="Name" bind:value={() => editor.layout.name, (name) => editor.rename('name', name)} />
 		</div>
 	</Row>
-	<Row title="Short name" description="Shown on the panel while you type with it">
+	<Row title="Short name">
 		<div class="w-[120px]">
 			<TextField label="Short name" bind:value={() => editor.layout.short, (short) => editor.rename('short', short.slice(0, SHORT_LENGTH))} />
 		</div>
 	</Row>
-	<Row title="Language" description="Its code, such as de for German or cs for Czech">
+	<Row title="Language">
 		<div class="w-[120px]">
-			<TextField label="Language" bind:value={() => editor.layout.language, (language) => editor.rename('language', language.trim())} />
+			<TextField label="Language" placeholder="de" bind:value={() => editor.layout.language, (language) => editor.rename('language', language.trim())} />
 		</div>
 	</Row>
 </Section>
 
-<Section title="Special keys" description="These go with the layout, so they change when you switch to it.">
+<Section>
 	{#if editor.usesThirdLevel}
-		<Row title="AltGr" description="Hold it for the third and fourth character on each key">
+		<Row title="AltGr">
 			<Select label="AltGr" options={ALTGR} value={options.altgr} onchange={(altgr) => editor.setOption('altgr', altgr)} />
 		</Row>
 	{/if}
-	<Row title="Compose" description="Press it, then a few keys, to type characters that aren't on the keyboard">
+	<Row title="Compose">
 		<Select label="Compose" options={COMPOSE} value={options.compose} onchange={(compose) => editor.setOption('compose', compose)} />
 	</Row>
-	<Row title="Caps Lock" description={capsTaken ? `Works as ${capsTaken}` : 'What the key does on its own'}>
-		<Select label="Caps Lock" options={CAPS} value={options.caps} disabled={Boolean(capsTaken)} onchange={(caps) => editor.setOption('caps', caps)} />
+	<Row title="Caps Lock">
+		{#if capsTaken}
+			<span class="px-3">Works as {capsTaken}</span>
+		{:else}
+			<Select label="Caps Lock" options={CAPS} value={options.caps} onchange={(caps) => editor.setOption('caps', caps)} />
+		{/if}
 	</Row>
+	{#if baseName}
+		<Row title="Starts from">
+			<span class="max-w-[320px] truncate px-3">{baseName}</span>
+		</Row>
+	{/if}
 </Section>
-
-{#if baseName}
-	<Section title="Starts from">
-		<Row title={baseName} description="Keys outside the letter block, such as the number pad, work like this layout" />
-	</Section>
-{/if}

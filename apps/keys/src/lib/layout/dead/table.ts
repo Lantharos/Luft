@@ -72,3 +72,11 @@ export function whereIs(keys: Record<string, Levels>, keysym: string) {
 	const sentence = phrases.length === 1 ? phrases[0] : `${phrases.slice(0, -1).join(', ')} and ${phrases.at(-1)}`;
 	return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
+
+const OWN_DEAD_FIRST = 0xec40;
+const OWN_DEAD_LAST = 0xecff;
+
+export function ownDeadKeysym(character: string) {
+	const point = character.codePointAt(0)!;
+	return point >= OWN_DEAD_FIRST && point <= OWN_DEAD_LAST ? `U${point.toString(16).toUpperCase()}` : null;
+}

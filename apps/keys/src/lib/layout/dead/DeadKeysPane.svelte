@@ -17,18 +17,13 @@
 </script>
 
 {#if empty}
-	<div class="flex max-w-[520px] flex-col items-start gap-4 pt-8">
-		<div class="flex flex-col gap-2">
-			<h2 class="text-[20px] font-semibold">Dead keys</h2>
-			<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">
-				A dead key types nothing by itself and changes the next key instead, like a caron that turns a into ǎ. Each one has its own list of what the
-				keys after it make, and can lead into another dead key.
-			</p>
-		</div>
-		<button type="button" class="button primary" onclick={() => void editor.addDead()}><Plus size={16} />New dead key</button>
+	<div class="flex flex-col items-center gap-4 pt-16 text-center">
+		<span class="text-[40px] leading-none text-[var(--text-muted)]" aria-hidden="true">ˇ</span>
+		<p class="text-[15px] text-[var(--text-soft)]">No dead keys yet</p>
+		<button type="button" class="button" onclick={() => void editor.addDead()}><Plus size={16} />New dead key</button>
 	</div>
 {:else}
-	<div class="grid items-start gap-8 min-[1000px]:grid-cols-[220px_minmax(0,1fr)]">
+	<div class="grid items-start gap-8 min-[1000px]:grid-cols-[200px_minmax(0,1fr)]">
 		<DeadKeyList {editor} />
 		{#if own}
 			{#key own.keysym}
@@ -38,8 +33,6 @@
 			{#key standard.keysym}
 				<StandardDeadKey {editor} symbol={standard} />
 			{/key}
-		{:else}
-			<p class="pt-2 text-[14px] text-[var(--text-muted)]">Pick a dead key to see what it makes.</p>
 		{/if}
 	</div>
 {/if}

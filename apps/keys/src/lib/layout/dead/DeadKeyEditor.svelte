@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import { MenuButton, MenuItem, Row, Section, TextField } from '@luft/ui';
+	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import type { DeadKey } from '../api';
 	import type { LayoutEditor } from '../editor.svelte';
+	import DeadKeyDetails from './DeadKeyDetails.svelte';
 	import DeadKeyHeader from './DeadKeyHeader.svelte';
 	import PairGrid from './PairGrid.svelte';
 	import { whereIs } from './table';
@@ -15,8 +17,8 @@
 
 	let { editor, key }: Props = $props();
 
-	let places = $derived(editor.placesOf(key.keysym));
 	let where = $derived(whereIs(editor.layout.keys, key.keysym));
+	let placed = $derived(editor.placesOf(key.keysym).length > 0);
 
 	function putOnKey() {
 		editor.placing = key.keysym;
@@ -24,14 +26,24 @@
 	}
 </script>
 
-<div class="flex min-w-0 flex-col gap-7">
+<div class="flex min-w-0 flex-col gap-5">
 	<DeadKeyHeader symbol={key.symbol} name={key.name} {where}>
-		<button type="button" class="button" onclick={putOnKey}>{places.length ? 'Put on another key' : 'Put on a key'}</button>
-		<MenuButton label="More" class="icon-button" align="end">
+		<DeadKeyDetails {editor} {key} />
+		<button type="button" class="icon-button" aria-label={placed ? 'Put on another key' : 'Put on a key'} {@attach tooltip(placed ? 'Put on another key' : 'Put on a key')} onclick={putOnKey}>
+			<Keyboard size={18} />
+		</button>
+		<MenuButton label="More" class="icon-button" align="end" minWidth={200}>
 			{#snippet trigger()}
 				<Ellipsis size={18} />
 			{/snippet}
 			{#snippet children(close)}
+				<MenuItem
+					onclick={() => {
+						close();
+						editor.addCapitals(key.keysym);
+					}}>Add capitals</MenuItem
+				>
+				<MenuSeparator />
 				<MenuItem
 					danger
 					onclick={() => {
@@ -42,30 +54,6 @@
 			{/snippet}
 		</MenuButton>
 	</DeadKeyHeader>
-
+	<TryDeadKey {editor} {key} />
 	<PairGrid {editor} {key} />
-
-	<section class="flex flex-col gap-2">
-		<h2 class="px-1.5 text-[14px] font-semibold text-[var(--text-soft)]">Try it</h2>
-		<TryDeadKey {editor} {key} />
-		<p class="px-1.5 text-[12.5px] text-[var(--text-muted)]">Most apps use changes right away. Some, such as many terminals, use them once they're reopened.</p>
-	</section>
-
-	<Section title="Details">
-		<Row title="Name">
-			<div class="w-[240px]">
-				<TextField label="Name" bind:value={() => key.name, (name) => editor.updateDead(key.keysym, 'name', name)} />
-			</div>
-		</Row>
-		<Row title="Shown on the key">
-			<div class="w-[120px]">
-				<TextField label="Shown on the key" bind:value={() => key.symbol, (symbol) => editor.updateDead(key.keysym, 'symbol', symbol)} />
-			</div>
-		</Row>
-		<Row title="With Space or pressed twice" description="Also what comes before a key that has nothing of its own">
-			<div class="w-[120px]">
-				<TextField label="With Space or pressed twice" bind:value={() => key.spacing, (spacing) => editor.updateDead(key.keysym, 'spacing', spacing)} />
-			</div>
-		</Row>
-	</Section>
 </div>

@@ -1,16 +1,5 @@
 data_builddir = meson.current_build_dir()
 
-serviceconf = configuration_data()
-serviceconf.set('libexecdir', libexecdir)
-if have_portal_helper
-  configure_file(
-    input: 'org.gnome.Shell.PortalHelper.service.in',
-    output: 'org.gnome.Shell.PortalHelper.service',
-    configuration: serviceconf,
-    install_dir: servicedir
-  )
-endif
-
 theme_deps = []
 
 subdir('dbus-interfaces')

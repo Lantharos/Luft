@@ -39,7 +39,6 @@
     <file preprocess="xml-stripblanks">org.gnome.Shell.Introspect.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.HotplugSniffer.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.PerfHelper.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.PortalHelper.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Screencast.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Screenshot.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Wacom.PadOsd.xml</file>

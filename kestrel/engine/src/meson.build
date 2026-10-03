@@ -60,7 +60,6 @@ gnome_shell_deps = [
   clutter_dep,
   gi_dep,
   polkit_dep,
-  gcr_dep,
   libsystemd_dep,
   libpipewire_dep,
   pango_dep,
@@ -72,9 +71,6 @@ if have_xwayland
 endif
 
 gnome_shell_deps += nm_deps
-
-tools_cflags = '-DLOCALEDIR="@0@"'.format(localedir)
-tools_deps = [gio_dep, gjs_dep]
 
 libshell_menu_sources = [
   'gtkactionmuxer.h',
@@ -145,15 +141,11 @@ libshell_sources = [
   'shell-glyph-renderer.c',
   'shell-global.c',
   'shell-invert-lightness-effect.c',
-  'shell-keyring-prompt.c',
-  'shell-keyring-prompt.h',
   'shell-mount-operation.c',
   'shell-perf-log.c',
   'shell-polkit-authentication-agent.c',
   'shell-polkit-authentication-agent.h',
   'shell-screenshot.c',
-  'shell-secure-text-buffer.c',
-  'shell-secure-text-buffer.h',
   'shell-stack.c',
   'shell-systemd.c',
   'shell-texture-file.c',
@@ -219,7 +211,6 @@ libshell_dep = declare_dependency(
 libshell_gir_includes = [
   'Clutter-@0@'.format(mutter_api_version),
   'Meta-@0@'.format(mutter_api_version),
-  'Gcr-4',
   'GioUnix-2.0',
   'PolkitAgent-1.0',
   'GdkPixbuf-2.0'
@@ -251,17 +242,6 @@ gnome_shell_binary = executable('kestrel', 'main.c',
   install_rpath: install_rpath,
   install: true
 )
-
-if have_portal_helper
-  executable('gnome-shell-portal-helper',
-    'gnome-shell-portal-helper.c', portal_resources,
-    c_args: tools_cflags,
-    dependencies: tools_deps,
-    include_directories: [conf_inc],
-    install_dir: libexecdir,
-    install: true
-  )
-endif
 
 gnome_shell_perf_helper = executable('gnome-shell-perf-helper', 'shell-perf-helper.c', js_resources,
   dependencies: [gtk_dep, gio_dep, m_dep],

@@ -36,6 +36,11 @@ install_settings() {
   as_owner "$prefix" install -DZ -m755 "$root/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
 }
 
+install_openconnect() {
+  cargo build --release --manifest-path "$root/kestrel/openconnect/Cargo.toml"
+  as_owner "$prefix" install -DZ -m755 "$root/kestrel/openconnect/target/release/kestrel-openconnect" "$prefix/libexec/kestrel-openconnect"
+}
+
 remove_greeter() {
   greeter_files | while read -r _ target; do sudo rm -f "$target"; done
   sudo systemctl daemon-reload
@@ -104,6 +109,7 @@ case "$action" in
     as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"
     as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
     install_settings
+    install_openconnect
     as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
     if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then

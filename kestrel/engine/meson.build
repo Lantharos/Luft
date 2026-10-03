@@ -17,7 +17,6 @@ cogl_pc = 'mutter-cogl-' + mutter_api_version
 mtk_pc = 'mutter-mtk-' + mutter_api_version
 libmutter_pc = 'libmutter-' + mutter_api_version
 
-gcr_req = '>= 3.90.0'
 gio_req = '>= 2.86.0'
 gjs_req = '>= 1.87.1'
 gtk_req = '>= 4.0'
@@ -69,7 +68,6 @@ endif
 
 atk_bridge_dep = dependency('atk-bridge-2.0')
 cairo_dep = dependency('cairo')
-gcr_dep = dependency('gcr-4', version: gcr_req)
 gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0')
 gi_dep = dependency('girepository-2.0', version: gio_req)
 gio_dep = dependency('gio-2.0', version: gio_req)
@@ -113,11 +111,6 @@ if get_option('networkmanager')
   have_networkmanager = true
 else
   have_networkmanager = false
-endif
-
-have_portal_helper = get_option('portal_helper')
-if have_portal_helper and not have_networkmanager
-  error('Portal helper requires networkmanager support')
 endif
 
 if get_option('camera_monitor')

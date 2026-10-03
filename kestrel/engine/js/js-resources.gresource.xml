@@ -110,7 +110,6 @@
     <file>ui/components.js</file>
     <file>ui/components/automountManager.js</file>
     <file>ui/components/autorunManager.js</file>
-    <file>ui/components/keyring.js</file>
     <file>ui/components/networkAgent.js</file>
     <file>ui/components/polkitAgent.js</file>
 

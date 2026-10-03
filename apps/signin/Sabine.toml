@@ -1,0 +1,19 @@
+[app]
+id = "com.lantharos.signin"
+name = "Network Sign-In"
+generic_name = "Wi-Fi Sign-In"
+categories = ["Network"]
+keywords = ["captive portal", "hotspot", "hotel", "airport", "wifi", "wi-fi", "login", "sign in"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["x-scheme-handler/kestrel-signin"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"

@@ -7,7 +7,7 @@ import * as Config from '../misc/config.js';
 const DEFAULT_MODE = 'restrictive';
 
 const USER_SESSION_COMPONENTS = [
-    'polkitAgent', 'keyring',
+    'polkitAgent',
     'autorunManager', 'automountManager',
 ];
 

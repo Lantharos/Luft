@@ -864,6 +864,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-pinentry"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "rustix",
+ "serde",
+ "tokio",
+ "zbus",
+ "zeroize",
+]
+
+[[package]]
 name = "mbox"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

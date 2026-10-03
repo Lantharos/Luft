@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["daemon", "pam", "unlock", "vault", "wire"]
+members = ["daemon", "pam", "pinentry", "unlock", "vault", "wire"]
 
 [workspace.package]
 version = "0.1.0"

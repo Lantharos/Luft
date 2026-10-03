@@ -1,22 +1,19 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
 import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import * as Signals from '../../misc/signals.js';
 
 import * as Dialog from '../dialog.js';
-import * as Main from '../main.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as MessageTray from '../messageTray.js';
 import * as ModalDialog from '../modalDialog.js';
 import * as ShellEntry from '../shellEntry.js';
 
 Gio._promisify(Shell.NetworkAgent.prototype, 'init_async');
-Gio._promisify(Shell.NetworkAgent.prototype, 'search_vpn_plugin');
 
 const CONNECTION_ICONS = {
     '802-11-wireless': 'network-wireless-symbolic',
@@ -27,11 +24,9 @@ const CONNECTION_ICONS = {
     'bluetooth': 'bluetooth-active-symbolic',
 };
 
-const VPN_UI_GROUP = 'VPN Plugin UI';
-
 const NetworkSecretDialog = GObject.registerClass(
 class NetworkSecretDialog extends ModalDialog.ModalDialog {
-    _init(agent, requestId, connection, settingName, hints, flags, contentOverride) {
+    _init(agent, requestId, connection, settingName, hints, flags) {
         super._init({styleClass: 'prompt-dialog'});
 
         this._agent = agent;
@@ -40,10 +35,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         this._settingName = settingName;
         this._hints = hints;
 
-        if (contentOverride)
-            this._content = contentOverride;
-        else
-            this._content = this._getContent();
+        this._content = this._getContent();
 
         const contentBox = new Dialog.MessageDialogContent({
             title: this._content.title,
@@ -145,10 +137,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             const secret = this._content.secrets[i];
             valid &&= secret.valid;
             if (secret.key !== null) {
-                if (this._settingName === 'vpn')
-                    this._agent.add_vpn_secret(this._requestId, secret.key, secret.value);
-                else
-                    this._agent.set_password(this._requestId, secret.key, secret.value);
+                this._agent.set_password(this._requestId, secret.key, secret.value);
             }
         }
 
@@ -425,260 +414,6 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
     }
 });
 
-class VPNRequestHandler extends Signals.EventEmitter {
-    constructor(agent, requestId, authHelper, serviceType, connection, hints, flags) {
-        super();
-
-        this._agent = agent;
-        this._requestId = requestId;
-        this._connection = connection;
-        this._flags = flags;
-        this._pluginOutBuffer = [];
-        this._title = null;
-        this._description = null;
-        this._content = [];
-        this._shellDialog = null;
-
-        const connectionSetting = connection.get_setting_connection();
-
-        const argv = [
-            authHelper.fileName,
-            '-u', connectionSetting.uuid,
-            '-n', connectionSetting.id,
-            '-s', serviceType,
-        ];
-        if (authHelper.externalUIMode)
-            argv.push('--external-ui-mode');
-        if (flags & NM.SecretAgentGetSecretsFlags.ALLOW_INTERACTION)
-            argv.push('-i');
-        if (flags & NM.SecretAgentGetSecretsFlags.REQUEST_NEW)
-            argv.push('-r');
-        if (authHelper.supportsHints) {
-            for (let i = 0; i < hints.length; i++) {
-                argv.push('-t');
-                argv.push(hints[i]);
-            }
-        }
-
-        this._newStylePlugin = authHelper.externalUIMode;
-
-        try {
-            const launchContext = global.create_app_launch_context(0, -1);
-            const [pid, stdin, stdout, stderr] =
-                Shell.util_spawn_async_with_pipes(
-                    null, /* pwd */
-                    argv,
-                    launchContext.get_environment(),
-                    GLib.SpawnFlags.DO_NOT_REAP_CHILD);
-
-            this._childPid = pid;
-            this._stdin = new GioUnix.OutputStream({fd: stdin, close_fd: true});
-            this._stdout = new GioUnix.InputStream({fd: stdout, close_fd: true});
-            GLib.close(stderr);
-            this._dataStdout = new Gio.DataInputStream({base_stream: this._stdout});
-
-            if (this._newStylePlugin)
-                this._readStdoutNewStyle();
-            else
-                this._readStdoutOldStyle();
-
-            GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid,
-                this._vpnChildFinished.bind(this));
-
-            this._writeConnection();
-        } catch (e) {
-            logError(e, 'error while spawning VPN auth helper');
-
-            this._agent.respond(requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
-        }
-    }
-
-    cancel(respond) {
-        if (respond)
-            this._agent.respond(this._requestId, Shell.NetworkAgentResponse.USER_CANCELED);
-
-        if (this._newStylePlugin && this._shellDialog) {
-            this._shellDialog.close();
-            this._shellDialog.destroy();
-        } else {
-            try {
-                this._stdin.write('QUIT\n\n', null);
-            } catch { /* ignore broken pipe errors */ }
-        }
-
-        this.destroy();
-    }
-
-    destroy() {
-        if (this._destroyed)
-            return;
-
-        this.emit('destroy');
-
-        this._stdin.close(null);
-        // Stdout is closed when we finish reading from it
-
-        this._destroyed = true;
-    }
-
-    _vpnChildFinished(pid, status, _requestObj) {
-        if (this._destroyed)
-            return;
-        if (this._newStylePlugin) {
-            // For new style plugin, all work is done in the async reading functions
-            // Just reap the process here
-            return;
-        }
-
-        const [exited, exitStatus] = Shell.util_wifexited(status);
-
-        if (exited) {
-            if (exitStatus !== 0)
-                this._agent.respond(this._requestId, Shell.NetworkAgentResponse.USER_CANCELED);
-            else
-                this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
-        } else {
-            this._agent.respond(this._requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
-        }
-
-        this.destroy();
-    }
-
-    _vpnChildProcessLineOldStyle(line) {
-        if (this._previousLine !== undefined) {
-            // Two consecutive newlines mean that the child should be closed
-            // (the actual newlines are eaten by Gio.DataInputStream)
-            // Send a termination message
-            if (line === '' && this._previousLine === '') {
-                try {
-                    this._stdin.write('QUIT\n\n', null);
-                } catch { /* ignore broken pipe errors */ }
-            } else {
-                this._agent.add_vpn_secret(this._requestId, this._previousLine, line);
-                this._previousLine = undefined;
-            }
-        } else {
-            this._previousLine = line;
-        }
-    }
-
-    async _readStdoutOldStyle() {
-        const [line, len_] =
-            await this._dataStdout.read_line_async(GLib.PRIORITY_DEFAULT, null);
-
-        if (line === null) {
-            // end of file
-            this._stdout.close(null);
-            return;
-        }
-
-        const decoder = new TextDecoder();
-        this._vpnChildProcessLineOldStyle(decoder.decode(line));
-
-        // try to read more!
-        this._readStdoutOldStyle();
-    }
-
-    async _readStdoutNewStyle() {
-        const cnt =
-            await this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, null);
-
-        if (cnt === 0) {
-            // end of file
-            this._showNewStyleDialog();
-
-            this._stdout.close(null);
-            return;
-        }
-
-        // Try to read more
-        this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
-        this._readStdoutNewStyle();
-    }
-
-    _showNewStyleDialog() {
-        const keyfile = new GLib.KeyFile();
-        let data;
-        let contentOverride;
-
-        try {
-            data = new GLib.Bytes(this._dataStdout.peek_buffer());
-            keyfile.load_from_bytes(data, GLib.KeyFileFlags.NONE);
-
-            if (keyfile.get_integer(VPN_UI_GROUP, 'Version') !== 2)
-                throw new Error('Invalid plugin keyfile version, is %d');
-
-            contentOverride = {
-                title: keyfile.get_string(VPN_UI_GROUP, 'Title'),
-                message: keyfile.get_string(VPN_UI_GROUP, 'Description'),
-                secrets: [],
-            };
-
-            const [groups, len_] = keyfile.get_groups();
-            for (let i = 0; i < groups.length; i++) {
-                if (groups[i] === VPN_UI_GROUP)
-                    continue;
-
-                const value = keyfile.get_string(groups[i], 'Value');
-                const shouldAsk = keyfile.get_boolean(groups[i], 'ShouldAsk');
-
-                if (shouldAsk) {
-                    contentOverride.secrets.push({
-                        label: keyfile.get_string(groups[i], 'Label'),
-                        key: groups[i],
-                        value,
-                        password: keyfile.get_boolean(groups[i], 'IsSecret'),
-                    });
-                } else {
-                    if (!value.length) // Ignore empty secrets
-                        continue;
-
-                    this._agent.add_vpn_secret(this._requestId, groups[i], value);
-                }
-            }
-        } catch (e) {
-            // No output is a valid case it means "both secrets are stored"
-            if (data.length > 0) {
-                logError(e, 'error while reading VPN plugin output keyfile');
-
-                this._agent.respond(this._requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
-                this.destroy();
-                return;
-            }
-        }
-
-        if (contentOverride && contentOverride.secrets.length) {
-            // Only show the dialog if we actually have something to ask
-            this._shellDialog = new NetworkSecretDialog(this._agent, this._requestId, this._connection, 'vpn', [], this._flags, contentOverride);
-            this._shellDialog.open();
-        } else {
-            this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
-            this.destroy();
-        }
-    }
-
-    _writeConnection() {
-        const vpnSetting = this._connection.get_setting_vpn();
-
-        try {
-            vpnSetting.foreach_data_item((key, value) => {
-                this._stdin.write(`DATA_KEY=${key}\n`, null);
-                this._stdin.write(`DATA_VAL=${value || ''}\n\n`, null);
-            });
-            vpnSetting.foreach_secret((key, value) => {
-                this._stdin.write(`SECRET_KEY=${key}\n`, null);
-                this._stdin.write(`SECRET_VAL=${value || ''}\n\n`, null);
-            });
-            this._stdin.write('DONE\n\n', null);
-        } catch (e) {
-            logError(e, 'internal error while writing connection to helper');
-
-            this._agent.respond(this._requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
-            this.destroy();
-        }
-    }
-}
-
 class NetworkAgent {
     constructor() {
         this._native = new Shell.NetworkAgent({
@@ -834,50 +569,9 @@ class NetworkAgent {
         }
     }
 
-    async _vpnRequest(requestId, connection, hints, flags) {
-        const vpnSetting = connection.get_setting_vpn();
-        const serviceType = vpnSetting.service_type;
-
-        const binary = await this._findAuthBinary(serviceType);
-        if (!binary) {
-            log('Invalid VPN service type (cannot find authentication binary)');
-
-            /* cancel the auth process */
-            this._native.respond(requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
-            return;
-        }
-
-        const vpnRequest = new VPNRequestHandler(this._native, requestId, binary, serviceType, connection, hints, flags);
-        vpnRequest.connect('destroy', () => {
-            delete this._vpnRequests[requestId];
-        });
-        this._vpnRequests[requestId] = vpnRequest;
-    }
-
-    async _findAuthBinary(serviceType) {
-        let plugin;
-
-        try {
-            plugin = await this._native.search_vpn_plugin(serviceType);
-        } catch (e) {
-            logError(e);
-            return null;
-        }
-
-        const fileName = plugin.get_auth_dialog();
-        if (!GLib.file_test(fileName, GLib.FileTest.IS_EXECUTABLE)) {
-            log(`VPN plugin at ${fileName} is not executable`);
-            return null;
-        }
-
-        const prop = plugin.lookup_property('GNOME', 'supports-external-ui-mode');
-        const trimmedProp = prop?.trim().toLowerCase() ?? '';
-
-        return {
-            fileName,
-            supportsHints: plugin.supports_hints(),
-            externalUIMode: ['true', 'yes', 'on', '1'].includes(trimmedProp),
-        };
+    _vpnRequest(requestId, connection, hints, flags) {
+        this._vpnRequests[requestId] = new KestrelUi.VpnSecrets(this._native, requestId, connection, hints, flags,
+            () => delete this._vpnRequests[requestId]);
     }
 }
 

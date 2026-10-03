@@ -125,7 +125,7 @@
 	}
 
 	.play:hover {
-		filter: brightness(1.06);
+		background: var(--accent-hover);
 	}
 
 	.play:active {

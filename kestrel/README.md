@@ -423,7 +423,7 @@ Kestrel is the portal backend for its session, so apps reach Kestrel's own dialo
 
 Printing, saving files, opening other apps, location, the camera, the microphone and sound can be turned off for apps under `org.gnome.desktop.lockdown`, `org.gnome.desktop.privacy` and `org.gnome.system.location`.
 
-The capture drives every portal the way xdg-desktop-portal does and saves the dialogs as `portal-*.png`. Test sessions run their own PipeWire and a print server with an office and a label printer, so screen sharing and printing never reach the real ones.
+The capture drives every portal the way xdg-desktop-portal does and saves the dialogs as `portal-*.png`. Test sessions run their own PipeWire, with a pair of speakers and a microphone, and a print server with an office and a label printer, so sound, screen sharing and printing never reach the real ones.
 
 ### Clipboard history
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tooltip } from '@luft/ui';
+	import { bytes, tooltip } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
 	import Icon from '#lib/components/Icon.svelte';
@@ -7,7 +7,6 @@
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
 	import { entryIcon } from '#lib/utils/file-kinds.js';
-	import { formatBytes } from '#lib/utils/format.js';
 	import { kindLabel } from '#lib/utils/kinds.js';
 	import FilePreview from './FilePreview.svelte';
 
@@ -39,7 +38,7 @@
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-[14px] font-medium text-[var(--text)]">{entry.name}</p>
 					<p class="truncate text-[12px] text-[var(--text-muted)]">
-						{kindLabel(entry)}{entry.is_dir ? '' : ` · ${formatBytes(entry.size)}`} · {position} of {count}
+						{kindLabel(entry)}{entry.is_dir ? '' : ` · ${bytes(entry.size)}`} · {position} of {count}
 					</p>
 				</div>
 				<button class="button" type="button" onclick={() => manager.openEntry(entry)}>Open</button>

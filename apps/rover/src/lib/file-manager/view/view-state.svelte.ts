@@ -1,7 +1,8 @@
+import { isInside } from '@luft/ui';
 import { tick } from 'svelte';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { Arrival, FileEntry, ViewMemory } from '#lib/types/index.js';
-import { isInside, joinPath, trimTrailingSlash } from '#lib/utils/paths.js';
+import { joinPath, trimTrailingSlash } from '#lib/utils/paths.js';
 import type { ChooserState } from '../chooser.svelte';
 import type { FileManager } from '../manager.svelte';
 import { ListMotion } from './motion.svelte';

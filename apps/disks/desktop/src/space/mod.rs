@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use gio::prelude::*;
-use luft_app::Events;
+use luft_app::{Events, file_manager};
 use parking_lot::Mutex;
 use serde::Serialize;
 
@@ -119,20 +119,6 @@ fn report(scan: &Scan, events: &Events) {
     }
 }
 
-fn file_manager(method: &str, path: &Path) -> Result<(), String> {
-    let uri = gio::File::for_path(path).uri().to_string();
-    luft_app::dbus::session()?
-        .call_method(
-            Some("org.freedesktop.FileManager1"),
-            "/org/freedesktop/FileManager1",
-            Some("org.freedesktop.FileManager1"),
-            method,
-            &(vec![uri], ""),
-        )
-        .map(drop)
-        .map_err(|error| error.to_string())
-}
-
 impl Explorer {
     fn current(&self) -> Result<Scan, String> {
         self.0
@@ -199,13 +185,17 @@ impl Explorer {
     pub fn show(&self, components: Vec<String>) -> Result<(), String> {
         let scan = self.current()?;
         if components.is_empty() {
-            return file_manager("ShowFolders", &scan.path);
+            return file_manager::show_folder(&scan.path);
         }
         let (parent, path) = scan.location(&components).ok_or("It's no longer there")?;
         let folder = components
             .last()
             .is_some_and(|name| parent.find(std::slice::from_ref(name)).is_some());
-        file_manager(if folder { "ShowFolders" } else { "ShowItems" }, &path)
+        if folder {
+            file_manager::show_folder(&path)
+        } else {
+            file_manager::show_in_folder(&path)
+        }
     }
 }
 

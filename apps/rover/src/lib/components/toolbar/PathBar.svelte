@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { isInside } from '@luft/ui';
 	import { untrack } from 'svelte';
 	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -8,7 +9,7 @@
 	import { expandHome } from '#lib/file-manager/location/expand.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import { isInside, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
+	import { pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 
 	interface Props {
 		manager: FileManager;

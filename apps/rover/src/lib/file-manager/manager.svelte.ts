@@ -1,5 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
-import { appearance } from '@luft/ui';
+import { appearance, basename } from '@luft/ui';
 import * as api from '#lib/api.js';
 import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
@@ -23,7 +23,7 @@ import type {
 	ViewMode
 } from '#lib/types/index.js';
 import { errorMessage } from '#lib/utils/format.js';
-import { basename, parentPath, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
+import { parentPath, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { DrivesState } from './places/drives.svelte';
 import { NetworkState, type NetworkEntry } from './places/network.svelte';

@@ -1,5 +1,5 @@
+import { bytes } from '@luft/ui';
 import type { SpaceView } from '#lib/api.js';
-import { bytes } from '#lib/format.js';
 
 export type TileKind = 'dir' | 'file' | 'other' | 'rest';
 

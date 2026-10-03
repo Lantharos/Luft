@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { basename, bytes, plural } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import Icon from '#lib/components/Icon.svelte';
 	import type { Operation } from '#lib/types/index.js';
-	import { formatBytes, formatDuration, plural } from '#lib/utils/format.js';
-	import { basename } from '#lib/utils/paths.js';
+	import { formatDuration } from '#lib/utils/format.js';
 
 	interface Props {
 		operations: Operation[];
@@ -96,8 +96,8 @@
 		const rate = speed(operation);
 		const remaining = operation.total_bytes - operation.bytes_processed;
 		return [
-			`${formatBytes(operation.bytes_processed)} of ${formatBytes(operation.total_bytes)}`,
-			rate > 0 && `${formatBytes(rate)}/s`,
+			`${bytes(operation.bytes_processed)} of ${bytes(operation.total_bytes)}`,
+			rate > 0 && `${bytes(rate)}/s`,
 			rate > 0 && remaining > 0 && `${formatDuration(remaining / rate)} left`
 		]
 			.filter(Boolean)

@@ -1,6 +1,6 @@
 import type { WindowFileDragEvent } from '@lantharos/sabine';
+import { isInside } from '@luft/ui';
 import type { FileEntry, Tab } from '#lib/types/index.js';
-import { isInside } from '#lib/utils/paths.js';
 import type { FileManager } from '../manager.svelte';
 import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from './data-transfer';
 import { dropKey, dropTargetFromPoint, TRASH_DROP_PATH, tabDropKey, type DropTarget } from './drop-targets';

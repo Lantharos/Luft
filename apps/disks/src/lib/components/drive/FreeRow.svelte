@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { bytes } from '@luft/ui';
 	import type { Drive } from '#lib/api.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
-	import { bytes } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {

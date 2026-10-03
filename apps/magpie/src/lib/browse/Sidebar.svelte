@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { plural } from '@luft/ui';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import PageThumbnails from '#lib/document/PageThumbnails.svelte';
 	import { documentState } from '#lib/document/state.svelte.js';
-	import { plural } from '#lib/library/format.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { folderTitle } from '#lib/library/places.js';
 	import { player } from '#lib/music/player.svelte.js';

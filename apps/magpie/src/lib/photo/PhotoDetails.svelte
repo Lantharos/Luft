@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { bytes } from '@luft/ui';
 	import type { ImageDetails, Item } from '#lib/api.js';
 	import * as api from '#lib/api.js';
-	import { formatBytes, formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
+	import { formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
 	import { extension } from '#lib/library/kinds.js';
 
 	let { item }: { item: Item } = $props();
@@ -20,7 +21,7 @@
 			const megapixels = (details.width * details.height) / 1e6;
 			add('Dimensions', `${details.width} × ${details.height} (${megapixels.toFixed(megapixels < 10 ? 1 : 0)} MP)`);
 		}
-		add('Size', formatBytes(item.size));
+		add('Size', bytes(item.size));
 		add('Type', extension(item.name).toUpperCase());
 		add('Taken', details?.taken ? formatDate(details.taken) : null);
 		add('Modified', formatDate(item.modified));

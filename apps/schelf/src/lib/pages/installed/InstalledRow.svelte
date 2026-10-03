@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import { MenuButton, MenuItem } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bridge/types.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { updateJob } from '#lib/app/jobs.js';
-	import { bytes, sourceName } from '#lib/format.js';
+	import { sourceName } from '#lib/format.js';
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';

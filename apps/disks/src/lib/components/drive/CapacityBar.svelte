@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { bytes } from '@luft/ui';
 	import type { Drive, Segment } from '#lib/api.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
-	import { bytes, segmentName, usedShare } from '#lib/format.js';
+	import { segmentName, usedShare } from '#lib/format.js';
 	import { disks, segmentKey } from '#lib/state/disks.svelte.js';
 	import { tones } from './tones';
 

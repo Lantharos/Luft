@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appWindow, events as sabineEvents, type WindowFileDragEvent } from '@lantharos/sabine';
-	import { appearance, GlassShell, tooltip } from '@luft/ui';
+	import { appearance, GlassShell, plural, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
 	import { commands, WIDE_WINDOW, type Shell } from '#lib/app/commands.js';
-	import { plural } from '#lib/app/format.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
 	import { navigate, openThread } from '#lib/app/navigation.js';

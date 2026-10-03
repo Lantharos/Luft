@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { memoryBytes, watts } from '@luft/ui';
 	import type { GpuInfo, GpuSample } from '#lib/backend/types.js';
-	import { bytes, frequency, percent, temperature, watts } from '#lib/format.js';
+	import { frequency, percent, temperature } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Page from '#lib/resources/common/Page.svelte';
@@ -43,8 +44,8 @@
 				title="Video memory"
 				max={memoryTotal}
 				lines={[{ values: series((sample) => sample.memoryUsed) }]}
-				legend={[{ label: 'Now', value: `${bytes(gpu?.memoryUsed ?? 0)} of ${bytes(memoryTotal)}` }]}
-				scale={(max) => bytes(max)}
+				legend={[{ label: 'Now', value: `${memoryBytes(gpu?.memoryUsed ?? 0)} of ${memoryBytes(memoryTotal)}` }]}
+				scale={(max) => memoryBytes(max)}
 			/>
 		{/if}
 		{#if present(gpu?.encoder) || present(gpu?.decoder)}
@@ -70,13 +71,13 @@
 				scale={(max) => temperature(max)}
 			/>
 		{/if}
-		{#if present(gpu?.power)}
+		{#if gpu?.power != null}
 			<Chart
 				title="Power"
 				max={info.powerCap ?? undefined}
 				floor={10}
 				lines={[{ values: series((sample) => sample.power) }]}
-				legend={[{ label: 'Now', value: watts(gpu?.power ?? null) }]}
+				legend={[{ label: 'Now', value: watts(gpu.power) }]}
 				scale={(max) => watts(max)}
 			/>
 		{/if}
@@ -85,10 +86,10 @@
 	<Stats
 		stats={[
 			{ label: 'Usage', value: percent(gpu?.usage ?? null) },
-			...(present(gpu?.memoryUsed) ? [{ label: 'Video memory', value: bytes(gpu?.memoryUsed ?? 0), detail: memoryTotal ? `of ${bytes(memoryTotal)}` : undefined }] : []),
+			...(present(gpu?.memoryUsed) ? [{ label: 'Video memory', value: memoryBytes(gpu?.memoryUsed ?? 0), detail: memoryTotal ? `of ${memoryBytes(memoryTotal)}` : undefined }] : []),
 			...(present(gpu?.clock) ? [{ label: 'Clock', value: frequency(gpu?.clock ?? null), detail: info.maxClock ? `Up to ${frequency(info.maxClock)}` : undefined }] : []),
 			...(present(gpu?.memoryClock) ? [{ label: 'Memory clock', value: frequency(gpu?.memoryClock ?? null) }] : []),
-			...(present(gpu?.power) ? [{ label: 'Power', value: watts(gpu?.power ?? null), detail: info.powerCap ? `Limit ${watts(info.powerCap)}` : undefined }] : []),
+			...(gpu?.power != null ? [{ label: 'Power', value: watts(gpu.power), detail: info.powerCap ? `Limit ${watts(info.powerCap)}` : undefined }] : []),
 			...(present(gpu?.temperature) ? [{ label: 'Temperature', value: temperature(gpu?.temperature ?? null) }] : []),
 			...(present(gpu?.fan) ? [{ label: 'Fan', value: percent(gpu?.fan ?? null) }] : [])
 		]}
@@ -102,7 +103,7 @@
 			{ label: 'Driver', value: [info.driver, info.driverVersion].filter(Boolean).join(' ') },
 			{ label: 'Slot', value: info.slot, mono: true },
 			{ label: 'Link', value: info.link },
-			{ label: 'Video memory', value: memoryTotal ? bytes(memoryTotal) : null },
+			{ label: 'Video memory', value: memoryTotal ? memoryBytes(memoryTotal) : null },
 			{ label: 'Power limit', value: info.powerCap ? watts(info.powerCap) : null },
 			{ label: 'Highest clock', value: info.maxClock ? frequency(info.maxClock) : null },
 			{ label: 'Highest memory clock', value: info.maxMemoryClock ? frequency(info.maxMemoryClock) : null }

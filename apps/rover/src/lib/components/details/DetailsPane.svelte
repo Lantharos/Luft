@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { basename, bytes, plural } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import FilePreview from '#lib/components/preview/FilePreview.svelte';
@@ -8,9 +9,8 @@
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import type { FileEntry } from '#lib/types/index.js';
 	import { entryIcon } from '#lib/utils/file-kinds.js';
-	import { formatBytes, plural } from '#lib/utils/format.js';
 	import { kindLabel } from '#lib/utils/kinds.js';
-	import { basename, parentPath } from '#lib/utils/paths.js';
+	import { parentPath } from '#lib/utils/paths.js';
 	import OpenWith from './OpenWith.svelte';
 
 	const context = entryContext();
@@ -93,7 +93,7 @@
 					.join(', ')}
 			</p>
 		</div>
-		{@render metadata(totalSize > 0 ? [{ label: 'Size', value: formatBytes(totalSize) }] : [])}
+		{@render metadata(totalSize > 0 ? [{ label: 'Size', value: bytes(totalSize) }] : [])}
 	{:else}
 		<div class="details-preview">
 			<EntryIcon name={manager.view === 'recent' ? 'file' : 'folder'} size={96} />
@@ -104,7 +104,7 @@
 		</div>
 		{@render metadata([
 			...(manager.view === 'home' ? [{ label: 'Where', value: tildePath(manager.currentPath, manager.homePath) }] : []),
-			...(drive ? [{ label: 'Free space', value: `${formatBytes(drive.available_space)} of ${formatBytes(drive.total_space)}` }] : [])
+			...(drive ? [{ label: 'Free space', value: `${bytes(drive.available_space)} of ${bytes(drive.total_space)}` }] : [])
 		])}
 	{/if}
 </aside>

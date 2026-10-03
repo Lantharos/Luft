@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes } from '#lib/format.js';
+	import { bytes } from '@luft/ui';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import DriveIcon from './DriveIcon.svelte';
 </script>

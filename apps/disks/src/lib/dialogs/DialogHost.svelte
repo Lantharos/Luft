@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { bytes } from '@luft/ui';
 	import * as api from '#lib/api.js';
-	import { bytes, volumeName } from '#lib/format.js';
+	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
 	import type { Drive, Volume } from '#lib/api.js';

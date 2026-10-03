@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { tooltip } from '@luft/ui';
+	import { bytes, tooltip } from '@luft/ui';
 	import Icon from '#lib/components/Icon.svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
 	import type { DriveInfo } from '#lib/types/index.js';
-	import { formatBytes } from '#lib/utils/format.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {
@@ -24,7 +23,7 @@
 	let ejecting = $derived(manager.drives.ejecting.has(drive.mount_point));
 	let used = $derived(drive.total_space === 0 ? 0 : Math.min(1, drive.used_space / drive.total_space));
 	let key = $derived(dropKey('sidebar', drive.mount_point));
-	let summary = $derived(`${formatBytes(drive.available_space)} free of ${formatBytes(drive.total_space)}`);
+	let summary = $derived(`${bytes(drive.available_space)} free of ${bytes(drive.total_space)}`);
 </script>
 
 <SidebarItem

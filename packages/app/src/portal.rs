@@ -147,6 +147,18 @@ pub fn open_files(title: &str, filter: Filter) -> Result<Vec<String>, String> {
     .open()
 }
 
+pub fn path_uri(path: &Path) -> String {
+    let mut uri = String::from(FILE_SCHEME);
+    for &byte in path.as_os_str().as_bytes() {
+        if byte.is_ascii_alphanumeric() || b"-._~/".contains(&byte) {
+            uri.push(char::from(byte));
+        } else {
+            uri.push_str(&format!("%{byte:02X}"));
+        }
+    }
+    uri
+}
+
 pub fn uri_path(uri: &str) -> Option<PathBuf> {
     let encoded = uri.strip_prefix(FILE_SCHEME)?.as_bytes();
     let mut bytes = Vec::with_capacity(encoded.len());

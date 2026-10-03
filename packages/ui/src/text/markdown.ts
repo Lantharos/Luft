@@ -1,15 +1,18 @@
 import { fileUrl, isAvailable } from '@lantharos/sabine';
-import { dirname, join } from '#lib/utils/paths.js';
 
 const EXTERNAL = /^[a-z][a-z0-9+.-]*:/i;
 const BLOCK_RULES = ['paragraph_open', 'heading_open', 'blockquote_open', 'bullet_list_open', 'ordered_list_open', 'table_open', 'hr', 'code_block'];
 
-type RenderEnv = { folder?: string };
+type RenderEnv = { path: string | null };
 
 let parser: ReturnType<typeof create> | null = null;
 
 function escapeAttribute(value: string) {
 	return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+}
+
+function besideDocument(source: string, path: string) {
+	return source.startsWith('/') ? source : `${path.slice(0, path.lastIndexOf('/'))}/${decodeURI(source)}`;
 }
 
 async function create() {
@@ -32,10 +35,8 @@ async function create() {
 	const image = markdown.renderer.rules.image!;
 	markdown.renderer.rules.image = (tokens, index, options, env, self) => {
 		const source = String(tokens[index].attrGet('src') ?? '');
-		const { folder } = env as RenderEnv;
-		if (isAvailable() && folder && source && !EXTERNAL.test(source)) {
-			tokens[index].attrSet('src', fileUrl(source.startsWith('/') ? source : join(folder, decodeURI(source))));
-		}
+		const { path } = env as RenderEnv;
+		if (isAvailable() && path && source && !EXTERNAL.test(source)) tokens[index].attrSet('src', fileUrl(besideDocument(source, path)));
 		return image(tokens, index, options, env, self);
 	};
 	return markdown;
@@ -43,6 +44,6 @@ async function create() {
 
 export async function renderMarkdown(source: string, path: string | null) {
 	parser ??= create();
-	const env: RenderEnv = { folder: path ? dirname(path) : undefined };
+	const env: RenderEnv = { path };
 	return (await parser).render(source, env);
 }

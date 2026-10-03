@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Dialog } from '@luft/ui';
+	import { bytes, Dialog } from '@luft/ui';
 	import type { Drive } from '#lib/api.js';
-	import { bytes, driveKindName } from '#lib/format.js';
+	import { driveKindName } from '#lib/format.js';
 	import Facts from './Facts.svelte';
 
 	interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { VirtualScroller } from '@luft/ui';
+	import { bytes, plural, VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
@@ -11,7 +11,7 @@
 	import { EntrySurface, isGroupRow } from '#lib/file-manager/view/surface.svelte.js';
 	import type { FileEntry, ListColumnId } from '#lib/types/index.js';
 	import { entryIcon } from '#lib/utils/file-kinds.js';
-	import { formatBytes, formatDate, plural } from '#lib/utils/format.js';
+	import { formatDate } from '#lib/utils/format.js';
 	import { kindLabel } from '#lib/utils/kinds.js';
 	import { parentPath } from '#lib/utils/paths.js';
 	import EntryName from '../EntryName.svelte';
@@ -43,7 +43,7 @@
 	}
 
 	function size(entry: FileEntry) {
-		if (!entry.is_dir) return formatBytes(entry.size);
+		if (!entry.is_dir) return bytes(entry.size);
 		const count = entry.path === DRAFT_PATH ? null : folderCounts.count(entry);
 		return count === null ? '' : plural(count, 'item');
 	}

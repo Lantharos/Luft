@@ -1,9 +1,10 @@
+import { isInside } from '@luft/ui';
 import { SvelteMap } from 'svelte/reactivity';
 import * as api from '#lib/api.js';
 import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FileEntry } from '#lib/types/index.js';
-import { isInside, pathSegments } from '#lib/utils/paths.js';
+import { pathSegments } from '#lib/utils/paths.js';
 import { sortedEntries } from '../listing/entries';
 import type { FileManager } from '../manager.svelte';
 import { previewEntries } from '../preview';

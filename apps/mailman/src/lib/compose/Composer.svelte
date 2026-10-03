@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MenuButton, MenuItem, MenuSeparator, Select, tooltip } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem, MenuSeparator, Select, tooltip } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -15,7 +15,6 @@
 	import { fly } from 'svelte/transition';
 	import * as api from '#lib/api/index.js';
 	import type { Template } from '#lib/api/index.js';
-	import { size } from '#lib/app/format.js';
 	import { REMINDERS, SEND_LATER } from '#lib/app/when.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
@@ -148,7 +147,7 @@
 				<span class="attachment">
 					<Paperclip size={14} class="flex-none text-[var(--text-muted)]" />
 					<span class="truncate">{attachment.name}</span>
-					{#if attachment.size}<span class="flex-none text-[12px] text-[var(--text-muted)]">{size(attachment.size)}</span>{/if}
+					{#if attachment.size}<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>{/if}
 					<button type="button" aria-label="Remove {attachment.name}" onclick={() => (composition.attachments = composition.attachments.filter((candidate) => candidate !== attachment))}><X size={13} /></button>
 				</span>
 			{/each}

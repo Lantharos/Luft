@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { events as sabineEvents, type WindowFileDragEvent } from '@lantharos/sabine';
-	import { appearance, GlassShell } from '@luft/ui';
+	import { appearance, GlassShell, plural } from '@luft/ui';
 	import type { Activation } from '#lib/api.js';
 	import * as api from '#lib/api.js';
 	import { openPaths } from '#lib/app/actions.js';
@@ -16,7 +16,6 @@
 	import { documentState } from '#lib/document/state.svelte.js';
 	import FontActions from '#lib/font/FontActions.svelte';
 	import FontView from '#lib/font/FontView.svelte';
-	import { plural } from '#lib/library/format.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { folderTitle } from '#lib/library/places.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';

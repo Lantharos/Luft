@@ -3,12 +3,11 @@
 	import ChevronsDownUp from '@lucide/svelte/icons/chevrons-down-up';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
-	import { tooltip, VirtualScroller } from '@luft/ui';
+	import { basename, tooltip, VirtualScroller } from '@luft/ui';
 	import { useApp } from '#lib/context.js';
 	import { openPath } from '#lib/documents/opening.js';
 	import { entryMenu } from '#lib/files/actions.js';
 	import type { TreeRow } from '#lib/files/tree.svelte.js';
-	import { basename } from '#lib/utils/paths.js';
 
 	const app = useApp();
 	let workspace = $derived(app.workspace);

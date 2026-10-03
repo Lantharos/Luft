@@ -2,7 +2,7 @@
 	import Forward from '@lucide/svelte/icons/forward';
 	import Reply from '@lucide/svelte/icons/reply';
 	import ReplyAll from '@lucide/svelte/icons/reply-all';
-	import { plural } from '#lib/app/format.js';
+	import { plural } from '@luft/ui';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import * as actions from '#lib/mail/actions.js';
 	import { list } from '#lib/mail/list.svelte.js';

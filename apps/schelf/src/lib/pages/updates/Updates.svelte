@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { Section } from '@luft/ui';
+	import { ago, bytes, Section } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bridge/types.js';
 	import { updateJob } from '#lib/app/jobs.js';
-	import { ago, bytes } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import UpdateRow from './UpdateRow.svelte';

@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { basename, bytes } from '@luft/ui';
 	import Icon from '#lib/components/Icon.svelte';
 	import type { ConflictItem } from '#lib/features/types.js';
-	import { formatBytes, formatDate, formatFullDate } from '#lib/utils/format.js';
-	import { basename, parentPath } from '#lib/utils/paths.js';
+	import { formatDate, formatFullDate } from '#lib/utils/format.js';
+	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		heading: string;
@@ -29,7 +30,7 @@
 	</div>
 	<dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[13px]">
 		<dt class="text-[var(--text-muted)]">Size</dt>
-		<dd class={['truncate text-right', larger ? 'text-[var(--text)]' : 'text-[var(--text-soft)]']}>{formatBytes(item.size)}</dd>
+		<dd class={['truncate text-right', larger ? 'text-[var(--text)]' : 'text-[var(--text-soft)]']}>{bytes(item.size)}</dd>
 		<dt class="text-[var(--text-muted)]">Modified</dt>
 		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} title={formatFullDate(item.modified)}>
 			{formatDate(item.modified) || 'Unknown'}

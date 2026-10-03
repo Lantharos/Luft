@@ -32,16 +32,6 @@ export function until(seconds: number) {
 	return relative.format(Math.round(difference / DAY), 'day');
 }
 
-export function size(bytes: number) {
-	if (bytes < 1024) return `${bytes} B`;
-	if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export function displayName(name: string, address: string) {
 	return name.trim() || address;
-}
-
-export function plural(count: number, one: string, many: string) {
-	return `${count} ${count === 1 ? one : many}`;
 }

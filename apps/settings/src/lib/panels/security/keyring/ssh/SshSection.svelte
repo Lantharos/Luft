@@ -5,8 +5,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash from '@lucide/svelte/icons/trash';
-	import { IconButton, Row, Section, Switch } from '@luft/ui';
-	import { ago } from '#lib/panels/updates/time.js';
+	import { ago, IconButton, Row, Section, Switch } from '@luft/ui';
 	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
 	import AddKeyDialog from './AddKeyDialog.svelte';
 	import ConfirmDialog from '../ConfirmDialog.svelte';

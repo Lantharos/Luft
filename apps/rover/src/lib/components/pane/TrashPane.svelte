@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Segmented, VirtualScroller } from '@luft/ui';
+	import { bytes, plural, Segmented, VirtualScroller } from '@luft/ui';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { TrashItem } from '#lib/types/index.js';
-	import { formatBytes, formatDate, plural } from '#lib/utils/format.js';
+	import { formatDate } from '#lib/utils/format.js';
 	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
@@ -68,7 +68,7 @@
 					</span>
 				</span>
 				<span class="list-cell list-date">{formatDate(item.deleted_at)}</span>
-				<span class="list-cell list-size">{item.is_dir ? '' : formatBytes(item.size)}</span>
+				<span class="list-cell list-size">{item.is_dir ? '' : bytes(item.size)}</span>
 			</div>
 		{/snippet}
 	</VirtualScroller>

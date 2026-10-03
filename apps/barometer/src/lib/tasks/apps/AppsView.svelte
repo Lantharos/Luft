@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { SearchField } from '@luft/ui';
+	import { plural, SearchField } from '@luft/ui';
 	import type { Process } from '#lib/backend/rows.js';
 	import type { AppUsage } from '#lib/backend/types.js';
-	import { plural } from '#lib/format.js';
 	import Header from '#lib/shell/Header.svelte';
 	import { processes } from '#lib/state/processes.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';

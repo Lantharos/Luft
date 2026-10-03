@@ -3,6 +3,7 @@ pub mod apps;
 mod bridge;
 pub mod dbus;
 mod events;
+pub mod file_manager;
 #[cfg(feature = "fonts")]
 pub mod fonts;
 #[cfg(feature = "ibus")]

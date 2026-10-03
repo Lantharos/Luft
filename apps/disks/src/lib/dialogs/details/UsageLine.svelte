@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes } from '#lib/format.js';
+	import { bytes } from '@luft/ui';
 
 	interface Props {
 		used: number;

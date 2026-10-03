@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { bytes, plural } from '@luft/ui';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import { formatBytes, plural } from '#lib/utils/format.js';
 	import { projectSummary } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
@@ -18,7 +18,7 @@
 	let summary = $derived.by(() => {
 		if (manager.selection.size === 0) return plural(count, 'item');
 		const selected = `${manager.selection.size} of ${plural(count, 'item')} selected`;
-		return selectedSize > 0 ? `${selected} · ${formatBytes(selectedSize)}` : selected;
+		return selectedSize > 0 ? `${selected} · ${bytes(selectedSize)}` : selected;
 	});
 	let drive = $derived(manager.view === 'home' ? manager.drives.holding(manager.currentPath) : undefined);
 	let status = $derived.by(() => {
@@ -39,7 +39,7 @@
 				<span class="truncate">{status}</span>
 			{/if}
 			{#if drive}
-				<span class="shrink-0">{formatBytes(drive.available_space)} free</span>
+				<span class="shrink-0">{bytes(drive.available_space)} free</span>
 			{/if}
 		{/if}
 	</span>

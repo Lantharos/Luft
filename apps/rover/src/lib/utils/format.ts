@@ -1,11 +1,3 @@
-const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-
-export function formatBytes(bytes: number, decimals = 1) {
-	if (bytes <= 0) return '0 B';
-	const unit = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), BYTE_UNITS.length - 1);
-	return `${parseFloat((bytes / 1024 ** unit).toFixed(decimals))} ${BYTE_UNITS[unit]}`;
-}
-
 const DAY_MS = 86_400_000;
 const time = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 const dayInYear = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
@@ -32,12 +24,6 @@ export function formatDuration(seconds: number) {
 	const hours = Math.floor(minutes / 60);
 	if (hours < 1) return `${minutes}m ${rounded % 60}s`;
 	return `${hours}h ${minutes % 60}m`;
-}
-
-const whole = new Intl.NumberFormat();
-
-export function plural(count: number, singular: string, pluralForm = `${singular}s`) {
-	return `${whole.format(count)} ${count === 1 ? singular : pluralForm}`;
 }
 
 export function errorMessage(caught: unknown) {

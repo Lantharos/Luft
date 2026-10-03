@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Row, Section } from '@luft/ui';
-	import { bytes } from '#lib/format.js';
+	import { bytes, Row, Section } from '@luft/ui';
 	import type { Activity, Firmware } from './api';
 	import { installFirmware } from './api';
 

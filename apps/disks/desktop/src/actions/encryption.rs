@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use luft_app::secrets;
+use zbus::zvariant::OwnedValue;
 
 use crate::udisks::{self, BLOCK, ENCRYPTED, no_options};
 
@@ -30,8 +33,28 @@ fn remembered(block: &str) -> Option<String> {
     String::from_utf8(secret).ok()
 }
 
+fn has_key_file(block: &str) -> bool {
+    udisks::objects()
+        .ok()
+        .and_then(|objects| {
+            objects
+                .get(block, BLOCK)?
+                .get::<Vec<(String, HashMap<String, OwnedValue>)>>("Configuration")
+        })
+        .unwrap_or_default()
+        .iter()
+        .filter(|(kind, _)| kind == "crypttab")
+        .filter_map(|(_, entry)| entry.get("passphrase-path")?.try_clone().ok())
+        .filter_map(|value| Vec::<u8>::try_from(value).ok())
+        .any(|path| !matches!(udisks::bytes_text(path).as_str(), "" | "none" | "-"))
+}
+
 pub fn unlock(block: &str, passphrase: Option<&str>, remember_it: bool) -> Result<bool, String> {
-    let Some(passphrase) = passphrase.map(str::to_owned).or_else(|| remembered(block)) else {
+    let passphrase = passphrase
+        .map(str::to_owned)
+        .or_else(|| remembered(block))
+        .or_else(|| has_key_file(block).then(String::new));
+    let Some(passphrase) = passphrase else {
         return Ok(false);
     };
     let _: zbus::zvariant::OwnedObjectPath = udisks::call(

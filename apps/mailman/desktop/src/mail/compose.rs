@@ -19,6 +19,8 @@ pub struct Attached {
 #[serde(rename_all = "camelCase")]
 pub struct Draft {
     pub account: i64,
+    pub identity: i64,
+    pub from: Option<String>,
     pub to: Vec<Address>,
     pub cc: Vec<Address>,
     pub bcc: Vec<Address>,
@@ -84,7 +86,7 @@ pub fn message_id(from: &str) -> String {
     format!("{token}@{domain}")
 }
 
-pub fn build(draft: &Draft, from: &Address) -> Result<Built, String> {
+pub fn build(draft: &Draft, from: &Address, reply_to: &str) -> Result<Built, String> {
     let message_id = message_id(&from.address);
     let mut builder = MessageBuilder::new()
         .from(BuiltAddress::new_address(
@@ -97,6 +99,12 @@ pub fn build(draft: &Draft, from: &Address) -> Result<Built, String> {
         .text_body(draft.text.clone());
     if !draft.html.is_empty() {
         builder = builder.html_body(draft.html.clone());
+    }
+    if !reply_to.is_empty() {
+        builder = builder.reply_to(BuiltAddress::new_address(
+            None::<String>,
+            reply_to.to_owned(),
+        ));
     }
     if !draft.to.is_empty() {
         builder = builder.to(built_addresses(&draft.to));

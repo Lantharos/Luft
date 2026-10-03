@@ -20,6 +20,7 @@
 	import { mail } from '$lib/mail/mail.svelte';
 	import { toasts } from '$lib/shell/toasts.svelte';
 	import { composer, type Composition } from './composer.svelte';
+	import { shownAddress } from './identity';
 	import Editor from './Editor.svelte';
 	import RecipientField from './RecipientField.svelte';
 
@@ -33,11 +34,27 @@
 	let showQuote = $state(false);
 	let templates = $state<Template[]>([]);
 
-	let accounts = $derived(mail.accounts.map((account) => ({ value: account.id, label: account.name ? `${account.name} <${account.email}>` : account.email })));
+	let senders = $derived(
+		mail.identities.map((identity) => {
+			const address = identity.id === composition.identity ? shownAddress(identity, composition.from) : identity.address;
+			return { value: identity.id, label: identity.name ? `${identity.name} <${address}>` : address };
+		})
+	);
+	let wildcard = $derived(mail.identities.find((identity) => identity.id === composition.identity)?.address.startsWith('*@') ?? false);
 	let title = $derived(composition.subject.trim() || (composition.inReplyTo ? 'Reply' : 'New message'));
 	let reminder = $derived(REMINDERS.find((option) => option.seconds === composition.remindAfter));
 
 	const laterFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+
+	function chooseSender(id: number) {
+		const identity = mail.identities.find((candidate) => candidate.id === id);
+		if (!identity) return;
+		const domain = identity.address.startsWith('*@') ? identity.address.slice(1) : null;
+		composition.account = identity.account;
+		composition.identity = identity.id;
+		composition.from = domain && composition.from?.endsWith(domain) ? composition.from : null;
+		editor?.replaceSignature(composer.signature(identity.id));
+	}
 
 	function send(at: number | null = null) {
 		if (editor) void composer.send(editor.content(), at);
@@ -89,10 +106,13 @@
 			<X size={17} />
 		</button>
 	</header>
-	{#if accounts.length > 1}
+	{#if senders.length > 1}
 		<div class="field">
 			<span class="label">From</span>
-			<Select options={accounts} value={composition.account} label="From" onchange={(account) => (composition.account = account)} />
+			<Select options={senders} value={composition.identity} label="From" onchange={chooseSender} />
+			{#if wildcard}
+				<input class="sender" bind:value={composition.from} placeholder="Address to send as" aria-label="Address to send as" />
+			{/if}
 		</div>
 	{/if}
 	<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
@@ -227,6 +247,17 @@
 		flex: none;
 		font-size: 13px;
 		color: var(--text-muted);
+	}
+
+	.sender {
+		height: 32px;
+		min-width: 0;
+		flex: 1;
+		border-radius: var(--radius-pill);
+		background: var(--control);
+		padding-inline: 12px;
+		font-size: 13px;
+		outline: none;
 	}
 
 	.subject {

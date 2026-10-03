@@ -15,6 +15,7 @@ use parking_lot::Mutex;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 
+pub use accounts::Identity;
 pub use mail::{Cursor, Fetched, Flag, Flags, Inserted, Located, NewMessage, Notable, View};
 pub use mailboxes::{Mailbox, RemoteFolder};
 pub use outbox::Outgoing;

@@ -54,10 +54,10 @@ export async function refreshAll() {
 	await Promise.all([list.load(), reader.refresh()]);
 }
 
-export function move(kind: Mover, threads: number[]) {
+export function move(kind: Mover, threads: number[], message = MOVED[kind](threads.length)) {
 	if (!threads.length) return;
 	if (STAYS[kind] !== list.view) leave(threads);
-	void undoable({ action: kind }, threads, MOVED[kind](threads.length));
+	void undoable({ action: kind }, threads, message);
 }
 
 export function moveTo(mailbox: number, threads: number[]) {
@@ -109,8 +109,7 @@ export async function unsubscribe(id: number, sender: string, thread: number) {
 	try {
 		const result = await api.unsubscribe(id);
 		if (result === 'opened') return toasts.show('Finish unsubscribing in your browser');
-		move('archive', [thread]);
-		toasts.show(`Unsubscribed from ${sender}`);
+		move('archive', [thread], `Unsubscribed from ${sender}`);
 	} catch (error) {
 		toasts.fail(error);
 	}

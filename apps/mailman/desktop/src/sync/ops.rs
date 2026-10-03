@@ -25,6 +25,10 @@ pub enum Operation {
         raw: String,
         draft: bool,
     },
+    Identity {
+        id: i64,
+        remote: Option<String>,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

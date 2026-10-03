@@ -1,3 +1,4 @@
+mod identities;
 mod mail;
 pub mod push;
 
@@ -106,34 +107,6 @@ impl JmapRemote {
         )
     }
 
-    fn identity(&self, email: &str, name: &str) -> Result<String, String> {
-        let responses = self.client.call(
-            &[CORE, MAIL, SUBMISSION],
-            vec![("Identity/get", json!({ "accountId": self.client.account }))],
-        )?;
-        let identities = responses[0]["list"].as_array().cloned().unwrap_or_default();
-        let found = identities
-            .iter()
-            .find(|identity| {
-                identity["email"]
-                    .as_str()
-                    .is_some_and(|address| address.eq_ignore_ascii_case(email))
-            })
-            .or(identities.first())
-            .and_then(|identity| identity["id"].as_str().map(str::to_owned));
-        if let Some(found) = found {
-            return Ok(found);
-        }
-        let responses = self.client.call(
-            &[CORE, MAIL, SUBMISSION],
-            vec![("Identity/set", json!({ "accountId": self.client.account, "create": { "own": { "email": email, "name": name } } }))],
-        )?;
-        responses[0]["created"]["own"]["id"]
-            .as_str()
-            .map(str::to_owned)
-            .ok_or_else(|| "This account can't send mail".into())
-    }
-
     fn destroy(&self, ids: &[String]) -> Result<(), String> {
         self.client
             .call(
@@ -210,6 +183,10 @@ impl Remote for JmapRemote {
 
     fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
         self.backfill_mailbox(context, mailbox)
+    }
+
+    fn identities(&mut self, context: &Context) -> Result<bool, String> {
+        self.load_identities(context)
     }
 
     fn bodies(
@@ -298,6 +275,9 @@ impl Remote for JmapRemote {
                 };
                 self.import(&raw, &target, keywords).map(drop)
             }
+            Operation::Identity { id, remote } => {
+                self.push_identity(context, *id, remote.as_deref())
+            }
         }
     }
 
@@ -306,7 +286,7 @@ impl Remote for JmapRemote {
             .store
             .mailbox_with_role(context.account.id, Role::Sent)?
             .ok_or("This account has no Sent folder")?;
-        let identity = self.identity(&outgoing.sender, &context.account.name)?;
+        let identity = self.sending_identity(&outgoing.sender, &context.account.name)?;
         let email = self.import(&outgoing.raw, &sent.remote, json!({ "$seen": true }))?;
         let recipients: Vec<Value> = outgoing
             .recipients

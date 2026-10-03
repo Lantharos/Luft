@@ -1,4 +1,8 @@
+mod identities;
+
 use rusqlite::{OptionalExtension, Row, params};
+
+pub use identities::Identity;
 
 use super::{Store, now};
 use crate::accounts::{Account, AccountConfig};
@@ -11,12 +15,11 @@ fn account(row: &Row) -> rusqlite::Result<Account> {
         name: row.get(2)?,
         config: serde_json::from_str(&config)
             .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))?,
-        signature: row.get(4)?,
-        added: row.get(5)?,
+        added: row.get(4)?,
     })
 }
 
-const COLUMNS: &str = "id, email, name, config, signature, added";
+const COLUMNS: &str = "id, email, name, config, added";
 
 impl Store {
     pub fn add_account(
@@ -27,11 +30,18 @@ impl Store {
     ) -> Result<Account, String> {
         let config = serde_json::to_string(config).map_err(|error| error.to_string())?;
         let id = self.writing(|connection| {
-            connection.execute(
+            let transaction = connection.transaction()?;
+            transaction.execute(
                 "INSERT INTO accounts (email, name, config, added) VALUES (?1, ?2, ?3, ?4)",
                 params![email, name, config, now()],
             )?;
-            Ok(connection.last_insert_rowid())
+            let id = transaction.last_insert_rowid();
+            transaction.execute(
+                "INSERT INTO identities (account, name, address, preferred) VALUES (?1, ?2, ?3, 1)",
+                params![id, name, email],
+            )?;
+            transaction.commit()?;
+            Ok(id)
         })?;
         self.account(id)?
             .ok_or_else(|| "the account wasn't saved".into())
@@ -58,11 +68,11 @@ impl Store {
         })
     }
 
-    pub fn update_account(&self, id: i64, name: &str, signature: &str) -> Result<(), String> {
+    pub fn rename_account(&self, id: i64, name: &str) -> Result<(), String> {
         self.writing(|connection| {
             connection.execute(
-                "UPDATE accounts SET name = ?2, signature = ?3 WHERE id = ?1",
-                params![id, name, signature],
+                "UPDATE accounts SET name = ?2 WHERE id = ?1",
+                params![id, name],
             )
         })
         .map(drop)

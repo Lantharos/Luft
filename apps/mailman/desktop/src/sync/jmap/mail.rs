@@ -58,14 +58,14 @@ fn header_properties() -> Vec<String> {
     ["id", "keywords", "size", "receivedAt"]
         .into_iter()
         .map(str::to_owned)
-        .chain(HEADERS.iter().map(|name| format!("header:{name}:asRaw")))
+        .chain(HEADERS.iter().map(|name| format!("header:{name}")))
         .collect()
 }
 
 fn raw_headers(email: &Value) -> Vec<u8> {
     let mut raw = String::new();
     for name in HEADERS {
-        if let Some(value) = email[format!("header:{name}:asRaw")].as_str() {
+        if let Some(value) = email[format!("header:{name}")].as_str() {
             raw.push_str(name);
             raw.push(':');
             raw.push_str(value);

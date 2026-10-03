@@ -39,6 +39,8 @@ pub struct Recipients {
     pub to: Vec<Address>,
     pub cc: Vec<Address>,
     pub reply_to: Vec<Address>,
+    #[serde(default)]
+    pub delivered: Vec<Address>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -88,6 +90,7 @@ pub fn from_message(message: &Message) -> Envelope {
             to: addresses(message.to()),
             cc: addresses(message.cc()),
             reply_to: addresses(message.reply_to()),
+            delivered: delivered(message),
         },
         date: message.date().map(|date| date.to_timestamp()),
         attachments: message.content_type().is_some_and(|kind| {
@@ -122,6 +125,33 @@ fn addresses(list: Option<&mail_parser::Address>) -> Vec<Address> {
             .collect()
     })
     .unwrap_or_default()
+}
+
+fn delivered(message: &Message) -> Vec<Address> {
+    let mut found: Vec<Address> = Vec::new();
+    for header in message.headers() {
+        let name = header.name();
+        if !name.eq_ignore_ascii_case("Delivered-To") && !name.eq_ignore_ascii_case("X-Original-To")
+        {
+            continue;
+        }
+        let Some(value) = header.value().as_text() else {
+            continue;
+        };
+        let address = value
+            .trim()
+            .trim_start_matches('<')
+            .trim_end_matches('>')
+            .trim()
+            .to_lowercase();
+        if address.contains('@') && !found.iter().any(|known| known.address == address) {
+            found.push(Address {
+                name: String::new(),
+                address,
+            });
+        }
+    }
+    found
 }
 
 fn text_list(value: &HeaderValue) -> Vec<String> {

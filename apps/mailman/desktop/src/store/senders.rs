@@ -37,6 +37,23 @@ impl Store {
         })
     }
 
+    pub fn meet(&self, addresses: &[Address]) -> Result<(), String> {
+        self.writing(|connection| {
+            let transaction = connection.transaction()?;
+            {
+                let mut meet = transaction.prepare_cached(
+                    "INSERT INTO people (address, name, weight) VALUES (lower(?1), ?2, 3)
+                     ON CONFLICT (address) DO UPDATE SET weight = weight + 3,
+                        name = CASE WHEN excluded.name != '' THEN excluded.name ELSE name END",
+                )?;
+                for address in addresses {
+                    meet.execute(params![address.address, address.name])?;
+                }
+            }
+            transaction.commit()
+        })
+    }
+
     pub fn contacts(&self, query: &str, limit: i64) -> Result<Vec<Address>, String> {
         let pattern = format!("%{}%", query.replace(['%', '_'], ""));
         self.reading(|connection| {

@@ -65,7 +65,10 @@ class ThreadList {
 		const limit = Math.min(MAX_RELOAD, Math.max(PAGE, this.rows.length));
 		const [page, summaries] = await Promise.all([api.threads(this.view, this.query || null, null, limit), this.loadSummaries()]);
 		if (generation !== this.generation) return;
-		this.rows = page.rows;
+		const last = page.rows.at(-1);
+		const fresh = new Set(page.rows.map((row) => row.thread));
+		const deeper = page.rows.length === limit && last ? this.rows.filter((row) => !fresh.has(row.thread) && (row.date < last.date || (row.date === last.date && row.thread < last.thread))) : [];
+		this.rows = [...page.rows, ...deeper];
 		this.total = page.total ?? 0;
 		this.exhausted = page.rows.length < limit;
 		this.summaries = summaries;

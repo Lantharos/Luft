@@ -19,6 +19,7 @@ pub trait Remote: Send {
     fn folders(&mut self, context: &Context) -> Result<Vec<Mailbox>, String>;
     fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String>;
     fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String>;
+    fn identities(&mut self, context: &Context) -> Result<bool, String>;
     fn bodies(
         &mut self,
         mailbox: &Mailbox,

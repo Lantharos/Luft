@@ -5,7 +5,7 @@ use super::params::*;
 use crate::accounts::{Account, Login, Secret, discover, oauth_sign_in};
 use crate::state::MailmanState;
 use crate::store::now;
-use crate::sync::Engine;
+use crate::sync::{Engine, Operation};
 
 fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
     let mut email = request.email.trim().to_lowercase();
@@ -51,7 +51,6 @@ fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
         email: email.clone(),
         name: name.clone(),
         config: config.clone(),
-        signature: String::new(),
         added: now(),
     };
     Engine::verify(&candidate, login)?;
@@ -80,15 +79,40 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("add_account", state, add)
         .with("remove_account", state, remove)
         .with(
-            "update_account",
+            "rename_account",
             state,
-            |state,
-             AccountUpdate {
-                 id,
-                 name,
-                 signature,
-             }| state.store.update_account(id, &name, &signature),
+            |state, AccountUpdate { id, name }| state.store.rename_account(id, &name),
         )
+        .with("identities", state, |state, Empty {}| {
+            state.store.identities()
+        })
+        .with(
+            "save_identity",
+            state,
+            |state, SavedIdentity { identity }| {
+                let id = state.store.save_identity(&identity)?;
+                state.engine.queue(
+                    identity.account,
+                    &Operation::Identity {
+                        id,
+                        remote: identity.remote,
+                    },
+                )?;
+                Ok(id)
+            },
+        )
+        .with("remove_identity", state, |state, Id { id }| {
+            if let Some(removed) = state.store.remove_identity(id)? {
+                state.engine.queue(
+                    removed.account,
+                    &Operation::Identity {
+                        id,
+                        remote: removed.remote,
+                    },
+                )?;
+            }
+            Ok(())
+        })
         .with("accounts", state, |state, Empty {}| state.store.accounts())
         .with("mailboxes", state, |state, Empty {}| {
             state.store.mailboxes(None)

@@ -5,6 +5,7 @@ import { mail } from '$lib/mail/mail.svelte';
 import { reader } from '$lib/reader/reader.svelte';
 import { toasts } from '$lib/shell/toasts.svelte';
 import { escapeHtml, signatureHtml } from './html';
+import { sendingFor, type Sending } from './identity';
 import { parseMailto } from './mailto';
 
 export interface Attachment extends Attached {
@@ -14,6 +15,8 @@ export interface Attachment extends Attached {
 export interface Composition {
 	key: number;
 	account: number;
+	identity: number;
+	from: string | null;
 	to: Address[];
 	cc: Address[];
 	bcc: Address[];
@@ -56,23 +59,28 @@ class Composer {
 		return mail.accounts[0]?.id ?? 0;
 	}
 
-	signature(account: number) {
-		const signature = mail.account(account)?.signature ?? '';
+	signature(identity: number) {
+		const signature = mail.identities.find((candidate) => candidate.id === identity)?.signature ?? '';
 		return signature.trim() ? signatureHtml(signature) : '';
+	}
+
+	private sendingFrom(account: number, sending: Sending | null): Pick<Composition, 'account' | 'identity' | 'from'> {
+		if (sending) return { account: sending.identity.account, identity: sending.identity.id, from: sending.from };
+		return { account, identity: mail.preferredIdentity(account)?.id ?? 0, from: null };
 	}
 
 	start(partial: Partial<Composition> = {}) {
 		if (!mail.accounts.length) return toasts.show('Add an account to write mail');
-		const account = partial.account ?? this.defaultAccount();
+		const sending = { ...this.sendingFrom(partial.account ?? this.defaultAccount(), null), ...partial };
 		this.current = {
 			key: ++this.keys,
-			account,
+			...sending,
 			to: [],
 			cc: [],
 			bcc: [],
 			showCopies: false,
 			subject: '',
-			body: `<p><br></p>${this.signature(account)}`,
+			body: `<p><br></p>${this.signature(sending.identity)}`,
 			quote: '',
 			attachments: [],
 			inReplyTo: null,
@@ -93,7 +101,7 @@ class Composer {
 		const others = all ? [...(sentByMe ? [] : recipients.to), ...recipients.cc].filter((address) => !own.has(address.address) && !to.some((existing) => existing.address === address.address)) : [];
 		const references = [...message.references.split(/\s+/).filter(Boolean), ...(message.messageId ? [message.messageId] : [])];
 		this.start({
-			account: mail.account(message.account) ? message.account : this.defaultAccount(),
+			...this.sendingFrom(mail.account(message.account) ? message.account : this.defaultAccount(), sendingFor(message, mail.identities)),
 			to,
 			cc: others,
 			showCopies: others.length > 0,
@@ -107,7 +115,11 @@ class Composer {
 	forward(message: Message, rendered: Rendered | null) {
 		const header = `<div>---------- Forwarded message ----------<br>From: ${escapeHtml(message.senderName)} &lt;${escapeHtml(message.sender)}&gt;<br>Date: ${escapeHtml(longDate(message.date))}<br>Subject: ${escapeHtml(message.subject)}</div>`;
 		const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : '';
-		this.start({ subject: prefixed(message.subject, 'Fwd'), quote: `${header}<br>${body}` });
+		this.start({
+			...this.sendingFrom(mail.account(message.account) ? message.account : this.defaultAccount(), sendingFor(message, mail.identities)),
+			subject: prefixed(message.subject, 'Fwd'),
+			quote: `${header}<br>${body}`
+		});
 	}
 
 	mailto(url: string) {
@@ -118,7 +130,7 @@ class Composer {
 			bcc: parsed.bcc,
 			showCopies: parsed.cc.length > 0 || parsed.bcc.length > 0,
 			subject: parsed.subject,
-			body: `<p>${escapeHtml(parsed.body).replace(/\n/g, '<br>') || '<br>'}</p>${this.signature(this.defaultAccount())}`
+			body: `<p>${escapeHtml(parsed.body).replace(/\n/g, '<br>') || '<br>'}</p>${this.signature(this.sendingFrom(this.defaultAccount(), null).identity)}`
 		});
 	}
 
@@ -126,8 +138,10 @@ class Composer {
 		try {
 			await reader.body(id);
 			const draft = await api.reopenDraft(id);
+			const from = draft.from.toLowerCase();
+			const own = mail.identitiesOf(draft.account).find((identity) => identity.address === from || identity.address === `*@${from.split('@')[1]}`);
 			this.start({
-				account: draft.account,
+				...this.sendingFrom(draft.account, own ? { identity: own, from: own.address.startsWith('*@') ? from : null } : null),
 				to: draft.recipients.to,
 				cc: draft.recipients.cc,
 				showCopies: draft.recipients.cc.length > 0,
@@ -144,6 +158,8 @@ class Composer {
 		const quote = composition.quote ? `<br>${composition.quote}` : '';
 		return {
 			account: composition.account,
+			identity: composition.identity,
+			from: composition.from,
 			to: composition.to,
 			cc: composition.cc,
 			bcc: composition.bcc,

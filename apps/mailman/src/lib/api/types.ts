@@ -24,8 +24,18 @@ export interface Account {
 	email: string;
 	name: string;
 	config: AccountConfig;
-	signature: string;
 	added: number;
+}
+
+export interface Identity {
+	id: number;
+	account: number;
+	name: string;
+	address: string;
+	replyTo: string;
+	signature: string;
+	preferred: boolean;
+	remote: string | null;
 }
 
 export interface Mailbox {
@@ -50,6 +60,7 @@ export type Launch = { kind: 'mailto'; url: string } | { kind: 'message'; path: 
 export interface AppState extends Appearance {
 	launch: Launch[];
 	accounts: Account[];
+	identities: Identity[];
 	mailboxes: Mailbox[];
 	settings: Settings;
 	oauth: Provider[];
@@ -105,6 +116,7 @@ export interface Recipients {
 	to: Address[];
 	cc: Address[];
 	replyTo: Address[];
+	delivered?: Address[];
 }
 
 export interface Unsubscribe {
@@ -178,6 +190,8 @@ export interface Attached {
 
 export interface Draft {
 	account: number;
+	identity: number;
+	from: string | null;
 	to: Address[];
 	cc: Address[];
 	bcc: Address[];

@@ -30,7 +30,9 @@ install_keyring() {
     exit 1
   fi
   cargo build --release --manifest-path "$keyring_root/Cargo.toml"
-  local built="$keyring_root/target/release"
+  local built="$keyring_root/target/release" changed=()
+  cmp -s "$built/luft-keyring-unlock" "$prefix/libexec/luft-keyring-unlock" || changed+=(unlock)
+  cmp -s "$built/luft-keyring" "$prefix/libexec/luft-keyring" || changed+=(daemon)
   sudo install -DZ -m755 "$built/luft-keyring" "$prefix/libexec/luft-keyring"
   sudo install -DZ -m755 "$built/luft-keyring-unlock" "$prefix/libexec/luft-keyring-unlock"
   sudo install -DZ -m755 "$built/libpam_luft_keyring.so" "$keyring_pam/pam_luft_keyring.so"
@@ -41,7 +43,16 @@ install_keyring() {
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$prefix/$target"
   done
   sudo systemctl daemon-reload
+  restart_keyring "${changed[@]}"
   echo "Luft Keyring is installed; kestrel/keyring/tools/switch.sh on makes it your keyring."
+}
+
+restart_keyring() {
+  [[ " $* " == *" unlock "* ]] && sudo systemctl try-restart luft-keyring-unlock.service
+  if [[ " $* " == *" daemon "* || " $* " == *" unlock "* ]] && systemctl --user --quiet is-active luft-keyring.service; then
+    systemctl --user restart luft-keyring.service
+    echo "Luft Keyring restarted on its new version; it asks for your password the next time an app needs it."
+  fi
 }
 
 remove_keyring() {

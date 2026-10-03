@@ -1,0 +1,166 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 3 Oct 2026 14:57:14 +0200
+Subject: [PATCH 13/13] backends: name monitor makers from the hardware
+ database instead of gnome-desktop
+
+systemd's hardware database already carries the PNP vendor registry, so
+Mutter no longer needs libgnome-desktop for it.
+---
+ meson.build                                 |  7 -----
+ meson.options                               |  5 ---
+ src/backends/meta-backend.c                 | 35 +++++++++++++--------
+ src/backends/meta-monitor-manager-private.h |  4 ---
+ src/meson.build                             |  6 ----
+ 5 files changed, 22 insertions(+), 35 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 09b04d7eea54d8c345b8e43f6e28e0a2057190fd..e6e7c01fe786396a887ec634b1eb28f382cf15e6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -170,11 +170,6 @@ if have_xwayland
+   xau_dep = dependency('xau')
+ endif
+ 
+-have_gnome_desktop = get_option('libgnome_desktop')
+-if have_gnome_desktop
+-  gnome_desktop_dep = dependency('gnome-desktop-4')
+-endif
+-
+ have_sound_player = get_option('sound_player')
+ if have_sound_player
+   libcanberra_dep = dependency('libcanberra', version: libcanberra_req)
+@@ -547,7 +542,6 @@ cdata.set('HAVE_GLES2', have_gles2)
+ cdata.set('HAVE_XWAYLAND', have_xwayland)
+ cdata.set('HAVE_REMOTE_DESKTOP', have_remote_desktop)
+ cdata.set('HAVE_DEVKIT', have_devkit)
+-cdata.set('HAVE_GNOME_DESKTOP', have_gnome_desktop)
+ cdata.set('HAVE_SOUND_PLAYER', have_sound_player)
+ cdata.set('HAVE_LIBWACOM', have_libwacom)
+ cdata.set('HAVE_LIBWACOM_GET_NUM_RINGS', have_libwacom_get_num_rings)
+@@ -735,7 +729,6 @@ summary('EGL', have_egl, section: 'Rendering APIs')
+ summary('XWayland', have_xwayland, section: 'Options')
+ summary('Remote desktop', have_remote_desktop, section: 'Options')
+ summary('Development Kit', have_devkit, section: 'Options')
+-summary('libgnome-desktop', have_gnome_desktop, section: 'Options')
+ summary('Sound player', have_sound_player, section: 'Options')
+ summary('Wacom', have_libwacom, section: 'Options')
+ summary('Fonts', have_fonts, section: 'Options')
+diff --git a/meson.options b/meson.options
+index 4f8c0c9ba0e78463a680d7f63675921b7a1ab58b..cbae3a79047a48d07df82198c7855bc797afce84 100644
+--- a/meson.options
++++ b/meson.options
+@@ -40,11 +40,6 @@ option('remote_desktop',
+   description: 'Enable remote desktop and screen cast support'
+ )
+ 
+-option('libgnome_desktop',
+-  type: 'boolean',
+-  value: true,
+-  description: 'Build with or without gnome-desktop'
+-)
+ 
+ option('udev_dir',
+   type: 'string',
+diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
+index 958f0843741d398100189ed68fb7d21f0bc77cc2..b80e485fd021e290e884b2dc2ccfc733a11d88b8 100644
+--- a/src/backends/meta-backend.c
++++ b/src/backends/meta-backend.c
+@@ -49,6 +49,7 @@
+ 
+ #include "backends/meta-backend-private.h"
+ 
++#include <libudev.h>
+ #include <stdlib.h>
+ 
+ #include "backends/meta-a11y-manager.h"
+@@ -164,9 +165,7 @@ struct _MetaBackendPrivate
+ #ifdef HAVE_LIBWACOM
+   WacomDeviceDatabase *wacom_db;
+ #endif
+-#ifdef HAVE_GNOME_DESKTOP
+-  GnomePnpIds *pnp_ids;
+-#endif
++  struct udev_hwdb *hwdb;
+ 
+   ClutterContext *clutter_context;
+   ClutterSeat *default_seat;
+@@ -283,9 +282,7 @@ meta_backend_finalize (GObject *object)
+ #ifdef HAVE_LIBWACOM
+   g_clear_pointer (&priv->wacom_db, libwacom_database_destroy);
+ #endif
+-#ifdef HAVE_GNOME_DESKTOP
+-  g_clear_object (&priv->pnp_ids);
+-#endif
++  g_clear_pointer (&priv->hwdb, udev_hwdb_unref);
+ 
+   G_OBJECT_CLASS (meta_backend_parent_class)->finalize (object);
+ }
+@@ -2151,16 +2148,28 @@ char *
+ meta_backend_get_vendor_name (MetaBackend *backend,
+                               const char  *pnp_id)
+ {
+-#ifdef HAVE_GNOME_DESKTOP
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
++  g_autofree char *modalias = g_strdup_printf ("acpi:%s:", pnp_id);
++  struct udev_list_entry *entry;
+ 
+-  if (!priv->pnp_ids)
+-    priv->pnp_ids = gnome_pnp_ids_new ();
++  if (!priv->hwdb)
++    {
++      struct udev *udev = udev_new ();
+ 
+-  return gnome_pnp_ids_get_pnp_id (priv->pnp_ids, pnp_id);
+-#else
+-  return g_strdup (pnp_id);
+-#endif
++      priv->hwdb = udev_hwdb_new (udev);
++      udev_unref (udev);
++    }
++
++  udev_list_entry_foreach (entry,
++                           udev_hwdb_get_properties_list_entry (priv->hwdb,
++                                                                modalias, 0))
++    {
++      if (g_str_equal (udev_list_entry_get_name (entry),
++                       "ID_VENDOR_FROM_DATABASE"))
++        return g_strdup (udev_list_entry_get_value (entry));
++    }
++
++  return NULL;
+ }
+ 
+ uint32_t
+diff --git a/src/backends/meta-monitor-manager-private.h b/src/backends/meta-monitor-manager-private.h
+index cfce38d376d7d18486ac660fa9a16fbb9088b1fc..d0c28ea79bcf12fb7c822aa9d6d642cd2644ead5 100644
+--- a/src/backends/meta-monitor-manager-private.h
++++ b/src/backends/meta-monitor-manager-private.h
+@@ -26,10 +26,6 @@
+ #include "cogl/cogl.h"
+ #include <graphene.h>
+ 
+-#ifdef HAVE_GNOME_DESKTOP
+-#include <libgnome-desktop/gnome-pnp-ids.h>
+-#endif
+-
+ #include "backends/meta-backend-private.h"
+ #include "backends/meta-crtc.h"
+ #include "backends/meta-display-config-shared.h"
+diff --git a/src/meson.build b/src/meson.build
+index ec55803f10cd13cac6d8619aaeadd5eda7d1ef59..9b514e1b46e44aad31bb9d4fb6f7dc96006d3d52 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -31,12 +31,6 @@ mutter_pkg_private_deps = [
+   libdrm_dep,
+ ]
+ 
+-if have_gnome_desktop
+-  mutter_pkg_private_deps += [
+-    gnome_desktop_dep,
+-  ]
+-endif
+-
+ if have_sound_player
+   mutter_pkg_private_deps += [
+     libcanberra_dep,

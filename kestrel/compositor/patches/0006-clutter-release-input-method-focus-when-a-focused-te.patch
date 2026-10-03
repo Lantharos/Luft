@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 29 Sep 2026 19:24:18 +0200
-Subject: [PATCH 06/12] clutter: release input method focus when a focused text
+Subject: [PATCH 06/13] clutter: release input method focus when a focused text
  is destroyed
 
 Actors being destroyed never get key-focus-out, so a ClutterText destroyed

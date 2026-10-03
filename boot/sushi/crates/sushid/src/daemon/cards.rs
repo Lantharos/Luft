@@ -3,8 +3,6 @@ use std::path::Path;
 use sushi::display::{Card, Display};
 use sushi::uevent::CardEvent;
 
-use crate::takeover::Then;
-
 use super::{Daemon, Firmware, Phase, Screen};
 
 impl Daemon {
@@ -30,20 +28,11 @@ impl Daemon {
 
     fn adopt(&mut self, display: Display) {
         let mut fresh = false;
-        let display = if display.card().is_firmware_framebuffer() {
+        if display.card().is_firmware_framebuffer() {
             self.on_firmware = true;
-            display
         } else if std::mem::take(&mut self.on_firmware) {
-            match self.take_over(display) {
-                Some((display, dark)) => {
-                    fresh = dark;
-                    display
-                }
-                None => return,
-            }
-        } else {
-            display
-        };
+            fresh = self.take_over(&display);
+        }
         let firmware = self
             .firmware
             .get_or_insert_with(|| Firmware::left_on(&display, self.logo.take(), &self.hints));
@@ -70,29 +59,17 @@ impl Daemon {
         self.take_terminal();
     }
 
-    fn take_over(&mut self, display: Display) -> Option<(Display, bool)> {
+    fn take_over(&mut self, display: &Display) -> bool {
         let now = self.now();
-        if self.takeover.awaits_card() || !display.kept_firmware_picture() {
-            self.takeover.resync(now);
-            return Some((display, true));
-        }
-        if display.shows_planned_modes() {
+        let seamless = !self.takeover.awaits_card()
+            && display.kept_firmware_picture()
+            && display.shows_planned_modes();
+        if seamless {
             eprintln!("The graphics driver kept the picture in the saved mode");
-            self.takeover.settle();
-            self.settle_loader(now);
-            return Some((display, false));
         }
-        eprintln!("The graphics driver kept the picture, switching to the saved mode in the dark");
-        match display.keeping_inherited_modes() {
-            Ok(display) => {
-                self.takeover.darken(now, Then::Modeset, true);
-                Some((display, false))
-            }
-            Err(error) => {
-                eprintln!("Couldn't keep the mode the graphics driver inherited: {error}");
-                None
-            }
-        }
+        self.takeover.settle(now);
+        self.settle_loader(now);
+        !seamless
     }
 
     pub(super) fn forget_screen(&mut self) {

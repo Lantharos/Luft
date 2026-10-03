@@ -35,7 +35,7 @@ impl Daemon {
                 self.leave_to_text();
                 reply(stream, "ok");
             }
-            Command::UpdateRoot(root) => self.enter_root_after_loading(root, stream),
+            Command::UpdateRoot(root) => self.enter_root_after_loading(root, Some(stream)),
             Command::LoadDrivers => self.load_drivers(stream),
             Command::Show(mode) => {
                 self.activity.set_mode(mode, self.now());
@@ -126,9 +126,7 @@ impl Daemon {
                 return;
             }
             Request::NewRoot(root) => {
-                if let Err(error) = self.enter_root(&root) {
-                    eprintln!("Couldn't move into {}: {error}", root.display());
-                }
+                self.enter_root_after_loading(root, None);
                 Response::Ack
             }
             Request::HasActiveVt
@@ -235,6 +233,7 @@ impl Daemon {
         rustix::process::chroot(root)?;
         std::env::set_current_dir("/")?;
         self.root = Some(root.to_owned());
+        let _ = self.events.follow_udev_only();
         self.config = Config::load();
         self.hints = hints(&self.config);
         eprintln!("Moved into {}", root.display());

@@ -1,6 +1,7 @@
 import St from 'gi://St';
 
 import * as Config from '../misc/config.js';
+import * as Bluetooth from './status/bluetooth.js';
 import * as Volume from './status/volume.js';
 import * as Brightness from './status/brightness.js';
 import * as PowerProfiles from './status/powerProfiles.js';
@@ -30,10 +31,10 @@ export class DesktopControls {
         Location.getGeoclueAgent();
         this.actor.add_child(new Thunderbolt.Indicator());
         this._network = null;
-        this._bluetooth = null;
+        this._bluetooth = new Bluetooth.Indicator();
         for (const indicator of [this._volumeOutput, this._brightness,
             this._powerProfiles, this._caffeine, this._nightLight, this._darkMode,
-            this._doNotDisturb, this._rfkill, this._backlight, this._autoRotate])
+            this._doNotDisturb, this._rfkill, this._backlight, this._autoRotate, this._bluetooth])
             this.actor.add_child(indicator);
         this.ready = this._loadDevices();
     }
@@ -43,11 +44,6 @@ export class DesktopControls {
             const Network = await import('./status/network.js');
             this._network = new Network.Indicator();
             this.actor.add_child(this._network);
-        }
-        if (Config.HAVE_BLUETOOTH) {
-            const Bluetooth = await import('./status/bluetooth.js');
-            this._bluetooth = new Bluetooth.Indicator();
-            this.actor.add_child(this._bluetooth);
         }
     }
 

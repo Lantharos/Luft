@@ -1,6 +1,5 @@
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
-import GnomeDesktop from 'gi://GnomeDesktop';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
@@ -16,6 +15,7 @@ import * as RemoteAccessStatus from './status/remoteAccess.js';
 import * as RFKillStatus from './status/rfkill.js';
 import * as CameraStatus from './status/camera.js';
 import * as VolumeStatus from './status/volume.js';
+import * as BluetoothStatus from './status/bluetooth.js';
 import * as BrightnessStatus from './status/brightness.js';
 import * as SystemStatus from './status/system.js';
 
@@ -25,18 +25,6 @@ import {DwellClickIndicator} from './status/dwellClick.js';
 import {ScreenRecordingIndicator, ScreenSharingIndicator} from './status/remoteAccess.js';
 
 const N_QUICK_SETTINGS_COLUMNS = 2;
-
-const SessionClock = GObject.registerClass(
-class SessionClock extends PanelMenu.Button {
-    _init() {
-        super._init(0.0, _('Clock'), true);
-        this._clock = new GnomeDesktop.WallClock();
-        const label = new St.Label({y_align: Clutter.ActorAlign.CENTER});
-        this.add_child(label);
-        this._clock.bind_property('clock', label, 'text', GObject.BindingFlags.SYNC_CREATE);
-        this.connect('destroy', () => this._clock.run_dispose());
-    }
-});
 
 const UnsafeModeIndicator = GObject.registerClass(
 class UnsafeModeIndicator extends SystemIndicator {
@@ -79,15 +67,7 @@ class QuickSettings extends PanelMenu.Button {
             this._network = null;
         }
 
-        if (Config.HAVE_BLUETOOTH) {
-            /** @type {import('./status/bluetooth.js')} */
-            const BluetoothStatus = await import('./status/bluetooth.js');
-
-            this._bluetooth = new BluetoothStatus.Indicator();
-        } else {
-            this._bluetooth = null;
-        }
-
+        this._bluetooth = new BluetoothStatus.Indicator();
         this._system = new SystemStatus.Indicator();
         this._camera = new CameraStatus.Indicator();
         this._volumeOutput = new VolumeStatus.OutputIndicator();
@@ -107,8 +87,7 @@ class QuickSettings extends PanelMenu.Button {
         this._indicators.add_child(this._brightness);
         if (this._network)
             this._indicators.add_child(this._network);
-        if (this._bluetooth)
-            this._indicators.add_child(this._bluetooth);
+        this._indicators.add_child(this._bluetooth);
         this._indicators.add_child(this._rfkill);
         this._indicators.add_child(this._volumeOutput);
         this._indicators.add_child(this._unsafeMode);
@@ -129,8 +108,7 @@ class QuickSettings extends PanelMenu.Button {
         this._addItemsBefore(this._remoteAccess.quickSettingsItems, sibling);
         if (this._network)
             this._addItemsBefore(this._network.quickSettingsItems, sibling);
-        if (this._bluetooth)
-            this._addItemsBefore(this._bluetooth.quickSettingsItems, sibling);
+        this._addItemsBefore(this._bluetooth.quickSettingsItems, sibling);
         this._addItemsBefore(this._rfkill.quickSettingsItems, sibling);
         this._addItemsBefore(this._unsafeMode.quickSettingsItems, sibling);
     }
@@ -157,7 +135,6 @@ class QuickSettings extends PanelMenu.Button {
 
 const PANEL_ITEM_IMPLEMENTATIONS = {
     'quickSettings': QuickSettings,
-    'clock': SessionClock,
     'a11y': ATIndicator,
     'keyboard': InputSourceIndicator,
     'dwellClick': DwellClickIndicator,

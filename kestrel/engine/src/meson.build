@@ -112,11 +112,13 @@ libshell_public_headers = [
   'shell-perf-log.h',
   'shell-screenshot.h',
   'shell-stack.h',
+  'shell-systemd.h',
   'shell-texture-file.h',
   'shell-time-change-source.h',
   'shell-util.h',
   'shell-window-tracker.h',
   'shell-wm.h',
+  'shell-xkb-info.h',
 ]
 
 if have_networkmanager
@@ -153,11 +155,13 @@ libshell_sources = [
   'shell-secure-text-buffer.c',
   'shell-secure-text-buffer.h',
   'shell-stack.c',
+  'shell-systemd.c',
   'shell-texture-file.c',
   'shell-time-change-source.c',
   'shell-util.c',
   'shell-window-tracker.c',
   'shell-wm.c',
+  'shell-xkb-info.c',
 ]
 
 if have_networkmanager
@@ -198,7 +202,7 @@ libshell_no_gir_sources += dbus_generated
 
 libshell = library('shell-' + mutter_api_version,
   sources: libshell_gir_sources + libshell_no_gir_sources,
-  dependencies: gnome_shell_deps + [libshell_menu_dep, libst_dep, mutter_dep, gnome_desktop_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
+  dependencies: gnome_shell_deps + [libshell_menu_dep, libst_dep, mutter_dep, xkbregistry_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
   include_directories: [conf_inc],
   c_args: gnome_shell_cflags,
   build_rpath: mutter_typelibdir,

@@ -31,6 +31,8 @@ Desktop Quick Settings owns only the device controls used by Kestrel. It does no
 
 GNOME’s calendar server integration, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for the login screen, unlocking, and the Start avatar. Authentication, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
 
+Kestrel doesn't use the GNOME Desktop or GNOME Bluetooth libraries. Keyboard layout names come from libxkbregistry, including the layouts in `~/.config/xkb`, input method language names from iso-codes, Bluetooth straight from BlueZ, and the clock follows the clock settings in `org.gnome.desktop.interface` and catches up right away after the time zone or the system clock changes, including after sleep. Wallpapers are pictures or [videos](#live-wallpapers); GNOME's XML slideshows that change through the day are not supported.
+
 ### Performance workload
 
 Run `kestrel/tools/session.sh performance` to measure resident memory and time since launch once the shell is ready, the emoji panel opening before and after its index is built and its search edits, repeated search edits, app-button reuse, an 80-notification burst, row creation while hidden, and settled desktop paints. Search timings cover synchronous update work; they are not end-to-end display latency. The command uses an isolated headless session and exits when finished.

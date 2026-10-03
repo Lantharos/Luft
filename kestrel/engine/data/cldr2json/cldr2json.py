@@ -20,19 +20,15 @@
 
 import glob
 import json
-import locale
 import logging
 import os
 import re
 import sys
 import xml.etree.ElementTree
 
-import gi
-gi.require_version('GnomeDesktop', '3.0')   # NOQA: E402
-from gi.repository import GnomeDesktop
-
 ESCAPE_PATTERN = re.compile(r'\\u\{([0-9A-Fa-f]+?)\}')
 ISO_PATTERN = re.compile(r'[A-E]([0-9]+)')
+XKB_RULES = '/usr/share/X11/xkb/rules/evdev.xml'
 
 LOCALE_TO_XKB_OVERRIDES = {
     'af':    'za',
@@ -176,18 +172,18 @@ def convert_file(source_file, destination_path):
 
 
 def load_xkb_mappings():
-    xkb = GnomeDesktop.XkbInfo()
-    layouts = xkb.get_all_layouts()
     name_to_xkb = {}
 
-    for layout in layouts:
-        name = xkb.get_layout_info(layout).display_name
-        name_to_xkb[name] = layout
+    for layout in xml.etree.ElementTree.parse(XKB_RULES).iter('layout'):
+        name = layout.findtext('configItem/name')
+        name_to_xkb[layout.findtext('configItem/description')] = name
+        for variant in layout.iter('variant'):
+            variant_name = variant.findtext('configItem/name')
+            name_to_xkb[variant.findtext('configItem/description')] = f'{name}+{variant_name}'
 
     return name_to_xkb
 
 
-locale.setlocale(locale.LC_ALL, "C")
 name_to_xkb = load_xkb_mappings()
 
 

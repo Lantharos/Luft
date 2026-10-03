@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {getLoginManager} from '../../misc/loginManager.js';
+import {getLoginManager} from '../../../misc/loginManager.js';
 
 const STATE_KEY = 'bluetooth-reconnect';
 const SETTLE_SECONDS = 2;
@@ -18,7 +18,7 @@ export class Reconnector {
         this._cancellable = null;
         this._loginManager = getLoginManager();
 
-        this._client.connect('notify::default-adapter-powered', () => this._adapterChanged());
+        this._client.connect('notify::active', () => this._adapterChanged());
         this._loginManager.connect('prepare-for-sleep', (manager, aboutToSuspend) => {
             if (aboutToSuspend)
                 this._stop();
@@ -53,7 +53,7 @@ export class Reconnector {
     }
 
     get _adapterUp() {
-        return this._client.default_adapter_powered && !this._loginManager.preparingForSleep;
+        return this._client.active && !this._loginManager.preparingForSleep;
     }
 
     _remember(address) {
@@ -102,14 +102,8 @@ export class Reconnector {
     }
 
     _waiting() {
-        const devices = this._client.get_devices();
-        const waiting = [];
-        for (let i = 0; i < devices.get_n_items(); i++) {
-            const device = devices.get_item(i);
-            if (this._remembered.has(device.address) && device.paired && device.trusted && !device.connected)
-                waiting.push(device);
-        }
-        return waiting;
+        return [...this._client.devices].filter(device =>
+            this._remembered.has(device.address) && device.paired && device.trusted && !device.connected);
     }
 
     async _reconnect() {
@@ -119,7 +113,7 @@ export class Reconnector {
             if (!this._remembered.has(device.address) || device.connected)
                 continue;
             try {
-                await this._client.connect_service(device.get_object_path(), true, cancellable);
+                await device.setConnected(true, cancellable);
             } catch (e) {
                 if (cancellable.is_cancelled())
                     return;

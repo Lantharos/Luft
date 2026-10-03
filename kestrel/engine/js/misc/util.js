@@ -3,7 +3,6 @@ import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import GnomeDesktop from 'gi://GnomeDesktop';
 
 import {formatTime} from './dateUtils.js';
 
@@ -143,8 +142,7 @@ export function trySpawn(argv) {
         }
     }
 
-    // Async call, we don't need the reply though
-    GnomeDesktop.start_systemd_scope(argv[0], pid, null, null, null, () => {});
+    Shell.systemd_start_app_scope(argv[0], pid);
 
     // Dummy child watch; we don't want to double-fork internally
     // because then we lose the parent-child relationship, which

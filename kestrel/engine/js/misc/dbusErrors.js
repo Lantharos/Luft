@@ -10,7 +10,7 @@ function decamelcase(str) {
     return str.replace(/(.)([A-Z])/g, '$1-$2');
 }
 
-function registerErrorDomain(domain, errorEnum, prefix = 'org.gnome.Shell') {
+function registerErrorDomain(domain, errorEnum, prefix = 'com.lantharos.Kestrel') {
     const domainName =
         `shell-${decamelcase(domain).toLowerCase()}-error`;
     const quark = GLib.quark_from_string(domainName);

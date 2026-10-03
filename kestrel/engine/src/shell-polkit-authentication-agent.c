@@ -298,7 +298,7 @@ on_request_cancelled (GCancellable *cancellable,
    *  https://bugzilla.gnome.org/show_bug.cgi?id=642968
    */
   request->idle_id = g_idle_add_once (handle_cancelled_in_idle, request);
-  g_source_set_name_by_id (request->idle_id, "[gnome-shell] handle_cancelled_in_idle");
+  g_source_set_name_by_id (request->idle_id, "[kestrel] handle_cancelled_in_idle");
 }
 
 static void

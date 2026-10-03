@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import { createInputSlider } from 'resource:///org/gnome/shell/ui/status/volume.js';
+import { createInputSlider } from 'resource:///com/lantharos/kestrel/ui/status/volume.js';
 
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { ScrollPane } from './scrollPane.js';

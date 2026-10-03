@@ -18,8 +18,8 @@ foreach resource : data_resources
   deps = resource.get('deps', [])
 
   data_resources_targets += gnome.compile_resources(
-    'gnome-shell-' + name,
-    'gnome-shell-@0@.gresource.xml'.format(name),
+    'kestrel-' + name,
+    'kestrel-@0@.gresource.xml'.format(name),
     source_dir: name,
     dependencies: deps,
     gresource_bundle: true,
@@ -31,8 +31,8 @@ endforeach
 fs.copyfile('characters.json', install: true, install_dir: pkgdatadir)
 
 cursor_theme_resource = gnome.compile_resources(
-  'gnome-shell-cursor-theme',
-  'gnome-shell-cursor-theme.gresource.xml',
+  'kestrel-cursor-theme',
+  'kestrel-cursor-theme.gresource.xml',
   source_dir: 'cursor-theme')
 
 keybinding_files = [

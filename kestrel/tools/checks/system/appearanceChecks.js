@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 const ROLES = ['primary', 'onPrimary', 'secondary', 'tertiary', 'error', 'surface', 'onSurface', 'surfaceContainerHighest', 'onSurfaceVariant', 'outline'];
 const USER_CSS = 'window { opacity: 1; }\n';

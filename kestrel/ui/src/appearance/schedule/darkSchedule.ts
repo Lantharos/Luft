@@ -1,6 +1,6 @@
 import type Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { getLoginManager } from 'resource:///org/gnome/shell/misc/loginManager.js';
+import { getLoginManager } from 'resource:///com/lantharos/kestrel/misc/loginManager.js';
 
 import { Location } from './location.js';
 import { dayNumber, dayStart, daylight, type Coordinates } from './sun.js';

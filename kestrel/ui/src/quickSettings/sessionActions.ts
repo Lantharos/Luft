@@ -1,5 +1,5 @@
 import GObject from 'gi://GObject';
-import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
+import * as SystemActions from 'resource:///com/lantharos/kestrel/misc/systemActions.js';
 
 export interface SessionAction {
   icon: string;

@@ -112,7 +112,7 @@ pub fn open_settings(page: &str) {
 pub fn launch(app: &str, command: &[&str]) {
     let launch = LAUNCHES.fetch_add(1, Ordering::Relaxed);
     let unit = format!(
-        "--unit=app-gnome-{app}-{}{launch}.scope",
+        "--unit=app-kestrel-{app}-{}{launch}.scope",
         std::process::id()
     );
     let launched = tokio::process::Command::new("systemd-run")

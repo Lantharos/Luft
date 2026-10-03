@@ -18,7 +18,7 @@ function watch(theme: St.Theme, stylesheet: Gio.File): Gio.FileMonitor {
 export function loadKestrelStylesheets(): Gio.FileMonitor[] {
   const theme = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).get_theme();
   const cssPath = GLib.getenv('KESTREL_CSS_PATH');
-  const directory = cssPath ? Gio.File.new_for_path(cssPath).get_parent()! : Gio.File.new_for_uri('resource:///org/gnome/shell/theme');
+  const directory = cssPath ? Gio.File.new_for_path(cssPath).get_parent()! : Gio.File.new_for_uri('resource:///com/lantharos/kestrel/theme');
   const stylesheets = STYLESHEETS.map(name => directory.get_child(name));
   for (const stylesheet of stylesheets) theme.load_stylesheet(stylesheet);
   return cssPath ? stylesheets.map(stylesheet => watch(theme, stylesheet)) : [];

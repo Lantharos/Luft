@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { appName } from '../core/apps.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';

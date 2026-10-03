@@ -1,9 +1,9 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
-import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import {toggleSurface, dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 const pause = milliseconds => new Promise(resolve => {
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {

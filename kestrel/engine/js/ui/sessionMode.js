@@ -12,8 +12,8 @@ const USER_SESSION_COMPONENTS = [
 const _modes = {
     'restrictive': {
         parentMode: null,
-        stylesheetName: 'gnome-shell.css',
-        themeResourceName: 'gnome-shell-theme.gresource',
+        stylesheetName: 'base.css',
+        themeResourceName: 'kestrel-theme.gresource',
         allowSettings: false,
         allowScreencast: false,
         hasWorkspaces: false,

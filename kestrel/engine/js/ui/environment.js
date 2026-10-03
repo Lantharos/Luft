@@ -21,7 +21,7 @@ import {logErrorUnlessCancelled} from '../misc/errorUtils.js';
 
 const sessionSignalHolder = new SignalTracker.TransientSignalHolder();
 
-setConsoleLogDomain('GNOME Shell');
+setConsoleLogDomain('Kestrel');
 
 Gio._promisify(Gio.DataInputStream.prototype, 'fill_async');
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
@@ -414,7 +414,7 @@ Object.defineProperties(St.ButtonMask, {
     ...defineCompatButtonMaskProp('THREE', 'SECONDARY'),
 });
 
-const slowdownEnv = GLib.getenv('GNOME_SHELL_SLOWDOWN_FACTOR');
+const slowdownEnv = GLib.getenv('KESTREL_SLOWDOWN_FACTOR');
 if (slowdownEnv) {
     const factor = parseFloat(slowdownEnv);
     if (!isNaN(factor) && factor > 0.0)

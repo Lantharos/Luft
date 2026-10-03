@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
+import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { windowIcon } from '../appearance/icons/appIcons.js';
 import type { Rect } from './grid.js';

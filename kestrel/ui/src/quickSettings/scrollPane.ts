@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
+import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 
 export class ScrollPane {
   readonly body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });

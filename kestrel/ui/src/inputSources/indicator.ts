@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { getInputSourceManager, type InputSource } from 'resource:///org/gnome/shell/ui/status/keyboard.js';
+import { getInputSourceManager, type InputSource } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { ScrollSteps } from '../shared/scrollSteps.js';

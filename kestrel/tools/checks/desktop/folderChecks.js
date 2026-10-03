@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface, dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 export async function checkFolders({pause, capture, actorNamed, pointer, output}) {
   const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

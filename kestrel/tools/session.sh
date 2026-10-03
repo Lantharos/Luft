@@ -30,6 +30,10 @@ export XDG_STATE_HOME="$session/state"
 export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
 mkdir -p "$session/data/dbus-1/services"
 printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=%s -m %s %s\n' "$(command -v gjs)" "$root/kestrel/tools/fixtures/documentPortal.js" "$session/documents" > "$session/data/dbus-1/services/org.freedesktop.portal.Documents.service"
+for name in com.lantharos.Kestrel.Notifications com.lantharos.Kestrel.Screencast; do
+  printf '[D-BUS Service]\nName=%s\nExec=%s -m %s %s %s\n' "$name" "$(command -v gjs)" "$root/kestrel/tools/fixtures/services/shellService.js" "$root/kestrel/build/js/dbusServices/$name.src.gresource" "$name" > "$session/data/dbus-1/services/$name.service"
+done
+printf '[D-BUS Service]\nName=com.lantharos.Kestrel.HotplugSniffer\nExec=%s\n' "$root/kestrel/build/src/hotplug-sniffer/kestrel-hotplug-sniffer" > "$session/data/dbus-1/services/com.lantharos.Kestrel.HotplugSniffer.service"
 for name in com.lantharos.Keyring1 org.freedesktop.secrets; do
   printf '[D-BUS Service]\nName=%s\nExec=/usr/bin/false\n' "$name" > "$session/data/dbus-1/services/$name.service"
 done
@@ -38,10 +42,10 @@ ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-de
 ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
 export GVFS_DISABLE_FUSE=1
 glib-compile-schemas "$root/kestrel/build/data"
-export GNOME_SHELL_BUILDDIR="$root/kestrel/build/src"
+export KESTREL_BUILDDIR="$root/kestrel/build/src"
 export GI_TYPELIB_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st:$root/kestrel/build/subprojects/gvc${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
 export LD_LIBRARY_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st:$root/kestrel/build/subprojects/gvc${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export GNOME_SHELL_DATADIR="$root/kestrel/build/data"
+export KESTREL_DATADIR="$root/kestrel/build/data"
 export GSETTINGS_SCHEMA_DIR="$root/kestrel/build/data"
 export KESTREL_CSS_PATH="$root/kestrel/engine/data/theme/kestrel.css"
 unset GSETTINGS_BACKEND GDK_BACKEND

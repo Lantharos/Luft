@@ -2,14 +2,14 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { wiggle } from 'resource:///org/gnome/shell/misc/animationUtils.js';
-import { EntryField } from 'resource:///org/gnome/shell/ui/dialog.js';
-import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import { wiggle } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
+import { EntryField } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
+import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 
 import { QualityMeter, type Measure } from './quality.js';
 import type { PasswordRequest } from './request.js';
 
-export type ShellEntryModule = typeof import('resource:///org/gnome/shell/ui/shellEntry.js');
+export type ShellEntryModule = typeof import('resource:///com/lantharos/kestrel/ui/shellEntry.js');
 
 export interface PasswordEvents {
   entered(secret: string): void;

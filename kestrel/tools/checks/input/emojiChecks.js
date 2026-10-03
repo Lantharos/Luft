@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 const KEPT = 'Keep this on the clipboard';
 const US_LAYOUT = new GLib.Variant('a(ss)', [['xkb', 'us']]);

@@ -3,8 +3,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import Shell from 'gi://Shell';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 export async function checkSession({pause, capture, actorNamed, pointer, keyboard, output}) {
   const key = symbol => {
@@ -94,7 +94,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
 
   toggleSurface('start');
   await pause(350);
-  const audio = ['org.gnome.Shell.AudioDeviceSelection', '/org/gnome/Shell/AudioDeviceSelection', 'org.gnome.Shell.AudioDeviceSelection'];
+  const audio = ['com.lantharos.Kestrel.AudioDeviceSelection', '/com/lantharos/Kestrel/AudioDeviceSelection', 'com.lantharos.Kestrel.AudioDeviceSelection'];
   await call(...audio, 'Open', new GLib.Variant('(as)', [['headphones', 'headset', 'microphone']]));
   await pause(200);
   require(!start.visible && Main.modalCount > 0, 'audio dialog dismisses Start and takes focus');

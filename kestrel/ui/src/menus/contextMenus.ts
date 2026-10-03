@@ -1,4 +1,4 @@
-import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
+import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';

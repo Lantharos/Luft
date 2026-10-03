@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/shell/osk-layouts">
+  <gresource prefix="/com/lantharos/kestrel/osk-layouts">
     <file>am.json</file>
     <file>ara.json</file>
     <file>at.json</file>

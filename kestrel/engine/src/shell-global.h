@@ -36,7 +36,6 @@ ClutterActor * shell_global_get_window_group (ShellGlobal *global);
 ClutterActor * shell_global_get_top_window_group (ShellGlobal *global);
 
 const char * shell_global_get_datadir (ShellGlobal *global);
-const char * shell_global_get_userdatadir (ShellGlobal *global);
 
 GFile * shell_global_get_automation_script (ShellGlobal *global);
 

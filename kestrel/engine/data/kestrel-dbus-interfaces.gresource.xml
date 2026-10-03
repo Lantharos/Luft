@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/shell/dbus-interfaces">
+  <gresource prefix="/com/lantharos/kestrel/dbus-interfaces">
     <file preprocess="xml-stripblanks">org.freedesktop.bolt1.Device.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.bolt1.Manager.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.DBus.xml</file>
@@ -31,11 +31,11 @@
     <file preprocess="xml-stripblanks">com.lantharos.Settings.NightLight.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.KeyboardLight.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.Rfkill.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.AudioDeviceSelection.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.Brightness.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.Introspect.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.HotplugSniffer.xml</file>
-    <file preprocess="xml-stripblanks">org.gnome.Shell.Screencast.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.AudioDeviceSelection.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Brightness.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Introspect.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.HotplugSniffer.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Screencast.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.Screenshot.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Shell.xml</file>
     <file preprocess="xml-stripblanks">org.Gtk.MountOperationHandler.xml</file>

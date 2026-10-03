@@ -26,7 +26,7 @@
 #include <librsvg/rsvg.h>
 #include <json-glib/json-glib.h>
 
-#define RESOURCE_CURSOR_THEME_URI_BASE "resource:///org/gnome/shell/cursor-theme/"
+#define RESOURCE_CURSOR_THEME_URI_BASE "resource:///com/lantharos/kestrel/cursor-theme/"
 
 #define FALLBACK_THEME_NAME "Adwaita"
 

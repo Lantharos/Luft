@@ -7,12 +7,12 @@
 <node>
 
   <!--
-      org.gnome.Shell.Brightness:
+      com.lantharos.Kestrel.Brightness:
       @short_description: Brightness interface
 
       The interface used to give the shell brightness related information.
   -->
-  <interface name="org.gnome.Shell.Brightness">
+  <interface name="com.lantharos.Kestrel.Brightness">
 
     <!--
         SetDimming:

@@ -351,7 +351,7 @@ class KeyboardModel {
 
     _loadModel(groupName) {
         const file = Gio.File.new_for_uri(
-            `resource:///org/gnome/shell/osk-layouts/${groupName}.json`);
+            `resource:///com/lantharos/kestrel/osk-layouts/${groupName}.json`);
         const [success_, contents] = file.load_contents(null);
 
         const decoder = new TextDecoder();
@@ -827,7 +827,7 @@ const EmojiSelection = GObject.registerClass({
     }
 
     _populateSections() {
-        const file = Gio.File.new_for_uri('resource:///org/gnome/shell/osk-layouts/emoji.json');
+        const file = Gio.File.new_for_uri('resource:///com/lantharos/kestrel/osk-layouts/emoji.json');
         const [success_, contents] = file.load_contents(null);
         const groups = new Map(JSON.parse(new TextDecoder().decode(contents)).map(({group, emoji}) => [group, emoji]));
 
@@ -1239,7 +1239,7 @@ export const Keyboard = GObject.registerClass({
                 this.open(Main.layoutManager.focusIndex);
                 this._showIdleId = 0;
             });
-            GLib.Source.set_name_by_id(this._showIdleId, '[gnome-shell] this.open');
+            GLib.Source.set_name_by_id(this._showIdleId, '[kestrel] this.open');
         }
     }
 
@@ -1582,7 +1582,7 @@ export const Keyboard = GObject.registerClass({
                 this._clearKeyboardRestTimer();
                 this._open();
             });
-        GLib.Source.set_name_by_id(this._keyboardRestingId, '[gnome-shell] this._clearKeyboardRestTimer');
+        GLib.Source.set_name_by_id(this._keyboardRestingId, '[kestrel] this._clearKeyboardRestTimer');
     }
 
     _open() {
@@ -1616,7 +1616,7 @@ export const Keyboard = GObject.registerClass({
                 this._clearKeyboardRestTimer();
                 this._close();
             });
-        GLib.Source.set_name_by_id(this._keyboardRestingId, '[gnome-shell] this._clearKeyboardRestTimer');
+        GLib.Source.set_name_by_id(this._keyboardRestingId, '[kestrel] this._clearKeyboardRestTimer');
     }
 
     _close() {

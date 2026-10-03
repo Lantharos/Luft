@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import NM from 'gi://NM';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import {VpnSecrets} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {VpnSecrets} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {checker, clicker, descendants, labelled} from '../portal/backend.js';
 

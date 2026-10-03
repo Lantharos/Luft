@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 export async function checkQuickTiles({pause, capture, actorNamed, pointer, output}) {
   const require = (condition, label) => {

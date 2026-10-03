@@ -6,14 +6,14 @@ import {loadInterfaceXML} from './fileUtils.js';
 
 const INTROSPECT_DBUS_API_VERSION = 3;
 
-const IntrospectDBusIface = loadInterfaceXML('org.gnome.Shell.Introspect');
+const IntrospectDBusIface = loadInterfaceXML('com.lantharos.Kestrel.Introspect');
 
 export class IntrospectService {
     constructor() {
         this._dbusImpl =
             Gio.DBusExportedObject.wrapJSObject(IntrospectDBusIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/Introspect');
-        Gio.DBus.session.own_name('org.gnome.Shell.Introspect',
+        this._dbusImpl.export(Gio.DBus.session, '/com/lantharos/Kestrel/Introspect');
+        Gio.DBus.session.own_name('com.lantharos.Kestrel.Introspect',
             Gio.BusNameOwnerFlags.REPLACE,
             null, null);
 

@@ -4,13 +4,13 @@
 <node>
 
   <!--
-      org.gnome.Shell.Introspect:
+      com.lantharos.Kestrel.Introspect:
       @short_description: Introspection interface
 
       The interface used to introspect the state of Shell, such as whether
       animations are enabled and the size of the screen.
   -->
-  <interface name="org.gnome.Shell.Introspect">
+  <interface name="com.lantharos.Kestrel.Introspect">
 
     <!--
        AnimationsEnabled:

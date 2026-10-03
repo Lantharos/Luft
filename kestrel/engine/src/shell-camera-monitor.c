@@ -354,7 +354,7 @@ create_pipewire_source (struct pw_loop *pipewire_loop)
   MetaPipeWireSource *pipewire_source;
 
   source = g_source_new (&pipewire_source_funcs, sizeof (MetaPipeWireSource));
-  g_source_set_name (source, "[gnome-shell] PipeWire");
+  g_source_set_name (source, "[kestrel] PipeWire");
 
   pipewire_source = (MetaPipeWireSource *) source;
   pipewire_source->pipewire_loop = pipewire_loop;

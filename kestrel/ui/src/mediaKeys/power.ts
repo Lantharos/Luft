@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
-import { getLoginManager } from 'resource:///org/gnome/shell/misc/loginManager.js';
+import * as SystemActions from 'resource:///com/lantharos/kestrel/misc/systemActions.js';
+import { getLoginManager } from 'resource:///com/lantharos/kestrel/misc/loginManager.js';
 
 const LOGIN = 'org.freedesktop.login1';
 const LOGIN_PATH = '/org/freedesktop/login1';

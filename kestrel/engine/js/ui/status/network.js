@@ -2104,7 +2104,7 @@ class Indicator extends SystemIndicator {
         // with a tethered phone
         // NONE is also possible, with a connection configured to force no default route
         // (but in general we should only prompt a portal if we know there is a portal)
-        if (GLib.getenv('GNOME_SHELL_CONNECTIVITY_TEST') != null)
+        if (GLib.getenv('KESTREL_CONNECTIVITY_TEST') != null)
             isPortal ||= this._client.connectivity < NM.ConnectivityState.FULL;
 
         if (isPortal) {

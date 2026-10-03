@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import type { ButtonInfo, ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import type { ButtonInfo, ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 import { CANCELLED, ENDED, PortalRequest, type Options, type Outcome } from './request.js';
 
 export interface DialogSpec {
@@ -21,8 +21,8 @@ export interface PortalDialog {
 
 export async function openDialog(handle: string, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
   const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
-    import('resource:///org/gnome/shell/ui/dialog.js'),
-    import('resource:///org/gnome/shell/ui/modalDialog.js'),
+    import('resource:///com/lantharos/kestrel/ui/dialog.js'),
+    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
   ]);
   return new Promise(resolve => {
     const modal = new ModalDialog({ styleClass: `kestrel-portal-dialog ${spec.styleClass ?? ''}` });

@@ -80,7 +80,7 @@ export class Catalog {
   private readonly byText = new Map<string, Item>();
 
   constructor() {
-    const file = Gio.File.new_for_uri('resource:///org/gnome/shell/osk-layouts/emoji.json');
+    const file = Gio.File.new_for_uri('resource:///com/lantharos/kestrel/osk-layouts/emoji.json');
     const groups: { group: string; emoji: Entry[] }[] = JSON.parse(new TextDecoder().decode(file.load_contents(null)[1]));
     const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
     for (const [id, title] of EMOJI_TABS) this.section(this.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));

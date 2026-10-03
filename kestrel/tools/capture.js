@@ -2,9 +2,9 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import {checkBackdrops} from './checks/desktop/backdropChecks.js';
 import {checkFolders} from './checks/desktop/folderChecks.js';

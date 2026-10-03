@@ -71,12 +71,12 @@ function startAppForMount(app, mount) {
     return retval;
 }
 
-const HotplugSnifferIface = loadInterfaceXML('org.gnome.Shell.HotplugSniffer');
+const HotplugSnifferIface = loadInterfaceXML('com.lantharos.Kestrel.HotplugSniffer');
 const HotplugSnifferProxy = Gio.DBusProxy.makeProxyWrapper(HotplugSnifferIface);
 function HotplugSniffer() {
     return new HotplugSnifferProxy(Gio.DBus.session,
-        'org.gnome.Shell.HotplugSniffer',
-        '/org/gnome/Shell/HotplugSniffer');
+        'com.lantharos.Kestrel.HotplugSniffer',
+        '/com/lantharos/Kestrel/HotplugSniffer');
 }
 
 class ContentTypeDiscoverer {

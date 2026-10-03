@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gvc from 'gi://Gvc';
 import Shell from 'gi://Shell';
-import { getMixerControl } from 'resource:///org/gnome/shell/ui/status/volume.js';
+import { getMixerControl } from 'resource:///com/lantharos/kestrel/ui/status/volume.js';
 
 import type { Context } from '../context.js';
 
@@ -13,8 +13,8 @@ const PRECISE_STEP = 2;
 const BUILT_IN_PORTS = new Set(['[OUT] Speaker', '[OUT] Handset', 'analog-output-speaker', 'analog-output']);
 const OUTPUT_ICONS = ['audio-volume-muted', 'audio-volume-low', 'audio-volume-medium', 'audio-volume-high', 'audio-volume-overamplified'];
 const INPUT_ICONS = ['microphone-sensitivity-muted', 'microphone-sensitivity-low', 'microphone-sensitivity-medium', 'microphone-sensitivity-high'];
-const SELECTION = 'org.gnome.Shell.AudioDeviceSelection';
-const SELECTION_PATH = '/org/gnome/Shell/AudioDeviceSelection';
+const SELECTION = 'com.lantharos.Kestrel.AudioDeviceSelection';
+const SELECTION_PATH = '/com/lantharos/Kestrel/AudioDeviceSelection';
 const HEADSET_CHOICES: [string, Gvc.HeadsetPortChoice][] = [
   ['headphones', Gvc.HeadsetPortChoice.HEADPHONES],
   ['headset', Gvc.HeadsetPortChoice.HEADSET],

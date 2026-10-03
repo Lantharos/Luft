@@ -2,8 +2,8 @@ import Cairo from 'cairo';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {LockBackdrop} from 'resource:///org/gnome/shell/ui/lockScreen/backdrop.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {LockBackdrop} from 'resource:///com/lantharos/kestrel/ui/lockScreen/backdrop.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 const STORE_WAIT = 4000;
 const LIVE_WAIT = 600;

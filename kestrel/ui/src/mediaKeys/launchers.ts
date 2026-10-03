@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import { spawnCommandLine } from 'resource:///org/gnome/shell/misc/util.js';
+import { spawnCommandLine } from 'resource:///com/lantharos/kestrel/misc/util.js';
 
 import type { Keybindings } from '../context.js';
 

@@ -43,7 +43,7 @@ Run `kestrel/tools/session.sh performance` to measure resident memory and time s
 
 ### Memory pressure
 
-The shell runs with the lowest OOM score and inside the session slice, which Fedora's resource daemon protects from reclaim, so a runaway app cannot push Kestrel out of memory. The installer also links a policy for the user's app slice: when apps spend half their time waiting on memory for ten seconds, or swap is nine-tenths full, systemd-oomd closes the app responsible before the kernel has to step in. The policy applies to every session of the user, including GNOME. When an app is closed this way, or by the kernel, Kestrel shows a notification naming the app and how much memory it had used.
+The shell runs with the lowest OOM score and inside the session slice, which Fedora's resource daemon protects from reclaim, so a runaway app cannot push Kestrel out of memory. The installer also links a policy for the user's app slice: when apps spend half their time waiting on memory for ten seconds, or swap is nine-tenths full, systemd-oomd closes the app responsible before the kernel has to step in. The policy applies to every session of the user, including GNOME. Every app Kestrel starts runs in its own `app-kestrel-<app>-<pid>.scope` in that slice. When an app is closed this way, or by the kernel, Kestrel shows a notification naming the app and how much memory it had used.
 
 The busy pointer after launching an app clears as soon as the app's first window appears, instead of waiting out the launch timeout for apps that never report their startup.
 

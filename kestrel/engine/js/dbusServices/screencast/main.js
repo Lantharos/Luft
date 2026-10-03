@@ -7,7 +7,7 @@ export async function main() {
         return;
 
     const service = new DBusService(
-        'org.gnome.Shell.Screencast',
+        'com.lantharos.Kestrel.Screencast',
         new ScreencastService());
     await service.runAsync();
 }

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Mtk from 'gi://Mtk';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 export async function checkSnapGroups({pause}) {
   const require = (condition, label) => {

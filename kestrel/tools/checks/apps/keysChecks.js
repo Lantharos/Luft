@@ -3,9 +3,9 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import * as IBusManager from 'resource:///org/gnome/shell/misc/ibusManager.js';
-import * as KeyboardManager from 'resource:///org/gnome/shell/misc/keyboardManager.js';
-import {getInputSourceManager} from 'resource:///org/gnome/shell/ui/status/keyboard.js';
+import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
+import * as KeyboardManager from 'resource:///com/lantharos/kestrel/misc/keyboardManager.js';
+import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import {prepareHome} from './home.js';
 import {checkDeadKeys} from './keysDeadKeys.js';

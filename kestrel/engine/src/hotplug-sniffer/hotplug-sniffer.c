@@ -26,12 +26,12 @@
 /* Set the environment variable HOTPLUG_SNIFFER_DEBUG to show debug */
 static void print_debug (const gchar *str, ...);
 
-#define BUS_NAME "org.gnome.Shell.HotplugSniffer"
+#define BUS_NAME "com.lantharos.Kestrel.HotplugSniffer"
 #define AUTOQUIT_TIMEOUT 5
 
 static const gchar introspection_xml[] =
   "<node>"
-  "  <interface name='org.gnome.Shell.HotplugSniffer'>"
+  "  <interface name='com.lantharos.Kestrel.HotplugSniffer'>"
   "    <method name='SniffURI'>"
   "      <arg type='s' name='uri' direction='in'/>"
   "      <arg type='as' name='content_types' direction='out'/>"
@@ -70,7 +70,7 @@ ensure_autoquit_on (void)
   autoquit_id =
     g_timeout_add_seconds_once (AUTOQUIT_TIMEOUT,
                                 autoquit_timeout_cb, NULL);
-  g_source_set_name_by_id (autoquit_id, "[gnome-shell] autoquit_timeout_cb");
+  g_source_set_name_by_id (autoquit_id, "[kestrel] autoquit_timeout_cb");
 }
 
 typedef struct {
@@ -190,7 +190,7 @@ on_bus_acquired (GDBusConnection *connection,
   print_debug ("Connected to the session bus: %s", name);
 
   g_dbus_connection_register_object (connection,
-                                     "/org/gnome/Shell/HotplugSniffer",
+                                     "/com/lantharos/Kestrel/HotplugSniffer",
                                      introspection_data->interfaces[0],
                                      &interface_vtable,
                                      NULL,
@@ -288,7 +288,7 @@ print_debug (const gchar *format, ...)
   s = g_strdup_vprintf (format, ap);
   va_end (ap);
 
-  g_print ("gnome-shell-hotplug-sniffer[%d]: %s.%03d: %s\n",
+  g_print ("kestrel-hotplug-sniffer[%d]: %s.%03d: %s\n",
            pid, timestamp, g_date_time_get_microsecond (now), s);
  out:
   ;

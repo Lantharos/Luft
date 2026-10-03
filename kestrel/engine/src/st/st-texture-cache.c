@@ -232,7 +232,7 @@ st_texture_cache_init (StTextureCache *self)
 {
   self->icon_theme = st_icon_theme_new ();
   st_icon_theme_add_resource_path (self->icon_theme,
-                                   "/org/gnome/shell/icons");
+                                   "/com/lantharos/kestrel/icons");
   g_signal_connect (self->icon_theme, "changed",
                     G_CALLBACK (on_icon_theme_changed), self);
 

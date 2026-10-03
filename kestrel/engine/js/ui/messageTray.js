@@ -1048,7 +1048,7 @@ export class MessageTray extends St.Widget {
             // That gives the user more time to mouse away from the notification and mouse back in in order to expand it.
             const timeout = this._useLongerNotificationLeftTimeout ? LONGER_HIDE_TIMEOUT : HIDE_TIMEOUT;
             this._notificationLeftTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, timeout, this._onNotificationLeftTimeout.bind(this));
-            GLib.Source.set_name_by_id(this._notificationLeftTimeoutId, '[gnome-shell] this._onNotificationLeftTimeout');
+            GLib.Source.set_name_by_id(this._notificationLeftTimeoutId, '[kestrel] this._onNotificationLeftTimeout');
         }
     }
 
@@ -1080,7 +1080,7 @@ export class MessageTray extends St.Widget {
                 GLib.PRIORITY_DEFAULT,
                 LONGER_HIDE_TIMEOUT,
                 this._onNotificationLeftTimeout.bind(this));
-            GLib.Source.set_name_by_id(this._notificationLeftTimeoutId, '[gnome-shell] this._onNotificationLeftTimeout');
+            GLib.Source.set_name_by_id(this._notificationLeftTimeoutId, '[kestrel] this._onNotificationLeftTimeout');
         } else {
             this._notificationLeftTimeoutId = 0;
             this._useLongerNotificationLeftTimeout = false;
@@ -1254,7 +1254,7 @@ export class MessageTray extends St.Widget {
             this._notificationTimeoutId =
                 GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, timeout,
                     this._notificationTimeout.bind(this));
-            GLib.Source.set_name_by_id(this._notificationTimeoutId, '[gnome-shell] this._notificationTimeout');
+            GLib.Source.set_name_by_id(this._notificationTimeoutId, '[kestrel] this._notificationTimeout');
         }
     }
 

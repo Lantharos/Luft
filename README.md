@@ -27,11 +27,21 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `security` | Device trust (Secure Boot signing, TPM disk unlock, device encryption) and USB protection while locked |
 | `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
 
-Kestrel currently boots on a virtual Wayland monitor with its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. The shell runs its own session but still relies on several GNOME settings services and GNOME's portal backend, so this is a working integration checkpoint rather than a distributable desktop session. The remaining work is tracked in [Kestrel's roadmap](kestrel/README.md).
+Kestrel has its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. It runs its own session with its own session manager, settings service, keyring and portal backend, and its own login screen on greetd. What is left before it is a distributable desktop session is tracked in [Kestrel's roadmap](kestrel/README.md#work-before-a-luft-session).
 
 ## Build and capture Kestrel
 
-The engine currently targets Mutter and GNOME Shell 51.0. Install the matching distribution build dependencies, Meson, Ninja, GJS, and Bun. On Fedora, `dnf builddep gnome-shell mutter` supplies the engine and compositor dependencies. The compositor is pinned to the matching 51.0 ABI and built locally; the host compositor is not replaced. Build output stays inside `kestrel/build`, `kestrel/run`, and the chosen installation prefix.
+The engine targets Mutter 51.0, which Kestrel builds itself from its pinned source and patches; the host compositor is not replaced. Install [Bun](https://bun.sh) and, on Fedora, the compositor's and engine's build dependencies plus the Rust toolchain for the settings service, keyring, login screen service and VPN helper:
+
+```bash
+sudo dnf builddep mutter
+sudo dnf install meson ninja-build sassc gjs-devel gtk4-devel at-spi2-atk-devel gsettings-desktop-schemas-devel \
+  json-glib-devel librsvg2-devel glycin-devel libxkbcommon-devel NetworkManager-libnm-devel libsecret-devel \
+  pipewire-devel pulseaudio-libs-devel alsa-lib-devel gstreamer1-devel polkit-devel libxml2-devel \
+  cargo pam-devel tpm2-tss-devel
+```
+
+Build output stays inside `kestrel/build`, `kestrel/run`, and the chosen installation prefix.
 
 ```bash
 cd kestrel/ui

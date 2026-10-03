@@ -23,7 +23,7 @@ Kestrel is Luft's desktop shell. It uses a local Mutter 51 build with native win
 
 ## Runtime scope
 
-The GNOME overview, its app grid, dash, window picker, and search providers are not part of Kestrel, and neither is the GNOME extension system. The Shell D-Bus requests that opened the overview or app grid open Start instead, and a request to focus an app opens Start searching for it. The run dialog, Looking Glass, screen time limits, and parental controls are not part of Kestrel either. The screenshot window picker has its own window layout.
+The GNOME overview, its app grid, dash, window picker, and search providers are not part of Kestrel, and neither is the GNOME extension system. The run dialog, Looking Glass, screen time limits, and parental controls are not part of Kestrel either. The screenshot window picker has its own window layout.
 
 The shell ships Open Runde and registers it for its own UI at startup; applications keep the system fonts. Shell text keeps fractional glyph advances instead of rounding each letter to whole pixels, so spacing matches GTK 4 apps.
 
@@ -91,7 +91,7 @@ Kestrel answers apps' portal requests itself, as described under [Portals](#port
 
 ### Keyring
 
-[Luft Keyring](keyring/README.md) is the session's keyring: it answers apps that store passwords through the Secret Service and the Secret portal, is the session's SSH agent, and opens when you sign in or unlock the screen, with your password or a fingerprint. `kestrel/tools/install.sh install` builds and installs it alongside Kestrel, and `kestrel/keyring/tools/switch.sh on` makes it your keyring in place of GNOME Keyring and oo7; its README explains what that changes and how to go back.
+[Luft Keyring](keyring/README.md) is the session's keyring: it answers apps that store passwords through the Secret Service and the Secret portal, is the session's SSH agent, and opens when you sign in or unlock the screen, with your password or a fingerprint. `kestrel/tools/install.sh install` builds and installs it alongside Kestrel; its README lists what that sets up.
 
 ## Login screen
 
@@ -115,7 +115,7 @@ Each person's own wallpaper appears when they are chosen. Kestrel keeps a copy f
 
 The Login Screen page in Settings chooses between everyone's own wallpaper and one picture for everyone, whether people are listed and who is left out, the session that starts by default, and which account signs in automatically when the computer starts.
 
-The settings are kept by `kestrel-greeter-service`, which answers on the system bus as `com.lantharos.Greeter1`. It starts when it is needed and quits after a minute without requests. Everyone can update their own login wallpaper, the display arrangement and Num Lock without a password while signed in at the computer; everything else asks for an administrator. Wallpapers arrive as open files, never as paths, and are stored as pictures of at most 3840 pixels on the long side in `/var/lib/kestrel-greeter`, which the login screen reads directly. Display arrangements arrive the same way and are kept as `/var/lib/kestrel-greeter/display/monitors.xml`. Automatic login is written as the `initial_session` in greetd's `/etc/greetd/config.toml`, which greetd runs once after each boot. The last session each person used is remembered in AccountsService, the same place GDM kept it, so earlier choices carry over.
+The settings are kept by `kestrel-greeter-service`, which answers on the system bus as `com.lantharos.Greeter1`. It starts when it is needed and quits after a minute without requests. Everyone can update their own login wallpaper, the display arrangement and Num Lock without a password while signed in at the computer; everything else asks for an administrator. Wallpapers arrive as open files, never as paths, and are stored as pictures of at most 3840 pixels on the long side in `/var/lib/kestrel-greeter`, which the login screen reads directly. Display arrangements arrive the same way and are kept as `/var/lib/kestrel-greeter/display/monitors.xml`. Automatic login is written as the `initial_session` in greetd's `/etc/greetd/config.toml`, which greetd runs once after each boot. The last session each person used is remembered in AccountsService.
 
 ### Lock screen
 
@@ -123,37 +123,23 @@ The lock screen checks passwords itself through `kestrel-authenticate`, a small 
 
 When fingers are enrolled, the fingerprint reader listens while the password field is shown. Its instructions appear as a quiet line under the field, a finger it doesn't recognize says so, and a recognized finger unlocks the session just like the right password. Typing a password never waits for the reader, and a wrong password leaves the reader listening. Without a reader or enrolled fingers, the lock screen doesn't mention fingerprints at all.
 
-It works the same under greetd, GDM, or no display manager. greetd runs one session at a time, so the lock screen has no Switch User.
+greetd runs one session at a time, so the lock screen has no Switch User.
 
-### Switching to the Kestrel login screen
+### Setting up the login screen
 
-Install greetd and Kestrel first:
+A fresh Fedora install starts GDM. Install greetd and Kestrel, give greetd Kestrel's configuration, and start greetd in GDM's place. The login screen runs on the seventh virtual terminal, so it never shares one with the text console:
 
 ```bash
 sudo dnf install greetd
 kestrel/tools/install.sh install
-```
-
-Then point greetd at the login screen, keeping its original configuration, and switch display managers. The login screen runs on the seventh virtual terminal, so it never shares one with the text console:
-
-```bash
-sudo cp /etc/greetd/config.toml /etc/greetd/config.toml.orig
 sudo cp /opt/kestrel/share/kestrel/greetd.toml /etc/greetd/config.toml
 sudo systemctl disable gdm && sudo systemctl enable greetd
 systemctl reboot
 ```
 
-To go back to GDM:
+If the login screen doesn't appear, press Ctrl+Alt+F3 for a text console, sign in there, and check `journalctl -b -u greetd` for what went wrong.
 
-```bash
-sudo systemctl disable greetd && sudo systemctl enable gdm
-sudo cp /etc/greetd/config.toml.orig /etc/greetd/config.toml
-systemctl reboot
-```
-
-If the login screen doesn't appear, press Ctrl+Alt+F3 for a text console, sign in there, and run the commands to go back to GDM. If no console answers either, press E on the boot menu entry, add `systemd.unit=multi-user.target` to the end of the line that starts with `linux`, and press Ctrl+X to boot to a text console for this boot only.
-
-### Trying it without switching
+### Testing the login screen
 
 `kestrel/tools/session.sh greeter` runs the login screen in a headless session against a stand-in for greetd with scripted sign-ins (a correct password, a wrong one, notes and warnings along the way, and a second step), stand-ins for the account, login and locale services, and the settings service itself running as a normal user. It checks the people list, password entry, wrong passwords, typed usernames, switching people with their wallpapers and accent colors, the session picker, keyboard layouts, larger text, and power, then signs in and confirms the chosen session starts and is remembered. It saves `login-clock.png`, `login-users.png`, `login-password.png`, `login-wrong-password.png`, `login-switch-user.png`, `login-session-picker.png`, `login-power-menu.png`, and `login-second-factor.png`, and reports the login screen's resident memory and processor use while idle. `kestrel/tools/session.sh capture` runs it after the desktop checks.
 
@@ -224,7 +210,7 @@ Retained dialogs, native menus, switchers, notification banners, volume and brig
 
 The screenshot tool is a single pill-shaped glass bar above the panel: area, screen, and window modes grouped in one pill, the photo and video switch in another, the pointer toggle, a compact capture button, and close, with a tooltip on each. Selection handles are small dots on the selection outline. Apps that ask the desktop to select an area get the same white outline.
 
-Single-row surfaces and controls are pills: the volume and brightness OSD, the workspace switcher, monitor labels, tooltips, text fields, dialog and notification buttons, and session actions. Larger popups use rounder corners: 24px for Start, Quick Settings, notifications, and dialogs, and 18px for menus.
+Single-row surfaces and controls are pills: the volume and brightness OSD, the workspace switcher, tooltips, text fields, dialog and notification buttons, and session actions. Larger popups use rounder corners: 24px for Start, Quick Settings, notifications, and dialogs, and 18px for menus.
 
 Modal dialogs rise in as they open and use a symbolic icon for their purpose above stable, left-aligned headings, with shared action buttons where the default action stands out. Authentication shows a small account row above the password field. Wi-Fi, VPN, keyring, and encrypted-drive forms keep their field labels visible while typing; inputs share the Start menu's glass treatment, caret, selection, and focus styling. Password visibility controls and accessible labels remain available. Audio-device choices use full-width rows. Session warnings and permission dialogs use the same typography and list styling.
 

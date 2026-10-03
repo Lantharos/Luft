@@ -78,8 +78,7 @@ const StreamSlider = GObject.registerClass({
         this.menu.addMenuItem(this._deviceSection);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Sound Settings'),
-            'gnome-sound-panel.desktop');
+        this.menu.addSettingsAction(_('Sound Settings'), 'sound');
 
         this._stream = null;
         this._volumeCancellable = null;

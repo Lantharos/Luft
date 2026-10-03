@@ -286,7 +286,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
         const description = strings.shift() || null;
         super._init({styleClass: 'prompt-dialog'});
 
-        const disksApp = Shell.AppSystem.get_default().lookup_app('org.gnome.DiskUtility.desktop');
+        const disksApp = Shell.AppSystem.get_default().lookup_app('com.lantharos.disks.desktop');
 
         const content = new Dialog.MessageDialogContent({title, description, iconName: 'channel-secure-symbolic'});
 

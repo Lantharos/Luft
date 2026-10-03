@@ -1,6 +1,6 @@
 org.gnome.Epiphany.desktop
 org.gnome.Calendar.desktop
 com.lantharos.rover.desktop
-org.gnome.Software.desktop
+com.lantharos.schelf.desktop
 com.lantharos.draft.desktop
 org.gnome.Calculator.desktop

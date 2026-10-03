@@ -120,8 +120,7 @@ class BluetoothToggle extends QuickMenuToggle {
             GObject.BindingFlags.INVERT_BOOLEAN);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Bluetooth Settings'),
-            'gnome-bluetooth-panel.desktop');
+        this.menu.addSettingsAction(_('Bluetooth Settings'), 'bluetooth');
 
         this._client = client;
 

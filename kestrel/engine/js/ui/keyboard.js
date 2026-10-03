@@ -218,7 +218,7 @@ class LanguageSelectionPopup extends NoGrabPopup {
         }
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        item = this.addSettingsAction(_('Keyboard Settings'), 'gnome-keyboard-panel.desktop');
+        item = this.addSettingsAction(_('Keyboard Settings'), 'keyboard');
         item.can_focus = false;
     }
 }

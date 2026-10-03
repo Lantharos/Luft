@@ -9,6 +9,7 @@ import St from 'gi://St';
 import UPower from 'gi://UPowerGlib';
 
 import * as SystemActions from '../../misc/systemActions.js';
+import * as Util from '../../misc/util.js';
 import * as Main from '../main.js';
 import * as PopupMenu from '../popupMenu.js';
 
@@ -51,9 +52,8 @@ const PowerToggle = GObject.registerClass({
             GObject.BindingFlags.SYNC_CREATE);
 
         this.connect('clicked', () => {
-            const app = Shell.AppSystem.get_default().lookup_app('gnome-power-panel.desktop');
             Main.panel.closeQuickSettings();
-            app.activate();
+            Util.openSettings('power');
         });
 
         Main.sessionMode.connect('updated', () => this._sessionUpdated());

@@ -28,6 +28,7 @@ import {checkInputSources} from './checks/input/inputSourceChecks.js';
 import {checkMediaKeys} from './checks/input/mediaKeyChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
+import {checkSettingsLinks} from './checks/system/settingsLinkChecks.js';
 import {checkSessionManager} from './checks/system/sessionManagerChecks.js';
 import {checkPortal} from './checks/system/portalChecks.js';
 import {checkAppearance} from './checks/system/appearanceChecks.js';
@@ -346,6 +347,7 @@ export async function run() {
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkMediaKeys({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
+  await checkSettingsLinks({pause, actorNamed});
   await checkSessionManager({pause, pointer});
   await checkPortal({pause, capture, output, pointer, keyboard});
   await checkAppearance({pause, capture, output});

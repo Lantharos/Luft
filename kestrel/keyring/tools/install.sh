@@ -30,11 +30,12 @@ install_keyring() {
     exit 1
   fi
   cargo build --release --manifest-path "$keyring_root/Cargo.toml"
-  local built="$keyring_root/target/release" changed=()
-  cmp -s "$built/luft-keyring-unlock" "$prefix/libexec/luft-keyring-unlock" || changed+=(unlock)
-  cmp -s "$built/luft-keyring" "$prefix/libexec/luft-keyring" || changed+=(daemon)
-  sudo install -DZ -m755 "$built/luft-keyring" "$prefix/libexec/luft-keyring"
-  sudo install -DZ -m755 "$built/luft-keyring-unlock" "$prefix/libexec/luft-keyring-unlock"
+  local built="$keyring_root/target/release" changed=() program
+  for program in luft-keyring luft-keyring-unlock; do
+    cmp -s "$built/$program" "$prefix/libexec/$program" && continue
+    sudo install -DZ -m755 "$built/$program" "$prefix/libexec/$program"
+    changed+=("$program")
+  done
   sudo install -DZ -m755 "$built/libpam_luft_keyring.so" "$keyring_pam/pam_luft_keyring.so"
   keyring_system_files | while read -r source target; do
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$target"
@@ -48,8 +49,9 @@ install_keyring() {
 }
 
 restart_keyring() {
-  [[ " $* " == *" unlock "* ]] && sudo systemctl try-restart luft-keyring-unlock.service
-  if [[ " $* " == *" daemon "* || " $* " == *" unlock "* ]] && systemctl --user --quiet is-active luft-keyring.service; then
+  (($#)) || return 0
+  [[ " $* " == *" luft-keyring-unlock "* ]] && sudo systemctl try-restart luft-keyring-unlock.service
+  if systemctl --user --quiet is-active luft-keyring.service; then
     systemctl --user restart luft-keyring.service
     echo "Luft Keyring restarted on its new version; it asks for your password the next time an app needs it."
   fi

@@ -2,9 +2,14 @@
 	import Copy from '@lucide/svelte/icons/copy';
 	import Printer from '@lucide/svelte/icons/printer';
 	import Save from '@lucide/svelte/icons/save';
-	import { printRecoveryKey, problem, saveRecoveryKey } from '../api';
 
-	let { key }: { key: string } = $props();
+	interface Props {
+		key: string;
+		onsave: () => Promise<boolean>;
+		onprint: () => Promise<void>;
+	}
+
+	let { key, onsave, onprint }: Props = $props();
 
 	let done = $state<'saved' | 'printing' | 'copied' | null>(null);
 	let error = $state('');
@@ -17,12 +22,12 @@
 			if (!(await action())) return;
 			done = outcome;
 		} catch (reason) {
-			error = problem(reason);
+			error = reason instanceof Error ? reason.message : String(reason);
 		}
 	}
 
-	const save = () => attempt(() => saveRecoveryKey(key), 'saved');
-	const print = () => attempt(() => printRecoveryKey(key).then(() => true), 'printing');
+	const save = () => attempt(onsave, 'saved');
+	const print = () => attempt(() => onprint().then(() => true), 'printing');
 	const copy = () => attempt(() => navigator.clipboard.writeText(key).then(() => true), 'copied');
 
 	const NOTES = { saved: 'Saved', printing: 'Sent to the printer', copied: 'Copied' };

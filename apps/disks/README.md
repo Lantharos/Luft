@@ -10,6 +10,7 @@ Disks shows the drives in your computer and the ones you plug in, and lets you l
 - Format a partition or a whole drive by what you will use it with: "All computers" gives exFAT, which Windows, Mac and Linux, cameras and TVs read, "Linux only" gives ext4, and Btrfs, NTFS and FAT32 are a choice away. Formatting can overwrite the old data so it can't be recovered
 - New partitions in free space, resizing into the free space after a partition or shrinking a mounted one down to what it holds, and deleting partitions
 - Encrypted partitions: unlock and lock them, change the passphrase, and encrypt a partition while formatting it. Passphrases you choose to remember are kept in Luft Keyring, so unlocking later needs no typing
+- Turn on encryption for any drive or partition the system doesn't need to start, keeping what's on it, the way BitLocker does: a check says whether there's room for it, the recovery key is shown with ways to save, print or copy it, and you choose whether it unlocks automatically on this computer (at startup for drives inside it, as soon as it's plugged in for removable ones) and whether it also takes a passphrase for other computers. It stays usable while it's encrypted in the background, shows its progress in its row, and can be paused and resumed; a restart, unplugging it or a power cut only pauses it. File systems that can't make room, such as a full exFAT stick, can be encrypted by formatting instead, with a clear warning. A partition's Encryption sheet turns unlocking automatically on or off, shows the recovery key this computer keeps or makes a new one, changes the passphrase, and turns encryption off again for drives inside the computer. The work itself happens in the system's device trust service, so it needs the security services installed; unlocking automatically also needs device encryption to be on in Settings
 - Health in plain words for SATA and NVMe drives, such as "Healthy" or "Failing", in one line under the partitions. Clicking it shows the temperature, how long the drive has been running, unreadable sectors, and quick and full self-tests
 - Save a drive or partition as a disk image, and write an image back, with progress. Opening an `.iso` or `.img` file with Disks offers to write it to a drive, which is how you make a bootable USB stick
 - Safely remove USB drives: everything on them is unmounted and locked, then the drive is powered off
@@ -29,7 +30,7 @@ bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
 ```
 
-`kestrel/tools/session.sh capture` opens Disks on a stand-in UDisks with an NVMe system drive, an encrypted hard drive, a failing one and a USB stick, and goes through mounting, formatting, unlocking, new partitions, self-tests, safe removal and disk images without touching a real drive. It also measures a folder it makes in the test home and moves its largest folder to the trash.
+`kestrel/tools/session.sh capture` opens Disks on a stand-in UDisks with an NVMe system drive, an encrypted hard drive, a failing one and a USB stick, and goes through mounting, formatting, unlocking, new partitions, self-tests, safe removal and disk images without touching a real drive. A stand-in device trust service lets it turn on encryption for a partition and unlocking automatically for the encrypted drive, and it measures a folder it makes in the test home and moves its largest folder to the trash.
 
 ## Install
 
@@ -45,7 +46,7 @@ disks/
 │   ├── lib/
 │   │   ├── api.ts            bridge commands and events
 │   │   ├── components/       sidebar, the drive's bar and partition list, actions, and the space map and list
-│   │   ├── dialogs/          details, health, format, new partition, resize, unlock, passphrase, startup and disk image dialogs
+│   │   ├── dialogs/          details, health, encryption, format, new partition, resize, unlock, passphrase, startup and disk image dialogs
 │   │   └── state/            drives, running actions and what's being measured
 │   └── routes/+page.svelte   window layout
 └── desktop/src/
@@ -53,6 +54,7 @@ disks/
     ├── actions/              mounting, formatting, partitions, encryption and drives
     ├── images/               saving and writing disk images
     ├── space/                measuring what's using space, in parallel
+    ├── trust/                encrypting drives through the device trust service
     └── launch.rs             finding the drive for a path given at startup
 ```
 

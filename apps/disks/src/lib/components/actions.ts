@@ -1,6 +1,7 @@
 import * as api from '$lib/api';
 import type { Drive, Segment, Volume } from '$lib/api';
 import { dialogs } from '$lib/dialogs/dialogs.svelte';
+import { changing } from '$lib/encryption.svelte';
 import { inner, volumeName } from '$lib/format';
 import { disks } from '$lib/state/disks.svelte';
 
@@ -50,6 +51,13 @@ export function imageActions(drive: Drive, block: string, name: string): Action[
 	];
 }
 
+function resume(drive: Drive, volume: Volume) {
+	void disks.run(volume.block, async () => {
+		const outcome = await api.trust.resume(volume.uuid, '');
+		if ('wrongKey' in outcome) dialogs.open({ kind: 'encryption', drive, volume });
+	});
+}
+
 export function isProtected(volume: Volume) {
 	return volume.system || Boolean(volume.encryption?.cleartext?.system);
 }
@@ -59,6 +67,8 @@ export function primaryAction(drive: Drive, volume: Volume): Action | null {
 	const mounted = contents.mountPoints.length > 0;
 	if (isProtected(volume) || drive.readOnly) return null;
 	if (volume.encryption && !volume.encryption.cleartext) return { label: 'Unlock', run: () => unlock(volume) };
+	const encryption = disks.encryption(volume);
+	if (encryption && (encryption.state === 'paused' || encryption.state === 'waiting')) return { label: 'Resume', run: () => resume(drive, volume) };
 	if (mounted) return { label: 'Open', run: () => void api.openFolder(contents.mountPoints[0]) };
 	if (contents.usage === 'filesystem') return { label: 'Mount', run: () => act(volume, () => api.mount(contents.block)) };
 	return null;
@@ -88,7 +98,15 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	if (resizable(drive, volume, room)) edit.push({ label: 'Resize…', run: () => dialogs.open({ kind: 'resize', volume, room }) });
 
 	const encryption: Action[] = [];
-	if (volume.encryption) {
+	const progress = disks.encryption(volume);
+	if (disks.protection.available && volume.encryption) {
+		encryption.push({ label: 'Encryption…', run: () => dialogs.open({ kind: 'encryption', drive, volume }) });
+		if (progress?.state === 'encrypting' || progress?.state === 'decrypting') {
+			encryption.push({ label: 'Pause', run: () => act(volume, () => api.trust.pause(volume.uuid)) });
+		}
+	} else if (disks.protection.available && (filesystem || !contents.usage) && !changing(progress)) {
+		encryption.push({ label: 'Turn on encryption…', run: () => dialogs.open({ kind: 'encrypt', drive, volume }) });
+	} else if (volume.encryption) {
 		encryption.push({ label: 'Change passphrase…', run: () => dialogs.open({ kind: 'passphrase', volume }) });
 		if (remembered) encryption.push({ label: 'Forget saved passphrase', run: () => act(volume, () => api.forgetPassphrase(volume.block)) });
 	}

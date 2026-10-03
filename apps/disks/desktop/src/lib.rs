@@ -3,6 +3,7 @@ mod bridge;
 mod images;
 mod launch;
 mod space;
+mod trust;
 mod udisks;
 
 use luft_app::GlassWindow;
@@ -20,6 +21,9 @@ pub fn run() -> ! {
     luft_app::run(
         &state.events,
         |window| bridge::register(GLASS_WINDOW.apply(window), &state),
-        udisks::watch::start,
+        |events| {
+            udisks::watch::start(events.clone());
+            trust::watch(events);
+        },
     )
 }

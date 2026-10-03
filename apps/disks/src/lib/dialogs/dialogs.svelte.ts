@@ -16,7 +16,11 @@ export type OpenDialog =
 	| { kind: 'details'; drive: Drive; volume: Volume }
 	| { kind: 'drive'; drive: Drive }
 	| { kind: 'health'; drive: Drive }
-	| { kind: 'trash'; path: string[]; name: string; size: number; folder: boolean };
+	| { kind: 'trash'; path: string[]; name: string; size: number; folder: boolean }
+	| { kind: 'encrypt'; drive: Drive; volume: Volume }
+	| { kind: 'encryption'; drive: Drive; volume: Volume }
+	| { kind: 'turn-off'; volume: Volume }
+	| { kind: 'recovery-key'; key: string; name: string };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);

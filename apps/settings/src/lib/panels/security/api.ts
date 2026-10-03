@@ -33,7 +33,15 @@ export interface Disk {
 	tpmRefused: boolean;
 }
 
+export interface Drives {
+	available: boolean;
+	count: number;
+	autoUnlock: number;
+	changing: { change: '' | 'encrypt' | 'decrypt'; state: string; progress: number } | null;
+}
+
 export interface Trust {
+	drives: Drives;
 	secureBoot: SecureBoot;
 	tpm: Tpm;
 	signingKey: SigningKey;

@@ -7,11 +7,13 @@ import {LuftApp, sleep, waitFor} from './luftApp.js';
 const LOADING = 800;
 const CHECKS = 'com.lantharos.KestrelChecks';
 const AT = {
-  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 459], save: [698, 472], done: [1001, 310],
-  format: [900, 550], erase: [660, 507], safelyRemove: [943, 85],
+  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 510], save: [698, 472], done: [1001, 310],
+  format: [900, 601], erase: [660, 507], safelyRemove: [943, 85],
   wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [974, 275], create: [692, 574],
   health: [600, 360], quickTest: [327, 496], firstDrive: [560, 338], next: [686, 465], write: [666, 419],
   largest: [1009, 467], trash: [860, 565], confirmTrash: [671, 417],
+  turnOn: [885, 448], checked: [755, 458], saved: [292, 457], keySaved: [755, 509], unlocking: [755, 452], encrypt: [759, 458],
+  encryption: [885, 459], autoUnlock: [772, 316],
 };
 
 function systemCalls() {
@@ -131,6 +133,27 @@ async function checkHealth(driver, {require, output}) {
   require(await driver.called(['udisks SelftestStart short Seagate_Barracuda'], 'testing'), 'disks starts a quick self-test on a failing drive');
 }
 
+async function checkEncryption(driver, {require, output}) {
+  await driver.click('seagate');
+  await driver.click('more');
+  (await driver.click('turnOn')).save(`${output}/disks-encrypt-dark.png`);
+  await driver.click('checked');
+  await driver.click('saved');
+  await driver.click('keySaved');
+  await driver.click('unlocking');
+  await driver.click('encrypt');
+  require(await driver.called(['Check /dev/sdc1', 'Encrypt /dev/sdc1 auto=true passphrase=false'], 'encrypting'),
+    'disks encrypts a partition in place, unlocking automatically on this computer');
+  (await driver.shown('encrypting')).save(`${output}/disks-encrypting-dark.png`);
+
+  await driver.click('wdc');
+  await driver.click('more');
+  (await driver.click('encryption')).save(`${output}/disks-encryption-dark.png`);
+  await driver.click('autoUnlock');
+  require(await driver.called(['SetUpUnlocking /dev/sda1 auto=true recovery=false'], 'unlocking automatically'),
+    'disks lets an encrypted drive unlock automatically on this computer');
+}
+
 async function checkWriteImage(image, {styles, require, output, pointer}) {
   const app = new LuftApp('disks', [image]);
   try {
@@ -222,6 +245,7 @@ export async function checkDisks(context) {
     image = await checkRemovable(driver, context);
     await checkEncrypted(driver, context);
     await checkHealth(driver, context);
+    await checkEncryption(driver, context);
   } finally {
     await app.close();
   }

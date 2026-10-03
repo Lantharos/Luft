@@ -2192,6 +2192,7 @@ dependencies = [
  "dirs",
  "gio",
  "gio-unix",
+ "libc",
  "sabine",
  "serde",
  "serde_json",

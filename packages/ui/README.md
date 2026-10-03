@@ -88,6 +88,7 @@ $effect(() => {
 | `MediaControls` | Play, position, time and volume in one bar for a video or audio element; bind `paused`, `currentTime`, `muted` and `volume`, pass `buffered` to show what has loaded, a `preview` snippet to show something above the position under the pointer, and children for extra buttons at the end |
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own, for players with their own layout. `SeekBar` reports every position while dragging through `onseek`, and `onscrub` says when dragging starts and stops |
 | `NativeVideoSurface` | Plays `src` through Sabine's native video, for formats Chromium can't decode, and fills its own box with it. Bind `player` to control playback, pass `cutout` when opaque content lies beneath, and handle `onfail` |
+| `RecoveryKey` | A recovery key in groups of eight, with saving to a file, printing and copying; the app passes `onsave` and `onprint` |
 | `GlassShell`, `WindowControls` | Window body and title bar buttons |
 
 `formatClock(seconds)` turns a duration into `1:05` or `1:02:05`.

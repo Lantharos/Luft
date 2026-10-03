@@ -1,5 +1,7 @@
 import GLib from 'gi://GLib';
 
+import {DRIVES, drivesService} from './drives.js';
+
 const TRUST = `<node><interface name="com.lantharos.Trust1">
   <property name="SecureBoot" type="s" access="read"/>
   <property name="Tpm" type="a{sv}" access="read"/>
@@ -52,7 +54,7 @@ const attribute = (id, summary, level, flags) => ({
 
 export const SECURITY_NAMES = ['com.lantharos.Trust1', 'com.lantharos.UsbProtection1', 'org.freedesktop.fwupd'];
 
-export function publishSecurity(publish, calls) {
+export function publishSecurity(publish, calls, model) {
   publish(TRUST, {
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
@@ -79,6 +81,8 @@ export function publishSecurity(publish, calls) {
     InstallSignedStartup: () => calls.push('InstallSignedStartup'),
     StartupFinished: () => {},
   }, '/com/lantharos/Trust1');
+  const drives = drivesService(calls, model, RECOVERY_KEY);
+  drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));
 
   publish(USB_PROTECTION, {
     Enabled: true,

@@ -160,6 +160,36 @@ export class Model {
     if (!block.encrypted) throw new Failure('NotSupported', 'Not encrypted');
     if (block.encrypted.cleartext !== '/') throw new Failure('AlreadyUnlocked', `${block.device} is already unlocked`);
     if (passphrase !== block.encrypted.passphrase) throw new Failure('Failed', 'Error unlocking: Failed to activate device: Operation not permitted');
+    return this._open(block);
+  }
+
+  byDevice(device) {
+    const block = [...this.blocks.values()].find(candidate => candidate.device === device);
+    if (!block) throw new Failure('NotFound', `No block device ${device}`);
+    return block;
+  }
+
+  encryptInPlace(device, passphrase) {
+    const block = this.byDevice(device);
+    this._busy(block);
+    const inner = {IdType: block.IdType, IdLabel: block.IdLabel, IdUUID: block.IdUUID};
+    Object.assign(block, {IdUsage: 'crypto', IdType: 'crypto_LUKS', IdVersion: '2', IdUUID: uuid(), mountPoints: null});
+    block.encrypted = {passphrase, cleartext: '/', inner};
+    this.changed(block.path);
+    this._open(block);
+    return block.IdUUID;
+  }
+
+  decryptInPlace(device) {
+    const block = this.byDevice(device);
+    const clear = this.blocks.get(block.encrypted?.cleartext);
+    if (clear) this._remove(clear.path);
+    Object.assign(block, {IdUsage: 'filesystem', IdVersion: '1.0', encrypted: null, mountPoints: clear?.mountPoints ?? [], ...block.encrypted?.inner});
+    this.changed(block.path);
+  }
+
+  _open(block) {
+    const path = block.path;
     const clear = this._block(`dm_2d${this._mappers++}`, block.size - 16 * MiB, '/',
       {cryptoBacking: path, IdUsage: 'filesystem', ...block.encrypted.inner});
     clear.device = `/dev/dm-${this._mappers - 1}`;

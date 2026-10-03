@@ -1,7 +1,6 @@
 mod hsi;
 mod properties;
 mod recovery;
-mod sheet;
 mod trust;
 mod usb;
 

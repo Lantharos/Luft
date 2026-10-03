@@ -35,6 +35,8 @@ export { default as NativeVideoSurface } from './playback/NativeVideoSurface.sve
 export { default as SeekBar } from './playback/SeekBar.svelte';
 export { default as VolumeControl } from './playback/VolumeControl.svelte';
 
+export { default as RecoveryKey } from './security/RecoveryKey.svelte';
+
 export { default as GlassShell } from './shell/GlassShell.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
 

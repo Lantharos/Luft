@@ -9,6 +9,8 @@ pub mod fonts;
 pub mod ibus;
 mod kestrel;
 pub mod portal;
+#[cfg(feature = "recovery")]
+pub mod recovery;
 pub mod secrets;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;

@@ -63,7 +63,6 @@ export interface Keyring {
 	itemCount: number;
 	chip: Chip;
 	lockWithScreen: boolean;
-	pendingImports: string[];
 	access: Access | null;
 	ssh: Ssh | null;
 }
@@ -77,7 +76,6 @@ export const lock = () => invoke<void>('keyring_lock');
 export const unlock = () => invoke<boolean>('keyring_unlock', {}, WAIT_FOR_PROMPT);
 export const setPin = (enabled: boolean) => invoke<boolean>('keyring_set_pin', { enabled }, WAIT_FOR_PROMPT);
 export const reseal = () => invoke<void>('keyring_reseal', {}, WAIT_FOR_PROMPT);
-export const importKeyring = (name: string) => invoke<boolean>('keyring_import', { name }, WAIT_FOR_PROMPT);
 export const setLockWithScreen = (enabled: boolean) => invoke<void>('keyring_lock_with_screen', { enabled });
 
 export const revoke = (app: string, item: string) => invoke<void>('keyring_revoke', { app, item });

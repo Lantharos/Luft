@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section, Switch } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
-	import { importKeyring, lock, reseal, setLockWithScreen, setPin, unlock, type Keyring } from './api';
+	import { lock, reseal, setLockWithScreen, setPin, unlock, type Keyring } from './api';
 	import { askedApps, contents, protection, sealed } from './describe';
 	import { Runner } from './runner.svelte';
 
@@ -58,11 +58,6 @@
 			onchange={(enabled) => runner.run(() => setLockWithScreen(enabled))}
 		/>
 	</Row>
-	{#each keyring.pendingImports as name (name)}
-		<Row title="Bring in “{name}”" description="An older keyring with its own password">
-			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(() => importKeyring(name))}>Bring in</button>
-		</Row>
-	{/each}
 	{#if access && (access.apps.length || access.stores.length || access.history.length)}
 		<Row
 			title="Apps with access"

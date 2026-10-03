@@ -58,7 +58,7 @@ SushiBoot has no command line editor, and with Secure Boot on it never hands a c
 
 ### Starting without GRUB and GNOME's services
 
-Once the signed startup has started the computer and Kestrel is your desktop, GRUB can go, together with the GNOME services Kestrel replaces (Mutter, gnome-settings-daemon, the GNOME and GTK portals, GNOME Keyring and oo7):
+The last step of setting up Luft on a fresh Fedora install removes GRUB and the GNOME services Kestrel replaces (Mutter, gnome-settings-daemon, the GNOME and GTK portals, GNOME Keyring and oo7). Once the signed startup has started the computer and Kestrel is your desktop, run:
 
 ```bash
 security/scripts/remove-grub-and-gnome.sh

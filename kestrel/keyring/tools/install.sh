@@ -9,15 +9,13 @@ keyring_system_files() {
   echo "pam/kestrel-unlock-fingerprint /etc/pam.d/kestrel-unlock-fingerprint"
 }
 
-keyring_staged_files() {
-  echo "user/luft-keyring.service lib/systemd/user/luft-keyring.service"
-  echo "user/luft-keyring.socket lib/systemd/user/luft-keyring.socket"
-  echo "user/gnome-keyring-autostart.conf lib/systemd/user/gnome-keyring-autostart.conf"
-  echo "dbus/org.freedesktop.secrets.service share/dbus-1/services/org.freedesktop.secrets.service"
-  echo "dbus/com.lantharos.Keyring1.service share/dbus-1/services/com.lantharos.Keyring1.service"
-  echo "dbus/luft-keyring.portal share/xdg-desktop-portal/portals/luft-keyring.portal"
-  echo "pam/greetd share/luft-keyring/greetd"
-  echo "selinux/luft-keyring.cil share/luft-keyring/luft-keyring.cil"
+keyring_user_files() {
+  echo "user/luft-keyring.service /usr/local/lib/systemd/user/luft-keyring.service"
+  echo "user/luft-keyring.socket /usr/local/lib/systemd/user/luft-keyring.socket"
+  echo "dbus/org.freedesktop.secrets.service /usr/local/share/dbus-1/services/org.freedesktop.secrets.service"
+  echo "dbus/com.lantharos.Keyring1.service /usr/local/share/dbus-1/services/com.lantharos.Keyring1.service"
+  echo "dbus/luft-keyring.portal /usr/local/share/xdg-desktop-portal/portals/luft-keyring.portal"
+  echo "pam/greetd /etc/pam.d/greetd"
 }
 
 gnupg_agent_conf=/etc/gnupg/gpg-agent.conf
@@ -50,16 +48,20 @@ install_keyring() {
   done
   cmp -s "$built/luft-pinentry" "$prefix/libexec/luft-pinentry" || sudo install -DZ -m755 "$built/luft-pinentry" "$prefix/libexec/luft-pinentry"
   sudo install -DZ -m755 "$built/libpam_luft_keyring.so" "$keyring_pam/pam_luft_keyring.so"
-  keyring_system_files | while read -r source target; do
+  { keyring_system_files; keyring_user_files; } | while read -r source target; do
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$target"
   done
-  keyring_staged_files | while read -r source target; do
-    keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$prefix/$target"
-  done
+  sudo semodule -i "$keyring_data/selinux/luft-keyring.cil"
+  if command -v authselect >/dev/null && ! authselect current 2>/dev/null | grep -q with-fingerprint; then
+    sudo authselect enable-feature with-fingerprint
+  fi
   sudo systemctl daemon-reload
+  sudo systemctl enable --now luft-keyring-unlock.socket
+  sudo restorecon -R /run/luft-keyring
+  sudo systemctl --global enable luft-keyring.socket luft-keyring.service
+  systemctl --user daemon-reload
   use_luft_pinentry
   restart_keyring "${changed[@]}"
-  echo "Luft Keyring is installed; kestrel/keyring/tools/switch.sh on makes it your keyring."
 }
 
 restart_keyring() {
@@ -72,7 +74,10 @@ restart_keyring() {
 }
 
 remove_keyring() {
-  keyring_system_files | while read -r _ target; do sudo rm -f "$target"; done
+  sudo systemctl --global disable luft-keyring.socket luft-keyring.service || true
+  sudo systemctl disable --now luft-keyring-unlock.socket || true
+  sudo semodule -r luft-keyring 2>/dev/null || true
+  { keyring_system_files; keyring_user_files; } | grep -v ' /etc/pam.d/greetd$' | while read -r _ target; do sudo rm -f "$target"; done
   [[ "$(cat "$gnupg_agent_conf" 2>/dev/null)" == "pinentry-program $prefix/libexec/luft-pinentry" ]] && sudo rm "$gnupg_agent_conf"
   sudo rm -f "$keyring_pam/pam_luft_keyring.so"
   sudo systemctl daemon-reload

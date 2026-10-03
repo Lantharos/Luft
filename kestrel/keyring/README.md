@@ -1,6 +1,6 @@
 # Luft Keyring
 
-Luft Keyring keeps your passwords, tokens and keys. Apps reach it the same way they reached GNOME Keyring, through the Secret Service on the session bus and the Secret portal for sandboxed apps, so they keep working without changes. Signing in unlocks it, including with a fingerprint, and you are never asked for a second password or PIN when the computer can vouch for you on its own.
+Luft Keyring keeps your passwords, tokens and keys. Apps reach it through the Secret Service on the session bus and the Secret portal for sandboxed apps, the same interfaces every Linux keyring offers, so they work with it without changes. Signing in unlocks it, including with a fingerprint, and you are never asked for a second password or PIN when the computer can vouch for you on its own.
 
 | Part | What it is |
 | --- | --- |
@@ -11,7 +11,7 @@ Luft Keyring keeps your passwords, tokens and keys. Apps reach it the same way t
 | `wire` | The messages the three programs exchange |
 | `pinentry` | `luft-pinentry`, which asks for GnuPG's passphrases and PINs through Kestrel |
 | `data` | Units, D-Bus and portal files, and the sign-in rules |
-| `tools` | Installing, switching over, and the tests |
+| `tools` | Installing and the tests |
 
 ## How your secrets are protected
 
@@ -37,7 +37,7 @@ Signing in or unlocking the screen runs the system's normal sign-in rules first,
 
 The lock screen asks for the password and listens for a fingerprint at the same time, each in its own conversation, so you never wait for one to type the other. When there's nothing the chip can vouch for, the keyring asks once with a calm prompt instead of staying locked:
 
-- **No usable security chip** (none, TPM 1.2, turned off in the firmware, failing its self-test, or no SHA-256 PCR bank). The keyring works exactly like GNOME Keyring: your password unlocks it at sign-in. After a fingerprint-only sign-in it asks for the password once. Fingerprint unlock and chip-held SSH keys are off, and Settings says why.
+- **No usable security chip** (none, TPM 1.2, turned off in the firmware, failing its self-test, or no SHA-256 PCR bank). Your password unlocks the keyring at sign-in. After a fingerprint-only sign-in it asks for the password once. Fingerprint unlock and chip-held SSH keys are off, and Settings says why.
 - **The startup changed** (a Secure Boot key or revocation list was updated, the chip was cleared, or the chip went away). The chip refuses to unseal, the password wrap opens the keyring, and as soon as it's open the keyring seals a fresh key for the new state. The next fingerprint works again.
 - **A PIN is set.** After a fingerprint the keyring asks for the PIN; after too many wrong PINs it asks for the password.
 
@@ -78,14 +78,13 @@ When an app is recognized better than before, for example after it gets a launch
 
 An app may always use what it saved itself. Anything else needs your permission: the keyring reports those items as locked to that app, and when it asks to unlock them, Kestrel shows "Allow Firefox to use “github.com”?" with the choice to remember it. Choices you remember are kept in the vault, listed in Settings under Apps with access, and can be taken back there.
 
-Items brought in from GNOME Keyring or oo7 don't know who saved them, so they go to the first app that uses them, with two exceptions:
+Some items name the app they belong to. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`.
 
-- **Items that name their app** go only to that app. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`, and only an app with that name, by launcher entry, Flatpak ID or program, takes it. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`, so any Chromium-based browser can take those. Every other app is asked.
-- **Keyring tools never take items.** `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens.
+Keyring tools never take items. `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens, and the first app with that name, by launcher entry, Flatpak ID or program, takes it without being asked; any Chromium-based browser can take a `chromium` item. Every other app is asked.
 
 Passphrases of encrypted drives are shared between the two things that unlock drives: the desktop, which asks for one when an encrypted drive is plugged in and keeps it through GVfs when Remember Password is ticked, and Disks. Both keep them the way GVfs always has, under the `gvfs-luks-uuid` attribute with the drive's UUID, and either may use the ones the other saved, so a passphrase remembered in one place unlocks the drive in both without asking.
 
-Secrets that sandboxed apps keep through the Secret portal are never shown to other apps. A Flatpak gets the same portal secret it got from GNOME Keyring or oo7, because those items are brought in unchanged and looked up the same way, by the app's ID.
+Secrets that sandboxed apps keep through the Secret portal are never shown to other apps.
 
 Settings shows which app read, saved, deleted or was refused what, and when.
 
@@ -119,7 +118,7 @@ The keyring is an SSH agent on `$XDG_RUNTIME_DIR/luft-keyring/ssh`, and Kestrel 
 
 ## GnuPG
 
-`luft-pinentry` is GnuPG's pinentry for Kestrel: gpg-agent starts it whenever it needs a passphrase or a smart card PIN, and it asks through the same Kestrel prompts as the keyring, with GnuPG's own description of the key, a second field when a new passphrase is chosen, GnuPG's rating of a new passphrase as it's typed, and confirmations and messages. Save in your keyring keeps the passphrase in the keyring the way GnuPG's GNOME pinentry did, under the `org.gnupg.Passphrase` schema and the key's keygrip, so passphrases saved before carry over and the next time the key is used nothing is asked. A wrong saved passphrase is only tried once: GnuPG then asks, and saving the new one replaces it. Outside a Kestrel session, for example on a text console or in another desktop, it hands over to the system's `pinentry`.
+`luft-pinentry` is GnuPG's pinentry for Kestrel: gpg-agent starts it whenever it needs a passphrase or a smart card PIN, and it asks through the same Kestrel prompts as the keyring, with GnuPG's own description of the key, a second field when a new passphrase is chosen, GnuPG's rating of a new passphrase as it's typed, and confirmations and messages. Save in your keyring keeps the passphrase in the keyring under the `org.gnupg.Passphrase` schema and the key's keygrip, the way GnuPG's other pinentries do, so the next time the key is used nothing is asked. A wrong saved passphrase is only tried once: GnuPG then asks, and saving the new one replaces it. Outside a Kestrel session, for example on a text console or in another desktop, it hands over to the system's `pinentry`.
 
 `kestrel/tools/install.sh install` installs it as `/opt/kestrel/libexec/luft-pinentry` and, when the computer has no `/etc/gnupg/gpg-agent.conf` yet, creates one that points gpg-agent at it for every account. When that file already exists it's left alone and the installer says which line to add. A `pinentry-program` line in your own `~/.gnupg/gpg-agent.conf` still wins; remove it, then run `gpgconf --reload gpg-agent`, to use Kestrel's prompts.
 
@@ -133,54 +132,27 @@ The vault crate holds the file format and the data every part of the keyring sha
 - `prompter` shows Kestrel's prompts, and `unlocking::authenticate` asks for a fingerprint through the lock screen's sign-in rules, so the check is made by root, not by the keyring.
 - `unlocking::link` creates and uses keys that live in the security chip.
 
-## Bringing in GNOME Keyring and oo7
+## Installing
 
-The first time the keyring is opened with your password it reads every keyring in `~/.local/share/keyrings`, GNOME Keyring's own files and oo7's `v1` files, and copies their items in with their labels, attributes and dates. When two files hold the same item, the most recently changed file wins. A keyring that was locked with a different password is listed in Settings, where you can bring it in with its own password. The old files are only read, never changed or removed.
-
-## Installing and switching over
-
-`kestrel/tools/install.sh install` builds the keyring with Kestrel (it needs `tpm2-tss-devel` to build) and installs:
+`kestrel/tools/install.sh install` builds the keyring with Kestrel (it needs `tpm2-tss-devel` to build), makes it your keyring and installs:
 
 - `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`
 - `/etc/gnupg/gpg-agent.conf`, pointing gpg-agent at `luft-pinentry`, unless the file already exists
 - `pam_luft_keyring.so` in `/usr/local/lib64/security`
-- the unlock service's socket and unit in `/usr/local/lib/systemd/system`
+- the unlock service's socket and unit in `/usr/local/lib/systemd/system`, and starts it
+- the keyring's user units, its D-Bus activation files and its portal under `/usr/local`, with the units turned on for every user
 - the lock screen's `kestrel-unlock` and `kestrel-unlock-fingerprint` sign-in rules in `/etc/pam.d`
+- the login screen's `greetd` sign-in rules in `/etc/pam.d/greetd`, which take the place of the packaged ones in `/usr/lib/pam.d/greetd`
+- a small SELinux module that lets the login screen reach the unlock service's socket and nothing more
 
-At that point nothing has changed yet. To make Luft Keyring your keyring, read through `kestrel/keyring/tools/switch.sh` and run:
+It also turns on fingerprint sign-in through `authselect enable-feature with-fingerprint`, which makes `sudo`, polkit and the login screen offer a fingerprint whenever one is enrolled; the password always stays available.
 
-```bash
-kestrel/keyring/tools/switch.sh on
-```
+Sign out and sign in with your password once; that sets up the keyring and seals it to the security chip. From then on a fingerprint unlocks everything.
 
-It asks for your password through `sudo` and then:
-
-1. Installs the keyring's user units, its D-Bus activation files and its portal.
-2. Keeps GNOME Keyring's autostart entries out of Kestrel sessions.
-3. Puts the login screen's `greetd` sign-in rules in `/etc/pam.d/greetd`, which replace the packaged ones in `/usr/lib/pam.d/greetd` without `pam_gnome_keyring` and `pam_oo7`, keeping any earlier `/etc/pam.d/greetd` as `/etc/pam.d/greetd.before-luft-keyring`.
-4. Adds a small SELinux module that lets the login screen reach the unlock service's socket and nothing more.
-5. Turns on fingerprint sign-in through `authselect enable-feature with-fingerprint`, which makes `sudo`, polkit and the login screen offer a fingerprint whenever one is enrolled; the password always stays available.
-6. Starts the unlock service.
-
-Sign out and sign in with your password once; that brings in your old keyrings and seals the keyring to the security chip. From then on a fingerprint unlocks everything. When you're happy with it, the oo7 and GNOME Keyring sign-in pieces can go:
-
-```bash
-sudo dnf remove pam_oo7 oo7-portal oo7-daemon gnome-keyring-pam
-```
-
-`gnome-keyring` itself stays installed but idle in Kestrel. `security/scripts/remove-grub-and-gnome.sh` removes it together with the other GNOME services Kestrel replaces; `NetworkManager-vpnc-gnome` goes with it, and niri loses its keyring.
-
-To go back, `kestrel/keyring/tools/switch.sh off` restores the previous login rules, removes the keyring's activation files and SELinux module, and stops the unlock service. GNOME Keyring takes over again after you sign out and back in, with its own files exactly as they were. Your Luft Keyring stays in `~/.local/share/luft-keyring`.
+`kestrel/tools/install.sh remove` takes all of it out again except `/etc/pam.d/greetd`, which skips the keyring's line once its module is gone. Your keyring stays in `~/.local/share/luft-keyring`.
 
 ## Testing
 
 - `cargo test` covers the vault format and, against a throwaway `swtpm`, sealing, PIN lockout, Secure Boot changes and chip-held signing keys.
-- `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` runs the keyring on a private session bus with a scratch home and a stand-in for Kestrel's prompts. It runs in its own user and mount namespace where `/run` holds nothing but your runtime folder, so the keyring under test never reaches the computer's unlock service, sign-in checks or fingerprint reader. It brings in keyrings made by real GNOME Keyring and oo7, kept in `tools/session/fixtures`, then checks `secret-tool`, per-app access, locking, apps' own secrets, the portal and the SSH agent with `ssh-add` and `ssh-keygen -Y sign`, and that apps keep their items when they update, move or run as AppImages. Apps started from a launcher entry run in scopes of your user manager through `systemd-run --user`.
-- The old keyrings hold GitHub, Wi-Fi and Parley Safe Storage items from GNOME Keyring and a Mail item from oo7, all under the password `correct horse`, plus an oo7 `Work` keyring with a VPN item under `work pass`. To make them again, unpack Fedora's packages into a scratch folder without installing them and let `make.py` drive both daemons on a private bus:
-
-  ```sh
-  dnf download --destdir "$scratch" gnome-keyring oo7-daemon
-  (cd "$scratch" && for package in *.rpm; do rpm2cpio "$package" | cpio -idm; done)
-  dbus-run-session -- python3 tools/session/fixtures/make.py "$scratch/usr/bin/gnome-keyring-daemon" "$scratch/usr/libexec/oo7-daemon"
-  ```
+- `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` runs the keyring on a private session bus with a scratch home and a stand-in for Kestrel's prompts. It runs in its own user and mount namespace where `/run` holds nothing but your runtime folder, so the keyring under test never reaches the computer's unlock service, sign-in checks or fingerprint reader. It sets up a new keyring the way a first sign-in does, stores items from `secret-tool` and other programs, then checks per-app access, locking, apps' own secrets, the portal and the SSH agent with `ssh-add` and `ssh-keygen -Y sign`, and that apps keep their items when they update, move or run as AppImages. Apps started from a launcher entry run in scopes of your user manager through `systemd-run --user`.
 - `tools/vm/build.sh` builds a small Fedora machine with the keyring, the lock screen's authentication service and a stand-in fingerprint reader. `tools/vm/run.sh tpm` then signs in through greetd with a password and with a fingerprint against a software TPM, unlocks through the lock screen's socket, uses `sudo`, changes the Secure Boot state, and sets and uses a PIN. `run.sh gone` boots the same disk without the chip and `run.sh none` starts fresh without one. SELinux is enforcing throughout and every denial fails the run.

@@ -25,9 +25,9 @@ pub trait DisplayConfig {
 }
 
 #[proxy(
-    interface = "org.gnome.Shell.Brightness",
-    default_service = "org.gnome.Shell.Brightness",
-    default_path = "/org/gnome/Shell/Brightness"
+    interface = "com.lantharos.Kestrel.Brightness",
+    default_service = "com.lantharos.Kestrel.Brightness",
+    default_path = "/com/lantharos/Kestrel/Brightness"
 )]
 pub trait ShellBrightness {
     fn set_dimming(&self, enable: bool) -> zbus::Result<()>;

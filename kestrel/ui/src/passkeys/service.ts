@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import { LIBEXECDIR } from 'resource:///org/gnome/shell/misc/config.js';
+import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Context } from '../context.js';
 import type { Account, Purpose, Request } from './copy.js';

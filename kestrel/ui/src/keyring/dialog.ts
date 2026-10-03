@@ -1,9 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { CheckBox } from 'resource:///org/gnome/shell/ui/checkBox.js';
-import { MessageDialogContent } from 'resource:///org/gnome/shell/ui/dialog.js';
-import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import { CheckBox } from 'resource:///com/lantharos/kestrel/ui/checkBox.js';
+import { MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
+import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 
 import { appIcon } from '../appearance/icons/appIcons.js';
 import { PasswordForm, feedbackLabel, showText, type PasswordEvents, type ShellEntryModule } from './passwordForm.js';
@@ -29,8 +29,8 @@ let modules: Promise<DialogModules> | null = null;
 
 export function loadDialogModules(): Promise<DialogModules> {
   modules ??= Promise.all([
-    import('resource:///org/gnome/shell/ui/modalDialog.js'),
-    import('resource:///org/gnome/shell/ui/shellEntry.js'),
+    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
+    import('resource:///com/lantharos/kestrel/ui/shellEntry.js'),
   ]).then(([{ ModalDialog }, shellEntry]) => ({ ModalDialog, shellEntry }));
   return modules;
 }

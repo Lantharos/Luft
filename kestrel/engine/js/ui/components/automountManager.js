@@ -39,7 +39,7 @@ class AutomountManager {
             'drive-eject-button', this._onDriveEjectButton.bind(this), this);
 
         this._mountAllId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, this._startupMountAll.bind(this));
-        GLib.Source.set_name_by_id(this._mountAllId, '[gnome-shell] this._startupMountAll');
+        GLib.Source.set_name_by_id(this._mountAllId, '[kestrel] this._startupMountAll');
     }
 
     disable() {
@@ -255,7 +255,7 @@ class AutomountManager {
             delete volume._allowAutorunExpireId;
         });
         volume._allowAutorunExpireId = id;
-        GLib.Source.set_name_by_id(id, '[gnome-shell] volume.allowAutorun');
+        GLib.Source.set_name_by_id(id, '[kestrel] volume.allowAutorun');
     }
 }
 

@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { setSolidSurfaces } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
+import { setSolidSurfaces } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 
 import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';

@@ -9,9 +9,9 @@ import {ScreencastErrors, ScreencastError} from './misc/dbusErrors.js';
 import {loadInterfaceXML, loadSubInterfaceXML} from './misc/dbusUtils.js';
 import * as Signals from './misc/signals.js';
 
-const ScreencastIface = loadInterfaceXML('org.gnome.Shell.Screencast');
+const ScreencastIface = loadInterfaceXML('com.lantharos.Kestrel.Screencast');
 
-const IntrospectIface = loadInterfaceXML('org.gnome.Shell.Introspect');
+const IntrospectIface = loadInterfaceXML('com.lantharos.Kestrel.Introspect');
 const IntrospectProxy = Gio.DBusProxy.makeProxyWrapper(IntrospectIface);
 
 const ScreenCastIface = loadSubInterfaceXML(
@@ -27,7 +27,7 @@ const ScreenCastStreamProxy = Gio.DBusProxy.makeProxyWrapper(ScreenCastStreamIfa
 const DEFAULT_FRAMERATE = 30;
 const DEFAULT_DRAW_CURSOR = true;
 
-const PIPELINE_BLOCKLIST_FILENAME = 'gnome-shell-screencast-pipeline-blocklist';
+const PIPELINE_BLOCKLIST_FILENAME = 'kestrel-screencast-pipeline-blocklist';
 
 const PIPELINES = [
     {
@@ -549,7 +549,7 @@ export const ScreencastService = class extends ServiceImplementation {
     }
 
     constructor() {
-        super(ScreencastIface, '/org/gnome/Shell/Screencast');
+        super(ScreencastIface, '/com/lantharos/Kestrel/Screencast');
 
         this.hold(); // gstreamer initializing can take a bit
         this._canScreencast = ScreencastService.canScreencast();
@@ -571,8 +571,8 @@ export const ScreencastService = class extends ServiceImplementation {
             '/org/gnome/Mutter/ScreenCast');
 
         this._introspectProxy = new IntrospectProxy(Gio.DBus.session,
-            'org.gnome.Shell.Introspect',
-            '/org/gnome/Shell/Introspect');
+            'com.lantharos.Kestrel.Introspect',
+            '/com/lantharos/Kestrel/Introspect');
     }
 
     get ScreencastSupported() {

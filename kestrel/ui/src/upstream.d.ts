@@ -1,4 +1,4 @@
-declare module 'resource:///org/gnome/shell/misc/systemActions.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/systemActions.js' {
   import GObject from 'gi://GObject';
   interface Actions extends GObject.Object {
     activateLockScreen(): void;
@@ -11,7 +11,7 @@ declare module 'resource:///org/gnome/shell/misc/systemActions.js' {
   export function getDefault(): Actions;
 }
 
-declare module 'resource:///org/gnome/shell/ui/userWidget.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/userWidget.js' {
   import St from 'gi://St';
   import AccountsService from 'gi://AccountsService';
   export class Avatar extends St.Bin {
@@ -26,7 +26,7 @@ declare module '*.svg' {
 }
 
 
-declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/status/volume.js' {
   interface MixerStream { get_application_id(): string | null }
   export function getMixerControl(): {
     get_source_outputs(): MixerStream[];
@@ -36,7 +36,7 @@ declare module 'resource:///org/gnome/shell/ui/status/volume.js' {
   export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
 }
 
-declare module 'resource:///org/gnome/shell/misc/wallClock.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/wallClock.js' {
   import Gio from 'gi://Gio';
   import GLib from 'gi://GLib';
   export class WallClock {
@@ -48,50 +48,50 @@ declare module 'resource:///org/gnome/shell/misc/wallClock.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/misc/util.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/util.js' {
   export function spawnCommandLine(commandLine: string): void;
 }
 
-declare module 'resource:///org/gnome/shell/ui/headerLayout.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/headerLayout.js' {
   import Clutter from 'gi://Clutter';
   export class HeaderLayout extends Clutter.BoxLayout {
     overhang(actor: Clutter.Actor): void;
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/kestrelGlass.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js' {
   export function blurSurface(actor: import('gi://St').default.Widget, corners?: number): void;
   export function freezeSelection(actor: import('gi://Clutter').default.Actor): () => void;
   export function setSolidSurfaces(enabled: boolean): void;
 }
 
-declare module 'resource:///org/gnome/shell/misc/loginManager.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/loginManager.js' {
   export function getLoginManager(): {
     connect(signal: 'prepare-for-sleep', callback: (manager: unknown, aboutToSuspend: boolean) => void): number;
     disconnect(id: number): void;
   };
 }
 
-declare module 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/workspaceSwitcherPopup.js' {
   export class WorkspaceSwitcherPopup extends import('gi://Clutter').default.Actor {
     connect(signal: string, callback: () => void): number;
     display(index: number): void;
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/dnd.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/dnd.js' {
   export enum DragMotionResult { NO_DROP, COPY_DROP, MOVE_DROP, CONTINUE }
   export function makeDraggable(actor: import('gi://Clutter').default.Actor, params: object): { enabled: boolean; connect(signal: string, callback: (...args: any[]) => void): number };
   export function addDragMonitor(monitor: object): void;
   export function removeDragMonitor(monitor: object): void;
 }
 
-declare module 'resource:///org/gnome/shell/misc/animationUtils.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/animationUtils.js' {
   export function ensureActorVisibleInScrollView(scroll: import('gi://St').default.ScrollView, actor: import('gi://Clutter').default.Actor): void;
   export function wiggle(actor: import('gi://Clutter').default.Actor): void;
 }
 
-declare module 'resource:///org/gnome/shell/ui/mpris.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/mpris.js' {
   import GObject from 'gi://GObject';
   import Shell from 'gi://Shell';
   export class MprisPlayer extends GObject.Object {
@@ -115,7 +115,7 @@ declare module 'resource:///org/gnome/shell/ui/mpris.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/messageTray.js' {
   import Gio from 'gi://Gio';
   export const Urgency: { LOW: number; NORMAL: number; HIGH: number; CRITICAL: number };
   export const PrivacyScope: { USER: number; SYSTEM: number };
@@ -131,7 +131,7 @@ declare module 'resource:///org/gnome/shell/ui/messageTray.js' {
   export function getSystemSource(): Source;
 }
 
-declare module 'resource:///org/gnome/shell/ui/status/location.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/status/location.js' {
   export function getGeoclueAgent(): {
     readonly inUse: boolean;
     connect(signal: string, callback: () => void): number;
@@ -139,7 +139,7 @@ declare module 'resource:///org/gnome/shell/ui/status/location.js' {
   };
 }
 
-declare module 'resource:///org/gnome/shell/ui/modalDialog.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/modalDialog.js' {
   import St from 'gi://St';
   import Clutter from 'gi://Clutter';
   export interface ButtonInfo { label: string; action: () => void; key?: number; default?: boolean; reactive?: boolean }
@@ -157,7 +157,7 @@ declare module 'resource:///org/gnome/shell/ui/modalDialog.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/dialog.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/dialog.js' {
   import St from 'gi://St';
   export class MessageDialogContent extends St.BoxLayout {
     constructor(params: { title: string; description?: string; icon_name?: string });
@@ -171,24 +171,24 @@ declare module 'resource:///org/gnome/shell/ui/dialog.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/checkBox.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/checkBox.js' {
   import St from 'gi://St';
   export class CheckBox extends St.Button {
     constructor(label?: string);
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/shellEntry.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/shellEntry.js' {
   import St from 'gi://St';
   export function addContextMenu(entry: St.Entry, params?: object): void;
   export class CapsLockWarning extends St.Label {}
 }
 
-declare module 'resource:///org/gnome/shell/misc/config.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/config.js' {
   export const LIBEXECDIR: string;
 }
 
-declare module 'resource:///org/gnome/shell/ui/status/keyboard.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/status/keyboard.js' {
   import type IBus from 'gi://IBus';
   export interface InputSource {
     readonly type: string;
@@ -215,6 +215,6 @@ declare module 'resource:///org/gnome/shell/ui/status/keyboard.js' {
   export function getInputSourceManager(): InputSourceManager;
 }
 
-declare module 'resource:///org/gnome/shell/misc/ibusManager.js' {
+declare module 'resource:///com/lantharos/kestrel/misc/ibusManager.js' {
   export function getIBusManager(): { activateProperty(key: string, state: number): void };
 }

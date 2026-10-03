@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 Gio._promisify(Gio.DBusConnection.prototype, 'call');
 Gio._promisify(Gio.File.prototype, 'load_contents_async');

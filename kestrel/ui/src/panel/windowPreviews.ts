@@ -5,8 +5,8 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
 import { animateActor } from '../shared/motion.js';
-import { freezeSelection } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
-import { ensureActorVisibleInScrollView } from 'resource:///org/gnome/shell/misc/animationUtils.js';
+import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
+import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 import type { Monitor } from './panel.js';
 import { windowIcon } from '../appearance/icons/appIcons.js';
 

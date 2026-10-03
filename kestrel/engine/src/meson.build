@@ -22,18 +22,18 @@ typelib_cflags = [
   '-DSHELL_TYPELIB_DIR="@0@"'.format(pkglibdir),
 ]
 
-gnome_shell_cflags = [
+kestrel_cflags = [
   '-DCLUTTER_ENABLE_EXPERIMENTAL_API',
   '-DCOGL_ENABLE_EXPERIMENTAL_API',
   '-DVERSION="@0@"'.format(meson.project_version()),
   '-DLOCALEDIR="@0@"'.format(localedir),
   '-DDATADIR="@0@"'.format(datadir),
-  '-DGNOME_SHELL_LIBEXECDIR="@0@"'.format(libexecdir),
-  '-DGNOME_SHELL_DATADIR="@0@"'.format(pkgdatadir),
-  '-DGNOME_SHELL_PKGLIBDIR="@0@"'.format(pkglibdir)
+  '-DKESTREL_LIBEXECDIR="@0@"'.format(libexecdir),
+  '-DKESTREL_DATADIR="@0@"'.format(pkgdatadir),
+  '-DKESTREL_PKGLIBDIR="@0@"'.format(pkglibdir)
 ]
 
-gnome_shell_deps = [
+kestrel_deps = [
   gio_unix_dep,
   libxml_dep,
   atk_bridge_dep,
@@ -51,7 +51,7 @@ gnome_shell_deps = [
 ]
 
 if have_xwayland
-  gnome_shell_deps += x11_dep
+  kestrel_deps += x11_dep
 endif
 
 libshell_menu_sources = [
@@ -63,7 +63,7 @@ libshell_menu_sources = [
   'gtkactionobserver.c'
 ]
 
-libshell_menu = library('gnome-shell-menu',
+libshell_menu = library('kestrel-menu',
   sources: libshell_menu_sources,
   dependencies: [gio_dep, clutter_dep, mtk_dep],
   include_directories: conf_inc,
@@ -107,7 +107,7 @@ libshell_private_headers = [
 ]
 
 libshell_sources = [
-  'gnome-shell-plugin.c',
+  'kestrel-plugin.c',
   'shell-app.c',
   'shell-app-system.c',
   'shell-blur-effect.c',
@@ -166,9 +166,9 @@ libshell_no_gir_sources += dbus_generated
 
 libshell = library('shell-' + mutter_api_version,
   sources: libshell_gir_sources + libshell_no_gir_sources,
-  dependencies: gnome_shell_deps + [libshell_menu_dep, libst_dep, mutter_dep, xkbregistry_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
+  dependencies: kestrel_deps + [libshell_menu_dep, libst_dep, mutter_dep, xkbregistry_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
   include_directories: [conf_inc],
-  c_args: gnome_shell_cflags,
+  c_args: kestrel_cflags,
   build_rpath: mutter_typelibdir,
   install_rpath: install_rpath,
   install_dir: pkglibdir,
@@ -200,9 +200,9 @@ libshell_gir = gnome.generate_gir(libshell,
   kwargs: introspection_common,
 )
 
-gnome_shell_binary = executable('kestrel', 'main.c',
-  c_args: gnome_shell_cflags + typelib_cflags,
-  dependencies: gnome_shell_deps + [libshell_dep, libst_dep, mutter_dep],
+executable('kestrel', 'main.c',
+  c_args: kestrel_cflags + typelib_cflags,
+  dependencies: kestrel_deps + [libshell_dep, libst_dep, mutter_dep],
   include_directories: [conf_inc],
   build_rpath: mutter_typelibdir,
   install_rpath: install_rpath,

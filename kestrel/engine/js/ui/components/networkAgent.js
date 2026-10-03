@@ -417,7 +417,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 class NetworkAgent {
     constructor() {
         this._native = new Shell.NetworkAgent({
-            identifier: 'org.gnome.Shell.NetworkAgent',
+            identifier: 'com.lantharos.Kestrel.NetworkAgent',
             capabilities: NM.SecretAgentCapabilities.VPN_HINTS,
             auto_register: false,
         });

@@ -110,7 +110,7 @@ class OsdWindow extends Clutter.Actor {
             GLib.source_remove(this._hideTimeoutId);
         this._hideTimeoutId = GLib.timeout_add_once(
             GLib.PRIORITY_DEFAULT, HIDE_TIMEOUT, this._hide.bind(this));
-        GLib.Source.set_name_by_id(this._hideTimeoutId, '[gnome-shell] this._hide');
+        GLib.Source.set_name_by_id(this._hideTimeoutId, '[kestrel] this._hide');
     }
 
     cancel() {

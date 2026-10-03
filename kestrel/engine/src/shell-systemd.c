@@ -61,7 +61,7 @@ start_scope (GDBusConnection *bus,
 {
   g_autofree char *base = app_name (name);
   g_autofree char *escaped = escape_unit_name (base);
-  g_autofree char *unit = g_strdup_printf ("app-gnome-%s-%d.scope", escaped, pid);
+  g_autofree char *unit = g_strdup_printf ("app-kestrel-%s-%d.scope", escaped, pid);
   const char *launcher = g_get_application_name ();
   GVariantBuilder properties;
 

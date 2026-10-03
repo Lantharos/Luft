@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/shell/cursor-theme/">
+  <gresource prefix="/com/lantharos/kestrel/cursor-theme/">
     <file>icons/Adwaita/cursors_scalable/alias/metadata.json</file>
     <file preprocess="xml-stripblanks">icons/Adwaita/cursors_scalable/alias/alias.svg</file>
     <file>icons/Adwaita/cursors_scalable/all-resize/metadata.json</file>

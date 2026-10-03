@@ -1,14 +1,14 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type NM from 'gi://NM';
-import { LIBEXECDIR } from 'resource:///org/gnome/shell/misc/config.js';
+import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Field, Step } from './vpnDialog.js';
 
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
 
-const BUILD_DIRECTORY = GLib.getenv('GNOME_SHELL_BUILDDIR');
+const BUILD_DIRECTORY = GLib.getenv('KESTREL_BUILDDIR');
 const HELPER = BUILD_DIRECTORY ? `${BUILD_DIRECTORY}/../../openconnect/target/release/kestrel-openconnect` : `${LIBEXECDIR}/kestrel-openconnect`;
 
 interface HelperField {

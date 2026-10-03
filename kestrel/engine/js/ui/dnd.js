@@ -375,7 +375,7 @@ class _Draggable extends Signals.EventEmitter {
 
         this._updateHoverId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT,
             this._updateDragHover.bind(this));
-        GLib.Source.set_name_by_id(this._updateHoverId, '[gnome-shell] this._updateDragHover');
+        GLib.Source.set_name_by_id(this._updateHoverId, '[kestrel] this._updateDragHover');
     }
 
     _updateDragPosition(event) {

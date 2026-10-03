@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import { LIBEXECDIR } from 'resource:///org/gnome/shell/misc/config.js';
+import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Monitor } from '../panel/panel.js';
 import { animateActor } from '../shared/motion.js';
@@ -13,7 +13,7 @@ const SIGTERM = 15;
 const UNAVAILABLE_EXIT_STATUS = 69;
 const RESTART_DELAYS_MS = [1000, 5000, 20000];
 const STABLE_AFTER_US = 2 * 60 * GLib.USEC_PER_SEC;
-const BUILD_DIRECTORY = GLib.getenv('GNOME_SHELL_BUILDDIR');
+const BUILD_DIRECTORY = GLib.getenv('KESTREL_BUILDDIR');
 
 export const RENDERER = BUILD_DIRECTORY ? `${BUILD_DIRECTORY}/wallpaper/kestrel-wallpaper` : `${LIBEXECDIR}/kestrel-wallpaper`;
 

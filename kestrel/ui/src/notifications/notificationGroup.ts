@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { HeaderLayout } from 'resource:///org/gnome/shell/ui/headerLayout.js';
+import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
 
 import { appIcons, sourceApp } from '../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../menus/contextMenus.js';

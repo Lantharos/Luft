@@ -52,7 +52,7 @@ const X11_SETTINGS_TIMEOUT_MS = 10000;
 const MIN_NUM_WORKSPACES = 1;
 const MAX_NUM_WORKSPACES = 10;
 
-const WINDOW_DIMMER_EFFECT_NAME = 'gnome-shell-window-dimmer';
+const WINDOW_DIMMER_EFFECT_NAME = 'kestrel-window-dimmer';
 
 const DisplayChangeDialog = GObject.registerClass(
 class DisplayChangeDialog extends ModalDialog.ModalDialog {
@@ -86,7 +86,7 @@ class DisplayChangeDialog extends ModalDialog.ModalDialog {
         });
 
         this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, ONE_SECOND, this._tick.bind(this));
-        GLib.Source.set_name_by_id(this._timeoutId, '[gnome-shell] this._tick');
+        GLib.Source.set_name_by_id(this._timeoutId, '[kestrel] this._tick');
     }
 
     close(timestamp) {
@@ -311,7 +311,7 @@ class WorkspaceTracker {
             workspace._keepAliveId = 0;
             this._queueCheckWorkspaces();
         });
-        GLib.Source.set_name_by_id(workspace._keepAliveId, '[gnome-shell] this._queueCheckWorkspaces');
+        GLib.Source.set_name_by_id(workspace._keepAliveId, '[kestrel] this._queueCheckWorkspaces');
     }
 
     _windowRemoved(workspace, window) {
@@ -323,7 +323,7 @@ class WorkspaceTracker {
                 this._queueCheckWorkspaces();
             }
         });
-        GLib.Source.set_name_by_id(id, '[gnome-shell] this._queueCheckWorkspaces');
+        GLib.Source.set_name_by_id(id, '[kestrel] this._queueCheckWorkspaces');
     }
 
     _windowLeftMonitor(metaDisplay, monitorIndex, _metaWin) {

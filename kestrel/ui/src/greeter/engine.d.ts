@@ -1,4 +1,4 @@
-declare module 'resource:///org/gnome/shell/auth/greetd.js' {
+declare module 'resource:///com/lantharos/kestrel/auth/greetd.js' {
   export class GreetdChannel {
     request(message: object): Promise<object>;
     close(): void;
@@ -6,8 +6,8 @@ declare module 'resource:///org/gnome/shell/auth/greetd.js' {
   export function connectGreetd(): Promise<GreetdChannel>;
 }
 
-declare module 'resource:///org/gnome/shell/auth/authentication.js' {
-  import type { GreetdChannel } from 'resource:///org/gnome/shell/auth/greetd.js';
+declare module 'resource:///com/lantharos/kestrel/auth/authentication.js' {
+  import type { GreetdChannel } from 'resource:///com/lantharos/kestrel/auth/greetd.js';
   export class Authentication {
     constructor(openChannel: () => Promise<GreetdChannel>);
     cancel(): void;
@@ -16,10 +16,10 @@ declare module 'resource:///org/gnome/shell/auth/authentication.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/auth/authPrompt.js' {
+declare module 'resource:///com/lantharos/kestrel/auth/authPrompt.js' {
   import type AccountsService from 'gi://AccountsService';
   import type St from 'gi://St';
-  import type { Authentication } from 'resource:///org/gnome/shell/auth/authentication.js';
+  import type { Authentication } from 'resource:///com/lantharos/kestrel/auth/authentication.js';
   export class AuthPrompt extends St.BoxLayout {
     constructor(authentication: Authentication);
     readonly userName: string | null;
@@ -36,7 +36,7 @@ declare module 'resource:///org/gnome/shell/auth/authPrompt.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/lockScreen/backdrop.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/lockScreen/backdrop.js' {
   import type Clutter from 'gi://Clutter';
   export class LockBackdrop {
     readonly actor: Clutter.Actor;
@@ -44,12 +44,12 @@ declare module 'resource:///org/gnome/shell/ui/lockScreen/backdrop.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/lockScreen/clock.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/lockScreen/clock.js' {
   import type St from 'gi://St';
   export class Clock extends St.BoxLayout {}
 }
 
-declare module 'resource:///org/gnome/shell/ui/lockScreen/pages.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/lockScreen/pages.js' {
   import type Clutter from 'gi://Clutter';
   import type Shell from 'gi://Shell';
   export class LockPages {
@@ -69,7 +69,7 @@ declare module 'resource:///org/gnome/shell/ui/lockScreen/pages.js' {
   }
 }
 
-declare module 'resource:///org/gnome/shell/ui/layout.js' {
+declare module 'resource:///com/lantharos/kestrel/ui/layout.js' {
   import type Clutter from 'gi://Clutter';
   export class MonitorConstraint extends Clutter.Constraint {
     constructor(params: { primary: boolean });

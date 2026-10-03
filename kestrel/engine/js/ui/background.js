@@ -523,7 +523,7 @@ const Background = GObject.registerClass({
             this.emit('bg-changed');
         });
         GLib.Source.set_name_by_id(this._changedIdleId,
-            '[gnome-shell] Background._emitChangedSignal');
+            '[kestrel] Background._emitChangedSignal');
     }
 
     updateResolution() {
@@ -548,7 +548,7 @@ const Background = GObject.registerClass({
         const id = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
             this.emit('loaded');
         });
-        GLib.Source.set_name_by_id(id, '[gnome-shell] Background._setLoaded Idle');
+        GLib.Source.set_name_by_id(id, '[kestrel] Background._setLoaded Idle');
     }
 
     _watchFile(file) {
@@ -624,7 +624,7 @@ export const SystemBackground = GObject.registerClass({
         const id = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
             this.emit('loaded');
         });
-        GLib.Source.set_name_by_id(id, '[gnome-shell] SystemBackground.loaded');
+        GLib.Source.set_name_by_id(id, '[kestrel] SystemBackground.loaded');
     }
 });
 

@@ -340,7 +340,7 @@ const AuthenticationDialog = GObject.registerClass({
 
         if (delay) {
             this._sessionRequestTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, delay, resetDialog);
-            GLib.Source.set_name_by_id(this._sessionRequestTimeoutId, '[gnome-shell] this._sessionRequestTimeoutId');
+            GLib.Source.set_name_by_id(this._sessionRequestTimeoutId, '[kestrel] this._sessionRequestTimeoutId');
         } else {
             resetDialog();
         }

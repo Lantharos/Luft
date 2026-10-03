@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/shell/icons">
+  <gresource prefix="/com/lantharos/kestrel/icons">
     <file preprocess="xml-stripblanks">scalable/actions/accessibility-bounce-keys-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/accessibility-menu-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/accessibility-high-contrast-symbolic.svg</file>

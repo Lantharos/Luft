@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 const CHECKS = 'com.lantharos.KestrelChecks';
 const DIM_DELAY = 24;

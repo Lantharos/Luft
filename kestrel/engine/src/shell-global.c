@@ -65,8 +65,7 @@ struct _ShellGlobal {
   GSettings *settings;
   const char *datadir;
   char *imagedir;
-  char *userdatadir;
-  GFile *userdatadir_path;
+  GFile *state_path;
   GFile *runtime_state_path;
   GFile *automation_script;
 
@@ -101,7 +100,6 @@ enum {
   PROP_WINDOW_MANAGER,
   PROP_SETTINGS,
   PROP_DATADIR,
-  PROP_USERDATADIR,
   PROP_FOCUS_MANAGER,
   PROP_SWITCHEROO_CONTROL,
   PROP_FORCE_ANIMATIONS,
@@ -273,9 +271,6 @@ shell_global_get_property(GObject         *object,
     case PROP_DATADIR:
       g_value_set_string (value, global->datadir);
       break;
-    case PROP_USERDATADIR:
-      g_value_set_string (value, global->userdatadir);
-      break;
     case PROP_FOCUS_MANAGER:
       g_value_set_object (value, global->focus_manager);
       break;
@@ -327,16 +322,17 @@ switcheroo_vanished_cb (GDBusConnection *connection,
 static void
 shell_global_init (ShellGlobal *global)
 {
-  const char *datadir = g_getenv ("GNOME_SHELL_DATADIR");
-  const char *shell_js = g_getenv("GNOME_SHELL_JS");
+  const char *datadir = g_getenv ("KESTREL_DATADIR");
+  const char *shell_js = g_getenv("KESTREL_JS");
   g_autofree char *imagedir = NULL;
   g_autofree char *fontdir = NULL;
   g_auto (GStrv) search_path = NULL;
   g_autofree char *path = NULL;
+  g_autofree char *statedir = NULL;
   const char *byteorder_string;
 
   if (!datadir)
-    datadir = GNOME_SHELL_DATADIR;
+    datadir = KESTREL_DATADIR;
   global->datadir = datadir;
 
   fontdir = g_build_filename (datadir, "fonts", NULL);
@@ -353,10 +349,9 @@ shell_global_init (ShellGlobal *global)
   else
     global->imagedir = g_strdup_printf ("%s/", datadir);
 
-  /* Ensure config dir exists for later use */
-  global->userdatadir = g_build_filename (g_get_user_data_dir (), "gnome-shell", NULL);
-  g_mkdir_with_parents (global->userdatadir, 0700);
-  global->userdatadir_path = g_file_new_for_path (global->userdatadir);
+  statedir = g_build_filename (g_get_user_state_dir (), "kestrel", NULL);
+  g_mkdir_with_parents (statedir, 0700);
+  global->state_path = g_file_new_for_path (statedir);
 
 #if G_BYTE_ORDER == G_LITTLE_ENDIAN
   byteorder_string = "LE";
@@ -365,7 +360,7 @@ shell_global_init (ShellGlobal *global)
 #endif
 
   /* And the runtime state */
-  path = g_strdup_printf ("%s/gnome-shell/runtime-state-%s.%s",
+  path = g_strdup_printf ("%s/kestrel/runtime-state-%s.%s",
                           g_get_user_runtime_dir (),
                           byteorder_string,
                           g_getenv ("DISPLAY"));
@@ -407,7 +402,7 @@ shell_global_init (ShellGlobal *global)
   else
     {
       search_path = g_malloc0 (2 * sizeof (char *));
-      search_path[0] = g_strdup ("resource:///org/gnome/shell");
+      search_path[0] = g_strdup ("resource:///com/lantharos/kestrel");
     }
 
   global->js_context = g_object_new (GJS_TYPE_CONTEXT,
@@ -447,12 +442,11 @@ shell_global_finalize (GObject *object)
   g_cancellable_cancel (global->switcheroo_cancellable);
   g_clear_object (&global->switcheroo_cancellable);
 
-  g_clear_object (&global->userdatadir_path);
+  g_clear_object (&global->state_path);
   g_clear_object (&global->runtime_state_path);
 
   g_free (global->session_mode);
   g_free (global->imagedir);
-  g_free (global->userdatadir);
 
   g_hash_table_unref (global->save_ops);
 
@@ -559,11 +553,6 @@ shell_global_class_init (ShellGlobalClass *klass)
 
   props[PROP_DATADIR] =
     g_param_spec_string ("datadir", NULL, NULL,
-                         NULL,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  props[PROP_USERDATADIR] =
-    g_param_spec_string ("userdatadir", NULL, NULL,
                          NULL,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
@@ -1124,12 +1113,6 @@ shell_global_get_datadir (ShellGlobal *global)
   return global->datadir;
 }
 
-const char *
-shell_global_get_userdatadir (ShellGlobal *global)
-{
-  return global->userdatadir;
-}
-
 /**
  * shell_global_get_automation_script:
  *
@@ -1348,7 +1331,7 @@ shell_global_set_persistent_state (ShellGlobal *global,
                                    const char  *property_name,
                                    GVariant    *variant)
 {
-  save_variant (global, global->userdatadir_path, property_name, variant);
+  save_variant (global, global->state_path, property_name, variant);
 }
 
 /**
@@ -1367,7 +1350,7 @@ shell_global_get_persistent_state (ShellGlobal  *global,
                                    const char   *property_type,
                                    const char   *property_name)
 {
-  return load_variant (global->userdatadir_path, property_type, property_name);
+  return load_variant (global->state_path, property_type, property_name);
 }
 
 void

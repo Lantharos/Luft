@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { EntryField, MessageDialogContent } from 'resource:///org/gnome/shell/ui/dialog.js';
-import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import { EntryField, MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
+import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 
 import { feedbackLabel, showText } from '../keyring/passwordForm.js';
 import type { DialogModules } from '../keyring/dialog.js';

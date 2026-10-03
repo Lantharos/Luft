@@ -58,9 +58,9 @@ const DISPLAYS: Endpoint = Endpoint {
     interface: "org.gnome.Mutter.DisplayConfig",
 };
 const BRIGHTNESS: Endpoint = Endpoint {
-    service: "org.gnome.Shell.Brightness",
-    path: "/org/gnome/Shell/Brightness",
-    interface: "org.gnome.Shell.Brightness",
+    service: "com.lantharos.Kestrel.Brightness",
+    path: "/com/lantharos/Kestrel/Brightness",
+    interface: "com.lantharos.Kestrel.Brightness",
 };
 const LIGHT_SENSOR: Endpoint = Endpoint {
     service: "net.hadess.SensorProxy",

@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 const SCHEME = 'x-scheme-handler/kestrel-settings';
 const LINKS = new Map([

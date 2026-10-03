@@ -18,7 +18,7 @@ const AudioDevice = {
     MICROPHONE: 1 << 2,
 };
 
-const AudioDeviceSelectionIface = loadInterfaceXML('org.gnome.Shell.AudioDeviceSelection');
+const AudioDeviceSelectionIface = loadInterfaceXML('com.lantharos.Kestrel.AudioDeviceSelection');
 
 const AudioDeviceSelectionDialog = GObject.registerClass({
     Signals: {'device-selected': {param_types: [GObject.TYPE_UINT]}},
@@ -140,9 +140,9 @@ export class AudioDeviceSelectionDBus {
         this._audioSelectionDialog = null;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AudioDeviceSelectionIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/AudioDeviceSelection');
+        this._dbusImpl.export(Gio.DBus.session, '/com/lantharos/Kestrel/AudioDeviceSelection');
 
-        Gio.DBus.session.own_name('org.gnome.Shell.AudioDeviceSelection', Gio.BusNameOwnerFlags.REPLACE, null, null);
+        Gio.DBus.session.own_name('com.lantharos.Kestrel.AudioDeviceSelection', Gio.BusNameOwnerFlags.REPLACE, null, null);
     }
 
     _onDialogClosed() {

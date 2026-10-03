@@ -29,7 +29,7 @@ import {DBusSenderChecker} from '../misc/util.js';
 
 const ScreenshotIface = loadInterfaceXML('org.gnome.Shell.Screenshot');
 
-const ScreencastIface = loadInterfaceXML('org.gnome.Shell.Screencast');
+const ScreencastIface = loadInterfaceXML('com.lantharos.Kestrel.Screencast');
 const ScreencastProxy = Gio.DBusProxy.makeProxyWrapper(ScreencastIface);
 
 let screenshotNotificationSource = null;
@@ -98,7 +98,7 @@ class Tooltip extends St.Label {
 
             this._timeoutId = null;
         });
-        GLib.Source.set_name_by_id(this._timeoutId, '[gnome-shell] tooltip.open');
+        GLib.Source.set_name_by_id(this._timeoutId, '[kestrel] tooltip.open');
     }
 
     close() {
@@ -1438,8 +1438,8 @@ export class ScreenshotUI extends St.Widget {
 
         this._screencastProxy = new ScreencastProxy(
             Gio.DBus.session,
-            'org.gnome.Shell.Screencast',
-            '/org/gnome/Shell/Screencast',
+            'com.lantharos.Kestrel.Screencast',
+            '/com/lantharos/Kestrel/Screencast',
             (object, error) => {
                 if (error !== null) {
                     log('Error connecting to the screencast service');

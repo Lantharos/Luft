@@ -37,7 +37,7 @@ import * as LocatePointer from './locatePointer.js';
 import * as PointerA11yTimeout from './pointerA11yTimeout.js';
 import {formatError} from '../misc/errorUtils.js';
 
-const LOG_DOMAIN = 'GNOME Shell';
+const LOG_DOMAIN = 'Kestrel';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
 export let componentManager = null;
@@ -141,7 +141,7 @@ export async function start() {
     shellDBusService = new ShellDBus.GnomeShell();
     shellMountOpDBusService = new ShellMountOperation.GnomeShellMountOpHandler();
 
-    const watchId = Gio.DBus.session.watch_name('org.gnome.Shell.Notifications',
+    const watchId = Gio.DBus.session.watch_name('com.lantharos.Kestrel.Notifications',
         Gio.BusNameWatcherFlags.AUTO_START,
         bus => bus.unwatch_name(watchId),
         bus => bus.unwatch_name(watchId));
@@ -344,7 +344,7 @@ async function _initializeUI() {
 function _getStylesheet(name) {
     let stylesheet;
 
-    stylesheet = Gio.File.new_for_uri(`resource:///org/gnome/shell/theme/${name}`);
+    stylesheet = Gio.File.new_for_uri(`resource:///com/lantharos/kestrel/theme/${name}`);
     if (stylesheet.query_exists(null))
         return stylesheet;
 
@@ -473,12 +473,12 @@ export function reloadThemeResource() {
 
 /** @private */
 function _loadIcons() {
-    _iconResource = Gio.Resource.load(`${global.datadir}/gnome-shell-icons.gresource`);
+    _iconResource = Gio.Resource.load(`${global.datadir}/kestrel-icons.gresource`);
     _iconResource._register();
 }
 
 function _loadOskLayouts() {
-    _oskResource = Gio.Resource.load(`${global.datadir}/gnome-shell-osk-layouts.gresource`);
+    _oskResource = Gio.Resource.load(`${global.datadir}/kestrel-osk-layouts.gresource`);
     _oskResource._register();
 }
 

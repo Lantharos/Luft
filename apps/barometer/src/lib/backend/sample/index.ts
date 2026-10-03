@@ -103,7 +103,7 @@ function details(pid: number): Details {
 		threads: process.threads,
 		nice: process.nice,
 		started: process.started,
-		cgroup: process.app ? `/user.slice/user-1000.slice/user@1000.service/app.slice/app-gnome-${process.app.replace('.desktop', '')}-${pid}.scope` : '/system.slice',
+		cgroup: process.app ? `/user.slice/user-1000.slice/user@1000.service/app.slice/app-kestrel-${process.app.replace('.desktop', '')}-${pid}.scope` : '/system.slice',
 		container: process.app === 'com.spotify.Client.desktop' ? 'Flatpak' : null,
 		openFiles: process.uid === 0 ? null : 40 + (pid % 90),
 		oomScore: 668,

@@ -1,5 +1,5 @@
 <node>
-  <interface name="org.gnome.Shell.HotplugSniffer">
+  <interface name="com.lantharos.Kestrel.HotplugSniffer">
     <method name="SniffURI">
       <arg type="s" direction="in"/>
       <arg type="as" direction="out"/>

@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 import { choose, list, row } from '../portal/core/rows.js';
 import { copyFor, needsVerification, type Request } from './copy.js';
 
@@ -26,8 +26,8 @@ export class PasskeyDialog {
 
   async open(): Promise<boolean> {
     const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
-      import('resource:///org/gnome/shell/ui/dialog.js'),
-      import('resource:///org/gnome/shell/ui/modalDialog.js'),
+      import('resource:///com/lantharos/kestrel/ui/dialog.js'),
+      import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
     ]);
     const copy = copyFor(this.request);
     const modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-passkey-dialog' });

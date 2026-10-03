@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { shortDuration } from '../shared/duration.js';
 import { PowerDevices, type PowerDevice } from './powerDevices.js';

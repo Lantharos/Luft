@@ -543,7 +543,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
             return GLib.SOURCE_REMOVE;
         });
-        GLib.Source.set_name_by_id(this._timerId, '[gnome-shell] this._confirm');
+        GLib.Source.set_name_by_id(this._timerId, '[kestrel] this._confirm');
     }
 
     _stopTimer() {

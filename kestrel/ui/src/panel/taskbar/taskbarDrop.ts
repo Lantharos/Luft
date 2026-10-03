@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
+import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 export interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }

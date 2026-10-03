@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { openSettings } from '../settings/pages.js';
 

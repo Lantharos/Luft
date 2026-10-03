@@ -1,7 +1,7 @@
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import type { getGeoclueAgent } from 'resource:///org/gnome/shell/ui/status/location.js';
-import { getMixerControl } from 'resource:///org/gnome/shell/ui/status/volume.js';
+import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
+import { getMixerControl } from 'resource:///com/lantharos/kestrel/ui/status/volume.js';
 
 const LEVEL_METERS = ['org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
 
@@ -37,7 +37,7 @@ export class PrivacyMonitor {
       () => mixer.forEach(id => this.mixer.disconnect(id)),
       () => { if (handles) controller!.disconnect(handles); },
     );
-    void import('resource:///org/gnome/shell/ui/status/location.js').then(({ getGeoclueAgent }) => {
+    void import('resource:///com/lantharos/kestrel/ui/status/location.js').then(({ getGeoclueAgent }) => {
       const geoclue = getGeoclueAgent();
       const location = geoclue.connect('notify::in-use', changed);
       this.geoclue = geoclue;

@@ -1,13 +1,13 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { appIcons } from '../appearance/icons/appIcons.js';
 
 const SYSTEMD = 'org.freedesktop.systemd1';
 const UNIT_PATH = '/org/freedesktop/systemd1/unit/';
-const APP_UNIT = /^app-(?:gnome|flatpak)-(.+)-\d+\.(?:scope|service)$/;
+const APP_UNIT = /^app-(?:kestrel|flatpak)-(.+)-\d+\.(?:scope|service)$/;
 
 const unescapeObjectPath = (path: string) => path.replace(/_([0-9a-f]{2})/g, (_match, hex: string) => String.fromCharCode(parseInt(hex, 16)));
 const unescapeUnit = (name: string) => name.replace(/\\x([0-9a-f]{2})/g, (_match, hex: string) => String.fromCharCode(parseInt(hex, 16)));

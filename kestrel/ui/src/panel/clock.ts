@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { WallClock } from 'resource:///org/gnome/shell/misc/wallClock.js';
+import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
 
 export class PanelClock {
   readonly actor = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });

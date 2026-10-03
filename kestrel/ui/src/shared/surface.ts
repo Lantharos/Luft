@@ -1,4 +1,4 @@
-export { blurSurface } from 'resource:///org/gnome/shell/ui/kestrelGlass.js';
+export { blurSurface } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 
 export const PANEL_HEIGHT = 48;
 export const PANEL_ICON_SIZE = 28;

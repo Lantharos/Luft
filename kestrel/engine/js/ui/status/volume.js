@@ -198,7 +198,7 @@ const StreamSlider = GObject.registerClass({
                 this._notifyVolumeChangeId = 0;
             });
             GLib.Source.set_name_by_id(this._notifyVolumeChangeId,
-                '[gnome-shell] this._notifyVolumeChangeId');
+                '[kestrel] this._notifyVolumeChangeId');
         }
     }
 

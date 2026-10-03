@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/shell/theme">
-    <file>gnome-shell-dark.css</file>
-    <file>gnome-shell-high-contrast.css</file>
+  <gresource prefix="/com/lantharos/kestrel/theme">
+    <file>base-dark.css</file>
+    <file>base-high-contrast.css</file>
     <file>kestrel.css</file>
     <file>kestrel-portal.css</file>
     <file>kestrel-passkeys.css</file>

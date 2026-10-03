@@ -24,7 +24,7 @@ export class ServiceImplementation {
         this._senders = new Map();
         this._holdCount = 0;
 
-        // Bail out when not running under gnome-shell
+        // Bail out when not running under Kestrel
         Gio.DBus.watch_name(Gio.BusType.SESSION,
             'org.gnome.Shell',
             Gio.BusNameWatcherFlags.NONE,

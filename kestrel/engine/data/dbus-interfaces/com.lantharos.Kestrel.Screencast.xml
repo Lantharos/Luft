@@ -4,12 +4,12 @@
 <node>
 
   <!--
-      org.gnome.Shell.Screencast:
+      com.lantharos.Kestrel.Screencast:
       @short_description: Screencast interface
 
       The interface used to record screen contents.
   -->
-  <interface name="org.gnome.Shell.Screencast">
+  <interface name="com.lantharos.Kestrel.Screencast">
     <property name="ScreencastSupported" type="b" access="read"/>
 
     <!--

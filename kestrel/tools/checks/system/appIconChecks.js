@@ -2,7 +2,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 const WALLPAPERS = [['lavender', 'Night lavender.jpg', [88, 52, 140]], ['forest', 'Autumn forest bench.jpg', [62, 108, 40]]];
 const STYLES = ['default', 'tinted', 'clear'];

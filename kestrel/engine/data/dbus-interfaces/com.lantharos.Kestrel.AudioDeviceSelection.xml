@@ -1,5 +1,5 @@
 <node>
-  <interface name="org.gnome.Shell.AudioDeviceSelection">
+  <interface name="com.lantharos.Kestrel.AudioDeviceSelection">
     <method name="Open">
       <arg name="devices" direction="in" type="as"/>
     </method>

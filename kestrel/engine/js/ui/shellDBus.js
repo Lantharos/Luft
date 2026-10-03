@@ -8,7 +8,7 @@ import {loadInterfaceXML} from '../misc/fileUtils.js';
 
 const GnomeShellIface = loadInterfaceXML('org.gnome.Shell');
 const ScreenSaverIface = loadInterfaceXML('org.gnome.ScreenSaver');
-const BrightnessIface = loadInterfaceXML('org.gnome.Shell.Brightness');
+const BrightnessIface = loadInterfaceXML('com.lantharos.Kestrel.Brightness');
 
 export class GnomeShell {
     constructor() {
@@ -79,9 +79,9 @@ export class BrightnessDBus {
         this._manager = brightnessManager;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(BrightnessIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/Brightness');
+        this._dbusImpl.export(Gio.DBus.session, '/com/lantharos/Kestrel/Brightness');
 
-        Gio.DBus.session.own_name('org.gnome.Shell.Brightness',
+        Gio.DBus.session.own_name('com.lantharos.Kestrel.Brightness',
             Gio.BusNameOwnerFlags.NONE, null, null);
 
         this._manager.connectObject(

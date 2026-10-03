@@ -244,7 +244,7 @@ export class ScreenShield extends Signals.EventEmitter {
                     this._lockTimeoutId = 0;
                     this.lock(false);
                 });
-            GLib.Source.set_name_by_id(this._lockTimeoutId, '[gnome-shell] this.lock');
+            GLib.Source.set_name_by_id(this._lockTimeoutId, '[kestrel] this.lock');
         }
 
         this._activateFade(this._longLightbox, STANDARD_FADE_TIME);
@@ -460,7 +460,7 @@ export class ScreenShield extends Signals.EventEmitter {
             const id = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, MANUAL_FADE_TIME, () => {
                 this._activateFade(this._shortLightbox, MANUAL_FADE_TIME);
             });
-            GLib.Source.set_name_by_id(id, '[gnome-shell] this._activateFade');
+            GLib.Source.set_name_by_id(id, '[kestrel] this._activateFade');
         } else {
             if (params.fadeToBlack)
                 this._activateFade(this._shortLightbox, 0);

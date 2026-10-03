@@ -22,13 +22,12 @@
  */
 
 /*
- * GnomeShellPlugin is the entry point for for GNOME Shell into and out of
- * Mutter. By registering itself into Mutter using
- * meta_plugin_manager_set_plugin_type(), Mutter will call the vfuncs of the
- * plugin at the appropriate time.
+ * KestrelPlugin is the entry point for Kestrel into and out of Mutter. By
+ * registering itself into Mutter using meta_plugin_manager_set_plugin_type(),
+ * Mutter will call the vfuncs of the plugin at the appropriate time.
  *
- * The functions in in GnomeShellPlugin are all just stubs, which just call the
- * similar methods in GnomeShellWm.
+ * The functions in KestrelPlugin are all just stubs, which just call the
+ * similar methods in ShellWM.
  */
 
 #include "config.h"
@@ -46,24 +45,24 @@
 #include "shell-global-private.h"
 #include "shell-wm-private.h"
 
-#define GNOME_TYPE_SHELL_PLUGIN (gnome_shell_plugin_get_type ())
-G_DECLARE_FINAL_TYPE (GnomeShellPlugin, gnome_shell_plugin,
-                      GNOME, SHELL_PLUGIN,
+#define KESTREL_TYPE_PLUGIN (kestrel_plugin_get_type ())
+G_DECLARE_FINAL_TYPE (KestrelPlugin, kestrel_plugin,
+                      KESTREL, PLUGIN,
                       MetaPlugin)
 
-struct _GnomeShellPlugin
+struct _KestrelPlugin
 {
   MetaPlugin parent;
 
   ShellGlobal *global;
 };
 
-G_DEFINE_TYPE (GnomeShellPlugin, gnome_shell_plugin, META_TYPE_PLUGIN)
+G_DEFINE_TYPE (KestrelPlugin, kestrel_plugin, META_TYPE_PLUGIN)
 
 static void
-gnome_shell_plugin_start (MetaPlugin *plugin)
+kestrel_plugin_start (MetaPlugin *plugin)
 {
-  GnomeShellPlugin *shell_plugin = GNOME_SHELL_PLUGIN (plugin);
+  KestrelPlugin *shell_plugin = KESTREL_PLUGIN (plugin);
 
   shell_plugin->global = shell_global_get ();
   _shell_global_set_plugin (shell_plugin->global, META_PLUGIN (shell_plugin));
@@ -84,7 +83,7 @@ get_shell_wm (void)
 }
 
 static void
-gnome_shell_plugin_minimize (MetaPlugin         *plugin,
+kestrel_plugin_minimize (MetaPlugin         *plugin,
 			     MetaWindowActor    *actor)
 {
   _shell_wm_minimize (get_shell_wm (),
@@ -93,7 +92,7 @@ gnome_shell_plugin_minimize (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_unminimize (MetaPlugin         *plugin,
+kestrel_plugin_unminimize (MetaPlugin         *plugin,
                                MetaWindowActor    *actor)
 {
   _shell_wm_unminimize (get_shell_wm (),
@@ -102,14 +101,14 @@ gnome_shell_plugin_unminimize (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_size_changed (MetaPlugin         *plugin,
+kestrel_plugin_size_changed (MetaPlugin         *plugin,
                                  MetaWindowActor    *actor)
 {
   _shell_wm_size_changed (get_shell_wm (), actor);
 }
 
 static void
-gnome_shell_plugin_size_change (MetaPlugin         *plugin,
+kestrel_plugin_size_change (MetaPlugin         *plugin,
                                 MetaWindowActor    *actor,
                                 MetaSizeChange      which_change,
                                 MtkRectangle       *old_frame_rect,
@@ -119,7 +118,7 @@ gnome_shell_plugin_size_change (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_map (MetaPlugin         *plugin,
+kestrel_plugin_map (MetaPlugin         *plugin,
                         MetaWindowActor    *actor)
 {
   _shell_wm_map (get_shell_wm (),
@@ -127,7 +126,7 @@ gnome_shell_plugin_map (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_destroy (MetaPlugin         *plugin,
+kestrel_plugin_destroy (MetaPlugin         *plugin,
                             MetaWindowActor    *actor)
 {
   _shell_wm_destroy (get_shell_wm (),
@@ -135,7 +134,7 @@ gnome_shell_plugin_destroy (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_switch_workspace (MetaPlugin         *plugin,
+kestrel_plugin_switch_workspace (MetaPlugin         *plugin,
                                      gint                from,
                                      gint                to,
                                      MetaMotionDirection direction)
@@ -144,20 +143,20 @@ gnome_shell_plugin_switch_workspace (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_kill_window_effects (MetaPlugin         *plugin,
+kestrel_plugin_kill_window_effects (MetaPlugin         *plugin,
                                         MetaWindowActor    *actor)
 {
   _shell_wm_kill_window_effects (get_shell_wm(), actor);
 }
 
 static void
-gnome_shell_plugin_kill_switch_workspace (MetaPlugin         *plugin)
+kestrel_plugin_kill_switch_workspace (MetaPlugin         *plugin)
 {
   _shell_wm_kill_switch_workspace (get_shell_wm());
 }
 
 static void
-gnome_shell_plugin_show_tile_preview (MetaPlugin      *plugin,
+kestrel_plugin_show_tile_preview (MetaPlugin      *plugin,
                                       MetaWindow      *window,
                                       MtkRectangle    *tile_rect,
                                       int              tile_monitor)
@@ -166,13 +165,13 @@ gnome_shell_plugin_show_tile_preview (MetaPlugin      *plugin,
 }
 
 static void
-gnome_shell_plugin_hide_tile_preview (MetaPlugin *plugin)
+kestrel_plugin_hide_tile_preview (MetaPlugin *plugin)
 {
   _shell_wm_hide_tile_preview (get_shell_wm ());
 }
 
 static void
-gnome_shell_plugin_show_window_menu (MetaPlugin         *plugin,
+kestrel_plugin_show_window_menu (MetaPlugin         *plugin,
                                      MetaWindow         *window,
                                      MetaWindowMenuType  menu,
                                      int                 x,
@@ -182,7 +181,7 @@ gnome_shell_plugin_show_window_menu (MetaPlugin         *plugin,
 }
 
 static void
-gnome_shell_plugin_show_window_menu_for_rect (MetaPlugin         *plugin,
+kestrel_plugin_show_window_menu_for_rect (MetaPlugin         *plugin,
                                               MetaWindow         *window,
                                               MetaWindowMenuType  menu,
                                               MtkRectangle       *rect)
@@ -191,73 +190,73 @@ gnome_shell_plugin_show_window_menu_for_rect (MetaPlugin         *plugin,
 }
 
 static gboolean
-gnome_shell_plugin_keybinding_filter (MetaPlugin     *plugin,
+kestrel_plugin_keybinding_filter (MetaPlugin     *plugin,
                                       MetaKeyBinding *binding)
 {
   return _shell_wm_filter_keybinding (get_shell_wm (), binding);
 }
 
 static void
-gnome_shell_plugin_confirm_display_change (MetaPlugin *plugin)
+kestrel_plugin_confirm_display_change (MetaPlugin *plugin)
 {
   _shell_wm_confirm_display_change (get_shell_wm ());
 }
 
 static MetaCloseDialog *
-gnome_shell_plugin_create_close_dialog (MetaPlugin *plugin,
+kestrel_plugin_create_close_dialog (MetaPlugin *plugin,
                                         MetaWindow *window)
 {
   return _shell_wm_create_close_dialog (get_shell_wm (), window);
 }
 
 static MetaInhibitShortcutsDialog *
-gnome_shell_plugin_create_inhibit_shortcuts_dialog (MetaPlugin *plugin,
+kestrel_plugin_create_inhibit_shortcuts_dialog (MetaPlugin *plugin,
                                                     MetaWindow *window)
 {
   return _shell_wm_create_inhibit_shortcuts_dialog (get_shell_wm (), window);
 }
 
 static void
-gnome_shell_plugin_locate_pointer (MetaPlugin *plugin)
+kestrel_plugin_locate_pointer (MetaPlugin *plugin)
 {
-  GnomeShellPlugin *shell_plugin = GNOME_SHELL_PLUGIN (plugin);
+  KestrelPlugin *shell_plugin = KESTREL_PLUGIN (plugin);
   _shell_global_locate_pointer (shell_plugin->global);
 }
 
 static void
-gnome_shell_plugin_class_init (GnomeShellPluginClass *klass)
+kestrel_plugin_class_init (KestrelPluginClass *klass)
 {
   MetaPluginClass *plugin_class  = META_PLUGIN_CLASS (klass);
 
-  plugin_class->start            = gnome_shell_plugin_start;
-  plugin_class->map              = gnome_shell_plugin_map;
-  plugin_class->minimize         = gnome_shell_plugin_minimize;
-  plugin_class->unminimize       = gnome_shell_plugin_unminimize;
-  plugin_class->size_changed     = gnome_shell_plugin_size_changed;
-  plugin_class->size_change      = gnome_shell_plugin_size_change;
-  plugin_class->destroy          = gnome_shell_plugin_destroy;
+  plugin_class->start            = kestrel_plugin_start;
+  plugin_class->map              = kestrel_plugin_map;
+  plugin_class->minimize         = kestrel_plugin_minimize;
+  plugin_class->unminimize       = kestrel_plugin_unminimize;
+  plugin_class->size_changed     = kestrel_plugin_size_changed;
+  plugin_class->size_change      = kestrel_plugin_size_change;
+  plugin_class->destroy          = kestrel_plugin_destroy;
 
-  plugin_class->switch_workspace = gnome_shell_plugin_switch_workspace;
+  plugin_class->switch_workspace = kestrel_plugin_switch_workspace;
 
-  plugin_class->kill_window_effects   = gnome_shell_plugin_kill_window_effects;
-  plugin_class->kill_switch_workspace = gnome_shell_plugin_kill_switch_workspace;
+  plugin_class->kill_window_effects   = kestrel_plugin_kill_window_effects;
+  plugin_class->kill_switch_workspace = kestrel_plugin_kill_switch_workspace;
 
-  plugin_class->show_tile_preview = gnome_shell_plugin_show_tile_preview;
-  plugin_class->hide_tile_preview = gnome_shell_plugin_hide_tile_preview;
-  plugin_class->show_window_menu = gnome_shell_plugin_show_window_menu;
-  plugin_class->show_window_menu_for_rect = gnome_shell_plugin_show_window_menu_for_rect;
+  plugin_class->show_tile_preview = kestrel_plugin_show_tile_preview;
+  plugin_class->hide_tile_preview = kestrel_plugin_hide_tile_preview;
+  plugin_class->show_window_menu = kestrel_plugin_show_window_menu;
+  plugin_class->show_window_menu_for_rect = kestrel_plugin_show_window_menu_for_rect;
 
-  plugin_class->keybinding_filter = gnome_shell_plugin_keybinding_filter;
+  plugin_class->keybinding_filter = kestrel_plugin_keybinding_filter;
 
-  plugin_class->confirm_display_change = gnome_shell_plugin_confirm_display_change;
+  plugin_class->confirm_display_change = kestrel_plugin_confirm_display_change;
 
-  plugin_class->create_close_dialog = gnome_shell_plugin_create_close_dialog;
-  plugin_class->create_inhibit_shortcuts_dialog = gnome_shell_plugin_create_inhibit_shortcuts_dialog;
+  plugin_class->create_close_dialog = kestrel_plugin_create_close_dialog;
+  plugin_class->create_inhibit_shortcuts_dialog = kestrel_plugin_create_inhibit_shortcuts_dialog;
 
-  plugin_class->locate_pointer = gnome_shell_plugin_locate_pointer;
+  plugin_class->locate_pointer = kestrel_plugin_locate_pointer;
 }
 
 static void
-gnome_shell_plugin_init (GnomeShellPlugin *shell_plugin)
+kestrel_plugin_init (KestrelPlugin *shell_plugin)
 {
 }

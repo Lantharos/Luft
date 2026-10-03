@@ -9,8 +9,8 @@ const NOT_SET = 'Not set';
 
 export async function recordShortcuts(appId: string, current: AppShortcuts, unavailable: Set<string>): Promise<AppShortcuts | null> {
   const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
-    import('resource:///org/gnome/shell/ui/dialog.js'),
-    import('resource:///org/gnome/shell/ui/modalDialog.js'),
+    import('resource:///com/lantharos/kestrel/ui/dialog.js'),
+    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
   ]);
   return new Promise(resolve => {
     const edited: AppShortcuts = Object.fromEntries(Object.entries(current).map(([id, shortcut]) => [id, { ...shortcut, shortcuts: [...shortcut.shortcuts] }]));

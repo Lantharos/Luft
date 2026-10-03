@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 const PASTED = 'See you at the harbour';
 

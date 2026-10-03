@@ -285,7 +285,7 @@ on_icon_theme_changed (StTextureCache *cache,
    * to force users such as StIcon to look up icons again.
    */
   id = g_idle_add_once ((GSourceOnceFunc) st_theme_context_changed, context);
-  g_source_set_name_by_id (id, "[gnome-shell] st_theme_context_changed");
+  g_source_set_name_by_id (id, "[kestrel] st_theme_context_changed");
 }
 
 /**

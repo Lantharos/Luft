@@ -26,7 +26,7 @@
 #include "shell-global-private.h"
 #include "st.h"
 
-extern GType gnome_shell_plugin_get_type (void);
+extern GType kestrel_plugin_get_type (void);
 
 #define SHELL_DBUS_SERVICE "org.gnome.Shell"
 
@@ -226,7 +226,7 @@ shell_introspection_init (void)
    * for some linkers (e.g. gold) and in some distros (e.g. Debian).
    */
   gi_repository_prepend_library_path (repo, MUTTER_TYPELIB_DIR);
-  gi_repository_prepend_library_path (repo, GNOME_SHELL_PKGLIBDIR);
+  gi_repository_prepend_library_path (repo, KESTREL_PKGLIBDIR);
 
 #ifdef HAVE_EXE_INTROSPECTION
   maybe_add_rpath_introspection_paths (repo);
@@ -521,7 +521,7 @@ main (int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-  meta_context_set_plugin_gtype (context, gnome_shell_plugin_get_type ());
+  meta_context_set_plugin_gtype (context, kestrel_plugin_get_type ());
   meta_context_enable_cogl_display_features (context,
                                              COGL_DISPLAY_FEATURE_RESET_NOTIFICATION);
   meta_context_set_gnome_wm_keybindings (context, GNOME_WM_KEYBINDINGS);
@@ -568,7 +568,7 @@ main (int argc, char **argv)
   shell_a11y_init ();
   shell_introspection_init ();
 
-  /* Ensure the GNOME Shell cursor implementation registers itself as
+  /* Ensure the Kestrel cursor implementation registers itself as
    * a GIO extension.
    */
   g_type_ensure (ST_TYPE_CURSOR);
@@ -581,7 +581,7 @@ main (int argc, char **argv)
 
   if (!meta_context_start (context, &error))
     {
-      g_printerr ("GNOME Shell failed to start: %s\n", error->message);
+      g_printerr ("Kestrel failed to start: %s\n", error->message);
       return EXIT_FAILURE;
     }
 
@@ -591,7 +591,7 @@ main (int argc, char **argv)
   GjsContext *gjs_context = _shell_global_get_gjs_context (shell_global_get());
   uint8_t status;
   if (!gjs_context_eval_module_file (gjs_context,
-                                     "resource:///org/gnome/shell/ui/init.js",
+                                     "resource:///com/lantharos/kestrel/ui/init.js",
                                      &status,
                                      &error))
     {
@@ -612,7 +612,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  g_message ("Shutting down GNOME Shell");
+  g_message ("Shutting down Kestrel");
   _shell_global_notify_shutdown (shell_global_get ());
   shell_profiler_shutdown ();
 

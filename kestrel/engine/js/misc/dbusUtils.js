@@ -13,8 +13,8 @@ function _ensureIfaceResource() {
         return;
 
     // don't use global.datadir so the method is usable from tests/tools
-    const dir = GLib.getenv('GNOME_SHELL_DATADIR') || Config.PKGDATADIR;
-    const path = `${dir}/gnome-shell-dbus-interfaces.gresource`;
+    const dir = GLib.getenv('KESTREL_DATADIR') || Config.PKGDATADIR;
+    const path = `${dir}/kestrel-dbus-interfaces.gresource`;
     _ifaceResource = Gio.Resource.load(path);
     _ifaceResource._register();
 }
@@ -26,7 +26,7 @@ function _ensureIfaceResource() {
 export function loadInterfaceXML(iface) {
     _ensureIfaceResource();
 
-    const uri = `resource:///org/gnome/shell/dbus-interfaces/${iface}.xml`;
+    const uri = `resource:///com/lantharos/kestrel/dbus-interfaces/${iface}.xml`;
     const f = Gio.File.new_for_uri(uri);
 
     try {

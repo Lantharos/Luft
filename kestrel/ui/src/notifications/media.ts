@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { MprisSource, type MprisPlayer } from 'resource:///org/gnome/shell/ui/mpris.js';
+import { MprisSource, type MprisPlayer } from 'resource:///com/lantharos/kestrel/ui/mpris.js';
 
 import { appIcon } from '../appearance/icons/appIcons.js';
 

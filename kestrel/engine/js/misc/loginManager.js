@@ -130,7 +130,7 @@ class LoginManagerSystemd extends Signals.EventEmitter {
 
     async inhibit(reason, cancellable) {
         const inVariant = new GLib.Variant('(ssss)',
-            ['sleep', 'GNOME Shell', reason, 'delay']);
+            ['sleep', 'Kestrel', reason, 'delay']);
         const [outVariant_, fdList] =
             await this._proxy.call_with_unix_fd_list('Inhibit',
                 inVariant, 0, -1, null, cancellable);

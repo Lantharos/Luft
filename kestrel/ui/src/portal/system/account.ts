@@ -1,7 +1,7 @@
 import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { Avatar } from 'resource:///org/gnome/shell/ui/userWidget.js';
+import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';

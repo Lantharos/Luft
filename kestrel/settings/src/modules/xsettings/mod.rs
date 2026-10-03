@@ -28,9 +28,9 @@ const MUTTER_X11: Endpoint = Endpoint {
     interface: "org.gnome.Mutter.X11",
 };
 const INTROSPECT: Endpoint = Endpoint {
-    service: "org.gnome.Shell.Introspect",
-    path: "/org/gnome/Shell/Introspect",
-    interface: "org.gnome.Shell.Introspect",
+    service: "com.lantharos.Kestrel.Introspect",
+    path: "/com/lantharos/Kestrel/Introspect",
+    interface: "com.lantharos.Kestrel.Introspect",
 };
 
 struct Sources {

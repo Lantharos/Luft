@@ -174,7 +174,7 @@ export const SwitcherPopup = GObject.registerClass({
             () => {
                 this._showImmediately();
             });
-        GLib.Source.set_name_by_id(this._initialDelayTimeoutId, '[gnome-shell] Main.osdWindow.cancel');
+        GLib.Source.set_name_by_id(this._initialDelayTimeoutId, '[kestrel] Main.osdWindow.cancel');
         return true;
     }
 
@@ -306,7 +306,7 @@ export const SwitcherPopup = GObject.registerClass({
             GLib.source_remove(this._motionTimeoutId);
 
         this._motionTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, DISABLE_HOVER_TIMEOUT, this._mouseTimedOut.bind(this));
-        GLib.Source.set_name_by_id(this._motionTimeoutId, '[gnome-shell] this._mouseTimedOut');
+        GLib.Source.set_name_by_id(this._motionTimeoutId, '[kestrel] this._mouseTimedOut');
     }
 
     _mouseTimedOut() {

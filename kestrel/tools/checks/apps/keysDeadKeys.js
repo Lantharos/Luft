@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import * as IBusManager from 'resource:///org/gnome/shell/misc/ibusManager.js';
+import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
 
 import {prepareHome} from './home.js';
 import {tryFieldChecker} from './keysTry.js';

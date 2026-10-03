@@ -94,13 +94,13 @@ export const CloseDialog = GObject.registerClass({
         const surfaceActor = windowActor.get_first_child();
         const effect = new Clutter.BrightnessContrastEffect();
         effect.set_brightness(FROZEN_WINDOW_BRIGHTNESS);
-        surfaceActor.add_effect_with_name('gnome-shell-frozen-window', effect);
+        surfaceActor.add_effect_with_name('kestrel-frozen-window', effect);
     }
 
     _removeWindowEffect() {
         const windowActor = this._window.get_compositor_private();
         const surfaceActor = windowActor.get_first_child();
-        surfaceActor.remove_effect_by_name('gnome-shell-frozen-window');
+        surfaceActor.remove_effect_by_name('kestrel-frozen-window');
     }
 
     _onWait() {

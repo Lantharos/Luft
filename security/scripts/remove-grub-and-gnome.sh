@@ -45,7 +45,7 @@ find_kestrel() {
   session="$(readlink -e /usr/local/share/wayland-sessions/kestrel.desktop)" ||
     stop "Kestrel isn't installed as a login session. Install it with kestrel/tools/install.sh install first."
   prefix="${session%/share/wayland-sessions/kestrel.desktop}"
-  LD_LIBRARY_PATH="" ldd "$prefix/bin/kestrel" | grep -q "libmutter-51.so.0 => $prefix/" ||
+  grep -q "libmutter-51.so.0 => $prefix/" <<<"$(LD_LIBRARY_PATH="" ldd "$prefix/bin/kestrel")" ||
     stop "Kestrel in $prefix uses the system's Mutter. Reinstall it with kestrel/tools/install.sh install first."
   [[ -e /usr/local/share/xdg-desktop-portal/kestrel-portals.conf ]] ||
     stop "Kestrel doesn't answer apps' portal requests yet. Reinstall it with kestrel/tools/install.sh install first."
@@ -72,7 +72,7 @@ check_images() {
   running="$(uname -r)"
   mapfile -t versions < <(kept_kernels)
   ((${#versions[@]} >= 2)) || stop "Only one kernel is installed, so there would be nothing to go back to. Wait for the next kernel update and run this again."
-  printf '%s\n' "${versions[@]}" | grep -qxF "$running" ||
+  grep -qxF "$running" < <(printf '%s\n' "${versions[@]}") ||
     stop "Linux $running isn't one of the three newest kernels. Restart into the newest one and run this again."
   for version in "${versions[@]}"; do
     image="$(sudo find "$esp/EFI/Linux" -maxdepth 1 \( -name "luft-$version.efi" -o -name "luft-$version+*.efi" \) -print -quit)"
@@ -88,7 +88,7 @@ check_fallback() {
     stop "The firmware's fallback, \\EFI\\BOOT\\BOOTX64.EFI, isn't Fedora's shim. Run 'sudo dnf reinstall shim-x64' and run this again."
   sudo test -f "$esp/EFI/BOOT/fbx64.efi" && sudo test -f "$esp/EFI/fedora/BOOTX64.CSV" ||
     stop "Shim's fallback program or its list of boot entries is missing. Run 'sudo dnf reinstall shim-x64' and run this again."
-  efibootmgr | grep -qE '^Boot[0-9A-F]{4}\* Luft' ||
+  grep -qE '^Boot[0-9A-F]{4}\* Luft' <<<"$(efibootmgr)" ||
     stop "The Luft boot entry is missing. Run 'sudo trustctl startup install' and run this again."
   echo "Fallback: \\EFI\\BOOT\\BOOTX64.EFI is Fedora's shim, and the Luft entry is there"
 }
@@ -97,7 +97,7 @@ preflight() {
   say "Checking that this computer can start without GRUB and work without GNOME's services"
   [[ -d /sys/firmware/efi ]] || stop "This computer doesn't start with UEFI."
   command -v trustctl >/dev/null || stop "trustctl isn't installed. Run security/scripts/install.sh install first."
-  bootctl status 2>/dev/null | grep -q 'Product: SushiBoot' ||
+  grep -q '^SushiBoot ' <<<"$(tail -c +5 /sys/firmware/efi/efivars/LoaderInfo-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f 2>/dev/null | tr -d '\0')" ||
     stop "This start didn't go through SushiBoot. Restart through the Luft entry and run this again."
   local status
   status="$(sudo trustctl status)"
@@ -228,7 +228,7 @@ take_over() {
 
 verify() {
   say "Checking the result"
-  ! rpm -qa --qf '%{NAME}\n' | grep -qE '^grub2-' || stop "GRUB's packages are still installed."
+  ! grep -qE '^grub2-' <<<"$(rpm -qa --qf '%{NAME}\n')" || stop "GRUB's packages are still installed."
   sudo sbverify --cert "$certificate" "$esp/EFI/fedora/grubx64.efi" >/dev/null 2>&1 ||
     stop "Shim's default program isn't SushiBoot signed with the Luft key. Run 'sudo trustctl startup install' before restarting."
   echo "Shim's default program, \\EFI\\fedora\\grubx64.efi, is SushiBoot"

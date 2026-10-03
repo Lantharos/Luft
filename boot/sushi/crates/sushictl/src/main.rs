@@ -5,8 +5,10 @@ use std::time::Duration;
 use clap::{Parser, Subcommand};
 
 use sushi::control::{self, Command, KeyEnrollment, Mode};
+use sushi::drivers;
 
 const NOTICE_WAIT: Duration = Duration::from_secs(300);
+const DRIVER_WAIT: Duration = Duration::from_secs(20);
 
 #[derive(Parser)]
 #[command(name = "sushictl", version, about = "Control the Sushi boot splash")]
@@ -27,6 +29,8 @@ enum Action {
     Show { mode: Mode },
     /// Print whether the splash is showing, handing over, or holding the display between sessions
     Status,
+    /// Load the graphics drivers the splash takes over itself: through the splash when it's showing, directly otherwise
+    LoadDrivers,
     /// Explain the key enrollment screen at the next restart, or show a notice from a file now and wait until it's dismissed
     Notice {
         #[command(subcommand)]
@@ -49,8 +53,33 @@ enum Notice {
     },
 }
 
+fn load_drivers() -> ExitCode {
+    if drivers::waiting().is_empty() {
+        return ExitCode::SUCCESS;
+    }
+    if let Err(error) = control::send(&Command::LoadDrivers, DRIVER_WAIT) {
+        eprintln!("Loading the graphics drivers without the splash: {error}");
+    }
+    let left = drivers::waiting().all();
+    if left.is_empty() {
+        return ExitCode::SUCCESS;
+    }
+    match drivers::load(&left) {
+        Ok(status) if status.success() => ExitCode::SUCCESS,
+        Ok(status) => {
+            eprintln!("Loading {} failed: {status}", left.join(", "));
+            ExitCode::FAILURE
+        }
+        Err(error) => {
+            eprintln!("Couldn't run modprobe: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let command = match Cli::parse().command {
+        Action::LoadDrivers => return load_drivers(),
         Action::Deactivate => Command::Deactivate,
         Action::Quit => Command::Quit,
         Action::UpdateRoot { root } => Command::UpdateRoot(root),
@@ -68,6 +97,7 @@ fn main() -> ExitCode {
     };
     let wait = match command {
         Command::Show(Mode::Shutdown) | Command::ShowNotice(_) => NOTICE_WAIT,
+        Command::UpdateRoot(_) => DRIVER_WAIT,
         _ => Duration::from_secs(5),
     };
     match control::send(&command, wait) {

@@ -12,7 +12,7 @@ In the Luft monorepo, Sushi lives at `boot/sushi`. Run the commands below from t
    - With a TPM PIN, it says "Enter your PIN"; a security key's PIN is asked for by name too.
    - When the TPM doesn't unlock a disk it normally unlocks, Sushi asks for the recovery key (or the passphrase, if the disk has one) and says why in a sentence: something about how the computer starts has changed, the TPM isn't responding, or the PIN didn't work. Recovery keys can be typed with or without their dashes, and Sushi counts the characters as they're typed.
 3. When the system switches from the initramfs to the installed system, Sushi keeps running and keeps the splash on screen.
-4. When the graphics driver loads and replaces the firmware framebuffer, Sushi redraws on the new device as soon as the system has finished setting the device up. If a display arrangement was saved by the login screen, Sushi uses that mode, so the monitor only switches modes once. When the splash looked different on the firmware framebuffer, it crossfades to the new picture instead of jumping.
+4. When the graphics driver replaces the firmware framebuffer, Sushi moves to the new device and sets the display arrangement the login screen saved, resolution and refresh rate, so the login screen and desktop find the monitor already in its final mode and never switch it again. How that looks depends on the driver (see [When the graphics driver takes over](#when-the-graphics-driver-takes-over)): either nothing visibly changes, or the logo fades to black and back once. Until then Sushi shows only the logo, so nothing it shows gets cut off.
 5. When the login screen starts, Sushi fades the spinner out, leaves the logo on screen, and lets go of the display. The login screen's first frame shows the same logo before its own interface fades in.
 6. Sushi then stays in the background holding the display open, so that when one session ends and the next begins (signing in, signing out), the last frame stays on screen instead of the kernel's text console taking over.
 7. When the computer restarts or shuts down, Sushi takes the display back the moment the login screen or session lets go of it, clears the pointer and anything else they left on screen, and shows the logo and spinner until the computer turns off.
@@ -23,7 +23,21 @@ Some firmware hands over a framebuffer smaller than the monitor, such as 1024×7
 
 - The firmware only records where it drew its logo, not on which screen. Firmware centers its logo, so twice the logo's distance from the left edge plus its width gives the width of the screen it was drawn on, and the monitor gives the height. Sushi then scales the logo into the framebuffer at the same place on the monitor.
 - When the monitor's shape is known, the spinner and text are drawn squeezed by exactly as much as the monitor will stretch them, so they come out round and centered. Sushi learns the monitor's resolution from its EDID, when the framebuffer device has one, or from the saved display arrangement, which the initramfs carries for this. If neither is available, Sushi draws square pixels.
-- When the graphics driver takes over at the monitor's resolution, the splash crossfades from how it looked on the stretched framebuffer to the sharp one.
+- When the graphics driver takes over at the monitor's resolution, the splash crossfades from how it looked on the stretched framebuffer to the sharp one, or fades back in sharp when the driver switched the screen off.
+
+### When the graphics driver takes over
+
+Some drivers take over the picture the firmware left on screen, others switch the display off for a moment. Sushi tells them apart and makes the moment look deliberate either way:
+
+- Drivers that keep the picture: Intel's (i915 and xe) on any screen, and AMD's on a laptop's built-in panel. When the firmware's mode is already the saved one, the hand-over is invisible: the logo stays exactly where it is and the spinner fades in once the driver is there. When the saved mode differs, for example 120 Hz on a panel the firmware started at 60 Hz, Sushi fades the logo out, switches the mode on a black screen, waits for the panel, and fades back in.
+- Drivers that switch the display off: AMD's on external monitors and desktop cards, and anything else that doesn't keep the picture. Sushi shows black in the saved mode right away, waits for the monitor to pick the signal back up, and fades the splash in.
+- NVIDIA's driver, which always switches the display off when it first sets a mode, isn't left to start whenever udev gets to it. Sushi loads it itself right after its first frame: it fades the logo to black in a fifth of a second, loads the driver, sets the saved mode on a black frame, waits for the monitor, and fades the splash back in over a second. With the driver in the initramfs, this happens in the first seconds of the boot, before the installed system starts.
+
+The wait for the monitor is `monitor-resync` in `/etc/sushi/sushi.conf`, one second by default. A monitor gives no signal when it's showing a picture again; most DisplayPort and HDMI monitors take half a second to a second after a mode change, longer when the refresh rate changes. The fade-in that follows takes another second, so a monitor that's a little slower still shows most of it. If the splash is already partly bright when the picture comes back, raise it (for example `monitor-resync = 1.5`) and rebuild the initramfs, since it carries a copy of the file.
+
+Drivers Sushi loads itself are listed in `/usr/lib/modprobe.d/sushi.conf` as `blacklist` lines, which keeps udev from loading them on its own; a file with the same name in `/etc/modprobe.d` replaces the list. The initramfs carries those drivers, with the firmware they need for the cards in the computer, whenever the computer has such a card. `sushi-drivers.service` makes sure they load even when Sushi doesn't: when the kernel command line doesn't turn Sushi on, when it stopped, in rescue mode, or when the initramfs didn't have the driver yet (for example right after a kernel update, before akmods built NVIDIA's driver for it). It asks Sushi to take the display over, and loads the driver directly if Sushi doesn't answer within 20 seconds. It runs before the login screen starts.
+
+On a laptop with two graphics cards, only the card that drives the screen the firmware used gets this treatment. A second card's driver loads in the background without touching the splash.
 
 ## Updates
 
@@ -80,7 +94,7 @@ sushictl notice show /run/example/notice   # waits until the notice is gone, and
 | `sushictl` | Talks to `sushid` |
 | `sushiboot` | The UEFI boot menu Luft starts through, drawn with the same scene |
 
-`data/` holds the systemd units, the drop-ins for greetd, Plymouth's boot units and the console password agent, the dracut module, and the default configuration.
+`data/` holds the systemd units, the drop-ins for greetd, Plymouth's boot units and the console password agent, the dracut module, the list of drivers Sushi loads itself, and the default configuration.
 
 ## Installing on Fedora
 
@@ -120,19 +134,22 @@ Sushi works with any display manager that starts its compositor after running `s
 
 With Kestrel's login screen, set greetd to the seventh virtual terminal (`vt = 7` in `/etc/greetd/config.toml`, which Kestrel's `greetd.toml` already does), so the text console never shares a terminal with graphical sessions.
 
-`/etc/sushi/sushi.conf` has one setting:
+`/etc/sushi/sushi.conf` has two settings:
 
 ```ini
 monitors = /var/lib/kestrel-greeter/display/monitors.xml
+monitor-resync = 1.0
 ```
 
 Kestrel copies your display arrangement there whenever you change it, and Sushi and the login screen both start in that mode. The initramfs carries a copy, so Sushi knows the monitor's shape before the graphics driver loads; the copy is refreshed whenever the initramfs is rebuilt.
 
 ### NVIDIA
 
-Keep `nvidia-drm.fbdev=1` (the default with current drivers). Without it, the driver turns every screen off whenever a program lets go of the display, which undoes the hand-over. Sushi doesn't need the NVIDIA driver in the initramfs; it follows the screen when the driver loads later.
+Keep `nvidia-drm.fbdev=1` (the default with current drivers). Without it, the driver turns every screen off whenever a program lets go of the display, which undoes the hand-over.
 
-The NVIDIA driver can't take over the picture the firmware left on screen: the first time anything sets a display mode on it, the driver switches the display off and on again, and the monitor goes dark while it picks the signal back up, for longer when the refresh rate changes too. Sushi draws on the new device the moment it appears and sets the mode the login screen will use, so this happens once per start and never again at the login screen or when signing in.
+The NVIDIA driver can't take over the picture the firmware left on screen: the first time anything sets a display mode on it, it switches the display off and on again. Sushi makes that its own moment, as described above, and sets the saved arrangement (for example 3440×1440 at 165 Hz) in the same step, so the monitor picks the signal up once per start and never again at the login screen or when signing in.
+
+Only `nvidia_drm`, the part that drives the display, waits for Sushi. The rest of the driver loads as usual while the splash shows, so the hand-over itself takes a fraction of a second. On Luft's signed startup, the initramfs is rebuilt whenever akmods builds the driver for a kernel or a new driver version, so the initramfs and the installed system always carry the same version (see `security/README.md`).
 
 ## sushictl
 
@@ -141,6 +158,7 @@ sushictl status        # showing, leaving, waiting, or holding
 sushictl deactivate    # fade the spinner out and let the next program take the display
 sushictl quit          # close the splash and return to the text console
 sushictl show updates  # take the display back and show the splash for boot-up, shutdown, updates, system-upgrade or firmware-upgrade
+sushictl load-drivers  # load the graphics drivers Sushi takes over, through Sushi when it's showing
 ```
 
 `sushictl update-root` is used by the initramfs while switching to the installed system, and `sushi-shutdown.service` runs `sushictl show shutdown` when the computer restarts or shuts down.
@@ -189,7 +207,7 @@ make check    # formatting, clippy for Linux and UEFI, tests
 
 ### Virtual machine
 
-The VM is a Fedora 45 system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. A small program in `scripts/vm/display` stands in for a graphics card's own firmware on the way: it describes the monitor to SushiBoot and can hand over a framebuffer of another size. The firmware framebuffer starts the boot; the virtio GPU driver loads after the switch to the installed system and replaces it, the same way the NVIDIA driver does on real hardware. The VM's udev takes half a second to finish setting up each new display device, so programs that open the device too early run into SELinux the way they would on a slow machine. Nothing on the host is installed or changed, and no step needs `sudo`.
+The VM is a Fedora 45 system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. A small program in `scripts/vm/display` stands in for a graphics card's own firmware on the way: it describes the monitor to SushiBoot and can hand over a framebuffer of another size. The firmware framebuffer starts the boot, and a graphics driver replaces it the way one would on real hardware. The VM's udev takes half a second to finish setting up each new display device, so programs that open the device too early run into SELinux the way they would on a slow machine. Nothing on the host is installed or changed, and no step needs `sudo`.
 
 ```bash
 scripts/vm/tree.sh       # Fedora root tree (first run downloads packages)
@@ -211,15 +229,24 @@ Everything lives in `vm/`; set `SUSHI_VM` to another folder to keep a second mac
 | `TPM=2` | A software TPM 2.0 (swtpm) whose state stays in `tpm2/` next to the disk, like a TPM soldered to the board |
 | `TPM=1.2` | An old TPM 1.2 instead |
 | `XRES=3440 YRES=1440` | The monitor's resolution (1920×1080 by default) |
-| `GPU=vga` | QEMU's standard VGA instead of virtio. Its firmware driver reads the monitor's EDID and starts at its resolution, which virtio's can't above 1920×1080; Linux's bochs driver then takes over after the switch to the installed system |
+| `GPU=vga` | QEMU's standard VGA instead of virtio. Its firmware driver reads the monitor's EDID and starts at its resolution, which virtio's can't above 1920×1080. Linux's bochs driver then takes it over |
 | `FRAMEBUFFER=1024x768` | Hand SushiBoot a framebuffer of this size, the way some firmware does |
 | `EDID=0` | Don't describe the monitor to SushiBoot, so it keeps the framebuffer it was given, as GRUB would |
+
+`disk.sh` takes `DRIVER` to choose how the graphics driver arrives:
+
+| `DRIVER` | Effect |
+|----------|--------|
+| `initramfs` (default) | Sushi loads bochs itself in the initramfs, the way it loads NVIDIA's driver: fade to black, load, set the saved mode, fade back in. Use it with `GPU=vga` |
+| `system` | Sushi loads bochs itself, but the initramfs doesn't carry it, so `sushi-drivers.service` asks for the hand-over after the switch to the installed system, as right after a kernel update before akmods built the driver |
+| `udev` | udev loads the driver in the initramfs, which switches the screen off on its own, like AMD's driver with an external monitor |
 
 `scripts/vm/record.py` boots the VM without a window, types at given times, answers prompts on the serial console, and saves every frame, which is how the hand-overs are checked frame by frame:
 
 ```bash
 scripts/vm/record.py /tmp/frames --seconds 40 --type "16:sushi-vm"
 GPU=vga XRES=3440 YRES=1440 FRAMEBUFFER=1024x768 EDID=0 scripts/vm/record.py /tmp/frames --seconds 20   # a stretched start
+DRIVER=initramfs scripts/vm/disk.sh && GPU=vga scripts/vm/record.py /tmp/frames --seconds 20   # NVIDIA's hand-over
 scripts/vm/frames.py /tmp/frames        # when the screen went black, froze, or changed resolution
 scripts/vm/journal.sh -b 0 -u sushi    # the VM's journal, read from its disk after it shuts down
 ```

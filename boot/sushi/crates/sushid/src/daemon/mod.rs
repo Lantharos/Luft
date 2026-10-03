@@ -1,4 +1,5 @@
 mod cards;
+mod drivers;
 mod requests;
 
 use std::os::fd::AsFd;
@@ -21,8 +22,9 @@ use sushi::uevent::CardEvents;
 use crate::activity::Activity;
 use crate::firmware::Firmware;
 use crate::notice::Shown;
-use crate::screen::{Fader, Look, Screen};
+use crate::screen::{Curtain, Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
+use crate::takeover::Takeover;
 use crate::unlock::{Answered, Typed, Unlock};
 
 const FRAME: Duration = Duration::from_micros(16_667);
@@ -68,6 +70,10 @@ pub struct Daemon {
     notice: Option<Shown>,
     fading_notice: Option<sushi::scene::Notice>,
     root: Option<PathBuf>,
+    takeover: Takeover,
+    on_firmware: bool,
+    driver_waiters: Vec<UnixStream>,
+    entering_root: Option<(PathBuf, UnixStream)>,
     quit: bool,
 }
 
@@ -119,6 +125,10 @@ impl Daemon {
             notice: None,
             fading_notice: None,
             root: None,
+            takeover: Takeover::new(config.monitor_resync),
+            on_firmware: false,
+            driver_waiters: Vec::new(),
+            entering_root: None,
             quit: false,
             config,
             hints,
@@ -127,6 +137,7 @@ impl Daemon {
         if daemon.held.is_none() {
             daemon.take_terminal();
         }
+        daemon.load_waiting_drivers(false);
         daemon.settle_loader(daemon.now());
         Ok(daemon)
     }
@@ -161,6 +172,9 @@ impl Daemon {
 
     fn next_wakeup(&self) -> Option<Duration> {
         let now = self.now();
+        if self.takeover.is_active() {
+            return Some(FRAME);
+        }
         match &self.phase {
             Phase::Leaving(_) => Some(FRAME),
             Phase::Splash if self.screen.is_none() => self.held.as_ref().map(|_| WATCH_INTERVAL),
@@ -267,7 +281,7 @@ impl Daemon {
     }
 
     fn refresh_unlock(&mut self) {
-        if !matches!(self.phase, Phase::Splash) {
+        if !matches!(self.phase, Phase::Splash) || self.takeover.hides_content() {
             return;
         }
         if self.unlock.as_ref().is_some_and(|unlock| !unlock.is_live()) {
@@ -299,7 +313,10 @@ impl Daemon {
     }
 
     fn settle_loader(&mut self, now: f32) {
-        let covered = self.unlock.is_some() || self.notice.is_some() || self.activity.is_showing();
+        let covered = self.unlock.is_some()
+            || self.notice.is_some()
+            || self.activity.is_showing()
+            || self.takeover.hides_content();
         self.look
             .loader
             .fade_to(if covered { 0.0 } else { 1.0 }, now);
@@ -334,8 +351,12 @@ impl Daemon {
         if self.fading_notice.is_some() && self.look.notice.settled(now) {
             self.fading_notice = None;
         }
+        self.advance_takeover(now);
         match std::mem::replace(&mut self.phase, Phase::Holding) {
-            Phase::Leaving(pending) if self.look.settled(now) || self.screen.is_none() => {
+            Phase::Leaving(pending)
+                if !self.takeover.is_active()
+                    && (self.look.settled(now) || self.screen.is_none()) =>
+            {
                 self.draw();
                 if let Some(screen) = &self.screen {
                     screen.share_logo_placement();
@@ -383,6 +404,15 @@ impl Daemon {
             return;
         }
         let now = self.now();
+        let curtain = self.takeover.curtain(now);
+        let curtain = Curtain {
+            logo: curtain,
+            content: if self.takeover.hides_content() {
+                0.0
+            } else {
+                curtain
+            },
+        };
         let status = self.activity.status(now);
         let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
         let notice = self
@@ -391,7 +421,7 @@ impl Daemon {
             .map(|shown| &shown.notice)
             .or(self.fading_notice.as_ref());
         if let Some(screen) = &mut self.screen
-            && let Err(error) = screen.draw(&self.look, now, prompt, status, notice)
+            && let Err(error) = screen.draw(&self.look, curtain, now, prompt, status, notice)
         {
             eprintln!("Lost {}: {error}", screen.path().display());
             self.forget_screen();

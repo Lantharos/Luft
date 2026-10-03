@@ -23,6 +23,37 @@ struct Planned {
     connector: connector::Handle,
     crtc: crtc::Handle,
     mode: Mode,
+    inherited: Option<Mode>,
+    internal: bool,
+}
+
+const SEAMLESS_DRIVERS: [&str; 2] = ["i915", "xe"];
+const SEAMLESS_ON_INTERNAL_PANELS: [&str; 1] = ["amdgpu"];
+
+fn is_internal(interface: connector::Interface) -> bool {
+    matches!(
+        interface,
+        connector::Interface::EmbeddedDisplayPort
+            | connector::Interface::LVDS
+            | connector::Interface::DSI
+    )
+}
+
+fn same_timing(a: &Mode, b: &Mode) -> bool {
+    a.clock() == b.clock()
+        && a.size() == b.size()
+        && a.hsync() == b.hsync()
+        && a.vsync() == b.vsync()
+        && a.hskew() == b.hskew()
+        && a.vscan() == b.vscan()
+        && a.flags() == b.flags()
+}
+
+fn shown_mode(card: &Card, crtc: crtc::Handle) -> Option<Mode> {
+    card.get_crtc(crtc)
+        .ok()
+        .filter(|info| info.framebuffer().is_some())
+        .and_then(|info| info.mode())
 }
 
 fn plan(card: &Card, hints: &ModeHints) -> io::Result<Vec<Planned>> {
@@ -44,6 +75,8 @@ fn plan(card: &Card, hints: &ModeHints) -> io::Result<Vec<Planned>> {
                 connector: info.handle(),
                 crtc,
                 mode,
+                inherited: shown_mode(card, crtc),
+                internal: is_internal(info.interface()),
             });
         }
     }
@@ -122,9 +155,45 @@ impl Display {
     fn build(card: Card, plan: Vec<Planned>) -> io::Result<Self> {
         let outputs = plan
             .into_iter()
-            .map(|planned| Output::create(&card, planned.connector, planned.crtc, planned.mode))
+            .map(|planned| {
+                Output::create(&card, planned.connector, planned.crtc, planned.mode)
+                    .map(|output| output.inheriting(planned.inherited, planned.internal))
+            })
             .collect::<io::Result<Vec<_>>>()?;
         Ok(Self { card, outputs })
+    }
+
+    /// Whether the driver took over the picture the firmware left on screen instead of switching the display off.
+    pub fn kept_firmware_picture(&self) -> bool {
+        let driver = self.card.driver().unwrap_or_default();
+        let inherited = self.outputs.iter().all(|output| output.inherited.is_some());
+        let internal = self.outputs.iter().all(|output| output.internal);
+        inherited
+            && (SEAMLESS_DRIVERS.contains(&driver.as_str())
+                || (internal && SEAMLESS_ON_INTERNAL_PANELS.contains(&driver.as_str())))
+    }
+
+    pub fn shows_planned_modes(&self) -> bool {
+        self.outputs.iter().all(|output| {
+            output
+                .inherited
+                .is_some_and(|inherited| same_timing(&inherited, &output.mode))
+        })
+    }
+
+    pub fn keeping_inherited_modes(self) -> io::Result<Self> {
+        let plan = self
+            .outputs
+            .iter()
+            .map(|output| Planned {
+                connector: output.connector,
+                crtc: output.crtc,
+                mode: output.inherited.unwrap_or(output.mode),
+                inherited: output.inherited,
+                internal: output.internal,
+            })
+            .collect();
+        Self::build(self.into_card(), plan)
     }
 
     pub fn refresh(self, hints: &ModeHints) -> io::Result<(Self, bool)> {

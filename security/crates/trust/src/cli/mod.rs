@@ -83,6 +83,8 @@ enum StartupAction {
     },
     /// Rebuild the initramfs and signed images after changing what goes into them
     Rebuild,
+    /// Rebuild the signed images whose kernel got new or changed modules, such as a graphics driver built by akmods
+    Refresh,
     /// Show or change the kernel command line inside the signed images
     Arguments {
         /// Arguments to add, such as quiet or loglevel=3
@@ -173,6 +175,7 @@ fn startup(action: StartupAction) -> Result<()> {
         StartupAction::Add { version } => startup::add(&Kernel::named(&version)),
         StartupAction::Remove { version } => startup::remove(&version),
         StartupAction::Rebuild => startup::rebuild_boot_files(),
+        StartupAction::Refresh => startup::refresh(true),
         StartupAction::Arguments { add, remove, once } => {
             let words = |values: Vec<String>| -> Vec<String> {
                 values

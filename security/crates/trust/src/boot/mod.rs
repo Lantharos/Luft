@@ -3,6 +3,7 @@ mod entries;
 pub mod esp;
 mod images;
 pub mod kernels;
+mod modules;
 pub mod sign;
 pub mod startup;
 pub mod tries;

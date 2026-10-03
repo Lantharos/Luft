@@ -10,7 +10,7 @@ use crate::system::efi;
 use super::esp::{self, Esp};
 use super::kernels::{self, Kernel};
 use super::uki::{self, Lines};
-use super::{cmdline, entries, images, sign, tries};
+use super::{cmdline, entries, images, modules, sign, tries};
 
 const BOOT_MENU: &str = "/usr/lib/sushi/efi/SushiBoot.efi";
 const SIGNED_MENU: &str = "EFI/sushi/SushiBoot.efi";
@@ -69,7 +69,11 @@ fn initrd_for(esp: &Esp, keys: &Unsealed, kernel: &Kernel, fresh: bool) -> Resul
     let initrd = keys.scratch(&format!("initrd-{}", kernel.version));
     match images::find(esp, &kernel.version) {
         Some(image) if !fresh => uki::extract_initrd(&image.path, &initrd)?,
-        _ => kernel.build_signed_initrd(&initrd, cmdline::has(&cmdline::read(), SPLASH))?,
+        _ => {
+            let added = kernel.added_modules();
+            kernel.build_signed_initrd(&initrd, cmdline::has(&cmdline::read(), SPLASH))?;
+            modules::remember(&kernel.version, &added);
+        }
     }
     Ok(initrd)
 }
@@ -118,7 +122,39 @@ pub fn add(kernel: &Kernel) -> Result<()> {
     let esp = esp::find()?;
     let keys = keys::unseal()?;
     images::keep_only(&esp, &wanted);
+    modules::forget_except(&wanted);
     build_untried(&esp, &keys, kernel, true, &lines(None))?;
+    rustix::fs::sync();
+    Ok(())
+}
+
+/// Rebuilds the images of kernels whose added modules changed since their initramfs was built, such as when
+/// akmods built NVIDIA's driver for a new kernel or a new driver version, so the initramfs never carries a
+/// driver that doesn't match the installed system.
+pub fn refresh(wait_for_akmods: bool) -> Result<()> {
+    if !installed() {
+        return Ok(());
+    }
+    let Ok(_akmods) = modules::hold_akmods(wait_for_akmods) else {
+        return Ok(());
+    };
+    let esp = esp::find()?;
+    let stale: Vec<Kernel> = images::wanted()
+        .into_iter()
+        .filter(|kernel| images::find(&esp, &kernel.version).is_some() && modules::changed(kernel))
+        .collect();
+    if stale.is_empty() {
+        return Ok(());
+    }
+    let keys = keys::unseal()?;
+    let lines = lines(None);
+    for kernel in &stale {
+        eprintln!(
+            "Rebuilding the signed image for Linux {}, whose added modules changed",
+            kernel.version
+        );
+        build_untried(&esp, &keys, kernel, true, &lines)?;
+    }
     rustix::fs::sync();
     Ok(())
 }
@@ -150,6 +186,7 @@ pub fn rebuild_boot_files() -> Result<()> {
 fn rebuild_with(esp: &Esp, keys: &Unsealed, rebuild_initrds: bool) -> Result<()> {
     let wanted = images::wanted();
     images::keep_only(esp, &wanted);
+    modules::forget_except(&wanted);
     let lines = lines(None);
     for kernel in &wanted {
         build_untried(esp, keys, kernel, rebuild_initrds, &lines)?;
@@ -212,6 +249,7 @@ pub fn uninstall() -> Result<()> {
     let _ = std::fs::remove_file(esp.file(SIGNED_MENU));
     let _ = std::fs::remove_file(esp.file(CERTIFICATE));
     images::keep_only(&esp, &[]);
+    modules::forget_except(&[]);
     Ok(())
 }
 
@@ -275,5 +313,6 @@ pub fn follow_up() -> Result<()> {
     {
         entries::create(&esp, &shim)?;
     }
-    tries::note_failures(&esp)
+    tries::note_failures(&esp)?;
+    refresh(false)
 }

@@ -1,0 +1,16 @@
+[Unit]
+Description=Load the graphics drivers the boot splash takes over
+Documentation=https://github.com/Lantharos/Luft/tree/main/boot/sushi
+DefaultDependencies=no
+After=sushi.service
+Before=display-manager.service greetd.service
+ConditionPathExists=!/etc/initrd-release
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/sushictl load-drivers
+TimeoutStartSec=90
+
+[Install]
+WantedBy=sysinit.target

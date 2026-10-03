@@ -17,9 +17,9 @@ Every piece is checked against a signature before it runs, and nothing can be ch
 
 Signed images are kept for the three newest installed kernels. SushiBoot shows the newest at the top and the others under Previous versions. A kernel-install plugin builds and signs the image for each kernel as it is installed and deletes it when the kernel is removed. When the EFI system partition runs short of room, an image being rebuilt makes room by going first, a new kernel's image makes room by removing the oldest previous versions, and the newest image is never removed to make room for an older one.
 
-The images get an initramfs of their own, made for this one job: finding and unlocking the system disk. Graphics drivers and their firmware stay out of it, since the firmware's framebuffer carries the splash until the real driver loads after the switch to the installed system, and so does Plymouth while Sushi is the splash. With an NVIDIA card that matters most: dracut would otherwise add nouveau and around 100 MB of GPU firmware, making each image close to 190 MB instead of about 80 MB. Changing only the command line reuses the initramfs already inside each image.
+The images get an initramfs of their own, made for finding and unlocking the system disk and for handing the screen to the graphics driver early. It carries the driver of each graphics card in the computer, so the driver takes over the screen in the first seconds of the boot while the splash shows (see `boot/sushi/README.md`), and leaves out Plymouth while Sushi is the splash. nouveau never goes in: on NVIDIA cards Luft uses NVIDIA's driver, and nouveau would bring around 100 MB of firmware of its own. NVIDIA's driver goes in with only the firmware its cards need, about 85 MB for current cards (`gsp` and `ucodes` for their generation), which makes each image about 140 MB instead of 65 MB; Intel's drivers add up to about 7 MB and AMD's up to about 40 MB. Changing only the command line reuses the initramfs already inside each image.
 
-To have a graphics driver in the initramfs anyway, ask dracut for it in `/etc/dracut.conf.d`, for example `force_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "` (with underscores), and run `sudo trustctl startup rebuild`. dracut keeps drivers it's explicitly asked for, so the signed images include it, and fewer previous versions fit.
+Drivers that akmods builds, such as NVIDIA's, arrive after the kernel: kernel-install builds the new kernel's image first, then starts akmods, which takes a few minutes. Each image remembers the modules it was built with outside the kernel package, and `trustctl startup refresh` rebuilds the images whose modules changed since, so the initramfs never carries a different driver version than the installed system. It runs when akmods finishes (`trustd-refresh.path` watches akmods' build folder for NVIDIA, and the refresh waits for akmods to finish installing), at shutdown after akmods' own shutdown build, and at startup. Until an image is rebuilt it starts the way it was built: without the driver for a brand new kernel, which then loads from the installed system a few seconds later.
 
 Until GRUB is removed, Fedora's own entry still starts shim and GRUB. That works as before, but the TPM won't unlock the disk that way, so it asks for the recovery key.
 
@@ -172,6 +172,7 @@ trustctl secure-boot cancel        # withdraw that, including any retries
 trustctl startup install           # SushiBoot, signed kernel images and the Luft boot entry
 trustctl startup uninstall         # remove them again while GRUB is still installed
 trustctl startup rebuild           # rebuild the initramfs and the signed images
+trustctl startup refresh           # rebuild the images whose kernel got new or changed modules
 trustctl startup arguments         # show or change the kernel command line (see above)
 trustctl tpm enroll [--pin]        # let the TPM unlock an encrypted disk
 trustctl tpm remove
@@ -180,7 +181,7 @@ trustctl encryption check|on|off
 trustctl sign efi IN OUT           # sign an EFI program with the Luft key
 ```
 
-They need root. `trustd.service` starts at boot to continue encrypting or decrypting, to put the Luft boot entry back if the firmware lost it, to take out a profile started with `--once`, and to note an image that ran out of tries; otherwise it stops after a minute without requests.
+They need root. `trustd.service` starts at boot to continue encrypting or decrypting, to put the Luft boot entry back if the firmware lost it, to take out a profile started with `--once`, to note an image that ran out of tries, and to rebuild images whose modules changed while akmods isn't busy; otherwise it stops after a minute without requests.
 
 ### D-Bus
 

@@ -71,12 +71,16 @@ impl Card {
         Path::new(SYSFS).join(self.name()).join("device")
     }
 
+    pub fn driver(&self) -> Option<String> {
+        std::fs::read_link(self.device().join("driver"))
+            .ok()?
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+    }
+
     pub fn is_firmware_framebuffer(&self) -> bool {
-        std::fs::read_link(self.device().join("driver")).is_ok_and(|driver| {
-            FIRMWARE_FRAMEBUFFER_DRIVERS
-                .iter()
-                .any(|name| driver.ends_with(name))
-        })
+        self.driver()
+            .is_some_and(|driver| FIRMWARE_FRAMEBUFFER_DRIVERS.contains(&driver.as_str()))
     }
 
     pub fn is_boot_display(&self) -> bool {

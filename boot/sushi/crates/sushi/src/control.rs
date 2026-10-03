@@ -63,6 +63,7 @@ pub enum Command {
     Status,
     KeyEnrollmentNotice(Option<KeyEnrollment>),
     ShowNotice(PathBuf),
+    LoadDrivers,
 }
 
 impl Command {
@@ -74,6 +75,7 @@ impl Command {
             "update-root" => Self::UpdateRoot(PathBuf::from(words.next()?)),
             "show" => Self::Show(words.next()?.parse().ok()?),
             "status" => Self::Status,
+            "load-drivers" => Self::LoadDrivers,
             "notice" => match words.next()? {
                 "key-enrollment" => Self::KeyEnrollmentNotice(Some(KeyEnrollment {
                     code: words
@@ -108,6 +110,7 @@ impl Command {
             ),
             Self::KeyEnrollmentNotice(None) => "notice clear".into(),
             Self::ShowNotice(path) => format!("notice show {}", path.display()),
+            Self::LoadDrivers => "load-drivers".into(),
         }
     }
 }
@@ -143,6 +146,7 @@ mod tests {
             })),
             Command::KeyEnrollmentNotice(None),
             Command::ShowNotice("/run/kestrel-watchdog/notice".into()),
+            Command::LoadDrivers,
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));
         }

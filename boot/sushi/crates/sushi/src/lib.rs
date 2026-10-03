@@ -1,6 +1,7 @@
 pub mod config;
 pub mod control;
 pub mod display;
+pub mod drivers;
 pub mod luks;
 pub mod notice_file;
 pub mod password;

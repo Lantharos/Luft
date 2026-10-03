@@ -22,3 +22,4 @@ for dropin in "$root"/data/drop-ins/*/*.conf; do
 done
 install -Dm755 "$root/data/dracut/module-setup.sh" "$destdir/usr/lib/dracut/modules.d/90sushi/module-setup.sh"
 install -Dm644 "$root/data/sushi.conf" "$destdir/etc/sushi/sushi.conf"
+install -Dm644 "$root/data/modprobe/sushi.conf" "$destdir/usr/lib/modprobe.d/sushi.conf"

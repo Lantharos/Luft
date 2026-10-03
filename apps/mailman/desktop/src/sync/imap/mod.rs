@@ -3,11 +3,12 @@ use std::collections::{HashMap, HashSet};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
+mod gmail;
 pub mod idle;
 
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
-use crate::accounts::{Account, Login};
+use crate::accounts::{Account, Login, Provider};
 use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
@@ -242,6 +243,18 @@ impl Remote for ImapRemote {
         Ok(inserted)
     }
 
+    fn identities(&mut self, context: &Context) -> Result<bool, String> {
+        match (&context.account.config.oauth, &self.login) {
+            (Some(Provider::Google), Login::Bearer { token, .. }) => {
+                let found = gmail::send_as(context.account.id, token)?;
+                context
+                    .store
+                    .merge_identities(context.account.id, &found, false)
+            }
+            _ => Ok(false),
+        }
+    }
+
     fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
         let floor = self.floor(context, mailbox)?.unwrap_or(0);
         let local: HashSet<u32> = context
@@ -360,6 +373,7 @@ impl Remote for ImapRemote {
                     &raw,
                 )
             }
+            Operation::Identity { .. } => Ok(()),
         }
     }
 

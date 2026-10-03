@@ -1,10 +1,11 @@
 import * as api from '$lib/api';
-import type { Account, AppState, Counts, Mailbox, Provider, Settings, Status } from '$lib/api';
+import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, Status } from '$lib/api';
 
 const EMPTY_COUNTS: Counts = { inbox: 0, screener: 0, later: 0, drafts: 0, newsletter: 0, receipt: 0, notification: 0, mailboxes: [] };
 
 class MailState {
 	accounts = $state<Account[]>([]);
+	identities = $state<Identity[]>([]);
 	mailboxes = $state<Mailbox[]>([]);
 	counts = $state<Counts>(EMPTY_COUNTS);
 	settings = $state<Settings>({ screener: true, bundles: true, notifications: true, undoSeconds: 10, darkMail: true });
@@ -18,6 +19,7 @@ class MailState {
 
 	start(state: AppState) {
 		this.accounts = state.accounts;
+		this.identities = state.identities;
 		this.mailboxes = state.mailboxes;
 		this.settings = state.settings;
 		this.oauth = state.oauth;
@@ -45,8 +47,21 @@ class MailState {
 	};
 
 	async reloadAccounts() {
-		this.accounts = await api.accounts();
+		[this.accounts, this.identities] = await Promise.all([api.accounts(), api.identities()]);
 		await this.refresh();
+	}
+
+	reloadIdentities = async () => {
+		this.identities = await api.identities();
+	};
+
+	identitiesOf(account: number) {
+		return this.identities.filter((identity) => identity.account === account);
+	}
+
+	preferredIdentity(account: number) {
+		const own = this.identitiesOf(account);
+		return own.find((identity) => identity.preferred) ?? own[0];
 	}
 
 	receiveStatus = (status: Status) => {

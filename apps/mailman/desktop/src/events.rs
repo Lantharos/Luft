@@ -4,3 +4,4 @@ pub const OPEN_THREAD: &str = "mailman.open";
 pub const OUTBOX: &str = "mailman.outbox";
 pub const BODY: &str = "mailman.body";
 pub const IMAGES: &str = "mailman.images";
+pub const IDENTITIES: &str = "mailman.identities";

@@ -3,8 +3,19 @@ CREATE TABLE IF NOT EXISTS accounts (
 	email TEXT NOT NULL UNIQUE,
 	name TEXT NOT NULL,
 	config TEXT NOT NULL,
-	signature TEXT NOT NULL DEFAULT '',
 	added INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS identities (
+	id INTEGER PRIMARY KEY,
+	account INTEGER NOT NULL REFERENCES accounts ON DELETE CASCADE,
+	name TEXT NOT NULL,
+	address TEXT NOT NULL,
+	reply_to TEXT NOT NULL DEFAULT '',
+	signature TEXT NOT NULL DEFAULT '',
+	remote TEXT,
+	preferred INTEGER NOT NULL DEFAULT 0,
+	UNIQUE (account, address)
 );
 
 CREATE TABLE IF NOT EXISTS mailboxes (

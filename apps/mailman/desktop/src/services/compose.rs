@@ -24,14 +24,34 @@ pub enum Unsubscribed {
     Opened,
 }
 
-fn sender(state: &MailmanState, account: i64) -> Result<Address, String> {
-    let account = state
+struct Sender {
+    from: Address,
+    reply_to: String,
+}
+
+fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
+    let identity = state
         .store
-        .account(account)?
-        .ok_or("That account is gone")?;
-    Ok(Address {
-        name: account.name,
-        address: account.email,
+        .identity(draft.identity)?
+        .filter(|identity| identity.account == draft.account)
+        .ok_or("That address can't send from this account")?;
+    let address = match identity.address.strip_prefix("*@") {
+        Some(domain) => draft
+            .from
+            .clone()
+            .filter(|from| {
+                from.rsplit_once('@')
+                    .is_some_and(|(local, at)| !local.is_empty() && at.eq_ignore_ascii_case(domain))
+            })
+            .ok_or("Pick the address to send from")?,
+        None => identity.address,
+    };
+    Ok(Sender {
+        from: Address {
+            name: identity.name,
+            address,
+        },
+        reply_to: identity.reply_to,
     })
 }
 
@@ -39,8 +59,8 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
     if draft.to.is_empty() && draft.cc.is_empty() && draft.bcc.is_empty() {
         return Err("Add someone to send this to".into());
     }
-    let from = sender(state, draft.account)?;
-    let built = compose::build(&draft, &from)?;
+    let Sender { from, reply_to } = sender(state, &draft)?;
+    let built = compose::build(&draft, &from, &reply_to)?;
     let send_at = draft
         .send_at
         .unwrap_or_else(|| now() + state.store.settings().undo_seconds);
@@ -55,13 +75,21 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
         remind_at,
     };
     let id = state.store.queue_outgoing(&outgoing, &saved, send_at)?;
+    let recipients: Vec<Address> = draft
+        .to
+        .iter()
+        .chain(&draft.cc)
+        .chain(&draft.bcc)
+        .cloned()
+        .collect();
+    state.store.meet(&recipients)?;
     state.engine.wake_outbox();
     Ok(Queued { id, send_at })
 }
 
 pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> Result<(), String> {
-    let from = sender(state, draft.account)?;
-    let built = compose::build(&draft, &from)?;
+    let Sender { from, reply_to } = sender(state, &draft)?;
+    let built = compose::build(&draft, &from, &reply_to)?;
     let drafts = state
         .store
         .mailbox_with_role(draft.account, Role::Drafts)?
@@ -108,6 +136,7 @@ pub fn reopen(state: &MailmanState, id: i64) -> Result<serde_json::Value, String
         .unwrap_or_default();
     Ok(json!({
         "account": message.account,
+        "from": message.sender,
         "recipients": message.recipients,
         "subject": message.subject,
         "html": html,
@@ -138,8 +167,14 @@ pub fn unsubscribe(state: &MailmanState, id: i64) -> Result<Unsubscribed, String
             .query_pairs()
             .find(|(key, _)| key.eq_ignore_ascii_case("body"))
             .map(|(_, value)| value.into_owned());
+        let identity = state
+            .store
+            .preferred_identity(message.account)?
+            .ok_or("This account has no address to send from")?;
         let draft = Draft {
             account: message.account,
+            identity: identity.id,
+            from: None,
             to: vec![Address {
                 name: String::new(),
                 address: url.path().to_owned(),

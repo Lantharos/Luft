@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::accounts::{Account, Credentials, Provider, oauth_providers};
 use crate::services::launch::{self, Launch};
 use crate::services::notify::Notifier;
-use crate::store::{Mailbox, Settings, Store};
+use crate::store::{Identity, Mailbox, Settings, Store};
 use crate::sync::Engine;
 
 #[derive(Clone)]
@@ -24,6 +24,7 @@ pub struct MailmanState {
 pub struct AppState {
     launch: Vec<Launch>,
     accounts: Vec<Account>,
+    identities: Vec<Identity>,
     mailboxes: Vec<Mailbox>,
     settings: Settings,
     oauth: Vec<Provider>,
@@ -74,6 +75,7 @@ impl MailmanState {
         Ok(AppState {
             launch: self.launch.clone(),
             accounts: self.store.accounts()?,
+            identities: self.store.identities()?,
             mailboxes: self.store.mailboxes(None)?,
             settings: self.store.settings(),
             oauth: oauth_providers(),

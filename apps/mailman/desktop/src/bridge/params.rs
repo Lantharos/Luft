@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use crate::accounts::{AccountConfig, Provider};
 use crate::mail::compose::Draft;
-use crate::store::{Cursor, Settings};
+use crate::store::{Cursor, Identity, Settings};
 
 #[derive(Deserialize)]
 pub struct Empty {}
@@ -53,7 +53,11 @@ pub struct NewAccount {
 pub struct AccountUpdate {
     pub id: i64,
     pub name: String,
-    pub signature: String,
+}
+
+#[derive(Deserialize)]
+pub struct SavedIdentity {
+    pub identity: Identity,
 }
 
 #[derive(Deserialize)]
@@ -97,6 +101,11 @@ pub struct Part {
 #[derive(Deserialize)]
 pub struct Path {
     pub path: String,
+}
+
+#[derive(Deserialize)]
+pub struct Paths {
+    pub paths: Vec<String>,
 }
 
 #[derive(Deserialize)]

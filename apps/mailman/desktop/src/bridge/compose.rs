@@ -17,6 +17,19 @@ struct Chosen {
     size: u64,
 }
 
+fn chosen(path: &std::path::Path) -> Chosen {
+    Chosen {
+        size: std::fs::metadata(path)
+            .map(|metadata| metadata.len())
+            .unwrap_or(0),
+        name: path
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or_default(),
+        path: path.to_string_lossy().into_owned(),
+    }
+}
+
 fn choose_files(Empty {}: Empty) -> Result<Vec<Chosen>, String> {
     let chooser = FileChooser {
         title: "Attach Files",
@@ -27,16 +40,15 @@ fn choose_files(Empty {}: Empty) -> Result<Vec<Chosen>, String> {
         .open()?
         .iter()
         .filter_map(|uri| luft_app::portal::uri_path(uri))
-        .map(|path| Chosen {
-            size: std::fs::metadata(&path)
-                .map(|metadata| metadata.len())
-                .unwrap_or(0),
-            name: path
-                .file_name()
-                .map(|name| name.to_string_lossy().into_owned())
-                .unwrap_or_default(),
-            path: path.to_string_lossy().into_owned(),
-        })
+        .map(|path| chosen(&path))
+        .collect())
+}
+
+fn describe_files(Paths { paths }: Paths) -> Result<Vec<Chosen>, String> {
+    Ok(paths
+        .iter()
+        .map(|path| chosen(std::path::Path::new(path)))
+        .filter(|file| std::path::Path::new(&file.path).is_file())
         .collect())
 }
 
@@ -73,6 +85,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             compose::unsubscribe(state, id)
         })
         .command("choose_files", choose_files)
+        .command("describe_files", describe_files)
         .command("stash_file", stash)
         .with("templates", state, |state, Empty {}| {
             state.store.templates()

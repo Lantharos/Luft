@@ -1,7 +1,7 @@
 use rusqlite::{Connection, Transaction, params};
 
 const SCHEMA: &str = include_str!("schema.sql");
-const VERSION: i64 = 1;
+const VERSION: i64 = 2;
 
 pub fn migrate(connection: &mut Connection) -> rusqlite::Result<()> {
     let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
@@ -32,6 +32,13 @@ pub fn migrate(connection: &mut Connection) -> rusqlite::Result<()> {
         )?;
         link_threads(&transaction)?;
         meet_people(&transaction)?;
+    }
+    if existing && version < 2 {
+        transaction.execute_batch(
+            "INSERT INTO identities (account, name, address, signature, preferred)
+                SELECT id, name, email, signature, 1 FROM accounts;
+             ALTER TABLE accounts DROP COLUMN signature;",
+        )?;
     }
     transaction.pragma_update(None, "user_version", VERSION)?;
     transaction.commit()

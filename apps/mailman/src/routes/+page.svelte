@@ -75,6 +75,7 @@
 			api.events.status(mail.receiveStatus),
 			api.events.body(reader.receive),
 			api.events.images(remoteImages.receive),
+			api.events.identities(() => void mail.reloadIdentities()),
 			api.events.open(({ thread, token }) => {
 				appWindow.focus(token ?? undefined);
 				opened.close();
@@ -100,15 +101,18 @@
 	}
 
 	function scheduleRefresh() {
-		clearTimeout(refreshTimer);
-		refreshTimer = setTimeout(() => void refreshAll(), REFRESH_DELAY);
+		refreshTimer ??= setTimeout(() => {
+			refreshTimer = undefined;
+			void refreshAll();
+		}, REFRESH_DELAY);
 	}
 
-	function drop(event: WindowFileDragEvent) {
+	async function drop(event: WindowFileDragEvent) {
 		if (event.phase !== 'drop' || event.internal) return;
 		const messages = event.paths.filter((path) => path.toLowerCase().endsWith('.eml'));
 		if (composer.current) {
-			composer.current.attachments = [...composer.current.attachments, ...event.paths.map((path) => ({ path, name: path.split('/').pop() ?? path, cid: null, size: 0 }))];
+			const files = await api.describeFiles(event.paths).catch(toasts.fail);
+			if (files && composer.current) composer.current.attachments = [...composer.current.attachments, ...files.map((file) => ({ ...file, cid: null }))];
 		} else if (messages.length) {
 			opened.file = messages[0];
 		}

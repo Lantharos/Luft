@@ -11,6 +11,7 @@ import type {
 	Cursor,
 	Discovery,
 	Draft,
+	Identity,
 	Launch,
 	Mailbox,
 	Message,
@@ -51,7 +52,10 @@ export const discover = (email: string) => call<Discovery>('discover', { email }
 export const addAccount = (email: string, name: string, config: AccountConfig, secret: Secret) =>
 	call<Account>('add_account', { email, name, config, secret }, LONG);
 export const removeAccount = (id: number) => call<void>('remove_account', { id });
-export const updateAccount = (id: number, name: string, signature: string) => call<void>('update_account', { id, name, signature });
+export const renameAccount = (id: number, name: string) => call<void>('rename_account', { id, name });
+export const identities = () => call<Identity[]>('identities');
+export const saveIdentity = (identity: Identity) => call<number>('save_identity', { identity });
+export const removeIdentity = (id: number) => call<void>('remove_identity', { id });
 export const accounts = () => call<Account[]>('accounts');
 export const mailboxes = () => call<Mailbox[]>('mailboxes');
 export const syncNow = () => call<void>('sync_now');
@@ -76,9 +80,10 @@ export const openUri = (uri: string) => call<void>('open_uri', { uri });
 export const send = (draft: Draft) => call<{ id: number; sendAt: number }>('send', { draft });
 export const cancelSend = (id: number) => call<Draft | null>('cancel_send', { id });
 export const saveDraft = (draft: Draft, replaces: number | null) => call<void>('save_draft', { draft, replaces });
-export const reopenDraft = (id: number) => call<{ account: number; recipients: Message['recipients']; subject: string; html: string; text: string }>('reopen_draft', { id }, LONG);
+export const reopenDraft = (id: number) => call<{ account: number; from: string; recipients: Message['recipients']; subject: string; html: string; text: string }>('reopen_draft', { id }, LONG);
 export const unsubscribe = (id: number) => call<'done' | 'opened'>('unsubscribe', { id }, LONG);
 export const chooseFiles = () => call<Chosen[]>('choose_files', {}, FOREVER);
+export const describeFiles = (paths: string[]) => call<Chosen[]>('describe_files', { paths });
 export const stashFile = (name: string, data: string) => call<string>('stash_file', { name, data });
 export const templates = () => call<Template[]>('templates');
 export const saveTemplate = (id: number | null, name: string, body: string) => call<void>('save_template', { id, name, body });
@@ -91,5 +96,6 @@ export const events = {
 	outbox: (callback: (event: OutboxEvent) => void) => on('mailman.outbox', callback),
 	body: (callback: (arrived: { id: number; error: string | null }) => void) => on('mailman.body', callback),
 	images: (callback: (images: [string, string | null][]) => void) => on('mailman.images', callback),
+	identities: (callback: (account: number) => void) => on('mailman.identities', callback),
 	activation: (callback: (activation: Activation) => void) => on('singleInstance.activate', callback)
 };

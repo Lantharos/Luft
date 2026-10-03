@@ -32,7 +32,6 @@ pub struct Account {
     pub email: String,
     pub name: String,
     pub config: AccountConfig,
-    pub signature: String,
     pub added: i64,
 }
 

@@ -47,6 +47,13 @@
 		updateEmpty();
 	}
 
+	export function replaceSignature(markup: string) {
+		if (!editor) return;
+		editor.querySelectorAll('.signature').forEach((signature) => signature.remove());
+		if (markup) editor.insertAdjacentHTML('beforeend', markup);
+		updateEmpty();
+	}
+
 	export function command(name: 'bold' | 'italic' | 'insertUnorderedList' | 'insertOrderedList' | 'link') {
 		editor?.focus();
 		if (name === 'link') return startLink();

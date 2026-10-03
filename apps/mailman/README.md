@@ -4,9 +4,11 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 
 ## Features
 
-- IMAP and SMTP accounts, and JMAP accounts such as Fastmail. New mail arrives the moment the server has it, over IMAP IDLE or JMAP push, and servers that support CONDSTORE and QRESYNC only send what changed since last time
+- IMAP and SMTP accounts, and JMAP accounts such as Fastmail. New mail arrives the moment the server has it, over IMAP IDLE or JMAP push, and servers that support CONDSTORE and QRESYNC, and every JMAP server, only send what changed since last time
+- The newest mail of every folder arrives first and the rest of its history follows in the background, newest first, picking up where it left off if Mailman is closed halfway. Lists stay quick at hundreds of thousands of messages
 - Adding an account needs just the address for most providers: Mailman looks up the servers in the address's own autoconfig file, Thunderbird's provider database, DNS service records and the provider behind the domain's mail servers. Server settings can still be entered by hand
-- Gmail and Outlook can sign in through the provider's own page in the browser, and any account works with a password or an app password
+- Gmail and Outlook can sign in through the provider's own page in the browser, and any account works with a password or an app password. Sign-ins are renewed before they expire, so new mail keeps arriving and sending keeps working
+- Several addresses per account, each with its own name, reply address and signature, and a preview of how the signature looks. JMAP accounts bring their addresses and aliases from the server, Gmail brings its send-as addresses, and any address can be added by hand. Replies and forwards are sent from the address the message was written to, including plus addresses and catch-all domains
 - Passwords and sign-in tokens are kept in Luft Keyring, readable only by Mailman, and never written anywhere else
 - One inbox for all accounts. Conversations are grouped across folders, so replies you sent appear in the thread they belong to
 - The Screener: when someone writes to you for the first time, their mail waits in the Screener until you let them in or screen them out. People you have written to, and everyone already in your mail when you added the account, go straight to the inbox
@@ -20,7 +22,7 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 - Mail is cleaned before it is shown and displayed under a strict content policy, so no scripts run and nothing loads from the internet unless you ask. Pictures from senders stay hidden until you show them once or always for that sender, and they are then fetched by Mailman itself rather than by the message. Tracking pixels are removed
 - Designed newsletters follow the dark style too
 - Full-text search across every account, offline, with `from:`, `to:`, `subject:`, `is:unread`, `is:starred` and `has:attachment`
-- A composer with formatting that follows what you type: `**bold**`, `*italic*`, `` `code` ``, `- ` and `1. ` lists, `> ` quotes and `# ` headings, links pasted or typed, pictures pasted inline and files attached from a picker or dropped on the window. Templates for messages you write often, drafts saved to the server, and suggestions from the people you write to
+- A composer with formatting that follows what you type: `**bold**`, `*italic*`, `` `code` ``, `- ` and `1. ` lists, `> ` quotes and `# ` headings, links pasted or typed, pictures pasted inline and files attached from a picker or dropped on the window. A From picker when you have more than one address, templates for messages you write often, drafts saved to the server, and suggestions from the people you write to
 - Quiet notifications for new mail from people you know, only while Mailman isn't in front, and clicking one opens the conversation
 - Opens `mailto:` links and `.eml` files. A message file opened on its own shows just that message
 
@@ -102,18 +104,20 @@ mailman/
 │   │   ├── mail/             accounts, views, the list and actions with undo
 │   │   ├── palette/          command palette
 │   │   ├── reader/           conversation view, message bodies, attachments and message files
-│   │   ├── settings/         settings and adding accounts
+│   │   ├── settings/         settings, addresses with their signatures, and adding accounts
 │   │   ├── shell/            header, toasts, later picker, shortcuts and welcome
 │   │   └── sidebar/          views, bundles, folders and sync status
 │   └── routes/+page.svelte   window layout
 └── desktop/src/
-    ├── accounts/             account settings, keyring credentials, discovery and OAuth sign-in
+    ├── accounts/             account settings, keyring credentials and token renewal, discovery and OAuth sign-in
     ├── bridge/               bridge command registration
     ├── mail/                 envelopes, categories, rendering, sanitizing, composing and pictures
     ├── protocols/            IMAP client, JMAP client, SMTP and TLS connections
     ├── services/             actions, sending, launch arguments and notifications
-    ├── store/                the local SQLite store, full-text search and views
-    └── sync/                 per-account sync, push, on-demand fetching, the outbox and reminders
+    ├── store/                the local SQLite store and its migrations, accounts and addresses, full-text search and views
+    └── sync/                 per-account sync, history, on-demand fetching, the outbox and reminders
+        ├── imap/             IMAP sync, IDLE and Gmail send-as addresses
+        └── jmap/             JMAP sync, push, history and addresses
 ```
 
 ## License

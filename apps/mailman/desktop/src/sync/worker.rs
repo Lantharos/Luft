@@ -8,7 +8,7 @@ use super::Shared;
 use super::ops::Operation;
 use super::remote::{self, Connection, Context, Remote};
 use crate::accounts::Account;
-use crate::events::{CHANGED, OUTBOX, STATUS};
+use crate::events::{CHANGED, IDENTITIES, OUTBOX, STATUS};
 use crate::mail::{envelope, render};
 use crate::store::Store;
 use crate::store::{Fetched, Mailbox, Outgoing, Role, now};
@@ -171,6 +171,9 @@ impl Worker {
         self.status("syncing", None);
         self.flush()?;
         let mut mailboxes = self.with_remote(|remote, context| remote.folders(context))?;
+        if self.with_remote(|remote, context| remote.identities(context))? {
+            self.shared.events.emit(IDENTITIES, self.account.id);
+        }
         mailboxes.retain(|mailbox| mailbox.selectable);
         mailboxes.sort_by_key(order);
         self.changed();

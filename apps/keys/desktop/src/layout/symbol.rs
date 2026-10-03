@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use xkbcommon::xkb;
 
+use super::dead::DeadKey;
+
 const COMPOSE: &str = "Multi_key";
 
 const DEAD_KEYS: [(&str, &str); 32] = [
@@ -123,6 +125,18 @@ impl Symbol {
             keysym,
             kind: Kind::Function,
         }
+    }
+
+    pub fn dead(key: &DeadKey) -> Self {
+        Self {
+            keysym: key.keysym.clone(),
+            text: key.symbol.clone(),
+            kind: Kind::Dead,
+        }
+    }
+
+    pub fn is_character(&self) -> bool {
+        self.kind == Kind::Character
     }
 
     pub fn is_empty(&self) -> bool {

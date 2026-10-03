@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { tryKey, tryLayout } from './api';
-	import type { LayoutEditor } from './editor.svelte';
+	import { tryKey, tryLayout } from '../api';
+	import type { LayoutEditor } from '../editor.svelte';
 	import { CODES } from '$lib/keyboard/geometry';
 
 	interface Props {
@@ -53,6 +53,7 @@
 	bind:this={field}
 	bind:value
 	class="try"
+	data-own-undo
 	rows="3"
 	spellcheck="false"
 	placeholder="Type here to try the layout"

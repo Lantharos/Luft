@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { typedLevel } from '$lib/keyboard/board';
 	import { describe, LEVEL_NAMES, shown } from '$lib/keyboard/describe';
-	import type { Levels } from '$lib/layout/api';
+	import type { DeadKey, Levels } from '$lib/layout/api';
 
 	interface Props {
 		levels: Levels;
 		level: number;
 		thirdLevel: boolean;
+		dead: DeadKey[];
 	}
 
-	let { levels, level, thirdLevel }: Props = $props();
+	let { levels, level, thirdLevel, dead }: Props = $props();
 
 	let typed = $derived(levels.map((_, index) => levels[typedLevel(levels, index)]));
 	let names = $state<string[]>(['', '', '', '']);
@@ -17,7 +18,7 @@
 
 	$effect(() => {
 		const current = typed;
-		void Promise.all(current.map(describe)).then((described) => {
+		void Promise.all(current.map((symbol) => describe(symbol, dead))).then((described) => {
 			if (current === typed) names = described;
 		});
 	});

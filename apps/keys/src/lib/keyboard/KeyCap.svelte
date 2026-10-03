@@ -5,18 +5,20 @@
 	interface Props {
 		levels: Levels;
 		level: number | null;
+		layer: number | null;
 		selected: boolean;
 		pressed: boolean;
 		onselect: () => void;
 		onkeydown: (event: KeyboardEvent) => void;
 	}
 
-	let { levels, level, selected, pressed, onselect, onkeydown }: Props = $props();
+	let { levels, level, layer, selected, pressed, onselect, onkeydown }: Props = $props();
 
 	let [base, shift] = $derived(levels);
 	let capital = $derived(base.kind === 'character' && shift.kind === 'character' && shift.text !== base.text && base.text.toUpperCase() === shift.text);
 
 	let typed = $derived(level === null ? null : typedLevel(levels, level));
+	let layered = $derived(layer === null ? null : typedLevel(levels, layer));
 
 	function emphasis(...shownLevels: number[]) {
 		if (typed === null) return '';
@@ -36,7 +38,12 @@
 {/snippet}
 
 <button type="button" class="cap" class:selected class:pressed aria-pressed={selected} onclick={onselect} {onkeydown}>
-	{#if capital}
+	{#if layer !== null && layered !== null}
+		{@const symbol = levels[layered]}
+		{#if symbol.kind !== 'empty'}
+			<span class="glyph single" class:inherited={layered !== layer} class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
+		{/if}
+	{:else if capital}
 		<span class="glyph capital {emphasis(0, 1)}">{shift.text}</span>
 	{:else}
 		{@render glyph(1, 'top-left')}
@@ -122,6 +129,22 @@
 
 	.bottom-right {
 		bottom: 14%;
+	}
+
+	.single {
+		inset: 0;
+		display: grid;
+		max-width: none;
+		place-items: center;
+		font-size: 2.1cqw;
+	}
+
+	.single.named {
+		font-size: 0.95cqw;
+	}
+
+	.inherited {
+		opacity: 0.32;
 	}
 
 	.faded {

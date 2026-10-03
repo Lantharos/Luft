@@ -1,5 +1,6 @@
 mod app;
 mod characters;
+mod compose;
 mod engine;
 mod ibus;
 mod layout;
@@ -35,6 +36,7 @@ fn run_app() -> ! {
 }
 
 fn build_window(window: SabineWindow) -> SabineWindow {
-    let window = app::register(GLASS_WINDOW.apply(window));
-    method::register(layout::register(window))
+    let reloader = compose::Reloader::start();
+    let window = app::register(GLASS_WINDOW.apply(window), &reloader);
+    method::register(layout::register(window, &reloader))
 }

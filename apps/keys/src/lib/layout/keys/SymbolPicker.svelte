@@ -1,15 +1,19 @@
 <script lang="ts">
+	import Plus from '@lucide/svelte/icons/plus';
 	import { Popover, SearchField, tooltip, VirtualScroller } from '@luft/ui';
 	import { search, type Character } from '$lib/characters/characters';
-	import { describeKeysym, describeText, EMPTY, specials, type Specials, type Symbol } from './api';
+	import { describeKeysym, describeText, EMPTY, specials, type Specials, type Symbol } from '../api';
+	import { deadSymbol } from '../dead/table';
+	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {
+		editor: LayoutEditor;
 		anchor: HTMLElement;
 		onpick: (symbol: Symbol) => void;
 		onclose: () => void;
 	}
 
-	let { anchor, onpick, onclose }: Props = $props();
+	let { editor, anchor, onpick, onclose }: Props = $props();
 
 	const KEYSYM_NAME = /^[A-Za-z][A-Za-z0-9_]+$/;
 
@@ -40,6 +44,12 @@
 		if (field) requestAnimationFrame(() => field?.focus());
 	});
 
+	async function newDead() {
+		const keysym = await editor.addDead();
+		const key = editor.dead(keysym);
+		if (key) onpick(deadSymbol(key));
+	}
+
 	async function pickText(text: string) {
 		onpick(await describeText(text));
 	}
@@ -57,7 +67,16 @@
 		<SearchField bind:this={field} label="Search characters" bind:value={query} onkeydown={keydown} />
 		{#if extras && !query}
 			<div class="flex flex-col gap-1.5">
-				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">Dead keys</h3>
+				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">Your dead keys</h3>
+				<div class="grid grid-cols-8 gap-1">
+					{#each editor.layout.dead as key (key.keysym)}
+						<button type="button" class="cell" aria-label={key.name} {@attach tooltip(key.name)} onclick={() => onpick(deadSymbol(key))}>{key.symbol}</button>
+					{/each}
+					<button type="button" class="cell add" aria-label="New dead key" {@attach tooltip('New dead key')} onclick={() => void newDead()}><Plus size={16} /></button>
+				</div>
+			</div>
+			<div class="flex flex-col gap-1.5">
+				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">Standard dead keys</h3>
 				<div class="grid grid-cols-8 gap-1">
 					{#each extras.dead as dead (dead.keysym)}
 						<button type="button" class="cell" aria-label={dead.keysym.replace('dead_', 'Dead ').replaceAll('_', ' ')} {@attach tooltip(dead.keysym.replace('dead_', '').replaceAll('_', ' '))} onclick={() => onpick(dead)}>
@@ -97,6 +116,10 @@
 		font-size: 17px;
 		color: var(--secondary);
 		transition: background-color 120ms var(--ease);
+	}
+
+	.cell.add {
+		color: var(--text-muted);
 	}
 
 	.cell:hover {

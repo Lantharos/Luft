@@ -1,3 +1,4 @@
+mod composer;
 mod engine;
 mod registration;
 mod wire;

@@ -19,8 +19,16 @@ pub fn user_rules() -> PathBuf {
     user_xkb().join("rules/evdev.xml")
 }
 
+pub fn keys() -> PathBuf {
+    config().join("keys")
+}
+
 pub fn methods() -> PathBuf {
-    config().join("keys/input-methods")
+    keys().join("input-methods")
+}
+
+pub fn compose() -> PathBuf {
+    keys().join("Compose")
 }
 
 pub fn learned() -> PathBuf {

@@ -6,6 +6,7 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::compose::Reloader;
 use crate::{characters, layout, method, sources};
 
 pub const LINK_SCHEME: &str = "kestrel-keys:";
@@ -31,16 +32,16 @@ enum Opened {
     Method { id: String },
 }
 
-fn open_file(OpenFile { path }: OpenFile) -> Result<Opened, String> {
+fn open_file(reloader: &Reloader, OpenFile { path }: OpenFile) -> Result<Opened, String> {
     let path = portal::uri_path(&path).unwrap_or_else(|| PathBuf::from(path));
     if method::is_method_file(&path) {
         method::import_path(&path).map(|stored| Opened::Method { id: stored.id })
     } else {
-        layout::import_path(&path).map(|layout| Opened::Layout { id: layout.id })
+        layout::import_path(&path, reloader).map(|layout| Opened::Layout { id: layout.id })
     }
 }
 
-pub fn register(window: SabineWindow) -> SabineWindow {
+pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
     window
         .command("app_state", |_: Value| {
             let arguments: Vec<String> = std::env::args().skip(1).collect();
@@ -58,7 +59,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
                     .collect(),
             })
         })
-        .command("open_file", open_file)
+        .with("open_file", reloader, open_file)
         .command("characters", |_: Value| Ok(characters::all()))
         .command("input_sources", |_: Value| sources::list())
 }

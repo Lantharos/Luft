@@ -6,6 +6,7 @@ export interface Board {
 	readonly selected: string;
 	readonly pressed: ReadonlySet<string>;
 	readonly usesThirdLevel: boolean;
+	readonly layer?: number | null;
 	levels(name: string): Levels;
 	select(name: string): void;
 }

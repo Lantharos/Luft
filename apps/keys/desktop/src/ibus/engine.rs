@@ -6,6 +6,7 @@ use zbus::object_server::SignalEmitter;
 use zbus::zvariant::Value;
 use zbus::{fdo, interface};
 
+use super::composer::{Composed, Composer};
 use super::wire;
 use crate::engine::{Engine, Input, Learned, Session};
 use crate::method::definition::{self, Method};
@@ -19,6 +20,7 @@ pub struct InputMethod {
     engine: Engine,
     session: Session,
     learned: Learned,
+    composer: Composer,
     modified: Option<SystemTime>,
     showing: bool,
 }
@@ -37,12 +39,14 @@ impl InputMethod {
             engine: Engine::new(&method),
             session: Session::default(),
             learned: Learned::load(id),
+            composer: Composer::new(),
             modified: modified(id),
             showing: false,
         })
     }
 
     fn refresh(&mut self) {
+        self.composer.refresh();
         let current = modified(&self.id);
         if current == self.modified {
             return;
@@ -94,7 +98,29 @@ impl InputMethod {
         Ok(response.handled)
     }
 
+    async fn type_composed(
+        &mut self,
+        emitter: &SignalEmitter<'_>,
+        text: &str,
+    ) -> fdo::Result<bool> {
+        let mut commit = String::new();
+        for character in text.chars() {
+            let response = self.session.feed(
+                &self.engine,
+                &mut self.learned,
+                Input::from_text(character, None),
+            );
+            commit.push_str(&response.commit);
+            if !response.handled {
+                commit.push(character);
+            }
+        }
+        self.show(emitter, commit).await?;
+        Ok(true)
+    }
+
     async fn clear(&mut self, emitter: &SignalEmitter<'_>) -> fdo::Result<()> {
+        self.composer.reset();
         self.session.reset();
         self.learned.save();
         self.show(emitter, String::new()).await
@@ -119,7 +145,15 @@ impl InputMethod {
             }
             return Ok(false);
         }
-        let input = Input::from_keysym(Keysym::new(keyval), self.engine.compose());
+        let keysym = Keysym::new(keyval);
+        if self.engine.compose() != Some(keysym) {
+            match self.composer.feed(keysym) {
+                Composed::Held => return Ok(true),
+                Composed::Text(text) => return self.type_composed(&emitter, &text).await,
+                Composed::Pass => {}
+            }
+        }
+        let input = Input::from_keysym(keysym, self.engine.compose());
         self.feed(&emitter, input).await
     }
 

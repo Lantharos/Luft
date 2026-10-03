@@ -1,0 +1,41 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { systemTable, type DeadKey, type Symbol } from '../api';
+	import type { LayoutEditor } from '../editor.svelte';
+	import DeadKeyHeader from './DeadKeyHeader.svelte';
+	import PairGrid from './PairGrid.svelte';
+	import { placeName, standardName } from './table';
+
+	interface Props {
+		editor: LayoutEditor;
+		symbol: Symbol;
+	}
+
+	let { editor, symbol }: Props = $props();
+
+	let table = $state<DeadKey | null>(null);
+	let where = $derived(
+		editor
+			.placesOf(symbol.keysym)
+			.map((place) => placeName(place.key, editor.levels(place.key), place.level))
+			.join(', ')
+	);
+
+	onMount(() => {
+		void systemTable(symbol.keysym).then(({ spacing, pairs }) => {
+			table = { keysym: symbol.keysym, name: standardName(symbol.keysym), symbol: symbol.text, spacing, pairs };
+		});
+	});
+</script>
+
+<div class="flex min-w-0 flex-col gap-7">
+	<DeadKeyHeader symbol={symbol.text} name={standardName(symbol.keysym)} {where}>
+		<button type="button" class="button" onclick={() => void editor.copySystem(symbol)}>Make an editable copy</button>
+	</DeadKeyHeader>
+	<p class="px-1.5 text-[13px] leading-relaxed text-[var(--text-muted)]">
+		This dead key makes what the computer's standard table says. A copy puts it on the same keys with a table of its own that you can change.
+	</p>
+	{#if table}
+		<PairGrid key={table} readonly />
+	{/if}
+</div>

@@ -57,6 +57,7 @@
 				<KeyCap
 					levels={board.levels(cap.name)}
 					{level}
+					layer={board.layer ?? null}
 					selected={board.selected === cap.name}
 					pressed={board.pressed.has(cap.name)}
 					onselect={() => board.select(cap.name)}

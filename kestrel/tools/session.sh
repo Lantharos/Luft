@@ -54,6 +54,11 @@ cargo build --release --quiet --manifest-path "$root/kestrel/settings/Cargo.toml
 cargo build --release --quiet --manifest-path "$root/kestrel/keyring/Cargo.toml" -p luft-pinentry
 cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.toml"
 
+home="$session/state/luft-home"
+mkdir -p "$home/.local/share"
+ln -sfn "$HOME/.local/share/sabine" "$home/.local/share/sabine"
+export HOME="$home"
+
 scope="kestrel-session-$(printf '%s' "$session" | sha1sum | cut -c1-12)"
 trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true' EXIT
 

@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
-	import { GEOMETRIES } from '$lib/keyboard/geometry';
-	import Keyboard from '$lib/keyboard/Keyboard.svelte';
 	import Page from '$lib/shell/Page.svelte';
 	import SourceActions from '$lib/shell/SourceActions.svelte';
+	import UndoButtons from '$lib/shell/UndoButtons.svelte';
 	import { app } from '$lib/state/app.svelte';
 	import { toast } from '$lib/state/toast.svelte';
 	import { deleteLayout, exportLayout, openLayout, systemLayouts, useLayout } from './api';
-	import { LayoutEditor } from './editor.svelte';
-	import KeyDetails from './KeyDetails.svelte';
-	import LayoutDetails from './LayoutDetails.svelte';
-	import TryLayout from './TryLayout.svelte';
+	import DeadKeysPane from './dead/DeadKeysPane.svelte';
+	import { LayoutEditor, type Tab } from './editor.svelte';
+	import KeysPane from './keys/KeysPane.svelte';
+	import LayoutSettings from './settings/LayoutSettings.svelte';
 
 	interface Props {
 		id: string;
@@ -19,14 +18,16 @@
 
 	let { id }: Props = $props();
 
+	const TABS: { value: Tab; label: string }[] = [
+		{ value: 'keys', label: 'Keys' },
+		{ value: 'dead', label: 'Dead keys' },
+		{ value: 'settings', label: 'Settings' }
+	];
+	const TAB_SHORTCUTS: Record<string, Tab> = { Digit1: 'keys', Digit2: 'dead', Digit3: 'settings' };
+
 	let editor = $state<LayoutEditor | null>(null);
 	let baseName = $state('');
-	let details = $state<KeyDetails>();
-	let keyboard = $state<Keyboard>();
 
-	$effect(() => {
-		if (editor && !app.creating) keyboard?.focus();
-	});
 
 	onMount(() => {
 		openLayout(id)
@@ -43,6 +44,13 @@
 
 	onDestroy(() => void editor?.save());
 
+	function switchTab(event: KeyboardEvent) {
+		const tab = TAB_SHORTCUTS[event.code];
+		if (!editor || !tab || !(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+		event.preventDefault();
+		editor.tab = tab;
+	}
+
 	async function remove() {
 		editor?.discard();
 		await deleteLayout(id);
@@ -50,35 +58,35 @@
 	}
 </script>
 
+<svelte:window onkeydown={switchTab} />
+
 {#if editor}
 	{@const current = editor}
-	<Page title={current.layout.name}>
+	<Page title={current.layout.name} wide>
 		{#snippet actions()}
+			<UndoButtons target={current} />
 			<SourceActions
 				selection={{ kind: 'layout', id }}
 				what="layout"
 				onuse={() => useLayout(id)}
 				exports={[
 					{ label: 'Export layout file', run: () => exportLayout(id, 'symbols') },
-					{ label: 'Export as a complete keymap', run: () => exportLayout(id, 'keymap') }
+					{ label: 'Export as a complete keymap', run: () => exportLayout(id, 'keymap') },
+					...(current.layout.dead.length ? [{ label: 'Export dead keys as a Compose file', run: () => exportLayout(id, 'compose') }] : []),
+					{ label: 'Export for Windows', run: () => exportLayout(id, 'klc') }
 				]}
 				onremove={remove}
 			/>
 		{/snippet}
-		<section class="flex flex-col gap-4">
-			<div class="flex items-center justify-between gap-4">
-				<p class="text-[13px] text-[var(--text-muted)]">Pick a key, or press it while the keyboard is focused.</p>
-				<div class="w-[200px]">
-					<Segmented label="Keyboard shape" options={GEOMETRIES} value={current.geometry} onchange={(geometry) => current.setGeometry(geometry)} />
-				</div>
-			</div>
-			<Keyboard bind:this={keyboard} board={current} onpicked={() => details?.focus()} />
-			<KeyDetails bind:this={details} editor={current} onescape={() => keyboard?.focus()} />
-		</section>
-		<section class="flex flex-col gap-2">
-			<h2 class="px-1.5 text-[14px] font-semibold text-[var(--text-soft)]">Try it</h2>
-			<TryLayout editor={current} />
-		</section>
-		<LayoutDetails editor={current} {baseName} />
+		<div class="w-[400px] max-w-full">
+			<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+		</div>
+		{#if current.tab === 'keys'}
+			<KeysPane editor={current} />
+		{:else if current.tab === 'dead'}
+			<DeadKeysPane editor={current} />
+		{:else}
+			<LayoutSettings editor={current} {baseName} />
+		{/if}
 	</Page>
 {/if}

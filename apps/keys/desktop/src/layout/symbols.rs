@@ -4,8 +4,6 @@ use super::Layout;
 use super::keys::EDITABLE;
 use super::symbol::Symbol;
 
-const LEVEL_THREE: &str = "level3(ralt_switch)";
-
 fn alphabetic(lower: &Symbol, upper: &Symbol) -> bool {
     match (lower.letter_case(), upper.letter_case()) {
         (Some((small, false)), Some((capital, true))) => small.to_uppercase().eq([capital]),
@@ -69,8 +67,12 @@ pub fn write(layout: &Layout) -> String {
             symbols.join(", ")
         );
     }
-    if third_level {
-        let _ = writeln!(text, "\n    include \"{LEVEL_THREE}\"");
+    let includes = layout.options.includes(third_level);
+    if !includes.is_empty() {
+        text.push('\n');
+    }
+    for include in includes {
+        let _ = writeln!(text, "    include \"{include}\"");
     }
     text.push_str("};\n");
     text

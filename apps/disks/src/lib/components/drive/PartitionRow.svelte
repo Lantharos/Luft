@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Lock from '@lucide/svelte/icons/lock';
-	import * as api from '$lib/api';
-	import type { Drive, Volume } from '$lib/api';
-	import { dialogs } from '$lib/dialogs/dialogs.svelte';
-	import { changing, rowStatus } from '$lib/encryption.svelte';
-	import { bytes, filesystemName, inner, jobText, usedShare, volumeName } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import type { Drive, Volume } from '#lib/api.js';
+	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { changing, rowStatus } from '#lib/encryption.svelte.js';
+	import { bytes, filesystemName, inner, jobText, usedShare, volumeName } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import ActionMenu from '../ActionMenu.svelte';
 	import { primaryAction, volumeMenu } from '../actions';
 	import UsageRing from './UsageRing.svelte';

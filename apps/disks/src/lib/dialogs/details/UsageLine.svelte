@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 
 	interface Props {
 		used: number;

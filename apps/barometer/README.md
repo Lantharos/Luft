@@ -1,6 +1,6 @@
 # Barometer
 
-Barometer is the system monitor and task manager for Luft, built with Sabine and SvelteKit. It lives at `apps/barometer`; run the commands below from that directory unless noted otherwise.
+Barometer is the system monitor and task manager for Luft, built with Sabine and Svelte. It lives at `apps/barometer`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -67,7 +67,7 @@ barometer/
 │   │   ├── state/             settings, live samples, apps, processes and window visibility
 │   │   ├── tasks/             apps and processes tables, columns, menus and dialogs
 │   │   └── format.ts          units and times
-│   └── routes/+page.svelte    window layout
+│   └── App.svelte             window layout
 └── desktop/src/
     ├── gpu/                   NVIDIA, AMD and Intel graphics and per process graphics use
     ├── monitor/               the sampling loop, history and page state

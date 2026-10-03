@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Segmented, VirtualScroller } from '@luft/ui';
-	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import { dialogs } from '$lib/features/dialogs.svelte';
-	import EmptyState from '$lib/components/pane/EmptyState.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { TrashItem } from '$lib/types';
-	import { formatBytes, formatDate, plural } from '$lib/utils/format';
-	import { parentPath } from '$lib/utils/paths';
+	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import EmptyState from '#lib/components/pane/EmptyState.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { TrashItem } from '#lib/types/index.js';
+	import { formatBytes, formatDate, plural } from '#lib/utils/format.js';
+	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		manager: FileManager;

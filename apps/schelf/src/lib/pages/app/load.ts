@@ -1,11 +1,11 @@
-import type { InstalledApp } from '$lib/bridge/types';
-import * as fedora from '$lib/catalog/fedora';
-import * as flathub from '$lib/catalog/flathub';
-import type { AppDetails, Origin } from '$lib/catalog/types';
-import { backend } from '$lib/state/backend';
-import { catalog } from '$lib/state/catalog.svelte';
-import { library } from '$lib/state/library.svelte';
-import type { AppTarget } from '$lib/state/navigation.svelte';
+import type { InstalledApp } from '#lib/bridge/types.js';
+import * as fedora from '#lib/catalog/fedora.js';
+import * as flathub from '#lib/catalog/flathub.js';
+import type { AppDetails, Origin } from '#lib/catalog/types.js';
+import { backend } from '#lib/state/backend.js';
+import { catalog } from '#lib/state/catalog.svelte.js';
+import { library } from '#lib/state/library.svelte.js';
+import type { AppTarget } from '#lib/state/navigation.svelte.js';
 
 export interface Listing {
 	origin: Origin;

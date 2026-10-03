@@ -1,4 +1,4 @@
-import type { ChosenImage, Drive, Volume } from '$lib/api';
+import type { ChosenImage, Drive, Volume } from '#lib/api.js';
 
 export type OpenDialog =
 	| { kind: 'format-volume'; drive: Drive; volume: Volume }

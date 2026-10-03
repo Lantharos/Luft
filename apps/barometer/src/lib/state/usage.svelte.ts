@@ -1,4 +1,4 @@
-import type { AppUsage, Backend } from '$lib/backend/types';
+import type { AppUsage, Backend } from '#lib/backend/types.js';
 
 class UsageStore {
 	apps = $state.raw<AppUsage[]>([]);

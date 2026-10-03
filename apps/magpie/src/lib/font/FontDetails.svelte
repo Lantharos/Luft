@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Item } from '$lib/api';
-	import * as api from '$lib/api';
-	import { formatBytes, plural } from '$lib/library/format';
+	import type { Item } from '#lib/api.js';
+	import * as api from '#lib/api.js';
+	import { formatBytes, plural } from '#lib/library/format.js';
 	import { count } from './characters';
 	import { fontState } from './state.svelte';
 

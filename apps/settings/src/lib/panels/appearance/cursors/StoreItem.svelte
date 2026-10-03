@@ -2,7 +2,7 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Star from '@lucide/svelte/icons/star';
 	import { MenuButton, MenuItem } from '@luft/ui';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 	import { openStorePage, type StoreItem } from './api';
 	import { cursors } from './cursors.svelte';
 

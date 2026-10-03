@@ -1,4 +1,4 @@
-import { settings } from '$lib/state/settings.svelte';
+import { settings } from '#lib/state/settings.svelte.js';
 import * as api from './api';
 import type { SearchKind, SearchQuery, SearchResult, SearchUpdate } from './types';
 

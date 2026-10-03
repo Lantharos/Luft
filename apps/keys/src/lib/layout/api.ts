@@ -1,4 +1,4 @@
-import { invoke } from '$lib/bridge';
+import { invoke } from '#lib/bridge.js';
 
 export type Kind = 'empty' | 'character' | 'dead' | 'compose' | 'function';
 

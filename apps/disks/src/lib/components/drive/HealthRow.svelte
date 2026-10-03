@@ -2,9 +2,9 @@
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { Row } from '@luft/ui';
-	import type { Drive, Health } from '$lib/api';
-	import { dialogs } from '$lib/dialogs/dialogs.svelte';
-	import { healthSummary, healthTitle } from '$lib/format';
+	import type { Drive, Health } from '#lib/api.js';
+	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { healthSummary, healthTitle } from '#lib/format.js';
 
 	interface Props {
 		drive: Drive;

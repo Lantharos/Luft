@@ -1,7 +1,7 @@
 import type { EditorState, Text } from '@codemirror/state';
-import type { Stat } from '$lib/bridge/types';
-import type { Indentation } from '$lib/editor/indentation';
-import { basename } from '$lib/utils/paths';
+import type { Stat } from '#lib/bridge/types.js';
+import type { Indentation } from '#lib/editor/indentation.js';
+import { basename } from '#lib/utils/paths.js';
 import type { LineEnding } from './encodings';
 
 export type DiskState = 'current' | 'changed' | 'deleted';

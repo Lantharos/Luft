@@ -1,7 +1,7 @@
 import { Compartment, EditorSelection, EditorState, type StateEffect, type Text } from '@codemirror/state';
 import { EditorView, type ViewUpdate } from '@codemirror/view';
 import { loadLanguage } from '@luft/ui/code';
-import type { Document } from '$lib/documents/document.svelte';
+import type { Document } from '#lib/documents/document.svelte.js';
 import { indentationExtension } from './indentation';
 import { baseExtensions } from './setup';
 

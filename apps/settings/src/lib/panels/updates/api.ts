@@ -1,4 +1,4 @@
-import { invoke, listen } from '$lib/bridge';
+import { invoke, listen } from '#lib/bridge.js';
 
 export type Schedule = 'daily' | 'weekly' | 'never';
 export type Stage = 'waiting' | 'preparing' | 'downloading' | 'installing' | 'removing' | 'finishing';

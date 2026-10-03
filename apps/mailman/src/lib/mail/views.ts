@@ -12,7 +12,7 @@ import Star from '@lucide/svelte/icons/star';
 import Trash from '@lucide/svelte/icons/trash-2';
 import UserCheck from '@lucide/svelte/icons/user-round-check';
 import type { Component } from 'svelte';
-import type { Counts, Mailbox } from '$lib/api';
+import type { Counts, Mailbox } from '#lib/api/index.js';
 
 export interface ViewInfo {
 	id: string;

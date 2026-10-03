@@ -1,10 +1,10 @@
 import { languages } from '@luft/ui/code';
-import type { App } from '$lib/app.svelte';
-import type { Document } from '$lib/documents/document.svelte';
-import { ENCODINGS, type LineEnding } from '$lib/documents/encodings';
-import { reload } from '$lib/documents/opening';
-import { save } from '$lib/documents/saving';
-import { detectIndentation } from '$lib/editor/indentation';
+import type { App } from '#lib/app.svelte.js';
+import type { Document } from '#lib/documents/document.svelte.js';
+import { ENCODINGS, type LineEnding } from '#lib/documents/encodings.js';
+import { reload } from '#lib/documents/opening.js';
+import { save } from '#lib/documents/saving.js';
+import { detectIndentation } from '#lib/editor/indentation.js';
 import { picker } from './sources';
 
 const WIDTHS = [2, 3, 4, 6, 8];

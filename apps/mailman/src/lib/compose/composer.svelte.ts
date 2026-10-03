@@ -1,9 +1,9 @@
-import * as api from '$lib/api';
-import type { Address, Attached, Draft, Message, Rendered } from '$lib/api';
-import { longDate } from '$lib/app/format';
-import { mail } from '$lib/mail/mail.svelte';
-import { reader } from '$lib/reader/reader.svelte';
-import { toasts } from '$lib/shell/toasts.svelte';
+import * as api from '#lib/api/index.js';
+import type { Address, Attached, Draft, Message, Rendered } from '#lib/api/index.js';
+import { longDate } from '#lib/app/format.js';
+import { mail } from '#lib/mail/mail.svelte.js';
+import { reader } from '#lib/reader/reader.svelte.js';
+import { toasts } from '#lib/shell/toasts.svelte.js';
 import { escapeHtml, signatureHtml } from './html';
 import { ownIdentity, sendingFor, type Sending } from './identity';
 import { parseMailto } from './mailto';

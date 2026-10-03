@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import type { ThreadRow } from '$lib/api';
-	import * as actions from '$lib/mail/actions';
-	import { list } from '$lib/mail/list.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
+	import type { ThreadRow } from '#lib/api/index.js';
+	import * as actions from '#lib/mail/actions.js';
+	import { list } from '#lib/mail/list.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
 
 	interface Props {
 		row: ThreadRow;

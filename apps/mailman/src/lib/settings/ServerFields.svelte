@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Segmented, TextField } from '@luft/ui';
-	import type { Security, Server } from '$lib/api';
+	import type { Security, Server } from '#lib/api/index.js';
 
 	interface Props {
 		title: string;

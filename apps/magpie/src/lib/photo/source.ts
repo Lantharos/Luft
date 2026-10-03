@@ -1,7 +1,7 @@
-import type { Item } from '$lib/api';
-import * as api from '$lib/api';
-import { fileSource } from '$lib/bridge';
-import { extension } from '$lib/library/kinds';
+import type { Item } from '#lib/api.js';
+import * as api from '#lib/api.js';
+import { fileSource } from '#lib/bridge.js';
+import { extension } from '#lib/library/kinds.js';
 import { isAnimated } from './animated';
 
 export type PhotoSource =

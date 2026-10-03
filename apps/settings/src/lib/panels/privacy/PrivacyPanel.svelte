@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog, Row, Section, Select, Switch } from '@luft/ui';
-	import { app } from '$lib/state/app.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { app } from '#lib/state/app.svelte.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { clearHistory } from './api';
 	import AppPermissions from './AppPermissions.svelte';
 	import { days, duration, including } from './format';

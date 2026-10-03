@@ -1,7 +1,7 @@
 import { SvelteMap } from 'svelte/reactivity';
-import type { Item, ThumbnailBatch } from '$lib/api';
-import * as api from '$lib/api';
-import { fileSource, isDesktop } from '$lib/bridge';
+import type { Item, ThumbnailBatch } from '#lib/api.js';
+import * as api from '#lib/api.js';
+import { fileSource, isDesktop } from '#lib/bridge.js';
 import { OnScreen } from './onscreen';
 
 const SIZE = 'large';

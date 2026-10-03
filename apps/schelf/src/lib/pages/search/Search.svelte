@@ -1,14 +1,14 @@
 <script lang="ts">
-	import AppArt from '$lib/components/AppArt.svelte';
-	import Shelf from '$lib/components/Shelf.svelte';
-	import * as fedora from '$lib/catalog/fedora';
-	import * as flathub from '$lib/catalog/flathub';
-	import type { CatalogApp } from '$lib/catalog/types';
-	import { sourceName } from '$lib/format';
-	import { backend } from '$lib/state/backend';
-	import { catalog } from '$lib/state/catalog.svelte';
-	import { library } from '$lib/state/library.svelte';
-	import { navigation } from '$lib/state/navigation.svelte';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import Shelf from '#lib/components/Shelf.svelte';
+	import * as fedora from '#lib/catalog/fedora.js';
+	import * as flathub from '#lib/catalog/flathub.js';
+	import type { CatalogApp } from '#lib/catalog/types.js';
+	import { sourceName } from '#lib/format.js';
+	import { backend } from '#lib/state/backend.js';
+	import { catalog } from '#lib/state/catalog.svelte.js';
+	import { library } from '#lib/state/library.svelte.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
 
 	const LIMIT = 30;
 

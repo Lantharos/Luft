@@ -1,9 +1,9 @@
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import { settings } from '$lib/state/settings.svelte';
-import type { NetworkAsk, NetworkLocation, NetworkPlace } from '$lib/types';
-import { isInside } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { settings } from '#lib/state/settings.svelte.js';
+import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/types/index.js';
+import { isInside } from '#lib/utils/paths.js';
 import { addressName, normalizeAddress, sameAddress } from '../location/addresses';
 
 const RECENT_SERVERS = 8;

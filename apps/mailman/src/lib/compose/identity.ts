@@ -1,4 +1,4 @@
-import type { Identity, Message } from '$lib/api';
+import type { Identity, Message } from '#lib/api/index.js';
 
 export interface Sending {
 	identity: Identity;

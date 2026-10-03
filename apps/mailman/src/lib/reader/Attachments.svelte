@@ -4,10 +4,10 @@
 	import File from '@lucide/svelte/icons/file';
 	import FileImage from '@lucide/svelte/icons/file-image';
 	import FileText from '@lucide/svelte/icons/file-text';
-	import * as api from '$lib/api';
-	import type { Attachment } from '$lib/api';
-	import { size } from '$lib/app/format';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Attachment } from '#lib/api/index.js';
+	import { size } from '#lib/app/format.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 
 	interface Props {
 		source: api.PartSource;

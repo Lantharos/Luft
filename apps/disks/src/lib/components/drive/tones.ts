@@ -1,4 +1,4 @@
-import type { Drive } from '$lib/api';
+import type { Drive } from '#lib/api.js';
 
 const TONES = ['var(--accent)', 'var(--tertiary)', 'var(--secondary)'];
 

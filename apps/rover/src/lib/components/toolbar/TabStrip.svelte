@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
-	import { tabDropKey } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { Tab } from '$lib/types';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
+	import { tabDropKey } from '#lib/file-manager/drag/drop-targets.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { Tab } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

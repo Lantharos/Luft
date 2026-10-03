@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as api from '$lib/api';
-	import { openFile } from '$lib/app/actions';
-	import { baseName } from '$lib/library/kinds';
-	import { library } from '$lib/library/library.svelte';
+	import * as api from '#lib/api.js';
+	import { openFile } from '#lib/app/actions.js';
+	import { baseName } from '#lib/library/kinds.js';
+	import { library } from '#lib/library/library.svelte.js';
 	import OpenWithMenu from './OpenWithMenu.svelte';
 </script>
 

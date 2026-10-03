@@ -1,6 +1,6 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import * as api from '$lib/api';
-import type { Message, Rendered } from '$lib/api';
+import * as api from '#lib/api/index.js';
+import type { Message, Rendered } from '#lib/api/index.js';
 
 const CACHE_LIMIT = 80;
 

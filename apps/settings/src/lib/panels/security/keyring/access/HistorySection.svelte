@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
-	import { ago } from '$lib/panels/updates/time';
+	import { ago } from '#lib/panels/updates/time.js';
 	import { clearHistory, type AccessEvent } from '../api';
 	import ConfirmDialog from '../ConfirmDialog.svelte';
 	import { happened } from '../describe';

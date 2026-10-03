@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { chrome } from '$lib/app/chrome.svelte';
-	import PageThumbnails from '$lib/document/PageThumbnails.svelte';
-	import { documentState } from '$lib/document/state.svelte';
-	import { plural } from '$lib/library/format';
-	import { library } from '$lib/library/library.svelte';
-	import { folderTitle } from '$lib/library/places';
-	import { player } from '$lib/music/player.svelte';
-	import QueueList from '$lib/music/QueueList.svelte';
+	import { chrome } from '#lib/app/chrome.svelte.js';
+	import PageThumbnails from '#lib/document/PageThumbnails.svelte';
+	import { documentState } from '#lib/document/state.svelte.js';
+	import { plural } from '#lib/library/format.js';
+	import { library } from '#lib/library/library.svelte.js';
+	import { folderTitle } from '#lib/library/places.js';
+	import { player } from '#lib/music/player.svelte.js';
+	import QueueList from '#lib/music/QueueList.svelte';
 	import FolderGrid from './FolderGrid.svelte';
 	import Places from './Places.svelte';
 

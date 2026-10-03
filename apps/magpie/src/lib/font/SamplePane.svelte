@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Row, Section, Select, Slider } from '@luft/ui';
-	import { plural } from '$lib/library/format';
+	import { plural } from '#lib/library/format.js';
 	import { count, headline, sampleText } from './characters';
 	import { fontState } from './state.svelte';
 	import Variations from './Variations.svelte';

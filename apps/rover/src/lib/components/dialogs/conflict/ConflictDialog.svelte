@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Checkbox, Dialog } from '@luft/ui';
-	import * as api from '$lib/api';
-	import * as features from '$lib/features/api';
-	import type { Resolution } from '$lib/features/types';
-	import type { Operation } from '$lib/types';
+	import * as api from '#lib/api.js';
+	import * as features from '#lib/features/api.js';
+	import type { Resolution } from '#lib/features/types.js';
+	import type { Operation } from '#lib/types/index.js';
 	import ConflictSide from './ConflictSide.svelte';
 
 	interface Props {

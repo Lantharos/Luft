@@ -1,7 +1,7 @@
-import type { App } from '$lib/app.svelte';
-import type { Document } from '$lib/documents/document.svelte';
-import { openPath } from '$lib/documents/opening';
-import type { MenuEntry } from '$lib/menus.svelte';
+import type { App } from '#lib/app.svelte.js';
+import type { Document } from '#lib/documents/document.svelte.js';
+import { openPath } from '#lib/documents/opening.js';
+import type { MenuEntry } from '#lib/menus.svelte.js';
 
 function pathEntries(app: App, path: string): MenuEntry[] {
 	return [

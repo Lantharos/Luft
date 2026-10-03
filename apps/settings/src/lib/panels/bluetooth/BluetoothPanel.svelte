@@ -5,7 +5,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { ActionRow, Dialog, IconButton, Row, Section, Select, Switch } from '@luft/ui';
-	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
+	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import {

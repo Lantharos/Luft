@@ -1,6 +1,6 @@
 # Disks
 
-Disks shows the drives in your computer and the ones you plug in, and lets you look after them: partitions, formatting, encryption, health and disk images. It is built with Sabine and SvelteKit and lives at `apps/disks`; run the commands below from that directory unless noted otherwise.
+Disks shows the drives in your computer and the ones you plug in, and lets you look after them: partitions, formatting, encryption, health and disk images. It is built with Sabine and Svelte and lives at `apps/disks`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -48,7 +48,7 @@ disks/
 │   │   ├── components/       sidebar, the drive's bar and partition list, actions, and the space map and list
 │   │   ├── dialogs/          details, health, encryption, format, new partition, resize, unlock, passphrase, startup and disk image dialogs
 │   │   └── state/            drives, running actions and what's being measured
-│   └── routes/+page.svelte   window layout
+│   └── App.svelte            window layout
 └── desktop/src/
     ├── udisks/               drives, partitions, free space, health and watching for changes
     ├── actions/              mounting, formatting, partitions, encryption and drives

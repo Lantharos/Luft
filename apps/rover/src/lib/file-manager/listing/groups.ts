@@ -1,5 +1,5 @@
-import type { FileEntry, GroupBy } from '$lib/types';
-import { entryIcon, type EntryIconName } from '$lib/utils/file-kinds';
+import type { FileEntry, GroupBy } from '#lib/types/index.js';
+import { entryIcon, type EntryIconName } from '#lib/utils/file-kinds.js';
 
 export type Section = { key: string; label: string; count: number };
 export type Grouped = { entries: FileEntry[]; sections: Section[] | null };

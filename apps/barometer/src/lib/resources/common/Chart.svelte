@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Line } from '$lib/graph/draw';
-	import Graph from '$lib/graph/Graph.svelte';
+	import type { Line } from '#lib/graph/draw.js';
+	import Graph from '#lib/graph/Graph.svelte';
 
 	interface Legend {
 		label: string;

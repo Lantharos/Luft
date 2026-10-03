@@ -6,8 +6,8 @@
 	import Paperclip from '@lucide/svelte/icons/paperclip';
 	import Star from '@lucide/svelte/icons/star';
 	import Trash from '@lucide/svelte/icons/trash-2';
-	import type { ThreadRow } from '$lib/api';
-	import { shortDate, until } from '$lib/app/format';
+	import type { ThreadRow } from '#lib/api/index.js';
+	import { shortDate, until } from '#lib/app/format.js';
 
 	interface Props {
 		row: ThreadRow;

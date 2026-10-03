@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Drive } from '$lib/api';
-	import { segmentKey } from '$lib/state/disks.svelte';
+	import type { Drive } from '#lib/api.js';
+	import { segmentKey } from '#lib/state/disks.svelte.js';
 	import FreeRow from './FreeRow.svelte';
 	import PartitionRow from './PartitionRow.svelte';
 	import { tones } from './tones';

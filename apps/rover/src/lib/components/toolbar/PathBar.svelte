@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
-	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import { PathCompletion } from '$lib/file-manager/location/completion.svelte';
-	import { looksRemote } from '$lib/file-manager/location/addresses';
-	import { expandHome } from '$lib/file-manager/location/expand';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import { isInside, pathSegments, trimTrailingSlash } from '$lib/utils/paths';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
+	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
+	import { PathCompletion } from '#lib/file-manager/location/completion.svelte.js';
+	import { looksRemote } from '#lib/file-manager/location/addresses.js';
+	import { expandHome } from '#lib/file-manager/location/expand.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import { isInside, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 
 	interface Props {
 		manager: FileManager;

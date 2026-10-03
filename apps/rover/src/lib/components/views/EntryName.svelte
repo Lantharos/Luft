@@ -1,8 +1,8 @@
 <script lang="ts">
-	import InlineNameField from '$lib/components/pane/InlineNameField.svelte';
-	import { defaultName, type FileManager } from '$lib/file-manager/manager.svelte';
-	import { DRAFT_PATH } from '$lib/file-manager/view/draft';
-	import type { FileEntry } from '$lib/types';
+	import InlineNameField from '#lib/components/pane/InlineNameField.svelte';
+	import { defaultName, type FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { DRAFT_PATH } from '#lib/file-manager/view/draft.js';
+	import type { FileEntry } from '#lib/types/index.js';
 
 	interface Props {
 		entry: FileEntry;

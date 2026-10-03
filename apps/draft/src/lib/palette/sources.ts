@@ -1,7 +1,7 @@
-import type { App } from '$lib/app.svelte';
-import type { Command } from '$lib/commands/registry';
-import { openPath } from '$lib/documents/opening';
-import { basename, dirname, tildify } from '$lib/utils/paths';
+import type { App } from '#lib/app.svelte.js';
+import type { Command } from '#lib/commands/registry.js';
+import { openPath } from '#lib/documents/opening.js';
+import { basename, dirname, tildify } from '#lib/utils/paths.js';
 import { fuzzyMatch, topMatches } from './fuzzy';
 import type { PaletteItem, PaletteSource } from './palette.svelte';
 

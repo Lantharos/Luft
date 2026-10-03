@@ -1,4 +1,4 @@
-import { useSettings } from '$lib/state/gsettings.svelte';
+import { useSettings } from '#lib/state/gsettings.svelte.js';
 
 export type Mode = 'none' | 'manual' | 'auto';
 export type Protocol = 'http' | 'https' | 'socks';

@@ -19,17 +19,26 @@ Import the styles right after Tailwind. They also tell Tailwind to scan this pac
 @import '@luft/ui/styles.css';
 ```
 
-Register the font plugin in `vite.config.ts`. It serves the fonts at `/fonts/` during development and copies them, with their license, into the build:
+Register the plugins in `vite.config.ts`. `luftFonts` serves the fonts at `/fonts/` during development and copies them, with their license, into the build. `sabineTarget` compiles scripts and styles for the Chromium that Sabine ships, so nothing gets downleveled or prefixed for browsers the apps never run in:
 
 ```ts
-import { luftFonts } from '@luft/ui/vite';
+import { luftFonts, sabineTarget } from '@luft/ui/vite';
 
 export default defineConfig({
-	plugins: [luftFonts(), tailwindcss(), sveltekit()]
+	plugins: [luftFonts(), sabineTarget(), tailwindcss(), svelte()]
 });
 ```
 
-Preload the regular weight in `app.html` so text shows up without waiting for the font, and do the same for `MapleMono-NF-Regular.woff2` in apps that show code from the start:
+Extend the shared TypeScript settings in the app's `tsconfig.json`:
+
+```json
+{
+	"extends": "@luft/ui/tsconfig.base.json",
+	"include": ["src", "vite.config.ts"]
+}
+```
+
+Preload the regular weight in `index.html` so text shows up without waiting for the font, and do the same for `MapleMono-NF-Regular.woff2` in apps that show code from the start:
 
 ```html
 <link rel="preload" href="/fonts/OpenRunde-Regular.woff2" as="font" type="font/woff2" crossorigin />

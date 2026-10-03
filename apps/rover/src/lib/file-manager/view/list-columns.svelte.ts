@@ -1,5 +1,5 @@
-import { DEFAULT_LIST_COLUMNS, settings } from '$lib/state/settings.svelte';
-import type { ListColumn, ListColumnId, SortBy } from '$lib/types';
+import { DEFAULT_LIST_COLUMNS, settings } from '#lib/state/settings.svelte.js';
+import type { ListColumn, ListColumnId, SortBy } from '#lib/types/index.js';
 
 const NAME_MIN_WIDTH = 220;
 const COLUMN_GAP = 16;

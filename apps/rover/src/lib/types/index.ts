@@ -1,5 +1,5 @@
 import type { Appearance } from '@luft/ui';
-import type { Conflict } from '$lib/features/types';
+import type { Conflict } from '#lib/features/types.js';
 
 export interface FileEntry {
 	name: string;

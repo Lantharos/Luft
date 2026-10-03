@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Segmented } from '@luft/ui';
-	import { GEOMETRIES } from '$lib/keyboard/geometry';
-	import Keyboard from '$lib/keyboard/Keyboard.svelte';
-	import { app } from '$lib/state/app.svelte';
+	import { GEOMETRIES } from '#lib/keyboard/geometry.js';
+	import Keyboard from '#lib/keyboard/Keyboard.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import Issues from '../Issues.svelte';
 	import KeyInspector from './KeyInspector.svelte';

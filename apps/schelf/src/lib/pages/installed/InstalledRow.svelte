@@ -1,15 +1,15 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton, MenuItem } from '@luft/ui';
-	import type { InstalledApp } from '$lib/bridge/types';
-	import AppArt from '$lib/components/AppArt.svelte';
-	import ProgressButton from '$lib/components/ProgressButton.svelte';
-	import { updateJob } from '$lib/app/jobs';
-	import { bytes, sourceName } from '$lib/format';
-	import { backend } from '$lib/state/backend';
-	import { library } from '$lib/state/library.svelte';
-	import { navigation } from '$lib/state/navigation.svelte';
-	import { operations } from '$lib/state/operations.svelte';
+	import type { InstalledApp } from '#lib/bridge/types.js';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import { updateJob } from '#lib/app/jobs.js';
+	import { bytes, sourceName } from '#lib/format.js';
+	import { backend } from '#lib/state/backend.js';
+	import { library } from '#lib/state/library.svelte.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { app, onremove }: { app: InstalledApp; onremove: (app: InstalledApp) => void } = $props();
 

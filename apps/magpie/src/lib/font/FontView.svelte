@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Segmented } from '@luft/ui';
-	import type { Item } from '$lib/api';
+	import type { Item } from '#lib/api.js';
 	import FontDetails from './FontDetails.svelte';
 	import GlyphGrid from './GlyphGrid.svelte';
 	import SamplePane from './SamplePane.svelte';

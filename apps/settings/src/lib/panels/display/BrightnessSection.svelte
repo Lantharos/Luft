@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Slider } from '@luft/ui';
-	import { percent } from '$lib/format';
+	import { percent } from '#lib/format.js';
 	import { loadBrightness, onBrightnessChanged, setBrightness, type Brightness, type ExternalBrightness, type Monitor } from './api';
 
 	const SETUP: Partial<Record<ExternalBrightness, string>> = {

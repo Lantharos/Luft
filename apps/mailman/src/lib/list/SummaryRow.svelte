@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import type { Summary } from '$lib/mail/list.svelte';
-	import { BUNDLES, PRIMARY } from '$lib/mail/views';
+	import type { Summary } from '#lib/mail/list.svelte.js';
+	import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
 
 	interface Props {
 		summary: Summary;

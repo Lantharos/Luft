@@ -1,8 +1,8 @@
 import { SvelteMap } from 'svelte/reactivity';
-import { previewEntries } from '$lib/file-manager/preview';
-import { isDesktopRuntime } from '$lib/runtime';
-import { settings } from '$lib/state/settings.svelte';
-import type { FileEntry } from '$lib/types';
+import { previewEntries } from '#lib/file-manager/preview.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { settings } from '#lib/state/settings.svelte.js';
+import type { FileEntry } from '#lib/types/index.js';
 import * as api from '../api';
 import { OnScreen } from './tracker';
 import type { CountBatch } from '../types';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
-	import type { Permissions } from '$lib/bridge/types';
-	import { describe } from '$lib/app/permissions';
+	import type { Permissions } from '#lib/bridge/types.js';
+	import { describe } from '#lib/app/permissions.js';
 
 	let { permissions }: { permissions: Permissions } = $props();
 	const access = $derived(describe(permissions));

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MenuButton, MenuItem, tooltip } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 
 	interface Props {
 		manager: FileManager;

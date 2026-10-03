@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Checkbox, Dialog, TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import Icon from '$lib/components/Icon.svelte';
-	import { normalizeAddress, protocolName } from '$lib/file-manager/location/addresses';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { settings } from '$lib/state/settings.svelte';
-	import type { NetworkPlace } from '$lib/types';
+	import * as api from '#lib/api.js';
+	import Icon from '#lib/components/Icon.svelte';
+	import { normalizeAddress, protocolName } from '#lib/file-manager/location/addresses.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import type { NetworkPlace } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

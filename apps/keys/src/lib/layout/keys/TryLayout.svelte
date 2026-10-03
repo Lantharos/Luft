@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tryKey, tryLayout } from '../api';
 	import type { LayoutEditor } from '../editor.svelte';
-	import { CODES } from '$lib/keyboard/geometry';
+	import { CODES } from '#lib/keyboard/geometry.js';
 
 	interface Props {
 		editor: LayoutEditor;

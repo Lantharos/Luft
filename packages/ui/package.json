@@ -14,7 +14,8 @@
 			"default": "./src/code/index.ts"
 		},
 		"./styles.css": "./src/styles/index.css",
-		"./vite": "./vite.js"
+		"./vite": "./vite.js",
+		"./tsconfig.base.json": "./tsconfig.base.json"
 	},
 	"scripts": {
 		"check": "svelte-check --tsgo --tsconfig ./tsconfig.json"
@@ -27,18 +28,18 @@
 		"@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
 		"@lezer/common": "^1.5.3",
 		"@lezer/highlight": "^1.2.5",
-		"@lucide/svelte": "^1.48.0"
+		"@lucide/svelte": "^1.51.0"
 	},
 	"peerDependencies": {
 		"svelte": "^5.57.1",
-		"vite": "^8.3.1"
+		"vite": "^8.3.2"
 	},
 	"devDependencies": {
-		"@types/node": "^26.6.3",
+		"@types/node": "^26.6.4",
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.6",
 		"typescript": "~6.0.3",
-		"vite": "^8.3.1"
+		"vite": "^8.3.2"
 	}
 }

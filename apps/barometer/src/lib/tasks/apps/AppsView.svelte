@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { SearchField } from '@luft/ui';
-	import type { Process } from '$lib/backend/rows';
-	import type { AppUsage } from '$lib/backend/types';
-	import { plural } from '$lib/format';
-	import Header from '$lib/shell/Header.svelte';
-	import { processes } from '$lib/state/processes.svelte';
-	import { settings } from '$lib/state/settings.svelte';
-	import { usage } from '$lib/state/usage.svelte';
-	import ColumnsMenu from '$lib/tasks/ColumnsMenu.svelte';
-	import { APP_COLUMN_IDS, columnsFor, compare, toggleSort, type Row } from '$lib/tasks/columns';
-	import TaskMenu from '$lib/tasks/actions/TaskMenu.svelte';
-	import { tasks, type Target } from '$lib/tasks/actions/actions.svelte';
-	import TaskTable, { type Item } from '$lib/tasks/TaskTable.svelte';
-	import { matches } from '$lib/tasks/search';
+	import type { Process } from '#lib/backend/rows.js';
+	import type { AppUsage } from '#lib/backend/types.js';
+	import { plural } from '#lib/format.js';
+	import Header from '#lib/shell/Header.svelte';
+	import { processes } from '#lib/state/processes.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import { usage } from '#lib/state/usage.svelte.js';
+	import ColumnsMenu from '#lib/tasks/ColumnsMenu.svelte';
+	import { APP_COLUMN_IDS, columnsFor, compare, toggleSort, type Row } from '#lib/tasks/columns.js';
+	import TaskMenu from '#lib/tasks/actions/TaskMenu.svelte';
+	import { tasks, type Target } from '#lib/tasks/actions/actions.svelte.js';
+	import TaskTable, { type Item } from '#lib/tasks/TaskTable.svelte';
+	import { matches } from '#lib/tasks/search.js';
 
 	let query = $state('');
 	let selected = $state<string | null>(null);

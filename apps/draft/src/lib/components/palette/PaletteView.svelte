@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import { useApp } from '$lib/context';
-	import type { PaletteItem } from '$lib/palette/palette.svelte';
+	import { useApp } from '#lib/context.js';
+	import type { PaletteItem } from '#lib/palette/palette.svelte.js';
 	import Highlight from './Highlight.svelte';
 
 	const app = useApp();

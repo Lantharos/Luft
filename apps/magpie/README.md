@@ -1,6 +1,6 @@
 # Magpie
 
-Magpie shows photos, videos, music, PDFs and fonts on the Luft desktop. It is built with Sabine and SvelteKit and lives at `apps/magpie` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
+Magpie shows photos, videos, music, PDFs and fonts on the Luft desktop. It is built with Sabine and Svelte and lives at `apps/magpie` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
 
 ## Two ways in
 
@@ -111,7 +111,7 @@ magpie/
 │   │   ├── playback/           shared volume and the media session
 │   │   ├── shell/              header, stage and shared messages
 │   │   └── video/              player, subtitles, frame previews and positions
-│   └── routes/+page.svelte     window layout
+│   └── App.svelte              window layout
 ├── vite/                       PDF assets and the browser preview
 └── desktop/src/
     ├── folder/                 listing, kinds, places and folder watching

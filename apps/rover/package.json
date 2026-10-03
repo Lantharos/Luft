@@ -7,28 +7,28 @@
 	},
 	"devDependencies": {
 		"@luft/ui": "workspace:*",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@tailwindcss/vite": "^4.3.3",
-		"@types/node": "^26.6.3",
+		"@types/node": "^26.6.4",
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.6",
 		"tailwindcss": "^4.3.3",
 		"typescript": "~6.0.3",
-		"vite": "^8.3.1"
+		"vite": "^8.3.2"
 	},
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"desktop:dev": "sabine dev .",
 		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release",
 		"desktop:bundle": "sabine bundle . --release"
 	},
-	"type": "module"
+	"type": "module",
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	}
 }

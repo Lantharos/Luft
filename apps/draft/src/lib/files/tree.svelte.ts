@@ -1,6 +1,6 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import type { Backend, Entry } from '$lib/bridge/types';
-import { dirname, isInside } from '$lib/utils/paths';
+import type { Backend, Entry } from '#lib/bridge/types.js';
+import { dirname, isInside } from '#lib/utils/paths.js';
 
 export interface TreeRow {
 	entry: Entry;

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { appearance, Row, Section, Segmented, Switch } from '@luft/ui';
-	import Swatches from '$lib/components/Swatches.svelte';
-	import TimePicker from '$lib/components/TimePicker.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import Swatches from '#lib/components/Swatches.svelte';
+	import TimePicker from '#lib/components/TimePicker.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 
 	type Schedule = 'off' | 'sunset' | 'custom';
 	type Accent = 'wallpaper' | 'white';

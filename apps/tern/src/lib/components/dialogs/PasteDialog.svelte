@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import type { PasteReview } from '$lib/workspace/workspace.svelte';
+	import type { PasteReview } from '#lib/workspace/workspace.svelte.js';
 
 	interface Props {
 		review: PasteReview;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog, VirtualScroller } from '@luft/ui';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 	import type { Update } from './api';
 	import { areas } from './summary';
 

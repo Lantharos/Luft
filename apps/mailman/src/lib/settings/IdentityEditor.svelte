@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Identity } from '$lib/api';
-	import { signatureHtml } from '$lib/compose/html';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Identity } from '#lib/api/index.js';
+	import { signatureHtml } from '#lib/compose/html.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 
 	interface Props {
 		identity: Identity;

@@ -1,4 +1,4 @@
-import type { App } from '$lib/app.svelte';
+import type { App } from '#lib/app.svelte.js';
 import { combo, tabNumber } from './keys';
 
 export function runShortcut(app: App, event: KeyboardEvent) {

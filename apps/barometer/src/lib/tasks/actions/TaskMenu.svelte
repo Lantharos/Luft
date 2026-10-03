@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import type { Process } from '$lib/backend/rows';
+	import type { Process } from '#lib/backend/rows.js';
 	import { tasks, type Target } from './actions.svelte';
 
 	interface Props {

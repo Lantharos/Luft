@@ -2,7 +2,7 @@
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import { tooltip, WindowControls } from '@luft/ui';
-	import { useApp } from '$lib/context';
+	import { useApp } from '#lib/context.js';
 	import TabStrip from './TabStrip.svelte';
 
 	const app = useApp();

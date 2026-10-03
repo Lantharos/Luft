@@ -2,8 +2,8 @@
 	import Download from '@lucide/svelte/icons/download';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import { Dialog, Row, Section, Select } from '@luft/ui';
-	import MoreRow from '$lib/components/MoreRow.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import MoreRow from '#lib/components/MoreRow.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
 	import { cursors } from './cursors.svelte';
 	import CursorTile from './CursorTile.svelte';

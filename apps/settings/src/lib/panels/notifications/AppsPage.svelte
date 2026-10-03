@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SearchField, Section } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import { matches } from '../apps/api';
 	import AppNotifications from './AppNotifications.svelte';
 	import type { NotifyingApp } from './api';

@@ -1,5 +1,5 @@
 import { createSubscriber } from 'svelte/reactivity';
-import type { Item } from '$lib/api';
+import type { Item } from '#lib/api.js';
 
 export class OnScreen {
 	readonly items = new Map<string, Item>();

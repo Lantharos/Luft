@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import type { Item } from '$lib/api';
-	import { library } from '$lib/library/library.svelte';
-	import { thumbnails } from '$lib/library/thumbnails.svelte';
-	import CantShow from '$lib/shell/CantShow.svelte';
+	import type { Item } from '#lib/api.js';
+	import { library } from '#lib/library/library.svelte.js';
+	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
+	import CantShow from '#lib/shell/CantShow.svelte';
 	import { activePhoto } from './active.svelte';
 	import { photoGestures } from './render/gestures';
 	import { cssMatrix } from './render/matrix';

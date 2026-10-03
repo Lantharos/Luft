@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Layers from '@lucide/svelte/icons/layers';
-	import type { AppUpdate } from '$lib/bridge/types';
-	import AppArt from '$lib/components/AppArt.svelte';
-	import ProgressButton from '$lib/components/ProgressButton.svelte';
-	import { updateJob } from '$lib/app/jobs';
-	import { bytes } from '$lib/format';
-	import { navigation } from '$lib/state/navigation.svelte';
-	import { operations } from '$lib/state/operations.svelte';
+	import type { AppUpdate } from '#lib/bridge/types.js';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import { updateJob } from '#lib/app/jobs.js';
+	import { bytes } from '#lib/format.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { update }: { update: AppUpdate } = $props();
 

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import { dialogs } from '$lib/features/dialogs.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { GRID_SIZES, type ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import { userFolders } from '$lib/file-manager/places/places.svelte';
-	import { setPlaceHidden, settings } from '$lib/state/settings.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { GRID_SIZES, type ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import { userFolders } from '#lib/file-manager/places/places.svelte.js';
+	import { setPlaceHidden, settings } from '#lib/state/settings.svelte.js';
 
 	interface Props {
 		manager: FileManager;

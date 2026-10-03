@@ -2,7 +2,7 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import X from '@lucide/svelte/icons/x';
-	import type { Screenshot } from '$lib/bridge/types';
+	import type { Screenshot } from '#lib/bridge/types.js';
 
 	let { screenshots }: { screenshots: Screenshot[] } = $props();
 	let open = $state<number | null>(null);

@@ -1,6 +1,6 @@
 import { appearance } from '@luft/ui';
-import { appState, onActivated } from '$lib/bridge';
-import { DEFAULT_PANEL, resolveLink, type PanelId } from '$lib/panels/registry';
+import { appState, onActivated } from '#lib/bridge.js';
+import { DEFAULT_PANEL, resolveLink, type PanelId } from '#lib/panels/registry.js';
 import { hardware } from './hardware.svelte';
 
 class AppStore {

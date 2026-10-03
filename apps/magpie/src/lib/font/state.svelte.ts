@@ -1,6 +1,6 @@
-import type { FontFace, FontFile, FontInstance, FontStatus } from '$lib/api';
-import * as api from '$lib/api';
-import { chrome } from '$lib/app/chrome.svelte';
+import type { FontFace, FontFile, FontInstance, FontStatus } from '#lib/api.js';
+import * as api from '#lib/api.js';
+import { chrome } from '#lib/app/chrome.svelte.js';
 import { loadFont } from './faces';
 
 export type Tab = 'preview' | 'characters' | 'details';

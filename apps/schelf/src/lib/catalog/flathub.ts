@@ -1,4 +1,4 @@
-import type { Backend, Permissions, Screenshot } from '$lib/bridge/types';
+import type { Backend, Permissions, Screenshot } from '#lib/bridge/types.js';
 import type { AppDetails, CatalogApp, Page } from './types';
 import type { CategoryId } from './categories';
 

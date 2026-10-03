@@ -1,6 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '$lib/api';
-import type { ThreadRow } from '$lib/api';
+import * as api from '#lib/api/index.js';
+import type { ThreadRow } from '#lib/api/index.js';
 import { mail } from './mail.svelte';
 import { BUNDLES } from './views';
 

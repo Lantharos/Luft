@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import { closeWindow } from '$lib/runtime';
-import { isInside, parentPath } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import { closeWindow } from '#lib/runtime.js';
+import { isInside, parentPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
-	import Page from '$lib/shell/Page.svelte';
-	import SourceActions from '$lib/shell/SourceActions.svelte';
-	import UndoButtons from '$lib/shell/UndoButtons.svelte';
-	import { app } from '$lib/state/app.svelte';
-	import { toast } from '$lib/state/toast.svelte';
+	import Page from '#lib/shell/Page.svelte';
+	import SourceActions from '#lib/shell/SourceActions.svelte';
+	import UndoButtons from '#lib/shell/UndoButtons.svelte';
+	import { app } from '#lib/state/app.svelte.js';
+	import { toast } from '#lib/state/toast.svelte.js';
 	import { deleteLayout, exportLayout, openLayout, systemLayouts, useLayout } from './api';
 	import DeadKeysPane from './dead/DeadKeysPane.svelte';
 	import { LayoutEditor, type Tab } from './editor.svelte';

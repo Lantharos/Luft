@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Drive, Health } from '$lib/api';
-	import { duration, healthAdvice, selftestResult } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import type { Drive, Health } from '#lib/api.js';
+	import { duration, healthAdvice, selftestResult } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import Facts from './Facts.svelte';
 
 	interface Props {

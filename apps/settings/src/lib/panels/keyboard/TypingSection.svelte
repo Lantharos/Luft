@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 
 	type Keyboard = { repeat: boolean; delay: number; 'repeat-interval': number };
 

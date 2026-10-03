@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import * as bookmarks from '$lib/file-manager/places/bookmarks';
-	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
-	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
-	import { dataTransferPaths } from '$lib/file-manager/drag/data-transfer';
-	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
-	import { settings } from '$lib/state/settings.svelte';
-	import type { PinnedFolder } from '$lib/types';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
+	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
+	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
+	import { dataTransferPaths } from '#lib/file-manager/drag/data-transfer.js';
+	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
+	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import type { PinnedFolder } from '#lib/types/index.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {

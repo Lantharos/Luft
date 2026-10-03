@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { chrome } from '$lib/app/chrome.svelte';
+	import { chrome } from '#lib/app/chrome.svelte.js';
 </script>
 
 {#if chrome.toast}

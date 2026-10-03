@@ -1,4 +1,4 @@
-import type { Address } from '$lib/api';
+import type { Address } from '#lib/api/index.js';
 
 export interface Mailto {
 	to: Address[];

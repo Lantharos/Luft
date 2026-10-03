@@ -1,7 +1,7 @@
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import { errorMessage } from '$lib/utils/format';
-import { absolutePath, relativePath } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { errorMessage } from '#lib/utils/format.js';
+import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
 import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject, VcsStatusEvent } from './types';
 

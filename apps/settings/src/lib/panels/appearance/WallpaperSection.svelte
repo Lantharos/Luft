@@ -3,7 +3,7 @@
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { addWallpapers, onWallpapersChanged, openFolder, wallpapers, type Wallpaper } from './api';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
 	import WallpaperTile from './WallpaperTile.svelte';

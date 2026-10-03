@@ -1,6 +1,6 @@
-import type { CategoryId } from '$lib/catalog/categories';
-import type { Collection } from '$lib/catalog/flathub';
-import type { Origin } from '$lib/catalog/types';
+import type { CategoryId } from '#lib/catalog/categories.js';
+import type { Collection } from '#lib/catalog/flathub.js';
+import type { Origin } from '#lib/catalog/types.js';
 
 export type AppTarget = { origin: Origin; id: string } | { installed: string };
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Music from '@lucide/svelte/icons/music';
-	import { fileSource } from '$lib/bridge';
+	import { fileSource } from '#lib/bridge.js';
 
 	let { art, size, radius = 12 }: { art: string | null; size: number; radius?: number } = $props();
 

@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { NetworkInfo, NetworkSample } from '$lib/backend/types';
-	import { bytes, networkRate } from '$lib/format';
-	import Chart from '$lib/resources/common/Chart.svelte';
-	import Facts from '$lib/resources/common/Facts.svelte';
-	import Page from '$lib/resources/common/Page.svelte';
-	import Stats from '$lib/resources/common/Stats.svelte';
-	import { byId, NETWORK_KINDS } from '$lib/resources/registry';
-	import { monitor } from '$lib/state/monitor.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import type { NetworkInfo, NetworkSample } from '#lib/backend/types.js';
+	import { bytes, networkRate } from '#lib/format.js';
+	import Chart from '#lib/resources/common/Chart.svelte';
+	import Facts from '#lib/resources/common/Facts.svelte';
+	import Page from '#lib/resources/common/Page.svelte';
+	import Stats from '#lib/resources/common/Stats.svelte';
+	import { byId, NETWORK_KINDS } from '#lib/resources/registry.js';
+	import { monitor } from '#lib/state/monitor.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 
 	interface Props {
 		info: NetworkInfo;

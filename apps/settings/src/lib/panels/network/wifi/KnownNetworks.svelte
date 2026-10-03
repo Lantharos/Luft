@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Settings from '@lucide/svelte/icons/settings';
 	import { IconButton, Row, Section } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import { remove, type Known, type Network } from '../api';
 	import type { Target } from '../connection/profile';
 	import { linkLabel } from '../describe';

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { AppIcon, Select } from '@luft/ui';
-	import * as api from '$lib/api';
-	import * as features from '$lib/features/api';
-	import type { OpenWithApps } from '$lib/types/details';
-	import { errorMessage } from '$lib/utils/format';
+	import * as api from '#lib/api.js';
+	import * as features from '#lib/features/api.js';
+	import type { OpenWithApps } from '#lib/types/details.js';
+	import { errorMessage } from '#lib/utils/format.js';
 
 	interface Props {
 		path: string;

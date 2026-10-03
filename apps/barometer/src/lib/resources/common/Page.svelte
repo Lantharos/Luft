@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import Header from '$lib/shell/Header.svelte';
+	import Header from '#lib/shell/Header.svelte';
 
 	interface Props {
 		title: string;

@@ -1,13 +1,13 @@
 import { selectSelectionMatches } from '@codemirror/search';
 import { addCursorAbove, addCursorBelow, toggleComment } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
-import type { App } from '$lib/app.svelte';
-import { reload } from '$lib/documents/opening';
-import { save, saveAll, saveAs } from '$lib/documents/saving';
-import { openSearch } from '$lib/editor/search/panel';
-import { trimTrailingWhitespace } from '$lib/editor/whitespace';
-import { defaultIndentationPicker, encodingPicker, indentationPicker, languagePicker, lineEndingPicker } from '$lib/palette/pickers';
-import { quickOpen } from '$lib/palette/sources';
+import type { App } from '#lib/app.svelte.js';
+import { reload } from '#lib/documents/opening.js';
+import { save, saveAll, saveAs } from '#lib/documents/saving.js';
+import { openSearch } from '#lib/editor/search/panel.js';
+import { trimTrailingWhitespace } from '#lib/editor/whitespace.js';
+import { defaultIndentationPicker, encodingPicker, indentationPicker, languagePicker, lineEndingPicker } from '#lib/palette/pickers.js';
+import { quickOpen } from '#lib/palette/sources.js';
 
 export interface Command {
 	id: string;

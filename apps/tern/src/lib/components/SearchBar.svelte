@@ -7,9 +7,9 @@
 	import Regex from '@lucide/svelte/icons/regex';
 	import X from '@lucide/svelte/icons/x';
 	import type { ISearchOptions } from '@xterm/addon-search';
-	import { settings } from '$lib/state/settings.svelte';
-	import { withAlpha } from '$lib/terminal/palette';
-	import type { TerminalSession } from '$lib/terminal/session.svelte';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import { withAlpha } from '#lib/terminal/palette.js';
+	import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 
 	interface Props {
 		session: TerminalSession;

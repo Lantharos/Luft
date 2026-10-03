@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
-	import * as features from '$lib/features/api';
-	import { dialogs } from '$lib/features/dialogs.svelte';
-	import { folderCounts } from '$lib/features/onscreen/folder-counts.svelte';
-	import { history } from '$lib/features/history.svelte';
-	import { search } from '$lib/features/search.svelte';
-	import { thumbnailSize, thumbnails } from '$lib/features/onscreen/thumbnails.svelte';
-	import { isDesktopRuntime } from '$lib/runtime';
-	import { settings } from '$lib/state/settings.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
+	import * as features from '#lib/features/api.js';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import { folderCounts } from '#lib/features/onscreen/folder-counts.svelte.js';
+	import { history } from '#lib/features/history.svelte.js';
+	import { search } from '#lib/features/search.svelte.js';
+	import { thumbnailSize, thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
+	import { isDesktopRuntime } from '#lib/runtime.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import AskDialog from './network/AskDialog.svelte';

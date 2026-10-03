@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import * as tools from '$lib/features/actions';
-	import { isArchive } from '$lib/features/archives';
-	import * as bookmarks from '$lib/file-manager/places/bookmarks';
-	import type { ContextMenuState, FileManager } from '$lib/file-manager/manager.svelte';
-	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import type { FileEntry } from '$lib/types';
-	import { primaryActionLabel } from '$lib/vcs/format';
-	import type { VcsState } from '$lib/vcs/state.svelte';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import * as tools from '#lib/features/actions.js';
+	import { isArchive } from '#lib/features/archives.js';
+	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
+	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { primaryActionLabel } from '#lib/vcs/format.js';
+	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
 		menu: ContextMenuState;

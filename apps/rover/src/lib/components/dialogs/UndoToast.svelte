@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { history } from '$lib/features/history.svelte';
+	import { history } from '#lib/features/history.svelte.js';
 
 	let toast = $derived(history.toast);
 	let action = $derived.by(() => {

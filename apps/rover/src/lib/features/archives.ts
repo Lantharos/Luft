@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 const SUFFIXES = [
 	'.zip', '.jar', '.cbz', '.epub', '.apk', '.7z',

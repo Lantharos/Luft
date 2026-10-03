@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import type { Access } from '../api';
 	import AppsSection from './AppsSection.svelte';
 	import HistorySection from './HistorySection.svelte';

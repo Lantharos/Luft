@@ -1,8 +1,8 @@
 import { appearance } from '@luft/ui';
-import { updateSettings } from '$lib/api';
-import { LUFT_COLORS, terminalTheme, withAlpha } from '$lib/terminal/palette';
-import type { TerminalOptions } from '$lib/terminal/session.svelte';
-import type { AppState, Settings } from '$lib/types';
+import { updateSettings } from '#lib/api.js';
+import { LUFT_COLORS, terminalTheme, withAlpha } from '#lib/terminal/palette.js';
+import type { TerminalOptions } from '#lib/terminal/session.svelte.js';
+import type { AppState, Settings } from '#lib/types.js';
 
 const DEFAULTS: Settings = {
 	fontSize: 13,

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { MemorySample } from '$lib/backend/types';
-	import { bytes, percent, share } from '$lib/format';
-	import Chart from '$lib/resources/common/Chart.svelte';
-	import Facts from '$lib/resources/common/Facts.svelte';
-	import Meter from '$lib/resources/common/Meter.svelte';
-	import Page from '$lib/resources/common/Page.svelte';
-	import Stats from '$lib/resources/common/Stats.svelte';
-	import { monitor } from '$lib/state/monitor.svelte';
+	import type { MemorySample } from '#lib/backend/types.js';
+	import { bytes, percent, share } from '#lib/format.js';
+	import Chart from '#lib/resources/common/Chart.svelte';
+	import Facts from '#lib/resources/common/Facts.svelte';
+	import Meter from '#lib/resources/common/Meter.svelte';
+	import Page from '#lib/resources/common/Page.svelte';
+	import Stats from '#lib/resources/common/Stats.svelte';
+	import { monitor } from '#lib/state/monitor.svelte.js';
 
 	const SWAP_KINDS: Record<string, string> = { compressed: 'Compressed in memory', partition: 'Partition', file: 'File' };
 

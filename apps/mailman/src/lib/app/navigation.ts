@@ -1,8 +1,8 @@
-import * as api from '$lib/api';
-import { setRead } from '$lib/mail/actions';
-import { list } from '$lib/mail/list.svelte';
-import { mail } from '$lib/mail/mail.svelte';
-import { reader } from '$lib/reader/reader.svelte';
+import * as api from '#lib/api/index.js';
+import { setRead } from '#lib/mail/actions.js';
+import { list } from '#lib/mail/list.svelte.js';
+import { mail } from '#lib/mail/mail.svelte.js';
+import { reader } from '#lib/reader/reader.svelte.js';
 
 export function navigate(view: string) {
 	reader.close();

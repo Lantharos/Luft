@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { appearance, GlassShell } from '@luft/ui';
 	import { untrack } from 'svelte';
-	import type { App } from '$lib/app.svelte';
-	import { runShortcut } from '$lib/commands/shortcuts';
-	import { provideApp } from '$lib/context';
+	import type { App } from '#lib/app.svelte.js';
+	import { runShortcut } from '#lib/commands/shortcuts.js';
+	import { provideApp } from '#lib/context.js';
 	import CloseDialog from './dialogs/CloseDialog.svelte';
 	import Menu from './Menu.svelte';
 	import EditorPane from './editor/EditorPane.svelte';

@@ -1,6 +1,6 @@
 # Mailman
 
-Mailman is the mail app of the Luft desktop. It keeps every account in one fast local copy, so opening, searching and sorting mail never waits on the network, and almost everything has a key. It is built with Sabine and SvelteKit and lives at `apps/mailman` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
+Mailman is the mail app of the Luft desktop. It keeps every account in one fast local copy, so opening, searching and sorting mail never waits on the network, and almost everything has a key. It is built with Sabine and Svelte and lives at `apps/mailman` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -107,7 +107,7 @@ mailman/
 │   │   ├── settings/         settings, addresses with their signatures, and adding accounts
 │   │   ├── shell/            header, toasts, later picker, shortcuts and welcome
 │   │   └── sidebar/          views, bundles, folders and sync status
-│   └── routes/+page.svelte   window layout
+│   └── App.svelte            window layout
 └── desktop/src/
     ├── accounts/             account settings, keyring credentials and token renewal, discovery and OAuth sign-in
     ├── bridge/               bridge command registration

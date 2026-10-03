@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Checkbox, Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { NetworkAsk } from '$lib/types';
+	import * as api from '#lib/api.js';
+	import type { NetworkAsk } from '#lib/types/index.js';
 
 	interface Props {
 		ask: Exclude<NetworkAsk, { kind: 'done' }>;

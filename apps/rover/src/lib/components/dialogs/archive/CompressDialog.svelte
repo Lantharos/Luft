@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Dialog, Segmented, TextField } from '@luft/ui';
-	import * as features from '$lib/features/api';
-	import { archiveName } from '$lib/features/archives';
-	import type { ArchiveFormat } from '$lib/features/types';
-	import type { FileEntry } from '$lib/types';
-	import { errorMessage, plural } from '$lib/utils/format';
+	import * as features from '#lib/features/api.js';
+	import { archiveName } from '#lib/features/archives.js';
+	import type { ArchiveFormat } from '#lib/features/types.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { errorMessage, plural } from '#lib/utils/format.js';
 
 	interface Props {
 		entries: FileEntry[];

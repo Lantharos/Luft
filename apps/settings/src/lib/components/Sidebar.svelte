@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { SearchField } from '@luft/ui';
-	import { searchPanels, shownGroups, titleOf, type Panel } from '$lib/panels/registry';
-	import { app } from '$lib/state/app.svelte';
-	import { hardware, type Hardware } from '$lib/state/hardware.svelte';
+	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
 
 	let present = $derived(hardware.present);
 	let results = $derived(present ? (app.query.trim() ? [searchPanels(app.query, present)] : shownGroups(present)) : []);

@@ -1,6 +1,6 @@
 # Network Sign-In
 
-Network Sign-In opens the page a Wi-Fi network shows before it lets you online, as in hotels, airports and trains. It is built with Sabine and SvelteKit and lives at `apps/signin`; run the commands below from that directory unless noted otherwise.
+Network Sign-In opens the page a Wi-Fi network shows before it lets you online, as in hotels, airports and trains. It is built with Sabine and Svelte and lives at `apps/signin`; run the commands below from that directory unless noted otherwise.
 
 Kestrel offers it in a notification when NetworkManager finds such a network, and opens it with a `kestrel-signin:` link that names the network and the page:
 

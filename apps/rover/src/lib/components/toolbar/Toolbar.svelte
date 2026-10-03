@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
-	import type { ViewMode } from '$lib/types';
-	import type { VcsState } from '$lib/vcs/state.svelte';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import type { ViewMode } from '#lib/types/index.js';
+	import type { VcsState } from '#lib/vcs/state.svelte.js';
 	import MoreMenu from './MoreMenu.svelte';
 	import NewMenu from './NewMenu.svelte';
 	import PathBar from './PathBar.svelte';

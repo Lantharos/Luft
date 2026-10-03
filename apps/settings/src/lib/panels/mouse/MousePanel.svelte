@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
-	import { hardware } from '$lib/state/hardware.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { hardware } from '#lib/state/hardware.svelte.js';
 	import SpeedSlider from './SpeedSlider.svelte';
 	import TouchpadSection from './TouchpadSection.svelte';
 

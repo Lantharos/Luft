@@ -1,8 +1,8 @@
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import type { DriveInfo } from '$lib/types';
-import { isInside } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import type { DriveInfo } from '#lib/types/index.js';
+import { isInside } from '#lib/utils/paths.js';
 
 export class DrivesState {
 	list = $state.raw<DriveInfo[]>([]);

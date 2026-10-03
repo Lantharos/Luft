@@ -1,10 +1,10 @@
-import { documentState } from '$lib/document/state.svelte';
-import { library } from '$lib/library/library.svelte';
-import { player } from '$lib/music/player.svelte';
-import { activePhoto } from '$lib/photo/active.svelte';
-import { copyImage } from '$lib/photo/clipboard';
-import { slideshow } from '$lib/photo/slideshow.svelte';
-import { volume } from '$lib/playback/volume.svelte';
+import { documentState } from '#lib/document/state.svelte.js';
+import { library } from '#lib/library/library.svelte.js';
+import { player } from '#lib/music/player.svelte.js';
+import { activePhoto } from '#lib/photo/active.svelte.js';
+import { copyImage } from '#lib/photo/clipboard.js';
+import { slideshow } from '#lib/photo/slideshow.svelte.js';
+import { volume } from '#lib/playback/volume.svelte.js';
 import { openFile } from './actions';
 import { chrome } from './chrome.svelte';
 import { viewHandled } from './keys';

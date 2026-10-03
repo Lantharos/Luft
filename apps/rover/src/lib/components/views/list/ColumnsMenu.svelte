@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import { columnLabel, type ListColumns } from '$lib/file-manager/view/list-columns.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import { columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 
 	interface Props {
 		at: { x: number; y: number };

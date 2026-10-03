@@ -1,4 +1,4 @@
-import type { Operation, Source } from '$lib/bridge/types';
+import type { Operation, Source } from '#lib/bridge/types.js';
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB'];
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog, TextField } from '@luft/ui';
-	import { toast } from '$lib/state/toast.svelte';
+	import { toast } from '#lib/state/toast.svelte.js';
 	import { createMethod, importMethod, type Method } from './api';
 
 	interface Props {

@@ -1,4 +1,4 @@
-import type { Process } from '$lib/backend/rows';
+import type { Process } from '#lib/backend/rows.js';
 
 export function matches(process: Process, query: string, appName?: string) {
 	const needle = query.trim().toLowerCase();

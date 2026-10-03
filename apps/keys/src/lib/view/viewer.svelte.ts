@@ -1,6 +1,6 @@
-import type { Board } from '$lib/keyboard/board';
-import { guessGeometry, type Geometry } from '$lib/keyboard/geometry';
-import { EMPTY, type Layout, type Levels } from '$lib/layout/api';
+import type { Board } from '#lib/keyboard/board.js';
+import { guessGeometry, type Geometry } from '#lib/keyboard/geometry.js';
+import { EMPTY, type Layout, type Levels } from '#lib/layout/api.js';
 
 const GEOMETRY_KEY = 'keys.keyboard';
 const SHIFTS = ['LFSH', 'RTSH'];

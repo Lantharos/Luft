@@ -1,6 +1,6 @@
 import { isAvailable } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { connect } from '$lib/bridge';
+import { connect } from '#lib/bridge/index.js';
 import { setBackend } from './backend';
 import { catalog } from './catalog.svelte';
 import { library } from './library.svelte';

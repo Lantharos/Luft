@@ -1,7 +1,7 @@
 import { appWindow } from '@lantharos/sabine';
-import type { MediaAction, Playback } from '$lib/api';
-import * as api from '$lib/api';
-import { isDesktop } from '$lib/bridge';
+import type { MediaAction, Playback } from '#lib/api.js';
+import * as api from '#lib/api.js';
+import { isDesktop } from '#lib/bridge.js';
 
 export interface MediaOwner {
 	playback(): Playback;

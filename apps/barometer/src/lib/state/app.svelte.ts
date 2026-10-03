@@ -1,7 +1,7 @@
 import { appWindow, isAvailable } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { connect } from '$lib/backend';
-import type { Backend, Devices } from '$lib/backend/types';
+import { connect } from '#lib/backend/index.js';
+import type { Backend, Devices } from '#lib/backend/types.js';
 import { monitor } from './monitor.svelte';
 import { processes } from './processes.svelte';
 import { settings } from './settings.svelte';

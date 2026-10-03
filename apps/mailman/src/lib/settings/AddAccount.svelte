@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import * as api from '$lib/api';
-	import type { AccountConfig, Provider, Server } from '$lib/api';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { AccountConfig, Provider, Server } from '#lib/api/index.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import ServerFields from './ServerFields.svelte';
 
 	interface Props {

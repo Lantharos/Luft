@@ -7,10 +7,10 @@
 	import Mail from '@lucide/svelte/icons/mail';
 	import Star from '@lucide/svelte/icons/star';
 	import Trash from '@lucide/svelte/icons/trash-2';
-	import * as actions from '$lib/mail/actions';
-	import { list } from '$lib/mail/list.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
-	import LaterPopover from '$lib/shell/LaterPopover.svelte';
+	import * as actions from '#lib/mail/actions.js';
+	import { list } from '#lib/mail/list.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import LaterPopover from '#lib/shell/LaterPopover.svelte';
 	import { reader } from './reader.svelte';
 
 	let threads = $derived(list.chosen.size ? [...list.chosen] : reader.thread !== null ? [reader.thread] : []);

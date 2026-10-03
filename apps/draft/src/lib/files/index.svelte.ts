@@ -1,4 +1,4 @@
-import type { Backend } from '$lib/bridge/types';
+import type { Backend } from '#lib/bridge/types.js';
 
 export interface IndexedFile {
 	path: string;

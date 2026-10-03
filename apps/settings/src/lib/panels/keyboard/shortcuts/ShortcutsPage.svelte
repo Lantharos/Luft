@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Search from '@lucide/svelte/icons/search';
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import CustomShortcuts from './CustomShortcuts.svelte';
 	import ShortcutsSection from './ShortcutsSection.svelte';
 	import type { Binding, ShortcutStore } from './store.svelte';

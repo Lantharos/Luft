@@ -4,7 +4,7 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash from '@lucide/svelte/icons/trash';
 	import { Dialog, IconButton, Row, Section } from '@luft/ui';
-	import { ago } from '$lib/panels/updates/time';
+	import { ago } from '#lib/panels/updates/time.js';
 	import { accountLabel, deletePasskey, onPasskeys, passkeys, siteLabel, type Passkey, type Passkeys } from './passkeys/api';
 	import RenameDialog from './passkeys/RenameDialog.svelte';
 

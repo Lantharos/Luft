@@ -5,7 +5,7 @@ generic_name = "Terminal"
 categories = ["System", "TerminalEmulator"]
 keywords = ["terminal", "console", "shell", "command line", "command prompt", "cmd", "powershell", "prompt", "cli", "tty", "bash", "zsh", "fish", "xterm", "konsole", "ptyxis"]
 version = "0.1.0"
-icon = "static/favicon.svg"
+icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 
 [install]
@@ -13,6 +13,6 @@ command = "cargo run --manifest-path desktop/Cargo.toml --"
 
 [web]
 root = "."
-dist = "build"
-entry = "build/index.html"
+dist = "dist"
+entry = "dist/index.html"
 build = "bun run build"

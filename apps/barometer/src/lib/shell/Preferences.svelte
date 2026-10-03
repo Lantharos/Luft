@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Popover, Segmented, Switch } from '@luft/ui';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
-	import { settings, type TemperatureUnit } from '$lib/state/settings.svelte';
+	import { settings, type TemperatureUnit } from '#lib/state/settings.svelte.js';
 
 	const SPEEDS = [
 		{ value: 2000, label: 'Slow' },

@@ -1,5 +1,5 @@
 import { fileUrl } from '@lantharos/sabine';
-import type { Rendered } from '$lib/api';
+import type { Rendered } from '#lib/api/index.js';
 
 const QUOTES = [
 	'.mm-quote',

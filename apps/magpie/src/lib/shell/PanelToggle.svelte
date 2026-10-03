@@ -3,8 +3,8 @@
 	import GalleryHorizontalEnd from '@lucide/svelte/icons/gallery-horizontal-end';
 	import ListMusic from '@lucide/svelte/icons/list-music';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
-	import { chrome } from '$lib/app/chrome.svelte';
-	import type { Group } from '$lib/library/kinds';
+	import { chrome } from '#lib/app/chrome.svelte.js';
+	import type { Group } from '#lib/library/kinds.js';
 
 	let { group }: { group: Group } = $props();
 

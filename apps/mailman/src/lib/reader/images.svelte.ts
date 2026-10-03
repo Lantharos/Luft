@@ -1,5 +1,5 @@
 import { SvelteMap } from 'svelte/reactivity';
-import * as api from '$lib/api';
+import * as api from '#lib/api/index.js';
 
 class RemoteImages {
 	loaded = new SvelteMap<string, string>();

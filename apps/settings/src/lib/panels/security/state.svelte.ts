@@ -1,4 +1,4 @@
-import { firmware } from '$lib/panels/updates/api';
+import { firmware } from '#lib/panels/updates/api.js';
 import {
 	fingerprintReader,
 	hostSecurity,

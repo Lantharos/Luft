@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import type { ListColumn, Settings } from '$lib/types';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import type { ListColumn, Settings } from '#lib/types/index.js';
 
 export const DEFAULT_LIST_COLUMNS: ListColumn[] = [
 	{ id: 'date', width: 150, visible: true },

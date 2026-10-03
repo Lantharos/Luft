@@ -1,10 +1,10 @@
 import { appWindow, isAvailable } from '@lantharos/sabine';
-import { notify } from '$lib/api';
-import { settings } from '$lib/state/settings.svelte';
-import type { FinishedCommand } from '$lib/terminal/integration';
-import { pasteRisks } from '$lib/terminal/paste';
-import { TerminalSession, type SessionEvents } from '$lib/terminal/session.svelte';
-import type { LaunchRequest } from '$lib/types';
+import { notify } from '#lib/api.js';
+import { settings } from '#lib/state/settings.svelte.js';
+import type { FinishedCommand } from '#lib/terminal/integration.js';
+import { pasteRisks } from '#lib/terminal/paste.js';
+import { TerminalSession, type SessionEvents } from '#lib/terminal/session.svelte.js';
+import type { LaunchRequest } from '#lib/types.js';
 import { neighbor, type Direction } from './layout';
 import { handleShortcut } from './shortcuts';
 import { Tab } from './tab.svelte';

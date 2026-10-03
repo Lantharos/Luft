@@ -1,9 +1,9 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import type { Operation } from '$lib/bridge/types';
-	import { activity, percent } from '$lib/format';
-	import { operations } from '$lib/state/operations.svelte';
+	import type { Operation } from '#lib/bridge/types.js';
+	import { activity, percent } from '#lib/format.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { operation, large = false }: { operation: Operation; large?: boolean } = $props();
 	const value = $derived(percent(operation));

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { settings } from '$lib/state/settings.svelte';
-	import type { GroupBy, SortBy } from '$lib/types';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import type { GroupBy, SortBy } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

@@ -5,7 +5,7 @@ generic_name = "Text Editor"
 categories = ["Utility", "TextEditor", "Development"]
 keywords = ["text editor", "notepad", "editor", "code editor", "code", "notes", "plain text", "write", "markdown", "ide", "programming", "gedit", "textedit", "kate", "wordpad"]
 version = "0.1.0"
-icon = "static/favicon.svg"
+icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = [
 	"text/plain",
@@ -51,8 +51,8 @@ command = "cargo run --manifest-path desktop/Cargo.toml --"
 
 [web]
 root = "."
-dist = "build"
-entry = "build/index.html"
+dist = "dist"
+entry = "dist/index.html"
 dev_port = 5176
 build = "bun run build"
 local_files = true

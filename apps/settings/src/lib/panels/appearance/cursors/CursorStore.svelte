@@ -2,8 +2,8 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Row, SearchField, Section, Segmented } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { browseCursors, type Order, type StorePage } from './api';
 	import StoreItem from './StoreItem.svelte';
 

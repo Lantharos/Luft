@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Row, Section, Slider, Switch } from '@luft/ui';
-	import { percent } from '$lib/format';
-	import { app } from '$lib/state/app.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { percent } from '#lib/format.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppIconsSection from './AppIconsSection.svelte';
 	import CursorSection from './cursors/CursorSection.svelte';
 	import CursorStore from './cursors/CursorStore.svelte';

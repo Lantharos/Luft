@@ -28,7 +28,6 @@ export function pdfjsAssets(): Plugin {
 			});
 		},
 		generateBundle() {
-			if (this.environment.config.consumer !== 'client') return;
 			for (const folder of FOLDERS) {
 				for (const name of files(folder)) {
 					this.emitFile({ type: 'asset', fileName: `pdfjs/${folder}/${name}`, source: readFileSync(join(ROOT, folder, name)) });

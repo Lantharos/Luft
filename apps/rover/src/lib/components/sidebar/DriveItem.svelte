@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
-	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import type { FileManager, SidebarPlace } from '$lib/file-manager/manager.svelte';
-	import type { DriveInfo } from '$lib/types';
-	import { formatBytes } from '$lib/utils/format';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
+	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
+	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
+	import type { DriveInfo } from '#lib/types/index.js';
+	import { formatBytes } from '#lib/utils/format.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {

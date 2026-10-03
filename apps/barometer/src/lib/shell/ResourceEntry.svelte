@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Graph from '$lib/graph/Graph.svelte';
-	import type { Resource } from '$lib/resources/registry';
-	import { app } from '$lib/state/app.svelte';
-	import { monitor } from '$lib/state/monitor.svelte';
+	import Graph from '#lib/graph/Graph.svelte';
+	import type { Resource } from '#lib/resources/registry.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { monitor } from '#lib/state/monitor.svelte.js';
 
 	interface Props {
 		resource: Resource;

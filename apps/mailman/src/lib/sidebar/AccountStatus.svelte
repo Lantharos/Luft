@@ -2,8 +2,8 @@
 	import CloudOff from '@lucide/svelte/icons/cloud-off';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { tooltip } from '@luft/ui';
-	import * as api from '$lib/api';
-	import { mail } from '$lib/mail/mail.svelte';
+	import * as api from '#lib/api/index.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
 
 	let failing = $derived(Object.values(mail.status).filter((status) => status.state === 'error'));
 	let syncing = $derived(Object.values(mail.status).some((status) => status.state === 'syncing'));

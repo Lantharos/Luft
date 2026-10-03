@@ -2,7 +2,7 @@
 	import FileIcon from '@lucide/svelte/icons/file';
 	import Files from '@lucide/svelte/icons/files';
 	import Folder from '@lucide/svelte/icons/folder';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 	import ActionMenu from '../ActionMenu.svelte';
 	import type { Action } from '../actions';
 	import type { Tile } from './tiles';

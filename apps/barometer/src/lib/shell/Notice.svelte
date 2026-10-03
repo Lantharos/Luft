@@ -1,7 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { fly } from 'svelte/transition';
-	import { notices } from '$lib/state/notices.svelte';
+	import { notices } from '#lib/state/notices.svelte.js';
 </script>
 
 {#if notices.current}

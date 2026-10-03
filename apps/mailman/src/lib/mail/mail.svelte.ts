@@ -1,5 +1,5 @@
-import * as api from '$lib/api';
-import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, Status } from '$lib/api';
+import * as api from '#lib/api/index.js';
+import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, Status } from '#lib/api/index.js';
 
 const EMPTY_COUNTS: Counts = { inbox: 0, screener: 0, later: 0, drafts: 0, newsletter: 0, receipt: 0, notification: 0, mailboxes: [] };
 

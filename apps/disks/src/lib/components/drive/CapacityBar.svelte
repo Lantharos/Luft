@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Drive, Segment } from '$lib/api';
-	import { dialogs } from '$lib/dialogs/dialogs.svelte';
-	import { bytes, segmentName, usedShare } from '$lib/format';
-	import { disks, segmentKey } from '$lib/state/disks.svelte';
+	import type { Drive, Segment } from '#lib/api.js';
+	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { bytes, segmentName, usedShare } from '#lib/format.js';
+	import { disks, segmentKey } from '#lib/state/disks.svelte.js';
 	import { tones } from './tones';
 
 	interface Props {

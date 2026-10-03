@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { untrack } from 'svelte';
-	import * as api from '$lib/api';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { escapeHtml } from './html';
 	import { applyShortcuts, extract } from './editor';
 

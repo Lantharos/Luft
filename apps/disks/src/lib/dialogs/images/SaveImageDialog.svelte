@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
 		block: string;

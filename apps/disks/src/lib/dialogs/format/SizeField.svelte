@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Slider } from '@luft/ui';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 
 	interface Props {
 		value: number;

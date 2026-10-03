@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import { useApp } from '$lib/context';
-	import { save } from '$lib/documents/saving';
+	import { useApp } from '#lib/context.js';
+	import { save } from '#lib/documents/saving.js';
 
 	const app = useApp();
 	let request = $derived(app.workspace.closeRequest);

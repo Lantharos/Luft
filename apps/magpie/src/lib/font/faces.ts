@@ -1,4 +1,4 @@
-import { fileSource } from '$lib/bridge';
+import { fileSource } from '#lib/bridge.js';
 
 const loaded = new Map<string, Promise<string>>();
 

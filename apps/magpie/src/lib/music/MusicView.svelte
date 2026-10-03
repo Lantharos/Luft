@@ -8,9 +8,9 @@
 	import SkipBack from '@lucide/svelte/icons/skip-back';
 	import SkipForward from '@lucide/svelte/icons/skip-forward';
 	import { untrack } from 'svelte';
-	import type { Item } from '$lib/api';
-	import { library } from '$lib/library/library.svelte';
-	import { volume } from '$lib/playback/volume.svelte';
+	import type { Item } from '#lib/api.js';
+	import { library } from '#lib/library/library.svelte.js';
+	import { volume } from '#lib/playback/volume.svelte.js';
 	import Artwork from './Artwork.svelte';
 	import { player } from './player.svelte';
 	import { trackArtist, trackTitle } from './queue';

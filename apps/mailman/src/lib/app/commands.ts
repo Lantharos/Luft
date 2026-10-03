@@ -1,11 +1,11 @@
-import * as api from '$lib/api';
-import { composer } from '$lib/compose/composer.svelte';
-import * as actions from '$lib/mail/actions';
-import { list } from '$lib/mail/list.svelte';
-import { mail } from '$lib/mail/mail.svelte';
-import { BUNDLES, PRIMARY } from '$lib/mail/views';
-import { reader } from '$lib/reader/reader.svelte';
-import { toasts } from '$lib/shell/toasts.svelte';
+import * as api from '#lib/api/index.js';
+import { composer } from '#lib/compose/composer.svelte.js';
+import * as actions from '#lib/mail/actions.js';
+import { list } from '#lib/mail/list.svelte.js';
+import { mail } from '#lib/mail/mail.svelte.js';
+import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
+import { reader } from '#lib/reader/reader.svelte.js';
+import { toasts } from '#lib/shell/toasts.svelte.js';
 import { navigate, openThread } from './navigation';
 
 export interface Command {

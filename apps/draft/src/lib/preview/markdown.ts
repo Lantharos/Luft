@@ -1,5 +1,5 @@
 import { fileUrl, isAvailable } from '@lantharos/sabine';
-import { dirname, join } from '$lib/utils/paths';
+import { dirname, join } from '#lib/utils/paths.js';
 
 const EXTERNAL = /^[a-z][a-z0-9+.-]*:/i;
 const BLOCK_RULES = ['paragraph_open', 'heading_open', 'blockquote_open', 'bullet_list_open', 'ordered_list_open', 'table_open', 'hr', 'code_block'];

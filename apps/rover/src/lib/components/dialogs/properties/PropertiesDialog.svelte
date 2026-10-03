@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import * as api from '$lib/api';
-	import * as features from '$lib/features/api';
-	import type { Measurement, Ownership } from '$lib/features/types';
-	import type { FileEntry } from '$lib/types';
-	import type { FileDetails } from '$lib/types/details';
-	import { errorMessage, formatBytes, formatFullDate, plural } from '$lib/utils/format';
-	import { parentPath } from '$lib/utils/paths';
+	import * as api from '#lib/api.js';
+	import * as features from '#lib/features/api.js';
+	import type { Measurement, Ownership } from '#lib/features/types.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import type { FileDetails } from '#lib/types/details.js';
+	import { errorMessage, formatBytes, formatFullDate, plural } from '#lib/utils/format.js';
+	import { parentPath } from '#lib/utils/paths.js';
 	import DefaultApp from './DefaultApp.svelte';
 	import PermissionGrid from './PermissionGrid.svelte';
 

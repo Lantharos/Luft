@@ -1,8 +1,8 @@
-import type { MediaAction, Playback, Repeat } from '$lib/api';
-import * as api from '$lib/api';
-import { fileSource } from '$lib/bridge';
-import { mediaSession, type MediaOwner } from '$lib/playback/session';
-import { volume } from '$lib/playback/volume.svelte';
+import type { MediaAction, Playback, Repeat } from '#lib/api.js';
+import * as api from '#lib/api.js';
+import { fileSource } from '#lib/bridge.js';
+import { mediaSession, type MediaOwner } from '#lib/playback/session.js';
+import { volume } from '#lib/playback/volume.svelte.js';
 import { albumOrder, shuffled, trackArtist, trackFrom, trackTitle, type Track } from './queue';
 
 const HANDOFF_WINDOW = 0.6;

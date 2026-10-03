@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Switch } from '@luft/ui';
-	import { app } from '$lib/state/app.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 	import { importKeyring, lock, reseal, setLockWithScreen, setPin, unlock, type Keyring } from './api';
 	import { askedApps, contents, protection, sealed } from './describe';
 	import { Runner } from './runner.svelte';

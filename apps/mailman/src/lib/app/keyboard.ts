@@ -1,5 +1,5 @@
-import { BUNDLES, PRIMARY } from '$lib/mail/views';
-import { toasts } from '$lib/shell/toasts.svelte';
+import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
+import { toasts } from '#lib/shell/toasts.svelte.js';
 import type { Command } from './commands';
 
 const KEYS: Record<string, string> = {

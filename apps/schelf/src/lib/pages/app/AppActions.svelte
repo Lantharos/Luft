@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { InstalledApp, Job } from '$lib/bridge/types';
-	import ProgressButton from '$lib/components/ProgressButton.svelte';
-	import RemoveDialog from '$lib/components/RemoveDialog.svelte';
-	import { backend } from '$lib/state/backend';
-	import { library } from '$lib/state/library.svelte';
-	import { operations } from '$lib/state/operations.svelte';
-	import { updateJob } from '$lib/app/jobs';
+	import type { InstalledApp, Job } from '#lib/bridge/types.js';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
+	import { backend } from '#lib/state/backend.js';
+	import { library } from '#lib/state/library.svelte.js';
+	import { operations } from '#lib/state/operations.svelte.js';
+	import { updateJob } from '#lib/app/jobs.js';
 	import type { Listing } from './load';
 
 	interface Props {

@@ -1,4 +1,4 @@
-import { settings } from '$lib/state/settings.svelte';
+import { settings } from '#lib/state/settings.svelte.js';
 import { isDirectionKey } from './layout';
 import type { Workspace } from './workspace.svelte';
 

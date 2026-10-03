@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AppIcon, MenuButton, MenuItem } from '@luft/ui';
-	import type { App } from '$lib/api';
-	import * as api from '$lib/api';
+	import type { App } from '#lib/api.js';
+	import * as api from '#lib/api.js';
 
 	let { path }: { path: string } = $props();
 

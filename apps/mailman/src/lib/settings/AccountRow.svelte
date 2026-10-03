@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Row, TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Account } from '$lib/api';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Account } from '#lib/api/index.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import Identities from './Identities.svelte';
 
 	interface Props {

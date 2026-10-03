@@ -3,11 +3,11 @@
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import Reply from '@lucide/svelte/icons/reply';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import * as api from '$lib/api';
-	import type { Address, Message } from '$lib/api';
-	import { longDate, shortDate } from '$lib/app/format';
-	import { composer } from '$lib/compose/composer.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Address, Message } from '#lib/api/index.js';
+	import { longDate, shortDate } from '#lib/app/format.js';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
 	import MailBody from './MailBody.svelte';
 	import { reader } from './reader.svelte';

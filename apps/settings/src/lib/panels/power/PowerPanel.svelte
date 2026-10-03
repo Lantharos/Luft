@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { onPowerChanged, powerState, setProfile, type PowerState } from './api';
 	import BatterySection from './BatterySection.svelte';
 	import DevicesSection from './DevicesSection.svelte';

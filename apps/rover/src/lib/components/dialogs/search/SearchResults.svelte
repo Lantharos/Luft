@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
-	import type { SearchResult } from '$lib/features/types';
-	import { entryIcon } from '$lib/utils/file-kinds';
-	import { parentPath } from '$lib/utils/paths';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { SearchResult } from '#lib/features/types.js';
+	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		results: SearchResult[];

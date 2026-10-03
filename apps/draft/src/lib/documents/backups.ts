@@ -1,4 +1,4 @@
-import { join } from '$lib/utils/paths';
+import { join } from '#lib/utils/paths.js';
 import { textChunks } from './chunks';
 import type { Document } from './document.svelte';
 import type { Workspace } from './workspace.svelte';

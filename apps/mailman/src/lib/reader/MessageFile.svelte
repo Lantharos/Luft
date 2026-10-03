@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Avatar } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
-	import * as api from '$lib/api';
-	import type { OpenedFile } from '$lib/api';
-	import { longDate } from '$lib/app/format';
-	import { composer } from '$lib/compose/composer.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { OpenedFile } from '#lib/api/index.js';
+	import { longDate } from '#lib/app/format.js';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
 	import MailBody from './MailBody.svelte';
 

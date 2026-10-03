@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { CatalogApp } from '$lib/catalog/types';
-	import { navigation } from '$lib/state/navigation.svelte';
+	import type { CatalogApp } from '#lib/catalog/types.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
 	import AppArt from './AppArt.svelte';
 
 	let { app }: { app: CatalogApp } = $props();

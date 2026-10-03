@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { cubicOut } from 'svelte/easing';
-	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import FilePreview from '$lib/components/preview/FilePreview.svelte';
-	import { EntryDetails } from '$lib/file-manager/inspect/details.svelte';
-	import { detailRows, tildePath, type DetailRow } from '$lib/file-manager/inspect/rows';
-	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
-	import { entryContext } from '$lib/file-manager/view/entry-props';
-	import type { FileEntry } from '$lib/types';
-	import { entryIcon } from '$lib/utils/file-kinds';
-	import { formatBytes, plural } from '$lib/utils/format';
-	import { kindLabel } from '$lib/utils/kinds';
-	import { basename, parentPath } from '$lib/utils/paths';
+	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import FilePreview from '#lib/components/preview/FilePreview.svelte';
+	import { EntryDetails } from '#lib/file-manager/inspect/details.svelte.js';
+	import { detailRows, tildePath, type DetailRow } from '#lib/file-manager/inspect/rows.js';
+	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { entryContext } from '#lib/file-manager/view/entry-props.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { formatBytes, plural } from '#lib/utils/format.js';
+	import { kindLabel } from '#lib/utils/kinds.js';
+	import { basename, parentPath } from '#lib/utils/paths.js';
 	import OpenWith from './OpenWith.svelte';
 
 	const context = entryContext();

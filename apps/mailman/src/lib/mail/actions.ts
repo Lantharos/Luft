@@ -1,8 +1,8 @@
-import * as api from '$lib/api';
-import type { Action } from '$lib/api';
-import { until } from '$lib/app/format';
-import { reader } from '$lib/reader/reader.svelte';
-import { toasts } from '$lib/shell/toasts.svelte';
+import * as api from '#lib/api/index.js';
+import type { Action } from '#lib/api/index.js';
+import { until } from '#lib/app/format.js';
+import { reader } from '#lib/reader/reader.svelte.js';
+import { toasts } from '#lib/shell/toasts.svelte.js';
 import { list } from './list.svelte';
 import { mail } from './mail.svelte';
 

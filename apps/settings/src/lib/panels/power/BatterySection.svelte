@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
 	import { duration, wattHours, watts } from './format';

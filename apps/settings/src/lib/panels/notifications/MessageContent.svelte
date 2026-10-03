@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { KESTREL_SCHEMA } from './api';
 
 	interface Props {

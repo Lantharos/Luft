@@ -1,5 +1,5 @@
-import { chrome } from '$lib/app/chrome.svelte';
-import { library } from '$lib/library/library.svelte';
+import { chrome } from '#lib/app/chrome.svelte.js';
+import { library } from '#lib/library/library.svelte.js';
 
 const INTERVAL_MS = 5000;
 

@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 export type OpenDialog =
 	| { kind: 'properties'; entries: FileEntry[] }

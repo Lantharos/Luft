@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Shelf from '$lib/components/Shelf.svelte';
-	import * as fedora from '$lib/catalog/fedora';
-	import * as flathub from '$lib/catalog/flathub';
-	import type { AppDetails, CatalogApp } from '$lib/catalog/types';
-	import { backend } from '$lib/state/backend';
-	import { catalog } from '$lib/state/catalog.svelte';
-	import { navigation } from '$lib/state/navigation.svelte';
+	import Shelf from '#lib/components/Shelf.svelte';
+	import * as fedora from '#lib/catalog/fedora.js';
+	import * as flathub from '#lib/catalog/flathub.js';
+	import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
+	import { backend } from '#lib/state/backend.js';
+	import { catalog } from '#lib/state/catalog.svelte.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
 	import Spotlight from './Spotlight.svelte';
 
 	const SHELF_SIZE = 6;

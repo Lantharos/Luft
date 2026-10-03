@@ -1,7 +1,7 @@
 import { appearance } from '@luft/ui';
-import { appState, inputSources, onActivated, openFile, type Source } from '$lib/bridge';
-import { listLayouts, type Entry } from '$lib/layout/api';
-import { ENGINE_PREFIX, listMethods, type Summary } from '$lib/method/api';
+import { appState, inputSources, onActivated, openFile, type Source } from '#lib/bridge.js';
+import { listLayouts, type Entry } from '#lib/layout/api.js';
+import { ENGINE_PREFIX, listMethods, type Summary } from '#lib/method/api.js';
 import { toast } from './toast.svelte';
 
 const LINK_SCHEME = 'kestrel-keys:';

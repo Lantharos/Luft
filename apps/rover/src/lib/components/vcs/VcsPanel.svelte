@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
-	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import {
 		primaryActionLabel,
 		projectTypeLabel,
 		projectSummary,
 		statusLabel,
 		workspaceLabel
-	} from '$lib/vcs/format';
-	import type { VcsState } from '$lib/vcs/state.svelte';
+	} from '#lib/vcs/format.js';
+	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
 		vcs: VcsState;

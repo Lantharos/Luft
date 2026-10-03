@@ -1,5 +1,5 @@
-import { History } from '$lib/state/history.svelte';
-import { toast } from '$lib/state/toast.svelte';
+import { History } from '#lib/state/history.svelte.js';
+import { toast } from '#lib/state/toast.svelte.js';
 import { saveMethod, tryMethod, type Method } from './api';
 
 const SAVE_DELAY = 500;

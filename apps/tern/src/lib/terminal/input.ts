@@ -1,4 +1,4 @@
-import { pty, type TerminalSize } from '$lib/api';
+import { pty, type TerminalSize } from '#lib/api.js';
 
 type Operation = { kind: 'data'; bytes: Uint8Array } | { kind: 'resize'; size: TerminalSize };
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { AppIcon, ItemRow, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppNotificationsDialog from './AppNotificationsDialog.svelte';
 	import { APP_KEYS, APP_SCHEMA, RULES_KEYS, RULES_SCHEMA, type AppOptions, type AppRules, type NotifyingApp } from './api';
 

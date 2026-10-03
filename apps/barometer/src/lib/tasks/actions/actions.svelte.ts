@@ -1,8 +1,8 @@
-import type { Signal } from '$lib/backend/types';
-import { app } from '$lib/state/app.svelte';
-import { notices } from '$lib/state/notices.svelte';
-import { processes } from '$lib/state/processes.svelte';
-import { usage } from '$lib/state/usage.svelte';
+import type { Signal } from '#lib/backend/types.js';
+import { app } from '#lib/state/app.svelte.js';
+import { notices } from '#lib/state/notices.svelte.js';
+import { processes } from '#lib/state/processes.svelte.js';
+import { usage } from '#lib/state/usage.svelte.js';
 
 const GRACE_MS = 4000;
 

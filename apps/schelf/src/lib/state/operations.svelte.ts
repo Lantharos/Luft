@@ -1,6 +1,6 @@
 import { untrack } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import type { Job, Operation } from '$lib/bridge/types';
+import type { Job, Operation } from '#lib/bridge/types.js';
 import { backend } from './backend';
 
 class Operations {

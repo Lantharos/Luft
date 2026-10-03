@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Dialog, SearchField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { search } from '$lib/features/search.svelte';
-	import type { SearchResult } from '$lib/features/types';
-	import { plural } from '$lib/utils/format';
-	import { basename, parentPath } from '$lib/utils/paths';
+	import * as api from '#lib/api.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { search } from '#lib/features/search.svelte.js';
+	import type { SearchResult } from '#lib/features/types.js';
+	import { plural } from '#lib/utils/format.js';
+	import { basename, parentPath } from '#lib/utils/paths.js';
 	import SearchFilters from './SearchFilters.svelte';
 	import SearchResults from './SearchResults.svelte';
 

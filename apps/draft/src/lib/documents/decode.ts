@@ -1,4 +1,4 @@
-import type { Backend } from '$lib/bridge/types';
+import type { Backend } from '#lib/bridge/types.js';
 import type { LineEnding } from './encodings';
 
 const SNIFF_BYTES = 8000;

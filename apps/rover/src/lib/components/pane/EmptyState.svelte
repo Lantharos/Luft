@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
+	import Icon from '#lib/components/Icon.svelte';
 	import type { EmptyStateProps } from './empty-states';
 
 	let { icon, title, message, action, tone = 'neutral' }: EmptyStateProps = $props();

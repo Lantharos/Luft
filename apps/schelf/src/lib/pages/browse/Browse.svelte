@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Segmented, VirtualScroller } from '@luft/ui';
-	import AppTile from '$lib/components/AppTile.svelte';
-	import { category } from '$lib/catalog/categories';
-	import * as fedora from '$lib/catalog/fedora';
-	import * as flathub from '$lib/catalog/flathub';
-	import type { CatalogApp, Origin, Page } from '$lib/catalog/types';
-	import { backend } from '$lib/state/backend';
-	import { catalog } from '$lib/state/catalog.svelte';
-	import type { Route } from '$lib/state/navigation.svelte';
+	import AppTile from '#lib/components/AppTile.svelte';
+	import { category } from '#lib/catalog/categories.js';
+	import * as fedora from '#lib/catalog/fedora.js';
+	import * as flathub from '#lib/catalog/flathub.js';
+	import type { CatalogApp, Origin, Page } from '#lib/catalog/types.js';
+	import { backend } from '#lib/state/backend.js';
+	import { catalog } from '#lib/state/catalog.svelte.js';
+	import type { Route } from '#lib/state/navigation.svelte.js';
 
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' }>;
 

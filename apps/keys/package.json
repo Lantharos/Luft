@@ -6,8 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"desktop:dev": "sabine dev .",
 		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release",
 		"desktop:bundle": "sabine bundle . --release"
@@ -16,10 +15,8 @@
 		"@lantharos/sabine": "github:Lantharos/Sabine#v0.33"
 	},
 	"devDependencies": {
-		"@lucide/svelte": "^1.50.0",
+		"@lucide/svelte": "^1.51.0",
 		"@luft/ui": "workspace:*",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/node": "^26.6.4",
@@ -28,5 +25,8 @@
 		"tailwindcss": "^4.3.3",
 		"typescript": "~6.0.3",
 		"vite": "^8.3.2"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*"
 	}
 }

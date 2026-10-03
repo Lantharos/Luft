@@ -1,7 +1,7 @@
-import type { Usage } from '$lib/backend/rows';
-import { bytes, count, cpuTime, percent, rate, timeOfDay } from '$lib/format';
-import { monitor } from '$lib/state/monitor.svelte';
-import { settings, type Sort } from '$lib/state/settings.svelte';
+import type { Usage } from '#lib/backend/rows.js';
+import { bytes, count, cpuTime, percent, rate, timeOfDay } from '#lib/format.js';
+import { monitor } from '#lib/state/monitor.svelte.js';
+import { settings, type Sort } from '#lib/state/settings.svelte.js';
 
 export interface Row extends Usage {
 	name: string;

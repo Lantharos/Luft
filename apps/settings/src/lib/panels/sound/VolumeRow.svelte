@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
 	import { Row, Slider } from '@luft/ui';
-	import { percent } from '$lib/format';
+	import { percent } from '#lib/format.js';
 
 	interface Props {
 		title: string;

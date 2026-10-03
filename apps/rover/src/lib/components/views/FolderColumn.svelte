@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { VirtualScroller } from '@luft/ui';
-	import Icon from '$lib/components/Icon.svelte';
-	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
-	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
-	import type { FolderColumnModel } from '$lib/file-manager/view/columns.svelte';
-	import { entryClasses, entryContext, entryProps } from '$lib/file-manager/view/entry-props';
-	import { EntrySurface } from '$lib/file-manager/view/surface.svelte';
-	import type { FileEntry } from '$lib/types';
-	import { entryIcon } from '$lib/utils/file-kinds';
+	import Icon from '#lib/components/Icon.svelte';
+	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
+	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import type { FolderColumnModel } from '#lib/file-manager/view/columns.svelte.js';
+	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
+	import { EntrySurface } from '#lib/file-manager/view/surface.svelte.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { entryIcon } from '#lib/utils/file-kinds.js';
 	import EntryName from './EntryName.svelte';
 
 	interface Props {

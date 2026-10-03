@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { appearance } from '@luft/ui';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 	import { mix, readPalette, type Palette } from './colors';
 	import { squarify, type Rect } from './squarify';
 	import type { Tile } from './tiles';

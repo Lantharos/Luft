@@ -1,5 +1,5 @@
-import { detectLanguage } from '$lib/editor/languages';
-import { basename, dirname } from '$lib/utils/paths';
+import { detectLanguage } from '#lib/editor/languages.js';
+import { basename, dirname } from '#lib/utils/paths.js';
 import { textChunks } from './chunks';
 import type { Document } from './document.svelte';
 import { LINE_BREAKS } from './encodings';

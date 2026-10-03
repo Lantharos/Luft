@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { frequency, percent } from '$lib/format';
-	import Graph from '$lib/graph/Graph.svelte';
-	import { monitor } from '$lib/state/monitor.svelte';
+	import { frequency, percent } from '#lib/format.js';
+	import Graph from '#lib/graph/Graph.svelte';
+	import { monitor } from '#lib/state/monitor.svelte.js';
 
 	interface Props {
 		count: number;

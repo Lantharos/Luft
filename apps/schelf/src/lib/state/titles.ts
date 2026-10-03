@@ -1,5 +1,5 @@
-import { category } from '$lib/catalog/categories';
-import type { Collection } from '$lib/catalog/flathub';
+import { category } from '#lib/catalog/categories.js';
+import type { Collection } from '#lib/catalog/flathub.js';
 import type { Route } from './navigation.svelte';
 
 const COLLECTIONS: Record<Collection, string> = {

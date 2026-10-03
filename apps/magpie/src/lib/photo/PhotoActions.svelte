@@ -3,9 +3,9 @@
 	import Info from '@lucide/svelte/icons/info';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
-	import * as api from '$lib/api';
-	import { chrome } from '$lib/app/chrome.svelte';
-	import MoreMenu from '$lib/shell/MoreMenu.svelte';
+	import * as api from '#lib/api.js';
+	import { chrome } from '#lib/app/chrome.svelte.js';
+	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import { activePhoto } from './active.svelte';
 	import { copyImage } from './clipboard';
 	import { slideshow } from './slideshow.svelte';

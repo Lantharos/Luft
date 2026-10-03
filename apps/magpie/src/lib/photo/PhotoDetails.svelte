@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { ImageDetails, Item } from '$lib/api';
-	import * as api from '$lib/api';
-	import { formatBytes, formatCoordinate, formatDate, formatExposure } from '$lib/library/format';
-	import { extension } from '$lib/library/kinds';
+	import type { ImageDetails, Item } from '#lib/api.js';
+	import * as api from '#lib/api.js';
+	import { formatBytes, formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
+	import { extension } from '#lib/library/kinds.js';
 
 	let { item }: { item: Item } = $props();
 

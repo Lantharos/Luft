@@ -1,6 +1,6 @@
-import { getFileInfo } from '$lib/api';
-import type { FileManager } from '$lib/file-manager/manager.svelte';
-import type { FileEntry } from '$lib/types';
+import { getFileInfo } from '#lib/api.js';
+import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+import type { FileEntry } from '#lib/types/index.js';
 import * as api from './api';
 import { dialogs } from './dialogs.svelte';
 import { search } from './search.svelte';

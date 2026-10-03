@@ -5,7 +5,7 @@ generic_name = "File Manager"
 categories = ["System", "Utility", "Core", "FileManager"]
 keywords = ["files", "file manager", "file explorer", "explorer", "finder", "folders", "directories", "browse", "documents", "drives", "disks", "trash", "nautilus", "dolphin", "thunar", "nemo"]
 version = "0.1.0"
-icon = "static/favicon.svg"
+icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = ["inode/directory", "x-scheme-handler/sftp", "x-scheme-handler/smb", "x-scheme-handler/dav", "x-scheme-handler/davs", "x-scheme-handler/nfs"]
 
@@ -14,7 +14,7 @@ command = "cargo run --manifest-path desktop/Cargo.toml --"
 
 [web]
 root = "."
-dist = "build"
-entry = "build/index.html"
+dist = "dist"
+entry = "dist/index.html"
 build = "bun run build"
 local_files = true

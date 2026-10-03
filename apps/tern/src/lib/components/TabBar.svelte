@@ -3,8 +3,8 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import X from '@lucide/svelte/icons/x';
-	import type { Tab } from '$lib/workspace/tab.svelte';
-	import type { Workspace } from '$lib/workspace/workspace.svelte';
+	import type { Tab } from '#lib/workspace/tab.svelte.js';
+	import type { Workspace } from '#lib/workspace/workspace.svelte.js';
 
 	interface Props {
 		workspace: Workspace;

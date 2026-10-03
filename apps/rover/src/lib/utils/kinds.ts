@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 import { entryIcon } from './file-kinds';
 
 export type PreviewKind = 'folder' | 'image' | 'video' | 'audio' | 'markdown' | 'text' | 'pdf' | 'none';

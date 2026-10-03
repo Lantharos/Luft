@@ -181,21 +181,6 @@ impl Display {
         })
     }
 
-    pub fn keeping_inherited_modes(self) -> io::Result<Self> {
-        let plan = self
-            .outputs
-            .iter()
-            .map(|output| Planned {
-                connector: output.connector,
-                crtc: output.crtc,
-                mode: output.inherited.unwrap_or(output.mode),
-                inherited: output.inherited,
-                internal: output.internal,
-            })
-            .collect();
-        Self::build(self.into_card(), plan)
-    }
-
     pub fn refresh(self, hints: &ModeHints) -> io::Result<(Self, bool)> {
         let plan = plan(&self.card, hints)?;
         let unchanged = plan.len() == self.outputs.len()

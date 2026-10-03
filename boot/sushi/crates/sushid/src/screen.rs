@@ -70,13 +70,6 @@ impl Look {
     }
 }
 
-/// How much of the splash shows through while a graphics driver takes over: the logo, and everything else.
-#[derive(Clone, Copy)]
-pub struct Curtain {
-    pub logo: f32,
-    pub content: f32,
-}
-
 #[derive(Clone, Default, PartialEq)]
 struct Shown {
     logo: f32,
@@ -122,15 +115,6 @@ impl Screen {
         })
     }
 
-    pub fn switch_to_planned_modes(
-        self,
-        hints: &ModeHints,
-        firmware: &Firmware,
-    ) -> io::Result<Self> {
-        let (display, _) = self.display.refresh(hints)?;
-        Ok(Self::new(display, firmware, None))
-    }
-
     pub fn is_crossfading(&self) -> bool {
         self.crossfade.is_some()
     }
@@ -150,19 +134,19 @@ impl Screen {
     pub fn draw(
         &mut self,
         look: &Look,
-        curtain: Curtain,
+        revealed: f32,
         now: f32,
         prompt: Option<&Prompt>,
         status: Option<(Status, f32)>,
         notice: Option<&Notice>,
     ) -> io::Result<()> {
         let next = Shown {
-            logo: look.logo.value(now) * curtain.logo,
-            loader: look.loader.value(now) * curtain.content,
-            prompt: look.prompt.value(now) * curtain.content,
+            logo: look.logo.value(now),
+            loader: look.loader.value(now),
+            prompt: look.prompt.value(now) * revealed,
             content: prompt.cloned(),
-            status: status.map(|(status, alpha)| (status, alpha * curtain.content)),
-            notice: look.notice.value(now) * curtain.content,
+            status: status.map(|(status, alpha)| (status, alpha * revealed)),
+            notice: look.notice.value(now) * revealed,
             notice_content: notice.cloned(),
         };
         let visuals = Visuals {

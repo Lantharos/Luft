@@ -22,7 +22,7 @@ use sushi::uevent::CardEvents;
 use crate::activity::Activity;
 use crate::firmware::Firmware;
 use crate::notice::Shown;
-use crate::screen::{Curtain, Fader, Look, Screen};
+use crate::screen::{Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
 use crate::takeover::Takeover;
 use crate::unlock::{Answered, Typed, Unlock};
@@ -73,7 +73,8 @@ pub struct Daemon {
     takeover: Takeover,
     on_firmware: bool,
     driver_waiters: Vec<UnixStream>,
-    entering_root: Option<(PathBuf, UnixStream)>,
+    entering_root: Option<PathBuf>,
+    root_waiters: Vec<UnixStream>,
     quit: bool,
 }
 
@@ -125,10 +126,11 @@ impl Daemon {
             notice: None,
             fading_notice: None,
             root: None,
-            takeover: Takeover::new(config.monitor_resync),
+            takeover: Takeover::new(),
             on_firmware: false,
             driver_waiters: Vec::new(),
             entering_root: None,
+            root_waiters: Vec::new(),
             quit: false,
             config,
             hints,
@@ -172,7 +174,7 @@ impl Daemon {
 
     fn next_wakeup(&self) -> Option<Duration> {
         let now = self.now();
-        if self.takeover.is_active() {
+        if self.takeover.is_animating(now) {
             return Some(FRAME);
         }
         match &self.phase {
@@ -281,7 +283,7 @@ impl Daemon {
     }
 
     fn refresh_unlock(&mut self) {
-        if !matches!(self.phase, Phase::Splash) || self.takeover.hides_content() {
+        if !matches!(self.phase, Phase::Splash) || self.takeover.is_active() {
             return;
         }
         if self.unlock.as_ref().is_some_and(|unlock| !unlock.is_live()) {
@@ -313,10 +315,8 @@ impl Daemon {
     }
 
     fn settle_loader(&mut self, now: f32) {
-        let covered = self.unlock.is_some()
-            || self.notice.is_some()
-            || self.activity.is_showing()
-            || self.takeover.hides_content();
+        let covered = !self.takeover.is_active()
+            && (self.unlock.is_some() || self.notice.is_some() || self.activity.is_showing());
         self.look
             .loader
             .fade_to(if covered { 0.0 } else { 1.0 }, now);
@@ -404,15 +404,7 @@ impl Daemon {
             return;
         }
         let now = self.now();
-        let curtain = self.takeover.curtain(now);
-        let curtain = Curtain {
-            logo: curtain,
-            content: if self.takeover.hides_content() {
-                0.0
-            } else {
-                curtain
-            },
-        };
+        let revealed = self.takeover.revealed(now);
         let status = self.activity.status(now);
         let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
         let notice = self
@@ -421,7 +413,7 @@ impl Daemon {
             .map(|shown| &shown.notice)
             .or(self.fading_notice.as_ref());
         if let Some(screen) = &mut self.screen
-            && let Err(error) = screen.draw(&self.look, curtain, now, prompt, status, notice)
+            && let Err(error) = screen.draw(&self.look, revealed, now, prompt, status, notice)
         {
             eprintln!("Lost {}: {error}", screen.path().display());
             self.forget_screen();

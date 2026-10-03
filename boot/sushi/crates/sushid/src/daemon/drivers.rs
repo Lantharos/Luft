@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use sushi::drivers;
 
-use crate::takeover::{Outcome, Then};
+use crate::takeover::Outcome;
 
 use super::requests::reply;
 use super::{Daemon, Phase};
@@ -21,12 +21,8 @@ impl Daemon {
         }
         let shown = matches!(self.phase, Phase::Splash) && self.screen.is_some();
         if shown && !self.takeover.is_active() {
-            eprintln!(
-                "Handing the display to {} in the dark",
-                waiting.boot_display.join(", ")
-            );
-            self.takeover
-                .darken(self.now(), Then::Load(waiting.boot_display), content_shown);
+            self.takeover.load(&waiting.boot_display);
+            self.settle_loader(self.now());
         } else {
             drivers::load_in_background(waiting.boot_display);
         }
@@ -43,43 +39,46 @@ impl Daemon {
         }
     }
 
-    pub(super) fn enter_root_after_loading(&mut self, root: PathBuf, stream: UnixStream) {
+    pub(super) fn enter_root_after_loading(&mut self, root: PathBuf, waiter: Option<UnixStream>) {
+        self.root_waiters.extend(waiter);
         if self.takeover.will_load() {
-            eprintln!(
-                "Holding the switch to {} until the graphics driver has loaded",
-                root.display()
-            );
-            self.entering_root = Some((root, stream));
+            if self.entering_root.is_none() {
+                eprintln!(
+                    "Holding the switch to {} until the graphics driver has loaded",
+                    root.display()
+                );
+            }
+            self.entering_root = Some(root);
         } else {
-            self.answer_root(&root, stream);
+            self.answer_root(&root);
         }
     }
 
-    fn answer_root(&mut self, root: &std::path::Path, stream: UnixStream) {
-        match self.enter_root(root) {
-            Ok(()) => reply(stream, "ok"),
-            Err(error) => reply(stream, &error.to_string()),
-        }
+    fn answer_root(&mut self, root: &std::path::Path) {
+        let answer = match self.enter_root(root) {
+            Ok(()) => "ok".to_owned(),
+            Err(error) => {
+                eprintln!("Couldn't move into {}: {error}", root.display());
+                error.to_string()
+            }
+        };
+        self.root_waiters
+            .drain(..)
+            .for_each(|stream| reply(stream, &answer));
     }
 
     pub(super) fn advance_takeover(&mut self, now: f32) {
         match self.takeover.advance(now) {
             Some(Outcome::Loaded) => {
+                self.handle_cards();
+                if self.takeover.awaits_card() {
+                    self.takeover.expect_driver(now);
+                }
                 self.driver_waiters
                     .drain(..)
                     .for_each(|stream| reply(stream, "ok"));
-                if let Some((root, stream)) = self.entering_root.take() {
-                    self.answer_root(&root, stream);
-                }
-            }
-            Some(Outcome::Modeset) => {
-                if let (Some(screen), Some(firmware)) = (self.screen.take(), &self.firmware) {
-                    self.screen = screen
-                        .switch_to_planned_modes(&self.hints, firmware)
-                        .inspect_err(|error| {
-                            eprintln!("Couldn't switch to the saved mode: {error}")
-                        })
-                        .ok();
+                if let Some(root) = self.entering_root.take() {
+                    self.answer_root(&root);
                 }
             }
             Some(Outcome::Finished) => self.settle_loader(now),

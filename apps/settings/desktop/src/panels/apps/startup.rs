@@ -14,6 +14,7 @@ const HIDDEN: &str = "Hidden";
 const ENABLED: &str = "X-GNOME-Autostart-enabled";
 const HIDDEN_UNDER_SYSTEMD: &str = "X-GNOME-HiddenUnderSystemd";
 const PHASE: &str = "X-GNOME-Autostart-Phase";
+const FLATPAK: &str = "X-Flatpak";
 
 #[derive(Serialize)]
 pub struct Entry {
@@ -85,7 +86,16 @@ fn runs(info: &gio_unix::DesktopAppInfo) -> bool {
 }
 
 fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
-    glib::find_program_in_path(info.executable()).is_some()
+    match info.string(FLATPAK) {
+        Some(id) => flatpak_installed(&id),
+        None => glib::find_program_in_path(info.executable()).is_some(),
+    }
+}
+
+fn flatpak_installed(id: &str) -> bool {
+    [glib::user_data_dir().join("flatpak"), PathBuf::from("/var/lib/flatpak")]
+        .iter()
+        .any(|installation| installation.join("app").join(id).join("current").exists())
 }
 
 fn entry(user: &Path, name: OsString) -> Option<Entry> {

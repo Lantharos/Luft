@@ -1,8 +1,8 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
-	import { useApp } from '$lib/context';
-	import type { Document } from '$lib/documents/document.svelte';
-	import { documentMenu } from '$lib/files/actions';
+	import { useApp } from '#lib/context.js';
+	import type { Document } from '#lib/documents/document.svelte.js';
+	import { documentMenu } from '#lib/files/actions.js';
 
 	const app = useApp();
 	let workspace = $derived(app.workspace);

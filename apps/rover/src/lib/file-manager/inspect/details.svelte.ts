@@ -1,7 +1,7 @@
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import type { FileEntry } from '$lib/types';
-import type { FileDetails, OpenWithApps } from '$lib/types/details';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import type { FileEntry } from '#lib/types/index.js';
+import type { FileDetails, OpenWithApps } from '#lib/types/details.js';
 
 export type MediaInfo = { width: number | null; height: number | null; duration: number | null };
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { appearance } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Rendered } from '$lib/api';
-	import { composer } from '$lib/compose/composer.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Rendered } from '#lib/api/index.js';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
 	import { markQuotes, showFiles, showRemote, stylesheet } from './body';
 	import { remoteImages } from './images.svelte';
 

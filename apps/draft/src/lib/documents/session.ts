@@ -1,5 +1,5 @@
-import type { Cursor } from '$lib/editor/editor';
-import { debounce } from '$lib/utils/debounce';
+import type { Cursor } from '#lib/editor/editor.js';
+import { debounce } from '#lib/utils/debounce.js';
 import { openPath, restoreUntitled, type OpenOptions } from './opening';
 import type { Workspace } from './workspace.svelte';
 

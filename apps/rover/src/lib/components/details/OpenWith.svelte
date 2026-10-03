@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { AppIcon } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import type { AppChoice, OpenWithApps } from '$lib/types/details';
+	import * as api from '#lib/api.js';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import type { AppChoice, OpenWithApps } from '#lib/types/details.js';
 
 	interface Props {
 		apps: OpenWithApps;

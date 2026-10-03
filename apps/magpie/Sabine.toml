@@ -5,7 +5,7 @@ generic_name = "Media Viewer"
 categories = ["AudioVideo", "Audio", "Video", "Player", "Graphics", "Viewer"]
 keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "fonts", "font viewer", "typeface", "media player", "loupe", "totem", "showtime", "evince", "papers", "vlc", "gnome-font-viewer"]
 version = "0.1.0"
-icon = "static/favicon.svg"
+icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = [
 	"image/jpeg",
@@ -65,7 +65,7 @@ command = "cargo run --manifest-path desktop/Cargo.toml --"
 
 [web]
 root = "."
-dist = "build"
-entry = "build/index.html"
+dist = "dist"
+entry = "dist/index.html"
 build = "bun run build"
 local_files = true

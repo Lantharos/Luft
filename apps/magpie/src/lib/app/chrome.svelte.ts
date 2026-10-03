@@ -1,5 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
-import { isDesktop } from '$lib/bridge';
+import { isDesktop } from '#lib/bridge.js';
 
 const IDLE_MS = 2200;
 const TOAST_MS = 2600;

@@ -1,4 +1,4 @@
-import type { TerminalSession } from '$lib/terminal/session.svelte';
+import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 
 export type Direction = 'row' | 'column';
 

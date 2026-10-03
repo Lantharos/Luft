@@ -1,4 +1,4 @@
-import type { Backend } from '$lib/bridge/types';
+import type { Backend } from '#lib/bridge/types.js';
 
 let current: Backend | null = null;
 

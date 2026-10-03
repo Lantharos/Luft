@@ -3,7 +3,7 @@
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { ActionRow, IconButton, Row, Section } from '@luft/ui';
-	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
+	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
 	import { activate, join, needsPassword, onFailed, type Security, type Wifi, type WifiNetwork } from '../api';

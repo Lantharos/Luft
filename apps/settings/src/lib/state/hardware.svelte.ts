@@ -1,4 +1,4 @@
-import { invoke, listen } from '$lib/bridge';
+import { invoke, listen } from '#lib/bridge.js';
 
 export interface Hardware {
 	bluetooth: boolean;

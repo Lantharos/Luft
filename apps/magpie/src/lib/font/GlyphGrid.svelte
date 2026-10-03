@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { VirtualScroller } from '@luft/ui';
-	import { chrome } from '$lib/app/chrome.svelte';
+	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { codepoints, hex } from './characters';
 	import { fontState } from './state.svelte';
 

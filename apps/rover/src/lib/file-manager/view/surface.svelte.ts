@@ -1,5 +1,5 @@
 import type { VirtualHandle } from '@luft/ui';
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 import type { Section } from '../listing/groups';
 import { Marquee } from '../listing/marquee.svelte';
 import { DRAFT_PATH, withDraft } from './draft';

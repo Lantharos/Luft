@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Item } from '$lib/api';
-	import * as api from '$lib/api';
-	import CantShow from '$lib/shell/CantShow.svelte';
+	import type { Item } from '#lib/api.js';
+	import * as api from '#lib/api.js';
+	import CantShow from '#lib/shell/CantShow.svelte';
 	import { DOCUMENT_SCOPE, openDocument, pdfModules } from './pdf';
 	import { documentState } from './state.svelte';
 	import { showDocument } from './viewer';

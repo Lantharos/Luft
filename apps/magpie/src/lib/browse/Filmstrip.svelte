@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Play from '@lucide/svelte/icons/play';
-	import type { Item } from '$lib/api';
-	import { library } from '$lib/library/library.svelte';
-	import { thumbnails } from '$lib/library/thumbnails.svelte';
+	import type { Item } from '#lib/api.js';
+	import { library } from '#lib/library/library.svelte.js';
+	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
 
 	const TILE = 64;
 	const GAP = 6;

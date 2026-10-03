@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as api from '$lib/api';
-	import { bytes, volumeName } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
-	import { space } from '$lib/state/space.svelte';
-	import type { Drive, Volume } from '$lib/api';
+	import * as api from '#lib/api.js';
+	import { bytes, volumeName } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
+	import { space } from '#lib/state/space.svelte.js';
+	import type { Drive, Volume } from '#lib/api.js';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import DriveDetails from './details/DriveDetails.svelte';
 	import HealthDialog from './details/HealthDialog.svelte';

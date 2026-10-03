@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { Popover, SearchField, tooltip, VirtualScroller } from '@luft/ui';
-	import { search, type Character } from '$lib/characters/characters';
+	import { search, type Character } from '#lib/characters/characters.js';
 	import { describeKeysym, describeText, EMPTY, specials, type Specials, type Symbol } from '../api';
 	import { deadSymbol } from '../dead/table';
 	import type { LayoutEditor } from '../editor.svelte';

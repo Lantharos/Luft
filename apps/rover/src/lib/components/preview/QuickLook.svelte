@@ -2,13 +2,13 @@
 	import { tooltip } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
-	import Icon from '$lib/components/Icon.svelte';
-	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import { entryContext } from '$lib/file-manager/view/entry-props';
-	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
-	import { entryIcon } from '$lib/utils/file-kinds';
-	import { formatBytes } from '$lib/utils/format';
-	import { kindLabel } from '$lib/utils/kinds';
+	import Icon from '#lib/components/Icon.svelte';
+	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import { entryContext } from '#lib/file-manager/view/entry-props.js';
+	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { formatBytes } from '#lib/utils/format.js';
+	import { kindLabel } from '#lib/utils/kinds.js';
 	import FilePreview from './FilePreview.svelte';
 
 	const { manager, view } = entryContext();

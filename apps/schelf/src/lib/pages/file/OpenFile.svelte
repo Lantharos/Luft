@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
-	import type { InstalledApp, Job, OpenedFile } from '$lib/bridge/types';
-	import AppArt from '$lib/components/AppArt.svelte';
-	import Description from '$lib/components/Description.svelte';
-	import ProgressButton from '$lib/components/ProgressButton.svelte';
-	import { bytes } from '$lib/format';
-	import { backend } from '$lib/state/backend';
-	import { library } from '$lib/state/library.svelte';
-	import { navigation } from '$lib/state/navigation.svelte';
-	import { operations } from '$lib/state/operations.svelte';
+	import type { InstalledApp, Job, OpenedFile } from '#lib/bridge/types.js';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import Description from '#lib/components/Description.svelte';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import { bytes } from '#lib/format.js';
+	import { backend } from '#lib/state/backend.js';
+	import { library } from '#lib/state/library.svelte.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { path }: { path: string } = $props();
 

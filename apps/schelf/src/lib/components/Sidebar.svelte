@@ -4,11 +4,11 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { SearchField } from '@luft/ui';
-	import { CATEGORIES } from '$lib/catalog/categories';
-	import { activity, percent } from '$lib/format';
-	import { library } from '$lib/state/library.svelte';
-	import { navigation, type Route } from '$lib/state/navigation.svelte';
-	import { operations } from '$lib/state/operations.svelte';
+	import { CATEGORIES } from '#lib/catalog/categories.js';
+	import { activity, percent } from '#lib/format.js';
+	import { library } from '#lib/state/library.svelte.js';
+	import { navigation, type Route } from '#lib/state/navigation.svelte.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	const SEARCH_DELAY_MS = 250;
 

@@ -1,4 +1,4 @@
-import type { Attached } from '$lib/api';
+import type { Attached } from '#lib/api/index.js';
 import type { Content } from './composer.svelte';
 import { escapeHtml } from './html';
 

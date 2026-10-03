@@ -3,17 +3,17 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { fly } from 'svelte/transition';
-	import type { Item } from '$lib/api';
-	import { chrome } from '$lib/app/chrome.svelte';
-	import { appear, disappear } from '$lib/app/transitions';
-	import Filmstrip from '$lib/browse/Filmstrip.svelte';
-	import { library } from '$lib/library/library.svelte';
-	import { activePhoto } from '$lib/photo/active.svelte';
-	import PhotoDetails from '$lib/photo/PhotoDetails.svelte';
-	import PhotoView from '$lib/photo/PhotoView.svelte';
-	import { keepPhotos, loadPhoto } from '$lib/photo/source';
-	import ZoomControls from '$lib/photo/ZoomControls.svelte';
-	import VideoView from '$lib/video/VideoView.svelte';
+	import type { Item } from '#lib/api.js';
+	import { chrome } from '#lib/app/chrome.svelte.js';
+	import { appear, disappear } from '#lib/app/transitions.js';
+	import Filmstrip from '#lib/browse/Filmstrip.svelte';
+	import { library } from '#lib/library/library.svelte.js';
+	import { activePhoto } from '#lib/photo/active.svelte.js';
+	import PhotoDetails from '#lib/photo/PhotoDetails.svelte';
+	import PhotoView from '#lib/photo/PhotoView.svelte';
+	import { keepPhotos, loadPhoto } from '#lib/photo/source.js';
+	import ZoomControls from '#lib/photo/ZoomControls.svelte';
+	import VideoView from '#lib/video/VideoView.svelte';
 
 	const PRELOAD_DELAY_MS = 250;
 

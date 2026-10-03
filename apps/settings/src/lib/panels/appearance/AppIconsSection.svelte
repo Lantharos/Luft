@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
-	import Swatches from '$lib/components/Swatches.svelte';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import Swatches from '#lib/components/Swatches.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { installedApps, type App } from '../apps/api';
 
 	type Kestrel = {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import { useApp } from '$lib/context';
+	import { useApp } from '#lib/context.js';
 
 	const app = useApp();
 	let menu = $derived(app.menus.current);

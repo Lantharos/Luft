@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import type { ChooserConfig, FileEntry, PinnedFolder } from '$lib/types';
-import { joinPath } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
+import { joinPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
 
 export class ChooserState {

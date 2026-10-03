@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 const RESET_MS = 900;
 

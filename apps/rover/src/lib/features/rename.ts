@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 export type RenameMode = 'replace' | 'number' | 'case';
 export type Casing = 'lower' | 'upper' | 'title' | 'sentence';

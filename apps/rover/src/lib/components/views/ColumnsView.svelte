@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { ColumnsData } from '$lib/file-manager/view/columns.svelte';
-	import { entryContext } from '$lib/file-manager/view/entry-props';
+	import { ColumnsData } from '#lib/file-manager/view/columns.svelte.js';
+	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import FolderColumn from './FolderColumn.svelte';
 
 	const { manager } = entryContext();

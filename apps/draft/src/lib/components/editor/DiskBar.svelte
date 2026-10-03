@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { useApp } from '$lib/context';
-	import { keepMine } from '$lib/documents/disk';
-	import type { Document } from '$lib/documents/document.svelte';
-	import { reload } from '$lib/documents/opening';
-	import { save } from '$lib/documents/saving';
+	import { useApp } from '#lib/context.js';
+	import { keepMine } from '#lib/documents/disk.js';
+	import type { Document } from '#lib/documents/document.svelte.js';
+	import { reload } from '#lib/documents/opening.js';
+	import { save } from '#lib/documents/saving.js';
 
 	let { document }: { document: Document } = $props();
 

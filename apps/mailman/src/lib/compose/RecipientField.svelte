@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
-	import * as api from '$lib/api';
-	import type { Address } from '$lib/api';
+	import * as api from '#lib/api/index.js';
+	import type { Address } from '#lib/api/index.js';
 
 	interface Props {
 		label: string;

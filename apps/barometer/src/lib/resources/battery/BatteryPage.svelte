@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { BatteryInfo, BatterySample } from '$lib/backend/types';
-	import { duration, percent, share, watts } from '$lib/format';
-	import Chart from '$lib/resources/common/Chart.svelte';
-	import Facts from '$lib/resources/common/Facts.svelte';
-	import Page from '$lib/resources/common/Page.svelte';
-	import Stats from '$lib/resources/common/Stats.svelte';
-	import { byId } from '$lib/resources/registry';
-	import { monitor } from '$lib/state/monitor.svelte';
+	import type { BatteryInfo, BatterySample } from '#lib/backend/types.js';
+	import { duration, percent, share, watts } from '#lib/format.js';
+	import Chart from '#lib/resources/common/Chart.svelte';
+	import Facts from '#lib/resources/common/Facts.svelte';
+	import Page from '#lib/resources/common/Page.svelte';
+	import Stats from '#lib/resources/common/Stats.svelte';
+	import { byId } from '#lib/resources/registry.js';
+	import { monitor } from '#lib/state/monitor.svelte.js';
 
 	interface Props {
 		info: BatteryInfo;

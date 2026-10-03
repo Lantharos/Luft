@@ -1,4 +1,4 @@
-import { settings } from '$lib/state/settings.svelte';
+import { settings } from '#lib/state/settings.svelte.js';
 
 const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 const BIT_UNITS = ['bit/s', 'kbit/s', 'Mbit/s', 'Gbit/s', 'Tbit/s'];

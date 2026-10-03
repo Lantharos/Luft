@@ -1,10 +1,10 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import * as api from '$lib/api';
-	import { dialogs } from '$lib/dialogs/dialogs.svelte';
-	import { bytes } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
-	import { space } from '$lib/state/space.svelte';
+	import * as api from '#lib/api.js';
+	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { bytes } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
+	import { space } from '#lib/state/space.svelte.js';
 	import type { Action } from '../actions';
 	import SpaceList from './SpaceList.svelte';
 	import { tilesOf, type Tile } from './tiles';

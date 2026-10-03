@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Checkbox, Dialog, PasswordField, RecoveryKey } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Drive, EncryptionCheck, Volume } from '$lib/api';
-	import { SHORTEST_PASSPHRASE } from '$lib/encryption.svelte';
-	import { errorText, volumeName } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import type { Drive, EncryptionCheck, Volume } from '#lib/api.js';
+	import { SHORTEST_PASSPHRASE } from '#lib/encryption.svelte.js';
+	import { errorText, volumeName } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import Steps from './Steps.svelte';
 	import SwitchLine from './SwitchLine.svelte';
 

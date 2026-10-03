@@ -1,4 +1,4 @@
-import { invoke } from '$lib/bridge';
+import { invoke } from '#lib/bridge.js';
 import type { Security } from '../api';
 
 const WAIT_FOR_PERMISSION = 300_000;

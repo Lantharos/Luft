@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ClassValue } from 'svelte/elements';
-	import { monitor } from '$lib/state/monitor.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import { monitor } from '#lib/state/monitor.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import { draw, niceCeiling, peak, type Frame, type Line } from './draw';
 	import { SLIDE_MS, slide } from './motion';
 

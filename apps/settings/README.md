@@ -1,6 +1,6 @@
 # Settings
 
-Settings is the system settings app for Luft, built with Sabine and SvelteKit. It lives at `apps/settings`; run the commands below from that directory unless noted otherwise.
+Settings is the system settings app for Luft, built with Sabine and Svelte. It lives at `apps/settings`; run the commands below from that directory unless noted otherwise.
 
 ## Pages
 

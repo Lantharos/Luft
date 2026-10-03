@@ -1,4 +1,4 @@
-import type { AppUpdate, InstalledApp, Job } from '$lib/bridge/types';
+import type { AppUpdate, InstalledApp, Job } from '#lib/bridge/types.js';
 
 export function removeJob(app: InstalledApp): Job {
 	if (app.source === 'flatpak') return { kind: 'removeFlatpak', installation: app.installation!, reference: app.reference! };

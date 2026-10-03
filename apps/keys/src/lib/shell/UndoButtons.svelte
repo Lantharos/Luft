@@ -2,7 +2,7 @@
 	import Redo2 from '@lucide/svelte/icons/redo-2';
 	import Undo2 from '@lucide/svelte/icons/undo-2';
 	import { IconButton } from '@luft/ui';
-	import { undoShortcuts, type Undoable } from '$lib/state/history.svelte';
+	import { undoShortcuts, type Undoable } from '#lib/state/history.svelte.js';
 
 	interface Props {
 		target: Undoable;

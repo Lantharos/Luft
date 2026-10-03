@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
-	import type { InstalledApp } from '$lib/bridge/types';
-	import type { AppDetails } from '$lib/catalog/types';
-	import { bytes, date, sourceName } from '$lib/format';
-	import { backend } from '$lib/state/backend';
+	import type { InstalledApp } from '#lib/bridge/types.js';
+	import type { AppDetails } from '#lib/catalog/types.js';
+	import { bytes, date, sourceName } from '#lib/format.js';
+	import { backend } from '#lib/state/backend.js';
 
 	let { details, installed }: { details: AppDetails | null; installed: InstalledApp | null } = $props();
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { typedLevel } from '$lib/keyboard/board';
-	import { describe, LEVEL_NAMES, shown } from '$lib/keyboard/describe';
-	import type { DeadKey, Levels } from '$lib/layout/api';
+	import { typedLevel } from '#lib/keyboard/board.js';
+	import { describe, LEVEL_NAMES, shown } from '#lib/keyboard/describe.js';
+	import type { DeadKey, Levels } from '#lib/layout/api.js';
 
 	interface Props {
 		levels: Levels;

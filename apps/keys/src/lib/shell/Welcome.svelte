@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/state/app.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 	import Page from './Page.svelte';
 </script>
 

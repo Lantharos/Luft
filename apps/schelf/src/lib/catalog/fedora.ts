@@ -1,4 +1,4 @@
-import type { Backend, FedoraSummary } from '$lib/bridge/types';
+import type { Backend, FedoraSummary } from '#lib/bridge/types.js';
 import type { AppDetails, CatalogApp } from './types';
 import type { Category } from './categories';
 

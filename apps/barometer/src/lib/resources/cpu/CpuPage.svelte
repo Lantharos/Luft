@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Switch } from '@luft/ui';
-	import type { CpuInfo } from '$lib/backend/types';
-	import { bytes, count, duration, frequency, percent, plural, temperature } from '$lib/format';
-	import Chart from '$lib/resources/common/Chart.svelte';
-	import Facts from '$lib/resources/common/Facts.svelte';
-	import Page from '$lib/resources/common/Page.svelte';
-	import Stats from '$lib/resources/common/Stats.svelte';
-	import { monitor } from '$lib/state/monitor.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import type { CpuInfo } from '#lib/backend/types.js';
+	import { bytes, count, duration, frequency, percent, plural, temperature } from '#lib/format.js';
+	import Chart from '#lib/resources/common/Chart.svelte';
+	import Facts from '#lib/resources/common/Facts.svelte';
+	import Page from '#lib/resources/common/Page.svelte';
+	import Stats from '#lib/resources/common/Stats.svelte';
+	import { monitor } from '#lib/state/monitor.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import CoreGrid from './CoreGrid.svelte';
 
 	interface Props {

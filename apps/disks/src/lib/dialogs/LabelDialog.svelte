@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Filesystem, Volume } from '$lib/api';
-	import { LABEL_LIMITS } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import type { Filesystem, Volume } from '#lib/api.js';
+	import { LABEL_LIMITS } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
 		volume: Volume;

@@ -1,4 +1,4 @@
-import type { Cue } from '$lib/api';
+import type { Cue } from '#lib/api.js';
 
 const TIMING = /(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})\s*-->\s*(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})/;
 const MARKUP = /<[^>]+>|\{\\[^}]*\}/g;

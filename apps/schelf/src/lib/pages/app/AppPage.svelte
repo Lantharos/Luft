@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Segmented } from '@luft/ui';
-	import type { Permissions } from '$lib/bridge/types';
-	import AccessList from '$lib/components/AccessList.svelte';
-	import AppArt from '$lib/components/AppArt.svelte';
-	import Description from '$lib/components/Description.svelte';
-	import Screenshots from '$lib/components/Screenshots.svelte';
-	import { backend } from '$lib/state/backend';
-	import { navigation, type AppTarget } from '$lib/state/navigation.svelte';
+	import type { Permissions } from '#lib/bridge/types.js';
+	import AccessList from '#lib/components/AccessList.svelte';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import Description from '#lib/components/Description.svelte';
+	import Screenshots from '#lib/components/Screenshots.svelte';
+	import { backend } from '#lib/state/backend.js';
+	import { navigation, type AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
 	import { installedFor, load, type Listing, type Loaded } from './load';

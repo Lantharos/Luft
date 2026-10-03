@@ -10,7 +10,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
 	import { untrack } from 'svelte';
-	import { debounce } from '$lib/utils/debounce';
+	import { debounce } from '#lib/utils/debounce.js';
 	import { countMatches, type MatchCount } from './count';
 
 	interface Props {

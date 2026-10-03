@@ -2,8 +2,8 @@
 	import Check from '@lucide/svelte/icons/check';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { Dialog, MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
-	import { app, type Selection } from '$lib/state/app.svelte';
-	import { toast } from '$lib/state/toast.svelte';
+	import { app, type Selection } from '#lib/state/app.svelte.js';
+	import { toast } from '#lib/state/toast.svelte.js';
 
 	interface Export {
 		label: string;

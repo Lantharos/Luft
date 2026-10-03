@@ -1,10 +1,10 @@
 import { countColumn } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 import { tick } from 'svelte';
-import type { Backend } from '$lib/bridge/types';
-import { Editor } from '$lib/editor/editor';
-import { FolderTree } from '$lib/files/tree.svelte';
-import type { SettingsStore } from '$lib/settings.svelte';
+import type { Backend } from '#lib/bridge/types.js';
+import { Editor } from '#lib/editor/editor.js';
+import { FolderTree } from '#lib/files/tree.svelte.js';
+import type { SettingsStore } from '#lib/settings.svelte.js';
 import { Backups } from './backups';
 import { Document } from './document.svelte';
 

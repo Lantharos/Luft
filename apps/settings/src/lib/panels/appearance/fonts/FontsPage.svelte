@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SearchField, VirtualScroller } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import { fontFamilies, openFont, removeFont, type FontFamily } from './api';
 	import FontRow from './FontRow.svelte';
 

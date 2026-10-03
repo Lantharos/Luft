@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
-	import type { EntryIconName } from '$lib/utils/file-kinds';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { EntryIconName } from '#lib/utils/file-kinds.js';
 
 	interface Props {
 		name: EntryIconName;

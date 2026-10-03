@@ -2,10 +2,10 @@
 	import { ActionRow, Dialog, Row, Section, Segmented, Switch } from '@luft/ui';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash from '@lucide/svelte/icons/trash-2';
-	import * as api from '$lib/api';
-	import type { Template } from '$lib/api';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { list } from '$lib/mail/list.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Template } from '#lib/api/index.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { list } from '#lib/mail/list.svelte.js';
 	import AccountRow from './AccountRow.svelte';
 
 	interface Props {

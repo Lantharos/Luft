@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog, Row, Select, Switch } from '@luft/ui';
-	import type { SettingsGroup } from '$lib/state/gsettings.svelte';
+	import type { SettingsGroup } from '#lib/state/gsettings.svelte.js';
 	import type { AppOptions, AppRules, DoNotDisturb, NotifyingApp } from './api';
 
 	interface Props {

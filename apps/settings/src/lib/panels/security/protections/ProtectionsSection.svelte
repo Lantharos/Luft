@@ -4,7 +4,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { Row, Section } from '@luft/ui';
-	import { app } from '$lib/state/app.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 	import DrivesRow from '../encryption/DrivesRow.svelte';
 	import EncryptionRow from '../encryption/EncryptionRow.svelte';
 	import type { SecurityState } from '../state.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SplitNode } from '$lib/workspace/layout';
+	import type { SplitNode } from '#lib/workspace/layout.js';
 
 	const MIN_RATIO = 0.1;
 

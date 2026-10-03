@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Popover } from '@luft/ui';
-	import { SNOOZES } from '$lib/app/when';
+	import { SNOOZES } from '#lib/app/when.js';
 
 	interface Props {
 		anchor: HTMLElement;

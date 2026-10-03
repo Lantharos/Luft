@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import EmptyState from '$lib/components/pane/EmptyState.svelte';
-	import TrashPane from '$lib/components/pane/TrashPane.svelte';
-	import ColumnsView from '$lib/components/views/ColumnsView.svelte';
-	import GridView from '$lib/components/views/GridView.svelte';
-	import ListView from '$lib/components/views/list/ListView.svelte';
-	import { dropKey } from '$lib/file-manager/drag/drop-targets';
-	import { entryContext } from '$lib/file-manager/view/entry-props';
-	import type { FileEntry } from '$lib/types';
+	import EmptyState from '#lib/components/pane/EmptyState.svelte';
+	import TrashPane from '#lib/components/pane/TrashPane.svelte';
+	import ColumnsView from '#lib/components/views/ColumnsView.svelte';
+	import GridView from '#lib/components/views/GridView.svelte';
+	import ListView from '#lib/components/views/list/ListView.svelte';
+	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
+	import { entryContext } from '#lib/file-manager/view/entry-props.js';
+	import type { FileEntry } from '#lib/types/index.js';
 	import { emptyStateFor } from './empty-states';
 
 	const context = entryContext();

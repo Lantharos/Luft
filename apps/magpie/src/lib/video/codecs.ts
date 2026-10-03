@@ -1,4 +1,4 @@
-import type { VideoInfo } from '$lib/api';
+import type { VideoInfo } from '#lib/api.js';
 
 const PROBES: Record<string, string> = {
 	'H.264': 'video/mp4; codecs="avc1.640028"',

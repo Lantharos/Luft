@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Dialog, PasswordField } from '@luft/ui';
-	import * as api from '$lib/api';
-	import type { Volume } from '$lib/api';
-	import { errorText, volumeName } from '$lib/format';
+	import * as api from '#lib/api.js';
+	import type { Volume } from '#lib/api.js';
+	import { errorText, volumeName } from '#lib/format.js';
 
 	interface Props {
 		volume: Volume;

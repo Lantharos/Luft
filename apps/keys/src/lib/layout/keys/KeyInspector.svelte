@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { describe, LEVEL_NAMES, shown } from '$lib/keyboard/describe';
+	import { describe, LEVEL_NAMES, shown } from '#lib/keyboard/describe.js';
 	import { describeText, EMPTY, type Symbol } from '../api';
 	import type { LayoutEditor } from '../editor.svelte';
 	import SymbolPicker from './SymbolPicker.svelte';

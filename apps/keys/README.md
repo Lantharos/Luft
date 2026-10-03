@@ -1,6 +1,6 @@
 # Keys
 
-Keys makes your own keyboard layouts and input methods for Luft. It is built with Sabine and SvelteKit and lives at `apps/keys`; run the commands below from that directory unless noted otherwise.
+Keys makes your own keyboard layouts and input methods for Luft. It is built with Sabine and Svelte and lives at `apps/keys`; run the commands below from that directory unless noted otherwise.
 
 ## Layouts
 

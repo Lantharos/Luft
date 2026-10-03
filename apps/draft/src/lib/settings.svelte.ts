@@ -1,5 +1,5 @@
-import type { Backend } from '$lib/bridge/types';
-import { debounce } from '$lib/utils/debounce';
+import type { Backend } from '#lib/bridge/types.js';
+import { debounce } from '#lib/utils/debounce.js';
 
 export interface Settings {
 	wrap: boolean;

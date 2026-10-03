@@ -5,9 +5,9 @@
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
-	import { percent } from '$lib/format';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
+	import { percent } from '#lib/format.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import {
 		onInputLevel,
 		onSoundChanged,

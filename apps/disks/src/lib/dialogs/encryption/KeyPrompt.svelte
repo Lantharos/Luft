@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { PasswordField } from '@luft/ui';
-	import type { KeyRequest } from '$lib/encryption.svelte';
+	import type { KeyRequest } from '#lib/encryption.svelte.js';
 
 	interface Props {
 		request: KeyRequest;

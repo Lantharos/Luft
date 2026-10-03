@@ -1,5 +1,5 @@
-import type { IconName } from '$lib/components/Icon.svelte';
-import type { EntryContext } from '$lib/file-manager/view/entry-props';
+import type { IconName } from '#lib/components/Icon.svelte';
+import type { EntryContext } from '#lib/file-manager/view/entry-props.js';
 
 export type EmptyAction = {
 	label: string;

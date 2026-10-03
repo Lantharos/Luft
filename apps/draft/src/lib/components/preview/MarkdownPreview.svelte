@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { highlight } from '@luft/ui/code';
-	import { useApp } from '$lib/context';
-	import { openPath } from '$lib/documents/opening';
-	import { renderMarkdown } from '$lib/preview/markdown';
-	import { dirname, join } from '$lib/utils/paths';
+	import { useApp } from '#lib/context.js';
+	import { openPath } from '#lib/documents/opening.js';
+	import { renderMarkdown } from '#lib/preview/markdown.js';
+	import { dirname, join } from '#lib/utils/paths.js';
 
 	const app = useApp();
 	let workspace = $derived(app.workspace);

@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub, from your system's software sources and as AppImages, all in one place. Updates to the system itself, such as the kernel, drivers and libraries, live in Settings instead, so Schelf only ever shows you apps. It is built with Sabine and SvelteKit and lives at `apps/schelf`; run the commands below from that directory unless noted otherwise.
+Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub, from your system's software sources and as AppImages, all in one place. Updates to the system itself, such as the kernel, drivers and libraries, live in Settings instead, so Schelf only ever shows you apps. It is built with Sabine and Svelte and lives at `apps/schelf`; run the commands below from that directory unless noted otherwise.
 
 ## What it does
 

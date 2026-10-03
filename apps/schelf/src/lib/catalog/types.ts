@@ -1,4 +1,4 @@
-import type { Permissions, Screenshot } from '$lib/bridge/types';
+import type { Permissions, Screenshot } from '#lib/bridge/types.js';
 
 export type Origin = 'flathub' | 'fedora';
 

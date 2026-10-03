@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
-	import EntryIcon from '$lib/components/pane/EntryIcon.svelte';
-	import type { MediaInfo } from '$lib/file-manager/inspect/details.svelte';
-	import { thumbnailOf } from '$lib/file-manager/listing/thumbnails';
-	import { isDesktopRuntime, localFileSource } from '$lib/runtime';
-	import type { FileEntry } from '$lib/types';
-	import { entryIcon, mayBeTransparent } from '$lib/utils/file-kinds';
-	import { previewKind } from '$lib/utils/kinds';
+	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
+	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { isDesktopRuntime, localFileSource } from '#lib/runtime.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { entryIcon, mayBeTransparent } from '#lib/utils/file-kinds.js';
+	import { previewKind } from '#lib/utils/kinds.js';
 	import NativePreview from './NativePreview.svelte';
 	import TextPreview from './TextPreview.svelte';
 

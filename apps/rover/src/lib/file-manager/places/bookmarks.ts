@@ -1,7 +1,7 @@
-import * as api from '$lib/api';
-import { settings } from '$lib/state/settings.svelte';
-import type { FileEntry, PinnedFolder } from '$lib/types';
-import { entryIcon } from '$lib/utils/file-kinds';
+import * as api from '#lib/api.js';
+import { settings } from '#lib/state/settings.svelte.js';
+import type { FileEntry, PinnedFolder } from '#lib/types/index.js';
+import { entryIcon } from '#lib/utils/file-kinds.js';
 
 export function isPinned(path: string) {
 	return settings.value.pinnedFolders.some((bookmark) => bookmark.path === path);

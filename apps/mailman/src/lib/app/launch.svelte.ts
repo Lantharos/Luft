@@ -1,5 +1,5 @@
-import type { Launch } from '$lib/api';
-import { composer } from '$lib/compose/composer.svelte';
+import type { Launch } from '#lib/api/index.js';
+import { composer } from '#lib/compose/composer.svelte.js';
 
 class Opened {
 	file = $state<string | null>(null);

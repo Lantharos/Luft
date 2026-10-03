@@ -1,9 +1,9 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance } from '@luft/ui';
-import * as api from '$lib/api';
-import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from '$lib/api';
-import { dialogs } from '$lib/dialogs/dialogs.svelte';
-import { errorText } from '$lib/format';
+import * as api from '#lib/api.js';
+import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/api.js';
+import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+import { errorText } from '#lib/format.js';
 import { space } from './space.svelte';
 
 const NOTICE_MS = 6000;

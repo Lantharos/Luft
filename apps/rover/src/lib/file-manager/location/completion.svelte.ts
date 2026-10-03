@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import { settings } from '$lib/state/settings.svelte';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { settings } from '#lib/state/settings.svelte.js';
 import { previewEntries } from '../preview';
 import { expandHome } from './expand';
 

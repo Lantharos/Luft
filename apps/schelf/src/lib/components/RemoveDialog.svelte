@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import type { InstalledApp } from '$lib/bridge/types';
-	import { removeJob } from '$lib/app/jobs';
-	import { backend } from '$lib/state/backend';
-	import { operations } from '$lib/state/operations.svelte';
+	import type { InstalledApp } from '#lib/bridge/types.js';
+	import { removeJob } from '#lib/app/jobs.js';
+	import { backend } from '#lib/state/backend.js';
+	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { app, onclose }: { app: InstalledApp; onclose: () => void } = $props();
 

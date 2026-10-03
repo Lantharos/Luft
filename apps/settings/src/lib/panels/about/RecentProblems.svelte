@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MonitorX from '@lucide/svelte/icons/monitor-x';
 	import { ActionRow, Dialog, Section } from '@luft/ui';
-	import MoreRow, { COLLAPSED } from '$lib/components/MoreRow.svelte';
+	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import { problems, restartToFirmware, type Problem } from './api';
 
 	const AFTERMATH: Record<Problem['restart'], string> = {

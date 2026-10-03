@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import VcsBadge from '$lib/components/vcs/VcsBadge.svelte';
-	import { primaryActionLabel } from '$lib/vcs/format';
-	import type { VcsState } from '$lib/vcs/state.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
+	import { primaryActionLabel } from '#lib/vcs/format.js';
+	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
 		vcs: VcsState;

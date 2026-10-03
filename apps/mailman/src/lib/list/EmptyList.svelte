@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { list } from '$lib/mail/list.svelte';
+	import { list } from '#lib/mail/list.svelte.js';
 
 	const QUIET: Record<string, [string, string]> = {
 		inbox: ['Inbox zero', 'Everything is taken care of.'],

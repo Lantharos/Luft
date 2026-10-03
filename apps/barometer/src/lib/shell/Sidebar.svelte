@@ -2,10 +2,10 @@
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import ListTree from '@lucide/svelte/icons/list-tree';
 	import type { Component } from 'svelte';
-	import { resources } from '$lib/resources/registry';
-	import { app } from '$lib/state/app.svelte';
-	import { monitor } from '$lib/state/monitor.svelte';
-	import { settings } from '$lib/state/settings.svelte';
+	import { resources } from '#lib/resources/registry.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { monitor } from '#lib/state/monitor.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import ResourceEntry from './ResourceEntry.svelte';
 
 	let entries = $derived(monitor.devices ? resources(monitor.devices, settings.value.showVirtual) : []);

@@ -1,4 +1,4 @@
-import type { FileEntry, SortBy } from '$lib/types';
+import type { FileEntry, SortBy } from '#lib/types/index.js';
 
 const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
 

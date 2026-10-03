@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { on } from 'svelte/events';
-	import Icon from '$lib/components/Icon.svelte';
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { COLUMN_SORT, columnLabel, type ListColumns } from '$lib/file-manager/view/list-columns.svelte';
-	import { settings } from '$lib/state/settings.svelte';
-	import type { ListColumnId, SortBy } from '$lib/types';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { COLUMN_SORT, columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import type { ListColumnId, SortBy } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

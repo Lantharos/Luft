@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Drive } from '$lib/api';
-	import { dialogs } from '$lib/dialogs/dialogs.svelte';
-	import { bytes } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import type { Drive } from '#lib/api.js';
+	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { bytes } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
 		drive: Drive;

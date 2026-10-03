@@ -3,10 +3,10 @@
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
-	import { parent } from '$lib/library/kinds';
-	import { library } from '$lib/library/library.svelte';
+	import { parent } from '#lib/library/kinds.js';
+	import { library } from '#lib/library/library.svelte.js';
 	import type { Snippet } from 'svelte';
-	import { chrome } from '$lib/app/chrome.svelte';
+	import { chrome } from '#lib/app/chrome.svelte.js';
 
 	interface Props {
 		title: string;

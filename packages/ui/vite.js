@@ -3,6 +3,15 @@ import { fileURLToPath } from 'node:url';
 
 const FONTS = fileURLToPath(new URL('./fonts/', import.meta.url));
 const FONT_FILES = readdirSync(FONTS);
+const SABINE_CHROMIUM = 'chrome151';
+
+/** @returns {import('vite').Plugin} */
+export function sabineTarget() {
+	return {
+		name: 'sabine-target',
+		config: () => ({ build: { target: SABINE_CHROMIUM, cssTarget: SABINE_CHROMIUM } })
+	};
+}
 
 /** @returns {import('vite').Plugin} */
 export function luftFonts() {

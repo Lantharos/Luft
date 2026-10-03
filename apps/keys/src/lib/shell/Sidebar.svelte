@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { tooltip } from '@luft/ui';
-	import { app } from '$lib/state/app.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 
 	interface Item {
 		id: string;

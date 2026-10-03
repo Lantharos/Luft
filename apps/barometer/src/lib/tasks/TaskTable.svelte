@@ -16,7 +16,7 @@
 <script lang="ts">
 	import { AppIcon, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import type { Sort } from '$lib/state/settings.svelte';
+	import type { Sort } from '#lib/state/settings.svelte.js';
 	import { template, type Column } from './columns';
 	import { desktopId } from './icons';
 	import TableHeader from './TableHeader.svelte';

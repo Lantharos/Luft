@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { Row, Section } from '@luft/ui';
-	import { bytes } from '$lib/format';
+	import { bytes } from '#lib/format.js';
 	import { appCount, cancel, check, download, firmware, onActivity, openApps, overview, restart, type Firmware, type Overview } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import DetailsDialog from './DetailsDialog.svelte';

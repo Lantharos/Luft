@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { TerminalSession } from '$lib/terminal/session.svelte';
-	import type { Workspace } from '$lib/workspace/workspace.svelte';
+	import type { TerminalSession } from '#lib/terminal/session.svelte.js';
+	import type { Workspace } from '#lib/workspace/workspace.svelte.js';
 	import SearchBar from './SearchBar.svelte';
 
 	interface Props {

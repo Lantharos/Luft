@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { list } from '$lib/mail/list.svelte';
-	import { plural } from '$lib/app/format';
+	import { list } from '#lib/mail/list.svelte.js';
+	import { plural } from '#lib/app/format.js';
 
 	let unread = $derived(list.rows.filter((row) => row.unread > 0).length);
 </script>

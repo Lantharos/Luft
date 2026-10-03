@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { clock as readClock, onClockChanged, setAutomatic, zones as readZones, type Clock, type Zone } from './api';
 	import DateTimeDialog from './DateTimeDialog.svelte';
 	import TimeZoneDialog from './TimeZoneDialog.svelte';

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
-	import type { ConflictItem } from '$lib/features/types';
-	import { formatBytes, formatDate, formatFullDate } from '$lib/utils/format';
-	import { basename, parentPath } from '$lib/utils/paths';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { ConflictItem } from '#lib/features/types.js';
+	import { formatBytes, formatDate, formatFullDate } from '#lib/utils/format.js';
+	import { basename, parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		heading: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import { Row } from '@luft/ui';
-	import { openDisks } from '$lib/panels/about/api';
+	import { openDisks } from '#lib/panels/about/api.js';
 	import type { Drives } from '../api';
 
 	let { drives }: { drives: Drives } = $props();

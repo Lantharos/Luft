@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Checkbox, Dialog, Segmented, TextField } from '@luft/ui';
-	import * as features from '$lib/features/api';
-	import { previewRenames, type Casing, type RenameMode, type RenameOptions } from '$lib/features/rename';
-	import type { FileEntry } from '$lib/types';
-	import { errorMessage, plural } from '$lib/utils/format';
+	import * as features from '#lib/features/api.js';
+	import { previewRenames, type Casing, type RenameMode, type RenameOptions } from '#lib/features/rename.js';
+	import type { FileEntry } from '#lib/types/index.js';
+	import { errorMessage, plural } from '#lib/utils/format.js';
 
 	interface Props {
 		entries: FileEntry[];

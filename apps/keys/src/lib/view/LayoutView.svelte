@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
-	import { GEOMETRIES, PHYSICAL, TYPING } from '$lib/keyboard/geometry';
-	import Keyboard from '$lib/keyboard/Keyboard.svelte';
-	import { viewLayout } from '$lib/layout/api';
-	import Page from '$lib/shell/Page.svelte';
-	import { app } from '$lib/state/app.svelte';
-	import { toast } from '$lib/state/toast.svelte';
+	import { GEOMETRIES, PHYSICAL, TYPING } from '#lib/keyboard/geometry.js';
+	import Keyboard from '#lib/keyboard/Keyboard.svelte';
+	import { viewLayout } from '#lib/layout/api.js';
+	import Page from '#lib/shell/Page.svelte';
+	import { app } from '#lib/state/app.svelte.js';
+	import { toast } from '#lib/state/toast.svelte.js';
 	import KeyLevels from './KeyLevels.svelte';
 	import { LayoutViewer } from './viewer.svelte';
 

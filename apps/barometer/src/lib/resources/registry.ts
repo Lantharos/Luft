@@ -1,6 +1,6 @@
-import type { Devices, DriveKind, NetworkKind, Tick } from '$lib/backend/types';
-import { networkRate, percent, share } from '$lib/format';
-import type { Line } from '$lib/graph/draw';
+import type { Devices, DriveKind, NetworkKind, Tick } from '#lib/backend/types.js';
+import { networkRate, percent, share } from '#lib/format.js';
+import type { Line } from '#lib/graph/draw.js';
 
 export interface Resource {
 	id: string;

@@ -1,5 +1,5 @@
-import type { Folder, Item, Listing, Location } from '$lib/api';
-import * as api from '$lib/api';
+import type { Folder, Item, Listing, Location } from '#lib/api.js';
+import * as api from '#lib/api.js';
 import { groupOf, parent, type Group } from './kinds';
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });

@@ -1,4 +1,4 @@
-import { invoke, listen } from '$lib/bridge';
+import { invoke, listen } from '#lib/bridge.js';
 
 export type Charge = 'charging' | 'discharging' | 'empty' | 'full' | 'not-charging';
 export type DeviceKind = 'mouse' | 'keyboard' | 'headphones' | 'speaker' | 'gamepad' | 'phone' | 'tablet' | 'pen' | 'touchpad' | 'other';

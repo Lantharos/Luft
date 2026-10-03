@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import type { ThreadRow as Row } from '$lib/api';
-	import { navigate, openThread } from '$lib/app/navigation';
-	import { composer } from '$lib/compose/composer.svelte';
-	import * as actions from '$lib/mail/actions';
-	import { list, type Item } from '$lib/mail/list.svelte';
-	import LaterPopover from '$lib/shell/LaterPopover.svelte';
+	import type { ThreadRow as Row } from '#lib/api/index.js';
+	import { navigate, openThread } from '#lib/app/navigation.js';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import * as actions from '#lib/mail/actions.js';
+	import { list, type Item } from '#lib/mail/list.svelte.js';
+	import LaterPopover from '#lib/shell/LaterPopover.svelte';
 	import EmptyList from './EmptyList.svelte';
 	import RowMenu from './RowMenu.svelte';
 	import SummaryRow from './SummaryRow.svelte';

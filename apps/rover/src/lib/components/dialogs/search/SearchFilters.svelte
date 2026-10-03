@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Select, Switch } from '@luft/ui';
-	import { search, type KindFilter, type ModifiedFilter, type SizeFilter } from '$lib/features/search.svelte';
+	import { search, type KindFilter, type ModifiedFilter, type SizeFilter } from '#lib/features/search.svelte.js';
 
 	const KINDS: { value: KindFilter; label: string }[] = [
 		{ value: 'any', label: 'Any kind' },

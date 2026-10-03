@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import type { Command } from '$lib/app/commands';
+	import type { Command } from '#lib/app/commands.js';
 
 	interface Props {
 		commands: Command[];

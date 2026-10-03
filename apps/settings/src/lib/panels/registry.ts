@@ -16,7 +16,7 @@ import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import Wifi from '@lucide/svelte/icons/wifi';
-import type { Hardware } from '$lib/state/hardware.svelte';
+import type { Hardware } from '#lib/state/hardware.svelte.js';
 
 export type PanelId =
 	| 'network'

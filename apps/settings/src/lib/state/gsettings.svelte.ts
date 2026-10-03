@@ -1,5 +1,5 @@
 import { onDestroy } from 'svelte';
-import { invoke, listen } from '$lib/bridge';
+import { invoke, listen } from '#lib/bridge.js';
 
 type Values = Record<string, unknown>;
 

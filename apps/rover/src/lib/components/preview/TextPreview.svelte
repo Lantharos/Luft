@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { highlight } from '@luft/ui/code';
-	import * as api from '$lib/api';
-	import { renderMarkdown } from '$lib/file-manager/inspect/markdown';
-	import { loadText, type TextPreview } from '$lib/file-manager/inspect/text';
-	import type { FileEntry } from '$lib/types';
+	import * as api from '#lib/api.js';
+	import { renderMarkdown } from '#lib/file-manager/inspect/markdown.js';
+	import { loadText, type TextPreview } from '#lib/file-manager/inspect/text.js';
+	import type { FileEntry } from '#lib/types/index.js';
 
 	interface Props {
 		entry: FileEntry;

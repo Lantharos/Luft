@@ -1,6 +1,6 @@
 # Draft
 
-Draft is a text and code editor for Luft, built with Sabine and SvelteKit on top of CodeMirror. It lives at `apps/draft`; run the commands below from that directory unless noted otherwise.
+Draft is a text and code editor for Luft, built with Sabine and Svelte on top of CodeMirror. It lives at `apps/draft`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -90,7 +90,7 @@ draft/
 │   │   ├── palette/           fuzzy matching, quick open and pickers
 │   │   ├── preview/           Markdown rendering
 │   │   └── utils/             paths and timing helpers
-│   └── routes/+page.svelte    startup
+│   └── App.svelte             startup
 └── desktop/src/
     ├── bridge.rs              bridge command registration
     ├── desktop.rs             file chooser, links and showing files in Rover

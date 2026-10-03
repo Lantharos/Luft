@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Checkbox, PasswordField, Segmented, Select, Switch, TextField } from '@luft/ui';
-	import type { Filesystem, Format } from '$lib/api';
-	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import type { Filesystem, Format } from '#lib/api.js';
+	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
 		format: Format;

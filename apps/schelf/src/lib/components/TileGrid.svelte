@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CatalogApp } from '$lib/catalog/types';
+	import type { CatalogApp } from '#lib/catalog/types.js';
 	import AppTile from './AppTile.svelte';
 
 	let { apps, placeholders = 6 }: { apps: CatalogApp[] | null; placeholders?: number } = $props();

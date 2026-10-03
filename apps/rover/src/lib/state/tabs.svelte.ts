@@ -1,4 +1,4 @@
-import type { Tab, TabHistoryEntry, TabPlace, ViewMemory } from '$lib/types';
+import type { Tab, TabHistoryEntry, TabPlace, ViewMemory } from '#lib/types/index.js';
 
 export class Tabs {
 	list = $state<Tab[]>([]);

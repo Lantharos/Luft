@@ -5,7 +5,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import RectangleVertical from '@lucide/svelte/icons/rectangle-vertical';
 	import Search from '@lucide/svelte/icons/search';
-	import MoreMenu from '$lib/shell/MoreMenu.svelte';
+	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import FindBar from './FindBar.svelte';
 	import { documentState } from './state.svelte';
 </script>

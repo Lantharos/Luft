@@ -1,4 +1,4 @@
-import { dirname } from '$lib/utils/paths';
+import { dirname } from '#lib/utils/paths.js';
 import type { Document } from './document.svelte';
 import { reload } from './opening';
 import type { Workspace } from './workspace.svelte';

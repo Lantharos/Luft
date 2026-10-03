@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { App } from '$lib/app.svelte';
-	import { useApp } from '$lib/context';
-	import type { Document } from '$lib/documents/document.svelte';
-	import { encodingName } from '$lib/documents/encodings';
-	import { describeIndentation } from '$lib/editor/indentation';
-	import { encodingPicker, indentationPicker, languagePicker, lineEndingPicker } from '$lib/palette/pickers';
-	import type { PaletteSource } from '$lib/palette/palette.svelte';
-	import { quickOpen } from '$lib/palette/sources';
-	import { tildify } from '$lib/utils/paths';
+	import type { App } from '#lib/app.svelte.js';
+	import { useApp } from '#lib/context.js';
+	import type { Document } from '#lib/documents/document.svelte.js';
+	import { encodingName } from '#lib/documents/encodings.js';
+	import { describeIndentation } from '#lib/editor/indentation.js';
+	import { encodingPicker, indentationPicker, languagePicker, lineEndingPicker } from '#lib/palette/pickers.js';
+	import type { PaletteSource } from '#lib/palette/palette.svelte.js';
+	import { quickOpen } from '#lib/palette/sources.js';
+	import { tildify } from '#lib/utils/paths.js';
 
 	const app = useApp();
 	let workspace = $derived(app.workspace);

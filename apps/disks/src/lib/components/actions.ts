@@ -1,9 +1,9 @@
-import * as api from '$lib/api';
-import type { Drive, Segment, Volume } from '$lib/api';
-import { dialogs } from '$lib/dialogs/dialogs.svelte';
-import { changing } from '$lib/encryption.svelte';
-import { inner, volumeName } from '$lib/format';
-import { disks } from '$lib/state/disks.svelte';
+import * as api from '#lib/api.js';
+import type { Drive, Segment, Volume } from '#lib/api.js';
+import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+import { changing } from '#lib/encryption.svelte.js';
+import { inner, volumeName } from '#lib/format.js';
+import { disks } from '#lib/state/disks.svelte.js';
 
 export interface Action {
 	label: string;

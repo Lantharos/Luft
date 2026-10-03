@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Devices } from '$lib/backend/types';
+	import type { Devices } from '#lib/backend/types.js';
 	import BatteryPage from './battery/BatteryPage.svelte';
 	import CpuPage from './cpu/CpuPage.svelte';
 	import DrivePage from './drive/DrivePage.svelte';

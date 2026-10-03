@@ -1,9 +1,9 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance } from '@luft/ui';
-import * as api from '$lib/api';
-import { isDesktopRuntime } from '$lib/runtime';
-import { settings } from '$lib/state/settings.svelte';
-import { Tabs } from '$lib/state/tabs.svelte';
+import * as api from '#lib/api.js';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { settings } from '#lib/state/settings.svelte.js';
+import { Tabs } from '#lib/state/tabs.svelte.js';
 import type {
 	AppState,
 	Arrival,
@@ -21,9 +21,9 @@ import type {
 	UserDirs,
 	ViewMemory,
 	ViewMode
-} from '$lib/types';
-import { errorMessage } from '$lib/utils/format';
-import { basename, parentPath, pathSegments, trimTrailingSlash } from '$lib/utils/paths';
+} from '#lib/types/index.js';
+import { errorMessage } from '#lib/utils/format.js';
+import { basename, parentPath, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { DrivesState } from './places/drives.svelte';
 import { NetworkState, type NetworkEntry } from './places/network.svelte';

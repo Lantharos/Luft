@@ -1,4 +1,4 @@
-import { invoke, listen } from '$lib/bridge';
+import { invoke, listen } from '#lib/bridge.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 

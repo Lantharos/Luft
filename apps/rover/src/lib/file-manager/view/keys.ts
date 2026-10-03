@@ -1,4 +1,4 @@
-import type { ViewMode } from '$lib/types';
+import type { ViewMode } from '#lib/types/index.js';
 import type { ChooserState } from '../chooser.svelte';
 import type { FileManager } from '../manager.svelte';
 import type { Direction, ViewState } from './view-state.svelte';

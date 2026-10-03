@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Drive } from '$lib/api';
-	import { disks } from '$lib/state/disks.svelte';
+	import type { Drive } from '#lib/api.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import CapacityBar from './CapacityBar.svelte';
 	import DriveHeader from './DriveHeader.svelte';
 	import HealthRow from './HealthRow.svelte';

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { topLayer } from '@luft/ui';
 	import Search from '@lucide/svelte/icons/search';
-	import type { Command } from '$lib/app/commands';
-	import { list } from '$lib/mail/list.svelte';
+	import type { Command } from '#lib/app/commands.js';
+	import { list } from '#lib/mail/list.svelte.js';
 	import { score } from './fuzzy';
 
 	interface Props {

@@ -1,6 +1,6 @@
 # Rover
 
-Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft monorepo it lives at `apps/rover`; run the commands below from that directory unless noted otherwise.
+Rover is a file manager for Linux built with Sabine and Svelte. In the Luft monorepo it lives at `apps/rover`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -125,7 +125,7 @@ rover/
 │   │   ├── state/             settings and tabs
 │   │   ├── utils/             formatting, paths and file kinds
 │   │   └── vcs/               version control state
-│   ├── routes/+page.svelte    window layout
+│   ├── App.svelte             window layout
 │   └── styles/                views, sidebar, toolbar and preview styles
 └── desktop/src/
     ├── archives/              compressing and extracting

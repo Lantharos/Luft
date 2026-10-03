@@ -1,5 +1,5 @@
-import type { DriveInfo, FileEntry, TrashItem, UserDirs } from '$lib/types';
-import { joinPath } from '$lib/utils/paths';
+import type { DriveInfo, FileEntry, TrashItem, UserDirs } from '#lib/types/index.js';
+import { joinPath } from '#lib/utils/paths.js';
 
 const now = Math.floor(Date.now() / 1000);
 const HOME = '/home/kristof';

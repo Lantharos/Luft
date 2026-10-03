@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as api from '$lib/api';
-	import Icon from '$lib/components/Icon.svelte';
-	import type { Operation } from '$lib/types';
-	import { formatBytes, formatDuration, plural } from '$lib/utils/format';
-	import { basename } from '$lib/utils/paths';
+	import * as api from '#lib/api.js';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { Operation } from '#lib/types/index.js';
+	import { formatBytes, formatDuration, plural } from '#lib/utils/format.js';
+	import { basename } from '#lib/utils/paths.js';
 
 	interface Props {
 		operations: Operation[];

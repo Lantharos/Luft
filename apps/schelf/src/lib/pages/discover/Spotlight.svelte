@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AppArt from '$lib/components/AppArt.svelte';
-	import type { AppDetails } from '$lib/catalog/types';
-	import { navigation } from '$lib/state/navigation.svelte';
+	import AppArt from '#lib/components/AppArt.svelte';
+	import type { AppDetails } from '#lib/catalog/types.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
 
 	let { app }: { app: AppDetails } = $props();
 	const shot = $derived(app.screenshots[0]);

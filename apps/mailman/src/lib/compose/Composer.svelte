@@ -13,12 +13,12 @@
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import X from '@lucide/svelte/icons/x';
 	import { fly } from 'svelte/transition';
-	import * as api from '$lib/api';
-	import type { Template } from '$lib/api';
-	import { size } from '$lib/app/format';
-	import { REMINDERS, SEND_LATER } from '$lib/app/when';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { toasts } from '$lib/shell/toasts.svelte';
+	import * as api from '#lib/api/index.js';
+	import type { Template } from '#lib/api/index.js';
+	import { size } from '#lib/app/format.js';
+	import { REMINDERS, SEND_LATER } from '#lib/app/when.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { composer, type Composition } from './composer.svelte';
 	import { shownAddress } from './identity';
 	import Editor from './Editor.svelte';

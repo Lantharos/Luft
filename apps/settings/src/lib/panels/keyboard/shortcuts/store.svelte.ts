@@ -1,5 +1,5 @@
 import { onDestroy, untrack } from 'svelte';
-import { SettingsGroup, schemaInstalled } from '$lib/state/gsettings.svelte';
+import { SettingsGroup, schemaInstalled } from '#lib/state/gsettings.svelte.js';
 import { appNames, resetSetting, shortcutEntries, writeSetting, type Category, type ShortcutEntry } from '../api';
 import { canonical, sameAccelerators } from './accelerator';
 

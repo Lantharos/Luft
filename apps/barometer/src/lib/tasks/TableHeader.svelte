@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import type { Sort } from '$lib/state/settings.svelte';
+	import type { Sort } from '#lib/state/settings.svelte.js';
 	import type { Column } from './columns';
 
 	interface Props {

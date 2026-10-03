@@ -1,4 +1,4 @@
-import type { Item, Kind } from '$lib/api';
+import type { Item, Kind } from '#lib/api.js';
 
 export type Group = 'visual' | 'audio' | 'document' | 'font';
 

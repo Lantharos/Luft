@@ -1,6 +1,6 @@
 # Tern
 
-Tern is the terminal for the Luft desktop, built with Sabine and SvelteKit. In the Luft monorepo it lives at `apps/tern`; run the commands below from that directory unless noted otherwise.
+Tern is the terminal for the Luft desktop, built with Sabine and Svelte. In the Luft monorepo it lives at `apps/tern`; run the commands below from that directory unless noted otherwise.
 
 ## Features
 
@@ -89,7 +89,7 @@ tern/
 │   │   ├── state/            preferences and the terminal look derived from them
 │   │   ├── terminal/         terminal sessions, output stream, colors, shell integration and paste checks
 │   │   └── workspace/        tabs, pane layout and shortcuts
-│   ├── routes/+page.svelte   window layout
+│   ├── App.svelte            window layout
 │   └── styles/               terminal and tab styles
 └── desktop/src/
     ├── desktop/              notifications, links and the desktop entry

@@ -3,12 +3,12 @@
 	import { SearchField, tooltip } from '@luft/ui';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Settings from '@lucide/svelte/icons/settings-2';
-	import { composer } from '$lib/compose/composer.svelte';
-	import { list } from '$lib/mail/list.svelte';
-	import { mail } from '$lib/mail/mail.svelte';
-	import { BUNDLES, PRIMARY, mailboxView } from '$lib/mail/views';
-	import { step } from '$lib/app/commands';
-	import { navigate } from '$lib/app/navigation';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import { list } from '#lib/mail/list.svelte.js';
+	import { mail } from '#lib/mail/mail.svelte.js';
+	import { BUNDLES, PRIMARY, mailboxView } from '#lib/mail/views.js';
+	import { step } from '#lib/app/commands.js';
+	import { navigate } from '#lib/app/navigation.js';
 	import AccountStatus from './AccountStatus.svelte';
 	import NavItem from './NavItem.svelte';
 

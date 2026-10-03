@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import type { TerminalMenu, Workspace } from '$lib/workspace/workspace.svelte';
+	import type { TerminalMenu, Workspace } from '#lib/workspace/workspace.svelte.js';
 
 	interface Props {
 		menu: TerminalMenu;

@@ -1,7 +1,7 @@
 import { Text } from '@codemirror/state';
-import type { Cursor } from '$lib/editor/editor';
-import { detectIndentation } from '$lib/editor/indentation';
-import { detectLanguage } from '$lib/editor/languages';
+import type { Cursor } from '#lib/editor/editor.js';
+import { detectIndentation } from '#lib/editor/indentation.js';
+import { detectLanguage } from '#lib/editor/languages.js';
 import { decode, type DecodedText } from './decode';
 import { Document } from './document.svelte';
 import type { Workspace } from './workspace.svelte';

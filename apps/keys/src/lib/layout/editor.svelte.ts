@@ -1,6 +1,6 @@
-import { History } from '$lib/state/history.svelte';
-import { toast } from '$lib/state/toast.svelte';
-import { guessGeometry, type Geometry } from '$lib/keyboard/geometry';
+import { History } from '#lib/state/history.svelte.js';
+import { toast } from '#lib/state/toast.svelte.js';
+import { guessGeometry, type Geometry } from '#lib/keyboard/geometry.js';
 import { EMPTY, freeKeysym, saveLayout, systemTable, tryLayout, type DeadKey, type Layout, type Levels, type Options, type Pair, type Symbol } from './api';
 import { capitals, deadSymbol, placements, standardName } from './dead/table';
 

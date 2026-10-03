@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Row, Section, Segmented, Slider, Switch } from '@luft/ui';
-	import { percent } from '$lib/format';
-	import { useSettings } from '$lib/state/gsettings.svelte';
-	import TimePicker from '$lib/components/TimePicker.svelte';
+	import { percent } from '#lib/format.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import TimePicker from '#lib/components/TimePicker.svelte';
 
 	type Color = {
 		enabled: boolean;

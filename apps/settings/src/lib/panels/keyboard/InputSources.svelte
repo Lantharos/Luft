@@ -5,7 +5,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
 	import { IconButton, Row, Section } from '@luft/ui';
-	import { useSettings } from '$lib/state/gsettings.svelte';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AddSourceDialog from './AddSourceDialog.svelte';
 	import { inputMethods, keysInstalled, layouts as readLayouts, openKeys } from './api';
 	import ShortcutButton from './shortcuts/ShortcutButton.svelte';

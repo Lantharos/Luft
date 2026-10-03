@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Row, Section } from '@luft/ui';
-	import SubPage from '$lib/components/SubPage.svelte';
+	import SubPage from '#lib/components/SubPage.svelte';
 	import { forget, remove, type Network } from '../api';
 	import AdvancedSection from './AdvancedSection.svelte';
 	import DetailsSection from './DetailsSection.svelte';

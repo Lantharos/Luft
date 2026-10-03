@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import type { SingleInstanceActivation } from '$lib/api';
-import { parentPath } from '$lib/utils/paths';
+import * as api from '#lib/api.js';
+import type { SingleInstanceActivation } from '#lib/api.js';
+import { parentPath } from '#lib/utils/paths.js';
 import { looksRemote } from './location/addresses';
 import type { FileManager } from './manager.svelte';
 

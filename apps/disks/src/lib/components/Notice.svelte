@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { disks } from '$lib/state/disks.svelte';
+	import { disks } from '#lib/state/disks.svelte.js';
 </script>
 
 {#if disks.notice}

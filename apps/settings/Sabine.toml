@@ -5,7 +5,7 @@ generic_name = "Settings"
 categories = ["Settings", "System"]
 keywords = ["preferences", "control panel", "control center", "system settings", "system preferences", "configuration", "options", "setup"]
 version = "0.1.0"
-icon = "static/favicon.svg"
+icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = ["x-scheme-handler/kestrel-settings"]
 
@@ -14,7 +14,7 @@ command = "cargo run --manifest-path desktop/Cargo.toml --"
 
 [web]
 root = "."
-dist = "build"
-entry = "build/index.html"
+dist = "dist"
+entry = "dist/index.html"
 build = "bun run build"
 local_files = true

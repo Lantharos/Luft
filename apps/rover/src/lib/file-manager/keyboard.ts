@@ -1,5 +1,5 @@
-import * as tools from '$lib/features/actions';
-import { history } from '$lib/features/history.svelte';
+import * as tools from '#lib/features/actions.js';
+import { history } from '#lib/features/history.svelte.js';
 import type { ChooserState } from './chooser.svelte';
 import type { FileManager } from './manager.svelte';
 import { handleViewKey } from './view/keys';

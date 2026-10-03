@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Switch } from '@luft/ui';
-	import { schemaInstalled, useSettings } from '$lib/state/gsettings.svelte';
+	import { schemaInstalled, useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppsPage from './AppsPage.svelte';
 	import MessageContent from './MessageContent.svelte';
 	import { KESTREL_SCHEMA, RULES_SCHEMA, notifyingApps, type NotifyingApp } from './api';

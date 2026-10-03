@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { FileManager } from '$lib/file-manager/manager.svelte';
-	import { formatBytes, plural } from '$lib/utils/format';
-	import { projectSummary } from '$lib/vcs/format';
-	import type { VcsState } from '$lib/vcs/state.svelte';
+	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { formatBytes, plural } from '#lib/utils/format.js';
+	import { projectSummary } from '#lib/vcs/format.js';
+	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
 		manager: FileManager;

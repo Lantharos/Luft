@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 
 	interface Props extends Omit<HTMLButtonAttributes, 'children'> {
 		icon: IconName;

@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 export type EntryIconName = 'folder' | 'file' | 'image' | 'video' | 'music' | 'archive' | 'code' | 'file-text' | 'package';
 

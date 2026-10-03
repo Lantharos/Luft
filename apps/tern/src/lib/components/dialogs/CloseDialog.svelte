@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import type { CloseReview } from '$lib/workspace/workspace.svelte';
+	import type { CloseReview } from '#lib/workspace/workspace.svelte.js';
 
 	interface Props {
 		review: CloseReview;

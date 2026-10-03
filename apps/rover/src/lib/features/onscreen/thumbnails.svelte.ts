@@ -1,8 +1,8 @@
 import { fileUrl } from '@lantharos/sabine';
 import { SvelteMap } from 'svelte/reactivity';
-import { isDesktopRuntime, localFileSource } from '$lib/runtime';
-import type { FileEntry } from '$lib/types';
-import { isImage } from '$lib/utils/file-kinds';
+import { isDesktopRuntime, localFileSource } from '#lib/runtime.js';
+import type { FileEntry } from '#lib/types/index.js';
+import { isImage } from '#lib/utils/file-kinds.js';
 import * as api from '../api';
 import { OnScreen } from './tracker';
 import type { ThumbnailBatch, ThumbnailSize } from '../types';

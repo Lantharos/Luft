@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as api from '$lib/api';
-	import type { Drive } from '$lib/api';
-	import { driveSummary } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import * as api from '#lib/api.js';
+	import type { Drive } from '#lib/api.js';
+	import { driveSummary } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import ActionMenu from '../ActionMenu.svelte';
 	import { driveMenu } from '../actions';
 

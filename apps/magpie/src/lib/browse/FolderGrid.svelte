@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
-	import type { Item } from '$lib/api';
-	import FontSample from '$lib/font/FontSample.svelte';
-	import { library } from '$lib/library/library.svelte';
-	import { thumbnails } from '$lib/library/thumbnails.svelte';
+	import type { Item } from '#lib/api.js';
+	import FontSample from '#lib/font/FontSample.svelte';
+	import { library } from '#lib/library/library.svelte.js';
+	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
 
 	const LAYOUT = { itemHeight: 118, minItemWidth: 118, gap: 6, padding: { top: 2, right: 12, bottom: 16, left: 12 } };
 

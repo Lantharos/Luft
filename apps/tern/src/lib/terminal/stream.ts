@@ -1,4 +1,4 @@
-import { events, pty } from '$lib/api';
+import { events, pty } from '#lib/api.js';
 
 export interface Sink {
 	write(data: Uint8Array, parsed: () => void): void;

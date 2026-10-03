@@ -1,7 +1,7 @@
 import { fileUrl } from '@lantharos/sabine';
 import MarkdownIt from 'markdown-it';
-import { isDesktopRuntime } from '$lib/runtime';
-import { joinPath, parentPath } from '$lib/utils/paths';
+import { isDesktopRuntime } from '#lib/runtime.js';
+import { joinPath, parentPath } from '#lib/utils/paths.js';
 
 const EXTERNAL = /^[a-z][a-z0-9+.-]*:/i;
 

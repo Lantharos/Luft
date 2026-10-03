@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog, RecoveryKey } from '@luft/ui';
-	import * as api from '$lib/api';
+	import * as api from '#lib/api.js';
 
 	interface Props {
 		key: string;

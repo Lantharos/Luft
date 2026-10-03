@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { bytes } from '$lib/format';
-	import { disks } from '$lib/state/disks.svelte';
+	import { bytes } from '#lib/format.js';
+	import { disks } from '#lib/state/disks.svelte.js';
 	import DriveIcon from './DriveIcon.svelte';
 </script>
 

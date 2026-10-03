@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { NativeVideo } from '@lantharos/sabine';
 	import { MediaControls, MediaState, NativeVideoSurface } from '@luft/ui';
-	import type { MediaInfo } from '$lib/file-manager/inspect/details.svelte';
+	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
 
 	interface Props {
 		source: string;

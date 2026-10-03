@@ -2,10 +2,10 @@
 	import Forward from '@lucide/svelte/icons/forward';
 	import Reply from '@lucide/svelte/icons/reply';
 	import ReplyAll from '@lucide/svelte/icons/reply-all';
-	import { plural } from '$lib/app/format';
-	import { composer } from '$lib/compose/composer.svelte';
-	import * as actions from '$lib/mail/actions';
-	import { list } from '$lib/mail/list.svelte';
+	import { plural } from '#lib/app/format.js';
+	import { composer } from '#lib/compose/composer.svelte.js';
+	import * as actions from '#lib/mail/actions.js';
+	import { list } from '#lib/mail/list.svelte.js';
 	import MessageView from './MessageView.svelte';
 	import { reader } from './reader.svelte';
 

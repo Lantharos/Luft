@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { LayoutNode } from '$lib/workspace/layout';
-	import type { Workspace } from '$lib/workspace/workspace.svelte';
+	import type { LayoutNode } from '#lib/workspace/layout.js';
+	import type { Workspace } from '#lib/workspace/workspace.svelte.js';
 	import LayoutView from './LayoutView.svelte';
 	import SplitDivider from './SplitDivider.svelte';
 	import TerminalPane from './TerminalPane.svelte';

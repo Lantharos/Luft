@@ -1,4 +1,4 @@
-import type { InstalledApp, Updates } from '$lib/bridge/types';
+import type { InstalledApp, Updates } from '#lib/bridge/types.js';
 import { backend } from './backend';
 
 class Library {

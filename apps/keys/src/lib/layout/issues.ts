@@ -1,4 +1,4 @@
-import { caps, type Geometry } from '$lib/keyboard/geometry';
+import { caps, type Geometry } from '#lib/keyboard/geometry.js';
 import type { DeadKey, Layout } from './api';
 import { placements } from './dead/table';
 

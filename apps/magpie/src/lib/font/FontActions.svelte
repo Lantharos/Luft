@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import MoreMenu from '$lib/shell/MoreMenu.svelte';
+	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import { fontState } from './state.svelte';
 </script>
 

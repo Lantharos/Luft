@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
-	import type { ChooserState } from '$lib/file-manager/chooser.svelte';
-	import { plural } from '$lib/utils/format';
+	import Icon from '#lib/components/Icon.svelte';
+	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
+	import { plural } from '#lib/utils/format.js';
 
 	interface Props {
 		chooser: ChooserState;

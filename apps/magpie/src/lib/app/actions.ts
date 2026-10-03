@@ -1,6 +1,6 @@
-import * as api from '$lib/api';
-import { library } from '$lib/library/library.svelte';
-import { player } from '$lib/music/player.svelte';
+import * as api from '#lib/api.js';
+import { library } from '#lib/library/library.svelte.js';
+import { player } from '#lib/music/player.svelte.js';
 import { chrome } from './chrome.svelte';
 
 export async function openFile() {

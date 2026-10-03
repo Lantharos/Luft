@@ -1,4 +1,4 @@
-import type { FileEntry } from '$lib/types';
+import type { FileEntry } from '#lib/types/index.js';
 
 export type Resolution = 'replace' | 'merge' | 'skip' | 'keepBoth';
 

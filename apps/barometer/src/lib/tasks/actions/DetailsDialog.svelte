@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { AppIcon, Dialog } from '@luft/ui';
-	import type { Details } from '$lib/backend/types';
-	import { bytes, count, cpuTime, date, duration, percent, rate } from '$lib/format';
-	import { app } from '$lib/state/app.svelte';
-	import { processes } from '$lib/state/processes.svelte';
+	import type { Details } from '#lib/backend/types.js';
+	import { bytes, count, cpuTime, date, duration, percent, rate } from '#lib/format.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { processes } from '#lib/state/processes.svelte.js';
 	import { desktopId } from '../icons';
 	import { tasks } from './actions.svelte';
 

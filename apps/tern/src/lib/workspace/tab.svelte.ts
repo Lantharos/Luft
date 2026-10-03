@@ -1,4 +1,4 @@
-import type { TerminalSession } from '$lib/terminal/session.svelte';
+import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 import { pane, remove, sessions, split, type Direction, type LayoutNode } from './layout';
 
 let nextKey = 0;

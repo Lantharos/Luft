@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import * as api from '$lib/api';
-	import Icon, { type IconName } from '$lib/components/Icon.svelte';
-	import { showPathProperties } from '$lib/features/actions';
-	import { dialogs } from '$lib/features/dialogs.svelte';
-	import * as bookmarks from '$lib/file-manager/places/bookmarks';
-	import type { FileManager, PlaceMenuState, SidebarPlace } from '$lib/file-manager/manager.svelte';
-	import type { TrashCounter } from '$lib/file-manager/places/places.svelte';
-	import { setPlaceHidden } from '$lib/state/settings.svelte';
+	import * as api from '#lib/api.js';
+	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import { showPathProperties } from '#lib/features/actions.js';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
+	import type { FileManager, PlaceMenuState, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
+	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
+	import { setPlaceHidden } from '#lib/state/settings.svelte.js';
 
 	interface Props {
 		menu: PlaceMenuState;

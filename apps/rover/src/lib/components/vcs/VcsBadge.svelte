@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { statusMarker } from '$lib/vcs/format';
-	import type { VcsFileStatus } from '$lib/vcs/types';
+	import { statusMarker } from '#lib/vcs/format.js';
+	import type { VcsFileStatus } from '#lib/vcs/types.js';
 
 	interface Props {
 		status: VcsFileStatus | null;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, SearchField } from '@luft/ui';
 	import type { Source } from './sources';
 
 	interface Props {
@@ -13,7 +13,7 @@
 	let { sources, onadd, onclose }: Props = $props();
 
 	let query = $state('');
-	let selected = $state<Source | null>(null);
+	let selected = $state.raw<Source | null>(null);
 	let list = $state<HTMLDivElement>();
 
 	let results = $derived.by(() => {
@@ -38,8 +38,8 @@
 </script>
 
 <Dialog title="Add an input source" description="Pick the keyboard layout or input method you want to type with." {onclose}>
-	<input class="text-field" bind:value={query} placeholder="Search languages, layouts and input methods" onkeydown={keydown} />
-	<div bind:this={list} class="soft-scroll -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label="Input sources">
+	<SearchField label="Search languages, layouts and input methods" bind:value={query} onkeydown={keydown} />
+	<div bind:this={list} class="hidden-scroll scroll-fade -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label="Input sources">
 		{#each results as source (`${source.type}:${source.id}`)}
 			<button
 				type="button"

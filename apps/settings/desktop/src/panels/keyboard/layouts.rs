@@ -6,6 +6,7 @@ use roxmltree::{Document, Node, ParsingOptions};
 use serde::Serialize;
 
 const RULES: &str = "/usr/share/X11/xkb/rules/evdev.xml";
+const EMPTY_PLACEHOLDER: &str = "custom";
 
 static LAYOUTS: OnceLock<Vec<Layout>> = OnceLock::new();
 
@@ -73,7 +74,11 @@ fn user_rules() -> Option<PathBuf> {
 }
 
 pub fn all() -> Vec<Layout> {
-    let system = LAYOUTS.get_or_init(|| parse(Path::new(RULES), false));
+    let system = LAYOUTS.get_or_init(|| {
+        let mut layouts = parse(Path::new(RULES), false);
+        layouts.retain(|layout| layout.id != EMPTY_PLACEHOLDER);
+        layouts
+    });
     let mut layouts = user_rules()
         .map(|rules| parse(&rules, true))
         .unwrap_or_default();

@@ -85,7 +85,7 @@
 		<div class="flex flex-col gap-2">
 			<span class="px-1 text-[13px] text-[var(--text-soft)]">Start from</span>
 			<SearchField label="Search layouts" bind:value={query} />
-			<VirtualScroller bind:this={list} class="soft-scroll h-[260px]" items={results} key={(choice) => choice.key} layout={{ itemHeight: 36, gap: 2 }}>
+			<VirtualScroller bind:this={list} class="hidden-scroll scroll-fade h-[260px]" items={results} key={(choice) => choice.key} layout={{ itemHeight: 36, gap: 2 }}>
 				{#snippet children(choice)}
 					<button type="button" class="option" aria-selected={chosen?.key === choice.key} role="option" onclick={() => (chosen = choice)} ondblclick={() => void create()}>
 						<span class="truncate">{choice.name}</span>

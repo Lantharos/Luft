@@ -8,6 +8,8 @@ use serde::Serialize;
 
 use crate::paths;
 
+const EMPTY_PLACEHOLDER: &str = "custom";
+
 static SYSTEM: OnceLock<Vec<Entry>> = OnceLock::new();
 
 #[derive(Serialize, Clone)]
@@ -83,6 +85,7 @@ fn parse(path: &Path, variants: bool) -> Vec<Entry> {
 pub fn system() -> &'static [Entry] {
     SYSTEM.get_or_init(|| {
         let mut entries = parse(&Path::new(paths::SYSTEM_XKB).join("rules/evdev.xml"), true);
+        entries.retain(|entry| entry.id != EMPTY_PLACEHOLDER);
         entries.sort_by(|left, right| left.name.cmp(&right.name));
         entries
     })

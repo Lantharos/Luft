@@ -77,7 +77,7 @@
 				<span class="truncate">The {named.keysym} key</span>
 			</button>
 		{/if}
-		<VirtualScroller class="soft-scroll h-[240px]" items={results} key={(character) => character.text} layout={{ itemHeight: 40, gap: 2 }}>
+		<VirtualScroller class="hidden-scroll scroll-fade h-[240px]" items={results} key={(character) => character.text} layout={{ itemHeight: 40, gap: 2 }}>
 			{#snippet children(character)}
 				<button type="button" class="option" onclick={() => void pickText(character.text)}>
 					<span class="glyph">{character.text}</span>

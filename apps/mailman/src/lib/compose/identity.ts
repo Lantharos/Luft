@@ -29,7 +29,15 @@ function sameDomain(identity: Identity, address: string) {
 	return split(identity.address).domain === split(address).domain;
 }
 
+export function ownIdentity(address: string, identities: Identity[]): Sending | null {
+	const lower = address.toLowerCase();
+	const found = identities.find((identity) => identity.address === lower) ?? identities.find((identity) => wildcard(identity, lower));
+	return found ? { identity: found, from: found.address.startsWith('*@') ? lower : null } : null;
+}
+
 export function sendingFor(message: Message, identities: Identity[]): Sending | null {
+	const own = ownIdentity(message.sender, identities);
+	if (own) return own;
 	const recipients = [...message.recipients.to, ...message.recipients.cc, ...(message.recipients.delivered ?? [])].map((address) => address.address.toLowerCase());
 	const ranked = [...identities].sort((a, b) => Number(b.account === message.account) - Number(a.account === message.account));
 	for (const address of recipients) {

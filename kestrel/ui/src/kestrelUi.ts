@@ -39,6 +39,7 @@ import { PasskeyPrompts } from './passkeys/service.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
 import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
 import { LoginDisplays } from './session/loginScreen/displays.js';
+import { LockControls } from './lockScreen/controls.js';
 import { LoginNumLock } from './session/loginScreen/numLock.js';
 import { Farewell } from './session/farewell.js';
 import type { Rgb } from './appearance/color.js';
@@ -121,10 +122,6 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
 
-    const panelParent = context.layoutManager.panelBox.get_parent()!;
-    context.layoutManager.removeChrome(context.layoutManager.panelBox);
-    panelParent.insert_child_at_index(context.layoutManager.panelBox, 0);
-    context.layoutManager.panelBox.hide();
     this.panels = new PanelSet(context.layoutManager, monitor => ({
       start: () => this.toggle('start', monitor()),
       quickSettings: () => this.toggle('quick', monitor()),
@@ -251,6 +248,10 @@ class KestrelUi {
       this.closingSelections.get(actor)?.();
       this.closingSelections.delete(actor);
     }
+  }
+
+  lockControls(): LockControls {
+    return new LockControls(this.context.layoutManager, (x, y) => this.monitorAt(x, y));
   }
 
   private monitorAt(x: number, y: number): Monitor | null {
@@ -508,3 +509,5 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
+
+export function lockControls(): LockControls { return currentUi!.lockControls(); }

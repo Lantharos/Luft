@@ -21,7 +21,6 @@ import * as Keyboard from './keyboard.js';
 import * as InputSources from './status/keyboard.js';
 import * as KestrelUi from './kestrelUi.js';
 import * as OsdWindow from './osdWindow.js';
-import * as Panel from './panel.js';
 import * as Layout from './layout.js';
 import * as NotificationDaemon from './notificationDaemon.js';
 import * as Screenshot from './screenshot.js';
@@ -41,7 +40,6 @@ const LOG_DOMAIN = 'Kestrel';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
 export let componentManager = null;
-export let panel = null;
 export let wm = null;
 export let messageTray = null;
 export let screenShield = null;
@@ -248,7 +246,6 @@ async function _initializeUI() {
     brightnessDBus = new ShellDBus.BrightnessDBus(brightnessManager);
 
     messageTray = new MessageTray.MessageTray();
-    panel = new Panel.Panel();
     keyboard = new Keyboard.KeyboardManager();
     InputSources.getInputSourceManager().reload();
     notificationDaemon = new NotificationDaemon.NotificationDaemon();

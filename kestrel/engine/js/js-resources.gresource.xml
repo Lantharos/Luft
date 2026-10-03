@@ -73,9 +73,7 @@
     <file>ui/notificationDaemon.js</file>
     <file>ui/osdWindow.js</file>
     <file>ui/pageIndicators.js</file>
-    <file>ui/panel.js</file>
     <file>ui/desktopControls.js</file>
-    <file>ui/panelMenu.js</file>
     <file>ui/pointerA11yTimeout.js</file>
     <file>ui/popupMenu.js</file>
     <file>ui/quickSettings.js</file>
@@ -109,7 +107,6 @@
     <file>ui/components/networkAgent.js</file>
     <file>ui/components/polkitAgent.js</file>
 
-    <file>ui/status/accessibility.js</file>
     <file>ui/status/autoRotate.js</file>
     <file>ui/status/backlight.js</file>
     <file>ui/status/bluetooth.js</file>
@@ -118,18 +115,14 @@
     <file>ui/status/bluetooth/reconnect.js</file>
     <file>ui/status/brightness.js</file>
     <file>ui/status/caffeine.js</file>
-    <file>ui/status/camera.js</file>
     <file>ui/status/darkMode.js</file>
     <file>ui/status/doNotDisturb.js</file>
-    <file>ui/status/dwellClick.js</file>
     <file>ui/status/keyboard.js</file>
     <file>ui/status/location.js</file>
     <file>ui/status/network.js</file>
     <file>ui/status/nightLight.js</file>
     <file>ui/status/powerProfiles.js</file>
-    <file>ui/status/remoteAccess.js</file>
     <file>ui/status/rfkill.js</file>
-    <file>ui/status/system.js</file>
     <file>ui/status/thunderbolt.js</file>
     <file>ui/status/volume.js</file>
   </gresource>

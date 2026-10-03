@@ -1,6 +1,9 @@
 declare module 'resource:///com/lantharos/kestrel/misc/systemActions.js' {
   import GObject from 'gi://GObject';
   interface Actions extends GObject.Object {
+    readonly canSuspend: boolean;
+    readonly canRestart: boolean;
+    readonly canPowerOff: boolean;
     activateLockScreen(): void;
     activateSuspend(): void;
     activateLogout(): void;

@@ -25,12 +25,6 @@ const _modes = {
         isPrimary: false,
         unlockDialog: null,
         components: [],
-        panel: {
-            left: [],
-            center: [],
-            right: [],
-        },
-        panelStyle: null,
     },
 
     'greeter': {
@@ -42,12 +36,6 @@ const _modes = {
         isLocked: true,
         unlockDialog: undefined,
         components: ['networkAgent', 'polkitAgent'],
-        panel: {
-            left: [],
-            center: [],
-            right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
-        },
-        panelStyle: 'unlock-screen',
     },
 
     'user': {
@@ -61,11 +49,6 @@ const _modes = {
         isPrimary: true,
         unlockDialog: UnlockDialog,
         components: USER_SESSION_COMPONENTS,
-        panel: {
-            left: [],
-            center: [],
-            right: [],
-        },
     },
 };
 

@@ -423,9 +423,9 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-greeter-user-content { spacing: 12px; }
 .kestrel-greeter-user-name { font-size: 14px; font-weight: 500; }
 .kestrel-greeter-avatar { width: 32px; height: 32px; border-radius: 999px; background-size: cover; background-color: rgba(255, 255, 255, 0.12); }
-.kestrel-greeter-controls { spacing: 2px; margin: 28px; }
-.kestrel-greeter-control { color: rgba(255, 255, 255, 0.86); }
-.kestrel-greeter-session-label { font-size: 13px; font-weight: 500; }
+.kestrel-login-controls { spacing: 2px; margin: 28px; }
+.kestrel-login-control { color: rgba(255, 255, 255, 0.86); }
+.kestrel-login-label { font-size: 13px; font-weight: 500; }
 .message-header, .message-content, .notification-buttons-bin { background-color: transparent; }
 .screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 999px; }

@@ -27,7 +27,7 @@ The GNOME overview, its app grid, dash, window picker, and search providers are 
 
 The shell ships Open Runde and registers it for its own UI at startup; applications keep the system fonts. Shell text keeps fractional glyph advances instead of rounding each letter to whole pixels, so spacing matches GTK 4 apps.
 
-Desktop Quick Settings owns only the device controls used by Kestrel. It does not construct a second native Quick Settings menu or duplicate microphone slider. The retained session panel supplies login and lock-screen controls; the desktop does not populate it.
+Desktop Quick Settings owns only the device controls used by Kestrel. It does not construct a second native Quick Settings menu or duplicate microphone slider. GNOME's top bar is not part of Kestrel; the login and lock screens have their own controls.
 
 GNOME’s calendar server integration, event list, world clocks, weather integration, GNOME welcome tour, break reminders, and unused status tiles have been removed with their resources. Local AccountsService integration remains for the login screen, unlocking, and the Start avatar. Authentication, location permission prompts, Thunderbolt authorization, accessibility, screenshots, and screen sharing retain their system backends.
 
@@ -127,6 +127,8 @@ The settings are kept by `kestrel-greeter-service`, which answers on the system 
 The lock screen checks passwords itself through `kestrel-authenticate`, a small system service that speaks greetd's protocol, so the lock screen and login screen share the same prompt. `kestrel-authenticate.socket` listens on `/run/kestrel/authenticate` and starts a separate copy of `kestrel-authenticate@.service` for each connection. Each copy asks who connected and only checks that person's own account, using Kestrel's own sign-in rules: `kestrel-unlock` for passwords and `kestrel-unlock-fingerprint` for fingerprints. It runs with the same restrictions as polkit's helper: it can reach other programs through local sockets, but nothing on the network, and it can't change anything on disk. When the lock screen moves on, for example after a password works, the copy that was still waiting for a finger ends right away and lets go of the fingerprint reader.
 
 When fingers are enrolled, the fingerprint reader listens while the password field is shown. Its instructions appear as a quiet line under the field, a finger it doesn't recognize says so, and a recognized finger unlocks the session just like the right password. Typing a password never waits for the reader, and a wrong password leaves the reader listening. Without a reader or enrolled fingers, the lock screen doesn't mention fingerprints at all.
+
+Like the login screen, the lock screen shows its controls at the bottom right once you wake it: the battery on portable computers, the keyboard layout when there is more than one, accessibility, and power. Accessibility turns the screen reader, zoom, the on-screen keyboard, high contrast, dwell click, and larger text on or off. Power offers Suspend, and Restart and Power off when the computer allows them while locked; those ask first, as they do on the desktop.
 
 greetd runs one session at a time, so the lock screen has no Switch User.
 

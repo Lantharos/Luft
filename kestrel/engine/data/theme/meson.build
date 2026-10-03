@@ -18,7 +18,6 @@ theme_sources = files([
   'sass/widgets/_misc.scss',
   'sass/widgets/_notifications.scss',
   'sass/widgets/_osd.scss',
-  'sass/widgets/_panel.scss',
   'sass/widgets/_popovers.scss',
   'sass/widgets/_quick-settings.scss',
   'sass/widgets/_screenshot.scss',

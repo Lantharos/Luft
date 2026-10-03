@@ -74,13 +74,6 @@
   // font-size: round($size) + pt;
 }
 
-// Function to fill the background of a panel button
-@mixin panel_button_fill($bg) {
-  // use a box-shadow to fill the background
-  // this is done because panel buttons use a transparent border to fake padding
-  box-shadow: inset 0 0 0 100px $bg;
-}
-
 // Text entries drawing function
 @mixin entry($type, $c:$fg_color, $bc:$bg_color, $style: null, $always_dark: false) {
   //
@@ -392,84 +385,4 @@
   &:active { @include button(active, $c:$bg, $style: flat);}
   &:hover, &:selected, &:checked { @include button(hover, $c:$bg, $style: flat);}
   &:insensitive { @include button(insensitive, $c:$bg, $style: flat);}
-}
-
-// Panel menu/button drawing function
-@mixin panel_button($bg:$panel_fg_color, $fg:$panel_fg_color, $style: null, $highlighted_child: false, $child_class:"") {
-  //
-  // $bg:                 background color, derived from $panel_fg_color
-  // $fg:                 foreground color, also derived from $panel_fg_color
-  // $style:              can be set to 'filled' if button uses a colored background
-  //
-  // $highlighted_child:  if true, applies some special overrides for to a
-  //                      child element, see _panel.scss for details
-  // $child_class:        class name of the child element
-  //
-
-  transition-duration: 150ms;
-  border: 3px solid transparent;
-  background-color: transparent;
-  border-radius: $forced_circular_radius;
-
-  font-weight: bold;
-  color: $fg;
-
-  // background fill defines
-  $fill:              transparent;
-  $hover_fill:        transparentize($fg, .83);
-  $active_fill:       transparentize($fg, .72);
-  $active_hover_fill: transparentize($fg, .68);
-
-  @if $style == 'filled' {
-    $fill:              $bg;
-    $hover_fill:        if($variant == 'light', darken($bg, 5%), lighten($bg, 5%));
-    $active_fill:       if($variant == 'light', darken($bg, 9%), lighten($bg, 9%));
-    $active_hover_fill: if($variant == 'light', darken($bg, 11%), lighten($bg, 11%));
-  }
-
-  @include panel_button_fill($fill);
-
-  &:focus, &:hover {
-    @include panel_button_fill($hover_fill);
-  }
-
-  &:active, &:checked  {
-    @include panel_button_fill($active_fill);
-
-    &:hover{
-      @include panel_button_fill($active_hover_fill);
-    }
-  }
-
-  // some overrides to style a child element
-  @if $highlighted_child {
-
-    // remove the common styles from the parent
-    background: none !important;
-    box-shadow: none !important;
-    border: none !important;
-
-    // add them to the child
-    #{$child_class} {
-      transition-duration: 150ms;
-      border: 3px solid transparent;
-      border-radius: $forced_circular_radius;
-    }
-
-    &:focus, &:hover {
-      #{$child_class} {
-        @include panel_button_fill($hover_fill);
-      }
-    }
-
-    &:active, &:checked {
-      #{$child_class} {
-        @include panel_button_fill($active_fill);
-
-        &:hover {
-          @include panel_button_fill($active_hover_fill);
-        }
-      }
-    }
-  }
 }

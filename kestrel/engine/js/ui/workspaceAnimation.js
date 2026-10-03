@@ -227,15 +227,6 @@ export const MonitorGroup = GObject.registerClass({
 
         for (const i of workspaceIndices) {
             const ws = workspaceManager.get_workspace_by_index(i);
-            const fullscreen = ws.list_windows().some(w => w.get_monitor() === monitor.index && w.is_fullscreen());
-
-            if (i > 0 && vertical && !fullscreen && monitor.index === Main.layoutManager.primaryIndex) {
-                // We have to shift windows up or down by the height of the panel to prevent having a
-                // visible gap between the windows while switching workspaces. Since fullscreen windows
-                // hide the panel, they don't need to be shifted up or down.
-                y -= Main.panel.height;
-            }
-
             const group = new WorkspaceGroup(ws, monitor, movingWindow);
 
             this._workspaceGroups.push(group);

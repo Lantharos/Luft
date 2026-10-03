@@ -698,10 +698,7 @@ export class PopupMenuBase extends Signals.EventEmitter {
     }
 
     addSettingsAction(title, page) {
-        const menuItem = this.addAction(title, () => {
-            Main.panel.closeQuickSettings();
-            Util.openSettings(page);
-        });
+        const menuItem = this.addAction(title, () => Util.openSettings(page));
 
         menuItem.visible = Main.sessionMode.allowSettings;
         this._settingsActions.push(menuItem);

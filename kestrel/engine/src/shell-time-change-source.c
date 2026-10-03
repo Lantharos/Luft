@@ -88,12 +88,7 @@ shell_time_change_source_dispatch (GSource     *source,
 
   if (callback (user_data))
     {
-      /* The timerfd_settime() call can’t really fail in this situation.
-       * The man page says it can return ECANCELED, but will still be re-armed. */
-      int retval = arm_timerfd (self->fd);
-      int errsv = errno;
-      g_assert (retval == 0 ||
-                (retval < 0 && errsv == ECANCELED));
+      arm_timerfd (self->fd);
 
       return G_SOURCE_CONTINUE;
     }

@@ -436,7 +436,7 @@ index 9e16b2682ab6db61106a6b1cd86b9d6691d3fda5..ac370b22aa8f89425efe8f2e702282f1
        get_shape_bounds (actor_x11, &shape_bounds);
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..59d73d8c92cb0e072b76a85f1867a18c4d043334
+index 0000000000000000000000000000000000000000..7c40b1c34bc038d2068a050b85fe02020fa1e1a0
 --- /dev/null
 +++ b/src/compositor/meta-window-corners.c
 @@ -0,0 +1,261 @@
@@ -669,10 +669,10 @@ index 0000000000000000000000000000000000000000..59d73d8c92cb0e072b76a85f1867a18c
 +  for (int i = 0; i < 4; i++)
 +    {
 +      MtkRectangle rect = {
-+        .x = floorf (positions[i][0]),
-+        .y = floorf (positions[i][1]),
-+        .width = ceilf (positions[i][2]) - floorf (positions[i][0]),
-+        .height = ceilf (positions[i][3]) - floorf (positions[i][1]),
++        .x = (int) floorf (positions[i][0]),
++        .y = (int) floorf (positions[i][1]),
++        .width = (int) (ceilf (positions[i][2]) - floorf (positions[i][0])),
++        .height = (int) (ceilf (positions[i][3]) - floorf (positions[i][1])),
 +      };
 +      mtk_region_subtract_rectangle (region, &rect);
 +    }

@@ -13,8 +13,6 @@ import 'gi://Gio?version=2.0';
 import 'gi://GioUnix?version=2.0';
 import 'gi://GDesktopEnums?version=3.0';
 import 'gi://GdkPixbuf?version=2.0';
-import 'gi://GnomeBG?version=4.0';
-import 'gi://GnomeDesktop?version=4.0';
 import 'gi://Graphene?version=1.0';
 import 'gi://GUdev?version=1.0';
 import 'gi://IBus?version=1.0';
@@ -38,12 +36,6 @@ gi.require('St', Config.LIBMUTTER_API_VERSION);
 /**
  * Compile-time optional dependencies
  */
-
-if (Config.HAVE_BLUETOOTH)
-    gi.require('GnomeBluetooth', '3.0');
-else
-    console.debug('GNOME Shell was compiled without GNOME Bluetooth support');
-
 
 if (Config.HAVE_NETWORKMANAGER) {
     gi.require('NM', '1.0');

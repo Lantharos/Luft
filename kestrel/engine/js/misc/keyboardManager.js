@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import GnomeDesktop from 'gi://GnomeDesktop';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import * as Signals from './signals.js';
 
@@ -11,27 +11,62 @@ export const DEFAULT_VARIANT = '';
 
 const USER_LAYOUT_FOLDERS = ['symbols', 'rules'];
 const USER_LAYOUT_SETTLE_MS = 250;
+const LOCALE_PATTERN = /^([A-Za-z][a-z]{0,2})(?:_([A-Z]{2}))?(?:\.[A-Za-z0-9][A-Za-z0-9-]*)?(?:@[a-z]*)?$/;
+const LOCALE_LAYOUTS = new Map([
+    ['ar_DZ', 'ara+azerty'],
+    ['ast_ES', 'es+ast'],
+    ['az_AZ', 'az'],
+    ['be_BY', 'by'],
+    ['bg_BG', 'bg+phonetic'],
+    ['cat_ES', 'es+cat'],
+    ['cs_CZ', 'cz'],
+    ['de_CH', 'ch'],
+    ['de_DE', 'de'],
+    ['el_CY', 'gr'],
+    ['el_GR', 'gr'],
+    ['en_GB', 'gb'],
+    ['en_US', 'us'],
+    ['en_ZA', 'za'],
+    ['es_ES', 'es'],
+    ['es_GT', 'latam'],
+    ['es_MX', 'latam'],
+    ['es_US', 'us+intl'],
+    ['fr_BE', 'be'],
+    ['fr_CH', 'ch+fr'],
+    ['fr_FR', 'fr+oss'],
+    ['gl_ES', 'es'],
+    ['he_IL', 'il'],
+    ['id_ID', 'us'],
+    ['it_IT', 'it'],
+    ['nl_NL', 'us+altgr-intl'],
+    ['pl_PL', 'pl'],
+    ['pt_BR', 'br'],
+    ['pt_PT', 'pt'],
+    ['ru_RU', 'ru'],
+    ['sk_SK', 'sk'],
+    ['tr_TR', 'tr'],
+]);
 
 let _xkbInfo = null;
 
 /**
- * @returns {GnomeDesktop.XkbInfo}
+ * @returns {Shell.XkbInfo}
  */
 export function getXkbInfo() {
     if (_xkbInfo == null)
-        _xkbInfo = new GnomeDesktop.XkbInfo();
+        _xkbInfo = new Shell.XkbInfo();
     return _xkbInfo;
 }
 
 /**
- * @param {(xkbInfo: GnomeDesktop.XkbInfo) => void} callback
+ * @param {(xkbInfo: Shell.XkbInfo) => void} callback
  * @returns {Gio.FileMonitor[]}
  */
 export function watchUserLayouts(callback) {
     let pending = 0;
     const settled = () => {
         pending = 0;
-        _xkbInfo = new GnomeDesktop.XkbInfo();
+        _xkbInfo = new Shell.XkbInfo();
         callback(_xkbInfo);
         return GLib.SOURCE_REMOVE;
     };
@@ -198,7 +233,7 @@ class KeyboardManager extends Signals.EventEmitter {
     }
 
     /**
-     * @param {GnomeDesktop.XkbInfo} xkbInfo
+     * @param {Shell.XkbInfo} xkbInfo
      */
     reloadLayouts(xkbInfo) {
         this._xkbInfo = xkbInfo;
@@ -257,12 +292,9 @@ class KeyboardManager extends Signals.EventEmitter {
         if (!locale.includes('_'))
             locale = DEFAULT_LOCALE;
 
-        let [found, , id] = GnomeDesktop.get_input_source_from_locale(locale);
-        if (!found)
-            [, , id] = GnomeDesktop.get_input_source_from_locale(DEFAULT_LOCALE);
-
-        let layout, variant;
-        [found, , , layout, variant] = this._xkbInfo.get_layout_info(id);
+        const [, language, country] = LOCALE_PATTERN.exec(locale) ?? [];
+        const id = LOCALE_LAYOUTS.get(`${language}_${country}`) ?? LOCALE_LAYOUTS.get(DEFAULT_LOCALE);
+        const [found, , , layout, variant] = this._xkbInfo.get_layout_info(id);
         if (found)
             return {layout, variant};
         else

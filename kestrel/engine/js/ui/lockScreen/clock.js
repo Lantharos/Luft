@@ -1,10 +1,11 @@
 import Clutter from 'gi://Clutter';
-import GnomeDesktop from 'gi://GnomeDesktop';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import {formatDateWithCFormatString} from '../../misc/dateUtils.js';
+import {timeFormat} from '../../misc/timeFormats.js';
+import {WallClock} from '../../misc/wallClock.js';
 
 const HINT_TIMEOUT = 4;
 const CROSSFADE_TIME = 300;
@@ -35,9 +36,6 @@ class LockClock extends St.BoxLayout {
         this.add_child(this._date);
         this.add_child(this._hint);
 
-        this._wallClock = new GnomeDesktop.WallClock({time_only: true});
-        this._wallClock.connect('notify::clock', this._updateClock.bind(this));
-
         this._seat = this.get_context().get_backend().get_default_seat();
         this._seat.connectObject('notify::touch-mode', this._updateHint.bind(this), this);
 
@@ -49,17 +47,17 @@ class LockClock extends St.BoxLayout {
             this._hint.ease({opacity: 255, duration: CROSSFADE_TIME});
         });
 
-        this._updateClock();
+        this._wallClock = new WallClock(this._updateClock.bind(this));
         this._updateHint();
 
         this.connect('destroy', () => {
-            this._wallClock.run_dispose();
+            this._wallClock.destroy();
             this._idleMonitor.remove_watch(this._idleWatchId);
         });
     }
 
-    _updateClock() {
-        this._time.text = this._wallClock.clock.trim();
+    _updateClock(now, clock) {
+        this._time.text = now.format(timeFormat(clock.twelveHour, clock.showSeconds)).trim();
         const dateFormat = Shell.util_translate_time_string(N_('%A %B %-d'));
         this._date.text = formatDateWithCFormatString(new Date(), dateFormat);
     }

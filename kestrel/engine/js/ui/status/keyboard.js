@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import GnomeDesktop from 'gi://GnomeDesktop';
 import GObject from 'gi://GObject';
 import IBus from 'gi://IBus';
 import Meta from 'gi://Meta';
@@ -13,6 +12,7 @@ import * as Signals from '../../misc/signals.js';
 
 import * as IBusManager from '../../misc/ibusManager.js';
 import * as KeyboardManager from '../../misc/keyboardManager.js';
+import {getLanguageName} from '../../misc/languages.js';
 import * as Main from '../main.js';
 import * as PopupMenu from '../popupMenu.js';
 import * as PanelMenu from '../panelMenu.js';
@@ -608,7 +608,7 @@ export class InputSourceManager extends Signals.EventEmitter {
                 const engineDesc = this._ibusManager.getEngineDesc(id);
                 if (engineDesc) {
                     const code = engineDesc.get_language();
-                    const language = GnomeDesktop.get_language_from_code(code.split('_')[0], null) ?? code;
+                    const language = getLanguageName(code.split('_')[0]) ?? code;
                     let longName = engineDesc.get_longname();
                     const textdomain = engineDesc.get_textdomain();
                     if (textdomain !== '')

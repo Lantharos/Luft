@@ -32,9 +32,6 @@
 #include <meta/meta-x11-display.h>
 #endif
 
-#define GNOME_DESKTOP_USE_UNSTABLE_API
-#include <libgnome-desktop/gnome-systemd.h>
-
 #if defined __OpenBSD__ || defined __FreeBSD__
 #include <sys/sysctl.h>
 #endif
@@ -42,6 +39,7 @@
 #include "shell-enum-types.h"
 #include "shell-global-private.h"
 #include "shell-perf-log.h"
+#include "shell-systemd.h"
 #include "shell-window-tracker.h"
 #include "shell-app-usage.h"
 #include "shell-app-cache-private.h"
@@ -1199,12 +1197,7 @@ shell_global_app_launched_cb (GAppLaunchContext *context,
   if (app_name == NULL)
     app_name = g_app_info_get_executable (info);
 
-  /* Start async request; we don't care about the result */
-  gnome_start_systemd_scope (app_name,
-                             pid,
-                             NULL,
-                             NULL,
-                             NULL, NULL, NULL);
+  shell_systemd_start_app_scope (app_name, pid);
 }
 
 /**

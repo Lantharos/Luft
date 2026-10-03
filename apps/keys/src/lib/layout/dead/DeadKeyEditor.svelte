@@ -5,7 +5,7 @@
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyHeader from './DeadKeyHeader.svelte';
 	import PairGrid from './PairGrid.svelte';
-	import { placeName } from './table';
+	import { whereIs } from './table';
 	import TryDeadKey from './TryDeadKey.svelte';
 
 	interface Props {
@@ -16,7 +16,7 @@
 	let { editor, key }: Props = $props();
 
 	let places = $derived(editor.placesOf(key.keysym));
-	let where = $derived(places.length ? places.map((place) => placeName(place.key, editor.levels(place.key), place.level)).join(', ') : 'Not on a key yet');
+	let where = $derived(whereIs(editor.layout.keys, key.keysym));
 
 	function putOnKey() {
 		editor.placing = key.keysym;

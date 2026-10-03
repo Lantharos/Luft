@@ -43,15 +43,32 @@ export function typeAfter(key: DeadKey, character: string, all: DeadKey[]): Type
 	return { text: key.spacing + character, pending: null };
 }
 
+const POSITIONS = ['below', 'above'];
+const PREFIXES = ['double', 'inverted', 'reversed'];
+
+function split(word: string): string[] {
+	const position = POSITIONS.find((candidate) => word.startsWith(candidate) && word.length > candidate.length);
+	if (position) return [...split(word.slice(position.length)), position];
+	const prefix = PREFIXES.find((candidate) => word.startsWith(candidate) && word.length > candidate.length);
+	return prefix ? [prefix, ...split(word.slice(prefix.length))] : [word];
+}
+
 export function standardName(keysym: string) {
-	const name = keysym.replace(/^dead_/, '').replaceAll('_', ' ');
+	const name = keysym.replace(/^dead_/, '').split('_').flatMap(split).join(' ');
 	return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-const LEVEL_PREFIX = ['On', 'With Shift on', 'With AltGr on', 'With Shift and AltGr on'];
+const LEVEL_PREFIX = ['on', 'with Shift on', 'with AltGr on', 'with Shift and AltGr on'];
 
-export function placeName(key: string, levels: Levels, level: number) {
+function placeName(key: string, levels: Levels, level: number) {
 	const base = levels[0];
-	const label = base.kind === 'character' && base.text.trim() ? base.text.toUpperCase() : (US_LABELS[key] ?? key);
+	const label = base.kind !== 'empty' && base.kind !== 'function' && base.text.trim() ? base.text.toUpperCase() : (US_LABELS[key] ?? key);
 	return `${LEVEL_PREFIX[level]} the ${label} key`;
+}
+
+export function whereIs(keys: Record<string, Levels>, keysym: string) {
+	const phrases = placements(keys, keysym).map((place) => placeName(place.key, keys[place.key], place.level));
+	if (!phrases.length) return 'Not on a key yet';
+	const sentence = phrases.length === 1 ? phrases[0] : `${phrases.slice(0, -1).join(', ')} and ${phrases.at(-1)}`;
+	return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }

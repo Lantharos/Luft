@@ -43,14 +43,16 @@
 		{#if symbol.kind !== 'empty'}
 			<span class="glyph single" class:inherited={layered !== layer} class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
 		{/if}
-	{:else if capital}
-		<span class="glyph capital {emphasis(0, 1)}">{shift.text}</span>
 	{:else}
-		{@render glyph(1, 'top-left')}
-		{@render glyph(0, 'bottom-left')}
+		{#if capital}
+			<span class="glyph capital {emphasis(0, 1)}">{shift.text}</span>
+		{:else}
+			{@render glyph(1, 'top-left')}
+			{@render glyph(0, 'bottom-left')}
+		{/if}
+		{@render glyph(3, 'top-right')}
+		{@render glyph(2, 'bottom-right')}
 	{/if}
-	{@render glyph(3, 'top-right')}
-	{@render glyph(2, 'bottom-right')}
 </button>
 
 <style>

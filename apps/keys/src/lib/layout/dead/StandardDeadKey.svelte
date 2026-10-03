@@ -4,7 +4,7 @@
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyHeader from './DeadKeyHeader.svelte';
 	import PairGrid from './PairGrid.svelte';
-	import { placeName, standardName } from './table';
+	import { standardName, whereIs } from './table';
 
 	interface Props {
 		editor: LayoutEditor;
@@ -14,12 +14,7 @@
 	let { editor, symbol }: Props = $props();
 
 	let table = $state<DeadKey | null>(null);
-	let where = $derived(
-		editor
-			.placesOf(symbol.keysym)
-			.map((place) => placeName(place.key, editor.levels(place.key), place.level))
-			.join(', ')
-	);
+	let where = $derived(whereIs(editor.layout.keys, symbol.keysym));
 
 	onMount(() => {
 		void systemTable(symbol.keysym).then(({ spacing, pairs }) => {

@@ -161,6 +161,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
             |_: Value| -> Result<&'static [Entry], String> { Ok(registry::system()) },
         )
         .command("layout_open", |Id { id }| store::open(&id))
+        .command("layout_view", |Id { id }| store::view(&id))
         .command("layout_create", |Create { name, from }| {
             store::create_from(&name, from)
         })

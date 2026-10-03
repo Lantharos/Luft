@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { tooltip } from '@luft/ui';
-	import { app, type Selection } from '$lib/state/app.svelte';
+	import { app } from '$lib/state/app.svelte';
 
 	interface Item {
 		id: string;
@@ -12,12 +12,14 @@
 	let layouts = $derived(app.layouts.map((layout) => ({ id: layout.id, name: layout.name, mark: layout.short })));
 	let methods = $derived(app.methods.map((method) => ({ id: method.id, name: method.name, mark: method.label })));
 
-	function active(kind: Selection['kind'], id: string) {
+	type Kind = 'layout' | 'method';
+
+	function active(kind: Kind, id: string) {
 		return app.selection?.kind === kind && app.selection.id === id;
 	}
 </script>
 
-{#snippet group(title: string, kind: Selection['kind'], items: Item[], empty: string, add: string)}
+{#snippet group(title: string, kind: Kind, items: Item[], empty: string, add: string)}
 	<section class="flex flex-col gap-0.5">
 		<div class="flex h-8 items-center justify-between pr-1 pl-3">
 			<h2 class="text-[13px] font-medium text-[var(--sidebar-text-muted)]">{title}</h2>

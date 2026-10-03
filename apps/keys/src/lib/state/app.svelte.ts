@@ -6,7 +6,7 @@ import { toast } from './toast.svelte';
 
 const LINK_SCHEME = 'kestrel-keys:';
 
-export type Selection = { kind: 'layout'; id: string } | { kind: 'method'; id: string };
+export type Selection = { kind: 'layout'; id: string } | { kind: 'method'; id: string } | { kind: 'view'; id: string };
 export type Creating = { kind: 'layout'; from: string | null } | { kind: 'method' };
 
 class AppStore {
@@ -15,12 +15,14 @@ class AppStore {
 	sources = $state.raw<Source[]>([]);
 	selection = $state<Selection | null>(null);
 	creating = $state<Creating | null>(null);
+	focused = $state(false);
 
 	async start() {
 		const [state] = await Promise.all([appState(), this.refresh()]);
 		appearance.start(state);
 		this.selection ??= this.first();
 		await this.arrive(state.link ? [state.link, ...state.files] : state.files);
+		this.focused = this.selection?.kind === 'view';
 		onActivated(({ arguments: args }) => void this.arrive(args.slice(1).filter((argument) => !argument.startsWith('-'))));
 		window.addEventListener('focus', () => void this.refreshSources());
 	}
@@ -41,6 +43,7 @@ class AppStore {
 
 	select(selection: Selection | null) {
 		this.selection = selection;
+		this.focused &&= selection?.kind === 'view';
 	}
 
 	first(): Selection | null {
@@ -64,11 +67,11 @@ class AppStore {
 	follow(link: string) {
 		const [path, query = ''] = link.split('?');
 		const [kind, id] = path.split('/');
-		if (kind !== 'layout' && kind !== 'method') return;
-		if (id === 'new') {
+		if (kind !== 'layout' && kind !== 'method' && kind !== 'view') return;
+		if (id === 'new' && kind !== 'view') {
 			this.creating = kind === 'layout' ? { kind, from: new URLSearchParams(query).get('from') } : { kind };
 		} else if (id) {
-			this.selection = { kind, id: decodeURIComponent(id) };
+			this.select({ kind, id: decodeURIComponent(id) });
 		}
 	}
 
@@ -76,7 +79,7 @@ class AppStore {
 		try {
 			const opened = await openFile(path);
 			await this.refresh();
-			this.selection = opened;
+			this.select(opened);
 		} catch (error) {
 			toast.failed(error);
 		}

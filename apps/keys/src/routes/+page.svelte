@@ -9,6 +9,7 @@
 	import Sidebar from '$lib/shell/Sidebar.svelte';
 	import Toast from '$lib/shell/Toast.svelte';
 	import Welcome from '$lib/shell/Welcome.svelte';
+	import LayoutView from '$lib/view/LayoutView.svelte';
 	import { app, type Selection } from '$lib/state/app.svelte';
 
 	onMount(() => {
@@ -27,8 +28,14 @@
 </script>
 
 <GlassShell class="[--sidebar-width:260px]">
-	<Sidebar />
-	{#if app.selection?.kind === 'layout'}
+	{#if !app.focused}
+		<Sidebar />
+	{/if}
+	{#if app.selection?.kind === 'view'}
+		{#key app.selection.id}
+			<LayoutView id={app.selection.id} />
+		{/key}
+	{:else if app.selection?.kind === 'layout'}
 		{#key app.selection.id}
 			<LayoutEditor id={app.selection.id} />
 		{/key}

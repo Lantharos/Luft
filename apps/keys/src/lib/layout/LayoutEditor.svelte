@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
+	import { GEOMETRIES } from '$lib/keyboard/geometry';
+	import Keyboard from '$lib/keyboard/Keyboard.svelte';
 	import Page from '$lib/shell/Page.svelte';
 	import SourceActions from '$lib/shell/SourceActions.svelte';
 	import { app } from '$lib/state/app.svelte';
@@ -8,7 +10,6 @@
 	import { deleteLayout, exportLayout, openLayout, systemLayouts, useLayout } from './api';
 	import { LayoutEditor } from './editor.svelte';
 	import KeyDetails from './KeyDetails.svelte';
-	import Keyboard from './Keyboard.svelte';
 	import LayoutDetails from './LayoutDetails.svelte';
 	import TryLayout from './TryLayout.svelte';
 
@@ -17,12 +18,6 @@
 	}
 
 	let { id }: Props = $props();
-
-	const GEOMETRIES = [
-		{ value: 'ansi' as const, label: 'ANSI' },
-		{ value: 'iso' as const, label: 'ISO' },
-		{ value: 'jis' as const, label: 'JIS' }
-	];
 
 	let editor = $state<LayoutEditor | null>(null);
 	let baseName = $state('');
@@ -77,7 +72,7 @@
 					<Segmented label="Keyboard shape" options={GEOMETRIES} value={current.geometry} onchange={(geometry) => current.setGeometry(geometry)} />
 				</div>
 			</div>
-			<Keyboard bind:this={keyboard} editor={current} onpicked={() => details?.focus()} />
+			<Keyboard bind:this={keyboard} board={current} onpicked={() => details?.focus()} />
 			<KeyDetails bind:this={details} editor={current} onescape={() => keyboard?.focus()} />
 		</section>
 		<section class="flex flex-col gap-2">

@@ -9,6 +9,12 @@ export interface Cap {
 	enter?: boolean;
 }
 
+export const GEOMETRIES = [
+	{ value: 'ansi' as const, label: 'ANSI' },
+	{ value: 'iso' as const, label: 'ISO' },
+	{ value: 'jis' as const, label: 'JIS' }
+];
+
 export const WIDTH = 15;
 export const HEIGHT = 5;
 
@@ -74,6 +80,24 @@ export const CODES: Record<string, string> = {
 	AltRight: 'RALT',
 	CapsLock: 'CAPS'
 };
+
+export const PHYSICAL: Record<string, string> = {
+	...CODES,
+	Backspace: 'BKSP',
+	Tab: 'TAB',
+	Enter: 'RTRN',
+	ControlLeft: 'LCTL',
+	ControlRight: 'RCTL',
+	MetaLeft: 'LWIN',
+	MetaRight: 'RWIN',
+	AltLeft: 'LALT',
+	ContextMenu: 'COMP',
+	NonConvert: 'MUHE',
+	Convert: 'HENK',
+	KanaMode: 'HKTG'
+};
+
+export const TYPING = new Set(['TLDE', ...NUMBERS, 'AE13', ...TOP, 'BKSL', ...HOME, 'LSGT', ...BOTTOM, 'AB11', 'SPCE']);
 
 function row(names: string[], start: number, y: number): Cap[] {
 	return names.map((name, index) => ({ name, x: start + index, y, width: 1 }));

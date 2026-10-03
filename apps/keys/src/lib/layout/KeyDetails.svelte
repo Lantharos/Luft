@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { nameOf } from '$lib/characters/characters';
+	import { describe, LEVEL_NAMES, shown } from '$lib/keyboard/describe';
 	import { describeText, EMPTY, type Symbol } from './api';
 	import type { LayoutEditor } from './editor.svelte';
 	import SymbolPicker from './SymbolPicker.svelte';
@@ -10,9 +10,6 @@
 	}
 
 	let { editor, onescape }: Props = $props();
-
-	const LEVELS = ['Alone', 'With Shift', 'With AltGr', 'With Shift and AltGr'];
-	const DIGITS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
 	let slots = $state<HTMLButtonElement[]>([]);
 	let picking = $state<number | null>(null);
@@ -29,27 +26,6 @@
 
 	export function focus() {
 		slots[editor.level]?.focus();
-	}
-
-	function plainName(text: string) {
-		if (/^[a-z]$/.test(text)) return `Latin small letter ${text}`;
-		if (/^[A-Z]$/.test(text)) return `Latin capital letter ${text}`;
-		if (/^[0-9]$/.test(text)) return `Digit ${DIGITS[Number(text)]}`;
-		return null;
-	}
-
-	async function describe(symbol: Symbol) {
-		if (symbol.kind === 'character') return plainName(symbol.text) ?? (await nameOf(symbol.text)) ?? symbol.keysym.replaceAll('_', ' ');
-		if (symbol.kind === 'dead') return `Dead key, ${symbol.keysym.replace('dead_', '').replaceAll('_', ' ')}`;
-		if (symbol.kind === 'compose') return 'Starts a compose sequence';
-		if (symbol.kind === 'function') return symbol.keysym.replaceAll('_', ' ');
-		return 'Nothing';
-	}
-
-	function shown(symbol: Symbol) {
-		if (symbol.kind === 'compose') return '⎄';
-		if (symbol.kind === 'empty') return '';
-		return symbol.text;
 	}
 
 	function pick(level: number, symbol: Symbol) {
@@ -80,14 +56,14 @@
 			type="button"
 			class="slot"
 			class:current={editor.level === level}
-			aria-label="{LEVELS[level]}: {names[level]}"
+			aria-label="{LEVEL_NAMES[level]}: {names[level]}"
 			onclick={() => {
 				editor.level = level;
 				picking = level;
 			}}
 			onkeydown={(event) => void keydown(event, level)}
 		>
-			<span class="text-[12px] text-[var(--text-muted)]">{LEVELS[level]}</span>
+			<span class="text-[12px] text-[var(--text-muted)]">{LEVEL_NAMES[level]}</span>
 			<span class="glyph" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
 			<span class="truncate text-[12px] text-[var(--text-soft)] first-letter:uppercase">{names[level]}</span>
 		</button>

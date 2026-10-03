@@ -1,21 +1,29 @@
 <script lang="ts">
-	import type { LayoutEditor } from './editor.svelte';
+	import type { Board } from './board';
 	import { caps, CODES, HEIGHT, WIDTH, type Cap } from './geometry';
 	import KeyCap from './KeyCap.svelte';
 
 	interface Props {
-		editor: LayoutEditor;
+		board: Board;
+		level?: number | null;
 		onpicked?: () => void;
+		onlatch?: (name: string) => void;
 	}
 
-	let { editor, onpicked }: Props = $props();
+	let { board, level = null, onpicked, onlatch }: Props = $props();
 
-	let board = $state<HTMLDivElement>();
-	let shown = $derived(caps(editor.geometry));
-	let altGr = $derived(editor.usesThirdLevel);
+	const SHIFTS = ['LFSH', 'RTSH'];
+
+	let element = $state<HTMLDivElement>();
+	let shown = $derived(caps(board.geometry));
+	let altGr = $derived(board.usesThirdLevel);
 
 	export function focus() {
-		board?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus();
+		element?.querySelector<HTMLButtonElement>('.cap[aria-pressed="true"]')?.focus();
+	}
+
+	function latchable(name: string) {
+		return !!onlatch && (SHIFTS.includes(name) || (name === 'RALT' && altGr));
 	}
 
 	function place(cap: Cap) {
@@ -31,22 +39,27 @@
 		const name = CODES[event.code];
 		if (!name || event.ctrlKey || event.metaKey || !shown.some((cap) => cap.name === name && !cap.label)) return;
 		event.preventDefault();
-		editor.select(name);
+		board.select(name);
 		onpicked?.();
 	}
 </script>
 
-<div bind:this={board} class="board" role="group" aria-label="Keyboard">
+<div bind:this={element} class="board" role="group" aria-label="Keyboard">
 	{#each shown as cap (cap.name)}
 		<div class="slot" class:enter={cap.enter} style={place(cap)}>
-			{#if cap.label}
-				<div class="modifier" class:pressed={editor.pressed.has(cap.name)}>{label(cap)}</div>
+			{#if cap.label && latchable(cap.name)}
+				<button type="button" class="modifier latch" class:pressed={board.pressed.has(cap.name)} aria-pressed={board.pressed.has(cap.name)} onclick={() => onlatch?.(cap.name)}
+					>{label(cap)}</button
+				>
+			{:else if cap.label}
+				<div class="modifier" class:pressed={board.pressed.has(cap.name)}>{label(cap)}</div>
 			{:else}
 				<KeyCap
-					levels={editor.levels(cap.name)}
-					selected={editor.selected === cap.name}
-					pressed={editor.pressed.has(cap.name)}
-					onselect={() => editor.select(cap.name)}
+					levels={board.levels(cap.name)}
+					{level}
+					selected={board.selected === cap.name}
+					pressed={board.pressed.has(cap.name)}
+					onselect={() => board.select(cap.name)}
 					onkeydown={keydown}
 				/>
 			{/if}
@@ -80,6 +93,15 @@
 		font-size: 1.05cqw;
 		color: var(--text-muted);
 		transition: background-color 140ms var(--ease);
+	}
+
+	.latch:hover {
+		background: var(--control-hover);
+	}
+
+	.latch:focus-visible {
+		outline: none;
+		box-shadow: inset 0 0 0 0.16cqw var(--accent-line);
 	}
 
 	.modifier.pressed {

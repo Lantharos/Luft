@@ -339,7 +339,7 @@ export async function run() {
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});
-  await checkKeys({pause, capture, keyboard, output});
+  await checkKeys({pause, capture, actorNamed, pointer, keyboard, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkMediaKeys({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});

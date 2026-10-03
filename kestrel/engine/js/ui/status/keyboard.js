@@ -886,12 +886,8 @@ class InputSourceIndicator extends PanelMenu.Button {
         this._propSection.actor.hide();
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this._showLayoutItem = this.menu.addAction(_('Show Keyboard Layout'), this._showLayout.bind(this));
         this.menu.addSettingsAction(_('Keyboard Settings'),
             'gnome-keyboard-panel.desktop');
-
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
-        this._sessionUpdated();
 
         this._inputSourceManager = getInputSourceManager();
         this._inputSourceManager.connectObject(
@@ -903,14 +899,6 @@ class InputSourceIndicator extends PanelMenu.Button {
 
     _onDestroy() {
         this._inputSourceManager = null;
-    }
-
-    _sessionUpdated() {
-        // re-using "allowSettings" for the keyboard layout is a bit shady,
-        // but at least for now it is used as "allow popping up windows
-        // from shell menus"; we can always add a separate sessionMode
-        // option if need arises.
-        this._showLayoutItem.visible = Main.sessionMode.allowSettings;
     }
 
     _createExternalSource(keyboardManager) {
@@ -1168,12 +1156,5 @@ class InputSourceIndicator extends PanelMenu.Button {
             item.setSensitive(prop.get_sensitive());
             menu.addMenuItem(item);
         }
-    }
-
-    _showLayout() {
-        const app =
-            Shell.AppSystem.get_default().lookup_app('org.gnome.Tecla.desktop');
-
-        app?.activate();
     }
 });

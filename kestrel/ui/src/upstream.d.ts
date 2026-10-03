@@ -179,12 +179,15 @@ declare module 'resource:///org/gnome/shell/misc/config.js' {
 declare module 'resource:///org/gnome/shell/ui/status/keyboard.js' {
   import type IBus from 'gi://IBus';
   export interface InputSource {
+    readonly type: string;
+    readonly id: string;
     readonly displayName: string;
     readonly shortName: string;
     readonly properties: IBus.PropList | null;
     activate(interactive: boolean): void;
   }
   interface KeyboardManager {
+    readonly currentLayout: { readonly id: string } | null;
     readonly shortName: string;
     readonly displayName: string;
     isLocked(): boolean;

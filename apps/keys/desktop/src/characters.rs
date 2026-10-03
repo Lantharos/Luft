@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::sync::OnceLock;
 
@@ -139,6 +139,8 @@ pub fn all() -> &'static [Character] {
     ALL.get_or_init(|| {
         let mut all = symbols();
         all.extend(emoji());
+        let mut seen = HashSet::new();
+        all.retain(|character| seen.insert(character.text.clone()));
         all
     })
 }

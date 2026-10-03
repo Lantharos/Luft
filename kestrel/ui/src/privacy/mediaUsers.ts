@@ -23,7 +23,7 @@ interface DumpObject {
 }
 
 const SOURCES: Record<string, MediaKind> = { 'Video/Source': 'camera', 'Audio/Source': 'microphone' };
-const LEVEL_METERS = ['org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
+const LEVEL_METERS = ['com.lantharos.settings', 'org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
 
 function appFor(props: Record<string, string | number | boolean>): Shell.App | null {
   const portalId = props['pipewire.access.portal.app_id'];

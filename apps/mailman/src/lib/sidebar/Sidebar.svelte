@@ -124,7 +124,7 @@
 	}
 
 	.write:hover {
-		filter: brightness(1.08);
+		background: var(--accent-hover);
 	}
 
 	.write:active {

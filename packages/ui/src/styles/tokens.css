@@ -27,6 +27,7 @@
 	--text-inverse: var(--kestrel-dark-inverse-on-surface, #181817);
 	--accent: var(--kestrel-dark-primary, #f3f3ef);
 	--accent-text: var(--kestrel-dark-on-primary, #181817);
+	--accent-hover: color-mix(in oklab, var(--accent) 86%, var(--ink));
 	--accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
 	--accent-line: color-mix(in oklab, var(--accent) 62%, transparent);
 	--secondary: var(--kestrel-dark-secondary, #b5afa2);

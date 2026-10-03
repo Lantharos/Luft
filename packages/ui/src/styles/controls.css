@@ -60,7 +60,7 @@
 	}
 
 	.button.primary:hover:not(:disabled) {
-		filter: brightness(1.08);
+		background: var(--accent-hover);
 	}
 
 	.button.danger {

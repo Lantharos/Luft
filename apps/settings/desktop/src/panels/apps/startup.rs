@@ -98,9 +98,12 @@ fn program(info: &gio_unix::DesktopAppInfo) -> Option<OsString> {
 }
 
 fn flatpak_installed(id: &str) -> bool {
-    [glib::user_data_dir().join("flatpak"), PathBuf::from("/var/lib/flatpak")]
-        .iter()
-        .any(|installation| installation.join("app").join(id).join("current").exists())
+    [
+        glib::user_data_dir().join("flatpak"),
+        PathBuf::from("/var/lib/flatpak"),
+    ]
+    .iter()
+    .any(|installation| installation.join("app").join(id).join("current").exists())
 }
 
 fn entry(user: &Path, name: OsString) -> Option<Entry> {

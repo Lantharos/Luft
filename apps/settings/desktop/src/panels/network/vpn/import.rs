@@ -56,4 +56,3 @@ pub fn import() -> Result<bool, String> {
     import_file(&file)?;
     Ok(true)
 }
-

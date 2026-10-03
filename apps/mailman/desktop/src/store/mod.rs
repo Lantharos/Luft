@@ -1,9 +1,9 @@
 mod accounts;
 mod mail;
 mod mailboxes;
-mod migrate;
 mod outbox;
 mod queue;
+mod schema;
 mod senders;
 mod settings;
 mod templates;
@@ -89,7 +89,7 @@ impl Store {
                  PRAGMA mmap_size = 1073741824; PRAGMA cache_size = -32768;",
             )
             .map_err(|error| error.to_string())?;
-        migrate::migrate(&mut write).map_err(|error| error.to_string())?;
+        schema::create(&mut write).map_err(|error| error.to_string())?;
         write
             .execute_batch("PRAGMA analysis_limit = 1000; PRAGMA optimize = 0x10002;")
             .map_err(|error| error.to_string())?;

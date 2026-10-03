@@ -105,7 +105,7 @@ async fn answer(
     body: &[u8],
 ) -> Vec<u8> {
     let outcome = match kind {
-        REQUEST_IDENTITIES => Some(identities(daemon).await),
+        REQUEST_IDENTITIES => Some(identities(daemon, requester).await),
         SIGN_REQUEST => sign(daemon, requester, body).await,
         ADD_IDENTITY | ADD_CONSTRAINED => add(daemon, body).await,
         REMOVE_IDENTITY => remove(daemon, Reader::new(body).string()).await,
@@ -115,7 +115,8 @@ async fn answer(
     outcome.unwrap_or_else(|| vec![FAILURE])
 }
 
-async fn identities(daemon: &Daemon) -> Vec<u8> {
+async fn identities(daemon: &Arc<Daemon>, requester: &confirm::Requester) -> Vec<u8> {
+    daemon.ensure_unlocked(&requester.app, false).await;
     let keyring = daemon.keyring.lock().await;
     let keys: &[SshKey] = keyring.view().map_or(&[], |view| &view.ssh);
     let mut reply = Writer::default()

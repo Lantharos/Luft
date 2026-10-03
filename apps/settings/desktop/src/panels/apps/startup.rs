@@ -88,8 +88,13 @@ fn runs(info: &gio_unix::DesktopAppInfo) -> bool {
 fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
     match info.string(FLATPAK) {
         Some(id) => flatpak_installed(&id),
-        None => glib::find_program_in_path(info.executable()).is_some(),
+        None => program(info).is_some_and(|program| glib::find_program_in_path(program).is_some()),
     }
+}
+
+fn program(info: &gio_unix::DesktopAppInfo) -> Option<OsString> {
+    let line = info.commandline()?;
+    glib::shell_parse_argv(line).ok()?.into_iter().next()
 }
 
 fn flatpak_installed(id: &str) -> bool {

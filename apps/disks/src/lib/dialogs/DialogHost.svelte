@@ -2,7 +2,12 @@
 	import * as api from '$lib/api';
 	import { bytes, volumeName } from '$lib/format';
 	import { disks } from '$lib/state/disks.svelte';
+	import { space } from '$lib/state/space.svelte';
+	import type { Drive, Volume } from '$lib/api';
 	import ConfirmDialog from './ConfirmDialog.svelte';
+	import DriveDetails from './details/DriveDetails.svelte';
+	import HealthDialog from './details/HealthDialog.svelte';
+	import VolumeDetails from './details/VolumeDetails.svelte';
 	import CreateDialog from './format/CreateDialog.svelte';
 	import { dialogs } from './dialogs.svelte';
 	import FormatDialog from './format/FormatDialog.svelte';
@@ -15,9 +20,29 @@
 	import WriteImageDialog from './images/WriteImageDialog.svelte';
 
 	let dialog = $derived(dialogs.current);
+
+	const live = (drive: Drive) => disks.drives.find((candidate) => candidate.id === drive.id) ?? null;
+
+	function liveVolume(drive: Drive | null, volume: Volume) {
+		const segment = drive?.segments.find((candidate) => candidate.kind === 'volume' && candidate.block === volume.block);
+		return segment?.kind === 'volume' ? segment : null;
+	}
 </script>
 
-{#if dialog?.kind === 'format-volume'}
+{#if dialog?.kind === 'details'}
+	{@const drive = live(dialog.drive)}
+	{@const volume = liveVolume(drive, dialog.volume)}
+	{#if drive && volume}
+		<VolumeDetails {drive} {volume} onclose={dialogs.close} />
+	{/if}
+{:else if dialog?.kind === 'drive'}
+	<DriveDetails drive={live(dialog.drive) ?? dialog.drive} onclose={dialogs.close} />
+{:else if dialog?.kind === 'health'}
+	{@const drive = live(dialog.drive)}
+	{#if drive?.health}
+		<HealthDialog {drive} health={drive.health} onclose={dialogs.close} />
+	{/if}
+{:else if dialog?.kind === 'format-volume'}
 	<FormatDialog drive={dialog.drive} volume={dialog.volume} onclose={dialogs.close} />
 {:else if dialog?.kind === 'format-drive'}
 	<FormatDialog drive={dialog.drive} volume={null} onclose={dialogs.close} />
@@ -44,6 +69,15 @@
 		description="The partition and all {bytes(volume.size)} on it will be removed from {drive.name}. This can't be undone."
 		confirm="Delete partition"
 		onconfirm={() => disks.run(volume.block, () => api.deletePartition(volume.block))}
+		onclose={dialogs.close}
+	/>
+{:else if dialog?.kind === 'trash'}
+	{@const { path, name, size, folder } = dialog}
+	<ConfirmDialog
+		title="Move “{name}” to the trash?"
+		description="{folder ? 'This folder and everything in it take' : 'It takes'} up {bytes(size)}. The space is freed once the trash is emptied, and until then you can put it back from the trash in Rover."
+		confirm="Move to trash"
+		onconfirm={() => space.trash(path).then(() => true, (caught) => (disks.fail(caught), false))}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'restore'}

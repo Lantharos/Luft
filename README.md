@@ -10,7 +10,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `kestrel/passkeys` | Passkeys kept in Luft Keyring and confirmed through Kestrel, offered to every browser as a security key |
 | `kestrel/openconnect` | Signs in to OpenConnect VPNs for Kestrel's VPN dialog |
 | `apps/barometer` | Barometer system monitor and task manager |
-| `apps/disks` | Disks, for drives, partitions, encryption, drive health and disk images |
+| `apps/disks` | Disks, for drives, partitions, encryption, drive health, disk images and what's using space |
 | `apps/draft` | Draft text and code editor |
 | `apps/keys` | Keys, for your own keyboard layouts and input methods |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |

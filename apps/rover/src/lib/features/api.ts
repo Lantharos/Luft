@@ -33,6 +33,7 @@ export const startSearch = (query: SearchQuery) => invoke<number>('start_search'
 export const cancelSearch = (id: number) => invoke<void>('cancel_search', { id });
 
 export const openTerminal = (path: string) => invoke<void>('open_terminal', { path });
+export const exploreSpace = (path: string) => invoke<void>('explore_space', { path });
 
 export const fileOwnership = (path: string) => invoke<Ownership>('file_ownership', { path });
 export const setPermissions = (path: string, mode: number) => invoke<void>('set_permissions', { path, mode });

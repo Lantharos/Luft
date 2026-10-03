@@ -95,6 +95,32 @@ export interface ChosenImage {
 	size: number;
 }
 
+export type SpaceItem =
+	| { kind: 'dir'; name: string; size: number; items: number; done: boolean; inner: number[] }
+	| { kind: 'file'; name: string; size: number }
+	| { kind: 'other'; count: number; size: number };
+
+export interface SpaceView {
+	path: string[];
+	size: number;
+	items: number;
+	done: boolean;
+	children: SpaceItem[];
+	hiddenCount: number;
+	hiddenSize: number;
+}
+
+export interface SpaceUpdate {
+	scan: number;
+	root: string;
+	view: SpaceView | null;
+	scanning: boolean;
+	totalItems: number;
+	totalSize: number;
+	unreadable: number;
+	seconds: number;
+}
+
 export interface AppState extends Appearance {
 	arguments: string[];
 }
@@ -103,7 +129,8 @@ export const CANCELLED = 'cancelled';
 
 export const appState = () => invoke<AppState>('app_state');
 export const snapshot = () => invoke<{ drives: Drive[] }>('disks_snapshot');
-export const locate = (args: string[]) => invoke<{ target: Target | null; image: ChosenImage | null }>('disks_locate', { arguments: args });
+export const locate = (args: string[]) =>
+	invoke<{ target: Target | null; image: ChosenImage | null; space: string | null }>('disks_locate', { arguments: args });
 export const formats = () => invoke<Support[]>('disks_formats');
 
 export const mount = (block: string) => invoke<string>('disks_mount', { block });
@@ -140,8 +167,17 @@ export const chooseImage = () => invoke<ChosenImage | null>('disks_image_choose'
 export const restoreImage = (block: string, path: string) => invoke<void>('disks_image_restore', { block, path });
 export const cancelImage = () => invoke<void>('disks_image_cancel');
 
+export const space = {
+	scan: (path: string) => invoke<SpaceUpdate>('space_scan', { path }),
+	view: (path: string[]) => invoke<SpaceUpdate>('space_view', { path }),
+	trash: (path: string[]) => invoke<SpaceUpdate>('space_trash', { path }),
+	show: (path: string[]) => invoke<void>('space_show', { path }),
+	stop: () => invoke<void>('space_stop')
+};
+
 export const events = {
 	changed: (callback: (state: { drives: Drive[] }) => void) => listen('disks.changed', callback),
 	image: (callback: (progress: ImageProgress) => void) => listen('disks.image', callback),
+	space: (callback: (update: SpaceUpdate) => void) => listen('space.update', callback),
 	activated: (callback: (activation: { arguments: string[] }) => void) => listen('singleInstance.activate', callback)
 };

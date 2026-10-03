@@ -108,12 +108,20 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
     ))
 }
 
-pub fn manage(mount_point: &str) -> Result<(), String> {
-    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
-    let uri = gio::File::for_path(mount_point).uri();
-    disks
-        .launch_uris(&[uri.as_str()], gio::AppLaunchContext::NONE)
+fn launch_disks(argument: &str) -> Result<(), String> {
+    gio_unix::DesktopAppInfo::new(DISKS)
+        .ok_or("Disks isn't installed")?
+        .launch_uris(&[argument], gio::AppLaunchContext::NONE)
         .map_err(|error| error.to_string())
+}
+
+pub fn manage(mount_point: &str) -> Result<(), String> {
+    launch_disks(&gio::File::for_path(mount_point).uri())
+}
+
+pub fn explore(path: &str) -> Result<(), String> {
+    let uri = gio::File::for_path(path).uri();
+    launch_disks(&uri.replacen("file://", "disks-space://", 1))
 }
 
 pub fn can_manage() -> bool {

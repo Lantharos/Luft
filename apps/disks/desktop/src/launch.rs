@@ -18,15 +18,21 @@ pub struct Target {
 pub struct Launch {
     target: Option<Target>,
     image: Option<ChosenImage>,
+    space: Option<PathBuf>,
 }
+
+const SPACE: &str = "disks-space://";
 
 pub fn resolve(arguments: &[String], snapshot: &Snapshot) -> Launch {
     let paths: Vec<PathBuf> = arguments
         .iter()
-        .filter(|argument| !argument.starts_with("--"))
+        .filter(|argument| !argument.starts_with("--") && !argument.starts_with(SPACE))
         .filter_map(|argument| path_of(argument))
         .collect();
     Launch {
+        space: arguments.iter().find_map(|argument| {
+            luft_app::portal::uri_path(&format!("file://{}", argument.strip_prefix(SPACE)?))
+        }),
         image: paths
             .iter()
             .find(|path| ChosenImage::is_image(path))

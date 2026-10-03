@@ -23,7 +23,7 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 - Drag and drop within Rover and to or from other apps. Holding a dragged file over a folder, in the views or the sidebar, opens it
 - Trash across the home folder and mounted drives, with restore
 - Favorites you can add from the context menu or by dropping files on the sidebar, and reorder by dragging
-- Drives with their usage in the sidebar, and eject for removable drives. "Manage drive…" in a drive's menu opens it in Disks
+- Drives with their usage in the sidebar, and eject for removable drives. "Manage drive…" in a drive's menu opens it in Disks, and "See what’s using space" in a folder's context menu, or the folder's own, measures it in Disks
 - Network locations over SFTP, Windows shares (SMB), FTP, WebDAV and NFS. Type an address such as `sftp://example.com` or `smb://server/share` into the path bar, or use Connect to server in the menu, which also lists recent servers and the ones it finds on your network. Rover asks for a password when the server wants one and can remember it in your keyring, and opens `sftp://`, `smb://`, `dav://`, `davs://` and `nfs://` links from other apps. Connected locations appear in the sidebar with a button to disconnect, and the ones you keep stay there for next time
 - Git and Pig status badges, diffs, commits and sync for the folder you are in
 - Inline create and rename, marquee selection and an editable path bar that completes folder names with `Tab` and selects the whole location when you click into it, so typing or pasting replaces it

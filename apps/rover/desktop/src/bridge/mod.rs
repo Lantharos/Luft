@@ -91,6 +91,7 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("manage_drive", |MountPoint { mount_point }| {
             drives::manage(&mount_point)
         })
+        .command("explore_space", |Path { path }| drives::explore(&path))
 }
 
 fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {

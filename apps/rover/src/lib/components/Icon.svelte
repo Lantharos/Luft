@@ -14,7 +14,7 @@
 		| 'clock' | 'panel-right' | 'more-horizontal' | 'chevron-left' | 'chevron-down'
 		| 'volume' | 'volume-x'
 		| 'git-branch' | 'arrow-up' | 'columns-3' | 'link' | 'lock' | 'search' | 'minus' | 'folder-x'
-		| 'terminal' | 'info' | 'copy-plus' | 'package-open';
+		| 'terminal' | 'info' | 'copy-plus' | 'package-open' | 'chart-pie';
 </script>
 
 <script lang="ts">
@@ -295,6 +295,9 @@
 		<line x1="12" x2="18" y1="15" y2="15" />
 		<rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
 		<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+	{:else if name === 'chart-pie'}
+		<path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z" />
+		<path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
 	{:else if name === 'package-open'}
 		<path d="M12 22v-9" />
 		<path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0L21 4.57a1.93 1.93 0 0 1 0 3.36L8.82 14.79a1.66 1.66 0 0 1-1.64 0L3 12.43a1.93 1.93 0 0 1 0-3.36z" />

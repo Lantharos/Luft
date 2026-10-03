@@ -23,7 +23,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="flex min-w-0 flex-1 items-center justify-end gap-1 pr-2" data-no-drag>
+	<div class="flex min-w-0 flex-1 items-center justify-end gap-1 pr-2">
 		{@render actions?.()}
 	</div>
 	<WindowControls />

@@ -54,8 +54,8 @@
 	});
 </script>
 
-<aside class="glass-sidebar sidebar">
-	<div class="drag-region flex h-[60px] flex-none items-center gap-2 px-3">
+<aside class="glass-sidebar drag-region sidebar">
+	<div class="flex h-[60px] flex-none items-center gap-2 px-3">
 		<button type="button" class="write" onclick={() => composer.start()} {@attach tooltip('Write (C)')}>
 			<PenLine size={16} />
 			<span>Write</span>

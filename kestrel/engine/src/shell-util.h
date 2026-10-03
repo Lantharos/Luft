@@ -17,10 +17,6 @@ int      shell_util_get_week_start             (void);
 
 const char *shell_util_translate_time_string   (const char *str);
 
-gboolean shell_write_string_to_stream          (GOutputStream    *stream,
-                                                const char       *str,
-                                                GError          **error);
-
 GdkPixbuf *shell_util_create_pixbuf_from_data (const guchar      *data,
                                                gsize              len,
                                                GdkColorspace      colorspace,
@@ -43,39 +39,6 @@ gboolean shell_util_has_x11_display_extension (MetaDisplay *display,
                                                const char  *extension);
 
 gint shell_util_get_uid (void);
-
-GPid shell_util_spawn_async_with_pipes_and_fds (const char          *working_directory,
-                                                const char * const  *argv,
-                                                const char * const  *envp,
-                                                GSpawnFlags          flags,
-                                                int                  stdin_fd,
-                                                int                  stdout_fd,
-                                                int                  stderr_fd,
-                                                const int           *source_fds,
-                                                const int           *target_fds,
-                                                size_t               n_fds,
-                                                int                 *stdin_pipe_out,
-                                                int                 *stdout_pipe_out,
-                                                int                 *stderr_pipe_out,
-                                                GError             **error);
-
-GPid shell_util_spawn_async_with_pipes (const char          *working_directory,
-                                        const char * const  *argv,
-                                        const char * const  *envp,
-                                        GSpawnFlags          flags,
-                                        int                 *standard_input,
-                                        int                 *standard_output,
-                                        int                 *standard_error,
-                                        GError             **error);
-
-GPid shell_util_spawn_async_with_fds (const char          *working_directory,
-                                      const char * const  *argv,
-                                      const char * const  *envp,
-                                      GSpawnFlags          flags,
-                                      int                  stdin_fd,
-                                      int                  stdout_fd,
-                                      int                  stderr_fd,
-                                      GError             **error);
 
 GPid shell_util_spawn_async (const char          *working_directory,
                              const char * const  *argv,

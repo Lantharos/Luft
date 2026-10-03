@@ -38,10 +38,8 @@
 
 #include "shell-enum-types.h"
 #include "shell-global-private.h"
-#include "shell-perf-log.h"
 #include "shell-systemd.h"
 #include "shell-window-tracker.h"
-#include "shell-app-usage.h"
 #include "shell-app-cache-private.h"
 #include "shell-util.h"
 #include "switcheroo-control.h"
@@ -75,21 +73,10 @@ struct _ShellGlobal {
   ShellWindowTracker *window_tracker;
   ShellAppSystem *app_system;
   ShellAppCache *app_cache;
-  ShellAppUsage *app_usage;
 
   StFocusManager *focus_manager;
 
-  guint work_count;
-  GSList *leisure_closures;
-  guint leisure_function_id;
-
   GHashTable *save_ops;
-
-  gboolean frame_timestamps;
-  gboolean frame_finish_timestamp;
-
-  guint before_paint_id;
-  guint after_swap_id;
 
   GDBusProxy *switcheroo_control;
   GCancellable *switcheroo_cancellable;
@@ -116,8 +103,6 @@ enum {
   PROP_DATADIR,
   PROP_USERDATADIR,
   PROP_FOCUS_MANAGER,
-  PROP_FRAME_TIMESTAMPS,
-  PROP_FRAME_FINISH_TIMESTAMP,
   PROP_SWITCHEROO_CONTROL,
   PROP_FORCE_ANIMATIONS,
   PROP_AUTOMATION_SCRIPT,
@@ -223,12 +208,6 @@ shell_global_set_property(GObject         *object,
       g_clear_pointer (&global->session_mode, g_free);
       global->session_mode = g_ascii_strdown (g_value_get_string (value), -1);
       break;
-    case PROP_FRAME_TIMESTAMPS:
-      shell_global_set_frame_timestamps (global, g_value_get_boolean (value));
-      break;
-    case PROP_FRAME_FINISH_TIMESTAMP:
-      shell_global_set_frame_finish_timestamp (global, g_value_get_boolean (value));
-      break;
     case PROP_FORCE_ANIMATIONS:
       shell_global_set_force_animations (global, g_value_get_boolean (value));
       break;
@@ -299,12 +278,6 @@ shell_global_get_property(GObject         *object,
       break;
     case PROP_FOCUS_MANAGER:
       g_value_set_object (value, global->focus_manager);
-      break;
-    case PROP_FRAME_TIMESTAMPS:
-      g_value_set_boolean (value, global->frame_timestamps);
-      break;
-    case PROP_FRAME_FINISH_TIMESTAMP:
-      g_value_set_boolean (value, global->frame_finish_timestamp);
       break;
     case PROP_SWITCHEROO_CONTROL:
       g_value_set_object (value, global->switcheroo_control);
@@ -466,13 +439,8 @@ shell_global_finalize (GObject *object)
   g_clear_object (&global->window_tracker);
   g_clear_object (&global->app_system);
   g_clear_object (&global->app_cache);
-  g_clear_object (&global->app_usage);
   g_clear_object (&global->wm);
 
-  g_clear_handle_id (&global->before_paint_id,
-                     clutter_threads_remove_repaint_func);
-  g_clear_handle_id (&global->after_swap_id,
-                     clutter_threads_remove_repaint_func);
 
   the_object = NULL;
 
@@ -603,16 +571,6 @@ shell_global_class_init (ShellGlobalClass *klass)
     g_param_spec_object ("focus-manager", NULL, NULL,
                          ST_TYPE_FOCUS_MANAGER,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  props[PROP_FRAME_TIMESTAMPS] =
-    g_param_spec_boolean ("frame-timestamps", NULL, NULL,
-                          FALSE,
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
-
-  props[PROP_FRAME_FINISH_TIMESTAMP] =
-    g_param_spec_boolean ("frame-finish-timestamp", NULL, NULL,
-                          FALSE,
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
   props[PROP_SWITCHEROO_CONTROL] =
     g_param_spec_object ("switcheroo-control", NULL, NULL,
@@ -861,87 +819,6 @@ global_stage_notify_height (GObject    *gobject,
   g_object_notify_by_pspec (G_OBJECT (global), props[PROP_SCREEN_HEIGHT]);
 }
 
-static gboolean
-global_stage_before_paint (gpointer data)
-{
-  ShellGlobal *global = SHELL_GLOBAL (data);
-
-  if (global->frame_timestamps)
-    shell_perf_log_event (shell_perf_log_get_default (),
-                          "clutter.stagePaintStart");
-
-  return TRUE;
-}
-
-static gboolean
-load_gl_symbol (CoglRenderer *renderer,
-                const char   *name,
-                void        **func)
-{
-  *func = cogl_renderer_get_proc_address (renderer, name);
-  if (!*func)
-    {
-      g_warning ("failed to resolve required GL symbol \"%s\"\n", name);
-      return FALSE;
-    }
-  return TRUE;
-}
-
-static void
-global_stage_after_paint (ClutterStage     *stage,
-                          ClutterStageView *stage_view,
-                          ClutterFrame     *frame,
-                          ShellGlobal      *global)
-{
-  /* At this point, we've finished all layout and painting, but haven't
-   * actually flushed or swapped */
-  ClutterContext *context = clutter_actor_get_context (CLUTTER_ACTOR (stage));
-  ClutterBackend *backend = clutter_context_get_backend (context);
-  CoglContext *cogl_context = clutter_backend_get_cogl_context (backend);
-  CoglDisplay *cogl_display = cogl_context_get_display (cogl_context);
-  CoglRenderer *cogl_renderer = cogl_display_get_renderer (cogl_display);
-
-  if (global->frame_timestamps && global->frame_finish_timestamp)
-    {
-      /* It's interesting to find out when the paint actually finishes
-       * on the GPU. We could wait for this asynchronously with
-       * ARB_timer_query (see https://bugzilla.gnome.org/show_bug.cgi?id=732350
-       * for an implementation of this), but what we actually would
-       * find out then is the latency for drawing a frame, not how much
-       * GPU work was needed, since frames can overlap. Calling glFinish()
-       * is a fairly reliable way to separate out adjacent frames
-       * and measure the amount of GPU work. This is turned on with a
-       * separate property from ::frame-timestamps, since it should not
-       * be turned on if we're trying to actual measure latency or frame
-       * rate.
-       */
-      static void (*finish) (void);
-
-      if (!finish)
-        load_gl_symbol (cogl_renderer, "glFinish", (void **)&finish);
-
-      cogl_context_flush (cogl_context);
-      finish ();
-
-      shell_perf_log_event (shell_perf_log_get_default (),
-                            "clutter.paintCompletedTimestamp");
-    }
-}
-
-static gboolean
-global_stage_after_swap (gpointer data)
-{
-  /* Everything is done, we're ready for a new frame */
-
-  ShellGlobal *global = SHELL_GLOBAL (data);
-
-  if (global->frame_timestamps)
-    shell_perf_log_event (shell_perf_log_get_default (),
-                          "clutter.stagePaintDone");
-
-  return TRUE;
-}
-
 static void
 update_scaling_factor (ShellGlobal  *global,
                        MetaSettings *settings)
@@ -1005,32 +882,6 @@ _shell_global_set_plugin (ShellGlobal *global,
                     G_CALLBACK (global_stage_notify_width), global);
   g_signal_connect (global->stage, "notify::height",
                     G_CALLBACK (global_stage_notify_height), global);
-
-  global->before_paint_id =
-    clutter_threads_add_repaint_func (CLUTTER_REPAINT_FLAGS_PRE_PAINT,
-                                      global_stage_before_paint,
-                                      global, NULL);
-
-  g_signal_connect (global->stage, "after-paint",
-                    G_CALLBACK (global_stage_after_paint), global);
-
-  global->after_swap_id =
-    clutter_threads_add_repaint_func (CLUTTER_REPAINT_FLAGS_POST_PAINT,
-                                      global_stage_after_swap,
-                                      global, NULL);
-
-  shell_perf_log_define_event (shell_perf_log_get_default(),
-                               "clutter.stagePaintStart",
-                               "Start of stage page repaint",
-                               "");
-  shell_perf_log_define_event (shell_perf_log_get_default(),
-                               "clutter.paintCompletedTimestamp",
-                               "Paint completion on GPU",
-                               "");
-  shell_perf_log_define_event (shell_perf_log_get_default(),
-                               "clutter.stagePaintDone",
-                               "End of frame, possibly including swap time",
-                               "");
 
 #ifdef HAVE_XWAYLAND
   x11_display = meta_display_get_x11_display (display);
@@ -1240,139 +1091,6 @@ shell_global_create_app_launch_context (ShellGlobal *global,
                     NULL);
 
   return (GAppLaunchContext *) context;
-}
-
-typedef struct
-{
-  ShellLeisureFunction func;
-  gpointer user_data;
-  GDestroyNotify notify;
-} LeisureClosure;
-
-static gboolean
-run_leisure_functions (gpointer data)
-{
-  ShellGlobal *global = data;
-  g_autoptr (GSList) closures = NULL;
-  GSList *iter;
-
-  global->leisure_function_id = 0;
-
-  /* We started more work since we scheduled the idle */
-  if (global->work_count > 0)
-    return G_SOURCE_REMOVE;
-
-  /* No leisure closures, so we are done */
-  if (global->leisure_closures == NULL)
-    return G_SOURCE_REMOVE;
-
-  closures = g_steal_pointer (&global->leisure_closures);
-
-  for (iter = closures; iter; iter = iter->next)
-    {
-      LeisureClosure *closure = iter->data;
-      closure->func (closure->user_data);
-
-      if (closure->notify)
-        closure->notify (closure->user_data);
-
-      g_free (closure);
-    }
-
-  return G_SOURCE_REMOVE;
-}
-
-static void
-schedule_leisure_functions (ShellGlobal *global)
-{
-  /* This is called when we think we are ready to run leisure functions
-   * by our own accounting. We try to handle other types of business
-   * (like ClutterAnimation) by adding a low priority idle function.
-   *
-   * This won't work properly if the mainloop goes idle waiting for
-   * the vertical blanking interval or waiting for work being done
-   * in another thread.
-   */
-  if (!global->leisure_function_id)
-    {
-      global->leisure_function_id = g_idle_add_full (G_PRIORITY_LOW,
-                                                     run_leisure_functions,
-                                                     global, NULL);
-      g_source_set_name_by_id (global->leisure_function_id, "[gnome-shell] run_leisure_functions");
-    }
-}
-
-/**
- * shell_global_begin_work:
- * @global: the #ShellGlobal
- *
- * Marks that we are currently doing work. This is used to to track
- * whether we are busy for the purposes of shell_global_run_at_leisure().
- * A count is kept and shell_global_end_work() must be called exactly
- * as many times as shell_global_begin_work().
- */
-void
-shell_global_begin_work (ShellGlobal *global)
-{
-  global->work_count++;
-}
-
-/**
- * shell_global_end_work:
- * @global: the #ShellGlobal
- *
- * Marks the end of work that we started with shell_global_begin_work().
- * If no other work is ongoing and functions have been added with
- * shell_global_run_at_leisure(), they will be run at the next
- * opportunity.
- */
-void
-shell_global_end_work (ShellGlobal *global)
-{
-  g_return_if_fail (global->work_count > 0);
-
-  global->work_count--;
-  if (global->work_count == 0)
-    schedule_leisure_functions (global);
-
-}
-
-/**
- * shell_global_run_at_leisure:
- * @global: the #ShellGlobal
- * @func: function to call at leisure
- * @user_data: data to pass to @func
- * @notify: function to call to free @user_data
- *
- * Schedules a function to be called the next time the shell is idle.
- * Idle means here no animations, no redrawing, and no ongoing background
- * work. Since there is currently no way to hook into the Clutter master
- * clock and know when is running, the implementation here is somewhat
- * approximation. Animations may be detected as terminating early if they
- * can be drawn fast enough so that the event loop goes idle between frames.
- *
- * The intent of this function is for performance measurement runs
- * where a number of actions should be run serially and each action is
- * timed individually. Using this function for other purposes will
- * interfere with the ability to use it for performance measurement so
- * should be avoided.
- */
-void
-shell_global_run_at_leisure (ShellGlobal         *global,
-                             ShellLeisureFunction func,
-                             gpointer             user_data,
-                             GDestroyNotify       notify)
-{
-  LeisureClosure *closure = g_new (LeisureClosure, 1);
-  closure->func = func;
-  closure->user_data = user_data;
-  closure->notify = notify;
-
-  global->leisure_closures = g_slist_append (global->leisure_closures,
-                                             closure);
-
-  if (global->work_count == 0)
-    schedule_leisure_functions (global);
 }
 
 const char *
@@ -1707,53 +1425,4 @@ shell_global_get_app_cache (ShellGlobal *global)
   if (!global->app_cache)
     global->app_cache = g_object_new (SHELL_TYPE_APP_CACHE, NULL);
   return global->app_cache;
-}
-
-/**
- * shell_global_get_app_usage:
- *
- * Gets app usage.
- *
- * Return value: (transfer none): the app usage
- */
-ShellAppUsage *
-shell_global_get_app_usage (ShellGlobal *global)
-{
-  if (!global->app_usage)
-    global->app_usage = g_object_new (SHELL_TYPE_APP_USAGE, NULL);
-  return global->app_usage;
-}
-
-gboolean
-shell_global_get_frame_timestamps (ShellGlobal *global)
-{
-  return global->frame_timestamps;
-}
-
-void
-shell_global_set_frame_timestamps (ShellGlobal *global,
-                                   gboolean     enable)
-{
-  if (global->frame_timestamps != enable)
-    {
-      global->frame_timestamps = enable;
-      g_object_notify_by_pspec (G_OBJECT (global), props[PROP_FRAME_TIMESTAMPS]);
-    }
-}
-
-gboolean
-shell_global_get_frame_finish_timestamp (ShellGlobal *global)
-{
-  return global->frame_finish_timestamp;
-}
-
-void
-shell_global_set_frame_finish_timestamp (ShellGlobal *global,
-                                         gboolean     enable)
-{
-  if (global->frame_finish_timestamp != enable)
-    {
-      global->frame_finish_timestamp = enable;
-      g_object_notify_by_pspec (G_OBJECT (global), props[PROP_FRAME_FINISH_TIMESTAMP]);
-    }
 }

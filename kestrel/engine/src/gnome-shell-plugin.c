@@ -44,7 +44,6 @@
 #include <mtk/mtk.h>
 
 #include "shell-global-private.h"
-#include "shell-perf-log.h"
 #include "shell-wm-private.h"
 
 #define GNOME_TYPE_SHELL_PLUGIN (gnome_shell_plugin_get_type ())

@@ -15,7 +15,6 @@ import * as WorkspaceSwitcherPopup from './workspaceSwitcherPopup.js';
 import * as InhibitShortcutsDialog from './inhibitShortcutsDialog.js';
 import * as ModalDialog from './modalDialog.js';
 import * as WindowMenu from './windowMenu.js';
-import * as PadOsd from './padOsd.js';
 import * as CloseDialog from './closeDialog.js';
 import * as SwitchMonitor from './switchMonitor.js';
 import * as IBusManager from '../misc/ibusManager.js';
@@ -792,7 +791,6 @@ export class WindowManager {
         }
 
         global.display.connect('show-resize-popup', this._showResizePopup.bind(this));
-        global.display.connect('show-pad-osd', this._showPadOsd.bind(this));
         global.display.connect('show-osd', (display, monitorIndex, iconName, label) => {
             const icon = Gio.Icon.new_for_string(iconName);
             Main.osdWindowManager.showOne(monitorIndex, icon, label);
@@ -859,13 +857,6 @@ export class WindowManager {
         } finally {
             task.return_boolean(true);
         }
-    }
-
-    _showPadOsd(display, device, settings, imagePath, editionMode, monitorIndex) {
-        this._currentPadOsd = new PadOsd.PadOsd(device, settings, imagePath, editionMode, monitorIndex);
-        this._currentPadOsd.connect('closed', () => (this._currentPadOsd = null));
-
-        return this._currentPadOsd;
     }
 
     _lookupIndex(windows, metaWindow) {

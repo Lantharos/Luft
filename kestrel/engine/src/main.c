@@ -4,9 +4,6 @@
 
 #include "config.h"
 
-#if defined (HAVE_MALLINFO) || defined (HAVE_MALLINFO2)
-#include <malloc.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,7 +24,6 @@
 
 #include "shell-global.h"
 #include "shell-global-private.h"
-#include "shell-perf-log.h"
 #include "st.h"
 
 extern GType gnome_shell_plugin_get_type (void);
@@ -291,56 +287,6 @@ shell_profiler_shutdown (void)
 
   if (profiler)
     gjs_profiler_stop (profiler);
-}
-
-static void
-malloc_statistics_callback (ShellPerfLog *perf_log,
-                            gpointer      data)
-{
-#if defined (HAVE_MALLINFO) || defined (HAVE_MALLINFO2)
-#ifdef HAVE_MALLINFO2
-  struct mallinfo2 info = mallinfo2 ();
-#else
-  struct mallinfo info = mallinfo ();
-#endif
-
-  shell_perf_log_update_statistic_i (perf_log,
-                                     "malloc.arenaSize",
-                                     info.arena);
-  shell_perf_log_update_statistic_i (perf_log,
-                                     "malloc.mmapSize",
-                                     info.hblkhd);
-  shell_perf_log_update_statistic_i (perf_log,
-                                     "malloc.usedSize",
-                                     info.uordblks);
-#endif /* defined (HAVE_MALLINFO) || defined (HAVE_MALLINFO2) */
-}
-
-static void
-shell_perf_log_init (void)
-{
-  ShellPerfLog *perf_log = shell_perf_log_get_default ();
-
-  /* For probably historical reasons, mallinfo() defines the returned values,
-   * even those in bytes as int, not size_t. We're determined not to use
-   * more than 2G of malloc'ed memory, so are OK with that.
-   */
-  shell_perf_log_define_statistic (perf_log,
-                                   "malloc.arenaSize",
-                                   "Amount of memory allocated by malloc() with brk(), in bytes",
-                                   "i");
-  shell_perf_log_define_statistic (perf_log,
-                                   "malloc.mmapSize",
-                                   "Amount of memory allocated by malloc() with mmap(), in bytes",
-                                   "i");
-  shell_perf_log_define_statistic (perf_log,
-                                   "malloc.usedSize",
-                                   "Amount of malloc'ed memory currently in use",
-                                   "i");
-
-  shell_perf_log_add_statistics_callback (perf_log,
-                                          malloc_statistics_callback,
-                                          NULL, NULL);
 }
 
 static void
@@ -620,7 +566,6 @@ main (int argc, char **argv)
 
   shell_dbus_init ();
   shell_a11y_init ();
-  shell_perf_log_init ();
   shell_introspection_init ();
 
   /* Ensure the GNOME Shell cursor implementation registers itself as

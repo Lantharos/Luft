@@ -8,8 +8,6 @@ import {checkControls} from './checks/greeter/controlChecks.js';
 import {checkSigningIn} from './checks/greeter/signInChecks.js';
 import {reportResources} from './checks/greeter/resources.js';
 
-export const METRICS = {};
-
 function pause(milliseconds) {
   return new Promise(resolve => GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {
     resolve();

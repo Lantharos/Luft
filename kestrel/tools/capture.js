@@ -40,7 +40,6 @@ import {checkKeys} from './checks/apps/keysChecks.js';
 import {checkLuftApps} from './checks/apps/luftAppChecks.js';
 import {captureRenderedFrames} from './checks/frameCapture.js';
 
-export const METRICS = {};
 const FILE_MANAGER = 'com.lantharos.rover.desktop';
 
 function pause(milliseconds) {

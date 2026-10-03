@@ -128,8 +128,6 @@ cdata.set_quoted('PACKAGE_VERSION', meson.project_version())
 cdata.set('HAVE_PIPEWIRE', have_pipewire)
 cdata.set('HAVE_XWAYLAND', have_xwayland)
 
-cdata.set('HAVE_MALLINFO', cc.has_function('mallinfo'))
-cdata.set('HAVE_MALLINFO2', cc.has_function('mallinfo2'))
 cdata.set('HAVE_SYS_RESOURCE_H', cc.has_header('sys/resource.h'))
 cdata.set('HAVE_EXE_INTROSPECTION',
   cc.has_header('elf.h') and

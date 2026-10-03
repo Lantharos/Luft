@@ -2,9 +2,11 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import * as MessageTray from './messageTray.js';
 import * as AccessDialog from './accessDialog.js';
 import * as AudioDeviceSelection from './audioDeviceSelection.js';
 import {DesktopControls} from './desktopControls.js';
@@ -18,7 +20,6 @@ import * as Introspect from '../misc/introspect.js';
 import * as Keyboard from './keyboard.js';
 import * as InputSources from './status/keyboard.js';
 import * as KestrelUi from './kestrelUi.js';
-import * as MessageTray from './messageTray.js';
 import * as OsdWindow from './osdWindow.js';
 import * as Panel from './panel.js';
 import * as Layout from './layout.js';
@@ -153,10 +154,19 @@ async function _loadAutomation() {
     if (!automationScript)
         return null;
 
-    const Scripting = await import('./scripting.js');
     const automation = await import(automationScript.get_uri());
-    automation.init?.();
-    return () => Scripting.runPerfScript(automation, GLib.getenv('SHELL_PERF_OUTPUT'));
+    return () => _runAutomation(automation);
+}
+
+async function _runAutomation(automation) {
+    try {
+        await automation.run();
+    } catch (err) {
+        logError(err, 'Script failed');
+        Meta.exit(Meta.ExitCode.ERROR);
+    }
+
+    global.context.terminate();
 }
 
 async function _initializeGreeter() {
@@ -191,7 +201,7 @@ async function _initializeGreeter() {
 
 /** @private */
 async function _initializeUI() {
-    // Ensure ShellWindowTracker and ShellAppUsage are initialized; this will
+    // Ensure ShellWindowTracker is initialized; this will
     // also initialize ShellAppSystem first. ShellAppSystem
     // needs to load all the .desktop files, and ShellWindowTracker
     // will use those to associate with windows. Right now
@@ -200,7 +210,6 @@ async function _initializeUI() {
     // races for now we initialize it here. It's better to
     // be predictable anyways.
     Shell.WindowTracker.get_default();
-    Shell.AppUsage.get_default();
 
     reloadThemeResource();
     _loadIcons();

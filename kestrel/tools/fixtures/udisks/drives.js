@@ -1,11 +1,17 @@
 const MiB = 1024 ** 2;
 const GiB = 1024 ** 3;
 
+import GLib from 'gi://GLib';
+
 export const KELVIN = 273.15;
 export const PASSPHRASE = 'correct horse';
 export const LINUX_DATA = '0fc63daf-8483-4772-8e79-3d69d8477de4';
 export const BASIC_DATA = 'ebd0a0a2-b9e5-4433-87c0-68b6b72699c7';
 const EFI = 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b';
+const BIOS_BOOT = '21686148-6449-6e6f-744e-656564454649';
+const MICROSOFT_RESERVED = 'e3c9e316-0b5c-4db8-817d-f92df00215ae';
+const LINUX_SWAP = '0657fd6d-a4ab-43c4-84e5-0933c84b4f4f';
+export const SPACE_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
 
 const drive = (id, props) => ({
   path: `/org/freedesktop/UDisks2/drives/${id}`,
@@ -14,7 +20,8 @@ const drive = (id, props) => ({
   RotationRate: 0, SortKey: `00coldplug/${id}`, Optical: false, ...props,
 });
 
-const partition = (name, number, offset, size, type, filesystem) => ({name, number, offset, size, type, ...filesystem});
+const partition = (name, number, offset, size, type, filesystem) =>
+  ({name, number, offset, size, type, flags: 0, uuid: `${number}0000000-0000-4000-8000-${String(offset).padStart(12, '0')}`, ...filesystem});
 
 export function fixtureDrives(user) {
   return [
@@ -52,6 +59,18 @@ export function fixtureDrives(user) {
       device: 'sdc', partitionPrefix: '', size: 1000 * GiB, table: 'gpt',
       partitions: [
         partition('', 1, MiB, 400 * GiB, BASIC_DATA, {IdUsage: 'filesystem', IdType: 'ntfs', IdLabel: 'Old Windows', IdUUID: '0AB2C3D4E5F60718'}),
+      ],
+    },
+    {
+      drive: drive('Kingston_A400', {Vendor: 'Kingston', Model: 'A400', Size: 8 * GiB, SortKey: '00coldplug/zz-Kingston'}),
+      device: 'sdd', partitionPrefix: '', size: 8 * GiB, table: 'gpt',
+      partitions: [
+        partition('', 1, MiB, MiB, BIOS_BOOT, {}),
+        partition('Microsoft reserved partition', 2, 2 * MiB, 16 * MiB, MICROSOFT_RESERVED, {}),
+        partition('', 3, 18 * MiB, 512 * MiB, LINUX_SWAP, {IdUsage: 'other', IdType: 'swap', IdVersion: '1', IdUUID: 'lab-swap'}),
+        partition('', 4, 530 * MiB, 2 * GiB, LINUX_DATA, {IdUsage: 'filesystem', IdType: 'ext4', IdLabel: 'Projects', IdUUID: 'lab-projects', mounts: [SPACE_FOLDER]}),
+        partition('', 5, 2578 * MiB, GiB, LINUX_DATA, {IdUsage: 'filesystem', IdType: 'ext4', IdLabel: 'Scratch', IdUUID: 'lab-scratch', mounts: []}),
+        partition('', 6, 3602 * MiB, 256 * MiB, LINUX_DATA, {}),
       ],
     },
   ];

@@ -5,7 +5,8 @@ export type OpenDialog =
 	| { kind: 'format-drive'; drive: Drive }
 	| { kind: 'create'; drive: Drive; offset: number; size: number }
 	| { kind: 'delete'; drive: Drive; volume: Volume }
-	| { kind: 'resize'; volume: Volume; room: number }
+	| { kind: 'apply-plan' }
+	| { kind: 'discard-plan' }
 	| { kind: 'label'; volume: Volume }
 	| { kind: 'unlock'; volume: Volume }
 	| { kind: 'passphrase'; volume: Volume }

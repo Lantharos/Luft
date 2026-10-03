@@ -43,6 +43,9 @@ pub struct Volume {
     pub swap_active: bool,
     pub system: bool,
     pub partition_type: Option<String>,
+    pub partition_name: String,
+    pub flags: Vec<u8>,
+    pub logical: bool,
     pub encryption: Option<Encryption>,
     pub startup: Option<Startup>,
     pub job: Option<Job>,
@@ -63,7 +66,7 @@ pub struct Startup {
 }
 
 impl Volume {
-    fn in_use_by_system(&self) -> bool {
+    pub fn in_use_by_system(&self) -> bool {
         self.system
             || self
                 .encryption
@@ -71,6 +74,25 @@ impl Volume {
                 .and_then(|encryption| encryption.cleartext.as_deref())
                 .is_some_and(Volume::in_use_by_system)
     }
+}
+
+#[derive(Serialize)]
+pub struct Span {
+    offset: u64,
+    size: u64,
+}
+
+pub fn extended(objects: &Objects, whole: &Object) -> Option<Span> {
+    objects
+        .get(whole.path, TABLE)?
+        .get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions")?
+        .iter()
+        .filter_map(|path| objects.get(path.as_str(), PARTITION))
+        .find(|partition| partition.flag("IsContainer"))
+        .map(|partition| Span {
+            offset: partition.get("Offset").unwrap_or(0),
+            size: partition.get("Size").unwrap_or(0),
+        })
 }
 
 pub fn map(
@@ -169,6 +191,14 @@ fn volume(
             || usage.holds(&mount_points)
             || (text("IdType") == "LVM2_member" && !usage.root_found()),
         partition_type: partition.and_then(|partition| partition.get("Type")),
+        partition_name: partition
+            .and_then(|partition| partition.get("Name"))
+            .unwrap_or_default(),
+        flags: partition
+            .and_then(|partition| partition.get::<u64>("Flags"))
+            .map(set_bits)
+            .unwrap_or_default(),
+        logical: partition.is_some_and(|partition| partition.flag("IsContained")),
         encryption: objects
             .get(block.path, ENCRYPTED)
             .map(|encrypted| Encryption {
@@ -184,6 +214,10 @@ fn volume(
         swap_active,
         mount_points,
     }
+}
+
+fn set_bits(flags: u64) -> Vec<u8> {
+    (0..64).filter(|bit| flags & (1 << bit) != 0).collect()
 }
 
 fn cleartext<'a>(objects: &'a Objects, backing: &str) -> Option<Object<'a>> {

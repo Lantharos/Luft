@@ -4,12 +4,14 @@
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
+	import { editor } from '#lib/editor/editor.svelte.js';
 	import type { Drive, Volume } from '#lib/api.js';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import DriveDetails from './details/DriveDetails.svelte';
 	import HealthDialog from './details/HealthDialog.svelte';
 	import VolumeDetails from './details/VolumeDetails.svelte';
 	import CreateDialog from './format/CreateDialog.svelte';
+	import ApplyDialog from './editor/ApplyDialog.svelte';
 	import EncryptionDialog from './encryption/EncryptionDialog.svelte';
 	import RecoveryKeyDialog from './encryption/RecoveryKeyDialog.svelte';
 	import TurnOffDialog from './encryption/TurnOffDialog.svelte';
@@ -18,7 +20,6 @@
 	import FormatDialog from './format/FormatDialog.svelte';
 	import LabelDialog from './LabelDialog.svelte';
 	import PassphraseDialog from './encryption/PassphraseDialog.svelte';
-	import ResizeDialog from './format/ResizeDialog.svelte';
 	import SaveImageDialog from './images/SaveImageDialog.svelte';
 	import StartupDialog from './StartupDialog.svelte';
 	import UnlockDialog from './encryption/UnlockDialog.svelte';
@@ -65,8 +66,16 @@
 	<FormatDialog drive={dialog.drive} volume={null} onclose={dialogs.close} />
 {:else if dialog?.kind === 'create'}
 	<CreateDialog drive={dialog.drive} offset={dialog.offset} size={dialog.size} onclose={dialogs.close} />
-{:else if dialog?.kind === 'resize'}
-	<ResizeDialog volume={dialog.volume} room={dialog.room} onclose={dialogs.close} />
+{:else if dialog?.kind === 'apply-plan'}
+	<ApplyDialog name={editor.drive?.name ?? ''} onclose={dialogs.close} />
+{:else if dialog?.kind === 'discard-plan'}
+	<ConfirmDialog
+		title="Discard the planned changes?"
+		description="Nothing on the drive has changed yet. The {editor.steps.length === 1 ? 'change' : `${editor.steps.length} changes`} you planned are forgotten."
+		confirm="Discard"
+		onconfirm={async () => (editor.close(), true)}
+		onclose={dialogs.close}
+	/>
 {:else if dialog?.kind === 'label'}
 	<LabelDialog volume={dialog.volume} onclose={dialogs.close} />
 {:else if dialog?.kind === 'unlock'}

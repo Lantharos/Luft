@@ -31,9 +31,9 @@ export class Model {
     this.drives.set(drive.path, {...drive, ata, nvme, device, partitionPrefix});
     const whole = this._block(device, size, drive.path, {table: {type: table, partitions: []}});
     for (const part of partitions) {
-      const {name, number, offset, size: length, type, mounts, encrypted, ...ids} = part;
+      const {name, number, offset, size: length, type, flags, uuid: partitionUuid, mounts, encrypted, ...ids} = part;
       const block = this._block(`${device}${partitionPrefix}${number}`, length, drive.path,
-        {partition: {number, offset, type, name, table: whole.path}, ...ids});
+        {partition: {number, offset, type, name, flags, uuid: partitionUuid, table: whole.path}, ...ids});
       if (ids.IdUsage === 'filesystem') block.mountPoints = mounts ?? [];
       if (encrypted) block.encrypted = {...encrypted, cleartext: '/'};
       whole.table.partitions.push(block.path);
@@ -116,7 +116,7 @@ export class Model {
     return WINDOWS_TYPES.includes(type) ? BASIC_DATA : LINUX_DATA;
   }
 
-  createPartition(tablePath, offset, size, format, options) {
+  createPartition(tablePath, offset, size, format, options, {type = '', name = '', uuid: partitionUuid = uuid()} = {}) {
     const whole = this.block(tablePath);
     if (!whole.table) throw new Failure('NotSupported', 'No partition table');
     const parts = whole.table.partitions.map(path => this.block(path)).sort((a, b) => a.partition.offset - b.partition.offset);
@@ -129,10 +129,11 @@ export class Model {
     const drive = this.drives.get(whole.drive);
     const number = Math.max(0, ...parts.map(part => part.partition.number)) + 1;
     const block = this._block(`${drive.device}${drive.partitionPrefix}${number}`, length, whole.drive,
-      {partition: {number, offset: start, type: this._partitionType(tablePath, format), name: '', table: tablePath}});
+      {partition: {number, offset: start, type: type || this._partitionType(tablePath, format), name, flags: 0, uuid: partitionUuid, table: tablePath}});
     whole.table.partitions.push(block.path);
     this.changed(tablePath);
-    this.format(block.path, format, options);
+    if (format) this.format(block.path, format, options);
+    else this.changed(block.path);
     return block.path;
   }
 
@@ -152,6 +153,12 @@ export class Model {
       .filter(offset => offset > block.partition.offset).reduce((a, b) => Math.min(a, b), whole.size - MiB);
     if (block.partition.offset + size > limit) throw new Failure('Failed', 'Not enough free space after the partition');
     block.size = size;
+    this.changed(path);
+  }
+
+  setPartition(path, field, value) {
+    const block = this.block(path);
+    block.partition[field] = value;
     this.changed(path);
   }
 

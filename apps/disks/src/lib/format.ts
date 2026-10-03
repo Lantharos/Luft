@@ -1,5 +1,6 @@
 import { bytes } from '@luft/ui';
 import type { Drive, Filesystem, Health, Job, Segment, Volume } from './api';
+import { isEfiSystem, partitionType } from './partitions/types';
 
 export const FILESYSTEM_NAMES: Record<string, string> = {
 	ext4: 'ext4',
@@ -26,22 +27,19 @@ export function filesystemName(volume: Volume) {
 	return FILESYSTEM_NAMES[volume.fsType] ?? volume.fsType;
 }
 
-const EFI_PARTITION = 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b';
-
 export function volumeName(volume: Volume) {
 	const contents = inner(volume);
 	if (volume.label || contents.label) return volume.label || contents.label;
-	if (volume.partitionType === EFI_PARTITION || volume.partitionType === '0xef') return 'EFI system';
+	if (volume.partitionName) return volume.partitionName;
+	if (isEfiSystem(volume)) return 'EFI system';
 	if (contents.mountPoints[0]) return contents.mountPoints[0];
+	const type = partitionType(volume.partitionType);
+	if (type && type.role !== 'data') return type.label;
 	return volume.number ? `Partition ${volume.number}` : volume.device.replace('/dev/', '');
 }
 
 export function inner(volume: Volume) {
 	return volume.encryption?.cleartext ?? volume;
-}
-
-export function isMounted(volume: Volume) {
-	return inner(volume).mountPoints.length > 0;
 }
 
 export function segmentName(segment: Segment) {
@@ -58,35 +56,6 @@ export function usedShare(item: Segment | Volume) {
 
 export function percent(share: number) {
 	return `${Math.floor(share * 100)}%`;
-}
-
-const PARTITION_TYPES: Record<string, string> = {
-	[EFI_PARTITION]: 'EFI system',
-	'0fc63daf-8483-4772-8e79-3d69d8477de4': 'Linux data',
-	'4f68bce3-e8cd-4db1-96e7-fbcaf984b709': 'Linux root',
-	'bc13c2ff-59e6-4262-a352-b275fd6f7172': 'Linux boot',
-	'0657fd6d-a4ab-43c4-84e5-0933c84b4f4f': 'Linux swap',
-	'ca7d7ccb-63ed-4c53-861c-1742536059cc': 'Linux encrypted',
-	'e6d6d379-f507-44c2-a23c-238f2a3df928': 'Linux LVM',
-	'ebd0a0a2-b9e5-4433-87c0-68b6b72699c7': 'Microsoft basic data',
-	'e3c9e316-0b5c-4db8-817d-f92df00215ae': 'Microsoft reserved',
-	'de94bba4-06d1-4d40-a16a-bfd50179d6ac': 'Windows recovery',
-	'48465300-0000-11aa-aa11-00306543ecac': 'Apple HFS+',
-	'7c3457ef-0000-11aa-aa11-00306543ecac': 'Apple APFS',
-	'0xef': 'EFI system',
-	'0x83': 'Linux',
-	'0x82': 'Linux swap',
-	'0x8e': 'Linux LVM',
-	'0x07': 'NTFS or exFAT',
-	'0x0b': 'FAT32',
-	'0x0c': 'FAT32',
-	'0x05': 'Extended',
-	'0x0f': 'Extended'
-};
-
-export function partitionTypeName(volume: Volume) {
-	if (!volume.partitionType) return null;
-	return PARTITION_TYPES[volume.partitionType.toLowerCase()] ?? volume.partitionType;
 }
 
 const JOBS: Record<string, string> = {

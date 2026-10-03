@@ -1,8 +1,10 @@
 import * as api from '#lib/api.js';
-import type { Drive, Segment, Volume } from '#lib/api.js';
+import type { Drive, Volume } from '#lib/api.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+import { editor } from '#lib/editor/editor.svelte.js';
 import { changing } from '#lib/encryption.svelte.js';
 import { inner, volumeName } from '#lib/format.js';
+import { explorable } from '#lib/partitions/types.js';
 import { disks } from '#lib/state/disks.svelte.js';
 
 export interface Action {
@@ -12,9 +14,6 @@ export interface Action {
 	checked?: boolean;
 }
 
-const SHRINKS = 2 | 8;
-const GROWS = 4 | 16;
-
 function act(volume: Volume, action: () => Promise<unknown>) {
 	void disks.run(volume.block, action);
 }
@@ -23,18 +22,6 @@ function unlock(volume: Volume) {
 	void disks.run(volume.block, async () => {
 		if (!(await api.unlock(volume.block, null, false))) dialogs.open({ kind: 'unlock', volume });
 	});
-}
-
-function roomAfter(segments: Segment[], volume: Volume) {
-	const index = segments.findIndex((segment) => segment.kind === 'volume' && segment.block === volume.block);
-	const next = segments[index + 1];
-	return next?.kind === 'free' ? next.size : 0;
-}
-
-function resizable(drive: Drive, volume: Volume, room: number) {
-	if (volume.number === null || volume.encryption) return false;
-	const flags = disks.support(volume.fsType)?.resize ?? 0;
-	return (room > 0 && (flags & GROWS) !== 0) || (volume.used !== null && (flags & SHRINKS) !== 0);
 }
 
 export function imageActions(drive: Drive, block: string, name: string): Action[] {
@@ -81,11 +68,10 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	const name = volumeName(volume);
 	const look: Action[] = [];
 	if (mounted && isProtected(volume)) look.push({ label: 'Open', run: () => void api.openFolder(contents.mountPoints[0]) });
-	if (mounted) look.push({ label: 'See what’s using space', run: () => disks.explore(contents.mountPoints[0], name) });
+	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.explore(contents.mountPoints[0], name) });
 	look.push({ label: 'Details', run: () => dialogs.open({ kind: 'details', drive, volume }) });
 	if (isProtected(volume) || drive.readOnly) return [look];
 
-	const room = roomAfter(drive.segments, volume);
 	const state: Action[] = [];
 	if (mounted && filesystem) state.push({ label: 'Unmount', run: () => act(volume, () => api.unmount(contents.block)) });
 	if (volume.encryption?.cleartext) state.push({ label: 'Lock', run: () => act(volume, () => api.lock(volume.block)) });
@@ -95,7 +81,7 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 		edit.push({ label: 'Rename…', run: () => dialogs.open({ kind: 'label', volume: contents }) });
 		if (!drive.removable) edit.push({ label: 'Mount at startup…', run: () => dialogs.open({ kind: 'startup', volume: contents }) });
 	}
-	if (resizable(drive, volume, room)) edit.push({ label: 'Resize…', run: () => dialogs.open({ kind: 'resize', volume, room }) });
+	if (volume.number !== null && drive.table) edit.push({ label: 'Resize or move…', run: () => editor.open(drive.id, volume.block) });
 
 	const encryption: Action[] = [];
 	const progress = disks.encryption(volume);
@@ -119,6 +105,7 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 
 export function driveMenu(drive: Drive): Action[][] {
 	const about: Action[] = [{ label: 'Drive details', run: () => dialogs.open({ kind: 'drive', drive }) }];
-	if (drive.system || drive.readOnly) return [about];
-	return [about, imageActions(drive, drive.block, drive.name), [{ label: 'Format drive…', run: () => dialogs.open({ kind: 'format-drive', drive }), danger: true }]];
+	const edit: Action[] = drive.table && !drive.readOnly ? [{ label: 'Edit partitions…', run: () => editor.open(drive.id) }] : [];
+	if (drive.system || drive.readOnly) return [about, edit];
+	return [about, edit, imageActions(drive, drive.block, drive.name), [{ label: 'Format drive…', run: () => dialogs.open({ kind: 'format-drive', drive }), danger: true }]];
 }

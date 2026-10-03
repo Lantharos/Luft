@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::actions::formatting::Format;
-use crate::actions::{drive, encryption, formatting, mounting, partitions};
+use crate::actions::{drive, encryption, formatting, mounting, plan};
 use crate::images::{self, Imaging};
 use crate::launch;
 use crate::space::Explorer;
@@ -80,9 +80,8 @@ struct CreatePartition {
 }
 
 #[derive(Deserialize)]
-struct Resize {
-    block: String,
-    size: u64,
+struct PlanStep {
+    step: plan::Step,
 }
 
 #[derive(Deserialize)]
@@ -188,6 +187,7 @@ pub fn register(window: SabineWindow, state: &State) -> SabineWindow {
     let window = register_encryption(window);
     let window = register_space(window, state);
     let window = register_trust(window);
+    let window = register_plan(window, state);
     register_drives(window, state)
 }
 
@@ -273,6 +273,12 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
         })
 }
 
+fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
+    window.with("disks_plan_step", state, |state, PlanStep { step }| {
+        plan::run(&state.events, step)
+    })
+}
+
 fn register_volumes(window: SabineWindow) -> SabineWindow {
     window
         .command("app_state", |_: Value| {
@@ -327,10 +333,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
              }| { formatting::create_partition(&table, offset, size, &format, true) },
         )
         .command("disks_delete_partition", |Block { block }| {
-            partitions::delete(&block)
-        })
-        .command("disks_resize", |Resize { block, size }| {
-            partitions::resize(&block, size)
+            plan::delete(&block)
         })
 }
 

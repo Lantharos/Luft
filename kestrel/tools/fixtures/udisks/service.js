@@ -40,6 +40,14 @@ function openImage(device, restoring) {
   return file.read(null);
 }
 
+function openDevice(block) {
+  const file = Gio.File.new_for_path(imageFile(`${block.device}-device`));
+  if (!file.query_exists(null)) file.create(Gio.FileCreateFlags.NONE, null).close(null);
+  const stream = file.open_readwrite(null);
+  if (file.query_info('standard::size', Gio.FileQueryInfoFlags.NONE, null).get_size() < block.size) stream.truncate(block.size, null);
+  return stream.get_output_stream();
+}
+
 export function publishUdisks(calls) {
   const server = Gio.DBusObjectManagerServer.new(ROOT);
   const user = GLib.get_user_name();
@@ -84,22 +92,40 @@ export function publishUdisks(calls) {
         record('OpenForRestore');
         returnFd(invocation, openImage(block.device, true));
       },
-      Rescan: () => record('Rescan'),
+      OpenDeviceAsync: ([mode], invocation) => {
+        record('OpenDevice', ` ${mode}`);
+        returnFd(invocation, openDevice(block));
+      },
+      RescanAsync: (_args, invocation) => answer(invocation, () => {
+        record('Rescan');
+      }),
     })];
     if (block.table) {
       interfaces.push(skeleton('PartitionTable', {
         Partitions: block.table.partitions, Type: block.table.type,
-        CreatePartitionAndFormatAsync: ([offset, size, , , , format, options], invocation) => answer(invocation, () => {
-          record('CreatePartitionAndFormat', ` ${format} size=${size}`);
-          return new GLib.Variant('(o)', [model.createPartition(block.path, offset, size, format, unpack(options))]);
+        CreatePartitionAndFormatAsync: ([offset, size, type, name, , format, options], invocation) => answer(invocation, () => {
+          record('CreatePartitionAndFormat', ` ${format} size=${size}${type ? ` type=${type}` : ''}${name ? ` name=${name}` : ''}`);
+          return new GLib.Variant('(o)', [model.createPartition(block.path, offset, size, format, unpack(options), {type, name})]);
+        }),
+        CreatePartitionAsync: ([offset, size, type, name, options], invocation) => answer(invocation, () => {
+          const values = unpack(options);
+          record('CreatePartition', ` offset=${offset} size=${size} type=${type}${name ? ` name=${name}` : ''}${values['partition-uuid'] ? ` uuid=${values['partition-uuid']}` : ''}`);
+          return new GLib.Variant('(o)', [model.createPartition(block.path, offset, size, '', {}, {type, name, uuid: values['partition-uuid']})]);
         }),
       }));
     }
     if (block.partition) {
-      const {number, type, offset, name, table} = block.partition;
+      const {number, type, offset, name, flags, uuid: partitionUuid, table} = block.partition;
+      const set = (method, field, describe = value => value) => ([value], invocation) => answer(invocation, () => {
+        record(method, ` ${describe(value)}`);
+        model.setPartition(block.path, field, value);
+      });
       interfaces.push(skeleton('Partition', {
-        Number: number, Type: type, Flags: 0, Offset: offset, Size: block.size, Name: name, UUID: '', Table: table,
+        Number: number, Type: type, Flags: flags, Offset: offset, Size: block.size, Name: name, UUID: partitionUuid, Table: table,
         IsContainer: false, IsContained: false,
+        SetTypeAsync: set('SetType', 'type'),
+        SetNameAsync: set('SetName', 'name'),
+        SetFlagsAsync: set('SetFlags', 'flags', value => `0x${BigInt(value).toString(16)}`),
         DeleteAsync: (_args, invocation) => answer(invocation, () => {
           record('Delete');
           model.deletePartition(block.path);

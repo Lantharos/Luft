@@ -24,6 +24,9 @@ export interface Volume {
 	swapActive: boolean;
 	system: boolean;
 	partitionType: string | null;
+	partitionName: string;
+	flags: number[];
+	logical: boolean;
 	encryption: { kind: string; cleartext: Volume | null } | null;
 	startup: { directory: string; options: string } | null;
 	job: Job | null;
@@ -54,6 +57,7 @@ export interface Drive {
 	system: boolean;
 	readOnly: boolean;
 	table: 'gpt' | 'dos' | null;
+	extended: { offset: number; size: number } | null;
 	segments: Segment[];
 	health: Health | null;
 	job: Job | null;
@@ -121,6 +125,13 @@ export interface SpaceUpdate {
 	seconds: number;
 }
 
+export type PlanStep =
+	| { kind: 'create'; table: string; offset: number; size: number; partitionType: string; name: string; flags: number[]; filesystem: string; label: string }
+	| { kind: 'delete'; block: string }
+	| { kind: 'place'; block: string; offset: number; size: number }
+	| { kind: 'format'; block: string; filesystem: string; label: string }
+	| { kind: 'change'; block: string; partitionType: string | null; name: string | null; flags: number[] | null; label: string | null };
+
 export interface AppState extends Appearance {
 	arguments: string[];
 }
@@ -170,7 +181,7 @@ export const formatDrive = (block: string, size: number, removable: boolean, for
 export const createPartition = (table: string, offset: number, size: number, format: Format) =>
 	invoke<void>('disks_create_partition', { table, offset, size, format }, WAIT);
 export const deletePartition = (block: string) => invoke<void>('disks_delete_partition', { block }, WAIT);
-export const resize = (block: string, size: number) => invoke<void>('disks_resize', { block, size }, WAIT);
+export const planStep = (step: PlanStep) => invoke<string | null>('disks_plan_step', { step }, WAIT);
 
 export const unlock = (block: string, passphrase: string | null, remember: boolean) =>
 	invoke<boolean>('disks_unlock', { block, passphrase, remember }, WAIT);
@@ -220,6 +231,7 @@ export const space = {
 export const events = {
 	changed: (callback: (state: { drives: Drive[] }) => void) => listen('disks.changed', callback),
 	image: (callback: (progress: ImageProgress) => void) => listen('disks.image', callback),
+	moved: (callback: (progress: { copied: number; total: number }) => void) => listen('disks.plan', callback),
 	space: (callback: (update: SpaceUpdate) => void) => listen('space.update', callback),
 	trust: (callback: (protection: Protection) => void) => listen('disks.trust', callback),
 	activated: (callback: (activation: { arguments: string[] }) => void) => listen('singleInstance.activate', callback)

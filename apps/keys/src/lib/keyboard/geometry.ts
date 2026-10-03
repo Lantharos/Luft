@@ -97,6 +97,19 @@ export const PHYSICAL: Record<string, string> = {
 	KanaMode: 'HKTG'
 };
 
+export const US_LABELS: Record<string, string> = Object.fromEntries([
+	['TLDE', '`'],
+	...NUMBERS.map((name, index) => [name, '1234567890-='[index]]),
+	['AE13', '¥'],
+	...TOP.map((name, index) => [name, 'QWERTYUIOP[]'[index]]),
+	['BKSL', '\\'],
+	...HOME.map((name, index) => [name, "ASDFGHJKL;'"[index]]),
+	['LSGT', '<'],
+	...BOTTOM.map((name, index) => [name, 'ZXCVBNM,./'[index]]),
+	['AB11', 'ろ'],
+	['SPCE', 'Space']
+]);
+
 export const TYPING = new Set(['TLDE', ...NUMBERS, 'AE13', ...TOP, 'BKSL', ...HOME, 'LSGT', ...BOTTOM, 'AB11', 'SPCE']);
 
 function row(names: string[], start: number, y: number): Cap[] {

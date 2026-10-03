@@ -47,6 +47,7 @@
 
 <div class="flex flex-col gap-3">
 	<div
+		data-own-undo
 		class="field"
 		class:focused
 		role="textbox"

@@ -63,7 +63,7 @@
 				</div>
 			</div>
 			<Keyboard board={current} level={current.level || null} onlatch={(name) => current.latch(name)} />
-			<KeyLevels levels={current.levels(current.selected)} level={current.level} thirdLevel={current.usesThirdLevel} />
+			<KeyLevels levels={current.levels(current.selected)} level={current.level} thirdLevel={current.usesThirdLevel} dead={current.layout.dead} />
 		</section>
 	</Page>
 {/if}

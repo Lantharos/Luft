@@ -3,12 +3,13 @@
 	import { Segmented } from '@luft/ui';
 	import Page from '$lib/shell/Page.svelte';
 	import SourceActions from '$lib/shell/SourceActions.svelte';
+	import UndoButtons from '$lib/shell/UndoButtons.svelte';
 	import { app } from '$lib/state/app.svelte';
 	import { toast } from '$lib/state/toast.svelte';
 	import { deleteMethod, exportMethod, openMethod, useMethod } from './api';
-	import { MethodEditor, type Table } from './editor.svelte';
+	import { MethodEditor, type Tab } from './editor.svelte';
 	import EntryTable from './EntryTable.svelte';
-	import MethodDetails from './MethodDetails.svelte';
+	import MethodSettings from './MethodSettings.svelte';
 	import TryMethod from './TryMethod.svelte';
 
 	interface Props {
@@ -17,25 +18,20 @@
 
 	let { id }: Props = $props();
 
-	let editor = $state<MethodEditor | null>(null);
-	let table = $state<Table>('rules');
+	const TABS: { value: Tab; label: string }[] = [
+		{ value: 'rules', label: 'Replacements' },
+		{ value: 'words', label: 'Words' },
+		{ value: 'sequences', label: 'Sequences' },
+		{ value: 'settings', label: 'Settings' }
+	];
+	const TAB_SHORTCUTS: Record<string, Tab> = { Digit1: 'rules', Digit2: 'words', Digit3: 'sequences', Digit4: 'settings' };
 
-	let tables = $derived(
-		editor
-			? [
-					{ value: 'rules' as const, label: `Replacements ${editor.rules.length || ''}`.trim() },
-					{ value: 'words' as const, label: `Words ${editor.words.length || ''}`.trim() },
-					{ value: 'sequences' as const, label: `Sequences ${editor.sequences.length || ''}`.trim() }
-				]
-			: []
-	);
+	let editor = $state<MethodEditor | null>(null);
+
 
 	onMount(() => {
 		openMethod(id)
-			.then((method) => {
-				editor = new MethodEditor(method, () => void app.refresh());
-				table = method.rules.length || !method.words.length ? 'rules' : 'words';
-			})
+			.then((method) => (editor = new MethodEditor(method, () => void app.refresh())))
 			.catch((error) => {
 				toast.failed(error);
 				app.select(app.first());
@@ -44,6 +40,13 @@
 
 	onDestroy(() => void editor?.save());
 
+	function switchTab(event: KeyboardEvent) {
+		const tab = TAB_SHORTCUTS[event.code];
+		if (!editor || !tab || !(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+		event.preventDefault();
+		editor.tab = tab;
+	}
+
 	async function remove() {
 		editor?.discard();
 		await deleteMethod(id);
@@ -51,10 +54,13 @@
 	}
 </script>
 
+<svelte:window onkeydown={switchTab} />
+
 {#if editor}
 	{@const current = editor}
 	<Page title={current.method.name} wide>
 		{#snippet actions()}
+			<UndoButtons target={current} />
 			<SourceActions
 				selection={{ kind: 'method', id }}
 				what="input method"
@@ -64,34 +70,23 @@
 			/>
 		{/snippet}
 		<div class="grid items-start gap-8 min-[1100px]:grid-cols-[minmax(0,1fr)_340px]">
-			<div class="flex min-w-0 flex-col gap-7">
-				<section class="flex flex-col gap-4">
-					<Segmented label="What to edit" options={tables} value={table} onchange={(value) => (table = value)} />
-					{#if table === 'rules'}
-						<EntryTable
-							editor={current}
-							table="rules"
-							add="Add replacement"
-							context
-							empty="Replacements turn what you type into something else as you go, like a' into á. The longest match wins, so a and a' can both have their own."
-						/>
-					{:else if table === 'words'}
-						<EntryTable
-							editor={current}
-							table="words"
-							add="Add word"
-							empty="Words offer choices while you type, like ni giving 你 and 尼. Pick one with its number or Space."
-						/>
-					{:else}
-						<EntryTable
-							editor={current}
-							table="sequences"
-							add="Add sequence"
-							empty="Sequences start with the sequence key, like the key, then a and e for æ."
-						/>
-					{/if}
-				</section>
-				<MethodDetails editor={current} />
+			<div class="flex min-w-0 flex-col gap-6">
+				<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+				{#if current.tab === 'rules'}
+					<EntryTable
+						editor={current}
+						table="rules"
+						add="Add replacement"
+						context
+						empty="Replacements turn what you type into something else as you go, like a' into á. The longest match wins, so a and a' can both have their own."
+					/>
+				{:else if current.tab === 'words'}
+					<EntryTable editor={current} table="words" add="Add word" empty="Words offer choices while you type, like ni giving 你 and 尼. Pick one with its number or Space." />
+				{:else if current.tab === 'sequences'}
+					<EntryTable editor={current} table="sequences" add="Add sequence" empty="Sequences start with the sequence key, then a few keys, like a and e for æ." />
+				{:else}
+					<MethodSettings editor={current} />
+				{/if}
 			</div>
 			<section class="flex flex-col gap-2 min-[1100px]:sticky min-[1100px]:top-2">
 				<h2 class="px-1.5 text-[14px] font-semibold text-[var(--text-soft)]">Try it</h2>

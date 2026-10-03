@@ -1,5 +1,5 @@
 import { nameOf } from '$lib/characters/characters';
-import type { Symbol } from '$lib/layout/api';
+import type { DeadKey, Symbol } from '$lib/layout/api';
 
 export const LEVEL_NAMES = ['Alone', 'With Shift', 'With AltGr', 'With Shift and AltGr'];
 
@@ -12,9 +12,12 @@ function plainName(text: string) {
 	return null;
 }
 
-export async function describe(symbol: Symbol) {
+export async function describe(symbol: Symbol, dead: DeadKey[] = []) {
 	if (symbol.kind === 'character') return plainName(symbol.text) ?? (await nameOf(symbol.text)) ?? symbol.keysym.replaceAll('_', ' ');
-	if (symbol.kind === 'dead') return `Dead key, ${symbol.keysym.replace('dead_', '').replaceAll('_', ' ')}`;
+	if (symbol.kind === 'dead') {
+		const own = dead.find((key) => key.keysym === symbol.keysym);
+		return own ? `${own.name} dead key` : `Dead key, ${symbol.keysym.replace('dead_', '').replaceAll('_', ' ')}`;
+	}
 	if (symbol.kind === 'compose') return 'Starts a compose sequence';
 	if (symbol.kind === 'function') return symbol.keysym.replaceAll('_', ' ');
 	return 'Nothing';

@@ -8,12 +8,17 @@ import * as KeyboardManager from 'resource:///org/gnome/shell/misc/keyboardManag
 import {getInputSourceManager} from 'resource:///org/gnome/shell/ui/status/keyboard.js';
 
 import {prepareHome} from './home.js';
+import {checkDeadKeys} from './keysDeadKeys.js';
 import {LuftApp, sleep, startSabineService, waitFor} from './luftApp.js';
 
 const KEY_A = 30;
 const KEY_E = 18;
 const KEY_APOSTROPHE = 40;
 const KEY_RIGHTALT = 100;
+const KEY_LEFTCTRL = 29;
+const KEY_1 = 2;
+const KEY_2 = 3;
+const KEY_3 = 4;
 const SAVED = 5000;
 const IBUS_RESTART = 30000;
 const METHOD = `name = "Pinyin lite"
@@ -44,12 +49,15 @@ function userLayouts() {
   return exists(RULES) ? [...read(RULES).matchAll(/<name>([^<]+)<\/name>/g)].map(match => match[1]) : [];
 }
 
-function forget(layout, method) {
-  if (layout) {
+function forget(layouts, method) {
+  for (const layout of layouts) {
     GLib.unlink(config('xkb/symbols', layout));
+    GLib.unlink(config('keys/layouts', `${layout}.toml`));
     const blocks = read(RULES).replace(/ *<layout>[\s\S]*?<\/layout>\n/g, block => block.includes(`<name>${layout}</name>`) ? '' : block);
     GLib.file_set_contents(RULES, blocks);
   }
+  GLib.unlink(config('keys', 'Compose'));
+  GLib.unlink(GLib.build_filenamev([GLib.get_home_dir(), '.XCompose']));
   GLib.unlink(config('keys/input-methods', `${method}.toml`));
   GLib.unlink(GLib.build_filenamev([GLib.get_user_state_dir(), 'keys/learned', `${method}.json`]));
   GLib.unlink(config('autostart', 'com.lantharos.keys.input-methods.desktop'));
@@ -143,6 +151,7 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
 
   const service = await startSabineService();
   const engine = 'keys:pinyin-lite';
+  const before = userLayouts();
   let id = null;
   try {
     styles.set_string('color-scheme', 'prefer-dark');
@@ -163,6 +172,18 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       await pick('small a with ring above');
       await reached(() => read(symbols).includes('replace key <AC01> { type[Group1] = "FOUR_LEVEL", [ aring,'), 'pressing a key picks it and a character found by name is assigned to it', SAVED);
       await shoot(keys, 'keys-layout');
+      const tab = async (code, name) => {
+        keyboard.notify_key(GLib.get_monotonic_time(), KEY_LEFTCTRL, Clutter.KeyState.PRESSED);
+        key(code);
+        keyboard.notify_key(GLib.get_monotonic_time(), KEY_LEFTCTRL, Clutter.KeyState.RELEASED);
+        await pause(700);
+        await shoot(keys, name);
+      };
+      await tab(KEY_2, 'keys-standard-dead-key');
+      await tab(KEY_3, 'keys-layout-settings');
+      await tab(KEY_1, 'keys-layout-again');
+      key(KEY_A);
+      await pause(300);
 
       useSources([['xkb', id]]);
       await reached(() => KeyboardManager.getKeyboardManager().currentLayout?.id === id, 'the custom layout is an input source Kestrel can switch to');
@@ -229,6 +250,8 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       await methods.close();
     }
 
+    await checkDeadKeys({require, reached, pause, keyboard, shoot, useSources, userLayouts, engine});
+
     useSources([['xkb', id], ['ibus', engine]]);
     const entry = installKeysEntry();
     try {
@@ -244,7 +267,8 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       const sources = getInputSourceManager();
       Object.values(sources.inputSources).find(source => source.id === engine).activate(true);
       await reached(() => sources.currentSource?.id === engine, 'the input method is the current input source');
-      await waitFor(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.keys.desktop'), 5000, () => 'Kestrel did not notice Keys');
+      const recorded = () => Shell.AppSystem.get_default().lookup_app('com.lantharos.keys.desktop')?.get_app_info().get_filename()?.startsWith(GLib.get_user_data_dir());
+      await waitFor(recorded, 5000, () => 'Kestrel did not notice Keys');
       await click(actorNamed(global.stage, 'kestrel-input-source'));
       const show = actorNamed(actorNamed(global.stage, 'kestrel-context-menu'), 'Show keyboard layout');
       require(show, 'the input source menu offers Show keyboard layout while Keys is installed');
@@ -269,7 +293,7 @@ export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, 
       entry.remove();
     }
   } finally {
-    forget(id, engine.slice('keys:'.length));
+    forget(userLayouts().filter(layout => !before.includes(layout)), engine.slice('keys:'.length));
     inputSources.set_value('sources', saved.sources);
     inputSources.set_value('mru-sources', saved.mru);
     styles.set_string('color-scheme', saved.scheme);

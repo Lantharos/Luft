@@ -1,13 +1,15 @@
-use std::ffi::OsString;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 
 use xkbcommon::xkb;
 
 use super::compile;
+use crate::compose::system;
+
+const LOCALE_SEQUENCES: &str = "include \"%L\"\n";
 
 enum Request {
-    Load(String, Sender<Result<(), String>>),
+    Load(String, String, Sender<Result<(), String>>),
     Key(String, bool, Sender<String>),
 }
 
@@ -20,19 +22,16 @@ struct Typing {
     compose: Option<xkb::compose::State>,
 }
 
-fn locale() -> OsString {
-    ["LC_ALL", "LC_CTYPE", "LANG"]
-        .iter()
-        .filter_map(std::env::var_os)
-        .find(|value| !value.is_empty() && value != "C" && value != "POSIX")
-        .unwrap_or_else(|| "en_US.UTF-8".into())
-}
-
-fn compose_state() -> Option<xkb::compose::State> {
+fn compose_state(sequences: &str) -> Option<xkb::compose::State> {
     let context = xkb::Context::new(xkb::CONTEXT_NO_FLAGS);
-    let table =
-        xkb::compose::Table::new_from_locale(&context, &locale(), xkb::compose::COMPILE_NO_FLAGS)
-            .ok()?;
+    let table = xkb::compose::Table::new_from_buffer(
+        &context,
+        format!("{LOCALE_SEQUENCES}{sequences}"),
+        &system::locale().to_string_lossy(),
+        xkb::compose::FORMAT_TEXT_V1,
+        xkb::compose::COMPILE_NO_FLAGS,
+    )
+    .ok()?;
     Some(xkb::compose::State::new(
         &table,
         xkb::compose::STATE_NO_FLAGS,
@@ -73,11 +72,11 @@ fn serve(requests: Receiver<Request>) {
     let mut typing: Option<Typing> = None;
     for request in requests {
         match request {
-            Request::Load(symbols, reply) => {
+            Request::Load(symbols, sequences, reply) => {
                 let loaded = compile::symbols(&symbols).map(|compiled| Typing {
                     state: xkb::State::new(&compiled.keymap),
                     keymap: compiled.keymap,
-                    compose: compose_state(),
+                    compose: compose_state(&sequences),
                 });
                 let _ = reply.send(loaded.as_ref().map(|_| ()).map_err(Clone::clone));
                 if let Ok(loaded) = loaded {
@@ -105,10 +104,10 @@ impl Tester {
         Self(sender)
     }
 
-    pub fn load(&self, symbols: String) -> Result<(), String> {
+    pub fn load(&self, symbols: String, sequences: String) -> Result<(), String> {
         let (reply, answer) = mpsc::channel();
         self.0
-            .send(Request::Load(symbols, reply))
+            .send(Request::Load(symbols, sequences, reply))
             .map_err(|error| error.to_string())?;
         answer.recv().map_err(|error| error.to_string())?
     }

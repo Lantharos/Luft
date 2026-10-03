@@ -1565,6 +1565,7 @@ dependencies = [
  "futures-util",
  "gio",
  "inotify",
+ "libc",
  "luft-app",
  "roxmltree 0.21.1",
  "sabine",

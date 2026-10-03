@@ -6,6 +6,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
 	import { cursors } from './cursors.svelte';
+	import { CURSOR_SIZES } from './sizes';
 	import CursorTile from './CursorTile.svelte';
 
 	interface Props {
@@ -18,14 +19,6 @@
 		'cursor-theme': string;
 		'cursor-size': number;
 	};
-
-	const SIZES = [
-		{ value: 24, label: 'Default' },
-		{ value: 32, label: 'Medium' },
-		{ value: 48, label: 'Large' },
-		{ value: 64, label: 'Larger' },
-		{ value: 96, label: 'Largest' }
-	];
 
 	const COLLAPSED = 6;
 
@@ -74,7 +67,7 @@
 		<MoreRow hidden={themes.length - COLLAPSED} bind:expanded />
 	{/if}
 	<Row title="Size">
-		<Select label="Cursor size" options={SIZES} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
+		<Select label="Cursor size" options={CURSOR_SIZES} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
 	</Row>
 	<Row title="Get more cursors" description="Browse themes shared on GNOME-Look" icon={Download} onclick={onbrowse} />
 	<Row title="Cursors folder" description="Themes you put in Home › .local › share › icons show up here" icon={FolderOpen} onclick={openCursorFolder} />

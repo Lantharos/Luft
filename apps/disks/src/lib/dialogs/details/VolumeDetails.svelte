@@ -2,7 +2,8 @@
 	import { bytes, Dialog } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { Drive, Volume } from '#lib/api.js';
-	import { filesystemName, inner, partitionTypeName, volumeName } from '#lib/format.js';
+	import { filesystemName, inner, volumeName } from '#lib/format.js';
+	import { explorable, typeName } from '#lib/partitions/types.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import Facts from './Facts.svelte';
 	import UsageLine from './UsageLine.svelte';
@@ -26,7 +27,8 @@
 			{ label: 'Device', value: volume.device, mono: true },
 			volume.uuid && { label: 'UUID', value: volume.uuid, mono: true },
 			contents !== volume && contents.uuid && { label: 'Contents UUID', value: contents.uuid, mono: true },
-			partitionTypeName(volume) && { label: 'Partition type', value: partitionTypeName(volume) ?? '' },
+			volume.partitionType && { label: 'Partition type', value: typeName(volume.partitionType) ?? '' },
+			volume.partitionName && { label: 'Partition name', value: volume.partitionName },
 			volume.number !== null && { label: 'Partition', value: `${volume.number} on ${drive.device}` }
 		].filter((fact) => fact !== false && fact !== '' && fact !== null)
 	);
@@ -37,8 +39,8 @@
 	}
 
 	function explore() {
-		onclose();
 		disks.explore(contents.mountPoints[0], volumeName(volume));
+		onclose();
 	}
 </script>
 
@@ -48,7 +50,7 @@
 	{/if}
 	<Facts {facts} />
 	{#snippet actions()}
-		{#if mounted}
+		{#if explorable(volume)}
 			<button type="button" class="button mr-auto" onclick={explore}>See what’s using space</button>
 		{/if}
 		<button type="button" class="button primary" onclick={onclose}>Done</button>

@@ -109,6 +109,11 @@ class Frame {
     return this.count(colors, tolerance) / samples;
   }
 
+  near(x, y, color, tolerance) {
+    const offset = y * this._pixbuf.get_rowstride() + x * this._pixbuf.get_n_channels();
+    return channels(color).every((value, channel) => Math.abs(this._pixels[offset + channel] - value) <= tolerance);
+  }
+
   same(other) {
     return other?.bytes.compare(this.bytes) === 0;
   }
@@ -179,6 +184,10 @@ export class LuftApp {
       previous = current;
       await sleep(50);
     }
+  }
+
+  async finished(milliseconds) {
+    await waitFor(() => this._exited, milliseconds, () => `${this.name} kept running:\n${this._log.join('\n')}`);
   }
 
   async close() {

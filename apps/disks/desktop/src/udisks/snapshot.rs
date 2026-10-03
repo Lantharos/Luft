@@ -2,7 +2,7 @@ use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
 
 use super::health::{self, Health};
-use super::volumes::{self, Segment};
+use super::volumes::{self, Segment, Span};
 use super::{BLOCK, DRIVE, JOB, LOOP, PARTITION, TABLE, bytes_text, system};
 
 #[derive(Serialize)]
@@ -38,6 +38,7 @@ pub struct Drive {
     pub system: bool,
     pub read_only: bool,
     pub table: Option<String>,
+    pub extended: Option<Span>,
     pub segments: Vec<Segment>,
     pub health: Option<Health>,
     pub job: Option<Job>,
@@ -125,6 +126,7 @@ fn drive(objects: &Objects, block: Object, jobs: &Jobs, usage: &system::Usage) -
         table: objects
             .get(block.path, TABLE)
             .and_then(|table| table.get("Type")),
+        extended: volumes::extended(objects, &block),
         health: drive
             .as_deref()
             .and_then(|path| health::read(objects, path)),

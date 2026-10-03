@@ -51,13 +51,23 @@ pub fn supported() -> Vec<Support> {
 }
 
 impl Format {
-    fn options(&self, erase: bool) -> Result<Options<'_>, String> {
+    pub fn plain(filesystem: String, label: String) -> Self {
+        Self {
+            filesystem,
+            label,
+            passphrase: None,
+            remember: false,
+            erase: false,
+        }
+    }
+
+    fn options(&self, erase: bool, typed: bool) -> Result<Options<'_>, String> {
         if !FILESYSTEMS.contains(&self.filesystem.as_str()) {
             return Err(format!("{} isn't offered here", self.filesystem));
         }
         let mut options = no_options();
         options.insert("label", Value::from(self.label.as_str()));
-        options.insert("update-partition-type", Value::from(true));
+        options.insert("update-partition-type", Value::from(typed));
         options.insert("tear-down", Value::from(true));
         if OWNED.contains(&self.filesystem.as_str()) {
             options.insert("take-ownership", Value::from(true));
@@ -92,7 +102,7 @@ pub fn format_volume(block: &str, format: &Format) -> Result<(), String> {
         block,
         BLOCK,
         "Format",
-        &(format.filesystem.as_str(), format.options(true)?),
+        &(format.filesystem.as_str(), format.options(true, true)?),
     )?;
     format.remember(block)
 }
@@ -129,21 +139,31 @@ pub fn create_partition(
     format: &Format,
     erase: bool,
 ) -> Result<(), String> {
-    let created = udisks::created(
+    let created = create_typed(table, (offset, size), ("", ""), format, erase)?;
+    format.remember(&created)
+}
+
+pub fn create_typed(
+    table: &str,
+    (offset, size): (u64, u64),
+    (kind, name): (&str, &str),
+    format: &Format,
+    erase: bool,
+) -> Result<String, String> {
+    udisks::created(
         table,
         TABLE,
         "CreatePartitionAndFormat",
         &(
             offset,
             size,
-            "",
-            "",
+            kind,
+            name,
             no_options(),
             format.filesystem.as_str(),
-            format.options(erase)?,
+            format.options(erase, kind.is_empty())?,
         ),
-    )?;
-    format.remember(&created)
+    )
 }
 
 fn partitions(objects: &luft_app::dbus::objects::Objects, block: &str) -> Vec<String> {

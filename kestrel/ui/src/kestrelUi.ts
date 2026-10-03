@@ -83,9 +83,8 @@ class KestrelUi {
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly liveWallpaper: LiveWallpaper;
-  private readonly loginWallpaper = new LoginWallpaper();
-  private readonly loginDisplays = new LoginDisplays();
-  private readonly loginNumLock = new LoginNumLock();
+  private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
+  private readonly loginScreen = this.ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
   private readonly farewell = new Farewell();
   private readonly mediaKeys: MediaKeys;
 
@@ -114,7 +113,7 @@ class KestrelUi {
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();
-      void confirmStartup().then(notifyAboutFailedStartup);
+      if (this.ownsTheScreen) void confirmStartup().then(notifyAboutFailedStartup);
     });
 
     context.layoutManager.addTopChrome(this.menus.shield);
@@ -453,9 +452,7 @@ class KestrelUi {
     this.keyring.destroy();
     this.appearance.destroy();
     this.liveWallpaper.destroy();
-    this.loginWallpaper.destroy();
-    this.loginDisplays.destroy();
-    this.loginNumLock.destroy();
+    for (const sync of this.loginScreen) sync.destroy();
     this.farewell.destroy();
     this.mediaKeys.destroy();
     this.oomNotifier.destroy();

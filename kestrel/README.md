@@ -109,7 +109,7 @@ The login screen starts in the same display mode as the desktop: Kestrel copies 
 
 ### Wallpaper and settings
 
-Each person's own wallpaper appears when they are chosen. Kestrel keeps a copy for the login screen up to date whenever the wallpaper or the light and dark style changes; for live wallpapers it is the still frame. The login screen takes its accent color from the wallpaper the same way the desktop does. Settings can instead show one picture for everyone.
+Each person's own wallpaper appears when they are chosen. Kestrel keeps a copy for the login screen up to date whenever the wallpaper or the light and dark style changes; for live wallpapers it is the still frame. The login screen takes its accent color from the wallpaper the same way the desktop does. Settings can instead show one picture for everyone. Without a picture, such as for Another account, the login screen is black, and so is anything behind a wallpaper on the desktop and lock screen.
 
 The Login Screen page in Settings chooses between everyone's own wallpaper and one picture for everyone, whether people are listed and who is left out, the session that starts by default, and which account signs in automatically when the computer starts.
 

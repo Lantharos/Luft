@@ -7,7 +7,6 @@
 /* WIDGETS */
 
 // Primary widgets
-@import 'widgets/base';
 @import 'widgets/entries';
 @import 'widgets/buttons';
 @import 'widgets/check-box';
@@ -34,6 +33,5 @@
 @import 'widgets/a11y';
 @import 'widgets/misc';
 @import 'widgets/keyboard';
-@import 'widgets/qr-code';
 // Lock / login screen
 @import 'widgets/login-lock';

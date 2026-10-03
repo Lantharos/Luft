@@ -15,14 +15,6 @@
  * to ensure that the compositor thread never needs to perform disk reads to
  * access them. All of the work is done off-thread. When the new data has
  * been loaded, a #ShellAppCache::changed signal is emitted.
- *
- * Additionally, the #ShellAppCache caches information about translations for
- * directories. This allows translation provided in [Desktop Entry] GKeyFiles
- * to be available when building StLabel and other elements without performing
- * costly disk reads.
- *
- * Various monitors are used to keep this information up to date while the
- * Shell is running.
  */
 
 #define DEFAULT_TIMEOUT_SECONDS 5
@@ -32,19 +24,11 @@ struct _ShellAppCache
   GObject          parent_instance;
 
   GAppInfoMonitor *monitor;
-  GPtrArray       *dir_monitors;
-  GHashTable      *folders;
   GCancellable    *cancellable;
   GList           *app_infos;
 
   guint            queued_update;
 };
-
-typedef struct
-{
-  GList      *app_infos;
-  GHashTable *folders;
-} CacheState;
 
 G_DEFINE_TYPE (ShellAppCache, shell_app_cache, G_TYPE_OBJECT)
 
@@ -56,22 +40,9 @@ enum {
 static guint signals [N_SIGNALS];
 
 static void
-cache_state_free (CacheState *state)
+free_app_infos (gpointer app_infos)
 {
-  g_clear_pointer (&state->folders, g_hash_table_unref);
-  g_list_free_full (state->app_infos, g_object_unref);
-  g_free (state);
-}
-
-static CacheState *
-cache_state_new (void)
-{
-  CacheState *state;
-
-  state = g_new0 (CacheState, 1);
-  state->folders = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
-  return g_steal_pointer (&state);
+  g_list_free_full (app_infos, g_object_unref);
 }
 
 /**
@@ -88,81 +59,15 @@ shell_app_cache_get_default (void)
 }
 
 static void
-load_folder (GHashTable *folders,
-             const char *path)
-{
-  g_autoptr(GDir) dir = NULL;
-  const char *name;
-
-  g_assert (folders != NULL);
-  g_assert (path != NULL);
-
-  dir = g_dir_open (path, 0, NULL);
-  if (dir == NULL)
-    return;
-
-  while ((name = g_dir_read_name (dir)))
-    {
-      g_autofree gchar *filename = NULL;
-      g_autoptr(GKeyFile) keyfile = NULL;
-
-      /* First added wins */
-      if (g_hash_table_contains (folders, name))
-        continue;
-
-      filename = g_build_filename (path, name, NULL);
-      keyfile = g_key_file_new ();
-
-      if (g_key_file_load_from_file (keyfile, filename, G_KEY_FILE_NONE, NULL))
-        {
-          gchar *translated;
-
-          translated = g_key_file_get_locale_string (keyfile,
-                                                     "Desktop Entry", "Name",
-                                                     NULL, NULL);
-
-          if (translated != NULL)
-            g_hash_table_insert (folders, g_strdup (name), translated);
-        }
-    }
-}
-
-static void
-load_folders (GHashTable *folders)
-{
-  const char * const *dirs;
-  g_autofree gchar *userdir = NULL;
-  guint i;
-
-  g_assert (folders != NULL);
-
-  userdir = g_build_filename (g_get_user_data_dir (), "desktop-directories", NULL);
-  load_folder (folders, userdir);
-
-  dirs = g_get_system_data_dirs ();
-  for (i = 0; dirs[i] != NULL; i++)
-    {
-      g_autofree gchar *sysdir = g_build_filename (dirs[i], "desktop-directories", NULL);
-      load_folder (folders, sysdir);
-    }
-}
-
-static void
 shell_app_cache_worker (GTask        *task,
                         gpointer      source_object,
                         gpointer      task_data,
                         GCancellable *cancellable)
 {
-  CacheState *state;
-
   g_assert (G_IS_TASK (task));
   g_assert (SHELL_IS_APP_CACHE (source_object));
 
-  state = cache_state_new ();
-  state->app_infos = g_app_info_get_all ();
-  load_folders (state->folders);
-
-  g_task_return_pointer (task, state, (GDestroyNotify) cache_state_free);
+  g_task_return_pointer (task, g_app_info_get_all (), free_app_infos);
 }
 
 static void
@@ -172,26 +77,21 @@ apply_update_cb (GObject      *object,
 {
   ShellAppCache *cache = (ShellAppCache *)object;
   g_autoptr(GError) error = NULL;
-  CacheState *state;
+  GList *app_infos;
 
   g_assert (SHELL_IS_APP_CACHE (cache));
   g_assert (G_IS_TASK (result));
   g_assert (user_data == NULL);
 
-  state = g_task_propagate_pointer (G_TASK (result), &error);
+  app_infos = g_task_propagate_pointer (G_TASK (result), &error);
 
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  g_list_free_full (cache->app_infos, g_object_unref);
-  cache->app_infos = g_steal_pointer (&state->app_infos);
-
-  g_clear_pointer (&cache->folders, g_hash_table_unref);
-  cache->folders = g_steal_pointer (&state->folders);
+  free_app_infos (cache->app_infos);
+  cache->app_infos = app_infos;
 
   g_signal_emit (cache, signals[CHANGED], 0);
-
-  cache_state_free (state);
 }
 
 static void
@@ -229,35 +129,6 @@ shell_app_cache_queue_update (ShellAppCache *self)
 }
 
 static void
-monitor_desktop_directories_for_data_dir (ShellAppCache *self,
-                                          const gchar   *directory)
-{
-  g_autofree gchar *subdir = NULL;
-  g_autoptr(GFile) file = NULL;
-  g_autoptr(GFileMonitor) monitor = NULL;
-
-  g_assert (SHELL_IS_APP_CACHE (self));
-
-  if (directory == NULL)
-    return;
-
-  subdir = g_build_filename (directory, "desktop-directories", NULL);
-  file = g_file_new_for_path (subdir);
-  monitor = g_file_monitor_directory (file, G_FILE_MONITOR_NONE, NULL, NULL);
-
-  if (monitor != NULL)
-    {
-      g_file_monitor_set_rate_limit (monitor, DEFAULT_TIMEOUT_SECONDS * 1000);
-      g_signal_connect_object (monitor,
-                               "changed",
-                               G_CALLBACK (shell_app_cache_queue_update),
-                               self,
-                               G_CONNECT_SWAPPED);
-      g_ptr_array_add (self->dir_monitors, g_steal_pointer (&monitor));
-    }
-}
-
-static void
 shell_app_cache_finalize (GObject *object)
 {
   ShellAppCache *self = (ShellAppCache *)object;
@@ -266,9 +137,7 @@ shell_app_cache_finalize (GObject *object)
 
   g_clear_handle_id (&self->queued_update, g_source_remove);
 
-  g_clear_pointer (&self->dir_monitors, g_ptr_array_unref);
-  g_clear_pointer (&self->folders, g_hash_table_unref);
-  g_list_free_full (self->app_infos, g_object_unref);
+  free_app_infos (self->app_infos);
 
   G_OBJECT_CLASS (shell_app_cache_parent_class)->finalize (object);
 }
@@ -297,21 +166,6 @@ shell_app_cache_class_init (ShellAppCacheClass *klass)
 static void
 shell_app_cache_init (ShellAppCache *self)
 {
-  const gchar * const *sysdirs;
-  guint i;
-
-  /* Monitor directories for translation changes */
-  self->dir_monitors = g_ptr_array_new_with_free_func (g_object_unref);
-  monitor_desktop_directories_for_data_dir (self, g_get_user_data_dir ());
-  sysdirs = g_get_system_data_dirs ();
-  for (i = 0; sysdirs[i] != NULL; i++)
-    monitor_desktop_directories_for_data_dir (self, sysdirs[i]);
-
-  /* Load translated directory names immediately */
-  self->folders = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-  load_folders (self->folders);
-
-  /* Setup AppMonitor to track changes */
   self->monitor = g_app_info_monitor_get ();
   g_signal_connect_object (self->monitor,
                            "changed",
@@ -367,26 +221,4 @@ shell_app_cache_get_info (ShellAppCache *cache,
     }
 
   return NULL;
-}
-
-/**
- * shell_app_cache_translate_folder:
- * @cache: (nullable): a #ShellAppCache or %NULL
- * @name: the folder name
- *
- * Gets the translated folder name for @name if any exists.
- *
- * Returns: (nullable): the translated string or %NULL if there is no
- *   translation.
- */
-char *
-shell_app_cache_translate_folder (ShellAppCache *cache,
-                                  const char    *name)
-{
-  g_return_val_if_fail (SHELL_IS_APP_CACHE (cache), NULL);
-
-  if (name == NULL)
-    return NULL;
-
-  return g_strdup (g_hash_table_lookup (cache->folders, name));
 }

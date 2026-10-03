@@ -349,8 +349,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .audio-device-selection-dialog .audio-selection-device-label { font-size: 14px; text-align: left; }
 .access-dialog { text-align: left; }
 .modal-dialog-button, .button, .icon-button, .notification-button,
-.audio-selection-device, .message-expand-button, .message-close-button,
-.message-collapse-button {
+.audio-selection-device, .message-expand-button, .message-close-button {
   background-color: rgba(255, 255, 255, 0.09);
   background-image: none;
   border: none;
@@ -427,7 +426,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-greeter-controls { spacing: 2px; margin: 28px; }
 .kestrel-greeter-control { color: rgba(255, 255, 255, 0.86); }
 .kestrel-greeter-session-label { font-size: 13px; font-weight: 500; }
-.message-header, .message-content, .message-notification-group, .notification-buttons-bin { background-color: transparent; }
+.message-header, .message-content, .notification-buttons-bin { background-color: transparent; }
 .screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }
 .screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 999px; }
 .screenshot-ui-type-button:hover, .screenshot-ui-shot-cast-button:hover,

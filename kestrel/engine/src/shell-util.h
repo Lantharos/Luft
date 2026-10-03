@@ -17,17 +17,9 @@ int      shell_util_get_week_start             (void);
 
 const char *shell_util_translate_time_string   (const char *str);
 
-char    *shell_util_regex_escape               (const char *str);
-
 gboolean shell_write_string_to_stream          (GOutputStream    *stream,
                                                 const char       *str,
                                                 GError          **error);
-
-char    *shell_get_file_contents_utf8_sync     (const char       *path,
-                                                GError          **error);
-
-gboolean shell_util_wifexited                  (int               status,
-                                                int              *exit);
 
 GdkPixbuf *shell_util_create_pixbuf_from_data (const guchar      *data,
                                                gsize              len,
@@ -37,24 +29,6 @@ GdkPixbuf *shell_util_create_pixbuf_from_data (const guchar      *data,
                                                int                width,
                                                int                height,
                                                int                rowstride);
-
-void shell_util_check_cloexec_fds (void);
-
-void   shell_util_start_systemd_unit          (const char           *unit,
-                                               const char           *mode,
-                                               GCancellable         *cancellable,
-                                               GAsyncReadyCallback   callback,
-                                               gpointer              user_data);
-gboolean shell_util_start_systemd_unit_finish (GAsyncResult         *res,
-                                               GError              **error);
-
-void  shell_util_stop_systemd_unit           (const char           *unit,
-                                              const char           *mode,
-                                              GCancellable         *cancellable,
-                                              GAsyncReadyCallback   callback,
-                                              gpointer              user_data);
-gboolean shell_util_stop_systemd_unit_finish (GAsyncResult         *res,
-                                              GError              **error);
 
 void shell_util_systemd_unit_exists (const gchar         *unit,
                                      GCancellable        *cancellable,
@@ -67,8 +41,6 @@ void shell_util_sd_notify (void);
 
 gboolean shell_util_has_x11_display_extension (MetaDisplay *display,
                                                const char  *extension);
-
-char *shell_util_get_translated_folder_name (const char *name);
 
 gint shell_util_get_uid (void);
 

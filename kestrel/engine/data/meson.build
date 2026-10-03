@@ -1,9 +1,6 @@
-data_builddir = meson.current_build_dir()
-
 theme_deps = []
 
 subdir('dbus-interfaces')
-subdir('icons')
 subdir('theme')
 
 data_resources = [
@@ -38,15 +35,6 @@ cursor_theme_resource = gnome.compile_resources(
   'gnome-shell-cursor-theme.gresource.xml',
   source_dir: 'cursor-theme')
 
-perfconf = configuration_data()
-perfconf.set('datadir', datadir)
-configure_file(
-  input: 'perf-background.xml.in',
-  output: 'perf-background.xml',
-  configuration: perfconf,
-  install_dir: pkgdatadir
-)
-
 keybinding_files = [
   '50-kestrel-accessibility.xml',
   '50-kestrel-hardware.xml',
@@ -65,15 +53,14 @@ schemaconf.set('DASH_APPS', run_command(
   generate_app_list, 'default-apps/dash.txt',
   check: true,
 ).stdout())
-schema = configure_file(
+configure_file(
   input: 'com.lantharos.kestrel.gschema.xml.in',
   output: 'com.lantharos.kestrel.gschema.xml',
   configuration: schemaconf,
   install_dir: schemadir
 )
-settings_schemas = []
 foreach name : ['diagnostics', 'media-keys', 'night-light', 'power', 'touchscreen']
-  settings_schemas += configure_file(
+  configure_file(
     input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     copy: true,
@@ -82,23 +69,14 @@ foreach name : ['diagnostics', 'media-keys', 'night-light', 'power', 'touchscree
 endforeach
 install_data('00_com.lantharos.kestrel.gschema.override', install_dir: schemadir)
 
-if have_systemd
-  unitconf = configuration_data()
-  unitconf.set('bindir', bindir)
-  unitconf.set('schemadir', schemadir)
-  configure_file(
-    input: 'kestrel.service.in',
-    output: 'kestrel.service',
-    configuration: unitconf,
-    install_dir: systemduserunitdir
-  )
-  subdir('session')
-  subdir('system')
-endif
-
-# for unit tests - gnome.compile_schemas() only looks in srcdir
-compiled_schemas = custom_target('compile-schemas',
-  input: [schema, settings_schemas],
-  output: 'gschemas.compiled',
-  command: [find_program('glib-compile-schemas'), '--strict', data_builddir],
+unitconf = configuration_data()
+unitconf.set('bindir', bindir)
+unitconf.set('schemadir', schemadir)
+configure_file(
+  input: 'kestrel.service.in',
+  output: 'kestrel.service',
+  configuration: unitconf,
+  install_dir: systemduserunitdir
 )
+subdir('session')
+subdir('system')

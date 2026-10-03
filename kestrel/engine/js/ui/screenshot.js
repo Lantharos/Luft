@@ -2671,7 +2671,7 @@ export function showScreenshotUI() {
 /**
  * Shows the screen recording UI.
  */
-export function showScreenRecordingUI() {
+function showScreenRecordingUI() {
     Main.screenshotUI.open(UIMode.SCREENCAST).catch(err => {
         logError(err, 'Error opening the screenshot UI');
     });

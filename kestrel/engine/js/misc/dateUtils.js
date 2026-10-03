@@ -1,4 +1,3 @@
-import * as System from 'system';
 import * as Gettext from 'gettext';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
@@ -214,17 +213,4 @@ export function formatTime(time, params) {
         format = format.replace(/\s*%p/g, '');
 
     return date.format(Shell.util_translate_time_string(format));
-}
-
-/**
- * Update the timezone used by JavaScript Date objects and other
- * date utilities
- */
-export function clearCachedLocalTimeZone() {
-    // SpiderMonkey caches the time zone so we must explicitly clear it
-    // before we can update the calendar, see
-    // https://bugzilla.gnome.org/show_bug.cgi?id=678507
-    System.clearDateCaches();
-
-    _localTimeZone = GLib.TimeZone.new_local();
 }

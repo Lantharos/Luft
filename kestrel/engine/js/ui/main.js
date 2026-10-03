@@ -2,7 +2,6 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -54,7 +53,6 @@ export let shellAccessDialogDBusService = null;
 export let shellAudioSelectionDBusService = null;
 export let shellDBusService = null;
 export let shellMountOpDBusService = null;
-export const screenSaverDBus = null;
 export let modalCount = 0;
 export let actionMode = Shell.ActionMode.NONE;
 export const modalActorFocusStack = [];
@@ -73,7 +71,6 @@ export let brightnessDBus = null;
 
 let _startDate;
 let _defaultCssStylesheet = null;
-let _cssStylesheet = null;
 let _themeResource = null;
 let _oskResource = null;
 let _iconResource = null;
@@ -456,26 +453,6 @@ export function createWorkspacesAdjustment(actor) {
     return adjustment;
 }
 
-/**
- * Get the theme CSS file that the shell will load
- *
- * @returns {?Gio.File}: A #GFile that contains the theme CSS,
- *          null if using the default
- */
-export function getThemeStylesheet() {
-    return _cssStylesheet;
-}
-
-/**
- * Set the theme CSS file that the shell will load
- *
- * @param {string=} cssStylesheet - A file path that contains the theme CSS,
- *     set it to null to use the default
- */
-export function setThemeStylesheet(cssStylesheet) {
-    _cssStylesheet = cssStylesheet ? Gio.File.new_for_path(cssStylesheet) : null;
-}
-
 export function reloadThemeResource() {
     if (_themeResource)
         _themeResource._unregister();
@@ -506,7 +483,6 @@ export function loadTheme() {
     const previousTheme = themeContext.get_theme();
 
     const theme = new St.Theme({
-        application_stylesheet: _cssStylesheet,
         default_stylesheet: _defaultCssStylesheet,
     });
 
@@ -722,153 +698,6 @@ export function activateWindow(window, time, workspaceNum) {
     }
 
     KestrelUi.dismissImmediately();
-}
-
-/**
- * Move @window to the specified monitor and workspace.
- *
- * @param {Meta.Window} window - the window to move
- * @param {number} monitorIndex - the requested monitor
- * @param {number} workspaceIndex - the requested workspace
- * @param {bool} append - create workspace if it doesn't exist
- */
-export function moveWindowToMonitorAndWorkspace(window, monitorIndex, workspaceIndex, append = false) {
-    // We need to move the window before changing the workspace, because
-    // the move itself could cause a workspace change if the window enters
-    // the primary monitor
-    if (window.get_monitor() !== monitorIndex) {
-        // Wait for the monitor change to take effect
-        const id = global.display.connect('window-entered-monitor',
-            (dsp, num, w) => {
-                if (w !== window)
-                    return;
-                window.change_workspace_by_index(workspaceIndex, append);
-                global.display.disconnect(id);
-            });
-        window.move_to_monitor(monitorIndex);
-    } else {
-        window.change_workspace_by_index(workspaceIndex, append);
-    }
-}
-
-// TODO - replace this timeout with some system to guess when the user might
-// be e.g. just reading the screen and not likely to interact.
-const DEFERRED_TIMEOUT_SECONDS = 20;
-const _deferredWorkData = {};
-// Work scheduled for some point in the future
-const _deferredWorkQueue = [];
-// Work we need to process before the next redraw
-let _beforeRedrawQueue = [];
-// Counter to assign work ids
-let _deferredWorkSequence = 0;
-let _deferredTimeoutId = 0;
-
-function _runDeferredWork(workId) {
-    if (!_deferredWorkData[workId])
-        return;
-    const index = _deferredWorkQueue.indexOf(workId);
-    if (index < 0)
-        return;
-
-    _deferredWorkQueue.splice(index, 1);
-    _deferredWorkData[workId].callback();
-    if (_deferredWorkQueue.length === 0 && _deferredTimeoutId > 0) {
-        GLib.source_remove(_deferredTimeoutId);
-        _deferredTimeoutId = 0;
-    }
-}
-
-function _runAllDeferredWork() {
-    while (_deferredWorkQueue.length > 0)
-        _runDeferredWork(_deferredWorkQueue[0]);
-}
-
-function _runBeforeRedrawQueue() {
-    for (let i = 0; i < _beforeRedrawQueue.length; i++) {
-        const workId = _beforeRedrawQueue[i];
-        _runDeferredWork(workId);
-    }
-    _beforeRedrawQueue = [];
-}
-
-function _queueBeforeRedraw(workId) {
-    _beforeRedrawQueue.push(workId);
-    if (_beforeRedrawQueue.length === 1) {
-        const laters = global.compositor.get_laters();
-        laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
-            _runBeforeRedrawQueue();
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-}
-
-/**
- * This function sets up a callback to be invoked when either the
- * given actor is mapped, or after some period of time when the machine
- * is idle. This is useful if your actor isn't always visible on the
- * screen (for example, all actors in the overview), and you don't want
- * to consume resources updating if the actor isn't actually going to be
- * displaying to the user.
- *
- * Note that queueDeferredWork is called by default immediately on
- * initialization as well, under the assumption that new actors
- * will need it.
- *
- * @param {Clutter.Actor} actor - an actor
- * @param {callback} callback - Function to invoke to perform work
- *
- * @returns {string} - A string work identifier
- */
-export function initializeDeferredWork(actor, callback) {
-    // Turn into a string so we can use as an object property
-    const workId = `${++_deferredWorkSequence}`;
-    _deferredWorkData[workId] = {
-        actor,
-        callback,
-    };
-    actor.connect('notify::mapped', () => {
-        if (!(actor.mapped && _deferredWorkQueue.includes(workId)))
-            return;
-        _queueBeforeRedraw(workId);
-    });
-    actor.connect('destroy', () => {
-        const index = _deferredWorkQueue.indexOf(workId);
-        if (index >= 0)
-            _deferredWorkQueue.splice(index, 1);
-        delete _deferredWorkData[workId];
-    });
-    queueDeferredWork(workId);
-    return workId;
-}
-
-/**
- * queueDeferredWork:
- *
- * @param {string} workId work identifier
- *
- * Ensure that the work identified by @workId will be
- * run on map or timeout. You should call this function
- * for example when data being displayed by the actor has
- * changed.
- */
-export function queueDeferredWork(workId) {
-    const data = _deferredWorkData[workId];
-    if (!data) {
-        const message = `Invalid work id ${workId}`;
-        logError(new Error(message), message);
-        return;
-    }
-    if (!_deferredWorkQueue.includes(workId))
-        _deferredWorkQueue.push(workId);
-    if (data.actor.mapped) {
-        _queueBeforeRedraw(workId);
-    } else if (_deferredTimeoutId === 0) {
-        _deferredTimeoutId = GLib.timeout_add_seconds_once(GLib.PRIORITY_DEFAULT, DEFERRED_TIMEOUT_SECONDS, () => {
-            _runAllDeferredWork();
-            _deferredTimeoutId = 0;
-        });
-        GLib.Source.set_name_by_id(_deferredTimeoutId, '[gnome-shell] _runAllDeferredWork');
-    }
 }
 
 class AnimationsSettings {

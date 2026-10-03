@@ -1,6 +1,5 @@
 import St from 'gi://St';
 
-import * as Config from '../misc/config.js';
 import * as Bluetooth from './status/bluetooth.js';
 import * as Volume from './status/volume.js';
 import * as Brightness from './status/brightness.js';
@@ -40,11 +39,9 @@ export class DesktopControls {
     }
 
     async _loadDevices() {
-        if (Config.HAVE_NETWORKMANAGER) {
-            const Network = await import('./status/network.js');
-            this._network = new Network.Indicator();
-            this.actor.add_child(this._network);
-        }
+        const Network = await import('./status/network.js');
+        this._network = new Network.Indicator();
+        this.actor.add_child(this._network);
     }
 
     destroy() {

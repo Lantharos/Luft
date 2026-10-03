@@ -35,16 +35,6 @@ export const NotificationError = {
 export const NotificationErrors =
     registerErrorDomain('Notifications', NotificationError, 'org.gtk');
 
-export const ExtensionError = {
-    INFO_DOWNLOAD_FAILED: 0,
-    DOWNLOAD_FAILED: 1,
-    EXTRACT_FAILED: 2,
-    ENABLE_FAILED: 3,
-    NOT_ALLOWED: 4,
-};
-export const ExtensionErrors =
-    registerErrorDomain('Extensions', ExtensionError);
-
 export const ScreencastError = {
     ALL_PIPELINES_FAILED: 0,
     PIPELINE_ERROR: 1,

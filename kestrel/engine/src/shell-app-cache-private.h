@@ -13,5 +13,3 @@ ShellAppCache   *shell_app_cache_get_default      (void);
 GList           *shell_app_cache_get_all          (ShellAppCache *cache);
 GDesktopAppInfo *shell_app_cache_get_info         (ShellAppCache *cache,
                                                    const char    *id);
-char            *shell_app_cache_translate_folder (ShellAppCache *cache,
-                                                   const char    *name);

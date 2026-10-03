@@ -2,9 +2,6 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
-import St from 'gi://St';
-
-import {formatTime} from './dateUtils.js';
 
 // http://daringfireball.net/2010/07/improved_regex_for_matching_urls
 const _balancedParens = '\\([^\\s()<>]+\\)';
@@ -33,7 +30,6 @@ const _urlRegexp = new RegExp(
         ')' +
     ')', 'gi');
 
-let _desktopSettings = null;
 
 /**
  * findUrls:
@@ -95,26 +91,6 @@ export function spawnCommandLine(commandLine) {
 export function openSettings(page) {
     Gio.AppInfo.launch_default_for_uri(`kestrel-settings:${page}`,
         global.create_app_launch_context(0, -1));
-}
-
-/**
- * spawnApp:
- *
- * @param {readonly string[]} argv an argv array
- *
- * Runs argv as if it was an application, handling startup notification
- */
-export function spawnApp(argv) {
-    try {
-        const app = Gio.AppInfo.create_from_commandline(argv.join(' '),
-            null,
-            Gio.AppInfoCreateFlags.SUPPORTS_STARTUP_NOTIFICATION);
-
-        const context = global.create_app_launch_context(0, -1);
-        app.launch([], context);
-    } catch (err) {
-        _handleSpawnError(argv[0], err);
-    }
 }
 
 /**
@@ -210,26 +186,6 @@ export function fixMarkup(text, allowMarkup) {
 }
 
 /**
- * Returns an {@link St.Label} with the date passed formatted
- * using {@link formatTime}
- *
- * @param {Date} date the date to format for the label
- * @param {object} params params for {@link formatTime}
- * @returns {St.Label}
- */
-export function createTimeLabel(date, params) {
-    if (_desktopSettings == null)
-        _desktopSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-
-    const label = new St.Label({text: formatTime(date, params)});
-    _desktopSettings.connectObject(
-        'changed::clock-format', () => (label.text = formatTime(date, params)),
-        label);
-    return label;
-}
-
-
-/**
  * lowerBound:
  *
  * @template T, [K=T]
@@ -299,54 +255,6 @@ export function insertSorted(array, val, cmp) {
  */
 export function lerp(start, end, progress) {
     return start + progress * (end - start);
-}
-
-/**
- * _GNOMEversionToNumber:
- *
- * @param {string} version a GNOME version element
- * @returns {number}
- *
- * Like Number() but returns sortable values for special-cases
- * 'alpha' and 'beta'. Returns NaN for unhandled 'versions'.
- */
-function _GNOMEversionToNumber(version) {
-    const ret = Number(version);
-    if (!isNaN(ret))
-        return ret;
-    if (version === 'alpha')
-        return -3;
-    if (version === 'beta')
-        return -2;
-    if (version === 'rc')
-        return -1;
-    return ret;
-}
-
-/**
- * GNOMEversionCompare:
- *
- * @param {string} version1 a string containing a GNOME version
- * @param {string} version2 a string containing another GNOME version
- * @returns {number}
- *
- * Returns an integer less than, equal to, or greater than
- * zero, if `version1` is older, equal or newer than `version2`
- */
-export function GNOMEversionCompare(version1, version2) {
-    const v1Array = version1.split('.');
-    const v2Array = version2.split('.');
-
-    for (let i = 0; i < Math.max(v1Array.length, v2Array.length); i++) {
-        const elemV1 = _GNOMEversionToNumber(v1Array[i] || '0');
-        const elemV2 = _GNOMEversionToNumber(v2Array[i] || '0');
-        if (elemV1 < elemV2)
-            return -1;
-        if (elemV1 > elemV2)
-            return 1;
-    }
-
-    return 0;
 }
 
 export class DBusSenderChecker {
@@ -423,57 +331,5 @@ export class DBusSenderChecker {
         for (const id in this._watchList)
             Gio.DBus.unwatch_name(id);
         this._watchList = [];
-    }
-}
-
-/* @class Highlighter Highlight given terms in text using markup. */
-export class Highlighter {
-    /**
-     * @param {?string[]} terms - list of terms to highlight
-     */
-    constructor(terms) {
-        if (!terms)
-            return;
-
-        const escapedTerms = terms
-            .map(term => Shell.util_regex_escape(term))
-            .filter(term => term.length > 0);
-
-        if (escapedTerms.length === 0)
-            return;
-
-        this._highlightRegex = new RegExp(
-            `(${escapedTerms.join('|')})`, 'gi');
-    }
-
-    /**
-     * Highlight all occurences of the terms defined for this
-     * highlighter in the provided text using markup.
-     *
-     * @param {string} text - text to highlight the defined terms in
-     * @returns {string}
-     */
-    highlight(text) {
-        if (!this._highlightRegex)
-            return GLib.markup_escape_text(text, -1);
-
-        const escaped = [];
-        let lastMatchEnd = 0;
-        let match;
-        while ((match = this._highlightRegex.exec(text))) {
-            if (match.index > lastMatchEnd) {
-                const unmatched = GLib.markup_escape_text(
-                    text.slice(lastMatchEnd, match.index), -1);
-                escaped.push(unmatched);
-            }
-            const matched = GLib.markup_escape_text(match[0], -1);
-            escaped.push(`<b>${matched}</b>`);
-            lastMatchEnd = match.index + match[0].length;
-        }
-        const unmatched = GLib.markup_escape_text(
-            text.slice(lastMatchEnd), -1);
-        escaped.push(unmatched);
-
-        return escaped.join('');
     }
 }

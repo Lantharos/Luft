@@ -4,6 +4,7 @@ name = "Network Sign-In"
 generic_name = "Wi-Fi Sign-In"
 categories = ["Network"]
 keywords = ["captive portal", "hotspot", "hotel", "airport", "wifi", "wi-fi", "login", "sign in"]
+listed = false
 version = "0.1.0"
 icon = "static/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"

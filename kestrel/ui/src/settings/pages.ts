@@ -3,7 +3,7 @@ import type Shell from 'gi://Shell';
 
 export type SettingsPageId =
   | 'network' | 'bluetooth' | 'display' | 'sound' | 'power' | 'appearance' | 'notifications'
-  | 'keyboard' | 'mouse' | 'accessibility' | 'apps' | 'privacy' | 'security' | 'datetime' | 'users' | 'login' | 'about';
+  | 'keyboard' | 'mouse' | 'accessibility' | 'apps' | 'privacy' | 'security' | 'datetime' | 'users' | 'login' | 'updates' | 'about';
 
 export interface SettingsPage {
   id: SettingsPageId;
@@ -29,6 +29,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   { id: 'datetime', title: 'Date & Time', icon: 'preferences-system-time-symbolic', keywords: ['time zone', 'clock', '24-hour'] },
   { id: 'users', title: 'Users', icon: 'system-users-symbolic', keywords: ['account', 'name', 'picture', 'avatar'] },
   { id: 'login', title: 'Login Screen', icon: 'system-lock-screen-symbolic', keywords: ['sign in', 'automatic login', 'session', 'wallpaper'] },
+  { id: 'updates', title: 'Updates', icon: 'software-update-available-symbolic', keywords: ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'restart and install', 'security updates'] },
   { id: 'about', title: 'About', icon: 'help-about-symbolic', keywords: ['device name', 'system', 'hardware', 'memory'] },
 ];
 

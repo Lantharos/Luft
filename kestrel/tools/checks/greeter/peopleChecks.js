@@ -53,6 +53,8 @@ export async function checkPeople(tools) {
 
   await click(rows[2], 700);
   require(!promptState(tools).secret && promptState(tools).hint === 'Username', 'another account asks for a username first');
+  require(background.get_string('picture-options') === 'none', 'another account shows black behind the prompt');
+  await capture(`${output}/login-another-account.png`);
   await type('kristof');
   await press(Clutter.KEY_Return, 900);
   const uid = new Gio.Credentials().get_unix_user();

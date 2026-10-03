@@ -67,7 +67,7 @@ class AppIcons {
     return () => this.listeners.delete(listener);
   }
 
-  private get paint(): Paint | null {
+  get paint(): Paint | null {
     return this.style === 'default' ? null : this.paints?.[this.style] ?? null;
   }
 

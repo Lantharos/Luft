@@ -68,7 +68,6 @@
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-ghostty-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-gimp-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-helium-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">scalable/apps/kestrel-luft-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-obs-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-raffi-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-spotify-symbolic.svg</file>

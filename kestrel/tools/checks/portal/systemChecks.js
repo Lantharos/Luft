@@ -1,10 +1,20 @@
+import Cairo from 'cairo';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { BACKEND, PORTAL_PATH, call, checker, clicker, descendants, labelled, portalDialog, requestHandle, sessionHandle } from './backend.js';
 
 const require = checker('portal');
-const WALLPAPER = '/usr/share/backgrounds/fedora-workstation/flight_dark.webp';
+
+function wallpaperFile() {
+  const path = GLib.build_filenamev([GLib.get_user_cache_dir(), 'portal-wallpaper.png']);
+  const surface = new Cairo.ImageSurface(Cairo.Format.RGB24, 1280, 720);
+  const context = new Cairo.Context(surface);
+  context.setSourceRGB(0.12, 0.2, 0.16);
+  context.paint();
+  surface.writeToPNG(path);
+  return Gio.File.new_for_path(path);
+}
 
 async function checkAccount({pause, capture, output, click}) {
   const shared = call('Account', 'GetUserInformation', new GLib.Variant('(ossa{sv})', [requestHandle(), 'discord', '', {
@@ -37,7 +47,7 @@ async function checkUsb({pause, capture, output, click}) {
 async function checkWallpaper({pause, capture, output, click}) {
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
   const original = ['picture-uri', 'picture-uri-dark', 'picture-options'].map(key => [key, background.get_string(key)]);
-  const uri = Gio.File.new_for_path(WALLPAPER).get_uri();
+  const uri = wallpaperFile().get_uri();
   const set = preview => call('Wallpaper', 'SetWallpaperURI', new GLib.Variant('(osssa{sv})', [requestHandle(), 'com.lantharos.magpie', '', uri, {
     'show-preview': new GLib.Variant('b', preview),
   }]), '(u)').then(reply => reply.deepUnpack()[0]);

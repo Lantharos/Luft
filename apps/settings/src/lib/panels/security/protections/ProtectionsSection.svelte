@@ -5,6 +5,7 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '$lib/state/app.svelte';
+	import DrivesRow from '../encryption/DrivesRow.svelte';
 	import EncryptionRow from '../encryption/EncryptionRow.svelte';
 	import type { SecurityState } from '../state.svelte';
 	import HardwareDialog from './HardwareDialog.svelte';
@@ -23,6 +24,9 @@
 	{#if security.trust}
 		{@const trust = security.trust}
 		<EncryptionRow disk={trust.disk} tpm={trust.tpm} />
+		{#if trust.drives.available}
+			<DrivesRow drives={trust.drives} />
+		{/if}
 		{#if trust.secureBoot === 'on'}
 			<Row title="Secure Boot" description="Only trusted software can start this computer" icon={ShieldCheck} />
 		{/if}

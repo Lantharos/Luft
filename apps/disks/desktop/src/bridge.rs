@@ -11,6 +11,7 @@ use crate::actions::{drive, encryption, formatting, mounting, partitions};
 use crate::images::{self, Imaging};
 use crate::launch;
 use crate::space::Explorer;
+use crate::trust::{self, drives as encryption_drives};
 use crate::udisks::{self, snapshot};
 
 #[derive(Clone, Default)]
@@ -116,6 +117,56 @@ struct Drive {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Encrypt {
+    block: String,
+    recovery_key: String,
+    passphrase: String,
+    auto_unlock: bool,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct FormatEncrypted {
+    block: String,
+    format: Format,
+    recovery_key: String,
+    auto_unlock: bool,
+}
+
+#[derive(Deserialize)]
+struct Unlocked {
+    block: String,
+    unlock: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Unlocking {
+    block: String,
+    unlock: String,
+    recovery_key: String,
+    auto_unlock: bool,
+}
+
+#[derive(Deserialize)]
+struct Uuid {
+    uuid: String,
+}
+
+#[derive(Deserialize)]
+struct Resume {
+    uuid: String,
+    unlock: String,
+}
+
+#[derive(Deserialize)]
+struct KeySheet {
+    key: String,
+    name: String,
+}
+
+#[derive(Deserialize)]
 struct Place {
     path: Vec<String>,
 }
@@ -136,7 +187,70 @@ pub fn register(window: SabineWindow, state: &State) -> SabineWindow {
     let window = register_volumes(window);
     let window = register_encryption(window);
     let window = register_space(window, state);
+    let window = register_trust(window);
     register_drives(window, state)
+}
+
+fn register_trust(window: SabineWindow) -> SabineWindow {
+    window
+        .command("trust_state", |_: Value| trust::state())
+        .command("trust_check", |Block { block }| {
+            encryption_drives::check(&block)
+        })
+        .command("trust_recovery_key", |_: Value| {
+            encryption_drives::recovery_key()
+        })
+        .command(
+            "trust_encrypt",
+            |Encrypt {
+                 block,
+                 recovery_key,
+                 passphrase,
+                 auto_unlock,
+             }| {
+                encryption_drives::encrypt(&block, &recovery_key, &passphrase, auto_unlock)
+            },
+        )
+        .command(
+            "trust_format",
+            |FormatEncrypted {
+                 block,
+                 format,
+                 recovery_key,
+                 auto_unlock,
+             }| {
+                encryption_drives::format(&block, format, &recovery_key, auto_unlock)
+            },
+        )
+        .command("trust_decrypt", |Unlocked { block, unlock }| {
+            encryption_drives::decrypt(&block, &unlock)
+        })
+        .command(
+            "trust_unlocking",
+            |Unlocking {
+                 block,
+                 unlock,
+                 recovery_key,
+                 auto_unlock,
+             }| {
+                encryption_drives::set_up_unlocking(&block, &unlock, &recovery_key, auto_unlock)
+            },
+        )
+        .command("trust_pause", |Uuid { uuid }| {
+            encryption_drives::pause(&uuid)
+        })
+        .command("trust_resume", |Resume { uuid, unlock }| {
+            encryption_drives::resume(&uuid, &unlock)
+        })
+        .command("trust_show_key", |Uuid { uuid }| {
+            encryption_drives::show_recovery_key(&uuid)
+        })
+        .command("trust_save_key", |KeySheet { key, name }| {
+            encryption_drives::save_key(&key, &name)
+        })
+        .command("trust_print_key", |KeySheet { key, name }| {
+            encryption_drives::print_key(&key, &name)
+        })
 }
 
 fn register_space(window: SabineWindow, state: &State) -> SabineWindow {

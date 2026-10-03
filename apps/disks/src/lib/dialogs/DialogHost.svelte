@@ -9,6 +9,10 @@
 	import HealthDialog from './details/HealthDialog.svelte';
 	import VolumeDetails from './details/VolumeDetails.svelte';
 	import CreateDialog from './format/CreateDialog.svelte';
+	import EncryptionDialog from './encryption/EncryptionDialog.svelte';
+	import RecoveryKeyDialog from './encryption/RecoveryKeyDialog.svelte';
+	import TurnOffDialog from './encryption/TurnOffDialog.svelte';
+	import TurnOnDialog from './encryption/TurnOnDialog.svelte';
 	import { dialogs } from './dialogs.svelte';
 	import FormatDialog from './format/FormatDialog.svelte';
 	import LabelDialog from './LabelDialog.svelte';
@@ -42,6 +46,18 @@
 	{#if drive?.health}
 		<HealthDialog {drive} health={drive.health} onclose={dialogs.close} />
 	{/if}
+{:else if dialog?.kind === 'encrypt'}
+	<TurnOnDialog drive={dialog.drive} volume={dialog.volume} onclose={dialogs.close} />
+{:else if dialog?.kind === 'encryption'}
+	{@const drive = live(dialog.drive)}
+	{@const volume = liveVolume(drive, dialog.volume)}
+	{#if drive && volume}
+		<EncryptionDialog {drive} {volume} onclose={dialogs.close} />
+	{/if}
+{:else if dialog?.kind === 'turn-off'}
+	<TurnOffDialog volume={dialog.volume} onclose={dialogs.close} />
+{:else if dialog?.kind === 'recovery-key'}
+	<RecoveryKeyDialog key={dialog.key} name={dialog.name} onclose={dialogs.close} />
 {:else if dialog?.kind === 'format-volume'}
 	<FormatDialog drive={dialog.drive} volume={dialog.volume} onclose={dialogs.close} />
 {:else if dialog?.kind === 'format-drive'}

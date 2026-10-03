@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Checkbox, Dialog } from '@luft/ui';
-	import RecoveryKeyView from './RecoveryKeyView.svelte';
+	import { Checkbox, Dialog, RecoveryKey } from '@luft/ui';
+	import { printRecoveryKey, saveRecoveryKey } from '../api';
 
 	interface Props {
 		key: string;
@@ -20,7 +20,7 @@
 </script>
 
 <Dialog title={fresh ? 'Save your new recovery key' : 'Your recovery key'} {description} wide onclose={close}>
-	<RecoveryKeyView {key} />
+	<RecoveryKey {key} onsave={() => saveRecoveryKey(key)} onprint={() => printRecoveryKey(key)} />
 	{#if fresh}
 		<Checkbox label="I’ve saved my recovery key" checked={saved} onchange={(checked) => (saved = checked)}>I’ve saved my recovery key</Checkbox>
 	{/if}

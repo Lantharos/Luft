@@ -9,6 +9,12 @@ pub const TRUST: Service = Service {
     interface: "com.lantharos.Trust1",
 };
 
+const DRIVES: Service = Service {
+    name: "com.lantharos.Trust1",
+    path: "/com/lantharos/Trust1",
+    interface: "com.lantharos.Trust1.Drives",
+};
+
 const ERROR: &str = "com.lantharos.Trust1.Error.";
 const WRONG_KEY: &str = "com.lantharos.Trust1.Error.WrongKey";
 
@@ -49,12 +55,30 @@ pub struct Disk {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Changing {
+    change: String,
+    state: String,
+    progress: f64,
+}
+
+#[derive(Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Drives {
+    available: bool,
+    count: usize,
+    auto_unlock: usize,
+    changing: Option<Changing>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Trust {
     secure_boot: String,
     tpm: Tpm,
     signing_key: SigningKey,
     startup: Startup,
     disk: Disk,
+    drives: Drives,
 }
 
 #[derive(Serialize)]
@@ -121,8 +145,33 @@ fn disk(map: &Map) -> Disk {
     }
 }
 
+fn drives() -> Drives {
+    let Ok(Some(properties)) = DRIVES.read() else {
+        return Drives::default();
+    };
+    let entries: std::collections::HashMap<String, Map> =
+        get(&properties, "Drives").unwrap_or_default();
+    Drives {
+        available: true,
+        count: entries.len(),
+        auto_unlock: entries
+            .values()
+            .filter(|entry| flag(entry, "AutoUnlock"))
+            .count(),
+        changing: entries
+            .values()
+            .find(|entry| text(entry, "State") != "on")
+            .map(|entry| Changing {
+                change: text(entry, "Change"),
+                state: text(entry, "State"),
+                progress: get(entry, "Progress").unwrap_or_default(),
+            }),
+    }
+}
+
 pub fn read() -> Result<Option<Trust>, String> {
     Ok(TRUST.read()?.map(|properties| Trust {
+        drives: drives(),
         secure_boot: text(&properties, "SecureBoot"),
         tpm: tpm(&group(&properties, "Tpm")),
         signing_key: signing_key(&group(&properties, "SigningKey")),

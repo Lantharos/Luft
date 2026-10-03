@@ -3,6 +3,7 @@
 	import * as api from '$lib/api';
 	import type { Drive, Volume } from '$lib/api';
 	import { dialogs } from '$lib/dialogs/dialogs.svelte';
+	import { changing, rowStatus } from '$lib/encryption.svelte';
 	import { bytes, filesystemName, inner, jobText, usedShare, volumeName } from '$lib/format';
 	import { disks } from '$lib/state/disks.svelte';
 	import ActionMenu from '../ActionMenu.svelte';
@@ -26,7 +27,16 @@
 	let primary = $derived(primaryAction(drive, volume));
 	let menu = $derived(volumeMenu(drive, volume, remembered));
 	let facts = $derived([locked ? 'Encrypted' : filesystemName(contents), bytes(volume.size)].join(' · '));
-	let status = $derived(job ? jobText(job) : contents.used !== null ? `${bytes(Math.max(0, volume.size - contents.used))} free` : '');
+	let encryption = $derived(disks.encryption(volume));
+	let status = $derived(
+		job
+			? jobText(job)
+			: encryption && changing(encryption)
+				? rowStatus(encryption)
+				: contents.used !== null
+					? `${bytes(Math.max(0, volume.size - contents.used))} free`
+					: ''
+	);
 
 	$effect(() => {
 		remembered = false;

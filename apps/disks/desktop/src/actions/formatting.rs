@@ -9,7 +9,7 @@ const OWNED: &[&str] = &["ext4", "btrfs"];
 const ALIGNMENT: u64 = 1024 * 1024;
 const LARGE_TABLE: u64 = 2 * 1024 * 1024 * 1024 * 1024;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Format {
     pub filesystem: String,

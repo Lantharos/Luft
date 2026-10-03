@@ -1,13 +1,12 @@
 <script lang="ts">
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import { Checkbox, Dialog, Switch } from '@luft/ui';
+	import { Checkbox, Dialog, RecoveryKey, Switch } from '@luft/ui';
 	import { MINIMUM_LENGTH } from '$lib/panels/users/strength';
-	import { checkEncryption, generateRecoveryKey, problem, restart, turnOnEncryption, type Check, type Tpm } from '../api';
+	import { checkEncryption, generateRecoveryKey, printRecoveryKey, problem, restart, saveRecoveryKey, turnOnEncryption, type Check, type Tpm } from '../api';
 	import PassphraseFields from '../keys/PassphraseFields.svelte';
 	import PinFields from '../keys/PinFields.svelte';
 	import { pinReady } from '../keys/pin';
-	import RecoveryKeyView from '../keys/RecoveryKeyView.svelte';
 
 	type Step = 'check' | 'key' | 'unlock' | 'summary';
 
@@ -113,7 +112,7 @@
 			<p class="text-[13px] text-[var(--text-muted)]">Checking your computer…</p>
 		{/if}
 	{:else if step === 'key'}
-		<RecoveryKeyView {key} />
+		<RecoveryKey {key} onsave={() => saveRecoveryKey(key)} onprint={() => printRecoveryKey(key)} />
 		<Checkbox label="I’ve saved my recovery key" checked={saved} onchange={(checked) => (saved = checked)}>I’ve saved my recovery key</Checkbox>
 	{:else if step === 'unlock'}
 		{#if tpm.usable}

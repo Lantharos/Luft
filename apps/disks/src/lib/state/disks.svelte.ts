@@ -1,7 +1,7 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance } from '@luft/ui';
 import * as api from '$lib/api';
-import type { Drive, ImageProgress, Segment, Support } from '$lib/api';
+import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from '$lib/api';
 import { dialogs } from '$lib/dialogs/dialogs.svelte';
 import { errorText } from '$lib/format';
 import { space } from './space.svelte';
@@ -19,6 +19,7 @@ class Disks {
 	current = $state<string | null>(null);
 	hovered = $state<string | null>(null);
 	image = $state.raw<ImageProgress | null>(null);
+	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {} });
 	notice = $state<string | null>(null);
 	loaded = $state(false);
 	readonly busy = new SvelteSet<string>();
@@ -33,10 +34,12 @@ class Disks {
 		api.events.changed(({ drives }) => (this.drives = drives));
 		api.events.image((progress) => this.#imageProgress(progress));
 		space.listen();
+		api.events.trust((protection) => (this.protection = protection));
 		api.events.activated(({ arguments: args }) => void this.#locate(args));
-		const [{ drives }, formats] = await Promise.all([api.snapshot(), api.formats()]);
+		const [{ drives }, formats, protection] = await Promise.all([api.snapshot(), api.formats(), api.trust.state().catch(() => this.protection)]);
 		this.drives = drives;
 		this.formats = formats;
+		this.protection = protection;
 		this.loaded = true;
 		await this.#locate(state.arguments);
 	}
@@ -50,6 +53,10 @@ class Disks {
 
 	explore(path: string, name: string) {
 		void space.open(path, name).catch((caught) => this.fail(caught));
+	}
+
+	encryption(volume: Volume) {
+		return volume.encryption ? (this.protection.drives[volume.uuid] ?? null) : null;
 	}
 
 	support(filesystem: string) {

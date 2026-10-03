@@ -108,6 +108,19 @@ fn free_after(target: &Target) -> Option<(u64, u64)> {
     Some((limit.saturating_sub(end) * sector, sector))
 }
 
+fn display_name(kind: &str) -> &str {
+    match kind {
+        "" => "a partition without a file system",
+        "exfat" => "exFAT",
+        "ntfs" => "NTFS",
+        "vfat" => "FAT",
+        "xfs" => "XFS",
+        "f2fs" => "F2FS",
+        "iso9660" => "a disc image",
+        other => other,
+    }
+}
+
 pub fn plan(target: &Target) -> std::result::Result<Room, String> {
     let space = space(target);
     if space
@@ -127,12 +140,8 @@ pub fn plan(target: &Target) -> std::result::Result<Room, String> {
     let kind = target.filesystem();
     let Some(space) = space else {
         return Err(format!(
-            "{} can't make room for encryption without erasing it, and there's no free space right after it on the drive.",
-            if kind.is_empty() {
-                "This partition"
-            } else {
-                kind
-            }
+            "There's no free space right after it on the drive, and {} can't make room for encryption without erasing it.",
+            display_name(kind)
         ));
     };
     if space.free < HEADER_ROOM + MARGIN {

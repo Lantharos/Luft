@@ -340,6 +340,17 @@ pub fn decrypt(device: &str, typed: &Secret) -> Result<Record> {
     Ok(record)
 }
 
+fn slot_opened_by(target: &Target, header: &luks::Header, key: &Secret) -> Option<u32> {
+    header.keyslots.iter().copied().find(|slot| {
+        Tool::new("cryptsetup")
+            .args(["open", "--test-passphrase", "--key-file", "-", "--key-slot"])
+            .arg(slot.to_string())
+            .arg(&target.device)
+            .input(key)
+            .succeeds()
+    })
+}
+
 pub fn set_up_unlocking(
     device: &str,
     typed: &Secret,
@@ -349,9 +360,15 @@ pub fn set_up_unlocking(
     let target = Target::find(device)?;
     let (header, mut record) = encrypted(&target)?;
     let key = unlock_key(&target, &record, typed)?;
-    if !recovery.is_empty() && !header.has(luks::RECOVERY) {
+    if !recovery.is_empty() && header.has(luks::RECOVERY) {
+        bail!(Unsupported("It already has a recovery key.".to_owned()));
+    }
+    if !recovery.is_empty() {
         let recovery = checked_recovery_key(recovery)?;
-        let slot = keys::add_keyslot(&target.device, &key, &recovery, &header)?;
+        let slot = match slot_opened_by(&target, &header, &recovery) {
+            Some(slot) => slot,
+            None => keys::add_keyslot(&target.device, &key, &recovery, &header)?,
+        };
         keys::add_recovery_token(&target.device, slot)?;
         unlocking::escrow(&record, &recovery)?;
     }

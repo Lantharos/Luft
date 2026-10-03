@@ -1,9 +1,8 @@
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
-import { getMixerControl } from 'resource:///com/lantharos/kestrel/ui/status/volume.js';
 
-const LEVEL_METERS = ['org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
+import { mixer } from '../mediaKeys/mixer.js';
 
 export interface PrivacyState {
   camera: boolean;
@@ -16,13 +15,13 @@ export interface PrivacyState {
 export class PrivacyMonitor {
   readonly handles = new Set<Meta.RemoteAccessHandle>();
   private readonly camera = new Shell.CameraMonitor();
-  private readonly mixer = getMixerControl();
+  private readonly mixer = mixer();
   private geoclue: ReturnType<typeof getGeoclueAgent> | null = null;
   private readonly disconnectors: (() => void)[] = [];
 
   constructor(changed: () => void) {
     const camera = this.camera.connect('notify::cameras-in-use', changed);
-    const mixer = ['stream-added', 'stream-removed'].map(signal => this.mixer.connect(signal, changed));
+    const recording = this.mixer.connect('notify::recording', changed);
     const controller = (global as unknown as Shell.Global).backend.get_remote_access_controller();
     const handles = controller?.connect('new-handle', (_controller, handle: Meta.RemoteAccessHandle) => {
       this.handles.add(handle);
@@ -34,7 +33,7 @@ export class PrivacyMonitor {
     });
     this.disconnectors.push(
       () => this.camera.disconnect(camera),
-      () => mixer.forEach(id => this.mixer.disconnect(id)),
+      () => this.mixer.disconnect(recording),
       () => { if (handles) controller!.disconnect(handles); },
     );
     void import('resource:///com/lantharos/kestrel/ui/status/location.js').then(({ getGeoclueAgent }) => {
@@ -49,7 +48,7 @@ export class PrivacyMonitor {
   get state(): PrivacyState {
     return {
       camera: this.camera.cameras_in_use,
-      microphone: this.mixer.get_source_outputs().some(output => !LEVEL_METERS.includes(output.get_application_id() ?? '')),
+      microphone: this.mixer.recording,
       sharing: [...this.handles].some(handle => !handle.is_recording),
       recording: [...this.handles].some(handle => handle.is_recording),
       location: this.geoclue?.inUse ?? false,

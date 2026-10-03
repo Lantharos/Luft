@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from './dialog.js';
@@ -9,16 +8,6 @@ import * as ModalDialog from './modalDialog.js';
 
 import * as Main from './main.js';
 import * as Util from '../misc/util.js';
-import {emitSignalToDestination} from '../misc/dbusUtils.js';
-import {loadInterfaceXML} from '../misc/fileUtils.js';
-
-const AudioDevice = {
-    HEADPHONES: 1 << 0,
-    HEADSET:    1 << 1,
-    MICROPHONE: 1 << 2,
-};
-
-const AudioDeviceSelectionIface = loadInterfaceXML('com.lantharos.Kestrel.AudioDeviceSelection');
 
 const AudioDeviceSelectionDialog = GObject.registerClass({
     Signals: {'device-selected': {param_types: [GObject.TYPE_UINT]}},
@@ -30,15 +19,12 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
         this._buildLayout();
 
-        if (devices & AudioDevice.HEADPHONES)
-            this._addDevice(AudioDevice.HEADPHONES);
-        if (devices & AudioDevice.HEADSET)
-            this._addDevice(AudioDevice.HEADSET);
-        if (devices & AudioDevice.MICROPHONE)
-            this._addDevice(AudioDevice.MICROPHONE);
-
-        if (this._selectionBox.get_n_children() < 2)
-            throw new Error('Too few devices for a selection');
+        if (devices & Shell.MixerHeadset.HEADPHONES)
+            this._addDevice(Shell.MixerHeadset.HEADPHONES);
+        if (devices & Shell.MixerHeadset.HEADSET)
+            this._addDevice(Shell.MixerHeadset.HEADSET);
+        if (devices & Shell.MixerHeadset.MICROPHONE)
+            this._addDevice(Shell.MixerHeadset.MICROPHONE);
     }
 
     _buildLayout() {
@@ -72,11 +58,11 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
     _getDeviceLabel(device) {
         switch (device) {
-        case AudioDevice.HEADPHONES:
+        case Shell.MixerHeadset.HEADPHONES:
             return _('Headphones');
-        case AudioDevice.HEADSET:
+        case Shell.MixerHeadset.HEADSET:
             return _('Headset');
-        case AudioDevice.MICROPHONE:
+        case Shell.MixerHeadset.MICROPHONE:
             return _('Microphone');
         default:
             return null;
@@ -85,11 +71,11 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
     _getDeviceIcon(device) {
         switch (device) {
-        case AudioDevice.HEADPHONES:
+        case Shell.MixerHeadset.HEADPHONES:
             return 'audio-headphones-symbolic';
-        case AudioDevice.HEADSET:
+        case Shell.MixerHeadset.HEADSET:
             return 'audio-headset-symbolic';
-        case AudioDevice.MICROPHONE:
+        case Shell.MixerHeadset.MICROPHONE:
             return 'audio-input-microphone-symbolic';
         default:
             return null;
@@ -135,62 +121,17 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
     }
 });
 
-export class AudioDeviceSelectionDBus {
-    constructor() {
-        this._audioSelectionDialog = null;
+/**
+ * @param {number} devices - the Shell.MixerHeadset choices to offer
+ * @param {(device: number) => void} selected - called with the chosen device
+ * @returns {ModalDialog.ModalDialog | null} the open dialog, unless there was nothing to choose
+ */
+export function askForAudioDevice(devices, selected) {
+    if ([Shell.MixerHeadset.HEADPHONES, Shell.MixerHeadset.HEADSET, Shell.MixerHeadset.MICROPHONE].filter(device => devices & device).length < 2)
+        return null;
 
-        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AudioDeviceSelectionIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/com/lantharos/Kestrel/AudioDeviceSelection');
-
-        Gio.DBus.session.own_name('com.lantharos.Kestrel.AudioDeviceSelection', Gio.BusNameOwnerFlags.REPLACE, null, null);
-    }
-
-    _onDialogClosed() {
-        this._audioSelectionDialog = null;
-    }
-
-    _onDeviceSelected(dialog, device) {
-        const deviceName = Object.keys(AudioDevice)
-            .filter(dev => AudioDevice[dev] === device)[0].toLowerCase();
-
-        emitSignalToDestination(this._dbusImpl,
-            this._audioSelectionDialog._sender, 'DeviceSelected',
-            GLib.Variant.new('(s)', [deviceName]));
-    }
-
-    OpenAsync(params, invocation) {
-        if (this._audioSelectionDialog) {
-            invocation.return_value(null);
-            return;
-        }
-
-        const [deviceNames] = params;
-        let devices = 0;
-        deviceNames.forEach(n => (devices |= AudioDevice[n.toUpperCase()]));
-
-        let dialog;
-        try {
-            dialog = new AudioDeviceSelectionDialog(devices);
-        } catch {
-            invocation.return_value(null);
-            return;
-        }
-        dialog._sender = invocation.get_sender();
-
-        dialog.connect('closed', this._onDialogClosed.bind(this));
-        dialog.connect('device-selected',
-            this._onDeviceSelected.bind(this));
-        dialog.open();
-
-        this._audioSelectionDialog = dialog;
-        invocation.return_value(null);
-    }
-
-    CloseAsync(params, invocation) {
-        if (this._audioSelectionDialog &&
-            this._audioSelectionDialog._sender === invocation.get_sender())
-            this._audioSelectionDialog.close();
-
-        invocation.return_value(null);
-    }
+    const dialog = new AudioDeviceSelectionDialog(devices);
+    dialog.connect('device-selected', (_dialog, device) => selected(device));
+    dialog.open();
+    return dialog;
 }

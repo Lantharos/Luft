@@ -48,6 +48,7 @@ kestrel_deps = [
   pango_dep,
   fontconfig_dep,
   nm_deps,
+  pulse_deps,
 ]
 
 if have_xwayland
@@ -96,6 +97,9 @@ libshell_public_headers = [
   'shell-window-tracker.h',
   'shell-wm.h',
   'shell-xkb-info.h',
+  'mixer/shell-mixer.h',
+  'mixer/shell-mixer-device.h',
+  'mixer/shell-mixer-stream.h',
 ]
 
 libshell_private_headers = [
@@ -103,7 +107,8 @@ libshell_private_headers = [
   'shell-app-cache-private.h',
   'shell-app-system-private.h',
   'shell-global-private.h',
-  'shell-wm-private.h'
+  'shell-wm-private.h',
+  'mixer/shell-mixer-private.h',
 ]
 
 libshell_sources = [
@@ -130,6 +135,13 @@ libshell_sources = [
   'shell-window-tracker.c',
   'shell-wm.c',
   'shell-xkb-info.c',
+  'mixer/shell-mixer.c',
+  'mixer/shell-mixer-card.c',
+  'mixer/shell-mixer-device.c',
+  'mixer/shell-mixer-devices.c',
+  'mixer/shell-mixer-headset.c',
+  'mixer/shell-mixer-server.c',
+  'mixer/shell-mixer-stream.c',
 ]
 
 libshell_private_sources = [
@@ -187,7 +199,6 @@ libshell_gir_includes = [
   'PolkitAgent-1.0',
   'GdkPixbuf-2.0',
   'NM-1.0',
-  libgvc_gir[0],
   libst_gir[0]
 ]
 

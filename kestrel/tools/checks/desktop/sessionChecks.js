@@ -94,10 +94,10 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
 
   toggleSurface('start');
   await pause(350);
-  const audio = ['com.lantharos.Kestrel.AudioDeviceSelection', '/com/lantharos/Kestrel/AudioDeviceSelection', 'com.lantharos.Kestrel.AudioDeviceSelection'];
-  await call(...audio, 'Open', new GLib.Variant('(as)', [['headphones', 'headset', 'microphone']]));
+  const {HEADPHONES, HEADSET, MICROPHONE} = Shell.MixerHeadset;
+  Shell.Mixer.get_default().emit('headset-changed', HEADPHONES | HEADSET | MICROPHONE);
   await pause(200);
-  require(!start.visible && Main.modalCount > 0, 'audio dialog dismisses Start and takes focus');
+  require(!start.visible && Main.modalCount > 0, 'plugging in a headset asks what it is, dismissing Start');
   await capture(`${output}/audio-device-dialog.png`);
   key(Clutter.KEY_Escape);
   await pause(250);

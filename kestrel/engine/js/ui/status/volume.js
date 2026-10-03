@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Gvc from 'gi://Gvc';
+import Shell from 'gi://Shell';
 
 import * as Main from '../main.js';
 import * as PopupMenu from '../popupMenu.js';
@@ -12,34 +12,18 @@ import {QuickSlider, SystemIndicator} from '../quickSettings.js';
 const ALLOW_AMPLIFIED_VOLUME_KEY = 'allow-volume-above-100-percent';
 const UNMUTE_DEFAULT_VOLUME = 0.25;
 
-// Each Gvc.MixerControl is a connection to PulseAudio,
-// so it's better to make it a singleton
-let _mixerControl;
-
-/**
- * @returns {Gvc.MixerControl} - the mixer control singleton
- */
-export function getMixerControl() {
-    if (_mixerControl)
-        return _mixerControl;
-
-    _mixerControl = new Gvc.MixerControl({name: 'GNOME Shell Volume Control'});
-    _mixerControl.open();
-
-    return _mixerControl;
-}
-
 const StreamSlider = GObject.registerClass({
     Signals: {
         'stream-updated': {},
     },
 }, class StreamSlider extends QuickSlider {
-    _init(control) {
+    _init(output) {
         super._init({
             icon_reactive: true,
         });
 
-        this._control = control;
+        this._output = output;
+        this._mixer = Shell.Mixer.get_default();
 
         this._inDrag = false;
         this._notifyVolumeChangeId = 0;
@@ -63,16 +47,11 @@ const StreamSlider = GObject.registerClass({
             if (!this._stream)
                 return;
 
-            const {isMuted} = this._stream;
-            if (isMuted && this._stream.volume === 0) {
-                this._stream.volume =
-                    UNMUTE_DEFAULT_VOLUME * this._control.get_vol_max_norm();
-                this._stream.push_volume();
-            }
-            this._stream.change_is_muted(!isMuted);
+            const {muted} = this._stream;
+            if (muted && this._stream.volume === 0)
+                this._stream.set_volume(UNMUTE_DEFAULT_VOLUME);
+            this._stream.set_muted(!muted);
         });
-
-        this._deviceItems = new Map();
 
         this._deviceSection = new PopupMenu.PopupMenuSection();
         this.menu.addMenuItem(this._deviceSection);
@@ -82,9 +61,20 @@ const StreamSlider = GObject.registerClass({
 
         this._stream = null;
         this._volumeCancellable = null;
-        this._icons = [];
 
-        this._sync();
+        this._mixer.connectObject(
+            `notify::${output ? 'output' : 'input'}`, () => (this.stream = this._defaultStream()),
+            'devices-changed', (_mixer, changed) => {
+                if (changed === output)
+                    this._showDevices();
+            },
+            this);
+        this._showDevices();
+        this.stream = this._defaultStream();
+    }
+
+    _defaultStream() {
+        return this._output ? this._mixer.output : this._mixer.input;
     }
 
     get stream() {
@@ -92,6 +82,9 @@ const StreamSlider = GObject.registerClass({
     }
 
     set stream(stream) {
+        if (stream === this._stream)
+            return;
+
         this._stream?.disconnectObject(this);
 
         this._stream = stream;
@@ -108,91 +101,46 @@ const StreamSlider = GObject.registerClass({
 
     _connectStream(stream) {
         stream.connectObject(
-            'notify::is-muted', this._updateVolume.bind(this),
+            'notify::muted', this._updateVolume.bind(this),
             'notify::volume', this._updateVolume.bind(this), this);
     }
 
-    _lookupDevice(_id) {
-        throw new GObject.NotImplementedError(
-            `_lookupDevice in ${this.constructor.name}`);
-    }
+    _showDevices() {
+        this._deviceSection.removeAll();
 
-    _activateDevice(_device) {
-        throw new GObject.NotImplementedError(
-            `_activateDevice in ${this.constructor.name}`);
-    }
-
-    _addDevice(id) {
-        if (this._deviceItems.has(id))
-            return;
-
-        const device = this._lookupDevice(id);
-        if (!device)
-            return;
-
-        const {description, origin} = device;
-        const name = origin
-            ? `${description} – ${origin}`
-            : description;
-        const item = new PopupMenu.PopupImageMenuItem(name, device.get_gicon());
-        item.connect('activate', () => {
-            const dev = this._lookupDevice(id);
-            if (dev)
-                this._activateDevice(dev);
-            else
-                console.warn(`Trying to activate invalid device ${id}`);
-        });
-
-        this._deviceSection.addMenuItem(item);
-        this._deviceItems.set(id, item);
-
-        this._sync();
-    }
-
-    _removeDevice(id) {
-        this._deviceItems.get(id)?.destroy();
-        if (this._deviceItems.delete(id))
-            this._sync();
-    }
-
-    _setActiveDevice(activeId) {
-        for (const [id, item] of this._deviceItems) {
-            item.setOrnament(id === activeId
-                ? PopupMenu.Ornament.CHECK
-                : PopupMenu.Ornament.NONE);
+        const devices = this._mixer.get_devices(this._output);
+        for (const device of devices) {
+            const origin = device.get_origin();
+            const name = origin
+                ? `${device.get_description()} – ${origin}`
+                : device.get_description();
+            const item = new PopupMenu.PopupImageMenuItem(name, new Gio.ThemedIcon({name: device.get_icon_name()}));
+            item.setOrnament(device.get_active() ? PopupMenu.Ornament.CHECK : PopupMenu.Ornament.NONE);
+            item.connect('activate', () => this._mixer.activate_device(device));
+            this._deviceSection.addMenuItem(item);
         }
-    }
 
-    _shouldBeVisible() {
-        return this._stream != null;
+        this.menuEnabled = devices.length > 1;
     }
 
     _sync() {
-        this.visible = this._shouldBeVisible();
-        this.menuEnabled = this._deviceItems.size > 1;
+        this.visible = this._stream != null;
     }
 
     _sliderChanged() {
         if (!this._stream)
             return;
 
-        const value = this.slider.value;
-        const volume = value * this._control.get_vol_max_norm();
-        const prevMuted = this._stream.is_muted;
-        let volumeChanged;
-        if (volume < 1) {
-            volumeChanged = this._stream.set_volume(0);
-            if (!prevMuted)
-                this._stream.change_is_muted(true);
-        } else {
-            volumeChanged = this._stream.set_volume(volume);
-            if (prevMuted)
-                this._stream.change_is_muted(false);
-        }
-        if (volumeChanged)
-            this._stream.push_volume();
+        const volume = this.slider.value;
+        const previous = this._stream.volume;
+        const prevMuted = this._stream.muted;
+        this._stream.set_volume(volume);
+        if (volume === 0 && !prevMuted)
+            this._stream.set_muted(true);
+        else if (volume > 0 && prevMuted)
+            this._stream.set_muted(false);
 
-        if (volumeChanged && !this._notifyVolumeChangeId && !this._inDrag) {
+        if (volume !== previous && !this._notifyVolumeChangeId && !this._inDrag) {
             this._notifyVolumeChangeId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, 30, () => {
                 this._notifyVolumeChange();
                 this._notifyVolumeChangeId = 0;
@@ -207,8 +155,8 @@ const StreamSlider = GObject.registerClass({
             this._volumeCancellable.cancel();
         this._volumeCancellable = null;
 
-        if (this._stream.state === Gvc.MixerStreamState.RUNNING)
-            return; // feedback not necessary while playing
+        if (this._stream.running)
+            return;
 
         this._volumeCancellable = new Gio.Cancellable();
         const player = global.display.get_sound_player();
@@ -224,9 +172,8 @@ const StreamSlider = GObject.registerClass({
     }
 
     _updateVolume() {
-        const muted = this._stream.is_muted;
-        this._changeSlider(muted
-            ? 0 : this._stream.volume / this._control.get_vol_max_norm());
+        const {muted} = this._stream;
+        this._changeSlider(muted ? 0 : this._stream.volume);
         this.iconLabel = muted ? _('Unmute') : _('Mute');
         this._updateIcon();
         this.emit('stream-updated');
@@ -235,9 +182,7 @@ const StreamSlider = GObject.registerClass({
     _amplifySettingsChanged() {
         this._allowAmplified = this._soundSettings.get_boolean(ALLOW_AMPLIFIED_VOLUME_KEY);
 
-        const maxLevel = this._allowAmplified
-            ? this.getMaxLevel() : 1;
-        this.slider.maximum_value = maxLevel;
+        this.slider.maximum_value = this.getMaxLevel();
 
         this.slider.clearMarks();
         if (this._allowAmplified)
@@ -255,53 +200,34 @@ const StreamSlider = GObject.registerClass({
         if (!this._stream)
             return null;
 
-        const volume = this._stream.volume;
+        const {volume} = this._stream;
         let n;
-        if (this._stream.is_muted || volume <= 0) {
+        if (this._stream.muted || volume <= 0) {
             n = 0;
         } else {
-            n = Math.ceil(3 * volume / this._control.get_vol_max_norm());
+            n = Math.ceil(3 * volume);
             n = Math.clamp(n, 1, this._icons.length - 1);
         }
         return this._icons[n];
     }
 
     getLevel() {
-        if (!this._stream)
-            return null;
-
-        return this._stream.volume / this._control.get_vol_max_norm();
+        return this._stream?.volume ?? null;
     }
 
     getMaxLevel() {
-        let maxVolume = this._control.get_vol_max_norm();
-        if (this._allowAmplified)
-            maxVolume = this._control.get_vol_max_amplified();
-
-        return maxVolume / this._control.get_vol_max_norm();
+        return this._allowAmplified ? Shell.Mixer.get_max_amplified() : 1;
     }
 
     showOSD() {
         const gicon = new Gio.ThemedIcon({name: this.getIcon()});
-        const level = this.getLevel();
-        const maxLevel = this.getMaxLevel();
-        Main.osdWindowManager.showAll(gicon, null, level, maxLevel);
+        Main.osdWindowManager.showAll(gicon, null, this.getLevel(), this.getMaxLevel());
     }
 });
 
 const OutputStreamSlider = GObject.registerClass(
 class OutputStreamSlider extends StreamSlider {
-    _init(control) {
-        super._init(control);
-
-        this.slider.accessible_name = _('Volume');
-
-        this._control.connectObject(
-            'output-added', (c, id) => this._addDevice(id),
-            'output-removed', (c, id) => this._removeDevice(id),
-            'active-output-update', (c, id) => this._setActiveDevice(id),
-            this);
-
+    _init() {
         this._icons = [
             'audio-volume-muted-symbolic',
             'audio-volume-low-symbolic',
@@ -310,6 +236,9 @@ class OutputStreamSlider extends StreamSlider {
             'audio-volume-overamplified-symbolic',
         ];
 
+        super._init(true);
+
+        this.slider.accessible_name = _('Volume');
         this.menu.setHeader('audio-headphones-symbolic', _('Sound Output'));
         this.menuButtonAccessibleName = _('Open sound output menu');
     }
@@ -321,27 +250,12 @@ class OutputStreamSlider extends StreamSlider {
         this._portChanged();
     }
 
-    _lookupDevice(id) {
-        return this._control.lookup_output_id(id);
-    }
-
-    _activateDevice(device) {
-        this._control.change_output(device);
-    }
-
     _findHeadphones(sink) {
-        // This only works for external headphones (e.g. bluetooth)
-        if (sink.get_form_factor() === 'headset' ||
-            sink.get_form_factor() === 'headphone')
+        const formFactor = sink.form_factor;
+        if (formFactor === 'headset' || formFactor === 'headphone')
             return true;
 
-        // a bit hackish, but ALSA/PulseAudio have a number
-        // of different identifiers for headphones, and I could
-        // not find the complete list
-        if (sink.get_ports().length > 0)
-            return sink.get_port().port.toLowerCase().includes('headphone');
-
-        return false;
+        return sink.port?.toLowerCase().includes('headphone') ?? false;
     }
 
     _portChanged() {
@@ -365,22 +279,7 @@ class OutputStreamSlider extends StreamSlider {
 
 const InputStreamSlider = GObject.registerClass(
 class InputStreamSlider extends StreamSlider {
-    _init(control, showWhenIdle = false) {
-        super._init(control);
-        this._showWhenIdle = showWhenIdle;
-
-        this.slider.accessible_name = _('Microphone');
-
-        this._control.connectObject(
-            'input-added', (c, id) => this._addDevice(id),
-            'input-removed', (c, id) => this._removeDevice(id),
-            'active-input-update', (c, id) => this._setActiveDevice(id),
-            'stream-added', () => this._maybeShowInput(),
-            'stream-removed', () => this._maybeShowInput(),
-            'stream-changed', () => this._maybeShowInput(),
-            this);
-
-        this.iconName = 'audio-input-microphone-symbolic';
+    _init() {
         this._icons = [
             'microphone-sensitivity-muted-symbolic',
             'microphone-sensitivity-low-symbolic',
@@ -388,51 +287,17 @@ class InputStreamSlider extends StreamSlider {
             'microphone-sensitivity-high-symbolic',
         ];
 
+        super._init(false);
+
+        this.slider.accessible_name = _('Microphone');
+        this.iconName = 'audio-input-microphone-symbolic';
         this.menu.setHeader('audio-input-microphone-symbolic', _('Sound Input'));
         this.menuButtonAccessibleName = _('Open sound input menu');
     }
-
-    _connectStream(stream) {
-        super._connectStream(stream);
-        this._maybeShowInput();
-    }
-
-    _lookupDevice(id) {
-        return this._control.lookup_input_id(id);
-    }
-
-    _activateDevice(device) {
-        this._control.change_input(device);
-    }
-
-    _maybeShowInput() {
-        // only show input widgets if any application is recording audio
-        let showInput = false;
-        if (this._stream) {
-            // skip gnome-volume-control and pavucontrol which appear
-            // as recording because they show the input level
-            const skippedApps = [
-                'org.gnome.VolumeControl',
-                'org.PulseAudio.pavucontrol',
-            ];
-
-            showInput =
-                this._control.get_sources().some(source => source.state === Gvc.MixerStreamState.RUNNING) &&
-                this._control.get_source_outputs().some(output =>
-                    !skippedApps.includes(output.get_application_id()));
-        }
-
-        this._showInput = showInput;
-        this._sync();
-    }
-
-    _shouldBeVisible() {
-        return super._shouldBeVisible() && (this._showWhenIdle || this._showInput);
-    }
 });
 
-const VolumeIndicator = GObject.registerClass(
-class VolumeIndicator extends SystemIndicator {
+export const OutputIndicator = GObject.registerClass(
+class OutputIndicator extends SystemIndicator {
     constructor() {
         super();
 
@@ -443,76 +308,29 @@ class VolumeIndicator extends SystemIndicator {
             flags: Clutter.ScrollControllerFlags.SCROLL_VERTICAL |
                 Clutter.ScrollControllerFlags.PHYSICAL_DIRECTION,
         });
-        scrollController.connect(
-            'scroll',
-            (controller, sprite, source, dx, dy) => {
-                this._onScroll(source, dx, dy);
-            });
-        this._indicator.add_action(scrollController);
-    }
-
-    _onScroll(_source, _dx, _dy) {
-        throw new GObject.NotImplementedError();
-    }
-
-    _handleScroll(item, delta) {
-        const nSteps = -delta;
-
-        if (item.mapped || item.slider.step(nSteps))
-            item.showOSD();
-
-        return Clutter.EVENT_STOP;
-    }
-});
-
-export const OutputIndicator = GObject.registerClass(
-class OutputIndicator extends VolumeIndicator {
-    constructor() {
-        super();
-
-        this._control = getMixerControl();
-        this._control.connectObject(
-            'state-changed', () => this._onControlStateChanged(),
-            'default-sink-changed', () => this._readOutput(),
-            this);
-
-        this._output = new OutputStreamSlider(this._control);
-        this._output.connect('stream-updated', () => {
-            const icon = this._output.getIcon();
-
-            if (icon)
-                this._indicator.icon_name = icon;
-            this._indicator.visible = icon !== null;
+        scrollController.connect('scroll', (_controller, _sprite, _source, _dx, dy) => {
+            if (this._output.mapped || this._output.slider.step(-dy))
+                this._output.showOSD();
+            return Clutter.EVENT_STOP;
         });
+        this._indicator.add_action(scrollController);
+
+        this._output = new OutputStreamSlider();
+        this._output.connect('stream-updated', () => this._sync());
+        this._sync();
 
         this.quickSettingsItems.push(this._output);
-
-        this._onControlStateChanged();
     }
 
-    _onScroll(_source, _dx, dy) {
-        this._handleScroll(this._output, dy);
-    }
+    _sync() {
+        const icon = this._output.getIcon();
 
-    _onControlStateChanged() {
-        if (this._control.get_state() === Gvc.MixerControlState.READY)
-            this._readOutput();
-        else
-            this._indicator.hide();
-    }
-
-    _readOutput() {
-        this._output.stream = this._control.get_default_sink();
+        if (icon)
+            this._indicator.icon_name = icon;
+        this._indicator.visible = icon !== null;
     }
 });
 
 export function createInputSlider() {
-    const control = getMixerControl();
-    const slider = new InputStreamSlider(control, true);
-    const update = () => {
-        slider.stream = control.get_default_source();
-    };
-    control.connectObject('state-changed', update, 'default-source-changed', update, slider);
-    update();
-    return slider;
+    return new InputStreamSlider();
 }

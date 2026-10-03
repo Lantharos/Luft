@@ -31,6 +31,7 @@ rsvg_req = '>= 2.46'
 glycin_req = '>= 2.0'
 
 nm_req = '>= 1.24'
+pulse_req = '>= 15.0'
 secret_req = '>= 0.18'
 
 fs = import('fs')
@@ -91,6 +92,11 @@ endif
 if not have_fonts
   error('Shell requires mutter to be built with fonts rendering support')
 endif
+
+pulse_deps = [
+  dependency('libpulse', version: pulse_req),
+  dependency('libpulse-mainloop-glib', version: pulse_req),
+]
 
 nm_deps = [
   dependency('libnm', version: nm_req),
@@ -212,19 +218,6 @@ config_h = configure_file(
 )
 
 conf_inc = include_directories('.')
-
-libgvc = subproject('gvc',
-  default_options: [
-    'package_name=' + meson.project_name(),
-    'package_version=' + meson.project_version(),
-    'pkgdatadir=' + pkgdatadir,
-    'pkglibdir=' + pkglibdir,
-    'static=false',
-    'introspection=true',
-    'alsa=false'
-  ]
-)
-libgvc_gir = libgvc.get_variable('libgvc_gir')
 
 subdir('data')
 subdir('js')

@@ -8,7 +8,6 @@ import St from 'gi://St';
 
 import * as MessageTray from './messageTray.js';
 import * as AccessDialog from './accessDialog.js';
-import * as AudioDeviceSelection from './audioDeviceSelection.js';
 import {DesktopControls} from './desktopControls.js';
 import * as BrightnessManager from '../misc/brightnessManager.js';
 import * as Config from '../misc/config.js';
@@ -49,7 +48,6 @@ export let osdWindowManager = null;
 export let sessionMode = null;
 export let screenshotUI = null;
 export let shellAccessDialogDBusService = null;
-export let shellAudioSelectionDBusService = null;
 export let shellDBusService = null;
 export let shellMountOpDBusService = null;
 export let modalCount = 0;
@@ -135,7 +133,6 @@ export async function start() {
     await _initializeUI();
 
     shellAccessDialogDBusService = new AccessDialog.AccessDialogDBus();
-    shellAudioSelectionDBusService = new AudioDeviceSelection.AudioDeviceSelectionDBus();
     shellDBusService = new ShellDBus.GnomeShell();
     shellMountOpDBusService = new ShellMountOperation.GnomeShellMountOpHandler();
 

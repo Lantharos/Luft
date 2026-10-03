@@ -1,25 +1,17 @@
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import Gvc from 'gi://Gvc';
-import Shell from 'gi://Shell';
-import { getMixerControl } from 'resource:///com/lantharos/kestrel/ui/status/volume.js';
+import type Shell from 'gi://Shell';
+import { askForAudioDevice } from 'resource:///com/lantharos/kestrel/ui/audioDeviceSelection.js';
 
 import type { Context } from '../context.js';
+import { maxAmplified, mixer, type MixerHeadset, type MixerStream } from './mixer.js';
 
 type ShowOsd = Context['showOsd'];
 
-const STEP = 6;
-const PRECISE_STEP = 2;
+const STEP = 0.06;
+const PRECISE_STEP = 0.02;
 const BUILT_IN_PORTS = new Set(['[OUT] Speaker', '[OUT] Handset', 'analog-output-speaker', 'analog-output']);
 const OUTPUT_ICONS = ['audio-volume-muted', 'audio-volume-low', 'audio-volume-medium', 'audio-volume-high', 'audio-volume-overamplified'];
 const INPUT_ICONS = ['microphone-sensitivity-muted', 'microphone-sensitivity-low', 'microphone-sensitivity-medium', 'microphone-sensitivity-high'];
-const SELECTION = 'com.lantharos.Kestrel.AudioDeviceSelection';
-const SELECTION_PATH = '/com/lantharos/Kestrel/AudioDeviceSelection';
-const HEADSET_CHOICES: [string, Gvc.HeadsetPortChoice][] = [
-  ['headphones', Gvc.HeadsetPortChoice.HEADPHONES],
-  ['headset', Gvc.HeadsetPortChoice.HEADSET],
-  ['microphone', Gvc.HeadsetPortChoice.MIC],
-];
 
 export type VolumeChange = 'mute' | 'down' | 'up';
 
@@ -35,32 +27,28 @@ function icon(output: boolean, muted: boolean, level: number): string {
   return `${names[index]}-symbolic`;
 }
 
+function deviceLabel(stream: MixerStream): string | null {
+  const { port } = stream;
+  if (stream.form_factor === 'internal' && (!port || BUILT_IN_PORTS.has(port))) return null;
+  return stream.port_description ?? stream.description;
+}
+
 export class VolumeKeys {
-  private readonly control = getMixerControl() as unknown as Gvc.MixerControl;
+  private readonly mixer = mixer();
   private readonly sound = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
-  private readonly selectionId: number;
-  private readonly choiceId: number;
-  private selectingFor: number | null = null;
+  private readonly headsetId: number;
+  private question: ReturnType<typeof askForAudioDevice> = null;
 
   constructor(private readonly showOsd: ShowOsd) {
-    this.selectionId = this.control.connect('audio-device-selection-needed',
-      (_control: Gvc.MixerControl, id: number, show: boolean, choices: number) => this.askForDevice(id, show, choices));
-    this.choiceId = Gio.DBus.session.signal_subscribe(SELECTION, SELECTION, 'DeviceSelected', SELECTION_PATH, null,
-      Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
-        const [choice] = parameters.deep_unpack() as [string];
-        const port = HEADSET_CHOICES.find(([name]) => name === choice)?.[1];
-        if (this.selectingFor !== null && port !== undefined) this.control.set_headset_port(this.selectingFor, port);
-        this.selectingFor = null;
-      });
+    this.headsetId = this.mixer.connect('headset-changed', (_mixer, choices) => this.askForDevice(choices));
   }
 
   change(change: VolumeChange, { output, quiet = false, precise = false }: VolumeOptions): void {
-    const stream = output ? this.control.get_default_sink() : this.control.get_default_source();
+    const stream = output ? this.mixer.output : this.mixer.input;
     if (!stream) return;
-    const norm = this.control.get_vol_max_norm();
-    const max = output && this.sound.get_boolean('allow-volume-above-100-percent') ? this.control.get_vol_max_amplified() : norm;
-    const step = norm * (precise ? PRECISE_STEP : STEP) / 100;
-    const [oldVolume, oldMuted] = [stream.volume, stream.is_muted];
+    const max = output && this.sound.get_boolean('allow-volume-above-100-percent') ? maxAmplified() : 1;
+    const step = precise ? PRECISE_STEP : STEP;
+    const [oldVolume, oldMuted] = [stream.volume, stream.muted];
     let [volume, muted] = [oldVolume, oldMuted];
     if (change === 'mute') {
       muted = !oldMuted;
@@ -71,47 +59,26 @@ export class VolumeKeys {
       muted = false;
       if (!oldMuted || oldVolume === 0) volume = Math.min(oldVolume + step, max);
     }
-    let changed = false;
-    if (muted !== oldMuted) {
-      stream.change_is_muted(muted);
-      changed = true;
-    }
-    if (volume !== oldVolume) {
-      stream.volume = volume;
-      stream.push_volume();
-      changed = true;
-    }
-    const level = muted ? 0 : Math.min(volume / norm, max / norm);
-    this.showOsd(Gio.ThemedIcon.new(icon(output, muted, level)), this.deviceLabel(stream), level, max / norm);
-    if (output && changed && !quiet && !muted && stream.get_state() !== Gvc.MixerStreamState.RUNNING)
+    if (muted !== oldMuted) stream.set_muted(muted);
+    if (volume !== oldVolume) stream.set_volume(volume);
+    const changed = muted !== oldMuted || volume !== oldVolume;
+    const level = muted ? 0 : Math.min(volume, max);
+    this.showOsd(Gio.ThemedIcon.new(icon(output, muted, level)), deviceLabel(stream), level, max);
+    if (output && changed && !quiet && !muted && !stream.running)
       (global as unknown as Shell.Global).display.get_sound_player().play_from_theme('audio-volume-change', 'Volume changed', null);
   }
 
-  private deviceLabel(stream: Gvc.MixerStream): string | null {
-    const port = stream.get_port()?.port;
-    if (stream.get_form_factor() === 'internal' && (!port || BUILT_IN_PORTS.has(port))) return null;
-    return this.control.lookup_device_from_stream(stream)?.get_description() ?? null;
-  }
-
-  private askForDevice(id: number, show: boolean, choices: number): void {
-    if (this.selectingFor !== null) void this.callSelection('Close', null);
-    this.selectingFor = null;
-    if (!show) return;
-    this.selectingFor = id;
-    const offered = HEADSET_CHOICES.filter(([, choice]) => choices & choice).map(([name]) => name);
-    void this.callSelection('Open', new GLib.Variant('(as)', [offered]));
-  }
-
-  private async callSelection(method: string, parameters: GLib.Variant | null): Promise<void> {
-    try {
-      await Gio.DBus.session.call(SELECTION, SELECTION_PATH, SELECTION, method, parameters, null, Gio.DBusCallFlags.NONE, -1, null);
-    } catch (error) {
-      console.warn(`The audio device question failed: ${error}`);
-    }
+  private askForDevice(choices: MixerHeadset | 0): void {
+    this.question?.close();
+    const question = choices ? askForAudioDevice(choices, choice => this.mixer.choose_headset(choice)) : null;
+    question?.connect('closed', () => {
+      if (this.question === question) this.question = null;
+    });
+    this.question = question;
   }
 
   destroy(): void {
-    this.control.disconnect(this.selectionId);
-    Gio.DBus.session.signal_unsubscribe(this.choiceId);
+    this.mixer.disconnect(this.headsetId);
+    this.question?.close();
   }
 }

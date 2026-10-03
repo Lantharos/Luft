@@ -404,15 +404,6 @@ default_log_writer (GLogLevelFlags   log_level,
   return output;
 }
 
-static GLogWriterOutput
-shut_up (GLogLevelFlags   log_level,
-         const GLogField *fields,
-         gsize            n_fields,
-         gpointer         user_data)
-{
-  return (GLogWriterOutput) {0};
-}
-
 static void
 dump_gjs_stack_alarm_sigaction (int signo)
 {

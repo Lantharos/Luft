@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {publishSecurity, SECURITY_NAMES} from './security.js';
+import {publishUdisks} from './udisks/service.js';
 
 const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Inhibit">
@@ -94,8 +95,9 @@ publish(SYSTEMD, {Virtualization: ''}, '/org/freedesktop/systemd1');
 publish(LOCALE, {X11Layout: 'us', X11Variant: '', X11Options: ''}, '/org/freedesktop/locale1');
 publish(CALLS, {Take: () => calls.splice(0)}, '/com/lantharos/KestrelChecks');
 publishSecurity(publish, calls);
+publishUdisks(calls);
 
 for (const name of ['org.freedesktop.login1', 'org.freedesktop.UPower', 'org.freedesktop.hostname1', 'org.freedesktop.systemd1',
-  'org.freedesktop.locale1', 'com.lantharos.Kestrel.Watchdog1', 'com.lantharos.KestrelChecks', ...SECURITY_NAMES])
+  'org.freedesktop.locale1', 'com.lantharos.Kestrel.Watchdog1', 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

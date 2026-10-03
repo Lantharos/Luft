@@ -8,12 +8,13 @@ export interface About {
 	processor: string | null;
 	graphics: string[];
 	memory: number | null;
-	storage: { total: number; free: number } | null;
+	storage: { total: number; free: number; manageable: boolean } | null;
 	windowing: string;
 }
 
 export const about = () => invoke<About>('about');
 export const rename = (name: string) => invoke<void>('about_rename', { name });
+export const openDisks = () => invoke<void>('about_open_disks');
 
 export interface Suggestion {
 	step: string;

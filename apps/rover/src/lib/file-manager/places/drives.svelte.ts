@@ -7,6 +7,7 @@ import { isInside } from '$lib/utils/paths';
 export class DrivesState {
 	list = $state.raw<DriveInfo[]>([]);
 	readonly ejecting = new SvelteSet<string>();
+	manageable = $state(false);
 
 	ordered = $derived(this.list.toSorted((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)));
 

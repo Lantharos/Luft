@@ -3,12 +3,15 @@ mod problems;
 use std::ffi::CString;
 use std::fs;
 
+use gio::prelude::*;
 use luft_app::dbus;
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::blocking::Proxy;
+
+const DISKS: &str = "com.lantharos.disks.desktop";
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -25,9 +28,11 @@ struct About {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct Storage {
     total: u64,
     free: u64,
+    manageable: bool,
 }
 
 #[derive(Deserialize)]
@@ -100,6 +105,7 @@ fn storage() -> Option<Storage> {
     Some(Storage {
         total: stats.f_blocks * stats.f_frsize,
         free: stats.f_bavail * stats.f_frsize,
+        manageable: gio_unix::DesktopAppInfo::new(DISKS).is_some(),
     })
 }
 
@@ -176,6 +182,13 @@ fn about() -> Result<About, String> {
     })
 }
 
+fn open_disks(_: Value) -> Result<(), String> {
+    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    disks
+        .launch_uris(&["file:///"], gio::AppLaunchContext::NONE)
+        .map_err(|error| error.to_string())
+}
+
 fn rename(Rename { name }: Rename) -> Result<(), String> {
     hostnamed()?
         .call_method("SetPrettyHostname", &(name.trim(), true))
@@ -187,6 +200,7 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
         .command("about", |_: Value| about())
         .command("about_rename", rename)
+        .command("about_open_disks", open_disks)
         .command("about_problems", |_: Value| problems::problems())
         .command("about_firmware_restart", |_: Value| {
             problems::restart_to_firmware()

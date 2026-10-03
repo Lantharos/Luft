@@ -8,9 +8,12 @@ use std::mem::MaybeUninit;
 use std::path::Path;
 use std::process::Command;
 
+use gio::prelude::*;
 use serde::Serialize;
 
 pub use watch::watch_mounts;
+
+const DISKS: &str = "com.lantharos.disks.desktop";
 
 #[derive(Debug, Serialize, Clone)]
 pub struct DriveInfo {
@@ -103,6 +106,18 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
         drive.name,
         errors.join("; ")
     ))
+}
+
+pub fn manage(mount_point: &str) -> Result<(), String> {
+    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    let uri = gio::File::for_path(mount_point).uri();
+    disks
+        .launch_uris(&[uri.as_str()], gio::AppLaunchContext::NONE)
+        .map_err(|error| error.to_string())
+}
+
+pub fn can_manage() -> bool {
+    gio_unix::DesktopAppInfo::new(DISKS).is_some()
 }
 
 fn run(program: &str, args: &[&str]) -> Result<(), String> {

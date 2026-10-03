@@ -26,6 +26,27 @@
         "vite": "^8.3.1",
       },
     },
+    "apps/disks": {
+      "name": "disks",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.48.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/adapter-static": "^3.0.10",
+        "@sveltejs/kit": "^2.70.3",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.3",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.1",
+      },
+    },
     "apps/draft": {
       "name": "draft",
       "version": "0.1.0",
@@ -543,6 +564,8 @@
     "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
 
     "devalue": ["devalue@5.9.4", "", {}, "sha512-sPAT4pztbu6586/hrhOnMKS17IJrvg12mXiSPSS3W5qDeN2RGgvZ0diZCm31dBbnevfVmujNO3IM2wrS4Y2Rhg=="],
+
+    "disks": ["disks@workspace:apps/disks"],
 
     "draft": ["draft@workspace:apps/draft"],
 

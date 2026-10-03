@@ -19,6 +19,11 @@
 	let { value = $bindable(), label, showLabel = false, placeholder, error, autocomplete = 'off', disabled = false, live = false, onreveal, onkeydown }: Props = $props();
 
 	let revealed = $state(false);
+	let field = $state<TextField>();
+
+	export function focus() {
+		field?.focus();
+	}
 
 	async function toggle() {
 		if (!revealed) await onreveal?.();
@@ -26,7 +31,7 @@
 	}
 </script>
 
-<TextField bind:value {label} {showLabel} {placeholder} {error} {autocomplete} {disabled} {live} {onkeydown} type={revealed ? 'text' : 'password'}>
+<TextField bind:this={field} bind:value {label} {showLabel} {placeholder} {error} {autocomplete} {disabled} {live} {onkeydown} type={revealed ? 'text' : 'password'}>
 	{#snippet trailing()}
 		<button type="button" class="reveal" aria-label={revealed ? 'Hide password' : 'Show password'} {disabled} onclick={toggle}>
 			{#if revealed}

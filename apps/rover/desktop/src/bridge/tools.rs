@@ -145,7 +145,8 @@ fn register_discovery(window: SabineWindow, state: &RoverState) -> SabineWindow 
         .with(
             "request_thumbnails",
             state,
-            |state, ThumbnailRequest { paths, size }| {
+            |state, ThumbnailRequest { mut paths, size }| {
+                paths.retain(|path| !crate::network::is_remote(path));
                 state.thumbnails.request(paths, size);
                 Ok(())
             },

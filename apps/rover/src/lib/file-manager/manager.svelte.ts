@@ -26,6 +26,7 @@ import { errorMessage } from '$lib/utils/format';
 import { basename, parentPath, pathSegments, trimTrailingSlash } from '$lib/utils/paths';
 import { FileActions } from './actions';
 import { DrivesState } from './places/drives.svelte';
+import { NetworkState, type NetworkEntry } from './places/network.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
 import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';
@@ -37,6 +38,7 @@ export type SidebarPlace =
 	| { kind: 'folder'; path: string }
 	| { kind: 'favorite'; bookmark: PinnedFolder }
 	| { kind: 'drive'; drive: DriveInfo }
+	| { kind: 'network'; entry: NetworkEntry }
 	| { kind: 'recent' }
 	| { kind: 'trash' };
 export type PlaceMenuState = { x: number; y: number; place: SidebarPlace };
@@ -49,6 +51,8 @@ function placeKey(place: SidebarPlace): string {
 			return `favorite:${place.bookmark.path}`;
 		case 'drive':
 			return `drive:${place.drive.mount_point}`;
+		case 'network':
+			return `network:${place.entry.place.uri}`;
 		default:
 			return place.kind;
 	}
@@ -68,6 +72,7 @@ export class FileManager {
 	readonly selection = new SvelteSet<string>();
 	readonly loading = new DelayedLoading();
 	readonly drives = new DrivesState();
+	readonly network = new NetworkState();
 	readonly actions = new FileActions(this);
 
 	view = $state<SidebarView>('home');
@@ -133,6 +138,23 @@ export class FileManager {
 
 	reloadDrives = () => this.#leavingUnmounted(this.drives.load);
 
+	reloadNetwork = async () => {
+		const location = this.view === 'home' ? this.network.holding(this.currentPath) : undefined;
+		await this.network.load();
+		if (location && !this.network.holding(this.currentPath)) await this.navigate(this.homePath);
+	};
+
+	disconnectNetwork = async (uri: string) => {
+		const leaving = this.view === 'home' && this.network.holding(this.currentPath)?.uri === uri;
+		if (leaving) await this.navigate(this.homePath);
+		await this.network.disconnect(uri).catch(this.notify);
+	};
+
+	openAddress = async (address: string, show: (path: string) => Promise<void> = this.navigate, keep = false) => {
+		const path = await this.network.connect(address, keep).catch((caught) => void this.notify(caught));
+		if (path) await show(path);
+	};
+
 	async #leavingUnmounted(change: () => Promise<void>) {
 		const drive = this.view === 'home' ? this.drives.containing(this.currentPath) : undefined;
 		await change().catch(this.notify);
@@ -151,7 +173,9 @@ export class FileManager {
 		settings.value = state.settings;
 		this.userDirs = state.userDirs;
 		appearance.start(state);
+		this.drives.manageable = state.canManageDrives;
 		void this.drives.load();
+		void this.network.load();
 		const path = startPath ?? this.homePath;
 		this.tabs.open(this.#homeEntry(path));
 		await this.loadDirectory(path);

@@ -18,7 +18,9 @@ const DEFAULT_SETTINGS: Settings = {
 	detailsOpen: false,
 	listColumns: DEFAULT_LIST_COLUMNS,
 	groupBy: 'none',
-	hiddenPlaces: []
+	hiddenPlaces: [],
+	networkPlaces: [],
+	recentServers: []
 };
 
 class SettingsState {

@@ -1,0 +1,20 @@
+[app]
+id = "com.lantharos.disks"
+name = "Disks"
+generic_name = "Disk Utility"
+categories = ["System", "Utility"]
+keywords = ["disks", "drives", "storage", "partitions", "partition", "format", "usb", "sd card", "encryption", "luks", "smart", "health", "disk image", "iso", "gparted", "gnome-disks", "disk management"]
+version = "0.1.0"
+icon = "static/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["application/x-cd-image", "application/x-raw-disk-image"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "build"
+entry = "build/index.html"
+build = "bun run build"
+local_files = true

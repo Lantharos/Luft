@@ -9,6 +9,7 @@
 	import { isInside } from '$lib/utils/paths';
 	import DriveItem from './DriveItem.svelte';
 	import FavoritesGroup from './FavoritesGroup.svelte';
+	import NetworkItem from './NetworkItem.svelte';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {
@@ -29,7 +30,7 @@
 	let browsing = $derived(manager.view === 'home');
 	let activeDrive = $derived.by(() => {
 		const path = manager.currentPath;
-		if (!browsing || placePaths.has(path) || isInside(path, manager.homePath)) return null;
+		if (!browsing || placePaths.has(path) || isInside(path, manager.homePath) || manager.network.holding(path)) return null;
 		return manager.drives.holding(path)?.mount_point ?? null;
 	});
 
@@ -120,6 +121,14 @@
 			<div class="sidebar-group">
 				{#each manager.drives.ordered as drive (drive.mount_point)}
 					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} onmenu={showMenu} />
+				{/each}
+			</div>
+		{/if}
+
+		{#if manager.network.entries.length > 0}
+			<div class="sidebar-group">
+				{#each manager.network.entries as entry (entry.place.uri)}
+					<NetworkItem {entry} {manager} {drag} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
 			</div>
 		{/if}

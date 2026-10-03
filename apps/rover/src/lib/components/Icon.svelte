@@ -10,7 +10,7 @@
 		| 'music' | 'archive' | 'code' | 'eye' | 'eye-off' | 'pin'
 		| 'refresh' | 'external-link' | 'package'
 		| 'check' | 'alert-circle' | 'edit' | 'pause' | 'play'
-		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save'
+		| 'folder-plus' | 'file-plus' | 'upload' | 'eject' | 'usb' | 'save' | 'server' | 'smartphone' | 'globe'
 		| 'clock' | 'panel-right' | 'more-horizontal' | 'chevron-left' | 'chevron-down'
 		| 'volume' | 'volume-x'
 		| 'git-branch' | 'arrow-up' | 'columns-3' | 'link' | 'lock' | 'search' | 'minus' | 'folder-x'
@@ -78,6 +78,18 @@
 		<path d="M9.26 7.68 5 12l2 5" />
 		<path d="m10 14 5 2 3.5-3.5" />
 		<path d="m18 12 1-1 1 1-1 1Z" />
+	{:else if name === 'server'}
+		<rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+		<rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+		<line x1="6" x2="6.01" y1="6" y2="6" />
+		<line x1="6" x2="6.01" y1="18" y2="18" />
+	{:else if name === 'smartphone'}
+		<rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+		<path d="M12 18h.01" />
+	{:else if name === 'globe'}
+		<circle cx="12" cy="12" r="10" />
+		<path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+		<path d="M2 12h20" />
 	{:else if name === 'file-text'}
 		<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
 		<polyline points="14 2 14 8 20 8" />

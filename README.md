@@ -9,6 +9,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
 | `kestrel/passkeys` | Passkeys kept in Luft Keyring and confirmed through Kestrel, offered to every browser as a security key |
 | `apps/barometer` | Barometer system monitor and task manager |
+| `apps/disks` | Disks, for drives, partitions, encryption, drive health and disk images |
 | `apps/draft` | Draft text and code editor |
 | `apps/keys` | Keys, for your own keyboard layouts and input methods |
 | `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |
@@ -60,7 +61,7 @@ Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1
 
 Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
 
-Barometer, Draft, Keys, Magpie, Mailman, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Barometer, Disks, Draft, Keys, Magpie, Mailman, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
 
 ## Source and licenses
 

@@ -2,7 +2,7 @@ use crossbeam_channel::{Receiver, Sender};
 use serde::Serialize;
 
 use super::Shared;
-use super::remote::{self, Remote};
+use super::remote::{self, Connection};
 use super::worker::keep;
 use crate::accounts::Account;
 use crate::events::BODY;
@@ -21,7 +21,7 @@ pub fn spawn(account: Account, shared: Shared) -> Sender<i64> {
             Fetcher {
                 account,
                 shared,
-                remote: None,
+                connection: None,
             }
             .run(receiver)
         })
@@ -32,7 +32,7 @@ pub fn spawn(account: Account, shared: Shared) -> Sender<i64> {
 struct Fetcher {
     account: Account,
     shared: Shared,
-    remote: Option<Box<dyn Remote>>,
+    connection: Option<Connection>,
 }
 
 impl Fetcher {
@@ -40,7 +40,7 @@ impl Fetcher {
         while let Ok(id) = requests.recv() {
             let fetched = self.fetch(id);
             if fetched.is_err() {
-                self.remote = None;
+                self.connection = None;
             }
             self.shared.events.emit(
                 BODY,
@@ -61,11 +61,13 @@ impl Fetcher {
         let mailbox = store
             .mailbox(located.mailbox)?
             .ok_or("This folder is gone")?;
-        if self.remote.is_none() {
-            self.remote = Some(remote::connect(&self.account, &self.shared.credentials)?);
+        if !self.connection.as_ref().is_some_and(Connection::current) {
+            self.connection = Some(remote::connect(&self.account, &self.shared.credentials)?);
         }
-        let remote = self.remote.as_mut().expect("connected above");
-        let bodies = remote.bodies(&mailbox, &[(located.id, located.remote)])?;
+        let connection = self.connection.as_mut().expect("connected above");
+        let bodies = connection
+            .remote
+            .bodies(&mailbox, &[(located.id, located.remote)])?;
         if bodies.is_empty() {
             return Err("The server didn't return this message".into());
         }

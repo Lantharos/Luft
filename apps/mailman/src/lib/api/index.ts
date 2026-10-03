@@ -8,6 +8,7 @@ import type {
 	AppState,
 	Chosen,
 	Counts,
+	Cursor,
 	Discovery,
 	Draft,
 	Launch,
@@ -56,7 +57,7 @@ export const mailboxes = () => call<Mailbox[]>('mailboxes');
 export const syncNow = () => call<void>('sync_now');
 export const syncMailbox = (account: number, mailbox: number) => call<void>('sync_mailbox', { account, mailbox });
 
-export const threads = (view: string, query: string | null, offset: number, limit: number) => call<ThreadPage>('threads', { view, query, offset, limit });
+export const threads = (view: string, query: string | null, after: Cursor | null, limit: number) => call<ThreadPage>('threads', { view, query, after, limit });
 export const counts = () => call<Counts>('counts');
 export const conversation = (thread: number) => call<Message[]>('conversation', { thread });
 export const messageBody = (id: number) => call<Rendered | null>('message_body', { id });

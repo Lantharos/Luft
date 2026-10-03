@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use crate::accounts::{AccountConfig, Provider};
 use crate::mail::compose::Draft;
-use crate::store::Settings;
+use crate::store::{Cursor, Settings};
 
 #[derive(Deserialize)]
 pub struct Empty {}
@@ -60,7 +60,7 @@ pub struct AccountUpdate {
 pub struct Page {
     pub view: String,
     pub query: Option<String>,
-    pub offset: i64,
+    pub after: Option<Cursor>,
     pub limit: i64,
 }
 

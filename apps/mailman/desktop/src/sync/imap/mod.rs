@@ -3,14 +3,16 @@ use std::collections::{HashMap, HashSet};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
+pub mod idle;
+
 use super::ops::{self, Operation};
-use super::remote::{Context, Remote, Synced};
+use super::remote::{Context, Remote};
 use crate::accounts::{Account, Login};
 use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
 use crate::protocols::smtp;
-use crate::store::{Flags, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
+use crate::store::{Flags, Inserted, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
 
 const WINDOW: usize = 2000;
 const HEADER_BATCH: usize = 200;
@@ -58,17 +60,14 @@ impl ImapRemote {
         Ok(())
     }
 
-    fn fetch_new(
+    fn insert(
         &mut self,
         context: &Context,
         mailbox: &Mailbox,
-        mut wanted: Vec<u32>,
-    ) -> Result<Synced, String> {
-        wanted.sort_unstable_by(|a, b| b.cmp(a));
-        let more = wanted.len() > WINDOW;
-        wanted.truncate(WINDOW);
+        uids: &[u32],
+    ) -> Result<Vec<Inserted>, String> {
         let mut inserted = Vec::new();
-        for batch in wanted.chunks(HEADER_BATCH) {
+        for batch in uids.chunks(HEADER_BATCH) {
             let headers = self.client.fetch_headers(&uid_set(batch))?;
             let messages: Vec<NewMessage> = headers.into_iter().map(new_message).collect();
             inserted.extend(context.store.insert_messages(
@@ -78,7 +77,32 @@ impl ImapRemote {
             )?);
             (context.changed)();
         }
-        Ok(Synced { inserted, more })
+        Ok(inserted)
+    }
+
+    fn floor(&self, context: &Context, mailbox: &Mailbox) -> Result<Option<u32>, String> {
+        Ok(match mailbox.backfill.as_deref() {
+            None => None,
+            Some("") => context
+                .store
+                .lowest_remote(mailbox.id)?
+                .map(|lowest| lowest as u32),
+            Some(floor) => floor.parse().ok(),
+        })
+    }
+
+    fn newest(
+        context: &Context,
+        mailbox: &Mailbox,
+        mut uids: Vec<u32>,
+    ) -> Result<Vec<u32>, String> {
+        uids.sort_unstable_by(|a, b| b.cmp(a));
+        if uids.len() > WINDOW {
+            uids.truncate(WINDOW);
+            let floor = uids[WINDOW - 1].to_string();
+            context.store.set_backfill(mailbox.id, Some(&floor))?;
+        }
+        Ok(uids)
     }
 
     fn reconcile(
@@ -188,7 +212,7 @@ impl Remote for ImapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Synced, String> {
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
         let known = mailbox
             .validity
             .zip(mailbox.modseq)
@@ -202,16 +226,47 @@ impl Remote for ImapRemote {
             context.store.clear_mailbox(mailbox.id)?;
         }
         let resumed = valid && known.is_some() && self.qresync;
-        let wanted = self.reconcile(context, mailbox, &selected, resumed)?;
+        let mut wanted = self.reconcile(context, mailbox, &selected, resumed)?;
         (context.changed)();
-        let synced = self.fetch_new(context, mailbox, wanted)?;
+        if valid && let Some(floor) = self.floor(context, mailbox)? {
+            wanted.retain(|uid| *uid > floor);
+        }
+        let wanted = Self::newest(context, mailbox, wanted)?;
+        let inserted = self.insert(context, mailbox, &wanted)?;
         context.store.save_mailbox_state(
             mailbox.id,
             Some(selected.uidvalidity as i64),
             selected.highest_modseq.map(|modseq| modseq as i64),
             None,
         )?;
-        Ok(synced)
+        Ok(inserted)
+    }
+
+    fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
+        let floor = self.floor(context, mailbox)?.unwrap_or(0);
+        let local: HashSet<u32> = context
+            .store
+            .remotes(mailbox.id)?
+            .iter()
+            .filter_map(|remote| remote.parse().ok())
+            .filter(|uid| *uid < floor)
+            .collect();
+        let older = if floor > 1 {
+            self.select(&mailbox.remote)?;
+            self.client.search_uids(&format!("UID 1:{}", floor - 1))?
+        } else {
+            Vec::new()
+        };
+        let mut missing: Vec<u32> = older
+            .into_iter()
+            .filter(|uid| *uid < floor && !local.contains(uid))
+            .collect();
+        missing.sort_unstable_by(|a, b| b.cmp(a));
+        let done = missing.len() <= WINDOW;
+        missing.truncate(WINDOW);
+        self.insert(context, mailbox, &missing)?;
+        let next = missing.last().filter(|_| !done).map(u32::to_string);
+        context.store.set_backfill(mailbox.id, next.as_deref())
     }
 
     fn bodies(

@@ -1,5 +1,6 @@
 use rusqlite::{OptionalExtension, params};
 
+use super::index;
 use crate::store::Store;
 
 pub struct Fetched {
@@ -19,14 +20,16 @@ impl Store {
                 )?;
                 let mut snippet =
                     transaction.prepare_cached("UPDATE messages SET snippet = ?2 WHERE id = ?1")?;
-                let mut search =
-                    transaction.prepare_cached("UPDATE search SET body = ?2 WHERE rowid = ?1")?;
                 for fetched in bodies {
                     body.execute(params![fetched.id, fetched.raw])?;
                     snippet.execute(params![fetched.id, fetched.snippet])?;
-                    search.execute(params![fetched.id, fetched.text])?;
                 }
             }
+            let texts: Vec<(i64, &str)> = bodies
+                .iter()
+                .map(|fetched| (fetched.id, fetched.text.as_str()))
+                .collect();
+            index::add_bodies(&transaction, &texts)?;
             transaction.commit()
         })
     }

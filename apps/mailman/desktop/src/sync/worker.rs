@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use super::Shared;
 use super::ops::Operation;
-use super::remote::{self, Context, Remote, Synced};
+use super::remote::{self, Connection, Context, Remote};
 use crate::accounts::Account;
 use crate::events::{CHANGED, OUTBOX, STATUS};
 use crate::mail::{envelope, render};
@@ -49,9 +49,10 @@ pub fn spawn(account: Account, shared: Shared) -> Sender<Job> {
             Worker {
                 account,
                 shared,
-                remote: None,
+                connection: None,
                 prefetch: VecDeque::new(),
                 backfill: VecDeque::new(),
+                backfilling: false,
             }
             .run(receiver)
         })
@@ -62,9 +63,10 @@ pub fn spawn(account: Account, shared: Shared) -> Sender<Job> {
 struct Worker {
     account: Account,
     shared: Shared,
-    remote: Option<Box<dyn Remote>>,
+    connection: Option<Connection>,
     prefetch: VecDeque<Mailbox>,
-    backfill: VecDeque<Mailbox>,
+    backfill: VecDeque<i64>,
+    backfilling: bool,
 }
 
 fn order(mailbox: &Mailbox) -> u8 {
@@ -121,10 +123,15 @@ impl Worker {
     }
 
     fn connect(&mut self) -> Result<&mut Box<dyn Remote>, String> {
-        if self.remote.is_none() {
-            self.remote = Some(remote::connect(&self.account, &self.shared.credentials)?);
+        if !self.connection.as_ref().is_some_and(Connection::current) {
+            self.connection = Some(remote::connect(&self.account, &self.shared.credentials)?);
         }
-        Ok(self.remote.as_mut().expect("connected above"))
+        Ok(&mut self.connection.as_mut().expect("connected above").remote)
+    }
+
+    fn fail(&mut self, error: String) {
+        self.connection = None;
+        self.status("error", Some(error));
     }
 
     fn handle(&mut self, job: Job) {
@@ -136,10 +143,7 @@ impl Worker {
         };
         match result {
             Ok(()) => self.status("ready", None),
-            Err(error) => {
-                self.remote = None;
-                self.status("error", Some(error));
-            }
+            Err(error) => self.fail(error),
         }
     }
 
@@ -173,7 +177,7 @@ impl Worker {
         for mailbox in mailboxes {
             self.sync_mailbox(&mailbox)?;
         }
-        Ok(())
+        self.shared.store.optimize()
     }
 
     fn sync_one(&mut self, id: i64) -> Result<(), String> {
@@ -185,11 +189,8 @@ impl Worker {
     }
 
     fn sync_mailbox(&mut self, mailbox: &Mailbox) -> Result<(), String> {
-        let Synced { inserted, more } =
-            self.with_remote(|remote, context| remote.sync(context, mailbox))?;
-        if more && !self.backfill.iter().any(|queued| queued.id == mailbox.id) {
-            self.backfill.push_back(mailbox.clone());
-        }
+        let inserted = self.with_remote(|remote, context| remote.sync(context, mailbox))?;
+        self.queue_backfill(mailbox.id)?;
         if mailbox.role == Some(Role::Inbox) && !inserted.is_empty() {
             let since = (now() - NOTIFY_WINDOW).max(self.account.added);
             let ids: Vec<i64> = inserted.iter().map(|message| message.id).collect();
@@ -236,14 +237,47 @@ impl Worker {
         Ok(bodies.len())
     }
 
-    fn idle_step(&mut self) {
-        let Some(mailbox) = self.backfill.pop_front() else {
-            return self.prefetch_step();
-        };
-        if let Err(error) = self.sync_mailbox(&mailbox) {
-            self.remote = None;
-            self.status("error", Some(error));
+    fn queue_backfill(&mut self, id: i64) -> Result<(), String> {
+        let pending = self
+            .shared
+            .store
+            .mailbox(id)?
+            .is_some_and(|mailbox| mailbox.backfill.is_some());
+        if pending && !self.backfill.contains(&id) {
+            self.backfill.push_back(id);
         }
+        Ok(())
+    }
+
+    fn idle_step(&mut self) {
+        self.backfilling = !self.backfilling || self.prefetch.is_empty();
+        match self.backfill.front().copied() {
+            Some(id) if self.backfilling => {
+                if let Err(error) = self.backfill_step(id) {
+                    self.backfill.clear();
+                    self.fail(error);
+                }
+            }
+            _ => self.prefetch_step(),
+        }
+    }
+
+    fn backfill_step(&mut self, id: i64) -> Result<(), String> {
+        let mailbox = self
+            .shared
+            .store
+            .mailbox(id)?
+            .filter(|mailbox| mailbox.backfill.is_some());
+        let Some(mailbox) = mailbox else {
+            self.backfill.pop_front();
+            return self.shared.store.optimize();
+        };
+        self.with_remote(|remote, context| remote.backfill(context, &mailbox))?;
+        if !self.prefetch.iter().any(|queued| queued.id == mailbox.id) {
+            self.prefetch.push_back(mailbox);
+        }
+        self.changed();
+        Ok(())
     }
 
     fn prefetch_step(&mut self) {
@@ -265,7 +299,7 @@ impl Worker {
                 self.prefetch.pop_front();
             }
             Err(_) => {
-                self.remote = None;
+                self.connection = None;
                 self.prefetch.clear();
             }
         }

@@ -18,6 +18,8 @@ pub struct Mailbox {
     pub modseq: Option<i64>,
     #[serde(skip)]
     pub state: Option<String>,
+    #[serde(skip)]
+    pub backfill: Option<String>,
 }
 
 pub struct RemoteFolder {
@@ -27,7 +29,8 @@ pub struct RemoteFolder {
     pub selectable: bool,
 }
 
-const COLUMNS: &str = "id, account, remote, name, role, selectable, validity, modseq, state";
+const COLUMNS: &str =
+    "id, account, remote, name, role, selectable, validity, modseq, state, backfill";
 
 fn mailbox(row: &Row) -> rusqlite::Result<Mailbox> {
     let role: Option<String> = row.get(4)?;
@@ -41,6 +44,7 @@ fn mailbox(row: &Row) -> rusqlite::Result<Mailbox> {
         validity: row.get(6)?,
         modseq: row.get(7)?,
         state: row.get(8)?,
+        backfill: row.get(9)?,
     })
 }
 
@@ -127,10 +131,21 @@ impl Store {
         .map(drop)
     }
 
-    pub fn clear_mailbox(&self, id: i64) -> Result<(), String> {
+    pub fn set_backfill(&self, id: i64, backfill: Option<&str>) -> Result<(), String> {
         self.writing(|connection| {
-            connection.execute("DELETE FROM messages WHERE mailbox = ?1", [id])
+            connection.execute(
+                "UPDATE mailboxes SET backfill = ?2 WHERE id = ?1",
+                params![id, backfill],
+            )
         })
         .map(drop)
+    }
+
+    pub fn clear_mailbox(&self, id: i64) -> Result<(), String> {
+        self.writing(|connection| {
+            connection.execute_batch(&format!(
+                "DELETE FROM messages WHERE mailbox = {id}; UPDATE mailboxes SET backfill = NULL WHERE id = {id};"
+            ))
+        })
     }
 }

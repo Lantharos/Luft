@@ -26,6 +26,7 @@ pub enum Secret {
 #[derive(Clone, Default)]
 pub struct Credentials {
     cache: Arc<Mutex<HashMap<i64, Secret>>>,
+    refreshing: Arc<Mutex<()>>,
 }
 
 fn key(account: i64) -> String {
@@ -45,6 +46,49 @@ impl Credentials {
         let _ = secrets::delete(&key(account));
     }
 
+    pub fn renew(&self, account: &Account, rejected: &str) -> Result<Login, String> {
+        if let Some(Secret::OAuth {
+            access, expires, ..
+        }) = self.cache.lock().get_mut(&account.id)
+            && access == rejected
+        {
+            *expires = 0;
+        }
+        self.login(account)
+    }
+
+    pub fn login(&self, account: &Account) -> Result<Login, String> {
+        if let Some(login) = self.current(account)? {
+            return Ok(login);
+        }
+        let _refreshing = self.refreshing.lock();
+        if let Some(login) = self.current(account)? {
+            return Ok(login);
+        }
+        let Secret::OAuth { refresh, .. } = self.secret(account.id)? else {
+            unreachable!("passwords are always current");
+        };
+        let provider = account
+            .config
+            .oauth
+            .ok_or("This account has no sign-in provider")?;
+        let tokens = oauth::refresh(provider, &refresh)?;
+        let login = Login::Bearer {
+            username: account.config.username.clone(),
+            token: tokens.access.clone(),
+            expires: tokens.expires,
+        };
+        self.save(
+            account.id,
+            Secret::OAuth {
+                refresh: tokens.refresh.unwrap_or(refresh),
+                access: tokens.access,
+                expires: tokens.expires,
+            },
+        )?;
+        Ok(login)
+    }
+
     fn secret(&self, account: i64) -> Result<Secret, String> {
         if let Some(secret) = self.cache.lock().get(&account) {
             return Ok(secret.clone());
@@ -56,33 +100,18 @@ impl Credentials {
         Ok(secret)
     }
 
-    pub fn login(&self, account: &Account) -> Result<Login, String> {
+    fn current(&self, account: &Account) -> Result<Option<Login>, String> {
         let username = account.config.username.clone();
-        match self.secret(account.id)? {
-            Secret::Password { password } => Ok(Login::Password { username, password }),
+        Ok(match self.secret(account.id)? {
+            Secret::Password { password } => Some(Login::Password { username, password }),
             Secret::OAuth {
                 access, expires, ..
-            } if expires > now() + REFRESH_MARGIN => Ok(Login::Bearer {
+            } if expires > now() + REFRESH_MARGIN => Some(Login::Bearer {
                 username,
                 token: access,
+                expires,
             }),
-            Secret::OAuth { refresh, .. } => {
-                let provider = account
-                    .config
-                    .oauth
-                    .ok_or("This account has no sign-in provider")?;
-                let tokens = oauth::refresh(provider, &refresh)?;
-                let token = tokens.access.clone();
-                self.save(
-                    account.id,
-                    Secret::OAuth {
-                        refresh: tokens.refresh.unwrap_or(refresh),
-                        access: tokens.access,
-                        expires: tokens.expires,
-                    },
-                )?;
-                Ok(Login::Bearer { username, token })
-            }
-        }
+            Secret::OAuth { .. } => None,
+        })
     }
 }

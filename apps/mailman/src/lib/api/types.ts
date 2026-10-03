@@ -81,9 +81,13 @@ export interface ThreadRow {
 }
 
 export interface ThreadPage {
-	total: number;
-	offset: number;
+	total: number | null;
 	rows: ThreadRow[];
+}
+
+export interface Cursor {
+	date: number;
+	thread: number;
 }
 
 export interface Counts {

@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use rusqlite::{OptionalExtension, Transaction, params};
 
+use super::index::{self, Entry};
 use crate::mail::classify;
 use crate::mail::envelope::Envelope;
 use crate::store::{Mailbox, Role, Store, now};
@@ -64,6 +67,7 @@ impl Store {
         self.writing(|connection| {
             let transaction = connection.transaction()?;
             let mut inserted = Vec::new();
+            let mut entries = Vec::new();
             for message in messages {
                 if let Some(id) = insert(&transaction, mailbox, message)? {
                     let thread = thread_for(&transaction, id, &message.envelope)?;
@@ -71,11 +75,13 @@ impl Store {
                         "UPDATE messages SET thread = ?2 WHERE id = ?1",
                         params![id, thread],
                     )?;
-                    index(&transaction, id, message)?;
+                    entries.push(entry(id, message));
+                    remember_people(&transaction, mailbox.role, &message.envelope)?;
                     screen(&transaction, mailbox.role, account_added, message)?;
                     inserted.push(Inserted { id });
                 }
             }
+            index::add(&transaction, entries)?;
             transaction.commit()?;
             Ok(inserted)
         })
@@ -123,6 +129,34 @@ impl Store {
                 )?
                 .query_map([mailbox], |row| row.get(0))?
                 .collect()
+        })
+    }
+
+    pub fn known_remotes(
+        &self,
+        mailbox: i64,
+        remotes: &[String],
+    ) -> Result<HashSet<String>, String> {
+        self.reading(|connection| {
+            let mut find = connection
+                .prepare_cached("SELECT 1 FROM messages WHERE mailbox = ?1 AND remote = ?2")?;
+            let mut known = HashSet::new();
+            for remote in remotes {
+                if find.exists(params![mailbox, remote])? {
+                    known.insert(remote.clone());
+                }
+            }
+            Ok(known)
+        })
+    }
+
+    pub fn lowest_remote(&self, mailbox: i64) -> Result<Option<i64>, String> {
+        self.reading(|connection| {
+            connection.query_row(
+                "SELECT min(CAST(remote AS INTEGER)) FROM messages WHERE mailbox = ?1 AND remote NOT LIKE '~%'",
+                [mailbox],
+                |row| row.get(0),
+            )
         })
     }
 
@@ -237,8 +271,9 @@ fn insert(
         .and_then(|unsubscribe| serde_json::to_string(unsubscribe).ok());
     let mut statement = transaction.prepare_cached(
         "INSERT INTO messages (account, mailbox, remote, message_id, in_reply_to, refs, subject, sender_name, sender, recipients, date,
-            seen, flagged, answered, draft, attachments, size, category, unsubscribe)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)
+            seen, flagged, answered, draft, attachments, size, category, unsubscribe, verdict)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19,
+            (SELECT verdict FROM senders WHERE address = ?9))
          ON CONFLICT (mailbox, remote) DO NOTHING",
     )?;
     let changed = statement.execute(params![
@@ -269,30 +304,50 @@ fn thread_for(transaction: &Transaction, id: i64, envelope: &Envelope) -> rusqli
     let mut related: Vec<&str> = envelope.references.iter().map(String::as_str).collect();
     related.extend(envelope.in_reply_to.as_deref());
     related.extend(envelope.message_id.as_deref());
-    let mut find = transaction.prepare_cached(
-        "SELECT thread FROM messages WHERE message_id = ?1 AND id != ?2 AND thread != 0 LIMIT 1",
-    )?;
+    let mut find = transaction.prepare_cached("SELECT thread FROM links WHERE message_id = ?1")?;
+    let mut thread = None;
+    for message_id in &related {
+        thread = find.query_row([message_id], |row| row.get(0)).optional()?;
+        if thread.is_some() {
+            break;
+        }
+    }
+    let thread = thread.unwrap_or(id);
+    let mut link = transaction
+        .prepare_cached("INSERT OR IGNORE INTO links (message_id, thread) VALUES (?1, ?2)")?;
     for message_id in related {
-        if let Some(thread) = find
-            .query_row(params![message_id, id], |row| row.get(0))
-            .optional()?
-        {
-            return Ok(thread);
-        }
+        link.execute(params![message_id, thread])?;
     }
-    if let Some(own) = envelope.message_id.as_deref() {
-        let replies = transaction
-            .prepare_cached("SELECT thread FROM messages WHERE (in_reply_to = ?1 OR instr(refs, ?1) > 0) AND thread != 0 LIMIT 1")?
-            .query_row([own], |row| row.get(0))
-            .optional()?;
-        if let Some(thread) = replies {
-            return Ok(thread);
-        }
-    }
-    Ok(id)
+    Ok(thread)
 }
 
-fn index(transaction: &Transaction, id: i64, message: &NewMessage) -> rusqlite::Result<()> {
+fn remember_people(
+    transaction: &Transaction,
+    role: Option<Role>,
+    envelope: &Envelope,
+) -> rusqlite::Result<()> {
+    let mut meet = transaction.prepare_cached(
+        "INSERT INTO people (address, name, weight) VALUES (?1, ?2, ?3)
+         ON CONFLICT (address) DO UPDATE SET weight = weight + excluded.weight,
+            name = CASE WHEN excluded.name != '' THEN excluded.name ELSE name END",
+    )?;
+    if !envelope.from.address.is_empty() {
+        meet.execute(params![envelope.from.address, envelope.from.name, 1])?;
+    }
+    if role == Some(Role::Sent) {
+        for address in envelope
+            .recipients
+            .to
+            .iter()
+            .filter(|address| !address.address.is_empty())
+        {
+            meet.execute(params![address.address, address.name, 3])?;
+        }
+    }
+    Ok(())
+}
+
+fn entry(id: i64, message: &NewMessage) -> Entry {
     let envelope = &message.envelope;
     let recipients = &envelope.recipients;
     let people = std::iter::once(&envelope.from)
@@ -301,12 +356,13 @@ fn index(transaction: &Transaction, id: i64, message: &NewMessage) -> rusqlite::
         .map(|address| format!("{} {}", address.name, address.address))
         .collect::<Vec<_>>()
         .join(" ");
-    transaction
-        .prepare_cached(
-            "INSERT OR REPLACE INTO search (rowid, subject, people, body) VALUES (?1, ?2, ?3, '')",
-        )?
-        .execute(params![id, envelope.subject, people])
-        .map(drop)
+    Entry {
+        message: id,
+        date: envelope.date.unwrap_or(message.received),
+        subject: envelope.subject.clone(),
+        people,
+        body: String::new(),
+    }
 }
 
 fn screen(

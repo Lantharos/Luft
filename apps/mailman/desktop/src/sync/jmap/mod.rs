@@ -1,101 +1,67 @@
-use std::collections::{HashMap, HashSet};
-use std::io::BufRead;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Duration;
+mod mail;
+pub mod push;
+
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use serde_json::{Map, Value, json};
 
-use super::idle::Push;
 use super::ops::{self, Operation};
-use super::remote::{Context, Remote, Synced};
+use super::remote::{Context, Remote};
 use crate::accounts::Login;
-use crate::mail::envelope;
-use crate::protocols::jmap::{self, CORE, Client, MAIL, SUBMISSION};
-use crate::store::{Flag, Flags, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
+use crate::protocols::jmap::{CORE, Client, MAIL, SUBMISSION};
+use crate::store::{Flag, Inserted, Mailbox, Outgoing, RemoteFolder, Role};
+use mail::Changes;
 
-const WINDOW: usize = 2000;
-const BATCH: usize = 200;
-const RECONNECT_AFTER: Duration = Duration::from_secs(30);
+const STATE_LIFETIME: Duration = Duration::from_secs(5);
 
 pub struct JmapRemote {
     client: Client,
-    state: Option<String>,
+    state: Option<(String, Instant)>,
+    changes: HashMap<String, Option<Changes>>,
 }
 
 fn role(role: Option<&str>) -> Option<Role> {
     Role::parse(role?)
 }
 
-fn keywords(value: &Value) -> Flags {
-    let has = |name: &str| value.get(name).and_then(Value::as_bool).unwrap_or(false);
-    Flags {
-        seen: has("$seen"),
-        flagged: has("$flagged"),
-        answered: has("$answered"),
-        draft: has("$draft"),
-    }
-}
-
-fn raw_headers(email: &Value) -> Vec<u8> {
-    let mut raw = String::new();
-    for header in email["headers"].as_array().into_iter().flatten() {
-        if let (Some(name), Some(value)) = (header["name"].as_str(), header["value"].as_str()) {
-            raw.push_str(name);
-            raw.push(':');
-            raw.push_str(value);
-            raw.push_str("\r\n");
-        }
-    }
-    raw.push_str("\r\n");
-    raw.into_bytes()
-}
-
-fn received(email: &Value) -> i64 {
-    email["receivedAt"]
-        .as_str()
-        .and_then(mail_parser::DateTime::parse_rfc3339)
-        .map(|date| date.to_timestamp())
-        .unwrap_or_else(now)
-}
-
 impl JmapRemote {
-    pub fn connect(session: &str, login: Login) -> Result<Self, String> {
+    pub fn connect(session: &str, login: &Login) -> Result<Self, String> {
         Ok(Self {
-            client: Client::connect(session, &login)?,
+            client: Client::connect(session, login)?,
             state: None,
+            changes: HashMap::new(),
         })
     }
 
-    fn ids_in(&self, mailbox: &str) -> Result<(Vec<String>, bool), String> {
+    fn current_state(&mut self) -> Result<String, String> {
+        if let Some((state, at)) = &self.state
+            && at.elapsed() < STATE_LIFETIME
+        {
+            return Ok(state.clone());
+        }
         let responses = self.client.call(
             &[CORE, MAIL],
             vec![(
-                "Email/query",
-                json!({ "accountId": self.client.account, "filter": { "inMailbox": mailbox }, "sort": [{ "property": "receivedAt", "isAscending": false }], "limit": WINDOW, "calculateTotal": true }),
+                "Email/get",
+                json!({ "accountId": self.client.account, "ids": [] }),
             )],
         )?;
-        let ids = responses[0]["ids"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|id| id.as_str().map(str::to_owned))
-            .collect::<Vec<_>>();
-        let complete = responses[0]["total"]
-            .as_u64()
-            .is_some_and(|total| total as usize <= ids.len());
-        Ok((ids, complete))
+        let state = responses[0]["state"]
+            .as_str()
+            .ok_or("The server didn't say what changed")?
+            .to_owned();
+        self.remember(state.clone());
+        Ok(state)
     }
 
-    fn emails(&self, ids: &[String], properties: &[&str]) -> Result<Vec<Value>, String> {
-        let mut emails = Vec::new();
-        for batch in ids.chunks(BATCH) {
-            let responses = self.client.call(&[CORE, MAIL], vec![("Email/get", json!({ "accountId": self.client.account, "ids": batch, "properties": properties }))])?;
-            emails.extend(responses[0]["list"].as_array().cloned().unwrap_or_default());
+    fn remember(&mut self, state: String) {
+        if self.state.as_ref().is_none_or(|(known, _)| *known != state) {
+            self.changes.clear();
         }
-        Ok(emails)
+        self.state = Some((state, Instant::now()));
     }
 
     fn set_email(&self, update: Map<String, Value>) -> Result<(), String> {
@@ -196,7 +162,9 @@ impl Remote for JmapRemote {
             )?;
             responses = self.mailboxes()?;
         }
-        self.state = responses[1]["state"].as_str().map(str::to_owned);
+        if let Some(state) = responses[1]["state"].as_str() {
+            self.remember(state.to_owned());
+        }
         let list = responses[0]["list"].as_array().cloned().unwrap_or_default();
         let by_id: HashMap<&str, &Value> = list
             .iter()
@@ -232,71 +200,16 @@ impl Remote for JmapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Synced, String> {
-        if self.state.is_some() && mailbox.state == self.state {
-            return Ok(Synced {
-                inserted: Vec::new(),
-                more: false,
-            });
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
+        let current = self.current_state()?;
+        if mailbox.state.as_deref() == Some(current.as_str()) {
+            return Ok(Vec::new());
         }
-        let (ids, complete) = self.ids_in(&mailbox.remote)?;
-        let local: HashSet<String> = context.store.remotes(mailbox.id)?.into_iter().collect();
-        let server: HashSet<&String> = ids.iter().collect();
-        if complete {
-            let gone: Vec<String> = local
-                .iter()
-                .filter(|remote| !server.contains(remote))
-                .cloned()
-                .collect();
-            context.store.remove_remotes(mailbox.id, &gone)?;
-        }
-        let known: Vec<String> = ids
-            .iter()
-            .filter(|id| local.contains(*id))
-            .cloned()
-            .collect();
-        let changes: Vec<(String, Flags)> = self
-            .emails(&known, &["id", "keywords"])?
-            .iter()
-            .filter_map(|email| {
-                Some((
-                    email["id"].as_str()?.to_owned(),
-                    keywords(&email["keywords"]),
-                ))
-            })
-            .collect();
-        context.store.update_flags(mailbox.id, &changes)?;
-        (context.changed)();
-        let fresh: Vec<String> = ids.into_iter().filter(|id| !local.contains(id)).collect();
-        let mut inserted = Vec::new();
-        for batch in fresh.chunks(BATCH) {
-            let messages: Vec<NewMessage> = self
-                .emails(batch, &["id", "keywords", "size", "receivedAt", "headers"])?
-                .iter()
-                .filter_map(|email| {
-                    Some(NewMessage {
-                        remote: email["id"].as_str()?.to_owned(),
-                        envelope: envelope::parse(&raw_headers(email)),
-                        flags: keywords(&email["keywords"]),
-                        size: email["size"].as_i64().unwrap_or(0),
-                        received: received(email),
-                    })
-                })
-                .collect();
-            inserted.extend(context.store.insert_messages(
-                mailbox,
-                context.account.added,
-                &messages,
-            )?);
-            (context.changed)();
-        }
-        context
-            .store
-            .save_mailbox_state(mailbox.id, None, None, self.state.as_deref())?;
-        Ok(Synced {
-            inserted,
-            more: false,
-        })
+        self.sync_mailbox(context, mailbox, &current)
+    }
+
+    fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
+        self.backfill_mailbox(context, mailbox)
     }
 
     fn bodies(
@@ -304,21 +217,7 @@ impl Remote for JmapRemote {
         _mailbox: &Mailbox,
         wanted: &[(i64, String)],
     ) -> Result<Vec<(i64, Vec<u8>)>, String> {
-        let ids: HashMap<&str, i64> = wanted
-            .iter()
-            .map(|(id, remote)| (remote.as_str(), *id))
-            .collect();
-        let remotes: Vec<String> = ids.keys().map(|remote| remote.to_string()).collect();
-        self.emails(&remotes, &["id", "blobId"])?
-            .iter()
-            .filter_map(|email| {
-                Some((
-                    *ids.get(email["id"].as_str()?)?,
-                    email["blobId"].as_str()?.to_owned(),
-                ))
-            })
-            .map(|(id, blob)| self.client.download(&blob).map(|raw| (id, raw)))
-            .collect()
+        self.fetch_bodies(wanted)
     }
 
     fn apply(&mut self, context: &Context, operation: &Operation) -> Result<(), String> {
@@ -436,52 +335,4 @@ impl Remote for JmapRemote {
         }
         Ok(())
     }
-}
-
-fn listen(
-    url: &str,
-    authorization: &str,
-    stop: &AtomicBool,
-    changed: &dyn Fn(),
-) -> Result<(), String> {
-    let response = ureq::get(url)
-        .header("Authorization", authorization)
-        .header("Accept", "text/event-stream")
-        .call()
-        .map_err(|error| error.to_string())?;
-    let reader = std::io::BufReader::new(response.into_body().into_reader());
-    let mut event = String::new();
-    for line in reader.lines() {
-        if stop.load(Ordering::Relaxed) {
-            return Ok(());
-        }
-        let line = line.map_err(|error| error.to_string())?;
-        if let Some(name) = line.strip_prefix("event:") {
-            event = name.trim().to_owned();
-        } else if line.starts_with("data:") && event == "state" {
-            changed();
-        }
-    }
-    Ok(())
-}
-
-pub fn watch(session: String, login: Login, changed: impl Fn() + Send + 'static) -> Push {
-    let stop = Arc::new(AtomicBool::new(false));
-    let watching = stop.clone();
-    std::thread::Builder::new()
-        .name("jmap-push".into())
-        .spawn(move || {
-            while !watching.load(Ordering::Relaxed) {
-                let source = Client::connect(&session, &login)
-                    .ok()
-                    .and_then(|client| client.event_source());
-                let Some(url) = source else {
-                    return;
-                };
-                let _ = listen(&url, &jmap::authorization(&login), &watching, &changed);
-                std::thread::sleep(RECONNECT_AFTER);
-            }
-        })
-        .ok();
-    Push { stop }
 }

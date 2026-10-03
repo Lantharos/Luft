@@ -148,13 +148,13 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
              Page {
                  view,
                  query,
-                 offset,
+                 after,
                  limit,
              }| {
                 let view = View::parse(&view, query).ok_or("Unknown view")?;
                 state
                     .store
-                    .threads(&view, &state.store.settings(), offset, limit)
+                    .threads(&view, &state.store.settings(), after, limit)
             },
         )
         .with("counts", state, |state, Empty {}| {

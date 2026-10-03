@@ -3,6 +3,29 @@ use serde::{Deserialize, Serialize};
 
 use super::classify::{self, Category};
 
+pub const HEADERS: [&str; 20] = [
+    "From",
+    "To",
+    "Cc",
+    "Reply-To",
+    "Sender",
+    "Subject",
+    "Date",
+    "Message-ID",
+    "In-Reply-To",
+    "References",
+    "Content-Type",
+    "List-Unsubscribe",
+    "List-Unsubscribe-Post",
+    "List-Id",
+    "List-Post",
+    "Precedence",
+    "Auto-Submitted",
+    "X-GitHub-Reason",
+    "Delivered-To",
+    "X-Original-To",
+];
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {

@@ -37,6 +37,22 @@ pub struct Account {
 }
 
 pub enum Login {
-    Password { username: String, password: String },
-    Bearer { username: String, token: String },
+    Password {
+        username: String,
+        password: String,
+    },
+    Bearer {
+        username: String,
+        token: String,
+        expires: i64,
+    },
+}
+
+impl Login {
+    pub fn expires(&self) -> Option<i64> {
+        match self {
+            Login::Password { .. } => None,
+            Login::Bearer { expires, .. } => Some(*expires),
+        }
+    }
 }

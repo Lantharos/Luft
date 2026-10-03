@@ -30,6 +30,7 @@ fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
             let login = Login::Bearer {
                 username: email.clone(),
                 token: tokens.access.clone(),
+                expires: tokens.expires,
             };
             (
                 Secret::OAuth {

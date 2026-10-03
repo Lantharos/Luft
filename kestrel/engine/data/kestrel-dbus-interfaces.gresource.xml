@@ -31,7 +31,6 @@
     <file preprocess="xml-stripblanks">com.lantharos.Settings.NightLight.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.KeyboardLight.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.Rfkill.xml</file>
-    <file preprocess="xml-stripblanks">com.lantharos.Kestrel.AudioDeviceSelection.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Brightness.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Introspect.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Kestrel.HotplugSniffer.xml</file>

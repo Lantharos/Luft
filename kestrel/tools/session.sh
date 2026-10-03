@@ -43,8 +43,8 @@ ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/confi
 export GVFS_DISABLE_FUSE=1
 glib-compile-schemas "$root/kestrel/build/data"
 export KESTREL_BUILDDIR="$root/kestrel/build/src"
-export GI_TYPELIB_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st:$root/kestrel/build/subprojects/gvc${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
-export LD_LIBRARY_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st:$root/kestrel/build/subprojects/gvc${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export GI_TYPELIB_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+export LD_LIBRARY_PATH="$root/kestrel/build/src:$root/kestrel/build/src/st${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export KESTREL_DATADIR="$root/kestrel/build/data"
 export GSETTINGS_SCHEMA_DIR="$root/kestrel/build/data"
 export KESTREL_CSS_PATH="$root/kestrel/engine/data/theme/kestrel.css"
@@ -97,13 +97,15 @@ systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$sc
   rm -f "$KESTREL_AUTHENTICATE_SOCK"
   pipewire -c "$root/kestrel/tools/fixtures/services/pipewire.conf" &
   pipewire_pid=$!
+  timeout 5 bash -c "until [[ -S \"$PULSE_RUNTIME_PATH/native\" ]]; do sleep 0.1; done"
+  "$root/kestrel/tools/fixtures/services/soundDefaults.sh" &
+  sound_defaults_pid=$!
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" "$root/kestrel/tools/fixtures/services/printServer.sh" "$session/cups" "$CUPS_SERVER" &
   print_server_pid=$!
   gjs -m "$root/kestrel/tools/fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK" &
   authenticator_pid=$!
-  trap "kill $system_bus_PID $pipewire_pid $print_server_pid $authenticator_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\" \"$PULSE_RUNTIME_PATH\" \"$KESTREL_APP_RUNTIME_DIR\" \"$KESTREL_AUTHENTICATE_SOCK\"" EXIT
+  trap "kill $system_bus_PID $pipewire_pid $sound_defaults_pid $print_server_pid $authenticator_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\" \"$PULSE_RUNTIME_PATH\" \"$KESTREL_APP_RUNTIME_DIR\" \"$KESTREL_AUTHENTICATE_SOCK\"" EXIT
   timeout 5 gdbus wait --session com.lantharos.KestrelChecks.Authenticator
-  timeout 5 bash -c "until [[ -S \"$PULSE_RUNTIME_PATH/native\" ]]; do sleep 0.1; done"
   timeout 10 bash -c "until [[ \"\$(lpstat -d 2> /dev/null)\" == *Office* ]]; do sleep 0.1; done"
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local "$root/kestrel/settings/target/release/kestrel-settings" \
     --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings &

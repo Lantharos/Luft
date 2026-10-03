@@ -26,6 +26,7 @@ import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
 import {checkInputSources} from './checks/input/inputSourceChecks.js';
 import {checkMediaKeys} from './checks/input/mediaKeyChecks.js';
+import {checkSound} from './checks/system/soundChecks.js';
 import {checkShortcuts} from './checks/system/shortcutChecks.js';
 import {checkQuickTiles} from './checks/system/quickTileChecks.js';
 import {checkSettingsLinks} from './checks/system/settingsLinkChecks.js';
@@ -345,6 +346,7 @@ export async function run() {
   await checkKeys({pause, capture, actorNamed, pointer, keyboard, output});
   await checkShortcuts({pause, capture, pointer, keyboard, output});
   await checkMediaKeys({pause, keyboard});
+  await checkSound({pause, keyboard});
   await checkQuickTiles({pause, capture, actorNamed, pointer, output});
   await checkSettingsLinks({pause, actorNamed});
   await checkSessionManager({pause, pointer});

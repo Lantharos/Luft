@@ -30,13 +30,15 @@ declare module '*.svg' {
 
 
 declare module 'resource:///com/lantharos/kestrel/ui/status/volume.js' {
-  interface MixerStream { get_application_id(): string | null }
-  export function getMixerControl(): {
-    get_source_outputs(): MixerStream[];
-    connect(signal: string, callback: () => void): number;
-    disconnect(id: number): void;
-  };
   export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
+}
+
+declare module 'resource:///com/lantharos/kestrel/ui/audioDeviceSelection.js' {
+  interface AudioDeviceQuestion {
+    close(): void;
+    connect(signal: 'closed', callback: () => void): number;
+  }
+  export function askForAudioDevice(devices: number, selected: (device: number) => void): AudioDeviceQuestion | null;
 }
 
 declare module 'resource:///com/lantharos/kestrel/misc/wallClock.js' {

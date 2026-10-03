@@ -34,7 +34,7 @@ fn open_in_rover(uris: &[String], startup_id: &str) {
     if paths.is_empty() {
         return;
     }
-    let Ok(exe) = env::current_exe() else {
+    let Some(exe) = env::args_os().next() else {
         return;
     };
     let mut command = Command::new(exe);

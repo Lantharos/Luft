@@ -1,0 +1,11 @@
+SUBSYSTEM!="block", GOTO="trustd_drives_end"
+
+ENV{DEVTYPE}=="partition", ENV{ID_PART_ENTRY_UUID}=="?*", TEST=="/etc/trustd/decrypting/$env{ID_PART_ENTRY_UUID}", \
+  PROGRAM="/usr/bin/cat /etc/trustd/decrypting/$env{ID_PART_ENTRY_UUID}", \
+  SYMLINK-="disk/by-uuid/$env{ID_FS_UUID_ENC}", SYMLINK-="disk/by-label/$env{ID_FS_LABEL_ENC}", SYMLINK+="disk/by-uuid/%c", \
+  ENV{ID_FS_TYPE}="crypto_LUKS", ENV{ID_FS_USAGE}="crypto", ENV{ID_FS_VERSION}="2", ENV{ID_FS_UUID}="%c", ENV{ID_FS_UUID_ENC}="%c", \
+  ENV{ID_FS_LABEL}="", ENV{ID_FS_LABEL_ENC}=""
+
+ACTION=="add|change", ENV{DM_UUID}=="CRYPT-LUKS2-*", TEST=="/var/lib/trustd/changing", TAG+="systemd", ENV{SYSTEMD_WANTS}+="trustd-drives.service"
+
+LABEL="trustd_drives_end"

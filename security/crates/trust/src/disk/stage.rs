@@ -28,7 +28,7 @@ fn derive(passphrase: &Secret, salt: &[u8]) -> Result<[u8; 32]> {
     Ok(key)
 }
 
-fn boxed(recovery: &Secret, passphrase: &Secret) -> Result<Vec<u8>> {
+pub fn boxed(recovery: &Secret, passphrase: &Secret) -> Result<Vec<u8>> {
     let mut salt = [0u8; SALT];
     let mut nonce = [0u8; NONCE];
     getrandom::fill(&mut salt)?;
@@ -42,7 +42,7 @@ fn boxed(recovery: &Secret, passphrase: &Secret) -> Result<Vec<u8>> {
     Ok([salt.as_slice(), nonce.as_slice(), &sealed].concat())
 }
 
-fn unbox(contents: &[u8], passphrase: &Secret) -> Option<Secret> {
+pub fn unbox(contents: &[u8], passphrase: &Secret) -> Option<Secret> {
     let (salt, rest) = contents.split_at_checked(SALT)?;
     let (nonce, sealed) = rest.split_at_checked(NONCE)?;
     let mut key = derive(passphrase, salt).ok()?;

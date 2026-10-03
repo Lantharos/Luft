@@ -1,0 +1,7 @@
+[Unit]
+Description=Continue encrypting or decrypting drives once they're unlocked
+After=dbus.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/busctl call com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1.Drives Continue

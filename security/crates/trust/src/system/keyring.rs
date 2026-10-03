@@ -35,6 +35,14 @@ fn search(description: &std::ffi::CStr) -> Option<libc::c_long> {
 }
 
 pub fn hand_over(name: &str, secret: &Secret) -> bool {
+    add(name, secret, Some(LIFETIME_SECONDS))
+}
+
+pub fn keep(name: &str, secret: &Secret) -> bool {
+    add(name, secret, None)
+}
+
+fn add(name: &str, secret: &Secret, lifetime: Option<libc::c_long>) -> bool {
     let kind = c"user";
     let description = description(name);
     let id = unsafe {
@@ -52,7 +60,9 @@ pub fn hand_over(name: &str, secret: &Secret) -> bool {
     }
     unsafe {
         libc::syscall(libc::SYS_keyctl, KEYCTL_SETPERM, id, OWNER_ONLY);
-        libc::syscall(libc::SYS_keyctl, KEYCTL_SET_TIMEOUT, id, LIFETIME_SECONDS);
+        if let Some(lifetime) = lifetime {
+            libc::syscall(libc::SYS_keyctl, KEYCTL_SET_TIMEOUT, id, lifetime);
+        }
     }
     true
 }

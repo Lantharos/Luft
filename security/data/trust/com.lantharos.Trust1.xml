@@ -78,4 +78,63 @@
          image this boot started from works, so its tries stop counting down. -->
     <method name="StartupFinished"/>
   </interface>
+
+  <!--
+    Encrypting and decrypting drives other than the system disk, in place, while they stay in use.
+
+    Drives: one entry per drive that is being changed or that this computer keeps something for, keyed by the
+      LUKS UUID: Device (s, its device node, "" while it's disconnected), State (s: "encrypting", "decrypting",
+      "paused", "waiting" until it's connected and unlocked, or "on"), Change (s: "encrypt", "decrypt", ""),
+      Progress (d), Remaining (t, seconds), AutoUnlock (b, it unlocks on this computer without asking:
+      at startup when it's inside the computer, when it's plugged in otherwise), RecoveryKeyStored (b).
+
+    Unlocking automatically keeps a key for the drive on this computer's own disk, so it needs device encryption
+    to be on. Methods that take "unlock" accept a passphrase or recovery key, or "" for a key this computer keeps.
+  -->
+  <interface name="com.lantharos.Trust1.Drives">
+    <property name="Drives" type="a{sa{sv}}" access="read"/>
+
+    <!-- method: "in-place" (keeps the files), "reformat" (only formatting can encrypt it) or "none".
+         auto_unlock: why it can't unlock automatically on this computer, "" when it can. -->
+    <method name="Check">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="method" type="s" direction="out"/>
+      <arg name="checks" type="a(sbs)" direction="out"/>
+      <arg name="auto_unlock" type="s" direction="out"/>
+    </method>
+    <!-- The partition must be unmounted. It is unlocked as soon as encrypting starts and stays usable
+         meanwhile. passphrase: "" for none. Returns the drive's LUKS UUID. -->
+    <method name="Encrypt">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+      <arg name="auto_unlock" type="b" direction="in"/>
+      <arg name="uuid" type="s" direction="out"/>
+    </method>
+    <method name="Decrypt">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <!-- Adds the recovery key when the drive has none (recovery_key "" to leave it), and turns unlocking
+         automatically on or off. -->
+    <method name="SetUpUnlocking">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="auto_unlock" type="b" direction="in"/>
+    </method>
+    <method name="Pause">
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="Resume">
+      <arg name="uuid" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <method name="ShowRecoveryKey">
+      <arg name="uuid" type="s" direction="in"/>
+      <arg name="key" type="s" direction="out"/>
+    </method>
+    <!-- Open to everyone: picks up drives that were waiting and are unlocked now. -->
+    <method name="Continue"/>
+  </interface>
 </node>

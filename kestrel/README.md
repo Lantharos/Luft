@@ -39,7 +39,7 @@ Run `kestrel/tools/session.sh performance` to measure resident memory and time s
 
 ## Install as a login session
 
-`kestrel/tools/install.sh install` builds Kestrel, its Mutter, and its settings service into `/opt/kestrel` and links a Kestrel entry for the login screen, its systemd user units, and its portal preferences into `/usr/local`. It also installs the login screen's settings service with its D-Bus and polkit files and the `/var/lib/kestrel-greeter` directory, and the graphics watchdog described below with its D-Bus policy and the units that start it. Nothing from the system GNOME installation is replaced. Pass a prefix as the second argument to install elsewhere; session entries are only linked for prefixes under `/opt` or `/usr`. `kestrel/tools/install.sh remove` removes the prefix and the links.
+`kestrel/tools/install.sh install` builds Kestrel, its Mutter, and its settings service into `/opt/kestrel` and links a Kestrel entry for the login screen, its systemd user units, and its portal preferences into `/usr/local`. It also installs the login screen's settings service with its D-Bus and polkit files and the `/var/lib/kestrel-greeter` directory, and the graphics watchdog described below with its D-Bus policy and the units that start it. Nothing from the system GNOME installation is replaced. Reinstalling removes files an earlier install put in the prefix that Kestrel no longer builds. Pass a prefix as the second argument to install elsewhere; session entries are only linked for prefixes under `/opt` or `/usr`. `kestrel/tools/install.sh remove` removes the prefix and the links.
 
 ### Memory pressure
 

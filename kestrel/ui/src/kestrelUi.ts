@@ -111,7 +111,7 @@ class KestrelUi {
     this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
     this.taskView = new TaskView(context.createBackground, () => this.close(), context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
-    this.mediaKeys = new MediaKeys(context, () => this.openStart(''));
+    this.mediaKeys = new MediaKeys(context, () => this.openStart());
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();
@@ -384,19 +384,13 @@ class KestrelUi {
   }
 
   private setActive(surface: Surface | null): void {
-    const wasStart = this.active === 'start';
     this.active = surface;
     this.context.messageTray.bannerBlocked = surface === 'notifications';
-    if (wasStart !== (surface === 'start'))
-      for (const watcher of startWatchers) watcher(surface === 'start');
   }
 
-  openStart(query: string): void {
+  private openStart(): void {
     if (this.active !== 'start') this.toggle('start');
-    if (query && this.active === 'start') this.start.search.set_text(query);
   }
-
-  startOpen(): boolean { return this.active === 'start'; }
 
   taskViewOpen(): boolean { return this.taskView.visible; }
 
@@ -476,7 +470,6 @@ class KestrelUi {
 
 let currentUi: KestrelUi | null = null;
 let greeter: Greeter | null = null;
-const startWatchers: ((visible: boolean) => void)[] = [];
 
 let pendingWallpaper: Rgb[] | null = null;
 
@@ -514,10 +507,4 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
-export function openStart(query = ''): void { currentUi?.openStart(query); }
-
-export function startOpen(): boolean { return currentUi?.startOpen() ?? false; }
-
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
-
-export function watchStart(watcher: (visible: boolean) => void): void { startWatchers.push(watcher); }

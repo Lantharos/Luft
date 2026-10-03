@@ -38,7 +38,6 @@ gi.require('St', Config.LIBMUTTER_API_VERSION);
 
 if (Config.HAVE_NETWORKMANAGER) {
     gi.require('NM', '1.0');
-    gi.require('NMA4', '1.0');
 } else {
     console.debug('GNOME Shell was compiled without Network Manager support');
 }

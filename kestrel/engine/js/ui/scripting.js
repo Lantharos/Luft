@@ -3,12 +3,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
-import * as Config from '../misc/config.js';
 import * as Main from './main.js';
-import * as Params from '../misc/params.js';
-import * as Util from '../misc/util.js';
-
-import {loadInterfaceXML} from '../misc/fileUtils.js';
 
 // This module provides functionality for driving the shell user interface
 // in an automated fashion. The primary current use case for this is
@@ -55,105 +50,6 @@ export function waitLeisure() {
     return new Promise(resolve => {
         global.run_at_leisure(resolve);
     });
-}
-
-const PerfHelperIface = loadInterfaceXML('org.gnome.Shell.PerfHelper');
-export const PerfHelperProxy = Gio.DBusProxy.makeProxyWrapper(PerfHelperIface);
-
-let _perfHelper = null;
-
-/**
- * @returns {PerfHelper}
- */
-export async function _getPerfHelper() {
-    if (_perfHelper == null) {
-        _perfHelper = await PerfHelperProxy.newAsync(
-            Gio.DBus.session, 'org.gnome.Shell.PerfHelper', '/org/gnome/Shell/PerfHelper');
-        _perfHelper._autoExit = true;
-    }
-
-    return _perfHelper;
-}
-
-/** @private */
-export function _spawnPerfHelper() {
-    const path = GLib.getenv('GNOME_SHELL_BUILDDIR') || Config.LIBEXECDIR;
-    const command = `${path}/gnome-shell-perf-helper`;
-    Util.trySpawnCommandLine(command);
-}
-
-/**
- * createTestWindow:
- *
- * @param {object} params options for window creation.
- * @param {number} [params.width=640] - width of window, in pixels
- * @param {number} [params.height=480] - height of window, in pixels
- * @param {boolean} [params.alpha=false] - whether the window should have an alpha channel
- * @param {boolean} [params.maximized=false] - whether the window should be created maximized
- * @param {boolean} [params.redraws=false] - whether the window should continually redraw itself
- * @returns {Promise}
- *
- * Creates a window using gnome-shell-perf-helper for testing purposes.
- * While this function can be used with yield in an automation
- * script to pause until the D-Bus call to the helper process returns,
- * because of the normal X asynchronous mapping process, to actually wait
- * until the window has been mapped and exposed, use waitTestWindows().
- */
-export async function createTestWindow(params) {
-    params = Params.parse(params, {
-        width: 640,
-        height: 480,
-        alpha: false,
-        maximized: false,
-        redraws: false,
-        textInput: false,
-    });
-
-    const perfHelper = await _getPerfHelper();
-    perfHelper.CreateWindowAsync(
-        params.width, params.height,
-        params.alpha, params.maximized,
-        params.redraws, params.textInput).catch(logError);
-}
-
-/**
- * waitTestWindows:
- *
- * @returns {Promise}
- *
- * Used within an automation script to pause until all windows previously
- * created with createTestWindow have been mapped and exposed.
- */
-export async function waitTestWindows() {
-    const perfHelper = await _getPerfHelper();
-    return perfHelper.WaitWindowsAsync().catch(logError);
-}
-
-/**
- * destroyTestWindows:
- *
- * @returns {Promise}
- *
- * Destroys all windows previously created with createTestWindow().
- * While this function can be used with yield in an automation
- * script to pause until the D-Bus call to the helper process returns,
- * this doesn't guarantee that Mutter has actually finished the destroy
- * process because of normal X asynchronicity.
- */
-export async function destroyTestWindows() {
-    const perfHelper = await _getPerfHelper();
-    return perfHelper.DestroyWindowsAsync().catch(logError);
-}
-
-/**
- * disableHelperAutoExit:
- *
- * Don't exixt the perf helper after running the script. Instead it will remain
- * running until something else makes it exit, e.g. the Wayland socket closing.
- */
-export async function disableHelperAutoExit() {
-    const perfHelper = await _getPerfHelper();
-    perfHelper._autoExit = false;
 }
 
 /**
@@ -303,15 +199,6 @@ async function _runPerfScript(scriptModule, outputFile) {
         Meta.exit(Meta.ExitCode.ERROR);
     }
 
-    try {
-        const perfHelper = await _getPerfHelper();
-        if (perfHelper._autoExit)
-            perfHelper.ExitSync();
-    } catch (err) {
-        logError(err, 'Failed to exit helper');
-        Meta.exit(Meta.ExitCode.ERROR);
-    }
-
     global.context.terminate();
 }
 
@@ -359,11 +246,5 @@ async function _runPerfScript(scriptModule, outputFile) {
  */
 export function runPerfScript(scriptModule, outputFile) {
     Shell.PerfLog.get_default().set_enabled(true);
-    _spawnPerfHelper();
-
-    Gio.bus_watch_name(Gio.BusType.SESSION,
-        'org.gnome.Shell.PerfHelper',
-        Gio.BusNameWatcherFlags.NONE,
-        () => _runPerfScript(scriptModule, outputFile),
-        null);
+    _runPerfScript(scriptModule, outputFile);
 }

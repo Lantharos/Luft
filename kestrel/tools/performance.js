@@ -4,7 +4,6 @@ import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
-import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
 
 export const METRICS = {};
 
@@ -150,7 +149,6 @@ async function measureRestyle(settings, style) {
 }
 
 export async function run() {
-    await disableHelperAutoExit();
     console.log(`Kestrel performance: ${JSON.stringify(processMetrics())}`);
     await pause(1000);
     await measureEmojiOpening('first');

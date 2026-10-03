@@ -25,6 +25,7 @@
     <file>misc/keyboardManager.js</file>
     <file>misc/languages.js</file>
     <file>misc/loginManager.js</file>
+    <file>misc/mobileProviders.js</file>
     <file>misc/modemManager.js</file>
     <file>misc/objectManager.js</file>
     <file>misc/params.js</file>
@@ -72,7 +73,6 @@
     <file>ui/kestrelGlass.js</file>
     <file>ui/mpris.js</file>
     <file>ui/notificationDaemon.js</file>
-    <file>ui/osdMonitorLabeler.js</file>
     <file>ui/osdWindow.js</file>
     <file>ui/padOsd.js</file>
     <file>ui/pageIndicators.js</file>

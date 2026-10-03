@@ -6,7 +6,6 @@ launcherconf.set('libdir', libdir)
 dbus_services = {
   'org.gnome.Shell.Notifications': 'notifications',
   'org.gnome.Shell.Screencast': 'screencast',
-  'org.gnome.ScreenSaver': 'screensaver',
 }
 
 config_dir = '@0@/..'.format(meson.current_build_dir())

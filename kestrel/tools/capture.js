@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
 import {toggleSurface} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
@@ -92,7 +91,6 @@ function reportLayout() {
 }
 
 export async function run() {
-  await disableHelperAutoExit();
   const pinned = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   if (!pinned.get_strv('favorite-apps').includes(FILE_MANAGER))
     pinned.set_strv('favorite-apps', [FILE_MANAGER, ...pinned.get_strv('favorite-apps')]);

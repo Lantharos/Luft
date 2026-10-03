@@ -243,13 +243,6 @@ gnome_shell_binary = executable('kestrel', 'main.c',
   install: true
 )
 
-gnome_shell_perf_helper = executable('gnome-shell-perf-helper', 'shell-perf-helper.c', js_resources,
-  dependencies: [gtk_dep, gio_dep, m_dep],
-  include_directories: [conf_inc],
-  install_dir: libexecdir,
-  install: true
-)
-
 run_test = executable('run-js-test', 'run-js-test.c',
   dependencies: [gio_dep, gi_dep, gjs_dep, libshell_dep],
   c_args: typelib_cflags,

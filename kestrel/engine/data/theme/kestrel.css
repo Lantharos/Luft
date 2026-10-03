@@ -387,7 +387,7 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .osd-window.kestrel-glass { padding: 10px 18px 10px 16px; border-radius: 999px; spacing: 12px; margin-bottom: 72px; font-weight: normal; }
 .osd-window.kestrel-glass StIcon { icon-size: 20px; }
 .osd-window.kestrel-glass .level { min-width: 180px; margin: 0; -barlevel-height: 6px; -barlevel-background-color: rgba(255, 255, 255, 0.16); -barlevel-active-background-color: #ffffff; -barlevel-overdrive-color: #e5484d; }
-.osd-monitor-label, .screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
+.screenshot-ui-tooltip { background-color: rgba(20, 20, 24, 0.25); color: white; border-radius: 999px; box-shadow: none; }
 .message.kestrel-glass { border-radius: 20px; background-color: rgba(20, 20, 24, 0.20); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
 .notification-banner .message-header { padding: 0 0 8px; }

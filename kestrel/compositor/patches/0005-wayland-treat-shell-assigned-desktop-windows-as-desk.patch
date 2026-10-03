@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 29 Sep 2026 00:40:31 +0200
-Subject: [PATCH 05/12] wayland: treat shell-assigned desktop windows as
+Subject: [PATCH 05/13] wayland: treat shell-assigned desktop windows as
  desktop backgrounds
 
 Wayland has no desktop window type of its own, so a Wayland window only

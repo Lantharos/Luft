@@ -1,36 +1,45 @@
 use std::collections::HashMap;
 
-use luft_app::secrets;
 use zbus::zvariant::OwnedValue;
 
+use super::passphrases;
 use crate::udisks::{self, BLOCK, ENCRYPTED, no_options};
 
-fn secret_name(uuid: &str) -> String {
-    format!("luks-{uuid}")
+fn text_of(block: &str, property: &str) -> Option<String> {
+    udisks::objects()
+        .ok()?
+        .get(block, BLOCK)
+        .and_then(|target| target.get::<String>(property))
+        .filter(|text| !text.is_empty())
 }
 
 fn uuid_of(block: &str) -> Result<String, String> {
-    udisks::objects()?
-        .get(block, BLOCK)
-        .and_then(|target| target.get::<String>("IdUUID"))
-        .filter(|uuid| !uuid.is_empty())
-        .ok_or_else(|| "This volume has no identifier".to_owned())
+    text_of(block, "IdUUID").ok_or_else(|| "This volume has no identifier".to_owned())
+}
+
+fn name_of(block: &str) -> String {
+    text_of(block, "IdLabel").unwrap_or_else(|| {
+        udisks::objects()
+            .ok()
+            .and_then(|objects| objects.get(block, BLOCK)?.get::<Vec<u8>>("PreferredDevice"))
+            .map(udisks::bytes_text)
+            .unwrap_or_else(|| block.to_owned())
+    })
 }
 
 pub fn remember(block: &str, passphrase: &str) -> Result<(), String> {
-    secrets::store(&secret_name(&uuid_of(block)?), passphrase.as_bytes())
+    passphrases::store(&uuid_of(block)?, &name_of(block), passphrase)
         .map_err(|_| "The passphrase couldn't be saved in your keyring".to_owned())
 }
 
 fn forget(block: &str) {
     if let Ok(uuid) = uuid_of(block) {
-        let _ = secrets::delete(&secret_name(&uuid));
+        passphrases::delete(&uuid);
     }
 }
 
 fn remembered(block: &str) -> Option<String> {
-    let secret = secrets::load(&secret_name(&uuid_of(block).ok()?)).ok()??;
-    String::from_utf8(secret).ok()
+    passphrases::load(&uuid_of(block).ok()?)
 }
 
 fn has_key_file(block: &str) -> bool {
@@ -81,7 +90,6 @@ pub fn change_passphrase(block: &str, current: &str, next: &str) -> Result<(), S
         &(current, next, no_options()),
     )?;
     if remembered(block).is_some() {
-        forget(block);
         remember(block, next)?;
     }
     Ok(())

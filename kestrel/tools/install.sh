@@ -5,6 +5,7 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 action="${1:-install}"
 prefix="${2:-/opt/kestrel}"
 build="$root/kestrel/run/install-build"
+manifest="$prefix/share/kestrel/installed-files"
 
 greeter_data="$root/kestrel/greeter/data"
 source "$root/kestrel/keyring/tools/install.sh"
@@ -92,6 +93,36 @@ as_owner() {
   if [[ -w "$(dirname "$1")" ]]; then "${@:2}"; else sudo "${@:2}"; fi
 }
 
+compositor_extras() {
+  echo "bin/mutter"
+  echo "share/GConf/gsettings/mutter-schemas.convert"
+  echo "share/man/man1/gdctl.1"
+  echo "share/man/man1/gnome-service-client.1"
+  echo "share/man/man1/mutter.1"
+}
+
+installed_files() {
+  grep -hv '^#' "$build/compositor/meson-logs/install-log.txt" "$build/engine/meson-logs/install-log.txt" \
+    | sed "s|^$prefix/||" | grep -vxF -f <(compositor_extras) | sort -u
+}
+
+remove_from_prefix() {
+  while IFS= read -r file; do
+    as_owner "$prefix" rm -f "$prefix/$file"
+    as_owner "$prefix" rmdir -p --ignore-fail-on-non-empty "$(dirname "$prefix/$file")" 2>/dev/null || true
+  done
+}
+
+prune_stale_files() {
+  local current
+  current="$(mktemp)"
+  installed_files > "$current"
+  compositor_extras | remove_from_prefix
+  [[ -f "$manifest" ]] && comm -23 "$manifest" "$current" | remove_from_prefix
+  as_owner "$prefix" install -DZ -m644 "$current" "$manifest"
+  rm "$current"
+}
+
 case "$action" in
   install)
     rm -rf "$build"
@@ -103,7 +134,6 @@ case "$action" in
       -Dcogl_tests=false -Dclutter_tests=false -Dmutter_tests=false -Dinstalled_tests=false
     meson compile -C "$build/compositor"
     as_owner "$prefix" meson install -C "$build/compositor" --no-rebuild
-    as_owner "$prefix" rm -f "$prefix/bin/mutter"
 
     (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
     meson setup "$build/engine" "$root/kestrel/engine" \
@@ -111,6 +141,7 @@ case "$action" in
     meson compile -C "$build/engine"
     as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"
     as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
+    prune_stale_files
     install_settings
     install_openconnect
     as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"

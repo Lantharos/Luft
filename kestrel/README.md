@@ -87,7 +87,12 @@ The shell handles the media and hardware keys itself, under `com.lantharos.kestr
 
 The test sessions run the service against a stand-in for the system services, so its power handling is checked without the real computer suspending. IBus provides input methods, and XDG autostart entries start with the session. Kestrel's own settings live under `com.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can be used on the same account. Kestrel doesn't need gnome-settings-daemon or any of its settings.
 
-Kestrel answers apps' portal requests itself, as described under [Portals](#portals). The session identifies as `Kestrel;GNOME`, so apps that look for GNOME, for example to pick the system keyring, behave as they do there.
+Kestrel answers apps' portal requests itself, as described under [Portals](#portals). The session identifies as `Kestrel;GNOME`. Portal preferences are found under the first name, `kestrel-portals.conf`, and the second keeps apps that only know a list of desktops working as they do on GNOME:
+
+- Electron apps such as Discord and Claude keep their saved sign-ins in the keyring only on desktops they recognize. On any other desktop they fall back to a fixed key, can no longer read what they saved before, and sign you out.
+- Qt apps without a platform theme of their own use the GTK theme, with its fonts, dark style and file dialogs, only on desktops they recognize, and plain Fusion everywhere else.
+- Java apps that follow the system look use the GTK one only on GNOME.
+- Autostart entries limited to GNOME, such as file indexing and the Mozc input method helper, keep starting, and GeoClue's demo agent, which is hidden on GNOME, stays out of the way of Kestrel's own location prompt.
 
 ### Keyring
 

@@ -14,6 +14,12 @@ Changes are saved as you make them. A layout is written as an ordinary XKB symbo
 
 Layouts can be brought in from an XKB symbols file, a complete `.xkb` keymap or a Windows `.klc` file, and exported as a symbols file or a complete keymap.
 
+## Viewing a layout
+
+Any layout can be opened just to look at it, whether it came with the computer or you made it, on the same keyboard drawn to the shape of yours. Pressing a key lights it up and shows what it types at each level; holding Shift or AltGr, or clicking them, brings forward what every key types with them, dead keys and the Compose key included. A layout that came with the computer can be copied into a new one to change, and one of your own opens in the editor.
+
+Show keyboard layout in Kestrel's input source menu opens Keys this way on the layout you're typing with, in a window of its own without the list of your layouts.
+
 ## Input methods
 
 An input method changes what you type as you type it, through IBus. It can hold three kinds of entries:
@@ -56,10 +62,11 @@ Once there is an input method, a small part of Keys keeps them registered with I
 
 ## Links
 
-Keys registers the `kestrel-keys:` link scheme, which Settings uses:
+Keys registers the `kestrel-keys:` link scheme, which Settings and Kestrel use:
 
 - `kestrel-keys:layout/new?from=de%2Bnodeadkeys` starts a new layout from a given layout
 - `kestrel-keys:layout/<name>` and `kestrel-keys:method/<name>` open a layout or input method
+- `kestrel-keys:view/<layout>` shows any layout without editing it, such as `kestrel-keys:view/us%2Bintl`
 - `kestrel-keys:method/new` starts a new input method
 
 Opening a layout or input method file with Keys brings it in.

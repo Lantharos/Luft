@@ -19,6 +19,8 @@ export type Layout = {
 	keys: Record<string, Levels>;
 };
 
+export type Viewed = Layout & { custom: boolean };
+
 export interface Entry {
 	id: string;
 	name: string;
@@ -38,6 +40,7 @@ export const EMPTY: Symbol = { keysym: '', text: '', kind: 'empty' };
 export const listLayouts = () => invoke<Entry[]>('layouts_list');
 export const systemLayouts = () => invoke<Entry[]>('layouts_system');
 export const openLayout = (id: string) => invoke<Layout>('layout_open', { id });
+export const viewLayout = (id: string) => invoke<Viewed>('layout_view', { id });
 export const createLayout = (name: string, from: Origin) => invoke<Layout>('layout_create', { name, from });
 export const saveLayout = (layout: Layout) => invoke<void>('layout_save', layout);
 export const deleteLayout = (id: string) => invoke<void>('layout_delete', { id });

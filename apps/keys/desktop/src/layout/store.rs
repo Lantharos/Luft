@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::compile::{self, Keys};
 use super::registry::{self, Entry};
@@ -15,6 +15,13 @@ const LEVEL_THREE: &str = "level3(";
 pub enum Origin {
     System { id: String },
     User { id: String },
+}
+
+#[derive(Serialize)]
+pub struct Viewed {
+    #[serde(flatten)]
+    layout: Layout,
+    custom: bool,
 }
 
 fn taken(id: &str) -> bool {
@@ -70,6 +77,27 @@ pub fn open(id: &str) -> Result<Layout, String> {
         name: entry.name,
         short: entry.short,
         language: entry.language,
+    })
+}
+
+pub fn view(id: &str) -> Result<Viewed, String> {
+    if list().iter().any(|entry| entry.id == id) {
+        return open(id).map(|layout| Viewed {
+            layout,
+            custom: true,
+        });
+    }
+    let entry = registry::system().iter().find(|entry| entry.id == id);
+    Ok(Viewed {
+        layout: Layout {
+            id: id.to_owned(),
+            name: entry.map_or_else(|| id.to_owned(), |entry| entry.name.clone()),
+            short: entry.map(|entry| entry.short.clone()).unwrap_or_default(),
+            language: entry.map(|entry| entry.language.clone()).unwrap_or_default(),
+            base: None,
+            keys: compile::layout(id)?.keys(),
+        },
+        custom: false,
     })
 }
 

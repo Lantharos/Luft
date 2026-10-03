@@ -1,6 +1,6 @@
 import { toast } from '$lib/state/toast.svelte';
 import { EMPTY, saveLayout, tryLayout, type Layout, type Levels, type Symbol } from './api';
-import { guessGeometry, type Geometry } from './geometry';
+import { guessGeometry, type Geometry } from '$lib/keyboard/geometry';
 
 const SAVE_DELAY = 400;
 const TRY_DELAY = 120;

@@ -1,39 +1,49 @@
 <script lang="ts">
-	import type { Levels, Symbol } from './api';
+	import type { Levels, Symbol } from '$lib/layout/api';
+	import { typedLevel } from './board';
 
 	interface Props {
 		levels: Levels;
+		level: number | null;
 		selected: boolean;
 		pressed: boolean;
 		onselect: () => void;
 		onkeydown: (event: KeyboardEvent) => void;
 	}
 
-	let { levels, selected, pressed, onselect, onkeydown }: Props = $props();
+	let { levels, level, selected, pressed, onselect, onkeydown }: Props = $props();
 
-	let [base, shift, third, fourth] = $derived(levels);
+	let [base, shift] = $derived(levels);
 	let capital = $derived(base.kind === 'character' && shift.kind === 'character' && shift.text !== base.text && base.text.toUpperCase() === shift.text);
+
+	let typed = $derived(level === null ? null : typedLevel(levels, level));
+
+	function emphasis(...shownLevels: number[]) {
+		if (typed === null) return '';
+		return shownLevels.includes(typed) ? 'lit' : 'faded';
+	}
 
 	function shown(symbol: Symbol) {
 		return symbol.kind === 'compose' ? '⎄' : symbol.text;
 	}
 </script>
 
-{#snippet glyph(symbol: Symbol, place: string)}
+{#snippet glyph(index: number, place: string)}
+	{@const symbol = levels[index]}
 	{#if symbol.kind !== 'empty'}
-		<span class="glyph {place}" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
+		<span class="glyph {place} {emphasis(index)}" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
 	{/if}
 {/snippet}
 
 <button type="button" class="cap" class:selected class:pressed aria-pressed={selected} onclick={onselect} {onkeydown}>
 	{#if capital}
-		<span class="glyph capital">{shift.text}</span>
+		<span class="glyph capital {emphasis(0, 1)}">{shift.text}</span>
 	{:else}
-		{@render glyph(shift, 'top-left')}
-		{@render glyph(base, 'bottom-left')}
+		{@render glyph(1, 'top-left')}
+		{@render glyph(0, 'bottom-left')}
 	{/if}
-	{@render glyph(fourth, 'top-right')}
-	{@render glyph(third, 'bottom-right')}
+	{@render glyph(3, 'top-right')}
+	{@render glyph(2, 'bottom-right')}
 </button>
 
 <style>
@@ -77,6 +87,9 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		font-size: 1.55cqw;
+		transition:
+			opacity 120ms var(--ease),
+			color 120ms var(--ease);
 	}
 
 	.capital {
@@ -109,6 +122,15 @@
 
 	.bottom-right {
 		bottom: 14%;
+	}
+
+	.faded {
+		opacity: 0.28;
+	}
+
+	.lit.top-right,
+	.lit.bottom-right {
+		color: var(--text);
 	}
 
 	.dead {

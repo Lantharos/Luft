@@ -90,11 +90,14 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         &recovery_key,
         (mode == Mode::Passphrase).then_some(passphrase),
     )?;
-    if mode == Mode::Tpm {
-        keys::escrow(&recovery_key)?;
-        if !pin.is_empty() {
-            keys::keep_pin_for_later(pin)?;
+    match mode {
+        Mode::Tpm => {
+            keys::escrow(&recovery_key)?;
+            if !pin.is_empty() {
+                keys::keep_pin_for_later(pin)?;
+            }
         }
+        Mode::Passphrase => keys::keep_passphrase_for_later(passphrase, &recovery_key)?,
     }
     let prepared = make_room(&disk)
         .and_then(|()| plan.save())
@@ -103,6 +106,7 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         stage::remove();
         keys::forget_escrow();
         keys::forget_kept_pin();
+        keys::forget_kept_passphrase();
         Plan::finish();
         let _ = rebuild_boot_files();
     }

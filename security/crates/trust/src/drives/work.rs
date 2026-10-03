@@ -86,7 +86,7 @@ fn finish(record: &mut Record, key: &Secret) -> Result<()> {
             if let Some(header) = record.header.take() {
                 let _ = std::fs::remove_file(header);
             }
-            record.unmask();
+            record.mask_until_restart()?;
             record.forget();
             close_if_unused(record);
             super::reprobe(&device);

@@ -1,6 +1,7 @@
 mod initrd;
 pub mod keys;
 pub mod luks;
+pub mod mask;
 mod preflight;
 pub mod reencrypt;
 pub mod stage;

@@ -3,11 +3,11 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
+use crate::disk::mask;
 use crate::paths;
 
 const FOLDER: &str = "/var/lib/trustd/drives";
 const CHANGING: &str = "/var/lib/trustd/changing";
-const DECRYPTING: &str = "/etc/trustd/decrypting";
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -100,18 +100,22 @@ impl Record {
     }
 
     pub fn mask(&self) -> Result<()> {
-        let Some(partuuid) = &self.partuuid else {
-            return Ok(());
-        };
-        std::fs::create_dir_all(DECRYPTING)?;
-        paths::write_private(&Path::new(DECRYPTING).join(partuuid), self.uuid.as_bytes())?;
-        Ok(())
+        match &self.partuuid {
+            Some(partuuid) => mask::mask(partuuid, &self.uuid),
+            None => Ok(()),
+        }
+    }
+
+    pub fn mask_until_restart(&self) -> Result<()> {
+        match &self.partuuid {
+            Some(partuuid) => mask::mask_until_restart(partuuid, &self.uuid),
+            None => Ok(()),
+        }
     }
 
     pub fn unmask(&self) {
         if let Some(partuuid) = &self.partuuid {
-            let _ = std::fs::remove_file(Path::new(DECRYPTING).join(partuuid));
-            let _ = std::fs::remove_dir(DECRYPTING);
+            mask::unmask(partuuid);
         }
     }
 

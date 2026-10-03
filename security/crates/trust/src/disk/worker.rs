@@ -5,7 +5,7 @@ use anyhow::{Context, Result, bail};
 use super::initrd::RESULT;
 pub use super::reencrypt::Progress;
 use super::state::{self, Change, Mode, Plan};
-use super::{SystemDisk, keys, luks, reencrypt, stage};
+use super::{SystemDisk, keys, luks, mask, reencrypt, stage};
 use crate::boot::cmdline;
 use crate::boot::startup::rebuild_boot_files;
 use crate::errors::NeedsKey;
@@ -18,12 +18,14 @@ pub fn pending() -> Option<Plan> {
 
 fn key_for(plan: &Plan) -> Result<Secret> {
     let device = plan.partition();
-    keyring::take("recovery-key")
+    let key = keyring::take(keys::HANDED_OVER)
         .into_iter()
         .chain(keys::escrowed())
         .chain(keyring::systemd_cached())
         .find(|key| keys::opens(&device, plan.header.as_deref(), key))
-        .ok_or_else(|| NeedsKey.into())
+        .ok_or(NeedsKey)?;
+    keyring::keep(keys::HANDED_OVER, &key);
+    Ok(key)
 }
 
 fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
@@ -45,9 +47,10 @@ fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
         }
         Mode::Passphrase => {
             if header.passphrase_slots().is_empty() {
-                let passphrase = keyring::take("passphrase").ok_or(NeedsKey)?;
+                let passphrase = keys::passphrase_kept_for_later(key).ok_or(NeedsKey)?;
                 keys::add_keyslot(&device, key, &passphrase, &header)?;
             }
+            keys::forget_kept_passphrase();
             "discard"
         }
     };
@@ -66,19 +69,20 @@ fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
     stage::remove();
     rebuild_boot_files()?;
     Plan::finish();
-    keyring::forget("recovery-key");
-    keyring::forget("passphrase");
+    keyring::forget(keys::HANDED_OVER);
     Ok(())
 }
 
 fn finish_decrypting(plan: &Plan) -> Result<()> {
     stage::remove();
+    mask::mask_until_restart(&plan.partuuid, &plan.uuid)?;
     rebuild_boot_files()?;
     if let Some(header) = &plan.header {
         let _ = std::fs::remove_file(header);
     }
     keys::forget_escrow();
     Plan::finish();
+    keyring::forget(keys::HANDED_OVER);
     Ok(())
 }
 
@@ -86,6 +90,7 @@ fn abandon_start() -> Result<()> {
     stage::remove();
     keys::forget_escrow();
     keys::forget_kept_pin();
+    keys::forget_kept_passphrase();
     Plan::finish();
     let _ = std::fs::remove_file(RESULT);
     rebuild_boot_files()
@@ -103,7 +108,7 @@ pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
     let Some(header) = header else {
         bail!("The disk lost its encryption header");
     };
-    let key = key_for(plan)?;
+    let mut key = None;
     if header.reencrypting.is_some() {
         if power::on_battery() {
             return Ok(false);
@@ -111,7 +116,7 @@ pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
         let finished = reencrypt::run(
             &plan.partition(),
             plan.header.as_deref(),
-            &key,
+            key.insert(key_for(plan)?),
             &AtomicBool::new(false),
             &mut report,
         )?;
@@ -120,7 +125,7 @@ pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
         }
     }
     match plan.change {
-        Change::Encrypt => finish_encrypting(plan, &key)?,
+        Change::Encrypt => finish_encrypting(plan, &key.map_or_else(|| key_for(plan), Ok)?)?,
         Change::Decrypt => finish_decrypting(plan)?,
     }
     Ok(true)

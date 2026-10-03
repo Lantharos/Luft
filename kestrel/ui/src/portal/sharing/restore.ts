@@ -3,7 +3,6 @@ import GLib from 'gi://GLib';
 import { option, type Options } from '../core/request.js';
 
 export const DONT_PERSIST = 0;
-export const PERSIST_WHILE_RUNNING = 1;
 export const PERSIST_UNTIL_REVOKED = 2;
 
 const PROVIDER = 'Kestrel';

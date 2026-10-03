@@ -23,10 +23,6 @@ impl PackageId {
             data: data.to_owned(),
         })
     }
-
-    pub fn repository(&self) -> &str {
-        self.data.strip_prefix("installed:").unwrap_or(&self.data)
-    }
 }
 
 #[derive(Clone, Debug)]

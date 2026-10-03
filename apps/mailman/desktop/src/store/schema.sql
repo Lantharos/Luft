@@ -1,7 +1,3 @@
-PRAGMA journal_mode = WAL;
-PRAGMA synchronous = NORMAL;
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE IF NOT EXISTS accounts (
 	id INTEGER PRIMARY KEY,
 	email TEXT NOT NULL UNIQUE,
@@ -21,6 +17,7 @@ CREATE TABLE IF NOT EXISTS mailboxes (
 	validity INTEGER,
 	modseq INTEGER,
 	state TEXT,
+	backfill TEXT,
 	UNIQUE (account, remote)
 );
 
@@ -49,25 +46,41 @@ CREATE TABLE IF NOT EXISTS messages (
 	unsubscribe TEXT,
 	snoozed_until INTEGER,
 	remind_at INTEGER,
+	verdict TEXT,
 	UNIQUE (mailbox, remote)
 );
 
-CREATE INDEX IF NOT EXISTS messages_by_mailbox ON messages (mailbox, date DESC);
+CREATE INDEX IF NOT EXISTS messages_listing ON messages (mailbox, date DESC, thread DESC, category, snoozed_until, verdict);
+CREATE INDEX IF NOT EXISTS messages_threads ON messages (mailbox, thread, category, snoozed_until, verdict);
+CREATE INDEX IF NOT EXISTS messages_unread ON messages (mailbox, thread, category, snoozed_until, verdict) WHERE seen = 0;
+CREATE INDEX IF NOT EXISTS messages_pending ON messages (mailbox, thread, snoozed_until) WHERE verdict = 'pending';
+CREATE INDEX IF NOT EXISTS messages_flagged ON messages (date DESC, thread) WHERE flagged = 1;
 CREATE INDEX IF NOT EXISTS messages_by_thread ON messages (thread, date);
 CREATE INDEX IF NOT EXISTS messages_by_message_id ON messages (message_id);
 CREATE INDEX IF NOT EXISTS messages_by_sender ON messages (sender);
 CREATE INDEX IF NOT EXISTS messages_snoozed ON messages (snoozed_until) WHERE snoozed_until IS NOT NULL;
 CREATE INDEX IF NOT EXISTS messages_reminders ON messages (remind_at) WHERE remind_at IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS links (
+	message_id TEXT PRIMARY KEY,
+	thread INTEGER NOT NULL
+) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS people (
+	address TEXT PRIMARY KEY,
+	name TEXT NOT NULL DEFAULT '',
+	weight INTEGER NOT NULL DEFAULT 0
+) WITHOUT ROWID;
+
 CREATE TABLE IF NOT EXISTS bodies (
 	message INTEGER PRIMARY KEY REFERENCES messages ON DELETE CASCADE,
 	raw BLOB NOT NULL
 );
 
-CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5 (subject, people, body, tokenize = 'unicode61 remove_diacritics 2');
+CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5 (subject, people, body, message UNINDEXED, tokenize = 'unicode61 remove_diacritics 2');
 
 CREATE TRIGGER IF NOT EXISTS messages_forget_search AFTER DELETE ON messages BEGIN
-	DELETE FROM search WHERE rowid = old.id;
+	DELETE FROM search WHERE rowid = old.date * 16777216 + old.id % 16777216;
 END;
 
 CREATE TABLE IF NOT EXISTS senders (
@@ -75,6 +88,14 @@ CREATE TABLE IF NOT EXISTS senders (
 	verdict TEXT NOT NULL,
 	images INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TRIGGER IF NOT EXISTS senders_judged AFTER INSERT ON senders BEGIN
+	UPDATE messages SET verdict = new.verdict WHERE sender = new.address;
+END;
+
+CREATE TRIGGER IF NOT EXISTS senders_rejudged AFTER UPDATE OF verdict ON senders WHEN new.verdict IS NOT old.verdict BEGIN
+	UPDATE messages SET verdict = new.verdict WHERE sender = new.address;
+END;
 
 CREATE TABLE IF NOT EXISTS outbox (
 	id INTEGER PRIMARY KEY,

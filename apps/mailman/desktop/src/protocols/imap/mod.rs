@@ -8,9 +8,8 @@ use parse::quote;
 pub use parse::{parse_uid_set, uid_set};
 use response::Untagged;
 
+use crate::mail::envelope::HEADERS;
 use crate::store::Role;
-
-const HEADER_FIELDS: &str = "FROM TO CC REPLY-TO SENDER SUBJECT DATE MESSAGE-ID IN-REPLY-TO REFERENCES CONTENT-TYPE LIST-UNSUBSCRIBE LIST-UNSUBSCRIBE-POST LIST-ID PRECEDENCE AUTO-SUBMITTED";
 
 pub struct RemoteMailbox {
     pub path: String,
@@ -141,8 +140,9 @@ impl Client {
     }
 
     pub fn fetch_headers(&mut self, set: &str) -> Result<Vec<Header>, String> {
+        let fields = HEADERS.join(" ");
         let reply = self.run(&format!(
-            "UID FETCH {set} (UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS ({HEADER_FIELDS})])"
+            "UID FETCH {set} (UID FLAGS RFC822.SIZE BODY.PEEK[HEADER.FIELDS ({fields})])"
         ))?;
         Ok(fetches(reply.untagged)
             .filter_map(|fetch| {

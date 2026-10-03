@@ -24,7 +24,9 @@ pub fn send(server: &Server, login: &Login, outgoing: &Outgoing) -> Result<(), S
             Credentials::new(username.clone(), password.clone()),
             vec![Mechanism::Plain, Mechanism::Login],
         ),
-        Login::Bearer { username, token } => (
+        Login::Bearer {
+            username, token, ..
+        } => (
             Credentials::new(username.clone(), token.clone()),
             vec![Mechanism::Xoauth2],
         ),

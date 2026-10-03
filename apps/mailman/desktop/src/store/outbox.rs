@@ -121,7 +121,8 @@ impl Store {
     pub fn has_reply(&self, message_id: &str, own_address: &str) -> Result<bool, String> {
         self.reading(|connection| {
             connection.query_row(
-                "SELECT EXISTS (SELECT 1 FROM messages WHERE (in_reply_to = ?1 OR instr(refs, ?1) > 0) AND sender != ?2)",
+                "SELECT EXISTS (SELECT 1 FROM messages WHERE thread = (SELECT thread FROM links WHERE message_id = ?1)
+                    AND (in_reply_to = ?1 OR instr(refs, ?1) > 0) AND sender != ?2)",
                 params![message_id, own_address],
                 |row| row.get(0),
             )

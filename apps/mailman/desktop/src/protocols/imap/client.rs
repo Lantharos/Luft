@@ -100,7 +100,9 @@ impl Client {
                     ))
                 }
             }
-            Login::Bearer { username, token } => {
+            Login::Bearer {
+                username, token, ..
+            } => {
                 let token =
                     STANDARD.encode(format!("user={username}\x01auth=Bearer {token}\x01\x01"));
                 self.run_sensitive(&format!("AUTHENTICATE XOAUTH2 {token}"))

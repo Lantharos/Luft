@@ -1,7 +1,6 @@
 mod fetcher;
-mod idle;
-mod imap_remote;
-mod jmap_remote;
+mod imap;
+mod jmap;
 pub mod ops;
 mod remote;
 mod schedule;
@@ -32,7 +31,7 @@ pub struct Shared {
 struct Running {
     jobs: Sender<Job>,
     bodies: Sender<i64>,
-    _push: Option<idle::Push>,
+    _push: remote::Push,
 }
 
 #[derive(Clone)]
@@ -77,7 +76,8 @@ impl Engine {
         );
     }
 
-    fn push(&self, account: &Account, jobs: Sender<Job>) -> Option<idle::Push> {
+    fn push(&self, account: &Account, jobs: Sender<Job>) -> remote::Push {
+        let credentials = self.shared.credentials.clone();
         match &account.config.protocol {
             Protocol::Imap { .. } => {
                 let inbox = self
@@ -89,20 +89,14 @@ impl Engine {
                 let (remote, id) = inbox
                     .map(|inbox| (inbox.remote, Some(inbox.id)))
                     .unwrap_or(("INBOX".into(), None));
-                Some(idle::watch(
-                    account.clone(),
-                    self.shared.credentials.clone(),
-                    remote,
-                    move || {
-                        let _ = jobs.send(id.map(Job::Mailbox).unwrap_or(Job::Sync));
-                    },
-                ))
+                imap::idle::watch(account.clone(), credentials, remote, move || {
+                    let _ = jobs.send(id.map(Job::Mailbox).unwrap_or(Job::Sync));
+                })
             }
             Protocol::Jmap { session } => {
-                let login = self.shared.credentials.login(account).ok()?;
-                Some(jmap_remote::watch(session.clone(), login, move || {
+                jmap::push::watch(session.clone(), account.clone(), credentials, move || {
                     let _ = jobs.send(Job::Sync);
-                }))
+                })
             }
         }
     }
@@ -154,10 +148,8 @@ impl Engine {
 
     pub fn verify(account: &Account, login: Login) -> Result<(), String> {
         match &account.config.protocol {
-            Protocol::Imap { .. } => imap_remote::connect(account, login).map(drop),
-            Protocol::Jmap { session } => {
-                jmap_remote::JmapRemote::connect(session, login).map(drop)
-            }
+            Protocol::Imap { .. } => imap::connect(account, login).map(drop),
+            Protocol::Jmap { session } => jmap::JmapRemote::connect(session, &login).map(drop),
         }
     }
 }

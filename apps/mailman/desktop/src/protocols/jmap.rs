@@ -9,9 +9,13 @@ use crate::accounts::Login;
 
 const TIMEOUT: Duration = Duration::from_secs(60);
 const MAX_REDIRECTS: usize = 5;
+const MAX_RESPONSE: u64 = 256 * 1024 * 1024;
 pub const CORE: &str = "urn:ietf:params:jmap:core";
 pub const MAIL: &str = "urn:ietf:params:jmap:mail";
 pub const SUBMISSION: &str = "urn:ietf:params:jmap:submission";
+pub const BLOB: &str = "urn:ietf:params:jmap:blob";
+const MAX_OBJECTS: usize = 1000;
+const MAX_CALLS: usize = 32;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -21,6 +25,7 @@ struct Session {
     upload_url: String,
     event_source_url: Option<String>,
     primary_accounts: std::collections::HashMap<String, String>,
+    capabilities: std::collections::HashMap<String, Value>,
 }
 
 pub struct Client {
@@ -28,6 +33,8 @@ pub struct Client {
     authorization: String,
     session: Session,
     pub account: String,
+    pub max_objects: usize,
+    pub max_calls: usize,
 }
 
 pub fn authorization(login: &Login) -> String {
@@ -85,12 +92,20 @@ impl Client {
             .get(MAIL)
             .cloned()
             .ok_or("This server doesn't offer mail")?;
+        let core = session.capabilities.get(CORE).cloned().unwrap_or_default();
+        let limit = |name: &str, fallback: u64| core[name].as_u64().unwrap_or(fallback) as usize;
         Ok(Self {
+            max_objects: limit("maxObjectsInGet", 500).min(MAX_OBJECTS),
+            max_calls: limit("maxCallsInRequest", 16).min(MAX_CALLS),
             agent,
             authorization,
             session,
             account,
         })
+    }
+
+    pub fn supports(&self, capability: &str) -> bool {
+        self.session.capabilities.contains_key(capability)
     }
 
     pub fn event_source(&self) -> Option<String> {
@@ -101,26 +116,36 @@ impl Client {
         })
     }
 
-    pub fn call(&self, using: &[&str], calls: Vec<(&str, Value)>) -> Result<Vec<Value>, String> {
+    pub fn calls(
+        &self,
+        using: &[&str],
+        calls: Vec<(&str, Value)>,
+    ) -> Result<Vec<Result<Value, String>>, String> {
         let method_calls: Vec<Value> = calls
             .into_iter()
             .enumerate()
             .map(|(index, (name, arguments))| json!([name, arguments, index.to_string()]))
             .collect();
-        let response: Value = self
+        let mut response = self
             .agent
             .post(&self.session.api_url)
             .header("Authorization", &self.authorization)
             .send_json(json!({ "using": using, "methodCalls": method_calls }))
-            .map_err(|error| error.to_string())?
+            .map_err(|error| error.to_string())?;
+        if !response.status().is_success() {
+            return Err(format!("The server refused ({})", response.status()));
+        }
+        let response: Value = response
             .body_mut()
+            .with_config()
+            .limit(MAX_RESPONSE)
             .read_json()
             .map_err(|error| error.to_string())?;
         let responses = response["methodResponses"]
             .as_array()
             .cloned()
             .unwrap_or_default();
-        responses
+        Ok(responses
             .into_iter()
             .map(|response| match response[0].as_str() {
                 Some("error") => Err(response[1]["description"]
@@ -130,7 +155,11 @@ impl Client {
                     .to_owned()),
                 _ => Ok(response[1].clone()),
             })
-            .collect()
+            .collect())
+    }
+
+    pub fn call(&self, using: &[&str], calls: Vec<(&str, Value)>) -> Result<Vec<Value>, String> {
+        self.calls(using, calls)?.into_iter().collect()
     }
 
     pub fn download(&self, blob: &str) -> Result<Vec<u8>, String> {

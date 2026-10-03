@@ -34,6 +34,7 @@
 
 	const LIST_WIDTH = 408;
 	const REFRESH_DELAY = 200;
+	const SEARCH_CAP = 1000;
 
 	let width = $state(window.innerWidth);
 	let sidebar = $state<Sidebar>();
@@ -50,7 +51,7 @@
 	let title = $derived(list.searching ? 'Search' : viewLabel(list.view, mail.mailboxes));
 	let subtitle = $derived.by(() => {
 		if (list.chosen.size) return `${list.chosen.size} selected`;
-		if (list.searching) return plural(list.total, 'result', 'results');
+		if (list.searching) return list.total >= SEARCH_CAP ? `${SEARCH_CAP.toLocaleString()}+ results` : plural(list.total, 'result', 'results');
 		const unread = list.rows.filter((row) => row.unread > 0).length;
 		if (list.view === 'inbox' && unread) return plural(unread, 'unread', 'unread');
 		return list.total ? plural(list.total, 'conversation', 'conversations') : null;

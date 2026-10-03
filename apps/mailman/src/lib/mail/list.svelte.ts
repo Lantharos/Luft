@@ -41,6 +41,7 @@ class ThreadList {
 
 	private generation = 0;
 	private fetchingMore = false;
+	private exhausted = false;
 
 	async open(view: string) {
 		this.chosen.clear();
@@ -62,23 +63,25 @@ class ThreadList {
 		const generation = ++this.generation;
 		this.loading = true;
 		const limit = Math.min(MAX_RELOAD, Math.max(PAGE, this.rows.length));
-		const [page, summaries] = await Promise.all([api.threads(this.view, this.query || null, 0, limit), this.loadSummaries()]);
+		const [page, summaries] = await Promise.all([api.threads(this.view, this.query || null, null, limit), this.loadSummaries()]);
 		if (generation !== this.generation) return;
 		this.rows = page.rows;
-		this.total = page.total;
+		this.total = page.total ?? 0;
+		this.exhausted = page.rows.length < limit;
 		this.summaries = summaries;
 		this.loading = false;
 	};
 
 	async more() {
-		if (this.fetchingMore || this.rows.length >= this.total) return;
+		const last = this.rows.at(-1);
+		if (this.fetchingMore || this.exhausted || !last) return;
 		this.fetchingMore = true;
 		const generation = this.generation;
-		const page = await api.threads(this.view, this.query || null, this.rows.length, PAGE).finally(() => (this.fetchingMore = false));
+		const page = await api.threads(this.view, this.query || null, { date: last.date, thread: last.thread }, PAGE).finally(() => (this.fetchingMore = false));
 		if (generation !== this.generation) return;
 		const known = new Set(this.rows.map((row) => row.thread));
 		this.rows = [...this.rows, ...page.rows.filter((row) => !known.has(row.thread))];
-		this.total = page.total;
+		this.exhausted = page.rows.length < PAGE;
 	}
 
 	private async loadSummaries(): Promise<Summary[]> {
@@ -86,14 +89,14 @@ class ThreadList {
 		const summaries: Summary[] = [];
 		const counts = mail.counts;
 		if (mail.settings.screener && counts.screener > 0) {
-			const page = await api.threads('screener', null, 0, 4);
+			const page = await api.threads('screener', null, null, 4);
 			summaries.push({ view: 'screener', label: 'New senders', count: counts.screener, names: names(page.rows) });
 		}
 		if (!mail.settings.bundles) return summaries;
 		for (const bundle of BUNDLES) {
 			const count = bundle.count?.(counts) ?? 0;
 			if (!count) continue;
-			const page = await api.threads(bundle.id, null, 0, 6);
+			const page = await api.threads(bundle.id, null, null, 6);
 			summaries.push({ view: bundle.id, label: bundle.label, count, names: names(page.rows.filter((row) => row.unread > 0)) });
 		}
 		return summaries;

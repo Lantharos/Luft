@@ -1,4 +1,5 @@
 mod bodies;
+mod index;
 mod messages;
 mod threads;
 mod views;
@@ -6,4 +7,4 @@ mod views;
 pub use bodies::Fetched;
 pub use messages::{Flag, Flags, Inserted, NewMessage};
 pub use threads::{Located, Notable};
-pub use views::View;
+pub use views::{Cursor, View};

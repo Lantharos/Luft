@@ -68,16 +68,21 @@ struct Target {
 }
 
 fn hex(bytes: &[u8]) -> String {
-    bytes.iter().fold(String::with_capacity(bytes.len() * 2), |mut text, byte| {
-        let _ = write!(text, "{byte:02x}");
-        text
-    })
+    bytes
+        .iter()
+        .fold(String::with_capacity(bytes.len() * 2), |mut text, byte| {
+            let _ = write!(text, "{byte:02x}");
+            text
+        })
 }
 
 fn unhex(text: &str) -> Result<Vec<u8>, String> {
     (0..text.len())
         .step_by(2)
-        .map(|index| text.get(index..index + 2).and_then(|pair| u8::from_str_radix(pair, 16).ok()))
+        .map(|index| {
+            text.get(index..index + 2)
+                .and_then(|pair| u8::from_str_radix(pair, 16).ok())
+        })
         .collect::<Option<_>>()
         .ok_or_else(|| "That passkey doesn't exist".to_owned())
 }
@@ -162,9 +167,13 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
         .with("passkeys", events, passkeys)
         .command("passkeys_rename", |Rename { id, name }| {
-            proxy()?.call::<_, _, ()>("Rename", &(unhex(&id)?, name)).map_err(explain)
+            proxy()?
+                .call::<_, _, ()>("Rename", &(unhex(&id)?, name))
+                .map_err(explain)
         })
         .command("passkeys_delete", |Target { id }| {
-            proxy()?.call::<_, _, ()>("Delete", &(unhex(&id)?,)).map_err(explain)
+            proxy()?
+                .call::<_, _, ()>("Delete", &(unhex(&id)?,))
+                .map_err(explain)
         })
 }

@@ -25,7 +25,9 @@ place "$usb/com.lantharos.usb-protection.policy" /usr/share/polkit-1/actions/com
 trust="$root/data/trust"
 install -Dm755 "$release/trustd" "$destdir$libexecdir/trustd"
 install -Dm755 "$release/trustctl" "$destdir/usr/bin/trustctl"
-place "$trust/trustd.service" /usr/lib/systemd/system/trustd.service
+for unit in "$trust"/systemd/*; do
+  place "$unit" "/usr/lib/systemd/system/$(basename "$unit")"
+done
 place "$trust/com.lantharos.Trust1.service" /usr/share/dbus-1/system-services/com.lantharos.Trust1.service
 place "$trust/com.lantharos.Trust1.conf" /usr/share/dbus-1/system.d/com.lantharos.Trust1.conf
 place "$trust/com.lantharos.Trust1.xml" /usr/share/dbus-1/interfaces/com.lantharos.Trust1.xml

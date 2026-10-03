@@ -35,10 +35,8 @@ impl Daemon {
                 self.leave_to_text();
                 reply(stream, "ok");
             }
-            Command::UpdateRoot(root) => match self.enter_root(&root) {
-                Ok(()) => reply(stream, "ok"),
-                Err(error) => reply(stream, &error.to_string()),
-            },
+            Command::UpdateRoot(root) => self.enter_root_after_loading(root, stream),
+            Command::LoadDrivers => self.load_drivers(stream),
             Command::Show(mode) => {
                 self.activity.set_mode(mode, self.now());
                 self.settle_loader(self.now());
@@ -230,7 +228,7 @@ impl Daemon {
         }
     }
 
-    fn enter_root(&mut self, root: &Path) -> std::io::Result<()> {
+    pub(super) fn enter_root(&mut self, root: &Path) -> std::io::Result<()> {
         if self.root.as_deref() == Some(root) {
             return Ok(());
         }
@@ -244,6 +242,6 @@ impl Daemon {
     }
 }
 
-fn reply(mut stream: UnixStream, message: &str) {
+pub(super) fn reply(mut stream: UnixStream, message: &str) {
     let _ = stream.write_all(format!("{message}\n").as_bytes());
 }

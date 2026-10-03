@@ -4,7 +4,7 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 action="${1:-}"
 manifest=/usr/lib/luft-security/installed-files
-units="luft-usb-protection.service trustd.service"
+units="luft-usb-protection.service trustd.service trustd-refresh.path trustd-refresh-at-shutdown.service"
 usb_state="/var/lib/luft-usb-protection"
 
 usage() {

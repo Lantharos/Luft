@@ -6,14 +6,8 @@ use anyhow::{Context, Result};
 use crate::system::command::Tool;
 
 const MODULES: &str = "/usr/lib/modules";
-const GRAPHICS: &str = "kernel/drivers/gpu";
-const NVIDIA: [&str; 5] = [
-    "nvidia",
-    "nvidia_drm",
-    "nvidia_modeset",
-    "nvidia_uvm",
-    "nvidia_peermem",
-];
+const OUT_OF_TREE: [&str; 2] = ["extra", "updates"];
+const NEVER_EARLY: &str = "nouveau nova_core nova_drm";
 
 #[derive(Clone, Debug)]
 pub struct Kernel {
@@ -46,20 +40,24 @@ impl Kernel {
             })
     }
 
-    fn graphics_drivers(&self) -> Vec<String> {
-        let mut drivers: Vec<String> = NVIDIA.iter().map(|name| (*name).to_owned()).collect();
-        module_names(
-            &Path::new(MODULES).join(&self.version).join(GRAPHICS),
-            &mut drivers,
-        );
-        drivers
+    /// Modules installed for this kernel outside the kernel package, such as NVIDIA's, which change without
+    /// the kernel changing: each one's path, size and modification time.
+    pub fn added_modules(&self) -> String {
+        let mut files = Vec::new();
+        for folder in OUT_OF_TREE {
+            module_files(
+                &Path::new(MODULES).join(&self.version).join(folder),
+                &mut files,
+            );
+        }
+        files.sort();
+        files.join("\n")
     }
 
     pub fn build_signed_initrd(&self, output: &Path, splash_is_sushi: bool) -> Result<()> {
         let mut dracut = Tool::new("dracut")
             .args(["--force", "--quiet", "--kver", &self.version])
-            .arg("--omit-drivers")
-            .arg(self.graphics_drivers().join(" "));
+            .args(["--omit-drivers", NEVER_EARLY]);
         if splash_is_sushi {
             dracut = dracut.args(["--omit", "plymouth"]);
         }
@@ -72,13 +70,26 @@ impl Kernel {
     }
 }
 
-fn module_names(folder: &Path, names: &mut Vec<String>) {
+fn module_files(folder: &Path, files: &mut Vec<String>) {
     for entry in std::fs::read_dir(folder).into_iter().flatten().flatten() {
         let path = entry.path();
-        if path.is_dir() {
-            module_names(&path, names);
-        } else if let Some((name, _)) = entry.file_name().to_string_lossy().split_once(".ko") {
-            names.push(name.replace('-', "_"));
+        let Ok(metadata) = entry.metadata() else {
+            continue;
+        };
+        if metadata.is_dir() {
+            module_files(&path, files);
+        } else if entry.file_name().to_string_lossy().contains(".ko") {
+            let modified = metadata
+                .modified()
+                .ok()
+                .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+                .unwrap_or_default();
+            files.push(format!(
+                "{} {} {}",
+                path.display(),
+                metadata.len(),
+                modified.as_nanos()
+            ));
         }
     }
 }

@@ -6,6 +6,7 @@ mod firmware;
 mod notice;
 mod screen;
 mod signals;
+mod takeover;
 mod unlock;
 
 use std::process::ExitCode;

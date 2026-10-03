@@ -1,0 +1,7 @@
+[Unit]
+Description=Rebuild the signed startup images of kernels whose added modules changed
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/trustctl startup refresh

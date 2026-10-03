@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch akmods build NVIDIA's driver for the signed startup images
+
+[Path]
+PathChanged=/var/cache/akmods/nvidia
+Unit=trustd-refresh.service
+
+[Install]
+WantedBy=paths.target

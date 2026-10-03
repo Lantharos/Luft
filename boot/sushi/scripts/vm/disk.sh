@@ -15,19 +15,25 @@ contexts="$tree/etc/selinux/targeted/contexts/files"
 rm -rf "$stage"
 "$root/scripts/build.sh" "$stage"
 
+omitted=""
+[[ "${DRIVER:-initramfs}" == system ]] && omitted="virtio_gpu bochs"
+deferred="$tree/etc/modprobe.d/sushi.conf"
 podman unshare sh -c "
   cp -a '$stage/.' '$tree/'
   echo 'LABEL=luft-root / ext4 defaults 0 1' > '$tree/etc/fstab'
   mkdir -p '$tree/etc/dracut.conf.d'
-  printf '%s\n' 'add_dracutmodules+=\" sushi crypt tpm2-tss \"' 'omit_drivers+=\" virtio_gpu bochs \"' > '$tree/etc/dracut.conf.d/90-sushi-vm.conf'
+  printf '%s\n' 'add_dracutmodules+=\" sushi crypt tpm2-tss \"' 'omit_drivers+=\" $omitted \"' > '$tree/etc/dracut.conf.d/90-sushi-vm.conf'
+  rm -f '$deferred'
+  [ '${DRIVER:-initramfs}' = initramfs ] && printf '%s\n' 'blacklist nvidia_drm' 'blacklist bochs' > '$deferred'
   echo '$HOME /opt' > '$contexts/file_contexts.subs'
   echo 'SUBSYSTEM==\"drm\", KERNEL==\"card[0-9]*\", ACTION==\"add\", PROGRAM=\"/usr/bin/sleep 0.5\"' > '$tree/etc/udev/rules.d/50-slow-drm.rules'
 "
 kernel="$(ls "$tree/lib/modules")"
 podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
-  systemctl enable sushi.service sushi-quit.service sushi-shutdown.service
+  systemctl enable sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service
   dracut --quiet --force --no-hostonly --kver '$kernel'
 "
+[[ "${DRIVER:-}" == system ]] && podman unshare sh -c "printf '%s\n' 'blacklist nvidia_drm' 'blacklist bochs' > '$deferred'"
 podman unshare setfiles -r "$tree" "$contexts/file_contexts" "$tree"
 [[ "${LAYOUT:-}" == fedora ]] && exec "$root/scripts/vm/fedora.sh" "$kernel"
 

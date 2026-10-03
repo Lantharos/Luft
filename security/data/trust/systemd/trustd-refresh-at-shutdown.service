@@ -1,0 +1,14 @@
+[Unit]
+Description=Rebuild the signed startup images for modules built while shutting down
+After=local-fs.target
+Before=akmods-shutdown.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/true
+ExecStop=/usr/bin/trustctl startup refresh
+TimeoutStopSec=5min
+
+[Install]
+WantedBy=multi-user.target

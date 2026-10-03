@@ -90,6 +90,8 @@ pub struct Output {
     pub crtc: crtc::Handle,
     pub mode: Mode,
     pub framebuffer: framebuffer::Handle,
+    pub inherited: Option<Mode>,
+    pub internal: bool,
     buffer: ScanoutBuffer,
 }
 
@@ -116,8 +118,18 @@ impl Output {
             crtc,
             mode,
             framebuffer,
+            inherited: None,
+            internal: false,
             buffer,
         })
+    }
+
+    pub fn inheriting(self, inherited: Option<Mode>, internal: bool) -> Self {
+        Self {
+            inherited,
+            internal,
+            ..self
+        }
     }
 
     pub fn size(&self) -> (u32, u32) {

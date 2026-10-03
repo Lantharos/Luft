@@ -11,6 +11,7 @@
 	--raised: var(--kestrel-dark-surface-container-low, #1a1a18);
 	--surface: color-mix(in oklab, var(--ink) 4%, transparent);
 	--surface-hover: color-mix(in oklab, var(--ink) 6.5%, transparent);
+	--group: var(--surface);
 	--control: var(--kestrel-dark-surface-container-high, #252522);
 	--control-hover: var(--kestrel-dark-surface-container-highest, #31312e);
 	--popover: var(--kestrel-dark-surface-container, #1c1c1a);
@@ -63,6 +64,7 @@
 	--raised: var(--kestrel-light-surface-container-lowest, #ffffff);
 	--surface: color-mix(in oklab, var(--ink) 4%, transparent);
 	--surface-hover: color-mix(in oklab, var(--ink) 6.5%, transparent);
+	--group: var(--kestrel-light-surface-container-low, #f5f5f2);
 	--control: var(--kestrel-light-surface-container-high, #ebebe7);
 	--control-hover: var(--kestrel-light-surface-container-highest, #e1e1dc);
 	--popover: var(--kestrel-light-surface-container-lowest, #ffffff);

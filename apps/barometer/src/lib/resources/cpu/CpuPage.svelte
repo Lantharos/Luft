@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Switch } from '@luft/ui';
+	import { memoryBytes, plural, Switch } from '@luft/ui';
 	import type { CpuInfo } from '#lib/backend/types.js';
-	import { bytes, count, duration, frequency, percent, plural, temperature } from '#lib/format.js';
+	import { count, duration, frequency, percent, temperature } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Page from '#lib/resources/common/Page.svelte';
@@ -24,7 +24,7 @@
 	function caches() {
 		return info.caches.map((cache) => ({
 			label: `L${cache.level}${cache.kind === 'Data' ? 'd' : cache.kind === 'Instruction' ? 'i' : ''} cache`,
-			value: cache.instances > 1 ? `${bytes(cache.size)} × ${cache.instances}` : bytes(cache.size)
+			value: cache.instances > 1 ? `${memoryBytes(cache.size)} × ${cache.instances}` : memoryBytes(cache.size)
 		}));
 	}
 </script>

@@ -1,16 +1,5 @@
+import { bytes } from '@luft/ui';
 import type { Drive, Filesystem, Health, Job, Segment, Volume } from './api';
-
-const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-
-export function bytes(value: number) {
-	let size = value;
-	let unit = 0;
-	while (size >= 1000 && unit < UNITS.length - 1) {
-		size /= 1000;
-		unit += 1;
-	}
-	return `${size >= 100 || unit === 0 ? Math.round(size) : size.toFixed(1)} ${UNITS[unit]}`;
-}
 
 export const FILESYSTEM_NAMES: Record<string, string> = {
 	ext4: 'ext4',

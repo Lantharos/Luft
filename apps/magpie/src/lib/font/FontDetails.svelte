@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { bytes, plural } from '@luft/ui';
 	import type { Item } from '#lib/api.js';
 	import * as api from '#lib/api.js';
-	import { formatBytes, plural } from '#lib/library/format.js';
 	import { count } from './characters';
 	import { fontState } from './state.svelte';
 
@@ -20,7 +20,7 @@
 		add('Made by', face.manufacturer);
 		add('Characters', `${plural(count(face.characters), 'character', 'characters')}, ${plural(face.glyphs, 'glyph', 'glyphs')}`);
 		add('Format', fontState.file?.format);
-		add('File', `${item.name}, ${formatBytes(item.size)}`);
+		add('File', `${item.name}, ${bytes(item.size)}`);
 		add('Copyright', face.copyright);
 		add('License', face.license);
 		return rows;

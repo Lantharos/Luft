@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { renderMarkdown } from '@luft/ui';
 	import { highlight } from '@luft/ui/code';
 	import * as api from '#lib/api.js';
-	import { renderMarkdown } from '#lib/file-manager/inspect/markdown.js';
 	import { loadText, type TextPreview } from '#lib/file-manager/inspect/text.js';
 	import type { FileEntry } from '#lib/types/index.js';
 
@@ -20,7 +20,19 @@
 	let result = $state.raw<TextPreview | null>(null);
 	let highlighted = $state.raw<{ html: string; rest: string } | null>(null);
 	let text = $derived(result && 'text' in result ? (full ? result.text : result.text.split('\n', PANE_LINES).join('\n')) : '');
-	let html = $derived(markdown && text ? renderMarkdown(text, entry.path) : '');
+	let html = $state('');
+
+	$effect(() => {
+		if (!markdown || !text) {
+			html = '';
+			return;
+		}
+		let current = true;
+		void renderMarkdown(text, entry.path).then((rendered) => {
+			if (current) html = rendered;
+		});
+		return () => (current = false);
+	});
 
 	$effect(() => {
 		highlighted = null;
@@ -58,6 +70,6 @@
 {:else if html}
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>{@html html}</article>
-{:else if result}
+{:else if result && !(markdown && text)}
 	<pre class={['preview-code', full ? 'is-full' : 'is-compact']}>{#if highlighted}{@html highlighted.html}{highlighted.rest}{:else}{text}{/if}{#if full && result.truncated}<span class="preview-code__more">…</span>{/if}</pre>
 {/if}

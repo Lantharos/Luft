@@ -1,4 +1,4 @@
-const plural = (count: number, unit: string) => `${count} ${unit}${count === 1 ? '' : 's'}`;
+import { plural } from '@luft/ui';
 
 export function duration(seconds: number) {
 	const minutes = Math.round(seconds / 60);
@@ -12,10 +12,6 @@ export function duration(seconds: number) {
 export function durationOptions(seconds: number[], current: number) {
 	const values = seconds.includes(current) || current === 0 ? seconds : [...seconds, current].sort((left, right) => left - right);
 	return [...values.map((value) => ({ value, label: duration(value) })), { value: 0, label: 'Never' }];
-}
-
-export function watts(value: number) {
-	return `${value < 10 ? value.toFixed(1) : Math.round(value)} W`;
 }
 
 export const wattHours = (value: number) => `${Number(value.toFixed(1))} Wh`;

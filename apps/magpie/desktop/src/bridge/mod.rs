@@ -3,7 +3,7 @@ mod params;
 use std::path::Path as FilePath;
 
 use gio::prelude::*;
-use luft_app::Commands;
+use luft_app::{Commands, file_manager};
 use luft_app::portal::{self, FileChooser, Filter};
 use sabine::SabineWindow;
 
@@ -89,7 +89,7 @@ fn register_files(window: SabineWindow, state: &MagpieState) -> SabineWindow {
             apps::open_with(FilePath::new(&path), &app)
         })
         .command("show_in_folder", |Path { path }| {
-            apps::show_in_folder(FilePath::new(&path))
+            file_manager::show_in_folder(FilePath::new(&path))
         })
         .command("open_uri", |Uri { uri }| apps::open_uri(&uri))
 }

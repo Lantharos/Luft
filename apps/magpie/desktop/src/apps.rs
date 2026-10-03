@@ -2,8 +2,6 @@ use std::path::Path;
 
 use gio::prelude::*;
 use luft_app::apps::{self, App};
-use luft_app::dbus;
-use zbus::blocking::Proxy;
 
 const OWN_ID: &str = "com.lantharos.magpie";
 
@@ -26,21 +24,6 @@ pub fn open_with(path: &Path, app: &str) -> Result<(), String> {
     let info = gio_unix::DesktopAppInfo::new(app).ok_or("That app is no longer installed")?;
     info.launch(&[gio::File::for_path(path)], gio::AppLaunchContext::NONE)
         .map_err(failed)
-}
-
-pub fn show_in_folder(path: &Path) -> Result<(), String> {
-    let proxy = Proxy::new(
-        dbus::session()?,
-        "org.freedesktop.FileManager1",
-        "/org/freedesktop/FileManager1",
-        "org.freedesktop.FileManager1",
-    )
-    .map_err(failed)?;
-    let uri = gio::File::for_path(path).uri().to_string();
-    proxy
-        .call::<_, _, ()>("ShowItems", &(vec![uri], ""))
-        .map_err(failed)?;
-    Ok(())
 }
 
 pub fn open_uri(uri: &str) -> Result<(), String> {

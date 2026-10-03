@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { Row, Section } from '@luft/ui';
+	import { bytes, Row, Section } from '@luft/ui';
 	import type { InstalledApp, Job, OpenedFile } from '#lib/bridge/types.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
-	import { bytes } from '#lib/format.js';
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';

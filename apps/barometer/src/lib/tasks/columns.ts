@@ -1,5 +1,6 @@
+import { bytes, memoryBytes } from '@luft/ui';
 import type { Usage } from '#lib/backend/rows.js';
-import { bytes, count, cpuTime, percent, rate, timeOfDay } from '#lib/format.js';
+import { count, cpuTime, percent, rate, timeOfDay } from '#lib/format.js';
 import { monitor } from '#lib/state/monitor.svelte.js';
 import { settings, type Sort } from '#lib/state/settings.svelte.js';
 
@@ -41,13 +42,13 @@ export const COLUMNS: Column[] = [
 	{ id: 'pid', label: 'PID', width: 76, numeric: true, value: (row) => row.pid ?? 0, text: (row) => String(row.pid ?? '') },
 	{ id: 'user', label: 'User', width: 104, numeric: false, value: (row) => row.user ?? '', text: (row) => row.user ?? '' },
 	{ id: 'cpu', label: 'CPU', width: 80, numeric: true, value: (row) => row.cpu, text: (row) => percent(processorShare(row), 1) },
-	{ id: 'memory', label: 'Memory', width: 96, numeric: true, value: (row) => row.memory, text: (row) => bytes(row.memory) },
+	{ id: 'memory', label: 'Memory', width: 96, numeric: true, value: (row) => row.memory, text: (row) => memoryBytes(row.memory) },
 	{ id: 'read', label: 'Reading', width: 96, numeric: true, value: (row) => row.read, text: (row) => quiet(row.read, rate) },
 	{ id: 'write', label: 'Writing', width: 96, numeric: true, value: (row) => row.write, text: (row) => quiet(row.write, rate) },
 	{ id: 'readTotal', label: 'Read', width: 92, numeric: true, value: (row) => row.readTotal, text: (row) => quiet(row.readTotal, bytes) },
 	{ id: 'writeTotal', label: 'Written', width: 92, numeric: true, value: (row) => row.writeTotal, text: (row) => quiet(row.writeTotal, bytes) },
 	{ id: 'gpu', label: 'GPU', width: 72, numeric: true, value: (row) => row.gpu, text: (row) => quiet(row.gpu, (value) => percent(value)) },
-	{ id: 'vram', label: 'Video memory', width: 112, numeric: true, value: (row) => row.vram, text: (row) => quiet(row.vram, bytes) },
+	{ id: 'vram', label: 'Video memory', width: 112, numeric: true, value: (row) => row.vram, text: (row) => quiet(row.vram, memoryBytes) },
 	{ id: 'encoder', label: 'Encode', width: 76, numeric: true, value: (row) => row.encoder, text: (row) => quiet(row.encoder, (value) => percent(value)) },
 	{ id: 'decoder', label: 'Decode', width: 76, numeric: true, value: (row) => row.decoder, text: (row) => quiet(row.decoder, (value) => percent(value)) },
 	{ id: 'time', label: 'Processor time', width: 118, numeric: true, value: (row) => row.userTime + row.systemTime, text: (row) => cpuTime(row.userTime + row.systemTime) },

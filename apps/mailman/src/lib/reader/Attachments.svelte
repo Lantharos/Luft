@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { tooltip } from '@luft/ui';
+	import { bytes, tooltip } from '@luft/ui';
 	import Download from '@lucide/svelte/icons/download';
 	import File from '@lucide/svelte/icons/file';
 	import FileImage from '@lucide/svelte/icons/file-image';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import * as api from '#lib/api/index.js';
 	import type { Attachment } from '#lib/api/index.js';
-	import { size } from '#lib/app/format.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 
 	interface Props {
@@ -38,7 +37,7 @@
 				<button type="button" class="open" onclick={() => void api.openAttachment(source, attachment.index).catch(toasts.fail)}>
 					<Icon size={17} class="flex-none text-[var(--text-muted)]" />
 					<span class="min-w-0 truncate">{attachment.name}</span>
-					<span class="flex-none text-[12px] text-[var(--text-muted)]">{size(attachment.size)}</span>
+					<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>
 				</button>
 				<button type="button" class="icon-button save" aria-label="Save" onclick={() => void save(attachment.index)} {@attach tooltip('Save')}>
 					<Download size={15} />

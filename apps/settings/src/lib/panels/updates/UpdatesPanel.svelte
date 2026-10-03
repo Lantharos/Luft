@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { Row, Section } from '@luft/ui';
-	import { bytes } from '#lib/format.js';
+	import { ago, bytes, Row, Section } from '@luft/ui';
 	import { appCount, cancel, check, download, firmware, onActivity, openApps, overview, restart, type Firmware, type Overview } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import DetailsDialog from './DetailsDialog.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
-	import { ago, recently } from './time';
+	import { recently } from './time';
 	import { describe } from './summary';
 
 	let info = $state<Overview | null>(null);

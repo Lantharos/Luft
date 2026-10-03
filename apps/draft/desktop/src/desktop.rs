@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-use luft_app::dbus;
+use luft_app::{dbus, file_manager};
 use luft_app::portal::{FileChooser, uri_path};
 use serde::Deserialize;
 use zbus::blocking::Proxy;
@@ -69,15 +69,7 @@ pub fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, String
 }
 
 pub fn show_in_folder(Target { path }: Target) -> Result<(), String> {
-    let uri = format!("file://{path}");
-    Proxy::new(
-        dbus::session()?,
-        "org.freedesktop.FileManager1",
-        "/org/freedesktop/FileManager1",
-        "org.freedesktop.FileManager1",
-    )
-    .and_then(|proxy| proxy.call::<_, _, ()>("ShowItems", &(vec![uri], "")))
-    .map_err(failed)
+    file_manager::show_in_folder(Path::new(&path))
 }
 
 pub fn open_link(Link { uri }: Link) -> Result<(), String> {

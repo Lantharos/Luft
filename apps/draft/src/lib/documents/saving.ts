@@ -1,5 +1,6 @@
+import { basename } from '@luft/ui';
 import { detectLanguage } from '#lib/editor/languages.js';
-import { basename, dirname } from '#lib/utils/paths.js';
+import { dirname } from '#lib/utils/paths.js';
 import { textChunks } from './chunks';
 import type { Document } from './document.svelte';
 import { LINE_BREAKS } from './encodings';

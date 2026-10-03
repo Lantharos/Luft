@@ -54,14 +54,12 @@
         "@codemirror/state": "^6.7.6",
         "@codemirror/view": "^6.43.13",
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
-        "markdown-it": "^15.0.2",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
-        "@types/markdown-it": "^14.2.0",
         "@types/node": "^26.6.4",
         "svelte": "^5.57.1",
         "svelte-check": "^4.7.6",
@@ -133,7 +131,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
-        "markdown-it": "^15.0.2",
       },
       "devDependencies": {
         "@luft/ui": "workspace:*",
@@ -242,8 +239,10 @@
         "@lezer/common": "^1.5.3",
         "@lezer/highlight": "^1.2.5",
         "@lucide/svelte": "^1.51.0",
+        "markdown-it": "^15.0.2",
       },
       "devDependencies": {
+        "@types/markdown-it": "^14.2.0",
         "@types/node": "^26.6.4",
         "@typescript/native": "npm:typescript@^7.0.2",
         "svelte": "^5.57.1",

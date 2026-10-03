@@ -1,7 +1,3 @@
-export function basename(path: string) {
-	return path.split('/').filter(Boolean).at(-1) ?? path;
-}
-
 export function trimTrailingSlash(path: string) {
 	return path === '/' ? path : path.replace(/\/+$/, '') || '/';
 }
@@ -14,11 +10,6 @@ export function parentPath(path: string) {
 
 export function joinPath(folder: string, name: string) {
 	return `${folder.replace(/\/+$/, '')}/${name.replace(/^\/+/, '')}`;
-}
-
-export function isInside(path: string, folder: string) {
-	const base = trimTrailingSlash(folder);
-	return path === base || path.startsWith(base === '/' ? '/' : `${base}/`);
 }
 
 export function pathSegments(path: string) {

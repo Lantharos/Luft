@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Dialog, Row, Section, TextField } from '@luft/ui';
-	import { binaryBytes, bytes } from '#lib/format.js';
+	import { bytes, Dialog, Row, Section, TextField } from '@luft/ui';
+	import { binaryBytes } from '#lib/format.js';
 	import { about, openDisks, rename, type About } from './api';
 	import RecentProblems from './RecentProblems.svelte';
 

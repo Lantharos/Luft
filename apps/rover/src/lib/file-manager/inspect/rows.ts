@@ -1,7 +1,7 @@
-import { formatClock } from '@luft/ui';
+import { bytes, formatClock, plural } from '@luft/ui';
 import type { FileEntry } from '#lib/types/index.js';
 import type { FileDetails } from '#lib/types/details.js';
-import { formatBytes, formatFullDate, plural } from '#lib/utils/format.js';
+import { formatFullDate } from '#lib/utils/format.js';
 import { parentPath } from '#lib/utils/paths.js';
 import { statusLabel } from '#lib/vcs/format.js';
 import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -29,7 +29,7 @@ export function detailRows({ entry, details, media, vcs, home, reveal }: RowSour
 			? details?.itemCount != null
 				? { label: 'Contains', value: plural(details.itemCount, 'item') }
 				: null
-			: { label: 'Size', value: formatBytes(entry.size) },
+			: { label: 'Size', value: bytes(entry.size) },
 		dimensions(details, media),
 		media?.duration ? { label: 'Duration', value: formatClock(media.duration) } : null,
 		details?.created ? { label: 'Created', value: formatFullDate(details.created) } : null,

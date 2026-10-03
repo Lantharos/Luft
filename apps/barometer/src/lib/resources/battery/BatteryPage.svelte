@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { watts } from '@luft/ui';
 	import type { BatteryInfo, BatterySample } from '#lib/backend/types.js';
-	import { duration, percent, share, watts } from '#lib/format.js';
+	import { duration, percent, share } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Page from '#lib/resources/common/Page.svelte';
@@ -58,7 +59,7 @@
 				label: battery?.state === 'Charging' ? 'Full in' : 'Time left',
 				value: battery?.secondsLeft ? duration(battery.secondsLeft) : '–'
 			},
-			{ label: battery?.state === 'Charging' ? 'Charging at' : 'Drawing', value: watts(battery?.power ?? null) },
+			{ label: battery?.state === 'Charging' ? 'Charging at' : 'Drawing', value: battery?.power == null ? '–' : watts(battery.power) },
 			{ label: 'Health', value: percent(health), detail: 'Capacity compared to new' },
 			{ label: 'Charge cycles', value: battery?.cycles ? String(battery.cycles) : '–' }
 		]}

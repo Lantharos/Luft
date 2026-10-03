@@ -1,11 +1,8 @@
+import { basename } from '@luft/ui';
 import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 import { pane, remove, sessions, split, type Direction, type LayoutNode } from './layout';
 
 let nextKey = 0;
-
-function basename(path: string) {
-	return path.split('/').filter(Boolean).at(-1) ?? '/';
-}
 
 export class Tab {
 	readonly key = `tab-${++nextKey}`;

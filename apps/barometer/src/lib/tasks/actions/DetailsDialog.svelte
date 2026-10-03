@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { AppIcon, Dialog } from '@luft/ui';
+	import { AppIcon, Dialog, memoryBytes } from '@luft/ui';
 	import type { Details } from '#lib/backend/types.js';
-	import { bytes, count, cpuTime, date, duration, percent, rate } from '#lib/format.js';
+	import { count, cpuTime, date, duration, percent, rate } from '#lib/format.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { processes } from '#lib/state/processes.svelte.js';
 	import { desktopId } from '../icons';
@@ -44,12 +44,12 @@
 			{ label: 'Open files', value: details.openFiles === null ? null : count(details.openFiles) },
 			{ label: 'Runs in', value: details.container },
 			{ label: 'Control group', value: details.cgroup, mono: true, wrap: true },
-			{ label: 'Resident memory', value: details.resident === null ? null : bytes(details.resident) },
-			{ label: 'Private', value: details.anonymous === null ? null : bytes(details.anonymous) },
-			{ label: 'Mapped files', value: details.fileBacked === null ? null : bytes(details.fileBacked) },
-			{ label: 'Shared', value: details.shared === null ? null : bytes(details.shared) },
-			{ label: 'Swapped out', value: details.swap ? bytes(details.swap) : null },
-			{ label: 'Address space', value: details.virtualSize === null ? null : bytes(details.virtualSize) },
+			{ label: 'Resident memory', value: details.resident === null ? null : memoryBytes(details.resident) },
+			{ label: 'Private', value: details.anonymous === null ? null : memoryBytes(details.anonymous) },
+			{ label: 'Mapped files', value: details.fileBacked === null ? null : memoryBytes(details.fileBacked) },
+			{ label: 'Shared', value: details.shared === null ? null : memoryBytes(details.shared) },
+			{ label: 'Swapped out', value: details.swap ? memoryBytes(details.swap) : null },
+			{ label: 'Address space', value: details.virtualSize === null ? null : memoryBytes(details.virtualSize) },
 			{ label: 'Context switches', value: details.switches === null ? null : count(details.switches) },
 			{ label: 'Out of memory score', value: details.oomScore === null ? null : String(details.oomScore) }
 		].filter((row) => row.value);
@@ -67,7 +67,7 @@
 
 	{#if live}
 		<div class="usage">
-			{#each [['Processor', percent(live.cpu, 1)], ['Memory', bytes(live.memory)], ['Disk', rate(live.read + live.write)], ['Processor time', cpuTime(live.userTime + live.systemTime)]] as [label, value] (label)}
+			{#each [['Processor', percent(live.cpu, 1)], ['Memory', memoryBytes(live.memory)], ['Disk', rate(live.read + live.write)], ['Processor time', cpuTime(live.userTime + live.systemTime)]] as [label, value] (label)}
 				<div class="flex flex-col gap-0.5">
 					<span class="text-[12px] text-[var(--text-muted)]">{label}</span>
 					<span>{value}</span>

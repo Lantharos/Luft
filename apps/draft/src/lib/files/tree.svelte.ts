@@ -1,6 +1,7 @@
+import { isInside } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import type { Backend, Entry } from '#lib/bridge/types.js';
-import { dirname, isInside } from '#lib/utils/paths.js';
+import { dirname } from '#lib/utils/paths.js';
 
 export interface TreeRow {
 	entry: Entry;

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Dialog } from '@luft/ui';
+	import { bytes, Dialog, plural } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import * as features from '#lib/features/api.js';
 	import type { Measurement, Ownership } from '#lib/features/types.js';
 	import type { FileEntry } from '#lib/types/index.js';
 	import type { FileDetails } from '#lib/types/details.js';
-	import { errorMessage, formatBytes, formatFullDate, plural } from '#lib/utils/format.js';
+	import { errorMessage, formatFullDate } from '#lib/utils/format.js';
 	import { parentPath } from '#lib/utils/paths.js';
 	import DefaultApp from './DefaultApp.svelte';
 	import PermissionGrid from './PermissionGrid.svelte';
@@ -61,11 +61,11 @@
 	}
 
 	function sizeText() {
-		if (!measured) return single ? `${formatBytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
+		if (!measured) return single ? `${bytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
 		if (!measurement) return 'Measuring…';
 		const contents = plural(measurement.files, 'file');
 		const folders = measurement.folders > 0 ? `, ${plural(measurement.folders, 'folder')}` : '';
-		return `${formatBytes(measurement.bytes)} · ${contents}${folders}${measurement.done ? '' : '…'}`;
+		return `${bytes(measurement.bytes)} · ${contents}${folders}${measurement.done ? '' : '…'}`;
 	}
 
 	async function changeMode(mode: number) {

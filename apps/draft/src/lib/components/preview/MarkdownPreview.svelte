@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { renderMarkdown } from '@luft/ui';
 	import { highlight } from '@luft/ui/code';
 	import { useApp } from '#lib/context.js';
 	import { openPath } from '#lib/documents/opening.js';
-	import { renderMarkdown } from '#lib/preview/markdown.js';
 	import { dirname, join } from '#lib/utils/paths.js';
 
 	const app = useApp();

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Row, Section, Switch } from '@luft/ui';
+	import { Row, Section, Switch, watts } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
-	import { duration, wattHours, watts } from './format';
+	import { duration, wattHours } from './format';
 	import Level from './Level.svelte';
 
 	const LOW_LEVEL = 10;

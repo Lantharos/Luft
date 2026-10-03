@@ -1,8 +1,8 @@
+import { basename } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { IconName } from '#lib/components/Icon.svelte';
 import { isDesktopRuntime } from '#lib/runtime.js';
 import type { Operation, UserDirs } from '#lib/types/index.js';
-import { basename } from '#lib/utils/paths.js';
 import { previewTrash } from '../preview';
 
 export type Place = { path: string; label: string; icon: IconName };

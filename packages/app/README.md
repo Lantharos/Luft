@@ -77,6 +77,12 @@ use luft_app::portal::{self, Filter};
 let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["*.png".into()] })?;
 ```
 
+`portal::path_uri` turns a path into a `file://` URI, and `portal::uri_path` turns one back.
+
+## Showing files
+
+`file_manager::show_in_folder(path)` opens the file manager at the folder containing `path` with it selected, and `file_manager::show_folder(path)` opens the folder itself. Both go through the `org.freedesktop.FileManager1` D-Bus interface, so they work with whichever file manager the desktop uses.
+
 ## Secrets
 
 `secrets` keeps tokens, API keys and sign-ins in Luft Keyring where only the app that stored them can read them back, without prompts. Other apps are told there's nothing there.

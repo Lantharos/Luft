@@ -37,6 +37,10 @@ export { default as VolumeControl } from './playback/VolumeControl.svelte';
 
 export { default as RecoveryKey } from './security/RecoveryKey.svelte';
 
+export { ago, bytes, memoryBytes, plural, watts } from './text/format';
+export { renderMarkdown } from './text/markdown';
+export { basename, isInside } from './text/paths';
+
 export { default as GlassShell } from './shell/GlassShell.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
 

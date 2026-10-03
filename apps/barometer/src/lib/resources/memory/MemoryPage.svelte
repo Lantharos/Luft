@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { memoryBytes } from '@luft/ui';
 	import type { MemorySample } from '#lib/backend/types.js';
-	import { bytes, percent, share } from '#lib/format.js';
+	import { percent, share } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Meter from '#lib/resources/common/Meter.svelte';
@@ -17,14 +18,14 @@
 	const inUse = (sample: MemorySample) => sample.total - sample.available;
 </script>
 
-<Page title="Memory" detail={memory ? `${bytes(memory.total)} installed` : null}>
+<Page title="Memory" detail={memory ? `${memoryBytes(memory.total)} installed` : null}>
 	<Chart
 		title="In use"
 		tall
 		max={memory?.total ?? 1}
 		lines={[{ values: monitor.ticks.map((tick) => inUse(tick.memory)) }]}
-		legend={[{ label: 'Now', value: memory ? `${bytes(used)} (${percent(share(used, memory.total))})` : '–' }]}
-		scale={(max) => bytes(max)}
+		legend={[{ label: 'Now', value: memory ? `${memoryBytes(used)} (${percent(share(used, memory.total))})` : '–' }]}
+		scale={(max) => memoryBytes(max)}
 	/>
 
 	{#if memory}
@@ -34,23 +35,23 @@
 				label="Memory composition"
 				total={memory.total}
 				segments={[
-					{ label: 'In use', value: used, display: bytes(used), tone: 'accent' },
-					{ label: 'Cache', value: memory.available - memory.free, display: bytes(memory.available - memory.free), tone: 'soft' },
-					{ label: 'Free', value: memory.free, display: bytes(memory.free), tone: 'empty' }
+					{ label: 'In use', value: used, display: memoryBytes(used), tone: 'accent' },
+					{ label: 'Cache', value: memory.available - memory.free, display: memoryBytes(memory.available - memory.free), tone: 'soft' },
+					{ label: 'Free', value: memory.free, display: memoryBytes(memory.free), tone: 'empty' }
 				]}
 			/>
 		</section>
 
 		<Stats
 			stats={[
-				{ label: 'In use', value: bytes(used), detail: `of ${bytes(memory.total)}` },
-				{ label: 'Available', value: bytes(memory.available) },
-				{ label: 'Apps', value: bytes(memory.anon), detail: 'Private memory of programs' },
-				{ label: 'Cached files', value: bytes(memory.cached + memory.buffers) },
-				{ label: 'Shared', value: bytes(memory.shared) },
-				{ label: 'Kernel', value: bytes(memory.kernel) },
-				{ label: 'Waiting to be written', value: bytes(memory.dirty) },
-				{ label: 'Committed', value: bytes(memory.committed), detail: 'Promised to programs' }
+				{ label: 'In use', value: memoryBytes(used), detail: `of ${memoryBytes(memory.total)}` },
+				{ label: 'Available', value: memoryBytes(memory.available) },
+				{ label: 'Apps', value: memoryBytes(memory.anon), detail: 'Private memory of programs' },
+				{ label: 'Cached files', value: memoryBytes(memory.cached + memory.buffers) },
+				{ label: 'Shared', value: memoryBytes(memory.shared) },
+				{ label: 'Kernel', value: memoryBytes(memory.kernel) },
+				{ label: 'Waiting to be written', value: memoryBytes(memory.dirty) },
+				{ label: 'Committed', value: memoryBytes(memory.committed), detail: 'Promised to programs' }
 			]}
 		/>
 
@@ -59,19 +60,19 @@
 				title="Swap"
 				max={memory.swapTotal}
 				lines={[{ values: monitor.ticks.map((tick) => tick.memory.swapTotal - tick.memory.swapFree), tone: 'soft' }]}
-				legend={[{ label: 'Now', value: `${bytes(swapUsed)} of ${bytes(memory.swapTotal)}`, tone: 'soft' }]}
-				scale={(max) => bytes(max)}
+				legend={[{ label: 'Now', value: `${memoryBytes(swapUsed)} of ${memoryBytes(memory.swapTotal)}`, tone: 'soft' }]}
+				scale={(max) => memoryBytes(max)}
 			/>
 		{/if}
 
 		<Facts
 			title="Swap and compression"
 			facts={[
-				...(memory.swaps ?? []).map((swap) => ({ label: `${swap.name} · ${SWAP_KINDS[swap.kind] ?? swap.kind}`, value: `${bytes(swap.used)} of ${bytes(swap.size)}` })),
-				{ label: 'Swapped back in', value: memory.swapCached ? bytes(memory.swapCached) : null },
+				...(memory.swaps ?? []).map((swap) => ({ label: `${swap.name} · ${SWAP_KINDS[swap.kind] ?? swap.kind}`, value: `${memoryBytes(swap.used)} of ${memoryBytes(swap.size)}` })),
+				{ label: 'Swapped back in', value: memory.swapCached ? memoryBytes(memory.swapCached) : null },
 				{
 					label: 'Compressed',
-					value: memory.compressed ? `${bytes(memory.compressed.stored)} stored in ${bytes(memory.compressed.size)}` : null
+					value: memory.compressed ? `${memoryBytes(memory.compressed.stored)} stored in ${memoryBytes(memory.compressed.size)}` : null
 				},
 				{
 					label: 'Compression ratio',

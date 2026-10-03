@@ -1,9 +1,8 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import { Segmented, VirtualScroller } from '@luft/ui';
+	import { bytes, Segmented, VirtualScroller } from '@luft/ui';
 	import type { InstalledApp, Source } from '#lib/bridge/types.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { bytes } from '#lib/format.js';
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';

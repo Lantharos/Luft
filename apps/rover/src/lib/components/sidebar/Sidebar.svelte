@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { SearchField } from '@luft/ui';
+	import { isInside, SearchField } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey, TRASH_DROP_PATH } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
 	import { userFolders, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import { isInside } from '#lib/utils/paths.js';
 	import DriveItem from './DriveItem.svelte';
 	import FavoritesGroup from './FavoritesGroup.svelte';
 	import NetworkItem from './NetworkItem.svelte';

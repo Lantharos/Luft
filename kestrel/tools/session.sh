@@ -57,7 +57,13 @@ cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.t
 home="$session/state/luft-home"
 mkdir -p "$home/.local/share"
 ln -sfn "$HOME/.local/share/sabine" "$home/.local/share/sabine"
+export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export HOME="$home"
+
+runtime="${XDG_RUNTIME_DIR:-/tmp}/kestrel-$(printf '%s' "$session" | sha1sum | cut -c1-12)"
+export PIPEWIRE_RUNTIME_DIR="$runtime-pipewire" PULSE_RUNTIME_PATH="$runtime-pulse" CUPS_SERVER="$runtime-cups.sock" KESTREL_AUTHENTICATE_SOCK="$runtime-authenticate.sock"
+export PULSE_SERVER="unix:$PULSE_RUNTIME_PATH/native"
+export KESTREL_APP_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}/ka-$(printf '%s' "$session" | sha1sum | cut -c1-8)"
 
 scope="kestrel-session-$(printf '%s' "$session" | sha1sum | cut -c1-12)"
 trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true' EXIT
@@ -82,10 +88,7 @@ systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$sc
   export KESTREL_SYSTEM_BUS
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" gjs -m "$root/kestrel/tools/fixtures/systemBus.js" &
   timeout 5 gdbus wait --address "$KESTREL_SYSTEM_BUS" com.lantharos.KestrelChecks
-  runtime="${XDG_RUNTIME_DIR:-/tmp}/kestrel-$(printf "%s" "$session" | sha1sum | cut -c1-12)"
-  export PIPEWIRE_RUNTIME_DIR="$runtime-pipewire" CUPS_SERVER="$runtime-cups.sock" KESTREL_AUTHENTICATE_SOCK="$runtime-authenticate.sock"
-  export KESTREL_APP_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}/ka-$(printf "%s" "$session" | sha1sum | cut -c1-8)"
-  mkdir -p "$PIPEWIRE_RUNTIME_DIR"
+  mkdir -p "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH"
   mkdir -m 700 -p "$KESTREL_APP_RUNTIME_DIR"
   rm -f "$KESTREL_AUTHENTICATE_SOCK"
   pipewire -c "$root/kestrel/tools/fixtures/services/pipewire.conf" &
@@ -94,8 +97,9 @@ systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$sc
   print_server_pid=$!
   gjs -m "$root/kestrel/tools/fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK" &
   authenticator_pid=$!
-  trap "kill $system_bus_PID $pipewire_pid $print_server_pid $authenticator_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\" \"$KESTREL_APP_RUNTIME_DIR\" \"$KESTREL_AUTHENTICATE_SOCK\"" EXIT
+  trap "kill $system_bus_PID $pipewire_pid $print_server_pid $authenticator_pid; rm -rf \"$PIPEWIRE_RUNTIME_DIR\" \"$PULSE_RUNTIME_PATH\" \"$KESTREL_APP_RUNTIME_DIR\" \"$KESTREL_AUTHENTICATE_SOCK\"" EXIT
   timeout 5 gdbus wait --session com.lantharos.KestrelChecks.Authenticator
+  timeout 5 bash -c "until [[ -S \"$PULSE_RUNTIME_PATH/native\" ]]; do sleep 0.1; done"
   timeout 10 bash -c "until [[ \"\$(lpstat -d 2> /dev/null)\" == *Office* ]]; do sleep 0.1; done"
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local "$root/kestrel/settings/target/release/kestrel-settings" \
     --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings &

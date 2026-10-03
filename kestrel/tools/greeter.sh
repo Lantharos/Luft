@@ -63,6 +63,7 @@ export KESTREL_GREETER_EVENTS="$events"
 export KESTREL_GREETER_IMAGES="$run/images"
 export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
 export GSETTINGS_BACKEND=memory
+export PIPEWIRE_RUNTIME_DIR="$socket_dir" PULSE_SERVER="unix:$socket_dir/pulse"
 export XDG_DATA_DIRS="$run/data:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(printf '%s' "$run" | sha1sum | cut -c1-12)"
 ln -sfn "$run/cache" "$cache_link"

@@ -3,7 +3,6 @@
 #include "config.h"
 
 #include "shell-app-system.h"
-#include "shell-app-usage.h"
 #include <string.h>
 
 #include <gio/gio.h>

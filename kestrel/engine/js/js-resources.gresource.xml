@@ -72,7 +72,6 @@
     <file>ui/mpris.js</file>
     <file>ui/notificationDaemon.js</file>
     <file>ui/osdWindow.js</file>
-    <file>ui/padOsd.js</file>
     <file>ui/pageIndicators.js</file>
     <file>ui/panel.js</file>
     <file>ui/desktopControls.js</file>
@@ -83,7 +82,6 @@
     <file>ui/ripples.js</file>
     <file>ui/screenShield.js</file>
     <file>ui/screenshot.js</file>
-    <file>ui/scripting.js</file>
     <file>ui/sessionMode.js</file>
     <file>ui/shellDBus.js</file>
     <file>ui/shellEntry.js</file>

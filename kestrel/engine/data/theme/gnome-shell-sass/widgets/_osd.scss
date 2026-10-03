@@ -34,19 +34,6 @@ $osd_levelbar_height:6px;
   }
 }
 
-/* Pad OSD */
-.pad-osd-window {
-  padding: 32px;
-  background-color: transparentize(#000, 0.2);
-
-  .pad-osd-title-box { spacing: 12px; }
-  .pad-osd-title-menu-box { spacing: 6px; }
-}
-
-.combo-box-label {
-  width: 15em;
-}
-
 .resize-popup {
   @extend %osd_panel;
 }

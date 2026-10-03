@@ -5,8 +5,6 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import {toggleSurface, dismissImmediately} from 'resource:///org/gnome/shell/ui/kestrelUi.js';
 
-export const METRICS = {};
-
 const pause = milliseconds => new Promise(resolve => {
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {
         resolve();

@@ -1,6 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 #pragma once
 
+#include <meta/meta-startup-notification.h>
+
 #include "shell-app.h"
 #include "shell-app-system.h"
 

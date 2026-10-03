@@ -2662,7 +2662,7 @@ export async function captureScreenshot(texture, geometry, scale, cursor) {
 /**
  * Shows the screenshot UI.
  */
-export function showScreenshotUI() {
+function showScreenshotUI() {
     Main.screenshotUI.open().catch(err => {
         logError(err, 'Error opening the screenshot UI');
     });

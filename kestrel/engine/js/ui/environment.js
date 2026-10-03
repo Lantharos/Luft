@@ -116,14 +116,12 @@ function _makeEasePrepareAndCleanup(duration) {
     let canCleanup = false;
     const prepare = () => {
         global.compositor.disable_unredirect();
-        global.begin_work();
         canCleanup = true;
     };
     const cleanup = () => {
         if (!canCleanup)
             return;
         global.compositor.enable_unredirect();
-        global.end_work();
     };
 
     return {prepare, cleanup};

@@ -11,7 +11,6 @@ G_BEGIN_DECLS
 
 #include "shell-window-tracker.h"
 #include "shell-app-system.h"
-#include "shell-app-usage.h"
 #include "shell-wm.h"
 
 #define SHELL_TYPE_GLOBAL (shell_global_get_type ())
@@ -51,32 +50,6 @@ void    shell_global_get_pointer             (ShellGlobal         *global,
                                               int                 *y,
                                               ClutterModifierType *mods);
 
-typedef struct {
-  guint glibc_uordblks;
-
-  guint js_bytes;
-
-  guint gjs_boxed;
-  guint gjs_gobject;
-  guint gjs_function;
-  guint gjs_closure;
-
-  /* 32 bit to avoid js conversion problems with 64 bit */
-  guint  last_gc_seconds_ago;
-} ShellMemoryInfo;
-
-/* Run-at-leisure API */
-void shell_global_begin_work     (ShellGlobal          *global);
-void shell_global_end_work       (ShellGlobal          *global);
-
-typedef void (*ShellLeisureFunction) (gpointer data);
-
-void shell_global_run_at_leisure (ShellGlobal          *global,
-                                  ShellLeisureFunction  func,
-                                  gpointer              user_data,
-                                  GDestroyNotify        notify);
-
-
 /* Misc utilities / Shell API */
 GDBusProxy *
          shell_global_get_switcheroo_control    (ShellGlobal  *global);
@@ -109,15 +82,5 @@ GVariant * shell_global_get_persistent_state    (ShellGlobal  *global,
 ShellWindowTracker * shell_global_get_window_tracker (ShellGlobal *global);
 
 ShellAppSystem *     shell_global_get_app_system     (ShellGlobal *global);
-
-ShellAppUsage *      shell_global_get_app_usage      (ShellGlobal *global);
-
-gboolean shell_global_get_frame_timestamps (ShellGlobal *global);
-void shell_global_set_frame_timestamps (ShellGlobal *global,
-                                        gboolean     enable);
-
-gboolean shell_global_get_frame_finish_timestamp (ShellGlobal *global);
-void shell_global_set_frame_finish_timestamp (ShellGlobal *global,
-                                              gboolean     enable);
 
 G_END_DECLS

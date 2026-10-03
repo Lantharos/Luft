@@ -18,7 +18,6 @@ import 'gi://NM?version=1.0';
 import 'gi://Pango?version=1.0';
 import 'gi://Polkit?version=1.0';
 import 'gi://PolkitAgent?version=1.0';
-import 'gi://Rsvg?version=2.0';
 import 'gi://UPowerGlib?version=1.0';
 
 import * as Config from './config.js';

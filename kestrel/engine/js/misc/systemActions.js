@@ -6,7 +6,6 @@ import GObject from 'gi://GObject';
 import {logErrorUnlessCancelled} from './errorUtils.js';
 import * as GnomeSession from './gnomeSession.js';
 import * as Main from '../ui/main.js';
-import * as Screenshot from '../ui/screenshot.js';
 
 const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
@@ -21,7 +20,6 @@ const LOCK_SCREEN_ACTION_ID      = 'lock-screen';
 const LOGOUT_ACTION_ID           = 'logout';
 const SUSPEND_ACTION_ID          = 'suspend';
 const LOCK_ORIENTATION_ACTION_ID = 'lock-orientation';
-const SCREENSHOT_UI_ACTION_ID    = 'open-screenshot-ui';
 
 let _singleton = null;
 
@@ -77,66 +75,14 @@ const SystemActions = GObject.registerClass({
         this._canHaveSuspend = true;
         this._suspendNeedsAuth = false;
 
-        function tokenizeKeywords(keywords) {
-            return keywords.split(';').map(keyword => GLib.str_tokenize_and_fold(keyword, null)).flat(2);
-        }
-
-        this._actions = new Map();
-        this._actions.set(POWER_OFF_ACTION_ID, {
-            // Translators: The name of the power-off action in search
-            name: C_('search-result', 'Power Off'),
-            iconName: 'system-shutdown-symbolic',
-            // Translators: A list of keywords that match the power-off action, separated by semicolons
-            keywords: tokenizeKeywords(_('power off;poweroff;shutdown;halt;stop')),
-            available: false,
-        });
-        this._actions.set(RESTART_ACTION_ID, {
-            // Translators: The name of the restart action in search
-            name: C_('search-result', 'Restart'),
-            iconName: 'system-reboot-symbolic',
-            // Translators: A list of keywords that match the restart action, separated by semicolons
-            keywords: tokenizeKeywords(_('reboot;restart;')),
-            available: false,
-        });
-        this._actions.set(LOCK_SCREEN_ACTION_ID, {
-            // Translators: The name of the lock screen action in search
-            name: C_('search-result', 'Lock Screen'),
-            iconName: 'system-lock-screen-symbolic',
-            // Translators: A list of keywords that match the lock screen action, separated by semicolons
-            keywords: tokenizeKeywords(_('lock screen')),
-            available: false,
-        });
-        this._actions.set(LOGOUT_ACTION_ID, {
-            // Translators: The name of the logout action in search
-            name: C_('search-result', 'Log Out'),
-            iconName: 'system-log-out-symbolic',
-            // Translators: A list of keywords that match the logout action, separated by semicolons
-            keywords: tokenizeKeywords(_('logout;log out;sign off')),
-            available: false,
-        });
-        this._actions.set(SUSPEND_ACTION_ID, {
-            // Translators: The name of the suspend action in search
-            name: C_('search-result', 'Suspend'),
-            iconName: 'media-playback-pause-symbolic',
-            // Translators: A list of keywords that match the suspend action, separated by semicolons
-            keywords: tokenizeKeywords(_('suspend;sleep')),
-            available: false,
-        });
-        this._actions.set(LOCK_ORIENTATION_ACTION_ID, {
-            name: '',
-            iconName: '',
-            // Translators: A list of keywords that match the lock orientation action, separated by semicolons
-            keywords: tokenizeKeywords(_('lock orientation;unlock orientation;screen;rotation')),
-            available: false,
-        });
-        this._actions.set(SCREENSHOT_UI_ACTION_ID, {
-            // Translators: The name of the screenshot UI action in search
-            name: C_('search-result', 'Take a Screenshot'),
-            iconName: 'record-screen-symbolic',
-            // Translators: A list of keywords that match the screenshot UI action, separated by semicolons
-            keywords: tokenizeKeywords(_('screenshot;screencast;snip;capture;record')),
-            available: true,
-        });
+        this._actions = new Map([
+            [POWER_OFF_ACTION_ID, {available: false}],
+            [RESTART_ACTION_ID, {available: false}],
+            [LOCK_SCREEN_ACTION_ID, {available: false}],
+            [LOGOUT_ACTION_ID, {available: false}],
+            [SUSPEND_ACTION_ID, {available: false}],
+            [LOCK_ORIENTATION_ACTION_ID, {iconName: '', available: false}],
+        ]);
 
         this._lockdownSettings = new Gio.Settings({schema_id: LOCKDOWN_SCHEMA});
         this._orientationSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.touchscreen'});
@@ -233,19 +179,9 @@ const SystemActions = GObject.registerClass({
 
     _updateOrientationLockStatus() {
         const locked = this._orientationSettings.get_boolean('orientation-lock');
-        const action = this._actions.get(LOCK_ORIENTATION_ACTION_ID);
-
-        // Translators: The name of the lock orientation action in search
-        // and in the system status menu
-        const name = locked
-            ? C_('search-result', 'Unlock Screen Rotation')
-            : C_('search-result', 'Lock Screen Rotation');
-        const iconName = locked
+        this._actions.get(LOCK_ORIENTATION_ACTION_ID).iconName = locked
             ? 'rotation-locked-symbolic'
             : 'rotation-allowed-symbolic';
-
-        action.name = name;
-        action.iconName = iconName;
 
         this.notify('orientation-lock-icon');
     }
@@ -265,59 +201,6 @@ const SystemActions = GObject.registerClass({
         this._updateHaveShutdown();
         this._updateHaveReboot();
         this._updateHaveSuspend();
-    }
-
-    getMatchingActions(terms) {
-        // terms is a list of strings
-        terms = terms.map(
-            term => GLib.str_tokenize_and_fold(term, null)[0]).flat(2);
-
-        // tokenizing may return an empty array
-        if (terms.length === 0)
-            return [];
-
-        const results = [];
-
-        for (const [key, {available, keywords}] of this._actions) {
-            if (available && terms.every(t => keywords.some(k => k.startsWith(t))))
-                results.push(key);
-        }
-
-        return results;
-    }
-
-    getName(id) {
-        return this._actions.get(id).name;
-    }
-
-    getIconName(id) {
-        return this._actions.get(id).iconName;
-    }
-
-    activateAction(id) {
-        switch (id) {
-        case POWER_OFF_ACTION_ID:
-            this.activatePowerOff();
-            break;
-        case RESTART_ACTION_ID:
-            this.activateRestart();
-            break;
-        case LOCK_SCREEN_ACTION_ID:
-            this.activateLockScreen();
-            break;
-        case LOGOUT_ACTION_ID:
-            this.activateLogout();
-            break;
-        case SUSPEND_ACTION_ID:
-            this.activateSuspend();
-            break;
-        case LOCK_ORIENTATION_ACTION_ID:
-            this.activateLockOrientation();
-            break;
-        case SCREENSHOT_UI_ACTION_ID:
-            this.activateScreenshotUI();
-            break;
-        }
     }
 
     _updateLockScreen() {
@@ -440,12 +323,5 @@ const SystemActions = GObject.registerClass({
             throw new Error('The suspend action is not available!');
 
         this._session.SuspendAsync().catch(logErrorUnlessCancelled);
-    }
-
-    activateScreenshotUI() {
-        if (!this._actions.get(SCREENSHOT_UI_ACTION_ID).available)
-            throw new Error('The screenshot UI action is not available!');
-
-        Screenshot.showScreenshotUI();
     }
 });

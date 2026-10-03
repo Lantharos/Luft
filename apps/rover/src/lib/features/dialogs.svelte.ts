@@ -4,7 +4,8 @@ export type OpenDialog =
 	| { kind: 'properties'; entries: FileEntry[] }
 	| { kind: 'rename'; entries: FileEntry[] }
 	| { kind: 'compress'; entries: FileEntry[]; destination: string }
-	| { kind: 'empty-trash'; trashPath: string | null };
+	| { kind: 'empty-trash'; trashPath: string | null }
+	| { kind: 'connect' };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);
@@ -19,11 +20,15 @@ class Dialogs {
 		this.current = { kind: 'empty-trash', trashPath };
 	};
 
+	connect = () => {
+		this.current = { kind: 'connect' };
+	};
+
 	close = () => {
 		this.current = null;
 	};
 
-	#open(dialog: Exclude<OpenDialog, { kind: 'empty-trash' }>) {
+	#open(dialog: Extract<OpenDialog, { entries: FileEntry[] }>) {
 		if (dialog.entries.length > 0) this.current = dialog;
 	}
 }

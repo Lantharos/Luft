@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog, Row, Section, TextField } from '@luft/ui';
 	import { binaryBytes, bytes } from '$lib/format';
-	import { about, rename, type About } from './api';
+	import { about, openDisks, rename, type About } from './api';
 	import RecentProblems from './RecentProblems.svelte';
 
 	let info = $state<About | null>(null);
@@ -58,6 +58,9 @@
 		{#if info.storage}
 			{@const storage = info.storage}
 			<Row title="Storage" description="{bytes(storage.free)} free of {bytes(storage.total)}">
+				{#if storage.manageable}
+					<button type="button" class="button" onclick={openDisks}>Manage drives</button>
+				{/if}
 				{#snippet below()}
 					<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
 						<div class="h-full rounded-full bg-[var(--accent)]" style:width="{((storage.total - storage.free) / storage.total) * 100}%"></div>

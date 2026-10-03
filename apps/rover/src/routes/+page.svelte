@@ -57,6 +57,8 @@
 				trash.receiveOperations(operations);
 			}),
 			api.events.drives(manager.reloadDrives),
+			api.events.network(manager.reloadNetwork),
+			api.events.networkAsk(manager.network.receiveAsk),
 			api.events.vcsStatus(vcs.receive),
 			api.events.directory(({ path }) => {
 				void manager.refreshListing(path);

@@ -3,11 +3,13 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {LuftApp, startSabineService, waitFor} from './luftApp.js';
+import {checkDisks} from './disksChecks.js';
 import {checkFontViewer} from './fontViewer.js';
+import {checkRoverNetwork} from './roverNetworkChecks.js';
 import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
 
-const APPS = ['rover', 'settings', 'draft', 'tern', 'magpie', 'mailman', 'barometer', 'schelf', 'keys'];
+const APPS = ['rover', 'settings', 'disks', 'draft', 'tern', 'magpie', 'mailman', 'barometer', 'schelf', 'keys'];
 const TRANSLUCENT = {tern: 40};
 const OPAQUE = 2;
 const SURFACE_SHARE = 0.5;
@@ -104,6 +106,8 @@ export async function checkLuftApps({output, pointer}) {
     await checkSettingsPages(darkFrames.settings, context);
     await checkSettingsHardware(context);
     await checkFontViewer(darkFrames.magpie, context);
+    await checkDisks(context);
+    await checkRoverNetwork(context);
   } finally {
     styles.interface.set_string('color-scheme', saved.scheme);
     styles.kestrel.set_boolean('pure-black', saved.pureBlack);

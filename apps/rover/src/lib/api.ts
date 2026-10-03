@@ -1,5 +1,17 @@
 import { invoke, listen } from '@lantharos/sabine';
-import type { AppState, DirectoryContents, DriveInfo, FileEntry, Operation, Settings, TrashContents } from './types';
+import type {
+	AppState,
+	DirectoryContents,
+	DriveInfo,
+	FileEntry,
+	NetworkAnswer,
+	NetworkAsk,
+	NetworkLocation,
+	NetworkPlace,
+	Operation,
+	Settings,
+	TrashContents
+} from './types';
 import type { FileDetails, OpenWithApps } from './types/details';
 import type { VcsRoot, VcsStatusEvent } from './vcs/types';
 
@@ -22,6 +34,13 @@ export const openWithApp = (path: string, app: string) => invoke<void>('open_wit
 
 export const listDrives = () => invoke<DriveInfo[]>('list_drives');
 export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
+export const manageDrive = (mountPoint: string) => invoke<void>('manage_drive', { mountPoint });
+
+export const networkLocations = () => invoke<NetworkLocation[]>('network_locations');
+export const connectNetwork = (uri: string) => invoke<NetworkLocation>('network_connect', { uri });
+export const answerNetwork = (answer: NetworkAnswer) => invoke<void>('network_answer', { ...answer });
+export const disconnectNetwork = (uri: string) => invoke<void>('network_disconnect', { uri });
+export const discoverNetwork = () => invoke<NetworkPlace[]>('network_discover');
 
 export const recentFiles = () => invoke<FileEntry[]>('recent_files');
 export const trashCount = () => invoke<number>('trash_count');
@@ -56,6 +75,8 @@ export type SingleInstanceActivation = {
 export const events = {
 	operations: (callback: (operations: Operation[]) => void) => listen('rover.operations', callback),
 	drives: (callback: () => void) => listen('rover.drives', callback),
+	network: (callback: () => void) => listen('rover.network', callback),
+	networkAsk: (callback: (ask: NetworkAsk) => void) => listen('rover.network.ask', callback),
 	directory: (callback: (event: { path: string }) => void) => listen('rover.directory', callback),
 	vcsStatus: (callback: (event: VcsStatusEvent) => void) => listen('rover.vcs', callback),
 	activation: (callback: (activation: SingleInstanceActivation) => void) => listen('singleInstance.activate', callback)

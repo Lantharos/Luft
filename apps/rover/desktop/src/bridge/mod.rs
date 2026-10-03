@@ -19,6 +19,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = register_vcs(window, state);
     let window = tools::register(window, state);
     let window = crate::places::register(crate::inspect::register(window));
+    let window = crate::network::register(window, &state.events);
     register_app(window, state)
 }
 
@@ -34,7 +35,12 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .with(
             "count_items",
             state,
-            |state, Counting { paths, show_hidden }| {
+            |state,
+             Counting {
+                 mut paths,
+                 show_hidden,
+             }| {
+                paths.retain(|path| !crate::network::is_remote(path));
                 state.counts.request(paths, show_hidden);
                 Ok(())
             },
@@ -81,6 +87,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("list_drives", |Empty {}| Ok(drives::list_drives()))
         .command("eject_drive", |MountPoint { mount_point }| {
             drives::eject_drive(mount_point)
+        })
+        .command("manage_drive", |MountPoint { mount_point }| {
+            drives::manage(&mount_point)
         })
 }
 

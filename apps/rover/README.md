@@ -23,11 +23,14 @@ Rover is a file manager for Linux built with Sabine and SvelteKit. In the Luft m
 - Drag and drop within Rover and to or from other apps. Holding a dragged file over a folder, in the views or the sidebar, opens it
 - Trash across the home folder and mounted drives, with restore
 - Favorites you can add from the context menu or by dropping files on the sidebar, and reorder by dragging
-- Drives with their usage in the sidebar, and eject for removable drives
+- Drives with their usage in the sidebar, and eject for removable drives. "Manage drive…" in a drive's menu opens it in Disks
+- Network locations over SFTP, Windows shares (SMB), FTP, WebDAV and NFS. Type an address such as `sftp://example.com` or `smb://server/share` into the path bar, or use Connect to server in the menu, which also lists recent servers and the ones it finds on your network. Rover asks for a password when the server wants one and can remember it in your keyring, and opens `sftp://`, `smb://`, `dav://`, `davs://` and `nfs://` links from other apps. Connected locations appear in the sidebar with a button to disconnect, and the ones you keep stay there for next time
 - Git and Pig status badges, diffs, commits and sync for the folder you are in
-- Inline create and rename, marquee selection and an editable path bar that completes folder names with `Tab`
+- Inline create and rename, marquee selection and an editable path bar that completes folder names with `Tab` and selects the whole location when you click into it, so typing or pasting replaces it
 - A file chooser for apps that use the xdg-desktop-portal picker
 - `org.freedesktop.FileManager1`, so "Show in folder" in other apps opens Rover
+
+Network locations need GVfs with its FUSE helper, `gvfs-fuse`, and the backends for the protocols you use, such as `gvfs-smb`. Thumbnails and folder item counts are left out on network locations so browsing them stays quick.
 
 The sidebar uses the compositor's background blur on Wayland compositors that support `ext-background-effect-v1`, and falls back to a solid surface elsewhere. The rest of the window stays opaque.
 
@@ -118,7 +121,7 @@ rover/
 │   │   ├── api.ts             bridge commands and events
 │   │   ├── components/        toolbar, sidebar, views, details, previews, dialogs, shell and version control
 │   │   ├── features/          search, on-screen thumbnails and folder counts, undo, batch rename and archive state
-│   │   ├── file-manager/      navigation, location completion, view state and keys, list columns and groups, previews, actions, drag and drop, chooser
+│   │   ├── file-manager/      navigation, network places, location completion, view state and keys, list columns and groups, previews, actions, drag and drop, chooser
 │   │   ├── state/             settings and tabs
 │   │   ├── utils/             formatting, paths and file kinds
 │   │   └── vcs/               version control state
@@ -132,6 +135,7 @@ rover/
     ├── history/               undo and redo
     ├── inspect/               file details and open with
     ├── integration/           file chooser portal, FileManager1, terminals and launch paths
+    ├── network/               network locations: connecting, signing in, disconnecting and finding servers nearby
     ├── places/                recent files and trash count
     ├── properties/            permissions, default apps and folder sizes
     ├── search/                recursive search

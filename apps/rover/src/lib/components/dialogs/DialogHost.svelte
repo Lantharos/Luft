@@ -12,6 +12,8 @@
 	import { settings } from '$lib/state/settings.svelte';
 	import CompressDialog from './archive/CompressDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
+	import AskDialog from './network/AskDialog.svelte';
+	import ConnectDialog from './network/ConnectDialog.svelte';
 	import ConflictDialog from './conflict/ConflictDialog.svelte';
 	import PropertiesDialog from './properties/PropertiesDialog.svelte';
 	import BatchRenameDialog from './rename/BatchRenameDialog.svelte';
@@ -63,6 +65,14 @@
 {:else if dialog?.kind === 'empty-trash'}
 	{@const trashPath = dialog.trashPath}
 	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(trash.refresh)} onclose={dialogs.close} />
+{:else if dialog?.kind === 'connect'}
+	<ConnectDialog {manager} onclose={dialogs.close} />
+{/if}
+
+{#if manager.network.ask}
+	{#key manager.network.ask}
+		<AskDialog ask={manager.network.ask} onclose={() => (manager.network.ask = null)} />
+	{/key}
 {/if}
 
 {#if search.open}

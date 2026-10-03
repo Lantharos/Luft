@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Icon from '$lib/components/Icon.svelte';
+	import { dialogs } from '$lib/features/dialogs.svelte';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import { GRID_SIZES, type ViewState } from '$lib/file-manager/view/view-state.svelte';
 	import { userFolders } from '$lib/file-manager/places/places.svelte';
@@ -84,6 +85,12 @@
 				<Icon name="edit" size={16} />
 				<span class="flex-1">Go to location</span>
 				{@render shortcut('Ctrl+L')}
+			</MenuItem>
+		{/if}
+		{#if !chooser}
+			<MenuItem onclick={() => run(dialogs.connect, close)}>
+				<Icon name="globe" size={16} />
+				<span class="flex-1">Connect to server…</span>
 			</MenuItem>
 		{/if}
 		<MenuItem onclick={() => run(manager.refresh, close)}>

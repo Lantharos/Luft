@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import type { DragController } from '$lib/file-manager/drag/controller.svelte';
 	import { dropKey } from '$lib/file-manager/drag/drop-targets';
 	import { PathCompletion } from '$lib/file-manager/location/completion.svelte';
+	import { looksRemote } from '$lib/file-manager/location/addresses';
 	import { expandHome } from '$lib/file-manager/location/expand';
 	import type { FileManager } from '$lib/file-manager/manager.svelte';
 	import type { ViewState } from '$lib/file-manager/view/view-state.svelte';
@@ -34,6 +36,8 @@
 	let root = $derived.by((): Crumb => {
 		const path = manager.currentPath;
 		if (isInside(path, manager.homePath)) return { path: manager.homePath, label: 'Home', icon: 'home' };
+		const remote = manager.network.holding(path);
+		if (remote) return { path: remote.path, label: remote.name, icon: remote.device ? 'smartphone' : 'server' };
 		const drive = manager.drives.holding(path);
 		if (!drive) return { path: '/', label: 'Computer', icon: 'hard-drive' };
 		return { path: drive.mount_point, label: drive.name, icon: drive.is_removable ? 'usb' : 'hard-drive' };
@@ -51,17 +55,22 @@
 	});
 
 	$effect(() => {
-		if (view.editingPath) draft = manager.currentPath || manager.homePath;
-		else completion.forget();
+		if (!view.editingPath) completion.forget();
 	});
 
 	function focusInput(input: HTMLInputElement) {
+		untrack(() => {
+			const path = manager.currentPath || manager.homePath;
+			draft = manager.network.addressOf(path) ?? path;
+			input.value = draft;
+		});
 		input.focus();
 		input.select();
 	}
 
 	function commit() {
 		view.editingPath = false;
+		if (looksRemote(draft)) return void manager.openAddress(draft);
 		const next = trimTrailingSlash(expandHome(draft.trim(), manager.homePath));
 		if (next && next !== manager.currentPath) void manager.navigate(next);
 	}

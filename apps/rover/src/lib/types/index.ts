@@ -137,11 +137,51 @@ export interface Settings {
 	listColumns: ListColumn[];
 	groupBy: GroupBy;
 	hiddenPlaces: string[];
+	networkPlaces: NetworkPlace[];
+	recentServers: string[];
+}
+
+export interface NetworkPlace {
+	name: string;
+	uri: string;
+}
+
+export interface NetworkLocation extends NetworkPlace {
+	path: string;
+	device: boolean;
+}
+
+export type NetworkAsk =
+	| {
+			kind: 'password';
+			id: number;
+			message: string;
+			user: string;
+			domain: string;
+			needsUser: boolean;
+			needsDomain: boolean;
+			needsPassword: boolean;
+			anonymous: boolean;
+			saving: boolean;
+	  }
+	| { kind: 'question'; id: number; message: string; choices: string[] }
+	| { kind: 'done'; id: number };
+
+export interface NetworkAnswer {
+	id: number;
+	cancelled: boolean;
+	user?: string;
+	domain?: string;
+	password?: string;
+	anonymous: boolean;
+	remember: boolean;
+	choice?: number;
 }
 
 export interface AppState extends Appearance {
 	chooser: ChooserConfig | null;
 	launchPaths: string[];
+	canManageDrives: boolean;
 	settings: Settings;
 	userDirs: UserDirs | null;
 }

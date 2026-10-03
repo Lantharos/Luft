@@ -6,6 +6,7 @@ mod files;
 mod history;
 mod inspect;
 mod integration;
+mod network;
 mod places;
 mod properties;
 mod search;

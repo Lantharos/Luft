@@ -54,6 +54,12 @@ pub struct PinnedFolder {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkPlace {
+    pub name: String,
+    pub uri: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub folder_view_modes: HashMap<String, ViewMode>,
@@ -66,6 +72,8 @@ pub struct Settings {
     pub list_columns: Vec<ListColumn>,
     pub group_by: GroupBy,
     pub hidden_places: Vec<String>,
+    pub network_places: Vec<NetworkPlace>,
+    pub recent_servers: Vec<String>,
 }
 
 impl Default for Settings {
@@ -97,6 +105,8 @@ impl Default for Settings {
             ],
             group_by: GroupBy::None,
             hidden_places: Vec::new(),
+            network_places: Vec::new(),
+            recent_servers: Vec::new(),
         }
     }
 }

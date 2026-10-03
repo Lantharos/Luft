@@ -24,6 +24,7 @@ fn path_arg(arg: &str, cwd: &Path) -> Option<String> {
     }
     let path = match Url::parse(arg) {
         Ok(url) if url.scheme() == "file" => url.to_file_path().ok()?,
+        Ok(url) if url.has_host() => return Some(arg.to_owned()),
         _ => cwd.join(arg),
     };
     let path = path.canonicalize().unwrap_or(path);

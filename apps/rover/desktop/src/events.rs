@@ -7,3 +7,5 @@ pub const THUMBNAILS_READY: &str = "rover.thumbnails";
 pub const SEARCH_RESULTS: &str = "rover.search";
 pub const MEASURE_PROGRESS: &str = "rover.measure";
 pub const FOLDER_COUNTS: &str = "rover.counts";
+pub const NETWORK_CHANGED: &str = "rover.network";
+pub const NETWORK_ASK: &str = "rover.network.ask";

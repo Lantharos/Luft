@@ -1,6 +1,7 @@
 import * as api from '$lib/api';
 import type { SingleInstanceActivation } from '$lib/api';
 import { parentPath } from '$lib/utils/paths';
+import { looksRemote } from './location/addresses';
 import type { FileManager } from './manager.svelte';
 
 export async function openLaunchPaths(manager: FileManager, paths: string[]) {
@@ -14,6 +15,7 @@ export async function openActivation(manager: FileManager, activation: SingleIns
 }
 
 async function open(manager: FileManager, path: string, show: (folder: string) => Promise<void>) {
+	if (looksRemote(path)) return manager.openAddress(path, show);
 	const entry = await api.getFileInfo(path).catch(() => null);
 	if (!entry || entry.is_dir) return show(path);
 	await show(parentPath(entry.path));

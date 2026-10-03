@@ -61,13 +61,6 @@ def store():
          (properties, (session, b"", secret.encode(), "text/plain"), True))
 
 
-def created():
-    unlocked, locked = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "SearchItems", "(a{ss})", (attributes(),))
-    path = (unlocked + locked)[0]
-    value = call(SECRETS, path, "org.freedesktop.DBus.Properties", "Get", "(ss)", ("org.freedesktop.Secret.Item", "Created"))[0]
-    sys.stdout.write(str(value))
-
-
 def pipe_with(data):
     reader, writer = os.pipe()
     os.write(writer, data)
@@ -125,21 +118,11 @@ def portal():
     sys.stdout.write(f"{first}|{second}|{portal_secret(stranger)}")
 
 
-def keyring_import():
-    try:
-        call(KEYRING, "/com/lantharos/Keyring1", KEYRING, "ImportKeyring", "(s)", (sys.argv[2],))
-        sys.stdout.write("allowed")
-    except GLib.Error as error:
-        sys.stdout.write(Gio.DBusError.get_remote_error(error).rsplit(".", 1)[-1])
-
-
 action = sys.argv[1]
 if action == "read":
     read()
 elif action == "store":
     store()
-elif action == "created":
-    created()
 elif action == "lock":
     call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "Lock", "(ao)", ([],))
 elif action == "app-secrets":
@@ -148,5 +131,3 @@ elif action == "app-load":
     sys.stdout.write("missing" if load("account-token") is None else "found")
 elif action == "portal":
     portal()
-elif action == "import":
-    keyring_import()

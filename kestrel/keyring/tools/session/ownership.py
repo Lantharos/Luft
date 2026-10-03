@@ -48,7 +48,7 @@ def exercise_ownership(root, home, environment, check, script, requests, lock):
     first = program_at(os.path.join(parley, "app-1.0.159/Parley"))
     before = asked()
     check(run(first, "read", "application", "parley") == "parley-key" and asked() == before,
-          "the app an imported item names takes it without being asked")
+          "the app an item names takes it without being asked")
     script(access="allow", remember=True)
     check(run(first, "read", "service", "github.com") == "gh-token", "an app is allowed another app's item once")
 
@@ -93,7 +93,7 @@ def exercise_ownership(root, home, environment, check, script, requests, lock):
     def in_terminal():
         fcntl.ioctl(0, termios.TIOCSCTTY, 0)
     before = asked()
-    typed = subprocess.run([sys.executable, READER, "read", "service", "mail.example.org"], env=environment, stdin=child,
+    typed = subprocess.run([sys.executable, READER, "read", "application", "reader"], env=environment, stdin=child,
                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True, preexec_fn=in_terminal,
                            timeout=60)
     os.close(child)

@@ -17,7 +17,6 @@ pub use authenticate::{Mode, Outcome, authenticate, available as can_authenticat
 
 use crate::daemon::Daemon;
 use crate::identity::App;
-use crate::keyring::{ImportError, pending_sources, read_source};
 
 const SIGN_IN_GRACE: Duration = Duration::from_secs(6);
 const REATTACH_DELAY: Duration = Duration::from_secs(3);
@@ -146,10 +145,8 @@ impl Daemon {
         let password = Zeroizing::new(password.to_vec());
         let Some(wrap) = keyring.password_wrap() else {
             let key = MasterKey::generate()?;
-            let (key, wrap, password) = stretch(key, password).await?;
-            let mut contents = Contents::fresh();
-            import_all(keyring.legacy_folder(), &mut contents, &password).await;
-            return keyring.create(key, wrap, contents);
+            let (key, wrap) = stretch(key, password).await?;
+            return keyring.create(key, wrap, Contents::fresh());
         };
         let key = tokio::task::spawn_blocking(move || wrap.open(&password))
             .await
@@ -175,7 +172,7 @@ impl Daemon {
         if current {
             return;
         }
-        if let Ok((_, wrap, _)) = stretch(key, password).await
+        if let Ok((_, wrap)) = stretch(key, password).await
             && let Err(error) = self.keyring.lock().await.set_password_wrap(wrap)
         {
             eprintln!("Couldn't update the keyring's password: {error}");
@@ -262,49 +259,16 @@ impl Daemon {
         self.refresh_chip().await;
         Ok(())
     }
-
-    pub async fn import(&self, name: &str, password: &[u8]) -> Result<bool, Error> {
-        let mut keyring = self.keyring.lock().await;
-        let contents = keyring.contents().ok_or(Error::WrongKey)?;
-        let Some(source) = pending_sources(keyring.legacy_folder(), contents)
-            .into_iter()
-            .find(|source| source.name == name)
-        else {
-            return Ok(false);
-        };
-        match read_source(&source, password).await {
-            Ok(imported) => keyring
-                .edit(|contents| imported.merge_into(contents, &source))
-                .map(|()| true),
-            Err(ImportError::WrongPassword) => Err(Error::WrongPassword),
-            Err(ImportError::Unreadable(reason)) => {
-                eprintln!("Couldn't import {}: {reason}", source.path.display());
-                Ok(false)
-            }
-        }
-    }
 }
 
 async fn stretch(
     key: MasterKey,
     password: Zeroizing<Vec<u8>>,
-) -> Result<(MasterKey, PasswordWrap, Zeroizing<Vec<u8>>), Error> {
+) -> Result<(MasterKey, PasswordWrap), Error> {
     tokio::task::spawn_blocking(move || {
         let wrap = PasswordWrap::create(&key, &password)?;
-        Ok((key, wrap, password))
+        Ok((key, wrap))
     })
     .await
     .map_err(|_| Error::Corrupt("the password couldn't be prepared"))?
-}
-
-async fn import_all(folder: &std::path::Path, contents: &mut Contents, password: &[u8]) {
-    for source in pending_sources(folder, contents) {
-        match read_source(&source, password).await {
-            Ok(imported) => imported.merge_into(contents, &source),
-            Err(ImportError::WrongPassword) => {}
-            Err(ImportError::Unreadable(reason)) => {
-                eprintln!("Couldn't import {}: {reason}", source.path.display())
-            }
-        }
-    }
 }

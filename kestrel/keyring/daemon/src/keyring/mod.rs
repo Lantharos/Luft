@@ -1,6 +1,4 @@
 mod access;
-mod formats;
-mod import;
 mod ownership;
 
 use std::path::PathBuf;
@@ -13,11 +11,9 @@ use luft_keyring_vault::{
 };
 
 pub use access::{Decision, PORTAL_SCHEMA, decide};
-pub use import::{ImportError, pending_sources, read_source};
 
 pub struct Paths {
     pub folder: PathBuf,
-    pub legacy: PathBuf,
 }
 
 impl Paths {
@@ -29,7 +25,6 @@ impl Paths {
             });
         Self {
             folder: data.join("luft-keyring"),
-            legacy: data.join("keyrings"),
         }
     }
 
@@ -73,10 +68,6 @@ impl Keyring {
 
     pub fn is_locked(&self) -> bool {
         self.unlocked.is_none()
-    }
-
-    pub fn legacy_folder(&self) -> &std::path::Path {
-        &self.paths.legacy
     }
 
     pub fn password_wrap(&self) -> Option<PasswordWrap> {

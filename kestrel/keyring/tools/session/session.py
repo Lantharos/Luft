@@ -64,17 +64,7 @@ def main():
 
 
 def run(root):
-    fixtures = os.path.join(HERE, "fixtures")
-    gnome = os.path.join(fixtures, "gnome-keyring.keyring")
-    with open(gnome, "rb") as fixture:
-        check(fixture.read(18) == b"GnomeKeyring\n\r\0\n\0\0", "the gnome-keyring fixture is its old binary keyring")
-
     home, environment = scratch_home(root, "person")
-    keyrings = os.path.join(home, ".local/share/keyrings")
-    os.makedirs(os.path.join(keyrings, "v1"))
-    shutil.copy(gnome, os.path.join(keyrings, "login.keyring"))
-    shutil.copy(os.path.join(fixtures, "oo7-login.keyring"), os.path.join(keyrings, "v1/login.keyring"))
-    shutil.copy(os.path.join(fixtures, "oo7-work.keyring"), os.path.join(keyrings, "v1/Work.keyring"))
 
     plan = os.path.join(root, "prompter.json")
     prompts = os.path.join(root, "prompts.log")
@@ -90,11 +80,10 @@ def run(root):
     script(passwords=[LOGIN], access="allow")
     prompter = subprocess.Popen([sys.executable, os.path.join(HERE, "prompter.py"), plan, prompts], env=environment)
     wait_for_name("com.lantharos.Kestrel")
-    started = time.time()
     daemon = subprocess.Popen([DAEMON], env=environment)
     try:
         wait_for_name("org.freedesktop.secrets")
-        exercise(root, home, environment, script, requests, started)
+        exercise(root, home, environment, script, requests)
     finally:
         daemon.terminate()
         prompter.terminate()
@@ -102,14 +91,28 @@ def run(root):
         prompter.wait()
 
 
-def exercise(root, home, environment, script, requests, started):
-    check(lookup(environment, "service", "github.com", "user", "kristof") == "gh-token", "a secret from gnome-keyring's file comes back after setup")
-    check([entry["request"]["title"] for entry in requests("access")] == ["Allow secret-tool to use “GitHub”?"],
-          "a keyring tool is asked before it uses an imported item")
+def store(environment, label, secret, *attributes):
+    subprocess.run(["secret-tool", "store", "--label", label, *attributes], input=secret.encode(), env=environment, check=True, timeout=60)
+
+
+def exercise(root, home, environment, script, requests):
+    reader = [sys.executable, os.path.join(HERE, "reader.py")]
+    stranger = os.path.join(root, "stranger")
+    shutil.copy(sys.executable, stranger)
+
+    store(environment, "Home network", "hunter2", "network", "home")
     setup = requests("password")[0]["request"]
     check(setup.get("confirm") is True, "setting up without the sign-in service asks to confirm the password")
-    check(lookup(environment, "service", "mail.example.org") == "mail-pass", "a secret from oo7's file comes back")
-    check(lookup(environment, "network", "home") == "hunter2", "every item of the old keyring came along")
+    subprocess.run([stranger, os.path.join(HERE, "reader.py"), "store", "GitHub", "gh-token", "service", "github.com", "user", "kristof"],
+                   env=environment, check=True, timeout=60)
+    store(environment, "Mail", "mail-pass", "service", "mail.example.org")
+    store(environment, "Parley", "parley-key", "application", "parley")
+    store(environment, "Reader", "reader-key", "application", "reader")
+
+    check(lookup(environment, "service", "github.com", "user", "kristof") == "gh-token", "a keyring tool reads another app's item once the person allows it")
+    check([entry["request"]["title"] for entry in requests("access")] == ["Allow secret-tool to use “GitHub”?"],
+          "a keyring tool is asked before it uses another app's item")
+    check(lookup(environment, "service", "mail.example.org") == "mail-pass", "a keyring tool reads back what it stored")
     found = subprocess.run(["secret-tool", "search", "--all", "network", "home"], env=environment, capture_output=True, timeout=60)
     check(b"secret = hunter2" in found.stdout and b"returned type" not in found.stderr, "an item hands its secret back in one piece, as Chromium-based apps read it")
 
@@ -118,22 +121,16 @@ def exercise(root, home, environment, script, requests, started):
 
     service = Gio.DBusProxy.new_for_bus_sync(Gio.BusType.SESSION, Gio.DBusProxyFlags.NONE, None,
                                              "com.lantharos.Keyring1", "/com/lantharos/Keyring1", "com.lantharos.Keyring1", None)
-    check(service.get_cached_property("PendingImports").unpack() == ["Work"], "a keyring with another password waits to be brought in")
     check(service.get_cached_property("Locked").unpack() is False, "the keyring reports itself unlocked")
-    check(service.get_cached_property("ItemCount").unpack() == 4, "the keyring counts its items")
-
-    reader = [sys.executable, os.path.join(HERE, "reader.py")]
+    check(service.get_cached_property("ItemCount").unpack() == 5, "the keyring counts its items")
 
     def lock():
         subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30)
 
-    stranger = os.path.join(root, "stranger")
-    shutil.copy(sys.executable, stranger)
     asked = len(requests("access"))
-    claimed = subprocess.run([stranger, os.path.join(HERE, "reader.py"), "read", "service", "github.com"], env=environment,
-                             capture_output=True, timeout=60)
-    check(claimed.stdout.decode() == "gh-token" and len(requests("access")) == asked,
-          "the first app to use an imported item takes it without being asked")
+    owned = subprocess.run([stranger, os.path.join(HERE, "reader.py"), "read", "service", "github.com"], env=environment,
+                           capture_output=True, timeout=60)
+    check(owned.stdout.decode() == "gh-token" and len(requests("access")) == asked, "the app that stored an item reads it without being asked")
 
     def read_as_other_app(*attributes):
         result = subprocess.run([*reader, "read", *attributes], env=environment, capture_output=True, timeout=60)
@@ -147,9 +144,6 @@ def exercise(root, home, environment, script, requests, started):
     asked = len(requests("access"))
     check(read_as_other_app("service", "github.com") == "gh-token", "an allowed app keeps reading")
     check(len(requests("access")) == asked, "a remembered choice doesn't ask again")
-
-    created = subprocess.run([*reader, "created", "service", "github.com"], env=environment, capture_output=True, timeout=60)
-    check(0 < int(created.stdout or 0) <= started, "imported items keep the time they were made")
 
     lock()
     check(service.call_sync("org.freedesktop.DBus.Properties.Get", GLib.Variant("(ss)", ("com.lantharos.Keyring1", "Locked")),
@@ -171,10 +165,6 @@ def exercise(root, home, environment, script, requests, started):
 
     exercise_agent(root, environment, check, script, requests, lock, LOGIN)
     exercise_ownership(root, home, environment, check, script, requests, lock)
-
-    script(passwords=["work pass"], access="allow")
-    imported = subprocess.run([*reader, "import", "Work"], env=environment, capture_output=True, timeout=60)
-    check(imported.stdout.decode() == "AccessDenied", "only Settings may bring in old keyrings")
 
 
 if __name__ == "__main__":

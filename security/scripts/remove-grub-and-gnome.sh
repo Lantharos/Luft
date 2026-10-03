@@ -50,7 +50,7 @@ find_kestrel() {
   [[ -e /usr/local/share/xdg-desktop-portal/kestrel-portals.conf ]] ||
     stop "Kestrel doesn't answer apps' portal requests yet. Reinstall it with kestrel/tools/install.sh install first."
   [[ -e /usr/local/share/dbus-1/services/org.freedesktop.secrets.service ]] ||
-    stop "Luft Keyring isn't your keyring yet. Run kestrel/keyring/tools/switch.sh on, sign in once, and run this again."
+    stop "Luft Keyring isn't installed yet. Install Kestrel with kestrel/tools/install.sh install, sign in once, and run this again."
 }
 
 install_tools() {

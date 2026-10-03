@@ -162,33 +162,6 @@ impl Daemon {
         outcome
     }
 
-    pub async fn import_with_prompt(self: &Arc<Self>, name: &str) -> bool {
-        let _turn = self.prompting.lock().await;
-        let handle = self.prompter.handle();
-        let title = format!("Bring in “{name}”");
-        let mut warning = String::new();
-        let imported = loop {
-            let prompt = Prompt {
-                title: &title,
-                body: "Enter the password this keyring was locked with before.",
-                warning: &warning,
-                action: "Bring In",
-                ..Prompt::default()
-            };
-            let Some(password) = self.prompter.password(&handle, &prompt).await else {
-                break false;
-            };
-            match self.import(name, &password).await {
-                Ok(imported) => break imported,
-                Err(Error::WrongPassword) => warning = "That password didn't open it".into(),
-                Err(error) => warning = format!("It couldn't be opened: {error}"),
-            }
-        };
-        self.prompter.close(&handle).await;
-        self.changed.notify_one();
-        imported
-    }
-
     pub async fn choose_pin(self: &Arc<Self>) -> bool {
         let _turn = self.prompting.lock().await;
         let handle = self.prompter.handle();

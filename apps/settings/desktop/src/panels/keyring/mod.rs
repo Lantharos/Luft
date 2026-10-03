@@ -21,11 +21,6 @@ struct Toggle {
 }
 
 #[derive(Deserialize)]
-struct Import {
-    name: String,
-}
-
-#[derive(Deserialize)]
 struct Revoke {
     app: String,
     item: String,
@@ -94,9 +89,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             Ok(bus::call::<_, bool>(STATUS, "SetPin", &(enabled,))?)
         })
         .command("keyring_reseal", reseal)
-        .command("keyring_import", |Import { name }| {
-            Ok(bus::call::<_, bool>(STATUS, "ImportKeyring", &(name,))?)
-        })
         .command("keyring_lock_with_screen", |Toggle { enabled }| {
             Ok(bus::set_property(STATUS, "LockWithScreen", enabled)?)
         })

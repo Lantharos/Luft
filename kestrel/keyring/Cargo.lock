@@ -806,9 +806,7 @@ dependencies = [
  "libc",
  "luft-keyring-vault",
  "luft-keyring-wire",
- "md-5",
  "p256",
- "pbkdf2",
  "postcard",
  "rustix",
  "serde",
@@ -817,7 +815,6 @@ dependencies = [
  "tokio",
  "zbus",
  "zeroize",
- "zgvariant",
 ]
 
 [[package]]
@@ -883,16 +880,6 @@ checksum = "26d142aeadbc4e8c679fc6d93fbe7efe1c021fa7d80629e615915b519e3bc6de"
 dependencies = [
  "libc",
  "stable_deref_trait",
-]
-
-[[package]]
-name = "md-5"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69b6441f590336821bb897fb28fc622898ccceb1d6cea3fde5ea86b090c4de98"
-dependencies = [
- "cfg-if",
- "digest 0.11.3",
 ]
 
 [[package]]
@@ -1000,16 +987,6 @@ checksum = "aab41826031698d6ffcd9cff78ef56ef998e39dc7e5067cdfebe373842d4723b"
 dependencies = [
  "getrandom 0.4.3",
  "phc",
-]
-
-[[package]]
-name = "pbkdf2"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "112d82ceb8c5bf524d9af484d4e4970c9fd5a0cc15ba14ad93dccd28873b0629"
-dependencies = [
- "digest 0.11.3",
- "hmac 0.13.0",
 ]
 
 [[package]]
@@ -1808,32 +1785,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "zgvariant"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8dca004bfe7d03c9e68ae443e63b2c25c69ac2fcfc9c4f47bc3546ff04c102cc"
-dependencies = [
- "endi",
- "serde",
- "winnow",
- "zcheapstr",
- "zgvariant_derive",
- "zvariant_utils",
-]
-
-[[package]]
-name = "zgvariant_derive"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a5cbf304b5650a6be838eae8b9d400a84f7003faa1f68862c085f28d0357cb2"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.6",
- "zvariant_utils",
 ]
 
 [[package]]

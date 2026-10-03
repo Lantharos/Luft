@@ -19,8 +19,6 @@ pub struct Contents {
     pub ssh: Vec<SshKey>,
     #[serde(default)]
     pub preferences: Preferences,
-    #[serde(default)]
-    pub imported: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

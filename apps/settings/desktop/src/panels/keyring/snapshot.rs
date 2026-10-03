@@ -24,7 +24,6 @@ struct Status {
     item_count: u32,
     chip: String,
     lock_with_screen: bool,
-    pending_imports: Vec<String>,
 }
 
 #[derive(DeserializeDict, Type)]

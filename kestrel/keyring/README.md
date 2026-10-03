@@ -9,6 +9,7 @@ Luft Keyring keeps your passwords, tokens and keys. Apps reach it the same way t
 | `pam` | `pam_luft_keyring.so`, which tells the unlock service that a sign-in succeeded |
 | `vault` | The encrypted file format, shared by everything that stores data in the keyring |
 | `wire` | The messages the three programs exchange |
+| `pinentry` | `luft-pinentry`, which asks for GnuPG's passphrases and PINs through Kestrel |
 | `data` | Units, D-Bus and portal files, and the sign-in rules |
 | `tools` | Installing, switching over, and the tests |
 
@@ -114,6 +115,12 @@ let token = secrets::load("account-token")?;
 
 The keyring is an SSH agent on `$XDG_RUNTIME_DIR/luft-keyring/ssh`, and Kestrel points `SSH_AUTH_SOCK` there. Keys added with `ssh-add` are kept in the vault and are there again after you sign in; `ssh-add -c` makes a key ask before each use. Settings can make Ed25519 keys, or ECDSA keys that live inside the security chip and can never be copied off it. A key that asks first shows a Kestrel prompt naming the app, "Allow ssh in Tern to use your SSH key “Laptop”?", and when you have a fingerprint enrolled, touching the reader is the answer. Ed25519 and ECDSA P-256 keys are supported; time-limited keys (`ssh-add -t`) are refused.
 
+## GnuPG
+
+`luft-pinentry` is GnuPG's pinentry for Kestrel: gpg-agent starts it whenever it needs a passphrase or a smart card PIN, and it asks through the same Kestrel prompts as the keyring, with GnuPG's own description of the key, a second field when a new passphrase is chosen, GnuPG's rating of a new passphrase as it's typed, and confirmations and messages. Save in your keyring keeps the passphrase in the keyring the way GnuPG's GNOME pinentry did, under the `org.gnupg.Passphrase` schema and the key's keygrip, so passphrases saved before carry over and the next time the key is used nothing is asked. A wrong saved passphrase is only tried once: GnuPG then asks, and saving the new one replaces it. Outside a Kestrel session, for example on a text console or in another desktop, it hands over to the system's `pinentry`.
+
+`kestrel/tools/install.sh install` installs it as `/opt/kestrel/libexec/luft-pinentry` and, when the computer has no `/etc/gnupg/gpg-agent.conf` yet, creates one that points gpg-agent at it for every account. When that file already exists it's left alone and the installer says which line to add. A `pinentry-program` line in your own `~/.gnupg/gpg-agent.conf` still wins; remove it, then run `gpgconf --reload gpg-agent`, to use Kestrel's prompts.
+
 ## Building on the keyring
 
 The vault crate holds the file format and the data every part of the keyring shares, in `Contents`: Secret Service collections and items, app access rules, apps' own secrets, SSH keys and preferences. A new kind of data gets its own place there and its own module and D-Bus interface in the daemon, next to `ssh` and `manage`. Passkeys work this way: they live in a collection only Luft Passkeys may use, with the `passkeys` module answering it. The daemon offers what such a module needs:
@@ -132,7 +139,8 @@ The first time the keyring is opened with your password it reads every keyring i
 
 `kestrel/tools/install.sh install` builds the keyring with Kestrel (it needs `tpm2-tss-devel` to build) and installs:
 
-- `luft-keyring` and `luft-keyring-unlock` in `/opt/kestrel/libexec`
+- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`
+- `/etc/gnupg/gpg-agent.conf`, pointing gpg-agent at `luft-pinentry`, unless the file already exists
 - `pam_luft_keyring.so` in `/usr/local/lib64/security`
 - the unlock service's socket and unit in `/usr/local/lib/systemd/system`
 - the lock screen's `kestrel-unlock` and `kestrel-unlock-fingerprint` sign-in rules in `/etc/pam.d`

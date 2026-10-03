@@ -7,7 +7,6 @@ import gi from 'gi';
 import 'gi://AccountsService?version=1.0';
 import 'gi://Atk?version=1.0';
 import 'gi://Atspi?version=2.0';
-import 'gi://Gcr?version=4';
 import 'gi://Gdk?version=4.0';
 import 'gi://Gio?version=2.0';
 import 'gi://GioUnix?version=2.0';

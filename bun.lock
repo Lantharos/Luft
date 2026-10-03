@@ -203,6 +203,27 @@
         "vite": "^8.3.1",
       },
     },
+    "apps/signin": {
+      "name": "signin",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.33",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.50.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/adapter-static": "^3.0.10",
+        "@sveltejs/kit": "^2.70.3",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
     "apps/tern": {
       "name": "tern",
       "version": "0.1.0",
@@ -662,6 +683,8 @@
     "set-cookie-parser": ["set-cookie-parser@3.1.2", "", {}, "sha512-5/r/lTwbJ3zQ+qwdUFZYeRNqda7P5HD8zQKqlSjdGt1/S0cjLAphHusj4Y58ahDtWn/g32xrIS58/ikOvwl0Lw=="],
 
     "settings": ["settings@workspace:apps/settings"],
+
+    "signin": ["signin@workspace:apps/signin"],
 
     "sirv": ["sirv@3.0.2", "", { "dependencies": { "@polka/url": "^1.0.0-next.24", "mrmime": "^2.0.0", "totalist": "^3.0.0" } }, "sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g=="],
 

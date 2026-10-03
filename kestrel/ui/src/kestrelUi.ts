@@ -18,7 +18,7 @@ import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
 import { animateActor } from './shared/motion.js';
 import { loadKestrelStylesheets } from './shared/stylesheet.js';
 import { AppearanceService } from './appearance/service.js';
-import { KeyringPrompter } from './keyring/prompter.js';
+import { SystemPrompts } from './keyring/prompts.js';
 import { ClipboardPanel } from './clipboard/panel.js';
 import { EmojiPanel } from './emoji/panel.js';
 import type { CaretPopup, Context } from './context.js';
@@ -45,6 +45,8 @@ import type { Rgb } from './appearance/color.js';
 import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
+export { signInToNetwork } from './network/signIn.js';
+export { VpnSecrets } from './network/vpnSecrets.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
@@ -76,7 +78,7 @@ class KestrelUi {
   private readonly portal: PortalBackend;
   private readonly passkeys: PasskeyPrompts;
   readonly appearance: AppearanceService;
-  private readonly keyring: KeyringPrompter;
+  private readonly keyring: SystemPrompts;
   private readonly oomNotifier = new OomNotifier();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
@@ -93,7 +95,7 @@ class KestrelUi {
     this.portal = new PortalBackend(context);
     this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
-    this.keyring = new KeyringPrompter(context);
+    this.keyring = new SystemPrompts(context);
     this.stylesheetMonitors = loadKestrelStylesheets();
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());

@@ -3,8 +3,9 @@ import type GLib from 'gi://GLib';
 export const ALLOWED = 0;
 export const DENIED = 1;
 export const DISMISSED = 2;
+export const ALTERNATIVE = 3;
 
-type Options = Record<string, GLib.Variant>;
+export type Options = Record<string, GLib.Variant>;
 
 interface Common {
   title: string;
@@ -17,6 +18,8 @@ interface Common {
 export interface AccessRequest extends Common {
   allow: string;
   deny: string;
+  alternative: string;
+  single: boolean;
   remember: boolean;
 }
 
@@ -25,7 +28,11 @@ export interface PasswordRequest extends Common {
   warning: string;
   numeric: boolean;
   confirm: boolean;
+  mismatch: string;
   continue: string;
+  cancel: string;
+  remember: boolean;
+  quality: boolean;
 }
 
 const DEFAULT_ICON = 'dialog-password-symbolic';
@@ -53,6 +60,8 @@ export function accessRequest(options: Options): AccessRequest {
     ...common(options),
     allow: text(options, 'allow', 'Allow'),
     deny: text(options, 'deny', 'Don’t Allow'),
+    alternative: text(options, 'alternative'),
+    single: flag(options, 'single'),
     remember: flag(options, 'remember'),
   };
 }
@@ -64,6 +73,10 @@ export function passwordRequest(options: Options): PasswordRequest {
     warning: text(options, 'warning'),
     numeric: flag(options, 'numeric'),
     confirm: flag(options, 'confirm'),
+    mismatch: text(options, 'mismatch', 'The entries don’t match'),
     continue: text(options, 'continue', 'Unlock'),
+    cancel: text(options, 'cancel', 'Cancel'),
+    remember: flag(options, 'remember'),
+    quality: flag(options, 'quality'),
   };
 }

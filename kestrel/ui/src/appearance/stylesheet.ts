@@ -37,7 +37,7 @@ function accentStylesheet(seed: Seed, palette: Palette): string {
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${bright}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${bright}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${bright}; }
-.kestrel-task-progress-fill.kestrel-task-progress-fill { background-color: ${bright}; }
+.kestrel-task-progress-fill.kestrel-task-progress-fill, .kestrel-quality-fill.kestrel-quality-fill { background-color: ${bright}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default { background-color: ${rgba(solid.primary, 0.9)}; color: ${solid.onPrimary}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default:hover { background-color: ${solid.primary}; }
 .modal-dialog.modal-dialog .check-box:checked StIcon { background-color: ${solid.primary}; color: ${solid.onPrimary}; }

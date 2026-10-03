@@ -7,12 +7,14 @@ import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js'
 
 import { appIcon } from '../appearance/icons/appIcons.js';
 import { PasswordForm, feedbackLabel, showText, type PasswordEvents, type ShellEntryModule } from './passwordForm.js';
+import type { Measure } from './quality.js';
 import type { AccessRequest, PasswordRequest } from './request.js';
 
 export type Prompt = { kind: 'access'; request: AccessRequest } | { kind: 'password'; request: PasswordRequest };
 
 export interface DialogEvents extends PasswordEvents {
   allowed(remember: boolean): void;
+  alternative(): void;
   closed(): void;
 }
 
@@ -42,7 +44,7 @@ export class KeyringDialog {
   private remember: CheckBox | null = null;
   private password: PasswordForm | null = null;
 
-  private constructor(private readonly modal: ModalDialog, prompt: Prompt, shellEntry: ShellEntryModule, private readonly events: DialogEvents) {
+  private constructor(private readonly modal: ModalDialog, prompt: Prompt, shellEntry: ShellEntryModule, private readonly events: DialogEvents, measure?: Measure) {
     this.kind = prompt.kind;
     this.header = new MessageDialogContent({ title: prompt.request.title });
     this.header.add_child(this.form);
@@ -53,13 +55,14 @@ export class KeyringDialog {
       this.describe(prompt.request);
     } else {
       this.password = new PasswordForm(this.form, this.hint, modal, shellEntry, events);
-      this.retry(prompt.request);
+      if (prompt.request.remember) this.remember = this.addRemember('Save in your keyring', false);
+      this.retry(prompt.request, measure);
     }
   }
 
-  static open({ ModalDialog, shellEntry }: DialogModules, prompt: Prompt, events: DialogEvents): KeyringDialog | null {
+  static open({ ModalDialog, shellEntry }: DialogModules, prompt: Prompt, events: DialogEvents, measure?: Measure): KeyringDialog | null {
     const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog' });
-    const dialog = new KeyringDialog(modal, prompt, shellEntry, events);
+    const dialog = new KeyringDialog(modal, prompt, shellEntry, events, measure);
     if (modal.open()) return dialog;
     modal.destroy();
     return null;
@@ -69,9 +72,9 @@ export class KeyringDialog {
     return this.remember?.checked ?? false;
   }
 
-  retry(request: PasswordRequest): void {
+  retry(request: PasswordRequest, measure?: Measure): void {
     this.describe(request);
-    this.password!.apply(request);
+    this.password!.apply(request, measure);
   }
 
   close(): void {
@@ -91,14 +94,20 @@ export class KeyringDialog {
   private buildAccess(request: AccessRequest): void {
     showText(this.hint, request.fingerprint ? 'Touch the fingerprint reader to allow' : '');
     this.form.add_child(this.hint);
-    if (request.remember) {
-      this.remember = new CheckBox('Remember for this app');
-      this.remember.checked = true;
-      this.form.add_child(this.remember);
-    }
+    if (request.remember) this.remember = this.addRemember('Remember for this app', true);
     this.form.visible = request.fingerprint || request.remember;
-    this.modal.addButton({ label: request.deny, action: () => this.events.denied(), key: Clutter.KEY_Escape });
+    if (request.alternative)
+      this.modal.addButton({ label: request.alternative, action: () => this.events.alternative() });
+    if (!request.single)
+      this.modal.addButton({ label: request.deny, action: () => this.events.denied(), key: Clutter.KEY_Escape });
     if (!request.fingerprint)
-      this.modal.addButton({ label: request.allow, action: () => this.events.allowed(this.remembered), default: true });
+      this.modal.addButton({ label: request.allow, action: () => this.events.allowed(this.remembered), default: true, key: request.single ? Clutter.KEY_Escape : undefined });
+  }
+
+  private addRemember(label: string, checked: boolean): CheckBox {
+    const remember = new CheckBox(label);
+    remember.checked = checked;
+    this.form.add_child(remember);
+    return remember;
   }
 }

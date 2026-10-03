@@ -20,6 +20,18 @@ keyring_staged_files() {
   echo "selinux/luft-keyring.cil share/luft-keyring/luft-keyring.cil"
 }
 
+gnupg_agent_conf=/etc/gnupg/gpg-agent.conf
+
+use_luft_pinentry() {
+  local line="pinentry-program $prefix/libexec/luft-pinentry"
+  if [[ ! -e "$gnupg_agent_conf" ]]; then
+    printf '%s\n' "$line" | sudo install -DZ -m644 /dev/stdin "$gnupg_agent_conf"
+    gpgconf --reload gpg-agent 2>/dev/null || true
+  elif ! grep -qxF "$line" "$gnupg_agent_conf"; then
+    echo "$gnupg_agent_conf already exists; add \"$line\" to it to have GnuPG ask through Kestrel." >&2
+  fi
+}
+
 keyring_fill() {
   sed -e "s|@libexecdir@|$prefix/libexec|g" -e "s|@pamdir@|$keyring_pam|g" "$keyring_data/$1"
 }
@@ -36,6 +48,7 @@ install_keyring() {
     sudo install -DZ -m755 "$built/$program" "$prefix/libexec/$program"
     changed+=("$program")
   done
+  cmp -s "$built/luft-pinentry" "$prefix/libexec/luft-pinentry" || sudo install -DZ -m755 "$built/luft-pinentry" "$prefix/libexec/luft-pinentry"
   sudo install -DZ -m755 "$built/libpam_luft_keyring.so" "$keyring_pam/pam_luft_keyring.so"
   keyring_system_files | while read -r source target; do
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$target"
@@ -44,6 +57,7 @@ install_keyring() {
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$prefix/$target"
   done
   sudo systemctl daemon-reload
+  use_luft_pinentry
   restart_keyring "${changed[@]}"
   echo "Luft Keyring is installed; kestrel/keyring/tools/switch.sh on makes it your keyring."
 }
@@ -59,6 +73,7 @@ restart_keyring() {
 
 remove_keyring() {
   keyring_system_files | while read -r _ target; do sudo rm -f "$target"; done
+  [[ "$(cat "$gnupg_agent_conf" 2>/dev/null)" == "pinentry-program $prefix/libexec/luft-pinentry" ]] && sudo rm "$gnupg_agent_conf"
   sudo rm -f "$keyring_pam/pam_luft_keyring.so"
   sudo systemctl daemon-reload
 }

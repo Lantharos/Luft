@@ -11,6 +11,9 @@ import {checkBackdrops} from './checks/desktop/backdropChecks.js';
 import {checkFolders} from './checks/desktop/folderChecks.js';
 import {checkSession} from './checks/desktop/sessionChecks.js';
 import {checkKeyring} from './checks/keyring/prompterChecks.js';
+import {checkPinentry} from './checks/keyring/pinentryChecks.js';
+import {checkNetworkSignIn} from './checks/network/signInChecks.js';
+import {checkVpn} from './checks/network/vpnChecks.js';
 import {checkUnlock} from './checks/lockScreen/unlockChecks.js';
 import {checkClipboardPlacement} from './checks/input/clipboardChecks.js';
 import {checkClipboardImages} from './checks/input/clipboardImageChecks.js';
@@ -327,6 +330,8 @@ export async function run() {
   }
   await checkSession({pause, capture, actorNamed, pointer, keyboard, output});
   await checkKeyring({pause, capture, output, pointer, keyboard});
+  await checkPinentry({pause, capture, output, pointer, keyboard});
+  await checkVpn({pause, capture, output, pointer, keyboard});
   await checkBackdrops({pause});
   await checkClipboardPlacement({pause, capture, actorNamed, keyboard, output});
   await checkClipboardImages({pause, capture, actorNamed, keyboard, output});
@@ -351,6 +356,7 @@ export async function run() {
   await checkPower({pause, pointer});
   await checkAppIcons({pause, capture, actorNamed, output});
   await checkLuftApps({output, pointer});
+  await checkNetworkSignIn({output});
   await checkLiveWallpaper({pause, actorNamed});
 
   const source = new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});

@@ -6,6 +6,7 @@ import { wiggle } from 'resource:///org/gnome/shell/misc/animationUtils.js';
 import { EntryField } from 'resource:///org/gnome/shell/ui/dialog.js';
 import type { ModalDialog } from 'resource:///org/gnome/shell/ui/modalDialog.js';
 
+import { QualityMeter, type Measure } from './quality.js';
 import type { PasswordRequest } from './request.js';
 
 export type ShellEntryModule = typeof import('resource:///org/gnome/shell/ui/shellEntry.js');
@@ -14,8 +15,6 @@ export interface PasswordEvents {
   entered(secret: string): void;
   denied(): void;
 }
-
-const MISMATCH = 'The entries don’t match';
 
 export function feedbackLabel(styleClass: string): St.Label {
   const label = new St.Label({ style_class: styleClass, visible: false });
@@ -40,8 +39,11 @@ export class PasswordForm {
   private readonly entry: St.PasswordEntry;
   private readonly confirmEntry: St.PasswordEntry;
   private readonly field: EntryField;
+  private readonly quality = new QualityMeter();
   private readonly warning = feedbackLabel('prompt-dialog-error-label');
+  private readonly cancelButton: St.Button;
   private readonly submitButton: St.Button;
+  private mismatch = '';
   private busy = false;
 
   constructor(form: St.BoxLayout, private readonly hint: St.Label, modal: ModalDialog, shellEntry: ShellEntryModule, private readonly events: PasswordEvents) {
@@ -49,6 +51,7 @@ export class PasswordForm {
     this.confirmEntry = passwordEntry(shellEntry);
     this.field = new EntryField(this.entry, '');
     form.add_child(this.field);
+    form.add_child(this.quality.actor);
     form.add_child(new EntryField(this.confirmEntry, 'Confirm'));
 
     const feedback = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-auth-feedback' });
@@ -59,24 +62,28 @@ export class PasswordForm {
 
     for (const entry of [this.entry, this.confirmEntry])
       entry.clutter_text.connect('text-changed', () => this.syncSubmit());
+    this.entry.clutter_text.connect('text-changed', () => this.quality.measure(this.entry.text));
     this.entry.clutter_text.connect('activate', () => {
       if (this.confirmEntry.visible) this.confirmEntry.grab_key_focus();
       else this.submit();
     });
     this.confirmEntry.clutter_text.connect('activate', () => this.submit());
 
-    modal.addButton({ label: 'Cancel', action: () => events.denied(), key: Clutter.KEY_Escape });
+    this.cancelButton = modal.addButton({ label: '', action: () => events.denied(), key: Clutter.KEY_Escape });
     this.submitButton = modal.addButton({ label: '', action: () => this.submit(), default: true });
     modal.setInitialKeyFocus(this.entry);
   }
 
-  apply(request: PasswordRequest): void {
+  apply(request: PasswordRequest, measure?: Measure): void {
     this.field.label = request.label;
     const purpose = request.numeric ? Clutter.InputContentPurpose.DIGITS : Clutter.InputContentPurpose.PASSWORD;
     this.entry.input_purpose = purpose;
     this.confirmEntry.input_purpose = purpose;
     this.confirmEntry.visible = request.confirm;
+    this.mismatch = request.mismatch;
+    this.quality.use(request.quality ? measure : undefined);
     showText(this.hint, request.fingerprint ? 'Or touch the fingerprint reader' : '');
+    this.cancelButton.label = request.cancel;
     this.submitButton.label = request.continue;
     this.warn(request.warning);
     this.setBusy(false);
@@ -87,7 +94,7 @@ export class PasswordForm {
     if (this.busy || !this.entry.text) return;
     if (this.confirmEntry.visible && this.confirmEntry.text !== this.entry.text) {
       this.confirmEntry.text = '';
-      this.warn(MISMATCH);
+      this.warn(this.mismatch);
       this.confirmEntry.grab_key_focus();
       return;
     }

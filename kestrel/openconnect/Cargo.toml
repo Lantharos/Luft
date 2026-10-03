@@ -1,0 +1,19 @@
+[package]
+name = "kestrel-openconnect"
+description = "Signs in to OpenConnect VPNs for Kestrel"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+libloading = "0.9.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+
+[build-dependencies]
+cc = "1.6.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

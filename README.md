@@ -8,6 +8,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `kestrel/compositor` | Mutter patch series, window corners, and window icons |
 | `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
 | `kestrel/passkeys` | Passkeys kept in Luft Keyring and confirmed through Kestrel, offered to every browser as a security key |
+| `kestrel/openconnect` | Signs in to OpenConnect VPNs for Kestrel's VPN dialog |
 | `apps/barometer` | Barometer system monitor and task manager |
 | `apps/disks` | Disks, for drives, partitions, encryption, drive health and disk images |
 | `apps/draft` | Draft text and code editor |
@@ -17,6 +18,7 @@ Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stac
 | `apps/rover` | Rover file manager and file chooser portal backend |
 | `apps/schelf` | Schelf app store for Flathub, Fedora and AppImages |
 | `apps/settings` | System settings app |
+| `apps/signin` | Network Sign-In, for Wi-Fi networks that ask you to sign in first |
 | `apps/tern` | Tern terminal |
 | `packages/ui` | Styles, window chrome, and controls shared by the apps |
 | `packages/app` | Native window, accent, and D-Bus setup shared by the apps |

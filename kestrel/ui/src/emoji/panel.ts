@@ -53,6 +53,7 @@ export class EmojiPanel {
   private browsing: GridLayout | null = null;
   private zone: Zone = 'grid';
   private hovered: string | null = null;
+  private pointing = false;
   private intercepting = false;
   private anchor: Anchor | null = null;
   private above = false;
@@ -64,6 +65,13 @@ export class EmojiPanel {
     this.actor.connect('key-press-event', (_actor, event) => {
       this.key(event);
       return Clutter.EVENT_STOP;
+    });
+    this.actor.connect('motion-event', () => {
+      if (!this.pointing) {
+        this.pointing = true;
+        this.updateFooter();
+      }
+      return Clutter.EVENT_PROPAGATE;
     });
     this.indexing = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, INDEX_DELAY_SECONDS, () => {
       this.indexing = 0;
@@ -104,6 +112,7 @@ export class EmojiPanel {
     else this.showBrowsing();
     this.closeTones(false);
     this.tones!.show(this.preferences.tone);
+    this.pointing = false;
     this.hover(null);
     this.setZone('grid');
     if (!this.intercepting) {
@@ -189,6 +198,7 @@ export class EmojiPanel {
 
   private key(event: Clutter.Event): void {
     const key = event.get_key_symbol();
+    this.pointing = false;
     if (key === Clutter.KEY_Escape) {
       if (this.zone === 'tones') this.closeTones(true);
       else this.close();
@@ -320,6 +330,7 @@ export class EmojiPanel {
 
   private updateFooter(): void {
     const selected = this.grid.selection?.item;
-    this.footer.text = this.hovered ?? (selected ? describe(selected) : '');
+    const pointed = this.pointing ? this.hovered : null;
+    this.footer.text = pointed ?? (selected ? describe(selected) : '');
   }
 }

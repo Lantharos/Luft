@@ -89,7 +89,7 @@ export async function checkSession({pause, capture, actorNamed, pointer, keyboar
   }
   await pause(200);
   require(panel.visible, 'panel returns after leaving lock mode');
-  for (const name of ['polkitAgent', 'keyring', 'networkAgent', 'automountManager'])
+  for (const name of ['polkitAgent', 'networkAgent', 'automountManager'])
     require(!!Main.componentManager._allComponents[name], `${name} component loaded`);
 
   toggleSurface('start');

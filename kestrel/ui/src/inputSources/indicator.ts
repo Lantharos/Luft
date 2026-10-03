@@ -18,7 +18,7 @@ export class InputSourceIndicator {
   private readonly manager = getInputSourceManager();
   private readonly steps = new ScrollSteps();
 
-  constructor(private readonly menus: ContextMenus, private readonly extraEntries: () => MenuEntry[]) {
+  constructor(private readonly menus: ContextMenus, private readonly extraEntries: (layout: string | null) => MenuEntry[]) {
     this.actor = new St.Button({
       name: 'kestrel-input-source', style_class: 'kestrel-status-button', child: this.label,
       can_focus: true, visible: false, button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.SECONDARY,
@@ -77,10 +77,14 @@ export class InputSourceIndicator {
     }));
     const properties = propertyEntries(current?.source?.properties ?? null);
     if (properties.length) entries.push('separator', ...properties);
-    const extras = this.extraEntries();
+    const extras = this.extraEntries(this.layout());
     if (extras.length) entries.push('separator', ...extras);
     const [x, y] = this.actor.get_transformed_position();
     this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
+  }
+
+  private layout(): string | null {
+    return this.manager.keyboardManager.currentLayout?.id ?? this.sources.find(source => source.type === 'xkb')?.id ?? null;
   }
 
   private scroll(step: number): void {

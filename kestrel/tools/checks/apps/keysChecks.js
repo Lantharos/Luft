@@ -2,8 +2,10 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 import * as IBusManager from 'resource:///org/gnome/shell/misc/ibusManager.js';
 import * as KeyboardManager from 'resource:///org/gnome/shell/misc/keyboardManager.js';
+import {getInputSourceManager} from 'resource:///org/gnome/shell/ui/status/keyboard.js';
 
 import {prepareHome} from './home.js';
 import {LuftApp, sleep, startSabineService, waitFor} from './luftApp.js';
@@ -11,6 +13,7 @@ import {LuftApp, sleep, startSabineService, waitFor} from './luftApp.js';
 const KEY_A = 30;
 const KEY_E = 18;
 const KEY_APOSTROPHE = 40;
+const KEY_RIGHTALT = 100;
 const SAVED = 5000;
 const IBUS_RESTART = 30000;
 const METHOD = `name = "Pinyin lite"
@@ -54,6 +57,20 @@ function forget(layout, method) {
 
 const windows = () => global.get_window_actors().map(actor => actor.meta_window);
 
+function installKeysEntry() {
+  const link = GLib.build_filenamev([GLib.get_user_cache_dir(), 'keys-link']);
+  const recorder = GLib.build_filenamev([GLib.get_user_cache_dir(), 'keys-record']);
+  const desktop = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.keys.desktop']);
+  GLib.file_set_contents(recorder, `#!/bin/sh\nprintf %s "$1" > '${link}'\n`);
+  GLib.chmod(recorder, 0o755);
+  GLib.mkdir_with_parents(GLib.path_get_dirname(desktop), 0o755);
+  GLib.file_set_contents(desktop, `[Desktop Entry]\nType=Application\nName=Keys\nExec=${recorder} %u\n`);
+  return {
+    link: () => exists(link) && read(link),
+    remove: () => [link, recorder, desktop].forEach(path => GLib.unlink(path)),
+  };
+}
+
 async function openEntry(...variables) {
   const before = new Set(windows());
   const launcher = new Gio.SubprocessLauncher({flags: Gio.SubprocessFlags.NONE});
@@ -65,7 +82,7 @@ async function openEntry(...variables) {
   return {process, window: opened()};
 }
 
-export async function checkKeys({pause, capture, keyboard, output}) {
+export async function checkKeys({pause, capture, actorNamed, pointer, keyboard, output}) {
   const require = (condition, label) => {
     if (!condition) throw new Error(`Kestrel Keys check failed: ${label}`);
     console.log(`Kestrel Keys check: ${label}`);
@@ -78,6 +95,13 @@ export async function checkKeys({pause, capture, keyboard, output}) {
     keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.PRESSED);
     keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.RELEASED);
   });
+  const click = async actor => {
+    const [x, y] = actor.get_transformed_position();
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), x + actor.width / 2, y + actor.height / 2);
+    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
+    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
+    await pause(300);
+  };
   const keyval = symbol => {
     keyboard.notify_keyval(GLib.get_monotonic_time(), symbol, Clutter.KeyState.PRESSED);
     keyboard.notify_keyval(GLib.get_monotonic_time(), symbol, Clutter.KeyState.RELEASED);
@@ -206,17 +230,43 @@ export async function checkKeys({pause, capture, keyboard, output}) {
     }
 
     useSources([['xkb', id], ['ibus', engine]]);
-    const desktop = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.keys.desktop']);
-    GLib.mkdir_with_parents(GLib.path_get_dirname(desktop), 0o755);
-    GLib.file_set_contents(desktop, '[Desktop Entry]\nType=Application\nName=Keys\nExec=true\n');
-    const settings = new LuftApp('settings', ['kestrel-settings:keyboard']);
+    const entry = installKeysEntry();
     try {
-      await settings.open();
-      await sleep(1500);
-      await shoot(settings, 'settings-keyboard-keys');
+      const settings = new LuftApp('settings', ['kestrel-settings:keyboard']);
+      try {
+        await settings.open();
+        await sleep(1500);
+        await shoot(settings, 'settings-keyboard-keys');
+      } finally {
+        await settings.close();
+      }
+
+      const sources = getInputSourceManager();
+      Object.values(sources.inputSources).find(source => source.id === engine).activate(true);
+      await reached(() => sources.currentSource?.id === engine, 'the input method is the current input source');
+      await waitFor(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.keys.desktop'), 5000, () => 'Kestrel did not notice Keys');
+      await click(actorNamed(global.stage, 'kestrel-input-source'));
+      const show = actorNamed(actorNamed(global.stage, 'kestrel-context-menu'), 'Show keyboard layout');
+      require(show, 'the input source menu offers Show keyboard layout while Keys is installed');
+      await click(show);
+      await reached(entry.link, 'Show keyboard layout opens Keys', 5000);
+      const link = entry.link();
+      require(link === `kestrel-keys:view/${encodeURIComponent(id)}`, `an input method shows the layout underneath it (${link})`);
+
+      const view = new LuftApp('keys', [link]);
+      try {
+        await view.open();
+        await sleep(2500);
+        key(KEY_A);
+        keyboard.notify_key(GLib.get_monotonic_time(), KEY_RIGHTALT, Clutter.KeyState.PRESSED);
+        await pause(300);
+        await shoot(view, 'keys-view');
+        keyboard.notify_key(GLib.get_monotonic_time(), KEY_RIGHTALT, Clutter.KeyState.RELEASED);
+      } finally {
+        await view.close();
+      }
     } finally {
-      await settings.close();
-      GLib.unlink(desktop);
+      entry.remove();
     }
   } finally {
     forget(id, engine.slice('keys:'.length));

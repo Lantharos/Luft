@@ -17,6 +17,12 @@ import { PrivacyIndicator } from '../privacy/indicator.js';
 import { InputSourceIndicator } from '../inputSources/indicator.js';
 import { systemMonitor } from './systemMonitor.js';
 
+const KEYS_APP = 'com.lantharos.keys.desktop';
+
+function showLayout(keys: Shell.App, layout: string): void {
+  keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+}
+
 export interface Monitor {
   index: number;
   x: number;
@@ -81,10 +87,10 @@ export class KestrelPanel {
       right.add_child(this.privacy.actor);
       this.tray = new Tray(menus);
       right.add_child(this.tray.actor);
-      this.inputSource = new InputSourceIndicator(menus, () => {
-        const layout = Shell.AppSystem.get_default().lookup_app('org.gnome.Tecla.desktop');
+      this.inputSource = new InputSourceIndicator(menus, layout => {
+        const keys = this.appSystem.lookup_app(KEYS_APP);
         return [
-          ...layout ? [{ label: 'Show keyboard layout', run: () => layout.activate() }] : [],
+          ...keys && layout ? [{ label: 'Show keyboard layout', run: () => showLayout(keys, layout) }] : [],
           { label: 'Keyboard settings', run: () => menus.settings('keyboard') },
         ];
       });

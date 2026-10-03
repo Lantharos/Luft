@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { SearchField, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import type { DeadKey, Pair } from '../api';
@@ -15,10 +15,11 @@
 
 	let { editor, key, readonly = false }: Props = $props();
 
-	const CELL = 48;
-	const GAP = 6;
-	const MIN_WIDTH = 168;
+	const CELL = 44;
+	const GAP = 4;
+	const MIN_WIDTH = 150;
 	const TALLEST = 432;
+	const SEARCH_FROM = 12;
 
 	interface Item {
 		pair: Pair;
@@ -28,7 +29,6 @@
 	let query = $state('');
 	let width = $state(0);
 	let scroller = $state<VirtualHandle>();
-	let search = $state<SearchField>();
 
 	let problems = $derived(editor && !readonly ? pairProblems(key, typeable(editor.layout)) : new Map<number, string>());
 	let items = $derived.by<Item[]>(() => {
@@ -38,8 +38,6 @@
 	});
 	let columns = $derived(Math.max(1, Math.floor((width + GAP) / (MIN_WIDTH + GAP))));
 	let height = $derived(Math.min(TALLEST, Math.ceil(items.length / columns) * (CELL + GAP)));
-
-	onMount(() => search?.focus());
 
 	async function add() {
 		if (!editor) return;
@@ -52,16 +50,12 @@
 	}
 </script>
 
-<section class="flex flex-col gap-3">
-	<div class="flex items-center gap-2" data-own-undo>
-		<div class="min-w-0 flex-1">
-			<SearchField bind:this={search} label="Search results" bind:value={query} />
+<section class="flex flex-col gap-2">
+	{#if key.pairs.length >= SEARCH_FROM}
+		<div data-own-undo>
+			<SearchField label="Search results" bind:value={query} />
 		</div>
-		{#if editor && !readonly}
-			<button type="button" class="plain-button" onclick={() => editor.addCapitals(key.keysym)}>Add capitals</button>
-			<button type="button" class="button" onclick={() => void add()}><Plus size={16} />Add</button>
-		{/if}
-	</div>
+	{/if}
 	<div bind:clientWidth={width}>
 		{#if items.length}
 			<VirtualScroller
@@ -77,11 +71,10 @@
 				{/snippet}
 			</VirtualScroller>
 		{:else if key.pairs.length}
-			<p class="px-1.5 text-[13px] text-[var(--text-muted)]">Nothing matches “{query.trim()}”</p>
-		{:else}
-			<p class="px-1.5 text-[13px] leading-relaxed text-[var(--text-muted)]">
-				Add what each key makes after this dead key, like a making ž. A result can also lead into another dead key.
-			</p>
+			<p class="px-1.5 py-2 text-[13px] text-[var(--text-muted)]">No matches</p>
 		{/if}
 	</div>
+	{#if editor && !readonly}
+		<button type="button" class="plain-button self-start" onclick={() => void add()}><Plus size={16} />Add a result</button>
+	{/if}
 </section>

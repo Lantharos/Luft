@@ -19,6 +19,7 @@ export class LayoutEditor {
 	layout = $state<Layout>() as Layout;
 	tab = $state<Tab>('keys');
 	selected = $state('AC01');
+	inspecting = $state(false);
 	level = $state(0);
 	layer = $state<number | null>(null);
 	geometry = $state<Geometry>('iso');
@@ -63,6 +64,7 @@ export class LayoutEditor {
 	select(name: string, level = this.layer ?? this.level) {
 		this.selected = name;
 		this.level = level;
+		this.inspecting = true;
 	}
 
 	setGeometry(geometry: Geometry) {

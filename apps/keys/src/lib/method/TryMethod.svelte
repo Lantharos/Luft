@@ -1,5 +1,15 @@
 <script lang="ts">
-	import { tryMethodKey, tryMethodPick, type Shown } from './api';
+	import { ownDeadKeysym } from '#lib/layout/dead/table.js';
+	import { toast } from '#lib/state/toast.svelte.js';
+	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
+	import { tryMethod, tryMethodKey, tryMethodPick, type Shown } from './api';
+	import type { MethodEditor } from './editor.svelte';
+
+	interface Props {
+		editor: MethodEditor;
+	}
+
+	let { editor }: Props = $props();
 
 	const KEYSYMS: Record<string, string> = {
 		Backspace: 'BackSpace',
@@ -14,116 +24,80 @@
 		Compose: 'Multi_key'
 	};
 
-	let typed = $state('');
+	let field = $state<TryField>();
 	let shown = $state<Shown | null>(null);
-	let focused = $state(false);
+	let waiting = 0;
+	let typing = Promise.resolve();
 
-	function passThrough(event: KeyboardEvent) {
-		if (event.key === 'Backspace') typed = [...typed].slice(0, -1).join('');
-		else if (event.key === 'Enter') typed += '\n';
-		else if ([...event.key].length === 1) typed += event.key;
+	let composing = $derived(Boolean(shown?.preedit || shown?.candidates.length));
+
+	function queue(task: () => Promise<void>) {
+		waiting++;
+		typing = typing
+			.then(task)
+			.catch((error) => toast.failed(error))
+			.finally(() => waiting--);
 	}
 
 	function show(next: Shown) {
-		typed += next.commit;
 		shown = next;
+		field?.write(next.commit, next.preedit);
 	}
 
-	async function keydown(event: KeyboardEvent) {
-		if (event.ctrlKey || event.metaKey || event.altKey || event.key === 'Tab') return;
-		const single = [...event.key].length === 1;
-		const keysym = KEYSYMS[event.key];
-		if (!single && !keysym) return;
-		event.preventDefault();
-		const next = await tryMethodKey(single ? { text: event.key } : { keysym });
+	function fallback(key: string, text?: string) {
+		if (text) field?.write(text, shown?.preedit ?? '');
+		else field?.perform(key);
+	}
+
+	async function press(key: string, text?: string) {
+		if (!text && ((!composing && key !== 'Compose') || !KEYSYMS[key])) return fallback(key);
+		const next = await tryMethodKey({ text, keysym: text ? undefined : KEYSYMS[key], before: field?.before() ?? '' });
 		show(next);
-		if (!next.handled) passThrough(event);
+		if (!next.handled) fallback(key, text);
 	}
 
-	async function pick(index: number) {
-		show(await tryMethodPick(index));
+	function keydown(event: KeyboardEvent) {
+		if (event.ctrlKey || event.metaKey || event.altKey) return;
+		const text = [...event.key].length === 1 ? event.key : undefined;
+		if (!text && !KEYSYMS[event.key] && !EDITING_KEYS.has(event.key)) return;
+		if (!text && !composing && !waiting && event.key !== 'Compose') return;
+		event.preventDefault();
+		if (text && ownDeadKeysym(text)) return;
+		const key = event.key;
+		queue(() => press(key, text));
+	}
+
+	function pick(index: number) {
+		queue(async () => show(await tryMethodPick(index)));
+	}
+
+	function settle() {
+		shown = null;
+		field?.finish();
+		void tryMethod(editor.snapshot());
 	}
 </script>
 
-<div class="flex flex-col gap-3">
-	<div
-		data-own-undo
-		class="field"
-		class:focused
-		role="textbox"
-		tabindex="0"
-		aria-label="Try the input method"
-		aria-multiline="true"
-		onkeydown={(event) => void keydown(event)}
-		onfocus={() => (focused = true)}
-		onblur={() => (focused = false)}
-	>
-		{#if typed || shown?.preedit}
-			<span class="whitespace-pre-wrap">{typed}</span><span class="preedit">{shown?.preedit ?? ''}</span>{#if focused}<span class="caret"></span>{/if}
-		{:else}
-			<span class="text-[var(--text-muted)]">Click here and type to try it</span>
-		{/if}
-	</div>
+<div class="flex flex-col gap-2">
+	<TryField bind:this={field} label="Try the input method" placeholder="Type to try" rows={5} onkeydown={keydown} onblur={settle} onabandon={settle} oncleared={settle} />
 	{#if shown?.candidates.length}
 		<ol class="candidates" aria-label="Candidates">
 			{#each shown.candidates as candidate, index (index)}
 				<li>
-					<button type="button" class="candidate" class:selected={index === shown.selected} onclick={() => void pick(index)}>
+					<button type="button" class="candidate" class:selected={index === shown.selected} onpointerdown={(event) => event.preventDefault()} onclick={() => pick(index)}>
 						<span class="index">{index + 1}</span>
 						<span class="truncate">{candidate}</span>
 					</button>
 				</li>
 			{/each}
+			{#if shown.total > shown.candidates.length}
+				<li class="px-2.5 pt-1 text-[12px] text-[var(--text-muted)]">{shown.first + 1}–{shown.first + shown.candidates.length} of {shown.total}</li>
+			{/if}
 		</ol>
-		{#if shown.total > shown.candidates.length}
-			<p class="px-1 text-[12px] text-[var(--text-muted)]">{shown.first + 1}–{shown.first + shown.candidates.length} of {shown.total}, Page Down for more</p>
-		{/if}
-	{/if}
-	{#if typed}
-		<button type="button" class="plain-button self-start" onclick={() => ((typed = ''), (shown = null))}>Clear</button>
 	{/if}
 </div>
 
 <style>
-	.field {
-		min-height: 120px;
-		border-radius: 18px;
-		background: var(--control);
-		padding: 14px 16px;
-		font-size: 18px;
-		line-height: 1.5;
-		outline: none;
-		overflow-wrap: anywhere;
-		box-shadow: inset 0 0 0 1px var(--hairline);
-		transition: box-shadow 160ms var(--ease);
-	}
-
-	.field.focused {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	.preedit {
-		text-decoration: underline;
-		text-decoration-color: var(--accent);
-		text-underline-offset: 4px;
-	}
-
-	.caret {
-		display: inline-block;
-		width: 1.5px;
-		height: 1.15em;
-		margin-left: 1px;
-		vertical-align: text-bottom;
-		background: var(--accent);
-		animation: blink 1.1s steps(1) infinite;
-	}
-
-	@keyframes blink {
-		50% {
-			opacity: 0;
-		}
-	}
-
 	.candidates {
 		display: flex;
 		flex-direction: column;

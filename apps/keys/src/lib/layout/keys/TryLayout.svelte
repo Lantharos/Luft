@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { CODES, PHYSICAL } from '#lib/keyboard/geometry.js';
+	import { toast } from '#lib/state/toast.svelte.js';
+	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
 	import { tryKey, tryLayout } from '../api';
 	import type { LayoutEditor } from '../editor.svelte';
-	import { CODES } from '#lib/keyboard/geometry.js';
 
 	interface Props {
 		editor: LayoutEditor;
@@ -9,81 +11,56 @@
 
 	let { editor }: Props = $props();
 
-	let field = $state<HTMLTextAreaElement>();
-	let value = $state('');
+	let field = $state<TryField>();
+	let held = new Set<string>();
+	let waiting = 0;
+	let typing = Promise.resolve();
 
-	function press(name: string, down: boolean) {
+	function show(name: string, down: boolean) {
 		const pressed = new Set(editor.pressed);
 		if (down) pressed.add(name);
 		else pressed.delete(name);
 		editor.pressed = pressed;
 	}
 
-	function insert(text: string) {
-		if (!field || !text) return;
-		const { selectionStart, selectionEnd } = field;
-		value = value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-		const caret = selectionStart + text.length;
-		requestAnimationFrame(() => field?.setSelectionRange(caret, caret));
+	function queue(task: () => Promise<void> | void) {
+		waiting++;
+		typing = typing
+			.then(task)
+			.catch((error) => toast.failed(error))
+			.finally(() => waiting--);
 	}
 
-	async function keydown(event: KeyboardEvent) {
-		const name = CODES[event.code];
-		if (!name || event.ctrlKey || event.metaKey || (event.altKey && event.code !== 'AltRight')) return;
-		event.preventDefault();
-		press(name, true);
-		insert(await tryKey(name, true));
+	function keydown(event: KeyboardEvent) {
+		if (event.ctrlKey || event.metaKey || (event.altKey && event.code !== 'AltRight')) return;
+		const name = PHYSICAL[event.code];
+		if (name) held.add(name);
+		const typed = name ? tryKey(name, true) : null;
+		if (typed && CODES[event.code]) {
+			event.preventDefault();
+			show(name, true);
+			queue(async () => field?.write(await typed));
+		} else if (waiting && EDITING_KEYS.has(event.key)) {
+			event.preventDefault();
+			const key = event.key;
+			queue(() => field?.perform(key));
+		}
 	}
 
 	function keyup(event: KeyboardEvent) {
-		const name = CODES[event.code];
-		if (!name) return;
-		event.preventDefault();
-		press(name, false);
+		const name = PHYSICAL[event.code];
+		if (!name || !held.delete(name)) return;
 		void tryKey(name, false);
+		if (!CODES[event.code]) return;
+		event.preventDefault();
+		show(name, false);
 	}
 
 	function reset() {
+		held = new Set();
 		editor.pressed = new Set();
 		void tryLayout($state.snapshot(editor.layout));
 	}
 </script>
 
-<textarea
-	bind:this={field}
-	bind:value
-	class="try"
-	data-own-undo
-	rows="3"
-	spellcheck="false"
-	placeholder="Type here to try the layout"
-	aria-label="Try the layout"
-	onkeydown={(event) => void keydown(event)}
-	onkeyup={keyup}
-	onfocus={reset}
-	onblur={reset}
-></textarea>
-
-<style>
-	.try {
-		width: 100%;
-		resize: none;
-		border-radius: 18px;
-		background: var(--control);
-		padding: 14px 16px;
-		font-size: 17px;
-		line-height: 1.5;
-		color: var(--text);
-		outline: none;
-		box-shadow: inset 0 0 0 1px var(--hairline);
-		transition: box-shadow 160ms var(--ease);
-	}
-
-	.try:focus {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	.try::placeholder {
-		color: var(--text-muted);
-	}
-</style>
+<TryField bind:this={field} label="Try the layout" placeholder="Type to try the layout" rows={2} onkeydown={keydown} onkeyup={keyup} onfocus={reset} onblur={reset} />

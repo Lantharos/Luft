@@ -5,19 +5,24 @@ import Meta from 'gi://Meta';
 import * as IBusManager from 'resource:///org/gnome/shell/misc/ibusManager.js';
 
 import {prepareHome} from './home.js';
+import {tryFieldChecker} from './keysTry.js';
 import {LuftApp, sleep, waitFor} from './luftApp.js';
 
+const KEY_1 = 2;
 const KEY_2 = 3;
+const KEY_BACKSPACE = 14;
 const KEY_TAB = 15;
 const KEY_Q = 16;
 const KEY_E = 18;
 const KEY_U = 22;
 const KEY_LEFTCTRL = 29;
 const KEY_A = 30;
+const KEY_S = 31;
 const KEY_TLDE = 41;
 const KEY_LEFTSHIFT = 42;
 const KEY_Z = 44;
 const KEY_SPACE = 57;
+const KEY_LEFT = 105;
 const IMPORTED = 15000;
 const SAVED = 5000;
 const FIXTURES = GLib.build_filenamev([GLib.path_get_dirname(GLib.filename_from_uri(import.meta.url)[0]), '..', '..', 'fixtures']);
@@ -89,6 +94,7 @@ export async function checkDeadKeys({require, reached, pause, keyboard, shoot, u
       throw new Error(`${error.message} (typed “${window.title}”)`);
     });
   };
+  const tryFieldHolds = tryFieldChecker({keyboard, pause, waitFor});
   const caronThen = (...codes) => () => {
     press(KEY_TLDE);
     for (const code of codes) press(code);
@@ -125,9 +131,15 @@ export async function checkDeadKeys({require, reached, pause, keyboard, shoot, u
     press(KEY_LEFTCTRL, KEY_2);
     await pause(900);
     await shoot(keys, 'keys-dead-keys');
-    type('a');
+    type('ua');
     await pause(300);
-    for (let step = 0; step < 4; step++) press(KEY_TAB);
+    await shoot(keys, 'keys-dead-key-try');
+    type(' ');
+    press(KEY_LEFT);
+    press(KEY_BACKSPACE);
+    type('z');
+    await tryFieldHolds('žˇ', 'the dead key’s Try it field chains, types its symbol with Space and edits at the caret');
+    for (let step = 0; step < 3; step++) press(KEY_TAB);
     press(KEY_LEFTCTRL, KEY_A);
     type('ez');
     await reached(() => read(compose).includes('<UEC40> <a> : "ez"'), 'changing a result in the dead key table updates its sequence', SAVED);
@@ -174,6 +186,15 @@ export async function checkDeadKeys({require, reached, pause, keyboard, shoot, u
       method.process.force_exit();
     }
 
+    keys.window.activate(global.get_current_time());
+    await pause(300);
+    press(KEY_LEFTCTRL, KEY_1);
+    await pause(900);
+    press(KEY_TAB);
+    await pause(300);
+    caronThen(KEY_A, KEY_A, KEY_S)();
+    await tryFieldHolds('žas', 'the Try it field types with the layout while one of Keys’ input methods is the input source');
+
     useSources([['ibus', 'mozc-jp'], ['xkb', id]]);
     await pause(2500);
     const mozc = await gtk4();
@@ -182,6 +203,14 @@ export async function checkDeadKeys({require, reached, pause, keyboard, shoot, u
     } finally {
       mozc.process.force_exit();
     }
+
+    keys.window.activate(global.get_current_time());
+    await pause(300);
+    press(KEY_LEFTCTRL, KEY_A);
+    press(KEY_BACKSPACE);
+    caronThen(KEY_U, KEY_A, KEY_Q)();
+    press(KEY_E);
+    await tryFieldHolds('ăqe', 'the Try it field types with the layout while Mozc is the input source');
     return id;
   } finally {
     await keys.close();

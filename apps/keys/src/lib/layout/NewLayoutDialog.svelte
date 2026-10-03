@@ -79,7 +79,7 @@
 	}
 </script>
 
-<Dialog title="New layout" description="Start from a layout that's close to what you want, then change the keys you need." wide {onclose}>
+<Dialog title="New layout" wide {onclose}>
 	<div class="flex flex-col gap-4">
 		<TextField bind:this={field} label="Name" showLabel bind:value={() => name, (value) => (typed = value)} onkeydown={keydown} />
 		<div class="flex flex-col gap-2">

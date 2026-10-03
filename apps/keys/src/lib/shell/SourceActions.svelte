@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import { Dialog, MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
+	import { Dialog, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import { app, type Selection } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';
 
@@ -16,9 +17,10 @@
 		onuse: () => Promise<void>;
 		exports: Export[];
 		onremove: () => Promise<void>;
+		menu?: Snippet<[() => void]>;
 	}
 
-	let { selection, what, onuse, exports, onremove }: Props = $props();
+	let { selection, what, onuse, exports, onremove, menu }: Props = $props();
 
 	let confirming = $state(false);
 	let added = $derived(app.inSources(selection));
@@ -39,7 +41,7 @@
 </script>
 
 {#if added}
-	<span class="flex items-center gap-1.5 px-2 text-[13px] text-[var(--text-muted)]"><Check size={15} />In your input sources</span>
+	<span class="added" role="img" aria-label="In your input sources" {@attach tooltip('In your input sources')}><Check size={17} /></span>
 {:else}
 	<button type="button" class="button" onclick={() => void use()}>Add to input sources</button>
 {/if}
@@ -49,6 +51,10 @@
 		<Ellipsis size={18} />
 	{/snippet}
 	{#snippet children(close)}
+		{#if menu}
+			{@render menu(close)}
+			<MenuSeparator />
+		{/if}
 		{#each exports as item (item.label)}
 			<MenuItem
 				onclick={() => {
@@ -69,7 +75,7 @@
 </MenuButton>
 
 {#if confirming}
-	<Dialog title="Delete this {what}?" description="It's removed from your input sources too. This can't be undone." onclose={() => (confirming = false)}>
+	<Dialog title="Delete this {what}?" description="It's removed from your input sources too." onclose={() => (confirming = false)}>
 		{#snippet actions()}
 			<button type="button" class="button" onclick={() => (confirming = false)}>Cancel</button>
 			<button
@@ -83,3 +89,13 @@
 		{/snippet}
 	</Dialog>
 {/if}
+
+<style>
+	.added {
+		display: grid;
+		height: 32px;
+		width: 32px;
+		place-items: center;
+		color: var(--text-muted);
+	}
+</style>

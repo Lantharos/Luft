@@ -23,13 +23,10 @@
 	});
 </script>
 
-<div class="flex min-w-0 flex-col gap-7">
+<div class="flex min-w-0 flex-col gap-5">
 	<DeadKeyHeader symbol={symbol.text} name={standardName(symbol.keysym)} {where}>
 		<button type="button" class="button" onclick={() => void editor.copySystem(symbol)}>Make an editable copy</button>
 	</DeadKeyHeader>
-	<p class="px-1.5 text-[13px] leading-relaxed text-[var(--text-muted)]">
-		This dead key makes what the computer's standard table says. A copy puts it on the same keys with a table of its own that you can change.
-	</p>
 	{#if table}
 		<PairGrid key={table} readonly />
 	{/if}

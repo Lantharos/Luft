@@ -19,23 +19,23 @@
 	const LABEL_LENGTH = 3;
 </script>
 
-<Section title="Details">
+<Section>
 	<Row title="Name">
 		<div class="w-[280px]">
 			<TextField label="Name" bind:value={() => editor.method.name, (name) => editor.set('name', name)} />
 		</div>
 	</Row>
-	<Row title="Short name" description="Shown on the panel while you type with it">
+	<Row title="Short name">
 		<div class="w-[120px]">
 			<TextField label="Short name" bind:value={() => editor.method.label, (label) => editor.set('label', label.slice(0, LABEL_LENGTH))} />
 		</div>
 	</Row>
-	<Row title="Language" description="Its code, such as eo for Esperanto or zh for Chinese">
+	<Row title="Language">
 		<div class="w-[120px]">
-			<TextField label="Language" bind:value={() => editor.method.language, (language) => editor.set('language', language.trim())} />
+			<TextField label="Language" placeholder="eo" bind:value={() => editor.method.language, (language) => editor.set('language', language.trim())} />
 		</div>
 	</Row>
-	<Row title="Sequence key" description="Press it, then a sequence below, to type what the sequence makes">
+	<Row title="Sequence key">
 		<Select label="Sequence key" options={COMPOSE_KEYS} value={editor.method.compose} onchange={(compose) => editor.set('compose', compose)} />
 	</Row>
 	{#if editor.words.length}
@@ -44,7 +44,7 @@
 				<Segmented label="Choices shown at once" options={PAGE_SIZES} value={editor.method.candidates} onchange={(size) => editor.set('candidates', size)} />
 			</div>
 		</Row>
-		<Row title="Learn from your choices" description="Words you pick often move to the top">
+		<Row title="Learn from your choices">
 			<Switch label="Learn from your choices" checked={editor.method.learn} onchange={(learn) => editor.set('learn', learn)} />
 		</Row>
 	{/if}

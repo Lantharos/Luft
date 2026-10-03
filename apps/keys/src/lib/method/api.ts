@@ -52,5 +52,5 @@ export const useMethod = (id: string) => invoke<void>('method_use', { id });
 export const importMethod = () => invoke<Method | null>('method_import');
 export const exportMethod = (id: string) => invoke<boolean>('method_export', { id });
 export const tryMethod = (method: Method) => invoke<void>('method_try', method);
-export const tryMethodKey = (press: { keysym?: string; text?: string }) => invoke<Shown>('method_try_key', press);
+export const tryMethodKey = (press: { keysym?: string; text?: string; before: string }) => invoke<Shown>('method_try_key', press);
 export const tryMethodPick = (index: number) => invoke<Shown>('method_try_pick', { index });

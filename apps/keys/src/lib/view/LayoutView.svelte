@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Segmented } from '@luft/ui';
-	import { GEOMETRIES, PHYSICAL, TYPING } from '#lib/keyboard/geometry.js';
+	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import { MenuButton } from '@luft/ui';
+	import { PHYSICAL, TYPING } from '#lib/keyboard/geometry.js';
 	import Keyboard from '#lib/keyboard/Keyboard.svelte';
+	import ShapeItems from '#lib/keyboard/ShapeItems.svelte';
 	import { viewLayout } from '#lib/layout/api.js';
 	import Page from '#lib/shell/Page.svelte';
 	import { app } from '#lib/state/app.svelte.js';
@@ -52,16 +54,16 @@
 			{:else}
 				<button type="button" class="button" onclick={() => (app.creating = { kind: 'layout', from: id })}>Make a copy to edit</button>
 			{/if}
+			<MenuButton label="More" class="icon-button" align="end" minWidth={200}>
+				{#snippet trigger()}
+					<Ellipsis size={18} />
+				{/snippet}
+				{#snippet children(close)}
+					<ShapeItems value={current.geometry} onchange={(geometry) => current.setGeometry(geometry)} {close} />
+				{/snippet}
+			</MenuButton>
 		{/snippet}
-		<section class="flex flex-col gap-4">
-			<div class="flex items-center justify-between gap-4">
-				<p class="text-[13px] text-[var(--text-muted)]">
-					{current.usesThirdLevel ? 'Hold Shift or AltGr, or click them, to see what else the keys type.' : 'Hold Shift, or click it, to see what else the keys type.'}
-				</p>
-				<div class="w-[200px] flex-none">
-					<Segmented label="Keyboard shape" options={GEOMETRIES} value={current.geometry} onchange={(geometry) => current.setGeometry(geometry)} />
-				</div>
-			</div>
+		<section class="flex flex-col gap-6 pt-4">
 			<Keyboard board={current} level={current.level || null} onlatch={(name) => current.latch(name)} />
 			<KeyLevels levels={current.levels(current.selected)} level={current.level} thirdLevel={current.usesThirdLevel} dead={current.layout.dead} />
 		</section>

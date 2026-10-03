@@ -1,6 +1,6 @@
 # Kestrel compositor
 
-Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the official repository, release, and exact base commit; `series` lists the patches in application order. The stack contains window rounding, framebuffer blur shader reuse, `xdg-toplevel-icon-v1` support, fractional glyph advances for shell text, desktop windows for Wayland clients the shell places behind everything else, such as live wallpapers, a fix that lets go of the input method when a focused text field is destroyed, so a later input source switch cannot read the freed field, and cursor lookup that moves on to the next cursor implementation when one declines a theme, so the shell's scalable cursors leave Xcursor themes to Mutter's loader, and cursor framebuffers that are removed rather than closed when they are released, so a compositor that exits leaves its last frame on screen without its pointer, and settings that come from Kestrel instead of gnome-settings-daemon. Desktop windows are never scanned out directly or used for variable refresh rate, since the shell draws its panels over them.
+Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the official repository, release, and exact base commit; `series` lists the patches in application order. The stack contains window rounding, framebuffer blur shader reuse, `xdg-toplevel-icon-v1` support, fractional glyph advances for shell text, desktop windows for Wayland clients the shell places behind everything else, such as live wallpapers, a fix that lets go of the input method when a focused text field is destroyed, so a later input source switch cannot read the freed field, and cursor lookup that moves on to the next cursor implementation when one declines a theme, so the shell's scalable cursors leave Xcursor themes to Mutter's loader, and cursor framebuffers that are removed rather than closed when they are released, so a compositor that exits leaves its last frame on screen without its pointer, and settings that come from Kestrel instead of gnome-settings-daemon. Desktop windows are never scanned out directly or used for variable refresh rate, since the shell draws its panels over them. When a display stops showing a fullscreen window's buffer directly, for example because the window left fullscreen, the compositor repaints the whole display right away instead of waiting for something else on screen to change.
 
 Mutter reads the rotation lock from `com.lantharos.kestrel.touchscreen` and the night light color temperature from `com.lantharos.Settings.NightLight`, which `kestrel-settings` provides, so it needs none of gnome-settings-daemon's settings or services. Color profiles that ask for a screen brightness no longer try to set it through gnome-settings-daemon, which stopped offering that interface. Monitor makers are named from systemd's hardware database, which carries the same registry of display vendors, so Mutter needs no part of gnome-desktop.
 
@@ -49,11 +49,21 @@ kestrel/compositor/build.sh
 
 ## Window rendering
 
-The 12px radius is measured in logical window coordinates. Each Wayland subsurface receives the same frame bounds transformed into its own coordinates. Xwayland uses the same shaped-texture path. Existing alpha masks and client shadow pixels outside the window frame remain intact.
+The 15px radius is measured in logical window coordinates. Each Wayland subsurface receives the same frame bounds transformed into its own coordinates. Xwayland uses the same shaped-texture path. Existing alpha masks and client shadow pixels outside the window frame remain intact. Inside the frame, the corners outside the curve continue the client's own shadow from the straight edges next to them, so a client that draws its shadow behind smaller corners shows no square gap around the rounded corner.
 
 Only the blended pipeline receives the antialiased distance mask. Four small corner squares are removed from the opaque region so underlying pixels are drawn correctly; the remaining interior still uses unblended rendering. Native Xwayland shadows use the rounded shape without changing whether the client content qualifies for a shadow. Input cutouts are cached and refreshed when window geometry or the client input region changes. App-requested background blur uses the same mask on its existing output pass. Its effect shader is shared between frames. This adds no per-window offscreen framebuffer or continuous repaint source.
 
 Maximized and fullscreen surfaces bypass rounding, preserving edge-to-edge presentation and direct scanout eligibility. Native display scanout must be qualified on hardware; a nested session cannot demonstrate it.
+
+## Direct scanout diagnostics
+
+To find out why a display kept showing a fullscreen window after it left fullscreen, turn on the log:
+
+```sh
+gsettings set com.lantharos.kestrel.diagnostics log-direct-scanout true
+```
+
+The compositor then writes a line to the journal whenever a display starts or stops showing a window's buffer directly, naming the app and why it stopped, and how long the desktop took to reach the screen afterwards. If the desktop isn't back after a second, it also records whether a redraw was queued and how long the oldest frame has waited for the display. At most 30 lines are written per minute. `journalctl --user -u kestrel.service | grep "Direct scanout"` shows them. Turn the log off again with `gsettings reset com.lantharos.kestrel.diagnostics log-direct-scanout`.
 
 ## Window icons
 

@@ -72,7 +72,7 @@ schema = configure_file(
   install_dir: schemadir
 )
 settings_schemas = []
-foreach name : ['media-keys', 'night-light', 'power', 'touchscreen']
+foreach name : ['diagnostics', 'media-keys', 'night-light', 'power', 'touchscreen']
   settings_schemas += configure_file(
     input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),

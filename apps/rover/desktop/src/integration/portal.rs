@@ -113,7 +113,7 @@ async fn run_chooser(
     options: &Options,
     mode: ChooserMode,
 ) -> Result<ChooserResponse, String> {
-    let exe = env::current_exe().map_err(|error| error.to_string())?;
+    let exe = env::args_os().next().ok_or("Rover doesn't know where it's installed")?;
     let directory = option_bool(options, "directory").unwrap_or(mode == ChooserMode::SaveFiles);
     let files = serde_json::to_string(&option_files(options)).map_err(|error| error.to_string())?;
     let status = Command::new(exe)

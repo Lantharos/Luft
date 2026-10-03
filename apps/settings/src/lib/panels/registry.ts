@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import Accessibility from '@lucide/svelte/icons/accessibility';
 import Bell from '@lucide/svelte/icons/bell';
 import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
@@ -28,6 +29,7 @@ export type PanelId =
 	| 'notifications'
 	| 'keyboard'
 	| 'mouse'
+	| 'accessibility'
 	| 'apps'
 	| 'privacy'
 	| 'security'
@@ -84,7 +86,8 @@ export const PANEL_GROUPS: Panel[][] = [
 		panel('mouse', pointerTitle, Mouse, ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad'], () => import('./mouse/MousePanel.svelte'), {
 			present: (hardware) => hardware.mouse || hardware.touchpad,
 			missing: 'No mouse or touchpad is connected'
-		})
+		}),
+		panel('accessibility', 'Accessibility', Accessibility, ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'], () => import('./accessibility/AccessibilityPanel.svelte'))
 	],
 	[
 		panel('apps', 'Apps', LayoutGrid, ['default apps', 'browser', 'startup', 'autostart'], () => import('./apps/AppsPanel.svelte')),

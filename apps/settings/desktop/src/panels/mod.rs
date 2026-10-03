@@ -1,4 +1,5 @@
 mod about;
+mod accessibility;
 mod appearance;
 mod apps;
 mod bluetooth;
@@ -33,6 +34,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = appearance::register(window, events);
     let window = notifications::register(window, events);
     let window = keyboard::register(window, events);
+    let window = accessibility::register(window);
     let window = apps::register(window, events);
     let window = privacy::register(window, events);
     let window = passkeys::register(window, events);

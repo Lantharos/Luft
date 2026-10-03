@@ -6,6 +6,7 @@ import {LuftApp, startSabineService, waitFor} from './luftApp.js';
 import {checkDisks} from './disksChecks.js';
 import {checkFontViewer} from './fontViewer.js';
 import {checkRoverNetwork} from './roverNetworkChecks.js';
+import {checkSettingsAccessibility} from './settingsAccessibility.js';
 import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
 import {checkTern} from './ternChecks.js';
@@ -107,6 +108,7 @@ export async function checkLuftApps({output, pointer}) {
     const darkFrames = {};
     for (const name of APPS) darkFrames[name] = await checkApp(name, context);
     await checkSettingsPages(darkFrames.settings, context);
+    await checkSettingsAccessibility(context);
     await checkSettingsHardware(context);
     await checkFontViewer(darkFrames.magpie, context);
     await checkDisks(context);

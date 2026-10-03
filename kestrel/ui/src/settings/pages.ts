@@ -3,7 +3,7 @@ import type Shell from 'gi://Shell';
 
 export type SettingsPageId =
   | 'network' | 'bluetooth' | 'display' | 'sound' | 'power' | 'appearance' | 'notifications'
-  | 'keyboard' | 'mouse' | 'apps' | 'privacy' | 'security' | 'datetime' | 'users' | 'login' | 'about';
+  | 'keyboard' | 'mouse' | 'accessibility' | 'apps' | 'privacy' | 'security' | 'datetime' | 'users' | 'login' | 'about';
 
 export interface SettingsPage {
   id: SettingsPageId;
@@ -22,6 +22,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   { id: 'notifications', title: 'Notifications', icon: 'preferences-system-notifications-symbolic', keywords: ['do not disturb', 'banners', 'lock screen'] },
   { id: 'keyboard', title: 'Keyboard', icon: 'input-keyboard-symbolic', keywords: ['input sources', 'layout', 'shortcuts', 'language'] },
   { id: 'mouse', title: 'Mouse & Touchpad', icon: 'input-mouse-symbolic', keywords: ['pointer', 'scroll', 'touchpad', 'tap to click'] },
+  { id: 'accessibility', title: 'Accessibility', icon: 'preferences-desktop-accessibility-symbolic', keywords: ['a11y', 'screen reader', 'zoom', 'magnifier', 'large text', 'high contrast', 'on-screen keyboard', 'sticky keys', 'mouse keys', 'visual alerts'] },
   { id: 'apps', title: 'Apps', icon: 'view-app-grid-symbolic', keywords: ['default apps', 'browser', 'startup', 'autostart'] },
   { id: 'privacy', title: 'Privacy', icon: 'preferences-system-privacy-symbolic', keywords: ['screen lock', 'location', 'camera', 'microphone', 'history'] },
   { id: 'security', title: 'Security', icon: 'security-high-symbolic', keywords: ['secure boot', 'tpm', 'encryption', 'recovery key', 'usb', 'passwords', 'passkeys'] },

@@ -1,33 +1,9 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
-import NMA4 from 'gi://NMA4';
 
 import {loadInterfaceXML} from './fileUtils.js';
-
-let _mpd;
-
-/**
- * _getMobileProvidersDatabase:
- *
- * Gets the database of mobile providers, with references between MCCMNC/SID and
- * operator name
- *
- * @returns {NMA4.MobileProvidersDatabase | null}
- */
-function _getMobileProvidersDatabase() {
-    if (_mpd == null) {
-        try {
-            _mpd = new NMA4.MobileProvidersDatabase();
-            _mpd.init(null);
-        } catch (e) {
-            log(e.message);
-            _mpd = null;
-        }
-    }
-
-    return _mpd;
-}
+import {lookup3gppMccMnc, lookupCdmaSid} from './mobileProviders.js';
 
 // _findProviderForMccMnc:
 // @operatorName: operator name
@@ -60,13 +36,7 @@ function _findProviderForMccMnc(operatorName, operatorCode) {
     else // nothing to search
         return null;
 
-    const mpd = _getMobileProvidersDatabase();
-    if (mpd) {
-        const provider = mpd.lookup_3gpp_mcc_mnc(needle);
-        if (provider)
-            return provider.get_name();
-    }
-    return null;
+    return lookup3gppMccMnc(needle);
 }
 
 // _findProviderForSid:
@@ -78,13 +48,7 @@ function _findProviderForSid(sid) {
     if (!sid)
         return null;
 
-    const mpd = _getMobileProvidersDatabase();
-    if (mpd) {
-        const provider = mpd.lookup_cdma_sid(sid);
-        if (provider)
-            return provider.get_name();
-    }
-    return null;
+    return lookupCdmaSid(sid);
 }
 
 

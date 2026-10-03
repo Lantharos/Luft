@@ -21,8 +21,6 @@ import * as InputSources from './status/keyboard.js';
 import * as KestrelUi from './kestrelUi.js';
 import * as MessageTray from './messageTray.js';
 import * as OsdWindow from './osdWindow.js';
-import * as OsdMonitorLabeler from './osdMonitorLabeler.js';
-import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
 import * as Layout from './layout.js';
 import * as NotificationDaemon from './notificationDaemon.js';
@@ -49,9 +47,7 @@ export let messageTray = null;
 export let screenShield = null;
 export let notificationDaemon = null;
 export let ctrlAltTabManager = null;
-export let padOsdService = null;
 export let osdWindowManager = null;
-export let osdMonitorLabeler = null;
 export let sessionMode = null;
 export let screenshotUI = null;
 export let shellAccessDialogDBusService = null;
@@ -225,11 +221,9 @@ async function _initializeUI() {
     // working until it's updated.
     uiGroup = layoutManager.uiGroup;
 
-    padOsdService = new PadOsd.PadOsdService();
     xdndHandler = new XdndHandler.XdndHandler();
     ctrlAltTabManager = new CtrlAltTab.CtrlAltTabManager();
     osdWindowManager = new OsdWindow.OsdWindowManager();
-    osdMonitorLabeler = new OsdMonitorLabeler.OsdMonitorLabeler();
     kbdA11yDialog = new KbdA11yDialog.KbdA11yDialog();
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();

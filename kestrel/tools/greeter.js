@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {disableHelperAutoExit} from 'resource:///org/gnome/shell/ui/scripting.js';
 
 import {checkPeople} from './checks/greeter/peopleChecks.js';
 import {checkControls} from './checks/greeter/controlChecks.js';
@@ -42,7 +41,6 @@ function events() {
 }
 
 export async function run() {
-  await disableHelperAutoExit();
   const seat = global.stage.context.get_backend().get_default_seat();
   const pointer = seat.create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
   const keyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);

@@ -10,13 +10,9 @@ import Pango from 'gi://Pango';
 import Rsvg from 'gi://Rsvg';
 import St from 'gi://St';
 
-import * as Signals from '../misc/signals.js';
-
 import * as Main from './main.js';
 import * as PopupMenu from './popupMenu.js';
 import * as Layout from './layout.js';
-
-import {loadInterfaceXML} from '../misc/fileUtils.js';
 
 const ACTIVE_COLOR = 'st-lighten(-st-accent-color, 15%)';
 
@@ -970,39 +966,3 @@ export const PadOsd = GObject.registerClass({
         this.emit('closed');
     }
 });
-
-const PadOsdIface = loadInterfaceXML('org.gnome.Shell.Wacom.PadOsd');
-
-export class PadOsdService extends Signals.EventEmitter {
-    constructor() {
-        super();
-
-        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PadOsdIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/Wacom');
-        Gio.DBus.session.own_name('org.gnome.Shell.Wacom.PadOsd', Gio.BusNameOwnerFlags.REPLACE, null, null);
-    }
-
-    ShowAsync(params, invocation) {
-        const [deviceNode, editionMode] = params;
-        const seat = global.stage.context.get_backend().get_default_seat();
-        const devices = seat.list_devices();
-        let padDevice = null;
-
-        devices.forEach(device => {
-            if (deviceNode === device.get_device_node() &&
-                device.get_device_type() === Clutter.InputDeviceType.PAD_DEVICE)
-                padDevice = device;
-        });
-
-        if (padDevice == null) {
-            invocation.return_error_literal(
-                Gio.IOErrorEnum,
-                Gio.IOErrorEnum.CANCELLED,
-                'Invalid params');
-            return;
-        }
-
-        global.display.request_pad_osd(padDevice, editionMode);
-        invocation.return_value(null);
-    }
-}

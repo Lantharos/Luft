@@ -3,6 +3,11 @@ use luft_keyring_vault::{Contents, Item};
 use crate::identity::App;
 
 pub const PORTAL_SCHEMA: &str = "org.freedesktop.portal.Secret";
+const DRIVE_PASSPHRASE: &str = "gvfs-luks-uuid";
+const DRIVE_UNLOCKERS: [&str; 2] = [
+    "exe:/usr/libexec/gvfs-udisks2-volume-monitor",
+    "app:com.lantharos.disks",
+];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Decision {
@@ -22,6 +27,10 @@ pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> 
         .is_some_and(|schema| schema == PORTAL_SCHEMA || schema == crate::passkeys::SCHEMA)
     {
         return Decision::Denied;
+    }
+    if item.attributes.contains_key(DRIVE_PASSPHRASE) && DRIVE_UNLOCKERS.contains(&app.key.as_str())
+    {
+        return Decision::Allowed;
     }
     let rule = contents
         .rules

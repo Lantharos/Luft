@@ -83,6 +83,8 @@ Items brought in from GNOME Keyring or oo7 don't know who saved them, so they go
 - **Items that name their app** go only to that app. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`, and only an app with that name, by launcher entry, Flatpak ID or program, takes it. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`, so any Chromium-based browser can take those. Every other app is asked.
 - **Keyring tools never take items.** `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens.
 
+Passphrases of encrypted drives are shared between the two things that unlock drives: the desktop, which asks for one when an encrypted drive is plugged in and keeps it through GVfs when Remember Password is ticked, and Disks. Both keep them the way GVfs always has, under the `gvfs-luks-uuid` attribute with the drive's UUID, and either may use the ones the other saved, so a passphrase remembered in one place unlocks the drive in both without asking.
+
 Secrets that sandboxed apps keep through the Secret portal are never shown to other apps. A Flatpak gets the same portal secret it got from GNOME Keyring or oo7, because those items are brought in unchanged and looked up the same way, by the app's ID.
 
 Settings shows which app read, saved, deleted or was refused what, and when.

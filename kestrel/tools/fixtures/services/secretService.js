@@ -26,6 +26,7 @@ const COLLECTION_XML = `<node><interface name="org.freedesktop.Secret.Collection
 </interface></node>`;
 const ITEM_XML = `<node><interface name="org.freedesktop.Secret.Item">
   <method name="GetSecret"><arg type="o" direction="in"/><arg type="${SECRET}" direction="out"/></method>
+  <method name="Delete"><arg type="o" direction="out"/></method>
   <property name="Attributes" type="a{ss}" access="read"/>
   <property name="Label" type="s" access="read"/>
   <property name="Locked" type="b" access="read"/>
@@ -43,6 +44,7 @@ export class ScratchKeyring {
     this.items = [];
     this._exported = [];
     this._sessions = 0;
+    this._created = 0;
     this._connection = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, null),
       Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
     this._export(SERVICE_XML, {
@@ -63,26 +65,14 @@ export class ScratchKeyring {
       Collections: [COLLECTION],
     }, ROOT);
     const collection = () => ({
-      CreateItem: (properties, [session, , value], replace) => {
+      CreateItem: (properties, [, , value], replace) => {
         const attributes = properties['org.freedesktop.Secret.Item.Attributes'].deepUnpack();
+        const label = properties['org.freedesktop.Secret.Item.Label']?.deepUnpack() ?? '';
         const existing = replace ? this.items.find(item => matches(item, attributes) && Object.keys(item.attributes).length === Object.keys(attributes).length) : null;
-        const item = existing ?? {path: `${COLLECTION}/${this.items.length + 1}`, attributes};
-        item.label = properties['org.freedesktop.Secret.Item.Label']?.deepUnpack() ?? '';
-        item.secret = new TextDecoder().decode(new Uint8Array(value));
-        if (!existing) {
-          this.items.push(item);
-          this._export(ITEM_XML, {
-            GetSecret: session => secretOf(item, session),
-            get Attributes() {
-              return item.attributes;
-            },
-            get Label() {
-              return item.label;
-            },
-            Locked: false, Created: 0, Modified: 0,
-          }, item.path);
-        }
-        return [item.path, '/'];
+        if (!existing) return [this.store(attributes, label, new TextDecoder().decode(new Uint8Array(value))), '/'];
+        existing.label = label;
+        existing.secret = new TextDecoder().decode(new Uint8Array(value));
+        return [existing.path, '/'];
       },
       SearchItems: attributes => this._search(attributes),
       get Items() {
@@ -94,6 +84,28 @@ export class ScratchKeyring {
     this._export(COLLECTION_XML, collection(), DEFAULT_ALIAS);
   }
 
+  store(attributes, label, secret) {
+    const item = {path: `${COLLECTION}/${++this._created}`, attributes, label, secret};
+    this.items.push(item);
+    const exported = this._export(ITEM_XML, {
+      GetSecret: session => secretOf(item, session),
+      Delete: () => {
+        this.items = this.items.filter(other => other !== item);
+        this._exported = this._exported.filter(other => other !== exported);
+        exported.unexport();
+        return '/';
+      },
+      get Attributes() {
+        return item.attributes;
+      },
+      get Label() {
+        return item.label;
+      },
+      Locked: false, Created: 0, Modified: 0,
+    }, item.path);
+    return item.path;
+  }
+
   _search(attributes) {
     return this.items.filter(item => matches(item, attributes)).map(item => item.path);
   }
@@ -102,6 +114,7 @@ export class ScratchKeyring {
     const exported = Gio.DBusExportedObject.wrapJSObject(xml, implementation);
     exported.export(this._connection, path);
     this._exported.push(exported);
+    return exported;
   }
 
   async own() {

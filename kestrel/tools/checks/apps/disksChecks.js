@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {ScratchKeyring} from '../../fixtures/services/secretService.js';
 import {LuftApp, sleep, waitFor} from './luftApp.js';
 
 const LOADING = 800;
@@ -13,8 +14,10 @@ const AT = {
   health: [600, 360], quickTest: [327, 496], firstDrive: [560, 338], next: [686, 465], write: [666, 419],
   largest: [1009, 467], trash: [860, 565], confirmTrash: [671, 417],
   turnOn: [885, 448], checked: [755, 458], saved: [292, 457], keySaved: [755, 509], unlocking: [755, 452], encrypt: [759, 458],
-  encryption: [885, 459], autoUnlock: [772, 316],
+  encryption: [885, 459], autoUnlock: [772, 290], remember: [362, 392], confirmUnlock: [692, 444], lock: [900, 300],
 };
+const ARCHIVE = 'archive-luks';
+const PASSPHRASE = 'correct horse';
 
 function systemCalls() {
   const bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
@@ -47,6 +50,7 @@ class Driver {
       this.keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.PRESSED);
       this.keyboard.notify_keyval(GLib.get_monotonic_time(), character.codePointAt(0), Clutter.KeyState.RELEASED);
     }
+    await sleep(LOADING / 2);
   }
 
   async key(keyval) {
@@ -111,12 +115,23 @@ async function checkRemovable(driver, {require, output}) {
   return image;
 }
 
-async function checkEncrypted(driver, {require, output}) {
+async function checkEncrypted(driver, keyring, {require, output}) {
   await driver.click('wdc');
   await driver.click('unlock');
-  await driver.type('correct horse');
-  await driver.key(Clutter.KEY_Return);
+  await driver.type(PASSPHRASE);
+  await driver.click('remember');
+  await driver.click('confirmUnlock');
   require(await driver.called(['udisks Unlock /dev/sda1'], 'unlocking'), 'disks unlocks an encrypted partition with its passphrase');
+  require(keyring.items.some(item => item.attributes['gvfs-luks-uuid'] === ARCHIVE && item.secret === PASSPHRASE),
+    'disks remembers the passphrase where the desktop looks when the drive is plugged in');
+
+  await driver.click('more');
+  await driver.click('lock');
+  require(await driver.called(['udisks Lock /dev/sda1'], 'locking'), 'disks locks an encrypted partition');
+  keyring.forget();
+  keyring.store({'gvfs-luks-uuid': ARCHIVE}, 'Encryption passphrase for Archive', PASSPHRASE);
+  await driver.click('unlock');
+  require(await driver.called(['udisks Unlock /dev/sda1'], 'unlocking again'), 'disks unlocks with a passphrase the desktop remembered');
   (await driver.shown('unlocked')).save(`${output}/disks-unlocked-dark.png`);
 
   const create = await driver.click('newPartition');
@@ -236,6 +251,8 @@ async function checkSpace({styles, require, output, pointer}) {
 export async function checkDisks(context) {
   const {styles, output} = context;
   styles.interface.set_string('color-scheme', 'prefer-dark');
+  const keyring = new ScratchKeyring();
+  context.require(await keyring.own(), 'a scratch keyring stands in for the Secret Service');
   const app = new LuftApp('disks', [`file:///run/media/${GLib.get_user_name()}/TRAVEL`]);
   let image;
   try {
@@ -243,11 +260,12 @@ export async function checkDisks(context) {
     const driver = new Driver(app, context);
     (await driver.shown('opened')).save(`${output}/disks-dark.png`);
     image = await checkRemovable(driver, context);
-    await checkEncrypted(driver, context);
+    await checkEncrypted(driver, keyring, context);
     await checkHealth(driver, context);
     await checkEncryption(driver, context);
   } finally {
     await app.close();
+    keyring.close();
   }
   await checkWriteImage(image, context);
   await checkSpace(context);

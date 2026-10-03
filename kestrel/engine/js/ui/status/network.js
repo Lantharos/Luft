@@ -50,10 +50,6 @@ function ssidToLabel(ssid) {
     return label;
 }
 
-function openNetworkSettings() {
-    Gio.AppInfo.launch_default_for_uri('kestrel-settings:network', null);
-}
-
 class ItemSorter {
     [Symbol.iterator] = this.items;
 
@@ -664,16 +660,8 @@ class NMModemDeviceItem extends NMDeviceItem {
         return this._mobileDevice?.operator_name || this._deviceName;
     }
 
-    get wwanPanelSupported() {
-        // Currently, wwan panel doesn't support CDMA_EVDO modems
-        const supportedCaps =
-            NM.DeviceModemCapabilities.GSM_UMTS |
-            NM.DeviceModemCapabilities.LTE;
-        return this._device.current_capabilities & supportedCaps;
-    }
-
     _autoConnect() {
-        openNetworkSettings();
+        Util.openSettings('network');
     }
 
     _sessionUpdated() {
@@ -922,7 +910,7 @@ const WirelessNetwork = GObject.registerClass({
         if (conn) {
             this._device.client.activate_connection_async(conn, this._device, null, null, null);
         } else if (!this.canAutoconnect()) {
-            openNetworkSettings();
+            Util.openSettings('network');
         } else {
             conn = new NM.SimpleConnection();
             const permission = Polkit.Permission.new_sync('org.freedesktop.NetworkManager.settings.modify.system', null, null);
@@ -1519,8 +1507,7 @@ class NMVpnToggle extends NMToggle {
 
         this.menu.setHeader('network-vpn-symbolic', _('VPN'));
         this.menuButtonAccessibleName = _('Open VPN menu');
-        this.menu.addSettingsAction(_('VPN Settings'),
-            'gnome-network-panel.desktop');
+        this.menu.addSettingsAction(_('VPN Settings'), 'network');
     }
 
     setClient(client) {
@@ -1782,8 +1769,7 @@ class NMWirelessToggle extends NMDeviceToggle {
         this.menu.setHeader('network-wireless-symbolic', _('Wi–Fi'));
         this.menuButtonAccessibleName = _('Open Wi–Fi menu');
         this.menu.addHeaderSuffix(this._scanningSpinner);
-        this.menu.addSettingsAction(_('All Networks'),
-            'gnome-wifi-panel.desktop');
+        this.menu.addSettingsAction(_('All Networks'), 'network');
     }
 
     setClient(client) {
@@ -1894,8 +1880,7 @@ class NMWiredToggle extends NMDeviceToggle {
 
         this.menu.setHeader('network-wired-symbolic', _('Wired Connections'));
         this.menuButtonAccessibleName = _('Open wired connections menu');
-        this.menu.addSettingsAction(_('Wired Settings'),
-            'gnome-network-panel.desktop');
+        this.menu.addSettingsAction(_('Wired Settings'), 'network');
     }
 
     _createDeviceMenuItem(device) {
@@ -1910,8 +1895,7 @@ class NMBluetoothToggle extends NMDeviceToggle {
 
         this.menu.setHeader('network-cellular-symbolic', _('Bluetooth Tethers'));
         this.menuButtonAccessibleName = _('Open Bluetooth tethers menu');
-        this.menu.addSettingsAction(_('Bluetooth Settings'),
-            'gnome-network-panel.desktop');
+        this.menu.addSettingsAction(_('Bluetooth Settings'), 'network');
     }
 
     _getDefaultName() {
@@ -1932,11 +1916,7 @@ class NMModemToggle extends NMDeviceToggle {
         this.menu.setHeader('network-cellular-symbolic', _('Mobile Connections'));
         this.menuButtonAccessibleName = _('Open mobile connections menu');
 
-        const settingsLabel = _('Mobile Broadband Settings');
-        this._wwanSettings = this.menu.addSettingsAction(settingsLabel,
-            'gnome-wwan-panel.desktop');
-        this._legacySettings = this.menu.addSettingsAction(settingsLabel,
-            'gnome-network-panel.desktop');
+        this.menu.addSettingsAction(_('Mobile Broadband Settings'), 'network');
     }
 
     _getDefaultName() {
@@ -1946,15 +1926,6 @@ class NMModemToggle extends NMDeviceToggle {
 
     _createDeviceMenuItem(device) {
         return new NMModemDeviceItem(this._client, device);
-    }
-
-    _sync() {
-        super._sync();
-
-        const useWwanPanel =
-            [...this._items.values()].some(i => i.wwanPanelSupported);
-        this._wwanSettings.visible = useWwanPanel;
-        this._legacySettings.visible = !useWwanPanel;
     }
 });
 

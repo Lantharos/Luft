@@ -886,8 +886,7 @@ class InputSourceIndicator extends PanelMenu.Button {
         this._propSection.actor.hide();
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Keyboard Settings'),
-            'gnome-keyboard-panel.desktop');
+        this.menu.addSettingsAction(_('Keyboard Settings'), 'keyboard');
 
         this._inputSourceManager = getInputSourceManager();
         this._inputSourceManager.connectObject(

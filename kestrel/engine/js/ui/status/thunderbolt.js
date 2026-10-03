@@ -4,11 +4,11 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Polkit from 'gi://Polkit';
-import Shell from 'gi://Shell';
 import * as Signals from '../../misc/signals.js';
 
 import * as Main from '../main.js';
 import * as MessageTray from '../messageTray.js';
+import * as Util from '../../misc/util.js';
 import {SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
@@ -268,10 +268,7 @@ class Indicator extends SystemIndicator {
         this._notification.connect('destroy', () => {
             this._notification = null;
         });
-        this._notification.connect('activated', () => {
-            const app = Shell.AppSystem.get_default().lookup_app('gnome-thunderbolt-panel.desktop');
-            app?.activate();
-        });
+        this._notification.connect('activated', () => Util.openSettings('security'));
         source.addNotification(this._notification);
     }
 

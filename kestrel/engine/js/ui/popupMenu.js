@@ -11,6 +11,7 @@ import * as Signals from '../misc/signals.js';
 import * as BoxPointer from './boxpointer.js';
 import * as Main from './main.js';
 import * as Params from '../misc/params.js';
+import * as Util from '../misc/util.js';
 
 /** @enum {number} */
 export const Ornament = {
@@ -640,7 +641,7 @@ export class PopupMenuBase extends Signals.EventEmitter {
         this.isOpen = false;
 
         this._activeMenuItem = null;
-        this._settingsActions = { };
+        this._settingsActions = [];
 
         this._sensitive = true;
 
@@ -696,31 +697,23 @@ export class PopupMenuBase extends Signals.EventEmitter {
         return menuItem;
     }
 
-    addSettingsAction(title, desktopFile) {
+    addSettingsAction(title, page) {
         const menuItem = this.addAction(title, () => {
-            const app = Shell.AppSystem.get_default().lookup_app(desktopFile);
-
-            if (!app) {
-                log(`Settings panel for desktop file ${desktopFile} could not be loaded!`);
-                return;
-            }
-
             Main.panel.closeQuickSettings();
-            app.activate();
+            Util.openSettings(page);
         });
 
         menuItem.visible = Main.sessionMode.allowSettings;
-        this._settingsActions[desktopFile] = menuItem;
+        this._settingsActions.push(menuItem);
 
         return menuItem;
     }
 
     _setSettingsVisibility(visible) {
-        for (const id in this._settingsActions) {
-            const item = this._settingsActions[id];
+        for (const item of this._settingsActions)
             item.visible = visible;
-        }
     }
+
 
     isEmpty() {
         const hasVisibleChildren = this.box.get_children().some(child => {

@@ -88,6 +88,16 @@ export function spawnCommandLine(commandLine) {
 }
 
 /**
+ * Opens a page of Luft Settings.
+ *
+ * @param {string} page a Settings page id
+ */
+export function openSettings(page) {
+    Gio.AppInfo.launch_default_for_uri(`kestrel-settings:${page}`,
+        global.create_app_launch_context(0, -1));
+}
+
+/**
  * spawnApp:
  *
  * @param {readonly string[]} argv an argv array

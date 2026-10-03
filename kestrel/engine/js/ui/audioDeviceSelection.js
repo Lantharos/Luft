@@ -2,13 +2,13 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from './dialog.js';
 import * as ModalDialog from './modalDialog.js';
 
 import * as Main from './main.js';
+import * as Util from '../misc/util.js';
 import {emitSignalToDestination} from '../misc/dbusUtils.js';
 import {loadInterfaceXML} from '../misc/fileUtils.js';
 
@@ -130,16 +130,8 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
     }
 
     _openSettings() {
-        const desktopFile = 'gnome-sound-panel.desktop';
-        const app = Shell.AppSystem.get_default().lookup_app(desktopFile);
-
-        if (!app) {
-            log(`Settings panel for desktop file ${desktopFile} could not be loaded!`);
-            return;
-        }
-
         this.close();
-        app.activate();
+        Util.openSettings('sound');
     }
 });
 

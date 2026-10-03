@@ -22,7 +22,7 @@ const SETTLE: Duration = Duration::from_secs(2 * 60);
 const DAILY: Duration = Duration::from_secs(24 * 60 * 60);
 const HOURLY: Duration = Duration::from_secs(60 * 60);
 const DISK_CHECK: Duration = Duration::from_secs(60);
-const DISK_ANALYZER: &str = "org.gnome.baobab.desktop";
+const DISKS: &str = "com.lantharos.disks.desktop";
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
     let Some(mut settings) = context.settings.watch(&[PRIVACY, THUMBNAILS]).await else {
@@ -77,10 +77,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                         continue;
                     }
                     match args.action_key.as_str() {
-                        "examine" => {
-                            let analyzer = analyzer_path();
-                            notify::launch("org.gnome.baobab", &["gio", "launch", &analyzer.to_string_lossy(), &warned_path.to_string_lossy()]);
-                        }
+                        "examine" => examine(&warned_path),
                         "empty-trash" => {
                             let _ = tokio::task::spawn_blocking(|| trash::empty(&trash::directories())).await;
                         }
@@ -123,12 +120,23 @@ async fn purge_temp(settings: &Schemas) {
         .await;
 }
 
-fn analyzer_path() -> PathBuf {
+fn disks_path() -> PathBuf {
     std::iter::once(glib::user_data_dir())
         .chain(glib::system_data_dirs())
-        .map(|directory| directory.join("applications").join(DISK_ANALYZER))
+        .map(|directory| directory.join("applications").join(DISKS))
         .find(|path| path.exists())
         .unwrap_or_default()
+}
+
+fn examine(path: &Path) {
+    let Ok(uri) = glib::filename_to_uri(path, None) else {
+        return;
+    };
+    let space = uri.replacen("file://", "disks-space://", 1);
+    notify::launch(
+        "com.lantharos.disks",
+        &["gio", "launch", &disks_path().to_string_lossy(), &space],
+    );
 }
 
 async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
@@ -149,7 +157,7 @@ async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
         )
     };
     let mut actions = Vec::new();
-    if analyzer_path().exists() {
+    if disks_path().exists() {
         actions.push(("examine", "Examine"));
     }
     if has_trash {

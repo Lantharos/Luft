@@ -10,3 +10,4 @@
 0010-Recover-from-GPU-resets.patch
 0011-backends-report-how-long-frames-wait-to-be-presented.patch
 0012-clutter-texture-content-Skip-textures-of-a-lost-grap.patch
+0013-backends-name-monitor-makers-from-the-hardware-datab.patch

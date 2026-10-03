@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.diagnostics" path="/com/lantharos/kestrel/diagnostics/">
+    <key name="log-direct-scanout" type="b">
+      <default>false</default>
+      <summary>Log when displays show fullscreen windows directly</summary>
+      <description>When on, the compositor writes to the journal whenever a display starts or stops showing a fullscreen window's buffer directly, and when the desktop takes long to appear again afterwards.</description>
+    </key>
+  </schema>
+</schemalist>

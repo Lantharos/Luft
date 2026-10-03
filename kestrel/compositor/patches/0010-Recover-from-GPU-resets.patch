@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Toluwaleke Ogundipe <anonymoux47@gmail.com>
 Date: Thu, 1 Oct 2026 21:33:54 +0200
-Subject: [PATCH 10/13] Recover from GPU resets
+Subject: [PATCH 10/14] Recover from GPU resets
 
 Create the GL context with reset notification and, when the driver reports
 that the context was lost, recreate the EGL and Cogl contexts and restore
@@ -6681,7 +6681,7 @@ index 6730bb1bd1ecec3fe1ae43b1397c120c75458295..fa498f350c5563b2efc5f725b0b47358
 +void meta_shaped_texture_realize (MetaShapedTexture *stex);
 +void meta_shaped_texture_unrealize (MetaShapedTexture *stex);
 diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
-index ba5d49bf10959de0bcf70cb04b7c7066fed49383..658b5fec13f4457ee4b11152b030ecb18d9b8d1f 100644
+index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..8d191be632affa004990408ac0ad147c66a0baf6 100644
 --- a/src/compositor/meta-shaped-texture.c
 +++ b/src/compositor/meta-shaped-texture.c
 @@ -122,10 +122,11 @@ struct _MetaShapedTexture
@@ -6714,7 +6714,7 @@ index ba5d49bf10959de0bcf70cb04b7c7066fed49383..658b5fec13f4457ee4b11152b030ecb1
  }
  
  static void
-@@ -1793,3 +1790,50 @@ meta_shaped_texture_set_color_repr (MetaShapedTexture            *stex,
+@@ -1795,3 +1792,50 @@ meta_shaped_texture_set_color_repr (MetaShapedTexture            *stex,
    meta_texture_mipmap_set_coeffs (stex->texture_mipmap, coeffs);
    meta_shaped_texture_reset_pipelines (stex);
  }

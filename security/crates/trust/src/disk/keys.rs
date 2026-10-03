@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Result, bail};
 
 use super::luks::{self, Header};
+use super::stage;
 use crate::errors::{NeedsKey, Unsupported, WrongKey};
 use crate::keys::{self as signing, Unsealed};
 use crate::paths;
@@ -16,6 +17,8 @@ const ESCROW: &str = "recovery-key.cred";
 const ESCROW_NAME: &str = "trustd.recovery-key";
 const PIN: &str = "pin.cred";
 const PIN_NAME: &str = "trustd.pin";
+const PASSPHRASE: &str = "passphrase.box";
+pub const HANDED_OVER: &str = "disk-key";
 
 pub fn generate_recovery_key() -> Result<Secret> {
     let mut bytes = [0u8; 32];
@@ -210,4 +213,21 @@ pub fn pin_kept_for_later() -> Secret {
 
 pub fn forget_kept_pin() {
     let _ = std::fs::remove_file(paths::state(PIN));
+}
+
+pub fn keep_passphrase_for_later(passphrase: &Secret, recovery: &Secret) -> Result<()> {
+    paths::ensure_private(paths::STATE)?;
+    paths::write_private(
+        &paths::state(PASSPHRASE),
+        &stage::boxed(passphrase, recovery)?,
+    )?;
+    Ok(())
+}
+
+pub fn passphrase_kept_for_later(recovery: &Secret) -> Option<Secret> {
+    stage::unbox(&std::fs::read(paths::state(PASSPHRASE)).ok()?, recovery)
+}
+
+pub fn forget_kept_passphrase() {
+    let _ = std::fs::remove_file(paths::state(PASSPHRASE));
 }

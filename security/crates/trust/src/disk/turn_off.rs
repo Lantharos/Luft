@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result, bail};
 
 use super::state::{Change, Mode, Plan};
-use super::{SystemDisk, keys, luks, stage, state};
+use super::{SystemDisk, keys, luks, mask, stage, state};
 use crate::boot::cmdline;
 use crate::boot::startup::rebuild_boot_files;
 use crate::errors::{Busy, Unsupported};
@@ -48,10 +48,12 @@ pub fn turn_off(typed: &Secret) -> Result<()> {
         boot_uuid: Some(boot_filesystem(&disk)?),
     };
     stage::write_plan(&plan)?;
+    mask::mask(&plan.partuuid, &plan.uuid)?;
     state::set_crypttab(&plan.mapping(), None)?;
     cmdline::change(&[], &["rd.luks.uuid", "rd.luks.data", "rd.luks.options"])?;
     if let Err(error) = rebuild_boot_files() {
         stage::remove();
+        mask::unmask(&plan.partuuid);
         return Err(error);
     }
     let header_file = plan.header.clone().context("The plan has no header file")?;
@@ -75,6 +77,6 @@ pub fn turn_off(typed: &Secret) -> Result<()> {
         .context("Decrypting couldn't start.")?;
     rustix::fs::sync();
     plan.save()?;
-    keyring::hand_over("recovery-key", &key);
+    keyring::keep(keys::HANDED_OVER, &key);
     Ok(())
 }

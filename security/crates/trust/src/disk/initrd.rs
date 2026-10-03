@@ -58,11 +58,7 @@ fn recovery_key_from_person(device: &Path) -> Result<Secret> {
     bail!("The recovery key wasn't entered")
 }
 
-fn recovery_key(
-    plan: &Plan,
-    device: Option<&Path>,
-    passphrase: &mut Option<Secret>,
-) -> Result<Secret> {
+fn recovery_key(plan: &Plan, device: Option<&Path>) -> Result<Secret> {
     let folder = Path::new(INITRD_STAGE);
     match plan.mode {
         Mode::Tpm => match stage::open_sealed(folder) {
@@ -80,7 +76,6 @@ fn recovery_key(
                     "Enter the disk's passphrase",
                 )?;
                 if let Some(key) = stage::open_boxed(folder, &typed) {
-                    *passphrase = Some(typed);
                     return Ok(key);
                 }
             }
@@ -180,10 +175,9 @@ fn open_while_decrypting(plan: &Plan, device: &Path) -> Result<()> {
 }
 
 fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
-    let mut passphrase = None;
     let key = match current_uuid(device) {
         None => {
-            let key = match recovery_key(plan, None, &mut passphrase) {
+            let key = match recovery_key(plan, None) {
                 Ok(key) => key,
                 Err(error) => {
                     record("failed");
@@ -193,7 +187,7 @@ fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
             start_encrypting(plan, device, &key)?;
             key
         }
-        Some(uuid) if uuid == plan.uuid => recovery_key(plan, Some(device), &mut passphrase)?,
+        Some(uuid) if uuid == plan.uuid => recovery_key(plan, Some(device))?,
         Some(_) => return Ok(()),
     };
     Tool::new("cryptsetup")
@@ -203,10 +197,7 @@ fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
         .input(&key)
         .status()
         .context("The disk couldn't be opened")?;
-    keyring::hand_over("recovery-key", &key);
-    if let Some(passphrase) = passphrase {
-        keyring::hand_over("passphrase", &passphrase);
-    }
+    keyring::keep(keys::HANDED_OVER, &key);
     record("started");
     Ok(())
 }

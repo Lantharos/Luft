@@ -16,7 +16,8 @@ installkernel() {
 }
 
 install() {
-    inst_multiple trustctl systemd-creds cryptsetup udevadm
+    inst_multiple trustctl systemd-creds cryptsetup udevadm cat
+    inst_rules 61-trustd-drives.rules
     inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
     inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"
     $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-encrypt.service
@@ -24,6 +25,12 @@ install() {
         local file
         for file in /var/lib/trustd/stage/*; do
             inst_simple "$file" "/etc/trustd/stage/${file##*/}"
+        done
+    fi
+    if [[ -d /etc/trustd/decrypting ]]; then
+        local mask
+        for mask in /etc/trustd/decrypting/*; do
+            inst_simple "$mask" "$mask"
         done
     fi
 }

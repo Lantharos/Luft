@@ -1,3 +1,4 @@
+mod hold;
 mod record;
 mod room;
 mod target;
@@ -11,6 +12,7 @@ use crate::errors::{Busy, NeedsKey, Unsupported};
 use crate::system::command::Tool;
 use crate::system::power;
 use crate::system::secret::Secret;
+use hold::Hold;
 pub use record::{Change, Record};
 use room::Room;
 use target::Target;
@@ -241,6 +243,7 @@ pub fn encrypt(
     }
     plugged_in().map_err(Unsupported)?;
     let room = room::plan(&target).map_err(Unsupported)?;
+    let _held = Hold::new(&target.name)?;
     room::make(&target, &room)?;
     let mut record = Record::new(new_uuid()?, target.partuuid.clone(), target.removable);
     record.change = Some(Change::Encrypt);

@@ -3,13 +3,11 @@ use std::ffi::CString;
 use super::secret::Secret;
 
 const KEY_SPEC_USER_KEYRING: libc::c_long = -4;
-const KEYCTL_SET_TIMEOUT: libc::c_long = 15;
 const KEYCTL_SETPERM: libc::c_long = 5;
 const KEYCTL_SEARCH: libc::c_long = 10;
 const KEYCTL_READ: libc::c_long = 11;
 const KEYCTL_INVALIDATE: libc::c_long = 21;
 const OWNER_ONLY: libc::c_long = 0x3f3f_0000;
-const LIFETIME_SECONDS: libc::c_long = 15 * 60;
 
 fn description(name: &str) -> CString {
     CString::new(format!("trustd:{name}")).expect("key names have no NUL bytes")
@@ -34,15 +32,7 @@ fn search(description: &std::ffi::CStr) -> Option<libc::c_long> {
     (id > 0).then_some(id)
 }
 
-pub fn hand_over(name: &str, secret: &Secret) -> bool {
-    add(name, secret, Some(LIFETIME_SECONDS))
-}
-
 pub fn keep(name: &str, secret: &Secret) -> bool {
-    add(name, secret, None)
-}
-
-fn add(name: &str, secret: &Secret, lifetime: Option<libc::c_long>) -> bool {
     let kind = c"user";
     let description = description(name);
     let id = unsafe {
@@ -58,12 +48,7 @@ fn add(name: &str, secret: &Secret, lifetime: Option<libc::c_long>) -> bool {
     if id <= 0 {
         return false;
     }
-    unsafe {
-        libc::syscall(libc::SYS_keyctl, KEYCTL_SETPERM, id, OWNER_ONLY);
-        if let Some(lifetime) = lifetime {
-            libc::syscall(libc::SYS_keyctl, KEYCTL_SET_TIMEOUT, id, lifetime);
-        }
-    }
+    unsafe { libc::syscall(libc::SYS_keyctl, KEYCTL_SETPERM, id, OWNER_ONLY) };
     true
 }
 

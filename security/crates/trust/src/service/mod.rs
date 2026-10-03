@@ -1,3 +1,4 @@
+mod drives;
 mod error;
 mod interface;
 mod properties;
@@ -39,10 +40,12 @@ async fn serve() -> zbus::Result<()> {
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()?
         .serve_at(PATH, Trust::new(idle.clone()))?
+        .serve_at(PATH, drives::Drives::new(idle.clone()))?
         .name(NAME)?
         .build()
         .await?;
     interface::continue_disk_work(&connection).await?;
+    drives::continue_work(&connection).await?;
     idle.wait(IDLE_TIMEOUT).await;
     connection.release_name(NAME).await?;
     Ok(())

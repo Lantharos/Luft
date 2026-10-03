@@ -25,8 +25,18 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.trust.manage-drive-encryption">
+    <description>Encrypt or decrypt a drive and change how it unlocks</description>
+    <message>Authentication is required to change a drive's encryption</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.trust.show-recovery-key">
-    <description>Show the disk's recovery key</description>
+    <description>Show the recovery key of the disk or a drive</description>
     <message>Authentication is required to show the recovery key</message>
     <defaults>
       <allow_any>auth_admin</allow_any>

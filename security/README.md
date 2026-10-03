@@ -147,7 +147,7 @@ Every encrypted disk has a recovery key: 64 letters from an alphabet that types 
 
 Turning on encryption encrypts the existing system in place with LUKS2.
 
-Before it starts, a check runs without changing anything. Encryption needs UEFI, the system on a single btrfs partition (btrfs can make room for the encryption header while in use), `/boot` and the EFI system partition on their own partitions, nothing else on the disk that would stay unencrypted (another partition in use, a swap partition), no other operating system on the same partition, 1 GB of free space, and the computer plugged in. Anything else is refused with the reason rather than guessed at. Disks other than the system disk are left as they are.
+Before it starts, a check runs without changing anything. Encryption needs UEFI, the system on a single btrfs partition (btrfs can make room for the encryption header while in use), `/boot` and the EFI system partition on their own partitions, nothing else on the disk that would stay unencrypted (another partition in use, a swap partition), no other operating system on the same partition, 1 GB of free space, and the computer plugged in. Anything else is refused with the reason rather than guessed at. Other drives are encrypted on their own, see below.
 
 Then:
 
@@ -162,6 +162,26 @@ LUKS2 keeps a journal of the area it is working on, so a crash or power cut at a
 Turning encryption off decrypts in place in the background the same way. The encryption header is moved to `/boot/trustd` meanwhile, so the start of the disk can be put back, and the startup files know where to find it. When decryption finishes, the header, the recovery key copy and the TPM link are removed.
 
 Without a usable TPM, encryption works with a passphrase instead, asked for by Sushi at every startup. The recovery key is then protected with that passphrase for the one restart that starts encrypting, and isn't kept afterwards.
+
+### Other drives
+
+Disks can encrypt any other drive or partition in place too, keeping what's on it, and `trustd` does the work. Partitions the computer needs to start (the EFI system partition, `/boot`, anything mounted as part of the system) and ones used for swap or by LVM or RAID are refused.
+
+The encryption header needs 32 MB at the start of the partition, so a check first finds where that room comes from:
+
+- **Free space right after the partition.** The partition grows by 32 MB into it. This works whatever the file system is, including exFAT, NTFS and FAT.
+- **ext2, ext3 and ext4** shrink by 32 MB while unmounted.
+- **btrfs** shrinks while mounted, in a private mount if it isn't.
+
+Anything else, such as exFAT, NTFS, FAT or XFS with no free space after it, can only be encrypted by formatting it, which Disks offers with a clear warning about what gets erased.
+
+Encrypting unmounts the partition for the few seconds it takes to write the header and move its first 16 MB, then unlocks it again, so it stays usable while the rest is encrypted in the background at idle priority, pausing on battery. It can be paused and resumed. LUKS2 keeps a journal of the area it is working on, so unplugging the drive, a crash or a power cut loses nothing, and it continues when the drive is unlocked again: at startup for drives that unlock automatically, or as soon as someone unlocks it, through a udev rule that asks `trustd` to carry on.
+
+Every drive gets a recovery key, made the same way as the disk's. A passphrase is optional, and LUKS2 can't add one while a drive is still being encrypted, so until encryption finishes the drive opens with its recovery key alone. The chosen passphrase waits next to it, encrypted with the recovery key, and is added when encryption finishes. When this computer's own disk is encrypted, a copy of the recovery key is kept sealed by the TPM in `/var/lib/trustd/drives`, so Disks can show it again (after asking for an administrator's password).
+
+**Unlocking automatically on this computer** works like BitLocker's automatic unlocking of data drives: a random key for the drive is kept in `/etc/luks-keys`, readable only by root, with an `/etc/crypttab` entry for it. Drives inside the computer unlock at startup; removable drives unlock as soon as they're plugged in, because UDisks and the desktop find the key through the same entry. Since that key lives on this computer's own disk, it needs device encryption to be on, and then the TPM protects it as well as it protects the disk. A TPM seal of the drive's key with the disk's own policy wouldn't do: the signed PCR 11 policy only covers the initramfs, so the TPM couldn't release a key for a drive unlocked after startup, and moving every drive into the signed initramfs would mean rebuilding every signed image whenever one changes. While a drive is being encrypted the key file holds its recovery key, and it gets its own random key when encryption finishes.
+
+Turning encryption off decrypts in place the same way, for drives inside the computer. The encryption header moves to `/var/lib/trustd/drives` meanwhile, and the crypttab entry follows it, so a restart in the middle opens the drive as before. While it's decrypting, a udev rule keeps presenting the partition as the encrypted drive it was, so nothing mounts or scans the half-decrypted file system underneath it. Removable drives aren't decrypted in place, since unplugging one partway would leave it unreadable on any other computer; copying what's on it somewhere safe and formatting it does the same job.
 
 ### Command line
 
@@ -186,6 +206,8 @@ They need root. `trustd.service` starts at boot to continue encrypting or decryp
 ### D-Bus
 
 `com.lantharos.Trust1` on the system bus, described in `data/trust/com.lantharos.Trust1.xml`. Reading the state is open to everyone. Checking whether the disk can be encrypted needs `com.lantharos.trust.check`, changing encryption or unlocking needs `com.lantharos.trust.manage-encryption`, showing the recovery key needs `com.lantharos.trust.show-recovery-key` (every time), and the Secure Boot key and startup need `com.lantharos.trust.manage-secure-boot`. `StartupFinished`, which the login screen and the desktop call once they're up, is open to everyone: all it does is mark the image this boot started from as working.
+
+Other drives are on `com.lantharos.Trust1.Drives` at the same object. Checking a drive needs `com.lantharos.trust.check`, encrypting, decrypting, pausing, resuming and changing how a drive unlocks need `com.lantharos.trust.manage-drive-encryption`, and showing a drive's recovery key needs `com.lantharos.trust.show-recovery-key`. `Continue`, which the udev rule calls when a drive is unlocked, is open to everyone: it only picks up work that was already started.
 
 ### A shim of Luft's own
 

@@ -1,107 +1,19 @@
-use std::io::{BufRead, BufReader};
-use std::os::unix::process::CommandExt;
-use std::process::{Child, Command, Stdio};
-use std::time::Duration;
+use std::sync::atomic::AtomicBool;
 
 use anyhow::{Context, Result, bail};
-use serde::Deserialize;
 
 use super::initrd::RESULT;
+pub use super::reencrypt::Progress;
 use super::state::{self, Change, Mode, Plan};
-use super::{SystemDisk, keys, luks, stage};
+use super::{SystemDisk, keys, luks, reencrypt, stage};
 use crate::boot::cmdline;
 use crate::boot::startup::rebuild_boot_files;
 use crate::errors::NeedsKey;
 use crate::system::secret::Secret;
 use crate::system::{keyring, power};
 
-const IDLE_IO: libc::c_int = 3 << 13;
-const BATTERY_CHECK: Duration = Duration::from_secs(20);
-
-#[derive(Clone, Copy, Debug, Default)]
-pub struct Progress {
-    pub done: f64,
-    pub remaining_seconds: u64,
-}
-
-#[derive(Deserialize)]
-struct Line {
-    device_bytes: String,
-    device_size: String,
-    eta_ms: String,
-}
-
 pub fn pending() -> Option<Plan> {
     Plan::load()
-}
-
-fn spawn(plan: &Plan, key: &Secret) -> Result<Child> {
-    let mut command = Command::new("cryptsetup");
-    command.args([
-        "reencrypt",
-        "--resume-only",
-        "--progress-json",
-        "--progress-frequency",
-        "1",
-    ]);
-    command.args(["--key-file", "-"]);
-    if let Some(header) = &plan.header {
-        command.arg("--header").arg(header);
-    }
-    command
-        .arg(plan.partition())
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null());
-    unsafe {
-        command.pre_exec(|| {
-            libc::setpriority(libc::PRIO_PROCESS, 0, 19);
-            libc::syscall(libc::SYS_ioprio_set, 1, 0, IDLE_IO);
-            Ok(())
-        });
-    }
-    let mut child = command.spawn().context("cryptsetup couldn't be started")?;
-    if let Some(mut input) = child.stdin.take() {
-        std::io::Write::write_all(&mut input, key.bytes())?;
-    }
-    Ok(child)
-}
-
-fn follow(child: &mut Child, report: &mut impl FnMut(Progress)) -> bool {
-    let Some(output) = child.stdout.take() else {
-        return false;
-    };
-    let (sender, receiver) = std::sync::mpsc::channel();
-    std::thread::spawn(move || {
-        for line in BufReader::new(output).lines().map_while(Result::ok) {
-            if sender.send(line).is_err() {
-                break;
-            }
-        }
-    });
-    loop {
-        match receiver.recv_timeout(BATTERY_CHECK) {
-            Ok(line) => {
-                if let Ok(line) = serde_json::from_str::<Line>(&line) {
-                    let done = line.device_bytes.parse::<f64>().unwrap_or(0.0);
-                    let size = line.device_size.parse::<f64>().unwrap_or(1.0).max(1.0);
-                    report(Progress {
-                        done: (done / size).clamp(0.0, 1.0),
-                        remaining_seconds: line.eta_ms.parse::<u64>().unwrap_or(0) / 1000,
-                    });
-                }
-            }
-            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
-            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
-                return child.wait().is_ok_and(|status| status.success());
-            }
-        }
-        if power::on_battery() {
-            unsafe { libc::kill(child.id() as libc::c_int, libc::SIGTERM) };
-            let _ = child.wait();
-            return false;
-        }
-    }
 }
 
 fn key_for(plan: &Plan) -> Result<Secret> {
@@ -196,8 +108,14 @@ pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
         if power::on_battery() {
             return Ok(false);
         }
-        let mut child = spawn(plan, &key)?;
-        if !follow(&mut child, &mut report) {
+        let finished = reencrypt::run(
+            &plan.partition(),
+            plan.header.as_deref(),
+            &key,
+            &AtomicBool::new(false),
+            &mut report,
+        )?;
+        if !finished {
             return Ok(false);
         }
     }

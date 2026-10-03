@@ -32,6 +32,7 @@ place "$trust/com.lantharos.Trust1.service" /usr/share/dbus-1/system-services/co
 place "$trust/com.lantharos.Trust1.conf" /usr/share/dbus-1/system.d/com.lantharos.Trust1.conf
 place "$trust/com.lantharos.Trust1.xml" /usr/share/dbus-1/interfaces/com.lantharos.Trust1.xml
 place "$trust/com.lantharos.trust.policy" /usr/share/polkit-1/actions/com.lantharos.trust.policy
+place "$trust/61-trustd-drives.rules" /usr/lib/udev/rules.d/61-trustd-drives.rules
 place "$trust/90-trustd.conf" /usr/lib/dracut/dracut.conf.d/90-trustd.conf
 place "$trust/dracut/trustd-encrypt.service" /usr/lib/dracut/modules.d/90trustd/trustd-encrypt.service
 place "$trust/dracut/cryptsetup-after-pcrphase.conf" /usr/lib/dracut/modules.d/90trustd/cryptsetup-after-pcrphase.conf

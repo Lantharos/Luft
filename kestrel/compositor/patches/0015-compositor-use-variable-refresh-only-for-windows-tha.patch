@@ -1,0 +1,915 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 4 Oct 2026 13:28:30 +0200
+Subject: [PATCH 15/15] compositor: use variable refresh only for windows that
+ ask for it
+
+Mutter switched a display with variable refresh turned on to variable
+mode for any window that covered it. Video players and browsers then
+drove the refresh rate with their irregular frame timing, and panels whose
+brightness depends on the refresh rate, VA panels in particular, flicker.
+
+Support wp_content_type_v1 and expose the content type a client declares
+on MetaWindow, and add a variable-refresh window property that the shell
+sets for windows it wants a display to follow. A display only leaves its
+fixed rate while a window with that property covers it; everything else
+keeps the display at the rate of its mode.
+
+With com.lantharos.kestrel.diagnostics log-variable-refresh enabled, the
+compositor logs whenever the window covering a display changes, whether
+the refresh rate follows it and why not.
+---
+ src/compositor/meta-compositor-native.c      |  10 ++
+ src/compositor/meta-compositor-native.h      |   3 +
+ src/compositor/meta-compositor-view-native.c |  73 ++++++--
+ src/compositor/meta-scanout-log.c            |   8 +-
+ src/compositor/meta-scanout-log.h            |   2 +
+ src/compositor/meta-variable-refresh-log.c   |  82 +++++++++
+ src/compositor/meta-variable-refresh-log.h   |  16 ++
+ src/core/window-private.h                    |   3 +
+ src/core/window-variable-refresh.c           |  66 +++++++
+ src/core/window.c                            |  22 +++
+ src/meson.build                              |   6 +
+ src/meta/window.h                            |  28 +++
+ src/wayland/meta-wayland-content-type.c      | 171 +++++++++++++++++++
+ src/wayland/meta-wayland-content-type.h      |   6 +
+ src/wayland/meta-wayland-surface-private.h   |   7 +
+ src/wayland/meta-wayland-surface.c           |  18 ++
+ src/wayland/meta-wayland-versions.h          |   1 +
+ src/wayland/meta-wayland.c                   |   2 +
+ 18 files changed, 507 insertions(+), 17 deletions(-)
+ create mode 100644 src/compositor/meta-variable-refresh-log.c
+ create mode 100644 src/compositor/meta-variable-refresh-log.h
+ create mode 100644 src/core/window-variable-refresh.c
+ create mode 100644 src/wayland/meta-wayland-content-type.c
+ create mode 100644 src/wayland/meta-wayland-content-type.h
+
+diff --git a/src/compositor/meta-compositor-native.c b/src/compositor/meta-compositor-native.c
+index 53ece8765d8949c8fe2aa0a608ad0248254234d5..9f562bc4a702e424523b4a87b6251106312276ea 100644
+--- a/src/compositor/meta-compositor-native.c
++++ b/src/compositor/meta-compositor-native.c
+@@ -28,6 +28,7 @@ struct _MetaCompositorNative
+   MetaCompositorServer parent;
+ 
+   MetaScanoutLog *scanout_log;
++  MetaVariableRefreshLog *variable_refresh_log;
+ };
+ 
+ G_DEFINE_TYPE (MetaCompositorNative, meta_compositor_native,
+@@ -39,6 +40,12 @@ meta_compositor_native_get_scanout_log (MetaCompositorNative *compositor_native)
+   return compositor_native->scanout_log;
+ }
+ 
++MetaVariableRefreshLog *
++meta_compositor_native_get_variable_refresh_log (MetaCompositorNative *compositor_native)
++{
++  return compositor_native->variable_refresh_log;
++}
++
+ static void
+ meta_compositor_native_before_update (MetaCompositor     *compositor,
+                                       MetaCompositorView *compositor_view)
+@@ -98,6 +105,7 @@ meta_compositor_native_constructed (GObject *object)
+   compositor_native->scanout_log =
+     meta_scanout_log_new (compositor,
+                           CLUTTER_STAGE (meta_backend_get_stage (backend)));
++  compositor_native->variable_refresh_log = meta_variable_refresh_log_new ();
+ 
+   G_OBJECT_CLASS (meta_compositor_native_parent_class)->constructed (object);
+ }
+@@ -108,6 +116,8 @@ meta_compositor_native_dispose (GObject *object)
+   MetaCompositorNative *compositor_native = META_COMPOSITOR_NATIVE (object);
+ 
+   g_clear_pointer (&compositor_native->scanout_log, meta_scanout_log_free);
++  g_clear_pointer (&compositor_native->variable_refresh_log,
++                   meta_variable_refresh_log_free);
+ 
+   G_OBJECT_CLASS (meta_compositor_native_parent_class)->dispose (object);
+ }
+diff --git a/src/compositor/meta-compositor-native.h b/src/compositor/meta-compositor-native.h
+index 2b9aba6e2b1d20f1d659a6556b49d7a5f5f1c18c..83da14f0dbc575f29b918f42ef59cd490c39c9b6 100644
+--- a/src/compositor/meta-compositor-native.h
++++ b/src/compositor/meta-compositor-native.h
+@@ -20,6 +20,7 @@
+ 
+ #include "compositor/meta-compositor-server.h"
+ #include "compositor/meta-scanout-log.h"
++#include "compositor/meta-variable-refresh-log.h"
+ 
+ #define META_TYPE_COMPOSITOR_NATIVE (meta_compositor_native_get_type ())
+ G_DECLARE_FINAL_TYPE (MetaCompositorNative, meta_compositor_native,
+@@ -29,3 +30,5 @@ MetaCompositorNative * meta_compositor_native_new (MetaDisplay *display,
+                                                    MetaBackend *backend);
+ 
+ MetaScanoutLog * meta_compositor_native_get_scanout_log (MetaCompositorNative *compositor_native);
++
++MetaVariableRefreshLog * meta_compositor_native_get_variable_refresh_log (MetaCompositorNative *compositor_native);
+diff --git a/src/compositor/meta-compositor-view-native.c b/src/compositor/meta-compositor-view-native.c
+index 692020c13ad9837a9e625ac8d1b4c8886ee8ea52..41adfabbea8b3135eacaff7c049155dc5e6d966f 100644
+--- a/src/compositor/meta-compositor-view-native.c
++++ b/src/compositor/meta-compositor-view-native.c
+@@ -56,6 +56,8 @@ struct _MetaCompositorViewNative
+   MetaWindow *scanout_window;
+ 
+   MetaSurfaceActor *fullscreen_actor;
++  MetaWindow *variable_refresh_window;
++  gboolean variable_refresh;
+ 
+   gulong fullscreen_surface_repaint_scheduled_id;
+   gulong fullscreen_surface_update_scheduled_id;
+@@ -88,11 +90,25 @@ maybe_set_fullscreen_update_time (MetaSurfaceActor         *surface_actor,
+     }
+ }
+ 
++static void
++allow_variable_refresh (MetaCompositorViewNative *view_native,
++                        gboolean                  allowed)
++{
++  ClutterStageView *stage_view =
++    meta_compositor_view_get_stage_view (META_COMPOSITOR_VIEW (view_native));
++  CoglFramebuffer *framebuffer = clutter_stage_view_get_onscreen (stage_view);
++
++  view_native->variable_refresh = allowed;
++  if (META_IS_ONSCREEN_NATIVE (framebuffer))
++    meta_onscreen_native_allow_vrr (META_ONSCREEN_NATIVE (framebuffer), allowed);
++}
++
+ static void
+ on_fullscreen_actor_destroyed (MetaSurfaceActor         *surface_actor,
+                                MetaCompositorViewNative *view_native)
+ {
+   update_fullscreen_actor (view_native, NULL);
++  allow_variable_refresh (view_native, FALSE);
+ }
+ 
+ static void
+@@ -509,11 +525,6 @@ static void
+ update_fullscreen_actor (MetaCompositorViewNative *view_native,
+                          MetaSurfaceActor         *surface_actor)
+ {
+-  MetaCompositorView *compositor_view =
+-    META_COMPOSITOR_VIEW (view_native);
+-  ClutterStageView *stage_view;
+-  CoglFramebuffer *framebuffer;
+-
+   g_clear_signal_handler (&view_native->fullscreen_surface_repaint_scheduled_id,
+                           view_native->fullscreen_actor);
+   g_clear_signal_handler (&view_native->fullscreen_surface_update_scheduled_id,
+@@ -538,15 +549,49 @@ update_fullscreen_actor (MetaCompositorViewNative *view_native,
+     }
+ 
+   view_native->fullscreen_actor = surface_actor;
++}
+ 
+-  stage_view = meta_compositor_view_get_stage_view (compositor_view);
++static MetaWindow *
++window_of_surface_actor (MetaSurfaceActor *surface_actor)
++{
++  MetaWaylandSurface *surface;
+ 
+-  framebuffer = clutter_stage_view_get_onscreen (stage_view);
+-  if (!META_IS_ONSCREEN_NATIVE (framebuffer))
++  if (!surface_actor)
++    return NULL;
++
++  surface =
++    meta_surface_actor_wayland_get_surface (META_SURFACE_ACTOR_WAYLAND (surface_actor));
++  return surface ? meta_wayland_surface_get_toplevel_window (surface) : NULL;
++}
++
++static gboolean
++view_has_variable_refresh (MetaCompositorViewNative *view_native)
++{
++  ClutterStageView *stage_view =
++    meta_compositor_view_get_stage_view (META_COMPOSITOR_VIEW (view_native));
++  MetaCrtc *crtc = meta_renderer_view_get_crtc (META_RENDERER_VIEW (stage_view));
++  const GList *outputs = meta_crtc_get_outputs (crtc);
++
++  return outputs && meta_output_is_vrr_enabled (outputs->data);
++}
++
++static void
++update_variable_refresh (MetaCompositorViewNative *view_native,
++                         MetaCompositor           *compositor,
++                         MetaWindow               *window)
++{
++  gboolean allowed = window && meta_window_get_variable_refresh (window);
++
++  if (G_LIKELY (window == view_native->variable_refresh_window &&
++                allowed == view_native->variable_refresh))
+     return;
+ 
+-  meta_onscreen_native_allow_vrr (META_ONSCREEN_NATIVE (framebuffer),
+-                                  surface_actor != NULL);
++  g_set_weak_pointer (&view_native->variable_refresh_window, window);
++  allow_variable_refresh (view_native, allowed);
++  meta_variable_refresh_log_changed (meta_compositor_native_get_variable_refresh_log (META_COMPOSITOR_NATIVE (compositor)),
++                                     meta_compositor_view_get_stage_view (META_COMPOSITOR_VIEW (view_native)),
++                                     window,
++                                     view_has_variable_refresh (view_native));
+ }
+ 
+ void
+@@ -558,10 +603,11 @@ meta_compositor_view_native_maybe_update_fullscreen_actor (MetaCompositorViewNat
+ 
+   fullscreen_actor = find_fullscreen_candidate (compositor_view, compositor);
+ 
+-  if (G_LIKELY (fullscreen_actor == view_native->fullscreen_actor))
+-    return;
++  if (G_UNLIKELY (fullscreen_actor != view_native->fullscreen_actor))
++    update_fullscreen_actor (view_native, fullscreen_actor);
+ 
+-  update_fullscreen_actor (view_native, fullscreen_actor);
++  update_variable_refresh (view_native, compositor,
++                           window_of_surface_actor (fullscreen_actor));
+ }
+ 
+ MetaCompositorViewNative *
+@@ -597,6 +643,7 @@ meta_compositor_view_native_finalize (GObject *object)
+ 
+   g_clear_weak_pointer (&view_native->scanout_candidate);
+   g_clear_weak_pointer (&view_native->scanout_window);
++  g_clear_weak_pointer (&view_native->variable_refresh_window);
+ 
+   G_OBJECT_CLASS (meta_compositor_view_native_parent_class)->finalize (object);
+ }
+diff --git a/src/compositor/meta-scanout-log.c b/src/compositor/meta-scanout-log.c
+index a2de1fc784199bfe25b8ce5ed069fcd1bd7f9c7d..8baa8929b1f34c5e52d31b86adbe105d8ded9d21 100644
+--- a/src/compositor/meta-scanout-log.c
++++ b/src/compositor/meta-scanout-log.c
+@@ -69,8 +69,8 @@ log_line (MetaScanoutLog *log,
+   g_message ("Direct scanout: %s", message);
+ }
+ 
+-static const char *
+-describe_window (MetaWindow *window)
++const char *
++meta_log_window_name (MetaWindow *window)
+ {
+   const char *id;
+ 
+@@ -253,7 +253,7 @@ meta_scanout_log_started (MetaScanoutLog   *log,
+   stop_waiting (state);
+   state->started_us = g_get_monotonic_time ();
+   log_line (log, "%s: showing %s directly",
+-            clutter_stage_view_get_name (view), describe_window (window));
++            clutter_stage_view_get_name (view), meta_log_window_name (window));
+ }
+ 
+ void
+@@ -272,7 +272,7 @@ meta_scanout_log_stopped (MetaScanoutLog   *log,
+   reason = describe_stop (log, window);
+   state->stopped_us = g_get_monotonic_time ();
+   log_line (log, "%s: stopped showing %s directly after %.1f s: %s",
+-            clutter_stage_view_get_name (view), describe_window (window),
++            clutter_stage_view_get_name (view), meta_log_window_name (window),
+             state->started_us ?
+             (state->stopped_us - state->started_us) / (double) G_USEC_PER_SEC :
+             0.0,
+diff --git a/src/compositor/meta-scanout-log.h b/src/compositor/meta-scanout-log.h
+index 9245aeef0ab2cc4c82d4647c0b31d28dd9c829a5..9b3894559908be61ee8a08801e0e94df189816da 100644
+--- a/src/compositor/meta-scanout-log.h
++++ b/src/compositor/meta-scanout-log.h
+@@ -7,6 +7,8 @@
+ 
+ typedef struct _MetaScanoutLog MetaScanoutLog;
+ 
++const char * meta_log_window_name (MetaWindow *window);
++
+ MetaScanoutLog * meta_scanout_log_new (MetaCompositor *compositor,
+                                        ClutterStage   *stage);
+ 
+diff --git a/src/compositor/meta-variable-refresh-log.c b/src/compositor/meta-variable-refresh-log.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..6bd894841c5d4bda288f850b14917f66e3579623
+--- /dev/null
++++ b/src/compositor/meta-variable-refresh-log.c
+@@ -0,0 +1,82 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "compositor/meta-variable-refresh-log.h"
++
++#include <gio/gio.h>
++
++#include "compositor/meta-scanout-log.h"
++
++#define SETTINGS_SCHEMA "com.lantharos.kestrel.diagnostics"
++#define SETTINGS_KEY "log-variable-refresh"
++
++struct _MetaVariableRefreshLog
++{
++  GSettings *settings;
++  gboolean enabled;
++};
++
++static void
++sync_enabled (MetaVariableRefreshLog *log)
++{
++  log->enabled = g_settings_get_boolean (log->settings, SETTINGS_KEY);
++}
++
++MetaVariableRefreshLog *
++meta_variable_refresh_log_new (void)
++{
++  MetaVariableRefreshLog *log = g_new0 (MetaVariableRefreshLog, 1);
++
++  log->settings = g_settings_new (SETTINGS_SCHEMA);
++  g_signal_connect_swapped (log->settings, "changed::" SETTINGS_KEY,
++                            G_CALLBACK (sync_enabled), log);
++  sync_enabled (log);
++  return log;
++}
++
++void
++meta_variable_refresh_log_free (MetaVariableRefreshLog *log)
++{
++  g_clear_object (&log->settings);
++  g_free (log);
++}
++
++static const char *
++describe_fixed (MetaWindow *window)
++{
++  switch (meta_window_get_content_type (window))
++    {
++    case META_WINDOW_CONTENT_TYPE_VIDEO:
++      return "it shows video";
++    case META_WINDOW_CONTENT_TYPE_PHOTO:
++      return "it shows photos";
++    default:
++      return "it is not a game";
++    }
++}
++
++void
++meta_variable_refresh_log_changed (MetaVariableRefreshLog *log,
++                                   ClutterStageView       *view,
++                                   MetaWindow             *window,
++                                   gboolean                display_enabled)
++{
++  const char *name = clutter_stage_view_get_name (view);
++  const char *display_off =
++    display_enabled ? "" : " (variable refresh is off for this display)";
++
++  if (!log->enabled)
++    return;
++
++  if (!window)
++    g_message ("Variable refresh: %s: no window covers the display, "
++               "the refresh rate stays fixed%s", name, display_off);
++  else if (meta_window_get_variable_refresh (window))
++    g_message ("Variable refresh: %s: the refresh rate follows %s%s",
++               name, meta_log_window_name (window), display_off);
++  else
++    g_message ("Variable refresh: %s: the refresh rate stays fixed for %s, "
++               "since %s%s",
++               name, meta_log_window_name (window), describe_fixed (window),
++               display_off);
++}
+diff --git a/src/compositor/meta-variable-refresh-log.h b/src/compositor/meta-variable-refresh-log.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7defa1b2e443bfd2861eae8ea883da2acae6f0b5
+--- /dev/null
++++ b/src/compositor/meta-variable-refresh-log.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "clutter/clutter-mutter.h"
++#include "meta/window.h"
++
++typedef struct _MetaVariableRefreshLog MetaVariableRefreshLog;
++
++MetaVariableRefreshLog * meta_variable_refresh_log_new (void);
++
++void meta_variable_refresh_log_free (MetaVariableRefreshLog *log);
++
++void meta_variable_refresh_log_changed (MetaVariableRefreshLog *log,
++                                        ClutterStageView       *view,
++                                        MetaWindow             *window,
++                                        gboolean                display_enabled);
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index b21f287333476eb3b2a6af3be446f7d45e12e153..e0993da5416fe7df1ddb72502eb96c760deda57a 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -245,6 +245,7 @@ struct _MetaWindow
+   char *desc; /* used in debug spew */
+   char *title;
+   GIcon *toplevel_icon;
++  gboolean variable_refresh;
+ 
+   MetaWindowType type;
+ 
+@@ -960,3 +961,5 @@ gboolean meta_window_is_ready (MetaWindow *window);
+ 
+ void meta_window_set_toplevel_icon (MetaWindow *window,
+                                    GIcon      *icon);
++
++void meta_window_content_type_changed (MetaWindow *window);
+diff --git a/src/core/window-variable-refresh.c b/src/core/window-variable-refresh.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..1be3c1cd47a3e22f92c58ad8cb071611c07edf98
+--- /dev/null
++++ b/src/core/window-variable-refresh.c
+@@ -0,0 +1,66 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "backends/meta-backend-private.h"
++#include "core/window-private.h"
++#include "meta/meta-context.h"
++#include "wayland/meta-wayland-surface-private.h"
++
++/**
++ * meta_window_get_content_type:
++ * @window: a #MetaWindow
++ *
++ * Returns: the kind of content the client says the window shows
++ */
++MetaWindowContentType
++meta_window_get_content_type (MetaWindow *window)
++{
++  MetaWaylandSurface *surface = meta_window_get_wayland_surface (window);
++
++  return surface ? surface->content_type : META_WINDOW_CONTENT_TYPE_NONE;
++}
++
++void
++meta_window_content_type_changed (MetaWindow *window)
++{
++  g_object_notify (G_OBJECT (window), "content-type");
++}
++
++/**
++ * meta_window_get_variable_refresh:
++ * @window: a #MetaWindow
++ *
++ * Returns: whether a display may follow the window's frame rate with
++ *   variable refresh while the window covers it
++ */
++gboolean
++meta_window_get_variable_refresh (MetaWindow *window)
++{
++  return window->variable_refresh;
++}
++
++/**
++ * meta_window_set_variable_refresh:
++ * @window: a #MetaWindow
++ * @variable_refresh: whether displays may use variable refresh for it
++ *
++ * Lets a display that has variable refresh turned on follow the window's
++ * frame rate while the window covers the whole display. Other windows keep
++ * the display at its fixed refresh rate.
++ */
++void
++meta_window_set_variable_refresh (MetaWindow *window,
++                                  gboolean    variable_refresh)
++{
++  MetaBackend *backend;
++
++  variable_refresh = !!variable_refresh;
++  if (window->variable_refresh == variable_refresh)
++    return;
++
++  window->variable_refresh = variable_refresh;
++  g_object_notify (G_OBJECT (window), "variable-refresh");
++
++  backend = meta_context_get_backend (meta_display_get_context (window->display));
++  clutter_stage_schedule_update (CLUTTER_STAGE (meta_backend_get_stage (backend)));
++}
+diff --git a/src/core/window.c b/src/core/window.c
+index 99424b25ea9b03421f4887934918a7ff3f156496..4d37e81398f5508e5b9a0633b19657af0d648b27 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -206,6 +206,8 @@ enum
+ 
+   PROP_TITLE,
+   PROP_TOPLEVEL_ICON,
++  PROP_CONTENT_TYPE,
++  PROP_VARIABLE_REFRESH,
+   PROP_DECORATED,
+   PROP_FULLSCREEN,
+   PROP_MAXIMIZED_HORIZONTALLY,
+@@ -442,6 +444,12 @@ meta_window_get_property (GObject         *object,
+     case PROP_TOPLEVEL_ICON:
+       g_value_set_object (value, window->toplevel_icon);
+       break;
++    case PROP_CONTENT_TYPE:
++      g_value_set_enum (value, meta_window_get_content_type (window));
++      break;
++    case PROP_VARIABLE_REFRESH:
++      g_value_set_boolean (value, window->variable_refresh);
++      break;
+     case PROP_TITLE:
+       g_value_set_string (value, window->title);
+       break;
+@@ -562,6 +570,9 @@ meta_window_set_property (GObject         *object,
+     case PROP_EFFECT:
+       window->pending_compositor_effect = g_value_get_int (value);
+       break;
++    case PROP_VARIABLE_REFRESH:
++      meta_window_set_variable_refresh (window, g_value_get_boolean (value));
++      break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+       break;
+@@ -590,6 +601,17 @@ meta_window_class_init (MetaWindowClass *klass)
+   obj_props[PROP_TOPLEVEL_ICON] =
+     g_param_spec_object ("toplevel-icon", NULL, NULL, G_TYPE_ICON,
+                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
++  obj_props[PROP_CONTENT_TYPE] =
++    g_param_spec_enum ("content-type", NULL, NULL,
++                       META_TYPE_WINDOW_CONTENT_TYPE,
++                       META_WINDOW_CONTENT_TYPE_NONE,
++                       G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY |
++                       G_PARAM_STATIC_STRINGS);
++  obj_props[PROP_VARIABLE_REFRESH] =
++    g_param_spec_boolean ("variable-refresh", NULL, NULL,
++                          FALSE,
++                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY |
++                          G_PARAM_STATIC_STRINGS);
+   obj_props[PROP_TITLE] =
+     g_param_spec_string ("title", NULL, NULL,
+                          NULL,
+diff --git a/src/meson.build b/src/meson.build
+index 5bb4b285087bac83111cdcdbedda7a9caa9185f2..bd726b0085107f71c56272551128b0ac693b4f46 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -287,6 +287,8 @@ mutter_sources = [
+   'compositor/meta-plugin-manager.h',
+   'compositor/meta-scanout-log.c',
+   'compositor/meta-scanout-log.h',
++  'compositor/meta-variable-refresh-log.c',
++  'compositor/meta-variable-refresh-log.h',
+   'compositor/meta-window-corners.c',
+   'compositor/meta-window-corners.h',
+   'compositor/meta-shaped-texture.c',
+@@ -366,6 +368,7 @@ mutter_sources = [
+   'core/util-private.h',
+   'core/window.c',
+   'core/window-icon.c',
++  'core/window-variable-refresh.c',
+   'core/window-private.h',
+   'core/workspace.c',
+   'core/workspace-private.h',
+@@ -505,6 +508,8 @@ mutter_sources += [
+   'wayland/meta-wayland-color-representation.c',
+   'wayland/meta-wayland-color-representation.h',
+   'wayland/meta-wayland-commit-timing.c',
++  'wayland/meta-wayland-content-type.c',
++  'wayland/meta-wayland-content-type.h',
+   'wayland/meta-wayland-cursor-shape.c',
+   'wayland/meta-wayland-cursor-shape.h',
+   'wayland/meta-wayland-fifo.c',
+@@ -1007,6 +1012,7 @@ wayland_protocols = [
+   ['color-management', 'staging', 1, ],
+   ['color-representation', 'staging', 1, ],
+   ['commit-timing', 'staging', 1, ],
++  ['content-type', 'staging', 1, ],
+   ['cursor-shape', 'staging', 1, ],
+   ['drm-lease', 'staging', 1, ],
+   ['ext-background-effect', 'staging', 1, ],
+diff --git a/src/meta/window.h b/src/meta/window.h
+index 39c66fe51f0e88c5f7d3390a1eaba24a87ffc5f5..0e4ff0c97c47b13cae561438520bc9bf973f367a 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -78,6 +78,24 @@ typedef enum
+   META_WINDOW_CLIENT_TYPE_X11
+ } MetaWindowClientType;
+ 
++/**
++ * MetaWindowContentType:
++ * @META_WINDOW_CONTENT_TYPE_NONE: The client did not describe its content
++ * @META_WINDOW_CONTENT_TYPE_PHOTO: Still images
++ * @META_WINDOW_CONTENT_TYPE_VIDEO: Video, such as a film or a stream
++ * @META_WINDOW_CONTENT_TYPE_GAME: A game
++ *
++ * The kind of content a client says its window shows, through the
++ * wp_content_type_v1 Wayland protocol.
++ */
++typedef enum
++{
++  META_WINDOW_CONTENT_TYPE_NONE,
++  META_WINDOW_CONTENT_TYPE_PHOTO,
++  META_WINDOW_CONTENT_TYPE_VIDEO,
++  META_WINDOW_CONTENT_TYPE_GAME,
++} MetaWindowContentType;
++
+ #define META_TYPE_WINDOW            (meta_window_get_type ())
+ #define META_WINDOW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), META_TYPE_WINDOW, MetaWindow))
+ #define META_WINDOW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass),  META_TYPE_WINDOW, MetaWindowClass))
+@@ -95,6 +113,16 @@ GType meta_window_get_type (void);
+ META_EXPORT
+ GIcon * meta_window_get_toplevel_icon (MetaWindow *window);
+ 
++META_EXPORT
++MetaWindowContentType meta_window_get_content_type (MetaWindow *window);
++
++META_EXPORT
++gboolean meta_window_get_variable_refresh (MetaWindow *window);
++
++META_EXPORT
++void meta_window_set_variable_refresh (MetaWindow *window,
++                                       gboolean    variable_refresh);
++
+ META_EXPORT
+ gboolean meta_window_has_focus (MetaWindow *window);
+ 
+diff --git a/src/wayland/meta-wayland-content-type.c b/src/wayland/meta-wayland-content-type.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..8cc2b2c1711ac4b142ba9549008e20c05520b926
+--- /dev/null
++++ b/src/wayland/meta-wayland-content-type.c
+@@ -0,0 +1,171 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "wayland/meta-wayland-content-type.h"
++
++#include <wayland-server.h>
++
++#include "content-type-v1-server-protocol.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-surface-private.h"
++#include "wayland/meta-wayland-versions.h"
++
++#define CONTENT_TYPE_DATA "-meta-wayland-content-type"
++
++typedef struct _MetaWaylandContentType
++{
++  MetaWaylandSurface *surface;
++  gulong destroy_handler_id;
++} MetaWaylandContentType;
++
++static MetaWindowContentType
++window_content_type (uint32_t type)
++{
++  switch (type)
++    {
++    case WP_CONTENT_TYPE_V1_TYPE_PHOTO:
++      return META_WINDOW_CONTENT_TYPE_PHOTO;
++    case WP_CONTENT_TYPE_V1_TYPE_VIDEO:
++      return META_WINDOW_CONTENT_TYPE_VIDEO;
++    case WP_CONTENT_TYPE_V1_TYPE_GAME:
++      return META_WINDOW_CONTENT_TYPE_GAME;
++    default:
++      return META_WINDOW_CONTENT_TYPE_NONE;
++    }
++}
++
++static void
++set_pending_content_type (MetaWaylandSurface    *surface,
++                          MetaWindowContentType  content_type)
++{
++  MetaWaylandSurfaceState *pending =
++    meta_wayland_surface_get_pending_state (surface);
++
++  pending->has_new_content_type = TRUE;
++  pending->content_type = content_type;
++}
++
++static void
++content_type_destructor (struct wl_resource *resource)
++{
++  MetaWaylandContentType *content_type = wl_resource_get_user_data (resource);
++
++  if (content_type->surface)
++    {
++      set_pending_content_type (content_type->surface,
++                                META_WINDOW_CONTENT_TYPE_NONE);
++      g_object_set_data (G_OBJECT (content_type->surface),
++                         CONTENT_TYPE_DATA, NULL);
++      g_clear_signal_handler (&content_type->destroy_handler_id,
++                              content_type->surface);
++    }
++
++  g_free (content_type);
++}
++
++static void
++content_type_destroy (struct wl_client   *client,
++                      struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++content_type_set_content_type (struct wl_client   *client,
++                               struct wl_resource *resource,
++                               uint32_t            type)
++{
++  MetaWaylandContentType *content_type = wl_resource_get_user_data (resource);
++
++  if (content_type->surface)
++    set_pending_content_type (content_type->surface, window_content_type (type));
++}
++
++static const struct wp_content_type_v1_interface meta_wayland_content_type_interface =
++{
++  content_type_destroy,
++  content_type_set_content_type,
++};
++
++static void
++on_surface_destroyed (MetaWaylandSurface     *surface,
++                      MetaWaylandContentType *content_type)
++{
++  content_type->surface = NULL;
++}
++
++static void
++manager_destroy (struct wl_client   *client,
++                 struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++manager_get_surface_content_type (struct wl_client   *client,
++                                  struct wl_resource *resource,
++                                  uint32_t            id,
++                                  struct wl_resource *surface_resource)
++{
++  MetaWaylandSurface *surface = wl_resource_get_user_data (surface_resource);
++  MetaWaylandContentType *content_type;
++  struct wl_resource *content_type_resource;
++
++  if (g_object_get_data (G_OBJECT (surface), CONTENT_TYPE_DATA))
++    {
++      wl_resource_post_error (resource,
++                              WP_CONTENT_TYPE_MANAGER_V1_ERROR_ALREADY_CONSTRUCTED,
++                              "The surface already has a content type object");
++      return;
++    }
++
++  content_type_resource = wl_resource_create (client,
++                                              &wp_content_type_v1_interface,
++                                              wl_resource_get_version (resource),
++                                              id);
++
++  content_type = g_new0 (MetaWaylandContentType, 1);
++  content_type->surface = surface;
++  content_type->destroy_handler_id =
++    g_signal_connect (surface, "destroy",
++                      G_CALLBACK (on_surface_destroyed), content_type);
++  g_object_set_data (G_OBJECT (surface), CONTENT_TYPE_DATA, content_type);
++
++  wl_resource_set_implementation (content_type_resource,
++                                  &meta_wayland_content_type_interface,
++                                  content_type,
++                                  content_type_destructor);
++}
++
++static const struct wp_content_type_manager_v1_interface meta_wayland_content_type_manager_interface =
++{
++  manager_destroy,
++  manager_get_surface_content_type,
++};
++
++static void
++bind_content_type_manager (struct wl_client *client,
++                           void             *data,
++                           uint32_t          version,
++                           uint32_t          id)
++{
++  struct wl_resource *resource;
++
++  resource = wl_resource_create (client,
++                                 &wp_content_type_manager_v1_interface,
++                                 version, id);
++  wl_resource_set_implementation (resource,
++                                  &meta_wayland_content_type_manager_interface,
++                                  NULL, NULL);
++}
++
++void
++meta_wayland_init_content_type (MetaWaylandCompositor *compositor)
++{
++  if (!wl_global_create (compositor->wayland_display,
++                         &wp_content_type_manager_v1_interface,
++                         META_WP_CONTENT_TYPE_V1_VERSION,
++                         NULL,
++                         bind_content_type_manager))
++    g_error ("Failed to register a global content type object");
++}
+diff --git a/src/wayland/meta-wayland-content-type.h b/src/wayland/meta-wayland-content-type.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..568a0a5dcf1432c5553e232f5d55dafbf2f161b7
+--- /dev/null
++++ b/src/wayland/meta-wayland-content-type.h
+@@ -0,0 +1,6 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "wayland/meta-wayland-types.h"
++
++void meta_wayland_init_content_type (MetaWaylandCompositor *compositor);
+diff --git a/src/wayland/meta-wayland-surface-private.h b/src/wayland/meta-wayland-surface-private.h
+index 561b778c88cfd2a5aacb621ebce455c7c79ac337..b4ffad7d68004c46057bef878d30c7fbe1b05406 100644
+--- a/src/wayland/meta-wayland-surface-private.h
++++ b/src/wayland/meta-wayland-surface-private.h
+@@ -28,6 +28,7 @@
+ #include "compositor/meta-surface-actor.h"
+ #include "meta/meta-cursor-tracker.h"
+ #include "meta/meta-wayland-surface.h"
++#include "meta/window.h"
+ #include "wayland/meta-wayland-pointer-constraints.h"
+ #include "wayland/meta-wayland-types.h"
+ #include "wayland/meta-wayland-linux-drm-syncobj.h"
+@@ -160,6 +161,10 @@ struct _MetaWaylandSurfaceState
+   MetaMultiTextureCoefficients coeffs;
+   gboolean has_new_chroma_loc;
+   MetaMultiTextureChromaLoc chroma_loc;
++
++  /* content-type */
++  gboolean has_new_content_type;
++  MetaWindowContentType content_type;
+ };
+ 
+ struct _MetaWaylandDragDestFuncs
+@@ -311,6 +316,8 @@ struct _MetaWaylandSurface
+ 
+   gboolean fifo_barrier;
+ 
++  MetaWindowContentType content_type;
++
+   gboolean flush_frame_callbacks;
+ };
+ 
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index 31d28b86515f6ba1faec4dd09ae7d45f570dc3e0..affa8de3667cf66da3c0ed4b7586271cb7636537 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -475,6 +475,8 @@ meta_wayland_surface_state_set_default (MetaWaylandSurfaceState *state)
+   state->has_new_coeffs = FALSE;
+   state->has_new_chroma_loc = FALSE;
+ 
++  state->has_new_content_type = FALSE;
++
+   wl_list_init (&state->presentation_feedback_list);
+ 
+   state->xdg_popup_reposition_token = 0;
+@@ -695,6 +697,12 @@ meta_wayland_surface_state_merge_into (MetaWaylandSurfaceState *from,
+       to->has_new_chroma_loc = TRUE;
+     }
+ 
++  if (from->has_new_content_type)
++    {
++      to->content_type = from->content_type;
++      to->has_new_content_type = TRUE;
++    }
++
+   /*
+    * A new commit indicates a new content update, so any previous
+    * content update did not go on screen and needs to be discarded.
+@@ -992,6 +1000,16 @@ meta_wayland_surface_apply_state (MetaWaylandSurface      *surface,
+   if (state->has_new_chroma_loc)
+     surface->applied_state.chroma_loc = state->chroma_loc;
+ 
++  if (state->has_new_content_type &&
++      state->content_type != surface->content_type)
++    {
++      MetaWindow *window = meta_wayland_surface_get_window (surface);
++
++      surface->content_type = state->content_type;
++      if (window)
++        meta_window_content_type_changed (window);
++    }
++
+   if (state->has_new_buffer_transform)
+     surface->buffer_transform = state->buffer_transform;
+ 
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index f17a642bc9ebf032e284b85b86ffeaad6b6a679a..1a8320811350861548498e0a0ce4572f08f9fb42 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -65,6 +65,7 @@
+ #define META_XDG_TOPLEVEL_DRAG_VERSION 1
+ #define META_WP_COMMIT_TIMING_V1_VERSION 1
+ #define META_WP_FIFO_V1_VERSION 1
++#define META_WP_CONTENT_TYPE_V1_VERSION 1
+ #define META_WP_CURSOR_SHAPE_VERSION 2
+ #define META_XDG_TOPLEVEL_TAG_V1_VERSION 1
+ #define META_WP_COLOR_REPRESENTATION_VERSION 1
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index 7e761bba1cd0ca123cc5633f2c900227707ac41c..85086dfe27eec73366a7f38886ef125b8ab87054 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -46,6 +46,7 @@
+ #include "wayland/meta-wayland-color-representation.h"
+ #include "wayland/meta-wayland-commit-timing.h"
+ #include "wayland/meta-wayland-cursor-shape.h"
++#include "wayland/meta-wayland-content-type.h"
+ #include "wayland/meta-wayland-fifo.h"
+ #include "wayland/meta-wayland-data-device.h"
+ #include "wayland/meta-wayland-dma-buf.h"
+@@ -1019,6 +1020,7 @@ meta_wayland_compositor_new (MetaContext *context)
+   meta_wayland_drm_lease_manager_init (compositor);
+   meta_wayland_commit_timing_init (compositor);
+   meta_wayland_fifo_init (compositor);
++  meta_wayland_init_content_type (compositor);
+   meta_wayland_init_cursor_shape (compositor);
+   meta_wayland_init_color_representation (compositor);
+   meta_wayland_init_background_effect (compositor);

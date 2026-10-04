@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 
 const FROZEN_WINDOW_BRIGHTNESS = -0.3;
 const DIALOG_TRANSITION_TIME = 150;
@@ -112,11 +113,7 @@ export const CloseDialog = GObject.registerClass({
     }
 
     _isGame() {
-        const app = Shell.WindowTracker.get_default().get_window_app(this._window);
-        const categories = app?.get_app_info()?.get_categories() ?? '';
-        return this._window.is_fullscreen() ||
-            categories.split(';').includes('Game') ||
-            /^steam_app_/i.test(this._window.get_wm_class() ?? '');
+        return this._window.is_fullscreen() || KestrelUi.isGame(this._window);
     }
 
     vfunc_show() {

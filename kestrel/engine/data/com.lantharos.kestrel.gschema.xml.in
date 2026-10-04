@@ -25,6 +25,11 @@
     <value nick="dark" value="5"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.VariableRefresh">
+    <value nick="games" value="0"/>
+    <value nick="fullscreen" value="1"/>
+  </enum>
+
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="lock-screen-content" type="b">
@@ -89,6 +94,20 @@
       <range min="0" max="23.99"/>
       <default>7.0</default>
       <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
+    </key>
+    <key name="variable-refresh" enum="com.lantharos.kestrel.VariableRefresh">
+      <default>'games'</default>
+      <summary>Which fullscreen windows displays with variable refresh follow</summary>
+      <description>
+        On displays with variable refresh turned on, 'games' lets the
+        refresh rate follow fullscreen games only: windows that say they
+        show a game, Steam, Lutris and Heroic games, gamescope, and apps in
+        the Game category. Video players, browsers and other apps keep the
+        display at its fixed refresh rate, which avoids the flicker some
+        panels show when the rate changes with a video's frame timing.
+        'fullscreen' lets it follow every fullscreen window except ones that
+        say they show video or photos.
+      </description>
     </key>
     <key name="pure-black" type="b">
       <default>false</default>

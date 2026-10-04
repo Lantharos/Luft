@@ -12,3 +12,4 @@
 0012-clutter-texture-content-Skip-textures-of-a-lost-grap.patch
 0013-backends-name-monitor-makers-from-the-hardware-datab.patch
 0014-native-repaint-a-display-as-soon-as-it-stops-scannin.patch
+0015-compositor-use-variable-refresh-only-for-windows-tha.patch

@@ -21,6 +21,7 @@ import {checkTray} from './checks/desktop/trayChecks.js';
 import {checkTaskView} from './checks/desktop/taskViewChecks.js';
 import {checkNotifications} from './checks/desktop/notificationChecks.js';
 import {checkSnapGroups} from './checks/desktop/snapGroupChecks.js';
+import {checkVariableRefresh} from './checks/desktop/variableRefreshChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
@@ -340,6 +341,7 @@ export async function run() {
   await checkTaskView({pause, capture, actorNamed, pointer, keyboard, output});
   await checkNotifications({pause, capture, actorNamed, output});
   await checkSnapGroups({pause});
+  await checkVariableRefresh({pause});
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});

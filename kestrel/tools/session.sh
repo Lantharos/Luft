@@ -118,6 +118,7 @@ systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$sc
     export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/docs/screenshots}"
     mkdir -p "$KESTREL_CAPTURE_DIR"
     export KESTREL_WINDOW_SCRIPT="$root/kestrel/tools/fixtures/window.js"
+    export KESTREL_CONTENT_TYPE_SCRIPT="$root/kestrel/tools/fixtures/contentTypeClient.py"
     export KESTREL_MEDIA_SCRIPT="$root/kestrel/tools/fixtures/mediaPlayer.js"
     export KESTREL_TRAY_SCRIPT="$root/kestrel/tools/fixtures/trayApp.js"
     export KESTREL_SESSION_CLIENT_SCRIPT="$root/kestrel/tools/fixtures/sessionClient.js"

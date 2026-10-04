@@ -31,7 +31,6 @@ type Properties = HashMap<String, OwnedValue>;
 struct Session {
     id: String,
     name: String,
-    x11: bool,
 }
 
 #[derive(Serialize)]
@@ -106,7 +105,7 @@ fn read() -> Result<Option<LoginScreen>, String> {
         Err(error) => return Err(explain(error)),
     };
     let wallpaper: String = take(&mut properties, "SharedWallpaper")?;
-    let sessions: Vec<(String, String, String)> = take(&mut properties, "Sessions")?;
+    let sessions: Vec<(String, String)> = take(&mut properties, "Sessions")?;
     Ok(Some(LoginScreen {
         shared_wallpaper: (!wallpaper.is_empty()).then_some(wallpaper),
         show_users: take(&mut properties, "ShowUsers")?,
@@ -115,11 +114,7 @@ fn read() -> Result<Option<LoginScreen>, String> {
         automatic_login: take(&mut properties, "AutomaticLogin")?,
         sessions: sessions
             .into_iter()
-            .map(|(id, name, kind)| Session {
-                id,
-                name,
-                x11: kind == "x11",
-            })
+            .map(|(id, name)| Session { id, name })
             .collect(),
     }))
 }

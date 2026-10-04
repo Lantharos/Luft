@@ -37,7 +37,7 @@ export class GreeterControls {
 
   private sessionEntries(): MenuEntry[] {
     return this.sessions.map(session => ({
-      label: session.type === 'x11' ? `${session.name} (X11)` : session.name,
+      label: session.name,
       checked: session === this.current,
       run: () => this.chooseSession(session),
     }));

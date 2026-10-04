@@ -1,9 +1,8 @@
 use std::env;
 use std::os::unix::fs::PermissionsExt;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 const DEFAULT_PATH: &str = "/usr/local/bin:/usr/bin:/bin";
-const STARTX_DIRECTORIES: [&str; 2] = ["/usr/bin", "/usr/local/bin"];
 
 pub fn exists(program: &str) -> bool {
     if program.contains('/') {
@@ -11,12 +10,6 @@ pub fn exists(program: &str) -> bool {
     }
     let search = env::var_os("PATH").unwrap_or_else(|| DEFAULT_PATH.into());
     env::split_paths(&search).any(|directory| is_executable(&directory.join(program)))
-}
-
-pub fn has_startx() -> bool {
-    STARTX_DIRECTORIES
-        .iter()
-        .any(|directory| is_executable(&PathBuf::from(directory).join("startx")))
 }
 
 fn is_executable(path: &Path) -> bool {

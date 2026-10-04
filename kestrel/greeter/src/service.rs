@@ -110,10 +110,10 @@ impl Greeter {
     }
 
     #[zbus(property)]
-    fn sessions(&self) -> Vec<(String, String, String)> {
+    fn sessions(&self) -> Vec<(String, String)> {
         sessions::discover()
             .into_iter()
-            .map(|session| (session.id, session.name, session.kind.as_str().to_owned()))
+            .map(|session| (session.id, session.name))
             .collect()
     }
 

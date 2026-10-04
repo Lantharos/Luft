@@ -12,6 +12,7 @@ data_resources = [
 
 install_subdir('sounds', install_dir: pkgdatadir)
 subdir('fonts')
+subdir('dconf')
 data_resources_targets = []
 foreach resource : data_resources
   name = resource.get('name')

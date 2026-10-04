@@ -4,12 +4,14 @@ import { seedFromSamples, type Rgb } from '../appearance/color.js';
 import { buildPalette } from '../appearance/palette.js';
 import { AccentStylesheet } from '../appearance/stylesheet.js';
 import { stateFile } from './config.js';
+import { applyDesktopDefaults } from './desktopDefaults.js';
 
 export class LoginAppearance {
   private readonly background = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
   private readonly stylesheet = new AccentStylesheet('greeter-accent.css');
 
   constructor() {
+    applyDesktopDefaults();
     new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' }).set_string('color-scheme', 'prefer-dark');
   }
 

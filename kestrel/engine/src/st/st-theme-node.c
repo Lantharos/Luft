@@ -2987,6 +2987,8 @@ static int font_sizes[] = {
   24 * 1024,  /* xx-large */
 };
 
+#define UNSCALED_RESOLUTION 96.
+
 static gboolean
 font_size_from_term (StThemeNode *node,
                      CRTerm      *term,
@@ -3069,8 +3071,10 @@ font_size_from_term (StThemeNode *node,
     }
   else if (get_length_from_term (node, term, TRUE, size) == VALUE_FOUND)
     {
-      /* Convert from pixels to Pango units */
-      *size *= 1024;
+      if (term->content.num->type == NUM_LENGTH_PX)
+        *size *= st_theme_context_get_resolution (node->context) / UNSCALED_RESOLUTION;
+
+      *size *= PANGO_SCALE;
       return TRUE;
     }
 

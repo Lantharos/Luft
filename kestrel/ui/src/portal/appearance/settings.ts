@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type { Rgb } from '../../appearance/color.js';
-import { FontconfigSerial } from './fontconfig.js';
+import { FontconfigSerial } from '../../shared/fontconfig.js';
 
 const SETTINGS_XML = `<node><interface name="org.freedesktop.impl.portal.Settings">
   <method name="ReadAll"><arg type="as" direction="in"/><arg type="a{sa{sv}}" direction="out"/></method>

@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 
 function brightnessAtCenter() {
@@ -28,10 +29,13 @@ export async function checkControls({pause, capture, events, find, visible, requ
   const layout = find('kestrel-input-source');
   require(visible(layout) && layout.get_child().text === 'EN', 'the keyboard layout can be switched');
 
+  const label = session.get_child();
+  require(Pango.FontDescription.from_string(label.clutter_text.font_name).get_family() === 'Open Runde', 'the login screen draws its text in Open Runde');
   const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+  const height = label.height;
   await click(find('kestrel-greeter-accessibility'));
   await click(find('Larger text', menu));
-  require(settings.get_double('text-scaling-factor') > 1, 'larger text can be turned on');
+  require(settings.get_double('text-scaling-factor') > 1 && label.height > height, 'larger text can be turned on');
   await click(find('kestrel-greeter-accessibility'));
   await click(find('Larger text', menu));
   require(settings.get_double('text-scaling-factor') === 1, 'and off again');

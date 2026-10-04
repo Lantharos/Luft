@@ -1,4 +1,4 @@
-import type { FontFace, FontFile, FontInstance, FontStatus } from '#lib/api.js';
+import type { FontFace, FontFile, FontInstance, FontRole, FontStatus } from '#lib/api.js';
 import * as api from '#lib/api.js';
 import { chrome } from '#lib/app/chrome.svelte.js';
 import { loadFont } from './faces';
@@ -57,6 +57,13 @@ class FontState {
 
 	async install() {
 		await this.#change(api.installFont, (family) => `${family} is installed`);
+	}
+
+	async use(role: FontRole) {
+		await this.#change(
+			(path) => api.useFont(path, role),
+			(family) => (role === 'interface' ? `${family} is now the system font` : `${family} is now the monospace font`)
+		);
 	}
 
 	async remove() {

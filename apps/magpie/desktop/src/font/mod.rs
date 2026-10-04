@@ -10,7 +10,7 @@ use serde::Serialize;
 use data::FontData;
 use faces::Face;
 
-pub use install::{install, remove, status};
+pub use install::{install, remove, status, use_as};
 pub use preview::source;
 
 #[derive(Serialize)]

@@ -85,6 +85,22 @@ pub fn install(path: &Path) -> Result<Status, String> {
     status(path)
 }
 
+pub fn use_as(path: &Path, role: fonts::Role) -> Result<Status, String> {
+    let status = match status(path)? {
+        Status::Missing => install(path)?,
+        installed => installed,
+    };
+    let data = FontData::read(path)?;
+    let identity = faces::identities(&data.bytes)?.swap_remove(0);
+    let family = fonts::installed()?
+        .into_iter()
+        .find(|face| matches(&identity, face))
+        .map(|face| face.family)
+        .ok_or("The font couldn't be found after installing it")?;
+    fonts::use_family(role, &family)?;
+    Ok(status)
+}
+
 pub fn remove(path: &Path) -> Result<Status, String> {
     let copies = installed_copies(path)?.unwrap_or_default();
     fonts::remove(&user_copies(path, copies))?;

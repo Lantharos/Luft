@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { SearchField, VirtualScroller } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { fontFamilies, openFont, removeFont, type FontFamily } from './api';
+	import { openFont, removeFont, type FontFamily } from './api';
 	import FontRow from './FontRow.svelte';
+	import { fontLibrary } from './library.svelte';
 
 	interface Props {
 		onclose: () => void;
@@ -12,7 +13,7 @@
 
 	const ROW_HEIGHT = 60;
 
-	let families = $state.raw<FontFamily[] | null>(null);
+	let families = $derived(fontLibrary.families);
 	let search = $state('');
 	let problem = $state('');
 
@@ -20,10 +21,6 @@
 		const needle = search.trim().toLowerCase();
 		return needle ? (families ?? []).filter((family) => family.name.toLowerCase().includes(needle)) : (families ?? []);
 	});
-
-	async function load() {
-		families = await fontFamilies();
-	}
 
 	async function attempt(action: () => Promise<void>) {
 		problem = '';
@@ -37,14 +34,14 @@
 	function remove(family: FontFamily) {
 		void attempt(async () => {
 			await removeFont(family.name);
-			await load();
+			await fontLibrary.load();
 		});
 	}
 
-	void load();
+	void fontLibrary.load();
 </script>
 
-<svelte:window onfocus={load} />
+<svelte:window onfocus={() => fontLibrary.load()} />
 
 <SubPage title="Fonts" back="Appearance" {onclose}>
 	<SearchField bind:value={search} label="Search fonts" />
@@ -62,7 +59,13 @@
 					layout={{ itemHeight: ROW_HEIGHT }}
 				>
 					{#snippet children(family, index)}
-						<FontRow {family} divided={index > 0} onopen={() => attempt(() => openFont(family.file))} onremove={() => remove(family)} />
+						<FontRow
+							{family}
+							divided={index > 0}
+							onopen={() => attempt(() => openFont(family.file))}
+							onuse={(role) => attempt(() => fontLibrary.choose(role, family.name))}
+							onremove={() => remove(family)}
+						/>
 					{/snippet}
 				</VirtualScroller>
 			{:else}

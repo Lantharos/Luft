@@ -1,3 +1,4 @@
+use luft_app::fonts::Role;
 use luft_app::thumbnails::ThumbnailSize;
 use serde::Deserialize;
 
@@ -48,4 +49,10 @@ pub struct Uri {
 pub struct FontFace {
     pub path: String,
     pub index: u32,
+}
+
+#[derive(Deserialize)]
+pub struct FontUse {
+    pub path: String,
+    pub role: Role,
 }

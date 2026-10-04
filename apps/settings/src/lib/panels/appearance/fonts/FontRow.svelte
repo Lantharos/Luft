@@ -1,16 +1,17 @@
 <script lang="ts">
-	import Trash from '@lucide/svelte/icons/trash-2';
-	import { IconButton } from '@luft/ui';
-	import type { FontFamily } from './api';
+	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
+	import type { FontFamily, FontRole } from './api';
 
 	interface Props {
 		family: FontFamily;
 		divided: boolean;
 		onopen: () => void;
+		onuse: (role: FontRole) => void;
 		onremove: () => void;
 	}
 
-	let { family, divided, onopen, onremove }: Props = $props();
+	let { family, divided, onopen, onuse, onremove }: Props = $props();
 </script>
 
 <div class="font-row" class:divided>
@@ -19,9 +20,35 @@
 		<span class="sample" style:font-family="'{family.name}', var(--font-sans)" aria-hidden="true">The quick brown fox jumps over the lazy dog</span>
 		<span class="styles">{family.styles === 1 ? '1 style' : `${family.styles} styles`}</span>
 	</button>
-	{#if family.removable}
-		<IconButton icon={Trash} label="Remove {family.name}" onclick={onremove} />
-	{/if}
+	<MenuButton class="icon-button" label="More for {family.name}" align="end" {@attach tooltip('More')}>
+		{#snippet trigger()}<Ellipsis size={18} />{/snippet}
+		{#snippet children(close)}
+			<MenuItem
+				onclick={() => {
+					close();
+					onuse('interface');
+				}}>Use as system font</MenuItem
+			>
+			{#if family.monospace}
+				<MenuItem
+					onclick={() => {
+						close();
+						onuse('monospace');
+					}}>Use as monospace font</MenuItem
+				>
+			{/if}
+			{#if family.removable}
+				<MenuSeparator />
+				<MenuItem
+					danger
+					onclick={() => {
+						close();
+						onremove();
+					}}>Remove</MenuItem
+				>
+			{/if}
+		{/snippet}
+	</MenuButton>
 </div>
 
 <style>

@@ -7,6 +7,7 @@
 	import CursorSection from './cursors/CursorSection.svelte';
 	import CursorStore from './cursors/CursorStore.svelte';
 	import FontsPage from './fonts/FontsPage.svelte';
+	import FontsSection from './fonts/FontsSection.svelte';
 	import StyleSection from './StyleSection.svelte';
 	import WallpaperSection from './WallpaperSection.svelte';
 
@@ -33,6 +34,8 @@
 
 	<CursorSection onbrowse={() => (app.section = 'cursors')} />
 
+	<FontsSection onbrowse={() => (app.section = 'fonts')} />
+
 	<Section title="Text and motion">
 		<Row title="Text size" description="Makes text larger or smaller across apps">
 			<span class="w-12 text-right tabular-nums">{percent(desktop.values['text-scaling-factor'] ?? 1)}</span>
@@ -48,7 +51,6 @@
 				/>
 			{/snippet}
 		</Row>
-		<Row title="Fonts" description="Preview the fonts on this computer and remove ones you added" onclick={() => (app.section = 'fonts')} />
 		<Row title="Animations" description="Windows and menus move instead of appearing instantly">
 			<Switch label="Animations" checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
 		</Row>

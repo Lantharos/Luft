@@ -8,10 +8,10 @@ import {LuftApp, waitFor} from './luftApp.js';
 
 const AT = {
   efi: [400, 219], boot: [400, 275], fedora: [400, 331], lab: [130, 205], projects: [400, 387],
-  largest: [1009, 467], trash: [860, 565], confirmTrash: [671, 417],
-  more: [1025, 86], editPartitions: [876, 183], barProjects: [435, 155], barScratch: [577, 155], barRaw: [636, 155], barFree: [850, 155],
-  delete: [955, 225], undo: [818, 30], before: [412, 316], size: [664, 316], newPartition: [947, 225], name: [911, 509], partitionName: [911, 646],
-  apply: [890, 30], confirmApply: [766, 482],
+  largest: [1009, 467], trash: [860, 565],
+  more: [1025, 86], editPartitions: [876, 183], barProjects: [460, 118], barScratch: [598, 118], barRaw: [657, 118], barFree: [900, 118],
+  deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [861, 198],
+  apply: [924, 30], confirmApply: [766, 482],
 };
 const DONE_X = 744;
 const SPACE_BUTTON = [290, 450];
@@ -52,7 +52,8 @@ async function trashLargest(driver, folder, name) {
   const before = trashed(name);
   await driver.click('largest');
   await driver.click('trash');
-  await driver.click('confirmTrash');
+  await driver.tab(1, true);
+  await driver.key(Clutter.KEY_Return);
   await waitFor(() => !GLib.file_test(GLib.build_filenamev([folder, name]), GLib.FileTest.EXISTS) && trashed(name) === before + 1, 5000,
     () => `${name} never reached the trash`);
 }
@@ -96,18 +97,26 @@ async function checkDiskPlan(driver, {styles, require, output}) {
   await driver.click('more');
   await driver.click('editPartitions');
   await driver.click('barProjects');
-  await driver.click('delete');
+  await driver.click('deleteProjects');
   await driver.click('undo');
   await driver.click('barScratch');
-  await driver.click('delete');
+  await driver.click('deleteScratch');
   await driver.click('barRaw');
-  await driver.fill('before', '0');
-  await driver.fill('size', '512');
+  await driver.click('exact');
+  await driver.tab(3, true);
+  await driver.enter('before', '0');
+  await driver.tab();
+  await driver.enter('size', '512');
   await driver.click('barFree');
-  await driver.click('newPartition');
-  await driver.fill('size', '1024');
-  await driver.fill('name', 'data');
-  (await driver.fill('partitionName', 'lab-data')).save(`${output}/disks-editor-dark.png`);
+  await driver.tab();
+  await driver.key(Clutter.KEY_Return);
+  await driver.enter('newSize', '1024');
+  await driver.tab(4);
+  await driver.enter('name', 'data');
+  await driver.click('settings');
+  await driver.tab();
+  (await driver.enter('partitionName', 'lab-data')).save(`${output}/disks-editor-dark.png`);
+  await driver.key(Clutter.KEY_Escape);
   (await driver.click('apply')).save(`${output}/disks-editor-apply-dark.png`);
   driver.takeCalls();
   await driver.click('confirmApply');

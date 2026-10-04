@@ -1,6 +1,6 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import { bytes } from '@luft/ui';
+	import { bytes, tooltip } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -50,7 +50,7 @@
 			{/each}
 		</nav>
 		<span class="flex-none text-[13px] text-[var(--text-muted)] tabular-nums">{status}</span>
-		<button type="button" class="icon-button" aria-label="Measure again" disabled={update?.scanning} onclick={() => space.refresh()}>
+		<button type="button" class="icon-button" aria-label="Measure again" disabled={update?.scanning} {@attach tooltip('Measure again')} onclick={() => space.refresh()}>
 			<RefreshCw size={17} />
 		</button>
 	</div>

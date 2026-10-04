@@ -46,7 +46,7 @@
 </script>
 
 <div
-	class={['row', disks.hovered === volume.block && 'lit', disks.current === volume.block && 'current']}
+	class={['row', 'hover-row', disks.hovered === volume.block && 'lit', disks.current === volume.block && 'current']}
 	role="listitem"
 	onpointerenter={() => (disks.hovered = volume.block)}
 	onpointerleave={() => (disks.hovered = null)}

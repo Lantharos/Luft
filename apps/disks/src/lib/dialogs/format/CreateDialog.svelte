@@ -33,7 +33,7 @@
 	}
 </script>
 
-<Dialog title="New partition" description="Made from free space on {drive.name}. Nothing else on the drive changes." {onclose}>
+<Dialog title="New partition" {onclose}>
 	<SizeField label="Size" bind:value={length} min={Math.min(SMALLEST, size)} max={size} />
 	<FormatFields bind:format bind:valid offerErase={false} />
 	{#snippet actions()}

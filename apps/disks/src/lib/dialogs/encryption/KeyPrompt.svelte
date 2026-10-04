@@ -17,7 +17,6 @@
 	});
 </script>
 
-<p class="px-1 text-[13px] leading-relaxed text-[var(--text-soft)]">This computer doesn’t have a key for it. Enter its passphrase or recovery key.</p>
 <PasswordField
 	bind:this={field}
 	label="Passphrase or recovery key"

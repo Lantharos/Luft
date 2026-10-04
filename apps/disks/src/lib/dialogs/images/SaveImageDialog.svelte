@@ -35,7 +35,7 @@
 	}
 </script>
 
-<Dialog title="Save as disk image" description="Copies everything on it, byte for byte, into one file you can write back later." {onclose}>
+<Dialog title="Save as disk image" {onclose}>
 	<TextField label="File name" showLabel bind:value={file} onkeydown={(event) => event.key === 'Enter' && submit()} />
 	<div class="flex items-center justify-between gap-3 px-1">
 		<div class="flex min-w-0 flex-col">

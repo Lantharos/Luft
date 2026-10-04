@@ -44,15 +44,13 @@
 		{/snippet}
 	</Dialog>
 {:else}
-	<Dialog title="Write “{image.name}” to a drive" description="Pick the drive to write this {bytes(image.size)} image to." {onclose}>
+	<Dialog title="Write “{image.name}” to a drive" {onclose}>
 		<div class="row-group" role="radiogroup" aria-label="Drives">
 			{#each candidates as drive (drive.id)}
 				<button type="button" role="radio" aria-checked={chosen?.id === drive.id} class="choice" onclick={() => (chosenId = drive.id)}>
 					<DriveIcon kind={drive.kind} size={20} />
-					<span class="flex min-w-0 flex-1 flex-col">
-						<span class="truncate text-[14px] font-medium">{drive.name}</span>
-						<span class="text-[12.5px] text-[var(--text-muted)]">{bytes(drive.size)}</span>
-					</span>
+					<span class="min-w-0 truncate text-[14px] font-medium">{drive.name}</span>
+					<span class="flex-1 text-[13px] text-[var(--text-muted)]">{bytes(drive.size)}</span>
 					{#if chosen?.id === drive.id}
 						<Check size={18} />
 					{/if}
@@ -71,10 +69,10 @@
 <style>
 	.choice {
 		display: flex;
-		min-height: 56px;
+		min-height: 48px;
 		align-items: center;
-		gap: 14px;
-		padding: 10px 16px;
+		gap: 12px;
+		padding: 0 16px;
 		text-align: left;
 		color: var(--text-soft);
 		transition: background-color 160ms var(--ease);

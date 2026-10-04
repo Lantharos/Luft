@@ -3,7 +3,7 @@
 	import { Dialog, TextField } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { Filesystem, Volume } from '#lib/api.js';
-	import { LABEL_LIMITS } from '#lib/format.js';
+	import { LABEL_LIMITS, volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
@@ -22,7 +22,7 @@
 	}
 </script>
 
-<Dialog title="Rename" description="The name other computers and apps show for it." {onclose}>
+<Dialog title="Rename “{volumeName(volume)}”" {onclose}>
 	<TextField label="Name" bind:value={label} error={label.length > limit ? `Up to ${limit} characters for this format` : ''} live onkeydown={(event) => event.key === 'Enter' && submit()} />
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>Cancel</button>

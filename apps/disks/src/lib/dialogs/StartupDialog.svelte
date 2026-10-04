@@ -30,8 +30,8 @@
 	</div>
 {/snippet}
 
-<Dialog title="Mount at startup" description="Mount “{volumeName(volume)}” for everyone each time the computer starts." {onclose}>
-	{@render row('Mount when the computer starts', enabled, (value) => (enabled = value))}
+<Dialog title="Mount “{volumeName(volume)}” at startup" {onclose}>
+	{@render row('Mount for everyone when the computer starts', enabled, (value) => (enabled = value))}
 	{#if enabled}
 		<TextField label="Folder" showLabel bind:value={directory} error={valid ? '' : 'Use a full folder path, such as /mnt/data'} live />
 		{@render row('Read only', readOnly, (value) => (readOnly = value))}

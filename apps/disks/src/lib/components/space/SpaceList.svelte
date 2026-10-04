@@ -22,7 +22,7 @@
 
 <div class="row-group" role="list" aria-label="What's in this folder">
 	{#each tiles as tile (tile.key)}
-		<div class={['row', hovered === tile.key && 'lit']} role="listitem" onpointerenter={() => onhover(tile.key)} onpointerleave={() => onhover(null)}>
+		<div class={['row', 'hover-row', hovered === tile.key && 'lit']} role="listitem" onpointerenter={() => onhover(tile.key)} onpointerleave={() => onhover(null)}>
 			<button type="button" class="main" disabled={tile.kind !== 'dir'} onclick={() => onopen(tile)}>
 				<span class="icon" style:color={tile.kind === 'dir' ? TONES[tile.tone] : undefined}>
 					{#if tile.kind === 'dir'}

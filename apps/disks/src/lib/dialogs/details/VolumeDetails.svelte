@@ -5,6 +5,7 @@
 	import { filesystemName, inner, volumeName } from '#lib/format.js';
 	import { explorable, typeName } from '#lib/partitions/types.js';
 	import { disks } from '#lib/state/disks.svelte.js';
+	import Disclosure from '#lib/components/Disclosure.svelte';
 	import Facts from './Facts.svelte';
 	import UsageLine from './UsageLine.svelte';
 
@@ -23,7 +24,11 @@
 			{ label: 'Format', value: volume.encryption ? encryption() : filesystemName(volume) },
 			{ label: 'Size', value: bytes(volume.size) },
 			mounted && { label: 'Mounted at', value: contents.mountPoints.join(', '), open: () => void api.openFolder(contents.mountPoints[0]) },
-			contents.startup && { label: 'At startup', value: `Mounts at ${contents.startup.directory}` },
+			contents.startup && { label: 'At startup', value: `Mounts at ${contents.startup.directory}` }
+		].filter((fact) => fact !== false && fact !== null)
+	);
+	let technical = $derived(
+		[
 			{ label: 'Device', value: volume.device, mono: true },
 			volume.uuid && { label: 'UUID', value: volume.uuid, mono: true },
 			contents !== volume && contents.uuid && { label: 'Contents UUID', value: contents.uuid, mono: true },
@@ -32,6 +37,7 @@
 			volume.number !== null && { label: 'Partition', value: `${volume.number} on ${drive.device}` }
 		].filter((fact) => fact !== false && fact !== '' && fact !== null)
 	);
+	let more = $state(false);
 
 	function encryption() {
 		const kind = volume.encryption?.kind.toUpperCase();
@@ -44,11 +50,15 @@
 	}
 </script>
 
-<Dialog title={volumeName(volume)} description="On {drive.name}" wide {onclose}>
+<Dialog title={volumeName(volume)} wide {onclose}>
 	{#if contents.used !== null}
 		<UsageLine used={contents.used} size={volume.size} />
 	{/if}
 	<Facts {facts} />
+	<div class="-ml-1 flex"><Disclosure bind:open={more}>Technical details</Disclosure></div>
+	{#if more}
+		<Facts facts={technical} />
+	{/if}
 	{#snippet actions()}
 		{#if explorable(volume)}
 			<button type="button" class="button mr-auto" onclick={explore}>See what’s using space</button>
@@ -56,3 +66,4 @@
 		<button type="button" class="button primary" onclick={onclose}>Done</button>
 	{/snippet}
 </Dialog>
+

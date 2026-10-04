@@ -11,7 +11,7 @@
 	let { key, name, onclose }: Props = $props();
 </script>
 
-<Dialog title="Recovery key for “{name}”" description="Type it if the drive ever asks for a recovery key. Keep a copy somewhere other than the drive and this computer." wide {onclose}>
+<Dialog title="Recovery key for “{name}”" description="Keep a copy somewhere other than this drive and computer." wide {onclose}>
 	<RecoveryKey {key} onsave={() => api.trust.saveKey(key, name)} onprint={() => api.trust.printKey(key, name)} />
 	{#snippet actions()}
 		<button type="button" class="button primary" onclick={onclose}>Done</button>

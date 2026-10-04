@@ -34,7 +34,7 @@
 
 <Dialog
 	title="Turn off encryption for “{volumeName(volume)}”?"
-	description="It’s decrypted in the background while you keep using it. Afterwards, anyone who has the drive can read what’s on it."
+	description="Afterwards, anyone who has the drive can read what’s on it."
 	{onclose}
 >
 	{#if request.asking}

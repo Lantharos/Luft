@@ -1,2 +1,10 @@
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
+
+.row-menu {
+	transition-property: background-color, color, opacity, transform;
+}
+
+.hover-row:not(:hover, :focus-within) .row-menu[aria-expanded='false'] {
+	opacity: 0;
+}

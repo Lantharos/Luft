@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox, PasswordField, Segmented, Select, Switch, TextField } from '@luft/ui';
+	import { Checkbox, PasswordField, Segmented, Select, Switch, TextField, tooltip } from '@luft/ui';
 	import type { Filesystem, Format } from '#lib/api.js';
 	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -19,10 +19,9 @@
 		{ value: 'linux', label: 'Linux only' },
 		{ value: 'other', label: 'Other' }
 	];
-	const HINTS: Record<Purpose, string> = {
-		everywhere: 'Works with Windows, Mac and Linux, and most cameras and TVs. Files can be any size.',
-		linux: 'Fastest and safest choice when only Linux computers use it. Can be encrypted.',
-		other: 'Pick a format yourself.'
+	const HINTS: Record<Exclude<Purpose, 'other'>, string> = {
+		everywhere: 'exFAT · Windows, Mac, Linux, cameras and TVs',
+		linux: 'ext4 · Fastest on Linux, can be encrypted'
 	};
 	const OTHER: Filesystem[] = ['ext4', 'btrfs', 'exfat', 'ntfs', 'vfat'];
 	const ENCRYPTABLE: Filesystem[] = ['ext4', 'btrfs'];
@@ -63,18 +62,16 @@
 
 <div class="flex flex-col gap-2">
 	<Segmented label="Use with" options={PURPOSES} value={purpose} onchange={choose} />
-	<p class="px-1 text-[12.5px] text-[var(--text-muted)]">{HINTS[purpose]}</p>
 	{#if purpose === 'other'}
 		<Select label="Format" {options} value={format.filesystem} onchange={(value) => (format.filesystem = value)} />
+	{:else}
+		<p class="px-1 text-[12.5px] text-[var(--text-muted)]">{HINTS[purpose]}</p>
 	{/if}
 </div>
 
 {#if encryptable}
 	<div class="flex items-center justify-between gap-4 px-1">
-		<div class="flex flex-col">
-			<span class="text-[13px] font-medium">Encrypt with a passphrase</span>
-			<span class="text-[12.5px] text-[var(--text-muted)]">Nobody can read it without the passphrase</span>
-		</div>
+		<span class="text-[13px] font-medium" {@attach tooltip('Nobody can read it without the passphrase')}>Encrypt with a passphrase</span>
 		<Switch label="Encrypt with a passphrase" checked={encrypt} onchange={(value) => (encrypt = value)} />
 	</div>
 	{#if encrypt}
@@ -85,7 +82,7 @@
 {/if}
 
 {#if offerErase}
-	<Checkbox label="Overwrite existing data" checked={format.erase} onchange={(value) => (format.erase = value)}>
-		Overwrite existing data so it can't be recovered (slow)
-	</Checkbox>
+	<span class="self-start" {@attach tooltip('So it can’t be recovered. Takes much longer.')}>
+		<Checkbox label="Overwrite old data" checked={format.erase} onchange={(value) => (format.erase = value)}>Overwrite old data</Checkbox>
+	</span>
 {/if}

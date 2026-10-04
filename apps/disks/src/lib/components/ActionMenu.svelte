@@ -15,7 +15,7 @@
 </script>
 
 {#if filled.length}
-	<MenuButton {label} class="icon-button" align="end" minWidth={230} {disabled}>
+	<MenuButton {label} class="icon-button row-menu" align="end" minWidth={230} {disabled}>
 		{#snippet trigger()}
 			<Ellipsis size={18} />
 		{/snippet}

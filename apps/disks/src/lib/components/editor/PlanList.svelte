@@ -7,7 +7,7 @@
 
 	type State = 'queued' | 'running' | 'done' | 'failed' | 'skipped';
 
-	let sentences = $derived(editor.frozen?.sentences ?? editor.outcome?.sentences ?? editor.described.map((described) => described.sentence));
+	let sentences = $derived(editor.frozen?.sentences ?? editor.outcome?.sentences ?? []);
 	let states = $derived(
 		sentences.map((_, index): State => {
 			if (editor.progress) return index < editor.progress.index ? 'done' : index === editor.progress.index ? 'running' : 'queued';
@@ -18,23 +18,12 @@
 		})
 	);
 	let moving = $derived(editor.progress && editor.progress.total > 0 ? editor.progress.copied / editor.progress.total : null);
-	let heading = $derived.by(() => {
-		if (editor.running) return 'Applying changes';
-		if (editor.outcome?.error) return 'Some changes weren’t made';
-		if (editor.outcome) return 'All changes were made';
-		return sentences.length ? 'Changes to make' : 'No changes yet';
-	});
+	let heading = $derived(editor.running ? 'Applying changes' : editor.outcome?.error ? 'Some changes weren’t made' : 'All changes were made');
 </script>
 
-<section class="flex flex-col gap-3">
-	<div class="flex min-h-9 items-center gap-2 px-1">
-		<h2 class="flex-1 text-[16px] font-semibold">{heading}</h2>
-		{#if editor.outcome}
-			<button type="button" class="button" onclick={() => (editor.outcome = null)}>Keep editing</button>
-			<button type="button" class="button primary" onclick={() => editor.close()}>Done</button>
-		{/if}
-	</div>
-	{#if sentences.length}
+{#if sentences.length}
+	<section class="flex flex-col gap-3">
+		<h2 class="px-1 text-[15px] font-semibold">{heading}</h2>
 		<ol class="row-group">
 			{#each sentences as sentence, index (index)}
 				<li class={['step', states[index]]}>
@@ -56,20 +45,16 @@
 				</li>
 			{/each}
 		</ol>
-	{:else}
-		<p class="px-1 text-[13px] text-[var(--text-muted)]">
-			Pick a partition or free space above, or drag the edges of the selected partition. Nothing on the drive changes until you apply.
-		</p>
-	{/if}
-	{#if editor.outcome?.error}
-		<p class="px-1 text-[13px] text-[var(--danger)]">{editor.outcome.error}</p>
-	{/if}
-</section>
+		{#if editor.outcome?.error}
+			<p class="px-1 text-[13px] text-[var(--danger)]">{editor.outcome.error}</p>
+		{/if}
+	</section>
+{/if}
 
 <style>
 	.step {
 		display: flex;
-		min-height: 48px;
+		min-height: 44px;
 		align-items: center;
 		gap: 12px;
 		padding: 0 16px;

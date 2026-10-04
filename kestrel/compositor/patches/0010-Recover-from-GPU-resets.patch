@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Toluwaleke Ogundipe <anonymoux47@gmail.com>
 Date: Thu, 1 Oct 2026 21:33:54 +0200
-Subject: [PATCH 10/15] Recover from GPU resets
+Subject: [PATCH 10/16] Recover from GPU resets
 
 Create the GL context with reset notification and, when the driver reports
 that the context was lost, recreate the EGL and Cogl contexts and restore

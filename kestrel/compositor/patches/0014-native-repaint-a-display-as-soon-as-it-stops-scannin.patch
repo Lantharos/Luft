@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 3 Oct 2026 20:40:40 +0200
-Subject: [PATCH 14/15] native: repaint a display as soon as it stops scanning
+Subject: [PATCH 14/16] native: repaint a display as soon as it stops scanning
  out a window
 
 When a fullscreen window stops qualifying for direct scanout, nothing in

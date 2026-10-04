@@ -13,3 +13,4 @@
 0013-backends-name-monitor-makers-from-the-hardware-datab.patch
 0014-native-repaint-a-display-as-soon-as-it-stops-scannin.patch
 0015-compositor-use-variable-refresh-only-for-windows-tha.patch
+0016-clutter-keep-shell-text-antialiasing-grayscale.patch

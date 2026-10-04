@@ -156,6 +156,9 @@ case "$action" in
       install_keyring
       install_authenticator
       install_watchdog
+      sudo install -dZ -m755 /usr/local/share/fonts
+      sudo ln -sfn "$prefix/share/kestrel/fonts" /usr/local/share/fonts/luft
+      sudo fc-cache /usr/local/share/fonts
       systemctl --user daemon-reload
       echo "Kestrel is installed in $prefix and appears as a session on the login screen."
       echo "The Kestrel login screen is ready for greetd; see Setting up the login screen in kestrel/README.md."
@@ -172,6 +175,7 @@ case "$action" in
     remove_authenticator
     remove_keyring
     remove_watchdog
+    [[ -L /usr/local/share/fonts/luft ]] && sudo rm /usr/local/share/fonts/luft && sudo fc-cache /usr/local/share/fonts
     as_owner "$prefix" rm -rf "$prefix"
     echo "Kestrel was removed from $prefix."
     ;;

@@ -86,7 +86,6 @@ export class KestrelPanel {
       this.privacy = new PrivacyIndicator(menus, actions.stopScreencast);
       right.add_child(this.privacy.actor);
       this.tray = new Tray(menus);
-      right.add_child(this.tray.actor);
       this.inputSource = new InputSourceIndicator(menus, layout => {
         const keys = this.appSystem.lookup_app(KEYS_APP);
         return [
@@ -95,6 +94,7 @@ export class KestrelPanel {
         ];
       });
       right.add_child(this.inputSource.actor);
+      right.add_child(this.tray.actor);
       this.quickButton = new St.Button({
         style_class: 'kestrel-status-button', child: this.statusIcons,
         can_focus: true, accessible_name: 'Quick settings',

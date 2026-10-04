@@ -9,41 +9,19 @@ use std::path::{Path, PathBuf};
 use desktop::DesktopEntry;
 
 const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
+const SESSIONS_DIRECTORY: &str = "wayland-sessions";
 const PREFERRED: &str = "kestrel";
-
-#[derive(Clone, Copy, PartialEq, Debug)]
-pub enum Kind {
-    Wayland,
-    X11,
-}
-
-impl Kind {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Wayland => "wayland",
-            Self::X11 => "x11",
-        }
-    }
-
-    fn directory(self) -> &'static str {
-        match self {
-            Self::Wayland => "wayland-sessions",
-            Self::X11 => "xsessions",
-        }
-    }
-}
 
 #[derive(Debug, PartialEq)]
 pub struct Session {
     pub id: String,
     pub name: String,
-    pub kind: Kind,
     exec: String,
     desktop_names: String,
 }
 
 impl Session {
-    fn parse(id: &str, kind: Kind, text: &str) -> Option<Self> {
+    fn parse(id: &str, text: &str) -> Option<Self> {
         let entry = DesktopEntry::parse(text);
         if entry.is_true("Hidden") || entry.is_true("NoDisplay") {
             return None;
@@ -65,7 +43,6 @@ impl Session {
         Some(Self {
             id: id.to_owned(),
             name: entry.get("Name").unwrap_or(id).to_owned(),
-            kind,
             desktop_names: if desktop_names.is_empty() {
                 id.to_owned()
             } else {
@@ -76,31 +53,21 @@ impl Session {
     }
 
     pub fn command(&self) -> String {
-        match self.kind {
-            Kind::Wayland => format!(
-                "env XDG_SESSION_TYPE=wayland XDG_SESSION_DESKTOP={} XDG_CURRENT_DESKTOP={} {}",
-                self.id, self.desktop_names, self.exec
-            ),
-            Kind::X11 => format!("startx /usr/bin/env {}", self.exec),
-        }
+        format!(
+            "env XDG_SESSION_TYPE=wayland XDG_SESSION_DESKTOP={} XDG_CURRENT_DESKTOP={} {}",
+            self.id, self.desktop_names, self.exec
+        )
     }
 }
 
 pub fn discover() -> Vec<Session> {
-    let data_dirs = data_dirs();
-    let mut kinds = vec![Kind::Wayland];
-    if executables::has_startx() {
-        kinds.push(Kind::X11);
-    }
     let mut seen = HashSet::new();
     let mut sessions = Vec::new();
-    for kind in kinds {
-        for data_dir in &data_dirs {
-            for (id, path) in desktop_files(&data_dir.join(kind.directory())) {
-                if seen.insert(id.clone()) {
-                    let text = fs::read_to_string(&path).unwrap_or_default();
-                    sessions.extend(Session::parse(&id, kind, &text));
-                }
+    for data_dir in data_dirs() {
+        for (id, path) in desktop_files(&data_dir.join(SESSIONS_DIRECTORY)) {
+            if seen.insert(id.clone()) {
+                let text = fs::read_to_string(&path).unwrap_or_default();
+                sessions.extend(Session::parse(&id, &text));
             }
         }
     }
@@ -111,11 +78,7 @@ pub fn preferred<'a>(sessions: &'a [Session], default: &str) -> Option<&'a Sessi
     [default, PREFERRED]
         .iter()
         .find_map(|id| sessions.iter().find(|session| session.id == *id))
-        .or_else(|| {
-            sessions
-                .iter()
-                .find(|session| session.kind == Kind::Wayland)
-        })
+        .or_else(|| sessions.first())
 }
 
 fn data_dirs() -> Vec<PathBuf> {
@@ -165,7 +128,7 @@ Type=Application
 Name=Safe mode
 Exec=/usr/bin/kestrel-session --safe
 ";
-        let session = Session::parse("kestrel", Kind::Wayland, text).unwrap();
+        let session = Session::parse("kestrel", text).unwrap();
         assert_eq!(session.name, "Kestrel");
         assert_eq!(
             session.command(),
@@ -178,14 +141,7 @@ Exec=/usr/bin/kestrel-session --safe
     fn skips_entries_that_should_not_be_offered() {
         let hidden = "[Desktop Entry]\nName=Old\nExec=old\nHidden=true\n";
         let missing = "[Desktop Entry]\nName=Gone\nExec=gone\nTryExec=/nonexistent/gone\n";
-        assert_eq!(Session::parse("old", Kind::Wayland, hidden), None);
-        assert_eq!(Session::parse("gone", Kind::Wayland, missing), None);
-    }
-
-    #[test]
-    fn starts_x11_sessions_through_startx() {
-        let text = "[Desktop Entry]\nName=Plasma (X11)\nExec=startplasma-x11 %f\n";
-        let session = Session::parse("plasmax11", Kind::X11, text).unwrap();
-        assert_eq!(session.command(), "startx /usr/bin/env startplasma-x11");
+        assert_eq!(Session::parse("old", hidden), None);
+        assert_eq!(Session::parse("gone", missing), None);
     }
 }

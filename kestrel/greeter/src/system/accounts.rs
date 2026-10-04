@@ -33,5 +33,5 @@ pub async fn remember_session(
         .await?;
     let user = UserProxy::builder(connection).path(path)?.build().await?;
     user.set_session(&session.id).await?;
-    user.set_session_type(session.kind.as_str()).await
+    user.set_session_type("wayland").await
 }

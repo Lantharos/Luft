@@ -5,7 +5,6 @@ const WAIT_FOR_PERMISSION = 300_000;
 export interface Session {
 	id: string;
 	name: string;
-	x11: boolean;
 }
 
 export interface LoginScreen {

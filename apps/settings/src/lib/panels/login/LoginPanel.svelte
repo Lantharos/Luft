@@ -24,7 +24,7 @@
 
 	let sessions = $derived([
 		{ value: '', label: 'Automatic' },
-		...(screen?.sessions ?? []).map((session) => ({ value: session.id, label: session.x11 ? `${session.name} (X11)` : session.name }))
+		...(screen?.sessions ?? []).map((session) => ({ value: session.id, label: session.name }))
 	]);
 	let automaticLogins = $derived([{ value: '', label: 'Off' }, ...people.map((user) => ({ value: user.userName, label: displayName(user) }))]);
 

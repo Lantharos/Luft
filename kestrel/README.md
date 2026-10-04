@@ -104,13 +104,13 @@ Kestrel answers apps' portal requests itself, as described under [Portals](#port
 
 ## Login screen
 
-Kestrel is also the login screen. It runs on [greetd](https://git.sr.ht/~kennylevinsen/greetd), a small login daemon that leaves the look entirely to the greeter, so it can start any session installed on the computer: Kestrel, other Wayland desktops, and X11 desktops when `startx` is installed. greetd runs `kestrel-greeter`, which starts Kestrel in its login mode: the compositor with the login screen and nothing else, so no panel, apps, notifications, or session services.
+Kestrel is also the login screen. It runs on [greetd](https://git.sr.ht/~kennylevinsen/greetd), a small login daemon that leaves the look entirely to the greeter, so it can start any Wayland session installed on the computer, Kestrel or another desktop. greetd runs `kestrel-greeter`, which starts Kestrel in its login mode: the compositor with the login screen and nothing else, so no panel, apps, notifications, or session services.
 
 It looks and moves like the lock screen and shares its code. It opens on the large clock and date over the blurred wallpaper. A click, a key, or a swipe brings up the people on this computer at the bottom left with their account pictures, and the key that wakes it is never typed into the field. The person who signed in most recently is already chosen, so typing starts their password right away. Choosing someone else crossfades to their wallpaper and accent color. Accounts hidden in Settings, and accounts the computer doesn't list, sign in with Another account, which asks for a username first; Back returns to it.
 
 Sign-in follows whatever the computer's sign-in rules ask for: a password, a verification code or other second step, a fingerprint, and any notes along the way, which appear under the field, with warnings in brighter text. A second step shows Back to start over. A wrong password shakes the field and says so, and the field is ready for another try. Caps Lock shows a warning while typing a password. After two minutes without input the screen returns to the clock.
 
-At the bottom right are the session, the keyboard layout when there is more than one, accessibility, and power. The session picker lists every installed session and starts with the one each person used last. Accessibility turns on larger text and, when Orca is installed, the screen reader. Power offers Suspend, Restart, and Power off.
+At the bottom right are the session, the keyboard layout when there is more than one, accessibility, and power. The session picker lists every installed Wayland session and starts with the one each person used last. Accessibility turns on larger text and, when Orca is installed, the screen reader. Power offers Suspend, Restart, and Power off.
 
 ### From boot to desktop
 

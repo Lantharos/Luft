@@ -125,9 +125,15 @@ class Frame {
   save(path) {
     GLib.file_set_contents(path, this.bytes.toArray());
   }
+
+  saveZoomed(path, factor) {
+    this._pixbuf.scale_simple(this._pixbuf.get_width() * factor, this._pixbuf.get_height() * factor, GdkPixbuf.InterpType.NEAREST)
+      .savev(path, 'png', [], []);
+  }
 }
 
-async function screenshotArea({x, y, width, height}, stream) {
+export async function captureFrame({x, y, width, height}) {
+  const stream = Gio.MemoryOutputStream.new_resizable();
   const screenshot = new Shell.Screenshot();
   await new Promise((resolve, reject) => screenshot.screenshot_area(x, y, width, height, stream, (source, result) => {
     try {
@@ -138,6 +144,7 @@ async function screenshotArea({x, y, width, height}, stream) {
     }
   }));
   stream.close(null);
+  return new Frame(stream.steal_as_bytes());
 }
 
 export class LuftApp {
@@ -169,10 +176,8 @@ export class LuftApp {
     return (GLib.get_monotonic_time() - started) / 1000;
   }
 
-  async frame(area = this.window.get_frame_rect()) {
-    const stream = Gio.MemoryOutputStream.new_resizable();
-    await screenshotArea(area, stream);
-    return new Frame(stream.steal_as_bytes());
+  frame(area = this.window.get_frame_rect()) {
+    return captureFrame(area);
   }
 
   async settle(condition, area) {

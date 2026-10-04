@@ -27,6 +27,8 @@ cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(printf '%s' "$session" | sh
 ln -sfn "$session/cache" "$cache_link"
 export XDG_CACHE_HOME="$cache_link"
 export XDG_STATE_HOME="$session/state"
+printf 'user-db:user\nfile-db:%s\n' "$root/kestrel/build/data/dconf/kestrel" > "$session/dconf-profile"
+export DCONF_PROFILE="$session/dconf-profile"
 export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
 mkdir -p "$session/data/dbus-1/services"
 printf '[D-BUS Service]\nName=org.freedesktop.portal.Documents\nExec=%s -m %s %s\n' "$(command -v gjs)" "$root/kestrel/tools/fixtures/documentPortal.js" "$session/documents" > "$session/data/dbus-1/services/org.freedesktop.portal.Documents.service"

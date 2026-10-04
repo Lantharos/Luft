@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 
 import {LuftApp, startSabineService, waitFor} from './luftApp.js';
 import {checkDisks} from './disksChecks.js';
+import {checkFonts} from './fontChecks.js';
 import {checkFontViewer} from './fontViewer.js';
 import {checkRoverNetwork} from './roverNetworkChecks.js';
 import {checkSettingsAccessibility} from './settingsAccessibility.js';
@@ -114,6 +115,7 @@ export async function checkLuftApps({output, pointer}) {
     await checkDisks(context);
     await checkRoverNetwork(context);
     await checkTern(context);
+    await checkFonts(context);
   } finally {
     styles.interface.set_string('color-scheme', saved.scheme);
     styles.kestrel.set_boolean('pure-black', saved.pureBlack);

@@ -9,7 +9,6 @@ export interface About {
 	graphics: string[];
 	memory: number | null;
 	storage: { total: number; free: number; manageable: boolean } | null;
-	windowing: string;
 }
 
 export const about = () => invoke<About>('about');

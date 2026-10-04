@@ -24,7 +24,6 @@ struct About {
     graphics: Vec<String>,
     memory: Option<u64>,
     storage: Option<Storage>,
-    windowing: &'static str,
 }
 
 #[derive(Serialize)]
@@ -174,11 +173,6 @@ fn about() -> Result<About, String> {
         graphics: graphics(),
         memory: memory(),
         storage: storage(),
-        windowing: if std::env::var_os("WAYLAND_DISPLAY").is_some() {
-            "Wayland"
-        } else {
-            "X11"
-        },
     })
 }
 

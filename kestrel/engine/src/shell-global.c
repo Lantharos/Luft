@@ -14,7 +14,6 @@
 #include <sys/resource.h>
 #endif
 #include <locale.h>
-#include <fontconfig/fontconfig.h>
 
 #include <gio/gio.h>
 #include <girepository/girepository.h>
@@ -34,6 +33,7 @@
 #endif
 
 #include "shell-enum-types.h"
+#include "shell-fonts.h"
 #include "shell-global-private.h"
 #include "shell-systemd.h"
 #include "shell-window-tracker.h"
@@ -322,7 +322,6 @@ shell_global_init (ShellGlobal *global)
   const char *datadir = g_getenv ("KESTREL_DATADIR");
   const char *shell_js = g_getenv("KESTREL_JS");
   g_autofree char *imagedir = NULL;
-  g_autofree char *fontdir = NULL;
   g_auto (GStrv) search_path = NULL;
   g_autofree char *path = NULL;
   g_autofree char *statedir = NULL;
@@ -332,9 +331,7 @@ shell_global_init (ShellGlobal *global)
     datadir = KESTREL_DATADIR;
   global->datadir = datadir;
 
-  fontdir = g_build_filename (datadir, "fonts", NULL);
-  if (!FcConfigAppFontAddDir (NULL, (const FcChar8 *) fontdir))
-    g_warning ("Failed to load the shell fonts from %s", fontdir);
+  shell_fonts_add_bundled (datadir);
 
   /* We make sure imagedir ends with a '/', since the JS won't have
    * access to g_build_filename() and so will end up just

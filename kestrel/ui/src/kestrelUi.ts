@@ -43,6 +43,7 @@ import { LoginDisplays } from './session/loginScreen/displays.js';
 import { LockControls } from './lockScreen/controls.js';
 import { LoginNumLock } from './session/loginScreen/numLock.js';
 import { Farewell } from './session/farewell.js';
+import { FontRefresh } from './appearance/fonts.js';
 import type { Rgb } from './appearance/color.js';
 import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
@@ -92,6 +93,7 @@ class KestrelUi {
   private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
   private readonly loginScreen = this.ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
   private readonly farewell = new Farewell();
+  private readonly fontRefresh = new FontRefresh();
   private readonly mediaKeys: MediaKeys;
 
   constructor(private readonly context: Context) {
@@ -454,6 +456,7 @@ class KestrelUi {
     this.liveWallpaper.destroy();
     for (const sync of this.loginScreen) sync.destroy();
     this.farewell.destroy();
+    this.fontRefresh.destroy();
     this.mediaKeys.destroy();
     this.oomNotifier.destroy();
     this.health.destroy();

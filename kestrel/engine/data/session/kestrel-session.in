@@ -8,6 +8,11 @@ unset KESTREL_LOGIN_SHELL
 export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export IBUS_DAEMON_ARGS="--panel disable"
 
+DCONF_PROFILE="${XDG_RUNTIME_DIR:-/tmp}/kestrel/dconf-profile"
+mkdir -p "${DCONF_PROFILE%/*}"
+{ cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } > "$DCONF_PROFILE"
+export DCONF_PROFILE
+
 systemctl --user reset-failed
 dbus-update-activation-environment --systemd --all
 

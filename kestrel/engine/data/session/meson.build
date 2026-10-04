@@ -1,6 +1,7 @@
 sessionconf = configuration_data()
 sessionconf.set('bindir', bindir)
 sessionconf.set('datadir', datadir)
+sessionconf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
   input: 'kestrel.desktop.in',

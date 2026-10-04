@@ -2,6 +2,8 @@
 
 Kestrel carries an ordered Git patch series on Mutter. `upstream.json` pins the official repository, release, and exact base commit; `series` lists the patches in application order. The stack contains window rounding, framebuffer blur shader reuse, `xdg-toplevel-icon-v1` support, fractional glyph advances for shell text, desktop windows for Wayland clients the shell places behind everything else, such as live wallpapers, a fix that lets go of the input method when a focused text field is destroyed, so a later input source switch cannot read the freed field, and cursor lookup that moves on to the next cursor implementation when one declines a theme, so the shell's scalable cursors leave Xcursor themes to Mutter's loader, and cursor framebuffers that are removed rather than closed when they are released, so a compositor that exits leaves its last frame on screen without its pointer, and settings that come from Kestrel instead of gnome-settings-daemon. Desktop windows are never scanned out directly or used for variable refresh rate, since the shell draws its panels over them. When a display stops showing a fullscreen window's buffer directly, for example because the window left fullscreen, the compositor repaints the whole display right away instead of waiting for something else on screen to change.
 
+A display with variable refresh turned on only follows a window's frame rate while that window covers it and has its `variable-refresh` property set; every other window keeps the display at the fixed rate of its mode. Kestrel sets the property for games, so video players and browsers no longer drive the refresh rate with their irregular frame timing, which makes the brightness of many panels, VA panels in particular, flicker. Clients can describe their content through `wp_content_type_v1`, and windows report it as `content-type`, which Kestrel uses alongside its own game detection.
+
 Mutter reads the rotation lock from `com.lantharos.kestrel.touchscreen` and the night light color temperature from `com.lantharos.Settings.NightLight`, which `kestrel-settings` provides, so it needs none of gnome-settings-daemon's settings or services. Color profiles that ask for a screen brightness no longer try to set it through gnome-settings-daemon, which stopped offering that interface. Monitor makers are named from systemd's hardware database, which carries the same registry of display vendors, so Mutter needs no part of gnome-desktop.
 
 The stack also carries recovery from GPU resets, taken from GNOME/mutter!5247 by Toluwaleke Ogundipe. The GL context is created with reset notification; when the driver reports that it was lost, Mutter waits for the reset to finish, creates new EGL and Cogl contexts and restores what it owns, including windows, backgrounds, cursors, text and effects. Kestrel's shell recreates its own textures from the `graphics-restored` signal of the backend's graphics recovery context. Texture contents from a lost context draw nothing until they are replaced, and the backend reports how long the oldest frame handed to a physical display has been waiting to be presented, which Kestrel's watchdog uses to tell a stuck display from an idle one.
@@ -64,6 +66,16 @@ gsettings set com.lantharos.kestrel.diagnostics log-direct-scanout true
 ```
 
 The compositor then writes a line to the journal whenever a display starts or stops showing a window's buffer directly, naming the app and why it stopped, and how long the desktop took to reach the screen afterwards. If the desktop isn't back after a second, it also records whether a redraw was queued and how long the oldest frame has waited for the display. At most 30 lines are written per minute. `journalctl --user -u kestrel.service | grep "Direct scanout"` shows them. Turn the log off again with `gsettings reset com.lantharos.kestrel.diagnostics log-direct-scanout`.
+
+## Variable refresh diagnostics
+
+To see which windows a display's refresh rate follows, turn on the log:
+
+```sh
+gsettings set com.lantharos.kestrel.diagnostics log-variable-refresh true
+```
+
+Whenever the window covering a display changes, the compositor writes whether the display's refresh rate follows it or stays fixed, and why, for example because the window shows video or isn't a game. Displays with variable refresh turned off say so at the end of the line. `journalctl --user -u kestrel.service | grep "Variable refresh"` shows them. Turn the log off again with `gsettings reset com.lantharos.kestrel.diagnostics log-variable-refresh`.
 
 ## Window icons
 

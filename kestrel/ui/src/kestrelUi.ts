@@ -34,6 +34,7 @@ import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { coveredMonitors } from './panel/coverage.js';
 import { systemMonitor } from './panel/systemMonitor.js';
 import { LaunchFeedback } from './windows/launchFeedback.js';
+import { VariableRefresh } from './windows/variableRefresh.js';
 import { PortalBackend } from './portal/backend.js';
 import { PasskeyPrompts } from './passkeys/service.js';
 import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
@@ -47,6 +48,7 @@ import { Greeter, type GreeterContext } from './greeter/greeter.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
 export { signInToNetwork } from './network/signIn.js';
+export { isGame } from './windows/games.js';
 export { VpnSecrets } from './network/vpnSecrets.js';
 
 type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
@@ -85,6 +87,7 @@ class KestrelUi {
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
+  private readonly variableRefresh = new VariableRefresh();
   private readonly liveWallpaper: LiveWallpaper;
   private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
   private readonly loginScreen = this.ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
@@ -457,6 +460,7 @@ class KestrelUi {
     this.batteryWarnings.destroy();
     this.plugSounds.destroy();
     this.launchFeedback.destroy();
+    this.variableRefresh.destroy();
     this.portal.destroy();
     this.passkeys.destroy();
     for (const monitor of this.stylesheetMonitors) monitor.cancel();

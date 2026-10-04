@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Row, Select, Switch } from '@luft/ui';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Displays } from './api';
 	import {
 		ORIENTATIONS,
@@ -29,6 +30,16 @@
 
 	let { displays, draft = $bindable(), output }: Props = $props();
 
+	type VariableRefresh = 'off' | 'games' | 'fullscreen';
+
+	const VARIABLE_REFRESH: { value: VariableRefresh; label: string }[] = [
+		{ value: 'off', label: 'Off' },
+		{ value: 'games', label: 'In games' },
+		{ value: 'fullscreen', label: 'In all fullscreen apps' }
+	];
+
+	const kestrel = useSettings<{ 'variable-refresh': Exclude<VariableRefresh, 'off'> }>('com.lantharos.kestrel', ['variable-refresh']);
+
 	let monitor = $derived(monitorOf(displays, output.connector));
 	let mode = $derived(modeOf(displays, output));
 	let several = $derived(displays.monitors.length > 1 && !draft.mirrored);
@@ -46,6 +57,11 @@
 			changed.mode = next.id;
 			if (!next.scales.includes(changed.scale)) changed.scale = next.preferredScale;
 		});
+	}
+
+	function setVariableRefresh(choice: VariableRefresh) {
+		if (choice !== 'off') kestrel.set('variable-refresh', choice);
+		if (mode.variable !== (choice !== 'off')) output.mode = pickMode(monitor, mode, mode.refresh, choice !== 'off').id;
 	}
 
 	function setOrientation(transform: number) {
@@ -80,8 +96,13 @@
 		</Row>
 	{/if}
 	{#if !draft.mirrored && hasVariant(monitor, mode)}
-		<Row title="Variable refresh rate" description="Matches the display to games and video for smoother motion">
-			<Switch label="Variable refresh rate" checked={mode.variable} onchange={(on) => (output.mode = pickMode(monitor, mode, mode.refresh, on).id)} />
+		<Row title="Variable refresh rate" description="Lets the display follow the frame rate of fullscreen games for smoother motion">
+			<Select
+				label="Variable refresh rate"
+				options={VARIABLE_REFRESH}
+				value={mode.variable ? (kestrel.values['variable-refresh'] ?? 'games') : 'off'}
+				onchange={setVariableRefresh}
+			/>
 		</Row>
 	{/if}
 	{#if scales.length > 1}

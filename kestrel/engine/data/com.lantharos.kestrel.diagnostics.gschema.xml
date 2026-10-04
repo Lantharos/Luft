@@ -5,5 +5,10 @@
       <summary>Log when displays show fullscreen windows directly</summary>
       <description>When on, the compositor writes to the journal whenever a display starts or stops showing a fullscreen window's buffer directly, and when the desktop takes long to appear again afterwards.</description>
     </key>
+    <key name="log-variable-refresh" type="b">
+      <default>false</default>
+      <summary>Log when displays switch between variable and fixed refresh</summary>
+      <description>When on, the compositor writes to the journal whenever the window covering a display changes, saying whether the display's refresh rate follows that window or stays fixed, and why.</description>
+    </key>
   </schema>
 </schemalist>

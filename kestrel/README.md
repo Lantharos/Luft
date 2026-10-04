@@ -47,7 +47,11 @@ The shell runs with the lowest OOM score and inside the session slice, which Fed
 
 The busy pointer after launching an app clears as soon as the app's first window appears, instead of waiting out the launch timeout for apps that never report their startup.
 
-Apps that stop answering get the Not Responding dialog after the usual few seconds. Games, recognized by being fullscreen, belonging to the Game category, or running as a Steam game, get a minute before it appears, since they often stall while loading.
+Apps that stop answering get the Not Responding dialog after the usual few seconds. Games, recognized by being fullscreen or by the game detection below, get a minute before it appears, since they often stall while loading.
+
+### Variable refresh
+
+On displays with variable refresh turned on, the refresh rate follows fullscreen games and stays at the display's fixed rate for everything else. Video players and browsers show video at frame rates that don't line up with the display, and following them makes the brightness of many panels, VA panels in particular, flicker. A window counts as a game when its app says it shows a game through the Wayland content type protocol, when it runs as a Steam, Lutris or Heroic game, inside gamescope, or when its app belongs to the Game category. Apps that say they show video or photos never get variable refresh. Settings → Displays can let the refresh rate follow every fullscreen app instead, which is the `variable-refresh` key in `com.lantharos.kestrel`.
 
 ### When the graphics card stops responding
 

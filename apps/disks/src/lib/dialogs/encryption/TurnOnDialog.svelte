@@ -47,31 +47,24 @@
 		summary: reformat ? 'Ready to erase and encrypt' : 'Ready to encrypt'
 	});
 
-	let descriptions = $derived<Record<Step, string>>({
-		check: blocked
-			? 'Take care of what’s marked below, then try again.'
-			: reformat
-				? 'It’s formatted as ext4 with encryption, which erases everything on it. Copy anything you want to keep somewhere else first.'
-				: 'Nobody can read what’s on it without its key, even if the drive is lost or taken out of the computer. Your files stay where they are.',
-		key: 'If it ever won’t unlock any other way, this key opens it. Keep it somewhere other than the drive and this computer.',
-		unlock: drive.removable
-			? 'A passphrase opens it on any Linux computer. On this one, it can also unlock by itself.'
-			: 'It can unlock by itself whenever this computer starts, or ask for a passphrase.',
-		summary: 'Here’s what happens next.'
+	let descriptions = $derived<Record<Step, string | undefined>>({
+		check: blocked ? undefined : reformat ? 'This erases everything on it. Copy anything you want to keep first.' : 'Your files stay where they are.',
+		key: 'Keep it somewhere other than this drive and computer.',
+		unlock: undefined,
+		summary: undefined
 	});
 
 	let summary = $derived(
 		reformat
 			? [
 					`Everything on “${name}” is erased.`,
-					`It’s formatted as ext4 and encrypted. Linux computers can open it with its ${usePassphrase ? 'passphrase or ' : ''}recovery key.`,
-					auto ? (drive.removable ? 'It unlocks by itself when you plug it into this computer.' : 'It unlocks by itself when this computer starts.') : ''
+					'It’s formatted as ext4 and encrypted.',
+					auto ? (drive.removable ? 'It unlocks by itself when you plug it in here.' : 'It unlocks by itself when this computer starts.') : ''
 				]
 			: [
-					'It’s unavailable for a few seconds while encrypting starts.',
-					'The rest happens in the background, and you can keep using it.',
-					usePassphrase ? 'Its passphrase works once encrypting is done. Until then, use the recovery key.' : '',
-					`Keep the computer plugged in${drive.removable ? ' and the drive connected' : ''}. If anything interrupts it, it continues where it stopped.`
+					'It’s unavailable for a few seconds, then encrypts in the background while you use it.',
+					usePassphrase ? 'Until it’s done, it opens with the recovery key instead of the passphrase.' : '',
+					`Keep the computer plugged in${drive.removable ? ' and the drive connected' : ''}. An interruption only pauses it.`
 				]
 	);
 
@@ -122,22 +115,23 @@
 		{#if check}
 			<Steps items={check.checks} />
 		{:else if !error}
-			<p class="px-1 text-[13px] text-[var(--text-muted)]">Checking the drive…</p>
+			<p class="px-1 text-[13px] text-[var(--text-muted)]">Checking…</p>
 		{/if}
 	{:else if step === 'key'}
 		<RecoveryKey {key} onsave={() => api.trust.saveKey(key, name)} onprint={() => api.trust.printKey(key, name)} />
 		<Checkbox label="I’ve saved the recovery key" checked={saved} onchange={(checked) => (saved = checked)}>I’ve saved the recovery key</Checkbox>
 	{:else if step === 'unlock'}
 		<SwitchLine
-			title="Unlock automatically on this computer"
-			description={autoAvailable ? (drive.removable ? 'When you plug it in, it opens without asking.' : 'When this computer starts, it opens without asking.') : (check?.autoUnlock ?? '')}
+			title="Unlock automatically"
+			hint={drive.removable ? 'Opens without asking when you plug it in' : 'Opens without asking when this computer starts'}
+			note={autoAvailable ? undefined : (check?.autoUnlock ?? '')}
 			checked={auto && autoAvailable}
 			disabled={!autoAvailable}
 			onchange={(checked) => (auto = checked)}
 		/>
 		<SwitchLine
 			title="Use a passphrase"
-			description={drive.removable ? 'To open it on other computers.' : 'Asked for when it doesn’t unlock by itself.'}
+			hint={drive.removable ? 'To open it on other computers' : 'Asked for when it doesn’t unlock by itself'}
 			checked={usePassphrase}
 			onchange={(checked) => (usePassphrase = checked)}
 		/>
@@ -146,7 +140,7 @@
 			<PasswordField label="Confirm passphrase" bind:value={confirmation} autocomplete="new-password" error={mismatch ? 'The passphrases don’t match' : ''} live />
 		{/if}
 		{#if !usePassphrase && !auto}
-			<p class="px-1 text-[12.5px] text-[var(--text-muted)]">Choose at least one, so you don’t need the recovery key every time.</p>
+			<p class="px-1 text-[12.5px] text-[var(--text-muted)]">Choose at least one.</p>
 		{/if}
 	{:else}
 		<ol class="flex flex-col gap-2.5 px-1">

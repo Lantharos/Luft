@@ -32,9 +32,7 @@
 			{/each}
 		</div>
 	{/if}
-	<p class="text-[13px] text-[var(--text-muted)]">
-		{unmounts ? 'Partitions that are in use are unmounted first. ' : ''}The changes are made one after another and can’t be undone once they start.
-	</p>
+	<p class="text-[13px] text-[var(--text-muted)]">{unmounts ? 'Partitions in use are unmounted first. ' : ''}This can’t be undone once it starts.</p>
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>Cancel</button>
 		<button type="button" class={['button', losses.length ? 'danger' : 'primary']} onclick={apply}>Apply</button>

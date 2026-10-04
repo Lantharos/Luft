@@ -1,3 +1,4 @@
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
@@ -8,13 +9,13 @@ import {remove, trashed, writeSpaceFixture} from './disksSpaceFixture.js';
 import {LuftApp, waitFor} from './luftApp.js';
 
 const AT = {
-  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 550], save: [698, 472], done: [1001, 310],
-  format: [900, 641], erase: [660, 507], safelyRemove: [943, 85],
-  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [974, 275], create: [692, 574],
-  health: [600, 360], quickTest: [327, 496], firstDrive: [560, 308], next: [686, 495], write: [666, 419],
-  largest: [1009, 467], trash: [860, 565], confirmTrash: [671, 417],
-  turnOn: [885, 448], checked: [755, 458], saved: [292, 457], keySaved: [755, 509], unlocking: [755, 452], encrypt: [759, 458],
-  encryption: [885, 499], autoUnlock: [772, 290], remember: [362, 392], confirmUnlock: [692, 444], lock: [900, 300],
+  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 550], done: [1001, 310],
+  format: [900, 641], safelyRemove: [943, 85],
+  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [974, 275],
+  health: [600, 360], firstDrive: [560, 301], next: [686, 470], write: [666, 419],
+  largest: [1009, 467], trash: [860, 565],
+  turnOn: [885, 448], checked: [755, 448], saved: [292, 447], keySaved: [755, 498], unlocking: [755, 436], encrypt: [759, 429],
+  encryption: [885, 499], lock: [900, 300],
 };
 const ARCHIVE = 'archive-luks';
 const PASSPHRASE = 'correct horse';
@@ -35,7 +36,8 @@ async function checkRemovable(driver, {require, output}) {
   await driver.click('more');
   const dialog = await driver.click('saveImage');
   dialog.save(`${output}/disks-save-image-dark.png`);
-  await driver.click('save');
+  await driver.tab();
+  await driver.key(Clutter.KEY_Return);
   await driver.called(['udisks OpenForBackup /dev/sdb1'], 'saving an image');
   const source = GLib.build_filenamev([GLib.get_user_cache_dir(), 'udisks-fixture', 'sdb1.img']);
   let image = null;
@@ -49,7 +51,8 @@ async function checkRemovable(driver, {require, output}) {
   await driver.click('more');
   const format = await driver.click('format');
   format.save(`${output}/disks-format-dark.png`);
-  await driver.click('erase');
+  await driver.tab(1, true);
+  await driver.key(Clutter.KEY_Return);
   require(await driver.called(['udisks Unmount /dev/sdb1', 'udisks Format /dev/sdb1 exfat label=TRAVEL'], 'formatting'),
     'formatting unmounts the partition first and keeps its name');
 
@@ -62,8 +65,10 @@ async function checkEncrypted(driver, keyring, {require, output}) {
   await driver.click('wdc');
   await driver.click('unlock');
   await driver.type(PASSPHRASE);
-  await driver.click('remember');
-  await driver.click('confirmUnlock');
+  await driver.tab(2);
+  await driver.key(Clutter.KEY_space);
+  await driver.tab(2, true);
+  await driver.key(Clutter.KEY_Return);
   require(await driver.called(['udisks Unlock /dev/sda1'], 'unlocking'), 'disks unlocks an encrypted partition with its passphrase');
   require(keyring.items.some(item => item.attributes['gvfs-luks-uuid'] === ARCHIVE && item.secret === PASSPHRASE),
     'disks remembers the passphrase where the desktop looks when the drive is plugged in');
@@ -79,7 +84,7 @@ async function checkEncrypted(driver, keyring, {require, output}) {
 
   const create = await driver.click('newPartition');
   create.save(`${output}/disks-new-partition-dark.png`);
-  await driver.click('create');
+  await driver.key(Clutter.KEY_Return);
   require(await driver.called(['udisks CreatePartitionAndFormat /dev/sda ext4 size=0'], 'creating'), 'disks fills free space with a new ext4 partition');
 }
 
@@ -87,7 +92,8 @@ async function checkHealth(driver, {require, output}) {
   await driver.click('seagate');
   const health = await driver.click('health');
   health.save(`${output}/disks-health-dark.png`);
-  await driver.click('quickTest');
+  await driver.tab(2, true);
+  await driver.key(Clutter.KEY_Return);
   require(await driver.called(['udisks SelftestStart short Seagate_Barracuda'], 'testing'), 'disks starts a quick self-test on a failing drive');
 }
 
@@ -107,7 +113,8 @@ async function checkEncryption(driver, {require, output}) {
   await driver.click('wdc');
   await driver.click('more');
   (await driver.click('encryption')).save(`${output}/disks-encryption-dark.png`);
-  await driver.click('autoUnlock');
+  await driver.tab();
+  await driver.key(Clutter.KEY_space);
   require(await driver.called(['SetUpUnlocking /dev/sda1 auto=true recovery=false'], 'unlocking automatically'),
     'disks lets an encrypted drive unlock automatically on this computer');
 }
@@ -144,7 +151,8 @@ async function checkSpace({styles, require, output, pointer}) {
     (await driver.shown('space')).save(`${output}/disks-space-dark.png`);
     await driver.click('largest');
     await driver.click('trash');
-    await driver.click('confirmTrash');
+    await driver.tab(1, true);
+  await driver.key(Clutter.KEY_Return);
     await waitFor(() => !GLib.file_test(videos, GLib.FileTest.EXISTS) && trashed('Videos') === before + 1, 5000,
       () => 'the largest folder never reached the trash');
     require(true, 'disks measures a folder and moves its largest folder to the trash');

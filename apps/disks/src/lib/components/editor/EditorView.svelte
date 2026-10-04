@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { bytes } from '@luft/ui';
 	import type { Drive } from '#lib/api.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { limitsOf } from '#lib/editor/limits.js';
@@ -7,9 +6,10 @@
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import EditorBar from './EditorBar.svelte';
-	import FreeInspector from './FreeInspector.svelte';
+	import type { Placed } from './fit';
+	import FreeInspector from './inspector/FreeInspector.svelte';
+	import PartInspector from './inspector/PartInspector.svelte';
 	import LayoutList from './LayoutList.svelte';
-	import PartInspector from './PartInspector.svelte';
 	import PlanList from './PlanList.svelte';
 
 	interface Props {
@@ -21,18 +21,16 @@
 
 	const TONES = ['var(--accent)', 'var(--tertiary)', 'var(--secondary)'];
 
-	let free = $derived(gaps(layout));
+	let width = $state(0);
+	let inspectorWidth = $state(0);
+	let anchor = $state.raw<Placed | null>(null);
+
 	let tones = $derived(new Map(layout.parts.map((part, index) => [part.key, TONES[index % TONES.length]])));
 	let part = $derived(layout.parts.find((candidate) => candidate.key === editor.selected) ?? null);
-	let gap = $derived(free.find((candidate) => `free:${candidate.offset}` === editor.selected) ?? null);
+	let gap = $derived(gaps(layout).find((candidate) => `free:${candidate.offset}` === editor.selected) ?? null);
 	let limits = $derived(part ? limitsOf(layout, part, (filesystem) => disks.support(filesystem)) : null);
-	let summary = $derived(
-		[
-			layout.table === 'gpt' ? 'GPT partition table' : 'MBR partition table',
-			`${bytes(free.reduce((total, candidate) => total + candidate.size, 0))} free`,
-			'Partitions start on 1 MiB boundaries'
-		].join(' · ')
-	);
+	let reporting = $derived(editor.running || editor.outcome !== null);
+	let offset = $derived(anchor ? Math.max(0, Math.min(width - inspectorWidth, anchor.left + anchor.width / 2 - inspectorWidth / 2)) : 0);
 
 	function keydown(event: KeyboardEvent) {
 		if (event.target instanceof HTMLInputElement || dialogs.current) return;
@@ -47,18 +45,21 @@
 
 <svelte:window onkeydown={keydown} />
 
-<section class="flex flex-col gap-5">
-	<p class="min-h-9 px-1.5 pt-2 text-[14px] text-[var(--text-muted)]">{summary}</p>
-	<EditorBar {layout} total={drive.size} {limits} {tones} />
-	{#if part && limits}
-		{#key part.key}
-			<PartInspector {layout} {part} {limits} />
-		{/key}
-	{:else if gap}
-		<FreeInspector {layout} {gap} removable={drive.removable} />
+<section bind:clientWidth={width} class="flex flex-col gap-4 pt-3">
+	<EditorBar {layout} limits={reporting ? null : limits} {tones} onplaced={(box) => (anchor = box)} />
+	{#if reporting}
+		<PlanList />
+	{:else if (part && limits) || gap}
+		<div bind:offsetWidth={inspectorWidth} class="max-w-full self-start" style:margin-left="{offset}px">
+			{#if part && limits}
+				{#key part.key}
+					<PartInspector {layout} {part} {limits} />
+				{/key}
+			{:else if gap}
+				<FreeInspector {layout} {gap} removable={drive.removable} />
+			{/if}
+		</div>
 	{:else}
 		<LayoutList {layout} {tones} />
 	{/if}
 </section>
-
-<PlanList />

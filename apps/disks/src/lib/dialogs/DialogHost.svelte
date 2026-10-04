@@ -71,7 +71,7 @@
 {:else if dialog?.kind === 'discard-plan'}
 	<ConfirmDialog
 		title="Discard the planned changes?"
-		description="Nothing on the drive has changed yet. The {editor.steps.length === 1 ? 'change' : `${editor.steps.length} changes`} you planned are forgotten."
+		description="Nothing on the drive has changed yet."
 		confirm="Discard"
 		onconfirm={async () => (editor.close(), true)}
 		onclose={dialogs.close}
@@ -101,7 +101,7 @@
 	{@const { path, name, size, folder } = dialog}
 	<ConfirmDialog
 		title="Move “{name}” to the trash?"
-		description="{folder ? 'This folder and everything in it take' : 'It takes'} up {bytes(size)}. The space is freed once the trash is emptied, and until then you can put it back from the trash in Rover."
+		description="{folder ? 'It and everything in it take' : 'It takes'} up {bytes(size)}, freed once the trash is emptied."
 		confirm="Move to trash"
 		onconfirm={() => space.trash(path).then(() => true, (caught) => (disks.fail(caught), false))}
 		onclose={dialogs.close}

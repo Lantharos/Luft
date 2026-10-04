@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
-	import { end, gaps, type Layout, type Span } from '#lib/editor/model.js';
-	import { mebibytes } from '#lib/editor/units.js';
+	import { gaps, type Layout, type Span } from '#lib/editor/model.js';
 	import { FILESYSTEM_NAMES } from '#lib/format.js';
 
 	interface Props {
@@ -38,12 +37,11 @@
 			role="option"
 			aria-selected={editor.selected === row.key}
 			class={['row', editor.selected === row.key && 'chosen']}
-			onclick={() => (editor.selected = row.key)}
+			onclick={() => editor.select(row.key)}
 		>
 			<span class={['dot', !row.tone && 'free', row.pending && 'pending']} style:--tone={row.tone}></span>
 			<span class="name">{row.name}</span>
 			<span class="muted">{row.kind}</span>
-			<span class="numbers">{mebibytes(row.span.offset)}–{mebibytes(end(row.span))} MiB</span>
 			<span class="size">{bytes(row.span.size)}</span>
 		</button>
 	{/each}
@@ -97,15 +95,8 @@
 		color: var(--text-muted);
 	}
 
-	.numbers {
-		margin-left: auto;
-		flex: none;
-		color: var(--text-muted);
-		font-variant-numeric: tabular-nums;
-	}
-
 	.size {
-		width: 72px;
+		margin-left: auto;
 		flex: none;
 		text-align: right;
 		color: var(--text-soft);

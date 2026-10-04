@@ -38,7 +38,7 @@
 	}
 </script>
 
-<Dialog title="Unlock “{volumeName(volume)}”" description="Enter the passphrase this partition was encrypted with." {onclose}>
+<Dialog title="Unlock “{volumeName(volume)}”" {onclose}>
 	<PasswordField bind:this={field} label="Passphrase" bind:value={passphrase} {error} live autocomplete="current-password" onkeydown={(event) => event.key === 'Enter' && submit()} />
 	<Checkbox label="Remember in my keyring" checked={remember} onchange={(value) => (remember = value)}>Remember in my keyring</Checkbox>
 	{#snippet actions()}

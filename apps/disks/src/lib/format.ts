@@ -108,12 +108,12 @@ export function healthSummary(health: Health) {
 }
 
 export function healthAdvice(health: Health) {
-	if (health.state === 'failing') return 'This drive reports that it is failing. Back up your files now and replace the drive soon.';
+	if (health.state === 'failing') return 'Back up your files now and replace it soon.';
 	if (health.state === 'warning') {
 		if (health.badSectors > 0) return `${health.badSectors} ${health.badSectors === 1 ? 'sector' : 'sectors'} can no longer be read reliably. Back up anything important.`;
 		return 'Back up anything important and keep an eye on it.';
 	}
-	return 'The drive reports no problems.';
+	return undefined;
 }
 
 export function selftestResult(status: string) {

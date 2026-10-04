@@ -61,6 +61,24 @@ export class Driver {
     await sleep(LOADING / 2);
   }
 
+  async tab(times = 1, backwards = false) {
+    if (backwards)
+      this.keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Shift_L, Clutter.KeyState.PRESSED);
+    for (let step = 0; step < times; step++) {
+      this.keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Tab, Clutter.KeyState.PRESSED);
+      this.keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Tab, Clutter.KeyState.RELEASED);
+    }
+    if (backwards)
+      this.keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Shift_L, Clutter.KeyState.RELEASED);
+    await sleep(LOADING / 2);
+  }
+
+  async enter(name, text) {
+    await this.type(text);
+    await this.key(Clutter.KEY_Return);
+    return this.shown(name);
+  }
+
   async shown(name) {
     await sleep(LOADING);
     const frame = await this.app.settle(() => true);

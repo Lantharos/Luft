@@ -30,13 +30,8 @@
 	let busy = $derived(changing(encryption));
 	let protection = $derived(disks.protection);
 	let autoReason = $derived(!protection.available ? 'Encrypting drives isn’t available on this computer.' : protection.autoUnlock);
-	let description = $derived(
-		encryption && busy
-			? progressSentence(encryption)
-			: encryption?.autoUnlock
-				? 'It unlocks by itself on this computer, and with its passphrase or recovery key anywhere else.'
-				: 'It asks for its passphrase or recovery key when it’s unlocked.'
-	);
+	let description = $derived(encryption && busy ? progressSentence(encryption) : undefined);
+	let unlocksWhen = $derived(drive.removable ? 'Opens without asking when you plug it in' : 'Opens without asking when this computer starts');
 	let title = $derived(
 		encryption?.state === 'encrypting' || (busy && encryption?.change === 'encrypt')
 			? `Encrypting “${name}”`
@@ -101,19 +96,17 @@
 	}
 </script>
 
-<Dialog {title} {description} wide onclose={() => !working && onclose()}>
+<Dialog {title} {description} onclose={() => !working && onclose()}>
 	<SwitchLine
-		title="Unlock automatically on this computer"
-		description={autoReason || (drive.removable ? 'When you plug it in, it opens without asking.' : 'When this computer starts, it opens without asking.')}
+		title="Unlock automatically"
+		hint={unlocksWhen}
+		note={autoReason || undefined}
 		checked={encryption?.autoUnlock ?? false}
 		disabled={Boolean(autoReason) || busy || working}
 		onchange={setAutoUnlock}
 	/>
 	{#if protection.available}
-		<Line
-			title="Recovery key"
-			description={encryption?.recoveryKeyStored ? 'This computer keeps a copy, so you can see it again.' : 'Opens it when nothing else does.'}
-		>
+		<Line title="Recovery key" hint="Opens it when nothing else does">
 			{#if encryption?.recoveryKeyStored}
 				<button type="button" class="button" disabled={working} onclick={showKey}>Show…</button>
 			{:else}
@@ -121,11 +114,11 @@
 			{/if}
 		</Line>
 	{/if}
-	<Line title="Passphrase" description="What you type to unlock it here and on other computers.">
+	<Line title="Passphrase" hint="Unlocks it here and on other computers">
 		<button type="button" class="button" disabled={working || busy} onclick={() => dialogs.open({ kind: 'passphrase', volume })}>Change…</button>
 	</Line>
 	{#if remembered}
-		<Line title="Saved in your keyring" description="So unlocking it here needs no typing.">
+		<Line title="Saved in your keyring" hint="Unlocking it here needs no typing">
 			<button type="button" class="button" disabled={working} onclick={() => attempt(() => api.forgetPassphrase(volume.block).then(() => (remembered = false)))}>Forget</button>
 		</Line>
 	{/if}

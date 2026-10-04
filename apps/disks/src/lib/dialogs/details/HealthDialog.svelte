@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog } from '@luft/ui';
+	import { Dialog, tooltip } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { Drive, Health } from '#lib/api.js';
 	import { duration, healthAdvice, selftestResult } from '#lib/format.js';
@@ -32,22 +32,19 @@
 	}
 </script>
 
-<Dialog title={health.state === 'good' ? 'This drive is healthy' : 'This drive needs attention'} description={healthAdvice(health)} wide {onclose}>
+<Dialog title={health.state === 'good' ? 'This drive is healthy' : 'This drive needs attention'} description={healthAdvice(health)} {onclose}>
 	<Facts {facts} />
 	{#if testing && done !== null}
 		<div class="mx-1 h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
 			<div class="h-full origin-left rounded-full bg-[var(--accent)] transition-transform" style:transform="scaleX({done / 100})"></div>
 		</div>
 	{/if}
-	<p class="px-1 text-[12.5px] leading-relaxed text-[var(--text-muted)]">
-		A self-test has the drive check itself while you keep using it. The quick test takes a couple of minutes, the full test can take hours.
-	</p>
 	{#snippet actions()}
 		{#if testing}
 			<button type="button" class="button mr-auto" disabled={busy} onclick={() => disks.run(key, () => api.stopSelftest(drive.id))}>Stop test</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={() => test(false)}>Quick test</button>
-			<button type="button" class="button mr-auto" disabled={busy} onclick={() => test(true)}>Full test</button>
+			<button type="button" class="button" disabled={busy} onclick={() => test(false)} {@attach tooltip('A couple of minutes, while you keep using it')}>Quick test</button>
+			<button type="button" class="button mr-auto" disabled={busy} onclick={() => test(true)} {@attach tooltip('Can take hours, while you keep using it')}>Full test</button>
 		{/if}
 		<button type="button" class="button primary" onclick={onclose}>Done</button>
 	{/snippet}

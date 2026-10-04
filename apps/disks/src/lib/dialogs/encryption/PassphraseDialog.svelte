@@ -42,7 +42,7 @@
 	}
 </script>
 
-<Dialog title="Change passphrase" description="For “{volumeName(volume)}”. Files on it stay as they are." {onclose}>
+<Dialog title="Change passphrase for “{volumeName(volume)}”" {onclose}>
 	<PasswordField bind:this={field} label="Current passphrase" bind:value={current} {error} live autocomplete="current-password" />
 	<PasswordField label="New passphrase" bind:value={next} autocomplete="new-password" />
 	<PasswordField label="Confirm new passphrase" bind:value={confirm} error={mismatch ? 'The passphrases don’t match' : ''} live autocomplete="new-password" onkeydown={(event) => event.key === 'Enter' && submit()} />

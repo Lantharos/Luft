@@ -45,5 +45,4 @@
 		</label>
 	</div>
 	<Slider {label} {min} {max} step={MiB} {value} format={bytes} oninput={(next) => (value = next)} onchange={(next) => (value = next)} />
-	<p class="px-1 text-[12px] text-[var(--text-muted)]">{bytes(min)} to {bytes(max)}</p>
 </div>

@@ -54,6 +54,7 @@ class Editor {
 	steps = $state.raw<Step[]>([]);
 	history = $state.raw<Step[][]>([]);
 	selected = $state<string | null>(null);
+	exact = $state(false);
 	draft = $state.raw<Draft | null>(null);
 	frozen = $state.raw<{ layout: Layout; sentences: string[] } | null>(null);
 	progress = $state.raw<Progress | null>(null);
@@ -79,6 +80,12 @@ class Editor {
 		this.steps = [];
 		this.history = [];
 		this.selected = selected;
+		this.outcome = null;
+	}
+
+	select(key: string) {
+		if (this.running) return;
+		this.selected = key;
 		this.outcome = null;
 	}
 
@@ -117,13 +124,6 @@ class Editor {
 		this.steps = previous;
 		this.history = this.history.slice(0, -1);
 		if (this.selected && !this.layout?.parts.some((part) => part.key === this.selected)) this.selected = null;
-	}
-
-	discard() {
-		if (this.running) return;
-		this.steps = [];
-		this.history = [];
-		this.selected = null;
 	}
 
 	async apply() {

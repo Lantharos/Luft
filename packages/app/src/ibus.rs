@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 const MACHINE_IDS: [&str; 2] = ["/var/lib/dbus/machine-id", "/etc/machine-id"];
 const PREFIX: &str = "IBUS_ADDRESS=";
+const DEFAULT_WAYLAND_DISPLAY: &str = "wayland-0";
 
 fn machine_id() -> String {
     MACHINE_IDS
@@ -12,28 +13,15 @@ fn machine_id() -> String {
         .map_or_else(|| "machine-id".into(), |id| id.trim().to_owned())
 }
 
-fn display() -> (String, String) {
-    if let Ok(wayland) = env::var("WAYLAND_DISPLAY") {
-        return ("unix".into(), wayland);
-    }
-    let Ok(display) = env::var("DISPLAY") else {
-        return ("unix".into(), "0".into());
-    };
-    let (host, rest) = display.split_once(':').unwrap_or((display.as_str(), "0"));
-    let number = rest.split('.').next().unwrap_or("0");
-    let host = if host.is_empty() { "unix" } else { host };
-    (host.into(), number.into())
-}
-
 fn socket_file() -> PathBuf {
     if let Some(file) = env::var_os("IBUS_ADDRESS_FILE") {
         return file.into();
     }
-    let (host, number) = display();
+    let display = env::var("WAYLAND_DISPLAY").unwrap_or_else(|_| DEFAULT_WAYLAND_DISPLAY.into());
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from(".config"))
         .join("ibus/bus")
-        .join(format!("{}-{host}-{number}", machine_id()))
+        .join(format!("{}-unix-{display}", machine_id()))
 }
 
 pub fn address() -> Result<String, String> {

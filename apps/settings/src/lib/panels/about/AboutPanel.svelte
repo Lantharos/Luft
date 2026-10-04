@@ -72,7 +72,7 @@
 
 	<Section title="Software">
 		<Row title="System"><span class="value">{info.system}</span></Row>
-		<Row title="Desktop"><span class="value">Kestrel on {info.windowing}</span></Row>
+		<Row title="Desktop"><span class="value">Kestrel</span></Row>
 		<Row title="Kernel"><span class="value">{info.kernel}</span></Row>
 		<Row title="Hostname"><span class="value">{info.hostname}</span></Row>
 	</Section>

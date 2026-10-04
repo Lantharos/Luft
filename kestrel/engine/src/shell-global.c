@@ -28,9 +28,6 @@
 #include <meta/meta-workspace-manager.h>
 #include <mtk/mtk.h>
 
-#ifdef HAVE_XWAYLAND
-#include <meta/meta-x11-display.h>
-#endif
 
 #if defined __OpenBSD__ || defined __FreeBSD__
 #include <sys/sysctl.h>
@@ -827,15 +824,6 @@ ui_scaling_factor_changed (MetaSettings *settings,
   update_scaling_factor (global, settings);
 }
 
-#ifdef HAVE_XWAYLAND
-static void
-on_x11_display_closed (MetaDisplay *display,
-                       ShellGlobal *global)
-{
-  g_signal_handlers_disconnect_by_data (global->stage, global);
-}
-#endif
-
 void
 _shell_global_set_plugin (ShellGlobal *global,
                           MetaPlugin  *plugin)
@@ -844,9 +832,6 @@ _shell_global_set_plugin (ShellGlobal *global,
   MetaDisplay *display;
   MetaBackend *backend;
   MetaSettings *settings;
-#ifdef HAVE_XWAYLAND
-  MetaX11Display *x11_display;
-#endif
 
   g_return_if_fail (SHELL_IS_GLOBAL (global));
   g_return_if_fail (global->plugin == NULL);
@@ -871,13 +856,6 @@ _shell_global_set_plugin (ShellGlobal *global,
                     G_CALLBACK (global_stage_notify_width), global);
   g_signal_connect (global->stage, "notify::height",
                     G_CALLBACK (global_stage_notify_height), global);
-
-#ifdef HAVE_XWAYLAND
-  x11_display = meta_display_get_x11_display (display);
-  if (x11_display && meta_x11_display_get_xdisplay (x11_display))
-    g_signal_connect_object (global->meta_display, "x11-display-closing",
-                             G_CALLBACK (on_x11_display_closed), global, 0);
-#endif
 
   backend = meta_context_get_backend (shell_global_get_context (global));
   settings = meta_backend_get_settings (backend);

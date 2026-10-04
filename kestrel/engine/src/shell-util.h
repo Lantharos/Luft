@@ -35,9 +35,6 @@ gboolean shell_util_systemd_unit_exists_finish (GAsyncResult  *res,
 
 void shell_util_sd_notify (void);
 
-gboolean shell_util_has_x11_display_extension (MetaDisplay *display,
-                                               const char  *extension);
-
 gint shell_util_get_uid (void);
 
 GPid shell_util_spawn_async (const char          *working_directory,

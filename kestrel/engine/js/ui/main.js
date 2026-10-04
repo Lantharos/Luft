@@ -727,15 +727,7 @@ class AnimationsSettings {
         if (this._handles.size > 0)
             return false;
 
-        const backend = global.backend;
-        if (!backend.is_rendering_hardware_accelerated())
-            return false;
-
-        if (Shell.util_has_x11_display_extension(
-            global.display, 'VNC-EXTENSION'))
-            return false;
-
-        return true;
+        return global.backend.is_rendering_hardware_accelerated();
     }
 
     _syncAnimationsEnabled() {

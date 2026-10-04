@@ -1,4 +1,5 @@
 mod display;
+mod families;
 mod gtk;
 mod modules;
 mod resources;
@@ -137,10 +138,13 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     session.request_name(gtk::NAME).await?;
     let gtk = server.interface::<_, GtkSettings>(gtk::PATH).await?;
     let mut fonts = TreeWatch::new(font_directories())?;
+    write_families(&sources.settings);
     tokio::spawn(async move {
         loop {
             tokio::select! {
-                _ = sources.settings.changed() => {}
+                _ = sources.settings.changed() => if write_families(&sources.settings) {
+                    sources.fonts_changed = glib::real_time();
+                },
                 value = scale.changed() => sources.window_scale = value,
                 value = animations.changed() => sources.animations = value,
                 () = fonts.changed() => sources.fonts_changed = glib::real_time(),
@@ -179,6 +183,13 @@ async fn publish(interface: &InterfaceRef<GtkSettings>, next: GtkSettings) {
     if let Err(error) = emitted.await {
         eprintln!("Couldn't announce GTK settings: {error}");
     }
+}
+
+fn write_families(settings: &Schemas) -> bool {
+    families::write(settings).unwrap_or_else(|error| {
+        eprintln!("Couldn't point the generic font families at the desktop fonts: {error}");
+        false
+    })
 }
 
 fn font_directories() -> Vec<PathBuf> {

@@ -10,6 +10,7 @@ import gi
 
 from agent import exercise_agent
 from ownership import exercise_ownership
+from portal import exercise_portal
 from seal import seal_off_system_services
 
 gi.require_version("Gio", "2.0")
@@ -158,11 +159,7 @@ def exercise(root, home, environment, script, requests):
     other = subprocess.run([stranger, os.path.join(HERE, "reader.py"), "app-load"], env=environment, capture_output=True, timeout=60)
     check(other.stdout.decode() == "missing", "another app can't read an app's sealed secret")
 
-    portal = subprocess.run([*reader, "portal"], env=environment, capture_output=True, timeout=60)
-    first, second, denied = portal.stdout.decode().split("|")
-    check(len(bytes.fromhex(first)) == 64 and first == second, "sandboxed apps get the same secret through the portal every time")
-    check(denied == "AccessDenied", "only the desktop portal may ask for sandboxed apps' secrets")
-
+    exercise_portal(root, home, environment, check)
     exercise_agent(root, environment, check, script, requests, lock, LOGIN)
     exercise_ownership(root, home, environment, check, script, requests, lock)
 

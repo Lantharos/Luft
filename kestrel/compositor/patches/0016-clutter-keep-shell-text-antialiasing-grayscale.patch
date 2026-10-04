@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 4 Oct 2026 17:19:55 +0200
+Subject: [PATCH 16/16] clutter: keep shell text antialiasing grayscale
+
+The glyph cache composites coverage as plain alpha, so subpixel
+antialiasing only leaves colored fringes on shell text. Draw it
+grayscale, as GTK 4 does, whatever the subpixel setting says.
+---
+ clutter/clutter/clutter-settings.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/clutter/clutter/clutter-settings.c b/clutter/clutter/clutter-settings.c
+index f0b463369b7e7e55a340574e5d7194c96af8f1cf..7c3c6101863fd650de56c5b598bdebd964fd057b 100644
+--- a/clutter/clutter/clutter-settings.c
++++ b/clutter/clutter/clutter-settings.c
+@@ -140,7 +140,7 @@ clutter_settings_update_font_options (ClutterSettings *self)
+   {
+     /* none=0      */ {CAIRO_ANTIALIAS_NONE,     0},
+     /* grayscale=1 */ {CAIRO_ANTIALIAS_GRAY,     1},
+-    /* rgba=2      */ {CAIRO_ANTIALIAS_SUBPIXEL, 1},
++    /* rgba=2      */ {CAIRO_ANTIALIAS_GRAY,     1},
+   };
+ 
+   /* org.gnome.desktop.GDesktopFontHinting */
+@@ -193,9 +193,6 @@ clutter_settings_update_font_options (ClutterSettings *self)
+   if (i < G_N_ELEMENTS (antialiasings))
+     antialias_mode = antialiasings[i].cairo_antialias;
+ 
+-  if (subpixel_order == CAIRO_SUBPIXEL_ORDER_DEFAULT)
+-    antialias_mode = CAIRO_ANTIALIAS_SUBPIXEL;
+-
+   cairo_font_options_set_antialias (self->backend->font_options, antialias_mode);
+ 
+   CLUTTER_NOTE (BACKEND, "New font options:\n"

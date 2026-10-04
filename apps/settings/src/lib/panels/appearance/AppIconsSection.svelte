@@ -12,7 +12,7 @@
 
 	const PREVIEW_COUNT = 4;
 	const STYLES: { value: AppIconStyle; label: string }[] = [
-		{ value: 'default', label: 'Default' },
+		{ value: 'default', label: 'Original' },
 		{ value: 'tinted', label: 'Tinted' },
 		{ value: 'clear', label: 'Clear' }
 	];
@@ -31,7 +31,7 @@
 	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
 
 	let installed = $state<App[]>([]);
-	let style = $derived(kestrel.values['app-icon-style'] ?? 'default');
+	let style = $derived(kestrel.values['app-icon-style'] ?? 'tinted');
 	let tint = $derived(kestrel.values['app-icon-tint'] ?? '');
 	let tints = $derived([{ value: '', label: 'Accent color', color: appearance.accent ?? 'var(--accent)' }, ...TINTS]);
 	let preview = $derived.by(() => {

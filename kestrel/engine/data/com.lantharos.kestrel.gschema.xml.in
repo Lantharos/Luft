@@ -136,11 +136,11 @@
       </description>
     </key>
     <key name="app-icon-style" enum="com.lantharos.kestrel.AppIconStyle">
-      <default>'default'</default>
+      <default>'tinted'</default>
       <summary>How app icons are drawn</summary>
       <description>
-        Default shows each app's own colors. Tinted draws a single-color
-        glyph on a plain plate, and Clear draws a light glyph on glass.
+        Tinted draws a single-color
+        glyph on a plain plate, Original shows each app's own colors, and Clear draws a light glyph on glass.
       </description>
     </key>
     <key name="app-icon-tint" type="s">

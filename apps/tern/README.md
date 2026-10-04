@@ -15,7 +15,7 @@ Tern is the terminal for the Luft desktop, built with Sabine and Svelte. In the 
 - Before closing a tab or pane with a program still running, Tern asks
 - A bell shows as a soft flash instead of a sound
 - The desktop accent, light or dark style and a see-through, blurred background
-- Maple Mono with Nerd Font symbols, emoji and wide characters
+- The desktop's monospace font, Maple Mono with Nerd Font symbols unless you choose another one in Settings, with emoji and wide characters, at a size that follows the desktop's text size
 
 Tern keeps up with heavy output such as a large `cat`, `yes` or a long build: output is drawn at most once per frame, and when a program writes faster than it can be shown, the program waits instead of the window freezing.
 

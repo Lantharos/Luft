@@ -2,6 +2,9 @@ import { listen } from '@lantharos/sabine';
 
 const PALETTE_CHANGED = 'kestrel.palette';
 const SCHEME_CHANGED = 'appearance.scheme';
+const TYPOGRAPHY_CHANGED = 'appearance.typography';
+const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
+const MONO = "'Maple Mono NF', ui-monospace, monospace";
 
 export interface SchemeColors {
 	light: Record<string, string>;
@@ -38,13 +41,21 @@ const SCHEMES = ['light', 'dark'] as const;
 
 export type Scheme = 'dark' | 'light';
 
+export interface Typography {
+	interface: string | null;
+	monospace: string | null;
+	textScale: number;
+}
+
 export interface Appearance {
 	translucent: boolean;
 	palette: Palette | null;
 	scheme: Scheme;
+	typography: Typography;
 }
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+const fontList = (family: string | null, fallback: string) => (family ? `"${family.replace(/["\\]/g, '\\$&')}", ${fallback}` : fallback);
 
 class AppearanceState {
 	translucent = $state(false);
@@ -55,16 +66,29 @@ class AppearanceState {
 	colors = $state<SchemeColors>({ light: {}, dark: {} });
 	terminal = $state<SchemeColors>({ light: {}, dark: {} });
 	appIcons = $state<AppIcons | null>(null);
+	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
+	fontSans = $derived(fontList(this.typography.interface, SANS));
+	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
 	start(initial: Appearance) {
 		this.translucent = initial.translucent;
 		this.scheme = initial.scheme;
 		if (initial.palette) this.receive(initial.palette);
+		this.type(initial.typography);
 		const stops = [
 			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
-			listen<Scheme>(SCHEME_CHANGED, (scheme) => (this.scheme = scheme))
+			listen<Scheme>(SCHEME_CHANGED, (scheme) => (this.scheme = scheme)),
+			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography))
 		];
 		return () => stops.forEach((stop) => stop());
+	}
+
+	private type(typography: Typography) {
+		this.typography = typography;
+		const root = document.documentElement.style;
+		root.setProperty('--font-sans', this.fontSans);
+		root.setProperty('--font-mono', this.fontMono);
+		root.setProperty('--text-scale', String(typography.textScale));
 	}
 
 	private receive(palette: Palette) {

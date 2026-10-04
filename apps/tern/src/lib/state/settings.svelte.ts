@@ -20,10 +20,6 @@ const DEFAULTS: Settings = {
 export const FONT_SIZES = { min: 8, max: 32 };
 const LIGHT_MINIMUM_CONTRAST = 3;
 
-function monospaceFont() {
-	return getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim() || 'monospace';
-}
-
 class SettingsState {
 	current = $state<Settings>(DEFAULTS);
 	defaultShell = $state('');
@@ -36,8 +32,8 @@ class SettingsState {
 	theme = $derived(terminalTheme(this.colors, this.scheme, this.translucent));
 	surface = $derived(this.translucent ? withAlpha(this.colors.background, this.current.opacity) : this.colors.background);
 	options = $derived<TerminalOptions>({
-		fontFamily: monospaceFont(),
-		fontSize: this.current.fontSize,
+		fontFamily: appearance.fontMono,
+		fontSize: this.current.fontSize * appearance.typography.textScale,
 		scrollback: this.current.scrollback,
 		cursorStyle: this.current.cursorStyle,
 		cursorBlink: this.current.cursorBlink,

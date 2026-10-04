@@ -4,9 +4,9 @@ use sabine::{
 };
 use serde::Serialize;
 
+use crate::desktop::{self, scheme::Scheme, typography::Typography};
 use crate::events::Events;
 use crate::kestrel::{self, Palette};
-use crate::scheme::{self, Scheme};
 
 const WINDOW_RADIUS: i32 = 16;
 const CONTROL_SIZE: i32 = 28;
@@ -78,6 +78,7 @@ pub struct Appearance {
     translucent: bool,
     palette: Option<Palette>,
     scheme: Scheme,
+    typography: Typography,
 }
 
 impl Appearance {
@@ -85,7 +86,8 @@ impl Appearance {
         Self {
             translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
             palette: kestrel::palette(),
-            scheme: scheme::current(),
+            scheme: Scheme::current(),
+            typography: Typography::current(),
         }
     }
 }
@@ -103,7 +105,7 @@ pub fn run(
                 events.attach(emitter);
             }
             kestrel::watch_palette(events.clone());
-            scheme::watch(events.clone());
+            desktop::watch(events.clone());
             started(events);
         },
     )

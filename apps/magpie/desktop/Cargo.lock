@@ -2428,11 +2428,13 @@ dependencies = [
  "image",
  "libc",
  "md-5",
+ "memmap2",
  "parking_lot",
  "png",
  "sabine",
  "serde",
  "serde_json",
+ "skrifa 0.47.0",
  "tokio",
  "zbus",
 ]

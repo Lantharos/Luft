@@ -155,6 +155,7 @@ export interface FontFace {
 	copyright: string | null;
 	sample: string | null;
 	glyphs: number;
+	monospace: boolean;
 	characters: [number, number][];
 	axes: FontAxis[];
 	instances: FontInstance[];
@@ -166,6 +167,7 @@ export interface FontFile {
 }
 
 export type FontStatus = 'missing' | 'system' | 'user';
+export type FontRole = 'interface' | 'monospace';
 
 export interface Activation {
 	arguments: string[];
@@ -193,6 +195,7 @@ export const fontSource = (path: string, index: number) => call<string>('font_so
 export const fontStatus = (path: string) => call<FontStatus>('font_status', { path });
 export const installFont = (path: string) => call<FontStatus>('font_install', { path });
 export const removeFont = (path: string) => call<FontStatus>('font_remove', { path });
+export const useFont = (path: string, role: FontRole) => call<FontStatus>('font_use', { path, role });
 
 export const audioTags = (paths: string[]) => call<Tags[]>('audio_tags', { paths });
 export const videoInfo = (path: string) => call<VideoInfo>('video_info', { path });

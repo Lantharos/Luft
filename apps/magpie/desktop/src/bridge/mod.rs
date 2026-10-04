@@ -126,4 +126,7 @@ fn register_fonts(window: SabineWindow) -> SabineWindow {
         .command("font_remove", |Path { path }| {
             font::remove(FilePath::new(&path))
         })
+        .command("font_use", |FontUse { path, role }| {
+            font::use_as(FilePath::new(&path), role)
+        })
 }

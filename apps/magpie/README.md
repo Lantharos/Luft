@@ -48,6 +48,7 @@ Opening another file while Magpie is running switches to it. Songs opened while 
 - Family, style, weight, version, designer, maker, copyright and license, along with the file's format and size
 - Collections let you pick any of their faces, and variable fonts get a slider for each axis plus their named styles
 - Install puts the font in your fonts folder (`~/.local/share/fonts`) and makes it available to every app right away; WOFF and WOFF2 files are unpacked into regular font files on the way. Fonts that are already on the computer show as installed, and the ones in your own fonts folder can be removed again, which moves them to the trash
+- The ⋯ menu makes the font the system font, or the monospace font when every letter in it is the same width, installing it first if it isn't yet
 
 ## Keyboard shortcuts
 

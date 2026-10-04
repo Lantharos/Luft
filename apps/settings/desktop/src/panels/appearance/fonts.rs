@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 use gio::prelude::*;
-use luft_app::fonts::{self, Face};
+use luft_app::fonts::{self, Defaults, Face, Role};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -14,6 +14,7 @@ const REGULAR_STYLES: [&str; 4] = ["regular", "book", "normal", "roman"];
 pub struct Family {
     name: String,
     styles: usize,
+    monospace: bool,
     file: String,
     removable: bool,
 }
@@ -26,6 +27,17 @@ pub struct Open {
 #[derive(Deserialize)]
 pub struct Remove {
     family: String,
+}
+
+#[derive(Deserialize)]
+pub struct Use {
+    role: Role,
+    family: String,
+}
+
+#[derive(Deserialize)]
+pub struct Reset {
+    role: Role,
 }
 
 fn is_regular(face: &Face) -> bool {
@@ -45,6 +57,7 @@ fn family(name: String, faces: &[Face], user_files: &HashSet<PathBuf>) -> Family
     Family {
         name,
         styles: styles.len().max(1),
+        monospace: fonts::is_monospaced(&shown.file, shown.face),
         file: shown.file.to_string_lossy().into_owned(),
         removable: faces.iter().any(|face| user_files.contains(&face.file)),
     }
@@ -90,4 +103,17 @@ pub fn remove(Remove { family }: Remove) -> Result<(), String> {
         .filter(|file| fonts::belongs_to_user(file))
         .collect();
     fonts::remove(&files.into_iter().collect::<Vec<_>>())
+}
+
+pub fn defaults(_: Value) -> Result<Defaults, String> {
+    Ok(fonts::defaults())
+}
+
+pub fn use_family(Use { role, family }: Use) -> Result<(), String> {
+    fonts::use_family(role, &family)
+}
+
+pub fn reset(Reset { role }: Reset) -> Result<(), String> {
+    fonts::reset(role);
+    Ok(())
 }

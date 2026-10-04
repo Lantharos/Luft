@@ -47,6 +47,7 @@ pub struct Face {
     copyright: Option<String>,
     sample: Option<String>,
     glyphs: u16,
+    monospace: bool,
     characters: Vec<[u32; 2]>,
     axes: Vec<Axis>,
     instances: Vec<Instance>,
@@ -160,6 +161,7 @@ fn face(index: u32, font: &FontRef) -> Face {
             .maxp()
             .map(|maxp| maxp.num_glyphs())
             .unwrap_or_default(),
+        monospace: luft_app::fonts::has_fixed_advances(font),
         characters: character_ranges(font),
         axes: axes(font),
         instances: instances(font),

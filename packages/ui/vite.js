@@ -4,6 +4,18 @@ import { fileURLToPath } from 'node:url';
 const FONTS = fileURLToPath(new URL('./fonts/', import.meta.url));
 const FONT_FILES = readdirSync(FONTS);
 const SABINE_CHROMIUM = 'chrome151';
+const TEXT_PROPERTIES = new Set(['font-size', 'line-height']);
+const FIXED_LENGTH = /^-?[\d.]+(px|rem)$/;
+
+const scaleText = {
+	postcssPlugin: 'luft-text-scale',
+	/** @param {{ prop: string, value: string }} declaration */
+	Declaration(declaration) {
+		if (TEXT_PROPERTIES.has(declaration.prop) && FIXED_LENGTH.test(declaration.value)) {
+			declaration.value = `calc(${declaration.value} * var(--text-scale, 1))`;
+		}
+	}
+};
 
 /** @returns {import('vite').Plugin} */
 export function sabineTarget() {
@@ -17,7 +29,10 @@ export function sabineTarget() {
 export function luftFonts() {
 	return {
 		name: 'luft-fonts',
-		config: () => ({ build: { rolldownOptions: { external: [/^\/fonts\//] } } }),
+		config: () => ({
+			build: { rolldownOptions: { external: [/^\/fonts\//] } },
+			css: { postcss: { plugins: [scaleText] } }
+		}),
 		configureServer(server) {
 			server.middlewares.use('/fonts', (request, response, next) => {
 				const name = decodeURIComponent(request.url?.split('?')[0].slice(1) ?? '');

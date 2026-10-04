@@ -118,7 +118,7 @@ function details(pid: number): Details {
 }
 
 export const sample: Backend = {
-	appState: async () => ({ translucent: false, palette: null, scheme: 'dark', settings }),
+	appState: async () => ({ translucent: false, palette: null, scheme: 'dark', typography: { interface: null, monospace: null, textScale: 1 }, settings }),
 	saveSettings: async (value) => void (settings = value),
 	view: async (next) => {
 		view = next;

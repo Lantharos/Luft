@@ -1,11 +1,18 @@
+mod system;
+
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use gio::prelude::*;
+use skrifa::instance::{LocationRef, Size};
+use skrifa::{FontRef, MetadataProvider};
+
+pub use system::{Defaults, Role, defaults, reset, use_family};
 
 const LIST_FORMAT: &str = "%{family[0]}\t%{style[0]}\t%{postscriptname}\t%{index}\t%{file}\n";
 const FONT_EXTENSIONS: [&str; 6] = ["ttf", "otf", "ttc", "otc", "woff", "woff2"];
 const INSTANCE_SHIFT: u32 = 16;
+const WIDTH_SAMPLES: [char; 4] = ['i', 'M', '0', 'W'];
 
 pub struct Face {
     pub family: String,
@@ -44,6 +51,29 @@ pub fn installed() -> Result<Vec<Face>, String> {
         .lines()
         .filter_map(face)
         .collect())
+}
+
+pub fn is_monospaced(file: &Path, face: u32) -> bool {
+    let Ok(file) = std::fs::File::open(file) else {
+        return false;
+    };
+    // SAFETY: the map is only read while parsing, and installed fonts aren't rewritten in place.
+    let Ok(bytes) = (unsafe { memmap2::Mmap::map(&file) }) else {
+        return false;
+    };
+    FontRef::from_index(&bytes, face).is_ok_and(|font| has_fixed_advances(&font))
+}
+
+pub fn has_fixed_advances(font: &FontRef) -> bool {
+    let charmap = font.charmap();
+    let metrics = font.glyph_metrics(Size::unscaled(), LocationRef::default());
+    let advances: Option<Vec<f32>> = WIDTH_SAMPLES
+        .iter()
+        .map(|&character| metrics.advance_width(charmap.map(character)?))
+        .collect();
+    advances.is_some_and(|advances| {
+        advances[0] > 0.0 && advances.iter().all(|&advance| advance == advances[0])
+    })
 }
 
 pub fn user_folder() -> Result<PathBuf, String> {

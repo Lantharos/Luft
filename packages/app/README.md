@@ -49,7 +49,7 @@ struct AppState {
 AppState { appearance: Appearance::current() }
 ```
 
-`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting, and Kestrel's palette as `palette`: the accent, the accent the wallpaper gives on its own, whether Pure black is on, the palette roles and the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. Palette changes arrive on the page as `kestrel.palette` events and style changes as `appearance.scheme` events, which `@luft/ui`'s `appearance` store listens for.
+`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting, and Kestrel's palette as `palette`: the accent, the accent the wallpaper gives on its own, whether Pure black is on, the palette roles and the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. It carries the desktop's fonts too, as `typography`: the families of the `org.gnome.desktop.interface` `font-name` and `monospace-font-name` settings and the `text-scaling-factor`, read through the same portal. Palette changes arrive on the page as `kestrel.palette` events, style changes as `appearance.scheme` events and font or text size changes as `appearance.typography` events, which `@luft/ui`'s `appearance` store listens for.
 
 ## Commands
 
@@ -99,7 +99,7 @@ secrets::delete("account-token")?;
 
 ## Fonts
 
-With the `fonts` feature, `fonts::installed()` lists every font face fontconfig knows about, with its family, style, PostScript name, face index and file. `fonts::user_folder()` is the user's own fonts folder, `~/.local/share/fonts`, and `fonts::belongs_to_user` tells whether a font file lives there or in `~/.fonts`. After adding files to the folder, `fonts::refresh()` rebuilds its fontconfig cache so other apps see them. `fonts::remove` moves font files to the trash and refreshes the cache, and refuses anything outside the user's own font folders.
+With the `fonts` feature, `fonts::installed()` lists every font face fontconfig knows about, with its family, style, PostScript name, face index and file. `fonts::user_folder()` is the user's own fonts folder, `~/.local/share/fonts`, and `fonts::belongs_to_user` tells whether a font file lives there or in `~/.fonts`. After adding files to the folder, `fonts::refresh()` rebuilds its fontconfig cache so other apps see them. `fonts::remove` moves font files to the trash and refreshes the cache, and refuses anything outside the user's own font folders. `fonts::is_monospaced` and `fonts::has_fixed_advances` tell whether a face's letters are all the same width, which is more reliable than what font files claim about themselves. `fonts::use_family(Role::Interface, family)` makes a family the desktop's system font, or with `Role::Monospace` its monospace font, keeping the size already chosen; `fonts::reset` goes back to the default, and `fonts::defaults()` names the default families.
 
 ## Thumbnails
 

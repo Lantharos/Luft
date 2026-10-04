@@ -2,6 +2,7 @@
 pub mod apps;
 mod bridge;
 pub mod dbus;
+mod desktop;
 mod events;
 pub mod file_manager;
 #[cfg(feature = "fonts")]
@@ -15,7 +16,6 @@ pub mod recovery;
 pub mod secrets;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;
-mod scheme;
 mod window;
 
 pub use bridge::Commands;

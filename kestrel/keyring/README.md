@@ -1,6 +1,6 @@
 # Luft Keyring
 
-Luft Keyring keeps your passwords, tokens and keys. Apps reach it through the Secret Service on the session bus and the Secret portal for sandboxed apps, the same interfaces every Linux keyring offers, so they work with it without changes. Signing in unlocks it, including with a fingerprint, and you are never asked for a second password or PIN when the computer can vouch for you on its own.
+Luft Keyring keeps your passwords, tokens and keys. Apps reach it through the Secret Service on the session bus and the Secret portal, the same interfaces every Linux keyring offers, so they work with it without changes. Signing in unlocks it, including with a fingerprint, and you are never asked for a second password or PIN when the computer can vouch for you on its own.
 
 | Part | What it is |
 | --- | --- |
@@ -84,7 +84,7 @@ Keyring tools never take items. `secret-tool`, Seahorse and scripts run from a t
 
 Passphrases of encrypted drives are shared between the two things that unlock drives: the desktop, which asks for one when an encrypted drive is plugged in and keeps it through GVfs when Remember Password is ticked, and Disks. Both keep them the way GVfs always has, under the `gvfs-luks-uuid` attribute with the drive's UUID, and either may use the ones the other saved, so a passphrase remembered in one place unlocks the drive in both without asking.
 
-Secrets that sandboxed apps keep through the Secret portal are never shown to other apps.
+Apps can also ask the Secret portal for a secret of their own, which sandboxed apps use for everything they keep and Chromium-based browsers and Electron apps use to protect what they save. Each app gets its own, recognized the same way as above rather than by the ID the portal passes along, so an app outside a sandbox can't name another app to get its secret. It moves along with the app when the app is recognized better, is never shown to another app, and a request from a program the keyring can't identify is refused.
 
 Settings shows which app read, saved, deleted or was refused what, and when.
 

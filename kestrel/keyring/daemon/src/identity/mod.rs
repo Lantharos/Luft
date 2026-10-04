@@ -16,6 +16,8 @@ pub use program::Program;
 use program::versionless;
 
 const UNBRANDED_CHROMIUM: &str = "chromium";
+const UNKNOWN: &str = "unknown";
+const FLATPAK: &str = "flatpak:";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -58,7 +60,7 @@ impl Lineage {
 impl App {
     pub fn unknown() -> Self {
         Self {
-            key: "unknown".into(),
+            key: UNKNOWN.into(),
             name: "An app".into(),
             icon: String::new(),
             kind: Kind::Host,
@@ -73,7 +75,7 @@ impl App {
     pub fn flatpak(id: &str) -> Self {
         let entry = desktop::find(id);
         Self {
-            key: format!("flatpak:{id}"),
+            key: format!("{FLATPAK}{id}"),
             name: entry
                 .as_ref()
                 .map_or_else(|| id.to_owned(), |entry| entry.name.clone()),
@@ -102,6 +104,14 @@ impl App {
             },
             _ => Self::unknown(),
         }
+    }
+
+    pub fn is_unknown(&self) -> bool {
+        self.key == UNKNOWN
+    }
+
+    pub fn flatpak_id(&self) -> Option<&str> {
+        self.key.strip_prefix(FLATPAK)
     }
 
     pub fn may_claim(&self, hint: Option<&str>) -> bool {

@@ -91,12 +91,13 @@ def app_secrets():
     sys.stdout.write(f"stored:account-token|loaded:{loaded}|listed:{','.join(names)}")
 
 
-def portal_secret(connection):
+def portal_secret(connection, requester, app_id=""):
     reader, writer = os.pipe()
     fds = Gio.UnixFDList.new()
     fds.append(writer)
     os.close(writer)
-    parameters = GLib.Variant("(osha{sv})", ("/org/freedesktop/portal/desktop/request/1_1/t", "org.example.App", 0, {}))
+    handle = f"/org/freedesktop/portal/desktop/request/{requester[1:].replace('.', '_')}/t"
+    parameters = GLib.Variant("(osha{sv})", (handle, app_id, 0, {}))
     try:
         connection.call_with_unix_fd_list_sync(KEYRING, "/org/freedesktop/portal/desktop", "org.freedesktop.impl.portal.Secret",
                                                "RetrieveSecret", parameters, GLib.VariantType("(ua{sv})"), Gio.DBusCallFlags.NONE, 120000, fds, None)
@@ -110,12 +111,14 @@ def portal_secret(connection):
 
 
 def portal():
-    call("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "RequestName", "(su)", ("org.freedesktop.portal.Desktop", 4))
-    first = portal_secret(bus)
-    second = portal_secret(bus)
-    stranger = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, None),
-                                                       Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, None, None)
-    sys.stdout.write(f"{first}|{second}|{portal_secret(stranger)}")
+    portal = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, None),
+                                                     Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, None, None)
+    portal.call_sync("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "RequestName",
+                     GLib.Variant("(su)", ("org.freedesktop.portal.Desktop", 4)), None, Gio.DBusCallFlags.NONE, -1, None)
+    app = bus.get_unique_name()
+    answers = [portal_secret(portal, app), portal_secret(portal, app, "org.example.Sandboxed"),
+               portal_secret(bus, app), portal_secret(portal, ":1.999999")]
+    sys.stdout.write("|".join(answers))
 
 
 action = sys.argv[1]

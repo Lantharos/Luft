@@ -18,7 +18,10 @@ pub const PATH: &str = "/org/freedesktop/portal/desktop";
 const PORTAL: &str = "org.freedesktop.portal.Desktop";
 const SUCCESS: u32 = 0;
 const CANCELLED: u32 = 1;
+const REQUESTS: &str = "/org/freedesktop/portal/desktop/request/";
 const TOKEN_SIZE: usize = 64;
+const APP_ID: &str = "app_id";
+const SCHEMA: &str = "xdg:schema";
 
 pub struct Portal {
     pub daemon: Arc<Daemon>,
@@ -40,25 +43,32 @@ impl Portal {
             .is_some_and(|sender| sender.as_str() == owner.as_str())
     }
 
-    async fn token(&self, app: &App, id: &str) -> Result<Secret, String> {
+    async fn requester(&self, handle: &ObjectPath<'_>) -> Option<App> {
+        let escaped = handle.as_str().strip_prefix(REQUESTS)?.split_once('/')?.0;
+        let sender = format!(":{}", escaped.replace('_', "."));
+        let app = self
+            .daemon
+            .identities
+            .identify(&self.daemon.connection, &sender)
+            .await;
+        (!app.is_unknown()).then_some(app)
+    }
+
+    async fn token(&self, app: &App) -> Result<Secret, String> {
         let mut keyring = self.daemon.keyring.lock().await;
+        keyring.adopt(app);
         let contents = keyring.contents().ok_or("the keyring is locked")?;
         let collection = contents
             .resolve_alias(DEFAULT_ALIAS)
             .unwrap_or(LOGIN)
             .to_owned();
-        let query = BTreeMap::from([("app_id".to_owned(), id.to_owned())]);
         let mut matches: Vec<&Item> = contents
             .collection(&collection)
             .into_iter()
             .flat_map(|found| found.items.iter())
-            .filter(|item| item.matches(&query))
+            .filter(|item| kept_for(item, app))
             .collect();
-        matches.sort_by_key(|item| {
-            item.attributes
-                .get("xdg:schema")
-                .is_none_or(|schema| schema != PORTAL_SCHEMA)
-        });
+        matches.sort_by_key(|item| !is_portal_secret(item));
         if let Some(item) = matches.first() {
             let secret = item.secret.clone();
             keyring.record(app, Action::Read, &item.label);
@@ -68,11 +78,15 @@ impl Portal {
         getrandom::fill(&mut bytes).map_err(|error| error.to_string())?;
         let secret = Secret::new(bytes);
         let attributes = BTreeMap::from([
-            ("app_id".to_owned(), id.to_owned()),
-            ("xdg:schema".to_owned(), PORTAL_SCHEMA.to_owned()),
+            (
+                APP_ID.to_owned(),
+                app.flatpak_id().unwrap_or(&app.key).to_owned(),
+            ),
+            (SCHEMA.to_owned(), PORTAL_SCHEMA.to_owned()),
         ]);
+        let label = format!("Secret for {}", app.name);
         let mut item = Item::new(
-            format!("Secret for {}", app.name),
+            label.clone(),
             attributes,
             secret.clone(),
             "application/octet-stream".into(),
@@ -81,17 +95,31 @@ impl Portal {
         keyring
             .edit(|contents| contents.store_item(&collection, item, false))
             .map_err(|error| error.to_string())?;
-        keyring.record(app, Action::Saved, &format!("Secret for {}", app.name));
+        keyring.record(app, Action::Saved, &label);
         Ok(secret)
     }
+}
+
+fn is_portal_secret(item: &Item) -> bool {
+    item.attributes
+        .get(SCHEMA)
+        .is_some_and(|schema| schema == PORTAL_SCHEMA)
+}
+
+fn kept_for(item: &Item, app: &App) -> bool {
+    let owned = is_portal_secret(item) && item.owner.as_ref() == Some(&app.key);
+    let named = app
+        .flatpak_id()
+        .is_some_and(|id| item.attributes.get(APP_ID).is_some_and(|named| named == id));
+    owned || named
 }
 
 #[interface(name = "org.freedesktop.impl.portal.Secret")]
 impl Portal {
     async fn retrieve_secret(
         &self,
-        _handle: ObjectPath<'_>,
-        app_id: &str,
+        handle: ObjectPath<'_>,
+        _app_id: &str,
         fd: Fd<'_>,
         _options: HashMap<String, OwnedValue>,
         #[zbus(header)] header: Header<'_>,
@@ -101,16 +129,15 @@ impl Portal {
                 "Only the desktop portal may ask for app secrets".into(),
             ));
         }
-        if app_id.is_empty() {
-            return Err(fdo::Error::InvalidArgs(
-                "Apps without an ID can't have a secret".into(),
+        let Some(app) = self.requester(&handle).await else {
+            return Err(fdo::Error::AccessDenied(
+                "The app asking for a secret couldn't be identified".into(),
             ));
-        }
-        let app = App::flatpak(app_id);
+        };
         if !self.daemon.ensure_unlocked(&app, true).await {
             return Ok((CANCELLED, HashMap::new()));
         }
-        let secret = self.token(&app, app_id).await.map_err(fdo::Error::Failed)?;
+        let secret = self.token(&app).await.map_err(fdo::Error::Failed)?;
         let file = fd
             .as_fd()
             .try_clone_to_owned()

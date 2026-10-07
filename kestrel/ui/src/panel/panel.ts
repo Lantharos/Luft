@@ -19,12 +19,13 @@ import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPrefer
 import { TaskbarSurface } from './preferences/taskbarLook.js';
 import { AutoHide } from './autoHide/autoHide.js';
 import { animateActor } from '../shared/motion.js';
+import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
 const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
 const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black'];
-const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display'];
+const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
 
 function showLayout(keys: Shell.App, layout: string): void {
   keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
@@ -61,6 +62,7 @@ export class KestrelPanel {
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker | Meta.Display, number][] = [];
   private readonly unwatchPreferences: () => void;
+  private workspaceWindows: WorkspaceWindows | null = null;
   private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
   private readonly tray: Tray | null = null;
@@ -69,7 +71,7 @@ export class KestrelPanel {
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
-      app => this.windowsOf(app), actions.activateWindow);
+      app => this.windowsOf(app), actions.activateWindow, app => this.open(app));
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
@@ -152,11 +154,14 @@ export class KestrelPanel {
     menus.bind(this.clockButton, () => [
       { label: 'Date and time settings', run: () => menus.settings('datetime') },
     ]);
+    this.syncWorkspaceWindows();
     this.refreshApps();
   }
 
   shutdown(): void {
     this.unwatchPreferences();
+    this.workspaceWindows?.destroy();
+    this.workspaceWindows = null;
     this.tray?.shutdown();
     this.privacy?.shutdown();
     this.inputSource?.shutdown();
@@ -215,10 +220,33 @@ export class KestrelPanel {
     }
   }
 
+  private get scoped(): boolean {
+    return taskbarPreferences.windowsPerDisplay || taskbarPreferences.windowsPerWorkspace;
+  }
+
   private windowsOf(app: Shell.App): Meta.Window[] {
-    const windows = app.get_windows();
-    if (!taskbarPreferences.windowsPerDisplay || !this.monitor) return windows;
-    return windows.filter(window => window.get_monitor() === this.monitor!.index);
+    let windows = app.get_windows();
+    if (taskbarPreferences.windowsPerWorkspace) {
+      const workspace = activeWorkspace();
+      windows = windows.filter(window => window.located_on_workspace(workspace));
+    }
+    if (taskbarPreferences.windowsPerDisplay && this.monitor) windows = windows.filter(window => window.get_monitor() === this.monitor!.index);
+    return windows;
+  }
+
+  private open(app: Shell.App): void {
+    const elsewhere = taskbarPreferences.windowsPerWorkspace && app.get_n_windows() > 0 &&
+      !app.get_windows().some(window => window.located_on_workspace(activeWorkspace()));
+    if (elsewhere && app.can_open_new_window()) app.open_new_window(-1);
+    else app.activate();
+  }
+
+  private syncWorkspaceWindows(): void {
+    if (taskbarPreferences.windowsPerWorkspace) this.workspaceWindows ??= new WorkspaceWindows(() => this.refreshApps());
+    else {
+      this.workspaceWindows?.destroy();
+      this.workspaceWindows = null;
+    }
   }
 
   private preferenceChanged(key: TaskbarKey): void {
@@ -230,6 +258,7 @@ export class KestrelPanel {
       this.place(true);
     }
     if (key === 'taskbar-alignment' || SHAPE_KEYS.includes(key)) this.layout.ease();
+    if (key === 'taskbar-windows-per-workspace') this.syncWorkspaceWindows();
     if (APP_KEYS.includes(key)) this.refreshApps();
   }
 
@@ -239,7 +268,7 @@ export class KestrelPanel {
       .map(id => this.appSystem.lookup_app(id))
       .filter((app): app is Shell.App => app !== null);
     for (const app of this.appSystem.get_running()) {
-      if (!apps.some(shown => shown.id === app.id) && (!taskbarPreferences.windowsPerDisplay || this.windowsOf(app).length)) apps.push(app);
+      if (!apps.some(shown => shown.id === app.id) && (!this.scoped || this.windowsOf(app).length)) apps.push(app);
     }
     this.taskbar.update(apps);
   }

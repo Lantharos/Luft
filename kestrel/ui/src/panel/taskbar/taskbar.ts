@@ -44,7 +44,7 @@ export class Taskbar {
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
     private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
     private readonly windowsOf: (app: Shell.App) => Meta.Window[],
-    private readonly activateWindow: (window: Meta.Window) => void) {
+    private readonly activateWindow: (window: Meta.Window) => void, private readonly open: (app: Shell.App) => void) {
     new TaskbarDrop(this.actor, () => {
       const pinned = this.pinned();
       return this.actor.get_children()
@@ -241,7 +241,7 @@ export class Taskbar {
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon);
     this.previews.bind(button, () => item.app, () => this.windowsOf(item.app));
-    this.menus.bind(button, () => this.menus.appEntries(item.app, this.windowsOf(item.app)));
+    this.menus.bind(button, () => this.menus.appEntries(item.app, this.windowsOf(item.app), () => this.open(item.app)));
     button.connect('clicked', () => {
       const app = item.app;
       const windows = this.windowsOf(app);
@@ -251,7 +251,7 @@ export class Taskbar {
       else if (windows.length === 1) this.activateWindow(windows[0]);
       else {
         launchHistory.record(appKey(app.id));
-        app.activate();
+        this.open(app);
       }
     });
     return item;

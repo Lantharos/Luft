@@ -261,6 +261,16 @@
         and clicks use only those windows.
       </description>
     </key>
+    <key name="taskbar-windows-per-workspace" type="b">
+      <default>false</default>
+      <summary>Show only the current workspace's windows on the taskbar</summary>
+      <description>
+        When enabled, the taskbar shows pinned apps and the apps with windows
+        on the current workspace, and its running indicators, previews and
+        clicks use only those windows. Opening an app whose windows are all
+        on other workspaces opens a new window here when the app supports it.
+      </description>
+    </key>
     <key name="favorite-apps" type="as">
       <default>
         @DASH_APPS@

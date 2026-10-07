@@ -24,8 +24,8 @@ const SIZES: Record<TaskbarSize, { height: number; button: number; icon: number 
 const FLOATING_MARGIN = 8;
 const BAR_INSET = 4;
 
-const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide',
-  'taskbar-show-pinned', 'taskbar-displays', 'taskbar-windows-per-display', 'pure-black'] as const;
+const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
+  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'pure-black'] as const;
 export type TaskbarKey = typeof KEYS[number];
 
 class TaskbarPreferences {
@@ -44,6 +44,7 @@ class TaskbarPreferences {
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }
+  get windowsPerWorkspace(): boolean { return this.settings.get_boolean('taskbar-windows-per-workspace'); }
   get pureBlack(): boolean { return this.settings.get_boolean('pure-black'); }
 
   get metrics(): TaskbarMetrics {

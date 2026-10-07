@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use luft_keyring_vault::{Contents, Item};
+use luft_keyring_vault::{AccessRule, Contents, Item};
 
 use super::access::app_hint;
 use crate::identity::{App, Program};
@@ -13,6 +13,34 @@ pub fn predecessors(contents: &Contents, app: &App) -> BTreeSet<String> {
         .filter(|key| app.succeeds(key))
         .cloned()
         .collect()
+}
+
+pub fn inherited(contents: &Contents, app: &App) -> Vec<AccessRule> {
+    contents
+        .rules
+        .iter()
+        .filter(|rule| rule.allowed && app.inherits(&rule.app))
+        .filter(|rule| !has_rule(contents, &app.key, rule))
+        .map(|rule| AccessRule {
+            app: app.key.clone(),
+            ..rule.clone()
+        })
+        .collect()
+}
+
+pub fn inherit(contents: &mut Contents, rules: Vec<AccessRule>) {
+    for rule in rules {
+        if !has_rule(contents, &rule.app, &rule) {
+            contents.rules.push(rule);
+        }
+    }
+}
+
+fn has_rule(contents: &Contents, app: &str, like: &AccessRule) -> bool {
+    contents
+        .rules
+        .iter()
+        .any(|rule| rule.app == app && rule.collection == like.collection && rule.item == like.item)
 }
 
 pub fn hand_over(contents: &mut Contents, previous: &BTreeSet<String>, key: &str) {

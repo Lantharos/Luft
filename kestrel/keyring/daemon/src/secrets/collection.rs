@@ -91,21 +91,33 @@ impl Collection {
         Ok(none())
     }
 
-    async fn search_items(&self, attributes: HashMap<String, String>) -> Vec<OwnedObjectPath> {
+    async fn search_items(
+        &self,
+        attributes: HashMap<String, String>,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Vec<OwnedObjectPath> {
+        let (_, app) = self.daemon.caller(&header).await;
         let query: BTreeMap<String, String> = attributes.into_iter().collect();
         let Some(id) = self.id().await else {
             return Vec::new();
         };
-        self.read(|collection| {
-            collection
-                .items
-                .iter()
-                .filter(|item| item.matches(&query))
-                .map(|item| item_path(&id, item.id))
-                .collect()
-        })
-        .await
-        .unwrap_or_default()
+        let found = self
+            .read(|collection| {
+                collection
+                    .items
+                    .iter()
+                    .filter(|item| item.matches(&query))
+                    .map(|item| (id.clone(), item.id))
+                    .collect()
+            })
+            .await
+            .unwrap_or_default();
+        self.daemon
+            .visible(&app, found)
+            .await
+            .iter()
+            .map(|(collection, item)| item_path(collection, *item))
+            .collect()
     }
 
     async fn create_item(

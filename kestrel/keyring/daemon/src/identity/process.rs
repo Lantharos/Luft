@@ -6,6 +6,10 @@ use std::path::Path;
 
 use super::program::{Program, is_interpreter};
 
+const PARENT: usize = 1;
+const TERMINAL: usize = 4;
+const STARTED: usize = 19;
+
 pub struct Process {
     directory: OwnedFd,
 }
@@ -123,11 +127,28 @@ impl Process {
     }
 
     pub fn has_terminal(&self) -> bool {
-        let stat = self.read("stat").unwrap_or_default();
-        String::from_utf8_lossy(&stat)
-            .rsplit_once(')')
-            .and_then(|(_, fields)| fields.split_whitespace().nth(4)?.parse::<i32>().ok())
+        self.stat_field::<i32>(TERMINAL)
             .is_some_and(|terminal| terminal != 0)
+    }
+
+    pub fn parent(&self) -> Option<Self> {
+        let parent_id = self.stat_field::<u32>(PARENT)?;
+        let started = self.stat_field::<u64>(STARTED)?;
+        let parent = Self::open(parent_id, None)?;
+        let still_its_child = self.stat_field::<u32>(PARENT) == Some(parent_id);
+        let started_first = parent.stat_field::<u64>(STARTED)? <= started;
+        (still_its_child && started_first).then_some(parent)
+    }
+
+    fn stat_field<T: std::str::FromStr>(&self, index: usize) -> Option<T> {
+        let stat = self.read("stat")?;
+        String::from_utf8_lossy(&stat)
+            .rsplit_once(')')?
+            .1
+            .split_whitespace()
+            .nth(index)?
+            .parse()
+            .ok()
     }
 
     pub fn unit_app_id(&self) -> Option<String> {

@@ -10,7 +10,7 @@ use luft_keyring_vault::{
     AuditLog, ChipWrap, Contents, Error, Header, MasterKey, PasswordWrap, Record, Stored, now,
 };
 
-pub use access::{Decision, PORTAL_SCHEMA, decide};
+pub use access::{Decision, PORTAL_SCHEMA, decide, hidden};
 
 pub struct Paths {
     pub folder: PathBuf,
@@ -172,12 +172,14 @@ impl Keyring {
             return;
         };
         let previous = ownership::predecessors(contents, app);
-        if previous.is_empty() {
+        let inherited = ownership::inherited(contents, app);
+        if previous.is_empty() && inherited.is_empty() {
             return;
         }
-        if let Err(error) =
-            self.edit(|contents| ownership::hand_over(contents, &previous, &app.key))
-        {
+        if let Err(error) = self.edit(|contents| {
+            ownership::hand_over(contents, &previous, &app.key);
+            ownership::inherit(contents, inherited);
+        }) {
             eprintln!("Couldn't carry an app's access over: {error}");
         }
     }

@@ -129,6 +129,7 @@ impl Service {
                 .map(|(collection, item)| (collection.id.clone(), item.id))
                 .collect()
         };
+        let found = self.daemon.visible(&app, found).await;
         let (mut unlocked, mut locked) = (Vec::new(), Vec::new());
         for key in found {
             let path = super::item_path(&key.0, key.1);

@@ -71,6 +71,7 @@ Every request is tied to the app that made it:
 
 - **Sandboxed apps** are recognized by their Flatpak ID, which the sandbox guarantees.
 - **Luft apps** are recognized by their `com.lantharos.*` ID.
+- **Sabine apps** show their pages through a Sabine host, a browser engine that every Sabine app shares. A request from a host counts as the app that started it, found by following the host back through the processes that started it rather than by anything the host says about itself, so Mailman's host is Mailman whichever Sabine version it runs.
 - **Other apps** are recognized by their launcher entry. Discord started from `discord.desktop` is Discord, whichever folder its updater put the program in this week. The entry has to start that program, either by its path or by its name, the way `/usr/bin/discord` starts `~/.config/discord/app-1.0.160/Discord`, so commands run in a terminal stay themselves instead of becoming the terminal. Apps started some other way are matched to the entry named after their program.
 - **Programs without an entry** are recognized by their path, with version numbers in folder names left out, so `app-1.0.160` and `app-1.0.161` are the same app. An AppImage is recognized by the AppImage file rather than the temporary folder it runs from, and a script by its interpreter and the script.
 
@@ -78,7 +79,7 @@ When an app is recognized better than before, for example after it gets a launch
 
 An app may always use what it saved itself. Anything else needs your permission: the keyring reports those items as locked to that app, and when it asks to unlock them, Kestrel shows "Allow Firefox to use “github.com”?" with the choice to remember it. Choices you remember are kept in the vault, listed in Settings under Apps with access, and can be taken back there.
 
-Some items name the app they belong to. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`.
+Some items name the app they belong to. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`. So do Sabine apps, but each of them keeps a key of its own: a Sabine app only finds the `chromium` key it saved itself or one you let it use, never the browser's or another app's, and saves its own the first time it starts, without asking. What you let the shared Sabine host use before Sabine apps were told apart, every Sabine app may still use, so the pages they saved stay readable.
 
 Keyring tools never take items. `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens, and the first app with that name, by launcher entry, Flatpak ID or program, takes it without being asked; any Chromium-based browser can take a `chromium` item. Every other app is asked.
 

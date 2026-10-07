@@ -1,6 +1,6 @@
 use luft_keyring_vault::{Contents, Item};
 
-use crate::identity::App;
+use crate::identity::{App, UNBRANDED_CHROMIUM};
 
 pub const PORTAL_SCHEMA: &str = "org.freedesktop.portal.Secret";
 const DRIVE_PASSPHRASE: &str = "gvfs-luks-uuid";
@@ -42,6 +42,12 @@ pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> 
         None if item.unclaimed && app.may_claim(app_hint(item).as_deref()) => Decision::Claim,
         None => Decision::Ask,
     }
+}
+
+pub fn hidden(contents: &Contents, app: &App, collection: &str, item: &Item) -> bool {
+    app.keeps_its_own_chromium_key()
+        && app_hint(item).as_deref() == Some(UNBRANDED_CHROMIUM)
+        && decide(contents, app, collection, item) != Decision::Allowed
 }
 
 pub fn app_hint(item: &Item) -> Option<String> {

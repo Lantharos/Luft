@@ -1,6 +1,7 @@
 mod desktop;
 mod process;
 mod program;
+mod sabine;
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -15,7 +16,7 @@ use process::Process;
 pub use program::Program;
 use program::versionless;
 
-const UNBRANDED_CHROMIUM: &str = "chromium";
+pub const UNBRANDED_CHROMIUM: &str = "chromium";
 const UNKNOWN: &str = "unknown";
 const FLATPAK: &str = "flatpak:";
 
@@ -36,6 +37,7 @@ pub struct App {
     names: Vec<String>,
     claims: bool,
     chromium: bool,
+    hosted: bool,
     lineage: Option<Lineage>,
 }
 
@@ -68,6 +70,7 @@ impl App {
             names: Vec::new(),
             claims: false,
             chromium: false,
+            hosted: false,
             lineage: None,
         }
     }
@@ -120,6 +123,14 @@ impl App {
                 self.names.iter().any(|name| name == hint)
                     || self.chromium && hint == UNBRANDED_CHROMIUM
             })
+    }
+
+    pub fn keeps_its_own_chromium_key(&self) -> bool {
+        self.hosted
+    }
+
+    pub fn inherits(&self, key: &str) -> bool {
+        self.hosted && sabine::is_host_key(key)
     }
 
     pub fn succeeds(&self, key: &str) -> bool {
@@ -183,7 +194,13 @@ fn classify(process: &Process) -> App {
         return App::flatpak(&id);
     }
     let executable = process.executable().unwrap_or_default();
-    if let Some(id) = luft_app_id(&executable) {
+    if sabine::is_host(&executable) {
+        return sabine::launcher(process).map_or_else(App::unknown, |launcher| App {
+            hosted: true,
+            ..classify(&launcher)
+        });
+    }
+    if let Some(id) = sabine::luft_app_id(&executable) {
         return luft(&id, executable);
     }
     let program = process.program(executable);
@@ -194,13 +211,6 @@ fn classify(process: &Process) -> App {
         .or_else(|| desktop::find(&program.name()).filter(|entry| entry.runs(&program)));
     let inspecting = program.is_inspector() || program.interpreted() && process.has_terminal();
     host(program, entry, !inspecting)
-}
-
-fn luft_app_id(executable: &str) -> Option<String> {
-    let home = std::env::var("HOME").ok()?;
-    let apps = format!("{home}/.local/share/sabine/apps/");
-    let id = executable.strip_prefix(&apps)?.split('/').next()?;
-    id.starts_with("com.lantharos.").then(|| id.to_owned())
 }
 
 fn luft(id: &str, executable: String) -> App {
@@ -239,6 +249,7 @@ fn host(program: Program, entry: Option<Entry>, claims: bool) -> App {
             .unwrap_or_default(),
         kind: Kind::Host,
         chromium: !program.interpreted() && is_chromium(&program.executable),
+        hosted: false,
         executable: program.executable,
         names,
         claims,

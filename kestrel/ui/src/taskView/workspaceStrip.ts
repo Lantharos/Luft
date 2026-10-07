@@ -4,6 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
+import type { BoardFrame } from '../board/board.js';
 import type { Monitor } from '../panel/panel.js';
 import type { WindowDragSource } from './windowCard.js';
 
@@ -11,6 +12,7 @@ export const THUMBNAIL_HEIGHT = 84;
 
 type DelegateActor = St.Widget & { _delegate?: object };
 export type BackgroundFactory = (container: Clutter.Actor, monitorIndex: number) => { destroy(): void };
+export type BoardFrames = (workspace: Meta.Workspace) => BoardFrame | null;
 
 function isWindowSource(source: unknown): source is WindowDragSource {
   return (source as WindowDragSource | null)?.window instanceof Meta.Window;
@@ -21,7 +23,7 @@ export class WorkspaceStrip {
 
   private backgrounds: { destroy(): void }[] = [];
 
-  constructor(private readonly createBackground: BackgroundFactory) {}
+  constructor(private readonly createBackground: BackgroundFactory, private readonly boardFrame: BoardFrames) {}
 
   clear(): void {
     for (const background of this.backgrounds) background.destroy();
@@ -56,13 +58,21 @@ export class WorkspaceStrip {
     const contents = new Clutter.Actor({ width: monitor.width, height: monitor.height, scale_x: scale, scale_y: scale });
     thumbnail.add_child(contents);
     this.backgrounds.push(this.createBackground(contents, monitor.index));
+    const board = this.boardFrame(workspace);
+    const layer = board ? new Clutter.Actor({
+      scale_x: board.scale,
+      scale_y: board.scale,
+      translation_x: board.viewportX - monitor.x - board.x * board.scale,
+      translation_y: board.viewportY - monitor.y - board.y * board.scale,
+    }) : contents;
+    if (board) contents.add_child(layer);
     const windows = workspace.list_windows()
-      .filter(window => !window.minimized && !window.skip_taskbar && window.get_monitor() === monitor.index);
+      .filter(window => !window.minimized && !window.skip_taskbar && (board || window.get_monitor() === monitor.index));
     for (const window of (global as unknown as Shell.Global).display.sort_windows_by_stacking(windows)) {
       const source = window.get_compositor_private() as Meta.WindowActor | null;
       if (!source) continue;
       const buffer = window.get_buffer_rect();
-      contents.add_child(new Clutter.Clone({ source, x: buffer.x - monitor.x, y: buffer.y - monitor.y }));
+      layer.add_child(new Clutter.Clone({ source, x: board ? buffer.x : buffer.x - monitor.x, y: board ? buffer.y : buffer.y - monitor.y }));
     }
     return thumbnail;
   }

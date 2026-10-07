@@ -263,6 +263,7 @@ async function _initializeUI() {
             openScreenshot: () => screenshotUI.open().catch(logError),
             stopScreencast: () => screenshotUI.stopScreencast(),
             createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
+            wallpaper: layoutManager.backgroundGroup,
             registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
             inputMethod,
             keybindings: {

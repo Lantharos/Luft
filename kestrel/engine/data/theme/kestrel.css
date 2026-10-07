@@ -562,3 +562,12 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 .kestrel-solid-22.kestrel-solid-22 { border-radius: 22px; }
 .kestrel-solid-24.kestrel-solid-24 { border-radius: 24px; }
 .kestrel-solid-999.kestrel-solid-999 { border-radius: 999px; }
+
+.kestrel-board-tint { background-color: rgba(12, 12, 16, 0.36); }
+.kestrel-board-light .kestrel-board-tint { background-color: rgba(246, 246, 248, 0.40); }
+.kestrel-board-pill.kestrel-glass { height: 36px; padding: 0 14px; border-radius: 999px; transition-duration: 160ms; }
+.kestrel-board-pill.kestrel-glass:hover, .kestrel-board-pill.kestrel-glass:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-board-pill-box, .kestrel-board-pill-status { spacing: 10px; }
+.kestrel-board-pill-icon { icon-size: 16px; }
+.kestrel-board-pill-battery { margin-left: -5px; font-size: 12px; font-feature-settings: "tnum"; }
+.kestrel-board-pill-time { font-size: 13px; font-weight: 500; font-feature-settings: "tnum"; }

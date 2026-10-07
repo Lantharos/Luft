@@ -18,6 +18,7 @@ export class AutoHide {
   private allowed = false;
   private active = false;
   private held = false;
+  private suppressed = false;
   private overlap: WindowOverlap | null = null;
   private timer = 0;
   private readonly focusSignal: number;
@@ -48,6 +49,11 @@ export class AutoHide {
     this.sync();
   }
 
+  suppress(suppressed: boolean): void {
+    this.suppressed = suppressed;
+    this.sync();
+  }
+
   hold(held: boolean): void {
     this.held = held;
     this.sync();
@@ -69,14 +75,17 @@ export class AutoHide {
   sync(immediate = false): void {
     const mode = taskbarPreferences.autoHide;
     this.panel.track_hover = mode !== 'never';
-    const reveal = mode === 'never' || this.wanted(mode === 'windows');
-    this.edge.visible = this.allowed && mode !== 'never' && !reveal;
+    const reveal = !this.suppressed && (mode === 'never' || this.wanted(mode === 'windows'));
+    this.edge.visible = this.allowed && !this.suppressed && mode !== 'never' && !reveal;
     if (reveal) {
       this.cancel();
       this.slide(true, immediate);
     } else if (immediate || !this.allowed) {
       this.cancel();
       this.slide(false, true);
+    } else if (this.suppressed) {
+      this.cancel();
+      this.slide(false, false);
     } else if (this.revealed && !this.timer) {
       this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HIDE_DELAY, () => {
         this.timer = 0;

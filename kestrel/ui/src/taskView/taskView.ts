@@ -10,7 +10,7 @@ import type { Monitor } from '../panel/panel.js';
 import { blurSurface } from '../shared/surface.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
-import { WorkspaceStrip, type BackgroundFactory } from './workspaceStrip.js';
+import { WorkspaceStrip, type BackgroundFactory, type BoardFrames } from './workspaceStrip.js';
 
 const MARGIN = 40;
 const SPACING = 28;
@@ -24,9 +24,9 @@ export class TaskView {
   private signals: [GObject.Object, number][] = [];
   private rebuildSource = 0;
 
-  constructor(background: BackgroundFactory, private readonly dismiss: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
+  constructor(background: BackgroundFactory, boardFrame: BoardFrames, private readonly dismiss: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 0);
-    this.strip = new WorkspaceStrip(background);
+    this.strip = new WorkspaceStrip(background, boardFrame);
     this.actor.add_child(this.windowLayer);
     this.actor.add_child(this.strip.actor);
     this.actor.connect('button-press-event', (_actor, event: Clutter.Event) => {

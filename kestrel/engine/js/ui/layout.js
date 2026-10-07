@@ -821,6 +821,10 @@ export const LayoutManager = GObject.registerClass({
         this._trackedActors.forEach(this._updateActorVisibility.bind(this));
     }
 
+    get backgroundGroup() {
+        return this._backgroundGroup;
+    }
+
     createBackground(container, monitorIndex) {
         return new Background.BackgroundManager({container, layoutManager: this, monitorIndex, controlPosition: false});
     }

@@ -23,6 +23,7 @@ import {checkNotifications} from './checks/desktop/notificationChecks.js';
 import {checkSnapGroups} from './checks/windows/snapGroupChecks.js';
 import {checkVariableRefresh} from './checks/windows/variableRefreshChecks.js';
 import {checkWindowState} from './checks/windows/windowStateChecks.js';
+import {checkBoard} from './checks/windows/boardChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
 import {checkTaskbarOptions} from './checks/desktop/taskbarOptionChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
@@ -345,6 +346,7 @@ export async function run() {
   await checkSnapGroups({pause});
   await checkVariableRefresh({pause});
   await checkWindowState({pause});
+  await checkBoard({pause, capture, pointer, keyboard, output});
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
   await checkTaskbarOptions({pause, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});

@@ -23,6 +23,12 @@
 	<KeyListEntry name="snap-layouts"
                       description="Show snap layouts for the focused window"/>
 
+	<KeyListEntry name="board-zoom-in"
+                      description="Zoom in on the board"/>
+
+	<KeyListEntry name="board-zoom-out"
+                      description="Zoom out of the board"/>
+
 	<KeyListEntry name="system-monitor"
                       description="Open the system monitor to see what's running"/>
 

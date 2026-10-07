@@ -104,7 +104,7 @@ export class CornerSnap {
     }
 
     _begin(window, op) {
-        if (!window || !MOVE_OPS.includes(op))
+        if (!window || window.unconstrained || !MOVE_OPS.includes(op))
             return;
 
         this._restore(window);

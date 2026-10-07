@@ -1,3 +1,4 @@
+import Clutter from 'gi://Clutter';
 import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -10,6 +11,7 @@ const FIRST_PAINT = 'browser.first_paint';
 const LAUNCH_TIMEOUT = 30000;
 const LOG_LINES = 40;
 const SETTLE_TIMEOUT = 5000;
+const TYPED = 300;
 const REPOSITORY = GLib.build_filenamev([GLib.path_get_dirname(GLib.filename_from_uri(import.meta.url)[0]), '..', '..', '..', '..']);
 const DEV_APPS = (GLib.getenv('KESTREL_DEV_APPS') ?? '').split(',').filter(Boolean);
 const SABINE = GLib.build_filenamev([GLib.get_user_data_dir(), 'sabine']);
@@ -62,6 +64,24 @@ export async function waitFor(condition, milliseconds, describe) {
   while (!(await condition())) {
     if (GLib.get_monotonic_time() > deadline) throw new Error(describe());
     await sleep(50);
+  }
+}
+
+export class Keys {
+  constructor() {
+    this.device = global.stage.context.get_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+  }
+
+  press(keyval, modifiers = []) {
+    for (const modifier of modifiers) this.device.notify_keyval(GLib.get_monotonic_time(), modifier, Clutter.KeyState.PRESSED);
+    this.device.notify_keyval(GLib.get_monotonic_time(), keyval, Clutter.KeyState.PRESSED);
+    this.device.notify_keyval(GLib.get_monotonic_time(), keyval, Clutter.KeyState.RELEASED);
+    for (const modifier of modifiers.toReversed()) this.device.notify_keyval(GLib.get_monotonic_time(), modifier, Clutter.KeyState.RELEASED);
+  }
+
+  async type(text) {
+    for (const character of text) this.press(character.codePointAt(0));
+    await sleep(TYPED);
   }
 }
 

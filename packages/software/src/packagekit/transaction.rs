@@ -3,17 +3,18 @@ use std::collections::HashMap;
 use luft_app::dbus;
 use serde::Serialize;
 use zbus::blocking::{Connection, MessageIterator};
-use zbus::message::Message;
 use zbus::zvariant::{DynamicType, OwnedObjectPath, OwnedValue};
 
-use super::enums::{self, exit};
+use super::enums::{self, exit, status};
 use super::package::Package;
 use crate::task::{CANCELLED, Task};
 
 pub const SERVICE: &str = "org.freedesktop.PackageKit";
 pub const PATH: &str = "/org/freedesktop/PackageKit";
-const MANAGER: &str = "org.freedesktop.PackageKit";
-const TRANSACTION: &str = "org.freedesktop.PackageKit.Transaction";
+pub const MANAGER: &str = "org.freedesktop.PackageKit";
+pub const TRANSACTION: &str = "org.freedesktop.PackageKit.Transaction";
+pub const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
+const UNKNOWN_PERCENTAGE: u32 = 101;
 const QUEUED_SIGNALS: usize = 8192;
 
 pub type Details = HashMap<String, OwnedValue>;
@@ -57,6 +58,33 @@ fn property_u32(changed: &HashMap<String, OwnedValue>, name: &str) -> Option<u32
         .and_then(|value| u32::try_from(value).ok())
 }
 
+fn subscribe(connection: &Connection, path: &str) -> Result<MessageIterator, String> {
+    let rule = zbus::MatchRule::builder()
+        .msg_type(zbus::message::Type::Signal)
+        .path(path)
+        .map_err(failed)?
+        .build();
+    MessageIterator::for_match_rule(rule, connection, Some(QUEUED_SIGNALS)).map_err(failed)
+}
+
+fn while_running<T>(
+    task: Task,
+    path: &str,
+    run: impl FnOnce() -> Result<T, String>,
+) -> Result<T, String> {
+    let path = path.to_owned();
+    task.cancel
+        .while_running(
+            move || {
+                if let Ok(connection) = dbus::system() {
+                    let _ = call(connection, &path, "Cancel", &());
+                }
+            },
+            run,
+        )
+        .unwrap_or_else(|| Err(CANCELLED.into()))
+}
+
 pub fn run<B>(method: &str, body: &B, mode: Mode, task: Option<Task>) -> Result<Outcome, String>
 where
     B: Serialize + DynamicType,
@@ -66,53 +94,48 @@ where
         .call_method(Some(SERVICE), PATH, Some(MANAGER), "CreateTransaction", &())
         .and_then(|reply| reply.body().deserialize())
         .map_err(failed)?;
-    let rule = zbus::MatchRule::builder()
-        .msg_type(zbus::message::Type::Signal)
-        .path(path.as_str())
-        .map_err(failed)?
-        .build();
-    let signals =
-        MessageIterator::for_match_rule(rule, connection, Some(QUEUED_SIGNALS)).map_err(failed)?;
-    call(connection, &path, "SetHints", &(mode.hints(),))?;
+    let signals = subscribe(connection, path.as_str())?;
+    call(connection, path.as_str(), "SetHints", &(mode.hints(),))?;
     let execute = || {
-        call(connection, &path, method, body)?;
-        collect(signals, task)
+        call(connection, path.as_str(), method, body)?;
+        collect(signals, task, Tracker::default())
     };
     match task {
-        Some(task) => {
-            let cancel_path = path.clone();
-            task.cancel
-                .while_running(
-                    move || {
-                        if let Ok(connection) = dbus::system() {
-                            let _ = call(connection, &cancel_path, "Cancel", &());
-                        }
-                    },
-                    execute,
-                )
-                .unwrap_or_else(|| Err(CANCELLED.into()))
-        }
+        Some(task) => while_running(task, path.as_str(), execute),
         None => execute(),
     }
 }
 
-fn call<B>(
-    connection: &Connection,
-    path: &OwnedObjectPath,
-    method: &str,
-    body: &B,
-) -> Result<(), String>
+pub fn follow(path: &str, task: Task) -> Result<(), String> {
+    let connection = dbus::system()?;
+    let signals = subscribe(connection, path)?;
+    let Ok(properties) = connection
+        .call_method(
+            Some(SERVICE),
+            path,
+            Some(PROPERTIES),
+            "GetAll",
+            &(TRANSACTION,),
+        )
+        .and_then(|reply| reply.body().deserialize::<HashMap<String, OwnedValue>>())
+    else {
+        return Ok(());
+    };
+    let mut tracker = Tracker::default();
+    tracker.update(&properties);
+    if tracker.status == status::FINISHED {
+        return Ok(());
+    }
+    tracker.report(task);
+    while_running(task, path, || collect(signals, Some(task), tracker)).map(|_| ())
+}
+
+fn call<B>(connection: &Connection, path: &str, method: &str, body: &B) -> Result<(), String>
 where
     B: Serialize + DynamicType,
 {
     connection
-        .call_method(
-            Some(SERVICE),
-            path.as_str(),
-            Some(TRANSACTION),
-            method,
-            body,
-        )
+        .call_method(Some(SERVICE), path, Some(TRANSACTION), method, body)
         .map(|_| ())
         .map_err(|error| match error {
             zbus::Error::MethodError(_, Some(message), _) => message,
@@ -120,10 +143,13 @@ where
         })
 }
 
-fn collect(signals: MessageIterator, task: Option<Task>) -> Result<Outcome, String> {
+fn collect(
+    signals: MessageIterator,
+    task: Option<Task>,
+    mut tracker: Tracker,
+) -> Result<Outcome, String> {
     let mut outcome = Outcome::default();
     let mut error = None;
-    let (mut status, mut percentage) = (0, 101);
     for message in signals {
         let message = message.map_err(failed)?;
         let member = message
@@ -163,12 +189,13 @@ fn collect(signals: MessageIterator, task: Option<Task>) -> Result<Outcome, Stri
             }
             "PropertiesChanged" => {
                 if let Some(task) = task
-                    && report(&message, &mut status, &mut percentage)
+                    && let Ok((_, changed, _)) =
+                        message
+                            .body()
+                            .deserialize::<(String, HashMap<String, OwnedValue>, Vec<String>)>()
+                    && tracker.update(&changed)
                 {
-                    task.progress(
-                        enums::stage(status),
-                        (percentage <= 100).then(|| percentage as f32 / 100.0),
-                    );
+                    tracker.report(task);
                 }
             }
             "Finished" => {
@@ -186,15 +213,32 @@ fn collect(signals: MessageIterator, task: Option<Task>) -> Result<Outcome, Stri
     Err(error.unwrap_or_else(|| "The software service stopped unexpectedly.".into()))
 }
 
-fn report(message: &Message, status: &mut u32, percentage: &mut u32) -> bool {
-    let Ok((_, changed, _)) = message
-        .body()
-        .deserialize::<(String, HashMap<String, OwnedValue>, Vec<String>)>()
-    else {
-        return false;
-    };
-    let previous = (*status, *percentage);
-    *status = property_u32(&changed, "Status").unwrap_or(*status);
-    *percentage = property_u32(&changed, "Percentage").unwrap_or(*percentage);
-    previous != (*status, *percentage)
+struct Tracker {
+    status: u32,
+    percentage: u32,
+}
+
+impl Default for Tracker {
+    fn default() -> Self {
+        Self {
+            status: 0,
+            percentage: UNKNOWN_PERCENTAGE,
+        }
+    }
+}
+
+impl Tracker {
+    fn update(&mut self, changed: &HashMap<String, OwnedValue>) -> bool {
+        let previous = (self.status, self.percentage);
+        self.status = property_u32(changed, "Status").unwrap_or(self.status);
+        self.percentage = property_u32(changed, "Percentage").unwrap_or(self.percentage);
+        previous != (self.status, self.percentage)
+    }
+
+    fn report(&self, task: Task) {
+        task.progress(
+            enums::stage(self.status),
+            (self.percentage <= 100).then(|| self.percentage as f32 / 100.0),
+        );
+    }
 }

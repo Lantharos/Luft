@@ -1,35 +1,42 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { ago, bytes, Row, Section } from '@luft/ui';
-	import { appCount, cancel, check, download, firmware, onActivity, openApps, overview, restart, type Firmware, type Overview } from './api';
+	import { updates } from '#lib/state/updates.svelte.js';
+	import { describe as describeActivity, fractionOf, showsProgress } from './activity';
+	import { cancel, check, download, firmware, load, openApps, preferences as loadPreferences, restart, type Activity, type Firmware, type Preferences } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import DetailsDialog from './DetailsDialog.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
+	import ProgressTrack from './ProgressTrack.svelte';
 	import { recently } from './time';
 	import { describe } from './summary';
 
-	let info = $state<Overview | null>(null);
 	let devices = $state<Firmware[]>([]);
-	let apps = $state<number | null>(null);
-	let checking = $state(false);
-	let error = $state<string | null>(null);
+	let preferences = $state<Preferences | null>(null);
+	let failure = $state<string | null>(null);
 	let details = $state(false);
 
-	const updates = $derived(info?.updates ?? []);
-	const activity = $derived(info?.activity);
-	const downloading = $derived(activity?.running === 'download');
-	const size = $derived(updates.reduce((sum, update) => sum + update.downloadSize, 0));
-	const fraction = $derived(downloading ? (activity?.progress?.fraction ?? null) : null);
+	const info = $derived(updates.overview);
+	const activity = $derived(updates.activity);
+	const busy = $derived(activity.running !== null);
+	const downloading = $derived(activity.running === 'download');
+	const list = $derived(info?.updates ?? []);
+	const size = $derived(list.reduce((sum, update) => sum + update.downloadSize, 0));
+	const fraction = $derived(fractionOf(activity));
+	const apps = $derived(info?.apps ?? null);
 
 	const headline = $derived.by(() => {
+		const running = describeActivity(activity);
+		if (running) return running;
 		if (!info) return 'Looking for updates…';
 		if (info.prepared) return 'Updates are ready to install';
-		if (downloading) return 'Downloading updates…';
-		if (updates.length) return `${updates.length} ${updates.length === 1 ? 'update is' : 'updates are'} available`;
+		if (list.length) return `${list.length} ${list.length === 1 ? 'update is' : 'updates are'} available`;
 		return 'Your system is up to date';
 	});
 
 	const subline = $derived.by(() => {
+		const error = failure ?? activity.error;
+		if (error) return error;
+		if (activity.running === 'elsewhere') return "You can look for updates again when it's done";
 		if (!info) return '';
 		if (info.prepared) return 'Restart to install them. Your computer is back in a few minutes.';
 		const parts = [info.checked ? `Last checked ${ago(info.checked)}` : 'Not checked yet'];
@@ -37,47 +44,45 @@
 		return parts.join(' · ');
 	});
 
-	async function load(next: Promise<Overview>) {
-		try {
-			info = await next;
-			error = null;
-		} catch (reason) {
-			error = String(reason);
-		}
+	async function attempt(action: () => Promise<void>) {
+		failure = null;
+		await action().catch((reason) => (failure = String(reason)));
 	}
 
-	async function checkNow() {
-		checking = true;
-		await load(check());
-		checking = false;
-		void refreshExtras();
-	}
-
-	async function refreshExtras() {
+	async function loadDevices() {
 		devices = await firmware().catch(() => []);
-		apps = await appCount().catch(() => null);
 	}
 
-	const stop = onActivity((next) => {
-		const finished = info?.activity.running && !next.running;
-		if (info) info.activity = next;
-		if (finished) {
-			void load(overview());
-			void refreshExtras();
-		}
+	let previous: Activity['running'] = null;
+	$effect(() => {
+		const running = activity.running;
+		if (previous === 'firmware' && running !== 'firmware') void loadDevices();
+		previous = running;
 	});
-	onDestroy(stop);
 
-	void load(overview());
-	void refreshExtras();
+	void attempt(load);
+	void loadDevices();
+	void loadPreferences().then((loaded) => (preferences = loaded));
 </script>
 
-<div class="flex items-center gap-4 px-2 pb-1">
-	<div class="flex min-w-0 flex-1 flex-col gap-1">
-		<span class="truncate text-[26px] font-semibold">{headline}</span>
-		<span class="truncate text-[14px] text-[var(--text-muted)]">{error ?? subline}</span>
+<div class="flex flex-col gap-3 px-2 pb-1">
+	<div class="flex items-center gap-4">
+		<div class="flex min-w-0 flex-1 flex-col gap-1">
+			<span class="truncate text-[26px] font-semibold">{headline}</span>
+			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline}</span>
+		</div>
+		{#if downloading}
+			<button type="button" class="button" onclick={() => attempt(cancel)}>Stop</button>
+		{:else}
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? 'Checking…' : 'Check now'}</button>
+		{/if}
 	</div>
-	<button type="button" class="button" disabled={checking || downloading} onclick={checkNow}>{checking ? 'Checking…' : 'Check now'}</button>
+	{#if showsProgress(activity)}
+		<div class="flex items-center gap-3">
+			<ProgressTrack {fraction} class="h-1.5 flex-1 bg-[var(--control)]" />
+			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : `${Math.round(fraction * 100)}%`}</span>
+		</div>
+	{/if}
 </div>
 
 {#if info?.results && !info.results.success && recently(info.results.finished)}
@@ -86,34 +91,20 @@
 	</Section>
 {/if}
 
-{#if updates.length}
+{#if list.length}
 	<Section>
-		<Row title={describe(updates)} description="{updates.length} {updates.length === 1 ? 'update' : 'updates'} · {bytes(size)}">
+		<Row title={describe(list)} description="{list.length} {list.length === 1 ? 'update' : 'updates'} · {bytes(size)}">
 			{#if info?.prepared}
-				<button type="button" class="button primary" onclick={restart}>Restart and install</button>
-			{:else if downloading}
-				<button type="button" class="button" onclick={cancel}>Stop</button>
-			{:else}
-				<button type="button" class="button primary" onclick={download}>Download</button>
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart and install</button>
+			{:else if !downloading}
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>Download</button>
 			{/if}
-			{#snippet below()}
-				{#if downloading}
-					<div class="flex items-center gap-3">
-						<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--control)]">
-							<div class="bar h-full rounded-full bg-[var(--accent)]" class:indeterminate={fraction === null} style:width={fraction === null ? undefined : `${fraction * 100}%`}></div>
-						</div>
-						<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : `${Math.round(fraction * 100)}%`}</span>
-					</div>
-				{:else if activity?.error}
-					<p class="text-[12.5px] text-[var(--danger)]">{activity.error}</p>
-				{/if}
-			{/snippet}
 		</Row>
 		<Row title="See what's included" onclick={() => (details = true)} />
 	</Section>
 {/if}
 
-{#if devices.length && activity}
+{#if devices.length}
 	<FirmwareSection {devices} {activity} />
 {/if}
 
@@ -125,30 +116,10 @@
 	/>
 </Section>
 
-{#if info}
-	<AutomaticSection bind:preferences={info.preferences} />
+{#if preferences}
+	<AutomaticSection bind:preferences />
 {/if}
 
 {#if details}
-	<DetailsDialog {updates} onclose={() => (details = false)} />
+	<DetailsDialog updates={list} onclose={() => (details = false)} />
 {/if}
-
-<style>
-	.bar {
-		transition: width 240ms var(--ease);
-	}
-
-	.bar.indeterminate {
-		width: 30%;
-		animation: slide 1.4s var(--ease) infinite;
-	}
-
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(340%);
-		}
-	}
-</style>

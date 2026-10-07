@@ -1,21 +1,22 @@
-mod activity;
 mod background;
+mod elsewhere;
 mod firmware;
+mod overview;
 mod schedule;
+mod state;
 mod store;
 
 use std::sync::Once;
 
 use luft_app::{Commands, Events, dbus};
-use luft_software::packagekit::{self, Mode, PackageId, Results, Update, offline};
-use luft_software::updates::{self, PackageUpdates};
+use luft_software::packagekit;
 use sabine::SabineWindow;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::Value;
 
-use activity::{Activity, Kind};
 use firmware::Firmware;
-use store::{Checked, Preferences};
+use state::{Activity, Kind, Status};
+use store::Preferences;
 
 pub use background::run as check_in_background;
 pub use schedule::CHECK_ARGUMENT;
@@ -24,23 +25,12 @@ const APP_UPDATES: &str = "schelf:updates";
 
 static FIRST_RUN: Once = Once::new();
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct Overview {
-    checked: Option<u64>,
-    updates: Vec<Update>,
-    prepared: bool,
-    results: Option<Results>,
-    preferences: Preferences,
-    activity: Activity,
-}
-
 #[derive(Deserialize)]
 struct Device {
     id: String,
 }
 
-fn overview(refresh: bool) -> Result<Overview, String> {
+fn load(_: Value) -> Result<(), String> {
     FIRST_RUN.call_once(|| {
         if !Preferences::exists() {
             let preferences = Preferences::default();
@@ -49,42 +39,48 @@ fn overview(refresh: bool) -> Result<Overview, String> {
                 .and_then(|_| schedule::apply(preferences.schedule));
         }
     });
-    let checked = if refresh {
-        packagekit::refresh(true, Mode::Interactive, None)?;
-        Checked::now()?
-    } else {
-        Checked::load()
+    if state::overview().is_none() {
+        overview::reload();
+    }
+    Ok(())
+}
+
+fn check(_: Value) -> Result<(), String> {
+    state::start(
+        Activity::new(Kind::Check),
+        |task| overview::load(Some(task)),
+        elsewhere::scan,
+    );
+    Ok(())
+}
+
+fn download(_: Value) -> Result<(), String> {
+    let started = state::start(
+        Activity::new(Kind::Download),
+        |task| packagekit::prepare(&overview::system_updates()?, task),
+        || {
+            overview::mark_prepared();
+            elsewhere::scan();
+        },
+    );
+    started
+        .then_some(())
+        .ok_or_else(|| "Something is already being downloaded.".into())
+}
+
+fn install_firmware(Device { id }: Device) -> Result<(), String> {
+    let activity = Activity {
+        target: Some(id.clone()),
+        ..Activity::new(Kind::Firmware)
     };
-    let updates = PackageUpdates::load(Mode::Quiet)?.system;
-    let ids: Vec<PackageId> = updates
-        .iter()
-        .map(|update| update.package.clone())
-        .collect();
-    Ok(Overview {
-        checked: checked.at,
-        prepared: background::covered(&ids),
-        updates,
-        results: offline::results(),
-        preferences: Preferences::load(),
-        activity: activity::current(),
-    })
-}
-
-fn download(events: &Events, _: Value) -> Result<(), String> {
-    activity::start(events, Kind::Download, None, |task| {
-        let updates: Vec<PackageId> = PackageUpdates::load(Mode::Quiet)?
-            .system
-            .into_iter()
-            .map(|update| update.package)
-            .collect();
-        packagekit::prepare(&updates, task)
-    })
-}
-
-fn install_firmware(events: &Events, Device { id }: Device) -> Result<(), String> {
-    activity::start(events, Kind::Firmware, Some(id.clone()), move |task| {
-        firmware::install(&id, task)
-    })
+    let started = state::start(
+        activity,
+        move |task| firmware::install(&id, task),
+        elsewhere::scan,
+    );
+    started
+        .then_some(())
+        .ok_or_else(|| "Something is already being installed.".into())
 }
 
 fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
@@ -92,10 +88,6 @@ fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
         return Ok(Vec::new());
     }
     firmware::updates()
-}
-
-fn app_count(_: Value) -> Result<usize, String> {
-    Ok(updates::app_count(&PackageUpdates::load(Mode::Quiet)?))
 }
 
 fn restart(_: Value) -> Result<(), String> {
@@ -126,18 +118,25 @@ fn open_apps(_: Value) -> Result<(), String> {
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    state::attach(events);
+    elsewhere::watch();
     window
-        .command("updates_overview", |_: Value| overview(false))
-        .command("updates_check", |_: Value| overview(true))
-        .with("updates_download", events, download)
+        .command("updates_status", |_: Value| {
+            Ok::<Status, String>(state::status())
+        })
+        .command("updates_load", load)
+        .command("updates_check", check)
+        .command("updates_download", download)
         .command("updates_cancel", |_: Value| {
-            activity::cancel();
+            state::cancel();
             Ok(())
         })
         .command("updates_firmware", firmware_updates)
-        .with("updates_firmware_install", events, install_firmware)
-        .command("updates_app_count", app_count)
+        .command("updates_firmware_install", install_firmware)
         .command("updates_restart", restart)
+        .command("updates_preferences", |_: Value| {
+            Ok::<Preferences, String>(Preferences::load())
+        })
         .command("updates_set_preferences", set_preferences)
         .command("updates_open_apps", open_apps)
 }

@@ -23,6 +23,21 @@ pub mod info {
     pub const REMOVING: u32 = 13;
 }
 
+pub mod role {
+    pub const INSTALL_FILES: u32 = 10;
+    pub const INSTALL_PACKAGES: u32 = 11;
+    pub const REFRESH_CACHE: u32 = 13;
+    pub const REMOVE_PACKAGES: u32 = 14;
+    pub const UPDATE_PACKAGES: u32 = 22;
+    pub const DOWNLOAD_PACKAGES: u32 = 25;
+    pub const REPAIR_SYSTEM: u32 = 28;
+    pub const UPGRADE_SYSTEM: u32 = 32;
+}
+
+pub mod status {
+    pub const FINISHED: u32 = 18;
+}
+
 pub mod exit {
     pub const SUCCESS: u32 = 1;
     pub const CANCELLED: u32 = 3;

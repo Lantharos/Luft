@@ -2,6 +2,7 @@ import { appearance } from '@luft/ui';
 import { appState, onActivated } from '#lib/bridge.js';
 import { DEFAULT_PANEL, resolveLink, type PanelId } from '#lib/panels/registry.js';
 import { hardware } from './hardware.svelte';
+import { updates } from './updates.svelte';
 
 class AppStore {
 	panel = $state<PanelId>(DEFAULT_PANEL);
@@ -9,7 +10,7 @@ class AppStore {
 	query = $state('');
 
 	async start() {
-		const [state] = await Promise.all([appState(), hardware.start()]);
+		const [state] = await Promise.all([appState(), hardware.start(), updates.start()]);
 		appearance.start(state);
 		if (state.page) this.open(state.page);
 		onActivated(({ arguments: args }) => {

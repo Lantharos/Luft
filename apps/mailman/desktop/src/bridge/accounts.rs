@@ -118,7 +118,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             state.store.mailboxes(None)
         })
         .with("sync_now", state, |state, Empty {}| {
-            state.engine.sync_all();
+            state.engine.refresh();
             Ok(())
         })
         .with("sync_mailbox", state, |state, Sync { account, mailbox }| {

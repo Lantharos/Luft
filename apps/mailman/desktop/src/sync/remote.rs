@@ -1,6 +1,8 @@
+use std::net::{Shutdown, TcpStream};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
+
+use parking_lot::{Condvar, Mutex};
 
 use crate::accounts::{Account, Credentials, Login, Protocol};
 use crate::store::{Inserted, Mailbox, Outgoing, Store, now};
@@ -8,16 +10,19 @@ use crate::store::{Inserted, Mailbox, Outgoing, Store, now};
 use super::ops::Operation;
 
 const RENEW_BEFORE: i64 = 60;
+const FIRST_RETRY: Duration = Duration::from_secs(1);
+const LAST_RETRY: Duration = Duration::from_secs(60);
 
 pub struct Context<'a> {
     pub store: &'a Store,
     pub account: &'a Account,
     pub changed: &'a dyn Fn(),
+    pub arrived: &'a dyn Fn(&Mailbox, &[Inserted]),
 }
 
 pub trait Remote: Send {
     fn folders(&mut self, context: &Context) -> Result<Vec<Mailbox>, String>;
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String>;
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String>;
     fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String>;
     fn identities(&mut self, context: &Context) -> Result<bool, String>;
     fn bodies(
@@ -78,34 +83,104 @@ pub fn connect(account: &Account, credentials: &Credentials) -> Result<Connectio
     Ok(Connection { remote, expires })
 }
 
+pub struct Watch {
+    state: Mutex<Watched>,
+    ring: Condvar,
+}
+
+#[derive(Default)]
+struct Watched {
+    stopped: bool,
+    kicked: bool,
+    line: Option<TcpStream>,
+}
+
+impl Watch {
+    pub fn attach(&self, line: TcpStream) -> bool {
+        let mut state = self.state.lock();
+        if state.stopped {
+            return false;
+        }
+        state.kicked = false;
+        state.line = Some(line);
+        true
+    }
+
+    pub fn detach(&self) {
+        self.state.lock().line = None;
+    }
+
+    pub fn stopped(&self) -> bool {
+        self.state.lock().stopped
+    }
+
+    pub fn rest(&self, duration: Duration) -> bool {
+        let mut state = self.state.lock();
+        self.ring.wait_while_for(
+            &mut state,
+            |state| !state.kicked && !state.stopped,
+            duration,
+        );
+        state.kicked = false;
+        !state.stopped
+    }
+
+    fn interrupt(&self, stop: bool) {
+        let mut state = self.state.lock();
+        state.stopped |= stop;
+        state.kicked = true;
+        if let Some(line) = state.line.take() {
+            let _ = line.shutdown(Shutdown::Both);
+        }
+        self.ring.notify_all();
+    }
+}
+
 pub struct Push {
-    stop: Arc<AtomicBool>,
+    watch: Arc<Watch>,
 }
 
 impl Push {
-    pub fn spawn(name: String, watch: impl FnOnce(&AtomicBool) + Send + 'static) -> Self {
-        let stop = Arc::new(AtomicBool::new(false));
-        let watching = stop.clone();
+    pub fn spawn(name: String, run: impl FnOnce(&Watch) + Send + 'static) -> Self {
+        let watch = Arc::new(Watch {
+            state: Mutex::default(),
+            ring: Condvar::new(),
+        });
+        let watching = watch.clone();
         std::thread::Builder::new()
             .name(name)
-            .spawn(move || watch(&watching))
+            .spawn(move || run(&watching))
             .ok();
-        Self { stop }
+        Self { watch }
+    }
+
+    pub fn kick(&self) {
+        self.watch.interrupt(false);
     }
 }
 
 impl Drop for Push {
     fn drop(&mut self) {
-        self.stop.store(true, Ordering::Relaxed);
+        self.watch.interrupt(true);
     }
 }
 
-pub fn pause(stop: &AtomicBool, duration: Duration) {
-    let steps = duration.as_millis() / 250;
-    for _ in 0..steps {
-        if stop.load(Ordering::Relaxed) {
-            return;
-        }
-        std::thread::sleep(Duration::from_millis(250));
+pub struct Backoff(Duration);
+
+impl Default for Backoff {
+    fn default() -> Self {
+        Self(FIRST_RETRY)
+    }
+}
+
+impl Backoff {
+    pub fn next(&mut self) -> Duration {
+        let wait = self.0;
+        self.0 = (wait * 2).min(LAST_RETRY);
+        wait
+    }
+
+    pub fn reset(&mut self) {
+        self.0 = FIRST_RETRY;
     }
 }

@@ -13,7 +13,7 @@ use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
 use crate::accounts::Login;
 use crate::protocols::jmap::{CORE, Client, MAIL, SUBMISSION};
-use crate::store::{Flag, Inserted, Mailbox, Outgoing, RemoteFolder, Role};
+use crate::store::{Flag, Mailbox, Outgoing, RemoteFolder, Role};
 use mail::Changes;
 
 const STATE_LIFETIME: Duration = Duration::from_secs(5);
@@ -173,12 +173,14 @@ impl Remote for JmapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
         let current = self.current_state()?;
         if mailbox.state.as_deref() == Some(current.as_str()) {
-            return Ok(Vec::new());
+            return Ok(());
         }
-        self.sync_mailbox(context, mailbox, &current)
+        let inserted = self.sync_mailbox(context, mailbox, &current)?;
+        (context.arrived)(mailbox, &inserted);
+        Ok(())
     }
 
     fn backfill(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {

@@ -1,5 +1,6 @@
 use std::io::{BufRead, BufReader, Read, Write};
-use std::time::Duration;
+use std::net::TcpStream;
+use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
@@ -225,19 +226,25 @@ impl Client {
         self.finish(&tag, command)
     }
 
-    pub fn idle(&mut self, wait: Duration, mut wake: impl FnMut() -> bool) -> Result<bool, String> {
+    pub fn handle(&self) -> Result<TcpStream, String> {
+        self.reader.get_ref().handle()
+    }
+
+    pub fn idle(&mut self, wait: Duration) -> Result<bool, String> {
         let tag = self.tag();
         self.send(format!("{tag} IDLE\r\n").as_bytes())?;
         match self.read()? {
             Response::Continue => {}
             _ => return Err("the server doesn't wait for new mail".into()),
         }
-        self.reader
-            .get_ref()
-            .set_timeout(Some(Duration::from_secs(1)));
-        let started = std::time::Instant::now();
+        let deadline = Instant::now() + wait;
         let mut changed = false;
-        while !changed && started.elapsed() < wait && !wake() {
+        while !changed {
+            let left = deadline.saturating_duration_since(Instant::now());
+            if left.is_zero() {
+                break;
+            }
+            self.reader.get_ref().set_timeout(Some(left));
             match self.read_raw() {
                 Ok(raw) => {
                     changed = matches!(

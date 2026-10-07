@@ -106,6 +106,29 @@ impl ImapRemote {
         Ok(uids)
     }
 
+    fn arrivals(
+        &mut self,
+        context: &Context,
+        mailbox: &Mailbox,
+        selected: &Selected,
+    ) -> Result<Vec<Inserted>, String> {
+        let Some(highest) = context.store.highest_remote(mailbox.id)? else {
+            return Ok(Vec::new());
+        };
+        let highest = highest as u32;
+        if selected.uidnext <= highest + 1 {
+            return Ok(Vec::new());
+        }
+        let fresh = self
+            .client
+            .search_uids(&format!("UID {}:*", highest + 1))?
+            .into_iter()
+            .filter(|uid| *uid > highest)
+            .collect();
+        let fresh = Self::newest(context, mailbox, fresh)?;
+        self.insert(context, mailbox, &fresh)
+    }
+
     fn reconcile(
         &mut self,
         context: &Context,
@@ -213,7 +236,7 @@ impl Remote for ImapRemote {
             .replace_mailboxes(context.account.id, &folders)
     }
 
-    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<Vec<Inserted>, String> {
+    fn sync(&mut self, context: &Context, mailbox: &Mailbox) -> Result<(), String> {
         let known = mailbox
             .validity
             .zip(mailbox.modseq)
@@ -223,7 +246,10 @@ impl Remote for ImapRemote {
         let valid = mailbox
             .validity
             .is_none_or(|validity| validity as u32 == selected.uidvalidity);
-        if !valid {
+        if valid {
+            let fresh = self.arrivals(context, mailbox, &selected)?;
+            (context.arrived)(mailbox, &fresh);
+        } else {
             context.store.clear_mailbox(mailbox.id)?;
         }
         let resumed = valid && known.is_some() && self.qresync;
@@ -234,13 +260,13 @@ impl Remote for ImapRemote {
         }
         let wanted = Self::newest(context, mailbox, wanted)?;
         let inserted = self.insert(context, mailbox, &wanted)?;
+        (context.arrived)(mailbox, &inserted);
         context.store.save_mailbox_state(
             mailbox.id,
             Some(selected.uidvalidity as i64),
             selected.highest_modseq.map(|modseq| modseq as i64),
             None,
-        )?;
-        Ok(inserted)
+        )
     }
 
     fn identities(&mut self, context: &Context) -> Result<bool, String> {

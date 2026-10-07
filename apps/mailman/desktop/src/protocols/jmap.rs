@@ -16,6 +16,7 @@ pub const SUBMISSION: &str = "urn:ietf:params:jmap:submission";
 pub const BLOB: &str = "urn:ietf:params:jmap:blob";
 const MAX_OBJECTS: usize = 1000;
 const MAX_CALLS: usize = 32;
+pub const PING: u64 = 30;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -112,7 +113,7 @@ impl Client {
         self.session.event_source_url.as_ref().map(|url| {
             url.replace("{types}", "*")
                 .replace("{closeafter}", "no")
-                .replace("{ping}", "60")
+                .replace("{ping}", &PING.to_string())
         })
     }
 

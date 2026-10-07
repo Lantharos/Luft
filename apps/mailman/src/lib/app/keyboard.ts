@@ -61,6 +61,7 @@ export function handleKeydown(event: KeyboardEvent, keyboard: Keyboard) {
 		event.preventDefault();
 		return keyboard.palette();
 	}
+	if (event.key === 'F5' || (control && event.key.toLowerCase() === 'r')) return run('sync');
 	if (control && event.key === ',') return run('settings');
 	if (control && event.key.toLowerCase() === 'n') return run('compose');
 	if (control || event.altKey || typing(event.target) || blocked()) return;

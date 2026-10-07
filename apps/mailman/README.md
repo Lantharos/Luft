@@ -4,7 +4,8 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 
 ## Features
 
-- IMAP and SMTP accounts, and JMAP accounts such as Fastmail. New mail arrives the moment the server has it, over IMAP IDLE or JMAP push, and servers that support CONDSTORE and QRESYNC, and every JMAP server, only send what changed since last time
+- IMAP and SMTP accounts, and JMAP accounts such as Fastmail. New mail arrives the moment the server has it, over IMAP IDLE or JMAP push, and only the new messages are fetched. Servers that support CONDSTORE and QRESYNC, and every JMAP server, only send what changed since last time. Servers without push are checked every two minutes, and every folder every five
+- Connections that quietly die are noticed and reopened, and mail that came in meanwhile is fetched right away. Waking from sleep or joining a network reconnects at once, and `F5` or the button above the list checks every account on demand
 - The newest mail of every folder arrives first and the rest of its history follows in the background, newest first, picking up where it left off if Mailman is closed halfway. Lists stay quick at hundreds of thousands of messages
 - Adding an account needs just the address for most providers: Mailman looks up the servers in the address's own autoconfig file, Thunderbird's provider database, DNS service records and the provider behind the domain's mail servers. Server settings can still be entered by hand
 - Gmail and Outlook can sign in through the provider's own page in the browser, and any account works with a password or an app password. Sign-ins are renewed before they expire, so new mail keeps arriving and sending keeps working
@@ -50,7 +51,7 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 | `Z` | Undo |
 | `G` then `I`, `K`, `L`, `S`, `D`, `T`, `A`, `J`, `X` | Inbox, Screener, Later, Starred, Drafts, Sent, Archive, Junk, Trash |
 | `G` then `N`, `R`, `U` | Newsletters, Receipts, Updates |
-| `Shift+R` | Check for new mail |
+| `F5` / `Ctrl+R` / `Shift+R` | Check for new mail |
 | `Ctrl+Enter` | Send |
 | `Ctrl+Shift+C` | Show Cc and Bcc while writing |
 | `Ctrl+B` / `Ctrl+I` / `Ctrl+K` | Bold, italic and link while writing |
@@ -112,10 +113,10 @@ mailman/
     ├── accounts/             account settings, keyring credentials and token renewal, discovery and OAuth sign-in
     ├── bridge/               bridge command registration
     ├── mail/                 envelopes, categories, rendering, sanitizing, composing and pictures
-    ├── protocols/            IMAP client, JMAP client, SMTP and TLS connections
+    ├── protocols/            IMAP client, JMAP client and its event stream, SMTP and TLS connections
     ├── services/             actions, sending, launch arguments and notifications
     ├── store/                the local SQLite store and its migrations, accounts and addresses, full-text search and views
-    └── sync/                 per-account sync, history, on-demand fetching, the outbox and reminders
+    └── sync/                 per-account sync, reconnecting after sleep and network changes, history, on-demand fetching, the outbox and reminders
         ├── imap/             IMAP sync, IDLE and Gmail send-as addresses
         └── jmap/             JMAP sync, push, history and addresses
 ```

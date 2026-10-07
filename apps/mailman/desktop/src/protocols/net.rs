@@ -7,8 +7,13 @@ use rustls::pki_types::ServerName;
 use rustls::{ClientConfig, ClientConnection, StreamOwned};
 use rustls_platform_verifier::ConfigVerifierExt;
 use serde::{Deserialize, Serialize};
+use socket2::{SockRef, TcpKeepalive};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
+const KEEPALIVE: TcpKeepalive = TcpKeepalive::new()
+    .with_time(Duration::from_secs(45))
+    .with_interval(Duration::from_secs(15))
+    .with_retries(3);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -53,6 +58,7 @@ impl Stream {
         let socket = TcpStream::connect_timeout(&address, CONNECT_TIMEOUT)
             .map_err(|error| format!("{} isn't reachable: {error}", server.host))?;
         socket.set_nodelay(true).ok();
+        SockRef::from(&socket).set_tcp_keepalive(&KEEPALIVE).ok();
         match server.security {
             Security::Tls => Self::Plain(socket).secure(&server.host),
             _ => Ok(Self::Plain(socket)),
@@ -73,6 +79,10 @@ impl Stream {
             Self::Plain(socket) => socket,
             Self::Tls(stream) => stream.get_ref(),
         }
+    }
+
+    pub fn handle(&self) -> Result<TcpStream, String> {
+        self.socket().try_clone().map_err(|error| error.to_string())
     }
 
     pub fn set_timeout(&self, timeout: Option<Duration>) {

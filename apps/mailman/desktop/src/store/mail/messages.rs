@@ -160,6 +160,16 @@ impl Store {
         })
     }
 
+    pub fn highest_remote(&self, mailbox: i64) -> Result<Option<i64>, String> {
+        self.reading(|connection| {
+            connection.query_row(
+                "SELECT max(CAST(remote AS INTEGER)) FROM messages WHERE mailbox = ?1 AND remote NOT LIKE '~%'",
+                [mailbox],
+                |row| row.get(0),
+            )
+        })
+    }
+
     pub fn set_flag(&self, ids: &[i64], flag: Flag, value: bool) -> Result<(), String> {
         self.writing(|connection| {
             let transaction = connection.transaction()?;

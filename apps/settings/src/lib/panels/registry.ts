@@ -107,7 +107,7 @@ export const PANEL_GROUPS: Panel[][] = [
 export const PANELS = PANEL_GROUPS.flat();
 
 const SUBPAGES: Panel[] = [
-	panel('appearance/taskbar', 'Taskbar', PanelBottom, ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays'], () => import('./appearance/AppearancePanel.svelte'))
+	panel('appearance/taskbar', 'Taskbar', PanelBottom, ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays', 'workspace', 'desktop', 'virtual desktop'], () => import('./appearance/AppearancePanel.svelte'))
 ];
 export const DEFAULT_PANEL: PanelId = 'network';
 

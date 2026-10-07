@@ -98,6 +98,13 @@
 			<Row title="Show pinned apps">
 				<Switch label="Show pinned apps" checked={showPinned} onchange={(on) => taskbar.set('taskbar-show-pinned', on)} />
 			</Row>
+			<Row title="Only list windows on the current workspace">
+				<Switch
+					label="Only list windows on the current workspace"
+					checked={values['taskbar-windows-per-workspace'] ?? false}
+					onchange={(on) => taskbar.set('taskbar-windows-per-workspace', on)}
+				/>
+			</Row>
 			{#if displays > 1}
 				<Row title="Show on every display">
 					<Switch label="Show on every display" checked={everyDisplay} onchange={(on) => taskbar.set('taskbar-displays', on ? 'all' : 'primary')} />

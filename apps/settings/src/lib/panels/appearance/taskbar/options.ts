@@ -14,6 +14,7 @@ export type TaskbarSettings = {
 	'taskbar-show-pinned': boolean;
 	'taskbar-displays': Displays;
 	'taskbar-windows-per-display': boolean;
+	'taskbar-windows-per-workspace': boolean;
 	'favorite-apps': string[];
 };
 
@@ -26,6 +27,7 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 	'taskbar-show-pinned',
 	'taskbar-displays',
 	'taskbar-windows-per-display',
+	'taskbar-windows-per-workspace',
 	'favorite-apps'
 ];
 

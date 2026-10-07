@@ -108,6 +108,7 @@ installed_files() {
 
 remove_from_prefix() {
   while IFS= read -r file; do
+    [[ -d "$prefix/$file" && ! -L "$prefix/$file" ]] && continue
     as_owner "$prefix" rm -f "$prefix/$file"
     as_owner "$prefix" rmdir -p --ignore-fail-on-non-empty "$(dirname "$prefix/$file")" 2>/dev/null || true
   done

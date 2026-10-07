@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 4 Oct 2026 17:19:55 +0200
-Subject: [PATCH 16/18] clutter: keep shell text antialiasing grayscale
+Subject: [PATCH 16/19] clutter: keep shell text antialiasing grayscale
 
 The glyph cache composites coverage as plain alpha, so subpixel
 antialiasing only leaves colored fringes on shell text. Draw it

@@ -69,7 +69,8 @@ export const remoteImages = (urls: string[]) => call<void>('remote_images', { ur
 export const allowImages = (address: string, allowed: boolean) => call<void>('allow_images', { address, allowed });
 export const imagesAllowed = (email: string) => call<boolean>('images_allowed', { email });
 export const act = (action: Action, target: { threads?: number[]; ids?: number[] }) => call<{ moves: Placement[] }>('act', { ...action, ...target });
-export const screen = (address: string, verdict: 'approved' | 'denied') => call<void>('screen', { address, verdict });
+export type Verdict = 'approved' | 'denied' | 'pending';
+export const screen = (address: string, verdict: Verdict) => call<Verdict>('screen', { address, verdict });
 export type PartSource = { id: number } | { file: string };
 export const openAttachment = (source: PartSource, index: number) => call<void>('open_attachment', { ...source, index }, LONG);
 export const saveAttachment = (source: PartSource, index: number) => call<string | null>('save_attachment', { ...source, index }, FOREVER);

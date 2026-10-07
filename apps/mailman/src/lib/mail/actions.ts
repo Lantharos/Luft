@@ -98,10 +98,11 @@ export async function setStar(threads: number[], starred: boolean) {
 
 export async function screen(address: string, verdict: 'approved' | 'denied', threads: number[]) {
 	if (list.view === 'screener' || list.view === 'screened') leave(threads);
-	await api.screen(address, verdict).catch(toasts.fail);
-	toasts.show(verdict === 'approved' ? `${address} can reach your inbox` : `${address} is screened out`, {
-		action: { label: 'Undo', run: () => void api.screen(address, verdict === 'approved' ? 'denied' : 'approved').then(refreshAll) }
-	});
+	const previous = await api.screen(address, verdict).catch(toasts.fail);
+	if (previous)
+		toasts.show(verdict === 'approved' ? `${address} can reach your inbox` : `${address} is screened out`, {
+			action: { label: 'Undo', run: () => void api.screen(address, previous).then(refreshAll) }
+		});
 	await refreshAll();
 }
 

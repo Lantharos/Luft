@@ -12,7 +12,7 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 - Several addresses per account, each with its own name, reply address and signature, and a preview of how the signature looks. JMAP accounts bring their addresses and aliases from the server, Gmail brings its send-as addresses, and any address can be added by hand. Replies and forwards are sent from the address the message was written to, including plus addresses and catch-all domains
 - Passwords and sign-in tokens are kept in Luft Keyring, readable only by Mailman, and never written anywhere else
 - One inbox for all accounts. Conversations are grouped across folders, so replies you sent appear in the thread they belong to
-- The Screener: when someone writes to you for the first time, their mail waits in the Screener until you let them in or screen them out. People you have written to, and everyone already in your mail when you added the account, go straight to the inbox
+- The Screener: when someone writes to you for the first time, their mail waits in the Screener until you let them in or screen them out. People you have written to, and everyone already in your mail when you added the account, go straight to the inbox. With the Screener turned off in settings, new senders land in the inbox too, while anyone you screened out stays out
 - Bundles keep newsletters, receipts and updates out of the inbox. They are summed up at its top with who sent them, and each has its own view
 - Unsubscribe from a newsletter with one click, using the sender's one-click unsubscribe where it offers one
 - Later sets a conversation aside until a time you pick, then puts it back at the top of the inbox, unread

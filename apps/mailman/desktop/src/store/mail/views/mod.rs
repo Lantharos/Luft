@@ -114,7 +114,7 @@ impl Filter {
     }
 }
 
-fn approved(settings: &Settings) -> &'static str {
+pub(super) fn approved(settings: &Settings) -> &'static str {
     if settings.screener {
         "coalesce(m.verdict, 'approved') = 'approved'"
     } else {

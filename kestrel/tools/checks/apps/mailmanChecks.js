@@ -14,6 +14,7 @@ const STARTUP = 20000;
 const SILENT = 3000;
 const SPACING = 1500;
 const LIST_AREA = {left: 248, top: 60, width: 408, height: 240};
+const BELOW_INBOX = {left: 8, top: 150, width: 232, height: 260};
 const TOOLS = GLib.path_get_dirname(GLib.path_get_dirname(GLib.path_get_dirname(GLib.filename_from_uri(import.meta.url)[0])));
 const STORE = GLib.build_filenamev([GLib.get_user_data_dir(), 'mailman', 'mail.sqlite']);
 
@@ -129,10 +130,12 @@ function seed() {
   return Object.fromEntries(accounts.map(([user], index) => [`account-${index + 1}`, JSON.stringify({kind: 'password', password: USERS[user]})]));
 }
 
-function listFrame(app) {
+function area(app, {left, top, width, height}) {
   const {x, y} = app.window.get_frame_rect();
-  return app.frame({x: x + LIST_AREA.left, y: y + LIST_AREA.top, width: LIST_AREA.width, height: LIST_AREA.height});
+  return {x: x + left, y: y + top, width, height};
 }
+
+const listFrame = app => app.frame(area(app, LIST_AREA));
 
 async function arrival(app, subject, since) {
   const before = await listFrame(app);
@@ -173,6 +176,24 @@ async function afterCutOff(app, relay, subject, recover) {
   const unnoticed = query(`SELECT count(*) FROM messages WHERE subject = '${subject}'`) === '0';
   const since = recover();
   return {unnoticed, ...(await arrival(app, subject, since))};
+}
+
+async function runCommand(app, keys, title) {
+  keys.press(Clutter.KEY_k, [Clutter.KEY_Control_L]);
+  await sleep(SPACING);
+  await keys.type(title);
+  keys.press(Clutter.KEY_Return);
+  await sleep(SPACING);
+  return app.settle(() => true, area(app, BELOW_INBOX));
+}
+
+async function screenerSwitch(app) {
+  const keys = new Keys();
+  const waiting = query("SELECT count(DISTINCT thread) FROM messages WHERE verdict = 'pending'");
+  const off = await app.settle(() => true, area(app, BELOW_INBOX));
+  const on = await runCommand(app, keys, 'Turn on the Screener');
+  const offAgain = await runCommand(app, keys, 'Turn off the Screener');
+  return {waiting: Number(waiting), appears: !on.looksLike(off), leaves: offAgain.looksLike(off)};
 }
 
 async function measure(app, servers, stalwart) {
@@ -222,6 +243,7 @@ export async function checkMailman({require, output}) {
     await sleep(SPACING);
     const {imap, jmap, restarted, refreshed, reconnected} = await measure(app, servers, stalwart);
     (await app.settle(() => true)).save(`${output}/mailman-inbox.png`);
+    const screener = await screenerSwitch(app);
     const ms = value => `${Math.round(value)} ms`;
     console.log(`Kestrel Luft app check: mailman delivery: IMAP IDLE stored ${ms(imap.stored)}, shown ${ms(imap.shown)}; JMAP push stored ${ms(jmap.stored)}, shown ${ms(jmap.shown)}; after a server restart ${ms(restarted.stored)}; F5 after a silent drop ${ms(refreshed.stored)}; network change after a silent drop ${ms(reconnected.stored)}`);
     require(imap.shown < ARRIVAL_TARGET, `mail over IMAP IDLE is listed ${ms(imap.shown)} after delivery`);
@@ -229,6 +251,7 @@ export async function checkMailman({require, output}) {
     require(restarted.stored < RECOVERY_TARGET, `mail arrives ${ms(restarted.stored)} after the server comes back from a restart`);
     require(refreshed.unnoticed && refreshed.stored < ARRIVAL_TARGET, `F5 brings in mail ${ms(refreshed.stored)} after a silently dropped connection`);
     require(reconnected.unnoticed && reconnected.stored < ARRIVAL_TARGET, `a network change brings in mail ${ms(reconnected.stored)} after a silently dropped connection`);
+    require(screener.waiting > 0 && screener.appears && screener.leaves, `with the Screener off, ${screener.waiting} conversations from new senders stay in the inbox, and the Screener shows in the sidebar only while it is on`);
   } finally {
     await app.close();
     keyring?.close();

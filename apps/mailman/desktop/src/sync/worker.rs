@@ -236,7 +236,7 @@ impl Worker {
             }
             let since = (now() - NOTIFY_WINDOW).max(account.added);
             let ids: Vec<i64> = inserted.iter().map(|message| message.id).collect();
-            if let Ok(notable) = store.notable(&ids, since) {
+            if let Ok(notable) = store.notable(&ids, since, &store.settings()) {
                 notifier.new_mail(&notable);
             }
         };

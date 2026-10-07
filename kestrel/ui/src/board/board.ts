@@ -11,22 +11,19 @@ import { animateActor } from '../shared/motion.js';
 import type { Box } from '../shared/placement.js';
 import { Backdrop, type BackgroundFactory } from './backdrop.js';
 import { Camera } from './camera.js';
+import { FIT_PADDING, Focus, WINDOW_PADDING, type FocusState } from './focus.js';
 import { Follower } from './follower.js';
-import { boundsOf, clampScale, copyView, fits, fitView, freeSpot, intersection, planExit, screenBox, settle, type View } from './geometry.js';
+import { boundsOf, copyView, fits, fitView, freeSpot, intersection, PLACEMENT_GAP, planExit, screenBox, settle, type View } from './geometry.js';
 import { BoardInput, type BoardActions } from './input.js';
 import { BoardKeys } from './keys.js';
 import { CornerPill } from './pill.js';
 import { fadeAway, glideFrom, settleActor } from './transitions.js';
 import { boardWindows, Collisions, frameBox, isBoardWindow, setUnconstrained } from './windows.js';
 
-const FIT_PADDING = 56;
-const WINDOW_PADDING = 24;
-const REVEAL_MARGIN = 32;
-const CAMERA_DURATION = 360;
 const SETTLE_TIMEOUT = 300;
 const FADE_DURATION = 200;
 
-export interface Canvas {
+export interface Canvas extends FocusState {
   readonly view: View;
   readonly layout: Map<Meta.Window, Box>;
   readonly normal: Map<Meta.Window, Box>;
@@ -68,9 +65,9 @@ export class Board implements BoardActions {
   private readonly collisions: Collisions;
   private readonly keys: BoardKeys;
   private readonly follower: Follower;
+  private readonly focus: Focus;
   private readonly canvases = new Map<Meta.Workspace, Canvas>();
   private presented: Canvas | null = null;
-  private readonly target: View = { x: 0, y: 0, scale: 1 };
   private readonly managerSignal: number;
   private settling = 0;
 
@@ -80,15 +77,28 @@ export class Board implements BoardActions {
   constructor(private readonly host: BoardHost) {
     this.backdrop = new Backdrop(host.createBackground, this.light);
     this.schemeSignal = this.interfaceSettings.connect('changed::color-scheme', () => this.backdrop.setLight(this.light));
-    this.camera = new Camera(shell().window_group, view => this.backdrop.update(view, this.camera.viewport));
-    this.pill = new CornerPill(() => host.openQuickSettings());
+    this.camera = new Camera(shell().window_group, view => {
+      this.backdrop.update(view, this.camera.viewport);
+      this.input.syncShield(true);
+    });
+    this.pill = new CornerPill(() => host.openQuickSettings(), () => this.overview());
     this.input = new BoardInput(this, this.backdrop.actor);
     this.collisions = new Collisions(() => this.presentedWorkspace(), () => this.camera.view.scale);
     this.keys = new BoardKeys(host.keybindings, this);
     this.follower = new Follower(this);
+    this.focus = new Focus({
+      camera: this.camera,
+      viewport: this.camera.viewport,
+      moving: () => this.collisions.window,
+      changed: entered => {
+        this.pill.showOverview(entered);
+        this.input.syncShield(!!this.presented);
+      },
+    });
     const uiGroup = shell().window_group.get_parent()!;
     uiGroup.insert_child_below(this.backdrop.actor, shell().window_group);
-    host.addChrome(this.pill.actor);
+    uiGroup.insert_child_above(this.input.shield, shell().window_group);
+    for (const actor of this.pill.actors) host.addChrome(actor);
     this.backdrop.build(host.monitors());
     const manager = shell().workspace_manager;
     this.managerSignal = manager.connect('active-workspace-changed', () => this.syncWorkspace());
@@ -205,7 +215,8 @@ export class Board implements BoardActions {
     canvas.layout.clear();
     for (const window of windows) canvas.layout.set(window, frameBox(window));
     const screens = new Map(windows.map(window => [window, screenBox(view, viewport, frameBox(window))]));
-    const fitted = windows.find(window => fits(view, frameBox(window), viewport, WINDOW_PADDING)) ?? null;
+    const entered = canvas.entered && !canvas.entered.minimized ? canvas.entered : null;
+    const fitted = entered ?? windows.find(window => fits(view, frameBox(window), viewport, WINDOW_PADDING)) ?? null;
     const plan = planExit([...canvas.layout], view, viewport, workArea, fitted);
     canvas.shown = false;
     this.present(null);
@@ -228,53 +239,48 @@ export class Board implements BoardActions {
   }
 
   fitAll(): void {
-    const workspace = this.presentedWorkspace();
-    if (!workspace) return;
-    const bounds = boundsOf(boardWindows(workspace).filter(window => !window.minimized).map(frameBox));
-    if (!bounds) return;
-    fitView(this.target, bounds, this.viewport, FIT_PADDING);
-    this.camera.animateTo(this.target, CAMERA_DURATION);
+    this.focus.release();
+    this.focus.fitAll();
   }
 
-  fitWindow(window: Meta.Window): void {
-    fitView(this.target, frameBox(window), this.viewport, WINDOW_PADDING);
-    this.camera.animateTo(this.target, CAMERA_DURATION);
-    window.activate(shell().get_current_time());
+  enteredWindow(): Meta.Window | null {
+    return this.focus.entered;
+  }
+
+  enterWindow(window: Meta.Window, from?: View): void {
+    const workspace = this.presentedWorkspace();
+    if (workspace && isBoardWindow(window) && window.located_on_workspace(workspace)) this.focus.enter(window, from);
+  }
+
+  enterFocused(): void {
+    const window = shell().display.focus_window;
+    if (window) this.enterWindow(window);
+  }
+
+  overview(): void {
+    this.focus.overview();
+  }
+
+  freeView(): void {
+    this.focus.release();
+  }
+
+  navigate(directionX: number, directionY: number): void {
+    this.focus.navigate(directionX, directionY);
   }
 
   reveal(window: Meta.Window): void {
-    const box = frameBox(window);
-    const view = this.camera.view;
-    const viewport = this.viewport;
-    const visibleWidth = viewport.width / view.scale - 2 * REVEAL_MARGIN / view.scale;
-    const visibleHeight = viewport.height / view.scale - 2 * REVEAL_MARGIN / view.scale;
-    if (box.width > visibleWidth || box.height > visibleHeight) {
-      fitView(this.target, box, viewport, WINDOW_PADDING);
-    } else {
-      copyView(this.target, view);
-      const margin = REVEAL_MARGIN / view.scale;
-      this.target.x = Math.min(Math.max(view.x, box.x + box.width + margin - viewport.width / view.scale), box.x - margin);
-      this.target.y = Math.min(Math.max(view.y, box.y + box.height + margin - viewport.height / view.scale), box.y - margin);
-    }
-    this.camera.animateTo(this.target, CAMERA_DURATION);
+    this.camera.reveal(frameBox(window), WINDOW_PADDING);
   }
 
-  panStep(directionX: number, directionY: number): void {
-    copyView(this.target, this.camera.view);
-    this.target.x += directionX * this.viewport.width / 3 / this.target.scale;
-    this.target.y += directionY * this.viewport.height / 3 / this.target.scale;
-    this.camera.animateTo(this.target, CAMERA_DURATION);
+  step(directionX: number, directionY: number): void {
+    if (this.focus.entered) this.focus.navigate(directionX, directionY);
+    else this.camera.panStep(directionX, directionY);
   }
 
   zoomStep(factor: number): void {
-    const { viewport } = this;
-    copyView(this.target, this.camera.view);
-    const centerX = this.target.x + viewport.width / 2 / this.target.scale;
-    const centerY = this.target.y + viewport.height / 2 / this.target.scale;
-    this.target.scale = clampScale(this.target.scale * factor);
-    this.target.x = centerX - viewport.width / 2 / this.target.scale;
-    this.target.y = centerY - viewport.height / 2 / this.target.scale;
-    this.camera.animateTo(this.target, CAMERA_DURATION);
+    this.focus.release();
+    this.camera.zoomStep(factor);
   }
 
   place(window: Meta.Window, canvas: Canvas): void {
@@ -283,15 +289,22 @@ export class Board implements BoardActions {
       .filter(other => other !== window && !other.minimized)
       .map(frameBox);
     const box = frameBox(window);
-    const centerX = view.x + this.viewport.width / 2 / view.scale;
-    const centerY = view.y + this.viewport.height / 2 / view.scale;
+    const beside = canvas.entered ? frameBox(canvas.entered) : null;
+    const centerX = beside ? beside.x + beside.width + PLACEMENT_GAP + box.width / 2 : view.x + this.viewport.width / 2 / view.scale;
+    const centerY = beside ? beside.y + beside.height / 2 : view.y + this.viewport.height / 2 / view.scale;
     const [x, y] = freeSpot(others, box.width, box.height, centerX, centerY);
     setUnconstrained(window, true);
     window.move_frame(false, x, y);
-    if (canvas === this.presented) this.reveal(window);
+    if (canvas !== this.presented) return;
+    if (canvas.entered) this.focus.shade(true);
+    else this.reveal(window);
   }
 
   release(window: Meta.Window, canvas: Canvas): void {
+    if (canvas.entered === window) {
+      if (canvas === this.presented) this.focus.overview();
+      else canvas.entered = canvas.overview = null;
+    }
     canvas.layout.delete(window);
     canvas.normal.delete(window);
     if (!window.get_workspace() || this.canvasOf(window.get_workspace())?.shown) return;
@@ -304,11 +317,13 @@ export class Board implements BoardActions {
 
   onCanvas(x: number, y: number): boolean {
     const actor = shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+    if (actor === this.input.shield) return !this.windowUnder(x, y);
     return !!actor && this.backdrop.actor.contains(actor);
   }
 
   windowAt(x: number, y: number): Meta.Window | null {
     let actor: Clutter.Actor | null = shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+    if (actor === this.input.shield) return this.windowUnder(x, y);
     while (actor && !(actor instanceof Meta.WindowActor)) actor = actor.get_parent();
     const window = actor ? (actor as Meta.WindowActor).meta_window : null;
     return window && isBoardWindow(window) ? window : null;
@@ -324,12 +339,14 @@ export class Board implements BoardActions {
 
   endMove(): void {
     this.collisions.end();
+    const entered = this.focus.entered;
+    if (entered) this.focus.enter(entered);
   }
 
   canvasFor(workspace: Meta.Workspace): Canvas {
     let canvas = this.canvases.get(workspace);
     if (!canvas) {
-      canvas = { view: { x: 0, y: 0, scale: 1 }, layout: new Map(), normal: new Map(), shown: false, known: false };
+      canvas = { view: { x: 0, y: 0, scale: 1 }, layout: new Map(), normal: new Map(), shown: false, known: false, entered: null, overview: null };
       this.canvases.set(workspace, canvas);
       this.follower.watch(workspace, canvas);
     }
@@ -349,11 +366,24 @@ export class Board implements BoardActions {
     this.interfaceSettings.disconnect(this.schemeSignal);
     if (this.settling) GLib.Source.remove(this.settling);
     this.present(null);
+    this.focus.destroy();
     this.follower.destroy();
     this.collisions.destroy();
     this.keys.destroy();
     this.pill.destroy();
     this.backdrop.destroy();
+  }
+
+  private windowUnder(x: number, y: number): Meta.Window | null {
+    const workspace = this.presentedWorkspace();
+    if (!workspace) return null;
+    const { view, viewport } = this.camera;
+    const canvasX = view.x + (x - viewport.x) / view.scale;
+    const canvasY = view.y + (y - viewport.y) / view.scale;
+    return boardWindows(workspace).find(window => {
+      const { x: left, y: top, width, height } = window.get_frame_rect();
+      return !window.minimized && canvasX >= left && canvasX < left + width && canvasY >= top && canvasY < top + height;
+    }) ?? null;
   }
 
   private layOut(workspace: Meta.Workspace, canvas: Canvas): void {
@@ -430,12 +460,13 @@ export class Board implements BoardActions {
     if (previous && previous !== canvas) copyView(previous.view, this.camera.view);
     this.collisions.end();
     this.presented = canvas;
+    this.focus.detach();
     if (!canvas) {
       if (!previous) return;
       this.camera.release();
       this.backdrop.actor.remove_transition('opacity');
       this.backdrop.actor.hide();
-      this.pill.actor.hide();
+      this.pill.setShown(false);
       this.host.wallpaper.show();
       this.setDesktopWindowsVisible(true);
       this.host.setPanelsHidden(false);
@@ -443,7 +474,9 @@ export class Board implements BoardActions {
       this.host.changed();
       return;
     }
-    this.viewportFor();
+    const viewport = this.viewportFor();
+    this.input.shield.set_position(viewport.x, viewport.y);
+    this.input.shield.set_size(viewport.width, viewport.height);
     this.camera.engage(canvas.view);
     this.backdrop.actor.show();
     this.backdrop.actor.opacity = 255;
@@ -452,10 +485,11 @@ export class Board implements BoardActions {
     this.host.setPanelsHidden(true);
     const primary = this.host.primary();
     if (primary) {
-      this.pill.actor.show();
+      this.pill.setShown(true);
       this.pill.place(primary);
     }
     this.keys.engage();
+    this.focus.attach(canvas, shell().workspace_manager.get_active_workspace());
     this.host.changed();
   }
 

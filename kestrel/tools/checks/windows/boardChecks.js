@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import {board as currentBoard} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
+import {checkBoardFocus} from './boardFocusChecks.js';
 import {touchpad} from './touchpad.js';
 
 const WINDOWS = [['Notes', 720, 460], ['Inbox', 640, 520], ['Music', 560, 380], ['Files', 800, 500]];
@@ -75,25 +76,9 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
     const [anchorX, anchorY] = screenPoint(board.camera.view, viewport, ...anchor);
     require(Math.abs(anchorX - focusX) < 0.5 && Math.abs(anchorY - focusY) < 0.5, 'pinching zooms around the fingers');
 
-    const notes = named('Notes');
-    board.fitWindow(notes);
-    await pause(SETTLE);
     board.fitAll();
     await pause(SETTLE);
     const zoomed = board.camera.view;
-    const frame = notes.get_frame_rect();
-    const [entryX, entryY] = screenPoint(zoomed, viewport, frame.x + 80, frame.y + 52);
-    pointer.notify_absolute_motion(GLib.get_monotonic_time(), entryX, entryY);
-    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
-    pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.RELEASED);
-    await pause(250);
-    for (const key of 'hi') {
-      keyboard.notify_keyval(GLib.get_monotonic_time(), key.charCodeAt(0), Clutter.KeyState.PRESSED);
-      keyboard.notify_keyval(GLib.get_monotonic_time(), key.charCodeAt(0), Clutter.KeyState.RELEASED);
-    }
-    await pause(300);
-    require(global.display.focus_window === notes && notes.get_title() === 'Notes: hi',
-      `clicks and typing reach a window shown at ${Math.round(zoomed.scale * 100)}%`);
 
     const inbox = named('Inbox');
     const start = inbox.get_frame_rect();
@@ -136,16 +121,19 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
     await superDrag(music, (target.x - source.x) * scale, (target.y - source.y) * scale);
     require(noOverlap() && !files.get_frame_rect().equal(filesBefore), 'dropping a window onto another pushes it aside');
 
+    await checkBoardFocus({board, named, windows, fixture, pointer, keyboard, pause, capture, output, require});
+
     const layout = new Map(windows().map(window => [window, window.get_frame_rect()]));
-    board.fitWindow(named('Files'));
+    board.enterWindow(named('Files'));
     await pause(SETTLE);
+    require(board.enteredWindow() === named('Files'), 'a window can be entered right before leaving the board');
     const filling = view();
     board.input.handle(touchpad.swipe('begin', 4));
     board.input.handle(touchpad.swipe('update', 4, 0, 30));
     board.input.handle(touchpad.swipe('end', 4));
     await pause(SETTLE);
-    require(!board.shown && group.scale_x === 1, 'a four-finger swipe down leaves the board');
-    require(named('Files').is_maximized(), 'the window that filled the view is maximized');
+    require(!board.shown && group.scale_x === 1, 'a four-finger swipe down leaves the board even with a window entered');
+    require(named('Files').is_maximized(), 'the entered window is maximized');
     require(windows().filter(window => window !== named('Files')).every(window => window.minimized), 'windows outside the view are minimized');
     require(windows().every(window => !window.unconstrained), 'windows are kept on screen again');
     await capture(`${output}/board-exit-maximized.png`);

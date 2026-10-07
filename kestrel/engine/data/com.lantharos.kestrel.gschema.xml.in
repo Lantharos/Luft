@@ -358,6 +358,10 @@
       <default>["&lt;Super&gt;minus","&lt;Super&gt;KP_Subtract"]</default>
       <summary>Zoom out of the board</summary>
     </key>
+    <key name="board-enter-window" type="as">
+      <default>["&lt;Super&gt;Return","&lt;Super&gt;KP_Enter"]</default>
+      <summary>Enter the focused window on the board</summary>
+    </key>
     <key name="system-monitor" type="as">
       <default>["&lt;Control&gt;&lt;Shift&gt;Escape"]</default>
       <summary>Open the system monitor</summary>

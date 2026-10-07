@@ -29,6 +29,9 @@
 	<KeyListEntry name="board-zoom-out"
                       description="Zoom out of the board"/>
 
+	<KeyListEntry name="board-enter-window"
+                      description="Enter the focused window on the board"/>
+
 	<KeyListEntry name="system-monitor"
                       description="Open the system monitor to see what's running"/>
 

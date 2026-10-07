@@ -27,6 +27,7 @@
 	import Shortcuts from '#lib/shell/Shortcuts.svelte';
 	import Toast from '#lib/shell/Toast.svelte';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
+	import CheckMail from '#lib/shell/CheckMail.svelte';
 	import Header from '#lib/shell/Header.svelte';
 	import Welcome from '#lib/shell/Welcome.svelte';
 	import Sidebar from '#lib/sidebar/Sidebar.svelte';
@@ -42,7 +43,8 @@
 	let settings = $state(false);
 	let adding = $state(false);
 	let shortcuts = $state(false);
-	let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+	let refreshing = false;
+	let refreshAgain = false;
 
 	let wide = $derived(width >= WIDE_WINDOW);
 	let showList = $derived(wide || reader.thread === null);
@@ -100,10 +102,19 @@
 	}
 
 	function scheduleRefresh() {
-		refreshTimer ??= setTimeout(() => {
-			refreshTimer = undefined;
-			void refreshAll();
-		}, REFRESH_DELAY);
+		if (refreshing) {
+			refreshAgain = true;
+			return;
+		}
+		refreshing = true;
+		void refreshAll().finally(() =>
+			setTimeout(() => {
+				refreshing = false;
+				if (!refreshAgain) return;
+				refreshAgain = false;
+				scheduleRefresh();
+			}, REFRESH_DELAY)
+		);
 	}
 
 	async function drop(event: WindowFileDragEvent) {
@@ -149,6 +160,11 @@
 					{#snippet leading()}
 						{#if !wide && reader.thread !== null}
 							<button type="button" class="icon-button" aria-label="Back" onclick={() => reader.close()} {@attach tooltip('Back (Esc)')}><ArrowLeft size={18} /></button>
+						{/if}
+					{/snippet}
+					{#snippet tools()}
+						{#if mail.accounts.length && showList}
+							<CheckMail />
 						{/if}
 					{/snippet}
 					{#snippet actions()}

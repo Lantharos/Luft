@@ -4,6 +4,7 @@ mod jmap;
 pub mod ops;
 mod remote;
 mod schedule;
+mod wake;
 mod worker;
 
 use std::collections::{HashMap, HashSet};
@@ -15,9 +16,9 @@ use parking_lot::Mutex;
 
 use crate::accounts::{Account, Credentials, Login, Protocol};
 use crate::services::notify::Notifier;
-use crate::store::{Role, Store};
+use crate::store::Store;
 pub use ops::{Operation, Target};
-use worker::Job;
+use worker::{Job, Queue};
 
 #[derive(Clone)]
 pub struct Shared {
@@ -29,9 +30,9 @@ pub struct Shared {
 }
 
 struct Running {
-    jobs: Sender<Job>,
+    queue: Queue,
     bodies: Sender<i64>,
-    _push: remote::Push,
+    push: remote::Push,
 }
 
 #[derive(Clone)]
@@ -59,45 +60,29 @@ impl Engine {
             self.add(account);
         }
         schedule::start(self.clone());
+        wake::start(self.clone());
     }
 
     pub fn add(&self, account: Account) {
         let id = account.id;
-        let jobs = worker::spawn(account.clone(), self.shared.clone());
+        let queue = worker::spawn(account.clone(), self.shared.clone());
         let bodies = fetcher::spawn(account.clone(), self.shared.clone());
-        let push = self.push(&account, jobs.clone());
+        let push = self.push(account, queue.arrivals());
         self.running.lock().insert(
             id,
             Running {
-                jobs,
+                queue,
                 bodies,
-                _push: push,
+                push,
             },
         );
     }
 
-    fn push(&self, account: &Account, jobs: Sender<Job>) -> remote::Push {
+    fn push(&self, account: Account, arrived: impl Fn() + Send + 'static) -> remote::Push {
         let credentials = self.shared.credentials.clone();
-        match &account.config.protocol {
-            Protocol::Imap { .. } => {
-                let inbox = self
-                    .shared
-                    .store
-                    .mailbox_with_role(account.id, Role::Inbox)
-                    .ok()
-                    .flatten();
-                let (remote, id) = inbox
-                    .map(|inbox| (inbox.remote, Some(inbox.id)))
-                    .unwrap_or(("INBOX".into(), None));
-                imap::idle::watch(account.clone(), credentials, remote, move || {
-                    let _ = jobs.send(id.map(Job::Mailbox).unwrap_or(Job::Sync));
-                })
-            }
-            Protocol::Jmap { session } => {
-                jmap::push::watch(session.clone(), account.clone(), credentials, move || {
-                    let _ = jobs.send(Job::Sync);
-                })
-            }
+        match account.config.protocol.clone() {
+            Protocol::Imap { .. } => imap::idle::watch(account, credentials, arrived),
+            Protocol::Jmap { session } => jmap::push::watch(session, account, credentials, arrived),
         }
     }
 
@@ -107,13 +92,14 @@ impl Engine {
 
     fn post(&self, account: i64, job: Job) {
         if let Some(running) = self.running.lock().get(&account) {
-            let _ = running.jobs.send(job);
+            running.queue.post(job);
         }
     }
 
-    pub fn sync_all(&self) {
+    pub fn refresh(&self) {
         for running in self.running.lock().values() {
-            let _ = running.jobs.send(Job::Sync);
+            running.push.kick();
+            running.queue.refresh();
         }
     }
 

@@ -7,10 +7,11 @@
 		subtitle?: string | null;
 		width?: number | null;
 		leading?: Snippet;
+		tools?: Snippet;
 		actions?: Snippet;
 	}
 
-	let { title, subtitle, width = null, leading, actions }: Props = $props();
+	let { title, subtitle, width = null, leading, tools, actions }: Props = $props();
 </script>
 
 <header class="drag-region header">
@@ -22,6 +23,9 @@
 				<p class="truncate text-[12px] text-[var(--text-muted)]">{subtitle}</p>
 			{/if}
 		</div>
+		{#if tools}
+			<div class="ml-auto flex flex-none items-center">{@render tools()}</div>
+		{/if}
 	</div>
 	<div class="flex min-w-0 flex-1 items-center justify-end gap-1 pr-2">
 		{@render actions?.()}

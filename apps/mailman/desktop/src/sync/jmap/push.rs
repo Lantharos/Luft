@@ -1,13 +1,13 @@
-use std::io::BufRead;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use crate::accounts::{Account, Credentials};
 use crate::protocols::jmap::{self, Client};
+use crate::protocols::sse::EventStream;
 use crate::store::now;
-use crate::sync::remote::{Push, pause, renewal, signed_in};
+use crate::sync::remote::{Backoff, Push, Watch, renewal, signed_in};
 
-const RECONNECT_AFTER: Duration = Duration::from_secs(30);
+const SILENCE: Duration = Duration::from_secs(jmap::PING * 2 + 15);
+const POLL_WITHOUT_PUSH: Duration = Duration::from_secs(2 * 60);
 
 struct Source {
     url: String,
@@ -15,27 +15,27 @@ struct Source {
     renew_at: Option<i64>,
 }
 
-fn listen(source: &Source, stop: &AtomicBool, changed: &dyn Fn()) -> Result<(), String> {
-    let response = ureq::get(&source.url)
-        .header("Authorization", &source.authorization)
-        .header("Accept", "text/event-stream")
-        .call()
-        .map_err(|error| error.to_string())?;
-    let reader = std::io::BufReader::new(response.into_body().into_reader());
-    let mut event = String::new();
-    for line in reader.lines() {
-        let renewing = source.renew_at.is_some_and(|renew_at| renew_at <= now());
-        if stop.load(Ordering::Relaxed) || renewing {
+fn listen(
+    source: &Source,
+    watch: &Watch,
+    backoff: &mut Backoff,
+    changed: &dyn Fn(),
+) -> Result<(), String> {
+    let mut events = EventStream::open(&source.url, &source.authorization, SILENCE)?;
+    if !watch.attach(events.handle()?) {
+        return Ok(());
+    }
+    backoff.reset();
+    changed();
+    loop {
+        let event = events.next()?;
+        if source.renew_at.is_some_and(|renew_at| renew_at <= now()) {
             return Ok(());
         }
-        let line = line.map_err(|error| error.to_string())?;
-        if let Some(name) = line.strip_prefix("event:") {
-            event = name.trim().to_owned();
-        } else if line.starts_with("data:") && event == "state" {
+        if event == "state" {
             changed();
         }
     }
-    Err("The server closed the event stream".into())
 }
 
 fn open(
@@ -55,27 +55,33 @@ fn open(
     }))
 }
 
+fn poll(watch: &Watch, changed: &dyn Fn()) {
+    while watch.rest(POLL_WITHOUT_PUSH) {
+        changed();
+    }
+}
+
 pub fn watch(
     session: String,
     account: Account,
     credentials: Credentials,
     changed: impl Fn() + Send + 'static,
 ) -> Push {
-    Push::spawn(format!("push-{}", account.id), move |stop| {
-        let mut resumed = false;
-        while !stop.load(Ordering::Relaxed) {
-            match open(&session, &account, &credentials) {
-                Ok(None) => return,
-                Ok(Some(source)) => {
-                    if resumed {
-                        changed();
-                    }
-                    resumed = true;
-                    if listen(&source, stop, &changed).is_err() {
-                        pause(stop, RECONNECT_AFTER);
-                    }
-                }
-                Err(_) => pause(stop, RECONNECT_AFTER),
+    Push::spawn(format!("push-{}", account.id), move |watch| {
+        let mut backoff = Backoff::default();
+        loop {
+            let ended = match open(&session, &account, &credentials) {
+                Ok(None) => return poll(watch, &changed),
+                Ok(Some(source)) => listen(&source, watch, &mut backoff, &changed),
+                Err(error) => Err(error),
+            };
+            watch.detach();
+            let wait = match ended {
+                Ok(()) => Duration::ZERO,
+                Err(_) => backoff.next(),
+            };
+            if !watch.rest(wait) {
+                return;
             }
         }
     })

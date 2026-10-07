@@ -1,6 +1,7 @@
 import * as api from '#lib/api/index.js';
 import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, Status } from '#lib/api/index.js';
 
+const CHECK_FEEDBACK = 700;
 const EMPTY_COUNTS: Counts = { inbox: 0, screener: 0, later: 0, drafts: 0, newsletter: 0, receipt: 0, notification: 0, mailboxes: [] };
 
 class MailState {
@@ -12,6 +13,9 @@ class MailState {
 	oauth = $state<Provider[]>([]);
 	status = $state<Record<number, Status>>({});
 	ready = $state(false);
+	syncing = $derived(Object.values(this.status).some((status) => status.state === 'syncing'));
+	private requested = $state(false);
+	checking = $derived(this.requested || this.syncing);
 
 	private unread = $derived(new Map(this.counts.mailboxes));
 	private refreshing: Promise<void> | null = null;
@@ -63,6 +67,13 @@ class MailState {
 		const own = this.identitiesOf(account);
 		return own.find((identity) => identity.preferred) ?? own[0];
 	}
+
+	checkNow = () => {
+		if (this.requested) return;
+		this.requested = true;
+		void api.syncNow();
+		setTimeout(() => (this.requested = false), CHECK_FEEDBACK);
+	};
 
 	receiveStatus = (status: Status) => {
 		this.status = { ...this.status, [status.account]: status };

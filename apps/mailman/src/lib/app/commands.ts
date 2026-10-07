@@ -1,11 +1,9 @@
-import * as api from '#lib/api/index.js';
 import { composer } from '#lib/compose/composer.svelte.js';
 import * as actions from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
 import { reader } from '#lib/reader/reader.svelte.js';
-import { toasts } from '#lib/shell/toasts.svelte.js';
 import { navigate, openThread } from './navigation';
 
 export interface Command {
@@ -87,7 +85,7 @@ export function commands(shell: Shell): Command[] {
 		...views,
 		...folders,
 		...moves,
-		{ id: 'sync', title: 'Check for new mail', keys: 'Shift R', run: () => void api.syncNow().then(() => toasts.show('Checking for mail')) },
+		{ id: 'sync', title: 'Check for new mail', keys: 'F5', run: mail.checkNow },
 		{ id: 'settings', title: 'Settings', keys: 'Ctrl ,', run: shell.openSettings },
 		{ id: 'add-account', title: 'Add an account', run: shell.addAccount },
 		{ id: 'toggle-screener', title: mail.settings.screener ? 'Turn off the Screener' : 'Turn on the Screener', run: () => void mail.updateSettings({ screener: !mail.settings.screener }).then(list.load) },

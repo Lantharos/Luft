@@ -1,17 +1,19 @@
 use std::collections::VecDeque;
-use std::time::Duration;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{Duration, Instant};
 
-use crossbeam_channel::{Receiver, RecvTimeoutError, Sender, TryRecvError};
+use crossbeam_channel::{Receiver, Sender, TryRecvError, select};
 use serde::Serialize;
 
 use super::Shared;
 use super::ops::Operation;
 use super::remote::{self, Connection, Context, Remote};
-use crate::accounts::Account;
+use crate::accounts::{Account, Protocol};
 use crate::events::{CHANGED, IDENTITIES, OUTBOX, STATUS};
 use crate::mail::{envelope, render};
 use crate::store::Store;
-use crate::store::{Fetched, Mailbox, Outgoing, Role, now};
+use crate::store::{Fetched, Inserted, Mailbox, Outgoing, Role, now};
 
 const POLL: Duration = Duration::from_secs(5 * 60);
 const PREFETCH_BATCH: usize = 25;
@@ -21,9 +23,43 @@ const GIVE_UP_AFTER: i64 = 5;
 
 pub enum Job {
     Sync,
+    Refresh,
+    Arrived,
     Mailbox(i64),
     Flush,
     Send(Outgoing),
+}
+
+impl Job {
+    fn repeatable(&self) -> bool {
+        !matches!(self, Self::Send(_))
+    }
+}
+
+#[derive(Clone)]
+pub struct Queue {
+    jobs: Sender<Job>,
+    arrivals: Sender<()>,
+    refreshing: Arc<AtomicBool>,
+}
+
+impl Queue {
+    pub fn post(&self, job: Job) {
+        let _ = self.jobs.send(job);
+    }
+
+    pub fn refresh(&self) {
+        if !self.refreshing.swap(true, Ordering::AcqRel) {
+            self.post(Job::Refresh);
+        }
+    }
+
+    pub fn arrivals(&self) -> impl Fn() + Send + 'static {
+        let arrivals = self.arrivals.clone();
+        move || {
+            let _ = arrivals.try_send(());
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -41,32 +77,44 @@ struct OutboxEvent {
     error: Option<String>,
 }
 
-pub fn spawn(account: Account, shared: Shared) -> Sender<Job> {
-    let (sender, receiver) = crossbeam_channel::unbounded();
+pub fn spawn(account: Account, shared: Shared) -> Queue {
+    let (jobs, queued) = crossbeam_channel::unbounded();
+    let (arrivals, arrived) = crossbeam_channel::bounded(1);
+    let refreshing = Arc::new(AtomicBool::new(false));
+    let worker = Worker {
+        account,
+        shared,
+        queued,
+        arrived,
+        refreshing: refreshing.clone(),
+        connection: None,
+        prefetch: VecDeque::new(),
+        backfill: VecDeque::new(),
+        backfilling: false,
+        poll_at: Instant::now() + POLL,
+    };
     std::thread::Builder::new()
-        .name(format!("account-{}", account.id))
-        .spawn(move || {
-            Worker {
-                account,
-                shared,
-                connection: None,
-                prefetch: VecDeque::new(),
-                backfill: VecDeque::new(),
-                backfilling: false,
-            }
-            .run(receiver)
-        })
+        .name(format!("account-{}", worker.account.id))
+        .spawn(move || worker.run())
         .ok();
-    sender
+    Queue {
+        jobs,
+        arrivals,
+        refreshing,
+    }
 }
 
 struct Worker {
     account: Account,
     shared: Shared,
+    queued: Receiver<Job>,
+    arrived: Receiver<()>,
+    refreshing: Arc<AtomicBool>,
     connection: Option<Connection>,
     prefetch: VecDeque<Mailbox>,
     backfill: VecDeque<i64>,
     backfilling: bool,
+    poll_at: Instant,
 }
 
 fn order(mailbox: &Mailbox) -> u8 {
@@ -82,13 +130,14 @@ fn order(mailbox: &Mailbox) -> u8 {
 }
 
 impl Worker {
-    fn run(mut self, jobs: Receiver<Job>) {
+    fn run(mut self) {
         let mut next = Some(Job::Sync);
         loop {
             let job = match next.take() {
                 Some(job) => job,
+                None if self.arrived.try_recv().is_ok() => Job::Arrived,
                 None if !self.prefetch.is_empty() || !self.backfill.is_empty() => {
-                    match jobs.try_recv() {
+                    match self.queued.try_recv() {
                         Ok(job) => job,
                         Err(TryRecvError::Empty) => {
                             self.idle_step();
@@ -97,11 +146,20 @@ impl Worker {
                         Err(TryRecvError::Disconnected) => return,
                     }
                 }
-                None => match jobs.recv_timeout(POLL) {
-                    Ok(job) => job,
-                    Err(RecvTimeoutError::Timeout) => Job::Sync,
-                    Err(RecvTimeoutError::Disconnected) => return,
-                },
+                None => {
+                    let wait = self.poll_at.saturating_duration_since(Instant::now());
+                    select! {
+                        recv(self.arrived) -> arrival => match arrival {
+                            Ok(()) => Job::Arrived,
+                            Err(_) => return,
+                        },
+                        recv(self.queued) -> job => match job {
+                            Ok(job) => job,
+                            Err(_) => return,
+                        },
+                        default(wait) => Job::Sync,
+                    }
+                }
             };
             self.handle(job);
         }
@@ -135,15 +193,29 @@ impl Worker {
     }
 
     fn handle(&mut self, job: Job) {
-        let result = match job {
-            Job::Sync => self.sync_all(),
-            Job::Mailbox(id) => self.sync_one(id),
-            Job::Flush => self.flush(),
-            Job::Send(outgoing) => self.send(outgoing),
-        };
+        if matches!(job, Job::Refresh) {
+            self.refreshing.store(false, Ordering::Release);
+            self.connection = None;
+        }
+        let reused = self.connection.is_some();
+        let mut result = self.perform(&job);
+        if result.is_err() && reused && job.repeatable() {
+            self.connection = None;
+            result = self.perform(&job);
+        }
         match result {
             Ok(()) => self.status("ready", None),
             Err(error) => self.fail(error),
+        }
+    }
+
+    fn perform(&mut self, job: &Job) -> Result<(), String> {
+        match job {
+            Job::Sync | Job::Refresh => self.sync_all(),
+            Job::Arrived => self.sync_arrivals(),
+            Job::Mailbox(id) => self.sync_one(*id),
+            Job::Flush => self.flush(),
+            Job::Send(outgoing) => self.send(outgoing),
         }
     }
 
@@ -154,8 +226,19 @@ impl Worker {
         let store = self.shared.store.clone();
         let account = self.account.clone();
         let events = self.shared.events.clone();
+        let notifier = self.shared.notifier.clone();
         let changed = move || {
             events.emit(CHANGED, account.id);
+        };
+        let arrived = |mailbox: &Mailbox, inserted: &[Inserted]| {
+            if mailbox.role != Some(Role::Inbox) || inserted.is_empty() {
+                return;
+            }
+            let since = (now() - NOTIFY_WINDOW).max(account.added);
+            let ids: Vec<i64> = inserted.iter().map(|message| message.id).collect();
+            if let Ok(notable) = store.notable(&ids, since) {
+                notifier.new_mail(&notable);
+            }
         };
         let account = self.account.clone();
         let remote = self.connect()?;
@@ -163,13 +246,42 @@ impl Worker {
             store: &store,
             account: &account,
             changed: &changed,
+            arrived: &arrived,
         };
         work(remote.as_mut(), &context)
     }
 
     fn sync_all(&mut self) -> Result<(), String> {
+        self.poll_at = Instant::now() + POLL;
         self.status("syncing", None);
         self.flush()?;
+        for mailbox in self.folders()? {
+            self.sync_mailbox(&mailbox)?;
+            if self.arrived.try_recv().is_ok() {
+                self.sync_arrivals()?;
+            }
+        }
+        self.shared.store.optimize()
+    }
+
+    fn sync_arrivals(&mut self) -> Result<(), String> {
+        self.flush()?;
+        let watched = match self.account.config.protocol {
+            Protocol::Imap { .. } => self
+                .shared
+                .store
+                .mailbox_with_role(self.account.id, Role::Inbox)?
+                .into_iter()
+                .collect(),
+            Protocol::Jmap { .. } => self.folders()?,
+        };
+        for mailbox in watched {
+            self.sync_mailbox(&mailbox)?;
+        }
+        Ok(())
+    }
+
+    fn folders(&mut self) -> Result<Vec<Mailbox>, String> {
         let mut mailboxes = self.with_remote(|remote, context| remote.folders(context))?;
         if self.with_remote(|remote, context| remote.identities(context))? {
             self.shared.events.emit(IDENTITIES, self.account.id);
@@ -177,10 +289,7 @@ impl Worker {
         mailboxes.retain(|mailbox| mailbox.selectable);
         mailboxes.sort_by_key(order);
         self.changed();
-        for mailbox in mailboxes {
-            self.sync_mailbox(&mailbox)?;
-        }
-        self.shared.store.optimize()
+        Ok(mailboxes)
     }
 
     fn sync_one(&mut self, id: i64) -> Result<(), String> {
@@ -192,15 +301,8 @@ impl Worker {
     }
 
     fn sync_mailbox(&mut self, mailbox: &Mailbox) -> Result<(), String> {
-        let inserted = self.with_remote(|remote, context| remote.sync(context, mailbox))?;
+        self.with_remote(|remote, context| remote.sync(context, mailbox))?;
         self.queue_backfill(mailbox.id)?;
-        if mailbox.role == Some(Role::Inbox) && !inserted.is_empty() {
-            let since = (now() - NOTIFY_WINDOW).max(self.account.added);
-            let ids: Vec<i64> = inserted.iter().map(|message| message.id).collect();
-            self.shared
-                .notifier
-                .new_mail(&self.shared.store.notable(&ids, since)?);
-        }
         if !self.prefetch.iter().any(|queued| queued.id == mailbox.id) {
             self.prefetch.push_back(mailbox.clone());
         }
@@ -308,10 +410,10 @@ impl Worker {
         }
     }
 
-    fn send(&mut self, outgoing: Outgoing) -> Result<(), String> {
+    fn send(&mut self, outgoing: &Outgoing) -> Result<(), String> {
         let id = outgoing.id;
-        let sent = self.with_remote(|remote, context| remote.send(context, &outgoing));
-        let settled = self.settle(&outgoing, sent);
+        let sent = self.with_remote(|remote, context| remote.send(context, outgoing));
+        let settled = self.settle(outgoing, sent);
         self.shared.sending.lock().remove(&id);
         settled
     }

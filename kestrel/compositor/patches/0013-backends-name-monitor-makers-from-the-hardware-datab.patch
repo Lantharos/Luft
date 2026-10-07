@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 3 Oct 2026 14:57:14 +0200
-Subject: [PATCH 13/19] backends: name monitor makers from the hardware
+Subject: [PATCH 13/21] backends: name monitor makers from the hardware
  database instead of gnome-desktop
 
 systemd's hardware database already carries the PNP vendor registry, so

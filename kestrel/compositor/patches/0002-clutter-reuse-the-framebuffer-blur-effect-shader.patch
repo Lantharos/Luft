@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Fri, 25 Sep 2026 01:05:33 +0200
-Subject: [PATCH 02/19] clutter: reuse the framebuffer blur effect shader
+Subject: [PATCH 02/21] clutter: reuse the framebuffer blur effect shader
 
 ---
  clutter/clutter/clutter-paint-nodes.c | 10 +++++-----

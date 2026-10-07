@@ -1,0 +1,702 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 7 Oct 2026 21:45:27 +0200
+Subject: [PATCH 20/21] x11: let the shell keep X11 windows on the X screen of
+ a panned canvas
+
+A shell that pans and zooms windows on a canvas larger than the monitors
+moves X11 windows far outside the X screen. The X server keeps its
+pointer on the screen, so clicks on those windows land at the screen's
+edge, and window positions beyond 32767 do not fit in the protocol.
+
+The shell can now move the X screen's origin among the windows. X11
+windows get X positions relative to it: configuring windows and their
+frames, configure requests and notifies, move and resize messages, size
+hint positions, override-redirect windows and drag and drop positions
+all go through it, and moving the origin moves every X11 window on the
+X server and tells its client. Window menus requested in window
+coordinates and move and resize requests from X11 clients also follow
+the window group's transform.
+---
+ src/compositor/meta-window-actor-private.h |   4 +
+ src/compositor/meta-window-actor.c         |  24 ++++
+ src/core/display-private.h                 |   2 +
+ src/core/display.c                         |  39 +++++++
+ src/core/keybindings.c                     |   3 +-
+ src/core/window-private.h                  |  34 ++++++
+ src/core/window.c                          |  92 +++++++++++++++
+ src/meta/display.h                         |   5 +
+ src/wayland/meta-wayland-xdg-shell.c       |   6 +-
+ src/wayland/meta-xwayland-dnd.c            |  14 ++-
+ src/x11/meta-x11-frame.c                   |  18 +--
+ src/x11/window-props.c                     |   8 +-
+ src/x11/window-x11.c                       | 130 ++++++++++++++-------
+ src/x11/window-x11.h                       |   1 +
+ 14 files changed, 316 insertions(+), 64 deletions(-)
+
+diff --git a/src/compositor/meta-window-actor-private.h b/src/compositor/meta-window-actor-private.h
+index 3479b3fa779dbfcb78d689ce93f21da019cf0ada..10fffc48aaceac66ab931b14aa4926706421a4af 100644
+--- a/src/compositor/meta-window-actor-private.h
++++ b/src/compositor/meta-window-actor-private.h
+@@ -97,6 +97,10 @@ void meta_window_actor_stage_to_window_space (MetaWindowActor *window_actor,
+                                               float           *x,
+                                               float           *y);
+ 
++void meta_window_actor_window_to_stage_space (MetaWindowActor *window_actor,
++                                              float           *x,
++                                              float           *y);
++
+ META_EXPORT_TEST
+ MetaWindowActor *meta_window_actor_from_actor (ClutterActor *actor);
+ 
+diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
+index 413f28107a1308cc987f4977ebf500e9b2c933ba..d79dfb694a65105e917e8ae4463bb0d19b228292 100644
+--- a/src/compositor/meta-window-actor.c
++++ b/src/compositor/meta-window-actor.c
+@@ -1320,6 +1320,30 @@ meta_window_actor_stage_to_window_space (MetaWindowActor *window_actor,
+   *y = point.y;
+ }
+ 
++void
++meta_window_actor_window_to_stage_space (MetaWindowActor *window_actor,
++                                         float           *x,
++                                         float           *y)
++{
++  ClutterActor *window_group =
++    clutter_actor_get_parent (CLUTTER_ACTOR (window_actor));
++  ClutterActor *stage = clutter_actor_get_stage (CLUTTER_ACTOR (window_actor));
++  graphene_matrix_t group_to_stage;
++  graphene_point3d_t point = GRAPHENE_POINT3D_INIT (*x, *y, 0.f);
++
++  if (!window_group || !stage)
++    return;
++
++  clutter_actor_get_relative_transformation_matrix (window_group, stage,
++                                                    &group_to_stage);
++  if (graphene_matrix_is_identity (&group_to_stage))
++    return;
++
++  graphene_matrix_transform_point3d (&group_to_stage, &point, &point);
++  *x = point.x;
++  *y = point.y;
++}
++
+ void
+ meta_window_actor_set_geometry_scale (MetaWindowActor *window_actor,
+                                       int              geometry_scale)
+diff --git a/src/core/display-private.h b/src/core/display-private.h
+index 94601581815bc53c91fbe63f88e31bf8e4e9ff6a..117c85c2cbd715a1182db51d1f468c68be45232c 100644
+--- a/src/core/display-private.h
++++ b/src/core/display-private.h
+@@ -72,6 +72,8 @@ struct _MetaDisplay
+   GObject parent_instance;
+ 
+   MetaX11Display *x11_display;
++  int x11_origin_x;
++  int x11_origin_y;
+ 
+   int clutter_event_filter;
+ 
+diff --git a/src/core/display.c b/src/core/display.c
+index 45b860eb8e62c9c82b59ea710397e8a62019610b..5a0100d5b783ced65bb03bb5b7d3b33b82c5a734 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -1834,6 +1834,45 @@ meta_display_list_all_windows (MetaDisplay *display)
+   return all_windows;
+ }
+ 
++/**
++ * meta_display_set_x11_origin:
++ * @display: a #MetaDisplay
++ * @x: horizontal position of the X screen's origin
++ * @y: vertical position of the X screen's origin
++ *
++ * Sets where the X screen's origin lies among the windows. X11 windows get
++ * their X server positions relative to it, so a shell that lays windows out
++ * on a canvas larger than the monitors can keep the X11 windows it shows on
++ * the X screen, where the X server can reach them with the pointer.
++ */
++void
++meta_display_set_x11_origin (MetaDisplay *display,
++                             int          x,
++                             int          y)
++{
++  if (display->x11_origin_x == x && display->x11_origin_y == y)
++    return;
++
++  display->x11_origin_x = x;
++  display->x11_origin_y = y;
++
++#ifdef HAVE_XWAYLAND
++  g_autoptr (GSList) windows = meta_display_list_windows (display,
++                                                          META_LIST_DEFAULT);
++
++  for (GSList *l = windows; l; l = l->next)
++    {
++      MetaWindow *window = l->data;
++
++      if (window->client_type == META_WINDOW_CLIENT_TYPE_X11)
++        meta_window_x11_sync_origin (window);
++    }
++
++  if (display->x11_display)
++    XFlush (display->x11_display->xdisplay);
++#endif
++}
++
+ /**
+  * meta_display_get_tab_list:
+  * @display: a #MetaDisplay
+diff --git a/src/core/keybindings.c b/src/core/keybindings.c
+index aa0ff5d654ad37a3e21a51b74636c5d9b423faa9..3fac255088c0ac30e5e2c4547c4a4ed06f1a68be 100644
+--- a/src/core/keybindings.c
++++ b/src/core/keybindings.c
+@@ -2014,7 +2014,8 @@ handle_activate_window_menu (MetaDisplay           *display,
+         x += child_rect.width;
+ 
+       y = frame_rect.y + child_rect.y;
+-      meta_window_show_menu (display->focus_window, META_WINDOW_MENU_WM, x, y);
++      meta_window_show_menu_at_window_point (display->focus_window,
++                                             META_WINDOW_MENU_WM, x, y);
+     }
+ }
+ 
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index cd182346abb33fd122cf3d6a137cb99fe1f92c31..fd7a9eef43d62dd0faccd3c6ace94e4918a1c7e0 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -706,6 +706,19 @@ void meta_window_show_menu (MetaWindow         *window,
+                             int                 x,
+                             int                 y);
+ 
++void meta_window_show_menu_at_window_point (MetaWindow         *window,
++                                            MetaWindowMenuType  menu,
++                                            int                 x,
++                                            int                 y);
++
++void meta_window_window_to_stage_point (MetaWindow *window,
++                                        float      *x,
++                                        float      *y);
++
++void meta_window_stage_to_window_point (MetaWindow *window,
++                                        float      *x,
++                                        float      *y);
++
+ void meta_window_get_work_area_for_logical_monitor (MetaWindow         *window,
+                                                     MetaLogicalMonitor *logical_monitor,
+                                                     MtkRectangle       *area);
+@@ -905,6 +918,27 @@ void meta_window_protocol_to_stage_size (MetaWindow *window,
+                                          int        *stage_w,
+                                          int        *stage_h);
+ 
++void meta_window_stage_to_root_point (MetaWindow *window,
++                                      int         stage_x,
++                                      int         stage_y,
++                                      int        *root_x,
++                                      int        *root_y);
++
++void meta_window_stage_to_root_rect (MetaWindow         *window,
++                                     const MtkRectangle *stage_rect,
++                                     MtkRectangle       *root_rect);
++
++void meta_window_root_to_stage_point (MetaWindow          *window,
++                                      int                  root_x,
++                                      int                  root_y,
++                                      int                 *stage_x,
++                                      int                 *stage_y,
++                                      MtkRoundingStrategy  rounding_strategy);
++
++void meta_window_root_to_stage_rect (MetaWindow         *window,
++                                     const MtkRectangle *root_rect,
++                                     MtkRectangle       *stage_rect);
++
+ gboolean meta_window_is_tiled_side_by_side (MetaWindow *window);
+ 
+ gboolean meta_window_is_tiled_left (MetaWindow *window);
+diff --git a/src/core/window.c b/src/core/window.c
+index 250d8b3bc62e54fab5b78d6b9a3b237df267e2a0..bcd014ad9f591478920975ec79e7bd4599f10017 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -6317,6 +6317,40 @@ meta_window_show_menu (MetaWindow         *window,
+   meta_compositor_show_window_menu (window->display->compositor, window, menu, x, y);
+ }
+ 
++void
++meta_window_show_menu_at_window_point (MetaWindow         *window,
++                                       MetaWindowMenuType  menu,
++                                       int                 x,
++                                       int                 y)
++{
++  float stage_x = x, stage_y = y;
++
++  meta_window_window_to_stage_point (window, &stage_x, &stage_y);
++  meta_window_show_menu (window, menu, (int) stage_x, (int) stage_y);
++}
++
++void
++meta_window_window_to_stage_point (MetaWindow *window,
++                                   float      *x,
++                                   float      *y)
++{
++  MetaWindowActor *window_actor = meta_window_actor_from_window (window);
++
++  if (window_actor)
++    meta_window_actor_window_to_stage_space (window_actor, x, y);
++}
++
++void
++meta_window_stage_to_window_point (MetaWindow *window,
++                                   float      *x,
++                                   float      *y)
++{
++  MetaWindowActor *window_actor = meta_window_actor_from_window (window);
++
++  if (window_actor)
++    meta_window_actor_stage_to_window_space (window_actor, x, y);
++}
++
+ void
+ meta_window_get_work_area_for_logical_monitor (MetaWindow         *window,
+                                                MetaLogicalMonitor *logical_monitor,
+@@ -8762,6 +8796,64 @@ meta_window_protocol_to_stage_point (MetaWindow          *window,
+                             rounding_strategy);
+ }
+ 
++void
++meta_window_stage_to_root_point (MetaWindow *window,
++                                 int         stage_x,
++                                 int         stage_y,
++                                 int        *root_x,
++                                 int        *root_y)
++{
++  MetaDisplay *display = window->display;
++
++  meta_window_stage_to_protocol_point (window,
++                                       stage_x - display->x11_origin_x,
++                                       stage_y - display->x11_origin_y,
++                                       root_x, root_y);
++}
++
++void
++meta_window_stage_to_root_rect (MetaWindow         *window,
++                                const MtkRectangle *stage_rect,
++                                MtkRectangle       *root_rect)
++{
++  MetaDisplay *display = window->display;
++  MtkRectangle rect = *stage_rect;
++
++  rect.x -= display->x11_origin_x;
++  rect.y -= display->x11_origin_y;
++  meta_window_stage_to_protocol_rect (window, &rect, root_rect);
++}
++
++void
++meta_window_root_to_stage_point (MetaWindow          *window,
++                                 int                  root_x,
++                                 int                  root_y,
++                                 int                 *stage_x,
++                                 int                 *stage_y,
++                                 MtkRoundingStrategy  rounding_strategy)
++{
++  MetaDisplay *display = window->display;
++
++  meta_window_protocol_to_stage_point (window, root_x, root_y,
++                                       stage_x, stage_y, rounding_strategy);
++  if (stage_x)
++    *stage_x += display->x11_origin_x;
++  if (stage_y)
++    *stage_y += display->x11_origin_y;
++}
++
++void
++meta_window_root_to_stage_rect (MetaWindow         *window,
++                                const MtkRectangle *root_rect,
++                                MtkRectangle       *stage_rect)
++{
++  MetaDisplay *display = window->display;
++
++  meta_window_protocol_to_stage_rect (window, root_rect, stage_rect);
++  stage_rect->x += display->x11_origin_x;
++  stage_rect->y += display->x11_origin_y;
++}
++
+ /**
+  * meta_window_protocol_to_stage_size:
+  * @window: A #MetaWindow
+diff --git a/src/meta/display.h b/src/meta/display.h
+index 443d3b7390bde41bb8b9eaaf36eba5b4b3264414..cc4d658d0380ac7e17afb9973189ebe524c7d0d2 100644
+--- a/src/meta/display.h
++++ b/src/meta/display.h
+@@ -113,6 +113,11 @@ guint32 meta_display_get_current_time_roundtrip (MetaDisplay *display);
+ META_EXPORT
+ GList * meta_display_list_all_windows (MetaDisplay *display);
+ 
++META_EXPORT
++void meta_display_set_x11_origin (MetaDisplay *display,
++                                  int          x,
++                                  int          y);
++
+ META_EXPORT
+ GList* meta_display_get_tab_list (MetaDisplay   *display,
+                                   MetaTabList    type,
+diff --git a/src/wayland/meta-wayland-xdg-shell.c b/src/wayland/meta-wayland-xdg-shell.c
+index 271ebfbacd88d9f29d4d598ddec40cfcbc494b00..48cb3a26046539c618c11cc50ce8c1b1ec64b17e 100644
+--- a/src/wayland/meta-wayland-xdg-shell.c
++++ b/src/wayland/meta-wayland-xdg-shell.c
+@@ -313,9 +313,9 @@ xdg_toplevel_show_window_menu (struct wl_client   *client,
+     return;
+ 
+   monitor_scale = meta_window_wayland_get_geometry_scale (window);
+-  meta_window_show_menu (window, META_WINDOW_MENU_WM,
+-                         window->buffer_rect.x + (x * monitor_scale),
+-                         window->buffer_rect.y + (y * monitor_scale));
++  meta_window_show_menu_at_window_point (window, META_WINDOW_MENU_WM,
++                                         window->buffer_rect.x + (x * monitor_scale),
++                                         window->buffer_rect.y + (y * monitor_scale));
+ }
+ 
+ static void
+diff --git a/src/wayland/meta-xwayland-dnd.c b/src/wayland/meta-xwayland-dnd.c
+index 3634af35657d36482a92f6685e5674756a62253f..567c24112a472f657f3070f39116895d0dc62736 100644
+--- a/src/wayland/meta-xwayland-dnd.c
++++ b/src/wayland/meta-xwayland-dnd.c
+@@ -342,6 +342,7 @@ xdnd_send_position (MetaXWaylandDnd *dnd,
+   Display *xdisplay = x11_display->xdisplay;
+   uint32_t action = 0, user_action, actions;
+   int protocol_x, protocol_y;
++  float window_x = x, window_y = y;
+   XEvent xev = { 0 };
+   MetaWindow *window;
+ 
+@@ -361,9 +362,10 @@ xdnd_send_position (MetaXWaylandDnd *dnd,
+   xev.xclient.format = 32;
+   xev.xclient.window = dest;
+ 
+-  meta_window_stage_to_protocol_point (window,
+-                                       x, y,
+-                                       &protocol_x, &protocol_y);
++  meta_window_stage_to_window_point (window, &window_x, &window_y);
++  meta_window_stage_to_root_point (window,
++                                   (int) window_x, (int) window_y,
++                                   &protocol_x, &protocol_y);
+ 
+   xev.xclient.data.l[0] = x11_display->selection.xwindow;
+   xev.xclient.data.l[1] = 0;
+@@ -827,9 +829,9 @@ repick_drop_surface (MetaWaylandCompositor *compositor,
+       XMapRaised (xdisplay, dnd_window);
+ 
+       frame_rect = meta_window_config_get_rect (focus_window->config);
+-      meta_window_stage_to_protocol_rect (focus_window,
+-                                          &frame_rect,
+-                                          &frame_rect);
++      meta_window_stage_to_root_rect (focus_window,
++                                      &frame_rect,
++                                      &frame_rect);
+ 
+       XMoveResizeWindow (xdisplay, dnd_window,
+                          frame_rect.x,
+diff --git a/src/x11/meta-x11-frame.c b/src/x11/meta-x11-frame.c
+index 9e538a8a38c33a444e28a21b99abad35b29e4356..cbc4de1ba45009161ccff07ccb48e6f2d1722698 100644
+--- a/src/x11/meta-x11-frame.c
++++ b/src/x11/meta-x11-frame.c
+@@ -251,11 +251,11 @@ meta_window_destroy_frame (MetaWindow *window)
+                                          XNextRequest (x11_display->xdisplay));
+         }
+ 
+-      meta_window_stage_to_protocol_point (window,
+-                                           frame->rect.x + borders.invisible.left,
+-                                           frame->rect.y + borders.invisible.top,
+-                                           &child_x,
+-                                           &child_y);
++      meta_window_stage_to_root_point (window,
++                                       frame->rect.x + borders.invisible.left,
++                                       frame->rect.y + borders.invisible.top,
++                                       &child_x,
++                                       &child_y);
+ 
+       XReparentWindow (x11_display->xdisplay,
+                        meta_window_x11_get_xwindow (window),
+@@ -444,7 +444,7 @@ meta_frame_sync_to_window (MetaFrame *frame,
+ 
+   mtk_x11_error_trap_push (x11_display->xdisplay);
+ 
+-  meta_window_stage_to_protocol_rect (window, &frame->rect, &rect);
++  meta_window_stage_to_root_rect (window, &frame->rect, &rect);
+ 
+   XMoveResizeWindow (x11_display->xdisplay,
+                      frame->xwindow,
+@@ -499,9 +499,9 @@ send_configure_notify (MetaFrame *frame)
+   event.xconfigure.event = frame->xwindow;
+   event.xconfigure.window = frame->xwindow;
+ 
+-  meta_window_stage_to_protocol_rect (frame->window,
+-                                      &frame->rect,
+-                                      &configure_rect);
++  meta_window_stage_to_root_rect (frame->window,
++                                  &frame->rect,
++                                  &configure_rect);
+ 
+   event.xconfigure.x = configure_rect.x;
+   event.xconfigure.y = configure_rect.y;
+diff --git a/src/x11/window-props.c b/src/x11/window-props.c
+index 5cefc0dd173e83c3b487b7827aa345e3bcad575e..f399bea45311911eca7be88640be717f8e71397a 100644
+--- a/src/x11/window-props.c
++++ b/src/x11/window-props.c
+@@ -1259,10 +1259,10 @@ static void
+ scale_size_hints (MetaWindow    *window,
+                   MetaSizeHints *hints)
+ {
+-  meta_window_protocol_to_stage_point (window,
+-                                       hints->x, hints->y,
+-                                       &hints->x, &hints->y,
+-                                       MTK_ROUNDING_STRATEGY_SHRINK);
++  meta_window_root_to_stage_point (window,
++                                   hints->x, hints->y,
++                                   &hints->x, &hints->y,
++                                   MTK_ROUNDING_STRATEGY_SHRINK);
+   meta_window_protocol_to_stage_size (window,
+                                       hints->width, hints->height,
+                                       &hints->width, &hints->height);
+diff --git a/src/x11/window-x11.c b/src/x11/window-x11.c
+index d63336960d75555cab867a24609ac43f3cf36e4b..8d7210355fdbf80a07ac82cf03ae594a7461f3ea 100644
+--- a/src/x11/window-x11.c
++++ b/src/x11/window-x11.c
+@@ -317,6 +317,38 @@ update_sm_hints (MetaWindow *window)
+               priv->sm_client_id ? priv->sm_client_id : "none");
+ }
+ 
++static void
++send_configure_notify (MetaWindow *window);
++
++void
++meta_window_x11_sync_origin (MetaWindow *window)
++{
++  MetaWindowX11 *window_x11 = META_WINDOW_X11 (window);
++  MetaWindowX11Private *priv = meta_window_x11_get_instance_private (window_x11);
++  Display *xdisplay = window->display->x11_display->xdisplay;
++  int x, y;
++
++  if (window->override_redirect || window->unmanaging)
++    return;
++
++  if (priv->frame)
++    {
++      meta_frame_sync_to_window (priv->frame, FALSE);
++    }
++  else
++    {
++      meta_window_stage_to_root_point (window,
++                                       priv->client_rect.x,
++                                       priv->client_rect.y,
++                                       &x, &y);
++      mtk_x11_error_trap_push (xdisplay);
++      XMoveWindow (xdisplay, priv->xwindow, x, y);
++      mtk_x11_error_trap_pop (xdisplay);
++    }
++
++  send_configure_notify (window);
++}
++
+ static void
+ send_configure_notify (MetaWindow *window)
+ {
+@@ -333,11 +365,18 @@ send_configure_notify (MetaWindow *window)
+   event.xconfigure.display = x11_display->xdisplay;
+   event.xconfigure.event = priv->xwindow;
+   event.xconfigure.window = priv->xwindow;
+-  meta_window_stage_to_protocol_point (window,
+-                                       priv->client_rect.x - priv->border_width,
+-                                       priv->client_rect.y - priv->border_width,
+-                                       &event.xconfigure.x,
+-                                       &event.xconfigure.y);
++  if (priv->frame)
++    meta_window_stage_to_protocol_point (window,
++                                         priv->client_rect.x - priv->border_width,
++                                         priv->client_rect.y - priv->border_width,
++                                         &event.xconfigure.x,
++                                         &event.xconfigure.y);
++  else
++    meta_window_stage_to_root_point (window,
++                                     priv->client_rect.x - priv->border_width,
++                                     priv->client_rect.y - priv->border_width,
++                                     &event.xconfigure.x,
++                                     &event.xconfigure.y);
+   if (priv->frame)
+     {
+       if (window->withdrawn)
+@@ -349,24 +388,24 @@ send_configure_notify (MetaWindow *window)
+ 
+           meta_frame_calc_borders (priv->frame, &borders);
+ 
+-          meta_window_stage_to_protocol_point (window,
+-                                               (priv->frame->rect.x +
+-                                                borders.invisible.left),
+-                                               (priv->frame->rect.y +
+-                                                borders.invisible.top),
+-                                               &event.xconfigure.x,
+-                                               &event.xconfigure.y);
++          meta_window_stage_to_root_point (window,
++                                           (priv->frame->rect.x +
++                                            borders.invisible.left),
++                                           (priv->frame->rect.y +
++                                            borders.invisible.top),
++                                           &event.xconfigure.x,
++                                           &event.xconfigure.y);
+         }
+       else
+         {
+           int dx, dy;
+ 
+           /* Need to be in root window coordinates */
+-          meta_window_stage_to_protocol_point (window,
+-                                               priv->frame->rect.x,
+-                                               priv->frame->rect.y,
+-                                               &dx,
+-                                               &dy);
++          meta_window_stage_to_root_point (window,
++                                           priv->frame->rect.x,
++                                           priv->frame->rect.y,
++                                           &dx,
++                                           &dy);
+           event.xconfigure.x += dx;
+           event.xconfigure.y += dy;
+         }
+@@ -1468,7 +1507,10 @@ meta_window_x11_move_resize_internal (MetaWindow                *window,
+   else
+     configure_frame_first = size_dx + size_dy >= 0;
+ 
+-  meta_window_stage_to_protocol_rect (window, &client_rect, &values_rect);
++  if (priv->frame)
++    meta_window_stage_to_protocol_rect (window, &client_rect, &values_rect);
++  else
++    meta_window_stage_to_root_rect (window, &client_rect, &values_rect);
+   values.border_width = 0;
+   values.x = values_rect.x;
+   values.y = values_rect.y;
+@@ -2125,7 +2167,7 @@ meta_window_x11_constructed (GObject *object)
+   window->override_redirect = attrs.override_redirect;
+ 
+   rect = MTK_RECTANGLE_INIT (attrs.x, attrs.y, attrs.width, attrs.height);
+-  meta_window_protocol_to_stage_rect (window, &rect, &rect);
++  meta_window_root_to_stage_rect (window, &rect, &rect);
+ 
+   window->config = meta_window_config_new ();
+   meta_window_config_update_rect (window->config, rect);
+@@ -2978,7 +3020,7 @@ meta_window_x11_configure_request (MetaWindow *window,
+ 
+   rect = MTK_RECTANGLE_INIT (event->xconfigurerequest.x, event->xconfigurerequest.y,
+                              event->xconfigurerequest.width, event->xconfigurerequest.height);
+-  meta_window_protocol_to_stage_rect (window, &rect, &rect);
++  meta_window_root_to_stage_rect (window, &rect, &rect);
+ 
+   meta_window_move_resize_request (window,
+                                    event->xconfigurerequest.value_mask,
+@@ -3445,18 +3487,23 @@ meta_window_x11_client_message (MetaWindow *window,
+     {
+       int x_root;
+       int y_root;
++      float pointer_x;
++      float pointer_y;
+       int action;
+       MetaGrabOp op;
+       int button;
+       guint32 timestamp;
+       MetaWindowDrag *window_drag;
+ 
+-      meta_window_protocol_to_stage_point (window,
+-                                           event->xclient.data.l[0],
+-                                           event->xclient.data.l[1],
+-                                           &x_root,
+-                                           &y_root,
+-                                           MTK_ROUNDING_STRATEGY_SHRINK);
++      meta_window_root_to_stage_point (window,
++                                       event->xclient.data.l[0],
++                                       event->xclient.data.l[1],
++                                       &x_root,
++                                       &y_root,
++                                       MTK_ROUNDING_STRATEGY_SHRINK);
++      pointer_x = x_root;
++      pointer_y = y_root;
++      meta_window_window_to_stage_point (window, &pointer_x, &pointer_y);
+       action = event->xclient.data.l[2];
+       button = event->xclient.data.l[3];
+ 
+@@ -3541,7 +3588,8 @@ meta_window_x11_client_message (MetaWindow *window,
+         {
+           ClutterSprite *sprite = NULL;
+ 
+-          if (!guess_nearest_device (window, x_root, y_root, button, &sprite))
++          if (!guess_nearest_device (window, (int) pointer_x, (int) pointer_y,
++                                     button, &sprite))
+             return FALSE;
+ 
+           g_assert (sprite);
+@@ -3550,7 +3598,7 @@ meta_window_x11_client_message (MetaWindow *window,
+           meta_window_begin_grab_op (window, op,
+                                      sprite,
+                                      timestamp,
+-                                     &GRAPHENE_POINT_INIT (x_root, y_root));
++                                     &GRAPHENE_POINT_INIT (pointer_x, pointer_y));
+         }
+ 
+       return TRUE;
+@@ -3573,7 +3621,7 @@ meta_window_x11_client_message (MetaWindow *window,
+                                  event->xclient.data.l[2],
+                                  event->xclient.data.l[3],
+                                  event->xclient.data.l[4]);
+-      meta_window_protocol_to_stage_rect (window, &rect, &rect);
++      meta_window_root_to_stage_rect (window, &rect, &rect);
+ 
+       meta_window_move_resize_request(window,
+                                       value_mask,
+@@ -3643,13 +3691,13 @@ meta_window_x11_client_message (MetaWindow *window,
+       int x, y;
+ 
+       /* l[0] is device_id, which we don't use */
+-      meta_window_protocol_to_stage_point (window,
+-                                           event->xclient.data.l[1],
+-                                           event->xclient.data.l[2],
+-                                           &x, &y,
+-                                           MTK_ROUNDING_STRATEGY_SHRINK);
++      meta_window_root_to_stage_point (window,
++                                       event->xclient.data.l[1],
++                                       event->xclient.data.l[2],
++                                       &x, &y,
++                                       MTK_ROUNDING_STRATEGY_SHRINK);
+ 
+-      meta_window_show_menu (window, META_WINDOW_MENU_WM, x, y);
++      meta_window_show_menu_at_window_point (window, META_WINDOW_MENU_WM, x, y);
+     }
+   else if (event->xclient.message_type ==
+            x11_display->atom__NET_RESTACK_WINDOW)
+@@ -4143,12 +4191,12 @@ meta_window_x11_configure_notify (MetaWindow      *window,
+   g_assert (window->override_redirect);
+   g_assert (priv->frame == NULL);
+ 
+-  meta_window_protocol_to_stage_rect (window,
+-                                      &MTK_RECTANGLE_INIT (event->x,
+-                                                           event->y,
+-                                                           event->width,
+-                                                           event->height),
+-                                      &rect);
++  meta_window_root_to_stage_rect (window,
++                                  &MTK_RECTANGLE_INIT (event->x,
++                                                       event->y,
++                                                       event->width,
++                                                       event->height),
++                                  &rect);
+   meta_window_config_set_rect (window->config, rect);
+ 
+   priv->client_rect = rect;
+diff --git a/src/x11/window-x11.h b/src/x11/window-x11.h
+index 120dea3f35d409f60106b019178dc19903075b58..89abed0f77e5f39f36334091cc6d75820568eed9 100644
+--- a/src/x11/window-x11.h
++++ b/src/x11/window-x11.h
+@@ -54,6 +54,7 @@ MetaWindow * meta_window_x11_new           (MetaDisplay        *display,
+                                             MetaCompEffect      effect);
+ 
+ void meta_window_x11_set_net_wm_state            (MetaWindow *window);
++void meta_window_x11_sync_origin                (MetaWindow *window);
+ void meta_window_x11_set_wm_state                (MetaWindow *window);
+ void meta_window_x11_set_wm_take_focus           (MetaWindow *window,
+                                                   gboolean    take_focus);

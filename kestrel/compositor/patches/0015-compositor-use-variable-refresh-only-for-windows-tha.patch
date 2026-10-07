@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 4 Oct 2026 13:28:30 +0200
-Subject: [PATCH 15/19] compositor: use variable refresh only for windows that
+Subject: [PATCH 15/21] compositor: use variable refresh only for windows that
  ask for it
 
 Mutter switched a display with variable refresh turned on to variable

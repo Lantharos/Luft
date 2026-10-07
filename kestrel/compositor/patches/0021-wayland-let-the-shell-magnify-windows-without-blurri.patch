@@ -1,0 +1,278 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 7 Oct 2026 21:46:35 +0200
+Subject: [PATCH 21/21] wayland: let the shell magnify windows without blurring
+ them
+
+A shell that zooms its windows past their size shows their buffers
+stretched, which blurs text and lines.
+
+A window's magnification property tells the compositor how much larger
+than its size it is shown. Wayland clients are asked for that much more
+detail through the fractional and integer preferred buffer scales of
+the window's surfaces, so a magnified window stays sharp. Popups and
+dialogs follow their parent window. Unconstrained windows that lie
+beyond every monitor take the primary monitor's scale, since the shell
+shows them there.
+---
+ src/core/window-private.h                   |  1 +
+ src/core/window.c                           | 40 +++++++++++++++++++++
+ src/meta/window.h                           |  7 ++++
+ src/wayland/meta-wayland-fractional-scale.c | 12 ++-----
+ src/wayland/meta-wayland-shell-surface.c    |  7 ++++
+ src/wayland/meta-wayland-surface-private.h  |  2 ++
+ src/wayland/meta-wayland-surface.c          | 38 +++++++++++++++++---
+ 7 files changed, 94 insertions(+), 13 deletions(-)
+
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index fd7a9eef43d62dd0faccd3c6ace94e4918a1c7e0..915ce9aef128e33a59d4e8af2c68d94d204cc8d8 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -247,6 +247,7 @@ struct _MetaWindow
+   GIcon *toplevel_icon;
+   gboolean variable_refresh;
+   gboolean unconstrained;
++  double magnification;
+ 
+   MetaWindowType type;
+ 
+diff --git a/src/core/window.c b/src/core/window.c
+index bcd014ad9f591478920975ec79e7bd4599f10017..e0b0ea8bef29fc484e97f2503bda5f9d3605afad 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -209,6 +209,7 @@ enum
+   PROP_CONTENT_TYPE,
+   PROP_VARIABLE_REFRESH,
+   PROP_UNCONSTRAINED,
++  PROP_MAGNIFICATION,
+   PROP_DECORATED,
+   PROP_FULLSCREEN,
+   PROP_MAXIMIZED_HORIZONTALLY,
+@@ -454,6 +455,9 @@ meta_window_get_property (GObject         *object,
+     case PROP_UNCONSTRAINED:
+       g_value_set_boolean (value, window->unconstrained);
+       break;
++    case PROP_MAGNIFICATION:
++      g_value_set_double (value, window->magnification);
++      break;
+     case PROP_TITLE:
+       g_value_set_string (value, window->title);
+       break;
+@@ -580,6 +584,9 @@ meta_window_set_property (GObject         *object,
+     case PROP_UNCONSTRAINED:
+       meta_window_set_unconstrained (window, g_value_get_boolean (value));
+       break;
++    case PROP_MAGNIFICATION:
++      meta_window_set_magnification (window, g_value_get_double (value));
++      break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+       break;
+@@ -606,6 +613,26 @@ meta_window_set_unconstrained (MetaWindow *window,
+   g_object_notify_by_pspec (G_OBJECT (window), obj_props[PROP_UNCONSTRAINED]);
+ }
+ 
++double
++meta_window_get_magnification (MetaWindow *window)
++{
++  while (window->transient_for)
++    window = window->transient_for;
++
++  return window->magnification;
++}
++
++void
++meta_window_set_magnification (MetaWindow *window,
++                               double      magnification)
++{
++  if (G_APPROX_VALUE (window->magnification, magnification, FLT_EPSILON))
++    return;
++
++  window->magnification = magnification;
++  g_object_notify_by_pspec (G_OBJECT (window), obj_props[PROP_MAGNIFICATION]);
++}
++
+ static void
+ meta_window_class_init (MetaWindowClass *klass)
+ {
+@@ -651,6 +678,18 @@ meta_window_class_init (MetaWindowClass *klass)
+                           FALSE,
+                           G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS);
++  /**
++   * MetaWindow:magnification:
++   *
++   * How much larger than its size the window is shown. Clients are asked
++   * to draw it with that much more detail, so it stays sharp when magnified.
++   * Popups and dialogs follow their parent window.
++   */
++  obj_props[PROP_MAGNIFICATION] =
++    g_param_spec_double ("magnification", NULL, NULL,
++                         0.1, 16.0, 1.0,
++                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY |
++                         G_PARAM_STATIC_STRINGS);
+   obj_props[PROP_TITLE] =
+     g_param_spec_string ("title", NULL, NULL,
+                          NULL,
+@@ -929,6 +968,7 @@ meta_window_init (MetaWindow *window)
+ 
+   priv->suspend_state = META_WINDOW_SUSPEND_STATE_ACTIVE;
+   window->stamp = next_window_stamp++;
++  window->magnification = 1.0;
+   meta_prefs_add_listener (prefs_changed_callback, window);
+   window->is_alive = TRUE;
+   priv->external_constraints =
+diff --git a/src/meta/window.h b/src/meta/window.h
+index ff96506aaeddaa47153fefafbcc01245fef01bfb..8e684a1a0c5b986a8a6feaad33ccdbf90e2c2ce0 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -126,6 +126,13 @@ void meta_window_set_variable_refresh (MetaWindow *window,
+ META_EXPORT
+ gboolean meta_window_is_unconstrained (MetaWindow *window);
+ 
++META_EXPORT
++double meta_window_get_magnification (MetaWindow *window);
++
++META_EXPORT
++void meta_window_set_magnification (MetaWindow *window,
++                                    double      magnification);
++
+ META_EXPORT
+ void meta_window_set_unconstrained (MetaWindow *window,
+                                     gboolean    unconstrained);
+diff --git a/src/wayland/meta-wayland-fractional-scale.c b/src/wayland/meta-wayland-fractional-scale.c
+index 9a197758c44d68ee691705ac8d4c3e573f99f2bc..90a442a9192fe09dd5d3b9de001ba64ae896349d 100644
+--- a/src/wayland/meta-wayland-fractional-scale.c
++++ b/src/wayland/meta-wayland-fractional-scale.c
+@@ -77,7 +77,7 @@ wp_fractional_scale_manager_get_fractional_scale (struct wl_client   *client,
+ {
+   MetaWaylandSurface *surface;
+   struct wl_resource *fractional_scale_resource;
+-  MetaLogicalMonitor *logical_monitor;
++  double scale;
+ 
+   surface = wl_resource_get_user_data (surface_resource);
+   if (surface->fractional_scale.resource)
+@@ -105,14 +105,8 @@ wp_fractional_scale_manager_get_fractional_scale (struct wl_client   *client,
+                       G_CALLBACK (on_surface_destroyed),
+                       NULL);
+ 
+-  logical_monitor = meta_wayland_surface_get_preferred_scale_monitor (surface);
+-  if (logical_monitor)
+-    {
+-      double scale;
+-
+-      scale = meta_logical_monitor_get_scale (logical_monitor);
+-      meta_wayland_fractional_scale_maybe_send_preferred_scale (surface, scale);
+-    }
++  scale = meta_wayland_surface_get_preferred_scale (surface);
++  meta_wayland_fractional_scale_maybe_send_preferred_scale (surface, scale);
+ }
+ 
+ static const struct wp_fractional_scale_manager_v1_interface meta_wayland_fractional_scale_manager_interface = {
+diff --git a/src/wayland/meta-wayland-shell-surface.c b/src/wayland/meta-wayland-shell-surface.c
+index 2ae76f5b33ec751640fcaeaaca83b0898ada6995..25d272404fdb37d869822433540b876d6abac60e 100644
+--- a/src/wayland/meta-wayland-shell-surface.c
++++ b/src/wayland/meta-wayland-shell-surface.c
+@@ -36,6 +36,7 @@ typedef struct _MetaWaylandShellSurfacePrivate
+ 
+   gulong unmanaging_handler_id;
+   gulong highest_scale_monitor_handler_id;
++  gulong magnification_handler_id;
+   GBinding *main_monitor_binding;
+ } MetaWaylandShellSurfacePrivate;
+ 
+@@ -114,6 +115,8 @@ clear_window (MetaWaylandShellSurface *shell_surface)
+                           priv->window);
+   g_clear_signal_handler (&priv->highest_scale_monitor_handler_id,
+                           priv->window);
++  g_clear_signal_handler (&priv->magnification_handler_id,
++                          priv->window);
+   priv->window = NULL;
+ 
+   surface_actor = meta_wayland_surface_get_actor (surface);
+@@ -173,6 +176,10 @@ meta_wayland_shell_surface_set_window (MetaWaylandShellSurface *shell_surface,
+     g_signal_connect_swapped (window, "highest-scale-monitor-changed",
+                               G_CALLBACK (meta_wayland_surface_notify_preferred_scale_monitor),
+                               surface);
++  priv->magnification_handler_id =
++    g_signal_connect_swapped (window, "notify::magnification",
++                              G_CALLBACK (meta_wayland_surface_notify_preferred_scale_monitor),
++                              surface);
+   meta_wayland_surface_notify_preferred_scale_monitor (surface);
+ }
+ 
+diff --git a/src/wayland/meta-wayland-surface-private.h b/src/wayland/meta-wayland-surface-private.h
+index b4ffad7d68004c46057bef878d30c7fbe1b05406..5073834d5ddc8f28e8b8170aeba8c21ffe8b04d6 100644
+--- a/src/wayland/meta-wayland-surface-private.h
++++ b/src/wayland/meta-wayland-surface-private.h
+@@ -468,6 +468,8 @@ MetaLogicalMonitor * meta_wayland_surface_get_main_monitor (MetaWaylandSurface *
+ 
+ MetaLogicalMonitor * meta_wayland_surface_get_preferred_scale_monitor (MetaWaylandSurface *surface);
+ 
++double meta_wayland_surface_get_preferred_scale (MetaWaylandSurface *surface);
++
+ static inline MetaWaylandSurfaceState *
+ meta_wayland_surface_state_new (void)
+ {
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index affa8de3667cf66da3c0ed4b7586271cb7636537..dfdeeb77eff7b857f16e6eba8751eafee40884d0 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -2950,22 +2950,52 @@ meta_wayland_surface_is_xwayland (MetaWaylandSurface *surface)
+ #endif
+ }
+ 
++double
++meta_wayland_surface_get_preferred_scale (MetaWaylandSurface *surface)
++{
++  MetaLogicalMonitor *logical_monitor;
++  MetaWindow *window;
++  double scale;
++
++  window = meta_wayland_surface_get_toplevel_window (surface);
++  if (window && window->client_type != META_WINDOW_CLIENT_TYPE_WAYLAND)
++    window = NULL;
++
++  logical_monitor = meta_wayland_surface_get_preferred_scale_monitor (surface);
++  if (!logical_monitor && window && meta_window_is_unconstrained (window))
++    {
++      MetaContext *context =
++        meta_wayland_compositor_get_context (surface->compositor);
++      MetaMonitorManager *monitor_manager =
++        meta_backend_get_monitor_manager (meta_context_get_backend (context));
++
++      logical_monitor =
++        meta_monitor_manager_get_primary_logical_monitor (monitor_manager);
++    }
++  if (!logical_monitor)
++    return 0.0;
++
++  scale = meta_logical_monitor_get_scale (logical_monitor);
++  if (window)
++    scale *= meta_window_get_magnification (window);
++
++  return scale;
++}
++
+ static void
+ committed_state_handle_preferred_scale_monitor (MetaWaylandSurface *surface)
+ {
+   MetaWaylandSurface *subsurface_surface;
+-  MetaLogicalMonitor *logical_monitor;
+   double scale;
+ 
+   /* Nothing to do if the client already destroyed the wl_surface */
+   if (!surface->resource)
+     return;
+ 
+-  logical_monitor = meta_wayland_surface_get_preferred_scale_monitor (surface);
+-  if (!logical_monitor)
++  scale = meta_wayland_surface_get_preferred_scale (surface);
++  if (scale == 0.0)
+     return;
+ 
+-  scale = meta_logical_monitor_get_scale (logical_monitor);
+   meta_wayland_fractional_scale_maybe_send_preferred_scale (surface, scale);
+ 
+   if (wl_resource_get_version (surface->resource) >=

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 7 Oct 2026 05:15:07 +0200
-Subject: [PATCH 18/19] core: let the shell lay windows out on a transformed
+Subject: [PATCH 18/21] core: let the shell lay windows out on a transformed
  canvas
 
 A shell can show windows on a canvas larger than the monitors by moving

@@ -1,13 +1,13 @@
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
+import Shell from 'gi://Shell';
 
-import type { Box } from '../shared/placement.js';
-import { pushApart, snapEdges } from './geometry.js';
+import type { Box } from '../../shared/placement.js';
+import { FULL_SIZE, intersection, pushApart, screenBox, snapEdges, type View } from '../view/geometry.js';
 
 const SNAP_DISTANCE = 12;
 const MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
 
-type FreeWindow = Meta.Window & { unconstrained: boolean };
+type FreeWindow = Meta.Window & { unconstrained: boolean; magnification: number };
 
 function shell(): Shell.Global {
   return global as unknown as Shell.Global;
@@ -15,6 +15,18 @@ function shell(): Shell.Global {
 
 export function setUnconstrained(window: Meta.Window, unconstrained: boolean): void {
   (window as FreeWindow).unconstrained = unconstrained;
+}
+
+export function setMagnification(window: Meta.Window, magnification: number): void {
+  const free = window as FreeWindow;
+  if (free.magnification !== magnification) free.magnification = magnification;
+}
+
+export function magnify(windows: readonly Meta.Window[], view: View, viewport: Box): void {
+  for (const window of windows) {
+    const shown = view.scale > FULL_SIZE && intersection(screenBox(view, viewport, frameBox(window)), viewport) > 0;
+    setMagnification(window, shown ? view.scale : FULL_SIZE);
+  }
 }
 
 export function frameBox(window: Meta.Window): Box {
@@ -29,6 +41,19 @@ export function isBoardWindow(window: Meta.Window): boolean {
 
 export function boardWindows(workspace: Meta.Workspace): Meta.Window[] {
   return shell().display.sort_windows_by_stacking(workspace.list_windows().filter(isBoardWindow)).reverse();
+}
+
+export function byOpening(a: Meta.Window, b: Meta.Window): number {
+  return a.get_stable_sequence() - b.get_stable_sequence();
+}
+
+export function appWindowAfter(app: Shell.App, workspace: Meta.Workspace, entered: Meta.Window | null): Meta.Window | null {
+  const tracker = Shell.WindowTracker.get_default();
+  const windows = shell().display.get_tab_list(Meta.TabList.NORMAL, workspace)
+    .filter(window => isBoardWindow(window) && tracker.get_window_app(window) === app);
+  if (!entered || !windows.includes(entered)) return windows[0] ?? null;
+  windows.sort(byOpening);
+  return windows[(windows.indexOf(entered) + 1) % windows.length]!;
 }
 
 export class Collisions {

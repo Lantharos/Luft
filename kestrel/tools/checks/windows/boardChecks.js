@@ -4,7 +4,11 @@ import GLib from 'gi://GLib';
 import {board as currentBoard} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
+import {captureFrame} from '../apps/luftApp.js';
+import {checkBoardCorner} from './boardCornerChecks.js';
 import {checkBoardFocus} from './boardFocusChecks.js';
+import {checkBoardView, headerOf} from './boardViewChecks.js';
+import {checkBoardX11} from './boardX11Checks.js';
 import {touchpad} from './touchpad.js';
 
 const WINDOWS = [['Notes', 720, 460], ['Inbox', 640, 520], ['Music', 560, 380], ['Files', 800, 500]];
@@ -35,6 +39,10 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
     await pause(2500);
     require(windows().length === 4, 'four windows open on the first desktop');
     require(!noOverlap(), 'the desktop starts with stacked windows');
+    named('Inbox').activate(global.get_current_time());
+    pointer.notify_absolute_motion(GLib.get_monotonic_time(), 1, 1);
+    await pause(400);
+    const header = await captureFrame(headerOf(named('Inbox')));
 
     global.display.emit('overlay-key');
     await pause(120);
@@ -58,6 +66,18 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
     Main.wm.actionMoveWorkspace(manager.get_workspace_by_index(index));
     await pause(SETTLE);
     require(board.shown && JSON.stringify(view()) === JSON.stringify(saved), 'returning to the board keeps its view');
+    const superScroll = async direction => {
+      keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.PRESSED);
+      pointer.notify_discrete_scroll(GLib.get_monotonic_time(), direction, Clutter.ScrollSource.WHEEL);
+      await pause(60);
+      keyboard.notify_keyval(GLib.get_monotonic_time(), Clutter.KEY_Super_L, Clutter.KeyState.RELEASED);
+      await pause(SETTLE);
+    };
+    await superScroll(Clutter.ScrollDirection.DOWN);
+    require(manager.get_active_workspace_index() === index + 1 && !board.shown, 'Super and scrolling switches to the next desktop from a board');
+    await superScroll(Clutter.ScrollDirection.UP);
+    require(manager.get_active_workspace_index() === index && board.shown && JSON.stringify(view()) === JSON.stringify(saved),
+      'Super and scrolling back returns to the board as it was');
 
     const viewport = board.viewport;
     const before = view();
@@ -75,6 +95,7 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
       board.input.handle(event);
     const [anchorX, anchorY] = screenPoint(board.camera.view, viewport, ...anchor);
     require(Math.abs(anchorX - focusX) < 0.5 && Math.abs(anchorY - focusY) < 0.5, 'pinching zooms around the fingers');
+    require(Number.isInteger(group.translation_x) && Number.isInteger(group.translation_y), 'the board is drawn on whole pixels after a pinch');
 
     board.fitAll();
     await pause(SETTLE);
@@ -122,6 +143,9 @@ export async function checkBoard({pause, capture, pointer, keyboard, output}) {
     require(noOverlap() && !files.get_frame_rect().equal(filesBefore), 'dropping a window onto another pushes it aside');
 
     await checkBoardFocus({board, named, windows, fixture, pointer, keyboard, pause, capture, output, require});
+    await checkBoardView({board, named, pointer, keyboard, pause, capture, output, require, header});
+    await checkBoardX11({board, pointer, keyboard, pause, require});
+    await checkBoardCorner({board, named, windows, pointer, keyboard, pause, capture, output, require});
 
     const layout = new Map(windows().map(window => [window, window.get_frame_rect()]));
     board.enterWindow(named('Files'));

@@ -1,21 +1,31 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import type { Box } from '../shared/placement.js';
-import { clampScale, copyView, fitView, zoomAround, type View } from './geometry.js';
+import type { Box } from '../../shared/placement.js';
+import { centerOn, clampScale, copyView, fitView, FULL_SIZE, magnifiedScale, zoomAround, type View } from './geometry.js';
 
 export const CAMERA_DURATION = 360;
 const MOMENTUM_DECAY_MS = 325;
 const MOMENTUM_MIN_SPEED = 0.02;
 const REVEAL_MARGIN = 32;
+const SETTLE_DELAY = 160;
+const FULL_SIZE_SNAP = 0.06;
 
 export function animationsEnabled(): boolean {
   return St.Settings.get().enable_animations;
 }
 
+export interface CameraHost {
+  changed(view: View): void;
+  settled(): void;
+  focusAt(screenX: number, screenY: number): Box | null;
+}
+
 export class Camera {
   readonly view: View = { x: 0, y: 0, scale: 1 };
+  readonly shown: View = { x: 0, y: 0, scale: 1 };
   readonly viewport: Box = { x: 0, y: 0, width: 1, height: 1 };
   private readonly from: View = { x: 0, y: 0, scale: 1 };
   private readonly to: View = { x: 0, y: 0, scale: 1 };
@@ -27,8 +37,11 @@ export class Camera {
   private lastMomentumFrame = 0;
   private arc = 0;
   private engaged = false;
+  private pixel = 1;
+  private lastChange = 0;
+  private settleTimer = 0;
 
-  constructor(private readonly group: Clutter.Actor, private readonly changed: (view: View) => void) {
+  constructor(private readonly group: Clutter.Actor, private readonly host: CameraHost) {
     const stage = (global as unknown as Shell.Global).stage;
     this.tween = new Clutter.Timeline({ actor: stage, duration: 1 });
     this.tween.set_progress_mode(Clutter.AnimationMode.EASE_OUT_CUBIC);
@@ -42,8 +55,9 @@ export class Camera {
     return this.engaged;
   }
 
-  engage(view: View): void {
+  engage(view: View, pixelScale: number): void {
     this.engaged = true;
+    this.pixel = 1 / pixelScale;
     this.group.set_pivot_point(0, 0);
     copyView(this.view, view);
     this.apply();
@@ -52,6 +66,7 @@ export class Camera {
   release(): void {
     this.stop();
     this.engaged = false;
+    this.clearSettle();
     this.group.set_scale(1, 1);
     this.group.set_translation(0, 0, 0);
   }
@@ -62,10 +77,16 @@ export class Camera {
   }
 
   apply(): void {
-    const { scale } = this.view;
-    this.group.set_scale(scale, scale);
-    this.group.set_translation(this.viewport.x - this.view.x * scale, this.viewport.y - this.view.y * scale, 0);
-    this.changed(this.view);
+    const { view, shown, viewport, pixel } = this;
+    const translationX = Math.round((viewport.x - view.x * view.scale) / pixel) * pixel;
+    const translationY = Math.round((viewport.y - view.y * view.scale) / pixel) * pixel;
+    shown.scale = view.scale;
+    shown.x = (viewport.x - translationX) / view.scale;
+    shown.y = (viewport.y - translationY) / view.scale;
+    this.group.set_scale(view.scale, view.scale);
+    this.group.set_translation(translationX, translationY, 0);
+    this.host.changed(shown);
+    this.queueSettle();
   }
 
   panBy(screenDx: number, screenDy: number): void {
@@ -77,10 +98,20 @@ export class Camera {
 
   zoomAt(scale: number, screenX: number, screenY: number, screenDx = 0, screenDy = 0): void {
     this.stop();
-    zoomAround(this.view, this.viewport, scale, screenX, screenY);
+    this.zoomView(this.view, scale, screenX, screenY, false);
     this.view.x -= screenDx / this.view.scale;
     this.view.y -= screenDy / this.view.scale;
     this.apply();
+  }
+
+  zoomBy(factor: number, screenX: number, screenY: number): void {
+    this.stop();
+    this.zoomView(this.view, this.view.scale * factor, screenX, screenY, true);
+    this.apply();
+  }
+
+  snapToFullSize(screenX: number, screenY: number): void {
+    if (this.view.scale !== FULL_SIZE && Math.abs(this.view.scale - FULL_SIZE) < FULL_SIZE_SNAP) this.zoomAt(FULL_SIZE, screenX, screenY);
   }
 
   glide(velocityX: number, velocityY: number): void {
@@ -95,7 +126,6 @@ export class Camera {
   animateTo(target: View, duration: number, arc = 0): void {
     this.stop();
     copyView(this.to, target);
-    this.to.scale = clampScale(this.to.scale);
     if (!animationsEnabled() || duration <= 0) {
       copyView(this.view, this.to);
       this.apply();
@@ -133,16 +163,50 @@ export class Camera {
   zoomStep(factor: number): void {
     const { target, viewport } = this;
     copyView(target, this.view);
-    const centerX = target.x + viewport.width / 2 / target.scale;
-    const centerY = target.y + viewport.height / 2 / target.scale;
-    target.scale = clampScale(target.scale * factor);
-    target.x = centerX - viewport.width / 2 / target.scale;
-    target.y = centerY - viewport.height / 2 / target.scale;
+    this.zoomView(target, target.scale * factor, viewport.x + viewport.width / 2, viewport.y + viewport.height / 2, true);
     this.animateTo(target, CAMERA_DURATION);
+  }
+
+  destroy(): void {
+    this.stop();
+    this.clearSettle();
+  }
+
+  private zoomView(view: View, scale: number, screenX: number, screenY: number, stepped: boolean): void {
+    const focus = this.host.focusAt(screenX, screenY);
+    const ceiling = focus ? magnifiedScale(focus, this.viewport) : FULL_SIZE;
+    let next = clampScale(scale, Math.max(ceiling, view.scale));
+    if (stepped && (view.scale - FULL_SIZE) * (next - FULL_SIZE) < 0) next = FULL_SIZE;
+    zoomAround(view, this.viewport, next, screenX, screenY);
+    if (focus && next > FULL_SIZE && ceiling > FULL_SIZE) centerOn(view, this.viewport, focus, Math.min(1, (next - FULL_SIZE) / (ceiling - FULL_SIZE)));
+  }
+
+  private queueSettle(): void {
+    this.lastChange = GLib.get_monotonic_time();
+    if (!this.settleTimer) this.settleTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, SETTLE_DELAY, () => this.settleCheck());
+  }
+
+  private settleCheck(): boolean {
+    const waited = (GLib.get_monotonic_time() - this.lastChange) / 1000;
+    this.settleTimer = waited < SETTLE_DELAY
+      ? GLib.timeout_add(GLib.PRIORITY_DEFAULT, Math.ceil(SETTLE_DELAY - waited), () => this.settleCheck())
+      : 0;
+    if (!this.settleTimer) this.host.settled();
+    return GLib.SOURCE_REMOVE;
+  }
+
+  private clearSettle(): void {
+    if (this.settleTimer) GLib.Source.remove(this.settleTimer);
+    this.settleTimer = 0;
   }
 
   private tweenFrame(progress: number): void {
     const { from, to, view, viewport } = this;
+    if (progress >= 1) {
+      copyView(view, to);
+      this.apply();
+      return;
+    }
     const scale = from.scale * Math.pow(to.scale / from.scale, progress) * (1 - this.arc * Math.sin(Math.PI * progress));
     const fromCenterX = from.x + viewport.width / 2 / from.scale;
     const fromCenterY = from.y + viewport.height / 2 / from.scale;

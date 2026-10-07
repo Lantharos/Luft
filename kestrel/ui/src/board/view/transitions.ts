@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import { animateActor } from '../shared/motion.js';
-import type { Box } from '../shared/placement.js';
+import { animateActor } from '../../shared/motion.js';
+import type { Box } from '../../shared/placement.js';
 import type { View } from './geometry.js';
 
 export const TRANSITION_DURATION = 320;
@@ -58,6 +58,7 @@ export function fadeAway(window: Meta.Window, screen: Box, viewport: Box, done: 
     duration: TRANSITION_DURATION / 2,
     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
     onStopped: () => {
+      if (actor.is_destroyed()) return;
       done();
       settleActor(window);
       actor.opacity = 255;

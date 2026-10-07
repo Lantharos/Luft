@@ -1,8 +1,8 @@
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
-import type { Board, Canvas } from './board.js';
-import { intersection, screenBox } from './geometry.js';
+import type { Board, Canvas } from '../board.js';
+import { intersection, screenBox } from '../view/geometry.js';
 import { frameBox, isBoardWindow } from './windows.js';
 
 const HIDDEN_FRACTION = 0.3;

@@ -3,8 +3,8 @@ import Cogl from 'gi://Cogl';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import type { Monitor } from '../panel/panel.js';
-import type { Box } from '../shared/placement.js';
+import type { Monitor } from '../../panel/panel.js';
+import type { Box } from '../../shared/placement.js';
 import type { View } from './geometry.js';
 
 export type BackgroundFactory = (container: Clutter.Actor, monitorIndex: number) => { destroy(): void };

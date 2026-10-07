@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
@@ -9,18 +8,19 @@ import type { Keybindings } from '../context.js';
 import type { Monitor } from '../panel/panel.js';
 import { animateActor } from '../shared/motion.js';
 import type { Box } from '../shared/placement.js';
-import { Backdrop, type BackgroundFactory } from './backdrop.js';
-import { Camera } from './camera.js';
-import { FIT_PADDING, Focus, WINDOW_PADDING, type FocusState } from './focus.js';
-import { Follower } from './follower.js';
-import { boundsOf, copyView, fits, fitView, freeSpot, intersection, PLACEMENT_GAP, planExit, screenBox, settle, type View } from './geometry.js';
-import { BoardInput, type BoardActions } from './input.js';
-import { BoardKeys } from './keys.js';
-import { CornerPill } from './pill.js';
-import { fadeAway, glideFrom, settleActor } from './transitions.js';
-import { boardWindows, Collisions, frameBox, isBoardWindow, setUnconstrained } from './windows.js';
+import { Corner } from './corner/corner.js';
+import { BoardInput, type BoardActions } from './input/input.js';
+import { BoardKeys } from './input/keys.js';
+import { Backdrop, type BackgroundFactory } from './view/backdrop.js';
+import { Camera } from './view/camera.js';
+import { boundsOf, copyView, fits, FULL_SIZE, freeSpot, intersection, PLACEMENT_GAP, planExit, type View } from './view/geometry.js';
+import { glideFrom, settleActor } from './view/transitions.js';
+import { arrange, putBack, restoreSizes } from './windows/arrange.js';
+import { Focus, WINDOW_PADDING, type FocusState } from './windows/focus.js';
+import { Follower } from './windows/follower.js';
+import { appWindowAfter, boardWindows, byOpening, Collisions, frameBox, isBoardWindow, magnify, setMagnification, setUnconstrained } from './windows/windows.js';
+import { X11Origin } from './windows/x11Origin.js';
 
-const SETTLE_TIMEOUT = 300;
 const FADE_DURATION = 200;
 
 export interface Canvas extends FocusState {
@@ -49,6 +49,7 @@ export interface BoardHost {
   addChrome(actor: Clutter.Actor): void;
   setPanelsHidden(hidden: boolean): void;
   openQuickSettings(): void;
+  openStart(): void;
   changed(): void;
   canInteract(): boolean;
 }
@@ -61,15 +62,17 @@ export class Board implements BoardActions {
   readonly camera: Camera;
   readonly input: BoardInput;
   private readonly backdrop: Backdrop;
-  private readonly pill: CornerPill;
+  private readonly corner: Corner;
   private readonly collisions: Collisions;
   private readonly keys: BoardKeys;
   private readonly follower: Follower;
   private readonly focus: Focus;
+  private readonly x11Origin: X11Origin;
   private readonly canvases = new Map<Meta.Workspace, Canvas>();
+  private readonly magnified = new Set<Meta.Window>();
   private presented: Canvas | null = null;
   private readonly managerSignal: number;
-  private settling = 0;
+  private cancelRestore: (() => void) | null = null;
 
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly schemeSignal: number;
@@ -77,28 +80,41 @@ export class Board implements BoardActions {
   constructor(private readonly host: BoardHost) {
     this.backdrop = new Backdrop(host.createBackground, this.light);
     this.schemeSignal = this.interfaceSettings.connect('changed::color-scheme', () => this.backdrop.setLight(this.light));
-    this.camera = new Camera(shell().window_group, view => {
-      this.backdrop.update(view, this.camera.viewport);
-      this.input.syncShield(true);
+    this.camera = new Camera(shell().window_group, {
+      changed: view => {
+        this.backdrop.update(view, this.camera.viewport);
+        this.input.syncShield(true);
+      },
+      settled: () => this.settled(),
+      focusAt: (x, y) => {
+        const window = this.focus.entered ?? this.windowUnder(x, y);
+        return window ? frameBox(window) : null;
+      },
     });
-    this.pill = new CornerPill(() => host.openQuickSettings(), () => this.overview());
+    this.corner = new Corner({
+      openQuickSettings: () => host.openQuickSettings(),
+      openStart: () => host.openStart(),
+      overview: () => this.overview(),
+      enterApp: app => this.enterApp(app),
+    });
     this.input = new BoardInput(this, this.backdrop.actor);
     this.collisions = new Collisions(() => this.presentedWorkspace(), () => this.camera.view.scale);
     this.keys = new BoardKeys(host.keybindings, this);
     this.follower = new Follower(this);
+    this.x11Origin = new X11Origin({ view: this.camera.shown, viewport: this.camera.viewport, screen: () => this.screen() });
     this.focus = new Focus({
       camera: this.camera,
       viewport: this.camera.viewport,
       moving: () => this.collisions.window,
-      changed: entered => {
-        this.pill.showOverview(entered);
+      changed: () => {
+        this.windowsChanged();
         this.input.syncShield(!!this.presented);
       },
     });
     const uiGroup = shell().window_group.get_parent()!;
     uiGroup.insert_child_below(this.backdrop.actor, shell().window_group);
     uiGroup.insert_child_above(this.input.shield, shell().window_group);
-    for (const actor of this.pill.actors) host.addChrome(actor);
+    host.addChrome(this.corner.actor);
     this.backdrop.build(host.monitors());
     const manager = shell().workspace_manager;
     this.managerSignal = manager.connect('active-workspace-changed', () => this.syncWorkspace());
@@ -106,6 +122,10 @@ export class Board implements BoardActions {
 
   get shown(): boolean {
     return this.presented !== null;
+  }
+
+  get cornerClearance(): number {
+    return this.corner.clearance;
   }
 
   active(): boolean {
@@ -123,7 +143,7 @@ export class Board implements BoardActions {
   liveView(workspace: Meta.Workspace): View | null {
     const canvas = this.canvases.get(workspace);
     if (!canvas?.shown) return null;
-    return canvas === this.presented ? this.camera.view : canvas.view;
+    return canvas === this.presented ? this.camera.shown : canvas.view;
   }
 
   frameOf(workspace: Meta.Workspace): BoardFrame | null {
@@ -149,7 +169,7 @@ export class Board implements BoardActions {
   }
 
   showStatus(iconNames: string[]): void {
-    this.pill.showStatus(iconNames);
+    this.corner.showStatus(iconNames);
   }
 
   monitorsChanged(): void {
@@ -169,36 +189,13 @@ export class Board implements BoardActions {
   enter(): void {
     const workspace = shell().workspace_manager.get_active_workspace();
     const canvas = this.canvasFor(workspace);
-    if (canvas.shown || this.settling) return;
+    if (canvas.shown || this.cancelRestore) return;
     canvas.shown = true;
     const windows = boardWindows(workspace);
-    const resizing = windows.filter(window => window.is_fullscreen() || window.get_maximize_flags() !== 0);
-    for (const window of windows) {
-      setUnconstrained(window, true);
-      if (window.minimized) window.unminimize();
-      if (window.is_fullscreen()) window.unmake_fullscreen();
-      if (window.get_maximize_flags() !== 0) window.unmaximize();
-    }
-    if (!resizing.length) {
-      this.layOut(workspace, canvas);
-      return;
-    }
-    const pending = new Map(resizing.map(window => [window, window.connect('size-changed', () => {
-      window.disconnect(pending.get(window)!);
-      pending.delete(window);
-      if (!pending.size) finish();
-    })]));
-    const finish = () => {
-      for (const [window, id] of pending) window.disconnect(id);
-      pending.clear();
-      if (this.settling) GLib.Source.remove(this.settling);
-      this.settling = 0;
+    for (const window of windows) setUnconstrained(window, true);
+    this.cancelRestore = restoreSizes(windows, () => {
+      this.cancelRestore = null;
       if (canvas.shown && workspace.active) this.layOut(workspace, canvas);
-    };
-    this.settling = GLib.timeout_add(GLib.PRIORITY_DEFAULT, SETTLE_TIMEOUT, () => {
-      this.settling = 0;
-      finish();
-      return GLib.SOURCE_REMOVE;
     });
   }
 
@@ -208,34 +205,17 @@ export class Board implements BoardActions {
     if (!canvas || !workspace) return;
     this.collisions.end();
     const windows = boardWindows(workspace).filter(window => !window.minimized);
-    const view = copyView({ x: 0, y: 0, scale: 1 }, this.camera.view);
+    const view = copyView({ x: 0, y: 0, scale: 1 }, this.camera.shown);
     const viewport = { ...this.viewport };
-    const primary = this.host.primary();
-    const workArea = this.host.workArea(primary?.index ?? 0);
+    const workArea = this.host.workArea(this.host.primary()?.index ?? 0);
     canvas.layout.clear();
     for (const window of windows) canvas.layout.set(window, frameBox(window));
-    const screens = new Map(windows.map(window => [window, screenBox(view, viewport, frameBox(window))]));
     const entered = canvas.entered && !canvas.entered.minimized ? canvas.entered : null;
     const fitted = entered ?? windows.find(window => fits(view, frameBox(window), viewport, WINDOW_PADDING)) ?? null;
     const plan = planExit([...canvas.layout], view, viewport, workArea, fitted);
     canvas.shown = false;
     this.present(null);
-    for (const [window, box] of plan.placed) {
-      setUnconstrained(window, false);
-      window.move_frame(false, box.x, box.y);
-      glideFrom(window, screens.get(window)!, null, viewport);
-    }
-    if (plan.maximized) {
-      setUnconstrained(plan.maximized, false);
-      glideFrom(plan.maximized, screens.get(plan.maximized)!, null, viewport);
-      plan.maximized.maximize();
-    }
-    for (const window of plan.minimized) {
-      const screen = screens.get(window)!;
-      const tuck = () => this.tuck(window, canvas, workArea);
-      if (intersection(screen, viewport) > 0) fadeAway(window, screen, viewport, tuck);
-      else tuck();
-    }
+    putBack(plan, canvas, view, viewport, workArea);
   }
 
   fitAll(): void {
@@ -283,6 +263,10 @@ export class Board implements BoardActions {
     this.camera.zoomStep(factor);
   }
 
+  pointerMoved(x: number, y: number): void {
+    this.x11Origin.hover(x, y);
+  }
+
   place(window: Meta.Window, canvas: Canvas): void {
     const view = canvas === this.presented ? this.camera.view : canvas.view;
     const others = boardWindows(window.get_workspace()!)
@@ -296,6 +280,7 @@ export class Board implements BoardActions {
     setUnconstrained(window, true);
     window.move_frame(false, x, y);
     if (canvas !== this.presented) return;
+    this.windowsChanged();
     if (canvas.entered) this.focus.shade(true);
     else this.reveal(window);
   }
@@ -307,6 +292,8 @@ export class Board implements BoardActions {
     }
     canvas.layout.delete(window);
     canvas.normal.delete(window);
+    if (this.magnified.delete(window)) setMagnification(window, FULL_SIZE);
+    if (canvas === this.presented) this.windowsChanged();
     if (!window.get_workspace() || this.canvasOf(window.get_workspace())?.shown) return;
     setUnconstrained(window, false);
     const area = this.host.workArea(this.host.primary()?.index ?? 0);
@@ -364,20 +351,50 @@ export class Board implements BoardActions {
   destroy(): void {
     shell().workspace_manager.disconnect(this.managerSignal);
     this.interfaceSettings.disconnect(this.schemeSignal);
-    if (this.settling) GLib.Source.remove(this.settling);
+    this.cancelRestore?.();
     this.present(null);
+    this.camera.destroy();
     this.focus.destroy();
     this.follower.destroy();
     this.collisions.destroy();
     this.keys.destroy();
-    this.pill.destroy();
+    this.corner.destroy();
     this.backdrop.destroy();
+  }
+
+  private enterApp(app: Shell.App): void {
+    const workspace = this.presentedWorkspace();
+    const next = workspace ? appWindowAfter(app, workspace, this.focus.entered) : null;
+    if (next && next === this.focus.entered) this.overview();
+    else if (next) this.enterWindow(next);
+  }
+
+  private screen(): Box {
+    return boundsOf(this.host.monitors()) ?? this.viewport;
+  }
+
+  private settled(): void {
+    const workspace = this.presentedWorkspace();
+    if (!workspace) return;
+    const windows = boardWindows(workspace).filter(window => !window.minimized);
+    magnify(windows, this.camera.shown, this.viewport);
+    for (const window of windows) this.magnified.add(window);
+    const [x, y] = shell().get_pointer();
+    this.x11Origin.settle(x, y);
+  }
+
+  private windowsChanged(): void {
+    const workspace = this.presentedWorkspace();
+    if (!workspace) return;
+    const windows = boardWindows(workspace).filter(window => !window.minimized);
+    this.x11Origin.track(windows);
+    this.corner.showWindows(windows.sort(byOpening), this.focus.entered);
   }
 
   private windowUnder(x: number, y: number): Meta.Window | null {
     const workspace = this.presentedWorkspace();
     if (!workspace) return null;
-    const { view, viewport } = this.camera;
+    const { shown: view, viewport } = this.camera;
     const canvasX = view.x + (x - viewport.x) / view.scale;
     const canvasY = view.y + (y - viewport.y) / view.scale;
     return boardWindows(workspace).find(window => {
@@ -390,29 +407,7 @@ export class Board implements BoardActions {
     const windows = boardWindows(workspace).filter(window => !window.minimized);
     const before = windows.map(frameBox);
     const viewport = this.viewportFor();
-    let boxes: Box[];
-    if (canvas.known) {
-      const known = windows.flatMap(window => {
-        const box = canvas.layout.get(window);
-        return box ? [box] : [];
-      });
-      const centerX = canvas.view.x + viewport.width / 2 / canvas.view.scale;
-      const centerY = canvas.view.y + viewport.height / 2 / canvas.view.scale;
-      boxes = windows.map((window, index) => {
-        const stored = canvas.layout.get(window);
-        if (stored) return { ...stored };
-        const [x, y] = freeSpot(known, before[index]!.width, before[index]!.height, centerX, centerY);
-        const placed = { ...before[index]!, x, y };
-        known.push(placed);
-        return placed;
-      });
-    } else {
-      boxes = before.map(box => ({ ...box }));
-      settle(boxes);
-      const bounds = boundsOf(boxes);
-      if (bounds) fitView(canvas.view, bounds, viewport, FIT_PADDING);
-      canvas.known = true;
-    }
+    const boxes = arrange(windows, canvas, viewport);
     canvas.layout.clear();
     canvas.normal.clear();
     windows.forEach((window, index) => canvas.normal.set(window, before[index]!));
@@ -422,20 +417,8 @@ export class Board implements BoardActions {
     windows.forEach((window, index) => {
       settleActor(window);
       window.move_frame(false, Math.round(boxes[index]!.x), Math.round(boxes[index]!.y));
-      glideFrom(window, before[index]!, this.camera.view, viewport);
+      glideFrom(window, before[index]!, this.camera.shown, viewport);
     });
-  }
-
-  private tuck(window: Meta.Window, canvas: Canvas, workArea: Box): void {
-    window.minimize();
-    setUnconstrained(window, false);
-    const normal = canvas.normal.get(window) ?? frameBox(window);
-    const width = Math.min(normal.width, workArea.width);
-    const height = Math.min(normal.height, workArea.height);
-    const inside = intersection(normal, workArea) >= width * height / 2;
-    window.move_frame(false,
-      inside ? normal.x : workArea.x + Math.round((workArea.width - width) / 2),
-      inside ? normal.y : workArea.y + Math.round((workArea.height - height) / 2));
   }
 
   private viewportFor(): Box {
@@ -461,12 +444,15 @@ export class Board implements BoardActions {
     this.collisions.end();
     this.presented = canvas;
     this.focus.detach();
+    for (const window of this.magnified) setMagnification(window, FULL_SIZE);
+    this.magnified.clear();
+    this.x11Origin.reset();
     if (!canvas) {
       if (!previous) return;
       this.camera.release();
       this.backdrop.actor.remove_transition('opacity');
       this.backdrop.actor.hide();
-      this.pill.setShown(false);
+      this.corner.setShown(false);
       this.host.wallpaper.show();
       this.setDesktopWindowsVisible(true);
       this.host.setPanelsHidden(false);
@@ -475,21 +461,22 @@ export class Board implements BoardActions {
       return;
     }
     const viewport = this.viewportFor();
+    const primary = this.host.primary();
     this.input.shield.set_position(viewport.x, viewport.y);
     this.input.shield.set_size(viewport.width, viewport.height);
-    this.camera.engage(canvas.view);
+    this.camera.engage(canvas.view, shell().display.get_monitor_scale(primary?.index ?? 0));
     this.backdrop.actor.show();
     this.backdrop.actor.opacity = 255;
     this.host.wallpaper.hide();
     this.setDesktopWindowsVisible(false);
     this.host.setPanelsHidden(true);
-    const primary = this.host.primary();
     if (primary) {
-      this.pill.setShown(true);
-      this.pill.place(primary);
+      this.corner.setShown(true);
+      this.corner.place(primary);
     }
     this.keys.engage();
     this.focus.attach(canvas, shell().workspace_manager.get_active_workspace());
+    this.windowsChanged();
     this.host.changed();
   }
 

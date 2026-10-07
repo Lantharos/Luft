@@ -58,6 +58,7 @@ type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'sn
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const START_HEIGHT = 600;
+const EDGE_MARGIN = 12;
 const OPEN_DURATION = 220;
 const CLOSE_DURATION = 160;
 
@@ -121,6 +122,7 @@ class KestrelUi {
       addChrome: actor => context.layoutManager.addChrome(actor),
       setPanelsHidden: hidden => this.panels.suppress(hidden),
       openQuickSettings: () => this.toggle('quick'),
+      openStart: () => this.toggle('start'),
       changed: () => this.syncSession(),
       canInteract: () => this.canInteract() && !this.active,
     });
@@ -171,8 +173,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.snapLayouts.actor);
     context.layoutManager.addTopChrome(this.taskView.actor);
     for (const actor of this.surfaces()) {
-      const updateClip = () => actor.set_clip(0, 0, actor.width,
-        Math.max(0, this.panels.forMonitor(this.surfaceMonitor()).actor.y - actor.y - actor.translation_y));
+      const updateClip = () => actor.set_clip(0, 0, actor.width, Math.max(0, this.surfaceFloor() - actor.y - actor.translation_y));
       for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
         actor.connect(signal, updateClip);
     }
@@ -315,25 +316,35 @@ class KestrelUi {
     const stage = (global as unknown as Shell.Global).stage;
     this.cover.set_size(stage.width, stage.height);
     const startWidth = Math.min(660, monitor.width - 24);
-    const clearance = taskbarPreferences.clearance;
+    const clearance = this.clearance();
     const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
     const available = monitor.height - clearance - 24;
     const startHeight = Math.min(START_HEIGHT, available);
+    const startX = this.board.shown ? monitor.x + monitor.width - EDGE_MARGIN - startWidth : monitor.x + (monitor.width - startWidth) / 2;
     this.start.actor.set_size(startWidth, startHeight);
-    this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
+    this.start.actor.set_position(Math.round(startX), bottom - startHeight);
 
     for (const [actor, width, height] of [
       [this.quick.actor, 420, this.quick.preferredHeight(420, available)],
       [this.notifications.actor, 380, this.notifications.preferredHeight(380, available)],
     ] as const) {
       actor.set_size(width, height);
-      actor.set_position(Math.round(monitor.x + monitor.width - 12 - width), bottom - height);
+      actor.set_position(Math.round(monitor.x + monitor.width - EDGE_MARGIN - width), bottom - height);
     }
     for (const popup of [this.clipboard, this.emoji])
       popup.place(available, this.context.layoutManager.getWorkAreaForMonitor(monitor.index));
     const [snapWidth, snapHeight] = this.snapLayouts.size();
     this.snapLayouts.actor.set_size(snapWidth, snapHeight);
     this.snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
+  }
+
+  private clearance(): number {
+    return this.board.shown ? this.board.cornerClearance : taskbarPreferences.clearance;
+  }
+
+  private surfaceFloor(): number {
+    const monitor = this.surfaceMonitor();
+    return this.board.shown ? monitor.y + monitor.height - this.board.cornerClearance : this.panels.forMonitor(monitor).actor.y;
   }
 
   private pointerMonitor(): Monitor {

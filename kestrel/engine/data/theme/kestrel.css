@@ -565,10 +565,17 @@ StEntry StLabel.hint-text { margin: 0; color: rgba(255, 255, 255, 0.65); }
 
 .kestrel-board-tint { background-color: rgba(12, 12, 16, 0.36); }
 .kestrel-board-light .kestrel-board-tint { background-color: rgba(246, 246, 248, 0.40); }
-.kestrel-board-pill.kestrel-glass, .kestrel-board-overview.kestrel-glass { border-radius: 999px; transition-duration: 160ms; }
+.kestrel-board-corner { spacing: 8px; }
+.kestrel-board-pill.kestrel-glass, .kestrel-board-overview.kestrel-glass, .kestrel-board-dock.kestrel-glass { border-radius: 999px; transition-duration: 160ms; }
 .kestrel-board-pill.kestrel-glass { height: 36px; padding: 0 14px; }
+.kestrel-board-overview.kestrel-glass { width: 36px; height: 36px; padding: 0; }
+.kestrel-board-dock.kestrel-glass { height: 36px; padding: 0 3px; spacing: 6px; }
+.kestrel-board-dock-apps { spacing: 2px; }
+.kestrel-board-dock-button { width: 30px; height: 30px; margin: 3px 0; padding: 0; border-radius: 999px; transition-duration: 160ms; }
 .kestrel-board-pill.kestrel-glass:hover, .kestrel-board-pill.kestrel-glass:focus,
-.kestrel-board-overview.kestrel-glass:hover, .kestrel-board-overview.kestrel-glass:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-board-overview.kestrel-glass:hover, .kestrel-board-overview.kestrel-glass:focus,
+.kestrel-board-dock-button:hover, .kestrel-board-dock-button:focus { background-color: rgba(255, 255, 255, 0.12); }
+.kestrel-board-dock-button:checked { background-color: rgba(255, 255, 255, 0.18); }
 .kestrel-board-pill-box, .kestrel-board-pill-status { spacing: 10px; }
 .kestrel-board-pill-icon { icon-size: 16px; }
 .kestrel-board-pill-battery { margin-left: -5px; font-size: 12px; font-feature-settings: "tnum"; }

@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
-import type { Keybindings } from '../context.js';
+import type { Keybindings } from '../../context.js';
 
 const DOUBLE_TAP_TIME = 250;
 const ZOOM_FACTOR = 1.25;

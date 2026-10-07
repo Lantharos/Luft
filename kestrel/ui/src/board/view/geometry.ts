@@ -1,4 +1,4 @@
-import type { Box } from '../shared/placement.js';
+import type { Box } from '../../shared/placement.js';
 
 export interface View {
   x: number;
@@ -7,11 +7,16 @@ export interface View {
 }
 
 export const MIN_SCALE = 0.08;
-export const MAX_SCALE = 1;
+export const FULL_SIZE = 1;
 export const PLACEMENT_GAP = 32;
+const MAGNIFIED_FILL = 0.9;
 
-export function clampScale(scale: number): number {
-  return Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
+export function clampScale(scale: number, max = FULL_SIZE): number {
+  return Math.max(MIN_SCALE, Math.min(max, scale));
+}
+
+export function magnifiedScale(box: Box, viewport: Box): number {
+  return Math.max(FULL_SIZE, MAGNIFIED_FILL * Math.min(viewport.width / box.width, viewport.height / box.height));
 }
 
 export function copyView(target: View, source: View): View {
@@ -22,12 +27,16 @@ export function copyView(target: View, source: View): View {
 }
 
 export function zoomAround(view: View, viewport: Box, scale: number, screenX: number, screenY: number): void {
-  const next = clampScale(scale);
   const offsetX = screenX - viewport.x;
   const offsetY = screenY - viewport.y;
-  view.x += offsetX / view.scale - offsetX / next;
-  view.y += offsetY / view.scale - offsetY / next;
-  view.scale = next;
+  view.x += offsetX / view.scale - offsetX / scale;
+  view.y += offsetY / view.scale - offsetY / scale;
+  view.scale = scale;
+}
+
+export function centerOn(view: View, viewport: Box, box: Box, amount: number): void {
+  view.x += (box.x + box.width / 2 - viewport.width / 2 / view.scale - view.x) * amount;
+  view.y += (box.y + box.height / 2 - viewport.height / 2 / view.scale - view.y) * amount;
 }
 
 export function fitView(view: View, bounds: Box, viewport: Box, padding: number): void {

@@ -2,10 +2,10 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
-import { animateActor } from '../shared/motion.js';
-import type { Box } from '../shared/placement.js';
-import { CAMERA_DURATION, type Camera } from './camera.js';
-import { boundsOf, copyView, fitView, nearestInDirection, type View } from './geometry.js';
+import { animateActor } from '../../shared/motion.js';
+import type { Box } from '../../shared/placement.js';
+import { CAMERA_DURATION, type Camera } from '../view/camera.js';
+import { boundsOf, copyView, fitView, nearestInDirection, type View } from '../view/geometry.js';
 import { boardWindows, frameBox } from './windows.js';
 
 export const FIT_PADDING = 56;

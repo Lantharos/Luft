@@ -23,7 +23,7 @@
 		normal: { height: 31, button: 26, icon: 18 },
 		large: { height: 36, button: 31, icon: 22 }
 	};
-	const FLOATING_MARGIN = 6;
+	const FLOATING_MARGIN = 8;
 	const RUNNING = 2;
 
 	let metrics = $derived(METRICS[size]);

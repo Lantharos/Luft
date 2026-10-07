@@ -49,6 +49,7 @@ export interface Context {
   openScreenshot(): void;
   stopScreencast(): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
+  wallpaper: Clutter.Actor;
   registerPanel(actor: St.Widget): void;
   inputMethod: TextInput;
   keybindings: Keybindings;

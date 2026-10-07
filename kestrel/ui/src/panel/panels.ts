@@ -17,6 +17,7 @@ export class PanelSet {
   readonly primary: KestrelPanel;
   private secondary: KestrelPanel[] = [];
   private overlap: WindowOverlap | null = null;
+  private suppressed = false;
   private readonly unwatchPreferences: () => void;
 
   constructor(
@@ -67,6 +68,11 @@ export class PanelSet {
 
   setActive(surface: string | null, monitor: Monitor | null): void {
     for (const panel of this.all) panel.setActive(monitor && panel.monitor?.index === monitor.index ? surface : null);
+  }
+
+  suppress(suppressed: boolean): void {
+    this.suppressed = suppressed;
+    for (const panel of this.all) panel.autoHide.suppress(suppressed);
   }
 
   hold(held: boolean): void {
@@ -120,6 +126,7 @@ export class PanelSet {
     this.layoutManager.addChrome(panel.actor);
     this.syncStrut(panel);
     panel.autoHide.watch(this.overlap);
+    panel.autoHide.suppress(this.suppressed);
     navigateWithKeyboard(panel.actor);
     return panel;
   }

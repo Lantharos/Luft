@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Background from './background.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Layout from './layout.js';
 import * as SwipeTracker from './swipeTracker.js';
 import * as Util from '../misc/util.js';
@@ -27,8 +28,20 @@ class BaseWorkspaceGroup extends Clutter.Actor {
         this._monitor = monitor;
         this._movingWindow = movingWindow;
         this._windowRecords = [];
+        this._board = workspace ? KestrelUi.boardView(workspace) : null;
+        this._windowLayer = this;
 
         this._createBackground();
+        if (this._board) {
+            const {x, y, scale, viewportX, viewportY} = this._board;
+            this._windowLayer = new Clutter.Actor({
+                scale_x: scale,
+                scale_y: scale,
+                translation_x: viewportX - monitor.x - x * scale,
+                translation_y: viewportY - monitor.y - y * scale,
+            });
+            this.add_child(this._windowLayer);
+        }
         this._createWindows();
 
         this.connect('destroy', this._onDestroy.bind(this));
@@ -59,14 +72,14 @@ class BaseWorkspaceGroup extends Clutter.Actor {
         const windowActors = global.get_window_actors().filter(w =>
             this._shouldShowWindow(w.meta_window));
 
-        windowActors.map(a => this._createClone(a)).forEach(clone => this.add_child(clone));
+        windowActors.map(a => this._createClone(a)).forEach(clone => this._windowLayer.add_child(clone));
     }
 
     _createClone(windowActor) {
         const clone = new Clutter.Clone({
             source: windowActor,
-            x: windowActor.x - this._monitor.x,
-            y: windowActor.y - this._monitor.y,
+            x: this._board ? windowActor.x : windowActor.x - this._monitor.x,
+            y: this._board ? windowActor.y : windowActor.y - this._monitor.y,
         });
 
         const record = {windowActor, clone};
@@ -118,7 +131,7 @@ class WorkspaceGroup extends BaseWorkspaceGroup {
         if (window.is_override_redirect())
             return false;
 
-        if (!this._windowIsOnThisMonitor(window))
+        if (!this._board && !this._windowIsOnThisMonitor(window))
             return false;
 
         const isSticky =
@@ -144,10 +157,10 @@ class WorkspaceGroup extends BaseWorkspaceGroup {
         });
 
         let lastRecord;
-        const bottomActor = this._background ?? null;
+        const bottomActor = this._board ? null : this._background ?? null;
 
         for (const record of this._windowRecords) {
-            this.set_child_above_sibling(record.clone,
+            this._windowLayer.set_child_above_sibling(record.clone,
                 lastRecord ? lastRecord.clone : bottomActor);
             lastRecord = record;
         }
@@ -157,7 +170,9 @@ class WorkspaceGroup extends BaseWorkspaceGroup {
         if (!this._workspace)
             return;
 
-        this._background = new WorkspaceBackground(this._workspace, this._monitor);
+        this._background = this._board
+            ? KestrelUi.boardBackdrop(this._workspace, this._monitor)
+            : new WorkspaceBackground(this._workspace, this._monitor);
         this.add_child(this._background);
     }
 });

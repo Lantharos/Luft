@@ -350,6 +350,14 @@
       <default>["&lt;Super&gt;z"]</default>
       <summary>Show snap layouts for the focused window</summary>
     </key>
+    <key name="board-zoom-in" type="as">
+      <default>["&lt;Super&gt;equal","&lt;Super&gt;KP_Add"]</default>
+      <summary>Zoom in on the board</summary>
+    </key>
+    <key name="board-zoom-out" type="as">
+      <default>["&lt;Super&gt;minus","&lt;Super&gt;KP_Subtract"]</default>
+      <summary>Zoom out of the board</summary>
+    </key>
     <key name="system-monitor" type="as">
       <default>["&lt;Control&gt;&lt;Shift&gt;Escape"]</default>
       <summary>Open the system monitor</summary>

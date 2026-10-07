@@ -219,7 +219,23 @@ Super+Tab, or Show all windows in the panel's context menu, hides the panel and 
 
 ### Workspaces
 
-Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total. Empty workspaces are removed as windows close or move. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace GNOME's overview application shortcuts.
+Kestrel keeps one empty workspace alongside occupied workspaces, up to ten total. Empty workspaces are removed as windows close or move. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll, scrolling over the panel, or swiping sideways with three fingers moves between adjacent workspaces. Transitions use the compositor’s workspace slide animation. These bindings replace GNOME's overview application shortcuts.
+
+### Board mode
+
+Any desktop can be turned into a board: an endless canvas where windows lie side by side instead of on top of each other. Swipe up with four fingers or press Super twice quickly to turn the current desktop into a board, and swipe down with four fingers or press Super twice again to go back. Each desktop keeps its own choice, and switching between them with a four-finger sideways swipe slides boards and ordinary desktops alike. A single press of Super still opens Start right away.
+
+On a board the taskbar steps aside and a small pill in the corner shows the time, battery and status icons; clicking it opens Quick Settings. The canvas sits on a blurred, dimmed copy of the wallpaper with a dot grid that moves and scales with it.
+
+- Pan with three fingers, by dragging empty canvas with the left or middle button, by scrolling over empty canvas, or with Super and the arrow keys. A three-finger flick keeps gliding for a moment.
+- Zoom by pinching, with Ctrl and the scroll wheel over empty canvas, with Super and the scroll wheel anywhere, or with Super+= and Super+-. Zooming goes from an overview of the whole board up to 100%. Super+0 fits the whole board, and so does double-clicking empty canvas.
+- Move windows by their title bar, by dragging with Super held, or by tapping with three fingers and then swiping. A window dropped onto others pushes them aside, and edges snap flush so windows can sit edge to edge. Windows never overlap.
+- Windows stay fully usable at any zoom. Maximizing a window, for example by double-clicking its title bar, zooms the board to fit it instead, and so does Super with a double-click.
+- New windows open in the middle of the current view, in the nearest free spot. Activating a window that is out of view, for example from Alt+Tab, pans the board to it.
+
+Leaving a board puts the windows you can see back on the ordinary desktop where they were on screen, at their normal size, and minimizes the ones out of view. If the board was zoomed to fit a single window, that window is maximized. Turning the board on again brings back every window and the view exactly as they were. Reduced motion turns the board's animations and gliding off.
+
+`kestrel/tools/session.sh capture` turns a desktop with four test windows into a board by pressing Super twice, checks that no windows overlap and that the next desktop stays ordinary, pans and pinches through the same handlers the touchpad uses, types into a window shown at about half size, moves windows with a three-finger tap and swipe and with Super held, then leaves and returns to the board and checks where every window ends up. It saves `board.png`, `board-exit.png` and `board-exit-maximized.png`.
 
 ### System dialogs
 

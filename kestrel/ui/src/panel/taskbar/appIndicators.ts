@@ -4,25 +4,36 @@ import St from 'gi://St';
 import { animateActor } from '../../shared/motion.js';
 import type { LauncherEntry } from './launcherEntries.js';
 
-const BUTTON_SIZE = 40;
 const PROGRESS_WIDTH = 28;
-const PROGRESS_Y = 35;
+const PROGRESS_INSET = 5;
 const FLASHES = 3;
 const SETTLED_OPACITY = 190;
 
 export class AppIndicators {
-  readonly attention = new St.Widget({ style_class: 'kestrel-task-attention', width: BUTTON_SIZE, height: BUTTON_SIZE, opacity: 0, visible: false });
+  readonly attention = new St.Widget({ style_class: 'kestrel-task-attention', opacity: 0, visible: false });
   private readonly badge = new St.Label({ style_class: 'kestrel-task-badge', visible: false, y: 1 });
-  private readonly progress = new St.Widget({ style_class: 'kestrel-task-progress', visible: false,
-    x: (BUTTON_SIZE - PROGRESS_WIDTH) / 2, y: PROGRESS_Y, width: PROGRESS_WIDTH });
+  private readonly progress = new St.Widget({ style_class: 'kestrel-task-progress', visible: false, width: PROGRESS_WIDTH });
   private readonly fill = new St.Widget({ style_class: 'kestrel-task-progress-fill' });
   private attending = false;
+  private size = 0;
 
-  constructor(content: St.Widget) {
+  constructor(content: St.Widget, size: number) {
     content.insert_child_at_index(this.attention, 0);
     this.progress.add_child(this.fill);
     content.add_child(this.progress);
     content.add_child(this.badge);
+    this.resize(size);
+  }
+
+  resize(size: number): void {
+    this.size = size;
+    this.attention.set_size(size, size);
+    this.progress.set_position((size - PROGRESS_WIDTH) / 2, size - PROGRESS_INSET);
+    this.placeBadge();
+  }
+
+  private placeBadge(): void {
+    if (this.badge.visible) this.badge.x = this.size - 1 - this.badge.get_preferred_width(-1)[1];
   }
 
   get showsProgress(): boolean {
@@ -31,10 +42,8 @@ export class AppIndicators {
 
   update(entry: LauncherEntry, attention: boolean): void {
     this.badge.visible = entry.countVisible && entry.count > 0;
-    if (this.badge.visible) {
-      this.badge.text = entry.count > 99 ? '99+' : `${entry.count}`;
-      this.badge.x = BUTTON_SIZE - 1 - this.badge.get_preferred_width(-1)[1];
-    }
+    if (this.badge.visible) this.badge.text = entry.count > 99 ? '99+' : `${entry.count}`;
+    this.placeBadge();
     this.progress.visible = entry.progressVisible;
     if (this.progress.visible) {
       this.fill.height = this.progress.get_theme_node().get_height();

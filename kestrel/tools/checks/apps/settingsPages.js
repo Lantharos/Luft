@@ -1,6 +1,6 @@
 import {LuftApp, sleep} from './luftApp.js';
 
-const PAGES = ['bluetooth', 'display', 'sound', 'power', 'appearance', 'appearance/fonts', 'notifications', 'keyboard', 'mouse', 'accessibility', 'apps',
+const PAGES = ['bluetooth', 'display', 'sound', 'power', 'appearance', 'appearance/fonts', 'appearance/taskbar', 'notifications', 'keyboard', 'mouse', 'accessibility', 'apps',
   'privacy', 'security', 'datetime', 'users', 'login', 'updates', 'about'];
 const LOADING = 600;
 

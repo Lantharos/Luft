@@ -8,8 +8,8 @@ import secondary from '../assets/luft-secondary.svg';
 import { appIcons } from '../appearance/icons/appIcons.js';
 import { animateActor } from '../shared/motion.js';
 
-const MARK_SIZE = 26;
-const PAINTED_MARK_SIZE = 21;
+const MARK_SCALE = 0.65;
+const PAINTED_MARK_SCALE = 0.8;
 const WHITE = '#ffffffff';
 
 const svgIcon = (svg: string, fill: string) =>
@@ -20,10 +20,16 @@ const LAYERS = [
   { svg: primary, direction: -1, pivot: [0.4, 0.3], fill: () => appIcons.paint?.ink ?? WHITE },
 ] as const;
 
-function animatedMark(button: St.Button): St.Widget {
-  const mark = new St.Widget({ width: MARK_SIZE, height: MARK_SIZE, layout_manager: new Clutter.BinLayout() });
+export interface Launcher {
+  button: St.Button;
+  resize(size: number): void;
+}
+
+function animatedMark(button: St.Button): [St.Widget, (size: number) => void] {
+  const mark = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+  let size = 0;
   const icons = LAYERS.map(({ direction, pivot: [pivotX, pivotY] }) => {
-    const icon = new St.Icon({ icon_size: MARK_SIZE });
+    const icon = new St.Icon();
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);
     const update = () => {
@@ -40,21 +46,30 @@ function animatedMark(button: St.Button): St.Widget {
     return icon;
   });
   const paint = () => LAYERS.forEach((layer, index) => {
-    icons[index].icon_size = appIcons.paint ? PAINTED_MARK_SIZE : MARK_SIZE;
+    icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
     icons[index].gicon = svgIcon(layer.svg, layer.fill());
   });
   const unwatch = appIcons.watch(paint);
   mark.connect('destroy', unwatch);
-  paint();
-  return mark;
+  return [mark, markSize => {
+    size = markSize;
+    mark.set_size(size, size);
+    paint();
+  }];
 }
 
-export function createLauncher(activate: () => void): St.Button {
+export function createLauncher(activate: () => void, size: number): Launcher {
   const button = new St.Button({
     style_class: 'kestrel-task-button', clip_to_allocation: true,
-    width: 40, height: 40, can_focus: true, track_hover: true, accessible_name: 'Start',
+    can_focus: true, track_hover: true, accessible_name: 'Start',
   });
-  button.child = animatedMark(button);
+  const [mark, resizeMark] = animatedMark(button);
+  button.child = mark;
   button.connect('clicked', activate);
-  return button;
+  const resize = (buttonSize: number) => {
+    button.set_size(buttonSize, buttonSize);
+    resizeMark(Math.round(buttonSize * MARK_SCALE));
+  };
+  resize(size);
+  return { button, resize };
 }

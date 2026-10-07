@@ -3,6 +3,8 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
+import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
+
 export interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }
 type DelegateActor = St.Widget & { _delegate?: object };
@@ -35,7 +37,7 @@ export class TaskbarDrop {
   }
 
   private pinnable(source: DraggedItem): source is { id: string } {
-    if (typeof source?.id !== 'string' || source.folder) return false;
+    if (!taskbarPreferences.showPinned || typeof source?.id !== 'string' || source.folder) return false;
     const app = Shell.AppSystem.get_default().lookup_app(source.id);
     return !!app && !app.is_window_backed();
   }

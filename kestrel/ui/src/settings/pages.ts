@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import type Shell from 'gi://Shell';
 
 export type SettingsPageId =
-  | 'network' | 'bluetooth' | 'display' | 'sound' | 'power' | 'appearance' | 'notifications'
+  | 'network' | 'bluetooth' | 'display' | 'sound' | 'power' | 'appearance' | 'appearance/taskbar' | 'notifications'
   | 'keyboard' | 'mouse' | 'accessibility' | 'apps' | 'privacy' | 'security' | 'datetime' | 'users' | 'login' | 'updates' | 'about';
 
 export interface SettingsPage {
@@ -19,6 +19,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
   { id: 'sound', title: 'Sound', icon: 'audio-speakers-symbolic', keywords: ['audio', 'volume', 'speakers', 'microphone', 'output', 'input'] },
   { id: 'power', title: 'Power & Battery', icon: 'battery-full-charging-symbolic', keywords: ['battery', 'sleep', 'suspend', 'power mode', 'screen blank'] },
   { id: 'appearance', title: 'Appearance', icon: 'preferences-desktop-appearance-symbolic', keywords: ['wallpaper', 'background', 'dark', 'light', 'accent', 'app icons', 'tinted', 'text size'] },
+  { id: 'appearance/taskbar', title: 'Taskbar', icon: 'user-desktop-symbolic', keywords: ['panel', 'dock', 'auto-hide', 'hide taskbar', 'floating', 'pinned apps', 'alignment', 'transparent'] },
   { id: 'notifications', title: 'Notifications', icon: 'preferences-system-notifications-symbolic', keywords: ['do not disturb', 'banners', 'lock screen'] },
   { id: 'keyboard', title: 'Keyboard', icon: 'input-keyboard-symbolic', keywords: ['input sources', 'layout', 'shortcuts', 'language'] },
   { id: 'mouse', title: 'Mouse & Touchpad', icon: 'input-mouse-symbolic', keywords: ['pointer', 'scroll', 'touchpad', 'tap to click'] },

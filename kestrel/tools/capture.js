@@ -24,6 +24,7 @@ import {checkSnapGroups} from './checks/windows/snapGroupChecks.js';
 import {checkVariableRefresh} from './checks/windows/variableRefreshChecks.js';
 import {checkWindowState} from './checks/windows/windowStateChecks.js';
 import {checkTaskbar} from './checks/desktop/taskbarChecks.js';
+import {checkTaskbarOptions} from './checks/desktop/taskbarOptionChecks.js';
 import {checkLiveWallpaper} from './checks/desktop/wallpaperChecks.js';
 import {checkPanelStatus} from './checks/system/panelStatusChecks.js';
 import {checkInputSources} from './checks/input/inputSourceChecks.js';
@@ -279,7 +280,7 @@ export async function run() {
     await capture(`${output}/panel-context-menu.png`);
     const favorites = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
     const savedFavorites = favorites.get_strv('favorite-apps');
-    const unpin = actorNamed(contextMenu, 'Unpin from panel');
+    const unpin = actorNamed(contextMenu, 'Unpin from taskbar');
     const [unpinX, unpinY] = unpin.get_transformed_position();
     pointer.notify_absolute_motion(GLib.get_monotonic_time(), unpinX + unpin.width / 2, unpinY + unpin.height / 2);
     pointer.notify_button(GLib.get_monotonic_time(), Clutter.BUTTON_PRIMARY, Clutter.ButtonState.PRESSED);
@@ -345,6 +346,7 @@ export async function run() {
   await checkVariableRefresh({pause});
   await checkWindowState({pause});
   await checkTaskbar({pause, capture, actorNamed, pointer, output});
+  await checkTaskbarOptions({pause, actorNamed, pointer, output});
   await checkPanelStatus({pause, capture, actorNamed, pointer, output});
   await checkInputSources({pause, capture, actorNamed, pointer, keyboard, output});
   await checkKeys({pause, capture, actorNamed, pointer, keyboard, output});

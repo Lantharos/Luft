@@ -4,14 +4,20 @@ use super::Store;
 use crate::mail::envelope::Address;
 
 impl Store {
-    pub fn set_verdict(&self, address: &str, verdict: &str) -> Result<(), String> {
+    pub fn set_verdict(&self, address: &str, verdict: &str) -> Result<String, String> {
         self.writing(|connection| {
-            connection.execute(
+            let transaction = connection.transaction()?;
+            let previous: String = transaction
+                .query_row("SELECT verdict FROM senders WHERE address = ?1", [address], |row| row.get(0))
+                .optional()?
+                .unwrap_or_else(|| "pending".into());
+            transaction.execute(
                 "INSERT INTO senders (address, verdict) VALUES (?1, ?2) ON CONFLICT (address) DO UPDATE SET verdict = excluded.verdict",
                 params![address, verdict],
-            )
+            )?;
+            transaction.commit()?;
+            Ok(previous)
         })
-        .map(drop)
     }
 
     pub fn set_images(&self, address: &str, allowed: bool) -> Result<(), String> {

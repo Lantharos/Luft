@@ -95,7 +95,8 @@ systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$sc
   DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" gjs -m "$root/kestrel/tools/fixtures/systemBus.js" &
   timeout 5 gdbus wait --address "$KESTREL_SYSTEM_BUS" com.lantharos.KestrelChecks
   mkdir -p "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH"
-  mkdir -m 700 -p "$KESTREL_APP_RUNTIME_DIR"
+  mkdir -m 700 -p "$KESTREL_APP_RUNTIME_DIR" "$XDG_RUNTIME_DIR/dconf"
+  ln -sfn "$XDG_RUNTIME_DIR/dconf" "$KESTREL_APP_RUNTIME_DIR/dconf"
   rm -f "$KESTREL_AUTHENTICATE_SOCK"
   pipewire -c "$root/kestrel/tools/fixtures/services/pipewire.conf" &
   pipewire_pid=$!

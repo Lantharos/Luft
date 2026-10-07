@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 1 Oct 2026 20:51:40 +0200
-Subject: [PATCH 11/18] backends: report how long frames wait to be presented
+Subject: [PATCH 11/19] backends: report how long frames wait to be presented
 
 A watchdog outside the compositor can tell a display that stopped presenting from an idle one by asking how long the oldest frame handed to a physical display has been waiting for presentation.
 ---

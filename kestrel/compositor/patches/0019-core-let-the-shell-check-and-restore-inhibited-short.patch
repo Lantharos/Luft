@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 7 Oct 2026 14:05:26 +0200
+Subject: [PATCH 19/19] core: let the shell check and restore inhibited
+ shortcuts
+
+The shell can bind its own action to the shortcut that restores inhibited
+shortcuts, and needs to know whether a window inhibits them to keep
+restoring them first.
+---
+ src/core/window-private.h |  5 -----
+ src/core/window.c         | 16 ++++++++++++++++
+ src/meta/window.h         |  8 ++++++++
+ 3 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index 2eb84858a8effe7ea13c0b921c5c135dc33810f0..cd182346abb33fd122cf3d6a137cb99fe1f92c31 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -830,11 +830,6 @@ MetaPlacementRule *meta_window_get_placement_rule (MetaWindow *window);
+ void meta_window_force_placement (MetaWindow    *window,
+                                   MetaPlaceFlag  flags);
+ 
+-void meta_window_force_restore_shortcuts (MetaWindow         *window,
+-                                          ClutterInputDevice *source);
+-
+-gboolean meta_window_shortcuts_inhibited (MetaWindow         *window,
+-                                          ClutterInputDevice *source);
+ gboolean meta_window_is_stackable (MetaWindow *window);
+ gboolean meta_window_is_focus_async (MetaWindow *window);
+ 
+diff --git a/src/core/window.c b/src/core/window.c
+index 88a50451faf997936a27815252e361dc5d675167..250d8b3bc62e54fab5b78d6b9a3b237df267e2a0 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -8109,6 +8109,14 @@ meta_window_emit_configure (MetaWindow       *window,
+   g_signal_emit (window, window_signals[CONFIGURE], 0, window_config);
+ }
+ 
++/**
++ * meta_window_force_restore_shortcuts:
++ * @window: a #MetaWindow
++ * @source: the device whose shortcuts are restored
++ *
++ * Gives keyboard shortcuts that @window inhibits for @source back to the
++ * compositor.
++ */
+ void
+ meta_window_force_restore_shortcuts (MetaWindow         *window,
+                                      ClutterInputDevice *source)
+@@ -8116,6 +8124,14 @@ meta_window_force_restore_shortcuts (MetaWindow         *window,
+   META_WINDOW_GET_CLASS (window)->force_restore_shortcuts (window, source);
+ }
+ 
++/**
++ * meta_window_shortcuts_inhibited:
++ * @window: a #MetaWindow
++ * @source: the device to check
++ *
++ * Returns: whether @window currently inhibits the compositor's keyboard
++ *   shortcuts for @source
++ */
+ gboolean
+ meta_window_shortcuts_inhibited (MetaWindow         *window,
+                                  ClutterInputDevice *source)
+diff --git a/src/meta/window.h b/src/meta/window.h
+index 45e04d99fcc75ebdb636695dd54a7a70b7b36bbf..ff96506aaeddaa47153fefafbcc01245fef01bfb 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -511,3 +511,11 @@ META_EXPORT
+ gboolean meta_window_get_max_size (MetaWindow *window,
+                                    int        *width,
+                                    int        *height);
++
++META_EXPORT
++void meta_window_force_restore_shortcuts (MetaWindow         *window,
++                                          ClutterInputDevice *source);
++
++META_EXPORT
++gboolean meta_window_shortcuts_inhibited (MetaWindow         *window,
++                                          ClutterInputDevice *source);

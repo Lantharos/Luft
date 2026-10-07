@@ -9,6 +9,7 @@
 	import FontsPage from './fonts/FontsPage.svelte';
 	import FontsSection from './fonts/FontsSection.svelte';
 	import StyleSection from './StyleSection.svelte';
+	import TaskbarPage from './taskbar/TaskbarPage.svelte';
 	import WallpaperSection from './WallpaperSection.svelte';
 
 	type Interface = {
@@ -25,12 +26,18 @@
 	<CursorStore onclose={close} />
 {:else if app.section === 'fonts'}
 	<FontsPage onclose={close} />
+{:else if app.section === 'taskbar'}
+	<TaskbarPage onclose={close} />
 {:else}
 	<StyleSection />
 
 	<WallpaperSection />
 
 	<AppIconsSection />
+
+	<Section>
+		<Row title="Taskbar" onclick={() => (app.section = 'taskbar')} />
+	</Section>
 
 	<CursorSection onbrowse={() => (app.section = 'cursors')} />
 

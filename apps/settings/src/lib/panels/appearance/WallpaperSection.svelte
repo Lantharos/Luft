@@ -4,7 +4,7 @@
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { addWallpapers, onWallpapersChanged, openFolder, wallpapers, type Wallpaper } from './api';
+	import { addWallpapers, onWallpapersChanged, openFolder, uriToPath, wallpapers, type Wallpaper } from './api';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
 	import WallpaperTile from './WallpaperTile.svelte';
 
@@ -43,10 +43,6 @@
 			? [{ path: current, name: 'Current wallpaper', live: !!live }, ...found]
 			: (found ?? [])
 	);
-
-	function uriToPath(uri: string) {
-		return uri.startsWith('file://') ? decodeURIComponent(uri.slice('file://'.length)) : uri;
-	}
 
 	function pathToUri(path: string) {
 		return `file://${path.split('/').map(encodeURIComponent).join('/')}`;

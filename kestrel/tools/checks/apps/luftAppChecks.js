@@ -6,6 +6,7 @@ import {LuftApp, startSabineService, waitFor} from './luftApp.js';
 import {checkDisks} from './disksChecks.js';
 import {checkFonts} from './fontChecks.js';
 import {checkFontViewer} from './fontViewer.js';
+import {checkMailman} from './mailmanChecks.js';
 import {checkRoverNetwork} from './roverNetworkChecks.js';
 import {checkSettingsAccessibility} from './settingsAccessibility.js';
 import {checkSettingsHardware} from './settingsHardware.js';
@@ -118,6 +119,7 @@ export async function checkLuftApps({output, pointer}) {
     await checkFontViewer(darkFrames.magpie, context);
     await checkDisks(context);
     await checkRoverNetwork(context);
+    await checkMailman(context);
     await checkTern(context);
     await checkFonts(context);
   } finally {

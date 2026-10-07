@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {ScratchKeyring} from '../../fixtures/services/secretService.js';
-import {LuftApp, sleep, waitFor} from './luftApp.js';
+import {Keys, LuftApp, sleep, waitFor} from './luftApp.js';
 
 const USER = 'luft';
 const PASSWORD = 'hunter2';
@@ -64,24 +64,6 @@ async function unmount(scheme) {
   if (!mount) return;
   await new Promise(resolve => mount.unmount_with_operation(Gio.MountUnmountFlags.FORCE, null, null, () => resolve()));
   await waitFor(() => !mounted(scheme), 5000, () => `${scheme} stayed mounted`);
-}
-
-class Keys {
-  constructor() {
-    this.device = global.stage.context.get_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
-  }
-
-  press(keyval, modifiers = []) {
-    for (const modifier of modifiers) this.device.notify_keyval(GLib.get_monotonic_time(), modifier, Clutter.KeyState.PRESSED);
-    this.device.notify_keyval(GLib.get_monotonic_time(), keyval, Clutter.KeyState.PRESSED);
-    this.device.notify_keyval(GLib.get_monotonic_time(), keyval, Clutter.KeyState.RELEASED);
-    for (const modifier of modifiers.toReversed()) this.device.notify_keyval(GLib.get_monotonic_time(), modifier, Clutter.KeyState.RELEASED);
-  }
-
-  async type(text) {
-    for (const character of text) this.press(character.codePointAt(0));
-    await sleep(SETTLE / 3);
-  }
 }
 
 async function acceptCertificate(app, keys, output, name) {

@@ -24,9 +24,17 @@ export interface Progress {
 	fraction: number | null;
 }
 
+export type Change = 'refresh' | 'download' | 'update' | 'install' | 'remove';
+
+export interface Elsewhere {
+	by: string | null;
+	change: Change | null;
+}
+
 export interface Activity {
-	running: 'download' | 'firmware' | null;
+	running: 'check' | 'download' | 'firmware' | 'elsewhere' | null;
 	target: string | null;
+	elsewhere: Elsewhere | null;
 	progress: Progress | null;
 	error: string | null;
 }
@@ -48,7 +56,11 @@ export interface Overview {
 	updates: Update[];
 	prepared: boolean;
 	results: Results | null;
-	preferences: Preferences;
+	apps: number | null;
+}
+
+export interface Status {
+	overview: Overview | null;
 	activity: Activity;
 }
 
@@ -65,14 +77,16 @@ export interface Firmware {
 
 const SLOW = { timeoutMs: 600_000 };
 
-export const overview = () => invoke<Overview>('updates_overview', {}, SLOW);
-export const check = () => invoke<Overview>('updates_check', {}, SLOW);
+export const status = () => invoke<Status>('updates_status');
+export const load = () => invoke<void>('updates_load');
+export const check = () => invoke<void>('updates_check');
 export const download = () => invoke<void>('updates_download');
 export const cancel = () => invoke<void>('updates_cancel');
 export const firmware = () => invoke<Firmware[]>('updates_firmware', {}, SLOW);
 export const installFirmware = (id: string) => invoke<void>('updates_firmware_install', { id });
-export const appCount = () => invoke<number>('updates_app_count', {}, SLOW);
 export const restart = () => invoke<void>('updates_restart');
+export const preferences = () => invoke<Preferences>('updates_preferences');
 export const setPreferences = (preferences: Preferences) => invoke<void>('updates_set_preferences', { ...preferences });
 export const openApps = () => invoke<void>('updates_open_apps');
 export const onActivity = (callback: (activity: Activity) => void) => listen<Activity>('updates.activity', callback);
+export const onOverview = (callback: (overview: Overview) => void) => listen<Overview>('updates.overview', callback);

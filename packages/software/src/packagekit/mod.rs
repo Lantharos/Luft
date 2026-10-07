@@ -1,6 +1,7 @@
 mod enums;
 pub mod offline;
 mod package;
+pub mod running;
 mod transaction;
 
 use std::collections::HashMap;
@@ -15,7 +16,7 @@ use transaction::Details;
 pub use enums::filter;
 pub use offline::Results;
 pub use package::{Package, PackageId};
-pub use transaction::Mode;
+pub use transaction::{Mode, follow};
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]

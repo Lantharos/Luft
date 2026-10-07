@@ -3,6 +3,8 @@
 	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
+	import { updates } from '#lib/state/updates.svelte.js';
+	import SidebarProgress from '#lib/panels/updates/SidebarProgress.svelte';
 
 	let present = $derived(hardware.present);
 	let results = $derived(present ? (app.query.trim() ? [searchPanels(app.query, present)] : shownGroups(present)) : []);
@@ -24,6 +26,9 @@
 	>
 		<panel.icon size={18} />
 		<span class="truncate">{titleOf(panel, present)}</span>
+		{#if panel.id === 'updates' && app.panel !== 'updates' && updates.activity.running}
+			<SidebarProgress activity={updates.activity} />
+		{/if}
 	</button>
 {/snippet}
 
@@ -47,6 +52,7 @@
 
 <style>
 	.nav-item {
+		position: relative;
 		display: flex;
 		height: 38px;
 		width: 100%;

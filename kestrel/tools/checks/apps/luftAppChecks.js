@@ -10,6 +10,7 @@ import {checkRoverNetwork} from './roverNetworkChecks.js';
 import {checkSettingsAccessibility} from './settingsAccessibility.js';
 import {checkSettingsHardware} from './settingsHardware.js';
 import {checkSettingsPages} from './settingsPages.js';
+import {checkSettingsUpdates} from './settingsUpdates.js';
 import {checkTern} from './ternChecks.js';
 
 const APPS = ['rover', 'settings', 'disks', 'draft', 'tern', 'magpie', 'mailman', 'barometer', 'schelf', 'keys'];
@@ -111,6 +112,7 @@ export async function checkLuftApps({output, pointer}) {
     await checkSettingsPages(darkFrames.settings, context);
     await checkSettingsAccessibility(context);
     await checkSettingsHardware(context);
+    await checkSettingsUpdates(context);
     await checkFontViewer(darkFrames.magpie, context);
     await checkDisks(context);
     await checkRoverNetwork(context);

@@ -1,6 +1,5 @@
 use std::cell::RefCell;
-use std::collections::HashSet;
-use std::sync::{Arc, Mutex};
+use std::collections::HashMap;
 
 use gio::glib;
 use gio::prelude::*;
@@ -21,13 +20,12 @@ struct Change {
 }
 
 thread_local! {
-    static WATCHED: RefCell<Vec<gio::Settings>> = const { RefCell::new(Vec::new()) };
+    static WATCHED: RefCell<HashMap<Location, gio::Settings>> = RefCell::default();
 }
 
 #[derive(Clone)]
 pub struct Watcher {
     context: glib::MainContext,
-    watching: Arc<Mutex<HashSet<Location>>>,
 }
 
 impl Watcher {
@@ -42,39 +40,38 @@ impl Watcher {
                     .expect("the settings watcher owns its main context");
             })
             .expect("the settings watcher thread starts");
-        Self {
-            context,
-            watching: Arc::default(),
-        }
+        Self { context }
     }
 
     pub fn watch(&self, location: Location, events: Events) -> Result<(), String> {
-        open(&location)?;
-        if !self
-            .watching
-            .lock()
-            .map_err(|error| error.to_string())?
-            .insert(location.clone())
-        {
-            return Ok(());
-        }
+        let (watching, watched) = std::sync::mpsc::sync_channel(1);
         self.context.invoke(move || {
-            let Ok(settings) = open(&location) else {
-                return;
-            };
-            settings.connect_changed(None, move |settings, key| {
-                events.emit(
-                    SETTINGS_CHANGED,
-                    Change {
-                        schema: location.schema.clone(),
-                        path: location.path.clone(),
-                        key: key.to_owned(),
-                        value: super::value::to_json(&settings.value(key)),
-                    },
-                );
-            });
-            WATCHED.with(|watched| watched.borrow_mut().push(settings));
+            let _ = watching.send(WATCHED.with(|watched| {
+                if watched.borrow().contains_key(&location) {
+                    return Ok(());
+                }
+                let settings = open(&location)?;
+                connect(&settings, location.clone(), events);
+                watched.borrow_mut().insert(location, settings);
+                Ok(())
+            }));
         });
-        Ok(())
+        watched
+            .recv()
+            .map_err(|_| "The settings watcher stopped".to_owned())?
     }
+}
+
+fn connect(settings: &gio::Settings, location: Location, events: Events) {
+    settings.connect_changed(None, move |settings, key| {
+        events.emit(
+            SETTINGS_CHANGED,
+            Change {
+                schema: location.schema.clone(),
+                path: location.path.clone(),
+                key: key.to_owned(),
+                value: super::value::to_json(&settings.value(key)),
+            },
+        );
+    });
 }

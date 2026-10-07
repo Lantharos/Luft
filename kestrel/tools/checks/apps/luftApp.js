@@ -118,8 +118,8 @@ class Frame {
     return other?.bytes.compare(this.bytes) === 0;
   }
 
-  looksLike(other) {
-    return this._pixels.length === other._pixels.length && this._pixels.every((value, index) => value === other._pixels[index]);
+  looksLike(other, tolerance = 0) {
+    return this._pixels.length === other._pixels.length && this._pixels.every((value, index) => Math.abs(value - other._pixels[index]) <= tolerance);
   }
 
   save(path) {

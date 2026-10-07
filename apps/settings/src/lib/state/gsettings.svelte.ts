@@ -36,9 +36,9 @@ export class SettingsGroup<T extends Values> {
 	}
 
 	async load() {
+		await invoke('settings_watch', this.location);
 		this.values = (await invoke<T>('settings_read', { ...this.location, keys: this.keys })) as T;
 		this.loaded = true;
-		await invoke('settings_watch', this.location);
 	}
 
 	receive(change: Change) {

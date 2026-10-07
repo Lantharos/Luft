@@ -22,7 +22,7 @@
 	let query = $state('');
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
-	let primary = $derived(PRIMARY.filter((view) => view.id !== 'screener' || mail.settings.screener || mail.counts.screener > 0));
+	let primary = $derived(PRIMARY.filter((view) => view.id !== 'screener' || mail.settings.screener));
 	let multiple = $derived(mail.accounts.length > 1);
 
 	$effect(() => {

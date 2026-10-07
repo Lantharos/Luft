@@ -69,7 +69,11 @@ impl Store {
             let bundle = |name: &str| count(View::Bundle(name.to_owned()), unread);
             Ok(Counts {
                 inbox: count(View::Inbox, unread)?,
-                screener: count(View::Screener, "1")?,
+                screener: if settings.screener {
+                    count(View::Screener, "1")?
+                } else {
+                    0
+                },
                 later: connection
                     .prepare_cached(
                         "SELECT count(DISTINCT thread) FROM messages WHERE snoozed_until > ?1",

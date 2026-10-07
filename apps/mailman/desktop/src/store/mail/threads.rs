@@ -2,7 +2,8 @@ use rusqlite::{OptionalExtension, Row};
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::store::{Role, Store};
+use super::views::approved;
+use crate::store::{Role, Settings, Store};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -144,14 +145,20 @@ impl Store {
         })
     }
 
-    pub fn notable(&self, ids: &[i64], since: i64) -> Result<Vec<Notable>, String> {
+    pub fn notable(
+        &self,
+        ids: &[i64],
+        since: i64,
+        settings: &Settings,
+    ) -> Result<Vec<Notable>, String> {
         self.reading(|connection| {
-            let mut statement = connection.prepare_cached(
+            let mut statement = connection.prepare_cached(&format!(
                 "SELECT m.id, m.thread, CASE WHEN m.sender_name != '' THEN m.sender_name ELSE m.sender END, m.subject
-                 FROM messages m JOIN mailboxes b ON b.id = m.mailbox LEFT JOIN senders s ON s.address = m.sender
+                 FROM messages m JOIN mailboxes b ON b.id = m.mailbox
                  WHERE m.id = ?1 AND b.role = 'inbox' AND m.seen = 0 AND m.category = 'primary' AND m.date >= ?2
-                 AND coalesce(s.verdict, 'approved') = 'approved'",
-            )?;
+                 AND {}",
+                approved(settings)
+            ))?;
             ids.iter()
                 .filter_map(|id| {
                     statement

@@ -48,12 +48,14 @@ function replyTo(all: boolean) {
 }
 
 export function commands(shell: Shell): Command[] {
-	const views = [...PRIMARY, ...BUNDLES].map((view) => ({
-		id: `go-${view.id}`,
-		title: `Go to ${view.label}`,
-		keys: view.key ? `G ${view.key.toUpperCase()}` : undefined,
-		run: () => navigate(view.id)
-	}));
+	const views = [...PRIMARY, ...BUNDLES]
+		.filter((view) => view.id !== 'screener' || mail.settings.screener)
+		.map((view) => ({
+			id: `go-${view.id}`,
+			title: `Go to ${view.label}`,
+			keys: view.key ? `G ${view.key.toUpperCase()}` : undefined,
+			run: () => navigate(view.id)
+		}));
 	const folders = mail.mailboxes
 		.filter((mailbox) => mailbox.selectable && !mailbox.role)
 		.map((mailbox) => ({ id: `go-mailbox:${mailbox.id}`, title: `Go to ${mailbox.name}`, run: () => navigate(`mailbox:${mailbox.id}`) }));

@@ -60,6 +60,7 @@ class ThreadList {
 	}
 
 	load = async () => {
+		if (this.view === 'screener' && !mail.settings.screener) this.view = 'inbox';
 		const generation = ++this.generation;
 		this.loading = true;
 		const limit = Math.min(MAX_RELOAD, Math.max(PAGE, this.rows.length));

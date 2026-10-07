@@ -11,6 +11,7 @@ import gi
 from agent import exercise_agent
 from ownership import exercise_ownership
 from portal import exercise_portal
+from sabine import exercise_sabine
 from seal import seal_off_system_services
 
 gi.require_version("Gio", "2.0")
@@ -162,6 +163,7 @@ def exercise(root, home, environment, script, requests):
     exercise_portal(root, home, environment, check)
     exercise_agent(root, environment, check, script, requests, lock, LOGIN)
     exercise_ownership(root, home, environment, check, script, requests, lock)
+    exercise_sabine(home, environment, check, script, requests)
 
 
 if __name__ == "__main__":

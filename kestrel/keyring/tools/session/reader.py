@@ -61,6 +61,25 @@ def store():
          (properties, (session, b"", secret.encode(), "text/plain"), True))
 
 
+def safe_storage():
+    _, session = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "OpenSession", "(sv)", ("plain", GLib.Variant("s", "")))
+    default = "/org/freedesktop/secrets/aliases/default"
+    (found,) = call(SECRETS, default, "org.freedesktop.Secret.Collection", "SearchItems", "(a{ss})", ({"application": "chromium"},))
+    if not found:
+        key = os.urandom(16).hex()
+        properties = {"org.freedesktop.Secret.Item.Label": GLib.Variant("s", "Chromium Safe Storage"),
+                      "org.freedesktop.Secret.Item.Attributes": GLib.Variant("a{ss}", {"application": "chromium",
+                                                                                     "xdg:schema": "chrome_libsecret_os_crypt_password_v2"})}
+        call(SECRETS, default, "org.freedesktop.Secret.Collection", "CreateItem", "(a{sv}(oayays)b)",
+             (properties, (session, b"", key.encode(), "text/plain"), False))
+        sys.stdout.write(key)
+        return
+    _, prompt = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "Unlock", "(ao)", ([found[0]],))
+    complete(prompt)
+    secrets = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "GetSecrets", "(aoo)", ([found[0]], session))[0]
+    sys.stdout.write("".join(bytes(value).decode() for _, (_, _, value, _) in secrets.items()))
+
+
 def pipe_with(data):
     reader, writer = os.pipe()
     os.write(writer, data)
@@ -134,3 +153,5 @@ elif action == "app-load":
     sys.stdout.write("missing" if load("account-token") is None else "found")
 elif action == "portal":
     portal()
+elif action == "safe-storage":
+    safe_storage()

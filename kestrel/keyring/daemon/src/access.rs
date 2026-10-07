@@ -5,7 +5,7 @@ use luft_keyring_vault::{AccessRule, Action};
 
 use crate::daemon::Daemon;
 use crate::identity::App;
-use crate::keyring::{Decision, decide};
+use crate::keyring::{Decision, decide, hidden};
 use crate::prompter::{Answer, Request};
 
 pub type ItemKey = (String, u64);
@@ -50,6 +50,25 @@ impl Daemon {
             decide(contents, app, &item.0, found),
             Decision::Allowed | Decision::Claim
         )
+    }
+
+    pub async fn visible(self: &Arc<Self>, app: &App, found: Vec<ItemKey>) -> Vec<ItemKey> {
+        if !app.keeps_its_own_chromium_key() {
+            return found;
+        }
+        self.ensure_unlocked(app, true).await;
+        let mut keyring = self.keyring.lock().await;
+        keyring.adopt(app);
+        let Some(view) = keyring.view() else {
+            return Vec::new();
+        };
+        found
+            .into_iter()
+            .filter(|(collection, id)| {
+                view.item(collection, *id)
+                    .is_some_and(|item| !hidden(view, app, collection, item))
+            })
+            .collect()
     }
 
     pub async fn authorize(

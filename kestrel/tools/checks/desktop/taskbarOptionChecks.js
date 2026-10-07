@@ -6,7 +6,13 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide',
-  'taskbar-show-pinned', 'taskbar-displays', 'taskbar-windows-per-display'];
+  'taskbar-show-pinned', 'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
+const SECOND_APP = `
+  imports.gi.versions.Gtk = '4.0';
+  const {Gtk} = imports.gi;
+  const app = new Gtk.Application({application_id: 'com.lantharos.Kestrel.WorkspaceCheck'});
+  app.connect('activate', () => new Gtk.ApplicationWindow({application: app, title: 'Kestrel workspace check'}).present());
+  app.run([]);`;
 const HEIGHTS = {compact: 40, normal: 48, large: 56};
 const FLOATING_MARGIN = 8;
 const SETTLE = 450;
@@ -147,6 +153,8 @@ export async function checkTaskbarOptions({pause, actorNamed, pointer, output}) 
     require(slots().length < pinnedCount || pinnedCount === 0, 'the taskbar can show only running apps');
     await set('taskbar-show-pinned', true);
 
+    await checkWorkspaceWindows({require, set, pause, actorNamed, panel, monitor});
+
     const monitors = Main.layoutManager.monitors;
     if (monitors.length > 1) {
       const other = monitors.find(candidate => candidate.index !== monitor.index);
@@ -178,4 +186,66 @@ export async function checkTaskbarOptions({pause, actorNamed, pointer, output}) 
     styles.set_string('color-scheme', scheme);
     await pause(SETTLE);
   }
+}
+
+async function checkWorkspaceWindows({require, set, pause, actorNamed, panel, monitor}) {
+  const manager = global.workspace_manager;
+  const tracker = Shell.WindowTracker.get_default();
+  const shownOn = (taskbar, app) => {
+    const button = actorNamed(taskbar, `kestrel-app-${app.id}`);
+    return button && button.get_parent().width > 0 ? button : null;
+  };
+  const dots = button => button.child.get_children().filter(actor => actor.has_style_class_name?.('kestrel-running-dot') && actor.visible).length;
+  const switchTo = async index => {
+    manager.get_workspace_by_index(index).activate(global.get_current_time());
+    await pause(SETTLE);
+  };
+  const multiple = Gio.Subprocess.new(['gjs', '-m', GLib.getenv('KESTREL_WINDOW_SCRIPT'), '--multiple'], Gio.SubprocessFlags.NONE);
+  const second = Gio.Subprocess.new(['gjs', '-c', SECOND_APP], Gio.SubprocessFlags.NONE);
+  try {
+    await pause(1500);
+    const windows = global.get_window_actors().map(actor => actor.meta_window);
+    const titled = title => windows.find(window => window.title === title);
+    const [first, other, lone] = ['Kestrel window check 1', 'Kestrel window check 2', 'Kestrel workspace check'].map(titled);
+    for (const window of [first, other, lone]) window.move_to_monitor(monitor.index);
+    const app = tracker.get_window_app(first);
+    const loneApp = tracker.get_window_app(lone);
+    other.change_workspace_by_index(1, false);
+    lone.change_workspace_by_index(1, false);
+    await pause(SETTLE);
+    require(dots(shownOn(panel, app)) === 2 && !!shownOn(panel, loneApp), 'the taskbar lists windows from every workspace by default');
+
+    await set('taskbar-windows-per-workspace', true);
+    require(dots(shownOn(panel, app)) === 1 && !shownOn(panel, loneApp), 'the taskbar can list only the windows on the current workspace');
+    await switchTo(1);
+    require(dots(shownOn(panel, app)) === 1 && !!shownOn(panel, loneApp), 'switching workspaces lists that workspace\'s windows');
+    lone.change_workspace_by_index(0, false);
+    await pause(SETTLE);
+    require(!shownOn(panel, loneApp), 'moving a window to another workspace takes it off the taskbar');
+    lone.change_workspace_by_index(1, false);
+    await pause(SETTLE);
+    require(!!shownOn(panel, loneApp), 'moving a window here puts it on the taskbar');
+
+    const otherMonitor = Main.layoutManager.monitors.find(candidate => candidate.index !== monitor.index);
+    if (otherMonitor) {
+      await set('taskbar-windows-per-display', true);
+      const secondary = actorNamed(global.stage, 'kestrel-secondary-panel');
+      lone.move_to_monitor(otherMonitor.index);
+      await pause(SETTLE);
+      require(!shownOn(panel, loneApp) && !!shownOn(secondary, loneApp) && !shownOn(secondary, app),
+        'each display lists only its own windows on the current workspace');
+      await switchTo(0);
+      require(dots(shownOn(panel, app)) === 1 && !shownOn(secondary, app) && !!shownOn(secondary, loneApp),
+        'switching workspaces keeps each display to its own windows, and windows on other displays show on every workspace');
+      await set('taskbar-windows-per-display', false);
+    }
+    await switchTo(0);
+    await set('taskbar-windows-per-workspace', false);
+    require(dots(shownOn(panel, app)) === 2 && !!shownOn(panel, loneApp), 'turning it off lists every workspace again');
+  } finally {
+    multiple.force_exit();
+    second.force_exit();
+    manager.get_workspace_by_index(0).activate(global.get_current_time());
+  }
+  await pause(500);
 }

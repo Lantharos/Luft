@@ -69,9 +69,9 @@ export class ContextMenus {
     });
   }
 
-  appEntries(app: Shell.App, windows = app.get_windows()): MenuEntry[] {
+  appEntries(app: Shell.App, windows = app.get_windows(), open = () => app.activate()): MenuEntry[] {
     const launch = (action: () => void) => () => { this.dismissShell(); action(); };
-    const entries: MenuEntry[] = [{ label: 'Open', run: launch(() => app.activate()) }];
+    const entries: MenuEntry[] = [{ label: 'Open', run: launch(open) }];
     const info = app.get_app_info();
     if (app.can_open_new_window() && !info?.list_actions().includes('new-window'))
       entries.push({ label: 'New window', run: launch(() => app.open_new_window(-1)) });

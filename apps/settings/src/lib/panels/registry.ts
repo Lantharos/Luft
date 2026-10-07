@@ -11,6 +11,7 @@ import LogIn from '@lucide/svelte/icons/log-in';
 import Monitor from '@lucide/svelte/icons/monitor';
 import Mouse from '@lucide/svelte/icons/mouse';
 import Palette from '@lucide/svelte/icons/palette';
+import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 import Hand from '@lucide/svelte/icons/hand';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
@@ -45,7 +46,7 @@ interface Needs {
 }
 
 export interface Panel {
-	id: PanelId;
+	id: PanelId | `${PanelId}/${string}`;
 	title: string | ((hardware: Hardware) => string);
 	icon: Component;
 	keywords: string[];
@@ -54,7 +55,7 @@ export interface Panel {
 }
 
 const panel = (
-	id: PanelId,
+	id: Panel['id'],
 	title: Panel['title'],
 	icon: Component,
 	keywords: string[],
@@ -104,6 +105,10 @@ export const PANEL_GROUPS: Panel[][] = [
 ];
 
 export const PANELS = PANEL_GROUPS.flat();
+
+const SUBPAGES: Panel[] = [
+	panel('appearance/taskbar', 'Taskbar', PanelBottom, ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays'], () => import('./appearance/AppearancePanel.svelte'))
+];
 export const DEFAULT_PANEL: PanelId = 'network';
 
 export interface Link {
@@ -118,7 +123,7 @@ export function resolveLink(target: string): Link | null {
 		.toLowerCase()
 		.split('/');
 	const panel = PANELS.find((candidate) => candidate.id === name);
-	return panel ? { panel: panel.id, section: section || null } : null;
+	return panel ? { panel: name as PanelId, section: section || null } : null;
 }
 
 export function titleOf(panel: Panel, hardware: Hardware) {
@@ -135,7 +140,7 @@ export function shownGroups(hardware: Hardware) {
 
 export function searchPanels(query: string, hardware: Hardware): Panel[] {
 	const needle = query.trim().toLowerCase();
-	return PANELS.filter(
+	return [...PANELS, ...SUBPAGES].filter(
 		(panel) => isShown(panel, hardware) && [titleOf(panel, hardware), ...panel.keywords].some((term) => term.toLowerCase().includes(needle))
 	);
 }

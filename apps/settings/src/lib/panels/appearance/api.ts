@@ -11,3 +11,7 @@ export const onWallpapersChanged = (callback: (wallpapers: Wallpaper[]) => void)
 export const thumbnail = (path: string) => invoke<string>('appearance_thumbnail', { path });
 export const addWallpapers = () => invoke<void>('appearance_add_wallpapers');
 export const openFolder = () => invoke<void>('appearance_open_folder');
+
+export function uriToPath(uri: string) {
+	return uri.startsWith('file://') ? decodeURIComponent(uri.slice('file://'.length)) : uri;
+}

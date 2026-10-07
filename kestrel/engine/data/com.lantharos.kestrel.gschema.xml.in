@@ -30,6 +30,40 @@
     <value nick="fullscreen" value="1"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.TaskbarAlignment">
+    <value nick="center" value="0"/>
+    <value nick="left" value="1"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TaskbarLook">
+    <value nick="glass" value="0"/>
+    <value nick="solid" value="1"/>
+    <value nick="transparent" value="2"/>
+    <value nick="accent" value="3"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TaskbarStyle">
+    <value nick="bar" value="0"/>
+    <value nick="floating" value="1"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TaskbarSize">
+    <value nick="compact" value="0"/>
+    <value nick="normal" value="1"/>
+    <value nick="large" value="2"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TaskbarAutoHide">
+    <value nick="never" value="0"/>
+    <value nick="always" value="1"/>
+    <value nick="windows" value="2"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TaskbarDisplays">
+    <value nick="all" value="0"/>
+    <value nick="primary" value="1"/>
+  </enum>
+
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="lock-screen-content" type="b">
@@ -170,6 +204,62 @@
     <key name="emoji-skin-tone" enum="com.lantharos.kestrel.SkinTone">
       <default>'none'</default>
       <summary>Skin tone used for emoji of people and hands</summary>
+    </key>
+    <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
+      <default>'center'</default>
+      <summary>Where Start and the apps sit on the taskbar</summary>
+    </key>
+    <key name="taskbar-look" enum="com.lantharos.kestrel.TaskbarLook">
+      <default>'glass'</default>
+      <summary>How the taskbar's background looks</summary>
+      <description>
+        'glass' blurs what is behind the taskbar, 'solid' paints it in the
+        dark surface color, 'transparent' leaves only the icons and text on
+        the wallpaper, and 'accent' tints the glass with the accent color.
+      </description>
+    </key>
+    <key name="taskbar-style" enum="com.lantharos.kestrel.TaskbarStyle">
+      <default>'bar'</default>
+      <summary>Whether the taskbar spans the screen or floats above its edge</summary>
+      <description>
+        'bar' runs along the whole bottom edge. 'floating' leaves a margin
+        around the taskbar and rounds its ends.
+      </description>
+    </key>
+    <key name="taskbar-size" enum="com.lantharos.kestrel.TaskbarSize">
+      <default>'normal'</default>
+      <summary>Height of the taskbar and size of its icons</summary>
+    </key>
+    <key name="taskbar-auto-hide" enum="com.lantharos.kestrel.TaskbarAutoHide">
+      <default>'never'</default>
+      <summary>When the taskbar hides itself</summary>
+      <description>
+        'always' keeps the taskbar hidden until the pointer reaches the
+        bottom edge or Start opens. 'windows' hides it only while a window
+        touches it. While the taskbar hides itself, windows can use the
+        whole screen.
+      </description>
+    </key>
+    <key name="taskbar-show-pinned" type="b">
+      <default>true</default>
+      <summary>Show pinned apps on the taskbar</summary>
+      <description>
+        When disabled, the taskbar shows only apps that are running, and
+        Start lists pinned apps along with the others.
+      </description>
+    </key>
+    <key name="taskbar-displays" enum="com.lantharos.kestrel.TaskbarDisplays">
+      <default>'all'</default>
+      <summary>Which displays show a taskbar</summary>
+    </key>
+    <key name="taskbar-windows-per-display" type="b">
+      <default>false</default>
+      <summary>Show each display's own windows on its taskbar</summary>
+      <description>
+        When enabled, each taskbar shows pinned apps and the apps with
+        windows on its own display, and its running indicators, previews
+        and clicks use only those windows.
+      </description>
     </key>
     <key name="favorite-apps" type="as">
       <default>

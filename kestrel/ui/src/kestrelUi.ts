@@ -14,7 +14,8 @@ import { PanelSet } from './panel/panels.js';
 import { StartMenu } from './start/startMenu.js';
 import { QuickSettings } from './quickSettings/quickSettings.js';
 import { NotificationCenter } from './notifications/notificationCenter.js';
-import { PANEL_HEIGHT, SURFACE_GAP } from './shared/surface.js';
+import { SURFACE_GAP } from './shared/surface.js';
+import { taskbarPreferences } from './panel/preferences/taskbarPreferences.js';
 import { animateActor } from './shared/motion.js';
 import { loadKestrelStylesheets } from './shared/stylesheet.js';
 import { AppearanceService } from './appearance/service.js';
@@ -133,7 +134,15 @@ class KestrelUi {
       notifications: () => this.toggle('notifications', monitor()),
       activateWindow: context.activateWindow,
       stopScreencast: context.stopScreencast,
-    }), this.menus, this.previews);
+    }), this.menus, this.previews, () => {
+      this.place();
+      this.syncSession();
+    });
+    const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
+    for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
+    this.disconnectors.push(taskbarPreferences.watch(key => {
+      if (key === 'taskbar-style' || key === 'taskbar-size') this.place();
+    }));
 
     context.layoutManager.addTopChrome(this.cover);
     context.layoutManager.addTopChrome(this.start.actor);
@@ -226,7 +235,7 @@ class KestrelUi {
     const available = this.desktopAvailable();
     const covered = coveredMonitors(this.context.layoutManager.monitors);
     for (const panel of this.panels.all)
-      panel.actor.visible = !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index);
+      panel.autoHide.setAllowed(!!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
     this.liveWallpaper.sync(available && !this.taskView.visible);
     if (!available) this.dismissImmediately();
   }
@@ -277,8 +286,9 @@ class KestrelUi {
     const stage = (global as unknown as Shell.Global).stage;
     this.cover.set_size(stage.width, stage.height);
     const startWidth = Math.min(660, monitor.width - 24);
-    const bottom = monitor.y + monitor.height - PANEL_HEIGHT - SURFACE_GAP;
-    const available = monitor.height - PANEL_HEIGHT - 24;
+    const clearance = taskbarPreferences.clearance;
+    const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
+    const available = monitor.height - clearance - 24;
     const startHeight = Math.min(START_HEIGHT, available);
     this.start.actor.set_size(startWidth, startHeight);
     this.start.actor.set_position(Math.round(monitor.x + (monitor.width - startWidth) / 2), bottom - startHeight);
@@ -299,7 +309,8 @@ class KestrelUi {
 
   private pointerMonitor(): Monitor {
     const index = (global as unknown as Shell.Global).display.get_current_monitor();
-    return this.context.layoutManager.monitors[index] ?? this.context.layoutManager.primaryMonitor!;
+    const monitor = this.context.layoutManager.monitors[index];
+    return monitor && this.panels.panelOn(monitor) ? monitor : this.context.layoutManager.primaryMonitor!;
   }
 
   private toggle(surface: Surface, monitor = this.pointerMonitor()): void {
@@ -514,6 +525,8 @@ export function dismissImmediately(): void {
 export function switchWorkspace(index: number): void { currentUi?.switchWorkspace(index); }
 
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
+
+export function taskbarClearance(): number { return taskbarPreferences.clearance; }
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
 

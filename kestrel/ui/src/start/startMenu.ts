@@ -10,13 +10,14 @@ import { StartGrid } from './grid.js';
 import { StartFooter } from './footer.js';
 import { StartSearch } from './search/search.js';
 import { appKey, launchHistory } from '../shared/launchHistory.js';
+import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
   readonly footer: StartFooter;
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private pinned = new Set(this.favorites.get_strv('favorite-apps'));
+  private pinned = this.readPinned();
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;
   private readonly searchProvider: StartSearch;
@@ -77,15 +78,22 @@ export class StartMenu {
     this.actor.add_child(this.footer.actor);
 
     const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
-    const favoritesChanged = this.favorites.connect('changed::favorite-apps', () => {
-      this.pinned = new Set(this.favorites.get_strv('favorite-apps'));
+    const pinnedChanged = () => {
+      this.pinned = this.readPinned();
       this.browser.update(this.apps, this.pinned);
-    });
+    };
+    const favoritesChanged = this.favorites.connect('changed::favorite-apps', pinnedChanged);
+    const unwatchTaskbar = taskbarPreferences.watch(key => { if (key === 'taskbar-show-pinned') pinnedChanged(); });
     this.actor.connect('destroy', () => {
       this.appSystem.disconnect(installedChanged);
       this.favorites.disconnect(favoritesChanged);
+      unwatchTaskbar();
     });
     this.loadApps();
+  }
+
+  private readPinned(): Set<string> {
+    return new Set(taskbarPreferences.showPinned ? this.favorites.get_strv('favorite-apps') : []);
   }
 
   focus(): void {

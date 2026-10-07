@@ -29,11 +29,19 @@ function checkedControls(seed: Seed, accent: string, { dark }: Palette): string 
 `;
 }
 
+function taskbarLooks(seed: Seed, { dark }: Palette): string {
+  const tint = isNeutral(seed) ? dark.colors.surfaceContainerHighest : dark.colors.primaryContainer;
+  return `.kestrel-panel.kestrel-panel.kestrel-taskbar-solid { background-color: ${dark.colors.surfaceContainer}; }
+.kestrel-panel.kestrel-panel.kestrel-taskbar-accent { background-color: ${rgba(tint, 0.62)}; }
+.kestrel-panel.kestrel-panel.kestrel-taskbar-accent.kestrel-taskbar-opaque { background-color: ${tint}; }
+`;
+}
+
 function accentStylesheet(seed: Seed, palette: Palette): string {
   const accent = toHex(accentColor(seed));
   const { colors: solid } = isNeutral(seed) ? palette.dark : palette.light;
   const bright = palette.dark.colors.primary;
-  return `${checkedControls(seed, accent, palette)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
+  return `${checkedControls(seed, accent, palette)}${taskbarLooks(seed, palette)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${bright}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${bright}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${bright}; }

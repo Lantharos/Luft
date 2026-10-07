@@ -6,9 +6,11 @@ import St from 'gi://St';
 
 import * as BarLevel from './barLevel.js';
 import * as Layout from './layout.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 
 const HIDE_TIMEOUT = 1500;
+const TASKBAR_GAP = 24;
 const FADE_TIME = 100;
 export const LEVEL_ANIMATION_TIME = 100;
 
@@ -94,6 +96,7 @@ class OsdWindow extends Clutter.Actor {
             return;
 
         if (!this.visible) {
+            this._hbox.style = `margin-bottom: ${KestrelUi.taskbarClearance() + TASKBAR_GAP}px;`;
             global.compositor.disable_unredirect();
             super.show();
             this.opacity = 0;

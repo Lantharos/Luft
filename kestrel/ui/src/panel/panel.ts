@@ -4,20 +4,27 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
 import { PanelLayout } from './panelLayout.js';
 import type { WindowPreviews } from './windowPreviews.js';
 import { Taskbar } from './taskbar/taskbar.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
-import { createLauncher } from './launcher.js';
+import { createLauncher, type Launcher } from './launcher.js';
 import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './desktopPeek.js';
 import { PanelClock } from './clock.js';
 import { PrivacyIndicator } from '../privacy/indicator.js';
 import { InputSourceIndicator } from '../inputSources/indicator.js';
 import { systemMonitor } from './systemMonitor.js';
+import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
+import { TaskbarSurface } from './preferences/taskbarLook.js';
+import { AutoHide } from './autoHide/autoHide.js';
+import { animateActor } from '../shared/motion.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
+const RESIZE_DURATION = 240;
+const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
+const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black'];
+const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display'];
 
 function showLayout(keys: Shell.App, layout: string): void {
   keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
@@ -41,14 +48,19 @@ export interface PanelActions {
 
 export class KestrelPanel {
   readonly actor: St.Widget;
+  readonly strut = new St.Widget();
+  readonly autoHide: AutoHide;
+  private readonly layout = new PanelLayout();
+  private readonly surface: TaskbarSurface;
+  private readonly launcher: Launcher;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly taskbar: Taskbar;
   private readonly clock = new PanelClock();
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', y_align: Clutter.ActorAlign.CENTER });
-  private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker, number][] = [];
-  private readonly startButton: St.Button;
+  private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker | Meta.Display, number][] = [];
+  private readonly unwatchPreferences: () => void;
   private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
   private readonly tray: Tray | null = null;
@@ -56,14 +68,15 @@ export class KestrelPanel {
   private readonly inputSource: InputSourceIndicator | null = null;
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1, actions.activateWindow);
+    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
+      app => this.windowsOf(app), actions.activateWindow);
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
       reactive: true,
-      layout_manager: new PanelLayout(),
+      layout_manager: this.layout,
     });
-    blurSurface(this.actor, 0);
+    this.autoHide = new AutoHide(this.actor, () => this.monitor);
 
     const center = new St.BoxLayout({
       name: primary ? 'kestrel-panel-center' : null,
@@ -71,8 +84,8 @@ export class KestrelPanel {
       x_align: Clutter.ActorAlign.CENTER,
       y_align: Clutter.ActorAlign.CENTER,
     });
-    this.startButton = createLauncher(actions.start);
-    center.add_child(this.startButton);
+    this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button);
+    center.add_child(this.launcher.button);
     center.add_child(this.taskbar.actor);
     this.actor.add_child(center);
 
@@ -115,19 +128,25 @@ export class KestrelPanel {
     this.actor.add_child(right);
     const peek = new DesktopPeek();
     this.actor.add_child(peek.actor);
+    this.surface = new TaskbarSurface(this.actor, peek.actor);
 
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => this.refreshApps())],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
       [this.tracker, this.tracker.connect('notify::focus-app', () => this.taskbar.updateFocus())],
+      ...(['window-entered-monitor', 'window-left-monitor'] as const).map(signal => {
+        const display = (global as unknown as Shell.Global).display;
+        return [display, display.connect(signal, () => { if (taskbarPreferences.windowsPerDisplay) this.refreshApps(); })] as [Meta.Display, number];
+      }),
     );
+    this.unwatchPreferences = taskbarPreferences.watch(key => this.preferenceChanged(key));
     menus.bind(this.actor, () => {
       const monitor = systemMonitor();
       return [
         { label: 'Show desktop', run: () => peek.toggleDesktop() },
         ...monitor ? [{ label: 'System monitor', run: () => monitor.activate() }] : [],
-        { label: 'Settings', run: () => menus.settings() },
+        { label: 'Taskbar settings', run: () => menus.settings('appearance/taskbar') },
       ];
     });
     menus.bind(this.clockButton, () => [
@@ -137,6 +156,7 @@ export class KestrelPanel {
   }
 
   shutdown(): void {
+    this.unwatchPreferences();
     this.tray?.shutdown();
     this.privacy?.shutdown();
     this.inputSource?.shutdown();
@@ -149,6 +169,8 @@ export class KestrelPanel {
   destroy(): void {
     this.shutdown();
     this.actor.destroy();
+    this.strut.destroy();
+    this.autoHide.edge.destroy();
   }
 
   handlesScroll(actor: Clutter.Actor | null): boolean {
@@ -165,15 +187,26 @@ export class KestrelPanel {
     for (const icon of icons.slice(iconNames.length)) icon.destroy();
   }
 
-  place(): void {
+  place(animate = false): void {
     if (!this.monitor) return;
-    this.actor.set_position(this.monitor.x, this.monitor.y + this.monitor.height - PANEL_HEIGHT);
-    this.actor.set_size(this.monitor.width, PANEL_HEIGHT);
+    const { x, y, width, height } = this.monitor;
+    const { height: barHeight, margin } = taskbarPreferences.metrics;
+    const clearance = barHeight + margin;
+    this.strut.set_position(x, y + height - clearance);
+    this.strut.set_size(width, clearance);
+    const bar = { x: x + margin, y: y + height - clearance, width: width - 2 * margin, height: barHeight };
+    if (animate) animateActor(this.actor, { ...bar, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+    else {
+      this.actor.set_position(bar.x, bar.y);
+      this.actor.set_size(bar.width, bar.height);
+    }
+    this.autoHide.place();
   }
 
   setActive(surface: string | null): void {
+    this.autoHide.setActive(surface !== null);
     for (const [button, active] of [
-      [this.startButton, surface === 'start'],
+      [this.launcher.button, surface === 'start'],
       [this.quickButton, surface === 'quick'],
       [this.clockButton, surface === 'notifications'],
     ] as const) {
@@ -182,12 +215,31 @@ export class KestrelPanel {
     }
   }
 
+  private windowsOf(app: Shell.App): Meta.Window[] {
+    const windows = app.get_windows();
+    if (!taskbarPreferences.windowsPerDisplay || !this.monitor) return windows;
+    return windows.filter(window => window.get_monitor() === this.monitor!.index);
+  }
+
+  private preferenceChanged(key: TaskbarKey): void {
+    if (LOOK_KEYS.includes(key)) this.surface.sync();
+    if (SHAPE_KEYS.includes(key)) {
+      const metrics = taskbarPreferences.metrics;
+      this.launcher.resize(metrics.button);
+      this.taskbar.resize(metrics);
+      this.place(true);
+    }
+    if (key === 'taskbar-alignment' || SHAPE_KEYS.includes(key)) this.layout.ease();
+    if (APP_KEYS.includes(key)) this.refreshApps();
+  }
+
   private refreshApps(): void {
-    const apps = this.favorites.get_strv('favorite-apps')
+    const pinned = taskbarPreferences.showPinned ? this.favorites.get_strv('favorite-apps') : [];
+    const apps = pinned
       .map(id => this.appSystem.lookup_app(id))
       .filter((app): app is Shell.App => app !== null);
     for (const app of this.appSystem.get_running()) {
-      if (!apps.some(favorite => favorite.id === app.id)) apps.push(app);
+      if (!apps.some(shown => shown.id === app.id) && (!taskbarPreferences.windowsPerDisplay || this.windowsOf(app).length)) apps.push(app);
     }
     this.taskbar.update(apps);
   }

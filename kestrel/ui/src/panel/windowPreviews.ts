@@ -3,7 +3,8 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { blurSurface, PANEL_HEIGHT } from '../shared/surface.js';
+import { blurSurface } from '../shared/surface.js';
+import { taskbarPreferences } from './preferences/taskbarPreferences.js';
 import { animateActor } from '../shared/motion.js';
 import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
@@ -33,14 +34,14 @@ export class WindowPreviews {
     this.actor.connect('destroy', () => { this.cleanup(); this.source = null; });
   }
 
-  bind(button: St.Button, app: () => Shell.App): void {
+  bind(button: St.Button, app: () => Shell.App, windows: () => Meta.Window[]): void {
     button.connect('notify::hover', () => {
-      if (button.hover) this.schedule(() => this.open(button, app()), 280);
+      if (button.hover) this.schedule(() => this.open(button, app(), windows()), 280);
       else this.schedule(() => this.closeUnlessFocused(), 180);
     });
     button.connect('key-press-event', (_actor, event) => {
-      if (event.get_key_symbol() !== Clutter.KEY_Up || !app().get_windows().length) return Clutter.EVENT_PROPAGATE;
-      this.open(button, app(), true);
+      if (event.get_key_symbol() !== Clutter.KEY_Up || !windows().length) return Clutter.EVENT_PROPAGATE;
+      this.open(button, app(), windows(), true);
       return Clutter.EVENT_STOP;
     });
     button.connect('destroy', () => {
@@ -49,11 +50,11 @@ export class WindowPreviews {
     });
   }
 
-  open(button: St.Button, app: Shell.App, focus = false): void {
+  open(button: St.Button, app: Shell.App, appWindows: Meta.Window[], focus = false): void {
     this.cancelTimer();
     if (!this.enabled()) return;
     const monitor = this.monitorFor(button);
-    const windows = app.get_windows().filter(window => !window.skip_taskbar);
+    const windows = appWindows.filter(window => !window.skip_taskbar);
     if (!monitor || !windows.length) return;
     this.beforeOpen();
     this.close(true);
@@ -105,14 +106,15 @@ export class WindowPreviews {
     scroll.child = grid;
     this.actor.add_child(scroll);
     this.actor.show();
-    const availableHeight = monitor.height - PANEL_HEIGHT - 36;
+    const clearance = taskbarPreferences.clearance;
+    const availableHeight = monitor.height - clearance - 36;
     const naturalHeight = grid.get_preferred_height(-1)[1];
     scroll.vscrollbar_policy = naturalHeight > availableHeight ? St.PolicyType.AUTOMATIC : St.PolicyType.NEVER;
     scroll.height = Math.min(naturalHeight, availableHeight);
     const popupWidth = this.actor.get_preferred_width(-1)[1];
     const popupHeight = this.actor.get_preferred_height(popupWidth)[1];
     const [x] = button.get_transformed_position();
-    this.actor.set_position(Math.round(Math.max(monitor.x + 12, Math.min(x + button.width / 2 - popupWidth / 2, monitor.x + monitor.width - popupWidth - 12))), monitor.y + monitor.height - PANEL_HEIGHT - popupHeight - 10);
+    this.actor.set_position(Math.round(Math.max(monitor.x + 12, Math.min(x + button.width / 2 - popupWidth / 2, monitor.x + monitor.width - popupWidth - 12))), monitor.y + monitor.height - clearance - popupHeight - 10);
     this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
     this.actor.opacity = 0;
     this.actor.translation_y = 8;

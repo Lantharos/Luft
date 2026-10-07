@@ -9,6 +9,7 @@ import { blurSurface } from '../shared/surface.js';
 import { animateActor } from '../shared/motion.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsPageId } from '../settings/pages.js';
+import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
 
 export type { MenuEntry } from './menuContent.js';
 
@@ -68,7 +69,7 @@ export class ContextMenus {
     });
   }
 
-  appEntries(app: Shell.App): MenuEntry[] {
+  appEntries(app: Shell.App, windows = app.get_windows()): MenuEntry[] {
     const launch = (action: () => void) => () => { this.dismissShell(); action(); };
     const entries: MenuEntry[] = [{ label: 'Open', run: launch(() => app.activate()) }];
     const info = app.get_app_info();
@@ -76,7 +77,6 @@ export class ContextMenus {
       entries.push({ label: 'New window', run: launch(() => app.open_new_window(-1)) });
     for (const action of info?.list_actions() ?? [])
       entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, (global as unknown as Shell.Global).get_current_time(), -1)) });
-    const windows = app.get_windows();
     for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => this.activateWindow(window)) });
     if (windows.length === 1) {
       const window = windows[0];
@@ -87,14 +87,17 @@ export class ContextMenus {
         if (window.is_maximized()) window.unmaximize(); else window.maximize();
       } });
     }
-    if (!app.is_window_backed()) {
+    if (taskbarPreferences.showPinned && !app.is_window_backed()) {
       const pinned = this.favorites.get_strv('favorite-apps').includes(app.id);
-      entries.push({ label: pinned ? 'Unpin from panel' : 'Pin to panel', run: () => {
+      entries.push({ label: pinned ? 'Unpin from taskbar' : 'Pin to taskbar', run: () => {
         const ids = this.favorites.get_strv('favorite-apps');
         this.favorites.set_strv('favorite-apps', pinned ? ids.filter(id => id !== app.id) : [...ids, app.id]);
       } });
     }
-    if (windows.length) entries.push({ label: windows.length === 1 ? 'Close window' : 'Close all windows', run: () => app.request_quit() });
+    if (windows.length) entries.push({ label: windows.length === 1 ? 'Close window' : 'Close all windows', run: () => {
+      if (windows.length === app.get_windows().length) app.request_quit();
+      else for (const window of windows) window.delete((global as unknown as Shell.Global).get_current_time());
+    } });
     return entries;
   }
 

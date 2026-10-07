@@ -7,7 +7,7 @@ import {LuftApp, sleep} from './luftApp.js';
 const REPOSITORY = GLib.build_filenamev([GLib.path_get_dirname(GLib.filename_from_uri(import.meta.url)[0]), '..', '..', '..', '..']);
 const SAMPLES = [
   {name: 'system', source: '/usr/share/fonts/adwaita-sans-fonts/AdwaitaSans-Regular.ttf', tabs: true},
-  {name: 'woff2', source: GLib.build_filenamev([REPOSITORY, 'packages/ui/fonts/OpenRunde-Regular.woff2']), install: true},
+  {name: 'woff2', source: GLib.build_filenamev([REPOSITORY, 'kestrel/tools/fixtures/fonts/MagpieSample-Regular.woff2']), install: true},
 ];
 const LOADING = 800;
 const TAB_Y = 77;
@@ -16,7 +16,7 @@ const TABS = {preview: -1, characters: 0, details: 1};
 const HEADER_Y = 29;
 const HEADER_BUTTON_FROM_RIGHT = 198;
 const BUSY = 200;
-const INSTALLED_NAME = 'OpenRunde-Regular.otf';
+const INSTALLED_NAME = 'MagpieSample-Regular.otf';
 
 function copySample(source) {
   const folder = GLib.build_filenamev([GLib.get_user_cache_dir(), 'luft-fonts']);

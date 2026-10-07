@@ -567,6 +567,10 @@ export function lockControls(): LockControls { return currentUi!.lockControls();
 
 export function board(): Board | null { return currentUi?.board ?? null; }
 
+export function enterBoardWindow(window: Meta.Window): void {
+  currentUi?.board.enterWindow(window);
+}
+
 export function boardView(workspace: Meta.Workspace): BoardFrame | null {
   return currentUi?.board.frameOf(workspace) ?? null;
 }

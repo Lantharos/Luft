@@ -20,6 +20,7 @@ function later(run: () => void): void {
 
 export class Follower {
   private readonly pending = new Set<Meta.Window>();
+  private readonly unplaced = new Set<Meta.Window>();
   private readonly workspaceSignals = new Map<Meta.Workspace, number[]>();
   private readonly signals: [{ disconnect(id: number): void }, number][];
 
@@ -49,10 +50,12 @@ export class Follower {
     for (const [object, id] of this.signals) object.disconnect(id);
     for (const workspace of [...this.workspaceSignals.keys()]) this.unwatch(workspace);
     this.pending.clear();
+    this.unplaced.clear();
   }
 
   private added(window: Meta.Window, canvas: Canvas): void {
     if (!canvas.shown || !isBoardWindow(window)) return;
+    this.unplaced.add(window);
     if ((window as Meta.Window & { mapped: boolean }).mapped) later(() => this.place(window, canvas));
     else this.pending.add(window);
   }
@@ -64,11 +67,15 @@ export class Follower {
   }
 
   private place(window: Meta.Window, canvas: Canvas): void {
-    if (canvas.shown && window.get_workspace() && this.board.canvasOf(window.get_workspace()) === canvas) this.board.place(window, canvas);
+    if (!this.unplaced.delete(window)) return;
+    if (!canvas.shown || !window.get_workspace() || this.board.canvasOf(window.get_workspace()) !== canvas) return;
+    this.board.place(window, canvas);
+    if (shell().display.focus_window === window) this.focused(window);
   }
 
   private removed(window: Meta.Window, canvas: Canvas): void {
     this.pending.delete(window);
+    this.unplaced.delete(window);
     later(() => this.board.release(window, canvas));
   }
 
@@ -78,7 +85,7 @@ export class Follower {
     if (change === Meta.SizeChange.MAXIMIZE) {
       later(() => {
         window.unmaximize();
-        this.board.fitWindow(window);
+        this.board.enterWindow(window);
       });
     } else if (change === Meta.SizeChange.FULLSCREEN) {
       later(() => this.board.exit());
@@ -87,7 +94,12 @@ export class Follower {
 
   private focused(window: Meta.Window | null): void {
     const workspace = this.board.presentedWorkspace();
-    if (!window || !workspace || !isBoardWindow(window) || !window.located_on_workspace(workspace)) return;
+    if (!window || !workspace || this.unplaced.has(window) || !isBoardWindow(window) || !window.located_on_workspace(workspace)) return;
+    const entered = this.board.enteredWindow();
+    if (entered) {
+      if (entered !== window) this.board.enterWindow(window);
+      return;
+    }
     const onScreen = screenBox(this.board.camera.view, this.board.viewport, frameBox(window));
     if (intersection(onScreen, this.board.viewport) < onScreen.width * onScreen.height * HIDDEN_FRACTION) this.board.reveal(window);
   }

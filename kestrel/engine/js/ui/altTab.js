@@ -144,6 +144,7 @@ const CyclerPopup = GObject.registerClass({
 
         if (activeWs === ws) {
             Main.activateWindow(window);
+            KestrelUi.enterBoardWindow(window);
         } else {
             // If the selected window is on a different workspace, we don't
             // want it to disappear, then slide in with the workspace; instead,
@@ -254,6 +255,7 @@ class WindowSwitcherPopup extends SwitcherPopup.SwitcherPopup {
             window.unminimize();
         }
         Main.activateWindow(window);
+        KestrelUi.enterBoardWindow(window);
 
         super._finish();
     }

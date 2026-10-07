@@ -63,6 +63,29 @@ export function boundsOf(boxes: Iterable<Box>): Box | null {
   return left === Infinity ? null : { x: left, y: top, width: right - left, height: bottom - top };
 }
 
+const NEIGHBOR_CONE = Math.tan(Math.PI / 3);
+const SIDEWAYS_WEIGHT = 2;
+
+export function nearestInDirection(from: Box, candidates: readonly Box[], directionX: number, directionY: number): number {
+  const centerX = from.x + from.width / 2;
+  const centerY = from.y + from.height / 2;
+  let best = -1;
+  let bestScore = Infinity;
+  candidates.forEach((box, index) => {
+    const offsetX = box.x + box.width / 2 - centerX;
+    const offsetY = box.y + box.height / 2 - centerY;
+    const along = offsetX * directionX + offsetY * directionY;
+    const sideways = Math.abs(offsetX * directionY - offsetY * directionX);
+    if (along <= 0 || sideways > along * NEIGHBOR_CONE) return;
+    const score = along + sideways * SIDEWAYS_WEIGHT;
+    if (score < bestScore) {
+      bestScore = score;
+      best = index;
+    }
+  });
+  return best;
+}
+
 export function intersection(a: Box, b: Box): number {
   const width = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
   const height = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);

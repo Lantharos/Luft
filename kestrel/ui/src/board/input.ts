@@ -3,6 +3,7 @@ import type Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
 import type { Camera } from './camera.js';
+import { copyView, type View } from './geometry.js';
 
 const TAP_DURATION = 250;
 const TAP_TO_DRAG = 400;
@@ -14,10 +15,15 @@ const WHEEL_PAN = 60;
 const FINGER_PAN = 10;
 const FINGER_ZOOM = 0.04;
 const SNAP_TO_FULL_SIZE = 0.94;
+const PINCH_ENTER = 1.15;
+const STEP_THRESHOLD = 48;
+const SHIELD_BELOW = 0.6;
+const DRAG_SLOP = 6;
+const OVERVIEW_QUIET = 500;
 const VELOCITY_SMOOTHING = 0.3;
 const SUPER = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 
-type SwipeMode = 'none' | 'pan' | 'move' | 'direction' | 'switch' | 'passed';
+type SwipeMode = 'none' | 'pan' | 'move' | 'step' | 'direction' | 'switch' | 'passed';
 
 export interface BoardActions {
   readonly camera: Camera;
@@ -26,7 +32,11 @@ export interface BoardActions {
   enter(): void;
   exit(): void;
   fitAll(): void;
-  fitWindow(window: Meta.Window): void;
+  enteredWindow(): Meta.Window | null;
+  enterWindow(window: Meta.Window, from?: View): void;
+  overview(): void;
+  freeView(): void;
+  navigate(directionX: number, directionY: number): void;
   onCanvas(x: number, y: number): boolean;
   windowAt(x: number, y: number): Meta.Window | null;
   beginMove(window: Meta.Window): void;
@@ -35,6 +45,7 @@ export interface BoardActions {
 }
 
 export class BoardInput {
+  readonly shield = new Clutter.Actor({ name: 'kestrel-board-shield', reactive: true, visible: false });
   private swipeMode: SwipeMode = 'none';
   private swipeX = 0;
   private swipeY = 0;
@@ -44,16 +55,30 @@ export class BoardInput {
   private holdStart = 0;
   private tapTime = -Infinity;
   private pinching = false;
-  private pinchStartScale = 1;
+  private pinchScale = 1;
+  private pinchEntered: Meta.Window | null = null;
+  private readonly pinchStart: View = { x: 0, y: 0, scale: 1 };
   private dragging: Clutter.Grab | null = null;
   private dragX = 0;
   private dragY = 0;
+  private panned = false;
+  private picked: Meta.Window | null = null;
+  private pickMoved = false;
+  private quietUntil = -Infinity;
   private lastClickTime = -Infinity;
   private lastClickX = 0;
   private lastClickY = 0;
   private swallowedButton = 0;
 
-  constructor(private readonly actions: BoardActions, private readonly grabActor: Clutter.Actor) {}
+  constructor(private readonly actions: BoardActions, private readonly grabActor: Clutter.Actor) {
+    grabActor.connect('event', (_actor, event: Clutter.Event) =>
+      this.dragging && this.handle(event) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
+  }
+
+  syncShield(shown: boolean): void {
+    const shielded = shown && !this.actions.enteredWindow() && this.actions.camera.view.scale < SHIELD_BELOW;
+    if (this.shield.visible !== shielded) this.shield.visible = shielded;
+  }
 
   handle(event: Clutter.Event): boolean {
     switch (event.type()) {
@@ -87,6 +112,7 @@ export class BoardInput {
       else this.actions.moveBy(dx, dy);
       return true;
     }
+    if (mode === 'step') return this.chooseStep(event);
     if (mode === 'direction') return this.chooseDirection(event);
     return mode === 'switch';
   }
@@ -102,12 +128,27 @@ export class BoardInput {
       this.swipeMode = 'none';
       return;
     }
-    this.actions.camera.stop();
     const [x, y] = event.get_coords();
     const window = time - this.tapTime < TAP_TO_DRAG ? this.actions.windowAt(x, y) : null;
     this.tapTime = -Infinity;
+    if (!window && this.actions.enteredWindow()) {
+      this.swipeMode = 'step';
+      return;
+    }
+    this.actions.camera.stop();
     if (window) this.actions.beginMove(window);
     this.swipeMode = window ? 'move' : 'pan';
+  }
+
+  private chooseStep(event: Clutter.Event): boolean {
+    const [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
+    this.swipeX += dx;
+    this.swipeY += dy;
+    if (Math.hypot(this.swipeX, this.swipeY) < STEP_THRESHOLD) return true;
+    this.swipeMode = 'switch';
+    if (Math.abs(this.swipeX) >= Math.abs(this.swipeY)) this.actions.navigate(this.swipeX < 0 ? 1 : -1, 0);
+    else if (this.swipeY > 0) this.actions.overview();
+    return true;
   }
 
   private chooseDirection(event: Clutter.Event): boolean {
@@ -144,22 +185,36 @@ export class BoardInput {
     const camera = this.actions.camera;
     const [x, y] = event.get_coords();
     if (phase === Clutter.TouchpadGesturePhase.BEGIN) {
-      this.pinching = this.actions.active() && (event.get_touchpad_gesture_finger_count() >= 3 || this.actions.onCanvas(x, y));
+      this.pinching = this.actions.active() && (event.get_touchpad_gesture_finger_count() >= 3 || this.shielded(x, y) || this.actions.onCanvas(x, y));
       if (this.pinching) {
         camera.stop();
-        this.pinchStartScale = camera.view.scale;
+        copyView(this.pinchStart, camera.view);
+        this.pinchScale = 1;
+        this.pinchEntered = this.actions.enteredWindow();
       }
       return this.pinching;
     }
     if (!this.pinching) return false;
     if (phase === Clutter.TouchpadGesturePhase.UPDATE) {
       const [dx, dy] = event.get_gesture_motion_delta();
-      camera.zoomAt(this.pinchStartScale * event.get_gesture_pinch_scale(), x, y, dx, dy);
+      this.pinchScale = event.get_gesture_pinch_scale();
+      camera.zoomAt(this.pinchStart.scale * this.pinchScale, x, y, dx, dy);
       return true;
     }
     this.pinching = false;
-    if (camera.view.scale >= SNAP_TO_FULL_SIZE && camera.view.scale < 1) camera.zoomAt(1, x, y);
+    this.endPinch(x, y);
     return true;
+  }
+
+  private endPinch(x: number, y: number): void {
+    const entered = this.pinchEntered;
+    this.pinchEntered = null;
+    const window = this.pinchScale > PINCH_ENTER ? this.actions.windowAt(x, y) : null;
+    const camera = this.actions.camera;
+    if (window) this.actions.enterWindow(window, this.pinchStart);
+    else if (entered && this.pinchScale < 1 / PINCH_ENTER) this.actions.overview();
+    else if (entered) this.actions.enterWindow(entered);
+    else if (camera.view.scale >= SNAP_TO_FULL_SIZE && camera.view.scale < 1) camera.zoomAt(1, x, y);
   }
 
   private press(event: Clutter.Event): boolean {
@@ -173,19 +228,25 @@ export class BoardInput {
     const [x, y] = event.get_coords();
     const onCanvas = this.actions.onCanvas(x, y);
     const withSuper = (event.get_state() & SUPER) !== 0;
-    if (button === Clutter.BUTTON_PRIMARY && this.isDoubleClick(event.get_time(), x, y)) {
-      const window = withSuper ? this.actions.windowAt(x, y) : null;
-      if (onCanvas) this.actions.fitAll();
-      else if (window) this.actions.fitWindow(window);
-      return onCanvas || !!window;
+    if (button === Clutter.BUTTON_PRIMARY && onCanvas && this.isDoubleClick(event.get_time(), x, y)) {
+      this.actions.fitAll();
+      return true;
     }
-    const pans = (button === Clutter.BUTTON_PRIMARY && onCanvas) || (button === Clutter.BUTTON_MIDDLE && (onCanvas || withSuper));
-    if (!pans) return false;
-    this.actions.camera.stop();
+    const shielded = this.shielded(x, y);
+    const picked = button === Clutter.BUTTON_PRIMARY && shielded ? this.actions.windowAt(x, y) : null;
+    const pans = (button === Clutter.BUTTON_PRIMARY && onCanvas) || (button === Clutter.BUTTON_MIDDLE && (onCanvas || withSuper || shielded));
+    if (!picked && !pans) return false;
+    if (pans) this.actions.camera.stop();
+    this.picked = picked;
+    this.pickMoved = this.panned = false;
     this.dragX = x;
     this.dragY = y;
     this.dragging = (global as unknown as Shell.Global).stage.grab(this.grabActor);
     return true;
+  }
+
+  private shielded(x: number, y: number): boolean {
+    return this.shield.visible && (global as unknown as Shell.Global).stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y) === this.shield;
   }
 
   private isDoubleClick(time: number, x: number, y: number): boolean {
@@ -200,7 +261,16 @@ export class BoardInput {
   private motion(event: Clutter.Event): boolean {
     if (!this.dragging) return false;
     const [x, y] = event.get_coords();
-    this.actions.camera.panBy(x - this.dragX, y - this.dragY);
+    if (this.picked) {
+      if (!this.pickMoved && Math.hypot(x - this.dragX, y - this.dragY) < DRAG_SLOP) return true;
+      if (!this.pickMoved) this.actions.beginMove(this.picked);
+      this.pickMoved = true;
+      this.actions.moveBy(x - this.dragX, y - this.dragY);
+    } else {
+      if (!this.panned) this.actions.freeView();
+      this.panned = true;
+      this.actions.camera.panBy(x - this.dragX, y - this.dragY);
+    }
     this.dragX = x;
     this.dragY = y;
     return true;
@@ -214,6 +284,10 @@ export class BoardInput {
     if (!this.dragging) return false;
     this.dragging.dismiss();
     this.dragging = null;
+    const picked = this.picked;
+    this.picked = null;
+    if (picked && this.pickMoved) this.actions.endMove();
+    else if (picked) this.actions.enterWindow(picked);
     return true;
   }
 
@@ -221,9 +295,18 @@ export class BoardInput {
     if (!this.actions.active()) return false;
     const [x, y] = event.get_coords();
     const state = event.get_state();
-    const onCanvas = this.actions.onCanvas(x, y);
+    const entered = this.actions.enteredWindow();
+    if ((state & SUPER) !== 0 && (entered || event.get_time() < this.quietUntil)) {
+      if (entered && this.zoomsOut(event)) {
+        this.actions.overview();
+        this.quietUntil = event.get_time() + OVERVIEW_QUIET;
+      }
+      return true;
+    }
+    const onCanvas = this.shielded(x, y) || this.actions.onCanvas(x, y);
     const zooms = (state & SUPER) !== 0 || ((state & Clutter.ModifierType.CONTROL_MASK) !== 0 && onCanvas);
     if (!zooms && !onCanvas) return false;
+    this.actions.freeView();
     const camera = this.actions.camera;
     const direction = event.get_scroll_direction();
     if (direction !== Clutter.ScrollDirection.SMOOTH) {
@@ -242,5 +325,11 @@ export class BoardInput {
     if ((state & Clutter.ModifierType.SHIFT_MASK) !== 0 && dx === 0) camera.panBy(-dy * unit, 0);
     else camera.panBy(-dx * unit, -dy * unit);
     return true;
+  }
+
+  private zoomsOut(event: Clutter.Event): boolean {
+    const direction = event.get_scroll_direction();
+    if (direction !== Clutter.ScrollDirection.SMOOTH) return direction === Clutter.ScrollDirection.DOWN;
+    return event.get_scroll_delta()[1] > 0;
   }
 }

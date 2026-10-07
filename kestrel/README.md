@@ -227,15 +227,26 @@ Any desktop can be turned into a board: an endless canvas where windows lie side
 
 On a board the taskbar steps aside and a small pill in the corner shows the time, battery and status icons; clicking it opens Quick Settings. The canvas sits on a blurred, dimmed copy of the wallpaper with a dot grid that moves and scales with it.
 
-- Pan with three fingers, by dragging empty canvas with the left or middle button, by scrolling over empty canvas, or with Super and the arrow keys. A three-finger flick keeps gliding for a moment.
+- Pan with three fingers, by dragging empty canvas with the left or middle button, by scrolling over empty canvas, or with Super and the arrow keys while no window is entered. A three-finger flick keeps gliding for a moment.
 - Zoom by pinching, with Ctrl and the scroll wheel over empty canvas, with Super and the scroll wheel anywhere, or with Super+= and Super+-. Zooming goes from an overview of the whole board up to 100%. Super+0 fits the whole board, and so does double-clicking empty canvas.
 - Move windows by their title bar, by dragging with Super held, or by tapping with three fingers and then swiping. A window dropped onto others pushes them aside, and edges snap flush so windows can sit edge to edge. Windows never overlap.
-- Windows stay fully usable at any zoom. Maximizing a window, for example by double-clicking its title bar, zooms the board to fit it instead, and so does Super with a double-click.
-- New windows open in the middle of the current view, in the nearest free spot. Activating a window that is out of view, for example from Alt+Tab, pans the board to it.
+- New windows open in the middle of the current view, in the nearest free spot. Activating a window that is mostly out of view pans the board to it.
 
-Leaving a board puts the windows you can see back on the ordinary desktop where they were on screen, at their normal size, and minimizes the ones out of view. If the board was zoomed to fit a single window, that window is maximized. Turning the board on again brings back every window and the view exactly as they were. Reduced motion turns the board's animations and gliding off.
+#### Working in a window
 
-`kestrel/tools/session.sh capture` turns a desktop with four test windows into a board by pressing Super twice, checks that no windows overlap and that the next desktop stays ordinary, pans and pinches through the same handlers the touchpad uses, types into a window shown at about half size, moves windows with a three-finger tap and swipe and with Super held, then leaves and returns to the board and checks where every window ends up. It saves `board.png`, `board-exit.png` and `board-exit-maximized.png`.
+Enter a window to work in it: the board glides until the window fills the screen with a small margin, at 100% when it fits, and the window takes the keyboard. The other windows dim a little, and a small grid button appears next to the corner pill.
+
+- Enter a window by clicking it while the board shows windows below 60%, by spreading three fingers over it, with Super+Enter on the focused window, with Alt+Tab, or by maximizing it, for example by double-clicking its title bar. While windows are shown that small, a click picks the window instead of reaching the app, dragging moves it from anywhere, and two-finger pinches and scrolling act on the board. From 60% up, the pointer goes straight to the app.
+- Move to the nearest window in a direction with Super and the arrow keys, or by swiping left or right with three fingers, which slides the next window in the way the fingers move. The board travels there with a slight camera arc and focuses the window.
+- Step back out with Super+Escape, by pinching in, with Super and scrolling down, by swiping down with three fingers, or with the grid button. The board returns to the view you entered from, or fits the whole board if there was none. When an app holds the desktop's shortcuts, Super+Escape gives them back first.
+- The view follows an entered window when it grows, shrinks or moves on its own, and settles again after you move or resize it. A window that opens while you work in another opens beside it, any window that takes focus is entered in turn, and closing the entered window steps back out.
+- Panning or zooming yourself leaves the window without moving the view.
+
+Three fingers stay on the board and four fingers leave it: a three-finger swipe down steps back out of a window, and a four-finger swipe down leaves the board, even from inside a window.
+
+Leaving a board puts the windows you can see back on the ordinary desktop where they were on screen, at their normal size, and minimizes the ones out of view. An entered window, or one the board was zoomed to fit, is maximized. Turning the board on again brings back every window, the view, and the entered window exactly as they were. Reduced motion turns the board's animations and gliding off.
+
+`kestrel/tools/session.sh capture` turns a desktop with four test windows into a board by pressing Super twice, checks that no windows overlap and that the next desktop stays ordinary, pans and pinches through the same handlers the touchpad uses, moves windows with a three-finger tap and swipe and with Super held, then lays the windows out in a grid and enters them: by clicking one in the overview and typing into it, with Super and each arrow key to the expected neighbor, Super+Escape and a pinch back to the exact overview, Super+Enter, a three-finger spread, three-finger swipes sideways and down, and Alt+Tab. It checks that the view follows an entered window as it grows and moves, that a new window opens beside it, and that a four-finger swipe still leaves the board from inside a window, maximizing it. It then returns to the board and checks where every window ends up. It saves `board.png`, `board-entered.png`, `board-exit.png` and `board-exit-maximized.png`.
 
 ### System dialogs
 

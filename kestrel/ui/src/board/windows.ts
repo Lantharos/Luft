@@ -37,6 +37,8 @@ export class Collisions {
   private start: Box[] = [];
   private boxes: Box[] = [];
   private readonly movingBox: Box = { x: 0, y: 0, width: 0, height: 0 };
+  private intendedX = 0;
+  private intendedY = 0;
   private snapping = false;
   private later = 0;
   private signals: number[] = [];
@@ -66,13 +68,15 @@ export class Collisions {
     this.start = this.others.map(frameBox);
     this.boxes = this.start.map(box => ({ ...box }));
     this.boxes.push(this.movingBox);
+    ({ x: this.intendedX, y: this.intendedY } = window.get_frame_rect());
     this.signals = (['position-changed', 'size-changed'] as const).map(signal => window.connect(signal, () => this.queue()));
   }
 
   moveBy(canvasDx: number, canvasDy: number): void {
     if (!this.moving) return;
-    const { x, y } = this.moving.get_frame_rect();
-    this.moving.move_frame(true, Math.round(x + canvasDx), Math.round(y + canvasDy));
+    this.intendedX += canvasDx;
+    this.intendedY += canvasDy;
+    this.moving.move_frame(true, Math.round(this.intendedX), Math.round(this.intendedY));
   }
 
   end(): void {

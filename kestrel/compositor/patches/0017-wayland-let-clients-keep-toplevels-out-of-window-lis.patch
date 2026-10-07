@@ -1,0 +1,500 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 7 Oct 2026 02:46:30 +0200
+Subject: [PATCH 17/17] wayland: let clients keep toplevels out of window lists
+ and above others
+
+Wayland has no way for a client to ask that a toplevel stay out of the
+taskbar and window switcher, or stay above other windows, which palettes,
+launchers and tray popups rely on elsewhere. kestrel_window_v1 gives each
+xdg_toplevel a window state object whose requests hide the window from
+window lists and keep it above, using the same window state as the
+compositor's own controls. The state survives the toplevel being unmapped
+and mapped again, and destroying the object undoes what it asked for.
+---
+ src/meson.build                            |   3 +
+ src/wayland/meta-wayland-kestrel-window.c  | 301 +++++++++++++++++++++
+ src/wayland/meta-wayland-kestrel-window.h  |  22 ++
+ src/wayland/meta-wayland-versions.h        |   1 +
+ src/wayland/meta-wayland.c                 |   2 +
+ src/wayland/protocol/kestrel-window-v1.xml |  84 ++++++
+ 6 files changed, 413 insertions(+)
+ create mode 100644 src/wayland/meta-wayland-kestrel-window.c
+ create mode 100644 src/wayland/meta-wayland-kestrel-window.h
+ create mode 100644 src/wayland/protocol/kestrel-window-v1.xml
+
+diff --git a/src/meson.build b/src/meson.build
+index bd726b0085107f71c56272551128b0ac693b4f46..92c5a4cb4154198fb855d862b4d22d0ad37e249c 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -638,6 +638,8 @@ mutter_sources += [
+   'wayland/meta-wayland-xdg-shell.h',
+   'wayland/meta-wayland-toplevel-icon.c',
+   'wayland/meta-wayland-toplevel-icon.h',
++  'wayland/meta-wayland-kestrel-window.c',
++  'wayland/meta-wayland-kestrel-window.h',
+   'wayland/meta-wayland-icon-pixels.c',
+   'wayland/meta-wayland-icon-pixels.h',
+   'wayland/meta-wayland-xdg-dialog.c',
+@@ -1019,6 +1021,7 @@ wayland_protocols = [
+   ['fractional-scale', 'staging', 1, ],
+   ['fifo', 'staging', 1, ],
+   ['gtk-shell', 'private', ],
++  ['kestrel-window-v1', 'private', ],
+   ['idle-inhibit', 'unstable', 1, ],
+   ['keyboard-shortcuts-inhibit', 'unstable', 1, ],
+   ['linux-dmabuf', 'stable', 1, ],
+diff --git a/src/wayland/meta-wayland-kestrel-window.c b/src/wayland/meta-wayland-kestrel-window.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..a8b47c48d88d48a9cab1d28276f35c842e1bad95
+--- /dev/null
++++ b/src/wayland/meta-wayland-kestrel-window.c
+@@ -0,0 +1,301 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "wayland/meta-wayland-kestrel-window.h"
++
++#include "core/window-private.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-versions.h"
++#include "wayland/meta-wayland-xdg-shell.h"
++
++#include "kestrel-window-v1-server-protocol.h"
++
++static GQuark quark_window_state_data = 0;
++
++typedef struct _MetaWaylandKestrelWindowState
++{
++  struct wl_resource *resource;
++  MetaWaylandXdgSurface *toplevel;
++  MetaDisplay *display;
++  gulong window_created_handler_id;
++  gboolean skip_window_list;
++  gboolean keep_above;
++} MetaWaylandKestrelWindowState;
++
++struct _MetaWaylandKestrelWindowManager
++{
++  GObject parent;
++  MetaWaylandCompositor *compositor;
++};
++
++#define META_TYPE_WAYLAND_KESTREL_WINDOW_MANAGER \
++  (meta_wayland_kestrel_window_manager_get_type ())
++G_DECLARE_FINAL_TYPE (MetaWaylandKestrelWindowManager,
++                      meta_wayland_kestrel_window_manager,
++                      META, WAYLAND_KESTREL_WINDOW_MANAGER, GObject)
++
++G_DEFINE_TYPE (MetaWaylandKestrelWindowManager,
++               meta_wayland_kestrel_window_manager,
++               G_TYPE_OBJECT)
++
++static MetaWindow *
++window_of (MetaWaylandKestrelWindowState *state)
++{
++  MetaWaylandSurface *surface;
++
++  if (!state->toplevel)
++    return NULL;
++
++  surface = meta_wayland_surface_role_get_surface (
++    META_WAYLAND_SURFACE_ROLE (state->toplevel));
++  return meta_wayland_surface_get_window (surface);
++}
++
++static void
++apply_skip_window_list (MetaWindow *window,
++                        gboolean    skip)
++{
++  if (skip)
++    meta_window_hide_from_window_list (window);
++  else
++    meta_window_show_in_window_list (window);
++}
++
++static void
++apply_keep_above (MetaWindow *window,
++                  gboolean    above)
++{
++  if (meta_window_is_above (window) == above)
++    return;
++
++  if (above)
++    meta_window_make_above (window);
++  else
++    meta_window_unmake_above (window);
++}
++
++static void
++update_skip_window_list (MetaWaylandKestrelWindowState *state,
++                         gboolean                       skip)
++{
++  MetaWindow *window = window_of (state);
++
++  state->skip_window_list = skip;
++  if (window)
++    apply_skip_window_list (window, skip);
++}
++
++static void
++update_keep_above (MetaWaylandKestrelWindowState *state,
++                   gboolean                       above)
++{
++  MetaWindow *window = window_of (state);
++
++  state->keep_above = above;
++  if (window)
++    apply_keep_above (window, above);
++}
++
++static void
++on_window_created (MetaDisplay                   *display,
++                   MetaWindow                    *window,
++                   MetaWaylandKestrelWindowState *state)
++{
++  if (window != window_of (state))
++    return;
++
++  if (state->skip_window_list)
++    apply_skip_window_list (window, TRUE);
++  if (state->keep_above)
++    apply_keep_above (window, TRUE);
++}
++
++static void
++window_state_destructor (struct wl_resource *resource)
++{
++  MetaWaylandKestrelWindowState *state = wl_resource_get_user_data (resource);
++
++  if (state->toplevel)
++    {
++      if (state->skip_window_list)
++        update_skip_window_list (state, FALSE);
++      if (state->keep_above)
++        update_keep_above (state, FALSE);
++      g_object_steal_qdata (G_OBJECT (state->toplevel),
++                            quark_window_state_data);
++    }
++
++  g_clear_signal_handler (&state->window_created_handler_id, state->display);
++  g_free (state);
++}
++
++static void
++window_state_destroy (struct wl_client   *client,
++                      struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++window_state_set_skip_window_list (struct wl_client   *client,
++                                   struct wl_resource *resource)
++{
++  update_skip_window_list (wl_resource_get_user_data (resource), TRUE);
++}
++
++static void
++window_state_unset_skip_window_list (struct wl_client   *client,
++                                     struct wl_resource *resource)
++{
++  update_skip_window_list (wl_resource_get_user_data (resource), FALSE);
++}
++
++static void
++window_state_set_keep_above (struct wl_client   *client,
++                             struct wl_resource *resource)
++{
++  update_keep_above (wl_resource_get_user_data (resource), TRUE);
++}
++
++static void
++window_state_unset_keep_above (struct wl_client   *client,
++                               struct wl_resource *resource)
++{
++  update_keep_above (wl_resource_get_user_data (resource), FALSE);
++}
++
++static const struct kestrel_window_state_v1_interface
++  meta_wayland_kestrel_window_state_interface = {
++  window_state_destroy,
++  window_state_set_skip_window_list,
++  window_state_unset_skip_window_list,
++  window_state_set_keep_above,
++  window_state_unset_keep_above,
++};
++
++static void
++window_state_toplevel_destroyed (MetaWaylandKestrelWindowState *state)
++{
++  state->toplevel = NULL;
++}
++
++static void
++window_manager_destroy (struct wl_client   *client,
++                        struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++window_manager_get_window_state (struct wl_client   *client,
++                                 struct wl_resource *resource,
++                                 uint32_t            id,
++                                 struct wl_resource *toplevel_resource)
++{
++  MetaWaylandKestrelWindowManager *manager =
++    wl_resource_get_user_data (resource);
++  MetaWaylandXdgSurface *toplevel =
++    wl_resource_get_user_data (toplevel_resource);
++  MetaWaylandKestrelWindowState *state;
++
++  if (g_object_get_qdata (G_OBJECT (toplevel), quark_window_state_data))
++    {
++      wl_resource_post_error (resource,
++                              KESTREL_WINDOW_MANAGER_V1_ERROR_ALREADY_REQUESTED,
++                              "kestrel_window_manager_v1::get_window_state already requested");
++      return;
++    }
++
++  state = g_new0 (MetaWaylandKestrelWindowState, 1);
++  state->toplevel = toplevel;
++  state->display = meta_context_get_display (manager->compositor->context);
++  state->resource = wl_resource_create (client,
++                                        &kestrel_window_state_v1_interface,
++                                        wl_resource_get_version (resource),
++                                        id);
++  wl_resource_set_implementation (state->resource,
++                                  &meta_wayland_kestrel_window_state_interface,
++                                  state, window_state_destructor);
++  state->window_created_handler_id =
++    g_signal_connect (state->display, "window-created",
++                      G_CALLBACK (on_window_created), state);
++
++  g_object_set_qdata_full (G_OBJECT (toplevel),
++                           quark_window_state_data,
++                           state,
++                           (GDestroyNotify) window_state_toplevel_destroyed);
++}
++
++static const struct kestrel_window_manager_v1_interface
++  meta_wayland_kestrel_window_manager_interface = {
++  window_manager_destroy,
++  window_manager_get_window_state,
++};
++
++static void
++bind_kestrel_window_manager (struct wl_client *client,
++                             void             *data,
++                             uint32_t          version,
++                             uint32_t          id)
++{
++  struct wl_resource *resource;
++
++  resource = wl_resource_create (client, &kestrel_window_manager_v1_interface,
++                                 version, id);
++  wl_resource_set_implementation (resource,
++                                  &meta_wayland_kestrel_window_manager_interface,
++                                  data, NULL);
++}
++
++static void
++meta_wayland_kestrel_window_manager_init (MetaWaylandKestrelWindowManager *manager)
++{
++}
++
++static void
++meta_wayland_kestrel_window_manager_class_init (MetaWaylandKestrelWindowManagerClass *klass)
++{
++  quark_window_state_data =
++    g_quark_from_static_string ("-meta-wayland-kestrel-window-state-data");
++}
++
++static MetaWaylandKestrelWindowManager *
++meta_wayland_kestrel_window_manager_new (MetaWaylandCompositor *compositor)
++{
++  MetaWaylandKestrelWindowManager *manager;
++
++  manager = g_object_new (META_TYPE_WAYLAND_KESTREL_WINDOW_MANAGER, NULL);
++  manager->compositor = compositor;
++
++  if (wl_global_create (compositor->wayland_display,
++                        &kestrel_window_manager_v1_interface,
++                        META_KESTREL_WINDOW_V1_VERSION,
++                        manager, bind_kestrel_window_manager) == NULL)
++    g_error ("Failed to register a global kestrel-window object");
++
++  return manager;
++}
++
++void
++meta_wayland_init_kestrel_window (MetaWaylandCompositor *compositor)
++{
++  g_object_set_data_full (G_OBJECT (compositor), "-meta-wayland-kestrel-window",
++                          meta_wayland_kestrel_window_manager_new (compositor),
++                          g_object_unref);
++}
+diff --git a/src/wayland/meta-wayland-kestrel-window.h b/src/wayland/meta-wayland-kestrel-window.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..528e691ba62a1a0d7da42bcc954dee824e9982f5
+--- /dev/null
++++ b/src/wayland/meta-wayland-kestrel-window.h
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include "wayland/meta-wayland.h"
++
++void meta_wayland_init_kestrel_window (MetaWaylandCompositor *compositor);
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index 1a8320811350861548498e0a0ce4572f08f9fb42..d0af544a7b7b580ee24c808afb1d74e7f1143736 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -72,3 +72,4 @@
+ #define META_WL_FIXES_VERSION 1
+ #define META_WP_POINTER_WARP_VERSION 1
+ #define META_EXT_BACKGROUND_EFFECT_V1_VERSION 1
++#define META_KESTREL_WINDOW_V1_VERSION 1
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index 85086dfe27eec73366a7f38886ef125b8ab87054..d78b904127c9d83009c426dfba16c151f50e3637 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -68,6 +68,7 @@
+ #include "wayland/meta-wayland-transaction.h"
+ #include "wayland/meta-wayland-xdg-dialog.h"
+ #include "wayland/meta-wayland-toplevel-icon.h"
++#include "wayland/meta-wayland-kestrel-window.h"
+ #include "wayland/meta-wayland-xdg-foreign.h"
+ #include "wayland/meta-wayland-xdg-session-manager.h"
+ #include "wayland/meta-wayland-xdg-toplevel-tag.h"
+@@ -1025,6 +1026,7 @@ meta_wayland_compositor_new (MetaContext *context)
+   meta_wayland_init_color_representation (compositor);
+   meta_wayland_init_background_effect (compositor);
+   meta_wayland_init_toplevel_icon (compositor);
++  meta_wayland_init_kestrel_window (compositor);
+   meta_wayland_init_fixes (compositor);
+ 
+ #ifdef HAVE_XWAYLAND
+diff --git a/src/wayland/protocol/kestrel-window-v1.xml b/src/wayland/protocol/kestrel-window-v1.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..2aec8b0a2e1bd2a345d7d19a2ece37709d9b2048
+--- /dev/null
++++ b/src/wayland/protocol/kestrel-window-v1.xml
+@@ -0,0 +1,84 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="kestrel_window_v1">
++  <copyright>
++    Copyright © 2026 Lantharos
++
++    Permission is hereby granted, free of charge, to any person obtaining a
++    copy of this software and associated documentation files (the "Software"),
++    to deal in the Software without restriction, including without limitation
++    the rights to use, copy, modify, merge, publish, distribute, sublicense,
++    and/or sell copies of the Software, and to permit persons to whom the
++    Software is furnished to do so, subject to the following conditions:
++
++    The above copyright notice and this permission notice (including the next
++    paragraph) shall be included in all copies or substantial portions of the
++    Software.
++
++    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++    DEALINGS IN THE SOFTWARE.
++  </copyright>
++
++  <interface name="kestrel_window_manager_v1" version="1">
++    <description summary="window placement requests for toplevels">
++      Lets a client keep a toplevel out of the desktop's window lists, such as
++      the taskbar and the window switcher, and keep it above other windows.
++      Palettes, launchers and tray popups use these.
++    </description>
++
++    <enum name="error">
++      <entry name="already_requested" value="0"
++             summary="the toplevel already has a window state object"/>
++    </enum>
++
++    <request name="destroy" type="destructor">
++      <description summary="destroy the manager">
++        Destroying the manager leaves window state objects it created intact.
++      </description>
++    </request>
++
++    <request name="get_window_state">
++      <description summary="get the window state object of a toplevel">
++        Creates the window state object of a toplevel. A toplevel can have
++        only one; asking again is an already_requested error.
++      </description>
++      <arg name="id" type="new_id" interface="kestrel_window_state_v1"/>
++      <arg name="toplevel" type="object" interface="xdg_toplevel"/>
++    </request>
++  </interface>
++
++  <interface name="kestrel_window_state_v1" version="1">
++    <description summary="placement state of one toplevel">
++      Requests take effect immediately and last until they are undone or the
++      object is destroyed, which returns the toplevel to its default state.
++      The toplevel keeps the state when it is unmapped and mapped again.
++    </description>
++
++    <request name="destroy" type="destructor">
++      <description summary="return the toplevel to its default state"/>
++    </request>
++
++    <request name="set_skip_window_list">
++      <description summary="leave the toplevel out of window lists">
++        The toplevel no longer appears in the taskbar, the window switcher or
++        other lists of windows.
++      </description>
++    </request>
++
++    <request name="unset_skip_window_list">
++      <description summary="show the toplevel in window lists again"/>
++    </request>
++
++    <request name="set_keep_above">
++      <description summary="keep the toplevel above other windows"/>
++    </request>
++
++    <request name="unset_keep_above">
++      <description summary="stack the toplevel normally again"/>
++    </request>
++  </interface>
++</protocol>

@@ -15,3 +15,4 @@
 0015-compositor-use-variable-refresh-only-for-windows-tha.patch
 0016-clutter-keep-shell-text-antialiasing-grayscale.patch
 0017-wayland-let-clients-keep-toplevels-out-of-window-lis.patch
+0018-core-let-the-shell-lay-windows-out-on-a-transformed-.patch

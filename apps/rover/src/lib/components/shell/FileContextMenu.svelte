@@ -83,7 +83,7 @@
 				{@render item('chart-pie', 'See what’s using space', () => tools.exploreSpace(manager, target.path))}
 			{/if}
 		{/if}
-		{@render item('info', 'Properties', () => tools.showProperties(manager, targets))}
+		{@render item('info', 'Properties', () => tools.showProperties(targets))}
 		<MenuSeparator />
 		{@render item('trash-2', 'Move to trash', manager.actions.trashSelected, true)}
 	{:else}

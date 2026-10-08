@@ -5,7 +5,6 @@
 	import type { Drive, EncryptionCheck, Volume } from '#lib/api.js';
 	import { SHORTEST_PASSPHRASE } from '#lib/encryption.svelte.js';
 	import { errorText, volumeName } from '#lib/format.js';
-	import { disks } from '#lib/state/disks.svelte.js';
 	import Steps from './Steps.svelte';
 	import SwitchLine from './SwitchLine.svelte';
 

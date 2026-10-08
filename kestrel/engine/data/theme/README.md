@@ -1,32 +1,14 @@
-## Summary
+# Kestrel theme
 
-Do not edit the CSS directly, edit the source SCSS files and the CSS files
-will be generated automatically when building with meson + ninja and left
-inside the build directory to be incorporated into the gresource XML (you'll
-need to have sassc installed).
+The stylesheets Kestrel's engine and UI load, compiled into resources under `resource:///com/lantharos/kestrel/theme`.
 
-## How to tweak the theme
+| File | Use |
+| --- | --- |
+| `base-dark.scss`, `base-high-contrast.scss` | Base widget styles, built to CSS with `sassc` during the Meson build. The high contrast one is used while the high contrast setting is on |
+| `sass/` | Sources for the base styles: colors in `_colors.scss` and `_palette.scss`, mixins in `_drawing.scss`, shared selectors in `_common.scss`, and one file per widget in `widgets/` |
+| `kestrel.css` | Kestrel's own styles, loaded on top of the base |
+| `kestrel-portal.css`, `kestrel-passkeys.css` | Portal and passkey dialogs |
 
-Adwaita is a complex theme, so to keep it maintainable it's written and
-processed in SASS, the generated CSS is then transformed into a gresource
-file during gtk build and used at runtime in a non-legible or editable form.
+Edit the `.scss` sources, not the generated CSS. The three `kestrel*.css` files are plain CSS and are edited directly.
 
-It is very likely your change will happen in the [_common.scss][common] file.
-That's where all the widget selectors are defined. Here's a rundown of
-the "supporting" stylesheets, that are unlikely to be the right place
-for a drive by stylesheet fix:
-
-| File                     | Description       |
-| ------------------------ | ----------------- |
-| [_colors.scss][colors]   | global color definitions. We keep the number of defined colors to a necessary minimum,  most colors are derived from a handful of basics. It is an exact copy of the gtk+ counterpart. Light theme is used for the classic theme and dark is for GNOME3 shell default. |
-| [_drawing.scss][drawing] | drawing helper mixings/functions to allow easier definition of widget drawing under specific context. This is why Adwaita isn't 15000 LOC. |
-| [_common.scss][common]   | actual definitions of style for each widget. This is where you are likely to add/remove your changes. |
-
-You can read about SASS on its [web page][sass-web]. Once you make your
-changes to the [_common.scss][common] file, you can run ninja to generate the
-final CSS files.
-
-[common]: data/theme/sass/_common.scss
-[colors]: data/theme/sass/_colors.scss
-[drawing]: data/theme/sass/_drawing.scss
-[sass-web]: http://sass-lang.com/documentation/
+Set `KESTREL_CSS_PATH` to the local `kestrel.css` when launching the shell to reload the `kestrel*.css` files on every save.

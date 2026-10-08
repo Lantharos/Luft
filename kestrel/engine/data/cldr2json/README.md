@@ -1,40 +1,24 @@
-cldr2json
-=========
+# cldr2json
 
-This script converts Unicode CLDR android keyboard layouts to JSON usable by
-GNOME Shell.
+Converts Unicode CLDR Android keyboard layouts into the JSON layouts Kestrel's on-screen keyboard uses. `../update-osk-layouts.sh` runs it to regenerate `../osk-layouts` and its resource file.
 
-CLDR keyboard layouts can be found at
-<http://www.unicode.org/Public/cldr/latest/keyboards.zip>
+The Android layouts were last published in CLDR 43, in <https://www.unicode.org/Public/cldr/43/keyboards.zip>; later releases use a different keyboard format.
 
+## Usage
 
-Usage
-=====
+```sh
+./cldr2json.py <input file or directory> <output directory>
+./cldr2json.py keyboards/android/ osk-layouts/
+```
 
-    ./cldr2json <input file or directory> <output directory>
+## Layout names
 
-example:
+CLDR names layouts by language, XKB by its own identifiers. The script matches them by comparing the layout descriptions, whole or word by word, with those in `/usr/share/X11/xkb/rules/evdev.xml`. When that picks the wrong layout, or it warns "failed to find XKB mapping", add an entry to `LOCALE_TO_XKB_OVERRIDES` at the top of the script.
 
-    ./cldr2json cldr/keyboards/android/ json_layouts/
+## Testing
 
+From this folder:
 
-Keyboard layout mapping
-=======================
-
-Unicode CLDR layout identifiers are language codes, while XKB layout
-identifiers are... something else. The mapping between the two currently uses
-heuristic based on the layout descriptions, in this order:
-
-- if the CLDR layout description matches an XKB layout description, chose its
-  XKB identifier
-- if one word of the CLDR layout description matches an XKB layout
-  description, chose its XKB identifier
-- if the CLDR layout description matches one word of an XKB layout description,
-  chose its XKB identifier
-
-That doesn't always work. For instance, it fails for "en" language, that should
-match "us" XKB identifier. For such cases, there is a mapping in
-LOCALE_TO_XKB_OVERRIDES at the top of the script. If you discover a weird
-mapping of if you get a "failed to find XKB mapping for <locale>" warning then
-please consider adding an override there.
-
+```sh
+python3 -m unittest test.test_cldr2json
+```

@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { animateActor } from '../../shared/motion.js';
+import { animateActor } from '../../../shared/motion.js';
 
 const PEEK_DELAY = 450;
 const PEEK_DURATION = 180;

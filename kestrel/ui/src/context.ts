@@ -9,7 +9,7 @@ import type { MessageTray } from './surfaces/notifications/notificationCenter.js
 import type { Monitor } from './desktop/panel/panel.js';
 import type { QuickSettingsSource } from './surfaces/quickSettings/quickControls.js';
 import type { Box } from './shared/placement.js';
-import type { TextInput } from './shared/textInput.js';
+import type { TextInput } from './shared/input/textInput.js';
 
 export interface CaretPopup {
   readonly actor: St.BoxLayout;

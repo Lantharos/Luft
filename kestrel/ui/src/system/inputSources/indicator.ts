@@ -3,7 +3,7 @@ import St from 'gi://St';
 import { getInputSourceManager, type InputSource } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
-import { ScrollSteps } from '../../shared/scrollSteps.js';
+import { ScrollSteps } from '../../shared/input/scrollSteps.js';
 import { modeSymbol, propertyEntries, visibleProperties } from './properties.js';
 
 interface Choice {

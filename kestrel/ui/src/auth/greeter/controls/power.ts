@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
-import { Blackout } from '../../session/farewell.js';
+import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
+import { Blackout } from '../../../session/farewell.js';
 
 const ACTIONS = [
   { label: 'Suspend', method: 'Suspend', check: 'CanSuspend', fadeOut: false },

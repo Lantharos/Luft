@@ -7,7 +7,7 @@ import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { blurSurface } from '../../shared/surface.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
-import type { TextInput } from '../../shared/textInput.js';
+import type { TextInput } from '../../shared/input/textInput.js';
 import { ClipboardHistory, TEXT_MIME_TYPES, type ClipboardEntry } from './history.js';
 import type { Thumbnail } from './thumbnail.js';
 

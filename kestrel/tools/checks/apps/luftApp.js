@@ -8,6 +8,7 @@ import Shell from 'gi://Shell';
 import {prepareHome} from './home.js';
 
 const FIRST_PAINT = 'browser.first_paint';
+const LIFECYCLE = /\blifecycle\.(active|suspended|frozen)\./;
 const LAUNCH_TIMEOUT = 30000;
 const LOG_LINES = 40;
 const SETTLE_TIMEOUT = 5000;
@@ -178,10 +179,13 @@ export class LuftApp {
     this._process = launcher(Gio.SubprocessFlags.STDERR_PIPE, manifest).spawnv([path, ...args]);
     this._painted = false;
     this._exited = false;
+    this.lifecycle = [];
     exited(this._process).then(() => (this._exited = true));
     readLines(this._process.get_stderr_pipe(), line => {
       this._log = [...this._log.slice(1 - LOG_LINES), line];
       this._painted ||= line.includes(`[${this.id}]`) && line.endsWith(FIRST_PAINT);
+      const [, state] = line.match(LIFECYCLE) ?? [];
+      if (state) this.lifecycle.push({state, at: GLib.get_monotonic_time()});
     });
   }
 
@@ -209,6 +213,12 @@ export class LuftApp {
       previous = current;
       await sleep(50);
     }
+  }
+
+  async reaches(state, since, milliseconds) {
+    const reached = () => this.lifecycle.find(change => change.state === state && change.at >= since);
+    await waitFor(reached, milliseconds, () => `${this.name} never became ${state}:\n${this._log.join('\n')}`);
+    return (reached().at - since) / 1000;
   }
 
   async finished(milliseconds) {

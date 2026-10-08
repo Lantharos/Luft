@@ -5,7 +5,9 @@ import GLib from 'gi://GLib';
 import {LuftApp, startSabineService, waitFor} from './luftApp.js';
 import {checkDisks} from './disksChecks.js';
 import {checkFonts} from './fontChecks.js';
+import {checkDragAndDrop} from './dragChecks.js';
 import {checkFontViewer} from './fontViewer.js';
+import {startFreezeCheck} from './freezeChecks.js';
 import {checkMailman} from './mailmanChecks.js';
 import {checkRoverNetwork} from './roverNetworkChecks.js';
 import {checkSettingsAccessibility} from './settingsAccessibility.js';
@@ -111,17 +113,24 @@ export async function checkLuftApps({output, pointer}) {
     const context = {palette, styles, require, output, pointer};
     const darkFrames = {};
     for (const name of APPS) darkFrames[name] = await checkApp(name, context);
-    await checkSettingsPages(darkFrames.settings, context);
-    await checkSettingsAccessibility(context);
-    await checkSettingsLive(context);
-    await checkSettingsHardware(context);
-    await checkSettingsUpdates(context);
-    await checkFontViewer(darkFrames.magpie, context);
-    await checkDisks(context);
-    await checkRoverNetwork(context);
-    await checkMailman(context);
+    await checkDragAndDrop(context);
     await checkTern(context);
     await checkFonts(context);
+    const freezing = await startFreezeCheck(context);
+    try {
+      await checkSettingsPages(darkFrames.settings, context);
+      await checkSettingsAccessibility(context);
+      await checkSettingsLive(context);
+      await checkSettingsHardware(context);
+      await checkSettingsUpdates(context);
+      await checkFontViewer(darkFrames.magpie, context);
+      await checkDisks(context);
+      await checkRoverNetwork(context);
+      await checkMailman(context);
+      await freezing.finish();
+    } finally {
+      await freezing.close();
+    }
   } finally {
     styles.interface.set_string('color-scheme', saved.scheme);
     styles.kestrel.set_boolean('pure-black', saved.pureBlack);

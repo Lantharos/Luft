@@ -45,6 +45,7 @@ export class ClipboardPanel {
   });
   private readonly history: ClipboardHistory;
   private dirty = true;
+  private readonly rows = new Map<St.Button, ClipboardEntry>();
   private keyboard: Clutter.VirtualInputDevice | null = null;
   private anchor: Anchor | null = null;
   private above = false;
@@ -110,9 +111,17 @@ export class ClipboardPanel {
   private refresh(): void {
     if (!this.dirty) return;
     this.dirty = false;
+    const focused = this.rows.get(this.actor.get_stage()?.get_key_focus() as St.Button);
+    this.rows.clear();
     this.list.destroy_all_children();
     for (const entry of this.history.entries) this.list.add_child(this.row(entry));
+    if (focused) this.focus(focused);
     if (this.actor.visible) this.layoutChanged();
+  }
+
+  private focus(entry: ClipboardEntry): void {
+    const row = [...this.rows].find(([, candidate]) => candidate === entry)?.[0] ?? this.list.get_first_child();
+    row?.grab_key_focus();
   }
 
   private row(entry: ClipboardEntry): St.Button {
@@ -133,6 +142,7 @@ export class ClipboardPanel {
       if (y < top) this.scroll.vadjustment.value += y - top;
       else if (y + row.height > top + this.scroll.height) this.scroll.vadjustment.value += y + row.height - top - this.scroll.height;
     });
+    this.rows.set(row, entry);
     this.menus.bind(row, () => [
       { label: 'Paste', run: () => this.paste(entry) },
       { label: 'Copy', run: () => { void this.history.put(entry); this.close(); } },

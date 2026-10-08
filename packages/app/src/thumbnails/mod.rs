@@ -15,7 +15,7 @@ use std::time::{Duration, Instant};
 use parking_lot::{Condvar, Mutex};
 use serde::Serialize;
 
-use crate::events::Events;
+use crate::bridge::events::Events;
 pub use cache::ThumbnailSize;
 use generate::Ready;
 use system::Registry;

@@ -4,9 +4,9 @@ use sabine::{
 };
 use serde::Serialize;
 
+use crate::bridge::events::Events;
+use crate::desktop::palette::{self, Palette};
 use crate::desktop::{self, typography::Typography};
-use crate::events::Events;
-use crate::kestrel::{self, Palette};
 
 const WINDOW_RADIUS: i32 = 16;
 const CONTROL_SIZE: i32 = 28;
@@ -82,7 +82,7 @@ pub struct Appearance {
 impl Appearance {
     pub fn current() -> Self {
         Self {
-            palette: kestrel::palette(),
+            palette: palette::palette(),
             typography: Typography::current(),
         }
     }
@@ -100,7 +100,7 @@ pub fn run(
             if let Some(emitter) = process.bridge_event_emitter() {
                 events.attach(emitter);
             }
-            kestrel::watch_palette(events.clone());
+            palette::watch_palette(events.clone());
             desktop::watch(events.clone());
             started(events);
         },

@@ -4,8 +4,8 @@ use serde::Serialize;
 use zbus::blocking::Proxy;
 use zbus::blocking::fdo::PropertiesProxy;
 
+use crate::bridge::events::Events;
 use crate::dbus;
-use crate::events::Events;
 
 pub const PALETTE_CHANGED: &str = "kestrel.palette";
 

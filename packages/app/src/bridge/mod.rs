@@ -1,3 +1,5 @@
+pub mod events;
+
 use sabine::{BridgeError, SabineWindow};
 use serde::Serialize;
 use serde::de::DeserializeOwned;

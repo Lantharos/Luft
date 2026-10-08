@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use zbus::zvariant::{OwnedValue, Value};
 
+use super::status::{SigningKey, Startup};
 use crate::disk::DiskStatus;
 use crate::disk::worker::Progress;
-use crate::status::{SigningKey, Startup};
 use crate::system::tpm::Tpm;
 
 pub type Dict = HashMap<String, OwnedValue>;

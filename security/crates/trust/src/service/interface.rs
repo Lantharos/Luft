@@ -8,14 +8,15 @@ use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{Connection, interface};
 
 use super::PATH;
+use super::actions;
 use super::error::Error;
 use super::properties::{self, Dict};
+use super::status::{self, Status};
 use crate::disk::worker::{self, Progress};
 use crate::disk::{self, keys};
-use crate::status::{self, Status};
 use crate::system::power;
 use crate::system::secret::Secret;
-use crate::{actions, boot, keys as signing};
+use crate::{boot, keys as signing};
 
 const CHECK: &str = "com.lantharos.trust.check";
 const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";

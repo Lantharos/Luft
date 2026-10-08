@@ -13,7 +13,6 @@ import {changes, withApp} from '../lib/apps.js';
 import {show} from './navigation.js';
 
 const {require, eventually} = checks('Luft app');
-const LUFT_FONTS = GLib.build_filenamev([GLib.getenv('KESTREL_DATADIR'), 'fonts']);
 const DEFAULTS = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
@@ -144,10 +143,6 @@ async function checkTextSize(surfaces, clock, defaults) {
 
 export async function checkFonts(app) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(output('fonts/shell-default')), 0o755);
-  const userFonts = GLib.build_filenamev([GLib.get_user_data_dir(), 'fonts']);
-  GLib.mkdir_with_parents(userFonts, 0o755);
-  const link = Gio.File.new_for_path(GLib.build_filenamev([userFonts, 'luft']));
-  link.make_symbolic_link(LUFT_FONTS, null);
   let windows = [];
   try {
     await scrollToFonts(app);
@@ -161,6 +156,5 @@ export async function checkFonts(app) {
   } finally {
     for (const key of [...Object.keys(CHOSEN), 'text-scaling-factor']) settings.reset(key);
     await Promise.all(windows.map(stop));
-    link.delete(null);
   }
 }

@@ -13,8 +13,18 @@ ROOT = Path(__file__).resolve().parents[2]
 VM = Path(os.environ.get("SUSHI_VM", ROOT / "vm"))
 
 KEYS = {
-    " ": "spc", "-": "minus", "=": "equal", ".": "dot", ",": "comma", "/": "slash", ";": "semicolon",
-    "'": "apostrophe", "[": "bracket_left", "]": "bracket_right", "\\": "backslash", "\n": "ret",
+    " ": "spc",
+    "-": "minus",
+    "=": "equal",
+    ".": "dot",
+    ",": "comma",
+    "/": "slash",
+    ";": "semicolon",
+    "'": "apostrophe",
+    "[": "bracket_left",
+    "]": "bracket_right",
+    "\\": "backslash",
+    "\n": "ret",
 }
 
 
@@ -25,7 +35,6 @@ class Machine:
         self.heard = ""
         self.started = time.monotonic()
         self.lock = threading.Lock()
-        self.serial_log = open(frames / "serial.log", "wb")
         environment = dict(os.environ, HEADLESS="1")
         self.qemu = subprocess.Popen([str(ROOT / "scripts/vm/run.sh")], env=environment)
         self.qmp = self.connect(VM / "qmp.sock")
@@ -61,14 +70,15 @@ class Machine:
             return self.read_reply()
 
     def pump_serial(self):
-        while chunk := self.serial.recv(4096):
-            self.serial_log.write(chunk)
-            self.serial_log.flush()
-            self.heard += chunk.decode(errors="replace")
-            while self.script and self.script[0][0] in self.heard:
-                pattern, command = self.script.pop(0)
-                self.heard = self.heard.split(pattern, 1)[1]
-                self.serial_run(command)
+        with open(self.frames / "serial.log", "wb") as serial_log:
+            while chunk := self.serial.recv(4096):
+                serial_log.write(chunk)
+                serial_log.flush()
+                self.heard += chunk.decode(errors="replace")
+                while self.script and self.script[0][0] in self.heard:
+                    pattern, command = self.script.pop(0)
+                    self.heard = self.heard.split(pattern, 1)[1]
+                    self.serial_run(command)
 
     def type(self, text: str):
         for character in text:
@@ -107,13 +117,17 @@ def main():
     parser.add_argument("--interval", type=float, default=0.05)
     parser.add_argument("--type", action="append", default=[], help="SECONDS:TEXT, a trailing newline is added")
     parser.add_argument(
-        "--serial", action="append", default=[],
+        "--serial",
+        action="append",
+        default=[],
         help="TEXT=>COMMAND: once TEXT appears on the serial console after the previous command, send COMMAND",
     )
     options = parser.parse_args()
     options.frames.mkdir(parents=True, exist_ok=True)
 
-    typing = sorted((float(at), text.replace("\\n", "\n") + "\n") for at, text in (item.split(":", 1) for item in options.type))
+    typing = sorted(
+        (float(at), text.replace("\\n", "\n") + "\n") for at, text in (item.split(":", 1) for item in options.type)
+    )
     script = [tuple(item.split("=>", 1)) for item in options.serial]
     machine = Machine(options.frames, script)
     try:

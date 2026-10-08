@@ -20,7 +20,11 @@ def main():
         image = Image.open(frame).convert("RGB")
         if max(high for _, high in image.getextrema()) < 12:
             look = "black"
-        elif previous is not None and previous.size == image.size and ImageChops.difference(previous, image).getbbox() is None:
+        elif (
+            previous is not None
+            and previous.size == image.size
+            and ImageChops.difference(previous, image).getbbox() is None
+        ):
             look = "still"
         else:
             look = "moving"

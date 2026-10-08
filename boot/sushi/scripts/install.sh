@@ -2,15 +2,14 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-action="${1:-}"
 manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
-units="sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service"
+units=(sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service)
 arguments="sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5"
 names="sushi plymouth.enable fbcon"
 
 usage() {
-  cat <<'EOF'
+  cat <<'USAGE'
 Usage: boot/sushi/scripts/install.sh ACTION
 
   install   Put Sushi on this computer next to Plymouth and rebuild the initramfs.
@@ -19,8 +18,7 @@ Usage: boot/sushi/scripts/install.sh ACTION
   enable    Use Sushi on every boot.
   disable   Go back to Plymouth on every boot. Sushi stays installed.
   remove    Disable Sushi, remove it, and rebuild the initramfs without it.
-EOF
-  exit 2
+USAGE
 }
 
 kernel_arguments() {
@@ -39,7 +37,7 @@ rebuild_initramfs() {
   fi
 }
 
-install_files() {
+install_everything() {
   local stage files file
   stage="$(mktemp -d)"
   files="$(mktemp)"
@@ -53,7 +51,7 @@ install_files() {
   sudo install -DZ -m644 "$files" "$manifest"
   printf 'add_dracutmodules+=" sushi "\n' | sudo install -DZ -m644 /dev/stdin "$dracut_config"
   sudo systemctl daemon-reload
-  sudo systemctl enable $units
+  sudo systemctl enable "${units[@]}"
   rebuild_initramfs
 }
 
@@ -73,24 +71,25 @@ disable_everywhere() {
 
 remove_everything() {
   disable_everywhere
-  sudo systemctl disable $units
+  sudo systemctl disable "${units[@]}"
   sudo rm -f "$dracut_config"
   if [[ -f "$manifest" ]]; then
     xargs -a "$manifest" sudo rm -f
     xargs -a "$manifest" -n1 dirname | sort -ru | xargs sudo rmdir --ignore-fail-on-non-empty 2>/dev/null || true
     sudo rm -f "$manifest"
-    sudo rmdir --ignore-fail-on-non-empty /usr/lib/sushi
+    sudo rmdir --ignore-fail-on-non-empty "$(dirname "$manifest")"
   fi
   sudo systemctl daemon-reload
   rebuild_initramfs
   echo "Sushi is removed."
 }
 
-case "$action" in
-  install) install_files ;;
+case "${1:-}" in
+  install) install_everything ;;
   try) try_once ;;
   enable) enable_everywhere ;;
   disable) disable_everywhere ;;
   remove) remove_everything ;;
-  *) usage ;;
+  -h | --help) usage ;;
+  *) usage >&2; exit 2 ;;
 esac

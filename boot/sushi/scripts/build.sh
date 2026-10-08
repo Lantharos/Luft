@@ -2,6 +2,20 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+
+usage() {
+  cat <<'USAGE'
+Usage: boot/sushi/scripts/build.sh [DESTDIR]
+
+Builds Sushi and SushiBoot. With DESTDIR, also stages their files under it as
+they would be laid out on the computer.
+USAGE
+}
+
+case "${1:-}" in
+  -h | --help) usage; exit 0 ;;
+esac
+(($# <= 1)) || { usage >&2; exit 2; }
 destdir="${1:-}"
 
 cargo build --release --manifest-path "$root/Cargo.toml"

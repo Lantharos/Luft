@@ -7,13 +7,13 @@ ovmf=/usr/share/edk2/ovmf
 
 [[ -f "$vm/disk.img" || -f "$vm/root.img" ]] || "$root/scripts/vm/disk.sh"
 
-firmware=(-machine q35,accel=kvm)
+firmware=(-machine "q35,accel=kvm")
 code="$ovmf/OVMF_CODE.fd"
 vars="$vm/OVMF_VARS.fd"
 template="$ovmf/OVMF_VARS.fd"
 format=raw
 if [[ "${SECURE_BOOT:-0}" == 1 ]]; then
-  firmware=(-machine q35,accel=kvm,smm=on -global driver=cfi.pflash01,property=secure,value=on)
+  firmware=(-machine "q35,accel=kvm,smm=on" -global "driver=cfi.pflash01,property=secure,value=on")
   code="$ovmf/OVMF_CODE_4M.secboot.qcow2"
   vars="$vm/OVMF_VARS_4M.secboot.qcow2"
   template="$ovmf/OVMF_VARS_4M.secboot.qcow2"
@@ -37,13 +37,14 @@ case "${TPM:-}" in
     state="$vm/tpm$TPM"
     mkdir -p "$state"
     version=(--tpm2)
-    device=tpm-crb
-    [[ "$TPM" == 1.2 ]] && version=() && device=tpm-tis
+    device="tpm-crb"
+    [[ "$TPM" == 1.2 ]] && version=() && device="tpm-tis"
     rm -f "$state/swtpm.sock"
     swtpm socket "${version[@]}" --tpmstate "dir=$state" --ctrl "type=unixio,path=$state/swtpm.sock" --terminate &
-    trap "kill $! 2>/dev/null" EXIT
+    swtpm_pid=$!
+    trap 'kill "$swtpm_pid" 2>/dev/null' EXIT
     until [[ -S "$state/swtpm.sock" ]]; do sleep 0.05; done
-    tpm=(-chardev "socket,id=tpm,path=$state/swtpm.sock" -tpmdev emulator,id=tpm0,chardev=tpm -device "$device,tpmdev=tpm0")
+    tpm=(-chardev "socket,id=tpm,path=$state/swtpm.sock" -tpmdev "emulator,id=tpm0,chardev=tpm" -device "$device,tpmdev=tpm0")
     ;;
 esac
 

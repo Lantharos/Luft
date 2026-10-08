@@ -2,6 +2,8 @@
 set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source-path=SCRIPTDIR
+source "$(dirname "$0")/lib.sh"
 startup="$luft/security/data/startup"
 certificate=/var/lib/trustd/secure-boot.crt
 typelibs=/usr/lib64/girepository-1.0
@@ -14,19 +16,18 @@ removable='^(grub2-.*|grubby|os-prober|shim-ia32|dracut-config-rescue|anaconda(-
 kept=(shim-x64 mokutil efibootmgr systemd-ukify systemd-boot-unsigned)
 kestrel_services=(xdg-desktop-portal geoclue2 iio-sensor-proxy)
 
+usage() {
+  cat <<'USAGE'
+Usage: security/scripts/remove-grub-and-gnome.sh
+
+Checks that this computer starts through shim, SushiBoot and signed images and
+that Kestrel no longer needs GNOME's services, then removes GRUB and those
+services after asking. GRUB's settings are saved under /var/lib/trustd first.
+USAGE
+}
+
 say() {
   printf '\n%s\n' "$*"
-}
-
-stop() {
-  printf '\n%s\n' "$*" >&2
-  exit 1
-}
-
-ask() {
-  local answer
-  read -r -p "$1 " answer
-  printf '%s' "$answer"
 }
 
 find_esp() {
@@ -37,20 +38,20 @@ find_esp() {
       return
     fi
   done
-  stop "The EFI system partition isn't mounted."
+  fail "The EFI system partition isn't mounted."
 }
 
 find_kestrel() {
   local session
   session="$(readlink -e /usr/local/share/wayland-sessions/kestrel.desktop)" ||
-    stop "Kestrel isn't installed as a login session. Install it with kestrel/tools/install.sh install first."
+    fail "Kestrel isn't installed as a login session. Install it with kestrel/tools/install.sh install first."
   prefix="${session%/share/wayland-sessions/kestrel.desktop}"
   grep -q "libmutter-51.so.0 => $prefix/" <<<"$(LD_LIBRARY_PATH="" ldd "$prefix/bin/kestrel")" ||
-    stop "Kestrel in $prefix uses the system's Mutter. Reinstall it with kestrel/tools/install.sh install first."
+    fail "Kestrel in $prefix uses the system's Mutter. Reinstall it with kestrel/tools/install.sh install first."
   [[ -e /usr/local/share/xdg-desktop-portal/kestrel-portals.conf ]] ||
-    stop "Kestrel doesn't answer apps' portal requests yet. Reinstall it with kestrel/tools/install.sh install first."
+    fail "Kestrel doesn't answer apps' portal requests yet. Reinstall it with kestrel/tools/install.sh install first."
   [[ -e /usr/local/share/dbus-1/services/org.freedesktop.secrets.service ]] ||
-    stop "Luft Keyring isn't installed yet. Install Kestrel with kestrel/tools/install.sh install, sign in once, and run this again."
+    fail "Luft Keyring isn't installed yet. Install Kestrel with kestrel/tools/install.sh install, sign in once, and run this again."
 }
 
 install_tools() {
@@ -71,43 +72,43 @@ check_images() {
   local running versions=() version image
   running="$(uname -r)"
   mapfile -t versions < <(kept_kernels)
-  ((${#versions[@]} >= 2)) || stop "Only one kernel is installed, so there would be nothing to go back to. Wait for the next kernel update and run this again."
+  ((${#versions[@]} >= 2)) || fail "Only one kernel is installed, so there would be nothing to go back to. Wait for the next kernel update and run this again."
   grep -qxF "$running" < <(printf '%s\n' "${versions[@]}") ||
-    stop "Linux $running isn't one of the three newest kernels. Restart into the newest one and run this again."
+    fail "Linux $running isn't one of the three newest kernels. Restart into the newest one and run this again."
   for version in "${versions[@]}"; do
     image="$(sudo find "$esp/EFI/Linux" -maxdepth 1 \( -name "luft-$version.efi" -o -name "luft-$version+*.efi" \) -print -quit)"
-    [[ -n "$image" ]] || stop "There's no signed image for Linux $version. Run 'sudo trustctl startup rebuild' and run this again."
+    [[ -n "$image" ]] || fail "There's no signed image for Linux $version. Run 'sudo trustctl startup rebuild' and run this again."
     sudo sbverify --cert "$certificate" "$image" >/dev/null 2>&1 ||
-      stop "The image for Linux $version isn't signed with this computer's Luft key. Run 'sudo trustctl startup rebuild' and run this again."
+      fail "The image for Linux $version isn't signed with this computer's Luft key. Run 'sudo trustctl startup rebuild' and run this again."
     echo "Linux $version: signed image present"
   done
 }
 
 check_fallback() {
   sudo cmp -s "$esp/EFI/BOOT/BOOTX64.EFI" "$esp/EFI/fedora/shimx64.efi" ||
-    stop "The firmware's fallback, \\EFI\\BOOT\\BOOTX64.EFI, isn't Fedora's shim. Run 'sudo dnf reinstall shim-x64' and run this again."
-  sudo test -f "$esp/EFI/BOOT/fbx64.efi" && sudo test -f "$esp/EFI/fedora/BOOTX64.CSV" ||
-    stop "Shim's fallback program or its list of boot entries is missing. Run 'sudo dnf reinstall shim-x64' and run this again."
+    fail "The firmware's fallback, \\EFI\\BOOT\\BOOTX64.EFI, isn't Fedora's shim. Run 'sudo dnf reinstall shim-x64' and run this again."
+  { sudo test -f "$esp/EFI/BOOT/fbx64.efi" && sudo test -f "$esp/EFI/fedora/BOOTX64.CSV"; } ||
+    fail "Shim's fallback program or its list of boot entries is missing. Run 'sudo dnf reinstall shim-x64' and run this again."
   grep -qE '^Boot[0-9A-F]{4}\* Luft' <<<"$(efibootmgr)" ||
-    stop "The Luft boot entry is missing. Run 'sudo trustctl startup install' and run this again."
-  echo "Fallback: \\EFI\\BOOT\\BOOTX64.EFI is Fedora's shim, and the Luft entry is there"
+    fail "The Luft boot entry is missing. Run 'sudo trustctl startup install' and run this again."
+  printf '%s\n' "Fallback: \\EFI\\BOOT\\BOOTX64.EFI is Fedora's shim, and the Luft entry is there"
 }
 
 preflight() {
   say "Checking that this computer can start without GRUB and work without GNOME's services"
-  [[ -d /sys/firmware/efi ]] || stop "This computer doesn't start with UEFI."
-  command -v trustctl >/dev/null || stop "trustctl isn't installed. Run security/scripts/install.sh install first."
+  [[ -d /sys/firmware/efi ]] || fail "This computer doesn't start with UEFI."
+  command -v trustctl >/dev/null || fail "trustctl isn't installed. Run security/scripts/install.sh install first."
   grep -q '^SushiBoot ' <<<"$(tail -c +5 /sys/firmware/efi/efivars/LoaderInfo-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f 2>/dev/null | tr -d '\0')" ||
-    stop "This start didn't go through SushiBoot. Restart through the Luft entry and run this again."
+    fail "This start didn't go through SushiBoot. Restart through the Luft entry and run this again."
   local status
   status="$(sudo trustctl status)"
   echo "$status"
   grep -qE '^Secure Boot +on$' <<<"$status" ||
-    stop "Secure Boot is off. Turn it on in the firmware settings, restart through the Luft entry, and run this again."
-  grep -qE '^Luft key +enrolled' <<<"$status" || stop "Luft's Secure Boot key isn't enrolled yet."
+    fail "Secure Boot is off. Turn it on in the firmware settings, restart through the Luft entry, and run this again."
+  grep -qE '^Luft key +enrolled' <<<"$status" || fail "Luft's Secure Boot key isn't enrolled yet."
   grep -q 'installed: yes, this boot: yes' <<<"$status" ||
-    stop "This start didn't go through a signed image. Run 'sudo trustctl startup install', restart, and run this again."
-  rpm -q --quiet shim-x64 || stop "Fedora's shim isn't installed."
+    fail "This start didn't go through a signed image. Run 'sudo trustctl startup install', restart, and run this again."
+  rpm -q --quiet shim-x64 || fail "Fedora's shim isn't installed."
   find_esp
   find_kestrel
   install_tools
@@ -148,7 +149,7 @@ runtime_files() {
     while read -r binary; do
       LD_LIBRARY_PATH="$prefix/lib:$prefix/lib/mutter-51:$prefix/lib64/kestrel" ldd "$binary" 2>/dev/null || true
     done | awk -v prefix="$prefix/" '/=> \// && index($3, prefix) != 1 {print $3}'
-  for import in $(grep -rhoE 'gi://[A-Za-z0-9]+' "$luft/kestrel/engine/js" "$luft/kestrel/ui/src" | sort -u); do
+  grep -rhoE 'gi://[A-Za-z0-9]+' "$luft/kestrel/engine/js" "$luft/kestrel/ui/src" | sort -u | while read -r import; do
     compgen -G "$typelibs/${import#gi://}-*.typelib" || true
   done
 }
@@ -175,10 +176,10 @@ section() {
 transaction() {
   local clean="$1"
   shift
-  local removing=()
+  local removing=() actions=(--action=install "$package")
   mapfile -t removing < <(rpm -q --qf '%{NAME}\n' "${replaced[@]}" 2>/dev/null | grep -v ' ')
-  sudo dnf do "$@" --allowerasing --setopt=clean_requirements_on_remove="$clean" \
-    --action=install "$package" ${removing[*]:+--action=remove "${removing[@]}"}
+  ((${#removing[@]} == 0)) || actions+=(--action=remove "${removing[@]}")
+  sudo dnf "do" "$@" --allowerasing --setopt=clean_requirements_on_remove="$clean" "${actions[@]}"
 }
 
 review() {
@@ -187,23 +188,23 @@ review() {
   plan="$(transaction False --assumeno 2>&1 || true)"
   echo "$plan"
   grep -q '^Transaction Summary' <<<"$plan" || grep -q 'Nothing to do' <<<"$plan" ||
-    stop "dnf couldn't work out the change. Nothing was changed."
+    fail "dnf couldn't work out the change. Nothing was changed."
   unexpected="$(section Removing <<<"$plan" | grep -Ev "$removable" || true)"
-  [[ -z "$unexpected" ]] || stop "This would also remove packages that are still needed: $unexpected. Nothing was changed."
+  [[ -z "$unexpected" ]] || fail "This would also remove packages that are still needed: $unexpected. Nothing was changed."
   needs="$(kestrel_needs)"
   lost="$(comm -12 <(section Removing <<<"$plan") <(echo "$needs") | grep -vxF -f <(printf '%s\n' "${replaced[@]}") || true)"
-  [[ -z "$lost" ]] || stop "This would remove packages Kestrel uses: $lost. Nothing was changed."
+  [[ -z "$lost" ]] || fail "This would remove packages Kestrel uses: $lost. Nothing was changed."
   orphans="$(transaction True --assumeno 2>&1 | section 'Removing unused' || true)"
-  keep="$(comm -12 <(echo "$orphans") <(echo "$needs") || true)"
-  if [[ -n "$keep" ]]; then
+  mapfile -t keep < <(comm -12 <(echo "$orphans") <(echo "$needs") | awk NF)
+  if ((${#keep[@]})); then
     say "Only GNOME's services asked for these, and Kestrel uses them, so they're marked as wanted on their own:"
-    echo "$keep"
+    printf '%s\n' "${keep[@]}"
   fi
   [[ "$(ask "Type yes to remove GRUB and GNOME's services:")" == yes ]] || exit 1
 }
 
 remove_packages() {
-  sudo dnf mark -y user "${kept[@]}" $keep
+  sudo dnf mark -y user "${kept[@]}" "${keep[@]}"
   transaction False -y
 }
 
@@ -228,15 +229,19 @@ take_over() {
 
 verify() {
   say "Checking the result"
-  ! grep -qE '^grub2-' <<<"$(rpm -qa --qf '%{NAME}\n')" || stop "GRUB's packages are still installed."
+  ! grep -qE '^grub2-' <<<"$(rpm -qa --qf '%{NAME}\n')" || fail "GRUB's packages are still installed."
   sudo sbverify --cert "$certificate" "$esp/EFI/fedora/grubx64.efi" >/dev/null 2>&1 ||
-    stop "Shim's default program isn't SushiBoot signed with the Luft key. Run 'sudo trustctl startup install' before restarting."
-  echo "Shim's default program, \\EFI\\fedora\\grubx64.efi, is SushiBoot"
+    fail "Shim's default program isn't SushiBoot signed with the Luft key. Run 'sudo trustctl startup install' before restarting."
+  printf '%s\n' "Shim's default program, \\EFI\\fedora\\grubx64.efi, is SushiBoot"
   sudo kernel-install inspect | grep -E "Layout|Initrd Generator"
   check_images
   check_fallback
 }
 
+case "${1:-}" in
+  -h | --help) usage; exit 0 ;;
+esac
+(($# == 0)) || { usage >&2; exit 2; }
 preflight
 offer_recovery_stick
 work="$(mktemp -d)"

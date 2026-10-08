@@ -4,9 +4,10 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, moveTo, pressButton, release, releaseButton, scroll} from '../lib/input.js';
+import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame} from '../lib/wait.js';
-import {board, boardResting, boardWindows, leaveBoard, noOverlap, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
+import {board, boardResting, boardWindows, leaveBoard, noOverlap, openBoardWindow, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
 import {screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
@@ -70,13 +71,14 @@ function checkGestures() {
   require(Number.isInteger(group.translation_x) && Number.isInteger(group.translation_y), 'the board is drawn on whole pixels after a pinch');
 }
 
-async function superDrag(window, screenDx, screenDy) {
+async function superDrag(window, screenDx, screenDy, midway = async () => {}) {
   const frame = window.get_frame_rect();
   const [fromX, fromY] = screenPoint(board().camera.view, board().viewport, frame.x + frame.width / 2, frame.y + frame.height / 2);
   hold(Clutter.KEY_Super_L);
   moveTo([fromX, fromY]);
   pressButton();
   for (let step = 1; step <= 12; step++) {
+    if (step === 10) await midway();
     moveTo([fromX + screenDx * step / 12, fromY + screenDy * step / 12]);
     await nextFrame();
   }
@@ -113,6 +115,19 @@ async function checkMoving() {
   const source = music.get_frame_rect();
   await superDrag(music, (filesBefore.x - source.x) * scale, (filesBefore.y - source.y) * scale);
   await eventually(() => noOverlap() && !files.get_frame_rect().equal(filesBefore), 'dropping a window onto another pushes it aside');
+}
+
+async function checkClosingWhileMoving() {
+  const process = openBoardWindow('Extra', 480, 360);
+  const extra = await waitForWindow(window => window.get_title()?.startsWith('Extra'), 'a window titled Extra opens');
+  await boardResting();
+  const layout = new Map(boardWindows().map(window => [window, window.get_frame_rect()]));
+  const target = windowNamed('Files').get_frame_rect();
+  const source = extra.get_frame_rect();
+  const scale = board().camera.view.scale;
+  await superDrag(extra, (target.x - source.x) * scale, (target.y - source.y) * scale, () => stop(process));
+  await eventually(() => [...layout].every(([window, rect]) => window.get_frame_rect().equal(rect)),
+    'windows pushed aside by a window that closes while it is dragged go back');
 }
 
 function fourFingerSwipe(dy) {
@@ -168,6 +183,7 @@ export async function run() {
     await checkDesktops();
     checkGestures();
     await checkMoving();
+    await checkClosingWhileMoving();
     await checkLeavingEntered();
     await checkLeaving();
   } finally {

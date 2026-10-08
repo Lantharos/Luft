@@ -5,9 +5,9 @@ import type Shell from 'gi://Shell';
 import type Mtk from 'gi://Mtk';
 import type St from 'gi://St';
 
-import type { MessageTray } from './notifications/notificationCenter.js';
-import type { Monitor } from './panel/panel.js';
-import type { QuickSettingsSource } from './quickSettings/quickControls.js';
+import type { MessageTray } from './surfaces/notifications/notificationCenter.js';
+import type { Monitor } from './desktop/panel/panel.js';
+import type { QuickSettingsSource } from './surfaces/quickSettings/quickControls.js';
 import type { Box } from './shared/placement.js';
 import type { TextInput } from './shared/textInput.js';
 

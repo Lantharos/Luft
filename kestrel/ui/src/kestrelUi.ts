@@ -1,116 +1,66 @@
-import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
-import St from 'gi://St';
+import type St from 'gi://St';
 
-import { navigateWithKeyboard } from './shared/keyboardNavigation.js';
-import { Workspaces } from './windows/workspaces.js';
-import { WindowPreviews } from './panel/windowPreviews.js';
-import { ContextMenus } from './menus/contextMenus.js';
-import type { Monitor } from './panel/panel.js';
-import { PanelSet } from './panel/panels.js';
-import { StartMenu } from './start/startMenu.js';
-import { QuickSettings } from './quickSettings/quickSettings.js';
-import { NotificationCenter } from './notifications/notificationCenter.js';
-import { SURFACE_GAP } from './shared/surface.js';
-import { taskbarPreferences } from './panel/preferences/taskbarPreferences.js';
-import { animateActor } from './shared/motion.js';
-import { loadKestrelStylesheets } from './shared/stylesheet.js';
-import { AppearanceService } from './appearance/service.js';
-import { SystemPrompts } from './keyring/prompts.js';
-import { ClipboardPanel } from './clipboard/panel.js';
-import { EmojiPanel } from './emoji/panel.js';
-import type { CaretPopup, Context } from './context.js';
-import { SnapLayouts } from './windows/snapLayouts.js';
-import { TaskView } from './taskView/taskView.js';
-import { OomNotifier } from './memory/oomNotifier.js';
-import { Health } from './health/health.js';
-import { notifyAboutIncidents } from './health/incidents.js';
-import { confirmStartup, notifyAboutFailedStartup } from './health/startup.js';
-import { BatteryWarnings } from './power/batteryWarnings.js';
-import { PlugSounds } from './power/plugSounds.js';
-import { MediaKeys } from './mediaKeys/mediaKeys.js';
-import { coveredMonitors } from './panel/coverage.js';
-import { systemMonitor } from './panel/systemMonitor.js';
-import { LaunchFeedback } from './windows/launchFeedback.js';
-import { VariableRefresh } from './windows/variableRefresh.js';
-import { PortalBackend } from './portal/backend.js';
-import { PasskeyPrompts } from './passkeys/service.js';
-import { LiveWallpaper } from './wallpaper/liveWallpaper.js';
-import { LoginWallpaper } from './wallpaper/loginWallpaper.js';
-import { LoginDisplays } from './session/loginScreen/displays.js';
-import { LockControls } from './lockScreen/controls.js';
-import { LoginNumLock } from './session/loginScreen/numLock.js';
-import { Farewell } from './session/farewell.js';
-import { FontRefresh } from './appearance/fonts.js';
+import type { Context } from './context.js';
 import type { Rgb } from './appearance/color.js';
-import { Greeter, type GreeterContext } from './greeter/greeter.js';
-import { Board, type BoardFrame } from './board/board.js';
+import type { AppearanceService } from './appearance/service.js';
+import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
+import { LockControls } from './auth/lockScreen/controls.js';
+import { Board, type BoardFrame } from './desktop/board/board.js';
+import { ContextMenus } from './desktop/menus/contextMenus.js';
+import { coveredMonitors } from './desktop/panel/coverage.js';
+import type { Monitor } from './desktop/panel/panel.js';
+import { PanelSet } from './desktop/panel/panels.js';
+import { taskbarPreferences } from './desktop/panel/preferences/taskbarPreferences.js';
+import { systemMonitor } from './desktop/panel/systemMonitor.js';
+import { WindowPreviews } from './desktop/panel/windowPreviews.js';
+import { TaskView } from './desktop/taskView/taskView.js';
+import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
+import { SnapLayouts } from './desktop/windows/snapLayouts.js';
+import { Workspaces } from './desktop/windows/workspaces.js';
+import { navigateWithKeyboard } from './shared/keyboardNavigation.js';
+import { ClipboardPanel } from './surfaces/clipboard/panel.js';
+import { EmojiPanel } from './surfaces/emoji/panel.js';
+import { NotificationCenter } from './surfaces/notifications/notificationCenter.js';
+import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
+import { StartMenu } from './surfaces/start/startMenu.js';
+import { Surfaces, type Surface } from './surfaces/surfaces.js';
+import { confirmStartup } from './system/health/startup.js';
+import { SystemServices } from './system/services.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
-export { signInToNetwork } from './network/signIn.js';
-export { isGame } from './windows/games.js';
-export { VpnSecrets } from './network/vpnSecrets.js';
-
-type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
-type PanelSurface = Exclude<Surface, 'tasks'>;
-
-const START_HEIGHT = 600;
-const EDGE_MARGIN = 12;
-const OPEN_DURATION = 220;
-const CLOSE_DURATION = 160;
+export { signInToNetwork } from './system/network/signIn.js';
+export { isGame } from './desktop/windows/games.js';
+export { VpnSecrets } from './system/network/vpnSecrets.js';
 
 class KestrelUi {
+  private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
+  private readonly services: SystemServices;
   private readonly menus: ContextMenus;
   private readonly workspaces: Workspaces;
   private readonly previews: WindowPreviews;
   private readonly panels: PanelSet;
-  private monitor: Monitor | null = null;
-  private readonly start: StartMenu;
   private readonly quick: QuickSettings;
-  private readonly notifications: NotificationCenter;
-  private readonly clipboard: ClipboardPanel;
-  private readonly emoji: EmojiPanel;
-  private readonly snapLayouts: SnapLayouts;
   private readonly taskView: TaskView;
+  private readonly surfaces: Surfaces;
   readonly board: Board;
-  private readonly cover = new St.Widget({ reactive: true, visible: false });
-  private readonly stylesheetMonitors: Gio.FileMonitor[];
-  private active: Surface | null = null;
-  private readonly closingSelections = new Map<Clutter.Actor, () => void>();
+  private readonly liveWallpaper: LiveWallpaper;
   private focusWindow: Meta.Window | null = null;
   private focusSignals: number[] = [];
   private readonly disconnectors: (() => void)[] = [];
-  private readonly portal: PortalBackend;
-  private readonly passkeys: PasskeyPrompts;
-  readonly appearance: AppearanceService;
-  private readonly keyring: SystemPrompts;
-  private readonly oomNotifier = new OomNotifier();
-  private readonly health = new Health();
-  private readonly batteryWarnings = new BatteryWarnings();
-  private readonly plugSounds = new PlugSounds();
-  private readonly launchFeedback = new LaunchFeedback();
-  private readonly variableRefresh = new VariableRefresh();
-  private readonly liveWallpaper: LiveWallpaper;
-  private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
-  private readonly loginScreen = this.ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
-  private readonly farewell = new Farewell();
-  private readonly fontRefresh = new FontRefresh();
-  private readonly mediaKeys: MediaKeys;
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
-    this.portal = new PortalBackend(context);
-    this.passkeys = new PasskeyPrompts(context);
-    this.appearance = new AppearanceService(color => this.portal.setAccent(color));
-    this.keyring = new SystemPrompts(context);
-    this.stylesheetMonitors = loadKestrelStylesheets();
+    this.services = new SystemServices(context, this.ownsTheScreen, () => this.openStart());
+    const close = () => this.surfaces.close();
+    const place = () => this.surfaces.place();
+    const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
-    this.menus = new ContextMenus((x, y) => this.monitorAt(x, y), () => this.close(), () => this.canInteract(), () => this.previews.close(), context.activateWindow);
-    this.previews = new WindowPreviews(actor => this.monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, () => this.close(), context.activateWindow);
+    this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow);
+    this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);
     this.board = new Board({
       monitors: () => context.layoutManager.monitors,
@@ -121,70 +71,68 @@ class KestrelUi {
       keybindings: context.keybindings,
       addChrome: actor => context.layoutManager.addChrome(actor),
       setPanelsHidden: hidden => this.panels.suppress(hidden),
-      openQuickSettings: () => this.toggle('quick'),
-      openStart: () => this.toggle('start'),
+      openQuickSettings: () => this.surfaces.toggle('quick'),
+      openStart: () => this.surfaces.toggle('start'),
       changed: () => this.syncSession(),
-      canInteract: () => this.canInteract() && !this.active,
+      canInteract: () => this.canInteract() && !this.surfaces.active,
     });
-    this.start = new StartMenu(() => this.close(), this.menus);
-    this.quick = new QuickSettings(context.quickSettings, () => this.place(), () => this.close(),
+    const start = new StartMenu(close, this.menus);
+    this.quick = new QuickSettings(context.quickSettings, place, close,
       icons => {
         this.panels.primary.updateStatus(icons);
         this.board.showStatus(icons);
       }, this.menus, () => this.takeScreenshot());
-    this.notifications = new NotificationCenter(context.messageTray, this.menus, () => this.place(), () => this.close());
-    this.clipboard = new ClipboardPanel(this.menus, () => this.close(), () => this.place(), context.inputMethod);
-    this.emoji = new EmojiPanel(context.inputMethod, () => this.close(), text => this.clipboard.pasteWithoutKeeping(text));
-    this.snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, () => this.close());
-    this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), () => this.close(), context.activateWindow);
+    const notifications = new NotificationCenter(context.messageTray, this.menus, place, close);
+    const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
+    const emoji = new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text));
+    const snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close);
+    this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
-    this.mediaKeys = new MediaKeys(context, () => this.openStart());
-    const startup = context.layoutManager.connect('startup-complete', () => {
-      context.layoutManager.disconnect(startup);
-      void notifyAboutIncidents();
-      if (this.ownsTheScreen) void confirmStartup().then(notifyAboutFailedStartup);
+    this.surfaces = new Surfaces({
+      context,
+      menus: this.menus,
+      previews: this.previews,
+      panels: () => this.panels,
+      board: this.board,
+      start,
+      quick: this.quick,
+      notifications,
+      clipboard,
+      emoji,
+      snapLayouts,
+      taskView: this.taskView,
+      canInteract: () => this.canInteract(),
+      syncSession: () => this.syncSession(),
     });
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
 
     this.panels = new PanelSet(context.layoutManager, monitor => ({
-      start: () => this.toggle('start', monitor()),
-      quickSettings: () => this.toggle('quick', monitor()),
-      notifications: () => this.toggle('notifications', monitor()),
+      start: () => this.surfaces.toggle('start', monitor()),
+      quickSettings: () => this.surfaces.toggle('quick', monitor()),
+      notifications: () => this.surfaces.toggle('notifications', monitor()),
       activateWindow: context.activateWindow,
       stopScreencast: context.stopScreencast,
     }), this.menus, this.previews, () => {
-      this.place();
+      place();
       this.syncSession();
     });
     const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
     this.disconnectors.push(taskbarPreferences.watch(key => {
-      if (key === 'taskbar-style' || key === 'taskbar-size') this.place();
+      if (key === 'taskbar-style' || key === 'taskbar-size') place();
     }));
 
-    context.layoutManager.addTopChrome(this.cover);
-    context.layoutManager.addTopChrome(this.start.actor);
-    context.layoutManager.addTopChrome(this.quick.actor);
-    context.layoutManager.addTopChrome(this.notifications.actor);
-    context.layoutManager.addTopChrome(this.clipboard.actor);
-    context.layoutManager.addTopChrome(this.emoji.actor);
-    context.layoutManager.addTopChrome(this.snapLayouts.actor);
+    context.layoutManager.addTopChrome(this.surfaces.cover);
+    for (const actor of this.surfaces.all()) context.layoutManager.addTopChrome(actor);
     context.layoutManager.addTopChrome(this.taskView.actor);
-    for (const actor of this.surfaces()) {
-      const updateClip = () => actor.set_clip(0, 0, actor.width, Math.max(0, this.surfaceFloor() - actor.y - actor.translation_y));
-      for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
-        actor.connect(signal, updateClip);
-    }
+    for (const actor of this.surfaces.all()) this.surfaces.clipToFloor(actor);
 
-    this.cover.connect('button-press-event', () => {
-      this.close();
-      return Clutter.EVENT_STOP;
-    });
     this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
-      if (this.active && event.get_key_symbol() === Clutter.KEY_Escape) {
-        if (this.active !== 'quick' || !this.quick.closeSubmenu()) this.close();
+      const active = this.surfaces.active;
+      if (active && event.get_key_symbol() === Clutter.KEY_Escape) {
+        if (active !== 'quick' || !this.quick.closeSubmenu()) close();
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -217,18 +165,22 @@ class KestrelUi {
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panels.primary.actor);
-    for (const actor of [...this.surfaces(), this.previews.actor, this.taskView.actor])
+    for (const actor of [...this.surfaces.all(), this.previews.actor, this.taskView.actor])
       navigateWithKeyboard(actor);
     this.watch(context.layoutManager, 'monitors-changed', () => {
       this.dismissImmediately();
       this.panels.sync();
       this.liveWallpaper.monitorsChanged();
       this.board.monitorsChanged();
-      this.place();
+      place();
       this.syncSession();
     });
-    this.place();
+    place();
     this.syncSession();
+  }
+
+  get appearance(): AppearanceService {
+    return this.services.appearance;
   }
 
   private watch(object: { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void }, signal: string, callback: (...args: any[]) => any): void {
@@ -267,7 +219,7 @@ class KestrelUi {
       this.board.toggle();
       return;
     }
-    this.toggle('start');
+    this.surfaces.toggle('start');
   }
 
   private takeScreenshot(): void {
@@ -279,246 +231,27 @@ class KestrelUi {
     });
   }
 
+  private openStart(): void {
+    if (this.surfaces.active !== 'start') this.surfaces.toggle('start');
+  }
+
   dismissImmediately(): void {
-    this.close();
-    this.menus.close(true);
-    this.previews.close(true);
-    this.panels.setActive(null, null);
-    this.quick.closeSubmenu(false);
-    this.taskView.close(true);
-    for (const actor of this.surfaces()) {
-      actor.remove_all_transitions();
-      actor.hide();
-      this.closingSelections.get(actor)?.();
-      this.closingSelections.delete(actor);
-    }
+    this.surfaces.dismissImmediately();
   }
 
   lockControls(): LockControls {
-    return new LockControls(this.context.layoutManager, (x, y) => this.monitorAt(x, y));
-  }
-
-  private monitorAt(x: number, y: number): Monitor | null {
-    return this.context.layoutManager.monitors.find(m => x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height) ?? null;
-  }
-
-  private surfaceMonitor(): Monitor {
-    const { monitors, primaryMonitor } = this.context.layoutManager;
-    return monitors.find(monitor => monitor === this.monitor) ?? primaryMonitor!;
-  }
-
-  private place(): void {
-    if (!this.context.layoutManager.primaryMonitor)
-      return;
-
-    const monitor = this.surfaceMonitor();
-    this.cover.set_position(0, 0);
-    const stage = (global as unknown as Shell.Global).stage;
-    this.cover.set_size(stage.width, stage.height);
-    const startWidth = Math.min(660, monitor.width - 24);
-    const clearance = this.clearance();
-    const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
-    const available = monitor.height - clearance - 24;
-    const startHeight = Math.min(START_HEIGHT, available);
-    const startX = this.board.shown ? monitor.x + monitor.width - EDGE_MARGIN - startWidth : monitor.x + (monitor.width - startWidth) / 2;
-    this.start.actor.set_size(startWidth, startHeight);
-    this.start.actor.set_position(Math.round(startX), bottom - startHeight);
-
-    for (const [actor, width, height] of [
-      [this.quick.actor, 420, this.quick.preferredHeight(420, available)],
-      [this.notifications.actor, 380, this.notifications.preferredHeight(380, available)],
-    ] as const) {
-      actor.set_size(width, height);
-      actor.set_position(Math.round(monitor.x + monitor.width - EDGE_MARGIN - width), bottom - height);
-    }
-    for (const popup of [this.clipboard, this.emoji])
-      popup.place(available, this.context.layoutManager.getWorkAreaForMonitor(monitor.index));
-    const [snapWidth, snapHeight] = this.snapLayouts.size();
-    this.snapLayouts.actor.set_size(snapWidth, snapHeight);
-    this.snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
-  }
-
-  private clearance(): number {
-    return this.board.shown ? this.board.cornerClearance : taskbarPreferences.clearance;
-  }
-
-  private surfaceFloor(): number {
-    const monitor = this.surfaceMonitor();
-    return this.board.shown ? monitor.y + monitor.height - this.board.cornerClearance : this.panels.forMonitor(monitor).actor.y;
-  }
-
-  private pointerMonitor(): Monitor {
-    const index = (global as unknown as Shell.Global).display.get_current_monitor();
-    const monitor = this.context.layoutManager.monitors[index];
-    return monitor && this.panels.panelOn(monitor) ? monitor : this.context.layoutManager.primaryMonitor!;
-  }
-
-  private toggle(surface: Surface, monitor = this.pointerMonitor()): void {
-    if (!this.canInteract()) return;
-    this.previews.close();
-    const popup = this.popupFor(surface);
-    if (popup && !popup.available) return;
-    if (popup) monitor = this.active === surface ? this.surfaceMonitor() : this.monitorAt(...popup.locate()) ?? monitor;
-    if (surface === 'snap' && (!this.snapLayouts.available || this.board.shown)) return;
-    if (this.active === surface && this.surfaceMonitor() === monitor) {
-      this.close();
-      return;
-    }
-
-    this.close();
-    if (this.monitor !== monitor) {
-      for (const actor of this.surfaces()) {
-        actor.remove_all_transitions();
-        actor.hide();
-      }
-    }
-    this.monitor = monitor;
-    this.setActive(surface);
-    this.panels.setActive(surface, monitor);
-    this.cover.show();
-    for (const panel of this.panels.all) panel.actor.get_parent()!.set_child_above_sibling(panel.actor, this.cover);
-    if (surface === 'tasks') {
-      this.taskView.open(monitor);
-      this.syncSession();
-      return;
-    }
-
-    const openingActor = this.actorFor(surface);
-    this.closingSelections.get(openingActor)?.();
-    this.closingSelections.delete(openingActor);
-    if (surface === 'start') this.start.reset();
-
-    const actor = this.actorFor(surface);
-    actor.get_parent()!.set_child_above_sibling(actor, null);
-    const opening = !actor.visible;
-    actor.show();
-    if (surface === 'notifications') this.notifications.prepareOpen();
-    popup?.open();
-    if (surface === 'snap') this.snapLayouts.prepareOpen();
-    this.place();
-    if (opening) {
-      actor.opacity = popup ? 0 : 255;
-      actor.translation_y = this.slideDistance(actor);
-    }
-    this.animate(actor, 0, OPEN_DURATION);
-
-    if (surface === 'start') this.start.focus();
-    else if (!popup) actor.grab_key_focus();
-  }
-
-  private close(): void {
-    this.menus.close();
-    const surface = this.active;
-    if (surface === 'notifications') this.notifications.freeze();
-    if (surface && surface !== 'tasks') this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
-    this.setActive(null);
-    this.popupFor(surface)?.closed?.();
-    this.cover.hide();
-    for (const panel of this.panels.all)
-      panel.actor.get_parent()!.set_child_below_sibling(panel.actor, (global as unknown as Shell.Global).top_window_group);
-    const stage = (global as unknown as Shell.Global).stage;
-    const focus = stage.get_key_focus();
-    if (focus && [...this.surfaces(), this.taskView.actor].some(actor => actor.contains(focus)))
-      stage.set_key_focus(null);
-    if (surface === 'tasks') {
-      this.taskView.close();
-      this.panels.setActive(null, null);
-      this.syncSession();
-      return;
-    }
-    if (!surface)
-      return;
-
-    const actor = this.actorFor(surface);
-    this.animate(actor, this.slideDistance(actor), CLOSE_DURATION, () => {
-      if (this.active === surface) return;
-      actor.hide();
-      this.closingSelections.get(actor)?.();
-      this.closingSelections.delete(actor);
-      if (surface === 'quick') this.quick.closeSubmenu(false);
-      if (!this.active) this.panels.setActive(null, null);
-    });
-  }
-
-  private setActive(surface: Surface | null): void {
-    this.active = surface;
-    this.context.messageTray.bannerBlocked = surface === 'notifications';
-  }
-
-  private openStart(): void {
-    if (this.active !== 'start') this.toggle('start');
+    return new LockControls(this.context.layoutManager, (x, y) => this.surfaces.monitorAt(x, y));
   }
 
   taskViewOpen(): boolean { return this.taskView.visible; }
-
-  private surfaces(): St.BoxLayout[] {
-    return [this.start.actor, this.quick.actor, this.notifications.actor, this.clipboard.actor, this.emoji.actor, this.snapLayouts.actor];
-  }
-
-  private popupFor(surface: Surface | null): CaretPopup | null {
-    return surface === 'clipboard' ? this.clipboard : surface === 'emoji' ? this.emoji : null;
-  }
-
-  private popupActor(actor: Clutter.Actor): CaretPopup | null {
-    return [this.clipboard, this.emoji].find(popup => popup.actor === actor) ?? null;
-  }
-
-  private actorFor(surface: PanelSurface): St.BoxLayout {
-    switch (surface) {
-      case 'start': return this.start.actor;
-      case 'quick': return this.quick.actor;
-      case 'notifications': return this.notifications.actor;
-      case 'clipboard': return this.clipboard.actor;
-      case 'emoji': return this.emoji.actor;
-      case 'snap': return this.snapLayouts.actor;
-    }
-  }
-
-  private animate(
-    actor: Clutter.Actor,
-    translationY: number,
-    duration: number,
-    onStopped?: () => void,
-  ): void {
-    animateActor(actor, {
-      translation_y: translationY,
-      ...this.popupActor(actor) ? { opacity: translationY === 0 ? 255 : 0 } : {},
-      duration,
-      mode: translationY === 0
-        ? Clutter.AnimationMode.EASE_OUT_QUART
-        : Clutter.AnimationMode.EASE_IN_QUART,
-      onStopped,
-    });
-  }
-
-  private slideDistance(actor: Clutter.Actor): number {
-    const popup = this.popupActor(actor);
-    if (popup) return popup.slideDistance;
-    const monitor = this.surfaceMonitor();
-    return monitor.y + monitor.height - actor.y;
-  }
 
   shutdown(): void {
     for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
     for (const disconnect of this.disconnectors) disconnect();
     this.panels.shutdown();
-    this.keyring.destroy();
-    this.appearance.destroy();
     this.liveWallpaper.destroy();
-    for (const sync of this.loginScreen) sync.destroy();
-    this.farewell.destroy();
-    this.fontRefresh.destroy();
-    this.mediaKeys.destroy();
-    this.oomNotifier.destroy();
-    this.health.destroy();
-    this.batteryWarnings.destroy();
-    this.plugSounds.destroy();
-    this.launchFeedback.destroy();
-    this.variableRefresh.destroy();
     this.board.destroy();
-    this.portal.destroy();
-    this.passkeys.destroy();
-    for (const monitor of this.stylesheetMonitors) monitor.cancel();
+    this.services.destroy();
   }
 
   switchWorkspace(index: number): void {
@@ -527,7 +260,7 @@ class KestrelUi {
   }
 
   toggleSurface(surface: Surface): void {
-    this.toggle(surface);
+    this.surfaces.toggle(surface);
   }
 }
 

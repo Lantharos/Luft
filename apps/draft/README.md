@@ -72,7 +72,7 @@ The installed desktop entry registers Draft for plain text, Markdown, logs, JSON
 | `Ctrl+B` | Show or hide the sidebar |
 | `Alt+Z` | Word wrap |
 | `Ctrl+Shift+V` | Markdown preview |
-| `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | Larger, smaller and default text size |
+| `Ctrl+=` / `Ctrl+-` / `Ctrl+0` | Larger, smaller and default text size; `Ctrl` with the scroll wheel or a pinch also changes it |
 
 ## Project layout
 

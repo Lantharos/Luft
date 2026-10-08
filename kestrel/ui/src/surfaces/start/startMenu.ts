@@ -22,6 +22,7 @@ export class StartMenu {
   private readonly browser: StartGrid;
   private readonly searchProvider: StartSearch;
   private apps: Gio.AppInfo[] = [];
+  private catalog = '';
 
   constructor(private readonly close: () => void, menus: ContextMenus) {
     this.actor = new St.BoxLayout({
@@ -112,8 +113,12 @@ export class StartMenu {
   }
 
   private loadApps(): void {
-    this.apps = this.appSystem.get_installed().filter(app => app.should_show())
+    const apps = this.appSystem.get_installed().filter(app => app.should_show())
       .sort((a, b) => a.get_display_name().localeCompare(b.get_display_name()));
+    const catalog = apps.map(app => [app.get_id(), app.get_display_name(), app.get_icon()?.to_string(), app.get_commandline()].join('\n')).join('\n\n');
+    if (catalog === this.catalog) return;
+    this.catalog = catalog;
+    this.apps = apps;
     this.searchProvider.update(this.apps);
     this.browser.update(this.apps, this.pinned);
     this.refreshApps();

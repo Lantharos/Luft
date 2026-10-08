@@ -1,8 +1,12 @@
+/boot/sushi/vm/
 /kestrel/build/
 /kestrel/install/
-/kestrel/ui/node_modules/
-
 /kestrel/run/
+/packages/*/Cargo.lock
 
+target/
+dist/
 node_modules/
 __pycache__/
+.svelte-check/
+vite.config.*.timestamp-*

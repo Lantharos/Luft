@@ -1,6 +1,6 @@
 # @luft/ui
 
-The shared look of Luft's apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome and the controls Rover and Settings are built from. Components ship as Svelte source, so apps compile them together with their own code.
+The shared look of Luft's Svelte apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome, controls and code highlighting. Components ship as Svelte source and compile with the app.
 
 ## Setup
 
@@ -12,14 +12,14 @@ Add the package to an app in this workspace:
 }
 ```
 
-Import the styles right after Tailwind. They also tell Tailwind to scan this package, so utility classes used inside the components end up in the app's CSS:
+Import the styles right after Tailwind. They also make Tailwind scan this package:
 
 ```css
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
 ```
 
-Register the plugins in `vite.config.ts`. `luftFonts` serves the fonts at `/fonts/` during development and copies them, with their license, into the build. It also makes every font size and line height given in `px` or `rem` follow the desktop's text size, through `--text-scale`, so larger text in Settings reaches the app without any work of its own. `sabineTarget` compiles scripts and styles for the Chromium that Sabine ships, so nothing gets downleveled or prefixed for browsers the apps never run in:
+Register the plugins in `vite.config.ts`:
 
 ```ts
 import { luftFonts, sabineTarget } from '@luft/ui/vite';
@@ -29,7 +29,10 @@ export default defineConfig({
 });
 ```
 
-Extend the shared TypeScript settings in the app's `tsconfig.json`:
+- `luftFonts` serves the fonts at `/fonts/`, copies them into the build, and scales every `px` or `rem` font size and line height by the desktop's text size (`--text-scale`).
+- `sabineTarget` builds for the Chromium that Sabine ships.
+
+Extend the shared TypeScript settings in `tsconfig.json`:
 
 ```json
 {
@@ -38,15 +41,13 @@ Extend the shared TypeScript settings in the app's `tsconfig.json`:
 }
 ```
 
-Preload the regular weight in `index.html` so text shows up without waiting for the font, and do the same for `MapleMono-NF-Regular.woff2` in apps that show code from the start:
+Preload the regular weight in `index.html`, and `MapleMono-NF-Regular.woff2` too in apps that show code from the start:
 
 ```html
 <link rel="preload" href="/fonts/OpenRunde-Regular.woff2" as="font" type="font/woff2" crossorigin />
 ```
 
 ## Window shell
-
-`GlassShell` is the rounded, frameless window body. It reads the shared `appearance` store, and marks itself `data-effect="translucent"` or `"solid"`. Put a `.glass-sidebar` and a `.glass-content` inside it:
 
 ```svelte
 <GlassShell>
@@ -59,9 +60,11 @@ Preload the regular weight in `index.html` so text shows up without waiting for 
 </GlassShell>
 ```
 
-On translucent windows the sidebar lets the compositor's blur through with a light tint (`--sidebar-glass`). The sidebar is `--sidebar-width` wide, 280px by default; override the variable on the shell if the app's native blur region uses a different width. `WindowControls` sits where the native side expects the minimize, maximize and close hit areas, so keep 16px of padding to its right. Pass `onclose` to run something first, such as saving state, and close the window from there.
+- The sidebar is `--sidebar-width` wide, 280px by default, and must match `sidebar_width` on the native side.
+- Keep 16px of padding to the right of `WindowControls`. Pass `onclose` to run something before closing.
+- Inside `GlassShell`, right-clicking a text field or selected text offers cut, copy, paste and select all, unless the app opens its own menu.
 
-Feed the store from the app's startup state, which the native side builds with `luft_app::Appearance`:
+Start the `appearance` store from the startup state that `luft_app::Appearance` builds:
 
 ```ts
 import { appearance } from '@luft/ui';
@@ -69,9 +72,19 @@ import { appearance } from '@luft/ui';
 appearance.start(await invoke('app_state'));
 ```
 
-After that, `appearance.translucent` is on, since Sabine windows are see-through, `appearance.accent` stays current as Kestrel's accent changes, `appearance.wallpaperAccent` holds the accent the wallpaper gives on its own, and `appearance.scheme` follows the desktop's light or dark style as Sabine reports it. `appearance.colors` holds Kestrel's palette for the light and the dark style, keyed by role name such as `primary`, `onSurface` or `surfaceContainerHigh` (the roles are listed in Kestrel's README). Every role also becomes a `--kestrel-light-…` and `--kestrel-dark-…` variable on the root element, such as `--kestrel-dark-on-primary`, and `appearance.pureBlack` tells whether Pure black is on. While it is, the store sets `data-black` on the root element and the dark palette's backgrounds, sidebar and content turn black. `appearance.terminal` holds Kestrel's sixteen terminal colors for the light and the dark style; their red, green, yellow, blue, magenta and cyan also become the `--kestrel-light-…` and `--kestrel-dark-…` variables on the root element, which the syntax colors use so code matches the wallpaper. `appearance.appIcons` holds the app icon style Kestrel draws with, its colors, and the folder of app glyphs, which `AppIcon` uses. `appearance.typography` holds the desktop's system and monospace font families and its text size, and `appearance.fontSans` and `appearance.fontMono` the matching font lists, for text drawn outside CSS such as a terminal's canvas.
+| Field | Value |
+| --- | --- |
+| `translucent` | Whether the window is see-through |
+| `scheme` | The desktop's `light` or `dark` style |
+| `accent`, `wallpaperAccent` | Kestrel's accent, and the accent the wallpaper gives on its own |
+| `colors` | Kestrel's palette for both styles, keyed by role such as `primary` or `surfaceContainerHigh` (see [Kestrel](../../kestrel/README.md)) |
+| `terminal` | Kestrel's sixteen terminal colors for both styles |
+| `pureBlack` | Whether Pure black is on; sets `data-black` on the root element |
+| `appIcons` | The app icon style, its colors and the glyph folder, used by `AppIcon` |
+| `typography` | The desktop's system and monospace families and text size |
+| `fontSans`, `fontMono` | Font lists for text drawn outside CSS, such as a canvas |
 
-The palette is dark unless an app opts into the light one by setting `data-scheme="light"` on the root element. Apps that follow the desktop style keep it in sync with the store:
+Every palette role also becomes a `--kestrel-light-…` and `--kestrel-dark-…` variable on the root element. The palette is dark unless the app sets `data-scheme="light"`; to follow the desktop:
 
 ```ts
 $effect(() => {
@@ -83,46 +96,58 @@ $effect(() => {
 
 | Component | Use |
 | --- | --- |
-| `Switch`, `Checkbox`, `Slider`, `Select`, `Segmented` | Form controls; each takes a `label` for assistive technology and reports changes through `onchange`. `Checkbox` shows its children as the visible label |
-| `SearchField` | Search input; `variant="sidebar"` for the sidebar, `large` for a taller field, `focus()` to focus and select |
-| `TextField`, `PasswordField` | Text inputs that show an `error` below the field once it has been left, or right away with `live`; `invalid` marks the field without a message, and `touched` can be bound to show the message elsewhere. `PasswordField` adds a show and hide button and calls `onreveal` before showing the value |
-| `Dialog` | Modal with a title, optional description, body and an `actions` snippet; `wide` for longer forms, and the body scrolls when it runs out of height |
-| `IconButton` | Round icon-only button taking a Lucide icon |
-| `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists and the rows inside them. Titles stay on one line and end in an ellipsis when they run out of room; `truncate` does the same for a `Row`'s description, and `expanded` turns a clickable `Row` into a disclosure whose arrow points down while open |
-| `AppIcon`, `Avatar` | App icon with a fallback, and a round user picture with initials. Give `AppIcon` the app's desktop `id` as well as its `icon` and it follows the desktop's app icon style; `style` shows one style regardless of the setting, for previews |
-| `Popover` | Floating panel anchored to a trigger; stays inside the window, flips above when there is no room below, and scrolls when it runs out of height |
-| `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at a pointer position; it closes when the window resizes or Escape is pressed inside it, and the app decides what an outside click does |
-| `MenuButton` | Button that opens a menu below it; `trigger` renders the button's content and `children` receives a `close` function for the items |
-| `VirtualScroller` | Scrolling list or grid that only renders the items in view, so it stays fast with tens of thousands of items. `layout` sets the item height and, for a grid, `minItemWidth`; `header` stays pinned above the items. Items passed while `stagger` is on fade in from top to bottom, and with `animateOrder` a reordered or filtered list moves its items to their new places. With `stableOrder`, rows that stay on screen keep their place in the document when the list is reordered and only move visually, which keeps frequently re-sorted lists cheap to update. `scrollToIndex`, `indicesIn` and `metrics` help with keyboard navigation and rubber-band selection |
-| `MediaControls` | Play, position, time and volume in one bar for a video or audio element; bind `paused`, `currentTime`, `muted` and `volume`, pass `buffered` to show what has loaded, a `preview` snippet to show something above the position under the pointer, and children for extra buttons at the end |
-| `SeekBar`, `VolumeControl` | The position and volume parts on their own, for players with their own layout. `SeekBar` reports every position while dragging through `onseek`, and `onscrub` says when dragging starts and stops |
-| `NativeVideoSurface` | Plays `src` through Sabine's native video, for formats Chromium can't decode, and fills its own box with it. Bind `player` to control playback, pass `cutout` when opaque content lies beneath, and handle `onfail` |
-| `RecoveryKey` | A recovery key in groups of eight, with saving to a file, printing and copying; the app passes `onsave` and `onprint` |
-| `GlassShell`, `WindowControls` | Window body and title bar buttons. Inside `GlassShell`, right-clicking a text field or editor offers cut, copy, paste and select all, and right-clicking selected text offers copy, wherever the app doesn't open a menu of its own |
+| `GlassShell`, `WindowControls` | Window body and title bar buttons |
+| `Switch`, `Checkbox`, `Slider`, `Select`, `Segmented` | Form controls with a `label` and `onchange`; `Segmented` takes an `item` snippet for icons |
+| `SearchField` | Search input; `variant="sidebar"`, `large`, and `focus()` |
+| `TextField`, `PasswordField` | Text inputs with `error`, `live`, `invalid` and bindable `touched`; `PasswordField` adds show and hide with `onreveal` |
+| `Dialog` | Modal with a title, description, body and `actions` snippet; `wide` for longer forms |
+| `IconButton` | Round button with a Lucide icon |
+| `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists; `Row` takes `truncate` and `expanded` |
+| `AppIcon`, `Avatar` | App icon that follows the desktop's icon style when given the app's `id`, and a round user picture with initials |
+| `Popover` | Panel anchored to a trigger that stays inside the window |
+| `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at the pointer |
+| `MenuButton` | Button with a `trigger` snippet that opens a menu; `children` receives `close` |
+| `VirtualScroller` | List or grid that renders only what is in view; `layout`, `header`, `stagger`, `animateOrder`, `stableOrder`, and `scrollToIndex`, `indicesIn` and `metrics` for keyboard and rubber-band selection |
+| `MediaControls` | Play, position, time and volume bar for a media element; bind `paused`, `currentTime`, `muted` and `volume` |
+| `SeekBar`, `VolumeControl` | The position and volume parts on their own; `onseek` and `onscrub` |
+| `NativeVideoSurface` | Plays `src` through Sabine's native video for formats Chromium can't decode; bind `player`, handle `onfail` |
+| `RecoveryKey` | Recovery key in groups of eight with copy, `onsave` and `onprint` |
 
-`fileDrop(open)` returns `ondragover` and `ondrop` handlers that accept files dropped from other apps and pass their paths to `open`; put them on `<svelte:window>`. `pathsFromUriList` and `fileUrlPath` turn `text/uri-list` contents and `file://` URLs into paths.
+## Helpers
 
-`formatClock(seconds)` turns a duration into `1:05` or `1:02:05`.
+| Export | Use |
+| --- | --- |
+| `tooltip(text)` | Attachment that shows a label under an element on hover |
+| `topLayer` | Attachment that puts an element in the browser's top layer |
+| `fileDrop(open)` | `ondragover` and `ondrop` handlers for `<svelte:window>` that pass dropped file paths to `open` |
+| `pathsFromUriList`, `fileUrlPath` | Paths from `text/uri-list` contents and `file://` URLs |
+| `basename`, `isInside` | A path's last part, and whether a path is inside a folder |
+| `bytes`, `memoryBytes` | Sizes in decimal and binary units |
+| `plural(count, singular, pluralForm?)` | `3 files` |
+| `ago(unixSeconds)` | Relative time such as `5 minutes ago` |
+| `watts(value)` | Power such as `4.2 W` |
+| `formatClock(seconds)` | `1:05` or `1:02:05` |
+| `renderMarkdown(source, path)` | Markdown to HTML, with relative images resolved against `path` |
+| `canPlayNatively()`, `decodeFailed(media)` | Whether native video is available, and whether a `<video>` failed to decode |
+| `MediaState` | A native player's state as reactive fields with setters, for `MediaControls` |
 
-For native video, `canPlayNatively()` says whether the window can use it and `decodeFailed(media)` whether a `<video>` stopped because Chromium can't decode its source. `MediaState` turns a native player into reactive `paused`, `currentTime`, `duration`, `muted`, `volume`, `width` and `height`, with setters to bind `MediaControls` to.
-
-`Segmented` also takes an `item` snippet to show icons instead of text; the option's `label` then becomes its accessible name.
+Types: `Appearance`, `AppIconPaint`, `AppIcons`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `Typography`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
 
 ## Classes
 
-`button` (with `primary`, `danger` and `large`), `plain-button`, `icon-button` (with `large`), `text-field`, `window-control`, `row-group`, `drag-region`, `soft-scroll`, `hidden-scroll` and `scroll-fade` are available globally for markup that doesn't need a component. `scroll-fade` fades a vertical scroller's top edge once it has scrolled away from the top and its bottom edge while there is more below; every sidebar list uses it.
-
-The `topLayer` attachment puts an element in the browser's top layer, above everything else in the window, for overlays that aren't built from `Dialog` or `Popover`.
-
-The `tooltip(text)` attachment shows a small label under an element after a short hover, and right away when moving between elements that have one:
-
-```svelte
-<button class="icon-button" aria-label="Back" {@attach tooltip('Back')}>…</button>
-```
+| Class | Use |
+| --- | --- |
+| `button` | Button; with `primary`, `danger` or `large` |
+| `plain-button` | Borderless button; with `large` |
+| `icon-button` | Round icon button; with `large` |
+| `text-field` | Text input |
+| `window-control` | Title bar button |
+| `row-group` | Grouped rows background |
+| `drag-region` | Drags the window |
+| `soft-scroll`, `hidden-scroll` | Thin or hidden scrollbars |
+| `scroll-fade` | Fades a scroller's edges while there is more to scroll |
 
 ## Code highlighting
-
-`@luft/ui/code` highlights code with the same colors everywhere, whether it's a preview or an editor. Grammars load the first time a language is used, so importing the module costs almost nothing up front:
 
 ```ts
 import { highlight } from '@luft/ui/code';
@@ -134,26 +159,37 @@ const html = await highlight(source, 'src/main.rs');
 <pre class="font-mono"><code>{@html html}</code></pre>
 ```
 
-The second argument is either a language name or alias, such as `rust`, `ts` or `Markdown`, or a file name or path, which is matched by extension and by well-known names like `Dockerfile`. The result is escaped HTML with `hl-*` classes whose colors come from the `--syntax-*` tokens, so it follows the accent, the wallpaper palette and the light and dark styles. Besides CodeMirror's own collection it knows Svelte and log files, where timestamps, levels and numbers stand out. Text in a language nobody knows comes back escaped without highlighting. Parsing happens on the calling thread, so cap very large inputs before highlighting them.
+The second argument is a language name or alias, or a file name or path. The result is escaped HTML with `hl-*` classes colored by the `--syntax-*` tokens. Grammars load on first use. Highlighting runs on the calling thread, so cap very large inputs.
 
 | Export | Use |
 | --- | --- |
-| `highlight(code, nameOrPath)` | Highlighted HTML for a string of code |
+| `highlight(code, nameOrPath)` | Highlighted HTML |
 | `findLanguage(nameOrPath)` | The matching language description, or `null` |
-| `loadLanguage(nameOrPath)` | Loads and returns the language support for editors, or `null` |
-| `languages` | Every known language, sorted by name, for language pickers |
-| `codeHighlighter` | The tag to class mapping behind `hl-*`, for CodeMirror's `syntaxHighlighting` |
+| `loadLanguage(nameOrPath)` | Language support for editors, or `null` |
+| `languages` | Every known language, sorted by name |
+| `codeHighlighter` | The tag to class mapping, for CodeMirror's `syntaxHighlighting` |
 
 ## Tokens
 
-Colors, radii and easing are CSS variables on `:root`, defined in `src/styles/tokens.css`, with the syntax colors in `src/styles/code.css`. `--font-sans` and `--font-mono` are the desktop's system and monospace fonts, which `appearance` keeps current, falling back to the bundled Open Runde and Maple Mono NF, a monospace font with ligatures and Nerd Font symbols in regular, italic, bold and bold italic; Tailwind's `font-sans` and `font-mono` utilities use them. The palette is dark by default, black under `data-black` unless the light palette is on, and light under `data-scheme="light"`. `--accent` is the palette's `primary` for the style in use and `--accent-text` its `onPrimary`, for text and icons on the accent; `--accent-soft` and `--accent-line` are a faint fill and an outline in the accent. Everything else comes from the same palette: backgrounds and sidebars are its surface roles, `--text`, `--text-soft` and `--text-muted` are `onSurface`, `onSurfaceVariant` and `outline`, `--group`, behind grouped rows, is a faint `onSurface` tint in the dark palette and `surfaceContainerLow` in the light one, `--danger` is `error`, `--secondary` and `--tertiary` are there for secondary colors such as file kinds, and `--ink` is `onSurface`, which hover fills, hairlines and scrollbars are mixed from. A colorful wallpaper therefore tints the whole app, and a black and white one keeps it neutral. Without Kestrel the colors fall back to neutral greys, with a white accent in the dark palette and a black one in the light one.
+Colors, radii and easing are CSS variables in `src/styles/tokens.css`, with syntax colors in `src/styles/code.css`. All colors come from Kestrel's palette and fall back to neutral greys without it.
+
+| Token | Value |
+| --- | --- |
+| `--font-sans`, `--font-mono` | The desktop's fonts, falling back to Open Runde and Maple Mono NF |
+| `--accent`, `--accent-text` | `primary` and `onPrimary` |
+| `--accent-soft`, `--accent-line` | Faint accent fill and outline |
+| `--text`, `--text-soft`, `--text-muted` | `onSurface`, `onSurfaceVariant` and `outline` |
+| `--group` | Background behind grouped rows |
+| `--danger` | `error` |
+| `--secondary`, `--tertiary` | Secondary colors such as file kinds |
+| `--ink` | `onSurface`, for hover fills, hairlines and scrollbars |
 
 ## Checks
 
-```bash
+```sh
 bun run check
 ```
 
 ## License
 
-Open Runde is licensed under the SIL Open Font License, included in `fonts/OFL.txt`. Maple Mono is licensed under the SIL Open Font License, included in `fonts/MapleMono-OFL.txt`.
+Open Runde and Maple Mono are licensed under the SIL Open Font License, in `fonts/OFL.txt` and `fonts/MapleMono-OFL.txt`.

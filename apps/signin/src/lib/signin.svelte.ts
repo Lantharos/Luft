@@ -72,6 +72,7 @@ class SignIn {
 			allowDownloads: false,
 			backgroundColor: '#ffffff'
 		});
+		await this.guest.setBounds(this.bounds);
 	}
 
 	place(rect: DOMRect) {

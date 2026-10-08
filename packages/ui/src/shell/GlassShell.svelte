@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { ClassValue } from 'svelte/elements';
 	import { appearance } from '../appearance.svelte';
+	import TextMenu from '../menus/TextMenu.svelte';
 
 	interface Props {
 		class?: ClassValue;
@@ -17,3 +18,5 @@
 >
 	{@render children()}
 </div>
+
+<TextMenu />

@@ -81,7 +81,8 @@
 	}
 
 	.drag-region :is(button, input, textarea, select, a, label, [role='button'], [role='tab'], [role='treeitem'], [role='option'], [contenteditable], [draggable='true']),
-	[data-no-drag] {
+	[data-no-drag],
+	:popover-open {
 		-webkit-app-region: no-drag;
 	}
 

@@ -98,7 +98,7 @@ $effect(() => {
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own, for players with their own layout. `SeekBar` reports every position while dragging through `onseek`, and `onscrub` says when dragging starts and stops |
 | `NativeVideoSurface` | Plays `src` through Sabine's native video, for formats Chromium can't decode, and fills its own box with it. Bind `player` to control playback, pass `cutout` when opaque content lies beneath, and handle `onfail` |
 | `RecoveryKey` | A recovery key in groups of eight, with saving to a file, printing and copying; the app passes `onsave` and `onprint` |
-| `GlassShell`, `WindowControls` | Window body and title bar buttons |
+| `GlassShell`, `WindowControls` | Window body and title bar buttons. Inside `GlassShell`, right-clicking a text field or editor offers cut, copy, paste and select all, and right-clicking selected text offers copy, wherever the app doesn't open a menu of its own |
 
 `fileDrop(open)` returns `ondragover` and `ondrop` handlers that accept files dropped from other apps and pass their paths to `open`; put them on `<svelte:window>`. `pathsFromUriList` and `fileUrlPath` turn `text/uri-list` contents and `file://` URLs into paths.
 

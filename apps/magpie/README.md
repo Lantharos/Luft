@@ -1,64 +1,55 @@
 # Magpie
 
-Magpie shows photos, videos, music, PDFs and fonts on the Luft desktop. It is built with Sabine and Svelte and lives at `apps/magpie` in the Luft monorepo; run the commands below from that directory unless noted otherwise.
+Magpie shows photos, videos, music, PDFs and fonts on Luft. It is built with Sabine and Svelte.
 
-## Two ways in
+Opening a file shows just that file, with the rest of its folder an arrow key away. Started on its own, Magpie opens Pictures with Pictures, Videos, Music and Documents in the sidebar and a button to open any other folder.
 
-Opening a file, from Rover or as the default app, shows just that file. The rest of its folder is one arrow key away, and a strip of thumbnails can be shown along the bottom. Nothing else sits around it.
+## Features
 
-Starting Magpie on its own opens your Pictures folder with Pictures, Videos, Music and Documents in the sidebar, plus any other folder you pick. The sidebar follows what you are looking at: other photos in the folder, the pages of a PDF or the music queue.
+- Photos: common formats directly, plus HEIC, JPEG XL, TIFF, OpenEXR, JPEG 2000 and more through the system's image loaders; animated GIF, WebP and PNG play
+- Zoom, pan, rotate, flip, copy, slideshow, camera details with a map link, and set as wallpaper
+- Videos with frame previews, speed, picture in picture, subtitles from `.srt`/`.vtt` files or inside MKV and MP4, and resume where you stopped
+- Formats the page can't decode, such as H.264 and HEVC, play through GStreamer with the same controls; Magpie offers other apps when a video can't play at all
+- Music: the folder becomes the queue, with tags and covers, shuffle and repeat; Kestrel's media controls and other MPRIS clients can control it
+- PDFs with selectable text, links, search, zoom and page thumbnails
+- Fonts (TrueType, OpenType, collections, WOFF, WOFF2) with samples, a character grid, details, variable font axes and collection faces
+- Install fonts to `~/.local/share/fonts`, remove your own, or make one the system or monospace font
+- Opening another file switches to it; songs opened during playback join the queue
 
-Opening another file while Magpie is running switches to it. Songs opened while music is playing join the queue instead.
+## Build and run
 
-## Photos
+Install dependencies once from the repository root with `bun install`, then from this directory:
 
-- JPEG, PNG, WebP, AVIF, GIF, SVG, BMP and icons open directly; HEIC, JPEG XL, TIFF, TGA, QOI, OpenEXR, JPEG 2000 and PNM are decoded by the system's image loaders and kept in a cache, so they open instantly the next time
-- Animated GIF, WebP and PNG play
-- Zoom with the wheel, a pinch or the zoom controls, drag to pan, and double-click to switch between fitting the window and actual size
-- Rotate, flip, copy, and set as wallpaper, which copies the picture into Pictures/Wallpapers and uses it for the current light or dark style
-- Details with dimensions, camera, lens, exposure, date and location, with a link to the location on a map
-- Slideshow
-- The next and previous photos load in the background
+```sh
+bun run desktop:dev      # Vite dev server and the native window
+bun run check            # svelte-check
+bun run desktop:build    # production web build and release binary
+bun run desktop:bundle   # release bundle
+```
 
-## Videos
+Local files are only readable from the packaged app, so media shows up in production builds and bundles, not in the Vite dev server. `bun run dev` in a regular browser reads real files instead: set `MAGPIE_OPEN` to a file to open it, or `MAGPIE_PLACES` to a folder to browse.
 
-- Play, position with frame previews, volume, speed, picture in picture and fullscreen
-- Subtitles from `.srt` and `.vtt` files next to the video (`Movie.srt`, `Movie.en.vtt`) and text subtitles inside MKV and MP4 files
-- Each video remembers where you stopped
-- VP9, AV1, VP8 and Theora play with Opus, Vorbis, FLAC and MP3 sound in the page. H.264, HEVC, AAC and the other formats GStreamer supports play through the system's decoders with the same controls, using the graphics card where it can; frame previews and picture in picture are only available for the first group
-- When a video can't be played at all, Magpie names the format and offers the other apps that can
+Formats beyond what Chromium shows need the `glycin-loaders` package and `bwrap`.
 
-## Music
+## Install
 
-- The folder becomes the queue, in album order when the files are tagged
-- Title, artist, album and cover from the file's tags, or `cover.jpg` and similar files in the folder
-- Shuffle, repeat one or all, and the next song starts right as the current one ends
-- Kestrel's media controls and other MPRIS clients see what is playing and can control it
+```sh
+sabine install --bundle .
+```
 
-## Documents
-
-- PDFs with selectable text, links, search, zoom, fit width and fit page
-- Page thumbnails in the sidebar, or in a panel you can show when a PDF was opened directly
-
-## Fonts
-
-- TrueType, OpenType, font collections, WOFF and WOFF2 open directly
-- A large sample in the font, a sample text you can type into at any size, and the same text at several sizes below it
-- Every character the font covers, in a grid; click one to copy it
-- Family, style, weight, version, designer, maker, copyright and license, along with the file's format and size
-- Collections let you pick any of their faces, and variable fonts get a slider for each axis plus their named styles
-- Install puts the font in your fonts folder (`~/.local/share/fonts`) and makes it available to every app right away; WOFF and WOFF2 files are unpacked into regular font files on the way. Fonts that are already on the computer show as installed, and the ones in your own fonts folder can be removed again, which moves them to the trash
-- The ⋯ menu makes the font the system font, or the monospace font when every letter in it is the same width, installing it first if it isn't yet
+Installing registers Magpie for the image, video, audio, PDF and font types it can show.
 
 ## Keyboard shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Left` / `Right` | Previous and next photo or font; seek in videos and music |
+| `Left` / `Right` | Previous and next photo or font; seek 5 seconds in videos and music |
+| `J` / `L` | Seek 10 seconds back or forward in videos |
+| `Home` | Back to the start of a video |
 | `Page Up` / `Page Down` | Previous and next item |
 | `Ctrl+Left` / `Ctrl+Right` | Previous and next video or song |
-| `Space` | Play or pause |
-| `+` / `-` / `0` / `1` | Zoom in, zoom out, fit, actual size |
+| `Space` | Play or pause; `K` also works in videos |
+| `+` / `-` / `0` / `1` | Zoom in, zoom out, fit (fit width in PDFs), actual size |
 | `R` / `Shift+R` | Rotate right and left |
 | `H` | Flip |
 | `F5` | Slideshow |
@@ -70,58 +61,14 @@ Opening another file while Magpie is running switches to it. Songs opened while 
 | `F9` | Sidebar, thumbnail strip, queue or pages |
 | `F` / `F11` | Fullscreen |
 | `Ctrl+O` | Open a file |
-| `Escape` | Leave fullscreen or the slideshow |
+| `Escape` | Leave the slideshow, search or fullscreen |
 
-## Development
+## Files
 
-Magpie's controls, styles and native setup come from `packages/ui` and `packages/app`, so install dependencies once from the repository root:
-
-```bash
-bun install              # from the repository root
-bun run desktop:dev      # Vite dev server and the native window
-bun run check            # svelte-check
-bun run desktop:build    # production web build and release binary
-```
-
-Local files are only readable from the packaged app, so photos, videos and music show up in production builds and bundles, not while running against the Vite dev server. Opening the Vite server in a regular browser shows the interface with real files instead: set `MAGPIE_OPEN` to a file to open it, or `MAGPIE_PLACES` to a folder to browse.
-
-Formats beyond what Chromium shows need the `glycin-loaders` package and `bwrap`, which GNOME's image viewer relies on too.
-
-## Install
-
-```bash
-sabine install .
-```
-
-The desktop entry registers Magpie for the image, video, audio, PDF and font types it can show.
-
-## Project layout
-
-```
-magpie/
-├── src/
-│   ├── lib/
-│   │   ├── api.ts, bridge.ts   bridge commands and the browser preview fallback
-│   │   ├── app/                window state, shortcuts and opening files
-│   │   ├── browse/             sidebar, places, folder gallery and thumbnail strip
-│   │   ├── document/           PDF viewer, search and page thumbnails
-│   │   ├── font/               font view, samples, characters, details and installing
-│   │   ├── library/            the open folder, navigation and thumbnails
-│   │   ├── music/              player, queue and music view
-│   │   ├── photo/              loading, WebGL drawing, zoom and gestures, details
-│   │   ├── playback/           shared volume and the media session
-│   │   ├── shell/              header, stage and shared messages
-│   │   └── video/              player, subtitles, frame previews and positions
-│   └── App.svelte              window layout
-├── vite/                       PDF assets and the browser preview
-└── desktop/src/
-    ├── folder/                 listing, kinds, places and folder watching
-    ├── font/                   font reading, collection faces and installing
-    ├── media/                  tags, covers, video streams and subtitles
-    ├── mpris/                  MPRIS player
-    ├── photo/                  native decoding, metadata and wallpaper
-    └── bridge/                 bridge command registration
-```
+| Path | Contents |
+|------|----------|
+| `~/Pictures/Wallpapers/` | Pictures set as wallpaper |
+| `~/.local/share/fonts/` | Installed fonts |
 
 ## License
 

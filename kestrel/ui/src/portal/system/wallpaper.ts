@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { createThumbnail } from '../../clipboard/thumbnail.js';
+import { createThumbnail } from '../../surfaces/clipboard/thumbnail.js';
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { ENDED, SUCCESS, option, type Invocation, type Options } from '../core/request.js';

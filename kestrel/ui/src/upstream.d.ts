@@ -30,7 +30,7 @@ declare module '*.svg' {
 
 
 declare module 'resource:///com/lantharos/kestrel/ui/status/volume.js' {
-  export function createInputSlider(): import('./quickSettings/quickControls.js').QuickControl;
+  export function createInputSlider(): import('./surfaces/quickSettings/quickControls.js').QuickControl;
 }
 
 declare module 'resource:///com/lantharos/kestrel/ui/audioDeviceSelection.js' {

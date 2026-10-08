@@ -9,7 +9,7 @@ use zbus::{fdo, interface};
 use super::settings_only;
 use crate::daemon::Daemon;
 use crate::identity::App;
-use crate::secrets::{Target, item_path, parse};
+use crate::services::secrets::{Target, item_path, parse};
 
 pub struct Access {
     pub daemon: Arc<Daemon>,

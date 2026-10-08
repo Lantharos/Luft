@@ -1,18 +1,12 @@
-mod a11y;
-mod housekeeping;
-mod keyboard;
-mod night_light;
-mod power;
-mod printers;
-mod rfkill;
-mod security;
-mod sound;
-mod timezone;
-mod watchdog;
-mod xsettings;
+mod desktop;
+mod devices;
+mod system;
 
 use crate::context::Context;
-use security::{signing_key, usb_protection};
+use desktop::{a11y, night_light, xsettings};
+use devices::{keyboard, power, printers, rfkill, sound};
+use system::security::{signing_key, usb_protection};
+use system::{housekeeping, timezone, watchdog};
 
 #[derive(Clone, Copy)]
 pub enum Module {

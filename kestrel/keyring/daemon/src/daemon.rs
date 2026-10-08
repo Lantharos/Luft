@@ -11,7 +11,7 @@ use crate::access::Granted;
 use crate::identity::Identities;
 use crate::keyring::Keyring;
 use crate::prompter::Prompter;
-use crate::secrets::{Sessions, Target};
+use crate::services::secrets::{Sessions, Target};
 
 pub struct Daemon {
     pub connection: Connection,

@@ -21,11 +21,9 @@ pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> 
     if item.owner.as_deref() == Some(app.key.as_str()) {
         return Decision::Allowed;
     }
-    if item
-        .attributes
-        .get("xdg:schema")
-        .is_some_and(|schema| schema == PORTAL_SCHEMA || schema == crate::passkeys::SCHEMA)
-    {
+    if item.attributes.get("xdg:schema").is_some_and(|schema| {
+        schema == PORTAL_SCHEMA || schema == crate::services::passkeys::SCHEMA
+    }) {
         return Decision::Denied;
     }
     if item.attributes.contains_key(DRIVE_PASSPHRASE) && DRIVE_UNLOCKERS.contains(&app.key.as_str())

@@ -2,12 +2,8 @@ mod access;
 mod daemon;
 mod identity;
 mod keyring;
-mod manage;
-mod passkeys;
-mod portal;
 mod prompter;
-mod secrets;
-mod ssh;
+mod services;
 mod unlocking;
 mod watch;
 
@@ -41,31 +37,31 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     connection
         .object_server()
         .at(
-            secrets::ROOT,
-            secrets::Service {
+            services::secrets::ROOT,
+            services::secrets::Service {
                 daemon: daemon.clone(),
             },
         )
         .await?;
-    secrets::sync(&daemon).await;
+    services::secrets::sync(&daemon).await;
     connection
         .object_server()
         .at(
-            portal::PATH,
-            portal::Portal {
+            services::portal::PATH,
+            services::portal::Portal {
                 daemon: daemon.clone(),
             },
         )
         .await?;
-    manage::serve(&daemon).await?;
+    services::manage::serve(&daemon).await?;
     connection
         .request_name_with_flags(SECRETS, RequestNameFlags::DoNotQueue.into())
         .await?;
     connection
-        .request_name_with_flags(manage::NAME, RequestNameFlags::DoNotQueue.into())
+        .request_name_with_flags(services::manage::NAME, RequestNameFlags::DoNotQueue.into())
         .await?;
     daemon.start_unlocking().await;
-    if let Err(error) = ssh::start(&daemon) {
+    if let Err(error) = services::ssh::start(&daemon) {
         eprintln!("The SSH agent couldn't start: {error}");
     }
     watch::start(&daemon).await?;

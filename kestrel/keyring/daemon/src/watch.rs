@@ -6,7 +6,7 @@ use zbus::fdo::DBusProxy;
 use zbus::{MatchRule, MessageStream};
 
 use crate::daemon::Daemon;
-use crate::secrets::sync;
+use crate::services::secrets::sync;
 
 pub async fn start(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     let proxy = DBusProxy::new(&daemon.connection).await?;
@@ -59,7 +59,7 @@ pub async fn start(daemon: &Arc<Daemon>) -> zbus::Result<()> {
         loop {
             publisher.changed.notified().await;
             sync(&publisher).await;
-            crate::manage::publish(&publisher).await;
+            crate::services::manage::publish(&publisher).await;
         }
     });
     Ok(())

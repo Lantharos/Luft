@@ -8,7 +8,7 @@ use zbus::{fdo, interface};
 
 use super::{PATH, settings_only};
 use crate::daemon::Daemon;
-use crate::ssh::{
+use crate::services::ssh::{
     fingerprint, generate_in_chip, generate_software, kind, openssh_line, socket_path,
 };
 

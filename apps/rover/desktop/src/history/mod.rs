@@ -9,7 +9,7 @@ use luft_app::Events;
 use parking_lot::Mutex;
 use serde::Serialize;
 
-use crate::events::HISTORY_CHANGED;
+use crate::app::events::HISTORY_CHANGED;
 use crate::files::operations::{OperationPhase, OperationType, OperationsQueue};
 use crate::files::trash::Trashed;
 

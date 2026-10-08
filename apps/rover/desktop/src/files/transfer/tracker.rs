@@ -4,11 +4,11 @@ use std::time::Duration;
 
 use super::resolve::Resolver;
 use super::space::{file_name, path_items, path_size};
-use crate::drives;
 use crate::files::operations::{OperationStatus, OperationsQueue, Resolution};
 use crate::files::privileged::remove_path;
 use crate::files::trash;
 use crate::history::Step;
+use crate::locations::drives;
 
 const PAUSE_POLL_INTERVAL: Duration = Duration::from_millis(120);
 

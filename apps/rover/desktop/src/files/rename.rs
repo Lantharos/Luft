@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use serde::Deserialize;
 
 use super::rename_no_replace;
+use crate::files::text::items;
 use crate::history::{History, Step};
-use crate::text::items;
 
 #[derive(Deserialize)]
 pub struct Renaming {

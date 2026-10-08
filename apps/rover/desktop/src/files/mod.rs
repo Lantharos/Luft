@@ -4,6 +4,7 @@ pub mod folders;
 pub mod operations;
 pub mod privileged;
 pub mod rename;
+pub mod text;
 pub mod transfer;
 pub mod trash;
 pub mod watch;

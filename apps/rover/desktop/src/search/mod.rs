@@ -12,7 +12,7 @@ use ignore::{WalkBuilder, WalkState};
 use luft_app::Events;
 use serde::Serialize;
 
-use crate::events::SEARCH_RESULTS;
+use crate::app::events::SEARCH_RESULTS;
 use crate::files::entries::{FileEntry, file_entry};
 pub use matcher::Query;
 use matcher::{Found, Matcher};

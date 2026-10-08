@@ -1,23 +1,15 @@
+mod app;
 mod archives;
-mod bridge;
-mod drives;
-mod events;
+mod details;
 mod files;
 mod history;
-mod inspect;
 mod integration;
-mod network;
-mod places;
-mod properties;
+mod locations;
 mod search;
-mod settings;
-mod state;
-mod text;
-mod vcs;
 
+use app::state::RoverState;
 use luft_app::GlassWindow;
 use sabine::SabineWindow;
-use state::RoverState;
 
 pub use integration::file_manager_bus::{
     install as install_file_manager_bus, run as run_file_manager_bus,
@@ -32,7 +24,7 @@ pub fn run_app() -> ! {
     luft_app::run(
         &state.events,
         |window| build_window(window, &state),
-        drives::watch_mounts,
+        locations::drives::watch_mounts,
     )
 }
 
@@ -45,5 +37,5 @@ fn build_window(window: SabineWindow, state: &RoverState) -> SabineWindow {
         sidebar_width: 260,
         single_instance: state.chooser.is_none().then_some(APP_ID),
     };
-    bridge::register(glass.apply(window), state)
+    app::bridge::register(glass.apply(window), state)
 }

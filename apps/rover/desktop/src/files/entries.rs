@@ -7,9 +7,9 @@ use std::time::SystemTime;
 use serde::Serialize;
 
 use super::privileged::{is_permission_error, os, run_pkexec};
-use crate::drives;
+use crate::files::text::quoted;
 use crate::history::{History, Step};
-use crate::text::quoted;
+use crate::locations::drives;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct FileEntry {

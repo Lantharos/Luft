@@ -7,7 +7,7 @@ use chrono::{Local, NaiveDateTime};
 use percent_encoding::percent_decode_str;
 use serde::Serialize;
 
-use crate::drives;
+use crate::locations::drives;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct TrashLocation {

@@ -9,9 +9,9 @@ use std::thread;
 
 use crate::files::operations::{OperationPhase, OperationType, OperationsQueue};
 use crate::files::privileged::remove_path;
+use crate::files::text::{quoted, subject};
 use crate::files::transfer::{available_destination, path_size};
 use crate::history::{History, Step};
-use crate::text::{quoted, subject};
 pub use compress::ArchiveFormat;
 use progress::Progress;
 

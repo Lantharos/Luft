@@ -67,47 +67,47 @@ const pointerTitle = ({ mouse, touchpad }: Hardware) => (mouse && touchpad ? 'Mo
 
 export const PANEL_GROUPS: Panel[][] = [
 	[
-		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy', 'dns', 'ip address', 'hardware address', 'metered'], () => import('./network/NetworkPanel.svelte')),
-		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker', 'visible', 'discoverable'], () => import('./bluetooth/BluetoothPanel.svelte'), {
+		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy', 'dns', 'ip address', 'hardware address', 'metered'], () => import('./connections/network/NetworkPanel.svelte')),
+		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker', 'visible', 'discoverable'], () => import('./connections/bluetooth/BluetoothPanel.svelte'), {
 			present: (hardware) => hardware.bluetooth,
 			missing: 'This computer has no Bluetooth adapter'
 		})
 	],
 	[
-		panel('display', 'Displays', Monitor, ['monitor', 'screen', 'resolution', 'scale', 'refresh rate', 'night light', 'arrangement'], () => import('./display/DisplayPanel.svelte')),
-		panel('sound', 'Sound', Volume2, ['audio', 'volume', 'speakers', 'microphone', 'output', 'input', 'alerts'], () => import('./sound/SoundPanel.svelte')),
-		panel('power', (hardware) => (hardware.battery ? 'Power & Battery' : 'Power'), BatteryCharging, ['battery', 'sleep', 'suspend', 'power mode', 'screen blank', 'lid'], () => import('./power/PowerPanel.svelte'))
+		panel('display', 'Displays', Monitor, ['monitor', 'screen', 'resolution', 'scale', 'refresh rate', 'night light', 'arrangement'], () => import('./devices/display/DisplayPanel.svelte')),
+		panel('sound', 'Sound', Volume2, ['audio', 'volume', 'speakers', 'microphone', 'output', 'input', 'alerts'], () => import('./devices/sound/SoundPanel.svelte')),
+		panel('power', (hardware) => (hardware.battery ? 'Power & Battery' : 'Power'), BatteryCharging, ['battery', 'sleep', 'suspend', 'power mode', 'screen blank', 'lid'], () => import('./devices/power/PowerPanel.svelte'))
 	],
 	[
-		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'app icons', 'tinted', 'cursor', 'pointer', 'mouse pointer', 'cursor size', 'text size', 'animations', 'fonts', 'typefaces', 'install fonts'], () => import('./appearance/AppearancePanel.svelte')),
-		panel('notifications', 'Notifications', Bell, ['do not disturb', 'banners', 'lock screen', 'apps'], () => import('./notifications/NotificationsPanel.svelte'))
+		panel('appearance', 'Appearance', Palette, ['wallpaper', 'background', 'dark', 'light', 'style', 'accent', 'app icons', 'tinted', 'cursor', 'pointer', 'mouse pointer', 'cursor size', 'text size', 'animations', 'fonts', 'typefaces', 'install fonts'], () => import('./personalization/appearance/AppearancePanel.svelte')),
+		panel('notifications', 'Notifications', Bell, ['do not disturb', 'banners', 'lock screen', 'apps'], () => import('./personalization/notifications/NotificationsPanel.svelte'))
 	],
 	[
-		panel('keyboard', 'Keyboard', Keyboard, ['input sources', 'layout', 'shortcuts', 'repeat', 'language'], () => import('./keyboard/KeyboardPanel.svelte')),
-		panel('mouse', pointerTitle, Mouse, ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad'], () => import('./mouse/MousePanel.svelte'), {
+		panel('keyboard', 'Keyboard', Keyboard, ['input sources', 'layout', 'shortcuts', 'repeat', 'language'], () => import('./devices/keyboard/KeyboardPanel.svelte')),
+		panel('mouse', pointerTitle, Mouse, ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad'], () => import('./devices/mouse/MousePanel.svelte'), {
 			present: (hardware) => hardware.mouse || hardware.touchpad,
 			missing: 'No mouse or touchpad is connected'
 		}),
-		panel('accessibility', 'Accessibility', Accessibility, ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'], () => import('./accessibility/AccessibilityPanel.svelte'))
+		panel('accessibility', 'Accessibility', Accessibility, ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'], () => import('./personalization/accessibility/AccessibilityPanel.svelte'))
 	],
 	[
-		panel('apps', 'Apps', LayoutGrid, ['default apps', 'browser', 'startup', 'autostart'], () => import('./apps/AppsPanel.svelte')),
-		panel('privacy', 'Privacy', Hand, ['screen lock', 'location', 'camera', 'microphone', 'recent files', 'file history', 'trash', 'temporary files'], () => import('./privacy/PrivacyPanel.svelte')),
-		panel('security', 'Security', ShieldCheck, ['secure boot', 'tpm', 'encryption', 'disk encryption', 'bitlocker', 'luks', 'recovery key', 'pin', 'firmware', 'hardware security', 'signing key', 'usb', 'passwords', 'keyring', 'passkeys'], () => import('./security/SecurityPanel.svelte'))
+		panel('apps', 'Apps', LayoutGrid, ['default apps', 'browser', 'startup', 'autostart'], () => import('./system/apps/AppsPanel.svelte')),
+		panel('privacy', 'Privacy', Hand, ['screen lock', 'location', 'camera', 'microphone', 'recent files', 'file history', 'trash', 'temporary files'], () => import('./protection/privacy/PrivacyPanel.svelte')),
+		panel('security', 'Security', ShieldCheck, ['secure boot', 'tpm', 'encryption', 'disk encryption', 'bitlocker', 'luks', 'recovery key', 'pin', 'firmware', 'hardware security', 'signing key', 'usb', 'passwords', 'keyring', 'passkeys'], () => import('./protection/security/SecurityPanel.svelte'))
 	],
 	[
-		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./datetime/DateTimePanel.svelte')),
-		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./users/UsersPanel.svelte')),
-		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./login/LoginPanel.svelte')),
-		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'restart and install', 'packages', 'automatic updates', 'security updates'], () => import('./updates/UpdatesPanel.svelte')),
-		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./about/AboutPanel.svelte'))
+		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./system/datetime/DateTimePanel.svelte')),
+		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./system/users/UsersPanel.svelte')),
+		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./system/login/LoginPanel.svelte')),
+		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'restart and install', 'packages', 'automatic updates', 'security updates'], () => import('./system/updates/UpdatesPanel.svelte')),
+		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./system/about/AboutPanel.svelte'))
 	]
 ];
 
 export const PANELS = PANEL_GROUPS.flat();
 
 const SUBPAGES: Panel[] = [
-	panel('appearance/taskbar', 'Taskbar', PanelBottom, ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays', 'workspace', 'desktop', 'virtual desktop'], () => import('./appearance/AppearancePanel.svelte'))
+	panel('appearance/taskbar', 'Taskbar', PanelBottom, ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays', 'workspace', 'desktop', 'virtual desktop'], () => import('./personalization/appearance/AppearancePanel.svelte'))
 ];
 export const DEFAULT_PANEL: PanelId = 'network';
 

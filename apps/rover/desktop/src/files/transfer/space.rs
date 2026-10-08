@@ -5,7 +5,7 @@ use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 
-use crate::drives;
+use crate::locations::drives;
 
 pub(super) fn ensure_space(destination: &Path, required_bytes: u64) -> Result<(), String> {
     if required_bytes == 0 {

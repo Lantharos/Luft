@@ -1,7 +1,11 @@
 import GLib from 'gi://GLib';
 
+import {named, shown} from '../lib/actors.js';
+import {pause, settled} from '../lib/wait.js';
+import {require} from './prompt.js';
+
 const CLOCK_TICKS = 100;
-const IDLE_SAMPLE = 10000;
+const IDLE_SAMPLE = 5000;
 
 const read = path => new TextDecoder().decode(GLib.file_get_contents(path)[1]);
 
@@ -19,12 +23,11 @@ function residentMegabytes(field) {
   return (Number(read('/proc/self/status').match(new RegExp(`${field}:\\s+(\\d+)`))[1]) / 1024).toFixed(1);
 }
 
-export async function reportResources({pause, find, visible, require}) {
+export async function reportResources() {
   console.log(`Kestrel login screen ready: ${secondsSinceLaunch()} s after launch, ${residentMegabytes('VmRSS')} MB resident`);
-  await pause(1500);
-  require(!visible(find('kestrel-greeter-users')) && !visible(find('kestrel-greeter-controls')),
+  await settled();
+  require(!shown(named('kestrel-greeter-users')) && !shown(named('kestrel-greeter-controls')),
     'the login screen opens on the clock alone');
-  await pause(5000);
   let frames = 0;
   const painted = global.stage.connect('after-paint', () => frames++);
   const cpu = cpuSeconds();

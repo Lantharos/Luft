@@ -8,8 +8,21 @@ build="$root/kestrel/run/install-build"
 manifest="$prefix/share/kestrel/installed-files"
 
 greeter_data="$root/kestrel/greeter/data"
+# shellcheck source=../keyring/tools/install.sh
 source "$root/kestrel/keyring/tools/install.sh"
+# shellcheck source=../watchdog/tools/install.sh
 source "$root/kestrel/watchdog/tools/install.sh"
+
+usage() {
+  cat <<'USAGE'
+Usage: kestrel/tools/install.sh [ACTION] [PREFIX]
+
+  install   Build Kestrel and install it into PREFIX (default: /opt/kestrel).
+            System prefixes also get the session entry, login screen,
+            keyring, authenticator and watchdog. This is the default action.
+  remove    Remove all of that again.
+USAGE
+}
 
 greeter_files() {
   echo "com.lantharos.Greeter1.conf /etc/dbus-1/system.d/com.lantharos.Greeter1.conf"
@@ -124,60 +137,62 @@ prune_stale_files() {
   rm "$current"
 }
 
-case "$action" in
-  install)
-    "$root/kestrel/compositor/build.sh" "$build/compositor" "$prefix"
+install_everything() {
+  "$root/kestrel/compositor/build.sh" "$build/compositor" "$prefix"
 
-    (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
-    engine_setup=()
-    if [[ -f "$build/engine/build.ninja" ]]; then
-      engine_setup+=(--reconfigure)
-    fi
-    meson setup "${engine_setup[@]}" "$build/engine" "$root/kestrel/engine" \
-      -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
-    meson compile -C "$build/engine"
-    as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"
-    as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
-    prune_stale_files
-    install_settings
-    install_openconnect
-    as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
+  (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
+  engine_setup=()
+  if [[ -f "$build/engine/build.ninja" ]]; then
+    engine_setup+=(--reconfigure)
+  fi
+  meson setup "${engine_setup[@]}" "$build/engine" "$root/kestrel/engine" \
+    -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
+  meson compile -C "$build/engine"
+  as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"
+  as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
+  prune_stale_files
+  install_settings
+  install_openconnect
+  as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
-    if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then
-      [[ -d /usr/local/lib/systemd/user ]] && find /usr/local/lib/systemd/user -maxdepth 1 -name 'kestrel*' -xtype l -exec sudo rm {} +
-      installed_links | while read -r link; do
-        sudo mkdir -p "/usr/local/$(dirname "$link")"
-        sudo ln -sfn "$prefix/$link" "/usr/local/$link"
-      done
-      install_greeter
-      install_keyring
-      install_authenticator
-      install_watchdog
-      sudo install -dZ -m755 /usr/local/share/fonts
-      sudo ln -sfn "$prefix/share/kestrel/fonts" /usr/local/share/fonts/luft
-      sudo fc-cache /usr/local/share/fonts
-      systemctl --user daemon-reload
-      echo "Kestrel is installed in $prefix and appears as a session on the login screen."
-      echo "The Kestrel login screen is ready for greetd; see Setting up the login screen in kestrel/README.md."
-      check_runtime
-    else
-      echo "Kestrel is installed in $prefix. Session entries are only linked for system prefixes."
-    fi
-    ;;
-  remove)
+  if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then
+    [[ -d /usr/local/lib/systemd/user ]] && find /usr/local/lib/systemd/user -maxdepth 1 -name 'kestrel*' -xtype l -exec sudo rm {} +
     installed_links | while read -r link; do
-      [[ -L "/usr/local/$link" ]] && sudo rm "/usr/local/$link"
+      sudo mkdir -p "/usr/local/$(dirname "$link")"
+      sudo ln -sfn "$prefix/$link" "/usr/local/$link"
     done
-    remove_greeter
-    remove_authenticator
-    remove_keyring
-    remove_watchdog
-    [[ -L /usr/local/share/fonts/luft ]] && sudo rm /usr/local/share/fonts/luft && sudo fc-cache /usr/local/share/fonts
-    as_owner "$prefix" rm -rf "$prefix"
-    echo "Kestrel was removed from $prefix."
-    ;;
-  *)
-    echo "Usage: kestrel/tools/install.sh [install|remove] [prefix]" >&2
-    exit 2
-    ;;
+    install_greeter
+    install_keyring
+    install_authenticator
+    install_watchdog
+    sudo install -dZ -m755 /usr/local/share/fonts
+    sudo ln -sfn "$prefix/share/kestrel/fonts" /usr/local/share/fonts/luft
+    sudo fc-cache /usr/local/share/fonts
+    systemctl --user daemon-reload
+    echo "Kestrel is installed in $prefix and appears as a session on the login screen."
+    echo "The Kestrel login screen is ready for greetd; see Setting up the login screen in kestrel/README.md."
+    check_runtime
+  else
+    echo "Kestrel is installed in $prefix. Session entries are only linked for system prefixes."
+  fi
+}
+
+remove_everything() {
+  installed_links | while read -r link; do
+    [[ -L "/usr/local/$link" ]] && sudo rm "/usr/local/$link"
+  done
+  remove_greeter
+  remove_authenticator
+  remove_keyring
+  remove_watchdog
+  [[ -L /usr/local/share/fonts/luft ]] && sudo rm /usr/local/share/fonts/luft && sudo fc-cache /usr/local/share/fonts
+  as_owner "$prefix" rm -rf "$prefix"
+  echo "Kestrel was removed from $prefix."
+}
+
+case "$action" in
+  install) install_everything ;;
+  remove) remove_everything ;;
+  -h | --help) usage ;;
+  *) usage >&2; exit 2 ;;
 esac

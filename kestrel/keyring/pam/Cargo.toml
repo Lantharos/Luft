@@ -3,6 +3,7 @@ name = "pam_luft_keyring"
 description = "Unlocks Luft Keyring after a successful sign-in"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [lib]

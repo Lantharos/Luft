@@ -5,7 +5,7 @@ description = "Signs in to Wi-Fi networks that ask for it first"
 authors = ["Kristof"]
 license = "MIT"
 edition = "2024"
-rust-version = "1.93"
+rust-version = "1.98"
 
 [lib]
 name = "signin_lib"

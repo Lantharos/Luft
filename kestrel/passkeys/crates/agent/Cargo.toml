@@ -3,11 +3,11 @@ name = "luft-passkeys"
 description = "Keeps passkeys in Luft Keyring and answers browsers through the passkey relay"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
 ctap = { path = "../ctap" }
-futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
 libc = "0.2.189"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"

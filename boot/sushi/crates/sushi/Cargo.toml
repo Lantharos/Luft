@@ -8,7 +8,6 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-anyhow.workspace = true
 drm.workspace = true
 drm-ffi = "0.9.1"
 libc.workspace = true

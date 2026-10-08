@@ -3,6 +3,7 @@ name = "luft-keyring-wire"
 description = "Messages between Luft Keyring's sign-in module, its unlock service and the keyring"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [features]

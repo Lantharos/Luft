@@ -1,10 +1,11 @@
+pub mod palette;
 pub mod typography;
 
 use zbus::blocking::Proxy;
 use zbus::zvariant::OwnedValue;
 
+use crate::bridge::events::Events;
 use crate::dbus;
-use crate::events::Events;
 
 fn proxy() -> Result<Proxy<'static>, String> {
     Proxy::new(

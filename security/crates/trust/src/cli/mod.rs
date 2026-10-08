@@ -12,7 +12,7 @@ use crate::disk::keys;
 use crate::system::command::Tool;
 use crate::system::secret::Secret;
 use crate::system::tpm;
-use crate::{actions, disk};
+use crate::{disk, service::actions};
 
 #[derive(Parser)]
 #[command(

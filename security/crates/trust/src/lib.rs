@@ -1,4 +1,3 @@
-mod actions;
 mod boot;
 pub mod cli;
 mod disk;
@@ -7,5 +6,4 @@ mod errors;
 mod keys;
 mod paths;
 pub mod service;
-mod status;
 mod system;

@@ -1,5 +1,5 @@
 use crate::disk::Check;
-use crate::status;
+use crate::service::status;
 use crate::system::secret::Secret;
 
 fn yes_no(value: bool) -> &'static str {

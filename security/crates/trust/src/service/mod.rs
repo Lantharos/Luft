@@ -1,7 +1,9 @@
+pub(crate) mod actions;
 mod drives;
 mod error;
 mod interface;
 mod properties;
+pub(crate) mod status;
 
 use std::sync::Arc;
 use std::time::Duration;

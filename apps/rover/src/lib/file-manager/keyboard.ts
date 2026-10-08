@@ -41,7 +41,7 @@ export function handleKeydown(event: KeyboardEvent, context: KeyboardContext) {
 	}
 	if (event.altKey && event.key === 'Enter' && manager.selection.size > 0) {
 		event.preventDefault();
-		return tools.showProperties(manager, tools.selection(manager));
+		return tools.showProperties(tools.selection(manager));
 	}
 	if (primary) return handleShortcut(event, manager, key);
 	if (event.key === 'Delete') void manager.actions.trashSelected();

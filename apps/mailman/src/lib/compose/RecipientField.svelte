@@ -15,7 +15,6 @@
 
 	const VALID = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 
-	let input = $state<HTMLInputElement>();
 	let text = $state('');
 	let suggestions = $state<Address[]>([]);
 	let highlighted = $state(0);
@@ -90,7 +89,7 @@
 				<button type="button" aria-label="Remove {address.address}" onclick={() => (addresses = addresses.filter((candidate) => candidate !== address))}><X size={12} /></button>
 			</span>
 		{/each}
-		<input bind:this={input} {@attach focusOnStart} bind:value={text} aria-label={label} spellcheck="false" autocomplete="off" onkeydown={keydown} onblur={commit} onpaste={paste} />
+		<input {@attach focusOnStart} bind:value={text} aria-label={label} spellcheck="false" autocomplete="off" onkeydown={keydown} onblur={commit} onpaste={paste} />
 	</div>
 	{@render trailing?.()}
 	{#if suggestions.length}

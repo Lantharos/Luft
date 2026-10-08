@@ -45,7 +45,7 @@ export function compress(manager: FileManager, entries: FileEntry[]) {
 	dialogs.compress(entries, manager.currentPath);
 }
 
-export function showProperties(manager: FileManager, entries: FileEntry[]) {
+export function showProperties(entries: FileEntry[]) {
 	dialogs.properties(entries);
 }
 

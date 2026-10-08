@@ -6,14 +6,14 @@
 	import { openFile } from '#lib/app/actions.js';
 	import { library } from '#lib/library/library.svelte.js';
 
-	let { children }: { children?: Snippet<[() => void]> } = $props();
+	let { children: extra }: { children?: Snippet<[() => void]> } = $props();
 </script>
 
 <MenuButton class="icon-button" label="More" align="end" {@attach tooltip('More')}>
 	{#snippet trigger()}<Ellipsis size={18} />{/snippet}
 	{#snippet children(close)}
-		{#if children}
-			{@render children(close)}
+		{#if extra}
+			{@render extra(close)}
 			<MenuSeparator />
 		{/if}
 		{#if library.current}

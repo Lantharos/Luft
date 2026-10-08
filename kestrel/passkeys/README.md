@@ -2,7 +2,7 @@
 
 Luft Passkeys keeps passkeys on the computer, in [Luft Keyring](../keyring/README.md), and offers them to every browser and app. Creating a passkey or signing in with one shows a Kestrel prompt naming the site and the app, confirmed with your fingerprint or password.
 
-![Creating a passkey in Chromium](../../docs/screenshots/passkey-prompt.png)
+![Creating a passkey in Helium](../../docs/screenshots/passkey-prompt.png)
 
 Browsers see Luft Passkeys as a USB security key, so Chrome, Chromium-based browsers, Electron apps, Sabine apps and Firefox work without extensions.
 

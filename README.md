@@ -2,6 +2,8 @@
 
 Luft is an operating system built on Fedora. It has its own shell and login screen (Kestrel), its own apps, a keyring with passkeys, and its own boot chain, from a flicker-free splash to TPM disk unlock (Sushi, SushiBoot and trustd).
 
+![The Luft desktop with Rover and Settings](docs/screenshots/desktop.png)
+
 <p>
   <img src="docs/screenshots/start.png" alt="Start menu" width="49%">
   <img src="docs/screenshots/quick-settings.png" alt="Quick settings" width="49%">

@@ -33,6 +33,8 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 - Privacy indicator for camera, microphone, screen sharing and location
 - Its own dialogs for polkit, Wi-Fi and VPN secrets, keyring and GnuPG prompts ([docs/prompts.md](../docs/prompts.md)), and every xdg-desktop-portal interface it backs
 
+![Board mode with several apps side by side](../docs/screenshots/board.png)
+
 ## Build
 
 Building is covered in the [repository README](../README.md#build). To try a build in a window:

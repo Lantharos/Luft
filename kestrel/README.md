@@ -1,6 +1,6 @@
 # Kestrel
 
-Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mutter 51 and brings its own panel, Start menu, quick settings, notification center, lock screen, session manager, settings service and portal backend. It installs next to GNOME without replacing anything.
+Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mutter 51 and brings its own panel, Start menu, quick settings, notification center, lock screen, session manager, settings service and portal backend.
 
 ![The notification center and calendar](../docs/screenshots/notification-center.png)
 
@@ -107,7 +107,7 @@ The Login Screen page in Settings chooses the wallpaper, which people are listed
 
 ## Settings
 
-Kestrel's settings live in `com.lantharos.kestrel`, separate from GNOME Shell's, so both desktops can share an account. Settings changes most of them; the main keys:
+Kestrel's settings live in `com.lantharos.kestrel`. Settings changes most of them; the main keys:
 
 | Key | Values |
 | --- | --- |

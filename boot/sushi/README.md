@@ -62,7 +62,7 @@ Keep the firmware's own boot menu hidden so nothing draws between the firmware l
 | `monitors` in `/etc/sushi/sushi.conf` | `/var/lib/kestrel-greeter/display/monitors.xml` | Display arrangement to start in. Kestrel keeps it up to date, and the initramfs carries a copy |
 | `/usr/lib/modprobe.d/sushi.conf` | NVIDIA's display driver | Drivers Sushi loads itself (`blacklist` lines keep udev from loading them). A file with the same name in `/etc/modprobe.d` replaces it |
 
-- `sushi-drivers.service` loads those drivers when Sushi isn't running, after 20 seconds at most.
+- `sushi-drivers.service` loads those drivers when Sushi isn't running, after 20 seconds at most. It also catches a driver that akmods builds during startup after a kernel update.
 - With NVIDIA, keep `nvidia-drm.fbdev=1` (the default with current drivers).
 - Any display manager works if it runs `sushictl deactivate` before starting its compositor. Sushi ships a drop-in for greetd; others are covered by `sushi-quit.service`.
 - greetd should run on the seventh virtual terminal (`vt = 7`), as Kestrel's `greetd.toml` does.

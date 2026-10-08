@@ -37,7 +37,7 @@ export PULSE_SERVER="unix:$PULSE_RUNTIME_PATH/native"
 export KESTREL_APP_RUNTIME_DIR="$app_runtime"
 
 scope="kestrel-session-$(session_hash "$session" 12)"
-trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true; rm -f "$cache_link"' EXIT
+trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true; rm -rf "$cache_link" "$app_runtime" "$runtime"-*' EXIT
 trap 'exit 143' TERM INT
 
 systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$scope" \

@@ -17,7 +17,6 @@ pids=()
 stop_services() {
   kill "${pids[@]}" 2> /dev/null || true
   wait "${pids[@]}" 2> /dev/null || true
-  rm -rf "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH" "$KESTREL_APP_RUNTIME_DIR" "$KESTREL_AUTHENTICATE_SOCK"
 }
 trap stop_services EXIT
 

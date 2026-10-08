@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Play from '@lucide/svelte/icons/play';
-	import type { Item } from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
 

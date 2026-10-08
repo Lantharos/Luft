@@ -1,4 +1,4 @@
-import type { Location, Place } from '#lib/api.js';
+import type { Location, Place } from '#lib/bridge/api.js';
 import { baseName } from './kinds';
 
 export const PLACE_NAMES: Record<Place, string> = {

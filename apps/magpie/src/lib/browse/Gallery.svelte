@@ -4,7 +4,7 @@
 	import Folder from '@lucide/svelte/icons/folder';
 	import Music from '@lucide/svelte/icons/music';
 	import Play from '@lucide/svelte/icons/play';
-	import type { Folder as FolderEntry, Item } from '#lib/api.js';
+	import type { Folder as FolderEntry, Item } from '#lib/bridge/api.js';
 	import FontSample from '#lib/font/FontSample.svelte';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';

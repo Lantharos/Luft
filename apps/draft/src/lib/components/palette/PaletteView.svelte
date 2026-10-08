@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import type { PaletteItem } from '#lib/palette/palette.svelte.js';
 	import Highlight from './Highlight.svelte';
 

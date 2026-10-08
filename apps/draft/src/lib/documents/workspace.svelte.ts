@@ -4,7 +4,7 @@ import { tick } from 'svelte';
 import type { Backend } from '#lib/bridge/types.js';
 import { Editor } from '#lib/editor/editor.js';
 import { FolderTree } from '#lib/files/tree.svelte.js';
-import type { SettingsStore } from '#lib/settings.svelte.js';
+import type { SettingsStore } from '#lib/app/settings.svelte.js';
 import { Backups } from './backups';
 import { Document } from './document.svelte';
 

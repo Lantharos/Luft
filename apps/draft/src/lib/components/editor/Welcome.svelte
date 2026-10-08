@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 
 	const app = useApp();
 

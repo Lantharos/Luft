@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { App } from '#lib/app.svelte.js';
-	import { useApp } from '#lib/context.js';
+	import type { App } from '#lib/app/app.svelte.js';
+	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
 	import { encodingName } from '#lib/documents/encodings.js';
 	import { describeIndentation } from '#lib/editor/indentation.js';

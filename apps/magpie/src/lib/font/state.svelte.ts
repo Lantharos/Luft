@@ -1,5 +1,5 @@
-import type { FontFace, FontFile, FontInstance, FontRole, FontStatus } from '#lib/api.js';
-import * as api from '#lib/api.js';
+import type { FontFace, FontFile, FontInstance, FontRole, FontStatus } from '#lib/bridge/api.js';
+import * as api from '#lib/bridge/api.js';
 import { chrome } from '#lib/app/chrome.svelte.js';
 import { loadFont } from './faces';
 

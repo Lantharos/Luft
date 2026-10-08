@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
-	import type { ImageDetails, Item } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { ImageDetails, Item } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
 	import { extension } from '#lib/library/kinds.js';
 

@@ -1,4 +1,4 @@
-import type { Item } from '#lib/api.js';
+import type { Item } from '#lib/bridge/api.js';
 
 const KEY = 'magpie.positions';
 const REMEMBERED = 300;

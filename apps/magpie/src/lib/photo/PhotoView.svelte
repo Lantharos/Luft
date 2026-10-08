@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import type { Item } from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
 	import CantShow from '#lib/shell/CantShow.svelte';

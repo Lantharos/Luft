@@ -4,8 +4,8 @@
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Image from '@lucide/svelte/icons/image';
 	import Music from '@lucide/svelte/icons/music';
-	import type { Place } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Place } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { PLACE_NAMES } from '#lib/library/places.js';
 

@@ -1,4 +1,4 @@
-import { call, on } from './bridge';
+import { call, on } from './index';
 import type { Appearance } from '@luft/ui';
 
 export type Kind = 'image' | 'video' | 'audio' | 'document' | 'font';

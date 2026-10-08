@@ -2,7 +2,7 @@
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import type { Snippet } from 'svelte';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { openFile } from '#lib/app/actions.js';
 	import { library } from '#lib/library/library.svelte.js';
 

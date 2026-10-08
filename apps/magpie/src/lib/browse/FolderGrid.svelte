@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
-	import type { Item } from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
 	import FontSample from '#lib/font/FontSample.svelte';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';

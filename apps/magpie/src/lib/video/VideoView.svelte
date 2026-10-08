@@ -3,11 +3,11 @@
 	import { canPlayNatively, decodeFailed, NativeVideoSurface } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import { onDestroy } from 'svelte';
-	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { registerKeys } from '#lib/app/keys.js';
-	import { fileSource } from '#lib/bridge.js';
+	import { fileSource } from '#lib/bridge/index.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { mediaSession, type MediaOwner } from '#lib/playback/session.js';
 	import { volume } from '#lib/playback/volume.svelte.js';

@@ -5,7 +5,7 @@
 	import Maximize from '@lucide/svelte/icons/maximize';
 	import Minimize from '@lucide/svelte/icons/minimize';
 	import PictureInPicture2 from '@lucide/svelte/icons/picture-in-picture-2';
-	import type { SubtitleTrack } from '#lib/api.js';
+	import type { SubtitleTrack } from '#lib/bridge/api.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { volume } from '#lib/playback/volume.svelte.js';
 	import type { FramePreview } from './frame-preview';

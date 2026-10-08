@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-use luft_app::{dbus, file_manager};
 use luft_app::portal::{FileChooser, uri_path};
+use luft_app::{dbus, file_manager};
 use serde::Deserialize;
 use zbus::blocking::Proxy;
 use zbus::zvariant::{OwnedObjectPath, Value};

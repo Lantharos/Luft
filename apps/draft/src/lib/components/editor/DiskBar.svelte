@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import { keepMine } from '#lib/documents/disk.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
 	import { reload } from '#lib/documents/opening.js';

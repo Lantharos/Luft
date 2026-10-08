@@ -9,10 +9,10 @@ import { newDocument, openPath } from '#lib/documents/opening.js';
 import { restoreSession, sessionName, sessionWriter, writeSession, type Session } from '#lib/documents/session.js';
 import { Workspace } from '#lib/documents/workspace.svelte.js';
 import { FileIndex } from '#lib/files/index.svelte.js';
-import { Menus } from '#lib/menus.svelte.js';
+import { Menus } from '#lib/app/menus.svelte.js';
 import { Palette } from '#lib/palette/palette.svelte.js';
 import { quickOpen } from '#lib/palette/sources.js';
-import { FONT_SIZES, SettingsStore } from '#lib/settings.svelte.js';
+import { FONT_SIZES, SettingsStore } from '#lib/app/settings.svelte.js';
 import { debounce } from '#lib/utils/debounce.js';
 
 const WATCH_DELAY_MS = 150;

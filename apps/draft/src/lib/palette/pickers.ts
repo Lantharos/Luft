@@ -1,5 +1,5 @@
 import { languages } from '@luft/ui/code';
-import type { App } from '#lib/app.svelte.js';
+import type { App } from '#lib/app/app.svelte.js';
 import type { Document } from '#lib/documents/document.svelte.js';
 import { ENCODINGS, type LineEnding } from '#lib/documents/encodings.js';
 import { reload } from '#lib/documents/opening.js';

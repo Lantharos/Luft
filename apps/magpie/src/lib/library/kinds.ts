@@ -1,4 +1,4 @@
-import type { Item, Kind } from '#lib/api.js';
+import type { Item, Kind } from '#lib/bridge/api.js';
 
 export type Group = 'visual' | 'audio' | 'document' | 'font';
 

@@ -1,11 +1,11 @@
 import Gio from 'gi://Gio';
 
-export type TaskbarAlignment = 'center' | 'left';
+type TaskbarAlignment = 'center' | 'left';
 export type TaskbarLook = 'glass' | 'solid' | 'transparent' | 'accent';
-export type TaskbarStyle = 'bar' | 'floating';
+type TaskbarStyle = 'bar' | 'floating';
 export type TaskbarSize = 'compact' | 'normal' | 'large';
-export type TaskbarAutoHide = 'never' | 'always' | 'windows';
-export type TaskbarDisplays = 'all' | 'primary';
+type TaskbarAutoHide = 'never' | 'always' | 'windows';
+type TaskbarDisplays = 'all' | 'primary';
 
 export interface TaskbarMetrics {
   height: number;

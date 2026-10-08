@@ -12,7 +12,7 @@ import type { AccessRequest, PasswordRequest } from './request.js';
 
 export type Prompt = { kind: 'access'; request: AccessRequest } | { kind: 'password'; request: PasswordRequest };
 
-export interface DialogEvents extends PasswordEvents {
+interface DialogEvents extends PasswordEvents {
   allowed(remember: boolean): void;
   alternative(): void;
   closed(): void;

@@ -14,7 +14,7 @@ export interface Tile {
   settingsPanel: SettingsPageId | null;
 }
 
-export interface ActionHandlers {
+interface ActionHandlers {
   takeScreenshot(): void;
   openSettings(page: SettingsPageId): void;
   close(): void;

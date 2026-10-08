@@ -5,7 +5,7 @@ import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDial
 import { choose, list, row } from '../../portal/core/rows.js';
 import { copyFor, needsVerification, type Request } from './copy.js';
 
-export interface Answers {
+interface Answers {
   account(index: number): void;
   password(text: string): void;
   confirm(): void;

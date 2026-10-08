@@ -6,7 +6,7 @@ export interface View {
   scale: number;
 }
 
-export const MIN_SCALE = 0.08;
+const MIN_SCALE = 0.08;
 export const FULL_SIZE = 1;
 export const PLACEMENT_GAP = 32;
 const MAGNIFIED_FILL = 0.9;
@@ -57,10 +57,6 @@ export function screenBox(view: View, viewport: Box, box: Box): Box {
   };
 }
 
-export function visibleCanvas(view: View, viewport: Box): Box {
-  return { x: view.x, y: view.y, width: viewport.width / view.scale, height: viewport.height / view.scale };
-}
-
 export function boundsOf(boxes: Iterable<Box>): Box | null {
   let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
   for (const box of boxes) {
@@ -101,7 +97,7 @@ export function intersection(a: Box, b: Box): number {
   return width > 0 && height > 0 ? width * height : 0;
 }
 
-export function overlaps(a: Box, b: Box, gap = 0): boolean {
+function overlaps(a: Box, b: Box, gap = 0): boolean {
   return a.x < b.x + b.width + gap && b.x < a.x + a.width + gap &&
     a.y < b.y + b.height + gap && b.y < a.y + a.height + gap;
 }

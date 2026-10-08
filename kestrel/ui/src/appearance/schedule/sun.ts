@@ -3,7 +3,7 @@ export interface Coordinates {
   longitude: number;
 }
 
-export type Daylight = { sunrise: number; sunset: number } | 'polar-day' | 'polar-night';
+type Daylight = { sunrise: number; sunset: number } | 'polar-day' | 'polar-night';
 
 const UNIX_EPOCH_JULIAN = 2440587.5;
 const J2000 = 2451545;

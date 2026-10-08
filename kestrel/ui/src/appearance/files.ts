@@ -5,7 +5,7 @@ Gio._promisify(Gio.File.prototype, 'load_contents_async');
 Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
 Gio._promisify(Gio.File.prototype, 'delete_async');
 
-export interface Markers {
+interface Markers {
   start: string;
   end: string;
 }

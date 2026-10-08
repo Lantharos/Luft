@@ -6,7 +6,7 @@ import type { WindowPreviews } from './windowPreviews.js';
 import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
 import { WindowOverlap } from './autoHide/windowOverlap.js';
 
-export interface PanelLayoutManager {
+interface PanelLayoutManager {
   primaryMonitor: Monitor | null;
   monitors: Monitor[];
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;

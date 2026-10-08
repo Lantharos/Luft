@@ -28,7 +28,7 @@ export interface Step {
   action?: string;
 }
 
-export interface VpnDialogEvents {
+interface VpnDialogEvents {
   submit(values: Record<string, string>): void;
   cancel(): void;
 }

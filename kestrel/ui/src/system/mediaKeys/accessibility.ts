@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 const TEXT_SIZES = [0.75, 1, 1.25, 1.5];
 const TEXT_SIZE_STEP = 0.25;
 
-export type Assistant = 'screen-magnifier-enabled' | 'screen-reader-enabled' | 'screen-keyboard-enabled';
+type Assistant = 'screen-magnifier-enabled' | 'screen-reader-enabled' | 'screen-keyboard-enabled';
 
 export class AccessibilityKeys {
   private readonly applications = new Gio.Settings({ schema_id: 'org.gnome.desktop.a11y.applications' });

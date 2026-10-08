@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 
 import { canonical } from './accelerators.js';
 
-export interface StoredShortcut { description: string; shortcuts: string[] }
+interface StoredShortcut { description: string; shortcuts: string[] }
 export type AppShortcuts = Record<string, StoredShortcut>;
 
 const KEY = 'global-shortcuts';

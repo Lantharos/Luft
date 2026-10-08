@@ -21,7 +21,7 @@ export interface FocusState {
   overview: View | null;
 }
 
-export interface FocusHost {
+interface FocusHost {
   readonly camera: Camera;
   readonly viewport: Box;
   moving(): Meta.Window | null;

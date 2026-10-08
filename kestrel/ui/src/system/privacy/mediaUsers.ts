@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 
-export type MediaKind = 'camera' | 'microphone';
+type MediaKind = 'camera' | 'microphone';
 
 export interface MediaUser {
   kind: MediaKind;

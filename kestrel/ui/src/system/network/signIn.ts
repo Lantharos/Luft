@@ -3,7 +3,7 @@ import Shell from 'gi://Shell';
 
 const SIGN_IN_APP = 'com.lantharos.signin.desktop';
 
-export function signInLink(network: string, url: string): string {
+function signInLink(network: string, url: string): string {
   return `kestrel-signin:?network=${encodeURIComponent(network)}&url=${encodeURIComponent(url)}`;
 }
 

@@ -22,7 +22,7 @@ const WELL_KNOWN_NAME = /^[a-zA-Z_-][a-zA-Z0-9_-]*(\.[a-zA-Z_-][a-zA-Z0-9_-]*)+$
 
 export interface TrayItemAddress { busName: string; objectPath: string; }
 
-export interface WatcherHost {
+interface WatcherHost {
   added(id: string, address: TrayItemAddress): void;
   removed(id: string): void;
 }

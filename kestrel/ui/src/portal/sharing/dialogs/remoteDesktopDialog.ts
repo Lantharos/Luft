@@ -16,7 +16,7 @@ const DEVICES = [
   { type: TOUCHSCREEN, icon: 'tablet-symbolic', title: 'Touchscreen' },
 ];
 
-export interface ControlRequest {
+interface ControlRequest {
   readonly devices: number;
   readonly selection: Selection | null;
   readonly clipboard: boolean;

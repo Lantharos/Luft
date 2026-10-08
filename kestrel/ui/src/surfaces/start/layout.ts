@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-export interface Folder { name: string; apps: string[]; }
+interface Folder { name: string; apps: string[]; }
 interface Layout { items: string[]; folders: Record<string, Folder>; }
 
 export class StartLayout {

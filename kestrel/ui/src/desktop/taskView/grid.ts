@@ -1,4 +1,4 @@
-export interface Size { width: number; height: number; }
+interface Size { width: number; height: number; }
 export interface Rect extends Size { x: number; y: number; }
 
 const MAXIMUM_SCALE = 0.7;

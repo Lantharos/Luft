@@ -12,7 +12,7 @@ export interface Anchor {
   centered: boolean;
 }
 
-export interface Placement {
+interface Placement {
   x: number;
   y: number;
   above: boolean;

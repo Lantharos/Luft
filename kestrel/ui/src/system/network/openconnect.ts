@@ -26,7 +26,7 @@ type Message =
   | { type: 'done'; secrets: Record<string, string> }
   | { type: 'failed'; message: string };
 
-export interface SignInSteps {
+interface SignInSteps {
   ask(step: Step): Promise<Record<string, string> | null>;
   wait(message: string): void;
 }

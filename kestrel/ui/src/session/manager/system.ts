@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import { ActionAvailability } from './interfaces.js';
 
-export type PowerAction = 'PowerOff' | 'Reboot' | 'Suspend';
+type PowerAction = 'PowerOff' | 'Reboot' | 'Suspend';
 
 const LOGIN1 = 'org.freedesktop.login1';
 const SESSION_TARGET = 'kestrel-session.target';

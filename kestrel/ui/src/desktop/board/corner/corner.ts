@@ -12,7 +12,7 @@ import { CornerPill } from './pill.js';
 const MARGIN = 12;
 const FADE_DURATION = 180;
 
-export interface CornerActions extends DockActions {
+interface CornerActions extends DockActions {
   openQuickSettings(): void;
   overview(): void;
 }

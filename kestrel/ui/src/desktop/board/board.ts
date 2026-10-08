@@ -39,7 +39,7 @@ export interface BoardFrame {
   viewportY: number;
 }
 
-export interface BoardHost {
+interface BoardHost {
   monitors(): Monitor[];
   primary(): Monitor | null;
   workArea(monitorIndex: number): Box;

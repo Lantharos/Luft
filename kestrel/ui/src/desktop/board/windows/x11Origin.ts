@@ -7,7 +7,7 @@ import { frameBox } from './windows.js';
 
 type OriginDisplay = Meta.Display & { set_x11_origin(x: number, y: number): void };
 
-export interface X11OriginHost {
+interface X11OriginHost {
   readonly view: View;
   readonly viewport: Box;
   screen(): Box;

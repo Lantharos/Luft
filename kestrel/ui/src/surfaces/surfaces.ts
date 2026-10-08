@@ -28,7 +28,7 @@ const EDGE_MARGIN = 12;
 const OPEN_DURATION = 220;
 const CLOSE_DURATION = 160;
 
-export interface SurfaceParts {
+interface SurfaceParts {
   context: Context;
   menus: ContextMenus;
   previews: WindowPreviews;

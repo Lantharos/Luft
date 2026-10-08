@@ -22,7 +22,7 @@ const RUNNING = 1;
 const QUERY_END = 2;
 const ENDING = 3;
 
-export interface ScreenLock {
+interface ScreenLock {
   readonly active: boolean;
   connect(signal: 'active-changed', callback: () => void): number;
 }

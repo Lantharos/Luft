@@ -2,12 +2,12 @@ import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
-export type MenuIcon = Gio.Icon | St.ImageContent | null;
-export interface MenuAction { label: string; detail?: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
+type MenuIcon = Gio.Icon | St.ImageContent | null;
+interface MenuAction { label: string; detail?: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
 export interface MenuGroup { label: string; enabled?: boolean; icon?: MenuIcon; children: MenuEntry[] | (() => Promise<MenuEntry[]>); }
 export type MenuEntry = MenuAction | MenuGroup | 'separator';
 
-export interface MenuHandlers {
+interface MenuHandlers {
   activate(action: MenuAction): void;
   open(group: MenuGroup): void;
   back: (() => void) | null;

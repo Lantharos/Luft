@@ -13,11 +13,11 @@ const REVEAL_MARGIN = 32;
 const SETTLE_DELAY = 160;
 const FULL_SIZE_SNAP = 0.06;
 
-export function animationsEnabled(): boolean {
+function animationsEnabled(): boolean {
   return St.Settings.get().enable_animations;
 }
 
-export interface CameraHost {
+interface CameraHost {
   changed(view: View): void;
   settled(): void;
   focusAt(screenX: number, screenY: number): Box | null;

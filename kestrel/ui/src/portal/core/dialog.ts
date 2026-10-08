@@ -4,7 +4,7 @@ import St from 'gi://St';
 import type { ButtonInfo, ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 import { CANCELLED, ENDED, PortalRequest, type Options, type Outcome } from './request.js';
 
-export interface DialogSpec {
+interface DialogSpec {
   title: string;
   description?: string;
   icon: string;

@@ -9,7 +9,7 @@ Build Kestrel first (see the [repository README](../README.md#build)). Then from
 | Command | Runs |
 | --- | --- |
 | `kestrel/tools/session.sh nested` | A visible nested session in Mutter's development kit window, for trying things by hand |
-| `kestrel/tools/session.sh capture` | The full headless check suite, saving screenshots of every surface, then the login screen checks |
+| `kestrel/tools/session.sh capture` | The full headless check suite, including the login screen, saving screenshots of every surface |
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
 
@@ -18,7 +18,7 @@ Build Kestrel first (see the [repository README](../README.md#build)). Then from
 | Option | Effect |
 | --- | --- |
 | `--only GROUPS` | Only these comma-separated groups. An area such as `apps` runs every group in it |
-| `--jobs N` | Up to N sessions at once (default: one per four processors); `--jobs 1` runs everything in one session |
+| `--jobs N` | Up to N sessions at once (default: one per four processors, fewer when the inotify limit is close); `--jobs 1` runs everything in one session |
 | `--list` | Lists the groups |
 
 The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Edits to `kestrel/engine/data/theme/kestrel.css` reload live.
@@ -26,7 +26,7 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `KESTREL_SESSION_DIR` | `kestrel/run` | Settings, caches and app data of the test session. Point it at an empty folder for a clean profile or to run sessions side by side |
-| `KESTREL_CAPTURE_DIR` | `docs/screenshots` | Where captures are saved |
+| `KESTREL_CAPTURE_DIR` | `kestrel/run/screenshots` | Where captures are saved |
 | `KESTREL_CAPTURE_SIZE` | `1440x900` | Size of the virtual monitor |
 | `KESTREL_CAPTURE_SECONDARY_SIZE` | none | Adds a second virtual monitor, such as `1280x720` |
 | `KESTREL_DEV_APPS` | none | Luft apps to test from their build folders instead of the installed ones, such as `rover,settings` (run `bun run desktop:build` in each first) |

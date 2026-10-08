@@ -4,19 +4,20 @@ import socket
 import sys
 import threading
 
-listen_port, target_port = int(sys.argv[1]), int(sys.argv[2])
+target_port = int(sys.argv[1])
 generation = 0
 
 
 def cut_off(*_):
     global generation
     generation += 1
+    print("cut off", flush=True)
 
 
 def relay(client):
     born = generation
     try:
-        server = socket.create_connection(('127.0.0.1', target_port))
+        server = socket.create_connection(("127.0.0.1", target_port))
     except OSError:
         client.close()
         return
@@ -32,7 +33,7 @@ def relay(client):
                 data = key.fileobj.recv(65536)
                 peers[key.fileobj].sendall(data)
             except OSError:
-                data = b''
+                data = b""
             if not data:
                 client.close()
                 server.close()
@@ -41,7 +42,8 @@ def relay(client):
 
 
 signal.signal(signal.SIGUSR1, cut_off)
-listener = socket.create_server(('127.0.0.1', listen_port))
+listener = socket.create_server(("127.0.0.1", 0))
+print(listener.getsockname()[1], flush=True)
 while True:
     accepted, _ = listener.accept()
     threading.Thread(target=relay, args=(accepted,), daemon=True).start()

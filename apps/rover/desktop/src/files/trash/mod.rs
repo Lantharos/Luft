@@ -8,11 +8,11 @@ use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
 use super::privileged::{os, remove_path, run_pkexec};
+use crate::files::text::{items, subject};
 use crate::history::{History, Step};
-use crate::text::{items, subject};
 pub use locations::TrashLocation;
-pub(crate) use locations::trash_locations;
 use locations::parse_trashinfo;
+pub(crate) use locations::trash_locations;
 pub use put::{Trashed, put, restore as restore_item};
 
 #[derive(Debug, Serialize)]

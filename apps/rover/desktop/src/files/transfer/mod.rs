@@ -10,8 +10,8 @@ use std::path::{Path, PathBuf};
 use std::thread;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue, Resolution};
+use crate::files::text::{quoted, subject};
 use crate::history::{History, Step};
-use crate::text::{quoted, subject};
 use resolve::Resolver;
 pub(crate) use resolve::available_destination;
 pub(crate) use space::path_size;

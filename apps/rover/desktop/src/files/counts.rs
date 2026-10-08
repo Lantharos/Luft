@@ -6,7 +6,7 @@ use luft_app::Events;
 use parking_lot::{Condvar, Mutex};
 use serde::Serialize;
 
-use crate::events::FOLDER_COUNTS;
+use crate::app::events::FOLDER_COUNTS;
 
 #[derive(Serialize)]
 struct Counted {

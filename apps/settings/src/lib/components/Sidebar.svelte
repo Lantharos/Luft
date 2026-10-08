@@ -4,7 +4,7 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import SidebarProgress from '#lib/panels/updates/SidebarProgress.svelte';
+	import SidebarProgress from '#lib/panels/system/updates/SidebarProgress.svelte';
 
 	let present = $derived(hardware.present);
 	let results = $derived(present ? (app.query.trim() ? [searchPanels(app.query, present)] : shownGroups(present)) : []);

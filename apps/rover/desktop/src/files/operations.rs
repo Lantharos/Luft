@@ -8,7 +8,7 @@ use luft_app::Events;
 use parking_lot::{Mutex, RwLock};
 use serde::{Deserialize, Serialize};
 
-use crate::events::OPERATIONS_CHANGED;
+use crate::app::events::OPERATIONS_CHANGED;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;

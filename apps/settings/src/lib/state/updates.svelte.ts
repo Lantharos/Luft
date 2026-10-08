@@ -1,4 +1,4 @@
-import { onActivity, onOverview, status, type Activity, type Overview } from '#lib/panels/updates/api.js';
+import { onActivity, onOverview, status, type Activity, type Overview } from '#lib/panels/system/updates/api.js';
 
 const IDLE: Activity = { running: null, target: null, elsewhere: null, progress: null, error: null };
 

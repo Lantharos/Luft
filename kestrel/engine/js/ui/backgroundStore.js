@@ -6,6 +6,7 @@ Gio._promisify(Shell, 'texture_file_load_async');
 Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
 Gio._promisify(Gio.File.prototype, 'delete_async');
+Gio._promisify(Gio.File.prototype, 'move_async');
 Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
 
 const STORE = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'backgrounds']));
@@ -56,8 +57,16 @@ async function prune() {
 async function write(key, texture, metadata) {
     const contents = Shell.texture_file_encode(texture, new GLib.Bytes(metadata));
     GLib.mkdir_with_parents(STORE.get_path(), 0o700);
-    await storedFile(key).replace_contents_bytes_async(contents, null, false,
-        Gio.FileCreateFlags.REPLACE_DESTINATION | Gio.FileCreateFlags.PRIVATE, null);
+    const file = storedFile(key);
+    const partial = STORE.get_child(`${file.get_basename()}.partial`);
+    used.add(partial.get_basename());
+    try {
+        await partial.replace_contents_bytes_async(contents, null, false,
+            Gio.FileCreateFlags.REPLACE_DESTINATION | Gio.FileCreateFlags.PRIVATE, null);
+        await partial.move_async(file, Gio.FileCopyFlags.OVERWRITE, GLib.PRIORITY_LOW, null, null);
+    } finally {
+        used.delete(partial.get_basename());
+    }
     await prune();
 }
 

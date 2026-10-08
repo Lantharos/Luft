@@ -85,7 +85,7 @@ export const reopenDraft = (id: number) => call<{ account: number; from: string;
 export const unsubscribe = (id: number) => call<'done' | 'opened'>('unsubscribe', { id }, LONG);
 export const chooseFiles = () => call<Chosen[]>('choose_files', {}, FOREVER);
 export const describeFiles = (paths: string[]) => call<Chosen[]>('describe_files', { paths });
-export const stashFile = (name: string, data: string) => call<string>('stash_file', { name, data });
+export const stashFile = (file: File, name = file.name) => invoke<string>('stash_file', { name }, { body: file });
 export const templates = () => call<Template[]>('templates');
 export const saveTemplate = (id: number | null, name: string, body: string) => call<void>('save_template', { id, name, body });
 export const deleteTemplate = (id: number) => call<void>('delete_template', { id });

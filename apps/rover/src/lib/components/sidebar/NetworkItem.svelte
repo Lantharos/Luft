@@ -40,8 +40,6 @@
 	ondragover={(event) => location && key && drag.overPath(event, location.path, key)}
 	ondragleave={drag.leave}
 	ondrop={(event) => location && drag.drop(event, location.path)}
-	data-drop-path={location?.path}
-	data-drop-key={key}
 	{@attach tooltip(entry.place.uri)}
 >
 	{#snippet trailing()}

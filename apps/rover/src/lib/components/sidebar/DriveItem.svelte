@@ -40,8 +40,6 @@
 	ondragover={(event) => drag.overPath(event, drive.mount_point, key)}
 	ondragleave={drag.leave}
 	ondrop={(event) => drag.drop(event, drive.mount_point)}
-	data-drop-path={drive.mount_point}
-	data-drop-key={key}
 	{@attach tooltip(summary)}
 >
 	{#snippet detail()}

@@ -53,8 +53,6 @@
 <section
 	class="pane-stack"
 	aria-label="File browser"
-	data-drop-path={manager.view === 'home' ? manager.currentPath : undefined}
-	data-drop-key={paneKey}
 	ondragover={(event) => (context.chooser ? event.preventDefault() : drag.overEntry(event, undefined, paneKey))}
 	ondrop={(event) => !context.chooser && manager.view === 'home' && drag.drop(event, manager.currentPath)}
 >

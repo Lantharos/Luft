@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appWindow, events as sabineEvents, type WindowFileDragEvent } from '@lantharos/sabine';
+	import { appWindow } from '@lantharos/sabine';
 	import { appearance, GlassShell, plural, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
@@ -86,8 +86,7 @@
 			api.events.outbox(({ error }) => {
 				if (error) toasts.show(`Couldn't send: ${error}. Mailman will try again.`, { failed: true });
 			}),
-			api.events.activation((activation) => void api.resolveArguments(activation).then((launches) => opened.handle(launches, false))),
-			api.isDesktop() ? sabineEvents.fileDrag(drop) : () => {}
+			api.events.activation((activation) => void api.resolveArguments(activation).then((launches) => opened.handle(launches, false)))
 		];
 		void start();
 		return () => stops.forEach((stop) => stop());
@@ -117,15 +116,22 @@
 		);
 	}
 
-	async function drop(event: WindowFileDragEvent) {
-		if (event.phase !== 'drop' || event.internal) return;
-		const messages = event.paths.filter((path) => path.toLowerCase().endsWith('.eml'));
-		if (composer.current) {
-			const files = await api.describeFiles(event.paths).catch(toasts.fail);
-			if (files && composer.current) composer.current.attachments = [...composer.current.attachments, ...files.map((file) => ({ ...file, cid: null }))];
-		} else if (messages.length) {
-			opened.file = messages[0];
-		}
+	const carriesFiles = (event: DragEvent) => event.dataTransfer?.types.includes('Files') ?? false;
+
+	function dragOver(event: DragEvent) {
+		if (carriesFiles(event)) event.preventDefault();
+	}
+
+	async function drop(event: DragEvent) {
+		if (!carriesFiles(event)) return;
+		event.preventDefault();
+		const files = [...event.dataTransfer!.files];
+		const wanted = composer.current ? files : files.filter((file) => file.name.toLowerCase().endsWith('.eml')).slice(0, 1);
+		const paths = await Promise.all(wanted.map((file) => api.stashFile(file))).catch(toasts.fail);
+		if (!paths?.length) return;
+		if (!composer.current) return void (opened.file = paths[0]);
+		const attached = await api.describeFiles(paths).catch(toasts.fail);
+		if (attached && composer.current) composer.current.attachments = [...composer.current.attachments, ...attached.map((file) => ({ ...file, cid: null }))];
 	}
 
 	function search(query: string) {
@@ -138,6 +144,8 @@
 	onkeydown={(event) => handleKeydown(event, { commands: () => commands(shell), palette: () => (palette = true) })}
 	onfocus={() => void api.setFocused(true)}
 	onblur={() => void api.setFocused(false)}
+	ondragover={dragOver}
+	ondrop={drop}
 />
 
 <div class="h-[100dvh] w-screen overflow-hidden">

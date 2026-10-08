@@ -1,9 +1,8 @@
-import type { WindowFileDragEvent } from '@lantharos/sabine';
 import { isInside } from '@luft/ui';
 import type { FileEntry, Tab } from '#lib/types/index.js';
 import type { FileManager } from '../manager.svelte';
 import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from './data-transfer';
-import { dropKey, dropTargetFromPoint, TRASH_DROP_PATH, tabDropKey, type DropTarget } from './drop-targets';
+import { dropKey, TRASH_DROP_PATH, tabDropKey, type DropTarget } from './drop-targets';
 
 const TAB_SWITCH_DELAY_MS = 450;
 const SPRING_DELAY_MS = 700;
@@ -73,9 +72,14 @@ export class DragController {
 	};
 
 	overTab = (event: DragEvent, tab: Tab) => {
-		if (tab.view === 'home') return this.overPath(event, tab.path, tabDropKey(tab.id));
-		if (tab.view === 'trash') return this.overTrash(event, tabDropKey(tab.id));
-		return false;
+		if (tab.view === 'recent' || !this.#carriesPaths(event)) return false;
+		this.#scheduleTabSwitch(tab.id);
+		return tab.view === 'home' ? this.overPath(event, tab.path, tabDropKey(tab.id)) : this.overTrash(event, tabDropKey(tab.id));
+	};
+
+	leaveTab = () => {
+		this.#clearHoverTab();
+		this.leave();
 	};
 
 	drop = async (event: DragEvent, targetPath: string) => {
@@ -102,23 +106,6 @@ export class DragController {
 	dropOnTab = (event: DragEvent, tab: Tab) => {
 		if (tab.view === 'home') void this.drop(event, tab.path);
 		if (tab.view === 'trash') void this.dropOnTrash(event);
-	};
-
-	native = (event: WindowFileDragEvent) => {
-		if (event.phase === 'leave') return this.end();
-		const target = dropTargetFromPoint(event.x, event.y);
-		if (event.phase !== 'drop') {
-			this.target = target && accepts(target, event.paths) ? target : null;
-			this.#scheduleTabSwitch(target?.tabId ?? null);
-			this.#prime(this.target);
-			return;
-		}
-		const internal = event.internal || this.dragging;
-		const move = event.action === 'move' || (event.action === 'none' && internal);
-		if (!target || !accepts(target, event.paths) || (internal && !this.#claim())) return this.end();
-		this.end();
-		if (target.path === TRASH_DROP_PATH) void this.#manager.actions.trash(event.paths);
-		else void this.#manager.actions.transfer(event.paths, target.path, move);
 	};
 
 	#carriesPaths(event: DragEvent) {
@@ -188,8 +175,4 @@ export class DragController {
 
 function canReceive(sources: string[], targetPath: string) {
 	return Boolean(targetPath) && !sources.some((source) => isInside(targetPath, source));
-}
-
-function accepts(target: DropTarget, sources: string[]) {
-	return target.path === TRASH_DROP_PATH || canReceive(sources, target.path);
 }

@@ -31,13 +31,13 @@ pub fn run_app() -> ! {
 
 The close button normally closes the window straight away. Apps that need to finish something first, such as writing unsaved work somewhere safe, use `apply_with_page_close` instead: the page's close button then receives the click, and `WindowControls`' `onclose` decides when to close.
 
-`luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's wallpaper palette and the desktop's light or dark style. The last closure runs at the same point, for any other watchers the app needs.
+`luft_app::run` starts the app, connects `Events` to the page once it exists, and starts watching Kestrel's wallpaper palette and the desktop's fonts. The last closure runs at the same point, for any other watchers the app needs.
 
 `Events::emit` sends a JSON event to the page and `Events::emit_bytes` sends raw bytes, which the page receives as a `Uint8Array`. Use bytes for large or frequent updates that would be wasteful as JSON.
 
 ## Startup state
 
-Flatten `Appearance` into the app's startup state so the page knows whether the window is translucent and which accent to use:
+Flatten `Appearance` into the app's startup state so the page knows which accent, colors and fonts to use:
 
 ```rust
 #[derive(Serialize)]
@@ -49,7 +49,7 @@ struct AppState {
 AppState { appearance: Appearance::current() }
 ```
 
-`Appearance` also carries the desktop's light or dark style, read from the `org.freedesktop.appearance` `color-scheme` portal setting, and Kestrel's palette as `palette`: the accent, the accent the wallpaper gives on its own, whether Pure black is on, the palette roles and the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. It carries the desktop's fonts too, as `typography`: the families of the `org.gnome.desktop.interface` `font-name` and `monospace-font-name` settings and the `text-scaling-factor`, read through the same portal. Palette changes arrive on the page as `kestrel.palette` events, style changes as `appearance.scheme` events and font or text size changes as `appearance.typography` events, which `@luft/ui`'s `appearance` store listens for.
+`Appearance` also carries Kestrel's palette as `palette`: the accent, the accent the wallpaper gives on its own, whether Pure black is on, the palette roles and the terminal colors of both styles, and the app icon style with its colors and the folder of app glyphs. It carries the desktop's fonts too, as `typography`: the families of the `org.gnome.desktop.interface` `font-name` and `monospace-font-name` settings and the `text-scaling-factor`, read through the same portal. Palette changes arrive on the page as `kestrel.palette` events and font or text size changes as `appearance.typography` events, which `@luft/ui`'s `appearance` store listens for. The light or dark style comes from Sabine, which the store asks directly.
 
 ## Commands
 

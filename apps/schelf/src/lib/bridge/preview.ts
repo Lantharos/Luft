@@ -93,9 +93,7 @@ async function json<T>(response: Response): Promise<T> {
 
 export const preview: Backend = {
 	appState: async () => ({
-		translucent: false,
 		palette: null,
-		scheme: parameters.get('scheme') === 'light' ? 'light' : 'dark',
 		typography: { interface: null, monospace: null, textScale: 1 },
 		files: parameters.getAll('file'),
 		page: parameters.get('page')

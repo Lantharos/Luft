@@ -1,4 +1,3 @@
-pub mod scheme;
 pub mod typography;
 
 use zbus::blocking::Proxy;
@@ -30,16 +29,12 @@ pub fn watch(events: Events) {
             return;
         };
         for signal in signals {
-            let Ok((namespace, key, value)) =
+            let Ok((namespace, key, _)) =
                 signal.body().deserialize::<(String, String, OwnedValue)>()
             else {
                 continue;
             };
-            if scheme::changed(&namespace, &key) {
-                if let Some(scheme) = scheme::Scheme::from_portal(value) {
-                    events.emit(scheme::SCHEME_CHANGED, scheme);
-                }
-            } else if typography::changed(&namespace, &key) {
+            if typography::changed(&namespace, &key) {
                 events.emit(
                     typography::TYPOGRAPHY_CHANGED,
                     typography::Typography::read(&proxy),

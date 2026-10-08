@@ -60,6 +60,9 @@ mime_types = [
 	"application/font-woff"
 ]
 
+[app.extensions]
+"audio/webm" = ["weba"]
+
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"
 

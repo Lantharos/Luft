@@ -18,7 +18,7 @@ ignore = "0.4.33"
 luft-app = { path = "../../../packages/app" }
 notify = { version = "8.2.0", default-features = false }
 parking_lot = "0.12.5"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.33" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.35" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

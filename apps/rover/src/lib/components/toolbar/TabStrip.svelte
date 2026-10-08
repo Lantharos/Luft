@@ -29,7 +29,7 @@
 	function leaveTab(event: DragEvent) {
 		const next = event.relatedTarget;
 		if (next instanceof Node && event.currentTarget instanceof HTMLElement && event.currentTarget.contains(next)) return;
-		drag.leave();
+		drag.leaveTab();
 	}
 </script>
 
@@ -42,10 +42,6 @@
 				ondragover={(event) => drag.overTab(event, tab)}
 				ondragleave={leaveTab}
 				ondrop={(event) => drag.dropOnTab(event, tab)}
-				data-drop-path={tab.view === 'home' ? tab.path : undefined}
-				data-drop-key={tabDropKey(tab.id)}
-				data-drop-tab-id={tab.id}
-				data-drop-trash={tab.view === 'trash' ? '' : undefined}
 			>
 				<button
 					class="tab-main"

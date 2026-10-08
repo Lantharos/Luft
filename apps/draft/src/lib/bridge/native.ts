@@ -1,12 +1,8 @@
 import { app, events, fileUrl, invoke, listen } from '@lantharos/sabine';
+import { fileUrlPath } from '@luft/ui';
 import type { Activation, AppState, Backend, Entry, FileIndex, SaveTarget, Stat, StoreName } from './types';
 
-const FILE_URL = 'file://';
 const CHOOSER = { timeoutMs: 24 * 60 * 60 * 1000 };
-
-function pathOf(url: string) {
-	return url.startsWith(FILE_URL) ? decodeURIComponent(new URL(url).pathname) : null;
-}
 
 async function write(chunks: Iterable<string>, target: SaveTarget) {
 	let id: number | null = null;
@@ -42,9 +38,8 @@ export const native: Backend = {
 	chooseSave: (name, folder) => invoke<string | null>('choose_save', { name, folder }, CHOOSER),
 	showInFolder: (path) => invoke('show_in_folder', { path }),
 	openLink: (uri) => invoke('open_link', { uri }),
-	takeOpenedFiles: async () => (await app.takeOpenUrls()).map(pathOf).filter((path) => path !== null),
+	takeOpenedFiles: async () => (await app.takeOpenUrls()).map(fileUrlPath).filter((path) => path !== null),
 	onFilesOpened: (callback) => events.openUrlsAvailable(callback),
 	onFilesChanged: (callback) => listen<{ paths: string[] }>('draft.files', ({ paths }) => callback(paths)),
-	onFilesDropped: (callback) => events.fileDrag((drag) => drag.phase === 'drop' && !drag.internal && callback(drag.paths)),
 	onActivation: (callback) => listen<Activation>('singleInstance.activate', callback)
 };

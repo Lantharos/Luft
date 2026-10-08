@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { events as sabineEvents } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import DetailsPane from '#lib/components/details/DetailsPane.svelte';
@@ -64,10 +63,7 @@
 				void manager.refreshListing(path);
 				vcs.refresh();
 			}),
-			api.events.activation((activation) => void openActivation(manager, activation)),
-			sabineEvents.fileDrag((event) => {
-				if (!chooser) drag.native(event);
-			})
+			api.events.activation((activation) => void openActivation(manager, activation))
 		];
 		void start();
 		return () => unsubscribe.forEach((stop) => stop());

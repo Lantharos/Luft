@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { events as sabineEvents, type WindowFileDragEvent } from '@lantharos/sabine';
-	import { appearance, GlassShell, plural } from '@luft/ui';
+	import { appearance, fileDrop, GlassShell, plural } from '@luft/ui';
 	import type { Activation } from '#lib/api.js';
 	import * as api from '#lib/api.js';
 	import { openPaths } from '#lib/app/actions.js';
@@ -60,8 +59,7 @@
 			api.events.folder(library.receive),
 			api.events.thumbnails(thumbnails.receive),
 			api.events.media(mediaSession.receive),
-			api.events.activation((activation) => void activate(activation)),
-			isDesktop() ? sabineEvents.fileDrag(drop) : () => {}
+			api.events.activation((activation) => void activate(activation))
 		];
 		void start();
 		return () => stops.forEach((stop) => stop());
@@ -84,12 +82,10 @@
 		await openPaths(await api.resolveArguments(activation));
 	}
 
-	function drop(event: WindowFileDragEvent) {
-		if (event.phase === 'drop' && !event.internal) void openPaths(event.paths);
-	}
+	const drop = fileDrop((paths) => void openPaths(paths));
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} ondragover={drop.ondragover} ondrop={drop.ondrop} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
 	<GlassShell class={['h-full select-none', chrome.fullscreen && 'fullscreen']}>

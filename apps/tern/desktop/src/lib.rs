@@ -8,7 +8,7 @@ mod shell;
 mod state;
 
 use luft_app::GlassWindow;
-use sabine::{SabineLifecyclePolicy, SabineWindow, WindowRegion};
+use sabine::{SabineWindow, WindowRegion};
 use state::TernState;
 
 const APP_ID: &str = "com.lantharos.tern";
@@ -32,9 +32,7 @@ fn build_window(window: SabineWindow, state: &TernState) -> SabineWindow {
         sidebar_width: 0,
         single_instance: Some(APP_ID),
     };
-    let window = glass
-        .apply(window)
-        .lifecycle_policy(SabineLifecyclePolicy::default());
+    let window = glass.apply(window);
     let window = if state.glass {
         window
             .blur_region(WindowRegion::adaptive_rounded_rect(WINDOW_RADIUS))

@@ -35,7 +35,7 @@ export async function start() {
 	setBackend(backend);
 	const state = await backend.appState();
 	if (isAvailable()) appearance.start(state);
-	else appearance.scheme = state.scheme;
+	else appearance.scheme = new URLSearchParams(location.search).get('scheme') === 'light' ? 'light' : 'dark';
 	openPage([state.page]);
 	openFiles(state.files);
 	backend.onActivated(async ({ arguments: list, workingDirectory }) => {

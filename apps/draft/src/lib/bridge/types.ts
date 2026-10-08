@@ -56,6 +56,5 @@ export interface Backend {
 	takeOpenedFiles(): Promise<string[]>;
 	onFilesOpened(callback: () => void): () => void;
 	onFilesChanged(callback: (paths: string[]) => void): () => void;
-	onFilesDropped(callback: (paths: string[]) => void): () => void;
 	onActivation(callback: (activation: Activation) => void): () => void;
 }

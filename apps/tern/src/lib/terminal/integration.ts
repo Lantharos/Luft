@@ -11,6 +11,8 @@ export interface FinishedCommand {
 
 interface Handlers {
 	cwd(path: string): void;
+	prompted(): void;
+	started(): void;
 	finished(command: FinishedCommand): void;
 }
 
@@ -62,11 +64,12 @@ export class ShellIntegration {
 		const [kind, ...parameters] = data.split(';');
 		if (kind === 'A') this.#promptStarted();
 		else if (kind === 'B') this.#input = this.#cursor();
-		else if (kind === 'C') this.#command = { text: this.#typedCommand(), started: performance.now() };
+		else if (kind === 'C') this.#commandStarted();
 		else if (kind === 'D') this.#commandFinished(Number(parameters[0] ?? 0));
 	}
 
 	#promptStarted() {
+		this.#handlers.prompted();
 		this.#prompts = this.#prompts.filter((marker) => !marker.isDisposed);
 		const line = this.#cursor().line;
 		if (this.#prompts.at(-1)?.line === line) return;
@@ -86,6 +89,11 @@ export class ShellIntegration {
 		}
 		this.#input = null;
 		return text.trim();
+	}
+
+	#commandStarted() {
+		this.#command = { text: this.#typedCommand(), started: performance.now() };
+		this.#handlers.started();
 	}
 
 	#commandFinished(code: number) {

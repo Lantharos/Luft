@@ -37,7 +37,7 @@ impl TernState {
     pub fn new() -> Self {
         let settings = Settings::load();
         Self {
-            glass: settings.translucent && std::env::var_os("WAYLAND_DISPLAY").is_some(),
+            glass: settings.translucent,
             events: Events::default(),
             sessions: Sessions::default(),
             settings: Arc::new(RwLock::new(settings)),

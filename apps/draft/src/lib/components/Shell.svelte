@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { appearance, GlassShell } from '@luft/ui';
+	import { appearance, fileDrop, GlassShell } from '@luft/ui';
 	import { untrack } from 'svelte';
 	import type { App } from '#lib/app.svelte.js';
 	import { runShortcut } from '#lib/commands/shortcuts.js';
@@ -20,12 +20,19 @@
 	let previewing = $derived(settings.preview && app.markdown);
 	let sidebar = $derived(app.configured && app.workspace.browsing && settings.sidebar);
 
+	const drop = fileDrop((paths) => void app.openDropped(paths));
+
 	$effect(() => {
 		document.documentElement.dataset.scheme = appearance.scheme;
 	});
 </script>
 
-<svelte:window onkeydowncapture={(event) => runShortcut(app, event)} onfocus={() => void app.refreshFromDisk()} />
+<svelte:window
+	onkeydowncapture={(event) => runShortcut(app, event)}
+	onfocus={() => void app.refreshFromDisk()}
+	ondragovercapture={drop.ondragover}
+	ondropcapture={drop.ondrop}
+/>
 
 <div class="h-[100dvh] w-screen overflow-hidden bg-transparent text-[var(--text)]" style:--editor-font-size="{settings.fontSize}px">
 	<GlassShell class="h-full [--sidebar-width:260px]">

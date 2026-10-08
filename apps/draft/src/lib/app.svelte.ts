@@ -64,7 +64,6 @@ export class App {
 			this.files.invalidate();
 			void filesChanged(this.workspace, paths);
 		});
-		this.backend.onFilesDropped((paths) => void this.openDropped(paths));
 		this.backend.onActivation(async (activation) => {
 			const [folder] = await this.backend.activationFolders(activation);
 			if (folder) await this.workspace.showFolder(folder);

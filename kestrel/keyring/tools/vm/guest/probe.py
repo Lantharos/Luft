@@ -10,9 +10,8 @@ import time
 import gi
 
 gi.require_version("Gio", "2.0")
-from gi.repository import Gio, GLib
-
 from authenticate import authenticate
+from gi.repository import Gio, GLib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOME = os.path.expanduser("~")
@@ -20,7 +19,8 @@ USER = pwd.getpwuid(os.getuid()).pw_name
 PASSWORD = "sign-in words"
 SECRET = "repo-token"
 os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
-scenario = json.load(open("/var/lib/keyring-test/scenario.json"))["name"]
+with open("/var/lib/keyring-test/scenario.json") as file:
+    scenario = json.load(file)["name"]
 results = []
 plan = os.path.join(HOME, "prompter.json")
 prompts = os.path.join(HOME, "prompts.log")
@@ -49,8 +49,17 @@ def finger(state):
 def keyring(name):
     bus = Gio.bus_get_sync(Gio.BusType.SESSION)
     try:
-        reply = bus.call_sync("com.lantharos.Keyring1", "/com/lantharos/Keyring1", "org.freedesktop.DBus.Properties", "Get",
-                              GLib.Variant("(ss)", ("com.lantharos.Keyring1", name)), None, Gio.DBusCallFlags.NONE, 5000, None)
+        reply = bus.call_sync(
+            "com.lantharos.Keyring1",
+            "/com/lantharos/Keyring1",
+            "org.freedesktop.DBus.Properties",
+            "Get",
+            GLib.Variant("(ss)", ("com.lantharos.Keyring1", name)),
+            None,
+            Gio.DBusCallFlags.NONE,
+            5000,
+            None,
+        )
         return reply.unpack()[0]
     except GLib.Error:
         return None
@@ -65,17 +74,33 @@ def wait_for(name, wanted, seconds=30):
 
 
 def lock():
-    Gio.bus_get_sync(Gio.BusType.SESSION).call_sync("com.lantharos.Keyring1", "/com/lantharos/Keyring1", "com.lantharos.Keyring1",
-                                                     "Lock", None, None, Gio.DBusCallFlags.NONE, 5000, None)
+    Gio.bus_get_sync(Gio.BusType.SESSION).call_sync(
+        "com.lantharos.Keyring1",
+        "/com/lantharos/Keyring1",
+        "com.lantharos.Keyring1",
+        "Lock",
+        None,
+        None,
+        Gio.DBusCallFlags.NONE,
+        5000,
+        None,
+    )
     return wait_for("Locked", True, 5)
 
 
 def secret_tool(*arguments, secret=None):
-    return subprocess.run(["secret-tool", *arguments], input=secret, capture_output=True, text=True, timeout=60)
+    return subprocess.run(
+        ["secret-tool", *arguments], input=secret, capture_output=True, text=True, timeout=60, check=False
+    )
 
 
 def sudo(password):
-    return subprocess.run(["sudo", "-k", "-S", "true"], input=password, capture_output=True, text=True, timeout=120).returncode == 0
+    return (
+        subprocess.run(
+            ["sudo", "-k", "-S", "true"], input=password, capture_output=True, text=True, timeout=120, check=False
+        ).returncode
+        == 0
+    )
 
 
 def as_settings(method, signature, arguments):
@@ -83,17 +108,27 @@ def as_settings(method, signature, arguments):
     os.makedirs(folder, exist_ok=True)
     settings = os.path.join(folder, "settings")
     shutil.copy(sys.executable, settings)
-    code = (f"import gi; gi.require_version('Gio','2.0'); from gi.repository import Gio, GLib; "
-            f"print(Gio.bus_get_sync(Gio.BusType.SESSION).call_sync('com.lantharos.Keyring1', '/com/lantharos/Keyring1', "
-            f"'com.lantharos.Keyring1', '{method}', GLib.Variant('{signature}', {arguments!r}), None, Gio.DBusCallFlags.NONE, 60000, None).unpack())")
-    return subprocess.run([settings, "-c", code], capture_output=True, text=True, timeout=90).stdout.strip()
+    code = (
+        f"import gi; gi.require_version('Gio','2.0'); from gi.repository import Gio, GLib; "
+        f"print(Gio.bus_get_sync(Gio.BusType.SESSION).call_sync('com.lantharos.Keyring1', '/com/lantharos/Keyring1', "
+        f"'com.lantharos.Keyring1', '{method}', GLib.Variant('{signature}', {arguments!r}), None, Gio.DBusCallFlags.NONE, 60000, None).unpack())"
+    )
+    return subprocess.run(
+        [settings, "-c", code], capture_output=True, text=True, timeout=90, check=False
+    ).stdout.strip()
 
 
 def lock_screen_flows(chip):
     check(lock(), "the keyring locks")
-    check(authenticate(USER, "password", PASSWORD) == "success" and wait_for("Locked", False), "unlocking the screen with the password unlocks it")
+    check(
+        authenticate(USER, "password", PASSWORD) == "success" and wait_for("Locked", False),
+        "unlocking the screen with the password unlocks it",
+    )
     lock()
-    check(authenticate(USER, "password", "wrong") == "auth_error" and keyring("Locked") is True, "a wrong password keeps it locked")
+    check(
+        authenticate(USER, "password", "wrong") == "auth_error" and keyring("Locked") is True,
+        "a wrong password keeps it locked",
+    )
     finger("match")
     lock()
     script([PASSWORD])
@@ -131,7 +166,10 @@ def main():
         check(wait_for("TpmSealed", True), "the keyring is sealed by the security chip")
         check(keyring("Chip") == "ready", "the security chip is ready")
         check(not asked, "signing in with the password asked nothing more")
-        check(secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0, "a secret is saved")
+        check(
+            secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0,
+            "a secret is saved",
+        )
         lock_screen_flows(chip=True)
         sudo_flows()
     elif scenario in ("fingerprint sign-in", "fingerprint after resealing"):
@@ -139,7 +177,10 @@ def main():
         check(secret_tool("lookup", "service", "repo").stdout == SECRET, "the saved secret is there")
         check(keyring("FingerprintUnlock") is True, "the keyring says a fingerprint unlocks it")
     elif scenario == "startup changed":
-        check(any("startup settings changed" in request.get("body", "") for request in asked), "the password is asked once, explaining why")
+        check(
+            any("startup settings changed" in request.get("body", "") for request in asked),
+            "the password is asked once, explaining why",
+        )
         check(wait_for("TpmSealed", True), "the keyring is sealed again for the new startup state")
     elif scenario == "choosing a PIN":
         script(["2468"])
@@ -147,17 +188,32 @@ def main():
         check(wait_for("Pin", True), "the keyring needs the PIN after a fingerprint")
     elif scenario == "fingerprint with a PIN":
         pins = [request for request in asked if request.get("label") == "PIN"]
-        check(len(pins) >= 2 and "PIN isn" in pins[-1].get("warning", ""), "a wrong PIN is refused and the right one unlocks")
+        check(
+            len(pins) >= 2 and "PIN isn" in pins[-1].get("warning", ""),
+            "a wrong PIN is refused and the right one unlocks",
+        )
     elif scenario == "chip gone":
-        check(keyring("Chip") == "missing" and keyring("TpmSealed") is False, "the keyring knows the security chip is gone")
+        check(
+            keyring("Chip") == "missing" and keyring("TpmSealed") is False,
+            "the keyring knows the security chip is gone",
+        )
         check(secret_tool("lookup", "service", "repo").stdout == SECRET, "the password still opens everything")
     elif scenario == "first sign-in without a chip":
-        check(keyring("Chip") == "missing" and keyring("TpmSealed") is False, "without a chip the password alone protects it")
-        check(secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0, "a secret is saved")
+        check(
+            keyring("Chip") == "missing" and keyring("TpmSealed") is False,
+            "without a chip the password alone protects it",
+        )
+        check(
+            secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0,
+            "a secret is saved",
+        )
         lock_screen_flows(chip=False)
         sudo_flows()
     elif scenario == "fingerprint without a chip":
-        check(any("fingerprint can't unlock" in request.get("body", "") for request in asked), "the password is asked once, explaining why")
+        check(
+            any("fingerprint can't unlock" in request.get("body", "") for request in asked),
+            "the password is asked once, explaining why",
+        )
         check(secret_tool("lookup", "service", "repo").stdout == SECRET, "the saved secret is there after the password")
 
     subprocess.run(["systemctl", "--user", "stop", "luft-keyring.service", "luft-keyring.socket"], check=False)

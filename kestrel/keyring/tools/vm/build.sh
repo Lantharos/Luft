@@ -67,7 +67,8 @@ install -Dm644 "$keyring/tools/vm/guest/keyring-test.service" "$stage/etc/system
 printf '[terminal]\nvt = 7\n\n[default_session]\ncommand = "/usr/local/libexec/keyring-test/greeter.sh"\nuser = "greetd"\n' \
   | install -Dm644 /dev/stdin "$stage/etc/greetd/config.toml"
 
-kernel="$(ls "$tree/lib/modules" | head -1)"
+kernels=("$tree"/lib/modules/*)
+kernel="${kernels[0]##*/}"
 podman unshare sh -c "
   set -e
   cp -r --preserve=mode '$stage/.' '$tree/'
@@ -79,7 +80,8 @@ podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
   systemctl enable luft-keyring-unlock.socket kestrel-authenticate.socket keyring-test.service
   dracut --quiet --force --no-hostonly --add-drivers 'virtio_blk virtio_pci ext4' --kver '$kernel'
 "
-podman unshare setfiles -c "$(ls "$tree"/etc/selinux/targeted/policy/policy.* | tail -1)" -r "$tree" "$tree/etc/selinux/targeted/contexts/files/file_contexts" "$tree"
+policies=("$tree"/etc/selinux/targeted/policy/policy.*)
+podman unshare setfiles -c "${policies[-1]}" -r "$tree" "$tree/etc/selinux/targeted/contexts/files/file_contexts" "$tree"
 podman unshare sh -c "cat '$tree/lib/modules/$kernel/vmlinuz' > '$vm/vmlinuz'; cat '$tree/boot/initramfs-$kernel.img' > '$vm/initramfs.img'"
 rm -f "$vm/root.img"
 truncate -s 4G "$vm/root.img"

@@ -17,5 +17,18 @@ exec unshare --user --map-user={os.getuid()} --map-group={os.getgid()} -- "$@"
 def seal_off_system_services():
     if os.listdir("/run") == ["user"]:
         return
-    os.execvp("unshare", ["unshare", "--map-root-user", "--mount", "--", "sh", "-ec", BEHIND_EMPTY_RUN, "sealed",
-                          sys.executable, *sys.argv])
+    os.execvp(
+        "unshare",
+        [
+            "unshare",
+            "--map-root-user",
+            "--mount",
+            "--",
+            "sh",
+            "-ec",
+            BEHIND_EMPTY_RUN,
+            "sealed",
+            sys.executable,
+            *sys.argv,
+        ],
+    )

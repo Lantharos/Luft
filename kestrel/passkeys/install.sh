@@ -8,6 +8,18 @@ destination="${DESTDIR:-}"
 data="$root/data"
 release="$root/target/release"
 
+usage() {
+  cat <<'USAGE'
+Usage: kestrel/passkeys/install.sh [ACTION] [PREFIX]
+
+  install   Build Luft Passkeys, install it under PREFIX (default /opt/kestrel) and
+            enable it. This is the default action.
+  remove    Disable and remove it. The passkeys you saved stay in your keyring.
+
+With DESTDIR set, install only stages the files under it.
+USAGE
+}
+
 files() {
   echo "$release/luft-passkeys $prefix/libexec/luft-passkeys 755"
   echo "$release/luft-passkeys-relay $prefix/libexec/luft-passkeys-relay 755"
@@ -53,8 +65,6 @@ case "$action" in
     as_root systemctl daemon-reload
     echo "Passkeys were removed. The passkeys you saved stay in your keyring."
     ;;
-  *)
-    echo "Usage: kestrel/passkeys/install.sh [install|remove] [prefix]" >&2
-    exit 2
-    ;;
+  -h | --help) usage ;;
+  *) usage >&2; exit 2 ;;
 esac

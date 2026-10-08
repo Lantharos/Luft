@@ -2,7 +2,7 @@
 	"name": "rover",
 	"version": "0.1.0",
 	"dependencies": {
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.36"
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.37"
 	},
 	"devDependencies": {
 		"@luft/ui": "workspace:*",

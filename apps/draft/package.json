@@ -18,7 +18,7 @@
 		"@codemirror/search": "^6.7.2",
 		"@codemirror/state": "^6.7.6",
 		"@codemirror/view": "^6.43.13",
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.36"
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.37"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.51.0",

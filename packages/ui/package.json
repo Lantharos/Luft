@@ -25,7 +25,7 @@
 		"@codemirror/lang-markdown": "^6.5.2",
 		"@codemirror/language": "^6.12.4",
 		"@codemirror/language-data": "^6.5.2",
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.36",
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.37",
 		"@lezer/common": "^1.5.3",
 		"@lezer/highlight": "^1.2.5",
 		"@lucide/svelte": "^1.51.0",

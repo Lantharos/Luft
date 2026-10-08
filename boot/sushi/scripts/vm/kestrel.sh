@@ -36,10 +36,10 @@ install -Dm755 "$luft/kestrel/watchdog/target/release/kestrel-watchdog" "$prefix
 
 libraries="$(find "$prefix" -type f \( -name '*.so*' -o -path '*/bin/*' -o -path '*/libexec/*' \) -exec sh -c 'file "$1" | grep -q ELF && ldd "$1"' _ {} \; 2>/dev/null |
   awk '/=> \//{print $3}' | grep -v "^$prefix" | sort -u)"
-packages="$(echo "$libraries" | xargs rpm -qf --qf '%{NAME}\n' | sort -u)"
+mapfile -t packages < <(echo "$libraries" | xargs rpm -qf --qf '%{NAME}\n' | sort -u)
 podman run --rm --security-opt label=disable -v "$tree:/installroot" "registry.fedoraproject.org/fedora:45" \
   dnf install -y -q --releasever=45 --installroot=/installroot --use-host-config --setopt=install_weak_deps=False --nodocs \
-  $packages libadwaita gcr iso-codes glycin-libs NetworkManager-libnm libnma-gtk4 polkit-libs \
+  "${packages[@]}" libadwaita gcr iso-codes glycin-libs NetworkManager-libnm libnma-gtk4 polkit-libs \
   librsvg2 libsoup3 upower-libs gstreamer1 ibus-libs geoclue2-libs libgudev at-spi2-core python3-gobject
 
 stage="$build/system"
@@ -62,9 +62,14 @@ ln -sfn /usr/lib/systemd/system/kestrel-incident.service "$stage/etc/systemd/sys
 for service in kestrel-greeter kestrel-watchdog; do
   printf '[Service]\nProtectHome=no\n' | install -Dm644 /dev/stdin "$stage/etc/systemd/system/$service.service.d/home.conf"
 done
-for link in share/wayland-sessions/kestrel.desktop share/xdg-desktop-portal/kestrel-portals.conf \
-  share/xdg-desktop-portal/portals/kestrel.portal lib/systemd/user/app.slice.d/50-kestrel-oomd.conf \
-  $(cd "$prefix" && ls lib/systemd/user/kestrel*); do
+links=(
+  share/wayland-sessions/kestrel.desktop share/xdg-desktop-portal/kestrel-portals.conf
+  share/xdg-desktop-portal/portals/kestrel.portal lib/systemd/user/app.slice.d/50-kestrel-oomd.conf
+)
+for unit in "$prefix"/lib/systemd/user/kestrel*; do
+  links+=("${unit#"$prefix/"}")
+done
+for link in "${links[@]}"; do
   mkdir -p "$stage/usr/local/$(dirname "$link")"
   ln -sfn "$prefix/$link" "$stage/usr/local/$link"
 done

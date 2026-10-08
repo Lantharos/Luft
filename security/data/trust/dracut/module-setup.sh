@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# shellcheck disable=SC2154
 
 check() {
     require_binaries trustctl cryptsetup || return 1

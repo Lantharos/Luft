@@ -2,8 +2,23 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-destdir="${1:-}"
 libexecdir="${LIBEXECDIR:-/usr/libexec}"
+
+usage() {
+  cat <<'USAGE'
+Usage: security/scripts/build.sh [DESTDIR]
+
+Builds Luft's device security services. With DESTDIR, also stages their files
+under it as they would be laid out on the computer. LIBEXECDIR sets where the
+services' programs go (default /usr/libexec).
+USAGE
+}
+
+case "${1:-}" in
+  -h | --help) usage; exit 0 ;;
+esac
+(($# <= 1)) || { usage >&2; exit 2; }
+destdir="${1:-}"
 
 cargo build --release --manifest-path "$root/Cargo.toml"
 

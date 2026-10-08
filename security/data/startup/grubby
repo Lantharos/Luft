@@ -2,14 +2,13 @@
 set -euo pipefail
 
 usage() {
-  cat >&2 <<'USAGE'
+  cat <<'USAGE'
 On Luft every kernel starts with the same signed command line, so this grubby
 changes that line and shows the newest kernel, and nothing else:
 
   grubby --update-kernel=ALL --args="ARGS" --remove-args="ARGS"
   grubby --default-kernel
 USAGE
-  exit 1
 }
 
 newest_kernel() {
@@ -22,7 +21,7 @@ key() {
 }
 
 change_arguments() {
-  local current add=() remove=() word present
+  local current add=() remove=() options=() word present
   current="$(trustctl startup arguments)"
   for word in $1; do
     [[ " $current " == *" $word "* ]] && continue
@@ -34,8 +33,10 @@ change_arguments() {
       [[ "$(key "$present")" == "$(key "$word")" ]] && remove+=("$(key "$word")") && break
     done
   done
-  ((${#add[@]} + ${#remove[@]})) || return 0
-  trustctl startup arguments ${add[*]:+--add "${add[*]}"} ${remove[*]:+--remove "${remove[*]}"} >/dev/null
+  ((${#add[@]} == 0)) || options+=(--add "${add[*]}")
+  ((${#remove[@]} == 0)) || options+=(--remove "${remove[*]}")
+  ((${#options[@]})) || return 0
+  trustctl startup arguments "${options[@]}" >/dev/null
 }
 
 update=false
@@ -50,10 +51,11 @@ while (($#)); do
     --remove-args=*) remove_args="${1#*=}" ;;
     --remove-args) remove_args="${2:-}"; shift ;;
     --default-kernel) echo "/boot/vmlinuz-$(newest_kernel)"; exit 0 ;;
-    *) usage ;;
+    -h | --help) usage; exit 0 ;;
+    *) usage >&2; exit 2 ;;
   esac
   shift
 done
 
-$update || usage
+$update || { usage >&2; exit 2; }
 change_arguments "$args" "$remove_args"

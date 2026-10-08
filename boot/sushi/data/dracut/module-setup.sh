@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# shellcheck disable=SC2154
 
 check() {
     require_binaries sushid sushictl || return 1
@@ -77,13 +78,15 @@ keep_nvidia_firmware_for_present_cards() {
 
 installkernel() {
     local config
-    local -a modules
+    local -a modules needed
     config="$(deferred_config)"
     [[ -n $config ]] || return 0
     mapfile -t modules < <(deferred_drivers "$config")
     ((${#modules[@]})) || return 0
-    mapfile -t -O "${#modules[@]}" modules < <(softdeps $(dependencies "${modules[@]}"))
-    omit_drivers="$(omitted_except $(dependencies "${modules[@]}"))" hostonly='' instmods "${modules[@]}"
+    mapfile -t needed < <(dependencies "${modules[@]}")
+    mapfile -t -O "${#modules[@]}" modules < <(softdeps "${needed[@]}")
+    mapfile -t needed < <(dependencies "${modules[@]}")
+    omit_drivers="$(omitted_except "${needed[@]}")" hostonly='' instmods "${modules[@]}"
     keep_nvidia_firmware_for_present_cards
 }
 

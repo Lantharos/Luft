@@ -1,106 +1,71 @@
 # Luft Keyring
 
-Luft Keyring keeps your passwords, tokens and keys. Apps reach it through the Secret Service on the session bus and the Secret portal, the same interfaces every Linux keyring offers, so they work with it without changes. Signing in unlocks it, including with a fingerprint, and you are never asked for a second password or PIN when the computer can vouch for you on its own.
+Luft Keyring keeps your passwords, tokens and keys. Apps use it through the Secret Service and the Secret portal, so they work without changes. Signing in, with a password or a fingerprint, unlocks it. It is also your SSH agent and GnuPG's pinentry.
+
+How secrets are encrypted, unlocked and what that protects against is in [docs/security.md](../../docs/security.md#luft-keyring).
 
 | Part | What it is |
 | --- | --- |
 | `daemon` | `luft-keyring`, the keyring itself, running in your session |
-| `unlock` | `luft-keyring-unlock`, a small system service that holds the security chip |
+| `unlock` | `luft-keyring-unlock`, a system service that holds the security chip (TPM) |
 | `pam` | `pam_luft_keyring.so`, which tells the unlock service that a sign-in succeeded |
-| `vault` | The encrypted file format, shared by everything that stores data in the keyring |
-| `wire` | The messages the three programs exchange |
-| `pinentry` | `luft-pinentry`, which asks for GnuPG's passphrases and PINs through Kestrel |
-| `data` | Units, D-Bus and portal files, and the sign-in rules |
-| `tools` | Installing and the tests |
+| `vault` | The encrypted file format |
+| `wire` | Messages exchanged between the three programs above |
+| `pinentry` | `luft-pinentry`, GnuPG's passphrase and PIN prompt |
+| `data` | Units, D-Bus, portal, PAM and SELinux files |
+| `tools` | Install script and tests |
 
-## How your secrets are protected
+## Install
 
-Everything lives in one file, `~/.local/share/luft-keyring/vault`. Its contents, including the names of items and which apps use them, are encrypted with XChaCha20-Poly1305 under a random 256-bit master key. The master key itself is never written anywhere in the clear. Instead the file carries it wrapped twice:
+The keyring is built and installed with Kestrel (building needs `tpm2-tss-devel`):
 
-- **By your password.** The sign-in password goes through Argon2id (64 MiB, three passes) and the result wraps the master key. This wrap always exists, so your password always opens the keyring, on any machine and whatever happens to the security chip.
-- **By the security chip.** On a computer with a TPM 2.0, a second random key wraps the master key too, and that key is sealed inside the chip under a policy tied to PCR 7, which records the Secure Boot state. The chip only releases it while the computer starts the way it did when the key was sealed.
+```sh
+kestrel/tools/install.sh install
+```
 
-You can add a PIN to the chip's wrap in Settings. The chip then needs the PIN too, and counts wrong guesses with its own dictionary-attack lockout, so a few wrong PINs lock it for a while and the password takes over.
+This installs:
 
-While the keyring is unlocked, the master key sits on a memory page that is locked into RAM, left out of core dumps and wiped on fork, and the daemon can't be traced or dumped by other processes. Locking wipes the key and every secret from memory; only item names stay so apps can still find what they need and ask to unlock it. Locking with the screen is off by default and can be turned on in Settings.
+- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`
+- `pam_luft_keyring.so` in `/usr/local/lib64/security`
+- the unlock service's socket and unit, started right away
+- the keyring's user units, D-Bus activation files and portal under `/usr/local`, enabled for every user
+- the PAM rules `kestrel-unlock`, `kestrel-unlock-fingerprint` and `greetd` in `/etc/pam.d`
+- `/etc/gnupg/gpg-agent.conf` pointing at `luft-pinentry`, unless that file already exists
+- a small SELinux module that lets the login screen reach the unlock service
 
-There is also an access history, `~/.local/share/luft-keyring/audit`, with each entry encrypted on its own under a key derived from the master key.
+It also runs `authselect enable-feature with-fingerprint`, so `sudo`, polkit and the login screen accept a fingerprint when one is enrolled. The password always works.
 
-## Unlocking when you sign in
+After installing, sign out and sign in once with your password. That sets up the keyring and seals it to the TPM; from then on a fingerprint unlocks it too.
 
-Signing in or unlocking the screen runs the system's normal sign-in rules first, a password, a fingerprint, or whatever else is set up. Only after they succeed does anything touch the keyring:
+`kestrel/tools/install.sh remove` removes everything except `/etc/pam.d/greetd`, which skips the keyring once its module is gone. Your data stays in `~/.local/share/luft-keyring`.
 
-1. `pam_luft_keyring.so` sits in the `greetd` rules of the login screen and in `kestrel-unlock` and `kestrel-unlock-fingerprint`, the lock screen's rules. It runs as root, keeps the password for a moment if one was typed, and when the sign-in has succeeded (in `pam_setcred`, which only runs after authentication) it tells the unlock service on `/run/luft-keyring/unlock`.
-2. The unlock service accepts that only from root. It unseals the chip's key and hands it, together with the password if there was one, to your keyring.
-3. It hands it only to your own `luft-keyring`: a process of your account, running the installed root-owned binary, inside your user manager's `luft-keyring.service`, not being traced and not started with preloaded libraries. The check uses the peer's pidfd so a recycled process ID can't be mistaken for it.
-4. The keyring opens the master key with what it got. A password sign-in also checks the password wrap and rewraps it when your password changed.
+## Files
 
-The lock screen asks for the password and listens for a fingerprint at the same time, each in its own conversation, so you never wait for one to type the other. When there's nothing the chip can vouch for, the keyring asks once with a calm prompt instead of staying locked:
+| Path | Contents |
+| --- | --- |
+| `~/.local/share/luft-keyring/vault` | All items, encrypted |
+| `~/.local/share/luft-keyring/audit` | Access history, encrypted |
+| `$XDG_RUNTIME_DIR/luft-keyring/ssh` | SSH agent socket (`SSH_AUTH_SOCK` in Kestrel) |
+| `/run/luft-keyring/unlock` | Unlock service socket |
 
-- **No usable security chip** (none, TPM 1.2, turned off in the firmware, failing its self-test, or no SHA-256 PCR bank). Your password unlocks the keyring at sign-in. After a fingerprint-only sign-in it asks for the password once. Fingerprint unlock and chip-held SSH keys are off, and Settings says why.
-- **The startup changed** (a Secure Boot key or revocation list was updated, the chip was cleared, or the chip went away). The chip refuses to unseal, the password wrap opens the keyring, and as soon as it's open the keyring seals a fresh key for the new state. The next fingerprint works again.
-- **A PIN is set.** After a fingerprint the keyring asks for the PIN; after too many wrong PINs it asks for the password.
+## App access
 
-Automatic login never unlocks the keyring, because nobody signed in. The first app that needs a secret brings up the prompt.
+- Each request is tied to the app that made it: Flatpak ID, `com.lantharos.*` ID, the Sabine app behind a Sabine host, launcher entry, or program path (version numbers in folder names ignored).
+- An app can always use what it saved. Anything else asks first ("Allow Firefox to use “github.com”?"), and remembered choices can be revoked in Settings.
+- Keyring tools such as `secret-tool` and Seahorse are asked like any other app and never take over items.
+- Encrypted drive passphrases are shared between Kestrel's unlock dialog and Disks (GVfs's `gvfs-luks-uuid` attribute).
+- Settings shows which app read, saved, deleted or was refused what, and when.
 
-### Why PCR 7 alone
+## App secrets
 
-The keyring isn't your disk: when the chip refuses, the cost is typing your password once, not a recovery key. PCR 7 changes only when Secure Boot itself changes, so kernel and boot loader updates don't cost even that, while booting another distribution's chain, turning Secure Boot off, or enrolling new keys does. Binding PCR 4, 8, 9 or 11 as well would break on every kernel update on a computer that boots through GRUB. Signed PCR 11 policies and `systemd-pcrlock` avoid that, but they need unified kernel images and a measured-boot setup that this kind of system doesn't have yet. When the disk itself is unlocked with a `systemd-pcrlock` policy, binding the keyring to the same policy is the natural next step.
-
-## What this protects against, and what it doesn't
-
-It protects you when:
-
-- **Someone has your disk, or a copy of it.** The vault is encrypted with a key they can only get from your password, guessed slowly through Argon2id, or from this computer's chip.
-- **Someone has the whole powered-off computer and tries an offline attack.** The chip only unseals in the Secure Boot state it was sealed in, and only to root after a successful sign-in; booting another system or changing the Secure Boot setup leaves the chip's key locked.
-- **The boot chain is tampered with in a way Secure Boot sees.** Unsigned loaders, disabled Secure Boot, or new keys change PCR 7, and the chip refuses.
-- **Another account on the computer is curious.** The unlock service only hands your key to your own keyring, and only after you signed in.
-- **An app you didn't allow wants your saved passwords.** It is asked about first, and sandboxed apps can't pretend to be anyone else.
-
-It doesn't protect you when:
-
-- **Someone can sign in as you.** If they know your password, or have your finger, or the computer is unlocked in front of them, they have what you have. That is the point of signing in.
-- **Something already runs as you.** Programs outside a sandbox share your account. The keyring checks who is asking, but an app running as you can impersonate another one of your apps, show a fake prompt, or read what you type into it. Treat per-app access for unsandboxed apps as a guard against mistakes and nosy apps, not against malware.
-- **Root is compromised on a correctly started computer.** Root can talk to the chip, so it can unseal your key.
-- **The Secure Boot chain itself is trusted but abused.** A signed boot loader that lets someone edit the kernel command line, or a signed but vulnerable component, starts with the same PCR 7 value. A boot loader password and a sealed disk close that gap; the keyring alone doesn't.
-- **Someone reads memory physically** while the keyring is unlocked, for example with a cold-boot attack. Lock with the screen narrows that window.
-
-## Apps and access
-
-Every request is tied to the app that made it:
-
-- **Sandboxed apps** are recognized by their Flatpak ID, which the sandbox guarantees.
-- **Luft apps** are recognized by their `com.lantharos.*` ID.
-- **Sabine apps** show their pages through a Sabine host, a browser engine that every Sabine app shares. A request from a host counts as the app that started it, found by following the host back through the processes that started it rather than by anything the host says about itself, so Mailman's host is Mailman whichever Sabine version it runs.
-- **Other apps** are recognized by their launcher entry. Discord started from `discord.desktop` is Discord, whichever folder its updater put the program in this week. The entry has to start that program, either by its path or by its name, the way `/usr/bin/discord` starts `~/.config/discord/app-1.0.160/Discord`, so commands run in a terminal stay themselves instead of becoming the terminal. Apps started some other way are matched to the entry named after their program.
-- **Programs without an entry** are recognized by their path, with version numbers in folder names left out, so `app-1.0.160` and `app-1.0.161` are the same app. An AppImage is recognized by the AppImage file rather than the temporary folder it runs from, and a script by its interpreter and the script.
-
-When an app is recognized better than before, for example after it gets a launcher entry, what it saved and the choices you made for it move along without asking.
-
-An app may always use what it saved itself. Anything else needs your permission: the keyring reports those items as locked to that app, and when it asks to unlock them, Kestrel shows "Allow Firefox to use “github.com”?" with the choice to remember it. Choices you remember are kept in the vault, listed in Settings under Apps with access, and can be taken back there.
-
-Some items name the app they belong to. Chromium-based browsers and Electron apps keep their key with an `application` attribute such as `chrome`, `discord` or `slack`. Browsers built from Chromium that keep its default name for the key, like Helium, use `chromium`. So do Sabine apps, but each of them keeps a key of its own: a Sabine app only finds the `chromium` key it saved itself or one you let it use, never the browser's or another app's, and saves its own the first time it starts, without asking. What you let the shared Sabine host use before Sabine apps were told apart, every Sabine app may still use, so the pages they saved stay readable.
-
-Keyring tools never take items. `secret-tool`, Seahorse and scripts run from a terminal are asked like any other app, so looking around in your keyring doesn't take items away from the apps they belong to. When a keyring tool holds an item that names another app, the keyring hands it back as soon as it opens, and the first app with that name, by launcher entry, Flatpak ID or program, takes it without being asked; any Chromium-based browser can take a `chromium` item. Every other app is asked.
-
-Passphrases of encrypted drives are shared between the two things that unlock drives: the desktop, which asks for one when an encrypted drive is plugged in and keeps it through GVfs when Remember Password is ticked, and Disks. Both keep them the way GVfs always has, under the `gvfs-luks-uuid` attribute with the drive's UUID, and either may use the ones the other saved, so a passphrase remembered in one place unlocks the drive in both without asking.
-
-Apps can also ask the Secret portal for a secret of their own, which sandboxed apps use for everything they keep and Chromium-based browsers and Electron apps use to protect what they save. Each app gets its own, recognized the same way as above rather than by the ID the portal passes along, so an app outside a sandbox can't name another app to get its secret. It moves along with the app when the app is recognized better, is never shown to another app, and a request from a program the keyring can't identify is refused.
-
-Settings shows which app read, saved, deleted or was refused what, and when.
-
-## Secrets an app keeps for itself
-
-Apps can keep tokens, API keys and account sign-ins that only they can read back, on `com.lantharos.Keyring1.AppSecrets` at `/com/lantharos/Keyring1`:
+Apps can keep tokens that only they can read back, on `com.lantharos.Keyring1.AppSecrets` at `/com/lantharos/Keyring1`. Secrets travel through file descriptors, never over the bus.
 
 | Method | Does |
 | --- | --- |
-| `Store(s name, h secret)` | Reads up to 1 MiB from the file descriptor and keeps it under the name |
+| `Store(s name, h secret)` | Keeps up to 1 MiB read from the file descriptor |
 | `Load(s name, h output) → b` | Writes the secret to the file descriptor; false when there is none |
 | `Delete(s name) → b` | Removes it |
-| `List() → as` | The names the app has kept |
-
-Secrets travel through file descriptors so they never appear on the bus. They are filed under the caller's identity and no other app can see them, not even with your permission: a different app is simply told there is nothing there. They're encrypted with everything else, so the security chip protects them whenever it protects the keyring.
+| `List() → as` | Names the app has kept |
 
 Luft apps use them through `luft-app`:
 
@@ -111,49 +76,30 @@ secrets::store("account-token", token.as_bytes())?;
 let token = secrets::load("account-token")?;
 ```
 
-`secrets::register(window)` also gives the app's page `secrets_store`, `secrets_load` and `secrets_delete` bridge commands for text secrets.
+`secrets::register(window)` adds `secrets_store`, `secrets_load` and `secrets_delete` commands for the app's page.
 
 ## SSH agent
 
-The keyring is an SSH agent on `$XDG_RUNTIME_DIR/luft-keyring/ssh`, and Kestrel points `SSH_AUTH_SOCK` there. Keys added with `ssh-add` are kept in the vault and are there again after you sign in; `ssh-add -c` makes a key ask before each use. Settings can make Ed25519 keys, or ECDSA keys that live inside the security chip and can never be copied off it. A key that asks first shows a Kestrel prompt naming the app, "Allow ssh in Tern to use your SSH key “Laptop”?", and when you have a fingerprint enrolled, touching the reader is the answer. Ed25519 and ECDSA P-256 keys are supported; time-limited keys (`ssh-add -t`) are refused.
+- Keys added with `ssh-add` are kept in the vault. `ssh-add -c` asks before each use; a fingerprint touch can answer.
+- Settings creates Ed25519 keys, or ECDSA P-256 keys that live in the TPM and can't be copied.
+- Time-limited keys (`ssh-add -t`) are refused.
 
 ## GnuPG
 
-`luft-pinentry` is GnuPG's pinentry for Kestrel: gpg-agent starts it whenever it needs a passphrase or a smart card PIN, and it asks through the same Kestrel prompts as the keyring, with GnuPG's own description of the key, a second field when a new passphrase is chosen, GnuPG's rating of a new passphrase as it's typed, and confirmations and messages. Save in your keyring keeps the passphrase in the keyring under the `org.gnupg.Passphrase` schema and the key's keygrip, the way GnuPG's other pinentries do, so the next time the key is used nothing is asked. A wrong saved passphrase is only tried once: GnuPG then asks, and saving the new one replaces it. Outside a Kestrel session, for example on a text console or in another desktop, it hands over to the system's `pinentry`.
+`luft-pinentry` asks for GnuPG passphrases and smart card PINs through Kestrel's prompts. Save in your keyring stores the passphrase under the `org.gnupg.Passphrase` schema. Outside Kestrel it hands over to the system `pinentry`.
 
-`kestrel/tools/install.sh install` installs it as `/opt/kestrel/libexec/luft-pinentry` and, when the computer has no `/etc/gnupg/gpg-agent.conf` yet, creates one that points gpg-agent at it for every account. When that file already exists it's left alone and the installer says which line to add. A `pinentry-program` line in your own `~/.gnupg/gpg-agent.conf` still wins; remove it, then run `gpgconf --reload gpg-agent`, to use Kestrel's prompts.
-
-## Building on the keyring
-
-The vault crate holds the file format and the data every part of the keyring shares, in `Contents`: Secret Service collections and items, app access rules, apps' own secrets, SSH keys and preferences. A new kind of data gets its own place there and its own module and D-Bus interface in the daemon, next to `ssh` and `manage`. Passkeys work this way: they live in a collection only Luft Passkeys may use, with the `passkeys` module answering it. The daemon offers what such a module needs:
-
-- `Daemon::ensure_unlocked` unlocks the keyring, prompting when needed.
-- `Keyring::edit` changes the contents and saves the vault, and `Keyring::record` adds to the access history.
-- `identity` tells which app is asking.
-- `prompter` shows Kestrel's prompts, and `unlocking::authenticate` asks for a fingerprint through the lock screen's sign-in rules, so the check is made by root, not by the keyring.
-- `unlocking::link` creates and uses keys that live in the security chip.
-
-## Installing
-
-`kestrel/tools/install.sh install` builds the keyring with Kestrel (it needs `tpm2-tss-devel` to build), makes it your keyring and installs:
-
-- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`
-- `/etc/gnupg/gpg-agent.conf`, pointing gpg-agent at `luft-pinentry`, unless the file already exists
-- `pam_luft_keyring.so` in `/usr/local/lib64/security`
-- the unlock service's socket and unit in `/usr/local/lib/systemd/system`, and starts it
-- the keyring's user units, its D-Bus activation files and its portal under `/usr/local`, with the units turned on for every user
-- the lock screen's `kestrel-unlock` and `kestrel-unlock-fingerprint` sign-in rules in `/etc/pam.d`
-- the login screen's `greetd` sign-in rules in `/etc/pam.d/greetd`, which take the place of the packaged ones in `/usr/lib/pam.d/greetd`
-- a small SELinux module that lets the login screen reach the unlock service's socket and nothing more
-
-It also turns on fingerprint sign-in through `authselect enable-feature with-fingerprint`, which makes `sudo`, polkit and the login screen offer a fingerprint whenever one is enrolled; the password always stays available.
-
-Sign out and sign in with your password once; that sets up the keyring and seals it to the security chip. From then on a fingerprint unlocks everything.
-
-`kestrel/tools/install.sh remove` takes all of it out again except `/etc/pam.d/greetd`, which skips the keyring's line once its module is gone. Your keyring stays in `~/.local/share/luft-keyring`.
+A `pinentry-program` line in `~/.gnupg/gpg-agent.conf` overrides it; remove the line and run `gpgconf --reload gpg-agent`.
 
 ## Testing
 
-- `cargo test` covers the vault format and, against a throwaway `swtpm`, sealing, PIN lockout, Secure Boot changes and chip-held signing keys.
-- `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` runs the keyring on a private session bus with a scratch home and a stand-in for Kestrel's prompts. It runs in its own user and mount namespace where `/run` holds nothing but your runtime folder, so the keyring under test never reaches the computer's unlock service, sign-in checks or fingerprint reader. It sets up a new keyring the way a first sign-in does, stores items from `secret-tool` and other programs, then checks per-app access, locking, apps' own secrets, the portal and the SSH agent with `ssh-add` and `ssh-keygen -Y sign`, and that apps keep their items when they update, move or run as AppImages. Apps started from a launcher entry run in scopes of your user manager through `systemd-run --user`.
-- `tools/vm/build.sh` builds a small Fedora machine with the keyring, the lock screen's authentication service and a stand-in fingerprint reader. `tools/vm/run.sh tpm` then signs in through greetd with a password and with a fingerprint against a software TPM, unlocks through the lock screen's socket, uses `sudo`, changes the Secure Boot state, and sets and uses a PIN. `run.sh gone` boots the same disk without the chip and `run.sh none` starts fresh without one. SELinux is enforcing throughout and every denial fails the run.
+Run from `kestrel/keyring`:
+
+| Command | Covers |
+| --- | --- |
+| `cargo test` | Vault format, and TPM sealing, PIN lockout and chip-held keys against `swtpm` |
+| `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` | The daemon on a private bus with a scratch home: items, app access, portal, SSH agent |
+| `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in, lock screen, `sudo`, Secure Boot changes and PINs in a Fedora VM with SELinux enforcing, with a software TPM, after the TPM is removed, and without one |
+
+## Adding data to the keyring
+
+New kinds of data get their own place in the vault's `Contents` and their own module and D-Bus interface in the daemon, next to `ssh` and `manage`, as [Luft Passkeys](../passkeys/README.md) does. Modules use `Daemon::ensure_unlocked`, `Keyring::edit` and `Keyring::record`, `identity`, `prompter`, and `unlocking::authenticate` and `unlocking::link`.

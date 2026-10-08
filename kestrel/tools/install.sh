@@ -126,18 +126,14 @@ prune_stale_files() {
 
 case "$action" in
   install)
-    rm -rf "$build"
-    mkdir -p "$build"
-    python3 "$root/kestrel/compositor/patches.py" prepare
-    meson setup "$build/compositor" "$root/kestrel/run/mutter-source" \
-      --prefix="$prefix" --libdir=lib --buildtype=release \
-      -Dudev_dir="$prefix/lib/udev" -Dtests=disabled \
-      -Dcogl_tests=false -Dclutter_tests=false -Dmutter_tests=false -Dinstalled_tests=false
-    meson compile -C "$build/compositor"
-    as_owner "$prefix" meson install -C "$build/compositor" --no-rebuild
+    "$root/kestrel/compositor/build.sh" "$build/compositor" "$prefix"
 
     (cd "$root/kestrel/ui" && bun install --frozen-lockfile)
-    meson setup "$build/engine" "$root/kestrel/engine" \
+    engine_setup=()
+    if [[ -f "$build/engine/build.ninja" ]]; then
+      engine_setup+=(--reconfigure)
+    fi
+    meson setup "${engine_setup[@]}" "$build/engine" "$root/kestrel/engine" \
       -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
     meson compile -C "$build/engine"
     as_owner "$prefix" rm -rf "$prefix/lib/systemd/user"

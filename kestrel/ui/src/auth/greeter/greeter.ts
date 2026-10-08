@@ -20,7 +20,7 @@ import { loadKestrelStylesheets } from '../../shared/stylesheet.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';
 import { readConfig } from './config.js';
-import { GreeterControls } from './controls.js';
+import { GreeterControls } from './controls/controls.js';
 import { GreeterLayout } from './layout.js';
 import { availableSessions, sessionCommand, type Session } from './sessions.js';
 import { UserList } from './userList.js';

@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GLibUnix from 'gi://GLibUnix';
 
-import { SessionManager } from './sessionManager.js';
+import { SessionManager } from './manager/sessionManager.js';
 
 const SIGTERM = 15;
 const SIGINT = 2;

@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { CaretBlink } from '../../../shared/caret.js';
+import { CaretBlink } from '../../../shared/input/caret.js';
 
 export class SearchField {
   private readonly entry = new St.Entry({

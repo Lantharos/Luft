@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import { WorkspaceSwitcherPopup } from 'resource:///com/lantharos/kestrel/ui/workspaceSwitcherPopup.js';
 
-import { ScrollSteps } from '../../shared/scrollSteps.js';
+import { ScrollSteps } from '../../shared/input/scrollSteps.js';
 
 export class Workspaces {
   private popup: WorkspaceSwitcherPopup | null = null;

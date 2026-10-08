@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
+import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
 
 const LARGER_TEXT = 1.25;
 

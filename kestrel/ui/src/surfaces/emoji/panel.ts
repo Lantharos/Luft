@@ -6,7 +6,7 @@ import St from 'gi://St';
 import { blurSurface } from '../../shared/surface.js';
 import { animateActor } from '../../shared/motion.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
-import type { TextInput } from '../../shared/textInput.js';
+import type { TextInput } from '../../shared/input/textInput.js';
 import { annotate } from './catalog/annotations.js';
 import { Catalog, describe, withTone } from './catalog/catalog.js';
 import { SearchIndex } from './catalog/search.js';

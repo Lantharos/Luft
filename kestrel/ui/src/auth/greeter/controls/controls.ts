@@ -1,12 +1,12 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { InputSourceIndicator } from '../../system/inputSources/indicator.js';
-import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
-import { ControlRow } from '../../desktop/menus/controlRow.js';
+import { InputSourceIndicator } from '../../../system/inputSources/indicator.js';
+import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
+import { ControlRow } from '../../../desktop/menus/controlRow.js';
 import { Accessibility } from './accessibility.js';
 import { PowerActions } from './power.js';
-import type { Session } from './sessions.js';
+import type { Session } from '../sessions.js';
 
 export class GreeterControls {
   private readonly row: ControlRow;

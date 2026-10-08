@@ -1,6 +1,6 @@
 import type Clutter from 'gi://Clutter';
 
-import type { Box } from './placement.js';
+import type { Box } from '../placement.js';
 
 export interface TextInput {
   readonly caret: Box | null;

@@ -4,7 +4,7 @@ import Gio from 'gi://Gio';
 import type Shell from 'gi://Shell';
 
 import { animateActor } from '../shared/motion.js';
-import { BUS_NAME, FAREWELL_DURATION, MANAGER_PATH } from './interfaces.js';
+import { BUS_NAME, FAREWELL_DURATION, MANAGER_PATH } from './manager/interfaces.js';
 
 function shell(): Shell.Global {
   return global as unknown as Shell.Global;

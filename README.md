@@ -1,6 +1,6 @@
 # Luft
 
-Luft is a desktop for Fedora. It brings its own shell and login screen (Kestrel), its own apps, a keyring with passkeys, and a boot chain from a flicker-free splash to TPM disk unlock (Sushi, SushiBoot and trustd). Everything installs next to GNOME, so you can switch back at the login screen.
+Luft is an operating system built on Fedora. It has its own shell and login screen (Kestrel), its own apps, a keyring with passkeys, and its own boot chain, from a flicker-free splash to TPM disk unlock (Sushi, SushiBoot and trustd).
 
 <p>
   <img src="docs/screenshots/start.png" alt="Start menu" width="49%">

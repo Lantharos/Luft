@@ -50,7 +50,7 @@ export function byOpening(a: Meta.Window, b: Meta.Window): number {
 export function appWindowAfter(app: Shell.App, workspace: Meta.Workspace, entered: Meta.Window | null): Meta.Window | null {
   const tracker = Shell.WindowTracker.get_default();
   const windows = shell().display.get_tab_list(Meta.TabList.NORMAL, workspace)
-    .filter(window => isBoardWindow(window) && tracker.get_window_app(window) === app);
+    .filter(window => isBoardWindow(window) && tracker.get_window_app(window)?.get_id() === app.get_id());
   if (!entered || !windows.includes(entered)) return windows[0] ?? null;
   windows.sort(byOpening);
   return windows[(windows.indexOf(entered) + 1) % windows.length]!;

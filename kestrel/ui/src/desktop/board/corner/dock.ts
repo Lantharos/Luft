@@ -21,7 +21,7 @@ export class Dock {
     child: new St.Icon({ icon_name: 'view-grid-symbolic', style_class: 'kestrel-board-pill-icon' }),
   });
   private readonly apps = new St.BoxLayout({ style_class: 'kestrel-board-dock-apps' });
-  private readonly buttons = new Map<Shell.App, St.Button>();
+  private readonly buttons = new Map<string, St.Button>();
   private readonly tracker = Shell.WindowTracker.get_default();
 
   constructor(private readonly actions: DockActions) {
@@ -32,17 +32,18 @@ export class Dock {
   }
 
   show(windows: readonly Meta.Window[], entered: Meta.Window | null): void {
-    const apps = [...new Set(windows.map(window => this.tracker.get_window_app(window)).filter(app => !!app))];
-    const current = entered ? this.tracker.get_window_app(entered) : null;
-    for (const [app, button] of this.buttons) {
-      if (apps.includes(app)) continue;
+    const apps = [...new Map(windows.map(window => this.tracker.get_window_app(window)).filter(app => !!app).map(app => [app.get_id(), app])).values()];
+    const ids = apps.map(app => app.get_id());
+    const current = entered ? this.tracker.get_window_app(entered)?.get_id() : null;
+    for (const [id, button] of this.buttons) {
+      if (ids.includes(id)) continue;
       button.destroy();
-      this.buttons.delete(app);
+      this.buttons.delete(id);
     }
     apps.forEach((app, index) => {
-      const button = this.buttons.get(app) ?? this.button(app);
+      const button = this.buttons.get(ids[index]!) ?? this.button(app);
       if (this.apps.get_child_at_index(index) !== button) this.apps.set_child_at_index(button, index);
-      button.checked = app === current;
+      button.checked = ids[index] === current;
     });
     this.apps.visible = apps.length > 0;
   }
@@ -56,7 +57,7 @@ export class Dock {
     });
     button.connect('clicked', () => this.actions.enterApp(app));
     this.apps.add_child(button);
-    this.buttons.set(app, button);
+    this.buttons.set(app.get_id(), button);
     return button;
   }
 }

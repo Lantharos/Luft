@@ -1,3 +1,5 @@
+# shellcheck shell=bash disable=SC2154
+
 watchdog_root="$root/kestrel/watchdog"
 
 watchdog_files() {

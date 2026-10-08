@@ -10,8 +10,17 @@ bus = Gio.bus_get_sync(Gio.BusType.SESSION)
 
 def call(method, signature, arguments, reply):
     try:
-        return bus.call_sync("com.lantharos.Keyring1", "/com/lantharos/Keyring1", "com.lantharos.Keyring1.Ssh", method,
-                             GLib.Variant(signature, arguments), GLib.VariantType(reply), Gio.DBusCallFlags.NONE, 60000, None).unpack()
+        return bus.call_sync(
+            "com.lantharos.Keyring1",
+            "/com/lantharos/Keyring1",
+            "com.lantharos.Keyring1.Ssh",
+            method,
+            GLib.Variant(signature, arguments),
+            GLib.VariantType(reply),
+            Gio.DBusCallFlags.NONE,
+            60000,
+            None,
+        ).unpack()
     except GLib.Error as error:
         return (Gio.DBusError.get_remote_error(error),)
 

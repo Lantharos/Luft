@@ -11,8 +11,16 @@ from PIL import Image
 
 SUSHI = Path(__file__).resolve().parents[4] / "boot/sushi"
 KEYS = {
-    " ": "spc", "-": "minus", "=": "equal", ".": "dot", ",": "comma", "/": "slash", ";": "semicolon",
-    "'": "apostrophe", "\n": "ret", "\t": "tab",
+    " ": "spc",
+    "-": "minus",
+    "=": "equal",
+    ".": "dot",
+    ",": "comma",
+    "/": "slash",
+    ";": "semicolon",
+    "'": "apostrophe",
+    "\n": "ret",
+    "\t": "tab",
 }
 MARK = "__done__"
 NOISE = re.compile(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]|\r")
@@ -23,7 +31,6 @@ class Machine:
         self.folder = folder
         self.heard = ""
         self.lock = threading.Lock()
-        self.log = open(folder / "serial.log", "wb")
         environment = dict(os.environ, HEADLESS="1", SUSHI_VM=str(folder))
         environment.pop("TPM", None)
         if tpm:
@@ -58,11 +65,12 @@ class Machine:
         return self.reply()
 
     def pump(self):
-        while chunk := self.serial.recv(4096):
-            self.log.write(chunk)
-            self.log.flush()
-            with self.lock:
-                self.heard += chunk.decode(errors="replace")
+        with open(self.folder / "serial.log", "wb") as log:
+            while chunk := self.serial.recv(4096):
+                log.write(chunk)
+                log.flush()
+                with self.lock:
+                    self.heard += chunk.decode(errors="replace")
 
     def wait_for(self, pattern: str, seconds: float) -> str:
         deadline = time.monotonic() + seconds
@@ -71,7 +79,7 @@ class Machine:
                 match = re.search(pattern, self.heard)
                 if match:
                     found = self.heard[: match.end()]
-                    self.heard = self.heard[match.end():]
+                    self.heard = self.heard[match.end() :]
                     return found
             time.sleep(0.1)
         raise TimeoutError(f"never saw {pattern!r}")

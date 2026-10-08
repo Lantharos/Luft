@@ -40,8 +40,9 @@ def call(connection, sender, path, interface, method, parameters, invocation):
     elif method == "VerifyStart":
         verifying["sender"] = sender
         invocation.return_value(None)
-        connection.emit_signal(sender, DEVICE_PATH, "net.reactivated.Fprint.Device", "VerifyFingerSelected",
-                               GLib.Variant("(s)", ("any",)))
+        connection.emit_signal(
+            sender, DEVICE_PATH, "net.reactivated.Fprint.Device", "VerifyFingerSelected", GLib.Variant("(s)", ("any",))
+        )
     else:
         if method in ("VerifyStop", "Release"):
             verifying["sender"] = None
@@ -65,8 +66,13 @@ def poll(connection):
     if TOUCH.exists() and verifying["sender"]:
         result = TOUCH.read_text().strip() or "verify-match"
         TOUCH.unlink()
-        connection.emit_signal(verifying["sender"], DEVICE_PATH, "net.reactivated.Fprint.Device", "VerifyStatus",
-                               GLib.Variant("(sb)", (result, True)))
+        connection.emit_signal(
+            verifying["sender"],
+            DEVICE_PATH,
+            "net.reactivated.Fprint.Device",
+            "VerifyStatus",
+            GLib.Variant("(sb)", (result, True)),
+        )
     return True
 
 

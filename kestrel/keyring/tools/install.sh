@@ -1,3 +1,5 @@
+# shellcheck shell=bash disable=SC2154
+
 keyring_root="$root/kestrel/keyring"
 keyring_data="$keyring_root/data"
 keyring_pam=/usr/local/lib64/security

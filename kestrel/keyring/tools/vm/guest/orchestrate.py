@@ -30,14 +30,17 @@ def greetd_socket():
     for _ in range(120):
         for environ in glob.glob("/proc/[0-9]*/environ"):
             try:
-                variables = open(environ, "rb").read().split(b"\0")
+                with open(environ, "rb") as file:
+                    variables = file.read().split(b"\0")
             except OSError:
                 continue
             for variable in variables:
                 if variable.startswith(b"GREETD_SOCK="):
                     return variable.split(b"=", 1)[1].decode()
         time.sleep(1)
-    status = subprocess.run(["journalctl", "-b", "-u", "greetd", "--no-pager", "-n", "30"], capture_output=True, text=True).stdout
+    status = subprocess.run(
+        ["journalctl", "-b", "-u", "greetd", "--no-pager", "-n", "30"], capture_output=True, text=True, check=False
+    ).stdout
     raise RuntimeError("greetd never started its greeter\n" + status)
 
 
@@ -78,32 +81,47 @@ def login(method, scenario):
         check(False, f"{scenario}: the session reported back")
         return
     time.sleep(1)
-    for label, passed in json.load(open(result_path)):
+    with open(result_path) as result:
+        outcome = json.load(result)
+    for label, passed in outcome:
         check(passed, f"{scenario}: {label}")
     time.sleep(3)
 
 
 def extend_secure_boot_state():
-    subprocess.run(["tpm2_pcrextend", "7:sha256=" + "01" * 32], check=True, env=dict(os.environ, TPM2TOOLS_TCTI="device:/dev/tpmrm0"))
+    subprocess.run(
+        ["tpm2_pcrextend", "7:sha256=" + "01" * 32],
+        check=True,
+        env=dict(os.environ, TPM2TOOLS_TCTI="device:/dev/tpmrm0"),
+    )
 
 
 def denials():
-    log = subprocess.run(["journalctl", "-k", "-b", "--no-pager"], capture_output=True, text=True).stdout
+    log = subprocess.run(["journalctl", "-k", "-b", "--no-pager"], capture_output=True, text=True, check=False).stdout
     return [line for line in log.splitlines() if "avc:" in line and "denied" in line]
 
 
 def diagnose():
     for prompts in sorted(glob.glob(os.path.join(person.pw_dir, "prompts-*.log"))):
-        for line in open(prompts).read().splitlines()[-6:]:
+        with open(prompts) as log:
+            lines = log.read().splitlines()
+        for line in lines[-6:]:
             report(f"prompt {os.path.basename(prompts)}: {line[:300]}")
     for selector in (["-u", "luft-keyring-unlock"], ["_SYSTEMD_USER_UNIT=luft-keyring.service"], ["-u", "greetd"]):
-        log = subprocess.run(["journalctl", "-b", "--no-pager", "-o", "cat", "-n", "25", *selector], capture_output=True, text=True).stdout
+        log = subprocess.run(
+            ["journalctl", "-b", "--no-pager", "-o", "cat", "-n", "25", *selector],
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout
         for line in log.splitlines():
             report(f"log {selector[-1]}: {line}")
 
 
 def main():
-    mode = next((word.split("=", 1)[1] for word in open("/proc/cmdline").read().split() if word.startswith("keyring.test=")), "tpm")
+    with open("/proc/cmdline") as cmdline:
+        words = cmdline.read().split()
+    mode = next((word.split("=", 1)[1] for word in words if word.startswith("keyring.test=")), "tpm")
     os.makedirs("/run/keyring-test", exist_ok=True)
     os.makedirs(STATE, exist_ok=True)
     with open("/run/keyring-test/finger", "w") as finger:
@@ -114,7 +132,10 @@ def main():
     report(f"LUFT-KEYRING-VM START {mode}")
     if mode == "tpm":
         login("password", "first sign-in")
-        check(os.path.exists(f"/var/lib/luft-keyring/{person.pw_uid}.seal"), "the security chip holds a seal for the person")
+        check(
+            os.path.exists(f"/var/lib/luft-keyring/{person.pw_uid}.seal"),
+            "the security chip holds a seal for the person",
+        )
         login("fingerprint", "fingerprint sign-in")
         extend_secure_boot_state()
         login("fingerprint", "startup changed")
@@ -135,12 +156,12 @@ def main():
     check(not found, "SELinux denied nothing")
     mock.terminate()
     report(f"LUFT-KEYRING-VM DONE passed={tally['passed']} failed={tally['failed']}")
-    subprocess.run(["systemctl", "poweroff"])
+    subprocess.run(["systemctl", "poweroff"], check=False)
 
 
 try:
     main()
-except Exception as error:
+except Exception as error:  # noqa: BLE001
     report(f"FAILED: the test stopped: {error}")
     report(f"LUFT-KEYRING-VM DONE passed={tally['passed']} failed={tally['failed'] + 1}")
-    subprocess.run(["systemctl", "poweroff"])
+    subprocess.run(["systemctl", "poweroff"], check=False)

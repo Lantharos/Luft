@@ -59,7 +59,9 @@ def call(connection, sender, path, interface, method, parameters, invocation):
         log("access", handle, request)
         allowed = script().get("access", "allow") == "allow"
         remember = script().get("remember", True)
-        invocation.return_value(GLib.Variant("(ua{sv})", (0 if allowed else 1, {"remember": GLib.Variant("b", remember)})))
+        invocation.return_value(
+            GLib.Variant("(ua{sv})", (0 if allowed else 1, {"remember": GLib.Variant("b", remember)}))
+        )
     elif method == "Password":
         handle, request, _ = parameters.unpack()
         log("password", handle, request)

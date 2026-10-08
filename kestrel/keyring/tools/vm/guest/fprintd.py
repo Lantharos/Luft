@@ -28,9 +28,13 @@ XML = """
   </interface>
 </node>
 """
-PROPERTIES = {"name": GLib.Variant("s", "Test reader"), "num-enroll-stages": GLib.Variant("i", 5),
-              "scan-type": GLib.Variant("s", "press"), "finger-present": GLib.Variant("b", False),
-              "finger-needed": GLib.Variant("b", False)}
+PROPERTIES = {
+    "name": GLib.Variant("s", "Test reader"),
+    "num-enroll-stages": GLib.Variant("i", 5),
+    "scan-type": GLib.Variant("s", "press"),
+    "finger-present": GLib.Variant("b", False),
+    "finger-needed": GLib.Variant("b", False),
+}
 
 
 def finger():
@@ -54,10 +58,16 @@ def call(connection, sender, path, interface, method, parameters, invocation):
     elif method == "VerifyStart":
         invocation.return_value(None)
         result = "verify-match" if finger() == "match" else "verify-no-match"
+
         def report():
-            connection.emit_signal(sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyFingerSelected", GLib.Variant("(s)", ("any",)))
-            connection.emit_signal(sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", GLib.Variant("(sb)", (result, True)))
+            connection.emit_signal(
+                sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyFingerSelected", GLib.Variant("(s)", ("any",))
+            )
+            connection.emit_signal(
+                sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", GLib.Variant("(sb)", (result, True))
+            )
             return False
+
         GLib.timeout_add(300, report)
     else:
         invocation.return_value(None)

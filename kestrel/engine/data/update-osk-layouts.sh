@@ -1,47 +1,34 @@
-#!/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-CLDR_LAYOUTS_TARBALL="http://www.unicode.org/Public/cldr/latest/keyboards.zip"
+cldr_layouts=http://www.unicode.org/Public/cldr/latest/keyboards.zip
+workdir=.osk-layout-workbench
+layouts=osk-layouts
+gresource=kestrel-osk-layouts.gresource.xml
+pending=".$gresource.tmp"
 
-WORKDIR=".osk-layout-workbench"
-CLDR2JSON="cldr2json/cldr2json.py"
-SRCDIR="$WORKDIR/keyboards/android"
-DESTDIR="osk-layouts"
-GRESOURCE_FILE="kestrel-osk-layouts.gresource.xml"
-TMP_GRESOURCE_FILE=".$GRESOURCE_FILE.tmp"
+cd "$(dirname "$0")"
 
-cd `dirname $0`
+rm -rf "$workdir"
+mkdir -p "$workdir" "$layouts"
+(cd "$workdir" && gio copy "$cldr_layouts" . && unzip keyboards.zip)
 
-# Ensure work/dest dirs
-rm -rf $WORKDIR
-mkdir -p $WORKDIR
-mkdir -p "osk-layouts"
+cldr2json/cldr2json.py "$workdir/keyboards/android" "$layouts"
 
-# Download stuff on the work dir
-pushd $WORKDIR
-gio copy $CLDR_LAYOUTS_TARBALL .
-unzip keyboards.zip
-popd
-
-# Transform to JSON files
-$CLDR2JSON $SRCDIR $DESTDIR
-
-# Generate new gresources xml file
-cat >$TMP_GRESOURCE_FILE <<EOF
+{
+  cat <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/com/lantharos/kestrel/osk-layouts">
 EOF
-
-for f in $DESTDIR/*.json
-do
-  echo "    <file>$(basename $f)</file>" >>$TMP_GRESOURCE_FILE
-done
-
-cat >>$TMP_GRESOURCE_FILE <<EOF
+  for layout in "$layouts"/*.json; do
+    echo "    <file>$(basename "$layout")</file>"
+  done
+  cat <<'EOF'
     <file>emoji.json</file>
   </gresource>
 </gresources>
 EOF
+} > "$pending"
 
-# Rewrite old gresources xml
-mv $TMP_GRESOURCE_FILE $GRESOURCE_FILE
+mv "$pending" "$gresource"

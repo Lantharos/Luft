@@ -25,4 +25,6 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
 
 
-ThreadingHTTPServer(("127.0.0.1", 8000), lambda *arguments: Handler(*arguments, directory=str(Path(__file__).parent))).serve_forever()
+ThreadingHTTPServer(
+    ("127.0.0.1", 8000), lambda *arguments: Handler(*arguments, directory=str(Path(__file__).parent))
+).serve_forever()

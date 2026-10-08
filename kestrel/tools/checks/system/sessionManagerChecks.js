@@ -6,6 +6,7 @@ const MANAGER = 'org.gnome.SessionManager';
 const MANAGER_PATH = '/org/gnome/SessionManager';
 const IDLE = 8;
 const IDLE_STATUS = 3;
+const CONFIRMATION_WAIT = 5_000_000;
 
 function call(path, iface, method, parameters, replyType) {
   return Gio.DBus.session.call(MANAGER, path, iface, method, parameters,
@@ -58,7 +59,8 @@ export async function checkSessionManager({pause, pointer}) {
   require(!await inhibited(), 'the screen saver request ends with the app');
 
   await call(MANAGER_PATH, MANAGER, 'Logout', new GLib.Variant('(u)', [0]), null);
-  await pause(600);
+  const asked = GLib.get_monotonic_time();
+  while (Main.modalCount === 0 && GLib.get_monotonic_time() - asked < CONFIRMATION_WAIT) await pause(50);
   require(Main.modalCount > 0, 'logging out asks for confirmation');
   await Gio.DBus.session.call(Gio.DBus.session.get_unique_name(), `${MANAGER_PATH}/EndSessionDialog`, `${MANAGER}.EndSessionDialog`, 'Close',
     null, null, Gio.DBusCallFlags.NONE, -1, null);

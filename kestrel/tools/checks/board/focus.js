@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {chord, click, type} from '../lib/input.js';
-import {waitForWindow} from '../lib/processes.js';
+import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {board, boardResting, boardWindows, leaveBoard, openBoardWindow, openWindows, showBoard, view, windowNamed} from './lib/board.js';
@@ -131,16 +131,16 @@ async function checkFollowing() {
   await eventually(() => chosen.get_frame_rect().x === rect.x - 400 && enteredFully(chosen), 'the view follows the entered window as it moves');
   await boardResting();
 
-  openBoardWindow('Extra', 480, 360);
+  const extra = openBoardWindow('Extra', 480, 360);
   const added = await waitForWindow(window => window.get_title()?.startsWith('Extra'), 'a window titled Extra opens');
   const beside = chosen.get_frame_rect();
   await eventually(() => {
     const placed = added.get_frame_rect();
     return placed.x >= beside.x + beside.width && placed.y < beside.y + beside.height && placed.y + placed.height > beside.y;
   }, 'a window opened while another is entered lands beside it');
+  await stop(extra);
+  await eventually(() => board().shown && !board().enteredWindow(), 'closing the entered window returns to the overview');
   chosen.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
-  await chord(Clutter.KEY_Super_L, Clutter.KEY_Escape);
-  await eventually(() => !board().enteredWindow(), 'Super+Escape steps out of the restored window');
 }
 
 export async function run() {

@@ -66,7 +66,7 @@ export class Collisions {
   private intendedY = 0;
   private snapping = false;
   private later = 0;
-  private signals: number[] = [];
+  private signals: [Meta.Window, number][] = [];
   private readonly displaySignals: number[];
 
   constructor(private readonly workspace: () => Meta.Workspace | null, private readonly scale: () => number) {
@@ -94,7 +94,12 @@ export class Collisions {
     this.boxes = this.start.map(box => ({ ...box }));
     this.boxes.push(this.movingBox);
     ({ x: this.intendedX, y: this.intendedY } = window.get_frame_rect());
-    this.signals = (['position-changed', 'size-changed'] as const).map(signal => window.connect(signal, () => this.queue()));
+    this.signals = [
+      [window, window.connect('position-changed', () => this.queue())],
+      [window, window.connect('size-changed', () => this.queue())],
+      [window, window.connect('unmanaging', () => this.abandon())],
+      ...this.others.map((other): [Meta.Window, number] => [other, other.connect('unmanaging', () => this.forget(other))]),
+    ];
   }
 
   moveBy(canvasDx: number, canvasDy: number): void {
@@ -106,18 +111,38 @@ export class Collisions {
 
   end(): void {
     if (!this.moving) return;
-    if (this.later) shell().compositor.get_laters().remove(this.later);
-    this.later = 0;
     this.resolve();
-    for (const id of this.signals) this.moving.disconnect(id);
-    this.signals = [];
-    this.moving = null;
-    this.others = [];
+    this.stop();
   }
 
   destroy(): void {
     this.end();
     for (const id of this.displaySignals) shell().display.disconnect(id);
+  }
+
+  private stop(): void {
+    if (this.later) shell().compositor.get_laters().remove(this.later);
+    this.later = 0;
+    for (const [window, id] of this.signals) window.disconnect(id);
+    this.signals = [];
+    this.moving = null;
+    this.others = [];
+  }
+
+  private abandon(): void {
+    this.others.forEach((window, index) => {
+      const { x, y } = this.start[index]!;
+      window.move_frame(false, Math.round(x), Math.round(y));
+    });
+    this.stop();
+  }
+
+  private forget(window: Meta.Window): void {
+    const index = this.others.indexOf(window);
+    this.others.splice(index, 1);
+    this.start.splice(index, 1);
+    this.boxes.splice(index, 1);
+    this.queue();
   }
 
   private grabBegan(window: Meta.Window, op: Meta.GrabOp): void {

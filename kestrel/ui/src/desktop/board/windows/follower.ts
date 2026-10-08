@@ -84,6 +84,7 @@ export class Follower {
     if (!window || !workspace || !isBoardWindow(window) || !window.located_on_workspace(workspace)) return;
     if (change === Meta.SizeChange.MAXIMIZE) {
       later(() => {
+        if (!window.located_on_workspace(workspace)) return;
         window.unmaximize();
         this.board.enterWindow(window);
       });

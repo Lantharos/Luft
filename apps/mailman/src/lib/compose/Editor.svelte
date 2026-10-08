@@ -105,20 +105,13 @@
 		updateEmpty();
 	}
 
-	async function stash(file: File) {
-		const bytes = new Uint8Array(await file.arrayBuffer());
-		let binary = '';
-		for (let index = 0; index < bytes.length; index += 0x8000) binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
-		return api.stashFile(file.name || 'image.png', btoa(binary));
-	}
-
 	async function paste(event: ClipboardEvent) {
 		const items = [...(event.clipboardData?.files ?? [])];
 		const images = items.filter((file) => file.type.startsWith('image/'));
 		event.preventDefault();
 		if (images.length) {
 			for (const image of images) {
-				const path = await stash(image).catch((error) => (toasts.fail(error), null));
+				const path = await api.stashFile(image, image.name || 'image.png').catch((error) => (toasts.fail(error), null));
 				if (path) insert(`<img src="${fileUrl(path)}" data-path="${escapeHtml(path)}" data-name="${escapeHtml(image.name || 'image.png')}" style="max-width:100%">`);
 			}
 			return;

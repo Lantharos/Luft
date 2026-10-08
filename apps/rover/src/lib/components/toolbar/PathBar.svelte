@@ -155,8 +155,6 @@
 				<button
 					class={['path-crumb', index === crumbs.length - 1 && 'is-current', drag.target?.key === segmentKey(crumb.path) && 'is-drop-target']}
 					type="button"
-					data-drop-path={accepts ? crumb.path : undefined}
-					data-drop-key={accepts ? segmentKey(crumb.path) : undefined}
 					ondragover={(event) => accepts && drag.overPath(event, crumb.path, segmentKey(crumb.path))}
 					ondragleave={drag.leave}
 					ondrop={(event) => accepts && drag.drop(event, crumb.path)}

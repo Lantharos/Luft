@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { appWindow, isAvailable } from '@lantharos/sabine';
+	import { activity, appWindow, isAvailable } from '@lantharos/sabine';
 	import { GlassShell, appearance } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
@@ -37,6 +37,12 @@
 		stops.push(appearance.start(state));
 		workspace.openTab(state.launch);
 	}
+
+	$effect(() => {
+		if (!isAvailable() || !workspace.busy) return;
+		const running = activity.begin({ name: 'Running commands' });
+		return () => void running.then((handle) => handle.end());
+	});
 
 	$effect(() => {
 		settings.options;

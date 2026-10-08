@@ -62,9 +62,7 @@
 			onauxclick: (event: MouseEvent) => openInTab(event, () => manager.openTab(path)),
 			ondragover: (event: DragEvent) => drag.overPath(event, path, key(path)),
 			ondragleave: drag.leave,
-			ondrop: (event: DragEvent) => drag.drop(event, path),
-			'data-drop-path': path,
-			'data-drop-key': key(path)
+			ondrop: (event: DragEvent) => drag.drop(event, path)
 		};
 	}
 </script>
@@ -102,8 +100,6 @@
 					ondragover={(event) => drag.overTrash(event, key(TRASH_DROP_PATH))}
 					ondragleave={drag.leave}
 					ondrop={(event) => drag.dropOnTrash(event)}
-					data-drop-key={key(TRASH_DROP_PATH)}
-					data-drop-trash=""
 				>
 					{#snippet trailing()}
 						{#if trash.count > 0}

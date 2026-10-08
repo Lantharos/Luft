@@ -1,7 +1,6 @@
-import { listen } from '@lantharos/sabine';
+import { events, listen, system } from '@lantharos/sabine';
 
 const PALETTE_CHANGED = 'kestrel.palette';
-const SCHEME_CHANGED = 'appearance.scheme';
 const TYPOGRAPHY_CHANGED = 'appearance.typography';
 const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
 const MONO = "'Maple Mono NF', ui-monospace, monospace";
@@ -48,9 +47,7 @@ export interface Typography {
 }
 
 export interface Appearance {
-	translucent: boolean;
 	palette: Palette | null;
-	scheme: Scheme;
 	typography: Typography;
 }
 
@@ -71,15 +68,15 @@ class AppearanceState {
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
 	start(initial: Appearance) {
-		this.translucent = initial.translucent;
-		this.scheme = initial.scheme;
+		this.translucent = true;
 		if (initial.palette) this.receive(initial.palette);
 		this.type(initial.typography);
 		const stops = [
 			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
-			listen<Scheme>(SCHEME_CHANGED, (scheme) => (this.scheme = scheme)),
+			events.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
 			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography))
 		];
+		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
 	}
 

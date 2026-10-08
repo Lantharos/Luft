@@ -135,8 +135,6 @@
 			ondragleave={drag.leave}
 			ondrop={(event) => rowDrop(event, bookmark)}
 			ondragend={finish}
-			data-drop-path={bookmark.is_dir ? bookmark.path : undefined}
-			data-drop-key={bookmark.is_dir ? key(bookmark.path) : undefined}
 		>
 			{#snippet trailing()}
 				<button

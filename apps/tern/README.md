@@ -13,6 +13,7 @@ Tern is the terminal for the Luft desktop, built with Sabine and Svelte. In the 
 - Programs can also read the clipboard once you allow it in Preferences; it stays off because programs on other computers can ask too
 - Pasting text with several lines, or text that looks risky, asks first and shows what is about to be pasted
 - Before closing a tab or pane with a program still running, Tern asks
+- Out of sight, an idle window rests and uses almost nothing, while windows running a command keep going
 - A bell shows as a soft flash instead of a sound
 - The desktop accent, light or dark style and a see-through, blurred background
 - The desktop's monospace font, Maple Mono with Nerd Font symbols unless you choose another one in Settings, with emoji and wide characters, at a size that follows the desktop's text size

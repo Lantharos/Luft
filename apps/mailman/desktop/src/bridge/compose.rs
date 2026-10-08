@@ -1,10 +1,7 @@
 use luft_app::Commands;
 use luft_app::portal::FileChooser;
-use sabine::SabineWindow;
+use sabine::{BridgeCommand, BridgeError, BridgeResponse, BridgeResult, SabineWindow};
 use serde::Serialize;
-
-use base64::Engine;
-use base64::engine::general_purpose::STANDARD;
 
 use super::params::*;
 use crate::services::compose;
@@ -52,15 +49,21 @@ fn describe_files(Paths { paths }: Paths) -> Result<Vec<Chosen>, String> {
         .collect())
 }
 
-fn stash(Stash { name, data }: Stash) -> Result<String, String> {
-    let bytes = STANDARD.decode(data).map_err(|error| error.to_string())?;
-    let folder = cache_folder().join("compose");
-    std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
+fn stash(command: BridgeCommand) -> BridgeResult {
+    let Stash { name } = serde_json::from_value(command.params)
+        .map_err(|error| BridgeError::new(error.to_string()))?;
+    let path = write_stash(&name, &command.body.unwrap_or_default()).map_err(BridgeError::new)?;
+    Ok(BridgeResponse::json(path.into()))
+}
+
+fn write_stash(name: &str, bytes: &[u8]) -> Result<String, String> {
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|elapsed| elapsed.as_nanos())
         .unwrap_or_default();
-    let path = folder.join(format!("{stamp}-{}", name.replace(['/', '\\'], "_")));
+    let folder = cache_folder().join("compose").join(stamp.to_string());
+    std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
+    let path = folder.join(name.replace(['/', '\\'], "_"));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
     Ok(path.to_string_lossy().into_owned())
 }
@@ -86,7 +89,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         })
         .command("choose_files", choose_files)
         .command("describe_files", describe_files)
-        .command("stash_file", stash)
+        .bridge_handler("stash_file", stash)
         .with("templates", state, |state, Empty {}| {
             state.store.templates()
         })

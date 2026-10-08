@@ -4,7 +4,7 @@ use sabine::{
 };
 use serde::Serialize;
 
-use crate::desktop::{self, scheme::Scheme, typography::Typography};
+use crate::desktop::{self, typography::Typography};
 use crate::events::Events;
 use crate::kestrel::{self, Palette};
 
@@ -75,18 +75,14 @@ impl GlassWindow<'_> {
 
 #[derive(Serialize)]
 pub struct Appearance {
-    translucent: bool,
     palette: Option<Palette>,
-    scheme: Scheme,
     typography: Typography,
 }
 
 impl Appearance {
     pub fn current() -> Self {
         Self {
-            translucent: std::env::var_os("WAYLAND_DISPLAY").is_some(),
             palette: kestrel::palette(),
-            scheme: Scheme::current(),
             typography: Typography::current(),
         }
     }

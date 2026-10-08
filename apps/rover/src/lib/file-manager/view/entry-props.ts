@@ -41,8 +41,6 @@ export function entryProps(entry: FileEntry, { manager, drag, view, chooser }: E
 		role: 'option',
 		'aria-selected': manager.selection.has(entry.path),
 		'data-entry-path': entry.path,
-		'data-drop-path': entry.is_dir ? entry.path : undefined,
-		'data-drop-key': key,
 		draggable: !chooser,
 		onclick: (event: MouseEvent) => select(entry, event),
 		ondblclick: () => (chooser ? chooser.open(entry) : manager.openEntry(entry)),

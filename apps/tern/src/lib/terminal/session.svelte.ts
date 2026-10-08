@@ -51,6 +51,7 @@ export class TerminalSession {
 	title = $state('');
 	cwd = $state<string | null>(null);
 	bells = $state(0);
+	busy = $state(true);
 	#fit = new FitAddon();
 	#integration: ShellIntegration;
 	#events: SessionEvents;
@@ -78,6 +79,8 @@ export class TerminalSession {
 		}
 		this.#integration = new ShellIntegration(this.terminal, {
 			cwd: (path) => (this.cwd = path),
+			prompted: () => (this.busy = false),
+			started: () => (this.busy = true),
 			finished: (command) => events.finished(this, command)
 		});
 		this.terminal.onTitleChange((title) => (this.title = title));

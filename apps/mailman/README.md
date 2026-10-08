@@ -25,7 +25,7 @@ Mailman is the mail app of the Luft desktop. It keeps every account in one fast 
 - Full-text search across every account, offline, with `from:`, `to:`, `subject:`, `is:unread`, `is:starred` and `has:attachment`
 - A composer with formatting that follows what you type: `**bold**`, `*italic*`, `` `code` ``, `- ` and `1. ` lists, `> ` quotes and `# ` headings, links pasted or typed, pictures pasted inline and files attached from a picker or dropped on the window. A From picker when you have more than one address, templates for messages you write often, drafts saved to the server, and suggestions from the people you write to
 - Quiet notifications for new mail from people you know, only while Mailman isn't in front, and clicking one opens the conversation
-- Opens `mailto:` links and `.eml` files. A message file opened on its own shows just that message
+- Opens `mailto:` links and `.eml` files, also dropped on the window. A message file opened on its own shows just that message
 
 ## Keyboard shortcuts
 

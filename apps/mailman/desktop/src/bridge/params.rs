@@ -144,5 +144,4 @@ pub struct Template {
 #[derive(Deserialize)]
 pub struct Stash {
     pub name: String,
-    pub data: String,
 }

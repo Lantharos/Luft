@@ -43,6 +43,7 @@ export class Workspace {
 	closeReview = $state<CloseReview | null>(null);
 	preferencesOpen = $state(false);
 	menu = $state<TerminalMenu | null>(null);
+	busy = $derived(this.tabs.some((tab) => tab.sessions.some((session) => session.busy)));
 
 	#events: SessionEvents = {
 		finished: (session, command) => this.#finished(session, command),

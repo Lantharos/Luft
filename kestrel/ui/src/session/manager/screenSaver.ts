@@ -8,7 +8,7 @@ const SCREEN_SAVER_XML = `<node><interface name="org.freedesktop.ScreenSaver">
   <method name="UnInhibit"><arg type="u" direction="in"/></method>
 </interface></node>`;
 
-export interface IdleRequests {
+interface IdleRequests {
   inhibit(sender: string, appId: string, reason: string): number;
   uninhibit(cookie: number): void;
 }

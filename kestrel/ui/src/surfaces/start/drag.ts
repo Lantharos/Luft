@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
-export interface DragItem { id: string; folder: boolean; }
+interface DragItem { id: string; folder: boolean; }
 type DelegateActor = Clutter.Actor & { _delegate?: object };
 
 export class GridDrag {

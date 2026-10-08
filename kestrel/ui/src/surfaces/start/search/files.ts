@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 const HISTORY_LIMIT = 300;
 
-export interface RecentFile {
+interface RecentFile {
   uri: string;
   name: string;
   folder: string;

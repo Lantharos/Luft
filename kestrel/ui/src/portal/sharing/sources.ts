@@ -26,7 +26,7 @@ export interface WindowSource {
   readonly app: Shell.App | null;
 }
 
-export interface VirtualSource {
+interface VirtualSource {
   readonly type: typeof VIRTUAL;
 }
 

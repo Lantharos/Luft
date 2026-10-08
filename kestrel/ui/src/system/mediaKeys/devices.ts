@@ -14,7 +14,7 @@ const DISPLAY_DEVICE = '/org/freedesktop/UPower/devices/DisplayDevice';
 const BATTERY_KINDS = new Set([2, 3]);
 const RADIO_KEY_INTERVAL_US = 1_000_000;
 
-export type KeyboardStep = 'StepUp' | 'StepDown' | 'Toggle';
+type KeyboardStep = 'StepUp' | 'StepDown' | 'Toggle';
 
 function icon(name: string): Gio.Icon {
   return Gio.ThemedIcon.new(name);

@@ -7,7 +7,7 @@ import St from 'gi://St';
 
 export const TRAY_ICON_SIZE = 16;
 
-export interface IconSource {
+interface IconSource {
   name: string;
   themePath: string;
   pixmaps: GLib.Variant | null;

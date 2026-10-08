@@ -15,7 +15,7 @@ const INPUT_ICONS = ['microphone-sensitivity-muted', 'microphone-sensitivity-low
 
 export type VolumeChange = 'mute' | 'down' | 'up';
 
-export interface VolumeOptions {
+interface VolumeOptions {
   output: boolean;
   quiet?: boolean;
   precise?: boolean;

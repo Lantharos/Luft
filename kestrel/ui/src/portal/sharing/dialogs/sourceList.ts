@@ -10,7 +10,7 @@ import { MONITOR, VIRTUAL, WINDOW, monitorSources, windowSources, type MonitorSo
 const THUMBNAIL_WIDTH = 64;
 const THUMBNAIL_HEIGHT = 40;
 
-export interface SourceList {
+interface SourceList {
   readonly actor: St.Widget;
   readonly selected: () => Source[];
 }

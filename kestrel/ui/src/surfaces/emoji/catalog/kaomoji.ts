@@ -1,4 +1,4 @@
-export type Named = readonly [text: string, name: string, keywords?: string];
+type Named = readonly [text: string, name: string, keywords?: string];
 
 export const KAOMOJI: readonly Named[] = [
   ['¯\\_(ツ)_/¯', 'shrug', 'whatever dunno'],

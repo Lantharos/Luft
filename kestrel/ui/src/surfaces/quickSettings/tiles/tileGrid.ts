@@ -17,7 +17,7 @@ function naturalHeight(tile: St.Widget, width: number): number {
   return theme.adjust_preferred_height(min, natural)[1];
 }
 
-export interface GridEvents {
+interface GridEvents {
   resized(): void;
   menuOpened(menu: ControlMenu): void;
   menuClosed(menu: ControlMenu): void;

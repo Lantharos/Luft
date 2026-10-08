@@ -14,7 +14,7 @@ export interface MutterObject {
   readonly iface: string;
 }
 
-export type SignalHandlers = Record<string, (parameters: GLib.Variant) => void>;
+type SignalHandlers = Record<string, (parameters: GLib.Variant) => void>;
 
 export function mutterObject(name: string, path: string, iface: string): MutterObject {
   return { name, path, iface };

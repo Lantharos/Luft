@@ -5,7 +5,7 @@ import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 
-export interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
+interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }
 type DelegateActor = St.Widget & { _delegate?: object };
 interface DragEvent { targetActor: St.Widget; }

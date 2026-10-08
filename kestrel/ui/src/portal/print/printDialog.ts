@@ -12,7 +12,7 @@ import { field, pick, segments, stepper, type Segment } from './controls.js';
 import { papers, sizeLabel } from './paper.js';
 import type { Printer } from './printers.js';
 
-export interface PrintDialogSpec {
+interface PrintDialogSpec {
   readonly title: string;
   readonly acceptLabel: string;
   readonly printers: Printer[];

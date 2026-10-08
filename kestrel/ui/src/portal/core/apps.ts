@@ -1,11 +1,11 @@
 import Shell from 'gi://Shell';
 
-export interface AppNames {
+interface AppNames {
   readonly subject: string;
   readonly object: string;
 }
 
-export function portalApp(appId: string): Shell.App | null {
+function portalApp(appId: string): Shell.App | null {
   return appId ? Shell.AppSystem.get_default().lookup_app(`${appId}.desktop`) : null;
 }
 

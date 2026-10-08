@@ -7,7 +7,7 @@ import { appNames } from '../../core/apps.js';
 import { rememberRow } from './choices.js';
 import { sourceList } from './sourceList.js';
 
-export interface SourceChoice {
+interface SourceChoice {
   readonly sources: Source[];
   readonly remember: boolean;
 }

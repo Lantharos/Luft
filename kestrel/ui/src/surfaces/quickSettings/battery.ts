@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 const BATTERY_TYPE = 2;
 const STATUSES: Record<number, BatteryStatus> = { 1: 'charging', 4: 'full', 5: 'plugged' };
 
-export type BatteryStatus = 'charging' | 'full' | 'plugged' | 'discharging';
+type BatteryStatus = 'charging' | 'full' | 'plugged' | 'discharging';
 
 export interface BatteryState {
   iconName: string;

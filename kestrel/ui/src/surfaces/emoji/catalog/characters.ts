@@ -30,12 +30,12 @@ export interface Character {
   readonly aliases: string[];
 }
 
-export interface CharacterSection {
+interface CharacterSection {
   readonly title: string;
   readonly characters: Character[];
 }
 
-export interface CharacterTab {
+interface CharacterTab {
   readonly id: string;
   readonly title: string;
   readonly glyph: string;

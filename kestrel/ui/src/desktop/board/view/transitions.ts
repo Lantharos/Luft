@@ -5,7 +5,7 @@ import { animateActor } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
 import type { View } from './geometry.js';
 
-export const TRANSITION_DURATION = 320;
+const TRANSITION_DURATION = 320;
 
 const IDENTITY: View = { x: 0, y: 0, scale: 1 };
 

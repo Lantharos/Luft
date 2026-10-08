@@ -4,7 +4,7 @@ import { ALLOWED, ALTERNATIVE, DENIED, DISMISSED } from './request.js';
 
 type Session = Pick<Context, 'sessionMode' | 'screenShield'>;
 
-export interface Call {
+interface Call {
   key: string;
   prompt: Prompt;
   answer(response: number, remember: boolean): void;

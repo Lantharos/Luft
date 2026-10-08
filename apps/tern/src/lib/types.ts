@@ -33,8 +33,3 @@ export interface Activation {
 	arguments: string[];
 	workingDirectory: string | null;
 }
-
-export interface NotificationActivation {
-	tab: string;
-	token: string | null;
-}

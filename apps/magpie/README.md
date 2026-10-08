@@ -15,6 +15,7 @@ Opening a file shows just that file, with the rest of its folder an arrow key aw
 - Fonts (TrueType, OpenType, collections, WOFF, WOFF2) with samples, a character grid, details, variable font axes and collection faces
 - Install fonts to `~/.local/share/fonts`, remove your own, or make one the system or monospace font
 - Opening another file switches to it; songs opened during playback join the queue
+- Drop files on the window to open them, and drag thumbnails out to put the files in other apps
 
 ## Build and run
 

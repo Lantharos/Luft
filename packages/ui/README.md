@@ -120,6 +120,9 @@ $effect(() => {
 | `tooltip(text)` | Attachment that shows a label under an element on hover |
 | `topLayer` | Attachment that puts an element in the browser's top layer |
 | `fileDrop(open)` | `ondragover` and `ondrop` handlers for `<svelte:window>` that pass dropped file paths to `open` |
+| `droppedPaths(dataTransfer)` | The paths of the files in a drop |
+| `dragFiles(dataTransfer, paths)` | Puts files in a drag, so other apps receive them as files |
+| `fileDragStart(path)` | A `dragstart` handler that drags the file at `path` |
 | `pathsFromUriList`, `fileUrlPath` | Paths from `text/uri-list` contents and `file://` URLs |
 | `basename`, `isInside` | A path's last part, and whether a path is inside a folder |
 | `bytes`, `memoryBytes` | Sizes in decimal and binary units |

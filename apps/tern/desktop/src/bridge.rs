@@ -7,7 +7,6 @@ use sabine::SabineWindow;
 use serde::Deserialize;
 
 use crate::desktop::links;
-use crate::desktop::notifications::Notification;
 use crate::launch::LaunchRequest;
 use crate::pty::Size;
 use crate::settings::{self, Settings};
@@ -122,7 +121,4 @@ fn register_app(window: SabineWindow, state: &TernState) -> SabineWindow {
             |state, SettingsUpdate { settings }| settings::update(settings, &state.settings),
         )
         .command("open_link", |Link { uri }| links::open(&uri))
-        .with("notify", state, |state, notification: Notification| {
-            state.notifications.show(notification)
-        })
 }

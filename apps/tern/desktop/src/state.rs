@@ -5,7 +5,6 @@ use luft_app::{Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
 
-use crate::desktop::notifications::Notifications;
 use crate::launch::LaunchRequest;
 use crate::pty::{Sessions, Size};
 use crate::settings::Settings;
@@ -16,7 +15,6 @@ pub struct TernState {
     pub events: Events,
     pub sessions: Sessions,
     pub settings: Arc<RwLock<Settings>>,
-    pub notifications: Notifications,
     pub glass: bool,
     launch: Arc<LaunchRequest>,
 }
@@ -41,7 +39,6 @@ impl TernState {
             events: Events::default(),
             sessions: Sessions::default(),
             settings: Arc::new(RwLock::new(settings)),
-            notifications: Notifications::default(),
             launch: Arc::new(LaunchRequest::current_process()),
         }
     }

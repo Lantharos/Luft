@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { dragFiles } from '@luft/ui';
 	import X from '@lucide/svelte/icons/x';
 	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
@@ -10,6 +11,11 @@
 
 	function scrollIntoView(node: HTMLElement, active: boolean) {
 		if (active) node.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+	}
+
+	function start(event: DragEvent, document: Document) {
+		dragged = document;
+		if (document.path && event.dataTransfer) dragFiles(event.dataTransfer, [document.path]);
 	}
 
 	function drop(target: Document) {
@@ -26,7 +32,7 @@
 			role="presentation"
 			draggable="true"
 			{@attach (node) => scrollIntoView(node, active)}
-			ondragstart={() => (dragged = document)}
+			ondragstart={(event) => start(event, document)}
 			ondragend={() => (dragged = null)}
 			ondragover={(event) => dragged && event.preventDefault()}
 			ondrop={() => drop(document)}

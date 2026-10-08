@@ -19,3 +19,7 @@ export function pathsFromUriList(list: string) {
 		.map(fileUrlPath)
 		.filter((path) => path !== null);
 }
+
+export function fileUri(path: string) {
+	return `file://${path.split('/').map(encodeURIComponent).join('/')}`;
+}

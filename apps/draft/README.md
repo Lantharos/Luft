@@ -13,6 +13,7 @@ Draft is the text and code editor for Luft, built with Sabine, Svelte and CodeMi
 - Restores the open folder, tabs, cursors and unsaved changes, including untitled documents, on the next start
 - Large files open quickly; files over 10 MB open as plain text until you pick a language
 - Command palette, fuzzy quick open, and a Markdown preview that follows the editor
+- Drop files on the window to open them, and drag tabs or files in the tree to other apps
 - Light and dark styles that follow the desktop, with syntax colors from the wallpaper and accent
 
 ## Build and run

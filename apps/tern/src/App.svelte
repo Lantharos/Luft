@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { activity, appWindow, isAvailable } from '@lantharos/sabine';
+	import { activity, isAvailable } from '@lantharos/sabine';
 	import { GlassShell, appearance } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
@@ -20,12 +20,7 @@
 	onMount(() => {
 		if (!isAvailable()) return;
 		const stops = [
-			api.events.activation(async (activation) => workspace.openTab(await api.resolveLaunch(activation))),
-			api.events.notification(({ tab, token }) => {
-				const target = workspace.tabs.find((candidate) => candidate.key === tab);
-				if (target) workspace.select(target);
-				appWindow.focus(token ?? undefined);
-			})
+			api.events.activation(async (activation) => workspace.openTab(await api.resolveLaunch(activation)))
 		];
 		void start(stops);
 		return () => stops.forEach((stop) => stop());

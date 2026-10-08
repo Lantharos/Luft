@@ -1,5 +1,4 @@
 import { appWindow, isAvailable } from '@lantharos/sabine';
-import { notify } from '#lib/api.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FinishedCommand } from '#lib/terminal/integration.js';
 import { pasteRisks } from '#lib/terminal/paste.js';
@@ -157,7 +156,11 @@ export class Workspace {
 		if (!tab || duration < LONG_COMMAND_MS || (tab === this.active && document.hasFocus())) return;
 		const took = describeDuration(duration);
 		const body = code === 0 ? `Finished in ${took}` : `Failed after ${took}`;
-		void notify(tab.key, command || tab.title, body);
+		const notification = new Notification(command || tab.title, { body, tag: tab.key });
+		notification.onclick = () => {
+			const target = this.tabs.find((candidate) => candidate.key === tab.key);
+			if (target) this.select(target);
+		};
 	}
 
 	configure() {

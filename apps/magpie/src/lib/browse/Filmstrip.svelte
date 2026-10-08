@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fileDragStart } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import type { Item } from '#lib/bridge/api.js';
 	import { library } from '#lib/library/library.svelte.js';
@@ -60,6 +61,8 @@
 					style:transform="translateX({PADDING + index * PITCH}px)"
 					aria-label={item.name}
 					title={item.name}
+					draggable="true"
+					ondragstart={fileDragStart(item.path)}
 					onclick={() => choose(item, index)}
 				>
 					{#if thumbnail}

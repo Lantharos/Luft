@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { VirtualScroller } from '@luft/ui';
+	import { fileDragStart, VirtualScroller } from '@luft/ui';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Folder from '@lucide/svelte/icons/folder';
 	import Music from '@lucide/svelte/icons/music';
@@ -27,13 +27,13 @@
 	<VirtualScroller class="soft-scroll min-h-0 flex-1" items={entries} {key} layout={LAYOUT}>
 		{#snippet children(entry)}
 			{#if entry.type === 'folder'}
-				<button type="button" class="entry" onclick={() => library.browse(entry.folder.path)}>
+				<button type="button" class="entry" draggable="true" ondragstart={fileDragStart(entry.folder.path)} onclick={() => library.browse(entry.folder.path)}>
 					<span class="cover folder"><Folder size={42} strokeWidth={1.5} /></span>
 					<span class="name">{entry.folder.name}</span>
 				</button>
 			{:else}
 				{@const thumbnail = thumbnails.source(entry.item)}
-				<button type="button" class="entry" onclick={() => library.select(entry.item)}>
+				<button type="button" class="entry" draggable="true" ondragstart={fileDragStart(entry.item.path)} onclick={() => library.select(entry.item)}>
 					<span class="cover">
 						{#if thumbnail}
 							<img src={thumbnail} alt="" draggable="false" decoding="async" />

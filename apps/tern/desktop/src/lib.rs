@@ -16,12 +16,7 @@ const WINDOW_RADIUS: i32 = 16;
 
 pub fn run_app() -> ! {
     let state = TernState::new();
-    let notifications = state.notifications.clone();
-    luft_app::run(
-        &state.events,
-        |window| build_window(window, &state),
-        move |events| notifications.watch(events),
-    )
+    luft_app::run(&state.events, |window| build_window(window, &state), |_| {})
 }
 
 fn build_window(window: SabineWindow, state: &TernState) -> SabineWindow {

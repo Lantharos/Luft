@@ -3,7 +3,7 @@
 	import ChevronsDownUp from '@lucide/svelte/icons/chevrons-down-up';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
-	import { basename, tooltip, VirtualScroller } from '@luft/ui';
+	import { basename, fileDragStart, tooltip, VirtualScroller } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';
 	import { openPath } from '#lib/documents/opening.js';
 	import { entryMenu } from '#lib/files/actions.js';
@@ -37,6 +37,8 @@
 				class={['tree-row', row.entry.path === activePath && 'is-active']}
 				style:padding-left="{10 + row.depth * INDENT}px"
 				aria-expanded={row.entry.folder ? row.expanded : undefined}
+				draggable="true"
+				ondragstart={fileDragStart(row.entry.path)}
 				onclick={() => open(row)}
 				oncontextmenu={(event) => app.menus.open(event, entryMenu(app, row.entry.path, row.entry.folder))}
 			>

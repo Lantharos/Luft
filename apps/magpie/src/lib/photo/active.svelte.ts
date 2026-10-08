@@ -1,4 +1,4 @@
-import type { Item } from '#lib/api.js';
+import type { Item } from '#lib/bridge/api.js';
 import type { Viewport } from './render/viewport.svelte';
 import type { PhotoSource } from './source';
 

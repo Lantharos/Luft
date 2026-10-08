@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Select, Slider } from '@luft/ui';
-	import type { FontFace } from '#lib/api.js';
+	import type { FontFace } from '#lib/bridge/api.js';
 	import { fontState } from './state.svelte';
 
 	let { face }: { face: FontFace } = $props();

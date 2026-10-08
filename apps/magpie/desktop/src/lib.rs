@@ -1,17 +1,15 @@
+mod app;
 mod apps;
-mod bridge;
 mod cache;
-mod events;
 mod folder;
 mod font;
 mod launch;
 mod media;
 mod mpris;
 mod photo;
-mod state;
 
+use app::state::MagpieState;
 use luft_app::GlassWindow;
-use state::MagpieState;
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Magpie",
@@ -25,7 +23,7 @@ pub fn run_app() -> ! {
     let state = MagpieState::new();
     luft_app::run(
         &state.events,
-        |window| bridge::register(WINDOW.apply(window), &state),
+        |window| app::bridge::register(WINDOW.apply(window), &state),
         |_| {},
     )
 }

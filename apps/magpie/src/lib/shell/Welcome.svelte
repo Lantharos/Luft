@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { openFile } from '#lib/app/actions.js';
 	import { baseName } from '#lib/library/kinds.js';
 	import { library } from '#lib/library/library.svelte.js';

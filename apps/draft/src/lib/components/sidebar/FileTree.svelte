@@ -4,7 +4,7 @@
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
 	import { basename, tooltip, VirtualScroller } from '@luft/ui';
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import { openPath } from '#lib/documents/opening.js';
 	import { entryMenu } from '#lib/files/actions.js';
 	import type { TreeRow } from '#lib/files/tree.svelte.js';

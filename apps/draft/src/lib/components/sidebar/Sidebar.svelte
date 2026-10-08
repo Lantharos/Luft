@@ -1,7 +1,7 @@
 <script lang="ts">
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Search from '@lucide/svelte/icons/search';
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import FileTree from './FileTree.svelte';
 
 	const app = useApp();

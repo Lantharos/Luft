@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import DiskBar from './DiskBar.svelte';
 	import Welcome from './Welcome.svelte';
 

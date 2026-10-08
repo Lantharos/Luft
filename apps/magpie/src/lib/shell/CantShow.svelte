@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Item } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import OpenWithMenu from './OpenWithMenu.svelte';
 
 	let { item, message, detail }: { item: Item; message: string; detail?: string } = $props();

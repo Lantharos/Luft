@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appearance, fileDrop, GlassShell, plural } from '@luft/ui';
-	import type { Activation } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Activation } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { openPaths } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
-	import { isDesktop } from '#lib/bridge.js';
+	import { isDesktop } from '#lib/bridge/index.js';
 	import Gallery from '#lib/browse/Gallery.svelte';
 	import Sidebar from '#lib/browse/Sidebar.svelte';
 	import DocumentActions from '#lib/document/DocumentActions.svelte';

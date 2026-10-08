@@ -1,6 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
-	import { useApp } from '#lib/context.js';
+	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
 	import { documentMenu } from '#lib/files/actions.js';
 

@@ -1,5 +1,5 @@
 import { basename } from '@luft/ui';
-import type { App } from '#lib/app.svelte.js';
+import type { App } from '#lib/app/app.svelte.js';
 import type { Command } from '#lib/commands/registry.js';
 import { openPath } from '#lib/documents/opening.js';
 import { dirname, tildify } from '#lib/utils/paths.js';

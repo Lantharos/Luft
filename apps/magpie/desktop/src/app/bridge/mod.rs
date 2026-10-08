@@ -3,14 +3,14 @@ mod params;
 use std::path::Path as FilePath;
 
 use gio::prelude::*;
-use luft_app::{Commands, file_manager};
 use luft_app::portal::{self, FileChooser, Filter};
+use luft_app::{Commands, file_manager};
 use sabine::SabineWindow;
 
+use crate::app::state::MagpieState;
 use crate::folder::{self, kinds};
 use crate::media::{tags, video};
 use crate::mpris::Playback;
-use crate::state::MagpieState;
 use crate::{apps, font, launch, photo};
 use params::*;
 

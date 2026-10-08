@@ -1,7 +1,7 @@
 import { selectSelectionMatches } from '@codemirror/search';
 import { addCursorAbove, addCursorBelow, toggleComment } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
-import type { App } from '#lib/app.svelte.js';
+import type { App } from '#lib/app/app.svelte.js';
 import { reload } from '#lib/documents/opening.js';
 import { save, saveAll, saveAs } from '#lib/documents/saving.js';
 import { openSearch } from '#lib/editor/search/panel.js';

@@ -7,7 +7,7 @@ use gio::glib;
 use gio::prelude::*;
 use luft_app::Events;
 
-use crate::events::FOLDER_CHANGED;
+use crate::app::events::FOLDER_CHANGED;
 
 const SETTLE: Duration = Duration::from_millis(150);
 

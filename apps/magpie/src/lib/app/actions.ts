@@ -1,4 +1,4 @@
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/api.js';
 import { library } from '#lib/library/library.svelte.js';
 import { player } from '#lib/music/player.svelte.js';
 import { chrome } from './chrome.svelte';

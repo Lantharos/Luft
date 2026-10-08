@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Item } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import CantShow from '#lib/shell/CantShow.svelte';
 	import { DOCUMENT_SCOPE, openDocument, pdfModules } from './pdf';
 	import { documentState } from './state.svelte';

@@ -1,6 +1,6 @@
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import type { PDFDocumentLoadingTask } from 'pdfjs-dist';
-import { fileSource } from '#lib/bridge.js';
+import { fileSource } from '#lib/bridge/index.js';
 
 type Library = typeof import('pdfjs-dist');
 type Viewer = typeof import('pdfjs-dist/web/pdf_viewer.mjs');

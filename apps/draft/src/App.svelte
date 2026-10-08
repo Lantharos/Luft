@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { App } from '#lib/app.svelte.js';
+	import { App } from '#lib/app/app.svelte.js';
 	import { connect } from '#lib/bridge/index.js';
 	import Shell from '#lib/components/Shell.svelte';
 

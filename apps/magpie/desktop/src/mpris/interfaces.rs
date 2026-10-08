@@ -8,7 +8,7 @@ use zbus::interface;
 use zbus::zvariant::{ObjectPath, OwnedValue};
 
 use super::playback::{self, Repeat, Reported};
-use crate::events::MEDIA_ACTION;
+use crate::app::events::MEDIA_ACTION;
 
 const MIMES: [&str; 8] = [
     "audio/mpeg",

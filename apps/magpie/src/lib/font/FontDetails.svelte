@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, plural } from '@luft/ui';
-	import type { Item } from '#lib/api.js';
-	import * as api from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
+	import * as api from '#lib/bridge/api.js';
 	import { count } from './characters';
 	import { fontState } from './state.svelte';
 

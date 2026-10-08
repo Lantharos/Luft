@@ -1,6 +1,6 @@
-import type { Item } from '#lib/api.js';
-import * as api from '#lib/api.js';
-import { fileSource } from '#lib/bridge.js';
+import type { Item } from '#lib/bridge/api.js';
+import * as api from '#lib/bridge/api.js';
+import { fileSource } from '#lib/bridge/index.js';
 import { extension } from '#lib/library/kinds.js';
 import { isAnimated } from './animated';
 

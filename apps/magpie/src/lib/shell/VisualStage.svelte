@@ -3,7 +3,7 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { fly } from 'svelte/transition';
-	import type { Item } from '#lib/api.js';
+	import type { Item } from '#lib/bridge/api.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { appear, disappear } from '#lib/app/transitions.js';
 	import Filmstrip from '#lib/browse/Filmstrip.svelte';

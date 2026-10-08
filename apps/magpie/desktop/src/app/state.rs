@@ -4,7 +4,7 @@ use luft_app::thumbnails::Thumbnails;
 use luft_app::{Appearance, Events};
 use serde::Serialize;
 
-use crate::events::THUMBNAILS_READY;
+use crate::app::events::THUMBNAILS_READY;
 use crate::folder::FolderWatcher;
 use crate::launch;
 use crate::mpris::Mpris;

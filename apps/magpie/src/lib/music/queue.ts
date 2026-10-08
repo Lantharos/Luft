@@ -1,4 +1,4 @@
-import type { Tags } from '#lib/api.js';
+import type { Tags } from '#lib/bridge/api.js';
 import { baseName, stem } from '#lib/library/kinds.js';
 
 export interface Track extends Tags {

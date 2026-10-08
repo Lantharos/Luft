@@ -2,7 +2,7 @@
 Description=Load the graphics drivers the boot splash takes over
 Documentation=https://github.com/Lantharos/Luft/tree/main/boot/sushi
 DefaultDependencies=no
-After=sushi.service
+After=sushi.service akmods.service
 Before=display-manager.service greetd.service
 ConditionPathExists=!/etc/initrd-release
 

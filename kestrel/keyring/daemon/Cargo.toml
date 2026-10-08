@@ -3,6 +3,7 @@ name = "luft-keyring"
 description = "Luft's secret store"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]

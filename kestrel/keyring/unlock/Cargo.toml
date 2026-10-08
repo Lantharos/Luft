@@ -3,6 +3,7 @@ name = "luft-keyring-unlock"
 description = "Hands the keyring key to a person's own keyring after they sign in"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]

@@ -3,6 +3,7 @@ name = "luft-passkeys-relay"
 description = "Presents the signed-in person's passkeys to browsers as a security key"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]

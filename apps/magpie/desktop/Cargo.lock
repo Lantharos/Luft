@@ -2411,7 +2411,6 @@ dependencies = [
  "parking_lot",
  "sabine",
  "serde",
- "serde_json",
  "skrifa 0.47.0",
  "tokio",
  "write-fonts",

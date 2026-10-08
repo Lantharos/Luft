@@ -6,9 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"preview": "vite preview",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"desktop:dev": "sabine dev .",
 		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release",
 		"desktop:bundle": "sabine bundle . --release"

@@ -550,7 +550,6 @@ name = "luft-passkeys"
 version = "0.1.0"
 dependencies = [
  "ctap",
- "futures-util",
  "libc",
  "serde",
  "serde_json",

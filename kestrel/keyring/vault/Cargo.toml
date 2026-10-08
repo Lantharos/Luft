@@ -3,6 +3,7 @@ name = "luft-keyring-vault"
 description = "Luft Keyring's encrypted storage"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]

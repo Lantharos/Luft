@@ -3,6 +3,7 @@ name = "luft-pinentry"
 description = "Asks for GnuPG passphrases and PINs through Kestrel"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 
 [dependencies]

@@ -5,6 +5,7 @@ members = ["daemon", "pam", "pinentry", "unlock", "vault", "wire"]
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.98"
 license = "GPL-3.0-or-later"
 
 [workspace.dependencies]

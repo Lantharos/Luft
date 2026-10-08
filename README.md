@@ -1,80 +1,102 @@
 # Luft
 
-Luft is the workspace for the Kestrel desktop, its apps, and the Sushi boot stack.
+Luft is a desktop for Fedora. It brings its own shell and login screen (Kestrel), its own apps, a keyring with passkeys, and a boot chain from a flicker-free splash to TPM disk unlock (Sushi, SushiBoot and trustd). Everything installs next to GNOME, so you can switch back at the login screen.
 
-| Directory | Purpose |
+<p>
+  <img src="docs/screenshots/start.png" alt="Start menu" width="49%">
+  <img src="docs/screenshots/quick-settings.png" alt="Quick settings" width="49%">
+</p>
+
+## Parts
+
+| Path | What it is |
 | --- | --- |
-| `kestrel/engine` | GNOME Shell 51.0 fork using Kestrel’s local Mutter 51 build |
-| `kestrel/compositor` | Mutter patch series, window corners, and window icons |
-| `kestrel/ui` | Kestrel's TypeScript shell actors and build pipeline |
-| `kestrel/passkeys` | Passkeys kept in Luft Keyring and confirmed through Kestrel, offered to every browser as a security key |
-| `kestrel/openconnect` | Signs in to OpenConnect VPNs for Kestrel's VPN dialog |
-| `apps/barometer` | Barometer system monitor and task manager |
-| `apps/disks` | Disks, for drives, partitions, encryption, drive health, disk images and what's using space |
-| `apps/draft` | Draft text and code editor |
-| `apps/keys` | Keys, for your own keyboard layouts and input methods |
-| `apps/magpie` | Magpie viewer for photos, videos, music and PDFs |
-| `apps/mailman` | Mailman mail client for IMAP, SMTP and JMAP accounts |
-| `apps/rover` | Rover file manager and file chooser portal backend |
-| `apps/schelf` | Schelf app store for Flathub, Fedora and AppImages |
-| `apps/settings` | System settings app |
-| `apps/signin` | Network Sign-In, for Wi-Fi networks that ask you to sign in first |
-| `apps/tern` | Tern terminal |
-| `packages/ui` | Styles, window chrome, and controls shared by the apps |
-| `packages/app` | Native window, accent, and D-Bus setup shared by the apps |
-| `packages/software` | Apps, system updates, Flatpak, AppImages and offline updates shared by Schelf and Settings |
-| `boot/sushi` | Sushi splash, initramfs integration, and SushiBoot, the boot menu Luft starts through |
-| `security` | Device trust (Secure Boot signing, TPM disk unlock, device encryption) and USB protection while locked |
-| `docs/screenshots` | Captures from an isolated virtual Kestrel monitor |
+| [`kestrel`](kestrel/README.md) | Shell, login screen, session services and installer |
+| [`kestrel/compositor`](kestrel/compositor/README.md) | Kestrel's Mutter 51 patch series |
+| [`kestrel/engine`](kestrel/engine/README.md) | The native shell, started from GNOME Shell 51.0 |
+| [`kestrel/keyring`](kestrel/keyring/README.md) | Luft Keyring: secrets, SSH agent and GnuPG pinentry |
+| [`kestrel/passkeys`](kestrel/passkeys/README.md) | Luft Passkeys, offered to every browser as a security key |
+| [`boot/sushi`](boot/sushi/README.md) | Sushi boot splash and the SushiBoot boot menu |
+| [`security`](security/README.md) | trustd (Secure Boot, signed startup, TPM unlock, encryption) and USB protection |
+| [`apps/barometer`](apps/barometer/README.md) | System monitor |
+| [`apps/disks`](apps/disks/README.md) | Drives, partitions, encryption and disk images |
+| [`apps/draft`](apps/draft/README.md) | Text and code editor |
+| [`apps/keys`](apps/keys/README.md) | Keyboard layouts and input methods |
+| [`apps/magpie`](apps/magpie/README.md) | Photos, videos, music, PDFs and fonts |
+| [`apps/mailman`](apps/mailman/README.md) | Mail |
+| [`apps/rover`](apps/rover/README.md) | Files, and the file chooser |
+| [`apps/schelf`](apps/schelf/README.md) | App store for Flathub, Fedora and AppImages |
+| [`apps/settings`](apps/settings/README.md) | Settings |
+| [`apps/signin`](apps/signin/README.md) | Wi-Fi sign-in pages |
+| [`apps/tern`](apps/tern/README.md) | Terminal |
+| [`packages/ui`](packages/ui/README.md) | Shared Svelte components and styles |
+| [`packages/app`](packages/app/README.md) | Shared native window, palette, D-Bus and portal code |
+| [`packages/software`](packages/software/README.md) | Packages, Flatpak, AppImages and offline updates for Schelf and Settings |
+| [`docs`](docs) | [Boot and recovery](docs/boot.md), [security model](docs/security.md), [testing](docs/testing.md), [wallpaper colors](docs/appearance.md), [prompts](docs/prompts.md) |
 
-Kestrel has its own bottom panel, Start menu, quick settings, notification center and calendar, and power options. Those surfaces use compositor blur on shell actors and animated entry and exit. App windows are not blurred by Kestrel's UI effect. It runs its own session with its own session manager, settings service, keyring and portal backend, and its own login screen on greetd. What is left before it is a distributable desktop session is tracked in [Kestrel's roadmap](kestrel/README.md#work-before-a-luft-session).
+## Requirements
 
-## Build and capture Kestrel
+- Fedora 45 on x86_64 with UEFI. A TPM 2.0 is optional but needed for unlocking without a password.
+- [Bun](https://bun.sh), Rust with Cargo, and the [Sabine](https://github.com/Lantharos/Sabine) CLI for the apps.
+- Build dependencies:
 
-The engine targets Mutter 51.0, which Kestrel builds itself from its pinned source and patches; the host compositor is not replaced. Install [Bun](https://bun.sh) and, on Fedora, the compositor's and engine's build dependencies plus the Rust toolchain for the settings service, keyring, login screen service and VPN helper:
-
-```bash
+```sh
 sudo dnf builddep mutter
 sudo dnf install meson ninja-build sassc gjs-devel gtk4-devel at-spi2-atk-devel gsettings-desktop-schemas-devel \
   json-glib-devel librsvg2-devel glycin-devel libxkbcommon-devel NetworkManager-libnm-devel libsecret-devel \
   pipewire-devel pulseaudio-libs-devel alsa-lib-devel gstreamer1-devel polkit-devel libxml2-devel \
   cargo pam-devel tpm2-tss-devel
+sudo dnf install greetd gstreamer1-plugin-gtk4 cldr-emoji-annotation
 ```
 
-Build output stays inside `kestrel/build`, `kestrel/run`, and the chosen installation prefix.
+## Build
 
-```bash
-cd kestrel/ui
-bun install --frozen-lockfile
-bun run check
-cd ../..
+A development build stays inside `kestrel/build`, `kestrel/run` and `kestrel/install`, and can be tried in a window:
+
+```sh
+bun install
+(cd kestrel/ui && bun install --frozen-lockfile)
 kestrel/compositor/build.sh
 meson setup kestrel/build kestrel/engine -Dpkg_config_path="$PWD/kestrel/run/mutter-install/lib/pkgconfig" --prefix="$PWD/kestrel/install"
 meson compile -C kestrel/build
-```
-
-For an existing build, rerun Meson setup with `--reconfigure --clearcache` and the same `pkg_config_path` before compiling.
-
-To open a visible nested session for interactive testing:
-
-```bash
 kestrel/tools/session.sh nested
 ```
 
-The session opens in Mutter Development Kit. Workspaces grow with open windows, keeping one empty workspace up to ten total. Super+1 through Super+9 selects a workspace and Super+0 selects the tenth; Super+scroll or scrolling over the panel moves between adjacent workspaces with a slide transition. Click inside it to test Kestrel; its launcher button opens Start, and Super opens it when the devkit has keyboard shortcuts captured. Closing the devkit window ends the nested session. The launcher copies the host wallpaper, interface preferences, keyboard layout, and favorite apps into an isolated configuration under `kestrel/run`. The session has its own D-Bus bus and notification history.
+After pulling changes, `meson compile -C kestrel/build` is enough; rerun `meson setup` with `--reconfigure` when the build files change.
 
-To capture the shell surfaces, keyboard search, and a test window:
+Each app builds from its own folder with `bun run desktop:build`, or runs with `bun run desktop:dev`.
 
-```bash
-kestrel/tools/session.sh capture
+## Install
+
+In this order:
+
+```sh
+kestrel/tools/install.sh install               # Kestrel, its Mutter, Luft Keyring, login screen service
+kestrel/passkeys/install.sh install            # Luft Passkeys
+security/scripts/install.sh install            # trustd and USB protection
+for app in apps/*; do (cd "$app" && sabine install --bundle .); done
 ```
 
-Captures use a 1440×900 virtual monitor by default. Set `KESTREL_CAPTURE_SIZE=1280x800` for another size, `KESTREL_CAPTURE_SECONDARY_SIZE=1280x720` to include a second display, or `KESTREL_CAPTURE_DIR` to choose the output directory. The output includes the panel, Start, search, quick settings, notification center, Start power options, available Quick Settings device selectors, a window, Start above a window, and a maximized window. A hover capture reads the rendered framebuffer without repainting the scene; a complete-redraw reference is saved under `kestrel/run/cache` for comparison. Context-menu captures cover Start and panel apps; the log checks keyboard opening, dismissal, isolated unpinning, surface stacking, and running-dot separation. Additional captures exercise real audio-selection and encrypted-volume password dialogs, live taskbar previews, and Alt-Tab. Session checks cover keyboard navigation, lock-mode visibility and shortcut blocking, modal dismissal, and Ctrl-Alt-Tab; with a second display, they also check context-menu placement. Authentication through polkit, and unlocking with a real password, still need a dedicated login session. The same command then runs the login screen checks described in the Kestrel README. The log also reports panel geometry, placeholder positions during opening, taskbar animation widths, caret blink states, Do Not Disturb pointer toggling and restoration, idle frame count after hover with search unfocused, and the maximized work area.
+Then:
 
-Run `kestrel/tools/session.sh performance` for the isolated startup memory, search, notification-burst, actor-reuse, and idle-paint workload. See [Kestrel’s runtime scope](kestrel/README.md#runtime-scope) for retained services and removed UI.
+1. Switch the login screen from GDM to greetd, as in [Kestrel's README](kestrel/README.md#setting-up-the-login-screen).
+2. In Settings, Security, add the Luft Secure Boot key, turn on signed startup and, if you like, device encryption. See [docs/boot.md](docs/boot.md).
+3. Install Sushi: `boot/sushi/scripts/install.sh install`, then `boot/sushi/scripts/install.sh enable`.
+4. Once everything starts through SushiBoot, remove GRUB and the GNOME services Kestrel replaces with `security/scripts/remove-grub-and-gnome.sh`.
 
-Barometer, Disks, Draft, Keys, Magpie, Mailman, Rover, Schelf, Settings, Tern, Sushi and the security services keep their own build commands in their READMEs. The apps and packages form one Bun workspace, so run `bun install` at the repository root before working on either app. Rover's and Sushi's repository histories have been imported into this repository under their new paths.
+Each install script also takes `remove`.
 
-## Source and licenses
+## Tests
 
-Kestrel's engine was imported from the GNOME Shell 51.0 release and modified here. Its upstream authors and GPL license are retained in `kestrel/engine/COPYING`. Rover and Sushi carry their own MIT license notices. Third party vendored subprojects under the engine keep their upstream notices.
+| Command | Checks |
+| --- | --- |
+| `bun run check` in `kestrel/ui`, an app or `packages/ui` | Type checks |
+| `kestrel/tools/session.sh capture` | Every Kestrel surface and the apps in an isolated headless session, with screenshots |
+| `cargo test` in `kestrel/keyring` or `kestrel/passkeys` | Vault format, TPM sealing and CTAP |
+| `make check` in `boot/sushi` | Formatting, lints and tests for Sushi and SushiBoot |
+
+Session options, the boot VM and the other checks are in [docs/testing.md](docs/testing.md).
+
+## License
+
+Kestrel's engine is GPL-2.0-or-later, inherited from GNOME Shell (`kestrel/engine/COPYING`), and so are the Mutter patches. The rest is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.

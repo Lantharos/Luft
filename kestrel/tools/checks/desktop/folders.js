@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
-import {descendants, named, shown} from '../lib/actors.js';
+import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, moveTo, pressButton, releaseButton} from '../lib/input.js';
 import {capture} from '../lib/screenshots.js';
@@ -9,6 +9,7 @@ import {nextFrame, settled, waitUntil} from '../lib/wait.js';
 
 const {eventually} = checks('Start folder');
 const ITEM = 'kestrel-start-item-';
+const DROP_MARKS = ['drop-into', 'drop-before', 'drop-after'];
 const DRAG_STEPS = 12;
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -25,13 +26,15 @@ async function dragOnto(sourceOf, targetOf, fraction = 0.5) {
   const [targetX, targetY] = target.get_transformed_position();
   const [fromX, fromY, toX, toY] = [x + source.width / 2, y + 24, targetX + target.width * fraction, targetY + Math.min(24, target.height / 2)];
   moveTo([fromX, fromY]);
+  await nextFrame();
   pressButton();
   for (let step = 1; step <= DRAG_STEPS; step++) {
     moveTo([fromX + (toX - fromX) * step / DRAG_STEPS, fromY + (toY - fromY) * step / DRAG_STEPS]);
     await nextFrame();
   }
-  await nextFrame();
+  await waitUntil(() => DROP_MARKS.some(mark => styled(mark).some(actor => actor.mapped)), `dragging over ${target.name} shows where the drop lands`);
   releaseButton();
+  await waitUntil(() => source.opacity === 255, 'the drag ends');
 }
 
 async function checkCreating() {

@@ -2,12 +2,12 @@ import Clutter from 'gi://Clutter';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, click, type} from '../lib/input.js';
+import {chord, click, moveTo, pressButton, releaseButton, type} from '../lib/input.js';
 import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled} from '../lib/wait.js';
+import {nextFrame, pause, settled} from '../lib/wait.js';
 import {board, boardResting, boardWindows, leaveBoard, openBoardWindow, openWindows, showBoard, view, windowNamed} from './lib/board.js';
-import {onScreen} from './lib/pointer.js';
+import {onScreen, screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
 const {require, eventually} = checks('board');
@@ -90,11 +90,41 @@ async function checkEntering(shown) {
   await boardResting();
   require(enteredFully(notes), 'Super+Up stays put with nothing above');
 
+  await checkDragAreaClick();
+
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Escape);
   await eventually(() => !board().enteredWindow() && sameView(view(), shown), 'Super+Escape returns to the overview it came from');
   await settled();
   require(!named('kestrel-start').visible, 'Super+Escape leaves Start closed');
   await eventually(() => boardWindows().every(window => window.get_compositor_private().opacity === 255), 'no window stays dimmed in the overview');
+}
+
+async function checkDragAreaClick() {
+  const notes = windowNamed('Notes');
+  const inbox = windowNamed('Inbox');
+  const home = inbox.get_frame_rect();
+  const beside = notes.get_frame_rect();
+  inbox.move_frame(false, beside.x + beside.width + 40, beside.y);
+  await eventually(() => inbox.get_frame_rect().x === beside.x + beside.width + 40, 'Inbox moves beside the entered window');
+  const {x, y, height} = inbox.get_frame_rect();
+  let grabbed = null;
+  const signal = global.display.connect('grab-op-begin', (_display, window) => { grabbed = window; });
+  try {
+    moveTo(screenPoint(view(), board().viewport, x + 60, y + height - 12));
+    await nextFrame();
+    pressButton();
+    await eventually(() => grabbed === inbox, 'pressing a draggable area of another window starts moving it');
+    await pause(150);
+    releaseButton();
+  } finally {
+    global.display.disconnect(signal);
+  }
+  await enters(inbox, 'clicking a draggable area of another window enters it');
+  const rect = inbox.get_frame_rect();
+  require(rect.x === x && rect.y === y, `entering it by its draggable area leaves it in place (moved by ${rect.x - x}, ${rect.y - y})`);
+  await chord(Clutter.KEY_Super_L, Clutter.KEY_Left);
+  await enters(notes, 'Super+Left goes back to the window on the left');
+  inbox.move_frame(false, home.x, home.y);
 }
 
 async function checkGestures(shown) {

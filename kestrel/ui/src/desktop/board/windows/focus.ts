@@ -38,14 +38,17 @@ export class Focus {
   private watched: Meta.Window | null = null;
   private signals: number[] = [];
   private following = 0;
+  private held: Meta.Window | null = null;
   private readonly target: View = { x: 0, y: 0, scale: 1 };
   private readonly next: View = { x: 0, y: 0, scale: 1 };
-  private readonly grabSignal: number;
+  private readonly grabSignals: number[];
 
   constructor(private readonly host: FocusHost) {
-    this.grabSignal = shell().display.connect('grab-op-end', (_display, window: Meta.Window) => {
-      if (window === this.entered) this.queueFollow();
-    });
+    const display = shell().display;
+    this.grabSignals = [
+      display.connect('grab-op-begin', (_display, window: Meta.Window) => this.grabBegan(window)),
+      display.connect('grab-op-end', (_display, window: Meta.Window) => this.grabEnded(window)),
+    ];
   }
 
   get entered(): Meta.Window | null {
@@ -138,8 +141,21 @@ export class Focus {
   }
 
   destroy(): void {
-    shell().display.disconnect(this.grabSignal);
+    for (const id of this.grabSignals) shell().display.disconnect(id);
     this.detach();
+  }
+
+  private grabBegan(window: Meta.Window): void {
+    if (window !== this.entered || !this.host.camera.travelling) return;
+    this.host.camera.stop();
+    this.held = window;
+  }
+
+  private grabEnded(window: Meta.Window): void {
+    if (window !== this.entered) return;
+    if (this.held === window) this.fit(window, true);
+    else this.queueFollow();
+    this.held = null;
   }
 
   private fit(window: Meta.Window, travelling: boolean): void {
@@ -166,6 +182,7 @@ export class Focus {
     for (const id of this.signals) this.watched!.disconnect(id);
     this.signals = [];
     this.watched = null;
+    this.held = null;
     if (this.following) shell().compositor.get_laters().remove(this.following);
     this.following = 0;
   }

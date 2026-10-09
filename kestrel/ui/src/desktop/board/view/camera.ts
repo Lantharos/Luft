@@ -55,6 +55,10 @@ export class Camera {
     return this.engaged;
   }
 
+  get travelling(): boolean {
+    return this.tween.is_playing();
+  }
+
   engage(view: View, pixelScale: number): void {
     this.engaged = true;
     this.pixel = 1 / pixelScale;

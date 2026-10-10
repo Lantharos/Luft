@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.freedesktop.impl.portal.desktop.kestrel
+Exec=/bin/false
+SystemdService=kestrel.service

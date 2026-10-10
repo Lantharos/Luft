@@ -94,6 +94,9 @@ installed_links() {
   for unit in "$prefix"/lib/systemd/user/kestrel*; do
     echo "lib/systemd/user/$(basename "$unit")"
   done
+  for service in "$prefix"/share/dbus-1/services/*.service; do
+    echo "share/dbus-1/services/$(basename "$service")"
+  done
 }
 
 check_runtime() {

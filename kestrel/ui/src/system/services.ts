@@ -17,7 +17,8 @@ import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
 import { OomNotifier } from './health/oomNotifier.js';
 import { confirmStartup, notifyAboutFailedStartup } from './health/startup.js';
-import { LookService } from './look/service.js';
+import { DesktopPolicy } from './peek/access/desktop.js';
+import { PeekService } from './peek/service.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
 import { PlugSounds } from './power/plugSounds.js';
@@ -38,7 +39,7 @@ export class SystemServices {
   private readonly keyring: SystemPrompts;
   private readonly stylesheetMonitors: Gio.FileMonitor[];
   private readonly mediaKeys: MediaKeys;
-  private readonly look: LookService;
+  private readonly peek: PeekService;
 
   constructor(context: Context, ownsTheScreen: boolean, openStart: () => void) {
     this.loginScreen = ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
@@ -48,7 +49,7 @@ export class SystemServices {
     this.keyring = new SystemPrompts(context);
     this.stylesheetMonitors = loadKestrelStylesheets();
     this.mediaKeys = new MediaKeys(context, openStart);
-    this.look = new LookService(context);
+    this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();
@@ -57,7 +58,7 @@ export class SystemServices {
   }
 
   destroy(): void {
-    this.look.destroy();
+    this.peek.destroy();
     this.keyring.destroy();
     this.appearance.destroy();
     for (const sync of this.loginScreen) sync.destroy();

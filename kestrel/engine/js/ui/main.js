@@ -126,6 +126,12 @@ export async function start() {
         return;
     }
 
+    if (sessionMode.isPeek) {
+        _initializePeek();
+        _sessionUpdated();
+        return;
+    }
+
     global.connect('notify-error', (global, msg, detail) => {
         notifyError(msg, detail);
     });
@@ -162,6 +168,30 @@ async function _runAutomation(automation) {
     }
 
     global.context.terminate();
+}
+
+function _initializePeek() {
+    global.connect('notify-error', (_global, msg, detail) => console.warn(`${msg}: ${detail}`));
+
+    reloadThemeResource();
+    _loadIcons();
+    _loadDefaultStylesheet();
+
+    layoutManager = new Layout.LayoutManager();
+    uiGroup = layoutManager.uiGroup;
+    wm = new WindowManager.WindowManager();
+
+    layoutManager.connect('startup-complete', () => {
+        actionMode = Shell.ActionMode.NORMAL;
+        KestrelUi.startPeek({
+            activateWindow: window => window.activate(global.get_current_time()),
+            canInteract: () => actionMode === Shell.ActionMode.NORMAL,
+        });
+    });
+    layoutManager.init();
+    global.connect('shutdown', () => KestrelUi.shutdown());
+
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => global.context.notify_ready());
 }
 
 async function _initializeGreeter() {

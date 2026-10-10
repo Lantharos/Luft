@@ -1,5 +1,5 @@
 .kestrel-portal-dialog { width: 28em; }
-.kestrel-portal-dialog.kestrel-look-dialog { width: 34em; }
+.kestrel-portal-dialog.kestrel-peek-dialog { width: 34em; }
 .kestrel-portal-dialog .message-dialog-content { margin-bottom: 0; }
 .kestrel-portal-content { spacing: 8px; }
 

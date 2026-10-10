@@ -4,7 +4,7 @@ import St from 'gi://St';
 
 import { appIcons } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
-import { windowAccess, type Grant } from '../look/access/grants.js';
+import { windowAccess, type Grant } from '../peek/access/grants.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
 

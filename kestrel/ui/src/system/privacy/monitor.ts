@@ -2,7 +2,7 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
 
-import { windowAccess } from '../look/access/grants.js';
+import { windowAccess } from '../peek/access/grants.js';
 import { mixer } from '../mediaKeys/mixer.js';
 
 export interface PrivacyState {

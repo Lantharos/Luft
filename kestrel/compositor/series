@@ -19,3 +19,4 @@
 0019-core-let-the-shell-check-and-restore-inhibited-short.patch
 0020-x11-let-the-shell-keep-X11-windows-on-the-X-screen-o.patch
 0021-wayland-let-the-shell-magnify-windows-without-blurri.patch
+0022-clutter-let-the-shell-filter-events-before-the-compo.patch

@@ -21,6 +21,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Variable refresh only for windows marked as games, and `wp_content_type_v1` support
 - Windows laid out on a transformed group, magnified without blur, and X11 windows kept reachable, for the board
 - Checking and restoring inhibited keyboard shortcuts
+- Event filters that run before the compositor's own, so the shell can check input it sends as it is delivered
 - Settings from `kestrel-settings` instead of gnome-settings-daemon, and monitor vendor names from systemd's hardware database
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe, plus reporting how long frames wait to be presented
 - Smaller fixes: input method focus on destroyed text fields, cursor theme fallback, keeping the last frame on screen at exit, repainting as soon as a display stops scanning out a window

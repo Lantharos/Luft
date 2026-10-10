@@ -48,4 +48,5 @@ configure_file(
 install_data('kestrel-session.target', install_dir: systemduserunitdir)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
 install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
+install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir: servicedir)
 install_data('app-slice-oomd.conf', install_dir: systemduserunitdir / 'app.slice.d', rename: '50-kestrel-oomd.conf')

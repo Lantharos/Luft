@@ -2708,13 +2708,8 @@ export class ScreenshotService {
                 Gio.IOErrorEnum, Gio.IOErrorEnum.PERMISSION_DENIED,
                 'Saving to disk is disabled');
             return null;
-        } else if (restrictCallers) {
-            try {
-                await this._senderChecker.checkInvocation(invocation);
-            } catch (e) {
-                invocation.return_gerror(e);
-                return null;
-            }
+        } else if (restrictCallers && !await this._allowCaller(invocation)) {
+            return null;
         }
 
         const shooter = new Shell.Screenshot();
@@ -2724,6 +2719,17 @@ export class ScreenshotService {
         this._screenShooter.set(sender, shooter);
 
         return shooter;
+    }
+
+    async _allowCaller(invocation) {
+        try {
+            await this._senderChecker.checkInvocation(invocation);
+            return true;
+        } catch {
+            invocation.return_error_literal(Gio.DBusError, Gio.DBusError.ACCESS_DENIED,
+                'Screenshots are limited to the system. To see or use windows, run luft-look --help');
+            return false;
+        }
     }
 
     _onNameVanished(connection, name) {
@@ -2924,12 +2930,8 @@ export class ScreenshotService {
     }
 
     async InteractiveScreenshotAsync(params, invocation) {
-        try {
-            await this._senderChecker.checkInvocation(invocation);
-        } catch (e) {
-            invocation.return_gerror(e);
+        if (!await this._allowCaller(invocation))
             return;
-        }
 
         Main.screenshotUI.connectObject(
             'screenshot-taken', (ui, file) => {
@@ -2952,12 +2954,8 @@ export class ScreenshotService {
     }
 
     async SelectAreaAsync(params, invocation) {
-        try {
-            await this._senderChecker.checkInvocation(invocation);
-        } catch (e) {
-            invocation.return_gerror(e);
+        if (!await this._allowCaller(invocation))
             return;
-        }
 
         const selectArea = new SelectArea();
         try {
@@ -2974,12 +2972,8 @@ export class ScreenshotService {
     }
 
     async FlashAreaAsync(params, invocation) {
-        try {
-            await this._senderChecker.checkInvocation(invocation);
-        } catch (e) {
-            invocation.return_gerror(e);
+        if (!await this._allowCaller(invocation))
             return;
-        }
 
         let [x, y, width, height] = params;
         [x, y, width, height] = this._scaleArea(x, y, width, height);

@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import { appIcons } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
+import { windowAccess, type Grant } from '../look/access/grants.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
 
@@ -13,9 +14,10 @@ const ICONS: Record<keyof PrivacyState, string> = {
   sharing: 'screen-shared-symbolic',
   recording: 'media-record-symbolic',
   location: 'find-location-symbolic',
+  windows: 'focus-windows-symbolic',
 };
 const LABELS: Record<keyof PrivacyState, string> = {
-  camera: 'camera', microphone: 'microphone', sharing: 'screen', recording: 'screen', location: 'location',
+  camera: 'camera', microphone: 'microphone', sharing: 'screen', recording: 'screen', location: 'location', windows: 'windows',
 };
 
 const icon = (name: string) => new Gio.ThemedIcon({ name });
@@ -62,9 +64,18 @@ export class PrivacyIndicator {
     if (state.location)
       entries.push({ label: 'Turn off location services', icon: icon(ICONS.location),
         run: () => new Gio.Settings({ schema_id: 'org.gnome.system.location' }).set_boolean('enabled', false) });
+    for (const grant of windowAccess.active) entries.push(this.windowsEntry(grant));
     entries.push('separator', { label: 'Privacy settings', run: () => this.menus.settings('privacy') });
     const [x, y] = this.actor.get_transformed_position();
     this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
+  }
+
+  private windowsEntry({ caller, level }: Grant): MenuEntry {
+    return {
+      label: `${caller.name} · ${level === 'use' ? 'Using your windows' : 'Seeing your windows'}`,
+      icon: caller.app ? appIcons.gicon(caller.app) : icon(ICONS.windows),
+      children: [{ label: 'Stop access', run: () => windowAccess.revoke(caller.unit) }],
+    };
   }
 
   private userEntry(user: MediaUser): MenuEntry {

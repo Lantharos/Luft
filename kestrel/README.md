@@ -17,6 +17,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 | [`passkeys`](passkeys/README.md) | Luft Passkeys |
 | `openconnect` | `kestrel-openconnect`, OpenConnect VPN sign-in |
 | `watchdog` | `kestrel-watchdog`, restarts cleanly when the GPU hangs |
+| `look` | `luft-look`, lets other programs see and use windows |
 | `tools` | Development sessions, checks and the installer |
 
 ## Features
@@ -30,7 +31,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 - Clipboard history with pictures, and an emoji, symbol and kaomoji picker
 - Lock screen and login screen (on greetd) with fingerprint support
 - Accent color and a full palette from the wallpaper, shared with apps ([docs/appearance.md](../docs/appearance.md)); tinted or clear app icons; Pure black; live video wallpapers
-- Privacy indicator for camera, microphone, screen sharing and location
+- Privacy indicator for camera, microphone, screen sharing, location and programs using your windows
 - Its own dialogs for polkit, Wi-Fi and VPN secrets, keyring and GnuPG prompts ([docs/prompts.md](../docs/prompts.md)), and every xdg-desktop-portal interface it backs
 
 ![Board mode with several apps side by side](../docs/screenshots/board.png)
@@ -53,7 +54,7 @@ kestrel/tools/install.sh install /opt/other # another prefix
 kestrel/tools/install.sh remove
 ```
 
-This builds Kestrel, its Mutter, `kestrel-settings`, `kestrel-openconnect`, Luft Keyring and the watchdog, installs them into the prefix, and links the session entry, user units, portal configuration and fonts into `/usr/local`. It also installs the login screen service, the lock screen's `kestrel-authenticate` socket and the watchdog's system service. Session entries are only linked for prefixes under `/opt` or `/usr`. Reinstalling removes files an earlier install left behind.
+This builds Kestrel, its Mutter, `kestrel-settings`, `kestrel-openconnect`, `luft-look`, Luft Keyring and the watchdog, installs them into the prefix, and links the session entry, user units, portal configuration, `luft-look` and fonts into `/usr/local`. It also installs the login screen service, the lock screen's `kestrel-authenticate` socket and the watchdog's system service. Session entries are only linked for prefixes under `/opt` or `/usr`. Reinstalling removes files an earlier install left behind.
 
 ### Setting up the login screen
 
@@ -106,6 +107,20 @@ The Login Screen page in Settings chooses the wallpaper, which people are listed
 | Four fingers up / down | Turn the desktop into a board, or back |
 | Three fingers (board) | Pan; spread to enter a window, swipe down to step out |
 | Pinch (board) | Zoom |
+
+## Seeing and using windows from other programs
+
+`luft-look` lets a program, such as a development tool, take pictures of windows and click and type in them. `luft-look --help` explains every command.
+
+```sh
+luft-look run --wait-window -- gnome-text-editor   # its windows can be used right away
+luft-look window launched                          # saves a PNG and prints its path
+luft-look click launched 120 40
+luft-look type launched 'Hello'
+luft-look list
+```
+
+Any other window needs permission: Kestrel asks whether the app may see your windows, or see and use them, once or until it quits. The privacy menu in the panel shows who has access and takes it back. Nothing works while the screen is locked or a password prompt is open, and nothing is remembered after signing out.
 
 ## Settings
 

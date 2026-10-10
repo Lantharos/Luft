@@ -2,6 +2,7 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
 
+import { windowAccess } from '../look/access/grants.js';
 import { mixer } from '../mediaKeys/mixer.js';
 
 export interface PrivacyState {
@@ -10,6 +11,7 @@ export interface PrivacyState {
   sharing: boolean;
   recording: boolean;
   location: boolean;
+  windows: boolean;
 }
 
 export class PrivacyMonitor {
@@ -32,6 +34,7 @@ export class PrivacyMonitor {
       changed();
     });
     this.disconnectors.push(
+      windowAccess.watch(changed),
       () => this.camera.disconnect(camera),
       () => this.mixer.disconnect(recording),
       () => { if (handles) controller!.disconnect(handles); },
@@ -52,6 +55,7 @@ export class PrivacyMonitor {
       sharing: [...this.handles].some(handle => !handle.is_recording),
       recording: [...this.handles].some(handle => handle.is_recording),
       location: this.geoclue?.inUse ?? false,
+      windows: windowAccess.active.length > 0,
     };
   }
 

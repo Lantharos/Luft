@@ -19,7 +19,7 @@ export interface PortalDialog {
   buttons(buttons: ButtonInfo[]): St.Button[];
 }
 
-export async function openDialog(handle: string, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
+export async function openDialog(handle: string | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
   const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
     import('resource:///com/lantharos/kestrel/ui/dialog.js'),
     import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
@@ -35,7 +35,7 @@ export async function openDialog(handle: string, spec: DialogSpec, build: (dialo
       outcome = [response, results];
       modal.close();
     };
-    const request = new PortalRequest(handle, () => finish(ENDED));
+    const request = handle ? new PortalRequest(handle, () => finish(ENDED)) : null;
     build({
       modal,
       content,
@@ -47,11 +47,11 @@ export async function openDialog(handle: string, spec: DialogSpec, build: (dialo
       },
     });
     modal.connect('closed', () => {
-      request.finish();
+      request?.finish();
       resolve(outcome);
     });
     if (!modal.open()) {
-      request.finish();
+      request?.finish();
       modal.destroy();
       resolve([ENDED, {}]);
     }

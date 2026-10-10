@@ -55,9 +55,9 @@ install_openconnect() {
   as_owner "$prefix" install -DZ -m755 "$root/kestrel/openconnect/target/release/kestrel-openconnect" "$prefix/libexec/kestrel-openconnect"
 }
 
-install_look() {
-  cargo build --release --manifest-path "$root/kestrel/look/Cargo.toml"
-  as_owner "$prefix" install -DZ -m755 "$root/kestrel/look/target/release/luft-look" "$prefix/bin/luft-look"
+install_peek() {
+  cargo build --release --manifest-path "$root/kestrel/peek/Cargo.toml"
+  as_owner "$prefix" install -DZ -m755 "$root/kestrel/peek/target/release/peek" "$prefix/bin/peek"
 }
 
 remove_greeter() {
@@ -86,7 +86,7 @@ remove_authenticator() {
 }
 
 installed_links() {
-  echo "bin/luft-look"
+  echo "bin/peek"
   echo "share/wayland-sessions/kestrel.desktop"
   echo "share/xdg-desktop-portal/kestrel-portals.conf"
   echo "share/xdg-desktop-portal/portals/kestrel.portal"
@@ -159,7 +159,7 @@ install_everything() {
   prune_stale_files
   install_settings
   install_openconnect
-  install_look
+  install_peek
   as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"
 
   if [[ "$prefix" == /opt/* || "$prefix" == /usr/* ]]; then

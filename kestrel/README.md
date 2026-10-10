@@ -17,7 +17,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 | [`passkeys`](passkeys/README.md) | Luft Passkeys |
 | `openconnect` | `kestrel-openconnect`, OpenConnect VPN sign-in |
 | `watchdog` | `kestrel-watchdog`, restarts cleanly when the GPU hangs |
-| `look` | `luft-look`, lets other programs see and use windows |
+| `peek` | `peek`, lets other programs see and use windows |
 | `tools` | Development sessions, checks and the installer |
 
 ## Features
@@ -54,7 +54,7 @@ kestrel/tools/install.sh install /opt/other # another prefix
 kestrel/tools/install.sh remove
 ```
 
-This builds Kestrel, its Mutter, `kestrel-settings`, `kestrel-openconnect`, `luft-look`, Luft Keyring and the watchdog, installs them into the prefix, and links the session entry, user units, portal configuration, `luft-look` and fonts into `/usr/local`. It also installs the login screen service, the lock screen's `kestrel-authenticate` socket and the watchdog's system service. Session entries are only linked for prefixes under `/opt` or `/usr`. Reinstalling removes files an earlier install left behind.
+This builds Kestrel, its Mutter, `kestrel-settings`, `kestrel-openconnect`, `peek`, Luft Keyring and the watchdog, installs them into the prefix, and links the session entry, user units, portal configuration, `peek` and fonts into `/usr/local`. It also installs the login screen service, the lock screen's `kestrel-authenticate` socket and the watchdog's system service. Session entries are only linked for prefixes under `/opt` or `/usr`. Reinstalling removes files an earlier install left behind.
 
 ### Setting up the login screen
 
@@ -110,17 +110,19 @@ The Login Screen page in Settings chooses the wallpaper, which people are listed
 
 ## Seeing and using windows from other programs
 
-`luft-look` lets a program, such as a development tool, take pictures of windows and click and type in them. `luft-look --help` explains every command.
+`peek` lets a program, such as a development tool, take pictures of windows and click and type in them. `peek --help` explains every command.
 
 ```sh
-luft-look run --wait-window -- gnome-text-editor   # its windows can be used right away
-luft-look window launched                          # saves a PNG and prints its path
-luft-look click launched 120 40
-luft-look type launched 'Hello'
-luft-look list
+h=$(peek run --wait-window -- cargo run)   # starts it on a hidden display and prints a handle
+peek window $h                             # saves a PNG and prints its path
+peek click $h 120 40
+peek type $h 'Hello'
+peek stop $h
 ```
 
-Any other window needs permission: Kestrel asks whether the app may see your windows, or see and use them, once or until it quits. The privacy menu in the panel shows who has access and takes it back. Nothing works while the screen is locked or a password prompt is open, and nothing is remembered after signing out.
+`peek run` gives every program its own hidden display: a headless Kestrel with its own monitor, pointer and keyboard, so nothing reaches your screen and nothing asks first. The program still uses your session for settings, files, the keyring and the network. The display closes when the program quits. `peek run --here` opens the program on your screen instead.
+
+Windows you opened yourself need permission: Kestrel asks whether the app may see your windows, or see and use them, once or until it quits, and a refusal holds until the app quits. The privacy menu in the panel shows who has access and takes it back. Nothing works while the screen is locked or a password prompt is open, and nothing is remembered after signing out. Hidden displays need `dbus-daemon`.
 
 ## Settings
 

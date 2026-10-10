@@ -2727,7 +2727,7 @@ export class ScreenshotService {
             return true;
         } catch {
             invocation.return_error_literal(Gio.DBusError, Gio.DBusError.ACCESS_DENIED,
-                'Screenshots are limited to the system. To see or use windows, run luft-look --help');
+                'Screenshots are limited to the system. To see or use windows, run peek --help');
             return false;
         }
     }

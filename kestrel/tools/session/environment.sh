@@ -39,7 +39,7 @@ build_helpers() {
   cargo build --release --quiet --manifest-path "$root/kestrel/keyring/Cargo.toml" -p luft-pinentry
   cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/greeter/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/kestrel/look/Cargo.toml"
+  cargo build --release --quiet --manifest-path "$root/kestrel/peek/Cargo.toml"
 }
 
 dbus_service() {

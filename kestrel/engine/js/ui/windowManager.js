@@ -797,6 +797,11 @@ export class WindowManager {
         });
 
         global.display.connect('init-xserver', (display, task) => {
+            if (Main.sessionMode.isPeek) {
+                task.return_boolean(true);
+                return true;
+            }
+
             IBusManager.getIBusManager().restartDaemon(['--xim']);
 
             this._shareSettingsWithX11(task);
@@ -804,7 +809,8 @@ export class WindowManager {
             return true;
         });
         global.display.connect('x11-display-closing', () => {
-            IBusManager.getIBusManager().restartDaemon();
+            if (!Main.sessionMode.isPeek)
+                IBusManager.getIBusManager().restartDaemon();
         });
 
         this._windowMenuManager = new WindowMenu.WindowMenuManager();

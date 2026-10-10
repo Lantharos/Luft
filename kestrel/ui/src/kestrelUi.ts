@@ -28,6 +28,8 @@ import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
 import { StartMenu } from './surfaces/start/startMenu.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartup } from './system/health/startup.js';
+import { startPeekHost, type HostContext } from './system/peek/host/host.js';
+import type { PeekService } from './system/peek/service.js';
 import { SystemServices } from './system/services.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
@@ -266,6 +268,7 @@ class KestrelUi {
 
 let currentUi: KestrelUi | null = null;
 let greeter: Greeter | null = null;
+let peekHost: PeekService | null = null;
 
 let pendingWallpaper: Rgb[] | null = null;
 
@@ -291,8 +294,13 @@ export function toggleSurface(surface: Surface): void {
   currentUi?.toggleSurface(surface);
 }
 
+export function startPeek(context: HostContext): void {
+  peekHost = startPeekHost(context);
+}
+
 export function shutdown(): void {
   currentUi?.shutdown();
+  peekHost?.destroy();
 }
 
 export function dismissImmediately(): void {

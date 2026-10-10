@@ -22,6 +22,7 @@ const _modes = {
         hasWmMenus: false,
         isLocked: false,
         isGreeter: false,
+        isPeek: false,
         isPrimary: false,
         unlockDialog: null,
         components: [],
@@ -30,6 +31,11 @@ const _modes = {
     'greeter': {
         isGreeter: true,
         isPrimary: true,
+    },
+
+    'peek': {
+        isPeek: true,
+        hasWindows: true,
     },
 
     'unlock-dialog': {

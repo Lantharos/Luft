@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 1 Oct 2026 21:14:44 +0200
-Subject: [PATCH 12/21] clutter/texture-content: Skip textures of a lost
+Subject: [PATCH 12/22] clutter/texture-content: Skip textures of a lost
  graphics context
 
 A texture from a context that was replaced during graphics recovery has a stale GL name, which in the new context can point at an unrelated texture. Draw nothing until the owner provides a new texture.

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 7 Oct 2026 21:45:27 +0200
-Subject: [PATCH 20/21] x11: let the shell keep X11 windows on the X screen of
+Subject: [PATCH 20/22] x11: let the shell keep X11 windows on the X screen of
  a panned canvas
 
 A shell that pans and zooms windows on a canvas larger than the monitors

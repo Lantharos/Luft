@@ -1,0 +1,115 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 10 Oct 2026 13:00:54 +0200
+Subject: [PATCH 22/22] clutter: let the shell filter events before the
+ compositor
+
+Add clutter_event_prepend_filter(), which runs a filter ahead of every
+filter added earlier, including Mutter's own. The shell uses it to check
+input it injects at the moment it is delivered, and to drop it when it
+would land somewhere other than the window it was meant for.
+---
+ clutter/clutter/clutter-event.c | 57 ++++++++++++++++++++++++++++-----
+ clutter/clutter/clutter-event.h |  7 ++++
+ 2 files changed, 56 insertions(+), 8 deletions(-)
+
+diff --git a/clutter/clutter/clutter-event.c b/clutter/clutter/clutter-event.c
+index 37b8ed001831b41d02f0427a2a017306af622549..a63c152a79df5a10fa92750cb273402aafbf7789 100644
+--- a/clutter/clutter/clutter-event.c
++++ b/clutter/clutter/clutter-event.c
+@@ -1267,6 +1267,24 @@ _clutter_event_process_filters (ClutterEvent *event,
+   return CLUTTER_EVENT_PROPAGATE;
+ }
+ 
++static ClutterEventFilter *
++event_filter_new (ClutterStage          *stage,
++                  ClutterEventFilterFunc func,
++                  GDestroyNotify         notify,
++                  gpointer               user_data)
++{
++  ClutterEventFilter *event_filter = g_new0 (ClutterEventFilter, 1);
++  static guint event_filter_id = 0;
++
++  event_filter->stage = stage;
++  event_filter->id = ++event_filter_id;
++  event_filter->func = func;
++  event_filter->notify = notify;
++  event_filter->user_data = user_data;
++
++  return event_filter;
++}
++
+ /**
+  * clutter_event_add_filter:
+  * @stage: (allow-none): The #ClutterStage to capture events for
+@@ -1288,14 +1306,8 @@ clutter_event_add_filter (ClutterStage          *stage,
+                           gpointer               user_data)
+ {
+   ClutterContext *context = _clutter_context_get_default ();
+-  ClutterEventFilter *event_filter = g_new0 (ClutterEventFilter, 1);
+-  static guint event_filter_id = 0;
+-
+-  event_filter->stage = stage;
+-  event_filter->id = ++event_filter_id;
+-  event_filter->func = func;
+-  event_filter->notify = notify;
+-  event_filter->user_data = user_data;
++  ClutterEventFilter *event_filter =
++    event_filter_new (stage, func, notify, user_data);
+ 
+   /* The event filters are kept in order from least recently added to
+    * most recently added so we must add it to the end */
+@@ -1304,6 +1316,35 @@ clutter_event_add_filter (ClutterStage          *stage,
+   return event_filter->id;
+ }
+ 
++/**
++ * clutter_event_prepend_filter:
++ * @stage: (allow-none): The #ClutterStage to capture events for
++ * @func: The callback function which will be passed all events.
++ * @notify: A #GDestroyNotify
++ * @user_data: A data pointer to pass to the function.
++ *
++ * Like [func@Clutter.Event.add_filter], but the function is called
++ * before every filter added earlier, including the compositor's own,
++ * so it sees each event before it is delivered anywhere.
++ *
++ * Return value: an identifier for the event filter, to be used
++ *   with [func@Clutter.Event.remove_filter].
++ */
++guint
++clutter_event_prepend_filter (ClutterStage          *stage,
++                              ClutterEventFilterFunc func,
++                              GDestroyNotify         notify,
++                              gpointer               user_data)
++{
++  ClutterContext *context = _clutter_context_get_default ();
++  ClutterEventFilter *event_filter =
++    event_filter_new (stage, func, notify, user_data);
++
++  context->event_filters = g_list_prepend (context->event_filters, event_filter);
++
++  return event_filter->id;
++}
++
+ /**
+  * clutter_event_remove_filter:
+  * @id: The ID of the event filter, as returned from [func@Clutter.Event.add_filter]
+diff --git a/clutter/clutter/clutter-event.h b/clutter/clutter/clutter-event.h
+index d87f3ec36e3ca2d17ae6da3318f11e800d25b47e..a40a78598b9e56a08559c39694c4b6eab6df67f7 100644
+--- a/clutter/clutter/clutter-event.h
++++ b/clutter/clutter/clutter-event.h
+@@ -146,6 +146,13 @@ guint                   clutter_event_add_filter                (ClutterStage
+                                                                  ClutterEventFilterFunc func,
+                                                                  GDestroyNotify         notify,
+                                                                  gpointer               user_data);
++
++CLUTTER_EXPORT
++guint                   clutter_event_prepend_filter            (ClutterStage          *stage,
++                                                                 ClutterEventFilterFunc func,
++                                                                 GDestroyNotify         notify,
++                                                                 gpointer               user_data);
++
+ CLUTTER_EXPORT
+ void                    clutter_event_remove_filter             (guint                  id);
+ 

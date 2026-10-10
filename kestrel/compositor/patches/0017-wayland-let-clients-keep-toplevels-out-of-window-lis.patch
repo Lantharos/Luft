@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 7 Oct 2026 02:46:30 +0200
-Subject: [PATCH 17/21] wayland: let clients keep toplevels out of window lists
+Subject: [PATCH 17/22] wayland: let clients keep toplevels out of window lists
  and above others
 
 Wayland has no way for a client to ask that a toplevel stay out of the

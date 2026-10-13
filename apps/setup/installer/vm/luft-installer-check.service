@@ -1,0 +1,12 @@
+[Unit]
+Description=Check the Luft installer against this VM's drives
+After=dbus.service local-fs.target
+ConditionPathExists=/dev/disk/by-label/luft-source
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-installer-check
+ExecStopPost=/usr/bin/systemctl poweroff --no-block
+
+[Install]
+WantedBy=multi-user.target

@@ -42,7 +42,7 @@ const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
 const CONTACT_MAKER = 1 << 11;
 
-const variants = (signature, values) => Object.fromEntries(Object.entries(values).map(([key, value]) =>
+export const variants = (signature, values) => Object.fromEntries(Object.entries(values).map(([key, value]) =>
   [key, new GLib.Variant(signature[key], value)]));
 
 const attribute = (id, summary, level, flags) => ({
@@ -54,7 +54,7 @@ const attribute = (id, summary, level, flags) => ({
 
 export const SECURITY_NAMES = ['com.lantharos.Trust1', 'com.lantharos.UsbProtection1', 'org.freedesktop.fwupd'];
 
-export function publishSecurity(publish, calls, model) {
+export function publishSecurity(publish, calls, model, trust = {}) {
   publish(TRUST, {
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
@@ -80,6 +80,7 @@ export function publishSecurity(publish, calls, model) {
     CancelSigningKeyEnrollment: () => calls.push('CancelSigningKeyEnrollment'),
     InstallSignedStartup: () => calls.push('InstallSignedStartup'),
     StartupFinished: () => {},
+    ...trust,
   }, '/com/lantharos/Trust1');
   const drives = drivesService(calls, model, RECOVERY_KEY);
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));

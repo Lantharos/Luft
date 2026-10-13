@@ -16,9 +16,9 @@ usage() {
 }
 
 all_groups() {
-  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*') \
+  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*') \
     | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
-  echo greeter
+  printf '%s\n' greeter setup
 }
 
 select_groups() {
@@ -50,8 +50,8 @@ longest_first() {
 queue_groups() {
   local index=0 group
   while read -r group; do
-    if [[ "$group" == greeter ]]; then
-      run_greeter=true
+    if standalone "$group"; then
+      separate+=("$group")
     else
       printf -v index '%03d' $((10#$index + 1))
       : > "$out/queue/$index-$group"
@@ -75,21 +75,26 @@ start_worker() {
   running[$!]="$name"
 }
 
-start_greeter() {
-  greeter_started=$EPOCHREALTIME
-  KESTREL_SESSION_DIR="$out/workers/greeter" timeout "$session_timeout" "$tools/session/greeter.sh" \
-    > "$out/logs/greeter.log" 2>&1 &
-  running[$!]=greeter
+standalone() {
+  [[ "$1" == greeter || "$1" == setup ]]
 }
 
-record_greeter() {
+start_standalone() {
+  local command=("$tools/session/greeter.sh")
+  [[ "$1" == setup ]] && command=("$tools/session/desktop.sh" setup)
+  started_at[$1]=$EPOCHREALTIME
+  KESTREL_SESSION_DIR="$out/workers/$1" timeout "$session_timeout" "${command[@]}" > "$out/logs/$1.log" 2>&1 &
+  running[$!]="$1"
+}
+
+record_standalone() {
   local seconds message
-  seconds=$(seconds_since "$greeter_started")
-  if [[ "$1" -eq 0 ]]; then
-    printf 'pass\t%s\t\n' "$seconds" > "$out/results/greeter.tsv"
+  seconds=$(seconds_since "${started_at[$1]}")
+  if [[ "$2" -eq 0 ]]; then
+    printf 'pass\t%s\t\n' "$seconds" > "$out/results/$1.tsv"
   else
-    message=$(grep -m1 -o 'check failed: .*\|Timed out .*' "$out/logs/greeter.log" || echo "the login screen exited with status $1")
-    printf 'fail\t%s\t%s\n' "$seconds" "$message" > "$out/results/greeter.tsv"
+    message=$(grep -m1 -o 'check failed: .*\|Timed out .*' "$out/logs/$1.log" || echo "its session exited with status $2")
+    printf 'fail\t%s\t%s\n' "$seconds" "$message" > "$out/results/$1.tsv"
   fi
 }
 
@@ -101,15 +106,15 @@ finished_worker() {
 }
 
 run_sessions() {
-  local pid status queued_groups
+  local pid status queued_groups group
   queued_groups=$(find "$out/queue" -type f | wc -l)
-  if $run_greeter; then start_greeter; fi
+  for group in "${separate[@]}"; do start_standalone "$group"; done
   while ((${#running[@]} < jobs && workers < queued_groups)); do start_worker; done
   while ((${#running[@]} > 0)); do
     status=0
     wait -n -p pid || status=$?
-    if [[ "${running[$pid]}" == greeter ]]; then
-      record_greeter "$status"
+    if standalone "${running[$pid]}"; then
+      record_standalone "${running[$pid]}" "$status"
     else
       finished_worker "${running[$pid]}"
     fi
@@ -206,8 +211,8 @@ build_helpers
 fit_jobs_to_inotify
 started=$EPOCHREALTIME
 declare -A running=()
-run_greeter=false
-greeter_started=0
+declare -A started_at=()
+separate=()
 workers=0
 startup_failures=0
 rm -rf "$out"

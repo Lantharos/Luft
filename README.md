@@ -29,12 +29,16 @@ Luft is an operating system built on Fedora. It has its own shell and login scre
 | [`apps/rover`](apps/rover/README.md) | Files, and the file chooser |
 | [`apps/schelf`](apps/schelf/README.md) | App store for Flathub, Fedora and AppImages |
 | [`apps/settings`](apps/settings/README.md) | Settings |
+| [`apps/setup`](apps/setup/README.md) | Install Luft: the installer and first-run setup |
 | [`apps/signin`](apps/signin/README.md) | Wi-Fi sign-in pages |
 | [`apps/tern`](apps/tern/README.md) | Terminal |
 | [`packages/ui`](packages/ui/README.md) | Shared Svelte components and styles |
 | [`packages/app`](packages/app/README.md) | Shared native window, palette, D-Bus and portal code |
+| [`packages/dbus`](packages/dbus/README.md) | Blocking D-Bus connections and service properties for apps and system services |
+| [`packages/disks`](packages/disks/README.md) | Drives, partitions and resizing through UDisks, for Disks and the installer |
+| [`packages/network`](packages/network/README.md) | Wi-Fi, wired and VPN connections through NetworkManager, for Settings and Install Luft |
 | [`packages/software`](packages/software/README.md) | Packages, Flatpak, AppImages and offline updates for Schelf and Settings |
-| [`docs`](docs) | [Boot and recovery](docs/boot.md), [security model](docs/security.md), [testing](docs/testing.md), [wallpaper colors](docs/appearance.md), [prompts](docs/prompts.md) |
+| [`docs`](docs) | [Installing](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [testing](docs/testing.md), [wallpaper colors](docs/appearance.md), [prompts](docs/prompts.md) |
 
 ## Requirements
 

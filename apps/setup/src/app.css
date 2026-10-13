@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+
+:root {
+	--window-radius: 22px;
+}
+
+.setup-window[data-effect='translucent'] {
+	background: color-mix(in oklab, var(--content) 58%, transparent);
+}

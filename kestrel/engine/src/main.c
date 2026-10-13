@@ -37,6 +37,7 @@ static int caught_signal = 0;
 static gboolean force_animations = FALSE;
 static gboolean greeter = FALSE;
 static gboolean peek = FALSE;
+static gboolean setup = FALSE;
 static char *script_path = NULL;
 
 #define DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER 1
@@ -434,6 +435,12 @@ GOptionEntry gnome_shell_options[] = {
     NULL
   },
   {
+    "setup", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,
+    &setup,
+    N_("Run first-run setup"),
+    NULL
+  },
+  {
     "force-animations", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,
     &force_animations,
     N_("Force animations to be enabled"),
@@ -555,7 +562,7 @@ main (int argc, char **argv)
    * GjsContext will iterate the default main loop to
    * resolve internal modules.
    */
-  _shell_global_init ("session-mode", greeter ? "greeter" : peek ? "peek" : "user",
+  _shell_global_init ("session-mode", greeter ? "greeter" : peek ? "peek" : setup ? "setup" : "user",
                       "force-animations", force_animations,
                       "automation-script", automation_script,
                       NULL);

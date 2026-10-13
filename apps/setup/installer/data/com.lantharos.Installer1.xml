@@ -1,0 +1,46 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Installer1">
+  <!--
+    Installing Luft from the live system, and finishing first-run setup on the installed one.
+
+    Phase: "live" (started from the USB stick), "first-boot" (installed, setup still pending) or "installed".
+    Stage: "idle", "preparing" (making room and partitions), "copying", "waiting" (copied, waiting for the
+      account and regional settings), "configuring", "finished" or "failed" (Error says why).
+    Progress: 0 to 1 over the whole install.
+
+    Everything except FinishFirstBoot needs com.lantharos.installer.install.
+  -->
+  <interface name="com.lantharos.Installer1">
+    <property name="Phase" type="s" access="read"/>
+    <property name="Stage" type="s" access="read"/>
+    <property name="Progress" type="d" access="read"/>
+    <property name="Error" type="s" access="read"/>
+
+    <!-- JSON: drives with their free spaces, EFI system partition and Windows (size, used, smallest it can
+         shrink to, room for Luft, version, fast startup and why it can't shrink: "bitlocker", "hibernated",
+         "dirty" or "full"), drives Luft can't use ("running", "read-only", "too-small"), hints read from
+         Windows (time zone, keyboard, locale) and the smallest size Luft needs. -->
+    <method name="Survey">
+      <arg name="survey" type="s" direction="out"/>
+    </method>
+    <!-- JSON: {"target": {"kind": "whole", "drive"} | {"kind": "alongside", "drive", "size"} |
+         {"kind": "free", "drive", "offset"}, "variant": "default" | "nvidia"}. Starts right away. -->
+    <method name="Install">
+      <arg name="request" type="s" direction="in"/>
+    </method>
+    <!-- JSON: {"locale", "keyboard": {"layout", "variant"}, "timezone", "hostname"}. The last one given before
+         copying ends is used. -->
+    <method name="Configure">
+      <arg name="regional" type="s" direction="in"/>
+    </method>
+    <!-- The account signs in automatically once, into first-run setup. -->
+    <method name="CreateAccount">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="full_name" type="s" direction="in"/>
+      <arg name="password" type="s" direction="in"/>
+    </method>
+    <!-- Only the account setup is pending for: stops signing in automatically. -->
+    <method name="FinishFirstBoot"/>
+  </interface>
+</node>

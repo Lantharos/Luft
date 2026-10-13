@@ -1,7 +1,7 @@
 #!/bin/sh
 if [ -z "$KESTREL_LOGIN_SHELL" ]; then
   export KESTREL_LOGIN_SHELL=1
-  exec "${SHELL:-/bin/sh}" -l -c "exec '$0'"
+  exec "${SHELL:-/bin/sh}" -l -c 'exec "$0" "$@"' "$0" "$@"
 fi
 unset KESTREL_LOGIN_SHELL
 
@@ -12,6 +12,10 @@ DCONF_PROFILE="${XDG_RUNTIME_DIR:-/tmp}/kestrel/dconf-profile"
 mkdir -p "${DCONF_PROFILE%/*}"
 { cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } > "$DCONF_PROFILE"
 export DCONF_PROFILE
+
+if [ "$1" = --setup ]; then
+  systemd-cat --identifier=kestrel-setup @bindir@/kestrel --setup --wayland --display-server --no-x11
+fi
 
 systemctl --user reset-failed
 dbus-update-activation-environment --systemd --all

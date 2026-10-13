@@ -1,0 +1,19 @@
+[app]
+id = "com.lantharos.setup"
+name = "Install Luft"
+generic_name = "Installer"
+categories = ["System"]
+keywords = ["install", "installer", "setup", "set up", "dual boot", "windows"]
+version = "0.1.0"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true

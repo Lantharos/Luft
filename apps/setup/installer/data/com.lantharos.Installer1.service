@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Installer1
+Exec=/usr/libexec/luft-installer
+User=root
+SystemdService=luft-installer.service

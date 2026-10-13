@@ -23,6 +23,7 @@ const _modes = {
         isLocked: false,
         isGreeter: false,
         isPeek: false,
+        isSetup: false,
         isPrimary: false,
         unlockDialog: null,
         components: [],
@@ -36,6 +37,13 @@ const _modes = {
     'peek': {
         isPeek: true,
         hasWindows: true,
+    },
+
+    'setup': {
+        isSetup: true,
+        isPrimary: true,
+        hasWindows: true,
+        components: ['networkAgent', 'polkitAgent'],
     },
 
     'unlock-dialog': {

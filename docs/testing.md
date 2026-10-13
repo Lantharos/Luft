@@ -11,6 +11,7 @@ Build Kestrel first (see the [repository README](../README.md#build)). Then from
 | `kestrel/tools/session.sh nested` | A visible nested session in Mutter's development kit window, for trying things by hand |
 | `kestrel/tools/session.sh capture` | The full headless check suite, including the login screen, saving screenshots of every surface |
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
+| `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft (needs `KESTREL_DEV_APPS=setup` or an installed build) |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
 
 `capture` splits the checks into groups and runs several sessions side by side:
@@ -38,6 +39,10 @@ Polkit, real network credentials, unlocking with the computer's own sign-in rule
 ## Apps and packages
 
 From an app's folder, `bun run check` type-checks its interface. The Rust side builds with `bun run desktop:build`. Shared Rust crates have their own `cargo test`.
+
+## Installer
+
+`apps/setup/installer/vm/run.sh` installs Luft for real with `bootc install to-filesystem` inside a QEMU VM with spare drives, checks the result and starts the installed drive with UEFI. See [Install Luft](../apps/setup/README.md#testing).
 
 ## Luft Keyring and Passkeys
 

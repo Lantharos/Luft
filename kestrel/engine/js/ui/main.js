@@ -132,6 +132,12 @@ export async function start() {
         return;
     }
 
+    if (sessionMode.isSetup) {
+        await _initializeSetup();
+        _sessionUpdated();
+        return;
+    }
+
     global.connect('notify-error', (global, msg, detail) => {
         notifyError(msg, detail);
     });
@@ -192,6 +198,41 @@ function _initializePeek() {
     global.connect('shutdown', () => KestrelUi.shutdown());
 
     GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => global.context.notify_ready());
+}
+
+async function _initializeSetup() {
+    global.connect('notify-error', (_global, msg, detail) => console.warn(`${msg}: ${detail}`));
+
+    reloadThemeResource();
+    _loadIcons();
+    _loadOskLayouts();
+    _loadDefaultStylesheet();
+
+    new AnimationsSettings();
+
+    layoutManager = new Layout.LayoutManager();
+    uiGroup = layoutManager.uiGroup;
+    wm = new WindowManager.WindowManager();
+    inputMethod = new InputMethod.InputMethod();
+    global.stage.context.get_backend().set_input_method(inputMethod);
+    global.connect('shutdown', () => global.stage.context.get_backend().set_input_method(null));
+    keyboard = new Keyboard.KeyboardManager();
+    InputSources.getInputSourceManager().reload();
+    componentManager = new Components.ComponentManager();
+
+    layoutManager.init(KestrelUi.startSetup({layoutManager}));
+    global.connect('shutdown', () => KestrelUi.shutdown());
+
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
+        Shell.util_sd_notify();
+        global.context.notify_ready();
+    });
+
+    const runAutomation = await _loadAutomation();
+    layoutManager.connect('startup-complete', () => {
+        actionMode = Shell.ActionMode.NORMAL;
+        runAutomation?.();
+    });
 }
 
 async function _initializeGreeter() {

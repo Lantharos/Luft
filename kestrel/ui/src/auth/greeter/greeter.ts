@@ -15,6 +15,7 @@ import { LockPages } from 'resource:///com/lantharos/kestrel/ui/lockScreen/pages
 import type { Rgb } from '../../appearance/color.js';
 import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
+import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
 import { loadKestrelStylesheets } from '../../shared/stylesheet.js';
 import { Accounts } from './accounts.js';
@@ -222,20 +223,6 @@ export class Greeter {
     this.controls.showSession(session);
   }
 
-  private terminateOnceShown(): void {
-    const stage = shell().stage;
-    let painted = 0;
-    const id = stage.connect('after-paint', () => {
-      if (++painted < 2) {
-        stage.queue_redraw();
-        return;
-      }
-      stage.disconnect(id);
-      shell().context.terminate();
-    });
-    stage.queue_redraw();
-  }
-
   private async finish(): Promise<void> {
     const user = this.prompt.userName!;
     const session = this.session;
@@ -252,7 +239,7 @@ export class Greeter {
     this.controls.shutdown();
     animateActor(this.main, {
       opacity: 0, duration: FINISH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD,
-      onComplete: () => this.terminateOnceShown(),
+      onComplete: terminateOnceShown,
     });
   }
 }

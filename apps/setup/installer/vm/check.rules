@@ -1,0 +1,4 @@
+polkit.addRule(function(action, subject) {
+  if (action.id == "com.lantharos.installer.finish-first-boot" && subject.user == "ada")
+    return polkit.Result.YES;
+});

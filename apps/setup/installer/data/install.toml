@@ -1,0 +1,11 @@
+# The images the live system installs. Updates come from the reference in /usr/share/luft/image-reference,
+# with -nvidia for the NVIDIA image. size is how many bytes the installed system takes, for the progress bar.
+first-boot-session = "/usr/bin/kestrel-session --setup"
+
+[images.default]
+source = "containers-storage:ghcr.io/lantharos/luft:45"
+size = 8_000_000_000
+
+[images.nvidia]
+source = "containers-storage:ghcr.io/lantharos/luft:45-nvidia"
+size = 9_000_000_000

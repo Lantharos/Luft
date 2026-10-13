@@ -1,0 +1,12 @@
+[Unit]
+Description=Luft installer and first-run setup
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Installer1
+ExecStart=/usr/libexec/luft-installer
+SyslogIdentifier=luft-installer
+RuntimeDirectory=luft-installer
+StateDirectory=luft-installer
+KillMode=mixed
+TimeoutStopSec=5min

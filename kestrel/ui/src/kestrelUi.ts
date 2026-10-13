@@ -20,6 +20,7 @@ import { TaskView } from './desktop/taskView/taskView.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
+import { Setup, type SetupContext } from './session/setup/setup.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
 import { ClipboardPanel } from './surfaces/clipboard/panel.js';
 import { EmojiPanel } from './surfaces/emoji/panel.js';
@@ -269,6 +270,7 @@ class KestrelUi {
 let currentUi: KestrelUi | null = null;
 let greeter: Greeter | null = null;
 let peekHost: PeekService | null = null;
+let setup: Setup | null = null;
 
 let pendingWallpaper: Rgb[] | null = null;
 
@@ -282,6 +284,12 @@ export function startGreeter(context: GreeterContext): Promise<void> {
   greeter = new Greeter(context);
   void greeter.wallpaperShown.then(confirmStartup);
   return greeter.wallpaperShown;
+}
+
+export function startSetup(context: SetupContext): Promise<void> {
+  setup = new Setup(context);
+  void setup.ready.then(confirmStartup);
+  return setup.ready;
 }
 
 export function wallpaperSampled(samples: Rgb[]): void {
@@ -301,6 +309,7 @@ export function startPeek(context: HostContext): void {
 export function shutdown(): void {
   currentUi?.shutdown();
   peekHost?.destroy();
+  setup?.destroy();
 }
 
 export function dismissImmediately(): void {

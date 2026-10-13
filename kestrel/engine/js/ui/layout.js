@@ -436,7 +436,7 @@ export const LayoutManager = GObject.registerClass({
     }
 
     async _updateBackgrounds() {
-        if (Main.sessionMode.isGreeter || Main.sessionMode.isPeek)
+        if (Main.sessionMode.isGreeter || Main.sessionMode.isPeek || Main.sessionMode.isSetup)
             return;
 
         this._bgLoadCancellable?.cancel();
@@ -575,7 +575,7 @@ export const LayoutManager = GObject.registerClass({
 
         if (Main.sessionMode.isPeek) {
             this._systemBackground = new Clutter.Actor();
-        } else if (Main.sessionMode.isGreeter) {
+        } else if (Main.sessionMode.isGreeter || Main.sessionMode.isSetup) {
             const background = new Background.SystemBackground();
             background.add_constraint(new Clutter.BindConstraint({
                 source: global.stage,
@@ -657,7 +657,7 @@ export const LayoutManager = GObject.registerClass({
         this._systemBackground.destroy();
         this._systemBackground = null;
 
-        if (!Main.sessionMode.isPeek) {
+        if (!Main.sessionMode.isPeek && !Main.sessionMode.isSetup) {
             this._backdropStore = new LockBackdrop({offscreen: true});
             global.stage.insert_child_below(this._backdropStore.actor, null);
         }

@@ -182,6 +182,25 @@
         "vite": "^8.3.2",
       },
     },
+    "apps/setup": {
+      "name": "setup",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.37",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
     "apps/signin": {
       "name": "signin",
       "version": "0.1.0",
@@ -642,6 +661,8 @@
     "schelf": ["schelf@workspace:apps/schelf"],
 
     "settings": ["settings@workspace:apps/settings"],
+
+    "setup": ["setup@workspace:apps/setup"],
 
     "signin": ["signin@workspace:apps/signin"],
 

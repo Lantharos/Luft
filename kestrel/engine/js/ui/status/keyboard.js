@@ -336,7 +336,7 @@ export class InputSourceManager extends Signals.EventEmitter {
                 Meta.KeyBindingFlags.IS_REVERSED,
                 Shell.ActionMode.ALL,
                 this._switchInputSource.bind(this));
-        this._settings = Main.sessionMode.isGreeter
+        this._settings = Main.sessionMode.isGreeter || Main.sessionMode.isSetup
             ? new InputSourceSystemSettings()
             : new InputSourceSessionSettings();
         this._settings.connect('input-sources-changed', this._inputSourcesChanged.bind(this));
@@ -346,7 +346,7 @@ export class InputSourceManager extends Signals.EventEmitter {
         this._xkbInfo = KeyboardManager.getXkbInfo();
         this._keyboardManager = KeyboardManager.getKeyboardManager();
         this._keyboardManager.connect('keymap-changed', this._keymapChanged.bind(this));
-        if (!Main.sessionMode.isGreeter)
+        if (!Main.sessionMode.isGreeter && !Main.sessionMode.isSetup)
             this._userLayoutMonitors = KeyboardManager.watchUserLayouts(this._userLayoutsChanged.bind(this));
 
         this._ibusReady = false;

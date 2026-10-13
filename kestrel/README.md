@@ -175,6 +175,8 @@ Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck, see [docs/boot.md](../docs/boot.md#graphics-driver-stopped-responding) |
 | `kestrel-wallpaper` | Plays live wallpapers |
 
+`kestrel-session --setup` first runs Kestrel in setup mode, which shows only Install Luft over the blurred wallpaper, then starts the session when setup finishes ([docs/install.md](../docs/install.md)).
+
 The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior. Portal preferences are in `kestrel-portals.conf`: Kestrel handles everything except file dialogs (Rover) and secrets (Luft Keyring).
 
 ## Before it becomes the default session

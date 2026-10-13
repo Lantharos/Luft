@@ -1,22 +1,33 @@
 use std::sync::{Mutex, MutexGuard};
 
-use luft_software::packagekit::{self, Mode, PackageId, Results, Update, offline};
 use luft_software::task::Task;
-use luft_software::updates::{self, PackageUpdates};
+use luft_software::updates;
 use serde::Serialize;
 
-use super::background;
+use super::backend;
+use super::image;
+use super::packages;
 use super::state;
 use super::store::Checked;
+
+#[derive(Serialize, Clone)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum System {
+    Packages(packages::Overview),
+    Image(Box<image::Overview>),
+}
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Overview {
     checked: Option<u64>,
-    updates: Vec<Update>,
-    prepared: bool,
-    results: Option<Results>,
     apps: Option<usize>,
+    pub system: System,
+}
+
+pub struct Loaded {
+    pub system: System,
+    pub package_apps: usize,
 }
 
 #[derive(PartialEq, Eq)]
@@ -28,49 +39,27 @@ enum Reload {
 
 static RELOAD: Mutex<Reload> = Mutex::new(Reload::Idle);
 
-fn ids(updates: &[Update]) -> Vec<PackageId> {
-    updates
-        .iter()
-        .map(|update| update.package.clone())
-        .collect()
-}
-
-pub fn system_updates() -> Result<Vec<PackageId>, String> {
-    match state::overview() {
-        Some(overview) => Ok(ids(&overview.updates)),
-        None => Ok(ids(&PackageUpdates::load(Mode::Quiet)?.system)),
-    }
-}
-
 pub fn load(refresh: Option<Task>) -> Result<(), String> {
-    let checked = match refresh {
-        Some(task) => {
-            packagekit::refresh(true, Mode::Interactive, Some(task))?;
-            Checked::now()?
-        }
-        None => Checked::load(),
+    let refreshed = refresh.is_some();
+    let Loaded {
+        system,
+        package_apps,
+    } = backend::current().load(refresh)?;
+    let checked = if refreshed {
+        Checked::now()?
+    } else {
+        Checked::load()
     };
-    let packages = PackageUpdates::load(Mode::Quiet)?;
     state::set_overview(Overview {
         checked: checked.at,
-        prepared: background::covered(&ids(&packages.system)),
-        updates: packages.system.clone(),
-        results: offline::results(),
         apps: state::overview().and_then(|overview| overview.apps),
+        system,
     });
     std::thread::spawn(move || {
-        let apps = updates::app_count(&packages);
+        let apps = updates::app_count(package_apps);
         state::edit_overview(|overview| overview.apps = Some(apps));
     });
     Ok(())
-}
-
-pub fn mark_prepared() {
-    let Some(current) = state::overview() else {
-        return;
-    };
-    let prepared = background::covered(&ids(&current.updates));
-    state::edit_overview(|overview| overview.prepared = prepared);
 }
 
 fn reloading() -> MutexGuard<'static, Reload> {

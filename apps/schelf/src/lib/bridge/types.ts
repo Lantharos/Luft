@@ -47,6 +47,12 @@ export interface Updates {
 	error: string | null;
 }
 
+export interface SystemPackages {
+	atRestart: boolean;
+	pending: { installing: string[]; removing: string[] };
+	layered: string[] | null;
+}
+
 export interface Permissions {
 	shared: string[];
 	sockets: string[];
@@ -146,6 +152,7 @@ export interface Backend {
 	installed(): Promise<InstalledApp[]>;
 	launch(desktop: string): Promise<void>;
 	removalPlan(packageName: string): Promise<string[]>;
+	systemPackages(): Promise<SystemPackages>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
 	checkUpdates(): Promise<Updates>;
 	inspectFile(path: string): Promise<OpenedFile>;

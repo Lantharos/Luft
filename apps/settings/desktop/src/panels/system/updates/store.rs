@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use luft_software::image::Update;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
@@ -35,6 +36,12 @@ impl Default for Preferences {
 #[serde(rename_all = "camelCase")]
 pub struct Checked {
     pub at: Option<u64>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Found {
+    pub update: Option<Update>,
 }
 
 fn path(base: Option<PathBuf>, name: &str) -> PathBuf {
@@ -92,5 +99,19 @@ impl Checked {
         };
         save(Self::file(), &checked)?;
         Ok(checked)
+    }
+}
+
+impl Found {
+    fn file() -> PathBuf {
+        path(dirs::state_dir(), "image-update.json")
+    }
+
+    pub fn load() -> Self {
+        load(Self::file())
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        save(Self::file(), self)
     }
 }

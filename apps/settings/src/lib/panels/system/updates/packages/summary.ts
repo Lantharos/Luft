@@ -1,4 +1,4 @@
-import type { Update } from './api';
+import type { Update } from '../api';
 
 export interface Area {
 	title: string;

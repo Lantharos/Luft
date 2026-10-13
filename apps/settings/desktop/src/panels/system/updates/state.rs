@@ -1,8 +1,7 @@
 use std::sync::{LazyLock, Mutex, MutexGuard, OnceLock};
 
 use luft_app::Events;
-use luft_software::packagekit::running::Change;
-use luft_software::progress::Progress;
+use luft_software::progress::{Change, Progress};
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
 
@@ -17,6 +16,7 @@ pub enum Kind {
     Check,
     Download,
     Firmware,
+    Rollback,
     Elsewhere,
 }
 

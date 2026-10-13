@@ -32,7 +32,7 @@ export interface Elsewhere {
 }
 
 export interface Activity {
-	running: 'check' | 'download' | 'firmware' | 'elsewhere' | null;
+	running: 'check' | 'download' | 'firmware' | 'rollback' | 'elsewhere' | null;
 	target: string | null;
 	elsewhere: Elsewhere | null;
 	progress: Progress | null;
@@ -51,12 +51,35 @@ export interface Results {
 	error: string | null;
 }
 
-export interface Overview {
-	checked: number | null;
+export interface PackageOverview {
+	kind: 'packages';
 	updates: Update[];
 	prepared: boolean;
 	results: Results | null;
+}
+
+export interface Release {
+	version: string | null;
+	notes: string | null;
+	released: number | null;
+}
+
+export interface ImageOverview {
+	kind: 'image';
+	current: Release;
+	staged: Release | null;
+	previous: Release | null;
+	returning: Release | null;
+	layered: string[];
+	installing: string[];
+	removing: string[];
+	available: (Release & { size: number }) | null;
+}
+
+export interface Overview {
+	checked: number | null;
 	apps: number | null;
+	system: PackageOverview | ImageOverview;
 }
 
 export interface Status {
@@ -84,6 +107,7 @@ export const download = () => invoke<void>('updates_download');
 export const cancel = () => invoke<void>('updates_cancel');
 export const firmware = () => invoke<Firmware[]>('updates_firmware', {}, SLOW);
 export const installFirmware = (id: string) => invoke<void>('updates_firmware_install', { id });
+export const rollback = () => invoke<void>('updates_rollback');
 export const restart = () => invoke<void>('updates_restart');
 export const preferences = () => invoke<Preferences>('updates_preferences');
 export const setPreferences = (preferences: Preferences) => invoke<void>('updates_set_preferences', { ...preferences });

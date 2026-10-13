@@ -41,11 +41,23 @@ pub fn session() -> Result<&'static Connection, String> {
     cached(&SESSION, zbus::Connection::session())
 }
 
-pub fn at(address: &str) -> Result<Connection, String> {
-    let _context = RUNTIME.enter();
-    let builder = zbus::connection::Builder::address(address).map_err(|error| error.to_string())?;
+fn build(builder: zbus::connection::Builder<'_>) -> Result<Connection, String> {
     RUNTIME
         .block_on(builder.build())
         .map(Connection::from)
         .map_err(|error| error.to_string())
+}
+
+fn address(address: &str) -> Result<zbus::connection::Builder<'_>, String> {
+    zbus::connection::Builder::address(address).map_err(|error| error.to_string())
+}
+
+pub fn at(address: &str) -> Result<Connection, String> {
+    let _context = RUNTIME.enter();
+    build(self::address(address)?)
+}
+
+pub fn peer(address: &str) -> Result<Connection, String> {
+    let _context = RUNTIME.enter();
+    build(self::address(address)?.p2p())
 }

@@ -5,7 +5,7 @@ mod packages;
 use gio::prelude::*;
 use luft_app::Commands;
 use luft_software::flatpak::{self, Installation, Permissions};
-use luft_software::packagekit::{self, Mode};
+use luft_software::packages::Packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -75,17 +75,7 @@ fn launch(Desktop { desktop }: Desktop) -> Result<(), String> {
 }
 
 fn removal_plan(Package { package }: Package) -> Result<Vec<String>, String> {
-    let installed = packagekit::resolve(
-        &[package.as_str()],
-        packagekit::filter::INSTALLED,
-        Mode::Quiet,
-    )?;
-    let ids: Vec<_> = installed.into_iter().map(|package| package.id).collect();
-    Ok(packagekit::removal_plan(&ids)?
-        .into_iter()
-        .map(|package| package.name)
-        .filter(|name| *name != package)
-        .collect())
+    luft_software::packages::removal_plan(&package)
 }
 
 fn permissions(
@@ -102,5 +92,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
         .command("library_removal_plan", removal_plan)
+        .command("library_packages", |_: Value| Packages::current())
         .command("library_permissions", permissions)
 }

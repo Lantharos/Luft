@@ -25,6 +25,8 @@ export function describe(activity: Activity) {
 			return 'Looking for updates…';
 		case 'download':
 			return 'Downloading updates…';
+		case 'rollback':
+			return 'Getting the earlier version ready…';
 		case 'elsewhere':
 			return activity.elsewhere ? elsewhere(activity.elsewhere) : null;
 		default:

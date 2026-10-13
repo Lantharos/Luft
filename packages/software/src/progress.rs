@@ -26,4 +26,14 @@ impl Progress {
     }
 }
 
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum Change {
+    Refresh,
+    Download,
+    Update,
+    Install,
+    Remove,
+}
+
 pub type Report<'a> = &'a (dyn Fn(Progress) + Sync);

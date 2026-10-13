@@ -3,6 +3,7 @@ use crate::classify::Classification;
 use crate::flatpak;
 use crate::packagekit::{self, Mode, Update};
 
+#[derive(Default)]
 pub struct PackageUpdates {
     pub system: Vec<Update>,
     pub apps: Vec<Update>,
@@ -42,10 +43,10 @@ pub fn appimages() -> Vec<(AppImage, Available)> {
     })
 }
 
-pub fn app_count(packages: &PackageUpdates) -> usize {
+pub fn app_count(package_apps: usize) -> usize {
     std::thread::scope(|scope| {
         let flatpaks = scope.spawn(|| flatpak::updates().map(|updates| updates.len()).unwrap_or(0));
         let appimages = scope.spawn(|| appimages().len());
-        packages.apps.len() + flatpaks.join().unwrap_or(0) + appimages.join().unwrap_or(0)
+        package_apps + flatpaks.join().unwrap_or(0) + appimages.join().unwrap_or(0)
     })
 }

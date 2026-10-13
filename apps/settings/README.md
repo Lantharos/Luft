@@ -22,7 +22,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 | Date & Time | Time zone, automatic time and clock format |
 | Users | Account picture, name, password and fingerprints |
 | Login Screen | Wallpaper, listed users, default session and automatic login |
-| Updates | System updates (kernel, drivers, libraries, services) and firmware, installed at the next restart; app updates are left to Schelf |
+| Updates | System updates and firmware, installed at the next restart, with release notes and a way back to the previous version on image-based installs; app updates are left to Schelf |
 | About | Device name, hardware, system versions, storage and recent graphics driver problems |
 
 Notes:
@@ -65,4 +65,4 @@ A link to a page for missing hardware, such as Bluetooth without an adapter, exp
 
 ## Automatic updates
 
-Settings writes the systemd user timer `com.lantharos.settings.updates.timer` the first time Updates opens, and rewrites it when the schedule changes. The timer runs Settings with `--check-updates`, which refreshes the software sources, downloads updates without a window and sends a notification when they are ready.
+Settings writes the systemd user timer `com.lantharos.settings.updates.timer` the first time Updates opens, and rewrites it when the schedule changes. The timer runs Settings with `--check-updates`, which looks for updates, downloads them without a window and sends a notification when they are ready. On a regular Fedora install that means PackageKit's offline updates; on an image-based install it means the next image, staged for the next restart.

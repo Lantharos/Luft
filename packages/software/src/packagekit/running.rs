@@ -1,40 +1,26 @@
 use std::collections::HashMap;
 
 use luft_app::dbus;
-use serde::Serialize;
 use zbus::blocking::MessageIterator;
 use zbus::names::BusName;
 use zbus::zvariant::{OwnedObjectPath, OwnedValue};
 
 use super::enums::{flag, role, status};
 use super::transaction::{MANAGER, PATH, PROPERTIES, SERVICE, TRANSACTION};
+use crate::progress::Change;
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
-#[serde(rename_all = "camelCase")]
-pub enum Change {
-    Refresh,
-    Download,
-    Update,
-    Install,
-    Remove,
-}
-
-impl Change {
-    fn of(role: u32, flags: u64) -> Option<Self> {
-        if flags & flag::SIMULATE != 0 {
-            return None;
-        }
-        match role {
-            role::REFRESH_CACHE => Some(Self::Refresh),
-            role::DOWNLOAD_PACKAGES => Some(Self::Download),
-            role::UPDATE_PACKAGES if flags & flag::ONLY_DOWNLOAD != 0 => Some(Self::Download),
-            role::UPDATE_PACKAGES | role::UPGRADE_SYSTEM | role::REPAIR_SYSTEM => {
-                Some(Self::Update)
-            }
-            role::INSTALL_PACKAGES | role::INSTALL_FILES => Some(Self::Install),
-            role::REMOVE_PACKAGES => Some(Self::Remove),
-            _ => None,
-        }
+fn change_of(role: u32, flags: u64) -> Option<Change> {
+    if flags & flag::SIMULATE != 0 {
+        return None;
+    }
+    match role {
+        role::REFRESH_CACHE => Some(Change::Refresh),
+        role::DOWNLOAD_PACKAGES => Some(Change::Download),
+        role::UPDATE_PACKAGES if flags & flag::ONLY_DOWNLOAD != 0 => Some(Change::Download),
+        role::UPDATE_PACKAGES | role::UPGRADE_SYSTEM | role::REPAIR_SYSTEM => Some(Change::Update),
+        role::INSTALL_PACKAGES | role::INSTALL_FILES => Some(Change::Install),
+        role::REMOVE_PACKAGES => Some(Change::Remove),
+        _ => None,
     }
 }
 
@@ -74,7 +60,7 @@ fn describe(path: OwnedObjectPath) -> Option<Running> {
         .and_then(|value| u64::try_from(value).ok())
         .unwrap_or(0);
     Some(Running {
-        change: Change::of(role, flags)?,
+        change: change_of(role, flags)?,
         sender: properties
             .get("Sender")
             .and_then(|value| String::try_from(value.clone()).ok())

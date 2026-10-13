@@ -2,27 +2,16 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use luft_app::dbus;
-use luft_software::packagekit::{self, Mode, PackageId, offline};
-use luft_software::progress::Progress;
-use luft_software::task::{Cancel, Task};
-use luft_software::updates::PackageUpdates;
 use zbus::blocking::MessageIterator;
 use zbus::zvariant::Value;
 
-use super::store::{Checked, Preferences};
+use super::backend::{self, Notice};
+use super::store::Preferences;
 
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
 const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
 const PAGE: &str = "kestrel-settings:updates";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
-
-pub fn covered(updates: &[PackageId]) -> bool {
-    let prepared: Vec<PackageId> = offline::prepared().unwrap_or_default();
-    !updates.is_empty()
-        && updates
-            .iter()
-            .all(|update| prepared.iter().any(|ready| ready.id == update.id))
-}
 
 fn notify(summary: &str, body: &str) -> Result<(), String> {
     let connection = dbus::session()?;
@@ -96,34 +85,10 @@ fn notify(summary: &str, body: &str) -> Result<(), String> {
 }
 
 fn check() -> Result<(), String> {
-    packagekit::refresh(false, Mode::Background, None)?;
-    Checked::now()?;
-    let updates: Vec<PackageId> = PackageUpdates::load(Mode::Background)?
-        .system
-        .into_iter()
-        .map(|update| update.package)
-        .collect();
-    if updates.is_empty() || covered(&updates) {
-        return Ok(());
+    match backend::current().check_in_background(Preferences::load().download)? {
+        Some(Notice { summary, body }) => notify(summary, body),
+        None => Ok(()),
     }
-    if !Preferences::load().download {
-        return notify(
-            "System updates are available",
-            "Open Settings to download and install them.",
-        );
-    }
-    let quiet = |_: Progress| {};
-    packagekit::prepare(
-        &updates,
-        Task {
-            report: &quiet,
-            cancel: &Cancel::default(),
-        },
-    )?;
-    notify(
-        "Updates are ready to install",
-        "Restart when it suits you to install them.",
-    )
 }
 
 pub fn run() {

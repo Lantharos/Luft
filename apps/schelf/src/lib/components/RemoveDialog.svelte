@@ -3,6 +3,7 @@
 	import type { InstalledApp } from '#lib/bridge/types.js';
 	import { removeJob } from '#lib/app/jobs.js';
 	import { backend } from '#lib/state/backend.js';
+	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { app, onclose }: { app: InstalledApp; onclose: () => void } = $props();
@@ -21,6 +22,7 @@
 
 	const description = $derived.by(() => {
 		if (app.source === 'appImage') return `${app.name} and its file in ${app.origin} will be deleted.`;
+		if (app.source === 'package' && library.packages.atRestart) return `${app.name} will be removed when you restart. Your files and settings stay.`;
 		if (alsoRemoved.length) return `This also removes ${alsoRemoved.join(', ')}, which ${alsoRemoved.length === 1 ? 'needs' : 'need'} ${app.name}.`;
 		return `${app.name} will be removed from this computer. Your files and settings stay.`;
 	});

@@ -1,48 +1,24 @@
 <script lang="ts">
-	import { ago, bytes, Row, Section } from '@luft/ui';
+	import { Row, Section } from '@luft/ui';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import { describe as describeActivity, fractionOf, showsProgress } from './activity';
-	import { cancel, check, download, firmware, load, openApps, preferences as loadPreferences, restart, type Activity, type Firmware, type Preferences } from './api';
+	import { fractionOf, showsProgress } from './activity';
+	import { cancel, check, firmware, load, openApps, preferences as loadPreferences, type Activity, type Firmware, type Preferences } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
-	import DetailsDialog from './DetailsDialog.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
+	import { headline, subline } from './headline';
+	import ImageUpdates from './image/ImageUpdates.svelte';
+	import PackageUpdates from './packages/PackageUpdates.svelte';
 	import ProgressTrack from './ProgressTrack.svelte';
-	import { recently } from './time';
-	import { describe } from './summary';
 
 	let devices = $state<Firmware[]>([]);
 	let preferences = $state<Preferences | null>(null);
 	let failure = $state<string | null>(null);
-	let details = $state(false);
 
 	const info = $derived(updates.overview);
 	const activity = $derived(updates.activity);
 	const busy = $derived(activity.running !== null);
-	const downloading = $derived(activity.running === 'download');
-	const list = $derived(info?.updates ?? []);
-	const size = $derived(list.reduce((sum, update) => sum + update.downloadSize, 0));
 	const fraction = $derived(fractionOf(activity));
 	const apps = $derived(info?.apps ?? null);
-
-	const headline = $derived.by(() => {
-		const running = describeActivity(activity);
-		if (running) return running;
-		if (!info) return 'Looking for updates…';
-		if (info.prepared) return 'Updates are ready to install';
-		if (list.length) return `${list.length} ${list.length === 1 ? 'update is' : 'updates are'} available`;
-		return 'Your system is up to date';
-	});
-
-	const subline = $derived.by(() => {
-		const error = failure ?? activity.error;
-		if (error) return error;
-		if (activity.running === 'elsewhere') return "You can look for updates again when it's done";
-		if (!info) return '';
-		if (info.prepared) return 'Restart to install them. Your computer is back in a few minutes.';
-		const parts = [info.checked ? `Last checked ${ago(info.checked)}` : 'Not checked yet'];
-		if (info.results?.success && recently(info.results.finished)) parts.push(`updates installed ${ago(info.results.finished)}`);
-		return parts.join(' · ');
-	});
 
 	async function attempt(action: () => Promise<void>) {
 		failure = null;
@@ -68,10 +44,10 @@
 <div class="flex flex-col gap-3 px-2 pb-1">
 	<div class="flex items-center gap-4">
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<span class="truncate text-[26px] font-semibold">{headline}</span>
-			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline}</span>
+			<span class="truncate text-[26px] font-semibold">{headline(info, activity)}</span>
+			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline(info, activity, failure)}</span>
 		</div>
-		{#if downloading}
+		{#if activity.running === 'download'}
 			<button type="button" class="button" onclick={() => attempt(cancel)}>Stop</button>
 		{:else}
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? 'Checking…' : 'Check now'}</button>
@@ -85,23 +61,10 @@
 	{/if}
 </div>
 
-{#if info?.results && !info.results.success && recently(info.results.finished)}
-	<Section>
-		<Row title="The last updates couldn't be installed" description={info.results.error ?? 'Your system was left as it was'} truncate />
-	</Section>
-{/if}
-
-{#if list.length}
-	<Section>
-		<Row title={describe(list)} description="{list.length} {list.length === 1 ? 'update' : 'updates'} · {bytes(size)}">
-			{#if info?.prepared}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart and install</button>
-			{:else if !downloading}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>Download</button>
-			{/if}
-		</Row>
-		<Row title="See what's included" onclick={() => (details = true)} />
-	</Section>
+{#if info?.system.kind === 'packages'}
+	<PackageUpdates overview={info.system} {activity} {attempt} />
+{:else if info?.system.kind === 'image'}
+	<ImageUpdates overview={info.system} {activity} {attempt} />
 {/if}
 
 {#if devices.length}
@@ -118,8 +81,4 @@
 
 {#if preferences}
 	<AutomaticSection bind:preferences />
-{/if}
-
-{#if details}
-	<DetailsDialog updates={list} onclose={() => (details = false)} />
 {/if}

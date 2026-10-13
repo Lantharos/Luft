@@ -19,7 +19,7 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | Source | Installed for | Permission |
 |--------|---------------|------------|
 | Flathub | Your account (Flathub is added on first use) | None |
-| System software sources | Everyone, through PackageKit | As the system is set up |
+| System software sources | Everyone, through PackageKit, or layered on the system image at the next restart on image-based installs | As the system is set up |
 | AppImage | Your account, in `~/Applications` | None |
 
 A package from the system's sources counts as an app when it puts a visible entry in the app menu. Everything else is part of the system and is updated from Settings, which uses the same rule.
@@ -36,7 +36,7 @@ bun run desktop:build    # production web build and release binary
 bun run desktop:bundle   # Sabine bundle
 ```
 
-In the browser, `?scheme=light` shows the light style, `?file=/path` shows the page for an opened file and `?page=schelf:updates` opens Updates.
+In the browser, `?scheme=light` shows the light style, `?system=image` shows an image-based install, `?file=/path` shows the page for an opened file and `?page=schelf:updates` opens Updates.
 
 ## Install
 

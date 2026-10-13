@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes, Dialog, VirtualScroller } from '@luft/ui';
-	import type { Update } from './api';
+	import type { Update } from '../api';
 	import { areas } from './summary';
 
 	let { updates, onclose }: { updates: Update[]; onclose: () => void } = $props();

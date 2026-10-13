@@ -1,8 +1,9 @@
-import type { InstalledApp, Updates } from '#lib/bridge/types.js';
+import type { InstalledApp, SystemPackages, Updates } from '#lib/bridge/types.js';
 import { backend } from './backend';
 
 class Library {
 	installed = $state<InstalledApp[]>([]);
+	packages = $state<SystemPackages>({ atRestart: false, pending: { installing: [], removing: [] }, layered: null });
 	loaded = $state(false);
 	updates = $state<Updates | null>(null);
 	checking = $state(false);
@@ -18,7 +19,9 @@ class Library {
 	}
 
 	async refresh() {
-		this.installed = await backend().installed();
+		const [installed, packages] = await Promise.all([backend().installed(), backend().systemPackages()]);
+		this.installed = installed;
+		this.packages = packages;
 		this.loaded = true;
 	}
 
@@ -49,6 +52,18 @@ class Library {
 
 	package(name: string) {
 		return this.installed.find((app) => app.source === 'package' && app.package === name) ?? null;
+	}
+
+	removable(app: InstalledApp) {
+		return app.source !== 'package' || !this.packages.layered || this.packages.layered.includes(app.package!);
+	}
+
+	installsAtRestart(name: string) {
+		return this.packages.pending.installing.includes(name);
+	}
+
+	removedAtRestart(app: InstalledApp) {
+		return app.source === 'package' && this.packages.pending.removing.includes(app.package!);
 	}
 
 	update(key: string) {

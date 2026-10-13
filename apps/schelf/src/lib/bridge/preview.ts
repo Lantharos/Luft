@@ -112,6 +112,10 @@ export const preview: Backend = {
 	installed: async () => installed,
 	launch: async () => {},
 	removalPlan: async () => [],
+	systemPackages: async () =>
+		parameters.get('system') === 'image'
+			? { atRestart: true, pending: { installing: ['inkscape'], removing: [] }, layered: ['discord'] }
+			: { atRestart: false, pending: { installing: [], removing: [] }, layered: null },
 	permissions: async () => ({ shared: ['network', 'ipc'], sockets: ['wayland', 'pulseaudio'], devices: ['dri'], filesystems: ['xdg-download'], sessionBus: [], systemBus: [] }),
 	checkUpdates: async () => {
 		await new Promise((resolve) => setTimeout(resolve, 600));

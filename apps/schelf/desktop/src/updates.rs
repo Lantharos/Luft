@@ -4,7 +4,7 @@ use luft_app::Commands;
 use luft_app::apps::App;
 use luft_software::classify::Classification;
 use luft_software::flatpak::{self, Installation};
-use luft_software::packagekit::Mode;
+use luft_software::packages;
 use luft_software::updates::{self, PackageUpdates};
 use sabine::SabineWindow;
 use serde::Serialize;
@@ -119,7 +119,7 @@ fn appimages() -> Vec<AppUpdate> {
 
 fn check(_: Value) -> Result<Updates, String> {
     let (packages, flatpaks, appimages) = std::thread::scope(|scope| {
-        let packages = scope.spawn(|| PackageUpdates::load(Mode::Quiet).map(packages));
+        let packages = scope.spawn(|| packages::updates().map(packages));
         let flatpaks = scope.spawn(|| flatpak::updates().map(flatpaks));
         let appimages = scope.spawn(appimages);
         (

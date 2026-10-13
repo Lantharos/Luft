@@ -4,7 +4,8 @@ mod fedora;
 mod flathub;
 
 use luft_app::Commands;
-use luft_software::packagekit::{self, Mode, PackageDetails, filter};
+use luft_software::packagekit::PackageDetails;
+use luft_software::packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -38,15 +39,7 @@ struct FedoraApp {
 
 fn fedora_app(Id { id }: Id) -> Result<FedoraApp, String> {
     let component = fedora::find(&id).ok_or("That app isn't in the catalog any more.")?;
-    let details = packagekit::resolve(
-        &[component.package.as_str()],
-        filter::NEWEST | filter::ARCH,
-        Mode::Quiet,
-    )
-    .ok()
-    .and_then(|packages| packages.into_iter().next())
-    .and_then(|package| packagekit::details(&[package.id], Mode::Quiet).ok())
-    .and_then(|details| details.into_iter().next());
+    let details = packages::details(&component.package);
     Ok(FedoraApp { component, details })
 }
 

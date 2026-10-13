@@ -1,7 +1,10 @@
+mod backend;
 mod background;
 mod elsewhere;
 mod firmware;
+mod image;
 mod overview;
+mod packages;
 mod schedule;
 mod state;
 mod store;
@@ -9,7 +12,6 @@ mod store;
 use std::sync::Once;
 
 use luft_app::{Commands, Events, dbus};
-use luft_software::packagekit;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
@@ -45,11 +47,15 @@ fn load(_: Value) -> Result<(), String> {
     Ok(())
 }
 
+fn scan() {
+    backend::current().scan();
+}
+
 fn check(_: Value) -> Result<(), String> {
     state::start(
         Activity::new(Kind::Check),
         |task| overview::load(Some(task)),
-        elsewhere::scan,
+        scan,
     );
     Ok(())
 }
@@ -57,10 +63,10 @@ fn check(_: Value) -> Result<(), String> {
 fn download(_: Value) -> Result<(), String> {
     let started = state::start(
         Activity::new(Kind::Download),
-        |task| packagekit::prepare(&overview::system_updates()?, task),
+        |task| backend::current().download(task),
         || {
-            overview::mark_prepared();
-            elsewhere::scan();
+            backend::current().downloaded();
+            scan();
         },
     );
     started
@@ -68,16 +74,26 @@ fn download(_: Value) -> Result<(), String> {
         .ok_or_else(|| "Something is already being downloaded.".into())
 }
 
+fn rollback(_: Value) -> Result<(), String> {
+    let started = state::start(
+        Activity::new(Kind::Rollback),
+        |task| backend::current().rollback(task),
+        || {
+            overview::reload();
+            scan();
+        },
+    );
+    started
+        .then_some(())
+        .ok_or_else(|| "Something else is changing the system right now.".into())
+}
+
 fn install_firmware(Device { id }: Device) -> Result<(), String> {
     let activity = Activity {
         target: Some(id.clone()),
         ..Activity::new(Kind::Firmware)
     };
-    let started = state::start(
-        activity,
-        move |task| firmware::install(&id, task),
-        elsewhere::scan,
-    );
+    let started = state::start(activity, move |task| firmware::install(&id, task), scan);
     started
         .then_some(())
         .ok_or_else(|| "Something is already being installed.".into())
@@ -119,7 +135,7 @@ fn open_apps(_: Value) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
-    elsewhere::watch();
+    backend::current().watch();
     window
         .command("updates_status", |_: Value| {
             Ok::<Status, String>(state::status())
@@ -133,6 +149,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .command("updates_firmware", firmware_updates)
         .command("updates_firmware_install", install_firmware)
+        .command("updates_rollback", rollback)
         .command("updates_restart", restart)
         .command("updates_preferences", |_: Value| {
             Ok::<Preferences, String>(Preferences::load())

@@ -18,6 +18,7 @@
 	const update = $derived(library.update(app.key));
 	const detail = $derived.by(() => {
 		if (operation?.state === 'failed') return operation.error;
+		if (library.removedAtRestart(app)) return 'Removed when you restart';
 		const parts = [sourceName(app.source, app.origin), app.version, app.size ? bytes(app.size) : null];
 		return parts.filter(Boolean).join(' · ');
 	});
@@ -54,13 +55,15 @@
 							navigation.push({ page: 'app', target: { installed: app.key }, name: app.name });
 						}}>Details</MenuItem
 					>
-					<MenuItem
-						danger
-						onclick={() => {
-							close();
-							onremove(app);
-						}}>Remove</MenuItem
-					>
+					{#if library.removable(app) && !library.removedAtRestart(app)}
+						<MenuItem
+							danger
+							onclick={() => {
+								close();
+								onremove(app);
+							}}>Remove</MenuItem
+						>
+					{/if}
 				{/snippet}
 			</MenuButton>
 		{/if}

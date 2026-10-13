@@ -37,6 +37,7 @@ import * as UserWidget from './userWidget.js';
 import {ModalDialogErrors, ModalDialogError} from '../misc/dbusErrors.js';
 
 import {loadInterfaceXML} from '../misc/fileUtils.js';
+import {loadPendingUpdates, UpdateAction} from '../misc/pendingUpdates.js';
 
 const _ITEM_ICON_SIZE = 64;
 
@@ -145,11 +146,6 @@ const MAX_USERS_IN_SESSION_DIALOG = 5;
 const LogindSessionIface = loadInterfaceXML('org.freedesktop.login1.Session');
 const LogindSession = Gio.DBusProxy.makeProxyWrapper(LogindSessionIface);
 
-const OFFLINE_UPDATE_ACTION_REBOOT = 'reboot';
-const OFFLINE_UPDATE_ACTION_SHUTDOWN = 'power-off';
-const OfflineUpdatesIface = loadInterfaceXML('org.freedesktop.PackageKit.Offline');
-const OfflineUpdatesProxy = Gio.DBusProxy.makeProxyWrapper(OfflineUpdatesIface);
-
 const UPowerIface = loadInterfaceXML('org.freedesktop.UPower.Device');
 const UPowerProxy = Gio.DBusProxy.makeProxyWrapper(UPowerIface);
 
@@ -222,7 +218,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         this._userManager = AccountsService.UserManager.get_default();
         this._user = this._userManager.get_user(GLib.get_user_name());
 
-        this._offlineUpdatesProxy = null;
+        this._pendingUpdates = null;
 
         this._powerProxy = new UPowerProxy(Gio.DBus.system,
             'org.freedesktop.UPower',
@@ -296,20 +292,11 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         this._canRebootToBootLoaderMenu = canRebootToBootLoaderMenu;
     }
 
-    async _loadOfflineUpdatesProxy() {
-        try {
-            this._offlineUpdatesProxy = await OfflineUpdatesProxy.newAsync(
-                Gio.DBus.system, 'org.freedesktop.PackageKit', '/org/freedesktop/PackageKit');
-
-            // Creating a D-Bus proxy won't propagate SERVICE_UNKNOWN or NAME_HAS_NO_OWNER
-            // errors if PackageKit is not available, but the GIO implementation will make
-            // sure in that case that the proxy's g-name-owner is set to null, so check that.
-            if (this._offlineUpdatesProxy.g_name_owner === null)
-                this._offlineUpdatesProxy = null;
-        } catch (error) {
-            this._offlineUpdatesProxy = null;
-            log(error.message);
-        }
+    _updatesCheckBoxText(dialogContent) {
+        const version = this._pendingUpdates?.version;
+        if (!dialogContent.checkBoxText || !version)
+            return dialogContent.checkBoxText || '';
+        return C_('checkbox', 'Install version %s').format(version);
     }
 
     _isDischargingBattery() {
@@ -470,20 +457,20 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
             if (this._checkBox.checked) {
                 switch (signal) {
                 case 'ConfirmedReboot':
-                    await this._setPostUpdateAction(OFFLINE_UPDATE_ACTION_REBOOT);
+                    await this._installThroughRestart(UpdateAction.REBOOT);
                     break;
                 case 'ConfirmedShutdown':
-                    if (await this._setPostUpdateAction(OFFLINE_UPDATE_ACTION_SHUTDOWN))
+                    if (await this._installThroughRestart(UpdateAction.POWER_OFF))
                         signal = 'ConfirmedReboot';
                     break;
                 default:
                     break;
                 }
             } else {
-                await this._triggerOfflineUpdateCancel();
+                await this._skipUpdates();
             }
-        } else if (this._type === DialogType.UPDATE_RESTART && (this._updatePrepared || this._updateScheduled)) {
-            await this._setPostUpdateAction(OFFLINE_UPDATE_ACTION_REBOOT);
+        } else if (this._type === DialogType.UPDATE_RESTART) {
+            await this._installThroughRestart(UpdateAction.REBOOT);
         }
 
         this._fadeOutDialog();
@@ -496,27 +483,18 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         this._sync();
     }
 
-    async _setPostUpdateAction(action) {
-        // Handle this gracefully if PackageKit is not available.
-        if (!this._offlineUpdatesProxy)
-            return false;
-
+    async _installThroughRestart(action) {
         try {
-            await this._offlineUpdatesProxy.TriggerAsync(action);
-            return true;
+            return await this._pendingUpdates.installThroughRestart(action);
         } catch (error) {
-            console.log(error.message);
+            log(error.message);
             return false;
         }
     }
 
-    async _triggerOfflineUpdateCancel() {
-        // Handle this gracefully if PackageKit is not available.
-        if (!this._offlineUpdatesProxy)
-            return;
-
+    async _skipUpdates() {
         try {
-            await this._offlineUpdatesProxy.CancelAsync();
+            await this._pendingUpdates.skip();
         } catch (error) {
             log(error.message);
         }
@@ -647,15 +625,12 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         this._totalSecondsToStayOpen = totalSecondsToStayOpen;
         this._type = type;
 
-        await this._loadOfflineUpdatesProxy();
-        this._updateScheduled = this._offlineUpdatesProxy?.UpdateTriggered ?? false;
-        this._updatePrepared = !this._updateScheduled && (this._offlineUpdatesProxy?.UpdatePrepared ?? false);
+        this._pendingUpdates = await loadPendingUpdates();
+        this._updateScheduled = this._pendingUpdates?.scheduled ?? false;
+        this._updatePrepared = this._pendingUpdates?.prepared ?? false;
 
-        // Only consider updates if PackageKit is available.
-        if (this._offlineUpdatesProxy && this._type === DialogType.RESTART) {
-            if (this._updateScheduled)
-                this._type = DialogType.UPDATE_RESTART;
-        }
+        if (this._updateScheduled && this._type === DialogType.RESTART)
+            this._type = DialogType.UPDATE_RESTART;
 
         this._applications = [];
         this._applicationSection.list.destroy_all_children();
@@ -683,7 +658,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         if (dialogContent.showOtherSessions)
             this._loadSessions().catch(logError);
 
-        _setCheckBoxLabel(this._checkBox, dialogContent.checkBoxText || '');
+        _setCheckBoxLabel(this._checkBox, this._updatesCheckBoxText(dialogContent));
         this._checkBox.visible = dialogContent.checkBoxText && (this._updatePrepared || this._updateScheduled);
 
         this._checkBox.checked = this._checkBox.visible && !this._isBatteryLow();

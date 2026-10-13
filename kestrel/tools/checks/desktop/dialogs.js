@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {loadPendingUpdates} from 'resource:///com/lantharos/kestrel/misc/pendingUpdates.js';
 
 import {descendants, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -17,6 +18,8 @@ const {require, eventually} = checks('dialog');
 const MOUNT = ['org.gtk.MountOperationHandler', '/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler'];
 const END_SESSION = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'];
 const LOGOUT = 0;
+const RESTART = 2;
+const UNHURRIED = 3600;
 const COUNTDOWN = 60;
 
 async function checkLockMode(panel, start) {
@@ -72,6 +75,19 @@ async function checkEndSession() {
   await eventually(() => Main.modalCount === 0, 'the log out confirmation closes');
 }
 
+async function checkRestart() {
+  const pending = await loadPendingUpdates();
+  await call(...END_SESSION, 'Open', new GLib.Variant('(uuuao)', [RESTART, 0, UNHURRIED, []]));
+  await eventually(() => Main.modalCount > 0, 'the restart confirmation opens');
+  const checkBox = Main.endSessionDialog._checkBox;
+  require(checkBox.visible === (pending?.prepared ?? false), 'the restart confirmation offers updates exactly when some are waiting');
+  if (pending?.version)
+    require(checkBox.getLabelActor().text === `Install version ${pending.version}`, 'the restart confirmation names the waiting version');
+  await capture('restart-dialog');
+  await call(...END_SESSION, 'Close');
+  await eventually(() => Main.modalCount === 0, 'the restart confirmation closes');
+}
+
 export async function run() {
   const panel = named('kestrel-panel');
   const start = named('kestrel-start');
@@ -79,4 +95,5 @@ export async function run() {
   await checkHeadset(start);
   await checkVolumePassword();
   await checkEndSession();
+  await checkRestart();
 }

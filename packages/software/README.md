@@ -57,7 +57,7 @@ The image side talks to rpm-ostree's daemon over D-Bus. It reads the same deploy
 
 ## Image updates
 
-`Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version and any packages that change at the restart. `check()` asks the registry for the newest image and how much of it is new. `download` stages it and `rollback` makes the previous version start next time; calling `rollback` again stays on the current one.
+`Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version and any packages that change at the restart. `check()` asks the registry for the newest image and how much of it is new. `download` stages it and `rollback` makes the previous version start next time; calling `rollback` again stays on the current one. Kestrel's restart and power off dialog names the waiting version, and unticking it removes the download.
 
 Versions and release notes come from the image's labels:
 

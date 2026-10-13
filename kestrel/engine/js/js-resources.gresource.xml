@@ -27,6 +27,7 @@
     <file>misc/mobileProviders.js</file>
     <file>misc/modemManager.js</file>
     <file>misc/params.js</file>
+    <file>misc/pendingUpdates.js</file>
     <file>misc/permissionStore.js</file>
     <file>misc/signals.js</file>
     <file>misc/signalTracker.js</file>

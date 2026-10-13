@@ -1,0 +1,91 @@
+name: Image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/lantharos/luft
+  CACHE: ghcr.io/lantharos/luft-cache
+  FEDORA: "45"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Make room
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost
+          sudo docker image prune --all --force
+          df -h /
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 50
+
+      - name: Sign in to the registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Signing key
+        env:
+          KEY: ${{ secrets.LUFT_SECUREBOOT_KEY }}
+          CERT: ${{ secrets.LUFT_SECUREBOOT_CERT }}
+        run: |
+          keys="$RUNNER_TEMP/secure-boot"
+          mkdir -m 700 "$keys"
+          if [[ -n "$KEY" && -n "$CERT" ]]; then
+            printf '%s\n' "$KEY" > "$keys/key.pem"
+            printf '%s\n' "$CERT" > "$keys/cert.pem"
+          else
+            openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=Luft ephemeral key" \
+              -keyout "$keys/key.pem" -out "$keys/cert.pem"
+            echo "::warning::LUFT_SECUREBOOT_KEY and LUFT_SECUREBOOT_CERT are not set. NVIDIA's driver is signed with an ephemeral key that Secure Boot won't accept."
+          fi
+          echo "KEYS=$keys" >> "$GITHUB_ENV"
+
+      - name: Version and release notes
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          version="$FEDORA.$(date -u +%Y%m%d).${{ github.run_number }}"
+          tags=("$FEDORA" "$version")
+          [[ "$GITHUB_REF_TYPE" == tag ]] && tags+=("$GITHUB_REF_NAME")
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "TAGS=${tags[*]}" >> "$GITHUB_ENV"
+          since="$BEFORE"
+          git cat-file -e "$since^{commit}" 2>/dev/null || since="$(git rev-parse HEAD~10)"
+          git log --no-merges --format='- %s' "$since..HEAD" > "$RUNNER_TEMP/release-notes.txt"
+
+      - name: Build luft
+        run: |
+          podman build --layers --target luft --file os/image/Containerfile \
+            --cache-from "$CACHE" --cache-to "$CACHE" \
+            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")" \
+            --tag luft .
+
+      - name: Build luft-nvidia
+        run: |
+          podman build --layers --target luft-nvidia --file os/image/Containerfile \
+            --cache-from "$CACHE" --cache-to "$CACHE" \
+            --secret "id=secureboot-key,src=$KEYS/key.pem" --secret "id=secureboot-cert,src=$KEYS/cert.pem" \
+            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")" \
+            --tag luft-nvidia .
+          rm -rf "$KEYS"
+
+      - name: Push
+        run: |
+          for tag in $TAGS; do
+            podman push luft "$IMAGE:$tag"
+            podman push luft-nvidia "$IMAGE:$tag-nvidia"
+          done

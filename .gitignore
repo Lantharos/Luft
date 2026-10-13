@@ -1,4 +1,5 @@
 /boot/sushi/vm/
+/os/vm/state/
 /kestrel/build/
 /kestrel/install/
 /kestrel/run/

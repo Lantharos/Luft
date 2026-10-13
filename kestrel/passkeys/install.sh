@@ -6,7 +6,7 @@ action="${1:-install}"
 prefix="${2:-/opt/kestrel}"
 destination="${DESTDIR:-}"
 data="$root/data"
-release="$root/target/release"
+release="${CARGO_TARGET_DIR:-$root/target}/release"
 
 usage() {
   cat <<'USAGE'

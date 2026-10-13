@@ -62,7 +62,7 @@ first-boot-session = "/usr/bin/kestrel-session --setup"
 
 [images.default]
 source = "containers-storage:ghcr.io/lantharos/luft:45"   # where the stick has the image
-size = 8000000000                                         # bytes installed, for the progress bar
+size = 4900000000                                         # bytes installed, for the progress bar
 ```
 
 `[images.nvidia]` is used on computers with an NVIDIA graphics card. Updates come from the reference in `/usr/share/luft/image-reference`, with `-nvidia` added for the NVIDIA image.

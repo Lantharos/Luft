@@ -16,7 +16,7 @@ gio-unix = "0.22.8"
 luft-app = { path = "../../../packages/app", features = ["recovery"] }
 luft-network = { path = "../../../packages/network" }
 roxmltree = "0.21.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.37" }
+sabine = { git = "https://github.com/Lantharos/Sabine", rev = "aa8939197d11b9c031998b9d792c18981a39fb6d" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 ureq = { version = "3.4.2", features = ["platform-verifier"] }

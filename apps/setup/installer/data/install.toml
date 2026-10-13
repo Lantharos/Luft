@@ -4,8 +4,8 @@ first-boot-session = "/usr/bin/kestrel-session --setup"
 
 [images.default]
 source = "containers-storage:ghcr.io/lantharos/luft:45"
-size = 8_000_000_000
+size = 4_900_000_000
 
 [images.nvidia]
 source = "containers-storage:ghcr.io/lantharos/luft:45-nvidia"
-size = 9_000_000_000
+size = 6_100_000_000

@@ -1,0 +1,13 @@
+gdm
+gnome-keyring
+gnome-keyring-pam
+gnome-session
+gnome-settings-daemon
+gnome-shell
+mutter
+mutter-common
+oo7-daemon
+oo7-portal
+pam_oo7
+xdg-desktop-portal-gnome
+xdg-desktop-portal-gtk

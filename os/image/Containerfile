@@ -1,0 +1,83 @@
+ARG FEDORA=45
+ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
+
+FROM ${BASE} AS builder
+ARG BUN_VERSION=1.4.2
+COPY os/image/packages/build.txt /tmp/build.txt
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf install -y --setopt=keepcache=True dnf5-plugins rust cargo rust-std-static-x86_64-unknown-uefi \
+      $(cat /tmp/build.txt) && \
+    dnf builddep -y --setopt=keepcache=True mutter
+RUN mkdir -p /var/roothome && \
+    curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" -o /tmp/bun.zip && \
+    unzip -j /tmp/bun.zip bun-linux-x64/bun -d /usr/local/bin && rm /tmp/bun.zip
+ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-target BUN_INSTALL_CACHE_DIR=/var/cache/bun
+
+FROM builder AS kestrel
+COPY kestrel /src/kestrel
+COPY os/image/stages /src/os/image/stages
+RUN --mount=type=cache,target=/var/cache/cargo \
+    --mount=type=cache,id=luft-target-kestrel,target=/var/cache/luft-target \
+    --mount=type=cache,target=/var/cache/bun \
+    --mount=type=cache,target=/var/tmp/luft-build \
+    --mount=type=cache,target=/src/kestrel/run \
+    /src/os/image/stages/kestrel.sh /stage /typelibs.txt && \
+    /src/os/image/stages/needed.sh /stage > /needed.txt
+
+FROM builder AS boot
+COPY boot/sushi /src/boot/sushi
+COPY security /src/security
+COPY kestrel/passkeys /src/kestrel/passkeys
+COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
+COPY os/image/stages /src/os/image/stages
+RUN --mount=type=cache,target=/var/cache/cargo \
+    --mount=type=cache,id=luft-target-boot,target=/var/cache/luft-target \
+    /src/os/image/stages/boot.sh /stage && \
+    /src/os/image/stages/needed.sh /stage > /needed.txt
+
+FROM builder AS apps
+COPY package.json bun.lock /src/
+COPY packages /src/packages
+COPY apps /src/apps
+COPY security/Cargo.toml security/Cargo.lock /src/security/
+COPY security/crates /src/security/crates
+COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
+COPY os/image/stages /src/os/image/stages
+RUN --mount=type=cache,target=/var/cache/cargo \
+    --mount=type=cache,id=luft-target-apps,target=/var/cache/luft-target \
+    --mount=type=cache,target=/var/cache/bun \
+    --mount=type=cache,target=/root/.local/share/sabine \
+    /src/os/image/stages/apps.sh /stage && \
+    /src/os/image/stages/needed.sh /stage > /needed.txt
+
+FROM ${BASE} AS luft
+ARG VERSION=45.dev
+COPY os/image/packages /usr/share/luft/image/packages
+COPY os/image/stages /usr/share/luft/image/stages
+COPY --from=kestrel /needed.txt /tmp/needed/kestrel.txt
+COPY --from=boot /needed.txt /tmp/needed/boot.txt
+COPY --from=apps /needed.txt /tmp/needed/apps.txt
+COPY --from=kestrel /typelibs.txt /usr/share/luft/image/typelibs.txt
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    cat /tmp/needed/*.txt > /tmp/needed.txt && \
+    /usr/share/luft/image/stages/packages.sh /tmp/needed.txt && \
+    rm -rf /tmp/needed /tmp/needed.txt
+COPY --from=kestrel /stage/ /
+COPY --from=boot /stage/ /
+COPY --from=apps /stage/ /
+COPY os/image/files/ /
+COPY packages/software/data/50-luft-system-updates.rules /usr/share/polkit-1/rules.d/
+RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" && \
+    rm -rf /usr/share/luft/image
+RUN bootc container lint
+ARG RELEASE_NOTES=""
+LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes="${RELEASE_NOTES}"
+
+FROM luft AS luft-nvidia
+COPY os/image/stages/nvidia.sh /tmp/nvidia.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    --mount=type=secret,id=secureboot-key \
+    --mount=type=secret,id=secureboot-cert \
+    /tmp/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
+    rm /tmp/nvidia.sh
+RUN bootc container lint

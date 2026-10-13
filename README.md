@@ -32,6 +32,7 @@ Luft is an operating system built on Fedora. It has its own shell and login scre
 | [`apps/setup`](apps/setup/README.md) | Install Luft: the installer and first-run setup |
 | [`apps/signin`](apps/signin/README.md) | Wi-Fi sign-in pages |
 | [`apps/tern`](apps/tern/README.md) | Terminal |
+| [`os`](os/README.md) | The bootc image Luft installs from, and a VM to try it |
 | [`packages/ui`](packages/ui/README.md) | Shared Svelte components and styles |
 | [`packages/app`](packages/app/README.md) | Shared native window, palette, D-Bus and portal code |
 | [`packages/dbus`](packages/dbus/README.md) | Blocking D-Bus connections and service properties for apps and system services |
@@ -74,7 +75,9 @@ Each app builds from its own folder with `bun run desktop:build`, or runs with `
 
 ## Install
 
-In this order:
+Luft is published as a bootc image, `ghcr.io/lantharos/luft:45` (`:45-nvidia` for NVIDIA graphics). On a bootc system such as Fedora Atomic, `sudo bootc switch ghcr.io/lantharos/luft:45` moves to it; building it and trying it in a VM are in [os/README.md](os/README.md).
+
+To install the parts onto a regular Fedora system instead, in this order:
 
 ```sh
 kestrel/tools/install.sh install               # Kestrel, its Mutter, Luft Keyring, login screen service

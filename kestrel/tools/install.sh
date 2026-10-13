@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root="$(cd "$(dirname "$0")/../.." && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 action="${1:-install}"
 prefix="${2:-/opt/kestrel}"
 build="$root/kestrel/run/install-build"
@@ -199,6 +199,8 @@ remove_everything() {
   as_owner "$prefix" rm -rf "$prefix"
   echo "Kestrel was removed from $prefix."
 }
+
+[[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "$action" in
   install) install_everything ;;

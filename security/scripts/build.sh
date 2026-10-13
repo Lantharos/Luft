@@ -24,7 +24,7 @@ cargo build --release --manifest-path "$root/Cargo.toml"
 
 [[ -n "$destdir" ]] || exit 0
 
-release="$root/target/release"
+release="${CARGO_TARGET_DIR:-$root/target}/release"
 place() {
   sed "s|@libexecdir@|$libexecdir|g" "$1" | install -Dm644 /dev/stdin "$destdir$2"
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root="$(cd "$(dirname "$0")/.." && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
 units=(sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service)
@@ -83,6 +83,8 @@ remove_everything() {
   rebuild_initramfs
   echo "Sushi is removed."
 }
+
+[[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "${1:-}" in
   install) install_everything ;;

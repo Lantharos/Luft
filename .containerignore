@@ -1,0 +1,10 @@
+.git
+.claude
+**/node_modules
+**/target
+**/dist
+kestrel/run
+kestrel/build
+kestrel/install
+boot/sushi/vm
+docs

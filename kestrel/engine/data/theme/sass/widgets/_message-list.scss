@@ -24,7 +24,6 @@ $_message_list_width: 29em;
     // header source icon
     .message-source-icon {
       icon-size: $scalable_icon_size; // 16px
-      -st-icon-style: symbolic;
     }
 
     // box that contains the source icon, source name and timestamp of the message

@@ -349,19 +349,12 @@ class MessageHeader extends St.BoxLayout {
             layout_manager: new HeaderLayout(),
         });
 
-        const sourceIconEffect = new Clutter.DesaturateEffect();
         const sourceIcon = new St.Icon({
             style_class: 'message-source-icon',
             y_align: Clutter.ActorAlign.CENTER,
             fallback_icon_name: 'application-x-executable-symbolic',
         });
-        sourceIcon.add_effect(sourceIconEffect);
         this.add_child(sourceIcon);
-
-        sourceIcon.connect('style-changed', () => {
-            const themeNode = sourceIcon.get_theme_node();
-            sourceIconEffect.enabled = themeNode.get_icon_style() === St.IconStyle.SYMBOLIC;
-        });
 
         const headerContent = new St.BoxLayout({
             style_class: 'message-header-content',

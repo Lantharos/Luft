@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use luft_app::dbus::objects::Objects;
+use luft_dbus::objects::Objects;
 use zbus::zvariant::Value;
 
 use crate::udisks::{self, BLOCK, ENCRYPTED, FILESYSTEM, SWAP, no_options, text_bytes};

@@ -21,6 +21,20 @@ pub struct Sheet<'a> {
     pub explanation: &'a [&'a str],
 }
 
+const DISK_EXPLANATION: [&str; 3] = [
+    "If your computer asks for a recovery key when it starts, type this key",
+    "to unlock its disk. Keep it somewhere other than the computer itself,",
+    "such as on paper or in a password manager.",
+];
+
+pub fn for_this_computer(key: &str) -> Sheet<'_> {
+    Sheet {
+        key,
+        name: computer(),
+        explanation: &DISK_EXPLANATION,
+    }
+}
+
 pub fn computer() -> String {
     std::fs::read_to_string("/proc/sys/kernel/hostname")
         .map(|name| name.trim().to_owned())

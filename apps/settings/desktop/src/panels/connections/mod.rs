@@ -1,2 +1,2 @@
 pub mod bluetooth;
-pub mod network;
+pub use luft_network as network;

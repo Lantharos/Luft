@@ -1816,9 +1816,18 @@ dependencies = [
  "dirs",
  "gio",
  "gio-unix",
+ "luft-dbus",
  "sabine",
  "serde",
  "serde_json",
+ "zbus",
+]
+
+[[package]]
+name = "luft-dbus"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "tokio",
  "zbus",
 ]
@@ -3683,6 +3692,7 @@ version = "1.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2ef6dac1e96601b4fb3acccccff2139741fcb757cb9a36089bf5be91cfb285ce"
 dependencies = [
+ "getrandom 0.4.3",
  "js-sys",
  "serde_core",
  "wasm-bindgen",

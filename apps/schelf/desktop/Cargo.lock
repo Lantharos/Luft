@@ -1907,9 +1907,18 @@ dependencies = [
  "dirs",
  "gio",
  "gio-unix",
+ "luft-dbus",
  "sabine",
  "serde",
  "serde_json",
+ "zbus",
+]
+
+[[package]]
+name = "luft-dbus"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "tokio",
  "zbus",
 ]

@@ -1,5 +1,5 @@
 mod hsi;
-mod properties;
+use luft_app::dbus::service as properties;
 mod recovery;
 mod trust;
 mod usb;

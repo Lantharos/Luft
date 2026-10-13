@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use luft_app::dbus;
 use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
 use zbus::zvariant::{DynamicType, OwnedValue};
@@ -35,11 +34,11 @@ pub fn absent(error: &zbus::Error) -> bool {
 
 impl Service {
     pub fn proxy(&self) -> Result<Proxy<'static>, String> {
-        Proxy::new(dbus::system()?, self.name, self.path, self.interface).map_err(failed)
+        Proxy::new(crate::system()?, self.name, self.path, self.interface).map_err(failed)
     }
 
     fn properties(&self) -> Result<Proxy<'static>, String> {
-        Proxy::new(dbus::system()?, self.name, self.path, PROPERTIES).map_err(failed)
+        Proxy::new(crate::system()?, self.name, self.path, PROPERTIES).map_err(failed)
     }
 
     pub fn read(&self) -> Result<Option<Map>, String> {

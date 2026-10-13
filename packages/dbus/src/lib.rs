@@ -1,4 +1,5 @@
 pub mod objects;
+pub mod service;
 
 use std::sync::{LazyLock, OnceLock};
 

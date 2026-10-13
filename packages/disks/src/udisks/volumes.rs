@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::ffi::CString;
 use std::mem::MaybeUninit;
 
-use luft_app::dbus::objects::{Object, Objects};
+use luft_dbus::objects::{Object, Objects};
 use serde::Serialize;
 use zbus::zvariant::OwnedValue;
 

@@ -1,0 +1,14 @@
+[package]
+name = "luft-disks"
+version = "0.1.0"
+description = "Drives, partitions, mounting and resizing through UDisks, shared by Disks and Luft's installer"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[dependencies]
+libc = "0.2.189"
+luft-dbus = { path = "../dbus" }
+serde = { version = "1.0.229", features = ["derive"] }
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

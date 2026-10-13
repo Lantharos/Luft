@@ -1,6 +1,6 @@
-use luft_app::dbus::objects::Objects;
+use luft_dbus::objects::Objects;
 
-use crate::actions::mounting;
+use crate::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, PARTITION, no_options};
 
 const OFFLINE_SHRINK: u64 = 2;

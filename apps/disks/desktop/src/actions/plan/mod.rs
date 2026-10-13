@@ -1,8 +1,8 @@
 mod guard;
 mod moving;
-mod resize;
 
 use luft_app::Events;
+use luft_disks::resize;
 use serde::Deserialize;
 use zbus::zvariant::Value;
 

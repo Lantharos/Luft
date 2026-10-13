@@ -2368,6 +2368,7 @@ dependencies = [
  "gio-unix",
  "image",
  "libc",
+ "luft-dbus",
  "md-5",
  "memmap2",
  "parking_lot",
@@ -2376,6 +2377,14 @@ dependencies = [
  "serde",
  "serde_json",
  "skrifa 0.47.0",
+ "zbus",
+]
+
+[[package]]
+name = "luft-dbus"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "tokio",
  "zbus",
 ]

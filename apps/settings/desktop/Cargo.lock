@@ -2244,12 +2244,35 @@ dependencies = [
  "gio",
  "gio-unix",
  "libc",
+ "luft-dbus",
  "memmap2",
  "sabine",
  "serde",
  "serde_json",
  "skrifa 0.47.0",
+ "zbus",
+]
+
+[[package]]
+name = "luft-dbus"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "tokio",
+ "zbus",
+]
+
+[[package]]
+name = "luft-network"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.4.3",
+ "gio",
+ "luft-app",
+ "sabine",
+ "serde",
+ "serde_json",
+ "x25519-dalek",
  "zbus",
 ]
 
@@ -3623,7 +3646,6 @@ dependencies = [
  "bzip2",
  "dirs",
  "flate2",
- "getrandom 0.4.3",
  "gio",
  "gio-unix",
  "gstreamer",
@@ -3634,6 +3656,7 @@ dependencies = [
  "liblzma",
  "libpulse-binding",
  "luft-app",
+ "luft-network",
  "luft-software",
  "roxmltree 0.21.1",
  "sabine",
@@ -3643,7 +3666,6 @@ dependencies = [
  "tempfile",
  "tokio",
  "ureq",
- "x25519-dalek",
  "zbus",
  "zip",
 ]

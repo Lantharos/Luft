@@ -1,4 +1,4 @@
-use luft_app::dbus::objects::Objects;
+use luft_dbus::objects::Objects;
 use serde::Serialize;
 
 use super::{ATA, NVME};

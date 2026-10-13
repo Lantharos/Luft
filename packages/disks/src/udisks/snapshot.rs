@@ -1,4 +1,4 @@
-use luft_app::dbus::objects::{Object, Objects};
+use luft_dbus::objects::{Object, Objects};
 use serde::Serialize;
 
 use super::health::{self, Health};

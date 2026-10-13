@@ -1,7 +1,7 @@
 #[cfg(feature = "apps")]
 pub mod apps;
 mod bridge;
-pub mod dbus;
+pub use luft_dbus as dbus;
 mod desktop;
 pub mod file_manager;
 #[cfg(feature = "fonts")]

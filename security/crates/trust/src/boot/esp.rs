@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 use crate::paths;
-use crate::system::command::Tool;
 use crate::system::{blocks, efi};
 
 const MOUNTS: [&str; 3] = ["/efi", "/boot", "/boot/efi"];
@@ -45,7 +44,7 @@ fn mount_the_one_started_from() -> Result<Esp> {
     let path = Path::new(paths::RUNTIME).join(PRIVATE_MOUNT);
     paths::ensure_private(&path.to_string_lossy())?;
     if vfat_at(&path).is_none() {
-        Tool::new("mount").arg(&device).arg(&path).status()?;
+        blocks::mount_boot_partition(&device, &path, false)?;
     }
     describe(&path, &device)
 }

@@ -9,7 +9,7 @@ use crate::paths;
 use crate::system::command::Tool;
 use crate::system::journal::STAGE_REFUSED;
 use crate::system::secret::Secret;
-use crate::system::{efi, keyring};
+use crate::system::{blocks, efi, keyring};
 
 const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const ATTEMPTS: usize = 5;
@@ -24,12 +24,9 @@ impl MountedEsp {
             efi::boot_partition().context("The firmware didn't say where it started from")?;
         let device = Path::new("/dev/disk/by-partuuid").join(partuuid);
         wait_for(&device)?;
-        std::fs::create_dir_all(ESP)?;
-        Tool::new("mount")
-            .args(["-o", "ro"])
-            .arg(&device)
-            .arg(ESP)
-            .status()?;
+        paths::ensure_private(paths::RUNTIME)?;
+        paths::ensure_private(ESP)?;
+        blocks::mount_boot_partition(&device, Path::new(ESP), true)?;
         Ok(Self)
     }
 
@@ -174,8 +171,7 @@ fn attach(plan: &Plan, device: &Path, header: Option<&Path>) -> Result<()> {
 }
 
 fn still_decrypting(header: &Path, device: &Path) -> bool {
-    let size = crate::system::blocks::kernel_name(device)
-        .map_or(0, |name| crate::system::blocks::size_bytes(&name));
+    let size = blocks::kernel_name(device).map_or(0, |name| blocks::size_bytes(&name));
     luks::read(device, Some(header), size)
         .is_ok_and(|header| header.is_some_and(|header| header.reencrypting.is_some()))
 }

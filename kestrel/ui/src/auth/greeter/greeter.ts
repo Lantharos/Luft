@@ -17,6 +17,7 @@ import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
 import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
+import type { StartupSignals } from '../../system/health/startup.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';
 import { readConfig } from './config.js';
@@ -31,7 +32,7 @@ const SWITCH_DURATION = 140;
 const FINISH_DURATION = 250;
 
 export interface GreeterContext {
-  layoutManager: {
+  layoutManager: StartupSignals & {
     monitors: Monitor[];
     uiGroup: Clutter.Actor;
     screenShieldGroup: St.Widget;

@@ -28,6 +28,7 @@ import { NotificationCenter } from './surfaces/notifications/notificationCenter.
 import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
 import { StartMenu } from './surfaces/start/startMenu.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
+import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
 import type { PeekService } from './system/peek/service.js';
 import { SystemServices } from './system/services.js';
@@ -281,6 +282,7 @@ export function initialize(context: Context): void {
 
 export function startGreeter(context: GreeterContext): Promise<void> {
   greeter = new Greeter(context);
+  confirmStartupOnceSettled(context.layoutManager);
   return greeter.wallpaperShown;
 }
 

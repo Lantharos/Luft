@@ -12,7 +12,7 @@ use super::actions;
 use super::error::Error;
 use super::properties::{self, Dict};
 use super::status::{self, Status};
-use crate::boot::startup;
+use crate::boot::{attempts, startup};
 use crate::disk::worker::{self, Progress};
 use crate::disk::{self, keys};
 use crate::keys::mok;
@@ -23,6 +23,7 @@ const CHECK: &str = "com.lantharos.trust.check";
 const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const SECURE_BOOT: &str = "com.lantharos.trust.manage-secure-boot";
+const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
 const FRESH: Duration = Duration::from_secs(2);
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
@@ -327,5 +328,18 @@ impl Trust {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SECURE_BOOT).await?;
         self.run(&emitter, || startup::install(None)).await
+    }
+
+    async fn confirm_startup(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, CONFIRM_STARTUP).await?;
+        let _activity = self.idle.hold();
+        tokio::task::spawn_blocking(attempts::mark_good)
+            .await
+            .map_err(|_| Error::Failed("The startup couldn't be confirmed.".to_owned()))??;
+        Ok(())
     }
 }

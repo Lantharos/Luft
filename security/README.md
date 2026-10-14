@@ -32,7 +32,7 @@ All commands need root.
 | `trustctl recovery-key show` / `replace` | Shows or replaces the disk's recovery key |
 | `trustctl encryption check` / `on` / `off` | Checks whether the disk can be encrypted, or encrypts or decrypts it in place |
 
-`encryption initrd` runs in the initramfs. `startup good` runs from `trustd-boot-good.service` once the login screen is up, and `startup went-back` from `trustd-went-back.service` after SushiBoot went back from an update that didn't start ([details](../docs/boot.md#when-an-update-doesnt-start)).
+`encryption initrd` runs in the initramfs, and `startup went-back` from `trustd-went-back.service` after SushiBoot went back from an update that didn't start ([details](../docs/boot.md#when-an-update-doesnt-start)).
 
 `trustd.service` starts at boot to continue encrypting or decrypting, follow up on the key enrollment, and bring shim and SushiBoot on the EFI system partition up to the running version's, along with the Fedora-signed way to start that stays until Luft's key is added ([details](../docs/boot.md#adding-lufts-secure-boot-key)). Otherwise it exits after a minute without requests.
 
@@ -40,10 +40,11 @@ All commands need root.
 
 | Name | Interface file | Polkit actions |
 | --- | --- | --- |
-| `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.check`, `.manage-encryption`, `.manage-drive-encryption`, `.show-recovery-key` (asked every time), `.manage-secure-boot` |
+| `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.check`, `.manage-encryption`, `.manage-drive-encryption`, `.show-recovery-key` (asked every time), `.manage-secure-boot`, `.confirm-startup` (allowed for the active session) |
 | `com.lantharos.UsbProtection1` | `data/usb/com.lantharos.UsbProtection1.xml` | `com.lantharos.usb-protection.configure` |
 
 - Reading state is open to everyone. So is `Drives.Continue`, which a udev rule calls to resume drive encryption.
+- Kestrel calls `ConfirmStartup` once the login screen or desktop has been up for a few seconds, which marks the running version as one that starts.
 - Other drives are on `com.lantharos.Trust1.Drives` at the same object.
 - `UsbProtection1` has `Enabled`, `Guarding` and `Held` properties, `SetEnabled(b)`, the `Released(a(ss))` signal and `TakeReleased()`, which lets the session announce what was connected at unlock.
 

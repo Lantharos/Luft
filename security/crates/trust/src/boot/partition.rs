@@ -50,10 +50,7 @@ fn mount(name: &str) -> Result<BootPartition> {
     }
     let path = Path::new(paths::RUNTIME).join(PRIVATE_MOUNT);
     paths::ensure_private(&path.to_string_lossy())?;
-    Tool::new("mount")
-        .arg(blocks::device(name))
-        .arg(&path)
-        .status()?;
+    blocks::mount_boot_partition(&blocks::device(name), &path, false)?;
     Ok(BootPartition {
         path,
         uuid,

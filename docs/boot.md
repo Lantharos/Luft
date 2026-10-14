@@ -24,7 +24,7 @@ Next to Windows, whose EFI system partition is usually too small for them, the s
 
 ### When an update doesn't start
 
-A new version gets three tries to reach the login screen. SushiBoot counts each start of a version it hasn't seen work yet, and once the login screen is up, `trustd-boot-good.service` remembers that version as the one that works. If the third try doesn't get there either, SushiBoot starts the version that last worked instead. Before the login screen, Sushi then explains that the update didn't start and Luft went back, and trustd makes that version the default again with `bootc rollback`. Settings doesn't offer the same update again; the next release replaces it.
+A new version gets three tries to reach the login screen. SushiBoot counts each start of a version it hasn't seen work yet. Once the login screen or the desktop has been on screen for five seconds, Kestrel tells trustd, which remembers that version as the one that works. A login screen that crashes as soon as it appears doesn't count. If the third try doesn't get there either, SushiBoot starts the version that last worked instead. Before the login screen, Sushi then explains that the update didn't start and Luft went back, and trustd makes that version the default again with `bootc rollback`. Settings doesn't offer the same update again; the next release replaces it.
 
 A new version only gets tries when there's a version that worked to go back to. The counts are kept in EFI variables (`LuftBootGood` and `LuftBootTried`, vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), keyed by the startup image's path, so they survive bootc rewriting its entries. Starting another version from the menu, or Rescue, never counts against an update.
 

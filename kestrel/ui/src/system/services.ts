@@ -14,6 +14,7 @@ import { LoginNumLock } from '../session/loginScreen/numLock.js';
 import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
 import { OomNotifier } from './health/oomNotifier.js';
+import { confirmStartupOnceSettled } from './health/startup.js';
 import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
@@ -45,6 +46,7 @@ export class SystemServices {
     this.keyring = new SystemPrompts(context);
     this.mediaKeys = new MediaKeys(context, openStart);
     this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
+    confirmStartupOnceSettled(context.layoutManager);
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();

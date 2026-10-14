@@ -72,8 +72,6 @@ enum StartupAction {
         #[arg(long)]
         esp: Option<PathBuf>,
     },
-    /// Remember that this version started, after the login screen came up
-    Good,
     /// Make the version before the default after an update didn't start, and say so
     WentBack,
 }
@@ -134,7 +132,6 @@ fn secure_boot(action: SecureBootAction) -> Result<()> {
 fn startup(action: StartupAction) -> Result<()> {
     match action {
         StartupAction::Install { esp } => startup::install(esp.as_deref()),
-        StartupAction::Good => attempts::mark_good(),
         StartupAction::WentBack => attempts::went_back(),
     }
 }

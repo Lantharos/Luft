@@ -54,4 +54,14 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
+
+  <action id="com.lantharos.trust.confirm-startup">
+    <description>Confirm that this version of Luft started</description>
+    <message>Authentication is required to confirm that the computer started</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
 </policyconfig>

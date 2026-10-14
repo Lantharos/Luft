@@ -44,7 +44,9 @@ Steps:
 4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
 5. When it finishes, the TPM is linked and the disk unlocks without a prompt.
 
-Without a TPM, a passphrase is asked at every start instead. Decrypting works the same way in reverse.
+Without a TPM, a passphrase is asked at every start instead. Decrypting works the same way in reverse, with the disk's header kept on the EFI system partition until it finishes, since the startup has to read it before the disk opens.
+
+Only root can read the EFI system partition and the startup partition, so other accounts can't copy the header or the sealed recovery key and try passphrases against them elsewhere.
 
 ## Other drives
 

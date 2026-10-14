@@ -1,5 +1,11 @@
 use std::path::{Path, PathBuf};
 
+use anyhow::Result;
+
+use super::command::Tool;
+
+const BOOT_PARTITION_OPTIONS: &str = "fmask=0177,dmask=0077,nosuid,nodev,noexec";
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Mount {
     pub source: PathBuf,
@@ -122,4 +128,17 @@ pub fn fs_uuid(name: &str) -> Option<String> {
 
 pub fn device(name: &str) -> PathBuf {
     Path::new("/dev").join(name)
+}
+
+pub fn mount_boot_partition(device: &Path, at: &Path, read_only: bool) -> Result<()> {
+    let options = if read_only {
+        format!("ro,{BOOT_PARTITION_OPTIONS}")
+    } else {
+        BOOT_PARTITION_OPTIONS.to_owned()
+    };
+    Tool::new("mount")
+        .args(["-t", "vfat", "-o", &options])
+        .arg(device)
+        .arg(at)
+        .status()
 }

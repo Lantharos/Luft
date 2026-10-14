@@ -72,6 +72,9 @@
     </method>
     <method name="CancelSigningKeyEnrollment"/>
     <method name="InstallSignedStartup"/>
+    <!-- Called by the login screen or the desktop once it has been shown for a moment. Remembers the running version
+         as one that starts, so an update that never gets this far goes back to it. -->
+    <method name="ConfirmStartup"/>
   </interface>
 
   <!--

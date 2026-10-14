@@ -34,7 +34,7 @@ os/iso/build.sh                              # from localhost/luft:45 and :45-nv
 os/iso/build.sh ghcr.io/lantharos/luft:45    # from the published images
 ```
 
-It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and put it on Cloudflare R2.
+It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and publish it at https://get.luft.lanth.me/luft-latest.iso.
 
 The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc shows GRUB's menu. It carries both images, so installing needs no network, and the session on the stick runs the regular image, so choosing *Just try Luft* gives the normal desktop with Install Luft in the launcher.
 

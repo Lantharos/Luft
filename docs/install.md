@@ -4,7 +4,7 @@ How Luft gets from the USB stick onto a computer, and what happens the first tim
 
 ## From the USB stick
 
-Download the latest `luft-VERSION.iso` and write it to a USB stick of 4 GB or more with Fedora Media Writer, balenaEtcher or Rufus (in DD mode). Start the computer from the stick with the firmware's boot menu, usually F12, F11 or Esc while the logo shows. Secure Boot can stay on.
+Download [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso) (checksum: [luft-latest.iso.sha256](https://get.luft.lanth.me/luft-latest.iso.sha256)) and write it to a USB stick of 4 GB or more with Fedora Media Writer, balenaEtcher or Rufus (in DD mode). Start the computer from the stick with the firmware's boot menu, usually F12, F11 or Esc while the logo shows. Secure Boot can stay on.
 
 The stick starts straight into Install Luft, over the blurred wallpaper. Holding Esc while it starts shows a menu with a basic graphics mode for screens that stay dark.
 

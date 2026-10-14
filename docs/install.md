@@ -8,7 +8,7 @@ Download the latest `luft-VERSION.iso` and write it to a USB stick of 4 GB or mo
 
 The stick starts straight into Install Luft, over the blurred wallpaper. Holding Esc while it starts shows a menu with a basic graphics mode for screens that stay dark.
 
-1. **Language, keyboard and time zone.** Guessed from the firmware's language, from Windows if it's on the computer, and from the network once you're online. The keyboard you pick works right away, so you can try it before typing a password.
+1. **Language, keyboard and time zone.** Guessed from the firmware's language, from Windows if it's on the computer, and from the network once you're online.
 2. **Where Luft goes.**
    - *Alongside Windows* makes Windows' partition smaller and puts Luft in the room it frees. Drag the bar to choose how much each gets; Windows keeps its files and at least 20 GB to grow.
    - *Use a whole drive* erases one drive.

@@ -7,7 +7,6 @@
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { regional } from '#lib/state/regional.svelte.js';
 
-	let typed = $state('');
 	let zone = $derived(regional.zoneEntry);
 </script>
 
@@ -44,7 +43,6 @@
 			selected={regional.zone}
 			onchoose={(entry) => regional.chooseZone(entry)}
 		/>
-		<input class="text-field mt-3" placeholder="Try your keyboard here" aria-label="Try your keyboard" bind:value={typed} spellcheck="false" />
 	</div>
 	{#snippet actions()}
 		<button type="button" class="button primary large px-6" onclick={() => flow.next()}>Continue</button>

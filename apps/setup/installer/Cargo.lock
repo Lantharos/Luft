@@ -497,13 +497,24 @@ dependencies = [
  "libc",
  "luft-dbus",
  "luft-disks",
- "nt-hive",
- "ntfs",
+ "luft-windows",
  "serde",
  "serde_json",
  "tokio",
  "toml",
  "zbus",
+]
+
+[[package]]
+name = "luft-windows"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "nt-hive",
+ "ntfs",
+ "regf-rs",
+ "serde",
 ]
 
 [[package]]
@@ -652,6 +663,12 @@ name = "r-efi"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
+
+[[package]]
+name = "regf-rs"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "349e79c5a22cd52d15fe4d364428b1c1040a6b2025a763c59f645a955ceae1ef"
 
 [[package]]
 name = "rustc_version"

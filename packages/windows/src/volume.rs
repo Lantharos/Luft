@@ -5,25 +5,25 @@ use ntfs::indexes::NtfsFileNameIndex;
 use ntfs::structured_values::{NtfsFileNamespace, NtfsVolumeFlags};
 use ntfs::{KnownNtfsFileRecordNumber, Ntfs, NtfsFile};
 
-pub(super) struct Volume<R: Read + Seek> {
+pub struct Volume<R: Read + Seek> {
     ntfs: Ntfs,
     fs: BufReader<R>,
 }
 
 impl<R: Read + Seek> Volume<R> {
-    pub(super) fn open(reader: R) -> Result<Self> {
+    pub fn open(reader: R) -> Result<Self> {
         let mut fs = BufReader::with_capacity(1 << 16, reader);
         let mut ntfs = Ntfs::new(&mut fs)?;
         ntfs.read_upcase_table(&mut fs)?;
         Ok(Self { ntfs, fs })
     }
 
-    pub(super) fn dirty(&mut self) -> Result<bool> {
+    pub fn dirty(&mut self) -> Result<bool> {
         let info = self.ntfs.volume_info(&mut self.fs)?;
         Ok(info.flags().contains(NtfsVolumeFlags::IS_DIRTY))
     }
 
-    pub(super) fn used(&mut self) -> Result<u64> {
+    pub fn used(&mut self) -> Result<u64> {
         let cluster_size = u64::from(self.ntfs.cluster_size());
         let clusters = self.ntfs.size() / cluster_size;
         let bitmap = self
@@ -58,25 +58,25 @@ impl<R: Read + Seek> Volume<R> {
         Ok(allocated * cluster_size)
     }
 
-    pub(super) fn read(&mut self, path: &str) -> Result<Option<Vec<u8>>> {
+    pub fn read(&mut self, path: &str) -> Result<Option<Vec<u8>>> {
         self.read_limited(path, u64::MAX)
     }
 
-    pub(super) fn read_limited(&mut self, path: &str, limit: u64) -> Result<Option<Vec<u8>>> {
+    pub fn read_limited(&mut self, path: &str, limit: u64) -> Result<Option<Vec<u8>>> {
         let Some(file) = lookup(&self.ntfs, &mut self.fs, path)? else {
             return Ok(None);
         };
         read_data(&file, &mut self.fs, limit).map(Some)
     }
 
-    pub(super) fn modified(&mut self, path: &str) -> Result<Option<u64>> {
+    pub fn modified(&mut self, path: &str) -> Result<Option<u64>> {
         let Some(file) = lookup(&self.ntfs, &mut self.fs, path)? else {
             return Ok(None);
         };
         Ok(Some(file.info()?.modification_time().nt_timestamp()))
     }
 
-    pub(super) fn subdirectories(&mut self, path: &str) -> Result<Vec<String>> {
+    pub fn subdirectories(&mut self, path: &str) -> Result<Vec<String>> {
         let Some(directory) = lookup(&self.ntfs, &mut self.fs, path)? else {
             return Ok(Vec::new());
         };

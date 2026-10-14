@@ -28,6 +28,8 @@ export interface WindowsVolume {
 	room: number;
 	version: string | null;
 	fastStartup: boolean;
+	universalClock: boolean;
+	bluetooth: number;
 	blocked: WindowsBlock | null;
 }
 
@@ -68,6 +70,12 @@ export type Target =
 	| { kind: 'alongside'; drive: string; size: number }
 	| { kind: 'free'; drive: string; offset: number };
 
+export interface WindowsChoices {
+	fastStartupOff: boolean;
+	universalClock: boolean;
+	bluetooth: boolean;
+}
+
 export interface Regional {
 	locale: string;
 	keyboard: Keyboard;
@@ -80,8 +88,8 @@ const WAIT_FOR_PERSON = 300_000;
 
 export const state = () => invoke<InstallerState | null>('installer_state');
 export const survey = () => invoke<Survey>('installer_survey', {}, { timeoutMs: SURVEY_TIMEOUT });
-export const install = (target: Target, variant: string) =>
-	invoke<void>('installer_install', { value: { target, variant } }, { timeoutMs: WAIT_FOR_PERSON });
+export const install = (target: Target, variant: string, windows: WindowsChoices) =>
+	invoke<void>('installer_install', { value: { target, variant, windows } }, { timeoutMs: WAIT_FOR_PERSON });
 export const configure = (regional: Regional) => invoke<void>('installer_configure', { value: regional }, { timeoutMs: WAIT_FOR_PERSON });
 export const createAccount = (name: string, fullName: string, password: string) =>
 	invoke<void>('installer_account', { name, fullName, password }, { timeoutMs: WAIT_FOR_PERSON });

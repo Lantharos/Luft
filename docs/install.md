@@ -30,7 +30,17 @@ Copying starts as soon as you confirm where Luft goes. Nothing changes on any dr
 | Windows needs almost all of its drive | Free up space in Windows |
 | The EFI system partition is smaller than 1 GB | Install Luft on another drive, or use a whole drive |
 
-Luft also suggests turning off Fast Startup in Windows: Power Options, Choose what the power buttons do. Otherwise Windows can keep its drive locked while you use Luft.
+### Next to Windows
+
+When Luft goes next to Windows, it offers three things, each with its own switch:
+
+- **Turn off Fast Startup in Windows.** With Fast Startup, Shut down in Windows is really a kind of hibernation: Windows' drive stays in use, and sound, Wi-Fi and Bluetooth can start in Luft in the state Windows left them. Luft changes the setting in Windows' registry while Windows is fully off, and keeps a copy of the registry as it was in `Windows\System32\config\SYSTEM.luft-backup`.
+- **Keep the clock right in both.** Windows keeps the computer's clock in local time and Luft in UTC, so the time jumps when you switch. Luft asks Windows to use UTC too (`RealTimeIsUniversal`). Luft itself always stays on UTC.
+- **Bring your Bluetooth devices.** Devices paired in Windows work in Luft right away. Later pairings come over from Settings, Bluetooth.
+
+Windows' registry is only changed when Windows was shut down fully and isn't locked with BitLocker. To do it yourself in Windows instead: open Control Panel, Power Options, Choose what the power buttons do, and clear *Turn on fast startup*; for the clock, run `reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f` in a terminal opened as administrator.
+
+Windows updates sometimes turn Fast Startup back on. When Luft starts after Windows was hibernated or fast-started, it resets the sound chips before anything uses them and, once, explains Fast Startup with a notification that can turn it off when Windows is fully shut down. Windows' drive shows up in Files; while Windows is asleep it opens read-only, so nothing Windows still has open gets changed.
 
 ## What goes on the drive
 

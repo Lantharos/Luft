@@ -1,0 +1,4 @@
+polkit.addRule(function(action, subject) {
+  if (action.id.indexOf("com.lantharos.windows.") == 0 && subject.user == "root")
+    return polkit.Result.YES;
+});

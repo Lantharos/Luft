@@ -45,6 +45,12 @@ export interface DriveInfo {
 	is_removable: boolean;
 }
 
+export interface WindowsDrive {
+	device: string;
+	name: string;
+	hibernated: boolean;
+}
+
 export interface TrashLocation {
 	name: string;
 	path: string;

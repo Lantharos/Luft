@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Windows1
+Exec=/usr/libexec/luft-windows
+User=root
+SystemdService=luft-windows.service

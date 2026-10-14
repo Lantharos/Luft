@@ -29,7 +29,7 @@ const SURVEY = {
       kind: 'nvme', removable: false, blocked: null, partitions: 4, esp: {offset: MIB, size: 100 * MIB},
       windows: {
         block: '/org/freedesktop/UDisks2/block_devices/nvme0n1p3', offset: 129 * MIB, size: 998 * GB, used: 212 * GB,
-        smallest: 233 * GB, room: 765 * GB, version: 'Windows 11 Home', fastStartup: true, blocked: null,
+        smallest: 233 * GB, room: 765 * GB, version: 'Windows 11 Home', fastStartup: true, universalClock: false, bluetooth: 3, blocked: null,
       },
       free: [],
     },

@@ -8,19 +8,19 @@ const TOOLS: [&str; 4] = ["mkntfs", "ntfscluster", "ntfs-3g", "unshare"];
 const POPULATE: &str =
     r#"ntfs-3g "$1" "$2" && cp -r --preserve=timestamps "$3"/. "$2"/ && umount "$2""#;
 
-pub(super) struct Image {
+pub struct Image {
     directory: PathBuf,
-    pub(super) path: PathBuf,
+    pub path: PathBuf,
 }
 
-pub(super) struct Entry {
-    pub(super) path: &'static str,
-    pub(super) contents: Vec<u8>,
-    pub(super) age_days: u64,
+pub struct Entry {
+    pub path: &'static str,
+    pub contents: Vec<u8>,
+    pub age_days: u64,
 }
 
 impl Image {
-    pub(super) fn build(name: &str, entries: &[Entry]) -> Option<Self> {
+    pub fn build(name: &str, entries: &[Entry]) -> Option<Self> {
         if TOOLS.iter().any(|tool| !installed(tool)) {
             eprintln!(
                 "skipping: {} are needed to build NTFS images",
@@ -75,11 +75,11 @@ impl Image {
         Some(image)
     }
 
-    pub(super) fn open(&self) -> File {
+    pub fn open(&self) -> File {
         File::open(&self.path).unwrap()
     }
 
-    pub(super) fn used_bytes(&self) -> u64 {
+    pub fn used_bytes(&self) -> u64 {
         let output = Command::new("ntfscluster")
             .arg("-i")
             .arg(&self.path)

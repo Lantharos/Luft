@@ -18,14 +18,16 @@
     <property name="Error" type="s" access="read"/>
 
     <!-- JSON: drives with their free spaces, EFI system partition and Windows (size, used, smallest it can
-         shrink to, room for Luft, version, fast startup and why it can't shrink: "bitlocker", "hibernated",
+         shrink to, room for Luft, version, fast startup, whether its clock is in UTC, how many
+         Bluetooth devices it has paired, and why it can't shrink: "bitlocker", "hibernated",
          "dirty" or "full"), drives Luft can't use ("running", "read-only", "too-small"), hints read from
          Windows (time zone, keyboard, locale) and the smallest size Luft needs. -->
     <method name="Survey">
       <arg name="survey" type="s" direction="out"/>
     </method>
     <!-- JSON: {"target": {"kind": "whole", "drive"} | {"kind": "alongside", "drive", "size"} |
-         {"kind": "free", "drive", "offset"}, "variant": "default" | "nvidia"}. Starts right away. -->
+         {"kind": "free", "drive", "offset"}, "variant": "default" | "nvidia", "windows": {"fastStartupOff", "universalClock", "bluetooth"}}.
+         Starts right away; the Windows choices apply to the Windows on that drive. -->
     <method name="Install">
       <arg name="request" type="s" direction="in"/>
     </method>

@@ -5,7 +5,7 @@ Rover is the file manager of Luft. Built with Sabine and Svelte.
 ## Features
 
 - Tabs, and list, grid and column views remembered per folder, with sortable, resizable and reorderable list columns
-- A sidebar with your folders, Recent, Trash, Favorites, drives and network locations
+- A sidebar with your folders, Recent, Trash, Favorites, drives, Windows' drive and network locations; Windows left asleep by Fast Startup opens read-only
 - A details pane and Quick Look for images, video, audio, text, code, Markdown and PDFs
 - Thumbnails through the standard thumbnail cache and your installed thumbnailers
 - Search by name or contents, narrowed by kind, date and size

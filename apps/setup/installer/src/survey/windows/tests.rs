@@ -1,8 +1,4 @@
-mod hive;
-mod image;
-
-use hive::{Data, Key};
-use image::{Entry, Image};
+use luft_windows::testing::{Entry, HiveBuilder, Image, Value};
 
 use super::{Hints, Keyboard, hints, inspect, keyboards, zones};
 
@@ -15,27 +11,27 @@ fn entry(path: &'static str, contents: Vec<u8>, age_days: u64) -> Entry {
 }
 
 fn user_hive(locale: &'static str, preload: &'static str) -> Vec<u8> {
-    Key::default()
+    HiveBuilder::default()
         .set(
             r"Control Panel\International",
             "LocaleName",
-            Data::String(locale),
+            Value::Sz(locale.into()),
         )
-        .set(r"Keyboard Layout\Preload", "1", Data::String(preload))
+        .set(r"Keyboard Layout\Preload", "1", Value::Sz(preload.into()))
         .build()
 }
 
 fn software_hive(product: &'static str, build: &'static str) -> Vec<u8> {
-    Key::default()
+    HiveBuilder::default()
         .set(
             r"Microsoft\Windows NT\CurrentVersion",
             "ProductName",
-            Data::String(product),
+            Value::Sz(product.into()),
         )
         .set(
             r"Microsoft\Windows NT\CurrentVersion",
             "CurrentBuildNumber",
-            Data::String(build),
+            Value::Sz(build.into()),
         )
         .build()
 }
@@ -49,35 +45,39 @@ fn keyboard(layout: &str, variant: &str) -> Option<Keyboard> {
 
 #[test]
 fn reads_installation_from_newest_user_profile() {
-    let system = Key::default()
-        .set("Select", "Current", Data::Dword(2))
+    let system = HiveBuilder::default()
+        .set("Select", "Current", Value::Dword(2))
         .set(
             r"ControlSet001\Control\TimeZoneInformation",
             "TimeZoneKeyName",
-            Data::String("Pacific Standard Time"),
+            Value::Sz("Pacific Standard Time".into()),
         )
         .set(
             r"ControlSet002\Control\TimeZoneInformation",
             "TimeZoneKeyName",
-            Data::String("W. Europe Standard Time"),
+            Value::Sz("W. Europe Standard Time".into()),
         )
         .set(
             r"ControlSet002\Control\Session Manager\Power",
             "HiberbootEnabled",
-            Data::Dword(1),
+            Value::Dword(1),
         )
         .build();
-    let bob = Key::default()
+    let bob = HiveBuilder::default()
         .set(
             r"Control Panel\International",
             "LocaleName",
-            Data::String("nl-NL"),
+            Value::Sz("nl-NL".into()),
         )
-        .set(r"Keyboard Layout\Preload", "1", Data::String("00000413"))
+        .set(
+            r"Keyboard Layout\Preload",
+            "1",
+            Value::Sz("00000413".into()),
+        )
         .set(
             r"Keyboard Layout\Substitutes",
             "00000413",
-            Data::String("00020409"),
+            Value::Sz("00020409".into()),
         )
         .build();
     let mut hiberfil = b"HIBR".to_vec();
@@ -128,17 +128,17 @@ fn reads_installation_from_newest_user_profile() {
 
 #[test]
 fn falls_back_to_default_user_hive() {
-    let system = Key::default()
-        .set("Select", "Current", Data::Dword(1))
+    let system = HiveBuilder::default()
+        .set("Select", "Current", Value::Dword(1))
         .set(
             r"ControlSet001\Control\TimeZoneInformation",
             "TimeZoneKeyName",
-            Data::String("Romance Standard Time"),
+            Value::Sz("Romance Standard Time".into()),
         )
         .set(
             r"ControlSet001\Control\Session Manager\Power",
             "HiberbootEnabled",
-            Data::Dword(0),
+            Value::Dword(0),
         )
         .build();
     let mut hiberfil = b"wake".to_vec();

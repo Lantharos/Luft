@@ -1,0 +1,12 @@
+[Unit]
+Description=Check luft-windows against a Windows drive made in this VM
+After=dbus.service local-fs.target
+ConditionPathExists=/usr/lib/luft-windows-check/fake-windows
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-windows-check
+ExecStopPost=/usr/bin/systemctl poweroff --no-block
+
+[Install]
+WantedBy=multi-user.target

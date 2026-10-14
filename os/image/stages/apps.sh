@@ -30,6 +30,19 @@ install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$updater/data/com.lantharos.updater.policy"
 install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-updater.rules"
 
+windows="$luft/packages/windows/service"
+cargo build --release --locked --manifest-path "$windows/Cargo.toml"
+install -Dm755 "$CARGO_TARGET_DIR/release/luft-windows" "$destdir/usr/libexec/luft-windows"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$windows/data/com.lantharos.Windows1.conf"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$windows/data/com.lantharos.Windows1.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/system" "$windows/data/luft-windows.service" "$windows/data/luft-windows-boot.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/user" "$windows/data/luft-windows-notice.service"
+install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$windows/data/com.lantharos.windows.policy"
+printf 'enable luft-windows-boot.service\n' |
+  install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-windows.preset"
+printf 'enable luft-windows-notice.service\n' |
+  install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-windows.preset"
+
 (cd "$luft" && bun install --frozen-lockfile)
 for app in "$luft"/apps/*/; do
   sabine install --bundle --system-wide --root "$destdir" "$app"

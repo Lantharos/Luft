@@ -1,5 +1,5 @@
 import * as installer from '#lib/api/installer.js';
-import type { Drive, InstallerState, Survey, Target } from '#lib/api/installer.js';
+import type { Drive, InstallerState, Survey, Target, WindowsChoices } from '#lib/api/installer.js';
 import { NO_HARDWARE, type Hardware } from '#lib/api/system.js';
 import { regional } from './regional.svelte.js';
 
@@ -13,6 +13,7 @@ class InstallState {
 	starting = $state(false);
 	startError = $state('');
 	user = $state('');
+	windowsChoices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true, bluetooth: true });
 	private hardware = NO_HARDWARE;
 
 	started = $derived(this.status !== null && this.status.stage !== 'idle');
@@ -49,7 +50,7 @@ class InstallState {
 		this.starting = true;
 		this.startError = '';
 		try {
-			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default');
+			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default', $state.snapshot(this.windowsChoices));
 			this.status = await installer.state();
 			await this.configure();
 			return true;

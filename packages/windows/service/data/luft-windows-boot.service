@@ -1,0 +1,14 @@
+[Unit]
+Description=Recover devices Windows left asleep
+DefaultDependencies=no
+After=local-fs.target systemd-udev-trigger.service
+Before=greetd.service bluetooth.service alsa-state.service alsa-restore.service
+ConditionKernelCommandLine=!rd.live.image
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-windows boot
+SyslogIdentifier=luft-windows
+
+[Install]
+WantedBy=multi-user.target

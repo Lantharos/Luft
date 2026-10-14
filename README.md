@@ -70,6 +70,7 @@ Releases are built and signed in CI and published as `ghcr.io/lantharos/luft:45`
 | [`packages/fingerprint`](packages/fingerprint/README.md) | Fingerprint readers through fprintd |
 | [`packages/network`](packages/network/README.md) | Wi-Fi, wired and VPN connections through NetworkManager |
 | [`packages/software`](packages/software/README.md) | System updates, Flatpak, AppImages and Toolbox tools |
+| [`packages/windows`](packages/windows/README.md) | Windows on the same computer: Fast Startup, its clock and its Bluetooth devices |
 
 Guides: [installing](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [wallpaper colors](docs/appearance.md), [Kestrel prompts](docs/prompts.md) and [testing](docs/testing.md).
 

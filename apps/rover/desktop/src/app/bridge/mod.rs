@@ -88,6 +88,10 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("eject_drive", |MountPoint { mount_point }| {
             drives::eject_drive(mount_point)
         })
+        .command("list_windows", |Empty {}| Ok(drives::closed_windows()))
+        .command("open_windows", |WindowsDevice { device, read_only }| {
+            drives::open_windows(&device, read_only)
+        })
         .command("manage_drive", |MountPoint { mount_point }| {
             drives::manage(&mount_point)
         })

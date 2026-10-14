@@ -12,6 +12,7 @@ use super::PATH;
 use super::error::Error;
 use crate::config::Config;
 use crate::install::drive::plan::{self, Request};
+use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Job, Regional, Stage, Status};
 use crate::options::Options;
 use crate::{first_boot, phase, survey};
@@ -149,9 +150,11 @@ impl Installer {
             .map_err(|error| Error::Failed(format!("The request isn't valid: {error}")))?;
         let image = self.config.image(&request.variant)?;
         let smallest = self.config.smallest_system;
-        let plan = Self::blocking(move || {
+        let (plan, windows) = Self::blocking(move || {
             let survey = survey::take(smallest).map_err(anyhow::Error::msg)?;
-            plan::resolve(&survey, &request.target)
+            let plan = plan::resolve(&survey, &request.target)?;
+            let windows = Windows::chosen(&survey, &plan.drive, request.windows);
+            Ok((plan, windows))
         })
         .await?;
         if self.started.swap(true, Ordering::SeqCst) {
@@ -173,6 +176,7 @@ impl Installer {
                     plan,
                     target: &options.target,
                     answers: &answers,
+                    windows,
                 };
                 install::run(job, |status| {
                     let _ = sender.send(status);

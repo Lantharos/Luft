@@ -6,6 +6,8 @@ use luft_disks::udisks::volumes::{Segment, Volume};
 use serde::Serialize;
 
 use super::room;
+use luft_windows::bluetooth::Pairing;
+
 use super::windows::{self, Hints};
 use crate::install::drive::layout::{ESP_TYPE, shares_esp};
 
@@ -39,6 +41,8 @@ pub struct Space {
 #[serde(rename_all = "camelCase")]
 pub struct WindowsVolume {
     pub block: String,
+    #[serde(skip)]
+    pub device: String,
     pub offset: u64,
     pub size: u64,
     pub used: u64,
@@ -46,9 +50,16 @@ pub struct WindowsVolume {
     pub room: u64,
     pub version: Option<String>,
     pub fast_startup: bool,
+    pub universal_clock: bool,
+    #[serde(serialize_with = "count")]
+    pub bluetooth: Vec<Pairing>,
     pub blocked: Option<&'static str>,
     #[serde(skip)]
     pub hints: Option<Hints>,
+}
+
+fn count<S: serde::Serializer>(pairings: &[Pairing], serializer: S) -> Result<S::Ok, S::Error> {
+    serializer.serialize_u64(pairings.len() as u64)
 }
 
 fn volumes(drive: &snapshot::Drive) -> impl Iterator<Item = &Volume> {
@@ -160,6 +171,7 @@ fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
     };
     Some(WindowsVolume {
         block: volume.block.clone(),
+        device: volume.device.clone(),
         offset: volume.offset,
         size: volume.size,
         used: found.used,
@@ -167,6 +179,8 @@ fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
         room,
         version: found.version,
         fast_startup: found.fast_startup,
+        universal_clock: found.universal_clock,
+        bluetooth: found.bluetooth,
         blocked,
         hints: Some(found.hints),
     })
@@ -175,6 +189,7 @@ fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
 fn locked(volume: &Volume) -> WindowsVolume {
     WindowsVolume {
         block: volume.block.clone(),
+        device: volume.device.clone(),
         offset: volume.offset,
         size: volume.size,
         used: 0,
@@ -182,6 +197,8 @@ fn locked(volume: &Volume) -> WindowsVolume {
         room: 0,
         version: None,
         fast_startup: false,
+        universal_clock: false,
+        bluetooth: Vec::new(),
         blocked: Some("bitlocker"),
         hints: None,
     }

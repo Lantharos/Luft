@@ -1,0 +1,14 @@
+[Unit]
+Description=Tell about Windows' Fast Startup once
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionPathExists=!%S/luft/windows-notice
+ConditionPathExists=|/run/luft-windows/hibernated
+ConditionPathExists=|!%S/luft/windows-checked
+
+[Service]
+Type=exec
+ExecStart=/usr/libexec/luft-windows notice
+
+[Install]
+WantedBy=graphical-session.target

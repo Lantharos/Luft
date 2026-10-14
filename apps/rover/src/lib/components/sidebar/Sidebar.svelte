@@ -10,6 +10,7 @@
 	import FavoritesGroup from './FavoritesGroup.svelte';
 	import NetworkItem from './NetworkItem.svelte';
 	import SidebarItem from './SidebarItem.svelte';
+	import WindowsItem from './WindowsItem.svelte';
 
 	interface Props {
 		manager: FileManager;
@@ -112,10 +113,13 @@
 
 		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} onmenu={showMenu} />
 
-		{#if manager.drives.ordered.length > 0}
+		{#if manager.drives.ordered.length > 0 || manager.drives.windows.length > 0}
 			<div class="sidebar-group">
 				{#each manager.drives.ordered as drive (drive.mount_point)}
 					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} onmenu={showMenu} />
+				{/each}
+				{#each manager.drives.windows as drive (drive.device)}
+					<WindowsItem {drive} {manager} />
 				{/each}
 			</div>
 		{/if}

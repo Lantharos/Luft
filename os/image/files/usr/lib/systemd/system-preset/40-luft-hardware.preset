@@ -1,0 +1,2 @@
+enable fwupd-refresh.timer
+enable thermald.service

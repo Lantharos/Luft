@@ -1,5 +1,6 @@
 mod mounts;
 mod watch;
+mod windows;
 
 use std::collections::HashMap;
 use std::ffi::CString;
@@ -12,6 +13,7 @@ use gio::prelude::*;
 use serde::Serialize;
 
 pub use watch::watch_mounts;
+pub use windows::{closed_windows, open_windows};
 
 const DISKS: &str = "com.lantharos.disks.desktop";
 

@@ -2,6 +2,7 @@ use anyhow::{Result, bail};
 use serde::Deserialize;
 
 use super::layout::{self, Part};
+use crate::install::windows::Choices;
 use crate::survey::{self, ALIGNMENT, Drive, Survey};
 
 #[derive(Deserialize)]
@@ -20,6 +21,8 @@ pub enum Target {
 pub struct Request {
     pub target: Target,
     pub variant: String,
+    #[serde(default)]
+    pub windows: Choices,
 }
 
 pub struct Shrink {

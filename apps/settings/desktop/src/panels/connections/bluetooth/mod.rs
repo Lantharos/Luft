@@ -3,6 +3,7 @@ mod agent;
 pub mod rfkill;
 mod snapshot;
 mod watch;
+mod windows;
 
 use luft_app::dbus;
 use luft_app::dbus::objects::Objects;
@@ -129,6 +130,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             "bluetooth_set_visible",
             |Visibility { visible, timeout }| actions::set_visible(&adapter()?, visible, timeout),
         )
+        .command("bluetooth_windows", |_: Value| windows::waiting())
+        .command("bluetooth_import_windows", |_: Value| windows::import())
         .command("bluetooth_answer", |Answer { id, value }| {
             agent::answer(id, value);
             Ok(())

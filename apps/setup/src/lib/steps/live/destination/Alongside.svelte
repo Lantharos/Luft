@@ -3,7 +3,8 @@
 	import type { Drive, WindowsVolume } from '#lib/api/installer.js';
 	import SplitBar from '#lib/components/SplitBar.svelte';
 	import { install } from '#lib/state/install.svelte.js';
-	import { FAST_STARTUP, overhead, whyWindowsCantShrink } from './explain.js';
+	import { overhead, whyWindowsCantShrink } from './explain.js';
+	import WindowsOptions from './WindowsOptions.svelte';
 
 	interface Props {
 		drive: Drive & { windows: WindowsVolume };
@@ -40,9 +41,7 @@
 		<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">
 			Drag to share {drive.name} between Windows and Luft. Windows keeps all of its files and some room to grow.
 		</p>
-		{#if windows.fastStartup}
-			<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">{FAST_STARTUP}</p>
-		{/if}
+		<WindowsOptions {windows} />
 		{#if install.startError}
 			<p class="text-[13.5px] text-[var(--danger)]">{install.startError}</p>
 		{/if}

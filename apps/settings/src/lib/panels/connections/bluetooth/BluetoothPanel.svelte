@@ -8,6 +8,7 @@
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
+	import WindowsDevices from './WindowsDevices.svelte';
 	import {
 		close,
 		connect,
@@ -200,6 +201,7 @@
 		{/if}
 
 		{#if adapter.powered}
+			<WindowsDevices />
 			<Section title="Nearby devices">
 				{#each nearby as device (device.path)}
 					<ActionRow

@@ -7,7 +7,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 | Page | Covers |
 |------|--------|
 | Network | Wi-Fi, wired, VPN (WireGuard, OpenVPN and other plugin imports) and proxy, with per-connection IP, DNS, routes and metered data |
-| Bluetooth | Pairing, connecting, visibility and device details; shown only with an adapter |
+| Bluetooth | Pairing, connecting, visibility and device details, and bringing devices paired in Windows; shown only with an adapter |
 | Displays | Arrangement, resolution, refresh rate, variable refresh, scale, brightness and night light |
 | Sound | Devices, volumes, per-app volume and output, profiles and alert sounds |
 | Power (& Battery) | Power mode, battery health and charge limit, keyboard backlight, blanking and suspend |

@@ -2,20 +2,16 @@ use std::io::{Read, Seek};
 
 use anyhow::Result;
 
-use super::registry::Registry;
-use super::volume::Volume;
+use luft_windows::{Registry, System, Volume};
+
 use super::{Hints, Keyboard, keyboards, zones};
 
 const SHARED_PROFILES: &[&str] = &["Default", "Default User", "Public", "All Users"];
 const DEFAULT_USER_HIVE: &str = r"Windows\System32\config\DEFAULT";
 
-pub(super) fn gather<R: Read + Seek>(
-    volume: &mut Volume<R>,
-    system: &Registry,
-    control_set: Option<&str>,
-) -> Result<Hints> {
-    let timezone = match control_set {
-        Some(control_set) => timezone(system, control_set)?,
+pub(super) fn gather<R: Read + Seek>(volume: &mut Volume<R>, system: &System) -> Result<Hints> {
+    let timezone = match system.control_set() {
+        Some(control_set) => timezone(system.registry(), control_set)?,
         None => None,
     };
     let Some(user) = user_hive(volume)? else {

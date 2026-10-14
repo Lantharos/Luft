@@ -49,7 +49,13 @@ export interface PairingRequest {
 	code: string | null;
 }
 
+export interface WindowsDevice {
+	device: string;
+	name: string | null;
+}
+
 const PAIRING_TIMEOUT = 120_000;
+const WAIT_FOR_PERSON = 300_000;
 
 export const open = () => invoke<Bluetooth>('bluetooth_open');
 export const close = () => invoke<void>('bluetooth_close');
@@ -61,6 +67,8 @@ export const cancelPairing = (device: string) => invoke<void>('bluetooth_cancel_
 export const forget = (device: string) => invoke<void>('bluetooth_forget', { device });
 export const setTrusted = (device: string, trusted: boolean) => invoke<void>('bluetooth_set_trusted', { device, trusted });
 export const setVisible = (visible: boolean, timeout: number) => invoke<void>('bluetooth_set_visible', { visible, timeout });
+export const pairedInWindows = () => invoke<WindowsDevice[]>('bluetooth_windows');
+export const importFromWindows = () => invoke<number>('bluetooth_import_windows', {}, { timeoutMs: WAIT_FOR_PERSON });
 export const answer = (id: number, value: string | null) => invoke<void>('bluetooth_answer', { id, value });
 
 export const onChanged = (callback: (bluetooth: Bluetooth) => void) => listen<Bluetooth>('bluetooth.changed', callback);

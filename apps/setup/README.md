@@ -9,6 +9,7 @@ Installs Luft from the USB stick and sets up a new computer the first time it st
 - Language, keyboard and time zone, guessed from the firmware, from Windows on the same computer, and from the network once online
 - Alongside Windows with a size bar, on a whole drive, in free space made with Disks, or just trying Luft from the stick
 - Refuses to touch Windows while it's hibernating, locked with BitLocker or needs a check, and says what to do in Windows
+- Next to Windows, offers to turn off Fast Startup, keep the clock right in both and bring Bluetooth devices paired in Windows
 - Copies Luft in the background while you connect to Wi-Fi and make your account
 - Picks the NVIDIA image when the computer has an NVIDIA graphics card
 - On first start, right after signing in: explains the one blue Secure Boot screen with pictures and the code to type, offers encryption with a recovery key and a fingerprint when there's a reader, then hands over to the desktop
@@ -55,7 +56,7 @@ KESTREL_DEV_APPS=setup kestrel/tools/session.sh setup
 
 runs the setup checks in a headless Kestrel in setup mode, against stand-ins for the installer, NetworkManager, trustd and logind, and saves a screenshot of every step.
 
-`cargo test` in `installer` covers the partition layout, the files written into the new system and reading Windows from an NTFS image.
+`cargo test` in `installer` covers the partition layout, the files written into the new system and reading Windows from an NTFS image; changing Windows is tested in [packages/windows](../../packages/windows/README.md).
 
 ```sh
 installer/vm/run.sh

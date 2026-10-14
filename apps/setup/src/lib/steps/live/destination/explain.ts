@@ -29,9 +29,6 @@ export function whyWindowsCantShrink(windows: WindowsVolume, needed: number): st
 	}
 }
 
-export const FAST_STARTUP =
-	'Fast Startup is on in Windows. It can lock the drive while you’re using Luft, so turn it off in Windows under Power Options, Choose what the power buttons do.';
-
 export function describeDrive(drive: Drive) {
 	if (drive.windows) return `Has ${windowsName(drive.windows)}`;
 	if (drive.partitions === 0) return 'Empty';

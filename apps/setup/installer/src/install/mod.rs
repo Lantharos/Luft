@@ -2,6 +2,7 @@ mod configure;
 mod copy;
 pub mod drive;
 mod startup;
+pub mod windows;
 
 use std::path::Path;
 use std::sync::{Condvar, Mutex};
@@ -17,6 +18,7 @@ use configure::handoff;
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
+use windows::Windows;
 
 const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
@@ -109,6 +111,7 @@ pub struct Job<'a> {
     pub plan: Plan,
     pub target: &'a Path,
     pub answers: &'a Answers,
+    pub windows: Option<Windows>,
 }
 
 pub fn run(job: Job, report: impl Fn(Status)) {
@@ -125,6 +128,9 @@ pub fn run(job: Job, report: impl Fn(Status)) {
 
 fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     report(Status::at(Stage::Preparing, 0.0));
+    if let Some(windows) = &job.windows {
+        windows.change();
+    }
     let parts = partition::apply(&job.plan)?;
     let mounted = Mounted::assemble(job.target, &job.plan.device, &parts)?;
     report(Status::at(Stage::Copying, PREPARED));
@@ -142,6 +148,11 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
     regional.apply(&deployment)?;
     account.create(&deployment)?;
+    if let Some(windows) = &job.windows
+        && let Err(error) = windows.bring_bluetooth(&deployment)
+    {
+        eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
+    }
     handoff::prepare(&deployment, &account.name)?;
     drop(deployment);
     mounted.finish()?;

@@ -1,0 +1,34 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Windows1">
+  <!--
+    Looks after Windows installed on the same computer. Started on demand and stops when idle.
+
+    Status and Drives need com.lantharos.windows.status, Change com.lantharos.windows.change and
+    ImportBluetooth com.lantharos.windows.bluetooth.
+  -->
+  <interface name="com.lantharos.Windows1">
+    <!-- JSON: {"afterHibernation": whether Windows was hibernated or fast-started when this boot began,
+         "installations": [{"device", "version", "hibernated", "mounted", "fastStartup", "universalClock",
+         "bluetooth": [{"adapter", "device", "name", "class"}] paired in Windows but not the same in Luft}]}. -->
+    <method name="Status">
+      <arg name="status" type="s" direction="out"/>
+    </method>
+    <!-- JSON: [{"device", "label", "hibernated", "mounted"}] for each partition with Windows on it, found
+         without reading Windows' settings, so it's quick. -->
+    <method name="Drives">
+      <arg name="drives" type="s" direction="out"/>
+    </method>
+    <!-- Changes Windows' settings on that partition: "fastStartupOff" and "universalClock". Refused while
+         Windows is hibernated, its drive needs a check or it's open in Luft. The settings as they were are
+         kept in Windows\System32\config\SYSTEM.luft-backup. -->
+    <method name="Change">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="changes" type="as" direction="in"/>
+    </method>
+    <!-- Copies the pairings Status lists into BlueZ, restarts Bluetooth and says how many it brought. -->
+    <method name="ImportBluetooth">
+      <arg name="imported" type="u" direction="out"/>
+    </method>
+  </interface>
+</node>

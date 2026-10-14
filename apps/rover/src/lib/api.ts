@@ -10,7 +10,8 @@ import type {
 	NetworkPlace,
 	Operation,
 	Settings,
-	TrashContents
+	TrashContents,
+	WindowsDrive
 } from './types';
 import type { FileDetails, OpenWithApps } from './types/details';
 import type { VcsRoot, VcsStatusEvent } from './vcs/types';
@@ -34,6 +35,8 @@ export const openWithApp = (path: string, app: string) => invoke<void>('open_wit
 
 export const listDrives = () => invoke<DriveInfo[]>('list_drives');
 export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
+export const listWindows = () => invoke<WindowsDrive[]>('list_windows');
+export const openWindows = (device: string, readOnly: boolean) => invoke<string>('open_windows', { device, readOnly }, { timeoutMs: 300_000 });
 export const manageDrive = (mountPoint: string) => invoke<void>('manage_drive', { mountPoint });
 
 export const networkLocations = () => invoke<NetworkLocation[]>('network_locations');

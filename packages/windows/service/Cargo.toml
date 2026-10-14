@@ -1,0 +1,34 @@
+[package]
+name = "luft-windows-service"
+version = "0.1.0"
+description = "Looks after Windows on the same computer: Fast Startup, its clock and its Bluetooth devices"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[[bin]]
+name = "luft-windows"
+path = "src/main.rs"
+
+[dependencies]
+access = { path = "../../../security/crates/access" }
+anyhow = "1.0.104"
+futures-util = { version = "0.3.34", default-features = false }
+libc = "0.2.189"
+luft-windows = { path = ".." }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", default-features = false, features = ["rt", "macros", "time", "sync"] }
+zbus = { version = "5.19.0", default-features = false, features = ["tokio"] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

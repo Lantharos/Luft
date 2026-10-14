@@ -44,6 +44,7 @@ The setup app and `luft-installer` ship in Luft's image. The installer's files, 
 | `com.lantharos.Installer1.service` | `/usr/share/dbus-1/system-services/` |
 | `luft-installer.service` | `/usr/lib/systemd/system/` |
 | `com.lantharos.installer.policy` | `/usr/share/polkit-1/actions/` |
+| `luft-installer.cil` | `/usr/share/selinux/packages/`, loaded with `semodule -i`; runs the service as SELinux's `install_t`, which bootc needs |
 
 ## Testing
 

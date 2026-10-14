@@ -1,0 +1,78 @@
+name: ISO
+
+on:
+  workflow_run:
+    workflows: [Image]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Image to build the ISO from
+        default: ghcr.io/lantharos/luft:45
+
+concurrency:
+  group: iso-${{ github.event.workflow_run.head_branch || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      IMAGE: ${{ inputs.image || format('ghcr.io/lantharos/luft:{0}', github.event.workflow_run.head_branch) }}
+      LUFT_ISO: ${{ github.workspace }}/iso
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - name: Make room
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost
+          sudo docker image prune --all --force
+          df -h /
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Sign in to the registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Build
+        run: |
+          mkdir -p "$LUFT_ISO"
+          os/iso/build.sh "$IMAGE"
+          ls -l "$LUFT_ISO"
+
+      - name: Upload to R2
+        if: env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          cd "$LUFT_ISO"
+          iso="$(ls luft-*.iso)"
+          for file in "$iso" "$iso.sha256"; do
+            aws s3 cp --endpoint-url "$endpoint" --no-progress "$file" "s3://$R2_BUCKET/$file"
+          done
+          latest=luft-latest.iso
+          aws s3 cp --endpoint-url "$endpoint" "s3://$R2_BUCKET/$iso" "s3://$R2_BUCKET/$latest"
+          sed "s/$iso/$latest/" "$iso.sha256" | aws s3 cp --endpoint-url "$endpoint" - "s3://$R2_BUCKET/$latest.sha256"
+
+      - name: Keep as a workflow artifact
+        if: env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: luft-iso
+          path: ${{ env.LUFT_ISO }}/luft-*
+          compression-level: 0
+          retention-days: 14

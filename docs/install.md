@@ -4,7 +4,9 @@ How Luft gets from the USB stick onto a computer, and what happens the first tim
 
 ## From the USB stick
 
-The stick starts straight into Install Luft, over the blurred wallpaper.
+Download the latest `luft-VERSION.iso` and write it to a USB stick of 4 GB or more with Fedora Media Writer, balenaEtcher or Rufus (in DD mode). Start the computer from the stick with the firmware's boot menu, usually F12, F11 or Esc while the logo shows. Secure Boot can stay on.
+
+The stick starts straight into Install Luft, over the blurred wallpaper. Holding Esc while it starts shows a menu with a basic graphics mode for screens that stay dark.
 
 1. **Language, keyboard and time zone.** Guessed from the firmware's language, from Windows if it's on the computer, and from the network once you're online. The keyboard you pick works right away, so you can try it before typing a password.
 2. **Where Luft goes.**
@@ -67,8 +69,8 @@ size = 4900000000                                         # bytes installed, for
 
 `[images.nvidia]` is used on computers with an NVIDIA graphics card. Updates come from the reference in `/usr/share/luft/image-reference`, with `-nvidia` added for the NVIDIA image.
 
-- The live system needs `rd.live.image` on its kernel command line, so the installer knows it's on the stick.
-- The stick's login screen should sign the live user in with `kestrel-session --setup` as greetd's `initial_session`, and allow that user `com.lantharos.installer.install` in polkit.
+- The stick ([os/iso](../os/iso)) keeps both images in a read-only image store on the stick, which the session there adds to Podman's storage, so `containers-storage:` sources install without a network.
+- Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included.
 - After copying, the installer writes the locale, keyboard, time zone, host name and the account into the new system, and sets greetd's `initial_session` so the first start opens setup. `FinishFirstBoot` takes it out again.
 
 `kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session. Setup mode shows the firmware logo while Sushi hands over, fades in the blurred wallpaper with the window, and ends on that same wallpaper, so the desktop takes over without a flash.

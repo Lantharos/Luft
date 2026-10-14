@@ -1,0 +1,10 @@
+[Unit]
+Description=Luft from the USB stick
+DefaultDependencies=no
+After=systemd-udev-trigger.service
+Before=sysroot.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/luft-live-root

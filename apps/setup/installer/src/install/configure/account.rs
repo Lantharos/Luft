@@ -56,6 +56,7 @@ impl Account {
         Tool::new("chpasswd")
             .arg("--root")
             .arg(&deployment.root)
+            .args(["--crypt-method", "YESCRYPT"])
             .input(format!("{}:{}\n", self.name, self.password).as_bytes())
             .run()?;
         let folder = deployment.var(home.trim_start_matches("/var/"));

@@ -1,0 +1,10 @@
+[terminal]
+vt = 7
+
+[default_session]
+command = "/usr/bin/kestrel-greeter"
+user = "greetd"
+
+[initial_session]
+command = "/usr/bin/kestrel-session --setup"
+user = "live"

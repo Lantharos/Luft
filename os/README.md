@@ -24,7 +24,25 @@ The NVIDIA image signs its driver with the PEM key and certificate named by `LUF
 | `image/stages` | The scripts each stage runs |
 | `image/packages` | Fedora packages for building, those added to the image, and the GNOME parts Kestrel replaces |
 | `image/files` | Files copied into the image as they are |
-| `vm` | Trying the image in a virtual machine |
+| `iso` | The USB stick |
+| `vm` | Trying the image and the stick in a virtual machine |
+
+## USB stick
+
+```sh
+os/iso/build.sh                              # from localhost/luft:45 and :45-nvidia
+os/iso/build.sh ghcr.io/lantharos/luft:45    # from the published images
+```
+
+It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and put it on Cloudflare R2.
+
+The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc shows GRUB's menu. It carries both images, so installing needs no network, and the session on the stick runs the regular image, so choosing *Just try Luft* gives the normal desktop with Install Luft in the launcher.
+
+| Path | Holds |
+| --- | --- |
+| `iso/live` | What the session on the stick adds to the image: the `live` account, signing it in to setup, and the startup step that builds its root from the stick |
+| `iso/stages` | Packing the images and making the ISO |
+| `iso/loader` | The boot loader on the stick |
 
 ## Try it in a VM
 
@@ -38,6 +56,14 @@ os/vm/run.sh       # start it in a window (HEADLESS=1 for none)
 ```sh
 os/vm/control.py screenshot login.png
 os/vm/control.py shell 'bootc status'
+```
+
+To start the stick instead, with an empty `os/vm/state/target.qcow2` to install onto:
+
+```sh
+ISO=os/iso/state/luft-VERSION.iso os/vm/run.sh                 # as a USB stick
+ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/run.sh          # as a DVD, Secure Boot on, offline
+DISK=os/vm/state/target.qcow2 os/vm/run.sh                     # the installed drive afterwards
 ```
 
 With root, Fedora's [bootc-image-builder](https://github.com/osbuild/bootc-image-builder) makes disk images too.

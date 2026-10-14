@@ -41,7 +41,11 @@ write_image_reference() {
 }
 
 configure_security() {
-  semodule -i /usr/share/selinux/packages/luft-keyring.cil
+  local module modules=()
+  for module in /usr/share/selinux/packages/luft-*.cil; do
+    modules+=(-i "$module")
+  done
+  semodule "${modules[@]}"
   authselect enable-feature with-fingerprint
 }
 

@@ -5,6 +5,7 @@ if [ -z "$KESTREL_LOGIN_SHELL" ]; then
 fi
 unset KESTREL_LOGIN_SHELL
 
+export XDG_SESSION_TYPE=wayland
 export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export IBUS_DAEMON_ARGS="--panel disable"
 

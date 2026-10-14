@@ -5,6 +5,7 @@ Description=Luft installer and first-run setup
 Type=dbus
 BusName=com.lantharos.Installer1
 ExecStart=/usr/libexec/luft-installer
+SELinuxContext=system_u:system_r:install_t:s0
 SyslogIdentifier=luft-installer
 RuntimeDirectory=luft-installer
 StateDirectory=luft-installer

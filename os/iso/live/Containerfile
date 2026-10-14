@@ -1,0 +1,8 @@
+ARG IMAGE=localhost/luft:45
+FROM ${IMAGE}
+COPY files/ /
+RUN useradd --no-create-home --groups wheel --comment Luft live && \
+    passwd --delete live && \
+    systemctl mask bootloader-update.service && \
+    systemctl --global mask luft-keyring.service luft-keyring.socket && \
+    glib-compile-schemas /usr/share/glib-2.0/schemas

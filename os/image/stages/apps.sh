@@ -19,6 +19,7 @@ install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$installer/data/com.lant
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$installer/data/com.lantharos.Installer1.service"
 install -Dm644 -t "$destdir/usr/lib/systemd/system" "$installer/data/luft-installer.service"
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$installer/data/com.lantharos.installer.policy"
+install -Dm644 -t "$destdir/usr/share/selinux/packages" "$installer/data/luft-installer.cil"
 
 (cd "$luft" && bun install --frozen-lockfile)
 for app in "$luft"/apps/*/; do

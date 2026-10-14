@@ -50,7 +50,7 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[880px] flex-col gap-7 px-8 pt-2 pb-10">
 		<header class="flex items-center gap-5">
-			<AppArt icon={details?.icon ?? installed?.icon ?? null} desktop={installed?.desktop} size={88} />
+			<AppArt icon={details?.icon ?? installed?.icon ?? null} desktop={installed?.desktop} tool={installed?.source === 'tool'} size={88} />
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
 				{#if details?.developer}

@@ -38,7 +38,6 @@ pub fn display_name(command: &str) -> Option<String> {
         "schelf" => "Schelf",
         "dnf" | "dnf5" => "dnf",
         "pkcon" => "pkcon",
-        "rpm-ostree" => "rpm-ostree",
         "gnome-software" => "GNOME Software",
         "plasma-discover" => "Discover",
         _ => "another app",

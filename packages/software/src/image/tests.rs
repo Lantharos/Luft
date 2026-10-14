@@ -1,15 +1,14 @@
 use super::*;
 
-fn status(fixture: &str) -> Status {
-    let deployments = Deployment::parse(serde_json::from_str(fixture).unwrap()).unwrap();
-    Deployments(deployments).status().unwrap()
+fn deployments(fixture: &str) -> Deployments {
+    Deployments(Host::parse(fixture).unwrap())
 }
 
 fn first() -> Release {
     Release {
         version: Some("45.1".into()),
         notes: Some("Faster startup and a fresher look.".into()),
-        released: Some(1_791_925_321),
+        released: Some(1_791_987_953),
     }
 }
 
@@ -17,45 +16,37 @@ fn second() -> Release {
     Release {
         version: Some("45.2".into()),
         notes: Some(
-            "Wi-Fi reconnects faster after sleep, and Settings shows what's new in each update."
+            "Wi-Fi reconnects faster after sleep.\nSettings shows what's new in each update."
                 .into(),
         ),
-        released: Some(1_791_925_454),
+        released: Some(1_791_988_620),
     }
 }
 
-fn nothing_else(current: Release) -> Status {
+fn only(current: Release) -> Status {
     Status {
         current,
         staged: None,
         previous: None,
         returning: None,
-        layered: Vec::new(),
-        installing: Vec::new(),
-        removing: Vec::new(),
     }
 }
 
 #[test]
 fn a_fresh_install_has_only_its_own_version() {
-    let installed = status(include_str!("fixtures/installed.json"));
     assert_eq!(
-        installed,
-        nothing_else(Release {
-            released: Some(1_791_924_427),
-            ..first()
-        })
+        deployments(include_str!("fixtures/installed.json")).status(),
+        only(first())
     );
 }
 
 #[test]
-fn a_downloaded_update_waits_with_the_packages_added_meanwhile() {
+fn a_downloaded_update_waits_for_a_restart() {
     assert_eq!(
-        status(include_str!("fixtures/installing.json")),
+        deployments(include_str!("fixtures/staged.json")).status(),
         Status {
             staged: Some(second()),
-            installing: vec!["htop".into()],
-            ..nothing_else(first())
+            ..only(first())
         }
     );
 }
@@ -63,11 +54,10 @@ fn a_downloaded_update_waits_with_the_packages_added_meanwhile() {
 #[test]
 fn after_updating_the_last_version_is_kept_to_go_back_to() {
     assert_eq!(
-        status(include_str!("fixtures/updated.json")),
+        deployments(include_str!("fixtures/updated.json")).status(),
         Status {
             previous: Some(first()),
-            layered: vec!["htop".into()],
-            ..nothing_else(second())
+            ..only(second())
         }
     );
 }
@@ -75,11 +65,22 @@ fn after_updating_the_last_version_is_kept_to_go_back_to() {
 #[test]
 fn going_back_waits_for_a_restart() {
     assert_eq!(
-        status(include_str!("fixtures/returning.json")),
+        deployments(include_str!("fixtures/returning.json")).status(),
         Status {
             returning: Some(first()),
-            layered: vec!["htop".into()],
-            ..nothing_else(second())
+            ..only(second())
         }
     );
+}
+
+#[test]
+fn an_update_is_new_until_it_is_downloaded() {
+    let staged = deployments(include_str!("fixtures/staged.json"));
+    let update = Update {
+        release: second(),
+        size: 0,
+        layers: staged.0.staged.as_ref().unwrap().layers().to_vec(),
+    };
+    assert!(deployments(include_str!("fixtures/installed.json")).lacks(&update));
+    assert!(!staged.lacks(&update));
 }

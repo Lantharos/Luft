@@ -1,0 +1,10 @@
+[Unit]
+Description=Luft system updates
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Updater1
+ExecStart=/usr/libexec/luft-updater
+SyslogIdentifier=luft-updater
+KillMode=mixed
+TimeoutStopSec=5min

@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use luft_software::flatpak::{self, FLATHUB, Installation};
 use luft_software::task::Task;
-use luft_software::{appimage, packages};
+use luft_software::{appimage, packages, toolbox};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug)]
@@ -39,6 +39,12 @@ pub enum Job {
     InstallAppImage {
         path: PathBuf,
     },
+    InstallTool {
+        package: String,
+    },
+    InstallToolFile {
+        path: String,
+    },
     RemoveFlatpak {
         installation: Installation,
         reference: String,
@@ -48,6 +54,9 @@ pub enum Job {
     },
     RemoveAppImage {
         id: String,
+    },
+    RemoveTool {
+        package: String,
     },
     UpdateFlatpaks {
         installation: Installation,
@@ -69,10 +78,13 @@ impl Job {
             | Self::AddFlatpakRepo { .. }
             | Self::InstallPackage { .. }
             | Self::InstallPackageFile { .. }
-            | Self::InstallAppImage { .. } => Action::Install,
+            | Self::InstallAppImage { .. }
+            | Self::InstallTool { .. }
+            | Self::InstallToolFile { .. } => Action::Install,
             Self::RemoveFlatpak { .. }
             | Self::RemovePackage { .. }
-            | Self::RemoveAppImage { .. } => Action::Remove,
+            | Self::RemoveAppImage { .. }
+            | Self::RemoveTool { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdatePackages { .. }
             | Self::UpdateAppImage { .. } => Action::Update,
@@ -94,12 +106,15 @@ impl Job {
             Self::InstallPackage { package } => packages::install(package, task),
             Self::InstallPackageFile { path } => packages::install_file(path, task),
             Self::InstallAppImage { path } => appimage::install(path, task).map(|_| ()),
+            Self::InstallTool { package } => toolbox::install(package, task),
+            Self::InstallToolFile { path } => toolbox::install_file(path, task),
             Self::RemoveFlatpak {
                 installation,
                 reference,
             } => flatpak::uninstall(*installation, reference, task),
             Self::RemovePackage { package } => packages::remove(package, task),
             Self::RemoveAppImage { id } => appimage::remove(id),
+            Self::RemoveTool { package } => toolbox::remove(package, task),
             Self::UpdateFlatpaks {
                 installation,
                 references,

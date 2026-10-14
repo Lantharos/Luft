@@ -1,14 +1,16 @@
 <script lang="ts">
 	import AppWindow from '@lucide/svelte/icons/app-window';
+	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 	import { AppIcon } from '@luft/ui';
 
 	interface Props {
 		icon: string | null;
 		desktop?: string | null;
 		size?: number;
+		tool?: boolean;
 	}
 
-	let { icon, desktop = null, size = 48 }: Props = $props();
+	let { icon, desktop = null, size = 48, tool = false }: Props = $props();
 	let broken = $state(false);
 	const remote = $derived(icon?.startsWith('http') ?? false);
 
@@ -18,7 +20,9 @@
 	});
 </script>
 
-{#if remote && !broken}
+{#if tool}
+	<span class="fallback" style:width="{size}px" style:height="{size}px"><SquareTerminal size={size * 0.5} /></span>
+{:else if remote && !broken}
 	<img src={icon} alt="" width={size} height={size} loading="lazy" decoding="async" style:width="{size}px" style:height="{size}px" onerror={() => (broken = true)} />
 {:else if remote}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><AppWindow size={size * 0.5} /></span>

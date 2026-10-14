@@ -6,7 +6,8 @@ use std::process::Command;
 use gio::prelude::*;
 use luft_app::Commands;
 use luft_app::portal::{FileChooser, Filter};
-use luft_software::appimage;
+use luft_software::system::System;
+use luft_software::{appimage, toolbox};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 
@@ -133,10 +134,13 @@ fn package(path: &str) -> Result<Opened, String> {
     else {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     };
-    let installed = Command::new("rpm")
-        .args(["--query", name])
-        .output()
-        .is_ok_and(|output| output.status.success());
+    let installed = match System::current() {
+        System::Packages => Command::new("rpm")
+            .args(["--query", name])
+            .output()
+            .is_ok_and(|output| output.status.success()),
+        System::Image => toolbox::installed().iter().any(|tool| tool.package == name),
+    };
     Ok(Opened::Package {
         path: path.to_owned(),
         package: name.to_owned(),

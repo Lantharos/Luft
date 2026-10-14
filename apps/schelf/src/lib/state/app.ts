@@ -6,6 +6,7 @@ import { catalog } from './catalog.svelte';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
 import { operations } from './operations.svelte';
+import { system } from './system.svelte';
 
 const PAGES: Record<string, Route> = {
 	'schelf:updates': { page: 'updates' },
@@ -34,6 +35,7 @@ export async function start() {
 	const backend = await connect();
 	setBackend(backend);
 	const state = await backend.appState();
+	system.kind = state.system;
 	if (isAvailable()) appearance.start(state);
 	else appearance.scheme = new URLSearchParams(location.search).get('scheme') === 'light' ? 'light' : 'dark';
 	openPage([state.page]);
@@ -42,6 +44,6 @@ export async function start() {
 		openPage(list);
 		openFiles(await backend.activationFiles(list, workingDirectory));
 	});
-	void catalog.loadFedora();
+	if (!system.image) void catalog.loadFedora();
 	await Promise.all([operations.start(), library.start()]);
 }

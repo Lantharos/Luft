@@ -36,6 +36,9 @@
 		<Row title="Size"><span>{size}</span></Row>
 	{/if}
 	<Row title="Source" description={installed?.path ?? undefined}><span>{source}</span></Row>
+	{#if installed?.commands.length}
+		<Row title="Commands" description="Run them in Tern"><span class="max-w-[320px] truncate">{installed.commands.join(', ')}</span></Row>
+	{/if}
 	{#if details?.developer}
 		<Row title="Developer" description={details.verified ? `Verified as ${details.verified}` : undefined}><span class="text-right">{details.developer}</span></Row>
 	{/if}

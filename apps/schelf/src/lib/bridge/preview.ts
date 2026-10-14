@@ -5,7 +5,7 @@ const ICONS = 'https://dl.flathub.org/media/icons/128x128';
 const icon = (id: string) => `${ICONS}/${id}.png`;
 
 function installedApp(source: InstalledApp['source'], id: string, name: string, version: string, size: number, origin: string, extra: Partial<InstalledApp> = {}): InstalledApp {
-	const key = source === 'flatpak' ? `flatpak/${id}/x86_64/stable` : source === 'package' ? `package/${extra.package}` : `appimage/${id}`;
+	const key = source === 'flatpak' ? `flatpak/${id}/x86_64/stable` : source === 'package' ? `package/${extra.package}` : source === 'tool' ? `tool/${id}` : `appimage/${id}`;
 	return {
 		key,
 		source,
@@ -21,9 +21,18 @@ function installedApp(source: InstalledApp['source'], id: string, name: string, 
 		reference: source === 'flatpak' ? `${id}/x86_64/stable` : null,
 		package: null,
 		path: null,
+		commands: [],
 		...extra
 	};
 }
+
+const image = parameters.get('system') === 'image';
+
+const tools = [
+	['ripgrep', "Line oriented search tool using Rust's regex library"],
+	['ripgrep-all', 'Ripgrep, but also searches in PDFs, E-Books, Office documents and archives'],
+	['rpmlint', 'Tool for checking common errors in RPM packages']
+].map(([name, summary]) => ({ package: name, summary }));
 
 let installed: InstalledApp[] = [
 	installedApp('flatpak', 'org.mozilla.Thunderbird', 'Thunderbird', '157.0', 339_400_000, 'flathub'),
@@ -33,7 +42,18 @@ let installed: InstalledApp[] = [
 	installedApp('package', 'org.gimp.GIMP', 'GNU Image Manipulation Program', '3.0.6', 142_000_000, 'Fedora Project', { package: 'gimp' }),
 	installedApp('package', 'org.gnome.DiskUtility', 'Disks', '46.1', 8_200_000, 'Fedora Project', { package: 'gnome-disk-utility' }),
 	installedApp('package', 'com.discordapp.Discord', 'Discord', '0.0.111', 287_000_000, 'Discord Inc.', { package: 'discord' }),
-	installedApp('appImage', 'appimage-limbo', 'Limbo', '1.4.0', 14_080_504, '~/Applications', { icon: null, path: '~/Applications/limbo.AppImage' })
+	installedApp('appImage', 'appimage-limbo', 'Limbo', '1.4.0', 14_080_504, '~/Applications', { icon: null, path: '~/Applications/limbo.AppImage' }),
+	...(image
+		? [
+				installedApp('tool', 'ripgrep', 'ripgrep', '14.1.1-5.fc45', 5_400_000, 'fedora-toolbox-45', {
+					icon: null,
+					desktop: null,
+					package: 'ripgrep',
+					summary: tools[0].summary,
+					commands: ['rg']
+				})
+			]
+		: [])
 ];
 
 const updates: AppUpdate[] = [
@@ -80,7 +100,7 @@ function simulate(operation: Operation, job: Job) {
 		if (fraction < 1) return;
 		clearInterval(timer);
 		operations = operations.filter((entry) => entry.id !== operation.id);
-		if (job.kind === 'removeFlatpak' || job.kind === 'removePackage' || job.kind === 'removeAppImage') installed = installed.filter((app) => app.key !== operation.key);
+		if (job.kind.startsWith('remove')) installed = installed.filter((app) => app.key !== operation.key);
 		publish();
 		for (const listener of listeners.library) listener({ keys: [operation.key, ...operation.members], action: operation.action, succeeded: true });
 	}, 220);
@@ -96,7 +116,8 @@ export const preview: Backend = {
 		palette: null,
 		typography: { interface: null, monospace: null, textScale: 1 },
 		files: parameters.getAll('file'),
-		page: parameters.get('page')
+		page: parameters.get('page'),
+		system: image ? 'image' : 'packages'
 	}),
 	activationFiles: async () => [],
 	flathub: <T>(path: string) => fetch(`/flathub/${path}`).then((response) => json<T>(response)),
@@ -112,10 +133,10 @@ export const preview: Backend = {
 	installed: async () => installed,
 	launch: async () => {},
 	removalPlan: async () => [],
-	systemPackages: async () =>
-		parameters.get('system') === 'image'
-			? { atRestart: true, pending: { installing: ['inkscape'], removing: [] }, layered: ['discord'] }
-			: { atRestart: false, pending: { installing: [], removing: [] }, layered: null },
+	searchTools: async (query) => {
+		await new Promise((resolve) => setTimeout(resolve, 400));
+		return tools.filter((tool) => tool.package.includes(query.toLowerCase()));
+	},
 	permissions: async () => ({ shared: ['network', 'ipc'], sockets: ['wayland', 'pulseaudio'], devices: ['dri'], filesystems: ['xdg-download'], sessionBus: [], systemBus: [] }),
 	checkUpdates: async () => {
 		await new Promise((resolve) => setTimeout(resolve, 600));

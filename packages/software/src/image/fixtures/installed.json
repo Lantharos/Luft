@@ -1,32 +1,155 @@
-[
- {
-  "unlocked": "none",
-  "requested-local-packages": [],
-  "base-commit-meta": {
-   "ostree.manifest-digest": "sha256:90befe88734b4cffcd5343ac3abbe31040beb2c2edcbf71d62f6354b069ec04c",
-   "ostree.manifest": "{\"annotations\":{\"containers.bootc\":\"1\",\"org.opencontainers.image.base.digest\":\"sha256:319ea2884b614e7fa061bd79fdbd7a8336e53c2c184f96740100e7a957540435\",\"org.opencontainers.image.base.name\":\"quay.io/fedora/fedora-bootc:45\",\"org.opencontainers.image.created\":\"2026-10-13T20:47:07.865244587Z\",\"org.opencontainers.image.version\":\"45.20261013.0\",\"ostree.bootable\":\"true\",\"ostree.commit\":\"962af743e51788f85acdadc854283071c488617e559f3aa7ece3d24c188d097a\",\"ostree.final-diffid\":\"sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1\",\"ostree.linux\":\"7.2.9-300.fc45.x86_64\",\"rpmostree.inputhash\":\"84644aebffbbacb6524565338e7274a92b2ce59cbd3679958c20340db1441b57\"},\"config\":{\"digest\":\"sha256:57bcf78672292794c4e0c5ff85568afd522ffaf2a8bd4693f662cb961ea0a7de\",\"mediaType\":\"application/vnd.oci.image.config.v1+json\",\"size\":13058},\"layers\":[{\"digest\":\"sha256:a2d8e0828eb2d0ef49b3e28761e01ce95f3d95f63a520f5757c9884d3f4e6ede\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16595968},{\"digest\":\"sha256:ac49fc49e456d68c54b402e60b39553912d2222a4d3432e24cda6acd1e659bb8\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":129695744},{\"digest\":\"sha256:d75f5de7d7f3eb9f8209460a0b77ab8e2f6130965518a43ff796181063cc2c87\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":107270144},{\"digest\":\"sha256:98e6838cbf087a02b418f2c44b4e1abb7ae29e2bed8fe9802fb41b407da8a935\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":85321728},{\"digest\":\"sha256:a401dd020e1770182029925ffbd6dd95f904a3160e86e8b14b55b0769c632381\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":63090688},{\"digest\":\"sha256:abe117d4f30cf88d69c9296e91397107d9e17d0ea66fe9bbc46e1cc4f859ecb3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":53834752},{\"digest\":\"sha256:97f2a2a114d4d32fd35c2b0dd985780e6a0808ef4bb4c8a07ea06bd9973f1f41\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":57977856},{\"digest\":\"sha256:f12427849e8be6e60b032bd5bbb8d1c3488d25508155cc1a8466d4d0399aaa60\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":50677248},{\"digest\":\"sha256:a84d28e85abd7411c7eedb94b8cea6051ecaf543c55a45ba694a05a5b9c652db\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":39880192},{\"digest\":\"sha256:2891eea8a1895f18f9636cd30fa9fa2384e4cd97f60e85126da462dc5a7446e8\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":38770176},{\"digest\":\"sha256:c31b8b53aa2765f45013c89dee8e8e843ec422dae219b8c1fd1490dcf5e1d5d6\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":38457344},{\"digest\":\"sha256:bc1d2f58d7eb94fd676cd0adf78a9b49b80b344844f60bb9673fe015bc67a8d0\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":34171392},{\"digest\":\"sha256:ed73c68b747156b2ffd3d958ee680f3110d7af80b3d34a6d707f69a8c5d5a0e1\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":33605120},{\"digest\":\"sha256:e361383ea7b8c369c746c0abf26841acaa5a9cf7cf06321ae93f1133b85e4832\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":32402944},{\"digest\":\"sha256:50329e42b76bb3f679c7445015a6561673ce0ae7db88b4cf068df9e00b4df82f\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":32374784},{\"digest\":\"sha256:43d85e51f12b09cd06abe2b31c45d0fc54173dbfe60eb5b293adc140014396d2\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":27536896},{\"digest\":\"sha256:caa20462b11d174d07a825c5e257520858932624ea3931c4861b05fa7d0f189f\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":19558400},{\"digest\":\"sha256:ce6c1ffd3b5222190965270185fe31ed142e81b28c1ca39679769f971ad09271\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16657920},{\"digest\":\"sha256:00b41255804e19c25febd1e29ec0d9912517610d70327159668f4d52925e57dd\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16513536},{\"digest\":\"sha256:4a8f7559ea77cded5fcfa95f13b811161669b96830edab5c74eac5d39a74807f\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16673280},{\"digest\":\"sha256:c6727be34cf0e3e0b7790dd15f3adc42a9aeac0f70662ff0eaddcb038fdea85c\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16545280},{\"digest\":\"sha256:4661b74aad186cbbc73b9955deb03ccc3f974dfdf14dab4e1edd3fb8d307e303\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":15831552},{\"digest\":\"sha256:d7fe59328769f8e18cee569b945c3c2002325bbe96dcde6215ce2e148b238a70\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":18148864},{\"digest\":\"sha256:49a354e924163b86b3c6977bacf58e496614d18955a12d3ca0e7b6ba1a87f260\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16836096},{\"digest\":\"sha256:d8aa14f28335242f49558b2157882a6995256d35986f4365abe2839a695089a2\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":14799360},{\"digest\":\"sha256:91dc7a0198be13af4d87438adde35a2b59be63bcbd19abf164d967d8784b06ab\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":14149632},{\"digest\":\"sha256:4a1aed3d8d0f3139d94f0a4a60f91bd3ec3c24d552dcdd576c02298d791da149\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":13455872},{\"digest\":\"sha256:f776c19fc7ffcde07ccc2ebfdcb2ff6a427a13ad6d6314e382d4b6e0d50adc9a\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":13215232},{\"digest\":\"sha256:db5e69e69620fbe5ceb0a0477f04b529824d144a70070f95dacba7eccd2224d0\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":13114368},{\"digest\":\"sha256:3d62a86acde69c410604c8b8ec596839dbe259a5f0d307896b7ef9265aea4189\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":13083648},{\"digest\":\"sha256:bfc1c7a0c5918faa621c61e48d15e46c38c98af1b4813a0f192fcffe1e787da6\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":13331456},{\"digest\":\"sha256:3146ffe4c3254716f763e655a0458cf311b835ffa66df8ecbc69a7a1419cc131\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":12610560},{\"digest\":\"sha256:19024b203253d97909158525d443ce34c095bfa2712296e3fd084002c7d50897\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":12124672},{\"digest\":\"sha256:f16825d0f09ed4b52451acb9775644e29ab9482ac58836ddfff7fc98fff8f047\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":12468224},{\"digest\":\"sha256:a7c1b97eb695dbe4af5a9fe2ea3f2400b6c035c58c0459399b2b5bb6464aca0a\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":11758592},{\"digest\":\"sha256:a79c7e9bee6f3bfcfd155fe96b684b2dcb41eeb26a0d8182828703e423b129d6\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":12079104},{\"digest\":\"sha256:59af075a585b4901064e7c0e8effb6a90b82b12cd3395a6913a39c5419f0c5f4\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":11065856},{\"digest\":\"sha256:8808fb05b71389d43857bbca5d1f6117e132fabad7a8fd6520016b92d83495b3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":17420800},{\"digest\":\"sha256:8882a975224869ecad610e296035a40cb581b08fc2d07318ab8292271d2d2ae4\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":23900160},{\"digest\":\"sha256:cb44c699ee8467941ae90c499f4b6ee5a8bb9310083df81019b044e82d5ef0a3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":2070016},{\"digest\":\"sha256:835d1d19bef93b82cf74e1895790c133de08841f94dcd21be69d84ebd4725aaa\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":7628288},{\"digest\":\"sha256:36c0fd9e3a1932e1a939eb1d2bb30f6042aa4dfa04d0a7dcdbd49ef4ef6d94a3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":101251072},{\"digest\":\"sha256:3582d78b46afb42ba7ec0c4ae1c454566238d715956380a75f4643f1b87fec06\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":15533056},{\"digest\":\"sha256:197c9e1a417181ec7e843fd28591bf3896a0b78d135631a3608941efd7e53085\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":9331200},{\"digest\":\"sha256:85ad6d75872fa4b26ef010fe4ec9c19ed4529fafd458100bc492daf6b3684dc1\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":6985728},{\"digest\":\"sha256:d84fe0c30a5ef1579dcea61d82d154a06163ec94c3db49c49dcb266fa9bcdbc6\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":7613440},{\"digest\":\"sha256:b574b0febc1f26c846104cc661f523c16796a4ff9e5d619f336df9ddc568eaa6\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":6423552},{\"digest\":\"sha256:f9b0dfcd13a7e68217dc9a44bfee7be3816e9ebad312643256abc39db647084d\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":44566016},{\"digest\":\"sha256:d6bebd277fdc11c3984e9ceff291bbdfd428b6e6595431cd75fb1b10a7c9d3b3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":41116672},{\"digest\":\"sha256:8757a040c28d8c6efafa20046da7b1fd6f4abe7718ca14af20df63cea80df09c\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":45753344},{\"digest\":\"sha256:43f0f01a498ffa8337b07fdc9b57fde06bed39b25fa5643cc2525162ddd27a85\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":24069120},{\"digest\":\"sha256:704cf0f0b8a0eb2f484cf13216bd18acab296c1a9565fc763e2c37c2aed484af\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":57992704},{\"digest\":\"sha256:3b91c41cd558420ac2b0cba51e9f9db901545eb1f4b5de20f67e580b4518230e\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":10322432},{\"digest\":\"sha256:10f53294ba729e60f4604b5ec30ea96685ddd72125cb24c9b9be209ab138bdd4\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":8411136},{\"digest\":\"sha256:5568e3add9f2459d7b78e363b176368852497f2c929cdca795bec520af12b75d\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":6058496},{\"digest\":\"sha256:d236cde1a03c91f87689791f2990cf837427efab7cb8861ed1d6da3eb1b66160\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":44841472},{\"digest\":\"sha256:6f7a2e3cc513ab577e42042b2834d3fdc70cdda77ae61837e49568f59939e1de\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":15629312},{\"digest\":\"sha256:e590864d24e641336485d3e1471fefa7dcc3652a357460f1494cca6e4fba773a\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":15741440},{\"digest\":\"sha256:93415ebc1d490968eb9e2503aa054fd2b259bbaadab64d5b2f9f883f15982f13\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":16955392},{\"digest\":\"sha256:da694db15d722f1ee734074f40019527edf339c94edf415291485d6a17c7a875\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":12358144},{\"digest\":\"sha256:76e3564c862e741f9bdfded1c2c0171bacf4ad51daeb2506b8820036396f6a36\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":37533696},{\"digest\":\"sha256:7da5cfb605cae996ee82a128dcf5de2bd511214d60f5be54e7612dea1ddea0b8\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":68451328},{\"digest\":\"sha256:a239d6f01ab560d1c582513d2d7028113c22cf4b6752db4a9758b4e7d9f2dd89\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":1851904},{\"digest\":\"sha256:41a495d98bf4dff200078b3980e220c6c23723299c05e73c2a7da26f18df81a3\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":191138304},{\"digest\":\"sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":139264},{\"digest\":\"sha256:700748d7da0a3d7b6d223de23ad0bf11cd3fa06819e924a6dd360ed71fd925ee\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":3584},{\"digest\":\"sha256:02c78a93b594280da47f01ce6690421513592088674330c0768273e961e51324\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":3584},{\"digest\":\"sha256:c690a7ccab6f2b8975f0816d59eed7efa548d53ca8ad78a72ff1e5839af08338\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":3584},{\"digest\":\"sha256:11f08dde4b5ce725c9b7a2601c7303792d92beff6028d2b17131c7fa614df97b\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":4096},{\"digest\":\"sha256:75aa3739bb67d10d7f0be3f70196e800484ecbf3e9389cb020b8c144a470ab20\",\"mediaType\":\"application/vnd.oci.image.layer.v1.tar\",\"size\":26112}],\"mediaType\":\"application/vnd.oci.image.manifest.v1+json\",\"schemaVersion\":2}",
-   "ostree.container.image-config": "{\"architecture\":\"amd64\",\"config\":{\"Cmd\":[\"/sbin/init\"],\"Env\":[\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"],\"Labels\":{\"com.lantharos.release-notes\":\"Faster startup and a fresher look.\",\"containers.bootc\":\"1\",\"io.buildah.version\":\"1.45.1\",\"org.opencontainers.image.version\":\"45.1\",\"ostree.bootable\":\"true\",\"ostree.commit\":\"962af743e51788f85acdadc854283071c488617e559f3aa7ece3d24c188d097a\",\"ostree.final-diffid\":\"sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1\",\"ostree.linux\":\"7.2.9-300.fc45.x86_64\",\"rpmostree.inputhash\":\"84644aebffbbacb6524565338e7274a92b2ce59cbd3679958c20340db1441b57\"}},\"created\":\"2026-10-13T20:47:07.865244587Z\",\"history\":[{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"ostree export of commit 962af743e51788f85acdadc854283071c488617e559f3aa7ece3d24c188d097a\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"python3-botocore-1.43.106-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"nvidia-gpu-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"kernel-modules-7.2.9-300.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"kernel-modules-core-7.2.9-300.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"podman-5:6.1.3-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"python3-libs-3.15.0-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"atheros-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"libicu-78.3-8.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"rpm-6.1.0-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"linux-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-mips-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"mt7xxx-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"kernel-core-7.2.9-300.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"amd-gpu-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"skopeo-1:1.24.1-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"bootc-1.16.13-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-aarch64-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-ppc-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"glib2-2.90.0-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"microcode_ctl-2:2.1-76.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-xtensa-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"systemd-262-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"systemd-udev-262-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"rpm-ostree-2026.3-2.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-sparc-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"NetworkManager-libnm-1:1.58.1-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"toolbox-0.3-7.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"file-libs-5.48-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"netavark-2:2.1.0-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"intel-gpu-firmware-20260916-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"fwupd-2.1.8-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-riscv-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"samba-client-libs-2:4.25.0-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-arm-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"coreutils-common-9.11-6.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"python3-libdnf5-5.4.6.0-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"185 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"glibc-gconv-extra-2.44-1.fc45.x86_64 and glibc-2.44-1.fc45.x86_64 and systemd-shared-262-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"glibc-common-2.44-1.fc45.x86_64 and systemd-resolved-262-3.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"systemd-libs-262-3.fc45.x86_64 and systemd-pam-262-3.fc45.x86_64 and python3-boto3-1.43.106-1.fc45.noarch\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"qemu-user-static-microblaze-2:11.1.2-1.fc45.x86_64 and qemu-user-static-hexagon-2:11.1.2-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"9 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"6 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"7 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"12 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"24 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"24 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"24 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"24 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"20 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"24 components\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"sqlite-libs-3.53.4-1.fc45.x86_64\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"initramfs (kernel 7.2.9-300.fc45.x86_64) and rpmostree-unpackaged-content\"},{\"created\":\"2026-10-13T11:06:31Z\",\"created_by\":\"Reserved for new packages\"},{\"comment\":\"FROM quay.io/fedora/fedora-bootc:45\",\"created\":\"2026-10-13T20:47:06.142157866Z\",\"created_by\":\"/bin/sh -c #(nop) ARG VERSION\",\"empty_layer\":true},{\"created\":\"2026-10-13T20:47:06.204011783Z\",\"created_by\":\"/bin/sh -c #(nop) ARG NOTES VERSION\",\"empty_layer\":true},{\"created\":\"2026-10-13T20:47:06.428188368Z\",\"created_by\":\"/bin/sh -c #(nop) COPY file:aa6bd0eae05243dc49434fecf539b5a0e736323f82a01d8b2239720870821979 in /etc/ssh/authorized_keys/tester      \"},{\"created\":\"2026-10-13T20:47:06.696554213Z\",\"created_by\":\"/bin/sh -c #(nop) COPY file:b3b64e062de19b35656d674d1c46db577db695a2fef42ed97102add698c77585 in /etc/ssh/sshd_config.d/50-tester.conf      \"},{\"created\":\"2026-10-13T20:47:06.97302773Z\",\"created_by\":\"/bin/sh -c #(nop) COPY file:48807642bc8dc6b68ff3febb0ede9ea7785d6fdb090b84b47bb2a462994715bf in /etc/containers/registries.conf.d/50-test-registry.conf      \"},{\"created\":\"2026-10-13T20:47:07.252861163Z\",\"created_by\":\"/bin/sh -c #(nop) COPY file:14ada4afaa2d38873bb6e80ec2046a2de61619f82042f66b6cff20bf521300ad in /usr/share/polkit-1/rules.d/49-test.rules      \"},{\"created\":\"2026-10-13T20:47:07.758219483Z\",\"created_by\":\"|7 NOTES=Faster startup and a fresher look. VERSION=45.1 /bin/sh -c useradd -u 1000 -G wheel -m tester && chmod 0755 /etc/ssh/authorized_keys && chmod 0644 /etc/ssh/authorized_keys/tester     && systemctl mask bootc-fetch-apply-updates.timer && echo \\\"$VERSION\\\" > /usr/share/luft-test-version\"},{\"created\":\"2026-10-13T20:47:07.866867412Z\",\"created_by\":\"/bin/sh -c #(nop) LABEL org.opencontainers.image.version=\\\"${VERSION}\\\" com.lantharos.release-notes=\\\"${NOTES}\\\"\",\"empty_layer\":true}],\"os\":\"linux\",\"rootfs\":{\"diff_ids\":[\"sha256:a2d8e0828eb2d0ef49b3e28761e01ce95f3d95f63a520f5757c9884d3f4e6ede\",\"sha256:ac49fc49e456d68c54b402e60b39553912d2222a4d3432e24cda6acd1e659bb8\",\"sha256:d75f5de7d7f3eb9f8209460a0b77ab8e2f6130965518a43ff796181063cc2c87\",\"sha256:98e6838cbf087a02b418f2c44b4e1abb7ae29e2bed8fe9802fb41b407da8a935\",\"sha256:a401dd020e1770182029925ffbd6dd95f904a3160e86e8b14b55b0769c632381\",\"sha256:abe117d4f30cf88d69c9296e91397107d9e17d0ea66fe9bbc46e1cc4f859ecb3\",\"sha256:97f2a2a114d4d32fd35c2b0dd985780e6a0808ef4bb4c8a07ea06bd9973f1f41\",\"sha256:f12427849e8be6e60b032bd5bbb8d1c3488d25508155cc1a8466d4d0399aaa60\",\"sha256:a84d28e85abd7411c7eedb94b8cea6051ecaf543c55a45ba694a05a5b9c652db\",\"sha256:2891eea8a1895f18f9636cd30fa9fa2384e4cd97f60e85126da462dc5a7446e8\",\"sha256:c31b8b53aa2765f45013c89dee8e8e843ec422dae219b8c1fd1490dcf5e1d5d6\",\"sha256:bc1d2f58d7eb94fd676cd0adf78a9b49b80b344844f60bb9673fe015bc67a8d0\",\"sha256:ed73c68b747156b2ffd3d958ee680f3110d7af80b3d34a6d707f69a8c5d5a0e1\",\"sha256:e361383ea7b8c369c746c0abf26841acaa5a9cf7cf06321ae93f1133b85e4832\",\"sha256:50329e42b76bb3f679c7445015a6561673ce0ae7db88b4cf068df9e00b4df82f\",\"sha256:43d85e51f12b09cd06abe2b31c45d0fc54173dbfe60eb5b293adc140014396d2\",\"sha256:caa20462b11d174d07a825c5e257520858932624ea3931c4861b05fa7d0f189f\",\"sha256:ce6c1ffd3b5222190965270185fe31ed142e81b28c1ca39679769f971ad09271\",\"sha256:00b41255804e19c25febd1e29ec0d9912517610d70327159668f4d52925e57dd\",\"sha256:4a8f7559ea77cded5fcfa95f13b811161669b96830edab5c74eac5d39a74807f\",\"sha256:c6727be34cf0e3e0b7790dd15f3adc42a9aeac0f70662ff0eaddcb038fdea85c\",\"sha256:4661b74aad186cbbc73b9955deb03ccc3f974dfdf14dab4e1edd3fb8d307e303\",\"sha256:d7fe59328769f8e18cee569b945c3c2002325bbe96dcde6215ce2e148b238a70\",\"sha256:49a354e924163b86b3c6977bacf58e496614d18955a12d3ca0e7b6ba1a87f260\",\"sha256:d8aa14f28335242f49558b2157882a6995256d35986f4365abe2839a695089a2\",\"sha256:91dc7a0198be13af4d87438adde35a2b59be63bcbd19abf164d967d8784b06ab\",\"sha256:4a1aed3d8d0f3139d94f0a4a60f91bd3ec3c24d552dcdd576c02298d791da149\",\"sha256:f776c19fc7ffcde07ccc2ebfdcb2ff6a427a13ad6d6314e382d4b6e0d50adc9a\",\"sha256:db5e69e69620fbe5ceb0a0477f04b529824d144a70070f95dacba7eccd2224d0\",\"sha256:3d62a86acde69c410604c8b8ec596839dbe259a5f0d307896b7ef9265aea4189\",\"sha256:bfc1c7a0c5918faa621c61e48d15e46c38c98af1b4813a0f192fcffe1e787da6\",\"sha256:3146ffe4c3254716f763e655a0458cf311b835ffa66df8ecbc69a7a1419cc131\",\"sha256:19024b203253d97909158525d443ce34c095bfa2712296e3fd084002c7d50897\",\"sha256:f16825d0f09ed4b52451acb9775644e29ab9482ac58836ddfff7fc98fff8f047\",\"sha256:a7c1b97eb695dbe4af5a9fe2ea3f2400b6c035c58c0459399b2b5bb6464aca0a\",\"sha256:a79c7e9bee6f3bfcfd155fe96b684b2dcb41eeb26a0d8182828703e423b129d6\",\"sha256:59af075a585b4901064e7c0e8effb6a90b82b12cd3395a6913a39c5419f0c5f4\",\"sha256:8808fb05b71389d43857bbca5d1f6117e132fabad7a8fd6520016b92d83495b3\",\"sha256:8882a975224869ecad610e296035a40cb581b08fc2d07318ab8292271d2d2ae4\",\"sha256:cb44c699ee8467941ae90c499f4b6ee5a8bb9310083df81019b044e82d5ef0a3\",\"sha256:835d1d19bef93b82cf74e1895790c133de08841f94dcd21be69d84ebd4725aaa\",\"sha256:36c0fd9e3a1932e1a939eb1d2bb30f6042aa4dfa04d0a7dcdbd49ef4ef6d94a3\",\"sha256:3582d78b46afb42ba7ec0c4ae1c454566238d715956380a75f4643f1b87fec06\",\"sha256:197c9e1a417181ec7e843fd28591bf3896a0b78d135631a3608941efd7e53085\",\"sha256:85ad6d75872fa4b26ef010fe4ec9c19ed4529fafd458100bc492daf6b3684dc1\",\"sha256:d84fe0c30a5ef1579dcea61d82d154a06163ec94c3db49c49dcb266fa9bcdbc6\",\"sha256:b574b0febc1f26c846104cc661f523c16796a4ff9e5d619f336df9ddc568eaa6\",\"sha256:f9b0dfcd13a7e68217dc9a44bfee7be3816e9ebad312643256abc39db647084d\",\"sha256:d6bebd277fdc11c3984e9ceff291bbdfd428b6e6595431cd75fb1b10a7c9d3b3\",\"sha256:8757a040c28d8c6efafa20046da7b1fd6f4abe7718ca14af20df63cea80df09c\",\"sha256:43f0f01a498ffa8337b07fdc9b57fde06bed39b25fa5643cc2525162ddd27a85\",\"sha256:704cf0f0b8a0eb2f484cf13216bd18acab296c1a9565fc763e2c37c2aed484af\",\"sha256:3b91c41cd558420ac2b0cba51e9f9db901545eb1f4b5de20f67e580b4518230e\",\"sha256:10f53294ba729e60f4604b5ec30ea96685ddd72125cb24c9b9be209ab138bdd4\",\"sha256:5568e3add9f2459d7b78e363b176368852497f2c929cdca795bec520af12b75d\",\"sha256:d236cde1a03c91f87689791f2990cf837427efab7cb8861ed1d6da3eb1b66160\",\"sha256:6f7a2e3cc513ab577e42042b2834d3fdc70cdda77ae61837e49568f59939e1de\",\"sha256:e590864d24e641336485d3e1471fefa7dcc3652a357460f1494cca6e4fba773a\",\"sha256:93415ebc1d490968eb9e2503aa054fd2b259bbaadab64d5b2f9f883f15982f13\",\"sha256:da694db15d722f1ee734074f40019527edf339c94edf415291485d6a17c7a875\",\"sha256:76e3564c862e741f9bdfded1c2c0171bacf4ad51daeb2506b8820036396f6a36\",\"sha256:7da5cfb605cae996ee82a128dcf5de2bd511214d60f5be54e7612dea1ddea0b8\",\"sha256:a239d6f01ab560d1c582513d2d7028113c22cf4b6752db4a9758b4e7d9f2dd89\",\"sha256:41a495d98bf4dff200078b3980e220c6c23723299c05e73c2a7da26f18df81a3\",\"sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1\",\"sha256:700748d7da0a3d7b6d223de23ad0bf11cd3fa06819e924a6dd360ed71fd925ee\",\"sha256:02c78a93b594280da47f01ce6690421513592088674330c0768273e961e51324\",\"sha256:c690a7ccab6f2b8975f0816d59eed7efa548d53ca8ad78a72ff1e5839af08338\",\"sha256:11f08dde4b5ce725c9b7a2601c7303792d92beff6028d2b17131c7fa614df97b\",\"sha256:75aa3739bb67d10d7f0be3f70196e800484ecbf3e9389cb020b8c144a470ab20\"],\"type\":\"layers\"}}",
-   "ostree.importer.version": "0.15.3"
+{
+  "configs": {
+    "sha256:7284e924986861cd7d1810357e1757e8ecf959a1a699b304252b0dd446ad11cf": {
+      "config": {
+        "Labels": {
+          "com.lantharos.release-notes": "Faster startup and a fresher look.",
+          "containers.bootc": "1",
+          "io.buildah.version": "1.45.1",
+          "org.opencontainers.image.version": "45.1",
+          "ostree.bootable": "true",
+          "ostree.commit": "962af743e51788f85acdadc854283071c488617e559f3aa7ece3d24c188d097a",
+          "ostree.final-diffid": "sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1",
+          "ostree.linux": "7.2.9-300.fc45.x86_64",
+          "rpmostree.inputhash": "84644aebffbbacb6524565338e7274a92b2ce59cbd3679958c20340db1441b57"
+        }
+      },
+      "created": "2026-10-14T14:25:53.323127405Z",
+      "rootfs": {
+        "diff_ids": [
+          "sha256:a2d8e0828eb2d0ef49b3e28761e01ce95f3d95f63a520f5757c9884d3f4e6ede",
+          "sha256:ac49fc49e456d68c54b402e60b39553912d2222a4d3432e24cda6acd1e659bb8",
+          "sha256:d75f5de7d7f3eb9f8209460a0b77ab8e2f6130965518a43ff796181063cc2c87",
+          "sha256:98e6838cbf087a02b418f2c44b4e1abb7ae29e2bed8fe9802fb41b407da8a935",
+          "sha256:a401dd020e1770182029925ffbd6dd95f904a3160e86e8b14b55b0769c632381",
+          "sha256:abe117d4f30cf88d69c9296e91397107d9e17d0ea66fe9bbc46e1cc4f859ecb3",
+          "sha256:97f2a2a114d4d32fd35c2b0dd985780e6a0808ef4bb4c8a07ea06bd9973f1f41",
+          "sha256:f12427849e8be6e60b032bd5bbb8d1c3488d25508155cc1a8466d4d0399aaa60",
+          "sha256:a84d28e85abd7411c7eedb94b8cea6051ecaf543c55a45ba694a05a5b9c652db",
+          "sha256:2891eea8a1895f18f9636cd30fa9fa2384e4cd97f60e85126da462dc5a7446e8",
+          "sha256:c31b8b53aa2765f45013c89dee8e8e843ec422dae219b8c1fd1490dcf5e1d5d6",
+          "sha256:bc1d2f58d7eb94fd676cd0adf78a9b49b80b344844f60bb9673fe015bc67a8d0",
+          "sha256:ed73c68b747156b2ffd3d958ee680f3110d7af80b3d34a6d707f69a8c5d5a0e1",
+          "sha256:e361383ea7b8c369c746c0abf26841acaa5a9cf7cf06321ae93f1133b85e4832",
+          "sha256:50329e42b76bb3f679c7445015a6561673ce0ae7db88b4cf068df9e00b4df82f",
+          "sha256:43d85e51f12b09cd06abe2b31c45d0fc54173dbfe60eb5b293adc140014396d2",
+          "sha256:caa20462b11d174d07a825c5e257520858932624ea3931c4861b05fa7d0f189f",
+          "sha256:ce6c1ffd3b5222190965270185fe31ed142e81b28c1ca39679769f971ad09271",
+          "sha256:00b41255804e19c25febd1e29ec0d9912517610d70327159668f4d52925e57dd",
+          "sha256:4a8f7559ea77cded5fcfa95f13b811161669b96830edab5c74eac5d39a74807f",
+          "sha256:c6727be34cf0e3e0b7790dd15f3adc42a9aeac0f70662ff0eaddcb038fdea85c",
+          "sha256:4661b74aad186cbbc73b9955deb03ccc3f974dfdf14dab4e1edd3fb8d307e303",
+          "sha256:d7fe59328769f8e18cee569b945c3c2002325bbe96dcde6215ce2e148b238a70",
+          "sha256:49a354e924163b86b3c6977bacf58e496614d18955a12d3ca0e7b6ba1a87f260",
+          "sha256:d8aa14f28335242f49558b2157882a6995256d35986f4365abe2839a695089a2",
+          "sha256:91dc7a0198be13af4d87438adde35a2b59be63bcbd19abf164d967d8784b06ab",
+          "sha256:4a1aed3d8d0f3139d94f0a4a60f91bd3ec3c24d552dcdd576c02298d791da149",
+          "sha256:f776c19fc7ffcde07ccc2ebfdcb2ff6a427a13ad6d6314e382d4b6e0d50adc9a",
+          "sha256:db5e69e69620fbe5ceb0a0477f04b529824d144a70070f95dacba7eccd2224d0",
+          "sha256:3d62a86acde69c410604c8b8ec596839dbe259a5f0d307896b7ef9265aea4189",
+          "sha256:bfc1c7a0c5918faa621c61e48d15e46c38c98af1b4813a0f192fcffe1e787da6",
+          "sha256:3146ffe4c3254716f763e655a0458cf311b835ffa66df8ecbc69a7a1419cc131",
+          "sha256:19024b203253d97909158525d443ce34c095bfa2712296e3fd084002c7d50897",
+          "sha256:f16825d0f09ed4b52451acb9775644e29ab9482ac58836ddfff7fc98fff8f047",
+          "sha256:a7c1b97eb695dbe4af5a9fe2ea3f2400b6c035c58c0459399b2b5bb6464aca0a",
+          "sha256:a79c7e9bee6f3bfcfd155fe96b684b2dcb41eeb26a0d8182828703e423b129d6",
+          "sha256:59af075a585b4901064e7c0e8effb6a90b82b12cd3395a6913a39c5419f0c5f4",
+          "sha256:8808fb05b71389d43857bbca5d1f6117e132fabad7a8fd6520016b92d83495b3",
+          "sha256:8882a975224869ecad610e296035a40cb581b08fc2d07318ab8292271d2d2ae4",
+          "sha256:cb44c699ee8467941ae90c499f4b6ee5a8bb9310083df81019b044e82d5ef0a3",
+          "sha256:835d1d19bef93b82cf74e1895790c133de08841f94dcd21be69d84ebd4725aaa",
+          "sha256:36c0fd9e3a1932e1a939eb1d2bb30f6042aa4dfa04d0a7dcdbd49ef4ef6d94a3",
+          "sha256:3582d78b46afb42ba7ec0c4ae1c454566238d715956380a75f4643f1b87fec06",
+          "sha256:197c9e1a417181ec7e843fd28591bf3896a0b78d135631a3608941efd7e53085",
+          "sha256:85ad6d75872fa4b26ef010fe4ec9c19ed4529fafd458100bc492daf6b3684dc1",
+          "sha256:d84fe0c30a5ef1579dcea61d82d154a06163ec94c3db49c49dcb266fa9bcdbc6",
+          "sha256:b574b0febc1f26c846104cc661f523c16796a4ff9e5d619f336df9ddc568eaa6",
+          "sha256:f9b0dfcd13a7e68217dc9a44bfee7be3816e9ebad312643256abc39db647084d",
+          "sha256:d6bebd277fdc11c3984e9ceff291bbdfd428b6e6595431cd75fb1b10a7c9d3b3",
+          "sha256:8757a040c28d8c6efafa20046da7b1fd6f4abe7718ca14af20df63cea80df09c",
+          "sha256:43f0f01a498ffa8337b07fdc9b57fde06bed39b25fa5643cc2525162ddd27a85",
+          "sha256:704cf0f0b8a0eb2f484cf13216bd18acab296c1a9565fc763e2c37c2aed484af",
+          "sha256:3b91c41cd558420ac2b0cba51e9f9db901545eb1f4b5de20f67e580b4518230e",
+          "sha256:10f53294ba729e60f4604b5ec30ea96685ddd72125cb24c9b9be209ab138bdd4",
+          "sha256:5568e3add9f2459d7b78e363b176368852497f2c929cdca795bec520af12b75d",
+          "sha256:d236cde1a03c91f87689791f2990cf837427efab7cb8861ed1d6da3eb1b66160",
+          "sha256:6f7a2e3cc513ab577e42042b2834d3fdc70cdda77ae61837e49568f59939e1de",
+          "sha256:e590864d24e641336485d3e1471fefa7dcc3652a357460f1494cca6e4fba773a",
+          "sha256:93415ebc1d490968eb9e2503aa054fd2b259bbaadab64d5b2f9f883f15982f13",
+          "sha256:da694db15d722f1ee734074f40019527edf339c94edf415291485d6a17c7a875",
+          "sha256:76e3564c862e741f9bdfded1c2c0171bacf4ad51daeb2506b8820036396f6a36",
+          "sha256:7da5cfb605cae996ee82a128dcf5de2bd511214d60f5be54e7612dea1ddea0b8",
+          "sha256:a239d6f01ab560d1c582513d2d7028113c22cf4b6752db4a9758b4e7d9f2dd89",
+          "sha256:41a495d98bf4dff200078b3980e220c6c23723299c05e73c2a7da26f18df81a3",
+          "sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1",
+          "sha256:ca7fe9c7588a3608416c0cd8fe2e7f09839e53367bd326c3a92efba63d6f420f",
+          "sha256:4c99435ca6dd5b7cae4fb2b403e1db53d2d4cb9190bfeacb3018485cbd6d4d14",
+          "sha256:b06c9c2ed33743a54d23328a5c798ce720e173473d7b1ba985351a9d555240aa",
+          "sha256:28dc8db403ed6b7b75c5a99faf2d7a429a10da55d0114599b26acdbd07d7c755",
+          "sha256:f64e4316e10c87875a0945dc69bbe09d5c625863da45feb32101ed6d03bb8409",
+          "sha256:5df9cf0608896ca51d363c5b5764ddcebb69536bebc440ec679b3ed00db62eea",
+          "sha256:37cfea8c16d334a0f9fb4eb081ead2fa48c3287c6b404986e6aafdb9df01bb99",
+          "sha256:9dc7fb3b7c8fc1aad1b094971ddb6e7b82fec47bbe941c1f9d4cbeb7c266b2f1",
+          "sha256:48065288b510110d5516266ae63e739460c59bbd19aff8b909c87f58dee8421c",
+          "sha256:b448069e94d0d39417afb9ca0e2a2a93c371cbaffde5eeed5f0f9999e75a8065",
+          "sha256:b8b199c28ec347663a20d6d3d521dd6e225ec415371c25c501eba370fdb46262",
+          "sha256:6f87bf91cf5300e06e4e4830be30b87926f91d1458f73c78430481d1841f0487",
+          "sha256:cd730da7750657e2a06331122413c7a0f5e09c6a1991a15a052d396b960df392",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:f939d4a2d63ab7e397c34c00d514d60cfeba4d7431a42699847d3765befa0455"
+        ]
+      }
+    }
   },
-  "base-removals": [],
-  "pinned": false,
-  "osname": "default",
-  "base-remote-replacements": {},
-  "regenerate-initramfs": false,
-  "checksum": "4e81bee2064ffac8cd8831222067ef1655d87dadb639c880ebd2697d8c6c845e",
-  "container-image-reference-digest": "sha256:90befe88734b4cffcd5343ac3abbe31040beb2c2edcbf71d62f6354b069ec04c",
-  "requested-base-local-replacements": [],
-  "id": "default-4e81bee2064ffac8cd8831222067ef1655d87dadb639c880ebd2697d8c6c845e.0",
-  "version": "45.1",
-  "requested-local-fileoverride-packages": [],
-  "requested-base-removals": [],
-  "requested-packages": [],
-  "serial": 0,
-  "timestamp": 1791924427,
-  "staged": false,
-  "booted": true,
-  "container-image-reference": "ostree-unverified-registry:localhost:5000/luft-test:latest",
-  "packages": [],
-  "base-local-replacements": []
- }
-]
+  "host": {
+    "apiVersion": "org.containers.bootc/v1",
+    "kind": "BootcHost",
+    "metadata": {
+      "name": "host"
+    },
+    "spec": {
+      "bootOrder": "default",
+      "image": {
+        "image": "10.0.2.2:5000/luft:45",
+        "transport": "registry"
+      }
+    },
+    "status": {
+      "booted": {
+        "cachedUpdate": null,
+        "composefs": {
+          "bootDigest": "286403852bedfb72a75081cce4c045e036d3f64ae5091765f173704e46df9283",
+          "bootType": "Bls",
+          "bootloader": "grub",
+          "missingVerityAllowed": false,
+          "verity": "63150ac76b8deed1934de7241c17f3fc5d96561559cfa1b820d44f2317a7a45756d82b11a4631c5849a66f56cf2db621b0d265c5bfd2101da1acdbb214ab347d"
+        },
+        "downloadOnly": false,
+        "image": {
+          "architecture": "amd64",
+          "image": {
+            "image": "10.0.2.2:5000/luft:45",
+            "transport": "registry"
+          },
+          "imageDigest": "sha256:7284e924986861cd7d1810357e1757e8ecf959a1a699b304252b0dd446ad11cf",
+          "timestamp": "2026-10-14T14:25:53.323127405Z",
+          "version": "45.20261013.0"
+        },
+        "incompatible": false,
+        "ostree": null,
+        "pinned": false,
+        "softRebootCapable": false,
+        "store": null
+      },
+      "readOnly": false,
+      "rollback": null,
+      "rollbackQueued": false,
+      "staged": null,
+      "type": null,
+      "usrOverlay": {
+        "accessMode": "readWrite",
+        "persistence": "transient"
+      }
+    }
+  }
+}

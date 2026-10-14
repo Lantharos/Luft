@@ -23,6 +23,7 @@ pub fn installed() -> Vec<InstalledApp> {
             reference: None,
             package: None,
             path: Some(app.path.to_string_lossy().into_owned()),
+            commands: Vec::new(),
             id: app.id,
         })
         .collect()

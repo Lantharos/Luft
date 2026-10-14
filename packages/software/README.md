@@ -1,6 +1,6 @@
 # luft-software
 
-The software handling Schelf and Settings share: which installed packages are apps and which are part of the system, system updates for both kinds of Luft installs, Flatpak and AppImages.
+The software handling Schelf and Settings share: which installed packages are apps and which are part of the system, system updates for both kinds of Luft installs, Flatpak, AppImages and command-line tools in a Toolbox container.
 
 ## Setup
 
@@ -23,9 +23,9 @@ let waiting_in_schelf = updates::app_count(&updates);
 `System::current()` tells them apart at runtime:
 
 - **Packages**: a regular Fedora install. Packages, updates and offline updates go through PackageKit.
-- **Image**: a system booted from a bootc image, such as `ghcr.io/lantharos/luft:45`. System updates are new versions of the image, downloaded and staged in the background and applied at the next restart, with the previous version kept to go back to. Fedora packages installed from Schelf are layered on top of the image and also arrive at the next restart.
+- **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:45`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, and command-line tools from a Toolbox container.
 
-The image side talks to rpm-ostree's daemon over D-Bus. It reads the same deployments as `bootc status`, and keeps working once packages are layered, which `bootc upgrade` refuses. Updates are found by comparing the image's layers with the registry's through `skopeo inspect`, so checking needs no administrator rights.
+Changing the image needs root, so the image side talks to `luft-updater` (in `updater/`), a small service started on demand over D-Bus that runs `bootc` for it. Updates are found by comparing the image's layers with the registry's through `skopeo inspect`, so checking needs no administrator rights.
 
 ## Apps and the system
 
@@ -38,8 +38,9 @@ The image side talks to rpm-ostree's daemon over D-Bus. It reads the same deploy
 | Module | Provides |
 | --- | --- |
 | `system` | `System::current()`, `Packages` or `Image` |
-| `packages` | Installing, removing and updating Fedora packages on either kind of system, and `Packages::current()` with what changes at the next restart |
-| `image` | `Deployments` (`load`, `status`, `check`, `lacks`), `download`, `rollback`, `install`, `remove`, `install_file`, `follow`, and `running` for transactions in progress |
+| `packages` | Installing, removing and updating Fedora packages through PackageKit |
+| `image` | `Deployments` (`load`, `status`, `check`, `lacks`), `download`, `rollback`, and `downloading`, `follow` and `watch` for a download started anywhere |
+| `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove` and `installed` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
 | `packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
@@ -57,7 +58,7 @@ The image side talks to rpm-ostree's daemon over D-Bus. It reads the same deploy
 
 ## Image updates
 
-`Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version and any packages that change at the restart. `check()` asks the registry for the newest image and how much of it is new. `download` stages it and `rollback` makes the previous version start next time; calling `rollback` again stays on the current one. Kestrel's restart and power off dialog names the waiting version, and unticking it removes the download.
+`Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version, and the previous version when going back to it is queued. `check()` asks the registry for the newest image and how much of it is new. `download` fetches it with `bootc upgrade --download-only`, with progress from bootc's `--progress-fd`. A downloaded update stays locked until Kestrel's restart and power off dialog unlocks it with `Apply`, so leaving the box unticked simply doesn't install it. `rollback` makes the previous version start next time, and calling it again stays on the current one.
 
 Versions and release notes come from the image's labels:
 
@@ -66,7 +67,11 @@ Versions and release notes come from the image's labels:
 | `org.opencontainers.image.version` | The version, such as 45.2 |
 | `com.lantharos.release-notes` | What's new, as plain text |
 
-Images install `data/50-luft-system-updates.rules` to `/usr/share/polkit-1/rules.d/`, so administrators can check for and download updates without a password, also in the background. Going back and changing packages still ask.
+`updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators can download and install updates without a password, also in the background; going back to the previous version asks.
+
+## Command-line tools
+
+On image systems Schelf installs Fedora packages into the default Toolbox container, `fedora-toolbox-45`, creating it the first time. Each command a package puts in `/usr/bin` gets a small launcher in `~/.local/bin`, unless the system already has a command by that name, so it runs from Tern like any other. The list of tools installed this way is kept in `~/.local/share/luft/tools.json`.
 
 ## Checks
 
@@ -74,4 +79,5 @@ Images install `data/50-luft-system-updates.rules` to `/usr/share/polkit-1/rules
 cargo clippy
 cargo fmt --check
 cargo test
+(cd updater && cargo clippy && cargo test)
 ```

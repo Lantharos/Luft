@@ -32,6 +32,7 @@ pub fn installed() -> Vec<InstalledApp> {
                 reference: Some(item.reference),
                 package: None,
                 path: None,
+                commands: Vec::new(),
                 id: item.id,
             }
         })

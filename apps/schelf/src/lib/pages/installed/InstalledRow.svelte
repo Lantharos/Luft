@@ -18,7 +18,6 @@
 	const update = $derived(library.update(app.key));
 	const detail = $derived.by(() => {
 		if (operation?.state === 'failed') return operation.error;
-		if (library.removedAtRestart(app)) return 'Removed when you restart';
 		const parts = [sourceName(app.source, app.origin), app.version, app.size ? bytes(app.size) : null];
 		return parts.filter(Boolean).join(' · ');
 	});
@@ -30,7 +29,7 @@
 
 <div class="row">
 	<button type="button" class="main" onclick={() => navigation.push({ page: 'app', target: { installed: app.key }, name: app.name })}>
-		<AppArt icon={app.icon} desktop={app.desktop} size={40} />
+		<AppArt icon={app.icon} desktop={app.desktop} tool={app.source === 'tool'} size={40} />
 		<span class="flex min-w-0 flex-col gap-0.5">
 			<span class="truncate text-[14px] font-medium">{app.name}</span>
 			<span class="truncate text-[12.5px]" class:failed={operation?.state === 'failed'}>{detail}</span>
@@ -55,7 +54,7 @@
 							navigation.push({ page: 'app', target: { installed: app.key }, name: app.name });
 						}}>Details</MenuItem
 					>
-					{#if library.removable(app) && !library.removedAtRestart(app)}
+					{#if library.removable(app)}
 						<MenuItem
 							danger
 							onclick={() => {

@@ -1,27 +1,18 @@
-use luft_software::image::{self, running};
+use luft_software::image;
 
-use super::super::elsewhere::{self, finished};
-use super::super::state;
+use super::super::elsewhere::finished;
+use super::super::state::{self, Activity, Kind};
 
 pub fn watch() {
     std::thread::spawn(|| {
         scan();
-        let _ = running::watch(scan);
+        let _ = image::watch(scan);
     });
 }
 
 pub fn scan() {
-    if state::busy() {
+    if state::busy() || !image::downloading().unwrap_or(false) {
         return;
     }
-    let Ok(Some(transaction)) = running::running() else {
-        return;
-    };
-    let activity = elsewhere::activity(elsewhere::sent_by(&transaction.sender), transaction.change);
-    let address = transaction.address;
-    state::start(
-        activity,
-        move |task| image::follow(&address, Some(task)).or_else(|_| running::wait()),
-        finished,
-    );
+    state::start(Activity::new(Kind::Download), super::follow, finished);
 }

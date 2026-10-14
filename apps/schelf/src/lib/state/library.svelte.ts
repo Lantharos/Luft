@@ -1,9 +1,9 @@
-import type { InstalledApp, SystemPackages, Updates } from '#lib/bridge/types.js';
+import type { InstalledApp, Updates } from '#lib/bridge/types.js';
 import { backend } from './backend';
+import { system } from './system.svelte';
 
 class Library {
 	installed = $state<InstalledApp[]>([]);
-	packages = $state<SystemPackages>({ atRestart: false, pending: { installing: [], removing: [] }, layered: null });
 	loaded = $state(false);
 	updates = $state<Updates | null>(null);
 	checking = $state(false);
@@ -19,9 +19,7 @@ class Library {
 	}
 
 	async refresh() {
-		const [installed, packages] = await Promise.all([backend().installed(), backend().systemPackages()]);
-		this.installed = installed;
-		this.packages = packages;
+		this.installed = await backend().installed();
 		this.loaded = true;
 	}
 
@@ -54,16 +52,12 @@ class Library {
 		return this.installed.find((app) => app.source === 'package' && app.package === name) ?? null;
 	}
 
+	tool(name: string) {
+		return this.installed.find((app) => app.source === 'tool' && app.package === name) ?? null;
+	}
+
 	removable(app: InstalledApp) {
-		return app.source !== 'package' || !this.packages.layered || this.packages.layered.includes(app.package!);
-	}
-
-	installsAtRestart(name: string) {
-		return this.packages.pending.installing.includes(name);
-	}
-
-	removedAtRestart(app: InstalledApp) {
-		return app.source === 'package' && this.packages.pending.removing.includes(app.package!);
+		return app.source !== 'package' || !system.image;
 	}
 
 	update(key: string) {

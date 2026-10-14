@@ -36,6 +36,14 @@ fn check(deployments: &Deployments) -> Result<Option<Update>, String> {
     Ok(update)
 }
 
+fn expected_size() -> Option<u64> {
+    Found::load().update.map(|update| update.size)
+}
+
+pub fn follow(task: Task) -> Result<(), String> {
+    image::follow(expected_size(), task)
+}
+
 impl Backend for Image {
     fn load(&self, refresh: Option<Task>) -> Result<Loaded, String> {
         let deployments = Deployments::load()?;
@@ -46,7 +54,7 @@ impl Backend for Image {
         Ok(Loaded {
             package_apps: 0,
             system: System::Image(Box::new(Overview {
-                status: deployments.status()?,
+                status: deployments.status(),
                 available: update
                     .filter(|update| deployments.lacks(update))
                     .map(|update| Available {
@@ -58,32 +66,35 @@ impl Backend for Image {
     }
 
     fn download(&self, task: Task) -> Result<(), String> {
-        image::download(task)
+        image::download(expected_size(), task)
     }
 
     fn downloaded(&self) {
         overview::reload();
     }
 
-    fn rollback(&self, task: Task) -> Result<(), String> {
-        image::rollback(task)
+    fn rollback(&self, _: Task) -> Result<(), String> {
+        image::rollback()
     }
 
     fn check_in_background(&self, download: bool) -> Result<Option<Notice>, String> {
         let deployments = Deployments::load()?;
         let update = check(&deployments)?;
         Checked::now()?;
-        if !update.is_some_and(|update| deployments.lacks(&update)) {
+        let Some(update) = update.filter(|update| deployments.lacks(update)) else {
             return Ok(None);
-        }
+        };
         if !download {
             return Ok(Some(AVAILABLE));
         }
         let quiet = |_: Progress| {};
-        image::download(Task {
-            report: &quiet,
-            cancel: &Cancel::default(),
-        })?;
+        image::download(
+            Some(update.size),
+            Task {
+                report: &quiet,
+                cancel: &Cancel::default(),
+            },
+        )?;
         Ok(Some(READY))
     }
 

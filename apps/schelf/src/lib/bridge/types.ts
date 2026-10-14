@@ -1,11 +1,13 @@
 import type { Appearance } from '@luft/ui';
 
-export type Source = 'flatpak' | 'package' | 'appImage';
+export type Source = 'flatpak' | 'package' | 'appImage' | 'tool';
+export type System = 'packages' | 'image';
 export type Installation = 'user' | 'system';
 
 export interface AppState extends Appearance {
 	files: string[];
 	page: string | null;
+	system: System;
 }
 
 export interface InstalledApp {
@@ -23,6 +25,7 @@ export interface InstalledApp {
 	reference: string | null;
 	package: string | null;
 	path: string | null;
+	commands: string[];
 }
 
 export interface AppUpdate {
@@ -47,10 +50,9 @@ export interface Updates {
 	error: string | null;
 }
 
-export interface SystemPackages {
-	atRestart: boolean;
-	pending: { installing: string[]; removing: string[] };
-	layered: string[] | null;
+export interface ToolSummary {
+	package: string;
+	summary: string;
 }
 
 export interface Permissions {
@@ -129,9 +131,12 @@ export type Job =
 	| { kind: 'installPackage'; package: string }
 	| { kind: 'installPackageFile'; path: string }
 	| { kind: 'installAppImage'; path: string }
+	| { kind: 'installTool'; package: string }
+	| { kind: 'installToolFile'; path: string }
 	| { kind: 'removeFlatpak'; installation: Installation; reference: string }
 	| { kind: 'removePackage'; package: string }
 	| { kind: 'removeAppImage'; id: string }
+	| { kind: 'removeTool'; package: string }
 	| { kind: 'updateFlatpaks'; installation: Installation; references: string[] }
 	| { kind: 'updatePackages'; packages: string[] }
 	| { kind: 'updateAppImage'; id: string };
@@ -152,7 +157,7 @@ export interface Backend {
 	installed(): Promise<InstalledApp[]>;
 	launch(desktop: string): Promise<void>;
 	removalPlan(packageName: string): Promise<string[]>;
-	systemPackages(): Promise<SystemPackages>;
+	searchTools(query: string): Promise<ToolSummary[]>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
 	checkUpdates(): Promise<Updates>;
 	inspectFile(path: string): Promise<OpenedFile>;

@@ -9,4 +9,5 @@ pub mod packages;
 pub mod progress;
 pub mod system;
 pub mod task;
+pub mod toolbox;
 pub mod updates;

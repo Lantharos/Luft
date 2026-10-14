@@ -40,6 +40,10 @@ write_image_reference() {
   echo "ghcr.io/lantharos/luft:$fedora" | install -Dm644 /dev/stdin /usr/share/luft/image-reference
 }
 
+configure_toolbox() {
+  printf '[general]\ndistro = "fedora"\nrelease = "%s"\n' "$fedora" >/etc/containers/toolbox.conf
+}
+
 configure_security() {
   local module modules=()
   for module in /usr/share/selinux/packages/luft-*.cil; do
@@ -81,6 +85,7 @@ clean_build_state() {
 write_os_release
 write_image_reference
 enable_units
+configure_toolbox
 configure_security
 check_typelibs
 refresh_caches

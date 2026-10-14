@@ -3,7 +3,6 @@
 	import { download, restart, rollback, type Activity, type ImageOverview, type Release } from '../api';
 	import { versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
-	import { changesAtRestart } from './pending';
 
 	interface Props {
 		overview: ImageOverview;
@@ -17,7 +16,6 @@
 
 	const busy = $derived(activity.running !== null);
 	const next = $derived(overview.staged ?? overview.available);
-	const changes = $derived(changesAtRestart(overview.installing, overview.removing));
 
 	const released = (release: Release) => (release.released ? `Released ${ago(release.released)}` : null);
 
@@ -48,16 +46,6 @@
 		{#if next.notes}
 			<Row title="See what's new" onclick={() => (notes = next)} />
 		{/if}
-	</Section>
-{/if}
-
-{#if changes && !overview.returning}
-	<Section>
-		<Row title={changes} description="Changed in Schelf">
-			{#if !overview.staged}
-				<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
-			{/if}
-		</Row>
 	</Section>
 {/if}
 

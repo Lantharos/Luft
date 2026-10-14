@@ -3,25 +3,19 @@ import GLib from 'gi://GLib';
 
 import {loadInterfaceXML} from './fileUtils.js';
 
-Gio._promisify(Gio.DBusConnection, 'new_for_address');
-Gio._promisify(Gio.DBusConnection.prototype, 'close');
-
 export const UpdateAction = {
     REBOOT: 'reboot',
     POWER_OFF: 'power-off',
 };
 
-const IMAGE_BOOTED = '/run/ostree-booted';
-const IMAGE_STAGED = '/run/ostree/staged-deployment';
+const COMPOSEFS_ROOT = /(^|\s)composefs(\.digest)?=/;
+const VERSION_LABEL = 'org.opencontainers.image.version';
 
 const OfflineUpdatesIface = loadInterfaceXML('org.freedesktop.PackageKit.Offline');
 const OfflineUpdatesProxy = Gio.DBusProxy.makeProxyWrapper(OfflineUpdatesIface);
 
-const RPM_OSTREE = 'org.projectatomic.rpmostree1';
-const SYSROOT_PATH = '/org/projectatomic/rpmostree1/Sysroot';
-const SYSROOT = 'org.projectatomic.rpmostree1.Sysroot';
-const OS = 'org.projectatomic.rpmostree1.OS';
-const TRANSACTION = 'org.projectatomic.rpmostree1.Transaction';
+const UPDATER = 'com.lantharos.Updater1';
+const UPDATER_PATH = '/com/lantharos/Updater1';
 const CALL_TIMEOUT = 10000;
 
 class OfflineUpdates {
@@ -49,80 +43,54 @@ class OfflineUpdates {
     }
 }
 
-async function systemCall(path, iface, method, parameters, replyType) {
+function startedFromImage() {
+    const [, commandLine] = GLib.file_get_contents('/proc/cmdline');
+    return COMPOSEFS_ROOT.test(new TextDecoder().decode(commandLine));
+}
+
+async function callUpdater(method, flags = Gio.DBusCallFlags.NONE) {
     const reply = await Gio.DBus.system.call(
-        RPM_OSTREE, path, iface, method, parameters, new GLib.VariantType(replyType),
-        Gio.DBusCallFlags.NONE, CALL_TIMEOUT, null);
+        UPDATER, UPDATER_PATH, UPDATER, method, null, null, flags, CALL_TIMEOUT, null);
     return reply.deepUnpack();
 }
 
-const sysrootProperty = async name => {
-    const [value] = await systemCall(SYSROOT_PATH, 'org.freedesktop.DBus.Properties', 'Get',
-        new GLib.Variant('(ss)', [SYSROOT, name]), '(v)');
-    return value.recursiveUnpack();
-};
-
-function finished(peer) {
-    return new Promise((resolve, reject) => {
-        const id = peer.signal_subscribe(null, TRANSACTION, 'Finished', '/', null, Gio.DBusSignalFlags.NONE,
-            (_connection, _sender, _path, _iface, _signal, parameters) => {
-                peer.signal_unsubscribe(id);
-                const [success, error] = parameters.deepUnpack();
-                if (success)
-                    resolve();
-                else
-                    reject(new Error(error));
-            });
-    });
-}
-
-async function runTransaction(address) {
-    const peer = await Gio.DBusConnection.new_for_address(address,
-        Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT, null, null);
-    const done = finished(peer);
-    await peer.call(null, '/', TRANSACTION, 'Start', null, null, Gio.DBusCallFlags.NONE, CALL_TIMEOUT, null);
-    await done;
-    await peer.close(null);
-}
-
 class StagedImage {
-    constructor(version) {
-        this.scheduled = false;
-        this.prepared = true;
+    constructor(staged, version) {
+        this.scheduled = !staged.downloadOnly;
+        this.prepared = staged.downloadOnly;
         this.version = version;
     }
 
     static async load() {
-        if (!GLib.file_test(IMAGE_STAGED, GLib.FileTest.EXISTS))
-            return null;
-        const deployments = await sysrootProperty('Deployments');
-        const booted = deployments.find(deployment => deployment.booted);
-        const staged = deployments.find(deployment => deployment.staged && !deployment.booted);
+        const [json] = await callUpdater('Status');
+        const {host, configs} = JSON.parse(json);
+        const staged = host.status.staged;
         if (!staged)
             return null;
-        return new StagedImage(staged.version !== booted?.version ? staged.version ?? null : null);
+        const label = configs[staged.image?.imageDigest]?.config?.Labels?.[VERSION_LABEL];
+        return new StagedImage(staged, label ?? staged.image?.version ?? null);
     }
 
     async installThroughRestart() {
+        await callUpdater('Apply', Gio.DBusCallFlags.ALLOW_INTERACTIVE_AUTHORIZATION);
         return false;
     }
 
     async skip() {
-        const os = await sysrootProperty('Booted');
-        const [address] = await systemCall(os, OS, 'Cleanup', new GLib.Variant('(as)', [['pending']]), '(s)');
-        await runTransaction(address);
     }
 }
 
 /**
  * Updates waiting to be installed when the computer restarts: PackageKit's
- * offline update on a regular install, or a staged image on an image-based one.
+ * offline update on a regular install, or a downloaded image on an image-based
+ * one. A downloaded image is only installed once Apply unlocks it, so skipping
+ * it needs nothing.
  *
  * @returns {Promise<OfflineUpdates | StagedImage | null>}
  */
 export async function loadPendingUpdates() {
     try {
-        if (GLib.file_test(IMAGE_BOOTED, GLib.FileTest.EXISTS))
+        if (startedFromImage())
             return await StagedImage.load();
         return await OfflineUpdates.load();
     } catch (error) {

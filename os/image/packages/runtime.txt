@@ -69,7 +69,6 @@ plymouth
 polkit
 power-profiles-daemon
 python3-gobject
-rpm-ostree
 shared-mime-info
 skopeo
 switcheroo-control

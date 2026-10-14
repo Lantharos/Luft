@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub, your system's software sources and AppImages. System updates such as the kernel and drivers live in Settings, so Schelf only shows apps. Built with Sabine and Svelte.
+Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub, your system's software sources and AppImages, and command-line tools on image-based installs. System updates such as the kernel and drivers live in Settings, so Schelf only shows apps. Built with Sabine and Svelte.
 
 ## Features
 
@@ -19,8 +19,11 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | Source | Installed for | Permission |
 |--------|---------------|------------|
 | Flathub | Your account (Flathub is added on first use) | None |
-| System software sources | Everyone, through PackageKit, or layered on the system image at the next restart on image-based installs | As the system is set up |
+| System software sources | Everyone, through PackageKit, on regular Fedora installs | As the system is set up |
 | AppImage | Your account, in `~/Applications` | None |
+| Fedora packages as command-line tools | Your account, in the default Toolbox container, on image-based installs | None |
+
+Image-based installs don't take Fedora's desktop apps; search shows command-line tools from Fedora instead. Their commands get launchers in `~/.local/bin`, so they run from Tern, and a `.rpm` file opened in Schelf installs into the same container.
 
 A package from the system's sources counts as an app when it puts a visible entry in the app menu. Everything else is part of the system and is updated from Settings, which uses the same rule.
 
@@ -36,7 +39,7 @@ bun run desktop:build    # production web build and release binary
 bun run desktop:bundle   # Sabine bundle
 ```
 
-In the browser, `?scheme=light` shows the light style, `?system=image` shows an image-based install, `?file=/path` shows the page for an opened file and `?page=schelf:updates` opens Updates.
+In the browser, `?scheme=light` shows the light style, `?system=image` shows an image-based install, with command-line tools, `?file=/path` shows the page for an opened file and `?page=schelf:updates` opens Updates.
 
 ## Install
 

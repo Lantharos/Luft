@@ -1,11 +1,12 @@
 mod appimages;
 mod flatpaks;
 mod packages;
+mod tools;
 
 use gio::prelude::*;
 use luft_app::Commands;
 use luft_software::flatpak::{self, Installation, Permissions};
-use luft_software::packages::Packages;
+use luft_software::system::System;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -16,6 +17,7 @@ pub enum Source {
     Flatpak,
     Package,
     AppImage,
+    Tool,
 }
 
 #[derive(Serialize, Clone, Debug)]
@@ -35,6 +37,7 @@ pub struct InstalledApp {
     pub reference: Option<String>,
     pub package: Option<String>,
     pub path: Option<String>,
+    pub commands: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -58,9 +61,13 @@ pub fn installed() -> Vec<InstalledApp> {
     let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
         let flatpaks = scope.spawn(flatpaks::installed);
         let packages = scope.spawn(packages::installed);
+        let tools = (System::current() == System::Image).then(|| scope.spawn(tools::installed));
         let mut apps = appimages::installed();
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(packages.join().unwrap_or_default());
+        if let Some(tools) = tools {
+            apps.extend(tools.join().unwrap_or_default());
+        }
         apps
     });
     apps.sort_by_cached_key(|app| app.name.to_lowercase());
@@ -92,6 +99,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
         .command("library_removal_plan", removal_plan)
-        .command("library_packages", |_: Value| Packages::current())
         .command("library_permissions", permissions)
 }

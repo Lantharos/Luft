@@ -6,6 +6,7 @@
 	import { backend } from '#lib/state/backend.js';
 	import { catalog } from '#lib/state/catalog.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
 	import Spotlight from './Spotlight.svelte';
 
 	const SHELF_SIZE = 6;
@@ -42,7 +43,9 @@
 	<div class="mx-auto flex w-full max-w-[1040px] flex-col gap-8 px-8 pt-2 pb-10">
 		{#if offline}
 			<div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">
-				<p class="text-[14px] text-[var(--text-soft)]">Flathub can't be reached right now. Apps from Fedora and the ones you have are still here.</p>
+				<p class="text-[14px] text-[var(--text-soft)]">
+					Flathub can't be reached right now. {system.image ? 'The apps you have are still here.' : 'Apps from Fedora and the ones you have are still here.'}
+				</p>
 				<button type="button" class="button" onclick={load}>Try again</button>
 			</div>
 		{:else}
@@ -55,6 +58,8 @@
 			<Shelf title="Popular" apps={popular} onmore={() => navigation.push({ page: 'collection', collection: 'popular' })} />
 			<Shelf title="New and updated" apps={updated} onmore={() => navigation.push({ page: 'collection', collection: 'recently-updated' })} />
 		{/if}
-		<Shelf title="From Fedora" apps={fedoraApps} />
+		{#if !system.image}
+			<Shelf title="From Fedora" apps={fedoraApps} />
+		{/if}
 	</div>
 </div>

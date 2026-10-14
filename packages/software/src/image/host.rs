@@ -1,0 +1,107 @@
+use std::collections::HashMap;
+
+use serde::Deserialize;
+
+use super::config::{Config, Release};
+use super::registry;
+
+#[derive(Deserialize)]
+struct Reply {
+    host: Document,
+    #[serde(default)]
+    configs: HashMap<String, Config>,
+}
+
+#[derive(Deserialize)]
+struct Document {
+    status: Slots,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Slots {
+    booted: Option<Entry>,
+    staged: Option<Entry>,
+    rollback: Option<Entry>,
+    #[serde(default)]
+    rollback_queued: bool,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Entry {
+    image: Option<Image>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Image {
+    image: Reference,
+    version: Option<String>,
+    image_digest: String,
+}
+
+#[derive(Deserialize)]
+struct Reference {
+    image: String,
+    transport: String,
+}
+
+pub struct Deployment {
+    image: Option<Image>,
+    config: Config,
+}
+
+pub struct Host {
+    pub booted: Deployment,
+    pub staged: Option<Deployment>,
+    pub rollback: Option<Deployment>,
+    pub rollback_queued: bool,
+}
+
+impl Host {
+    pub fn parse(json: &str) -> Result<Self, String> {
+        let Reply {
+            host: Document { status },
+            mut configs,
+        } = serde_json::from_str(json).map_err(|error| error.to_string())?;
+        let mut deployment = |entry: Entry| Deployment {
+            config: entry
+                .image
+                .as_ref()
+                .and_then(|image| configs.remove(&image.image_digest))
+                .unwrap_or_default(),
+            image: entry.image,
+        };
+        let booted = status
+            .booted
+            .ok_or("This computer didn't start from a system image.")?;
+        Ok(Self {
+            booted: deployment(booted),
+            staged: status.staged.map(&mut deployment),
+            rollback: status.rollback.map(&mut deployment),
+            rollback_queued: status.rollback_queued,
+        })
+    }
+}
+
+impl Deployment {
+    pub fn layers(&self) -> &[String] {
+        self.config.layers()
+    }
+
+    pub fn release(&self) -> Release {
+        let release = self.config.release();
+        Release {
+            version: release
+                .version
+                .or_else(|| self.image.as_ref()?.version.clone()),
+            ..release
+        }
+    }
+
+    pub fn location(&self) -> Option<String> {
+        let reference = &self.image.as_ref()?.image;
+        registry::location(&reference.transport, &reference.image)
+    }
+}

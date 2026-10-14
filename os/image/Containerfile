@@ -66,7 +66,6 @@ COPY --from=kestrel /stage/ /
 COPY --from=boot /stage/ /
 COPY --from=apps /stage/ /
 COPY os/image/files/ /
-COPY packages/software/data/50-luft-system-updates.rules /usr/share/polkit-1/rules.d/
 RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" && \
     rm -rf /usr/share/luft/image
 RUN bootc container lint

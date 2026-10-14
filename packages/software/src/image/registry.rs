@@ -5,8 +5,7 @@ use serde::de::DeserializeOwned;
 
 use super::config::Config;
 
-const UNVERIFIED_REGISTRY: &str = "ostree-unverified-registry:";
-const REMOTE_IMAGE: &str = "ostree-remote-image:";
+const REGISTRY_TRANSPORT: &str = "registry";
 const REGISTRY: &str = "docker://";
 const UNREACHABLE: &str = "Couldn't reach the update server. Check your connection and try again.";
 
@@ -28,15 +27,8 @@ struct Inspected {
     layers_data: Vec<Blob>,
 }
 
-pub fn location(reference: &str) -> Option<String> {
-    if let Some(name) = reference.strip_prefix(UNVERIFIED_REGISTRY) {
-        return Some(format!("{REGISTRY}{name}"));
-    }
-    let image = match reference.strip_prefix(REMOTE_IMAGE) {
-        Some(remote) => remote.split_once(':')?.1,
-        None => reference.split_once(':')?.1,
-    };
-    image.contains(':').then(|| image.to_owned())
+pub fn location(transport: &str, image: &str) -> Option<String> {
+    (transport == REGISTRY_TRANSPORT).then(|| format!("{REGISTRY}{image}"))
 }
 
 fn inspect<T: DeserializeOwned>(location: &str, options: &[&str]) -> Result<T, String> {
@@ -62,25 +54,4 @@ pub fn fetch(location: &str) -> Result<Image, String> {
             blobs: blobs?,
         })
     })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::location;
-
-    #[test]
-    fn finds_where_images_come_from() {
-        assert_eq!(
-            location("ostree-unverified-registry:ghcr.io/lantharos/luft:45").as_deref(),
-            Some("docker://ghcr.io/lantharos/luft:45")
-        );
-        assert_eq!(
-            location("ostree-image-signed:docker://ghcr.io/lantharos/luft:45-nvidia").as_deref(),
-            Some("docker://ghcr.io/lantharos/luft:45-nvidia")
-        );
-        assert_eq!(
-            location("ostree-remote-image:luft:docker://ghcr.io/lantharos/luft:45").as_deref(),
-            Some("docker://ghcr.io/lantharos/luft:45")
-        );
-    }
 }

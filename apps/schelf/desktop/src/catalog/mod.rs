@@ -2,6 +2,7 @@ mod appstream;
 pub mod cache;
 mod fedora;
 mod flathub;
+mod tools;
 
 use luft_app::Commands;
 use luft_software::packagekit::PackageDetails;
@@ -49,4 +50,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("flathub_search", |Query { query }| flathub::search(&query))
         .command("fedora_apps", |_: Value| Ok(fedora::list()))
         .command("fedora_app", fedora_app)
+        .command("tools_search", |Query { query }| tools::search(&query))
 }

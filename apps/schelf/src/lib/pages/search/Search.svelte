@@ -9,6 +9,8 @@
 	import { catalog } from '#lib/state/catalog.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
+	import ToolResults from './ToolResults.svelte';
 
 	const LIMIT = 30;
 
@@ -16,6 +18,7 @@
 
 	let remote = $state<CatalogApp[] | null>(null);
 	let error = $state<string | null>(null);
+	let tools = $state<number | null>(null);
 
 	const needle = $derived(query.toLowerCase());
 	const installed = $derived(library.installed.filter((app) => app.name.toLowerCase().includes(needle)).slice(0, 8));
@@ -35,7 +38,8 @@
 			});
 	});
 
-	const nothing = $derived(!installed.length && remote?.length === 0 && local?.length === 0);
+	const others = $derived(system.image ? tools : (local?.length ?? null));
+	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
@@ -46,7 +50,7 @@
 				<div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-1">
 					{#each installed as app (app.key)}
 						<button type="button" class="result" onclick={() => navigation.push({ page: 'app', target: { installed: app.key }, name: app.name })}>
-							<AppArt icon={app.icon} desktop={app.desktop} size={40} />
+							<AppArt icon={app.icon} desktop={app.desktop} tool={app.source === 'tool'} size={40} />
 							<span class="flex min-w-0 flex-col">
 								<span class="truncate text-[14px] font-semibold">{app.name}</span>
 								<span class="truncate text-[12.5px] text-[var(--text-muted)]">{sourceName(app.source, app.origin)}</span>
@@ -61,7 +65,9 @@
 		{:else if remote === null || remote.length}
 			<Shelf title="Flathub" apps={remote} />
 		{/if}
-		{#if local === null || local.length}
+		{#if system.image}
+			<ToolResults {query} bind:found={tools} />
+		{:else if local === null || local.length}
 			<Shelf title="Fedora" apps={local} />
 		{/if}
 		{#if nothing}

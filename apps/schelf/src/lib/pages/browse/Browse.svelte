@@ -8,6 +8,7 @@
 	import { backend } from '#lib/state/backend.js';
 	import { catalog } from '#lib/state/catalog.svelte.js';
 	import type { Route } from '#lib/state/navigation.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
 
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' }>;
 
@@ -68,7 +69,7 @@
 <VirtualScroller class="soft-scroll h-full" items={shown} key={(app) => app.key} layout={LAYOUT} onscroll={scrolled}>
 	{#snippet header()}
 		<div class="flex min-h-2 items-center justify-between gap-4 bg-[var(--content)] px-8 pb-3">
-			{#if route.page === 'category'}
+			{#if route.page === 'category' && !system.image}
 				<Segmented
 					label="Source"
 					value={source}

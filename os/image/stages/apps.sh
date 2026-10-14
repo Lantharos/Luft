@@ -21,6 +21,15 @@ install -Dm644 -t "$destdir/usr/lib/systemd/system" "$installer/data/luft-instal
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$installer/data/com.lantharos.installer.policy"
 install -Dm644 -t "$destdir/usr/share/selinux/packages" "$installer/data/luft-installer.cil"
 
+updater="$luft/packages/software/updater"
+cargo build --release --locked --manifest-path "$updater/Cargo.toml"
+install -Dm755 "$CARGO_TARGET_DIR/release/luft-updater" "$destdir/usr/libexec/luft-updater"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$updater/data/com.lantharos.Updater1.conf"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$updater/data/com.lantharos.Updater1.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.service"
+install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$updater/data/com.lantharos.updater.policy"
+install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-updater.rules"
+
 (cd "$luft" && bun install --frozen-lockfile)
 for app in "$luft"/apps/*/; do
   sabine install --bundle --system-wide --root "$destdir" "$app"

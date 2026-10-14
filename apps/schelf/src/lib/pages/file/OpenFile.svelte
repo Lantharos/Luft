@@ -8,6 +8,7 @@
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
 
 	let { path }: { path: string } = $props();
 
@@ -25,7 +26,7 @@
 	const installed = $derived.by((): InstalledApp | null => {
 		if (!file) return null;
 		if (file.kind === 'flatpakRef') return library.flatpak(file.id);
-		if (file.kind === 'package') return library.package(file.package);
+		if (file.kind === 'package') return system.image ? library.tool(file.package) : library.package(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
 		return null;
 	});
@@ -45,7 +46,7 @@
 	function job(opened: OpenedFile): Job {
 		if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
-		if (opened.kind === 'package') return { kind: 'installPackageFile', path: opened.path };
+		if (opened.kind === 'package') return system.image ? { kind: 'installToolFile', path: opened.path } : { kind: 'installPackageFile', path: opened.path };
 		return { kind: 'installAppImage', path: opened.path };
 	}
 
@@ -60,7 +61,7 @@
 	const KIND: Record<OpenedFile['kind'], string> = {
 		flatpakRef: 'Flatpak app',
 		flatpakRepo: 'Flatpak app source',
-		package: 'System package',
+		package: system.image ? 'Command-line tool' : 'System package',
 		appImage: 'AppImage'
 	};
 </script>
@@ -116,6 +117,8 @@
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>
+				{:else if file.kind === 'package' && system.image}
+					<Row title="Installs to" description="Its commands run in Tern."><span>Tools container</span></Row>
 				{/if}
 				<Row title="File" description={path} />
 			</Section>

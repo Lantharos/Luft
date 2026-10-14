@@ -70,9 +70,6 @@ export interface ImageOverview {
 	staged: Release | null;
 	previous: Release | null;
 	returning: Release | null;
-	layered: string[];
-	installing: string[];
-	removing: string[];
 	available: (Release & { size: number }) | null;
 }
 

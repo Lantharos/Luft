@@ -1,9 +1,9 @@
-use std::path::Path;
 use std::sync::LazyLock;
 
 use serde::Serialize;
 
-const IMAGE_BOOTED: &str = "/run/ostree-booted";
+const KERNEL_COMMAND_LINE: &str = "/proc/cmdline";
+const COMPOSEFS_ROOT: [&str; 2] = ["composefs=", "composefs.digest="];
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -12,8 +12,15 @@ pub enum System {
     Image,
 }
 
+fn started_from_image(command_line: &str) -> bool {
+    command_line
+        .split_whitespace()
+        .any(|argument| COMPOSEFS_ROOT.iter().any(|key| argument.starts_with(key)))
+}
+
 static CURRENT: LazyLock<System> = LazyLock::new(|| {
-    if Path::new(IMAGE_BOOTED).exists() {
+    let command_line = std::fs::read_to_string(KERNEL_COMMAND_LINE).unwrap_or_default();
+    if started_from_image(&command_line) {
         System::Image
     } else {
         System::Packages

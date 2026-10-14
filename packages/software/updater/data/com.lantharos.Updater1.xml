@@ -1,0 +1,35 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Updater1">
+  <!--
+    Updates the system image with bootc. Started on demand and stops when idle.
+
+    Downloading: whether an update is being downloaded right now, by anyone.
+    Downloaded: bytes of image layers fetched so far by the current download.
+
+    Download, Cancel and Apply need com.lantharos.updater.download; Rollback needs
+    com.lantharos.updater.rollback. Status needs nothing.
+  -->
+  <interface name="com.lantharos.Updater1">
+    <property name="Downloading" type="b" access="read"/>
+    <property name="Downloaded" type="t" access="read"/>
+
+    <!-- JSON: {"host": `bootc status` as JSON, "configs": {manifest digest: OCI image config}} for the
+         booted, staged and rollback images. -->
+    <method name="Status">
+      <arg name="status" type="s" direction="out"/>
+    </method>
+    <!-- Starts downloading the newest image and stages it, locked: it's only installed at a restart once
+         Apply unlocks it. Finished says how it went. -->
+    <method name="Download"/>
+    <method name="Cancel"/>
+    <!-- Installs the downloaded update at the next restart or power off. -->
+    <method name="Apply"/>
+    <!-- Starts the previous version next time, or, when that's already queued, stays on this one. -->
+    <method name="Rollback"/>
+    <!-- Empty when the download succeeded. -->
+    <signal name="Finished">
+      <arg name="error" type="s"/>
+    </signal>
+  </interface>
+</node>

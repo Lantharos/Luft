@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use gio::prelude::*;
 use luft_app::{Appearance, Commands};
+use luft_software::system::System;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -15,6 +16,7 @@ struct AppState {
     appearance: Appearance,
     files: Vec<String>,
     page: Option<String>,
+    system: System,
 }
 
 #[derive(Deserialize)]
@@ -63,6 +65,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
                 page: arguments
                     .into_iter()
                     .find(|argument| argument.starts_with(PAGE_SCHEME)),
+                system: System::current(),
             })
         })
         .command("app_activation_files", |activation: Activation| {

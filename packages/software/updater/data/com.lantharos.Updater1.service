@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.Updater1
+Exec=/usr/libexec/luft-updater
+User=root
+SystemdService=luft-updater.service

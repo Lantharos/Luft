@@ -6,11 +6,17 @@
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
 	import InstalledRow from './InstalledRow.svelte';
 
 	type Filter = 'all' | Source;
 
 	const LAYOUT = { itemHeight: 64, gap: 2, padding: { top: 4, left: 28, right: 28, bottom: 40 } };
+
+	const EMPTY: Partial<Record<Filter, string>> = {
+		appImage: 'AppImages you add show up here, with a place in your app menu.',
+		tool: 'Command-line tools you install from search show up here.'
+	};
 
 	let filter = $state<Filter>('all');
 	let removing = $state<InstalledApp | null>(null);
@@ -35,20 +41,21 @@
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
 					{ value: 'package', label: 'System' },
-					{ value: 'appImage', label: 'AppImage' }
+					{ value: 'appImage', label: 'AppImage' },
+					...(system.image ? [{ value: 'tool' as const, label: 'Tools' }] : [])
 				]}
 				onchange={(value) => (filter = value)}
 			/>
 			<div class="flex items-center gap-3">
 				{#if library.loaded}
-					<span class="text-[13px] text-[var(--text-muted)]">{shown.length} {shown.length === 1 ? 'app' : 'apps'} · {bytes(total)}</span>
+					<span class="text-[13px] text-[var(--text-muted)]">{shown.length} {filter === 'tool' ? (shown.length === 1 ? 'tool' : 'tools') : shown.length === 1 ? 'app' : 'apps'} · {bytes(total)}</span>
 				{/if}
 				<button type="button" class="button" onclick={addAppImage}><Plus size={16} />Add AppImage</button>
 			</div>
 		</div>
 		{#if library.loaded && !shown.length}
 			<p class="px-8 pt-16 text-center text-[14px] text-[var(--text-muted)]">
-				{filter === 'appImage' ? 'AppImages you add show up here, with a place in your app menu.' : 'No apps here yet.'}
+				{EMPTY[filter] ?? 'No apps here yet.'}
 			</p>
 		{/if}
 	{/snippet}

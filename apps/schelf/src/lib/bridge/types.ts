@@ -139,7 +139,8 @@ export type Job =
 	| { kind: 'removeTool'; package: string }
 	| { kind: 'updateFlatpaks'; installation: Installation; references: string[] }
 	| { kind: 'updatePackages'; packages: string[] }
-	| { kind: 'updateAppImage'; id: string };
+	| { kind: 'updateAppImage'; id: string }
+	| { kind: 'updateTools'; packages: string[] };
 
 export type OpenedFile =
 	| { kind: 'flatpakRef'; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null }

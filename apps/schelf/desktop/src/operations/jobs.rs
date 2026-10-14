@@ -68,6 +68,9 @@ pub enum Job {
     UpdateAppImage {
         id: String,
     },
+    UpdateTools {
+        packages: Vec<String>,
+    },
 }
 
 impl Job {
@@ -87,7 +90,8 @@ impl Job {
             | Self::RemoveTool { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdatePackages { .. }
-            | Self::UpdateAppImage { .. } => Action::Update,
+            | Self::UpdateAppImage { .. }
+            | Self::UpdateTools { .. } => Action::Update,
         }
     }
 
@@ -124,6 +128,7 @@ impl Job {
             }
             Self::UpdatePackages { packages: names } => packages::update(names, task),
             Self::UpdateAppImage { id } => appimage::update(&appimage::find(id)?, task).map(|_| ()),
+            Self::UpdateTools { packages } => toolbox::update(packages, task),
         }
     }
 }

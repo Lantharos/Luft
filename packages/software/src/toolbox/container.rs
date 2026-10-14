@@ -4,10 +4,11 @@ use std::sync::LazyLock;
 use crate::progress::Stage;
 use crate::task::Task;
 
-use super::transaction;
+use super::{pull, transaction};
 
 const OS_RELEASE: &str = "/etc/os-release";
 const DISTRO: &str = "fedora";
+const IMAGES: &str = "registry.fedoraproject.org/fedora-toolbox";
 
 static RELEASE: LazyLock<String> = LazyLock::new(|| {
     std::fs::read_to_string(OS_RELEASE)
@@ -33,6 +34,8 @@ pub fn exists() -> bool {
 }
 
 pub fn create(task: Task) -> Result<(), String> {
+    task.progress(Stage::Preparing, None);
+    pull::pull(&format!("{IMAGES}:{}", *RELEASE), task)?;
     task.progress(Stage::Preparing, None);
     transaction::run(
         Command::new("toolbox").args([

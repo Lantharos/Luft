@@ -40,7 +40,7 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | `system` | `System::current()`, `Packages` or `Image` |
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
 | `image` | `Deployments` (`load`, `status`, `check`, `lacks`), `download`, `rollback`, and `downloading`, `follow` and `watch` for a download started anywhere |
-| `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove` and `installed` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
+| `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
 | `packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
@@ -71,7 +71,7 @@ Versions and release notes come from the image's labels:
 
 ## Command-line tools
 
-On image systems Schelf installs Fedora packages into the default Toolbox container, `fedora-toolbox-45`, creating it the first time. Each command a package puts in `/usr/bin` gets a small launcher in `~/.local/bin`, unless the system already has a command by that name, so it runs from Tern like any other. The list of tools installed this way is kept in `~/.local/share/luft/tools.json`.
+On image systems Schelf installs Fedora packages into the default Toolbox container, `fedora-toolbox-45`, creating it the first time from Fedora's toolbox image, pulled through Podman's API so the download shows its progress. Updates for the tools come from `dnf` inside the container and appear in Schelf's Updates. Each command a package puts in `/usr/bin` gets a small launcher in `~/.local/bin`, unless the system already has a command by that name, so it runs from Tern like any other. The list of tools installed this way is kept in `~/.local/share/luft/tools.json`.
 
 ## Checks
 

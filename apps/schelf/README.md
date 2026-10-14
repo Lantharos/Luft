@@ -23,7 +23,7 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | AppImage | Your account, in `~/Applications` | None |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, on image-based installs | None |
 
-Image-based installs don't take Fedora's desktop apps; search shows command-line tools from Fedora instead. Their commands get launchers in `~/.local/bin`, so they run from Tern, and a `.rpm` file opened in Schelf installs into the same container.
+Image-based installs don't take Fedora's desktop apps; search shows command-line tools from Fedora instead. Their commands get launchers in `~/.local/bin`, so they run from Tern, their updates show up in Updates, and a `.rpm` file opened in Schelf installs into the same container.
 
 A package from the system's sources counts as an app when it puts a visible entry in the app menu. Everything else is part of the system and is updated from Settings, which uses the same rule.
 

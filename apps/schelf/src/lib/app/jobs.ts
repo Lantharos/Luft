@@ -10,5 +10,6 @@ export function removeJob(app: InstalledApp): Job {
 export function updateJob(update: AppUpdate): Job {
 	if (update.source === 'flatpak') return { kind: 'updateFlatpaks', installation: update.installation!, references: [update.reference!] };
 	if (update.source === 'package') return { kind: 'updatePackages', packages: [update.package!] };
+	if (update.source === 'tool') return { kind: 'updateTools', packages: [update.package!] };
 	return { kind: 'updateAppImage', id: update.id };
 }

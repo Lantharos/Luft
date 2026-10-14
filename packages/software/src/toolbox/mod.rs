@@ -2,7 +2,9 @@ mod catalog;
 mod commands;
 mod container;
 mod installed;
+mod pull;
 mod transaction;
+mod updates;
 
 use std::process::Command;
 
@@ -12,6 +14,7 @@ use crate::task::Task;
 pub use catalog::{Available, available};
 pub use container::name as container;
 pub use installed::{Tool, installed};
+pub use updates::{Update, updates};
 
 const NOTHING_TO_REMOVE: &str = "No packages to remove";
 
@@ -38,6 +41,15 @@ fn record(package: &str) -> Result<(), String> {
     let programs = commands::programs(&container::query(&["rpm", "--query", "--list", package])?);
     let exported = commands::export(&container::name(), &programs, &owned);
     let tool = installed::describe(package, exported)?;
+    if let Some(previous) = tools.iter().find(|existing| existing.package == package) {
+        let dropped: Vec<String> = previous
+            .commands
+            .iter()
+            .filter(|command| !tool.commands.contains(command))
+            .cloned()
+            .collect();
+        commands::unexport(&dropped);
+    }
     tools.retain(|existing| existing.package != package);
     tools.push(tool);
     tools.sort_by(|a, b| a.package.cmp(&b.package));
@@ -65,6 +77,13 @@ pub fn install_file(path: &str, task: Task) -> Result<(), String> {
     ready(task)?;
     transaction::run(&mut dnf(&["install", path]), Stage::Installing, task)?;
     record(&package)
+}
+
+pub fn update(packages: &[String], task: Task) -> Result<(), String> {
+    let mut arguments = vec!["upgrade"];
+    arguments.extend(packages.iter().map(String::as_str));
+    transaction::run(&mut dnf(&arguments), Stage::Installing, task)?;
+    packages.iter().try_for_each(|package| record(package))
 }
 
 pub fn remove(package: &str, task: Task) -> Result<(), String> {

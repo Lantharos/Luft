@@ -4,8 +4,9 @@ use luft_app::Commands;
 use luft_app::apps::App;
 use luft_software::classify::Classification;
 use luft_software::flatpak::{self, Installation};
-use luft_software::packages;
+use luft_software::system::System;
 use luft_software::updates::{self, PackageUpdates};
+use luft_software::{packages, toolbox};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
@@ -117,21 +118,55 @@ fn appimages() -> Vec<AppUpdate> {
         .collect()
 }
 
+fn tools(updates: Vec<toolbox::Update>) -> Vec<AppUpdate> {
+    updates
+        .into_iter()
+        .map(|update| AppUpdate {
+            key: format!("tool/{}", update.package),
+            source: Source::Tool,
+            id: update.package.clone(),
+            desktop: None,
+            name: update.package.clone(),
+            icon: None,
+            from: update.from,
+            to: Some(update.to),
+            size: update.size,
+            platform: false,
+            installation: None,
+            reference: None,
+            package: Some(update.package),
+        })
+        .collect()
+}
+
+fn installed_tools() -> Result<Vec<AppUpdate>, String> {
+    match System::current() {
+        System::Image => toolbox::updates().map(tools),
+        System::Packages => Ok(Vec::new()),
+    }
+}
+
 fn check(_: Value) -> Result<Updates, String> {
-    let (packages, flatpaks, appimages) = std::thread::scope(|scope| {
+    let (packages, flatpaks, appimages, tools) = std::thread::scope(|scope| {
         let packages = scope.spawn(|| packages::updates().map(packages));
         let flatpaks = scope.spawn(|| flatpak::updates().map(flatpaks));
+        let tools = scope.spawn(installed_tools);
         let appimages = scope.spawn(appimages);
         (
             packages.join().unwrap_or_else(|_| Err(String::new())),
             flatpaks.join().unwrap_or_else(|_| Err(String::new())),
             appimages.join().unwrap_or_default(),
+            tools.join().unwrap_or_else(|_| Err(String::new())),
         )
     });
-    let error = packages.as_ref().err().or(flatpaks.as_ref().err()).cloned();
+    let error = [&packages, &flatpaks, &tools]
+        .into_iter()
+        .find_map(|result| result.as_ref().err())
+        .cloned();
     let mut apps: Vec<AppUpdate> = packages.unwrap_or_default();
     apps.extend(flatpaks.unwrap_or_default());
     apps.extend(appimages);
+    apps.extend(tools.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
     Ok(Updates {
         apps,

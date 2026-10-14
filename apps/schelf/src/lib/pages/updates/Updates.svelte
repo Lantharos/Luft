@@ -4,10 +4,12 @@
 	import { updateJob } from '#lib/app/jobs.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { system } from '#lib/state/system.svelte.js';
 	import UpdateRow from './UpdateRow.svelte';
 
 	const updates = $derived(library.updates?.apps ?? []);
-	const apps = $derived(updates.filter((update) => !update.platform));
+	const apps = $derived(updates.filter((update) => !update.platform && update.source !== 'tool'));
+	const tools = $derived(updates.filter((update) => update.source === 'tool'));
 	const platforms = $derived(updates.filter((update) => update.platform));
 	const waiting = $derived(updates.filter((update) => !operations.forKey(update.key) || operations.forKey(update.key)?.state === 'failed'));
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
@@ -30,6 +32,8 @@
 		}
 		const packages = waiting.filter((update) => update.source === 'package');
 		batch('package-updates', packages, { kind: 'updatePackages', packages: packages.map((update) => update.package!) });
+		const tools = waiting.filter((update) => update.source === 'tool');
+		batch('tool-updates', tools, { kind: 'updateTools', packages: tools.map((update) => update.package!) });
 		for (const update of waiting.filter((update) => update.source === 'appImage')) void operations.run(update.key, update.name, updateJob(update));
 	}
 </script>
@@ -43,7 +47,7 @@
 					{#if library.error}
 						{library.error}
 					{:else if library.checking}
-						Looking at Flathub, your software sources and your AppImages
+						{system.image ? 'Looking at Flathub, your AppImages and your tools' : 'Looking at Flathub, your software sources and your AppImages'}
 					{:else if library.updates}
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
 					{/if}
@@ -58,6 +62,14 @@
 		{#if apps.length}
 			<Section title="Apps">
 				{#each apps as update (update.key)}
+					<UpdateRow {update} />
+				{/each}
+			</Section>
+		{/if}
+
+		{#if tools.length}
+			<Section title="Command-line tools">
+				{#each tools as update (update.key)}
 					<UpdateRow {update} />
 				{/each}
 			</Section>

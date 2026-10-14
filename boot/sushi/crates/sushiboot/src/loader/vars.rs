@@ -3,13 +3,14 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 use uefi::runtime::{self, VariableAttributes, VariableVendor};
-use uefi::{CStr16, cstr16, guid};
+use uefi::{CStr16, Handle, cstr16, guid};
 
-use crate::entries::Catalog;
+use crate::entries::{Catalog, volume};
 
 const LOADER: VariableVendor = VariableVendor(guid!("4a67b082-0a4c-41cf-b6c7-440b29bb8c4f"));
 const ENTRY_DEFAULT: u64 = 1 << 2;
 const ENTRY_ONESHOT: u64 = 1 << 3;
+const XBOOTLDR: u64 = 1 << 5;
 const MULTI_PROFILE_UKI: u64 = 1 << 14;
 
 fn utf16(text: &str) -> Vec<u8> {
@@ -51,7 +52,10 @@ pub fn chosen_default() -> Option<String> {
     text(cstr16!("LoaderEntryDefault"))
 }
 
-pub fn describe(catalog: &Catalog) {
+pub fn describe(catalog: &Catalog, boot_device: Handle) {
+    if let Some(partition) = volume::partition_guid(boot_device) {
+        announce(cstr16!("LoaderDevicePartUUID"), &utf16(&partition));
+    }
     announce(
         cstr16!("LoaderInfo"),
         &utf16(&format!(
@@ -61,7 +65,7 @@ pub fn describe(catalog: &Catalog) {
     );
     announce(
         cstr16!("LoaderFeatures"),
-        &(ENTRY_DEFAULT | ENTRY_ONESHOT | MULTI_PROFILE_UKI).to_le_bytes(),
+        &(ENTRY_DEFAULT | ENTRY_ONESHOT | XBOOTLDR | MULTI_PROFILE_UKI).to_le_bytes(),
     );
     let entries: Vec<u8> = catalog
         .entries

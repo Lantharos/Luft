@@ -4,7 +4,7 @@ use anyhow::Result;
 
 use super::esp::{self, Esp};
 use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
-use super::{entry, fallback};
+use super::{entry, fallback, partition};
 use crate::keys::{self, mok};
 use crate::system::efi;
 
@@ -55,14 +55,15 @@ fn needs_fallback() -> bool {
 }
 
 fn place_fallback(esp: &Esp) -> Result<bool> {
+    let boot = partition::next_to(esp)?;
     if needs_fallback() {
-        let changed = fallback::place(esp)?;
+        let changed = fallback::place(esp, &boot)?;
         if efi::booted_with_uefi() {
             entry::ensure(esp, FALLBACK_LABEL, fallback::LOADER)?;
         }
         Ok(changed)
     } else {
-        fallback::remove(esp);
+        fallback::remove(esp, &boot);
         if efi::booted_with_uefi() {
             entry::remove(FALLBACK_LABEL)?;
         }

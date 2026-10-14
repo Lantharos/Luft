@@ -39,6 +39,12 @@ RUN --mount=type=cache,target=/var/cache/cargo \
     /src/os/image/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 
+FROM builder AS bootc
+COPY os/image/patches/bootc /src/os/image/patches/bootc
+COPY os/image/stages/bootc.sh /src/os/image/stages/bootc.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    /src/os/image/stages/bootc.sh /rpms
+
 FROM builder AS apps
 COPY package.json bun.lock /src/
 COPY packages /src/packages
@@ -62,7 +68,9 @@ COPY --from=kestrel /needed.txt /tmp/needed/kestrel.txt
 COPY --from=boot /needed.txt /tmp/needed/boot.txt
 COPY --from=apps /needed.txt /tmp/needed/apps.txt
 COPY --from=kestrel /typelibs.txt /usr/share/luft/image/typelibs.txt
+COPY --from=bootc /rpms /tmp/bootc
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf install -y /tmp/bootc/*.rpm && rm -rf /tmp/bootc && \
     cat /tmp/needed/*.txt > /tmp/needed.txt && \
     /usr/share/luft/image/stages/packages.sh /tmp/needed.txt && \
     rm -rf /tmp/needed /tmp/needed.txt

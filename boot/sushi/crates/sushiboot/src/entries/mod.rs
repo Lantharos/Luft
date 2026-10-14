@@ -3,7 +3,7 @@ mod images;
 mod loaders;
 mod pe;
 mod tries;
-mod volume;
+pub mod volume;
 
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -72,7 +72,7 @@ impl Origin {
 impl Catalog {
     pub fn collect(boot_device: Handle, secure_boot: bool) -> Self {
         let volumes = volume::enumerate(boot_device);
-        let several = volumes.len() > 1;
+        let several = volumes.iter().any(|volume| !volume.is_boot);
         let mut catalog = Self::default();
         let mut found_images = Vec::new();
         let mut others = Vec::new();

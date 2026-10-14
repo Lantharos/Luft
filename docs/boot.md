@@ -16,6 +16,8 @@ Nothing can be changed at startup, including the kernel command line. Kernel arg
 
 Every version of Luft is a sealed bootc image, built and signed in CI. An update downloads the new version, and bootc puts its startup image in `EFI/Linux/bootc` on the EFI system partition with an entry in `loader/entries`. The version before it stays, so there are always two.
 
+Next to Windows, whose EFI system partition is usually too small for them, the startup images and entries go on a separate 2 GB startup partition (XBOOTLDR, as the Boot Loader Specification calls it) on the same drive instead. Shim and SushiBoot stay on the EFI system partition, and SushiBoot reads the entries from both.
+
 - SushiBoot starts the newest. Holding any key while the computer starts shows its menu, with the version before under Previous versions.
 - `bootc rollback` makes the previous version the default from a running system.
 - After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's.
@@ -27,7 +29,7 @@ Shim only trusts Luft's key after someone confirms it in person, once per comput
 1. After the restart, shim's blue screen waits ten seconds for a key press.
 2. Choose Enroll MOK, Continue, Yes, type the code, and choose Reboot.
 
-If the blue screen was skipped, the computer still starts: shim shows "Verification failed" for SushiBoot, and after OK the firmware moves on to the entry called "Luft without its key". It starts the same version through Fedora's signed GRUB and kernel, from `EFI/luft-start`, which trustd keeps in step with the newest version until the key is added. That way has no signed command line or TPM unlock, so an encrypted disk asks for its recovery key or passphrase. trustd asks shim again with a new code at the next starts, up to three times, and Sushi shows the code before each restart; after that, Settings (or `trustctl secure-boot enroll`) asks again. Once the key is in, trustd removes `EFI/luft-start` and its entry.
+If the blue screen was skipped, the computer still starts: shim shows "Verification failed" for SushiBoot, and after OK the firmware moves on to the entry called "Luft without its key". It starts the same version through Fedora's signed GRUB and kernel, from `EFI/luft-start` (the kernel itself is on the startup partition when there is one), which trustd keeps in step with the newest version until the key is added. That way has no signed command line or TPM unlock, so an encrypted disk asks for its recovery key or passphrase. trustd asks shim again with a new code at the next starts, up to three times, and Sushi shows the code before each restart; after that, Settings (or `trustctl secure-boot enroll`) asks again. Once the key is in, trustd removes `EFI/luft-start` and its entry.
 
 The key can also be added from the blue screen without a code: press a key for key management, then Enroll key from disk, the EFI system partition, `EFI`, `luft`, `luft.cer`, Continue, Yes and Reboot.
 

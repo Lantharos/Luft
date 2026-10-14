@@ -62,6 +62,25 @@ pub fn is_partition(name: &str) -> bool {
     class(name).join("partition").exists()
 }
 
+pub fn partitions_of(disk: &str) -> Vec<String> {
+    std::fs::read_dir(class(disk))
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .filter(|name| is_partition(name))
+        .collect()
+}
+
+pub fn partition_type(name: &str) -> Option<String> {
+    let numbers = std::fs::read_to_string(class(name).join("dev")).ok()?;
+    std::fs::read_to_string(format!("/run/udev/data/b{}", numbers.trim()))
+        .ok()?
+        .lines()
+        .find_map(|line| line.strip_prefix("E:ID_PART_ENTRY_TYPE="))
+        .map(str::to_lowercase)
+}
+
 pub fn disk_of(partition: &str) -> Option<String> {
     let path = std::fs::canonicalize(class(partition)).ok()?;
     Some(path.parent()?.file_name()?.to_string_lossy().into_owned())

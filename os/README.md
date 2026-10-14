@@ -25,6 +25,7 @@ The first build downloads Fedora packages, Mutter's source and the web runtime a
 | `image/Containerfile` | The build: one stage each for Kestrel, the boot and security services, and the apps, then the image |
 | `image/stages` | The scripts each stage runs |
 | `image/packages` | Fedora packages for building, those added to the image, and the GNOME parts Kestrel replaces |
+| `image/patches` | Changes to Fedora packages the image rebuilds, such as bootc |
 | `image/files` | Files copied into the image as they are |
 | `image/startup` | Building and signing the startup image |
 | `image/keys` | Luft's public Secure Boot certificate and TPM policy key |

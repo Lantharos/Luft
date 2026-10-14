@@ -7,12 +7,13 @@ Installs Luft from the USB stick and sets up a new computer the first time it st
 ## Features
 
 - Language, keyboard and time zone, guessed from the firmware, from Windows on the same computer, and from the network once online
-- Alongside Windows with a size bar, on a whole drive, in free space made with Disks, or just trying Luft from the stick
+- Alongside Windows with a size bar, on a whole drive, in free space made with Disks, or just trying Luft from the stick, next to Windows' small EFI system partition too
 - Refuses to touch Windows while it's hibernating, locked with BitLocker or needs a check, and says what to do in Windows
 - Next to Windows, offers to turn off Fast Startup, keep the clock right in both and bring Bluetooth devices paired in Windows
 - Copies Luft in the background while you connect to Wi-Fi and make your account
 - Picks the NVIDIA image when the computer has an NVIDIA graphics card
-- On first start, right after signing in: explains the one blue Secure Boot screen with pictures and the code to type, offers encryption with a recovery key and a fingerprint when there's a reader, then hands over to the desktop
+- Before the restart, explains the one blue Secure Boot screen with pictures and the code to type
+- On first start, right after signing in: asks again if the blue screen was skipped, offers encryption with a recovery key and a fingerprint when there's a reader, then hands over to the desktop
 - Listed in Start only on the stick
 
 ## Parts
@@ -62,4 +63,4 @@ runs the setup checks in a headless Kestrel in setup mode, against stand-ins for
 installer/vm/run.sh
 ```
 
-installs for real in a VM: it seals a test image from `localhost/luft-system:45` (made by `os/image/build.sh`) with the installer, starts it with three spare drives, installs onto an empty drive and into free space next to an existing partition with `bootc install to-filesystem`, checks the account, regional settings, first sign-in and the startup files on the EFI system partition, checks that only the new account can end setup, then starts the installed drive with UEFI. It needs Podman, QEMU with KVM and OVMF; everything lives in `installer/target/vm`.
+installs for real in a VM: it seals a test image from `localhost/luft-system:45` (made by `os/image/build.sh`) with the installer, starts it with four spare drives, installs onto an empty drive, into free space next to an existing partition and next to a Windows-like drive with a 100 MB EFI system partition with `bootc install to-filesystem`, checks the account, regional settings, first sign-in and the startup files on the EFI system partition, checks that only the new account can end setup, checks that Windows' files and boot files stay, then starts both installed drives with UEFI. It needs Podman, QEMU with KVM and OVMF; everything lives in `installer/target/vm`.

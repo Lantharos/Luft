@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { restart, finishSetup } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
+	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { install } from '#lib/state/install.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 
@@ -14,6 +15,8 @@
 	};
 
 	let status = $derived(install.status);
+	let code = $derived(status?.secureBootCode ?? '');
+	let pointer = $derived(setup.hardware.touchpad ? 'touchpad' : 'mouse');
 	let percent = $derived(Math.round((status?.progress ?? 0) * 100));
 	let problem = $state('');
 
@@ -31,6 +34,19 @@
 		{#snippet actions()}
 			<button type="button" class="plain-button large" onclick={() => finishSetup()}>Use Luft from the stick</button>
 			<button type="button" class="button large px-6" onclick={restartNow}>Restart</button>
+		{/snippet}
+	</StepFrame>
+{:else if install.finished && code}
+	<StepFrame
+		title="Luft is installed"
+		description="Take out the USB stick once the screen goes dark. Right after, your computer asks once on a blue screen whether to trust Luft. Use the arrow keys and Enter there, since the {pointer} doesn’t work on it."
+	>
+		<EnrollSteps {code} />
+		{#if problem}
+			<p class="mt-5 text-[13.5px] text-[var(--danger)]">{problem}</p>
+		{/if}
+		{#snippet actions()}
+			<button type="button" class="button primary large px-6" onclick={restartNow}>Restart now</button>
 		{/snippet}
 	</StepFrame>
 {:else if install.finished}

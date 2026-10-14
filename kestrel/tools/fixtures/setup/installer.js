@@ -5,6 +5,7 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <property name="Stage" type="s" access="read"/>
   <property name="Progress" type="d" access="read"/>
   <property name="Error" type="s" access="read"/>
+  <property name="SecureBootCode" type="s" access="read"/>
   <method name="Survey"><arg type="s" direction="out"/></method>
   <method name="Install"><arg type="s" direction="in"/></method>
   <method name="Configure"><arg type="s" direction="in"/></method>
@@ -21,12 +22,14 @@ export const INSTALLER_NAME = 'com.lantharos.Installer1';
 
 const GB = 1e9;
 const MIB = 1024 ** 2;
+const GIB = 1024 ** 3;
+const SECURE_BOOT_CODE = '48203917';
 
 const SURVEY = {
   drives: [
     {
       block: '/org/freedesktop/UDisks2/block_devices/nvme0n1', device: '/dev/nvme0n1', name: 'Samsung SSD 980 PRO', size: 1000 * GB,
-      kind: 'nvme', removable: false, blocked: null, partitions: 4, esp: {offset: MIB, size: 100 * MIB},
+      kind: 'nvme', removable: false, blocked: null, partitions: 4, esp: {offset: MIB, size: 100 * MIB}, startupSpace: 2 * GIB,
       windows: {
         block: '/org/freedesktop/UDisks2/block_devices/nvme0n1p3', offset: 129 * MIB, size: 998 * GB, used: 212 * GB,
         smallest: 233 * GB, room: 765 * GB, version: 'Windows 11 Home', fastStartup: true, universalClock: false, bluetooth: 3, blocked: null,
@@ -35,11 +38,12 @@ const SURVEY = {
     },
     {
       block: '/org/freedesktop/UDisks2/block_devices/sda', device: '/dev/sda', name: 'WD Blue SA510', size: 500 * GB,
-      kind: 'ssd', removable: false, blocked: null, partitions: 1, esp: null, windows: null, free: [{offset: 400 * GB, size: 100 * GB}],
+      kind: 'ssd', removable: false, blocked: null, partitions: 1, esp: null, startupSpace: GIB, windows: null,
+      free: [{offset: 400 * GB, size: 100 * GB}],
     },
     {
       block: '/org/freedesktop/UDisks2/block_devices/sdb', device: '/dev/sdb', name: 'SanDisk Ultra', size: 32 * GB,
-      kind: 'usb', removable: true, blocked: 'running', partitions: 2, esp: null, windows: null, free: [],
+      kind: 'usb', removable: true, blocked: 'running', partitions: 2, esp: null, startupSpace: GIB, windows: null, free: [],
     },
   ],
   hints: {timezone: 'Europe/Berlin', keyboard: {layout: 'de', variant: 'nodeadkeys'}, locale: 'de_DE'},
@@ -48,7 +52,7 @@ const SURVEY = {
 };
 
 export function publishInstaller(publish, calls) {
-  const state = {Phase: 'live', Stage: 'idle', Progress: 0, Error: ''};
+  const state = {Phase: 'live', Stage: 'idle', Progress: 0, Error: '', SecureBootCode: ''};
   const requests = [];
   let exported = null;
   const set = changes => {
@@ -69,6 +73,9 @@ export function publishInstaller(publish, calls) {
     get Error() {
       return state.Error;
     },
+    get SecureBootCode() {
+      return state.SecureBootCode;
+    },
     Survey: () => JSON.stringify(SURVEY),
     Install: request => {
       requests.push(request);
@@ -84,7 +91,7 @@ export function publishInstaller(publish, calls) {
   }, '/com/lantharos/Installer1');
   publish(CONTROL, {
     SetPhase: phase => set({Phase: phase}),
-    SetStage: (stage, progress) => set({Stage: stage, Progress: progress}),
+    SetStage: (stage, progress) => set({Stage: stage, Progress: progress, SecureBootCode: stage === 'finished' ? SECURE_BOOT_CODE : ''}),
     Requests: () => requests.splice(0),
   }, '/com/lantharos/KestrelChecks/Installer');
 }

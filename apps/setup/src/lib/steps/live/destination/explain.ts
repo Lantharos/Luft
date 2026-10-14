@@ -2,11 +2,6 @@ import { bytes } from '@luft/ui';
 import type { Drive, WindowsVolume } from '#lib/api/installer.js';
 
 const GIB = 1024 ** 3;
-const ESP = GIB;
-
-export function overhead(drive: Drive) {
-	return drive.esp ? 0 : ESP;
-}
 
 export function windowsName(windows: WindowsVolume) {
 	return windows.version ?? 'Windows';
@@ -22,8 +17,6 @@ export function whyWindowsCantShrink(windows: WindowsVolume, needed: number): st
 			return 'Windows’ drive needs a quick check first. Start Windows, restart it once, then start Luft again.';
 		case 'full':
 			return `Windows needs almost all of its drive. Free up about ${bytes(Math.max(needed - windows.room, GIB))} in Windows, then start Luft again.`;
-		case 'small-esp':
-			return 'The partition this computer starts from is too small to hold Luft’s startup files next to Windows. Install Luft on another drive, or use a whole drive.';
 		default:
 			return '';
 	}

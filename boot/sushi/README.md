@@ -98,7 +98,7 @@ sudo plymouth display-message --text="Upgrading firefox"
 
 ## SushiBoot
 
-SushiBoot reads unified kernel images and [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries from every EFI system partition, finds Windows and other systems, and draws its menu under the firmware logo. Holding any key while it starts shows the menu.
+SushiBoot reads unified kernel images and [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries from every EFI system partition and from the XBOOTLDR partition next to the one it started from, finds Windows and other systems, and draws its menu under the firmware logo. Holding any key while it starts shows the menu.
 
 - Menu: the newest image of each system, its titled profiles (such as Rescue), Previous versions, BLS entries, other systems, and Firmware settings.
 - Startup images listed by BLS entries (`uki` or `efi`), such as the ones bootc writes for each version of Luft, count as images: the entry with the lowest `sort-key` is the newest, and the others go under Previous versions, titled with the image's `IMAGE_VERSION`.

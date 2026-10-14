@@ -4,7 +4,7 @@ export type Phase = 'live' | 'first-boot' | 'installed';
 export type Stage = 'idle' | 'preparing' | 'copying' | 'waiting' | 'configuring' | 'finished' | 'failed';
 export type DriveKind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type DriveBlock = 'running' | 'read-only' | 'too-small';
-export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full' | 'small-esp';
+export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full';
 
 export interface InstallerState {
 	phase: Phase;
@@ -43,6 +43,7 @@ export interface Drive {
 	blocked: DriveBlock | null;
 	partitions: number;
 	esp: Space | null;
+	startupSpace: number;
 	windows: WindowsVolume | null;
 	free: Space[];
 }

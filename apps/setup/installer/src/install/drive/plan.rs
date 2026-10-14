@@ -1,7 +1,7 @@
 use anyhow::{Result, bail};
 use serde::Deserialize;
 
-use super::layout::{self, Part};
+use super::layout::{self, Part, Startup};
 use crate::install::windows::Choices;
 use crate::survey::{self, ALIGNMENT, Drive, Survey};
 
@@ -48,14 +48,6 @@ fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
     Ok(drive)
 }
 
-fn needs_own_esp(drive: &Drive) -> Result<bool> {
-    match drive.esp {
-        None => Ok(true),
-        Some(esp) if layout::shares_esp(Some(esp.size)) => Ok(false),
-        Some(_) => bail!("The drive's EFI system partition is too small for Luft's startup files."),
-    }
-}
-
 pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
     match target {
         Target::Whole { drive: block } => {
@@ -70,7 +62,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
         }
         Target::Alongside { drive: block, size } => {
             let drive = drive(survey, block)?;
-            let own_esp = needs_own_esp(drive)?;
+            let startup = Startup::for_esp(drive.esp.map(|esp| esp.size));
             let Some(windows) = drive
                 .windows
                 .as_ref()
@@ -79,7 +71,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
                 bail!("Windows on that drive can't be made smaller.");
             };
             let size = survey::room::align_down(*size);
-            if size < survey.smallest_system + layout::overhead(own_esp) || size > windows.room {
+            if size < survey.smallest_system + startup.space() || size > windows.room {
                 bail!("That size doesn't fit next to Windows.");
             }
             let kept = windows.size - size;
@@ -91,7 +83,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
                     block: windows.block.clone(),
                     size: kept,
                 }),
-                parts: layout::within(windows.offset + kept, size, own_esp),
+                parts: layout::within(windows.offset + kept, size, startup),
             })
         }
         Target::Free {
@@ -99,11 +91,11 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
             offset,
         } => {
             let drive = drive(survey, block)?;
-            let own_esp = needs_own_esp(drive)?;
+            let startup = Startup::for_esp(drive.esp.map(|esp| esp.size));
             let Some(space) = drive.free.iter().find(|space| space.offset == *offset) else {
                 bail!("That free space isn't there anymore.");
             };
-            if space.size < survey.smallest_system + layout::overhead(own_esp) + ALIGNMENT {
+            if space.size < survey.smallest_system + startup.space() + ALIGNMENT {
                 bail!("That free space is too small for Luft.");
             }
             Ok(Plan {
@@ -111,7 +103,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
                 device: drive.device.clone(),
                 wipe: false,
                 shrink: None,
-                parts: layout::within(space.offset, space.size, own_esp),
+                parts: layout::within(space.offset, space.size, startup),
             })
         }
     }

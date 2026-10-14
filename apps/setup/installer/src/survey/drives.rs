@@ -9,7 +9,7 @@ use super::room;
 use luft_windows::bluetooth::Pairing;
 
 use super::windows::{self, Hints};
-use crate::install::drive::layout::{ESP_TYPE, shares_esp};
+use crate::install::drive::layout::{ESP_TYPE, Startup};
 
 const LIVE_MEDIUM: &str = "/run/initramfs";
 const BITLOCKER: &str = "BitLocker";
@@ -27,6 +27,7 @@ pub struct Drive {
     pub blocked: Option<&'static str>,
     pub partitions: usize,
     pub esp: Option<Space>,
+    pub startup_space: u64,
     pub windows: Option<WindowsVolume>,
     pub free: Vec<Space>,
 }
@@ -106,12 +107,7 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
     let windows = if drive.removable {
         None
     } else {
-        find_windows(drive, smallest_system).map(|windows| WindowsVolume {
-            blocked: windows.blocked.or(esp
-                .filter(|esp| !shares_esp(Some(esp.size)))
-                .map(|_| "small-esp")),
-            ..windows
-        })
+        find_windows(drive, smallest_system)
     };
     Drive {
         block: drive.block.clone(),
@@ -123,6 +119,7 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
         blocked: blocked(drive, smallest_system),
         partitions: volumes(drive).count(),
         esp,
+        startup_space: Startup::for_esp(esp.map(|esp| esp.size)).space(),
         free: drive
             .segments
             .iter()

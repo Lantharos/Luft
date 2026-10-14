@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 
 use super::esp::Esp;
 use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
+use super::partition::BootPartition;
 use super::pe::StartupImage;
 
 pub const FOLDER: &str = "EFI/luft-start";
@@ -31,9 +32,9 @@ fn parse(text: &str, name: &str) -> Option<Entry> {
     })
 }
 
-fn default_image(esp: &Esp) -> Result<PathBuf> {
-    let entry = std::fs::read_dir(esp.file(ENTRIES))
-        .context("The EFI system partition has no boot entries.")?
+fn default_image(boot: &BootPartition) -> Result<PathBuf> {
+    let entry = std::fs::read_dir(boot.file(ENTRIES))
+        .context("The boot partition has no boot entries.")?
         .flatten()
         .filter_map(|file| {
             let name = file.file_name().to_string_lossy().into_owned();
@@ -41,36 +42,38 @@ fn default_image(esp: &Esp) -> Result<PathBuf> {
         })
         .min_by(|a, b| a.sort_key.cmp(&b.sort_key))
         .context("No boot entry starts a startup image.")?;
-    Ok(esp.file(entry.image.trim_start_matches('/')))
+    Ok(boot.file(entry.image.trim_start_matches('/')))
 }
 
-fn grub_config(command_line: &str) -> String {
+fn grub_config(boot_uuid: &str, command_line: &str) -> String {
     format!(
-        "set timeout=0\nlinux /{FOLDER}/{KERNEL} {command_line}\ninitrd /{FOLDER}/{INITRD}\nboot\n"
+        "set timeout=0\nsearch --no-floppy --fs-uuid --set=root {boot_uuid}\nlinux /{FOLDER}/{KERNEL} {command_line}\ninitrd /{FOLDER}/{INITRD}\nboot\n"
     )
 }
 
-pub fn place(esp: &Esp) -> Result<bool> {
-    let mut image = StartupImage::open(&default_image(esp)?)?;
+pub fn place(esp: &Esp, boot: &BootPartition) -> Result<bool> {
+    let mut image = StartupImage::open(&default_image(boot)?)?;
     let command_line = String::from_utf8_lossy(&image.section(".cmdline")?)
         .trim_matches(char::from(0))
         .trim()
         .to_owned();
-    let folder = esp.file(FOLDER);
+    let loaders = esp.file(FOLDER);
+    let system = boot.file(FOLDER);
     let shim = files::shim_folder()?;
     let mut changed = false;
-    changed |= files::copy_if_changed(&shim.join(SHIM), &folder.join(SHIM))?;
-    changed |= files::copy_if_changed(&shim.join(MOK_MANAGER), &folder.join(MOK_MANAGER))?;
-    changed |= files::copy_if_changed(&files::grub()?, &folder.join(SECOND_STAGE))?;
-    changed |= files::write_if_changed(&folder.join(KERNEL), &image.section(".linux")?)?;
-    changed |= files::write_if_changed(&folder.join(INITRD), &image.section(".initrd")?)?;
+    changed |= files::copy_if_changed(&shim.join(SHIM), &loaders.join(SHIM))?;
+    changed |= files::copy_if_changed(&shim.join(MOK_MANAGER), &loaders.join(MOK_MANAGER))?;
+    changed |= files::copy_if_changed(&files::grub()?, &loaders.join(SECOND_STAGE))?;
+    changed |= files::write_if_changed(&system.join(KERNEL), &image.section(".linux")?)?;
+    changed |= files::write_if_changed(&system.join(INITRD), &image.section(".initrd")?)?;
     changed |= files::write_if_changed(
-        &folder.join(GRUB_CONFIG),
-        grub_config(&command_line).as_bytes(),
+        &loaders.join(GRUB_CONFIG),
+        grub_config(&boot.uuid, &command_line).as_bytes(),
     )?;
     Ok(changed)
 }
 
-pub fn remove(esp: &Esp) {
+pub fn remove(esp: &Esp, boot: &BootPartition) {
     let _ = std::fs::remove_dir_all(esp.file(FOLDER));
+    let _ = std::fs::remove_dir_all(boot.file(FOLDER));
 }

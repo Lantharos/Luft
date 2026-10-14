@@ -3,7 +3,7 @@
 	import type { Drive, WindowsVolume } from '#lib/api/installer.js';
 	import SplitBar from '#lib/components/SplitBar.svelte';
 	import { install } from '#lib/state/install.svelte.js';
-	import { overhead, whyWindowsCantShrink } from './explain.js';
+	import { whyWindowsCantShrink } from './explain.js';
 	import WindowsOptions from './WindowsOptions.svelte';
 
 	interface Props {
@@ -18,7 +18,7 @@
 	let { drive, smallest, onsize }: Props = $props();
 
 	let windows = $derived(drive.windows);
-	let min = $derived(smallest + overhead(drive));
+	let min = $derived(smallest + drive.startupSpace);
 	let max = $derived(windows.room);
 	let blocked = $derived(windows.blocked ?? (max < min ? 'full' : null));
 	let size = $state(0);

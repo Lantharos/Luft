@@ -8,9 +8,11 @@ use crate::system::{blocks, efi};
 
 const MOUNTS: [&str; 3] = ["/efi", "/boot", "/boot/efi"];
 const PRIVATE_MOUNT: &str = "esp";
+const ESP_TYPE: &str = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
 
 pub struct Esp {
     pub path: PathBuf,
+    pub name: String,
     pub disk: String,
     pub partition: u32,
 }
@@ -20,6 +22,12 @@ fn vfat_at(path: &Path) -> Option<blocks::Mount> {
     blocks::mount_at(&path.to_string_lossy()).filter(|mount| mount.fstype == "vfat")
 }
 
+fn is_esp(mount: &blocks::Mount) -> bool {
+    blocks::kernel_name(&mount.source)
+        .and_then(|name| blocks::partition_type(&name))
+        .is_some_and(|kind| kind == ESP_TYPE)
+}
+
 fn describe(path: &Path, device: &Path) -> Result<Esp> {
     let name = blocks::kernel_name(device).context("The EFI system partition has no device.")?;
     Ok(Esp {
@@ -27,6 +35,7 @@ fn describe(path: &Path, device: &Path) -> Result<Esp> {
         disk: blocks::disk_of(&name).context("The EFI system partition isn't on a disk.")?,
         partition: blocks::partition_number(&name)
             .context("The EFI system partition isn't a partition.")?,
+        name,
     })
 }
 
@@ -45,7 +54,7 @@ pub fn find() -> Result<Esp> {
     match MOUNTS
         .iter()
         .map(Path::new)
-        .find_map(|path| Some((path, vfat_at(path)?)))
+        .find_map(|path| Some((path, vfat_at(path).filter(is_esp)?)))
     {
         Some((path, mount)) => describe(path, &mount.source),
         None => mount_the_one_started_from(),

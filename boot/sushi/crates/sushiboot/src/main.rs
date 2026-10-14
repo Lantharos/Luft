@@ -51,7 +51,7 @@ fn efi_main() -> Status {
     let Some(first) = catalog.first() else {
         return Status::NOT_FOUND;
     };
-    vars::describe(&catalog);
+    vars::describe(&catalog, device);
     let config = conf::load(device);
     let default = [vars::take_oneshot(), vars::chosen_default(), config.default]
         .iter()

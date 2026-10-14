@@ -40,6 +40,7 @@ podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage"
 
 rm -rf "$vm/source" && mkdir -p "$vm/source"
 podman save --quiet --format oci-archive --output "$vm/source/luft.ociarchive" "$image"
+mkdir -p "$vm/source/windows" && "$here/windows-hive.py" "$vm/source/windows/SYSTEM"
 rm -f "$vm/source.img" "$vm/root.img"
 mkfs.ext4 -q -F -L luft-source -d "$vm/source" "$vm/source.img" "$(($(du -sm "$vm/source" | cut -f1) + 512))M"
 podman unshare sh -c "
@@ -53,8 +54,9 @@ podman unshare sh -c "
 "
 objcopy -O binary --only-section=.initrd "$vm/startup.efi" "$vm/initramfs.img"
 
-rm -f "$vm/whole.img" "$vm/free.img"
+rm -f "$vm/whole.img" "$vm/free.img" "$vm/windows.img"
 truncate -s 40G "$vm/whole.img"
+truncate -s 80G "$vm/windows.img"
 truncate -s 60G "$vm/free.img"
 printf 'label: gpt\nsize=8GiB, type=linux\n' | sfdisk --quiet "$vm/free.img"
 mkdir -p "$vm/kept" && echo "still here" > "$vm/kept/kept"
@@ -71,27 +73,34 @@ timeout 1h qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 4 -m 6144 -n
   -drive "file=$vm/whole.img,format=raw,if=virtio" \
   -drive "file=$vm/free.img,format=raw,if=virtio" \
   -drive "file=$vm/source.img,format=raw,if=virtio,readonly=on" \
+  -drive "file=$vm/windows.img,format=raw,if=virtio" \
   -serial "file:$vm/serial.log"
 
 grep 'luft-installer-check:' "$vm/serial.log"
 grep -q 'luft-installer-check: DONE' "$vm/serial.log"
 
-rm -f "$vm/installed.log"
-qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 2 -m 4096 -display none \
-  -drive "if=pflash,format=raw,readonly=on,file=$firmware/OVMF_CODE.fd" \
-  -drive "if=pflash,format=raw,file=$vm/vars.fd" \
-  -drive "file=$vm/whole.img,format=raw,if=virtio" \
-  -serial "file:$vm/installed.log" &
-qemu=$!
-for _ in $(seq 180); do
-  grep -qa 'login:' "$vm/installed.log" 2> /dev/null && break
-  sleep 1
-done
-kill "$qemu"
-wait "$qemu" 2> /dev/null || true
-if grep -qa 'login:' "$vm/installed.log"; then
-  echo "luft-installer-check: PASS the installed drive starts on its own"
-else
-  echo "luft-installer-check: FAIL the installed drive didn't start, see $vm/installed.log"
-  exit 1
-fi
+starts() {
+  local drive="$1" what="$2" log="$vm/installed-$1.log"
+  rm -f "$log"
+  qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 2 -m 4096 -display none \
+    -drive "if=pflash,format=raw,readonly=on,file=$firmware/OVMF_CODE.fd" \
+    -drive "if=pflash,format=raw,file=$vm/vars.fd" \
+    -drive "file=$vm/$drive.img,format=raw,if=virtio" \
+    -serial "file:$log" &
+  local qemu=$!
+  for _ in $(seq 180); do
+    grep -qa 'login:' "$log" 2> /dev/null && break
+    sleep 1
+  done
+  kill "$qemu"
+  wait "$qemu" 2> /dev/null || true
+  if grep -qa 'login:' "$log"; then
+    echo "luft-installer-check: PASS $what starts on its own"
+  else
+    echo "luft-installer-check: FAIL $what didn't start, see $log"
+    exit 1
+  fi
+}
+
+starts whole "the installed drive"
+starts windows "Luft next to Windows"

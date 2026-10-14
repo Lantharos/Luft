@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
     tags: ["v*"]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/workflows/iso.yml"
+      - "os/iso/**"
   workflow_dispatch:
 
 concurrency:

@@ -11,6 +11,7 @@ const NVIDIA: &str = "nvidia";
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Config {
+    #[serde(default)]
     images: HashMap<String, Source>,
     #[serde(default)]
     pub bootloader: Option<String>,

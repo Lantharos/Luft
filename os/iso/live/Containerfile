@@ -1,7 +1,9 @@
 ARG IMAGE=localhost/luft:45
 FROM ${IMAGE}
+ARG INSTALL_IMAGES
 COPY files/ /
-RUN useradd --no-create-home --groups wheel --comment Luft live && \
+RUN printf '%s\n' "$INSTALL_IMAGES" >> /usr/lib/luft-installer/install.toml && \
+    useradd --no-create-home --groups wheel --comment Luft live && \
     passwd --delete live && \
     systemctl mask bootloader-update.service && \
     systemctl --global mask luft-keyring.service luft-keyring.socket && \

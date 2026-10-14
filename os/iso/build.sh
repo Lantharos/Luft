@@ -46,8 +46,14 @@ ensure_images() {
   done
 }
 
+install_images() {
+  printf '\n[images.%s]\nsource = "containers-storage:%s"\nsize = %s\n' \
+    default "$published" "$(image_value "$image" '{{.Size}}')" \
+    nvidia "$published-nvidia" "$(image_value "$image-nvidia" '{{.Size}}')"
+}
+
 build_containers() {
-  podman build --quiet --tag "$live_image" --build-arg "IMAGE=$image" "$iso/live" >/dev/null
+  podman build --quiet --tag "$live_image" --build-arg "IMAGE=$image" --build-arg "INSTALL_IMAGES=$(install_images)" "$iso/live" >/dev/null
   podman build --quiet --tag "$tools" "$iso" >/dev/null
 }
 

@@ -2,21 +2,21 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
+	import { weekdayName } from './weekStart.svelte';
+
 	interface Props {
+		firstWeekday: number;
 		year: number;
 		month: number;
 		day: number;
 		onselect: (year: number, month: number, day: number) => void;
 	}
 
-	const SUNDAY = Date.UTC(2023, 0, 1);
-	const DAY = 86_400_000;
-	const firstWeekday = new Intl.Locale(navigator.language).getWeekInfo().firstDay % 7;
 	const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' });
-	const weekdayFormat = new Intl.DateTimeFormat(undefined, { weekday: 'narrow', timeZone: 'UTC' });
-	const weekdays = Array.from({ length: 7 }, (_, index) => weekdayFormat.format(SUNDAY + ((firstWeekday + index) % 7) * DAY));
 
-	let { year, month, day, onselect }: Props = $props();
+	let { firstWeekday, year, month, day, onselect }: Props = $props();
+
+	let weekdays = $derived(Array.from({ length: 7 }, (_, index) => weekdayName((firstWeekday + index) % 7, 'narrow')));
 
 	let shift = $state(0);
 

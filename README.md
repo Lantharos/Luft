@@ -51,7 +51,7 @@ Luft is an operating system built on Fedora. It has its own shell and login scre
 sudo dnf builddep mutter
 sudo dnf install meson ninja-build sassc gjs-devel gtk4-devel at-spi2-atk-devel gsettings-desktop-schemas-devel \
   json-glib-devel librsvg2-devel glycin-devel libxkbcommon-devel NetworkManager-libnm-devel libsecret-devel \
-  pipewire-devel pulseaudio-libs-devel alsa-lib-devel gstreamer1-devel polkit-devel libxml2-devel \
+  pipewire-devel pulseaudio-libs-devel alsa-lib-devel gstreamer1-devel polkit-devel libxml2-devel libicu-devel \
   cargo pam-devel tpm2-tss-devel
 sudo dnf install greetd gstreamer1-plugin-gtk4 cldr-emoji-annotation
 ```

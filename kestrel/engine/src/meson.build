@@ -39,6 +39,7 @@ kestrel_deps = [
   atk_bridge_dep,
   gdk_pixbuf_dep,
   gjs_dep,
+  icu_dep,
   mtk_dep,
   clutter_dep,
   gi_dep,

@@ -122,6 +122,30 @@ async function checkAppRules() {
   }
 }
 
+async function checkCalendar() {
+  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  const locale = new Gio.Settings({schema_id: 'org.gnome.system.locale'});
+  const shortDay = day => new Intl.DateTimeFormat(undefined, {weekday: 'short'}).format(new Date(2023, 0, 1 + day)).slice(0, 2);
+  toggleSurface('notifications');
+  const center = named('kestrel-notifications');
+  await waitUntil(() => shown(center), 'the notification center opens');
+  const firstHeading = () => classed('kestrel-calendar-heading', center)[0].text;
+  try {
+    require(/, week \d+$/.test(firstStyled('kestrel-calendar-month', center).label), 'the month header shows the week number');
+    locale.set_string('region', 'de_DE.UTF-8');
+    await eventually(() => firstHeading() === shortDay(1), 'German region formats start the week on Monday');
+    settings.set_string('week-start', 'sunday');
+    await eventually(() => firstHeading() === shortDay(0), 'the week can start on Sunday whatever the region');
+    settings.set_string('week-start', 'monday');
+    await eventually(() => firstHeading() === shortDay(1), 'the week can start on Monday');
+    await capture('notification-calendar');
+  } finally {
+    settings.reset('week-start');
+    locale.reset('region');
+    dismissImmediately();
+  }
+}
+
 export async function run() {
   const replies = [];
   const unsubscribe = subscribe({iface: 'org.freedesktop.Notifications', member: 'NotificationReplied', path: '/org/freedesktop/Notifications'},
@@ -131,6 +155,7 @@ export async function run() {
     await checkCenter(replies);
     await checkBanner(replies);
     await checkAppRules();
+    await checkCalendar();
   } finally {
     unsubscribe();
     clearAll();

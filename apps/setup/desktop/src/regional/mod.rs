@@ -1,3 +1,4 @@
+mod formats;
 mod keyboards;
 mod zones;
 
@@ -96,4 +97,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
             TIME.change::<_, ()>("SetTimezone", &(zone, true))
                 .map_err(failed)
         })
+        .command("regional_formats_country", formats::unset_country)
+        .command("regional_set_formats", formats::set)
 }

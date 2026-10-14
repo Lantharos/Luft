@@ -1,16 +1,24 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { WeekStart } from './weekStart.js';
+
 const WEEKS = 6;
+const DAY = 86_400_000;
 const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
 const weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
+
+function isoWeek(date: Date): number {
+  const thursday = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 3 - (date.getDay() + 6) % 7));
+  return 1 + Math.floor((thursday.getTime() - Date.UTC(thursday.getUTCFullYear(), 0, 1)) / DAY / 7);
+}
 
 export class Calendar {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar' });
   private readonly month = new St.Button({ style_class: 'kestrel-calendar-month', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.START });
+  private readonly headings: St.Label[] = [];
   private readonly days: St.Label[] = [];
-  private readonly weekStart = Shell.util_get_week_start();
+  private readonly weekStart = new WeekStart();
   private shown = new Date();
 
   constructor() {
@@ -24,8 +32,9 @@ export class Calendar {
     const grid = new St.Widget({ style_class: 'kestrel-calendar-grid', layout_manager: new Clutter.GridLayout({ column_homogeneous: true, row_spacing: 2 }) });
     const layout = grid.layout_manager as Clutter.GridLayout;
     for (let column = 0; column < 7; column++) {
-      const sample = new Date(2023, 0, 1 + (this.weekStart + column) % 7);
-      layout.attach(new St.Label({ text: weekdayName.format(sample).slice(0, 2), style_class: 'kestrel-calendar-heading', x_expand: true }), column, 0, 1, 1);
+      const heading = new St.Label({ style_class: 'kestrel-calendar-heading', x_expand: true });
+      this.headings.push(heading);
+      layout.attach(heading, column, 0, 1, 1);
     }
     for (let index = 0; index < WEEKS * 7; index++) {
       const day = new St.Label({ style_class: 'kestrel-calendar-day', x_expand: true, x_align: Clutter.ActorAlign.CENTER });
@@ -33,6 +42,8 @@ export class Calendar {
       layout.attach(day, index % 7, 1 + Math.floor(index / 7), 1, 1);
     }
     this.actor.add_child(grid);
+    const unwatch = this.weekStart.watch(() => this.render());
+    this.actor.connect('destroy', unwatch);
     this.showToday();
   }
 
@@ -55,9 +66,13 @@ export class Calendar {
   }
 
   private render(): void {
-    this.month.label = monthTitle.format(this.shown);
     const now = new Date();
-    const offset = (this.shown.getDay() - this.weekStart + 7) % 7;
+    const current = this.shown.getFullYear() === now.getFullYear() && this.shown.getMonth() === now.getMonth();
+    this.month.label = `${monthTitle.format(this.shown)}, week ${isoWeek(current ? now : this.shown)}`;
+    const weekStart = this.weekStart.day;
+    for (const [column, heading] of this.headings.entries())
+      heading.text = weekdayName.format(new Date(2023, 0, 1 + (weekStart + column) % 7)).slice(0, 2);
+    const offset = (this.shown.getDay() - weekStart + 7) % 7;
     for (const [index, label] of this.days.entries()) {
       const date = new Date(this.shown.getFullYear(), this.shown.getMonth(), 1 + index - offset);
       label.text = `${date.getDate()}`;

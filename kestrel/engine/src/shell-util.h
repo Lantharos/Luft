@@ -13,7 +13,7 @@ G_BEGIN_DECLS
 void     shell_util_set_hidden_from_pick       (ClutterActor     *actor,
                                                 gboolean          hidden);
 
-int      shell_util_get_week_start             (void);
+int      shell_util_get_week_start             (const char *locale);
 
 const char *shell_util_translate_time_string   (const char *str);
 

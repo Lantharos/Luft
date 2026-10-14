@@ -26,6 +26,7 @@ class SetupState {
 		const phase = install.status?.phase ?? 'live';
 		if (phase === 'first-boot') {
 			this.trust = await trustState().catch(() => null);
+			void regional.adoptFormats().catch(() => {});
 			flow.begin(phase, firstBootSkips(this.trust, this.hardware));
 		} else {
 			await regional.start();

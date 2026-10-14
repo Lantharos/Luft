@@ -18,6 +18,7 @@ gstreamer1-plugins-base-devel
 gtk4-devel
 json-glib-devel
 libdrm-devel
+libicu-devel
 libseccomp-devel
 libsecret-devel
 librsvg2-devel

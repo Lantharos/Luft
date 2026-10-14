@@ -4,6 +4,7 @@
 	import { clock as readClock, onClockChanged, setAutomatic, zones as readZones, type Clock, type Zone } from './api';
 	import DateTimeDialog from './DateTimeDialog.svelte';
 	import TimeZoneDialog from './TimeZoneDialog.svelte';
+	import { useWeekStart, weekdayName } from './weekStart.svelte';
 	import { city, country, offsetLabel, offsetMinutes } from './zones';
 
 	type Interface = { 'clock-format': string; 'clock-show-seconds': boolean; 'clock-show-weekday': boolean };
@@ -13,6 +14,7 @@
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['clock-format', 'clock-show-seconds', 'clock-show-weekday']);
 	const datetime = useSettings<Datetime>('org.gnome.desktop.datetime', ['automatic-timezone']);
 	const location = useSettings<Location>('org.gnome.system.location', ['enabled']);
+	const weekStart = useWeekStart();
 
 	let clock = $state<Clock | null>(null);
 	let zones = $state<Zone[]>([]);
@@ -120,8 +122,23 @@
 	</Row>
 </Section>
 
+<Section title="Calendar">
+	<Row title="Week starts on" description={weekStart.choice === 'automatic' ? `${weekdayName(weekStart.regional, 'long')}, from your region` : undefined}>
+		<Segmented
+			label="Week starts on"
+			options={[
+				{ value: 'automatic', label: 'Automatic' },
+				{ value: 'monday', label: 'Monday' },
+				{ value: 'sunday', label: 'Sunday' }
+			]}
+			value={weekStart.choice}
+			onchange={weekStart.choose}
+		/>
+	</Row>
+</Section>
+
 {#if editing === 'zone'}
 	<TimeZoneDialog {zones} current={zone} {minute} {hour12} onclose={() => (editing = null)} />
 {:else if editing === 'time'}
-	<DateTimeDialog {zone} {hour12} onclose={() => (editing = null)} />
+	<DateTimeDialog {zone} {hour12} firstWeekday={weekStart.firstDay} onclose={() => (editing = null)} />
 {/if}

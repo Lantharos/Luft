@@ -9,10 +9,11 @@
 	interface Props {
 		zone: string;
 		hour12: boolean;
+		firstWeekday: number;
 		onclose: () => void;
 	}
 
-	let { zone, hour12, onclose }: Props = $props();
+	let { zone, hour12, firstWeekday, onclose }: Props = $props();
 
 	let time = $state(untrack(() => wallTime(zone, Date.now())));
 	let saving = $state(false);
@@ -41,6 +42,7 @@
 
 <Dialog title="Set date and time" {onclose}>
 	<Calendar
+		{firstWeekday}
 		year={time.year}
 		month={time.month}
 		day={time.day}

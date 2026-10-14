@@ -1,4 +1,4 @@
-import { catalog, locate, useKeyboard, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
+import { catalog, formatsCountry, locate, setFormats, useKeyboard, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
 import type { Hints, Keyboard } from '#lib/api/installer.js';
 import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, LANGUAGES, type Language } from '#lib/regional/languages.js';
 
@@ -26,7 +26,6 @@ class RegionalState {
 	keyboardName = $derived(this.catalog.keyboards.find((entry) => sameKeyboard(entry, this.keyboard))?.name ?? this.keyboard.layout);
 	zoneEntry = $derived(this.catalog.zones.find((entry) => entry.id === this.zone) ?? null);
 
-
 	async start() {
 		this.catalog = await catalog();
 		await this.locate();
@@ -52,6 +51,13 @@ class RegionalState {
 		if (layout && !this.chosen.has('keyboard') && !sameKeyboard(layout, this.keyboard)) this.applyKeyboard(layout);
 		const zone = timezone ?? this.catalog.zones.find((entry) => entry.code === country)?.id ?? null;
 		if (zone && !this.chosen.has('zone') && zone !== this.zone) this.applyZone(zone);
+	}
+
+	async adoptFormats() {
+		const country = await formatsCountry();
+		if (!country || countryOf(navigator.language) === country) return;
+		const { language } = new Intl.Locale(`und-${country}`).maximize();
+		await setFormats(`${language}_${country}.UTF-8`);
 	}
 
 	chooseLanguage(language: Language) {

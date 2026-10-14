@@ -45,7 +45,7 @@ The system is a bootc image from `ghcr.io/lantharos/luft`, or the `-nvidia` vari
 
 ## The first start
 
-Luft starts at the login screen with your new account. Sign in with the password you chose, and Install Luft opens over the blurred wallpaper for the last steps before the desktop appears.
+Luft starts at the login screen with your new account. Sign in with the password you chose, and Install Luft opens over the blurred wallpaper for the last steps before the desktop appears. When your time zone is in another country than your language, it also sets your region formats to that country, so a German time zone starts calendars on Monday. You can change the first day of the week in Settings, under Date and time.
 
 Before the first start, when Secure Boot is on, your computer asks once whether to trust Luft, on a blue screen right after the restart. Install Luft shows that screen ahead of time with an eight-digit code: press a key within ten seconds, choose *Enroll MOK*, *Continue*, *Yes*, type the code and choose *Reboot*. The blue screen only takes the arrow keys and Enter. If it's skipped, Luft still starts and asks again at the next restart. Details are in [Boot and recovery](boot.md#adding-lufts-secure-boot-key).
 

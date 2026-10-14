@@ -30,6 +30,12 @@
     <value nick="fullscreen" value="1"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.WeekStart">
+    <value nick="automatic" value="0"/>
+    <value nick="monday" value="1"/>
+    <value nick="sunday" value="2"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.TaskbarAlignment">
     <value nick="center" value="0"/>
     <value nick="left" value="1"/>
@@ -230,6 +236,13 @@
     <key name="emoji-skin-tone" enum="com.lantharos.kestrel.SkinTone">
       <default>'none'</default>
       <summary>Skin tone used for emoji of people and hands</summary>
+    </key>
+    <key name="week-start" enum="com.lantharos.kestrel.WeekStart">
+      <default>'automatic'</default>
+      <summary>First day of the week in calendars</summary>
+      <description>
+        “automatic” follows the region formats, from the region setting or LC_TIME.
+      </description>
     </key>
     <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
       <default>'center'</default>

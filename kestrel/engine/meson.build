@@ -68,6 +68,7 @@ gio_dep = dependency('gio-2.0', version: gio_req)
 gio_unix_dep = dependency('gio-unix-2.0', version: gio_req)
 gjs_dep = dependency('gjs-1.0', version: gjs_req)
 gtk_dep = dependency('gtk4', version: gtk_req)
+icu_dep = dependency('icu-i18n')
 libxml_dep = dependency('libxml-2.0')
 clutter_dep = dependency(clutter_pc, version: mutter_req)
 mtk_dep = dependency(mtk_pc, version: mutter_req)
@@ -141,10 +142,6 @@ cdata.set('HAVE_EXE_INTROSPECTION',
   cc.has_header('link.h') and
   cc.has_define('__GLIBC__', prefix: '#include <link.h>')
 )
-cdata.set('HAVE__NL_TIME_FIRST_WEEKDAY',
-  cc.has_header_symbol('langinfo.h', '_NL_TIME_FIRST_WEEKDAY')
-)
-
 polkit_has_autocleanup = cc.compiles(
 '''
   #define POLKIT_AGENT_I_KNOW_API_IS_SUBJECT_TO_CHANGE

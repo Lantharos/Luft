@@ -2,7 +2,10 @@
 
 Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mutter 51 and brings its own panel, Start menu, quick settings, notification center, lock screen, session manager, settings service and portal backend.
 
-![The notification center and calendar](../docs/screenshots/notification-center.png)
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="../docs/screenshots/notification-center-light.png">
+  <img src="../docs/screenshots/notification-center.png" alt="The notification center and calendar">
+</picture>
 
 ## Parts
 
@@ -18,7 +21,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 | `openconnect` | `kestrel-openconnect`, OpenConnect VPN sign-in |
 | `watchdog` | `kestrel-watchdog`, restarts cleanly when the GPU hangs |
 | `peek` | `peek`, lets other programs see and use windows |
-| `tools` | Development sessions, checks and the installer |
+| `tools` | Development sessions, checks and the install script |
 
 ## Features
 
@@ -38,7 +41,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 
 ## Build
 
-Building is covered in the [repository README](../README.md#build). To try a build in a window:
+Building is covered in the [repository README](../README.md#develop). To try a build in a window:
 
 ```sh
 kestrel/tools/session.sh nested
@@ -46,33 +49,21 @@ kestrel/tools/session.sh nested
 
 Other session modes and test options are in [docs/testing.md](../docs/testing.md).
 
-## Install as a login session
-
-```sh
-kestrel/tools/install.sh install            # into /opt/kestrel
-kestrel/tools/install.sh install /opt/other # another prefix
-kestrel/tools/install.sh remove
-```
-
-This builds Kestrel, its Mutter, `kestrel-settings`, `kestrel-openconnect`, `peek`, Luft Keyring and the watchdog, installs them into the prefix, and links the session entry, user units, portal configuration, `peek` and fonts into `/usr/local`. It also installs the login screen service, the lock screen's `kestrel-authenticate` socket and the watchdog's system service. Session entries are only linked for prefixes under `/opt` or `/usr`. Reinstalling removes files an earlier install left behind.
-
-### Setting up the login screen
-
-A fresh Fedora install starts GDM. Switch to greetd:
-
-```sh
-sudo dnf install greetd
-kestrel/tools/install.sh install
-sudo cp /opt/kestrel/share/kestrel/greetd.toml /etc/greetd/config.toml
-sudo systemctl disable gdm && sudo systemctl enable greetd
-systemctl reboot
-```
-
-The login screen runs on virtual terminal 7. If it doesn't appear, press Ctrl+Alt+F3, sign in, and check `journalctl -b -u greetd`.
-
 ![The login screen](../docs/screenshots/login-users.png)
 
-The Login Screen page in Settings chooses the wallpaper, which people are listed, the default session and automatic login (written as `initial_session` in `/etc/greetd/config.toml`).
+The login screen runs on greetd. The Login Screen page in Settings chooses its wallpaper, which people are listed, the default session and automatic login.
+
+## On a regular Fedora system
+
+Luft's image carries Kestrel. To use a development build as your session on a regular Fedora install instead:
+
+```sh
+kestrel/tools/install.sh install     # into /opt/kestrel, with Luft Keyring, the login screen service and the watchdog
+sudo cp /opt/kestrel/share/kestrel/greetd.toml /etc/greetd/config.toml
+sudo systemctl disable gdm && sudo systemctl enable greetd
+```
+
+`kestrel/tools/install.sh remove` takes it out again. If the login screen doesn't appear after a restart, press Ctrl+Alt+F3, sign in, and check `journalctl -b -u greetd`.
 
 ## Keyboard shortcuts
 
@@ -179,9 +170,3 @@ Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-
 `kestrel-session --setup` first runs Kestrel in setup mode, which shows only Install Luft over the blurred wallpaper, then starts the session when setup finishes ([docs/install.md](../docs/install.md)).
 
 The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior. Portal preferences are in `kestrel-portals.conf`: Kestrel handles everything except file dialogs (Rover) and secrets (Luft Keyring).
-
-## Before it becomes the default session
-
-1. Qualify the session end to end on real hardware, including monitor hotplug and mixed scaling.
-2. Verify polkit, network credentials, lock and unlock, OSDs and accessibility in a real login session.
-3. Package Kestrel with a pinned Mutter ABI and test on a disposable machine.

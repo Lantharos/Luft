@@ -180,7 +180,7 @@ install_everything() {
     sudo fc-cache /usr/local/share/fonts
     systemctl --user daemon-reload
     echo "Kestrel is installed in $prefix and appears as a session on the login screen."
-    echo "The Kestrel login screen is ready for greetd; see Setting up the login screen in kestrel/README.md."
+    echo "The Kestrel login screen is ready for greetd; see On a regular Fedora system in kestrel/README.md."
     check_runtime
   else
     echo "Kestrel is installed in $prefix. Session entries are only linked for system prefixes."

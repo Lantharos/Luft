@@ -30,14 +30,12 @@ Browsers call it a security key and don't offer passkeys in autofill. That needs
 
 ## Install
 
-Install Kestrel and Luft Keyring first (`kestrel/tools/install.sh install`), then:
+Luft's image carries Luft Passkeys. On a regular Fedora system, after `kestrel/tools/install.sh install`:
 
 ```sh
 kestrel/passkeys/install.sh install   # build, install into /opt/kestrel and enable
-kestrel/passkeys/install.sh remove    # disable and remove
+kestrel/passkeys/install.sh remove    # disable and remove; saved passkeys stay in the keyring
 ```
-
-This installs both programs into `/opt/kestrel/libexec`, and the relay's socket and service, the session service and its D-Bus activation file under `/usr/local`. It enables `luft-passkeys-relay.socket` and the session service for every user. Removing leaves saved passkeys in the keyring.
 
 The relay needs no SELinux policy of its own; its unit drops every capability and denies the network, home folders and every device except `/dev/uhid`.
 

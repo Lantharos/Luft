@@ -29,7 +29,7 @@ SushiBoot, in the same folder, is the UEFI boot menu Luft starts through.
 
 ## Install
 
-The [Luft image](../../os/README.md) carries Sushi, with its kernel arguments in `/usr/lib/bootc/kargs.d/10-sushi.toml`, and seals them into its startup image. On a regular Fedora install, Sushi installs next to Plymouth:
+The [Luft image](../../os/README.md) carries Sushi, with its kernel arguments in `/usr/lib/bootc/kargs.d/10-sushi.toml`, and seals them into its startup image. On a regular Fedora install, Sushi goes next to Plymouth:
 
 ```sh
 boot/sushi/scripts/install.sh install   # build, install and rebuild the initramfs

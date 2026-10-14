@@ -5,7 +5,7 @@ What protects a Luft computer, and against what. The services are [trustd and US
 ## Luft Secure Boot key
 
 - Luft's key is held by the Luft project and signs, in CI, everything that starts the computer: SushiBoot, the startup images and NVIDIA's driver. Its certificate ships in every image, at `/usr/share/luft/secure-boot/luft.der`.
-- Shim trusts it once someone confirms it in person on shim's key enrollment screen ([boot.md](boot.md#adding-luft-s-secure-boot-key)).
+- Shim trusts it once someone confirms it in person on shim's key enrollment screen ([boot.md](boot.md#adding-lufts-secure-boot-key)).
 - A second key signs the TPM policy for each startup image. Its public half ships at `/usr/share/luft/secure-boot/pcr-policy.pem`. Keeping it apart means a leaked Secure Boot key alone still can't make a startup image the TPM would unlock the disk for.
 - Each startup image names the exact system it belongs to by its composefs digest, and the system's files are checked against it with fs-verity, so a signed image never starts a changed system. Nothing is signed or rebuilt on the computer.
 - Shipping a Luft shim with the key built in would remove the one-time enrollment screen, but needs Microsoft's shim review and an HSM-backed CA.

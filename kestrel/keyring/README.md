@@ -17,27 +17,14 @@ How secrets are encrypted, unlocked and what that protects against is in [docs/s
 
 ## Install
 
-The keyring is built and installed with Kestrel (building needs `tpm2-tss-devel`):
+Luft's image carries the keyring. On a regular Fedora system it's installed with Kestrel by `kestrel/tools/install.sh install` (building needs `tpm2-tss-devel`), which adds:
 
-```sh
-kestrel/tools/install.sh install
-```
+- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`, and `pam_luft_keyring.so` in `/usr/local/lib64/security`
+- the unlock service, and the keyring's user units, D-Bus activation files and portal under `/usr/local`
+- the PAM rules `kestrel-unlock`, `kestrel-unlock-fingerprint` and `greetd`, and `authselect`'s `with-fingerprint` feature
+- `/etc/gnupg/gpg-agent.conf` pointing at `luft-pinentry`, unless it exists, and a small SELinux module for the login screen
 
-This installs:
-
-- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`
-- `pam_luft_keyring.so` in `/usr/local/lib64/security`
-- the unlock service's socket and unit, started right away
-- the keyring's user units, D-Bus activation files and portal under `/usr/local`, enabled for every user
-- the PAM rules `kestrel-unlock`, `kestrel-unlock-fingerprint` and `greetd` in `/etc/pam.d`
-- `/etc/gnupg/gpg-agent.conf` pointing at `luft-pinentry`, unless that file already exists
-- a small SELinux module that lets the login screen reach the unlock service
-
-It also runs `authselect enable-feature with-fingerprint`, so `sudo`, polkit and the login screen accept a fingerprint when one is enrolled. The password always works.
-
-After installing, sign out and sign in once with your password. That sets up the keyring and seals it to the TPM; from then on a fingerprint unlocks it too.
-
-`kestrel/tools/install.sh remove` removes everything except `/etc/pam.d/greetd`, which skips the keyring once its module is gone. Your data stays in `~/.local/share/luft-keyring`.
+Sign out and in once with your password afterwards; that sets up the keyring and seals it to the TPM. `kestrel/tools/install.sh remove` leaves your data in `~/.local/share/luft-keyring`.
 
 ## Files
 

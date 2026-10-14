@@ -7,7 +7,7 @@ Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay
 | `ghcr.io/lantharos/luft:45` | Any computer |
 | `ghcr.io/lantharos/luft:45-nvidia` | NVIDIA graphics, with the driver built for the image's kernel and signed with the Luft key |
 
-Each build is also tagged with its version, such as `45.20261013.12`.
+Releases come from tags: pushing `v45.20261014` builds and publishes that version as `:45` and `:45-nvidia`, which installed systems update from, then builds the ISO. Every night, if main changed, CI builds `:45-nightly` and `:45-nightly-nvidia` for testing; switch a test machine with `bootc switch ghcr.io/lantharos/luft:45-nightly`. Each build is also tagged with its version.
 
 ## Build
 

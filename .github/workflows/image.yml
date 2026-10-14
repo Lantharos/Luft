@@ -2,13 +2,9 @@ name: Image
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-      - ".github/workflows/iso.yml"
-      - "os/iso/**"
+  schedule:
+    - cron: "0 2 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -60,19 +56,27 @@ jobs:
           echo "KEYS=$keys" >> "$GITHUB_ENV"
 
       - name: Version and release notes
-        env:
-          BEFORE: ${{ github.event.before }}
         run: |
-          version="$FEDORA.$(date -u +%Y%m%d).${{ github.run_number }}"
-          tags=("$FEDORA" "$version")
-          [[ "$GITHUB_REF_TYPE" == tag ]] && tags+=("$GITHUB_REF_NAME")
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            tags=("$FEDORA" "$version")
+            since="$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-parse HEAD~10)"
+          else
+            if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
+              echo "No changes since the last nightly build."
+              echo "SKIP=1" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            version="$FEDORA.$(date -u +%Y%m%d).${{ github.run_number }}-nightly"
+            tags=("$FEDORA-nightly" "$version")
+            since="$(git rev-list -1 --before=24.hours HEAD)"
+          fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "TAGS=${tags[*]}" >> "$GITHUB_ENV"
-          since="$BEFORE"
-          git cat-file -e "$since^{commit}" 2>/dev/null || since="$(git rev-parse HEAD~10)"
           git log --no-merges --format='- %s' "$since..HEAD" > "$RUNNER_TEMP/release-notes.txt"
 
       - name: Build luft
+        if: env.SKIP != '1'
         run: |
           podman build --layers --target luft --file os/image/Containerfile \
             --cache-from "$CACHE" --cache-to "$CACHE" \
@@ -80,6 +84,7 @@ jobs:
             --tag luft .
 
       - name: Build luft-nvidia
+        if: env.SKIP != '1'
         run: |
           podman build --layers --target luft-nvidia --file os/image/Containerfile \
             --cache-from "$CACHE" --cache-to "$CACHE" \
@@ -89,6 +94,7 @@ jobs:
           rm -rf "$KEYS"
 
       - name: Push
+        if: env.SKIP != '1'
         run: |
           for tag in $TAGS; do
             podman push luft "$IMAGE:$tag"

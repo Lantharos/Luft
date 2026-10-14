@@ -10,7 +10,7 @@ use crate::access::{self, Access, CONFIGURE, SET_APPEARANCE};
 use crate::error::Error;
 use crate::idle::Idle;
 use crate::options::Options;
-use crate::store::{self, Config, Store};
+use crate::store::{self, Config, Focus, Store};
 use crate::system::greetd::{Greetd, InitialSession};
 use crate::system::sessions::{self, Session};
 use crate::system::{accounts, users};
@@ -122,15 +122,17 @@ impl Greeter {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         wallpaper: OwnedFd,
+        focus: (f64, f64),
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
+        let focus = Focus::new(focus)?;
         let uid = access::caller_uid(connection, &header).await?;
         let jpeg = prepare_wallpaper(wallpaper).await?;
         let _writing = self.writing.lock().await;
-        Ok(self.store.save_user_wallpaper(uid, &jpeg)?)
+        Ok(self.store.save_user_wallpaper(uid, &jpeg, focus)?)
     }
 
     async fn set_displays(
@@ -167,15 +169,17 @@ impl Greeter {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
         wallpaper: OwnedFd,
+        focus: (f64, f64),
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, CONFIGURE)
             .await?;
+        let focus = Focus::new(focus)?;
         let jpeg = prepare_wallpaper(wallpaper).await?;
         {
             let _writing = self.writing.lock().await;
-            self.store.save_shared_wallpaper(&jpeg)?;
+            self.store.save_shared_wallpaper(&jpeg, focus)?;
         }
         Ok(self.shared_wallpaper_changed(&emitter).await?)
     }

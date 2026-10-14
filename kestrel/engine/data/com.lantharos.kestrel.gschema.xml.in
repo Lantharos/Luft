@@ -108,6 +108,32 @@
         wallpaper is a picture; choosing a picture for dark mode clears it.
       </description>
     </key>
+    <key name="wallpaper-focus" type="(dd)">
+      <default>(0.5, 0.5)</default>
+      <summary>Part of the light wallpaper kept on screen</summary>
+      <description>
+        Horizontal and vertical position, from 0 to 1, of the visible area
+        when the Fill style crops the light wallpaper to a display of a
+        different shape. (0.5, 0.5) keeps the middle; (0.5, 1) keeps the
+        bottom. Applies to live wallpapers too.
+      </description>
+    </key>
+    <key name="wallpaper-focus-dark" type="(dd)">
+      <default>(0.5, 0.5)</default>
+      <summary>Part of the dark wallpaper kept on screen</summary>
+      <description>
+        Like wallpaper-focus, for the wallpaper shown while the dark style
+        is active.
+      </description>
+    </key>
+    <key name="wallpaper-focus-chosen" type="a{s(dd)}">
+      <default>{}</default>
+      <summary>Wallpaper positions chosen by hand</summary>
+      <description>
+        Focus points the user set in Settings, by wallpaper URI, so a
+        wallpaper keeps its position when it is chosen again.
+      </description>
+    </key>
     <key name="dark-schedule" enum="com.lantharos.kestrel.DarkSchedule">
       <default>'off'</default>
       <summary>When the dark style turns on by itself</summary>

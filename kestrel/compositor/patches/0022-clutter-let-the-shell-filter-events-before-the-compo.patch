@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 10 Oct 2026 13:00:54 +0200
-Subject: [PATCH 22/25] clutter: let the shell filter events before the
+Subject: [PATCH 22/26] clutter: let the shell filter events before the
  compositor
 
 Add clutter_event_prepend_filter(), which runs a filter ahead of every

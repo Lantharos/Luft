@@ -1,33 +1,38 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import Film from '@lucide/svelte/icons/film';
-	import { thumbnail, type Wallpaper } from './api';
+	import { CENTER, objectPosition, thumbnail, wallpaperFocus, type Focus, type Wallpaper } from './api';
 
 	interface Props {
 		wallpaper: Wallpaper;
 		selected: boolean;
+		focus: Focus | undefined;
+		shape: number;
 		onselect: () => void;
 	}
 
-	let { wallpaper, selected, onselect }: Props = $props();
+	let { wallpaper, selected, focus, shape, onselect }: Props = $props();
 
 	let tile = $state<HTMLButtonElement>();
 	let source = $state<string | null>(null);
+	let estimated = $state<Focus | null>(null);
 
 	$effect(() => {
 		const observer = new IntersectionObserver(async ([entry]) => {
 			if (!entry.isIntersecting) return;
 			observer.disconnect();
-			source = fileUrl(await thumbnail(wallpaper.path));
+			const preview = await thumbnail(wallpaper.path);
+			estimated = await wallpaperFocus(wallpaper.path);
+			source = fileUrl(preview);
 		}, { rootMargin: '200px' });
 		observer.observe(tile!);
 		return () => observer.disconnect();
 	});
 </script>
 
-<button bind:this={tile} type="button" class="tile" class:selected aria-label={wallpaper.live ? `${wallpaper.name}, video` : wallpaper.name} aria-pressed={selected} onclick={onselect}>
+<button bind:this={tile} type="button" class="tile" class:selected style:aspect-ratio={shape} aria-label={wallpaper.live ? `${wallpaper.name}, video` : wallpaper.name} aria-pressed={selected} onclick={onselect}>
 	{#if source}
-		<img src={source} alt="" decoding="async" />
+		<img src={source} alt="" decoding="async" style:object-position={objectPosition(focus ?? estimated ?? CENTER)} />
 	{/if}
 	{#if wallpaper.live}
 		<Film size={14} class="live" aria-hidden="true" />
@@ -37,7 +42,6 @@
 <style>
 	.tile {
 		position: relative;
-		aspect-ratio: 16 / 10;
 		overflow: hidden;
 		border-radius: 14px;
 		background: var(--control);

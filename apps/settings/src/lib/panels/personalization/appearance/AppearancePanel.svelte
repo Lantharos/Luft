@@ -10,7 +10,7 @@
 	import FontsSection from './fonts/FontsSection.svelte';
 	import StyleSection from './StyleSection.svelte';
 	import TaskbarPage from './taskbar/TaskbarPage.svelte';
-	import WallpaperSection from './WallpaperSection.svelte';
+	import WallpaperSection from './wallpaper/WallpaperSection.svelte';
 
 	type Interface = {
 		'text-scaling-factor': number;

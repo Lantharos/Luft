@@ -66,6 +66,8 @@ export async function checkPeople() {
   const state = GLib.getenv('KESTREL_GREETER_STATE_DIR');
   await eventually(() => background.get_string('picture-uri-dark') === Gio.File.new_for_path(`${state}/users/${uid}/wallpaper.jpg`).get_uri(),
     'a typed username shows that person’s wallpaper');
+  const [, focusY] = new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).get_value('wallpaper-focus-dark').deepUnpack();
+  require(focusY === 0.75, 'their wallpaper keeps the part they chose on screen');
   await eventually(() => lastSessionStart() === 'kristof' && promptState().secret && promptState().hint === 'Password',
     'then asks for their password');
   press(Clutter.KEY_Escape);

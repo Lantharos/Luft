@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { Row, Section, Segmented } from '@luft/ui';
-	import { thumbnail } from '../../personalization/appearance/api';
+	import { thumbnail } from '../../personalization/appearance/wallpaper/api';
 
 	interface Props {
 		wallpaper: string | null;

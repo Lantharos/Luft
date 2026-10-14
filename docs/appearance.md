@@ -2,6 +2,20 @@
 
 Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when the wallpaper has hardly any color, or when White is chosen in Settings) and builds a full palette from it for light and dark. Apps can read it to match the desktop.
 
+## Wallpaper position
+
+When a wallpaper's shape differs from the display's, Fill crops it. The focus point decides which part stays: `(x, y)` from 0 to 1, where `(0.5, 0.5)` keeps the middle and `(0.5, 1)` keeps the bottom. It applies to the desktop, live wallpapers, the lock screen, the login screen and setup.
+
+- `wallpaper-focus` and `wallpaper-focus-dark` in `com.lantharos.kestrel` hold the focus for the light and dark wallpaper.
+- Picking a wallpaper in Settings sets its focus. Pictures can carry one in a file next to them with the same name, such as `Fog.json` beside `Fog.jpg`:
+
+  ```json
+  { "focus": [0.5, 0.768] }
+  ```
+
+- Without that file, Settings estimates the focus from the picture's detail, color and skin tones, and remembers the result.
+- Dragging the preview in Settings moves the picture. That choice is kept per wallpaper in `wallpaper-focus-chosen`, and the thumbnails show the same crop as the display.
+
 ## Palette
 
 Every role sits at a fixed tone (perceived lightness, 0 is black and 100 is white), so contrast is the same whatever the wallpaper.

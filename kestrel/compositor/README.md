@@ -21,6 +21,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Variable refresh only for windows marked as games, and `wp_content_type_v1` support
 - Windows laid out on a transformed group, magnified without blur, and X11 windows kept reachable, for the board
 - Checking and restoring inhibited keyboard shortcuts
+- A focus point for zoomed backgrounds, so a crop can keep something other than the middle
 - Event filters that run before the compositor's own, so the shell can check input it sends as it is delivered
 - Settings from `kestrel-settings` instead of gnome-settings-daemon, and monitor vendor names from systemd's hardware database
 - Default display scales aimed at 120 DPI on laptop screens, on quarter steps where they fit, and `--virtual-monitor 1920x1080:344x194mm` for virtual monitors with a physical size

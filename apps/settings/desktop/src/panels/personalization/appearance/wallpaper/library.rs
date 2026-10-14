@@ -6,6 +6,8 @@ use gio::prelude::*;
 use luft_app::Events;
 use serde::Serialize;
 
+use super::cache::failed;
+
 const WALLPAPERS_CHANGED: &str = "appearance.wallpapers";
 const IMAGE_EXTENSIONS: [&str; 6] = ["jpg", "jpeg", "png", "webp", "jxl", "avif"];
 const VIDEO_EXTENSIONS: [&str; 4] = ["mp4", "webm", "mkv", "mov"];
@@ -16,10 +18,6 @@ pub struct Wallpaper {
     path: String,
     name: String,
     live: bool,
-}
-
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
 }
 
 pub fn extensions() -> impl Iterator<Item = &'static str> {

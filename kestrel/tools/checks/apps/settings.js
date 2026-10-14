@@ -6,6 +6,7 @@ import {checkHardware} from './settings/hardware.js';
 import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
 import {checkUpdates} from './settings/updates.js';
+import {checkWallpaper} from './settings/wallpaper.js';
 
 export async function run() {
   await withPalette(async palette => {
@@ -17,6 +18,7 @@ export async function run() {
       await checkLive(app);
       await checkHardware(app);
       await checkFonts(app);
+      await checkWallpaper(app);
     });
     await checkUpdates(palette);
   });

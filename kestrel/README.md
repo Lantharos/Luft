@@ -138,6 +138,7 @@ Kestrel's settings live in `com.lantharos.kestrel`. Settings changes most of the
 | `dark-schedule` | `off`, `sunset`, `custom` (`dark-schedule-from`, `dark-schedule-to` in hours) |
 | `live-wallpaper`, `live-wallpaper-dark` | Video URI for each style |
 | `live-wallpaper-on-battery` | Keep playing on battery |
+| `wallpaper-focus`, `wallpaper-focus-dark` | Part of the wallpaper kept when Fill crops it ([docs/appearance.md](../docs/appearance.md#wallpaper-position)) |
 | `variable-refresh` | `games`, `fullscreen` |
 | `taskbar-alignment` | `center`, `left` |
 | `taskbar-look` | `glass`, `solid`, `transparent`, `accent` |

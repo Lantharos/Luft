@@ -1,12 +1,18 @@
 #include "surfaces.h"
 
+#include "picture.h"
+
 #define BACKGROUND_SCHEMA "org.gnome.desktop.background"
+#define INTERFACE_SCHEMA "org.gnome.desktop.interface"
+#define KESTREL_SCHEMA "com.lantharos.kestrel"
 
 struct _WallpaperSurfaces
 {
   GdkPaintable *paintable;
   GListModel *monitors;
   GSettings *background;
+  GSettings *interface;
+  GSettings *kestrel;
   GPtrArray *windows;
   GStrv live;
   gboolean ready;
@@ -27,10 +33,22 @@ content_fit (GSettings *background)
   return GTK_CONTENT_FIT_COVER;
 }
 
-static GtkPicture *
+static WallpaperPicture *
 window_picture (GtkWindow *window)
 {
-  return GTK_PICTURE (gtk_window_get_child (window));
+  return WALLPAPER_PICTURE (gtk_window_get_child (window));
+}
+
+static void
+apply_focus (WallpaperSurfaces *surfaces,
+             WallpaperPicture  *picture)
+{
+  g_autofree char *scheme = g_settings_get_string (surfaces->interface, "color-scheme");
+  const char *key = g_str_equal (scheme, "prefer-dark") ? "wallpaper-focus-dark" : "wallpaper-focus";
+  double x, y;
+
+  g_settings_get (surfaces->kestrel, key, "(dd)", &x, &y);
+  wallpaper_picture_set_focus (picture, x, y);
 }
 
 static void
@@ -44,12 +62,12 @@ sync_playback (WallpaperSurfaces *surfaces,
 
   if (g_strv_contains ((const char * const *) surfaces->live, gtk_window_get_title (window)))
     {
-      gtk_picture_set_paintable (window_picture (window), surfaces->paintable);
+      wallpaper_picture_set_paintable (window_picture (window), surfaces->paintable);
       return;
     }
 
   frame = gdk_paintable_get_current_image (surfaces->paintable);
-  gtk_picture_set_paintable (window_picture (window), frame);
+  wallpaper_picture_set_paintable (window_picture (window), frame);
 }
 
 static void
@@ -66,15 +84,15 @@ create_window (WallpaperSurfaces *surfaces,
                GdkMonitor        *monitor)
 {
   GtkWindow *window = GTK_WINDOW (gtk_window_new ());
-  GtkWidget *picture = gtk_picture_new ();
+  GtkWidget *picture = wallpaper_picture_new ();
   GdkRectangle geometry;
 
   gdk_monitor_get_geometry (monitor, &geometry);
   gtk_window_set_title (window, gdk_monitor_get_connector (monitor));
   gtk_window_set_decorated (window, FALSE);
   gtk_window_set_default_size (window, geometry.width, geometry.height);
-  gtk_picture_set_can_shrink (GTK_PICTURE (picture), TRUE);
-  gtk_picture_set_content_fit (GTK_PICTURE (picture), content_fit (surfaces->background));
+  wallpaper_picture_set_content_fit (WALLPAPER_PICTURE (picture), content_fit (surfaces->background));
+  apply_focus (surfaces, WALLPAPER_PICTURE (picture));
   gtk_window_set_child (window, picture);
   g_signal_connect_after (window, "realize", G_CALLBACK (pass_input_through), NULL);
 
@@ -116,7 +134,16 @@ on_fit_changed (GSettings         *background,
   GtkContentFit fit = content_fit (background);
 
   for (guint index = 0; index < surfaces->windows->len; index++)
-    gtk_picture_set_content_fit (window_picture (surfaces->windows->pdata[index]), fit);
+    wallpaper_picture_set_content_fit (window_picture (surfaces->windows->pdata[index]), fit);
+}
+
+static void
+on_focus_changed (GSettings         *settings,
+                  const char        *key,
+                  WallpaperSurfaces *surfaces)
+{
+  for (guint index = 0; index < surfaces->windows->len; index++)
+    apply_focus (surfaces, window_picture (surfaces->windows->pdata[index]));
 }
 
 static void
@@ -160,11 +187,16 @@ wallpaper_surfaces_new (GdkPaintable *paintable)
   surfaces->paintable = paintable;
   surfaces->monitors = gdk_display_get_monitors (gdk_display_get_default ());
   surfaces->background = g_settings_new (BACKGROUND_SCHEMA);
+  surfaces->interface = g_settings_new (INTERFACE_SCHEMA);
+  surfaces->kestrel = g_settings_new (KESTREL_SCHEMA);
   surfaces->windows = g_ptr_array_new_with_free_func ((GDestroyNotify) gtk_window_destroy);
   surfaces->live = g_new0 (char *, 1);
 
   g_signal_connect (surfaces->monitors, "items-changed", G_CALLBACK (on_monitors_changed), surfaces);
   g_signal_connect (surfaces->background, "changed::picture-options", G_CALLBACK (on_fit_changed), surfaces);
+  g_signal_connect (surfaces->interface, "changed::color-scheme", G_CALLBACK (on_focus_changed), surfaces);
+  g_signal_connect (surfaces->kestrel, "changed::wallpaper-focus", G_CALLBACK (on_focus_changed), surfaces);
+  g_signal_connect (surfaces->kestrel, "changed::wallpaper-focus-dark", G_CALLBACK (on_focus_changed), surfaces);
   g_signal_connect (paintable, "invalidate-contents", G_CALLBACK (on_first_frame), surfaces);
   rebuild_windows (surfaces);
   return surfaces;

@@ -1,13 +1,12 @@
 use std::fs;
-use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::time::UNIX_EPOCH;
 
 use gstreamer as gst;
 use gstreamer::prelude::*;
 use image::{DynamicImage, RgbImage};
 use serde::Deserialize;
 
+use super::cache::{cached_path, failed};
 use super::library::{extension, is_video};
 
 const THUMBNAIL_WIDTH: u32 = 480;
@@ -17,29 +16,7 @@ const DECODED_FRAME_SINK: &str = "capsfilter caps=video/x-raw ! fakesink";
 
 #[derive(Deserialize)]
 pub struct Image {
-    path: String,
-}
-
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
-fn cached_path(source: &Path) -> Result<PathBuf, String> {
-    let metadata = fs::metadata(source).map_err(failed)?;
-    let mut hasher = DefaultHasher::new();
-    source.hash(&mut hasher);
-    metadata.len().hash(&mut hasher);
-    metadata
-        .modified()
-        .ok()
-        .and_then(|modified| modified.duration_since(UNIX_EPOCH).ok())
-        .map(|modified| modified.as_secs())
-        .hash(&mut hasher);
-    Ok(dirs::cache_dir()
-        .ok_or("There is no cache folder")?
-        .join("com.lantharos.settings")
-        .join("wallpapers")
-        .join(format!("{:016x}.jpg", hasher.finish())))
+    pub path: String,
 }
 
 fn decode_image(source: &Path) -> Result<DynamicImage, String> {
@@ -100,11 +77,14 @@ fn first_frame(source: &Path) -> Result<RgbImage, String> {
 }
 
 pub fn thumbnail(Image { path }: Image) -> Result<String, String> {
-    let source = Path::new(&path);
+    Ok(preview(Path::new(&path))?.to_string_lossy().into_owned())
+}
+
+pub fn preview(source: &Path) -> Result<PathBuf, String> {
     if !is_video(source) && !DECODABLE_IMAGES.contains(&extension(source).as_str()) {
-        return Ok(path);
+        return Ok(source.to_owned());
     }
-    let target = cached_path(source)?;
+    let target = cached_path(source, "wallpapers", "jpg")?;
     if !target.exists() {
         let preview = if is_video(source) {
             first_frame(source)?
@@ -114,5 +94,5 @@ pub fn thumbnail(Image { path }: Image) -> Result<String, String> {
         fs::create_dir_all(target.parent().ok_or("There is no cache folder")?).map_err(failed)?;
         preview.save(&target).map_err(failed)?;
     }
-    Ok(target.to_string_lossy().into_owned())
+    Ok(target)
 }

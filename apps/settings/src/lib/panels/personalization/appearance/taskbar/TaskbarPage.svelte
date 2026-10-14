@@ -6,7 +6,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { installedApps, type App } from '../../../system/apps/api';
 	import { loadDisplays, onDisplaysChanged, type Displays } from '../../../devices/display/api';
-	import { thumbnail, uriToPath } from '../api';
+	import { thumbnail, uriToPath } from '../wallpaper/api';
 	import { ALIGNMENTS, AUTO_HIDE, LOOKS, SIZES, STYLES, TASKBAR_KEYS, type TaskbarSettings } from './options';
 	import TaskbarPreview from './TaskbarPreview.svelte';
 

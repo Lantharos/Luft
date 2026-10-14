@@ -13,6 +13,8 @@ use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
 use zbus::zvariant::{DynamicType, Fd, OwnedValue};
 
+use crate::panels::personalization::appearance::wallpaper;
+
 pub const LOGIN_CHANGED: &str = "login.changed";
 
 const GREETER: &str = "com.lantharos.Greeter1";
@@ -165,8 +167,9 @@ fn choose_wallpaper(_: Value) -> Result<bool, String> {
         return Ok(false);
     };
     let path = portal::uri_path(&uri).ok_or("This picture can't be opened")?;
-    let picture = File::open(path).map_err(failed)?;
-    change("SetSharedWallpaper", &Fd::from(&picture))?;
+    let picture = File::open(&path).map_err(failed)?;
+    let focus: (f64, f64) = wallpaper::focus::of(&path).into();
+    change("SetSharedWallpaper", &(Fd::from(&picture), focus))?;
     Ok(true)
 }
 

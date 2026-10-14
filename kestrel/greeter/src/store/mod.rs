@@ -4,15 +4,16 @@ mod wallpaper;
 
 use std::fs;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub use config::Config;
 pub use displays::prepare as prepare_displays;
-pub use wallpaper::prepare as prepare_wallpaper;
+pub use wallpaper::{Focus, prepare as prepare_wallpaper};
 
 use crate::files::{self, write_atomically};
 
 const WALLPAPER: &str = "wallpaper.jpg";
+const WALLPAPER_DETAILS: &str = "wallpaper.json";
 const DISPLAYS: &str = "display/monitors.xml";
 
 pub struct Store {
@@ -49,21 +50,17 @@ impl Store {
         path.exists().then_some(path)
     }
 
-    pub fn save_shared_wallpaper(&self, jpeg: &[u8]) -> io::Result<()> {
-        write_atomically(&self.shared_wallpaper_path(), jpeg)
+    pub fn save_shared_wallpaper(&self, jpeg: &[u8], focus: Focus) -> io::Result<()> {
+        save_wallpaper(&self.root.join("shared"), jpeg, focus)
     }
 
     pub fn clear_shared_wallpaper(&self) -> io::Result<()> {
-        files::remove(&self.shared_wallpaper_path())
+        files::remove(&self.shared_wallpaper_path())?;
+        files::remove(&self.root.join("shared").join(WALLPAPER_DETAILS))
     }
 
-    pub fn save_user_wallpaper(&self, uid: u32, jpeg: &[u8]) -> io::Result<()> {
-        let path = self
-            .root
-            .join("users")
-            .join(uid.to_string())
-            .join(WALLPAPER);
-        write_atomically(&path, jpeg)
+    pub fn save_user_wallpaper(&self, uid: u32, jpeg: &[u8], focus: Focus) -> io::Result<()> {
+        save_wallpaper(&self.root.join("users").join(uid.to_string()), jpeg, focus)
     }
 
     pub fn save_displays(&self, arrangement: &[u8]) -> io::Result<()> {
@@ -77,4 +74,9 @@ impl Store {
     fn shared_wallpaper_path(&self) -> PathBuf {
         self.root.join("shared").join(WALLPAPER)
     }
+}
+
+fn save_wallpaper(folder: &Path, jpeg: &[u8], focus: Focus) -> io::Result<()> {
+    write_atomically(&folder.join(WALLPAPER_DETAILS), &focus.details())?;
+    write_atomically(&folder.join(WALLPAPER), jpeg)
 }

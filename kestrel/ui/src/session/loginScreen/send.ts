@@ -28,13 +28,13 @@ function call(method: string, parameters: GLib.Variant, descriptors: Gio.UnixFDL
     });
 }
 
-export function sendToLoginScreen(method: string, file: Gio.File, recordName: string, description: string): void {
+export function sendToLoginScreen(method: string, file: Gio.File, recordName: string, description: string, details: GLib.Variant[] = []): void {
   const record = recordOf(recordName);
   const descriptors = new Gio.UnixFDList();
   let identity: string;
   try {
     const info = file.query_info('time::modified,standard::size', Gio.FileQueryInfoFlags.NONE, null);
-    identity = `${file.get_uri()} ${info.get_modification_date_time()?.to_unix()} ${info.get_size()}`;
+    identity = [file.get_uri(), info.get_modification_date_time()?.to_unix(), info.get_size(), ...details.map(detail => detail.print(false))].join(' ');
     if (identity === readRecord(record)) return;
     const stream = file.read(null);
     descriptors.append((stream as unknown as GioUnix.FileDescriptorBased).get_fd());
@@ -42,7 +42,7 @@ export function sendToLoginScreen(method: string, file: Gio.File, recordName: st
   } catch {
     return;
   }
-  call(method, new GLib.Variant('(h)', [0]), descriptors, record, identity, description);
+  call(method, GLib.Variant.new_tuple([GLib.Variant.new_handle(0), ...details]), descriptors, record, identity, description);
 }
 
 export function tellLoginScreen(method: string, parameters: GLib.Variant, recordName: string, description: string): void {

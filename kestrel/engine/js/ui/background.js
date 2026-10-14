@@ -75,6 +75,10 @@ const PICTURE_URI_DARK_KEY = 'picture-uri-dark';
 const INTERFACE_SCHEMA = 'org.gnome.desktop.interface';
 const COLOR_SCHEME_KEY = 'color-scheme';
 
+const KESTREL_SCHEMA = 'com.lantharos.kestrel';
+const FOCUS_KEY = 'wallpaper-focus';
+const FOCUS_DARK_KEY = 'wallpaper-focus-dark';
+
 export const FADE_ANIMATION_TIME = 1000;
 
 let _backgroundCache = null;
@@ -459,7 +463,7 @@ function getBackgroundTextureCache() {
 }
 
 const Background = GObject.registerClass({
-    Signals: {'loaded': {}, 'bg-changed': {}},
+    Signals: {'loaded': {}, 'bg-changed': {}, 'focus-changed': {}},
 }, class Background extends Meta.Background {
     _init(params) {
         params = Params.parse(params, {
@@ -467,6 +471,7 @@ const Background = GObject.registerClass({
             settings: null,
             file: null,
             style: null,
+            focusKey: null,
         });
 
         super._init({meta_display: global.display});
@@ -474,18 +479,28 @@ const Background = GObject.registerClass({
         this._settings = params.settings;
         this._file = params.file;
         this._style = params.style;
+        this.focus = [0.5, 0.5];
+        this._focusKey = params.focusKey;
         this._layoutManager = params.layoutManager;
         this._fileWatches = {};
         this._cancellable = new Gio.Cancellable();
         this.isLoaded = false;
 
         this._interfaceSettings = new Gio.Settings({schema_id: INTERFACE_SCHEMA});
+        this._kestrelSettings = new Gio.Settings({schema_id: KESTREL_SCHEMA});
 
         this._settings.connectObject('changed',
             this._emitChangedSignal.bind(this), this);
 
         this._interfaceSettings.connectObject(`changed::${COLOR_SCHEME_KEY}`,
             this._emitChangedSignal.bind(this), this);
+
+        if (this._focusKey) {
+            this._kestrelSettings.connectObject(`changed::${this._focusKey}`, () => {
+                this._readFocus();
+                this.emit('focus-changed');
+            }, this);
+        }
 
         graphicsRecovery().connectObject('graphics-restored',
             this._emitChangedSignal.bind(this), this);
@@ -505,6 +520,7 @@ const Background = GObject.registerClass({
 
         this._settings.disconnectObject(this);
         this._interfaceSettings.disconnectObject(this);
+        this._kestrelSettings.disconnectObject(this);
         graphicsRecovery().disconnectObject(this);
         getBackgroundTextureCache().release(this);
 
@@ -590,10 +606,17 @@ const Background = GObject.registerClass({
         }
     }
 
+    _readFocus() {
+        this.focus = this._kestrelSettings.get_value(this._focusKey).deepUnpack();
+        this.set_focus(...this.focus);
+    }
+
     _load() {
         this._cache = getBackgroundCache();
 
         this.set_color(DEFAULT_BACKGROUND_COLOR);
+        if (this._focusKey)
+            this._readFocus();
 
         if (!this._file) {
             this._setLoaded();
@@ -649,6 +672,7 @@ class BackgroundSource {
 
         let file = null;
         let style;
+        let focusKey = null;
 
         // We don't watch changes to settings here,
         // instead we rely on Background to watch those
@@ -660,13 +684,10 @@ class BackgroundSource {
         } else {
             style = this._settings.get_enum(BACKGROUND_STYLE_KEY);
             if (style !== GDesktopEnums.BackgroundStyle.NONE) {
-                const colorScheme = this._interfaceSettings.get_enum('color-scheme');
-                const uri = this._settings.get_string(
-                    colorScheme === GDesktopEnums.ColorScheme.PREFER_DARK
-                        ? PICTURE_URI_DARK_KEY
-                        : PICTURE_URI_KEY);
-
-                file = Gio.File.new_for_commandline_arg(uri);
+                const dark = this._interfaceSettings.get_enum('color-scheme') === GDesktopEnums.ColorScheme.PREFER_DARK;
+                file = Gio.File.new_for_commandline_arg(
+                    this._settings.get_string(dark ? PICTURE_URI_DARK_KEY : PICTURE_URI_KEY));
+                focusKey = dark ? FOCUS_DARK_KEY : FOCUS_KEY;
             }
         }
 
@@ -675,6 +696,7 @@ class BackgroundSource {
             settings: this._settings,
             file,
             style,
+            focusKey,
         });
         background._changedId = background.connect('bg-changed', () => {
             background.disconnect(background._changedId);
@@ -825,6 +847,7 @@ export class BackgroundManager extends Signals.EventEmitter {
             changeSignalId = null;
             this._updateBackgroundActor();
         });
+        const focusSignalId = background.connect('focus-changed', () => this.emit('changed'));
 
         let loadedSignalId;
         if (background.isLoaded) {
@@ -842,6 +865,8 @@ export class BackgroundManager extends Signals.EventEmitter {
         backgroundActor.connect('destroy', () => {
             if (changeSignalId)
                 background.disconnect(changeSignalId);
+
+            background.disconnect(focusSignalId);
 
             if (loadedSignalId)
                 background.disconnect(loadedSignalId);

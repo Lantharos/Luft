@@ -34,6 +34,8 @@ function apply(uri: string): void {
   background.set_string('picture-uri', uri);
   background.set_string('picture-uri-dark', uri);
   background.set_string('picture-options', 'zoom');
+  const kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
+  for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.set_value(key, new GLib.Variant('(dd)', [0.5, 0.5]));
 }
 
 async function confirm(handle: string, appId: string, bytes: GLib.Bytes): Promise<number> {

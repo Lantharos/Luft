@@ -69,9 +69,10 @@ class MonitorBackdrop {
 
     async _key() {
         try {
-            const source = await this._manager.backgroundActor.content.background.storeKey(this._cancellable);
+            const {background} = this._manager.backgroundActor.content;
+            const source = await background.storeKey(this._cancellable);
             const {x, y, width, height, geometry_scale: scale} = this._monitor;
-            return source && `${source} backdrop ${x},${y} ${width}x${height}@${scale} ${this._radius} ${BLUR_BRIGHTNESS}`;
+            return source && `${source} ${background.focus} backdrop ${x},${y} ${width}x${height}@${scale} ${this._radius} ${BLUR_BRIGHTNESS}`;
         } catch {
             return null;
         }

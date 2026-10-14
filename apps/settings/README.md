@@ -27,7 +27,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 
 Notes:
 
-- Wallpapers are the pictures and videos in `~/Pictures/Wallpapers`; light and dark styles each keep their own.
+- Wallpapers are Luft's own and the pictures and videos in `~/Pictures/Wallpapers`; light and dark styles each keep their own. Dragging the preview chooses which part stays on screen when the wallpaper and display have different shapes.
 - All fonts lists every installed family; fonts in `~/.local/share/fonts` can be removed, and clicking a family opens it in Magpie.
 - Cursor themes come from `~/.local/share/icons`, `~/.icons` and `/usr/share/icons`. Get more cursors installs themes from [GNOME-Look](https://www.gnome-look.org/browse?cat=107) into `~/.local/share/icons`, limited to 128 MB downloaded and 512 MB unpacked.
 - Brightness for external displays needs [ddcutil](https://www.ddcutil.com).

@@ -12,3 +12,7 @@ monospace-font-name='Maple Mono NF 11'
 
 [org.gnome.desktop.peripherals.touchpad]
 tap-to-click=true
+
+[com.lantharos.kestrel]
+wallpaper-focus=(0.5, 0.768)
+wallpaper-focus-dark=(0.5, 0.768)

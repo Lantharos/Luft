@@ -8,6 +8,7 @@ const SYNC_DELAY = 1500;
 export class LoginWallpaper {
   private readonly background = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
+  private readonly kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly signals: [Gio.Settings, number][];
   private timer = 0;
 
@@ -16,6 +17,8 @@ export class LoginWallpaper {
       [this.background, this.background.connect('changed::picture-uri', () => this.schedule())],
       [this.background, this.background.connect('changed::picture-uri-dark', () => this.schedule())],
       [this.interfaceSettings, this.interfaceSettings.connect('changed::color-scheme', () => this.schedule())],
+      [this.kestrel, this.kestrel.connect('changed::wallpaper-focus', () => this.schedule())],
+      [this.kestrel, this.kestrel.connect('changed::wallpaper-focus-dark', () => this.schedule())],
     ];
     this.schedule();
   }
@@ -32,7 +35,8 @@ export class LoginWallpaper {
   private sync(): void {
     const dark = this.interfaceSettings.get_string('color-scheme') === 'prefer-dark';
     const file = Gio.File.new_for_uri(this.background.get_string(dark ? 'picture-uri-dark' : 'picture-uri'));
-    sendToLoginScreen('SetAppearance', file, 'login-wallpaper', 'wallpaper');
+    const focus = this.kestrel.get_value(dark ? 'wallpaper-focus-dark' : 'wallpaper-focus');
+    sendToLoginScreen('SetAppearance', file, 'login-wallpaper', 'wallpaper', [focus]);
   }
 
   destroy(): void {

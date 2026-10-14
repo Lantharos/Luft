@@ -6,7 +6,7 @@ Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when
 
 The shell follows `color-scheme` in `org.gnome.desktop.interface`, like Luft's apps: `prefer-dark` is dark, anything else is light. Switching restyles the shell once, with no restart.
 
-- Light glass is a pale tint over the blur with dark text and icons. Its blur brightens dark wallpapers behind it, where dark glass dims bright ones, so text stays readable on any wallpaper.
+- Light glass is a thin white frost over the blur with dark text and icons. Its blur brightens dark wallpapers and deepens their colors, so the wallpaper shows through clean instead of grey. Dark glass dims bright wallpapers instead, so text stays readable on any wallpaper.
 - Tinted and clear app icons, the Start mark and symbolic icons switch to the ink of each style.
 - Pure black only applies to the dark style. In the light style the shell keeps its glass.
 - The login and lock screens stay dark in both styles, as does high contrast.

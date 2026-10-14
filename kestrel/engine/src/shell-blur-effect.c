@@ -51,7 +51,8 @@ static const gchar *brightness_glsl_declarations =
 "uniform float corner_radius;                                              \n"
 "uniform float edge_highlight;                                             \n"
 "uniform float bright_dim;                                                 \n"
-"uniform float dark_lift;                                                  \n";
+"uniform float dark_lift;                                                  \n"
+"uniform float saturation;                                                 \n";
 
 static const gchar *brightness_glsl =
 "  cogl_color_out.rgb *= brightness;                                       \n"
@@ -60,6 +61,9 @@ static const gchar *brightness_glsl =
 "  cogl_color_out.rgb *= 1.0 - bright_dim * smoothstep(0.3, 0.95, luma);   \n"
 "  cogl_color_out.rgb = mix(cogl_color_out.rgb, vec3(cogl_color_out.a),     \n"
 "                           dark_lift * (1.0 - smoothstep(0.1, 0.9, luma))); \n"
+"  float lifted = dot(cogl_color_out.rgb, vec3(0.2126, 0.7152, 0.0722));    \n"
+"  cogl_color_out.rgb = clamp(mix(vec3(lifted), cogl_color_out.rgb,         \n"
+"                                 saturation), 0.0, cogl_color_out.a);      \n"
 "  vec2 half_size = surface_size * 0.5;                                    \n"
 "  float r = min(corner_radius, min(half_size.x, half_size.y));              \n"
 "  vec2 p = abs(cogl_tex_coord_in[0].xy * surface_size - half_size);         \n"
@@ -114,6 +118,8 @@ struct _ShellBlurEffect
   float bright_dim;
   int dark_lift_uniform;
   float dark_lift;
+  int saturation_uniform;
+  float saturation;
 
   ShellBlurMode mode;
   float downscale_factor;
@@ -131,6 +137,7 @@ enum {
   PROP_EDGE_HIGHLIGHT,
   PROP_BRIGHT_DIM,
   PROP_DARK_LIFT,
+  PROP_SATURATION,
   PROP_MODE,
   N_PROPS
 };
@@ -218,6 +225,8 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "bright_dim");
   self->dark_lift_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "dark_lift");
+  self->saturation_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "saturation");
 }
 
 static void
@@ -266,6 +275,8 @@ update_brightness (ShellBlurEffect *self,
                                self->bright_dim_uniform, self->bright_dim);
   cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
                                self->dark_lift_uniform, self->dark_lift);
+  cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
+                               self->saturation_uniform, self->saturation);
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -826,6 +837,10 @@ shell_blur_effect_get_property (GObject    *object,
       g_value_set_float (value, self->dark_lift);
       break;
 
+    case PROP_SATURATION:
+      g_value_set_float (value, self->saturation);
+      break;
+
     case PROP_MODE:
       g_value_set_enum (value, self->mode);
       break;
@@ -893,6 +908,16 @@ shell_blur_effect_set_property (GObject      *object,
         }
       break;
 
+    case PROP_SATURATION:
+      if (self->saturation != g_value_get_float (value))
+        {
+          self->saturation = g_value_get_float (value);
+          if (self->actor)
+            clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
+          g_object_notify_by_pspec (object, properties[PROP_SATURATION]);
+        }
+      break;
+
     case PROP_MODE:
       shell_blur_effect_set_mode (self, g_value_get_enum (value));
       break;
@@ -948,6 +973,11 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
                         0.f, 1.f, 0.f,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
+  properties[PROP_SATURATION] =
+    g_param_spec_float ("saturation", NULL, NULL,
+                        0.f, 2.f, 1.f,
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+
   properties[PROP_MODE] =
     g_param_spec_enum ("mode", NULL, NULL,
                        SHELL_TYPE_BLUR_MODE,
@@ -963,6 +993,7 @@ shell_blur_effect_init (ShellBlurEffect *self)
   self->mode = SHELL_BLUR_MODE_ACTOR;
   self->radius = 0;
   self->brightness = 1.f;
+  self->saturation = 1.f;
 
   self->backdrops = shell_backdrop_cache_new ();
   create_pipelines (self, get_cogl_context ());

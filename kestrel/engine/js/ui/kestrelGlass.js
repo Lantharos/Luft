@@ -6,6 +6,7 @@ const THEMED_PROPERTIES = [
     ['-kestrel-glass-highlight', 'edge-highlight'],
     ['-kestrel-glass-dim', 'bright-dim'],
     ['-kestrel-glass-lift', 'dark-lift'],
+    ['-kestrel-glass-saturation', 'saturation'],
 ];
 
 const solidSurfaces = new Set();

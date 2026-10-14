@@ -1,6 +1,6 @@
 import * as installer from '#lib/api/installer.js';
 import type { Drive, InstallerState, Survey, Target } from '#lib/api/installer.js';
-import type { Hardware } from '#lib/api/system.js';
+import { NO_HARDWARE, type Hardware } from '#lib/api/system.js';
 import { regional } from './regional.svelte.js';
 
 const NAME_FALLBACK = 'luft';
@@ -13,7 +13,7 @@ class InstallState {
 	starting = $state(false);
 	startError = $state('');
 	user = $state('');
-	private hardware: Hardware = { nvidia: false, portable: false, onBattery: false };
+	private hardware = NO_HARDWARE;
 
 	started = $derived(this.status !== null && this.status.stage !== 'idle');
 	failed = $derived(this.status?.stage === 'failed');

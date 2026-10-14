@@ -6,6 +6,7 @@ categories = ["System"]
 keywords = ["install", "installer", "setup", "set up", "dual boot", "windows"]
 version = "0.1.0"
 icon = "public/favicon.svg"
+listed = false
 cargo_manifest = "desktop/Cargo.toml"
 
 [install]

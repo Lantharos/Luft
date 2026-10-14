@@ -1,6 +1,6 @@
+import { fingerprintReader } from '@luft/ui';
 import { firmware } from '#lib/panels/system/updates/api.js';
 import {
-	fingerprintReader,
 	hostSecurity,
 	onTrust,
 	onUsbProtection,

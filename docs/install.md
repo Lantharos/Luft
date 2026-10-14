@@ -44,20 +44,26 @@ The system is a bootc image from `ghcr.io/lantharos/luft`, or the `-nvidia` vari
 
 ## The first start
 
-Luft signs you in once by itself and opens Install Luft again for the last steps.
+Luft starts at the login screen with your new account. Sign in with the password you chose, and Install Luft opens over the blurred wallpaper for the last steps before the desktop appears.
 
-1. **Secure Boot**, when it's on. Your computer only starts what it trusts, so it asks once whether to trust Luft, on a blue screen right after a restart. Install Luft shows that screen ahead of time and gives you an eight-digit code. After restarting: press a key within ten seconds, choose *Enroll MOK*, *Continue*, *Yes*, type the code and choose *Reboot*. Details are in [Boot and recovery](boot.md#adding-the-luft-secure-boot-key).
+1. **Secure Boot**, when it's on. Your computer only starts what it trusts, so it asks once whether to trust Luft, on a blue screen right after a restart. Install Luft shows that screen ahead of time and gives you an eight-digit code. After restarting: press a key within ten seconds, choose *Enroll MOK*, *Continue*, *Yes*, type the code and choose *Reboot*. The blue screen only takes the arrow keys and Enter. Details are in [Boot and recovery](boot.md#adding-the-luft-secure-boot-key).
 2. **Encryption**, optional. Luft encrypts the disk in the background after the next restart. With a TPM it unlocks by itself; without one it asks for a passphrase. Keep the recovery key it shows somewhere else.
-3. **Done.** The desktop opens, or the computer restarts when one of the steps needs it. From then on Luft starts at the login screen.
+3. **Fingerprint**, optional, when the computer has a reader. Add a finger to sign in and unlock with it.
+4. **Done.** The desktop opens, or the computer restarts when one of the steps needs it.
 
-Both steps can be skipped and done later in Settings, under Security.
+Every step can be skipped. Secure Boot and encryption are in Settings under Security, fingerprints under Users.
+
+Luft also picks a few things for you: the display scale from the screen's size and resolution (125% on most 14" to 16" laptop screens, 200% on sharper ones), and tap to click on touchpads. Both can be changed in Settings.
+
+## Graphics on the stick
+
+The stick runs on the open-source drivers, including nouveau on NVIDIA graphics cards. Nouveau drives cards up to the GeForce RTX 50 series through NVIDIA's own GSP firmware, which the stick carries, so setup looks the same as anywhere else. Installing picks the image with NVIDIA's driver when there's an NVIDIA card. A card newer than the stick's kernel falls back to the firmware's screen, which is slower but enough for setup; the basic graphics mode in the Esc menu does the same on purpose.
 
 ## For image builders
 
 `/usr/lib/luft-installer/install.toml` says what to install:
 
 ```toml
-first-boot-session = "/usr/bin/kestrel-session --setup"
 # bootloader = "none"                 # passed to bootc install --bootloader
 # kernel-arguments = ["quiet"]
 # smallest-system = 34359738368       # bytes; drives or spaces below it aren't offered
@@ -70,7 +76,7 @@ size = 5286520084                                         # bytes installed, for
 The image ships only the settings above the `[images]` tables. The stick's build adds a table for each image it carries, with the size Podman reports for it. `[images.nvidia]` is used on computers with an NVIDIA graphics card. Updates come from the reference in `/usr/share/luft/image-reference`, with `-nvidia` added for the NVIDIA image.
 
 - The stick ([os/iso](../os/iso)) keeps both images in a read-only image store on the stick, which the session there adds to Podman's storage, so `containers-storage:` sources install without a network.
-- Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included.
-- After copying, the installer writes the locale, keyboard, time zone, host name and the account into the new system, and sets greetd's `initial_session` so the first start opens setup. `FinishFirstBoot` takes it out again.
+- Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included. Install Luft is listed in Start only there.
+- After copying, the installer writes the locale, keyboard, time zone, host name and the account into the new system, plus `/var/lib/luft-installer/first-boot` with the account's name. `FinishFirstBoot` removes that file, and only that account may call it.
 
-`kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session. Setup mode shows the firmware logo while Sushi hands over, fades in the blurred wallpaper with the window, and ends on that same wallpaper, so the desktop takes over without a flash.
+`kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session. `kestrel-session` does the same on its own when `/var/lib/luft-installer/first-boot` names the person signing in. Setup mode shows the firmware logo while Sushi hands over, fades in the blurred wallpaper with the window, and ends on that same wallpaper, so the desktop takes over without a flash. It also serves the portal's appearance settings and Luft's palette, so apps in setup look like they do on the desktop.

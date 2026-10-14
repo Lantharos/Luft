@@ -27,7 +27,7 @@ printf 'ghcr.io/lantharos/luft:45\n' | install -Dm644 /dev/stdin "$stage/root/us
 printf '[terminal]\nvt = 7\n\n[default_session]\ncommand = "kestrel-greeter"\nuser = "greetd"\n' |
   install -Dm644 /dev/stdin "$stage/root/etc/greetd/config.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
-printf 'first-boot-session = "kestrel-session --setup"\nkernel-arguments = ["console=ttyS0,115200"]\n\n[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
+printf 'kernel-arguments = ["console=ttyS0,115200"]\n\n[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
 podman build --quiet --tag "$image" "$stage"

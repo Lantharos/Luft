@@ -84,7 +84,6 @@ export const trust = () => invoke<Trust | null>('security_trust');
 export const onTrust = (callback: (trust: Trust) => void) => listen<Trust>('security.trust', callback);
 export const hostSecurity = () => invoke<HostSecurity | null>('security_host', {}, { timeoutMs: 120_000 });
 
-export const fingerprintReader = () => invoke<boolean>('users_fingerprint_reader');
 
 export const usbProtection = () => invoke<UsbProtection | null>('security_usb');
 export const onUsbProtection = (callback: (usb: UsbProtection) => void) => listen<UsbProtection>('security.usb', callback);

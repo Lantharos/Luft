@@ -35,6 +35,17 @@ export { default as NativeVideoSurface } from './playback/NativeVideoSurface.sve
 export { default as SeekBar } from './playback/SeekBar.svelte';
 export { default as VolumeControl } from './playback/VolumeControl.svelte';
 
+export {
+	deleteFingerprint,
+	fingerLabel,
+	FINGERS,
+	FingerprintEnrollment,
+	fingerprintReader,
+	fingerprints,
+	type EnrollPhase,
+	type Fingerprints
+} from './security/fingerprint.svelte';
+export { default as FingerprintDial } from './security/FingerprintDial.svelte';
 export { default as RecoveryKey } from './security/RecoveryKey.svelte';
 
 export { ago, bytes, memoryBytes, plural, watts } from './text/format';

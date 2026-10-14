@@ -66,9 +66,9 @@ check_whole_drive() {
     grep -q '^XKBLAYOUT=de$' "$root/etc/vconsole.conf" && grep -q '"nodeadkeys"' "$root/etc/X11/xorg.conf.d/00-keyboard.conf" &&
     [[ "$(cat "$root/etc/hostname")" == ada-laptop ]] || fail "the regional settings aren't in the new system"
   pass "the time zone, language, keyboard and name are in the new system"
-  grep -q '^\[initial_session\]' "$root/etc/greetd/config.toml" && grep -q '^user = "ada"' "$root/etc/greetd/config.toml" &&
-    [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
-  pass "the first start signs ada in once, into setup"
+  ! grep -q initial_session "$root/etc/greetd/config.toml" || fail "the first start signs someone in by itself"
+  [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
+  pass "the first start shows the login screen, and setup continues once ada signs in"
   grep -rqs 'ghcr.io/lantharos/luft:45' "$TARGET/ostree/deploy/default/deploy/"*.origin || fail "updates won't come from Luft's image"
   pass "updates come from ghcr.io/lantharos/luft:45"
   umount "$TARGET"
@@ -98,13 +98,11 @@ check_first_boot_finish() {
   useradd ada
   mkdir -p /var/lib/luft-installer
   echo ada > /var/lib/luft-installer/first-boot
-  printf '\n[initial_session]\nuser = "ada"\ncommand = "kestrel-session --setup"\n' >> /etc/greetd/config.toml
   [[ "$(busctl --json=short get-property "${BUS[@]}" Phase | jq -r .data)" == first-boot ]] || fail "the installed system doesn't know setup is pending"
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
-  ! grep -q initial_session /etc/greetd/config.toml && [[ ! -e /var/lib/luft-installer/first-boot ]] ||
-    fail "the computer would still sign in by itself"
-  pass "only the new account ends setup, and the login screen comes back"
+  [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
+  pass "only the new account ends setup"
 }
 
 mkdir -p "$SOURCE" && mount -o ro LABEL=luft-source "$SOURCE" || fail "the source disk doesn't mount"

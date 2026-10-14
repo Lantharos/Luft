@@ -41,6 +41,7 @@ fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
     });
     let window = luft_network::register(window, events);
+    let window = luft_fingerprint::register(window, events);
     let window = installer::register(window);
     let window = trust::register(window);
     let window = regional::register(window);

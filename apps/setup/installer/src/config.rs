@@ -17,7 +17,6 @@ pub struct Config {
     pub bootloader: Option<String>,
     #[serde(default)]
     pub kernel_arguments: Vec<String>,
-    pub first_boot_session: String,
     #[serde(default = "smallest_system")]
     pub smallest_system: u64,
 }

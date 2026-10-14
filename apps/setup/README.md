@@ -11,7 +11,8 @@ Installs Luft from the USB stick and sets up a new computer the first time it st
 - Refuses to touch Windows while it's hibernating, locked with BitLocker or needs a check, and says what to do in Windows
 - Copies Luft in the background while you connect to Wi-Fi and make your account
 - Picks the NVIDIA image when the computer has an NVIDIA graphics card
-- On first start: explains the one blue Secure Boot screen with pictures and the code to type, offers encryption with a recovery key, then hands over to the desktop
+- On first start, right after signing in: explains the one blue Secure Boot screen with pictures and the code to type, offers encryption with a recovery key and a fingerprint when there's a reader, then hands over to the desktop
+- Listed in Start only on the stick
 
 ## Parts
 

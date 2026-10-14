@@ -2,6 +2,7 @@
 	import { enrollKey, restart } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
+	import { setup } from '#lib/state/setup.svelte.js';
 	import MokScreen from './MokScreen.svelte';
 
 	const STEPS = [
@@ -11,6 +12,7 @@
 		{ caption: 'Type your code, then choose Reboot', screen: { heading: 'Enroll MOK', items: [], prompt: 'Password:\n• • • • • • • •' } }
 	];
 
+	let pointer = $derived(setup.hardware.touchpad ? 'touchpad' : 'mouse');
 	let code = $state('');
 	let busy = $state(false);
 	let problem = $state('');
@@ -35,7 +37,7 @@
 
 <StepFrame
 	title="One more step for a safe start"
-	description="Your computer only starts software it trusts. To trust Luft, it shows a blue screen once when it restarts. Here’s what to do there."
+	description="Your computer only starts software it trusts. To trust Luft, it shows a blue screen once when it restarts. Use the arrow keys and Enter there, since the {pointer} doesn’t work on it."
 >
 	<div class="flex flex-col gap-7">
 		<ol class="grid grid-cols-4 gap-4">

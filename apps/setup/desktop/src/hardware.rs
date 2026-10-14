@@ -4,6 +4,9 @@ use luft_app::dbus::service::{Service, get};
 use serde::Serialize;
 
 const PCI: &str = "/sys/bus/pci/devices";
+const INPUT: &str = "/sys/class/input";
+const UDEV_DATA: &str = "/run/udev/data";
+const TOUCHPAD: &str = "E:ID_INPUT_TOUCHPAD=1";
 const DISPLAY_CLASS: &str = "0x03";
 const NVIDIA: &str = "0x10de";
 const CHASSIS: &str = "/sys/class/dmi/id/chassis_type";
@@ -20,6 +23,8 @@ pub struct Hardware {
     nvidia: bool,
     portable: bool,
     on_battery: bool,
+    touchpad: bool,
+    fingerprint: bool,
 }
 
 fn read(path: &Path) -> String {
@@ -41,6 +46,18 @@ fn has_nvidia_display() -> bool {
         })
 }
 
+fn has_touchpad() -> bool {
+    std::fs::read_dir(INPUT)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter_map(|device| {
+            let number = read(&device.path().join("dev"));
+            (!number.is_empty()).then(|| Path::new(UDEV_DATA).join(format!("c{number}")))
+        })
+        .any(|properties| read(&properties).lines().any(|line| line == TOUCHPAD))
+}
+
 fn portable() -> bool {
     read(Path::new(CHASSIS))
         .parse::<u32>()
@@ -57,5 +74,7 @@ pub fn detect() -> Hardware {
             .flatten()
             .and_then(|properties| get(&properties, "OnBattery"))
             .unwrap_or(false),
+        touchpad: has_touchpad(),
+        fingerprint: luft_fingerprint::reader_present(),
     }
 }

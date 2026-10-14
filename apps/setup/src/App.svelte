@@ -4,6 +4,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { isAvailable } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
+	import Fingerprint from '#lib/steps/firstboot/Fingerprint.svelte';
 	import SecureBoot from '#lib/steps/firstboot/SecureBoot.svelte';
 	import Protect from '#lib/steps/firstboot/Protect.svelte';
 	import Ready from '#lib/steps/firstboot/Ready.svelte';
@@ -17,7 +18,7 @@
 	import { regional } from '#lib/state/regional.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 
-	const STEPS = { region: Region, destination: Destination, network: Network, account: Account, finishing: Finishing, 'secure-boot': SecureBoot, protect: Protect, ready: Ready };
+	const STEPS = { region: Region, destination: Destination, network: Network, account: Account, finishing: Finishing, 'secure-boot': SecureBoot, protect: Protect, fingerprint: Fingerprint, ready: Ready };
 	const SLIDE = 28;
 
 	onMount(() => {

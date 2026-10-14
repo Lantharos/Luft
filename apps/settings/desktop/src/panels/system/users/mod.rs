@@ -1,4 +1,3 @@
-mod fingerprint;
 mod password;
 mod picture;
 
@@ -111,21 +110,12 @@ fn choose_picture(_: Value) -> Result<bool, String> {
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window
+    let window = window
         .command("users", |_: Value| users())
         .command("users_rename", |Rename { name }| {
             change("SetRealName", &name.trim())
         })
         .command("users_choose_picture", choose_picture)
-        .command("users_change_password", password::change)
-        .command("users_fingerprints", |_: Value| Ok(fingerprint::list()))
-        .command("users_fingerprint_reader", |_: Value| {
-            Ok(fingerprint::reader_present())
-        })
-        .with("users_fingerprint_enroll", events, fingerprint::enroll)
-        .command("users_fingerprint_stop", |_: Value| {
-            fingerprint::stop();
-            Ok(())
-        })
-        .command("users_fingerprint_delete", fingerprint::delete)
+        .command("users_change_password", password::change);
+    luft_fingerprint::register(window, events)
 }

@@ -10,6 +10,8 @@ const AT = {
   notNow: [560, 547],
   encrypt: [680, 547],
   kept: [70, 420],
+  addFingerprint: [690, 547],
+  continue: [722, 547],
   restart: [720, 547],
 };
 const HANDOFF = 5000;
@@ -31,6 +33,16 @@ async function checkProtect(setup) {
   await setup.called('TurnOnEncryption', 'encryption is turned on through trustd');
 }
 
+async function checkFingerprint(setup) {
+  await setup.shot('fingerprint');
+  await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
+  await setup.called('fingerprint EnrollStart right-index-finger', 'the right index finger is added through fprintd');
+  await eventually(async () => (await setup.calls()).includes('fingerprint Release'), 'the reader is released once the finger is added');
+  await setup.app.settle(() => true);
+  await setup.shot('fingerprint-added');
+  await setup.click(AT.continue, 'continuing moves on');
+}
+
 async function checkHandoff(endSession) {
   gjs('clients/window.js', [], {env: {GDK_BACKEND: 'x11'}});
   await waitForWindow('Kestrel window check', 'an X11 window is open next to setup when it finishes');
@@ -47,9 +59,10 @@ export async function checkFirstBoot(endSession) {
   await setup.open();
   await checkSecureBoot(setup);
   await checkProtect(setup);
+  await checkFingerprint(setup);
   await setup.shot('ready');
   setup.tap(AT.restart);
-  await setup.called('installer FinishFirstBoot', 'finishing stops signing in automatically');
+  await setup.called('installer FinishFirstBoot', 'finishing tells the installer setup is done');
   await eventually(async () => (await setup.calls()).includes('Reboot'), 'encrypting needs a restart to finish');
   await checkHandoff(endSession);
 }

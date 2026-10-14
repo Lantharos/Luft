@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {BASIC_NAMES, publishBasics} from '../system/basics.js';
+import {FINGERPRINT_NAME, publishFingerprint} from '../system/fingerprint.js';
 import {publishSecurity, SECURITY_NAMES, variants} from '../system/security.js';
 import {publishUdisks} from '../system/udisks/service.js';
 import {INSTALLER_NAME, publishInstaller} from './installer.js';
@@ -35,7 +36,8 @@ publishSecurity(publish, calls, publishUdisks(calls), {
 });
 publishInstaller(publish, calls);
 publishNetworkManager(calls);
+publishFingerprint(publish, calls);
 
-for (const name of [...BASIC_NAMES, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', INSTALLER_NAME, NETWORK_MANAGER_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', INSTALLER_NAME, NETWORK_MANAGER_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

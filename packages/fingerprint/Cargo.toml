@@ -1,0 +1,15 @@
+[package]
+name = "luft-fingerprint"
+version = "0.1.0"
+description = "Fingerprint readers through fprintd, shared by Settings and Setup"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[dependencies]
+luft-app = { path = "../app" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.38" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

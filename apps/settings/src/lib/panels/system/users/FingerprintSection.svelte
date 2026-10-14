@@ -1,10 +1,8 @@
 <script lang="ts">
 	import Fingerprint from '@lucide/svelte/icons/fingerprint';
 	import Trash from '@lucide/svelte/icons/trash';
-	import { Dialog, IconButton, Row, Section } from '@luft/ui';
+	import { deleteFingerprint, Dialog, FINGERS, fingerLabel, fingerprints, IconButton, Row, Section, type Fingerprints } from '@luft/ui';
 	import EnrollDialog from './EnrollDialog.svelte';
-	import { deleteFingerprint, fingerprints, type Fingerprints } from './api';
-	import { FINGERS, fingerLabel } from './fingers';
 
 	let prints = $state<Fingerprints | null>(null);
 	let enrolling = $state(false);

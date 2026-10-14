@@ -138,7 +138,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     let deployment = Deployment::find(mounted.root())?;
     regional.apply(&deployment)?;
     account.create(&deployment)?;
-    handoff::prepare(&deployment, &account.name, &job.config.first_boot_session)?;
+    handoff::prepare(&deployment, &account.name)?;
     mounted.finish()?;
     report(Status::at(Stage::Finished, 1.0));
     Ok(())

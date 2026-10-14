@@ -1,9 +1,9 @@
 import type { Phase } from '#lib/api/installer.js';
 
-export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing' | 'secure-boot' | 'protect' | 'ready';
+export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing' | 'secure-boot' | 'protect' | 'fingerprint' | 'ready';
 
 const LIVE: Step[] = ['region', 'destination', 'network', 'account', 'finishing'];
-const FIRST_BOOT: Step[] = ['secure-boot', 'protect', 'ready'];
+const FIRST_BOOT: Step[] = ['secure-boot', 'protect', 'fingerprint', 'ready'];
 const POINT_OF_NO_RETURN: Step = 'network';
 
 class Flow {

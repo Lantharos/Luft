@@ -1,14 +1,16 @@
 use std::sync::{Mutex, OnceLock};
 
-use luft_app::Events;
 use luft_app::dbus;
+use luft_app::{Commands, Events};
+use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use zbus::blocking::{MessageIterator, Proxy};
 use zbus::message::Type;
 use zbus::proxy::MethodFlags;
 use zbus::zvariant::OwnedObjectPath;
 
-const PROGRESS: &str = "users.fingerprint";
+const PROGRESS: &str = "fingerprint.enroll";
 
 const SERVICE: &str = "net.reactivated.Fprint";
 const MANAGER_PATH: &str = "/net/reactivated/Fprint/Manager";
@@ -18,14 +20,14 @@ const CURRENT_USER: &str = "";
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Fingerprints {
+struct Fingerprints {
     swipe: bool,
     stages: i32,
     enrolled: Vec<String>,
 }
 
 #[derive(Deserialize)]
-pub struct Finger {
+struct Finger {
     finger: String,
 }
 
@@ -79,7 +81,7 @@ fn call(
         .map_err(explain)
 }
 
-pub fn list() -> Option<Fingerprints> {
+fn list() -> Option<Fingerprints> {
     let reader = reader()?;
     Some(Fingerprints {
         swipe: reader.get_property::<String>("scan-type").ok().as_deref() == Some("swipe"),
@@ -90,7 +92,7 @@ pub fn list() -> Option<Fingerprints> {
     })
 }
 
-pub fn delete(Finger { finger }: Finger) -> Result<(), String> {
+fn delete(Finger { finger }: Finger) -> Result<(), String> {
     let reader = reader().ok_or("There's no fingerprint reader")?;
     call(&reader, "Claim", &(CURRENT_USER,))?;
     let deleted = call(&reader, "DeleteEnrolledFinger", &(finger,));
@@ -98,7 +100,7 @@ pub fn delete(Finger { finger }: Finger) -> Result<(), String> {
     deleted
 }
 
-pub fn enroll(events: &Events, Finger { finger }: Finger) -> Result<(), String> {
+fn enroll(events: &Events, Finger { finger }: Finger) -> Result<(), String> {
     LISTENING.get_or_init(|| listen(events.clone()));
     let reader = reader().ok_or("There's no fingerprint reader")?;
     call(&reader, "Claim", &(CURRENT_USER,))?;
@@ -110,7 +112,7 @@ pub fn enroll(events: &Events, Finger { finger }: Finger) -> Result<(), String> 
     Ok(())
 }
 
-pub fn stop() {
+fn stop() {
     if let Some(reader) = ENROLLING.lock().unwrap().take() {
         let _ = reader.call_method("EnrollStop", &());
         let _ = reader.call_method("Release", &());
@@ -147,4 +149,16 @@ fn listen(events: Events) {
             }
         }
     });
+}
+
+pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    window
+        .command("fingerprint_reader", |_: Value| Ok(reader_present()))
+        .command("fingerprint_list", |_: Value| Ok(list()))
+        .with("fingerprint_enroll", events, enroll)
+        .command("fingerprint_stop", |_: Value| {
+            stop();
+            Ok(())
+        })
+        .command("fingerprint_delete", delete)
 }

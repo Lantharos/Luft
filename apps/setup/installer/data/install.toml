@@ -1,2 +1,1 @@
 # The USB stick's build (os/iso) adds an [images.NAME] table for each image it carries, with its source and installed size.
-first-boot-session = "/usr/bin/kestrel-session --setup"

@@ -5,7 +5,11 @@ export interface Hardware {
 	nvidia: boolean;
 	portable: boolean;
 	onBattery: boolean;
+	touchpad: boolean;
+	fingerprint: boolean;
 }
+
+export const NO_HARDWARE: Hardware = { nvidia: false, portable: false, onBattery: false, touchpad: false, fingerprint: false };
 
 export interface AppState extends Appearance {
 	hardware: Hardware;

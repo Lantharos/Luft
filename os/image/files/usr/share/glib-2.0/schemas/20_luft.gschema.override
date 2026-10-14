@@ -9,3 +9,6 @@ picture-uri='file:///usr/share/backgrounds/luft/Fog.jpg'
 font-name='Open Runde 11'
 document-font-name='Open Runde 12'
 monospace-font-name='Maple Mono NF 11'
+
+[org.gnome.desktop.peripherals.touchpad]
+tap-to-click=true

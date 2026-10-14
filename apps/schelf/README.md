@@ -63,6 +63,8 @@ This makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.AppIma
 |------|----------|
 | `~/Applications/` | Installed AppImages |
 | `~/.local/share/applications/` | Menu entries for AppImages |
-| `~/.local/share/icons/hicolor/` | AppImage icons |
+| `~/.local/share/icons/hicolor/` | AppImage icons, at each size the AppImage ships |
 
 Electron AppImages are started with `--no-sandbox`, since Chromium's sandbox refuses to start from an AppImage.
+
+When Schelf starts, it gives AppImages installed earlier the icons they ship if theirs are missing or the wrong size.

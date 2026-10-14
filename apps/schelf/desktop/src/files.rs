@@ -156,7 +156,7 @@ fn package(path: &str) -> Result<Opened, String> {
 
 fn appimage_file(path: &str) -> Result<Opened, String> {
     let bundle = appimage::inspect(Path::new(path))?;
-    let icon = bundle.icon.as_ref().and_then(|icon| {
+    let icon = bundle.icons.first().and_then(|icon| {
         let mut hasher = DefaultHasher::new();
         icon.bytes.hash(&mut hasher);
         let folder = cache::folder().join("opened");

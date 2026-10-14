@@ -6,21 +6,23 @@ use std::path::{Component, Path, PathBuf};
 use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 
 use super::elf;
+use super::library::IconSize;
 use crate::desktop::DesktopEntry;
 
 const MAX_LINKS: usize = 8;
-const ICON_SIZES: [&str; 5] = ["scalable", "512x512", "256x256", "128x128", "64x64"];
+const THEMED_ICONS: &str = "/usr/share/icons/hicolor";
 const ELECTRON_MARKERS: [&str; 2] = ["/chrome-sandbox", "/resources/app.asar"];
 
 pub struct Icon {
     pub bytes: Vec<u8>,
     pub extension: &'static str,
+    pub size: IconSize,
 }
 
 pub struct Bundle {
     pub entry: DesktopEntry,
     pub entry_text: String,
-    pub icon: Option<Icon>,
+    pub icons: Vec<Icon>,
     pub electron: bool,
 }
 
@@ -76,24 +78,49 @@ impl<'a, 'b> Contents<'a, 'b> {
         entries.first().map(|path| path.to_path_buf())
     }
 
-    fn icon(&self, name: &str) -> Option<Icon> {
-        let mut candidates: Vec<PathBuf> = ["svg", "png"]
-            .iter()
-            .map(|extension| PathBuf::from(format!("/{name}.{extension}")))
-            .collect();
-        candidates.push(PathBuf::from("/.DirIcon"));
-        for size in ICON_SIZES {
-            for extension in ["svg", "png"] {
-                candidates.push(PathBuf::from(format!(
-                    "/usr/share/icons/hicolor/{size}/apps/{name}.{extension}"
-                )));
-            }
-        }
-        candidates.iter().find_map(|path| {
-            let bytes = self.read(path)?;
-            let extension = image_kind(&bytes)?;
-            Some(Icon { bytes, extension })
+    fn icon_at(&self, path: &Path) -> Option<Icon> {
+        let bytes = self.read(path)?;
+        let (extension, size) = image_kind(&bytes)?;
+        Some(Icon {
+            bytes,
+            extension,
+            size,
         })
+    }
+
+    fn themed(&self, name: &str) -> Vec<&'a Path> {
+        self.nodes
+            .keys()
+            .copied()
+            .filter(|path| path.starts_with(THEMED_ICONS))
+            .filter(|path| path.parent().is_some_and(|folder| folder.ends_with("apps")))
+            .filter(|path| path.file_stem().is_some_and(|stem| stem == name))
+            .collect()
+    }
+
+    fn icons(&self, name: &str) -> Vec<Icon> {
+        let root = [
+            format!("/{name}.svg"),
+            format!("/{name}.png"),
+            "/.DirIcon".to_owned(),
+        ];
+        let mut icons: Vec<Icon> = self
+            .themed(name)
+            .into_iter()
+            .chain(root.iter().map(Path::new))
+            .filter_map(|path| self.icon_at(path))
+            .collect();
+        if icons.is_empty() {
+            icons = self
+                .nodes
+                .keys()
+                .filter(|path| path.parent() == Some(Path::new("/")))
+                .filter_map(|path| self.icon_at(path))
+                .collect();
+        }
+        icons.sort_by_key(|icon| std::cmp::Reverse(icon.size));
+        icons.dedup_by_key(|icon| icon.size.folder());
+        icons
     }
 }
 
@@ -115,12 +142,12 @@ fn normalize(base: &Path, link: &Path) -> PathBuf {
     path
 }
 
-fn image_kind(bytes: &[u8]) -> Option<&'static str> {
+fn image_kind(bytes: &[u8]) -> Option<(&'static str, IconSize)> {
     if bytes.starts_with(b"\x89PNG") {
-        return Some("png");
+        return IconSize::of_png(bytes).map(|size| ("png", size));
     }
     let head = String::from_utf8_lossy(&bytes[..bytes.len().min(1024)]);
-    head.contains("<svg").then_some("svg")
+    head.contains("<svg").then_some(("svg", IconSize::Scalable))
 }
 
 pub fn read(path: &Path) -> Result<Bundle, String> {
@@ -136,14 +163,17 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
     let entry_text =
         String::from_utf8_lossy(&contents.read(&desktop).ok_or_else(unreadable)?).into_owned();
     let entry = DesktopEntry::parse(&entry_text);
-    let icon = entry.get("Icon").and_then(|name| contents.icon(name));
+    let icons = entry
+        .get("Icon")
+        .map(|name| contents.icons(name))
+        .unwrap_or_default();
     let electron = ELECTRON_MARKERS
         .iter()
         .any(|marker| contents.nodes.contains_key(Path::new(marker)));
     Ok(Bundle {
         entry,
         entry_text,
-        icon,
+        icons,
         electron,
     })
 }

@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use super::bundle::{self, Bundle};
-use super::library::{self, AppImage};
+use super::library::{self, AppImage, IconSize};
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
@@ -95,33 +95,45 @@ pub fn copy(source: &Path, destination: &Path, task: Task) -> Result<(), String>
 }
 
 pub fn integrate(id: &str, executable: &Path, bundle: &Bundle) -> Result<(), String> {
-    let icon = match &bundle.icon {
-        Some(icon) => {
-            remove_icons(id);
-            let size = if icon.extension == "svg" {
-                "scalable"
-            } else {
-                "256x256"
-            };
-            let folder = library::icons().join(size).join("apps");
-            fs::create_dir_all(&folder).map_err(failed)?;
-            fs::write(folder.join(format!("{id}.{}", icon.extension)), &icon.bytes)
-                .map_err(failed)?;
-            Some(id.to_owned())
-        }
-        None => None,
-    };
+    remove_icons(id);
+    for icon in &bundle.icons {
+        let folder = library::icons().join(icon.size.folder()).join("apps");
+        fs::create_dir_all(&folder).map_err(failed)?;
+        fs::write(folder.join(format!("{id}.{}", icon.extension)), &icon.bytes).map_err(failed)?;
+    }
+    refresh_icons();
     let applications = library::applications();
     fs::create_dir_all(&applications).map_err(failed)?;
-    let entry = desktop_entry(
-        &bundle.entry_text,
-        executable,
-        icon.as_deref(),
-        bundle.electron,
-    );
+    let icon = (!bundle.icons.is_empty()).then_some(id);
+    let entry = desktop_entry(&bundle.entry_text, executable, icon, bundle.electron);
     fs::write(applications.join(format!("{id}.desktop")), entry).map_err(failed)?;
     refresh_menus(&applications);
     Ok(())
+}
+
+fn icon_fits(icon: &Path) -> bool {
+    let folder = icon
+        .parent()
+        .and_then(Path::parent)
+        .and_then(Path::file_name);
+    let size = match icon.extension().and_then(|extension| extension.to_str()) {
+        Some("svg") => Some(IconSize::Scalable),
+        _ => fs::read(icon)
+            .ok()
+            .and_then(|bytes| IconSize::of_png(&bytes)),
+    };
+    size.is_some_and(|size| folder.is_some_and(|folder| *folder == *size.folder()))
+}
+
+pub fn repair() {
+    for app in library::list() {
+        if app.icon.as_deref().is_some_and(icon_fits) {
+            continue;
+        }
+        if let Ok(bundle) = bundle::read(&app.path) {
+            let _ = integrate(&app.id, &app.path, &bundle);
+        }
+    }
 }
 
 fn exec_line(original: &str, executable: &Path, electron: bool) -> String {
@@ -181,6 +193,13 @@ fn desktop_entry(original: &str, executable: &Path, icon: Option<&str>, electron
     lines.join("\n") + "\n"
 }
 
+fn refresh_icons() {
+    let _ = Command::new("gtk-update-icon-cache")
+        .args(["-q", "-t", "-f"])
+        .arg(library::icons())
+        .status();
+}
+
 fn refresh_menus(applications: &Path) {
     let _ = Command::new("update-desktop-database")
         .arg(applications)
@@ -203,6 +222,7 @@ pub fn remove(id: &str) -> Result<(), String> {
     fs::remove_file(&app.path).map_err(failed)?;
     fs::remove_file(&app.desktop).map_err(failed)?;
     remove_icons(id);
+    refresh_icons();
     if let Some(icon) = app.icon.filter(|icon| owned_icon(icon, &app.path)) {
         let _ = fs::remove_file(icon);
     }

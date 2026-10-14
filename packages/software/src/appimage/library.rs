@@ -5,9 +5,46 @@ use serde::Serialize;
 use super::elf;
 use crate::desktop::DesktopEntry;
 
-const ICON_SIZES: [&str; 7] = [
-    "scalable", "512x512", "256x256", "128x128", "96x96", "64x64", "48x48",
-];
+const ICON_FOLDERS: [u32; 13] = [16, 22, 24, 32, 36, 48, 64, 72, 96, 128, 192, 256, 512];
+const SCALABLE: &str = "scalable";
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum IconSize {
+    Pixels(u32),
+    Scalable,
+}
+
+impl IconSize {
+    pub fn of_png(bytes: &[u8]) -> Option<Self> {
+        let dimension = |range: std::ops::Range<usize>| {
+            Some(u32::from_be_bytes(bytes.get(range)?.try_into().ok()?))
+        };
+        Some(Self::Pixels(dimension(16..20)?.max(dimension(20..24)?)))
+    }
+
+    pub fn folder(self) -> String {
+        match self {
+            Self::Scalable => SCALABLE.to_owned(),
+            Self::Pixels(pixels) => {
+                let size = ICON_FOLDERS
+                    .iter()
+                    .rev()
+                    .find(|size| **size <= pixels)
+                    .unwrap_or(&ICON_FOLDERS[0]);
+                format!("{size}x{size}")
+            }
+        }
+    }
+}
+
+fn icon_folders() -> impl Iterator<Item = String> {
+    std::iter::once(SCALABLE.to_owned()).chain(
+        ICON_FOLDERS
+            .iter()
+            .rev()
+            .map(|size| format!("{size}x{size}")),
+    )
+}
 
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -41,11 +78,11 @@ pub fn icon_path(name: &str) -> Option<PathBuf> {
         return name.exists().then(|| name.to_path_buf());
     }
     let base = icons();
-    ICON_SIZES.iter().find_map(|size| {
+    icon_folders().find_map(|size| {
         ["svg", "png"]
             .iter()
             .map(|extension| {
-                base.join(size)
+                base.join(&size)
                     .join("apps")
                     .join(format!("{}.{extension}", name.display()))
             })

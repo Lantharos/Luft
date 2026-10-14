@@ -12,6 +12,7 @@ Build Kestrel first (see the [repository README](../README.md#build)). Then from
 | `kestrel/tools/session.sh capture` | The full headless check suite, including the login screen, saving screenshots of every surface |
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
 | `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft (needs `KESTREL_DEV_APPS=setup` or an installed build) |
+| `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
 
 `capture` splits the checks into groups and runs several sessions side by side:

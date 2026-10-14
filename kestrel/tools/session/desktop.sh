@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: kestrel/tools/session/desktop.sh nested|capture|performance|setup" >&2
+  echo "Usage: kestrel/tools/session/desktop.sh nested|capture|performance|setup|scaling" >&2
   echo "Starts one Kestrel session. kestrel/tools/session.sh is the way to run it." >&2
   exit 2
 }
@@ -17,9 +17,13 @@ case "$mode" in
   capture) args=(--headless --virtual-monitor "$size" --automation-script "$tools/automation/capture.js") ;;
   performance) args=(--headless --virtual-monitor "$size" --automation-script "$tools/automation/performance.js") ;;
   setup) args=(--setup --headless --virtual-monitor "$size" --automation-script "$tools/automation/setup.js") ;;
+  scaling)
+    args=(--headless --automation-script "$tools/automation/scaling.js")
+    while IFS=$'\t' read -r panel _; do args+=(--virtual-monitor "$panel"); done < "$tools/fixtures/scaling/panels.tsv"
+    ;;
   *) usage ;;
 esac
-if [[ "$mode" != nested && "$mode" != setup && -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then
+if [[ "$mode" =~ ^(capture|performance)$ && -n "${KESTREL_CAPTURE_SECONDARY_SIZE:-}" ]]; then
   args+=(--virtual-monitor "$KESTREL_CAPTURE_SECONDARY_SIZE")
 fi
 

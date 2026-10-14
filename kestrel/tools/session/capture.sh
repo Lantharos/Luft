@@ -16,9 +16,9 @@ usage() {
 }
 
 all_groups() {
-  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*') \
+  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
     | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
-  printf '%s\n' greeter setup
+  printf '%s\n' greeter setup scaling
 }
 
 select_groups() {
@@ -76,12 +76,12 @@ start_worker() {
 }
 
 standalone() {
-  [[ "$1" == greeter || "$1" == setup ]]
+  [[ "$1" == greeter || "$1" == setup || "$1" == scaling ]]
 }
 
 start_standalone() {
-  local command=("$tools/session/greeter.sh")
-  [[ "$1" == setup ]] && command=("$tools/session/desktop.sh" setup)
+  local command=("$tools/session/desktop.sh" "$1")
+  [[ "$1" == greeter ]] && command=("$tools/session/greeter.sh")
   started_at[$1]=$EPOCHREALTIME
   KESTREL_SESSION_DIR="$out/workers/$1" timeout "$session_timeout" "${command[@]}" > "$out/logs/$1.log" 2>&1 &
   running[$!]="$1"

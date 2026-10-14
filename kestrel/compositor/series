@@ -21,3 +21,5 @@
 0021-wayland-let-the-shell-magnify-windows-without-blurri.patch
 0022-clutter-let-the-shell-filter-events-before-the-compo.patch
 0023-wayland-disconnect-clients-after-the-compositor-prep.patch
+0024-backends-let-virtual-monitors-report-a-physical-size.patch
+0025-backends-pick-laptop-friendly-default-scales.patch

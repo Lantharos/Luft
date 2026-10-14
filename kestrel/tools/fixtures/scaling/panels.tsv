@@ -1,0 +1,8 @@
+1920x1080:344x194mm	1.25	a 15.6" 1080p laptop panel
+1920x1080:310x174mm	1.25	a 14" 1080p laptop panel
+1920x1080:294x166mm	1.5	a 13.3" 1080p laptop panel
+2880x1800:301x188mm	2	a 14" HiDPI laptop panel
+2560x1600:345x216mm	1.6666666	a 16" 2560x1600 laptop panel, where no quarter step fits
+2560x1440:598x336mm	1	a 27" 1440p monitor
+3840x2160:598x336mm	1.5	a 27" 4K monitor
+1440x900	1	a screen that reports no size

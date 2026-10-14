@@ -14,6 +14,7 @@ Modes:
   performance   Measure startup and Start menu timings headless.
   greeter       Run the login screen checks headless.
   setup         Run the first-run setup checks headless.
+  scaling       Check the default scale of laptop panels and monitors headless.
 
 Capture options:
   --only GROUPS   Run only these comma separated groups. An area such as
@@ -44,11 +45,11 @@ case "$mode" in
     exec "$tools/session/desktop.sh" "$mode"
     ;;
   capture) exec "$tools/session/capture.sh" "$@" ;;
-  setup)
+  setup | scaling)
     [[ $# -eq 0 ]] || { usage >&2; exit 2; }
     require_build
     build_helpers
-    exec "$tools/session/desktop.sh" setup
+    exec "$tools/session/desktop.sh" "$mode"
     ;;
   *) usage >&2; exit 2 ;;
 esac

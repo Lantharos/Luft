@@ -27,6 +27,7 @@ geoclue2
 geoclue2-libs
 gjs
 glib-networking
+glibc-all-langpacks
 glycin-loaders
 google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts

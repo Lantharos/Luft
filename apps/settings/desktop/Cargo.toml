@@ -27,7 +27,7 @@ luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "ibus"
 luft-network = { path = "../../../packages/network" }
 luft-software = { path = "../../../packages/software" }
 roxmltree = "0.21.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", rev = "aa8939197d11b9c031998b9d792c18981a39fb6d" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.38" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 tar = "0.4.46"

@@ -32,7 +32,7 @@ All commands need root.
 | `trustctl recovery-key show` / `replace` | Shows or replaces the disk's recovery key |
 | `trustctl encryption check` / `on` / `off` | Checks whether the disk can be encrypted, or encrypts or decrypts it in place |
 
-`encryption initrd` runs in the initramfs.
+`encryption initrd` runs in the initramfs. `startup good` runs from `trustd-boot-good.service` once the login screen is up, and `startup went-back` from `trustd-went-back.service` after SushiBoot went back from an update that didn't start ([details](../docs/boot.md#when-an-update-doesnt-start)).
 
 `trustd.service` starts at boot to continue encrypting or decrypting, follow up on the key enrollment, and bring shim and SushiBoot on the EFI system partition up to the running version's, along with the Fedora-signed way to start that stays until Luft's key is added ([details](../docs/boot.md#adding-lufts-secure-boot-key)). Otherwise it exits after a minute without requests.
 

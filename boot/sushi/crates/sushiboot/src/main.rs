@@ -22,6 +22,7 @@ use uefi::proto::loaded_image::LoadedImage;
 use uefi::{Handle, Identify};
 
 use entries::Catalog;
+use loader::attempts::{self, Attempts};
 use loader::{conf, vars};
 use screen::Screen;
 use start::firmware;
@@ -37,6 +38,18 @@ fn graphics_handle() -> Option<Handle> {
         })
 }
 
+fn note_attempt(catalog: &Catalog, chosen: usize, failed: Option<usize>, attempts: &mut Attempts) {
+    if let Some((image, _)) = catalog.entries[chosen].image() {
+        let counted = catalog.on_trial(chosen, attempts);
+        attempts.start(image, counted);
+    }
+    if let Some((_, release)) = failed.and_then(|failed| catalog.entries[failed].image())
+        && failed != Some(chosen)
+    {
+        attempts::went_back(&release.version);
+    }
+}
+
 #[entry]
 fn efi_main() -> Status {
     uefi::helpers::init().expect("the UEFI helpers start once");
@@ -47,7 +60,7 @@ fn efi_main() -> Status {
         return Status::LOAD_ERROR;
     };
 
-    let mut catalog = Catalog::collect(device, firmware::secure_boot());
+    let catalog = Catalog::collect(device, firmware::secure_boot());
     let Some(first) = catalog.first() else {
         return Status::NOT_FOUND;
     };
@@ -58,6 +71,10 @@ fn efi_main() -> Status {
         .flatten()
         .find_map(|pattern| catalog.find(pattern))
         .unwrap_or(first);
+    let mut attempts = Attempts::load();
+    let going_back = catalog.going_back(default, &attempts);
+    let failed = going_back.map(|_| default);
+    let default = going_back.unwrap_or(default);
     let mut screen = graphics_handle().and_then(|handle| {
         let gop = protocol::shared::<GraphicsOutput>(handle).ok()?;
         Some(Screen::new(handle, gop))
@@ -67,7 +84,7 @@ fn efi_main() -> Status {
         None => default,
     };
     loop {
-        catalog.record_attempt(chosen);
+        note_attempt(&catalog, chosen, failed, &mut attempts);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
         if start::start(entry).is_ok() {

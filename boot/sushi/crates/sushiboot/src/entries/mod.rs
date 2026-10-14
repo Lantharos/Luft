@@ -2,7 +2,6 @@ mod bls;
 mod images;
 mod loaders;
 mod pe;
-mod tries;
 pub mod volume;
 
 use alloc::format;
@@ -12,8 +11,8 @@ use alloc::vec::Vec;
 use uefi::Handle;
 
 use crate::files::Volume;
+use crate::loader::attempts::Attempts;
 use crate::start::firmware;
-use tries::Tries;
 
 pub enum Action {
     Linux {
@@ -33,7 +32,21 @@ pub struct BootEntry {
     pub title: String,
     pub volume: Handle,
     pub action: Action,
-    pub tries: Option<Tries>,
+    pub release: Option<Release>,
+}
+
+pub struct Release {
+    pub os: String,
+    pub version: String,
+}
+
+impl BootEntry {
+    pub fn image(&self) -> Option<(&str, &Release)> {
+        match (&self.action, &self.release) {
+            (Action::Efi { path, .. }, Some(release)) => Some((path, release)),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -109,7 +122,7 @@ impl Catalog {
                 title: String::from("Firmware settings"),
                 volume: boot_device,
                 action: Action::FirmwareSetup,
-                tries: None,
+                release: None,
             });
             catalog.main.push(Row::Entry(index));
         }
@@ -128,24 +141,26 @@ impl Catalog {
         })
     }
 
-    pub fn record_attempt(&mut self, index: usize) {
-        let entry = &self.entries[index];
-        let (Some(tries), Action::Efi { path, .. }) = (entry.tries, &entry.action) else {
-            return;
-        };
-        let Some((renamed, attempted)) = tries::record_attempt(entry.volume, path, tries) else {
-            return;
-        };
-        let (volume, previous) = (entry.volume, path.clone());
-        for other in &mut self.entries {
-            if let Action::Efi { path, .. } = &mut other.action
-                && other.volume == volume
-                && *path == previous
-            {
-                path.clone_from(&renamed);
-            }
+    pub fn on_trial(&self, index: usize, attempts: &Attempts) -> bool {
+        self.entries[index].image().is_some_and(|(image, release)| {
+            !attempts.is_good(image) && self.good(release, attempts).is_some()
+        })
+    }
+
+    pub fn going_back(&self, index: usize, attempts: &Attempts) -> Option<usize> {
+        let (image, release) = self.entries[index].image()?;
+        if attempts.is_good(image) || !attempts.exhausted(image) {
+            return None;
         }
-        self.entries[index].tries = Some(attempted);
+        self.good(release, attempts)
+    }
+
+    fn good(&self, release: &Release, attempts: &Attempts) -> Option<usize> {
+        self.entries.iter().position(|entry| {
+            entry
+                .image()
+                .is_some_and(|(image, other)| other.os == release.os && attempts.is_good(image))
+        })
     }
 
     pub fn find(&self, pattern: &str) -> Option<usize> {

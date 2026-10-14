@@ -79,6 +79,7 @@ keep_nvidia_firmware_for_present_cards() {
 installkernel() {
     local config
     local -a modules needed
+    [[ $hostonly ]] || return 0
     config="$(deferred_config)"
     [[ -n $config ]] || return 0
     mapfile -t modules < <(deferred_drivers "$config")

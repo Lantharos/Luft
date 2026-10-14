@@ -6,13 +6,13 @@ use std::path::PathBuf;
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 
-use crate::boot::startup;
+use crate::boot::{attempts, startup};
+use crate::disk;
 use crate::disk::keys;
 use crate::keys::mok;
-use crate::system::command::Tool;
+use crate::service::{self, actions};
 use crate::system::secret::Secret;
 use crate::system::tpm;
-use crate::{disk, service::actions};
 
 #[derive(Parser)]
 #[command(
@@ -72,6 +72,10 @@ enum StartupAction {
         #[arg(long)]
         esp: Option<PathBuf>,
     },
+    /// Remember that this version started, after the login screen came up
+    Good,
+    /// Make the version before the default after an update didn't start, and say so
+    WentBack,
 }
 
 #[derive(Subcommand)]
@@ -130,6 +134,8 @@ fn secure_boot(action: SecureBootAction) -> Result<()> {
 fn startup(action: StartupAction) -> Result<()> {
     match action {
         StartupAction::Install { esp } => startup::install(esp.as_deref()),
+        StartupAction::Good => attempts::mark_good(),
+        StartupAction::WentBack => attempts::went_back(),
     }
 }
 
@@ -194,13 +200,29 @@ fn encryption(action: EncryptionAction) -> Result<()> {
             Ok(())
         }
         EncryptionAction::Off => {
-            disk::turn_off(&ask::unlock_key()?)?;
-            Tool::new("systemctl")
-                .args(["start", "trustd.service"])
-                .status()?;
+            ask_trustd_to_decrypt(&ask::unlock_key()?)?;
             println!("Decrypting in the background. You can keep using the computer.");
             Ok(())
         }
         EncryptionAction::Initrd => disk::run_in_initrd(),
     }
+}
+
+fn ask_trustd_to_decrypt(unlock: &Secret) -> Result<()> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(async {
+            zbus::Connection::system()
+                .await?
+                .call_method(
+                    Some(service::NAME),
+                    service::PATH,
+                    Some(service::NAME),
+                    "TurnOffEncryption",
+                    &(unlock.text()),
+                )
+                .await
+        })?;
+    Ok(())
 }

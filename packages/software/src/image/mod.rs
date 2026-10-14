@@ -83,8 +83,7 @@ impl Deployments {
     }
 
     pub fn lacks(&self, update: &Update) -> bool {
-        std::iter::once(&self.0.booted)
-            .chain(&self.0.staged)
+        self.all()
             .all(|deployment| deployment.layers() != update.layers)
     }
 }

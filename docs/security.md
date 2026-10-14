@@ -20,6 +20,7 @@ The TPM releases the disk key only when both match:
 | 11 | The startup image, through a policy signed by Luft's policy key | Never for a Luft-signed image; the policy only covers the initramfs, so the running system can't release the key |
 
 - Updates to Luft and ordinary firmware updates keep unlocking without a prompt.
+- Once the disk is open, its volume key is measured into PCR 15, so anything sealed to the running system later only opens on this disk.
 - When PCR 7 changes, Sushi asks for the recovery key and says why, and Settings offers to link the TPM again.
 - An optional PIN of 6 to 20 digits makes the TPM also require something you know, with its own guessing lockout.
 - Every encrypted disk has a 64-character recovery key, in groups of eight, from letters that type the same on almost every keyboard. With a TPM, a sealed copy lets Settings show it again after an administrator password.

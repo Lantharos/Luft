@@ -49,6 +49,7 @@ ukify build \
   --secureboot-certificate="$certificate" \
   --pcr-private-key="$pcr_key" \
   --phases=enter-initrd \
+  --sign-initrd-pcrs \
   --pcr-banks=sha256 \
   --sign-profile=main \
   --output="$out/luft.efi"

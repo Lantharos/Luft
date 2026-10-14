@@ -84,3 +84,14 @@ fn an_update_is_new_until_it_is_downloaded() {
     assert!(deployments(include_str!("fixtures/installed.json")).lacks(&update));
     assert!(!staged.lacks(&update));
 }
+
+#[test]
+fn the_version_luft_went_back_from_is_not_offered_again() {
+    let returned = deployments(include_str!("fixtures/updated.json"));
+    let update = Update {
+        release: first(),
+        size: 0,
+        layers: returned.0.rollback.as_ref().unwrap().layers().to_vec(),
+    };
+    assert!(!returned.lacks(&update));
+}

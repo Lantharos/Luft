@@ -23,7 +23,7 @@ cp -a "$destdir/usr/local/." "$destdir/usr/"
 rm -rf "$destdir/usr/local"
 
 {
-  printf 'enable %s\n' "${units[@]}" trustd.service luft-usb-protection.service luft-passkeys-relay.socket
+  printf 'enable %s\n' "${units[@]}" trustd.service trustd-boot-good.service trustd-went-back.service luft-usb-protection.service luft-passkeys-relay.socket
 } | install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-boot.preset"
 printf 'enable luft-passkeys.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-passkeys.preset"

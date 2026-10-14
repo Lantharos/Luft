@@ -61,7 +61,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
                 title: origin.title(&entry.title),
                 volume: origin.handle,
                 action,
-                tries: None,
+                release: None,
             },
         ));
     }

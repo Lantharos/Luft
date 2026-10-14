@@ -4,8 +4,7 @@ use alloc::vec::Vec;
 use core::cmp::Ordering;
 
 use super::pe::{self, Uki};
-use super::tries::{self, Tries};
-use super::{Action, BootEntry, Catalog, Origin, Row, newest_first};
+use super::{Action, BootEntry, Catalog, Origin, Release, Row, newest_first};
 use crate::files::Volume;
 
 const IMAGES: &str = "\\EFI\\Linux";
@@ -14,7 +13,6 @@ pub struct Image {
     origin: Origin,
     path: String,
     name: String,
-    tries: Option<Tries>,
     sort_key: Option<String>,
     uki: Uki,
 }
@@ -32,7 +30,6 @@ impl Image {
             origin: origin.clone(),
             path,
             name,
-            tries: None,
             sort_key,
             uki,
         })
@@ -45,10 +42,6 @@ impl Image {
             .unwrap_or(self.name.trim_end_matches(".efi"))
     }
 
-    fn exhausted(&self) -> bool {
-        self.tries.is_some_and(Tries::exhausted)
-    }
-
     fn release(&self) -> String {
         match (&self.uki.name, &self.uki.image_version) {
             (Some(name), Some(version)) => format!("{name} {version}"),
@@ -57,12 +50,10 @@ impl Image {
     }
 
     fn order(&self, other: &Self) -> Ordering {
-        self.exhausted().cmp(&other.exhausted()).then_with(|| {
-            match (&self.sort_key, &other.sort_key) {
-                (Some(ours), Some(theirs)) => ours.cmp(theirs),
-                _ => newest_first(self.version(), other.version()),
-            }
-        })
+        match (&self.sort_key, &other.sort_key) {
+            (Some(ours), Some(theirs)) => ours.cmp(theirs),
+            _ => newest_first(self.version(), other.version()),
+        }
     }
 
     fn entry(&self, profile: usize, title: String) -> BootEntry {
@@ -85,7 +76,14 @@ impl Image {
                 path: self.path.clone(),
                 options,
             },
-            tries: self.tries.filter(|_| profile == 0),
+            release: (profile == 0).then(|| Release {
+                os: self.uki.os.clone(),
+                version: self
+                    .uki
+                    .image_version
+                    .clone()
+                    .unwrap_or_else(|| self.version().into()),
+            }),
         }
     }
 }
@@ -96,10 +94,8 @@ pub fn scan(volume: &mut Volume, origin: &Origin) -> Vec<Image> {
         .into_iter()
         .filter(|listed| !listed.directory && listed.name.to_ascii_lowercase().ends_with(".efi"))
         .filter_map(|listed| {
-            let (name, tries) = tries::split(&listed.name);
             let path = format!("{IMAGES}\\{}", listed.name);
-            let image = Image::open(volume, origin, path, name, None)?;
-            Some(Image { tries, ..image })
+            Image::open(volume, origin, path, listed.name, None)
         })
         .collect()
 }

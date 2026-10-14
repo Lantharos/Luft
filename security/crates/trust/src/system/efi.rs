@@ -78,19 +78,27 @@ pub fn boot_partition() -> Option<String> {
     variable("LoaderDevicePartUUID", STUB).map(|data| text(&data).to_lowercase())
 }
 
-pub fn announce_disk_change(pending: bool) -> std::io::Result<()> {
-    let path = format!("{VARIABLES}/{DISK_CHANGE}-{LUFT}");
+pub fn luft_variable(name: &str) -> Option<Vec<u8>> {
+    variable(name, LUFT)
+}
+
+pub fn set_luft_variable(name: &str, data: Option<&[u8]>) -> std::io::Result<()> {
+    let path = format!("{VARIABLES}/{name}-{LUFT}");
     if let Ok(existing) = std::fs::File::open(&path) {
         let flags = rustix::fs::ioctl_getflags(&existing)?;
         rustix::fs::ioctl_setflags(&existing, flags - rustix::fs::IFlags::IMMUTABLE)?;
         std::fs::remove_file(&path)?;
     }
-    if !pending {
+    let Some(data) = data else {
         return Ok(());
-    }
-    let mut data = NON_VOLATILE_BOOT_RUNTIME.to_le_bytes().to_vec();
-    data.push(1);
-    std::fs::write(path, data)
+    };
+    let mut contents = NON_VOLATILE_BOOT_RUNTIME.to_le_bytes().to_vec();
+    contents.extend_from_slice(data);
+    std::fs::write(path, contents)
+}
+
+pub fn announce_disk_change(pending: bool) -> std::io::Result<()> {
+    set_luft_variable(DISK_CHANGE, pending.then_some(&[1]))
 }
 
 pub fn requested_certificates() -> Vec<Vec<u8>> {

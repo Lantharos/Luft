@@ -1,0 +1,14 @@
+[Unit]
+Description=Go back to the version before an update that didn't start
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md
+After=local-fs.target sushi.service
+Before=display-manager.service greetd.service sushi-quit.service
+ConditionPathExists=/sys/firmware/efi/efivars/LuftBootWentBack-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/trustctl startup went-back
+TimeoutStartSec=6min
+
+[Install]
+WantedBy=graphical.target

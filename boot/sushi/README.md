@@ -60,6 +60,7 @@ Keep the firmware's own boot menu hidden so nothing draws between the firmware l
 | `/usr/lib/modprobe.d/sushi.conf` | NVIDIA's display driver | Drivers Sushi loads itself (`blacklist` lines keep udev from loading them). A file with the same name in `/etc/modprobe.d` replaces it |
 
 - `sushi-drivers.service` loads those drivers when Sushi isn't running, after 20 seconds at most. It also catches a driver that akmods builds during startup after a kernel update.
+- A host-only initramfs carries the drivers for the graphics cards present, so Sushi loads them during the splash. Generic ones, such as Luft's startup images, leave them out, and Sushi loads them from the system right after the switch from the initramfs.
 - With NVIDIA, keep `nvidia-drm.fbdev=1` (the default with current drivers).
 - Any display manager works if it runs `sushictl deactivate` before starting its compositor. Sushi ships a drop-in for greetd; others are covered by `sushi-quit.service`.
 - greetd should run on the seventh virtual terminal (`vt = 7`), as Kestrel's `greetd.toml` does.
@@ -104,7 +105,7 @@ SushiBoot reads unified kernel images and [Boot Loader Specification](https://ua
 - Startup images listed by BLS entries (`uki` or `efi`), such as the ones bootc writes for each version of Luft, count as images: the entry with the lowest `sort-key` is the newest, and the others go under Previous versions, titled with the image's `IMAGE_VERSION`.
 - `loader/loader.conf` takes `timeout` and `default`. `default` accepts patterns such as `luft-*`.
 - Entry IDs match systemd-boot's, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`, and the Boot Loader Interface variables are supported, so `bootctl status`, `bootctl list` and `bootctl set-oneshot ID` work.
-- Boot counting uses systemd-boot's file names (`luft-VERSION+3.efi`). An image with no tries left moves to Previous versions.
+- A version that hasn't been seen to start yet gets three tries; after that SushiBoot starts the one that last worked ([details](../../docs/boot.md#when-an-update-doesnt-start)).
 - It switches to the monitor's own resolution before Linux starts.
 - With Secure Boot on, it must be signed (it carries an SBAT section), passes nothing to what it starts but a profile number, has no command line editor, and skips entries that start a kernel directly.
 

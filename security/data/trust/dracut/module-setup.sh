@@ -7,7 +7,7 @@ check() {
 }
 
 depends() {
-    echo crypt systemd-cryptsetup systemd-ask-password tpm2-tss
+    echo crypt systemd-cryptsetup systemd-ask-password systemd-pcrextend tpm2-tss
     return 0
 }
 
@@ -19,6 +19,10 @@ install() {
     inst_multiple trustctl systemd-creds cryptsetup udevadm cat mount umount
     inst_rules 61-trustd-drives.rules
     inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
+    inst_multiple "$systemdsystemunitdir/systemd-pcrextend.socket" "$systemdsystemunitdir/systemd-pcrextend@.service" \
+        "$systemdutildir/systemd-tpm2-setup" "$systemdsystemunitdir/systemd-tpm2-setup-early.service"
     inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"
+    $SYSTEMCTL -q --root "$initdir" add-wants sockets.target systemd-pcrextend.socket
+    $SYSTEMCTL -q --root "$initdir" add-wants sysinit.target systemd-tpm2-setup-early.service
     $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-encrypt.service
 }

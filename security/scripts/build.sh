@@ -43,6 +43,9 @@ install -Dm755 "$release/trustctl" "$destdir/usr/bin/trustctl"
 for unit in "$trust"/systemd/*; do
   place "$unit" "/usr/lib/systemd/system/$(basename "$unit")"
 done
+for dropin in "$trust"/drop-ins/*/*.conf; do
+  place "$dropin" "/usr/lib/systemd/system/$(basename "$(dirname "$dropin")")/$(basename "$dropin")"
+done
 place "$trust/com.lantharos.Trust1.service" /usr/share/dbus-1/system-services/com.lantharos.Trust1.service
 place "$trust/com.lantharos.Trust1.conf" /usr/share/dbus-1/system.d/com.lantharos.Trust1.conf
 place "$trust/com.lantharos.Trust1.xml" /usr/share/dbus-1/interfaces/com.lantharos.Trust1.xml

@@ -29,6 +29,8 @@ Environment:
   KESTREL_CAPTURE_DIR   Where screenshots go (default: kestrel/run/screenshots).
   KESTREL_CAPTURE_SIZE  Size of the virtual monitor (default: 1440x900).
   KESTREL_CAPTURE_SECONDARY_SIZE  Adds a second virtual monitor.
+  KESTREL_CAPTURE_SCHEME  Starts sessions light or dark (default: as on this desktop).
+  KESTREL_CAPTURE_WALLPAPER  Image to use as the wallpaper in both schemes.
   KESTREL_DEV_APPS      Comma separated Luft apps to use from their own build.
 USAGE
 }

@@ -1,0 +1,39 @@
+$scheme: $variant;
+
+@function pick($light, $dark) {
+  @if $scheme == 'light' { @return $light; }
+  @return $dark;
+}
+
+@mixin scheme($name) {
+  $outer: $scheme;
+  $scheme: $name !global;
+  @content;
+  $scheme: $outer !global;
+}
+
+@function ink($alpha: 1) { @return rgba(pick(#1b1b1f, #ffffff), $alpha); }
+@function paper($alpha: 1) { @return rgba(pick(#ffffff, #15171a), $alpha); }
+@function fill($alpha) { @return ink($alpha * pick(0.7, 1)); }
+
+@function glass($kind: tinted) {
+  $tints: (
+    clear: pick(rgba(248, 248, 250, 0.6), transparent),
+    tinted: pick(rgba(248, 248, 250, 0.68), rgba(20, 20, 24, 0.2)),
+    deep: pick(rgba(248, 248, 250, 0.72), rgba(20, 20, 24, 0.3)),
+    scrim: pick(rgba(244, 244, 247, 0.45), rgba(10, 10, 14, 0.28)),
+  );
+  @return map-get($tints, $kind);
+}
+
+@function halo($alpha) { @return pick(rgba(255, 255, 255, $alpha), rgba(0, 0, 0, $alpha)); }
+
+$danger: #e5484d;
+$warning: pick(#9c6e03, #cd9309);
+$on_danger: #ffffff;
+
+@mixin glass-shading {
+  -kestrel-glass-highlight: pick(0.35, 0.14);
+  -kestrel-glass-dim: pick(0, 0.55);
+  -kestrel-glass-lift: pick(0.6, 0);
+}

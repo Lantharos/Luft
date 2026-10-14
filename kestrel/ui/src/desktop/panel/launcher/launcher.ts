@@ -16,8 +16,8 @@ const svgIcon = (svg: string, fill: string) =>
   Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(svg.replace('fill="white"', `fill="${fill}"`))));
 
 const LAYERS = [
-  { svg: secondary, direction: 1, pivot: [0.58, 0.69], fill: () => appIcons.paint?.shade ?? WHITE },
-  { svg: primary, direction: -1, pivot: [0.4, 0.3], fill: () => appIcons.paint?.ink ?? WHITE },
+  { svg: secondary, direction: 1, pivot: [0.58, 0.69], fill: (ink: string) => appIcons.paint?.shade ?? ink },
+  { svg: primary, direction: -1, pivot: [0.4, 0.3], fill: (ink: string) => appIcons.paint?.ink ?? ink },
 ] as const;
 
 export interface Launcher {
@@ -45,12 +45,21 @@ function animatedMark(button: St.Button): [St.Widget, (size: number) => void] {
     button.connect('notify::pressed', update);
     return icon;
   });
-  const paint = () => LAYERS.forEach((layer, index) => {
-    icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
-    icons[index].gicon = svgIcon(layer.svg, layer.fill());
-  });
+  let painted = '';
+  const ink = () => button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
+  const paint = () => {
+    const fills = LAYERS.map(layer => layer.fill(ink()));
+    painted = fills.join();
+    LAYERS.forEach((layer, index) => {
+      icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
+      icons[index].gicon = svgIcon(layer.svg, fills[index]);
+    });
+  };
   const unwatch = appIcons.watch(paint);
   mark.connect('destroy', unwatch);
+  button.connect('style-changed', () => {
+    if (LAYERS.map(layer => layer.fill(ink())).join() !== painted) paint();
+  });
   return [mark, markSize => {
     size = markSize;
     mark.set_size(size, size);

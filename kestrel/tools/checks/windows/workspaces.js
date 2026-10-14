@@ -5,7 +5,7 @@ import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, moveTo, press, release, scroll} from '../lib/input.js';
 import {gjs, stop, waitForWindows} from '../lib/processes.js';
-import {captureFrame} from '../lib/screenshots.js';
+import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('workspace');
@@ -45,6 +45,14 @@ async function checkScrolling() {
   require(!named('kestrel-start').visible, 'releasing Super after scrolling keeps Start closed');
 }
 
+async function checkSwitcher() {
+  hold(Clutter.KEY_Super_L);
+  press(Clutter.KEY_Page_Up);
+  release(Clutter.KEY_Super_L);
+  await eventually(() => Main.wm._workspaceSwitcherPopup?.visible && switchedTo(0), 'Super+Page Up shows the workspace switcher');
+  await capture('workspace-switcher');
+}
+
 export async function run() {
   const [app, [, second]] = await openWindows();
   try {
@@ -53,6 +61,7 @@ export async function run() {
     await eventually(() => manager.n_workspaces === 3, 'a second occupied workspace adds one empty workspace');
     await checkSlide();
     await checkScrolling();
+    await checkSwitcher();
   } finally {
     await stop(app);
   }

@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
@@ -7,6 +6,7 @@ import type St from 'gi://St';
 import type { Keybindings } from '../../context.js';
 import type { Monitor } from '../panel/panel.js';
 import { animateActor } from '../../shared/motion.js';
+import { isDark, watchScheme } from '../../shared/scheme.js';
 import type { Box } from '../../shared/placement.js';
 import { Corner } from './corner/corner.js';
 import { BoardInput, type BoardActions } from './input/input.js';
@@ -74,12 +74,11 @@ export class Board implements BoardActions {
   private readonly managerSignal: number;
   private cancelRestore: (() => void) | null = null;
 
-  private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
-  private readonly schemeSignal: number;
+  private readonly unwatchScheme: () => void;
 
   constructor(private readonly host: BoardHost) {
-    this.backdrop = new Backdrop(host.createBackground, this.light);
-    this.schemeSignal = this.interfaceSettings.connect('changed::color-scheme', () => this.backdrop.setLight(this.light));
+    this.backdrop = new Backdrop(host.createBackground, !isDark());
+    this.unwatchScheme = watchScheme(dark => this.backdrop.setLight(!dark));
     this.camera = new Camera(shell().window_group, {
       changed: view => {
         this.backdrop.update(view, this.camera.viewport);
@@ -157,10 +156,6 @@ export class Board implements BoardActions {
 
   presentedWorkspace(): Meta.Workspace | null {
     return this.presented ? shell().workspace_manager.get_active_workspace() : null;
-  }
-
-  private get light(): boolean {
-    return this.interfaceSettings.get_string('color-scheme') !== 'prefer-dark';
   }
 
   backdropFor(workspace: Meta.Workspace, monitor: Monitor): St.Widget | null {
@@ -350,7 +345,7 @@ export class Board implements BoardActions {
 
   destroy(): void {
     shell().workspace_manager.disconnect(this.managerSignal);
-    this.interfaceSettings.disconnect(this.schemeSignal);
+    this.unwatchScheme();
     this.cancelRestore?.();
     this.present(null);
     this.camera.destroy();

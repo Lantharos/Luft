@@ -1,4 +1,3 @@
-import type Gio from 'gi://Gio';
 
 import type { Context } from '../context.js';
 import { AppearanceService } from '../appearance/service.js';
@@ -12,7 +11,6 @@ import { PortalBackend } from '../portal/backend.js';
 import { Farewell } from '../session/farewell.js';
 import { LoginDisplays } from '../session/loginScreen/displays.js';
 import { LoginNumLock } from '../session/loginScreen/numLock.js';
-import { loadKestrelStylesheets } from '../shared/stylesheet.js';
 import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
 import { OomNotifier } from './health/oomNotifier.js';
@@ -36,7 +34,6 @@ export class SystemServices {
   private readonly passkeys: PasskeyPrompts;
   readonly appearance: AppearanceService;
   private readonly keyring: SystemPrompts;
-  private readonly stylesheetMonitors: Gio.FileMonitor[];
   private readonly mediaKeys: MediaKeys;
   private readonly peek: PeekService;
 
@@ -46,7 +43,6 @@ export class SystemServices {
     this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.keyring = new SystemPrompts(context);
-    this.stylesheetMonitors = loadKestrelStylesheets();
     this.mediaKeys = new MediaKeys(context, openStart);
     this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
     const startup = context.layoutManager.connect('startup-complete', () => {
@@ -71,6 +67,5 @@ export class SystemServices {
     this.variableRefresh.destroy();
     this.portal.destroy();
     this.passkeys.destroy();
-    for (const monitor of this.stylesheetMonitors) monitor.cancel();
   }
 }

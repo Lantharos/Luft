@@ -22,7 +22,7 @@ function focusOf(wallpaper: Gio.File): [number, number] {
 export class LoginAppearance {
   private readonly background = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
   private readonly kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private readonly stylesheet = new AccentStylesheet('greeter-accent.css');
+  private readonly stylesheet = new AccentStylesheet('greeter-accent');
 
   constructor() {
     applyDesktopDefaults();

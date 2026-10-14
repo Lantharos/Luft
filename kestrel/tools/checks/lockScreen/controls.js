@@ -1,22 +1,23 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 
 import {named, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {press} from '../lib/input.js';
-import {capture, captureFrame} from '../lib/screenshots.js';
+import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {lockAndWake, showPrompt, unlock} from './lib/shield.js';
 
 const {require, eventually} = checks('lock screen');
 const ACCESSIBILITY = ['Screen reader', 'Zoom', 'On-screen keyboard', 'High contrast', 'Dwell click', 'Larger text'];
-const THEME_TOLERANCE = 2;
+const LIGHT_INK = 200;
 
 const openMenu = () => styled('kestrel-context-menu').find(actor => actor.mapped && actor.opacity === 255) ?? null;
 
-function areaOf(actor) {
-  const [x, y] = actor.get_transformed_position().map(Math.round);
-  return {x, y, width: Math.round(actor.width), height: Math.round(actor.height)};
+function inksLight(actor) {
+  const {red, green, blue} = actor.get_theme_node().get_foreground_color();
+  return [red, green, blue].every(channel => channel > LIGHT_INK);
 }
 
 async function open(button, label) {
@@ -39,20 +40,22 @@ async function checkAccessibility() {
   await close();
 }
 
-async function switchStyle(styles, scheme, menu, label) {
-  const before = await captureFrame(areaOf(menu));
+async function switchStyle(styles, scheme) {
   styles.set_string('color-scheme', scheme);
-  await eventually(async () => !(await captureFrame(areaOf(menu))).looksLike(before, THEME_TOLERANCE), label);
+  const variant = scheme === 'prefer-dark' ? 'dark' : 'light';
+  await eventually(() => getStyleVariant() === variant, `the shell turns ${variant}`);
   await settled();
 }
 
 async function checkPower(styles, scheme) {
   const menu = await open('kestrel-lock-power', 'power opens its menu');
   require(showsText('Suspend'), 'power offers suspend while locked');
+  await switchStyle(styles, 'prefer-dark');
   await capture('lock-power-dark');
-  await switchStyle(styles, 'prefer-light', menu, 'the power menu follows the light style');
+  await switchStyle(styles, 'prefer-light');
+  require(inksLight(menu), 'the power menu stays dark while the desktop is light');
   await capture('lock-power-light');
-  await switchStyle(styles, scheme, menu, 'the power menu returns to the dark style');
+  await switchStyle(styles, scheme);
   await close();
   require(!showsText('Suspend'), 'menus close again on the lock screen');
 }

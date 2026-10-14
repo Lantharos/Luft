@@ -2,6 +2,15 @@
 
 Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when the wallpaper has hardly any color, or when White is chosen in Settings) and builds a full palette from it for light and dark. Apps can read it to match the desktop.
 
+## Light and dark
+
+The shell follows `color-scheme` in `org.gnome.desktop.interface`, like Luft's apps: `prefer-dark` is dark, anything else is light. Switching restyles the shell once, with no restart.
+
+- Light glass is a pale tint over the blur with dark text and icons. Its blur brightens dark wallpapers behind it, where dark glass dims bright ones, so text stays readable on any wallpaper.
+- Tinted and clear app icons, the Start mark and symbolic icons switch to the ink of each style.
+- Pure black only applies to the dark style. In the light style the shell keeps its glass.
+- The login and lock screens stay dark in both styles, as does high contrast.
+
 ## Wallpaper position
 
 When a wallpaper's shape differs from the display's, Fill crops it. The focus point decides which part stays: `(x, y)` from 0 to 1, where `(0.5, 0.5)` keeps the middle and `(0.5, 1)` keeps the bottom. It applies to the desktop, live wallpapers, the lock screen, the login screen and setup.

@@ -1,0 +1,84 @@
+.kestrel-snap-layouts { padding: 14px; }
+.kestrel-snap-card { border-radius: 12px; background-color: fill(0.06); }
+.kestrel-snap-zone { border-radius: 7px; background-color: fill(0.16); transition-duration: 100ms; }
+.kestrel-snap-zone:hover, .kestrel-snap-zone:focus { background-color: fill(0.46); }
+
+.kestrel-clipboard { padding: 10px; spacing: 6px; }
+.kestrel-clipboard-list { spacing: 4px; }
+.kestrel-clipboard-row { padding: 10px 12px; border-radius: 12px; background-color: fill(0.06); transition-duration: 120ms; }
+.kestrel-clipboard-row:hover { background-color: fill(0.11); }
+.kestrel-clipboard-row:focus, .kestrel-clipboard-row:active { background-color: fill(0.15); }
+.kestrel-clipboard-text { font-size: 13px; height: 34px; text-align: left; }
+.kestrel-clipboard-image { padding: 6px; }
+.kestrel-clipboard-footer { padding: 0 2px; }
+
+.kestrel-emoji { padding: 12px; spacing: 8px; }
+.kestrel-emoji-header-row { spacing: 6px; }
+.kestrel-emoji-search { padding: 10px 14px; }
+.kestrel-emoji-caret { width: 1px; height: 17px; background-color: ink(); }
+.kestrel-emoji-tabs { spacing: 0; }
+.kestrel-emoji-tab-scroll { -st-hfade-offset: 24px; }
+.kestrel-emoji-category { width: 41px; }
+.kestrel-emoji-tab { height: 34px; border-radius: 10px; color: ink(0.60); transition-duration: 120ms; }
+.kestrel-emoji-tab:hover { background-color: fill(0.09); color: ink(); }
+.kestrel-emoji-tab:checked { color: ink(); }
+.kestrel-emoji-tab:focus { background-color: fill(0.15); color: ink(); }
+.kestrel-emoji-tab-glyph { font-size: 14px; font-weight: 700; }
+.kestrel-emoji-tab-track { height: 3px; }
+.kestrel-emoji-tab-indicator { width: 14px; height: 3px; border-radius: 2px; background-color: ink(); }
+.kestrel-emoji-tone-button { width: 38px; height: 38px; border-radius: 999px; }
+.kestrel-emoji-tone { font-size: 18px; color: ink(); }
+.kestrel-emoji-grid StScrollBar { min-width: 6px; }
+.kestrel-emoji-tones .kestrel-emoji-tab:checked { background-color: fill(0.12); }
+.kestrel-emoji-cell { border-radius: 10px; font-size: 26px; transition-duration: 100ms; }
+.kestrel-emoji-cell:hover { background-color: fill(0.10); }
+.kestrel-emoji-cell:selected { background-color: fill(0.20); }
+.kestrel-emoji-wide { font-size: 13px; padding: 0 6px; }
+.kestrel-emoji-space { color: ink(0.65); }
+.kestrel-emoji-header { padding: 12px 4px 0; font-size: 12px; font-weight: 600; color: ink(0.60); }
+.kestrel-emoji-name { padding: 0 4px; height: 16px; font-size: 12px; color: ink(0.65); }
+
+.kestrel-task-view { background-color: glass(scrim); color: ink(); }
+.kestrel-task-window { padding: 0; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: 140ms; }
+.kestrel-task-window:hover, .kestrel-task-window:focus { background-color: fill(0.08); }
+.kestrel-task-header { spacing: 8px; padding: 0 4px 6px 6px; }
+.kestrel-task-title { font-size: 13px; font-weight: 500; }
+.kestrel-task-close { width: 24px; height: 24px; border-radius: 12px; padding: 0; background-color: fill(0.10); box-shadow: none; }
+.kestrel-task-close:hover { background-color: rgba(235, 70, 70, 0.9); color: #ffffff; }
+.kestrel-task-workspaces { spacing: 12px; }
+.kestrel-task-workspace { padding: 6px; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: 140ms; }
+.kestrel-task-workspace:hover, .kestrel-task-workspace:focus { background-color: fill(0.10); }
+.kestrel-task-workspace:checked { background-color: fill(0.18); }
+.kestrel-task-workspace:drop { background-color: fill(0.28); }
+.kestrel-task-workspace-body { spacing: 6px; }
+.kestrel-task-thumbnail { border-radius: 8px; }
+.kestrel-task-workspace-label { font-size: 12px; }
+
+.kestrel-board-tint { background-color: pick(rgba(246, 246, 248, 0.40), rgba(12, 12, 16, 0.36)); }
+.kestrel-board-corner { spacing: 8px; }
+.kestrel-board-pill.kestrel-glass, .kestrel-board-overview.kestrel-glass, .kestrel-board-dock.kestrel-glass { border-radius: 999px; transition-duration: 160ms; }
+.kestrel-board-pill.kestrel-glass { height: 36px; padding: 0 14px; }
+.kestrel-board-overview.kestrel-glass { width: 36px; height: 36px; padding: 0; }
+.kestrel-board-dock.kestrel-glass { height: 36px; padding: 0 3px; spacing: 6px; }
+.kestrel-board-dock-apps { spacing: 2px; }
+.kestrel-board-dock-button { width: 30px; height: 30px; margin: 3px 0; padding: 0; border-radius: 999px; transition-duration: 160ms; }
+.kestrel-board-pill.kestrel-glass:hover, .kestrel-board-pill.kestrel-glass:focus,
+.kestrel-board-overview.kestrel-glass:hover, .kestrel-board-overview.kestrel-glass:focus,
+.kestrel-board-dock-button:hover, .kestrel-board-dock-button:focus { background-color: fill(0.12); }
+.kestrel-board-dock-button:checked { background-color: fill(0.18); }
+.kestrel-board-pill-box, .kestrel-board-pill-status { spacing: 10px; }
+.kestrel-board-pill-icon { icon-size: 16px; }
+.kestrel-board-pill-battery { margin-left: -5px; font-size: 12px; font-feature-settings: "tnum"; }
+.kestrel-board-pill-time { font-size: 13px; font-weight: 500; font-feature-settings: "tnum"; }
+
+.screenshot-ui-tooltip { background-color: pick(rgba(248, 248, 250, 0.7), rgba(20, 20, 24, 0.25)); color: ink(); border-radius: 999px; box-shadow: none; }
+.screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }
+.screenshot-ui-type-button, .screenshot-ui-shot-cast-button { background-color: transparent; border-radius: 999px; }
+.screenshot-ui-type-button:hover, .screenshot-ui-shot-cast-button:hover,
+.screenshot-ui-type-button:checked, .screenshot-ui-shot-cast-button:checked { background-color: fill(0.18); }
+.screenshot-ui-close-button, .screenshot-ui-show-pointer-button { background-color: transparent; color: ink(); box-shadow: none; border-radius: 999px; }
+.screenshot-ui-close-button:hover, .screenshot-ui-close-button:focus,
+.screenshot-ui-show-pointer-button:hover, .screenshot-ui-show-pointer-button:focus,
+.screenshot-ui-show-pointer-button:checked { background-color: fill(0.22); color: ink(); }
+.screenshot-ui-shot-cast-button:checked { color: ink(); }
+.screenshot-ui-window-selector { background-color: glass(); }

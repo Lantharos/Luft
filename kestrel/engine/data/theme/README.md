@@ -1,14 +1,14 @@
 # Kestrel theme
 
-The stylesheets Kestrel's engine and UI load, compiled into resources under `resource:///com/lantharos/kestrel/theme`.
+The stylesheets Kestrel's engine and UI load, compiled with `sassc` during the Meson build into resources under `resource:///com/lantharos/kestrel/theme`.
 
 | File | Use |
 | --- | --- |
-| `base-dark.scss`, `base-high-contrast.scss` | Base widget styles, built to CSS with `sassc` during the Meson build. The high contrast one is used while the high contrast setting is on |
+| `base-light.scss`, `base-dark.scss`, `base-high-contrast.scss` | Base widget styles. The high contrast one is used while the high contrast setting is on |
 | `sass/` | Sources for the base styles: colors in `_colors.scss` and `_palette.scss`, mixins in `_drawing.scss`, shared selectors in `_common.scss`, and one file per widget in `widgets/` |
-| `kestrel.css` | Kestrel's own styles, loaded on top of the base |
-| `kestrel-portal.css`, `kestrel-passkeys.css` | Portal and passkey dialogs |
+| `kestrel-light.scss`, `kestrel-dark.scss` | Kestrel's own styles, loaded on top of the base |
+| `kestrel/` | Sources for Kestrel's styles, one file per part of the shell. Colors come from the tokens in `_tokens.scss` (`ink()`, `fill()`, `glass()`), so both styles share every rule |
 
-Edit the `.scss` sources, not the generated CSS. The three `kestrel*.css` files are plain CSS and are edited directly.
+The shell loads the light or dark pair to match `color-scheme`. Glass surfaces read their blur shading from `-kestrel-glass-highlight`, `-kestrel-glass-dim` and `-kestrel-glass-lift` on `stage`. Wallpaper colors are generated at runtime as `accent-light.css` and `accent-dark.css`; any stylesheet named `*-light.css` or `*-dark.css` is swapped for its sibling when the style changes.
 
-Set `KESTREL_CSS_PATH` to the local `kestrel.css` when launching the shell to reload the `kestrel*.css` files on every save.
+Set `KESTREL_THEME_DIR` to the build's `data/theme` folder to load the compiled stylesheets from there and reload them when they change. `kestrel/tools/session.sh` does this, so rebuilding with `meson compile -C kestrel/build` restyles a running session.

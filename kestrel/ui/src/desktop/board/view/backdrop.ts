@@ -120,8 +120,6 @@ export class Backdrop {
   setLight(light: boolean): void {
     this.tile = dotTile(light ? 0.16 : 0.2, !light);
     this.brightness = light ? 0.96 : 0.7;
-    if (light) this.actor.add_style_class_name('kestrel-board-light');
-    else this.actor.remove_style_class_name('kestrel-board-light');
     for (const monitor of this.monitors) monitor.setTile(this.tile, this.brightness);
   }
 
@@ -144,7 +142,6 @@ export class Backdrop {
     backdrop.setTile(this.tile, this.brightness);
     backdrop.update(view, viewport);
     backdrop.actor.set_position(0, 0);
-    if (this.actor.has_style_class_name('kestrel-board-light')) backdrop.actor.add_style_class_name('kestrel-board-light');
     return backdrop.actor;
   }
 

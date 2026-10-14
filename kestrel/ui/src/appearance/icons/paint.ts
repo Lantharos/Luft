@@ -27,12 +27,9 @@ function tinted({ hue, chroma }: Seed, dark: boolean): Paint {
   };
 }
 
-const clear = (dark: boolean): Paint => ({
-  plate: withAlpha('#ffffff', dark ? 0.12 : 0.2),
-  ink: withAlpha('#ffffff', 0.94),
-  shade: withAlpha('#ffffff', 0.5),
-  rim: CLEAR_RIM,
-});
+const clear = (dark: boolean): Paint => dark
+  ? { plate: withAlpha('#ffffff', 0.12), ink: withAlpha('#ffffff', 0.94), shade: withAlpha('#ffffff', 0.5), rim: CLEAR_RIM }
+  : { plate: withAlpha('#ffffff', 0.45), ink: withAlpha('#1b1b1f', 0.88), shade: withAlpha('#1b1b1f', 0.45), rim: CLEAR_RIM };
 
 export const paints = (seed: Seed, dark: boolean): Record<PaintedStyle, Paint> => ({ tinted: tinted(seed, dark), clear: clear(dark) });
 

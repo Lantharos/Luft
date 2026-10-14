@@ -4,9 +4,9 @@ import St from 'gi://St';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {descendants, named, shown} from '../lib/actors.js';
+import {descendants, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {moveTo, press, rest} from '../lib/input.js';
 import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 
@@ -25,13 +25,27 @@ async function checkMediaControls() {
   await stop(player);
 }
 
-async function checkVolumeOsd() {
+async function checkLevelOsd(name, icon, level) {
   const [osd] = Main.osdWindowManager._osdWindows;
-  Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'}), null, 0.6, 1);
-  await eventually(() => osd.visible && osd.opacity === 255, 'the volume level shows on screen');
-  await capture('volume-osd');
+  Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: icon}), null, level, 1);
+  await eventually(() => osd.visible && osd.opacity === 255, `the ${name} level shows on screen`);
+  await capture(`${name}-osd`);
   Main.osdWindowManager.hideAll();
-  await eventually(() => !osd.visible, 'the volume level hides again');
+  await eventually(() => !osd.visible, `the ${name} level hides again`);
+}
+
+async function checkScreenKeyboard() {
+  const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.applications'});
+  settings.set_boolean('screen-keyboard-enabled', true);
+  try {
+    Main.keyboard.open(global.display.get_primary_monitor());
+    await eventually(() => Main.keyboard.visible && shown(Main.keyboard.keyboardActor), 'the on-screen keyboard opens');
+    await capture('screen-keyboard');
+    Main.keyboard.close();
+    await eventually(() => !Main.keyboard.visible, 'the on-screen keyboard closes');
+  } finally {
+    settings.reset('screen-keyboard-enabled');
+  }
 }
 
 async function checkScreenshotTool() {
@@ -41,6 +55,12 @@ async function checkScreenshotTool() {
   named('Screenshot', quick).emit('clicked', Clutter.BUTTON_PRIMARY);
   await eventually(() => Main.screenshotUI.visible && !quick.visible, 'Quick Settings opens the screenshot tool without itself in view');
   await capture('screenshot-controls');
+  const [button] = descendants(Main.screenshotUI).filter(actor => actor.has_style_class_name?.('screenshot-ui-type-button') && actor.mapped);
+  const [x, y] = button.get_transformed_position();
+  moveTo([x + button.width / 2, y + button.height / 2]);
+  await eventually(() => shownStyled('screenshot-ui-tooltip')?.opacity === 255, 'pointing at a screenshot button shows its name');
+  await capture('screenshot-tooltip');
+  rest();
   Main.screenshotUI.close(true);
   await eventually(() => !Main.screenshotUI.visible && Main.modalCount === 0, 'the screenshot tool closes');
 }
@@ -65,7 +85,9 @@ async function checkClipboardHistory() {
 
 export async function run() {
   await checkMediaControls();
-  await checkVolumeOsd();
+  await checkLevelOsd('volume', 'audio-volume-high-symbolic', 0.6);
+  await checkLevelOsd('brightness', 'display-brightness-symbolic', 0.4);
+  await checkScreenKeyboard();
   await checkScreenshotTool();
   await checkClipboardHistory();
 }

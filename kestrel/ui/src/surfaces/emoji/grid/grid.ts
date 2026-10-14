@@ -34,6 +34,7 @@ export class EmojiGrid {
   private readonly reusable = new Map<Item, CellView>();
   private readonly emojiImages = new GlyphImages(GlyphRenderer.new_for_emoji(), EMOJI_SIZE);
   private characterImages: GlyphImages | null = null;
+  private characterInk = '';
   private readonly themeContext = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
   private readonly headers = new Map<number, St.Label>();
   private readonly spareHeaders: St.Label[] = [];
@@ -49,6 +50,7 @@ export class EmojiGrid {
     this.actor.vadjustment.connect('notify::page-size', () => this.refresh());
     this.actor.connect('resource-scale-changed', () => this.redraw());
     this.themeContext.connect('notify::scale-factor', () => this.redraw());
+    this.actor.connect('style-changed', () => this.inkChanged());
   }
 
   get cells(): readonly Cell[] {
@@ -166,9 +168,16 @@ export class EmojiGrid {
   private get characters(): GlyphImages {
     if (!this.characterImages) {
       const theme = this.actor.get_theme_node();
+      this.characterInk = theme.get_foreground_color().to_string();
       this.characterImages = new GlyphImages(GlyphRenderer.new_for_text(theme.get_font().get_family()!, theme.get_foreground_color()), CHARACTER_SIZE);
     }
     return this.characterImages;
+  }
+
+  private inkChanged(): void {
+    if (!this.characterImages || this.actor.get_theme_node().get_foreground_color().to_string() === this.characterInk) return;
+    this.characterImages = null;
+    this.redraw();
   }
 
   private bindViews(cells: readonly Cell[]): void {

@@ -12,9 +12,10 @@ $base_color: if($variant == 'light', $light_1, $_base_color_dark);
 $bg_color: if($variant == 'light', $_base_color_light, #36363a);
 $fg_color: if($variant == 'light', $_base_color_dark, $light_1);
 
-// OSD elements
-$osd_fg_color: $light_1;
-$osd_bg_color: lighten($_base_color_dark, 5%);
+// OSD elements, drawn in the shell's own scheme
+$osd_fg_color: if($variant == 'light', $_base_color_dark, $light_1);
+$osd_bg_color: if($variant == 'light', $light_1, lighten($_base_color_dark, 5%));
+$osd_always_dark: $variant != 'light';
 
 // system elements (e.g. the overview) that are always dark
 $system_base_color: $_base_color_dark;

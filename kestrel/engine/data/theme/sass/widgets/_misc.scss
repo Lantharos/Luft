@@ -48,6 +48,6 @@
 
 /* Tiled window previews */
 .tile-preview {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: if($variant == 'light', rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.08));
   border-radius: 16px;
 }

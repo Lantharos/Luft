@@ -23,7 +23,7 @@ Build Kestrel first (see the [repository README](../README.md#build)). Then from
 | `--jobs N` | Up to N sessions at once (default: one per four processors, fewer when the inotify limit is close); `--jobs 1` runs everything in one session |
 | `--list` | Lists the groups |
 
-The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Edits to `kestrel/engine/data/theme/kestrel.css` reload live.
+The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Theme edits reload live after `meson compile -C kestrel/build`.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -31,6 +31,8 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_CAPTURE_DIR` | `kestrel/run/screenshots` | Where captures are saved |
 | `KESTREL_CAPTURE_SIZE` | `1440x900` | Size of the virtual monitor |
 | `KESTREL_CAPTURE_SECONDARY_SIZE` | none | Adds a second virtual monitor, such as `1280x720` |
+| `KESTREL_CAPTURE_SCHEME` | the host's | `light` or `dark`, to capture every surface in one style |
+| `KESTREL_CAPTURE_WALLPAPER` | the host's | An image used as the wallpaper for both styles, to check the glass on light and dark pictures |
 | `KESTREL_DEV_APPS` | none | Luft apps to test from their build folders instead of the installed ones, such as `rover,settings` (run `bun run desktop:build` in each first) |
 
 Optional tools widen the capture: with `rclone` installed Rover connects to local WebDAV and FTP servers, and with `stalwart` Mailman signs in to a local mail server.

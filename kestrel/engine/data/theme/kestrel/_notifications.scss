@@ -1,0 +1,50 @@
+.kestrel-notification-header { spacing: 12px; padding: 4px 4px 0; }
+.kestrel-notification-center { spacing: 14px; }
+.kestrel-notification-list { spacing: 8px; }
+.kestrel-notification { spacing: 2px; }
+
+.kestrel-calendar { spacing: 10px; }
+.kestrel-calendar-navigation { spacing: 2px; }
+.kestrel-calendar-month { padding: 7px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; transition-duration: 120ms; }
+.kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: fill(0.10); }
+.kestrel-calendar-page { padding: 8px; }
+.kestrel-calendar-heading { padding: 2px 0 6px; font-size: 11px; font-weight: 500; text-align: center; color: ink(0.50); }
+.kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; }
+.kestrel-calendar-day:selected { background-color: ink(0.94); color: paper(); font-weight: 600; }
+.kestrel-calendar-day:insensitive { color: ink(0.30); }
+
+.message.kestrel-glass { border-radius: 20px; background-color: glass(); }
+.notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
+.notification-banner .message-header { padding: 0 0 8px; }
+.notification-banner .message-header .message-header-content { min-height: 0; padding-bottom: 0; }
+.notification-banner .message-box { padding: 0; }
+.notification-banner .message-source-title { font-size: 12px; font-weight: 500; color: ink(0.72); }
+.notification-banner .event-time { font-size: 12px; color: ink(0.50); }
+.notification-banner .message-title { font-size: 14px; font-weight: 600; }
+.notification-banner .message-body { font-size: 13px; color: ink(0.78); }
+.notification-banner .message-close-button, .notification-banner .message-expand-button { padding: 5px; border-radius: 8px; background-color: transparent; }
+.notification-banner .message-close-button:hover, .notification-banner .message-expand-button:hover { background-color: fill(0.14); }
+.notification-banner .notification-buttons-bin { spacing: 6px; padding-top: 10px; }
+.notification-banner .notification-button { padding: 9px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: fill(0.10); }
+.message-header, .message-content, .notification-buttons-bin { background-color: transparent; }
+
+.kestrel-notification-content { spacing: 6px; }
+.kestrel-notification-open { padding: 6px; border-radius: 8px; text-align: left; }
+.kestrel-notification-dismiss { padding: 8px; border-radius: 8px; }
+.kestrel-notification-actions { spacing: 6px; padding: 2px 6px 6px; }
+.kestrel-notification-action { padding: 10px 12px; border-radius: 999px; background-color: fill(0.08); }
+.kestrel-notification-open:hover, .kestrel-notification-dismiss:hover, .kestrel-notification-action:hover { background-color: fill(0.13); }
+.kestrel-notification-open:focus, .kestrel-notification-dismiss:focus, .kestrel-notification-action:focus { background-color: fill(0.13); box-shadow: inset 0 0 0 1px ink(0.35); }
+.kestrel-notification-open:rtl { text-align: right; }
+.kestrel-notification-group { spacing: 0; padding: 6px; border-radius: 18px; background-color: fill(0.06); }
+.kestrel-notification-group-list { spacing: 4px; }
+.kestrel-notification-group-header { spacing: 8px; padding: 6px; }
+.kestrel-notification-group-header .kestrel-notification-dismiss { padding: 6px; }
+.kestrel-notification-group-icon { icon-size: 16px; }
+.kestrel-notification-more { padding: 6px 10px; font-size: 12px; }
+.kestrel-notification-reply { spacing: 6px; }
+.kestrel-notification-reply-send, .notification-reply-send { padding: 9px; border-radius: 999px; background-color: fill(0.10); }
+.kestrel-notification-reply-send:hover, .notification-reply-send:hover,
+.kestrel-notification-reply-send:focus, .notification-reply-send:focus { background-color: fill(0.18); }
+.notification-banner .notification-reply { spacing: 6px; padding-top: 10px; }
+.notification-reply-send StIcon { icon-size: 16px; }

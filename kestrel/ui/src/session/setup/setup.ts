@@ -11,7 +11,6 @@ import type { Rgb } from '../../appearance/color.js';
 import { PortalBackend } from '../../portal/backend.js';
 import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
-import { loadKestrelStylesheets } from '../../shared/stylesheet.js';
 import { centerOnArrival } from './placement.js';
 
 const APP = 'com.lantharos.setup.desktop';
@@ -61,7 +60,6 @@ export class Setup {
   readonly ready: Promise<void>;
 
   constructor(context: SetupContext) {
-    loadKestrelStylesheets();
     context.layoutManager.backgroundGroup.add_child(this.backdrop.actor);
     this.placement = centerOnArrival();
     this.dbus.export(Gio.DBus.session, PATH);

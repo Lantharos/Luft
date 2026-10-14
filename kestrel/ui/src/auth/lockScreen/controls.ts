@@ -23,6 +23,7 @@ export class LockControls {
 
   constructor(private readonly layoutManager: Context['layoutManager'], monitorAt: (x: number, y: number) => Monitor | null) {
     this.menus = new ContextMenus(monitorAt, () => {}, () => true, () => {}, () => {});
+    this.menus.actor.add_style_class_name('kestrel-lock-menu');
     layoutManager.addTopChrome(this.menus.shield);
     layoutManager.addTopChrome(this.menus.actor);
     this.row = new ControlRow(this.menus, 'kestrel-lock-controls');

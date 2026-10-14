@@ -10,7 +10,6 @@ import * as MessageTray from './messageTray.js';
 import * as AccessDialog from './accessDialog.js';
 import {DesktopControls} from './desktopControls.js';
 import * as BrightnessManager from '../misc/brightnessManager.js';
-import * as Config from '../misc/config.js';
 import * as Components from './components.js';
 import * as CtrlAltTab from './ctrlAltTab.js';
 import * as EndSessionDialog from './endSessionDialog.js';
@@ -19,6 +18,7 @@ import * as Introspect from '../misc/introspect.js';
 import * as Keyboard from './keyboard.js';
 import * as InputSources from './status/keyboard.js';
 import * as KestrelUi from './kestrelUi.js';
+import {initTheme, updateTheme} from './kestrelTheme.js';
 import * as OsdWindow from './osdWindow.js';
 import * as Layout from './layout.js';
 import * as NotificationDaemon from './notificationDaemon.js';
@@ -67,7 +67,6 @@ export let brightnessManager = null;
 export let brightnessDBus = null;
 
 let _startDate;
-let _defaultCssStylesheet = null;
 let _themeResource = null;
 let _oskResource = null;
 let _iconResource = null;
@@ -78,7 +77,7 @@ let _remoteAccessInhibited = false;
 
 function _sessionUpdated() {
     if (sessionMode.isPrimary)
-        _loadDefaultStylesheet();
+        updateTheme();
 
     wm.allowKeybinding('overlay-key',
         Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
@@ -118,7 +117,7 @@ export async function start() {
     sessionMode = new SessionMode.SessionMode();
     sessionMode.connect('updated', _sessionUpdated);
 
-    St.Settings.get().connect('notify::high-contrast', _loadDefaultStylesheet);
+    initTheme(sessionMode);
 
     if (sessionMode.isGreeter) {
         await _initializeGreeter();
@@ -181,7 +180,7 @@ function _initializePeek() {
 
     reloadThemeResource();
     _loadIcons();
-    _loadDefaultStylesheet();
+    updateTheme();
 
     layoutManager = new Layout.LayoutManager();
     uiGroup = layoutManager.uiGroup;
@@ -206,7 +205,7 @@ async function _initializeSetup() {
     reloadThemeResource();
     _loadIcons();
     _loadOskLayouts();
-    _loadDefaultStylesheet();
+    updateTheme();
 
     new AnimationsSettings();
 
@@ -240,7 +239,7 @@ async function _initializeGreeter() {
 
     reloadThemeResource();
     _loadIcons();
-    _loadDefaultStylesheet();
+    updateTheme();
 
     new AnimationsSettings();
 
@@ -280,7 +279,7 @@ async function _initializeUI() {
     reloadThemeResource();
     _loadIcons();
     _loadOskLayouts();
-    _loadDefaultStylesheet();
+    updateTheme();
     _loadWorkspacesAdjustment();
 
     new AnimationsSettings();
@@ -407,42 +406,6 @@ async function _initializeUI() {
     });
 }
 
-function _getStylesheet(name) {
-    let stylesheet;
-
-    stylesheet = Gio.File.new_for_uri(`resource:///com/lantharos/kestrel/theme/${name}`);
-    if (stylesheet.query_exists(null))
-        return stylesheet;
-
-    const dataDirs = GLib.get_system_data_dirs();
-    for (let i = 0; i < dataDirs.length; i++) {
-        const path = GLib.build_filenamev([dataDirs[i], Config.PACKAGE_NAME, 'theme', name]);
-        stylesheet = Gio.file_new_for_path(path);
-        if (stylesheet.query_exists(null))
-            return stylesheet;
-    }
-
-    stylesheet = Gio.File.new_for_path(`${global.datadir}/theme/${name}`);
-    if (stylesheet.query_exists(null))
-        return stylesheet;
-
-    return null;
-}
-
-function _getDefaultStylesheet() {
-    const variant = St.Settings.get().high_contrast ? 'high-contrast' : 'dark';
-    return _getStylesheet(sessionMode.stylesheetName.replace('.css', `-${variant}.css`));
-}
-
-function _loadDefaultStylesheet() {
-    const stylesheet = _getDefaultStylesheet();
-    if (_defaultCssStylesheet && _defaultCssStylesheet.equal(stylesheet))
-        return;
-
-    _defaultCssStylesheet = stylesheet;
-    loadTheme();
-}
-
 class AdjustmentRegistry {
     #count = 0;
     #adjustments = new Map();
@@ -546,32 +509,6 @@ function _loadIcons() {
 function _loadOskLayouts() {
     _oskResource = Gio.Resource.load(`${global.datadir}/kestrel-osk-layouts.gresource`);
     _oskResource._register();
-}
-
-/**
- * loadTheme:
- *
- * Reloads the theme CSS file
- */
-export function loadTheme() {
-    const themeContext = St.ThemeContext.get_for_stage(global.stage);
-    const previousTheme = themeContext.get_theme();
-
-    const theme = new St.Theme({
-        default_stylesheet: _defaultCssStylesheet,
-    });
-
-    if (theme.default_stylesheet == null)
-        throw new Error(`No valid stylesheet found for '${sessionMode.stylesheetName}'`);
-
-    if (previousTheme) {
-        const customStylesheets = previousTheme.get_custom_stylesheets();
-
-        for (let i = 0; i < customStylesheets.length; i++)
-            theme.load_stylesheet(customStylesheets[i]);
-    }
-
-    themeContext.set_theme(theme);
 }
 
 /**

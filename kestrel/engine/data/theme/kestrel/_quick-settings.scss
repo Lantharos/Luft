@@ -1,0 +1,55 @@
+.kestrel-quick-settings { border-radius: 24px; padding: 14px 4px 14px 14px; spacing: 10px; }
+.kestrel-quick-scroll-body { padding-right: 10px; }
+.kestrel-quick-settings StScrollBar { min-width: 6px; }
+.kestrel-quick-content { spacing: 14px; }
+.kestrel-quick-sliders { spacing: 2px; }
+.kestrel-slider-value { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; font-feature-settings: "tnum"; color: ink(); background-color: pick(rgba(250, 250, 252, 0.94), rgba(28, 28, 32, 0.92)); }
+.kestrel-quick-settings .quick-toggle-menu.kestrel-inline-menu { margin: 2px 0 4px; }
+.kestrel-quick-settings .kestrel-tile-menu .quick-toggle-menu { margin: 0; }
+.kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: fill(0.06); box-shadow: none; color: ink(); }
+.kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }
+.kestrel-quick-settings .quick-slider { padding: 0; }
+.kestrel-quick-settings .quick-slider .icon-button { width: 36px; height: 36px; padding: 0; border-radius: 10px; background-color: transparent; }
+.kestrel-slider-menu-space { width: 36px; }
+.kestrel-quick-settings .quick-slider .icon-button:hover { background-color: fill(0.12); }
+.kestrel-quick-settings .quick-slider .slider-bin { padding: 8px; }
+
+.kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: 120ms; }
+.kestrel-quick-settings .keyboard-brightness-level { spacing: 6px; font-size: 13px; }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button { padding: 10px; border-radius: 999px; background-color: fill(0.08); transition-duration: 120ms; }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:hover { background-color: fill(0.14); }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:checked { background-color: fill(0.26); }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button:checked:hover { background-color: fill(0.32); }
+.kestrel-quick-settings .popup-menu-item:hover,
+.kestrel-quick-settings .popup-menu-item:focus,
+.kestrel-quick-settings .popup-menu-item:active { background-color: fill(0.16); }
+
+.kestrel-control {
+  padding: 14px; border: none; border-radius: 12px;
+  background-color: fill(0.07); color: ink(); box-shadow: none;
+  transition-duration: 140ms; min-width: 0;
+}
+.kestrel-control:hover { background-color: fill(0.13); }
+.kestrel-control:active { background-color: fill(0.19); }
+.kestrel-control:focus { box-shadow: inset 0 0 0 1px ink(0.35); }
+.kestrel-control:checked { background-color: fill(0.26); }
+.kestrel-control:checked:hover { background-color: fill(0.32); }
+.kestrel-control:checked:active { background-color: fill(0.38); }
+.kestrel-control:checked .kestrel-control-subtitle { color: ink(0.85); }
+.kestrel-control.kestrel-control-lifted { background-color: pick(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.20)); box-shadow: 0 6px 18px rgba(0, 0, 0, pick(0.16, 0.28)); }
+.kestrel-control.kestrel-control-lifted:checked { background-color: fill(0.34); }
+.kestrel-control-body { spacing: 3px; }
+.kestrel-control-top { height: 32px; }
+.kestrel-control-title { font-size: 13px; font-weight: 600; }
+.kestrel-control-subtitle { font-size: 11px; color: ink(0.65); }
+.kestrel-control-more { width: 32px; height: 32px; border-radius: 8px; background-color: transparent; box-shadow: none; }
+.kestrel-control-more:hover { background-color: fill(0.15); }
+
+.kestrel-media { spacing: 2px; padding: 8px; border-radius: 16px; background-color: fill(0.07); }
+.kestrel-media-open { padding: 0; border-radius: 10px; }
+.kestrel-media-details { spacing: 12px; }
+.kestrel-media-cover { border-radius: 10px; background-color: fill(0.10); background-size: cover; }
+.kestrel-media-title { font-size: 14px; font-weight: 600; }
+.kestrel-media-artist { font-size: 12px; color: ink(0.62); }
+.kestrel-media-control { padding: 9px; }
+.kestrel-media-control:insensitive { color: ink(0.30); }

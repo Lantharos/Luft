@@ -13,6 +13,7 @@ const _modes = {
     'restrictive': {
         parentMode: null,
         stylesheetName: 'base.css',
+        colorScheme: null,
         themeResourceName: 'kestrel-theme.gresource',
         allowSettings: false,
         allowScreencast: false,
@@ -32,6 +33,7 @@ const _modes = {
     'greeter': {
         isGreeter: true,
         isPrimary: true,
+        colorScheme: 'dark',
     },
 
     'peek': {

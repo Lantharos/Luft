@@ -1,6 +1,9 @@
 theme_sources = files([
   'base-high-contrast.scss',
   'base-dark.scss',
+  'base-light.scss',
+  'kestrel-dark.scss',
+  'kestrel-light.scss',
   'sass/_colors.scss',
   'sass/_common.scss',
   'sass/_drawing.scss',
@@ -26,11 +29,25 @@ theme_sources = files([
   'sass/widgets/_switcher-popup.scss',
   'sass/widgets/_switches.scss',
   'sass/widgets/_workspace-switcher.scss',
+  'kestrel/_base.scss',
+  'kestrel/_dialogs.scss',
+  'kestrel/_kestrel.scss',
+  'kestrel/_lock.scss',
+  'kestrel/_menus.scss',
+  'kestrel/_notifications.scss',
+  'kestrel/_panel.scss',
+  'kestrel/_quick-settings.scss',
+  'kestrel/_start.scss',
+  'kestrel/_surfaces.scss',
+  'kestrel/_tokens.scss',
 ])
 
 stylesheets = [
   'base-high-contrast.css',
   'base-dark.css',
+  'base-light.css',
+  'kestrel-dark.css',
+  'kestrel-light.css',
 ]
 
 sassc = find_program('sassc')

@@ -7,6 +7,7 @@ import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
 import { userFile, writeText } from './files.js';
 import { buildPalette, type Palette } from './palette.js';
 import { DarkSchedule } from './schedule/darkSchedule.js';
+import { isDark, watchScheme } from '../shared/scheme.js';
 import { appIcons } from './icons/appIcons.js';
 import { GlyphFiles } from './icons/glyphFiles.js';
 import { AccentStylesheet } from './stylesheet.js';
@@ -36,7 +37,7 @@ const PROPERTIES: [string, string][] = [
 const PERSIST_DELAY = 400;
 
 export class AppearanceService {
-  private readonly stylesheet = new AccentStylesheet('accent.css');
+  private readonly stylesheet = new AccentStylesheet('accent');
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -47,6 +48,7 @@ export class AppearanceService {
   private readonly schedule: DarkSchedule;
   private readonly glyphFiles = new GlyphFiles();
   private readonly unwatchIcons = appIcons.watch(() => this.emitChanged('AppIcons'));
+  private readonly unwatchScheme = watchScheme(() => this.update());
   private wallpaperSeed: Seed | null = null;
   private appearance: Appearance | null = null;
   private published = '';
@@ -56,17 +58,14 @@ export class AppearanceService {
   constructor(private readonly changed: (color: Rgb) => void) {
     this.dbus.export(Gio.DBus.session, '/com/lantharos/Kestrel/Appearance');
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.lantharos.Kestrel', Gio.BusNameOwnerFlags.NONE, null, null);
-    setSolidSurfaces(this.settings.get_boolean('pure-black'));
     this.signalIds = [
       [this.interfaceSettings, this.interfaceSettings.connect('changed::color-scheme', () => this.update())],
-      [this.settings, this.settings.connect('changed::pure-black', () => {
-        setSolidSurfaces(this.settings.get_boolean('pure-black'));
-        this.update();
-      })],
+      [this.settings, this.settings.connect('changed::pure-black', () => this.update())],
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
     ];
     this.schedule = new DarkSchedule(this.settings, this.interfaceSettings);
+    setSolidSurfaces(this.PureBlack && isDark());
   }
 
   private get palette(): Palette | null {
@@ -109,9 +108,10 @@ export class AppearanceService {
   }
 
   private update(): void {
+    setSolidSurfaces(this.PureBlack && isDark());
     const seed = this.seed;
     if (!seed) return;
-    appIcons.setAccent(seed, this.Dark);
+    appIcons.setAccent(seed, isDark());
     const accent = accentColor(seed);
     const previousAccent = this.AccentColor;
     this.appearance = {
@@ -159,6 +159,7 @@ export class AppearanceService {
     this.schedule.destroy();
     this.glyphFiles.destroy();
     this.unwatchIcons();
+    this.unwatchScheme();
     Gio.bus_unown_name(this.nameId);
     this.dbus.unexport();
     this.stylesheet.unload();

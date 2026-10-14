@@ -33,6 +33,16 @@ restore_settings() {
       dconf reset "/com/lantharos/kestrel/$key"
     done
   fi
+  case "${KESTREL_CAPTURE_SCHEME:-}" in
+    light) dconf write /org/gnome/desktop/interface/color-scheme "'default'" ;;
+    dark) dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'" ;;
+  esac
+  if [[ -n "${KESTREL_CAPTURE_WALLPAPER:-}" ]]; then
+    local uri
+    uri="'$(python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).resolve().as_uri())' "$KESTREL_CAPTURE_WALLPAPER")'"
+    dconf write /org/gnome/desktop/background/picture-uri "$uri"
+    dconf write /org/gnome/desktop/background/picture-uri-dark "$uri"
+  fi
 }
 
 start_system_bus() {

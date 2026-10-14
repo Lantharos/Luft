@@ -1,0 +1,103 @@
+stage { @include glass-shading; }
+
+@mixin glass-surface {
+  background-color: glass();
+  background-image: none;
+  border: none;
+  border-radius: 24px;
+  box-shadow: none;
+  color: ink();
+}
+
+.kestrel-glass { @include glass-surface; }
+.kestrel-glass-radius-16 { border-radius: 16px; }
+.kestrel-glass-radius-18 { border-radius: 18px; }
+.kestrel-glass-radius-20 { border-radius: 20px; }
+.kestrel-glass-radius-22 { border-radius: 22px; }
+.kestrel-glass-radius-999 { border-radius: 999px; }
+
+.kestrel-solid.kestrel-solid.kestrel-solid { background-color: #000000; }
+.kestrel-solid .kestrel-solid.kestrel-solid.kestrel-solid { background-color: #141414; }
+.kestrel-solid-0.kestrel-solid-0 { border-radius: 0; }
+.kestrel-solid-16.kestrel-solid-16 { border-radius: 16px; }
+.kestrel-solid-18.kestrel-solid-18 { border-radius: 18px; }
+.kestrel-solid-20.kestrel-solid-20 { border-radius: 20px; }
+.kestrel-solid-22.kestrel-solid-22 { border-radius: 22px; }
+.kestrel-solid-24.kestrel-solid-24 { border-radius: 24px; }
+.kestrel-solid-999.kestrel-solid-999 { border-radius: 999px; }
+
+.kestrel-closing-selection { background-color: fill(0.16); }
+.kestrel-glass .kestrel-closing-selection { background-color: fill(0.18); }
+
+@mixin entry {
+  color: ink();
+  caret-size: 1px;
+  caret-color: ink();
+  selection-background-color: fill(0.25);
+  selected-color: ink();
+  background-color: fill(0.07);
+  background-image: none;
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+@mixin entry-focus {
+  background-color: fill(0.13);
+  border: none;
+  box-shadow: none;
+}
+
+StEntry, .kestrel-search, .prompt-dialog .prompt-dialog-password-entry { @include entry; }
+StEntry:hover { background-color: fill(0.09); }
+StEntry:focus, .kestrel-search:focus, .prompt-dialog .prompt-dialog-password-entry:focus { @include entry-focus; }
+StEntry:insensitive { color: ink(0.45); background-color: fill(0.04); }
+StEntry StLabel.hint-text { margin: 0; color: ink(0.65); }
+
+.modal-dialog-button, .button, .icon-button, .notification-button,
+.audio-selection-device, .message-expand-button, .message-close-button {
+  background-color: fill(0.09);
+  background-image: none;
+  border: none;
+  border-radius: 10px;
+  box-shadow: none;
+  color: ink();
+}
+.modal-dialog-button:hover, .modal-dialog-button:focus, .button:hover, .button:focus,
+.icon-button:hover, .icon-button:focus, .audio-selection-device:hover, .audio-selection-device:focus,
+.notification-button:hover, .notification-button:focus { background-color: fill(0.18); box-shadow: none; }
+.modal-dialog-button:active, .button:active, .icon-button:active { background-color: fill(0.25); }
+
+.kestrel-section-title { font-size: 13px; font-weight: 600; }
+.kestrel-muted { color: ink(0.65); font-size: 12px; }
+.kestrel-empty { color: ink(0.65); font-size: 13px; padding: 24px 8px; text-align: center; }
+
+.kestrel-slider {
+  height: 24px;
+  color: ink();
+  -slider-handle-radius: 8px;
+  -barlevel-height: 6px;
+  -barlevel-background-color: fill(0.16);
+  -barlevel-active-background-color: ink();
+  -barlevel-border-width: 0;
+  -barlevel-active-border-color: transparent;
+  -barlevel-border-color: transparent;
+  -barlevel-overdrive-color: $danger;
+}
+
+@mixin scrollbar-handle {
+  background-color: fill(0.24);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  transition-duration: 120ms;
+}
+
+.kestrel-app-scroll .vhandle { @include scrollbar-handle; }
+.kestrel-app-scroll .vhandle:hover { background-color: fill(0.40); }
+.kestrel-app-scroll .vhandle:active { background-color: fill(0.55); }
+
+.workspace-animation { background-color: transparent; }
+.select-area-rubberband { background-color: fill(0.10); border: 2px solid ink(); }

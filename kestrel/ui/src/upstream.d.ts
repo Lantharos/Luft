@@ -71,6 +71,10 @@ declare module 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js' {
   export function setSolidSurfaces(enabled: boolean): void;
 }
 
+declare module 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js' {
+  export function getStyleVariant(): 'light' | 'dark';
+}
+
 declare module 'resource:///com/lantharos/kestrel/misc/loginManager.js' {
   export function getLoginManager(): {
     connect(signal: 'prepare-for-sleep', callback: (manager: unknown, aboutToSuspend: boolean) => void): number;

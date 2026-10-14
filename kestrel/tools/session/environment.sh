@@ -66,7 +66,7 @@ export_build_paths() {
   export LD_LIBRARY_PATH="$build/src:$build/src/st:$compositor:$compositor/mutter-51${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
   export GI_TYPELIB_PATH="$build/src:$build/src/st:$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
   export KESTREL_BUILDDIR="$build/src" KESTREL_DATADIR="$build/data" GSETTINGS_SCHEMA_DIR="$build/data:$compositor_data/glib-2.0/schemas"
-  export KESTREL_CSS_PATH="$root/kestrel/engine/data/theme/kestrel.css"
+  export KESTREL_THEME_DIR="$build/data/theme"
   export GVFS_DISABLE_FUSE=1
   unset GSETTINGS_BACKEND GDK_BACKEND
 }

@@ -70,6 +70,7 @@
     <file>ui/messageTray.js</file>
     <file>ui/modalDialog.js</file>
     <file>ui/kestrelGlass.js</file>
+    <file>ui/kestrelTheme.js</file>
     <file>ui/mpris.js</file>
     <file>ui/notificationDaemon.js</file>
     <file>ui/osdWindow.js</file>

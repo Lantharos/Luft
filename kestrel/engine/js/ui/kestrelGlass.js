@@ -1,9 +1,12 @@
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-const EDGE_HIGHLIGHT = 0.14;
-const BRIGHT_DIM = 0.55;
 export const PILL = 999;
+const THEMED_PROPERTIES = [
+    ['-kestrel-glass-highlight', 'edge-highlight'],
+    ['-kestrel-glass-dim', 'bright-dim'],
+    ['-kestrel-glass-lift', 'dark-lift'],
+];
 
 const solidSurfaces = new Set();
 let solid = false;
@@ -19,9 +22,22 @@ function makeSolid({actor, effect, corners}, enabled) {
 }
 
 export function setSolidSurfaces(enabled) {
+    if (solid === enabled)
+        return;
     solid = enabled;
     for (const surface of solidSurfaces)
         makeSolid(surface, enabled);
+}
+
+function followTheme(actor, effect) {
+    actor.connect('style-changed', () => {
+        const node = actor.get_theme_node();
+        for (const [property, name] of THEMED_PROPERTIES) {
+            const [found, value] = node.lookup_double(property, true);
+            if (found)
+                effect.set_property(name, value);
+        }
+    });
 }
 
 export function blurBackdrop(actor, corners) {
@@ -32,8 +48,7 @@ export function blurBackdrop(actor, corners) {
         brightness: 1,
     });
     effect.set_property('corner-radius', corners);
-    effect.set_property('edge-highlight', EDGE_HIGHLIGHT);
-    effect.set_property('bright-dim', BRIGHT_DIM);
+    followTheme(actor, effect);
     actor.add_effect_with_name('backdrop', effect);
     const changed = theme.connect('notify::scale-factor', () => {
         effect.radius = 30 * theme.scale_factor;

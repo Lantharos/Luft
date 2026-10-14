@@ -2,9 +2,9 @@
 <gresources>
   <gresource prefix="/com/lantharos/kestrel/theme">
     <file>base-dark.css</file>
+    <file>base-light.css</file>
     <file>base-high-contrast.css</file>
-    <file>kestrel.css</file>
-    <file>kestrel-portal.css</file>
-    <file>kestrel-passkeys.css</file>
+    <file>kestrel-dark.css</file>
+    <file>kestrel-light.css</file>
   </gresource>
 </gresources>

@@ -1,17 +1,20 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
+import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {capture} from '../lib/screenshots.js';
+import {pause} from '../lib/wait.js';
 import {contrast} from './lib/colors.js';
 
 const {require, eventually} = checks('appearance');
 const ROLES = ['primary', 'onPrimary', 'secondary', 'tertiary', 'error', 'surface', 'onSurface', 'surfaceContainerHighest', 'onSurfaceVariant', 'outline'];
 const USER_CSS = 'window { opacity: 1; }\n';
+const THEME_QUIET = 500;
 
 const appearance = name => property('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance', 'com.lantharos.Kestrel.Appearance', name);
 const configFile = (...parts) => Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), ...parts]));
@@ -92,6 +95,40 @@ async function checkWhiteAccent(settings) {
   settings.reset('accent');
 }
 
+async function quietTheme(context) {
+  await eventually(async () => {
+    let restyled = false;
+    const signal = context.connect('changed', () => (restyled = true));
+    await pause(THEME_QUIET);
+    context.disconnect(signal);
+    return !restyled;
+  }, 'the shell stops restyling');
+}
+
+async function checkSchemeSwitch(interfaceSettings) {
+  const context = St.ThemeContext.get_for_stage(global.stage);
+  const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+  const darkWallpaper = background.get_string('picture-uri-dark');
+  background.set_string('picture-uri-dark', background.get_string('picture-uri'));
+  try {
+    await quietTheme(context);
+    for (const [scheme, variant] of [['default', 'light'], ['prefer-dark', 'dark']]) {
+      let restyles = 0;
+      const signal = context.connect('changed', () => restyles++);
+      interfaceSettings.set_string('color-scheme', scheme);
+      await eventually(() => getStyleVariant() === variant, `the shell turns ${variant}`);
+      await quietTheme(context);
+      context.disconnect(signal);
+      const stylesheets = context.get_theme().get_custom_stylesheets().map(file => file.get_basename());
+      require(restyles === 1, `turning ${variant} restyles the shell once`);
+      require(stylesheets.includes(`kestrel-${variant}.css`) && stylesheets.includes(`accent-${variant}.css`),
+        `turning ${variant} swaps Kestrel's and the wallpaper colors' stylesheets in the same change`);
+    }
+  } finally {
+    background.set_string('picture-uri-dark', darkWallpaper);
+  }
+}
+
 async function checkSchedule(settings, interfaceSettings) {
   const hour = GLib.DateTime.new_now_local().get_hour();
   settings.set_double('dark-schedule-from', (hour + 23) % 24);
@@ -113,6 +150,7 @@ export async function run() {
     await checkAppColors(settings);
     await checkPureBlack(settings, interfaceSettings);
     await checkWhiteAccent(settings);
+    await checkSchemeSwitch(interfaceSettings);
     await checkSchedule(settings, interfaceSettings);
   } finally {
     for (const key of ['pure-black', 'accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to']) settings.reset(key);

@@ -17,7 +17,6 @@ import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
 import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
-import { loadKestrelStylesheets } from '../../shared/stylesheet.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';
 import { readConfig } from './config.js';
@@ -83,7 +82,6 @@ export class Greeter {
   private finishing = false;
 
   constructor(context: GreeterContext) {
-    loadKestrelStylesheets();
     this.matchNumLock();
     const monitorAt = (x: number, y: number) =>
       context.layoutManager.monitors.find(monitor => x >= monitor.x && y >= monitor.y && x < monitor.x + monitor.width && y < monitor.y + monitor.height) ?? null;

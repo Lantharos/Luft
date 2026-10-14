@@ -8,7 +8,7 @@ import {capture} from '../lib/screenshots.js';
 import {eventually, events, lastSessionStart, promptState, require} from './prompt.js';
 
 function accentStylesheet() {
-  const file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY'), 'greeter-accent.css']));
+  const file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY'), 'greeter-accent-dark.css']));
   return new TextDecoder().decode(file.load_contents(null)[1]);
 }
 

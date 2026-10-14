@@ -6,10 +6,10 @@
 	}
 
 	const STEPS = [
-		{ caption: 'Press any key within ten seconds', screen: { heading: 'Shim', items: [], prompt: 'Press any key to perform\nMOK management' } },
+		{ caption: 'Press a key within 10 seconds', screen: { heading: 'Shim', items: [], prompt: 'Press any key to perform\nMOK management' } },
 		{ caption: 'Choose Enroll MOK, then Continue', screen: { heading: 'Perform MOK management', items: ['Continue boot', 'Enroll MOK', 'Enroll key from disk', 'Enroll hash from disk'], highlighted: 1 } },
 		{ caption: 'Choose Yes', screen: { heading: 'Enroll the key(s)?', items: ['No', 'Yes'], highlighted: 1 } },
-		{ caption: 'Type your code, then choose Reboot', screen: { heading: 'Enroll MOK', items: [], prompt: 'Password:\n• • • • • • • •' } }
+		{ caption: 'Type the code, then choose Reboot', screen: { heading: 'Enroll MOK', items: [], prompt: 'Password:\n• • • • • • • •' } }
 	];
 
 	let { code }: Props = $props();
@@ -25,9 +25,9 @@
 		{/each}
 	</ol>
 	{#if code}
-		<div class="flex items-center gap-5">
-			<span class="font-mono text-[34px] font-semibold tracking-[0.12em] tabular-nums">{code.slice(0, 4)} {code.slice(4)}</span>
-			<span class="max-w-[300px] text-[13.5px] leading-snug text-[var(--text-soft)]">Your code, for when the blue screen asks for a password.</span>
+		<div class="flex flex-col items-center gap-1">
+			<span class="pl-[0.12em] font-mono text-[34px] font-semibold tracking-[0.12em] tabular-nums">{code}</span>
+			<span class="text-[12.5px] text-[var(--text-soft)]">{code.length} digits</span>
 		</div>
 	{/if}
 </div>

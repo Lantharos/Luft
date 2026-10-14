@@ -3,9 +3,7 @@
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
-	import { setup } from '#lib/state/setup.svelte.js';
 
-	let pointer = $derived(setup.hardware.touchpad ? 'touchpad' : 'mouse');
 	let code = $state('');
 	let busy = $state(false);
 	let problem = $state('');
@@ -30,7 +28,7 @@
 
 <StepFrame
 	title="Your computer doesn’t trust Luft yet"
-	description="The blue screen was skipped at the restart. Get a new code and restart to see it again. Use the arrow keys and Enter there, since the {pointer} doesn’t work on it."
+	description="The blue screen was skipped. Get a new code and restart, then use the keyboard there."
 >
 	<EnrollSteps {code} />
 	{#if problem}

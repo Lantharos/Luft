@@ -16,7 +16,6 @@
 
 	let status = $derived(install.status);
 	let code = $derived(status?.secureBootCode ?? '');
-	let pointer = $derived(setup.hardware.touchpad ? 'touchpad' : 'mouse');
 	let percent = $derived(Math.round((status?.progress ?? 0) * 100));
 	let problem = $state('');
 
@@ -39,7 +38,7 @@
 {:else if install.finished && code}
 	<StepFrame
 		title="Luft is installed"
-		description="Take out the USB stick once the screen goes dark. Right after, your computer asks once on a blue screen whether to trust Luft. Use the arrow keys and Enter there, since the {pointer} doesn’t work on it."
+		description="Take out the USB stick once the screen goes dark. A blue screen then asks to trust Luft. Use the keyboard there."
 	>
 		<EnrollSteps {code} />
 		{#if problem}

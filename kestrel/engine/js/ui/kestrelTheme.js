@@ -57,13 +57,23 @@ function _customStylesheets(themeContext) {
     return themeContext.get_theme().get_custom_stylesheets().reverse();
 }
 
-function _loadTheme() {
-    const themeContext = St.ThemeContext.get_for_stage(global.stage);
-    const stylesheets = _customStylesheets(themeContext);
+function _buildTheme(stylesheets) {
     const theme = new St.Theme({default_stylesheet: _loaded.base});
     for (const stylesheet of stylesheets)
         theme.load_stylesheet(_inVariant(stylesheet, _loaded.variant));
-    themeContext.set_theme(theme);
+    return theme;
+}
+
+function _loadTheme() {
+    const themeContext = St.ThemeContext.get_for_stage(global.stage);
+    themeContext.set_theme(_buildTheme(_customStylesheets(themeContext)));
+}
+
+export function setAccent(stylesheet, color, fgColor) {
+    const themeContext = St.ThemeContext.get_for_stage(global.stage);
+    const loaded = themeContext.get_theme().get_custom_stylesheets().reverse();
+    const stylesheets = loaded.some(file => file.equal(stylesheet)) ? loaded : [...loaded, stylesheet];
+    themeContext.set_theme_and_accent_color(_buildTheme(stylesheets), color, fgColor);
 }
 
 export function updateTheme() {

@@ -329,6 +329,30 @@ st_theme_context_get_for_stage (ClutterStage *stage)
   return context;
 }
 
+static gboolean
+swap_theme (StThemeContext *context,
+            StTheme        *theme)
+{
+  if (context->theme == theme)
+    return FALSE;
+
+  if (context->theme)
+    g_clear_signal_handler (&context->stylesheets_changed_id, context->theme);
+
+  g_set_object (&context->theme, theme);
+
+  if (context->theme)
+    {
+      context->stylesheets_changed_id =
+        g_signal_connect_swapped (context->theme,
+                                  "custom-stylesheets-changed",
+                                  G_CALLBACK (st_theme_context_changed),
+                                  context);
+    }
+
+  return TRUE;
+}
+
 /**
  * st_theme_context_set_theme:
  * @context: a #StThemeContext
@@ -345,24 +369,8 @@ st_theme_context_set_theme (StThemeContext          *context,
   g_return_if_fail (ST_IS_THEME_CONTEXT (context));
   g_return_if_fail (theme == NULL || ST_IS_THEME (theme));
 
-  if (context->theme != theme)
-    {
-      if (context->theme)
-        g_clear_signal_handler (&context->stylesheets_changed_id, context->theme);
-
-      g_set_object (&context->theme, theme);
-
-      if (context->theme)
-        {
-          context->stylesheets_changed_id =
-            g_signal_connect_swapped (context->theme,
-                                      "custom-stylesheets-changed",
-                                      G_CALLBACK (st_theme_context_changed),
-                                      context);
-        }
-
-      st_theme_context_changed (context);
-    }
+  if (swap_theme (context, theme))
+    st_theme_context_changed (context);
 }
 
 /**
@@ -447,28 +455,39 @@ st_theme_context_get_accent_color (StThemeContext *context,
 }
 
 /**
- * st_theme_context_set_accent_color:
+ * st_theme_context_set_theme_and_accent_color:
  * @context: a #StThemeContext
+ * @theme: a #StTheme
  * @color: the accent color
  * @fg_color: the color of text and icons drawn on the accent color
  *
- * Sets the accent color that `-st-accent-color` and `-st-accent-fg-color`
- * resolve to.
+ * Sets the theme like st_theme_context_set_theme() together with the accent
+ * color that `-st-accent-color` and `-st-accent-fg-color` resolve to, restyling
+ * once for both.
  */
 void
-st_theme_context_set_accent_color (StThemeContext  *context,
-                                   const CoglColor *color,
-                                   const CoglColor *fg_color)
+st_theme_context_set_theme_and_accent_color (StThemeContext  *context,
+                                             StTheme         *theme,
+                                             const CoglColor *color,
+                                             const CoglColor *fg_color)
 {
+  gboolean changed;
+
   g_return_if_fail (ST_IS_THEME_CONTEXT (context));
+  g_return_if_fail (ST_IS_THEME (theme));
 
-  if (cogl_color_equal (&context->accent_color, color) &&
-      cogl_color_equal (&context->accent_fg_color, fg_color))
-    return;
+  changed = swap_theme (context, theme);
 
-  context->accent_color = *color;
-  context->accent_fg_color = *fg_color;
-  st_theme_context_changed (context);
+  if (!cogl_color_equal (&context->accent_color, color) ||
+      !cogl_color_equal (&context->accent_fg_color, fg_color))
+    {
+      context->accent_color = *color;
+      context->accent_fg_color = *fg_color;
+      changed = TRUE;
+    }
+
+  if (changed)
+    st_theme_context_changed (context);
 }
 
 /**

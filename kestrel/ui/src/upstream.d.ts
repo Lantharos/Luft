@@ -73,6 +73,7 @@ declare module 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js' {
 
 declare module 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js' {
   export function getStyleVariant(): 'light' | 'dark';
+  export function setAccent(stylesheet: import('gi://Gio').default.File, color: import('gi://Cogl').default.Color, fgColor: import('gi://Cogl').default.Color): void;
 }
 
 declare module 'resource:///com/lantharos/kestrel/misc/loginManager.js' {

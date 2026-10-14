@@ -3,12 +3,11 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { getStyleVariant } from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
+import { getStyleVariant, setAccent } from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 
 import { accentColor, fromHex, isNeutral, readableOn, toHex, type Rgb, type Seed } from './color.js';
 import type { Colors, Palette } from './palette.js';
 
-type AccentThemeContext = St.ThemeContext & { set_accent_color(color: Cogl.Color, fgColor: Cogl.Color): void };
 type Variant = 'light' | 'dark';
 
 const VARIANTS: Variant[] = ['light', 'dark'];
@@ -76,8 +75,8 @@ export class AccentStylesheet {
     this.directory = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!]));
   }
 
-  private get context(): AccentThemeContext {
-    return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage) as AccentThemeContext;
+  private get context(): St.ThemeContext {
+    return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
   }
 
   private file(variant: Variant): Gio.File {
@@ -85,18 +84,14 @@ export class AccentStylesheet {
   }
 
   apply(seed: Seed, palette: Palette): void {
-    const accent = accentColor(seed);
-    this.context.set_accent_color(coglColor(accent), coglColor(readableOn(accent)));
     const sheets = VARIANTS.map(variant => accentStylesheet(seed, palette, variant));
     const css = sheets.join('');
     if (css === this.css) return;
     GLib.mkdir_with_parents(this.directory.get_path()!, 0o700);
     VARIANTS.forEach((variant, index) =>
       this.file(variant).replace_contents(new TextEncoder().encode(sheets[index]), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null));
-    const theme = this.context.get_theme();
-    const current = this.file(getStyleVariant());
-    if (this.css) theme.unload_stylesheet(current);
-    theme.load_stylesheet(current);
+    const accent = accentColor(seed);
+    setAccent(this.file(getStyleVariant()), coglColor(accent), coglColor(readableOn(accent)));
     this.css = css;
   }
 

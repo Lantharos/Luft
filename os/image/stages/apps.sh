@@ -4,8 +4,8 @@ set -euo pipefail
 luft="$(cd "$(dirname "$0")/../../.." && pwd)"
 destdir="$1"
 
-sabine_revision="$(sed -n 's|^sabine = { git = "https://github.com/Lantharos/Sabine", rev = "\([0-9a-f]*\)" }$|\1|p' "$luft/packages/app/Cargo.toml")"
-cargo install --locked --root /usr/local --git https://github.com/Lantharos/Sabine --rev "$sabine_revision" \
+sabine_tag="$(sed -n 's|^sabine = { git = "https://github.com/Lantharos/Sabine", tag = "\([^"]*\)" }$|\1|p' "$luft/packages/app/Cargo.toml")"
+cargo install --locked --root /usr/local --git https://github.com/Lantharos/Sabine --tag "$sabine_tag" \
   sabine-cli sabine-service
 
 sabine runtime install --system-wide --root "$destdir"

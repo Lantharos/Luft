@@ -53,9 +53,9 @@ build_containers() {
 
 fill_store() {
   local destination="containers-storage:[overlay@$work/store+$work/run]"
-  skopeo copy --quiet "containers-storage:$image" "$destination$published"
-  skopeo copy --quiet "containers-storage:$image-nvidia" "$destination$published-nvidia"
-  skopeo copy --quiet "containers-storage:$live_image" "$destination$live_image"
+  podman push --quiet "$image" "$destination$published"
+  podman push --quiet "$image-nvidia" "$destination$published-nvidia"
+  podman push --quiet "$live_image" "$destination$live_image"
 }
 
 make_initramfs() {
@@ -64,6 +64,10 @@ make_initramfs() {
     mkdir -p /var/roothome
     dracut --quiet --force --no-hostonly --reproducible --add luft-live --omit "$1" --omit-drivers "$2" --kver "$kernel" /work/initrd.img
   ' sh "${initramfs_omitted[*]}" "${initramfs_omitted_drivers[*]}"
+}
+
+remove_work() {
+  podman unshare sh -c 'if mountpoint -q "$1/store/overlay"; then umount "$1/store/overlay"; fi; rm -rf "$1"' sh "$work"
 }
 
 pack() {
@@ -76,11 +80,11 @@ pack() {
 ensure_images
 name="luft-$(image_value "$image" '{{index .Labels "org.opencontainers.image.version"}}').iso"
 build_containers
-podman unshare rm -rf "$work"
+remove_work
 mkdir -p "$work"
 fill_store
 make_initramfs
 pack "$name"
 mv "$work/$name" "$work/$name.sha256" "$state/"
-podman unshare rm -rf "$work"
+remove_work
 echo "$state/$name"

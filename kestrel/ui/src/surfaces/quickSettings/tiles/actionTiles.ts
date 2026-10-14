@@ -20,10 +20,12 @@ interface ActionHandlers {
   close(): void;
 }
 
+const onKeyboard = (accelerator: string) => !accelerator.replace(/<[^>]+>/g, '').startsWith('XF86');
+
 function showShortcut(tile: ActionTile, schema: string, key: string, settings: Gio.Settings[]): void {
   const source = new Gio.Settings({ schema_id: schema });
   const update = () => {
-    const [accelerator] = source.get_strv(key);
+    const accelerator = source.get_strv(key).find(onKeyboard);
     tile.subtitle.text = accelerator ? label(accelerator) : '';
   };
   source.connect(`changed::${key}`, update);

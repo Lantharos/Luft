@@ -141,7 +141,7 @@
       <summary>Search</summary>
     </key>
     <key name="control-center" type="as">
-      <default>['XF86Tools']</default>
+      <default>['&lt;Super&gt;i', 'XF86Tools']</default>
       <summary>Open Settings</summary>
     </key>
     <key name="screensaver" type="as">

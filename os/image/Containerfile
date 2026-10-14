@@ -30,9 +30,13 @@ COPY security /src/security
 COPY kestrel/passkeys /src/kestrel/passkeys
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/stages /src/os/image/stages
+ARG SIGNED_BY
 RUN --mount=type=cache,target=/var/cache/cargo \
     --mount=type=cache,id=luft-target-boot,target=/var/cache/luft-target \
-    /src/os/image/stages/boot.sh /stage && \
+    --mount=type=secret,id=secureboot-key \
+    --mount=type=secret,id=secureboot-cert \
+    : "signed by ${SIGNED_BY}" && \
+    /src/os/image/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 
 FROM builder AS apps
@@ -66,6 +70,8 @@ COPY --from=kestrel /stage/ /
 COPY --from=boot /stage/ /
 COPY --from=apps /stage/ /
 COPY os/image/files/ /
+COPY --from=public-keys luft-secureboot.der /usr/share/luft/secure-boot/luft.der
+COPY --from=public-keys luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
 RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" && \
     rm -rf /usr/share/luft/image
 RUN bootc container lint
@@ -74,9 +80,11 @@ LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes=
 
 FROM luft AS luft-nvidia
 COPY os/image/stages/nvidia.sh /tmp/nvidia.sh
+ARG SIGNED_BY
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
+    : "signed by ${SIGNED_BY}" && \
     /tmp/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
     rm /tmp/nvidia.sh
 RUN bootc container lint

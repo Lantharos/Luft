@@ -41,6 +41,50 @@ def screenshot(path: str):
         subprocess.run(["magick", str(frame), path], check=True)
 
 
+def pixel(x: int, y: int) -> tuple[int, int, int]:
+    with tempfile.TemporaryDirectory() as directory:
+        frame = Path(directory) / "frame.ppm"
+        qmp(("screendump", {"filename": str(frame)}))
+        data = frame.read_bytes()
+    fields = data.split(maxsplit=4)
+    width = int(fields[1])
+    at = len(data) - len(fields[4]) + (y * width + x) * 3
+    return tuple(data[at:at + 3])
+
+
+def wait_for_shim_screen(timeout: float):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        red, green, blue = pixel(20, 200)
+        if blue > 120 and red < 60 and green < 60:
+            return
+        time.sleep(0.3)
+    raise SystemExit("shim's key management screen didn't appear")
+
+
+def enroll(code: str, timeout: float):
+    wait_for_shim_screen(timeout)
+    for step in [["spc"], ["down", "ret"], ["down", "ret"], ["down", "ret"]]:
+        for combo in step:
+            press(combo)
+            time.sleep(0.4)
+        time.sleep(2)
+    type_text(code + "\n")
+    time.sleep(2)
+    press("ret")
+
+
+def enroll_from_disk(timeout: float):
+    wait_for_shim_screen(timeout)
+    last = ["down"] * 6 + ["ret"]
+    steps = [["ret"], ["spc"], ["down", "ret"], ["ret"], ["ret"], last, last, ["down", "ret"], ["down", "ret"], ["ret"]]
+    for step in steps:
+        for combo in step:
+            press(combo)
+            time.sleep(0.4)
+        time.sleep(2)
+
+
 def press(combo: str):
     keys = [{"type": "qcode", "data": key} for key in combo.split("-")]
     qmp(("send-key", {"keys": keys}))
@@ -103,9 +147,18 @@ def main():
     run = commands.add_parser("shell", help="run a command as root on the serial console")
     run.add_argument("line")
     run.add_argument("--timeout", type=float, default=60)
+    queued = commands.add_parser("enroll", help="add the key queued with this code on shim's blue screen, then restart")
+    queued.add_argument("code")
+    queued.add_argument("--timeout", type=float, default=120)
+    mok = commands.add_parser("enroll-from-disk", help="add EFI/luft/luft.cer on shim's blue screen, then restart")
+    mok.add_argument("--timeout", type=float, default=120)
     arguments = parser.parse_args()
     if arguments.command == "screenshot":
         screenshot(arguments.path)
+    elif arguments.command == "enroll":
+        enroll(arguments.code, arguments.timeout)
+    elif arguments.command == "enroll-from-disk":
+        enroll_from_disk(arguments.timeout)
     elif arguments.command == "key":
         press(arguments.combo)
     elif arguments.command == "type":

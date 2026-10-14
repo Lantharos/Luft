@@ -5,6 +5,8 @@ const MOK_VARIABLES: &str = "/sys/firmware/efi/mok-variables";
 const GLOBAL: &str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
 const SHIM: &str = "605dab50-e046-4300-abb6-3dd810dd8b23";
 const STUB: &str = "4a67b082-0a4c-41cf-b6c7-440b29bb8c4f";
+const LUFT: &str = "b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e";
+const DISK_CHANGE: &str = "LuftDiskChange";
 const NON_VOLATILE_BOOT_RUNTIME: u32 = 0x7;
 const X509: [u8; 16] = [
     0xa1, 0x59, 0xc0, 0xa5, 0xe4, 0x94, 0xa7, 0x4a, 0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72,
@@ -72,19 +74,22 @@ pub fn boot_loader() -> Option<String> {
     variable("LoaderInfo", STUB).map(|data| text(&data))
 }
 
-pub fn selected_entry() -> Option<String> {
-    variable("LoaderEntrySelected", STUB).map(|data| text(&data))
+pub fn boot_partition() -> Option<String> {
+    variable("LoaderDevicePartUUID", STUB).map(|data| text(&data).to_lowercase())
 }
 
-pub fn set_oneshot_entry(id: &str) -> std::io::Result<()> {
-    let path = format!("{VARIABLES}/LoaderEntryOneShot-{STUB}");
+pub fn announce_disk_change(pending: bool) -> std::io::Result<()> {
+    let path = format!("{VARIABLES}/{DISK_CHANGE}-{LUFT}");
     if let Ok(existing) = std::fs::File::open(&path) {
         let flags = rustix::fs::ioctl_getflags(&existing)?;
         rustix::fs::ioctl_setflags(&existing, flags - rustix::fs::IFlags::IMMUTABLE)?;
         std::fs::remove_file(&path)?;
     }
+    if !pending {
+        return Ok(());
+    }
     let mut data = NON_VOLATILE_BOOT_RUNTIME.to_le_bytes().to_vec();
-    data.extend(id.encode_utf16().chain([0]).flat_map(u16::to_le_bytes));
+    data.push(1);
     std::fs::write(path, data)
 }
 

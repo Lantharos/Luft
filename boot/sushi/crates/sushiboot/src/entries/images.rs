@@ -1,6 +1,7 @@
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::cmp::Ordering;
 
 use super::pe::{self, Uki};
 use super::tries::{self, Tries};
@@ -11,13 +12,32 @@ const IMAGES: &str = "\\EFI\\Linux";
 
 pub struct Image {
     origin: Origin,
-    file: String,
+    path: String,
     name: String,
     tries: Option<Tries>,
+    sort_key: Option<String>,
     uki: Uki,
 }
 
 impl Image {
+    pub fn open(
+        volume: &mut Volume,
+        origin: &Origin,
+        path: String,
+        name: String,
+        sort_key: Option<String>,
+    ) -> Option<Self> {
+        let uki = pe::uki(&mut volume.file(&path)?)?;
+        Some(Self {
+            origin: origin.clone(),
+            path,
+            name,
+            tries: None,
+            sort_key,
+            uki,
+        })
+    }
+
     fn version(&self) -> &str {
         self.uki
             .version
@@ -27,6 +47,22 @@ impl Image {
 
     fn exhausted(&self) -> bool {
         self.tries.is_some_and(Tries::exhausted)
+    }
+
+    fn release(&self) -> String {
+        match (&self.uki.name, &self.uki.image_version) {
+            (Some(name), Some(version)) => format!("{name} {version}"),
+            _ => format!("Linux {}", self.version()),
+        }
+    }
+
+    fn order(&self, other: &Self) -> Ordering {
+        self.exhausted().cmp(&other.exhausted()).then_with(|| {
+            match (&self.sort_key, &other.sort_key) {
+                (Some(ours), Some(theirs)) => ours.cmp(theirs),
+                _ => newest_first(self.version(), other.version()),
+            }
+        })
     }
 
     fn entry(&self, profile: usize, title: String) -> BootEntry {
@@ -46,7 +82,7 @@ impl Image {
             title: self.origin.title(&title),
             volume: self.origin.handle,
             action: Action::Efi {
-                path: format!("{IMAGES}\\{}", self.file),
+                path: self.path.clone(),
                 options,
             },
             tries: self.tries.filter(|_| profile == 0),
@@ -60,25 +96,16 @@ pub fn scan(volume: &mut Volume, origin: &Origin) -> Vec<Image> {
         .into_iter()
         .filter(|listed| !listed.directory && listed.name.to_ascii_lowercase().ends_with(".efi"))
         .filter_map(|listed| {
-            let mut file = volume.file(&format!("{IMAGES}\\{}", listed.name))?;
             let (name, tries) = tries::split(&listed.name);
-            Some(Image {
-                origin: origin.clone(),
-                uki: pe::uki(&mut file)?,
-                file: listed.name,
-                name,
-                tries,
-            })
+            let path = format!("{IMAGES}\\{}", listed.name);
+            let image = Image::open(volume, origin, path, name, None)?;
+            Some(Image { tries, ..image })
         })
         .collect()
 }
 
 pub fn add(catalog: &mut Catalog, mut images: Vec<Image>) {
-    images.sort_by(|a, b| {
-        a.exhausted()
-            .cmp(&b.exhausted())
-            .then_with(|| newest_first(a.version(), b.version()))
-    });
+    images.sort_by(Image::order);
     let mut systems: Vec<&str> = images.iter().map(|image| image.uki.os.as_str()).collect();
     systems.sort_unstable();
     systems.dedup();
@@ -88,11 +115,14 @@ pub fn add(catalog: &mut Catalog, mut images: Vec<Image>) {
         let newest = !listed.contains(&image.uki.os.as_str());
         let name = image.uki.name.as_deref();
         let title = if newest {
-            name.map_or_else(|| format!("Linux {}", image.version()), String::from)
-        } else if several && let Some(name) = name {
-            format!("{name}, Linux {}", image.version())
+            name.map_or_else(|| image.release(), String::from)
+        } else if several
+            && image.uki.image_version.is_none()
+            && let Some(name) = name
+        {
+            format!("{name}, {}", image.release())
         } else {
-            format!("Linux {}", image.version())
+            image.release()
         };
         let main = catalog.push(image.entry(0, title));
         if newest {

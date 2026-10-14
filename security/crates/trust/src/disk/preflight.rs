@@ -62,17 +62,11 @@ fn layout(disk: &SystemDisk) -> Result<String, String> {
     Ok("The system is a single btrfs partition.".to_owned())
 }
 
-fn boot_partition(disk: &SystemDisk) -> Result<String, String> {
-    let separate = blocks::mount_at("/boot")
-        .and_then(|boot| blocks::kernel_name(&boot.source))
-        .filter(|name| *name != disk.partition);
-    if separate.is_none() {
-        return Err("/boot is part of the system partition. It needs its own partition so the computer can start before the disk is unlocked.".to_owned());
-    }
+fn boot_partition() -> Result<String, String> {
     if esp::find().is_err() {
         return Err("The EFI system partition isn't mounted.".to_owned());
     }
-    Ok("/boot and the EFI system partition stay readable at startup.".to_owned())
+    Ok("The EFI system partition stays readable at startup.".to_owned())
 }
 
 fn left_out(disk: &SystemDisk) -> Result<String, String> {
@@ -165,7 +159,7 @@ fn shared(disk: &SystemDisk) -> Result<String, String> {
 
 fn space(disk: &SystemDisk) -> Result<String, String> {
     let usage = Tool::new("btrfs")
-        .args(["filesystem", "usage", "-b", "/"])
+        .args(["filesystem", "usage", "-b", disk.mountpoint])
         .output()
         .unwrap_or_default();
     let free = usage
@@ -182,10 +176,9 @@ fn space(disk: &SystemDisk) -> Result<String, String> {
     Ok("There's room for the encryption header.".to_owned())
 }
 
-const TOOLS: [(&str, &str); 3] = [
+const TOOLS: [(&str, &str); 2] = [
     ("/usr/lib/systemd/systemd-cryptsetup", "systemd-cryptsetup"),
     ("/usr/sbin/cryptsetup", "cryptsetup"),
-    ("/usr/bin/ukify", "systemd-ukify"),
 ];
 
 fn tools() -> Result<String, String> {
@@ -240,7 +233,7 @@ pub fn check() -> Vec<Check> {
     let layout = verdict("layout", layout(&disk));
     let mut checks = vec![firmware, layout];
     if checks.iter().all(|check| check.passed) {
-        checks.push(verdict("boot", boot_partition(&disk)));
+        checks.push(verdict("boot", boot_partition()));
         checks.push(verdict("left-out", left_out(&disk)));
         checks.push(verdict("shared", shared(&disk)));
         checks.push(verdict("space", space(&disk)));

@@ -13,13 +13,6 @@ pub enum Protection {
 }
 
 impl Protection {
-    pub fn name(self) -> &'static str {
-        match self {
-            Self::Tpm => "tpm",
-            Self::Disk => "disk",
-        }
-    }
-
     fn key(self) -> &'static str {
         match self {
             Self::Tpm => "host+tpm2",

@@ -1,3 +1,4 @@
-FROM quay.io/fedora/fedora-bootc:45
+ARG BASE
+FROM ${BASE}
 COPY root/ /
 RUN systemctl enable luft-installer-check.service

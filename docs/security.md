@@ -4,11 +4,11 @@ What protects a Luft computer, and against what. The services are [trustd and US
 
 ## Luft Secure Boot key
 
-- Made on the computer the first time it is needed. The private key is sealed with `systemd-creds` to the TPM and a root-only secret in `/var/lib/trustd`, and only unsealed into `/run/trustd` while signing.
-- Without a usable TPM, a key is only made once the disk is encrypted.
-- It signs SushiBoot, the kernel images and DKMS modules. akmods modules (such as NVIDIA's) keep akmods' own key, because akmods builds as an unprivileged user that must never be able to sign what starts the computer.
-- A second key signs the PCR 11 policies, kept the same way.
-- Shipping a Luft shim with the key built in would remove the one-time enrollment screen, but needs Microsoft's shim review and an HSM-backed CA. Until then, Fedora's shim and a per-computer key give the same protection.
+- Luft's key is held by the Luft project and signs, in CI, everything that starts the computer: SushiBoot, the startup images and NVIDIA's driver. Its certificate ships in every image, at `/usr/share/luft/secure-boot/luft.der`.
+- Shim trusts it once someone confirms it in person on shim's key enrollment screen ([boot.md](boot.md#adding-luft-s-secure-boot-key)).
+- A second key signs the TPM policy for each startup image. Its public half ships at `/usr/share/luft/secure-boot/pcr-policy.pem`. Keeping it apart means a leaked Secure Boot key alone still can't make a startup image the TPM would unlock the disk for.
+- Each startup image names the exact system it belongs to by its composefs digest, and the system's files are checked against it with fs-verity, so a signed image never starts a changed system. Nothing is signed or rebuilt on the computer.
+- Shipping a Luft shim with the key built in would remove the one-time enrollment screen, but needs Microsoft's shim review and an HSM-backed CA.
 
 ## Disk unlock with the TPM
 
@@ -17,9 +17,9 @@ The TPM releases the disk key only when both match:
 | PCR | Measures | Changes when |
 | --- | --- | --- |
 | 7 | Secure Boot state and the certificates that vouched for what started | Secure Boot is turned off, keys or the forbidden list change, or something else starts |
-| 11 | The unified kernel image, through a policy signed by Luft's key | Never for a correctly signed image; the policy only covers the initramfs, so the running system can't release the key |
+| 11 | The startup image, through a policy signed by Luft's policy key | Never for a Luft-signed image; the policy only covers the initramfs, so the running system can't release the key |
 
-- Kernel, initramfs and ordinary firmware updates keep unlocking without a prompt.
+- Updates to Luft and ordinary firmware updates keep unlocking without a prompt.
 - When PCR 7 changes, Sushi asks for the recovery key and says why, and Settings offers to link the TPM again.
 - An optional PIN of 6 to 20 digits makes the TPM also require something you know, with its own guessing lockout.
 - Every encrypted disk has a 64-character recovery key, in groups of eight, from letters that type the same on almost every keyboard. With a TPM, a sealed copy lets Settings show it again after an administrator password.
@@ -31,14 +31,14 @@ The TPM releases the disk key only when both match:
 Requirements, checked first by `trustctl encryption check`:
 
 - UEFI, with the system on a single btrfs partition
-- `/boot` and the EFI system partition on their own partitions
+- the EFI system partition on its own partition
 - nothing else on the disk that would stay unencrypted, and no other system on the same partition
 - 1 GB free, and the computer plugged in
 
 Steps:
 
 1. Save the recovery key.
-2. The file system shrinks by 32 MB for the header.
+2. The file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one).
 3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written.
 4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
 5. When it finishes, the TPM is linked and the disk unlocks without a prompt.

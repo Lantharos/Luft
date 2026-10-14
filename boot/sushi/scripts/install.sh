@@ -6,15 +6,13 @@ manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
 units=(sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service)
 arguments="sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5"
-names="sushi plymouth.enable fbcon"
 
 usage() {
   cat <<'USAGE'
 Usage: boot/sushi/scripts/install.sh ACTION
 
   install   Put Sushi on this computer next to Plymouth and rebuild the initramfs.
-            Nothing changes at boot until you try or enable it.
-  try       Boot once with Sushi. The next boot after that returns to your usual boot.
+            Nothing changes at boot until you enable it.
   enable    Use Sushi on every boot.
   disable   Go back to Plymouth on every boot. Sushi stays installed.
   remove    Disable Sushi, remove it, and rebuild the initramfs without it.
@@ -22,19 +20,11 @@ USAGE
 }
 
 kernel_arguments() {
-  command -v trustctl >/dev/null || {
-    echo "Luft's signed startup keeps the kernel command line. Install it first (security/README.md)." >&2
-    exit 1
-  }
-  sudo trustctl startup arguments "$@"
+  sudo grubby --update-kernel=ALL "$@"
 }
 
 rebuild_initramfs() {
-  if command -v trustctl >/dev/null; then
-    sudo trustctl startup rebuild
-  else
-    sudo dracut --force --kver "$(uname -r)"
-  fi
+  sudo dracut --force --kver "$(uname -r)"
 }
 
 install_everything() {
@@ -55,17 +45,13 @@ install_everything() {
   rebuild_initramfs
 }
 
-try_once() {
-  kernel_arguments --once --add "$arguments"
-}
-
 enable_everywhere() {
-  kernel_arguments --add "$arguments"
+  kernel_arguments --args="$arguments"
   echo "Sushi now shows on every boot."
 }
 
 disable_everywhere() {
-  kernel_arguments --remove "$names"
+  kernel_arguments --remove-args="$arguments"
   echo "Plymouth shows on every boot again."
 }
 
@@ -88,7 +74,6 @@ remove_everything() {
 
 case "${1:-}" in
   install) install_everything ;;
-  try) try_once ;;
   enable) enable_everywhere ;;
   disable) disable_everywhere ;;
   remove) remove_everything ;;

@@ -16,7 +16,6 @@ import { loadKestrelStylesheets } from '../shared/stylesheet.js';
 import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
 import { OomNotifier } from './health/oomNotifier.js';
-import { confirmStartup, notifyAboutFailedStartup } from './health/startup.js';
 import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
@@ -53,7 +52,6 @@ export class SystemServices {
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
       void notifyAboutIncidents();
-      if (ownsTheScreen) void confirmStartup().then(notifyAboutFailedStartup);
     });
   }
 

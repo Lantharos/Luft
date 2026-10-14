@@ -9,7 +9,7 @@ use crate::system::command::Tool;
 pub struct Mounted {
     root: PathBuf,
     pub root_uuid: String,
-    pub boot_uuid: String,
+    pub esp: String,
 }
 
 fn find(parts: &[Created], role: Role) -> Option<&Created> {
@@ -21,7 +21,7 @@ fn mount(device: &str, at: &Path) -> Result<()> {
     Tool::new("mount").arg(device).arg(at).run()
 }
 
-fn shared_esp(drive_device: &str) -> Result<String> {
+fn first_esp(drive_device: &str) -> Result<String> {
     let listing = Tool::new("lsblk")
         .args([
             "--list",
@@ -43,20 +43,12 @@ fn shared_esp(drive_device: &str) -> Result<String> {
 impl Mounted {
     pub fn assemble(root: &Path, drive_device: &str, parts: &[Created]) -> Result<Self> {
         let system = find(parts, Role::Root).context("No partition for Luft was made")?;
-        let boot = find(parts, Role::Boot).context("No boot partition was made")?;
-        let esp = match find(parts, Role::Esp) {
-            Some(esp) => esp.device.clone(),
-            None => shared_esp(drive_device)?,
-        };
         mount(&system.device, root)?;
-        let mounted = Self {
+        Ok(Self {
             root: root.to_owned(),
             root_uuid: system.uuid.clone(),
-            boot_uuid: boot.uuid.clone(),
-        };
-        mount(&boot.device, &root.join("boot"))?;
-        mount(&esp, &root.join("boot/efi"))?;
-        Ok(mounted)
+            esp: first_esp(drive_device)?,
+        })
     }
 
     pub fn root(&self) -> &Path {
@@ -64,10 +56,10 @@ impl Mounted {
     }
 
     pub fn finish(self) -> Result<()> {
-        for path in [self.root.clone(), self.root.join("boot")] {
-            Tool::new("fstrim").arg("--quiet-unsupported").arg(path).run()?;
-        }
-        Ok(())
+        Tool::new("fstrim")
+            .arg("--quiet-unsupported")
+            .arg(&self.root)
+            .run()
     }
 }
 

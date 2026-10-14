@@ -28,6 +28,7 @@ pub struct Uki {
     pub os: String,
     pub name: Option<String>,
     pub version: Option<String>,
+    pub image_version: Option<String>,
     pub profiles: Vec<Profile>,
 }
 
@@ -111,6 +112,7 @@ pub fn uki(file: &mut RegularFile) -> Option<Uki> {
         os: field(&release, "ID").unwrap_or_default(),
         name: field(&release, "PRETTY_NAME").or_else(|| field(&release, "NAME")),
         version,
+        image_version: field(&release, "IMAGE_VERSION"),
         profiles,
     })
 }

@@ -61,12 +61,8 @@ refresh_caches() {
   update-mime-database /usr/share/mime
 }
 
-rebuild_initramfs() {
-  local kernel
-  for kernel in /usr/lib/modules/*/vmlinuz; do
-    kernel="$(basename "$(dirname "$kernel")")"
-    dracut --force --kver "$kernel" "/usr/lib/modules/$kernel/initramfs.img"
-  done
+leave_initramfs_to_the_startup_image() {
+  rm -f /usr/lib/modules/*/initramfs.img
 }
 
 check_typelibs() {
@@ -89,5 +85,5 @@ configure_toolbox
 configure_security
 check_typelibs
 refresh_caches
-rebuild_initramfs
+leave_initramfs_to_the_startup_image
 clean_build_state

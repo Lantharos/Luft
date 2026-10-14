@@ -2,15 +2,9 @@ use std::path::PathBuf;
 
 pub const STATE: &str = "/var/lib/trustd";
 pub const RUNTIME: &str = "/run/trustd";
-pub const STAGE: &str = "/var/lib/trustd/stage";
-pub const INITRD_STAGE: &str = "/etc/trustd/stage";
 
 pub fn state(name: &str) -> PathBuf {
     PathBuf::from(STATE).join(name)
-}
-
-pub fn stage(name: &str) -> PathBuf {
-    PathBuf::from(STAGE).join(name)
 }
 
 pub fn ensure_private(path: &str) -> std::io::Result<()> {

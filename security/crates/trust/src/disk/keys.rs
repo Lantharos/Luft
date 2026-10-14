@@ -5,10 +5,11 @@ use anyhow::{Result, bail};
 use super::luks::{self, Header};
 use super::stage;
 use crate::errors::{NeedsKey, Unsupported, WrongKey};
-use crate::keys::{self as signing, Unsealed};
+use crate::keys as signing;
 use crate::paths;
 use crate::system::command::Tool;
 use crate::system::creds::{self, Protection};
+use crate::system::scratch::Scratch;
 use crate::system::secret::Secret;
 use crate::system::{efi, tpm};
 
@@ -108,7 +109,7 @@ pub fn unlock_key(device: &Path, header: Option<&Path>, typed: &Secret) -> Resul
 
 pub fn add_keyslot(device: &Path, unlock: &Secret, new: &Secret, header: &Header) -> Result<u32> {
     let slot = header.free_slot();
-    let scratch = Unsealed::empty()?;
+    let scratch = Scratch::empty()?;
     let new_key = scratch.write("new-key", new)?;
     Tool::new("cryptsetup")
         .args([
@@ -161,7 +162,7 @@ pub fn tpm_unavailable_reason() -> Option<String> {
     if !tpm.usable {
         return Some(tpm.reason);
     }
-    if !signing::has_pcr_key() || !efi::measured_uki() {
+    if !signing::shipped() || !efi::measured_uki() {
         return Some("Restart through Luft's signed startup first, so the TPM can check how the computer started.".to_owned());
     }
     None
@@ -176,10 +177,7 @@ pub fn enroll_tpm(device: &Path, unlock: &Secret, pin: &Secret) -> Result<()> {
         .arg("--wipe-slot=tpm2")
         .arg("--tpm2-device=auto")
         .arg("--tpm2-pcrs=7")
-        .arg(format!(
-            "--tpm2-public-key={}",
-            signing::pcr_public_key().display()
-        ))
+        .arg(format!("--tpm2-public-key={}", signing::PCR_PUBLIC_KEY))
         .arg("--tpm2-public-key-pcrs=11")
         .arg("--tpm2-pcrlock=")
         .arg(format!(

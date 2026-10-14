@@ -1,6 +1,7 @@
 mod configure;
 mod copy;
 pub mod drive;
+mod startup;
 
 use std::path::Path;
 use std::sync::{Condvar, Mutex};
@@ -10,7 +11,7 @@ use anyhow::{Context, Result};
 pub use configure::account::Account;
 pub use configure::regional::Regional;
 
-use crate::config::{Config, Image};
+use crate::config::Image;
 use configure::deployment::Deployment;
 use configure::handoff;
 use drive::partition;
@@ -50,6 +51,7 @@ pub struct Status {
     pub stage: Stage,
     pub progress: f64,
     pub error: String,
+    pub secure_boot_code: String,
 }
 
 impl Status {
@@ -62,6 +64,7 @@ impl Status {
             stage,
             progress,
             error: String::new(),
+            secure_boot_code: String::new(),
         }
     }
 }
@@ -102,7 +105,6 @@ impl Answers {
 }
 
 pub struct Job<'a> {
-    pub config: &'a Config,
     pub image: &'a Image,
     pub plan: Plan,
     pub target: &'a Path,
@@ -116,6 +118,7 @@ pub fn run(job: Job, report: impl Fn(Status)) {
             stage: Stage::Failed,
             progress: 0.0,
             error: format!("{error:#}"),
+            secure_boot_code: String::new(),
         });
     }
 }
@@ -125,21 +128,27 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     let parts = partition::apply(&job.plan)?;
     let mounted = Mounted::assemble(job.target, &job.plan.device, &parts)?;
     report(Status::at(Stage::Copying, PREPARED));
-    copy::run(job.config, job.image, &mounted, |copied| {
+    copy::run(job.image, &mounted, |copied| {
         report(Status::at(
             Stage::Copying,
             PREPARED + (COPIED - PREPARED) * copied,
         ))
     })
     .context("Luft couldn't be copied")?;
+    startup::place(&mounted, &job.target.with_extension("esp"))?;
     report(Status::at(Stage::Waiting, COPIED));
     let (regional, account) = job.answers.wait();
     report(Status::at(Stage::Configuring, COPIED));
-    let deployment = Deployment::find(mounted.root())?;
+    let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
     regional.apply(&deployment)?;
     account.create(&deployment)?;
     handoff::prepare(&deployment, &account.name)?;
+    drop(deployment);
     mounted.finish()?;
-    report(Status::at(Stage::Finished, 1.0));
+    let secure_boot_code = startup::ask_shim_to_trust_luft()?;
+    report(Status {
+        secure_boot_code,
+        ..Status::at(Stage::Finished, 1.0)
+    });
     Ok(())
 }

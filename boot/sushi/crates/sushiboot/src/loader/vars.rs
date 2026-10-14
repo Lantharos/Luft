@@ -54,7 +54,10 @@ pub fn chosen_default() -> Option<String> {
 pub fn describe(catalog: &Catalog) {
     announce(
         cstr16!("LoaderInfo"),
-        &utf16(&format!("SushiBoot {}", env!("CARGO_PKG_VERSION"))),
+        &utf16(&format!(
+            "SushiBoot {}, systemd-boot compatible",
+            env!("CARGO_PKG_VERSION")
+        )),
     );
     announce(
         cstr16!("LoaderFeatures"),

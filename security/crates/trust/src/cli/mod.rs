@@ -6,9 +6,9 @@ use std::path::PathBuf;
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 
-use crate::boot::kernels::Kernel;
-use crate::boot::{sign, startup};
+use crate::boot::startup;
 use crate::disk::keys;
+use crate::keys::mok;
 use crate::system::command::Tool;
 use crate::system::secret::Secret;
 use crate::system::tpm;
@@ -18,7 +18,7 @@ use crate::{disk, service::actions};
 #[command(
     name = "trustctl",
     version,
-    about = "Secure Boot signing, TPM disk unlock and device encryption"
+    about = "Luft's Secure Boot key, signed startup, TPM disk unlock and device encryption"
 )]
 pub struct Cli {
     #[command(subcommand)]
@@ -34,15 +34,10 @@ enum Command {
         #[command(subcommand)]
         action: SecureBootAction,
     },
-    /// The signed startup: Luft's boot menu and signed kernel images on the EFI system partition
+    /// The signed startup: shim and Luft's boot menu on the EFI system partition
     Startup {
         #[command(subcommand)]
         action: StartupAction,
-    },
-    /// Sign with Luft's Secure Boot key
-    Sign {
-        #[command(subcommand)]
-        action: SignAction,
     },
     /// Unlocking the disk with the TPM
     Tpm {
@@ -63,7 +58,7 @@ enum Command {
 
 #[derive(Subcommand)]
 enum SecureBootAction {
-    /// Make the key if needed and ask the firmware to trust it at the next restart
+    /// Ask shim to trust Luft's key at the next restart
     Enroll,
     /// Withdraw the request before restarting
     Cancel,
@@ -71,44 +66,11 @@ enum SecureBootAction {
 
 #[derive(Subcommand)]
 enum StartupAction {
-    Install,
-    Uninstall,
-    /// Build the signed image for a newly installed kernel (used by kernel-install)
-    Add {
-        version: String,
-    },
-    /// Remove a kernel's signed image (used by kernel-install)
-    Remove {
-        version: String,
-    },
-    /// Rebuild the initramfs and signed images after changing what goes into them
-    Rebuild,
-    /// Rebuild the signed images whose kernel got new or changed modules, such as a graphics driver built by akmods
-    Refresh,
-    /// Show or change the kernel command line inside the signed images
-    Arguments {
-        /// Arguments to add, such as quiet or loglevel=3
-        #[arg(long, value_name = "ARGUMENTS")]
-        add: Vec<String>,
-        /// Arguments to take out, by name, such as loglevel
-        #[arg(long, value_name = "NAMES")]
-        remove: Vec<String>,
-        /// Start with the changed command line at the next restart only
+    /// Put shim and Luft's boot menu on the EFI system partition and make Luft the firmware's boot entry
+    Install {
+        /// The EFI system partition's mount point, when it isn't this system's own
         #[arg(long)]
-        once: bool,
-    },
-}
-
-#[derive(Subcommand)]
-enum SignAction {
-    /// Sign an EFI program
-    Efi { input: PathBuf, output: PathBuf },
-    /// Sign a kernel module the way DKMS asks: hash, key, certificate, module
-    Module {
-        hash: String,
-        key: PathBuf,
-        certificate: PathBuf,
-        module: PathBuf,
+        esp: Option<PathBuf>,
     },
 }
 
@@ -147,7 +109,6 @@ impl Cli {
             }
             Command::SecureBoot { action } => secure_boot(action),
             Command::Startup { action } => startup(action),
-            Command::Sign { action } => signing(action),
             Command::Tpm { action } => tpm_unlock(action),
             Command::RecoveryKey { action } => recovery_key(action),
             Command::Encryption { action } => encryption(action),
@@ -158,47 +119,17 @@ impl Cli {
 fn secure_boot(action: SecureBootAction) -> Result<()> {
     match action {
         SecureBootAction::Enroll => {
-            let encrypted = disk::status().is_some_and(|disk| disk.encrypted);
-            crate::keys::create(encrypted)?;
-            let code = crate::keys::mok::request()?;
+            let code = mok::request()?;
             report::enrollment_steps(&code);
             Ok(())
         }
-        SecureBootAction::Cancel => crate::keys::mok::cancel(),
+        SecureBootAction::Cancel => mok::cancel(),
     }
 }
 
 fn startup(action: StartupAction) -> Result<()> {
     match action {
-        StartupAction::Install => startup::install(),
-        StartupAction::Uninstall => startup::uninstall(),
-        StartupAction::Add { version } => startup::add(&Kernel::named(&version)),
-        StartupAction::Remove { version } => startup::remove(&version),
-        StartupAction::Rebuild => startup::rebuild_boot_files(),
-        StartupAction::Refresh => startup::refresh(true),
-        StartupAction::Arguments { add, remove, once } => {
-            let words = |values: Vec<String>| -> Vec<String> {
-                values
-                    .iter()
-                    .flat_map(|value| value.split_whitespace().map(str::to_owned))
-                    .collect()
-            };
-            let changing = !add.is_empty() || !remove.is_empty();
-            let line = startup::arguments(&words(add), &words(remove), once)?;
-            println!("{line}");
-            if changing && once {
-                println!("The next restart starts with this command line once.");
-            }
-            Ok(())
-        }
-    }
-}
-
-fn signing(action: SignAction) -> Result<()> {
-    let keys = crate::keys::unseal()?;
-    match action {
-        SignAction::Efi { input, output } => sign::efi_binary(&input, &output, &keys),
-        SignAction::Module { hash, module, .. } => sign::kernel_module(&module, &hash, &keys),
+        StartupAction::Install { esp } => startup::install(esp.as_deref()),
     }
 }
 

@@ -21,11 +21,19 @@ fn this_boot() -> String {
 }
 
 impl Request {
+    pub fn declined(attempts: u32) -> Self {
+        Self {
+            missed: attempts,
+            ..Self::default()
+        }
+    }
+
     pub fn load() -> Option<Self> {
         serde_json::from_slice(&std::fs::read(paths::state(FILE)).ok()?).ok()
     }
 
     pub fn save(&self) -> Result<()> {
+        paths::ensure_private(paths::STATE)?;
         paths::write_private(&paths::state(FILE), &serde_json::to_vec(self)?)?;
         Ok(())
     }

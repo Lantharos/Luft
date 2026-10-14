@@ -88,6 +88,9 @@ async fn forward(installer: InterfaceRef<Installer>, mut updates: watch::Receive
         if previous.error != status.error {
             let _ = inner.error_changed(emitter).await;
         }
+        if previous.secure_boot_code != status.secure_boot_code {
+            let _ = inner.secure_boot_code_changed(emitter).await;
+        }
         let _ = inner.progress_changed(emitter).await;
     }
 }
@@ -112,6 +115,11 @@ impl Installer {
     #[zbus(property)]
     fn error(&self) -> String {
         self.current().error
+    }
+
+    #[zbus(property)]
+    fn secure_boot_code(&self) -> String {
+        self.current().secure_boot_code
     }
 
     async fn survey(
@@ -152,8 +160,7 @@ impl Installer {
         let (sender, updates) = watch::channel(Status::idle());
         let installer = server.interface::<_, Installer>(PATH).await?;
         tokio::spawn(forward(installer, updates));
-        let (config, options, answers, idle) = (
-            self.config.clone(),
+        let (options, answers, idle) = (
             self.options.clone(),
             self.answers.clone(),
             self.idle.clone(),
@@ -162,7 +169,6 @@ impl Installer {
             let _activity = idle.hold();
             let _ = tokio::task::spawn_blocking(move || {
                 let job = Job {
-                    config: &config,
                     image: &image,
                     plan,
                     target: &options.target,

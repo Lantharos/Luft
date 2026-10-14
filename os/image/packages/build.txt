@@ -33,6 +33,7 @@ polkit-devel
 pulseaudio-libs-devel
 python3
 sassc
+sbsigntools
 systemd-devel
 tpm2-tss-devel
 unzip

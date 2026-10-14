@@ -13,11 +13,13 @@ const ERROR: &str = "com.lantharos.Installer1.Error.";
 const CHANGED: &str = "installer.changed";
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct State {
     phase: String,
     stage: String,
     progress: f64,
     error: String,
+    secure_boot_code: String,
 }
 
 #[derive(Deserialize)]
@@ -43,6 +45,7 @@ pub fn state() -> Result<Option<State>, String> {
         stage: text(&map, "Stage"),
         progress: get(&map, "Progress").unwrap_or_default(),
         error: text(&map, "Error"),
+        secure_boot_code: text(&map, "SecureBootCode"),
     }))
 }
 

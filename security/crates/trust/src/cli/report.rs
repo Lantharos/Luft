@@ -23,15 +23,7 @@ pub fn status() {
         println!("TPM                none. {}", status.tpm.reason);
     }
     let key = &status.signing_key;
-    println!(
-        "Luft key           {}{}",
-        key.enrollment.name(),
-        if key.protection.is_empty() {
-            String::new()
-        } else {
-            format!(", kept by the {}", key.protection)
-        }
-    );
+    println!("Luft key           {}", key.enrollment.name());
     if key.missed > 0 {
         println!(
             "                   not added at the last {}",
@@ -46,24 +38,10 @@ pub fn status() {
         println!("                   {}", key.reason);
     }
     println!(
-        "Driver key         {}",
-        if key.driver_key_enrolled {
-            "enrolled"
-        } else {
-            "not enrolled"
-        }
-    );
-    println!(
         "Signed startup     installed: {}, this boot: {}",
         yes_no(status.startup.installed),
         yes_no(status.startup.measured)
     );
-    if !status.startup.failed_version.is_empty() {
-        println!(
-            "                   Linux {} didn't start, so the version before it started instead.",
-            status.startup.failed_version
-        );
-    }
     match &status.disk {
         Some(disk) => {
             println!("Disk               {} {}", disk.device, disk.state);

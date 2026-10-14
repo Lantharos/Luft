@@ -2,38 +2,58 @@
 set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../.." && pwd)"
-variant="${1:-luft}"
+image="$luft/os/image"
+state="${LUFT_IMAGE_STATE:-$image/state}"
 fedora=45
 
 usage() {
   cat <<'USAGE'
-Usage: os/image/build.sh [luft | luft-nvidia]
+Usage: os/image/build.sh [luft | luft-nvidia] [PODMAN BUILD OPTIONS...]
 
-Builds the Luft image with Podman as localhost/luft:45 or localhost/luft:45-nvidia.
-The NVIDIA image signs its driver with the key and certificate (PEM) named by
-LUFT_SECUREBOOT_KEY and LUFT_SECUREBOOT_CERT, or with a throwaway key.
+Builds the Luft image with Podman and seals it as localhost/luft:45 or
+localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the system
+before sealing. Signs with the keys named by LUFT_SECUREBOOT_KEY,
+LUFT_SECUREBOOT_CERT (PEM) and LUFT_PCR_KEY, or with throwaway keys kept in
+os/image/state/keys, which Secure Boot only accepts once they're enrolled.
 USAGE
 }
 
+variant="${1:-luft}"
 case "$variant" in
-  luft) tag="localhost/luft:$fedora" ;;
-  luft-nvidia) tag="localhost/luft:$fedora-nvidia" ;;
+  luft) suffix="" ;;
+  luft-nvidia) suffix="-nvidia" ;;
   -h | --help) usage; exit 0 ;;
   *) usage >&2; exit 2 ;;
 esac
+shift $(($# > 0 ? 1 : 0))
 
-secrets=()
-if [[ "$variant" == luft-nvidia ]]; then
-  if [[ -z "${LUFT_SECUREBOOT_KEY:-}" || -z "${LUFT_SECUREBOOT_CERT:-}" ]]; then
-    keys="$(mktemp -d)"
-    trap 'rm -rf "$keys"' EXIT
-    openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=Luft throwaway key" \
-      -keyout "$keys/key.pem" -out "$keys/cert.pem" 2>/dev/null
-    LUFT_SECUREBOOT_KEY="$keys/key.pem" LUFT_SECUREBOOT_CERT="$keys/cert.pem"
-    echo "Signing NVIDIA's driver with a throwaway key; Secure Boot won't accept it." >&2
-  fi
-  secrets=(--secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" --secret "id=secureboot-cert,src=$LUFT_SECUREBOOT_CERT")
+throwaway_keys() {
+  local keys="$state/keys"
+  mkdir -p -m 700 "$keys"
+  [[ -f "$keys/secureboot.key" ]] || openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
+    -subj "/CN=Luft throwaway Secure Boot key/" -keyout "$keys/secureboot.key" -out "$keys/secureboot.crt"
+  [[ -f "$keys/pcr.key" ]] || openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.key"
+  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
+  echo "Signing with the throwaway keys in $keys." >&2
+}
+
+public_keys() {
+  local public="$state/public"
+  mkdir -p "$public"
+  openssl x509 -in "$LUFT_SECUREBOOT_CERT" -outform DER -out "$public/luft-secureboot.der"
+  openssl pkey -in "$LUFT_PCR_KEY" -pubout -out "$public/luft-pcr-policy.pub.pem"
+  echo "$public"
+}
+
+if [[ -z "${LUFT_SECUREBOOT_KEY:-}" || -z "${LUFT_SECUREBOOT_CERT:-}" || -z "${LUFT_PCR_KEY:-}" ]]; then
+  throwaway_keys
 fi
 
-podman build --layers --jobs 3 --target "$variant" --file "$luft/os/image/Containerfile" \
-  --build-arg "VERSION=$fedora.$(date -u +%Y%m%d).dev" "${secrets[@]}" --tag "$tag" "$luft"
+system="localhost/luft-system:$fedora$suffix"
+podman build --layers --jobs 3 --target "$variant" --file "$image/Containerfile" \
+  --build-context "public-keys=$(public_keys)" \
+  --secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" \
+  --secret "id=secureboot-cert,src=$LUFT_SECUREBOOT_CERT" \
+  --build-arg "SIGNED_BY=$(openssl x509 -in "$LUFT_SECUREBOOT_CERT" -noout -fingerprint -sha256)" \
+  --build-arg "VERSION=$fedora.$(date -u +%Y%m%d).dev" "$@" --tag "$system" "$luft"
+"$image/seal.sh" "$system" "localhost/luft:$fedora$suffix"

@@ -4,27 +4,49 @@ use anyhow::{Context, Result};
 
 use crate::system::command::Tool;
 
-const STATEROOT: &str = "ostree/deploy/default";
+const DEPLOYMENTS: &str = "state/deploy";
+const SHARED_VAR: &str = "state/os/default/var";
+const REPOSITORY: &str = "composefs";
 const CONTEXTS: &str = "etc/selinux/targeted/contexts/files/file_contexts";
 
 pub struct Deployment {
     pub root: PathBuf,
-    pub state: PathBuf,
+}
+
+fn bind(source: &Path, target: &Path) -> Result<()> {
+    Tool::new("mount")
+        .arg("--bind")
+        .arg(source)
+        .arg(target)
+        .run()
 }
 
 impl Deployment {
-    pub fn find(target: &Path) -> Result<Self> {
-        let stateroot = target.join(STATEROOT);
-        let root = std::fs::read_dir(stateroot.join("deploy"))
+    pub fn mount(target: &Path, at: &Path) -> Result<Self> {
+        let state = std::fs::read_dir(target.join(DEPLOYMENTS))
             .context("The new system has no deployment")?
             .flatten()
             .map(|entry| entry.path())
             .find(|path| path.is_dir())
             .context("The new system has no deployment")?;
-        Ok(Self {
-            root,
-            state: stateroot,
-        })
+        let id = state
+            .file_name()
+            .context("The new system's deployment has no name")?;
+        std::fs::create_dir_all(at)?;
+        Tool::new("bootc")
+            .args(["internals", "cfs", "--repo"])
+            .arg(target.join(REPOSITORY))
+            .args(["mount", "--fuse=no"])
+            .arg(id)
+            .arg(at)
+            .run()
+            .context("The new system couldn't be opened")?;
+        let deployment = Self {
+            root: at.to_owned(),
+        };
+        bind(&state.join("etc"), &at.join("etc"))?;
+        bind(&target.join(SHARED_VAR), &at.join("var"))?;
+        Ok(deployment)
     }
 
     pub fn etc(&self, path: &str) -> PathBuf {
@@ -32,26 +54,27 @@ impl Deployment {
     }
 
     pub fn var(&self, path: &str) -> PathBuf {
-        self.state.join("var").join(path)
+        self.root.join("var").join(path)
     }
 
-    pub fn relabel_etc(&self, paths: &[PathBuf]) -> Result<()> {
-        relabel(&self.root, &self.root.join(CONTEXTS), paths)
-    }
-
-    pub fn relabel_var(&self, paths: &[PathBuf]) -> Result<()> {
-        relabel(&self.state, &self.root.join(CONTEXTS), paths)
+    pub fn relabel(&self, paths: &[PathBuf]) -> Result<()> {
+        let contexts = self.root.join(CONTEXTS);
+        if !contexts.exists() {
+            return Ok(());
+        }
+        Tool::new("setfiles")
+            .args(["-F", "-r"])
+            .arg(&self.root)
+            .arg(contexts)
+            .args(paths)
+            .run()
     }
 }
 
-fn relabel(root: &Path, contexts: &Path, paths: &[PathBuf]) -> Result<()> {
-    if !contexts.exists() {
-        return Ok(());
+impl Drop for Deployment {
+    fn drop(&mut self) {
+        if let Err(error) = Tool::new("umount").arg("--recursive").arg(&self.root).run() {
+            eprintln!("The new system's deployment couldn't be unmounted: {error:#}");
+        }
     }
-    Tool::new("setfiles")
-        .args(["-F", "-r"])
-        .arg(root)
-        .arg(contexts)
-        .args(paths)
-        .run()
 }

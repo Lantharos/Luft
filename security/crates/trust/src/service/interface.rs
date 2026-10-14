@@ -12,11 +12,12 @@ use super::actions;
 use super::error::Error;
 use super::properties::{self, Dict};
 use super::status::{self, Status};
+use crate::boot::startup;
 use crate::disk::worker::{self, Progress};
 use crate::disk::{self, keys};
+use crate::keys::mok;
 use crate::system::power;
 use crate::system::secret::Secret;
-use crate::{boot, keys as signing};
 
 const CHECK: &str = "com.lantharos.trust.check";
 const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";
@@ -305,17 +306,7 @@ impl Trust {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<String, Error> {
         self.authorize(connection, &header, SECURE_BOOT).await?;
-        let encrypted = self
-            .status()
-            .await
-            .disk
-            .as_ref()
-            .is_some_and(|disk| disk.encrypted);
-        self.run(&emitter, move || {
-            signing::create(encrypted)?;
-            signing::mok::request()
-        })
-        .await
+        self.run(&emitter, mok::request).await
     }
 
     async fn cancel_signing_key_enrollment(
@@ -325,7 +316,7 @@ impl Trust {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SECURE_BOOT).await?;
-        self.run(&emitter, signing::mok::cancel).await
+        self.run(&emitter, mok::cancel).await
     }
 
     async fn install_signed_startup(
@@ -335,17 +326,6 @@ impl Trust {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SECURE_BOOT).await?;
-        self.run(&emitter, boot::startup::install).await
-    }
-
-    async fn startup_finished(&self) -> Result<(), Error> {
-        let _activity = self.idle.hold();
-        let _busy = self.busy.lock().await;
-        tokio::task::spawn_blocking(boot::tries::mark_good)
-            .await
-            .map_err(|_| {
-                Error::Failed("The startup couldn't be marked as working.".to_owned())
-            })??;
-        Ok(())
+        self.run(&emitter, || startup::install(None)).await
     }
 }

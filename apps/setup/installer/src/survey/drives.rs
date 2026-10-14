@@ -7,7 +7,7 @@ use serde::Serialize;
 
 use super::room;
 use super::windows::{self, Hints};
-use crate::install::drive::layout::ESP_TYPE;
+use crate::install::drive::layout::{ESP_TYPE, shares_esp};
 
 const LIVE_MEDIUM: &str = "/run/initramfs";
 const BITLOCKER: &str = "BitLocker";
@@ -81,10 +81,26 @@ fn blocked(drive: &snapshot::Drive, smallest_system: u64) -> Option<&'static str
 }
 
 pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
+    let esp = volumes(drive)
+        .find(|volume| {
+            volume
+                .partition_type
+                .as_deref()
+                .is_some_and(|kind| kind.eq_ignore_ascii_case(ESP_TYPE))
+        })
+        .map(|volume| Space {
+            offset: volume.offset,
+            size: volume.size,
+        });
     let windows = if drive.removable {
         None
     } else {
-        find_windows(drive, smallest_system)
+        find_windows(drive, smallest_system).map(|windows| WindowsVolume {
+            blocked: windows.blocked.or(esp
+                .filter(|esp| !shares_esp(Some(esp.size)))
+                .map(|_| "small-esp")),
+            ..windows
+        })
     };
     Drive {
         block: drive.block.clone(),
@@ -95,17 +111,7 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
         removable: drive.removable,
         blocked: blocked(drive, smallest_system),
         partitions: volumes(drive).count(),
-        esp: volumes(drive)
-            .find(|volume| {
-                volume
-                    .partition_type
-                    .as_deref()
-                    .is_some_and(|kind| kind.eq_ignore_ascii_case(ESP_TYPE))
-            })
-            .map(|volume| Space {
-                offset: volume.offset,
-                size: volume.size,
-            }),
+        esp,
         free: drive
             .segments
             .iter()

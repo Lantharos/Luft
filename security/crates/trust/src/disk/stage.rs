@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use argon2::{Algorithm, Argon2, Params, Version};
@@ -6,11 +6,13 @@ use chacha20poly1305::aead::{Aead, KeyInit};
 use chacha20poly1305::{XChaCha20Poly1305, XNonce};
 
 use super::state::Plan;
+use crate::boot::esp;
 use crate::keys;
-use crate::paths::{self, STAGE};
-use crate::system::creds;
+use crate::paths;
 use crate::system::secret::Secret;
+use crate::system::{creds, efi};
 
+pub const FOLDER: &str = "EFI/luft/encryption";
 const PLAN: &str = "plan.json";
 const SEALED: &str = "recovery-key.cred";
 const BOXED: &str = "recovery-key.box";
@@ -55,31 +57,49 @@ pub fn unbox(contents: &[u8], passphrase: &Secret) -> Option<Secret> {
         .map(Secret::new)
 }
 
+pub fn folder() -> Result<PathBuf> {
+    Ok(esp::find()?.file(FOLDER))
+}
+
+fn prepare() -> Result<PathBuf> {
+    let folder = folder()?;
+    std::fs::create_dir_all(&folder)?;
+    Ok(folder)
+}
+
 pub fn write(plan: &Plan, recovery: &Secret, passphrase: Option<&Secret>) -> Result<()> {
-    paths::ensure_private(STAGE)?;
+    let folder = prepare()?;
     match passphrase {
         Some(passphrase) => {
-            paths::write_private(&paths::stage(BOXED), &boxed(recovery, passphrase)?)?
+            paths::write_private(&folder.join(BOXED), &boxed(recovery, passphrase)?)?
         }
         None => creds::seal_for_startup(
             SEALED_NAME,
             recovery,
-            &keys::pcr_public_key(),
-            &paths::stage(SEALED),
+            Path::new(keys::PCR_PUBLIC_KEY),
+            &folder.join(SEALED),
         )?,
     }
-    paths::write_private(&paths::stage(PLAN), serde_json::to_string(plan)?.as_bytes())?;
-    Ok(())
+    write_plan(plan)
 }
 
 pub fn write_plan(plan: &Plan) -> Result<()> {
-    paths::ensure_private(STAGE)?;
-    paths::write_private(&paths::stage(PLAN), serde_json::to_string(plan)?.as_bytes())?;
+    let folder = prepare()?;
+    paths::write_private(&folder.join(PLAN), serde_json::to_string(plan)?.as_bytes())?;
+    Ok(())
+}
+
+pub fn arm() -> Result<()> {
+    rustix::fs::sync();
+    efi::announce_disk_change(true)?;
     Ok(())
 }
 
 pub fn remove() {
-    let _ = std::fs::remove_dir_all(STAGE);
+    if let Ok(folder) = folder() {
+        let _ = std::fs::remove_dir_all(folder);
+    }
+    let _ = efi::announce_disk_change(false);
 }
 
 pub fn plan_in(folder: &Path) -> Option<Plan> {

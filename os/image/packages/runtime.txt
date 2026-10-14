@@ -72,6 +72,7 @@ python3-gobject
 shared-mime-info
 skopeo
 switcheroo-control
+systemd-boot-unsigned
 udisks2
 upower
 wireplumber

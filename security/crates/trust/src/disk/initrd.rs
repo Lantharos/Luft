@@ -1,20 +1,48 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 
-use super::state::{Change, Mode, Plan};
-use super::{keys, luks, stage};
-use crate::paths::{self, INITRD_STAGE};
+use super::state::{Change, MAPPING, Mode, Plan};
+use super::{keys, luks, mask, stage};
+use crate::paths;
 use crate::system::command::Tool;
 use crate::system::journal::STAGE_REFUSED;
-use crate::system::keyring;
 use crate::system::secret::Secret;
+use crate::system::{efi, keyring};
 
 const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const ATTEMPTS: usize = 5;
 pub const RESULT: &str = "/run/trustd/encryption-result";
-const BOOT: &str = "/run/trustd/boot";
+const ESP: &str = "/run/trustd/esp";
+
+struct MountedEsp;
+
+impl MountedEsp {
+    fn mount() -> Result<Self> {
+        let partuuid =
+            efi::boot_partition().context("The firmware didn't say where it started from")?;
+        let device = Path::new("/dev/disk/by-partuuid").join(partuuid);
+        wait_for(&device)?;
+        std::fs::create_dir_all(ESP)?;
+        Tool::new("mount")
+            .args(["-o", "ro"])
+            .arg(&device)
+            .arg(ESP)
+            .status()?;
+        Ok(Self)
+    }
+
+    fn stage(&self) -> PathBuf {
+        Path::new(ESP).join(stage::FOLDER)
+    }
+}
+
+impl Drop for MountedEsp {
+    fn drop(&mut self) {
+        let _ = Tool::new("umount").arg(ESP).status();
+    }
+}
 
 fn splash(mode: &str) {
     let _ = Tool::new("sushictl").args(["show", mode]).status();
@@ -58,8 +86,7 @@ fn recovery_key_from_person(device: &Path) -> Result<Secret> {
     bail!("The recovery key wasn't entered")
 }
 
-fn recovery_key(plan: &Plan, device: Option<&Path>) -> Result<Secret> {
-    let folder = Path::new(INITRD_STAGE);
+fn recovery_key(plan: &Plan, folder: &Path, device: Option<&Path>) -> Result<Secret> {
     match plan.mode {
         Mode::Tpm => match stage::open_sealed(folder) {
             Ok(key) => Ok(key),
@@ -138,7 +165,7 @@ fn attach(plan: &Plan, device: &Path, header: Option<&Path>) -> Result<()> {
     }
     Tool::new("/usr/lib/systemd/systemd-cryptsetup")
         .arg("attach")
-        .arg(plan.mapping())
+        .arg(MAPPING)
         .arg(device)
         .arg("none")
         .arg(options.join(","))
@@ -153,31 +180,29 @@ fn still_decrypting(header: &Path, device: &Path) -> bool {
         .is_ok_and(|header| header.is_some_and(|header| header.reencrypting.is_some()))
 }
 
-fn open_while_decrypting(plan: &Plan, device: &Path) -> Result<()> {
+fn open_while_decrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()> {
     if current_uuid(device).as_deref() == Some(plan.uuid.as_str()) {
         return attach(plan, device, None);
     }
-    let (Some(boot), Some(header)) = (&plan.boot_uuid, &plan.header) else {
+    let Some(name) = &plan.header else {
         return Ok(());
     };
-    let boot_device = Path::new("/dev/disk/by-uuid").join(boot);
-    wait_for(&boot_device)?;
-    std::fs::create_dir_all(BOOT)?;
-    Tool::new("mount").arg(&boot_device).arg(BOOT).status()?;
-    let inside = Path::new(BOOT).join(header.strip_prefix("/boot").unwrap_or(header));
-    let opened = if still_decrypting(&inside, device) {
-        attach(plan, device, Some(&inside))
-    } else {
-        Ok(())
-    };
-    let _ = Tool::new("umount").arg(BOOT).status();
-    opened
+    let header = folder.join(name);
+    if !still_decrypting(&header, device) {
+        return Ok(());
+    }
+    mask::mask_system_disk(&plan.partuuid, &plan.uuid)?;
+    let _ = Tool::new("udevadm")
+        .args(["trigger", "--action=change", "--settle"])
+        .arg(device)
+        .status();
+    attach(plan, device, Some(&header))
 }
 
-fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
+fn open_while_encrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()> {
     let key = match current_uuid(device) {
         None => {
-            let key = match recovery_key(plan, None) {
+            let key = match recovery_key(plan, folder, None) {
                 Ok(key) => key,
                 Err(error) => {
                     record("failed");
@@ -187,13 +212,13 @@ fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
             start_encrypting(plan, device, &key)?;
             key
         }
-        Some(uuid) if uuid == plan.uuid => recovery_key(plan, Some(device))?,
+        Some(uuid) if uuid == plan.uuid => recovery_key(plan, folder, Some(device))?,
         Some(_) => return Ok(()),
     };
     Tool::new("cryptsetup")
         .args(["open", "--key-file", "-"])
         .arg(device)
-        .arg(plan.mapping())
+        .arg(MAPPING)
         .input(&key)
         .status()
         .context("The disk couldn't be opened")?;
@@ -203,13 +228,15 @@ fn open_while_encrypting(plan: &Plan, device: &Path) -> Result<()> {
 }
 
 pub fn run() -> Result<()> {
-    let Some(plan) = stage::plan_in(Path::new(INITRD_STAGE)) else {
+    let esp = MountedEsp::mount()?;
+    let folder = esp.stage();
+    let Some(plan) = stage::plan_in(&folder) else {
         return Ok(());
     };
     let device = plan.partition();
     wait_for(&device)?;
     match plan.change {
-        Change::Encrypt => open_while_encrypting(&plan, &device),
-        Change::Decrypt => open_while_decrypting(&plan, &device),
+        Change::Encrypt => open_while_encrypting(&plan, &folder, &device),
+        Change::Decrypt => open_while_decrypting(&plan, &folder, &device),
     }
 }

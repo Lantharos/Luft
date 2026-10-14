@@ -48,27 +48,17 @@ fn create(drive: &str, part: &Part) -> Result<String> {
         part.role.partition_type(),
         part.role.name(),
     );
-    let created = match part.role.filesystem() {
-        Some((filesystem, label)) => {
-            let mut format = quiet();
-            format.insert("label", Value::from(label));
-            udisks::created(
-                drive,
-                TABLE,
-                "CreatePartitionAndFormat",
-                &(offset, size, kind, name, quiet(), filesystem, format),
-            )
-        }
-        None => udisks::created(
-            drive,
-            TABLE,
-            "CreatePartition",
-            &(offset, size, kind, name, quiet()),
-        ),
-    };
-    created
-        .map_err(failed)
-        .with_context(|| format!("Couldn't make the {} partition", part.role.name()))
+    let (filesystem, label) = part.role.filesystem();
+    let mut format = quiet();
+    format.insert("label", Value::from(label));
+    udisks::created(
+        drive,
+        TABLE,
+        "CreatePartitionAndFormat",
+        &(offset, size, kind, name, quiet(), filesystem, format),
+    )
+    .map_err(failed)
+    .with_context(|| format!("Couldn't make the {} partition", part.role.name()))
 }
 
 fn describe(role: Role, block: &str) -> Result<Created> {

@@ -16,7 +16,9 @@ os/image/build.sh               # localhost/luft:45
 os/image/build.sh luft-nvidia   # localhost/luft:45-nvidia
 ```
 
-The NVIDIA image signs its driver with the PEM key and certificate named by `LUFT_SECUREBOOT_KEY` and `LUFT_SECUREBOOT_CERT`, or with a throwaway key when they're not set. The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour; later builds reuse what they can.
+Each image is sealed: `image/seal.sh` adds a startup image (kernel, initramfs and command line in one file) that names the image's exact root file system by its composefs digest, signs it for Secure Boot and signs its TPM policy. Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys named by `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and `LUFT_PCR_KEY` (PEM), and ship the public halves. Without them they make throwaway keys in `os/image/state/keys`. CI signs with the real keys, whose public halves are in `image/keys`. How the computer starts from there is in [docs/boot.md](../docs/boot.md).
+
+The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour; later builds reuse what they can.
 
 | Path | Holds |
 | --- | --- |
@@ -24,6 +26,8 @@ The NVIDIA image signs its driver with the PEM key and certificate named by `LUF
 | `image/stages` | The scripts each stage runs |
 | `image/packages` | Fedora packages for building, those added to the image, and the GNOME parts Kestrel replaces |
 | `image/files` | Files copied into the image as they are |
+| `image/startup` | Building and signing the startup image |
+| `image/keys` | Luft's public Secure Boot certificate and TPM policy key |
 | `iso` | The USB stick |
 | `vm` | Trying the image and the stick in a virtual machine |
 
@@ -47,15 +51,16 @@ The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc
 ## Try it in a VM
 
 ```sh
-os/vm/disk.sh      # install localhost/luft:45 onto os/vm/state/disk.qcow2
-os/vm/run.sh       # start it in a window (HEADLESS=1 for none)
+os/vm/disk.sh                   # install localhost/luft-system:45 onto os/vm/state/disk.qcow2
+SECURE_BOOT=1 os/vm/run.sh      # start it with Secure Boot (HEADLESS=1 for no window)
 ```
 
-`disk.sh` needs no root: it boots a helper VM from the image, which installs it with `bootc install to-disk` like on a real drive. It adds the account `luft` with the password `luft-vm`, which is also root's. While the VM runs, `os/vm/control.py` takes screenshots, presses keys and runs commands on its serial console:
+`disk.sh` needs no root: it seals the image with a VM account and serial console, then boots a helper VM from it, which installs it with `bootc install to-disk` like on a real drive and puts shim and SushiBoot on the EFI system partition. The account is `luft` with the password `luft-vm`, which is also root's. The VM has a TPM, kept in `os/vm/state/tpm`. While it runs, `os/vm/control.py` takes screenshots, presses keys and runs commands on its serial console:
 
 ```sh
 os/vm/control.py screenshot login.png
 os/vm/control.py shell 'bootc status'
+os/vm/control.py enroll-from-disk     # add Luft's key on shim's blue screen at the first start
 ```
 
 To start the stick instead, with an empty `os/vm/state/target.qcow2` to install onto:
@@ -66,14 +71,8 @@ ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/run.sh          # as a DVD, Secur
 DISK=os/vm/state/target.qcow2 os/vm/run.sh                     # the installed drive afterwards
 ```
 
-With root, Fedora's [bootc-image-builder](https://github.com/osbuild/bootc-image-builder) makes disk images too.
-
 ## Install
 
-On a computer already running a bootc system, such as Fedora Atomic:
+Luft installs from the USB stick, which formats the system with bootc's composefs backend. Switching an existing ostree-based system, such as Fedora Atomic, with `bootc switch` isn't supported: the sealed startup images need the composefs backend.
 
-```sh
-sudo bootc switch ghcr.io/lantharos/luft:45
-```
-
-Updates arrive with `bootc upgrade`, and `bootc rollback` returns to the previous version.
+Updates arrive with `bootc upgrade` (Settings does it for you), and `bootc rollback` or the Previous versions menu at startup return to the version before.

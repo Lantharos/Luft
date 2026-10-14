@@ -75,23 +75,22 @@ Each app builds from its own folder with `bun run desktop:build`, or runs with `
 
 ## Install
 
-Luft is published as a bootc image, `ghcr.io/lantharos/luft:45` (`:45-nvidia` for NVIDIA graphics). On a bootc system such as Fedora Atomic, `sudo bootc switch ghcr.io/lantharos/luft:45` moves to it; building it and trying it in a VM are in [os/README.md](os/README.md).
+Luft is published as a sealed bootc image, `ghcr.io/lantharos/luft:45` (`:45-nvidia` for NVIDIA graphics), and installs from its USB stick; building it and trying it in a VM are in [os/README.md](os/README.md).
 
 To install the parts onto a regular Fedora system instead, in this order:
 
 ```sh
 kestrel/tools/install.sh install               # Kestrel, its Mutter, Luft Keyring, login screen service
 kestrel/passkeys/install.sh install            # Luft Passkeys
-security/scripts/install.sh install            # trustd and USB protection
 for app in apps/*; do (cd "$app" && sabine install --bundle .); done
 ```
 
 Then:
 
 1. Switch the login screen from GDM to greetd, as in [Kestrel's README](kestrel/README.md#setting-up-the-login-screen).
-2. In Settings, Security, add the Luft Secure Boot key, turn on signed startup and, if you like, device encryption. See [docs/boot.md](docs/boot.md).
-3. Install Sushi: `boot/sushi/scripts/install.sh install`, then `boot/sushi/scripts/install.sh enable`.
-4. Once everything starts through SushiBoot, remove GRUB and the GNOME services Kestrel replaces with `security/scripts/remove-grub-and-gnome.sh`.
+2. Install Sushi: `boot/sushi/scripts/install.sh install`, then `boot/sushi/scripts/install.sh enable`.
+
+The signed startup, TPM unlock and device encryption ([docs/boot.md](docs/boot.md)) come with the Luft image only.
 
 Each install script also takes `remove`.
 

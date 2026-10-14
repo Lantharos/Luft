@@ -38,22 +38,36 @@ jobs:
       - name: Sign in to the registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
 
-      - name: Signing key
+      - name: Signing keys
         env:
           KEY: ${{ secrets.LUFT_SECUREBOOT_KEY }}
           CERT: ${{ secrets.LUFT_SECUREBOOT_CERT }}
+          PCR_KEY: ${{ secrets.LUFT_PCR_KEY }}
         run: |
           keys="$RUNNER_TEMP/secure-boot"
           mkdir -m 700 "$keys"
-          if [[ -n "$KEY" && -n "$CERT" ]]; then
+          if [[ -n "$KEY" && -n "$CERT" && -n "$PCR_KEY" ]]; then
             printf '%s\n' "$KEY" > "$keys/key.pem"
             printf '%s\n' "$CERT" > "$keys/cert.pem"
+            printf '%s\n' "$PCR_KEY" > "$keys/pcr.pem"
+            cmp <(openssl x509 -in "$keys/cert.pem" -outform DER) os/image/keys/luft-secureboot.der ||
+              { echo "::error::LUFT_SECUREBOOT_CERT isn't the certificate in os/image/keys"; exit 1; }
+            cmp <(openssl pkey -in "$keys/pcr.pem" -pubout) os/image/keys/luft-pcr-policy.pub.pem ||
+              { echo "::error::LUFT_PCR_KEY doesn't match the public key in os/image/keys"; exit 1; }
           else
             openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=Luft ephemeral key" \
               -keyout "$keys/key.pem" -out "$keys/cert.pem"
-            echo "::warning::LUFT_SECUREBOOT_KEY and LUFT_SECUREBOOT_CERT are not set. NVIDIA's driver is signed with an ephemeral key that Secure Boot won't accept."
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.pem"
+            echo "::warning::LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT or LUFT_PCR_KEY isn't set. The images are signed with ephemeral keys that computers won't trust."
           fi
-          echo "KEYS=$keys" >> "$GITHUB_ENV"
+          {
+            echo "KEYS=$keys"
+            echo "LUFT_SECUREBOOT_KEY=$keys/key.pem"
+            echo "LUFT_SECUREBOOT_CERT=$keys/cert.pem"
+            echo "LUFT_PCR_KEY=$keys/pcr.pem"
+            echo "LUFT_IMAGE_STATE=$RUNNER_TEMP/image"
+            echo "TMPDIR=$RUNNER_TEMP"
+          } >> "$GITHUB_ENV"
 
       - name: Version and release notes
         run: |
@@ -78,25 +92,20 @@ jobs:
       - name: Build luft
         if: env.SKIP != '1'
         run: |
-          podman build --layers --target luft --file os/image/Containerfile \
-            --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")" \
-            --tag luft .
+          os/image/build.sh luft --cache-from "$CACHE" --cache-to "$CACHE" \
+            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
 
       - name: Build luft-nvidia
         if: env.SKIP != '1'
         run: |
-          podman build --layers --target luft-nvidia --file os/image/Containerfile \
-            --cache-from "$CACHE" --cache-to "$CACHE" \
-            --secret "id=secureboot-key,src=$KEYS/key.pem" --secret "id=secureboot-cert,src=$KEYS/cert.pem" \
-            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")" \
-            --tag luft-nvidia .
+          os/image/build.sh luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
+            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
           rm -rf "$KEYS"
 
       - name: Push
         if: env.SKIP != '1'
         run: |
           for tag in $TAGS; do
-            podman push luft "$IMAGE:$tag"
-            podman push luft-nvidia "$IMAGE:$tag-nvidia"
+            podman push "localhost/luft:$FEDORA" "$IMAGE:$tag"
+            podman push "localhost/luft:$FEDORA-nvidia" "$IMAGE:$tag-nvidia"
           done

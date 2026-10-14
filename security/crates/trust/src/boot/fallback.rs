@@ -1,0 +1,76 @@
+use std::path::PathBuf;
+
+use anyhow::{Context, Result};
+
+use super::esp::Esp;
+use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
+use super::pe::StartupImage;
+
+pub const FOLDER: &str = "EFI/luft-start";
+pub const LOADER: &str = "\\EFI\\luft-start\\shimx64.efi";
+const ENTRIES: &str = "loader/entries";
+const KERNEL: &str = "linux";
+const INITRD: &str = "initrd";
+const GRUB_CONFIG: &str = "grub.cfg";
+
+struct Entry {
+    sort_key: String,
+    image: String,
+}
+
+fn parse(text: &str, name: &str) -> Option<Entry> {
+    let value = |key: &str| {
+        text.lines().find_map(|line| {
+            let (found, value) = line.trim().split_once(char::is_whitespace)?;
+            (found == key).then(|| value.trim().to_owned())
+        })
+    };
+    Some(Entry {
+        sort_key: value("sort-key").unwrap_or_else(|| name.to_owned()),
+        image: value("uki").or_else(|| value("efi"))?,
+    })
+}
+
+fn default_image(esp: &Esp) -> Result<PathBuf> {
+    let entry = std::fs::read_dir(esp.file(ENTRIES))
+        .context("The EFI system partition has no boot entries.")?
+        .flatten()
+        .filter_map(|file| {
+            let name = file.file_name().to_string_lossy().into_owned();
+            parse(&std::fs::read_to_string(file.path()).ok()?, &name)
+        })
+        .min_by(|a, b| a.sort_key.cmp(&b.sort_key))
+        .context("No boot entry starts a startup image.")?;
+    Ok(esp.file(entry.image.trim_start_matches('/')))
+}
+
+fn grub_config(command_line: &str) -> String {
+    format!(
+        "set timeout=0\nlinux /{FOLDER}/{KERNEL} {command_line}\ninitrd /{FOLDER}/{INITRD}\nboot\n"
+    )
+}
+
+pub fn place(esp: &Esp) -> Result<bool> {
+    let mut image = StartupImage::open(&default_image(esp)?)?;
+    let command_line = String::from_utf8_lossy(&image.section(".cmdline")?)
+        .trim_matches(char::from(0))
+        .trim()
+        .to_owned();
+    let folder = esp.file(FOLDER);
+    let shim = files::shim_folder()?;
+    let mut changed = false;
+    changed |= files::copy_if_changed(&shim.join(SHIM), &folder.join(SHIM))?;
+    changed |= files::copy_if_changed(&shim.join(MOK_MANAGER), &folder.join(MOK_MANAGER))?;
+    changed |= files::copy_if_changed(&files::grub()?, &folder.join(SECOND_STAGE))?;
+    changed |= files::write_if_changed(&folder.join(KERNEL), &image.section(".linux")?)?;
+    changed |= files::write_if_changed(&folder.join(INITRD), &image.section(".initrd")?)?;
+    changed |= files::write_if_changed(
+        &folder.join(GRUB_CONFIG),
+        grub_config(&command_line).as_bytes(),
+    )?;
+    Ok(changed)
+}
+
+pub fn remove(esp: &Esp) {
+    let _ = std::fs::remove_dir_all(esp.file(FOLDER));
+}

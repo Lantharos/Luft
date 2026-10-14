@@ -30,8 +30,6 @@ pub fn signing_key(key: &SigningKey) -> Dict {
         ("State", key.enrollment.name().into()),
         ("Available", key.available.into()),
         ("Reason", key.reason.as_str().into()),
-        ("Protection", key.protection.into()),
-        ("DriverKeyEnrolled", key.driver_key_enrolled.into()),
         ("Missed", key.missed.into()),
         ("MissedThisBoot", key.missed_this_boot.into()),
     ])
@@ -43,7 +41,6 @@ pub fn startup(startup: &Startup) -> Dict {
         ("Measured", startup.measured.into()),
         ("Available", startup.available.into()),
         ("Reason", startup.reason.as_str().into()),
-        ("FailedVersion", startup.failed_version.as_str().into()),
     ])
 }
 

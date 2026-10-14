@@ -5,5 +5,6 @@ pub mod efi;
 pub mod journal;
 pub mod keyring;
 pub mod power;
+pub mod scratch;
 pub mod secret;
 pub mod tpm;

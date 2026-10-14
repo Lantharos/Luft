@@ -24,15 +24,25 @@ pub use preflight::{Check, check};
 pub use turn_off::turn_off;
 pub use turn_on::turn_on;
 
+const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
+
 pub struct SystemDisk {
     pub partition: String,
     pub mapping: Option<String>,
     pub root: Mount,
+    pub mountpoint: &'static str,
 }
 
 impl SystemDisk {
     pub fn find() -> Result<Self> {
-        let root = blocks::mount_at("/").context("The system disk couldn't be found.")?;
+        let (mountpoint, root) = PHYSICAL_ROOTS
+            .iter()
+            .find_map(|path| {
+                blocks::mount_at(path)
+                    .filter(|mount| mount.source.starts_with("/dev"))
+                    .map(|mount| (*path, mount))
+            })
+            .context("The system disk couldn't be found.")?;
         let name =
             blocks::kernel_name(&root.source).context("The system disk couldn't be found.")?;
         let crypt = blocks::dm_uuid(&name).is_some_and(|uuid| uuid.starts_with("CRYPT-LUKS2"));
@@ -47,6 +57,7 @@ impl SystemDisk {
             partition,
             mapping,
             root,
+            mountpoint,
         })
     }
 
@@ -61,7 +72,7 @@ impl SystemDisk {
     pub fn header(&self) -> Result<Option<Header>> {
         let detached = Plan::load()
             .filter(|plan| plan.change == Change::Decrypt)
-            .and_then(|plan| plan.header);
+            .and_then(|plan| plan.header_file());
         luks::read(&self.device(), detached.as_deref(), self.size())
     }
 }

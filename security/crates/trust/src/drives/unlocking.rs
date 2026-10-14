@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 
 use super::record::Record;
-use crate::disk::{self, keys, luks, stage, state};
+use crate::disk::{self, keys, luks, stage};
 use crate::errors::Unsupported;
 use crate::paths;
 use crate::system::command::Tool;
@@ -60,7 +60,7 @@ pub fn write_crypttab(record: &Record) -> Result<()> {
         }
         _ => format!("UUID={}", record.uuid),
     };
-    state::set_crypttab(
+    set_crypttab(
         &record.mapping(),
         Some(format!(
             "{} {source} {} {}",
@@ -127,7 +127,7 @@ pub fn disable(device: &Path, record: &mut Record) -> Result<()> {
 pub fn forget(record: &mut Record) -> Result<()> {
     let _ = std::fs::remove_file(keyfile(record));
     record.auto_unlock = false;
-    state::set_crypttab(&record.mapping(), None)
+    set_crypttab(&record.mapping(), None)
 }
 
 pub fn keep_passphrase(record: &Record, passphrase: &Secret, recovery: &Secret) -> Result<()> {
@@ -197,4 +197,24 @@ pub fn known_keys(record: &Record) -> impl Iterator<Item = Secret> {
         .into_iter()
         .chain(keyring::take(&hand_over_name(record)))
         .chain(key(record))
+}
+
+const CRYPTTAB: &str = "/etc/crypttab";
+
+fn set_crypttab(name: &str, entry: Option<String>) -> Result<()> {
+    let existing = std::fs::read_to_string(CRYPTTAB).unwrap_or_default();
+    let mut lines: Vec<String> = existing
+        .lines()
+        .filter(|line| line.split_whitespace().next() != Some(name))
+        .map(str::to_owned)
+        .collect();
+    lines.extend(entry);
+    let text = if lines.is_empty() {
+        String::new()
+    } else {
+        lines.join("\n") + "\n"
+    };
+    paths::write_private(Path::new(CRYPTTAB), text.as_bytes())?;
+    std::fs::set_permissions(CRYPTTAB, std::fs::Permissions::from_mode(0o600))?;
+    Ok(())
 }

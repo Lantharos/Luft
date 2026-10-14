@@ -13,10 +13,6 @@ const NVIDIA: &str = "nvidia";
 pub struct Config {
     #[serde(default)]
     images: HashMap<String, Source>,
-    #[serde(default)]
-    pub bootloader: Option<String>,
-    #[serde(default)]
-    pub kernel_arguments: Vec<String>,
     #[serde(default = "smallest_system")]
     pub smallest_system: u64,
 }

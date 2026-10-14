@@ -3,10 +3,17 @@ set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 installer="$(dirname "$here")"
+luft="$(cd "$installer/../../.." && pwd)"
 vm="${LUFT_INSTALLER_VM:-$installer/target/vm}"
+system=localhost/luft-installer-check-system
 image=localhost/luft-installer-check
-base=quay.io/fedora/fedora-bootc:45
+base="${LUFT_SYSTEM:-localhost/luft-system:45}"
 stage="$vm/stage"
+
+if [[ -z "${LUFT_SECUREBOOT_KEY:-}" ]]; then
+  keys="$luft/os/image/state/keys"
+  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
+fi
 
 place() {
   install -Dm"$1" "$2" "$stage/root$3"
@@ -23,14 +30,13 @@ place 644 "$installer/data/com.lantharos.installer.policy" /usr/share/polkit-1/a
 place 755 "$here/check.sh" /usr/libexec/luft-installer-check
 place 644 "$here/luft-installer-check.service" /usr/lib/systemd/system/luft-installer-check.service
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-installer-check.rules
-printf 'ghcr.io/lantharos/luft:45\n' | install -Dm644 /dev/stdin "$stage/root/usr/share/luft/image-reference"
-printf '[terminal]\nvt = 7\n\n[default_session]\ncommand = "kestrel-greeter"\nuser = "greetd"\n' |
-  install -Dm644 /dev/stdin "$stage/root/etc/greetd/config.toml"
+printf 'kargs = ["console=ttyS0,115200"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/90-check.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
-printf 'kernel-arguments = ["console=ttyS0,115200"]\n\n[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
+printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
-podman build --quiet --tag "$image" "$stage"
+podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage"
+"$luft/os/image/seal.sh" "$system" "$image"
 
 rm -rf "$vm/source" && mkdir -p "$vm/source"
 podman save --quiet --format oci-archive --output "$vm/source/luft.ociarchive" "$image"
@@ -39,12 +45,13 @@ mkfs.ext4 -q -F -L luft-source -d "$vm/source" "$vm/source.img" "$(($(du -sm "$v
 podman unshare sh -c "
   set -e
   tree=\$(podman image mount '$image')
-  mkfs.ext4 -q -F -L luft-check-root -d \"\$tree\" '$vm/root.img' 12G
+  mkfs.ext4 -q -F -L luft-check-root -d \"\$tree\" '$vm/root.img' 16G
   cp \"\$tree\"/usr/lib/modules/*/vmlinuz '$vm/vmlinuz'
-  cp \"\$tree\"/usr/lib/modules/*/initramfs.img '$vm/initramfs.img'
-  chmod 644 '$vm/vmlinuz' '$vm/initramfs.img'
+  cp \"\$tree\"/boot/EFI/Linux/*.efi '$vm/startup.efi'
+  chmod 644 '$vm/vmlinuz' '$vm/startup.efi'
   podman image unmount '$image' > /dev/null
 "
+objcopy -O binary --only-section=.initrd "$vm/startup.efi" "$vm/initramfs.img"
 
 rm -f "$vm/whole.img" "$vm/free.img"
 truncate -s 40G "$vm/whole.img"

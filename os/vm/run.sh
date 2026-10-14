@@ -10,7 +10,8 @@ usage() {
   cat <<'USAGE'
 Usage: os/vm/run.sh
 
-Starts the Luft VM from os/vm/state/disk.qcow2, made by os/vm/disk.sh when missing.
+Starts the Luft VM from os/vm/state/disk.qcow2, made by os/vm/disk.sh when missing,
+with a TPM whose state stays in os/vm/state/tpm.
 
   ISO=luft.iso      also attach a live USB image and start from it, with an empty
                     os/vm/state/target.qcow2 to install onto
@@ -28,15 +29,15 @@ case "${1:-}" in
 esac
 
 machine=q35,accel=kvm
-code="$ovmf/OVMF_CODE.fd"
-vars_template="$ovmf/OVMF_VARS.fd"
-vars="$vm/OVMF_VARS.fd"
+code="$ovmf/OVMF_CODE_4M.qcow2"
+vars_template="$ovmf/OVMF_VARS_4M.qcow2"
+vars="$vm/OVMF_VARS_4M.qcow2"
 secure=()
 if [[ "${SECURE_BOOT:-0}" == 1 ]]; then
   machine+=,smm=on
-  code="$ovmf/OVMF_CODE.secboot.fd"
-  vars_template="$ovmf/OVMF_VARS.secboot.fd"
-  vars="$vm/OVMF_VARS.secboot.fd"
+  code="$ovmf/OVMF_CODE_4M.secboot.qcow2"
+  vars_template="$ovmf/OVMF_VARS_4M.secboot.qcow2"
+  vars="$vm/OVMF_VARS_4M.secboot.qcow2"
   secure=(-global "driver=cfi.pflash01,property=secure,value=on")
 fi
 
@@ -62,10 +63,18 @@ network=(-nic "user,model=virtio-net-pci")
 display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
 [[ "${HEADLESS:-0}" == 1 ]] && display=(-display none)
 
+mkdir -p "$vm/tpm"
+rm -f "$vm/tpm.sock"
+swtpm socket --tpm2 --tpmstate "dir=$vm/tpm" --ctrl "type=unixio,path=$vm/tpm.sock" --terminate &
+swtpm=$!
+trap 'kill "$swtpm" 2>/dev/null || true' EXIT
+until [[ -S "$vm/tpm.sock" ]]; do sleep 0.1; done
+
 qemu-system-x86_64 -machine "$machine" -cpu host -smp 4 -m "${MEMORY:-8192}" "${secure[@]}" \
-  -drive "if=pflash,format=raw,readonly=on,file=$code" \
-  -drive "if=pflash,format=raw,file=$vars" \
+  -drive "if=pflash,format=qcow2,readonly=on,file=$code" \
+  -drive "if=pflash,format=qcow2,file=$vars" \
   -drive "file=$disk,format=qcow2,if=virtio" \
+  -chardev "socket,id=tpm,path=$vm/tpm.sock" -tpmdev emulator,id=tpm,chardev=tpm -device tpm-tis,tpmdev=tpm \
   "${media[@]}" \
   -device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}" \
   -device virtio-keyboard-pci -device virtio-tablet-pci \

@@ -45,6 +45,14 @@ fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
     Ok(drive)
 }
 
+fn needs_own_esp(drive: &Drive) -> Result<bool> {
+    match drive.esp {
+        None => Ok(true),
+        Some(esp) if layout::shares_esp(Some(esp.size)) => Ok(false),
+        Some(_) => bail!("The drive's EFI system partition is too small for Luft's startup files."),
+    }
+}
+
 pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
     match target {
         Target::Whole { drive: block } => {
@@ -59,7 +67,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
         }
         Target::Alongside { drive: block, size } => {
             let drive = drive(survey, block)?;
-            let own_esp = !layout::shares_esp(drive.esp.map(|esp| esp.size));
+            let own_esp = needs_own_esp(drive)?;
             let Some(windows) = drive
                 .windows
                 .as_ref()
@@ -88,7 +96,7 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
             offset,
         } => {
             let drive = drive(survey, block)?;
-            let own_esp = !layout::shares_esp(drive.esp.map(|esp| esp.size));
+            let own_esp = needs_own_esp(drive)?;
             let Some(space) = drive.free.iter().find(|space| space.offset == *offset) else {
                 bail!("That free space isn't there anymore.");
             };

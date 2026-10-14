@@ -28,6 +28,7 @@ Copying starts as soon as you confirm where Luft goes. Nothing changes on any dr
 | Windows is asleep or shut down with Fast Startup | Start Windows, hold Shift while choosing Shut down, then start from the stick again |
 | Windows' drive needs a check | Restart Windows once |
 | Windows needs almost all of its drive | Free up space in Windows |
+| The EFI system partition is smaller than 1 GB | Install Luft on another drive, or use a whole drive |
 
 Luft also suggests turning off Fast Startup in Windows: Power Options, Choose what the power buttons do. Otherwise Windows can keep its drive locked while you use Luft.
 
@@ -35,10 +36,10 @@ Luft also suggests turning off Fast Startup in Windows: Power Options, Choose wh
 
 | Partition | Size | Holds |
 | --- | --- | --- |
-| BIOS boot | 1 MB | Room the boot loader needs on computers that start the old way |
-| EFI system partition | 1 GB | The boot loader and signed startup images. Next to Windows, Windows' own is shared when it has 512 MB or more |
-| Boot | 2 GB, ext4 | Kernels for each version of Luft |
+| EFI system partition | 1 GB | Shim, SushiBoot and a signed startup image for each version of Luft. A drive that already has one, such as Windows', shares it when it has 1 GB or more |
 | Luft | The rest, btrfs | The system and your files |
+
+Luft starts with UEFI only.
 
 The system is a bootc image from `ghcr.io/lantharos/luft`, or the `-nvidia` variant when the computer has an NVIDIA graphics card. It updates from there.
 
@@ -46,7 +47,9 @@ The system is a bootc image from `ghcr.io/lantharos/luft`, or the `-nvidia` vari
 
 Luft starts at the login screen with your new account. Sign in with the password you chose, and Install Luft opens over the blurred wallpaper for the last steps before the desktop appears.
 
-1. **Secure Boot**, when it's on. Your computer only starts what it trusts, so it asks once whether to trust Luft, on a blue screen right after a restart. Install Luft shows that screen ahead of time and gives you an eight-digit code. After restarting: press a key within ten seconds, choose *Enroll MOK*, *Continue*, *Yes*, type the code and choose *Reboot*. The blue screen only takes the arrow keys and Enter. Details are in [Boot and recovery](boot.md#adding-the-luft-secure-boot-key).
+Before the first start, when Secure Boot is on, your computer asks once whether to trust Luft, on a blue screen right after the restart. Install Luft shows that screen ahead of time with an eight-digit code: press a key within ten seconds, choose *Enroll MOK*, *Continue*, *Yes*, type the code and choose *Reboot*. The blue screen only takes the arrow keys and Enter. If it's skipped, Luft still starts and asks again at the next restart. Details are in [Boot and recovery](boot.md#adding-lufts-secure-boot-key).
+
+1. **Secure Boot**, when the key wasn't added at the restart. Install Luft offers to ask again.
 2. **Encryption**, optional. Luft encrypts the disk in the background after the next restart. With a TPM it unlocks by itself; without one it asks for a passphrase. Keep the recovery key it shows somewhere else.
 3. **Fingerprint**, optional, when the computer has a reader. Add a finger to sign in and unlock with it.
 4. **Done.** The desktop opens, or the computer restarts when one of the steps needs it.
@@ -64,8 +67,6 @@ The stick runs on the open-source drivers, including nouveau on NVIDIA graphics 
 `/usr/lib/luft-installer/install.toml` says what to install:
 
 ```toml
-# bootloader = "none"                 # passed to bootc install --bootloader
-# kernel-arguments = ["quiet"]
 # smallest-system = 34359738368       # bytes; drives or spaces below it aren't offered
 
 [images.default]
@@ -77,6 +78,8 @@ The image ships only the settings above the `[images]` tables. The stick's build
 
 - The stick ([os/iso](../os/iso)) keeps both images in a read-only image store on the stick, which the session there adds to Podman's storage, so `containers-storage:` sources install without a network.
 - Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included. Install Luft is listed in Start only there.
+- Kernel arguments come from the image (`/usr/lib/bootc/kargs.d`), sealed into its startup image.
+- After copying, the installer puts shim and SushiBoot on the EFI system partition with `trustctl startup install`, and, when Secure Boot is on, queues Luft's key for shim and publishes the code as `SecureBootCode`.
 - After copying, the installer writes the locale, keyboard, time zone, host name and the account into the new system, plus `/var/lib/luft-installer/first-boot` with the account's name. `FinishFirstBoot` removes that file, and only that account may call it.
 
 `kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session. `kestrel-session` does the same on its own when `/var/lib/luft-installer/first-boot` names the person signing in. Setup mode shows the firmware logo while Sushi hands over, fades in the blurred wallpaper with the window, and ends on that same wallpaper, so the desktop takes over without a flash. It also serves the portal's appearance settings and Luft's palette, so apps in setup look like they do on the desktop.

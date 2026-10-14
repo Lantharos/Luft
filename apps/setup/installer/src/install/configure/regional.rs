@@ -97,7 +97,7 @@ impl Regional {
         )?;
         let mut touched: Vec<PathBuf> = files.into_iter().map(|(path, _)| path).collect();
         touched.push(localtime);
-        deployment.relabel_etc(&touched)
+        deployment.relabel(&touched)
     }
 }
 

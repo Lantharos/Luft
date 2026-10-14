@@ -1,5 +1,5 @@
 [Unit]
-Description=Device trust: Secure Boot signing, TPM disk unlock and device encryption
+Description=Device trust: Secure Boot key, signed startup, TPM disk unlock and device encryption
 After=local-fs.target
 
 [Service]

@@ -33,7 +33,7 @@ wait_for_install() {
 
 deployment() {
   local root=$1
-  compgen -G "$root/ostree/deploy/default/deploy/*.0" | head -n1
+  compgen -G "$root/state/deploy/*/etc" | head -n1 | xargs dirname
 }
 
 check_whole_drive() {
@@ -49,14 +49,14 @@ check_whole_drive() {
   call CreateAccount sss ada "Ada Lovelace" "correct horse" > /dev/null || fail "the account wasn't taken"
   wait_for_install
 
-  mkdir -p "$TARGET" && mount /dev/vdb4 "$TARGET" || fail "the new system's partition doesn't mount"
+  mkdir -p "$TARGET" && mount /dev/vdb2 "$TARGET" || fail "the new system's partition doesn't mount"
   local root state
   root="$(deployment "$TARGET")"
-  state="$TARGET/ostree/deploy/default/var"
+  state="$TARGET/state/os/default/var"
   [[ -d "$root" ]] || fail "bootc made no deployment"
-  [[ "$(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)" == "21686148-6449-6e6f-744e-656564454649 c12a7328-f81f-11d2-ba4b-00a0c93ec93b vfat 0fc63daf-8483-4772-8e79-3d69d8477de4 ext4 4f68bce3-e8cd-4db1-96e7-fbcaf984b709 btrfs" ]] ||
-    fail "the partitions aren't EFI, boot and root: $(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)"
-  pass "the drive has BIOS boot and EFI system partitions, a boot partition and Luft's btrfs"
+  [[ "$(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b vfat 4f68bce3-e8cd-4db1-96e7-fbcaf984b709 btrfs" ]] ||
+    fail "the partitions aren't EFI and root: $(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)"
+  pass "the drive has an EFI system partition and Luft's btrfs"
   grep -q '^ada:.*:Ada Lovelace:/var/home/ada:' "$root/etc/passwd" && grep -q '^wheel:.*ada' "$root/etc/group" &&
     grep -q '^ada:\$' "$root/etc/shadow" || fail "the account isn't in the new system"
   [[ "$(stat -c '%u %a' "$state/home/ada" 2>&1)" == "1000 700" ]] ||
@@ -69,8 +69,14 @@ check_whole_drive() {
   ! grep -q initial_session "$root/etc/greetd/config.toml" || fail "the first start signs someone in by itself"
   [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
   pass "the first start shows the login screen, and setup continues once ada signs in"
-  grep -rqs 'ghcr.io/lantharos/luft:45' "$TARGET/ostree/deploy/default/deploy/"*.origin || fail "updates won't come from Luft's image"
+  grep -rqs 'ghcr.io/lantharos/luft:45' "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from Luft's image"
   pass "updates come from ghcr.io/lantharos/luft:45"
+  umount "$TARGET"
+  mount -o ro /dev/vdb1 "$TARGET" || fail "the EFI system partition doesn't mount"
+  [[ -f "$TARGET/EFI/luft/grubx64.efi" && -f "$TARGET/EFI/BOOT/BOOTX64.EFI" && ! -e "$TARGET/EFI/systemd" ]] &&
+    compgen -G "$TARGET/EFI/Linux/bootc/*.efi" > /dev/null && grep -qs '^uki ' "$TARGET"/loader/entries/*.conf ||
+    fail "shim, SushiBoot and the startup image aren't on the EFI system partition"
+  pass "the computer starts through shim, SushiBoot and the signed startup image"
   umount "$TARGET"
 }
 
@@ -89,7 +95,7 @@ check_free_space() {
   mkdir -p "$TARGET" && mount -o ro /dev/vdc1 "$TARGET" && [[ "$(cat "$TARGET/kept")" == "still here" ]] ||
     fail "the partition that was already there changed"
   umount "$TARGET"
-  [[ "$(lsblk -no FSTYPE /dev/vdc | xargs)" == "ext4 vfat ext4 btrfs" ]] || fail "Luft's partitions aren't in the free space"
+  [[ "$(lsblk -no FSTYPE /dev/vdc | xargs)" == "ext4 vfat btrfs" ]] || fail "Luft's partitions aren't in the free space"
   pass "Luft goes into free space and leaves the partition before it alone"
 }
 

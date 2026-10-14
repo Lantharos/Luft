@@ -1,9 +1,11 @@
+use std::path::Path;
+
 use anyhow::{Context, Result, bail};
 
 use super::state::{Change, Mode, Plan};
 use super::{SystemDisk, keys, preflight, stage};
-use crate::boot::startup::rebuild_boot_files;
 use crate::errors::Unsupported;
+use crate::paths;
 use crate::system::blocks;
 use crate::system::command::Tool;
 use crate::system::secret::Secret;
@@ -35,12 +37,39 @@ fn make_room(disk: &SystemDisk) -> Result<()> {
         .find_map(|entry| entry.file_name().to_str()?.parse::<u32>().ok())
         .context("The file system's device couldn't be found.")?;
     let target = (disk.size() - HEADER_ROOM) / 4096 * 4096;
-    Tool::new("btrfs")
+    let writable = Path::new(paths::RUNTIME).join("resize");
+    std::fs::create_dir_all(&writable)?;
+    Tool::new("mount")
+        .args(["-o", "subvolid=5"])
+        .arg(disk.device())
+        .arg(&writable)
+        .status()?;
+    let resized = Tool::new("btrfs")
         .args(["filesystem", "resize"])
         .arg(format!("{device_id}:{target}"))
-        .arg("/")
+        .arg(&writable)
         .status()
-        .context("The file system couldn't make room for encryption.")
+        .context("The file system couldn't make room for encryption.");
+    let _ = Tool::new("umount").arg(&writable).status();
+    resized
+}
+
+fn keep_for_later(
+    mode: Mode,
+    recovery_key: &Secret,
+    pin: &Secret,
+    passphrase: &Secret,
+) -> Result<()> {
+    match mode {
+        Mode::Tpm => {
+            keys::escrow(recovery_key)?;
+            if !pin.is_empty() {
+                keys::keep_pin_for_later(pin)?;
+            }
+            Ok(())
+        }
+        Mode::Passphrase => keys::keep_passphrase_for_later(passphrase, recovery_key),
+    }
 }
 
 pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Result<()> {
@@ -83,32 +112,22 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
             .context("The system partition has no PARTUUID.")?,
         mode,
         header: None,
-        boot_uuid: None,
     };
-    stage::write(
+    let prepared = stage::write(
         &plan,
         &recovery_key,
         (mode == Mode::Passphrase).then_some(passphrase),
-    )?;
-    match mode {
-        Mode::Tpm => {
-            keys::escrow(&recovery_key)?;
-            if !pin.is_empty() {
-                keys::keep_pin_for_later(pin)?;
-            }
-        }
-        Mode::Passphrase => keys::keep_passphrase_for_later(passphrase, &recovery_key)?,
-    }
-    let prepared = make_room(&disk)
-        .and_then(|()| plan.save())
-        .and_then(|()| rebuild_boot_files());
+    )
+    .and_then(|()| keep_for_later(mode, &recovery_key, pin, passphrase))
+    .and_then(|()| make_room(&disk))
+    .and_then(|()| plan.save())
+    .and_then(|()| stage::arm());
     if prepared.is_err() {
         stage::remove();
         keys::forget_escrow();
         keys::forget_kept_pin();
         keys::forget_kept_passphrase();
         Plan::finish();
-        let _ = rebuild_boot_files();
     }
     prepared
 }

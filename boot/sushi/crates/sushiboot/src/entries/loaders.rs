@@ -7,7 +7,7 @@ use super::{Action, BootEntry, Origin};
 use crate::files::Volume;
 
 const WINDOWS: &str = "\\EFI\\Microsoft\\Boot\\bootmgfw.efi";
-const NOT_SYSTEMS: [&str; 3] = ["boot", "linux", "microsoft"];
+const NOT_SYSTEMS: [&str; 4] = ["boot", "linux", "luft-start", "microsoft"];
 const SHIM: &str = "shimx64.efi";
 const SHIM_SECOND_STAGE: &str = "grubx64.efi";
 const LOADERS: [&str; 2] = [SHIM_SECOND_STAGE, "systemd-bootx64.efi"];

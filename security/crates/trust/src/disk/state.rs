@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::paths;
 
 const FILE: &str = "encryption.json";
+pub const MAPPING: &str = "root";
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -27,8 +28,7 @@ pub struct Plan {
     pub uuid: String,
     pub partuuid: String,
     pub mode: Mode,
-    pub header: Option<PathBuf>,
-    pub boot_uuid: Option<String>,
+    pub header: Option<String>,
 }
 
 impl Plan {
@@ -47,34 +47,12 @@ impl Plan {
         let _ = std::fs::remove_file(paths::state(FILE));
     }
 
-    pub fn mapping(&self) -> String {
-        format!("luks-{}", self.uuid)
+    pub fn header_file(&self) -> Option<PathBuf> {
+        let name = self.header.as_ref()?;
+        super::stage::folder().ok().map(|folder| folder.join(name))
     }
 
     pub fn partition(&self) -> PathBuf {
         PathBuf::from(format!("/dev/disk/by-partuuid/{}", self.partuuid))
     }
-}
-
-const CRYPTTAB: &str = "/etc/crypttab";
-
-pub fn set_crypttab(name: &str, entry: Option<String>) -> Result<()> {
-    let existing = std::fs::read_to_string(CRYPTTAB).unwrap_or_default();
-    let mut lines: Vec<String> = existing
-        .lines()
-        .filter(|line| line.split_whitespace().next() != Some(name))
-        .map(str::to_owned)
-        .collect();
-    lines.extend(entry);
-    let text = if lines.is_empty() {
-        String::new()
-    } else {
-        lines.join("\n") + "\n"
-    };
-    paths::write_private(std::path::Path::new(CRYPTTAB), text.as_bytes())?;
-    std::fs::set_permissions(
-        CRYPTTAB,
-        std::os::unix::fs::PermissionsExt::from_mode(0o600),
-    )?;
-    Ok(())
 }

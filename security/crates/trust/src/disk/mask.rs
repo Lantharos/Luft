@@ -5,6 +5,7 @@ use anyhow::Result;
 use crate::paths;
 
 const DECRYPTING: &str = "/etc/trustd/decrypting";
+const DECRYPTING_SYSTEM: &str = "/run/trustd/decrypting";
 const DECRYPTED: &str = "/run/trustd/decrypted";
 
 fn write(folder: &str, partuuid: &str, uuid: &str) -> Result<()> {
@@ -22,9 +23,14 @@ pub fn mask(partuuid: &str, uuid: &str) -> Result<()> {
     write(DECRYPTING, partuuid, uuid)
 }
 
+pub fn mask_system_disk(partuuid: &str, uuid: &str) -> Result<()> {
+    write(DECRYPTING_SYSTEM, partuuid, uuid)
+}
+
 pub fn mask_until_restart(partuuid: &str, uuid: &str) -> Result<()> {
     write(DECRYPTED, partuuid, uuid)?;
     remove(DECRYPTING, partuuid);
+    remove(DECRYPTING_SYSTEM, partuuid);
     Ok(())
 }
 

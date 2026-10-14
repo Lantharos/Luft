@@ -1,4 +1,4 @@
-use crate::boot::{startup, tries};
+use crate::boot::startup;
 use crate::disk::{self, DiskStatus};
 use crate::keys::request::Request;
 use crate::keys::{self, mok};
@@ -9,8 +9,6 @@ pub struct SigningKey {
     pub enrollment: mok::Enrollment,
     pub available: bool,
     pub reason: String,
-    pub protection: &'static str,
-    pub driver_key_enrolled: bool,
     pub missed: u32,
     pub missed_this_boot: bool,
 }
@@ -20,7 +18,6 @@ pub struct Startup {
     pub measured: bool,
     pub available: bool,
     pub reason: String,
-    pub failed_version: String,
 }
 
 pub struct Status {
@@ -31,19 +28,23 @@ pub struct Status {
     pub disk: Option<DiskStatus>,
 }
 
-pub fn signing_key(disk_encrypted: bool) -> SigningKey {
-    let possible = if efi::secure_boot() == SecureBoot::Unsupported {
-        Err("This computer doesn't start with UEFI.")
+fn signing_key_unavailable() -> Option<&'static str> {
+    if efi::secure_boot() == SecureBoot::Unsupported {
+        Some("This computer doesn't start with UEFI.")
+    } else if !keys::shipped() {
+        Some("This system doesn't carry Luft's Secure Boot key.")
     } else {
-        keys::protection(disk_encrypted).map(|_| ())
-    };
+        None
+    }
+}
+
+pub fn signing_key() -> SigningKey {
+    let reason = signing_key_unavailable();
     let request = Request::load().unwrap_or_default();
     SigningKey {
         enrollment: mok::enrollment(),
-        available: possible.is_ok() || keys::has_signing_key(),
-        reason: possible.err().unwrap_or_default().to_owned(),
-        protection: keys::stored_protection().map_or("", |protection| protection.name()),
-        driver_key_enrolled: mok::driver_key_enrolled(),
+        available: reason.is_none(),
+        reason: reason.unwrap_or_default().to_owned(),
         missed: request.missed,
         missed_this_boot: request.missed_this_boot(),
     }
@@ -53,20 +54,18 @@ pub fn startup() -> Startup {
     let reason = startup::unavailable_reason();
     Startup {
         installed: startup::installed(),
-        measured: efi::measured_uki(),
+        measured: efi::measured_uki() && startup::started_through_menu(),
         available: reason.is_none(),
         reason: reason.unwrap_or_default().to_owned(),
-        failed_version: tries::failed_version(),
     }
 }
 
 pub fn gather() -> Status {
-    let disk = disk::status();
     Status {
         secure_boot: efi::secure_boot(),
         tpm: tpm::detect(),
-        signing_key: signing_key(disk.as_ref().is_some_and(|disk| disk.encrypted)),
+        signing_key: signing_key(),
         startup: startup(),
-        disk,
+        disk: disk::status(),
     }
 }

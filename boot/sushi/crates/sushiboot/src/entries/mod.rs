@@ -90,7 +90,9 @@ impl Catalog {
                 label: several.then(|| found.label.clone()),
             };
             found_images.extend(images::scan(&mut volume, &origin));
-            others.extend(bls::scan(&mut volume, &origin, secure_boot));
+            let listed = bls::scan(&mut volume, &origin, secure_boot);
+            found_images.extend(listed.images);
+            others.extend(listed.others);
             others.extend(loaders::scan(&mut volume, &origin));
         }
         images::add(&mut catalog, found_images);

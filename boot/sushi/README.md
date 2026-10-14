@@ -29,19 +29,16 @@ SushiBoot, in the same folder, is the UEFI boot menu Luft starts through.
 
 ## Install
 
-Sushi installs next to Plymouth, and the kernel command line picks which one runs. Keep the `plymouth` package installed: updaters use its tool to report progress.
+The [Luft image](../../os/README.md) carries Sushi, with its kernel arguments in `/usr/lib/bootc/kargs.d/10-sushi.toml`, and seals them into its startup image. On a regular Fedora install, Sushi installs next to Plymouth:
 
 ```sh
-boot/sushi/scripts/install.sh install   # build, install, rebuild the initramfs and signed images
-boot/sushi/scripts/install.sh try       # use Sushi for the next boot only
+boot/sushi/scripts/install.sh install   # build, install and rebuild the initramfs
 boot/sushi/scripts/install.sh enable    # use Sushi on every boot
 boot/sushi/scripts/install.sh disable   # go back to Plymouth
 boot/sushi/scripts/install.sh remove    # uninstall
 ```
 
-The script needs `sudo` and Luft's signed startup: the command line lives inside the signed kernel images and is changed through `trustctl startup arguments` (see [security](../../security/README.md)).
-
-`try` and `enable` add these kernel arguments:
+Keep the `plymouth` package installed: updaters use its tool to report progress. `enable` adds these kernel arguments:
 
 | Argument | Why |
 | --- | --- |
@@ -104,13 +101,14 @@ sudo plymouth display-message --text="Upgrading firefox"
 SushiBoot reads unified kernel images and [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries from every EFI system partition, finds Windows and other systems, and draws its menu under the firmware logo. Holding any key while it starts shows the menu.
 
 - Menu: the newest image of each system, its titled profiles (such as Rescue), Previous versions, BLS entries, other systems, and Firmware settings.
+- Startup images listed by BLS entries (`uki` or `efi`), such as the ones bootc writes for each version of Luft, count as images: the entry with the lowest `sort-key` is the newest, and the others go under Previous versions, titled with the image's `IMAGE_VERSION`.
 - `loader/loader.conf` takes `timeout` and `default`. `default` accepts patterns such as `luft-*`.
 - Entry IDs match systemd-boot's, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`, and the Boot Loader Interface variables are supported, so `bootctl status`, `bootctl list` and `bootctl set-oneshot ID` work.
 - Boot counting uses systemd-boot's file names (`luft-VERSION+3.efi`). An image with no tries left moves to Previous versions.
 - It switches to the monitor's own resolution before Linux starts.
 - With Secure Boot on, it must be signed (it carries an SBAT section), passes nothing to what it starts but a profile number, has no command line editor, and skips entries that start a kernel directly.
 
-How SushiBoot, the signed images and the TPM fit together, and what to do when a kernel doesn't start, is in [docs/boot.md](../../docs/boot.md).
+How shim, SushiBoot, the signed startup images and the TPM fit together is in [docs/boot.md](../../docs/boot.md). The image signs SushiBoot with Luft's key; trustd puts it on the EFI system partition as shim's second stage.
 
 ## Development
 

@@ -8,17 +8,15 @@
 
     Tpm: Present (b), Version (s, "2.0" or "1.2"), Usable (b), Reason (s, why it can't be used, empty when usable).
 
-    SigningKey: State (s: "none", "pending" until the next restart adds it, "enrolled"),
-      Available (b), Reason (s, why a key can't be made here), Protection (s: "tpm" or "disk"),
-      DriverKeyEnrolled (b, the key that signs drivers built on this computer),
+    SigningKey: Luft's Secure Boot key, which signs the boot menu, the startup images and drivers.
+      State (s: "none", "pending" until the next restart adds it, "enrolled"),
+      Available (b), Reason (s, why it can't be added here),
       Missed (u, restarts that went by without the key being added since it was requested; after three,
       it is no longer requested again by itself and State goes back to "none"),
       MissedThisBoot (b, the restart that started this boot was one of them).
 
-    Startup: Installed (b, the signed startup is on the EFI system partition and in the firmware's boot list),
-      Measured (b, this boot came through it and recorded what started), Available (b), Reason (s),
-      FailedVersion (s, the kernel version whose image didn't start this boot's last tries, so the version
-      before it started instead; "" when nothing failed).
+    Startup: Installed (b, shim and Luft's boot menu are on the EFI system partition),
+      Measured (b, this boot came through them and recorded what started), Available (b), Reason (s).
 
     Disk: Device (s), Encrypted (b), State (s: "off", "starting" until the restart, "encrypting",
       "decrypting", "on"), Progress (d, 0 to 1 while encrypting or decrypting), Remaining (t, seconds, 0 when unknown),
@@ -74,9 +72,6 @@
     </method>
     <method name="CancelSigningKeyEnrollment"/>
     <method name="InstallSignedStartup"/>
-    <!-- Called by the login screen or the session once it is up. Open to everyone: it only records that the
-         image this boot started from works, so its tries stop counting down. -->
-    <method name="StartupFinished"/>
   </interface>
 
   <!--

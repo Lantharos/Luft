@@ -4,13 +4,14 @@ export type Phase = 'live' | 'first-boot' | 'installed';
 export type Stage = 'idle' | 'preparing' | 'copying' | 'waiting' | 'configuring' | 'finished' | 'failed';
 export type DriveKind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type DriveBlock = 'running' | 'read-only' | 'too-small';
-export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full';
+export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full' | 'small-esp';
 
 export interface InstallerState {
 	phase: Phase;
 	stage: Stage;
 	progress: number;
 	error: string;
+	secureBootCode: string;
 }
 
 export interface Space {

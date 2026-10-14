@@ -1,10 +1,6 @@
-pub mod cmdline;
-mod entries;
+mod entry;
 pub mod esp;
-mod images;
-pub mod kernels;
-mod modules;
-pub mod sign;
+mod fallback;
+mod files;
+mod pe;
 pub mod startup;
-pub mod tries;
-mod uki;

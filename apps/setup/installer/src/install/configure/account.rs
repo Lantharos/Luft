@@ -71,10 +71,9 @@ impl Account {
             .arg(&folder)
             .run()?;
         Tool::new("chmod").arg("0700").arg(&folder).run()?;
-        deployment.relabel_etc(
-            &["passwd", "shadow", "group", "gshadow"].map(|name| deployment.etc(name)),
-        )?;
-        deployment.relabel_var(&[PathBuf::from(&folder)])
+        deployment
+            .relabel(&["passwd", "shadow", "group", "gshadow"].map(|name| deployment.etc(name)))?;
+        deployment.relabel(&[PathBuf::from(&folder)])
     }
 }
 

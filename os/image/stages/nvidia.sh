@@ -19,7 +19,6 @@ install_kernel_devel() {
 use_signing_key() {
   install -Dm640 -g akmods "$key" "$akmods_keys/private/private_key.priv"
   openssl x509 -in "$certificate" -outform DER | install -Dm644 /dev/stdin "$akmods_keys/certs/public_key.der"
-  openssl x509 -in "$certificate" -outform DER | install -Dm644 /dev/stdin /usr/share/luft/secure-boot/luft.der
 }
 
 forget_signing_key() {
@@ -53,6 +52,5 @@ printf 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "n
   install -Dm644 /dev/stdin /usr/lib/bootc/kargs.d/20-nvidia.toml
 sed -i 's/^IMAGE_ID=.*/IMAGE_ID=luft-nvidia/' /usr/lib/os-release
 sed -i 's/$/-nvidia/' /usr/share/luft/image-reference
-dracut --force --kver "$kernel" "/usr/lib/modules/$kernel/initramfs.img"
 userdel akmods
 rm -rf /run/dnf /var/log/akmods /var/cache/akmods /var/log/dnf5.log* /var/lib/dnf /var/cache/ldconfig

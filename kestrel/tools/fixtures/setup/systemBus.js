@@ -25,8 +25,8 @@ function publish(xml, implementation, path) {
 publishBasics(publish, calls);
 publish(CALLS, {Take: () => calls.splice(0)}, '/com/lantharos/KestrelChecks');
 publishSecurity(publish, calls, publishUdisks(calls), {
-  SigningKey: variants({State: 's', Available: 'b', Reason: 's', Protection: 's', DriverKeyEnrolled: 'b', Missed: 'u', MissedThisBoot: 'b'},
-    {State: 'none', Available: true, Reason: '', Protection: 'tpm', DriverKeyEnrolled: false, Missed: 0, MissedThisBoot: false}),
+  SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b'},
+    {State: 'none', Available: true, Reason: '', Missed: 0, MissedThisBoot: false}),
   Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b'},
     {Device: '/dev/nvme0n1p3', Encrypted: false, State: 'off', Progress: 0, Remaining: 0, Unlock: [], RecoveryKeyStored: false, TpmRefused: false}),
   EnrollSigningKey: () => {

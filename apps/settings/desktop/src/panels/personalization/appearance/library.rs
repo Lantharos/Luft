@@ -58,13 +58,17 @@ fn folder() -> Result<PathBuf, String> {
         .ok_or_else(|| "There is no Pictures folder".into())
 }
 
+fn system_folders() -> impl Iterator<Item = PathBuf> {
+    glib::system_data_dirs()
+        .into_iter()
+        .map(|data| data.join("backgrounds/luft"))
+}
+
 pub fn list() -> Result<Vec<Wallpaper>, String> {
-    let Ok(entries) = fs::read_dir(folder()?) else {
-        return Ok(Vec::new());
-    };
-    let mut wallpapers: Vec<Wallpaper> = entries
-        .flatten()
-        .map(|entry| entry.path())
+    let mut wallpapers: Vec<Wallpaper> = system_folders()
+        .chain([folder()?])
+        .filter_map(|folder| fs::read_dir(folder).ok())
+        .flat_map(|entries| entries.flatten().map(|entry| entry.path()))
         .filter(|path| is_wallpaper(path))
         .map(|path| Wallpaper {
             name: display_name(&path),

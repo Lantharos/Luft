@@ -28,7 +28,6 @@ geoclue2-libs
 gjs
 glib-networking
 glycin-loaders
-gnome-backgrounds
 google-noto-color-emoji-fonts
 google-noto-sans-cjk-fonts
 google-noto-sans-fonts

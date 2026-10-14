@@ -108,4 +108,4 @@ Session options, the boot VM and the other checks are in [docs/testing.md](docs/
 
 ## License
 
-Kestrel's engine is GPL-2.0-or-later, inherited from GNOME Shell (`kestrel/engine/COPYING`), and so are the Mutter patches. The rest is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.
+Kestrel's engine is GPL-2.0-or-later, inherited from GNOME Shell (`kestrel/engine/COPYING`), and so are the Mutter patches. The rest is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`. The default wallpaper, Fog, is a photo by [Fabien TWB](https://unsplash.com/@fabienfeub) under the [Unsplash License](https://unsplash.com/license).

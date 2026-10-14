@@ -146,6 +146,7 @@ Types: `Appearance`, `AppIconPaint`, `AppIcons`, `AppIconStyle`, `Palette`, `Sch
 | `text-field` | Text input |
 | `window-control` | Title bar button |
 | `row-group` | Grouped rows background |
+| `glass-surface` | Gives the controls inside see-through fills, for windows whose content sits straight on the glass |
 | `drag-region` | Drags the window |
 | `soft-scroll`, `hidden-scroll` | Thin or hidden scrollbars |
 | `scroll-fade` | Fades a scroller's edges while there is more to scroll |
@@ -183,6 +184,8 @@ Colors, radii and easing are CSS variables in `src/styles/tokens.css`, with synt
 | `--accent-soft`, `--accent-line` | Faint accent fill and outline |
 | `--text`, `--text-soft`, `--text-muted` | `onSurface`, `onSurfaceVariant` and `outline` |
 | `--group` | Background behind grouped rows |
+| `--control`, `--control-hover` | Fill of buttons, text fields, checkboxes and switches |
+| `--control-edge`, `--control-focus`, `--control-outline` | Text field outline and focus ring, and the outline of an unchecked checkbox |
 | `--danger` | `error` |
 | `--secondary`, `--tertiary` | Secondary colors such as file kinds |
 | `--ink` | `onSurface`, for hover fills, hairlines and scrollbars |

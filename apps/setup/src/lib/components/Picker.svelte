@@ -103,12 +103,13 @@
 		gap: 14px;
 		border-radius: 16px;
 		padding: 10px 14px;
-		background: var(--surface);
+		background: var(--control);
 		transition: background-color 160ms var(--ease);
 	}
 
-	.picker:hover {
-		background: var(--surface-hover);
+	.picker:hover,
+	.picker[aria-expanded='true'] {
+		background: var(--control-hover);
 	}
 
 	.option {

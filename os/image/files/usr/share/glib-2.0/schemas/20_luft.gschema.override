@@ -4,3 +4,8 @@ picture-uri-dark='file:///usr/share/backgrounds/luft/Fog.jpg'
 
 [org.gnome.desktop.screensaver]
 picture-uri='file:///usr/share/backgrounds/luft/Fog.jpg'
+
+[org.gnome.desktop.interface]
+font-name='Open Runde 11'
+document-font-name='Open Runde 12'
+monospace-font-name='Maple Mono NF 11'

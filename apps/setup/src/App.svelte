@@ -38,7 +38,7 @@
 	let Step = $derived(flow.step ? STEPS[flow.step] : null);
 </script>
 
-<GlassShell class="setup-window">
+<GlassShell class="setup-window glass-surface">
 	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 		<div class="drag-region absolute inset-x-0 top-0 z-10 h-10"></div>
 		{#if setup.ready && Step}

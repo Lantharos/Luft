@@ -65,6 +65,18 @@
 		text-shadow: none;
 	}
 
+	.glass-surface {
+		--control: color-mix(in oklab, var(--ink) 5%, transparent);
+		--control-hover: color-mix(in oklab, var(--ink) 8%, transparent);
+		--control-edge: transparent;
+		--control-focus: var(--accent-line);
+		--control-outline: var(--text-muted);
+	}
+
+	.glass-surface .text-field:focus {
+		background: var(--control-hover);
+	}
+
 	.glass-content {
 		display: flex;
 		min-width: 0;

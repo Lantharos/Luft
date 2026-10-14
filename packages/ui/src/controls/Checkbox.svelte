@@ -60,8 +60,9 @@
 		place-items: center;
 		border-radius: 7px;
 		background: var(--control);
+		box-shadow: inset 0 0 0 1.5px var(--control-outline);
 		color: var(--accent-text);
-		transition: background-color 160ms var(--ease), transform 160ms var(--ease);
+		transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease), transform 160ms var(--ease);
 	}
 
 	.checkbox:hover:not(:disabled) .box:not(.on) {
@@ -74,5 +75,6 @@
 
 	.box.on {
 		background: var(--accent);
+		box-shadow: none;
 	}
 </style>

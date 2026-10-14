@@ -14,6 +14,9 @@
 	--group: var(--surface);
 	--control: var(--kestrel-dark-surface-container-high, #252522);
 	--control-hover: var(--kestrel-dark-surface-container-highest, #31312e);
+	--control-edge: var(--hairline);
+	--control-focus: var(--accent);
+	--control-outline: transparent;
 	--popover: var(--kestrel-dark-surface-container, #1c1c1a);
 	--sidebar-solid: var(--kestrel-dark-surface-container-low, #181817);
 	--sidebar-active: color-mix(in oklab, var(--ink) 9%, transparent);

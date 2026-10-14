@@ -98,11 +98,11 @@
 
 	.text-field {
 		color: var(--text);
-		box-shadow: inset 0 0 0 1px var(--hairline);
+		box-shadow: inset 0 0 0 1px var(--control-edge);
 	}
 
 	.text-field:focus {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
+		box-shadow: inset 0 0 0 1.5px var(--control-focus);
 	}
 
 	.text-field:disabled {

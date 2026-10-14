@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 
 import {call} from '../lib/dbus.js';
+import {gjs, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {eventually, Setup} from './lib/driver.js';
 
@@ -30,7 +31,10 @@ async function checkProtect(setup) {
   await setup.called('TurnOnEncryption', 'encryption is turned on through trustd');
 }
 
-async function checkHandoff() {
+async function checkHandoff(endSession) {
+  gjs('clients/window.js', [], {env: {GDK_BACKEND: 'x11'}});
+  await waitForWindow('Kestrel window check', 'an X11 window is open next to setup when it finishes');
+  await endSession();
   await call('com.lantharos.Kestrel.Setup', '/com/lantharos/Kestrel/Setup', 'com.lantharos.Kestrel.Setup', 'Finish', null, null,
     {connection: Gio.DBus.session});
   await pause(HANDOFF);
@@ -47,7 +51,5 @@ export async function checkFirstBoot(endSession) {
   setup.tap(AT.restart);
   await setup.called('installer FinishFirstBoot', 'finishing stops signing in automatically');
   await eventually(async () => (await setup.calls()).includes('Reboot'), 'encrypting needs a restart to finish');
-  await setup.close();
-  await endSession();
-  await checkHandoff();
+  await checkHandoff(endSession);
 }

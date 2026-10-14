@@ -295,6 +295,7 @@ export function startSetup(context: SetupContext): Promise<void> {
 export function wallpaperSampled(samples: Rgb[]): void {
   if (currentUi) currentUi.appearance.apply(samples);
   else if (greeter) greeter.wallpaperSampled(samples);
+  else if (setup) setup.wallpaperSampled(samples);
   else pendingWallpaper = samples;
 }
 

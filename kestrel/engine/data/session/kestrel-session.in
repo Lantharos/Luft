@@ -6,6 +6,8 @@ fi
 unset KESTREL_LOGIN_SHELL
 
 export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-kestrel}"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Kestrel:GNOME}"
 export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export IBUS_DAEMON_ARGS="--panel disable"
 
@@ -14,12 +16,13 @@ mkdir -p "${DCONF_PROFILE%/*}"
 { cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } > "$DCONF_PROFILE"
 export DCONF_PROFILE
 
-if [ "$1" = --setup ]; then
-  systemd-cat --identifier=kestrel-setup @bindir@/kestrel --setup --wayland --display-server --no-x11
-fi
-
 systemctl --user reset-failed
 dbus-update-activation-environment --systemd --all
+
+SETUP_PENDING=/var/lib/luft-installer/first-boot
+if [ "$1" = --setup ] || [ "$(cat "$SETUP_PENDING" 2> /dev/null)" = "$USER" ]; then
+  systemd-cat --identifier=kestrel-setup @bindir@/kestrel --setup --wayland --display-server --no-x11
+fi
 
 systemctl --user start --wait kestrel-session.target &
 trap 'systemctl --user stop kestrel-session.target' HUP INT TERM

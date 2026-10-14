@@ -29,32 +29,43 @@ interface Portal {
   destroy?(): void;
 }
 
+function sessionPortals(context: Pick<Context, 'keybindings' | 'screenShield'>): Portal[] {
+  return [
+    new AccountPortal(),
+    new AppChooserPortal(),
+    new BackgroundPortal(),
+    new ClipboardPortal(),
+    new DynamicLauncherPortal(),
+    new EmailPortal(),
+    new GlobalShortcutsPortal(context.keybindings),
+    new InhibitPortal(context.screenShield),
+    new InputCapturePortal(),
+    new LockdownPortal(),
+    new NotificationPortal(),
+    new PrintPortal(),
+    new RemoteDesktopPortal(),
+    new ScreenCastPortal(),
+    new ScreenshotPortal(),
+    new UsbPortal(),
+    new WallpaperPortal(),
+  ];
+}
+
 export class PortalBackend {
   private readonly settings = new SettingsPortal();
   private readonly portals: Portal[];
   private readonly nameId: number;
 
-  constructor(context: Pick<Context, 'keybindings' | 'screenShield'>) {
-    this.portals = [
-      this.settings,
-      new AccountPortal(),
-      new AppChooserPortal(),
-      new BackgroundPortal(),
-      new ClipboardPortal(),
-      new DynamicLauncherPortal(),
-      new EmailPortal(),
-      new GlobalShortcutsPortal(context.keybindings),
-      new InhibitPortal(context.screenShield),
-      new InputCapturePortal(),
-      new LockdownPortal(),
-      new NotificationPortal(),
-      new PrintPortal(),
-      new RemoteDesktopPortal(),
-      new ScreenCastPortal(),
-      new ScreenshotPortal(),
-      new UsbPortal(),
-      new WallpaperPortal(),
-    ];
+  static forSession(context: Pick<Context, 'keybindings' | 'screenShield'>): PortalBackend {
+    return new PortalBackend(sessionPortals(context));
+  }
+
+  static forSetup(): PortalBackend {
+    return new PortalBackend([]);
+  }
+
+  private constructor(portals: Portal[]) {
+    this.portals = [this.settings, ...portals];
     for (const portal of this.portals) portal.dbus.export(Gio.DBus.session, PORTAL_PATH);
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.NONE, null, null);
   }

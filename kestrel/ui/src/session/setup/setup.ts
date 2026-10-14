@@ -6,6 +6,9 @@ import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 import { LockBackdrop } from 'resource:///com/lantharos/kestrel/ui/lockScreen/backdrop.js';
 
+import { AppearanceService } from '../../appearance/service.js';
+import type { Rgb } from '../../appearance/color.js';
+import { PortalBackend } from '../../portal/backend.js';
 import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
 import { loadKestrelStylesheets } from '../../shared/stylesheet.js';
@@ -49,6 +52,8 @@ function firstWindow(): Promise<void> {
 
 export class Setup {
   private readonly backdrop = new LockBackdrop();
+  private readonly portal = PortalBackend.forSetup();
+  private readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly nameId: number;
   private readonly placement: () => void;
@@ -77,6 +82,10 @@ export class Setup {
     });
   }
 
+  wallpaperSampled(samples: Rgb[]): void {
+    this.appearance.apply(samples);
+  }
+
   Finish(): void {
     if (this.finishing) return;
     this.finishing = true;
@@ -89,6 +98,8 @@ export class Setup {
   }
 
   destroy(): void {
+    this.appearance.destroy();
+    this.portal.destroy();
     this.placement();
     this.dbus.unexport();
     Gio.bus_unown_name(this.nameId);

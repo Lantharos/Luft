@@ -43,7 +43,7 @@ export class SystemServices {
 
   constructor(context: Context, ownsTheScreen: boolean, openStart: () => void) {
     this.loginScreen = ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
-    this.portal = new PortalBackend(context);
+    this.portal = PortalBackend.forSession(context);
     this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.keyring = new SystemPrompts(context);

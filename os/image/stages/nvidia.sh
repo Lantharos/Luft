@@ -3,7 +3,7 @@ set -euo pipefail
 
 key="$1"
 certificate="$2"
-fedora="$(rpm -E %fedora)"
+source "$(dirname "$0")/rpmfusion.sh"
 kernel="$(rpm -q kernel-core --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n' | tail -1)"
 akmods_keys=/etc/pki/akmods
 
@@ -36,9 +36,7 @@ check_signatures() {
   done
 }
 
-dnf install -y \
-  "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$fedora.noarch.rpm" \
-  "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$fedora.noarch.rpm"
+use_rpmfusion
 install_kernel_devel
 dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda-libs libva-nvidia-driver
 use_signing_key
@@ -46,6 +44,7 @@ akmods --force --kernels "$kernel" --kmod nvidia
 forget_signing_key
 check_signatures
 dnf remove -y akmod-nvidia akmods kernel-devel kernel-devel-matched
+forget_rpmfusion
 dnf clean all
 
 printf 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]\n' |
@@ -53,4 +52,4 @@ printf 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "n
 sed -i 's/^IMAGE_ID=.*/IMAGE_ID=luft-nvidia/' /usr/lib/os-release
 sed -i 's/$/-nvidia/' /usr/share/luft/image-reference
 userdel akmods
-rm -rf /run/dnf /var/log/akmods /var/cache/akmods /var/log/dnf5.log* /var/lib/dnf /var/cache/ldconfig
+rm -rf /run/akmods /run/dnf /var/log/akmods /var/cache/akmods /var/log/dnf5.log* /var/lib/dnf /var/cache/ldconfig

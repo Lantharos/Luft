@@ -87,12 +87,12 @@ ARG RELEASE_NOTES=""
 LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes="${RELEASE_NOTES}"
 
 FROM luft AS luft-nvidia
-COPY os/image/stages/nvidia.sh /tmp/nvidia.sh
+COPY os/image/stages/nvidia.sh os/image/stages/rpmfusion.sh /tmp/stages/
 ARG SIGNED_BY
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
     : "signed by ${SIGNED_BY}" && \
-    /tmp/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
-    rm /tmp/nvidia.sh
+    /tmp/stages/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
+    rm -rf /tmp/stages
 RUN bootc container lint

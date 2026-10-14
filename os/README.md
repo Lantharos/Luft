@@ -7,6 +7,8 @@ Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay
 | `ghcr.io/lantharos/luft:45` | Any computer |
 | `ghcr.io/lantharos/luft:45-nvidia` | NVIDIA graphics, with the driver built for the image's kernel and signed with the Luft key |
 
+Both play every common audio and video format, including H.264, HEVC and AV1, decoded in hardware on Intel, AMD and NVIDIA graphics. The full FFmpeg, GStreamer's freeworld and ugly plugins and Mesa's freeworld video drivers come from [RPM Fusion](https://rpmfusion.org) while the image is built, as does NVIDIA's driver; installed systems don't use RPM Fusion's repositories and get new versions with each update.
+
 Releases come from tags: pushing `v45.20261014` builds and publishes that version as `:45` and `:45-nvidia`, which installed systems update from, then builds the ISO. Every night, if main changed, CI builds `:45-nightly` and `:45-nightly-nvidia` for testing; switch a test machine with `bootc switch ghcr.io/lantharos/luft:45-nightly`. Each build is also tagged with its version.
 
 ## Build
@@ -24,7 +26,7 @@ The first build downloads Fedora packages, Mutter's source and the web runtime a
 | --- | --- |
 | `image/Containerfile` | The build: one stage each for Kestrel, the boot and security services, and the apps, then the image |
 | `image/stages` | The scripts each stage runs |
-| `image/packages` | Fedora packages for building, those added to the image, and the GNOME parts Kestrel replaces |
+| `image/packages` | Fedora packages for building, those added to the image, the codecs from RPM Fusion, and the GNOME parts Kestrel replaces |
 | `image/patches` | Changes to Fedora packages the image rebuilds, such as bootc |
 | `image/files` | Files copied into the image as they are |
 | `image/startup` | Building and signing the startup image |

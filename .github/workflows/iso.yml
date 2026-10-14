@@ -65,7 +65,7 @@ jobs:
             aws s3 cp --endpoint-url "$endpoint" --no-progress "$file" "s3://$R2_BUCKET/$file"
           done
           latest=luft-latest.iso
-          aws s3 cp --endpoint-url "$endpoint" --copy-props none "s3://$R2_BUCKET/$iso" "s3://$R2_BUCKET/$latest"
+          aws s3 cp --endpoint-url "$endpoint" --no-progress "$iso" "s3://$R2_BUCKET/$latest"
           sed "s/$iso/$latest/" "$iso.sha256" | aws s3 cp --endpoint-url "$endpoint" - "s3://$R2_BUCKET/$latest.sha256"
 
       - name: Keep as a workflow artifact

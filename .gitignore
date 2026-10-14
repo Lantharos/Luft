@@ -12,3 +12,4 @@ node_modules/
 __pycache__/
 .svelte-check/
 vite.config.*.timestamp-*
+/.claude/worktrees/

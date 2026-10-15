@@ -1,5 +1,5 @@
 use super::Context;
-use super::drive::storage::{BASIC_TYPE, ESP_TYPE, MSFT_Partition, Storage};
+use super::drive::storage::{MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
 use super::system::start_entries;
@@ -15,9 +15,6 @@ pub fn give_back(
     for (index, partition) in partitions.iter().enumerate() {
         context.progress(Stage::Removing, index as u64, steps);
         let partition = storage.refreshed(partition)?;
-        if partition.is_type(ESP_TYPE) {
-            storage.set_type(&partition, BASIC_TYPE)?;
-        }
         storage.delete(&partition)?;
         if let Some(guid) = partition.guid() {
             record::removed_partition(&guid)?;

@@ -20,6 +20,7 @@ KEYS = {
     "$": "shift-4", "?": "shift-slash", "!": "shift-1", "@": "shift-2", "#": "shift-3", "&": "shift-7", "*": "shift-8",
     "(": "shift-9", ")": "shift-0", "|": "shift-backslash", "\\": "backslash", ">": "shift-dot", "<": "shift-comma",
     "{": "shift-bracket_left", "}": "shift-bracket_right", "[": "bracket_left", "]": "bracket_right", "%": "shift-5",
+    "~": "shift-grave_accent", "`": "grave_accent", "^": "shift-6",
 }
 
 
@@ -109,21 +110,23 @@ def wait_for_agent(vm: Path, timeout: float):
 
 
 def run(vm: Path, command: str, timeout: float) -> int:
-    channel = agent(vm)
-    started = channel.call("guest-exec", {
+    started = agent(vm).call("guest-exec", {
         "path": "powershell.exe",
         "arg": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command],
         "capture-output": True,
     })
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        status = channel.call("guest-exec-status", {"pid": started["pid"]})
+        time.sleep(0.5)
+        try:
+            status = agent(vm).call("guest-exec-status", {"pid": started["pid"]})
+        except (OSError, TimeoutError, json.JSONDecodeError):
+            continue
         if status["exited"]:
             for stream, target in (("out-data", sys.stdout), ("err-data", sys.stderr)):
                 if stream in status:
                     target.write(base64.b64decode(status[stream]).decode("utf-8", "replace"))
             return status.get("exitcode", 0)
-        time.sleep(0.5)
     raise SystemExit(f"{command} didn't finish in {timeout} seconds")
 
 

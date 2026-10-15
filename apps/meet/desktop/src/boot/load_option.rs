@@ -1,6 +1,6 @@
 pub const GLOBAL_VARIABLES: &str = "{8BE4DF61-93CA-11D2-AA0D-00E098032B8C}";
 pub const LOADER: &str = r"\EFI\BOOT\BOOTX64.EFI";
-pub const DESCRIPTION: &str = "Luft";
+pub const DESCRIPTION: &str = "Meet Luft";
 const ACTIVE: u32 = 1;
 const MEDIA: u8 = 0x04;
 const HARD_DRIVE: u8 = 0x01;
@@ -61,6 +61,7 @@ pub struct Decoded {
     pub description: String,
     pub partition: Option<[u8; 16]>,
     pub file: Option<String>,
+    pub windows_object: Option<String>,
 }
 
 fn utf16(bytes: &[u8]) -> String {
@@ -74,6 +75,20 @@ fn utf16(bytes: &[u8]) -> String {
     String::from_utf16_lossy(&units)
 }
 
+fn windows_object(optional: &[u8]) -> Option<String> {
+    let marker: Vec<u8> = "BCDOBJECT="
+        .encode_utf16()
+        .flat_map(u16::to_le_bytes)
+        .collect();
+    let start = optional
+        .windows(marker.len())
+        .position(|window| window == marker)?
+        + marker.len();
+    let text = utf16(optional.get(start..)?);
+    let end = text.find('}')?;
+    text.starts_with('{').then(|| text[..=end].to_owned())
+}
+
 pub fn decode(option: &[u8]) -> Option<Decoded> {
     let path_length = u16::from_le_bytes(option.get(4..6)?.try_into().ok()?) as usize;
     let description_end = 6 + option
@@ -83,11 +98,13 @@ pub fn decode(option: &[u8]) -> Option<Decoded> {
         .iter()
         .position(|unit| *unit == [0, 0])?
         * 2;
-    let mut path = option.get(description_end + 2..description_end + 2 + path_length)?;
+    let path_start = description_end + 2;
+    let mut path = option.get(path_start..path_start + path_length)?;
     let mut decoded = Decoded {
         description: utf16(&option[6..description_end]),
         partition: None,
         file: None,
+        windows_object: windows_object(&option[path_start + path_length..]),
     };
     while let [kind, subtype, low, high, ..] = *path {
         let length = u16::from_le_bytes([low, high]) as usize;
@@ -203,8 +220,31 @@ mod tests {
             Some(Decoded {
                 description: DESCRIPTION.to_owned(),
                 partition: Some(guid),
-                file: Some(LOADER.to_owned())
+                file: Some(LOADER.to_owned()),
+                windows_object: None,
             })
+        );
+    }
+
+    #[test]
+    fn entries_windows_keeps_name_their_object() {
+        let guid = guid_bytes("0a1b2c3d-4e5f-4061-8273-8495a6b7c8d9").unwrap();
+        let mut option = encode(&Partition {
+            number: 1,
+            first_lba: 2048,
+            sectors: 409_600,
+            guid,
+        });
+        option.extend(b"WINDOWS\0");
+        option.extend([1, 0, 0, 0, 0x88, 0, 0, 0]);
+        option.extend(
+            "BCDOBJECT={9dea862c-5cdd-4e70-acc1-f32b344d4795}\0"
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes),
+        );
+        assert_eq!(
+            decode(&option).unwrap().windows_object.as_deref(),
+            Some("{9dea862c-5cdd-4e70-acc1-f32b344d4795}")
         );
     }
 

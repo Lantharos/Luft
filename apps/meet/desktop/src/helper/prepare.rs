@@ -3,7 +3,7 @@ use std::io;
 use luft_meet::handoff::{LIVE_LABEL, START_LABEL};
 use luft_meet::{Handoff, Intent, Room};
 
-use super::drive::storage::{ESP_TYPE, Layout, MSFT_Partition, Storage};
+use super::drive::storage::{BASIC_TYPE, ESP_TYPE, Layout, MSFT_Partition, Storage};
 use super::drive::{record, state, windows_drive};
 use super::system::{facts, firmware, start_entries};
 use super::{Context, undo};
@@ -81,11 +81,10 @@ pub fn tidy() -> Result<(), String> {
     let drive = windows_drive::find()?;
     let layout = storage.layout(&drive.volume)?;
     let luft_entry = state::find(&layout).boot_entry;
-    let stale: Vec<u16> = start_entries::stale(&storage.all_partitions()?, luft_entry)
-        .iter()
-        .map(|entry| entry.number)
-        .collect();
-    start_entries::remove(&stale)
+    start_entries::tidy(&start_entries::stale(
+        &storage.all_partitions()?,
+        luft_entry,
+    ))
 }
 
 fn write_live_system(
@@ -126,12 +125,12 @@ fn build(
             .expect("both partitions are planned")
             .span
     });
-    let start = storage.create(layout, start)?;
+    let start = storage.create(layout, start, ESP_TYPE)?;
     created.push(start.clone());
     record::made_partition(&start.guid().ok_or("The start partition has no GUID")?)?;
     let start_path = storage.format(&start, FAT32, START_LABEL, None)?;
     context.progress(Stage::Partitioning, 1, 2);
-    let live = storage.create(layout, live)?;
+    let live = storage.create(layout, live, BASIC_TYPE)?;
     created.push(live.clone());
     record::made_partition(&live.guid().ok_or("The live partition has no GUID")?)?;
     let live_path = storage.format(&live, EXFAT, LIVE_LABEL, None)?;
@@ -144,7 +143,6 @@ fn build(
         &mut Volumes::new(start_path.clone(), live_path.clone()),
     )?;
     files::write_grub_configs(&start_path, &live_guid).map_err(|error| error.to_string())?;
-    storage.set_type(&start, ESP_TYPE)?;
     let partition = firmware::partition_on_disk(
         layout.disk.Number,
         layout.disk.LogicalSectorSize as u64,

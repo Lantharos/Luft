@@ -4,12 +4,10 @@ use raw_window_handle::{
     DisplayHandle, HandleError, HasDisplayHandle, HasWindowHandle, RawWindowHandle,
     Win32WindowHandle, WindowHandle,
 };
-use windows::Win32::Foundation::{HWND, LPARAM};
-use windows::Win32::System::Threading::GetCurrentProcessId;
-use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GW_OWNER, GetWindow, GetWindowThreadProcessId, IsWindowVisible,
-};
-use windows::core::BOOL;
+use windows::Win32::UI::WindowsAndMessaging::FindWindowW;
+use windows::core::{HSTRING, PCWSTR};
+
+use super::TITLE;
 
 struct Owner(NonZeroIsize);
 
@@ -26,29 +24,16 @@ impl HasDisplayHandle for Owner {
     }
 }
 
-unsafe extern "system" fn visit(window: HWND, found: LPARAM) -> BOOL {
-    let mut process = 0u32;
-    unsafe { GetWindowThreadProcessId(window, Some(&mut process)) };
-    let ours = process == unsafe { GetCurrentProcessId() }
-        && unsafe { IsWindowVisible(window) }.as_bool()
-        && unsafe { GetWindow(window, GW_OWNER) }.is_err();
-    if ours {
-        unsafe { *(found.0 as *mut isize) = window.0 as isize };
-    }
-    BOOL::from(!ours)
-}
-
-fn own_window() -> Option<Owner> {
-    let mut found = 0isize;
-    let _ = unsafe { EnumWindows(Some(visit), LPARAM(&mut found as *mut isize as isize)) };
-    NonZeroIsize::new(found).map(Owner)
+fn meet_window() -> Option<Owner> {
+    let window = unsafe { FindWindowW(PCWSTR::null(), &HSTRING::from(TITLE)) }.ok()?;
+    NonZeroIsize::new(window.0 as isize).map(Owner)
 }
 
 pub fn pick_iso() -> Option<String> {
     let mut dialog = rfd::FileDialog::new()
         .set_title("Choose a Luft ISO")
         .add_filter("Luft ISO", &["iso"]);
-    if let Some(owner) = own_window() {
+    if let Some(owner) = meet_window() {
         dialog = dialog.set_parent(&owner);
     }
     dialog

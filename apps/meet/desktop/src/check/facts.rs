@@ -34,6 +34,8 @@ pub struct Device {
 pub struct StartEntry {
     pub number: u16,
     pub name: String,
+    #[serde(skip)]
+    pub windows_object: Option<String>,
 }
 
 pub const NVIDIA: u16 = 0x10de;

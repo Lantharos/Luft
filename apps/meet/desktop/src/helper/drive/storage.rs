@@ -70,11 +70,6 @@ struct Attributes {
 }
 
 #[derive(Serialize)]
-struct PartitionType {
-    GptType: String,
-}
-
-#[derive(Serialize)]
 struct Format {
     FileSystem: String,
     FileSystemLabel: String,
@@ -266,7 +261,12 @@ impl Storage {
         )
     }
 
-    pub fn create(&self, layout: &Layout, span: Span) -> Result<MSFT_Partition, String> {
+    pub fn create(
+        &self,
+        layout: &Layout,
+        span: Span,
+        kind: &str,
+    ) -> Result<MSFT_Partition, String> {
         let returned: Returned = self
             .wmi
             .exec_instance_method::<MSFT_Disk, _>(
@@ -275,7 +275,7 @@ impl Storage {
                 CreatePartition {
                     Size: span.size,
                     Offset: span.offset,
-                    GptType: BASIC_TYPE.to_owned(),
+                    GptType: kind.to_owned(),
                     AssignDriveLetter: false,
                 },
             )
@@ -289,10 +289,20 @@ impl Storage {
             .into_iter()
             .find(|partition| partition.Offset == span.offset)
             .ok_or("The new partition wasn't found")?;
+        if kind != ESP_TYPE
+            && let Err(error) = self.hide(&created)
+        {
+            self.delete(&created)?;
+            return Err(error);
+        }
+        self.refreshed(&created)
+    }
+
+    fn hide(&self, partition: &MSFT_Partition) -> Result<(), String> {
         let returned: Returned = self
             .wmi
             .exec_instance_method::<MSFT_Partition, _>(
-                &created.__Path,
+                &partition.__Path,
                 "SetAttributes",
                 Attributes {
                     NoDefaultDriveLetter: true,
@@ -302,8 +312,7 @@ impl Storage {
         checked(
             "Windows couldn't keep the new partition out of Explorer",
             returned.ReturnValue,
-        )?;
-        self.refreshed(&created)
+        )
     }
 
     pub fn refreshed(&self, partition: &MSFT_Partition) -> Result<MSFT_Partition, String> {
@@ -344,23 +353,6 @@ impl Storage {
         )?;
         BitLocker::open()?.keep_readable(&path)?;
         Ok(path)
-    }
-
-    pub fn set_type(&self, partition: &MSFT_Partition, kind: &str) -> Result<(), String> {
-        let returned: Returned = self
-            .wmi
-            .exec_instance_method::<MSFT_Partition, _>(
-                &partition.__Path,
-                "SetAttributes",
-                PartitionType {
-                    GptType: kind.to_owned(),
-                },
-            )
-            .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't mark Luft's start partition",
-            returned.ReturnValue,
-        )
     }
 
     pub fn delete(&self, partition: &MSFT_Partition) -> Result<(), String> {

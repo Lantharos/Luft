@@ -178,6 +178,9 @@ fn measure(kind: FolderKind) -> Option<FoundFolder> {
     let path = known(kind)?;
     let mut items: Vec<Item> = Vec::new();
     walk(&path, "", &mut items);
+    if items.is_empty() {
+        return None;
+    }
     Some(FoundFolder {
         kind,
         path: path.to_string_lossy().into_owned(),

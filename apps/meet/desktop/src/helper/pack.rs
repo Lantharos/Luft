@@ -2,7 +2,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use luft_meet::handoff::BOX_LABEL;
 use luft_meet::moving_box::{
@@ -10,7 +10,7 @@ use luft_meet::moving_box::{
     WALLPAPER, WIFI,
 };
 
-use super::drive::storage::{MSFT_Partition, Storage};
+use super::drive::storage::{BASIC_TYPE, MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
 use super::system::bluetooth;
@@ -51,6 +51,7 @@ fn export_wifi(into: &Path) -> Result<Vec<PathBuf>, String> {
     let status = Command::new("netsh")
         .args(["wlan", "export", "profile", "key=clear"])
         .arg(format!("folder={}", into.display()))
+        .stdout(Stdio::null())
         .creation_flags(NO_WINDOW)
         .status()
         .map_err(|error| error.to_string())?;
@@ -246,7 +247,7 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
         context.progress(Stage::Shrinking, 1, 1);
     }
     let layout = storage.layout(&drive.volume)?;
-    let partition = storage.create(&layout, plan.partitions[0].span)?;
+    let partition = storage.create(&layout, plan.partitions[0].span, BASIC_TYPE)?;
     record::made_partition(&partition.guid().ok_or("The moving box has no GUID")?)?;
     if let Err(error) = fill(context, &storage, &partition, &items, &manifest) {
         if let Err(cleanup) = take_back(&storage, &drive, &partition, windows_before) {

@@ -17,6 +17,7 @@ use crate::live::source::Source;
 use crate::protocol::{Belongings, Call, WindowsChoices};
 
 const APP_ID: &str = "com.lantharos.meet";
+const TITLE: &str = "Meet Luft";
 const SIZE: (u32, u32) = (900, 620);
 const NIGHTLY: &str = "--nightly";
 pub const PROGRESS: &str = "meet.progress";
@@ -108,7 +109,7 @@ where
 
 fn window(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = window
-        .title("Meet Luft")
+        .title(TITLE)
         .fixed_size(SIZE.0, SIZE.1)
         .frameless()
         .single_instance_id(APP_ID)

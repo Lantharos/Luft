@@ -17,6 +17,7 @@ import { taskbarPreferences } from './desktop/panel/preferences/taskbarPreferenc
 import { systemMonitor } from './desktop/panel/widgets/systemMonitor.js';
 import { WindowPreviews } from './desktop/panel/windowPreviews.js';
 import { TaskView } from './desktop/taskView/taskView.js';
+import { wallpaperFloor } from './desktop/wallpaper/floor.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
@@ -292,6 +293,7 @@ export function startSetup(context: SetupContext): Promise<void> {
 }
 
 export function wallpaperSampled(samples: Rgb[]): void {
+  wallpaperFloor.sample(samples);
   if (currentUi) currentUi.appearance.apply(samples);
   else if (greeter) greeter.wallpaperSampled(samples);
   else if (setup) setup.wallpaperSampled(samples);

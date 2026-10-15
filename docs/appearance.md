@@ -8,6 +8,7 @@ The shell follows `color-scheme` in `org.gnome.desktop.interface`, like Luft's a
 
 - Light glass is a thin white frost over the blur with dark text and icons. Its blur brightens dark wallpapers and deepens their colors, so the wallpaper shows through clean instead of grey. Dark glass dims bright wallpapers instead, so text stays readable on any wallpaper.
 - Tinted and clear app icons, the Start mark and symbolic icons switch to the ink of each style.
+- The back half of the Start mark takes its shade from what sits behind the taskbar: the bottom of the wallpaper as the taskbar's look shows it. It stays a quieter partner of the front half and keeps clear of the wallpaper in every look. Over a busy wallpaper it also gets a faint edge.
 - Pure black only applies to the dark style. In the light style the shell keeps its glass.
 - The login and lock screens stay dark in both styles, as does high contrast.
 

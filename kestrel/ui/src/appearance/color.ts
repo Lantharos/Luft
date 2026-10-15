@@ -109,6 +109,13 @@ function withLuminance(hue: number, chroma: number, luminance: number): Rgb {
 
 const luminanceOfTone = (tone: number) => tone > 8 ? ((tone + 16) / 116) ** 3 : tone / 903.2962962;
 
+const relativeLuminance = (color: Rgb) => linearLuminance(color.map(toLinear));
+
+export function toneOf(color: Rgb): number {
+  const luminance = relativeLuminance(color);
+  return luminance > 0.008856 ? 116 * Math.cbrt(luminance) - 16 : luminance * 903.2962962;
+}
+
 export const atTone = ({ hue, chroma }: TonalPalette, tone: number): Rgb => withLuminance(hue, chroma, luminanceOfTone(tone));
 
 const hueDistance = (first: number, second: number) => {
@@ -154,8 +161,8 @@ export const isNeutral = ({ chroma }: Seed) => chroma === 0;
 
 export const accentColor = (seed: Seed): Rgb => isNeutral(seed) ? WHITE : fromOklch([ACCENT_TONE, seed.chroma, seed.hue]);
 
-const contrast = (first: Rgb, second: Rgb) => {
-  const [lighter, darker] = [first, second].map(color => linearLuminance(color.map(toLinear))).sort((a, b) => b - a);
+export const contrast = (first: Rgb, second: Rgb) => {
+  const [lighter, darker] = [first, second].map(relativeLuminance).sort((a, b) => b - a);
   return (lighter + 0.05) / (darker + 0.05);
 };
 

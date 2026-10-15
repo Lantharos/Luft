@@ -86,7 +86,7 @@ export class KestrelPanel {
       x_align: Clutter.ActorAlign.CENTER,
       y_align: Clutter.ActorAlign.CENTER,
     });
-    this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button);
+    this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button, this.actor);
     center.add_child(this.launcher.button);
     center.add_child(this.taskbar.actor);
     this.actor.add_child(center);

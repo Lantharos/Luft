@@ -103,40 +103,68 @@ export async function captureFrame(area = null) {
   return new Frame(await screenshot(area));
 }
 
+function primaryView(view) {
+  const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+  return view.layout.x === monitor.x && view.layout.y === monitor.y;
+}
+
+function compositeTo(stream, texture, {x, y, width, height}) {
+  return new Promise((resolve, reject) => Shell.Screenshot.composite_to_stream(texture, x, y, width, height,
+    1, null, 0, 0, 1, stream, (_source, result) => {
+      try {
+        Shell.Screenshot.composite_to_stream_finish(result);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    })).finally(() => stream.close(null));
+}
+
+class ViewCopy {
+  constructor(view) {
+    const framebuffer = view.get_framebuffer();
+    this.texture = Cogl.Texture2D.new_with_size(framebuffer.get_context(), framebuffer.get_width(), framebuffer.get_height());
+    this._offscreen = Cogl.Offscreen.new_with_texture(this.texture);
+    this.copy(view);
+  }
+
+  copy(view) {
+    view.get_framebuffer().blit(this._offscreen, 0, 0, 0, 0, this.texture.get_width(), this.texture.get_height());
+  }
+
+  get whole() {
+    return {x: 0, y: 0, width: this.texture.get_width(), height: this.texture.get_height()};
+  }
+}
+
 export async function captureRenderedFrames(name, action) {
-  let texture = null;
   let snapshot = null;
   const signal = global.stage.connect('after-paint', (_stage, view) => {
-    const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
-    if (view.layout.x !== monitor.x || view.layout.y !== monitor.y) return;
-    const framebuffer = view.get_framebuffer();
-    const [width, height] = [framebuffer.get_width(), framebuffer.get_height()];
-    if (!snapshot) {
-      texture = Cogl.Texture2D.new_with_size(framebuffer.get_context(), width, height);
-      snapshot = Cogl.Offscreen.new_with_texture(texture);
-    }
-    framebuffer.blit(snapshot, 0, 0, 0, 0, width, height);
+    if (!primaryView(view)) return;
+    if (snapshot) snapshot.copy(view);
+    else snapshot = new ViewCopy(view);
   });
   try {
     await action();
   } finally {
     global.stage.disconnect(signal);
   }
-  if (!texture) throw new Error('No frame was rendered during capture');
-  const stream = Gio.File.new_for_path(pathFor(name)).replace(null, false, Gio.FileCreateFlags.NONE, null);
-  try {
-    await new Promise((resolve, reject) => Shell.Screenshot.composite_to_stream(texture, 0, 0, texture.get_width(), texture.get_height(),
-      1, null, 0, 0, 1, stream, (_source, result) => {
-        try {
-          Shell.Screenshot.composite_to_stream_finish(result);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      }));
-  } finally {
-    stream.close(null);
-  }
+  if (!snapshot) throw new Error('No frame was rendered during capture');
+  await compositeTo(Gio.File.new_for_path(pathFor(name)).replace(null, false, Gio.FileCreateFlags.NONE, null), snapshot.texture, snapshot.whole);
+}
+
+export async function renderedFrame(area) {
+  const [view, snapshot] = await new Promise(resolve => {
+    const signal = global.stage.connect('after-paint', (_stage, painted) => {
+      if (!primaryView(painted)) return;
+      global.stage.disconnect(signal);
+      resolve([painted, new ViewCopy(painted)]);
+    });
+    global.stage.queue_redraw();
+  });
+  const stream = Gio.MemoryOutputStream.new_resizable();
+  await compositeTo(stream, snapshot.texture, {...area, x: area.x - view.layout.x, y: area.y - view.layout.y});
+  return new Frame(stream.steal_as_bytes());
 }
 
 export async function captureArea(name, area) {

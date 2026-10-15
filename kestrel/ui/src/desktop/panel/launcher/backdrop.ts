@@ -1,0 +1,52 @@
+import type St from 'gi://St';
+
+import type { Rgb } from '../../../appearance/color.js';
+import type { WallpaperFloor } from '../../wallpaper/floor.js';
+
+type Channels = [number, number, number];
+
+const LUMA: Channels = [0.2126, 0.7152, 0.0722];
+
+const luma = (color: Channels) => color.reduce((sum, channel, index) => sum + channel * LUMA[index], 0);
+const mix = (from: Channels, to: Channels, amount: number) => from.map((value, index) => value + (to[index] - value) * amount) as Channels;
+const clamp = (value: number) => Math.min(1, Math.max(0, value));
+
+function smoothstep(low: number, high: number, value: number): number {
+  const t = clamp((value - low) / (high - low));
+  return t * t * (3 - 2 * t);
+}
+
+function glassShading(node: St.ThemeNode) {
+  const lookup = (property: string, fallback: number) => {
+    const [found, value] = node.lookup_double(property, true);
+    return found ? value : fallback;
+  };
+  return {
+    dim: lookup('-kestrel-glass-dim', 0),
+    lift: lookup('-kestrel-glass-lift', 0),
+    saturation: lookup('-kestrel-glass-saturation', 1),
+  };
+}
+
+function shadeLikeGlass(color: Channels, node: St.ThemeNode): Channels {
+  const { dim, lift, saturation } = glassShading(node);
+  const brightness = luma(color);
+  const dimmed = color.map(channel => channel * (1 - dim * smoothstep(0.3, 0.95, brightness))) as Channels;
+  const lifted = mix(dimmed, [1, 1, 1], lift * (1 - smoothstep(0.1, 0.9, brightness)));
+  const gray = luma(lifted);
+  return mix([gray, gray, gray], lifted, saturation).map(clamp) as Channels;
+}
+
+export function taskbarBackdrops(panel: St.Widget, floor: WallpaperFloor): Rgb[] {
+  const node = panel.peek_theme_node();
+  if (!node || !floor.color) return [];
+  const glass = !!panel.get_effect('backdrop')?.enabled;
+  const { red, green, blue, alpha } = node.get_background_color();
+  return (glass ? [floor.color] : [floor.color, ...floor.extremes]).map(color => {
+    const behind = color.map(channel => channel / 255) as Channels;
+    const shaded = glass ? shadeLikeGlass(behind, node) : behind;
+    return mix(shaded, [red / 255, green / 255, blue / 255], alpha / 255).map(channel => Math.round(channel * 255)) as Rgb;
+  });
+}
+
+export const showsWallpaper = (panel: St.Widget): boolean => (panel.peek_theme_node()?.get_background_color().alpha ?? 0) < 255;

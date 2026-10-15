@@ -58,7 +58,7 @@
 	let title = $derived(!session.report ? 'Looking at this PC' : session.blocked ? 'Almost there' : 'This PC is ready for Luft');
 	let description = $derived(
 		!session.report
-			? slow
+			? slow && !session.failure
 				? 'Windows is working out how much room it can spare. On a big drive this can take a few minutes.'
 				: 'This takes a moment.'
 			: session.blocked

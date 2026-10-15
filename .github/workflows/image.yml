@@ -149,12 +149,20 @@ jobs:
         run: rm -rf "$LUFT_KEYS"
 
   image:
+    name: Image ${{ matrix.variant }}
     needs: [plan, parts, signed-parts]
     if: >-
       always() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' &&
       !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-26.04
     timeout-minutes: 120
+    strategy:
+      matrix:
+        include:
+          - variant: luft
+            suffix: ""
+          - variant: luft-nvidia
+            suffix: -nvidia
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       VERSION: ${{ needs.plan.outputs.version }}
@@ -180,15 +188,9 @@ jobs:
           certificate: ${{ secrets.LUFT_SECUREBOOT_CERT }}
           pcr-key: ${{ secrets.LUFT_PCR_KEY }}
 
-      - name: Build luft
+      - name: Build ${{ matrix.variant }}
         run: |
-          os/image/build.sh luft --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
-            --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
-
-      - name: Build luft-nvidia
-        run: |
-          os/image/build.sh luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
+          os/image/build.sh "${{ matrix.variant }}" --cache-from "$CACHE" --cache-to "$CACHE" \
             --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
             --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
 
@@ -197,8 +199,25 @@ jobs:
         run: rm -rf "$LUFT_KEYS"
 
       - name: Push
+        run: podman push "localhost/luft:$FEDORA${{ matrix.suffix }}" "$IMAGE:$VERSION${{ matrix.suffix }}"
+
+  publish:
+    needs: [plan, image]
+    if: always() && needs.image.result == 'success'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      TAGS: ${{ needs.plan.outputs.tags }}
+    steps:
+      - name: Sign in to the registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Tag both images
         run: |
           for tag in $TAGS; do
-            podman push "localhost/luft:$FEDORA" "$IMAGE:$tag"
-            podman push "localhost/luft:$FEDORA-nvidia" "$IMAGE:$tag-nvidia"
+            [[ "$tag" != "$VERSION" ]] || continue
+            for suffix in "" -nvidia; do
+              skopeo copy --retry-times 3 "docker://$IMAGE:$VERSION$suffix" "docker://$IMAGE:$tag$suffix"
+            done
           done

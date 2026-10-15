@@ -52,13 +52,12 @@ COPY --from=boot-build /stage /stage
 COPY --from=boot-build /out/ /
 
 FROM builder AS bootc-build
-ARG BASE
+ARG BOOTC
 COPY os/image/patches/bootc /src/os/image/patches/bootc
 COPY os/image/parts/stages/bootc.sh /src/os/image/parts/stages/bootc.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
-    : "built for ${BASE}" && \
-    /src/os/image/parts/stages/bootc.sh /out/rpms
+    /src/os/image/parts/stages/bootc.sh "${BOOTC}" /out/rpms
 
 FROM scratch AS bootc
 COPY --from=bootc-build /out/ /

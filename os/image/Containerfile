@@ -2,9 +2,6 @@ ARG FEDORA=45
 ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
 
 FROM ${BASE} AS luft
-ARG FEDORA
-ARG VERSION=45.dev
-ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
 COPY os/image/packages /usr/share/luft/image/packages
 COPY os/image/stages /usr/share/luft/image/stages
 COPY --from=parts needed.txt /usr/share/luft/image/needed.txt
@@ -20,6 +17,9 @@ COPY os/image/files/ /
 COPY --from=parts kestrel/typelibs.txt /usr/share/luft/image/typelibs.txt
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
+ARG FEDORA
+ARG VERSION=45.dev
+ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
 RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}" && \
     rm -rf /usr/share/luft/image
 RUN bootc container lint

@@ -99,21 +99,22 @@ part_names() {
   done
 }
 
+base_bootc() {
+  podman image exists "$base" || podman pull "${retries[@]}" --quiet "$base" >/dev/null
+  podman run --rm --network none "$base" rpm -q --qf '%{VERSION}-%{RELEASE}' bootc
+}
+
 part_target() {
   case "$1" in
     app-*) echo "app APP=${1#app-}" ;;
+    bootc) echo "bootc BOOTC=$(base_bootc)" ;;
+    boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;
     *) echo "$1" ;;
   esac
 }
 
 part_refs() {
   local name globals=(BASE="$base" SABINE="$(sabine_tag)")
-  for name in "$@"; do
-    if is_signed "$name"; then
-      globals+=(SIGNED_BY="$(signed_by)")
-      break
-    fi
-  done
   for name in "$@"; do
     echo "$name $(part_target "$name")"
   done | (cd "$luft" && bun "$image/parts/key.ts" "$image/parts/Containerfile" "${globals[@]}") |
@@ -133,15 +134,17 @@ cache_dirs() {
 }
 
 build_part() {
-  local name="$1" ref="$2" target arguments work options=()
-  read -r target arguments <<<"$(part_target "$name")"
+  local name="$1" ref="$2" target rest argument work options=() arguments=()
+  read -r target rest <<<"$(part_target "$name")"
+  read -ra arguments <<<"$rest"
   work="$name"
   [[ "$target" != app ]] || work=apps
-  [[ -z "$arguments" ]] || options+=(--build-arg "$arguments")
+  for argument in "${arguments[@]}"; do
+    options+=(--build-arg "$argument")
+  done
   if is_signed "$name"; then
     require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
-    options+=(--build-arg "SIGNED_BY=$(signed_by)"
-      --secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" --secret "id=secureboot-cert,src=$LUFT_SECUREBOOT_CERT")
+    options+=(--secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" --secret "id=secureboot-cert,src=$LUFT_SECUREBOOT_CERT")
   fi
   [[ "$ref" == localhost/* ]] || options+=(--label org.opencontainers.image.source=https://github.com/Lantharos/Luft)
   cache_dirs "$cache/work/$work"
@@ -255,6 +258,7 @@ build_image() {
 
 plan() {
   local name ref presence signing names
+  require_keys LUFT_SECUREBOOT_CERT
   mapfile -t names < <(part_names "${1:-luft-nvidia}")
   while read -r name ref; do
     if [[ -z "${LUFT_REBUILD:-}" ]] && part_exists "$ref"; then presence=present; else presence=missing; fi
@@ -271,6 +275,7 @@ case "${1:-luft}" in
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
     podman_options=("${@:3}")
+    ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     read -r name ref <<<"$(part_refs "$2")"
     build_part "$name" "$ref"
     ;;

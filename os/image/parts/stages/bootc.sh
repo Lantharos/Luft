@@ -2,8 +2,8 @@
 set -euo pipefail
 
 patches="$(cd "$(dirname "$0")/../../patches/bootc" && pwd)"
-out="$1"
-version="$(rpm -q --qf '%{VERSION}-%{RELEASE}' bootc)"
+version="$1"
+out="$2"
 top=/var/tmp/bootc-rpm
 spec="$top/SPECS/bootc.spec"
 

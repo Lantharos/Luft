@@ -73,7 +73,10 @@ where
         std::thread::spawn(move || {
             let outcome = match work(&events, request) {
                 Ok(value) => Outcome::Done { value },
-                Err(failed) => Outcome::Failed(failed),
+                Err(failed) => {
+                    sabine_runtime::report_error("meet", &failed.detail);
+                    Outcome::Failed(failed)
+                }
             };
             events.emit(FINISHED, Finished { job, outcome });
         });

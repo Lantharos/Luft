@@ -54,11 +54,14 @@ jobs:
       - name: Bundle
         working-directory: apps/meet
         run: |
+          $ErrorActionPreference = 'Stop'
           $bundle = sabine bundle . --target exe --release --out $env:RUNNER_TEMP/meet --json | Select-Object -Last 1
           if ($LASTEXITCODE -ne 0) { throw 'Bundling failed' }
-          $setup = ($bundle | ConvertFrom-Json).artifacts | Select-Object -First 1
+          $artifacts = @(($bundle | ConvertFrom-Json).artifacts)
+          if ($artifacts.Count -ne 1) { throw "Bundling made no setup program: $bundle" }
+          $setup = $artifacts[0]
           New-Item -ItemType Directory -Force out | Out-Null
-          Copy-Item $setup out/meet-luft.exe
+          Copy-Item -LiteralPath $setup -Destination out/meet-luft.exe
           $hash = (Get-FileHash out/meet-luft.exe -Algorithm SHA256).Hash.ToLower()
           "$hash  meet-luft.exe" | Set-Content -NoNewline out/meet-luft.exe.sha256
 

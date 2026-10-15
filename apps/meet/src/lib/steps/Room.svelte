@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { bytes, Dialog, SplitBar } from '@luft/ui';
 	import Frame from '#lib/components/Frame.svelte';
+	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 
 	const GIB = 1024 ** 3;
@@ -29,8 +30,8 @@
 		<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">
 			Windows keeps room to grow. Luft also sets aside {bytes(report.live)} to start from, which it gives back once it’s installed.
 		</p>
-		{#if session.error}
-			<p class="text-[13.5px] text-[var(--danger)]">{session.error}</p>
+		{#if session.failure}
+			<Problem failure={session.failure} />
 		{/if}
 	</div>
 	{#snippet actions()}

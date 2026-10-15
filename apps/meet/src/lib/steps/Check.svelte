@@ -6,6 +6,7 @@
 	import { Dialog } from '@luft/ui';
 	import type { Action, Level } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
+	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 
 	const ICONS = { fine: CircleCheck, note: Info, blocks: CircleX };
@@ -30,7 +31,17 @@
 		}
 	};
 
+	const PATIENCE = 15_000;
+
 	let confirming = $state<Confirmed | null>(null);
+	let slow = $state(false);
+
+	$effect(() => {
+		if (session.report || session.failure) return;
+		slow = false;
+		const timer = setTimeout(() => (slow = true), PATIENCE);
+		return () => clearTimeout(timer);
+	});
 
 	function start(action: Action) {
 		if (action === 'chooseIso') void session.act(action);
@@ -47,7 +58,9 @@
 	let title = $derived(!session.report ? 'Looking at this PC' : session.blocked ? 'Almost there' : 'This PC is ready for Luft');
 	let description = $derived(
 		!session.report
-			? 'This takes a few seconds.'
+			? slow
+				? 'Windows is working out how much room it can spare. On a big drive this can take a few minutes.'
+				: 'This takes a moment.'
 			: session.blocked
 				? 'Something needs to change before Luft can move in. Here’s what to do.'
 				: 'Here’s what Meet Luft found.'
@@ -57,8 +70,8 @@
 <Frame {title} {description} onback={() => session.go('hello')}>
 	{#if !session.report}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
-			{#if session.error}
-				<span class="text-[var(--danger)]">{session.error}</span>
+			{#if session.failure}
+				<Problem failure={session.failure} />
 			{:else}
 				<LoaderCircle size={18} class="animate-spin" />Checking the drive, the firmware and the hardware…
 			{/if}
@@ -81,9 +94,12 @@
 				</li>
 			{/each}
 		</ul>
+		{#if session.failure}
+			<div class="mt-3 px-3.5"><Problem failure={session.failure} /></div>
+		{/if}
 	{/if}
 	{#snippet actions()}
-		{#if session.error || session.blocked}
+		{#if session.report && session.blocked}
 			<button type="button" class="button large px-6" disabled={session.busy} onclick={() => session.check()}>Check again</button>
 		{:else if session.report}
 			<button type="button" class="button primary large px-6" onclick={() => session.go('room')}>Continue</button>

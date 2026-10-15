@@ -4,7 +4,9 @@
 	import { bytes, Checkbox, plural } from '@luft/ui';
 	import * as meet from '#lib/api/meet.js';
 	import type { Belongings, FolderKind } from '#lib/api/meet.js';
+	import type { Failure } from '#lib/state/meet.svelte.js';
 	import Frame from '#lib/components/Frame.svelte';
+	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 
 	const NAMES: Record<FolderKind, string> = {
@@ -19,7 +21,7 @@
 	const A_WHILE = 20 * 1000 ** 3;
 
 	let found = $state<Belongings | null>(null);
-	let problem = $state('');
+	let problem = $state<Failure | null>(null);
 	let folders = $state<Record<string, boolean>>({});
 	let wallpaper = $state(true);
 	let wifi = $state(false);
@@ -32,14 +34,18 @@
 	let total = $derived(chosen.reduce((sum, folder) => sum + folder.bytes, 0));
 	let minutes = $derived(Math.max(1, Math.round(total / BYTES_PER_MINUTE)));
 
-	onMount(async () => {
+	async function look() {
+		problem = null;
 		try {
 			found = await meet.belongings();
 			folders = Object.fromEntries(found.folders.map((folder) => [folder.kind, folder.kind !== 'downloads' && folder.bytes > 0]));
 		} catch (error) {
-			problem = meet.message(error);
+			console.error('Meet Luft couldn’t look through the folders:', error);
+			problem = { task: 'folders', declined: false, retry: look };
 		}
-	});
+	}
+
+	onMount(look);
 
 	function pack() {
 		if (!found) return;
@@ -58,7 +64,7 @@
 	{#if !found}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 			{#if problem}
-				<span class="text-[var(--danger)]">{problem}</span>
+				<Problem failure={problem} />
 			{:else}
 				<LoaderCircle size={18} class="animate-spin" />Looking through your folders…
 			{/if}
@@ -120,8 +126,8 @@
 				</Checkbox>
 			</div>
 		</div>
-		{#if session.error}
-			<p class="mt-4 text-[13.5px] text-[var(--danger)]">{session.error}</p>
+		{#if session.failure}
+			<div class="mt-4"><Problem failure={session.failure} /></div>
 		{/if}
 	{/if}
 	{#snippet actions()}

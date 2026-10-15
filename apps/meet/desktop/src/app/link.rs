@@ -24,6 +24,7 @@ use windows::Win32::UI::Shell::{
 use windows::Win32::UI::WindowsAndMessaging::SW_HIDE;
 use windows::core::{HSTRING, PCWSTR, w};
 
+use super::job::Failed;
 use super::{Events, PROGRESS};
 use crate::protocol::{Call, Reply, Request};
 
@@ -75,7 +76,7 @@ fn pipe(
     Ok(handle)
 }
 
-fn launch(name: &str) -> Result<OwnedHandle, String> {
+fn launch(name: &str) -> Result<OwnedHandle, Failed> {
     let program = std::env::current_exe().map_err(|error| error.to_string())?;
     let parameters = format!("{} {name} {}", crate::helper::ARGUMENT, unsafe {
         GetCurrentProcessId()
@@ -93,10 +94,12 @@ fn launch(name: &str) -> Result<OwnedHandle, String> {
     };
     match unsafe { ShellExecuteExW(&mut info) } {
         Ok(()) => Ok(OwnedHandle(info.hProcess)),
-        Err(error) if error.code() == ERROR_CANCELLED.to_hresult() => Err(
-            "Meet Luft needs your permission to look at your drive and make room on it. Try again and choose Yes.".to_owned(),
-        ),
-        Err(error) => Err(format!("Meet Luft's helper didn't start: {error}")),
+        Err(error) if error.code() == ERROR_CANCELLED.to_hresult() => {
+            Err(Failed::declined(error.to_string()))
+        }
+        Err(error) => Err(Failed::from(format!(
+            "Meet Luft's helper didn't start: {error}"
+        ))),
     }
 }
 
@@ -141,7 +144,7 @@ fn read_replies(replies: File, waiting: Waiting, events: Events) {
         }
         *HELPER.lock().expect("helper lock") = None;
         for (_, waiter) in waiting.lock().expect("waiting lock").drain() {
-            let _ = waiter.send(Err("Meet Luft's helper stopped. Try again.".to_owned()));
+            let _ = waiter.send(Err("Meet Luft's helper stopped".to_owned()));
         }
     });
 }
@@ -152,7 +155,7 @@ fn answer(waiting: &Waiting, id: u64, result: Result<Value, String>) {
     }
 }
 
-fn start(events: &Events) -> Result<Helper, String> {
+fn start(events: &Events) -> Result<Helper, Failed> {
     let name = format!(
         r"\\.\pipe\com.lantharos.meet-{}-{}",
         unsafe { GetCurrentProcessId() },
@@ -181,7 +184,7 @@ fn start(events: &Events) -> Result<Helper, String> {
     Ok(Helper { calls, waiting })
 }
 
-pub fn call(events: &Events, call: Call) -> Result<Value, String> {
+pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
     let id = NEXT.fetch_add(1, Ordering::Relaxed);
     let (sender, receiver) = channel();
     {
@@ -205,5 +208,6 @@ pub fn call(events: &Events, call: Call) -> Result<Value, String> {
     }
     receiver
         .recv()
-        .map_err(|_| "Meet Luft's helper stopped. Try again.".to_owned())?
+        .map_err(|_| "Meet Luft's helper stopped".to_owned())?
+        .map_err(Failed::from)
 }

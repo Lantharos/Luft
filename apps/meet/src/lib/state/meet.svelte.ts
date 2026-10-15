@@ -2,6 +2,13 @@ import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
 export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed';
+export type Task = 'check' | 'room' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders';
+
+export interface Failure {
+	task: Task;
+	declined: boolean;
+	retry: () => unknown;
+}
 
 const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'removed'];
 const GIB = 1024 ** 3;
@@ -22,7 +29,7 @@ class MeetState {
 	source = $state<Source>({ kind: 'download', channel: 'latest' });
 	luft = $state(0);
 	busy = $state(false);
-	error = $state('');
+	failure = $state<Failure | null>(null);
 	note = $state<ChannelNote | null>(null);
 
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
@@ -33,17 +40,23 @@ class MeetState {
 
 	go(step: Step) {
 		this.direction = ORDER.indexOf(step) >= ORDER.indexOf(this.step) ? 1 : -1;
-		this.error = '';
+		this.failure = null;
 		this.step = step;
 	}
 
-	private async run<T>(work: () => Promise<T>): Promise<T | null> {
+	private async run<T>(task: Task, work: () => Promise<T>, retry: () => unknown): Promise<T | null> {
 		this.busy = true;
-		this.error = '';
+		this.failure = null;
 		try {
 			return await work();
 		} catch (error) {
-			this.error = meet.message(error);
+			console.error(`Meet Luft couldn't finish ${task}:`, error);
+			const stage = this.progress?.stage;
+			this.failure = {
+				task: task === 'room' && stage === 'downloading' ? 'download' : task,
+				declined: error instanceof meet.Failed && error.failure === 'declined',
+				retry
+			};
 			return null;
 		} finally {
 			this.busy = false;
@@ -52,7 +65,7 @@ class MeetState {
 
 	private async inspect() {
 		const inspection = ++this.inspection;
-		const report = await this.run(() => meet.check($state.snapshot(this.source)));
+		const report = await this.run('check', () => meet.check($state.snapshot(this.source)), () => this.check());
 		if (!report || inspection !== this.inspection) return null;
 		this.report = report;
 		this.prepared = report.prepared;
@@ -96,15 +109,22 @@ class MeetState {
 		await this.check();
 	}
 
-	private async working<T>(first: Stage, work: () => Promise<T>, after: 'ready' | 'removed', back: 'room' | 'ready' | 'box') {
+	private async working<T>(
+		task: Task,
+		first: Stage,
+		work: () => Promise<T>,
+		retry: () => unknown,
+		after: 'ready' | 'removed',
+		back: 'room' | 'ready' | 'box'
+	) {
 		this.progress = { stage: first, done: 0, total: 0 };
 		this.go('working');
-		const result = await this.run(work);
+		const result = await this.run(task, work, retry);
 		this.progress = null;
-		if (result === null && this.error) {
-			const error = this.error;
+		if (result === null && this.failure) {
+			const failure = this.failure;
 			this.go(back);
-			this.error = error;
+			this.failure = failure;
 			return null;
 		}
 		this.go(after);
@@ -112,28 +132,38 @@ class MeetState {
 	}
 
 	async makeRoom() {
-		const prepared = await this.working('shrinking', () => meet.prepare(this.luft, $state.snapshot(this.source)), 'ready', 'room');
+		const prepared = await this.working(
+			'room',
+			'shrinking',
+			() => meet.prepare(this.luft, $state.snapshot(this.source)),
+			() => this.makeRoom(),
+			'ready',
+			'room'
+		);
 		if (prepared) this.prepared = prepared;
 	}
 
 	async pack(packing: Packing) {
-		const prepared = await this.working('packing', () => meet.pack(packing), 'ready', 'box');
+		const prepared = await this.working('pack', 'packing', () => meet.pack(packing), () => this.pack(packing), 'ready', 'box');
 		if (prepared) this.prepared = prepared;
 	}
 
 	async remove() {
-		await this.working('removing', () => meet.undo().then(() => true), 'removed', 'ready');
+		await this.working('remove', 'removing', () => meet.undo().then(() => true), () => this.remove(), 'removed', 'ready');
 	}
 
-	restart(intent: Intent, windows: WindowsChoices) {
-		return this.run(() => meet.restart(intent, windows));
+	async restart(intent: Intent, windows: WindowsChoices): Promise<void> {
+		await this.run('restart', () => meet.restart(intent, windows), () => this.restart(intent, windows));
 	}
 
-	async act(action: Action) {
+	async act(action: Action): Promise<void> {
 		if (action === 'chooseIso') return this.chooseIso();
-		if (action === 'firmwareSettings') return this.run(() => meet.firmwareSettings());
-		await this.run(() => meet.tidy());
-		await this.check();
+		if (action === 'firmwareSettings') {
+			await this.run('firmware', () => meet.firmwareSettings(), () => this.act(action));
+			return;
+		}
+		const tidied = await this.run('tidy', () => meet.tidy().then(() => true), () => this.act(action));
+		if (tidied !== null) await this.check();
 	}
 
 	listen() {

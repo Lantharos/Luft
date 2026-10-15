@@ -5,6 +5,7 @@
 	import { bytes, Choice, Dialog, Switch } from '@luft/ui';
 	import type { Intent, WindowsChoices } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
+	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 
 	interface Option {
@@ -66,8 +67,8 @@
 			onclick={() => (restarting = 'install')}
 		/>
 	</div>
-	{#if session.error}
-		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{session.error}</p>
+	{#if session.failure}
+		<div class="mt-4"><Problem failure={session.failure} /></div>
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>Remove Luft from this PC</button>

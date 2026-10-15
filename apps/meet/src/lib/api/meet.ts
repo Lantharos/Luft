@@ -84,19 +84,62 @@ export interface WindowsChoices {
 	universalClock: boolean;
 }
 
-export const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+export type Failure = 'declined' | 'stopped';
 
-const FOREVER = 24 * 60 * 60 * 1000;
-const CHECKING = 5 * 60 * 1000;
+export class Failed extends Error {
+	constructor(
+		readonly failure: Failure,
+		detail: string
+	) {
+		super(detail);
+	}
+}
 
-export const check = (source: Source) => invoke<Report>('meet_check', { source }, { timeoutMs: CHECKING });
-export const prepare = (luft: number, source: Source) => invoke<Prepared>('meet_prepare', { luft, source }, { timeoutMs: FOREVER });
-export const pack = (belongings: Packing) => invoke<Prepared>('meet_pack', { belongings }, { timeoutMs: FOREVER });
-export const restart = (intent: Intent, windows: WindowsChoices) => invoke<null>('meet_restart', { intent, windows }, { timeoutMs: CHECKING });
-export const tidy = () => invoke<null>('meet_tidy', {}, { timeoutMs: CHECKING });
-export const firmwareSettings = () => invoke<null>('meet_firmware_settings', {}, { timeoutMs: CHECKING });
-export const undo = () => invoke<null>('meet_undo', {}, { timeoutMs: FOREVER });
-export const pickIso = () => invoke<string | null>('meet_pick_iso', {}, { timeoutMs: FOREVER });
+type Finished = { job: number; value: unknown } | { job: number; failure: Failure; detail: string };
+
+interface Waiting {
+	resolve: (value: unknown) => void;
+	reject: (error: Failed) => void;
+}
+
+const waiting = new Map<number, Waiting>();
+let nextJob = 1;
+let listening = false;
+
+function settle(finished: Finished) {
+	const job = waiting.get(finished.job);
+	if (!job) return;
+	waiting.delete(finished.job);
+	if ('failure' in finished) job.reject(new Failed(finished.failure, finished.detail));
+	else job.resolve(finished.value);
+}
+
+async function start<T>(command: string, request: object = {}): Promise<T> {
+	if (!listening) {
+		listen<Finished>('meet.finished', settle);
+		listening = true;
+	}
+	const job = nextJob++;
+	const finished = new Promise<T>((resolve, reject) => waiting.set(job, { resolve: resolve as (value: unknown) => void, reject }));
+	try {
+		await invoke(command, { job, request });
+	} catch (error) {
+		waiting.delete(job);
+		throw error;
+	}
+	return finished;
+}
+
+const call = <T>(request: object) => start<T>('meet_call', request);
+
+export const check = (source: Source) => call<Report>({ call: 'check', source });
+export const prepare = (luft: number, source: Source) => call<Prepared>({ call: 'prepare', luft, source });
+export const pack = (belongings: Packing) => call<Prepared>({ call: 'pack', belongings });
+export const restart = (intent: Intent, windows: WindowsChoices) => call<null>({ call: 'restart', intent, windows });
+export const tidy = () => call<null>({ call: 'tidy' });
+export const firmwareSettings = () => call<null>({ call: 'firmwareSettings' });
+export const undo = () => call<null>({ call: 'undo' });
+export const pickIso = () => start<string | null>('meet_pick_iso');
+export const belongings = () => start<Belongings>('meet_belongings');
 export const defaultSource = () => invoke<Source>('meet_source', {});
-export const belongings = () => invoke<Belongings>('meet_belongings', {}, { timeoutMs: CHECKING });
 export const onProgress = (callback: (progress: Progress) => void) => listen<Progress>('meet.progress', callback);

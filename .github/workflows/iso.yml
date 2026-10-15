@@ -61,7 +61,9 @@ jobs:
           fi
           version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$image")"
           if [[ "$version" == *-nightly ]]; then channel=nightly; else channel=latest; fi
-          if [[ "$GITHUB_EVENT_NAME" == workflow_run ]] && curl -sfIo /dev/null "$DOWNLOADS/luft-$version.iso"; then
+          if [[ "$channel" == nightly ]]; then published="$(curl -sf "$DOWNLOADS/luft-nightly.version" || true)"
+          elif curl -sfIo /dev/null "$DOWNLOADS/luft-$version.iso"; then published="$version"; fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_run && "${published:-}" == "$version" ]]; then
             echo "luft-$version.iso is already published."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
@@ -85,12 +87,18 @@ jobs:
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
           cd "$LUFT_ISO"
           iso="$(ls luft-*.iso)"
-          for file in "$iso" "$iso.sha256"; do
-            aws s3 cp --endpoint-url "$endpoint" --no-progress "$file" "s3://$R2_BUCKET/$file"
-          done
+          s3() { aws s3 "$@" --endpoint-url "$endpoint" --no-progress; }
+          if [[ "$CHANNEL" == latest ]]; then
+            s3 cp "$iso" "s3://$R2_BUCKET/$iso"
+            s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
+          fi
           alias="luft-$CHANNEL.iso"
-          aws s3 cp --endpoint-url "$endpoint" --no-progress "$iso" "s3://$R2_BUCKET/$alias"
-          sed "s/$iso/$alias/" "$iso.sha256" | aws s3 cp --endpoint-url "$endpoint" - "s3://$R2_BUCKET/$alias.sha256"
+          s3 cp "$iso" "s3://$R2_BUCKET/$alias"
+          sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
+          if [[ "$CHANNEL" == nightly ]]; then
+            echo "${iso#luft-}" | sed 's/\.iso$//' | s3 cp - "s3://$R2_BUCKET/luft-nightly.version"
+            aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256'
+          fi
 
       - name: Keep as a workflow artifact
         if: env.SKIP != '1' && (env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == '')

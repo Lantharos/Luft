@@ -54,7 +54,7 @@ jobs:
       - name: Bundle
         working-directory: apps/meet
         run: |
-          $bundle = sabine bundle . --target exe --release --json | Select-Object -Last 1
+          $bundle = sabine bundle . --target exe --release --out $env:RUNNER_TEMP/meet --json | Select-Object -Last 1
           if ($LASTEXITCODE -ne 0) { throw 'Bundling failed' }
           $setup = ($bundle | ConvertFrom-Json).artifacts | Select-Object -First 1
           New-Item -ItemType Directory -Force out | Out-Null

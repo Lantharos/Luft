@@ -80,7 +80,7 @@ jobs:
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create $env:GITHUB_REF_NAME apps/meet/out/meet-luft.exe apps/meet/out/meet-luft.exe.sha256 --title "Meet Luft $($env:GITHUB_REF_NAME -replace '^meet-v')" --notes 'Meet Luft for Windows. The download is not code-signed yet, so Windows SmartScreen asks before it opens.'
+        run: gh release create $env:GITHUB_REF_NAME apps/meet/out/meet-luft.exe apps/meet/out/meet-luft.exe.sha256 --latest=false --title "Meet Luft $($env:GITHUB_REF_NAME -replace '^meet-v')" --notes 'Meet Luft for Windows. The download is not code-signed yet, so Windows SmartScreen asks before it opens.'
 
       - uses: actions/upload-artifact@v7
         with:

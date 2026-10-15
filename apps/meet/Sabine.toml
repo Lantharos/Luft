@@ -14,3 +14,8 @@ dist = "dist"
 entry = "dist/index.html"
 build = "bun run build"
 local_files = true
+
+[updates]
+provider = "github"
+repository = "Lantharos/Luft"
+policy = "disabled"

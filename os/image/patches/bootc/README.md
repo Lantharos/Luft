@@ -1,6 +1,6 @@
 # bootc patches
 
-The image build rebuilds Fedora's bootc package with these patches (`image/stages/bootc.sh`), from the source of the exact version in the base image.
+The image build rebuilds Fedora's bootc package with these patches (`image/parts/stages/bootc.sh`), from the source of the exact version in the base image.
 
 | Patch | Why |
 | --- | --- |

@@ -11,7 +11,7 @@ usage() {
   cat <<'USAGE'
 Usage: apps/meet/vm/iso.sh
 
-Builds a Luft ISO with this checkout's installer, Install Luft and live start-up,
+Builds a Luft ISO with this checkout's installer, Install Luft, trustd and live start-up,
 on top of localhost/luft-system:45 and :45-nvidia (made by os/image/build.sh), so
 Meet Luft can be tried against them without building the whole image. Writes
 apps/meet/vm/state/luft-meet.iso and its .sha256 (MEET_VM picks another folder).
@@ -36,6 +36,7 @@ stage_changes() {
   rm -rf "$stage"
   mkdir -p "$stage/root"
   install -Dm755 "$installer/target/release/luft-installer" "$stage/root/usr/libexec/luft-installer"
+  "$luft/security/scripts/build.sh" "$stage/root"
   (cd "$luft" && bun install --frozen-lockfile)
   sabine install --bundle --system-wide --root "$stage/root" "$luft/apps/setup"
   printf 'ARG BASE\nFROM ${BASE}\nCOPY root/ /\n' > "$stage/Containerfile"

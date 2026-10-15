@@ -38,7 +38,7 @@ vm/run.sh plain            # a copy of it to test in; delete vm/state/plain to s
 vm/control.py plain wait   # until Windows is up
 vm/control.py plain run 'Get-Partition'
 vm/control.py plain screenshot shot.png
-vm/iso.sh                  # a Luft ISO with this checkout's installer and Install Luft
+vm/iso.sh                  # a Luft ISO with this checkout's installer, Install Luft and trustd
 ```
 
 The VM needs the Windows 11 Enterprise evaluation ISO and the virtio-win ISO in `vm/state`. Windows signs in as `ada` (password `meet-vm`) by itself, with the QEMU guest agent, so `control.py` can run PowerShell as SYSTEM, copy files and click and type.

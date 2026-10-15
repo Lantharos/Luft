@@ -4,6 +4,7 @@ pub mod creds;
 pub mod efi;
 pub mod journal;
 pub mod keyring;
+pub mod live;
 pub mod power;
 pub mod scratch;
 pub mod secret;

@@ -10,7 +10,7 @@ use std::time::Duration;
 
 use access::Idle;
 
-use crate::{boot, keys};
+use crate::{boot, keys, system};
 
 pub use interface::Trust;
 
@@ -27,17 +27,8 @@ pub fn run() -> anyhow::Result<()> {
 }
 
 async fn serve() -> zbus::Result<()> {
-    if let Err(error) = tokio::task::spawn_blocking(keys::mok::follow_up)
-        .await
-        .expect("following up on the key enrollment doesn't panic")
-    {
-        eprintln!("Couldn't follow up on adding Luft's key: {error:#}");
-    }
-    if let Err(error) = tokio::task::spawn_blocking(boot::startup::follow_up)
-        .await
-        .expect("following up on the startup doesn't panic")
-    {
-        eprintln!("Couldn't follow up on Luft's startup: {error:#}");
+    if !system::live::running() {
+        follow_up_on_this_start().await;
     }
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()?
@@ -51,4 +42,19 @@ async fn serve() -> zbus::Result<()> {
     idle.wait(IDLE_TIMEOUT).await;
     connection.release_name(NAME).await?;
     Ok(())
+}
+
+async fn follow_up_on_this_start() {
+    if let Err(error) = tokio::task::spawn_blocking(keys::mok::follow_up)
+        .await
+        .expect("following up on the key enrollment doesn't panic")
+    {
+        eprintln!("Couldn't follow up on adding Luft's key: {error:#}");
+    }
+    if let Err(error) = tokio::task::spawn_blocking(boot::startup::follow_up)
+        .await
+        .expect("following up on the startup doesn't panic")
+    {
+        eprintln!("Couldn't follow up on Luft's startup: {error:#}");
+    }
 }

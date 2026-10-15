@@ -247,6 +247,7 @@ impl Installer {
         if pending.is_none() || pending != caller {
             return Err(Error::not_authorized());
         }
+        let _activity = self.idle.hold();
         Self::blocking(move || first_boot::finish(&state_dir)).await
     }
 }

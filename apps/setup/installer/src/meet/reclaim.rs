@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use luft_disks::resize;
 use luft_disks::udisks::snapshot;
 use luft_disks::udisks::volumes::Segment;
 use luft_disks::udisks::{self, PARTITION, no_options};
@@ -12,6 +11,9 @@ use crate::system::files::write;
 
 const RECORD: &str = "meet.json";
 const PHYSICAL_ROOT: &str = "/sysroot";
+const WRITABLE_ROOT: &str = "/var";
+const BOOT_VARIABLES: &str = "/sys/firmware/efi/efivars";
+const GLOBAL_VARIABLES: &str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
 
 pub fn record(state_dir: &Path) -> PathBuf {
     state_dir.join(RECORD)
@@ -93,15 +95,22 @@ fn grow_root() -> Result<()> {
                 },
                 &free,
             ) {
-                resize::resize(&root.block, size, false).map_err(anyhow::Error::msg)?;
+                udisks::run(&root.block, PARTITION, "Resize", &(size, no_options()))
+                    .map_err(anyhow::Error::msg)?;
             }
-            return Ok(());
+            return Tool::new("btrfs")
+                .args(["filesystem", "resize", "max", WRITABLE_ROOT])
+                .run();
         }
     }
     Ok(())
 }
 
 fn remove_start_entry(number: u16) -> Result<()> {
+    let variable = Path::new(BOOT_VARIABLES).join(format!("Boot{number:04X}-{GLOBAL_VARIABLES}"));
+    if !variable.exists() {
+        return Ok(());
+    }
     Tool::new("efibootmgr")
         .args([
             "--quiet",

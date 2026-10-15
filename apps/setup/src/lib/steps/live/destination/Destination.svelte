@@ -41,12 +41,15 @@
 	});
 	let chosenDrive = $derived(target ? install.drive(target.drive) : null);
 
+	const MEET_ROOM: [string, string] = ['Next to Windows', 'Meet Luft already made this room, so Windows stays just as it is.'];
 	const TITLES: Record<View, [string, string]> = {
 		choose: ['Where should Luft go?', 'Pick how Luft fits on this computer. Nothing changes until you confirm.'],
 		alongside: ['Make room next to Windows', 'Windows gets smaller to make space for Luft. Your files in Windows stay as they are.'],
 		whole: ['Choose a drive', 'Luft takes over the whole drive. Everything on it is erased.'],
 		custom: ['Choose the space for Luft', 'Use Disks to arrange your drives your way.']
 	};
+
+	let [title, description] = $derived(view === 'alongside' && meet?.space ? MEET_ROOM : TITLES[view]);
 
 	async function justTry() {
 		if (!(await finishSetup().catch(() => false))) await appWindow.close();
@@ -63,7 +66,7 @@
 	}
 </script>
 
-<StepFrame title={TITLES[view][0]} description={TITLES[view][1]} onback={view === 'choose' ? undefined : back}>
+<StepFrame {title} {description} onback={view === 'choose' ? undefined : back}>
 	{#if !survey}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 			{#if install.surveyError}
@@ -107,7 +110,7 @@
 
 {#if confirming && target && chosenDrive}
 	<Dialog
-		title={target.kind === 'whole' ? `Erase ${chosenDrive.name}?` : target.kind === 'alongside' ? `Shrink Windows to ${bytes(chosenDrive.windows!.size - target.size)}?` : 'Install Luft in the free space?'}
+		title={target.kind === 'whole' ? `Erase ${chosenDrive.name}?` : target.kind === 'alongside' ? `Shrink Windows to ${bytes(chosenDrive.windows!.size - target.size)}?` : meet?.space ? 'Install Luft next to Windows?' : 'Install Luft in the free space?'}
 		description={target.kind === 'whole'
 			? 'Everything on this drive is erased for good, including other systems and files.'
 			: 'Luft starts copying right away. You can set up your account while it works.'}

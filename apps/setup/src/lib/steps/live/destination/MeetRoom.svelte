@@ -19,12 +19,9 @@
 		<div class="windows flex min-w-28 basis-0 items-end rounded-[16px] p-3 text-[13px] font-medium" style:flex-grow={drive.windows?.size ?? drive.size - space.size}>Windows</div>
 		<div class="luft flex min-w-36 basis-0 items-end rounded-[16px] p-3 text-[13px] font-medium" style:flex-grow={space.size}>Luft, {bytes(space.size)}</div>
 	</div>
-	<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">
-		Meet Luft already made this room on {drive.name}, so Windows stays just as it is.
-		{#if packed}
-			Your moving box, {bytes(packed)}, is unpacked into your new account.
-		{/if}
-	</p>
+	{#if packed}
+		<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">The things you packed in Windows, {bytes(packed)}, are unpacked into your new account.</p>
+	{/if}
 	{#if windows}
 		<WindowsOptions {windows} />
 	{/if}

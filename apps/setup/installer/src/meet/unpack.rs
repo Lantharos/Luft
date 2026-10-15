@@ -34,13 +34,19 @@ impl Copying<'_> {
             if kind.is_dir() {
                 self.tree(&entry.path(), &target)?;
             } else if kind.is_file() {
-                self.done += fs::copy(entry.path(), &target)
+                self.done += copy(&entry.path(), &target)
                     .with_context(|| format!("Couldn't unpack {}", entry.path().display()))?;
                 (self.progress)(self.done as f64 / self.total.max(1) as f64);
             }
         }
         Ok(())
     }
+}
+
+fn copy(from: &Path, to: &Path) -> Result<u64> {
+    let copied = fs::copy(from, to)?;
+    fs::set_permissions(to, fs::Permissions::from_mode(0o644))?;
+    Ok(copied)
 }
 
 fn uuid() -> Result<String> {
@@ -100,7 +106,7 @@ fn picture(
     };
     let icon = deployment.var(&format!("{ICONS}/{user}"));
     fs::create_dir_all(icon.parent().expect("icons live in a folder"))?;
-    fs::copy(from.join(picture), &icon)?;
+    copy(&from.join(picture), &icon)?;
     let settings = deployment.var(&format!("{USERS}/{user}"));
     write(
         &settings,
@@ -118,7 +124,7 @@ fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Resul
         .context("The wallpaper has no name")?;
     let target = home.join(BACKGROUNDS).join(name);
     fs::create_dir_all(target.parent().expect("backgrounds live in a folder"))?;
-    fs::copy(from.join(wallpaper), &target)?;
+    copy(&from.join(wallpaper), &target)?;
     let uri = format!(
         "file:///var/home/{user}/{BACKGROUNDS}/{}",
         name.to_string_lossy()

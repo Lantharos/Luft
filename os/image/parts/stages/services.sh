@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-luft="$(cd "$(dirname "$0")/../../.." && pwd)"
+luft="$(cd "$(dirname "$0")/../../../.." && pwd)"
 destdir="$1"
-
-sabine_tag="$(sed -n 's|^sabine = { git = "https://github.com/Lantharos/Sabine", tag = "\([^"]*\)" }$|\1|p' "$luft/packages/app/Cargo.toml")"
-cargo install --locked --root /usr/local --git https://github.com/Lantharos/Sabine --tag "$sabine_tag" \
-  sabine-cli sabine-service
-
-sabine runtime install --system-wide --root "$destdir"
-strip --strip-debug "$destdir"/usr/lib/sabine/runtimes/cef/*/Release/libcef.so
 
 installer="$luft/apps/setup/installer"
 cargo build --release --locked --manifest-path "$installer/Cargo.toml"
@@ -42,9 +35,3 @@ printf 'enable luft-windows-boot.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-windows.preset"
 printf 'enable luft-windows-notice.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-windows.preset"
-
-(cd "$luft" && bun install --frozen-lockfile)
-for app in "$luft"/apps/*/; do
-  [[ "$app" == */apps/meet/ ]] && continue
-  sabine install --bundle --system-wide --root "$destdir" "$app"
-done

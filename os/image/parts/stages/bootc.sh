@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-patches="$(cd "$(dirname "$0")/../patches/bootc" && pwd)"
+patches="$(cd "$(dirname "$0")/../../patches/bootc" && pwd)"
 out="$1"
 version="$(rpm -q --qf '%{VERSION}-%{RELEASE}' bootc)"
-top="$(mktemp -d)"
+top=/var/tmp/bootc-rpm
 spec="$top/SPECS/bootc.spec"
 
+mkdir -p "$top"
 dnf install -y --setopt=keepcache=True rpm-build
 dnf download --source --destdir "$top" "bootc-$version"
 rpm --define "_topdir $top" -i "$top"/bootc-*.src.rpm

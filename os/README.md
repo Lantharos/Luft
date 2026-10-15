@@ -20,12 +20,15 @@ os/image/build.sh luft-nvidia   # localhost/luft:45-nvidia
 
 Each image is sealed: `image/seal.sh` adds a startup image (kernel, initramfs and command line in one file) that names the image's exact root file system by its composefs digest, signs it for Secure Boot and signs its TPM policy. Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys named by `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and `LUFT_PCR_KEY` (PEM), and ship the public halves. Without them they make throwaway keys in `os/image/state/keys`. CI signs with the real keys, whose public halves are in `image/keys`. How the computer starts from there is in [docs/boot.md](../docs/boot.md).
 
-The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour; later builds reuse what they can. Every checkout shares these caches, and a build recompiles whatever differs in content from the one before it, whichever checkout that came from.
+The image is put together from parts: Kestrel, the boot and security services, the patched bootc, the web runtime, the system services, each app and NVIDIA's driver. Each part is an image named after a hash of everything it's built from, so a build only makes the parts whose sources changed; `LUFT_REBUILD=1` makes them all again. The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour. Compilers keep their caches in `~/.cache/luft-image`, shared by every checkout, so later builds recompile only what differs.
+
+CI builds each changed part in its own job, all at once, keeps it at `ghcr.io/lantharos/luft-parts` and carries the compiler caches over to the next run. A last job puts both images together, seals and publishes them. Releases make every part again, as does running the Image workflow by hand with *rebuild*.
 
 | Path | Holds |
 | --- | --- |
-| `image/Containerfile` | The build: one stage each for Kestrel, the boot and security services, and the apps, then the image |
-| `image/stages` | The scripts each stage runs |
+| `image/Containerfile` | The image, put together from the parts |
+| `image/parts` | Building the parts, and the scripts each one runs |
+| `image/stages` | The scripts that put the image together |
 | `image/packages` | Fedora packages for building, those added to the image, the codecs from RPM Fusion, and the GNOME parts Kestrel replaces |
 | `image/patches` | Changes to Fedora packages the image rebuilds, such as bootc |
 | `image/files` | Files copied into the image as they are |

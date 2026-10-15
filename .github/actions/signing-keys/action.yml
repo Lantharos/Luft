@@ -1,0 +1,41 @@
+name: Signing keys
+description: Writes Luft's signing keys for the build, after checking them against the public halves in os/image/keys.
+
+inputs:
+  key:
+    description: LUFT_SECUREBOOT_KEY
+    required: true
+  certificate:
+    description: LUFT_SECUREBOOT_CERT
+    required: true
+  pcr-key:
+    description: LUFT_PCR_KEY, for sealing
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Signing keys
+      shell: bash
+      env:
+        KEY: ${{ inputs.key }}
+        CERT: ${{ inputs.certificate }}
+        PCR_KEY: ${{ inputs.pcr-key }}
+      run: |
+        [[ -n "$KEY" && -n "$CERT" ]] || { echo "::error::LUFT_SECUREBOOT_KEY or LUFT_SECUREBOOT_CERT isn't set."; exit 1; }
+        keys="$RUNNER_TEMP/secure-boot"
+        mkdir -m 700 "$keys"
+        printf '%s\n' "$KEY" > "$keys/key.pem"
+        printf '%s\n' "$CERT" > "$keys/cert.pem"
+        cmp <(openssl x509 -in "$keys/cert.pem" -outform DER) os/image/keys/luft-secureboot.der ||
+          { echo "::error::LUFT_SECUREBOOT_CERT isn't the certificate in os/image/keys"; exit 1; }
+        {
+          echo "LUFT_KEYS=$keys"
+          echo "LUFT_SECUREBOOT_KEY=$keys/key.pem"
+          echo "LUFT_SECUREBOOT_CERT=$keys/cert.pem"
+        } >> "$GITHUB_ENV"
+        [[ -n "$PCR_KEY" ]] || exit 0
+        printf '%s\n' "$PCR_KEY" > "$keys/pcr.pem"
+        cmp <(openssl pkey -in "$keys/pcr.pem" -pubout) os/image/keys/luft-pcr-policy.pub.pem ||
+          { echo "::error::LUFT_PCR_KEY doesn't match the public key in os/image/keys"; exit 1; }
+        echo "LUFT_PCR_KEY=$keys/pcr.pem" >> "$GITHUB_ENV"

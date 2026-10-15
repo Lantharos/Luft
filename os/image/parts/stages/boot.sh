@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-luft="$(cd "$(dirname "$0")/../../.." && pwd)"
+luft="$(cd "$(dirname "$0")/../../../.." && pwd)"
 destdir="$1"
 key="$2"
 certificate="$3"
 boot_menu="$destdir/usr/lib/sushi/efi/SushiBoot.efi"
 
-# shellcheck source=../../../boot/sushi/scripts/install.sh
+# shellcheck source=../../../../boot/sushi/scripts/install.sh
 source "$luft/boot/sushi/scripts/install.sh"
 
 "$luft/security/scripts/build.sh" "$destdir"

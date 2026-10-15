@@ -1,0 +1,136 @@
+ARG BASE=quay.io/fedora/fedora-bootc:45
+
+FROM ${BASE} AS builder
+ARG BUN_VERSION=1.4.2
+COPY os/image/packages/build.txt /tmp/build.txt
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf install -y --setopt=keepcache=True dnf5-plugins rust cargo rust-std-static-x86_64-unknown-uefi \
+      $(cat /tmp/build.txt) && \
+    dnf builddep -y --setopt=keepcache=True mutter
+RUN mkdir -p /var/roothome && \
+    curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" -o /tmp/bun.zip && \
+    unzip -j /tmp/bun.zip bun-linux-x64/bun -d /usr/local/bin && rm /tmp/bun.zip
+ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUFT_BUILD=/var/cache/luft-part/build \
+    BUN_INSTALL_CACHE_DIR=/var/cache/bun RUSTC_WRAPPER=sccache SCCACHE_DIR=/var/cache/sccache SCCACHE_CACHE_SIZE=2G \
+    CCACHE_DIR=/var/cache/ccache CCACHE_MAXSIZE=1G
+
+FROM builder AS kestrel-build
+COPY kestrel /src/kestrel
+COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
+    --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    --mount=type=cache,from=cache,source=ccache,target=/var/cache/ccache \
+    --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
+    /src/os/image/parts/stages/kestrel.sh /stage /out && \
+    /src/os/image/parts/stages/needed.sh /stage /out
+
+FROM scratch AS kestrel
+COPY --from=kestrel-build /stage /stage
+COPY --from=kestrel-build /out/ /
+
+FROM builder AS boot-build
+COPY boot/sushi /src/boot/sushi
+COPY security /src/security
+COPY kestrel/passkeys /src/kestrel/passkeys
+COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
+COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+ARG SIGNED_BY
+RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
+    --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    --mount=type=secret,id=secureboot-key \
+    --mount=type=secret,id=secureboot-cert \
+    : "signed by ${SIGNED_BY}" && \
+    bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
+    /src/os/image/parts/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
+    /src/os/image/parts/stages/needed.sh /stage /out
+
+FROM scratch AS boot
+COPY --from=boot-build /stage /stage
+COPY --from=boot-build /out/ /
+
+FROM builder AS bootc-build
+ARG BASE
+COPY os/image/patches/bootc /src/os/image/patches/bootc
+COPY os/image/parts/stages/bootc.sh /src/os/image/parts/stages/bootc.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    : "built for ${BASE}" && \
+    /src/os/image/parts/stages/bootc.sh /out/rpms
+
+FROM scratch AS bootc
+COPY --from=bootc-build /out/ /
+
+FROM builder AS sabine
+ARG SABINE
+RUN --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    cargo install --locked --root /usr/local --target-dir /var/tmp/sabine-target \
+      --git https://github.com/Lantharos/Sabine --tag "${SABINE}" sabine-cli sabine-service && \
+    rm -rf /var/tmp/sabine-target
+
+FROM sabine AS runtime-build
+COPY os/image/parts/stages/needed.sh /src/os/image/parts/stages/needed.sh
+RUN --mount=type=cache,from=cache,source=sabine,target=/root/.local/share/sabine \
+    sabine runtime install --system-wide --root /stage && \
+    strip --strip-debug /stage/usr/lib/sabine/runtimes/cef/*/Release/libcef.so && \
+    /src/os/image/parts/stages/needed.sh /stage /out
+
+FROM scratch AS runtime
+COPY --from=runtime-build /stage /stage
+COPY --from=runtime-build /out/ /
+
+FROM builder AS services-build
+COPY packages /src/packages
+COPY security/Cargo.toml security/Cargo.lock /src/security/
+COPY security/crates /src/security/crates
+COPY apps/setup/installer /src/apps/setup/installer
+COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
+    --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
+    /src/os/image/parts/stages/services.sh /stage && \
+    /src/os/image/parts/stages/needed.sh /stage /out
+
+FROM scratch AS services
+COPY --from=services-build /stage /stage
+COPY --from=services-build /out/ /
+
+FROM sabine AS app-build
+ARG APP
+COPY package.json bun.lock /src/
+COPY packages /src/packages
+COPY security/Cargo.toml security/Cargo.lock /src/security/
+COPY security/crates /src/security/crates
+COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
+COPY apps/${APP} /src/apps/${APP}
+COPY os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
+    --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    bun /src/os/image/parts/stages/source-times.ts "/var/cache/luft-part/sources-${APP}.json" /src && \
+    (cd /src && bun install --frozen-lockfile) && \
+    sabine install --bundle --system-wide --root /stage "/src/apps/${APP}" && \
+    /src/os/image/parts/stages/needed.sh /stage /out
+
+FROM scratch AS app
+COPY --from=app-build /stage /stage
+COPY --from=app-build /out/ /
+
+FROM ${BASE} AS nvidia-build
+ARG BASE
+ARG SIGNED_BY
+COPY os/image/stages/rpmfusion.sh /src/os/image/stages/rpmfusion.sh
+COPY os/image/parts/stages/nvidia.sh /src/os/image/parts/stages/nvidia.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    --mount=type=secret,id=secureboot-key \
+    --mount=type=secret,id=secureboot-cert \
+    : "signed by ${SIGNED_BY}, built for ${BASE}" && \
+    /src/os/image/parts/stages/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert /out
+
+FROM scratch AS nvidia
+COPY --from=nvidia-build /out/ /

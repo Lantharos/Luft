@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-luft="$(cd "$(dirname "$0")/../../.." && pwd)"
+luft="$(cd "$(dirname "$0")/../../../.." && pwd)"
 destdir="$1"
+out="$2"
 work="${LUFT_BUILD:-/var/tmp/luft-build}/kestrel"
 
-# shellcheck source=../../../kestrel/tools/install.sh
+# shellcheck source=../../../../kestrel/tools/install.sh
 source "$luft/kestrel/tools/install.sh"
 prefix=/usr
 keyring_pam=/usr/lib64/security
@@ -22,6 +23,11 @@ image_path() {
 
 place() {
   install -Dm"$2" /dev/stdin "$destdir$(image_path "$1")"
+}
+
+keep_sources_in_work() {
+  mkdir -p "$work/run"
+  ln -sfn "$work/run" "$luft/kestrel/run"
 }
 
 build_compositor() {
@@ -89,9 +95,11 @@ list_typelibs() {
   grep -rhoE "gi://[A-Za-z0-9]+" "$luft/kestrel/engine/js" "$luft/kestrel/ui/src" | cut -d/ -f3 | sort -u
 }
 
+keep_sources_in_work
 build_compositor
 build_engine
 build_services
 stage_service_files
 stage_presets
-list_typelibs > "$2"
+mkdir -p "$out"
+list_typelibs > "$out/typelibs.txt"

@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
+    inputs:
+      rebuild:
+        description: Build every part again instead of reusing the unchanged ones
+        type: boolean
+        default: false
 
 concurrency:
   group: image-${{ github.ref }}
@@ -18,58 +23,34 @@ permissions:
 env:
   IMAGE: ghcr.io/lantharos/luft
   CACHE: ghcr.io/lantharos/luft-cache
+  LUFT_PARTS: ghcr.io/lantharos/luft-parts
   FEDORA: "45"
 
 jobs:
-  build:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 360
+  plan:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    outputs:
+      skip: ${{ steps.version.outputs.skip }}
+      version: ${{ steps.version.outputs.version }}
+      tags: ${{ steps.version.outputs.tags }}
+      reference: ${{ steps.version.outputs.reference }}
+      notes: ${{ steps.version.outputs.notes }}
+      base: ${{ steps.parts.outputs.base }}
+      parts: ${{ steps.parts.outputs.parts }}
+      signed: ${{ steps.parts.outputs.signed }}
     steps:
-      - name: Make room
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost
-          sudo docker image prune --all --force
-          df -h /
-
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 50
+
+      - uses: oven-sh/setup-bun@v2
 
       - name: Sign in to the registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
 
-      - name: Signing keys
-        env:
-          KEY: ${{ secrets.LUFT_SECUREBOOT_KEY }}
-          CERT: ${{ secrets.LUFT_SECUREBOOT_CERT }}
-          PCR_KEY: ${{ secrets.LUFT_PCR_KEY }}
-        run: |
-          keys="$RUNNER_TEMP/secure-boot"
-          mkdir -m 700 "$keys"
-          if [[ -n "$KEY" && -n "$CERT" && -n "$PCR_KEY" ]]; then
-            printf '%s\n' "$KEY" > "$keys/key.pem"
-            printf '%s\n' "$CERT" > "$keys/cert.pem"
-            printf '%s\n' "$PCR_KEY" > "$keys/pcr.pem"
-            cmp <(openssl x509 -in "$keys/cert.pem" -outform DER) os/image/keys/luft-secureboot.der ||
-              { echo "::error::LUFT_SECUREBOOT_CERT isn't the certificate in os/image/keys"; exit 1; }
-            cmp <(openssl pkey -in "$keys/pcr.pem" -pubout) os/image/keys/luft-pcr-policy.pub.pem ||
-              { echo "::error::LUFT_PCR_KEY doesn't match the public key in os/image/keys"; exit 1; }
-          else
-            openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=Luft ephemeral key" \
-              -keyout "$keys/key.pem" -out "$keys/cert.pem"
-            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.pem"
-            echo "::warning::LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT or LUFT_PCR_KEY isn't set. The images are signed with ephemeral keys that computers won't trust."
-          fi
-          {
-            echo "KEYS=$keys"
-            echo "LUFT_SECUREBOOT_KEY=$keys/key.pem"
-            echo "LUFT_SECUREBOOT_CERT=$keys/cert.pem"
-            echo "LUFT_PCR_KEY=$keys/pcr.pem"
-            echo "LUFT_IMAGE_STATE=$RUNNER_TEMP/image"
-            echo "TMPDIR=$RUNNER_TEMP"
-          } >> "$GITHUB_ENV"
-
       - name: Version and release notes
+        id: version
         run: |
           if [[ "$GITHUB_REF_TYPE" == tag ]]; then
             version="${GITHUB_REF_NAME#v}"
@@ -78,35 +59,144 @@ jobs:
           else
             if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
               echo "No changes since the last nightly build."
-              echo "SKIP=1" >> "$GITHUB_ENV"
+              echo "skip=1" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             version="$FEDORA.$(date -u +%Y%m%d).${{ github.run_number }}-nightly"
             tags=("$FEDORA-nightly" "$version")
             since="$(git rev-list -1 --before=24.hours HEAD)"
           fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
-          echo "TAGS=${tags[*]}" >> "$GITHUB_ENV"
-          echo "REFERENCE=$IMAGE:${tags[0]}" >> "$GITHUB_ENV"
-          git log --no-merges --format='- %s' "$since..HEAD" > "$RUNNER_TEMP/release-notes.txt"
+          delimiter="notes-$(openssl rand -hex 8)"
+          {
+            echo "version=$version"
+            echo "tags=${tags[*]}"
+            echo "reference=$IMAGE:${tags[0]}"
+            echo "notes<<$delimiter"
+            git log --no-merges --format='- %s' "$since..HEAD"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Parts
+        id: parts
+        if: steps.version.outputs.skip != '1'
+        env:
+          LUFT_SECUREBOOT_CERT: os/image/keys/luft-secureboot.crt
+          LUFT_REBUILD: ${{ (github.ref_type == 'tag' || inputs.rebuild) && '1' || '' }}
+        run: |
+          base="$(os/image/build.sh base)"
+          LUFT_BASE="$base" os/image/build.sh plan luft-nvidia | tee "$RUNNER_TEMP/parts.tsv"
+          missing() {
+            jq --raw-input --slurp --compact-output --arg signing "$1" '[
+              split("\n")[] | select(length > 0) | split("\t") | select(.[2] == "missing" and .[3] == $signing) |
+              {name: .[0], key: (.[1] | sub(".*-"; "")), family: (.[0] | sub("-.*"; ""))}
+            ]' "$RUNNER_TEMP/parts.tsv"
+          }
+          {
+            echo "base=$base"
+            echo "parts=$(missing unsigned)"
+            echo "signed=$(missing signed)"
+          } >> "$GITHUB_OUTPUT"
+
+  parts:
+    name: Part ${{ matrix.part.name }}
+    needs: plan
+    if: needs.plan.outputs.skip != '1' && needs.plan.outputs.parts != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ${{ fromJSON(needs.plan.outputs.parts) }}
+    env:
+      LUFT_BASE: ${{ needs.plan.outputs.base }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/build-part
+        with:
+          part: ${{ matrix.part.name }}
+          key: ${{ matrix.part.key }}
+          family: ${{ matrix.part.family }}
+
+  signed-parts:
+    name: Part ${{ matrix.part.name }}
+    needs: plan
+    if: needs.plan.outputs.skip != '1' && needs.plan.outputs.signed != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ${{ fromJSON(needs.plan.outputs.signed) }}
+    env:
+      LUFT_BASE: ${{ needs.plan.outputs.base }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/signing-keys
+        with:
+          key: ${{ secrets.LUFT_SECUREBOOT_KEY }}
+          certificate: ${{ secrets.LUFT_SECUREBOOT_CERT }}
+
+      - uses: ./.github/actions/build-part
+        with:
+          part: ${{ matrix.part.name }}
+          key: ${{ matrix.part.key }}
+          family: ${{ matrix.part.family }}
+
+      - name: Forget the signing keys
+        if: always()
+        run: rm -rf "$LUFT_KEYS"
+
+  image:
+    needs: [plan, parts, signed-parts]
+    if: >-
+      always() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' &&
+      !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-26.04
+    timeout-minutes: 120
+    env:
+      LUFT_BASE: ${{ needs.plan.outputs.base }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      TAGS: ${{ needs.plan.outputs.tags }}
+      REFERENCE: ${{ needs.plan.outputs.reference }}
+      RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Sign in to the registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+          {
+            echo "LUFT_IMAGE_STATE=$RUNNER_TEMP/image"
+            echo "TMPDIR=$RUNNER_TEMP"
+          } >> "$GITHUB_ENV"
+
+      - uses: ./.github/actions/signing-keys
+        with:
+          key: ${{ secrets.LUFT_SECUREBOOT_KEY }}
+          certificate: ${{ secrets.LUFT_SECUREBOOT_CERT }}
+          pcr-key: ${{ secrets.LUFT_PCR_KEY }}
 
       - name: Build luft
-        if: env.SKIP != '1'
         run: |
           os/image/build.sh luft --cache-from "$CACHE" --cache-to "$CACHE" \
             --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
-            --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
+            --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
 
       - name: Build luft-nvidia
-        if: env.SKIP != '1'
         run: |
           os/image/build.sh luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
             --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
-            --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
-          rm -rf "$KEYS"
+            --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
+
+      - name: Forget the signing keys
+        if: always()
+        run: rm -rf "$LUFT_KEYS"
 
       - name: Push
-        if: env.SKIP != '1'
         run: |
           for tag in $TAGS; do
             podman push "localhost/luft:$FEDORA" "$IMAGE:$tag"

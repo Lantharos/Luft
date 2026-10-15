@@ -1,90 +1,25 @@
 ARG FEDORA=45
 ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
 
-FROM ${BASE} AS builder
-ARG BUN_VERSION=1.4.2
-COPY os/image/packages/build.txt /tmp/build.txt
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf install -y --setopt=keepcache=True dnf5-plugins rust cargo rust-std-static-x86_64-unknown-uefi \
-      $(cat /tmp/build.txt) && \
-    dnf builddep -y --setopt=keepcache=True mutter
-RUN mkdir -p /var/roothome && \
-    curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" -o /tmp/bun.zip && \
-    unzip -j /tmp/bun.zip bun-linux-x64/bun -d /usr/local/bin && rm /tmp/bun.zip
-ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-target BUN_INSTALL_CACHE_DIR=/var/cache/bun
-
-FROM builder AS kestrel
-COPY kestrel /src/kestrel
-COPY os/image/stages /src/os/image/stages
-RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-kestrel,target=/var/cache/luft-target,sharing=locked \
-    --mount=type=cache,target=/var/cache/bun \
-    --mount=type=cache,target=/var/tmp/luft-build,sharing=locked \
-    --mount=type=cache,target=/src/kestrel/run,sharing=locked \
-    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
-    /src/os/image/stages/kestrel.sh /stage /typelibs.txt && \
-    /src/os/image/stages/needed.sh /stage > /needed.txt
-
-FROM builder AS boot
-COPY boot/sushi /src/boot/sushi
-COPY security /src/security
-COPY kestrel/passkeys /src/kestrel/passkeys
-COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
-COPY os/image/stages /src/os/image/stages
-ARG SIGNED_BY
-RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-boot,target=/var/cache/luft-target,sharing=locked \
-    --mount=type=secret,id=secureboot-key \
-    --mount=type=secret,id=secureboot-cert \
-    : "signed by ${SIGNED_BY}" && \
-    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
-    /src/os/image/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
-    /src/os/image/stages/needed.sh /stage > /needed.txt
-
-FROM builder AS bootc
-COPY os/image/patches/bootc /src/os/image/patches/bootc
-COPY os/image/stages/bootc.sh /src/os/image/stages/bootc.sh
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    /src/os/image/stages/bootc.sh /rpms
-
-FROM builder AS apps
-COPY package.json bun.lock /src/
-COPY packages /src/packages
-COPY apps /src/apps
-COPY security/Cargo.toml security/Cargo.lock /src/security/
-COPY security/crates /src/security/crates
-COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
-COPY os/image/stages /src/os/image/stages
-RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-apps,target=/var/cache/luft-target,sharing=locked \
-    --mount=type=cache,target=/var/cache/bun \
-    --mount=type=cache,target=/root/.local/share/sabine,sharing=locked \
-    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
-    /src/os/image/stages/apps.sh /stage && \
-    /src/os/image/stages/needed.sh /stage > /needed.txt
-
 FROM ${BASE} AS luft
 ARG FEDORA
 ARG VERSION=45.dev
 ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
 COPY os/image/packages /usr/share/luft/image/packages
 COPY os/image/stages /usr/share/luft/image/stages
-COPY --from=kestrel /needed.txt /tmp/needed/kestrel.txt
-COPY --from=boot /needed.txt /tmp/needed/boot.txt
-COPY --from=apps /needed.txt /tmp/needed/apps.txt
-COPY --from=kestrel /typelibs.txt /usr/share/luft/image/typelibs.txt
-COPY --from=bootc /rpms /tmp/bootc
+COPY --from=parts needed.txt /usr/share/luft/image/needed.txt
+COPY --from=parts bootc/rpms/ /tmp/bootc/
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf install -y /tmp/bootc/*.rpm && rm -rf /tmp/bootc && \
-    cat /tmp/needed/*.txt > /tmp/needed.txt && \
-    /usr/share/luft/image/stages/packages.sh /tmp/needed.txt && \
-    rm -rf /tmp/needed /tmp/needed.txt
-COPY --from=kestrel /stage/ /
-COPY --from=boot /stage/ /
-COPY --from=apps /stage/ /
+    /usr/share/luft/image/stages/packages.sh /usr/share/luft/image/needed.txt
+COPY --from=parts kestrel/stage/ /
+COPY --from=parts boot/stage/ /
+COPY --from=parts runtime/stage/ /
+COPY --from=parts apps/ /
 COPY os/image/files/ /
-COPY --from=public-keys luft-secureboot.der /usr/share/luft/secure-boot/luft.der
-COPY --from=public-keys luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
+COPY --from=parts kestrel/typelibs.txt /usr/share/luft/image/typelibs.txt
+COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
+COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
 RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}" && \
     rm -rf /usr/share/luft/image
 RUN bootc container lint
@@ -93,11 +28,8 @@ LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes=
 
 FROM luft AS luft-nvidia
 COPY os/image/stages/nvidia.sh os/image/stages/rpmfusion.sh /tmp/stages/
-ARG SIGNED_BY
+COPY --from=parts nvidia/ /tmp/nvidia/
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    --mount=type=secret,id=secureboot-key \
-    --mount=type=secret,id=secureboot-cert \
-    : "signed by ${SIGNED_BY}" && \
-    /tmp/stages/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
-    rm -rf /tmp/stages
+    /tmp/stages/nvidia.sh /tmp/nvidia && \
+    rm -rf /tmp/stages /tmp/nvidia
 RUN bootc container lint

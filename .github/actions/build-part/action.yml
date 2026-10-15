@@ -1,0 +1,54 @@
+name: Build a part
+description: Builds one part of the Luft image and publishes it, keeping the compilers' caches between runs.
+
+inputs:
+  part:
+    description: The part, as os/image/build.sh plan names it
+    required: true
+  key:
+    description: The part's key, which names its compiler cache
+    required: true
+  family:
+    description: Parts whose compiler caches are close enough to start from
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+
+    - name: Sign in to the registry
+      shell: bash
+      run: |
+        echo "${{ github.token }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+        echo "LUFT_IMAGE_CACHE=$RUNNER_TEMP/luft-cache" >> "$GITHUB_ENV"
+
+    - name: Restore the compiler caches
+      uses: actions/cache/restore@v6
+      with:
+        path: |
+          ${{ runner.temp }}/luft-cache/cargo/registry/index
+          ${{ runner.temp }}/luft-cache/cargo/registry/cache
+          ${{ runner.temp }}/luft-cache/cargo/git/db
+          ${{ runner.temp }}/luft-cache/sccache
+          ${{ runner.temp }}/luft-cache/ccache
+        key: luft-${{ inputs.part }}-${{ inputs.key }}
+        restore-keys: |
+          luft-${{ inputs.part }}-
+          luft-${{ inputs.family }}-
+
+    - name: Build ${{ inputs.part }}
+      shell: bash
+      run: os/image/build.sh part "${{ inputs.part }}" --cache-from "$CACHE" --cache-to "$CACHE"
+
+    - name: Keep the compiler caches
+      if: github.ref_type != 'tag'
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          ${{ runner.temp }}/luft-cache/cargo/registry/index
+          ${{ runner.temp }}/luft-cache/cargo/registry/cache
+          ${{ runner.temp }}/luft-cache/cargo/git/db
+          ${{ runner.temp }}/luft-cache/sccache
+          ${{ runner.temp }}/luft-cache/ccache
+        key: luft-${{ inputs.part }}-${{ inputs.key }}

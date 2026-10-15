@@ -1,6 +1,7 @@
 alsa-lib-devel
 at-spi2-atk-devel
 binutils
+ccache
 clang-devel
 cmake
 dconf
@@ -35,6 +36,7 @@ pulseaudio-libs-devel
 python3
 sassc
 sbsigntools
+sccache
 systemd-devel
 tpm2-tss-devel
 unzip

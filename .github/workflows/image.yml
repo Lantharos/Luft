@@ -87,19 +87,22 @@ jobs:
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "TAGS=${tags[*]}" >> "$GITHUB_ENV"
+          echo "REFERENCE=$IMAGE:${tags[0]}" >> "$GITHUB_ENV"
           git log --no-merges --format='- %s' "$since..HEAD" > "$RUNNER_TEMP/release-notes.txt"
 
       - name: Build luft
         if: env.SKIP != '1'
         run: |
           os/image/build.sh luft --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
+            --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
+            --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
 
       - name: Build luft-nvidia
         if: env.SKIP != '1'
         run: |
           os/image/build.sh luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
+            --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
+            --build-arg "RELEASE_NOTES=$(cat "$RUNNER_TEMP/release-notes.txt")"
           rm -rf "$KEYS"
 
       - name: Push

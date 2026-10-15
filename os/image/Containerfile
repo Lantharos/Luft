@@ -64,7 +64,9 @@ RUN --mount=type=cache,target=/var/cache/cargo \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 
 FROM ${BASE} AS luft
+ARG FEDORA
 ARG VERSION=45.dev
+ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
 COPY os/image/packages /usr/share/luft/image/packages
 COPY os/image/stages /usr/share/luft/image/stages
 COPY --from=kestrel /needed.txt /tmp/needed/kestrel.txt
@@ -83,7 +85,7 @@ COPY --from=apps /stage/ /
 COPY os/image/files/ /
 COPY --from=public-keys luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=public-keys luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
-RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" && \
+RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}" && \
     rm -rf /usr/share/luft/image
 RUN bootc container lint
 ARG RELEASE_NOTES=""

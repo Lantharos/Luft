@@ -3,6 +3,7 @@ set -euo pipefail
 
 variant="$1"
 version="$2"
+reference="$3"
 fedora="$(rpm -E %fedora)"
 
 write_os_release() {
@@ -37,7 +38,7 @@ enable_units() {
 }
 
 write_image_reference() {
-  echo "ghcr.io/lantharos/luft:$fedora" | install -Dm644 /dev/stdin /usr/share/luft/image-reference
+  echo "$reference" | install -Dm644 /dev/stdin /usr/share/luft/image-reference
 }
 
 configure_toolbox() {

@@ -22,12 +22,13 @@ jobs:
   build:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' &&
-       startsWith(github.event.workflow_run.head_branch, 'v'))
+      (github.event.workflow_run.conclusion == 'success' &&
+       ((github.event.workflow_run.event == 'push' && startsWith(github.event.workflow_run.head_branch, 'v')) ||
+        github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch'))
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
-      IMAGE: ${{ inputs.image || format('ghcr.io/lantharos/luft:{0}', github.event.workflow_run.head_branch) }}
+      DOWNLOADS: https://get.luft.lanth.me
       LUFT_ISO: ${{ github.workspace }}/iso
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -45,14 +46,37 @@ jobs:
       - name: Sign in to the registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
 
+      - name: Image and channel
+        env:
+          CHOSEN: ${{ inputs.image }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if [[ -n "$CHOSEN" ]]; then
+            image="$CHOSEN"
+          elif [[ "$RUN_EVENT" == push ]]; then
+            image="ghcr.io/lantharos/luft:${RUN_TAG#v}"
+          else
+            image=ghcr.io/lantharos/luft:45-nightly
+          fi
+          version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$image")"
+          if [[ "$version" == *-nightly ]]; then channel=nightly; else channel=latest; fi
+          if [[ "$GITHUB_EVENT_NAME" == workflow_run ]] && curl -sfIo /dev/null "$DOWNLOADS/luft-$version.iso"; then
+            echo "luft-$version.iso is already published."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+          echo "IMAGE=$image" >> "$GITHUB_ENV"
+          echo "CHANNEL=$channel" >> "$GITHUB_ENV"
+
       - name: Build
+        if: env.SKIP != '1'
         run: |
           mkdir -p "$LUFT_ISO"
           os/iso/build.sh "$IMAGE"
           ls -l "$LUFT_ISO"
 
       - name: Upload to R2
-        if: env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        if: env.SKIP != '1' && env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -64,12 +88,12 @@ jobs:
           for file in "$iso" "$iso.sha256"; do
             aws s3 cp --endpoint-url "$endpoint" --no-progress "$file" "s3://$R2_BUCKET/$file"
           done
-          latest=luft-latest.iso
-          aws s3 cp --endpoint-url "$endpoint" --no-progress "$iso" "s3://$R2_BUCKET/$latest"
-          sed "s/$iso/$latest/" "$iso.sha256" | aws s3 cp --endpoint-url "$endpoint" - "s3://$R2_BUCKET/$latest.sha256"
+          alias="luft-$CHANNEL.iso"
+          aws s3 cp --endpoint-url "$endpoint" --no-progress "$iso" "s3://$R2_BUCKET/$alias"
+          sed "s/$iso/$alias/" "$iso.sha256" | aws s3 cp --endpoint-url "$endpoint" - "s3://$R2_BUCKET/$alias.sha256"
 
       - name: Keep as a workflow artifact
-        if: env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == ''
+        if: env.SKIP != '1' && (env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == '')
         uses: actions/upload-artifact@v7
         with:
           name: luft-iso

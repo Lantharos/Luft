@@ -61,6 +61,7 @@ libnma-gtk4
 librsvg2
 libsoup3
 libva-intel-media-driver
+libva-utils
 mesa-dri-drivers
 mesa-vulkan-drivers
 ModemManager
@@ -71,6 +72,7 @@ NetworkManager-wifi
 NetworkManager-wwan
 nss-mdns
 openconnect
+pciutils
 pipewire
 pipewire-alsa
 pipewire-gstreamer
@@ -88,6 +90,7 @@ systemd-oomd-defaults
 thermald
 udisks2
 upower
+usbutils
 wireplumber
 xdg-desktop-portal
 xdg-user-dirs

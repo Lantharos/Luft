@@ -9,7 +9,7 @@ Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay
 
 Both play every common audio and video format, including H.264, HEVC and AV1, decoded in hardware on Intel, AMD and NVIDIA graphics. The full FFmpeg, GStreamer's freeworld and ugly plugins and Mesa's freeworld video drivers come from [RPM Fusion](https://rpmfusion.org) while the image is built, as does NVIDIA's driver; installed systems don't use RPM Fusion's repositories and get new versions with each update.
 
-Releases come from tags: pushing `v45.20261014` builds and publishes that version as `:45` and `:45-nvidia`, which installed systems update from, then builds the ISO. Every night, if main changed, CI builds `:45-nightly` and `:45-nightly-nvidia` for testing; switch a test machine with `bootc switch ghcr.io/lantharos/luft:45-nightly`. Each build is also tagged with its version.
+Releases come from tags: pushing `v45.20261014` builds and publishes that version as `:45` and `:45-nvidia`, which installed systems update from, then builds the ISO. Every night, if main changed, CI builds `:45-nightly` and `:45-nightly-nvidia` for testing; switch a test machine with `bootc switch ghcr.io/lantharos/luft:45-nightly`, or install it from the nightly ISO. Each build is also tagged with its version.
 
 ## Build
 
@@ -41,7 +41,7 @@ os/iso/build.sh                              # from localhost/luft:45 and :45-nv
 os/iso/build.sh ghcr.io/lantharos/luft:45    # from the published images
 ```
 
-It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and publish it at https://get.luft.lanth.me/luft-latest.iso.
+It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and publish it at https://get.luft.lanth.me/luft-latest.iso; each nightly image gets one at https://get.luft.lanth.me/luft-nightly.iso, whose installs keep following the nightly images. [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.
 
 The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc shows GRUB's menu. It carries both images, so installing needs no network, and the session on the stick runs the regular image, so choosing *Just try Luft* gives the normal desktop with Install Luft in the launcher.
 

@@ -4,6 +4,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { isAvailable } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
+	import ChannelNote from '#lib/components/ChannelNote.svelte';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
@@ -16,6 +17,12 @@
 
 	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed };
 	const SLIDE = 28;
+
+	function onkeydown(event: KeyboardEvent) {
+		if (!event.ctrlKey || !event.shiftKey || event.altKey || event.code !== 'KeyN') return;
+		event.preventDefault();
+		void session.switchChannel();
+	}
 
 	onMount(() => {
 		if (!isAvailable()) return;
@@ -30,9 +37,12 @@
 	let Step = $derived(STEPS[session.step]);
 </script>
 
+<svelte:window {onkeydown} />
+
 <GlassShell class="meet-window">
 	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-		<div class="drag-region absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-end pr-3">
+		<div class="drag-region absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between pr-3 pl-14">
+			<span class="text-[12.5px] text-[var(--text-muted)]">{session.nightly ? 'Nightly builds' : ''}</span>
 			<WindowButtons closable={session.step !== 'working'} />
 		</div>
 		{#key session.step}
@@ -40,5 +50,6 @@
 				<Step />
 			</div>
 		{/key}
+		<ChannelNote />
 	</main>
 </GlassShell>

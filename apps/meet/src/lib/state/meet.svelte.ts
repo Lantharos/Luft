@@ -1,11 +1,17 @@
 import * as meet from '#lib/api/meet.js';
-import type { Action, Intent, Packing, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
+import type { Action, Channel, Intent, Packing, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
 export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed';
 
 const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'removed'];
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
+const NOTE_SHOWN = 6000;
+
+export interface ChannelNote {
+	id: number;
+	channel: Channel;
+}
 
 class MeetState {
 	step = $state<Step>('hello');
@@ -17,8 +23,13 @@ class MeetState {
 	luft = $state(0);
 	busy = $state(false);
 	error = $state('');
+	note = $state<ChannelNote | null>(null);
 
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
+	nightly = $derived(this.source.kind === 'download' && this.source.channel === 'nightly');
+
+	private noteTimer: ReturnType<typeof setTimeout> | undefined;
+	private inspection = 0;
 
 	go(step: Step) {
 		this.direction = ORDER.indexOf(step) >= ORDER.indexOf(this.step) ? 1 : -1;
@@ -39,16 +50,43 @@ class MeetState {
 		}
 	}
 
-	async check() {
-		this.go('check');
-		this.report = null;
+	private async inspect() {
+		const inspection = ++this.inspection;
 		const report = await this.run(() => meet.check($state.snapshot(this.source)));
-		if (!report) return;
+		if (!report || inspection !== this.inspection) return null;
 		this.report = report;
 		this.prepared = report.prepared;
 		const suggested = Math.round((report.facts.windowsSize * SHARE) / GIB) * GIB;
 		this.luft = Math.min(report.mostLuft, Math.max(report.smallestLuft, suggested));
-		if (report.prepared) this.go('ready');
+		return report;
+	}
+
+	async check() {
+		this.go('check');
+		this.report = null;
+		const report = await this.inspect();
+		if (report?.prepared) this.go('ready');
+	}
+
+	async switchChannel() {
+		if (this.step === 'working') return;
+		const channel: Channel = this.nightly ? 'latest' : 'nightly';
+		this.source = { kind: 'download', channel };
+		this.note = { id: (this.note?.id ?? 0) + 1, channel };
+		clearTimeout(this.noteTimer);
+		this.noteTimer = setTimeout(() => (this.note = null), NOTE_SHOWN);
+		if (this.step === 'check') {
+			this.report = null;
+			await this.inspect();
+		} else if (this.step === 'room') {
+			await this.inspect();
+			if (this.blocked) this.go('check');
+		}
+	}
+
+	dismissNote() {
+		clearTimeout(this.noteTimer);
+		this.note = null;
 	}
 
 	async chooseIso() {

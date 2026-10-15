@@ -4,7 +4,8 @@ export type Level = 'fine' | 'note' | 'blocks';
 export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing';
 export type Intent = 'try' | 'install';
 export type FolderKind = 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos';
-export type Source = { kind: 'download'; channel: 'latest' | 'nightly' } | { kind: 'file'; path: string };
+export type Channel = 'latest' | 'nightly';
+export type Source = { kind: 'download'; channel: Channel } | { kind: 'file'; path: string };
 
 export type Action = 'firmwareSettings' | 'tidy' | 'chooseIso';
 

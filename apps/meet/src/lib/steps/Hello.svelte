@@ -7,8 +7,5 @@
 	<p class="mt-5 max-w-[470px] text-[17px] leading-relaxed text-[var(--text-soft)]">
 		Luft can live right next to Windows. Try it first without installing anything, and bring your things along when you’re ready.
 	</p>
-	<div class="mt-9 flex items-center gap-3">
-		<button type="button" class="button primary large px-6" onclick={() => session.check()}>Check this PC</button>
-		<span class="text-[13px] text-[var(--text-muted)]">Nothing changes until you say so.</span>
-	</div>
+	<button type="button" class="button primary large mt-9 self-start px-6" onclick={() => session.check()}>Check this PC</button>
 </section>

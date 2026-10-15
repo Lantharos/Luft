@@ -28,7 +28,7 @@ cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Car
 
 The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
 
-Start it with `--nightly` to use `luft-nightly.iso` instead of `luft-latest.iso`.
+Start it with `--nightly`, or press Ctrl+Shift+N in it, to use `luft-nightly.iso` instead of `luft-latest.iso`. Ctrl+Shift+N again switches back.
 
 ## Testing
 

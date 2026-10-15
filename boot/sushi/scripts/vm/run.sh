@@ -48,7 +48,8 @@ case "${TPM:-}" in
     ;;
 esac
 
-gpu=(-device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}")
+gpu=(-device pcie-root-port,id=display-port,chassis=1
+  -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,xres=${XRES:-1920},yres=${YRES:-1080}")
 [[ "${GPU:-}" == vga ]] && gpu=(-device "VGA,xres=${XRES:-1920},yres=${YRES:-1080},vgamem_mb=64")
 
 display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")

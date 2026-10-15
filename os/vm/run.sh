@@ -77,7 +77,8 @@ qemu-system-x86_64 -machine "$machine" -cpu host -smp 4 -m "${MEMORY:-8192}" "${
   -drive "file=$disk,format=qcow2,if=virtio" \
   -chardev "socket,id=tpm,path=$vm/tpm.sock" -tpmdev emulator,id=tpm,chardev=tpm -device tpm-tis,tpmdev=tpm \
   "${media[@]}" \
-  -device "virtio-vga,xres=${XRES:-1920},yres=${YRES:-1080}" \
+  -device pcie-root-port,id=display-port,chassis=1 \
+  -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,xres=${XRES:-1920},yres=${YRES:-1080}" \
   -device virtio-keyboard-pci -device virtio-tablet-pci \
   "${network[@]}" \
   -serial "unix:$vm/serial.sock,server=on,wait=off" \

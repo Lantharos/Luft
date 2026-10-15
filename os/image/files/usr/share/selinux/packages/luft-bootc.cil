@@ -1,0 +1,2 @@
+(typetransition unconfined_service_t install_exec_t process install_t)
+(allow unconfined_service_t install_t (process (transition)))

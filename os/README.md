@@ -20,7 +20,7 @@ os/image/build.sh luft-nvidia   # localhost/luft:45-nvidia
 
 Each image is sealed: `image/seal.sh` adds a startup image (kernel, initramfs and command line in one file) that names the image's exact root file system by its composefs digest, signs it for Secure Boot and signs its TPM policy. Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys named by `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and `LUFT_PCR_KEY` (PEM), and ship the public halves. Without them they make throwaway keys in `os/image/state/keys`. CI signs with the real keys, whose public halves are in `image/keys`. How the computer starts from there is in [docs/boot.md](../docs/boot.md).
 
-The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour; later builds reuse what they can.
+The first build downloads Fedora packages, Mutter's source and the web runtime and takes about an hour; later builds reuse what they can. Every checkout shares these caches, and a build recompiles whatever differs in content from the one before it, whichever checkout that came from.
 
 | Path | Holds |
 | --- | --- |

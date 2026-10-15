@@ -17,10 +17,11 @@ FROM builder AS kestrel
 COPY kestrel /src/kestrel
 COPY os/image/stages /src/os/image/stages
 RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-kestrel,target=/var/cache/luft-target \
+    --mount=type=cache,id=luft-target-kestrel,target=/var/cache/luft-target,sharing=locked \
     --mount=type=cache,target=/var/cache/bun \
-    --mount=type=cache,target=/var/tmp/luft-build \
-    --mount=type=cache,target=/src/kestrel/run \
+    --mount=type=cache,target=/var/tmp/luft-build,sharing=locked \
+    --mount=type=cache,target=/src/kestrel/run,sharing=locked \
+    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
     /src/os/image/stages/kestrel.sh /stage /typelibs.txt && \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 
@@ -32,10 +33,11 @@ COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/stages /src/os/image/stages
 ARG SIGNED_BY
 RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-boot,target=/var/cache/luft-target \
+    --mount=type=cache,id=luft-target-boot,target=/var/cache/luft-target,sharing=locked \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
     : "signed by ${SIGNED_BY}" && \
+    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
     /src/os/image/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 
@@ -54,9 +56,10 @@ COPY security/crates /src/security/crates
 COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
 COPY os/image/stages /src/os/image/stages
 RUN --mount=type=cache,target=/var/cache/cargo \
-    --mount=type=cache,id=luft-target-apps,target=/var/cache/luft-target \
+    --mount=type=cache,id=luft-target-apps,target=/var/cache/luft-target,sharing=locked \
     --mount=type=cache,target=/var/cache/bun \
-    --mount=type=cache,target=/root/.local/share/sabine \
+    --mount=type=cache,target=/root/.local/share/sabine,sharing=locked \
+    bun /src/os/image/stages/source-times.ts /var/cache/luft-target/sources.json /src && \
     /src/os/image/stages/apps.sh /stage && \
     /src/os/image/stages/needed.sh /stage > /needed.txt
 

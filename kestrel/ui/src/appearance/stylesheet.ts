@@ -9,9 +9,10 @@ import { accentColor, fromHex, isNeutral, readableOn, toHex, type Rgb, type Seed
 import type { Colors, Palette } from './palette.js';
 
 type Variant = 'light' | 'dark';
+type ExtraStyles = (seed: Seed, palette: Palette, variant: Variant) => string;
 
 const VARIANTS: Variant[] = ['light', 'dark'];
-const rgba = (hex: string, alpha: number) => `rgba(${fromHex(hex).join(', ')}, ${alpha})`;
+export const rgba = (hex: string, alpha: number) => `rgba(${fromHex(hex).join(', ')}, ${alpha})`;
 const coglColor = (color: Rgb) => Cogl.Color.from_string(toHex(color))[1];
 
 function checkedControls(fill: string, ink: string): string {
@@ -31,14 +32,6 @@ function glassyCheckedControls(accent: string): string {
 `;
 }
 
-function taskbarLooks(seed: Seed, colors: Colors): string {
-  const tint = isNeutral(seed) ? colors.surfaceContainerHighest : colors.primaryContainer;
-  return `.kestrel-panel.kestrel-panel.kestrel-taskbar-solid { background-color: ${colors.surfaceContainer}; }
-.kestrel-panel.kestrel-panel.kestrel-taskbar-accent { background-color: ${rgba(tint, 0.62)}; }
-.kestrel-panel.kestrel-panel.kestrel-taskbar-accent.kestrel-taskbar-opaque { background-color: ${tint}; }
-`;
-}
-
 function lockScreen(accent: string, solid: Colors): string {
   return `.login-dialog-button.next-button.next-button { background-color: ${rgba(solid.primary, 0.9)}; color: ${solid.onPrimary}; }
 .login-dialog-button.next-button.next-button:hover { background-color: ${solid.primary}; }
@@ -55,7 +48,7 @@ function accentStylesheet(seed: Seed, palette: Palette, variant: Variant): strin
   const solid = dark ? darkSolid : palette.light.colors;
   const highlight = neutral && !dark ? scheme.primary : accent;
   const checked = dark && !neutral ? glassyCheckedControls(accent) : checkedControls(dark ? accent : scheme.primary, scheme.onPrimary);
-  return `${checked}${taskbarLooks(seed, scheme)}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
+  return `${checked}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${scheme.primary}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${scheme.primary}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${scheme.primary}; }
@@ -71,7 +64,7 @@ export class AccentStylesheet {
   private readonly directory: Gio.File;
   private css = '';
 
-  constructor(private readonly name: string) {
+  constructor(private readonly name: string, private readonly extra: ExtraStyles = () => '') {
     this.directory = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!]));
   }
 
@@ -84,7 +77,7 @@ export class AccentStylesheet {
   }
 
   apply(seed: Seed, palette: Palette): void {
-    const sheets = VARIANTS.map(variant => accentStylesheet(seed, palette, variant));
+    const sheets = VARIANTS.map(variant => accentStylesheet(seed, palette, variant) + this.extra(seed, palette, variant));
     const css = sheets.join('');
     if (css === this.css) return;
     GLib.mkdir_with_parents(this.directory.get_path()!, 0o700);

@@ -41,7 +41,7 @@ const item = {
   Id: 'kestrel-tray-check',
   Title: 'Chatter',
   Status: 'Active',
-  IconName: '',
+  IconName: ARGV[0] ?? '',
   IconPixmap: new GLib.Variant('a(iiay)', [[SIZE, SIZE, pixels]]),
   Menu: '/MenuBar',
   ItemIsMenu: false,

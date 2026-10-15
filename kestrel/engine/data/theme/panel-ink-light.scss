@@ -1,0 +1,12 @@
+$variant: 'light';
+
+@import "kestrel/tokens";
+@import "kestrel/panel-ink";
+
+stage { @include glass-shading; }
+.kestrel-panel-surface { @include panel-surfaces; }
+.kestrel-panel-ink { @include panel-ink; }
+.kestrel-panel-soft-halo { @include halo(soft); }
+.kestrel-panel-status-halo { @include halo(soft, '.kestrel-panel-status'); }
+.kestrel-panel-strong-halo { @include halo(strong, '.kestrel-panel-status'); }
+.kestrel-panel-no-halo { @include halo(none, '.kestrel-panel-status'); }

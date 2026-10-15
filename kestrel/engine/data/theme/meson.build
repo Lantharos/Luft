@@ -4,6 +4,8 @@ theme_sources = files([
   'base-light.scss',
   'kestrel-dark.scss',
   'kestrel-light.scss',
+  'panel-ink-dark.scss',
+  'panel-ink-light.scss',
   'sass/_colors.scss',
   'sass/_common.scss',
   'sass/_drawing.scss',
@@ -36,6 +38,7 @@ theme_sources = files([
   'kestrel/_menus.scss',
   'kestrel/_notifications.scss',
   'kestrel/_panel.scss',
+  'kestrel/_panel-ink.scss',
   'kestrel/_quick-settings.scss',
   'kestrel/_start.scss',
   'kestrel/_surfaces.scss',
@@ -48,6 +51,8 @@ stylesheets = [
   'base-light.css',
   'kestrel-dark.css',
   'kestrel-light.css',
+  'panel-ink-dark.css',
+  'panel-ink-light.css',
 ]
 
 sassc = find_program('sassc')

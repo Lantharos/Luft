@@ -1,0 +1,37 @@
+@mixin panel-surfaces {
+  background-color: glass(clear);
+  &.kestrel-taskbar-solid { background-color: pick(#f3f3f5, #1b1b1f); }
+  &.kestrel-taskbar-accent { background-color: fill(0.12); }
+  &.kestrel-taskbar-transparent { background-color: transparent; }
+  &.kestrel-taskbar-glass.kestrel-taskbar-opaque { background-color: #000000; }
+}
+
+@mixin panel-ink {
+  color: ink();
+  .kestrel-task-button:hover, .kestrel-status-button:hover, .kestrel-peek:hover { background-color: fill(0.10); }
+  .kestrel-task-button:active, .kestrel-app-focused { background-color: fill(0.15); }
+  .kestrel-status-button:active { background-color: fill(0.14); }
+  .kestrel-task-button:focus, .kestrel-status-button:focus { background-color: fill(0.17); }
+  .kestrel-privacy { background-color: #ff9d42; color: #1c1206; }
+  .kestrel-privacy:hover { background-color: #ffad61; }
+  .kestrel-privacy:active, .kestrel-privacy:focus { background-color: #ffb877; }
+  .kestrel-running-dot { background-color: ink(0.6); }
+  .kestrel-app-focused .kestrel-running-dot { background-color: ink(); }
+  .kestrel-task-progress { background-color: fill(0.18); }
+  .kestrel-task-progress-fill { background-color: ink(); }
+  .kestrel-task-button.drop-before { box-shadow: inset 3px 0 ink(0.75); }
+  .kestrel-task-button.drop-after { box-shadow: inset -3px 0 ink(0.75); }
+}
+
+@function halo-shadows($strength) {
+  @if $strength == strong { @return (0 0 2px 1px halo(0.8), 0 0 2px 1px halo(0.9), 0 0 2px 1px halo(0.8)); }
+  @if $strength == none { @return (none, none, none); }
+  @return (0 1px 3px halo(0.5), 0 1px 3px halo(0.65), 0 0 3px halo(0.55));
+}
+
+@mixin halo($strength, $scope: null) {
+  $shadows: halo-shadows($strength);
+  #{$scope} StIcon { icon-shadow: nth($shadows, 1); }
+  #{$scope} StLabel { text-shadow: nth($shadows, 2); }
+  .kestrel-running-dot { box-shadow: nth($shadows, 3); }
+}

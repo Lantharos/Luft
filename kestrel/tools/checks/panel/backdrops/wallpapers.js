@@ -14,7 +14,7 @@ function pictureFile(name, paint) {
   for (let y = 0; y < HEIGHT; y++) {
     for (let x = 0; x < WIDTH; x++) pixels.set(paint(x, y), (y * WIDTH + x) * 3);
   }
-  const path = scratch(`launcher-${name}.png`);
+  const path = scratch(`backdrop-${name}.png`);
   GdkPixbuf.Pixbuf.new_from_bytes(new GLib.Bytes(pixels), GdkPixbuf.Colorspace.RGB, false, 8, WIDTH, HEIGHT, WIDTH * 3).savev(path, 'png', [], []);
   return Gio.File.new_for_path(path);
 }

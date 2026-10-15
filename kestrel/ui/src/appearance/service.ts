@@ -12,6 +12,7 @@ import { appIcons } from './icons/appIcons.js';
 import { GlyphFiles } from './icons/glyphFiles.js';
 import { AccentStylesheet } from './stylesheet.js';
 import { AppThemes } from './themes/appThemes.js';
+import { taskbarStylesheet } from '../desktop/panel/ink/taskbarStylesheet.js';
 
 const APPEARANCE_INTERFACE = `<node>
   <interface name="com.lantharos.Kestrel.Appearance">
@@ -37,7 +38,7 @@ const PROPERTIES: [string, string][] = [
 const PERSIST_DELAY = 400;
 
 export class AppearanceService {
-  private readonly stylesheet = new AccentStylesheet('accent');
+  private readonly stylesheet = new AccentStylesheet('accent', taskbarStylesheet);
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -121,10 +122,10 @@ export class AppearanceService {
       pureBlack: this.PureBlack,
       palette: buildPalette(seed, this.PureBlack),
     };
+    this.stylesheet.apply(seed, this.appearance.palette);
     const published = JSON.stringify([this.appearance, this.WallpaperAccentColor]);
     if (published === this.published) return;
     this.published = published;
-    this.stylesheet.apply(seed, this.appearance.palette);
     if (this.appearance.accentColor !== previousAccent) {
       if (this.interfaceSettings.settings_schema.has_key('accent-color'))
         this.interfaceSettings.set_string('accent-color', this.appearance.accentName);

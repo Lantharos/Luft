@@ -6,5 +6,7 @@
     <file>base-high-contrast.css</file>
     <file>kestrel-dark.css</file>
     <file>kestrel-light.css</file>
+    <file>panel-ink-dark.css</file>
+    <file>panel-ink-light.css</file>
   </gresource>
 </gresources>

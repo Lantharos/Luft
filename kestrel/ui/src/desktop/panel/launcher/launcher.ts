@@ -5,8 +5,8 @@ import St from 'gi://St';
 
 import primary from './luft-primary.svg';
 import secondary from './luft-secondary.svg';
-import { showsWallpaper, taskbarBackdrops } from './backdrop.js';
 import { markEdge, markShade, monochromeShade } from './shade.js';
+import { showsWallpaper, taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
 import { animateActor } from '../../../shared/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';

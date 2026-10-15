@@ -13,6 +13,7 @@ export const NO_HARDWARE: Hardware = { nvidia: false, portable: false, onBattery
 
 export interface AppState extends Appearance {
 	hardware: Hardware;
+	meet: 'try' | 'install' | null;
 }
 
 export interface TrustState {

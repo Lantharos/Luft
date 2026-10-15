@@ -35,6 +35,18 @@ pub struct Keyboard {
     pub variant: String,
 }
 
+pub fn hints_from_names(
+    time_zone: Option<&str>,
+    keyboard: Option<&str>,
+    locale: Option<&str>,
+) -> Hints {
+    Hints {
+        timezone: time_zone.and_then(zones::iana).map(Into::into),
+        keyboard: keyboard.and_then(keyboards::xkb),
+        locale: locale.and_then(hints::posix_locale),
+    }
+}
+
 pub fn inspect<R: Read + Seek>(volume: R) -> Result<Option<Windows>> {
     let mut volume = Volume::open(volume)?;
     let Some(installation) = Installation::read(&mut volume)? else {

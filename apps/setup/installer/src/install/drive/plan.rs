@@ -52,6 +52,9 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
     match target {
         Target::Whole { drive: block } => {
             let drive = drive(survey, block)?;
+            if drive.meet {
+                bail!("Luft is starting from that drive right now, so it can't be erased.");
+            }
             Ok(Plan {
                 drive: drive.block.clone(),
                 device: drive.device.clone(),

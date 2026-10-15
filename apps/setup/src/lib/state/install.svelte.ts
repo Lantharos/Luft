@@ -20,7 +20,8 @@ class InstallState {
 	failed = $derived(this.status?.stage === 'failed');
 	finished = $derived(this.status?.stage === 'finished');
 	windowsDrive = $derived(this.survey?.drives.find((drive) => drive.windows && !drive.blocked) ?? null);
-	usableDrives = $derived(this.survey?.drives.filter((drive) => !drive.blocked && !drive.removable) ?? []);
+	usableDrives = $derived(this.survey?.drives.filter((drive) => !drive.blocked && !drive.removable && !drive.meet) ?? []);
+	meet = $derived(this.survey?.meet?.space ? this.survey.meet : null);
 	freeSpaces = $derived(
 		this.survey?.drives.filter((drive) => !drive.blocked).flatMap((drive) => drive.free.map((space) => ({ drive, space }))) ?? []
 	);

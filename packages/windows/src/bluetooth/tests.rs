@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use super::{Keys, bluez, pairings};
+use super::{Keys, bluez, pairings, saved_pairings};
 use crate::System;
 use crate::testing::{HiveBuilder, Value};
 
@@ -79,6 +79,75 @@ fn reads_classic_and_low_energy_pairings() {
     assert!(random_address);
     assert!(key.authenticated);
     assert_eq!((key.ediv, key.rand), (0xbeef, 0x1122334455667788));
+}
+
+#[test]
+fn reads_the_same_pairings_from_keys_saved_in_windows() {
+    let full = windows_pairings();
+    let parameters = HiveBuilder::default()
+        .set(
+            r"Keys\c8e265a1b2c3",
+            "001122334455",
+            Value::Binary(counting(0x10)),
+        )
+        .set(
+            r"Devices\001122334455",
+            "Name",
+            Value::Binary(b"Studio Buds\0".to_vec()),
+        )
+        .set(r"Devices\001122334455", "COD", Value::Dword(0x240404))
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "LTK",
+            Value::Binary(counting(0xa0)),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "KeyLength",
+            Value::Dword(16),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "ERand",
+            Value::Qword(0x1122334455667788),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "EDIV",
+            Value::Dword(0xbeef),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "IRK",
+            Value::Binary(counting(0xc0)),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "Address",
+            Value::Qword(0xd0d1d2d3d4d5),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "AddressType",
+            Value::Dword(1),
+        )
+        .set(
+            r"Keys\c8e265a1b2c3\d0d1d2d3d4d5",
+            "AuthReq",
+            Value::Dword(0x2d),
+        )
+        .build();
+    let low_energy = HiveBuilder::default()
+        .set(
+            r"Dev_d0d1d2d3d4d5\7&2e5d&0&D0D1D2D3D4D5_C00000000",
+            "FriendlyName",
+            Value::Sz("MX Anywhere 3".into()),
+        )
+        .build();
+    assert_eq!(
+        saved_pairings(&parameters, Some(&low_energy)).unwrap(),
+        pairings(&System::new(&full).unwrap()).unwrap()
+    );
 }
 
 #[test]

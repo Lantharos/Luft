@@ -6,7 +6,7 @@
 
 	const USER_NAME = /^[a-z_][a-z0-9_-]{0,31}$/;
 
-	let fullName = $state('');
+	let fullName = $state(install.survey?.meet?.movingBox?.fullName ?? '');
 	let userName = $state('');
 	let editedUserName = $state(false);
 	let password = $state('');

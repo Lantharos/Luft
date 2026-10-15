@@ -1,6 +1,7 @@
 mod config;
 mod first_boot;
 mod install;
+mod meet;
 mod options;
 mod phase;
 mod service;

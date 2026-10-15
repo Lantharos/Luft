@@ -6,6 +6,7 @@ use luft_disks::udisks::volumes::{Segment, Volume};
 use serde::Serialize;
 
 use super::room;
+use luft_meet::Handoff;
 use luft_windows::bluetooth::Pairing;
 
 use super::windows::{self, Hints};
@@ -30,9 +31,10 @@ pub struct Drive {
     pub startup_space: u64,
     pub windows: Option<WindowsVolume>,
     pub free: Vec<Space>,
+    pub meet: bool,
 }
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Space {
     pub offset: u64,
     pub size: u64,
@@ -70,18 +72,28 @@ fn volumes(drive: &snapshot::Drive) -> impl Iterator<Item = &Volume> {
     })
 }
 
-fn runs_from(drive: &snapshot::Drive) -> bool {
+fn from_meet(volume: &Volume, handoff: Option<&Handoff>) -> bool {
+    let partition = volume.partition_uuid.to_ascii_lowercase();
+    handoff.is_some_and(|handoff| handoff.partitions().any(|ours| ours == partition))
+}
+
+fn runs_from(drive: &snapshot::Drive, handoff: Option<&Handoff>) -> bool {
     drive.system
         || volumes(drive).any(|volume| {
-            volume
-                .mount_points
-                .iter()
-                .any(|point| point.starts_with(LIVE_MEDIUM))
+            !from_meet(volume, handoff)
+                && volume
+                    .mount_points
+                    .iter()
+                    .any(|point| point.starts_with(LIVE_MEDIUM))
         })
 }
 
-fn blocked(drive: &snapshot::Drive, smallest_system: u64) -> Option<&'static str> {
-    if runs_from(drive) {
+fn blocked(
+    drive: &snapshot::Drive,
+    smallest_system: u64,
+    handoff: Option<&Handoff>,
+) -> Option<&'static str> {
+    if runs_from(drive, handoff) {
         Some("running")
     } else if drive.read_only || matches!(drive.kind, Kind::Optical | Kind::Image) {
         Some("read-only")
@@ -92,8 +104,9 @@ fn blocked(drive: &snapshot::Drive, smallest_system: u64) -> Option<&'static str
     }
 }
 
-pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
+pub fn describe(drive: &snapshot::Drive, smallest_system: u64, handoff: Option<&Handoff>) -> Drive {
     let esp = volumes(drive)
+        .filter(|volume| !from_meet(volume, handoff))
         .find(|volume| {
             volume
                 .partition_type
@@ -116,7 +129,8 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64) -> Drive {
         size: drive.size,
         kind: drive.kind,
         removable: drive.removable,
-        blocked: blocked(drive, smallest_system),
+        blocked: blocked(drive, smallest_system, handoff),
+        meet: volumes(drive).any(|volume| from_meet(volume, handoff)),
         partitions: volumes(drive).count(),
         esp,
         startup_space: Startup::for_esp(esp.map(|esp| esp.size)).space(),

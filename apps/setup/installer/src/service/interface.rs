@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use access::Idle;
+use luft_meet::Handoff;
 use tokio::sync::watch;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer};
@@ -15,7 +16,7 @@ use crate::install::drive::plan::{self, Request};
 use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Job, Regional, Stage, Status};
 use crate::options::Options;
-use crate::{first_boot, phase, survey};
+use crate::{first_boot, meet, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
@@ -27,11 +28,13 @@ pub struct Installer {
     status: Arc<Mutex<Status>>,
     answers: Arc<Answers>,
     started: AtomicBool,
+    meet: Option<Handoff>,
 }
 
 impl Installer {
     pub fn new(options: Options, config: Config, idle: Arc<Idle>) -> Self {
         Self {
+            meet: meet::handoff(&options.live_medium),
             options: Arc::new(options),
             config: Arc::new(config),
             idle,
@@ -131,8 +134,11 @@ impl Installer {
         self.authorize(connection, &header, INSTALL).await?;
         let _activity = self.idle.hold();
         let smallest = self.config.smallest_system;
+        let handoff = self.meet.clone();
+        let scratch = self.options.target.with_extension("moving-box");
         Self::blocking(move || {
-            let survey = survey::take(smallest).map_err(anyhow::Error::msg)?;
+            let survey =
+                survey::take(smallest, handoff.as_ref(), &scratch).map_err(anyhow::Error::msg)?;
             Ok(serde_json::to_string(&survey)?)
         })
         .await
@@ -150,8 +156,11 @@ impl Installer {
             .map_err(|error| Error::Failed(format!("The request isn't valid: {error}")))?;
         let image = self.config.image(&request.variant)?;
         let smallest = self.config.smallest_system;
+        let handoff = self.meet.clone();
+        let scratch = self.options.target.with_extension("moving-box");
         let (plan, windows) = Self::blocking(move || {
-            let survey = survey::take(smallest).map_err(anyhow::Error::msg)?;
+            let survey =
+                survey::take(smallest, handoff.as_ref(), &scratch).map_err(anyhow::Error::msg)?;
             let plan = plan::resolve(&survey, &request.target)?;
             let windows = Windows::chosen(&survey, &plan.drive, request.windows);
             Ok((plan, windows))
@@ -163,10 +172,11 @@ impl Installer {
         let (sender, updates) = watch::channel(Status::idle());
         let installer = server.interface::<_, Installer>(PATH).await?;
         tokio::spawn(forward(installer, updates));
-        let (options, answers, idle) = (
+        let (options, answers, idle, meet) = (
             self.options.clone(),
             self.answers.clone(),
             self.idle.clone(),
+            self.meet.clone(),
         );
         tokio::spawn(async move {
             let _activity = idle.hold();
@@ -177,6 +187,7 @@ impl Installer {
                     target: &options.target,
                     answers: &answers,
                     windows,
+                    meet,
                 };
                 install::run(job, |status| {
                     let _ = sender.send(status);

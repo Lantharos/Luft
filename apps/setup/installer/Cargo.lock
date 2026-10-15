@@ -497,12 +497,22 @@ dependencies = [
  "libc",
  "luft-dbus",
  "luft-disks",
+ "luft-meet",
  "luft-windows",
  "serde",
  "serde_json",
  "tokio",
  "toml",
  "zbus",
+]
+
+[[package]]
+name = "luft-meet"
+version = "0.1.0"
+dependencies = [
+ "roxmltree",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -669,6 +679,15 @@ name = "regf-rs"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "349e79c5a22cd52d15fe4d364428b1c1040a6b2025a763c59f645a955ceae1ef"
+
+[[package]]
+name = "roxmltree"
+version = "0.21.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1964b10c76125c36f8afe190065a4bf9a87bf324842c05701330bba9f1cacbb"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "rustc_version"

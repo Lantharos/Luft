@@ -1,5 +1,8 @@
 export { appearance, type Appearance, type AppIconPaint, type AppIcons, type AppIconStyle, type Palette, type Scheme, type SchemeColors, type Typography } from './appearance.svelte';
 
+export { default as Choice } from './choices/Choice.svelte';
+export { default as SplitBar } from './choices/SplitBar.svelte';
+
 export { default as Checkbox } from './controls/Checkbox.svelte';
 export { default as Dialog } from './controls/Dialog.svelte';
 export { default as IconButton } from './controls/IconButton.svelte';

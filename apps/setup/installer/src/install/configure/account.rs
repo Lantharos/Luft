@@ -34,7 +34,7 @@ impl Account {
         Ok(())
     }
 
-    fn ids(&self, deployment: &Deployment) -> Result<String> {
+    pub fn ids(&self, deployment: &Deployment) -> Result<String> {
         let passwd = std::fs::read_to_string(deployment.etc("passwd"))?;
         passwd
             .lines()

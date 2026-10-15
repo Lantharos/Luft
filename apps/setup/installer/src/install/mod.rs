@@ -1,4 +1,4 @@
-mod configure;
+pub mod configure;
 mod copy;
 pub mod drive;
 mod startup;
@@ -8,6 +8,7 @@ use std::path::Path;
 use std::sync::{Condvar, Mutex};
 
 use anyhow::{Context, Result};
+use luft_meet::Handoff;
 
 pub use configure::account::Account;
 pub use configure::regional::Regional;
@@ -20,8 +21,12 @@ use drive::plan::Plan;
 use drive::target::Mounted;
 use windows::Windows;
 
+use crate::meet::{self, reclaim, unpack};
+
 const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
+const COPIED_BEFORE_UNPACKING: f64 = 0.8;
+const STATE: &str = "lib/luft-installer";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Stage {
@@ -112,6 +117,19 @@ pub struct Job<'a> {
     pub target: &'a Path,
     pub answers: &'a Answers,
     pub windows: Option<Windows>,
+    pub meet: Option<Handoff>,
+}
+
+fn unpack_box(
+    guid: &str,
+    deployment: &Deployment,
+    account: &Account,
+    at: &Path,
+    progress: &dyn Fn(f64),
+) -> Result<()> {
+    let opened = meet::Opened::mount(guid, at)?;
+    let manifest = opened.manifest()?;
+    unpack::unpack(deployment, account, opened.root(), &manifest, progress)
 }
 
 pub fn run(job: Job, report: impl Fn(Status)) {
@@ -132,19 +150,29 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         windows.change();
     }
     let parts = partition::apply(&job.plan)?;
-    let mounted = Mounted::assemble(job.target, &job.plan.device, &parts)?;
+    let skipped: Vec<&str> = job.meet.iter().flat_map(Handoff::partitions).collect();
+    let mounted = Mounted::assemble(job.target, &job.plan.device, &parts, &skipped)?;
+    let moving_box = job
+        .meet
+        .as_ref()
+        .and_then(|handoff| handoff.moving_box.as_deref());
+    let copied = if moving_box.is_some() {
+        COPIED_BEFORE_UNPACKING
+    } else {
+        COPIED
+    };
     report(Status::at(Stage::Copying, PREPARED));
-    copy::run(job.image, &mounted, |copied| {
+    copy::run(job.image, &mounted, |done| {
         report(Status::at(
             Stage::Copying,
-            PREPARED + (COPIED - PREPARED) * copied,
+            PREPARED + (copied - PREPARED) * done,
         ))
     })
     .context("Luft couldn't be copied")?;
     startup::place(&mounted, &job.target.with_extension("esp"))?;
-    report(Status::at(Stage::Waiting, COPIED));
+    report(Status::at(Stage::Waiting, copied));
     let (regional, account) = job.answers.wait();
-    report(Status::at(Stage::Configuring, COPIED));
+    report(Status::at(Stage::Configuring, copied));
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
     regional.apply(&deployment)?;
     account.create(&deployment)?;
@@ -152,6 +180,25 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         && let Err(error) = windows.bring_bluetooth(&deployment)
     {
         eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
+    }
+    if let Some(guid) = moving_box
+        && let Err(error) = unpack_box(
+            guid,
+            &deployment,
+            &account,
+            &job.target.with_extension("box"),
+            &|done| {
+                report(Status::at(
+                    Stage::Configuring,
+                    copied + (COPIED - copied) * done,
+                ))
+            },
+        )
+    {
+        eprintln!("The moving box wasn't unpacked: {error:#}");
+    }
+    if let Some(meet) = &job.meet {
+        reclaim::remember(&deployment.var(STATE), meet)?;
     }
     handoff::prepare(&deployment, &account.name)?;
     drop(deployment);

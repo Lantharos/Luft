@@ -5,6 +5,7 @@ mod session;
 mod trust;
 
 use luft_app::{Appearance, Commands, Events};
+use luft_meet::{Handoff, Intent};
 use sabine::{SabineLifecyclePolicy, SabineWindow, SingleInstancePolicy, WindowRegion};
 use serde::Serialize;
 use serde_json::Value;
@@ -12,12 +13,19 @@ use serde_json::Value;
 const APP_ID: &str = "com.lantharos.setup";
 const SIZE: (u32, u32) = (820, 600);
 const RADIUS: i32 = 22;
+const MEET_NOTES: &str = "/run/initramfs/live/meet.json";
 
 #[derive(Serialize)]
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
     hardware: hardware::Hardware,
+    meet: Option<Intent>,
+}
+
+fn meet_intent() -> Option<Intent> {
+    let notes = std::fs::read_to_string(MEET_NOTES).ok()?;
+    Handoff::parse(&notes).ok().map(|handoff| handoff.intent)
 }
 
 fn window(window: SabineWindow) -> SabineWindow {
@@ -38,6 +46,7 @@ fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         Ok(AppState {
             appearance: Appearance::current(),
             hardware: hardware::detect(),
+            meet: meet_intent(),
         })
     });
     let window = luft_network::register(window, events);

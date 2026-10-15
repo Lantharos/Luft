@@ -46,6 +46,7 @@ export interface Drive {
 	startupSpace: number;
 	windows: WindowsVolume | null;
 	free: Space[];
+	meet: boolean;
 }
 
 export interface Keyboard {
@@ -59,11 +60,19 @@ export interface Hints {
 	locale: string | null;
 }
 
+export interface MeetSurvey {
+	drive: string;
+	space: Space | null;
+	intent: 'try' | 'install';
+	movingBox: { bytes: number; fullName: string | null; userName: string | null } | null;
+}
+
 export interface Survey {
 	drives: Drive[];
 	hints: Hints;
 	firmwareLanguage: string | null;
 	smallestSystem: number;
+	meet: MeetSurvey | null;
 }
 
 export type Target =

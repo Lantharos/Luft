@@ -1775,6 +1775,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-meet"
+version = "0.1.0"
+dependencies = [
+ "roxmltree 0.21.1",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "luft-network"
 version = "0.1.0"
 dependencies = [
@@ -3020,6 +3029,7 @@ dependencies = [
  "gio-unix",
  "luft-app",
  "luft-fingerprint",
+ "luft-meet",
  "luft-network",
  "roxmltree 0.21.1",
  "sabine",

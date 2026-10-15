@@ -1,0 +1,19 @@
+[package]
+name = "luft-meet"
+version = "0.1.0"
+description = "What Meet Luft leaves on the drive for Install Luft: its partitions, why it restarted and the moving box"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[dependencies]
+roxmltree = "0.21.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

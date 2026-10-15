@@ -6,7 +6,7 @@ use std::fmt;
 
 use serde::Serialize;
 
-pub use windows::pairings;
+pub use windows::{pairings, saved_pairings};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Address([u8; 6]);

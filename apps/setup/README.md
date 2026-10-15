@@ -10,6 +10,7 @@ Installs Luft from the USB stick and sets up a new computer the first time it st
 - Alongside Windows with a size bar, on a whole drive, in free space made with Disks, or just trying Luft from the stick, next to Windows' small EFI system partition too
 - Refuses to touch Windows while it's hibernating, locked with BitLocker or needs a check, and says what to do in Windows
 - Next to Windows, offers to turn off Fast Startup, keep the clock right in both and bring Bluetooth devices paired in Windows
+- Started by [Meet Luft](../meet/README.md) from Windows, goes straight to the room Meet Luft made, fills in your name and regional settings from the moving box, unpacks it into the new account, and takes back Meet Luft's partitions after the first sign-in
 - Copies Luft in the background while you connect to Wi-Fi and make your account
 - Picks the NVIDIA image when the computer has an NVIDIA graphics card
 - Before the restart, explains the one blue Secure Boot screen with pictures and the code to type

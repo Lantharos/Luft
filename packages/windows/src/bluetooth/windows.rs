@@ -2,55 +2,98 @@ use anyhow::Result;
 
 use super::{Address, Key, Keys, LongTermKey, Pairing};
 use crate::System;
-use crate::registry::Data;
+use crate::registry::{Data, Registry};
 
 const PARAMETERS: &str = r"Services\BTHPORT\Parameters";
 const LOW_ENERGY_DEVICES: &str = r"Enum\BTHLE";
 const MITM: u32 = 0x04;
 const RANDOM: u32 = 1;
 
+struct Place<'a, 'h> {
+    registry: &'a Registry<'h>,
+    path: String,
+}
+
+impl Place<'_, '_> {
+    fn join(&self, below: &str) -> String {
+        match (self.path.is_empty(), below.is_empty()) {
+            (true, _) => below.to_owned(),
+            (_, true) => self.path.clone(),
+            _ => format!(r"{}\{below}", self.path),
+        }
+    }
+}
+
 pub fn pairings(system: &System) -> Result<Vec<Pairing>> {
     let Some(control_set) = system.control_set() else {
         return Ok(Vec::new());
     };
-    let reader = Reader {
-        system,
-        control_set,
-    };
-    let keys = format!(r"{control_set}\{PARAMETERS}\Keys");
-    let mut pairings = Vec::new();
-    for adapter_name in system.registry().subkeys(&keys)? {
-        let Some(adapter) = Address::from_hex(&adapter_name) else {
-            continue;
-        };
-        let adapter_path = format!(r"{keys}\{adapter_name}");
-        for (device, data) in system.registry().values(&adapter_path)? {
-            if let (Some(device), Data::Binary(link_key)) = (Address::from_hex(&device), data)
-                && let Ok(link_key) = Key::try_from(link_key.as_slice())
-            {
-                pairings.push(reader.pairing(adapter, device, Keys::Classic { link_key })?);
-            }
-        }
-        for device_name in system.registry().subkeys(&adapter_path)? {
-            let path = format!(r"{adapter_path}\{device_name}");
-            if let Some((device, keys)) = reader.low_energy(&path, &device_name)? {
-                pairings.push(reader.pairing(adapter, device, keys)?);
-            }
-        }
+    let registry = system.registry();
+    Reader {
+        parameters: Place {
+            registry,
+            path: format!(r"{control_set}\{PARAMETERS}"),
+        },
+        low_energy: Some(Place {
+            registry,
+            path: format!(r"{control_set}\{LOW_ENERGY_DEVICES}"),
+        }),
     }
-    Ok(pairings)
+    .pairings()
+}
+
+pub fn saved_pairings(parameters: &[u8], low_energy: Option<&[u8]>) -> Result<Vec<Pairing>> {
+    let parameters = Registry::new(parameters)?;
+    let low_energy = low_energy.map(Registry::new).transpose()?;
+    Reader {
+        parameters: Place {
+            registry: &parameters,
+            path: String::new(),
+        },
+        low_energy: low_energy.as_ref().map(|registry| Place {
+            registry,
+            path: String::new(),
+        }),
+    }
+    .pairings()
 }
 
 struct Reader<'a, 'h> {
-    system: &'a System<'h>,
-    control_set: &'a str,
+    parameters: Place<'a, 'h>,
+    low_energy: Option<Place<'a, 'h>>,
 }
 
 impl Reader<'_, '_> {
+    fn pairings(&self) -> Result<Vec<Pairing>> {
+        let registry = self.parameters.registry;
+        let keys = self.parameters.join("Keys");
+        let mut pairings = Vec::new();
+        for adapter_name in registry.subkeys(&keys)? {
+            let Some(adapter) = Address::from_hex(&adapter_name) else {
+                continue;
+            };
+            let adapter_path = format!(r"{keys}\{adapter_name}");
+            for (device, data) in registry.values(&adapter_path)? {
+                if let (Some(device), Data::Binary(link_key)) = (Address::from_hex(&device), data)
+                    && let Ok(link_key) = Key::try_from(link_key.as_slice())
+                {
+                    pairings.push(self.pairing(adapter, device, Keys::Classic { link_key })?);
+                }
+            }
+            for device_name in registry.subkeys(&adapter_path)? {
+                let path = format!(r"{adapter_path}\{device_name}");
+                if let Some((device, keys)) = self.low_energy(&path, &device_name)? {
+                    pairings.push(self.pairing(adapter, device, keys)?);
+                }
+            }
+        }
+        Ok(pairings)
+    }
+
     fn pairing(&self, adapter: Address, device: Address, keys: Keys) -> Result<Pairing> {
         let hex = hex_name(device);
-        let registry = self.system.registry();
-        let known = format!(r"{}\{PARAMETERS}\Devices\{hex}", self.control_set);
+        let registry = self.parameters.registry;
+        let known = self.parameters.join(&format!(r"Devices\{hex}"));
         let name = match registry.binary(&known, "Name")? {
             Some(name) => utf8_name(&name),
             None => self.low_energy_name(&hex)?,
@@ -65,8 +108,11 @@ impl Reader<'_, '_> {
     }
 
     fn low_energy_name(&self, hex: &str) -> Result<Option<String>> {
-        let registry = self.system.registry();
-        let device = format!(r"{}\{LOW_ENERGY_DEVICES}\Dev_{hex}", self.control_set);
+        let Some(place) = &self.low_energy else {
+            return Ok(None);
+        };
+        let registry = place.registry;
+        let device = place.join(&format!("Dev_{hex}"));
         for instance in registry.subkeys(&device)? {
             if let Some(name) = registry.string(&format!(r"{device}\{instance}"), "FriendlyName")? {
                 return Ok(Some(name));
@@ -76,7 +122,7 @@ impl Reader<'_, '_> {
     }
 
     fn low_energy(&self, path: &str, name: &str) -> Result<Option<(Address, Keys)>> {
-        let registry = self.system.registry();
+        let registry = self.parameters.registry;
         let long_term_key = match registry.binary(path, "LTK")? {
             Some(key) => match Key::try_from(key.as_slice()) {
                 Ok(key) => Some(LongTermKey {

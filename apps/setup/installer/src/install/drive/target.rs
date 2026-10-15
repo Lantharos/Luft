@@ -21,33 +21,47 @@ fn mount(device: &str, at: &Path) -> Result<()> {
     Tool::new("mount").arg(device).arg(at).run()
 }
 
-fn first_esp(drive_device: &str) -> Result<String> {
+fn first_esp(drive_device: &str, skipped: &[&str]) -> Result<String> {
     let listing = Tool::new("lsblk")
         .args([
             "--list",
             "--noheadings",
             "--paths",
             "--output",
-            "PATH,PARTTYPE",
+            "PATH,PARTTYPE,PARTUUID",
         ])
         .arg(drive_device)
         .output()?;
     listing
         .lines()
-        .filter_map(|line| line.split_once(' '))
-        .find(|(_, kind)| kind.trim().eq_ignore_ascii_case(super::layout::ESP_TYPE))
-        .map(|(path, _)| path.to_owned())
+        .map(|line| line.split_whitespace().collect::<Vec<_>>())
+        .find(|fields| {
+            fields
+                .get(1)
+                .is_some_and(|kind| kind.eq_ignore_ascii_case(super::layout::ESP_TYPE))
+                && !fields.get(2).is_some_and(|partition| {
+                    skipped
+                        .iter()
+                        .any(|skip| skip.eq_ignore_ascii_case(partition))
+                })
+        })
+        .map(|fields| fields[0].to_owned())
         .context("The drive has no EFI system partition")
 }
 
 impl Mounted {
-    pub fn assemble(root: &Path, drive_device: &str, parts: &[Created]) -> Result<Self> {
+    pub fn assemble(
+        root: &Path,
+        drive_device: &str,
+        parts: &[Created],
+        skipped_esps: &[&str],
+    ) -> Result<Self> {
         let system = find(parts, Role::Root).context("No partition for Luft was made")?;
         mount(&system.device, root)?;
         Ok(Self {
             root: root.to_owned(),
             root_uuid: system.uuid.clone(),
-            esp: first_esp(drive_device)?,
+            esp: first_esp(drive_device, skipped_esps)?,
         })
     }
 

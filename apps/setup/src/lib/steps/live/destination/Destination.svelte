@@ -5,21 +5,21 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
-	import { bytes, Dialog } from '@luft/ui';
+	import { bytes, Choice, Dialog } from '@luft/ui';
 	import type { Drive, Target, WindowsVolume } from '#lib/api/installer.js';
 	import { finishSetup } from '#lib/api/system.js';
-	import Choice from '#lib/components/Choice.svelte';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
 	import Alongside from './Alongside.svelte';
 	import Custom from './Custom.svelte';
+	import MeetRoom from './MeetRoom.svelte';
 	import WholeDrive from './WholeDrive.svelte';
 	import { windowsName } from './explain.js';
 
 	type View = 'choose' | 'alongside' | 'whole' | 'custom';
 
-	let view = $state<View>('choose');
+	let view = $state<View>(install.meet ? 'alongside' : 'choose');
 	let size = $state(0);
 	let wholeDrive = $state<string | null>(null);
 	let freeSpace = $state<string | null>(null);
@@ -27,7 +27,10 @@
 
 	let survey = $derived(install.survey);
 	let windowsDrive = $derived(install.windowsDrive as (Drive & { windows: WindowsVolume }) | null);
+	let meet = $derived(install.meet);
+	let meetDrive = $derived(meet ? install.drive(meet.drive) : null);
 	let target = $derived.by((): Target | null => {
+		if (view === 'alongside' && meet?.space) return { kind: 'free', drive: meet.drive, offset: meet.space.offset };
 		if (view === 'alongside' && windowsDrive && size > 0) return { kind: 'alongside', drive: windowsDrive.block, size };
 		if (view === 'whole' && wholeDrive) return { kind: 'whole', drive: wholeDrive };
 		if (view === 'custom' && freeSpace) {
@@ -72,13 +75,17 @@
 		</div>
 	{:else if view === 'choose'}
 		<div class="-mx-2 flex flex-col gap-1">
-			{#if windowsDrive}
+			{#if meet?.space}
+				<Choice icon={LayoutPanelLeft} title="Alongside Windows" description="Use the {bytes(meet.space.size)} Meet Luft made next to Windows." onclick={() => (view = 'alongside')} />
+			{:else if windowsDrive}
 				<Choice icon={LayoutPanelLeft} title="Alongside {windowsName(windowsDrive.windows)}" description="Keep Windows and its files, and give Luft part of its drive." onclick={() => (view = 'alongside')} />
 			{/if}
 			<Choice icon={HardDrive} title="Use a whole drive" description="Erase a drive and give all of it to Luft." disabled={install.usableDrives.length === 0} onclick={() => (view = 'whole')} />
 			<Choice icon={Sparkles} title="Just try Luft" description="Look around first. Nothing is installed and your drives stay untouched." onclick={justTry} />
 			<Choice icon={SlidersHorizontal} title="Custom" description="Arrange partitions yourself in Disks." onclick={() => (view = 'custom')} />
 		</div>
+	{:else if view === 'alongside' && meet?.space && meetDrive}
+		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} />
 	{:else if view === 'alongside' && windowsDrive}
 		<Alongside drive={windowsDrive} smallest={survey.smallestSystem} onsize={(next) => (size = next)} />
 	{:else if view === 'whole'}

@@ -44,6 +44,7 @@ pub struct Volume {
     pub system: bool,
     pub partition_type: Option<String>,
     pub partition_name: String,
+    pub partition_uuid: String,
     pub flags: Vec<u8>,
     pub logical: bool,
     pub encryption: Option<Encryption>,
@@ -193,6 +194,9 @@ fn volume(
         partition_type: partition.and_then(|partition| partition.get("Type")),
         partition_name: partition
             .and_then(|partition| partition.get("Name"))
+            .unwrap_or_default(),
+        partition_uuid: partition
+            .and_then(|partition| partition.get("UUID"))
             .unwrap_or_default(),
         flags: partition
             .and_then(|partition| partition.get::<u64>("Flags"))

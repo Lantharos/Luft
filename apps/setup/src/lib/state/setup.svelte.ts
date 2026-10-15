@@ -1,5 +1,5 @@
 import { appearance } from '@luft/ui';
-import { appState, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/api/system.js';
+import { appState, finishSetup, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/api/system.js';
 import { flow, type Step } from './flow.svelte.js';
 import { install } from './install.svelte.js';
 import { regional } from './regional.svelte.js';
@@ -20,6 +20,7 @@ class SetupState {
 
 	async start() {
 		const state = await appState();
+		if (state.meet === 'try' && (await finishSetup().catch(() => false))) return () => {};
 		const stops = [appearance.start(state)];
 		this.hardware = state.hardware;
 		stops.push(await install.start(state.hardware));

@@ -6,6 +6,8 @@ Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when
 
 The shell follows `color-scheme` in `org.gnome.desktop.interface`, like Luft's apps: `prefer-dark` is dark, anything else is light. Switching restyles the shell once, with no restart.
 
+Luft starts dark, on Fog. The light style has its own wallpaper, Dunes, in `picture-uri`, while `picture-uri-dark` holds the dark one. Both sit with the other built-in wallpapers in `/usr/share/backgrounds/luft`.
+
 - Light glass is a thin white frost over the blur with dark text and icons. Its blur brightens dark wallpapers and deepens their colors, so the wallpaper shows through clean instead of grey. Dark glass dims bright wallpapers instead, so text stays readable on any wallpaper.
 - Tinted and clear app icons, the Start mark and symbolic icons switch to the ink of each style.
 - The taskbar's text and icons take the light or dark ink, whichever reads better against what sits behind them: the bottom of the wallpaper as the taskbar's look shows it. A transparent taskbar over a dark wallpaper turns its ink white in the light style, and over a bright one it turns dark in the dark style. Where neither ink is clear enough, the clock and status icons get a halo, a firmer one on a transparent taskbar over a busy wallpaper. The choice is made once per wallpaper, for both styles and every look, so switching style or look adds no extra restyle.

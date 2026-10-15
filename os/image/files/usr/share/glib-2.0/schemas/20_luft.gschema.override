@@ -1,11 +1,9 @@
 [org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/luft/Fog.jpg'
+picture-uri='file:///usr/share/backgrounds/luft/Dunes.jpg'
 picture-uri-dark='file:///usr/share/backgrounds/luft/Fog.jpg'
 
-[org.gnome.desktop.screensaver]
-picture-uri='file:///usr/share/backgrounds/luft/Fog.jpg'
-
 [org.gnome.desktop.interface]
+color-scheme='prefer-dark'
 font-name='Open Runde 11'
 document-font-name='Open Runde 12'
 monospace-font-name='Maple Mono NF 11'
@@ -14,5 +12,5 @@ monospace-font-name='Maple Mono NF 11'
 tap-to-click=true
 
 [com.lantharos.kestrel]
-wallpaper-focus=(0.5, 0.768)
+wallpaper-focus=(0.79, 0.775)
 wallpaper-focus-dark=(0.5, 0.768)

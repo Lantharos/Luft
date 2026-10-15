@@ -9,7 +9,7 @@ depends() {
 }
 
 installkernel() {
-    hostonly="" instmods erofs overlay loop isofs sr_mod cdrom usb_storage uas
+    hostonly="" instmods erofs overlay loop isofs exfat sr_mod cdrom usb_storage uas
 }
 
 install() {

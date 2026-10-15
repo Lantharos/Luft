@@ -6,13 +6,16 @@ store=/run/luft/store
 writable=/run/luft/writable
 root=/run/luft/root
 
-label() {
-    local argument
+medium_device() {
+    local argument spec=""
     for argument in $(</proc/cmdline); do
-        if [[ $argument == root=luft-live:* ]]; then
-            echo "${argument#root=luft-live:}"
-        fi
+        [[ $argument == root=luft-live:* ]] && spec="${argument#root=luft-live:}"
     done
+    case "$spec" in
+        LABEL=*) echo "/dev/disk/by-label/${spec#LABEL=}" ;;
+        PARTUUID=*) echo "/dev/disk/by-partuuid/${spec#PARTUUID=}" ;;
+        *) echo "Luft doesn't know where to start from: root=luft-live:$spec" >&2; return 1 ;;
+    esac
 }
 
 layers() {
@@ -22,7 +25,7 @@ layers() {
     printf '%s\n' "$top/diff" "${lower[@]}"
 }
 
-device="/dev/disk/by-label/$(label)"
+device="$(medium_device)"
 udevadm wait --timeout=120 "$device"
 mkdir -p "$medium" "$store" "$writable" "$root"
 mount -o ro "$device" "$medium"

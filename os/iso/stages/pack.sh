@@ -16,7 +16,7 @@ live_layer() {
 }
 
 kernel_arguments() {
-  printf 'root=luft-live:%s rd.live.image ' "$label"
+  printf 'rd.live.image '
   sed -n 's/^kargs = \[\(.*\)\]$/\1/p' "$live"/usr/lib/bootc/kargs.d/*.toml | tr -d '",' | tr '\n' ' '
 }
 

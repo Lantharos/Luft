@@ -22,9 +22,11 @@ impl Section {
 pub struct Profile {
     pub id: Option<String>,
     pub title: Option<String>,
+    pub command_line: Option<String>,
 }
 
 pub struct Uki {
+    pub command_line: Option<String>,
     pub os: String,
     pub name: Option<String>,
     pub version: Option<String>,
@@ -97,18 +99,23 @@ pub fn uki(file: &mut RegularFile) -> Option<Uki> {
     };
     let release = base_text(file, b".osrel").unwrap_or_default();
     let version = base_text(file, b".uname").map(|version| version.trim().to_string());
-    let profiles = sections[base..]
-        .iter()
-        .filter(|section| section.is(b".profile"))
-        .map(|section| {
+    let mut profiles: Vec<Profile> = Vec::new();
+    for section in &sections[base..] {
+        if section.is(b".profile") {
             let profile = text(file, section).unwrap_or_default();
-            Profile {
+            profiles.push(Profile {
                 id: field(&profile, "ID"),
                 title: field(&profile, "TITLE"),
-            }
-        })
-        .collect();
+                command_line: None,
+            });
+        } else if section.is(b".cmdline")
+            && let Some(profile) = profiles.last_mut()
+        {
+            profile.command_line = text(file, section).map(|line| line.trim().to_string());
+        }
+    }
     Some(Uki {
+        command_line: base_text(file, b".cmdline").map(|line| line.trim().to_string()),
         os: field(&release, "ID").unwrap_or_default(),
         name: field(&release, "PRETTY_NAME").or_else(|| field(&release, "NAME")),
         version,

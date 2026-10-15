@@ -14,6 +14,19 @@ export interface SigningKey {
 	state: 'none' | 'pending' | 'enrolled';
 	available: boolean;
 	missed: number;
+	otherKeys: string[];
+	removingOtherKeys: boolean;
+}
+
+export interface Requirement {
+	id: string;
+	met: boolean;
+	missing: string;
+}
+
+export interface AntiCheat {
+	requirements: Requirement[];
+	usesLuftKey: boolean;
 }
 
 export interface Startup {
@@ -47,6 +60,7 @@ export interface Trust {
 	signingKey: SigningKey;
 	startup: Startup;
 	disk: Disk;
+	antiCheat: AntiCheat;
 }
 
 export interface Check {
@@ -101,6 +115,8 @@ export const replaceRecoveryKey = (unlock: string) => invoke<Outcome<string>>('s
 
 export const enrollSigningKey = () => invoke<string>('security_enroll_key', {}, WAIT_FOR_PERMISSION);
 export const cancelSigningKey = () => invoke<void>('security_cancel_enrollment', {}, WAIT_FOR_PERMISSION);
+export const removeOtherKeys = () => invoke<string>('security_remove_other_keys', {}, WAIT_FOR_PERMISSION);
+export const keepOtherKeys = () => invoke<void>('security_keep_other_keys', {}, WAIT_FOR_PERMISSION);
 export const installSignedStartup = () => invoke<void>('security_install_startup', {}, WAIT_FOR_PERMISSION);
 
 export const saveRecoveryKey = (key: string) => invoke<boolean>('security_save_key', { key }, WAIT_FOR_PERMISSION);

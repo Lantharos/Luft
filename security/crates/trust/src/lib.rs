@@ -1,3 +1,4 @@
+mod anticheat;
 mod boot;
 pub mod cli;
 mod disk;

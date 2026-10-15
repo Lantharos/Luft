@@ -10,6 +10,7 @@ mod menu;
 mod protocol;
 mod screen;
 mod start;
+mod tpm;
 
 #[used]
 #[unsafe(link_section = ".sbat")]

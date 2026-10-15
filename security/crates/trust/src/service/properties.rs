@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use zbus::zvariant::{OwnedValue, Value};
 
 use super::status::{SigningKey, Startup};
+use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
 use crate::disk::worker::Progress;
 use crate::system::tpm::Tpm;
@@ -32,6 +33,26 @@ pub fn signing_key(key: &SigningKey) -> Dict {
         ("Reason", key.reason.as_str().into()),
         ("Missed", key.missed.into()),
         ("MissedThisBoot", key.missed_this_boot.into()),
+        ("OtherKeys", key.other_keys.clone().into()),
+        ("RemovingOtherKeys", key.removing_other_keys.into()),
+    ])
+}
+
+pub fn anti_cheat(readiness: &Readiness) -> Dict {
+    let checks: Vec<(String, bool, String)> = readiness
+        .checks
+        .iter()
+        .map(|check| {
+            (
+                check.id.to_owned(),
+                check.missing.is_none(),
+                check.missing.clone().unwrap_or_default(),
+            )
+        })
+        .collect();
+    dict([
+        ("Checks", checks.into()),
+        ("UsesLuftKey", readiness.uses_luft_key.into()),
     ])
 }
 

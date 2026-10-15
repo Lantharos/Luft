@@ -2,7 +2,7 @@
 	import { Dialog } from '@luft/ui';
 	import { problem, restart } from '../api';
 
-	let { code, onclose }: { code: string; onclose: () => void } = $props();
+	let { code, removing = false, onclose }: { code: string; removing?: boolean; onclose: () => void } = $props();
 
 	let busy = $state(false);
 	let error = $state('');
@@ -23,12 +23,12 @@
 </script>
 
 <Dialog
-	title="Add the key when you restart"
-	description="After you restart, a blue screen asks about a new key. It only waits 10 seconds, so press any key as soon as it appears."
+	title={removing ? 'Remove the keys when you restart' : 'Add the key when you restart'}
+	description="After you restart, a blue screen asks about {removing ? 'removing keys' : 'a new key'}. It only waits 10 seconds, so press any key as soon as it appears."
 	onclose={() => !busy && onclose()}
 >
 	<ol class="flex flex-col gap-2.5">
-		<li class="step"><span class="number">1</span><span>Choose <b>Enroll MOK</b>, then <b>Continue</b>.</span></li>
+		<li class="step"><span class="number">1</span><span>Choose <b>{removing ? 'Delete MOK' : 'Enroll MOK'}</b>, then <b>Continue</b>.</span></li>
 		<li class="step"><span class="number">2</span><span>Choose <b>Yes</b>.</span></li>
 		<li class="step"><span class="number">3</span><span>Type the code below and press <b>Enter</b>.</span></li>
 		<li class="step"><span class="number">4</span><span>Choose <b>Reboot</b>.</span></li>
@@ -38,7 +38,11 @@
 			<span>{half}</span>
 		{/each}
 	</div>
-	<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">If you miss it, your computer starts as usual and the steps show again at the next restart, with a new code.</p>
+	<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">
+		{removing
+			? 'If you miss it, your computer starts as usual and you can try again here.'
+			: 'If you miss it, your computer starts as usual and the steps show again at the next restart, with a new code.'}
+	</p>
 	{#if error}
 		<p class="text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}

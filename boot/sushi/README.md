@@ -108,6 +108,8 @@ SushiBoot reads unified kernel images and [Boot Loader Specification](https://ua
 - A version that hasn't been seen to start yet gets three tries; after that SushiBoot starts the one that last worked ([details](../../docs/boot.md#when-an-update-doesnt-start)).
 - It switches to the monitor's own resolution before Linux starts.
 - With Secure Boot on, it must be signed (it carries an SBAT section), passes nothing to what it starts but a profile number, has no command line editor, and skips entries that start a kernel directly.
+- With Secure Boot off, it passes a startup image its own command line without `lockdown=`, so the kernel isn't locked down on a computer whose owner turned Secure Boot off.
+- It measures into the TPM what systemd-boot does: `loader/loader.conf` into PCR 5, and any command line it passes into PCR 12.
 
 How shim, SushiBoot, the signed startup images and the TPM fit together is in [docs/boot.md](../../docs/boot.md). The image signs SushiBoot with Luft's key; trustd puts it on the EFI system partition as shim's second stage.
 

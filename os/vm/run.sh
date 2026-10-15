@@ -28,7 +28,7 @@ case "${1:-}" in
   -h | --help) usage; exit 0 ;;
 esac
 
-machine=q35,accel=kvm
+machine=q35,accel=kvm,kernel-irqchip=split
 code="$ovmf/OVMF_CODE_4M.qcow2"
 vars_template="$ovmf/OVMF_VARS_4M.qcow2"
 vars="$vm/OVMF_VARS_4M.qcow2"
@@ -71,6 +71,7 @@ trap 'kill "$swtpm" 2>/dev/null || true' EXIT
 until [[ -S "$vm/tpm.sock" ]]; do sleep 0.1; done
 
 qemu-system-x86_64 -machine "$machine" -cpu host -smp 4 -m "${MEMORY:-8192}" "${secure[@]}" \
+  -device intel-iommu,intremap=on \
   -drive "if=pflash,format=qcow2,readonly=on,file=$code" \
   -drive "if=pflash,format=qcow2,file=$vars" \
   -drive "file=$disk,format=qcow2,if=virtio" \

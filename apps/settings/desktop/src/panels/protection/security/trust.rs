@@ -30,6 +30,8 @@ pub struct SigningKey {
     state: String,
     available: bool,
     missed: u32,
+    other_keys: Vec<String>,
+    removing_other_keys: bool,
 }
 
 #[derive(Serialize, Default)]
@@ -38,6 +40,21 @@ pub struct Startup {
     installed: bool,
     measured: bool,
     available: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Requirement {
+    id: String,
+    met: bool,
+    missing: String,
+}
+
+#[derive(Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct AntiCheat {
+    requirements: Vec<Requirement>,
+    uses_luft_key: bool,
 }
 
 #[derive(Serialize, Default)]
@@ -79,6 +96,7 @@ pub struct Trust {
     startup: Startup,
     disk: Disk,
     drives: Drives,
+    anti_cheat: AntiCheat,
 }
 
 #[derive(Serialize)]
@@ -121,6 +139,19 @@ fn signing_key(map: &Map) -> SigningKey {
         state: text(map, "State"),
         available: flag(map, "Available"),
         missed: get(map, "Missed").unwrap_or_default(),
+        other_keys: get(map, "OtherKeys").unwrap_or_default(),
+        removing_other_keys: flag(map, "RemovingOtherKeys"),
+    }
+}
+
+fn anti_cheat(map: &Map) -> AntiCheat {
+    let checks: Vec<(String, bool, String)> = get(map, "Checks").unwrap_or_default();
+    AntiCheat {
+        requirements: checks
+            .into_iter()
+            .map(|(id, met, missing)| Requirement { id, met, missing })
+            .collect(),
+        uses_luft_key: flag(map, "UsesLuftKey"),
     }
 }
 
@@ -177,6 +208,7 @@ pub fn read() -> Result<Option<Trust>, String> {
         signing_key: signing_key(&group(&properties, "SigningKey")),
         startup: startup(&group(&properties, "Startup")),
         disk: disk(&group(&properties, "Disk")),
+        anti_cheat: anti_cheat(&group(&properties, "AntiCheat")),
     }))
 }
 

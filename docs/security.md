@@ -10,6 +10,27 @@ What protects a Luft computer, and against what. The services are [trustd and US
 - Each startup image names the exact system it belongs to by its composefs digest, and the system's files are checked against it with fs-verity, so a signed image never starts a changed system. Nothing is signed or rebuilt on the computer.
 - Shipping a Luft shim with the key built in would remove the one-time enrollment screen, but needs Microsoft's shim review and an HSM-backed CA.
 
+## Games with anti-cheat
+
+Epic's Easy Anti-Cheat for Linux, and others like it, only let a game run when the computer can show it started the way its maker intended. Luft meets each of Epic's requirements by default:
+
+| Requirement | How Luft meets it |
+| --- | --- |
+| Signed kernel and drivers | The kernel is in the signed startup image, Fedora signs its drivers and Luft's key signs NVIDIA's |
+| TPM 2.0 | Used when the computer has one |
+| Secure Boot with well-known keys only | Only Fedora's shim, Luft's key and shim's own key; any other key added to shim counts against it, since shim trusts those for drivers too |
+| Measured startup | The firmware measures shim, SushiBoot and the startup image into PCR 4, shim measures the Secure Boot state and its keys into PCR 7, SushiBoot measures `loader.conf` into PCR 5 and any command line it passes into PCR 12 like systemd-boot, and the startup image's stub measures itself into PCR 11 |
+| IOMMU on, without passthrough | `intel_iommu=on iommu.passthrough=0`; AMD's is on by itself |
+| Kernel lockdown in integrity mode, set at startup | `lockdown=integrity` |
+| kexec turned off at startup | `sysctl.kernel.kexec_load_disabled=1` |
+| The BPF security module | Part of Fedora's kernel |
+
+Settings shows "Ready for games with anti-cheat" under Security, or the first thing missing, such as Secure Boot being off in the firmware. Other keys added to shim can be removed from there; shim's blue screen asks to confirm with a one-time code at the next restart. `trustctl anti-cheat` lists every requirement.
+
+Epic's list of well-known keys doesn't include Luft's key yet. Nothing on the computer changes that; games that check for it start working once Epic adds it.
+
+Secure Boot and the TPM stay optional. With Secure Boot off, SushiBoot starts the kernel without `lockdown=integrity`, so unsigned drivers load and nothing is locked down against the computer's owner; games with anti-cheat just aren't available then. The IOMMU and kexec settings apply either way. Hibernation isn't available while the kernel is locked down; sleep works as usual.
+
 ## Disk unlock with the TPM
 
 The TPM releases the disk key only when both match:

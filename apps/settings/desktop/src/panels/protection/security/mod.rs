@@ -135,6 +135,12 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("security_cancel_enrollment", |_: Value| {
             trust::call::<_, ()>("CancelSigningKeyEnrollment", &())
         })
+        .command("security_remove_other_keys", |_: Value| {
+            trust::call::<_, String>("RemoveOtherKeys", &())
+        })
+        .command("security_keep_other_keys", |_: Value| {
+            trust::call::<_, ()>("KeepOtherKeys", &())
+        })
         .command("security_install_startup", |_: Value| {
             trust::call::<_, ()>("InstallSignedStartup", &())
         })

@@ -9,7 +9,7 @@ use uefi::proto::loaded_image::LoadedImage;
 use uefi::{CString16, Handle, Status};
 
 use crate::files::{self, Volume};
-use crate::protocol;
+use crate::{protocol, tpm};
 
 fn resources() -> uefi::Error {
     uefi::Error::from(Status::OUT_OF_RESOURCES)
@@ -78,6 +78,7 @@ pub fn start(image: Handle, options: &str) -> uefi::Result<()> {
         unsafe {
             loaded.set_load_options(encoded.as_ptr(), encoded.len() as u32);
         }
+        tpm::measure_load_options(&encoded);
     }
     boot::start_image(image)
 }

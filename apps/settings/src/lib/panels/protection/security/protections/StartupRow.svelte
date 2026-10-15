@@ -2,7 +2,7 @@
 	import Power from '@lucide/svelte/icons/power';
 	import { Row } from '@luft/ui';
 	import { cancelSigningKey, enrollSigningKey, installSignedStartup, problem, restart, type SigningKey, type Startup } from '../api';
-	import SigningKeyDialog from './SigningKeyDialog.svelte';
+	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
 	const PURPOSE = 'Only lets software signed for this computer start it';
 
@@ -62,5 +62,5 @@
 {/if}
 
 {#if code}
-	<SigningKeyDialog {code} onclose={() => (code = null)} />
+	<KeyStepsDialog {code} onclose={() => (code = null)} />
 {/if}

@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
@@ -42,7 +42,7 @@ pub fn enrollment() -> Enrollment {
     }
 }
 
-fn one_time_code() -> Result<String> {
+pub(super) fn one_time_code() -> Result<String> {
     let mut bytes = [0u8; 8];
     getrandom::fill(&mut bytes)?;
     Ok(bytes
@@ -62,18 +62,21 @@ pub fn request() -> Result<String> {
     ask_shim(Request::default())
 }
 
-fn import(code: &str) -> Result<()> {
-    let scratch = Scratch::empty()?;
+pub(super) fn hash_file(scratch: &Scratch, code: &str) -> Result<PathBuf> {
     let hash = Tool::new("mokutil")
         .arg(format!("--generate-hash={code}"))
         .output_bytes()
         .map(Secret::new)?;
-    let hash_file = scratch.write("mok-hash", &hash)?;
+    scratch.write("mok-hash", &hash)
+}
+
+fn import(code: &str) -> Result<()> {
+    let scratch = Scratch::empty()?;
     Tool::new("mokutil")
         .arg("--import")
         .arg(Path::new(CERTIFICATE))
         .arg("--hash-file")
-        .arg(&hash_file)
+        .arg(hash_file(&scratch, code)?)
         .status()
 }
 

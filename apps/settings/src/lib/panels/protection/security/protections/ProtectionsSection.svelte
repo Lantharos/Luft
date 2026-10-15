@@ -5,6 +5,7 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
+	import AntiCheatRow from './AntiCheatRow.svelte';
 	import DrivesRow from '../encryption/DrivesRow.svelte';
 	import EncryptionRow from '../encryption/EncryptionRow.svelte';
 	import type { SecurityState } from '../state.svelte';
@@ -34,6 +35,7 @@
 		{#if trust.tpm.usable}
 			<Row title="Security chip" description="Keeps keys safe and checks how this computer started" icon={Microchip} />
 		{/if}
+		<AntiCheatRow antiCheat={trust.antiCheat} key={trust.signingKey} />
 	{/if}
 	{#if security.host}
 		<Row title="Hardware security" description={levelSentence(security.host)} icon={CircuitBoard} onclick={() => (detailing = true)} />

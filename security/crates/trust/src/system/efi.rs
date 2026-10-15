@@ -105,6 +105,14 @@ pub fn requested_certificates() -> Vec<Vec<u8>> {
     certificates_in(&variable("MokNew", SHIM).unwrap_or_default())
 }
 
+pub fn removal_requested_certificates() -> Vec<Vec<u8>> {
+    certificates_in(&variable("MokDel", SHIM).unwrap_or_default())
+}
+
+pub fn shim_checks_off() -> bool {
+    flag("MokSBStateRT", SHIM) == Some(true)
+}
+
 fn mok_list() -> Vec<u8> {
     std::fs::read(format!("{MOK_VARIABLES}/MokListRT"))
         .ok()
@@ -121,7 +129,7 @@ fn read_u32(data: &[u8], at: usize) -> Option<usize> {
     Some(u32::from_le_bytes(bytes.try_into().ok()?) as usize)
 }
 
-fn certificates_in(mut lists: &[u8]) -> Vec<Vec<u8>> {
+pub fn certificates_in(mut lists: &[u8]) -> Vec<Vec<u8>> {
     let mut certificates = Vec::new();
     while lists.len() >= 28 {
         let (Some(list_size), Some(header_size), Some(signature_size)) = (

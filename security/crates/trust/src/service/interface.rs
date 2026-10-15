@@ -15,7 +15,7 @@ use super::status::{self, Status};
 use crate::boot::{attempts, startup};
 use crate::disk::worker::{self, Progress};
 use crate::disk::{self, keys};
-use crate::keys::mok;
+use crate::keys::{mok, others};
 use crate::system::power;
 use crate::system::secret::Secret;
 
@@ -101,6 +101,7 @@ impl Trust {
         let _ = self.signing_key_changed(emitter).await;
         let _ = self.startup_changed(emitter).await;
         let _ = self.disk_changed(emitter).await;
+        let _ = self.anti_cheat_changed(emitter).await;
     }
 }
 
@@ -180,6 +181,11 @@ impl Trust {
     #[zbus(property)]
     async fn startup(&self) -> Dict {
         properties::startup(&self.status().await.startup)
+    }
+
+    #[zbus(property)]
+    async fn anti_cheat(&self) -> Dict {
+        properties::anti_cheat(&self.status().await.anti_cheat)
     }
 
     #[zbus(property)]
@@ -318,6 +324,26 @@ impl Trust {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SECURE_BOOT).await?;
         self.run(&emitter, mok::cancel).await
+    }
+
+    async fn remove_other_keys(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<String, Error> {
+        self.authorize(connection, &header, SECURE_BOOT).await?;
+        self.run(&emitter, others::request_removal).await
+    }
+
+    async fn keep_other_keys(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, SECURE_BOOT).await?;
+        self.run(&emitter, others::withdraw_removal).await
     }
 
     async fn install_signed_startup(

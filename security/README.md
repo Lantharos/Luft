@@ -26,6 +26,8 @@ All commands need root.
 | `trustctl status` | Shows Secure Boot, the TPM, the key, the startup and the disk |
 | `trustctl secure-boot enroll` | Asks shim to trust Luft's key at the next restart and prints the steps |
 | `trustctl secure-boot cancel` | Withdraws that request |
+| `trustctl secure-boot remove-others` / `keep-others` | Asks shim to remove the keys added from elsewhere at the next restart, or withdraws that |
+| `trustctl anti-cheat` | Checks what games with anti-cheat look for ([details](../docs/security.md#games-with-anti-cheat)) |
 | `trustctl startup install [--esp DIR]` | Puts shim and SushiBoot on the EFI system partition and makes Luft the firmware's boot entry |
 | `trustctl tpm enroll [--pin]` | Lets the TPM unlock the encrypted disk, optionally with a PIN |
 | `trustctl tpm remove` | Removes the TPM unlock |

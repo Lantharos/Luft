@@ -108,7 +108,7 @@ impl Catalog {
             others.extend(listed.others);
             others.extend(loaders::scan(&mut volume, &origin));
         }
-        images::add(&mut catalog, found_images);
+        images::add(&mut catalog, found_images, secure_boot);
         for entry in others {
             let index = catalog.push(entry);
             catalog.main.push(Row::Entry(index));

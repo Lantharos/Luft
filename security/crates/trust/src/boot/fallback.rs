@@ -5,7 +5,7 @@ use anyhow::{Context, Result};
 use super::esp::Esp;
 use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
 use super::partition::BootPartition;
-use super::pe::StartupImage;
+use super::pe::PeFile;
 
 pub const FOLDER: &str = "EFI/luft-start";
 pub const LOADER: &str = "\\EFI\\luft-start\\shimx64.efi";
@@ -52,7 +52,7 @@ fn grub_config(boot_uuid: &str, command_line: &str) -> String {
 }
 
 pub fn place(esp: &Esp, boot: &BootPartition) -> Result<bool> {
-    let mut image = StartupImage::open(&default_image(boot)?)?;
+    let mut image = PeFile::open(&default_image(boot)?)?;
     let command_line = String::from_utf8_lossy(&image.section(".cmdline")?)
         .trim_matches(char::from(0))
         .trim()

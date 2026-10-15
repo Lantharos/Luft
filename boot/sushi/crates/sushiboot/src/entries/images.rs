@@ -8,6 +8,7 @@ use super::{Action, BootEntry, Catalog, Origin, Release, Row, newest_first};
 use crate::files::Volume;
 
 const IMAGES: &str = "\\EFI\\Linux";
+const LOCKDOWN: &str = "lockdown";
 
 pub struct Image {
     origin: Origin,
@@ -56,7 +57,26 @@ impl Image {
         }
     }
 
-    fn entry(&self, profile: usize, title: String) -> BootEntry {
+    fn command_line(&self, profile: usize) -> Option<&str> {
+        self.uki
+            .profiles
+            .get(profile)
+            .and_then(|details| details.command_line.as_deref())
+            .or(self.uki.command_line.as_deref())
+    }
+
+    fn options(&self, profile: usize, secure_boot: bool) -> String {
+        let mut options = Vec::new();
+        if profile > 0 {
+            options.push(format!("@{profile}"));
+        }
+        if !secure_boot && let Some(command_line) = self.command_line(profile) {
+            options.push(without_lockdown(command_line));
+        }
+        options.join(" ")
+    }
+
+    fn entry(&self, profile: usize, title: String, secure_boot: bool) -> BootEntry {
         let id = match self.uki.profiles.get(profile) {
             Some(details) => match &details.id {
                 Some(name) => format!("{}@{name}", self.name),
@@ -64,10 +84,7 @@ impl Image {
             },
             None => self.name.clone(),
         };
-        let options = match profile {
-            0 => String::new(),
-            profile => format!("@{profile}"),
-        };
+        let options = self.options(profile, secure_boot);
         BootEntry {
             id: self.origin.id(&id),
             title: self.origin.title(&title),
@@ -100,7 +117,15 @@ pub fn scan(volume: &mut Volume, origin: &Origin) -> Vec<Image> {
         .collect()
 }
 
-pub fn add(catalog: &mut Catalog, mut images: Vec<Image>) {
+fn without_lockdown(command_line: &str) -> String {
+    command_line
+        .split_whitespace()
+        .filter(|argument| argument.split('=').next() != Some(LOCKDOWN))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+pub fn add(catalog: &mut Catalog, mut images: Vec<Image>, secure_boot: bool) {
     images.sort_by(Image::order);
     let mut systems: Vec<&str> = images.iter().map(|image| image.uki.os.as_str()).collect();
     systems.sort_unstable();
@@ -120,7 +145,7 @@ pub fn add(catalog: &mut Catalog, mut images: Vec<Image>) {
         } else {
             image.release()
         };
-        let main = catalog.push(image.entry(0, title));
+        let main = catalog.push(image.entry(0, title, secure_boot));
         if newest {
             listed.push(&image.uki.os);
             catalog.main.push(Row::Entry(main));
@@ -129,7 +154,7 @@ pub fn add(catalog: &mut Catalog, mut images: Vec<Image>) {
         }
         for (profile, details) in image.uki.profiles.iter().enumerate().skip(1) {
             let title = details.title.clone().unwrap_or_default();
-            let index = catalog.push(image.entry(profile, title));
+            let index = catalog.push(image.entry(profile, title, secure_boot));
             if newest && details.title.is_some() {
                 catalog.main.push(Row::Entry(index));
             }

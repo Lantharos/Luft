@@ -13,7 +13,9 @@
       Available (b), Reason (s, why it can't be added here),
       Missed (u, restarts that went by without the key being added since it was requested; after three,
       it is no longer requested again by itself and State goes back to "none"),
-      MissedThisBoot (b, the restart that started this boot was one of them).
+      MissedThisBoot (b, the restart that started this boot was one of them),
+      OtherKeys (as, names of keys added to shim from elsewhere, which shim also trusts for drivers;
+      Luft's key and shim's own don't count), RemovingOtherKeys (b, the next restart asks to remove them).
 
     Startup: Installed (b, shim and Luft's boot menu are on the EFI system partition),
       Measured (b, this boot came through them and recorded what started), Available (b), Reason (s).
@@ -24,6 +26,11 @@
       RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
       at the last startup, so the recovery key or passphrase was needed).
 
+    AntiCheat: what games with anti-cheat (such as Epic's Easy Anti-Cheat) check about how the computer started.
+      Checks (a(sbs): id, met, a sentence for people saying what's missing, empty when met), for "signed-system",
+      "tpm", "secure-boot", "measured-startup", "iommu", "lockdown", "kexec" and "bpf-lsm".
+      UsesLuftKey (b, the computer starts with Luft's key, which Epic hasn't listed as well-known yet; nothing to fix).
+
     Methods that change the disk take "unlock": a passphrase or recovery key typed by the person, or "" to use
     the recovery key kept sealed by the TPM.
   -->
@@ -33,6 +40,7 @@
     <property name="SigningKey" type="a{sv}" access="read"/>
     <property name="Startup" type="a{sv}" access="read"/>
     <property name="Disk" type="a{sv}" access="read"/>
+    <property name="AntiCheat" type="a{sv}" access="read"/>
 
     <method name="GenerateRecoveryKey">
       <arg name="key" type="s" direction="out"/>
@@ -71,6 +79,11 @@
       <arg name="code" type="s" direction="out"/>
     </method>
     <method name="CancelSigningKeyEnrollment"/>
+    <!-- Asks shim to remove OtherKeys at the next restart. Returns the one-time code to type in its blue screen. -->
+    <method name="RemoveOtherKeys">
+      <arg name="code" type="s" direction="out"/>
+    </method>
+    <method name="KeepOtherKeys"/>
     <method name="InstallSignedStartup"/>
     <!-- Called by the login screen or the desktop once it has been shown for a moment. Remembers the running version
          as one that starts, so an update that never gets this far goes back to it. -->

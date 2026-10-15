@@ -1,3 +1,4 @@
+use crate::anticheat::Readiness;
 use crate::disk::Check;
 use crate::service::status;
 use crate::system::secret::Secret;
@@ -69,14 +70,43 @@ pub fn recovery_key(key: &Secret) {
     println!("Keep it somewhere other than this computer. It unlocks the disk when the TPM can't.");
 }
 
-pub fn enrollment_steps(code: &str) {
+fn blue_screen_steps(asks_about: &str, choice: &str, code: &str) {
     println!(
-        "Restart the computer. A blue screen asks about a new key and waits only 10 seconds, so press a key when it appears. Then:"
+        "Restart the computer. A blue screen asks about {asks_about} and waits only 10 seconds, so press a key when it appears. Then:"
     );
-    println!("  1. Choose Enroll MOK, then Continue");
+    println!("  1. Choose {choice}, then Continue");
     println!("  2. Choose Yes");
     println!("  3. Type {} {} and press Enter", &code[..4], &code[4..]);
     println!("  4. Choose Reboot");
+}
+
+pub fn enrollment_steps(code: &str) {
+    blue_screen_steps("a new key", "Enroll MOK", code);
+}
+
+pub fn removal_steps(code: &str) {
+    blue_screen_steps("removing keys", "Delete MOK", code);
+}
+
+pub fn anti_cheat(readiness: &Readiness, other_keys: &[String]) {
+    for check in &readiness.checks {
+        match &check.missing {
+            None => println!("ok    {}", check.name),
+            Some(missing) => println!("no    {}: {missing}", check.name),
+        }
+    }
+    println!();
+    if !other_keys.is_empty() {
+        println!("Keys added from elsewhere: {}", other_keys.join(", "));
+        println!("trustctl secure-boot remove-others removes them at the next restart.");
+    } else if readiness.ready() {
+        println!("Ready for games with anti-cheat.");
+    }
+    if readiness.uses_luft_key {
+        println!(
+            "Luft starts with its own key, which Epic hasn't added to its list of well-known keys yet. There's nothing to change on this computer for that."
+        );
+    }
 }
 
 pub fn checks(checks: &[Check]) {

@@ -9,8 +9,8 @@ use clap::{Parser, Subcommand};
 use crate::boot::{attempts, startup};
 use crate::disk;
 use crate::disk::keys;
-use crate::keys::mok;
-use crate::service::{self, actions};
+use crate::keys::{mok, others};
+use crate::service::{self, actions, status};
 use crate::system::secret::Secret;
 use crate::system::tpm;
 
@@ -54,6 +54,8 @@ enum Command {
         #[command(subcommand)]
         action: EncryptionAction,
     },
+    /// Check what games with anti-cheat look for in how the computer started
+    AntiCheat,
 }
 
 #[derive(Subcommand)]
@@ -62,6 +64,10 @@ enum SecureBootAction {
     Enroll,
     /// Withdraw the request before restarting
     Cancel,
+    /// Ask shim to remove the keys added from elsewhere at the next restart
+    RemoveOthers,
+    /// Withdraw the request to remove them
+    KeepOthers,
 }
 
 #[derive(Subcommand)]
@@ -114,6 +120,14 @@ impl Cli {
             Command::Tpm { action } => tpm_unlock(action),
             Command::RecoveryKey { action } => recovery_key(action),
             Command::Encryption { action } => encryption(action),
+            Command::AntiCheat => {
+                let status = status::gather();
+                report::anti_cheat(&status.anti_cheat, &status.signing_key.other_keys);
+                if !status.anti_cheat.ready() {
+                    bail!("This computer isn't ready for games with anti-cheat yet.");
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -126,6 +140,12 @@ fn secure_boot(action: SecureBootAction) -> Result<()> {
             Ok(())
         }
         SecureBootAction::Cancel => mok::cancel(),
+        SecureBootAction::RemoveOthers => {
+            let code = others::request_removal()?;
+            report::removal_steps(&code);
+            Ok(())
+        }
+        SecureBootAction::KeepOthers => others::withdraw_removal(),
     }
 }
 

@@ -3,6 +3,7 @@ use alloc::string::{String, ToString};
 use uefi::Handle;
 
 use crate::files::Volume;
+use crate::tpm;
 
 pub struct LoaderConfig {
     pub default: Option<String>,
@@ -10,11 +11,13 @@ pub struct LoaderConfig {
 }
 
 pub fn load(device: Handle) -> LoaderConfig {
-    let text = Volume::open(device)
-        .and_then(|mut volume| volume.read("\\loader\\loader.conf"))
-        .and_then(|data| String::from_utf8(data).ok())
-        .unwrap_or_default();
-    parse(&text)
+    let Some(contents) =
+        Volume::open(device).and_then(|mut volume| volume.read("\\loader\\loader.conf"))
+    else {
+        return parse("");
+    };
+    tpm::measure_loader_conf(&contents);
+    parse(&String::from_utf8(contents).unwrap_or_default())
 }
 
 fn parse(text: &str) -> LoaderConfig {

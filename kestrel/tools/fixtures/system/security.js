@@ -8,6 +8,7 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <property name="SigningKey" type="a{sv}" access="read"/>
   <property name="Startup" type="a{sv}" access="read"/>
   <property name="Disk" type="a{sv}" access="read"/>
+  <property name="AntiCheat" type="a{sv}" access="read"/>
   <method name="GenerateRecoveryKey"><arg name="key" type="s" direction="out"/></method>
   <method name="CheckEncryption"><arg name="checks" type="a(sbs)" direction="out"/></method>
   <method name="TurnOnEncryption">
@@ -22,6 +23,8 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="ReplaceRecoveryKey"><arg name="unlock" type="s" direction="in"/><arg name="key" type="s" direction="out"/></method>
   <method name="EnrollSigningKey"><arg name="code" type="s" direction="out"/></method>
   <method name="CancelSigningKeyEnrollment"/>
+  <method name="RemoveOtherKeys"><arg name="code" type="s" direction="out"/></method>
+  <method name="KeepOtherKeys"/>
   <method name="InstallSignedStartup"/>
 </interface></node>`;
 const USB_PROTECTION = `<node><interface name="com.lantharos.UsbProtection1">
@@ -40,6 +43,7 @@ const RECOVERY_KEY = 'bfgdekjl-vtictulg-gcjginrv-hcddchdu-ihruiigb-bednnflv-hlui
 const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
 const CONTACT_MAKER = 1 << 11;
+const ANTI_CHEAT_CHECKS = ['signed-system', 'tpm', 'secure-boot', 'measured-startup', 'iommu', 'lockdown', 'kexec', 'bpf-lsm'];
 
 export const variants = (signature, values) => Object.fromEntries(Object.entries(values).map(([key, value]) =>
   [key, new GLib.Variant(signature[key], value)]));
@@ -57,13 +61,15 @@ export function publishSecurity(publish, calls, model, trust = {}) {
   publish(TRUST, {
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
-    SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b'},
-      {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false}),
+    SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b', OtherKeys: 'as', RemovingOtherKeys: 'b'},
+      {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false, OtherKeys: [], RemovingOtherKeys: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's'},
       {Installed: true, Measured: true, Available: true, Reason: ''}),
     Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b'},
       {Device: '/dev/nvme0n1p3', Encrypted: true, State: 'on', Progress: 0, Remaining: 0, Unlock: ['tpm', 'pin', 'recovery-key'],
         RecoveryKeyStored: true, TpmRefused: false}),
+    AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
+      {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
     GenerateRecoveryKey: () => RECOVERY_KEY,
     CheckEncryption: () => [['space', true, 'There’s enough free space to encrypt the disk.'], ['power', true, 'The computer is plugged in.']],
     TurnOnEncryption: () => calls.push('TurnOnEncryption'),
@@ -77,6 +83,8 @@ export function publishSecurity(publish, calls, model, trust = {}) {
     ReplaceRecoveryKey: () => RECOVERY_KEY,
     EnrollSigningKey: () => '48203917',
     CancelSigningKeyEnrollment: () => calls.push('CancelSigningKeyEnrollment'),
+    RemoveOtherKeys: () => '51740386',
+    KeepOtherKeys: () => calls.push('KeepOtherKeys'),
     InstallSignedStartup: () => calls.push('InstallSignedStartup'),
     ...trust,
   }, '/com/lantharos/Trust1');

@@ -10,7 +10,7 @@ How a Luft computer starts, and what to do when it doesn't. The pieces are [Sush
 4. The startup image's stub measures what it started into the TPM, which releases the disk key only if the computer started this way.
 5. The command line names the exact system the image was built with (`composefs=` and a SHA-512 digest). The initramfs mounts the system only if every file matches it, so nothing from the firmware to `/usr` can change without Secure Boot noticing.
 
-Nothing can be changed at startup, including the kernel command line. Kernel arguments are part of the image, in `/usr/lib/bootc/kargs.d`.
+Nothing can be changed at startup, including the kernel command line. Kernel arguments are part of the image, in `/usr/lib/bootc/kargs.d`. With Secure Boot off, SushiBoot starts the same command line without `lockdown=integrity` ([why](security.md#games-with-anti-cheat)).
 
 ## Updates and going back
 

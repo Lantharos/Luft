@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  SABINE: b55a3c58889ceb39c457c2da660b474143657fb0
+  SABINE: v0.39
 
 jobs:
   build:
@@ -49,7 +49,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'NSIS installation failed' }
           "${env:ProgramFiles(x86)}\NSIS" >> $env:GITHUB_PATH
 
-      - run: cargo install --git https://github.com/Lantharos/Sabine --rev $env:SABINE --locked sabine-cli
+      - run: cargo install --git https://github.com/Lantharos/Sabine --tag $env:SABINE --locked sabine-cli
 
       - name: Bundle
         working-directory: apps/meet

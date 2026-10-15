@@ -33,7 +33,10 @@ impl Made {
                 Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
                     Err(error.to_string())
                 }
-                _ => Ok(()),
+                _ => {
+                    let _ = fs::remove_dir(path.parent().expect("the record lives in a folder"));
+                    Ok(())
+                }
             };
         }
         fs::create_dir_all(path.parent().expect("the record lives in a folder"))

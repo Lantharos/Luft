@@ -1,5 +1,7 @@
 # Meet Luft
 
+![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
+
 A Windows app that gets a PC ready for Luft without a USB stick. It checks the computer, makes room next to Windows with Windows' own tools, puts the live Luft system in that room and restarts into it once, to try Luft or install it. It can pack files and settings into a moving box that Install Luft unpacks, and it can take everything back out again. How it fits together is in [docs/meet.md](../../docs/meet.md).
 
 Builds aren't code-signed yet, so Windows SmartScreen asks before the first start ("More info", then "Run anyway").
@@ -24,7 +26,7 @@ bun run build
 cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml
 ```
 
-The Windows build cross-compiles from Linux with MinGW. Put `meet.exe` next to `Sabine.toml` and `dist` to run it; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
+The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
 
 Start it with `--nightly` to use `luft-nightly.iso` instead of `luft-latest.iso`.
 

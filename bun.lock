@@ -126,6 +126,25 @@
         "vite": "^8.3.2",
       },
     },
+    "apps/meet": {
+      "name": "meet",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.38",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
     "apps/rover": {
       "name": "rover",
       "version": "0.1.0",
@@ -634,6 +653,8 @@
 
     "mdurl": ["mdurl@2.1.0", "", {}, "sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg=="],
 
+    "meet": ["meet@workspace:apps/meet"],
+
     "mri": ["mri@1.2.0", "", {}, "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA=="],
 
     "nanoid": ["nanoid@3.3.19", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-Y2tUNy4ouw6tq5oDSKeQYGOyhkUBhNOcGV/02KC+6kd9eDGqdZd++mjMiIDilrBYvjEnCYvVtsuHCuP+okSfug=="],
@@ -711,6 +732,30 @@
     "@tailwindcss/oxide-wasm32-wasi/@tybys/wasm-util": ["@tybys/wasm-util@0.10.4", "", { "dependencies": { "tslib": "^2.4.0" }, "bundled": true }, "sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A=="],
 
     "@tailwindcss/oxide-wasm32-wasi/tslib": ["tslib@2.8.1", "", { "bundled": true }, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
+
+    "barometer/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "disks/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "draft/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "keys/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "magpie/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "mailman/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "rover/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "schelf/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "settings/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "setup/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "signin/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
+
+    "tern/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#8ebbdb2", {}, "Lantharos-Sabine-8ebbdb2", "sha512-nWcb1n3f76B1Kp442PJ9yhPGR4aNlZwBP821TIm/VZjItoSwZ+cBib5ctkn7GQyMFrVyHu0J6gClyl0vQnMwcg=="],
 
     "@tailwindcss/node/lightningcss/lightningcss-android-arm64": ["lightningcss-android-arm64@1.32.0", "", { "os": "android", "cpu": "arm64" }, "sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg=="],
 

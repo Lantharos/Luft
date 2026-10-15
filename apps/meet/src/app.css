@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+@import './fog.css';
+
+:root {
+	--window-radius: 0px;
+}
+
+body {
+	background: #2a2723 url('/fog.jpg') center / cover no-repeat;
+}
+
+.meet-window {
+	background: color-mix(in oklab, var(--content) 52%, transparent);
+	backdrop-filter: blur(24px);
+}
+
+:root[data-scheme='light'] .meet-window {
+	background: color-mix(in oklab, var(--content) 62%, transparent);
+}

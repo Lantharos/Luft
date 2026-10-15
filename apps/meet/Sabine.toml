@@ -1,0 +1,16 @@
+[app]
+id = "com.lantharos.meet"
+name = "Meet Luft"
+generic_name = "Luft installer for Windows"
+categories = ["System"]
+keywords = ["luft", "install", "dual boot", "linux"]
+version = "0.1.0"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true

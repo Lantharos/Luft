@@ -1,0 +1,89 @@
+name: Meet Luft
+
+on:
+  push:
+    tags: ["meet-v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: meet-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  SABINE: v0.38
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag
+        if: github.ref_type == 'tag'
+        run: |
+          $manifest = Get-Content apps/meet/Sabine.toml -Raw
+          if ($manifest -notmatch '(?m)^version\s*=\s*"([^"]+)"') { throw 'apps/meet/Sabine.toml has no version' }
+          if ($env:GITHUB_REF_NAME -ne "meet-v$($Matches[1])") { throw "$env:GITHUB_REF_NAME doesn't match version $($Matches[1])" }
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - run: rustup toolchain install stable --profile minimal
+
+      - name: Install NSIS
+        run: |
+          choco install nsis --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'NSIS installation failed' }
+          "${env:ProgramFiles(x86)}\NSIS" >> $env:GITHUB_PATH
+
+      - run: cargo install --git https://github.com/Lantharos/Sabine --tag $env:SABINE --locked sabine-cli
+
+      - name: Bundle
+        working-directory: apps/meet
+        run: |
+          $bundle = sabine bundle . --target exe --release --json | Select-Object -Last 1
+          if ($LASTEXITCODE -ne 0) { throw 'Bundling failed' }
+          $setup = ($bundle | ConvertFrom-Json).artifacts | Select-Object -First 1
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item $setup out/meet-luft.exe
+          $hash = (Get-FileHash out/meet-luft.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  meet-luft.exe" | Set-Content -NoNewline out/meet-luft.exe.sha256
+
+      - name: Upload to R2
+        if: github.ref_type == 'tag' && env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        working-directory: apps/meet/out
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          $endpoint = "https://$env:R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          foreach ($file in 'meet-luft.exe', 'meet-luft.exe.sha256') {
+            aws s3 cp --endpoint-url $endpoint --no-progress $file "s3://$env:R2_BUCKET/$file"
+            if ($LASTEXITCODE -ne 0) { throw "Uploading $file failed" }
+          }
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create $env:GITHUB_REF_NAME apps/meet/out/meet-luft.exe apps/meet/out/meet-luft.exe.sha256 --title "Meet Luft $($env:GITHUB_REF_NAME -replace '^meet-v')" --notes 'Meet Luft for Windows. The download is not code-signed yet, so Windows SmartScreen asks before it opens.'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: meet-luft
+          path: apps/meet/out
+          retention-days: 14

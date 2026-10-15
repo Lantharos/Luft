@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+	import { isAvailable } from '@lantharos/sabine';
+	import { appearance, GlassShell } from '@luft/ui';
+	import WindowButtons from '#lib/components/WindowButtons.svelte';
+	import { session } from '#lib/state/meet.svelte.js';
+	import Check from '#lib/steps/Check.svelte';
+	import Hello from '#lib/steps/Hello.svelte';
+	import MovingBox from '#lib/steps/MovingBox.svelte';
+	import Ready from '#lib/steps/Ready.svelte';
+	import Removed from '#lib/steps/Removed.svelte';
+	import Room from '#lib/steps/Room.svelte';
+	import Working from '#lib/steps/Working.svelte';
+
+	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed };
+	const SLIDE = 28;
+
+	onMount(() => {
+		if (!isAvailable()) return;
+		const stops = [appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 } }), session.listen()];
+		return () => stops.forEach((stop) => stop());
+	});
+
+	$effect(() => {
+		document.documentElement.dataset.scheme = appearance.scheme;
+	});
+
+	let Step = $derived(STEPS[session.step]);
+</script>
+
+<GlassShell class="meet-window">
+	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+		<div class="drag-region absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-end pr-3">
+			<WindowButtons closable={session.step !== 'working'} />
+		</div>
+		{#key session.step}
+			<div class="absolute inset-0" in:fly={{ x: SLIDE * session.direction, duration: 260, easing: cubicOut }} out:fly={{ x: -SLIDE * session.direction, duration: 160 }}>
+				<Step />
+			</div>
+		{/key}
+	</main>
+</GlassShell>

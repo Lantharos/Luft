@@ -45,5 +45,6 @@ printf 'enable luft-windows-notice.service\n' |
 
 (cd "$luft" && bun install --frozen-lockfile)
 for app in "$luft"/apps/*/; do
+  [[ "$app" == */apps/meet/ ]] && continue
   sabine install --bundle --system-wide --root "$destdir" "$app"
 done

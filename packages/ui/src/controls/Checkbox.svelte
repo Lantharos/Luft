@@ -40,6 +40,7 @@
 		gap: 10px;
 		border-radius: 10px;
 		font-size: 13px;
+		text-align: start;
 		color: var(--text-soft);
 		transition: color 160ms var(--ease), opacity 160ms var(--ease);
 	}

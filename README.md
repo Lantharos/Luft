@@ -22,6 +22,8 @@ Luft is an operating system built on Fedora. It has its own desktop and login sc
 
 Download [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso), write it to a USB stick of 4 GB or more, and start the computer from it. The stick opens Install Luft, which can put Luft next to Windows, on a whole drive, or just let you try it. Secure Boot can stay on.
 
+On a Windows PC, [Meet Luft](docs/meet.md) does the same without a stick: it makes room next to Windows and restarts into Luft to try or install it.
+
 Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional, and lets an encrypted disk unlock without a password. [Installing Luft](docs/install.md) has the details.
 
 After that, updates arrive in Settings and install at the next restart. Apps come from Schelf (Flathub and AppImages), and command-line tools from a Toolbox container that Schelf manages too.
@@ -57,6 +59,7 @@ Releases are built and signed in CI and published as `ghcr.io/lantharos/luft:45`
 | [`apps/keys`](apps/keys/README.md) | Keyboard layouts and input methods |
 | [`apps/magpie`](apps/magpie/README.md) | Photos, videos, music, PDFs and fonts |
 | [`apps/mailman`](apps/mailman/README.md) | Mail |
+| [`apps/meet`](apps/meet/README.md) | Meet Luft, which gets a Windows PC ready for Luft without a USB stick |
 | [`apps/rover`](apps/rover/README.md) | Files, and the file chooser |
 | [`apps/schelf`](apps/schelf/README.md) | Apps from Flathub and AppImages, and command-line tools |
 | [`apps/settings`](apps/settings/README.md) | Settings |

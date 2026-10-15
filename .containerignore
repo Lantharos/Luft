@@ -7,4 +7,5 @@ kestrel/run
 kestrel/build
 kestrel/install
 boot/sushi/vm
+apps/meet/vm
 docs

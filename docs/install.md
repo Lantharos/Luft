@@ -45,6 +45,10 @@ Windows' registry is only changed when Windows was shut down fully and isn't loc
 
 Windows updates sometimes turn Fast Startup back on. When Luft starts after Windows was hibernated or fast-started, it resets the sound chips before anything uses them and, once, explains Fast Startup with a notification that can turn it off when Windows is fully shut down. Windows' drive shows up in Files; while Windows is asleep it opens read-only, so nothing Windows still has open gets changed.
 
+## From Windows, without a stick
+
+[Meet Luft](meet.md) makes room next to Windows, puts the live system there and restarts into Install Luft, with *Alongside Windows* already set to that room. It works with BitLocker on, and can bring files and settings along in a moving box.
+
 ## What goes on the drive
 
 | Partition | Size | Holds |

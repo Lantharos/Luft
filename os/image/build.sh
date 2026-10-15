@@ -8,6 +8,7 @@ cache="${LUFT_IMAGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/luft-image}"
 registry="${LUFT_PARTS:-localhost/luft-parts}"
 fedora=45
 signed_parts=(boot nvidia)
+retries=(--retry 6 --retry-delay 20s)
 
 usage() {
   cat <<'USAGE'
@@ -144,11 +145,11 @@ build_part() {
   fi
   [[ "$ref" == localhost/* ]] || options+=(--label org.opencontainers.image.source=https://github.com/Lantharos/Luft)
   cache_dirs "$cache/work/$work"
-  podman build --layers --security-opt label=disable --file "$image/parts/Containerfile" --target "$target" \
+  podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target "$target" \
     --build-context "cache=$cache" --build-context "work=$cache/work/$work" \
     --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" "${options[@]}" "${podman_options[@]}" \
     --tag "$ref" "$luft"
-  [[ "$ref" == localhost/* ]] || podman push --quiet "$ref"
+  [[ "$ref" == localhost/* ]] || podman push "${retries[@]}" --quiet "$ref"
 }
 
 build_in_turn() {
@@ -167,10 +168,10 @@ build_parts() {
   ((${#apps[@]} == 0)) || jobs+=("${apps[*]}")
   ((${#jobs[@]})) || return 0
   cache_dirs
-  podman build --layers --file "$image/parts/Containerfile" --target builder --build-arg "BASE=$base" \
+  podman build "${retries[@]}" --layers --file "$image/parts/Containerfile" --target builder --build-arg "BASE=$base" \
     "${podman_options[@]}" "$luft"
   if printf '%s\n' "${jobs[@]}" | grep -qE '(^| )(runtime|app-)'; then
-    podman build --layers --security-opt label=disable --file "$image/parts/Containerfile" --target sabine \
+    podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target sabine \
       --build-context "cache=$cache" --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" \
       "${podman_options[@]}" "$luft"
   fi
@@ -219,7 +220,7 @@ gather_parts() {
   done
   for ref in "${refs[@]}"; do
     podman image exists "$ref" || echo "$ref"
-  done | xargs --no-run-if-empty --max-procs 6 --max-args 1 podman pull --quiet >/dev/null
+  done | xargs --no-run-if-empty --max-procs 6 --max-args 1 podman pull "${retries[@]}" --quiet >/dev/null
   for i in "${!names[@]}"; do
     extract_part "${names[$i]}" "${refs[$i]}"
   done
@@ -246,7 +247,7 @@ build_image() {
   done <<<"$refs" | build_parts
   gather_parts <<<"$refs"
   system="localhost/luft-system:$fedora$suffix"
-  podman build --layers --target "$variant" --file "$image/Containerfile" \
+  podman build "${retries[@]}" --layers --target "$variant" --file "$image/Containerfile" \
     --build-context "parts=$state/parts" --build-arg "BASE=$base" \
     --build-arg "VERSION=$fedora.$(date -u +%Y%m%d).dev" "${podman_options[@]}" --tag "$system" "$luft"
   "$image/seal.sh" "$system" "localhost/luft:$fedora$suffix"

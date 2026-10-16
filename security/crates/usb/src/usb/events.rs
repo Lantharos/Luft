@@ -53,9 +53,9 @@ impl Events {
             Some(netlink::KOBJECT_UEVENT),
         )?;
         bind(&socket, &SocketAddrNetlink::new(0, KERNEL_EVENTS))?;
-        Ok(Self {
-            socket: AsyncFd::new(socket)?,
-        })
+        // SAFETY: the AsyncFd owns the socket, so its descriptor stays open for its whole life.
+        let socket = unsafe { AsyncFd::register(socket)? };
+        Ok(Self { socket })
     }
 
     pub async fn next(&self) -> io::Result<Event> {

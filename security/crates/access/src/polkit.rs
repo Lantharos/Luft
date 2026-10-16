@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
+use zbus::Variant;
 use zbus::fdo::DBusProxy;
 use zbus::message::{Flags, Header};
 use zbus::names::BusName;
-use zbus::zvariant::Value;
 use zbus::{Connection, proxy};
 
 const ALLOW_USER_INTERACTION: u32 = 1;
 
-type Subject<'a> = (&'a str, HashMap<&'a str, Value<'a>>);
+type Subject<'a> = (&'a str, HashMap<&'a str, Variant<'a>>);
 
 #[proxy(
     interface = "org.freedesktop.PolicyKit1.Authority",
@@ -36,12 +36,12 @@ pub async fn is_authorized(
     };
     let subject = (
         "system-bus-name",
-        HashMap::from([("name", Value::from(sender.as_str()))]),
+        HashMap::from([("name", Variant::from(sender.as_str()))]),
     );
     let interactive = header
         .primary()
         .flags()
-        .contains(Flags::AllowInteractiveAuth);
+        .contains(Flags::ALLOW_INTERACTIVE_AUTH);
     let flags = if interactive {
         ALLOW_USER_INTERACTION
     } else {

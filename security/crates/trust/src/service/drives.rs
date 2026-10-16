@@ -7,8 +7,8 @@ use access::Idle;
 use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::object_server::InterfaceRef;
-use zbus::zvariant::{OwnedValue, Value};
 use zbus::{Connection, interface};
+use zbus::{OwnedVariant, Variant};
 
 use super::PATH;
 use super::error::Error;
@@ -22,7 +22,7 @@ const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
-type Dict = HashMap<String, OwnedValue>;
+type Dict = HashMap<String, OwnedVariant>;
 
 struct Worker {
     stop: Arc<AtomicBool>,
@@ -92,7 +92,7 @@ fn state(drive: &DriveStatus, running: bool) -> &'static str {
 
 fn entry(drive: &DriveStatus, running: Option<Option<Progress>>) -> Dict {
     let live = running.flatten();
-    let values: [(&str, Value<'_>); 7] = [
+    let values: [(&str, Variant<'_>); 7] = [
         ("Device", drive.device.as_str().into()),
         ("State", state(drive, running.is_some()).into()),
         (

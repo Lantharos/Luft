@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use zbus::zvariant::{OwnedValue, Value};
+use zbus::{OwnedVariant, Variant};
 
 use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
@@ -8,9 +8,9 @@ use crate::disk::DiskStatus;
 use crate::disk::worker::Progress;
 use crate::system::tpm::Tpm;
 
-pub type Dict = HashMap<String, OwnedValue>;
+pub type Dict = HashMap<String, OwnedVariant>;
 
-fn dict<const N: usize>(entries: [(&str, Value<'_>); N]) -> Dict {
+fn dict<const N: usize>(entries: [(&str, Variant<'_>); N]) -> Dict {
     entries
         .into_iter()
         .filter_map(|(key, value)| Some((key.to_owned(), value.try_to_owned().ok()?)))

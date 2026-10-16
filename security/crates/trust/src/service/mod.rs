@@ -31,10 +31,10 @@ async fn serve() -> zbus::Result<()> {
         follow_up_on_this_start().await;
     }
     let idle = Arc::new(Idle::default());
-    let connection = zbus::connection::Builder::system()?
-        .serve_at(PATH, Trust::new(idle.clone()))?
-        .serve_at(PATH, drives::Drives::new(idle.clone()))?
-        .name(NAME)?
+    let connection = zbus::connection::Builder::system()
+        .serve_at(PATH, Trust::new(idle.clone()))
+        .serve_at(PATH, drives::Drives::new(idle.clone()))
+        .name(NAME)
         .build()
         .await?;
     interface::continue_disk_work(&connection).await?;

@@ -1,8 +1,8 @@
 use futures_util::StreamExt;
 use tokio::sync::watch;
+use zbus::OwnedObjectPath;
 use zbus::fdo::{PropertiesChangedStream, PropertiesProxy};
 use zbus::proxy::{CacheProperties, PropertyStream};
-use zbus::zvariant::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
 const UNLOCKED_CLASSES: [&str; 2] = ["user", "user-early"];
@@ -47,14 +47,14 @@ struct Seat0 {
 impl ActiveSession {
     async fn watch(connection: &Connection, path: OwnedObjectPath) -> zbus::Result<Self> {
         let changes = PropertiesProxy::builder(connection)
-            .destination("org.freedesktop.login1")?
-            .path(path.clone())?
+            .destination("org.freedesktop.login1")
+            .path(path.clone())
             .build()
             .await?
             .receive_properties_changed()
             .await?;
         let session = SessionProxy::builder(connection)
-            .path(path)?
+            .path(path)
             .cache_properties(CacheProperties::No)
             .build()
             .await?;
@@ -147,7 +147,7 @@ pub async fn active_user(connection: &Connection) -> zbus::Result<Option<u32>> {
         return Ok(None);
     }
     let (uid, _) = SessionProxy::builder(connection)
-        .path(path)?
+        .path(path)
         .cache_properties(CacheProperties::No)
         .build()
         .await?

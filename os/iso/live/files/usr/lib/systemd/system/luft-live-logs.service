@@ -6,3 +6,4 @@ After=run-initramfs-live.mount systemd-journald.service
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/luft-live-logs
+TimeoutStartSec=5min

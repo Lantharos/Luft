@@ -4,6 +4,7 @@
 	const SAID: Record<Task, string> = {
 		check: 'Meet Luft couldn’t finish looking at this PC.',
 		room: 'Making room for Luft didn’t finish.',
+		update: 'Updating Luft didn’t finish.',
 		download: 'Luft’s download stopped. Check that you’re online.',
 		pack: 'Packing your things didn’t finish.',
 		remove: 'Removing Luft didn’t finish.',

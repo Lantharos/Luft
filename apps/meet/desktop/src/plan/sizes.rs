@@ -8,7 +8,7 @@ pub const BOX_CLUSTER: u64 = 4096;
 const WINDOWS_HEADROOM: u64 = 20 * GIB;
 const SMALLEST_START: u64 = 512 * MIB;
 const START_SPARE: u64 = 64 * MIB;
-const LIVE_SPARE: u64 = 256 * MIB;
+const LIVE_SPARE: u64 = GIB;
 const BOX_SPARE: u64 = 128 * MIB;
 
 pub fn align_up(bytes: u64) -> u64 {

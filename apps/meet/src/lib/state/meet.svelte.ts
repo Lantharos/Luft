@@ -2,7 +2,7 @@ import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
 export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed';
-export type Task = 'check' | 'room' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders';
+export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders';
 
 export interface Failure {
 	task: Task;
@@ -58,7 +58,7 @@ class MeetState {
 			console.error(`Meet Luft couldn't finish ${task}:`, error);
 			const stage = this.progress?.stage;
 			this.failure = {
-				task: task === 'room' && stage === 'downloading' ? 'download' : task,
+				task: (task === 'room' || task === 'update') && stage === 'downloading' ? 'download' : task,
 				declined: error instanceof meet.Failed && error.failure === 'declined',
 				retry
 			};
@@ -97,6 +97,8 @@ class MeetState {
 		} else if (this.step === 'room') {
 			await this.inspect();
 			if (this.blocked) this.go('check');
+		} else if (this.step === 'ready') {
+			await this.inspect();
 		}
 	}
 
@@ -161,6 +163,20 @@ class MeetState {
 			'room'
 		);
 		if (prepared) this.prepared = prepared;
+	}
+
+	async update() {
+		const prepared = await this.working(
+			'update',
+			'downloading',
+			() => meet.refresh($state.snapshot(this.source)),
+			() => this.update(),
+			'ready',
+			'ready'
+		);
+		if (!prepared) return;
+		this.prepared = prepared;
+		if (this.report) this.report.outdated = false;
 	}
 
 	async pack(packing: Packing) {

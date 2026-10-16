@@ -36,6 +36,7 @@ export interface Report {
 	smallestLuft: number;
 	mostLuft: number;
 	prepared: Prepared | null;
+	outdated: boolean;
 }
 
 export interface Progress {
@@ -134,6 +135,7 @@ const call = <T>(request: object) => start<T>('meet_call', request);
 
 export const check = (source: Source) => call<Report>({ call: 'check', source });
 export const prepare = (luft: number, source: Source) => call<Prepared>({ call: 'prepare', luft, source });
+export const refresh = (source: Source) => call<Prepared>({ call: 'refresh', source });
 export const pack = (belongings: Packing) => call<Prepared>({ call: 'pack', belongings });
 export const restart = (intent: Intent, windows: WindowsChoices) => call<null>({ call: 'restart', intent, windows });
 export const tidy = () => call<null>({ call: 'tidy' });

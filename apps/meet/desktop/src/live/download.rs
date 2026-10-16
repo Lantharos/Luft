@@ -58,6 +58,10 @@ pub fn parse_checksum(text: &str) -> Option<[u8; 32]> {
     Some(digest)
 }
 
+pub fn format_checksum(digest: &[u8; 32]) -> String {
+    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
 pub fn checksum(agent: &Agent, iso: &str) -> io::Result<[u8; 32]> {
     let text = agent
         .get(format!("{iso}.sha256"))
@@ -179,6 +183,10 @@ mod tests {
         let line = format!("{}  luft-latest.iso\n", "ab".repeat(32));
         assert_eq!(parse_checksum(&line), Some([0xab; 32]));
         assert_eq!(parse_checksum("not a checksum"), None);
+        assert_eq!(
+            parse_checksum(&format_checksum(&[0xab; 32])),
+            Some([0xab; 32])
+        );
     }
 
     #[test]

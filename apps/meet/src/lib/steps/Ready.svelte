@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 	import Package from '@lucide/svelte/icons/package';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import { bytes, Choice, Dialog, Switch } from '@luft/ui';
 	import type { Intent, WindowsChoices } from '#lib/api/meet.js';
@@ -52,6 +53,14 @@
 
 <Frame title="Luft is ready" description="Choose how you’d like to meet it. Windows starts as usual afterwards, unless you install Luft and choose it.">
 	<div class="-mx-2 flex flex-col gap-1">
+		{#if session.report?.outdated}
+			<Choice
+				icon={RefreshCw}
+				title="Get the newest Luft"
+				description="A newer build is out. It replaces this one and keeps the room and anything you packed."
+				onclick={() => session.update()}
+			/>
+		{/if}
 		<Choice icon={Sparkles} title="Try Luft" description="Restart into Luft without installing anything. Windows starts as usual next time." onclick={() => (restarting = 'try')} />
 		<Choice
 			icon={Package}
@@ -72,6 +81,9 @@
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>Remove Luft from this PC</button>
+		<button type="button" class="plain-button large" onclick={() => session.chooseIso()}>
+			{session.source.kind === 'file' ? 'Using your Luft ISO' : 'Use an ISO I already have'}
+		</button>
 	{/snippet}
 </Frame>
 

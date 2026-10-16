@@ -21,6 +21,9 @@ pub enum Call {
         luft: u64,
         source: Source,
     },
+    Refresh {
+        source: Source,
+    },
     Pack {
         belongings: Belongings,
     },
@@ -89,6 +92,7 @@ pub struct Report {
     pub smallest_luft: u64,
     pub most_luft: u64,
     pub prepared: Option<Prepared>,
+    pub outdated: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

@@ -11,6 +11,7 @@ use super::durable;
 use super::record::{self, Made};
 use super::storage::{Layout, MSFT_Partition, Storage};
 use super::windows_drive;
+use crate::helper::live_system;
 use crate::helper::system::{firmware, settings, start_entries};
 
 const LIVE_FOLDER: &str = "LiveOS";
@@ -89,6 +90,9 @@ pub fn restart(intent: Intent, windows: WindowsChoices) -> Result<(), String> {
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
         return Err("Luft isn't ready to start yet. Make room for it first.".to_owned());
     };
+    if live_system::unfinished(&live) {
+        return Err("Updating Luft didn't finish. Update it again first.".to_owned());
+    }
     let start = firmware::partition_on_disk(
         layout.disk.Number,
         layout.disk.LogicalSectorSize as u64,

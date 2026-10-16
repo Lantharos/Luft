@@ -14,6 +14,8 @@ const START_FILES: [&str; 6] = [
 ];
 const LIVE_FOLDER: &str = "LiveOS/";
 const GRUB_CONFIGS: [&str; 2] = ["EFI/BOOT/grub.cfg", "EFI/fedora/grub.cfg"];
+pub const BUILD_RECORD: &str = "LiveOS/iso.sha256";
+pub const UPDATING: &str = "updating";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Place {
@@ -58,6 +60,25 @@ pub fn write_grub_configs(start: &Path, live_partition: &str) -> io::Result<()> 
     Ok(())
 }
 
+fn on(root: &Path, path: &str) -> PathBuf {
+    path.split('/')
+        .fold(root.to_owned(), |target, part| target.join(part))
+}
+
+fn gone(result: io::Result<()>) -> io::Result<()> {
+    match result {
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(()),
+        other => other,
+    }
+}
+
+pub fn clear(start: &Path, live: &Path) -> io::Result<()> {
+    for file in START_FILES {
+        gone(fs::remove_file(on(start, file)))?;
+    }
+    gone(fs::remove_dir_all(on(live, LIVE_FOLDER)))
+}
+
 pub struct Volumes {
     start: PathBuf,
     live: PathBuf,
@@ -78,8 +99,7 @@ impl Volumes {
             Some(Place::Start) => &self.start,
             _ => &self.live,
         };
-        path.split('/')
-            .fold(root.clone(), |target, part| target.join(part))
+        on(root, path)
     }
 
     fn file(&mut self, path: &str) -> io::Result<&mut File> {

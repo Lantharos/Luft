@@ -1,5 +1,4 @@
-use std::fs::{self, File};
-use std::io;
+use std::fs;
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -7,8 +6,6 @@ use std::process::Command;
 use luft_meet::FolderKind;
 use luft_meet::handoff;
 use windows::Win32::Storage::FileSystem::{FindFirstVolumeW, FindNextVolumeW, FindVolumeClose};
-use zip::ZipWriter;
-use zip::write::SimpleFileOptions;
 
 use super::belongings::known;
 
@@ -44,10 +41,14 @@ fn sessions(volume: &Path) -> Vec<PathBuf> {
     };
     entries
         .flatten()
-        .filter(|entry| {
-            entry.path().is_dir() && !entry.file_name().to_string_lossy().starts_with('.')
-        })
         .map(|entry| entry.path())
+        .filter(|path| {
+            path.is_file()
+                && path.extension().is_some_and(|extension| extension == "zip")
+                && !path
+                    .file_name()
+                    .is_some_and(|name| name.to_string_lossy().starts_with('.'))
+        })
         .collect()
 }
 
@@ -58,27 +59,6 @@ fn latest_session() -> Option<PathBuf> {
         .max_by(|a, b| a.file_name().cmp(&b.file_name()))
 }
 
-fn add(zip: &mut ZipWriter<File>, folder: &Path, prefix: &str) -> io::Result<()> {
-    for entry in fs::read_dir(folder)?.flatten() {
-        let name = format!("{prefix}{}", entry.file_name().to_string_lossy());
-        if entry.file_type()?.is_dir() {
-            zip.add_directory(format!("{name}/"), SimpleFileOptions::default())?;
-            add(zip, &entry.path(), &format!("{name}/"))?;
-        } else {
-            zip.start_file(name, SimpleFileOptions::default())?;
-            io::copy(&mut File::open(entry.path())?, zip)?;
-        }
-    }
-    Ok(())
-}
-
-fn pack(session: &Path, into: &Path) -> io::Result<()> {
-    let mut zip = ZipWriter::new(File::create(into)?);
-    add(&mut zip, session, "")?;
-    zip.finish()?;
-    Ok(())
-}
-
 pub fn save() -> Result<Option<String>, String> {
     let Some(session) = latest_session() else {
         return Ok(None);
@@ -86,12 +66,12 @@ pub fn save() -> Result<Option<String>, String> {
     let desktop = known(FolderKind::Desktop).ok_or("Meet Luft couldn't find your desktop")?;
     let name = session
         .file_name()
-        .expect("a session is a named folder")
+        .expect("a session is a named file")
         .to_string_lossy();
-    let zip = desktop.join(format!("{LOGS} {name}.zip"));
-    pack(&session, &zip)
+    let saved = desktop.join(format!("{LOGS} {name}"));
+    fs::copy(&session, &saved)
         .map_err(|error| format!("Meet Luft couldn't save Try Luft's logs: {error}"))?;
-    Ok(Some(zip.to_string_lossy().into_owned()))
+    Ok(Some(saved.to_string_lossy().into_owned()))
 }
 
 pub fn show(path: &str) -> Result<(), String> {

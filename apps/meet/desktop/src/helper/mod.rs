@@ -1,6 +1,8 @@
 mod drive;
+mod live_system;
 mod pack;
 mod prepare;
+mod refresh;
 mod system;
 mod undo;
 
@@ -68,6 +70,7 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
         Call::Prepare { luft, source } => {
             serde_json::to_value(prepare::prepare(context, luft, &source)?)
         }
+        Call::Refresh { source } => serde_json::to_value(refresh::refresh(context, &source)?),
         Call::Pack { belongings } => serde_json::to_value(pack::pack(context, &belongings)?),
         Call::Restart { intent, windows } => {
             serde_json::to_value(drive::state::restart(intent, windows)?)

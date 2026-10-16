@@ -3,12 +3,17 @@ set -uo pipefail
 
 medium=/run/initramfs/live
 logs="$medium/Luft logs"
-saving="$logs/.saving"
+staged="$logs/.saving.zip"
 state=/run/luft-live-logs
+collected="$state/collected"
+packed="$state/packed.zip"
 coredump_store=/var/lib/systemd/coredump
 coredump_message=fc2e22bc6ee647b6b90729ab34a250b1
 sessions_kept=5
-free_kept_kib=$((64 * 1024))
+session_cap=$((48 * 1024 * 1024))
+free_kept=$((16 * 1024 * 1024))
+journal_lines_kept=(100000 20000)
+probe_timeout=20s
 
 session_name() {
     [[ -s "$state/session" ]] || date '+%Y-%m-%d %H-%M-%S' >"$state/session"
@@ -36,7 +41,7 @@ coredumps() {
     boot="_BOOT_ID=$(tr -d - </proc/sys/kernel/random/boot_id)"
     coredumpctl --no-pager --quiet list "$boot"
     echo
-    coredumpctl --no-pager --quiet info "$boot"
+    timeout 2m coredumpctl --no-pager --quiet info "$boot"
 }
 
 drm() {
@@ -55,7 +60,7 @@ video_acceleration() {
     local node
     for node in /dev/dri/renderD*; do
         echo "== $node"
-        vainfo --display drm --device "$node" 2>&1
+        timeout "$probe_timeout" vainfo --display drm --device "$node" 2>&1
     done
 }
 
@@ -71,6 +76,8 @@ system() {
     uptime
     free -h
     echo
+    df -h "$medium"
+    echo
     lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,PARTLABEL,PARTUUID,MOUNTPOINTS
 }
 
@@ -78,47 +85,83 @@ live_home() {
     getent passwd live | cut -d: -f6
 }
 
+journal_text() {
+    journalctl --boot --no-pager --output=short-precise "$@" >"$collected/journal.txt"
+}
+
 collect() {
-    local into="$1" home
-    journalctl --boot --no-pager --output=short-precise >"$into/journal.txt"
-    journalctl --boot --no-pager --output=json | zstd --quiet -6 -o "$into/journal.json.zst"
+    local home
+    rm -rf "$collected"
+    mkdir "$collected"
+    journal_text
+    journalctl --boot --no-pager --output=json | zstd --quiet -6 -o "$collected/journal.json.zst"
     journalctl --boot --no-pager --output=short-precise \
         _SYSTEMD_USER_UNIT=kestrel.service + SYSLOG_IDENTIFIER=kestrel-setup + \
-        _SYSTEMD_UNIT=kestrel-greeter.service + _SYSTEMD_UNIT=kestrel-watchdog.service >"$into/kestrel.txt"
-    coredumps >"$into/coredumps.txt" 2>&1
-    dmesg --time-format=iso >"$into/dmesg.txt"
-    system >"$into/system.txt" 2>&1
-    lspci -nnk >"$into/lspci.txt" 2>&1
-    { lsusb; echo; lsusb -t; } >"$into/lsusb.txt" 2>&1
-    drm >"$into/drm.txt" 2>&1
-    video_acceleration >"$into/vainfo.txt"
-    sushictl status >"$into/sushi.txt" 2>&1
+        _SYSTEMD_UNIT=kestrel-greeter.service + _SYSTEMD_UNIT=kestrel-watchdog.service >"$collected/kestrel.txt"
+    coredumps >"$collected/coredumps.txt" 2>&1
+    dmesg --time-format=iso >"$collected/dmesg.txt"
+    system >"$collected/system.txt" 2>&1
+    timeout "$probe_timeout" lspci -nnk >"$collected/lspci.txt" 2>&1
+    { timeout "$probe_timeout" lsusb; echo; timeout "$probe_timeout" lsusb -t; } >"$collected/lsusb.txt" 2>&1
+    drm >"$collected/drm.txt" 2>&1
+    video_acceleration >"$collected/vainfo.txt"
+    timeout "$probe_timeout" sushictl status >"$collected/sushi.txt" 2>&1
     home="$(live_home)"
-    [[ -d "$home/.local/share/sabine/logs" ]] && cp -r "$home/.local/share/sabine/logs" "$into/sabine"
-    [[ -d /var/lib/kestrel-watchdog ]] && cp -r /var/lib/kestrel-watchdog "$into/kestrel-watchdog"
+    [[ -d "$home/.local/share/sabine/logs" ]] && cp -r "$home/.local/share/sabine/logs" "$collected/sabine"
+    [[ -d /var/lib/kestrel-watchdog ]] && cp -r /var/lib/kestrel-watchdog "$collected/kestrel-watchdog"
 }
 
-free_kib() {
-    df --output=avail -k "$medium" | tail -n1
+pack() {
+    rm -f "$packed"
+    (cd "$collected" && 7z a -tzip -mx=5 -bso0 -bsp0 "$packed" .)
 }
 
-prune() {
-    local -a sessions
-    mapfile -t sessions < <(find "$logs" -mindepth 1 -maxdepth 1 -type d -not -name '.*' -printf '%f\n' | sort)
-    while ((${#sessions[@]} > sessions_kept)) || ((${#sessions[@]} > 1 && $(free_kib) < free_kept_kib)); do
-        rm -rf "$logs/${sessions[0]}"
-        sessions=("${sessions[@]:1}")
+packed_size() {
+    stat --format=%s "$packed"
+}
+
+pack_within_cap() {
+    local lines
+    pack
+    (($(packed_size) <= session_cap)) && return
+    rm "$collected/journal.json.zst"
+    pack
+    for lines in "${journal_lines_kept[@]}"; do
+        (($(packed_size) <= session_cap)) && return
+        journal_text --lines="$lines"
+        pack
     done
 }
 
+free_bytes() {
+    df --output=avail --block-size=1 "$medium" | tail -n1
+}
+
+older_sessions() {
+    find "$logs" -mindepth 1 -maxdepth 1 -type f -name '*.zip' -not -name '.*' -not -name "$1" -printf '%f\n' | sort
+}
+
+make_room() {
+    local own="$1" needed="$2"
+    local -a older
+    mapfile -t older < <(older_sessions "$own")
+    while ((${#older[@]} >= sessions_kept)) || ((${#older[@]} > 0 && $(free_bytes) < needed)); do
+        rm -f "$logs/${older[0]}"
+        older=("${older[@]:1}")
+    done
+    (($(free_bytes) >= needed)) && return
+    rm -f "$logs/$own"
+    (($(free_bytes) >= needed))
+}
+
 save() {
-    local session="$logs/$(session_name)"
-    rm -rf "$saving"
-    mkdir -p "$saving"
-    cp -r --no-preserve=all "$state/collected/." "$saving/"
-    rm -rf "$session"
-    mv "$saving" "$session"
-    prune
+    local own needed
+    own="$(session_name).zip"
+    needed=$(($(packed_size) + free_kept))
+    mkdir -p "$logs"
+    rm -f "$staged"
+    make_room "$own" "$needed" || return
+    cp "$packed" "$staged" && sync --file-system "$medium" && mv -f "$staged" "$logs/$own"
     sync --file-system "$medium"
 }
 
@@ -126,9 +169,8 @@ mkdir -p "$state"
 exec 9>"$state/lock"
 flock 9
 wait_for_crash_reports
-rm -rf "$state/collected"
-mkdir "$state/collected"
-collect "$state/collected"
+collect
+pack_within_cap
 mount -o remount,rw "$medium" || exit
 trap 'mount -o remount,ro "$medium"' EXIT
 save

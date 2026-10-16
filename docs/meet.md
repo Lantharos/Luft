@@ -20,7 +20,7 @@ Before restarting, Meet Luft offers to keep the clock right in both systems (`Re
 | Luft's room | your choice, at least 32 GB (34 GB next to a small EFI system partition) | Empty until Luft is installed into it |
 | Moving box | what you packed, plus a little | exFAT, labelled *Moving box*, with `box.json` listing what's inside |
 | Start | about 512 MB | FAT, an EFI system partition of its own with shim, GRUB, the kernel and its initramfs |
-| Luft | the live system plus 256 MB | exFAT, labelled *Luft*, with `LiveOS` from the ISO and `meet.json` |
+| Luft | the live system plus 1 GB | exFAT, labelled *Luft*, with `LiveOS` from the ISO, `meet.json` and the logs from Try Luft |
 
 When Windows encrypts new partitions with BitLocker as soon as they're formatted, as it does on PCs with device encryption, Meet Luft decrypts its own right away, so the firmware and Luft can read them. Windows' drive stays encrypted. Meet Luft also notes the partitions it made in `C:\ProgramData\Lantharos\Meet Luft\made.json`, so it can always take them back out.
 
@@ -28,9 +28,15 @@ When Windows encrypts new partitions with BitLocker as soon as they're formatted
 
 After Luft is installed and you sign in for the first time, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
 
+## Getting a newer Luft
+
+When a newer Luft is out than the one on its partition, Meet Luft offers *Get the newest Luft* next to *Try Luft*. Newer means a different checksum than the build it copied, from the releases or nightly builds Meet Luft is using, or from an ISO picked with *Use an ISO I already have*; an ISO without a `.sha256` next to it always counts as newer. It downloads the new build in place of the old one and keeps the room, the moving box and the logs from Try Luft. When the new build fits the partitions Meet Luft already made, only their files change. Otherwise it makes them again at the size the new build needs, taking what's missing from Windows, and adds the start entry back. Meet Luft remembers which build it copied by its checksum in `LiveOS\iso.sha256`. If an update stops halfway, Meet Luft won't restart into Luft until the update is done.
+
 ## Logs from Try Luft
 
-When Luft starts from Meet Luft's partition, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets its own folder, `Luft logs\YYYY-MM-DD HH-MM-SS` on the *Luft* partition, named after the time of its first save. The last five are kept, fewer when the partition runs low on space. Starting from a USB stick saves nothing.
+When Luft starts from Meet Luft's partition, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets one zip, `Luft logs\YYYY-MM-DD HH-MM-SS.zip` on the *Luft* partition, named after the time of its first save, and each save replaces it whole. Starting from a USB stick saves nothing.
+
+A zip stays under 48 MB. When the logs of one start get bigger than that, the JSON journal is left out first, then only the last part of the text journal is kept. The last five starts are kept, and older ones are removed sooner when the partition gets short of space.
 
 | File | What's in it |
 | --- | --- |
@@ -40,21 +46,20 @@ When Luft starts from Meet Luft's partition, it keeps its logs on that partition
 | `kestrel-watchdog` | The graphics watchdog's records, when it has any |
 | `coredumps.txt` | `coredumpctl list` and `coredumpctl info` for every crash, with backtraces |
 | `dmesg.txt` | Kernel messages |
-| `system.txt` | Kernel, version, command line, `meet.json`, memory and drives |
+| `system.txt` | Kernel, version, command line, `meet.json`, memory, free space and drives |
 | `lspci.txt`, `lsusb.txt` | Devices and their drivers (`lspci -nnk`, `lsusb`, `lsusb -t`) |
 | `drm.txt` | Graphics cards and their drivers, and each connector's state and modes |
 | `vainfo.txt` | Video decoding, for each render node |
 | `sushi.txt` | `sushictl status` |
 | `sabine` | Sabine's logs from the live account |
 
-In Meet Luft, **Ctrl+Shift+L** puts the newest folder on the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer.
+In Meet Luft, **Ctrl+Shift+L** copies the newest zip to the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer.
 
 To read them without Meet Luft, use the partition's volume path. It works without giving the partition a drive letter, and only reads:
 
 ```powershell
 $luft = (Get-Volume -FileSystemLabel Luft).Path        # \\?\Volume{…}\
 Get-ChildItem -LiteralPath "${luft}Luft logs"
-Get-Content -LiteralPath "${luft}Luft logs\2026-10-16 14-05-33\journal.txt" -Tail 50
 Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Recurse
 ```
 

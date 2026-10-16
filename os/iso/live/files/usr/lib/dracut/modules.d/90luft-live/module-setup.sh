@@ -9,11 +9,11 @@ depends() {
 }
 
 installkernel() {
-    hostonly="" instmods erofs overlay loop isofs exfat sr_mod cdrom usb_storage uas
+    hostonly="" instmods erofs overlay loop isofs exfat ext4 btrfs xfs sr_mod cdrom usb_storage uas
 }
 
 install() {
-    inst_multiple mount udevadm
+    inst_multiple mount udevadm blkid
     inst_hook cmdline 90 "$moddir/parse-luft-live.sh"
     inst_script "$moddir/luft-live-root.sh" /usr/libexec/luft-live-root
     inst_simple "$moddir/luft-live-root.service" "$systemdsystemunitdir/luft-live-root.service"

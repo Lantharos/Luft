@@ -2,6 +2,7 @@
 set -uo pipefail
 
 medium=/run/initramfs/live
+host=/run/luft/host
 logs="$medium/Luft logs"
 staged="$logs/.saving.zip"
 state=/run/luft-live-logs
@@ -189,12 +190,21 @@ save() {
     sync --file-system "$medium"
 }
 
+open_medium() {
+    if mountpoint --quiet "$host"; then
+        mount -o remount,rw "$host" && mount -o remount,bind,rw "$medium" || return
+        trap 'mount -o remount,bind,ro "$medium"' EXIT
+    else
+        mount -o remount,rw "$medium" || return
+        trap 'mount -o remount,ro "$medium"' EXIT
+    fi
+}
+
 mkdir -p "$state"
 exec 9>"$state/lock"
 flock 9
 wait_for_crash_reports
 collect
 pack_within_cap
-mount -o remount,rw "$medium" || exit
-trap 'mount -o remount,ro "$medium"' EXIT
+open_medium || exit
 save

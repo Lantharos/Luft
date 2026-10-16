@@ -1,10 +1,11 @@
 use alloc::format;
 use alloc::string::{String, ToString};
 
-use uefi::runtime::{self, VariableAttributes, VariableVendor};
-use uefi::{CStr16, cstr16, guid};
+use uefi::runtime::{self, VariableAttributes};
+use uefi::{CStr16, cstr16};
 
-const LUFT: VariableVendor = VariableVendor(guid!("b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e"));
+use super::LUFT;
+
 const TRIES: u32 = 3;
 const GOOD: &CStr16 = cstr16!("LuftBootGood");
 const TRIED: &CStr16 = cstr16!("LuftBootTried");

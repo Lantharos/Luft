@@ -34,7 +34,7 @@ podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
   dracut --quiet --force --no-hostonly --kver '$kernel'
 "
 [[ "${DRIVER:-}" == system ]] && podman unshare sh -c "printf '%s\n' 'blacklist nvidia_drm' 'blacklist bochs' > '$deferred'"
-podman unshare setfiles -r "$tree" "$contexts/file_contexts" "$tree"
+podman unshare setfiles -F -r "$tree" "$contexts/file_contexts" "$tree"
 [[ "${LAYOUT:-}" == fedora ]] && exec "$root/scripts/vm/fedora.sh" "$kernel"
 
 cargo build --release --manifest-path "$root/scripts/vm/display/Cargo.toml" --target x86_64-unknown-uefi --target-dir "$root/target"

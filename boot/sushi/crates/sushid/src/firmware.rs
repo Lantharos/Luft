@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use sushi::display::{Display, ModeHints};
+use sushi::display::{Display, ModeHints, firmware_screen};
 use sushi::render::Logo;
 use sushi::scene::FirmwareLogo;
 use sushi::scene::tiny_skia::Pixmap;
@@ -26,9 +26,16 @@ impl Firmware {
             .monitor()
             .map(|monitor| monitor.native)
             .or_else(|| hints.only_size());
+        let framebuffer = firmware_screen().unwrap_or(display.sizes()[0]);
+        if let Some(logo) = &logo {
+            eprintln!(
+                "The firmware's logo is {logo}, on a {}×{} screen",
+                framebuffer.0, framebuffer.1
+            );
+        }
         Self {
             logo,
-            framebuffer: display.sizes()[0],
+            framebuffer,
             monitor,
         }
     }

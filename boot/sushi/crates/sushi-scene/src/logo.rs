@@ -45,22 +45,17 @@ impl FirmwareLogo {
         on((screen_width, screen_height))
     }
 
-    pub fn area_on(&self, framebuffer: (u32, u32), canvas: (u32, u32)) -> Option<Area> {
-        if self.screen == framebuffer {
-            let across = framebuffer.0 as f32 / canvas.0 as f32;
-            let down = framebuffer.1 as f32 / canvas.1 as f32;
-            return Area::from_xywh(
-                self.x as f32 / across,
-                self.y as f32 / down,
-                self.width as f32 / across,
-                self.height as f32 / down,
-            );
-        }
-        let scale = canvas.1 as f32 / self.screen.1.max(1) as f32;
-        let center_offset = self.x as f32 - self.screen.0 as f32 / 2.0;
+    /// Where the logo goes on a canvas the size of the picture the monitor shows: the firmware's screen fitted into
+    /// the canvas without stretching it, so the logo keeps its shape whether or not the monitor stretched it.
+    pub fn area_on(&self, canvas: (u32, u32)) -> Option<Area> {
+        let (screen_width, screen_height) =
+            (self.screen.0.max(1) as f32, self.screen.1.max(1) as f32);
+        let scale = (canvas.0 as f32 / screen_width).min(canvas.1 as f32 / screen_height);
+        let left = (canvas.0 as f32 - screen_width * scale) / 2.0;
+        let top = (canvas.1 as f32 - screen_height * scale) / 2.0;
         Area::from_xywh(
-            canvas.0 as f32 / 2.0 + center_offset * scale,
-            self.y as f32 * scale,
+            left + self.x as f32 * scale,
+            top + self.y as f32 * scale,
             self.width as f32 * scale,
             self.height as f32 * scale,
         )
@@ -81,7 +76,7 @@ mod tests {
     fn a_logo_drawn_on_the_framebuffer_stays_where_it_is() {
         let logo = ultrawide_logo(ULTRAWIDE, Some(ULTRAWIDE));
         assert_eq!(logo.screen, ULTRAWIDE);
-        let area = logo.area_on(ULTRAWIDE, ULTRAWIDE).unwrap();
+        let area = logo.area_on(ULTRAWIDE).unwrap();
         assert_eq!((area.x(), area.y(), area.width()), (1573.0, 350.0, 293.0));
     }
 
@@ -89,7 +84,7 @@ mod tests {
     fn a_smaller_framebuffer_takes_the_screen_from_the_monitor() {
         let logo = ultrawide_logo((1024, 768), Some(ULTRAWIDE));
         assert_eq!(logo.screen, ULTRAWIDE);
-        let area = logo.area_on((1024, 768), ULTRAWIDE).unwrap();
+        let area = logo.area_on(ULTRAWIDE).unwrap();
         assert_eq!((area.x(), area.y(), area.height()), (1573.0, 350.0, 400.0));
     }
 
@@ -103,8 +98,19 @@ mod tests {
     fn without_a_monitor_the_width_comes_from_centering() {
         let logo = ultrawide_logo((1024, 768), None);
         assert_eq!(logo.screen, (3440, 2580));
-        let area = logo.area_on((1024, 768), (1024, 768)).unwrap();
+        let area = logo.area_on((1024, 768)).unwrap();
         assert!(libm::fabsf(area.x() + area.width() / 2.0 - 512.0) < 0.5);
         assert!(area.bottom() < 768.0);
+    }
+
+    #[test]
+    fn a_logo_on_a_stretched_framebuffer_keeps_its_shape_on_the_panel() {
+        let logo = FirmwareLogo::infer((700, 282), (520, 260), (1920, 1080), Some((1920, 1200)));
+        assert_eq!(logo.screen, (1920, 1080));
+        let area = logo.area_on((1920, 1200)).unwrap();
+        assert_eq!(
+            (area.x(), area.y(), area.width(), area.height()),
+            (700.0, 342.0, 520.0, 260.0)
+        );
     }
 }

@@ -48,7 +48,7 @@ A zip stays under 48 MB. When the logs of one start get bigger than that, the JS
 | `dmesg.txt` | Kernel messages |
 | `system.txt` | Kernel, version, command line, `meet.json`, memory, free space and drives |
 | `lspci.txt`, `lsusb.txt` | Devices and their drivers (`lspci -nnk`, `lsusb`, `lsusb -t`) |
-| `drm.txt` | Graphics cards and their drivers, and each connector's state and modes |
+| `drm.txt` | The framebuffer and logo the firmware left, graphics cards and their drivers, and each connector's state and modes |
 | `vainfo.txt` | Video decoding, for each render node |
 | `graphics.txt` | Vulkan and EGL drivers and devices (`vulkaninfo --summary`, `eglinfo -B`) |
 | `sushi.txt` | `sushictl status` |

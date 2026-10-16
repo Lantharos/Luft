@@ -44,8 +44,23 @@ coredumps() {
     timeout 2m coredumpctl --no-pager --quiet info "$boot"
 }
 
+binary_number() {
+    od --address-radix=n --format="$1" --skip-bytes="$2" --read-bytes="${1:1}" "$3" | tr -d ' '
+}
+
+firmware_display() {
+    local bgrt=/sys/firmware/acpi/bgrt boot_params=/sys/kernel/boot_params/data height
+    printf 'Firmware framebuffer: %sx%s\n' "$(binary_number u2 18 "$boot_params")" "$(binary_number u2 20 "$boot_params")"
+    [[ -r "$bgrt/image" ]] || return
+    height="$(binary_number d4 22 "$bgrt/image")"
+    printf 'Firmware logo: %sx%s at (%s, %s), status %s\n' "$(binary_number u4 18 "$bgrt/image")" "${height#-}" \
+        "$(<"$bgrt/xoffset")" "$(<"$bgrt/yoffset")" "$(<"$bgrt/status")"
+}
+
 drm() {
     local card connector
+    firmware_display
+    echo
     for card in /sys/class/drm/card[0-9]; do
         printf '%s: %s %s\n' "${card##*/}" "$(basename "$(readlink -f "$card/device/driver")")" "$(basename "$(readlink -f "$card/device")")"
     done

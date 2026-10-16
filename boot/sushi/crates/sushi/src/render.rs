@@ -1,3 +1,4 @@
+use std::fmt;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -45,5 +46,18 @@ impl Logo {
             monitor,
         );
         (self.image.clone(), placement)
+    }
+}
+
+impl fmt::Display for Logo {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            formatter,
+            "{}×{} at ({}, {})",
+            self.image.width(),
+            self.image.height(),
+            self.x,
+            self.y
+        )
     }
 }

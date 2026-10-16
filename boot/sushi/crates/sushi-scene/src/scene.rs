@@ -50,8 +50,7 @@ impl Scene {
         canvas: (u32, u32),
         logo: Option<(Arc<Pixmap>, FirmwareLogo)>,
     ) -> Self {
-        let logo =
-            logo.and_then(|(image, firmware)| Some((image, firmware.area_on(size, canvas)?)));
+        let logo = logo.and_then(|(image, firmware)| Some((image, firmware.area_on(canvas)?)));
         let layout = Layout::new(
             canvas.0,
             canvas.1,

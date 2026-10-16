@@ -10,7 +10,7 @@ SushiBoot, in the same folder, is the UEFI boot menu Luft starts through.
 - Unlocks encrypted disks: nothing to type when the TPM unlocks, otherwise a PIN, passphrase or recovery key prompt that says why it is asking
 - Follows the graphics driver taking over and sets the saved display mode, so the monitor never switches modes again at the login screen
 - Loads NVIDIA's driver itself while the splash shows, so the monitor goes dark only once per boot
-- Keeps its drawing in proportion when the firmware hands over a framebuffer the monitor stretches, such as 1920×1080 on a 16:10 laptop panel
+- Keeps the logo and spinner in proportion when the firmware hands over a framebuffer the monitor stretches, such as 1920×1080 on a 16:10 laptop panel
 - Holds the display between sessions, so signing in and out never shows the text console
 - Answers Plymouth's `plymouth` tool, so `dnf5 offline`, `dnf5 system-upgrade`, PackageKit and fwupd show progress unchanged
 - Shows notices before the login screen, such as the Secure Boot key enrollment steps

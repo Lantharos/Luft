@@ -1,3 +1,4 @@
+mod boot;
 mod card;
 mod modes;
 mod output;
@@ -10,6 +11,7 @@ use drm::control::{Device as ControlDevice, Mode, ResourceHandles, connector, cr
 use sushi_scene::Rect;
 use sushi_scene::tiny_skia::Pixmap;
 
+pub use boot::firmware_screen;
 pub use card::Card;
 pub use modes::ModeHints;
 pub use output::Output;

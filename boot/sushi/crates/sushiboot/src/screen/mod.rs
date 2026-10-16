@@ -1,14 +1,18 @@
 mod bgrt;
 mod mode;
 
+use alloc::format;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
 use sushi_scene::tiny_skia::{Pixmap, PixmapMut, Transform};
 use sushi_scene::{FirmwareLogo, Rect, Scene, Visuals};
-use uefi::Handle;
 use uefi::boot::ScopedProtocol;
 use uefi::proto::console::gop::{BltOp, BltPixel, BltRegion, GraphicsOutput};
+use uefi::runtime::{self, VariableAttributes};
+use uefi::{Handle, cstr16};
+
+use crate::loader::LUFT;
 
 pub struct Screen {
     gop: ScopedProtocol<GraphicsOutput>,
@@ -20,9 +24,19 @@ fn resolution(gop: &GraphicsOutput) -> (u32, u32) {
     (width as u32, height as u32)
 }
 
+fn tell_linux_the_firmware_screen((width, height): (u32, u32)) {
+    let _ = runtime::set_variable(
+        cstr16!("LuftFirmwareScreen"),
+        &LUFT,
+        VariableAttributes::BOOTSERVICE_ACCESS | VariableAttributes::RUNTIME_ACCESS,
+        format!("{width}x{height}").as_bytes(),
+    );
+}
+
 impl Screen {
     pub fn new(handle: Handle, mut gop: ScopedProtocol<GraphicsOutput>) -> Self {
         let framebuffer = resolution(&gop);
+        tell_linux_the_firmware_screen(framebuffer);
         let monitor = mode::monitor(handle);
         let switched = monitor
             .as_ref()

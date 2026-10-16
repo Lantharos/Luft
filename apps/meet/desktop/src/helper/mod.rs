@@ -7,19 +7,16 @@ mod system;
 mod undo;
 
 use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
 use std::os::windows::io::AsRawHandle;
-use std::sync::Mutex;
-use std::time::{Duration, Instant};
 
 use serde_json::Value;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::System::Pipes::GetNamedPipeServerProcessId;
 
-use crate::protocol::{Call, Progress, Reply, Request, Stage};
+use crate::protocol::Call;
+pub use crate::serving::Context;
 
 pub const ARGUMENT: &str = "--meet-helper";
-const PROGRESS_INTERVAL: Duration = Duration::from_millis(250);
 
 pub struct Link {
     pipe: String,
@@ -33,29 +30,6 @@ pub fn requested() -> Option<Link> {
         pipe: args.next()?,
         parent: args.next()?.parse().ok()?,
     })
-}
-
-pub struct Context {
-    replies: Mutex<File>,
-    last: Mutex<Option<(Stage, Instant)>>,
-}
-
-impl Context {
-    fn send(&self, reply: &Reply) {
-        let mut line = serde_json::to_vec(reply).expect("replies always serialize");
-        line.push(b'\n');
-        let _ = self.replies.lock().expect("replies lock").write_all(&line);
-    }
-
-    pub fn progress(&self, stage: Stage, done: u64, total: u64) {
-        let mut last = self.last.lock().expect("progress lock");
-        let due = last
-            .is_none_or(|(previous, at)| previous != stage || at.elapsed() >= PROGRESS_INTERVAL);
-        if due || done == total {
-            *last = Some((stage, Instant::now()));
-            self.send(&Reply::Progress(Progress { stage, done, total }));
-        }
-    }
 }
 
 fn server_is(pipe: &File, parent: u32) -> bool {
@@ -95,25 +69,6 @@ pub fn serve(link: Link) {
     if !server_is(&calls, link.parent) || !server_is(&replies, link.parent) {
         return;
     }
-    let context = Context {
-        replies: Mutex::new(replies),
-        last: Mutex::new(None),
-    };
-    for line in BufReader::new(calls).lines() {
-        let Ok(line) = line else { break };
-        let Ok(request) = serde_json::from_str::<Request>(&line) else {
-            continue;
-        };
-        let reply = match handle(&context, request.call) {
-            Ok(value) => Reply::Done {
-                id: request.id,
-                value,
-            },
-            Err(error) => Reply::Failed {
-                id: request.id,
-                error,
-            },
-        };
-        context.send(&reply);
-    }
+    let context = Context::new(replies);
+    crate::serving::serve(calls, &context, handle);
 }

@@ -1677,6 +1677,7 @@ name = "meet"
 version = "0.1.0"
 dependencies = [
  "embed-resource",
+ "libc",
  "luft-meet",
  "raw-window-handle",
  "rfd",

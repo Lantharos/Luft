@@ -9,6 +9,7 @@
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
 	import Hello from '#lib/steps/Hello.svelte';
+	import LinuxReady from '#lib/steps/LinuxReady.svelte';
 	import MovingBox from '#lib/steps/MovingBox.svelte';
 	import Ready from '#lib/steps/Ready.svelte';
 	import Removed from '#lib/steps/Removed.svelte';
@@ -40,7 +41,7 @@
 		document.documentElement.dataset.scheme = appearance.scheme;
 	});
 
-	let Step = $derived(STEPS[session.step]);
+	let Step = $derived(session.step === 'ready' && session.platform === 'linux' ? LinuxReady : STEPS[session.step]);
 </script>
 
 <svelte:window {onkeydown} />

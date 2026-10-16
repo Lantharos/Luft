@@ -26,7 +26,7 @@
 	let wallpaper = $state(true);
 	let wifi = $state(false);
 	let bluetooth = $state(true);
-	let paired = $derived(session.report?.facts.bluetooth ?? 0);
+	let paired = $derived(session.windows?.bluetooth ?? 0);
 	let account = $state(true);
 	let regional = $state(true);
 

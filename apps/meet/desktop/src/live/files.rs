@@ -13,6 +13,7 @@ const START_FILES: [&str; 6] = [
     "boot/menu.cfg",
 ];
 const LIVE_FOLDER: &str = "LiveOS/";
+#[cfg(any(windows, test))]
 const GRUB_CONFIGS: [&str; 2] = ["EFI/BOOT/grub.cfg", "EFI/fedora/grub.cfg"];
 pub const BUILD_RECORD: &str = "LiveOS/iso.sha256";
 pub const UPDATING: &str = "updating";
@@ -47,10 +48,12 @@ pub fn missing(entries: &[Entry]) -> Option<&'static str> {
         .find(|wanted| !entries.iter().any(|entry| entry.path == *wanted))
 }
 
+#[cfg(any(windows, test))]
 pub fn grub_config(live_partition: &str) -> String {
     format!("set medium='PARTUUID={live_partition}'\nexport medium\nsource /boot/menu.cfg\n")
 }
 
+#[cfg(any(windows, test))]
 pub fn write_grub_configs(start: &Path, live_partition: &str) -> io::Result<()> {
     for config in GRUB_CONFIGS {
         let path = start.join(config);
@@ -60,11 +63,12 @@ pub fn write_grub_configs(start: &Path, live_partition: &str) -> io::Result<()> 
     Ok(())
 }
 
-fn on(root: &Path, path: &str) -> PathBuf {
+pub fn on(root: &Path, path: &str) -> PathBuf {
     path.split('/')
         .fold(root.to_owned(), |target, part| target.join(part))
 }
 
+#[cfg(any(windows, test))]
 fn gone(result: io::Result<()>) -> io::Result<()> {
     match result {
         Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(()),
@@ -72,6 +76,7 @@ fn gone(result: io::Result<()>) -> io::Result<()> {
     }
 }
 
+#[cfg(any(windows, test))]
 pub fn clear(start: &Path, live: &Path) -> io::Result<()> {
     for file in START_FILES {
         gone(fs::remove_file(on(start, file)))?;
@@ -79,32 +84,30 @@ pub fn clear(start: &Path, live: &Path) -> io::Result<()> {
     gone(fs::remove_dir_all(on(live, LIVE_FOLDER)))
 }
 
-pub struct Volumes {
-    start: PathBuf,
-    live: PathBuf,
+#[cfg(any(windows, test))]
+pub fn split(start: PathBuf, live: PathBuf) -> impl Fn(&str) -> PathBuf {
+    move |path| {
+        let root = match place(path) {
+            Some(Place::Start) => &start,
+            _ => &live,
+        };
+        on(root, path)
+    }
+}
+
+pub struct Volumes<F> {
+    target: F,
     open: Option<(String, File)>,
 }
 
-impl Volumes {
-    pub fn new(start: PathBuf, live: PathBuf) -> Self {
-        Self {
-            start,
-            live,
-            open: None,
-        }
-    }
-
-    fn target(&self, path: &str) -> PathBuf {
-        let root = match place(path) {
-            Some(Place::Start) => &self.start,
-            _ => &self.live,
-        };
-        on(root, path)
+impl<F: Fn(&str) -> PathBuf> Volumes<F> {
+    pub fn new(target: F) -> Self {
+        Self { target, open: None }
     }
 
     fn file(&mut self, path: &str) -> io::Result<&mut File> {
         if self.open.as_ref().is_none_or(|(open, _)| open != path) {
-            let target = self.target(path);
+            let target = (self.target)(path);
             fs::create_dir_all(target.parent().expect("files live in folders"))?;
             let file = OpenOptions::new()
                 .create(true)
@@ -124,7 +127,7 @@ impl Volumes {
     }
 }
 
-impl Sink for Volumes {
+impl<F: Fn(&str) -> PathBuf> Sink for Volumes<F> {
     fn wants(&self, path: &str) -> bool {
         place(path).is_some()
     }

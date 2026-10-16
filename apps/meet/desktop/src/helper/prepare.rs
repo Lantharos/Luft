@@ -1,10 +1,11 @@
 use luft_meet::handoff::{LIVE_LABEL, START_LABEL};
-use luft_meet::{Handoff, Intent, Room};
+use luft_meet::{Handoff, Intent, Made, Partitions, Room};
 
 use super::drive::storage::{BASIC_TYPE, ESP_TYPE, Layout, MSFT_Partition, Storage};
 use super::drive::{record, state, windows_drive};
 use super::system::{facts, firmware, start_entries};
 use super::{Context, live_system, undo};
+use crate::check::facts::Facts;
 use crate::check::rules;
 use crate::live::source::Source;
 use crate::plan::layout::{self, Role};
@@ -17,33 +18,34 @@ const EXFAT: &str = "exFAT";
 pub fn prepared(found: &state::Found) -> Option<Prepared> {
     let handoff = found.handoff.as_ref()?;
     Some(Prepared {
-        room: handoff.room.map_or(0, |room| room.size),
+        room: handoff.room().map_or(0, |room| room.size),
         moving_box: found.moving_box.as_ref().map(|partition| partition.Size),
     })
 }
 
-pub fn check(source: &Source) -> Result<Report, String> {
+pub fn check(source: &Source) -> Result<Report<Facts>, String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
     let layout = storage.layout(&drive.volume)?;
     let windows = storage.windows_plan(&layout, &drive.volume)?;
     let found = state::find(&layout);
     let facts = facts::gather(&storage, &layout, &windows, &drive.letter, &found);
-    let live = live_system::listing(source)
+    let listing = live_system::listing(source)
         .inspect_err(|error| eprintln!("Luft's download isn't reachable: {error}"))
-        .ok()
-        .map(|entries| {
-            live_system::partitions(&entries)
-                .iter()
-                .map(|(_, size)| size)
-                .sum::<u64>()
-        });
+        .ok();
+    let live = listing.as_ref().map(|listing| {
+        live_system::partitions(&listing.entries)
+            .iter()
+            .map(|(_, size)| size)
+            .sum::<u64>()
+    });
     let smallest_luft = sizes::smallest_luft(facts.esp_size);
     Ok(Report {
         findings: rules::evaluate(&facts, live),
         most_luft: facts.most_room.saturating_sub(live.unwrap_or(0)),
         smallest_luft,
         live: live.unwrap_or(0),
+        download: listing.map_or(0, |listing| listing.download),
         prepared: prepared(&found),
         outdated: found
             .live_path()
@@ -110,14 +112,16 @@ pub fn build(
     record::set_boot_entry(Some(boot_entry))?;
     let handoff = Handoff {
         intent: Intent::Try,
-        start: start_guid,
-        live: live_guid,
-        moving_box,
-        room: Some(Room {
-            offset: plan.room.offset,
-            size: plan.room.size,
-        }),
         boot_entry,
+        made: Made::Partitions(Partitions {
+            start: start_guid,
+            live: live_guid,
+            moving_box,
+            room: Some(Room {
+                offset: plan.room.offset,
+                size: plan.room.size,
+            }),
+        }),
     };
     state::write_handoff(&live_path, &handoff)
 }
@@ -138,7 +142,7 @@ pub fn prepare(context: &Context, luft: u64, source: &Source) -> Result<Prepared
     if luft < sizes::smallest_luft(layout.esp_size(&found.made)) {
         return Err("Luft needs more room than that.".to_owned());
     }
-    let entries = live_system::listing(source)?;
+    let entries = live_system::listing(source)?.entries;
     let plan = layout::plan(
         &layout.plan_disk(),
         &windows,

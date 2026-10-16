@@ -1,11 +1,15 @@
 # Meet Luft
 
-Meet Luft gets a Windows PC ready for Luft without a USB stick. It runs in Windows, makes room next to it, and restarts into Luft once, to try it or install it. Windows keeps starting as usual unless you install Luft and choose it. The app is in [apps/meet](../apps/meet/README.md).
+Meet Luft gets a Windows or Linux computer ready for Luft without a USB stick. It restarts into Luft once, to try it, install it or, on Linux, let it take the old system's place. The system already there keeps starting as usual until you decide otherwise in Install Luft. The app is in [apps/meet](../apps/meet/README.md).
 
-## What it does
+## Which Luft it downloads
+
+Meet Luft only downloads the image the computer needs: `luft-latest-nvidia.iso` when it has an NVIDIA graphics card, hybrid laptops included, and `luft-latest-standard.iso` otherwise (`luft-nightly-…` for nightly builds), each with its `.sha256`. Until a build has its own image for that, it falls back to the universal `luft-latest.iso`. The size it shows is the real size of that download, and *Get the newest Luft* keeps to the same one.
+
+## On Windows
 
 1. **Checks the PC.** A 64-bit Intel or AMD processor, UEFI and a GPT drive are needed. It also looks at Secure Boot, the TPM, BitLocker, Fast Startup, free space, the graphics card (an NVIDIA card gets the image with NVIDIA's driver later) and the Wi-Fi chip, and says what each means. When Secure Boot is off it explains where to turn it on for that PC's maker, and can restart straight into the firmware settings. Start entries left by systems that are gone, such as an old Ubuntu, can be tidied away, from the firmware and from Windows' own boot configuration.
-2. **Makes room.** Windows makes its partition smaller, the same way Disk Management does, so it also works with BitLocker on. Luft's room and Meet Luft's own partitions go right after Windows, in front of a recovery partition at the end of the drive. Then it downloads [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso), checks it against its `.sha256`, and copies the live system out of it as it arrives. An ISO you already have works too.
+2. **Makes room.** Windows makes its partition smaller, the same way Disk Management does, so it also works with BitLocker on. Luft's room and Meet Luft's own partitions go right after Windows, in front of a recovery partition at the end of the drive. Then it downloads Luft, checks it against its `.sha256`, and copies the live system out of it as it arrives. An ISO you already have works too.
 3. **Restarts into Luft.** It adds a start entry called *Meet Luft* at the end of the firmware's list and asks the firmware to use it once (`BootNext`). Some firmware drops entries it doesn't know; Meet Luft puts it back before each restart. Luft starts the same way as from the stick, through Fedora's signed shim and GRUB, so Secure Boot can stay on. The restart after that goes back to Windows.
    - *Try Luft* opens the desktop. Nothing is installed.
    - *Install Luft* opens Install Luft with *Alongside Windows* already chosen, in the room Meet Luft made. Nothing on the drive changes until you confirm there.
@@ -13,7 +17,7 @@ Meet Luft gets a Windows PC ready for Luft without a USB stick. It runs in Windo
 
 Before restarting, Meet Luft offers to keep the clock right in both systems (`RealTimeIsUniversal`) and, when installing, to turn off Fast Startup. It changes these in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
 
-## Partitions
+### Partitions
 
 | Partition | Size | What's on it |
 | --- | --- | --- |
@@ -28,13 +32,13 @@ When Windows encrypts new partitions with BitLocker as soon as they're formatted
 
 After Luft is installed and you sign in for the first time, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
 
-## Getting a newer Luft
+### Getting a newer Luft
 
 When a newer Luft is out than the one on its partition, Meet Luft offers *Get the newest Luft* next to *Try Luft*. Newer means a different checksum than the build it copied, from the releases or nightly builds Meet Luft is using, or from an ISO picked with *Use an ISO I already have*; an ISO without a `.sha256` next to it always counts as newer. It downloads the new build in place of the old one and keeps the room, the moving box and the logs from Try Luft. When the new build fits the partitions Meet Luft already made, only their files change. Otherwise it makes them again at the size the new build needs, taking what's missing from Windows, and adds the start entry back. Meet Luft remembers which build it copied by its checksum in `LiveOS\iso.sha256`. If an update stops halfway, Meet Luft won't restart into Luft until the update is done.
 
 ## Logs from Try Luft
 
-When Luft starts from Meet Luft's partition, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets one zip, `Luft logs\YYYY-MM-DD HH-MM-SS.zip` on the *Luft* partition, named after the time of its first save, and each save replaces it whole. Starting from a USB stick saves nothing.
+When Luft starts from Meet Luft's partition or folder, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets one zip, `Luft logs\YYYY-MM-DD HH-MM-SS.zip` on the *Luft* partition (on Linux, in Meet Luft's folder), named after the time of its first save, and each save replaces it whole. Starting from a USB stick saves nothing.
 
 A zip stays under 48 MB. When the logs of one start get bigger than that, the JSON journal is left out first, then only the last part of the text journal is kept. The last five starts are kept, and older ones are removed sooner when the partition gets short of space.
 
@@ -54,7 +58,7 @@ A zip stays under 48 MB. When the logs of one start get bigger than that, the JS
 | `sushi.txt` | `sushictl status` |
 | `sabine` | Sabine's logs from the live account, with Chromium's own log in `chromium.log` |
 
-In Meet Luft, **Ctrl+Shift+L** copies the newest zip to the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer.
+In Meet Luft, **Ctrl+Shift+L** copies the newest zip to the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer or your file manager.
 
 To read them without Meet Luft, use the partition's volume path. It works without giving the partition a drive letter, and only reads:
 
@@ -64,12 +68,30 @@ Get-ChildItem -LiteralPath "${luft}Luft logs"
 Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Recurse
 ```
 
-## Taking it back out
+### Taking it back out
 
 *Remove Luft from this PC* deletes the start entry and every partition Meet Luft made, moving box included, and gives Windows all of its space back. Once Luft is installed, its partition is Luft's own: remove it from Windows' Disk Management if you go back.
 
-## Running it
+### Running it
 
 Meet Luft asks Windows for administrator rights once, when it first looks at the drive. A small helper does the disk and firmware work with those rights; the window itself runs as you, so it sees your own folders and settings. It needs Windows 10 or 11, and an internet connection unless you pick an ISO.
 
 When a step doesn't finish, Meet Luft says which one and offers to try it again. What went wrong is written to `%LOCALAPPDATA%\Sabine\logs\meet.jsonl`.
+
+## On Linux
+
+Meet Luft for Linux is an AppImage. It needs UEFI and a GPT drive, and checks Secure Boot, the TPM, the graphics card (an NVIDIA card gets the image with NVIDIA's driver), the Wi-Fi chip, free space, the EFI system partition and how the system is laid out.
+
+Nothing is repartitioned. Meet Luft keeps the live system as files in a folder, `/home/.luft-meet` on the drive that holds your home folder, or `/var/lib/luft-meet/live` when that one can't be used. The folder has to be on ext4, btrfs or XFS on a plain partition: Luft can't start from an encrypted drive, LVM or RAID yet, and Meet Luft says so. Next to the system's own boot files on the EFI system partition it adds `EFI/luft-meet` with Fedora's signed shim and GRUB, about 5 MB, and a start entry called *Meet Luft*. GRUB reads the kernel and initramfs straight from the folder, and the live system finds it with `root=luft-live:UUID=<file system>/<folder>` on the kernel command line, the folder being its path from the top of the file system (for btrfs, from the top-level subvolume). Restarting sets `BootNext` once, so the restart after that is back in the old system.
+
+Secure Boot can stay on: Luft starts through Fedora's shim and GRUB, like the stick. Luft's own key is only added when it's installed, with the usual blue screen at its first start.
+
+On *Luft is ready* there are three ways in:
+
+- *Try Luft* opens the desktop.
+- *Replace* opens Install Luft with the old system chosen, explains what stays and changes, and does nothing before you confirm. It's offered when your home folder is its own btrfs subvolume, as Fedora does it, or its own partition. A system with everything on one partition is found but can't be replaced yet.
+- *Install Luft* opens Install Luft to put Luft on another drive or in free space.
+
+*Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. After Luft is installed and you sign in for the first time, it removes them itself.
+
+Meet Luft asks for your password through polkit once, when it first looks at the computer; a helper started with `pkexec` does the work on the drive and the firmware, and the window runs as you.

@@ -8,6 +8,7 @@
 
 	let confirming = $state(false);
 	let report = $derived(session.report!);
+	let windows = $derived(session.windows!);
 	let fromFile = $derived(session.source.kind === 'file');
 
 	function start() {
@@ -19,8 +20,8 @@
 <Frame title="How much room for Luft?" description="Windows makes itself smaller to give Luft space. Your files in Windows stay exactly where they are." onback={() => session.go('check')}>
 	<div class="flex flex-col gap-6">
 		<SplitBar
-			total={report.facts.windowsSize}
-			used={report.facts.windowsUsed}
+			total={windows.windowsSize}
+			used={windows.windowsUsed}
 			value={session.luft}
 			min={report.smallestLuft}
 			max={report.mostLuft}
@@ -47,7 +48,7 @@
 		title="Give Luft {bytes(session.luft)}?"
 		description={fromFile
 			? 'Windows shrinks its drive, then Meet Luft copies Luft from your ISO. Keep the PC plugged in.'
-			: `Windows shrinks its drive, then Meet Luft downloads Luft, about ${bytes(report.live)}. Keep the PC plugged in and online.`}
+			: `Windows shrinks its drive, then Meet Luft downloads Luft, about ${bytes(report.download)}. Keep the PC plugged in and online.`}
 		onclose={() => (confirming = false)}
 	>
 		{#snippet actions()}

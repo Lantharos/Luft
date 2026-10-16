@@ -3,8 +3,7 @@ use luft_meet::moving_box::{FolderKind, Regional};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::check::facts::Facts;
-use crate::check::rules::Finding;
+use crate::check::common::Finding;
 use crate::live::source::Source;
 
 #[derive(Serialize, Deserialize)]
@@ -85,10 +84,11 @@ pub struct Prepared {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Report {
-    pub facts: Facts,
+pub struct Report<F> {
+    pub facts: F,
     pub findings: Vec<Finding>,
     pub live: u64,
+    pub download: u64,
     pub smallest_luft: u64,
     pub most_luft: u64,
     pub prepared: Option<Prepared>,

@@ -3,7 +3,7 @@
 	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import { Dialog } from '@luft/ui';
+	import { bytes, Dialog } from '@luft/ui';
 	import type { Action, Level } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
@@ -21,7 +21,7 @@
 	const CONFIRMATIONS: Record<Confirmed, { title: string; description: string; confirm: string }> = {
 		firmwareSettings: {
 			title: 'Restart into the firmware settings?',
-			description: 'Save anything you’re working on first. Turn on Secure Boot there, save, and Windows starts again as usual.',
+			description: 'Save anything you’re working on first. Turn on Secure Boot there and save, and your computer starts again as usual.',
 			confirm: 'Restart'
 		},
 		tidy: {
@@ -34,6 +34,8 @@
 	const PATIENCE = 15_000;
 
 	let confirming = $state<Confirmed | null>(null);
+	let readying = $state(false);
+	let computer = $derived(session.platform === 'linux' ? 'computer' : 'PC');
 	let slow = $state(false);
 
 	$effect(() => {
@@ -48,6 +50,11 @@
 		else confirming = action;
 	}
 
+	function getReady() {
+		readying = false;
+		void session.getReady();
+	}
+
 	function act() {
 		const action = confirming!;
 		confirming = null;
@@ -55,10 +62,10 @@
 	}
 
 	let findings = $derived([...(session.report?.findings ?? [])].sort((a, b) => ORDER[a.level] - ORDER[b.level]));
-	let title = $derived(!session.report ? 'Looking at this PC' : session.blocked ? 'Almost there' : 'This PC is ready for Luft');
+	let title = $derived(!session.report ? `Looking at this ${computer}` : session.blocked ? 'Almost there' : `This ${computer} is ready for Luft`);
 	let description = $derived(
 		!session.report
-			? slow && !session.failure
+			? slow && !session.failure && session.platform === 'windows'
 				? 'Windows is working out how much room it can spare. On a big drive this can take a few minutes.'
 				: 'This takes a moment.'
 			: session.blocked
@@ -102,10 +109,31 @@
 		{#if session.report && session.blocked}
 			<button type="button" class="button large px-6" disabled={session.busy} onclick={() => session.check()}>Check again</button>
 		{:else if session.report}
-			<button type="button" class="button primary large px-6" onclick={() => session.go('room')}>Continue</button>
+			<button
+				type="button"
+				class="button primary large px-6"
+				onclick={() => (session.platform === 'linux' ? (readying = true) : session.go('room'))}
+			>
+				Continue
+			</button>
 		{/if}
 	{/snippet}
 </Frame>
+
+{#if readying}
+	<Dialog
+		title="Get Luft ready?"
+		description={session.source.kind === 'file'
+			? 'Meet Luft copies Luft from your ISO into a folder on this computer and adds a start entry for it. Nothing is repartitioned.'
+			: `Meet Luft downloads Luft, about ${bytes(session.report?.download ?? 0)}, into a folder on this computer and adds a start entry for it. Nothing is repartitioned.`}
+		onclose={() => (readying = false)}
+	>
+		{#snippet actions()}
+			<button type="button" class="button" onclick={() => (readying = false)}>Cancel</button>
+			<button type="button" class="button primary" onclick={getReady}>Get it ready</button>
+		{/snippet}
+	</Dialog>
+{/if}
 
 {#if confirming}
 	<Dialog title={CONFIRMATIONS[confirming].title} description={CONFIRMATIONS[confirming].description} onclose={() => (confirming = null)}>

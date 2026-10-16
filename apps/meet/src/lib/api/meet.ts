@@ -2,7 +2,9 @@ import { invoke, listen } from '@lantharos/sabine';
 
 export type Level = 'fine' | 'note' | 'blocks';
 export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing';
-export type Intent = 'try' | 'install';
+export type Intent = 'try' | 'install' | 'replace';
+export type Platform = 'windows' | 'linux';
+export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
 export type FolderKind = 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos';
 export type Channel = 'latest' | 'nightly';
 export type Source = { kind: 'download'; channel: Channel } | { kind: 'file'; path: string };
@@ -22,17 +24,27 @@ export interface Prepared {
 	movingBox: number | null;
 }
 
+export interface WindowsFacts {
+	platform: 'windows';
+	windowsSize: number;
+	windowsUsed: number;
+	espSize: number;
+	fastStartup: boolean;
+	universalClock: boolean;
+	bluetooth: number;
+}
+
+export interface LinuxFacts {
+	platform: 'linux';
+	system: string;
+	layout: Layout;
+}
+
 export interface Report {
-	facts: {
-		windowsSize: number;
-		windowsUsed: number;
-		espSize: number;
-		fastStartup: boolean;
-		universalClock: boolean;
-		bluetooth: number;
-	};
+	facts: WindowsFacts | LinuxFacts;
 	findings: Finding[];
 	live: number;
+	download: number;
 	smallestLuft: number;
 	mostLuft: number;
 	prepared: Prepared | null;
@@ -146,4 +158,5 @@ export const saveLogs = () => start<string | null>('meet_save_logs');
 export const showFile = (path: string) => start<null>('meet_show_file', path);
 export const belongings = () => start<Belongings>('meet_belongings');
 export const defaultSource = () => invoke<Source>('meet_source', {});
+export const platform = () => invoke<Platform>('meet_platform', {});
 export const onProgress = (callback: (progress: Progress) => void) => listen<Progress>('meet.progress', callback);

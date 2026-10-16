@@ -8,7 +8,7 @@ use windows::Win32::System::SystemInformation::{
 use wmi::WMIConnection;
 
 use super::{bluetooth, firmware, registry, settings, start_entries};
-use crate::check::facts::{Architecture, Device, Encryption, Facts};
+use crate::check::facts::{Architecture, Device, Encryption, Facts, Machine, Platform};
 use crate::helper::drive::bitlocker::BitLocker;
 use crate::helper::drive::state::Found;
 use crate::helper::drive::storage::{Layout, Storage};
@@ -66,7 +66,7 @@ fn vendor(device: Option<&str>) -> u16 {
         .unwrap_or(0)
 }
 
-fn graphics() -> Vec<Device> {
+pub fn graphics() -> Vec<Device> {
     let Some(wmi) = connect(r"ROOT\CIMV2") else {
         return Vec::new();
     };
@@ -113,12 +113,18 @@ pub fn gather(
     found: &Found,
 ) -> Facts {
     Facts {
-        architecture: architecture(),
-        firmware: firmware::firmware(),
-        secure_boot: firmware::secure_boot(),
-        opens_settings: firmware::opens_settings(),
-        maker: registry::string(BIOS, "SystemManufacturer"),
-        tpm: tpm(),
+        machine: Machine {
+            platform: Platform::Windows,
+            architecture: architecture(),
+            firmware: firmware::firmware(),
+            gpt: layout.gpt(),
+            secure_boot: firmware::secure_boot(),
+            opens_settings: firmware::opens_settings(),
+            maker: registry::string(BIOS, "SystemManufacturer"),
+            tpm: tpm(),
+            graphics: graphics(),
+            wifi: wifi(),
+        },
         encryption: BitLocker::open()
             .map_or(Encryption::Off, |bitlocker| bitlocker.of_drive(drive)),
         fast_startup: settings::fast_startup(),
@@ -128,9 +134,6 @@ pub fn gather(
             &storage.all_partitions().unwrap_or_default(),
             found.boot_entry,
         ),
-        gpt: layout.gpt(),
-        graphics: graphics(),
-        wifi: wifi(),
         esp_size: layout.esp_size(&found.made),
         windows_size: windows.partition.size,
         windows_used: windows.used,

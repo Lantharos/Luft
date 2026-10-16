@@ -19,7 +19,7 @@
 	let removing = $state(false);
 	let choices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true });
 	let prepared = $derived(session.prepared);
-	let facts = $derived(session.report?.facts);
+	let facts = $derived(session.windows);
 
 	let options = $derived(
 		[

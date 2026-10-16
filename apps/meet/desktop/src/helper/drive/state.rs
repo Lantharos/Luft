@@ -7,12 +7,13 @@ use luft_meet::{Handoff, Intent};
 use crate::protocol::WindowsChoices;
 
 use super::bitlocker::BitLocker;
-use super::durable;
 use super::record::{self, Made};
 use super::storage::{Layout, MSFT_Partition, Storage};
 use super::windows_drive;
+use crate::boot::entries;
 use crate::helper::live_system;
 use crate::helper::system::{firmware, settings, start_entries};
+use crate::live::durable;
 
 const LIVE_FOLDER: &str = "LiveOS";
 
@@ -67,7 +68,7 @@ pub fn find(layout: &Layout) -> Found {
         .and_then(|path| read_handoff(&path));
     let moving_box = handoff
         .as_ref()
-        .and_then(|handoff| handoff.moving_box.as_deref())
+        .and_then(Handoff::moving_box)
         .and_then(|guid| layout.by_guid(guid))
         .cloned();
     Found {
@@ -93,10 +94,13 @@ pub fn restart(intent: Intent, windows: WindowsChoices) -> Result<(), String> {
     if live_system::unfinished(&live) {
         return Err("Updating Luft didn't finish. Update it again first.".to_owned());
     }
+    let made = handoff
+        .made_partitions()
+        .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
     let start = firmware::partition_on_disk(
         layout.disk.Number,
         layout.disk.LogicalSectorSize as u64,
-        &handoff.start,
+        &made.start,
     )?;
     let bitlocker = BitLocker::open()?;
     for path in found.made.iter().filter_map(MSFT_Partition::volume_path) {
@@ -107,6 +111,6 @@ pub fn restart(intent: Intent, windows: WindowsChoices) -> Result<(), String> {
     handoff.intent = intent;
     write_handoff(&live, &handoff)?;
     settings::apply(windows)?;
-    firmware::boot_next(handoff.boot_entry)?;
+    entries::boot_next(&firmware::Nvram, handoff.boot_entry)?;
     firmware::restart()
 }

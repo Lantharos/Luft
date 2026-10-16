@@ -109,12 +109,19 @@ def wait_for_agent(vm: Path, timeout: float):
     raise SystemExit("The guest agent didn't answer")
 
 
-def run(vm: Path, command: str, timeout: float) -> int:
-    started = agent(vm).call("guest-exec", {
+def shell(vm: Path, command: str) -> dict:
+    guest = vm / "guest"
+    if guest.exists() and guest.read_text().strip() == "linux":
+        return {"path": "/bin/sh", "arg": ["-c", command], "capture-output": True}
+    return {
         "path": "powershell.exe",
         "arg": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command],
         "capture-output": True,
-    })
+    }
+
+
+def run(vm: Path, command: str, timeout: float) -> int:
+    started = agent(vm).call("guest-exec", shell(vm, command))
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         time.sleep(0.5)
@@ -152,7 +159,7 @@ def pull(vm: Path, source: str, destination: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Look at and use a Windows VM started by apps/meet/vm/run.sh")
+    parser = argparse.ArgumentParser(description="Look at and use a VM started by apps/meet/vm/run.sh or vm/linux/run.sh")
     parser.add_argument("name", help="the VM, such as base or bitlocker")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("screenshot").add_argument("path")
@@ -161,8 +168,8 @@ def main():
     pointer = commands.add_parser("click")
     pointer.add_argument("x", type=int)
     pointer.add_argument("y", type=int)
-    commands.add_parser("wait", help="wait until Windows' guest agent answers").add_argument("--timeout", type=float, default=600)
-    shell = commands.add_parser("run", help="run a PowerShell command as SYSTEM and print its output")
+    commands.add_parser("wait", help="wait until the guest agent answers").add_argument("--timeout", type=float, default=600)
+    shell = commands.add_parser("run", help="run a command as SYSTEM or root (PowerShell or sh) and print its output")
     shell.add_argument("line")
     shell.add_argument("--timeout", type=float, default=600)
     for name in ("push", "pull"):

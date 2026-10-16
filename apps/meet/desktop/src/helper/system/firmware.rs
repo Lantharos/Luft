@@ -13,6 +13,7 @@ use windows::Win32::System::WindowsProgramming::{
 use windows::core::HSTRING;
 
 use super::privilege::enable;
+use crate::boot::entries::Variables;
 use crate::boot::gpt;
 use crate::boot::load_option::{self, GLOBAL_VARIABLES, Partition};
 use crate::check::facts::Firmware;
@@ -121,46 +122,18 @@ pub fn partition_on_disk(disk: u32, sector: u64, guid: &str) -> Result<Partition
         .ok_or_else(|| "Luft's start partition isn't in the partition table".to_owned())
 }
 
-pub fn entry(number: u16) -> Result<Option<Vec<u8>>, String> {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
-    read(&load_option::variable(number))
-}
+pub struct Nvram;
 
-pub fn order() -> Result<Vec<u8>, String> {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
-    Ok(read("BootOrder")?.unwrap_or_default())
-}
-
-pub fn listed() -> Result<Vec<(u16, Vec<u8>)>, String> {
-    let mut found = Vec::new();
-    for number in load_option::numbers(&order()?) {
-        if let Some(option) = entry(number)? {
-            found.push((number, option));
-        }
+impl Variables for Nvram {
+    fn read(&self, name: &str) -> Result<Option<Vec<u8>>, String> {
+        enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
+        read(name)
     }
-    Ok(found)
-}
 
-pub fn free_number() -> Result<u16, String> {
-    for number in 0..=u16::MAX {
-        if entry(number)?.is_none() {
-            return Ok(number);
-        }
+    fn write(&self, name: &str, data: &[u8]) -> Result<(), String> {
+        enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
+        write(name, data)
     }
-    Err("The firmware has no room for another start entry".to_owned())
-}
-
-pub fn set_order(order: &[u8]) -> Result<(), String> {
-    write("BootOrder", order)
-}
-
-pub fn set_entry(number: u16, option: &[u8]) -> Result<(), String> {
-    write(&load_option::variable(number), option)
-}
-
-pub fn boot_next(number: u16) -> Result<(), String> {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
-    write("BootNext", &number.to_le_bytes())
 }
 
 pub fn restart() -> Result<(), String> {

@@ -152,10 +152,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     let parts = partition::apply(&job.plan)?;
     let skipped: Vec<&str> = job.meet.iter().flat_map(Handoff::partitions).collect();
     let mounted = Mounted::assemble(job.target, &job.plan.device, &parts, &skipped)?;
-    let moving_box = job
-        .meet
-        .as_ref()
-        .and_then(|handoff| handoff.moving_box.as_deref());
+    let moving_box = job.meet.as_ref().and_then(Handoff::moving_box);
     let copied = if moving_box.is_some() {
         COPIED_BEFORE_UNPACKING
     } else {

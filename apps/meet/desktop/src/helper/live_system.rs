@@ -3,8 +3,11 @@ use std::io;
 use std::path::Path;
 
 use super::Context;
-use super::drive::durable;
-use crate::live::download::{Hashing, format_checksum, parse_checksum};
+use super::system::facts;
+pub use crate::live::build::unfinished;
+use crate::live::build::{self, Listing};
+use crate::live::download::{Hashing, format_checksum};
+use crate::live::durable;
 use crate::live::files::{self, BUILD_RECORD, Place, UPDATING, Volumes};
 use crate::live::iso::{self, Entry};
 use crate::live::source::Source;
@@ -12,13 +15,16 @@ use crate::plan::layout::Role;
 use crate::plan::sizes;
 use crate::protocol::Stage;
 
-pub fn listing(source: &Source) -> Result<Vec<Entry>, String> {
-    let opened = source.open().map_err(|error| error.to_string())?;
-    let entries = iso::list(opened.reader).map_err(|error| error.to_string())?;
-    if let Some(missing) = files::missing(&entries) {
-        return Err(format!("The downloaded Luft is missing {missing}"));
-    }
-    Ok(entries)
+fn variant() -> crate::live::variant::Variant {
+    crate::live::variant::Variant::for_graphics(&facts::graphics())
+}
+
+pub fn listing(source: &Source) -> Result<Listing, String> {
+    build::listing(source, variant())
+}
+
+pub fn outdated(live: &Path, source: &Source) -> bool {
+    build::outdated(live, source, variant())
 }
 
 pub fn partitions(entries: &[Entry]) -> [(Role, u64); 2] {
@@ -41,15 +47,16 @@ pub fn write(
     live: &Path,
     live_guid: &str,
 ) -> Result<(), String> {
+    let variant = variant();
     let expected = source
-        .checksum()
+        .checksum(variant)
         .map_err(|error| format!("Luft's checksum couldn't be read: {error}"))?;
-    let opened = source.open().map_err(|error| error.to_string())?;
+    let opened = source.open(variant).map_err(|error| error.to_string())?;
     let total = opened.total;
     let mut hashing = Hashing::new(opened.reader, |read| {
         context.progress(Stage::Downloading, read, total)
     });
-    let mut volumes = Volumes::new(start.to_owned(), live.to_owned());
+    let mut volumes = Volumes::new(files::split(start.to_owned(), live.to_owned()));
     iso::extract(&mut hashing, &mut volumes)
         .map_err(|error: io::Error| format!("Luft couldn't be downloaded: {error}"))?;
     volumes.finish().map_err(|error| error.to_string())?;
@@ -77,21 +84,4 @@ pub fn rewrite(
     files::clear(start, live).map_err(|error| error.to_string())?;
     write(context, source, start, live, live_guid)?;
     fs::remove_file(unfinished).map_err(|error| error.to_string())
-}
-
-pub fn unfinished(live: &Path) -> bool {
-    live.join(UPDATING).exists()
-}
-
-pub fn outdated(live: &Path, source: &Source) -> bool {
-    if unfinished(live) {
-        return true;
-    }
-    let Ok(newest) = source.checksum() else {
-        return false;
-    };
-    let copied = fs::read_to_string(live.join(BUILD_RECORD))
-        .ok()
-        .and_then(|text| parse_checksum(&text));
-    newest.is_none() || copied != newest
 }

@@ -1,5 +1,5 @@
 import * as meet from '#lib/api/meet.js';
-import type { Action, Channel, Intent, Packing, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
+import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
 export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed';
 export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders';
@@ -26,6 +26,7 @@ export interface Note {
 }
 
 class MeetState {
+	platform = $state<Platform>('windows');
 	step = $state<Step>('hello');
 	direction = $state(1);
 	report = $state<Report | null>(null);
@@ -37,6 +38,8 @@ class MeetState {
 	failure = $state<Failure | null>(null);
 	note = $state<Note | null>(null);
 
+	windows = $derived(this.report?.facts.platform === 'windows' ? this.report.facts : null);
+	linux = $derived(this.report?.facts.platform === 'linux' ? this.report.facts : null);
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
 	nightly = $derived(this.source.kind === 'download' && this.source.channel === 'nightly');
 
@@ -74,8 +77,10 @@ class MeetState {
 		if (!report || inspection !== this.inspection) return null;
 		this.report = report;
 		this.prepared = report.prepared;
-		const suggested = Math.round((report.facts.windowsSize * SHARE) / GIB) * GIB;
-		this.luft = Math.min(report.mostLuft, Math.max(report.smallestLuft, suggested));
+		if (report.facts.platform === 'windows') {
+			const suggested = Math.round((report.facts.windowsSize * SHARE) / GIB) * GIB;
+			this.luft = Math.min(report.mostLuft, Math.max(report.smallestLuft, suggested));
+		}
 		return report;
 	}
 
@@ -137,7 +142,7 @@ class MeetState {
 		work: () => Promise<T>,
 		retry: () => unknown,
 		after: 'ready' | 'removed',
-		back: 'room' | 'ready' | 'box'
+		back: 'check' | 'room' | 'ready' | 'box'
 	) {
 		this.progress = { stage: first, done: 0, total: 0 };
 		this.go('working');
@@ -161,6 +166,18 @@ class MeetState {
 			() => this.makeRoom(),
 			'ready',
 			'room'
+		);
+		if (prepared) this.prepared = prepared;
+	}
+
+	async getReady() {
+		const prepared = await this.working(
+			'room',
+			'downloading',
+			() => meet.prepare(0, $state.snapshot(this.source)),
+			() => this.getReady(),
+			'ready',
+			'check'
 		);
 		if (prepared) this.prepared = prepared;
 	}
@@ -204,6 +221,7 @@ class MeetState {
 
 	listen() {
 		void meet.defaultSource().then((source) => (this.source = source));
+		void meet.platform().then((platform) => (this.platform = platform));
 		return meet.onProgress((progress) => (this.progress = progress));
 	}
 }

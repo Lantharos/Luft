@@ -6,6 +6,8 @@ use sha2::{Digest, Sha256};
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
+use super::variant::Variant;
+
 const DOWNLOADS: &str = "https://get.luft.lanth.me";
 const ATTEMPTS: u32 = 6;
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -19,13 +21,55 @@ pub enum Channel {
 }
 
 impl Channel {
-    pub fn iso(self) -> String {
-        let name = match self {
+    fn name(self) -> &'static str {
+        match self {
             Self::Latest => "latest",
             Self::Nightly => "nightly",
-        };
-        format!("{DOWNLOADS}/luft-{name}.iso")
+        }
     }
+
+    fn isos(self, downloads: &str, variant: Variant) -> [String; 2] {
+        let name = self.name();
+        [
+            format!("{downloads}/luft-{name}-{}.iso", variant.name()),
+            format!("{downloads}/luft-{name}.iso"),
+        ]
+    }
+}
+
+pub struct Located {
+    pub iso: String,
+    pub checksum: [u8; 32],
+}
+
+fn missing(error: &ureq::Error) -> bool {
+    matches!(error, ureq::Error::StatusCode(404))
+}
+
+fn locate_at(
+    agent: &Agent,
+    downloads: &str,
+    channel: Channel,
+    variant: Variant,
+) -> io::Result<Located> {
+    let [built_for_it, universal] = channel.isos(downloads, variant);
+    match checksum(agent, &built_for_it) {
+        Ok(checksum) => Ok(Located {
+            iso: built_for_it,
+            checksum,
+        }),
+        Err(Fetch::Missing) => checksum(agent, &universal)
+            .map(|checksum| Located {
+                iso: universal,
+                checksum,
+            })
+            .map_err(Fetch::into_io),
+        Err(other) => Err(other.into_io()),
+    }
+}
+
+pub fn locate(agent: &Agent, channel: Channel, variant: Variant) -> io::Result<Located> {
+    locate_at(agent, DOWNLOADS, channel, variant)
 }
 
 pub fn agent() -> Agent {
@@ -62,19 +106,40 @@ pub fn format_checksum(digest: &[u8; 32]) -> String {
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
-pub fn checksum(agent: &Agent, iso: &str) -> io::Result<[u8; 32]> {
+enum Fetch {
+    Missing,
+    Failed(io::Error),
+}
+
+impl Fetch {
+    fn into_io(self) -> io::Error {
+        match self {
+            Self::Missing => io::Error::new(io::ErrorKind::NotFound, "Luft isn't published there"),
+            Self::Failed(error) => error,
+        }
+    }
+}
+
+fn checksum(agent: &Agent, iso: &str) -> Result<[u8; 32], Fetch> {
+    let fetched = |error: ureq::Error| {
+        if missing(&error) {
+            Fetch::Missing
+        } else {
+            Fetch::Failed(failed(error))
+        }
+    };
     let text = agent
         .get(format!("{iso}.sha256"))
         .call()
-        .map_err(failed)?
+        .map_err(fetched)?
         .body_mut()
         .read_to_string()
-        .map_err(failed)?;
+        .map_err(fetched)?;
     parse_checksum(&text).ok_or_else(|| {
-        io::Error::new(
+        Fetch::Failed(io::Error::new(
             io::ErrorKind::InvalidData,
             "The checksum file isn't readable",
-        )
+        ))
     })
 }
 
@@ -176,7 +241,99 @@ impl<R: Read, F: FnMut(u64)> Read for Hashing<R, F> {
 
 #[cfg(test)]
 mod tests {
+    use std::io::{BufRead, BufReader, Write};
+    use std::net::TcpListener;
+
     use super::*;
+
+    fn published(names: &'static [(&'static str, &'static str)]) -> String {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = listener.local_addr().unwrap();
+        std::thread::spawn(move || {
+            for stream in listener.incoming().flatten() {
+                let mut reader = BufReader::new(&stream);
+                let mut request = String::new();
+                reader.read_line(&mut request).unwrap();
+                let path = request
+                    .split_whitespace()
+                    .nth(1)
+                    .unwrap_or_default()
+                    .to_owned();
+                while reader.read_line(&mut String::new()).unwrap_or(0) > 2 {}
+                let reply = match names.iter().find(|(name, _)| path == format!("/{name}")) {
+                    Some((_, body)) => format!(
+                        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                        body.len()
+                    ),
+                    None => {
+                        "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                            .to_owned()
+                    }
+                };
+                let _ = (&stream).write_all(reply.as_bytes());
+            }
+        });
+        format!("http://{address}")
+    }
+
+    fn plain_agent() -> Agent {
+        Agent::config_builder()
+            .http_status_as_error(true)
+            .build()
+            .into()
+    }
+
+    const STANDARD: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  luft-nightly-standard.iso\n";
+    const UNIVERSAL: &str =
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  luft-nightly.iso\n";
+
+    #[test]
+    fn the_image_built_for_the_pc_is_downloaded_when_it_is_published() {
+        let downloads = published(&[
+            ("luft-nightly-standard.iso.sha256", STANDARD),
+            ("luft-nightly.iso.sha256", UNIVERSAL),
+        ]);
+        let located = locate_at(
+            &plain_agent(),
+            &downloads,
+            Channel::Nightly,
+            Variant::Standard,
+        )
+        .unwrap();
+        assert_eq!(
+            located.iso,
+            format!("{downloads}/luft-nightly-standard.iso")
+        );
+        assert_eq!(located.checksum, [0xaa; 32]);
+    }
+
+    #[test]
+    fn the_universal_image_is_used_until_the_variant_is_published() {
+        let downloads = published(&[("luft-nightly.iso.sha256", UNIVERSAL)]);
+        let located = locate_at(
+            &plain_agent(),
+            &downloads,
+            Channel::Nightly,
+            Variant::Nvidia,
+        )
+        .unwrap();
+        assert_eq!(located.iso, format!("{downloads}/luft-nightly.iso"));
+        assert_eq!(located.checksum, [0xbb; 32]);
+    }
+
+    #[test]
+    fn nothing_published_is_an_error() {
+        let downloads = published(&[]);
+        assert!(
+            locate_at(
+                &plain_agent(),
+                &downloads,
+                Channel::Latest,
+                Variant::Standard
+            )
+            .is_err()
+        );
+    }
 
     #[test]
     fn the_checksum_file_names_the_digest_first() {

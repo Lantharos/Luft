@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use super::download::{self, Channel, Download};
+use super::variant::Variant;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(tag = "kind", rename_all = "camelCase")]
@@ -19,10 +20,12 @@ pub struct Opened {
 }
 
 impl Source {
-    pub fn open(&self) -> io::Result<Opened> {
+    pub fn open(&self, variant: Variant) -> io::Result<Opened> {
         match self {
             Self::Download { channel } => {
-                let stream = Download::open(&download::agent(), &channel.iso())?;
+                let agent = download::agent();
+                let located = download::locate(&agent, *channel, variant)?;
+                let stream = Download::open(&agent, &located.iso)?;
                 Ok(Opened {
                     total: stream.total,
                     reader: Box::new(stream),
@@ -38,11 +41,10 @@ impl Source {
         }
     }
 
-    pub fn checksum(&self) -> io::Result<Option<[u8; 32]>> {
+    pub fn checksum(&self, variant: Variant) -> io::Result<Option<[u8; 32]>> {
         match self {
-            Self::Download { channel } => {
-                download::checksum(&download::agent(), &channel.iso()).map(Some)
-            }
+            Self::Download { channel } => download::locate(&download::agent(), *channel, variant)
+                .map(|located| Some(located.checksum)),
             Self::File { path } => {
                 let mut sidecar = path.clone().into_os_string();
                 sidecar.push(".sha256");

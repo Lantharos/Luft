@@ -78,7 +78,7 @@ pub struct Summary {
 }
 
 pub fn summarize(handoff: &Handoff, scratch: &Path) -> Summary {
-    let manifest = handoff.moving_box.as_deref().and_then(|guid| {
+    let manifest = handoff.moving_box().and_then(|guid| {
         Opened::mount(guid, scratch)
             .and_then(|opened| opened.manifest())
             .inspect_err(|error| eprintln!("The moving box couldn't be read: {error:#}"))
@@ -86,7 +86,7 @@ pub fn summarize(handoff: &Handoff, scratch: &Path) -> Summary {
     });
     Summary {
         intent: handoff.intent,
-        room: handoff.room,
+        room: handoff.room(),
         hints: manifest
             .as_ref()
             .and_then(|manifest| manifest.regional.as_ref())

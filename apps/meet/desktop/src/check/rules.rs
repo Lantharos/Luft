@@ -1,97 +1,12 @@
-use serde::{Deserialize, Serialize};
-
-use super::facts::{Architecture, BROADCOM, Encryption, Facts, Firmware};
-use crate::plan::sizes::{GIB, smallest_luft};
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum Level {
-    Fine,
-    Note,
-    Blocks,
-}
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub enum Topic {
-    Processor,
-    Startup,
-    SecureBoot,
-    Tpm,
-    Encryption,
-    FastStartup,
-    Space,
-    Graphics,
-    Wifi,
-    StartEntries,
-    Download,
-}
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub enum Action {
-    FirmwareSettings,
-    Tidy,
-    ChooseIso,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct Finding {
-    pub topic: Topic,
-    pub level: Level,
-    pub title: String,
-    pub detail: String,
-    pub action: Option<Action>,
-}
-
-fn finding(topic: Topic, level: Level, title: &str, detail: &str) -> Finding {
-    Finding {
-        topic,
-        level,
-        title: title.to_owned(),
-        detail: detail.to_owned(),
-        action: None,
-    }
-}
-
-impl Finding {
-    fn with(self, action: Action) -> Self {
-        Self {
-            action: Some(action),
-            ..self
-        }
-    }
-}
-
-fn gib(bytes: u64) -> u64 {
-    bytes.div_ceil(GIB)
-}
-
-fn processor(facts: &Facts) -> Finding {
-    match facts.architecture {
-        Architecture::X64 => finding(
-            Topic::Processor,
-            Level::Fine,
-            "64-bit Intel or AMD processor",
-            "Luft runs on it.",
-        ),
-        Architecture::Arm64 => finding(
-            Topic::Processor,
-            Level::Blocks,
-            "Arm processor",
-            "Luft only runs on Intel and AMD processors for now.",
-        ),
-        Architecture::Other => finding(
-            Topic::Processor,
-            Level::Blocks,
-            "32-bit Windows",
-            "Luft needs a 64-bit Intel or AMD processor and 64-bit Windows.",
-        ),
-    }
-}
+use super::common::{
+    Action, Finding, LIVE_ESTIMATE, Level, Topic, download, finding, gib, graphics, processor,
+    secure_boot, tpm, wifi,
+};
+use super::facts::{Encryption, Facts, Firmware};
+use crate::plan::sizes::smallest_luft;
 
 fn startup(facts: &Facts) -> Finding {
-    match (facts.firmware, facts.gpt) {
+    match (facts.machine.firmware, facts.machine.gpt) {
         (Firmware::Uefi, true) => finding(
             Topic::Startup,
             Level::Fine,
@@ -109,129 +24,6 @@ fn startup(facts: &Facts) -> Finding {
             Level::Blocks,
             "The drive uses an old partition table",
             "Luft needs a GPT drive. Windows can convert it with MBR2GPT without losing files.",
-        ),
-    }
-}
-
-struct Maker {
-    names: &'static [&'static str],
-    shown: &'static str,
-    key: &'static str,
-    place: &'static str,
-}
-
-const MAKERS: [Maker; 8] = [
-    Maker {
-        names: &["lenovo"],
-        shown: "Lenovo",
-        key: "F2 (F1 on a ThinkPad)",
-        place: "Security, then Secure Boot",
-    },
-    Maker {
-        names: &["dell"],
-        shown: "Dell",
-        key: "F2",
-        place: "Boot Configuration, then Secure Boot",
-    },
-    Maker {
-        names: &["hp", "hewlett"],
-        shown: "HP",
-        key: "F10",
-        place: "Security or Advanced, then Secure Boot Configuration",
-    },
-    Maker {
-        names: &["asus"],
-        shown: "ASUS",
-        key: "F2 or Delete",
-        place: "Security or Boot, then Secure Boot",
-    },
-    Maker {
-        names: &["acer"],
-        shown: "Acer",
-        key: "F2",
-        place: "Boot, then Secure Boot",
-    },
-    Maker {
-        names: &["micro-star", "msi"],
-        shown: "MSI",
-        key: "Delete",
-        place: "Settings, then Security, then Secure Boot",
-    },
-    Maker {
-        names: &["gigabyte"],
-        shown: "Gigabyte",
-        key: "Delete",
-        place: "Boot, then Secure Boot",
-    },
-    Maker {
-        names: &["microsoft"],
-        shown: "Surface",
-        key: "volume up",
-        place: "Security, then Secure Boot",
-    },
-];
-
-fn maker(name: Option<&str>) -> Option<&'static Maker> {
-    let name = name?.to_ascii_lowercase();
-    MAKERS
-        .iter()
-        .find(|maker| maker.names.iter().any(|known| name.starts_with(known)))
-}
-
-fn turning_on_secure_boot(facts: &Facts) -> String {
-    let maker = maker(facts.maker.as_deref());
-    match (facts.opens_settings, maker) {
-        (true, Some(maker)) => format!("Meet Luft can restart into the firmware settings, where it's under {}.", maker.place),
-        (true, None) => "Meet Luft can restart into the firmware settings, where it's usually under Security or Boot.".to_owned(),
-        (false, Some(maker)) => format!(
-            "To turn it on, restart and press {} as the {} logo appears, then go to {}.",
-            maker.key, maker.shown, maker.place
-        ),
-        (false, None) => "To turn it on, open the firmware settings while the computer starts and look under Security or Boot.".to_owned(),
-    }
-}
-
-fn secure_boot(facts: &Facts) -> Finding {
-    match facts.secure_boot {
-        Some(true) => finding(
-            Topic::SecureBoot,
-            Level::Fine,
-            "Secure Boot is on",
-            "It can stay on. Luft asks once, on a blue screen, to add its key.",
-        ),
-        _ => {
-            let detail = format!(
-                "Luft works without it, though games with anti-cheat need it. {}",
-                turning_on_secure_boot(facts)
-            );
-            let found = finding(
-                Topic::SecureBoot,
-                Level::Note,
-                "Secure Boot is off",
-                &detail,
-            );
-            if facts.opens_settings {
-                found.with(Action::FirmwareSettings)
-            } else {
-                found
-            }
-        }
-    }
-}
-
-fn tpm(facts: &Facts) -> Finding {
-    match facts.tpm.as_deref() {
-        Some(version) if version.starts_with('2') => finding(
-            Topic::Tpm,
-            Level::Fine,
-            "TPM 2.0",
-            "An encrypted Luft can unlock by itself when the computer starts.",
-        ),
-        _ => finding(
-            Topic::Tpm,
-            Level::Note,
-            "No TPM 2.0",
-            "If you encrypt Luft, it asks for a passphrase each time it starts.",
         ),
     }
 }
@@ -300,48 +92,6 @@ fn space(facts: &Facts, live: u64) -> Finding {
     }
 }
 
-fn graphics(facts: &Facts) -> Finding {
-    let names = facts
-        .graphics
-        .iter()
-        .map(|device| device.name.as_str())
-        .collect::<Vec<_>>()
-        .join(", ");
-    if facts.nvidia() {
-        finding(
-            Topic::Graphics,
-            Level::Fine,
-            &names,
-            "Luft installs with NVIDIA's own driver.",
-        )
-    } else {
-        finding(
-            Topic::Graphics,
-            Level::Fine,
-            if names.is_empty() { "Graphics" } else { &names },
-            "Works out of the box.",
-        )
-    }
-}
-
-fn wifi(facts: &Facts) -> Finding {
-    match facts.wifi.first() {
-        None => finding(
-            Topic::Wifi,
-            Level::Fine,
-            "No Wi-Fi",
-            "Use a network cable in Luft, or nothing at all.",
-        ),
-        Some(device) if device.vendor == BROADCOM => finding(
-            Topic::Wifi,
-            Level::Note,
-            &device.name,
-            "Some Broadcom Wi-Fi chips need a driver Luft doesn't include. Keep a network cable or a phone for USB tethering nearby.",
-        ),
-        Some(device) => finding(Topic::Wifi, Level::Fine, &device.name, "Works in Luft."),
-    }
-}
-
 fn start_entries(facts: &Facts) -> Option<Finding> {
     let names: Vec<&str> = facts
         .start_entries
@@ -360,31 +110,17 @@ fn start_entries(facts: &Facts) -> Option<Finding> {
     Some(finding(Topic::StartEntries, Level::Note, &title, &detail).with(Action::Tidy))
 }
 
-const LIVE_ESTIMATE: u64 = 4 * GIB;
-
-fn download(live: Option<u64>) -> Option<Finding> {
-    live.is_none().then(|| {
-        finding(
-            Topic::Download,
-            Level::Blocks,
-            "Luft can't be downloaded right now",
-            "Meet Luft downloads about 3 GB. Check that this PC is online and check again, or use a Luft ISO you already have.",
-        )
-        .with(Action::ChooseIso)
-    })
-}
-
 pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {
     let mut findings = vec![
-        processor(facts),
+        processor(&facts.machine),
         startup(facts),
         space(facts, live.unwrap_or(LIVE_ESTIMATE)),
         encryption(facts),
-        secure_boot(facts),
-        tpm(facts),
+        secure_boot(&facts.machine),
+        tpm(&facts.machine),
         fast_startup(facts),
-        graphics(facts),
-        wifi(facts),
+        graphics(&facts.machine),
+        wifi(&facts.machine),
     ];
     findings.extend(start_entries(facts));
     findings.extend(download(live));
@@ -393,31 +129,35 @@ pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::facts::Device;
+    use super::super::facts::{Architecture, Device, Machine, Platform};
     use super::*;
+    use crate::plan::sizes::GIB;
 
     fn laptop() -> Facts {
         Facts {
-            architecture: Architecture::X64,
-            firmware: Firmware::Uefi,
-            secure_boot: Some(true),
-            opens_settings: true,
-            maker: Some("LENOVO".into()),
-            tpm: Some("2.0, 0, 1.38".into()),
+            machine: Machine {
+                platform: Platform::Windows,
+                architecture: Architecture::X64,
+                firmware: Firmware::Uefi,
+                gpt: true,
+                secure_boot: Some(true),
+                opens_settings: true,
+                maker: Some("LENOVO".into()),
+                tpm: Some("2.0, 0, 1.38".into()),
+                graphics: vec![Device {
+                    name: "Intel Arc".into(),
+                    vendor: 0x8086,
+                }],
+                wifi: vec![Device {
+                    name: "Intel Wi-Fi 7 BE200".into(),
+                    vendor: 0x8086,
+                }],
+            },
             encryption: Encryption::Off,
             fast_startup: false,
             universal_clock: false,
             bluetooth: 0,
             start_entries: Vec::new(),
-            gpt: true,
-            graphics: vec![Device {
-                name: "Intel Arc".into(),
-                vendor: 0x8086,
-            }],
-            wifi: vec![Device {
-                name: "Intel Wi-Fi 7 BE200".into(),
-                vendor: 0x8086,
-            }],
             esp_size: 100 << 20,
             windows_size: 475 * GIB,
             windows_used: 120 * GIB,
@@ -472,8 +212,8 @@ mod tests {
     #[test]
     fn secure_boot_off_says_where_to_turn_it_on() {
         let mut facts = laptop();
-        facts.secure_boot = Some(false);
-        facts.opens_settings = false;
+        facts.machine.secure_boot = Some(false);
+        facts.machine.opens_settings = false;
         let findings = evaluate(&facts, Some(4 * GIB));
         let secure_boot = findings
             .iter()
@@ -489,9 +229,9 @@ mod tests {
     #[test]
     fn only_64_bit_uefi_pcs_with_gpt_can_start_luft() {
         for change in [
-            |facts: &mut Facts| facts.architecture = Architecture::Arm64,
-            |facts: &mut Facts| facts.firmware = Firmware::Bios,
-            |facts: &mut Facts| facts.gpt = false,
+            |facts: &mut Facts| facts.machine.architecture = Architecture::Arm64,
+            |facts: &mut Facts| facts.machine.firmware = Firmware::Bios,
+            |facts: &mut Facts| facts.machine.gpt = false,
         ] {
             let mut facts = laptop();
             change(&mut facts);

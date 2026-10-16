@@ -16,7 +16,7 @@ enum Failure {
     Stopped,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Failed {
     failure: Failure,
     detail: String,

@@ -2,51 +2,26 @@ use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-use super::firmware;
+use super::firmware::Nvram;
+use crate::boot::entries;
 use crate::boot::load_option::{self, Decoded, Partition};
 use crate::check::facts::StartEntry;
 use crate::helper::drive::storage::MSFT_Partition;
 
 const NO_WINDOW: u32 = 0x0800_0000;
 const WINDOWS_LOADER: &str = r"\EFI\Microsoft\Boot\bootmgfw.efi";
+const LOADER: &str = r"\EFI\BOOT\BOOTX64.EFI";
 
 pub fn add(partition: &Partition) -> Result<u16, String> {
-    let listed = firmware::listed()?;
-    let number = match listed
-        .iter()
-        .find(|(_, option)| load_option::points_at(option, &partition.guid))
-    {
-        Some((number, _)) => *number,
-        None => firmware::free_number()?,
-    };
-    firmware::set_entry(number, &load_option::encode(partition))?;
-    firmware::set_order(&load_option::appended(&firmware::order()?, number))?;
-    Ok(number)
+    entries::add(&Nvram, partition, LOADER)
 }
 
 pub fn ensure(partition: &Partition, number: u16) -> Result<u16, String> {
-    let wanted = load_option::encode(partition);
-    match firmware::entry(number)? {
-        Some(option) if option == wanted => {}
-        Some(option) if load_option::points_at(&option, &partition.guid) => {
-            firmware::set_entry(number, &wanted)?
-        }
-        _ => return add(partition),
-    }
-    let order = firmware::order()?;
-    if !load_option::numbers(&order).any(|listed| listed == number) {
-        firmware::set_order(&load_option::appended(&order, number))?;
-    }
-    Ok(number)
+    entries::ensure(&Nvram, partition, LOADER, number)
 }
 
 pub fn remove(numbers: &[u16]) -> Result<(), String> {
-    for number in numbers {
-        if firmware::entry(*number)?.is_some() {
-            firmware::set_entry(*number, &[])?;
-        }
-    }
-    firmware::set_order(&load_option::without(&firmware::order()?, numbers))
+    entries::remove(&Nvram, numbers)
 }
 
 fn partition_of<'a>(
@@ -104,10 +79,10 @@ pub fn tidy(entries: &[StartEntry]) -> Result<(), String> {
 }
 
 pub fn stale(partitions: &[MSFT_Partition], kept: Option<u16>) -> Vec<StartEntry> {
-    let Ok(entries) = firmware::listed() else {
+    let Ok(listed) = entries::listed(&Nvram) else {
         return Vec::new();
     };
-    entries
+    listed
         .into_iter()
         .filter(|(number, _)| Some(*number) != kept)
         .filter_map(|(number, option)| Some((number, load_option::decode(&option)?)))

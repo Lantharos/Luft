@@ -152,7 +152,9 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
         if let Some(guid) = old.guid() {
             record::removed_partition(&guid)?;
         }
-        handoff.moving_box = None;
+        if let Some(made) = handoff.partitions_mut() {
+            made.moving_box = None;
+        }
         state::write_handoff(&live, &handoff)?;
     }
 
@@ -226,7 +228,7 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     let layout = storage.layout(&drive.volume)?;
     let windows = storage.windows_plan(&layout, &drive.volume)?;
     let windows_before = layout.windows.Size;
-    let room = handoff.room.map_or(0, |room| room.size);
+    let room = handoff.room().map_or(0, |room| room.size);
     let size = sizes::moving_box(items.len() as u64, total);
     let plan = layout::plan(
         &layout.plan_disk(),
@@ -256,11 +258,13 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
         return Err(error);
     }
     drop(staging);
-    handoff.moving_box = partition.guid();
-    handoff.room = Some(luft_meet::Room {
-        offset: plan.room.offset,
-        size: plan.room.size,
-    });
+    if let Some(made) = handoff.partitions_mut() {
+        made.moving_box = partition.guid();
+        made.room = Some(luft_meet::Room {
+            offset: plan.room.offset,
+            size: plan.room.size,
+        });
+    }
     state::write_handoff(&live, &handoff)?;
     let layout = storage.layout(&drive.volume)?;
     prepare::prepared(&state::find(&layout))

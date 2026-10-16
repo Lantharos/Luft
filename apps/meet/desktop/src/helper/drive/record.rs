@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use super::durable;
+use crate::live::durable;
 
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase", default)]

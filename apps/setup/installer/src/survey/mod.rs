@@ -34,7 +34,7 @@ pub struct Survey {
 
 fn meet_survey(drives: &[Drive], handoff: &Handoff, scratch: &Path) -> Option<MeetSurvey> {
     let drive = drives.iter().find(|drive| drive.meet)?;
-    let space = handoff.room.and_then(|room| {
+    let space = handoff.room().and_then(|room| {
         drive
             .free
             .iter()

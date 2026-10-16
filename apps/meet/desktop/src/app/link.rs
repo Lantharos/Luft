@@ -1,10 +1,5 @@
-use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
 use std::os::windows::io::FromRawHandle;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::mpsc::{Sender, channel};
-use std::sync::{Arc, Mutex};
 
 use serde_json::Value;
 use windows::Win32::Foundation::{CloseHandle, ERROR_CANCELLED, ERROR_PIPE_CONNECTED, HANDLE};
@@ -24,21 +19,12 @@ use windows::Win32::UI::Shell::{
 use windows::Win32::UI::WindowsAndMessaging::SW_HIDE;
 use windows::core::{HSTRING, PCWSTR, w};
 
+use super::Events;
+use super::calls::{self, Helper};
 use super::job::Failed;
-use super::{Events, PROGRESS};
-use crate::protocol::{Call, Reply, Request};
+use crate::protocol::Call;
 
 const BUFFER: u32 = 1 << 16;
-
-type Waiting = Arc<Mutex<HashMap<u64, Sender<Result<Value, String>>>>>;
-
-struct Helper {
-    calls: File,
-    waiting: Waiting,
-}
-
-static HELPER: Mutex<Option<Helper>> = Mutex::new(None);
-static NEXT: AtomicU64 = AtomicU64::new(1);
 
 struct OwnedHandle(HANDLE);
 
@@ -131,35 +117,11 @@ fn unblock_when_gone(process: OwnedHandle, names: [String; 2]) {
     });
 }
 
-fn read_replies(replies: File, waiting: Waiting, events: Events) {
-    std::thread::spawn(move || {
-        for line in BufReader::new(replies).lines() {
-            let Ok(line) = line else { break };
-            match serde_json::from_str::<Reply>(&line) {
-                Ok(Reply::Progress(progress)) => events.emit(PROGRESS, progress),
-                Ok(Reply::Done { id, value }) => answer(&waiting, id, Ok(value)),
-                Ok(Reply::Failed { id, error }) => answer(&waiting, id, Err(error)),
-                Err(_) => {}
-            }
-        }
-        *HELPER.lock().expect("helper lock") = None;
-        for (_, waiter) in waiting.lock().expect("waiting lock").drain() {
-            let _ = waiter.send(Err("Meet Luft's helper stopped".to_owned()));
-        }
-    });
-}
-
-fn answer(waiting: &Waiting, id: u64, result: Result<Value, String>) {
-    if let Some(waiter) = waiting.lock().expect("waiting lock").remove(&id) {
-        let _ = waiter.send(result);
-    }
-}
-
 fn start(events: &Events) -> Result<Helper, Failed> {
     let name = format!(
         r"\\.\pipe\com.lantharos.meet-{}-{}",
         unsafe { GetCurrentProcessId() },
-        NEXT.fetch_add(1, Ordering::Relaxed)
+        calls::next_number()
     );
     let calls_name = format!("{name}-calls");
     let replies_name = format!("{name}-replies");
@@ -179,35 +141,11 @@ fn start(events: &Events) -> Result<Helper, Failed> {
     unblock_when_gone(process, [calls_name.clone(), replies_name.clone()]);
     let calls = accept(calls, helper_id, &calls_name)?;
     let replies = accept(replies, helper_id, &replies_name)?;
-    let waiting = Waiting::default();
-    read_replies(replies, waiting.clone(), events.clone());
-    Ok(Helper { calls, waiting })
+    Ok(Helper::new(calls, replies, events, || {
+        Failed::from("Meet Luft's helper stopped".to_owned())
+    }))
 }
 
 pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
-    let id = NEXT.fetch_add(1, Ordering::Relaxed);
-    let (sender, receiver) = channel();
-    {
-        let mut helper = HELPER.lock().expect("helper lock");
-        if helper.is_none() {
-            *helper = Some(start(events)?);
-        }
-        let helper = helper.as_mut().expect("helper just started");
-        helper
-            .waiting
-            .lock()
-            .expect("waiting lock")
-            .insert(id, sender);
-        let mut line =
-            serde_json::to_vec(&Request { id, call }).map_err(|error| error.to_string())?;
-        line.push(b'\n');
-        helper
-            .calls
-            .write_all(&line)
-            .map_err(|error| format!("Meet Luft's helper stopped: {error}"))?;
-    }
-    receiver
-        .recv()
-        .map_err(|_| "Meet Luft's helper stopped".to_owned())?
-        .map_err(Failed::from)
+    calls::call(events, call, start)
 }

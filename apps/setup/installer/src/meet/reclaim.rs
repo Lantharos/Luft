@@ -4,16 +4,18 @@ use anyhow::{Context, Result};
 use luft_disks::udisks::snapshot;
 use luft_disks::udisks::volumes::Segment;
 use luft_disks::udisks::{self, PARTITION, no_options};
-use luft_meet::Handoff;
+use luft_meet::{Folder, Handoff};
 
 use crate::system::command::Tool;
 use crate::system::files::write;
+use crate::system::mount::{self, Mounted};
 
 const RECORD: &str = "meet.json";
 const PHYSICAL_ROOT: &str = "/sysroot";
 const WRITABLE_ROOT: &str = "/var";
 const BOOT_VARIABLES: &str = "/sys/firmware/efi/efivars";
 const GLOBAL_VARIABLES: &str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
+const SCRATCH: &str = "/run/luft-installer/reclaim";
 
 pub fn record(state_dir: &Path) -> PathBuf {
     state_dir.join(RECORD)
@@ -121,6 +123,33 @@ fn remove_start_entry(number: u16) -> Result<()> {
         .run()
 }
 
+fn remove_folder(folder: &Folder) -> Result<()> {
+    let scratch = Path::new(SCRATCH);
+    let esp = Mounted::new(
+        &format!("/dev/disk/by-partuuid/{}", folder.esp),
+        "",
+        &scratch.join("esp"),
+    )?;
+    remove_all(&esp.path().join(&folder.loader))?;
+    drop(esp);
+    let device = format!("/dev/disk/by-uuid/{}", folder.filesystem);
+    let kind = Tool::new("blkid")
+        .args(["--output", "value", "--match-tag", "TYPE"])
+        .arg(&device)
+        .output()?;
+    let top = Mounted::new(&device, mount::top_level(kind.trim()), &scratch.join("top"))?;
+    remove_all(&top.path().join(folder.folder.trim_start_matches('/')))
+}
+
+fn remove_all(path: &Path) -> Result<()> {
+    match std::fs::remove_dir_all(path) {
+        Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
+            Err(error).with_context(|| format!("{} couldn't be removed", path.display()))
+        }
+        _ => Ok(()),
+    }
+}
+
 pub fn reclaim(state_dir: &Path) -> Result<()> {
     let Ok(text) = std::fs::read_to_string(record(state_dir)) else {
         return Ok(());
@@ -129,8 +158,12 @@ pub fn reclaim(state_dir: &Path) -> Result<()> {
     if let Err(error) = remove_start_entry(handoff.boot_entry) {
         eprintln!("Meet Luft's start entry wasn't removed: {error:#}");
     }
-    remove_partitions(&handoff)?;
-    grow_root().context("Luft couldn't grow into the space Meet Luft used")?;
+    if let Some(folder) = handoff.folder() {
+        remove_folder(folder).context("Meet Luft's copy of Luft couldn't be removed")?;
+    } else {
+        remove_partitions(&handoff)?;
+        grow_root().context("Luft couldn't grow into the space Meet Luft used")?;
+    }
     std::fs::remove_file(record(state_dir))?;
     Ok(())
 }

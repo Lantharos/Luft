@@ -79,7 +79,7 @@ fn rebuild(
 ) -> Result<(), String> {
     let layout = &storage.layout(&drive.volume)?;
     let windows = storage.windows_plan(layout, &drive.volume)?;
-    let room = handoff.room.map_or(0, |room| room.size);
+    let room = handoff.room().map_or(0, |room| room.size);
     let plan = layout::plan(
         &without(layout, &old),
         &windows,
@@ -107,7 +107,7 @@ fn rebuild(
     }
     let layout = storage.layout(&drive.volume)?;
     let mut created = Vec::new();
-    let moving_box = handoff.moving_box.clone();
+    let moving_box = handoff.moving_box().map(str::to_owned);
     prepare::build(
         context,
         storage,
@@ -140,18 +140,21 @@ pub fn refresh(context: &Context, source: &Source) -> Result<Prepared, String> {
     let (Some(handoff), Some(live)) = (found.handoff.clone(), found.live.clone()) else {
         return Err("Make room for Luft first.".to_owned());
     };
+    let made = handoff
+        .made_partitions()
+        .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
     let start = layout
-        .by_guid(&handoff.start)
+        .by_guid(&made.start)
         .cloned()
         .ok_or("Luft's start partition is gone")?;
-    let entries = live_system::listing(source)?;
+    let entries = live_system::listing(source)?.entries;
     let [(_, start_needed), (_, live_needed)] = live_system::partitions(&entries);
     if fits(&start, start_needed) && fits(&live, live_needed) {
         let start_path = start
             .volume_path()
             .ok_or("The start partition has no volume")?;
         let live_path = live.volume_path().ok_or("Luft's partition has no volume")?;
-        live_system::rewrite(context, source, &start_path, &live_path, &handoff.live)?;
+        live_system::rewrite(context, source, &start_path, &live_path, &made.live)?;
     } else {
         rebuild(
             context,

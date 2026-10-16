@@ -2,7 +2,7 @@
 
 ![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
 
-A Windows app that gets a PC ready for Luft without a USB stick. It checks the computer, makes room next to Windows with Windows' own tools, puts the live Luft system in that room and restarts into it once, to try Luft or install it. It can pack files and settings into a moving box that Install Luft unpacks, and it can take everything back out again. How it fits together is in [docs/meet.md](../../docs/meet.md).
+An app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, puts the live Luft system next to the one already there and restarts into it once, to try Luft, install it or, on Linux, replace the old system and keep your files. On Windows it makes room with Windows' own tools and can pack files and settings into a moving box; on Linux it keeps Luft in a folder and repartitions nothing. It can take everything back out again. How it fits together is in [docs/meet.md](../../docs/meet.md).
 
 Builds aren't code-signed yet, so Windows SmartScreen asks before the first start ("More info", then "Run anyway").
 
@@ -11,8 +11,8 @@ Builds aren't code-signed yet, so Windows SmartScreen asks before the first star
 | Folder | What it is |
 | --- | --- |
 | `src` | The window: check, room, moving box, ready |
-| `desktop` | Its native side. It runs as you, and starts itself a second time with administrator rights, after Windows asks, for the disk and firmware work |
-| `vm` | A Windows 11 VM with Secure Boot and a TPM to try it in |
+| `desktop` | Its native side. It runs as you, and starts itself a second time with administrator rights (UAC on Windows, `pkexec` on Linux) for the disk and firmware work |
+| `vm` | A Windows 11 VM, and Fedora VMs in `vm/linux`, with Secure Boot and a TPM to try it in |
 
 What Meet Luft leaves on the drive for Install Luft, and the moving box's format, are in [packages/meet](../../packages/meet).
 
@@ -26,9 +26,9 @@ bun run build
 cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml
 ```
 
-The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
+On Linux, `sabine bundle . --target appimage --release` makes `Meet Luft.AppImage` (it needs `appimagetool`). The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
 
-Start it with `--nightly`, or press Ctrl+Shift+N in it, to use `luft-nightly.iso` instead of `luft-latest.iso`. Ctrl+Shift+N again switches back.
+Start it with `--nightly`, or press Ctrl+Shift+N in it, to use nightly builds instead of releases. Ctrl+Shift+N again switches back.
 
 Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip. Where Luft keeps them is in [docs/meet.md](../../docs/meet.md#logs-from-try-luft).
 
@@ -43,4 +43,17 @@ vm/control.py plain screenshot shot.png
 vm/iso.sh                  # a Luft ISO with this checkout's installer, Install Luft and trustd
 ```
 
-The VM needs the Windows 11 Enterprise evaluation ISO and the virtio-win ISO in `vm/state`. Windows signs in as `ada` (password `meet-vm`) by itself, with the QEMU guest agent, so `control.py` can run PowerShell as SYSTEM, copy files and click and type.
+For Linux:
+
+```sh
+vm/linux/install.sh fedora              # Fedora Workstation as it installs: btrfs root and home, a second drive
+vm/linux/install.sh home                # ext4 with a separate /home
+vm/linux/install.sh single              # everything on one ext4 partition
+vm/linux/run.sh try fedora              # a copy of it to test in
+ISO=vm/state/luft-meet.iso vm/linux/run.sh try    # start Luft from a stick in it
+vm/control.py try run 'lsblk'           # as root, through the guest agent
+```
+
+The Fedora VMs sign in as `ada` (password `meet-vm`, also root's). `SHARE=folder` shares a folder as 9p tag `share`.
+
+The Windows VM needs the Windows 11 Enterprise evaluation ISO and the virtio-win ISO in `vm/state`. Windows signs in as `ada` (password `meet-vm`) by itself, with the QEMU guest agent, so `control.py` can run PowerShell as SYSTEM, copy files and click and type.

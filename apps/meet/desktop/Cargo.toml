@@ -1,7 +1,7 @@
 [package]
 name = "meet"
 version = "0.1.0"
-description = "Meet Luft: makes room for Luft next to Windows and starts it without a USB stick"
+description = "Meet Luft: gets a Windows or Linux computer ready for Luft and starts it without a USB stick"
 authors = ["Kristof"]
 license = "MIT"
 edition = "2024"
@@ -16,9 +16,14 @@ serde_json = "1.0.154"
 sha2 = "0.11.1"
 ureq = { version = "3.4.2", features = ["platform-verifier"] }
 
+[target.'cfg(any(windows, target_os = "linux"))'.dependencies]
+rfd = "0.17.2"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2.190"
+
 [target.'cfg(windows)'.dependencies]
 raw-window-handle = "0.6.2"
-rfd = "0.17.2"
 wmi = { version = "0.18.4", default-features = false }
 windows = { version = "0.62.2", features = [
   "Win32_Foundation",

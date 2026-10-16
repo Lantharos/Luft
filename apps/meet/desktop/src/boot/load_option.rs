@@ -1,5 +1,5 @@
+#[cfg(any(windows, test))]
 pub const GLOBAL_VARIABLES: &str = "{8BE4DF61-93CA-11D2-AA0D-00E098032B8C}";
-pub const LOADER: &str = r"\EFI\BOOT\BOOTX64.EFI";
 pub const DESCRIPTION: &str = "Meet Luft";
 const ACTIVE: u32 = 1;
 const MEDIA: u8 = 0x04;
@@ -43,8 +43,8 @@ fn file_path(path: &str) -> Vec<u8> {
     node
 }
 
-pub fn encode(partition: &Partition) -> Vec<u8> {
-    let device_path = [hard_drive(partition), file_path(LOADER), END.to_vec()].concat();
+pub fn encode(partition: &Partition, loader: &str) -> Vec<u8> {
+    let device_path = [hard_drive(partition), file_path(loader), END.to_vec()].concat();
     let mut option = ACTIVE.to_le_bytes().to_vec();
     option.extend((device_path.len() as u16).to_le_bytes());
     option.extend(utf16_with_nul(DESCRIPTION));
@@ -52,10 +52,15 @@ pub fn encode(partition: &Partition) -> Vec<u8> {
     option
 }
 
-pub fn points_at(option: &[u8], guid: &[u8; 16]) -> bool {
-    option.windows(16).any(|window| window == guid)
+pub fn starts(option: &[u8], partition: &Partition, loader: &str) -> bool {
+    let path = utf16_with_nul(loader);
+    option.windows(16).any(|window| window == partition.guid)
+        && option
+            .windows(path.len())
+            .any(|window| window == path.as_slice())
 }
 
+#[cfg(any(windows, test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Decoded {
     pub description: String,
@@ -64,6 +69,7 @@ pub struct Decoded {
     pub windows_object: Option<String>,
 }
 
+#[cfg(any(windows, test))]
 fn utf16(bytes: &[u8]) -> String {
     let units: Vec<u16> = bytes
         .as_chunks::<2>()
@@ -75,6 +81,7 @@ fn utf16(bytes: &[u8]) -> String {
     String::from_utf16_lossy(&units)
 }
 
+#[cfg(any(windows, test))]
 fn windows_object(optional: &[u8]) -> Option<String> {
     let marker: Vec<u8> = "BCDOBJECT="
         .encode_utf16()
@@ -89,6 +96,7 @@ fn windows_object(optional: &[u8]) -> Option<String> {
     text.starts_with('{').then(|| text[..=end].to_owned())
 }
 
+#[cfg(any(windows, test))]
 pub fn decode(option: &[u8]) -> Option<Decoded> {
     let path_length = u16::from_le_bytes(option.get(4..6)?.try_into().ok()?) as usize;
     let description_end = 6 + option
@@ -172,6 +180,22 @@ mod tests {
     use super::*;
 
     #[test]
+    fn an_entry_is_ours_only_when_it_starts_our_loader() {
+        let partition = Partition {
+            number: 1,
+            first_lba: 2048,
+            sectors: 1_228_800,
+            guid: [7; 16],
+        };
+        let fedora = encode(&partition, r"\EFI\fedora\shimx64.efi");
+        let ours = encode(&partition, r"\EFI\luft-meet\shimx64.efi");
+        assert!(starts(&ours, &partition, r"\EFI\luft-meet\shimx64.efi"));
+        assert!(!starts(&fedora, &partition, r"\EFI\luft-meet\shimx64.efi"));
+    }
+
+    const LOADER: &str = r"\EFI\BOOT\BOOTX64.EFI";
+
+    #[test]
     fn guids_are_stored_mixed_endian() {
         assert_eq!(
             guid_bytes("{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}").unwrap(),
@@ -186,12 +210,15 @@ mod tests {
     #[test]
     fn the_entry_starts_shim_from_luft_s_partition() {
         let guid = guid_bytes("0a1b2c3d-4e5f-4061-8273-8495a6b7c8d9").unwrap();
-        let option = encode(&Partition {
-            number: 5,
-            first_lba: 2048,
-            sectors: 1_048_576,
-            guid,
-        });
+        let option = encode(
+            &Partition {
+                number: 5,
+                first_lba: 2048,
+                sectors: 1_048_576,
+                guid,
+            },
+            LOADER,
+        );
         assert_eq!(&option[..4], &[1, 0, 0, 0]);
         let description = utf16_with_nul(DESCRIPTION);
         let path_start = 6 + description.len();
@@ -203,18 +230,20 @@ mod tests {
         assert_eq!(&path[24..40], &guid);
         assert_eq!(&path[42..44], &[MEDIA, FILE_PATH]);
         assert!(path.ends_with(&END));
-        assert!(points_at(&option, &guid));
     }
 
     #[test]
     fn an_entry_says_which_partition_and_file_it_starts() {
         let guid = guid_bytes("0a1b2c3d-4e5f-4061-8273-8495a6b7c8d9").unwrap();
-        let option = encode(&Partition {
-            number: 1,
-            first_lba: 2048,
-            sectors: 409_600,
-            guid,
-        });
+        let option = encode(
+            &Partition {
+                number: 1,
+                first_lba: 2048,
+                sectors: 409_600,
+                guid,
+            },
+            LOADER,
+        );
         assert_eq!(
             decode(&option),
             Some(Decoded {
@@ -229,12 +258,15 @@ mod tests {
     #[test]
     fn entries_windows_keeps_name_their_object() {
         let guid = guid_bytes("0a1b2c3d-4e5f-4061-8273-8495a6b7c8d9").unwrap();
-        let mut option = encode(&Partition {
-            number: 1,
-            first_lba: 2048,
-            sectors: 409_600,
-            guid,
-        });
+        let mut option = encode(
+            &Partition {
+                number: 1,
+                first_lba: 2048,
+                sectors: 409_600,
+                guid,
+            },
+            LOADER,
+        );
         option.extend(b"WINDOWS\0");
         option.extend([1, 0, 0, 0, 0x88, 0, 0, 0]);
         option.extend(

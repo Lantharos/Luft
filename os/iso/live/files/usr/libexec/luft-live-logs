@@ -64,6 +64,14 @@ video_acceleration() {
     done
 }
 
+graphics() {
+    echo "== vulkaninfo --summary"
+    timeout "$probe_timeout" vulkaninfo --summary 2>&1
+    echo
+    echo "== eglinfo -B"
+    timeout "$probe_timeout" eglinfo -B 2>&1
+}
+
 system() {
     uname -a
     echo
@@ -105,6 +113,7 @@ collect() {
     { timeout "$probe_timeout" lsusb; echo; timeout "$probe_timeout" lsusb -t; } >"$collected/lsusb.txt" 2>&1
     drm >"$collected/drm.txt" 2>&1
     video_acceleration >"$collected/vainfo.txt"
+    graphics >"$collected/graphics.txt"
     timeout "$probe_timeout" sushictl status >"$collected/sushi.txt" 2>&1
     home="$(live_home)"
     [[ -d "$home/.local/share/sabine/logs" ]] && cp -r "$home/.local/share/sabine/logs" "$collected/sabine"

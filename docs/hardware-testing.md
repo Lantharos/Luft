@@ -40,6 +40,7 @@ Note what you did, what you expected and what happened, with a photo if it's on 
 | `lspci -nnk` and `lsusb` | The hardware and the drivers it uses |
 | `cat /sys/power/mem_sleep` | The sleep modes |
 | `vainfo` | Video decoding |
+| `vulkaninfo --summary` and `eglinfo -B` | The graphics drivers apps draw with |
 | `wpctl status` | Sound devices |
 
 For problems in one app, `journalctl -b --user` has the session's own messages.

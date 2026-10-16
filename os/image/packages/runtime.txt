@@ -18,6 +18,7 @@ dbus-daemon
 dconf
 ddcutil
 desktop-file-utils
+egl-utils
 fedora-flathub-remote
 flatpak
 fprintd
@@ -91,6 +92,7 @@ thermald
 udisks2
 upower
 usbutils
+vulkan-tools
 wireplumber
 xdg-desktop-portal
 xdg-utils

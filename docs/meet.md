@@ -50,8 +50,9 @@ A zip stays under 48 MB. When the logs of one start get bigger than that, the JS
 | `lspci.txt`, `lsusb.txt` | Devices and their drivers (`lspci -nnk`, `lsusb`, `lsusb -t`) |
 | `drm.txt` | Graphics cards and their drivers, and each connector's state and modes |
 | `vainfo.txt` | Video decoding, for each render node |
+| `graphics.txt` | Vulkan and EGL drivers and devices (`vulkaninfo --summary`, `eglinfo -B`) |
 | `sushi.txt` | `sushictl status` |
-| `sabine` | Sabine's logs from the live account |
+| `sabine` | Sabine's logs from the live account, with Chromium's own log in `chromium.log` |
 
 In Meet Luft, **Ctrl+Shift+L** copies the newest zip to the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer.
 

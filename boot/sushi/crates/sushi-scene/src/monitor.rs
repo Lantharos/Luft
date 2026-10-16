@@ -110,17 +110,52 @@ impl Monitor {
         self.sizes.contains(&size)
     }
 
-    /// The best of the given sizes this monitor can show: its own if offered, else the largest one shaped like the panel.
-    pub fn best(&self, offered: impl IntoIterator<Item = (u32, u32)>) -> Option<(u32, u32)> {
+    fn rank(&self, size: (u32, u32)) -> (bool, bool, u64) {
+        (
+            size == self.native,
+            same_aspect(size, self.native),
+            u64::from(size.0) * u64::from(size.1),
+        )
+    }
+
+    /// The best of the given sizes this monitor can show, if it looks better than the current one: its own, else
+    /// the largest one shaped like the panel, else the largest.
+    pub fn better_than(
+        &self,
+        current: (u32, u32),
+        offered: impl IntoIterator<Item = (u32, u32)>,
+    ) -> Option<(u32, u32)> {
         offered
             .into_iter()
             .filter(|size| self.shows(*size))
-            .max_by_key(|&(width, height)| {
-                (
-                    (width, height) == self.native,
-                    same_aspect((width, height), self.native),
-                    u64::from(width) * u64::from(height),
-                )
-            })
+            .max_by_key(|size| self.rank(*size))
+            .filter(|best| self.rank(*best) > self.rank(current))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn panel() -> Monitor {
+        Monitor {
+            native: (1920, 1200),
+            sizes: alloc::vec![(1920, 1200), (640, 480), (1024, 768)],
+        }
+    }
+
+    #[test]
+    fn switches_to_the_panels_own_size() {
+        let offered = [(1024, 768), (1920, 1080), (1920, 1200)];
+        assert_eq!(
+            panel().better_than((1024, 768), offered),
+            Some((1920, 1200))
+        );
+    }
+
+    #[test]
+    fn keeps_a_wide_framebuffer_over_a_smaller_listed_one() {
+        let offered = [(640, 480), (1024, 768), (1920, 1080)];
+        assert_eq!(panel().better_than((1920, 1080), offered), None);
     }
 }

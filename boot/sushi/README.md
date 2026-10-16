@@ -10,7 +10,7 @@ SushiBoot, in the same folder, is the UEFI boot menu Luft starts through.
 - Unlocks encrypted disks: nothing to type when the TPM unlocks, otherwise a PIN, passphrase or recovery key prompt that says why it is asking
 - Follows the graphics driver taking over and sets the saved display mode, so the monitor never switches modes again at the login screen
 - Loads NVIDIA's driver itself while the splash shows, so the monitor goes dark only once per boot
-- Corrects for firmware that hands over a stretched, lower-resolution framebuffer
+- Keeps its drawing in proportion when the firmware hands over a framebuffer the monitor stretches, such as 1920×1080 on a 16:10 laptop panel
 - Holds the display between sessions, so signing in and out never shows the text console
 - Answers Plymouth's `plymouth` tool, so `dnf5 offline`, `dnf5 system-upgrade`, PackageKit and fwupd show progress unchanged
 - Shows notices before the login screen, such as the Secure Boot key enrollment steps
@@ -106,7 +106,7 @@ SushiBoot reads unified kernel images and [Boot Loader Specification](https://ua
 - `loader/loader.conf` takes `timeout` and `default`. `default` accepts patterns such as `luft-*`.
 - Entry IDs match systemd-boot's, such as `luft-7.2.8-300.fc45.x86_64.efi@rescue`, and the Boot Loader Interface variables are supported, so `bootctl status`, `bootctl list` and `bootctl set-oneshot ID` work.
 - A version that hasn't been seen to start yet gets three tries; after that SushiBoot starts the one that last worked ([details](../../docs/boot.md#when-an-update-doesnt-start)).
-- It switches to the monitor's own resolution before Linux starts.
+- It switches to the monitor's own resolution before Linux starts, when the firmware offers it.
 - With Secure Boot on, it must be signed (it carries an SBAT section), passes nothing to what it starts but a profile number, has no command line editor, and skips entries that start a kernel directly.
 - With Secure Boot off, it passes a startup image its own command line without `lockdown=`, so the kernel isn't locked down on a computer whose owner turned Secure Boot off.
 - It measures into the TPM what systemd-boot does: `loader/loader.conf` into PCR 5, and any command line it passes into PCR 12.

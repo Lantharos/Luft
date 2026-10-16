@@ -43,12 +43,9 @@ pub fn switch_to_best(gop: &mut GraphicsOutput, monitor: &Monitor) -> bool {
         .modes()
         .filter(|mode| mode.info().pixel_format() != PixelFormat::BltOnly)
         .collect();
-    let Some(best) = monitor.best(modes.iter().map(size)) else {
+    let Some(best) = monitor.better_than(current, modes.iter().map(size)) else {
         return false;
     };
-    if best == current {
-        return false;
-    }
     let Some(mode) = modes.iter().find(|mode| size(mode) == best) else {
         return false;
     };

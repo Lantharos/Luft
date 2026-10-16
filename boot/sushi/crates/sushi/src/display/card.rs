@@ -1,5 +1,6 @@
 use std::fs::{File, OpenOptions};
 use std::io;
+use std::ops::Range;
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
@@ -10,6 +11,8 @@ use sushi_scene::Monitor;
 
 const DRM_IOCTL_MODE_CLOSEFB: libc::c_ulong = 0xC008_64D0;
 const SYSFS: &str = "/sys/class/drm";
+const BOOT_PARAMS: &str = "/sys/kernel/boot_params/data";
+const BOOT_PARAMS_EDID: Range<usize> = 0x140..0x1c0;
 const FIRMWARE_FRAMEBUFFER_DRIVERS: [&str; 4] =
     ["simple-framebuffer", "efidrm", "vesadrm", "ofdrm"];
 
@@ -90,6 +93,14 @@ impl Card {
     }
 
     pub fn monitor(&self) -> Option<Monitor> {
+        self.connected_monitor().or_else(|| {
+            self.is_firmware_framebuffer()
+                .then(firmware_monitor)
+                .flatten()
+        })
+    }
+
+    fn connected_monitor(&self) -> Option<Monitor> {
         let prefix = format!("{}-", self.name());
         std::fs::read_dir(SYSFS)
             .ok()?
@@ -102,4 +113,9 @@ impl Card {
             })
             .find_map(|connector| Monitor::from_edid(&std::fs::read(connector.join("edid")).ok()?))
     }
+}
+
+fn firmware_monitor() -> Option<Monitor> {
+    let boot_params = std::fs::read(BOOT_PARAMS).ok()?;
+    Monitor::from_edid(boot_params.get(BOOT_PARAMS_EDID)?)
 }

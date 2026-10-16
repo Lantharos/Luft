@@ -109,7 +109,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -120,7 +120,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -326,9 +326,6 @@ name = "bitflags"
 version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
-dependencies = [
- "serde_core",
-]
 
 [[package]]
 name = "block-buffer"
@@ -743,7 +740,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -802,7 +799,7 @@ checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 [[package]]
 name = "dpi"
 version = "0.1.2"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 
 [[package]]
 name = "draft"
@@ -903,7 +900,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1159,12 +1156,12 @@ dependencies = [
 
 [[package]]
 name = "global-hotkey"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c386b0a4a70cb2d39fffd74480f985b6f0bfbcb934b6a6b6b7e630e448f242e"
+checksum = "adda8c76a5139df3bae0eb0413c2cd746f66594e0bb66231a4daa0be3172da70"
 dependencies = [
  "crossbeam-channel",
- "keyboard-types 0.7.0",
+ "keyboard-types",
  "objc2",
  "objc2-app-kit",
  "once_cell",
@@ -1604,17 +1601,6 @@ dependencies = [
 
 [[package]]
 name = "keyboard-types"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b750dcadc39a09dbadd74e118f6dd6598df77fa01df0cfcdc52c28dece74528a"
-dependencies = [
- "bitflags",
- "serde",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "keyboard-types"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fbe853b403ae61a04233030ae8a79d94975281ed9770a1f9e246732b534b28d"
@@ -1795,9 +1781,9 @@ dependencies = [
 
 [[package]]
 name = "lzma-rust2"
-version = "0.16.5"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca93e534d1142d1d0dcca6d25fe302508a5dfb40b302802904577725ea0b695b"
+checksum = "7277c9742229dc25243236d578b6471a798c554512c6f6a04365ec2e87c2a3bb"
 dependencies = [
  "sha2",
 ]
@@ -1882,14 +1868,14 @@ checksum = "4340e89c178916e62879c5c36b7f699019369be413e496178a6983ce91b8bc03"
 dependencies = [
  "crossbeam-channel",
  "dpi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "keyboard-types 0.8.3",
+ "keyboard-types",
  "objc2",
  "objc2-app-kit",
  "objc2-core-foundation",
  "objc2-foundation",
  "png",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1964,6 +1950,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee6cda3051665f1fb8d9e08fc35c96d5a244fb1be711a03b71118828afc9a873"
 dependencies = [
  "jni-sys 0.3.1",
+]
+
+[[package]]
+name = "nix"
+version = "0.31.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf20d2fde8ff38632c426f1165ed7436270b44f199fc55284c38276f9db47c3d"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
 ]
 
 [[package]]
@@ -2686,7 +2684,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2732,8 +2730,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "ashpd",
  "base64",
@@ -2791,8 +2789,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "serde",
  "serde_json",
@@ -2800,8 +2798,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -2812,8 +2810,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "ashpd",
  "block2",
@@ -2832,8 +2830,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "bzip2",
  "libc",
@@ -2849,8 +2847,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.42.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.42#2011d38082c42edc4bf8f5892469addf4045b92c"
+version = "0.43.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.43#8830ac98bf888e40806ac60aadc462627e311617"
 dependencies = [
  "base64",
  "clap",
@@ -3146,7 +3144,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3298,7 +3296,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3519,7 +3517,7 @@ dependencies = [
  "once_cell",
  "png",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3551,7 +3549,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4088,7 +4086,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4369,12 +4367,12 @@ checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
 [[package]]
 name = "winit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "cfg_aliases",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "libc",
  "raw-window-handle",
  "rustix",
@@ -4394,11 +4392,11 @@ dependencies = [
 [[package]]
 name = "winit-android"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "android-activity",
  "bitflags",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "ndk",
  "raw-window-handle",
  "smol_str",
@@ -4409,12 +4407,12 @@ dependencies = [
 [[package]]
 name = "winit-appkit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "block2",
  "dispatch2",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "objc2",
  "objc2-app-kit",
  "objc2-core-foundation",
@@ -4431,10 +4429,10 @@ dependencies = [
 [[package]]
 name = "winit-common"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "block2",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "memmap2",
  "objc2",
  "objc2-core-foundation",
@@ -4448,12 +4446,12 @@ dependencies = [
 [[package]]
 name = "winit-core"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
- "keyboard-types 0.8.3",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
+ "keyboard-types",
  "raw-window-handle",
  "smol_str",
  "web-time",
@@ -4462,10 +4460,10 @@ dependencies = [
 [[package]]
 name = "winit-orbital"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "libredox",
  "orbclient",
  "raw-window-handle",
@@ -4478,12 +4476,12 @@ dependencies = [
 [[package]]
 name = "winit-uikit"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "block2",
  "dispatch2",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "objc2",
  "objc2-core-foundation",
  "objc2-foundation",
@@ -4498,12 +4496,12 @@ dependencies = [
 [[package]]
 name = "winit-wayland"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "calloop",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "foldhash",
  "libc",
  "memmap2",
@@ -4525,13 +4523,13 @@ dependencies = [
 [[package]]
 name = "winit-web"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "atomic-waker",
  "bitflags",
  "concurrent-queue",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "js-sys",
  "pin-project",
  "raw-window-handle",
@@ -4547,11 +4545,11 @@ dependencies = [
 [[package]]
 name = "winit-win32"
 version = "0.31.0-beta.3"
-source = "git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c#4fb57cfd7bf04fafae0bb277df3ee2a151e1715c"
+source = "git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42#d53da931269ee450ba64f90a937b4af1b7895d42"
 dependencies = [
  "bitflags",
  "cursor-icon",
- "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=4fb57cfd7bf04fafae0bb277df3ee2a151e1715c)",
+ "dpi 0.1.2 (git+https://github.com/Lantharos/winit?rev=d53da931269ee450ba64f90a937b4af1b7895d42)",
  "percent-encoding",
  "raw-window-handle",
  "smol_str",
@@ -4813,9 +4811,9 @@ dependencies = [
 
 [[package]]
 name = "zip"
-version = "8.6.0"
+version = "9.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d04a6b5381502aa6087c94c669499eb1602eb9c5e8198e534de571f7154809b"
+checksum = "a954114b47a54df49f83d2722814e86b23d4bb1b54a1b90fb7d92b41619ddc22"
 dependencies = [
  "bzip2",
  "crc32fast",
@@ -4824,6 +4822,7 @@ dependencies = [
  "indexmap",
  "lzma-rust2",
  "memchr",
+ "nix",
  "typed-path",
  "zstd",
 ]
@@ -4842,18 +4841,18 @@ checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
 
 [[package]]
 name = "zstd"
-version = "0.13.3"
+version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e91ee311a569c327171651566e07972200e76fcfe2242a4fa446149a3881c08a"
+checksum = "db3ae9bf90af6e40197bef767eeefc46ad6397420fe873830bd85e5fbbfb3c70"
 dependencies = [
  "zstd-safe",
 ]
 
 [[package]]
 name = "zstd-safe"
-version = "7.3.0"
+version = "8.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64d80649ab6db9d9f6f9c80a40becd948eda4714a0a5ac8c4d157a32231c7882"
+checksum = "ded520f16b29e1a9b771c722221b2b0a0398c2316d9bb3c42b458a5414d7434b"
 dependencies = [
  "zstd-sys",
 ]

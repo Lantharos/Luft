@@ -35,7 +35,7 @@ const byRefresh = (a: Mode, b: Mode) => b.refresh - a.refresh;
 
 export const monitorOf = (state: Displays, connector: string) => state.monitors.find((monitor) => monitor.connector === connector)!;
 export const modeOf = (state: Displays, output: Output) => monitorOf(state, output.connector).modes.find((mode) => mode.id === output.mode)!;
-export const hertz = (refresh: number) => `${Number(refresh.toFixed(2))} Hz`;
+const hertz = (refresh: number) => `${Number(refresh.toFixed(2))} Hz`;
 export const percentScale = (scale: number) => `${Math.round(scale * 100)}%`;
 
 export function draftFrom(state: Displays): Draft {
@@ -69,7 +69,7 @@ export function footprint(state: Displays, output: Output): Rect {
 	};
 }
 
-export function settle(state: Displays, draft: Draft) {
+function settle(state: Displays, draft: Draft) {
 	const enabled = draft.outputs.filter((output) => output.enabled).sort((a, b) => a.x - b.x || a.y - b.y);
 	if (!enabled.length) return;
 	let rects = enabled.map((output) => footprint(state, output));

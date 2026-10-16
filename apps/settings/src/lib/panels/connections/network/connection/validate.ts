@@ -14,12 +14,12 @@ const EXAMPLES: Record<Family, { address: string; router: string; prefix: number
 
 export const words = (text: string) => text.split(/[\s,]+/).filter(Boolean);
 
-export const isIpv4 = (text: string) => {
+const isIpv4 = (text: string) => {
 	const parts = text.split('.');
 	return parts.length === 4 && parts.every((part) => OCTET.test(part));
 };
 
-export function isIpv6(text: string) {
+function isIpv6(text: string) {
 	if (!text.includes(':') || /[[\]/%]/.test(text)) return false;
 	try {
 		new URL(`http://[${text}]/`);
@@ -29,7 +29,7 @@ export function isIpv6(text: string) {
 	}
 }
 
-export const isAddress = (family: Family, text: string) => (family === 'ipv4' ? isIpv4(text) : isIpv6(text));
+const isAddress = (family: Family, text: string) => (family === 'ipv4' ? isIpv4(text) : isIpv6(text));
 
 function isNetwork(family: Family, text: string, prefixRequired: boolean) {
 	const [address, prefix, ...rest] = text.split('/');
@@ -38,7 +38,7 @@ function isNetwork(family: Family, text: string, prefixRequired: boolean) {
 	return /^\d+$/.test(prefix) && Number(prefix) <= EXAMPLES[family].prefix;
 }
 
-export const isMac = (text: string) => MAC.test(text);
+const isMac = (text: string) => MAC.test(text);
 
 export function minimumPassword(security: Security) {
 	if (security === 'wep') return 5;

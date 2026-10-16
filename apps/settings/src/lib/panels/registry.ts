@@ -65,7 +65,7 @@ const panel = (
 
 const pointerTitle = ({ mouse, touchpad }: Hardware) => (mouse && touchpad ? 'Mouse & Touchpad' : touchpad ? 'Touchpad' : 'Mouse');
 
-export const PANEL_GROUPS: Panel[][] = [
+const PANEL_GROUPS: Panel[][] = [
 	[
 		panel('network', 'Network', Wifi, ['wifi', 'wireless', 'ethernet', 'wired', 'vpn', 'internet', 'airplane', 'proxy', 'dns', 'ip address', 'hardware address', 'metered'], () => import('./connections/network/NetworkPanel.svelte')),
 		panel('bluetooth', 'Bluetooth', Bluetooth, ['devices', 'pair', 'headphones', 'speaker', 'visible', 'discoverable'], () => import('./connections/bluetooth/BluetoothPanel.svelte'), {

@@ -24,7 +24,7 @@ function unlock(volume: Volume) {
 	});
 }
 
-export function imageActions(drive: Drive, block: string, name: string): Action[] {
+function imageActions(drive: Drive, block: string, name: string): Action[] {
 	return [
 		{ label: 'Save as disk image…', run: () => dialogs.open({ kind: 'save-image', block, name }) },
 		{
@@ -45,7 +45,7 @@ function resume(drive: Drive, volume: Volume) {
 	});
 }
 
-export function isProtected(volume: Volume) {
+function isProtected(volume: Volume) {
 	return volume.system || Boolean(volume.encryption?.cleartext?.system);
 }
 

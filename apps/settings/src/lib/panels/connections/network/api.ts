@@ -113,7 +113,6 @@ export const needsPassword = (security: Security) => security === 'psk' || secur
 
 export const open = () => invoke<Network>('network_open');
 export const close = () => invoke<void>('network_close');
-export const scan = (device: string) => invoke<void>('network_scan', { device });
 export const setWifi = (enabled: boolean) => invoke<void>('network_set_wifi', { enabled });
 export const setAirplane = (enabled: boolean) => invoke<void>('network_set_airplane', { enabled });
 export const activate = (target: { connection?: string; device?: string }) => invoke<void>('network_activate', target);

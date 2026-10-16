@@ -52,7 +52,7 @@ interface Summary {
 }
 
 const PREFERRED_WIDTH = 752;
-export const PAGE_SIZE = 48;
+const PAGE_SIZE = 48;
 
 export function toApp(hit: Hit): CatalogApp {
 	return {

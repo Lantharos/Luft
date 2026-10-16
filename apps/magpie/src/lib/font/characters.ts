@@ -3,7 +3,7 @@ const FALLBACK_LENGTH = 32;
 
 export type Ranges = [number, number][];
 
-export function covers(ranges: Ranges, text: string) {
+function covers(ranges: Ranges, text: string) {
 	return [...text].every((character) => {
 		const codepoint = character.codePointAt(0)!;
 		if (/\s/.test(character)) return true;

@@ -31,8 +31,6 @@ export * from './types';
 const LONG = 10 * 60 * 1000;
 const FOREVER = 24 * 60 * 60 * 1000;
 
-export const isDesktop = isAvailable;
-
 function call<T>(name: string, params: Record<string, unknown> = {}, timeoutMs?: number): Promise<T> {
 	return invoke<T>(name, params, timeoutMs ? { timeoutMs } : undefined);
 }

@@ -82,7 +82,7 @@ function firstText(block: Node): Node | null {
 	return walker.nextNode();
 }
 
-export function toText(root: Node): string {
+function toText(root: Node): string {
 	let text = '';
 	const walk = (node: Node, prefix: string) => {
 		if (node.nodeType === Node.TEXT_NODE) {

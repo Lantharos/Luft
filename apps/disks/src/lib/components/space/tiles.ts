@@ -1,4 +1,3 @@
-import { bytes } from '@luft/ui';
 import type { SpaceView } from '#lib/api.js';
 
 export type TileKind = 'dir' | 'file' | 'other' | 'rest';
@@ -62,8 +61,4 @@ export function tilesOf(view: SpaceView): Tile[] {
 		});
 	}
 	return tiles;
-}
-
-export function tileSize(tile: Tile) {
-	return bytes(tile.size);
 }

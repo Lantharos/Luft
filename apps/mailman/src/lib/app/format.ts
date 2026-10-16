@@ -31,7 +31,3 @@ export function until(seconds: number) {
 	if (Math.abs(hours) < 24) return relative.format(hours, 'hour');
 	return relative.format(Math.round(difference / DAY), 'day');
 }
-
-export function displayName(name: string, address: string) {
-	return name.trim() || address;
-}

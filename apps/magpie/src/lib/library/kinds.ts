@@ -1,4 +1,4 @@
-import type { Item, Kind } from '#lib/bridge/api.js';
+import type { Kind } from '#lib/bridge/api.js';
 
 export type Group = 'visual' | 'audio' | 'document' | 'font';
 
@@ -8,17 +8,9 @@ export function groupOf(kind: Kind): Group {
 	return GROUPS[kind];
 }
 
-export function sameGroup(a: Item, b: Item) {
-	return groupOf(a.kind) === groupOf(b.kind);
-}
-
 export function extension(name: string) {
 	const dot = name.lastIndexOf('.');
 	return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
-}
-
-export function isVector(item: Item) {
-	return extension(item.name) === 'svg';
 }
 
 export function parent(path: string) {

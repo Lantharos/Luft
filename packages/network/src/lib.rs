@@ -89,10 +89,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             watch::close();
             Ok(())
         })
-        .command("network_scan", |Device { device }| {
-            actions::scan(&device);
-            Ok(())
-        })
         .command("network_set_wifi", |Toggle { enabled }| {
             actions::set_wifi(enabled)
         })

@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
+use zbus::Variant;
 use zbus::names::UniqueName;
-use zbus::zvariant::Value;
 use zbus::{Connection, proxy};
 
 use crate::error::Error;
 
 const ALLOW_USER_INTERACTION: u32 = 1;
 
-type Subject<'a> = (&'a str, HashMap<&'a str, Value<'a>>);
+type Subject<'a> = (&'a str, HashMap<&'a str, Variant<'a>>);
 
 #[proxy(
     interface = "org.freedesktop.PolicyKit1.Authority",
@@ -34,7 +34,7 @@ pub async fn check(
 ) -> Result<(), Error> {
     let subject = (
         "system-bus-name",
-        HashMap::from([("name", Value::from(caller.as_str()))]),
+        HashMap::from([("name", Variant::from(caller.as_str()))]),
     );
     let flags = if interactive {
         ALLOW_USER_INTERACTION

@@ -1,5 +1,5 @@
+use zbus::OwnedObjectPath;
 use zbus::proxy;
-use zbus::zvariant::OwnedObjectPath;
 
 pub const SKIP_INHIBITORS: u64 = 1 << 4;
 

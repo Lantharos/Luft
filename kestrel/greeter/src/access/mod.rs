@@ -36,7 +36,7 @@ impl Access {
                 let interactive = header
                     .primary()
                     .flags()
-                    .contains(Flags::AllowInteractiveAuth);
+                    .contains(Flags::ALLOW_INTERACTIVE_AUTH);
                 polkit::check(connection, sender(header), action, interactive).await
             }
             Self::SameUser(uid) => require_user(connection, header, *uid).await,

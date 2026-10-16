@@ -1,4 +1,4 @@
-use zbus::zvariant::OwnedObjectPath;
+use zbus::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
 use super::sessions::Session;
@@ -31,7 +31,7 @@ pub async fn remember_session(
         .await?
         .find_user_by_name(username)
         .await?;
-    let user = UserProxy::builder(connection).path(path)?.build().await?;
+    let user = UserProxy::builder(connection).path(path).build().await?;
     user.set_session(&session.id).await?;
     user.set_session_type("wayland").await
 }

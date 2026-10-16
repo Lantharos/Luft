@@ -55,13 +55,13 @@ impl Watchdog {
         }
         let user = self.login.get_user_by_pid(pid).await?;
         let (_, session) = UserProxy::builder(connection)
-            .path(user)?
+            .path(user)
             .build()
             .await?
             .display()
             .await?;
         let session = SessionProxy::builder(connection)
-            .path(session)?
+            .path(session)
             .build()
             .await?;
         let (seat, _) = session.seat().await?;

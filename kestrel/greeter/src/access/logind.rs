@@ -1,5 +1,5 @@
+use zbus::OwnedObjectPath;
 use zbus::proxy::CacheProperties;
-use zbus::zvariant::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
 use crate::error::Error;
@@ -34,7 +34,7 @@ pub async fn require_greeter(connection: &Connection, pid: u32) -> Result<(), Er
         return Err(Error::not_authorized());
     };
     let class = SessionProxy::builder(connection)
-        .path(path)?
+        .path(path)
         .cache_properties(CacheProperties::No)
         .build()
         .await?

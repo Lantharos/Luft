@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use tokio::sync::Mutex;
+use zbus::OwnedFd;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::zvariant::OwnedFd;
 use zbus::{Connection, interface};
 
 use crate::access::{self, Access, CONFIGURE, SET_APPEARANCE};

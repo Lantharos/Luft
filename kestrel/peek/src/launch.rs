@@ -6,13 +6,13 @@ use std::path::Path;
 use std::process::{Command, ExitCode, Stdio};
 
 use rustix::process::{Pid, PidfdFlags, pidfd_open, setsid};
-use zbus::zvariant::Fd;
+use zbus::Fd;
 
 use crate::service::{Failure, Peek};
 
 pub const STUB: &str = "started-program";
 
-pub fn launch(peek: &Peek, command: &[OsString], log: &Path) -> Result<String, Failure> {
+pub async fn launch(peek: &Peek, command: &[OsString], log: &Path) -> Result<String, Failure> {
     let output = File::create(log)
         .map_err(|error| Failure(format!("Couldn't write {}: {error}", log.display())))?;
     let mut child = Command::new(std::env::current_exe()?)
@@ -25,7 +25,7 @@ pub fn launch(peek: &Peek, command: &[OsString], log: &Path) -> Result<String, F
     let mut go = child.stdin.take().expect("the program's input is piped");
     let pidfd =
         pidfd_open(Pid::from_child(&child), PidfdFlags::empty()).map_err(std::io::Error::from)?;
-    let handle = match peek.launch(Fd::from(&pidfd)) {
+    let handle = match peek.launch(Fd::from(&pidfd)).await {
         Ok(handle) => handle,
         Err(error) => {
             drop(go);

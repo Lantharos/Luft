@@ -10,17 +10,19 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Parser;
-use zbus::zvariant::Fd;
+use zbus::Fd;
 
 use cli::{Action, At, Cli};
 use files::{Output, scratch_file};
 use launch::{STUB, launch, start_program};
 use service::{Failure, Peek, Window, connect_display, connect_session, windows};
 
-fn connection(handle: Option<&str>) -> Result<Peek, Failure> {
+async fn connection(handle: Option<&str>) -> Result<Peek, Failure> {
     match handle {
-        Some(handle) if offscreen::is_running(handle) => connect_display(&offscreen::bus(handle)?),
-        _ => connect_session(),
+        Some(handle) if offscreen::is_running(handle) => {
+            connect_display(&offscreen::bus(handle)?).await
+        }
+        _ => connect_session().await,
     }
 }
 
@@ -38,8 +40,8 @@ fn summary(window: &Window) -> String {
     )
 }
 
-fn list(handle: Option<&str>, json: bool) -> Result<(), Failure> {
-    let windows = windows(&connection(handle)?, handle.unwrap_or_default())?;
+async fn list(handle: Option<&str>, json: bool) -> Result<(), Failure> {
+    let windows = windows(&connection(handle).await?, handle.unwrap_or_default()).await?;
     if json {
         let entries: Vec<_> = windows
             .iter()
@@ -64,18 +66,18 @@ fn list(handle: Option<&str>, json: bool) -> Result<(), Failure> {
     Ok(())
 }
 
-fn capture(
+async fn capture(
     output: Option<PathBuf>,
     prefix: &str,
-    shoot: impl FnOnce(Fd<'_>) -> zbus::Result<()>,
+    shoot: impl AsyncFnOnce(Fd<'_>) -> zbus::Result<()>,
 ) -> Result<(), Failure> {
     let output = Output::create(output, prefix)?;
-    let result = shoot(Fd::from(&output.file)).map_err(Failure::from);
+    let result = shoot(Fd::from(&output.file)).await.map_err(Failure::from);
     println!("{}", output.finish(result)?.display());
     Ok(())
 }
 
-fn run(
+async fn run(
     here: bool,
     size: &str,
     wait: Option<u32>,
@@ -87,7 +89,7 @@ fn run(
         None => scratch_file("run", "log")?,
     };
     let handle = if here {
-        launch(&connect_session()?, command, &log)?
+        launch(&connect_session().await?, command, &log).await?
     } else {
         offscreen::start(command, size, &log)?
     };
@@ -102,8 +104,10 @@ fn run(
         std::path::absolute(&log)?.display()
     );
     if let Some(timeout) = wait {
-        let window = connection(Some(&handle))?
+        let window = connection(Some(&handle))
+            .await?
             .wait_for_window(&handle, timeout)
+            .await
             .map_err(Failure::from)
             .and_then(Window::try_from)
             .map_err(|Failure(message)| {
@@ -118,28 +122,29 @@ fn run(
     Ok(())
 }
 
-fn act(
+async fn act(
     at: &At,
-    action: impl FnOnce(&Peek, u64, f64, f64) -> zbus::Result<()>,
+    action: impl AsyncFnOnce(&Peek, u64, f64, f64) -> zbus::Result<()>,
 ) -> Result<(), Failure> {
-    let peek = connection(at.window.handle())?;
-    let window = at.window.resolve(&peek)?;
-    Ok(action(&peek, window.id, at.x, at.y)?)
+    let peek = connection(at.window.handle()).await?;
+    let window = at.window.resolve(&peek).await?;
+    Ok(action(&peek, window.id, at.x, at.y).await?)
 }
 
-fn dispatch(action: Action) -> Result<(), Failure> {
+async fn dispatch(action: Action) -> Result<(), Failure> {
     match action {
-        Action::List { handle, json } => list(handle.as_deref(), json),
+        Action::List { handle, json } => list(handle.as_deref(), json).await,
         Action::Window { window, output } => {
-            let peek = connection(window.handle())?;
-            let window = window.resolve(&peek)?;
-            capture(output, &format!("window-{}", window.id), |fd| {
-                peek.capture_window(window.id, fd)
+            let peek = connection(window.handle()).await?;
+            let window = window.resolve(&peek).await?;
+            capture(output, &format!("window-{}", window.id), async |fd| {
+                peek.capture_window(window.id, fd).await
             })
+            .await
         }
         Action::Screen { handle, output } => {
-            let peek = connection(handle.as_deref())?;
-            capture(output, "screen", |fd| peek.capture_screen(fd))
+            let peek = connection(handle.as_deref()).await?;
+            capture(output, "screen", async |fd| peek.capture_screen(fd).await).await
         }
         Action::Run {
             here,
@@ -148,34 +153,51 @@ fn dispatch(action: Action) -> Result<(), Failure> {
             timeout,
             log,
             command,
-        } => run(
-            here,
-            &size,
-            wait_window.then_some(timeout * 1000),
-            log,
-            &command,
-        ),
-        Action::Stop { handle } => Ok(connection(Some(&handle))?.stop(&handle)?),
-        Action::Click { at, button, double } => act(&at, |peek, id, x, y| {
-            peek.click(id, x, y, button.number(), if double { 2 } else { 1 })
-        }),
-        Action::Move { at } => act(&at, Peek::move_to),
+        } => {
+            run(
+                here,
+                &size,
+                wait_window.then_some(timeout * 1000),
+                log,
+                &command,
+            )
+            .await
+        }
+        Action::Stop { handle } => Ok(connection(Some(&handle)).await?.stop(&handle).await?),
+        Action::Click { at, button, double } => {
+            act(&at, async |peek, id, x, y| {
+                peek.click(id, x, y, button.number(), if double { 2 } else { 1 })
+                    .await
+            })
+            .await
+        }
+        Action::Move { at } => act(&at, async |peek, id, x, y| peek.move_to(id, x, y).await).await,
         Action::Drag {
             at,
             to_x,
             to_y,
             button,
-        } => act(&at, |peek, id, x, y| {
-            peek.drag(id, x, y, to_x, to_y, button.number())
-        }),
-        Action::Scroll { at, dy, dx } => act(&at, |peek, id, x, y| peek.scroll(id, x, y, dx, dy)),
+        } => {
+            act(&at, async |peek, id, x, y| {
+                peek.drag(id, x, y, to_x, to_y, button.number()).await
+            })
+            .await
+        }
+        Action::Scroll { at, dy, dx } => {
+            act(&at, async |peek, id, x, y| {
+                peek.scroll(id, x, y, dx, dy).await
+            })
+            .await
+        }
         Action::Type { window, text } => {
-            let peek = connection(window.handle())?;
-            Ok(peek.type_text(window.resolve(&peek)?.id, &text)?)
+            let peek = connection(window.handle()).await?;
+            Ok(peek
+                .type_text(window.resolve(&peek).await?.id, &text)
+                .await?)
         }
         Action::Key { window, combo } => {
-            let peek = connection(window.handle())?;
-            Ok(peek.key(window.resolve(&peek)?.id, &combo)?)
+            let peek = connection(window.handle()).await?;
+            Ok(peek.key(window.resolve(&peek).await?.id, &combo).await?)
         }
     }
 }
@@ -187,7 +209,7 @@ fn main() -> ExitCode {
         Some(offscreen::HOST) => return offscreen::host(&arguments[2..]),
         _ => {}
     }
-    match dispatch(Cli::parse().command) {
+    match zbus::block_on(dispatch(Cli::parse().command)) {
         Ok(()) => ExitCode::SUCCESS,
         Err(Failure(message)) => {
             eprintln!("peek: {message}");

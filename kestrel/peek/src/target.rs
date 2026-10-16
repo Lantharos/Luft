@@ -40,8 +40,13 @@ impl FromStr for Target {
     }
 }
 
-fn find(peek: &Peek, missing: &str, accept: impl Fn(&Window) -> bool) -> Result<Window, Failure> {
-    windows(peek, "")?
+async fn find(
+    peek: &Peek,
+    missing: &str,
+    accept: impl Fn(&Window) -> bool,
+) -> Result<Window, Failure> {
+    windows(peek, "")
+        .await?
         .into_iter()
         .find(accept)
         .ok_or_else(|| Failure(format!("{missing}. peek list shows the open windows.")))
@@ -64,21 +69,30 @@ impl Target {
         }
     }
 
-    pub fn resolve(&self, peek: &Peek) -> Result<Window, Failure> {
+    pub async fn resolve(&self, peek: &Peek) -> Result<Window, Failure> {
         match self {
-            Self::Handle(handle) => Window::try_from(peek.handle_window(handle)?),
-            Self::Id(id) => find(peek, &format!("No window has the id {id}"), |window| {
-                window.id == *id
-            }),
-            Self::Focused => find(peek, "No window is focused", |window| window.focused),
-            Self::App(id) => find(peek, &format!("No window belongs to {id}"), |window| {
-                same_app(window, id)
-            }),
-            Self::Title(text) => find(
-                peek,
-                &format!("No window you can see has a title containing {text}"),
-                |window| window.title.to_lowercase().contains(&text.to_lowercase()),
-            ),
+            Self::Handle(handle) => Window::try_from(peek.handle_window(handle).await?),
+            Self::Id(id) => {
+                find(peek, &format!("No window has the id {id}"), |window| {
+                    window.id == *id
+                })
+                .await
+            }
+            Self::Focused => find(peek, "No window is focused", |window| window.focused).await,
+            Self::App(id) => {
+                find(peek, &format!("No window belongs to {id}"), |window| {
+                    same_app(window, id)
+                })
+                .await
+            }
+            Self::Title(text) => {
+                find(
+                    peek,
+                    &format!("No window you can see has a title containing {text}"),
+                    |window| window.title.to_lowercase().contains(&text.to_lowercase()),
+                )
+                .await
+            }
         }
     }
 }

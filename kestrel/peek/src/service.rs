@@ -2,8 +2,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::path::Path;
 
-use zbus::blocking::Connection;
-use zbus::zvariant::{Fd, OwnedValue};
+use zbus::{Connection, Fd, OwnedVariant};
 
 #[zbus::proxy(
     interface = "com.lantharos.Kestrel.Peek",
@@ -11,8 +10,8 @@ use zbus::zvariant::{Fd, OwnedValue};
     default_path = "/com/lantharos/Kestrel/Peek"
 )]
 pub trait Service {
-    fn list(&self, handle: &str) -> zbus::Result<Vec<HashMap<String, OwnedValue>>>;
-    fn handle_window(&self, handle: &str) -> zbus::Result<HashMap<String, OwnedValue>>;
+    fn list(&self, handle: &str) -> zbus::Result<Vec<HashMap<String, OwnedVariant>>>;
+    fn handle_window(&self, handle: &str) -> zbus::Result<HashMap<String, OwnedVariant>>;
     fn capture_window(&self, window: u64, output: Fd<'_>) -> zbus::Result<()>;
     fn capture_screen(&self, output: Fd<'_>) -> zbus::Result<()>;
     fn launch(&self, process: Fd<'_>) -> zbus::Result<String>;
@@ -20,7 +19,7 @@ pub trait Service {
         &self,
         unit: &str,
         timeout: u32,
-    ) -> zbus::Result<HashMap<String, OwnedValue>>;
+    ) -> zbus::Result<HashMap<String, OwnedVariant>>;
     #[zbus(name = "Move")]
     fn move_to(&self, window: u64, x: f64, y: f64) -> zbus::Result<()>;
     fn click(&self, window: u64, x: f64, y: f64, button: u32, count: u32) -> zbus::Result<()>;
@@ -40,19 +39,19 @@ pub trait Service {
     fn stop(&self, handle: &str) -> zbus::Result<()>;
 }
 
-pub type Peek = ServiceProxyBlocking<'static>;
+pub type Peek = ServiceProxy<'static>;
 
-pub fn connect_session() -> Result<Peek, Failure> {
-    let connection = Connection::session()?;
-    Ok(ServiceProxyBlocking::new(&connection)?)
+pub async fn connect_session() -> Result<Peek, Failure> {
+    let connection = Connection::session().await?;
+    Ok(ServiceProxy::new(&connection).await?)
 }
 
-pub fn connect_display(bus: &Path) -> Result<Peek, Failure> {
-    let connection = zbus::blocking::connection::Builder::address(
-        format!("unix:path={}", bus.display()).as_str(),
-    )?
-    .build()?;
-    Ok(ServiceProxyBlocking::new(&connection)?)
+pub async fn connect_display(bus: &Path) -> Result<Peek, Failure> {
+    let connection =
+        zbus::connection::Builder::address(format!("unix:path={}", bus.display()).as_str())
+            .build()
+            .await?;
+    Ok(ServiceProxy::new(&connection).await?)
 }
 
 #[derive(Debug)]
@@ -98,8 +97,8 @@ pub struct Window {
     pub handle: String,
 }
 
-fn field<T: TryFrom<OwnedValue>>(
-    fields: &HashMap<String, OwnedValue>,
+fn field<T: TryFrom<OwnedVariant>>(
+    fields: &HashMap<String, OwnedVariant>,
     name: &str,
 ) -> Result<T, Failure> {
     fields
@@ -109,10 +108,10 @@ fn field<T: TryFrom<OwnedValue>>(
         .ok_or_else(|| Failure(format!("Kestrel described a window without its {name}")))
 }
 
-impl TryFrom<HashMap<String, OwnedValue>> for Window {
+impl TryFrom<HashMap<String, OwnedVariant>> for Window {
     type Error = Failure;
 
-    fn try_from(fields: HashMap<String, OwnedValue>) -> Result<Self, Failure> {
+    fn try_from(fields: HashMap<String, OwnedVariant>) -> Result<Self, Failure> {
         Ok(Self {
             id: field(&fields, "id")?,
             app: field(&fields, "app")?,
@@ -128,8 +127,9 @@ impl TryFrom<HashMap<String, OwnedValue>> for Window {
     }
 }
 
-pub fn windows(peek: &Peek, handle: &str) -> Result<Vec<Window>, Failure> {
-    peek.list(handle)?
+pub async fn windows(peek: &Peek, handle: &str) -> Result<Vec<Window>, Failure> {
+    peek.list(handle)
+        .await?
         .into_iter()
         .map(Window::try_from)
         .collect()

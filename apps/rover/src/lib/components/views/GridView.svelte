@@ -3,6 +3,7 @@
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
 	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
@@ -70,6 +71,7 @@
 		<div class={[entryClasses(entry, context), 'grid-tile']} {...entryProps(entry, context)}>
 			<span class="grid-art" style:height="{size}px">
 				<EntryIcon name={entryIcon(entry)} {size} {...thumbnailOf(entry)} fit="contain" />
+				<CloudMark state={context.manager.cloud.stateOf(entry.path)} density="grid" />
 				<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} density="grid" />
 			</span>
 			<EntryName {entry} manager={context.manager} class="grid-name" fieldClass="inline-name-field--grid" />

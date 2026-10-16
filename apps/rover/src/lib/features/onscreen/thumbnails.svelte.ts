@@ -28,6 +28,11 @@ class Thumbnails {
 	#screen = new OnScreen(() => this.#flush());
 	#size: ThumbnailSize = 'normal';
 	#requested = '';
+	#skip: (path: string) => boolean = () => false;
+
+	skipWhen(skip: (path: string) => boolean) {
+		this.#skip = skip;
+	}
 
 	resize(size: ThumbnailSize) {
 		if (size === this.#size) return;
@@ -46,7 +51,7 @@ class Thumbnails {
 	};
 
 	source(entry: FileEntry) {
-		if (!entry.is_file) return null;
+		if (!entry.is_file || this.#skip(entry.path)) return null;
 		if (!isDesktopRuntime()) return isImage(entry) ? localFileSource(entry.path, entry.modified) : null;
 		this.#screen.watch(entry);
 		const ready = this.#ready.get(entry.path);

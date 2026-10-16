@@ -22,6 +22,7 @@ chrono = "0.4.45"
 parking_lot = "0.12.5"
 open = "5.4.4"
 libc = "0.2"
+luft-accounts = { path = "../../../packages/accounts" }
 luft-app = { path = "../../../packages/app", features = ["apps", "thumbnails"] }
 gio = "0.22.10"
 gio-unix = "0.22.8"

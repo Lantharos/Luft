@@ -20,6 +20,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = tools::register(window, state);
     let window = crate::locations::places::register(crate::details::inspect::register(window));
     let window = crate::locations::network::register(window, &state.events);
+    let window = crate::locations::cloud::register(window, &state.events);
     register_app(window, state)
 }
 
@@ -40,7 +41,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                  mut paths,
                  show_hidden,
              }| {
-                paths.retain(|path| !crate::locations::network::is_remote(path));
+                paths.retain(|path| {
+                    !crate::locations::network::is_remote(path) && !crate::locations::cloud::is_cloud(path)
+                });
                 state.counts.request(paths, show_hidden);
                 Ok(())
             },

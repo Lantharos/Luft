@@ -25,6 +25,7 @@ import type {
 import { errorMessage } from '#lib/utils/format.js';
 import { parentPath, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
+import { CloudState } from './places/cloud.svelte';
 import { DrivesState } from './places/drives.svelte';
 import { NetworkState, type NetworkEntry } from './places/network.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
@@ -73,6 +74,7 @@ export class FileManager {
 	readonly loading = new DelayedLoading();
 	readonly drives = new DrivesState();
 	readonly network = new NetworkState();
+	readonly cloud = new CloudState();
 	readonly actions = new FileActions(this);
 
 	view = $state<SidebarView>('home');
@@ -176,6 +178,7 @@ export class FileManager {
 		this.drives.manageable = state.canManageDrives;
 		void this.drives.load();
 		void this.network.load();
+		void this.cloud.load();
 		const path = startPath ?? this.homePath;
 		this.tabs.open(this.#homeEntry(path));
 		await this.loadDirectory(path);
@@ -211,6 +214,7 @@ export class FileManager {
 		const listing = await api.listDirectory(path, settings.value.showHidden).catch(() => null);
 		if (!listing || this.view !== 'home' || this.currentPath !== path || this.loading.active) return;
 		this.entries = listing.entries;
+		this.cloud.follow(path);
 		const present = new Set(listing.entries.map((entry) => entry.path));
 		for (const selected of this.selection) if (!present.has(selected)) this.selection.delete(selected);
 	};
@@ -350,6 +354,7 @@ export class FileManager {
 
 	openEntry = (entry: Pick<FileEntry, 'path' | 'is_dir'>) => {
 		if (entry.is_dir) void this.navigate(entry.path);
+		else if (this.cloud.unreachable(entry.path)) this.notify('Connect to the internet to open files that aren’t kept on this device');
 		else api.openWithDefault(entry.path).catch(this.notify);
 	};
 
@@ -458,6 +463,7 @@ export class FileManager {
 		const from = this.currentPath;
 		this.currentPath = path;
 		this.entries = entries;
+		this.cloud.follow(path);
 		this.viewMode = this.viewMode === 'columns' ? 'columns' : viewModeForPath(path, settings.value, this.userDirs);
 		this.view = 'home';
 		this.searchQuery = '';

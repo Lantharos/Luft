@@ -15,7 +15,7 @@ export interface Conflict {
 	target: ConflictItem;
 }
 
-export type NoticeKind = 'done' | 'undone' | 'redone' | 'failed';
+export type NoticeKind = 'done' | 'undone' | 'redone' | 'failed' | 'info';
 
 export interface HistoryState {
 	canUndo: boolean;

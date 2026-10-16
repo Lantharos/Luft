@@ -4,7 +4,7 @@
 
 	let toast = $derived(history.toast);
 	let action = $derived.by(() => {
-		if (!toast || toast.kind === 'failed') return null;
+		if (!toast || toast.kind === 'failed' || toast.kind === 'info') return null;
 		return toast.kind === 'undone' ? { label: 'Redo', run: history.redo } : { label: 'Undo', run: history.undo };
 	});
 

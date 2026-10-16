@@ -13,6 +13,7 @@ import type {
 	TrashContents,
 	WindowsDrive
 } from './types';
+import type { CloudDrive, FileState } from './types/cloud';
 import type { FileDetails, OpenWithApps } from './types/details';
 import type { VcsRoot, VcsStatusEvent } from './vcs/types';
 
@@ -44,6 +45,15 @@ export const connectNetwork = (uri: string) => invoke<NetworkLocation>('network_
 export const answerNetwork = (answer: NetworkAnswer) => invoke<void>('network_answer', { ...answer });
 export const disconnectNetwork = (uri: string) => invoke<void>('network_disconnect', { uri });
 export const discoverNetwork = () => invoke<NetworkPlace[]>('network_discover');
+
+export const cloudDrives = () => invoke<CloudDrive[]>('cloud_drives');
+export const cloudStates = (path: string) => invoke<Record<string, FileState>>('cloud_states', { path });
+export const keepOnDevice = (paths: string[]) => invoke<void>('cloud_keep', { paths });
+export const freeUpSpace = (paths: string[]) => invoke<void>('cloud_free', { paths }, { timeoutMs: 600_000 });
+export const shareLink = (path: string) => invoke<string>('cloud_share_link', { path }, { timeoutMs: 60_000 });
+export const openInBrowser = (path: string) => invoke<void>('cloud_open_in_browser', { path }, { timeoutMs: 60_000 });
+export const dismissConflict = (account: string, copy: string) => invoke<void>('cloud_dismiss_conflict', { account, copy });
+export const addCloudAccount = () => invoke<void>('cloud_add_account');
 
 export const recentFiles = () => invoke<FileEntry[]>('recent_files');
 export const trashCount = () => invoke<number>('trash_count');
@@ -79,6 +89,7 @@ export const events = {
 	operations: (callback: (operations: Operation[]) => void) => listen('rover.operations', callback),
 	drives: (callback: () => void) => listen('rover.drives', callback),
 	network: (callback: () => void) => listen('rover.network', callback),
+	cloud: (callback: () => void) => listen('rover.cloud', callback),
 	networkAsk: (callback: (ask: NetworkAsk) => void) => listen('rover.network.ask', callback),
 	directory: (callback: (event: { path: string }) => void) => listen('rover.directory', callback),
 	vcsStatus: (callback: (event: VcsStatusEvent) => void) => listen('rover.vcs', callback),

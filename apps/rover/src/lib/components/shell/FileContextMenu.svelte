@@ -2,6 +2,7 @@
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 	import * as tools from '#lib/features/actions.js';
+	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -24,6 +25,8 @@
 	let offersVcs = $derived(Boolean(vcs.project && (!target || target.is_dir || vcs.statusFor(target.path, false))));
 	let primaryAction = $derived(primaryActionLabel(vcs.project));
 	let targets = $derived(target ? tools.targetsOf(manager, target) : []);
+	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
+	let kept = $derived(cloud.keptEverywhere(manager, targets));
 	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.is_dir && isArchive(entry.name)));
 
 	function close() {
@@ -66,6 +69,20 @@
 			{@render item('plus', 'Open in tab', () => manager.openTab(target.path))}
 		{/if}
 		{@render item('star', isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
+		{#if cloudDrive}
+			<MenuSeparator />
+			{#if kept}
+				{@render item('cloud', 'Free up space', () => cloud.free(manager, targets))}
+			{:else}
+				{@render item('download', 'Keep on this device', () => cloud.keep(manager, targets))}
+			{/if}
+			{#if targets.length === 1 && cloudDrive.shareLinks}
+				{@render item('link', 'Copy share link', () => cloud.copyShareLink(manager, target))}
+			{/if}
+			{#if targets.length === 1 && cloudDrive.web}
+				{@render item('globe', 'Open in browser', () => cloud.openInBrowser(manager, target))}
+			{/if}
+		{/if}
 		<MenuSeparator />
 		{@render item('scissors', 'Cut', manager.actions.cut)}
 		{@render item('copy', 'Copy', manager.actions.copy)}

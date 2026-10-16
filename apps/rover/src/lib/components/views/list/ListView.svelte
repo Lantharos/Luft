@@ -2,6 +2,7 @@
 	import { bytes, plural, VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { folderCounts } from '#lib/features/onscreen/folder-counts.svelte.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
@@ -101,6 +102,7 @@
 				<span class="list-name">
 					<EntryIcon name={entryIcon(row)} size={24} {...thumbnailOf(row)} />
 					<EntryName entry={row} {manager} class="truncate" />
+					<CloudMark state={manager.cloud.stateOf(row.path)} />
 					<VcsBadge status={vcs.statusFor(row.path, row.is_dir)} />
 				</span>
 				{#each columns.shown as column (column.id)}

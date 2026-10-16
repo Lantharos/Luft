@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { bytes, plural } from '@luft/ui';
+	import { describe } from '#lib/features/cloud.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { projectSummary } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -20,7 +21,8 @@
 		const selected = `${manager.selection.size} of ${plural(count, 'item')} selected`;
 		return selectedSize > 0 ? `${selected} · ${bytes(selectedSize)}` : selected;
 	});
-	let drive = $derived(manager.view === 'home' ? manager.drives.holding(manager.currentPath) : undefined);
+	let cloudDrive = $derived(manager.view === 'home' ? manager.cloud.holding(manager.currentPath) : undefined);
+	let drive = $derived(manager.view === 'home' && !cloudDrive ? manager.drives.holding(manager.currentPath) : undefined);
 	let status = $derived.by(() => {
 		if (vcs.busy === 'sync') return 'Syncing…';
 		if (vcs.busy === 'save') return vcs.project?.kind === 'pig' ? 'Saving…' : 'Committing…';
@@ -38,7 +40,9 @@
 			{#if status}
 				<span class="truncate">{status}</span>
 			{/if}
-			{#if drive}
+			{#if cloudDrive}
+				<span class="truncate">{describe(cloudDrive)}</span>
+			{:else if drive}
 				<span class="shrink-0">{bytes(drive.available_space)} free</span>
 			{/if}
 		{/if}

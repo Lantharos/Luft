@@ -41,6 +41,7 @@
 			features.events.counts(folderCounts.receive),
 			features.events.search(search.receive)
 		];
+		thumbnails.skipWhen(manager.cloud.onlineOnly);
 		void features.historyState().then(history.receive);
 		return () => unsubscribe.forEach((stop) => stop());
 	});

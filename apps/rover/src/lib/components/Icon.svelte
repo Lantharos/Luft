@@ -14,7 +14,8 @@
 		| 'clock' | 'panel-right' | 'more-horizontal' | 'chevron-left' | 'chevron-down'
 		| 'volume' | 'volume-x'
 		| 'git-branch' | 'arrow-up' | 'columns-3' | 'link' | 'lock' | 'search' | 'minus' | 'folder-x'
-		| 'terminal' | 'info' | 'copy-plus' | 'package-open' | 'chart-pie';
+		| 'terminal' | 'info' | 'copy-plus' | 'package-open' | 'chart-pie'
+		| 'cloud' | 'cloud-off' | 'circle-check';
 </script>
 
 <script lang="ts">
@@ -39,7 +40,16 @@
 	class={className}
 	aria-hidden="true"
 >
-	{#if name === 'home'}
+	{#if name === 'cloud'}
+		<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+	{:else if name === 'cloud-off'}
+		<path d="m2 2 20 20" />
+		<path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193" />
+		<path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07" />
+	{:else if name === 'circle-check'}
+		<circle cx="12" cy="12" r="10" />
+		<path d="m9 12 2 2 4-4" />
+	{:else if name === 'home'}
 		<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
 		<path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
 	{:else if name === 'star'}

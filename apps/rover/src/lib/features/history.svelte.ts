@@ -36,6 +36,8 @@ class History {
 		this.toast = null;
 	};
 
+	inform = (message: string) => this.#show('info', message);
+
 	hold = () => clearTimeout(this.#timer);
 
 	release = () => {

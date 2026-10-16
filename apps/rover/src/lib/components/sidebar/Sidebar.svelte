@@ -6,6 +6,7 @@
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
 	import { userFolders, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
+	import CloudGroup from './CloudGroup.svelte';
 	import DriveItem from './DriveItem.svelte';
 	import FavoritesGroup from './FavoritesGroup.svelte';
 	import NetworkItem from './NetworkItem.svelte';
@@ -122,6 +123,10 @@
 					<WindowsItem {drive} {manager} />
 				{/each}
 			</div>
+		{/if}
+
+		{#if manager.cloud.available}
+			<CloudGroup {manager} {drag} adding={!chooser} onopentab={openInTab} />
 		{/if}
 
 		{#if manager.network.entries.length > 0}

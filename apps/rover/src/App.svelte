@@ -6,6 +6,7 @@
 	import DialogHost from '#lib/components/dialogs/DialogHost.svelte';
 	import FilePane from '#lib/components/pane/FilePane.svelte';
 	import QuickLook from '#lib/components/preview/QuickLook.svelte';
+	import CloudNotes from '#lib/components/cloud/CloudNotes.svelte';
 	import ChooserBar from '#lib/components/shell/ChooserBar.svelte';
 	import FileContextMenu from '#lib/components/shell/FileContextMenu.svelte';
 	import OperationDock from '#lib/components/shell/OperationDock.svelte';
@@ -57,6 +58,7 @@
 			}),
 			api.events.drives(manager.reloadDrives),
 			api.events.network(manager.reloadNetwork),
+			api.events.cloud(manager.cloud.load),
 			api.events.networkAsk(manager.network.receiveAsk),
 			api.events.vcsStatus(vcs.receive),
 			api.events.directory(({ path }) => {
@@ -116,6 +118,9 @@
 		<main class="glass-content relative isolate">
 			<Toolbar {manager} {drag} {view} {vcs} chooser={Boolean(chooser)} />
 			<TabStrip {manager} {drag} />
+			{#if !chooser}
+				<CloudNotes {manager} />
+			{/if}
 
 			<div class="flex min-h-0 flex-1 overflow-hidden">
 				<FilePane />

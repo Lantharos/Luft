@@ -1941,6 +1941,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f66e8d5d03f609abc3a39e6f08e4164ebf1447a732906d39eb9b99b7919ef39"
 
 [[package]]
+name = "luft-accounts"
+version = "0.1.0"
+dependencies = [
+ "luft-dbus",
+ "serde",
+ "serde_json",
+ "zbus",
+]
+
+[[package]]
 name = "luft-app"
 version = "0.1.0"
 dependencies = [
@@ -2876,6 +2886,7 @@ dependencies = [
  "imagesize",
  "libc",
  "liblzma",
+ "luft-accounts",
  "luft-app",
  "memchr",
  "mime_guess",

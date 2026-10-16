@@ -6,7 +6,7 @@ import type St from 'gi://St';
 
 import { levelLayout, type BatteryGeometry, type Rect } from './geometry.js';
 
-const OUTLINE_ALPHA = 0.4;
+const OUTLINE_ALPHA = 0.55;
 const TRACK_ALPHA = 0.3;
 const HALO_STEPS = 3;
 const BOLT: [number, number][] = [[0.68, 0], [0.04, 0.57], [0.46, 0.57], [0.32, 1], [0.96, 0.43], [0.54, 0.43]];

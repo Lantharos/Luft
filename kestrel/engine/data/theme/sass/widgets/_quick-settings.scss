@@ -189,7 +189,8 @@ $quick_toggle_checked_separator_color: if(
 }
 
 .nm-network-item {
-  .wireless-secure-icon { icon-size: $scalable_icon_size * 0.5; } // half-size symbolic
+  .wireless-icons { width: $scalable_icon_size * 1.25; }
+  .wireless-secure-icon { icon-size: $scalable_icon_size * 0.5; }
 }
 
 .bt-device-item {

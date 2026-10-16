@@ -966,14 +966,25 @@ class NMWirelessNetworkItem extends PopupMenu.PopupBaseMenuItem {
 
         this._network = network;
 
-        const icons = new St.BoxLayout();
+        const icons = new St.Widget({
+            style_class: 'wireless-icons',
+            layout_manager: new Clutter.BinLayout(),
+            y_align: Clutter.ActorAlign.CENTER,
+        });
         this.add_child(icons);
 
-        this._signalIcon = new St.Icon({style_class: 'popup-menu-icon'});
+        this._signalIcon = new St.Icon({
+            style_class: 'popup-menu-icon',
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+        });
         icons.add_child(this._signalIcon);
 
         this._secureIcon = new St.Icon({
             style_class: 'wireless-secure-icon',
+            x_expand: true,
+            y_expand: true,
+            x_align: Clutter.ActorAlign.END,
             y_align: Clutter.ActorAlign.END,
         });
         icons.add_child(this._secureIcon);
@@ -2034,6 +2045,8 @@ class Indicator extends SystemIndicator {
             'notify::activating-connection', () => this._syncMainConnection(),
             'notify::connectivity', () => this._syncConnectivity(),
             this);
+        this._wirelessToggle.connectObject('notify::visible',
+            () => this._updateIcon(), this);
         this._syncMainConnection();
 
         try {
@@ -2118,7 +2131,10 @@ class Indicator extends SystemIndicator {
 
     _updateIcon() {
         const [dev] = this._mainConnection?.get_devices() ?? [];
-        const primaryToggle = this._deviceToggles.get(dev?.device_type) ?? null;
+        const idleToggle = this._wirelessToggle.visible ? this._wirelessToggle : null;
+        const primaryToggle = this._mainConnection
+            ? this._deviceToggles.get(dev?.device_type) ?? null
+            : idleToggle;
         this._primaryIndicatorBinding.source = primaryToggle;
 
         if (!primaryToggle) {

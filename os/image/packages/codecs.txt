@@ -1,4 +1,3 @@
 ffmpeg-libs
 gstreamer1-plugins-bad-freeworld
 gstreamer1-plugins-ugly
-mesa-va-drivers-freeworld

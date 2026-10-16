@@ -1,4 +1,4 @@
-export { appearance, type Appearance, type AppIconPaint, type AppIcons, type AppIconStyle, type Palette, type Scheme, type SchemeColors, type Typography } from './appearance.svelte';
+export { appearance, type Appearance, type AppIconStyle, type Palette, type Scheme, type SchemeColors } from './appearance.svelte';
 
 export { default as Choice } from './choices/Choice.svelte';
 export { default as SplitBar } from './choices/SplitBar.svelte';
@@ -45,7 +45,6 @@ export {
 	FingerprintEnrollment,
 	fingerprintReader,
 	fingerprints,
-	type EnrollPhase,
 	type Fingerprints
 } from './security/fingerprint.svelte';
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';

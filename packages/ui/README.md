@@ -112,6 +112,9 @@ $effect(() => {
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own; `onseek` and `onscrub` |
 | `NativeVideoSurface` | Plays `src` through Sabine's native video for formats Chromium can't decode; bind `player`, handle `onfail` |
 | `RecoveryKey` | Recovery key in groups of eight with copy, `onsave` and `onprint` |
+| `Choice` | Large option button with an icon, title, description and optional `note` |
+| `SplitBar` | Draggable bar that splits a drive's space between two parts |
+| `FingerprintDial` | Progress ring and prompt for a `FingerprintEnrollment` |
 
 ## Helpers
 
@@ -124,6 +127,7 @@ $effect(() => {
 | `dragFiles(dataTransfer, paths)` | Puts files in a drag, so other apps receive them as files |
 | `fileDragStart(path)` | A `dragstart` handler that drags the file at `path` |
 | `pathsFromUriList`, `fileUrlPath` | Paths from `text/uri-list` contents and `file://` URLs |
+| `fileUri(path)` | A `file://` URL for a path |
 | `basename`, `isInside` | A path's last part, and whether a path is inside a folder |
 | `bytes`, `memoryBytes` | Sizes in decimal and binary units |
 | `plural(count, singular, pluralForm?)` | `3 files` |
@@ -133,8 +137,9 @@ $effect(() => {
 | `renderMarkdown(source, path)` | Markdown to HTML, with relative images resolved against `path` |
 | `canPlayNatively()`, `decodeFailed(media)` | Whether native video is available, and whether a `<video>` failed to decode |
 | `MediaState` | A native player's state as reactive fields with setters, for `MediaControls` |
+| `FingerprintEnrollment`, `fingerprints()`, `fingerprintReader()`, `deleteFingerprint(finger)` | Enrolling and managing fingerprints through `luft-fingerprint`; `FINGERS` and `fingerLabel` name the fingers |
 
-Types: `Appearance`, `AppIconPaint`, `AppIcons`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `Typography`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
+Types: `Appearance`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
 
 ## Classes
 

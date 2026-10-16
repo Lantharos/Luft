@@ -4,6 +4,7 @@
 
 	const KEY_STEP = 5;
 	const PAGE_STEP = 30;
+	const THUMB = 12;
 
 	interface Props {
 		time: number;
@@ -28,7 +29,7 @@
 
 	function pointerFraction(event: PointerEvent) {
 		const box = track!.getBoundingClientRect();
-		return Math.min(1, Math.max(0, (event.clientX - box.left) / box.width));
+		return Math.min(1, Math.max(0, (event.clientX - box.left - THUMB / 2) / (box.width - THUMB)));
 	}
 
 	function seek(next: number) {
@@ -75,6 +76,7 @@
 	aria-valuetext={formatClock(shown)}
 	aria-disabled={!length}
 	class="seek"
+	style:--thumb="{THUMB}px"
 	class:active={hover !== null || draft !== null}
 	class:disabled={!length}
 	onpointerdown={pointerDown}
@@ -88,9 +90,9 @@
 		<div class="buffered" style:transform="scaleX({bufferedFraction})"></div>
 		<div class="fill" style:transform="scaleX({fraction})"></div>
 	</div>
-	<div class="thumb" style:left="{fraction * 100}%"></div>
+	<div class="thumb" style:--at={fraction}></div>
 	{#if hover !== null && length}
-		<div class="bubble" style:left="{hover * 100}%">
+		<div class="bubble" style:--at={hover}>
 			{@render preview?.(hover * length)}
 			<span class="time">{formatClock(hover * length)}</span>
 		</div>
@@ -105,6 +107,7 @@
 		min-width: 80px;
 		touch-action: none;
 		cursor: pointer;
+		user-select: none;
 	}
 
 	.seek.disabled {
@@ -140,12 +143,17 @@
 		background: var(--accent);
 	}
 
-	.thumb {
+	.thumb,
+	.bubble {
 		position: absolute;
+		left: calc(var(--thumb) / 2 + var(--at) * (100% - var(--thumb)));
+	}
+
+	.thumb {
 		top: 8px;
-		height: 12px;
-		width: 12px;
-		margin-left: -6px;
+		height: var(--thumb);
+		width: var(--thumb);
+		margin-left: calc(var(--thumb) / -2);
 		border-radius: var(--radius-pill);
 		background: var(--text);
 		box-shadow: 0 1px 4px var(--shadow-soft);
@@ -162,7 +170,6 @@
 	}
 
 	.bubble {
-		position: absolute;
 		bottom: 30px;
 		display: flex;
 		flex-direction: column;

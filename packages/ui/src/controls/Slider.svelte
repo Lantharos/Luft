@@ -13,6 +13,8 @@
 
 	let { value, min = 0, max = 1, step = 0.01, label, disabled = false, format, oninput, onchange }: Props = $props();
 
+	const THUMB = 20;
+
 	let track = $state<HTMLDivElement>();
 	let dragging = $state(false);
 	let draft = $state<number | null>(null);
@@ -27,7 +29,8 @@
 
 	function fromPointer(event: PointerEvent) {
 		const box = track!.getBoundingClientRect();
-		return snap(min + ((event.clientX - box.left) / box.width) * (max - min));
+		const travel = (event.clientX - box.left - THUMB / 2) / (box.width - THUMB);
+		return snap(min + Math.min(1, Math.max(0, travel)) * (max - min));
 	}
 
 	function update(next: number) {
@@ -42,7 +45,7 @@
 	}
 
 	function pointerDown(event: PointerEvent) {
-		if (disabled) return;
+		if (disabled || event.button !== 0) return;
 		dragging = true;
 		track!.setPointerCapture(event.pointerId);
 		update(fromPointer(event));
@@ -78,6 +81,8 @@
 	aria-valuetext={format?.(current)}
 	aria-disabled={disabled}
 	class="slider"
+	style:--thumb="{THUMB}px"
+	style:--fraction={fraction}
 	class:dragging
 	class:disabled
 	onpointerdown={pointerDown}
@@ -87,9 +92,9 @@
 	onkeydown={keydown}
 >
 	<div class="rail">
-		<div class="fill" style:width="{fraction * 100}%"></div>
+		<div class="fill"></div>
 	</div>
-	<div class="thumb" style:left="{fraction * 100}%">
+	<div class="thumb">
 		{#if dragging && format}
 			<span class="value">{format(current)}</span>
 		{/if}
@@ -103,6 +108,8 @@
 		width: 100%;
 		min-width: 120px;
 		touch-action: none;
+		user-select: none;
+		--travel: calc(var(--thumb) / 2 + var(--fraction) * (100% - var(--thumb)));
 	}
 
 	.slider.disabled {
@@ -118,6 +125,7 @@
 	}
 
 	.fill {
+		width: var(--travel);
 		height: 100%;
 		background: var(--accent);
 	}
@@ -125,9 +133,10 @@
 	.thumb {
 		position: absolute;
 		top: 4px;
-		height: 20px;
-		width: 20px;
-		margin-left: -10px;
+		left: var(--travel);
+		height: var(--thumb);
+		width: var(--thumb);
+		margin-left: calc(var(--thumb) / -2);
 		border-radius: var(--radius-pill);
 		background: var(--text);
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);

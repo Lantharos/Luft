@@ -30,6 +30,7 @@
 	}
 
 	function down(event: PointerEvent) {
+		if (event.button !== 0) return;
 		dragging = true;
 		track!.setPointerCapture(event.pointerId);
 		fromPointer(event);
@@ -58,6 +59,7 @@
 		onpointerdown={down}
 		onpointermove={(event) => dragging && fromPointer(event)}
 		onpointerup={() => (dragging = false)}
+		onpointercancel={() => (dragging = false)}
 		onkeydown={keydown}
 	>
 		<div class="windows" style:width="{split}%">
@@ -79,6 +81,7 @@
 		height: 64px;
 		gap: 6px;
 		touch-action: none;
+		user-select: none;
 		outline-offset: 4px;
 	}
 

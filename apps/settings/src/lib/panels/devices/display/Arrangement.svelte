@@ -124,6 +124,7 @@
 		position: relative;
 		overflow: hidden;
 		touch-action: none;
+		user-select: none;
 	}
 
 	.display {

@@ -5,6 +5,8 @@ import socket
 import struct
 
 WIDTH, HEIGHT = 320, 240
+OPAQUE_PIXEL = b"\x40\x30\x20\xff"
+ARGB8888, XRGB8888 = 0, 1
 DISPLAY, REGISTRY, SYNC = 1, 2, 3
 
 
@@ -67,9 +69,10 @@ class Connection:
 class Toplevel:
     """A mapped xdg_toplevel showing a solid shared-memory buffer."""
 
-    def __init__(self, connection, ids):
+    def __init__(self, connection, ids, width=WIDTH, height=HEIGHT, pixel=OPAQUE_PIXEL, pixel_format=XRGB8888):
         self.connection = connection
         self.ids = ids
+        self.width, self.height, self.pixel, self.pixel_format = width, height, pixel, pixel_format
         connection.send(ids["compositor"], 0, struct.pack("=I", ids["surface"]))
 
     def map(self, title, app_id):
@@ -79,14 +82,14 @@ class Toplevel:
         connection.send(ids["toplevel"], 2, string(title))
         connection.send(ids["toplevel"], 3, string(app_id))
         connection.send(ids["surface"], 6)
-        size = WIDTH * HEIGHT * 4
+        size = self.width * self.height * 4
         fd = os.memfd_create("kestrel-toplevel")
         os.ftruncate(fd, size)
         with mmap.mmap(fd, size) as pixels:
-            pixels.write(b"\x40\x30\x20\xff" * WIDTH * HEIGHT)
+            pixels.write(self.pixel * self.width * self.height)
         connection.send(ids["shm"], 0, struct.pack("=Ii", ids["pool"], size), fd)
         os.close(fd)
-        connection.send(ids["pool"], 0, struct.pack("=IiiiiI", ids["buffer"], 0, WIDTH, HEIGHT, WIDTH * 4, 1))
+        connection.send(ids["pool"], 0, struct.pack("=IiiiiI", ids["buffer"], 0, self.width, self.height, self.width * 4, self.pixel_format))
 
     def handle(self, sender, opcode, payload):
         connection, ids = self.connection, self.ids
@@ -99,7 +102,7 @@ class Toplevel:
         elif sender == ids["xdg_surface"] and opcode == 0:
             connection.send(ids["xdg_surface"], 4, payload[:4])
             connection.send(ids["surface"], 1, struct.pack("=Iii", ids["buffer"], 0, 0))
-            connection.send(ids["surface"], 2, struct.pack("=iiii", 0, 0, WIDTH, HEIGHT))
+            connection.send(ids["surface"], 2, struct.pack("=iiii", 0, 0, self.width, self.height))
             connection.send(ids["surface"], 6)
 
     def run(self):

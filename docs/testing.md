@@ -14,6 +14,7 @@ Build Kestrel first (see the [repository README](../README.md#develop)). Then fr
 | `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft (needs `KESTREL_DEV_APPS=setup` or an installed build) |
 | `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
+| `kestrel/tools/session.sh frames` | Frame times of animations and gestures, see [Frame timing](#frame-timing) |
 
 `capture` splits the checks into groups and runs several sessions side by side:
 
@@ -36,8 +37,21 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_CAPTURE_SCHEME` | the host's | `light` or `dark`, to capture every surface in one style |
 | `KESTREL_CAPTURE_WALLPAPER` | the host's | An image used as the wallpaper for both styles, to check the glass on light and dark pictures |
 | `KESTREL_DEV_APPS` | none | Luft apps to test from their build folders instead of the installed ones, such as `rover,settings` (run `bun run desktop:build` in each first) |
+| `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |
+| `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on, such as one from `kestrel/compositor/build.sh BUILD_DIR PREFIX` |
 
 Optional tools widen the capture: with `rclone` installed Rover connects to local WebDAV and FTP servers, and with `stalwart` Mailman signs in to a local mail server.
+
+### Frame timing
+
+`frames` opens Start, quick settings, the notification center and the overview, opens, closes and drags windows, slides windows under stacked glass and under a blurred app window, and enters, pans, pinches, zooms and leaves a board. Each runs three times for timing and twice more to time the GPU. For every interaction it prints the frames drawn, missed refreshes, frames slower than a refresh, CPU time per frame on the compositor thread, update time, layout time and GPU time after each frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
+
+| Variable | Purpose |
+| --- | --- |
+| `KESTREL_FRAMES_BASELINE` | A saved report to compare against; each value prints as before → after |
+| `KESTREL_FRAMES_ONLY` | Comma-separated words; only interactions whose name contains one run |
+
+`KESTREL_CAPTURE_SIZE=1920x1200:302x189mm` measures a 14-inch laptop panel at its own scale. To compare two builds, point `KESTREL_BUILD` and `KESTREL_COMPOSITOR` at each in turn, ideally while nothing else loads the machine.
 
 Polkit, real network credentials, unlocking with the computer's own sign-in rules, physical displays and suspend still need a real login session.
 

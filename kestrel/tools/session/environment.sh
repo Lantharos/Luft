@@ -2,9 +2,10 @@
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 tools="$root/kestrel/tools"
-build="$root/kestrel/build"
-compositor="$root/kestrel/run/mutter-install/lib"
-compositor_data="$root/kestrel/run/mutter-install/share"
+build="${KESTREL_BUILD:-$root/kestrel/build}"
+compositor_prefix="${KESTREL_COMPOSITOR:-$root/kestrel/run/mutter-install}"
+compositor="$compositor_prefix/lib"
+compositor_data="$compositor_prefix/share"
 export KESTREL_CAPTURE_DIR="${KESTREL_CAPTURE_DIR:-$root/kestrel/run/screenshots}"
 
 session_hash() {

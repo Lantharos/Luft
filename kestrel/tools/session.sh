@@ -12,6 +12,7 @@ Modes:
   nested        Run Kestrel in a window on the current desktop (default).
   capture       Run the checks headless and save screenshots.
   performance   Measure startup and Start menu timings headless.
+  frames        Measure frame times of animations and gestures headless.
   greeter       Run the login screen checks headless.
   setup         Run the first-run setup checks headless.
   scaling       Check the default scale of laptop panels and monitors headless.
@@ -32,6 +33,10 @@ Environment:
   KESTREL_CAPTURE_SCHEME  Starts sessions light or dark (default: as on this desktop).
   KESTREL_CAPTURE_WALLPAPER  Image to use as the wallpaper in both schemes.
   KESTREL_DEV_APPS      Comma separated Luft apps to use from their own build.
+  KESTREL_BUILD         Kestrel build to run (default: kestrel/build).
+  KESTREL_COMPOSITOR    Mutter install to run on (default: kestrel/run/mutter-install).
+  KESTREL_FRAMES_BASELINE  A saved frames report to compare against.
+  KESTREL_FRAMES_ONLY   Comma separated words; measures only interactions named with one.
 USAGE
 }
 
@@ -39,7 +44,7 @@ mode="${1:-nested}"
 [[ $# -eq 0 ]] || shift
 case "$mode" in
   -h | --help) usage; exit 0 ;;
-  nested | performance | greeter)
+  nested | performance | frames | greeter)
     [[ $# -eq 0 ]] || { usage >&2; exit 2; }
     require_build
     build_helpers

@@ -8,4 +8,5 @@ CoglPipeline *shell_backdrop_capture (GHashTable          *cache,
                                      ClutterPaintContext *context,
                                      ClutterActorBox     *actor_box,
                                      ClutterActorBox     *area,
+                                     float                scale,
                                      gboolean            *changed);

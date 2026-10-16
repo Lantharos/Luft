@@ -408,13 +408,41 @@ shell_blur_effect_set_actor (ClutterActorMeta *meta,
   self->actor = clutter_actor_meta_get_actor (meta);
 }
 
-static void
+static float
+stage_to_framebuffer (ShellBlurEffect     *self,
+                      ClutterPaintContext *paint_context,
+                      float               *offset_x,
+                      float               *offset_y)
+{
+  ClutterStageView *stage_view = clutter_paint_context_get_stage_view (paint_context);
+  CoglFramebuffer *framebuffer;
+  ClutterActor *stage;
+  MtkRectangle layout;
+  float scale;
+
+  if (stage_view)
+    {
+      scale = clutter_stage_view_get_scale (stage_view);
+      clutter_stage_view_get_layout (stage_view, &layout);
+      *offset_x = -layout.x * scale;
+      *offset_y = -layout.y * scale;
+      return scale;
+    }
+
+  framebuffer = clutter_paint_context_get_framebuffer (paint_context);
+  stage = clutter_actor_get_stage (self->actor);
+  *offset_x = cogl_framebuffer_get_viewport_x (framebuffer);
+  *offset_y = cogl_framebuffer_get_viewport_y (framebuffer);
+  return cogl_framebuffer_get_viewport_width (framebuffer) / clutter_actor_get_width (stage);
+}
+
+static float
 update_actor_box (ShellBlurEffect     *self,
                   ClutterPaintContext *paint_context,
                   ClutterActorBox     *source_actor_box)
 {
-  ClutterStageView *stage_view;
-  float box_scale_factor = 1.0f;
+  float scale = 1.0f;
+  float offset_x, offset_y;
   float origin_x, origin_y;
   float width, height;
 
@@ -425,36 +453,19 @@ update_actor_box (ShellBlurEffect     *self,
       break;
 
     case SHELL_BLUR_MODE_BACKGROUND:
-      stage_view = clutter_paint_context_get_stage_view (paint_context);
-
+      scale = stage_to_framebuffer (self, paint_context, &offset_x, &offset_y);
       clutter_actor_get_transformed_position (self->actor, &origin_x, &origin_y);
       clutter_actor_get_transformed_size (self->actor, &width, &height);
 
-      if (stage_view)
-        {
-          MtkRectangle stage_view_layout;
-
-          box_scale_factor = clutter_stage_view_get_scale (stage_view);
-          clutter_stage_view_get_layout (stage_view, &stage_view_layout);
-
-          origin_x -= stage_view_layout.x;
-          origin_y -= stage_view_layout.y;
-        }
-      else
-        {
-          /* If we're drawing off stage, just assume scale = 1, this won't work
-           * with stage-view scaling though.
-           */
-        }
-
-      clutter_actor_box_set_origin (source_actor_box, origin_x, origin_y);
-      clutter_actor_box_set_size (source_actor_box, width, height);
-
-      clutter_actor_box_scale (source_actor_box, box_scale_factor);
+      clutter_actor_box_set_origin (source_actor_box,
+                                    origin_x * scale + offset_x,
+                                    origin_y * scale + offset_y);
+      clutter_actor_box_set_size (source_actor_box, width * scale, height * scale);
       break;
     }
 
   clutter_actor_box_clamp_to_pixel (source_actor_box);
+  return scale;
 }
 
 static gboolean
@@ -730,8 +741,9 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
       ClutterActorBox actor_box;
       ClutterActorBox area;
       gboolean background_changed = FALSE;
+      float scale;
 
-      update_actor_box (self, paint_context, &actor_box);
+      scale = update_actor_box (self, paint_context, &actor_box);
       area = actor_box;
       if (self->mode == SHELL_BLUR_MODE_BACKGROUND &&
           !fit_to_framebuffer (paint_context, &area))
@@ -746,7 +758,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
         {
           backdrop = shell_backdrop_capture (self->backdrops, self->actor,
                                              paint_context, &actor_box, &area,
-                                             &background_changed);
+                                             scale, &background_changed);
           if (!backdrop)
             goto fail;
 

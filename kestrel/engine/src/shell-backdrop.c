@@ -123,6 +123,7 @@ shell_backdrop_capture (GHashTable          *cache,
                         ClutterPaintContext *context,
                         ClutterActorBox     *actor_box,
                         ClutterActorBox     *area,
+                        float                scale,
                         gboolean            *changed)
 {
   ClutterStageView *view = clutter_paint_context_get_stage_view (context);
@@ -144,7 +145,6 @@ shell_backdrop_capture (GHashTable          *cache,
   if (clutter_actor_has_clip (actor))
     {
       float x, y, width, height;
-      float scale = view ? clutter_stage_view_get_scale (view) : 1.f;
       int x1, y1, x2, y2;
       MtkRectangle clip;
 
@@ -160,7 +160,6 @@ shell_backdrop_capture (GHashTable          *cache,
   if (damage && view)
     {
       MtkRectangle layout;
-      float scale = clutter_stage_view_get_scale (view);
       int i;
 
       clutter_stage_view_get_layout (view, &layout);

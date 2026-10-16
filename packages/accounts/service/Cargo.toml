@@ -1,0 +1,40 @@
+[package]
+name = "luft-accounts-service"
+version = "0.1.0"
+description = "Keeps online accounts in Luft Keyring and brings their files to ~/Cloud through rclone"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[[bin]]
+name = "luft-accounts"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+base64 = "0.23.1"
+futures-util = { version = "0.3.34", default-features = false }
+inotify = "0.11.5"
+libc = "0.2.190"
+luft-accounts = { path = "..", default-features = false }
+rand = "0.10.3"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sha2 = "0.11.1"
+time = { version = "0.3.55", features = ["formatting", "parsing"] }
+tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread", "macros", "time", "sync", "net", "io-util", "process", "fs", "signal"] }
+ureq = { version = "3.4.2", features = ["json", "platform-verifier"] }
+url = "2.5.8"
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

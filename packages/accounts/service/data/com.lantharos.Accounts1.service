@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Accounts1
+Exec=/usr/libexec/luft-accounts
+SystemdService=luft-accounts.service

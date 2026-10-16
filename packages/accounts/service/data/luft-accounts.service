@@ -1,0 +1,14 @@
+[Unit]
+Description=Online accounts and cloud drives
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Accounts1
+ExecStart=/usr/libexec/luft-accounts
+Restart=on-failure
+TimeoutStopSec=30
+
+[Install]
+WantedBy=graphical-session.target

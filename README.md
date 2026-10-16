@@ -67,6 +67,7 @@ Releases are built and signed in CI and published as `ghcr.io/lantharos/luft:45`
 | [`apps/signin`](apps/signin/README.md) | Wi-Fi sign-in pages |
 | [`apps/tern`](apps/tern/README.md) | Terminal |
 | [`packages/ui`](packages/ui/README.md) | Shared Svelte components and styles |
+| [`packages/accounts`](packages/accounts/README.md) | Online accounts in Luft Keyring and the cloud drives they bring |
 | [`packages/app`](packages/app/README.md) | Shared native window, palette, D-Bus and portal code |
 | [`packages/dbus`](packages/dbus/README.md) | D-Bus connections and service properties for apps and system services |
 | [`packages/disks`](packages/disks/README.md) | Drives, partitions and resizing through UDisks |
@@ -75,7 +76,7 @@ Releases are built and signed in CI and published as `ghcr.io/lantharos/luft:45`
 | [`packages/software`](packages/software/README.md) | System updates, Flatpak, AppImages and Toolbox tools |
 | [`packages/windows`](packages/windows/README.md) | Windows on the same computer: Fast Startup, its clock and its Bluetooth devices |
 
-Guides: [installing](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [wallpaper colors](docs/appearance.md), [Kestrel prompts](docs/prompts.md) and [testing](docs/testing.md).
+Guides: [installing](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [wallpaper colors](docs/appearance.md), [Kestrel prompts](docs/prompts.md), [cloud drives](docs/cloud.md) and [testing](docs/testing.md).
 
 ## Develop
 

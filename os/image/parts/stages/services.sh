@@ -35,3 +35,11 @@ printf 'enable luft-windows-boot.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-windows.preset"
 printf 'enable luft-windows-notice.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-windows.preset"
+
+accounts="$luft/packages/accounts/service"
+cargo build --release --locked --manifest-path "$accounts/Cargo.toml"
+install -Dm755 "$CARGO_TARGET_DIR/release/luft-accounts" "$destdir/usr/libexec/luft-accounts"
+install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$accounts/data/com.lantharos.Accounts1.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/user" "$accounts/data/luft-accounts.service"
+printf 'enable luft-accounts.service\n' |
+  install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-accounts.preset"

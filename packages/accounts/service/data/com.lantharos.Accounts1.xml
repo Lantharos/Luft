@@ -1,0 +1,104 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Accounts1">
+  <!--
+    Online accounts, kept in Luft Keyring, and the cloud drives they bring to ~/Cloud. Runs in the
+    session, starts at login and on demand. Payloads are JSON in camelCase; the shapes are the types
+    in packages/accounts/src/types.rs.
+  -->
+  <interface name="com.lantharos.Accounts1">
+    <!-- [Account]: {"id", "provider" ("onedrive", "dropbox", "icloud", "nextcloud" or "webdav"), "name",
+         "user", "server", "services" (["files"]), "standing" ({"kind": "ready"} or
+         {"kind": "signInAgain", "reason"})}. Secrets never leave the service. -->
+    <method name="Accounts">
+      <arg name="accounts" type="s" direction="out"/>
+    </method>
+    <!-- Starts signing in. Credentials: {"server", "user", "password"}, each only where the provider
+         needs it: none for OneDrive and Dropbox, which hand over to the browser; the server alone for
+         Nextcloud's browser sign-in, or with a user and app password; all three for WebDAV; the Apple
+         Account email and password for iCloud. Returns a session followed through SignInStep. -->
+    <method name="SignIn">
+      <arg name="provider" type="s" direction="in"/>
+      <arg name="credentials" type="s" direction="in"/>
+      <arg name="session" type="s" direction="out"/>
+    </method>
+    <!-- Signs an existing account in again, keeping its files and settings. iCloud reuses the saved
+         password unless credentials bring a new one. -->
+    <method name="SignInAgain">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="credentials" type="s" direction="in"/>
+      <arg name="session" type="s" direction="out"/>
+    </method>
+    <!-- The current step: {"step": "working"}, {"step": "browser", "url"} to open, {"step": "code",
+         "prompt", "texted"} for a two-factor code, {"step": "phones", "phones": [{"id", "number"}]} to
+         pick where a code is texted, {"step": "approve"} while Apple waits for approval on a device,
+         {"step": "done", "account"} or {"step": "failed", "message"}. -->
+    <method name="Step">
+      <arg name="session" type="s" direction="in"/>
+      <arg name="step" type="s" direction="out"/>
+    </method>
+    <!-- {"kind": "code", "code"}, {"kind": "text"} to have the code texted instead, or
+         {"kind": "phone", "id"}. -->
+    <method name="Answer">
+      <arg name="session" type="s" direction="in"/>
+      <arg name="answer" type="s" direction="in"/>
+    </method>
+    <method name="Cancel">
+      <arg name="session" type="s" direction="in"/>
+    </method>
+    <!-- Renames the account, which also renames its folder in ~/Cloud. -->
+    <method name="Rename">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="name" type="s" direction="in"/>
+    </method>
+    <!-- Syncs what's kept on this device, then removes the account, its secret and its local copies. -->
+    <method name="Remove">
+      <arg name="account" type="s" direction="in"/>
+    </method>
+    <signal name="Changed"/>
+    <signal name="SignInStep">
+      <arg name="session" type="s"/>
+      <arg name="step" type="s"/>
+    </signal>
+  </interface>
+
+  <interface name="com.lantharos.Accounts1.Files">
+    <!-- [Drive]: {"account", "provider", "name", "path", "state" ("connecting", "ready", "offline",
+         "signInAgain" or "problem"), "problem", "paused" (null, "metered" or "battery"), "syncing"
+         (uploads waiting), "usage" ({"used", "total"} or null), "kept" (paths kept on this device),
+         "conflicts" ([{"path", "copy", "copyFrom" ("thisDevice" or "cloud"), "at"}]), "shareLinks",
+         "web"}. -->
+    <method name="Drives">
+      <arg name="drives" type="s" direction="out"/>
+    </method>
+    <!-- {name: "online", "local" or "syncing"} for each entry of a folder inside a drive. -->
+    <method name="States">
+      <arg name="folder" type="s" direction="in"/>
+      <arg name="states" type="s" direction="out"/>
+    </method>
+    <!-- Keeps files or folders on this device and syncs them both ways. -->
+    <method name="Keep">
+      <arg name="paths" type="as" direction="in"/>
+    </method>
+    <!-- Syncs, then frees the local copies; the files stay online. Needs a connection. -->
+    <method name="Free">
+      <arg name="paths" type="as" direction="in"/>
+    </method>
+    <!-- A link anyone can open, where the service makes them (OneDrive, Dropbox, Nextcloud). -->
+    <method name="ShareLink">
+      <arg name="path" type="s" direction="in"/>
+      <arg name="url" type="s" direction="out"/>
+    </method>
+    <!-- The file or folder on the service's website (OneDrive, Dropbox, Nextcloud). -->
+    <method name="WebAddress">
+      <arg name="path" type="s" direction="in"/>
+      <arg name="url" type="s" direction="out"/>
+    </method>
+    <!-- Hides the note about a conflict copy, by the copy's path inside the drive. -->
+    <method name="DismissConflict">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="copy" type="s" direction="in"/>
+    </method>
+    <signal name="DrivesChanged"/>
+  </interface>
+</node>

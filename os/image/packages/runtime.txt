@@ -23,6 +23,7 @@ fedora-flathub-remote
 flatpak
 fprintd
 fprintd-pam
+fuse3
 fwupd
 gcr
 gdk-pixbuf2-modules-extra
@@ -82,6 +83,7 @@ plymouth
 polkit
 power-profiles-daemon
 python3-gobject
+rclone
 shared-mime-info
 skopeo
 steam-devices

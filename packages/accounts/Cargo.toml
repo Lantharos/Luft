@@ -1,0 +1,18 @@
+[package]
+name = "luft-accounts"
+version = "0.1.0"
+description = "Online accounts and the cloud drives they bring, shared by Settings, Rover and Luft's other apps"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[features]
+default = ["client"]
+client = ["dep:luft-dbus", "dep:serde_json", "dep:zbus"]
+
+[dependencies]
+luft-dbus = { path = "../dbus", optional = true }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", optional = true }
+zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"], optional = true }

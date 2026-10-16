@@ -40,6 +40,12 @@ pub struct Checked {
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct GraphicsSeen {
+    pub cards: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Found {
     pub update: Option<Update>,
 }
@@ -105,6 +111,20 @@ impl Checked {
 impl Found {
     fn file() -> PathBuf {
         path(dirs::state_dir(), "image-update.json")
+    }
+
+    pub fn load() -> Self {
+        load(Self::file())
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        save(Self::file(), self)
+    }
+}
+
+impl GraphicsSeen {
+    fn file() -> PathBuf {
+        path(dirs::state_dir(), "graphics.json")
     }
 
     pub fn load() -> Self {

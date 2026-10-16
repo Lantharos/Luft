@@ -13,8 +13,9 @@ function packagesHeadline({ prepared, updates }: PackageOverview) {
 	return 'Your system is up to date';
 }
 
-function imageHeadline({ returning, staged, available }: ImageOverview) {
+function imageHeadline({ returning, switching, staged, available }: ImageOverview) {
 	if (returning) return `Ready to go back to ${versionName(returning).toLowerCase()}`;
+	if (switching) return switching === 'nvidia' ? "NVIDIA's driver is ready" : 'The standard image is ready';
 	if (staged) return `${versionName(staged)} is ready to install`;
 	if (available) return `${versionName(available)} is available`;
 	return 'Your system is up to date';
@@ -31,6 +32,7 @@ function waiting(overview: Overview) {
 	const system = overview.system;
 	if (system.kind === 'packages') return system.prepared ? `Restart to install them. ${BACK_SOON}` : null;
 	if (system.returning) return 'Restart to finish going back.';
+	if (system.switching) return `Restart to finish. ${BACK_SOON}`;
 	return system.staged ? `Restart to install it. ${BACK_SOON}` : null;
 }
 

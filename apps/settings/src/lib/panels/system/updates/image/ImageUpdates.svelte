@@ -3,6 +3,7 @@
 	import { download, restart, rollback, type Activity, type ImageOverview, type Release } from '../api';
 	import { versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
+	import VariantRow from './VariantRow.svelte';
 
 	interface Props {
 		overview: ImageOverview;
@@ -15,7 +16,7 @@
 	let notes = $state<Release | null>(null);
 
 	const busy = $derived(activity.running !== null);
-	const next = $derived(overview.staged ?? overview.available);
+	const next = $derived(overview.switching ? null : (overview.staged ?? overview.available));
 
 	const released = (release: Release) => (release.released ? `Released ${ago(release.released)}` : null);
 
@@ -55,6 +56,7 @@
 			<button type="button" class="button" onclick={() => (notes = overview.current)}>What's new</button>
 		{/if}
 	</Row>
+	<VariantRow {overview} {activity} {attempt} />
 	{#if overview.previous && !overview.returning}
 		<Row title="Go back to the previous version" description="{versionName(overview.previous)}. Your files and settings stay as they are.">
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>Go back</button>

@@ -1,0 +1,13 @@
+[Unit]
+Description=Offer NVIDIA's driver when an NVIDIA graphics card is new to this computer
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/settings --check-graphics
+Nice=10
+
+[Install]
+WantedBy=graphical-session.target

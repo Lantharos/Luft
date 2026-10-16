@@ -1,6 +1,7 @@
 import { invoke, listen } from '#lib/bridge.js';
 
 export type Schedule = 'daily' | 'weekly' | 'never';
+export type Variant = 'standard' | 'nvidia';
 export type Stage = 'waiting' | 'preparing' | 'downloading' | 'installing' | 'removing' | 'finishing';
 
 export interface PackageId {
@@ -32,7 +33,7 @@ export interface Elsewhere {
 }
 
 export interface Activity {
-	running: 'check' | 'download' | 'firmware' | 'rollback' | 'elsewhere' | null;
+	running: 'check' | 'download' | 'firmware' | 'rollback' | 'switch' | 'elsewhere' | null;
 	target: string | null;
 	elsewhere: Elsewhere | null;
 	progress: Progress | null;
@@ -64,13 +65,20 @@ export interface Release {
 	released: number | null;
 }
 
+export interface VariantOffer {
+	to: Variant;
+	size: number | null;
+}
+
 export interface ImageOverview {
 	kind: 'image';
 	current: Release;
 	staged: Release | null;
 	previous: Release | null;
 	returning: Release | null;
+	switching: Variant | null;
 	available: (Release & { size: number }) | null;
+	offer: VariantOffer | null;
 }
 
 export interface Overview {
@@ -105,6 +113,7 @@ export const cancel = () => invoke<void>('updates_cancel');
 export const firmware = () => invoke<Firmware[]>('updates_firmware', {}, SLOW);
 export const installFirmware = (id: string) => invoke<void>('updates_firmware_install', { id });
 export const rollback = () => invoke<void>('updates_rollback');
+export const switchVariant = (variant: Variant) => invoke<void>('updates_switch', { variant });
 export const restart = () => invoke<void>('updates_restart');
 export const preferences = () => invoke<Preferences>('updates_preferences');
 export const setPreferences = (preferences: Preferences) => invoke<void>('updates_set_preferences', { ...preferences });

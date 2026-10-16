@@ -1,3 +1,4 @@
+mod switch;
 mod watch;
 
 use luft_software::image::{self, Deployments, Release, Status, Update};
@@ -8,6 +9,8 @@ use serde::Serialize;
 use super::backend::{AVAILABLE, Backend, Notice, READY};
 use super::overview::{self, Loaded, System};
 use super::store::{Checked, Found};
+
+pub use switch::run as switch;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +26,7 @@ pub struct Overview {
     #[serde(flatten)]
     status: Status,
     available: Option<Available>,
+    offer: Option<switch::Offer>,
 }
 
 pub struct Image;
@@ -46,21 +50,25 @@ pub fn follow(task: Task) -> Result<(), String> {
 
 impl Backend for Image {
     fn load(&self, refresh: Option<Task>) -> Result<Loaded, String> {
+        let refreshed = refresh.is_some();
         let deployments = Deployments::load()?;
         let update = match refresh {
             Some(_) => check(&deployments)?,
             None => Found::load().update,
         };
+        let status = deployments.status();
+        let available = update
+            .filter(|update| deployments.lacks(update))
+            .map(|update| Available {
+                release: update.release,
+                size: update.size,
+            });
         Ok(Loaded {
             package_apps: 0,
             system: System::Image(Box::new(Overview {
-                status: deployments.status(),
-                available: update
-                    .filter(|update| deployments.lacks(update))
-                    .map(|update| Available {
-                        release: update.release,
-                        size: update.size,
-                    }),
+                status,
+                available,
+                offer: switch::offer(deployments, refreshed),
             })),
         })
     }

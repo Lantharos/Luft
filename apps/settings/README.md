@@ -23,7 +23,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 | Users | Account picture, name, password and fingerprints |
 | Accounts | iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV accounts, each a folder in `~/Cloud` (see [cloud drives](../../docs/cloud.md)) |
 | Login Screen | Wallpaper, listed users, default session and automatic login |
-| Updates | System updates and firmware, installed at the next restart, with release notes and a way back to the previous version on image-based installs; app updates are left to Schelf |
+| Updates | System updates and firmware, installed at the next restart, with release notes and a way back to the previous version on image-based installs, and switching between the standard and NVIDIA images; app updates are left to Schelf |
 | About | Device name, hardware, system versions, storage and recent graphics driver problems |
 
 Notes:
@@ -68,3 +68,9 @@ A link to a page for missing hardware, such as Bluetooth without an adapter, exp
 ## Automatic updates
 
 Settings writes the systemd user timer `com.lantharos.settings.updates.timer` the first time Updates opens, and rewrites it when the schedule changes. The timer runs Settings with `--check-updates`, which looks for updates, downloads them without a window and sends a notification when they are ready. On a regular Fedora install that means PackageKit's offline updates; on an image-based install it means the next image, staged for the next restart.
+
+## NVIDIA graphics
+
+On an image-based install, Updates offers NVIDIA's driver when the computer has NVIDIA graphics but runs the standard image, and the smaller standard image when it runs the NVIDIA image without NVIDIA graphics. Switching keeps the channel and version the system follows, downloads the other image, stages it for the next restart and keeps the current one to go back to.
+
+`data/luft-graphics-notice.service`, a user service started with the graphical session, runs Settings with `--check-graphics`. When an NVIDIA card is new to the computer and the standard image is running, it sends one notification that opens Updates.

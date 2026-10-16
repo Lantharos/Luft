@@ -7,7 +7,9 @@ mod system;
 use luft_app::Events;
 use sabine::SabineWindow;
 
-pub use system::updates::{CHECK_ARGUMENT, check_in_background};
+pub use system::updates::{
+    CHECK_ARGUMENT, CHECK_GRAPHICS_ARGUMENT, check_graphics, check_in_background,
+};
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = devices::hardware::register(window, events);

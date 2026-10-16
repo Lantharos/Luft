@@ -2,6 +2,7 @@ mod backend;
 mod background;
 mod elsewhere;
 mod firmware;
+mod graphics;
 mod image;
 mod overview;
 mod packages;
@@ -12,6 +13,7 @@ mod store;
 use std::sync::Once;
 
 use luft_app::{Commands, Events, dbus};
+use luft_software::variant::Variant;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
@@ -21,6 +23,7 @@ use state::{Activity, Kind, Status};
 use store::Preferences;
 
 pub use background::run as check_in_background;
+pub use graphics::{CHECK_GRAPHICS_ARGUMENT, run as check_graphics};
 pub use schedule::CHECK_ARGUMENT;
 
 const APP_UPDATES: &str = "schelf:updates";
@@ -30,6 +33,11 @@ static FIRST_RUN: Once = Once::new();
 #[derive(Deserialize)]
 struct Device {
     id: String,
+}
+
+#[derive(Deserialize)]
+struct Switch {
+    variant: Variant,
 }
 
 fn load(_: Value) -> Result<(), String> {
@@ -78,6 +86,24 @@ fn rollback(_: Value) -> Result<(), String> {
     let started = state::start(
         Activity::new(Kind::Rollback),
         |task| backend::current().rollback(task),
+        || {
+            overview::reload();
+            scan();
+        },
+    );
+    started
+        .then_some(())
+        .ok_or_else(|| "Something else is changing the system right now.".into())
+}
+
+fn switch(Switch { variant }: Switch) -> Result<(), String> {
+    let activity = Activity {
+        target: Some(variant.name().to_owned()),
+        ..Activity::new(Kind::Switch)
+    };
+    let started = state::start(
+        activity,
+        move |task| image::switch(variant, task),
         || {
             overview::reload();
             scan();
@@ -150,6 +176,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_firmware", firmware_updates)
         .command("updates_firmware_install", install_firmware)
         .command("updates_rollback", rollback)
+        .command("updates_switch", switch)
         .command("updates_restart", restart)
         .command("updates_preferences", |_: Value| {
             Ok::<Preferences, String>(Preferences::load())

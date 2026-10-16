@@ -22,6 +22,12 @@ Next to Windows, whose EFI system partition is usually too small for them, the s
 - `bootc rollback` makes the previous version the default from a running system.
 - After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's.
 
+### Switching between the standard and NVIDIA images
+
+When a computer running the standard image has an NVIDIA graphics card, hybrid laptops included, Luft offers NVIDIA's driver in Settings, Updates, and once with a notification after signing in. That happens again only when a different NVIDIA card turns up. The other way round, on the NVIDIA image without an NVIDIA card, Settings offers the smaller standard image without a notification.
+
+Switching stays on the same channel and version: `:45` becomes `:45-nvidia`, `:45-nightly` becomes `:45-nightly-nvidia`, and a pinned release such as `:45.20261014` becomes `:45.20261014-nvidia`. Settings shows the download size, which counts only the parts of the image the computer doesn't have yet, and the switch waits for the next restart like an update. The image it came from stays as the previous version to go back to. NVIDIA's driver is signed with the same Luft key as the startup images, so Secure Boot needs nothing new.
+
 ### When an update doesn't start
 
 A new version gets three tries to reach the login screen. SushiBoot counts each start of a version it hasn't seen work yet. Once the login screen or the desktop has been on screen for five seconds, Kestrel tells trustd, which remembers that version as the one that works. A login screen that crashes as soon as it appears doesn't count. If the third try doesn't get there either, SushiBoot starts the version that last worked instead. Before the login screen, Sushi then explains that the update didn't start and Luft went back, and trustd makes that version the default again with `bootc rollback`. Settings doesn't offer the same update again; the next release replaces it.

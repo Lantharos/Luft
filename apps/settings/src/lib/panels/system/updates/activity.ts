@@ -27,6 +27,8 @@ export function describe(activity: Activity) {
 			return 'Downloading updates…';
 		case 'rollback':
 			return 'Getting the earlier version ready…';
+		case 'switch':
+			return activity.target === 'nvidia' ? "Downloading NVIDIA's driver…" : 'Downloading the standard image…';
 		case 'elsewhere':
 			return activity.elsewhere ? elsewhere(activity.elsewhere) : null;
 		default:
@@ -36,4 +38,6 @@ export function describe(activity: Activity) {
 
 export const fractionOf = (activity: Activity) => activity.progress?.fraction ?? null;
 
-export const showsProgress = (activity: Activity) => activity.running === 'download' || activity.running === 'elsewhere';
+export const downloading = (activity: Activity) => activity.running === 'download' || activity.running === 'switch';
+
+export const showsProgress = (activity: Activity) => downloading(activity) || activity.running === 'elsewhere';

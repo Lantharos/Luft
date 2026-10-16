@@ -16,8 +16,11 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
 };
 
 pub fn run() {
-    if std::env::args().any(|argument| argument == panels::CHECK_ARGUMENT) {
+    let given = |wanted: &str| std::env::args().any(|argument| argument == wanted);
+    if given(panels::CHECK_ARGUMENT) {
         panels::check_in_background();
+    } else if given(panels::CHECK_GRAPHICS_ARGUMENT) {
+        panels::check_graphics();
     } else {
         run_app();
     }

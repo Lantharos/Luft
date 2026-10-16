@@ -17,6 +17,7 @@ pub enum Kind {
     Download,
     Firmware,
     Rollback,
+    Switch,
     Elsewhere,
 }
 

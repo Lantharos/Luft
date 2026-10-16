@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Section } from '@luft/ui';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import { fractionOf, showsProgress } from './activity';
+	import { downloading, fractionOf, showsProgress } from './activity';
 	import { cancel, check, firmware, load, openApps, preferences as loadPreferences, type Activity, type Firmware, type Preferences } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
@@ -47,7 +47,7 @@
 			<span class="truncate text-[26px] font-semibold">{headline(info, activity)}</span>
 			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline(info, activity, failure)}</span>
 		</div>
-		{#if activity.running === 'download'}
+		{#if downloading(activity)}
 			<button type="button" class="button" onclick={() => attempt(cancel)}>Stop</button>
 		{:else}
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? 'Checking…' : 'Check now'}</button>

@@ -59,6 +59,7 @@ pub fn parse_profile(xml: &str) -> Result<Option<Network>, String> {
         path(profile, &["MSM", "security"]).ok_or("The profile has no security settings")?;
     let authentication = text(security, &["authEncryption", "authentication"]).unwrap_or("open");
     let one_x = text(security, &["authEncryption", "useOneX"]) == Some("true");
+    let transition = text(security, &["authEncryption", "transitionMode"]) == Some("true");
     let key = path(security, &["sharedKey", "keyMaterial"])
         .and_then(|node| node.text())
         .map(str::to_owned);
@@ -68,6 +69,7 @@ pub fn parse_profile(xml: &str) -> Result<Option<Network>, String> {
         ("open", None) => Security::Open,
         (_, Some(_)) if protected => return Ok(None),
         ("WPAPSK" | "WPA2PSK", Some(key)) => Security::Wpa(key),
+        ("WPA3SAE", Some(key)) if transition => Security::Wpa(key),
         ("WPA3SAE", Some(key)) => Security::Sae(key),
         _ => return Ok(None),
     };
@@ -191,6 +193,16 @@ mod tests {
         assert_eq!(parse_profile(&encrypted_key).unwrap(), None);
         let open = parse_profile(&profile("open", "", "")).unwrap().unwrap();
         assert!(!open.keyfile("u").contains("wifi-security"));
+    }
+
+    #[test]
+    fn wpa3_networks_that_also_take_wpa2_join_as_wpa2() {
+        let transition = profile("WPA3SAE", KEY, "").replace(
+            "<useOneX>false</useOneX>",
+            r#"<useOneX>false</useOneX><transitionMode xmlns="http://www.microsoft.com/networking/WLAN/profile/v4">true</transitionMode>"#,
+        );
+        let network = parse_profile(&transition).unwrap().unwrap();
+        assert_eq!(network.security, Security::Wpa(" pass;word".into()));
     }
 
     #[test]

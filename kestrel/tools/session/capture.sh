@@ -9,7 +9,7 @@ durations="$state/capture-durations.tsv"
 session_timeout=30m
 max_startup_failures=3
 inotify_per_session=24
-laptop_size=1920x1200:302x189mm
+declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 laptop_areas=(board panel:battery panel:screenshot)
 
 usage() {
@@ -18,16 +18,18 @@ usage() {
 }
 
 all_groups() {
-  local area
+  local area laptop
   (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
     | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
-  for area in "${laptop_areas[@]}"; do
-    if [[ "$area" == *:* ]]; then
-      echo "$area+laptop"
-    else
-      (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+laptop|" | sort
-    fi
-  done
+  for laptop in "${!laptops[@]}"; do
+    for area in "${laptop_areas[@]}"; do
+      if [[ "$area" == *:* ]]; then
+        echo "$area+$laptop"
+      else
+        (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+$laptop|"
+      fi
+    done
+  done | sort
   printf '%s\n' greeter setup scaling
 }
 
@@ -65,7 +67,7 @@ queue_groups() {
     else
       printf -v index '%03d' $((10#$index + 1))
       size=default
-      [[ "$group" == *+laptop ]] && size=laptop
+      [[ "$group" == *+* ]] && size="${group##*+}"
       mkdir -p "$out/queue/$size"
       : > "$out/queue/$size/$index-$group"
     fi
@@ -96,9 +98,9 @@ seconds_since() {
 start_worker() {
   local name="worker-$((++workers))" size capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
   size=$(next_size)
-  if [[ "$size" == laptop ]]; then
-    capture_size="$laptop_size"
-    captures="$KESTREL_CAPTURE_DIR/laptop"
+  if [[ "$size" != default ]]; then
+    capture_size="${laptops[$size]}"
+    captures="$KESTREL_CAPTURE_DIR/$size"
   fi
   mkdir -p "$captures"
   KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \

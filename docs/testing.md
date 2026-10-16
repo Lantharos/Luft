@@ -20,8 +20,10 @@ Build Kestrel first (see the [repository README](../README.md#develop)). Then fr
 | Option | Effect |
 | --- | --- |
 | `--only GROUPS` | Only these comma-separated groups. An area such as `apps` runs every group in it |
-| `--jobs N` | Up to N sessions at once (default: one per four processors, fewer when the inotify limit is close); `--jobs 1` runs everything in one session |
+| `--jobs N` | Up to N sessions at once (default: one per four processors, fewer when the inotify limit is close); `--jobs 1` runs one session at a time |
 | `--list` | Lists the groups |
+
+The board groups also run on a 14-inch 1920×1200 laptop panel at its automatic display scale, as the groups ending in `+laptop`. Their screenshots go to a `laptop` folder inside the capture folder.
 
 The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Theme edits reload live after `meson compile -C kestrel/build`.
 

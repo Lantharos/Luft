@@ -12,7 +12,7 @@ app.connect('activate', () => {
   const click = new Gtk.GestureClick();
   let clicked = '';
   let scale = '';
-  const show = () => { window.title = `${title}: ${entry.text}${clicked}${scale}`; };
+  const show = () => { window.title = `${title}${entry.text ? `: ${entry.text}` : ''}${clicked}${scale}`; };
   click.connect('pressed', (_gesture, _count, x, y) => {
     clicked = ` @${Math.round(x)},${Math.round(y)}`;
     show();

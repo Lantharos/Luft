@@ -162,8 +162,15 @@ export async function renderedFrame(area) {
     });
     global.stage.queue_redraw();
   });
+  const scale = view.get_scale();
+  const toPixels = value => Math.round(value * scale + 1e-6);
   const stream = Gio.MemoryOutputStream.new_resizable();
-  await compositeTo(stream, snapshot.texture, {...area, x: area.x - view.layout.x, y: area.y - view.layout.y});
+  await compositeTo(stream, snapshot.texture, {
+    x: toPixels(area.x - view.layout.x),
+    y: toPixels(area.y - view.layout.y),
+    width: toPixels(area.width),
+    height: toPixels(area.height),
+  });
   return new Frame(stream.steal_as_bytes());
 }
 

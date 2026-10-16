@@ -11,7 +11,7 @@ import {onScreen, screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
 const {require, eventually} = checks('board');
-const GRID = {Notes: [0, 0], Inbox: [1200, 0], Music: [0, 900], Files: [1200, 900]};
+const GRID = {Notes: [0, 0], Inbox: [1.6, 0], Music: [0, 1.6], Files: [1.6, 1.6]};
 
 const sameView = (a, b) => Math.abs(a.scale - b.scale) < 1e-6 && Math.abs(a.x - b.x) < 1e-3 && Math.abs(a.y - b.y) < 1e-3;
 
@@ -60,7 +60,8 @@ async function enters(window, label) {
 }
 
 async function overview() {
-  for (const [title, [x, y]] of Object.entries(GRID)) windowNamed(title).move_frame(false, x, y);
+  const {viewport} = board();
+  for (const [title, [x, y]] of Object.entries(GRID)) windowNamed(title).move_frame(false, Math.round(x * viewport.width), Math.round(y * viewport.height));
   board().fitAll();
   await boardResting();
   const shown = view();
@@ -74,7 +75,7 @@ async function checkEntering(shown) {
   await enters(notes, 'clicking a window in the overview enters it at 100%, centered and focused');
   require(dimmedAround(notes), 'the other windows dim while one is entered');
   type('hi');
-  await eventually(() => notes.get_title() === 'Notes: hi', 'typing reaches the entered window');
+  await eventually(() => notes.get_title().startsWith('Notes: hi'), 'typing reaches the entered window');
   await capture('board-entered');
 
   for (const [keyval, title, label] of [

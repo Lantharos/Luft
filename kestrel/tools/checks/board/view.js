@@ -1,24 +1,35 @@
 import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
 import {moveTo} from '../lib/input.js';
-import {capture, captureFrame} from '../lib/screenshots.js';
+import {capture, renderedFrame} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
-import {board, boardResting, leaveBoard, openWindows, showBoard, windowNamed} from './lib/board.js';
+import {board, boardResting, leaveBoard, onWholePixels, openWindows, showBoard, windowNamed} from './lib/board.js';
 import {clickAt, onScreen, screenPoint, zoomWithWheel} from './lib/pointer.js';
 
 const {require, eventually} = checks('board');
 const HEADER_INSET = 64;
+const HEADER_TOP = 6;
 const HEADER_HEIGHT = 30;
 const MAGNIFIED_STEPS = 8;
 const group = global.window_group;
 
-const scaleOf = window => Number(/ x([\d.]+)$/.exec(window.get_title())?.[1] ?? 1);
+const monitorScale = () => global.display.get_monitor_scale(Main.layoutManager.primaryIndex);
+const scaleOf = window => Number(/ x([\d.]+)$/.exec(window.get_title())?.[1] ?? 1) / monitorScale();
 
-function headerOf(window, view = {x: 0, y: 0, scale: 1}, viewport = {x: 0, y: 0}) {
-  const rect = window.get_frame_rect();
-  const [x, y] = screenPoint(view, viewport, rect.x + HEADER_INSET, rect.y + 6);
-  return {x: Math.round(x), y: Math.round(y), width: rect.width - 2 * HEADER_INSET, height: HEADER_HEIGHT};
+function headerOf(window) {
+  const scale = monitorScale();
+  const onPixels = value => Math.round(value * scale) / scale;
+  const [surfaceX, surfaceY] = window.get_compositor_private().get_first_child().get_transformed_position();
+  const frame = window.get_frame_rect();
+  const buffer = window.get_buffer_rect();
+  return {
+    x: onPixels(surfaceX) + onPixels(frame.x + HEADER_INSET - buffer.x),
+    y: onPixels(surfaceY) + onPixels(frame.y + HEADER_TOP - buffer.y),
+    width: frame.width - 2 * HEADER_INSET,
+    height: HEADER_HEIGHT,
+  };
 }
 
 async function desktopHeader(inbox) {
@@ -26,7 +37,7 @@ async function desktopHeader(inbox) {
   moveTo([1, 1]);
   await waitUntil(() => global.display.focus_window === inbox, 'Inbox takes focus');
   await settled();
-  return captureFrame(headerOf(inbox));
+  return renderedFrame(headerOf(inbox));
 }
 
 async function checkFullSize(inbox, header) {
@@ -35,11 +46,11 @@ async function checkFullSize(inbox, header) {
   moveTo([viewport.x + 1, viewport.y + 1]);
   await boardResting();
   require(camera.view.scale === 1 && group.scale_x === 1, 'an entered window that fits is shown at exactly 100%');
-  const entered = await captureFrame(headerOf(inbox, camera.shown, viewport));
+  const entered = await renderedFrame(headerOf(inbox));
   require(entered.looksLike(header), 'a window at 100% on the board looks exactly as it does on the desktop');
   camera.panBy(0.37, -0.61);
-  require(Number.isInteger(group.translation_x) && Number.isInteger(group.translation_y), 'panning by a fraction of a pixel keeps the board on whole pixels');
-  const panned = await captureFrame(headerOf(inbox, camera.shown, viewport));
+  require(onWholePixels(), 'panning by a fraction of a pixel keeps the board on whole pixels');
+  const panned = await renderedFrame(headerOf(inbox));
   require(panned.looksLike(header), 'the window stays exactly as sharp after a fractional pan');
 }
 

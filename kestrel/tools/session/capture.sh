@@ -9,6 +9,8 @@ durations="$state/capture-durations.tsv"
 session_timeout=30m
 max_startup_failures=3
 inotify_per_session=24
+laptop_size=1920x1200:302x189mm
+laptop_areas=(board)
 
 usage() {
   echo "Usage: kestrel/tools/session.sh capture [--only GROUPS] [--jobs N] [--list]"
@@ -16,8 +18,12 @@ usage() {
 }
 
 all_groups() {
+  local area
   (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
     | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
+  for area in "${laptop_areas[@]}"; do
+    (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+laptop|" | sort
+  done
   printf '%s\n' greeter setup scaling
 }
 
@@ -48,19 +54,35 @@ longest_first() {
 }
 
 queue_groups() {
-  local index=0 group
+  local index=0 group size
   while read -r group; do
     if standalone "$group"; then
       separate+=("$group")
     else
       printf -v index '%03d' $((10#$index + 1))
-      : > "$out/queue/$index-$group"
+      size=default
+      [[ "$group" == *+laptop ]] && size=laptop
+      mkdir -p "$out/queue/$size"
+      : > "$out/queue/$size/$index-$group"
     fi
   done < <(select_groups | longest_first)
 }
 
 queued() {
-  compgen -G "$out/queue/*" > /dev/null
+  compgen -G "$out/queue/*/*" > /dev/null
+}
+
+next_size() {
+  local queue best="" best_share=-1 serving share
+  for queue in "$out"/queue/*; do
+    serving=$(printf '%s\n' "${sizes[@]}" | grep -c "^${queue##*/}$" || true)
+    share=$(($(find "$queue" -type f | wc -l) * 100 / (serving + 1)))
+    if ((share > best_share)); then
+      best="${queue##*/}"
+      best_share=$share
+    fi
+  done
+  echo "$best"
 }
 
 seconds_since() {
@@ -68,11 +90,19 @@ seconds_since() {
 }
 
 start_worker() {
-  local name="worker-$((++workers))"
-  KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue" \
+  local name="worker-$((++workers))" size capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
+  size=$(next_size)
+  if [[ "$size" == laptop ]]; then
+    capture_size="$laptop_size"
+    captures="$KESTREL_CAPTURE_DIR/laptop"
+  fi
+  mkdir -p "$captures"
+  KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \
     KESTREL_CAPTURE_CLAIMED="$out/claimed" KESTREL_CAPTURE_RESULTS="$out/results" \
+    KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_DIR="$captures" \
     timeout "$session_timeout" "$tools/session/desktop.sh" capture > "$out/workers/$name.log" 2>&1 &
   running[$!]="$name"
+  sizes[$!]="$size"
 }
 
 standalone() {
@@ -99,7 +129,7 @@ record_standalone() {
 }
 
 finished_worker() {
-  if queued && ! compgen -G "$out/claimed/*@$1" > /dev/null && ((++startup_failures >= max_startup_failures)); then
+  if compgen -G "$out/queue/$2/*" > /dev/null && ! compgen -G "$out/claimed/*@$1" > /dev/null && ((++startup_failures >= max_startup_failures)); then
     echo "Sessions keep ending before running a check, see $out/workers/$1.log" >&2
     exit 1
   fi
@@ -116,9 +146,9 @@ run_sessions() {
     if standalone "${running[$pid]}"; then
       record_standalone "${running[$pid]}" "$status"
     else
-      finished_worker "${running[$pid]}"
+      finished_worker "${running[$pid]}" "${sizes[$pid]}"
     fi
-    unset "running[$pid]"
+    unset "running[$pid]" "sizes[$pid]"
     if queued && ((${#running[@]} < jobs)); then start_worker; fi
   done
 }
@@ -211,6 +241,7 @@ build_helpers
 fit_jobs_to_inotify
 started=$EPOCHREALTIME
 declare -A running=()
+declare -A sizes=()
 declare -A started_at=()
 separate=()
 workers=0

@@ -16,7 +16,8 @@ export async function endSession() {
 }
 
 function moduleOf(group) {
-  return Gio.File.new_for_path(GLib.build_filenamev([CHECKS, ...group.split(':')]) + '.js').get_uri();
+  const [checks] = group.split('+');
+  return Gio.File.new_for_path(GLib.build_filenamev([CHECKS, ...checks.split(':')]) + '.js').get_uri();
 }
 
 function record(group, passed, seconds, message = '') {

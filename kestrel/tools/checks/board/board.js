@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
@@ -6,14 +7,15 @@ import {checks} from '../lib/check.js';
 import {hold, moveTo, pressButton, release, releaseButton, scroll} from '../lib/input.js';
 import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {nextFrame} from '../lib/wait.js';
-import {board, boardResting, boardWindows, leaveBoard, noOverlap, openBoardWindow, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
+import {nextFrame, pause} from '../lib/wait.js';
+import {board, boardResting, boardWindows, fourFingerSwipe, leaveBoard, noOverlap, onWholePixels, openBoardWindow, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
 import {screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
 const {require, eventually} = checks('board');
 const manager = global.workspace_manager;
 const group = global.window_group;
+const DOUBLE_CLICK_TIME = new Gio.Settings({schema_id: 'org.gnome.desktop.peripherals.mouse'}).get_int('double-click');
 const panel = () => named('kestrel-panel');
 
 async function checkEntering() {
@@ -68,10 +70,11 @@ function checkGestures() {
     input.handle(event);
   const [anchorX, anchorY] = screenPoint(camera.view, viewport, ...anchor);
   require(Math.abs(anchorX - focusX) < 0.5 && Math.abs(anchorY - focusY) < 0.5, 'pinching zooms around the fingers');
-  require(Number.isInteger(group.translation_x) && Number.isInteger(group.translation_y), 'the board is drawn on whole pixels after a pinch');
+  require(onWholePixels(), 'the board is drawn on whole pixels after a pinch');
 }
 
 async function superDrag(window, screenDx, screenDy, midway = async () => {}) {
+  await pause(DOUBLE_CLICK_TIME);
   const frame = window.get_frame_rect();
   const [fromX, fromY] = screenPoint(board().camera.view, board().viewport, frame.x + frame.width / 2, frame.y + frame.height / 2);
   hold(Clutter.KEY_Super_L);
@@ -128,11 +131,6 @@ async function checkClosingWhileMoving() {
   await superDrag(extra, (target.x - source.x) * scale, (target.y - source.y) * scale, () => stop(process));
   await eventually(() => [...layout].every(([window, rect]) => window.get_frame_rect().equal(rect)),
     'windows pushed aside by a window that closes while it is dragged go back');
-}
-
-function fourFingerSwipe(dy) {
-  for (const event of [touchpad.swipe('begin', 4), touchpad.swipe('update', 4, 0, dy), touchpad.swipe('end', 4)])
-    board().input.handle(event);
 }
 
 async function checkLeavingEntered() {

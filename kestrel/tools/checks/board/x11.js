@@ -7,6 +7,7 @@ import {board, boardResting, leaveBoard, openWindows, showBoard} from './lib/boa
 import {clickAt, screenPoint, zoomWithWheel} from './lib/pointer.js';
 
 const {require, eventually} = checks('board');
+const [WIDTH, HEIGHT] = [480, 300];
 const FAR_AWAY = [[9000, 6000], [-7000, -4000]];
 
 async function compile() {
@@ -18,8 +19,10 @@ async function compile() {
 }
 
 async function clickReaches(window, x, y) {
-  const landed = await clickAt(window, window.frame_rect_to_client_rect(window.get_frame_rect()), x, y);
-  return Math.abs(landed[0] - x) <= 1 && Math.abs(landed[1] - y) <= 1;
+  const client = window.frame_rect_to_client_rect(window.get_frame_rect());
+  const x11Scale = WIDTH / client.width;
+  const landed = await clickAt(window, client, x / x11Scale, y / x11Scale);
+  return Math.abs(landed[0] - x) <= x11Scale && Math.abs(landed[1] - y) <= x11Scale;
 }
 
 export async function run() {
@@ -27,7 +30,7 @@ export async function run() {
   await openWindows();
   try {
     await showBoard();
-    spawn([binary, '480', '300']);
+    spawn([binary, `${WIDTH}`, `${HEIGHT}`]);
     const window = await waitForWindow(candidate => candidate.get_title()?.startsWith('Kestrel clicks'), 'an X11 window opens');
     await eventually(() => window.unconstrained, 'an X11 window opens on the board');
 

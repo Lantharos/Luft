@@ -15,6 +15,7 @@ const ASK_FOR_TEXT: &str = "sms";
 const WAITING_FOR_APPROVAL: &str = "waiting for device approval";
 const DEVICE_PROMPT: &str = "Enter the code shown on your iPhone, iPad or Mac.";
 const WRONG_CODE: &str = "That code didn't work. Check it, or wait for a new one.";
+const WRONG_TEXTED_CODE: &str = "That code didn't work. Try again to get a new one.";
 
 pub async fn run(flow: &mut Flow) -> Result<String> {
     let (apple_id, password) = identity(flow).await?;
@@ -82,6 +83,7 @@ async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str)
                 }
             }
             Err(error) if question.state == "2fa_do" && error.to_string().contains("validate2FACode") => wrong = true,
+            Err(error) if error.to_string().contains("validateSMSCode") => bail!(WRONG_TEXTED_CODE),
             Err(error) => return Err(error),
         }
     }

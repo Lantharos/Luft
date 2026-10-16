@@ -7,7 +7,7 @@ use tokio::time::sleep;
 
 use super::attach::{self, is_stale};
 use super::keep::{self, sync};
-use super::{conflicts, remote, union};
+use super::{conflicts, filters, remote, union};
 use crate::hub::Hub;
 use crate::providers::trouble::{self, Trouble};
 
@@ -242,7 +242,17 @@ async fn follow_uploads(hub: &Hub, release: bool) {
             }
         }
         let uploads: HashSet<String> = queue.into_iter().map(|item| item.name).collect();
-        changed |= hub.drives.update(&account, |live| std::mem::replace(&mut live.uploads, uploads.clone()) != uploads);
+        let Some(record) = hub.records().get(&account).cloned() else { continue };
+        changed |= hub.drives.update(&account, |live| {
+            let landed_in_kept = live
+                .uploads
+                .difference(&uploads)
+                .any(|upload| filters::keeps(&record.kept, &record.skipped, upload));
+            if landed_in_kept {
+                live.dirty = Some(Instant::now());
+            }
+            std::mem::replace(&mut live.uploads, uploads.clone()) != uploads
+        });
     }
     if changed {
         hub.drives_changed().await;

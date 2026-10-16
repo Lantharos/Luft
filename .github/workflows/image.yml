@@ -39,6 +39,7 @@ jobs:
       base: ${{ steps.parts.outputs.base }}
       parts: ${{ steps.parts.outputs.parts }}
       signed: ${{ steps.parts.outputs.signed }}
+      details: ${{ steps.parts.outputs.details }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -85,20 +86,22 @@ jobs:
         run: |
           base="$(os/image/build.sh base)"
           LUFT_BASE="$base" os/image/build.sh plan luft-nvidia | tee "$RUNNER_TEMP/parts.tsv"
-          missing() {
-            jq --raw-input --slurp --compact-output --arg signing "$1" '[
-              split("\n")[] | select(length > 0) | split("\t") | select(.[2] == "missing" and .[3] == $signing) |
-              {name: .[0], key: (.[1] | sub(".*-"; "")), family: (.[0] | sub("-.*"; ""))}
+          rows() {
+            jq --raw-input --slurp --compact-output '[
+              split("\n")[] | select(length > 0) | split("\t") | select(.[2] == "missing") |
+              {name: .[0], key: (.[1] | sub(".*-"; "")), family: (.[0] | sub("-.*"; "")), signing: .[3]}
             ]' "$RUNNER_TEMP/parts.tsv"
           }
+          missing="$(rows)"
           {
             echo "base=$base"
-            echo "parts=$(missing unsigned)"
-            echo "signed=$(missing signed)"
+            echo "parts=$(jq -c '[.[] | select(.signing == "unsigned") | .name]' <<<"$missing")"
+            echo "signed=$(jq -c '[.[] | select(.signing == "signed") | .name]' <<<"$missing")"
+            echo "details=$(jq -c 'map({(.name): {key, family}}) | add // {}' <<<"$missing")"
           } >> "$GITHUB_OUTPUT"
 
   parts:
-    name: Part ${{ matrix.part.name }}
+    name: Part
     needs: plan
     if: needs.plan.outputs.skip != '1' && needs.plan.outputs.parts != '[]'
     runs-on: ubuntu-26.04
@@ -114,12 +117,12 @@ jobs:
 
       - uses: ./.github/actions/build-part
         with:
-          part: ${{ matrix.part.name }}
-          key: ${{ matrix.part.key }}
-          family: ${{ matrix.part.family }}
+          part: ${{ matrix.part }}
+          key: ${{ fromJSON(needs.plan.outputs.details)[matrix.part].key }}
+          family: ${{ fromJSON(needs.plan.outputs.details)[matrix.part].family }}
 
   signed-parts:
-    name: Part ${{ matrix.part.name }}
+    name: Signed part
     needs: plan
     if: needs.plan.outputs.skip != '1' && needs.plan.outputs.signed != '[]'
     runs-on: ubuntu-26.04
@@ -140,9 +143,9 @@ jobs:
 
       - uses: ./.github/actions/build-part
         with:
-          part: ${{ matrix.part.name }}
-          key: ${{ matrix.part.key }}
-          family: ${{ matrix.part.family }}
+          part: ${{ matrix.part }}
+          key: ${{ fromJSON(needs.plan.outputs.details)[matrix.part].key }}
+          family: ${{ fromJSON(needs.plan.outputs.details)[matrix.part].family }}
 
       - name: Forget the signing keys
         if: always()

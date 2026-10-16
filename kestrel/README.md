@@ -87,7 +87,7 @@ sudo systemctl disable gdm && sudo systemctl enable greetd
 | Super+Escape | Give shortcuts back to the desktop; on a board, step out of a window |
 | Super+Enter | On a board, enter the focused window |
 | Super+= / Super+- | On a board, zoom in and out |
-| Print, Shift+Print, Alt+Print | Screenshot tool, full screenshot, window screenshot |
+| Print or Super+Shift+S, Shift+Print, Alt+Print | Screenshot tool, full screenshot, window screenshot |
 | Ctrl+Shift+Alt+R | Screen recording |
 | Ctrl+Shift+Esc | System monitor |
 | Menu or Shift+F10 | Context menu of the focused control |

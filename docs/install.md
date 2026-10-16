@@ -74,7 +74,7 @@ When Secure Boot is on, your computer asks once whether to trust Luft, on a blue
 
 Every step can be skipped. Secure Boot and encryption are in Settings under Security, fingerprints under Users.
 
-Luft also picks a few things for you: the display scale from the screen's size and resolution (125% on most 14" to 16" laptop screens, 200% on sharper ones), and tap to click on touchpads. Both can be changed in Settings.
+Luft also picks a few things for you: the display scale from the screen's size and resolution (150% on 13" and 14" laptop screens, 125% on 15" to 17" ones, 167% to 225% on sharper ones), and tap to click on touchpads. Both can be changed in Settings.
 
 ## Graphics on the stick
 

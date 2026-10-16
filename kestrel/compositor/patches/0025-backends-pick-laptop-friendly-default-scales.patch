@@ -4,18 +4,20 @@ Date: Wed, 14 Oct 2026 16:22:39 +0200
 Subject: [PATCH 25/26] backends: pick laptop-friendly default scales
 
 Monitors without a saved configuration got 100% on 15.6" 1080p laptop
-panels and thirds such as 133% elsewhere. Aim for 120 DPI on screens
-under 20", like other systems do, and prefer quarter steps unless a third
-fits clearly better. Scales people chose are stored and never recalculated.
+panels, 125% on 14" panels that other systems run at 150%, and thirds
+such as 133% elsewhere. Aim for 110 DPI on every screen, which gives 150%
+on 13" and 14" laptop panels, 125% on 15" to 17" ones and 100% on 24"
+and 27" monitors, and prefer quarter steps unless a third fits clearly
+better. Scales people chose are stored and never recalculated.
 ---
- src/backends/meta-monitor.c | 66 +++++++++++++++++++++++++++----------
- 1 file changed, 49 insertions(+), 17 deletions(-)
+ src/backends/meta-monitor.c | 83 ++++++++++++++++++++++---------------
+ 1 file changed, 49 insertions(+), 34 deletions(-)
 
 diff --git a/src/backends/meta-monitor.c b/src/backends/meta-monitor.c
-index 04a91104bc2ddc8194f83708f154286e8bf9e4b4..3f67457c91db6142959f08bd79374327259776aa 100644
+index 04a91104bc2ddc8194f83708f154286e8bf9e4b4..113d3f1530433d35e1bf0e50b12a5bacb39e1b46 100644
 --- a/src/backends/meta-monitor.c
 +++ b/src/backends/meta-monitor.c
-@@ -2423,13 +2423,11 @@ meta_monitor_calculate_crtc_pos (MetaMonitor         *monitor,
+@@ -2423,25 +2423,52 @@ meta_monitor_calculate_crtc_pos (MetaMonitor         *monitor,
   * We choose a default scale factor such that the UI is as big
   * as it would be on a display with this DPI without scaling.
   *
@@ -24,23 +26,28 @@ index 04a91104bc2ddc8194f83708f154286e8bf9e4b4..3f67457c91db6142959f08bd79374327
 - * systems (macOS, Android, iOS, Windows) and the community-decided
 - * "known-good" scale factors for GNOME for various mobile devices
 - * such as phones, tablets, and laptops
-+ * A value of 120 lines up with the scale other operating systems
-+ * pick for common laptop panels: 125% for 14" to 16" 1080p panels,
-+ * 150% for 13" 1080p panels and 200% for 13" to 14" HiDPI panels.
++ * A value of 110 lines up with the scale other operating systems
++ * pick for laptop panels and external monitors alike: 150% for 13" and
++ * 14" 1080p and 1920x1200 panels, 125% for 15" to 17" 1080p panels,
++ * 167% to 225% for HiDPI laptop panels and 100% for 24" to 27"
++ * 1080p and 1440p monitors.
   */
 -#define UI_SCALE_MOBILE_TARGET_DPI 135
-+#define UI_SCALE_MOBILE_TARGET_DPI 120
++#define UI_SCALE_TARGET_DPI 110
  
  /*
-  * People tend to sit further away from larger stationary displays
-@@ -2443,6 +2441,45 @@ meta_monitor_calculate_crtc_pos (MetaMonitor         *monitor,
- #define UI_SCALE_LARGE_TARGET_DPI 110
- #define UI_SCALE_LARGE_MIN_SIZE_INCHES 20
- 
-+/*
+- * People tend to sit further away from larger stationary displays
+- * than they do from mobile displays, so a UI of an identical size to
+- * a mobile device has a smaller angular size and thus seems to be too
+- * small.
+- *
+- * The largest mainstream laptops have screens ~17in, and HiDPI external
+- * monitors start at ~23in, so 20in is a good boundary point
 + * Quarter steps (125%, 150%, 175%) are what people recognize and render
 + * most evenly, so they win over thirds unless a third fits much better.
-+ */
+  */
+-#define UI_SCALE_LARGE_TARGET_DPI 110
+-#define UI_SCALE_LARGE_MIN_SIZE_INCHES 20
 +#define UI_SCALE_STEPS_PER_INTEGER 4
 +#define UI_SCALE_STEP_TOLERANCE 0.1f
 +
@@ -75,20 +82,39 @@ index 04a91104bc2ddc8194f83708f154286e8bf9e4b4..3f67457c91db6142959f08bd79374327
 +
 +  return best_scale;
 +}
-+
+ 
  static float
  calculate_scale (MetaMonitor                *monitor,
-                  MetaMonitorMode            *monitor_mode,
-@@ -2452,7 +2489,7 @@ calculate_scale (MetaMonitor                *monitor,
+@@ -2452,8 +2479,7 @@ calculate_scale (MetaMonitor                *monitor,
    float diag_inches;
    g_autofree float *scales = NULL;
    int n_scales;
 -  float best_scale, physical_dpi, perfect_scale, best_scale_error = 0.0f;
+-  int target_dpi;
 +  float best_scale, quarter_scale, physical_dpi, perfect_scale;
-   int target_dpi;
  
    /*
-@@ -2487,17 +2524,12 @@ calculate_scale (MetaMonitor                *monitor,
+    * Somebody encoded the aspect ratio (16/9 or 16/10) instead of the physical
+@@ -2468,17 +2494,11 @@ calculate_scale (MetaMonitor                *monitor,
+     return 1.0;
+   diag_inches = sqrtf (width_mm * width_mm + height_mm * height_mm) / 25.4f;
+ 
+-  /* Pick the appropriate target DPI based on screen size */
+-  if (diag_inches < UI_SCALE_LARGE_MIN_SIZE_INCHES)
+-    target_dpi = UI_SCALE_MOBILE_TARGET_DPI;
+-  else
+-    target_dpi = UI_SCALE_LARGE_TARGET_DPI;
+-
+   meta_monitor_mode_get_resolution (monitor_mode, &width_px, &height_px);
+ 
+   physical_dpi = sqrtf (width_px * width_px + height_px * height_px) /
+                  diag_inches;
+-  perfect_scale = physical_dpi / target_dpi;
++  perfect_scale = physical_dpi / UI_SCALE_TARGET_DPI;
+ 
+   if (constraints & META_MONITOR_SCALES_CONSTRAINT_NO_FRAC)
+     perfect_scale -= 0.125f;
+@@ -2487,17 +2507,12 @@ calculate_scale (MetaMonitor                *monitor,
    scales = meta_monitor_calculate_supported_scales (monitor, monitor_mode,
                                                      constraints,
                                                      &n_scales);

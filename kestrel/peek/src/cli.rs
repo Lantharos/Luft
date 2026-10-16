@@ -79,7 +79,8 @@ pub enum Action {
         #[arg(long)]
         here: bool,
         /// Size of the hidden display in pixels, optionally with its physical size, such as 1920x1200:302x189mm for a 14"
-        /// laptop panel. Kestrel picks the display's scale from the physical size, as it does for real screens.
+        /// laptop panel, which runs at 150%. Kestrel picks the display's scale from the physical size, as it does for real
+        /// screens.
         #[arg(long, default_value = "1280x800", value_name = "WxH[:WxHmm]", value_parser = parse_size)]
         size: String,
         /// Wait until the program opens its first window

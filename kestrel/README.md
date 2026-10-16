@@ -113,7 +113,7 @@ peek stop $h
 
 `peek run` gives every program its own hidden display: a headless Kestrel with its own monitor, pointer and keyboard, so nothing reaches your screen and nothing asks first. The program still uses your session for settings, files, the keyring and the network. The display closes when the program quits. `peek run --here` opens the program on your screen instead.
 
-`--size` sets the hidden display's resolution, 1280x800 by default. Add its physical size to have Kestrel pick a scale the way it does for a real screen: `peek run --size 1920x1200:302x189mm -- …` stands in for a 14" laptop panel and runs at 125%.
+`--size` sets the hidden display's resolution, 1280x800 by default. Add its physical size to have Kestrel pick a scale the way it does for a real screen: `peek run --size 1920x1200:302x189mm -- …` stands in for a 14" laptop panel and runs at 150%.
 
 Windows you opened yourself need permission: Kestrel asks whether the app may see your windows, or see and use them, once or until it quits, and a refusal holds until the app quits. The privacy menu in the panel shows who has access and takes it back. Nothing works while the screen is locked or a password prompt is open, and nothing is remembered after signing out. Hidden displays need `dbus-daemon`.
 

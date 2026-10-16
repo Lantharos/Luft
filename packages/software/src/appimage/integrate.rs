@@ -36,9 +36,18 @@ fn slug(name: &str) -> String {
     if slug.is_empty() { "app".into() } else { slug }
 }
 
-pub fn install(source: &Path, task: Task) -> Result<AppImage, String> {
-    task.progress(Stage::Preparing, None);
-    let bundle = bundle::read(source)?;
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Transfer {
+    Move,
+    Copy,
+}
+
+pub struct Placement {
+    pub id: String,
+    pub path: PathBuf,
+}
+
+pub fn placement(source: &Path, bundle: &Bundle) -> Placement {
     let name = bundle
         .entry
         .get("Name")
@@ -50,21 +59,56 @@ pub fn install(source: &Path, task: Task) -> Result<AppImage, String> {
                 .unwrap_or_default()
         });
     let slug = slug(&name);
-    let id = format!("{PREFIX}{slug}");
-    let folder = library::folder();
-    fs::create_dir_all(&folder).map_err(failed)?;
-    let destination = folder.join(format!("{slug}.AppImage"));
-    if source != destination {
-        place(source, &destination, task)?;
+    let id = bundle
+        .desktop_id
+        .clone()
+        .filter(|id| is_desktop_id(id))
+        .unwrap_or_else(|| format!("{PREFIX}{slug}"));
+    Placement {
+        id,
+        path: library::folder().join(format!("{slug}.AppImage")),
     }
-    integrate(&id, &destination, &bundle)?;
+}
+
+fn is_desktop_id(id: &str) -> bool {
+    !id.is_empty()
+        && id
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || "._-".contains(character))
+}
+
+pub fn install(source: &Path, task: Task) -> Result<AppImage, String> {
+    add(source, Transfer::Move, task)
+}
+
+pub fn install_copy(source: &Path, task: Task) -> Result<AppImage, String> {
+    add(source, Transfer::Copy, task)
+}
+
+fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String> {
+    task.progress(Stage::Preparing, None);
+    let bundle = bundle::read(source)?;
+    let Placement { id, path } = placement(source, &bundle);
+    fs::create_dir_all(library::folder()).map_err(failed)?;
+    if source != path {
+        place(source, &path, transfer, task)?;
+    }
+    for earlier in library::list() {
+        if earlier.path == path && earlier.id != id {
+            fs::remove_file(&earlier.desktop).map_err(failed)?;
+            remove_icons(&earlier.id);
+        }
+    }
+    integrate(&id, &path, &bundle)?;
     library::find(&id)
 }
 
-fn place(source: &Path, destination: &Path, task: Task) -> Result<(), String> {
+fn place(source: &Path, destination: &Path, transfer: Transfer, task: Task) -> Result<(), String> {
     let staging = destination.with_extension("AppImage.part");
-    if fs::rename(source, &staging).is_err() {
+    if transfer == Transfer::Copy || fs::rename(source, &staging).is_err() {
         copy(source, &staging, task)?;
+    }
+    if transfer == Transfer::Move && source.exists() {
         fs::remove_file(source).map_err(failed)?;
     }
     fs::set_permissions(&staging, fs::Permissions::from_mode(0o755)).map_err(failed)?;

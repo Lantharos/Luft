@@ -62,9 +62,14 @@ This makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.AppIma
 | Path | Contents |
 |------|----------|
 | `~/Applications/` | Installed AppImages |
-| `~/.local/share/applications/` | Menu entries for AppImages |
+| `~/.local/share/applications/` | Menu entries for AppImages, named like the entry inside each AppImage so windows and the default app settings match it |
 | `~/.local/share/icons/hicolor/` | AppImage icons, at each size the AppImage ships |
+| `~/.local/state/luft/preinstalled` | Apps Luft has already preinstalled for you |
 
 Electron AppImages are started with `--no-sandbox`, since Chromium's sandbox refuses to start from an AppImage.
+
+## Preinstalled apps and background updates
+
+On Luft, `schelf --preinstall` runs once per account at sign-in and installs each AppImage in `/usr/share/luft/preinstall` the same way as opening it in Schelf, so it works offline and can be removed like any other app. A browser among them becomes the default one if there's none yet. Each app is only preinstalled once, so a removed app stays removed. `schelf --update-apps` runs a few minutes after sign-in and every six hours after that, and updates every AppImage that has a newer version.
 
 When Schelf starts, it gives AppImages installed earlier the icons they ship if theirs are missing or the wrong size.

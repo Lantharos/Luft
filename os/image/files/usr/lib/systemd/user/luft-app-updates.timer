@@ -1,0 +1,11 @@
+[Unit]
+Description=Update AppImages every few hours
+ConditionUser=!@system
+
+[Timer]
+OnStartupSec=5min
+OnUnitActiveSec=6h
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

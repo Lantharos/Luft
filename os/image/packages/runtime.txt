@@ -93,6 +93,7 @@ upower
 usbutils
 wireplumber
 xdg-desktop-portal
+xdg-utils
 xdg-user-dirs
 xorg-x11-server-Xwayland
 zram-generator-defaults

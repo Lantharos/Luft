@@ -1,0 +1,10 @@
+[Unit]
+Description=Update AppImages
+After=luft-preinstall.service
+ConditionUser=!@system
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/schelf --update-apps
+Nice=10
+IOSchedulingClass=idle

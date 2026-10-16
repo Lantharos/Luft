@@ -1,0 +1,12 @@
+[Unit]
+Description=Install the apps Luft comes with
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/schelf --preinstall
+
+[Install]
+WantedBy=graphical-session.target

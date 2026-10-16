@@ -26,7 +26,7 @@ On a Windows PC, [Meet Luft](docs/meet.md) does the same without a stick: it mak
 
 Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional, and lets an encrypted disk unlock without a password. [Installing Luft](docs/install.md) has the details.
 
-After that, updates arrive in Settings and install at the next restart. Apps come from Schelf (Flathub and AppImages), and command-line tools from a Toolbox container that Schelf manages too.
+After that, updates arrive in Settings and install at the next restart. Apps come from Schelf (Flathub and AppImages), and command-line tools from a Toolbox container that Schelf manages too. Luft comes with [Helium](https://helium.computer), the Chromium-based browser by imput, as the default browser; it updates on its own and can be removed in Schelf like any other app.
 
 ## Build it
 
@@ -111,4 +111,4 @@ Session options, VMs and the other checks are in [docs/testing.md](docs/testing.
 
 ## License
 
-Kestrel's engine is GPL-2.0-or-later, inherited from GNOME Shell (`kestrel/engine/COPYING`), and so are the Mutter patches. The rest is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`. The wallpapers are photos under the [Unsplash License](https://unsplash.com/license), credited in [`os/image/files/usr/share/backgrounds/luft/CREDITS`](os/image/files/usr/share/backgrounds/luft/CREDITS).
+Kestrel's engine is GPL-2.0-or-later, inherited from GNOME Shell (`kestrel/engine/COPYING`), and so are the Mutter patches. The rest is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`. Helium is GPL-3.0 and comes unchanged from [its releases](https://github.com/imputnet/helium-linux/releases), with its source at [imputnet/helium](https://github.com/imputnet/helium). The wallpapers are photos under the [Unsplash License](https://unsplash.com/license), credited in [`os/image/files/usr/share/backgrounds/luft/CREDITS`](os/image/files/usr/share/backgrounds/luft/CREDITS).

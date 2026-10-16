@@ -81,6 +81,16 @@ FROM scratch AS runtime
 COPY --from=runtime-build /stage /stage
 COPY --from=runtime-build /out/ /
 
+FROM ${BASE} AS helium-build
+COPY os/image/parts/helium /src/os/image/parts/helium
+COPY os/image/parts/stages/helium.sh /src/os/image/parts/stages/helium.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf install -y --setopt=keepcache=True binutils && \
+    /src/os/image/parts/stages/helium.sh /stage
+
+FROM scratch AS helium
+COPY --from=helium-build /stage /stage
+
 FROM builder AS services-build
 COPY packages /src/packages
 COPY security/Cargo.toml security/Cargo.lock /src/security/

@@ -1,0 +1,7 @@
+[Default Applications]
+application/pdf=com.lantharos.magpie.desktop;
+image/gif=com.lantharos.magpie.desktop;
+image/jpeg=com.lantharos.magpie.desktop;
+image/png=com.lantharos.magpie.desktop;
+image/webp=com.lantharos.magpie.desktop;
+application/xml=com.lantharos.draft.desktop;

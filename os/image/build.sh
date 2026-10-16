@@ -22,10 +22,10 @@ localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the system
 before sealing.
 
 The image is put together from parts: Kestrel, the boot services, the patched
-bootc, the web runtime, the system services, each app and NVIDIA's driver. Each
-part is an image named after a hash of everything it's built from, in
-LUFT_PARTS (default localhost/luft-parts), so a build only makes the parts that
-changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
+bootc, the web runtime, Helium, the system services, each app and NVIDIA's
+driver. Each part is an image named after a hash of everything it's built from,
+in LUFT_PARTS (default localhost/luft-parts), so a build only makes the parts
+that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one
@@ -92,7 +92,7 @@ part_names() {
   local app
   printf '%s\n' kestrel boot bootc
   [[ "$1" != luft-nvidia ]] || echo nvidia
-  printf '%s\n' runtime services
+  printf '%s\n' runtime helium services
   for app in "$luft"/apps/*/; do
     app="$(basename "$app")"
     [[ "$app" == meet ]] || echo "app-$app"

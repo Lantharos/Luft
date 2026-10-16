@@ -20,6 +20,7 @@ pub struct Icon {
 }
 
 pub struct Bundle {
+    pub desktop_id: Option<String>,
     pub entry: DesktopEntry,
     pub entry_text: String,
     pub icons: Vec<Icon>,
@@ -171,6 +172,9 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         .iter()
         .any(|marker| contents.nodes.contains_key(Path::new(marker)));
     Ok(Bundle {
+        desktop_id: desktop
+            .file_stem()
+            .map(|stem| stem.to_string_lossy().into_owned()),
         entry,
         entry_text,
         icons,

@@ -169,7 +169,6 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       VERSION: ${{ needs.plan.outputs.version }}
-      TAGS: ${{ needs.plan.outputs.tags }}
       REFERENCE: ${{ needs.plan.outputs.reference }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:

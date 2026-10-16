@@ -1,5 +1,5 @@
+use zbus::OwnedObjectPath;
 use zbus::proxy;
-use zbus::zvariant::OwnedObjectPath;
 
 #[proxy(
     interface = "com.lantharos.Kestrel.Health",

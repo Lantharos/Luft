@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
 use futures_util::StreamExt;
+use zbus::OwnedVariant;
 use zbus::fdo::{PropertiesChangedStream, PropertiesProxy};
 use zbus::names::InterfaceName;
 use zbus::proxy::{CacheProperties, OwnerChangedStream};
-use zbus::zvariant::OwnedValue;
 use zbus::{Connection, Proxy};
 
 pub struct Endpoint {
@@ -22,7 +22,7 @@ pub struct RemoteProperty<T> {
     value: PhantomData<T>,
 }
 
-impl<T: TryFrom<OwnedValue>> RemoteProperty<T> {
+impl<T: TryFrom<OwnedVariant>> RemoteProperty<T> {
     pub async fn new(
         connection: &Connection,
         endpoint: &Endpoint,
@@ -34,8 +34,8 @@ impl<T: TryFrom<OwnedValue>> RemoteProperty<T> {
             interface,
         } = *endpoint;
         let properties = PropertiesProxy::builder(connection)
-            .destination(service)?
-            .path(path)?
+            .destination(service)
+            .path(path)
             .cache_properties(CacheProperties::No)
             .build()
             .await?;

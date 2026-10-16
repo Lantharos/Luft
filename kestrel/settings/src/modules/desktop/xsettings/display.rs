@@ -77,8 +77,11 @@ impl Display {
             ClientMessageEvent::new(32, root, manager, [time, selection, window, 0, 0]);
         connection.send_event(false, root, EventMask::STRUCTURE_NOTIFY, announcement)?;
         connection.flush()?;
+        // SAFETY: `readable` is declared before `connection`, so it is dropped while the
+        // connection's socket is still open.
+        let readable = unsafe { AsyncFd::register(connection.stream().as_raw_fd())? };
         Ok(Self {
-            readable: AsyncFd::new(connection.stream().as_raw_fd())?,
+            readable,
             connection,
             root,
             window,

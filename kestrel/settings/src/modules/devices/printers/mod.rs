@@ -59,9 +59,9 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         .await?;
     let rule = MatchRule::builder()
         .msg_type(Type::Signal)
-        .interface(NOTIFIER)?
-        .path("/org/cups/cupsd/Notifier")?
-        .build();
+        .interface(NOTIFIER)
+        .path("/org/cups/cupsd/Notifier")
+        .build()?;
     let mut events = MessageStream::for_match_rule(rule, &context.system, None).await?;
     let mut printers = Printers {
         session: context.session.clone(),

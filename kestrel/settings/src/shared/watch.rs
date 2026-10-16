@@ -18,8 +18,10 @@ pub struct TreeWatch {
 impl TreeWatch {
     pub fn new(roots: impl IntoIterator<Item = PathBuf>) -> io::Result<Self> {
         let inotify = inotify::init(CreateFlags::NONBLOCK | CreateFlags::CLOEXEC)?;
+        // SAFETY: the AsyncFd owns the inotify descriptor, so it stays open for its whole life.
+        let inotify = unsafe { AsyncFd::register(inotify)? };
         let mut watch = Self {
-            inotify: AsyncFd::new(inotify)?,
+            inotify,
             directories: HashMap::new(),
         };
         for root in roots {

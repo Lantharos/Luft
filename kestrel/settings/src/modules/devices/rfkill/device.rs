@@ -39,9 +39,11 @@ pub struct Rfkill {
 impl Rfkill {
     pub fn open() -> io::Result<Self> {
         let flags = OFlags::RDWR | OFlags::NONBLOCK | OFlags::CLOEXEC;
-        let device = rustix::fs::open(DEVICE, flags, Mode::empty())?;
+        let device = std::fs::File::from(rustix::fs::open(DEVICE, flags, Mode::empty())?);
+        // SAFETY: the AsyncFd owns the device, so its descriptor stays open for its whole life.
+        let device = unsafe { AsyncFd::register(device)? };
         Ok(Self {
-            device: AsyncFd::new(std::fs::File::from(device))?,
+            device,
             input_inhibitor: None,
         })
     }

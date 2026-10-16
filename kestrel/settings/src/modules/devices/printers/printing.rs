@@ -2,8 +2,7 @@ use std::io;
 use std::os::fd::OwnedFd;
 
 use tokio::fs::File;
-use zbus::zvariant::{self, DeserializeDict, SerializeDict, Type};
-use zbus::{fdo, interface};
+use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 
 use super::cups::{self, Cups, PRINT_JOB};
 use super::ipp::{Attributes, JOB};
@@ -29,11 +28,7 @@ const COLLATED: &str = "separate-documents-collated-copies";
 const UNCOLLATED: &str = "separate-documents-uncollated-copies";
 
 #[derive(SerializeDict, Type)]
-#[zvariant(
-    signature = "a{sv}",
-    rename_all = "kebab-case",
-    crate = "zbus::zvariant"
-)]
+#[zbus(signature = "a{sv}", rename_all = "kebab-case")]
 pub struct Printer {
     name: String,
     description: String,
@@ -86,11 +81,7 @@ impl Printer {
 }
 
 #[derive(DeserializeDict, Type)]
-#[zvariant(
-    signature = "a{sv}",
-    rename_all = "kebab-case",
-    crate = "zbus::zvariant"
-)]
+#[zbus(signature = "a{sv}", rename_all = "kebab-case")]
 pub struct JobOptions {
     copies: Option<i32>,
     collate: Option<bool>,
@@ -163,7 +154,7 @@ impl Printing {
     async fn print(
         &self,
         printer: &str,
-        document: zvariant::OwnedFd,
+        document: zbus::OwnedFd,
         title: &str,
         options: JobOptions,
     ) -> fdo::Result<u32> {

@@ -6,11 +6,11 @@ use std::collections::HashMap;
 
 use futures_util::StreamExt;
 use tokio::sync::mpsc;
+use zbus::Variant;
 use zbus::fdo::{ObjectManagerProxy, Properties};
 use zbus::names::InterfaceName;
 use zbus::object_server::InterfaceRef;
 use zbus::proxy;
-use zbus::zvariant::Value;
 
 use crate::context::Context;
 use crate::shared::remote::{Endpoint, RemoteProperty};
@@ -54,8 +54,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         .ok();
     let mut wwan = RemoteProperty::<bool>::new(system, &NETWORK_MANAGER, "WwanEnabled").await?;
     let modem_objects = ObjectManagerProxy::builder(system)
-        .destination(MODEM_MANAGER)?
-        .path("/org/freedesktop/ModemManager1")?
+        .destination(MODEM_MANAGER)
+        .path("/org/freedesktop/ModemManager1")
         .build()
         .await?;
     let mut modems_added = modem_objects.receive_interfaces_added().await?;
@@ -162,10 +162,10 @@ async fn publish(radios: &InterfaceRef<Radios>, next: State) {
         ),
         ("WwanHasAirplaneMode", previous.has_wwan, next.has_wwan),
     ];
-    let changed: HashMap<&str, Value> = fields
+    let changed: HashMap<&str, Variant> = fields
         .into_iter()
         .filter(|(_, before, after)| before != after)
-        .map(|(name, _, after)| (name, Value::from(after)))
+        .map(|(name, _, after)| (name, Variant::from(after)))
         .collect();
     if changed.is_empty() {
         return;

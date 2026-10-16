@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use zbus::zvariant::OwnedObjectPath;
+use zbus::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
 const CITY_ACCURACY: u32 = 4;
@@ -72,7 +72,7 @@ async fn locate_with(
     path: &OwnedObjectPath,
     desktop_id: &str,
 ) -> zbus::Result<Coordinates> {
-    let client = ClientProxy::builder(system).path(path)?.build().await?;
+    let client = ClientProxy::builder(system).path(path).build().await?;
     client.set_desktop_id(desktop_id).await?;
     client.set_requested_accuracy_level(CITY_ACCURACY).await?;
     let mut updates = client.receive_location_updated().await?;
@@ -84,7 +84,7 @@ async fn locate_with(
         .flatten()
         .ok_or_else(|| zbus::Error::Failure("The location didn't arrive in time".into()))?;
     let location = LocationProxy::builder(system)
-        .path(update.args()?.new)?
+        .path(update.args()?.new)
         .build()
         .await?;
     Ok(Coordinates {

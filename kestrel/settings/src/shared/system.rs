@@ -1,5 +1,5 @@
 use zbus::proxy;
-use zbus::zvariant::{OwnedFd, OwnedObjectPath};
+use zbus::{OwnedFd, OwnedObjectPath};
 
 #[proxy(
     interface = "org.freedesktop.login1.Manager",

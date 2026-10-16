@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use futures_util::StreamExt;
+use zbus::Variant;
 use zbus::fdo::DBusProxy;
-use zbus::zvariant::Value;
 use zbus::{Connection, proxy};
 
 pub const URGENCY_NORMAL: u8 = 1;
@@ -27,7 +27,7 @@ pub trait Notifications {
         summary: &str,
         body: &str,
         actions: &[&str],
-        hints: HashMap<&str, Value<'_>>,
+        hints: HashMap<&str, Variant<'_>>,
         expire_timeout: i32,
     ) -> zbus::Result<u32>;
 
@@ -55,11 +55,11 @@ impl Notification<'_> {
             .flat_map(|(key, label)| [*key, *label])
             .collect();
         let mut hints = HashMap::from([
-            ("desktop-entry", Value::from(SETTINGS_APP)),
-            ("urgency", Value::from(self.urgency)),
+            ("desktop-entry", Variant::from(SETTINGS_APP)),
+            ("urgency", Variant::from(self.urgency)),
         ]);
         if self.transient {
-            hints.insert("transient", Value::from(true));
+            hints.insert("transient", Variant::from(true));
         }
         NotificationsProxy::new(session)
             .await?

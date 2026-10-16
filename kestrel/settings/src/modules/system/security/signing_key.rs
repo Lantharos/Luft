@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
+use zbus::OwnedVariant;
 use zbus::proxy::CacheProperties;
-use zbus::zvariant::OwnedValue;
 use zbus::{Connection, proxy};
 
 use crate::context::Context;
@@ -17,7 +17,7 @@ const SETTINGS_ACTION: &str = "settings";
 )]
 trait Trust {
     #[zbus(property)]
-    fn signing_key(&self) -> zbus::Result<HashMap<String, OwnedValue>>;
+    fn signing_key(&self) -> zbus::Result<HashMap<String, OwnedVariant>>;
 }
 
 enum Missed {
@@ -26,7 +26,7 @@ enum Missed {
 }
 
 impl Missed {
-    fn read(key: &HashMap<String, OwnedValue>) -> Option<Self> {
+    fn read(key: &HashMap<String, OwnedVariant>) -> Option<Self> {
         let this_boot = key
             .get("MissedThisBoot")
             .and_then(|value| bool::try_from(value).ok())?;

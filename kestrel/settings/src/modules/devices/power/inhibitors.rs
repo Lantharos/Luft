@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use tokio::time::{Instant, sleep_until};
 use zbus::Connection;
-use zbus::zvariant::OwnedFd;
+use zbus::OwnedFd;
 
 use super::proxies::PowerProfilesProxy;
 use crate::shared::system::LoginProxy;

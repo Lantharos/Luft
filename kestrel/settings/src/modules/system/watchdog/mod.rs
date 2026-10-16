@@ -6,9 +6,9 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use tokio::time::{Instant, MissedTickBehavior, interval, timeout};
 use zbus::Connection;
+use zbus::OwnedFd;
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
-use zbus::zvariant::OwnedFd;
 
 use crate::context::Context;
 use crate::shared::system::LoginProxy;
@@ -69,14 +69,12 @@ async fn display_session(
         .ok()?;
     let user = LoginUserProxy::builder(system)
         .path(user)
-        .ok()?
         .build()
         .await
         .ok()?;
     let (_, session) = user.display().await.ok()?;
     LoginSessionProxy::builder(system)
         .path(session)
-        .ok()?
         .build()
         .await
         .ok()

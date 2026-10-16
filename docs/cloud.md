@@ -81,10 +81,9 @@ Accounts signed in before the switch keep working with the registration they wer
 
 `cargo test` in `packages/accounts/service` covers token exchange against a stand-in server, filters, conflict names and how errors read.
 
-End to end, the service runs on a private session bus with a scratch Luft Keyring, both sealed off from the system like the keyring's own tests, while rclone runs outside so it can mount:
+`kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and `KESTREL_DEV_APPS=settings,rover`, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover.
 
-- Nextcloud: a local server from the official `nextcloud` image in Podman, signed in with a password and the browser flow, then reading, keeping, editing on both sides, conflicts, freeing space, share links and going offline and back.
-- OneDrive and Dropbox: up to the browser, then a made-up code, which each service refuses.
-- iCloud Drive: against a stand-in for `rclone rcd` that answers like Apple, covering device and texted codes, choosing a phone, a wrong code, a wrong password, Advanced Data Protection and the monthly sign-in.
+Signing in to iCloud Drive, OneDrive and Dropbox needs real accounts, so check these by hand after changing sign-in:
 
-Settings and Rover run from their build folders in a headless Kestrel session with `KESTREL_DEV_APPS=settings,rover`.
+- iCloud Drive: the code from a device, a texted code, a wrong code, signing in again after the monthly check, and an account with Advanced Data Protection.
+- OneDrive and Dropbox: the browser sign-in, a share link and opening a file in the browser.

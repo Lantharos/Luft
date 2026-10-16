@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  SABINE: v0.39
+  SABINE: v0.40
 
 jobs:
   build:

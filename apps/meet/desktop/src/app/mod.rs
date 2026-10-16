@@ -5,6 +5,8 @@ mod dialog;
 mod job;
 #[cfg(windows)]
 mod link;
+#[cfg(windows)]
+mod logs;
 
 use std::sync::{Arc, OnceLock};
 
@@ -65,6 +67,27 @@ fn pick_iso() -> Value {
     Value::Null
 }
 
+#[cfg(windows)]
+fn save_logs() -> Result<Value, Failed> {
+    Ok(logs::save()?.map_or(Value::Null, Value::String))
+}
+
+#[cfg(not(windows))]
+fn save_logs() -> Result<Value, Failed> {
+    Err(Failed::from(ONLY_WINDOWS.to_owned()))
+}
+
+#[cfg(windows)]
+fn show_file(path: String) -> Result<Value, Failed> {
+    logs::show(&path)?;
+    Ok(Value::Null)
+}
+
+#[cfg(not(windows))]
+fn show_file(_: String) -> Result<Value, Failed> {
+    Err(Failed::from(ONLY_WINDOWS.to_owned()))
+}
+
 fn source() -> Source {
     let channel = if std::env::args().any(|argument| argument == NIGHTLY) {
         Channel::Nightly
@@ -85,6 +108,10 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = job::command(window, "meet_call", events, call);
     let window = job::command(window, "meet_belongings", events, |_, _: Value| {
         belongings()
+    });
+    let window = job::command(window, "meet_save_logs", events, |_, _: Value| save_logs());
+    let window = job::command(window, "meet_show_file", events, |_, path: String| {
+        show_file(path)
     });
     job::command(
         window,

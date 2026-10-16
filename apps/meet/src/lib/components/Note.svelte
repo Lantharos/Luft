@@ -2,22 +2,20 @@
 	import { fly } from 'svelte/transition';
 	import { session } from '#lib/state/meet.svelte.js';
 
-	const MESSAGES = {
-		nightly: 'Meet Luft will use nightly builds',
-		latest: 'Meet Luft will use releases again'
-	};
-
-	function undo() {
+	function act(run: () => unknown) {
 		session.dismissNote();
-		void session.switchChannel();
+		void run();
 	}
 </script>
 
 {#if session.note}
 	{#key session.note.id}
-		<div class="note" role="status" transition:fly={{ y: 12, duration: 200 }}>
-			<span class="min-w-0 truncate">{MESSAGES[session.note.channel]}</span>
-			<button class="action" type="button" onclick={undo}>Undo</button>
+		<div class="note" class:plain={!session.note.action} role="status" transition:fly={{ y: 12, duration: 200 }}>
+			<span class="min-w-0 truncate">{session.note.message}</span>
+			{#if session.note.action}
+				{@const action = session.note.action}
+				<button class="action" type="button" onclick={() => act(action.run)}>{action.label}</button>
+			{/if}
 		</div>
 	{/key}
 {/if}
@@ -42,6 +40,10 @@
 		backdrop-filter: blur(24px);
 		font-size: 13px;
 		color: var(--text-soft);
+	}
+
+	.plain {
+		padding: 12px 16px;
 	}
 
 	.action {

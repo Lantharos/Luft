@@ -6,6 +6,7 @@ RUN printf '%s\n' "$INSTALL_IMAGES" >> /usr/lib/luft-installer/install.toml && \
     useradd --no-create-home --groups wheel --comment Luft live && \
     passwd --delete live && \
     systemctl mask bootloader-update.service && \
+    systemctl enable luft-live-logs.timer luft-live-logs.path luft-live-logs-shutdown.service && \
     systemctl --global mask luft-keyring.service luft-keyring.socket && \
     sed -i '/^NoDisplay=true$/d' /usr/share/applications/com.lantharos.setup.desktop && \
     glib-compile-schemas /usr/share/glib-2.0/schemas

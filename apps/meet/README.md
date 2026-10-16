@@ -30,6 +30,8 @@ The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe
 
 Start it with `--nightly`, or press Ctrl+Shift+N in it, to use `luft-nightly.iso` instead of `luft-latest.iso`. Ctrl+Shift+N again switches back.
 
+Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip. Where Luft keeps them is in [docs/meet.md](../../docs/meet.md#logs-from-try-luft).
+
 ## Testing
 
 ```sh

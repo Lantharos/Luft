@@ -1,0 +1,15 @@
+[Unit]
+Description=Save Try Luft's logs when it stops
+ConditionPathExists=/run/initramfs/live/meet.json
+After=run-initramfs-live.mount systemd-journald.service
+Before=systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/true
+ExecStop=/usr/libexec/luft-live-logs
+TimeoutStopSec=2min
+
+[Install]
+WantedBy=multi-user.target

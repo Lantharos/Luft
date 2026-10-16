@@ -14,10 +14,15 @@ const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'rem
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;
+const CHANNEL_NOTES: Record<Channel, string> = {
+	nightly: 'Meet Luft will use nightly builds',
+	latest: 'Meet Luft will use releases again'
+};
 
-export interface ChannelNote {
+export interface Note {
 	id: number;
-	channel: Channel;
+	message: string;
+	action: { label: string; run: () => unknown } | null;
 }
 
 class MeetState {
@@ -30,7 +35,7 @@ class MeetState {
 	luft = $state(0);
 	busy = $state(false);
 	failure = $state<Failure | null>(null);
-	note = $state<ChannelNote | null>(null);
+	note = $state<Note | null>(null);
 
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
 	nightly = $derived(this.source.kind === 'download' && this.source.channel === 'nightly');
@@ -85,9 +90,7 @@ class MeetState {
 		if (this.step === 'working') return;
 		const channel: Channel = this.nightly ? 'latest' : 'nightly';
 		this.source = { kind: 'download', channel };
-		this.note = { id: (this.note?.id ?? 0) + 1, channel };
-		clearTimeout(this.noteTimer);
-		this.noteTimer = setTimeout(() => (this.note = null), NOTE_SHOWN);
+		this.showNote(CHANNEL_NOTES[channel], { label: 'Undo', run: () => this.switchChannel() });
 		if (this.step === 'check') {
 			this.report = null;
 			await this.inspect();
@@ -95,6 +98,23 @@ class MeetState {
 			await this.inspect();
 			if (this.blocked) this.go('check');
 		}
+	}
+
+	async saveLogs() {
+		try {
+			const saved = await meet.saveLogs();
+			if (saved) this.showNote('Saved the logs from Try Luft to your desktop', { label: 'Show', run: () => meet.showFile(saved) });
+			else this.showNote('There are no logs from Try Luft yet', null);
+		} catch (error) {
+			console.error("Meet Luft couldn't save Try Luft's logs:", error);
+			this.showNote("Meet Luft couldn't save the logs from Try Luft", null);
+		}
+	}
+
+	private showNote(message: string, action: Note['action']) {
+		this.note = { id: (this.note?.id ?? 0) + 1, message, action };
+		clearTimeout(this.noteTimer);
+		this.noteTimer = setTimeout(() => (this.note = null), NOTE_SHOWN);
 	}
 
 	dismissNote() {

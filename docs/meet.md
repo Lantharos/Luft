@@ -28,6 +28,36 @@ When Windows encrypts new partitions with BitLocker as soon as they're formatted
 
 After Luft is installed and you sign in for the first time, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
 
+## Logs from Try Luft
+
+When Luft starts from Meet Luft's partition, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets its own folder, `Luft logs\YYYY-MM-DD HH-MM-SS` on the *Luft* partition, named after the time of its first save. The last five are kept, fewer when the partition runs low on space. Starting from a USB stick saves nothing.
+
+| File | What's in it |
+| --- | --- |
+| `journal.txt` | The whole journal of that start (`journalctl -b -o short-precise`) |
+| `journal.json.zst` | The same journal as JSON, compressed with zstd |
+| `kestrel.txt` | Kestrel's own messages: the desktop, setup mode, the login screen and the graphics watchdog |
+| `kestrel-watchdog` | The graphics watchdog's records, when it has any |
+| `coredumps.txt` | `coredumpctl list` and `coredumpctl info` for every crash, with backtraces |
+| `dmesg.txt` | Kernel messages |
+| `system.txt` | Kernel, version, command line, `meet.json`, memory and drives |
+| `lspci.txt`, `lsusb.txt` | Devices and their drivers (`lspci -nnk`, `lsusb`, `lsusb -t`) |
+| `drm.txt` | Graphics cards and their drivers, and each connector's state and modes |
+| `vainfo.txt` | Video decoding, for each render node |
+| `sushi.txt` | `sushictl status` |
+| `sabine` | Sabine's logs from the live account |
+
+In Meet Luft, **Ctrl+Shift+L** puts the newest folder on the desktop as `Luft logs YYYY-MM-DD HH-MM-SS.zip`, and *Show* opens it in Explorer.
+
+To read them without Meet Luft, use the partition's volume path. It works without giving the partition a drive letter, and only reads:
+
+```powershell
+$luft = (Get-Volume -FileSystemLabel Luft).Path        # \\?\Volume{…}\
+Get-ChildItem -LiteralPath "${luft}Luft logs"
+Get-Content -LiteralPath "${luft}Luft logs\2026-10-16 14-05-33\journal.txt" -Tail 50
+Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Recurse
+```
+
 ## Taking it back out
 
 *Remove Luft from this PC* deletes the start entry and every partition Meet Luft made, moving box included, and gives Windows all of its space back. Once Luft is installed, its partition is Luft's own: remove it from Windows' Disk Management if you go back.

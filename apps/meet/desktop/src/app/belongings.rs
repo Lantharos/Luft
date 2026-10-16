@@ -45,7 +45,7 @@ pub struct Gathered {
     regional: Regional,
 }
 
-fn known(kind: FolderKind) -> Option<PathBuf> {
+pub(super) fn known(kind: FolderKind) -> Option<PathBuf> {
     let id: &GUID = match kind {
         FolderKind::Desktop => &FOLDERID_Desktop,
         FolderKind::Documents => &FOLDERID_Documents,

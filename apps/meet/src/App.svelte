@@ -4,7 +4,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { isAvailable } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
-	import ChannelNote from '#lib/components/ChannelNote.svelte';
+	import Note from '#lib/components/Note.svelte';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
@@ -18,10 +18,16 @@
 	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed };
 	const SLIDE = 28;
 
+	const SHORTCUTS: Record<string, () => unknown> = {
+		KeyN: () => session.switchChannel(),
+		KeyL: () => session.saveLogs()
+	};
+
 	function onkeydown(event: KeyboardEvent) {
-		if (!event.ctrlKey || !event.shiftKey || event.altKey || event.code !== 'KeyN') return;
+		const shortcut = SHORTCUTS[event.code];
+		if (!event.ctrlKey || !event.shiftKey || event.altKey || !shortcut) return;
 		event.preventDefault();
-		void session.switchChannel();
+		void shortcut();
 	}
 
 	onMount(() => {
@@ -50,6 +56,6 @@
 				<Step />
 			</div>
 		{/key}
-		<ChannelNote />
+		<Note />
 	</main>
 </GlassShell>

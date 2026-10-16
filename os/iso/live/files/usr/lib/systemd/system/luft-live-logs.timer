@@ -1,0 +1,10 @@
+[Unit]
+Description=Save Try Luft's logs every few minutes
+ConditionPathExists=/run/initramfs/live/meet.json
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

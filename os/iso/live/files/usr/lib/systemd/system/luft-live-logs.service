@@ -1,0 +1,8 @@
+[Unit]
+Description=Save Try Luft's logs next to it on the disk
+ConditionPathExists=/run/initramfs/live/meet.json
+After=run-initramfs-live.mount systemd-journald.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-live-logs

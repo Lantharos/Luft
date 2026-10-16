@@ -1,0 +1,134 @@
+#!/usr/bin/bash
+set -uo pipefail
+
+medium=/run/initramfs/live
+logs="$medium/Luft logs"
+saving="$logs/.saving"
+state=/run/luft-live-logs
+coredump_store=/var/lib/systemd/coredump
+coredump_message=fc2e22bc6ee647b6b90729ab34a250b1
+sessions_kept=5
+free_kept_kib=$((64 * 1024))
+
+session_name() {
+    [[ -s "$state/session" ]] || date '+%Y-%m-%d %H-%M-%S' >"$state/session"
+    cat "$state/session"
+}
+
+crash_reports() {
+    journalctl --boot --quiet --output=cat --output-fields=COREDUMP_PID "MESSAGE_ID=$coredump_message" | grep -c .
+}
+
+stored_coredumps() {
+    find "$coredump_store" -maxdepth 1 -type f -name 'core.*' 2>/dev/null | wc -l
+}
+
+wait_for_crash_reports() {
+    local attempt
+    for attempt in {1..60}; do
+        (($(crash_reports) >= $(stored_coredumps))) && return
+        sleep 1
+    done
+}
+
+coredumps() {
+    local boot
+    boot="_BOOT_ID=$(tr -d - </proc/sys/kernel/random/boot_id)"
+    coredumpctl --no-pager --quiet list "$boot"
+    echo
+    coredumpctl --no-pager --quiet info "$boot"
+}
+
+drm() {
+    local card connector
+    for card in /sys/class/drm/card[0-9]; do
+        printf '%s: %s %s\n' "${card##*/}" "$(basename "$(readlink -f "$card/device/driver")")" "$(basename "$(readlink -f "$card/device")")"
+    done
+    for connector in /sys/class/drm/card[0-9]-*; do
+        printf '\n%s: %s, %s, dpms %s, EDID %s bytes\n' "${connector##*/}" \
+            "$(<"$connector/status")" "$(<"$connector/enabled")" "$(<"$connector/dpms")" "$(wc -c <"$connector/edid")"
+        sed 's/^/  /' "$connector/modes"
+    done
+}
+
+video_acceleration() {
+    local node
+    for node in /dev/dri/renderD*; do
+        echo "== $node"
+        vainfo --display drm --device "$node" 2>&1
+    done
+}
+
+system() {
+    uname -a
+    echo
+    cat /etc/os-release
+    echo
+    cat /proc/cmdline
+    echo
+    cat "$medium/meet.json"
+    echo
+    uptime
+    free -h
+    echo
+    lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,PARTLABEL,PARTUUID,MOUNTPOINTS
+}
+
+live_home() {
+    getent passwd live | cut -d: -f6
+}
+
+collect() {
+    local into="$1" home
+    journalctl --boot --no-pager --output=short-precise >"$into/journal.txt"
+    journalctl --boot --no-pager --output=json | zstd --quiet -6 -o "$into/journal.json.zst"
+    journalctl --boot --no-pager --output=short-precise \
+        _SYSTEMD_USER_UNIT=kestrel.service + SYSLOG_IDENTIFIER=kestrel-setup + \
+        _SYSTEMD_UNIT=kestrel-greeter.service + _SYSTEMD_UNIT=kestrel-watchdog.service >"$into/kestrel.txt"
+    coredumps >"$into/coredumps.txt" 2>&1
+    dmesg --time-format=iso >"$into/dmesg.txt"
+    system >"$into/system.txt" 2>&1
+    lspci -nnk >"$into/lspci.txt" 2>&1
+    { lsusb; echo; lsusb -t; } >"$into/lsusb.txt" 2>&1
+    drm >"$into/drm.txt" 2>&1
+    video_acceleration >"$into/vainfo.txt"
+    sushictl status >"$into/sushi.txt" 2>&1
+    home="$(live_home)"
+    [[ -d "$home/.local/share/sabine/logs" ]] && cp -r "$home/.local/share/sabine/logs" "$into/sabine"
+    [[ -d /var/lib/kestrel-watchdog ]] && cp -r /var/lib/kestrel-watchdog "$into/kestrel-watchdog"
+}
+
+free_kib() {
+    df --output=avail -k "$medium" | tail -n1
+}
+
+prune() {
+    local -a sessions
+    mapfile -t sessions < <(find "$logs" -mindepth 1 -maxdepth 1 -type d -not -name '.*' -printf '%f\n' | sort)
+    while ((${#sessions[@]} > sessions_kept)) || ((${#sessions[@]} > 1 && $(free_kib) < free_kept_kib)); do
+        rm -rf "$logs/${sessions[0]}"
+        sessions=("${sessions[@]:1}")
+    done
+}
+
+save() {
+    local session="$logs/$(session_name)"
+    rm -rf "$saving"
+    mkdir -p "$saving"
+    cp -r --no-preserve=all "$state/collected/." "$saving/"
+    rm -rf "$session"
+    mv "$saving" "$session"
+    prune
+    sync --file-system "$medium"
+}
+
+mkdir -p "$state"
+exec 9>"$state/lock"
+flock 9
+wait_for_crash_reports
+rm -rf "$state/collected"
+mkdir "$state/collected"
+collect "$state/collected"
+mount -o remount,rw "$medium" || exit
+trap 'mount -o remount,ro "$medium"' EXIT
+save

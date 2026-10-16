@@ -114,7 +114,7 @@ function settle(finished: Finished) {
 	else job.resolve(finished.value);
 }
 
-async function start<T>(command: string, request: object = {}): Promise<T> {
+async function start<T>(command: string, request: unknown = {}): Promise<T> {
 	if (!listening) {
 		listen<Finished>('meet.finished', settle);
 		listening = true;
@@ -140,6 +140,8 @@ export const tidy = () => call<null>({ call: 'tidy' });
 export const firmwareSettings = () => call<null>({ call: 'firmwareSettings' });
 export const undo = () => call<null>({ call: 'undo' });
 export const pickIso = () => start<string | null>('meet_pick_iso');
+export const saveLogs = () => start<string | null>('meet_save_logs');
+export const showFile = (path: string) => start<null>('meet_show_file', path);
 export const belongings = () => start<Belongings>('meet_belongings');
 export const defaultSource = () => invoke<Source>('meet_source', {});
 export const onProgress = (callback: (progress: Progress) => void) => listen<Progress>('meet.progress', callback);

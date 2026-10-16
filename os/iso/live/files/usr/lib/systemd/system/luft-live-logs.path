@@ -1,0 +1,9 @@
+[Unit]
+Description=Save Try Luft's logs when an app crashes
+ConditionPathExists=/run/initramfs/live/meet.json
+
+[Path]
+PathChanged=/var/lib/systemd/coredump
+
+[Install]
+WantedBy=paths.target

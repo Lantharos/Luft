@@ -20,6 +20,7 @@ ureq = { version = "3.4.2", features = ["platform-verifier"] }
 raw-window-handle = "0.6.2"
 rfd = "0.17.2"
 wmi = { version = "0.18.4", default-features = false }
+zip = { version = "9.0.3", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 windows = { version = "0.62.2", features = [
   "Win32_Foundation",
   "Win32_Globalization",

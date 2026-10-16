@@ -28,9 +28,9 @@ sushi-scene = { path = "crates/sushi-scene" }
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
 drm = "0.15.0"
-libc = "0.2"
+libc = "0.2.190"
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.151"
+serde_json = "1.0.154"
 rustix = { version = "1.1.5", features = ["event", "fs", "mm", "net", "process", "termios", "time"] }
 tiny-skia = { version = "0.12.0", default-features = false }
 

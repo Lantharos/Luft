@@ -10,7 +10,7 @@ session_timeout=30m
 max_startup_failures=3
 inotify_per_session=24
 laptop_size=1920x1200:302x189mm
-laptop_areas=(board)
+laptop_areas=(board panel:battery)
 
 usage() {
   echo "Usage: kestrel/tools/session.sh capture [--only GROUPS] [--jobs N] [--list]"
@@ -22,7 +22,11 @@ all_groups() {
   (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
     | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
   for area in "${laptop_areas[@]}"; do
-    (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+laptop|" | sort
+    if [[ "$area" == *:* ]]; then
+      echo "$area+laptop"
+    else
+      (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+laptop|" | sort
+    fi
   done
   printf '%s\n' greeter setup scaling
 }

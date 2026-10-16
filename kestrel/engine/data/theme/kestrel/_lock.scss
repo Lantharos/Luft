@@ -23,6 +23,7 @@
   .kestrel-greeter-avatar { width: 32px; height: 32px; border-radius: 999px; background-size: cover; background-color: fill(0.12); }
   .kestrel-login-controls { spacing: 2px; margin: 28px; }
   .kestrel-login-control { color: ink(0.86); }
+  .kestrel-login-control .kestrel-battery { @include battery-tints; }
   .kestrel-login-label { font-size: 13px; font-weight: 500; }
   .unlock-dialog .button, .unlock-dialog .icon-button {
     background-color: fill(0.10); border-radius: 10px; border-color: transparent; box-shadow: none;

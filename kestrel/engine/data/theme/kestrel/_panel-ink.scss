@@ -19,6 +19,7 @@
   .kestrel-app-focused .kestrel-running-dot { background-color: ink(); }
   .kestrel-task-progress { background-color: fill(0.18); }
   .kestrel-task-progress-fill { background-color: ink(); }
+  .kestrel-battery { @include battery-tints; }
   .kestrel-task-button.drop-before { box-shadow: inset 3px 0 ink(0.75); }
   .kestrel-task-button.drop-after { box-shadow: inset -3px 0 ink(0.75); }
 }
@@ -33,5 +34,6 @@
   $shadows: halo-shadows($strength);
   #{$scope} StIcon { icon-shadow: nth($shadows, 1); }
   #{$scope} StLabel { text-shadow: nth($shadows, 2); }
+  #{$scope} .kestrel-battery { icon-shadow: nth($shadows, 1); }
   .kestrel-running-dot { box-shadow: nth($shadows, 3); }
 }

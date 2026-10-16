@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
+import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -12,7 +13,7 @@ import {touchpad} from './lib/touchpad.js';
 const {require, eventually} = checks('board');
 const STAGE_MULTIPLE = 4;
 const ZOOM_STEPS = 12;
-const BATTERY = {iconName: 'battery-level-80-symbolic', percentage: 80, status: 'discharging', secondsLeft: 0};
+const BATTERY = {percentage: 80, status: 'discharging', secondsLeft: 0};
 
 const blurredBehind = actor => actor.get_effects().some(effect => effect instanceof Shell.BlurEffect && effect.mode === Shell.BlurMode.BACKGROUND);
 
@@ -93,14 +94,13 @@ async function useBoard() {
 
 export async function run() {
   await openWindows();
-  const {pill} = board().corner;
-  pill.showBattery(BATTERY);
+  battery.pin(BATTERY);
   const bounds = new GlassBounds();
   try {
     await useBoard();
   } finally {
     bounds.stop();
-    pill.showBattery(null);
+    battery.pin(undefined);
     await leaveBoard();
   }
   require(!bounds.worst, `glass stays within ${STAGE_MULTIPLE} times the screen on a board with a battery${bounds.worst ? `, but ${bounds.worst.text}` : ''}`);

@@ -3,7 +3,7 @@ import type GLib from 'gi://GLib';
 import St from 'gi://St';
 import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
 
-import { Battery, type BatteryState } from '../../../surfaces/quickSettings/battery.js';
+import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { blurSurface } from '../../../shared/surface.js';
 
 export class CornerPill {
@@ -14,19 +14,13 @@ export class CornerPill {
     accessible_name: 'Quick settings',
   });
   private readonly status = new St.BoxLayout({ style_class: 'kestrel-board-pill-status', y_align: Clutter.ActorAlign.CENTER });
-  private readonly batteryBox = new St.BoxLayout({ style_class: 'kestrel-board-pill-battery', visible: false });
-  private readonly batteryIcon = new St.Icon({ style_class: 'kestrel-board-pill-icon' });
-  private readonly batteryLevel = new St.Label({ style_class: 'kestrel-board-pill-battery-level', y_align: Clutter.ActorAlign.CENTER });
   private readonly time = new St.Label({ style_class: 'kestrel-board-pill-time', y_align: Clutter.ActorAlign.CENTER });
   private readonly clock = new WallClock((now, clock) => this.tick(now, clock));
-  private readonly battery = new Battery(state => this.showBattery(state));
 
   constructor(openQuickSettings: () => void) {
     const box = new St.BoxLayout({ style_class: 'kestrel-board-pill-box' });
     box.add_child(this.status);
-    this.batteryBox.add_child(this.batteryIcon);
-    this.batteryBox.add_child(this.batteryLevel);
-    box.add_child(this.batteryBox);
+    box.add_child(new BatteryIndicator(16).actor);
     box.add_child(this.time);
     this.actor.set_child(box);
     blurSurface(this.actor, 999);
@@ -45,14 +39,6 @@ export class CornerPill {
 
   destroy(): void {
     this.clock.destroy();
-    this.battery.destroy();
-  }
-
-  private showBattery(state: BatteryState | null): void {
-    this.batteryBox.visible = !!state;
-    if (!state) return;
-    this.batteryIcon.icon_name = state.iconName;
-    this.batteryLevel.text = `${state.percentage}%`;
   }
 
   private tick(now: GLib.DateTime, clock: WallClock): void {

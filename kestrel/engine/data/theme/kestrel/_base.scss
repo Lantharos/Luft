@@ -10,6 +10,7 @@ stage { @include glass-shading; }
 }
 
 .kestrel-glass { @include glass-surface; }
+.kestrel-battery { @include battery-tints; }
 .kestrel-glass-radius-16 { border-radius: 16px; }
 .kestrel-glass-radius-18 { border-radius: 18px; }
 .kestrel-glass-radius-20 { border-radius: 20px; }

@@ -12,6 +12,7 @@ import { createLauncher, type Launcher } from './launcher/launcher.js';
 import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './widgets/desktopPeek.js';
 import { PanelClock } from './widgets/clock.js';
+import { BatteryIndicator } from '../../shared/battery/indicator.js';
 import { PrivacyIndicator } from '../../system/privacy/indicator.js';
 import { InputSourceIndicator } from '../../system/inputSources/indicator.js';
 import { systemMonitor } from './widgets/systemMonitor.js';
@@ -110,6 +111,7 @@ export class KestrelPanel {
       });
       right.add_child(this.inputSource.actor);
       right.add_child(this.tray.actor);
+      this.statusIcons.add_child(new BatteryIndicator(16).actor);
       this.quickButton = new St.Button({
         style_class: 'kestrel-status-button', child: this.statusIcons,
         can_focus: true, accessible_name: 'Quick settings',
@@ -183,10 +185,10 @@ export class KestrelPanel {
   }
 
   updateStatus(iconNames: string[]): void {
-    const icons = this.statusIcons.get_children() as St.Icon[];
+    const icons = this.statusIcons.get_children().filter(child => child instanceof St.Icon);
     iconNames.forEach((iconName, index) => {
       const icon = icons[index] ?? new St.Icon({ icon_size: 16 });
-      if (!icon.get_parent()) this.statusIcons.add_child(icon);
+      if (!icon.get_parent()) this.statusIcons.insert_child_at_index(icon, index);
       icon.icon_name = iconName;
     });
     for (const icon of icons.slice(iconNames.length)) icon.destroy();

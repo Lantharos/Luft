@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
+import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -63,15 +64,19 @@ async function checkPower(styles, scheme) {
 export async function run() {
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const scheme = styles.get_string('color-scheme');
+  battery.pin({percentage: 64, status: 'charging', secondsLeft: 0});
   await lockAndWake();
   try {
     await showPrompt();
     require(named('kestrel-lock-controls') && named('kestrel-lock-accessibility') && named('kestrel-lock-power'),
       'the unlock prompt shows accessibility and power at the bottom right');
+    await eventually(() => named('kestrel-lock-battery')?.mapped && named('Battery 64%, charging', named('kestrel-lock-battery')),
+      'the unlock prompt shows the charging battery');
     await checkAccessibility();
     await checkPower(styles, scheme);
   } finally {
     styles.set_string('color-scheme', scheme);
     await unlock();
+    battery.pin(undefined);
   }
 }

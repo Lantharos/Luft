@@ -8,22 +8,24 @@ import type { QuickControl } from '../quickControls.js';
 interface TileParts {
   body: St.BoxLayout;
   top: St.BoxLayout;
-  icon: St.Icon;
   title: St.Label;
   subtitle: St.Label;
 }
 
-function tileParts(): TileParts {
+export const TILE_ICON_SIZE = 22;
+
+function tileParts(glyph: Clutter.Actor): TileParts {
   const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-control-body', x_expand: true });
   const top = new St.BoxLayout({ style_class: 'kestrel-control-top', x_expand: true });
-  const icon = new St.Icon({ icon_size: 22, x_expand: true, x_align: Clutter.ActorAlign.START });
+  glyph.x_expand = true;
+  glyph.x_align = Clutter.ActorAlign.START;
   const title = new St.Label({ style_class: 'kestrel-control-title', x_align: Clutter.ActorAlign.START });
   const subtitle = new St.Label({ style_class: 'kestrel-control-subtitle', x_align: Clutter.ActorAlign.START });
-  top.add_child(icon);
+  top.add_child(glyph);
   body.add_child(top);
   body.add_child(title);
   body.add_child(subtitle);
-  return { body, top, icon, title, subtitle };
+  return { body, top, title, subtitle };
 }
 
 function chevron(item: QuickControl): St.Button {
@@ -45,7 +47,8 @@ function chevron(item: QuickControl): St.Button {
 
 export function styleControl(item: QuickControl): void {
   const previous = item.get_child();
-  const { body, top, icon, title, subtitle } = tileParts();
+  const icon = new St.Icon({ icon_size: TILE_ICON_SIZE });
+  const { body, top, title, subtitle } = tileParts(icon);
   item.bind_property('gicon', icon, 'gicon', GObject.BindingFlags.SYNC_CREATE);
   item.bind_property('icon-name', icon, 'icon-name', item.icon_name ? GObject.BindingFlags.SYNC_CREATE : GObject.BindingFlags.DEFAULT);
   if (item.menu) top.add_child(chevron(item));
@@ -68,17 +71,15 @@ export interface ActionTile {
   actor: St.Button;
   title: St.Label;
   subtitle: St.Label;
-  icon: St.Icon;
 }
 
-export function actionTile(iconName: string, titleText: string, activate: () => void): ActionTile {
-  const { body, icon, title, subtitle } = tileParts();
-  icon.icon_name = iconName;
+export function actionTile(glyph: string | Clutter.Actor, titleText: string, activate: () => void): ActionTile {
+  const { body, title, subtitle } = tileParts(typeof glyph === 'string' ? new St.Icon({ icon_size: TILE_ICON_SIZE, icon_name: glyph }) : glyph);
   title.text = titleText;
   const actor = new St.Button({
     style_class: 'kestrel-control', can_focus: true, track_hover: true,
     accessible_name: titleText, label_actor: title, child: body,
   });
   actor.connect('clicked', activate);
-  return { actor, title, subtitle, icon };
+  return { actor, title, subtitle };
 }

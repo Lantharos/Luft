@@ -30,7 +30,13 @@ $scheme: $variant;
 
 $danger: #e5484d;
 $warning: pick(#9c6e03, #cd9309);
+$success: pick(#1f8f4e, #30c46c);
 $on_danger: #ffffff;
+
+@mixin battery-tints {
+  -kestrel-battery-charging: $success;
+  -kestrel-battery-low: $warning;
+}
 
 @mixin glass-shading {
   -kestrel-glass-highlight: pick(0.35, 0.14);

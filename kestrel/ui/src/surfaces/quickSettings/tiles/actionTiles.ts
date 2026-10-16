@@ -2,10 +2,11 @@ import Gio from 'gi://Gio';
 import type St from 'gi://St';
 
 import { label } from '../../../portal/shortcuts/accelerators.js';
-import { Battery, type BatteryState } from '../battery.js';
+import { battery, type BatteryState } from '../../../shared/battery/battery.js';
+import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
 import { openSettings, type SettingsPageId } from '../../../system/settingsPages.js';
-import { actionTile, type ActionTile } from './controlTile.js';
+import { actionTile, TILE_ICON_SIZE, type ActionTile } from './controlTile.js';
 import { shortDuration } from '../../../shared/duration.js';
 
 export interface Tile {
@@ -33,20 +34,18 @@ function showShortcut(tile: ActionTile, schema: string, key: string, settings: G
   settings.push(source);
 }
 
-const BATTERY_STATUS = { charging: 'Charging', full: 'Fully charged', plugged: 'Plugged in' };
-
-function batterySubtitle(state: BatteryState): string {
-  if (state.status !== 'discharging') return BATTERY_STATUS[state.status];
-  if (!state.secondsLeft) return 'On battery';
-  return `${shortDuration(state.secondsLeft)} left`;
+function batterySubtitle({ status, secondsLeft }: BatteryState): string {
+  if (status === 'charging') return secondsLeft ? `${shortDuration(secondsLeft)} until full` : 'Charging';
+  if (status === 'discharging') return secondsLeft ? `${shortDuration(secondsLeft)} left` : 'On battery';
+  return status === 'full' ? 'Fully charged' : 'Plugged in';
 }
 
 export class ActionTiles {
   readonly tiles: Tile[];
   private readonly settings: Gio.Settings[] = [];
-  private readonly battery: Battery;
+  private readonly unwatchBattery: () => void;
 
-  constructor(handlers: ActionHandlers, batteryChanged: (state: BatteryState | null) => void) {
+  constructor(handlers: ActionHandlers) {
     const screenshot = actionTile('camera-photo-symbolic', 'Screenshot', handlers.takeScreenshot);
     showShortcut(screenshot, 'com.lantharos.kestrel.keybindings', 'show-screenshot-ui', this.settings);
     const settings = actionTile('emblem-system-symbolic', 'Settings', () => {
@@ -60,19 +59,15 @@ export class ActionTiles {
     });
     showShortcut(lock, 'com.lantharos.kestrel.media-keys', 'screensaver', this.settings);
     bindAvailability(LOCK, lock.actor);
-    const battery = actionTile('battery-missing-symbolic', 'Battery', () => handlers.openSettings('power'));
-    battery.actor.visible = false;
-    this.battery = new Battery(state => {
-      battery.actor.visible = !!state;
-      if (state) {
-        battery.icon.icon_name = state.iconName;
-        battery.title.text = `${state.percentage}%`;
-        battery.subtitle.text = batterySubtitle(state);
-      }
-      batteryChanged(state);
+    const batteryTile = actionTile(new BatteryIndicator(TILE_ICON_SIZE, 'never').actor, 'Battery', () => handlers.openSettings('power'));
+    this.unwatchBattery = battery.watch(state => {
+      batteryTile.actor.visible = !!state;
+      if (!state) return;
+      batteryTile.title.text = `${state.percentage}%`;
+      batteryTile.subtitle.text = batterySubtitle(state);
     });
     this.tiles = [
-      { id: 'battery', actor: battery.actor, settingsPanel: 'power' },
+      { id: 'battery', actor: batteryTile.actor, settingsPanel: 'power' },
       { id: 'screenshot', actor: screenshot.actor, settingsPanel: null },
       { id: 'settings', actor: settings.actor, settingsPanel: null },
       { id: 'lock', actor: lock.actor, settingsPanel: 'privacy' },
@@ -80,7 +75,7 @@ export class ActionTiles {
   }
 
   destroy(): void {
-    this.battery.destroy();
+    this.unwatchBattery();
     for (const settings of this.settings) settings.run_dispose();
   }
 }

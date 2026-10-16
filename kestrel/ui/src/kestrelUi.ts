@@ -38,6 +38,7 @@ export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/app
 export { signInToNetwork } from './system/network/signIn.js';
 export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
+export { battery } from './shared/battery/battery.js';
 
 class KestrelUi {
   private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();

@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import type { Context } from '../../context.js';
@@ -6,17 +5,16 @@ import { InputSourceIndicator } from '../../system/inputSources/indicator.js';
 import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { ControlRow } from '../../desktop/menus/controlRow.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
-import { Battery, type BatteryState } from '../../surfaces/quickSettings/battery.js';
+import { battery, type BatteryState } from '../../shared/battery/battery.js';
+import { BatteryIndicator } from '../../shared/battery/indicator.js';
 import { LockAccessibility } from './accessibility.js';
 import { LockPower } from './power.js';
 
 export class LockControls {
   private readonly menus: ContextMenus;
   private readonly row: ControlRow;
-  private readonly batteryIcon = new St.Icon({ icon_size: 16, y_align: Clutter.ActorAlign.CENTER });
-  private readonly batteryLabel = new St.Label({ style_class: 'kestrel-login-label', y_align: Clutter.ActorAlign.CENTER });
   private readonly batteryStatus = new St.BoxLayout({ name: 'kestrel-lock-battery', style_class: 'kestrel-status-button kestrel-login-control kestrel-lock-battery', visible: false });
-  private readonly battery = new Battery(state => this.showBattery(state));
+  private readonly unwatchBattery: () => void;
   private readonly inputSource: InputSourceIndicator;
   private readonly accessibility = new LockAccessibility();
   private readonly power = new LockPower();
@@ -27,8 +25,8 @@ export class LockControls {
     layoutManager.addTopChrome(this.menus.shield);
     layoutManager.addTopChrome(this.menus.actor);
     this.row = new ControlRow(this.menus, 'kestrel-lock-controls');
-    this.batteryStatus.add_child(this.batteryIcon);
-    this.batteryStatus.add_child(this.batteryLabel);
+    this.batteryStatus.add_child(new BatteryIndicator(16).actor);
+    this.unwatchBattery = battery.watch(state => this.showBattery(state));
     this.row.add(this.batteryStatus);
     this.inputSource = new InputSourceIndicator(this.menus, () => []);
     this.row.add(this.inputSource.actor);
@@ -42,14 +40,11 @@ export class LockControls {
 
   private showBattery(state: BatteryState | null): void {
     this.batteryStatus.visible = !!state;
-    if (!state) return;
-    this.batteryIcon.icon_name = state.iconName;
-    this.batteryLabel.text = `${state.percentage}%`;
-    this.batteryStatus.accessible_name = `Battery ${state.percentage}%`;
+    if (state) this.batteryStatus.accessible_name = `Battery ${state.percentage}%`;
   }
 
   destroy(): void {
-    this.battery.destroy();
+    this.unwatchBattery();
     this.inputSource.shutdown();
     for (const actor of [this.menus.shield, this.menus.actor]) {
       this.layoutManager.removeChrome(actor);

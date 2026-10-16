@@ -12,7 +12,6 @@ import { attachSliderValue } from './sliderValue.js';
 import { KeepAwake } from './keepAwake.js';
 import { animateActor } from '../../shared/motion.js';
 import { blurSurface } from '../../shared/surface.js';
-import type { BatteryState } from './battery.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 import { styleControl } from './tiles/controlTile.js';
 import { ActionTiles, type Tile } from './tiles/actionTiles.js';
@@ -44,7 +43,6 @@ export class QuickSettings {
   private readonly tiles: RegisteredTile[] = [];
   private readonly actions: ActionTiles;
   private openMenu: ControlMenu | null = null;
-  private batteryState: BatteryState | null = null;
   private updateStatus = () => {};
   private readonly keepAwake = new KeepAwake(() => this.updateStatus());
   private layoutLater = 0;
@@ -65,10 +63,7 @@ export class QuickSettings {
       menuClosed: menu => this.menuClosed(menu),
     });
     this.drag = new TileDrag(this.grid, () => this.saveOrder());
-    this.actions = new ActionTiles({ takeScreenshot, openSettings: page => menus.settings(page), close }, state => {
-      this.batteryState = state;
-      this.updateStatus();
-    });
+    this.actions = new ActionTiles({ takeScreenshot, openSettings: page => menus.settings(page), close });
     this.actor.connect('destroy', () => {
       if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
@@ -112,7 +107,6 @@ export class QuickSettings {
         visibleIcon(networkIcons) ?? 'network-offline-symbolic',
         visibleIcon(bluetoothIcons),
         visibleIcon(volumeIcons) ?? 'audio-volume-muted-symbolic',
-        this.batteryState?.iconName,
       ].filter((icon): icon is string => !!icon));
       for (const icon of [...airplaneIcons, ...networkIcons, ...bluetoothIcons, ...volumeIcons]) {
         icon.connectObject('notify::icon-name', this.updateStatus, this.actor);

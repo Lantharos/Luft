@@ -45,6 +45,20 @@ Windows' registry is only changed when Windows was shut down fully and isn't loc
 
 Windows updates sometimes turn Fast Startup back on. When Luft starts after Windows was hibernated or fast-started, it resets the sound chips before anything uses them and, once, explains Fast Startup with a notification that can turn it off when Windows is fully shut down. Windows' drive shows up in Files; while Windows is asleep it opens read-only, so nothing Windows still has open gets changed.
 
+## Removing Windows or the old system
+
+Once Luft starts the computer, Disks shows the other systems on each drive below its partitions, such as Windows or the Linux that Luft replaced, and Settings lists them under About. *Remove* names everything that goes and how big it is, and offers to open its files in Rover first.
+
+| System | What goes |
+| --- | --- |
+| Windows | Its system, recovery and reserved partitions, and Meet Luft's partitions left on that drive. Windows Boot Manager, its start entry and `EFI/Microsoft` go too, unless another Windows stays. Windows locked with BitLocker can't be read from Luft, so its files are gone for good |
+| The old system Luft replaced | The kept subvolume and its partitions, its folder on the EFI system partition and its start entries |
+| Another Linux | The partitions its boot loader looks for, its folder on the EFI system partition and its start entries |
+
+The EFI system partition, Luft's startup partition and anything the running system uses always stay. Removing first makes sure Luft's own startup is in place and first in the firmware's list, then takes the other system out of the startup list, then deletes its partitions, so the computer keeps starting Luft if it's interrupted at any point; removing again finishes the job.
+
+Free space right after Luft's partition goes to Luft straight away, while it runs. Space before it can't: Disks offers to make it a partition for your files, or start Try Luft from a USB stick and move Luft into it with Disks' partition editor.
+
 ## From Windows, without a stick
 
 [Meet Luft](meet.md) makes room next to Windows, puts the live system there and restarts into Install Luft, with *Alongside Windows* already set to that room. It works with BitLocker on, and can bring files and settings along in a moving box.

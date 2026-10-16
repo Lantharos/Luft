@@ -9,7 +9,6 @@ live=/live
 work=/work
 tree="$work/tree"
 esp="$work/esp"
-loader="${LOADER:-grub}"
 
 live_layer() {
   jq -er --arg name "$live_image" '.[] | select(.names | index($name)) | .layer' "$work/store/overlay-images/images.json"
@@ -36,7 +35,7 @@ copy_kernel() {
 
 make_esp() {
   rm -rf "$esp"
-  "$iso/loader/$loader.sh" "$esp" "$tree" "$label" "$(kernel_arguments)"
+  "$iso/loader/grub.sh" "$esp" "$tree" "$label" "$(kernel_arguments)"
   find "$esp" "$tree" -exec touch --no-dereference --date="@$SOURCE_DATE_EPOCH" {} +
   local size=$(($(du -sk "$esp" | cut -f1) + 2048))
   rm -f "$work/esp.img"

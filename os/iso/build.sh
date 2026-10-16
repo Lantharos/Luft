@@ -79,7 +79,7 @@ remove_work() {
 pack() {
   podman run --rm --security-opt label=disable --volume "$work:/work" --volume "$iso:/iso:ro" \
     --mount "type=image,source=$live_image,destination=/live" \
-    --env SOURCE_DATE_EPOCH="$(image_value "$image" '{{.Created.Unix}}')" --env LOADER \
+    --env SOURCE_DATE_EPOCH="$(image_value "$image" '{{.Created.Unix}}')" \
     "$tools" /iso/stages/pack.sh "$label" "$live_image" "/work/$1"
 }
 

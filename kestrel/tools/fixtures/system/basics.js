@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {publishUpower} from './upower.js';
+
 const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Reboot"><arg type="b" direction="in"/></method>
   <method name="Inhibit">
@@ -22,12 +24,6 @@ const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
 </interface></node>`;
 const WATCHDOG = `<node><interface name="com.lantharos.Kestrel.Watchdog1">
   <method name="Report"><arg type="t" direction="in"/><arg type="u" direction="in"/></method>
-</interface></node>`;
-const UPOWER = `<node><interface name="org.freedesktop.UPower">
-  <property name="OnBattery" type="b" access="read"/>
-</interface></node>`;
-const DEVICE = `<node><interface name="org.freedesktop.UPower.Device">
-  <property name="WarningLevel" type="u" access="read"/>
 </interface></node>`;
 const KEYBOARD = `<node><interface name="org.freedesktop.UPower.KbdBacklight">
   <method name="GetBrightness"><arg type="i" direction="out"/></method>
@@ -80,8 +76,7 @@ export function publishBasics(publish, calls) {
   publish(LOGIN_SESSION, {Active: true}, '/org/freedesktop/login1/session/c1');
   publish(WATCHDOG, {Report: (_stalledMs, compositor) => calls.push(`Report ${compositor}`)}, '/com/lantharos/Kestrel/Watchdog1');
 
-  publish(UPOWER, {OnBattery: false}, '/org/freedesktop/UPower');
-  publish(DEVICE, {WarningLevel: 1}, '/org/freedesktop/UPower/devices/DisplayDevice');
+  publishUpower(publish, calls);
   let backlight = 1;
   publish(KEYBOARD, {
     GetBrightness: () => backlight,

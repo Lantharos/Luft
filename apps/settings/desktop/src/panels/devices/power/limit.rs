@@ -24,7 +24,7 @@ struct PackLimit {
 }
 
 fn percentage(value: u32) -> Option<u32> {
-    (value <= FULL).then_some(value)
+    (1..FULL).contains(&value).then_some(value)
 }
 
 impl PackLimit {
@@ -41,7 +41,7 @@ impl PackLimit {
     }
 
     fn applied(&self) -> Option<u32> {
-        self.written.filter(|end| (1..FULL).contains(end))
+        self.written.and_then(percentage)
     }
 
     fn elsewhere(&self) -> bool {

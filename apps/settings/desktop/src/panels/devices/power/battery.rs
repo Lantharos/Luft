@@ -17,6 +17,8 @@ const POWER_SUPPLIES: &str = "/sys/class/power_supply";
 const TYPE_LINE_POWER: u32 = 1;
 const TYPE_BATTERY: u32 = 2;
 const STATE_CHARGING: u32 = 1;
+const PLAUSIBLE_ESTIMATE: std::ops::RangeInclusive<i64> = 60..=24 * 3600;
+const SMALLEST_RATE: f64 = 0.1;
 
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -113,14 +115,21 @@ fn kind(device_type: u32) -> Kind {
     }
 }
 
-fn charge(state: u32) -> Charge {
+fn charge(state: u32, on_battery: bool) -> Charge {
     match state {
         1 => Charge::Charging,
-        2 => Charge::Discharging,
         3 => Charge::Empty,
         4 => Charge::Full,
+        _ if on_battery => Charge::Discharging,
         _ => Charge::NotCharging,
     }
+}
+
+fn estimate(display: &Properties, key: &str) -> i64 {
+    display
+        .get::<i64>(key)
+        .filter(|seconds| PLAUSIBLE_ESTIMATE.contains(seconds))
+        .unwrap_or_default()
 }
 
 fn is(properties: &Properties, key: &str) -> bool {
@@ -174,16 +183,23 @@ pub fn present(connection: &Connection) -> bool {
         .is_ok_and(|display| is_battery(&display))
 }
 
-fn battery(display: &Properties, packs: &[Pack]) -> Option<Battery> {
+fn battery(display: &Properties, on_battery: bool, packs: &[Pack]) -> Option<Battery> {
     if !is_battery(display) {
         return None;
     }
+    let charge = charge(display.get("State").unwrap_or_default(), on_battery);
     Some(Battery {
         level: display.get("Percentage").unwrap_or_default(),
-        charge: charge(display.get("State").unwrap_or_default()),
-        until_full: display.get("TimeToFull").unwrap_or_default(),
-        until_empty: display.get("TimeToEmpty").unwrap_or_default(),
-        rate: display.get::<f64>("EnergyRate").filter(|rate| *rate > 0.0),
+        until_full: match charge {
+            Charge::Charging => estimate(display, "TimeToFull"),
+            _ => 0,
+        },
+        until_empty: match charge {
+            Charge::Discharging => estimate(display, "TimeToEmpty"),
+            _ => 0,
+        },
+        charge,
+        rate: display.get::<f64>("EnergyRate").filter(|rate| *rate >= SMALLEST_RATE),
         capacity: capacity(packs),
         cycles: packs.iter().filter_map(Pack::cycles).collect(),
         limit: limit::read(packs),
@@ -232,8 +248,11 @@ pub fn devices(connection: &Connection) -> Result<Vec<(OwnedObjectPath, Properti
 pub fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<Device>), String> {
     let devices = devices(connection)?;
     let display = Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE)?;
+    let on_battery = Properties::read(connection, DESTINATION, PATH, DESTINATION)?
+        .get::<bool>("OnBattery")
+        .unwrap_or(true);
     Ok((
-        battery(&display, &packs(&devices)),
+        battery(&display, on_battery, &packs(&devices)),
         devices.iter().filter_map(peripheral).collect(),
     ))
 }

@@ -55,7 +55,7 @@
 			{/if}
 		</Row>
 	{/if}
-	<Row title="Show percentage" description="Shows the battery level next to the battery icon">
+	<Row title="Show percentage" description="Shows the battery level inside the battery icon">
 		<Switch
 			label="Show percentage"
 			checked={desktop.values['show-battery-percentage'] ?? false}

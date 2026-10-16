@@ -13,8 +13,8 @@ const CHECKS = 'com.lantharos.KestrelChecks';
 export const AT = {
   more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 550], done: [1001, 310],
   format: [900, 641], safelyRemove: [943, 85],
-  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [974, 275],
-  health: [600, 360], firstDrive: [560, 301], next: [686, 470], write: [666, 419],
+  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [1008, 275],
+  health: [600, 360], firstDrive: [560, 282], next: [686, 488], write: [666, 419],
   largest: [1009, 467], trash: [860, 565],
   turnOn: [885, 448], checked: [755, 448], saved: [292, 447], keySaved: [755, 498], unlocking: [755, 436], encrypt: [759, 429],
   encryption: [885, 499], lock: [900, 300],
@@ -22,6 +22,7 @@ export const AT = {
   moreDrive: [1025, 86], editPartitions: [876, 183], barProjects: [460, 118], barScratch: [598, 118], barRaw: [657, 118], barFree: [900, 118],
   deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [861, 198],
   apply: [924, 30], confirmApply: [766, 482],
+  crucial: [130, 262], removeSystem: [992, 534], confirmRemoveSystem: [728, 517], systemDone: [767, 530],
 };
 
 export class Driver {

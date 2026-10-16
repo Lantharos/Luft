@@ -5,6 +5,7 @@ import {BASIC_NAMES, publishBasics} from './basics.js';
 import {PACKAGEKIT_NAME, publishPackageKit} from './packageKit.js';
 import {publishSecurity, SECURITY_NAMES} from './security.js';
 import {publishUdisks} from './udisks/service.js';
+import {publishWindows, WINDOWS_NAME} from './windows.js';
 
 const CALLS = `<node><interface name="com.lantharos.KestrelChecks.Calls">
   <method name="Take"><arg type="as" direction="out"/></method>
@@ -33,7 +34,8 @@ publish(CALLS, {
 }, '/com/lantharos/KestrelChecks');
 publishSecurity(publish, calls, publishUdisks(calls));
 publishPackageKit(publish, calls);
+publishWindows(publish);
 
-for (const name of [...BASIC_NAMES, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', PACKAGEKIT_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', PACKAGEKIT_NAME, WINDOWS_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

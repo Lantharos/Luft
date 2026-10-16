@@ -11,6 +11,7 @@ import {Driver} from './disks/driver.js';
 import {checkEncrypted, checkEncryption, checkHealth, checkRemovable, copied} from './disks/drives.js';
 import {checkEditing} from './disks/editing.js';
 import {trashed, writeSpace} from './disks/space.js';
+import {checkOtherSystems} from './disks/systems.js';
 
 const {require, eventually} = checks('Luft app');
 const COPY_TIMEOUT = 10000;
@@ -82,5 +83,6 @@ export async function run() {
     });
     await checkWriteImage(await checkDrives());
     await checkSpace();
+    await withDriver([], driver => checkOtherSystems(driver, palette));
   });
 }

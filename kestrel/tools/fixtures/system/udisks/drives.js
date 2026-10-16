@@ -10,6 +10,7 @@ export const BASIC_DATA = 'ebd0a0a2-b9e5-4433-87c0-68b6b72699c7';
 const EFI = 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b';
 const BIOS_BOOT = '21686148-6449-6e6f-744e-656564454649';
 const MICROSOFT_RESERVED = 'e3c9e316-0b5c-4db8-817d-f92df00215ae';
+const WINDOWS_RECOVERY = 'de94bba4-06d1-4d40-a16a-bfd50179d6ac';
 const LINUX_SWAP = '0657fd6d-a4ab-43c4-84e5-0933c84b4f4f';
 export const SPACE_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
 
@@ -42,6 +43,17 @@ export function fixtureDrives(user) {
       partitions: [
         partition('', 1, MiB, 1500 * GiB, LINUX_DATA, {IdUsage: 'crypto', IdType: 'crypto_LUKS', IdVersion: '2', IdUUID: 'archive-luks',
           encrypted: {passphrase: PASSPHRASE, inner: {IdType: 'ext4', IdLabel: 'Archive', IdUUID: 'archive-ext4'}}}),
+      ],
+    },
+    {
+      drive: drive('Crucial_P3', {Vendor: 'Crucial', Model: 'CT500P3SSD8', Size: 500 * GiB, SortKey: '00coldplug/zzz-Crucial'}),
+      nvme: {SmartUpdated: 1, SmartCriticalWarning: [], SmartPowerOnHours: 9310, SmartTemperature: 309, SmartSelftestStatus: 'success'},
+      device: 'nvme1n1', partitionPrefix: 'p', size: 500 * GiB, table: 'gpt',
+      partitions: [
+        partition('EFI system partition', 1, MiB, 100 * MiB, EFI, {IdUsage: 'filesystem', IdType: 'vfat', IdVersion: 'FAT32', IdLabel: 'SYSTEM', IdUUID: '5C1E-9A02'}),
+        partition('Microsoft reserved partition', 2, 101 * MiB, 16 * MiB, MICROSOFT_RESERVED, {}),
+        partition('Basic data partition', 3, 117 * MiB, 498 * GiB, BASIC_DATA, {IdUsage: 'filesystem', IdType: 'ntfs', IdLabel: 'Windows', IdUUID: '7E3A21C95B1F04D2'}),
+        partition('', 4, 117 * MiB + 498 * GiB, 750 * MiB, WINDOWS_RECOVERY, {IdUsage: 'filesystem', IdType: 'ntfs', IdUUID: '12F4A0B39C7E5D61'}),
       ],
     },
     {

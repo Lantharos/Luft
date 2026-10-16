@@ -26,6 +26,10 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="RemoveOtherKeys"><arg name="code" type="s" direction="out"/></method>
   <method name="KeepOtherKeys"/>
   <method name="InstallSignedStartup"/>
+  <method name="OtherStartups"><arg name="startups" type="a(sssa(qs)as)" direction="out"/></method>
+  <method name="RemoveStartups"><arg name="folders" type="a(ss)" direction="in"/><arg name="partitions" type="as" direction="in"/></method>
+  <method name="RemoveOldSystem"/>
+  <method name="GrowSystem"><arg name="unlock" type="s" direction="in"/><arg name="grown" type="t" direction="out"/></method>
 </interface></node>`;
 const USB_PROTECTION = `<node><interface name="com.lantharos.UsbProtection1">
   <property name="Enabled" type="b" access="read"/>
@@ -39,6 +43,7 @@ const FWUPD = `<node><interface name="org.freedesktop.fwupd">
   <method name="GetHostSecurityAttrs"><arg type="aa{sv}" direction="out"/></method>
 </interface></node>`;
 
+const WINDOWS_ESP = '10000000-0000-4000-8000-000001048576';
 const RECOVERY_KEY = 'bfgdekjl-vtictulg-gcjginrv-hcddchdu-ihruiigb-bednnflv-hluincci-cdktjdrh';
 const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
@@ -58,6 +63,7 @@ const attribute = (id, summary, level, flags) => ({
 export const SECURITY_NAMES = ['com.lantharos.Trust1', 'com.lantharos.UsbProtection1', 'org.freedesktop.fwupd'];
 
 export function publishSecurity(publish, calls, model, trust = {}) {
+  const startups = [[WINDOWS_ESP, 'EFI/Microsoft', 'windows', [[0, 'Windows Boot Manager']], []]];
   publish(TRUST, {
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
@@ -86,6 +92,16 @@ export function publishSecurity(publish, calls, model, trust = {}) {
     RemoveOtherKeys: () => '51740386',
     KeepOtherKeys: () => calls.push('KeepOtherKeys'),
     InstallSignedStartup: () => calls.push('InstallSignedStartup'),
+    OtherStartups: () => startups,
+    RemoveStartups: (folders, partitions) => {
+      calls.push(`RemoveStartups ${folders.map(([, folder]) => folder).join(',')} partitions=${partitions.length}`);
+      startups.splice(0, startups.length, ...startups.filter(([esp, folder]) => !folders.some(([gone, name]) => gone === esp && name === folder)));
+    },
+    RemoveOldSystem: () => calls.push('RemoveOldSystem'),
+    GrowSystem: () => {
+      calls.push('GrowSystem');
+      return 0;
+    },
     ...trust,
   }, '/com/lantharos/Trust1');
   const drives = drivesService(calls, model, RECOVERY_KEY);

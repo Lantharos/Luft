@@ -60,11 +60,12 @@ export function publishPackageKit(publish, calls) {
   let next = 1;
   let manager = null;
 
-  const listChanged = () => manager.emit_signal('TransactionListChanged', new GLib.Variant('(as)', [[...transactions.keys()]]));
+  const running = () => [...transactions].filter(([, isRunning]) => isRunning()).map(([path]) => path);
+  const listChanged = () => manager.emit_signal('TransactionListChanged', new GLib.Variant('(as)', [running()]));
 
   function createTransaction(sender) {
     const path = `/${next++}_fixture`;
-    const state = {Role: 0, Status: 1, Percentage: 101, TransactionFlags: 0, Sender: sender, Uid: 0, timer: 0, finish: null};
+    const state = {Role: 0, Status: 1, Percentage: 101, TransactionFlags: 0, Sender: sender, Uid: 0, timer: 0, committed: false};
     const set = (property, signature, value) => {
       state[property] = value;
       exported.emit_property_changed(property, new GLib.Variant(signature, value));
@@ -76,11 +77,11 @@ export function publishPackageKit(publish, calls) {
       state.timer = 0;
       set('Status', 'u', STATUS.finished);
       emit('Finished', '(uu)', [code, 0]);
+      listChanged();
       GLib.timeout_add(GLib.PRIORITY_DEFAULT, LINGER, () => {
         emit('Destroy', '()', []);
         exported.unexport();
         transactions.delete(path);
-        listChanged();
         return GLib.SOURCE_REMOVE;
       });
     };
@@ -88,6 +89,9 @@ export function publishPackageKit(publish, calls) {
       calls.push(`PackageKit ${Object.keys(ROLE).find(key => ROLE[key] === role)}`);
       set('Role', 'u', role);
       set('Status', 'u', status);
+      if (state.committed) return;
+      state.committed = true;
+      listChanged();
     };
     const progress = (steps, status, done) => {
       let step = 0;
@@ -147,8 +151,7 @@ export function publishPackageKit(publish, calls) {
         finish(EXIT.cancelled);
       },
     }, path);
-    transactions.set(path, exported);
-    listChanged();
+    transactions.set(path, () => state.committed && state.Status !== STATUS.finished);
     return path;
   }
 
@@ -156,7 +159,7 @@ export function publishPackageKit(publish, calls) {
     CreateTransactionAsync(_parameters, invocation) {
       invocation.return_value(new GLib.Variant('(o)', [createTransaction(invocation.get_sender())]));
     },
-    GetTransactionList: () => [...transactions.keys()],
+    GetTransactionList: running,
   }, PATH);
   publish(OFFLINE, {
     GetPrepared: () => prepared,

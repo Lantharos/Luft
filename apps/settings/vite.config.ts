@@ -7,7 +7,7 @@ export default defineConfig({
 	plugins: [luftFonts(), sabineTarget(), tailwindcss(), svelte()],
 	clearScreen: false,
 	server: {
-		port: 5173,
+		port: 5174,
 		strictPort: true,
 		watch: {
 			ignored: ['**/desktop/**']

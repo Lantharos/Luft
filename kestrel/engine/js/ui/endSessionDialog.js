@@ -625,7 +625,8 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
         this._totalSecondsToStayOpen = totalSecondsToStayOpen;
         this._type = type;
 
-        this._pendingUpdates = await loadPendingUpdates();
+        const pending = await loadPendingUpdates();
+        this._pendingUpdates = pending?.switching ? null : pending;
         this._updateScheduled = this._pendingUpdates?.scheduled ?? false;
         this._updatePrepared = this._pendingUpdates?.prepared ?? false;
 

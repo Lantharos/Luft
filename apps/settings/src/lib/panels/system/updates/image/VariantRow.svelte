@@ -15,6 +15,11 @@
 		standard: 'Switch to the standard image'
 	};
 
+	const READY: Record<Variant, string> = {
+		nvidia: "NVIDIA's driver is ready",
+		standard: 'The standard image is ready'
+	};
+
 	const REASONS: Record<Variant, string> = {
 		nvidia: 'Full speed from your NVIDIA graphics',
 		standard: 'Smaller, as this computer has no NVIDIA graphics'
@@ -26,7 +31,7 @@
 </script>
 
 {#if overview.switching}
-	<Row title={TITLES[overview.switching]} description="Restart to finish">
+	<Row title={TITLES[overview.switching]} description={READY[overview.switching]}>
 		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
 	</Row>
 {:else if overview.offer && !overview.returning}

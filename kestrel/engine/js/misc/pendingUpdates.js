@@ -54,21 +54,24 @@ async function callUpdater(method, flags = Gio.DBusCallFlags.NONE) {
     return reply.deepUnpack();
 }
 
+const followedImage = deployment => deployment?.image?.image?.image ?? null;
+
 class StagedImage {
-    constructor(staged, version) {
+    constructor(staged, booted, version) {
         this.scheduled = !staged.downloadOnly;
         this.prepared = staged.downloadOnly;
+        this.switching = followedImage(staged) !== followedImage(booted);
         this.version = version;
     }
 
     static async load() {
         const [json] = await callUpdater('Status');
         const {host, configs} = JSON.parse(json);
-        const staged = host.status.staged;
+        const {staged, booted} = host.status;
         if (!staged)
             return null;
         const label = configs[staged.image?.imageDigest]?.config?.Labels?.[VERSION_LABEL];
-        return new StagedImage(staged, label ?? staged.image?.version ?? null);
+        return new StagedImage(staged, booted, label ?? staged.image?.version ?? null);
     }
 
     async installThroughRestart() {
@@ -84,7 +87,8 @@ class StagedImage {
  * Updates waiting to be installed when the computer restarts: PackageKit's
  * offline update on a regular install, or a downloaded image on an image-based
  * one. A downloaded image is only installed once Apply unlocks it, so skipping
- * it needs nothing.
+ * it needs nothing. A staged image that follows another image than the booted
+ * one is a switch between Luft's images rather than an update.
  *
  * @returns {Promise<OfflineUpdates | StagedImage | null>}
  */

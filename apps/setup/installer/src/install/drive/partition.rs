@@ -4,7 +4,7 @@ use anyhow::{Context, Result, anyhow};
 use luft_dbus::objects::Objects;
 use luft_disks::udisks::{self, BLOCK, Options, TABLE, bytes_text};
 use luft_disks::{mounting, resize};
-use zbus::zvariant::{OwnedObjectPath, Value};
+use zvariant::{OwnedObjectPath, Value};
 
 use super::layout::{Part, Role};
 use super::plan::Plan;

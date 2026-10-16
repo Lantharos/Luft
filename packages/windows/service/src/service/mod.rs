@@ -22,9 +22,9 @@ pub fn run() -> anyhow::Result<()> {
 
 async fn serve() -> zbus::Result<()> {
     let idle = Arc::new(Idle::default());
-    let connection = zbus::connection::Builder::system()?
-        .serve_at(PATH, Windows::new(idle.clone()))?
-        .name(NAME)?
+    let connection = zbus::connection::Builder::system()
+        .serve_at(PATH, Windows::new(idle.clone()))
+        .name(NAME)
         .build()
         .await?;
     idle.wait(IDLE_TIMEOUT).await;

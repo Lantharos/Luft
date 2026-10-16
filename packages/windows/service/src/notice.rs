@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use futures_util::StreamExt;
 use serde::Deserialize;
+use zbus::Variant;
 use zbus::proxy::MethodFlags;
-use zbus::zvariant::Value;
 use zbus::{Connection, Proxy};
 
 use crate::service::{NAME, PATH};
@@ -102,7 +102,7 @@ async fn notice() -> Result<()> {
                 summary,
                 body,
                 actions,
-                HashMap::<&str, Value>::new(),
+                HashMap::<&str, Variant>::new(),
                 0i32,
             ),
         )
@@ -123,7 +123,7 @@ async fn notice() -> Result<()> {
                     notifications
                         .call::<_, _, u32>(
                             "Notify",
-                            &("Luft", 0u32, ICON, summary, body, Vec::<&str>::new(), HashMap::<&str, Value>::new(), -1i32),
+                            &("Luft", 0u32, ICON, summary, body, Vec::<&str>::new(), HashMap::<&str, Variant>::new(), -1i32),
                         )
                         .await?;
                     return Ok(());
@@ -147,7 +147,7 @@ async fn turn_off(system: &Connection, device: &str) -> Result<(), String> {
     windows
         .call_with_flags::<_, _, ()>(
             "Change",
-            MethodFlags::AllowInteractiveAuth.into(),
+            MethodFlags::ALLOW_INTERACTIVE_AUTH,
             &(device, vec!["fastStartupOff"]),
         )
         .await

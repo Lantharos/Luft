@@ -1917,11 +1917,19 @@ dependencies = [
  "glob",
  "libc",
  "luft-app",
+ "luft-variant",
  "serde",
  "serde_json",
  "sha1",
  "ureq",
  "zbus",
+]
+
+[[package]]
+name = "luft-variant"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

@@ -37,7 +37,7 @@ index fd7a9eef43d62dd0faccd3c6ace94e4918a1c7e0..915ce9aef128e33a59d4e8af2c68d94d
    MetaWindowType type;
  
 diff --git a/src/core/window.c b/src/core/window.c
-index bcd014ad9f591478920975ec79e7bd4599f10017..e0b0ea8bef29fc484e97f2503bda5f9d3605afad 100644
+index 7b6879c16e13108f873c795ac992e6a4f4614f5b..6d93a6328a8463440532c5abe8650b8150c04377 100644
 --- a/src/core/window.c
 +++ b/src/core/window.c
 @@ -209,6 +209,7 @@ enum

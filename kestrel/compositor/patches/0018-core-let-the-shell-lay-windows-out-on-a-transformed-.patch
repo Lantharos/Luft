@@ -19,6 +19,10 @@ without being slid or flipped back onto a monitor. Window drags,
 Xwayland pointer coordinates and the unobscured regions are mapped
 through the window group's transform, which leaves them unchanged while
 the group is untransformed.
+
+A window placed beyond every monitor keeps its main monitor as the one
+whose scale it follows, so its surfaces stay aligned to whole pixels at
+fractional scales.
 ---
  src/compositor/compositor.c                | 44 ++++++++++++++++------
  src/compositor/edge-resistance.c           |  4 ++
@@ -27,10 +31,10 @@ the group is untransformed.
  src/compositor/meta-window-drag.c          | 33 +++++++++++-----
  src/core/constraints.c                     | 28 +++++++++-----
  src/core/window-private.h                  |  1 +
- src/core/window.c                          | 39 +++++++++++++++++++
+ src/core/window.c                          | 41 ++++++++++++++++++++
  src/meta/window.h                          |  7 ++++
  src/wayland/meta-xwayland-surface.c        |  9 ++++-
- 10 files changed, 162 insertions(+), 32 deletions(-)
+ 10 files changed, 164 insertions(+), 32 deletions(-)
 
 diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
 index 0c4ea20118a180bb14765aa6b4bdf1e60db431d6..2595e31bf28b3712e159f78003e875bcdc035e99 100644
@@ -336,7 +340,7 @@ index e0993da5416fe7df1ddb72502eb96c760deda57a..2eb84858a8effe7ea13c0b921c5c135d
    MetaWindowType type;
  
 diff --git a/src/core/window.c b/src/core/window.c
-index 4d37e81398f5508e5b9a0633b19657af0d648b27..88a50451faf997936a27815252e361dc5d675167 100644
+index 4d37e81398f5508e5b9a0633b19657af0d648b27..c88c475840b558d29ae8cdb75aa7fb746376cd50 100644
 --- a/src/core/window.c
 +++ b/src/core/window.c
 @@ -208,6 +208,7 @@ enum
@@ -412,6 +416,15 @@ index 4d37e81398f5508e5b9a0633b19657af0d648b27..88a50451faf997936a27815252e361dc
    obj_props[PROP_TITLE] =
      g_param_spec_string ("title", NULL, NULL,
                           NULL,
+@@ -4333,6 +4372,8 @@ meta_window_update_monitor (MetaWindow                   *window,
+   new_highest_scale_monitor = frame_width > 0 && frame_height > 0
+     ? meta_window_find_highest_scale_monitor_from_frame_rect (window)
+     : window->monitor;
++  if (!new_highest_scale_monitor)
++    new_highest_scale_monitor = window->monitor;
+ 
+   if (g_set_object (&window->highest_scale_monitor, new_highest_scale_monitor))
+     g_signal_emit (window, window_signals[HIGHEST_SCALE_MONITOR_CHANGED], 0);
 diff --git a/src/meta/window.h b/src/meta/window.h
 index 0e4ff0c97c47b13cae561438520bc9bf973f367a..45e04d99fcc75ebdb636695dd54a7a70b7b36bbf 100644
 --- a/src/meta/window.h

@@ -30,10 +30,10 @@ index 2eb84858a8effe7ea13c0b921c5c135dc33810f0..cd182346abb33fd122cf3d6a137cb99f
  gboolean meta_window_is_focus_async (MetaWindow *window);
  
 diff --git a/src/core/window.c b/src/core/window.c
-index 88a50451faf997936a27815252e361dc5d675167..250d8b3bc62e54fab5b78d6b9a3b237df267e2a0 100644
+index c88c475840b558d29ae8cdb75aa7fb746376cd50..79012c12d37da3339bd9265bb2e9da0ca722da2a 100644
 --- a/src/core/window.c
 +++ b/src/core/window.c
-@@ -8109,6 +8109,14 @@ meta_window_emit_configure (MetaWindow       *window,
+@@ -8111,6 +8111,14 @@ meta_window_emit_configure (MetaWindow       *window,
    g_signal_emit (window, window_signals[CONFIGURE], 0, window_config);
  }
  
@@ -48,7 +48,7 @@ index 88a50451faf997936a27815252e361dc5d675167..250d8b3bc62e54fab5b78d6b9a3b237d
  void
  meta_window_force_restore_shortcuts (MetaWindow         *window,
                                       ClutterInputDevice *source)
-@@ -8116,6 +8124,14 @@ meta_window_force_restore_shortcuts (MetaWindow         *window,
+@@ -8118,6 +8126,14 @@ meta_window_force_restore_shortcuts (MetaWindow         *window,
    META_WINDOW_GET_CLASS (window)->force_restore_shortcuts (window, source);
  }
  

@@ -214,10 +214,10 @@ index cd182346abb33fd122cf3d6a137cb99fe1f92c31..fd7a9eef43d62dd0faccd3c6ace94e49
  
  gboolean meta_window_is_tiled_left (MetaWindow *window);
 diff --git a/src/core/window.c b/src/core/window.c
-index 250d8b3bc62e54fab5b78d6b9a3b237df267e2a0..bcd014ad9f591478920975ec79e7bd4599f10017 100644
+index 79012c12d37da3339bd9265bb2e9da0ca722da2a..7b6879c16e13108f873c795ac992e6a4f4614f5b 100644
 --- a/src/core/window.c
 +++ b/src/core/window.c
-@@ -6317,6 +6317,40 @@ meta_window_show_menu (MetaWindow         *window,
+@@ -6319,6 +6319,40 @@ meta_window_show_menu (MetaWindow         *window,
    meta_compositor_show_window_menu (window->display->compositor, window, menu, x, y);
  }
  
@@ -258,7 +258,7 @@ index 250d8b3bc62e54fab5b78d6b9a3b237df267e2a0..bcd014ad9f591478920975ec79e7bd45
  void
  meta_window_get_work_area_for_logical_monitor (MetaWindow         *window,
                                                 MetaLogicalMonitor *logical_monitor,
-@@ -8762,6 +8796,64 @@ meta_window_protocol_to_stage_point (MetaWindow          *window,
+@@ -8764,6 +8798,64 @@ meta_window_protocol_to_stage_point (MetaWindow          *window,
                              rounding_strategy);
  }
  

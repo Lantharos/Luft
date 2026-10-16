@@ -499,6 +499,7 @@ dependencies = [
  "luft-dbus",
  "luft-disks",
  "luft-meet",
+ "luft-variant",
  "luft-windows",
  "serde",
  "serde_json",
@@ -515,6 +516,13 @@ dependencies = [
  "roxmltree",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "luft-variant"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

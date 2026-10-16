@@ -3,12 +3,9 @@ use std::path::Path;
 use luft_app::dbus::service::{Service, get};
 use serde::Serialize;
 
-const PCI: &str = "/sys/bus/pci/devices";
 const INPUT: &str = "/sys/class/input";
 const UDEV_DATA: &str = "/run/udev/data";
 const TOUCHPAD: &str = "E:ID_INPUT_TOUCHPAD=1";
-const DISPLAY_CLASS: &str = "0x03";
-const NVIDIA: &str = "0x10de";
 const CHASSIS: &str = "/sys/class/dmi/id/chassis_type";
 const PORTABLE_CHASSIS: [u32; 8] = [8, 9, 10, 11, 14, 30, 31, 32];
 const UPOWER: Service = Service {
@@ -34,18 +31,6 @@ fn read(path: &Path) -> String {
         .to_owned()
 }
 
-fn has_nvidia_display() -> bool {
-    std::fs::read_dir(PCI)
-        .into_iter()
-        .flatten()
-        .flatten()
-        .map(|device| device.path())
-        .any(|device| {
-            read(&device.join("class")).starts_with(DISPLAY_CLASS)
-                && read(&device.join("vendor")) == NVIDIA
-        })
-}
-
 fn has_touchpad() -> bool {
     std::fs::read_dir(INPUT)
         .into_iter()
@@ -66,7 +51,7 @@ fn portable() -> bool {
 
 pub fn detect() -> Hardware {
     Hardware {
-        nvidia: has_nvidia_display(),
+        nvidia: !luft_variant::nvidia_cards().is_empty(),
         portable: portable(),
         on_battery: UPOWER
             .read()

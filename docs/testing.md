@@ -59,6 +59,20 @@ Polkit, real network credentials, unlocking with the computer's own sign-in rule
 
 From an app's folder, `bun run check` type-checks its interface. The Rust side builds with `bun run desktop:build`. Shared Rust crates have their own `cargo test`.
 
+## NVIDIA graphics
+
+Install Luft and Settings find NVIDIA graphics by reading `/sys/bus/pci/devices`. Pointing `LUFT_PCI_DEVICES` at another folder laid out the same way, each device a folder with `class`, `vendor` and `device` files, makes them read that instead, to try NVIDIA's offers on a computer or VM without an NVIDIA card:
+
+```sh
+mkdir -p ~/pci/0000:01:00.0 ~/.config/environment.d
+printf '0x030200\n' >~/pci/0000:01:00.0/class
+printf '0x10de\n' >~/pci/0000:01:00.0/vendor
+printf '0x28e0\n' >~/pci/0000:01:00.0/device
+printf 'LUFT_PCI_DEVICES=%s\n' ~/pci >~/.config/environment.d/90-pci.conf
+```
+
+After signing in again, the session sees an NVIDIA card; removing the file brings back the real devices.
+
 ## Installer
 
 `apps/setup/installer/vm/run.sh` installs Luft for real with `bootc install to-filesystem` inside a QEMU VM with spare drives, checks the result and starts the installed drive with UEFI. See [Install Luft](../apps/setup/README.md#testing).

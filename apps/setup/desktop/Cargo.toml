@@ -17,6 +17,7 @@ luft-app = { path = "../../../packages/app", features = ["recovery"] }
 luft-fingerprint = { path = "../../../packages/fingerprint" }
 luft-meet = { path = "../../../packages/meet" }
 luft-network = { path = "../../../packages/network" }
+luft-variant = { path = "../../../packages/variant" }
 roxmltree = "0.21.1"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 serde = { version = "1.0.229", features = ["derive"] }

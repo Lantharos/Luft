@@ -1784,6 +1784,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-variant"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "lzma-rust2"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3029,6 +3036,7 @@ dependencies = [
  "luft-fingerprint",
  "luft-meet",
  "luft-network",
+ "luft-variant",
  "roxmltree 0.21.1",
  "sabine",
  "serde",

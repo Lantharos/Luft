@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use luft_variant::Variant;
 use serde::Deserialize;
 
 const GIB: u64 = 1 << 30;
 const IMAGE_REFERENCE: &str = "/usr/share/luft/image-reference";
-const NVIDIA: &str = "nvidia";
 
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -35,15 +35,6 @@ fn smallest_system() -> u64 {
     32 * GIB
 }
 
-fn reference_for(running: &str, variant: &str) -> String {
-    let base = running.strip_suffix("-nvidia").unwrap_or(running);
-    if variant == NVIDIA {
-        format!("{base}-nvidia")
-    } else {
-        base.to_owned()
-    }
-}
-
 impl Config {
     pub fn read(path: &Path) -> Result<Self> {
         let text = std::fs::read_to_string(path)
@@ -58,31 +49,13 @@ impl Config {
             .with_context(|| format!("There's no {variant} image to install."))?;
         let running = std::fs::read_to_string(IMAGE_REFERENCE)
             .with_context(|| format!("Couldn't read {IMAGE_REFERENCE}"))?;
+        let target = Variant::named(variant)
+            .reference(running.trim())
+            .with_context(|| format!("{IMAGE_REFERENCE} names no image tag"))?;
         Ok(Image {
             source: source.source.clone(),
-            target: reference_for(running.trim(), variant),
+            target,
             size: source.size,
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::reference_for;
-
-    #[test]
-    fn updates_come_from_the_variant_that_was_installed() {
-        assert_eq!(
-            reference_for("ghcr.io/lantharos/luft:45", "nvidia"),
-            "ghcr.io/lantharos/luft:45-nvidia"
-        );
-        assert_eq!(
-            reference_for("ghcr.io/lantharos/luft:45-nvidia", "default"),
-            "ghcr.io/lantharos/luft:45"
-        );
-        assert_eq!(
-            reference_for("ghcr.io/lantharos/luft:45", "default"),
-            "ghcr.io/lantharos/luft:45"
-        );
     }
 }

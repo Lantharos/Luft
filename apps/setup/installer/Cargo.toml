@@ -15,6 +15,7 @@ libc = "0.2.190"
 luft-dbus = { path = "../../../packages/dbus" }
 luft-disks = { path = "../../../packages/disks" }
 luft-meet = { path = "../../../packages/meet" }
+luft-variant = { path = "../../../packages/variant" }
 luft-windows = { path = "../../../packages/windows" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"

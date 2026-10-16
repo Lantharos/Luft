@@ -32,6 +32,10 @@
 		overflow: hidden;
 	}
 
+	.glass-shell[data-window='docked'] {
+		--window-radius: 0px;
+	}
+
 	.glass-shell[data-effect='translucent'] {
 		background: transparent;
 	}

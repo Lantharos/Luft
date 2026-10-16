@@ -88,7 +88,7 @@
 <svelte:window onkeydown={handleKeydown} ondragover={drop.ondragover} ondrop={drop.ondrop} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class={['h-full select-none', chrome.fullscreen && 'fullscreen']}>
+	<GlassShell class="h-full select-none">
 		{#if !viewer}
 			<Sidebar />
 		{/if}

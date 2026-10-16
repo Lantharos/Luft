@@ -59,7 +59,7 @@ pub fn measured_uki() -> bool {
     variable("StubPcrKernelImage", STUB).is_some()
 }
 
-fn text(data: &[u8]) -> String {
+pub fn text(data: &[u8]) -> String {
     let units: Vec<u16> = data
         .as_chunks::<2>()
         .0
@@ -76,6 +76,23 @@ pub fn boot_loader() -> Option<String> {
 
 pub fn boot_partition() -> Option<String> {
     variable("LoaderDevicePartUUID", STUB).map(|data| text(&data).to_lowercase())
+}
+
+pub fn global_variable(name: &str) -> Option<Vec<u8>> {
+    variable(name, GLOBAL)
+}
+
+pub fn global_variable_names() -> Vec<String> {
+    let suffix = format!("-{GLOBAL}");
+    std::fs::read_dir(VARIABLES)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter_map(|entry| {
+            let name = entry.file_name().to_string_lossy().into_owned();
+            name.strip_suffix(&suffix).map(str::to_owned)
+        })
+        .collect()
 }
 
 pub fn luft_variable(name: &str) -> Option<Vec<u8>> {

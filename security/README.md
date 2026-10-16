@@ -42,12 +42,13 @@ All commands need root.
 
 | Name | Interface file | Polkit actions |
 | --- | --- | --- |
-| `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.check`, `.manage-encryption`, `.manage-drive-encryption`, `.show-recovery-key` (asked every time), `.manage-secure-boot`, `.confirm-startup` (allowed for the active session) |
+| `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.check`, `.manage-encryption`, `.manage-drive-encryption`, `.show-recovery-key` (asked every time), `.manage-secure-boot`, `.remove-other-systems`, `.confirm-startup` (allowed for the active session) |
 | `com.lantharos.UsbProtection1` | `data/usb/com.lantharos.UsbProtection1.xml` | `com.lantharos.usb-protection.configure` |
 
 - Reading state is open to everyone. So is `Drives.Continue`, which a udev rule calls to resume drive encryption.
 - Kestrel calls `ConfirmStartup` once the login screen or desktop has been up for a few seconds, which marks the running version as one that starts.
 - Other drives are on `com.lantharos.Trust1.Drives` at the same object.
+- `OtherStartups` lists other systems' boot loaders on the EFI system partition and their start entries. `RemoveStartups`, `RemoveOldSystem` and `GrowSystem` let Disks remove another system and give Luft its space ([details](../docs/install.md#removing-windows-or-the-old-system)).
 - `UsbProtection1` has `Enabled`, `Guarding` and `Held` properties, `SetEnabled(b)`, the `Released(a(ss))` signal and `TakeReleased()`, which lets the session announce what was connected at unlock.
 
 ## Testing

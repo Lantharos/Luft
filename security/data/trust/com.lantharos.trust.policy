@@ -55,6 +55,16 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.trust.remove-other-systems">
+    <description>Remove another system from this computer and give Luft its space</description>
+    <message>Authentication is required to remove another system from this computer</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.trust.confirm-startup">
     <description>Confirm that this version of Luft started</description>
     <message>Authentication is required to confirm that the computer started</message>

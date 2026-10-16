@@ -3,6 +3,8 @@ mod entry;
 pub mod esp;
 mod fallback;
 pub mod files;
+mod options;
+pub mod other_systems;
 mod partition;
 mod pe;
 pub mod startup;

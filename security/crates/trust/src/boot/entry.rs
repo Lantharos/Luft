@@ -42,7 +42,7 @@ fn numbers(listing: &Listing, label: &str) -> Vec<String> {
         .collect()
 }
 
-fn delete(number: &str) -> Result<()> {
+pub fn delete(number: &str) -> Result<()> {
     Tool::new("efibootmgr")
         .args(["--bootnum", number, "--delete-bootnum"])
         .status()

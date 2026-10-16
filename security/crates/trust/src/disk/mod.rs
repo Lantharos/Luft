@@ -1,11 +1,14 @@
+pub mod grow;
 mod initrd;
 pub mod keys;
 pub mod luks;
 pub mod mask;
+pub mod old_system;
 mod preflight;
 pub mod reencrypt;
 pub mod stage;
 pub mod state;
+mod top_level;
 mod turn_off;
 mod turn_on;
 pub mod worker;
@@ -47,8 +50,8 @@ impl SystemDisk {
             blocks::kernel_name(&root.source).context("The system disk couldn't be found.")?;
         let crypt = blocks::dm_uuid(&name).is_some_and(|uuid| uuid.starts_with("CRYPT-LUKS2"));
         let (partition, mapping) = if crypt {
-            let partition =
-                underneath(&name).context("The encrypted disk has no partition under it.")?;
+            let partition = blocks::partition_under(&name)
+                .context("The encrypted disk has no partition under it.")?;
             (partition, blocks::dm_name(&name))
         } else {
             (name, None)
@@ -74,15 +77,6 @@ impl SystemDisk {
             .filter(|plan| plan.change == Change::Decrypt)
             .and_then(|plan| plan.header_file());
         luks::read(&self.device(), detached.as_deref(), self.size())
-    }
-}
-
-fn underneath(name: &str) -> Option<String> {
-    let below = blocks::slaves(name).into_iter().next()?;
-    if blocks::dm_uuid(&below).is_some() {
-        underneath(&below)
-    } else {
-        Some(below)
     }
 }
 

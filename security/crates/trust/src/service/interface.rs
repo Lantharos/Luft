@@ -12,9 +12,9 @@ use super::actions;
 use super::error::Error;
 use super::properties::{self, Dict};
 use super::status::{self, Status};
-use crate::boot::{attempts, startup};
+use crate::boot::{attempts, other_systems, startup};
 use crate::disk::worker::{self, Progress};
-use crate::disk::{self, keys};
+use crate::disk::{self, grow, keys, old_system};
 use crate::keys::{mok, others};
 use crate::system::power;
 use crate::system::secret::Secret;
@@ -24,6 +24,7 @@ const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const SECURE_BOOT: &str = "com.lantharos.trust.manage-secure-boot";
 const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
+const OTHER_SYSTEMS: &str = "com.lantharos.trust.remove-other-systems";
 const FRESH: Duration = Duration::from_secs(2);
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
@@ -104,6 +105,8 @@ impl Trust {
         let _ = self.anti_cheat_changed(emitter).await;
     }
 }
+
+type OtherStartup = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
 pub async fn continue_disk_work(connection: &Connection) -> zbus::Result<()> {
     let trust: InterfaceRef<Trust> = connection.object_server().interface(PATH).await?;
@@ -367,5 +370,64 @@ impl Trust {
             .await
             .map_err(|_| Error::Failed("The startup couldn't be confirmed.".to_owned()))??;
         Ok(())
+    }
+
+    async fn other_startups(&self) -> Result<Vec<OtherStartup>, Error> {
+        let _activity = self.idle.hold();
+        let startups = tokio::task::spawn_blocking(other_systems::list)
+            .await
+            .map_err(|_| Error::Failed("Other systems couldn't be looked at.".to_owned()))??;
+        Ok(startups
+            .into_iter()
+            .map(|startup| {
+                (
+                    startup.esp,
+                    startup.folder,
+                    startup.kind.name().to_owned(),
+                    startup.entries,
+                    startup.partitions,
+                )
+            })
+            .collect())
+    }
+
+    async fn remove_startups(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        folders: Vec<(String, String)>,
+        partitions: Vec<String>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, OTHER_SYSTEMS).await?;
+        let folders: Vec<(String, String)> = folders
+            .into_iter()
+            .map(|(esp, folder)| (esp.to_lowercase(), folder))
+            .collect();
+        let partitions: Vec<String> = partitions.iter().map(|uuid| uuid.to_lowercase()).collect();
+        self.run(&emitter, move || other_systems::remove(&folders, &partitions))
+            .await
+    }
+
+    async fn remove_old_system(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, OTHER_SYSTEMS).await?;
+        self.run(&emitter, old_system::remove).await
+    }
+
+    async fn grow_system(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        unlock: String,
+    ) -> Result<u64, Error> {
+        self.authorize(connection, &header, OTHER_SYSTEMS).await?;
+        let unlock = Secret::from(unlock);
+        self.run(&emitter, move || grow::grow(&unlock)).await
     }
 }

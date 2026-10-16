@@ -64,6 +64,13 @@ pub fn dm_name(name: &str) -> Option<String> {
         .map(|uuid| uuid.trim().to_owned())
 }
 
+pub fn partition_under(name: &str) -> Option<String> {
+    if dm_uuid(name).is_none() {
+        return Some(name.to_owned());
+    }
+    partition_under(&slaves(name).into_iter().next()?)
+}
+
 pub fn is_partition(name: &str) -> bool {
     class(name).join("partition").exists()
 }
@@ -107,15 +114,26 @@ pub fn size_bytes(name: &str) -> u64 {
         .map_or(0, |sectors| sectors * 512)
 }
 
-fn link_to(directory: &str, name: &str) -> Option<String> {
+pub fn links(directory: &str) -> Vec<(String, String)> {
     std::fs::read_dir(directory)
-        .ok()?
+        .into_iter()
         .flatten()
-        .find_map(|entry| {
+        .flatten()
+        .filter_map(|entry| {
             let target = std::fs::canonicalize(entry.path()).ok()?;
-            (target.file_name()?.to_str()? == name)
-                .then(|| entry.file_name().to_string_lossy().into_owned())
+            Some((
+                entry.file_name().to_string_lossy().into_owned(),
+                target.file_name()?.to_string_lossy().into_owned(),
+            ))
         })
+        .collect()
+}
+
+fn link_to(directory: &str, name: &str) -> Option<String> {
+    links(directory)
+        .into_iter()
+        .find(|(_, target)| target == name)
+        .map(|(link, _)| link)
 }
 
 pub fn partuuid(name: &str) -> Option<String> {

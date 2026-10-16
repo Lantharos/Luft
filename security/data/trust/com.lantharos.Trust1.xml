@@ -85,6 +85,31 @@
     </method>
     <method name="KeepOtherKeys"/>
     <method name="InstallSignedStartup"/>
+    <!-- Other systems' boot loaders: each folder of one on the EFI system partition this computer started from, and
+         each folder on another EFI system partition that a firmware entry starts. esp: that partition's GUID,
+         folder: such as "EFI/Microsoft", kind: "windows" or "grub", entries: the firmware entries that start from
+         it (number, label), partitions: the partition GUIDs its settings name (Windows Boot Manager's store, the
+         file systems GRUB looks for). Empty while Luft's own startup isn't installed. Open to everyone. -->
+    <method name="OtherStartups">
+      <arg name="startups" type="a(sssa(qs)as)" direction="out"/>
+    </method>
+    <!-- Run before deleting another system's partitions. Puts Luft's startup in place and first, then removes the
+         firmware entries that start from the folders (esp, folder) or from any of the partitions, and the folders
+         themselves from the EFI system partition this computer started from. Refuses Luft's own folders and the
+         entry this computer started from. -->
+    <method name="RemoveStartups">
+      <arg name="folders" type="a(ss)" direction="in"/>
+      <arg name="partitions" type="as" direction="in"/>
+    </method>
+    <!-- Deletes the old system that Install Luft kept when it replaced it, as /var/lib/luft-installer/old-system.json
+         records, then that record. -->
+    <method name="RemoveOldSystem"/>
+    <!-- Grows the system's partition into the free space right after it, then its encryption and file system.
+         Returns the bytes Luft gained. -->
+    <method name="GrowSystem">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="grown" type="t" direction="out"/>
+    </method>
     <!-- Called by the login screen or the desktop once it has been shown for a moment. Remembers the running version
          as one that starts, so an update that never gets this far goes back to it. -->
     <method name="ConfirmStartup"/>

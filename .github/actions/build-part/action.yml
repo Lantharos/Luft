@@ -27,9 +27,6 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: |
-          ${{ runner.temp }}/luft-cache/cargo/registry/index
-          ${{ runner.temp }}/luft-cache/cargo/registry/cache
-          ${{ runner.temp }}/luft-cache/cargo/git/db
           ${{ runner.temp }}/luft-cache/sccache
           ${{ runner.temp }}/luft-cache/ccache
         key: luft-${{ inputs.part }}-${{ inputs.key }}
@@ -46,9 +43,6 @@ runs:
       uses: actions/cache/save@v6
       with:
         path: |
-          ${{ runner.temp }}/luft-cache/cargo/registry/index
-          ${{ runner.temp }}/luft-cache/cargo/registry/cache
-          ${{ runner.temp }}/luft-cache/cargo/git/db
           ${{ runner.temp }}/luft-cache/sccache
           ${{ runner.temp }}/luft-cache/ccache
         key: luft-${{ inputs.part }}-${{ inputs.key }}

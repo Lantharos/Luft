@@ -9,7 +9,7 @@ mod transfer;
 
 use std::collections::HashMap;
 
-use zbus::zvariant::{ObjectPath, OwnedObjectPath, OwnedValue};
+use zbus::{ObjectPath, OwnedObjectPath, OwnedVariant};
 
 pub use error::SecretError;
 pub use service::Service;
@@ -21,7 +21,7 @@ const COLLECTIONS: &str = "/org/freedesktop/secrets/collection/";
 const ALIASES: &str = "/org/freedesktop/secrets/aliases/";
 
 pub type Secret = (OwnedObjectPath, Vec<u8>, Vec<u8>, String);
-pub type Properties = HashMap<String, OwnedValue>;
+pub type Properties = HashMap<String, OwnedVariant>;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Target {

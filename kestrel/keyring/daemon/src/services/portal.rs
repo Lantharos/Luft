@@ -7,7 +7,7 @@ use luft_keyring_vault::{Action, DEFAULT_ALIAS, Item, LOGIN, Secret};
 use zbus::fdo::DBusProxy;
 use zbus::message::Header;
 use zbus::names::BusName;
-use zbus::zvariant::{Fd, ObjectPath, OwnedValue};
+use zbus::{Fd, ObjectPath, OwnedVariant};
 use zbus::{fdo, interface};
 
 use crate::daemon::Daemon;
@@ -121,9 +121,9 @@ impl Portal {
         handle: ObjectPath<'_>,
         _app_id: &str,
         fd: Fd<'_>,
-        _options: HashMap<String, OwnedValue>,
+        _options: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
-    ) -> fdo::Result<(u32, HashMap<String, OwnedValue>)> {
+    ) -> fdo::Result<(u32, HashMap<String, OwnedVariant>)> {
         if !self.sent_by_portal(&header).await {
             return Err(fdo::Error::AccessDenied(
                 "Only the desktop portal may ask for app secrets".into(),

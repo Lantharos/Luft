@@ -32,7 +32,7 @@ async fn main() -> ExitCode {
 
 async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let keyring = Keyring::open(Paths::from_environment())?;
-    let connection = zbus::connection::Builder::session()?.build().await?;
+    let connection = zbus::connection::Builder::session().build().await?;
     let daemon = Arc::new(Daemon::new(connection.clone(), keyring));
     connection
         .object_server()
@@ -55,10 +55,10 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
     services::manage::serve(&daemon).await?;
     connection
-        .request_name_with_flags(SECRETS, RequestNameFlags::DoNotQueue.into())
+        .request_name_with_flags(SECRETS, RequestNameFlags::DO_NOT_QUEUE)
         .await?;
     connection
-        .request_name_with_flags(services::manage::NAME, RequestNameFlags::DoNotQueue.into())
+        .request_name_with_flags(services::manage::NAME, RequestNameFlags::DO_NOT_QUEUE)
         .await?;
     daemon.start_unlocking().await;
     if let Err(error) = services::ssh::start(&daemon) {

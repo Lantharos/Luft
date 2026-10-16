@@ -3,8 +3,8 @@ use std::os::fd::AsFd;
 use std::sync::Arc;
 
 use luft_keyring_vault::{Action, Secret};
+use zbus::Fd;
 use zbus::message::Header;
-use zbus::zvariant::Fd;
 use zbus::{fdo, interface};
 
 use crate::daemon::Daemon;

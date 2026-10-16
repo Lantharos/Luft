@@ -15,7 +15,7 @@ hkdf = "0.13.0"
 luft-keyring-wire.workspace = true
 rustix.workspace = true
 serde.workspace = true
-sha2 = "0.11.0"
+sha2 = "0.11.1"
 zeroize.workspace = true
 
 [dev-dependencies]

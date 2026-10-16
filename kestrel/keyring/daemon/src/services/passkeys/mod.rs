@@ -8,8 +8,8 @@ use std::sync::Arc;
 use luft_keyring_vault::now;
 use luft_keyring_wire::{Chip, Problem};
 use zbus::message::Header;
-use zbus::zvariant::{OwnedValue, Value};
 use zbus::{DBusError, interface};
+use zbus::{OwnedVariant, Variant};
 
 use crate::daemon::Daemon;
 use crate::identity::App;
@@ -47,14 +47,14 @@ fn missing() -> PasskeyError {
     PasskeyError::NotFound("No such passkey".into())
 }
 
-fn text(fields: &HashMap<String, OwnedValue>, name: &str) -> String {
+fn text(fields: &HashMap<String, OwnedVariant>, name: &str) -> String {
     fields
         .get(name)
         .and_then(|value| String::try_from(value.try_clone().ok()?).ok())
         .unwrap_or_default()
 }
 
-fn bytes(fields: &HashMap<String, OwnedValue>, name: &str) -> Vec<u8> {
+fn bytes(fields: &HashMap<String, OwnedVariant>, name: &str) -> Vec<u8> {
     fields
         .get(name)
         .and_then(|value| Vec::<u8>::try_from(value.try_clone().ok()?).ok())
@@ -129,7 +129,7 @@ impl Passkeys {
     async fn list(
         &self,
         #[zbus(header)] header: Header<'_>,
-    ) -> Result<Vec<HashMap<&'static str, OwnedValue>>, PasskeyError> {
+    ) -> Result<Vec<HashMap<&'static str, OwnedVariant>>, PasskeyError> {
         self.caller(&header).await?;
         let keyring = self.daemon.keyring.lock().await;
         let contents = keyring.contents().ok_or_else(locked)?;
@@ -141,9 +141,9 @@ impl Passkeys {
 
     async fn create(
         &self,
-        fields: HashMap<String, OwnedValue>,
+        fields: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
-    ) -> Result<HashMap<&'static str, OwnedValue>, PasskeyError> {
+    ) -> Result<HashMap<&'static str, OwnedVariant>, PasskeyError> {
         let app = self.caller(&header).await?;
         let created = key::create(self.chip_ready().await)
             .await
@@ -234,7 +234,7 @@ impl Passkeys {
     async fn update(
         &self,
         id: Vec<u8>,
-        changes: HashMap<String, OwnedValue>,
+        changes: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), PasskeyError> {
         self.caller(&header).await?;
@@ -243,10 +243,10 @@ impl Passkeys {
                 let Ok(value) = value.try_clone() else {
                     continue;
                 };
-                match (name.as_str(), Value::from(value)) {
-                    ("nickname", Value::Str(text)) => passkey.nickname = text.to_string(),
-                    ("user_name", Value::Str(text)) => passkey.user_name = text.to_string(),
-                    ("display_name", Value::Str(text)) => passkey.display_name = text.to_string(),
+                match (name.as_str(), Variant::from(value)) {
+                    ("nickname", Variant::Str(text)) => passkey.nickname = text.to_string(),
+                    ("user_name", Variant::Str(text)) => passkey.user_name = text.to_string(),
+                    ("display_name", Variant::Str(text)) => passkey.display_name = text.to_string(),
                     _ => {}
                 }
             }

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use luft_keyring_vault::Action;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::zvariant::{ObjectPath, OwnedObjectPath};
+use zbus::{ObjectPath, OwnedObjectPath};
 use zbus::{fdo, interface};
 
 use super::settings_only;

@@ -4,7 +4,7 @@ use std::os::fd::OwnedFd;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use zbus::Connection;
-use zbus::zvariant::{Fd, OwnedValue, Value};
+use zbus::{Fd, OwnedVariant, Variant};
 use zeroize::Zeroizing;
 
 const NAME: &str = "com.lantharos.Kestrel";
@@ -39,7 +39,7 @@ pub struct Request<'a> {
 }
 
 impl Request<'_> {
-    fn options(&self, action_key: &'static str) -> HashMap<&'static str, Value<'_>> {
+    fn options(&self, action_key: &'static str) -> HashMap<&'static str, Variant<'_>> {
         let mut options = HashMap::new();
         for (key, value) in [
             ("title", self.title),
@@ -50,11 +50,11 @@ impl Request<'_> {
             ("label", self.label),
         ] {
             if !value.is_empty() {
-                options.insert(key, Value::from(value));
+                options.insert(key, Variant::from(value));
             }
         }
         if !self.action.is_empty() {
-            options.insert(action_key, Value::from(self.action));
+            options.insert(action_key, Variant::from(self.action));
         }
         for (key, value) in [
             ("remember", self.remember),
@@ -63,7 +63,7 @@ impl Request<'_> {
             ("confirm", self.confirm),
         ] {
             if value {
-                options.insert(key, Value::from(true));
+                options.insert(key, Variant::from(true));
             }
         }
         options
@@ -121,7 +121,7 @@ impl Prompter {
         };
         let Ok((response, results)) = reply
             .body()
-            .deserialize::<(u32, HashMap<String, OwnedValue>)>()
+            .deserialize::<(u32, HashMap<String, OwnedVariant>)>()
         else {
             return Answer::Dismissed;
         };

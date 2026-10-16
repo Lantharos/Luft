@@ -15,7 +15,7 @@ pub struct Process {
 }
 
 impl Process {
-    pub fn open(pid: u32, pidfd: Option<&zbus::zvariant::OwnedFd>) -> Option<Self> {
+    pub fn open(pid: u32, pidfd: Option<&zbus::OwnedFd>) -> Option<Self> {
         let path = CString::new(format!("/proc/{pid}")).ok()?;
         let fd = unsafe {
             libc::open(

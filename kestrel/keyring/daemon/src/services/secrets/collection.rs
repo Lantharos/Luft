@@ -4,7 +4,7 @@ use std::sync::Arc;
 use luft_keyring_vault::{Action, Item as StoredItem, Secret as Stored};
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::zvariant::{ObjectPath, OwnedObjectPath};
+use zbus::{ObjectPath, OwnedObjectPath};
 use zbus::{fdo, interface};
 
 use super::session::decode;

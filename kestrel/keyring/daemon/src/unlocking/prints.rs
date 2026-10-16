@@ -1,5 +1,5 @@
 use zbus::Connection;
-use zbus::zvariant::OwnedObjectPath;
+use zbus::OwnedObjectPath;
 
 const FPRINTD: &str = "net.reactivated.Fprint";
 

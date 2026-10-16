@@ -10,5 +10,5 @@ license.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-libc = "0.2.189"
+libc = "0.2.190"
 luft-keyring-wire.workspace = true

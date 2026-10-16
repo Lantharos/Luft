@@ -4,7 +4,7 @@ use std::sync::Arc;
 use luft_keyring_vault::{Action as Logged, DEFAULT_ALIAS, LOGIN};
 use zbus::message::Header;
 use zbus::object_server::{ObjectServer, SignalEmitter};
-use zbus::zvariant::{ObjectPath, OwnedObjectPath, OwnedValue, Value};
+use zbus::{ObjectPath, OwnedObjectPath, OwnedVariant, Variant};
 use zbus::{fdo, interface};
 
 use super::prompt::{Action, PromptObject};
@@ -44,18 +44,18 @@ impl Service {
     async fn open_session(
         &self,
         algorithm: &str,
-        input: OwnedValue,
+        input: OwnedVariant,
         #[zbus(header)] header: Header<'_>,
         #[zbus(object_server)] server: &ObjectServer,
-    ) -> fdo::Result<(OwnedValue, OwnedObjectPath)> {
+    ) -> fdo::Result<(OwnedVariant, OwnedObjectPath)> {
         let (sender, _) = self.daemon.caller(&header).await;
         let bytes = Vec::<u8>::try_from(input).unwrap_or_default();
         let (transfer, output) = Transfer::negotiate(algorithm, &bytes)
             .map_err(|_| fdo::Error::NotSupported(format!("{algorithm} isn't supported")))?;
         let output = if algorithm == PLAIN {
-            Value::from("")
+            Variant::from("")
         } else {
-            Value::from(output)
+            Variant::from(output)
         };
         let path = self.daemon.sessions.add(&sender, transfer);
         server
@@ -67,7 +67,7 @@ impl Service {
                 },
             )
             .await?;
-        Ok((output.try_into().map_err(zbus::Error::from)?, path))
+        Ok((output.try_into()?, path))
     }
 
     async fn create_collection(

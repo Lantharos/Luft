@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use luft_keyring_vault::{Collection, Contents, Item, Secret};
 use luft_keyring_wire::TpmKey;
 use serde::{Deserialize, Serialize};
-use zbus::zvariant::{OwnedValue, Value};
+use zbus::{OwnedVariant, Variant};
 
 pub const COLLECTION: &str = "passkeys";
 pub const SCHEMA: &str = "com.lantharos.Passkey";
@@ -66,22 +66,22 @@ impl Passkey {
         matches!(self.private, Private::Chip { .. })
     }
 
-    pub fn describe(&self) -> HashMap<&'static str, OwnedValue> {
+    pub fn describe(&self) -> HashMap<&'static str, OwnedVariant> {
         let fields = [
-            ("id", Value::from(self.id.clone())),
-            ("rp", Value::from(self.rp.clone())),
-            ("rp_name", Value::from(self.rp_name.clone())),
-            ("user_id", Value::from(self.user_id.clone())),
-            ("user_name", Value::from(self.user_name.clone())),
-            ("display_name", Value::from(self.display_name.clone())),
-            ("discoverable", Value::from(self.discoverable)),
-            ("protection", Value::from(self.protection)),
-            ("x", Value::from(self.x.clone())),
-            ("y", Value::from(self.y.clone())),
-            ("nickname", Value::from(self.nickname.clone())),
-            ("created", Value::from(self.created)),
-            ("used", Value::from(self.used)),
-            ("chip", Value::from(self.on_chip())),
+            ("id", Variant::from(self.id.clone())),
+            ("rp", Variant::from(self.rp.clone())),
+            ("rp_name", Variant::from(self.rp_name.clone())),
+            ("user_id", Variant::from(self.user_id.clone())),
+            ("user_name", Variant::from(self.user_name.clone())),
+            ("display_name", Variant::from(self.display_name.clone())),
+            ("discoverable", Variant::from(self.discoverable)),
+            ("protection", Variant::from(self.protection)),
+            ("x", Variant::from(self.x.clone())),
+            ("y", Variant::from(self.y.clone())),
+            ("nickname", Variant::from(self.nickname.clone())),
+            ("created", Variant::from(self.created)),
+            ("used", Variant::from(self.used)),
+            ("chip", Variant::from(self.on_chip())),
         ];
         fields
             .into_iter()

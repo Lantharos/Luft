@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::sync::Mutex;
 use zbus::object_server::{ObjectServer, SignalEmitter};
-use zbus::zvariant::{OwnedObjectPath, Value};
+use zbus::{OwnedObjectPath, Variant};
 use zbus::{fdo, interface};
 
 use super::{Target, parse};
@@ -35,7 +35,7 @@ impl PromptObject {
             "/org/freedesktop/secrets/prompt/p{}",
             NEXT.fetch_add(1, Ordering::Relaxed)
         );
-        let path = OwnedObjectPath::try_from(path).map_err(zbus::Error::from)?;
+        let path = OwnedObjectPath::try_from(path)?;
         let prompt = Self {
             daemon: daemon.clone(),
             path: path.clone(),
@@ -45,7 +45,7 @@ impl PromptObject {
         Ok(path)
     }
 
-    async fn finish(daemon: &Daemon, path: &OwnedObjectPath, dismissed: bool, result: Value<'_>) {
+    async fn finish(daemon: &Daemon, path: &OwnedObjectPath, dismissed: bool, result: Variant<'_>) {
         if let Ok(emitter) = SignalEmitter::new(&daemon.connection, path.as_ref()) {
             let _ = Self::completed(&emitter, dismissed, result).await;
         }
@@ -57,10 +57,10 @@ impl PromptObject {
     }
 }
 
-async fn run(daemon: &Arc<Daemon>, action: Action) -> (bool, Value<'static>) {
+async fn run(daemon: &Arc<Daemon>, action: Action) -> (bool, Variant<'static>) {
     let Action::Unlock { app, objects } = action;
     if !daemon.ensure_unlocked(&app, true).await {
-        return (true, Value::from(Vec::<OwnedObjectPath>::new()));
+        return (true, Variant::from(Vec::<OwnedObjectPath>::new()));
     }
     let keys = daemon.items_of(&objects).await;
     let allowed = daemon.authorize(&app, &keys, true).await;
@@ -71,7 +71,7 @@ async fn run(daemon: &Arc<Daemon>, action: Action) -> (bool, Value<'static>) {
             _ => true,
         })
         .collect();
-    (unlocked.is_empty(), Value::from(unlocked))
+    (unlocked.is_empty(), Variant::from(unlocked))
 }
 
 #[interface(name = "org.freedesktop.Secret.Prompt")]
@@ -94,7 +94,7 @@ impl PromptObject {
                 &self.daemon,
                 &self.path,
                 true,
-                Value::from(Vec::<OwnedObjectPath>::new()),
+                Variant::from(Vec::<OwnedObjectPath>::new()),
             )
             .await;
         }
@@ -104,6 +104,6 @@ impl PromptObject {
     async fn completed(
         emitter: &SignalEmitter<'_>,
         dismissed: bool,
-        result: Value<'_>,
+        result: Variant<'_>,
     ) -> zbus::Result<()>;
 }

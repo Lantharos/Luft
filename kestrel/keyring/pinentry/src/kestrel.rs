@@ -6,7 +6,7 @@ use std::time::Duration;
 use rustix::net::{AddressFamily, Shutdown, SocketFlags, SocketType};
 use tokio::runtime::Runtime;
 use zbus::Connection;
-use zbus::zvariant::{Fd, OwnedValue, Value};
+use zbus::{Fd, OwnedVariant, Variant};
 use zeroize::Zeroizing;
 
 const NAME: &str = "com.lantharos.Kestrel";
@@ -37,12 +37,12 @@ impl Request {
         }
     }
 
-    fn options(&self) -> HashMap<&'static str, Value<'static>> {
+    fn options(&self) -> HashMap<&'static str, Variant<'static>> {
         let texts = self
             .texts
             .iter()
-            .map(|(key, value)| (*key, Value::from(value.clone())));
-        let flags = self.flags.iter().map(|key| (*key, Value::from(true)));
+            .map(|(key, value)| (*key, Variant::from(value.clone())));
+        let flags = self.flags.iter().map(|key| (*key, Variant::from(true)));
         texts.chain(flags).collect()
     }
 }
@@ -131,7 +131,7 @@ impl Kestrel {
                     .and_then(|reply| {
                         reply
                             .body()
-                            .deserialize::<(u32, HashMap<String, OwnedValue>)>()
+                            .deserialize::<(u32, HashMap<String, OwnedVariant>)>()
                     })
             })
             .await;

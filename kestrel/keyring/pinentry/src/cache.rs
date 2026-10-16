@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use futures_util::StreamExt;
 use zbus::Connection;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
+use zbus::{OwnedObjectPath, OwnedVariant, Variant};
 use zeroize::Zeroizing;
 
 const SERVICE: &str = "org.freedesktop.secrets";
@@ -44,8 +44,8 @@ impl<'a> Cache<'a> {
         body: &B,
     ) -> zbus::Result<R>
     where
-        B: serde::Serialize + zbus::zvariant::DynamicType,
-        R: for<'d> serde::Deserialize<'d> + zbus::zvariant::Type,
+        B: serde::Serialize + zbus::DynamicType,
+        R: for<'d> serde::Deserialize<'d> + zbus::Type,
     {
         self.connection
             .call_method(Some(SERVICE), path, Some(interface), method, body)
@@ -55,13 +55,13 @@ impl<'a> Cache<'a> {
     }
 
     async fn session(&self) -> zbus::Result<OwnedObjectPath> {
-        let (_, session): (OwnedValue, OwnedObjectPath) = self
-            .call(ROOT, SECRETS, "OpenSession", &("plain", Value::from("")))
+        let (_, session): (OwnedVariant, OwnedObjectPath) = self
+            .call(ROOT, SECRETS, "OpenSession", &("plain", Variant::from("")))
             .await?;
         Ok(session)
     }
 
-    async fn prompt(&self, prompt: OwnedObjectPath) -> zbus::Result<Option<OwnedValue>> {
+    async fn prompt(&self, prompt: OwnedObjectPath) -> zbus::Result<Option<OwnedVariant>> {
         if prompt.as_str() == NO_PROMPT {
             return Ok(None);
         }
@@ -71,7 +71,7 @@ impl<'a> Cache<'a> {
         let Some(signal) = completed.next().await else {
             return Ok(None);
         };
-        let (dismissed, result): (bool, OwnedValue) = signal.body().deserialize()?;
+        let (dismissed, result): (bool, OwnedVariant) = signal.body().deserialize()?;
         Ok((!dismissed).then_some(result))
     }
 
@@ -114,11 +114,11 @@ impl<'a> Cache<'a> {
         let properties = HashMap::from([
             (
                 "org.freedesktop.Secret.Item.Label",
-                Value::from(label.as_str()),
+                Variant::from(label.as_str()),
             ),
             (
                 "org.freedesktop.Secret.Item.Attributes",
-                Value::from(attributes),
+                Variant::from(attributes),
             ),
         ]);
         let secret = (&session, Vec::<u8>::new(), secret, "text/plain");

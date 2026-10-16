@@ -42,7 +42,7 @@ pub async fn create(on_chip: bool) -> Result<Created, Problem> {
         });
     }
     let key = generate()?;
-    let point = key.verifying_key().to_encoded_point(false);
+    let point = key.verifying_key().to_sec1_point(false);
     let bytes = point.as_bytes();
     Ok(Created {
         private: Private::Software(Secret::copy_of(&key.to_bytes())),

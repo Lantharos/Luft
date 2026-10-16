@@ -3,7 +3,6 @@ use base64::engine::general_purpose::{STANDARD, STANDARD_NO_PAD};
 use ed25519_dalek::{Signer, SigningKey};
 use luft_keyring_vault::{Secret, SshKey, SshPrivate, now};
 use luft_keyring_wire::{Reply, Request, TpmKey};
-use p256::ecdsa::signature::Signer as _;
 use p256::ecdsa::{Signature, SigningKey as EcdsaKey};
 use sha2::{Digest, Sha256};
 

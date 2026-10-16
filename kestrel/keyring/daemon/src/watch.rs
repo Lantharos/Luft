@@ -30,9 +30,9 @@ pub async fn start(daemon: &Arc<Daemon>) -> zbus::Result<()> {
 
     let rule = MatchRule::builder()
         .msg_type(zbus::message::Type::Signal)
-        .interface("org.gnome.ScreenSaver")?
-        .member("ActiveChanged")?
-        .build();
+        .interface("org.gnome.ScreenSaver")
+        .member("ActiveChanged")
+        .build()?;
     let mut screen = MessageStream::for_match_rule(rule, &daemon.connection, None).await?;
     let watcher = daemon.clone();
     tokio::spawn(async move {

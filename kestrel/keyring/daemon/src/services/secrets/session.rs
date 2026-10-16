@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 
 use zbus::interface;
 use zbus::object_server::ObjectServer;
-use zbus::zvariant::{ObjectPath, OwnedObjectPath};
+use zbus::{ObjectPath, OwnedObjectPath};
 use zeroize::Zeroizing;
 
 use super::Secret;

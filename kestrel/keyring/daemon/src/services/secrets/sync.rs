@@ -48,9 +48,9 @@ pub async fn sync(daemon: &Arc<Daemon>) {
     }
     for new in wanted.difference(&objects) {
         let daemon = daemon.clone();
-        let _ = match new {
+        match new {
             Target::Collection(id) => {
-                server
+                let _ = server
                     .at(
                         collection_path(id),
                         Collection {
@@ -58,10 +58,10 @@ pub async fn sync(daemon: &Arc<Daemon>) {
                             target: new.clone(),
                         },
                     )
-                    .await
+                    .await;
             }
             Target::Alias(alias) => {
-                server
+                let _ = server
                     .at(
                         alias_path(alias),
                         Collection {
@@ -69,10 +69,10 @@ pub async fn sync(daemon: &Arc<Daemon>) {
                             target: new.clone(),
                         },
                     )
-                    .await
+                    .await;
             }
             Target::Item(collection, item) => {
-                server
+                let _ = server
                     .at(
                         item_path(collection, *item),
                         Item {
@@ -81,9 +81,9 @@ pub async fn sync(daemon: &Arc<Daemon>) {
                             id: *item,
                         },
                     )
-                    .await
+                    .await;
             }
-        };
+        }
     }
     *objects = wanted;
 }

@@ -14,7 +14,7 @@ name = "magpie_lib"
 dirs = "7.0.0"
 gio = "0.22.10"
 gio-unix = "0.22.8"
-glycin = { version = "4.0.0", default-features = false, features = ["tokio"] }
+glycin = { version = "4.0.3", default-features = false, features = ["tokio"] }
 imagesize = "0.15.0"
 kamadak-exif = "0.6.1"
 lofty = "0.25.4"
@@ -23,8 +23,8 @@ matroska-demuxer = "0.8.1"
 parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.42" }
 serde = { version = "1.0.229", features = ["derive"] }
-skrifa = "0.47"
-tokio = { version = "1.53.1", default-features = false, features = ["rt-multi-thread"] }
-write-fonts = "0.53"
+skrifa = "0.48"
+tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread"] }
+write-fonts = "0.54"
 wuff = "0.2.9"
 zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }

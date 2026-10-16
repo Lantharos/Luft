@@ -78,8 +78,9 @@ pub enum Action {
         /// Open the program on the person's screen instead of a hidden display
         #[arg(long)]
         here: bool,
-        /// Size of the hidden display
-        #[arg(long, default_value = "1280x800", value_name = "WxH", value_parser = parse_size)]
+        /// Size of the hidden display in pixels, optionally with its physical size, such as 1920x1200:302x189mm for a 14"
+        /// laptop panel. Kestrel picks the display's scale from the physical size, as it does for real screens.
+        #[arg(long, default_value = "1280x800", value_name = "WxH[:WxHmm]", value_parser = parse_size)]
         size: String,
         /// Wait until the program opens its first window
         #[arg(long)]
@@ -176,12 +177,27 @@ impl Button {
     }
 }
 
+fn dimensions(text: &str) -> Option<(u16, u16)> {
+    let (width, height) = text.split_once('x')?;
+    Some((width.parse().ok()?, height.parse().ok()?))
+}
+
 fn parse_size(text: &str) -> Result<String, String> {
-    match text
-        .split_once('x')
-        .map(|(width, height)| (width.parse::<u16>(), height.parse::<u16>()))
-    {
-        Some((Ok(width), Ok(height))) if width >= 320 && height >= 240 => Ok(text.into()),
-        _ => Err("use WIDTHxHEIGHT, at least 320x240, such as 1280x800".into()),
+    let (pixels, physical) = match text.split_once(':') {
+        Some((pixels, physical)) => (pixels, Some(physical)),
+        None => (text, None),
+    };
+    let pixels_fit =
+        dimensions(pixels).is_some_and(|(width, height)| width >= 320 && height >= 240);
+    let physical_fits = physical.is_none_or(|physical| {
+        physical
+            .strip_suffix("mm")
+            .and_then(dimensions)
+            .is_some_and(|(width, height)| width > 0 && height > 0)
+    });
+    if pixels_fit && physical_fits {
+        Ok(text.into())
+    } else {
+        Err("use WIDTHxHEIGHT, at least 320x240, optionally followed by :WIDTHxHEIGHTmm, such as 1920x1200:302x189mm".into())
     }
 }

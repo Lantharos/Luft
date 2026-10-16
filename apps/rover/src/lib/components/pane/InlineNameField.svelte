@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	interface Props {
 		value: string;
 		label: string;
@@ -17,10 +19,12 @@
 	let committing = false;
 
 	function focusName(input: HTMLInputElement) {
-		input.focus({ preventScroll: true });
-		const dot = input.value.lastIndexOf('.');
-		if (selectStem && dot > 0) input.setSelectionRange(0, dot);
-		else input.select();
+		untrack(() => {
+			input.focus({ preventScroll: true });
+			const dot = input.value.lastIndexOf('.');
+			if (selectStem && dot > 0) input.setSelectionRange(0, dot);
+			else input.select();
+		});
 	}
 
 	function commit() {

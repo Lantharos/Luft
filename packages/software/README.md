@@ -39,7 +39,8 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | --- | --- |
 | `system` | `System::current()`, `Packages` or `Image` |
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
-| `image` | `Deployments` (`load`, `status`, `check`, `lacks`), `download`, `rollback`, and `downloading`, `follow` and `watch` for a download started anywhere |
+| `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `watch` for a download started anywhere |
+| `variant` | [`luft-variant`](../variant/README.md), which image suits this computer |
 | `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
@@ -60,6 +61,8 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 
 `Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version, and the previous version when going back to it is queued. `check()` asks the registry for the newest image and how much of it is new. `download` fetches it with `bootc upgrade --download-only`, with progress from bootc's `--progress-fd`. A downloaded update stays locked until Kestrel's restart and power off dialog unlocks it with `Apply`, so leaving the box unticked simply doesn't install it. `rollback` makes the previous version start next time, and calling it again stays on the current one.
 
+`variant_offer` names the other image when it suits the computer better: the NVIDIA one with NVIDIA graphics, the standard one without. `switch` asks the updater to `bootc switch` to it, on the same channel and version, derived from the reference `bootc status` follows; it's staged for the next restart, and the current image stays as the previous version. `switch_size` is how much of it isn't on the computer yet.
+
 Versions and release notes come from the image's labels:
 
 | Label | Shown as |
@@ -67,7 +70,7 @@ Versions and release notes come from the image's labels:
 | `org.opencontainers.image.version` | The version, such as 45.2 |
 | `com.lantharos.release-notes` | What's new, as plain text |
 
-`updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators can download and install updates without a password, also in the background; going back to the previous version asks.
+`updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks.
 
 ## Command-line tools
 

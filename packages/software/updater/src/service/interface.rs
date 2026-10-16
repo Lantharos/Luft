@@ -2,6 +2,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
 use access::Idle;
+use luft_variant::Variant;
 use tokio::sync::mpsc;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
@@ -9,7 +10,7 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::error::Error;
-use crate::bootc::{self, Upgrade};
+use crate::bootc::{self, Fetch};
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
@@ -46,6 +47,31 @@ impl Updater {
         }
     }
 
+    async fn begin(
+        &self,
+        fetch: impl FnOnce() -> anyhow::Result<Fetch>,
+        server: &ObjectServer,
+        emitter: &SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        let fetch = {
+            let mut downloading = self.downloading.lock().expect("download lock");
+            if downloading.is_some() {
+                return Err(Error::Busy(
+                    "An update is already being downloaded.".to_owned(),
+                ));
+            }
+            let fetch = fetch()?;
+            *downloading = Some(fetch.pid());
+            fetch
+        };
+        self.downloaded.store(0, Ordering::Relaxed);
+        let _ = self.downloaded_changed(emitter).await;
+        let _ = self.downloading_changed(emitter).await;
+        let updater = server.interface::<_, Updater>(PATH).await?;
+        tokio::spawn(follow(updater, fetch, self.idle.clone()));
+        Ok(())
+    }
+
     fn refuse_while_downloading(&self) -> Result<(), Error> {
         match self.download_pid() {
             Some(_) => Err(Error::Busy("An update is being downloaded.".to_owned())),
@@ -65,11 +91,11 @@ impl Updater {
     }
 }
 
-async fn follow(updater: InterfaceRef<Updater>, upgrade: Upgrade, idle: Arc<Idle>) {
+async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
     let _activity = idle.hold();
     let (sender, mut fetched) = mpsc::unbounded_channel();
     let work = tokio::task::spawn_blocking(move || {
-        upgrade.follow(|bytes| {
+        fetch.follow(|bytes| {
             let _ = sender.send(bytes);
         })
     });
@@ -117,23 +143,23 @@ impl Updater {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        let upgrade = {
-            let mut downloading = self.downloading.lock().expect("download lock");
-            if downloading.is_some() {
-                return Err(Error::Busy(
-                    "An update is already being downloaded.".to_owned(),
-                ));
-            }
-            let upgrade = Upgrade::start()?;
-            *downloading = Some(upgrade.pid());
-            upgrade
-        };
-        self.downloaded.store(0, Ordering::Relaxed);
-        let _ = self.downloaded_changed(&emitter).await;
-        let _ = self.downloading_changed(&emitter).await;
-        let updater = server.interface::<_, Updater>(PATH).await?;
-        tokio::spawn(follow(updater, upgrade, self.idle.clone()));
-        Ok(())
+        self.begin(Fetch::upgrade, server, &emitter).await
+    }
+
+    async fn switch_variant(
+        &self,
+        variant: &str,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(object_server)] server: &ObjectServer,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, DOWNLOAD).await?;
+        self.refuse_while_downloading()?;
+        let variant = Variant::named(variant);
+        let target = self.blocking(move || bootc::switch_target(variant)).await?;
+        self.begin(|| Fetch::switch(&target), server, &emitter)
+            .await
     }
 
     async fn cancel(

@@ -162,10 +162,18 @@ dependencies = [
  "access",
  "anyhow",
  "libc",
+ "luft-variant",
  "serde",
  "serde_json",
  "tokio",
  "zbus",
+]
+
+[[package]]
+name = "luft-variant"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

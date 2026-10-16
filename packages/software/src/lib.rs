@@ -11,3 +11,5 @@ pub mod system;
 pub mod task;
 pub mod toolbox;
 pub mod updates;
+
+pub use luft_variant as variant;

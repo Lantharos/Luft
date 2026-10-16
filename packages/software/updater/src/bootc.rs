@@ -5,6 +5,8 @@ use std::os::unix::process::CommandExt;
 use std::process::{Child, Command, Stdio};
 
 use anyhow::{Context, Result, anyhow, bail};
+use luft_variant::Variant;
+use serde::Deserialize;
 use serde_json::{Map, Value, json};
 
 use crate::progress::Pull;
@@ -92,18 +94,58 @@ fn pipe() -> Result<(File, OwnedFd)> {
     Ok((read, write))
 }
 
-pub struct Upgrade {
+#[derive(Deserialize)]
+struct Followed {
+    spec: Spec,
+}
+
+#[derive(Deserialize)]
+struct Spec {
+    image: Option<Reference>,
+}
+
+#[derive(Deserialize)]
+pub struct Reference {
+    image: String,
+    transport: String,
+}
+
+pub fn switch_target(variant: Variant) -> Result<Reference> {
+    let host: Followed = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
+    let Reference { image, transport } = host
+        .spec
+        .image
+        .ok_or_else(|| anyhow!("This system doesn't get its updates from an image."))?;
+    if Variant::of(&image) == variant {
+        bail!("This system already uses that image.");
+    }
+    let image = variant
+        .reference(&image)
+        .ok_or_else(|| anyhow!("This system follows one fixed build of its image."))?;
+    Ok(Reference { image, transport })
+}
+
+pub struct Fetch {
     child: Child,
     events: File,
 }
 
-impl Upgrade {
-    pub fn start() -> Result<Self> {
+impl Fetch {
+    pub fn upgrade() -> Result<Self> {
+        Self::start(&["upgrade", "--download-only"])
+    }
+
+    pub fn switch(target: &Reference) -> Result<Self> {
+        Self::start(&["switch", "--transport", &target.transport, &target.image])
+    }
+
+    fn start(arguments: &[&str]) -> Result<Self> {
         let (events, writer) = pipe()?;
         let source = writer.as_raw_fd();
         let mut command = Command::new(BOOTC);
         command
-            .args(["upgrade", "--download-only", "--quiet"])
+            .args(arguments)
+            .arg("--quiet")
             .arg(format!("--progress-fd={PROGRESS_FD}"))
             .stdin(Stdio::null())
             .stdout(Stdio::null())

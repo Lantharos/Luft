@@ -29,6 +29,7 @@ fn only(current: Release) -> Status {
         staged: None,
         previous: None,
         returning: None,
+        switching: None,
     }
 }
 
@@ -46,6 +47,18 @@ fn a_downloaded_update_waits_for_a_restart() {
         deployments(include_str!("fixtures/staged.json")).status(),
         Status {
             staged: Some(second()),
+            ..only(first())
+        }
+    );
+}
+
+#[test]
+fn a_switch_to_the_nvidia_image_waits_for_a_restart() {
+    assert_eq!(
+        deployments(include_str!("fixtures/switching.json")).status(),
+        Status {
+            staged: Some(second()),
+            switching: Some(Variant::Nvidia),
             ..only(first())
         }
     );

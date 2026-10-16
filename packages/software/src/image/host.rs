@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_variant::Variant;
 use serde::Deserialize;
 
 use super::config::{Config, Release};
@@ -14,7 +15,13 @@ struct Reply {
 
 #[derive(Deserialize)]
 struct Document {
+    spec: Spec,
     status: Slots,
+}
+
+#[derive(Deserialize)]
+struct Spec {
+    image: Option<Reference>,
 }
 
 #[derive(Deserialize)]
@@ -42,9 +49,26 @@ struct Image {
 }
 
 #[derive(Deserialize)]
-struct Reference {
+pub struct Reference {
     image: String,
     transport: String,
+}
+
+impl Reference {
+    pub fn location(&self) -> Option<String> {
+        registry::location(&self.transport, &self.image)
+    }
+
+    pub fn variant(&self) -> Variant {
+        Variant::of(&self.image)
+    }
+
+    pub fn as_variant(&self, variant: Variant) -> Option<Self> {
+        Some(Self {
+            image: variant.reference(&self.image)?,
+            transport: self.transport.clone(),
+        })
+    }
 }
 
 pub struct Deployment {
@@ -53,6 +77,7 @@ pub struct Deployment {
 }
 
 pub struct Host {
+    pub followed: Option<Reference>,
     pub booted: Deployment,
     pub staged: Option<Deployment>,
     pub rollback: Option<Deployment>,
@@ -62,7 +87,7 @@ pub struct Host {
 impl Host {
     pub fn parse(json: &str) -> Result<Self, String> {
         let Reply {
-            host: Document { status },
+            host: Document { spec, status },
             mut configs,
         } = serde_json::from_str(json).map_err(|error| error.to_string())?;
         let mut deployment = |entry: Entry| Deployment {
@@ -77,6 +102,7 @@ impl Host {
             .booted
             .ok_or("This computer didn't start from a system image.")?;
         Ok(Self {
+            followed: spec.image,
             booted: deployment(booted),
             staged: status.staged.map(&mut deployment),
             rollback: status.rollback.map(&mut deployment),
@@ -100,8 +126,7 @@ impl Deployment {
         }
     }
 
-    pub fn location(&self) -> Option<String> {
-        let reference = &self.image.as_ref()?.image;
-        registry::location(&reference.transport, &reference.image)
+    pub fn variant(&self) -> Option<Variant> {
+        Some(self.image.as_ref()?.image.variant())
     }
 }

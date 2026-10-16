@@ -7,7 +7,7 @@
     Downloading: whether an update is being downloaded right now, by anyone.
     Downloaded: bytes of image layers fetched so far by the current download.
 
-    Download, Cancel and Apply need com.lantharos.updater.download; Rollback needs
+    Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; Rollback needs
     com.lantharos.updater.rollback. Status needs nothing.
   -->
   <interface name="com.lantharos.Updater1">
@@ -22,6 +22,12 @@
     <!-- Starts downloading the newest image and stages it, locked: it's only installed at a restart once
          Apply unlocks it. Finished says how it went. -->
     <method name="Download"/>
+    <!-- Starts downloading the same channel and version of Luft's other image, "standard" or "nvidia",
+         and stages it, unlocked, for the next restart, keeping this one to go back to. Downloading,
+         Downloaded and Finished report it like an update. -->
+    <method name="SwitchVariant">
+      <arg name="variant" type="s" direction="in"/>
+    </method>
     <method name="Cancel"/>
     <!-- Installs the downloaded update at the next restart or power off. -->
     <method name="Apply"/>

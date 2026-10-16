@@ -1,4 +1,5 @@
 use luft_app::dbus::{self, service::Service};
+use luft_variant::Variant;
 use zbus::blocking::MessageIterator;
 use zbus::blocking::fdo::DBusProxy;
 use zbus::names::BusName;
@@ -123,6 +124,15 @@ pub fn download(size: Option<u64>, task: Task) -> Result<(), String> {
     let signals = signals()?;
     task.progress(Stage::Preparing, None);
     change("Download")?;
+    cancellable(signals, size, task)
+}
+
+pub fn switch(variant: Variant, size: Option<u64>, task: Task) -> Result<(), String> {
+    let signals = signals()?;
+    task.progress(Stage::Preparing, None);
+    UPDATER
+        .change::<_, ()>("SwitchVariant", &(variant.name(),))
+        .map_err(message_of)?;
     cancellable(signals, size, task)
 }
 

@@ -1,0 +1,4 @@
+ARG BASE
+FROM ${BASE}
+COPY root/ /
+RUN systemctl enable luft-remove-prepare.service luft-remove-check.service

@@ -1,4 +1,4 @@
-import type { ChosenImage, Drive, Volume } from '#lib/api.js';
+import type { ChosenImage, Drive, OtherSystem, Volume } from '#lib/api.js';
 
 export type OpenDialog =
 	| { kind: 'format-volume'; drive: Drive; volume: Volume }
@@ -21,7 +21,8 @@ export type OpenDialog =
 	| { kind: 'encrypt'; drive: Drive; volume: Volume }
 	| { kind: 'encryption'; drive: Drive; volume: Volume }
 	| { kind: 'turn-off'; volume: Volume }
-	| { kind: 'recovery-key'; key: string; name: string };
+	| { kind: 'recovery-key'; key: string; name: string }
+	| { kind: 'remove-system'; system: OtherSystem };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);

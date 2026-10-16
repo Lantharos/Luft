@@ -1,4 +1,3 @@
-mod client;
 pub mod drives;
 
 use std::collections::HashMap;
@@ -6,7 +5,7 @@ use std::collections::HashMap;
 use luft_app::Events;
 use serde::Serialize;
 
-use client::{DRIVES, Map, TRUST, get};
+use luft_disks::trust::{self as client, DRIVES, Map, TRUST, get};
 
 pub const CHANGED: &str = "disks.trust";
 const NEEDS_DEVICE_ENCRYPTION: &str = "Turn on device encryption in Settings first. This computer keeps the drive's key on its own disk, so that disk has to be encrypted too.";

@@ -2,9 +2,8 @@ mod guard;
 mod moving;
 
 use luft_app::Events;
-use luft_disks::resize;
+use luft_disks::{partitions, resize};
 use serde::Deserialize;
-use zbus::zvariant::Value;
 
 use super::formatting::{self, Format};
 use super::mounting;
@@ -92,7 +91,7 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
         }
         Step::Delete { block } => {
             Guard::volume(&block)?.changeable()?;
-            delete(&block).map(|()| None)
+            partitions::delete(&block).map(|()| None)
         }
         Step::Place {
             block,
@@ -118,13 +117,6 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
             change(&block, partition_type, name, flags, label).map(|()| None)
         }
     }
-}
-
-pub fn delete(block: &str) -> Result<(), String> {
-    mounting::release(block)?;
-    let mut options = no_options();
-    options.insert("tear-down", Value::from(true));
-    udisks::run(block, PARTITION, "Delete", &(options,))
 }
 
 fn place(events: &Events, block: &str, offset: u64, size: u64) -> Result<Option<String>, String> {

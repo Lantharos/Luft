@@ -13,6 +13,9 @@ use crate::launch;
 use crate::space::Explorer;
 use crate::trust::{self, drives as encryption_drives};
 use crate::udisks::{self, snapshot};
+use luft_disks::{partitions, systems};
+
+const SYSTEM_STEP: &str = "disks.system";
 
 #[derive(Clone, Default)]
 pub struct State {
@@ -177,6 +180,16 @@ struct CreateImage {
 }
 
 #[derive(Deserialize)]
+struct SystemId {
+    id: String,
+}
+
+#[derive(Deserialize)]
+struct Grow {
+    unlock: String,
+}
+
+#[derive(Deserialize)]
 struct RestoreImage {
     block: String,
     path: String,
@@ -188,6 +201,7 @@ pub fn register(window: SabineWindow, state: &State) -> SabineWindow {
     let window = register_space(window, state);
     let window = register_trust(window);
     let window = register_plan(window, state);
+    let window = register_systems(window, state);
     register_drives(window, state)
 }
 
@@ -279,6 +293,19 @@ fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
     })
 }
 
+fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
+    window
+        .command("disks_systems", |_: Value| systems::find())
+        .with("disks_remove_system", state, |state, SystemId { id }| {
+            systems::remove(&id, |step| {
+                state.events.emit(SYSTEM_STEP, step);
+            })
+        })
+        .command("disks_grow_system", |Grow { unlock }| {
+            systems::grow(&unlock)
+        })
+}
+
 fn register_volumes(window: SabineWindow) -> SabineWindow {
     window
         .command("app_state", |_: Value| {
@@ -333,7 +360,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
              }| { formatting::create_partition(&table, offset, size, &format, true) },
         )
         .command("disks_delete_partition", |Block { block }| {
-            plan::delete(&block)
+            partitions::delete(&block)
         })
 }
 

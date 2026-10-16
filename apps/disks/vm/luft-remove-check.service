@@ -1,0 +1,11 @@
+[Unit]
+Description=Remove Windows and the old system, then check Luft still starts
+After=dbus.service local-fs.target
+ConditionPathExists=/var/lib/luft-remove-check/stage
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-remove-check
+
+[Install]
+WantedBy=multi-user.target

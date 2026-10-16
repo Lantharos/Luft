@@ -22,6 +22,7 @@
 	import PassphraseDialog from './encryption/PassphraseDialog.svelte';
 	import SaveImageDialog from './images/SaveImageDialog.svelte';
 	import StartupDialog from './StartupDialog.svelte';
+	import RemoveSystemDialog from './systems/RemoveSystemDialog.svelte';
 	import UnlockDialog from './encryption/UnlockDialog.svelte';
 	import WriteImageDialog from './images/WriteImageDialog.svelte';
 
@@ -58,6 +59,8 @@
 	{/if}
 {:else if dialog?.kind === 'turn-off'}
 	<TurnOffDialog volume={dialog.volume} onclose={dialogs.close} />
+{:else if dialog?.kind === 'remove-system'}
+	<RemoveSystemDialog system={dialog.system} onclose={dialogs.close} />
 {:else if dialog?.kind === 'recovery-key'}
 	<RecoveryKeyDialog key={dialog.key} name={dialog.name} onclose={dialogs.close} />
 {:else if dialog?.kind === 'format-volume'}

@@ -1,9 +1,9 @@
 use serde::Serialize;
 
-use super::client::{self, DRIVES, Outcome, TRUST};
 use crate::actions::formatting::{self, Format};
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, bytes_text};
+use luft_disks::trust::{self as client, DRIVES, Outcome, TRUST};
 
 const EXPLANATION: [&str; 3] = [
     "If this drive asks for a recovery key, type this key to unlock it.",

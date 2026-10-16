@@ -5,6 +5,7 @@ import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from 
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { errorText } from '#lib/format.js';
 import { space } from './space.svelte';
+import { systems } from './systems.svelte';
 
 const NOTICE_MS = 6000;
 
@@ -31,13 +32,17 @@ class Disks {
 	async start() {
 		const state = await api.appState();
 		appearance.start(state);
-		api.events.changed(({ drives }) => (this.drives = drives));
+		api.events.changed(({ drives }) => {
+			this.drives = drives;
+			systems.follow(drives);
+		});
 		api.events.image((progress) => this.#imageProgress(progress));
 		space.listen();
 		api.events.trust((protection) => (this.protection = protection));
 		api.events.activated(({ arguments: args }) => void this.#locate(args));
 		const [{ drives }, formats, protection] = await Promise.all([api.snapshot(), api.formats(), api.trust.state().catch(() => this.protection)]);
 		this.drives = drives;
+		systems.follow(drives);
 		this.formats = formats;
 		this.protection = protection;
 		this.loaded = true;
@@ -93,10 +98,19 @@ class Disks {
 		this.image = progress;
 	}
 
+	async #offerRemoval(id: string) {
+		await systems.load();
+		const system = systems.find(id);
+		if (!system) return;
+		this.select(system.drive);
+		dialogs.open({ kind: 'remove-system', system });
+	}
+
 	async #locate(args: string[]) {
 		const located = await api.locate(args).catch(() => null);
 		if (located?.target) this.select(located.target.drive, located.target.block);
 		if (located?.image) dialogs.open({ kind: 'write-image', image: located.image });
+		if (located?.system) void this.#offerRemoval(located.system);
 		if (located?.space) this.explore(located.space, located.space.split('/').filter(Boolean).at(-1) ?? located.space);
 	}
 }

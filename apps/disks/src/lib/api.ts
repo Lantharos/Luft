@@ -159,13 +159,48 @@ export interface EncryptionCheck {
 
 export type Outcome<T> = { done: T } | { wrongKey: string };
 
+export type SystemKind = 'windows' | 'linux' | 'old-system';
+export type PartRole = 'system' | 'reserved' | 'recovery' | 'meet';
+
+export interface SystemPart {
+	block: string;
+	device: string;
+	size: number;
+	role: PartRole;
+	label: string;
+	filesystem: string;
+}
+
+export interface OtherSystem {
+	id: string;
+	kind: SystemKind;
+	name: string;
+	drive: string;
+	size: number;
+	parts: SystemPart[];
+	kept: number | null;
+	startups: { folder: string; entries: string[] }[];
+	bitlocker: boolean;
+	files: string | null;
+	folder: string | null;
+}
+
+export type SystemStep = { kind: 'startup' } | { kind: 'partition'; block: string } | { kind: 'old-system' } | { kind: 'grow' };
+
+export interface Removed {
+	grown: number;
+	needsKey: boolean;
+	drive: string;
+	free: { offset: number; size: number } | null;
+}
+
 export const CANCELLED = 'cancelled';
 const WAIT = { timeoutMs: 2_147_483_647 };
 
 export const appState = () => invoke<AppState>('app_state');
 export const snapshot = () => invoke<{ drives: Drive[] }>('disks_snapshot');
 export const locate = (args: string[]) =>
-	invoke<{ target: Target | null; image: ChosenImage | null; space: string | null }>('disks_locate', { arguments: args });
+	invoke<{ target: Target | null; image: ChosenImage | null; space: string | null; system: string | null }>('disks_locate', { arguments: args });
 export const formats = () => invoke<Support[]>('disks_formats');
 
 export const mount = (block: string) => invoke<string>('disks_mount', { block }, WAIT);
@@ -194,6 +229,10 @@ export const forgetPassphrase = (block: string) => invoke<void>('disks_forget_pa
 export const safelyRemove = (drive: string, block: string) => invoke<void>('disks_safely_remove', { drive, block }, WAIT);
 export const startSelftest = (drive: string, extended: boolean) => invoke<void>('disks_selftest', { drive, extended }, WAIT);
 export const stopSelftest = (drive: string) => invoke<void>('disks_selftest_stop', { drive }, WAIT);
+
+export const otherSystems = () => invoke<OtherSystem[]>('disks_systems', undefined, WAIT);
+export const removeSystem = (id: string) => invoke<Removed>('disks_remove_system', { id }, WAIT);
+export const growSystem = (unlock: string) => invoke<Outcome<number>>('disks_grow_system', { unlock }, WAIT);
 
 export const imageFolder = () => invoke<string>('disks_image_folder');
 export const chooseFolder = () => invoke<string | null>('disks_image_choose_folder');
@@ -234,5 +273,6 @@ export const events = {
 	moved: (callback: (progress: { copied: number; total: number }) => void) => listen('disks.plan', callback),
 	space: (callback: (update: SpaceUpdate) => void) => listen('space.update', callback),
 	trust: (callback: (protection: Protection) => void) => listen('disks.trust', callback),
+	system: (callback: (step: SystemStep) => void) => listen('disks.system', callback),
 	activated: (callback: (activation: { arguments: string[] }) => void) => listen('singleInstance.activate', callback)
 };

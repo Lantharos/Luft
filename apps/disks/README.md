@@ -14,6 +14,7 @@ Disks shows the drives in your computer and the ones you plug in, and looks afte
 - Health and self-tests for SATA and NVMe drives
 - Save a drive or partition as a disk image and write images back, including making a bootable USB stick from an `.iso`
 - Safely remove USB drives
+- Recognise Windows and other Linux systems on the drives, and remove one with its partitions and startup files, giving Luft the space
 
 Anything that erases data asks first. The drive the running system lives on can be viewed, but the partitions it uses can't be changed. Changes go through UDisks, which asks for your password when needed. Encryption needs trustd; automatic unlocking also needs device encryption turned on in Settings.
 
@@ -40,6 +41,8 @@ Installing registers Disks for `.iso` and raw disk image files. Rover opens it f
 
 `kestrel/tools/session.sh capture` runs Disks against a stand-in UDisks, keyring and trustd without touching a real drive.
 
+`vm/run.sh` installs Luft next to a Windows-like drive in a VM, keeps an old Linux as a subvolume with its own boot loader, then removes both from the installed system and checks that their partitions, subvolumes, boot files and start entries are gone, that Luft grew and that it starts again. It needs Podman, QEMU with KVM, OVMF and `localhost/luft-system:45` (made by `os/image/build.sh`); everything lives in `target/vm`.
+
 ## Command line
 
 | Argument | Opens |
@@ -48,6 +51,7 @@ Installing registers Disks for `.iso` and raw disk image files. Rover opens it f
 | `disks /dev/sdb` | That drive |
 | `disks image.iso` | Write that image to a drive |
 | `disks disks-space:///home/you/Videos` | What's using space in that folder |
+| `disks disks-system://ID` | Removing that other system, as Settings opens it |
 
 ## License
 

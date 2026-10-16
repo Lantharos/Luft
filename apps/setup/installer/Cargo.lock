@@ -484,6 +484,7 @@ dependencies = [
  "libc",
  "luft-dbus",
  "serde",
+ "serde_json",
  "zbus 5.19.0",
 ]
 

@@ -43,7 +43,7 @@ pub struct Drive {
     pub health: Option<Health>,
     pub job: Option<Job>,
     #[serde(skip)]
-    sort_key: String,
+    pub(crate) sort_key: String,
 }
 
 #[derive(Serialize, Clone)]

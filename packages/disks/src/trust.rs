@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use luft_app::dbus;
+use luft_dbus as dbus;
 use serde::Serialize;
 use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
@@ -41,7 +41,9 @@ fn explain(error: zbus::Error) -> String {
         zbus::Error::MethodError(name, _, _) if name.ends_with("NotAuthorized") => {
             "Administrator rights are needed to change this".to_owned()
         }
-        error if absent(&error) => "Encrypting drives isn't available on this computer".to_owned(),
+        error if absent(&error) => {
+            "This needs Luft's security service, which isn't on this computer".to_owned()
+        }
         error => failed(error),
     }
 }

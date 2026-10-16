@@ -51,7 +51,9 @@ typedef struct _StThemeNodeTransition {
   gulong timeline_completed_id;
   gulong timeline_new_frame_id;
 
-  ClutterActorBox last_allocation;
+  float last_width;
+  float last_height;
+  float last_resource_scale;
   ClutterActorBox offscreen_box;
 
   gboolean needs_setup;
@@ -234,6 +236,37 @@ st_theme_node_transition_get_paint_box (StThemeNodeTransition *transition,
 }
 
 static gboolean
+allocate_offscreen (CoglContext      *ctx,
+                    guint             width,
+                    guint             height,
+                    CoglTexture     **texture,
+                    CoglFramebuffer **offscreen)
+{
+  g_autoptr (GError) error = NULL;
+
+  if (*offscreen &&
+      cogl_texture_get_context (*texture) == ctx &&
+      cogl_texture_get_width (*texture) == width &&
+      cogl_texture_get_height (*texture) == height)
+    return TRUE;
+
+  g_clear_object (offscreen);
+  g_clear_object (texture);
+  *texture = cogl_texture_2d_new_with_size (ctx, width, height);
+  if (*texture == NULL)
+    return FALSE;
+
+  *offscreen = COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (*texture));
+  if (!cogl_framebuffer_allocate (*offscreen, &error))
+    {
+      g_clear_object (offscreen);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static gboolean
 setup_framebuffers (StThemeNodeTransition *transition,
                     CoglContext           *ctx,
                     ClutterPaintContext   *paint_context,
@@ -245,7 +278,6 @@ setup_framebuffers (StThemeNodeTransition *transition,
   g_autoptr (ClutterPaintNode) new_layer_node = NULL;
   CoglPipeline *noop_pipeline;
   guint width, height;
-  GError *catch_error = NULL;
 
   /* template pipeline to avoid unnecessary shader compilation */
   static CoglPipelineKey pipeline_key = "st-theme-node-transition";
@@ -257,35 +289,11 @@ setup_framebuffers (StThemeNodeTransition *transition,
   g_return_val_if_fail (width  > 0, FALSE);
   g_return_val_if_fail (height > 0, FALSE);
 
-  g_clear_object (&transition->old_texture);
-  transition->old_texture = cogl_texture_2d_new_with_size (ctx, width, height);
-
-  g_clear_object (&transition->new_texture);
-  transition->new_texture = cogl_texture_2d_new_with_size (ctx, width, height);
-
-  if (transition->old_texture == NULL)
+  if (!allocate_offscreen (ctx, width, height,
+                           &transition->old_texture, &transition->old_offscreen) ||
+      !allocate_offscreen (ctx, width, height,
+                           &transition->new_texture, &transition->new_offscreen))
     return FALSE;
-
-  if (transition->new_texture == NULL)
-    return FALSE;
-
-  g_clear_object (&transition->old_offscreen);
-  transition->old_offscreen = COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (transition->old_texture));
-  if (!cogl_framebuffer_allocate (transition->old_offscreen, &catch_error))
-    {
-      g_error_free (catch_error);
-      g_clear_object (&transition->old_offscreen);
-      return FALSE;
-    }
-
-  g_clear_object (&transition->new_offscreen);
-  transition->new_offscreen = COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (transition->new_texture));
-  if (!cogl_framebuffer_allocate (transition->new_offscreen, &catch_error))
-    {
-      g_error_free (catch_error);
-      g_clear_object (&transition->new_offscreen);
-      return FALSE;
-    }
 
   if (transition->pipeline == NULL)
     {
@@ -366,12 +374,16 @@ st_theme_node_transition_paint (StThemeNodeTransition *transition,
   g_return_if_fail (ST_IS_THEME_NODE (transition->old_theme_node));
   g_return_if_fail (ST_IS_THEME_NODE (transition->new_theme_node));
 
-  if (!clutter_actor_box_equal (allocation, &transition->last_allocation))
+  if (clutter_actor_box_get_width (allocation) != transition->last_width ||
+      clutter_actor_box_get_height (allocation) != transition->last_height ||
+      resource_scale != transition->last_resource_scale)
     transition->needs_setup = TRUE;
 
   if (transition->needs_setup)
     {
-      transition->last_allocation = *allocation;
+      transition->last_width = clutter_actor_box_get_width (allocation);
+      transition->last_height = clutter_actor_box_get_height (allocation);
+      transition->last_resource_scale = resource_scale;
 
       calculate_offscreen_box (transition, allocation);
       transition->needs_setup = clutter_actor_box_get_area (&transition->offscreen_box) == 0 ||

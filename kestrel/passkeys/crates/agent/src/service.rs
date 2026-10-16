@@ -1,6 +1,6 @@
 use serde::Serialize;
+use zbus::Type;
 use zbus::object_server::SignalEmitter;
-use zbus::zvariant::Type;
 use zbus::{Connection, fdo, interface};
 
 use crate::vault::Vault;

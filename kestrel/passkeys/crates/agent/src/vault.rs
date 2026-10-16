@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 
 use ctap::{Credential, NewCredential, Protection, PublicKey, RelyingParty, Status, User};
-use zbus::zvariant::{OwnedValue, Value};
 use zbus::{Connection, Proxy};
+use zbus::{OwnedVariant, Variant};
 use zeroize::Zeroizing;
 
 const KEYRING: &str = "com.lantharos.Keyring1";
 const PATH: &str = "/com/lantharos/Keyring1";
 const PASSKEYS: &str = "com.lantharos.Keyring1.Passkeys";
 
-type Record = HashMap<String, OwnedValue>;
+type Record = HashMap<String, OwnedVariant>;
 
 pub struct Passkey {
     pub credential: Credential,
@@ -32,7 +32,7 @@ fn unavailable(error: zbus::Error) -> Status {
     }
 }
 
-fn field<T: TryFrom<OwnedValue>>(record: &Record, name: &str) -> Result<T, Status> {
+fn field<T: TryFrom<OwnedVariant>>(record: &Record, name: &str) -> Result<T, Status> {
     let value = record.get(name).ok_or(Status::Other)?;
     T::try_from(value.try_clone().map_err(|_| Status::Other)?).map_err(|_| Status::Other)
 }
@@ -76,16 +76,16 @@ fn passkey(record: &Record) -> Result<Passkey, Status> {
     })
 }
 
-fn user_fields(user: &User) -> [(&'static str, Value<'_>); 3] {
+fn user_fields(user: &User) -> [(&'static str, Variant<'_>); 3] {
     [
-        ("user_id", Value::from(user.id.as_slice())),
+        ("user_id", Variant::from(user.id.as_slice())),
         (
             "user_name",
-            Value::from(user.name.as_deref().unwrap_or_default()),
+            Variant::from(user.name.as_deref().unwrap_or_default()),
         ),
         (
             "display_name",
-            Value::from(user.display_name.as_deref().unwrap_or_default()),
+            Variant::from(user.display_name.as_deref().unwrap_or_default()),
         ),
     ]
 }
@@ -103,16 +103,16 @@ impl Vault {
     }
 
     pub async fn create(&self, request: &NewCredential) -> Result<Passkey, Status> {
-        let mut fields: HashMap<&str, Value<'_>> = HashMap::from([
-            ("rp", Value::from(request.rp.id.as_str())),
+        let mut fields: HashMap<&str, Variant<'_>> = HashMap::from([
+            ("rp", Variant::from(request.rp.id.as_str())),
             (
                 "rp_name",
-                Value::from(request.rp.name.as_deref().unwrap_or_default()),
+                Variant::from(request.rp.name.as_deref().unwrap_or_default()),
             ),
-            ("discoverable", Value::from(request.discoverable)),
+            ("discoverable", Variant::from(request.discoverable)),
             (
                 "protection",
-                Value::from(u8::try_from(request.protection.level()).expect("levels are 1 to 3")),
+                Variant::from(u8::try_from(request.protection.level()).expect("levels are 1 to 3")),
             ),
         ]);
         fields.extend(user_fields(&request.user));
@@ -149,7 +149,7 @@ impl Vault {
     }
 
     pub async fn rename(&self, id: &[u8], nickname: &str) -> Result<(), Status> {
-        let changes = HashMap::from([("nickname", Value::from(nickname))]);
+        let changes = HashMap::from([("nickname", Variant::from(nickname))]);
         self.proxy
             .call("Update", &(id, changes))
             .await
@@ -157,7 +157,7 @@ impl Vault {
     }
 
     pub async fn update_user(&self, id: &[u8], user: &User) -> Result<(), Status> {
-        let changes: HashMap<&str, Value<'_>> = user_fields(user).into_iter().collect();
+        let changes: HashMap<&str, Variant<'_>> = user_fields(user).into_iter().collect();
         self.proxy
             .call("Update", &(id, changes))
             .await

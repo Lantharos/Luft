@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use ctap::Prompt;
 use ctap::platform::Purpose;
 use tokio::sync::mpsc;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
 use zbus::{Connection, Proxy};
+use zbus::{OwnedObjectPath, OwnedVariant, Variant};
 use zeroize::Zeroizing;
 
 const KESTREL: &str = "com.lantharos.Kestrel.Passkeys";
@@ -58,14 +58,18 @@ impl Window {
                 )
             })
             .collect();
-        let mut details: HashMap<&str, Value<'_>> = HashMap::from([
-            ("purpose", Value::from(purpose(prompt.purpose))),
-            ("accounts", Value::from(accounts)),
+        let mut details: HashMap<&str, Variant<'_>> = HashMap::from([
+            ("purpose", Variant::from(purpose(prompt.purpose))),
+            ("accounts", Variant::from(accounts)),
         ]);
-        details.extend(fingerprint.map(|hint| ("fingerprint", Value::from(hint))));
-        details.extend(prompt.rp_id.map(|site| ("site", Value::from(site))));
-        details.extend(prompt.rp_name.map(|name| ("site_name", Value::from(name))));
-        details.extend(requester.map(|pid| ("requester", Value::from(pid))));
+        details.extend(fingerprint.map(|hint| ("fingerprint", Variant::from(hint))));
+        details.extend(prompt.rp_id.map(|site| ("site", Variant::from(site))));
+        details.extend(
+            prompt
+                .rp_name
+                .map(|name| ("site_name", Variant::from(name))),
+        );
+        details.extend(requester.map(|pid| ("requester", Variant::from(pid))));
         let prompts = Proxy::new(session, KESTREL, PATH, PROMPTS).await?;
         let path: OwnedObjectPath = prompts.call("Open", &(details,)).await?;
         let proxy = Proxy::new(session, KESTREL, path, PROMPT).await?;
@@ -104,7 +108,7 @@ impl Drop for Window {
 async fn pump(proxy: Proxy<'static>, sender: mpsc::UnboundedSender<Action>) {
     loop {
         let action = match proxy
-            .call::<_, _, (String, HashMap<String, OwnedValue>)>("Next", &())
+            .call::<_, _, (String, HashMap<String, OwnedVariant>)>("Next", &())
             .await
         {
             Ok((kind, details)) => action(&kind, &details),
@@ -117,7 +121,7 @@ async fn pump(proxy: Proxy<'static>, sender: mpsc::UnboundedSender<Action>) {
     }
 }
 
-fn action(kind: &str, details: &HashMap<String, OwnedValue>) -> Action {
+fn action(kind: &str, details: &HashMap<String, OwnedVariant>) -> Action {
     let value = |name: &str| details.get(name).and_then(|value| value.try_clone().ok());
     match kind {
         "account" => value("index")

@@ -16,6 +16,7 @@ Gio._promisify(IBus.InputContext.prototype,
     'process_key_event_async', 'process_key_event_async_finish');
 
 const HIDE_PANEL_TIME = 50;
+const SUPER_MASK = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 
 const HAVE_REQUIRE_SURROUNDING_TEXT = GObject.signal_lookup('require-surrounding-text', IBus.InputContext);
 
@@ -439,8 +440,13 @@ export const InputMethod = GObject.registerClass({
             this._context.set_content_type(this._purpose, this._hints);
     }
 
+    _forCompositor(event) {
+        return (event.get_state() & SUPER_MASK) !== 0 ||
+            global.display.get_keybinding_action(event.get_key_code(), event.get_state()) !== Meta.KeyBindingAction.NONE;
+    }
+
     vfunc_filter_key_event(event) {
-        if (global.display.get_keybinding_action(event.get_key_code(), event.get_state()) !== Meta.KeyBindingAction.NONE)
+        if (this._forCompositor(event))
             return false;
         if (this._interceptKey(event))
             return true;

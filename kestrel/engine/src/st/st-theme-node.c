@@ -1807,6 +1807,22 @@ do_outline_property (StThemeNode   *node,
     node->outline_width = width;
 }
 
+static gboolean
+get_spacing_from_term (StThemeNode *node,
+                       CRTerm      *term,
+                       int         *value)
+{
+  if (get_length_from_term_int (node, term, FALSE, value) != VALUE_FOUND)
+    return FALSE;
+
+  if (*value >= 0)
+    return TRUE;
+
+  g_warning ("Ignoring negative padding or margin at line %d, col %d",
+             term->location.line, term->location.column);
+  return FALSE;
+}
+
 static void
 do_padding_property_term (StThemeNode *node,
                           CRTerm      *term,
@@ -1817,7 +1833,7 @@ do_padding_property_term (StThemeNode *node,
 {
   int value;
 
-  if (get_length_from_term_int (node, term, FALSE, &value) != VALUE_FOUND)
+  if (!get_spacing_from_term (node, term, &value))
     return;
 
   if (left)
@@ -1899,7 +1915,7 @@ do_margin_property_term (StThemeNode *node,
 {
   int value;
 
-  if (get_length_from_term_int (node, term, FALSE, &value) != VALUE_FOUND)
+  if (!get_spacing_from_term (node, term, &value))
     return;
 
   if (left)

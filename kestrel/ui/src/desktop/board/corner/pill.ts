@@ -14,8 +14,9 @@ export class CornerPill {
     accessible_name: 'Quick settings',
   });
   private readonly status = new St.BoxLayout({ style_class: 'kestrel-board-pill-status', y_align: Clutter.ActorAlign.CENTER });
-  private readonly batteryIcon = new St.Icon({ style_class: 'kestrel-board-pill-icon', visible: false });
-  private readonly batteryLabel = new St.Label({ style_class: 'kestrel-board-pill-battery', y_align: Clutter.ActorAlign.CENTER, visible: false });
+  private readonly batteryBox = new St.BoxLayout({ style_class: 'kestrel-board-pill-battery', visible: false });
+  private readonly batteryIcon = new St.Icon({ style_class: 'kestrel-board-pill-icon' });
+  private readonly batteryLevel = new St.Label({ style_class: 'kestrel-board-pill-battery-level', y_align: Clutter.ActorAlign.CENTER });
   private readonly time = new St.Label({ style_class: 'kestrel-board-pill-time', y_align: Clutter.ActorAlign.CENTER });
   private readonly clock = new WallClock((now, clock) => this.tick(now, clock));
   private readonly battery = new Battery(state => this.showBattery(state));
@@ -23,8 +24,9 @@ export class CornerPill {
   constructor(openQuickSettings: () => void) {
     const box = new St.BoxLayout({ style_class: 'kestrel-board-pill-box' });
     box.add_child(this.status);
-    box.add_child(this.batteryIcon);
-    box.add_child(this.batteryLabel);
+    this.batteryBox.add_child(this.batteryIcon);
+    this.batteryBox.add_child(this.batteryLevel);
+    box.add_child(this.batteryBox);
     box.add_child(this.time);
     this.actor.set_child(box);
     blurSurface(this.actor, 999);
@@ -47,10 +49,10 @@ export class CornerPill {
   }
 
   private showBattery(state: BatteryState | null): void {
-    this.batteryIcon.visible = this.batteryLabel.visible = !!state;
+    this.batteryBox.visible = !!state;
     if (!state) return;
     this.batteryIcon.icon_name = state.iconName;
-    this.batteryLabel.text = `${state.percentage}%`;
+    this.batteryLevel.text = `${state.percentage}%`;
   }
 
   private tick(now: GLib.DateTime, clock: WallClock): void {

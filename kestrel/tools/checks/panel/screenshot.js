@@ -3,18 +3,48 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {property} from '../lib/dbus.js';
 import {rest} from '../lib/input.js';
+import {inputMethodSettled} from '../lib/inputMethod.js';
 import {capture, captureFrame, renderedFrame} from '../lib/screenshots.js';
-import {settled} from '../lib/wait.js';
+import {settled, within} from '../lib/wait.js';
 import {areaOf} from './backdrops/coverage.js';
+import {WALLPAPERS} from './backdrops/wallpapers.js';
 
 const {require, eventually} = checks('screenshot');
 const SCHEMES = [['dark', 'prefer-dark'], ['light', 'default']];
 const TOLERANCE = 8;
 const ZOOM = 2;
 const PAST_SCREEN_OUTLINE = 4;
+const WALLPAPER_KEYS = ['picture-uri', 'picture-uri-dark'];
+const WALLPAPER_TIMEOUT = 10000;
+const INPUT_METHOD_TIMEOUT = 15000;
+const STRIPES = Object.fromEntries(WALLPAPERS).stripes;
 
 const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+
+const wallpaperAccent = () => property('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance', 'com.lantharos.Kestrel.Appearance', 'WallpaperAccentColor');
+
+const loaded = manager => new Promise(resolve => {
+  const id = manager.connect('loaded', () => {
+    manager.disconnect(id);
+    resolve();
+  });
+});
+
+const fadedIn = manager => manager._container.get_children().every(actor => actor === manager.backgroundActor);
+
+async function showStripes() {
+  const uri = STRIPES().get_uri();
+  const before = await wallpaperAccent();
+  const managers = Main.layoutManager._bgManagers;
+  const shown = Promise.all(managers.map(loaded));
+  for (const key of WALLPAPER_KEYS) background.set_string(key, uri);
+  await within(shown, WALLPAPER_TIMEOUT, 'the striped wallpaper loads');
+  await eventually(() => managers.every(fadedIn), 'the striped wallpaper fades in completely', WALLPAPER_TIMEOUT);
+  await eventually(async () => await wallpaperAccent() !== before, 'the striped wallpaper sets the accent for both styles', WALLPAPER_TIMEOUT);
+}
 
 async function openScreenshotTool() {
   Main.screenshotUI.open();
@@ -52,13 +82,17 @@ async function checkScheme(scheme) {
 
 export async function run() {
   const saved = interfaceSettings.get_string('color-scheme');
+  const wallpapers = WALLPAPER_KEYS.map(key => [key, background.get_string(key)]);
   rest();
   try {
+    await eventually(inputMethodSettled, 'IBus has settled, so the taskbar shows its final input source', INPUT_METHOD_TIMEOUT);
+    await showStripes();
     for (const [scheme, colorScheme] of SCHEMES) {
       interfaceSettings.set_string('color-scheme', colorScheme);
       await checkScheme(scheme);
     }
   } finally {
     interfaceSettings.set_string('color-scheme', saved);
+    for (const [key, uri] of wallpapers) background.set_string(key, uri);
   }
 }

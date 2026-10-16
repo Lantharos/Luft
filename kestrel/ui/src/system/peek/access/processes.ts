@@ -40,7 +40,7 @@ export function statOf(pid: number): ProcessStat | null {
   return { parent: Number(fields[1]), started: Number(fields[19]) };
 }
 
-export function unitOf(cgroup: string): string | null {
+function unitOf(cgroup: string): string | null {
   const parts = cgroup.split('/');
   while (parts.length && !UNIT.test(parts.at(-1)!)) parts.pop();
   return parts.length ? parts.join('/') : null;

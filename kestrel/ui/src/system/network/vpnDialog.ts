@@ -8,7 +8,7 @@ import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDial
 import { feedbackLabel, showText } from '../../auth/keyring/passwordForm.js';
 import type { DialogModules } from '../../auth/keyring/dialog.js';
 
-export interface Choice {
+interface Choice {
   name: string;
   label: string;
 }

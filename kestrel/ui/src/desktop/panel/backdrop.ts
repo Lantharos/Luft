@@ -5,7 +5,7 @@ import type { WallpaperFloor } from '../wallpaper/floor.js';
 
 type Channels = [number, number, number];
 
-export interface GlassShading {
+interface GlassShading {
   dim: number;
   lift: number;
   saturation: number;

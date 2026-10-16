@@ -8,7 +8,7 @@ import type { BoardFrame } from '../board/board.js';
 import type { Monitor } from '../panel/panel.js';
 import type { WindowDragSource } from './windowCard.js';
 
-export const THUMBNAIL_HEIGHT = 84;
+const THUMBNAIL_HEIGHT = 84;
 
 type DelegateActor = St.Widget & { _delegate?: object };
 export type BackgroundFactory = (container: Clutter.Actor, monitorIndex: number) => { destroy(): void };

@@ -14,7 +14,7 @@ const POLL = 16;
 
 const shell = () => global as unknown as Shell.Global;
 
-export function stagePoint(window: Meta.Window, [x, y]: Point): Point {
+function stagePoint(window: Meta.Window, [x, y]: Point): Point {
   const area = captureArea(window);
   if (!(x >= 0 && y >= 0 && x < area.width && y < area.height))
     throw new PeekError('InvalidArgs', `${x}, ${y} is outside the window's picture, which is ${area.width} × ${area.height}`);
@@ -28,7 +28,7 @@ function windowAt([x, y]: Point): Meta.Window | null {
   return windowOfActor(shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y));
 }
 
-export function reaches(target: Meta.Window, point: Point): boolean {
+function reaches(target: Meta.Window, point: Point): boolean {
   const window = windowAt(point);
   return !!window && partOf(window, target);
 }

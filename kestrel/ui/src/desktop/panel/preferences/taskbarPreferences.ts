@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 type TaskbarAlignment = 'center' | 'left';
 export type TaskbarLook = 'glass' | 'solid' | 'transparent' | 'accent';
 type TaskbarStyle = 'bar' | 'floating';
-export type TaskbarSize = 'compact' | 'normal' | 'large';
+type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';
 type TaskbarDisplays = 'all' | 'primary';
 

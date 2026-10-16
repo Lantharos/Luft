@@ -12,10 +12,10 @@ Subject: [PATCH 01/26] compositor: round window surfaces and preserve native
  src/compositor/meta-shaped-texture.c         |  54 +++-
  src/compositor/meta-surface-actor.c          |  52 +++-
  src/compositor/meta-window-actor-x11.c       |  15 +-
- src/compositor/meta-window-corners.c         | 261 +++++++++++++++++++
+ src/compositor/meta-window-corners.c         | 271 +++++++++++++++++++
  src/compositor/meta-window-corners.h         |  28 ++
  src/meson.build                              |   2 +
- 10 files changed, 435 insertions(+), 15 deletions(-)
+ 10 files changed, 445 insertions(+), 15 deletions(-)
  create mode 100644 src/compositor/meta-window-corners.c
  create mode 100644 src/compositor/meta-window-corners.h
 
@@ -436,10 +436,10 @@ index 9e16b2682ab6db61106a6b1cd86b9d6691d3fda5..ac370b22aa8f89425efe8f2e702282f1
        get_shape_bounds (actor_x11, &shape_bounds);
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..7c40b1c34bc038d2068a050b85fe02020fa1e1a0
+index 0000000000000000000000000000000000000000..8bff38280715c589a245911fd8ba206d56a4e0fc
 --- /dev/null
 +++ b/src/compositor/meta-window-corners.c
-@@ -0,0 +1,261 @@
+@@ -0,0 +1,271 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -448,8 +448,19 @@ index 0000000000000000000000000000000000000000..7c40b1c34bc038d2068a050b85fe0202
 +#include "clutter/clutter-mutter.h"
 +#include "compositor/meta-window-corners.h"
 +#include "compositor/meta-shaped-texture-private.h"
++#include "core/window-private.h"
 +#include "meta/meta-window-actor.h"
 +#include "meta/window.h"
++
++static gboolean
++is_against_screen_edges (MetaWindow *window)
++{
++  return meta_window_is_fullscreen (window) ||
++         window->edge_constraints.top != META_EDGE_CONSTRAINT_NONE ||
++         window->edge_constraints.right != META_EDGE_CONSTRAINT_NONE ||
++         window->edge_constraints.bottom != META_EDGE_CONSTRAINT_NONE ||
++         window->edge_constraints.left != META_EDGE_CONSTRAINT_NONE;
++}
 +
 +MetaWindowCorners
 +meta_window_corners_for_actor (ClutterActor *actor)
@@ -469,8 +480,7 @@ index 0000000000000000000000000000000000000000..7c40b1c34bc038d2068a050b85fe0202
 +    return corners;
 +
 +  window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (ancestor));
-+  if (!window || meta_window_is_fullscreen (window) ||
-+      meta_window_is_maximized (window))
++  if (!window || is_against_screen_edges (window))
 +    return corners;
 +
 +  switch (meta_window_get_window_type (window))

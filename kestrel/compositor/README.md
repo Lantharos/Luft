@@ -12,7 +12,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 
 ## What the patches add
 
-- Rounded window corners (15px) that keep maximized and fullscreen windows eligible for direct scanout
+- Rounded window corners (15px), square on maximized, tiled and fullscreen windows so those stay eligible for direct scanout
 - Shared blur shader for app-requested background blur
 - `xdg-toplevel-icon-v1` window icons
 - Shell text with fractional glyph advances and grayscale antialiasing
@@ -24,7 +24,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - A focus point for zoomed backgrounds, so a crop can keep something other than the middle
 - Event filters that run before the compositor's own, so the shell can check input it sends as it is delivered
 - Settings from `kestrel-settings` instead of gnome-settings-daemon, and monitor vendor names from systemd's hardware database
-- Default display scales aimed at 120 DPI on laptop screens, on quarter steps where they fit, and `--virtual-monitor 1920x1080:344x194mm` for virtual monitors with a physical size
+- Default display scales aimed at 110 DPI, on quarter steps where they fit, and `--virtual-monitor 1920x1080:344x194mm` for virtual monitors with a physical size
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe, plus reporting how long frames wait to be presented
 - Smaller fixes: input method focus on destroyed text fields, cursor theme fallback, keeping the last frame on screen at exit, repainting as soon as a display stops scanning out a window
 

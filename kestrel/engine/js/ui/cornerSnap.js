@@ -7,7 +7,7 @@ import * as Main from './main.js';
 const CORNER_REACH = 96;
 const EDGE_REACH = 4;
 const POLL_INTERVAL = 16;
-const MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED];
+const POINTER_MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED];
 
 /**
  * @param {number} x
@@ -47,6 +47,24 @@ function cornerAt(x, y, monitor, area) {
     });
 }
 
+/**
+ * @param {Mtk.Rectangle} rect
+ * @param {Mtk.Rectangle} area
+ * @returns {Meta.Direction} the edges of the work area that the rectangle lies against
+ */
+function edgesAgainst(rect, area) {
+    let edges = 0;
+    if (rect.x === area.x)
+        edges |= Meta.Direction.LEFT;
+    if (rect.y === area.y)
+        edges |= Meta.Direction.TOP;
+    if (rect.x + rect.width === area.x + area.width)
+        edges |= Meta.Direction.RIGHT;
+    if (rect.y + rect.height === area.y + area.height)
+        edges |= Meta.Direction.BOTTOM;
+    return edges;
+}
+
 export class CornerSnap {
     /**
      * @param {(window: Meta.Window, rect: Mtk.Rectangle | null, monitorIndex: number) => void} preview
@@ -73,6 +91,8 @@ export class CornerSnap {
      */
     snap(window, rect, size = window.get_frame_rect()) {
         const restore = this._snapped.get(window) ?? {width: size.width, height: size.height};
+        const monitorIndex = global.display.get_monitor_index_for_rect(rect);
+        window.set_tiled_edges(edgesAgainst(rect, Main.layoutManager.getWorkAreaForMonitor(monitorIndex)));
         if (window.maximized_horizontally || window.maximized_vertically)
             window.unmaximize();
         window.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
@@ -88,7 +108,7 @@ export class CornerSnap {
         const monitor = window.get_monitor();
         const arranged = candidate => candidate.get_workspace() === workspace &&
             candidate.get_monitor() === monitor &&
-            (this._snapped.get(candidate)?.rect?.equal(candidate.get_frame_rect()) ||
+            ((candidate.get_tiled_edges() && this._snapped.get(candidate)?.rect?.equal(candidate.get_frame_rect())) ||
              (candidate.maximized_vertically && !candidate.maximized_horizontally));
         if (!arranged(window))
             return [];
@@ -104,7 +124,11 @@ export class CornerSnap {
     }
 
     _begin(window, op) {
-        if (!window || window.unconstrained || !MOVE_OPS.includes(op))
+        if (!window || window.unconstrained)
+            return;
+        if (op === Meta.GrabOp.KEYBOARD_MOVING)
+            this._release(window);
+        if (!POINTER_MOVE_OPS.includes(op))
             return;
 
         this._restore(window);
@@ -117,11 +141,23 @@ export class CornerSnap {
         });
     }
 
-    _restore(window) {
+    /**
+     * Lets a snapped window float again where it is.
+     *
+     * @param {Meta.Window} window
+     * @returns {{width: number, height: number, rect: Mtk.Rectangle} | undefined} how it was snapped
+     */
+    _release(window) {
         const snapped = this._snapped.get(window);
+        this._snapped.delete(window);
+        window.set_tiled_edges(0);
+        return snapped;
+    }
+
+    _restore(window) {
+        const snapped = this._release(window);
         if (!snapped)
             return;
-        this._snapped.delete(window);
 
         const frame = window.get_frame_rect();
         if (!snapped.rect?.equal(frame))

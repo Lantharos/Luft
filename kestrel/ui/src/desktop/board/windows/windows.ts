@@ -7,7 +7,7 @@ import { FULL_SIZE, intersection, pushApart, screenBox, snapEdges, type View } f
 const SNAP_DISTANCE = 12;
 const MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
 
-type FreeWindow = Meta.Window & { unconstrained: boolean; magnification: number };
+type FreeWindow = Meta.Window & { unconstrained: boolean; magnification: number; set_tiled_edges(edges: Meta.Direction | 0): void };
 
 function shell(): Shell.Global {
   return global as unknown as Shell.Global;
@@ -15,6 +15,10 @@ function shell(): Shell.Global {
 
 export function setUnconstrained(window: Meta.Window, unconstrained: boolean): void {
   (window as FreeWindow).unconstrained = unconstrained;
+}
+
+export function untile(window: Meta.Window): void {
+  (window as FreeWindow).set_tiled_edges(0);
 }
 
 export function setMagnification(window: Meta.Window, magnification: number): void {

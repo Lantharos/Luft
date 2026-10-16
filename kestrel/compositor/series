@@ -24,3 +24,4 @@
 0024-backends-let-virtual-monitors-report-a-physical-size.patch
 0025-backends-pick-laptop-friendly-default-scales.patch
 0026-background-let-the-shell-choose-which-part-of-a-zoom.patch
+0027-core-let-the-shell-mark-windows-it-tiles-itself.patch

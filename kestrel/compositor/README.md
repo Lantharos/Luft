@@ -13,6 +13,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 ## What the patches add
 
 - Rounded window corners (15px), square on maximized, tiled and fullscreen windows so those stay eligible for direct scanout
+- Windows the shell snaps into corners or layout cells count as tiled on the screen edges they touch, for apps and for the corners
 - Shared blur shader for app-requested background blur
 - `xdg-toplevel-icon-v1` window icons
 - Shell text with fractional glyph advances and grayscale antialiasing

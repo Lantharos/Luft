@@ -9,6 +9,7 @@ import St from 'gi://St';
 
 import * as Dialog from '../dialog.js';
 import * as KestrelUi from '../kestrelUi.js';
+import * as Main from '../main.js';
 import * as MessageTray from '../messageTray.js';
 import * as ModalDialog from '../modalDialog.js';
 import * as ShellEntry from '../shellEntry.js';
@@ -34,6 +35,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         this._connection = connection;
         this._settingName = settingName;
         this._hints = hints;
+        this._rejected = Boolean(flags & NM.SecretAgentGetSecretsFlags.REQUEST_NEW);
 
         this._content = this._getContent();
 
@@ -211,7 +213,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             secrets.push({
                 label: _('Password'),
                 key: 'psk',
-                value: wirelessSecuritySetting.psk || '',
+                value: this._rejected ? '' : wirelessSecuritySetting.psk || '',
                 validate: this._validateWpaPsk,
                 password: true,
             });
@@ -220,7 +222,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             secrets.push({
                 label: _('Key'),
                 key: `wep-key${wirelessSecuritySetting.wep_tx_keyidx}`,
-                value: wirelessSecuritySetting.get_wep_key(wirelessSecuritySetting.wep_tx_keyidx) || '',
+                value: this._rejected ? '' : wirelessSecuritySetting.get_wep_key(wirelessSecuritySetting.wep_tx_keyidx) || '',
                 wep_key_type: wirelessSecuritySetting.wep_key_type,
                 validate: this._validateStaticWep,
                 password: true,
@@ -367,7 +369,9 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             wirelessSetting = this._connection.get_setting_wireless();
             ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
             content.title = _('Authentication required');
-            content.message = _('Passwords or encryption keys are required to access the wireless network “%s”').format(ssid);
+            content.message = this._rejected
+                ? _('The saved password for “%s” didn’t work. Enter it again.').format(ssid)
+                : _('Passwords or encryption keys are required to access the wireless network “%s”').format(ssid);
             this._getWirelessSecrets(content.secrets, wirelessSetting);
             break;
         case '802-3-ethernet':
@@ -538,10 +542,12 @@ class NetworkAgent {
     }
 
     _newRequest(agent, requestId, connection, settingName, hints, flags) {
-        if (!(flags & NM.SecretAgentGetSecretsFlags.USER_REQUESTED))
-            this._showNotification(requestId, connection, settingName, hints, flags);
-        else
+        const userRequested = flags & NM.SecretAgentGetSecretsFlags.USER_REQUESTED;
+        const rejected = flags & NM.SecretAgentGetSecretsFlags.REQUEST_NEW;
+        if (userRequested || (rejected && !Main.sessionMode.isLocked))
             this._handleRequest(requestId, connection, settingName, hints, flags);
+        else
+            this._showNotification(requestId, connection, settingName, hints, flags);
     }
 
     _handleRequest(requestId, connection, settingName, hints, flags) {

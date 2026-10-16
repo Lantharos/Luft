@@ -15,6 +15,7 @@ const REMOVABLE_SHIM: &str = "BOOTX64.EFI";
 const CERTIFICATE: &str = "luft.cer";
 const LOADER_CONF: &str = "loader/loader.conf";
 const SYSTEMD_BOOT: &str = "EFI/systemd";
+const BOOTCTL_FOLDERS: [&str; 3] = ["loader/keys", "loader/entries", "EFI/Linux"];
 const LOADER: &str = "\\EFI\\luft\\shimx64.efi";
 const LABEL: &str = "Luft";
 const FALLBACK_LABEL: &str = "Luft without its key";
@@ -31,6 +32,13 @@ fn placements() -> Result<Vec<(PathBuf, String)>> {
         place(shim.join(MOK_MANAGER), REMOVABLE, MOK_MANAGER),
         place(PathBuf::from(BOOT_MENU), REMOVABLE, SECOND_STAGE),
     ])
+}
+
+fn remove_systemd_boot(esp: &Esp) {
+    let _ = std::fs::remove_dir_all(esp.file(SYSTEMD_BOOT));
+    for folder in BOOTCTL_FOLDERS {
+        let _ = std::fs::remove_dir(esp.file(folder));
+    }
 }
 
 fn hide_menu(esp: &Esp) -> Result<()> {
@@ -76,7 +84,7 @@ pub fn place(esp: &Esp) -> Result<bool> {
     for (source, target) in placements()? {
         changed |= files::copy_if_changed(&source, &esp.file(&target))?;
     }
-    let _ = std::fs::remove_dir_all(esp.file(SYSTEMD_BOOT));
+    remove_systemd_boot(esp);
     hide_menu(esp)?;
     changed |= place_fallback(esp)?;
     rustix::fs::sync();

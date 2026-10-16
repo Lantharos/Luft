@@ -50,12 +50,16 @@ export class Surfaces {
   private monitor: Monitor | null = null;
   private current: Surface | null = null;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
+  private keepsComposited = false;
 
   constructor(private readonly parts: SurfaceParts) {
     this.cover.connect('button-press-event', () => {
       this.close();
       return Clutter.EVENT_STOP;
     });
+    const shown = [...this.all(), parts.taskView.actor];
+    for (const actor of shown)
+      actor.connect('notify::visible', () => this.keepComposited(shown.some(surface => surface.visible)));
   }
 
   get active(): Surface | null {
@@ -210,6 +214,14 @@ export class Surfaces {
       if (surface === 'quick') quick.closeSubmenu(false);
       if (!this.current) panels.setActive(null, null);
     });
+  }
+
+  private keepComposited(composited: boolean): void {
+    if (composited === this.keepsComposited) return;
+    this.keepsComposited = composited;
+    const compositor = (global as unknown as Shell.Global).compositor;
+    if (composited) compositor.disable_unredirect();
+    else compositor.enable_unredirect();
   }
 
   private releaseSelection(actor: Clutter.Actor): void {

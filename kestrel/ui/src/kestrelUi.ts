@@ -40,6 +40,8 @@ export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
 
+type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
+
 class KestrelUi {
   private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
   private readonly services: SystemServices;
@@ -52,8 +54,7 @@ class KestrelUi {
   private readonly surfaces: Surfaces;
   readonly board: Board;
   private readonly liveWallpaper: LiveWallpaper;
-  private focusWindow: Meta.Window | null = null;
-  private focusSignals: number[] = [];
+  private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
 
   constructor(private readonly context: Context) {
@@ -188,7 +189,7 @@ class KestrelUi {
     return this.services.appearance;
   }
 
-  private watch(object: { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void }, signal: string, callback: (...args: any[]) => any): void {
+  private watch(object: Signals, signal: string, callback: (...args: any[]) => any): void {
     const id = object.connect(signal, callback);
     this.disconnectors.push(() => object.disconnect(id));
   }
@@ -202,10 +203,17 @@ class KestrelUi {
   }
 
   private trackFocusedWindow(): void {
-    for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
-    this.focusWindow = (global as unknown as Shell.Global).display.focus_window;
-    this.focusSignals = this.focusWindow ? (['size-changed', 'position-changed', 'notify::fullscreen'] as const).map(signal =>
-      this.focusWindow!.connect(signal, () => this.syncSession())) : [];
+    for (const disconnect of this.focusSignals) disconnect();
+    const window = (global as unknown as Shell.Global).display.focus_window;
+    const actor = window?.get_compositor_private() as Meta.WindowActor | null;
+    const sync = (object: Signals, signal: string) => {
+      const id = object.connect(signal, () => this.syncSession());
+      return () => object.disconnect(id);
+    };
+    this.focusSignals = [
+      ...window ? ['size-changed', 'position-changed', 'notify::fullscreen'].map(signal => sync(window, signal)) : [],
+      ...actor ? [sync(actor, 'effects-completed')] : [],
+    ];
     this.syncSession();
   }
 
@@ -251,8 +259,7 @@ class KestrelUi {
   taskViewOpen(): boolean { return this.taskView.visible; }
 
   shutdown(): void {
-    for (const id of this.focusSignals) this.focusWindow!.disconnect(id);
-    for (const disconnect of this.disconnectors) disconnect();
+    for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
     this.panels.shutdown();
     this.liveWallpaper.destroy();
     this.board.destroy();

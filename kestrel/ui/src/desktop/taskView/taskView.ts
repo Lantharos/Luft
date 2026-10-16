@@ -108,7 +108,7 @@ export class TaskView {
     const focusInside = !!focused && this.actor.contains(focused);
     this.clearCards();
     const workspace = shell.workspace_manager.get_active_workspace();
-    const windows = shell.display.get_tab_list(Meta.TabList.NORMAL, workspace);
+    const windows = shell.display.get_tab_list(Meta.TabList.NORMAL, workspace).filter(window => window.located_on_workspace(workspace));
     this.cards = windows.map(window => new WindowCard(window, () => {
       this.dismiss();
       this.activateWindow(window);

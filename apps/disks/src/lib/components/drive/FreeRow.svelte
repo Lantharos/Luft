@@ -29,9 +29,10 @@
 		<button
 			type="button"
 			class="button ml-auto"
+			aria-label={blank ? undefined : 'New partition'}
 			onclick={() => dialogs.open(blank ? { kind: 'format-drive', drive } : { kind: 'create', drive, offset, size })}
 		>
-			{blank ? 'Format drive…' : 'New partition…'}
+			{blank ? 'Format drive…' : 'New'}
 		</button>
 	{/if}
 </div>

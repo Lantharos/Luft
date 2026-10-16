@@ -6,6 +6,7 @@ use zbus::blocking::MessageIterator;
 use zbus::zvariant::Value;
 
 use super::backend::{self, Notice};
+use super::schedule;
 use super::store::Preferences;
 
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
@@ -13,7 +14,24 @@ const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
 const PAGE: &str = "kestrel-settings:updates";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
 
-fn notify(summary: &str, body: &str) -> Result<(), String> {
+type Properties<'a> = Vec<(&'a str, Value<'a>)>;
+
+fn open_updates() -> Result<(), String> {
+    let settings = std::env::current_exe()
+        .map_err(|error| error.to_string())?
+        .to_string_lossy()
+        .into_owned();
+    let unit = format!("app-com.lantharos.settings-{}.service", std::process::id());
+    let command = vec![(settings.clone(), vec![settings, PAGE.to_owned()], false)];
+    let properties: Properties = vec![
+        ("Description", Value::from("Settings")),
+        ("ExecStart", Value::from(command)),
+    ];
+    let auxiliary: Vec<(&str, Properties)> = Vec::new();
+    schedule::call("StartTransientUnit", &(unit, "fail", properties, auxiliary))
+}
+
+pub fn notify(summary: &str, body: &str) -> Result<(), String> {
     let connection = dbus::session()?;
     let rule = zbus::MatchRule::builder()
         .msg_type(zbus::message::Type::Signal)
@@ -64,7 +82,9 @@ fn notify(summary: &str, body: &str) -> Result<(), String> {
                         .map(|(clicked, _)| clicked),
                 ) =>
             {
-                let _ = gio::AppInfo::launch_default_for_uri(PAGE, gio::AppLaunchContext::NONE);
+                if let Err(error) = open_updates() {
+                    eprintln!("Opening Settings failed: {error}");
+                }
                 break;
             }
             "NotificationClosed"

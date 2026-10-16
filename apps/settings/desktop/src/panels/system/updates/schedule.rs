@@ -19,7 +19,7 @@ fn units() -> PathBuf {
     dirs::config_dir().unwrap_or_default().join("systemd/user")
 }
 
-fn call<B>(method: &str, body: &B) -> Result<(), String>
+pub fn call<B>(method: &str, body: &B) -> Result<(), String>
 where
     B: serde::Serialize + zbus::zvariant::DynamicType,
 {

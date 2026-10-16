@@ -40,6 +40,7 @@ build_helpers() {
   cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/greeter/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/peek/Cargo.toml"
+  cargo build --release --quiet --manifest-path "$root/packages/accounts/service/Cargo.toml"
 }
 
 dbus_service() {

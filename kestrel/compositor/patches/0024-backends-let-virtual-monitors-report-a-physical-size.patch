@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 14 Oct 2026 16:22:39 +0200
-Subject: [PATCH 24/27] backends: let virtual monitors report a physical size
+Subject: [PATCH 24/28] backends: let virtual monitors report a physical size
 
 --virtual-monitor accepts an optional :WxHmm suffix, such as
 1920x1080:344x194mm, so headless sessions can stand in for laptop

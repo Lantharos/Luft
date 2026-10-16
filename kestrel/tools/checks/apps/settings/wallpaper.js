@@ -9,7 +9,7 @@ import {repository} from '../../lib/processes.js';
 import {capture} from '../../lib/screenshots.js';
 import {show} from './navigation.js';
 
-const {require, eventually} = checks('Luft app');
+const {eventually} = checks('Luft app');
 const SCROLL_POINT = [650, 400];
 const SCROLL_STEPS = 3;
 const PREVIEW = [655, 330];
@@ -52,8 +52,9 @@ export async function checkWallpaper(app) {
     background.set_string('picture-options', 'zoom');
     for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.set_value(key, new GLib.Variant('(dd)', [0.5, 0.5]));
     await show(app, 'about');
-    await show(app, 'appearance');
+    const top = await show(app, 'appearance');
     for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
+    await app.settle(frame => !frame.looksLike(top));
     moveTo(app.at(PREVIEW));
     (await app.settle(() => true)).save('settings-wallpaper');
 
@@ -62,8 +63,8 @@ export async function checkWallpaper(app) {
     const axis = shape > FOG_SHAPE ? 1 : 0;
     await drag(app.at(PREVIEW), app.at(PREVIEW.map((value, index) => index === axis ? value - DRAG : value)));
     await eventually(() => focus()[axis] > 0.6 && focus()[1 - axis] === 0.5, 'dragging the preview shows another part of the wallpaper');
-    const chosen = kestrel.get_value('wallpaper-focus-chosen').recursiveUnpack()[uri];
-    require(chosen?.[axis] === focus()[axis], 'the chosen position is remembered for that wallpaper');
+    const chosen = () => kestrel.get_value('wallpaper-focus-chosen').recursiveUnpack()[uri];
+    await eventually(() => chosen()?.[axis] === focus()[axis], 'the chosen position is remembered for that wallpaper');
     await capture('settings-wallpaper-moved');
 
     app.click(secondTile(shape));

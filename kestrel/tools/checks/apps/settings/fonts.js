@@ -92,8 +92,7 @@ async function scrollToFonts(app) {
   do {
     before = after;
     for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
-    await settled();
-    after = await app.frame();
+    after = await app.settle(frame => !frame.looksLike(before));
   } while (!after.looksLike(before));
 }
 

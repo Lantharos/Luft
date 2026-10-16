@@ -43,6 +43,33 @@ shell_backdrop_cache_new (void)
   return g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, backdrop_free);
 }
 
+static void
+allocate_backdrop (Backdrop     *backdrop,
+                   CoglContext  *cogl,
+                   MtkRectangle *geometry)
+{
+  g_autoptr (CoglTexture) texture = cogl_texture_2d_new_with_size (cogl, geometry->width, geometry->height);
+  g_autoptr (CoglOffscreen) offscreen = cogl_offscreen_new_with_texture (texture);
+  g_autoptr (GError) error = NULL;
+
+  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
+    {
+      g_warning ("Could not keep a %dx%d backdrop: %s",
+                 geometry->width, geometry->height, error->message);
+      return;
+    }
+
+  backdrop->framebuffer = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
+  backdrop->pipeline = cogl_pipeline_new (cogl);
+  cogl_pipeline_set_layer_texture (backdrop->pipeline, 0, texture);
+  cogl_pipeline_set_layer_filters (backdrop->pipeline, 0,
+                                  COGL_PIPELINE_FILTER_LINEAR,
+                                  COGL_PIPELINE_FILTER_LINEAR);
+  cogl_pipeline_set_layer_wrap_mode (backdrop->pipeline, 0,
+                                    COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+  cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
+}
+
 static Backdrop *
 ensure_backdrop (GHashTable          *cache,
                  ClutterPaintContext *context,
@@ -72,28 +99,16 @@ ensure_backdrop (GHashTable          *cache,
       backdrop->valid = mtk_region_create ();
     }
 
-  if (!backdrop->framebuffer ||
-      backdrop->geometry.width != geometry->width ||
+  if (backdrop->geometry.width != geometry->width ||
       backdrop->geometry.height != geometry->height)
     {
-      CoglContext *cogl = cogl_framebuffer_get_context (source);
-      g_autoptr (CoglTexture) texture = NULL;
-
       g_clear_object (&backdrop->framebuffer);
       g_clear_object (&backdrop->pipeline);
-      texture = cogl_texture_2d_new_with_size (cogl, geometry->width, geometry->height);
-      backdrop->framebuffer = COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (texture));
-      backdrop->pipeline = cogl_pipeline_new (cogl);
-      cogl_pipeline_set_layer_texture (backdrop->pipeline, 0, texture);
-      cogl_pipeline_set_layer_filters (backdrop->pipeline, 0,
-                                      COGL_PIPELINE_FILTER_LINEAR,
-                                      COGL_PIPELINE_FILTER_LINEAR);
-      cogl_pipeline_set_layer_wrap_mode (backdrop->pipeline, 0,
-                                        COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
-      cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
+      allocate_backdrop (backdrop, cogl_framebuffer_get_context (source), geometry);
     }
-  else if (backdrop->geometry.x != geometry->x ||
-           backdrop->geometry.y != geometry->y)
+  else if (backdrop->framebuffer &&
+           (backdrop->geometry.x != geometry->x ||
+            backdrop->geometry.y != geometry->y))
     {
       cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
     }
@@ -106,30 +121,39 @@ CoglPipeline *
 shell_backdrop_capture (GHashTable          *cache,
                         ClutterActor        *actor,
                         ClutterPaintContext *context,
-                        ClutterActorBox     *box,
+                        ClutterActorBox     *actor_box,
+                        ClutterActorBox     *area,
                         gboolean            *changed)
 {
   ClutterStageView *view = clutter_paint_context_get_stage_view (context);
   CoglFramebuffer *source = clutter_paint_context_get_framebuffer (context);
   const MtkRegion *damage = clutter_paint_context_get_redraw_clip (context);
-  MtkRectangle geometry = { box->x1, box->y1, box->x2 - box->x1, box->y2 - box->y1 };
+  MtkRectangle geometry = { area->x1, area->y1, area->x2 - area->x1, area->y2 - area->y1 };
   MtkRectangle framebuffer_bounds = { 0, 0,
     cogl_framebuffer_get_width (source), cogl_framebuffer_get_height (source) };
   Backdrop *backdrop = ensure_backdrop (cache, context, &geometry, changed);
-  g_autoptr (MtkRegion) visible = mtk_region_create_rectangle (&geometry);
-  g_autoptr (MtkRegion) captured = mtk_region_create ();
+  g_autoptr (MtkRegion) visible = NULL;
+  g_autoptr (MtkRegion) captured = NULL;
 
+  if (!backdrop->framebuffer)
+    return NULL;
+
+  visible = mtk_region_create_rectangle (&geometry);
+  captured = mtk_region_create ();
   mtk_region_intersect_rectangle (visible, &framebuffer_bounds);
   if (clutter_actor_has_clip (actor))
     {
       float x, y, width, height;
       float scale = view ? clutter_stage_view_get_scale (view) : 1.f;
+      int x1, y1, x2, y2;
       MtkRectangle clip;
 
       clutter_actor_get_clip (actor, &x, &y, &width, &height);
-      clip = (MtkRectangle) { geometry.x + floorf (x * scale),
-                              geometry.y + floorf (y * scale),
-                              ceilf (width * scale), ceilf (height * scale) };
+      x1 = CLAMP (floorf (actor_box->x1 + x * scale), 0, framebuffer_bounds.width);
+      y1 = CLAMP (floorf (actor_box->y1 + y * scale), 0, framebuffer_bounds.height);
+      x2 = CLAMP (ceilf (actor_box->x1 + (x + width) * scale), x1, framebuffer_bounds.width);
+      y2 = CLAMP (ceilf (actor_box->y1 + (y + height) * scale), y1, framebuffer_bounds.height);
+      clip = (MtkRectangle) { x1, y1, x2 - x1, y2 - y1 };
       mtk_region_intersect_rectangle (visible, &clip);
     }
 

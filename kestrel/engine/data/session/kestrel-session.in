@@ -8,7 +8,12 @@ unset KESTREL_LOGIN_SHELL
 export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-kestrel}"
 export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Kestrel:GNOME}"
-export XDG_DATA_DIRS="@datadir@:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+case ":$XDG_DATA_DIRS:" in
+  *:@datadir@:*) ;;
+  *) XDG_DATA_DIRS="@datadir@:$XDG_DATA_DIRS" ;;
+esac
+export XDG_DATA_DIRS
 export IBUS_DAEMON_ARGS="--panel disable"
 
 DCONF_PROFILE="${XDG_RUNTIME_DIR:-/tmp}/kestrel/dconf-profile"

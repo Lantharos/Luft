@@ -67,7 +67,7 @@ window
 | `dbus::objects` | `Objects` reads `ObjectManager` trees; `settle` debounces bursts of change signals |
 | `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `path_uri` and `uri_path` convert between paths and URIs |
 | `file_manager` | `show_in_folder(path)` opens the folder with the file selected, `show_folder(path)` opens the folder itself |
-| `secrets` | `store`, `load`, `delete` and `names` for the app's own secrets in Luft Keyring; `register(window)` adds the `secrets_store`, `secrets_load` and `secrets_delete` bridge commands |
+| `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
 
 ## Features
 

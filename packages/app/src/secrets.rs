@@ -2,11 +2,9 @@ use std::io::{Read, Write};
 use std::os::fd::OwnedFd;
 use std::thread;
 
-use sabine::SabineWindow;
-use serde::Deserialize;
 use zbus::zvariant::Fd;
 
-use crate::{Commands, dbus};
+use crate::dbus;
 
 const NAME: &str = "com.lantharos.Keyring1";
 const PATH: &str = "/com/lantharos/Keyring1";
@@ -57,34 +55,4 @@ pub fn load(name: &str) -> Result<Option<Vec<u8>>, String> {
 
 pub fn delete(name: &str) -> Result<bool, String> {
     call("Delete", &(name,))
-}
-
-pub fn names() -> Result<Vec<String>, String> {
-    call("List", &())
-}
-
-#[derive(Deserialize)]
-struct Named {
-    name: String,
-}
-
-#[derive(Deserialize)]
-struct Value {
-    name: String,
-    value: String,
-}
-
-fn load_text(Named { name }: Named) -> Result<Option<String>, String> {
-    load(&name)?
-        .map(|secret| String::from_utf8(secret).map_err(|error| error.to_string()))
-        .transpose()
-}
-
-pub fn register(window: SabineWindow) -> SabineWindow {
-    window
-        .command("secrets_store", |Value { name, value }: Value| {
-            store(&name, value.as_bytes())
-        })
-        .command("secrets_load", load_text)
-        .command("secrets_delete", |Named { name }: Named| delete(&name))
 }

@@ -1,4 +1,5 @@
 mod problems;
+mod systems;
 
 use std::ffi::CString;
 use std::fs;
@@ -176,10 +177,10 @@ fn about() -> Result<About, String> {
     })
 }
 
-fn open_disks(_: Value) -> Result<(), String> {
-    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
-    disks
-        .launch_uris(&["file:///"], gio::AppLaunchContext::NONE)
+fn launch_disks(argument: &str) -> Result<(), String> {
+    gio_unix::DesktopAppInfo::new(DISKS)
+        .ok_or("Disks isn't installed")?
+        .launch_uris(&[argument], gio::AppLaunchContext::NONE)
         .map_err(|error| error.to_string())
 }
 
@@ -194,7 +195,9 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
         .command("about", |_: Value| about())
         .command("about_rename", rename)
-        .command("about_open_disks", open_disks)
+        .command("about_open_disks", |_: Value| launch_disks("file:///"))
+        .command("about_other_systems", |_: Value| systems::list())
+        .command("about_remove_system", systems::remove)
         .command("about_problems", |_: Value| problems::problems())
         .command("about_firmware_restart", |_: Value| {
             problems::restart_to_firmware()

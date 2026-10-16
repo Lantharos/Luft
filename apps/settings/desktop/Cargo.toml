@@ -25,6 +25,7 @@ liblzma = "0.4.8"
 libpulse-binding = "2.30.1"
 luft-accounts = { path = "../../../packages/accounts" }
 luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "ibus", "recovery"] }
+luft-disks = { path = "../../../packages/disks" }
 luft-fingerprint = { path = "../../../packages/fingerprint" }
 luft-network = { path = "../../../packages/network" }
 luft-software = { path = "../../../packages/software" }

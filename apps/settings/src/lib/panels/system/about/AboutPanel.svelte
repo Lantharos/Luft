@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { bytes, Dialog, Row, Section, TextField } from '@luft/ui';
 	import { binaryBytes } from '#lib/format.js';
-	import { about, openDisks, rename, type About } from './api';
+	import { about, openDisks, otherSystems, removeSystem, rename, type About, type OtherSystem } from './api';
 	import RecentProblems from './RecentProblems.svelte';
 
 	let info = $state<About | null>(null);
+	let others = $state<OtherSystem[]>([]);
 	let renaming = $state(false);
 	let draft = $state('');
 	let error = $state('');
@@ -29,7 +30,13 @@
 		renaming = true;
 	}
 
+	function describe(system: OtherSystem) {
+		if (system.kind === 'old-system') return `Kept when Luft replaced it · ${bytes(system.size)}`;
+		return `Remove it to give its ${bytes(system.size)} to Luft`;
+	}
+
 	void load();
+	otherSystems().then((list) => (others = list));
 </script>
 
 {#if info}
@@ -68,6 +75,11 @@
 				{/snippet}
 			</Row>
 		{/if}
+		{#each others as system (system.id)}
+			<Row title={system.name} description={describe(system)}>
+				<button type="button" class="button" onclick={() => removeSystem(system.id)}>Remove</button>
+			</Row>
+		{/each}
 	</Section>
 
 	<Section title="Software">

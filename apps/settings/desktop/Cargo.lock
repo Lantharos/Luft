@@ -2258,6 +2258,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-disks"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "luft-dbus",
+ "serde",
+ "serde_json",
+ "zbus",
+]
+
+[[package]]
 name = "luft-fingerprint"
 version = "0.1.0"
 dependencies = [

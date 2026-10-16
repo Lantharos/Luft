@@ -15,6 +15,16 @@ export const about = () => invoke<About>('about');
 export const rename = (name: string) => invoke<void>('about_rename', { name });
 export const openDisks = () => invoke<void>('about_open_disks');
 
+export interface OtherSystem {
+	id: string;
+	kind: 'windows' | 'linux' | 'old-system';
+	name: string;
+	size: number;
+}
+
+export const otherSystems = () => invoke<OtherSystem[]>('about_other_systems');
+export const removeSystem = (id: string) => invoke<void>('about_remove_system', { id });
+
 export interface Suggestion {
 	step: string;
 	detail: string;

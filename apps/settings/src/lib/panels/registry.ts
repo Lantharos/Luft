@@ -4,6 +4,7 @@ import Bell from '@lucide/svelte/icons/bell';
 import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
 import CalendarClock from '@lucide/svelte/icons/calendar-clock';
+import Cloud from '@lucide/svelte/icons/cloud';
 import Info from '@lucide/svelte/icons/info';
 import Keyboard from '@lucide/svelte/icons/keyboard';
 import LayoutGrid from '@lucide/svelte/icons/layout-grid';
@@ -36,6 +37,7 @@ export type PanelId =
 	| 'security'
 	| 'datetime'
 	| 'users'
+	| 'accounts'
 	| 'login'
 	| 'updates'
 	| 'about';
@@ -98,6 +100,7 @@ const PANEL_GROUPS: Panel[][] = [
 	[
 		panel('datetime', 'Date & Time', CalendarClock, ['time zone', 'clock', '24-hour', 'automatic'], () => import('./system/datetime/DateTimePanel.svelte')),
 		panel('users', 'Users', UserRound, ['account', 'name', 'picture', 'avatar', 'password', 'fingerprint'], () => import('./system/users/UsersPanel.svelte')),
+		panel('accounts', 'Accounts', Cloud, ['online accounts', 'cloud', 'icloud', 'icloud drive', 'apple', 'onedrive', 'microsoft', 'dropbox', 'nextcloud', 'webdav', 'sync', 'files on demand', 'sign in'], () => import('./connections/accounts/AccountsPanel.svelte')),
 		panel('login', 'Login Screen', LogIn, ['greeter', 'sign in', 'automatic login', 'autologin', 'session', 'wallpaper', 'users', 'lock screen', 'hidden users'], () => import('./system/login/LoginPanel.svelte')),
 		panel('updates', 'Updates', RefreshCw, ['software updates', 'system updates', 'upgrade', 'firmware', 'kernel', 'restart and install', 'packages', 'automatic updates', 'security updates'], () => import('./system/updates/UpdatesPanel.svelte')),
 		panel('about', 'About', Info, ['device name', 'system', 'hardware', 'memory', 'processor', 'graphics', 'storage'], () => import('./system/about/AboutPanel.svelte'))

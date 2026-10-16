@@ -13,6 +13,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = devices::hardware::register(window, events);
     let window = connections::network::register(window, events);
     let window = connections::bluetooth::register(window, events);
+    let window = connections::accounts::register(window, events);
     let window = devices::display::register(window, events);
     let window = devices::sound::register(window, events);
     let window = devices::power::register(window, events);

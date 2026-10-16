@@ -21,6 +21,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 | Security | Device encryption and recovery key, Secure Boot and signed startup, the security chip, USB protection, Luft Keyring, app access to passwords, SSH keys and passkeys |
 | Date & Time | Time zone, automatic time and clock format |
 | Users | Account picture, name, password and fingerprints |
+| Accounts | iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV accounts, each a folder in `~/Cloud` (see [cloud drives](../../docs/cloud.md)) |
 | Login Screen | Wallpaper, listed users, default session and automatic login |
 | Updates | System updates and firmware, installed at the next restart, with release notes and a way back to the previous version on image-based installs; app updates are left to Schelf |
 | About | Device name, hardware, system versions, storage and recent graphics driver problems |
@@ -56,10 +57,11 @@ This registers the `kestrel-settings:` link scheme. If Settings is already open,
 
 | Link | Opens |
 |------|-------|
-| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `appearance`, `notifications`, `keyboard`, `mouse`, `accessibility`, `apps`, `privacy`, `security`, `datetime`, `users`, `login`, `updates`, `about` |
+| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `appearance`, `notifications`, `keyboard`, `mouse`, `accessibility`, `apps`, `privacy`, `security`, `datetime`, `users`, `accounts`, `login`, `updates`, `about` |
 | `kestrel-settings:appearance/fonts` | All fonts |
 | `kestrel-settings:appearance/cursors` | Cursor themes |
 | `kestrel-settings:appearance/taskbar` | Taskbar |
+| `kestrel-settings:accounts/add` | Adding an account |
 
 A link to a page for missing hardware, such as Bluetooth without an adapter, explains that instead.
 

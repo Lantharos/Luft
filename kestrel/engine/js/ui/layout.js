@@ -181,7 +181,7 @@ class Monitor {
 }
 
 const UiActor = GObject.registerClass(
-class UiActor extends St.Widget {
+class UiActor extends Clutter.Actor {
     vfunc_get_preferred_width(_forHeight) {
         const width = global.stage.width;
         return [width, width];

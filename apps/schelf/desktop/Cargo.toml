@@ -22,3 +22,8 @@ sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["raw_value"] }
 tokio = { version = "1.53.3", default-features = false, features = ["rt"] }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = true

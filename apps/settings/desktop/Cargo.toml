@@ -40,5 +40,10 @@ ureq = { version = "3.4.2", features = ["platform-verifier"] }
 zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
 zip = { version = "9.0.4", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
 
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = true
+
 [dev-dependencies]
 tempfile = "3.27.0"

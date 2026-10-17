@@ -23,6 +23,7 @@ import * as WorkspaceAnimation from './workspaceAnimation.js';
 import * as Main from './main.js';
 import {blurBackdrop} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
+import {OpenCloseEffects} from './windowEffects/openClose.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
 
@@ -30,15 +31,6 @@ const MINIMIZE_PROPERTIES = ['x', 'y', 'scale_x', 'scale_y', 'opacity'];
 const MINIMIZED_WINDOW_SCALE = 0.04;
 const TILE_PREVIEW_GAP = 8;
 const TILE_PREVIEW_RADIUS = 16;
-const WINDOW_OPEN_TIME = 240;
-const DIALOG_OPEN_TIME = 180;
-const WINDOW_CLOSE_TIME = 170;
-const DIALOG_CLOSE_TIME = 130;
-const WINDOW_TRANSITION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;
-const WINDOW_OPEN_SCALE = 0.92;
-const DIALOG_OPEN_SCALE = 0.96;
-const WINDOW_CLOSE_SCALE = 0.94;
-const WINDOW_OPEN_RISE = 14;
 export const WINDOW_ANIMATION_TIME = 250;
 export const DIM_BRIGHTNESS = -0.3;
 export const DIM_TIME = 500;
@@ -497,10 +489,9 @@ export class WindowManager {
         this._minimizing = new Set();
         this._unminimizing = new Set();
         this._minimizeMotion = new Map();
-        this._mapping = new Set();
+        this._openClose = new OpenCloseEffects();
         this._resizing = new Set();
         this._resizePending = new Set();
-        this._destroying = new Set();
 
         this._skippedActors = new Set();
 
@@ -511,8 +502,7 @@ export class WindowManager {
 
         this._shellwm.connect('kill-window-effects', (shellwm, actor) => {
             this._handOverMinimizeMotion(shellwm, actor);
-            this._mapWindowDone(shellwm, actor);
-            this._destroyWindowDone(shellwm, actor);
+            this._openClose.finish(actor);
             this._sizeChangeWindowDone(shellwm, actor);
         });
 
@@ -1353,42 +1343,8 @@ export class WindowManager {
             return;
         }
 
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
         const dialog = this._getAnimationWindowType(actor) !== Meta.WindowType.NORMAL;
-
-        actor.set_pivot_point(0.5, 0.5);
-        actor.opacity = 0;
-        if (useMotion) {
-            const scale = dialog ? DIALOG_OPEN_SCALE : WINDOW_OPEN_SCALE;
-            actor.set_scale(scale, scale);
-            actor.translation_y = dialog ? 0 : WINDOW_OPEN_RISE;
-        }
-        actor.show();
-        this._mapping.add(actor);
-
-        actor.ease({
-            opacity: 255,
-            scale_x: 1,
-            scale_y: 1,
-            translation_y: 0,
-            duration: dialog ? DIALOG_OPEN_TIME : WINDOW_OPEN_TIME,
-            mode: WINDOW_TRANSITION_MODE,
-            onStopped: () => this._mapWindowDone(shellwm, actor),
-        });
-    }
-
-    _mapWindowDone(shellwm, actor) {
-        if (this._mapping.delete(actor)) {
-            actor.remove_all_transitions();
-            actor.opacity = 255;
-            actor.set_pivot_point(0, 0);
-            actor.scale_y = 1;
-            actor.scale_x = 1;
-            actor.translation_y = 0;
-            actor.translation_x = 0;
-            shellwm.completed_map(actor);
-        }
+        this._openClose.open(actor, dialog, () => shellwm.completed_map(actor));
     }
 
     _destroyWindow(shellwm, actor) {
@@ -1408,37 +1364,12 @@ export class WindowManager {
             return;
         }
 
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
-        const dialog = this._getAnimationWindowType(actor) !== Meta.WindowType.NORMAL;
-
-        actor.set_pivot_point(0.5, 0.5);
-        this._destroying.add(actor);
-
-        if (window.is_attached_dialog()) {
-            window.get_transient_for().connectObject('unmanaged', () => {
-                actor.remove_all_transitions();
-                this._destroyWindowDone(shellwm, actor);
-            }, actor);
-        }
-
-        const scale = useMotion ? WINDOW_CLOSE_SCALE : 1;
-        actor.ease({
-            opacity: 0,
-            scale_x: scale,
-            scale_y: scale,
-            duration: dialog ? DIALOG_CLOSE_TIME : WINDOW_CLOSE_TIME,
-            mode: WINDOW_TRANSITION_MODE,
-            onStopped: () => this._destroyWindowDone(shellwm, actor),
-        });
-    }
-
-    _destroyWindowDone(shellwm, actor) {
-        if (this._destroying.delete(actor)) {
-            const parent = actor.get_meta_window()?.get_transient_for();
+        const parent = window.is_attached_dialog() ? window.get_transient_for() : null;
+        parent?.connectObject('unmanaged', () => this._openClose.finish(actor), actor);
+        this._openClose.close(actor, () => {
             parent?.disconnectObject(actor);
             shellwm.completed_destroy(actor);
-        }
+        });
     }
 
     _filterKeybinding(shellwm, binding) {

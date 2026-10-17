@@ -22,6 +22,7 @@ import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
+import { afterMotion, dropAfterMotion } from './shared/afterMotion.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
 import { ClipboardPanel } from './surfaces/clipboard/panel.js';
 import { EmojiPanel } from './surfaces/emoji/panel.js';
@@ -39,6 +40,7 @@ export { signInToNetwork } from './system/network/signIn.js';
 export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
+export { afterMotion, holdMotion } from './shared/afterMotion.js';
 export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion.js';
 
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
@@ -57,6 +59,8 @@ class KestrelUi {
   private readonly liveWallpaper: LiveWallpaper;
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
+  private sessionSyncLater = 0;
+  private readonly syncSessionAfterMotion = () => this.syncSession();
 
   constructor(private readonly context: Context) {
     const shellGlobal = global as unknown as Shell.Global;
@@ -166,9 +170,9 @@ class KestrelUi {
       return Clutter.EVENT_STOP;
     });
     this.watch(shellGlobal.display, 'overlay-key', () => this.superTapped());
-    this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.syncSession());
+    this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.queueSyncSession());
     this.watch(shellGlobal.display, 'notify::focus-window', () => this.trackFocusedWindow());
-    this.watch(shellGlobal.display, 'restacked', () => this.syncSession());
+    this.watch(shellGlobal.display, 'restacked', () => this.queueSyncSession());
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panels.primary.actor);
@@ -208,14 +212,23 @@ class KestrelUi {
     const window = (global as unknown as Shell.Global).display.focus_window;
     const actor = window?.get_compositor_private() as Meta.WindowActor | null;
     const sync = (object: Signals, signal: string) => {
-      const id = object.connect(signal, () => this.syncSession());
+      const id = object.connect(signal, () => this.queueSyncSession());
       return () => object.disconnect(id);
     };
     this.focusSignals = [
       ...window ? ['size-changed', 'position-changed', 'notify::fullscreen'].map(signal => sync(window, signal)) : [],
       ...actor ? [sync(actor, 'effects-completed')] : [],
     ];
-    this.syncSession();
+    this.queueSyncSession();
+  }
+
+  private queueSyncSession(): void {
+    if (this.sessionSyncLater) return;
+    this.sessionSyncLater = (global as unknown as Shell.Global).compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+      this.sessionSyncLater = 0;
+      afterMotion(this.syncSessionAfterMotion);
+      return false;
+    });
   }
 
   private syncSession(): void {
@@ -261,6 +274,8 @@ class KestrelUi {
 
   shutdown(): void {
     for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
+    if (this.sessionSyncLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.sessionSyncLater);
+    dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();
     this.liveWallpaper.destroy();
     this.board.destroy();

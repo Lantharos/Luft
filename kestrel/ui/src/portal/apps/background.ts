@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
+import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
 import { SUCCESS, respond, type Invocation } from '../core/request.js';
 
 const BACKGROUND_XML = `<node><interface name="org.freedesktop.impl.portal.Background">
@@ -32,11 +33,12 @@ export class BackgroundPortal {
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly signals: [object: Shell.AppSystem | Shell.WindowTracker, id: number][];
   private visible = new Set(sandboxedApps().keys());
+  private readonly syncAfterMotion = () => this.sync();
 
   constructor() {
     this.signals = [
-      [this.appSystem, this.appSystem.connect('app-state-changed', () => this.sync())],
-      [this.tracker, this.tracker.connect('tracked-windows-changed', () => this.sync())],
+      [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.syncAfterMotion))],
+      [this.tracker, this.tracker.connect('tracked-windows-changed', () => afterMotion(this.syncAfterMotion))],
     ];
   }
 
@@ -50,6 +52,7 @@ export class BackgroundPortal {
   }
 
   destroy(): void {
+    dropAfterMotion(this.syncAfterMotion);
     for (const [object, id] of this.signals) object.disconnect(id);
   }
 

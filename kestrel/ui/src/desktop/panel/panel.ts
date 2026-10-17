@@ -19,6 +19,7 @@ import { systemMonitor } from './widgets/systemMonitor.js';
 import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
 import { TaskbarSurface } from './preferences/taskbarLook.js';
 import { AutoHide } from './autoHide/autoHide.js';
+import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
 import { animateActor } from '../../shared/motion.js';
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 
@@ -69,6 +70,8 @@ export class KestrelPanel {
   private readonly tray: Tray | null = null;
   private readonly privacy: PrivacyIndicator | null = null;
   private readonly inputSource: InputSourceIndicator | null = null;
+  private readonly refreshAfterMotion = () => this.refreshApps();
+  private readonly updateFocusAfterMotion = () => this.taskbar.updateFocus();
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
@@ -135,10 +138,10 @@ export class KestrelPanel {
     this.surface = new TaskbarSurface(this.actor, peek.actor);
 
     this.externalSignals.push(
-      [this.appSystem, this.appSystem.connect('app-state-changed', () => this.refreshApps())],
+      [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.refreshAfterMotion))],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
-      [this.tracker, this.tracker.connect('notify::focus-app', () => this.taskbar.updateFocus())],
+      [this.tracker, this.tracker.connect('notify::focus-app', () => afterMotion(this.updateFocusAfterMotion))],
       ...(['window-entered-monitor', 'window-left-monitor'] as const).map(signal => {
         const display = (global as unknown as Shell.Global).display;
         return [display, display.connect(signal, () => { if (taskbarPreferences.windowsPerDisplay) this.refreshApps(); })] as [Meta.Display, number];
@@ -161,6 +164,7 @@ export class KestrelPanel {
   }
 
   shutdown(): void {
+    dropAfterMotion(this.refreshAfterMotion, this.updateFocusAfterMotion);
     this.unwatchPreferences();
     this.workspaceWindows?.destroy();
     this.workspaceWindows = null;
@@ -244,7 +248,7 @@ export class KestrelPanel {
   }
 
   private syncWorkspaceWindows(): void {
-    if (taskbarPreferences.windowsPerWorkspace) this.workspaceWindows ??= new WorkspaceWindows(() => this.refreshApps());
+    if (taskbarPreferences.windowsPerWorkspace) this.workspaceWindows ??= new WorkspaceWindows(() => afterMotion(this.refreshAfterMotion));
     else {
       this.workspaceWindows?.destroy();
       this.workspaceWindows = null;

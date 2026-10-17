@@ -18,7 +18,7 @@ gio-unix = "0.22.8"
 luft-app = { path = "../../../packages/app", features = ["apps"] }
 luft-software = { path = "../../../packages/software" }
 quick-xml = "0.42.0"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.45" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.46" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["raw_value"] }
 tokio = { version = "1.53.3", default-features = false, features = ["rt"] }

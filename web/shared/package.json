@@ -6,7 +6,8 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./styles.css": "./styles/index.css",
-		"./logo.svg": "./assets/logo.svg"
+		"./logo.svg": "./assets/logo.svg",
+		"./fonts/*": "./fonts/*"
 	},
 	"dependencies": {
 		"@luft/motion": "workspace:*"

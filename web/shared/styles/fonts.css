@@ -3,7 +3,7 @@
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
-	src: url('../../../packages/ui/fonts/OpenRunde-Regular.woff2') format('woff2');
+	src: url('../fonts/OpenRunde-Regular.woff2') format('woff2');
 }
 
 @font-face {
@@ -11,7 +11,7 @@
 	font-style: normal;
 	font-weight: 500;
 	font-display: swap;
-	src: url('../../../packages/ui/fonts/OpenRunde-Medium.woff2') format('woff2');
+	src: url('../fonts/OpenRunde-Medium.woff2') format('woff2');
 }
 
 @font-face {
@@ -19,7 +19,7 @@
 	font-style: normal;
 	font-weight: 600 700;
 	font-display: swap;
-	src: url('../../../packages/ui/fonts/OpenRunde-Semibold.woff2') format('woff2');
+	src: url('../fonts/OpenRunde-Semibold.woff2') format('woff2');
 }
 
 @font-face {
@@ -36,5 +36,5 @@
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
-	src: url('../../../packages/ui/fonts/MapleMono-NF-Regular.woff2') format('woff2');
+	src: url('../fonts/MapleMono-Regular.woff2') format('woff2');
 }

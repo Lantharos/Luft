@@ -5,6 +5,25 @@ export type Stage = 'idle' | 'preparing' | 'copying' | 'waiting' | 'configuring'
 export type DriveKind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type DriveBlock = 'running' | 'read-only' | 'too-small';
 export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full';
+export type Intent = 'try' | 'install' | 'replace';
+export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
+export type SystemBlock = 'layout' | 'read-only' | 'startup' | 'no-account' | 'running';
+
+export interface LinuxSystem {
+	id: string;
+	name: string;
+	drive: string;
+	layout: Layout;
+	blocked: SystemBlock | null;
+	owner: { name: string; fullName: string; password: boolean } | null;
+	accounts: number;
+	hostname: string | null;
+	networks: number;
+	drives: string[];
+	packages: number;
+	keepsOld: boolean;
+	startup: 'esp' | 'boot' | null;
+}
 
 export interface InstallerState {
 	phase: Phase;
@@ -63,7 +82,7 @@ export interface Hints {
 export interface MeetSurvey {
 	drive: string;
 	space: Space | null;
-	intent: 'try' | 'install';
+	intent: Intent;
 	movingBox: { bytes: number; fullName: string | null; userName: string | null } | null;
 }
 
@@ -73,12 +92,14 @@ export interface Survey {
 	firmwareLanguage: string | null;
 	smallestSystem: number;
 	meet: MeetSurvey | null;
+	systems: LinuxSystem[];
 }
 
 export type Target =
 	| { kind: 'whole'; drive: string }
 	| { kind: 'alongside'; drive: string; size: number }
-	| { kind: 'free'; drive: string; offset: number };
+	| { kind: 'free'; drive: string; offset: number }
+	| { kind: 'replace'; system: string };
 
 export interface WindowsChoices {
 	fastStartupOff: boolean;

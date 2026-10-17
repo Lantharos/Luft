@@ -13,6 +13,7 @@ The stick starts straight into Install Luft, over the blurred wallpaper. Holding
 1. **Language, keyboard and time zone.** Guessed from the firmware's language, from Windows if it's on the computer, and from the network once you're online.
 2. **Where Luft goes.**
    - *Alongside Windows* makes Windows' partition smaller and puts Luft in the room it frees. Drag the bar to choose how much each gets; Windows keeps its files and at least 20 GB to grow.
+   - *Replace* puts Luft in place of a Linux system and keeps your files, accounts and settings ([Replacing Linux](#replacing-linux)).
    - *Use a whole drive* erases one drive.
    - *Just try Luft* goes to the desktop on the stick and changes nothing.
    - *Custom* opens Disks, where you can make free space your own way, then pick it.
@@ -59,9 +60,53 @@ The EFI system partition, Luft's startup partition and anything the running syst
 
 Free space right after Luft's partition goes to Luft straight away, while it runs. Space before it can't: Disks offers to make it a partition for your files, or start Try Luft from a USB stick and move Luft into it with Disks' partition editor.
 
-## From Windows, without a stick
+## Replacing Linux
 
-[Meet Luft](meet.md) makes room next to Windows, puts the live system there and restarts into Install Luft, with *Alongside Windows* already set to that room. It works with BitLocker on, and can bring files and settings along in a moving box.
+Install Luft finds Linux systems on the computer's drives and offers *Replace* for those whose home folders live apart from the system: Fedora's btrfs with `root` and `home` subvolumes, or a separate `/home` partition with any file system. A system with everything on one partition, as Ubuntu installs by default, is listed but not offered yet.
+
+| What | What happens |
+| --- | --- |
+| Your files | `/home` stays where it is and becomes `/var/home` in Luft, relabelled for SELinux, with its owners unchanged |
+| Accounts | Every account comes over with the same user name, UID, GID and password; the first one, or anyone who was an administrator, is an administrator in Luft |
+| Network | NetworkManager connections, Wi-Fi passwords included |
+| The computer | Its name and SSH host keys |
+| Other drives | Drives in the old `/etc/fstab` are mounted at startup again, under `/var/mnt` unless they were already under `/var` or `/home` |
+| Command-line tools | Packages you installed with dnf (Fedora's own repositories) or pacman become a Toolbox, built when you first sign in. Enter it with `toolbox enter fedora` (or `arch`) |
+| The old system | On btrfs, Luft goes into a new subvolume `luft`, which becomes the default, and the old root subvolume is renamed `old-system` and kept. With a separate `/home`, the old system partition becomes Luft's |
+
+When the EFI system partition is smaller than 1 GB, the old `/boot` partition becomes Luft's startup partition (FAT, XBOOTLDR), so it needs to be at least 1 GB. The old system doesn't start anymore after replacing. Its files on the EFI system partition, such as `EFI/fedora`, stay until it's removed.
+
+Install Luft notes the old system in `/var/lib/luft-installer/old-system.json`, which Disks and Settings use to remove it:
+
+```json
+{
+  "name": "Fedora Linux 45 (Workstation Edition)",
+  "size": 9876543210,
+  "subvolume": "old-system",
+  "partitions": [],
+  "startups": ["EFI/fedora"]
+}
+```
+
+`subvolume` is the kept system's path from the top of Luft's btrfs, or `null` when nothing was kept; `startups` are its folders on the EFI system partition. Removing deletes the subvolume and anything nested in it, those folders and their start entries.
+
+## Removing Windows or the old system
+
+Once Luft starts the computer, Disks shows the other systems on each drive below its partitions, such as Windows or the Linux that Luft replaced, and Settings lists them under About. *Remove* names everything that goes and how big it is, and offers to open its files in Rover first.
+
+| System | What goes |
+| --- | --- |
+| Windows | Its system, recovery and reserved partitions, and Meet Luft's partitions left on that drive. Windows Boot Manager, its start entry and `EFI/Microsoft` go too, unless another Windows stays. Windows locked with BitLocker can't be read from Luft, so its files are gone for good |
+| The old system Luft replaced | The kept subvolume and its partitions, its folder on the EFI system partition and its start entries |
+| Another Linux | The partitions its boot loader looks for, its folder on the EFI system partition and its start entries |
+
+The EFI system partition, Luft's startup partition and anything the running system uses always stay. Removing first makes sure Luft's own startup is in place and first in the firmware's list, then takes the other system out of the startup list, then deletes its partitions, so the computer keeps starting Luft if it's interrupted at any point; removing again finishes the job.
+
+Free space right after Luft's partition goes to Luft straight away, while it runs. Space before it can't: Disks offers to make it a partition for your files, or start Try Luft from a USB stick and move Luft into it with Disks' partition editor.
+
+## From Windows or Linux, without a stick
+
+[Meet Luft](meet.md) makes room next to Windows, puts the live system there and restarts into Install Luft, with *Alongside Windows* already set to that room. It works with BitLocker on, and can bring files and settings along in a moving box. On Linux it keeps the live system in a folder instead, and can restart straight into *Replace*.
 
 ## What goes on the drive
 

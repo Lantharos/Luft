@@ -7,7 +7,7 @@ const SMALLEST_SHARED_ESP: u64 = 1024 * MIB;
 const GPT_TAIL: u64 = MIB;
 
 pub const ESP_TYPE: &str = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
-const XBOOTLDR_TYPE: &str = "bc13c2ff-59e6-4262-a352-b275fd6f7172";
+pub const XBOOTLDR_TYPE: &str = "bc13c2ff-59e6-4262-a352-b275fd6f7172";
 const ROOT_TYPE: &str = "4f68bce3-e8cd-4db1-96e7-fbcaf984b709";
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

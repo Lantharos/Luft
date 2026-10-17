@@ -1,6 +1,7 @@
 pub mod configure;
 mod copy;
 pub mod drive;
+mod replace;
 mod startup;
 pub mod windows;
 
@@ -19,7 +20,10 @@ use configure::handoff;
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
+use replace::Kept;
 use windows::Windows;
+
+use crate::survey::linux;
 
 use crate::meet::{self, reclaim, unpack};
 
@@ -99,21 +103,37 @@ impl Answers {
         self.given.notify_all();
     }
 
-    fn wait(&self) -> (Regional, Account) {
+    fn wait(&self, account_needed: bool) -> (Regional, Option<Account>) {
         let mut inputs = self.inputs.lock().expect("answers lock");
         loop {
-            if let (Some(regional), Some(_)) = (&inputs.regional, &inputs.account) {
+            if let Some(regional) = &inputs.regional
+                && (inputs.account.is_some() || !account_needed)
+            {
                 let regional = regional.clone();
-                return (regional, inputs.account.take().expect("account was given"));
+                return (regional, inputs.account.take());
             }
             inputs = self.given.wait(inputs).expect("answers lock");
         }
     }
 }
 
+pub enum Destination {
+    Partitions(Plan),
+    Replace(Box<linux::Plan>),
+}
+
+impl Destination {
+    pub fn drive(&self) -> &str {
+        match self {
+            Self::Partitions(plan) => &plan.drive,
+            Self::Replace(plan) => &plan.root.drive,
+        }
+    }
+}
+
 pub struct Job<'a> {
     pub image: &'a Image,
-    pub plan: Plan,
+    pub destination: Destination,
     pub target: &'a Path,
     pub answers: &'a Answers,
     pub windows: Option<Windows>,
@@ -144,14 +164,29 @@ pub fn run(job: Job, report: impl Fn(Status)) {
     }
 }
 
+fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
+    match &job.destination {
+        Destination::Partitions(plan) => {
+            let parts = partition::apply(plan)?;
+            let skipped: Vec<&str> = job.meet.iter().flat_map(Handoff::partitions).collect();
+            Ok((
+                Mounted::assemble(job.target, &plan.device, &parts, &skipped)?,
+                None,
+            ))
+        }
+        Destination::Replace(plan) => {
+            let (mounted, kept) = replace::prepare(plan, job.target)?;
+            Ok((mounted, Some(kept)))
+        }
+    }
+}
+
 fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     report(Status::at(Stage::Preparing, 0.0));
     if let Some(windows) = &job.windows {
         windows.change();
     }
-    let parts = partition::apply(&job.plan)?;
-    let skipped: Vec<&str> = job.meet.iter().flat_map(Handoff::partitions).collect();
-    let mounted = Mounted::assemble(job.target, &job.plan.device, &parts, &skipped)?;
+    let (mounted, kept) = prepare(job)?;
     let moving_box = job.meet.as_ref().and_then(Handoff::moving_box);
     let copied = if moving_box.is_some() {
         COPIED_BEFORE_UNPACKING
@@ -168,37 +203,55 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     .context("Luft couldn't be copied")?;
     startup::place(&mounted, &job.target.with_extension("esp"))?;
     report(Status::at(Stage::Waiting, copied));
-    let (regional, account) = job.answers.wait();
+    let (regional, account) = job
+        .answers
+        .wait(kept.as_ref().is_none_or(Kept::needs_password));
     report(Status::at(Stage::Configuring, copied));
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
     regional.apply(&deployment)?;
-    account.create(&deployment)?;
-    if let Some(windows) = &job.windows
-        && let Err(error) = windows.bring_bluetooth(&deployment)
-    {
-        eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
-    }
-    if let Some(guid) = moving_box
-        && let Err(error) = unpack_box(
-            guid,
-            &deployment,
-            &account,
-            &job.target.with_extension("box"),
-            &|done| {
-                report(Status::at(
-                    Stage::Configuring,
-                    copied + (COPIED - copied) * done,
-                ))
-            },
-        )
-    {
-        eprintln!("The moving box wasn't unpacked: {error:#}");
-    }
+    let user = match (&kept, account) {
+        (Some(kept), account) => {
+            kept.configure(
+                &deployment,
+                account.as_ref().map(|account| account.password.as_str()),
+            )?;
+            kept.owner().to_owned()
+        }
+        (None, Some(account)) => {
+            account.create(&deployment)?;
+            if let Some(windows) = &job.windows
+                && let Err(error) = windows.bring_bluetooth(&deployment)
+            {
+                eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
+            }
+            if let Some(guid) = moving_box
+                && let Err(error) = unpack_box(
+                    guid,
+                    &deployment,
+                    &account,
+                    &job.target.with_extension("box"),
+                    &|done| {
+                        report(Status::at(
+                            Stage::Configuring,
+                            copied + (COPIED - copied) * done,
+                        ))
+                    },
+                )
+            {
+                eprintln!("The moving box wasn't unpacked: {error:#}");
+            }
+            account.name
+        }
+        (None, None) => anyhow::bail!("The new account is missing"),
+    };
     if let Some(meet) = &job.meet {
         reclaim::remember(&deployment.var(STATE), meet)?;
     }
-    handoff::prepare(&deployment, &account.name)?;
+    handoff::prepare(&deployment, &user)?;
     drop(deployment);
+    if let Some(kept) = kept {
+        kept.finish()?;
+    }
     mounted.finish()?;
     let secure_boot_code = startup::ask_shim_to_trust_luft()?;
     report(Status {

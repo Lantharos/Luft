@@ -36,6 +36,15 @@ impl Drop for Mounted {
     }
 }
 
+pub fn looking_into(fs_type: &str) -> &'static str {
+    match fs_type {
+        "btrfs" => "ro,subvolid=5",
+        "ext4" => "ro,noload",
+        "xfs" => "ro,norecovery",
+        _ => "ro",
+    }
+}
+
 pub fn top_level(fs_type: &str) -> &'static str {
     if fs_type == "btrfs" { "subvolid=5" } else { "" }
 }

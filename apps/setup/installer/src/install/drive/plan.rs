@@ -2,6 +2,7 @@ use anyhow::{Result, bail};
 use serde::Deserialize;
 
 use super::layout::{self, Part, Startup};
+use crate::install::Destination;
 use crate::install::windows::Choices;
 use crate::survey::{self, ALIGNMENT, Drive, Survey};
 
@@ -15,6 +16,7 @@ pub enum Target {
     Whole { drive: String },
     Alongside { drive: String, size: u64 },
     Free { drive: String, offset: u64 },
+    Replace { system: String },
 }
 
 #[derive(Deserialize)]
@@ -48,7 +50,20 @@ fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
     Ok(drive)
 }
 
-pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
+pub fn resolve(survey: &Survey, target: &Target) -> Result<Destination> {
+    if let Target::Replace { system } = target {
+        let Some(found) = survey.systems.iter().find(|found| found.id == *system) else {
+            bail!("That system isn't there anymore.");
+        };
+        let Some(plan) = &found.plan else {
+            bail!("Luft can't replace {} yet.", found.name);
+        };
+        return Ok(Destination::Replace(Box::new(plan.clone())));
+    }
+    partitions(survey, target).map(Destination::Partitions)
+}
+
+fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
     match target {
         Target::Whole { drive: block } => {
             let drive = drive(survey, block)?;
@@ -109,5 +124,6 @@ pub fn resolve(survey: &Survey, target: &Target) -> Result<Plan> {
                 parts: layout::within(space.offset, space.size, startup),
             })
         }
+        Target::Replace { .. } => unreachable!("replacing has no partition plan"),
     }
 }

@@ -1,5 +1,5 @@
 import * as installer from '#lib/api/installer.js';
-import type { Drive, InstallerState, Survey, Target, WindowsChoices } from '#lib/api/installer.js';
+import type { Drive, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/api/installer.js';
 import { NO_HARDWARE, type Hardware } from '#lib/api/system.js';
 import { regional } from './regional.svelte.js';
 
@@ -13,6 +13,8 @@ class InstallState {
 	starting = $state(false);
 	startError = $state('');
 	user = $state('');
+	intent = $state<Intent | null>(null);
+	replacing = $state<LinuxSystem | null>(null);
 	windowsChoices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true, bluetooth: true });
 	private hardware = NO_HARDWARE;
 
@@ -22,12 +24,14 @@ class InstallState {
 	windowsDrive = $derived(this.survey?.drives.find((drive) => drive.windows && !drive.blocked) ?? null);
 	usableDrives = $derived(this.survey?.drives.filter((drive) => !drive.blocked && !drive.removable && !drive.meet) ?? []);
 	meet = $derived(this.survey?.meet?.space ? this.survey.meet : null);
+	systems = $derived(this.survey?.systems ?? []);
 	freeSpaces = $derived(
 		this.survey?.drives.filter((drive) => !drive.blocked).flatMap((drive) => drive.free.map((space) => ({ drive, space }))) ?? []
 	);
 
-	async start(hardware: Hardware) {
+	async start(hardware: Hardware, intent: Intent | null) {
 		this.hardware = hardware;
+		this.intent = intent;
 		this.status = await installer.state();
 		const stop = installer.onChanged((status) => (this.status = status));
 		if (this.status?.phase === 'live') void this.look();
@@ -52,6 +56,7 @@ class InstallState {
 		this.startError = '';
 		try {
 			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default', $state.snapshot(this.windowsChoices));
+			this.replacing = target.kind === 'replace' ? (this.systems.find((system) => system.id === target.system) ?? null) : null;
 			this.status = await installer.state();
 			await this.configure();
 			return true;
@@ -64,7 +69,7 @@ class InstallState {
 	}
 
 	configure() {
-		const name = this.user || NAME_FALLBACK;
+		const name = this.user || this.replacing?.owner?.name || NAME_FALLBACK;
 		return installer.configure({
 			locale: regional.language.locale,
 			keyboard: $state.snapshot(regional.keyboard),

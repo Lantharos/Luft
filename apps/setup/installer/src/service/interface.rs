@@ -14,7 +14,7 @@ use super::error::Error;
 use crate::config::Config;
 use crate::install::drive::plan::{self, Request};
 use crate::install::windows::Windows;
-use crate::install::{self, Account, Answers, Job, Regional, Stage, Status};
+use crate::install::{self, Account, Answers, Destination, Job, Regional, Stage, Status};
 use crate::options::Options;
 use crate::{first_boot, meet, phase, survey};
 
@@ -158,12 +158,17 @@ impl Installer {
         let smallest = self.config.smallest_system;
         let handoff = self.meet.clone();
         let scratch = self.options.target.with_extension("moving-box");
-        let (plan, windows) = Self::blocking(move || {
+        let (destination, windows) = Self::blocking(move || {
             let survey =
                 survey::take(smallest, handoff.as_ref(), &scratch).map_err(anyhow::Error::msg)?;
-            let plan = plan::resolve(&survey, &request.target)?;
-            let windows = Windows::chosen(&survey, &plan.drive, request.windows);
-            Ok((plan, windows))
+            let destination = plan::resolve(&survey, &request.target)?;
+            let windows = match destination {
+                Destination::Partitions(_) => {
+                    Windows::chosen(&survey, destination.drive(), request.windows)
+                }
+                Destination::Replace(_) => None,
+            };
+            Ok((destination, windows))
         })
         .await?;
         if self.started.swap(true, Ordering::SeqCst) {
@@ -183,7 +188,7 @@ impl Installer {
             let _ = tokio::task::spawn_blocking(move || {
                 let job = Job {
                     image: &image,
-                    plan,
+                    destination,
                     target: &options.target,
                     answers: &answers,
                     windows,

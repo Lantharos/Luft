@@ -1,5 +1,5 @@
 import { bytes } from '@luft/ui';
-import type { Drive, WindowsVolume } from '#lib/api/installer.js';
+import type { Drive, LinuxSystem, WindowsVolume } from '#lib/api/installer.js';
 
 const GIB = 1024 ** 3;
 
@@ -26,4 +26,25 @@ export function describeDrive(drive: Drive) {
 	if (drive.windows) return `Has ${windowsName(drive.windows)}`;
 	if (drive.partitions === 0) return 'Empty';
 	return drive.partitions === 1 ? 'Has 1 partition' : `Has ${drive.partitions} partitions`;
+}
+
+export function whyNotReplaced(system: LinuxSystem): string {
+	switch (system.blocked) {
+		case 'layout':
+			return system.layout === 'encrypted'
+				? 'It’s encrypted, so replacing it while keeping your files isn’t supported yet.'
+				: system.layout === 'single'
+					? 'Your files share one partition with the system, so replacing it while keeping them isn’t supported yet.'
+					: 'Its drive is laid out in a way Luft can’t replace yet.';
+		case 'startup':
+			return 'Its EFI system partition is too small for Luft, and there’s no /boot partition to use instead.';
+		case 'no-account':
+			return 'It has no account to bring over.';
+		case 'running':
+			return 'Luft is starting from it right now. Start Luft from a USB stick to replace it.';
+		case 'read-only':
+			return 'Its drive is read-only.';
+		default:
+			return '';
+	}
 }

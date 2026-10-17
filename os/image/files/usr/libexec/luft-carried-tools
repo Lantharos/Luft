@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+definition="/var/lib/luft/carried-tools/$USER"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/luft/carried-tools"
+name="$(<"$definition/name")"
+image="localhost/carried-$name"
+
+podman build --pull=newer --tag "$image" --file "$definition/Containerfile" "$definition"
+podman container exists "$name" || toolbox create --assumeyes --image "$image" --container "$name"
+mkdir -p "$(dirname "$state")"
+touch "$state"

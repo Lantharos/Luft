@@ -1,5 +1,6 @@
 mod drives;
 mod firmware;
+pub mod linux;
 pub mod room;
 pub mod windows;
 
@@ -30,6 +31,7 @@ pub struct Survey {
     pub firmware_language: Option<String>,
     pub smallest_system: u64,
     pub meet: Option<MeetSurvey>,
+    pub systems: Vec<linux::System>,
 }
 
 fn meet_survey(drives: &[Drive], handoff: &Handoff, scratch: &Path) -> Option<MeetSurvey> {
@@ -56,11 +58,13 @@ pub fn take(
     scratch: &Path,
 ) -> Result<Survey, String> {
     let objects = udisks::objects()?;
-    let drives: Vec<Drive> = snapshot::build(&objects)
+    let snapshot = snapshot::build(&objects);
+    let drives: Vec<Drive> = snapshot
         .drives
         .iter()
         .map(|drive| drives::describe(drive, smallest_system, handoff))
         .collect();
+    let systems = linux::find(&snapshot.drives, &scratch.with_extension("old"));
     let meet = handoff.and_then(|handoff| meet_survey(&drives, handoff, scratch));
     let hints = meet
         .as_ref()
@@ -78,5 +82,6 @@ pub fn take(
         firmware_language: firmware::language(),
         smallest_system,
         meet,
+        systems,
     })
 }

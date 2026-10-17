@@ -6,9 +6,10 @@
 
 	const USER_NAME = /^[a-z_][a-z0-9_-]{0,31}$/;
 
-	let fullName = $state(install.survey?.meet?.movingBox?.fullName ?? '');
-	let userName = $state('');
-	let editedUserName = $state(false);
+	let kept = install.replacing?.owner ?? null;
+	let fullName = $state(kept?.fullName ?? install.survey?.meet?.movingBox?.fullName ?? '');
+	let userName = $state(kept?.name ?? '');
+	let editedUserName = $state(!!kept);
 	let password = $state('');
 	let repeated = $state('');
 	let saving = $state(false);

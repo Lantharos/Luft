@@ -23,7 +23,7 @@ class SetupState {
 		if (state.meet === 'try' && (await finishSetup().catch(() => false))) return () => {};
 		const stops = [appearance.start(state)];
 		this.hardware = state.hardware;
-		stops.push(await install.start(state.hardware));
+		stops.push(await install.start(state.hardware, state.meet));
 		const phase = install.status?.phase ?? 'live';
 		if (phase === 'first-boot') {
 			this.trust = await trustState().catch(() => null);

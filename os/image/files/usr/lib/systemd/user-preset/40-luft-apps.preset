@@ -1,2 +1,3 @@
 enable luft-preinstall.service
 enable luft-app-updates.timer
+enable luft-carried-tools.service

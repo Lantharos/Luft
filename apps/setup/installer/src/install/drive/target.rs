@@ -16,9 +16,13 @@ fn find(parts: &[Created], role: Role) -> Option<&Created> {
     parts.iter().find(|part| part.role == role)
 }
 
-fn mount(device: &str, at: &Path) -> Result<()> {
+fn mount(device: &str, options: &str, at: &Path) -> Result<()> {
     std::fs::create_dir_all(at)?;
-    Tool::new("mount").arg(device).arg(at).run()
+    let mut mount = Tool::new("mount");
+    if !options.is_empty() {
+        mount = mount.args(["-o", options]);
+    }
+    mount.arg(device).arg(at).run()
 }
 
 fn first_esp(drive_device: &str, skipped: &[&str]) -> Result<String> {
@@ -57,11 +61,27 @@ impl Mounted {
         skipped_esps: &[&str],
     ) -> Result<Self> {
         let system = find(parts, Role::Root).context("No partition for Luft was made")?;
-        mount(&system.device, root)?;
+        Self::open(
+            &system.device,
+            "",
+            root,
+            &system.uuid,
+            first_esp(drive_device, skipped_esps)?,
+        )
+    }
+
+    pub fn open(
+        device: &str,
+        options: &str,
+        root: &Path,
+        root_uuid: &str,
+        esp: String,
+    ) -> Result<Self> {
+        mount(device, options, root)?;
         Ok(Self {
             root: root.to_owned(),
-            root_uuid: system.uuid.clone(),
-            esp: first_esp(drive_device, skipped_esps)?,
+            root_uuid: root_uuid.to_owned(),
+            esp,
         })
     }
 

@@ -58,12 +58,21 @@ impl Deployment {
     }
 
     pub fn relabel(&self, paths: &[PathBuf]) -> Result<()> {
+        self.set_contexts(&["-F"], paths)
+    }
+
+    pub fn relabel_kept(&self, paths: &[PathBuf]) -> Result<()> {
+        self.set_contexts(&[], paths)
+    }
+
+    fn set_contexts(&self, flags: &[&str], paths: &[PathBuf]) -> Result<()> {
         let contexts = self.root.join(CONTEXTS);
         if !contexts.exists() {
             return Ok(());
         }
         Tool::new("setfiles")
-            .args(["-F", "-r"])
+            .args(flags)
+            .arg("-r")
             .arg(&self.root)
             .arg(contexts)
             .args(paths)

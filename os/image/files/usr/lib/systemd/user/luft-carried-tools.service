@@ -1,0 +1,16 @@
+[Unit]
+Description=Bring over the command-line tools of the system Luft replaced
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionUser=!@system
+ConditionPathExists=/var/lib/luft/carried-tools/%u/Containerfile
+ConditionPathExists=!%S/luft/carried-tools
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-carried-tools
+Restart=on-failure
+RestartSec=10min
+
+[Install]
+WantedBy=graphical-session.target

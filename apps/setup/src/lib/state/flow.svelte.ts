@@ -16,6 +16,10 @@ class Flow {
 	step = $derived(this.steps[this.index]);
 	canGoBack = $derived(this.index > 0 && this.step !== POINT_OF_NO_RETURN && this.step !== 'finishing' && this.step !== 'ready');
 
+	skip(step: Step) {
+		if (!this.skipped.includes(step)) this.skipped = [...this.skipped, step];
+	}
+
 	begin(phase: Phase, skipped: Step[]) {
 		this.phase = phase;
 		this.skipped = skipped;

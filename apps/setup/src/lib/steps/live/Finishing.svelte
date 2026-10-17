@@ -18,7 +18,7 @@
 	let code = $derived(status?.secureBootCode ?? '');
 	let percent = $derived(Math.round((status?.progress ?? 0) * 100));
 	let problem = $state('');
-	let fromStick = $derived(!install.survey?.meet);
+	let fromStick = $derived(!install.intent);
 
 	async function restartNow() {
 		problem = '';

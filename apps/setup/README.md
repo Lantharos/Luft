@@ -8,6 +8,7 @@ Installs Luft from the USB stick and sets up a new computer the first time it st
 
 - Language, keyboard and time zone, guessed from the firmware, from Windows on the same computer, and from the network once online
 - Alongside Windows with a size bar, on a whole drive, in free space made with Disks, or just trying Luft from the stick, next to Windows' small EFI system partition too
+- Replaces a Linux system whose home folder is a btrfs subvolume or its own partition, keeping files, accounts with their passwords and IDs, network connections, SSH host keys, other drives and command-line tools (as a Toolbox), and keeps a btrfs system as `old-system` until it's removed
 - Refuses to touch Windows while it's hibernating, locked with BitLocker or needs a check, and says what to do in Windows
 - Next to Windows, offers to turn off Fast Startup, keep the clock right in both and bring Bluetooth devices paired in Windows
 - Started by [Meet Luft](../meet/README.md) from Windows, goes straight to the room Meet Luft made, fills in your name and regional settings from the moving box, unpacks it into the new account, and takes back Meet Luft's partitions after the first sign-in

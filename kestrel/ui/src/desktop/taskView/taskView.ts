@@ -90,7 +90,7 @@ export class TaskView {
   }
 
   private scaleWindows(scale: number): void {
-    animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.smooth });
+    animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.snappy });
   }
 
   private scheduleRebuild(): void {

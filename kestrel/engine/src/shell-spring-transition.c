@@ -127,26 +127,43 @@ damping_ratio (double bounce)
 }
 
 static double
+parent_scale (ClutterActor *actor)
+{
+  graphene_point3d_t corners[4];
+  float width = clutter_actor_get_width (actor);
+  double scale_x;
+
+  clutter_actor_get_scale (actor, &scale_x, NULL);
+  if (width <= 0.0f || scale_x == 0.0)
+    return 1.0;
+  clutter_actor_get_abs_allocation_vertices (actor, corners);
+  return graphene_point3d_distance (&corners[0], &corners[1], NULL) / width / fabs (scale_x);
+}
+
+static double
 automatic_epsilon (ShellSpringTransition *self,
                    ClutterAnimatable     *animatable)
 {
   ClutterActor *actor = clutter_animatable_get_actor (animatable);
   const char *name = g_param_spec_get_name (self->pspec);
-  float scale = actor ? clutter_actor_get_resource_scale (actor) : 1.0f;
+  double pixel;
 
   if (g_str_equal (name, "opacity"))
     return 0.5;
-  if (g_str_has_prefix (name, "scale"))
-    {
-      float width = 0.0f, height = 0.0f;
-
-      if (actor)
-        clutter_actor_get_size (actor, &width, &height);
-      return 0.5 / (MAX (1.0f, MAX (width, height)) * scale);
-    }
   if (g_str_has_prefix (name, "rotation"))
     return 0.05;
-  return 0.5 / scale;
+  if (!actor)
+    return 0.5;
+
+  pixel = 0.5 / (clutter_actor_get_resource_scale (actor) * MAX (parent_scale (actor), 1e-3));
+  if (g_str_has_prefix (name, "scale"))
+    {
+      float width, height;
+
+      clutter_actor_get_size (actor, &width, &height);
+      return pixel / MAX (1.0f, MAX (width, height));
+    }
+  return pixel;
 }
 
 static double

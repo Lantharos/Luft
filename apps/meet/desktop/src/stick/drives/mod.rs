@@ -1,4 +1,4 @@
-#[cfg(any(target_os = "linux", test))]
+#[cfg(target_os = "linux")]
 pub mod linux;
 #[cfg(any(windows, test))]
 pub mod windows;

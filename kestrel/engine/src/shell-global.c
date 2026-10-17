@@ -98,7 +98,6 @@ enum {
   PROP_SETTINGS,
   PROP_DATADIR,
   PROP_FOCUS_MANAGER,
-  PROP_SWITCHEROO_CONTROL,
   PROP_FORCE_ANIMATIONS,
   PROP_AUTOMATION_SCRIPT,
 
@@ -140,7 +139,6 @@ got_switcheroo_control_gpus_property_cb (GObject      *source_object,
 
   global = user_data;
   g_dbus_proxy_set_cached_property (global->switcheroo_control, "GPUs", gpus);
-  g_object_notify_by_pspec (G_OBJECT (global), props[PROP_SWITCHEROO_CONTROL]);
 }
 
 static void
@@ -167,10 +165,7 @@ switcheroo_control_ready_cb (GObject      *source_object,
 
   cached_props = g_dbus_proxy_get_cached_property_names (global->switcheroo_control);
   if (cached_props != NULL && g_strv_contains ((const gchar * const *) cached_props, "GPUs"))
-    {
-      g_object_notify_by_pspec (G_OBJECT (global), props[PROP_SWITCHEROO_CONTROL]);
-      return;
-    }
+    return;
   /* Delay property notification until we have all the properties gathered */
 
   g_dbus_connection_call (g_dbus_proxy_get_connection (global->switcheroo_control),
@@ -271,9 +266,6 @@ shell_global_get_property(GObject         *object,
     case PROP_FOCUS_MANAGER:
       g_value_set_object (value, global->focus_manager);
       break;
-    case PROP_SWITCHEROO_CONTROL:
-      g_value_set_object (value, global->switcheroo_control);
-      break;
     case PROP_FORCE_ANIMATIONS:
       g_value_set_boolean (value, global->force_animations);
       break;
@@ -313,7 +305,6 @@ switcheroo_vanished_cb (GDBusConnection *connection,
 
   g_debug ("switcheroo-control vanished");
   g_clear_object (&global->switcheroo_control);
-  g_object_notify_by_pspec (G_OBJECT (global), props[PROP_SWITCHEROO_CONTROL]);
 }
 
 static void
@@ -553,11 +544,6 @@ shell_global_class_init (ShellGlobalClass *klass)
   props[PROP_FOCUS_MANAGER] =
     g_param_spec_object ("focus-manager", NULL, NULL,
                          ST_TYPE_FOCUS_MANAGER,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  props[PROP_SWITCHEROO_CONTROL] =
-    g_param_spec_object ("switcheroo-control", NULL, NULL,
-                         G_TYPE_DBUS_PROXY,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   props[PROP_FORCE_ANIMATIONS] =

@@ -25,10 +25,8 @@
 G_BEGIN_DECLS
 
 #define ST_TYPE_SHADOW              (st_shadow_get_type ())
-#define ST_TYPE_SHADOW_HELPER       (st_shadow_get_type ())
 
 typedef struct _StShadow StShadow;
-typedef struct _StShadowHelper StShadowHelper;
 
 /**
  * StShadow:
@@ -75,22 +73,5 @@ void      st_shadow_get_box  (StShadow              *shadow,
                               ClutterActorBox       *shadow_box);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (StShadow, st_shadow_unref)
-
-
-GType     st_shadow_helper_get_type (void);
-
-StShadowHelper *st_shadow_helper_new  (StShadow       *shadow);
-
-StShadowHelper *st_shadow_helper_copy (StShadowHelper *helper);
-void            st_shadow_helper_free (StShadowHelper *helper);
-
-void            st_shadow_helper_update (StShadowHelper      *helper,
-                                         ClutterActor        *source,
-                                         ClutterPaintContext *paint_context);
-
-void            st_shadow_helper_paint (StShadowHelper   *helper,
-                                        ClutterPaintNode *node,
-                                        ClutterActorBox  *actor_box,
-                                        uint8_t           paint_opacity);
 
 G_END_DECLS

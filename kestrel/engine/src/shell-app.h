@@ -27,14 +27,11 @@ const char *shell_app_get_id (ShellApp *app);
 
 GDesktopAppInfo *shell_app_get_app_info (ShellApp *app);
 
-ClutterActor *shell_app_create_icon_texture (ShellApp *app, int size);
 ClutterActor *shell_app_create_window_icon_texture (ShellApp *app, MetaWindow *window, int size);
 GIcon *shell_app_get_icon (ShellApp *app);
 const char *shell_app_get_name (ShellApp *app);
-const char *shell_app_get_description (ShellApp *app);
 gboolean shell_app_is_window_backed (ShellApp *app);
 
-GActionGroup * shell_app_get_action_group (ShellApp *app);
 
 void shell_app_activate_window (ShellApp *app, MetaWindow *window, guint32 timestamp);
 
@@ -58,7 +55,6 @@ GSList *shell_app_get_windows (ShellApp *app);
 
 GSList *shell_app_get_pids (ShellApp *app);
 
-gboolean shell_app_is_on_workspace (ShellApp *app, MetaWorkspace *workspace);
 
 gboolean shell_app_launch (ShellApp           *app,
                            guint               timestamp,
@@ -84,14 +80,12 @@ shell_app_activate_action_finish (ShellApp      *app,
                                   GAsyncResult  *result,
                                   GError       **error);
 
-int shell_app_compare_by_name (ShellApp *app, ShellApp *other);
 
 int shell_app_compare (ShellApp *app, ShellApp *other);
 
 void shell_app_update_window_actions (ShellApp *app, MetaWindow *window);
 void shell_app_update_app_actions    (ShellApp *app, MetaWindow *window);
 
-gboolean shell_app_get_busy          (ShellApp *app);
 
 
 G_END_DECLS

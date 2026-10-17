@@ -21,7 +21,6 @@
 #include "shell-app-system-private.h"
 #include "st.h"
 #include "gtkactionmuxer.h"
-#include "org-gtk-application.h"
 #include "switcheroo-control.h"
 
 /* This is mainly a memory usage optimization - the user is going to
@@ -46,10 +45,6 @@ typedef struct {
   GtkActionMuxer   *muxer;
   char             *unique_bus_name;
   GDBusConnection  *session;
-
-  /* GDBus Proxy for getting application busy state */
-  ShellOrgGtkApplication *application_proxy;
-  GCancellable           *cancellable;
 
 } ShellAppRunningState;
 
@@ -81,16 +76,13 @@ struct _ShellApp
   ShellAppRunningState *running_state;
 
   char *window_id_string;
-  char *name_collation_key;
 };
 
 enum {
   PROP_0,
 
   PROP_STATE,
-  PROP_BUSY,
   PROP_ID,
-  PROP_ACTION_GROUP,
   PROP_ICON,
   PROP_APP_INFO,
 
@@ -124,17 +116,11 @@ shell_app_get_property (GObject    *gobject,
     case PROP_STATE:
       g_value_set_enum (value, app->state);
       break;
-    case PROP_BUSY:
-      g_value_set_boolean (value, shell_app_get_busy (app));
-      break;
     case PROP_ID:
       g_value_set_string (value, shell_app_get_id (app));
       break;
     case PROP_ICON:
       g_value_set_object (value, shell_app_get_icon (app));
-      break;
-    case PROP_ACTION_GROUP:
-      g_value_set_object (value, shell_app_get_action_group (app));
       break;
     case PROP_APP_INFO:
       if (app->info)
@@ -212,47 +198,6 @@ shell_app_get_icon (ShellApp *app)
 }
 
 /**
- * shell_app_get_action_group:
- *
- * Return value: (transfer none) (nullable):
- */
-GActionGroup *
-shell_app_get_action_group (ShellApp *app)
-{
-  g_return_val_if_fail (SHELL_IS_APP (app), NULL);
-
-  if (app->running_state)
-    return G_ACTION_GROUP (app->running_state->muxer);
-  return NULL;
-}
-
-/**
- * shell_app_create_icon_texture:
- *
- * Look up the icon for this application, and create a #ClutterActor
- * for it at the given size.
- *
- * Return value: (transfer none): A floating #ClutterActor
- */
-ClutterActor *
-shell_app_create_icon_texture (ShellApp   *app,
-                               int         size)
-{
-  ClutterActor *ret;
-
-  ret = st_icon_new ();
-  st_icon_set_icon_size (ST_ICON (ret), size);
-  st_icon_set_fallback_icon_name (ST_ICON (ret), "application-x-executable");
-
-  g_object_bind_property (app, "icon", ret, "gicon", G_BINDING_SYNC_CREATE);
-
-  if (shell_app_is_window_backed (app))
-    st_widget_add_style_class_name (ST_WIDGET (ret), "fallback-app-icon");
-
-  return ret;
-}
-
-/**
  * shell_app_create_window_icon_texture:
  * @app: the window's application
  * @window: the window supplying the icon
@@ -291,15 +236,6 @@ shell_app_get_name (ShellApp *app)
         name = C_("program", "Unknown");
       return name;
     }
-}
-
-const char *
-shell_app_get_description (ShellApp *app)
-{
-  if (app->info)
-    return g_app_info_get_description (G_APP_INFO (app->info));
-  else
-    return NULL;
 }
 
 /**
@@ -488,7 +424,6 @@ shell_app_update_window_actions (ShellApp *app, MetaWindow *window)
 
       g_assert (app->running_state->muxer);
       gtk_action_muxer_insert (app->running_state->muxer, "win", actions);
-      g_object_notify_by_pspec (G_OBJECT (app), props[PROP_ACTION_GROUP]);
     }
 }
 
@@ -821,33 +756,6 @@ shell_app_get_n_windows (ShellApp *app)
   return g_slist_length (app->running_state->windows);
 }
 
-gboolean
-shell_app_is_on_workspace (ShellApp *app,
-                           MetaWorkspace   *workspace)
-{
-  GSList *iter;
-
-  if (shell_app_get_state (app) == SHELL_APP_STATE_STARTING)
-    {
-      if (app->started_on_workspace == -1 ||
-          meta_workspace_index (workspace) == app->started_on_workspace)
-        return TRUE;
-      else
-        return FALSE;
-    }
-
-  if (app->running_state == NULL)
-    return FALSE;
-
-  for (iter = app->running_state->windows; iter; iter = iter->next)
-    {
-      if (meta_window_get_workspace (iter->data) == workspace)
-        return TRUE;
-    }
-
-  return FALSE;
-}
-
 static int
 shell_app_get_last_user_time (ShellApp *app)
 {
@@ -961,10 +869,6 @@ _shell_app_set_app_info (ShellApp        *app,
                          GDesktopAppInfo *info)
 {
   g_set_object (&app->info, info);
-
-  g_clear_pointer (&app->name_collation_key, g_free);
-  if (app->info)
-    app->name_collation_key = g_utf8_collate_key (shell_app_get_name (app), -1);
 }
 
 static void
@@ -1049,91 +953,6 @@ shell_app_on_ws_switch (MetaWorkspaceManager *workspace_manager,
   g_signal_emit (app, shell_app_signals[WINDOWS_CHANGED], 0);
 }
 
-gboolean
-shell_app_get_busy (ShellApp *app)
-{
-  if (app->running_state != NULL &&
-      app->running_state->application_proxy != NULL &&
-      shell_org_gtk_application_get_busy (app->running_state->application_proxy))
-    return TRUE;
-
-  return FALSE;
-}
-
-static void
-busy_changed_cb (GObject    *object,
-                 GParamSpec *pspec,
-                 gpointer    user_data)
-{
-  ShellApp *app = user_data;
-
-  g_assert (SHELL_IS_APP (app));
-
-  g_object_notify_by_pspec (G_OBJECT (app), props[PROP_BUSY]);
-}
-
-static void
-get_application_proxy (GObject      *source,
-                       GAsyncResult *result,
-                       gpointer      user_data)
-{
-  ShellApp *app = user_data;
-  ShellOrgGtkApplication *proxy;
-  g_autoptr (GError) error = NULL;
-
-  g_assert (SHELL_IS_APP (app));
-
-  proxy = shell_org_gtk_application_proxy_new_finish (result, &error);
-  if (proxy != NULL)
-    {
-      app->running_state->application_proxy = proxy;
-      g_signal_connect (proxy,
-                        "notify::busy",
-                        G_CALLBACK (busy_changed_cb),
-                        app);
-      if (shell_org_gtk_application_get_busy (proxy))
-        g_object_notify_by_pspec (G_OBJECT (app), props[PROP_BUSY]);
-    }
-
-  if (app->running_state != NULL &&
-      !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-    g_clear_object (&app->running_state->cancellable);
-
-  g_object_unref (app);
-}
-
-static void
-shell_app_ensure_busy_watch (ShellApp *app)
-{
-  ShellAppRunningState *running_state = app->running_state;
-  MetaWindow *window;
-  const gchar *object_path;
-
-  if (running_state->application_proxy != NULL ||
-      running_state->cancellable != NULL)
-    return;
-
-  if (running_state->unique_bus_name == NULL)
-    return;
-
-  window = g_slist_nth_data (running_state->windows, 0);
-  object_path = meta_window_get_gtk_application_object_path (window);
-
-  if (object_path == NULL)
-    return;
-
-  running_state->cancellable = g_cancellable_new();
-  /* Take a reference to app to make sure it isn't finalized before
-     get_application_proxy runs */
-  shell_org_gtk_application_proxy_new (running_state->session,
-                                       G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
-                                       running_state->unique_bus_name,
-                                       object_path,
-                                       running_state->cancellable,
-                                       get_application_proxy,
-                                       g_object_ref (app));
-}
-
 static void
 shell_app_on_toplevel_icon_changed (MetaWindow *window,
                                     GParamSpec *pspec,
@@ -1164,7 +983,6 @@ _shell_app_add_window (ShellApp        *app,
   shell_app_on_toplevel_icon_changed (window, NULL, app);
 
   shell_app_update_app_actions (app, window);
-  shell_app_ensure_busy_watch (app);
 
   if (!meta_window_is_skip_taskbar (window))
     app->running_state->interesting_windows++;
@@ -1757,35 +1575,11 @@ unref_running_state (ShellAppRunningState *state)
 
   g_clear_signal_handler (&state->workspace_switch_id, workspace_manager);
 
-  g_clear_object (&state->application_proxy);
-
-  if (state->cancellable != NULL)
-    {
-      g_cancellable_cancel (state->cancellable);
-      g_clear_object (&state->cancellable);
-    }
-
   g_clear_object (&state->muxer);
   g_clear_object (&state->session);
   g_clear_pointer (&state->unique_bus_name, g_free);
 
   g_free (state);
-}
-
-/**
- * shell_app_compare_by_name:
- * @app: One app
- * @other: The other app
- *
- * Order two applications by name.
- *
- * Returns: -1, 0, or 1; suitable for use as a comparison function
- * for e.g. g_slist_sort()
- */
-int
-shell_app_compare_by_name (ShellApp *app, ShellApp *other)
-{
-  return strcmp (app->name_collation_key, other->name_collation_key);
 }
 
 static void
@@ -1820,8 +1614,6 @@ shell_app_finalize (GObject *object)
 
   g_free (app->window_id_string);
 
-  g_free (app->name_collation_key);
-
   G_OBJECT_CLASS(shell_app_parent_class)->finalize (object);
 }
 
@@ -1855,16 +1647,6 @@ shell_app_class_init(ShellAppClass *klass)
                        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   /**
-   * ShellApp:busy:
-   *
-   * Whether the application has marked itself as busy.
-   */
-  props[PROP_BUSY] =
-    g_param_spec_boolean ("busy", NULL, NULL,
-                          FALSE,
-                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  /**
    * ShellApp:id:
    *
    * The id of this application (a desktop filename, or a special string
@@ -1883,17 +1665,6 @@ shell_app_class_init(ShellAppClass *klass)
   props[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
                          G_TYPE_ICON,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * ShellApp:action-group:
-   *
-   * The #GDBusActionGroup associated with this ShellApp, if any. See the
-   * documentation of #GApplication and #GActionGroup for details.
-   */
-  props[PROP_ACTION_GROUP] =
-    g_param_spec_object ("action-group", NULL, NULL,
-                         G_TYPE_ACTION_GROUP,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   /**

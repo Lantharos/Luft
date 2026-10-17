@@ -36,7 +36,7 @@
 .kestrel-switcher-title { font-size: 13px; font-weight: 500; text-align: left; }
 .input-source-switcher-symbol { width: 104px; height: 72px; font-size: 28px; font-weight: 600; }
 .input-source-switcher-name { padding: 0 6px 4px; font-size: 13px; font-weight: 500; }
-.switcher-list .item-box:selected, .switcher-list .item-box:outlined { background-color: fill(0.18); box-shadow: none; }
+.switcher-list .item-box:selected { background-color: fill(0.18); box-shadow: none; }
 
 .workspace-switcher.kestrel-glass { padding: 10px 14px; border-radius: 999px; margin-bottom: 64px; }
 .ws-switcher-indicator { background-color: fill(0.17); border: none; border-radius: 999px; }

@@ -45,7 +45,6 @@ $alert_radius: 18px;
 // Chroma key to flag when a background-color is always occluded, not visible.
 // This allows any box-shadow behind it to be rendered more efficiently by
 // omitting the middle rectangle.
-$invisible_occluded_bg_color: rgba(3,2,1,0);
 
 // Fixed icon sizes
 $base_icon_size: 16px;
@@ -59,7 +58,6 @@ $scaled_padding: to_em(6px); // same as $base_padding
 // Used for symbolic icons that scale
 $scalable_icon_size: to_em(16px);
 $medium_scalable_icon_size: $scalable_icon_size * 1.5;
-$large_scalable_icon_size: $scalable_icon_size * 2;
 
 // animation definition
 $ease_out_quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -71,15 +69,6 @@ stage {
 }
 
 /* Common Stylings */
-%reset {
-  background: none;
-  box-shadow: none;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  margin: 0;
-}
-
 // icon tiles
 %tile {
   border-radius: $base_border_radius * 2;
@@ -160,16 +149,6 @@ stage {
   &:insensitive { @include button(insensitive, $style: card);}
 }
 
-%card_flat {
-  @extend %card_common;
-  border: 1px solid transparent !important; // override of the button style needed here
-  @include button(undecorated, $style: flat);
-  &:hover { @include button(hover, $style: flat);}
-  &:active { @include button(active, $style: flat);}
-  &:focus { @include button(focus, $style: card);}
-  &:insensitive { @include button(insensitive, $style: card);}
-}
-
 
 // normal entry style
 %entry_common {
@@ -238,11 +217,6 @@ stage {
 }
 
 /* General Typography */
-%large_title {
-  font-weight: 300;
-  @include fontsize(24pt);
-}
-
 %title_1 {
   font-weight: 800;
   @include fontsize(20pt);
@@ -278,12 +252,6 @@ stage {
   @include fontsize(9pt);
 }
 
-%smaller {
-  font-weight: 400;
-  @include fontsize(9pt);
-}
-
-%monospace {font-family: monospace;}
 %numeric { font-feature-settings: "tnum";}
 
 
@@ -299,28 +267,6 @@ stage {
   }
 }
 
-// entries
-%osd_entry {
-  @extend %entry_common;
-  @include entry(normal, $c:$osd_fg_color, $bc:$osd_bg_color, $always_dark: $osd_always_dark);
-  &:hover { @include entry(hover, $c:$osd_fg_color, $bc:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:focus { @include entry(focus, $c:$osd_fg_color, $bc:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:insensitive { @include entry(insensitive, $c:$osd_fg_color, $bc:$osd_bg_color, $always_dark: $osd_always_dark);}
-
-  StLabel.hint-text {color: transparentize($osd_fg_color, 0.3); }
-}
-
-// buttons on OSD elements
-%osd_button {
-  @extend %button_common;
-  @include button(normal, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);
-  &:focus { @include button(focus, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:hover { @include button(hover, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:active { @include button(active, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:checked { @include button(checked, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);}
-  &:insensitive { @include button(insensitive, $tc:$osd_fg_color, $c:$osd_bg_color, $always_dark: $osd_always_dark);}
-}
-
 %osd_button_flat {
   @extend %button_common;
   @include button(normal, $tc:$osd_fg_color, $c:$osd_bg_color, $style: flat, $always_dark: $osd_always_dark);
@@ -332,17 +278,6 @@ stage {
 }
 
 /* System Elements */
-
-// entries
-%system_entry {
-  @extend %entry_common;
-  @include entry(normal, $c:$system_fg_color, $bc:$system_bg_color, $always_dark: true);
-  &:hover { @include entry(hover, $c:$system_fg_color, $bc:$system_bg_color, $always_dark: true);}
-  &:focus { @include entry(focus, $c:$system_fg_color, $bc:$system_bg_color, $always_dark: true);}
-  &:insensitive { @include entry(insensitive, $c:$system_fg_color, $bc:$system_bg_color, $always_dark: true);}
-
-  StLabel.hint-text { color: transparentize($system_fg_color, 0.3);}
-}
 
 // buttons
 %system_button {

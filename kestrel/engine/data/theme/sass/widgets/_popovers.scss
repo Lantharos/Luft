@@ -16,11 +16,6 @@ $submenu_bg_color: if($variant == 'light', darken($menu_bg_color, 17%),  lighten
 .popup-menu {
   min-width: 15em;
   color: $fg_color;
-
-  //.popup-status-menu-item {font-weight: normal;  color: pink;} //dunno what that is
-  &.panel-menu {
-    margin-bottom: 1.75em; // so it doesn't touch the bottom of the screen
-  }
 }
 
 // popover content
@@ -129,20 +124,6 @@ $submenu_bg_color: if($variant == 'light', darken($menu_bg_color, 17%),  lighten
 
     .popup-separator-menu-item-separator {
       background-color: $borders_color;
-    }
-  }
-}
-
-// right-click (and panel) app menu
-.app-menu {
-  max-width: 27.25em;
-
-  .popup-inactive-menu-item:first-child {
-    // "Open Windows" label
-    > StLabel {
-      @extend %caption_heading;
-      &:ltr {margin-right: $base_margin * 2;}
-      &:rtl {margin-left: $base_margin * 2;}
     }
   }
 }

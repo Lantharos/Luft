@@ -2,8 +2,6 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import * as Config from '../misc/config.js';
-
 const SCHEME_SUFFIX = /-(light|dark)\.css$/;
 
 let _sessionMode = null;
@@ -16,8 +14,6 @@ function _sourceDirectories() {
     return [
         ...source ? [Gio.File.new_for_path(source)] : [],
         Gio.File.new_for_uri('resource:///com/lantharos/kestrel/theme'),
-        ...GLib.get_system_data_dirs().map(dir => Gio.File.new_for_path(GLib.build_filenamev([dir, Config.PACKAGE_NAME, 'theme']))),
-        Gio.File.new_for_path(`${global.datadir}/theme`),
     ];
 }
 

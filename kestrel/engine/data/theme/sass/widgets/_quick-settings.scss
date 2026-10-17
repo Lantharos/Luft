@@ -185,9 +185,6 @@ $quick_toggle_checked_separator_color: if(
   }
 }
 
-.quick-toggle-menu-container {
-}
-
 .nm-network-item {
   .wireless-icons { width: $scalable_icon_size * 1.25; }
   .wireless-secure-icon { icon-size: $scalable_icon_size * 0.5; }
@@ -208,6 +205,4 @@ $quick_toggle_checked_separator_color: if(
 
 .keyboard-brightness-level {
   spacing: $base_padding;
-
-  .button:checked { @extend %default_button; }
 }

@@ -6,6 +6,7 @@
 	type Touchpad = {
 		'send-events': string;
 		speed: number;
+		'scroll-speed': number;
 		'tap-to-click': boolean;
 		'natural-scroll': boolean;
 		'two-finger-scrolling-enabled': boolean;
@@ -17,6 +18,7 @@
 	const touchpad = useSettings<Touchpad>('org.gnome.desktop.peripherals.touchpad', [
 		'send-events',
 		'speed',
+		'scroll-speed',
 		'tap-to-click',
 		'natural-scroll',
 		'two-finger-scrolling-enabled',
@@ -24,6 +26,8 @@
 		'disable-while-typing',
 		'click-method'
 	]);
+
+	const SCROLL_SPEED_OCTAVES = 1.5;
 
 	let off = $derived(touchpad.values['send-events'] === 'disabled');
 
@@ -40,6 +44,18 @@
 	<Row title="Pointer speed" disabled={off}>
 		{#snippet below()}
 			<SpeedSlider label="Touchpad pointer speed" value={touchpad.values.speed ?? 0} disabled={off} onchange={(speed) => touchpad.set('speed', speed)} />
+		{/snippet}
+	</Row>
+	<Row title="Scrolling speed" disabled={off}>
+		{#snippet below()}
+			<SpeedSlider
+				label="Touchpad scrolling speed"
+				value={Math.log2(touchpad.values['scroll-speed'] ?? 1)}
+				min={-SCROLL_SPEED_OCTAVES}
+				max={SCROLL_SPEED_OCTAVES}
+				disabled={off}
+				onchange={(octaves) => touchpad.set('scroll-speed', 2 ** octaves)}
+			/>
 		{/snippet}
 	</Row>
 	<Row title="Tap to click" description="Tap the touchpad instead of pressing it down" disabled={off}>

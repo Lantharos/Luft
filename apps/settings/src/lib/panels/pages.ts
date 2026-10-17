@@ -48,7 +48,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 	],
 	[
 		page('keyboard', 'Keyboard', 'input-keyboard-symbolic', ['input sources', 'layout', 'shortcuts', 'repeat', 'language']),
-		page('mouse', 'Mouse & Touchpad', 'input-mouse-symbolic', ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'tap to click', 'touchpad']),
+		page('mouse', 'Mouse & Touchpad', 'input-mouse-symbolic', ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'scrolling speed', 'scroll speed', 'tap to click', 'touchpad']),
 		page('accessibility', 'Accessibility', 'preferences-desktop-accessibility-symbolic', ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'])
 	],
 	[

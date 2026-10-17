@@ -1,6 +1,6 @@
 # Luft OS
 
-How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, the USB stick that installs it, and VMs to try both. [How Luft fits together](https://docs.luft.lanth.me/developers/architecture/) explains the design, and [docs/boot.md](../docs/boot.md) how a computer starts from it.
+How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, the USB stick that installs it, and VMs to try both. [How Luft fits together](https://docs.luft.computer/developers/architecture/) explains the design, and [docs/boot.md](../docs/boot.md) how a computer starts from it.
 
 | Image | For |
 | --- | --- |
@@ -44,7 +44,7 @@ os/iso/build.sh localhost/luft:45 standard nvidia       # one image per stick
 
 It writes `os/iso/state/luft-VERSION.iso` and its `.sha256`, in a few minutes and without root. The stick starts through Fedora's signed shim and GRUB, carries its images so installing needs no network, and runs the regular desktop when you choose to just try Luft. It also starts as a DVD and from [Ventoy](https://www.ventoy.net).
 
-| Published at [get.luft.lanth.me](https://get.luft.lanth.me/luft-nightly.iso) | Carries |
+| Published at [get.luft.computer](https://get.luft.computer/luft-nightly.iso) | Carries |
 | --- | --- |
 | `luft-nightly.iso`, `luft-latest.iso` | Both images, for any computer |
 | `luft-nightly-standard.iso`, `luft-latest-standard.iso` | The image for computers without NVIDIA graphics |

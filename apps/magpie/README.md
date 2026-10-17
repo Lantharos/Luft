@@ -1,6 +1,6 @@
 # Magpie
 
-Magpie shows photos, videos, music, PDFs and fonts on Luft. Opening a file shows just that file, with the rest of its folder an arrow key away; started on its own, it browses Pictures, Videos, Music and Documents. Using it is described in [the docs](https://docs.luft.lanth.me/apps/magpie/).
+Magpie shows photos, videos, music, PDFs and fonts on Luft. Opening a file shows just that file, with the rest of its folder an arrow key away; started on its own, it browses Pictures, Videos, Music and Documents. Using it is described in [the docs](https://docs.luft.computer/apps/magpie/).
 
 ## Build and run
 

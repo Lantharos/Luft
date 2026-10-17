@@ -1,6 +1,6 @@
 # Kestrel
 
-Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Start, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.lanth.me/desktop/overview/).
+Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Start, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.computer/desktop/overview/).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="../docs/screenshots/notification-center-light.png">
@@ -24,7 +24,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 
 ## Build and run
 
-[Building Luft](https://docs.luft.lanth.me/developers/building/) sets up the dependencies and builds Kestrel into `kestrel/build`. To try it in a window:
+[Building Luft](https://docs.luft.computer/developers/building/) sets up the dependencies and builds Kestrel into `kestrel/build`. To try it in a window:
 
 ```sh
 kestrel/tools/session.sh nested
@@ -58,7 +58,7 @@ peek stop $h
 
 ## Settings
 
-Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.lanth.me/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [docs/appearance.md](../docs/appearance.md), and its own dialogs for the keyring and GnuPG in [docs/prompts.md](../docs/prompts.md).
+Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.computer/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [docs/appearance.md](../docs/appearance.md), and its own dialogs for the keyring and GnuPG in [docs/prompts.md](../docs/prompts.md).
 
 ## Session services
 

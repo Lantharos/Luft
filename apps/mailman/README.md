@@ -1,6 +1,6 @@
 # Mailman
 
-Mailman is Luft's mail app. It keeps every account, IMAP/SMTP or JMAP, in one local copy, so opening, searching and sorting mail never waits on the network. Passwords and sign-in tokens stay in Luft Keyring, readable only by Mailman. Using it is described in [the docs](https://docs.luft.lanth.me/apps/mailman/).
+Mailman is Luft's mail app. It keeps every account, IMAP/SMTP or JMAP, in one local copy, so opening, searching and sorting mail never waits on the network. Passwords and sign-in tokens stay in Luft Keyring, readable only by Mailman. Using it is described in [the docs](https://docs.luft.computer/apps/mailman/).
 
 ## Build and run
 

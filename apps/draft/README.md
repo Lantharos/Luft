@@ -1,6 +1,6 @@
 # Draft
 
-Draft is Luft's text and code editor, built on CodeMirror: syntax highlighting for over a hundred languages, multiple cursors, a command palette and a Markdown preview, with your open files and unsaved changes restored on the next start. Using it is described in [the docs](https://docs.luft.lanth.me/apps/draft/).
+Draft is Luft's text and code editor, built on CodeMirror: syntax highlighting for over a hundred languages, multiple cursors, a command palette and a Markdown preview, with your open files and unsaved changes restored on the next start. Using it is described in [the docs](https://docs.luft.computer/apps/draft/).
 
 ## Build and run
 

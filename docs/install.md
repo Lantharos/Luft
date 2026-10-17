@@ -1,6 +1,6 @@
 # How Luft installs
 
-The parts behind installing: the [Install Luft](../apps/setup/README.md) app, its `luft-installer` service and Kestrel's setup mode. The steps people go through are in [Install from a USB stick](https://docs.luft.lanth.me/start/usb-stick/).
+The parts behind installing: the [Install Luft](../apps/setup/README.md) app, its `luft-installer` service and Kestrel's setup mode. The steps people go through are in [Install from a USB stick](https://docs.luft.computer/start/usb-stick/).
 
 ## The drive layout
 

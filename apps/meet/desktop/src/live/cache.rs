@@ -116,7 +116,7 @@ mod tests {
     fn a_kept_iso_counts_only_with_the_same_checksum() {
         let folder = std::env::temp_dir().join(format!("meet-cache-{}", std::process::id()));
         fs::create_dir_all(&folder).unwrap();
-        let url = "https://get.luft.lanth.me/luft-nightly.iso";
+        let url = "https://get.luft.computer/luft-nightly.iso";
         fs::write(folder.join("luft-nightly.iso"), b"iso").unwrap();
         fs::write(
             folder.join("luft-nightly.iso.sha256"),

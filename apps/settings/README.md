@@ -1,6 +1,6 @@
 # Settings
 
-Settings is Luft's system settings app, from network and displays to security, accounts and updates. It reads and writes the same settings as the desktop, so changes made elsewhere show up right away. Every page is described in [the docs](https://docs.luft.lanth.me/apps/settings/).
+Settings is Luft's system settings app, from network and displays to security, accounts and updates. It reads and writes the same settings as the desktop, so changes made elsewhere show up right away. Every page is described in [the docs](https://docs.luft.computer/apps/settings/).
 
 ## Build and run
 

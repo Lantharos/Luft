@@ -28,9 +28,9 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 ## Get Luft
 
-- **[luft.lanth.me](https://luft.lanth.me)** shows what Luft is like, and its [download page](https://luft.lanth.me/download) has Meet Luft and the USB stick images.
-- **[docs.luft.lanth.me](https://docs.luft.lanth.me)** covers trying it, installing it and everything after.
-- **[get.luft.lanth.me](https://get.luft.lanth.me/luft-nightly.iso)** hosts the files themselves, each with a `.sha256` next to it.
+- **[luft.computer](https://luft.computer)** shows what Luft is like, and its [download page](https://luft.computer/download) has Meet Luft and the USB stick images.
+- **[docs.luft.computer](https://docs.luft.computer)** covers trying it, installing it and everything after.
+- **[get.luft.computer](https://get.luft.computer/luft-nightly.iso)** hosts the files themselves, each with a `.sha256` next to it.
 
 Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional and lets an encrypted disk unlock without a password.
 
@@ -55,7 +55,7 @@ Each folder's README says what it is and how to build it.
 
 ## Building and contributing
 
-[Building Luft](https://docs.luft.lanth.me/developers/building/) sets up a development machine and runs Kestrel in a window, the apps on their own, and the image and USB stick in VMs. [How Luft fits together](https://docs.luft.lanth.me/developers/architecture/) is the place to start reading, and [Contributing](https://docs.luft.lanth.me/developers/contributing/) covers how to send changes. Problems and ideas go in [the issues](https://github.com/Lantharos/Luft/issues).
+[Building Luft](https://docs.luft.computer/developers/building/) sets up a development machine and runs Kestrel in a window, the apps on their own, and the image and USB stick in VMs. [How Luft fits together](https://docs.luft.computer/developers/architecture/) is the place to start reading, and [Contributing](https://docs.luft.computer/developers/contributing/) covers how to send changes. Problems and ideas go in [the issues](https://github.com/Lantharos/Luft/issues).
 
 ## License and credits
 

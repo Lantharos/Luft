@@ -1,6 +1,6 @@
 # Luft docs
 
-The documentation site at [docs.luft.lanth.me](https://docs.luft.lanth.me), built with [Starlight](https://starlight.astro.build) and served from Cloudflare Workers. It shares its colours, fonts and logo with the website through [`web/shared`](../shared).
+The documentation site at [docs.luft.computer](https://docs.luft.computer), built with [Starlight](https://starlight.astro.build) and served from Cloudflare Workers. It shares its colours, fonts and logo with the website through [`web/shared`](../shared).
 
 | Path | Holds |
 | --- | --- |
@@ -25,5 +25,5 @@ Screenshots come from `kestrel/tools/session.sh capture`. Put them in `src/asset
 
 ```sh
 bunx wrangler login
-bun run deploy             # builds and deploys the luft-docs Worker on docs.luft.lanth.me
+bun run deploy             # builds and deploys the luft-docs Worker on docs.luft.computer
 ```

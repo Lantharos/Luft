@@ -2,7 +2,7 @@
 
 Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, and encrypts or decrypts disks in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except keyboards, mice and security keys.
 
-How the pieces protect the computer is in [docs/security.md](../docs/security.md), boot and recovery in [docs/boot.md](../docs/boot.md), and what people see in [Security](https://docs.luft.lanth.me/system/security/).
+How the pieces protect the computer is in [docs/security.md](../docs/security.md), boot and recovery in [docs/boot.md](../docs/boot.md), and what people see in [Security](https://docs.luft.computer/system/security/).
 
 | Crate | Builds |
 | --- | --- |

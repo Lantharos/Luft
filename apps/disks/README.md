@@ -1,6 +1,6 @@
 # Disks
 
-Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system and give Luft its space. Using it is described in [the docs](https://docs.luft.lanth.me/apps/disks/).
+Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system and give Luft its space. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
 
 Changes go through UDisks, and encryption through [trustd](../../security/README.md). Anything that erases data asks first, and the partitions the running system uses can't be changed.
 

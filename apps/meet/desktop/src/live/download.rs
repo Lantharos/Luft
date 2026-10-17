@@ -8,7 +8,7 @@ use ureq::tls::{RootCerts, TlsConfig};
 
 use luft_variant::Variant;
 
-const DOWNLOADS: &str = "https://get.luft.lanth.me";
+const DOWNLOADS: &str = "https://get.luft.computer";
 const ATTEMPTS: u32 = 6;
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
 const READ_TIMEOUT: Duration = Duration::from_secs(60);

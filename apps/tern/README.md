@@ -1,6 +1,6 @@
 # Tern
 
-Tern is Luft's terminal: tabs and split panes, jumping between prompts, a notification when a long command finishes in the background, and colors that follow the wallpaper. Using it is described in [the docs](https://docs.luft.lanth.me/apps/tern/).
+Tern is Luft's terminal: tabs and split panes, jumping between prompts, a notification when a long command finishes in the background, and colors that follow the wallpaper. Using it is described in [the docs](https://docs.luft.computer/apps/tern/).
 
 ## Build and run
 

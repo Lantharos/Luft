@@ -1,6 +1,6 @@
 # Barometer
 
-Barometer is Luft's system monitor and task manager: apps and processes with their processor, memory, disk and graphics use, and live graphs for the hardware. Kestrel opens it with `Ctrl+Shift+Esc`. Using it is described in [the docs](https://docs.luft.lanth.me/apps/barometer/).
+Barometer is Luft's system monitor and task manager: apps and processes with their processor, memory, disk and graphics use, and live graphs for the hardware. Kestrel opens it with `Ctrl+Shift+Esc`. Using it is described in [the docs](https://docs.luft.computer/apps/barometer/).
 
 ## Build and run
 

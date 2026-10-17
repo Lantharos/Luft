@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub and AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.lanth.me/apps/schelf/), and the code it shares with Settings is in [packages/software](../../packages/software/README.md).
+Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub and AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/software](../../packages/software/README.md).
 
 | Source | Installed for |
 |--------|---------------|

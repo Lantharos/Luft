@@ -1,6 +1,6 @@
 # Luft website
 
-The site at [luft.lanth.me](https://luft.lanth.me): the home page and downloads. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
+The site at [luft.computer](https://luft.computer): the home page and downloads. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
 
 ## Run it
 
@@ -13,7 +13,7 @@ bun run preview      # build, then serve dist/ the way Cloudflare does
 bun run check        # type checks
 ```
 
-Download sizes on the download page are read from get.luft.lanth.me while building, and the ISO links switch from the nightly builds to `luft-latest*.iso` once a release is published there. Rebuild after a release to pick it up.
+Download sizes on the download page are read from get.luft.computer while building, and the ISO links switch from the nightly builds to `luft-latest*.iso` once a release is published there. Rebuild after a release to pick it up.
 
 ## Deploy
 
@@ -21,7 +21,7 @@ The site is a Cloudflare Worker that only serves the files in `dist/` ([`wrangle
 
 ```sh
 bunx wrangler login
-bun run deploy       # builds, then uploads dist/ to luft.lanth.me
+bun run deploy       # builds, then uploads dist/ to luft.computer
 ```
 
 ## Pictures and clips

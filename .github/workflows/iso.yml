@@ -36,7 +36,7 @@ jobs:
       version: ${{ steps.channel.outputs.version }}
       skip: ${{ steps.channel.outputs.skip }}
     env:
-      DOWNLOADS: https://get.luft.lanth.me
+      DOWNLOADS: https://get.luft.computer
       LUFT_ISO: ${{ github.workspace }}/iso
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}

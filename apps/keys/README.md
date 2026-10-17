@@ -1,6 +1,6 @@
 # Keys
 
-Keys makes your own keyboard layouts, dead keys and input methods for Luft, and imports and exports them in the usual formats. Using it is described in [the docs](https://docs.luft.lanth.me/apps/keys/).
+Keys makes your own keyboard layouts, dead keys and input methods for Luft, and imports and exports them in the usual formats. Using it is described in [the docs](https://docs.luft.computer/apps/keys/).
 
 ## Build and run
 

@@ -1,6 +1,6 @@
 # Testing on real hardware
 
-What to try when Luft goes on a new computer. Use [luft-nightly.iso](https://get.luft.lanth.me/luft-nightly.iso) for the newest build, or [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso) for the last release. Write down the computer's model, its graphics, and whether Windows is on it.
+What to try when Luft goes on a new computer. Use [luft-nightly.iso](https://get.luft.computer/luft-nightly.iso) for the newest build, or [luft-latest.iso](https://get.luft.computer/luft-latest.iso) for the last release. Write down the computer's model, its graphics, and whether Windows is on it.
 
 ## Installing
 

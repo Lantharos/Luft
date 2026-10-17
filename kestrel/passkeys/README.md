@@ -13,7 +13,7 @@ Browsers see Luft Passkeys as a USB security key, so Chrome, Chromium-based brow
 | Luft Keyring | you | Keeps passkeys in its Passkeys collection and makes every signature |
 | Kestrel | you | Shows the prompt; `kestrel-authenticate` checks the fingerprint or password |
 
-Private keys are made inside the TPM when there is one, and passkeys stay bound to the computer. Browsers treat it as a security key, so they don't offer passkeys in autofill until the [Credentials portal](https://github.com/flatpak/xdg-desktop-portal/pull/1889) lands. Using it is described in [Keyring and passkeys](https://docs.luft.lanth.me/files/keyring-and-passkeys/).
+Private keys are made inside the TPM when there is one, and passkeys stay bound to the computer. Browsers treat it as a security key, so they don't offer passkeys in autofill until the [Credentials portal](https://github.com/flatpak/xdg-desktop-portal/pull/1889) lands. Using it is described in [Keyring and passkeys](https://docs.luft.computer/files/keyring-and-passkeys/).
 
 ## Install
 

@@ -1,7 +1,7 @@
 export const urls = {
-	site: 'https://luft.lanth.me',
-	docs: 'https://docs.luft.lanth.me',
-	downloads: 'https://get.luft.lanth.me',
+	site: 'https://luft.computer',
+	docs: 'https://docs.luft.computer',
+	downloads: 'https://get.luft.computer',
 	source: 'https://github.com/Lantharos/Luft'
 } as const;
 

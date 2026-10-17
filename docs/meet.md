@@ -8,7 +8,7 @@ Meet Luft only downloads the image the computer needs: `luft-latest-nvidia.iso` 
 
 ## On Windows
 
-The steps people see are in [Try Luft with Meet Luft](https://docs.luft.lanth.me/start/meet-luft/). Underneath:
+The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer/start/meet-luft/). Underneath:
 
 - Windows shrinks its own partition through its storage service, as Disk Management does, so it works with BitLocker on. Luft's room and Meet Luft's partitions go right after Windows, in front of a recovery partition at the end of the drive.
 - The download is checked against its `.sha256`, and the live system is copied out of the ISO as it arrives.
@@ -108,7 +108,7 @@ Nothing is repartitioned. Meet Luft keeps the live system as files in a folder, 
 
 Secure Boot can stay on: Luft starts through Fedora's shim and GRUB, like the stick. Luft's own key is only added when it's installed, with the usual blue screen at its first start.
 
-*Luft is ready* offers *Try Luft*, *Replace* and *Install Luft*; [Try Luft with Meet Luft](https://docs.luft.lanth.me/start/meet-luft/#on-linux) describes them.
+*Luft is ready* offers *Try Luft*, *Replace* and *Install Luft*; [Try Luft with Meet Luft](https://docs.luft.computer/start/meet-luft/#on-linux) describes them.
 
 *Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. After Luft is installed and you sign in for the first time, it removes them itself.
 

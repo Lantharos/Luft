@@ -2,7 +2,7 @@
 
 ![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
 
-Meet Luft is an app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, makes room next to the system already there, and restarts into Luft once to try it, install it or, on Linux, replace the old system and keep your files. It can also make a USB stick, and take everything back out again. Using it is described in [the docs](https://docs.luft.lanth.me/start/meet-luft/), and how it works in [docs/meet.md](../../docs/meet.md).
+Meet Luft is an app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, makes room next to the system already there, and restarts into Luft once to try it, install it or, on Linux, replace the old system and keep your files. It can also make a USB stick, and take everything back out again. Using it is described in [the docs](https://docs.luft.computer/start/meet-luft/), and how it works in [docs/meet.md](../../docs/meet.md).
 
 ## Parts
 
@@ -25,7 +25,7 @@ cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Car
 sabine bundle . --target appimage --release                                               # Linux, needs appimagetool
 ```
 
-To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds the Windows setup program and the AppImage and publishes them to get.luft.lanth.me.
+To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds the Windows setup program and the AppImage and publishes them to get.luft.computer.
 
 `--nightly`, or Ctrl+Shift+N in the app, uses nightly builds instead of releases. Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip.
 

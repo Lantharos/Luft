@@ -1,6 +1,6 @@
 # Cloud drives
 
-How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.lanth.me/files/cloud-drives/), and the service itself in [packages/accounts](../packages/accounts/README.md).
+How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.computer/files/cloud-drives/), and the service itself in [packages/accounts](../packages/accounts/README.md).
 
 ## Where things are
 

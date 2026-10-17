@@ -70,11 +70,3 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 		</div>
 	</div>
 </section>
-
-{
-	iso.channel === 'nightly' && (
-		<p class="page reveal -mt-6 pb-8 text-sm text-ink-muted">
-			These are nightly builds, made whenever Luft changes, and computers installed from them keep getting nightly updates. The first release, Alizé, follows once Luft is stable.
-		</p>
-	)
-}

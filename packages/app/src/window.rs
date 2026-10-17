@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use crate::bridge::events::Events;
 use crate::desktop::palette::{self, Palette};
-use crate::desktop::{self, typography::Typography};
+use crate::desktop::{self, motion::Motion, typography::Typography};
 
 const WINDOW_RADIUS: i32 = 16;
 const CONTROL_SIZE: i32 = 28;
@@ -77,6 +77,7 @@ impl GlassWindow<'_> {
 pub struct Appearance {
     palette: Option<Palette>,
     typography: Typography,
+    motion: Motion,
 }
 
 impl Appearance {
@@ -84,6 +85,7 @@ impl Appearance {
         Self {
             palette: palette::palette().await,
             typography: Typography::current().await,
+            motion: Motion::current().await,
         }
     }
 }

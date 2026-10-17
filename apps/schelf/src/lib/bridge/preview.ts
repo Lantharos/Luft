@@ -116,6 +116,7 @@ export const preview: Backend = {
 	appState: async () => ({
 		palette: null,
 		typography: { interface: null, monospace: null, textScale: 1 },
+		motion: 'full',
 		files: parameters.getAll('file'),
 		page: parameters.get('page'),
 		system: image ? 'image' : 'packages'

@@ -29,7 +29,7 @@ function list(path: string): Entry[] {
 const idle = () => () => {};
 
 export const sample: Backend = {
-	appState: async () => ({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, home: SAMPLE_HOME, backups: '/tmp/draft', folders: launchFile ? [] : [SAMPLE_FOLDER] }),
+	appState: async () => ({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', home: SAMPLE_HOME, backups: '/tmp/draft', folders: launchFile ? [] : [SAMPLE_FOLDER] }),
 	activationFolders: async () => [],
 	readStore: async () => null,
 	writeStore: async () => {},

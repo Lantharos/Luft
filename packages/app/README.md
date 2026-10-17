@@ -32,7 +32,7 @@ pub fn run_app() -> ! {
 - `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` connects `Events` to the page and watches Kestrel's palette and the desktop's fonts. The last closure runs at the same point, for the app's own watchers.
 
-Flatten `Appearance` into the app's startup state so the page gets the palette and fonts. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette` and `appearance.typography` events after that:
+Flatten `Appearance` into the app's startup state so the page gets the palette, fonts and motion preference. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette`, `appearance.typography` and `appearance.motion` events after that:
 
 ```rust
 #[derive(Serialize)]

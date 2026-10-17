@@ -11,16 +11,20 @@
 
 	type Interface = {
 		'text-scaling-factor': number;
-		'enable-animations': boolean;
 		'cursor-size': number;
+	};
+
+	type A11yInterface = {
+		'high-contrast': boolean;
+		'reduced-motion': 'no-preference' | 'reduce';
 	};
 
 	const LARGE_TEXT = 1.25;
 
 	const applications = useSettings<Applications>('org.gnome.desktop.a11y.applications', ['screen-reader-enabled', 'screen-magnifier-enabled']);
 	const magnifier = useSettings<{ 'mag-factor': number }>('org.gnome.desktop.a11y.magnifier', ['mag-factor']);
-	const contrast = useSettings<{ 'high-contrast': boolean }>('org.gnome.desktop.a11y.interface', ['high-contrast']);
-	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'enable-animations', 'cursor-size']);
+	const a11y = useSettings<A11yInterface>('org.gnome.desktop.a11y.interface', ['high-contrast', 'reduced-motion']);
+	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'cursor-size']);
 
 	let readerInstalled = $state(false);
 	let zoomed = $derived(applications.values['screen-magnifier-enabled'] ?? false);
@@ -67,13 +71,13 @@
 		/>
 	</Row>
 	<Row title="High contrast">
-		<Switch label="High contrast" checked={contrast.values['high-contrast'] ?? false} onchange={(on) => contrast.set('high-contrast', on)} />
+		<Switch label="High contrast" checked={a11y.values['high-contrast'] ?? false} onchange={(on) => a11y.set('high-contrast', on)} />
 	</Row>
-	<Row title="Reduce animations">
+	<Row title="Reduce motion" description="Fade instead of sliding and zooming">
 		<Switch
-			label="Reduce animations"
-			checked={!(desktop.values['enable-animations'] ?? true)}
-			onchange={(on) => desktop.set('enable-animations', !on)}
+			label="Reduce motion"
+			checked={a11y.values['reduced-motion'] === 'reduce'}
+			onchange={(on) => a11y.set('reduced-motion', on ? 'reduce' : 'no-preference')}
 		/>
 	</Row>
 	<Row title="Cursor size">

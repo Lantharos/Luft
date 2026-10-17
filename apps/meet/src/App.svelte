@@ -32,7 +32,7 @@
 
 	onMount(() => {
 		if (!isAvailable()) return;
-		const stops = [appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 } }), session.listen()];
+		const stops = [appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full' }), session.listen()];
 		return () => stops.forEach((stop) => stop());
 	});
 

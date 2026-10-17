@@ -1,3 +1,4 @@
+pub mod motion;
 pub mod palette;
 pub mod typography;
 
@@ -41,6 +42,9 @@ pub async fn watch(events: Events) {
                 typography::TYPOGRAPHY_CHANGED,
                 typography::Typography::read(&proxy).await,
             );
+        }
+        if motion::changed(&namespace, &key) {
+            events.emit(motion::MOTION_CHANGED, motion::Motion::read(&proxy).await);
         }
     }
 }

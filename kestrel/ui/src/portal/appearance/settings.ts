@@ -53,7 +53,11 @@ export class SettingsPortal {
       settings.connect('changed', (_settings, key) => this.changed(id, key));
       this.schemas.set(id, settings);
     }
-    this.shell.connect('notify::enable-animations', () => this.emitValue(INTERFACE, 'enable-animations'));
+    this.shell.connect('notify::enable-animations', () => {
+      this.emitValue(INTERFACE, 'enable-animations');
+      this.emitValue(APPEARANCE, 'reduced-motion');
+    });
+    this.shell.connect('notify::reduced-motion', () => this.emitValue(APPEARANCE, 'reduced-motion'));
   }
 
   setAccent(accent: Rgb): void {
@@ -97,13 +101,17 @@ export class SettingsPortal {
     const values: Namespace = {
       'color-scheme': new GLib.Variant('u', COLOR_SCHEMES[interfaceSettings.get_string('color-scheme')] ?? 0),
       'contrast': new GLib.Variant('u', this.highContrast() ? 1 : 0),
-      'reduced-motion': new GLib.Variant('u', interfaceSettings.get_boolean('enable-animations') ? 0 : 1),
+      'reduced-motion': new GLib.Variant('u', this.reducedMotion() ? 1 : 0),
     };
     if (this.accent) {
       const [red, green, blue] = this.accent;
       values['accent-color'] = new GLib.Variant('(ddd)', [red / 255, green / 255, blue / 255]);
     }
     return values;
+  }
+
+  private reducedMotion(): boolean {
+    return !this.shell.enable_animations || this.shell.reduced_motion === St.ReducedMotion.REDUCE;
   }
 
   private highContrast(): boolean {
@@ -113,7 +121,6 @@ export class SettingsPortal {
   private changed(namespace: string, key: string): void {
     if (namespace !== INTERFACE || key !== 'enable-animations') this.emitValue(namespace, key);
     if (namespace === INTERFACE && key === 'color-scheme') this.emitValue(APPEARANCE, 'color-scheme');
-    if (namespace === INTERFACE && key === 'enable-animations') this.emitValue(APPEARANCE, 'reduced-motion');
     if (namespace === A11Y_INTERFACE && key === 'high-contrast') {
       this.emitValue(APPEARANCE, 'contrast');
       this.emitValue(INTERFACE, 'gtk-theme');

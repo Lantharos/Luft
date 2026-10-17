@@ -1,7 +1,10 @@
 import { events, listen, system } from '@lantharos/sabine';
 
+import type { MotionPreference } from './motion';
+
 const PALETTE_CHANGED = 'kestrel.palette';
 const TYPOGRAPHY_CHANGED = 'appearance.typography';
+const MOTION_CHANGED = 'appearance.motion';
 const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
 const MONO = "'Maple Mono NF', ui-monospace, monospace";
 
@@ -49,6 +52,7 @@ export interface Typography {
 export interface Appearance {
 	palette: Palette | null;
 	typography: Typography;
+	motion: MotionPreference;
 }
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -64,6 +68,7 @@ class AppearanceState {
 	terminal = $state<SchemeColors>({ light: {}, dark: {} });
 	appIcons = $state<AppIcons | null>(null);
 	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
+	motion = $state<MotionPreference>('full');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
@@ -71,13 +76,20 @@ class AppearanceState {
 		this.translucent = true;
 		if (initial.palette) this.receive(initial.palette);
 		this.type(initial.typography);
+		this.move(initial.motion);
 		const stops = [
 			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
 			events.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
-			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography))
+			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography)),
+			listen<MotionPreference>(MOTION_CHANGED, (motion) => this.move(motion))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
+	}
+
+	private move(motion: MotionPreference) {
+		this.motion = motion;
+		document.documentElement.dataset.motion = motion;
 	}
 
 	private type(typography: Typography) {

@@ -49,7 +49,7 @@
 	}
 }
 
-@media (prefers-reduced-motion: reduce) {
+:root[data-motion='off'] {
 	*,
 	::before,
 	::after {

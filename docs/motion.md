@@ -155,3 +155,12 @@ Toasts go through `Toast` and a `Toasts` store, which shows one toast at a time,
 Swiping between workspaces with three fingers follows the fingers: a swipe across about two thirds of the touchpad moves one workspace, using the touchpad's real size when it reports one. Past the first and last workspace the desktop resists and springs back. On release, the speed of the swipe decides where it lands, so a quick flick moves on even if it was short, and a fast one can cross several workspaces. The settle starts at the speed the fingers had. Scrolling with two fingers while holding Super works the same way.
 
 Keyboard switches, Super and the wheel, and swipes all drive the same spring, so pressing Super+3 while a switch to the second workspace is still under way carries on across, and reversing turns around where the desktop is. Minimising a window and restoring it, or opening and closing Start, Quick settings, the notification center or the task view, also turn around from wherever they are.
+
+## Reduced motion
+
+Settings has two separate choices:
+
+- **Appearance → Animations** turns animation off entirely. Everything changes at once.
+- **Accessibility → Reduce motion** keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and gestures still follow the fingers and settle.
+
+Kestrel reads them from `org.gnome.desktop.interface enable-animations` and `org.gnome.desktop.a11y.interface reduced-motion`, and its settings portal reports either as reduced motion to other apps. In Kestrel, workspace switches become a crossfade and surfaces fade in place. The apps see them as `data-motion="off"` or `data-motion="reduced"` on the root element, and `motionPreference()` returns `full`, `reduced` or `off`. `SpringValue` changes at once under reduced motion unless it settles a gesture.

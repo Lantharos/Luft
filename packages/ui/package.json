@@ -18,7 +18,7 @@
 		"./tsconfig.base.json": "./tsconfig.base.json"
 	},
 	"scripts": {
-		"check": "svelte-check --tsgo --tsconfig ./tsconfig.json"
+		"check": "bun ../motion/generate.ts --check && svelte-check --tsgo --tsconfig ./tsconfig.json"
 	},
 	"dependencies": {
 		"@codemirror/lang-html": "^6.4.12",

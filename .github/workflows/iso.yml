@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   build:
+    name: ISO ${{ matrix.edition }}
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -27,6 +28,13 @@ jobs:
         github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch'))
     runs-on: ubuntu-24.04
     timeout-minutes: 120
+    strategy:
+      matrix:
+        edition: [universal, standard, nvidia]
+    outputs:
+      channel: ${{ steps.channel.outputs.channel }}
+      version: ${{ steps.channel.outputs.version }}
+      skip: ${{ steps.channel.outputs.skip }}
     env:
       DOWNLOADS: https://get.luft.lanth.me
       LUFT_ISO: ${{ github.workspace }}/iso
@@ -47,7 +55,9 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Image and channel
+        id: channel
         env:
+          EDITION: ${{ matrix.edition }}
           CHOSEN: ${{ inputs.image }}
           RUN_EVENT: ${{ github.event.workflow_run.event }}
           RUN_TAG: ${{ github.event.workflow_run.head_branch }}
@@ -61,21 +71,25 @@ jobs:
           fi
           version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$image")"
           if [[ "$version" == *-nightly ]]; then channel=nightly; else channel=latest; fi
+          if [[ "$EDITION" == universal ]]; then iso="luft-$version.iso"; else iso="luft-$version-$EDITION.iso"; fi
           if [[ "$channel" == nightly ]]; then published="$(curl -sf "$DOWNLOADS/luft-nightly.version" || true)"
-          elif curl -sfIo /dev/null "$DOWNLOADS/luft-$version.iso"; then published="$version"; fi
+          elif curl -sfIo /dev/null "$DOWNLOADS/$iso"; then published="$version"; fi
           if [[ "$GITHUB_EVENT_NAME" == workflow_run && "${published:-}" == "$version" ]]; then
-            echo "luft-$version.iso is already published."
+            echo "$iso is already published."
             echo "SKIP=1" >> "$GITHUB_ENV"
+            echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
           echo "IMAGE=$image" >> "$GITHUB_ENV"
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "CHANNEL=$channel" >> "$GITHUB_ENV"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
 
       - name: Build
         if: env.SKIP != '1'
         run: |
           mkdir -p "$LUFT_ISO"
-          os/iso/build.sh "$IMAGE" universal standard nvidia
+          os/iso/build.sh "$IMAGE" "${{ matrix.edition }}"
           ls -l "$LUFT_ISO"
 
       - name: Upload to R2
@@ -88,25 +102,42 @@ jobs:
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
           cd "$LUFT_ISO"
           s3() { aws s3 "$@" --endpoint-url "$endpoint" --no-progress; }
-          for iso in luft-*.iso; do
-            if [[ "$CHANNEL" == latest ]]; then
-              s3 cp "$iso" "s3://$R2_BUCKET/$iso"
-              s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
-            fi
-            alias="luft-$CHANNEL${iso#luft-"$VERSION"}"
-            s3 cp "$iso" "s3://$R2_BUCKET/$alias"
-            sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
-          done
-          if [[ "$CHANNEL" == nightly ]]; then
-            echo "$VERSION" | s3 cp - "s3://$R2_BUCKET/luft-nightly.version"
-            aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256'
+          iso="$(ls luft-*.iso)"
+          if [[ "$CHANNEL" == latest ]]; then
+            s3 cp "$iso" "s3://$R2_BUCKET/$iso"
+            s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
           fi
+          alias="luft-$CHANNEL${iso#luft-"$VERSION"}"
+          s3 cp "$iso" "s3://$R2_BUCKET/$alias"
+          sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
 
       - name: Keep as a workflow artifact
         if: env.SKIP != '1' && (env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == '')
         uses: actions/upload-artifact@v7
         with:
-          name: luft-iso
+          name: luft-iso-${{ matrix.edition }}
           path: ${{ env.LUFT_ISO }}/luft-*
           compression-level: 0
           retention-days: 14
+
+  nightly:
+    name: Nightly version
+    needs: build
+    if: needs.build.outputs.channel == 'nightly' && needs.build.outputs.skip != '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - name: Publish the version once every stick is up
+        if: env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          echo "$VERSION" | aws s3 cp - "s3://$R2_BUCKET/luft-nightly.version" --endpoint-url "$endpoint" --no-progress
+          aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256'

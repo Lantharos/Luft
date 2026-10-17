@@ -154,7 +154,7 @@ class Morph {
         });
         snapshot.actor.ease({
             opacity: 0,
-            duration: Duration.tap,
+            duration: Duration.quick,
             mode: Clutter.AnimationMode.LINEAR,
         });
 

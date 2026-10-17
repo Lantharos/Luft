@@ -74,7 +74,7 @@ actor.ease({translation_x: target, spring: Spring.smooth, velocity: releaseSpeed
 
 - A window opens once its first frame has been drawn: it fades in over `quick` with `decelerate` while it grows from 94% and rises 8 px on `snappy`. Dialogs start at 96% without the rise.
 - Closing fades it out over `quick` and shrinks it to 95% on `snappy`, staying above the window that takes focus.
-- Maximizing, restoring, snapping, Snap Layouts and corner snaps move the window on `smooth` from the moment they start. A picture of the window that keeps its corners and title bar ends unstretched leads until the app has drawn its new size, then crossfades to the live window over `tap`.
+- Maximizing, restoring, snapping, Snap Layouts and corner snaps move the window on `smooth` from the moment they start. A picture of the window that keeps its corners and title bar ends unstretched leads until the app has drawn its new size, then crossfades to the live window over `quick`.
 - Work that follows a window opening or closing, such as refreshing the taskbar, waits for the motion to end: pass it to `afterMotion()` from `kestrel/ui/src/shared/afterMotion.ts`.
 
 ## In the apps

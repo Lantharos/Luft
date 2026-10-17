@@ -764,6 +764,8 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
 
           background_changed |= backdrop != self->last_backdrop;
           g_set_object (&self->last_backdrop, backdrop);
+          if (!clutter_paint_context_get_stage_view (paint_context))
+            g_hash_table_remove (self->backdrops, NULL);
         }
 
       if (needs_repaint (self, flags, background_changed))

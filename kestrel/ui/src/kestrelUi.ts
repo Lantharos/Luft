@@ -29,6 +29,7 @@ import { EmojiPanel } from './surfaces/emoji/panel.js';
 import { NotificationCenter } from './surfaces/notifications/notificationCenter.js';
 import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
 import { StartMenu } from './surfaces/start/startMenu.js';
+import { paintHidden, prewarmAfterStartup } from './surfaces/prewarm.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
@@ -188,6 +189,15 @@ class KestrelUi {
     });
     place();
     this.syncSession();
+    this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
+      () => start.reset(),
+      () => paintHidden(start.actor, start.search),
+      () => paintHidden(this.quick.actor, this.quick.actor),
+      () => paintHidden(notifications.actor, notifications.actor),
+      () => emoji.prewarm(),
+      () => paintHidden(emoji.actor),
+      () => this.taskView.prewarm(context.layoutManager.primaryMonitor!),
+    ]));
   }
 
   get appearance(): AppearanceService {

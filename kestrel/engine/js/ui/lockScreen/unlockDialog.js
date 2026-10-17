@@ -13,13 +13,25 @@ import {Authentication} from '../../auth/authentication.js';
 import {AuthPrompt} from '../../auth/authPrompt.js';
 import {FingerprintAuthentication} from '../../auth/fingerprint.js';
 import {connectAuthenticator} from '../../auth/greetd.js';
+import * as Signals from '../../misc/signals.js';
 import {LockBackdrop} from './backdrop.js';
 import {Clock} from './clock.js';
 import {NotificationsBox} from './notifications.js';
 import {LockPages} from './pages.js';
 
 const IDLE_TIMEOUT = 2 * 60;
+const PASSWORD_QUESTION = 'Password: ';
 const FIXED_PROMPT_HEIGHT = 550;
+
+class RehearsedAuthentication extends Signals.EventEmitter {
+    begin() {
+        this.emit('question', PASSWORD_QUESTION, true);
+    }
+
+    answer() {}
+
+    cancel() {}
+}
 
 const UnlockDialogLayout = GObject.registerClass(
 class UnlockDialogLayout extends Clutter.LayoutManager {
@@ -138,7 +150,54 @@ export const UnlockDialog = GObject.registerClass({
                 this._authPrompt.cancel();
         });
 
+        this._prewarmId = 0;
+        Main.screenShield.connectObject('lock-screen-shown', () => this._schedulePrewarm(), this);
+
         this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _schedulePrewarm() {
+        if (!this._prewarmId)
+            this._prewarmLater(() => this._prewarmPrompt());
+    }
+
+    _prewarmLater(step) {
+        this._prewarmId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+            this._prewarmId = 0;
+            step();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _prewarmPrompt() {
+        if (this._authPrompt)
+            return;
+        const prompt = new AuthPrompt(new RehearsedAuthentication());
+        prompt.setUser(this._user);
+        this._promptBox.add_child(prompt);
+        this._keepingFocus(() => prompt.begin(this._userName));
+        const pages = [this._promptBox, this._controls.actor];
+        for (const page of pages) {
+            Shell.util_set_hidden_from_pick(page, true);
+            page.show();
+        }
+        this._prewarmLater(() => {
+            this._keepingFocus(() => {
+                prompt.focus();
+                pages.forEach(page => Shell.util_paint_offscreen(page));
+            });
+            for (const page of pages) {
+                Shell.util_set_hidden_from_pick(page, false);
+                page.visible = page.opacity > 0;
+            }
+            prompt.destroy();
+        });
+    }
+
+    _keepingFocus(callback) {
+        const focus = global.stage.key_focus;
+        callback();
+        global.stage.set_key_focus(focus);
     }
 
     _ensureAuthPrompt() {
@@ -177,6 +236,8 @@ export const UnlockDialog = GObject.registerClass({
     }
 
     _onDestroy() {
+        if (this._prewarmId)
+            GLib.Source.remove(this._prewarmId);
         this.popModal();
         this._controls.destroy();
         this._idleMonitor.remove_watch(this._idleWatchId);

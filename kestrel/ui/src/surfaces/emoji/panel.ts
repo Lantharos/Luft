@@ -23,7 +23,6 @@ const ZONES: readonly Zone[] = ['grid', 'tone', 'tabs'];
 const PREFERRED_HEIGHT = 452;
 const SLIDE_DISTANCE = 8;
 const FADE_DURATION = 160;
-const INDEX_DELAY_SECONDS = 5;
 const INDEX_CHUNK = 500;
 const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
 const NAVIGATION_KEYS = [
@@ -58,7 +57,7 @@ export class EmojiPanel {
   private anchor: Anchor | null = null;
   private above = false;
   private focusWatch = 0;
-  private indexing: number;
+  private indexing = 0;
 
   constructor(private readonly input: TextInput, private readonly close: () => void, private readonly paste: (text: string) => void) {
     blurSurface(this.actor);
@@ -72,11 +71,6 @@ export class EmojiPanel {
         this.updateFooter();
       }
       return Clutter.EVENT_PROPAGATE;
-    });
-    this.indexing = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, INDEX_DELAY_SECONDS, () => {
-      this.indexing = 0;
-      this.prepare();
-      return GLib.SOURCE_REMOVE;
     });
     this.actor.connect('destroy', () => {
       if (this.indexing) GLib.Source.remove(this.indexing);
@@ -101,6 +95,11 @@ export class EmojiPanel {
     this.above = above;
     this.actor.set_size(width, height);
     this.actor.set_position(x, y);
+  }
+
+  prewarm(): void {
+    this.prepare();
+    if (!this.anchor) this.actor.set_size(GRID_WIDTH + this.actor.get_theme_node().get_horizontal_padding(), PREFERRED_HEIGHT);
   }
 
   open(): void {
@@ -135,8 +134,6 @@ export class EmojiPanel {
 
   private prepare(): void {
     if (this.catalog) return;
-    if (this.indexing) GLib.Source.remove(this.indexing);
-    this.indexing = 0;
     const catalog = this.catalog = new Catalog();
     annotate(catalog);
     const index = this.index = new SearchIndex(catalog.items);

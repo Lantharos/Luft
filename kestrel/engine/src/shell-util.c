@@ -62,6 +62,75 @@ shell_util_set_hidden_from_pick (ClutterActor *actor,
 }
 
 /**
+ * shell_util_paint_offscreen:
+ * @actor: A #ClutterActor whose parent is mapped
+ *
+ * Shows @actor if it is hidden, paints it once into a scratch framebuffer and
+ * hides it again, all before the next frame. Its styles, text layouts,
+ * glyphs, icons, shaders and effect buffers are then ready the first time it
+ * appears on screen.
+ */
+void
+shell_util_paint_offscreen (ClutterActor *actor)
+{
+  ClutterContext *context = clutter_actor_get_context (actor);
+  CoglContext *cogl_context =
+    clutter_backend_get_cogl_context (clutter_context_get_backend (context));
+  gboolean was_visible = clutter_actor_is_visible (actor);
+  float resource_scale;
+  ClutterActorBox box;
+  graphene_matrix_t transform, inverse;
+  g_autoptr (CoglTexture) texture = NULL;
+  g_autoptr (CoglOffscreen) offscreen = NULL;
+  CoglFramebuffer *framebuffer;
+  ClutterColorState *color_state;
+  ClutterPaintContext *paint_context;
+  int opacity_override;
+  int width, height;
+
+  clutter_actor_show (actor);
+  if (!clutter_actor_is_mapped (actor))
+    goto out;
+
+  clutter_actor_get_allocation_box (actor, &box);
+  resource_scale = clutter_actor_get_resource_scale (actor);
+  width = ceilf (clutter_actor_box_get_width (&box) * resource_scale);
+  height = ceilf (clutter_actor_box_get_height (&box) * resource_scale);
+  if (width <= 0 || height <= 0)
+    goto out;
+
+  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
+  offscreen = cogl_offscreen_new_with_texture (texture);
+  framebuffer = COGL_FRAMEBUFFER (offscreen);
+  if (!cogl_framebuffer_allocate (framebuffer, NULL))
+    goto out;
+
+  clutter_actor_get_transform (actor, &transform);
+  if (!graphene_matrix_inverse (&transform, &inverse))
+    goto out;
+
+  cogl_framebuffer_orthographic (framebuffer, 0, 0, width, height, 0, 1.0);
+  cogl_framebuffer_scale (framebuffer, resource_scale, resource_scale, 1);
+  cogl_framebuffer_transform (framebuffer, &inverse);
+
+  opacity_override = clutter_actor_get_opacity_override (actor);
+  clutter_actor_set_opacity_override (actor, 255);
+  color_state = clutter_actor_get_color_state (actor);
+  paint_context = clutter_paint_context_new_for_framebuffer (framebuffer, NULL,
+                                                             CLUTTER_PAINT_FLAG_NONE,
+                                                             color_state);
+  clutter_paint_context_push_color_state (paint_context, color_state);
+  clutter_actor_paint (actor, paint_context);
+  clutter_paint_context_pop_color_state (paint_context);
+  clutter_paint_context_destroy (paint_context);
+  clutter_actor_set_opacity_override (actor, opacity_override);
+
+out:
+  if (!was_visible)
+    clutter_actor_hide (actor);
+}
+
+/**
  * shell_util_get_week_start:
  * @locale: A locale such as "de_DE" or "en-US"
  *

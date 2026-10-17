@@ -8,6 +8,7 @@ import St from 'gi://St';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface } from '../../shared/surface.js';
+import { paintHidden } from '../../surfaces/prewarm.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
 import { WorkspaceStrip, type BackgroundFactory, type BoardFrames } from './workspaceStrip.js';
@@ -42,9 +43,7 @@ export class TaskView {
   }
 
   open(monitor: Monitor): void {
-    this.monitor = monitor;
-    this.actor.set_position(monitor.x, monitor.y);
-    this.actor.set_size(monitor.width, monitor.height);
+    this.cover(monitor);
     const shell = global as unknown as Shell.Global;
     const manager = shell.workspace_manager;
     const rebuild = () => this.scheduleRebuild();
@@ -65,6 +64,20 @@ export class TaskView {
     animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
     this.scaleWindows(1);
     this.actor.grab_key_focus();
+  }
+
+  prewarm(monitor: Monitor): void {
+    if (this.monitor) return;
+    if (!this.activeWindows().length) {
+      this.prewarmOnceWindowShows(monitor);
+      return;
+    }
+    this.cover(monitor);
+    this.rebuild();
+    this.monitor = null;
+    paintHidden(this.actor, this.actor);
+    this.clearCards();
+    this.strip.clear();
   }
 
   close(immediate = false): void {
@@ -93,6 +106,32 @@ export class TaskView {
     animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.snappy });
   }
 
+  private prewarmOnceWindowShows(monitor: Monitor): void {
+    const wm = (global as unknown as Shell.Global).window_manager;
+    const mapped = wm.connect('map', (_wm, actor: Meta.WindowActor) => {
+      wm.disconnect(mapped);
+      const shown = actor.connect('effects-completed', () => {
+        actor.disconnect(shown);
+        GLib.idle_add(GLib.PRIORITY_LOW, () => {
+          this.prewarm(monitor);
+          return GLib.SOURCE_REMOVE;
+        });
+      });
+    });
+  }
+
+  private activeWindows(): Meta.Window[] {
+    const shell = global as unknown as Shell.Global;
+    const workspace = shell.workspace_manager.get_active_workspace();
+    return shell.display.get_tab_list(Meta.TabList.NORMAL, workspace).filter(window => window.located_on_workspace(workspace));
+  }
+
+  private cover(monitor: Monitor): void {
+    this.monitor = monitor;
+    this.actor.set_position(monitor.x, monitor.y);
+    this.actor.set_size(monitor.width, monitor.height);
+  }
+
   private scheduleRebuild(): void {
     if (this.rebuildSource) return;
     this.rebuildSource = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -114,8 +153,7 @@ export class TaskView {
     const focusedWindow = this.cards.find(card => card.actor === focused)?.window;
     const focusInside = !!focused && this.actor.contains(focused);
     this.clearCards();
-    const workspace = shell.workspace_manager.get_active_workspace();
-    const windows = shell.display.get_tab_list(Meta.TabList.NORMAL, workspace).filter(window => window.located_on_workspace(workspace));
+    const windows = this.activeWindows();
     this.cards = windows.map(window => new WindowCard(window, () => {
       this.dismiss();
       this.activateWindow(window);

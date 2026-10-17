@@ -2,9 +2,9 @@
 	import { ago, bytes, Section } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bridge/types.js';
 	import { updateJob } from '#lib/app/jobs.js';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
-	import { system } from '#lib/state/system.svelte.js';
 	import UpdateRow from './UpdateRow.svelte';
 
 	const updates = $derived(library.updates?.apps ?? []);
@@ -47,7 +47,7 @@
 					{#if library.error}
 						{library.error}
 					{:else if library.checking}
-						{system.image ? 'Looking at Flathub, your AppImages and your tools' : 'Looking at Flathub, your software sources and your AppImages'}
+						{fedora.available ? 'Looking at Flathub, your software sources and your AppImages' : 'Looking at Flathub, your AppImages and your tools'}
 					{:else if library.updates}
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
 					{/if}

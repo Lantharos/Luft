@@ -45,7 +45,7 @@
 </script>
 
 {#if error}
-	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Fedora's packages can't be searched right now. {error}</p>
+	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Command-line tools can't be searched right now. {error}</p>
 {:else if tools === null || tools.length}
 	<section class="flex flex-col gap-2">
 		<div class="flex flex-col gap-0.5 px-1.5">

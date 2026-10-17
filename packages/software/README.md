@@ -27,6 +27,8 @@ PackageKit and the image updater are reached over D-Bus, so their functions are 
 - **Packages**: a regular Fedora install. Packages, updates and offline updates go through PackageKit.
 - **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:45`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, and command-line tools from a Toolbox container.
 
+`LUFT_KERNEL_COMMAND_LINE` names a file to read in place of `/proc/cmdline`, to try either kind on any computer (see [Testing](../../docs/testing.md#image-systems)).
+
 Changing the image needs root, so the image side talks to `luft-updater` (in `updater/`), a small service started on demand over D-Bus that runs `bootc` for it. Updates are found by comparing the image's layers with the registry's through `skopeo inspect`, so checking needs no administrator rights.
 
 ## Apps and the system

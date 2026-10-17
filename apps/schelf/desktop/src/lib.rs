@@ -1,6 +1,7 @@
 mod app;
 mod background;
 mod catalog;
+mod fedora;
 mod files;
 mod library;
 mod operations;
@@ -41,6 +42,7 @@ pub fn run_app() -> ! {
 fn build_window(window: SabineWindow, queue: &Queue) -> SabineWindow {
     let window = app::register(GLASS_WINDOW.apply(window));
     let window = catalog::register(window);
+    let window = fedora::register(window);
     let window = library::register(window);
     let window = files::register(window);
     let window = updates::register(window);

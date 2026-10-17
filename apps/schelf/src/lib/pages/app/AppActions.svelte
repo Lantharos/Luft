@@ -46,9 +46,7 @@
 		{#if active}
 			<ProgressButton operation={active} large />
 		{:else if installed}
-			{#if library.removable(installed)}
-				<button type="button" class="button large" onclick={() => (confirming = true)}>Remove</button>
-			{/if}
+			<button type="button" class="button large" onclick={() => (confirming = true)}>Remove</button>
 			{#if update}
 				<button type="button" class="button large" onclick={updateNow}>Update</button>
 			{/if}

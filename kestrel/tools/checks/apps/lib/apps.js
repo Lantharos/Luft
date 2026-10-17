@@ -2,15 +2,15 @@ import {LuftApp, sabineService} from '../../lib/luftApp.js';
 
 const LINK_TIMEOUT = 10000;
 
-export async function openApp(name, args = []) {
+export async function openApp(name, args = [], env = {}) {
   await sabineService();
-  const app = new LuftApp(name, args);
+  const app = new LuftApp(name, args, env);
   await app.open();
   return app;
 }
 
-export async function withApp(name, args, use) {
-  const app = await openApp(name, args);
+export async function withApp(name, args, use, env = {}) {
+  const app = await openApp(name, args, env);
   try {
     return await use(app);
   } finally {

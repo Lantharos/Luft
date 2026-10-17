@@ -1,13 +1,12 @@
 import type { Appearance } from '@luft/ui';
 
 export type Source = 'flatpak' | 'package' | 'appImage' | 'tool';
-export type System = 'packages' | 'image';
 export type Installation = 'user' | 'system';
 
 export interface AppState extends Appearance {
 	files: string[];
 	page: string | null;
-	system: System;
+	fedora: boolean;
 }
 
 export interface InstalledApp {
@@ -157,7 +156,7 @@ export interface Backend {
 	fedoraApp(id: string): Promise<FedoraApp>;
 	installed(): Promise<InstalledApp[]>;
 	launch(desktop: string): Promise<void>;
-	removalPlan(packageName: string): Promise<string[]>;
+	fedoraRemovalPlan(packageName: string): Promise<string[]>;
 	searchTools(query: string): Promise<ToolSummary[]>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
 	checkUpdates(): Promise<Updates>;

@@ -8,7 +8,7 @@ use flate2::read::GzDecoder;
 use serde::{Deserialize, Serialize};
 
 use super::appstream::{self, Component};
-use super::cache::Entry;
+use crate::catalog::cache::Entry;
 
 const CATALOGS: &str = "/usr/share/swcatalog/xml";
 const ICONS: &str = "/usr/share/swcatalog/icons";

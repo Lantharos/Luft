@@ -3,7 +3,6 @@ use crate::classify::Classification;
 use crate::flatpak;
 use crate::packagekit::{self, Mode, Update};
 
-#[derive(Default)]
 pub struct PackageUpdates {
     pub system: Vec<Update>,
     pub apps: Vec<Update>,

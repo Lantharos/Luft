@@ -1,15 +1,15 @@
 mod appimages;
 mod flatpaks;
-mod packages;
 mod tools;
 
 use gio::prelude::*;
 use luft_app::Commands;
 use luft_software::flatpak::{self, Installation, Permissions};
-use luft_software::system::System;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::fedora;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -46,11 +46,6 @@ struct Desktop {
 }
 
 #[derive(Deserialize)]
-struct Package {
-    package: String,
-}
-
-#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct FlatpakRef {
     installation: Installation,
@@ -60,8 +55,8 @@ struct FlatpakRef {
 pub fn installed() -> Vec<InstalledApp> {
     let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
         let flatpaks = scope.spawn(flatpaks::installed);
-        let packages = scope.spawn(packages::installed);
-        let tools = (System::current() == System::Image).then(|| scope.spawn(tools::installed));
+        let packages = scope.spawn(fedora::installed);
+        let tools = (!fedora::available()).then(|| scope.spawn(tools::installed));
         let mut apps = appimages::installed();
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(packages.join().unwrap_or_default());
@@ -81,10 +76,6 @@ fn launch(Desktop { desktop }: Desktop) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-async fn removal_plan(Package { package }: Package) -> Result<Vec<String>, String> {
-    luft_software::packages::removal_plan(&package).await
-}
-
 fn permissions(
     FlatpakRef {
         installation,
@@ -98,6 +89,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
-        .command_async("library_removal_plan", removal_plan)
         .command("library_permissions", permissions)
 }

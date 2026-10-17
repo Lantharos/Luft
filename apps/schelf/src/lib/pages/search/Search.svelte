@@ -1,15 +1,13 @@
 <script lang="ts">
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Shelf from '#lib/components/Shelf.svelte';
-	import * as fedora from '#lib/catalog/fedora.js';
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { CatalogApp } from '#lib/catalog/types.js';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { sourceName } from '#lib/format.js';
 	import { backend } from '#lib/state/backend.js';
-	import { catalog } from '#lib/state/catalog.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
-	import { system } from '#lib/state/system.svelte.js';
 	import ToolResults from './ToolResults.svelte';
 
 	const LIMIT = 30;
@@ -22,7 +20,7 @@
 
 	const needle = $derived(query.toLowerCase());
 	const installed = $derived(library.installed.filter((app) => app.name.toLowerCase().includes(needle)).slice(0, 8));
-	const local = $derived(catalog.fedora.length ? fedora.search(catalog.fedora, query).slice(0, LIMIT) : null);
+	const local = $derived(fedora.search(query)?.slice(0, LIMIT) ?? null);
 
 	$effect(() => {
 		const current = query;
@@ -38,7 +36,7 @@
 			});
 	});
 
-	const others = $derived(system.image ? tools : (local?.length ?? null));
+	const others = $derived(fedora.available ? (local?.length ?? null) : tools);
 	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
 
@@ -65,7 +63,7 @@
 		{:else if remote === null || remote.length}
 			<Shelf title="Flathub" apps={remote} />
 		{/if}
-		{#if system.image}
+		{#if !fedora.available}
 			<ToolResults {query} bind:found={tools} />
 		{:else if local === null || local.length}
 			<Shelf title="Fedora" apps={local} />

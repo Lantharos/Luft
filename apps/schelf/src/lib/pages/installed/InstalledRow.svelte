@@ -54,15 +54,13 @@
 							navigation.push({ page: 'app', target: { installed: app.key }, name: app.name });
 						}}>Details</MenuItem
 					>
-					{#if library.removable(app)}
-						<MenuItem
-							danger
-							onclick={() => {
-								close();
-								onremove(app);
-							}}>Remove</MenuItem
-						>
-					{/if}
+					<MenuItem
+						danger
+						onclick={() => {
+							close();
+							onremove(app);
+						}}>Remove</MenuItem
+					>
 				{/snippet}
 			</MenuButton>
 		{/if}

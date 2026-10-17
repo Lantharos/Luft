@@ -2,10 +2,11 @@ use std::path::PathBuf;
 
 use gio::prelude::*;
 use luft_app::{Appearance, Commands};
-use luft_software::system::System;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::fedora;
 
 const PAGE_SCHEME: &str = "schelf:";
 
@@ -16,7 +17,7 @@ struct AppState {
     appearance: Appearance,
     files: Vec<String>,
     page: Option<String>,
-    system: System,
+    fedora: bool,
 }
 
 #[derive(Deserialize)]
@@ -63,7 +64,7 @@ async fn state(_: Value) -> Result<AppState, String> {
         page: arguments
             .into_iter()
             .find(|argument| argument.starts_with(PAGE_SCHEME)),
-        system: System::current(),
+        fedora: fedora::available(),
     })
 }
 

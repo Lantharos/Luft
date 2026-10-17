@@ -119,7 +119,7 @@ export const preview: Backend = {
 		motion: 'full',
 		files: parameters.getAll('file'),
 		page: parameters.get('page'),
-		system: image ? 'image' : 'packages'
+		fedora: !image
 	}),
 	activationFiles: async () => [],
 	flathub: <T>(path: string) => fetch(`/flathub/${path}`).then((response) => json<T>(response)),
@@ -134,7 +134,7 @@ export const preview: Backend = {
 	},
 	installed: async () => installed,
 	launch: async () => {},
-	removalPlan: async () => [],
+	fedoraRemovalPlan: async () => [],
 	searchTools: async (query) => {
 		await new Promise((resolve) => setTimeout(resolve, 400));
 		return tools.filter((tool) => tool.package.includes(query.toLowerCase()));

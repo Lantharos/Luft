@@ -1,5 +1,4 @@
 use crate::packagekit::{self, Mode, PackageDetails, PackageId, filter};
-use crate::system::System;
 use crate::task::Task;
 use crate::updates::PackageUpdates;
 
@@ -51,10 +50,7 @@ pub async fn removal_plan(name: &str) -> Result<Vec<String>, String> {
 }
 
 pub async fn updates() -> Result<PackageUpdates, String> {
-    match System::current() {
-        System::Packages => PackageUpdates::load(Mode::Quiet).await,
-        System::Image => Ok(PackageUpdates::default()),
-    }
+    PackageUpdates::load(Mode::Quiet).await
 }
 
 pub async fn update(names: &[String], task: Task<'_>) -> Result<(), String> {

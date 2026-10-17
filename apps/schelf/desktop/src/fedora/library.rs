@@ -5,8 +5,8 @@ use gio::prelude::*;
 use luft_app::apps::App;
 use luft_software::classify::Classification;
 
-use super::{InstalledApp, Source};
-use crate::catalog::fedora_component;
+use super::catalog;
+use crate::library::{InstalledApp, Source};
 
 struct Package {
     version: String,
@@ -59,7 +59,7 @@ pub fn installed() -> Vec<InstalledApp> {
             let info = gio_unix::DesktopAppInfo::new(&desktop)?;
             let app = App::new(desktop.clone(), &info);
             let package = packages.get(name);
-            let component = fedora_component(name);
+            let component = catalog::find_package(name);
             Some(InstalledApp {
                 key: format!("package/{name}"),
                 source: Source::Package,
@@ -85,4 +85,11 @@ pub fn installed() -> Vec<InstalledApp> {
             })
         })
         .collect()
+}
+
+pub fn is_installed(name: &str) -> bool {
+    Command::new("rpm")
+        .args(["--query", name])
+        .output()
+        .is_ok_and(|output| output.status.success())
 }

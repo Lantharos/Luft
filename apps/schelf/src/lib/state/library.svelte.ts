@@ -1,6 +1,5 @@
 import type { InstalledApp, Updates } from '#lib/bridge/types.js';
 import { backend } from './backend';
-import { system } from './system.svelte';
 
 class Library {
 	installed = $state<InstalledApp[]>([]);
@@ -54,10 +53,6 @@ class Library {
 
 	tool(name: string) {
 		return this.installed.find((app) => app.source === 'tool' && app.package === name) ?? null;
-	}
-
-	removable(app: InstalledApp) {
-		return app.source !== 'package' || !system.image;
 	}
 
 	update(key: string) {

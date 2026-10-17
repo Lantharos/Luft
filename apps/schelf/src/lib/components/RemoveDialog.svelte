@@ -14,7 +14,7 @@
 		alsoRemoved = [];
 		if (name)
 			void backend()
-				.removalPlan(name)
+				.fedoraRemovalPlan(name)
 				.then((names) => (alsoRemoved = names))
 				.catch(() => {});
 	});

@@ -2,34 +2,33 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::Commands;
 use luft_app::apps::App;
-use luft_software::classify::Classification;
 use luft_software::flatpak::{self, Installation};
-use luft_software::system::System;
-use luft_software::updates::{self, PackageUpdates};
-use luft_software::{packages, toolbox};
+use luft_software::toolbox;
+use luft_software::updates;
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
 use tokio::task::{JoinHandle, spawn_blocking};
 
+use crate::fedora;
 use crate::library::Source;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct AppUpdate {
-    key: String,
-    source: Source,
-    id: String,
-    desktop: Option<String>,
-    name: String,
-    icon: Option<String>,
-    from: Option<String>,
-    to: Option<String>,
-    size: u64,
-    platform: bool,
-    installation: Option<Installation>,
-    reference: Option<String>,
-    package: Option<String>,
+pub struct AppUpdate {
+    pub key: String,
+    pub source: Source,
+    pub id: String,
+    pub desktop: Option<String>,
+    pub name: String,
+    pub icon: Option<String>,
+    pub from: Option<String>,
+    pub to: Option<String>,
+    pub size: u64,
+    pub platform: bool,
+    pub installation: Option<Installation>,
+    pub reference: Option<String>,
+    pub package: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -38,36 +37,6 @@ struct Updates {
     apps: Vec<AppUpdate>,
     checked: u64,
     error: Option<String>,
-}
-
-fn packages(updates: PackageUpdates) -> Vec<AppUpdate> {
-    let classification = Classification::current();
-    updates
-        .apps
-        .into_iter()
-        .map(|update| {
-            let name = update.package.name.clone();
-            let desktop = classification.desktop_ids(&name).first().cloned();
-            let app = desktop.as_deref().and_then(App::by_id);
-            AppUpdate {
-                key: format!("package/{name}"),
-                source: Source::Package,
-                id: desktop.clone().unwrap_or_else(|| name.clone()),
-                name: app
-                    .as_ref()
-                    .map_or_else(|| name.clone(), |app| app.name.clone()),
-                icon: app.and_then(|app| app.icon),
-                desktop,
-                from: update.installed_version,
-                to: Some(update.package.version),
-                size: update.download_size,
-                platform: false,
-                installation: None,
-                reference: None,
-                package: Some(name),
-            }
-        })
-        .collect()
 }
 
 fn flatpaks(updates: Vec<flatpak::Update>) -> Vec<AppUpdate> {
@@ -141,17 +110,11 @@ fn tools(updates: Vec<toolbox::Update>) -> Vec<AppUpdate> {
 }
 
 fn installed_tools() -> Result<Vec<AppUpdate>, String> {
-    match System::current() {
-        System::Image => toolbox::updates().map(tools),
-        System::Packages => Ok(Vec::new()),
+    if fedora::available() {
+        Ok(Vec::new())
+    } else {
+        toolbox::updates().map(tools)
     }
-}
-
-async fn package_updates() -> Result<Vec<AppUpdate>, String> {
-    let updates = packages::updates().await?;
-    spawn_blocking(move || packages(updates))
-        .await
-        .map_err(|error| error.to_string())
 }
 
 async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
@@ -162,7 +125,7 @@ async fn check(_: Value) -> Result<Updates, String> {
     let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
     let tools = spawn_blocking(installed_tools);
     let appimages = spawn_blocking(appimages);
-    let packages = package_updates().await;
+    let packages = fedora::updates().await;
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();

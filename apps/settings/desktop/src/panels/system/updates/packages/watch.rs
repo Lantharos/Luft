@@ -10,8 +10,9 @@ use luft_software::packagekit::{
     running::{self, Running},
 };
 
-use super::super::elsewhere::{self, command, display_name, finished};
+use super::super::elsewhere::finished;
 use super::super::state;
+use super::elsewhere::{self, command, display_name};
 
 const RUN: &str = "/run";
 const DNF_FOLDER: &str = "dnf";

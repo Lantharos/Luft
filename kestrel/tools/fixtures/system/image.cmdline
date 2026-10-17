@@ -1,0 +1,1 @@
+BOOT_IMAGE=(hd0,gpt1)/vmlinuz root=composefs composefs=0b2ad9d1f4e1c3b6a7d8e9f00112233445566778899aabbccddeeff00112233 rw

@@ -2,13 +2,11 @@
 	import { Segmented, VirtualScroller } from '@luft/ui';
 	import AppTile from '#lib/components/AppTile.svelte';
 	import { category } from '#lib/catalog/categories.js';
-	import * as fedora from '#lib/catalog/fedora.js';
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { CatalogApp, Origin, Page } from '#lib/catalog/types.js';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/state/backend.js';
-	import { catalog } from '#lib/state/catalog.svelte.js';
 	import type { Route } from '#lib/state/navigation.svelte.js';
-	import { system } from '#lib/state/system.svelte.js';
 
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' }>;
 
@@ -24,7 +22,7 @@
 	let page = 0;
 	let pages = 1;
 
-	const fedoraApps = $derived(route.page === 'category' ? fedora.inCategory(catalog.fedora, category(route.category)) : []);
+	const fedoraApps = $derived(route.page === 'category' ? fedora.inCategory(category(route.category)) : []);
 	const shown = $derived(source === 'flathub' ? apps : fedoraApps);
 
 	function fetchPage(next: number): Promise<Page> {
@@ -69,7 +67,7 @@
 <VirtualScroller class="soft-scroll h-full" items={shown} key={(app) => app.key} layout={LAYOUT} onscroll={scrolled}>
 	{#snippet header()}
 		<div class="flex min-h-2 items-center justify-between gap-4 bg-[var(--content)] px-8 pb-3">
-			{#if route.page === 'category' && !system.image}
+			{#if route.page === 'category' && fedora.available}
 				<Segmented
 					label="Source"
 					value={source}

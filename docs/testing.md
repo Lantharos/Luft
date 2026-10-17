@@ -80,6 +80,10 @@ printf 'LUFT_PCI_DEVICES=%s\n' ~/pci >~/.config/environment.d/90-pci.conf
 
 After signing in again, the session sees an NVIDIA card; removing the file brings back the real devices.
 
+## Image systems
+
+Schelf and Settings tell Luft's image from a regular Fedora install by `composefs=` on the kernel command line in `/proc/cmdline`. Pointing `LUFT_KERNEL_COMMAND_LINE` at another file makes them read that instead: `kestrel/tools/fixtures/system/image.cmdline` makes them behave as on Luft's image, and `/dev/null` as on a regular Fedora install. The `apps:schelf` checks capture Schelf both ways.
+
 ## Installer
 
 `apps/setup/installer/vm/run.sh` installs Luft for real with `bootc install to-filesystem` inside a QEMU VM with spare drives, checks the result and starts the installed drive with UEFI. See [Install Luft](../apps/setup/README.md#testing).

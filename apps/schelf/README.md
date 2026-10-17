@@ -9,6 +9,8 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
 | System software sources | Everyone, through PackageKit, on regular Fedora installs only |
 
+Everything for regular Fedora installs lives in `desktop/src/fedora` and `src/lib/fedora`, and is switched off on Luft's image, where command-line tools take its place.
+
 ## Build and run
 
 Install dependencies once from the repository root with `bun install`, then from this folder:

@@ -4,11 +4,11 @@
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
-	import { system } from '#lib/state/system.svelte.js';
 
 	let { path }: { path: string } = $props();
 
@@ -26,7 +26,7 @@
 	const installed = $derived.by((): InstalledApp | null => {
 		if (!file) return null;
 		if (file.kind === 'flatpakRef') return library.flatpak(file.id);
-		if (file.kind === 'package') return system.image ? library.tool(file.package) : library.package(file.package);
+		if (file.kind === 'package') return fedora.available ? library.package(file.package) : library.tool(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
 		return null;
 	});
@@ -46,7 +46,7 @@
 	function job(opened: OpenedFile): Job {
 		if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
-		if (opened.kind === 'package') return system.image ? { kind: 'installToolFile', path: opened.path } : { kind: 'installPackageFile', path: opened.path };
+		if (opened.kind === 'package') return fedora.available ? { kind: 'installPackageFile', path: opened.path } : { kind: 'installToolFile', path: opened.path };
 		return { kind: 'installAppImage', path: opened.path };
 	}
 
@@ -61,7 +61,7 @@
 	const KIND: Record<OpenedFile['kind'], string> = {
 		flatpakRef: 'Flatpak app',
 		flatpakRepo: 'Flatpak app source',
-		package: system.image ? 'Command-line tool' : 'System package',
+		package: fedora.available ? 'System package' : 'Command-line tool',
 		appImage: 'AppImage'
 	};
 </script>
@@ -117,7 +117,7 @@
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>
-				{:else if file.kind === 'package' && system.image}
+				{:else if file.kind === 'package' && !fedora.available}
 					<Row title="Installs to" description="Its commands run in Tern."><span>Tools container</span></Row>
 				{/if}
 				<Row title="File" description={path} />
@@ -125,7 +125,7 @@
 
 			{#if file.kind === 'package'}
 				<p class="px-2 text-[13px] text-[var(--text-muted)]">
-					Packages from files aren't checked by your software sources. Only install ones from people you trust.
+					Package files aren't checked before they install. Only install ones from people you trust.
 				</p>
 			{/if}
 		{:else}

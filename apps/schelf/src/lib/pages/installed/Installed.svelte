@@ -3,10 +3,10 @@
 	import { bytes, Segmented, VirtualScroller } from '@luft/ui';
 	import type { InstalledApp, Source } from '#lib/bridge/types.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/state/backend.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
-	import { system } from '#lib/state/system.svelte.js';
 	import InstalledRow from './InstalledRow.svelte';
 
 	type Filter = 'all' | Source;
@@ -40,9 +40,8 @@
 				options={[
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
-					{ value: 'package', label: 'System' },
-					{ value: 'appImage', label: 'AppImage' },
-					...(system.image ? [{ value: 'tool' as const, label: 'Tools' }] : [])
+					fedora.available ? { value: 'package', label: 'System' } : { value: 'tool', label: 'Tools' },
+					{ value: 'appImage', label: 'AppImage' }
 				]}
 				onchange={(value) => (filter = value)}
 			/>

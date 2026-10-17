@@ -21,7 +21,7 @@ Settings is the system settings app for Luft. It reads and writes the same setti
 | Security | Device encryption and recovery key, Secure Boot and signed startup, the security chip, USB protection, Luft Keyring, app access to passwords, SSH keys and passkeys |
 | Date & Time | Time zone, automatic time and clock format |
 | Users | Account picture, name, password and fingerprints |
-| Accounts | iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV accounts, each a folder in `~/Cloud` (see [cloud drives](../../docs/cloud.md)) |
+| Accounts | iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV accounts, each a folder in `~/Cloud` (see [cloud drives](https://docs.luft.lanth.me/files/cloud-drives/)) |
 | Login Screen | Wallpaper, listed users, default session and automatic login |
 | Updates | System updates and firmware, installed at the next restart, with release notes and a way back to the previous version on image-based installs, and switching between the standard and NVIDIA images; app updates are left to Schelf |
 | About | Device name, hardware, system versions, storage and recent graphics driver problems |

@@ -48,7 +48,7 @@ All commands need root.
 - Reading state is open to everyone. So is `Drives.Continue`, which a udev rule calls to resume drive encryption.
 - Kestrel calls `ConfirmStartup` once the login screen or desktop has been up for a few seconds, which marks the running version as one that starts.
 - Other drives are on `com.lantharos.Trust1.Drives` at the same object.
-- `OtherStartups` lists other systems' boot loaders on the EFI system partition and their start entries. `RemoveStartups`, `RemoveOldSystem` and `GrowSystem` let Disks remove another system and give Luft its space ([details](../docs/install.md#removing-windows-or-the-old-system)).
+- `OtherStartups` lists other systems' boot loaders on the EFI system partition and their start entries. `RemoveStartups`, `RemoveOldSystem` and `GrowSystem` let Disks remove another system and give Luft its space ([details](https://docs.luft.lanth.me/system/remove-other-systems/)).
 - `UsbProtection1` has `Enabled`, `Guarding` and `Held` properties, `SetEnabled(b)`, the `Released(a(ss))` signal and `TakeReleased()`, which lets the session announce what was connected at unlock.
 
 ## Testing

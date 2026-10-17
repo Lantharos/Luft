@@ -1,6 +1,6 @@
 # Install Luft
 
-Installs Luft from the USB stick and sets up a new computer the first time it starts. It is built with Sabine and Svelte, and runs in Kestrel's setup mode: one window over the blurred wallpaper, with no panel. How the whole install goes is in [docs/install.md](../../docs/install.md).
+Installs Luft from the USB stick and sets up a new computer the first time it starts. It is built with Sabine and Svelte, and runs in Kestrel's setup mode: one window over the blurred wallpaper, with no panel. The steps are described in [Install from a USB stick](https://docs.luft.lanth.me/start/usb-stick/), and what happens underneath in [docs/install.md](../../docs/install.md).
 
 ![Sharing a drive with Windows](../../docs/screenshots/setup-alongside.png)
 

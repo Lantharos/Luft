@@ -1,53 +1,6 @@
 # Cloud drives
 
-Sign in to a cloud service once in Settings, under Accounts, and its files appear as a folder in `~/Cloud`, next to your other drives in Rover. Every app and every file dialog sees it like any other folder.
-
-| Service | How you sign in |
-| --- | --- |
-| OneDrive | In your browser, with your Microsoft account |
-| Dropbox | In your browser |
-| iCloud Drive | With your Apple Account email and password, then the code Apple shows on your iPhone, iPad or Mac |
-| Nextcloud | In your browser, or with a user name and app password |
-| WebDAV | With the server address, user name and password |
-
-Passwords and sign-in tokens are kept in Luft Keyring and never written to a file. Removing an account in Settings removes its keyring entry and the copies on this computer; the files stay in the cloud.
-
-## Files on demand
-
-Nothing downloads until you open it. Opened files stay for a day and at most 5 GB, and are cleared sooner when the disk runs low on space, so a large cloud drive doesn't fill your disk.
-
-Choose **Keep on this device** on a file or folder in Rover to keep it on your computer. Kept files open without a connection, and changes go both ways: what you change here reaches the cloud, and changes made elsewhere come down, within a few seconds of a change here and every five minutes otherwise. **Free up space** turns a kept file or folder back into one that downloads when opened; anything changed here is sent up first, so it needs a connection.
-
-Rover marks each file in a cloud drive:
-
-| Mark | Means |
-| --- | --- |
-| Cloud | Online only; it downloads when opened |
-| Check | On this device |
-| Arrows | Syncing |
-
-If the computer starts without a connection, the drive shows only the kept files until it's back online. Files that are online only can't open without a connection.
-
-## When the same file changes in two places
-
-If a kept file changes on this computer and in the cloud before they meet, both versions are kept. The newer one keeps the name, and the other is renamed, for example to `Report (copy from OneDrive).docx` or `Report (copy from this device).docx`. A notification says so, and Rover shows a note in the drive until you dismiss it or remove the copy.
-
-## Pausing
-
-Syncing in the background pauses on a metered connection, such as a phone's hotspot, and when the battery is at 20% or lower and not charging. Opening a file still downloads it. Changes made meanwhile are kept on this computer and go up once the pause ends. Settings shows why a drive is paused.
-
-## Sharing
-
-Right-click a file or folder in a cloud drive:
-
-- **Copy share link** makes a link anyone with it can open (OneDrive, Dropbox and Nextcloud).
-- **Open in browser** shows it on the service's website (OneDrive, Dropbox and Nextcloud).
-
-## iCloud Drive
-
-- Apple asks you to confirm it's you about once a month. When that happens, a notification and Settings ask you to sign in again; it only takes the code from your Apple device.
-- App-specific passwords don't work; use your Apple Account password.
-- With Advanced Data Protection on, iCloud Drive only works outside Apple devices when **Access iCloud Data on the Web** is on. On an iPhone it's in Settings, your name, iCloud. After turning it on, sign in again and approve the request on your iPhone.
+How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.lanth.me/files/cloud-drives/), and the service itself in [packages/accounts](../packages/accounts/README.md).
 
 ## Where things are
 

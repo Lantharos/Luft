@@ -22,9 +22,9 @@ Luft is an operating system built on Fedora. It has its own desktop and login sc
 
 Download [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso), write it to a USB stick of 4 GB or more, and start the computer from it. The stick opens Install Luft, which can put Luft next to Windows, on a whole drive, or just let you try it. Secure Boot can stay on.
 
-On a Windows PC, [Meet Luft](docs/meet.md) does the same without a stick: it makes room next to Windows and restarts into Luft to try or install it.
+On a Windows PC, [Meet Luft](https://docs.luft.lanth.me/start/meet-luft/) does the same without a stick: it makes room next to Windows and restarts into Luft to try or install it.
 
-Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional, and lets an encrypted disk unlock without a password. [Installing Luft](docs/install.md) has the details.
+Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional, and lets an encrypted disk unlock without a password. The [documentation](https://docs.luft.lanth.me) covers installing and everything after.
 
 After that, updates arrive in Settings and install at the next restart. Apps come from Schelf (Flathub and AppImages), and command-line tools from a Toolbox container that Schelf manages too. Luft comes with [Helium](https://helium.computer), the Chromium-based browser by imput, as the default browser; it updates on its own and can be removed in Schelf like any other app.
 
@@ -76,8 +76,9 @@ Releases are built and signed in CI and published as `ghcr.io/lantharos/luft:45`
 | [`packages/software`](packages/software/README.md) | System updates, Flatpak, AppImages and Toolbox tools |
 | [`packages/variant`](packages/variant/README.md) | Which of Luft's images suits a computer, standard or NVIDIA |
 | [`packages/windows`](packages/windows/README.md) | Windows on the same computer: Fast Startup, its clock and its Bluetooth devices |
+| [`web/docs`](web/docs/README.md) | The documentation site |
 
-Guides: [installing](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [wallpaper colors](docs/appearance.md), [Kestrel prompts](docs/prompts.md), [cloud drives](docs/cloud.md) and [testing](docs/testing.md).
+How to use Luft is at [docs.luft.lanth.me](https://docs.luft.lanth.me), built from [`web/docs`](web/docs). Notes for working on it: [how Luft installs](docs/install.md), [boot and recovery](docs/boot.md), [security model](docs/security.md), [Meet Luft](docs/meet.md), [wallpaper colors](docs/appearance.md), [motion](docs/motion.md), [Kestrel prompts](docs/prompts.md), [cloud drives](docs/cloud.md), [testing](docs/testing.md) and [testing on real hardware](docs/hardware-testing.md).
 
 ## Develop
 

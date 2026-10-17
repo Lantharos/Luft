@@ -1,6 +1,6 @@
 # Meet Luft
 
-Meet Luft gets a Windows or Linux computer ready for Luft without a USB stick. It restarts into Luft once, to try it, install it or, on Linux, let it take the old system's place. The system already there keeps starting as usual until you decide otherwise in Install Luft. The app is in [apps/meet](../apps/meet/README.md).
+How Meet Luft prepares a Windows or Linux computer for Luft, makes USB sticks and keeps logs from Try Luft. The app is in [apps/meet](../apps/meet/README.md).
 
 ## Which Luft it downloads
 
@@ -8,14 +8,13 @@ Meet Luft only downloads the image the computer needs: `luft-latest-nvidia.iso` 
 
 ## On Windows
 
-1. **Checks the PC.** A 64-bit Intel or AMD processor, UEFI and a GPT drive are needed. It also looks at Secure Boot, the TPM, BitLocker, Fast Startup, free space, the graphics card (an NVIDIA card gets the image with NVIDIA's driver later) and the Wi-Fi chip, and says what each means. When Secure Boot is off it explains where to turn it on for that PC's maker, and can restart straight into the firmware settings. Start entries left by systems that are gone, such as an old Ubuntu, can be tidied away, from the firmware and from Windows' own boot configuration.
-2. **Makes room.** Windows makes its partition smaller, the same way Disk Management does, so it also works with BitLocker on. Luft's room and Meet Luft's own partitions go right after Windows, in front of a recovery partition at the end of the drive. Then it downloads Luft, checks it against its `.sha256`, and copies the live system out of it as it arrives. An ISO you already have works too.
-3. **Restarts into Luft.** It adds a start entry called *Meet Luft* at the end of the firmware's list and asks the firmware to use it once (`BootNext`). Some firmware drops entries it doesn't know; Meet Luft puts it back before each restart. Luft starts the same way as from the stick, through Fedora's signed shim and GRUB, so Secure Boot can stay on. The restart after that goes back to Windows.
-   - *Try Luft* opens the desktop. Nothing is installed.
-   - *Install Luft* opens Install Luft with *Alongside Windows* already chosen, in the room Meet Luft made. Nothing on the drive changes until you confirm there.
-4. **Packs a moving box**, if you like: folders from your Windows account with their sizes, your wallpaper, your name and account picture, time zone, keyboard and language, Bluetooth devices, and Wi-Fi networks with their passwords (off unless you tick it). Install Luft fills in your name and regional settings from it, and unpacks the rest into your new account.
+The steps people see are in [Try Luft with Meet Luft](https://docs.luft.lanth.me/start/meet-luft/). Underneath:
 
-Before restarting, Meet Luft offers to keep the clock right in both systems (`RealTimeIsUniversal`) and, when installing, to turn off Fast Startup. It changes these in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
+- Windows shrinks its own partition through its storage service, as Disk Management does, so it works with BitLocker on. Luft's room and Meet Luft's partitions go right after Windows, in front of a recovery partition at the end of the drive.
+- The download is checked against its `.sha256`, and the live system is copied out of the ISO as it arrives.
+- The start entry *Meet Luft* goes at the end of the firmware's list, and the firmware is asked to use it once (`BootNext`). Some firmware drops entries it doesn't know, so Meet Luft puts it back before each restart. Luft starts through Fedora's signed shim and GRUB, like the stick.
+- The clock (`RealTimeIsUniversal`) and Fast Startup are changed in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
+- The moving box holds folders from the Windows account, the wallpaper, name and account picture, time zone, keyboard and language, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
 
 ### Partitions
 
@@ -109,11 +108,7 @@ Nothing is repartitioned. Meet Luft keeps the live system as files in a folder, 
 
 Secure Boot can stay on: Luft starts through Fedora's shim and GRUB, like the stick. Luft's own key is only added when it's installed, with the usual blue screen at its first start.
 
-On *Luft is ready* there are three ways in:
-
-- *Try Luft* opens the desktop.
-- *Replace* opens Install Luft with the old system chosen, explains what stays and changes, and does nothing before you confirm. It's offered when your home folder is its own btrfs subvolume, as Fedora does it, or its own partition. A system with everything on one partition is found but can't be replaced yet.
-- *Install Luft* opens Install Luft to put Luft on another drive or in free space.
+*Luft is ready* offers *Try Luft*, *Replace* and *Install Luft*; [Try Luft with Meet Luft](https://docs.luft.lanth.me/start/meet-luft/#on-linux) describes them.
 
 *Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. After Luft is installed and you sign in for the first time, it removes them itself.
 

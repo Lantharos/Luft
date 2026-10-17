@@ -27,7 +27,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 ## Features
 
 - Taskbar with pinned and running apps, live window previews, unread counts and progress, and a tray for StatusNotifierItem apps
-- Start with folders, and search across apps, actions, Settings pages, files and their text, calculations and unit conversions ([docs/search.md](../docs/search.md))
+- Start with folders, and search across apps, actions, Settings pages, files and their text, calculations and unit conversions ([search](https://docs.luft.lanth.me/desktop/start-and-search/))
 - Quick settings as rearrangeable tiles: network, Bluetooth, audio devices, brightness (including DDC/CI monitors with `ddcutil`), power mode, Night Light, Dark Style, Keep Awake and more
 - Notification center with grouping, inline replies, media controls and a calendar
 - All-windows view, dynamic workspaces up to ten, snap layouts and snap groups
@@ -68,38 +68,7 @@ sudo systemctl disable gdm && sudo systemctl enable greetd
 
 ## Keyboard shortcuts
 
-| Shortcut | Action |
-| --- | --- |
-| Super | Start |
-| Super twice | Turn the desktop into a board, or back |
-| Super+Tab | All windows |
-| Alt+Tab, Alt+\` | Switch windows, or windows of the focused app |
-| Ctrl+Alt+Tab | Move focus to the panel |
-| Super+1 … Super+9, Super+0 | Workspace 1 to 10 |
-| Super+scroll | Next or previous workspace |
-| Super+N, Super+M | Notifications |
-| Super+S | Quick settings |
-| Super+V | Clipboard history |
-| Super+. or Super+; | Emoji and symbols |
-| Super+Z | Snap layouts |
-| Super+arrows | Snap to halves and maximize; on a board, pan or move between windows |
-| Super+Space | Next input source |
-| Super+L | Lock |
-| Super+Escape | Give shortcuts back to the desktop; on a board, step out of a window |
-| Super+Enter | On a board, enter the focused window |
-| Super+= / Super+- | On a board, zoom in and out |
-| Print or Super+Shift+S, Shift+Print, Alt+Print | Screenshot tool, full screenshot, window screenshot |
-| Ctrl+Shift+Alt+R | Screen recording |
-| Ctrl+Shift+Esc | System monitor |
-| Menu or Shift+F10 | Context menu of the focused control |
-
-| Gesture | Action |
-| --- | --- |
-| Three fingers sideways | Next or previous workspace; on a board, next window |
-| Four fingers up, then down | Turn the desktop into a board, and back |
-| Four fingers down, then up | All windows, and back |
-| Three fingers (board) | Pan; spread to enter a window, swipe down to step out |
-| Pinch (board) | Zoom, also over windows |
+Every shortcut and gesture is listed in [Keyboard shortcuts and gestures](https://docs.luft.lanth.me/desktop/shortcuts/). They live in `com.lantharos.kestrel.keybindings` and `com.lantharos.kestrel.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`.
 
 ## Seeing and using windows from other programs
 

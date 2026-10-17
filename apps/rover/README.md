@@ -12,7 +12,7 @@ Rover is the file manager of Luft. Built with Sabine and Svelte.
 - Background copy and move with pause, cancel and conflict handling, plus undo and redo for file operations
 - Batch rename, compress to zip or tar.zst, and extract zip, tar, 7z and single compressed files
 - Network locations over SFTP, SMB, FTP, WebDAV and NFS, with passwords kept in your keyring
-- Cloud drives from the accounts in Settings (iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV), with each file marked online only, on this device or syncing, keeping files on this device, share links and opening them on the service's website (see [cloud drives](../../docs/cloud.md))
+- Cloud drives from the accounts in Settings (iCloud Drive, OneDrive, Dropbox, Nextcloud and WebDAV), with each file marked online only, on this device or syncing, keeping files on this device, share links and opening them on the service's website (see [cloud drives](https://docs.luft.lanth.me/files/cloud-drives/))
 - Git and Pig status, diffs, commits and sync for the current folder
 - A file chooser portal backend and `org.freedesktop.FileManager1` for "Show in folder"
 

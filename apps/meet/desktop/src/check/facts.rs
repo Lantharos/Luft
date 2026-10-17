@@ -1,3 +1,4 @@
+use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -47,7 +48,6 @@ pub struct StartEntry {
     pub windows_object: Option<String>,
 }
 
-pub const NVIDIA: u16 = 0x10de;
 pub const BROADCOM: u16 = 0x14e4;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -65,9 +65,13 @@ pub struct Machine {
     pub wifi: Vec<Device>,
 }
 
+pub fn variant_for(graphics: &[Device]) -> Variant {
+    Variant::for_vendors(graphics.iter().map(|device| device.vendor))
+}
+
 impl Machine {
-    pub fn nvidia(&self) -> bool {
-        self.graphics.iter().any(|device| device.vendor == NVIDIA)
+    pub fn variant(&self) -> Variant {
+        variant_for(&self.graphics)
     }
 }
 

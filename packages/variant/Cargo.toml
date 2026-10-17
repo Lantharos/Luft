@@ -1,7 +1,7 @@
 [package]
 name = "luft-variant"
 version = "0.1.0"
-description = "Which of Luft's images suits a computer, and the image reference of each, shared by Install Luft, Settings and the updater"
+description = "Which of Luft's images suits a computer, and the image reference of each, shared by Install Luft, Settings, the updater and Meet Luft"
 authors = ["Kristof"]
 license = "MIT"
 edition = "2024"

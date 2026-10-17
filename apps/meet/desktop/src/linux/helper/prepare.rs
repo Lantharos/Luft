@@ -14,7 +14,6 @@ use crate::linux::record::Made;
 use crate::live::build;
 use crate::live::durable;
 use crate::live::source::Source;
-use crate::live::variant::Variant;
 use crate::protocol::{Prepared, Report};
 use crate::serving::Context;
 
@@ -60,7 +59,7 @@ pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
         esp_free,
         place: spot.describe(),
     };
-    let variant = Variant::for_graphics(&facts.machine.graphics);
+    let variant = facts.machine.variant();
     let listing = build::listing(source, variant)
         .inspect_err(|error| eprintln!("Luft's download isn't reachable: {error}"))
         .ok();

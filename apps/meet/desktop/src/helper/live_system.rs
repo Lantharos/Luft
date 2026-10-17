@@ -2,8 +2,11 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use luft_variant::Variant;
+
 use super::Context;
 use super::system::facts;
+use crate::check::facts::variant_for;
 pub use crate::live::build::unfinished;
 use crate::live::build::{self, Listing};
 use crate::live::download::{Hashing, format_checksum};
@@ -15,8 +18,8 @@ use crate::plan::layout::Role;
 use crate::plan::sizes;
 use crate::protocol::Stage;
 
-fn variant() -> crate::live::variant::Variant {
-    crate::live::variant::Variant::for_graphics(&facts::graphics())
+fn variant() -> Variant {
+    variant_for(&facts::graphics())
 }
 
 pub fn listing(source: &Source) -> Result<Listing, String> {

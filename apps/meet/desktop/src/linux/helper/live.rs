@@ -7,9 +7,9 @@ use crate::live::durable;
 use crate::live::files::{self, BUILD_RECORD, Place, UPDATING, Volumes};
 use crate::live::iso::{self, Entry};
 use crate::live::source::Source;
-use crate::live::variant::Variant;
 use crate::protocol::Stage;
 use crate::serving::Context;
+use luft_variant::Variant;
 
 const SHIM: &str = "EFI/BOOT/BOOTX64.EFI";
 const LOADERS: &str = "EFI/BOOT/";

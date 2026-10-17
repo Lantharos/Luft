@@ -3,8 +3,8 @@ use std::path::Path;
 use std::process::Command;
 
 use super::efi;
-use crate::check::facts::{Architecture, Device, Firmware, Machine, Platform};
-use crate::live::variant::Variant;
+use crate::check::facts::{Architecture, Device, Firmware, Machine, Platform, variant_for};
+use luft_variant::Variant;
 
 const PCI_DEVICES: &str = "/sys/bus/pci/devices";
 const NETWORK: &str = "/sys/class/net";
@@ -112,7 +112,7 @@ pub fn gather(gpt: bool) -> Machine {
 }
 
 pub fn variant() -> Variant {
-    Variant::for_graphics(&graphics())
+    variant_for(&graphics())
 }
 
 pub fn system_name() -> String {

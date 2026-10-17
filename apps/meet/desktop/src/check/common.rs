@@ -1,3 +1,4 @@
+use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
 
 use super::facts::{Architecture, BROADCOM, Machine, Platform};
@@ -226,7 +227,7 @@ pub fn graphics(machine: &Machine) -> Finding {
         .map(|device| device.name.as_str())
         .collect::<Vec<_>>()
         .join(", ");
-    if machine.nvidia() {
+    if machine.variant() == Variant::Nvidia {
         finding(
             Topic::Graphics,
             Level::Fine,

@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
-use super::variant::Variant;
+use luft_variant::Variant;
 
 const DOWNLOADS: &str = "https://get.luft.lanth.me";
 const ATTEMPTS: u32 = 6;

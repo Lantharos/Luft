@@ -1,9 +1,10 @@
 use std::path::{Path, PathBuf};
 
+use crate::NVIDIA_VENDOR;
+
 const PCI_DEVICES: &str = "/sys/bus/pci/devices";
 const PCI_DEVICES_OVERRIDE: &str = "LUFT_PCI_DEVICES";
 const DISPLAY_CLASS: &str = "0x03";
-const NVIDIA: &str = "0x10de";
 
 fn read(path: &Path) -> String {
     std::fs::read_to_string(path)
@@ -26,11 +27,11 @@ fn nvidia_cards_in(devices: &Path) -> Vec<String> {
         .map(|device| device.path())
         .filter(|device| {
             read(&device.join("class")).starts_with(DISPLAY_CLASS)
-                && read(&device.join("vendor")) == NVIDIA
+                && read(&device.join("vendor")) == format!("{NVIDIA_VENDOR:#06x}")
         })
         .map(|device| {
             let model = read(&device.join("device"));
-            format!("10de:{}", model.trim_start_matches("0x"))
+            format!("{NVIDIA_VENDOR:04x}:{}", model.trim_start_matches("0x"))
         })
         .collect();
     cards.sort();

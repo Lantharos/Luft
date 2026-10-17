@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub use graphics::nvidia_cards;
 
 const NVIDIA_TAG: &str = "-nvidia";
+pub const NVIDIA_VENDOR: u16 = 0x10de;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -29,11 +30,15 @@ impl Variant {
     }
 
     pub fn for_this_computer() -> Self {
-        if nvidia_cards().is_empty() {
-            Self::Standard
-        } else {
-            Self::Nvidia
-        }
+        Self::with_nvidia(!nvidia_cards().is_empty())
+    }
+
+    pub fn for_vendors(graphics: impl IntoIterator<Item = u16>) -> Self {
+        Self::with_nvidia(graphics.into_iter().any(|vendor| vendor == NVIDIA_VENDOR))
+    }
+
+    fn with_nvidia(nvidia: bool) -> Self {
+        if nvidia { Self::Nvidia } else { Self::Standard }
     }
 
     pub fn of(reference: &str) -> Self {
@@ -94,6 +99,14 @@ mod tests {
             assert_eq!(Variant::of(nvidia), Variant::Nvidia);
             assert_eq!(Variant::of(standard), Variant::Standard);
         }
+    }
+
+    #[test]
+    fn any_nvidia_card_picks_the_nvidia_image() {
+        assert_eq!(Variant::for_vendors([0x10de]), Variant::Nvidia);
+        assert_eq!(Variant::for_vendors([0x8086, 0x10de]), Variant::Nvidia);
+        assert_eq!(Variant::for_vendors([0x1002]), Variant::Standard);
+        assert_eq!(Variant::for_vendors([]), Variant::Standard);
     }
 
     #[test]

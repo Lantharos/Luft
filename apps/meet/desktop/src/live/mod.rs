@@ -4,4 +4,3 @@ pub mod durable;
 pub mod files;
 pub mod iso;
 pub mod source;
-pub mod variant;

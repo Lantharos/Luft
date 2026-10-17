@@ -5,7 +5,7 @@ use super::download::parse_checksum;
 use super::files::{self, BUILD_RECORD, UPDATING};
 use super::iso::{self, Entry};
 use super::source::Source;
-use super::variant::Variant;
+use luft_variant::Variant;
 
 pub struct Listing {
     pub entries: Vec<Entry>,

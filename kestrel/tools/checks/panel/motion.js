@@ -1,12 +1,75 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
+import Gio from 'gi://Gio';
 import St from 'gi://St';
-import {Spring} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
+import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {nextFrame, pause, waitUntil} from '../lib/wait.js';
+import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require} = checks('motion');
+const SURFACES = [['start', 'kestrel-start'], ['quick', 'kestrel-quick-settings'], ['notifications', 'kestrel-notifications']];
+const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
+
+function sample(actor, frames, record) {
+  return new Promise(resolve => {
+    let left = frames;
+    const id = global.stage.connect_after('after-paint', () => {
+      record(actor);
+      if (--left > 0) return;
+      global.stage.disconnect(id);
+      resolve();
+    });
+    global.stage.queue_redraw();
+  });
+}
+
+const resting = actor => actor.get_transition('translation-y') === null && actor.get_transition('opacity') === null;
+
+async function checkInterruptedSurface(surface, name) {
+  dismissImmediately();
+  await settled();
+  const actor = named(name);
+  toggleSurface(surface);
+  await pause(80);
+  await nextFrame();
+  const before = actor.translation_y;
+  toggleSurface(surface);
+  const heights = [];
+  await sample(actor, 3, () => heights.push(actor.translation_y));
+  require(heights.some(height => height > before), `${surface} starts back down at once when closed 80 ms into opening`);
+  await waitUntil(() => !actor.visible && resting(actor), `${surface} hides after closing mid-way`, 2000);
+
+  toggleSurface(surface);
+  await waitUntil(() => resting(actor), `${surface} opens`, 2000);
+  toggleSurface(surface);
+  await pause(60);
+  toggleSurface(surface);
+  await waitUntil(() => resting(actor), `${surface} settles after reopening mid-close`, 2000);
+  require(actor.visible && actor.translation_y === 0 && actor.opacity === 255,
+    `${surface} ends fully open when reopened 60 ms into closing`);
+  toggleSurface(surface);
+  await waitUntil(() => !actor.visible, `${surface} closes`, 2000);
+}
+
+async function checkReducedSurface(surface, name) {
+  dismissImmediately();
+  await settled();
+  const actor = named(name);
+  const offsets = [];
+  const opacities = [];
+  toggleSurface(surface);
+  await sample(actor, 8, () => {
+    offsets.push(actor.translation_y);
+    opacities.push(actor.opacity);
+  });
+  require(offsets.every(offset => offset === 0) && opacities.some(opacity => opacity > 0 && opacity < 255),
+    `with reduced motion ${surface} fades in without sliding`);
+  toggleSurface(surface);
+  await waitUntil(() => !actor.visible, `${surface} closes with reduced motion`, 2000);
+  require(actor.translation_y === 0, `with reduced motion ${surface} fades out without sliding`);
+}
 
 function testActor() {
   const actor = new Clutter.Actor({width: 200, height: 200});
@@ -72,4 +135,11 @@ export async function run() {
   await checkSpring();
   await checkRetarget();
   await checkDisabledAnimations();
+  for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
+  a11y.set_string('reduced-motion', 'reduce');
+  try {
+    for (const [surface, name] of SURFACES) await checkReducedSurface(surface, name);
+  } finally {
+    a11y.reset('reduced-motion');
+  }
 }

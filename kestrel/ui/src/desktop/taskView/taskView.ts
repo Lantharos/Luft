@@ -5,7 +5,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { animateActor } from '../../shared/motion.js';
+import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface } from '../../shared/surface.js';
 import { windowSlots } from './grid.js';
@@ -14,6 +14,7 @@ import { WorkspaceStrip, type BackgroundFactory, type BoardFrames } from './work
 
 const MARGIN = 40;
 const SPACING = 28;
+const RECEDED = 0.96;
 
 export class TaskView {
   readonly actor = new St.Widget({ name: 'kestrel-task-view', style_class: 'kestrel-task-view', reactive: true, visible: false });
@@ -55,13 +56,14 @@ export class TaskView {
     ];
     this.rebuild();
     this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
-    this.actor.remove_all_transitions();
-    this.actor.show();
-    this.actor.opacity = 0;
-    this.windowLayer.set_pivot_point(0.5, 0.5);
-    this.windowLayer.set_scale(0.96, 0.96);
-    animateActor(this.actor, { opacity: 255, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-    animateActor(this.windowLayer, { scale_x: 1, scale_y: 1, duration: 220, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+    if (!this.actor.visible) {
+      this.actor.opacity = 0;
+      this.windowLayer.set_pivot_point(0.5, 0.5);
+      this.windowLayer.set_scale(reducedMotion() ? 1 : RECEDED, reducedMotion() ? 1 : RECEDED);
+      this.actor.show();
+    }
+    animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+    this.scaleWindows(1);
     this.actor.grab_key_focus();
   }
 
@@ -83,7 +85,12 @@ export class TaskView {
       finish();
       return;
     }
-    animateActor(this.actor, { opacity: 0, duration: 140, mode: Clutter.AnimationMode.EASE_IN_QUAD, onStopped: finish });
+    if (!reducedMotion()) this.scaleWindows(RECEDED);
+    animateActor(this.actor, { opacity: 0, duration: Duration.quick, curve: Curve.decelerate, onStopped: finish });
+  }
+
+  private scaleWindows(scale: number): void {
+    animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.smooth });
   }
 
   private scheduleRebuild(): void {

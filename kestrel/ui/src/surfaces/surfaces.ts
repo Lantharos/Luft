@@ -12,7 +12,7 @@ import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferen
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
-import { animateActor } from '../shared/motion.js';
+import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion.js';
 import { SURFACE_GAP } from '../shared/surface.js';
 import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
@@ -25,8 +25,7 @@ type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const START_HEIGHT = 600;
 const EDGE_MARGIN = 12;
-const OPEN_DURATION = 220;
-const CLOSE_DURATION = 160;
+const PANEL_SLIDE = 56;
 
 interface SurfaceParts {
   context: Context;
@@ -141,7 +140,7 @@ export class Surfaces {
       return;
     }
 
-    this.close();
+    this.close(Duration.tap);
     if (this.monitor !== monitor) {
       for (const actor of this.all()) {
         actor.remove_all_transitions();
@@ -172,16 +171,16 @@ export class Surfaces {
     if (surface === 'snap') snapLayouts.prepareOpen();
     this.place();
     if (opening) {
-      actor.opacity = popup ? 0 : 255;
-      actor.translation_y = this.slideDistance(actor);
+      actor.opacity = 0;
+      actor.translation_y = reducedMotion() ? 0 : this.slideDistance(actor);
     }
-    this.animate(actor, 0, OPEN_DURATION);
+    this.reveal(actor);
 
     if (surface === 'start') start.focus();
     else if (!popup) actor.grab_key_focus();
   }
 
-  close(): void {
+  close(fade: number = Duration.quick): void {
     const { menus, notifications, taskView, quick } = this.parts;
     menus.close();
     const surface = this.current;
@@ -207,8 +206,9 @@ export class Surfaces {
       return;
 
     const actor = this.actorFor(surface);
-    this.animate(actor, this.slideDistance(actor), CLOSE_DURATION, () => {
+    this.conceal(actor, fade, () => {
       if (this.current === surface) return;
+      actor.remove_all_transitions();
       actor.hide();
       this.releaseSelection(actor);
       if (surface === 'quick') quick.closeSubmenu(false);
@@ -271,22 +271,17 @@ export class Surfaces {
     }
   }
 
-  private animate(actor: Clutter.Actor, translationY: number, duration: number, onStopped?: () => void): void {
-    animateActor(actor, {
-      translation_y: translationY,
-      ...this.popupActor(actor) ? { opacity: translationY === 0 ? 255 : 0 } : {},
-      duration,
-      mode: translationY === 0
-        ? Clutter.AnimationMode.EASE_OUT_QUART
-        : Clutter.AnimationMode.EASE_IN_QUART,
-      onStopped,
-    });
+  private reveal(actor: Clutter.Actor): void {
+    animateActor(actor, { translation_y: 0, spring: Spring.snappy });
+    animateActor(actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+  }
+
+  private conceal(actor: Clutter.Actor, fade: number, onHidden: () => void): void {
+    if (!reducedMotion()) animateActor(actor, { translation_y: this.slideDistance(actor), spring: Spring.snappy });
+    animateActor(actor, { opacity: 0, duration: fade, curve: Curve.decelerate, onStopped: onHidden });
   }
 
   private slideDistance(actor: Clutter.Actor): number {
-    const popup = this.popupActor(actor);
-    if (popup) return popup.slideDistance;
-    const monitor = this.surfaceMonitor();
-    return monitor.y + monitor.height - actor.y;
+    return this.popupActor(actor)?.slideDistance ?? PANEL_SLIDE;
   }
 }

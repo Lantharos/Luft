@@ -1,0 +1,78 @@
+---
+import { formatSize, iso, meet, nightlyIso } from '../../data/downloads';
+
+const variants = [
+	{ label: 'Without NVIDIA graphics', download: iso.standard },
+	{ label: 'With NVIDIA graphics', download: iso.nvidia }
+];
+const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
+---
+
+<section class="page grid gap-20 py-24 md:py-36 lg:grid-cols-2 lg:gap-24">
+	<div class="only-meet reveal">
+		<h2 class="text-3xl font-semibold tracking-tight">Meet Luft</h2>
+		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">
+			The easiest way in. It checks your computer, makes room and restarts into Luft, to try it or install it. No USB stick, and nothing changes until you say so.
+		</p>
+		<div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+			<a class="button button-primary only-windows" href={meet.windows.href}>Download for Windows{sized(meet.windows.size)}</a>
+			<a class="button button-primary only-linux" href={meet.linux.href}>Download for Linux{sized(meet.linux.size)}</a>
+		</div>
+		<p class="mt-5 space-x-4 text-sm text-ink-muted">
+			<a class="link only-linux" href={meet.windows.href}>Windows version</a>
+			<a class="link only-windows" href={meet.linux.href}>Linux version</a>
+			<a class="link" href={meet.windows.checksum}>Windows checksum</a>
+			<a class="link" href={meet.linux.checksum}>Linux checksum</a>
+		</p>
+		<p class="mt-8 max-w-md text-sm text-ink-muted">
+			Windows 10 or 11, or Linux with a UEFI computer. Windows may ask once before opening it the first time: choose More info, then Run anyway.
+		</p>
+	</div>
+
+	<div id="iso" class="reveal scroll-mt-24">
+		<h2 class="text-3xl font-semibold tracking-tight">ISO</h2>
+		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">
+			For a USB stick, a virtual machine, or a computer that starts from nothing. It installs offline, on any PC.
+		</p>
+		<div class="mt-8">
+			<a class="button button-primary only-other" href={iso.universal.href}>Download ISO{sized(iso.universal.size)}</a>
+			<a class="button button-quiet only-meet" href={iso.universal.href}>Download ISO{sized(iso.universal.size)}</a>
+		</div>
+		<p class="mt-5 text-sm text-ink-muted">
+			<span class="font-mono">{iso.universal.file}</span> · <a class="link" href={iso.universal.checksum}>checksum</a>
+		</p>
+		<div class="mt-10 border-t border-hairline pt-6">
+			<p class="text-sm text-ink-soft">Smaller ISOs that carry just the edition one computer needs:</p>
+			<ul class="mt-3 space-y-2 text-sm">
+				{
+					variants.map(({ label, download }) => (
+						<li class="flex flex-wrap items-baseline justify-between gap-x-4">
+							<a class="link font-medium" href={download.href}>
+								{label}
+							</a>
+							<span class="text-ink-muted">
+								<span class="font-mono">{download.file}</span>
+								{sized(download.size)} · <a class="link" href={download.checksum}>checksum</a>
+							</span>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+		{
+			nightlyIso && (
+				<p class="mt-6 text-sm text-ink-muted">
+					Testing something new? <a class="link" href={nightlyIso.universal.href}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
+				</p>
+			)
+		}
+	</div>
+</section>
+
+{
+	iso.channel === 'nightly' && (
+		<p class="page reveal -mt-6 pb-8 text-sm text-ink-muted">
+			These are nightly builds, made whenever Luft changes, and computers installed from them keep getting nightly updates. The first release, Alizé, follows once Luft is stable.
+		</p>
+	)
+}

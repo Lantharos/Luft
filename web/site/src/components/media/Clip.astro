@@ -1,0 +1,46 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+interface Props {
+	webm: string;
+	mp4: string;
+	poster: ImageMetadata;
+	label: string;
+	class?: string;
+}
+
+const { webm, mp4, poster, label, class: className } = Astro.props;
+const still = await getImage({ src: poster, width: Math.min(1280, poster.width), format: 'webp', quality: 72 });
+---
+
+<video
+	class:list={['block h-auto w-full', className]}
+	data-clip
+	muted
+	loop
+	playsinline
+	preload="none"
+	poster={still.src}
+	width={poster.width}
+	height={poster.height}
+	aria-label={label}
+>
+	<source src={webm} type='video/webm; codecs="av01.0.08M.08"' />
+	<source src={mp4} type="video/mp4" />
+</video>
+
+<script>
+	const calm = matchMedia('(prefers-reduced-motion: reduce)');
+	const watcher = new IntersectionObserver(
+		(entries) => {
+			for (const { target, isIntersecting } of entries) {
+				const video = target as HTMLVideoElement;
+				if (isIntersecting && !calm.matches) video.play().catch(() => {});
+				else video.pause();
+			}
+		},
+		{ threshold: 0.35 }
+	);
+	for (const video of document.querySelectorAll<HTMLVideoElement>('[data-clip]')) watcher.observe(video);
+</script>

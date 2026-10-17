@@ -1,0 +1,32 @@
+---
+import { faq } from '../../data/faq';
+---
+
+<section id="questions" class="page py-24 md:py-44">
+	<div class="grid gap-10 md:grid-cols-12">
+		<h2 class="reveal text-headline font-semibold md:col-span-4">Questions</h2>
+		<div class="md:col-span-8">
+			{
+				faq.map(({ question, answer }) => (
+					<details class="faq group border-b border-hairline" name="faq">
+						<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+							{question}
+							<svg
+								class="size-5 shrink-0 text-ink-muted transition-transform duration-(--spring-snappy-duration) ease-(--spring-snappy) group-open:rotate-45"
+								viewBox="0 0 20 20"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.75"
+								stroke-linecap="round"
+								aria-hidden="true"
+							>
+								<path d="M10 4v12M4 10h12" />
+							</svg>
+						</summary>
+						<p class="max-w-2xl pb-7 text-ink-soft text-pretty">{answer}</p>
+					</details>
+				))
+			}
+		</div>
+	</div>
+</section>

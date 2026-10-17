@@ -1,0 +1,52 @@
+---
+import { getImage } from 'astro:assets';
+import { wallpapers } from '../../data/wallpapers';
+
+const tiles = await Promise.all(
+	wallpapers.map(async ({ name, photographer, image }) => {
+		const [small, large] = await Promise.all(
+			[320, 640].map((width) => getImage({ src: image, width, height: Math.round(width * 0.625), fit: 'cover', format: 'avif', quality: 55 }))
+		);
+		return { label: `${name}, a photo by ${photographer}`, src: small.src, srcset: `${small.src} 320w, ${large.src} 640w` };
+	})
+);
+const half = Math.ceil(tiles.length / 2);
+const rows = [tiles.slice(0, half), tiles.slice(half)];
+---
+
+<section class="py-24 md:py-44">
+	<div class="page reveal max-w-3xl text-center">
+		<h2 class="text-headline font-semibold text-balance">Pick a photo. Luft does the rest.</h2>
+		<p class="mx-auto mt-6 max-w-2xl text-lede text-ink-soft text-pretty">
+			{wallpapers.length} photographs come with it. Choose one, and the accent, the glass and every app take on its colours, in light and dark.
+		</p>
+	</div>
+	<div class="mt-14 space-y-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+		{
+			rows.map((row, index) => (
+				<div class="marquee-track flex w-max" data-reverse={index === 1 ? '' : undefined}>
+					{[0, 1].map((copy) => (
+						<ul class="flex gap-4 pr-4" aria-hidden={copy === 1 ? 'true' : undefined}>
+							{row.map((tile) => (
+								<li class="w-[clamp(11rem,22vw,18rem)] shrink-0">
+									<img
+										src={tile.src}
+										srcset={tile.srcset}
+										sizes="(min-width: 82rem) 18rem, 22vw"
+										alt={copy === 0 ? tile.label : ''}
+										title={tile.label}
+										width="320"
+										height="200"
+										loading="lazy"
+										decoding="async"
+										class="aspect-[8/5] h-auto w-full rounded-xl bg-well object-cover"
+									/>
+								</li>
+							))}
+						</ul>
+					))}
+				</div>
+			))
+		}
+	</div>
+</section>

@@ -1,0 +1,30 @@
+---
+import { Picture } from 'astro:assets';
+import { wallpaper } from '../../data/wallpapers';
+
+interface Props {
+	name: string;
+	position?: string;
+	eager?: boolean;
+	class?: string;
+}
+
+const { name, position = '50% 50%', eager = false, class: className } = Astro.props;
+const { image } = wallpaper(name);
+---
+
+<div class:list={['absolute inset-0 -z-10 overflow-hidden [&>picture]:contents', className]} aria-hidden="true">
+	<Picture
+		src={image}
+		alt=""
+		formats={['avif', 'webp']}
+		fallbackFormat="webp"
+		widths={[828, 1280, 1920, 2560]}
+		sizes="100vw"
+		quality={68}
+		loading={eager ? 'eager' : 'lazy'}
+		fetchpriority={eager ? 'high' : 'auto'}
+		class="size-full object-cover"
+		style={`object-position: ${position}`}
+	/>
+</div>

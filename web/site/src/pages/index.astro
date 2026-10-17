@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import Apps from '../components/home/Apps.astro';
+import Cloud from '../components/home/Cloud.astro';
+import Faq from '../components/home/Faq.astro';
+import Hero from '../components/home/Hero.astro';
+import Meet from '../components/home/Meet.astro';
+import Security from '../components/home/Security.astro';
+import Showcase from '../components/home/Showcase.astro';
+import Story from '../components/home/Story.astro';
+import Wallpapers from '../components/home/Wallpapers.astro';
+import mist from '../assets/mist.webp';
+---
+
+<Base
+	title="Luft"
+	description="A calm, quick desktop for your PC. Try it from Windows or Linux with one restart, no USB stick needed."
+	credits={['Fog', 'Nocturne', 'Inversion']}
+	overFog
+>
+	<link slot="head" rel="preload" as="image" href={mist.src} type="image/webp" />
+	<Hero />
+	<Showcase />
+	<Story />
+	<Wallpapers />
+	<Apps />
+	<Cloud />
+	<Security />
+	<Meet />
+	<Faq />
+</Base>

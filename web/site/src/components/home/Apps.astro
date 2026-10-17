@@ -1,0 +1,112 @@
+---
+import { apps } from '../../data/apps';
+import { hasShot, shot } from '../../data/shots';
+import Shot from '../media/Shot.astro';
+import Frame from './Frame.astro';
+
+const shown = apps.filter((app) => hasShot(`app-${app.id}`));
+const others = apps.filter((app) => !shown.includes(app));
+---
+
+<section id="apps" class="page py-24 md:py-44">
+	<div class="reveal max-w-2xl">
+		<h2 class="text-headline font-semibold text-balance">Apps made for it, from day one.</h2>
+		<p class="mt-6 text-lede text-ink-soft text-pretty">
+			Luft comes with its own apps. They share the desktop’s glass, colours and motion, open in a blink and stay out of your way.
+		</p>
+	</div>
+
+	<div class="mt-12 grid gap-8 lg:grid-cols-[15rem_1fr] lg:gap-12" data-tabs>
+		<div
+			role="tablist"
+			aria-label="Luft’s apps"
+			aria-orientation="vertical"
+			class="-mx-5 flex snap-x gap-1 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+		>
+			{
+				shown.map((app, index) => (
+					<button
+						type="button"
+						role="tab"
+						id={`tab-${app.id}`}
+						aria-controls={`panel-${app.id}`}
+						aria-selected={index === 0 ? 'true' : 'false'}
+						tabindex={index === 0 ? 0 : -1}
+						class="group flex shrink-0 snap-start items-center gap-3 rounded-2xl px-3.5 py-3 text-left transition-colors duration-(--motion-tap) hover:bg-ink/5 aria-selected:bg-ink/8"
+					>
+						<span class="size-6 shrink-0 text-ink-muted transition-colors group-aria-selected:text-accent [&>svg]:size-full" set:html={app.icon} />
+						<span class="flex flex-col">
+							<span class="font-semibold">{app.name}</span>
+							<span class="hidden text-sm text-ink-muted lg:block">{app.does}</span>
+						</span>
+					</button>
+				))
+			}
+		</div>
+
+		<div class="grid">
+			{
+				shown.map((app, index) => (
+					<div
+						role="tabpanel"
+						id={`panel-${app.id}`}
+						aria-labelledby={`tab-${app.id}`}
+						class="tab-panel col-start-1 row-start-1"
+						hidden={index !== 0}
+					>
+						<Frame>
+							<Shot {...shot(`app-${app.id}`)} alt={`${app.name}, ${app.does.toLowerCase()}`} sizes="(min-width: 76rem) 56rem, (min-width: 64rem) 70vw, 100vw" />
+						</Frame>
+						<p class="mt-5 max-w-2xl text-ink-soft">
+							<span class="font-semibold text-ink">{app.name}.</span> {app.detail}
+						</p>
+					</div>
+				))
+			}
+		</div>
+	</div>
+
+	<ul class="reveal mt-16 grid gap-8 border-t border-hairline pt-10 sm:grid-cols-2">
+		{
+			others.map((app) => (
+				<li class="flex gap-4">
+					<span class="mt-0.5 size-6 shrink-0 text-accent [&>svg]:size-full" set:html={app.icon} />
+					<p class="text-ink-soft">
+						<span class="font-semibold text-ink">{app.name}</span>, {app.does.toLowerCase()}. {app.detail}
+					</p>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<script>
+	for (const tabs of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+		const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+		const select = (chosen: HTMLButtonElement) => {
+			for (const button of buttons) {
+				const selected = button === chosen;
+				button.setAttribute('aria-selected', String(selected));
+				button.tabIndex = selected ? 0 : -1;
+				document.getElementById(button.getAttribute('aria-controls')!)!.hidden = !selected;
+			}
+		};
+		const warm = (button: HTMLButtonElement) => {
+			const image = document.getElementById(button.getAttribute('aria-controls')!)!.querySelector('img');
+			if (image) image.loading = 'eager';
+		};
+		for (const button of buttons) {
+			button.addEventListener('pointerenter', () => warm(button), { once: true });
+			button.addEventListener('focus', () => warm(button), { once: true });
+			button.addEventListener('click', () => select(button));
+			button.addEventListener('keydown', (event) => {
+				const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+				if (!step) return;
+				event.preventDefault();
+				const next = buttons[(buttons.indexOf(button) + step + buttons.length) % buttons.length];
+				next.focus();
+				select(next);
+			});
+		}
+	}
+</script>

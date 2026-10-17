@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+@import '@luft/web/styles.css';
+@import './motion.css';
+
+@theme {
+	--text-display: clamp(5rem, 13vw, 10rem);
+	--text-display--line-height: 0.92;
+	--text-display--letter-spacing: -0.045em;
+	--text-headline: clamp(2.25rem, 5vw, 4rem);
+	--text-headline--line-height: 1.02;
+	--text-headline--letter-spacing: -0.03em;
+	--text-title: clamp(1.875rem, 3.2vw, 2.75rem);
+	--text-title--line-height: 1.08;
+	--text-title--letter-spacing: -0.025em;
+	--text-lede: clamp(1.125rem, 1.6vw, 1.375rem);
+	--text-lede--line-height: 1.5;
+	--container-page: 76rem;
+}
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+		text-rendering: optimizeLegibility;
+		font-synthesis: none;
+	}
+
+	body {
+		min-height: 100svh;
+		overflow-x: clip;
+	}
+
+	::selection {
+		background: color-mix(in oklab, var(--accent) 35%, transparent);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 3px;
+		border-radius: 8px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+}
+
+@utility page {
+	width: 100%;
+	max-width: var(--container-page);
+	margin-inline: auto;
+	padding-inline: 1.25rem;
+
+	@media (width >= 48rem) {
+		padding-inline: 2rem;
+	}
+}
+
+@utility skip {
+	position: fixed;
+	top: 0.75rem;
+	left: 0.75rem;
+	z-index: 100;
+	padding: 0.625rem 1rem;
+	border-radius: 999px;
+	background: var(--ink);
+	color: var(--canvas);
+	transform: translateY(-200%);
+
+	&:focus-visible {
+		transform: none;
+	}
+}
+
+@utility button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	height: 3rem;
+	padding-inline: 1.375rem;
+	border-radius: 999px;
+	font-weight: 600;
+	white-space: nowrap;
+	transition:
+		transform var(--spring-snappy-duration) var(--spring-snappy),
+		background-color var(--motion-tap) linear;
+
+	&:active {
+		transform: scale(0.96);
+	}
+}
+
+@utility button-primary {
+	background: var(--accent);
+	color: var(--accent-ink);
+
+	&:hover {
+		background: color-mix(in oklab, var(--accent) 88%, var(--ink));
+	}
+}
+
+@utility button-quiet {
+	background: color-mix(in oklab, var(--ink) 8%, transparent);
+	color: var(--ink);
+
+	&:hover {
+		background: color-mix(in oklab, var(--ink) 13%, transparent);
+	}
+}
+
+@utility link {
+	text-decoration-line: underline;
+	text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+	transition: text-decoration-color var(--motion-tap) linear;
+
+	&:hover {
+		text-decoration-color: currentColor;
+	}
+}
+
+:root[data-os='windows'] :is(.only-linux, .only-other),
+:root[data-os='linux'] :is(.only-windows, .only-other),
+:root[data-os='other'] :is(.only-windows, .only-linux, .only-meet),
+:root:not([data-os]) .only-other {
+	display: none;
+}

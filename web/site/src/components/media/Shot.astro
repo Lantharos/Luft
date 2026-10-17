@@ -1,0 +1,46 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+interface Props {
+	dark: ImageMetadata;
+	light?: ImageMetadata;
+	alt: string;
+	sizes: string;
+	widths?: number[];
+	eager?: boolean;
+	class?: string;
+}
+
+const { dark, light, alt, sizes, widths = [640, 960, 1440, 1920, 2880], eager = false, class: className } = Astro.props;
+const formats = ['avif', 'webp'] as const;
+
+const srcset = async (image: ImageMetadata, format: (typeof formats)[number]) => {
+	const fitting = widths.filter((width) => width <= image.width);
+	const variants = await Promise.all(
+		fitting.map((width) => getImage({ src: image, width, format, quality: format === 'avif' ? 62 : 78 }))
+	);
+	return variants.map((variant, index) => `${variant.src} ${fitting[index]}w`).join(', ');
+};
+
+const sources = await Promise.all(
+	[...(light ? [{ image: light, media: '(prefers-color-scheme: light)' }] : []), { image: dark, media: undefined }].flatMap(
+		({ image, media }) => formats.map(async (format) => ({ media, type: `image/${format}`, srcset: await srcset(image, format) }))
+	)
+);
+const fallback = await getImage({ src: dark, width: Math.min(1440, dark.width), format: 'webp' });
+---
+
+<picture>
+	{sources.map((source) => <source media={source.media} type={source.type} srcset={source.srcset} sizes={sizes} />)}
+	<img
+		src={fallback.src}
+		alt={alt}
+		width={dark.width}
+		height={dark.height}
+		loading={eager ? 'eager' : 'lazy'}
+		fetchpriority={eager ? 'high' : 'auto'}
+		decoding="async"
+		class:list={['block h-auto w-full', className]}
+	/>
+</picture>

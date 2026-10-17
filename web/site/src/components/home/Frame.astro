@@ -1,0 +1,14 @@
+---
+interface Props {
+	class?: string;
+}
+---
+
+<div
+	class:list={[
+		'overflow-hidden rounded-[clamp(0.75rem,1.4vw,1.25rem)] bg-well shadow-[0_1px_0_0_var(--hairline),0_30px_80px_-30px_rgb(0_0_0/0.45)] ring-1 ring-hairline',
+		Astro.props.class
+	]}
+>
+	<slot />
+</div>

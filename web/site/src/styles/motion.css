@@ -1,0 +1,155 @@
+@keyframes rise {
+	from {
+		opacity: 0;
+		transform: translateY(2.5rem);
+	}
+}
+
+@keyframes settle {
+	from {
+		opacity: 0.4;
+		transform: translateY(6rem) scale(0.9);
+	}
+}
+
+@keyframes sink {
+	to {
+		transform: translateY(18%) scale(1.06);
+	}
+}
+
+@keyframes lift-away {
+	to {
+		opacity: 0;
+		transform: translateY(-4rem);
+	}
+}
+
+@keyframes drift {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes frost {
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes ink-to-theme {
+	from {
+		color: var(--light-ink);
+	}
+	to {
+		color: var(--ink);
+	}
+}
+
+@keyframes appear {
+	from {
+		opacity: 0;
+		transform: translateY(1rem);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.enter {
+		animation: appear var(--spring-smooth-duration) var(--spring-smooth) both;
+		animation-delay: calc(var(--order, 0) * 70ms + 80ms);
+	}
+
+	.tab-panel:not([hidden]) {
+		animation: appear var(--spring-smooth-duration) var(--spring-smooth) both;
+	}
+
+	.mist {
+		animation: drift 90s linear infinite;
+	}
+
+	.mist-slow {
+		animation-duration: 160s;
+		animation-direction: reverse;
+	}
+
+	@supports (animation-timeline: view()) {
+		.reveal,
+		.settle {
+			animation-fill-mode: both;
+			animation-timing-function: var(--ease-decelerate);
+			animation-timeline: view();
+		}
+
+		.reveal {
+			animation-name: rise;
+			animation-range: entry 5% entry 75%;
+		}
+
+		.settle {
+			animation-name: settle;
+			animation-range: entry 0% cover 40%;
+		}
+
+		.sink,
+		.lift-away {
+			animation-fill-mode: both;
+			animation-timing-function: linear;
+			animation-timeline: scroll(root);
+		}
+
+		.sink {
+			animation-name: sink;
+			animation-range: 0 100svh;
+		}
+
+		.lift-away {
+			animation-name: lift-away;
+			animation-range: 0 70svh;
+		}
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	.frost,
+	.fog-ink {
+		animation-fill-mode: both;
+		animation-timing-function: linear;
+		animation-timeline: scroll(root);
+		animation-range: 40svh 70svh;
+	}
+
+	.frost {
+		opacity: 0;
+		animation-name: frost;
+	}
+
+	.fog-ink {
+		animation-name: ink-to-theme;
+	}
+}
+
+@keyframes marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.marquee-track {
+		animation: marquee 140s linear infinite;
+	}
+
+	.marquee-track[data-reverse] {
+		animation-direction: reverse;
+	}
+
+	.marquee-track:hover {
+		animation-play-state: paused;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.faq[open] > p {
+		animation: appear var(--spring-snappy-duration) var(--spring-snappy) both;
+	}
+}

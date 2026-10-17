@@ -1,0 +1,48 @@
+---
+import { Picture } from 'astro:assets';
+import mist from '../../assets/mist.webp';
+import { wallpaper } from '../../data/wallpapers';
+
+const fog = wallpaper('Fog').image;
+---
+
+<section class="relative isolate flex h-svh min-h-[38rem] flex-col overflow-hidden bg-[#c9c7c1]">
+	<div class="sink absolute inset-0 -z-20 origin-top [&>picture]:contents">
+		<Picture
+			src={fog}
+			alt=""
+			formats={['avif', 'webp']}
+			widths={[828, 1280, 1920, 2560, 3200]}
+			sizes="100vw"
+			quality={70}
+			fallbackFormat="webp"
+			loading="eager"
+			fetchpriority="high"
+			class="size-full object-cover object-[50%_70%]"
+		/>
+	</div>
+	<div
+		class="mist pointer-events-none absolute inset-x-0 top-[38%] -z-10 h-[34%] w-[200%] bg-repeat-x opacity-25 [background-size:50%_100%]"
+		style={`background-image: url(${mist.src})`}
+		aria-hidden="true"
+	>
+	</div>
+	<div
+		class="mist mist-slow pointer-events-none absolute inset-x-0 top-[52%] -z-10 h-[30%] w-[200%] bg-repeat-x opacity-20 [background-size:50%_100%]"
+		style={`background-image: url(${mist.src})`}
+		aria-hidden="true"
+	>
+	</div>
+	<div class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-linear-to-b from-transparent to-canvas" aria-hidden="true"></div>
+
+	<div class="lift-away page flex flex-1 flex-col items-center pt-[18svh] text-center text-ink scheme-light">
+		<h1 class="enter text-display font-semibold">Luft</h1>
+		<p class="enter mt-6 max-w-xl text-lede text-ink-soft" style="--order: 1">
+			A calm, quick desktop for your PC. Try it from Windows or Linux with one restart, no USB stick needed.
+		</p>
+		<div class="enter mt-9 flex flex-wrap justify-center gap-3" style="--order: 2">
+			<a href="/download" class="button bg-ink text-canvas hover:bg-ink/88">Get Luft</a>
+			<a href="#tour" class="button button-quiet">Take a look</a>
+		</div>
+	</div>
+</section>

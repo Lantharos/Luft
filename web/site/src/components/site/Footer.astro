@@ -1,0 +1,53 @@
+---
+import { nav, urls } from '@luft/web';
+import { wallpaper } from '../../data/wallpapers';
+import Logo from './Logo.astro';
+
+interface Props {
+	credits: string[];
+}
+
+const photos = Astro.props.credits.map(wallpaper);
+---
+
+<footer class="border-t border-hairline">
+	<div class="page grid gap-10 py-14 text-sm text-ink-muted md:grid-cols-[1fr_auto]">
+		<div class="max-w-md space-y-3">
+			<a href="/" class="inline-flex items-center gap-2 text-base font-semibold text-ink">
+				<Logo class="size-5" />
+				Luft
+			</a>
+			<p>
+				Made by <a class="link" href="https://lanth.me">Lantharos</a>. Free and open source, built on{' '}
+				<a class="link" href="https://fedoraproject.org">Fedora</a>.
+			</p>
+			{
+				photos.length > 0 && (
+					<p>
+						Photos by{' '}
+						{photos.map((photo, index) => (
+							<>
+								<a class="link" href={photo.url}>
+									{photo.photographer}
+								</a>
+								{index < photos.length - 2 ? ', ' : index === photos.length - 2 ? ' and ' : ''}
+							</>
+						))}{' '}
+						on Unsplash. Every one of them is a wallpaper in Luft.
+					</p>
+				)
+			}
+		</div>
+		<ul class="flex gap-6 md:flex-col md:gap-2 md:text-right">
+			{
+				nav.map(({ label, href }) => (
+					<li>
+						<a class="transition-colors duration-(--motion-tap) hover:text-ink" href={href.replace(urls.site, '') || '/'}>
+							{label}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</footer>

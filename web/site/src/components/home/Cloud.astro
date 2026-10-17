@@ -1,0 +1,15 @@
+---
+const services = ['iCloud Drive', 'OneDrive', 'Dropbox', 'Nextcloud', 'WebDAV'];
+---
+
+<section class="page py-24 md:py-44">
+	<div class="reveal grid gap-10 md:grid-cols-2 md:items-end">
+		<h2 class="text-headline font-semibold text-balance">Your cloud, as plain folders.</h2>
+		<p class="text-lede text-ink-soft text-pretty">
+			Sign in once in Settings and your files appear in Rover, and in every app’s Open dialog. Nothing downloads until you open it, and what you keep on the computer works offline.
+		</p>
+	</div>
+	<ul class="reveal mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-hairline pt-10 text-[clamp(1.5rem,3vw,2.25rem)] font-semibold tracking-tight text-ink-muted">
+		{services.map((service) => <li>{service}</li>)}
+	</ul>
+</section>

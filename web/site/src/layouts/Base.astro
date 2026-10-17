@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+import openRunde from '@luft/web/fonts/OpenRunde-Regular.woff2?url';
+import openRundeSemibold from '@luft/web/fonts/OpenRunde-Semibold.woff2?url';
+import Header from '../components/site/Header.astro';
+import Footer from '../components/site/Footer.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	credits?: string[];
+	overFog?: boolean;
+}
+
+const { title, description, credits = [], overFog = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<meta name="theme-color" content="#fcf9f3" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#12110e" media="(prefers-color-scheme: dark)" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={new URL('/og.jpg', Astro.site)} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="preload" href={openRunde} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={openRundeSemibold} as="font" type="font/woff2" crossorigin />
+		<slot name="head" />
+		<script is:inline>
+			const agent = navigator.userAgent;
+			document.documentElement.dataset.os = /Android|CrOS|iPhone|iPad/.test(agent)
+				? 'other'
+				: /Windows/.test(agent)
+					? 'windows'
+					: /Linux|X11/.test(agent)
+						? 'linux'
+						: 'other';
+		</script>
+	</head>
+	<body class="bg-canvas text-ink font-sans antialiased">
+		<a href="#main" class="skip">Skip to content</a>
+		<Header overFog={overFog} />
+		<main id="main">
+			<slot />
+		</main>
+		<Footer credits={credits} />
+	</body>
+</html>

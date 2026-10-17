@@ -1,0 +1,21 @@
+---
+import { iso, meet } from '../../data/downloads';
+
+interface Props {
+	isoHref?: string;
+	class?: string;
+}
+
+const { isoHref = iso.universal.href, class: className } = Astro.props;
+---
+
+<div class:list={['flex flex-wrap gap-3', className]}>
+	<a class="button button-primary only-meet only-windows" href={meet.windows.href}>
+		Download Meet Luft <span class="hidden font-normal opacity-70 sm:inline">for Windows</span>
+	</a>
+	<a class="button button-primary only-meet only-linux" href={meet.linux.href}>
+		Download Meet Luft <span class="hidden font-normal opacity-70 sm:inline">for Linux</span>
+	</a>
+	<a class="button button-quiet only-meet" href={isoHref}>Download ISO</a>
+	<a class="button button-primary only-other" href={isoHref}>Download ISO</a>
+</div>

@@ -1,0 +1,65 @@
+---
+import { shot } from '../../data/shots';
+import movesMp4 from '../../assets/clips/moves.mp4?url';
+import movesWebm from '../../assets/clips/moves.webm?url';
+import movesPoster from '../../assets/clips/moves.webp';
+import Clip from '../media/Clip.astro';
+import Shot from '../media/Shot.astro';
+import Chapter from './Chapter.astro';
+import Frame from './Frame.astro';
+---
+
+<Chapter title="Start knows where everything is.">
+	<p>
+		Type a few letters and Start finds apps, settings, files and even the words inside them. It does sums and unit
+		conversions, and turns on dark style or Wi-Fi when you ask.
+	</p>
+	<Frame slot="media">
+		<Shot {...shot('search')} alt="Start searching for dark, with the dark style action and matching settings" sizes="(min-width: 76rem) 48rem, (min-width: 48rem) 64vw, 94vw" />
+	</Frame>
+</Chapter>
+
+<Chapter title="The essentials, one click away." flip>
+	<p>
+		Quick settings are tiles you arrange yourself. Notifications group by app, with replies, media controls and a
+		calendar right next to them.
+	</p>
+	<div slot="media" class="grid grid-cols-2 gap-4 md:gap-6">
+		<Frame>
+			<Shot {...shot('quick')} alt="Quick settings with network, power mode, dark style and volume" sizes="(min-width: 76rem) 24rem, (min-width: 48rem) 32vw, 47vw" />
+		</Frame>
+		<Frame class="translate-y-10">
+			<Shot {...shot('notifications')} alt="The notification center with a calendar" sizes="(min-width: 76rem) 24rem, (min-width: 48rem) 32vw, 47vw" />
+		</Frame>
+	</div>
+</Chapter>
+
+<Chapter title="Room for every window.">
+	<p>
+		Snap windows into layouts or see them all at once. Or turn any desktop into a board, an endless canvas where
+		windows sit side by side and you zoom out to see the whole picture.
+	</p>
+	<div slot="media" class="space-y-4 md:space-y-6">
+		<Frame>
+			<Shot {...shot('board')} alt="A desktop as a board, with every window side by side" sizes="(min-width: 76rem) 48rem, (min-width: 48rem) 64vw, 94vw" />
+		</Frame>
+		<div class="grid grid-cols-2 gap-4 md:gap-6">
+			<Frame>
+				<Shot {...shot('snap')} alt="Snap layouts for the focused window" sizes="(min-width: 76rem) 24rem, (min-width: 48rem) 32vw, 47vw" />
+			</Frame>
+			<Frame>
+				<Shot {...shot('tasks')} alt="Every window and desktop at a glance" sizes="(min-width: 76rem) 24rem, (min-width: 48rem) 32vw, 47vw" />
+			</Frame>
+		</div>
+	</div>
+</Chapter>
+
+<Chapter title="It moves like it means it." flip>
+	<p>
+		Everything in Luft moves on springs, so it can change its mind halfway without a jolt. Swipes follow your fingers
+		and land where you meant, and apps open quickly, even the first time.
+	</p>
+	<Frame slot="media">
+		<Clip webm={movesWebm} mp4={movesMp4} poster={movesPoster} label="Start, quick settings, every window at a glance and the board, opening and closing in Luft" />
+	</Frame>
+</Chapter>

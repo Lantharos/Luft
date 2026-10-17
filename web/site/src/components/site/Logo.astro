@@ -1,0 +1,11 @@
+---
+import logo from '@luft/web/logo.svg?raw';
+
+interface Props {
+	class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['inline-block [&>svg]:size-full', className]} aria-hidden="true" set:html={logo} />

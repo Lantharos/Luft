@@ -1,8 +1,6 @@
 name: Meet Luft
 
 on:
-  push:
-    tags: ["meet-v*"]
   workflow_dispatch:
 
 concurrency:
@@ -10,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   SABINE: v0.45
@@ -24,13 +22,6 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v7
-
-      - name: Check the tag
-        if: github.ref_type == 'tag'
-        run: |
-          $manifest = Get-Content apps/meet/Sabine.toml -Raw
-          if ($manifest -notmatch '(?m)^version\s*=\s*"([^"]+)"') { throw 'apps/meet/Sabine.toml has no version' }
-          if ($env:GITHUB_REF_NAME -ne "meet-v$($Matches[1])") { throw "$env:GITHUB_REF_NAME doesn't match version $($Matches[1])" }
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -132,14 +123,3 @@ jobs:
           for file in meet-luft.exe meet-luft.exe.sha256 meet-luft.AppImage meet-luft.AppImage.sha256; do
             aws s3 cp --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" --no-progress "$file" "s3://$R2_BUCKET/$file"
           done
-
-      - name: Release
-        if: github.ref_type == 'tag'
-        working-directory: out
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY" --latest=false
-          --title "Meet Luft ${GITHUB_REF_NAME#meet-v}"
-          --notes 'Meet Luft for Windows and Linux. The Windows download is not code-signed yet, so Windows SmartScreen asks before it opens.'
-          meet-luft.exe meet-luft.exe.sha256 meet-luft.AppImage meet-luft.AppImage.sha256

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 const LIVE_ARGUMENT: &str = "rd.live.image";
 const PENDING: &str = "first-boot";
+pub const SETUP_GROUP: &str = "luft-setup";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Phase {

@@ -1,6 +1,6 @@
 [Unit]
 Description=Check the Luft installer against this VM's drives
-After=dbus.service local-fs.target
+After=dbus.service local-fs.target systemd-user-sessions.service
 ConditionPathExists=/dev/disk/by-label/luft-source
 
 [Service]

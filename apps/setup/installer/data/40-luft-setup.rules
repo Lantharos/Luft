@@ -1,0 +1,12 @@
+var SETUP_ACTIONS = [
+    "com.lantharos.trust.manage-encryption",
+    "com.lantharos.trust.manage-secure-boot",
+    "net.reactivated.fprint.device.enroll",
+];
+
+polkit.addRule(function (action, subject) {
+    if (SETUP_ACTIONS.indexOf(action.id) >= 0 && subject.local && subject.active && subject.isInGroup("luft-setup")) {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
+});

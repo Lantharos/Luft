@@ -60,7 +60,7 @@
 			<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">
 				Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
 			</p>
-			<RecoveryKey {key} onsave={() => saveKey(key)} onprint={() => printKey(key)} />
+			<RecoveryKey {key} onsave={() => saveKey(key)} onprint={() => printKey(key)} copyable={false} />
 			{#if !tpm}
 				<div class="grid grid-cols-2 gap-3">
 					<PasswordField bind:value={passphrase} label="Passphrase" showLabel autocomplete="new-password" />

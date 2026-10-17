@@ -86,6 +86,7 @@
 		align-items: flex-start;
 		padding-top: 14vh;
 		background: rgba(8, 8, 7, 0.32);
+		border-radius: var(--window-radius);
 		animation: fade var(--motion-standard) var(--ease-decelerate);
 	}
 

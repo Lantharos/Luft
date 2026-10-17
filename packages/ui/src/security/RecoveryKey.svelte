@@ -7,9 +7,10 @@
 		key: string;
 		onsave: () => Promise<boolean>;
 		onprint: () => Promise<boolean>;
+		copyable?: boolean;
 	}
 
-	let { key, onsave, onprint }: Props = $props();
+	let { key, onsave, onprint, copyable = true }: Props = $props();
 
 	let done = $state<'saved' | 'printing' | 'copied' | null>(null);
 	let error = $state('');
@@ -42,7 +43,9 @@
 	<div class="flex flex-wrap items-center gap-1">
 		<button type="button" class="plain-button" onclick={save}><Save size={16} />Save to a file</button>
 		<button type="button" class="plain-button" onclick={print}><Printer size={16} />Print</button>
-		<button type="button" class="plain-button" onclick={copy}><Copy size={16} />Copy</button>
+		{#if copyable}
+			<button type="button" class="plain-button" onclick={copy}><Copy size={16} />Copy</button>
+		{/if}
 		{#if done}
 			<span class="ml-auto pr-2 text-[12.5px] text-[var(--text-muted)]">{NOTES[done]}</span>
 		{/if}

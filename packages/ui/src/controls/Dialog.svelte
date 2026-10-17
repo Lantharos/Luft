@@ -79,6 +79,7 @@
 		display: grid;
 		place-items: center;
 		background: rgba(8, 8, 7, 0.45);
+		border-radius: var(--window-radius);
 	}
 
 	.dialog {

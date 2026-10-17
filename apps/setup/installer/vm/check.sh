@@ -58,6 +58,7 @@ check_whole_drive() {
     fail "the partitions aren't EFI and root: $(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)"
   pass "the drive has an EFI system partition and Luft's btrfs"
   grep -q '^ada:.*:Ada Lovelace:/var/home/ada:' "$root/etc/passwd" && grep -q '^wheel:.*ada' "$root/etc/group" &&
+    grep -q '^luft-setup:.*:ada$' "$root/etc/group" &&
     grep -q '^ada:\$' "$root/etc/shadow" || fail "the account isn't in the new system"
   [[ "$(stat -c '%u %a' "$state/home/ada" 2>&1)" == "1000 700" ]] ||
     fail "the home folder is missing or not private: $(stat -c '%u %a' "$state/home/ada" 2>&1)"
@@ -160,16 +161,65 @@ check_alongside_windows() {
   pass "the signed startup images and their entries are on the startup partition"
 }
 
+SETUP_ACTIONS=(com.lantharos.trust.manage-encryption com.lantharos.trust.manage-secure-boot net.reactivated.fprint.device.enroll)
+
+switch_to() {
+  local console="$1" state="$2"
+  chvt "$console"
+  for _ in $(seq 20); do
+    [[ "$(loginctl show-user ada -p State --value 2> /dev/null)" == "$state" ]] && return
+    sleep 0.5
+  done
+  fail "ada's session didn't become $state on tty$console"
+}
+
+sign_in_ada() {
+  systemd-run --quiet --unit=ada-session -p PAMName=login -p User=ada -p TTYPath=/dev/tty3 -p StandardInput=tty sleep infinity
+  switch_to 3 active
+}
+
+answers() {
+  local action="$1" pid
+  pid="$(systemctl show -p MainPID --value ada-session)"
+  pkcheck --action-id "$action" --process "$pid" > /dev/null 2>&1
+  echo $?
+}
+
+check_setup_needs_no_password() {
+  local action
+  for action in "${SETUP_ACTIONS[@]}"; do
+    [[ "$(answers "$action")" == 0 ]] || fail "$action asks for a password during setup"
+  done
+  [[ "$(answers com.lantharos.trust.show-recovery-key)" == 2 ]] || fail "setup lets the new account see the recovery key without its password"
+  switch_to 1 online
+  [[ "$(answers net.reactivated.fprint.device.enroll)" != 0 ]] || fail "setup's exceptions reach a session that isn't in front"
+  switch_to 3 active
+  pass "setup turns on encryption, Secure Boot and fingerprints without asking for the new password"
+}
+
+check_password_needed_after_setup() {
+  local action
+  for action in "${SETUP_ACTIONS[@]}"; do
+    [[ "$(answers "$action")" == 2 ]] || fail "$action still needs no password after setup"
+  done
+  pass "after setup, encryption, Secure Boot and fingerprints ask for the password again"
+}
+
 check_first_boot_finish() {
   systemctl stop luft-installer
   useradd ada
+  groupadd --system luft-setup
+  usermod --append --groups luft-setup ada
   mkdir -p /var/lib/luft-installer
   echo ada > /var/lib/luft-installer/first-boot
   [[ "$(busctl --json=short get-property "${BUS[@]}" Phase | jq -r .data)" == first-boot ]] || fail "the installed system doesn't know setup is pending"
+  sign_in_ada
+  check_setup_needs_no_password
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
   [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
   pass "only the new account ends setup"
+  check_password_needed_after_setup
 }
 
 mkdir -p "$SOURCE" && mount -o ro LABEL=luft-source "$SOURCE" || fail "the source disk doesn't mount"

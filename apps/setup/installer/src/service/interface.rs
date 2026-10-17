@@ -247,12 +247,14 @@ impl Installer {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, FINISH).await?;
         let state_dir = self.options.state_dir.clone();
-        let pending = phase::pending_user(&state_dir).and_then(|user| uid_of(&user));
-        let caller = access::caller_uid(connection, &header).await?;
-        if pending.is_none() || pending != caller {
+        let Some(user) = phase::pending_user(&state_dir) else {
+            return Err(Error::not_authorized());
+        };
+        let pending = uid_of(&user);
+        if pending.is_none() || pending != access::caller_uid(connection, &header).await? {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();
-        Self::blocking(move || first_boot::finish(&state_dir)).await
+        Self::blocking(move || first_boot::finish(&state_dir, &user)).await
     }
 }

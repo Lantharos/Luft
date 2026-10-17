@@ -29,6 +29,7 @@ place 644 "$installer/data/com.lantharos.Installer1.conf" /usr/share/dbus-1/syst
 place 644 "$installer/data/com.lantharos.Installer1.service" /usr/share/dbus-1/system-services/com.lantharos.Installer1.service
 place 644 "$installer/data/luft-installer.service" /usr/lib/systemd/system/luft-installer.service
 place 644 "$installer/data/com.lantharos.installer.policy" /usr/share/polkit-1/actions/com.lantharos.installer.policy
+place 644 "$installer/data/40-luft-setup.rules" /usr/share/polkit-1/rules.d/40-luft-setup.rules
 place 755 "$here/check.sh" /usr/libexec/luft-installer-check
 place 644 "$here/luft-installer-check.service" /usr/lib/systemd/system/luft-installer-check.service
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-installer-check.rules

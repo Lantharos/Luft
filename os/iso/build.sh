@@ -3,16 +3,17 @@ set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../.." && pwd)"
 iso="$luft/os/iso"
-image="${1:-localhost/luft:45}"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
+image="${1:-$image_name:45}"
 state="${LUFT_ISO:-$iso/state}"
 work="$state/work"
 store="$work/store"
 fedora=45
 label="Luft-$fedora"
 published=ghcr.io/lantharos/luft:$fedora
-live_image=localhost/luft-live:$fedora
-live_system=localhost/luft-live-system:$fedora
-tools=localhost/luft-iso-tools
+live_image=$image_name-live:$fedora
+live_system=$image_name-live-system:$fedora
+tools=$image_name-iso-tools
 initramfs_omitted=(
   ostree bootc plymouth trustd crypt systemd-cryptsetup lvm mdraid dmraid multipath resume btrfs nvdimm
   clevis clevis-pin-tpm2 clevis-pin-file clevis-pin-null clevis-pin-sss clevis-pin-tang tpm2-tss systemd-pcrextend
@@ -26,7 +27,8 @@ usage() {
 Usage: os/iso/build.sh [IMAGE [EDITION...]]
 
 Builds Luft's live USB images from IMAGE (default localhost/luft:45) and
-IMAGE-nvidia, pulling them when they aren't here yet. Each stick starts the
+IMAGE-nvidia, pulling them when they aren't here yet. LUFT_IMAGE_NAME names
+its own images something other than localhost/luft. Each stick starts the
 regular image and installs without a network. EDITION picks what it carries:
 
   universal   both images (the default)

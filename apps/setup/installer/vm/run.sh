@@ -5,16 +5,17 @@ here="$(cd "$(dirname "$0")" && pwd)"
 installer="$(dirname "$here")"
 luft="$(cd "$installer/../../.." && pwd)"
 vm="${LUFT_INSTALLER_VM:-$installer/target/vm}"
-system=localhost/luft-installer-check-system
-image=localhost/luft-installer-check
-base="${LUFT_SYSTEM:-localhost/luft-system:45}"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
+base="${LUFT_SYSTEM:-$image_name-system:45}"
+system=$image_name-installer-check-system
+image=$image_name-installer-check
 carried="${LUFT_STICK_IMAGE:-default}"
 stage="$vm/stage"
 
-if [[ -z "${LUFT_SECUREBOOT_KEY:-}" ]]; then
-  keys="$luft/os/image/state/keys"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
-fi
+# shellcheck source=os/image/throwaway-keys.sh
+source "$luft/os/image/throwaway-keys.sh"
+use_signing_keys
+require_signed_by_keys "$base"
 
 place() {
   install -Dm"$1" "$2" "$stage/root$3"

@@ -6,10 +6,14 @@ image="$luft/os/image"
 state="${LUFT_IMAGE_STATE:-$image/state}"
 cache="${LUFT_IMAGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/luft-image}"
 registry="${LUFT_PARTS:-localhost/luft-parts}"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 fedora=45
 signed_parts=(boot nvidia)
 chunkah=quay.io/coreos/chunkah:v0.7.1
 retries=(--retry 6 --retry-delay 20s)
+
+# shellcheck source=os/image/throwaway-keys.sh
+source "$image/throwaway-keys.sh"
 
 usage() {
   cat <<'USAGE'
@@ -20,9 +24,10 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
 
 Builds the Luft images with Podman and seals them as localhost/luft:45 and
 localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the systems
-before sealing. The default system is split into layers by content with
-chunkah, so a layer only changes when what's in it does, and the NVIDIA system
-is that system plus the driver, so the two images share every layer below it.
+before sealing (LUFT_IMAGE_NAME names them something other than localhost/luft).
+The default system is split into layers by content with chunkah, so a layer
+only changes when what's in it does, and the NVIDIA system is that system plus
+the driver, so the two images share every layer below it.
 
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc, the web runtime, Helium, the system services, each app and NVIDIA's
@@ -36,20 +41,10 @@ part, and base prints the Fedora image the parts are built on (LUFT_BASE, by
 digest).
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
-and LUFT_PCR_KEY, or with throwaway keys kept in os/image/state/keys, which
-Secure Boot only accepts once they're enrolled.
+and LUFT_PCR_KEY, or with throwaway keys kept in ~/.local/state/luft/throwaway-keys
+(LUFT_THROWAWAY_KEYS), shared by every checkout and the VMs, which Secure Boot
+only accepts once they're enrolled.
 USAGE
-}
-
-throwaway_keys() {
-  local keys="$state/keys"
-  mkdir -p "$keys"
-  chmod 700 "$keys"
-  [[ -f "$keys/secureboot.key" ]] || openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
-    -subj "/CN=Luft throwaway Secure Boot key/" -keyout "$keys/secureboot.key" -out "$keys/secureboot.crt"
-  [[ -f "$keys/pcr.key" ]] || openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.key"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
-  echo "Signing with the throwaway keys in $keys." >&2
 }
 
 keys_set() {
@@ -66,6 +61,7 @@ require_keys() {
     exit 1
   fi
   throwaway_keys
+  echo "Signing with the throwaway keys in $(dirname "$LUFT_SECUREBOOT_KEY")." >&2
 }
 
 signed_by() {
@@ -263,7 +259,7 @@ rechunk() {
 }
 
 build_images() {
-  local variant parts=luft system="localhost/luft-system:$fedora" refs name ref names
+  local variant parts=luft system="$image_name-system:$fedora" refs name ref names
   [[ " $* " != *" luft-nvidia "* ]] || parts="luft-nvidia"
   require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT LUFT_PCR_KEY
   mapfile -t names < <(part_names "$parts")
@@ -276,10 +272,10 @@ build_images() {
   rechunk "$system"
   for variant; do
     case "$variant" in
-      luft) "$image/seal.sh" "$system" "localhost/luft:$fedora" ;;
+      luft) "$image/seal.sh" "$system" "$image_name:$fedora" ;;
       luft-nvidia)
         build_system luft-nvidia "$system-nvidia" --build-arg "SYSTEM=$(podman image inspect --format '{{.Id}}' "$system")"
-        "$image/seal.sh" "$system-nvidia" "localhost/luft:$fedora-nvidia"
+        "$image/seal.sh" "$system-nvidia" "$image_name:$fedora-nvidia"
         ;;
     esac
   done

@@ -3,18 +3,19 @@ set -euo pipefail
 
 os="$(cd "$(dirname "$0")/.." && pwd)"
 vm="${LUFT_VM:-$os/vm/state}"
-system="${1:-localhost/luft-system:45}"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
+system="${1:-$image_name-system:45}"
 user="${VM_USER:-luft}"
 password="${VM_PASSWORD:-luft-vm}"
-vm_system=localhost/luft-vm-system:latest
-test_image=localhost/luft-vm:latest
+vm_system=$image_name-vm-system:latest
+test_image=$image_name-vm:latest
 
 usage() {
   cat <<'USAGE'
 Usage: os/vm/disk.sh [SYSTEM]
 
 Installs the system image SYSTEM (default localhost/luft-system:45, from
-os/image/build.sh) onto a virtual disk with bootc, the way it lands on a real
+os/image/build.sh, or LUFT_IMAGE_NAME-system:45) onto a virtual disk with bootc, the way it lands on a real
 drive, without root on this computer: a helper VM booted from the image itself
 runs `bootc install to-disk` and puts shim and SushiBoot on the EFI system
 partition. Adds the account luft (password luft-vm, also root's) and a serial
@@ -27,10 +28,10 @@ case "${1:-}" in
   -h | --help) usage; exit 0 ;;
 esac
 
-if [[ -z "${LUFT_SECUREBOOT_KEY:-}" ]]; then
-  keys="$os/image/state/keys"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
-fi
+# shellcheck source=os/image/throwaway-keys.sh
+source "$os/image/throwaway-keys.sh"
+use_signing_keys
+require_signed_by_keys "$system"
 
 mkdir -p "$vm/share"
 
@@ -48,14 +49,15 @@ CONTAINERFILE
 rm -f "$vm/share/image.tar"
 podman save --quiet --format oci-archive --output "$vm/share/image.tar" "$test_image"
 
-cat >"$vm/share/install.sh" <<'SCRIPT'
-#!/bin/sh
+{
+  printf '#!/bin/sh\nimage=%s\n' "$test_image"
+  cat <<'SCRIPT'
 set -eux
 podman load --input /mnt/share/image.tar
 podman run --rm --privileged --pid=host --security-opt label=type:unconfined_t \
   -v /dev:/dev -v /var/lib/containers:/var/lib/containers \
   -v /sys/firmware/efi/efivars:/sys/firmware/efi/efivars \
-  localhost/luft-vm:latest sh -c '
+  "$image" sh -c '
     bootc install to-disk --wipe --target-imgref "$(cat /usr/share/luft/image-reference)" /dev/vdb
     esp="$(lsblk --list --noheadings --paths --output PATH,PARTTYPE /dev/vdb | grep c12a7328-f81f-11d2-ba4b-00a0c93ec93b | cut -d" " -f1)"
     mkdir -p /run/esp
@@ -64,6 +66,7 @@ podman run --rm --privileged --pid=host --security-opt label=type:unconfined_t \
     umount /run/esp'
 echo LUFT-INSTALL-DONE
 SCRIPT
+} >"$vm/share/install.sh"
 
 tree="$(podman unshare podman image mount "$test_image")"
 helper="$vm/helper.img"

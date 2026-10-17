@@ -5,16 +5,21 @@ here="$(cd "$(dirname "$0")" && pwd)"
 luft="$(cd "$here/../../.." && pwd)"
 state="${MEET_VM:-$here/state}"
 stage="$state/stage"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 
 usage() {
   cat <<'USAGE'
-Usage: apps/meet/vm/iso.sh
+Usage: apps/meet/vm/iso.sh [EDITION...]
 
-Builds a Luft ISO with this checkout's installer, Install Luft, trustd, live start-up and Toolbox builder,
-on top of localhost/luft-system:45 and :45-nvidia (made by os/image/build.sh), so
-Meet Luft can be tried against them without building the whole image. Writes
-apps/meet/vm/state/luft-meet.iso and its .sha256 (MEET_VM picks another folder), signed
-with the keys os/image/build.sh signs with.
+Builds Luft ISOs with this checkout's installer, Install Luft, trustd, live start-up
+and Toolbox builder on top of localhost/luft-system:45 and :45-nvidia (made by
+os/image/build.sh, and named after LUFT_IMAGE_NAME like it), so Meet Luft and
+Install Luft can be tried against them without building the whole image. They
+carry the QEMU guest agent, so apps/meet/vm/control.py can run commands in the live
+session and in what it installs. EDITION is universal (the default), standard or
+nvidia, as for os/iso/build.sh. Writes apps/meet/vm/state/luft-meet.iso,
+luft-meet-standard.iso and luft-meet-nvidia.iso with a .sha256 each (MEET_VM picks
+another folder), signed with the keys os/image/build.sh signs with.
 USAGE
 }
 
@@ -22,11 +27,8 @@ case "${1:-}" in
   -h | --help) usage; exit 0 ;;
 esac
 
-image_keys() {
-  [[ -n "${LUFT_SECUREBOOT_KEY:-}" ]] && return
-  local keys="$luft/os/image/state/keys"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
-}
+# shellcheck source=os/image/throwaway-keys.sh
+source "$luft/os/image/throwaway-keys.sh"
 
 stage_changes() {
   local installer="$luft/apps/setup/installer"
@@ -39,22 +41,35 @@ stage_changes() {
   sabine install --bundle --system-wide --root "$stage/root" "$luft/apps/setup"
   install -Dm755 "$luft/os/image/files/usr/libexec/luft-carried-tools" "$stage/root/usr/libexec/luft-carried-tools"
   install -Dm644 -t "$stage/root/usr/lib/systemd/user" "$luft/os/image/files/usr/lib/systemd/user/luft-carried-tools.service"
-  printf 'ARG BASE\nFROM ${BASE}\nCOPY root/ /\nRUN systemctl --global enable luft-carried-tools.service\n' > "$stage/Containerfile"
+  cat >"$stage/Containerfile" <<'CONTAINERFILE'
+ARG BASE
+FROM ${BASE}
+COPY root/ /
+RUN systemctl --global enable luft-carried-tools.service && \
+    dnf install -y qemu-guest-agent && dnf clean all && \
+    echo '(typepermissive virt_qemu_ga_t)' >/tmp/guest-agent.cil && semodule -i /tmp/guest-agent.cil && rm /tmp/guest-agent.cil
+CONTAINERFILE
 }
 
 overlay() {
-  local suffix="$1" system="localhost/luft-meet-system:45$1"
-  podman build --quiet --build-arg "BASE=localhost/luft-system:45$suffix" --tag "$system" "$stage" > /dev/null
-  "$luft/os/image/seal.sh" "$system" "localhost/luft-meet:45$suffix"
+  local suffix="$1" system="$image_name-meet-system:45$1"
+  podman build --quiet --build-arg "BASE=$image_name-system:45$suffix" --tag "$system" "$stage" > /dev/null
+  "$luft/os/image/seal.sh" "$system" "$image_name-meet:45$suffix"
 }
 
-image_keys
+use_signing_keys
+require_signed_by_keys "$image_name-system:45"
+require_signed_by_keys "$image_name-system:45-nvidia"
 stage_changes
 overlay ""
 overlay "-nvidia"
-LUFT_ISO="$state/iso" "$luft/os/iso/build.sh" localhost/luft-meet:45
-built="$(ls -t "$state"/iso/luft-*.iso | head -n1)"
-mv "$built" "$state/luft-meet.iso"
-sed "s|$(basename "$built")|luft-meet.iso|" "$built.sha256" > "$state/luft-meet.iso.sha256"
-rm "$built.sha256"
-echo "$state/luft-meet.iso"
+rm -rf "$state/iso"
+LUFT_ISO="$state/iso" "$luft/os/iso/build.sh" "$image_name-meet:45" "$@"
+for built in "$state"/iso/luft-*.iso; do
+  edition="$(basename "$built" .iso | grep -oE -- '-(standard|nvidia)$' || true)"
+  named="luft-meet$edition.iso"
+  mv "$built" "$state/$named"
+  sed "s|$(basename "$built")|$named|" "$built.sha256" >"$state/$named.sha256"
+  rm "$built.sha256"
+  echo "$state/$named"
+done

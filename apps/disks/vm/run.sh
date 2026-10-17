@@ -4,20 +4,17 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 luft="$(cd "$here/../../.." && pwd)"
 vm="${LUFT_REMOVE_VM:-$here/../target/vm}"
-system=localhost/luft-remove-check-system
-image=localhost/luft-remove-check
-base="${LUFT_SYSTEM:-localhost/luft-system:45}"
+image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
+base="${LUFT_SYSTEM:-$image_name-system:45}"
+system=$image_name-remove-check-system
+image=$image_name-remove-check
 stage="$vm/stage"
 firmware=/usr/share/edk2/ovmf
 
-if [[ -z "${LUFT_SECUREBOOT_KEY:-}" ]]; then
-  keys="$luft/os/image/state/keys"
-  mkdir -p "$keys" && chmod 700 "$keys"
-  [[ -f "$keys/secureboot.key" ]] || openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
-    -subj "/CN=Luft throwaway Secure Boot key/" -keyout "$keys/secureboot.key" -out "$keys/secureboot.crt"
-  [[ -f "$keys/pcr.key" ]] || openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.key"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
-fi
+# shellcheck source=os/image/throwaway-keys.sh
+source "$luft/os/image/throwaway-keys.sh"
+use_signing_keys
+require_signed_by_keys "$base"
 
 place() {
   install -Dm"$1" "$2" "$stage/root$3"

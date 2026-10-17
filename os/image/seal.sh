@@ -36,7 +36,9 @@ digest_of() {
 
 digest="$(digest_of "$system")"
 echo "Sealing $system as $sealed, root $digest" >&2
+version="$(podman image inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "$system")"
 podman build --quiet --layers --file "$image/startup/Containerfile" \
+  --annotation "org.opencontainers.image.version=$version" \
   --build-arg "IMAGE=$system" --build-arg "DIGEST=$digest" \
   --build-arg "SIGNED_BY=$(openssl x509 -in "$LUFT_SECUREBOOT_CERT" -noout -fingerprint -sha256)" \
   --secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" \

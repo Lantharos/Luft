@@ -11,7 +11,14 @@ use crate::errors::Unsupported;
 use crate::system::blocks;
 use references::Partitions;
 
-const LUFT_FOLDERS: [&str; 5] = ["luft", "luft-start", "boot", "linux", "systemd"];
+const LUFT_FOLDERS: [&str; 6] = [
+    "luft",
+    "luft-start",
+    "luft-meet",
+    "boot",
+    "linux",
+    "systemd",
+];
 const WINDOWS_LOADER: &str = "Boot/bootmgfw.efi";
 const GRUB_LOADERS: [&str; 3] = ["grub.cfg", "grubx64.efi", "shimx64.efi"];
 const SHIM_FALLBACK: &str = "EFI/BOOT/fbx64.efi";

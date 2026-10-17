@@ -48,20 +48,6 @@ Windows' registry is only changed when Windows was shut down fully and isn't loc
 
 Windows updates sometimes turn Fast Startup back on. When Luft starts after Windows was hibernated or fast-started, it resets the sound chips before anything uses them and, once, explains Fast Startup with a notification that can turn it off when Windows is fully shut down. Windows' drive shows up in Files; while Windows is asleep it opens read-only, so nothing Windows still has open gets changed.
 
-## Removing Windows or the old system
-
-Once Luft starts the computer, Disks shows the other systems on each drive below its partitions, such as Windows or the Linux that Luft replaced, and Settings lists them under About. *Remove* names everything that goes and how big it is, and offers to open its files in Rover first.
-
-| System | What goes |
-| --- | --- |
-| Windows | Its system, recovery and reserved partitions, and Meet Luft's partitions left on that drive. Windows Boot Manager, its start entry and `EFI/Microsoft` go too, unless another Windows stays. Windows locked with BitLocker can't be read from Luft, so its files are gone for good |
-| The old system Luft replaced | The kept subvolume and its partitions, its folder on the EFI system partition and its start entries |
-| Another Linux | The partitions its boot loader looks for, its folder on the EFI system partition and its start entries |
-
-The EFI system partition, Luft's startup partition and anything the running system uses always stay. Removing first makes sure Luft's own startup is in place and first in the firmware's list, then takes the other system out of the startup list, then deletes its partitions, so the computer keeps starting Luft if it's interrupted at any point; removing again finishes the job.
-
-Free space right after Luft's partition goes to Luft straight away, while it runs. Space before it can't: Disks offers to make it a partition for your files, or start Try Luft from a USB stick and move Luft into it with Disks' partition editor.
-
 ## Replacing Linux
 
 Install Luft finds Linux systems on the computer's drives and offers *Replace* for those whose home folders live apart from the system: Fedora's btrfs with `root` and `home` subvolumes, or a separate `/home` partition with any file system. A system with everything on one partition, as Ubuntu installs by default, is listed but not offered yet.
@@ -76,7 +62,7 @@ Install Luft finds Linux systems on the computer's drives and offers *Replace* f
 | Command-line tools | Packages you installed with dnf (Fedora's own repositories) or pacman become a Toolbox, built when you first sign in. Enter it with `toolbox enter fedora` (or `arch`) |
 | The old system | On btrfs, Luft goes into a new subvolume `luft`, which becomes the default, and the old root subvolume is renamed `old-system` and kept. With a separate `/home`, the old system partition becomes Luft's |
 
-When the EFI system partition is smaller than 1 GB, the old `/boot` partition becomes Luft's startup partition (FAT, XBOOTLDR), so it needs to be at least 1 GB. The old system doesn't start anymore after replacing. Its files on the EFI system partition, such as `EFI/fedora`, stay until it's removed.
+When the EFI system partition is smaller than 1 GB, the old `/boot` partition becomes Luft's startup partition (FAT, XBOOTLDR), so it needs to be at least 1 GB. The old system doesn't start anymore after replacing. Its start entries and its files on the EFI system partition, such as `EFI/fedora`, go the first time you sign in to Luft.
 
 Install Luft notes the old system in `/var/lib/luft-installer/old-system.json`, which Disks and Settings use to remove it:
 
@@ -90,7 +76,7 @@ Install Luft notes the old system in `/var/lib/luft-installer/old-system.json`, 
 }
 ```
 
-`subvolume` is the kept system's path from the top of Luft's btrfs, or `null` when nothing was kept; `startups` are its folders on the EFI system partition. Removing deletes the subvolume and anything nested in it, those folders and their start entries.
+`subvolume` is the kept system's path from the top of Luft's btrfs, or `null` when nothing was kept; `startups` are its folders on the EFI system partition, which the first sign-in removes with their start entries. Removing deletes the subvolume and anything nested in it.
 
 ## Removing Windows or the old system
 

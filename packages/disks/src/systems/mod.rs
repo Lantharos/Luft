@@ -8,7 +8,7 @@ use serde::Serialize;
 use crate::udisks::{self, snapshot};
 
 pub use facts::Facts;
-pub use remove::{Removed, Step, grow, remove};
+pub use remove::{Removed, Step, grow, remove, remove_old_system_startups};
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "kebab-case")]

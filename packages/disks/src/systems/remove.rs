@@ -96,6 +96,17 @@ async fn remove_startups(system: &System) -> Result<(), String> {
     trust::call::<_, ()>(TRUST, "RemoveStartups", &(folders, partitions)).await
 }
 
+pub async fn remove_old_system_startups() -> Result<(), String> {
+    match find()
+        .await?
+        .into_iter()
+        .find(|system| system.kind == Kind::OldSystem)
+    {
+        Some(old) => remove_startups(&old).await,
+        None => Ok(()),
+    }
+}
+
 pub async fn grow(unlock: &str) -> Result<Outcome<u64>, String> {
     trust::unlocking(TRUST, "GrowSystem", &(unlock,)).await
 }

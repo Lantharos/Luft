@@ -41,7 +41,10 @@
 	--sl-color-hairline: var(--hairline);
 	--sl-color-hairline-shade: var(--hairline);
 	--sl-content-width: 46rem;
-	--sl-line-height: 1.7;
+	--sl-line-height: 1.8;
+	--sl-sidebar-width: 19.5rem;
+	--sl-sidebar-pad-x: 1.25rem;
+	--sl-content-pad-x: 1.25rem;
 	--sl-nav-height: 4rem;
 	--sl-text-h1: 2.5rem;
 	--sl-text-h2: 1.625rem;
@@ -51,6 +54,12 @@
 
 body {
 	background: var(--canvas);
+}
+
+@media (min-width: 72rem) {
+	:root {
+		--sl-content-pad-x: 3rem;
+	}
 }
 
 ::selection {

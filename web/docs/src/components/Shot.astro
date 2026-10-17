@@ -38,7 +38,7 @@ const pictures = [{ theme: light ? 'dark' : undefined, ...(await picture(dark)) 
 if (light) pictures.push({ theme: 'light', ...(await picture(light)) });
 ---
 
-<figure class="shot not-content my-8">
+<figure class="shot not-content">
 	{
 		pictures.map(({ theme, image, sources, fallback }) => (
 			<picture data-shot-theme={theme}>

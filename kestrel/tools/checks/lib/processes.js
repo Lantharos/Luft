@@ -29,7 +29,7 @@ export function spawn(argv, {env = {}, flags = Gio.SubprocessFlags.NONE, cwd = n
 }
 
 export function gjs(script, args = [], options = {}) {
-  return spawn(['gjs', '-m', fixture(...script.split('/')), ...args], options);
+  return spawn(['gjs', '-m', fixture(...script.split('/')), ...args], {...options, env: {GSK_RENDERER: 'cairo', ...options.env}});
 }
 
 export const windows = () => global.get_window_actors().map(actor => actor.meta_window);

@@ -23,6 +23,7 @@ import * as WorkspaceAnimation from './workspaceAnimation.js';
 import * as Main from './main.js';
 import {blurBackdrop} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
+import {WindowMorphs} from './windowEffects/morph.js';
 import {OpenCloseEffects} from './windowEffects/openClose.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
@@ -490,8 +491,7 @@ export class WindowManager {
         this._unminimizing = new Set();
         this._minimizeMotion = new Map();
         this._openClose = new OpenCloseEffects();
-        this._resizing = new Set();
-        this._resizePending = new Set();
+        this._morphs = new WindowMorphs();
 
         this._skippedActors = new Set();
 
@@ -503,19 +503,18 @@ export class WindowManager {
         this._shellwm.connect('kill-window-effects', (shellwm, actor) => {
             this._handOverMinimizeMotion(shellwm, actor);
             this._openClose.finish(actor);
-            this._sizeChangeWindowDone(shellwm, actor);
+            this._morphs.interrupt(actor);
         });
 
         this._shellwm.connect('switch-workspace', this._switchWorkspace.bind(this));
         this._tileRequest = null;
-        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this));
+        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this), this._morphWindow.bind(this));
         this._shellwm.connect('show-tile-preview', this._showTilePreview.bind(this));
         this._shellwm.connect('hide-tile-preview', this._hideTilePreview.bind(this));
         this._shellwm.connect('show-window-menu', this._showWindowMenu.bind(this));
         this._shellwm.connect('minimize', this._minimizeWindow.bind(this));
         this._shellwm.connect('unminimize', this._unminimizeWindow.bind(this));
         this._shellwm.connect('size-change', this._sizeChangeWindow.bind(this));
-        this._shellwm.connect('size-changed', this._sizeChangedWindow.bind(this));
         this._shellwm.connect('map', this._mapWindow.bind(this));
         this._shellwm.connect('destroy', this._destroyWindow.bind(this));
         this._shellwm.connect('filter-keybinding', this._filterKeybinding.bind(this));
@@ -1145,136 +1144,16 @@ export class WindowManager {
         }
     }
 
-    _sizeChangeWindow(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect) {
-        const types = [Meta.WindowType.NORMAL];
-        const shouldAnimate =
-            this._shouldAnimateActor(actor, types) &&
-            oldFrameRect.width > 0 &&
-            oldFrameRect.height > 0;
-
-        if (shouldAnimate)
-            this._prepareAnimationInfo(shellwm, actor, oldFrameRect, whichChange);
-        else
-            shellwm.completed_size_change(actor);
+    _sizeChangeWindow(shellwm, actor, _change, oldFrameRect) {
+        const completed = () => shellwm.completed_size_change(actor);
+        if (!this._shouldAnimateActor(actor, [Meta.WindowType.NORMAL]) || !this._morphs.begin(actor, oldFrameRect, completed))
+            completed();
     }
 
-    _prepareAnimationInfo(shellwm, actor, oldFrameRect, _change) {
-        // Position a clone of the window on top of the old position,
-        // while actor updates are frozen.
-        const actorContent = actor.paint_to_content(oldFrameRect);
-        const actorClone = new St.Widget({content: actorContent});
-        actorClone.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
-        actorClone.set_position(oldFrameRect.x, oldFrameRect.y);
-        actorClone.set_size(oldFrameRect.width, oldFrameRect.height);
-
-        actor.freeze();
-
-        if (this._clearAnimationInfo(actor)) {
-            log(`Old animationInfo removed from actor ${actor}`);
-            this._shellwm.completed_size_change(actor);
-        }
-
-        actor.connectObject('destroy',
-            () => this._clearAnimationInfo(actor), actorClone);
-
-        this._resizePending.add(actor);
-        actor.__animationInfo = {
-            clone: actorClone,
-            oldRect: oldFrameRect,
-            frozen: true,
-        };
-    }
-
-    _sizeChangedWindow(shellwm, actor) {
-        if (!actor.__animationInfo)
-            return;
-        if (this._resizing.has(actor))
-            return;
-
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
-
-        const actorClone = actor.__animationInfo.clone;
-        const sourceRect = actor.__animationInfo.oldRect;
-        const targetRect = useMotion
-            ? actor.meta_window.get_frame_rect()
-            : sourceRect;
-
-        const scaleX = targetRect.width / sourceRect.width;
-        const scaleY = targetRect.height / sourceRect.height;
-
-        this._resizePending.delete(actor);
-        this._resizing.add(actor);
-
-        Main.uiGroup.add_child(actorClone);
-
-        // Now scale and fade out the clone
-        actorClone.ease({
-            x: targetRect.x,
-            y: targetRect.y,
-            scale_x: scaleX,
-            scale_y: scaleY,
-            opacity: 0,
-            duration: WINDOW_ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        });
-
-        actor.translation_x = -targetRect.x + sourceRect.x;
-        actor.translation_y = -targetRect.y + sourceRect.y;
-
-        // Now set scale the actor to size it as the clone.
-        actor.scale_x = 1 / scaleX;
-        actor.scale_y = 1 / scaleY;
-
-        // Scale it to its actual new size
-        actor.ease({
-            scale_x: 1,
-            scale_y: 1,
-            translation_x: 0,
-            translation_y: 0,
-            duration: WINDOW_ANIMATION_TIME,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            onStopped: () => this._sizeChangeWindowDone(shellwm, actor),
-        });
-
-        // ease didn't animate and cleared the info, we are done
-        if (!actor.__animationInfo)
-            return;
-
-        // Now unfreeze actor updates, to get it to the new size.
-        // It's important that we don't wait until the animation is completed to
-        // do this, otherwise our scale will be applied to the old texture size.
-        actor.thaw();
-        actor.__animationInfo.frozen = false;
-    }
-
-    _clearAnimationInfo(actor) {
-        if (actor.__animationInfo) {
-            actor.__animationInfo.clone.destroy();
-            if (actor.__animationInfo.frozen)
-                actor.thaw();
-
-            delete actor.__animationInfo;
-            return true;
-        }
-        return false;
-    }
-
-    _sizeChangeWindowDone(shellwm, actor) {
-        if (this._resizing.delete(actor)) {
-            actor.remove_all_transitions();
-            actor.scale_x = 1.0;
-            actor.scale_y = 1.0;
-            actor.translation_x = 0;
-            actor.translation_y = 0;
-            this._clearAnimationInfo(actor);
-            this._shellwm.completed_size_change(actor);
-        }
-
-        if (this._resizePending.delete(actor)) {
-            this._clearAnimationInfo(actor);
-            this._shellwm.completed_size_change(actor);
-        }
+    _morphWindow(window) {
+        const actor = window.get_compositor_private();
+        if (actor && this._shouldAnimateActor(actor, [Meta.WindowType.NORMAL]))
+            this._morphs.begin(actor, window.get_frame_rect(), () => {});
     }
 
     _checkDimming(window) {

@@ -96,7 +96,9 @@
     <file>ui/lockScreen/pages.js</file>
     <file>ui/lockScreen/unlockDialog.js</file>
     <file>ui/userWidget.js</file>
+    <file>ui/windowEffects/morph.js</file>
     <file>ui/windowEffects/openClose.js</file>
+    <file>ui/windowEffects/snapshot.js</file>
     <file>ui/windowManager.js</file>
     <file>ui/windowLayout.js</file>
     <file>ui/windowMenu.js</file>

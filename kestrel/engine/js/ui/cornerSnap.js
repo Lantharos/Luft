@@ -68,9 +68,11 @@ function edgesAgainst(rect, area) {
 export class CornerSnap {
     /**
      * @param {(window: Meta.Window, rect: Mtk.Rectangle | null, monitorIndex: number) => void} preview
+     * @param {(window: Meta.Window) => void} morph animates the window from where it is to where it is moved next
      */
-    constructor(preview) {
+    constructor(preview, morph) {
         this._preview = preview;
+        this._morph = morph;
         this._window = null;
         this._zone = null;
         this._timer = 0;
@@ -91,6 +93,7 @@ export class CornerSnap {
      */
     snap(window, rect, size = window.get_frame_rect()) {
         const restore = this._snapped.get(window) ?? {width: size.width, height: size.height};
+        this._morph(window);
         const monitorIndex = global.display.get_monitor_index_for_rect(rect);
         window.set_tiled_edges(edgesAgainst(rect, Main.layoutManager.getWorkAreaForMonitor(monitorIndex)));
         if (window.maximized_horizontally || window.maximized_vertically)

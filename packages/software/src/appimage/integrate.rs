@@ -12,6 +12,8 @@ use crate::task::{CANCELLED, Task};
 const PREFIX: &str = "appimage-";
 const CHUNK: usize = 1 << 20;
 const MAIN_GROUP: &str = "[Desktop Entry]";
+const ENABLE_FEATURES: &str = "--enable-features=";
+const FINGER_SCROLLING: &str = "WaylandUnscaledTouchpadScrolling:scroll_scaling_factor/1";
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -152,7 +154,7 @@ pub fn integrate(id: &str, executable: &Path, bundle: &Bundle) -> Result<(), Str
     let applications = library::applications();
     fs::create_dir_all(&applications).map_err(failed)?;
     let icon = (!bundle.icons.is_empty()).then_some(id);
-    let entry = desktop_entry(&bundle.entry_text, executable, icon, bundle.electron);
+    let entry = desktop_entry(bundle, executable, icon);
     fs::write(applications.join(format!("{id}.desktop")), entry).map_err(failed)?;
     refresh_menus(&applications);
     Ok(())
@@ -183,26 +185,46 @@ pub fn repair() {
     }
 }
 
-fn exec_line(original: &str, executable: &Path, electron: bool) -> String {
-    let mut arguments: Vec<&str> = original.split_whitespace().skip(1).collect();
-    if electron && !arguments.contains(&"--no-sandbox") {
-        arguments.insert(0, "--no-sandbox");
+fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
+    let mut arguments: Vec<String> = original
+        .split_whitespace()
+        .skip(1)
+        .map(str::to_owned)
+        .collect();
+    if bundle.electron && !arguments.iter().any(|argument| argument == "--no-sandbox") {
+        arguments.insert(0, "--no-sandbox".into());
+    }
+    if bundle.chromium {
+        enable_feature(&mut arguments, FINGER_SCROLLING);
     }
     let quoted = format!(
         "\"{}\"",
         executable.display().to_string().replace('"', "\\\"")
     );
-    std::iter::once("env DESKTOPINTEGRATION=1")
-        .chain(std::iter::once(quoted.as_str()))
+    ["env DESKTOPINTEGRATION=1".to_owned(), quoted]
+        .into_iter()
         .chain(arguments)
         .collect::<Vec<_>>()
         .join(" ")
 }
 
-fn desktop_entry(original: &str, executable: &Path, icon: Option<&str>, electron: bool) -> String {
+fn enable_feature(arguments: &mut Vec<String>, feature: &str) {
+    match arguments
+        .iter_mut()
+        .find(|argument| argument.starts_with(ENABLE_FEATURES))
+    {
+        Some(features) => {
+            features.push(',');
+            features.push_str(feature);
+        }
+        None => arguments.insert(0, format!("{ENABLE_FEATURES}{feature}")),
+    }
+}
+
+fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {
     let mut lines = Vec::new();
     let mut main = false;
-    for line in original.lines() {
+    for line in bundle.entry_text.lines() {
         let trimmed = line.trim();
         if trimmed.starts_with('[') {
             main = trimmed == MAIN_GROUP;
@@ -225,7 +247,7 @@ fn desktop_entry(original: &str, executable: &Path, icon: Option<&str>, electron
                         .map(|(_, value)| value)
                         .unwrap_or_default(),
                     executable,
-                    electron
+                    bundle
                 )
             )),
             "TryExec" => {}

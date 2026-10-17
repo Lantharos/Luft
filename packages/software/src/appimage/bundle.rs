@@ -12,6 +12,7 @@ use crate::desktop::DesktopEntry;
 const MAX_LINKS: usize = 8;
 const THEMED_ICONS: &str = "/usr/share/icons/hicolor";
 const ELECTRON_MARKERS: [&str; 2] = ["/chrome-sandbox", "/resources/app.asar"];
+const CHROMIUM_MARKER: &str = "chrome_100_percent.pak";
 
 pub struct Icon {
     pub bytes: Vec<u8>,
@@ -25,6 +26,7 @@ pub struct Bundle {
     pub entry_text: String,
     pub icons: Vec<Icon>,
     pub electron: bool,
+    pub chromium: bool,
 }
 
 struct Contents<'a, 'b> {
@@ -171,6 +173,10 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
     let electron = ELECTRON_MARKERS
         .iter()
         .any(|marker| contents.nodes.contains_key(Path::new(marker)));
+    let chromium = contents
+        .nodes
+        .keys()
+        .any(|path| path.file_name().is_some_and(|name| name == CHROMIUM_MARKER));
     Ok(Bundle {
         desktop_id: desktop
             .file_stem()
@@ -179,5 +185,6 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         entry_text,
         icons,
         electron,
+        chromium,
     })
 }

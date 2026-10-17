@@ -26,7 +26,7 @@ bun run build
 cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml
 ```
 
-On Linux, `sabine bundle . --target appimage --release` makes `Meet Luft.AppImage` (it needs `appimagetool`). The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. Releases come from the [Meet Luft workflow](../../.github/workflows/meet.yml) on Windows: push a `meet-vVERSION` tag matching `Sabine.toml`, or start it by hand for a test build. It publishes `meet-luft.exe` (a setup program) to the GitHub release and to `get.luft.lanth.me` when the R2 secrets are set.
+On Linux, `sabine bundle . --target appimage --release` makes `Meet Luft.AppImage` (it needs `appimagetool`). The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds `meet-luft.exe` (a setup program) on Windows and `meet-luft.AppImage` on Linux, and publishes both to `get.luft.lanth.me` every time it runs. Start it by hand to publish the current main, or push a `meet-vVERSION` tag matching `Sabine.toml` to also make a GitHub release.
 
 Start it with `--nightly`, or press Ctrl+Shift+N in it, to use nightly builds instead of releases. Ctrl+Shift+N again switches back.
 

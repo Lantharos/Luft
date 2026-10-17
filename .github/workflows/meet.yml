@@ -16,12 +16,9 @@ env:
   SABINE: v0.45
 
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     timeout-minutes: 90
-    env:
-      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-      R2_BUCKET: ${{ secrets.R2_BUCKET }}
     defaults:
       run:
         shell: pwsh
@@ -59,34 +56,90 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Bundling failed' }
           $artifacts = @(($bundle | ConvertFrom-Json).artifacts)
           if ($artifacts.Count -ne 1) { throw "Bundling made no setup program: $bundle" }
-          $setup = $artifacts[0]
           New-Item -ItemType Directory -Force out | Out-Null
-          Copy-Item -LiteralPath $setup -Destination out/meet-luft.exe
+          Copy-Item -LiteralPath $artifacts[0] -Destination out/meet-luft.exe
           $hash = (Get-FileHash out/meet-luft.exe -Algorithm SHA256).Hash.ToLower()
           "$hash  meet-luft.exe" | Set-Content -NoNewline out/meet-luft.exe.sha256
 
+      - uses: actions/upload-artifact@v7
+        with:
+          name: meet-luft-windows
+          path: apps/meet/out
+          retention-days: 14
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - run: rustup toolchain install stable --profile minimal
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libwayland-dev libfontconfig1-dev libxkbcommon-dev
+          curl --fail --location --output "$RUNNER_TEMP/appimagetool" https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
+          echo "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  $RUNNER_TEMP/appimagetool" | sha256sum --check
+          sudo install -m 755 "$RUNNER_TEMP/appimagetool" /usr/local/bin/appimagetool
+
+      - run: cargo install --git https://github.com/Lantharos/Sabine --tag "$SABINE" --locked sabine-cli
+
+      - name: Bundle
+        working-directory: apps/meet
+        run: |
+          bundle="$(sabine bundle . --target appimage --release --out "$RUNNER_TEMP/meet" --json | tail -n 1)"
+          mapfile -t artifacts < <(jq -r '.artifacts[]' <<<"$bundle")
+          [[ ${#artifacts[@]} -eq 1 ]] || { echo "Bundling made no AppImage: $bundle"; exit 1; }
+          mkdir -p out
+          install -m 755 "${artifacts[0]}" out/meet-luft.AppImage
+          (cd out && sha256sum meet-luft.AppImage > meet-luft.AppImage.sha256)
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: meet-luft-linux
+          path: apps/meet/out
+          retention-days: 14
+
+  publish:
+    needs: [windows, linux]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: meet-luft-*
+          merge-multiple: true
+          path: out
+
       - name: Upload to R2
-        if: github.ref_type == 'tag' && env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
-        working-directory: apps/meet/out
+        if: env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        working-directory: out
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
-          $endpoint = "https://$env:R2_ACCOUNT_ID.r2.cloudflarestorage.com"
-          foreach ($file in 'meet-luft.exe', 'meet-luft.exe.sha256') {
-            aws s3 cp --endpoint-url $endpoint --no-progress $file "s3://$env:R2_BUCKET/$file"
-            if ($LASTEXITCODE -ne 0) { throw "Uploading $file failed" }
-          }
+          for file in meet-luft.exe meet-luft.exe.sha256 meet-luft.AppImage meet-luft.AppImage.sha256; do
+            aws s3 cp --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" --no-progress "$file" "s3://$R2_BUCKET/$file"
+          done
 
       - name: Release
         if: github.ref_type == 'tag'
+        working-directory: out
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create $env:GITHUB_REF_NAME apps/meet/out/meet-luft.exe apps/meet/out/meet-luft.exe.sha256 --latest=false --title "Meet Luft $($env:GITHUB_REF_NAME -replace '^meet-v')" --notes 'Meet Luft for Windows. The download is not code-signed yet, so Windows SmartScreen asks before it opens.'
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: meet-luft
-          path: apps/meet/out
-          retention-days: 14
+        run: >-
+          gh release create "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY" --latest=false
+          --title "Meet Luft ${GITHUB_REF_NAME#meet-v}"
+          --notes 'Meet Luft for Windows and Linux. The Windows download is not code-signed yet, so Windows SmartScreen asks before it opens.'
+          meet-luft.exe meet-luft.exe.sha256 meet-luft.AppImage meet-luft.AppImage.sha256

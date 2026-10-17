@@ -10,8 +10,8 @@ rust-version = "1.98"
 [dependencies]
 luft-meet = { path = "../../../packages/meet" }
 luft-variant = { path = "../../../packages/variant" }
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.44" }
-sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.44" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.45" }
+sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.45" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 sha2 = "0.11.1"

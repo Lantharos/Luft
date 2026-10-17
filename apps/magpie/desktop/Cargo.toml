@@ -21,7 +21,7 @@ lofty = "0.25.4"
 luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "thumbnails"] }
 matroska-demuxer = "0.8.1"
 parking_lot = "0.12.5"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.44" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.45" }
 serde = { version = "1.0.229", features = ["derive"] }
 skrifa = "0.48"
 tokio = { version = "1.53.3", default-features = false, features = ["sync"] }

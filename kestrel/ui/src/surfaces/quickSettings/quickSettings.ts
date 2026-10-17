@@ -64,7 +64,9 @@ export class QuickSettings {
     });
     this.drag = new TileDrag(this.grid, () => this.saveOrder());
     this.actions = new ActionTiles({ takeScreenshot, openSettings: page => menus.settings(page), close });
+    const unwatchRemoved = this.layoutStore.watchRemoved(() => this.arrangeTiles(true));
     this.actor.connect('destroy', () => {
+      unwatchRemoved();
       if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
@@ -171,7 +173,6 @@ export class QuickSettings {
     entries.push({
       label: 'Remove', run: () => {
         this.layoutStore.remove(tile.id);
-        this.arrangeTiles(true);
       },
     });
     return entries;
@@ -187,7 +188,6 @@ export class QuickSettings {
         children: addable.map(tile => ({
           label: tile.name(), run: () => {
             this.layoutStore.restore(tile.id);
-            this.arrangeTiles(true);
           },
         })),
       });

@@ -90,7 +90,7 @@
       <summary>Order of the Quick Settings tiles</summary>
     </key>
     <key name="quick-tiles-removed" type="as">
-      <default>[]</default>
+      <default>["screenshot", "settings", "lock"]</default>
       <summary>Quick Settings tiles removed by the user</summary>
     </key>
     <key name="live-wallpaper" type="s">

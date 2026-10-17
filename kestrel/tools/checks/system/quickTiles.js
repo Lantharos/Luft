@@ -39,9 +39,10 @@ async function toggle(control, label, effect) {
 
 async function checkKeepAwake() {
   const keepAwake = tile('Keep Awake');
-  rightClick(surfaceCorner());
+  const placed = grid().get_n_children();
+  new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).set_strv('quick-tiles-removed', []);
+  await eventually(() => grid().get_n_children() > placed, 'tiles hidden by default come back when the setting changes');
   await settled();
-  require(!menu().visible, 'quick settings has no context menu until the layout is customized');
   await toggle(keepAwake, 'keep awake holds the session awake and shows the eye', checked => checked && statusShows('view-reveal-symbolic'));
   await toggle(keepAwake, 'turning keep awake off lets the session sleep', checked => !checked && !statusShows('view-reveal-symbolic'));
 

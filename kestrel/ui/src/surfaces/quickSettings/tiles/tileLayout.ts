@@ -11,12 +11,17 @@ export class TileLayout {
     return [...stored, ...defaults.filter(id => !stored.includes(id))];
   }
 
+  watchRemoved(changed: () => void): () => void {
+    const id = this.settings.connect(`changed::${REMOVED}`, changed);
+    return () => this.settings.disconnect(id);
+  }
+
   get removed(): Set<string> {
     return new Set(this.settings.get_strv(REMOVED));
   }
 
   get customized(): boolean {
-    return this.settings.get_strv(ORDER).length > 0 || this.settings.get_strv(REMOVED).length > 0;
+    return this.settings.get_user_value(ORDER) !== null || this.settings.get_user_value(REMOVED) !== null;
   }
 
   saveOrder(ids: string[]): void {

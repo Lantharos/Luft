@@ -72,11 +72,15 @@
 		gap: 10px;
 		border-radius: 14px;
 		padding: 14px 8px 10px;
-		transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover {
-		transform: scale(1.02);
+		box-shadow: 0 0 0 2px var(--content), 0 0 0 4px var(--hairline);
+	}
+
+	.choice:active {
+		transform: scale(0.98);
 	}
 
 	.choice.selected {

@@ -105,7 +105,7 @@
 		display: flex;
 		align-items: center;
 		padding-right: 8px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.server:has(.server__main:hover) {

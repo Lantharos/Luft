@@ -214,7 +214,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--control);
 		padding: 0 4px 0 14px;
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.search-field:focus-within {
@@ -247,7 +247,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
-		transition: background-color 140ms var(--ease), color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.search-option:hover {

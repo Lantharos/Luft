@@ -94,7 +94,7 @@
 		border-radius: 16px;
 		padding: 11px 14px 0 12px;
 		cursor: default;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:hover {

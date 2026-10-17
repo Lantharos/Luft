@@ -65,9 +65,9 @@
 		color: var(--text);
 		box-shadow: 0 0.15cqw 0 color-mix(in oklab, var(--ink) 6%, transparent);
 		transition:
-			background-color 140ms var(--ease),
-			box-shadow 140ms var(--ease),
-			transform 120ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate),
+			transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.cap:hover {
@@ -97,8 +97,8 @@
 		text-overflow: ellipsis;
 		font-size: 1.55cqw;
 		transition:
-			opacity 120ms var(--ease),
-			color 120ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.capital {

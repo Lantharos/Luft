@@ -6,8 +6,8 @@
 		border-radius: 10px;
 		color: var(--text-soft);
 		transition-property: background-color, color, box-shadow, opacity;
-		transition-duration: 140ms;
-		transition-timing-function: var(--ease);
+		transition-duration: var(--motion-tap);
+		transition-timing-function: var(--ease-decelerate);
 	}
 
 	.entry:hover {

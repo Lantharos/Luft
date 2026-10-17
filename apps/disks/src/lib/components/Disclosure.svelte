@@ -31,8 +31,8 @@
 		font-size: 13px;
 		color: var(--text-muted);
 		transition:
-			background-color 160ms var(--ease),
-			color 160ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.disclosure:hover,

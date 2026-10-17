@@ -58,7 +58,7 @@
 		text-align: left;
 		font-size: 13.5px;
 		color: var(--text-soft);
-		transition: background-color 160ms var(--ease), color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.app:hover {

@@ -151,7 +151,7 @@
 		border-radius: 10px;
 		padding-inline: 0;
 		font-size: 13px;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.task-row:hover {

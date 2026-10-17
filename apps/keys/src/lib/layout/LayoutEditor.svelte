@@ -38,7 +38,7 @@
 				baseName = (base && (await systemLayouts()).find((entry) => entry.id === base)?.name) || '';
 			})
 			.catch((error) => {
-				toast.failed(error);
+				toast.fail(error);
 				app.select(app.first());
 			});
 	});

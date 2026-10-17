@@ -1,3 +1,4 @@
+import { Toasts } from '@luft/ui';
 import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
@@ -19,11 +20,6 @@ const CHANNEL_NOTES: Record<Channel, string> = {
 	latest: 'Meet Luft will use releases again'
 };
 
-export interface Note {
-	id: number;
-	message: string;
-	action: { label: string; run: () => unknown } | null;
-}
 
 class MeetState {
 	platform = $state<Platform>('windows');
@@ -36,14 +32,13 @@ class MeetState {
 	luft = $state(0);
 	busy = $state(false);
 	failure = $state<Failure | null>(null);
-	note = $state<Note | null>(null);
+	readonly notes = new Toasts(NOTE_SHOWN);
 
 	windows = $derived(this.report?.facts.platform === 'windows' ? this.report.facts : null);
 	linux = $derived(this.report?.facts.platform === 'linux' ? this.report.facts : null);
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
 	nightly = $derived(this.source.kind === 'download' && this.source.channel === 'nightly');
 
-	private noteTimer: ReturnType<typeof setTimeout> | undefined;
 	private inspection = 0;
 
 	go(step: Step) {
@@ -95,7 +90,7 @@ class MeetState {
 		if (this.step === 'working') return;
 		const channel: Channel = this.nightly ? 'latest' : 'nightly';
 		this.source = { kind: 'download', channel };
-		this.showNote(CHANNEL_NOTES[channel], { label: 'Undo', run: () => this.switchChannel() });
+		this.notes.show(CHANNEL_NOTES[channel], { action: { label: 'Undo', run: () => this.switchChannel() } });
 		if (this.step === 'check') {
 			this.report = null;
 			await this.inspect();
@@ -110,23 +105,12 @@ class MeetState {
 	async saveLogs() {
 		try {
 			const saved = await meet.saveLogs();
-			if (saved) this.showNote('Saved the logs from Try Luft to your desktop', { label: 'Show', run: () => meet.showFile(saved) });
-			else this.showNote('There are no logs from Try Luft yet', null);
+			if (saved) this.notes.show('Saved the logs from Try Luft to your desktop', { action: { label: 'Show', run: () => meet.showFile(saved) } });
+			else this.notes.show('There are no logs from Try Luft yet');
 		} catch (error) {
 			console.error("Meet Luft couldn't save Try Luft's logs:", error);
-			this.showNote("Meet Luft couldn't save the logs from Try Luft", null);
+			this.notes.show("Meet Luft couldn't save the logs from Try Luft");
 		}
-	}
-
-	private showNote(message: string, action: Note['action']) {
-		this.note = { id: (this.note?.id ?? 0) + 1, message, action };
-		clearTimeout(this.noteTimer);
-		this.noteTimer = setTimeout(() => (this.note = null), NOTE_SHOWN);
-	}
-
-	dismissNote() {
-		clearTimeout(this.noteTimer);
-		this.note = null;
 	}
 
 	async chooseIso() {

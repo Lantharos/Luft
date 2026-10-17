@@ -54,8 +54,8 @@
 		font-size: 12.5px;
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.heading.numeric {

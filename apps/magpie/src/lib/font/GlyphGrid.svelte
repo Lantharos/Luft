@@ -35,7 +35,7 @@
 		gap: 6px;
 		border-radius: 12px;
 		background: var(--surface-hover);
-		transition: transform 160ms var(--ease), background-color 160ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate), background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.glyph:hover {

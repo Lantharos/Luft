@@ -21,7 +21,7 @@
 		align-items: center;
 		border-radius: 12px;
 		padding: 4px 6px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.shortcut:hover {

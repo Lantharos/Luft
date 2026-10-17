@@ -60,7 +60,7 @@
 					<span class="text-[12px] text-[var(--text-muted)]">Message</span>
 					<input
 						{@attach (input) => input.focus()}
-						class="h-11 rounded-[14px] bg-[var(--control)] px-3 text-[14px] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] duration-150 focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_18%,transparent)]"
+						class="h-11 rounded-[14px] bg-[var(--control)] px-3 text-[14px] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_18%,transparent)]"
 						value={message}
 						placeholder="Describe your changes"
 						oninput={(event) => (message = event.currentTarget.value)}
@@ -76,7 +76,7 @@
 					<div class="soft-scroll max-h-[280px] overflow-auto rounded-[14px] bg-[var(--content)] p-1 shadow-[inset_0_0_0_1px_var(--hairline)]">
 						{#each files as file (file.path)}
 							<button
-								class="flex min-h-10 w-full items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color,opacity] duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+								class="flex min-h-10 w-full items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color,opacity] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
 								type="button"
 								aria-pressed={selected.includes(file.path)}
 								onclick={() => toggle(file.path)}

@@ -24,7 +24,7 @@
 		height: 4px;
 		border-radius: var(--radius-pill);
 		background: var(--control);
-		transition: background-color 200ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.meter .filled[data-level='1'] {

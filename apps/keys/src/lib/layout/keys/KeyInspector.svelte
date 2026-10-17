@@ -98,7 +98,7 @@
 		position: relative;
 		min-width: 0;
 		border-radius: 14px;
-		transition: background-color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.slot:hover {
@@ -164,8 +164,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.edit:hover {

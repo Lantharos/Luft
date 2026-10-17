@@ -47,7 +47,7 @@
 		padding-inline: 12px 10px;
 		color: var(--sidebar-text-muted);
 		font-size: 13px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.quick-open:hover {
@@ -82,7 +82,7 @@
 		padding-inline: 12px;
 		color: var(--sidebar-text);
 		font-size: 13px;
-		transition: background-color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.open-folder:hover {

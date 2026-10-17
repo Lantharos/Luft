@@ -79,7 +79,7 @@
 		border-radius: 4px;
 		background: #fff;
 		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.current .paper {

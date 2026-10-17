@@ -63,7 +63,7 @@
 		try {
 			oncreated(await createLayout(name, chosen.origin));
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		} finally {
 			busy = false;
 		}
@@ -74,7 +74,7 @@
 			const imported = await importLayout();
 			if (imported) oncreated(imported);
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		}
 	}
 </script>
@@ -117,7 +117,7 @@
 		text-align: left;
 		font-size: 13px;
 		color: var(--text-soft);
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.option:hover,

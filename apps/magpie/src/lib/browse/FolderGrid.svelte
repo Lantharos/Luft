@@ -55,8 +55,8 @@
 		border-radius: 10px;
 		background: var(--sidebar-control);
 		transition:
-			transform 160ms var(--ease),
-			box-shadow 160ms var(--ease);
+			transform var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover {

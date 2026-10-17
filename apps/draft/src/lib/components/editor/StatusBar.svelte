@@ -63,7 +63,7 @@
 		flex: none;
 		border-radius: var(--radius-pill);
 		padding-inline: 8px;
-		transition: background-color 140ms var(--ease), color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.status-item:hover {

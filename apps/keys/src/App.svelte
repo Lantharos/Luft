@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { isAvailable } from '@lantharos/sabine';
-	import { appearance, GlassShell } from '@luft/ui';
+	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import LayoutEditor from '#lib/layout/LayoutEditor.svelte';
 	import NewLayoutDialog from '#lib/layout/NewLayoutDialog.svelte';
 	import MethodEditor from '#lib/method/MethodEditor.svelte';
 	import NewMethodDialog from '#lib/method/NewMethodDialog.svelte';
 	import Sidebar from '#lib/shell/Sidebar.svelte';
-	import Toast from '#lib/shell/Toast.svelte';
 	import Welcome from '#lib/shell/Welcome.svelte';
 	import LayoutView from '#lib/view/LayoutView.svelte';
 	import { app, type Selection } from '#lib/state/app.svelte.js';
+	import { toast } from '#lib/state/toast.svelte.js';
 
 	onMount(() => {
 		if (isAvailable()) void app.start();
@@ -54,4 +54,4 @@
 	<NewMethodDialog oncreated={(method) => void created({ kind: 'method', id: method.id })} onclose={() => (app.creating = null)} />
 {/if}
 
-<Toast />
+<Toast toast={toast.current} ondismiss={toast.dismiss} onhold={toast.hold} onrelease={toast.release} />

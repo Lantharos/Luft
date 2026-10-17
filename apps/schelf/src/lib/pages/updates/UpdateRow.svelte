@@ -46,7 +46,7 @@
 		align-items: center;
 		gap: 8px;
 		padding-right: 16px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:has(.main:hover:not(:disabled)) {

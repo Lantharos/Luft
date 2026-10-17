@@ -75,7 +75,7 @@
 	.details-link {
 		text-align: left;
 		color: var(--text-soft);
-		transition: color 140ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.details-link:hover {
@@ -106,8 +106,8 @@
 		font-size: 13px;
 		text-align: left;
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.open-with__app:hover {

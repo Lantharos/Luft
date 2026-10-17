@@ -27,7 +27,7 @@
 		waiting++;
 		typing = typing
 			.then(task)
-			.catch((error) => toast.failed(error))
+			.catch((error) => toast.fail(error))
 			.finally(() => waiting--);
 	}
 

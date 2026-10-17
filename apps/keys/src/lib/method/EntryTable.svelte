@@ -126,7 +126,7 @@
 		height: 100%;
 		border-radius: 14px;
 		padding-inline: 4px;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:hover,
@@ -158,8 +158,8 @@
 		color: var(--text);
 		outline: none;
 		transition:
-			background-color 120ms var(--ease),
-			box-shadow 120ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.cell:hover {

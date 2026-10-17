@@ -28,7 +28,7 @@
 				viewer = new LayoutViewer(layout, app.sources.find(([type]) => type === 'xkb')?.[1] ?? null);
 			})
 			.catch((error) => {
-				toast.failed(error);
+				toast.fail(error);
 				app.select(app.first());
 			});
 	});

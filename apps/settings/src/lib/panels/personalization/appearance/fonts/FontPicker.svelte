@@ -142,7 +142,7 @@
 		background: var(--control);
 		padding-inline: 14px 12px;
 		font-size: 13.5px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.trigger:hover,

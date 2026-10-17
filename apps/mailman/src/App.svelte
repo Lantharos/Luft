@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
-	import { appearance, GlassShell, plural, tooltip } from '@luft/ui';
+	import { appearance, GlassShell, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
 	import { commands, WIDE_WINDOW, type Shell } from '#lib/app/commands.js';
@@ -25,7 +25,6 @@
 	import AddAccount from '#lib/settings/AddAccount.svelte';
 	import SettingsDialog from '#lib/settings/SettingsDialog.svelte';
 	import Shortcuts from '#lib/shell/Shortcuts.svelte';
-	import Toast from '#lib/shell/Toast.svelte';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import CheckMail from '#lib/shell/CheckMail.svelte';
 	import Header from '#lib/shell/Header.svelte';
@@ -206,7 +205,13 @@
 		{#if composer.current}
 			<Composer bind:composition={composer.current} />
 		{/if}
-		<Toast />
+		<Toast
+			class="bottom-6 left-[calc(var(--sidebar-width)_+_24px)] translate-x-0"
+			toast={toasts.current}
+			ondismiss={toasts.dismiss}
+			onhold={toasts.hold}
+			onrelease={toasts.release}
+		/>
 	</GlassShell>
 </div>
 

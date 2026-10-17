@@ -74,7 +74,7 @@
 		color: var(--sidebar-text);
 		font-size: 13px;
 		text-align: left;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tree-row:hover {
@@ -117,7 +117,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--sidebar-text-muted);
-		transition: background-color 140ms var(--ease), color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tree-action:hover {

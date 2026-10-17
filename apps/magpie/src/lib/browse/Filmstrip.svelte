@@ -105,8 +105,8 @@
 		background: color-mix(in oklab, var(--ink) 6%, transparent);
 		opacity: 0.72;
 		transition:
-			opacity 160ms var(--ease),
-			box-shadow 160ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover,

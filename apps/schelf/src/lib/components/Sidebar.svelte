@@ -96,7 +96,7 @@
 		text-align: left;
 		font-size: 14px;
 		color: var(--sidebar-text);
-		transition: background-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.nav-item:hover {

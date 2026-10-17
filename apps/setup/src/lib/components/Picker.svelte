@@ -104,7 +104,7 @@
 		border-radius: 16px;
 		padding: 10px 14px;
 		background: var(--control);
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.picker:hover,

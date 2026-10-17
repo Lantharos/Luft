@@ -20,7 +20,7 @@
 			const method = await task();
 			if (method) oncreated(method);
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		} finally {
 			busy = false;
 		}

@@ -41,7 +41,7 @@
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 		color: var(--text-soft);
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.level:hover {

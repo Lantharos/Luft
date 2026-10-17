@@ -32,7 +32,7 @@
 		openMethod(id)
 			.then((method) => (editor = new MethodEditor(method, () => void app.refresh())))
 			.catch((error) => {
-				toast.failed(error);
+				toast.fail(error);
 				app.select(app.first());
 			});
 	});

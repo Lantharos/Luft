@@ -123,11 +123,14 @@
 		background: var(--control);
 		font-size: 13px;
 		color: var(--text-soft);
-		transition: background-color 160ms var(--ease), transform 180ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.add-tile:hover {
 		background: var(--control-hover);
-		transform: scale(1.02);
+	}
+
+	.add-tile:active {
+		transform: scale(0.98);
 	}
 </style>

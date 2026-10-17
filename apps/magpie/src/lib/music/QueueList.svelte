@@ -42,7 +42,7 @@
 		border-radius: 12px;
 		padding-inline: 8px;
 		color: var(--sidebar-text);
-		transition: background-color 150ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.song:hover {

@@ -39,7 +39,7 @@
 		width: 24px;
 		border-radius: 999px;
 		box-shadow: inset 0 0 0 1px var(--hairline);
-		transition: box-shadow 180ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.swatch.selected {

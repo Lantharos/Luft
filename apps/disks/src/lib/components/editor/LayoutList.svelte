@@ -56,7 +56,7 @@
 		padding: 0 16px;
 		text-align: left;
 		font-size: 13px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:hover,

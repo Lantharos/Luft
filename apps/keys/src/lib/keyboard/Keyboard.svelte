@@ -143,7 +143,7 @@
 		white-space: nowrap;
 		font-size: 1.05cqw;
 		color: var(--text-muted);
-		transition: background-color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.latch:hover {

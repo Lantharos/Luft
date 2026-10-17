@@ -75,7 +75,7 @@
 		padding: 0 16px;
 		text-align: left;
 		color: var(--text-soft);
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover {

@@ -36,7 +36,7 @@
 		gap: 12px;
 		border-radius: 16px;
 		padding: 0 14px 0 10px;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.summary:hover {

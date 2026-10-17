@@ -85,7 +85,7 @@
 		justify-content: center;
 		border-radius: 16px;
 		background: var(--control);
-		transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.capture:hover {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { fade } from '@luft/ui';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import TrashPane from '#lib/components/pane/TrashPane.svelte';
 	import ColumnsView from '#lib/components/views/ColumnsView.svelte';
@@ -62,7 +62,7 @@
 		</div>
 	{:else}
 		{#key mode}
-			<div class="pane-layer" in:fade={{ duration: 160, delay: 60 }} out:fade={{ duration: 120 }}>
+			<div class="pane-layer" in:fade out:fade>
 				{#if empty}
 					<EmptyState {...empty} />
 				{:else if manager.loading.skeleton}

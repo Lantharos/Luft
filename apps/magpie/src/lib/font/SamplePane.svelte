@@ -89,7 +89,7 @@
 		line-height: 1.25;
 		color: var(--text);
 		outline: none;
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.sample:focus-visible {

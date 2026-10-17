@@ -93,7 +93,7 @@
 		gap: 8px;
 		border-radius: var(--radius-group);
 		padding-right: 12px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:has(.main:not(:disabled):hover) {

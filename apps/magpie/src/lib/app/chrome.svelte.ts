@@ -1,4 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
+import { Toasts } from '@luft/ui';
 import { isDesktop } from '#lib/bridge/index.js';
 
 const IDLE_MS = 2200;
@@ -35,10 +36,9 @@ class Chrome {
 	idle = $state(false);
 	watching = $state(false);
 	seeThrough = $state(false);
-	toast = $state<{ id: number; text: string } | null>(null);
+	readonly toasts = new Toasts(TOAST_MS);
 
 	#idleTimer: ReturnType<typeof setTimeout> | undefined;
-	#toastTimer: ReturnType<typeof setTimeout> | undefined;
 
 	start(mode: Mode) {
 		this.mode = mode;
@@ -71,9 +71,7 @@ class Chrome {
 	}
 
 	notify(text: string) {
-		clearTimeout(this.#toastTimer);
-		this.toast = { id: (this.toast?.id ?? 0) + 1, text };
-		this.#toastTimer = setTimeout(() => (this.toast = null), TOAST_MS);
+		this.toasts.show(text);
 	}
 }
 

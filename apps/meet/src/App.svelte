@@ -3,8 +3,7 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { isAvailable } from '@lantharos/sabine';
-	import { appearance, GlassShell } from '@luft/ui';
-	import Note from '#lib/components/Note.svelte';
+	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
@@ -57,6 +56,12 @@
 				<Step />
 			</div>
 		{/key}
-		<Note />
+		<Toast
+			class="absolute z-20"
+			toast={session.notes.current}
+			ondismiss={session.notes.dismiss}
+			onhold={session.notes.hold}
+			onrelease={session.notes.release}
+		/>
 	</main>
 </GlassShell>

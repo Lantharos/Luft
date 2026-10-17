@@ -115,7 +115,7 @@
 		border-radius: 10px;
 		font-size: 17px;
 		color: var(--secondary);
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.cell.add {
@@ -137,7 +137,7 @@
 		text-align: left;
 		font-size: 13px;
 		color: var(--text-soft);
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.option:hover {

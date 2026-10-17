@@ -110,11 +110,11 @@
 		position: relative;
 		flex: none;
 		border-radius: var(--radius-pill);
-		transition: transform 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate);
 	}
 
-	.picture:hover {
-		transform: scale(1.03);
+	.picture:active {
+		transform: scale(0.96);
 	}
 
 	.overlay {
@@ -143,7 +143,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--control-hover);
 		color: var(--text);
-		transition: background-color 180ms var(--ease), color 180ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.picture:hover .overlay,

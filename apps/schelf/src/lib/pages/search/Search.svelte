@@ -84,7 +84,7 @@
 		border-radius: var(--radius-group);
 		padding: 10px 14px;
 		text-align: left;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.result:hover {

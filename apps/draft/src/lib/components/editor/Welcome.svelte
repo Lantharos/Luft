@@ -28,7 +28,7 @@
 		padding-inline: 16px;
 		color: var(--text-soft);
 		font-size: 13.5px;
-		transition: background-color 140ms var(--ease), color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.welcome-action:hover {

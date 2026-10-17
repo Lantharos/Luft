@@ -36,9 +36,9 @@
 		text-align: left;
 		color: var(--sidebar-text);
 		transition:
-			background-color 150ms var(--ease),
-			color 150ms var(--ease),
-			transform 150ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate),
+			transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.entry:hover {

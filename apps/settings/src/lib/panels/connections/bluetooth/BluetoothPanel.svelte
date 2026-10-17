@@ -4,7 +4,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
-	import { ActionRow, Dialog, IconButton, Row, Section, Select, Switch } from '@luft/ui';
+	import { ActionRow, Dialog, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
@@ -179,23 +179,25 @@
 		{#if bluetooth.paired.length}
 			<Section title="My devices">
 				{#each bluetooth.paired as device (device.path)}
-					<ActionRow
-						title={device.name}
-						description={status(device)}
-						alert={Boolean(problems[device.path])}
-						icon={KIND_ICONS[device.kind]}
-						disabled={!adapter.powered}
-						onclick={() => toggle(device)}
-					>
-						{#snippet trailing()}
-							{#if busy[device.path]}
-								<LoaderCircle size={16} class="animate-spin" />
-							{/if}
-						{/snippet}
-						{#snippet actions()}
-							<IconButton icon={Info} label="Device details" onclick={() => (inspecting = device.path)} />
-						{/snippet}
-					</ActionRow>
+					<div class="row-slot" animate:reorder in:item out:item>
+						<ActionRow
+							title={device.name}
+							description={status(device)}
+							alert={Boolean(problems[device.path])}
+							icon={KIND_ICONS[device.kind]}
+							disabled={!adapter.powered}
+							onclick={() => toggle(device)}
+						>
+							{#snippet trailing()}
+								{#if busy[device.path]}
+									<LoaderCircle size={16} class="animate-spin" />
+								{/if}
+							{/snippet}
+							{#snippet actions()}
+								<IconButton icon={Info} label="Device details" onclick={() => (inspecting = device.path)} />
+							{/snippet}
+						</ActionRow>
+					</div>
 				{/each}
 			</Section>
 		{/if}
@@ -204,19 +206,21 @@
 			<WindowsDevices />
 			<Section title="Nearby devices">
 				{#each nearby as device (device.path)}
-					<ActionRow
-						title={device.name}
-						description={problems[device.path] ?? (busy[device.path] ? BUSY_LABELS[busy[device.path]] : undefined)}
-						alert={Boolean(problems[device.path])}
-						icon={KIND_ICONS[device.kind]}
-						onclick={() => perform(device, 'pairing', pair)}
-					>
-						{#snippet trailing()}
-							{#if busy[device.path]}
-								<LoaderCircle size={16} class="animate-spin" />
-							{/if}
-						{/snippet}
-					</ActionRow>
+					<div class="row-slot" animate:reorder in:item out:item>
+						<ActionRow
+							title={device.name}
+							description={problems[device.path] ?? (busy[device.path] ? BUSY_LABELS[busy[device.path]] : undefined)}
+							alert={Boolean(problems[device.path])}
+							icon={KIND_ICONS[device.kind]}
+							onclick={() => perform(device, 'pairing', pair)}
+						>
+							{#snippet trailing()}
+								{#if busy[device.path]}
+									<LoaderCircle size={16} class="animate-spin" />
+								{/if}
+							{/snippet}
+						</ActionRow>
+					</div>
 				{:else}
 					<Row title="Looking for devices…" description="Put the device you want to add in pairing mode">
 						<LoaderCircle size={16} class="animate-spin" />

@@ -74,8 +74,8 @@
 		font-weight: 500;
 		color: var(--text-muted);
 		transition:
-			background-color 180ms var(--ease),
-			color 180ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.presets button:hover,

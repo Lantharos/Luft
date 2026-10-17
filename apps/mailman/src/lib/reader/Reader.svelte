@@ -102,7 +102,7 @@
 		border-radius: var(--radius-pill);
 		font-size: 13px;
 		color: var(--text-muted);
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.fold:hover {

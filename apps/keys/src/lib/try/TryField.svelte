@@ -161,7 +161,7 @@
 		border-radius: 18px;
 		background: var(--control);
 		box-shadow: inset 0 0 0 1px var(--hairline);
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.try:focus-within {
@@ -217,8 +217,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.clear:hover {

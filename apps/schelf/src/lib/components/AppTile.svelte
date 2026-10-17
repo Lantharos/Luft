@@ -24,7 +24,7 @@
 		border-radius: var(--radius-group);
 		padding: 12px 14px;
 		text-align: left;
-		transition: background-color 160ms var(--ease), transform 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover {

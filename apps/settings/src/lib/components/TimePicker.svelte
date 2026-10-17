@@ -101,7 +101,7 @@
 		font-size: 13px;
 		font-weight: 500;
 		color: var(--text);
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.trigger:hover,
@@ -131,7 +131,7 @@
 		font-size: 13px;
 		font-variant-numeric: tabular-nums;
 		color: var(--text-soft);
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.column button:hover {

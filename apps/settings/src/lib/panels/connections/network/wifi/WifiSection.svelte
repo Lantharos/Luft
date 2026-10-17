@@ -2,7 +2,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
-	import { ActionRow, IconButton, Row, Section } from '@luft/ui';
+	import { ActionRow, IconButton, item, reorder, Row, Section } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
@@ -88,27 +88,29 @@
 
 <Section title="Wi‑Fi networks">
 	{#each shown as network (network.ssid)}
-		<ActionRow
-			title={network.ssid}
-			description={describe(network)}
-			alert={Boolean(problems[network.ssid])}
-			icon={signalIcon(network.strength)}
-			onclick={() => choose(network)}
-		>
-			{#snippet trailing()}
-				{#if network.state === 'connecting'}
-					<LoaderCircle size={16} class="animate-spin" />
-				{/if}
-				{#if isSecured(network.security)}
-					<Lock size={15} />
-				{/if}
-			{/snippet}
-			{#snippet actions()}
-				{#if network.saved}
-					<IconButton icon={Settings} label="Network settings" onclick={() => configure(network)} />
-				{/if}
-			{/snippet}
-		</ActionRow>
+		<div class="row-slot" animate:reorder in:item out:item>
+			<ActionRow
+				title={network.ssid}
+				description={describe(network)}
+				alert={Boolean(problems[network.ssid])}
+				icon={signalIcon(network.strength)}
+				onclick={() => choose(network)}
+			>
+				{#snippet trailing()}
+					{#if network.state === 'connecting'}
+						<LoaderCircle size={16} class="animate-spin" />
+					{/if}
+					{#if isSecured(network.security)}
+						<Lock size={15} />
+					{/if}
+				{/snippet}
+				{#snippet actions()}
+					{#if network.saved}
+						<IconButton icon={Settings} label="Network settings" onclick={() => configure(network)} />
+					{/if}
+				{/snippet}
+			</ActionRow>
+		</div>
 	{:else}
 		<Row title="Looking for networks…" />
 	{/each}

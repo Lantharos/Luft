@@ -44,7 +44,7 @@
 		min-width: 0;
 		align-items: center;
 		gap: 4px;
-		transition: color 140ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.list-heading:hover:not(:disabled),
@@ -113,7 +113,7 @@
 		color: var(--text-muted);
 		font-size: 12.5px;
 		font-variant-numeric: tabular-nums;
-		transition: color 140ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.list-cell.list-size {

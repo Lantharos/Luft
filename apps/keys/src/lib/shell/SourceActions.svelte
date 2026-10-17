@@ -30,7 +30,7 @@
 			const result = await task();
 			if (done && result !== false) toast.show(done);
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		}
 	}
 

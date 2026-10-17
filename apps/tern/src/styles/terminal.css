@@ -6,7 +6,7 @@
 		flex-direction: column;
 		background: var(--terminal-background);
 		color: var(--text);
-		transition: background-color 200ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab-views {
@@ -64,7 +64,7 @@
 		inset: 0 4px;
 		background: var(--hairline);
 		content: '';
-		transition: background-color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.split.column > .split-divider::after {
@@ -169,8 +169,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.search-toggle:hover {

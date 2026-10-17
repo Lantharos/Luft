@@ -29,7 +29,7 @@
 		gap: 14px;
 		border-radius: 16px;
 		padding: 12px 16px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.option:hover,
@@ -43,7 +43,7 @@
 		flex: none;
 		border-radius: 50%;
 		box-shadow: inset 0 0 0 1.5px var(--text-muted);
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.selected .dot {

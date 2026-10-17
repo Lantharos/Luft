@@ -89,7 +89,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
-		transition: background-color 160ms var(--ease), color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.arrow:hover {
@@ -108,7 +108,7 @@
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 		outline: none;
-		transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.value:hover {

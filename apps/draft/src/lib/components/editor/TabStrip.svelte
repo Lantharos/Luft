@@ -66,7 +66,7 @@
 		align-items: center;
 		border-radius: 10px;
 		color: var(--text-muted);
-		transition: background-color 140ms var(--ease), color 140ms var(--ease), opacity 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate), opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover {
@@ -103,7 +103,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		opacity: 0;
-		transition: opacity 140ms var(--ease), background-color 140ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate), background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover .tab-close,

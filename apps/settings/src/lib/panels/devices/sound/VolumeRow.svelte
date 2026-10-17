@@ -44,8 +44,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-soft);
 		transition:
-			background-color 160ms var(--ease),
-			color 160ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.mute:hover {

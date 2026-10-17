@@ -57,11 +57,15 @@
 		border-radius: 14px;
 		padding: 8px 8px 10px;
 		text-align: left;
-		transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover {
-		transform: scale(1.02);
+		box-shadow: 0 0 0 2px var(--content), 0 0 0 4px var(--hairline);
+	}
+
+	.choice:active {
+		transform: scale(0.98);
 	}
 
 	.choice.selected {
@@ -103,7 +107,7 @@
 		color: var(--text-soft);
 		box-shadow: 0 2px 8px var(--shadow-faint);
 		opacity: 0;
-		transition: opacity 160ms var(--ease), color 160ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover .remove,

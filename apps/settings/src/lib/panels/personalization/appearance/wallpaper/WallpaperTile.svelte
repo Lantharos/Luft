@@ -45,11 +45,15 @@
 		overflow: hidden;
 		border-radius: 14px;
 		background: var(--control);
-		transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover {
-		transform: scale(1.02);
+		box-shadow: 0 0 0 2px var(--content), 0 0 0 4px var(--hairline);
+	}
+
+	.tile:active {
+		transform: scale(0.98);
 	}
 
 	.tile.selected {

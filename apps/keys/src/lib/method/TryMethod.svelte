@@ -35,7 +35,7 @@
 		waiting++;
 		typing = typing
 			.then(task)
-			.catch((error) => toast.failed(error))
+			.catch((error) => toast.fail(error))
 			.finally(() => waiting--);
 	}
 
@@ -117,7 +117,7 @@
 		padding: 7px 10px;
 		text-align: left;
 		font-size: 16px;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.candidate:hover,

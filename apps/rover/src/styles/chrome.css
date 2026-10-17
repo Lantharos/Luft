@@ -30,8 +30,8 @@
 		border-radius: var(--radius-pill);
 		background: var(--surface);
 		transition:
-			background-color 140ms var(--ease),
-			box-shadow 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.path-bar:hover {
@@ -69,9 +69,9 @@
 		color: var(--text-muted);
 		font-size: 13px;
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease),
-			box-shadow 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.path-crumb:hover {
@@ -143,8 +143,8 @@
 		font-size: 13px;
 		text-align: left;
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.path-candidate:hover {
@@ -173,8 +173,8 @@
 		color: var(--text-soft);
 		font-size: 12.5px;
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.vcs-chip:hover,
@@ -208,8 +208,8 @@
 		border-radius: 10px;
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover {
@@ -248,8 +248,8 @@
 		border-radius: var(--radius-pill);
 		opacity: 0;
 		transition:
-			opacity 140ms var(--ease),
-			background-color 140ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover .tab-close,

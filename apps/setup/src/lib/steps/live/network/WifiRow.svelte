@@ -45,7 +45,7 @@
 <style>
 	.row {
 		border-radius: 16px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:hover,

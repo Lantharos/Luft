@@ -62,7 +62,7 @@
 		border-radius: 14px;
 		padding: 6px 10px;
 		text-align: left;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.highlighted {

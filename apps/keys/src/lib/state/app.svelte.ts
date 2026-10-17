@@ -81,7 +81,7 @@ class AppStore {
 			await this.refresh();
 			this.select(opened);
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		}
 	}
 }

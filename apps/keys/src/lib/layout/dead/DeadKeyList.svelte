@@ -53,8 +53,8 @@
 		font-size: 14px;
 		color: var(--text-soft);
 		transition:
-			background-color 150ms var(--ease),
-			color 150ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.item:hover {

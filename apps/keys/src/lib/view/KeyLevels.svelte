@@ -44,7 +44,7 @@
 		gap: 4px;
 		border-radius: 16px;
 		padding: 10px 8px 8px;
-		transition: background-color 140ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.slot.current {

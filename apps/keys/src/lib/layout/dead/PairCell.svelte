@@ -97,8 +97,8 @@
 		border-radius: 14px;
 		padding-inline: 6px;
 		transition:
-			background-color 120ms var(--ease),
-			box-shadow 120ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.cell:hover,
@@ -158,8 +158,8 @@
 		color: var(--text-muted);
 		opacity: 0;
 		transition:
-			opacity 120ms var(--ease),
-			background-color 120ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.cell:hover :global(.more),

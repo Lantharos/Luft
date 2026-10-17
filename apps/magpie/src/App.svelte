@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, fileDrop, GlassShell, plural } from '@luft/ui';
+	import { appearance, fileDrop, GlassShell, plural, Toast } from '@luft/ui';
 	import type { Activation } from '#lib/bridge/api.js';
 	import * as api from '#lib/bridge/api.js';
 	import { openPaths } from '#lib/app/actions.js';
@@ -31,7 +31,6 @@
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import PanelToggle from '#lib/shell/PanelToggle.svelte';
 	import SidePanel from '#lib/shell/SidePanel.svelte';
-	import Toast from '#lib/shell/Toast.svelte';
 	import VisualStage from '#lib/shell/VisualStage.svelte';
 	import Welcome from '#lib/shell/Welcome.svelte';
 
@@ -143,7 +142,13 @@
 					<div class="min-w-0 flex-1"><Welcome /></div>
 				{/if}
 			</div>
-			<Toast />
+			<Toast
+				class="absolute z-40"
+				toast={chrome.toasts.current}
+				ondismiss={chrome.toasts.dismiss}
+				onhold={chrome.toasts.hold}
+				onrelease={chrome.toasts.release}
+			/>
 		</main>
 	</GlassShell>
 </div>

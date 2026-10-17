@@ -127,8 +127,8 @@
 		background: color-mix(in oklab, var(--tone) 24%, transparent);
 		text-align: left;
 		transition:
-			box-shadow 160ms var(--ease),
-			background-color 160ms var(--ease);
+			box-shadow var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.segment:first-child {

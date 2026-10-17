@@ -111,7 +111,7 @@
 									{#each group.files as file (file.path)}
 										<button
 											class={[
-												'flex min-h-9 min-w-0 items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color] duration-150 hover:bg-[var(--surface-hover)] hover:text-[var(--text)]',
+												'flex min-h-9 min-w-0 items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]',
 												vcs.diffPath === file.path ? 'bg-[var(--selection)] text-[var(--text)]' : ''
 											]}
 											type="button"

@@ -26,8 +26,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition:
-			background-color 140ms var(--ease),
-			color 140ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover {
@@ -64,8 +64,8 @@
 		border-radius: var(--radius-pill);
 		opacity: 0;
 		transition:
-			opacity 140ms var(--ease),
-			background-color 140ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tab:hover .tab-close,

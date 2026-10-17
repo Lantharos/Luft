@@ -195,7 +195,7 @@
 		gap: 12px;
 		border-radius: 18px;
 		padding-inline: 16px 20px;
-		transition: background-color 120ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.collapsed:hover {

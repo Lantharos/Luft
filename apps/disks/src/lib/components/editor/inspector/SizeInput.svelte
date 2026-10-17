@@ -64,8 +64,8 @@
 		padding-inline: 14px;
 		font-size: 13px;
 		transition:
-			background-color 160ms var(--ease),
-			box-shadow 160ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.field:hover:not(.locked) {

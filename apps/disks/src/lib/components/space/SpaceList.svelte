@@ -52,7 +52,7 @@
 		min-height: 48px;
 		align-items: center;
 		padding-right: 12px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row.lit {

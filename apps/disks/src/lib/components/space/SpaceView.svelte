@@ -72,7 +72,7 @@
 		margin: 0 -6px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		transition: color 160ms var(--ease), background-color 160ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate), background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.crumb:hover {

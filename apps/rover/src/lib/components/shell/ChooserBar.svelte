@@ -11,7 +11,7 @@
 	let { chooser, selectedCount }: Props = $props();
 
 	const BUTTON =
-		'inline-flex h-10 min-w-[96px] select-none items-center justify-center rounded-full px-5 text-[13px] font-medium leading-none transition-[background-color,color,transform,opacity,box-shadow,filter] duration-150 active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100';
+		'inline-flex h-10 min-w-[96px] select-none items-center justify-center rounded-full px-5 text-[13px] font-medium leading-none transition-[background-color,color,transform,opacity,box-shadow,filter] active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100';
 	const SECONDARY =
 		'bg-[var(--control)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] hover:bg-[var(--control-hover)] focus-visible:bg-[var(--control-hover)]';
 	const PRIMARY =
@@ -64,7 +64,7 @@
 			<span class="shrink-0 text-[12px] text-[var(--text-muted)]">Name</span>
 			<input
 				{@attach focusName}
-				class="h-10 min-w-0 flex-1 rounded-full bg-[var(--control)] px-4 text-[13px] font-medium text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] duration-150 placeholder:font-normal placeholder:text-[var(--text-muted)] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_20%,transparent)]"
+				class="h-10 min-w-0 flex-1 rounded-full bg-[var(--control)] px-4 text-[13px] font-medium text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] placeholder:font-normal placeholder:text-[var(--text-muted)] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_20%,transparent)]"
 				value={chooser.saveName}
 				placeholder="Untitled"
 				aria-label="File name"

@@ -331,13 +331,16 @@
 		box-shadow: 0 10px 32px var(--shadow-soft);
 		backdrop-filter: blur(18px);
 		transition:
-			transform 160ms var(--ease),
-			background-color 160ms var(--ease);
+			transform var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.big-play:hover {
 		background: var(--control-hover);
-		transform: scale(1.04);
+	}
+
+	.big-play:active {
+		transform: scale(0.96);
 	}
 
 	.cue {

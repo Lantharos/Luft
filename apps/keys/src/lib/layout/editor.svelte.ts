@@ -210,7 +210,7 @@ export class LayoutEditor {
 			this.saved = true;
 			this.#onsaved();
 		} catch (error) {
-			toast.failed(error);
+			toast.fail(error);
 		}
 	}
 }

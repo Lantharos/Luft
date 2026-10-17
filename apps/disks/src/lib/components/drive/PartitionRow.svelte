@@ -61,10 +61,10 @@
 		<span class="status">{status}</span>
 	</button>
 	<div class="actions">
+		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
 		{#if primary}
 			<button type="button" class="button" disabled={busy} onclick={primary.run}>{primary.label}</button>
 		{/if}
-		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
 	</div>
 </div>
 

@@ -11,9 +11,9 @@ const {eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
 
 export const AT = {
-  more: [1019, 219], unmount: [900, 357], mount: [965, 219], saveImage: [900, 550], done: [1001, 310],
-  format: [900, 641], safelyRemove: [943, 85],
-  wdc: [130, 157], seagate: [130, 100], unlock: [962, 219], newPartition: [1008, 275],
+  more: [945, 219], unmount: [900, 357], mount: [1005, 219], saveImage: [900, 550], done: [1001, 310],
+  format: [900, 641], safelyRemove: [983, 85],
+  wdc: [130, 157], seagate: [130, 100], unlock: [1005, 219], newPartition: [1008, 275],
   health: [600, 360], firstDrive: [560, 282], next: [686, 488], write: [666, 419],
   largest: [1009, 467], trash: [860, 565],
   turnOn: [885, 448], checked: [755, 448], saved: [292, 447], keySaved: [755, 498], unlocking: [755, 436], encrypt: [759, 429],

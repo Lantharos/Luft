@@ -18,10 +18,10 @@
 
 <div class="flex min-h-9 items-center gap-2 px-1.5">
 	<p class="min-w-0 flex-1 truncate text-[14px] text-[var(--text-muted)]">{summary}</p>
+	<ActionMenu label="More for {drive.name}" groups={driveMenu(drive)} disabled={busy} />
 	{#if drive.removable && !drive.system}
 		<button type="button" class="button" disabled={busy} onclick={() => disks.run(drive.id, () => api.safelyRemove(drive.id, drive.block))}>
 			{drive.canPowerOff ? 'Safely remove' : 'Eject'}
 		</button>
 	{/if}
-	<ActionMenu label="More for {drive.name}" groups={driveMenu(drive)} disabled={busy} />
 </div>

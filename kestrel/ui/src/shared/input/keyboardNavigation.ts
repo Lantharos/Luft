@@ -7,6 +7,12 @@ const directions = new Map([
   [Clutter.KEY_Up, St.DirectionType.UP], [Clutter.KEY_Down, St.DirectionType.DOWN],
 ]);
 
+const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
+
+export function isControlEnter(event: Clutter.Event): boolean {
+  return ENTER_KEYS.includes(event.get_key_symbol()) && !!(event.get_state() & Clutter.ModifierType.CONTROL_MASK);
+}
+
 export function navigateWithKeyboard(root: St.Widget): void {
   root.connect('key-press-event', (_actor, event) => {
     if (event.get_state() & (Clutter.ModifierType.CONTROL_MASK | Clutter.ModifierType.MOD1_MASK | Clutter.ModifierType.SUPER_MASK))

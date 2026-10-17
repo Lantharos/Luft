@@ -82,7 +82,7 @@ class KestrelUi {
       changed: () => this.syncSession(),
       canInteract: () => this.canInteract() && !this.surfaces.active,
     });
-    const start = new StartMenu(close, this.menus);
+    const start = new StartMenu(close, this.menus, context.quickSettings);
     this.quick = new QuickSettings(context.quickSettings, place, close,
       icons => {
         this.panels.primary.updateStatus(icons);

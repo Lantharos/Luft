@@ -21,6 +21,11 @@ export const POWER_ACTIONS: SessionAction[] = [
   { icon: 'system-shutdown-symbolic', label: 'Power off', availability: 'can-power-off', run: () => actions().activatePowerOff() },
 ];
 
+export function isAvailable(action: SessionAction): boolean {
+  const availability = actions() as unknown as Record<string, boolean>;
+  return availability[action.availability.replaceAll('-', '_')];
+}
+
 export function bindAvailability(action: SessionAction, target: GObject.Object): void {
   actions().bind_property(action.availability, target, 'visible', GObject.BindingFlags.SYNC_CREATE);
 }

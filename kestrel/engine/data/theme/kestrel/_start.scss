@@ -11,7 +11,7 @@
 .kestrel-start { padding: 20px; spacing: 14px; }
 .kestrel-search StIcon { color: ink(0.7); padding-right: 6px; }
 
-.kestrel-app-grid { spacing: 4px; }
+.kestrel-app-grid, .kestrel-search-results { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
 .kestrel-app-content { spacing: 8px; }
 .kestrel-app-button { border-radius: 12px; padding: 12px 4px 8px; }
@@ -20,11 +20,13 @@
 .kestrel-app-button:active { background-color: fill(0.20); }
 .kestrel-app-label { font-size: 12px; max-width: 84px; height: 30px; text-align: center; }
 
-.kestrel-search-result { padding: 8px 10px; border-radius: 12px; transition-duration: 120ms; }
+.kestrel-search-result { padding: 0; border-radius: 12px; transition-duration: 120ms; }
 .kestrel-search-result:hover { background-color: fill(0.09); }
 .kestrel-search-result:focus { background-color: fill(0.14); }
 .kestrel-search-result:active { background-color: fill(0.20); }
-.kestrel-search-result-content { spacing: 12px; }
+.kestrel-search-result-highlight { border-radius: 12px; background-color: fill(0.10); }
+.kestrel-start .kestrel-search-group { padding: 10px 10px 2px; color: ink(0.7); }
+.kestrel-search-result-content { padding: 8px 10px; spacing: 12px; }
 .kestrel-search-result-name { font-size: 14px; font-weight: 500; }
 .kestrel-search-result-description { font-size: 12px; color: ink(0.60); }
 

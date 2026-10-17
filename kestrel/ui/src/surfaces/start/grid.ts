@@ -6,7 +6,7 @@ import Shell from 'gi://Shell';
 import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
 import { SearchResults } from './searchResults.js';
-import type { SearchItem } from './search/item.js';
+import type { SearchItem, SearchView } from './search/item.js';
 import { animateActor, liftIcon } from '../../shared/motion.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
@@ -17,26 +17,27 @@ export class StartGrid {
   private readonly layout = new StartLayout();
   private readonly drag: GridDrag;
   private readonly results: SearchResults;
+  private readonly resultsBox = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true, visible: false });
   private catalogDirty = false;
   private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
   private apps = new Map<string, Gio.AppInfo>();
   private pinned = new Set<string>();
-  private searchItems: SearchItem[] | null = null;
+  private searchView: SearchView | null = null;
   private folder: string | null = null;
   private headerKey: string | null = null;
   firstResult: SearchItem | undefined;
 
   constructor(private readonly scroller: St.ScrollView, private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {
     scroller.child = this.actor;
+    this.actor.add_child(this.resultsBox);
     this.results = new SearchResults(menus, actor => this.reveal(actor));
     this.actor.connect('destroy', () => {
       for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
       this.buttons.clear();
-      this.results.destroy();
     });
     this.drag = new GridDrag(scroller, () => this.render(false, true));
-    this.drag.target(this.actor, source => this.searchItems ? null : () => this.layout.move(source.id, this.folder));
+    this.drag.target(this.actor, source => this.searchView ? null : () => this.layout.move(source.id, this.folder));
   }
 
   update(apps: Gio.AppInfo[], pinned: Set<string>): void {
@@ -50,9 +51,22 @@ export class StartGrid {
     if (!this.drag.active) this.render();
   }
 
-  showResults(items: SearchItem[] | null): void {
-    this.searchItems = items;
-    if (!this.drag.active) this.render();
+  showResults(view: SearchView | null): void {
+    const searching = !!this.searchView;
+    this.searchView = view;
+    if (this.drag.active) return;
+    if (view && searching) this.renderResults(view);
+    else this.render();
+  }
+
+  highlightFirstResult(highlight: boolean): void {
+    this.results.setHighlighting(highlight);
+  }
+
+  private renderResults(view: SearchView): void {
+    this.firstResult = view.best ?? view.groups[0]?.items[0];
+    this.results.show(this.resultsBox, view);
+    if (view.fresh) this.scroller.vadjustment.value = 0;
   }
 
   focusFirst(): boolean { return this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false); }
@@ -77,19 +91,19 @@ export class StartGrid {
   }
 
   private render(animate = false, reorder = false): void {
+    const rows = this.actor.get_children().filter(child => child !== this.resultsBox);
     const positions = reorder
-      ? new Map(this.actor.get_children().flatMap(row => row.get_children()).map(button => [button.name, button.get_transformed_position()]))
+      ? new Map(rows.flatMap(row => row.get_children()).map(button => [button.name, button.get_transformed_position()]))
       : new Map<string, [number, number]>();
     if (this.catalogDirty) {
       for (const { actor } of this.buttons.values()) actor.destroy();
       this.buttons.clear();
-      this.results.destroy();
+      this.results.clear();
       this.catalogDirty = false;
     }
     if (this.folder && !this.layout.folder(this.folder)) this.folder = null;
     for (const { actor } of this.buttons.values()) actor.get_parent()?.remove_child(actor);
-    this.results.detach();
-    this.actor.destroy_all_children();
+    for (const row of rows) row.destroy();
     for (const [key, item] of this.buttons) {
       const id = key;
       if (!this.apps.has(id) && !this.layout.folder(id)) {
@@ -98,13 +112,12 @@ export class StartGrid {
       }
     }
     this.renderHeader();
-    if (this.searchItems) {
-      this.firstResult = this.searchItems[0];
-      if (!this.firstResult) this.actor.add_child(new St.Label({ text: 'No results', style_class: 'kestrel-empty' }));
-      for (const item of this.searchItems) this.actor.add_child(this.results.row(item));
-      this.scroller.vadjustment.value = 0;
+    if (this.searchView) {
+      this.renderResults(this.searchView);
+      this.resultsBox.show();
       return;
     }
+    this.resultsBox.hide();
     this.firstResult = undefined;
     const ids = this.layout.items(this.folder).filter(id => this.visible(id));
     for (let index = 0; index < ids.length; index += 6) {
@@ -137,11 +150,11 @@ export class StartGrid {
   }
 
   private renderHeader(): void {
-    const key = this.searchItems ? 'search' : this.folder ?? 'root';
+    const key = this.searchView ? 'search' : this.folder ?? 'root';
     if (this.headerKey === key) return;
     this.headerKey = key;
     this.header.destroy_all_children();
-    const folder = !this.searchItems && this.folder ? this.layout.folder(this.folder) : undefined;
+    const folder = !this.searchView && this.folder ? this.layout.folder(this.folder) : undefined;
     this.header.visible = !!folder;
     if (!folder) return;
     const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
@@ -186,12 +199,12 @@ export class StartGrid {
     const key = id;
     const cached = this.buttons.get(key);
     if (cached?.signature === signature) {
-      cached.draggable.enabled = !this.searchItems;
+      cached.draggable.enabled = !this.searchView;
       return cached.actor;
     }
     cached?.actor.destroy();
     const item = this.button(id);
-    item.draggable.enabled = !this.searchItems;
+    item.draggable.enabled = !this.searchView;
     this.buttons.set(key, { signature, ...item });
     return item.actor;
   }
@@ -226,7 +239,7 @@ export class StartGrid {
       ];
       const shellApp = Shell.AppSystem.get_default().lookup_app(id);
       const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: 'Open', run: () => this.launch(app!) }];
-      if (this.folder && !this.searchItems) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
+      if (this.folder && !this.searchView) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
       return entries;
     });
     const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));

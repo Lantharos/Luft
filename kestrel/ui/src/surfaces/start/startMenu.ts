@@ -11,6 +11,8 @@ import { StartFooter } from './footer.js';
 import { StartSearch } from './search/search.js';
 import { appKey, launchHistory } from '../../shared/launchHistory.js';
 import { taskbarPreferences } from '../../desktop/panel/preferences/taskbarPreferences.js';
+import type { QuickSettingsSource } from '../quickSettings/quickControls.js';
+import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
 
 export class StartMenu {
   readonly actor: St.BoxLayout;
@@ -24,7 +26,7 @@ export class StartMenu {
   private apps: Gio.AppInfo[] = [];
   private catalog = '';
 
-  constructor(private readonly close: () => void, menus: ContextMenus) {
+  constructor(private readonly close: () => void, menus: ContextMenus, quickSettings: QuickSettingsSource) {
     this.actor = new St.BoxLayout({
       name: 'kestrel-start',
       orientation: Clutter.Orientation.VERTICAL,
@@ -33,7 +35,7 @@ export class StartMenu {
     });
     blurSurface(this.actor);
     this.search = new St.Entry({
-      style_class: 'kestrel-search', hint_text: 'Search apps',
+      style_class: 'kestrel-search', hint_text: 'Search apps, settings and files',
       can_focus: true, x_expand: true,
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
@@ -51,16 +53,17 @@ export class StartMenu {
         { label: 'Select all', run: () => text.set_selection(0, -1) },
       ];
     });
-    this.search.get_clutter_text().connect('text-changed', () => {
-      this.refreshApps();
-    });
+    this.search.clutter_text.connect('text-changed', () => this.searchProvider.setText(this.search.get_text()));
     this.search.clutter_text.connect('key-press-event', (_text, event) => {
-      if (event.get_key_symbol() !== Clutter.KEY_Down) return Clutter.EVENT_PROPAGATE;
-      return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+      if (event.get_key_symbol() === Clutter.KEY_Down) return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+      const reveal = this.browser.firstResult?.reveal;
+      if (!reveal || !isControlEnter(event)) return Clutter.EVENT_PROPAGATE;
+      reveal();
+      return Clutter.EVENT_STOP;
     });
-    this.search.get_clutter_text().connect('activate', () => {
-      this.browser.firstResult?.activate();
-    });
+    this.search.clutter_text.connect('activate', () => this.browser.firstResult?.activate());
+    this.search.clutter_text.connect('key-focus-in', () => this.browser.highlightFirstResult(true));
+    this.search.clutter_text.connect('key-focus-out', () => this.browser.highlightFirstResult(false));
     this.actor.add_child(this.search);
     const scroller = new St.ScrollView({
       style_class: 'kestrel-app-scroll',
@@ -70,7 +73,7 @@ export class StartMenu {
       x_expand: true, y_expand: true,
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
-    this.searchProvider = new StartSearch(menus, app => this.launch(app), close);
+    this.searchProvider = new StartSearch(menus, app => this.launch(app), close, quickSettings, view => this.browser.showResults(view));
     this.actor.add_child(this.browser.header);
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
@@ -86,6 +89,7 @@ export class StartMenu {
     const favoritesChanged = this.favorites.connect('changed::favorite-apps', pinnedChanged);
     const unwatchTaskbar = taskbarPreferences.watch(key => { if (key === 'taskbar-show-pinned') pinnedChanged(); });
     this.actor.connect('destroy', () => {
+      this.searchProvider.destroy();
       this.appSystem.disconnect(installedChanged);
       this.favorites.disconnect(favoritesChanged);
       unwatchTaskbar();
@@ -110,6 +114,7 @@ export class StartMenu {
     this.browser.home();
     this.search.set_text('');
     this.footer.setOpen(false, false);
+    this.searchProvider.prepare();
   }
 
   private loadApps(): void {
@@ -121,12 +126,6 @@ export class StartMenu {
     this.apps = apps;
     this.searchProvider.update(this.apps);
     this.browser.update(this.apps, this.pinned);
-    this.refreshApps();
-  }
-
-  private refreshApps(): void {
-    const text = this.search.get_text();
-    this.browser.showResults(text.trim() ? this.searchProvider.results(text) : null);
   }
 
   private launch(app: Gio.AppInfo): void {

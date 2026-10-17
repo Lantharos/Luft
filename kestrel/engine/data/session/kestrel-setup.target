@@ -1,0 +1,7 @@
+[Unit]
+Description=Kestrel setup
+BindsTo=graphical-session.target
+Before=graphical-session.target
+Requires=kestrel-session-manager.service
+BindsTo=kestrel-setup.service
+After=kestrel-setup.service

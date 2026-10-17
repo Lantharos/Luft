@@ -36,4 +36,4 @@ A link to a page for missing hardware, such as Bluetooth without an adapter, exp
 
 On an image-based install, Updates offers NVIDIA's driver when the computer has NVIDIA graphics but runs the standard image, and the smaller standard image when it runs the NVIDIA image without NVIDIA graphics. Switching keeps the channel and version the system follows, downloads the other image, stages it for the next restart and keeps the current one to go back to.
 
-`data/luft-graphics-notice.service`, a user service started with the graphical session, runs Settings with `--check-graphics`. When an NVIDIA card is new to the computer and the standard image is running, it sends one notification that opens Updates.
+`data/luft-graphics-notice.service`, a user service started with the desktop (not during first-run setup), runs Settings with `--check-graphics`. When an NVIDIA card is new to the computer and the standard image is running, it sends one notification that opens Updates.

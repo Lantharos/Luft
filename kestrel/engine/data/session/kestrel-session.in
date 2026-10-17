@@ -24,11 +24,16 @@ export DCONF_PROFILE
 systemctl --user reset-failed
 dbus-update-activation-environment --systemd --all
 
+run_until_stopped() {
+  target="$1"
+  systemctl --user start --wait "$target" &
+  trap 'systemctl --user stop "$target"; exit' HUP INT TERM
+  wait $!
+}
+
 SETUP_PENDING=/var/lib/luft-installer/first-boot
 if [ "$1" = --setup ] || [ "$(cat "$SETUP_PENDING" 2> /dev/null)" = "$USER" ]; then
-  systemd-cat --identifier=kestrel-setup @bindir@/kestrel --setup --wayland --display-server --no-x11
+  run_until_stopped kestrel-setup.target
 fi
 
-systemctl --user start --wait kestrel-session.target &
-trap 'systemctl --user stop kestrel-session.target' HUP INT TERM
-wait $!
+run_until_stopped kestrel-session.target

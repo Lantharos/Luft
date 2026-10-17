@@ -63,7 +63,7 @@ export const enrollKey = () => invoke<string>('trust_enroll', {}, { timeoutMs: W
 export const encryptionChecks = () => invoke<Check[]>('trust_checks', {}, { timeoutMs: WAIT_FOR_PERSON });
 export const recoveryKey = () => invoke<string>('trust_recovery_key');
 export const saveKey = (key: string) => invoke<boolean>('trust_save_key', { key }, { timeoutMs: WAIT_FOR_PERSON });
-export const printKey = (key: string) => invoke<void>('trust_print_key', { key }, { timeoutMs: WAIT_FOR_PERSON });
+export const printKey = (key: string) => invoke<boolean>('trust_print_key', { key }, { timeoutMs: WAIT_FOR_PERSON });
 export const encrypt = (recoveryKey: string, passphrase: string) =>
 	invoke<void>('trust_encrypt', { recoveryKey, passphrase }, { timeoutMs: WAIT_FOR_PERSON });
 

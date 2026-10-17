@@ -6,10 +6,10 @@ use std::io::{Seek, Write};
 use std::os::fd::{AsFd, FromRawFd};
 use std::os::unix::fs::OpenOptionsExt;
 
-use zbus::{Fd, OwnedObjectPath, Proxy, Variant};
+use zbus::{Fd, Variant};
 
-use crate::dbus::{self, failed};
-use crate::portal::{FileChooser, uri_path};
+use crate::dbus::failed;
+use crate::portal::{self, FileChooser, Response, uri_path};
 use sheet::{Font, Line};
 
 const GROUPS_PER_LINE: usize = 4;
@@ -114,25 +114,18 @@ impl Sheet<'_> {
         Ok(true)
     }
 
-    pub async fn print(&self) -> Result<(), String> {
+    pub async fn print(&self) -> Result<bool, String> {
         let document = sealed_file(&sheet::pdf(&self.lines()))?;
-        let printer = Proxy::new(
-            dbus::session().await?,
-            "org.freedesktop.portal.Desktop",
-            "/org/freedesktop/portal/desktop",
-            "org.freedesktop.portal.Print",
-        )
-        .await
-        .map_err(failed)?;
-        let options: HashMap<&str, Variant> = HashMap::new();
-        let _: OwnedObjectPath = printer
-            .call(
-                "Print",
-                &("", "Recovery key", Fd::from(document.as_fd()), options),
-            )
-            .await
-            .map_err(failed)?;
-        Ok(())
+        let (response, _) = portal::request("org.freedesktop.portal.Print", "Print", |token| {
+            let options = HashMap::from([("handle_token", Variant::from(token))]);
+            ("", "Recovery key", Fd::from(document.as_fd()), options)
+        })
+        .await?;
+        match response {
+            Response::Answered => Ok(true),
+            Response::Cancelled => Ok(false),
+            Response::Ended => Err("The recovery key couldn't be printed".into()),
+        }
     }
 }
 

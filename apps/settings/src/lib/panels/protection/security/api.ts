@@ -120,5 +120,5 @@ export const keepOtherKeys = () => invoke<void>('security_keep_other_keys', {}, 
 export const installSignedStartup = () => invoke<void>('security_install_startup', {}, WAIT_FOR_PERMISSION);
 
 export const saveRecoveryKey = (key: string) => invoke<boolean>('security_save_key', { key }, WAIT_FOR_PERMISSION);
-export const printRecoveryKey = (key: string) => invoke<void>('security_print_key', { key });
+export const printRecoveryKey = (key: string) => invoke<boolean>('security_print_key', { key }, WAIT_FOR_PERMISSION);
 export const restart = () => invoke<void>('security_restart', {}, WAIT_FOR_PERMISSION);

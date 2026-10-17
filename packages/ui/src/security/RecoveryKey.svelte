@@ -6,7 +6,7 @@
 	interface Props {
 		key: string;
 		onsave: () => Promise<boolean>;
-		onprint: () => Promise<void>;
+		onprint: () => Promise<boolean>;
 	}
 
 	let { key, onsave, onprint }: Props = $props();
@@ -27,7 +27,7 @@
 	}
 
 	const save = () => attempt(onsave, 'saved');
-	const print = () => attempt(() => onprint().then(() => true), 'printing');
+	const print = () => attempt(onprint, 'printing');
 	const copy = () => attempt(() => navigator.clipboard.writeText(key).then(() => true), 'copied');
 
 	const NOTES = { saved: 'Saved', printing: 'Sent to the printer', copied: 'Copied' };

@@ -51,7 +51,7 @@ async function availablePrinters(): Promise<Printer[]> {
   }
 }
 
-function reportFailure(printer: Printer, appId: string): void {
+export function notifyFailure(printer: Printer, appId: string): void {
   const source = MessageTray.getSystemSource();
   source.addNotification(new MessageTray.Notification({
     source,
@@ -64,6 +64,8 @@ function reportFailure(printer: Printer, appId: string): void {
 export class PrintPortal {
   readonly dbus = Gio.DBusExportedObject.wrapJSObject(PRINT_XML, this);
   private readonly prepared = new Map<number, Prepared>();
+
+  constructor(private readonly reportFailure?: (printer: Printer, appId: string) => void) {}
 
   async PreparePrintAsync([handle, appId, , , settings, pageSetup, options]: PrepareArguments, invocation: Invocation): Promise<void> {
     const pageChoices: PageChoice[] = ['all'];
@@ -114,7 +116,7 @@ export class PrintPortal {
       return [SUCCESS, {}];
     } catch (error) {
       console.warn(`Couldn't print on ${printer.name}: ${(error as Error).message}`);
-      reportFailure(printer, appId);
+      this.reportFailure?.(printer, appId);
       return [ENDED, {}];
     }
   }

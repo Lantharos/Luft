@@ -1,0 +1,21 @@
+[Unit]
+Description=Kestrel setup
+CollectMode=inactive-or-failed
+RefuseManualStart=on
+RefuseManualStop=on
+PartOf=kestrel-setup.target
+Before=kestrel-setup.target
+Requires=kestrel-session-manager.service
+After=kestrel-session-manager.service
+
+AssertEnvironment=XDG_SESSION_TYPE=wayland
+
+[Service]
+Slice=session.slice
+Type=notify
+ExecStart=@bindir@/kestrel --setup --wayland --display-server --no-x11
+Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
+ExecStopPost=-systemctl --user unset-environment WAYLAND_DISPLAY
+Restart=no
+TimeoutStopSec=5
+OOMScoreAdjust=-1000

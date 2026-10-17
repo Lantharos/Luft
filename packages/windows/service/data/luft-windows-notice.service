@@ -11,4 +11,4 @@ Type=exec
 ExecStart=/usr/libexec/luft-windows notice
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=kestrel-session.target

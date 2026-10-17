@@ -256,7 +256,7 @@ export const trust = {
 	resume: (uuid: string, unlock: string) => invoke<Outcome<null>>('trust_resume', { uuid, unlock }, WAIT),
 	showKey: (uuid: string) => invoke<string>('trust_show_key', { uuid }, WAIT),
 	saveKey: (key: string, name: string) => invoke<boolean>('trust_save_key', { key, name }, WAIT),
-	printKey: (key: string, name: string) => invoke<void>('trust_print_key', { key, name })
+	printKey: (key: string, name: string) => invoke<boolean>('trust_print_key', { key, name }, WAIT)
 };
 
 export const space = {

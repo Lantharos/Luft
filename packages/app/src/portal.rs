@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use futures_util::StreamExt;
+use serde::Serialize;
+use zbus::zvariant::DynamicType;
 use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use crate::dbus::{self, failed};
@@ -13,6 +15,23 @@ const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
 const FILE_SCHEME: &str = "file://";
 
 static REQUESTS: AtomicU32 = AtomicU32::new(0);
+
+#[derive(PartialEq)]
+pub(crate) enum Response {
+    Answered,
+    Cancelled,
+    Ended,
+}
+
+impl From<u32> for Response {
+    fn from(code: u32) -> Self {
+        match code {
+            0 => Self::Answered,
+            1 => Self::Cancelled,
+            _ => Self::Ended,
+        }
+    }
+}
 
 pub struct Filter<'a> {
     pub name: &'a str,
@@ -70,48 +89,11 @@ impl FileChooser<'_> {
     }
 
     async fn request(&self, method: &str) -> Result<Vec<String>, String> {
-        let connection = dbus::session().await?;
-        let chooser = Proxy::new(
-            connection,
-            PORTAL,
-            PORTAL_PATH,
-            "org.freedesktop.portal.FileChooser",
-        )
-        .await
-        .map_err(failed)?;
-        let token = format!(
-            "luft{}_{}",
-            std::process::id(),
-            REQUESTS.fetch_add(1, Ordering::Relaxed)
-        );
-        let sender = connection
-            .unique_name()
-            .ok_or("Not connected to the session bus")?
-            .trim_start_matches(':')
-            .replace('.', "_");
-        let handle = format!("{PORTAL_PATH}/request/{sender}/{token}");
-        let rule = zbus::MatchRule::builder()
-            .msg_type(zbus::message::Type::Signal)
-            .interface("org.freedesktop.portal.Request")
-            .member("Response")
-            .path(handle.as_str())
-            .build()
-            .map_err(failed)?;
-        let mut responses = MessageStream::for_match_rule(rule, connection, None)
-            .await
-            .map_err(failed)?;
-        let _: OwnedObjectPath = chooser
-            .call(method, &("", self.title, self.options(&token)))
-            .await
-            .map_err(failed)?;
-        let message = responses
-            .next()
-            .await
-            .ok_or("The file chooser closed")?
-            .map_err(failed)?;
-        let (response, results): (u32, HashMap<String, OwnedVariant>) =
-            message.body().deserialize().map_err(failed)?;
-        if response != 0 {
+        let (response, results) = request("org.freedesktop.portal.FileChooser", method, |token| {
+            ("", self.title, self.options(&token))
+        })
+        .await?;
+        if response != Response::Answered {
             return Ok(Vec::new());
         }
         Ok(results
@@ -122,6 +104,50 @@ impl FileChooser<'_> {
             .map_err(failed)?
             .unwrap_or_default())
     }
+}
+
+pub(crate) async fn request<B>(
+    interface: &str,
+    method: &str,
+    body: impl FnOnce(String) -> B,
+) -> Result<(Response, HashMap<String, OwnedVariant>), String>
+where
+    B: Serialize + DynamicType,
+{
+    let connection = dbus::session().await?;
+    let portal = Proxy::new(connection, PORTAL, PORTAL_PATH, interface)
+        .await
+        .map_err(failed)?;
+    let token = format!(
+        "luft{}_{}",
+        std::process::id(),
+        REQUESTS.fetch_add(1, Ordering::Relaxed)
+    );
+    let sender = connection
+        .unique_name()
+        .ok_or("Not connected to the session bus")?
+        .trim_start_matches(':')
+        .replace('.', "_");
+    let handle = format!("{PORTAL_PATH}/request/{sender}/{token}");
+    let rule = zbus::MatchRule::builder()
+        .msg_type(zbus::message::Type::Signal)
+        .interface("org.freedesktop.portal.Request")
+        .member("Response")
+        .path(handle.as_str())
+        .build()
+        .map_err(failed)?;
+    let mut responses = MessageStream::for_match_rule(rule, connection, None)
+        .await
+        .map_err(failed)?;
+    let _: OwnedObjectPath = portal.call(method, &body(token)).await.map_err(failed)?;
+    let message = responses
+        .next()
+        .await
+        .ok_or("The portal closed")?
+        .map_err(failed)?;
+    let (response, results): (u32, HashMap<String, OwnedVariant>) =
+        message.body().deserialize().map_err(failed)?;
+    Ok((response.into(), results))
 }
 
 pub async fn open_file(title: &str, filter: Filter<'_>) -> Result<Option<String>, String> {

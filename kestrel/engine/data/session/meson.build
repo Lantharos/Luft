@@ -52,7 +52,7 @@ configure_file(
   install_dir: systemduserunitdir,
 )
 
-install_data('kestrel-session.target', install_dir: systemduserunitdir)
+install_data('kestrel-session.target', 'kestrel-setup.target', install_dir: systemduserunitdir)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
 install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
 install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir: servicedir)

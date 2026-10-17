@@ -183,6 +183,6 @@ pub async fn save_key(key: &str, name: &str) -> Result<bool, String> {
         .await
 }
 
-pub async fn print_key(key: &str, name: &str) -> Result<(), String> {
+pub async fn print_key(key: &str, name: &str) -> Result<bool, String> {
     sheet(key, name).print().await
 }

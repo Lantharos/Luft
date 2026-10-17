@@ -2,7 +2,8 @@
 Description=Kestrel session manager
 CollectMode=inactive-or-failed
 PartOf=kestrel-session.target
-Before=kestrel.service
+PartOf=kestrel-setup.target
+Before=kestrel.service kestrel-setup.service
 
 [Service]
 Slice=session.slice

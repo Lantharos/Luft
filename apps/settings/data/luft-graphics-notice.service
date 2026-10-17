@@ -10,4 +10,4 @@ ExecStart=/usr/bin/settings --check-graphics
 Nice=10
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=kestrel-session.target

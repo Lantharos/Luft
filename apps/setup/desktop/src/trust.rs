@@ -111,7 +111,7 @@ async fn save_key(Key { key }: Key) -> Result<bool, String> {
     for_this_computer(&key).save("Recovery key.txt").await
 }
 
-async fn print_key(Key { key }: Key) -> Result<(), String> {
+async fn print_key(Key { key }: Key) -> Result<bool, String> {
     for_this_computer(&key).print().await
 }
 

@@ -9,7 +9,7 @@ import { DynamicLauncherPortal } from './apps/dynamicLauncher.js';
 import { EmailPortal } from './apps/email.js';
 import { NotificationPortal } from './apps/notification.js';
 import { ScreenshotPortal } from './capture/screenshot.js';
-import { PrintPortal } from './print/print.js';
+import { notifyFailure, PrintPortal } from './print/print.js';
 import { ClipboardPortal } from './sharing/clipboard.js';
 import { InputCapturePortal } from './sharing/inputCapture.js';
 import { RemoteDesktopPortal } from './sharing/remoteDesktop.js';
@@ -42,7 +42,7 @@ function sessionPortals(context: Pick<Context, 'keybindings' | 'screenShield'>):
     new InputCapturePortal(),
     new LockdownPortal(),
     new NotificationPortal(),
-    new PrintPortal(),
+    new PrintPortal(notifyFailure),
     new RemoteDesktopPortal(),
     new ScreenCastPortal(),
     new ScreenshotPortal(),
@@ -61,7 +61,7 @@ export class PortalBackend {
   }
 
   static forSetup(): PortalBackend {
-    return new PortalBackend([]);
+    return new PortalBackend([new PrintPortal()]);
   }
 
   private constructor(portals: Portal[]) {

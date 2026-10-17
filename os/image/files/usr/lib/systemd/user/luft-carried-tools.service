@@ -13,4 +13,4 @@ Restart=on-failure
 RestartSec=10min
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=kestrel-session.target

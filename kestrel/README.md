@@ -65,6 +65,7 @@ Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings cha
 | Service | Role |
 | --- | --- |
 | `kestrel-session` | Started by the login screen; runs `kestrel-session.target` and Kestrel's session manager in place of gnome-session |
+| `kestrel-setup.target` | Kestrel in setup mode with the session manager, before the desktop when setup is pending |
 | `kestrel-settings` | Settings service started before the shell |
 | `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |

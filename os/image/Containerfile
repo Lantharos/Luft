@@ -1,36 +1,36 @@
 ARG FEDORA=45
 ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
+ARG SYSTEM=localhost/luft-system:${FEDORA}
 
 FROM ${BASE} AS luft
-COPY os/image/packages /usr/share/luft/image/packages
-COPY os/image/stages /usr/share/luft/image/stages
-COPY --from=parts needed.txt /usr/share/luft/image/needed.txt
-COPY --from=parts bootc/rpms/ /tmp/bootc/
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf install -y /tmp/bootc/*.rpm && rm -rf /tmp/bootc && \
-    /usr/share/luft/image/stages/packages.sh /usr/share/luft/image/needed.txt
+    --mount=type=bind,source=os/image/packages,target=/run/luft/packages \
+    --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
+    --mount=type=bind,from=parts,source=needed.txt,target=/run/luft/needed.txt \
+    --mount=type=bind,from=parts,source=bootc/rpms,target=/run/luft/bootc \
+    dnf install -y /run/luft/bootc/*.rpm && \
+    /run/luft/stages/packages.sh /run/luft/needed.txt
 COPY --from=parts kestrel/stage/ /
 COPY --from=parts boot/stage/ /
 COPY --from=parts runtime/stage/ /
 COPY --from=parts helium/stage/ /
 COPY --from=parts apps/ /
 COPY os/image/files/ /
-COPY --from=parts kestrel/typelibs.txt /usr/share/luft/image/typelibs.txt
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
 ARG FEDORA
 ARG VERSION=45.dev
 ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
-RUN /usr/share/luft/image/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}" && \
-    rm -rf /usr/share/luft/image
+RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
+    --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
+    /run/luft/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}"
 RUN bootc container lint
 ARG RELEASE_NOTES=""
 LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes="${RELEASE_NOTES}"
 
-FROM luft AS luft-nvidia
-COPY os/image/stages/nvidia.sh os/image/stages/rpmfusion.sh /tmp/stages/
-COPY --from=parts nvidia/ /tmp/nvidia/
+FROM ${SYSTEM} AS luft-nvidia
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    /tmp/stages/nvidia.sh /tmp/nvidia && \
-    rm -rf /tmp/stages /tmp/nvidia
+    --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
+    --mount=type=bind,from=parts,source=nvidia,target=/run/luft/nvidia \
+    /run/luft/stages/nvidia.sh /run/luft/nvidia
 RUN bootc container lint

@@ -152,26 +152,22 @@ jobs:
         run: rm -rf "$LUFT_KEYS"
 
   image:
-    name: Image ${{ matrix.variant }}
+    name: Images
     needs: [plan, parts, signed-parts]
     if: >-
       always() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' &&
       !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-26.04
     timeout-minutes: 120
-    strategy:
-      matrix:
-        include:
-          - variant: luft
-            suffix: ""
-          - variant: luft-nvidia
-            suffix: -nvidia
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       VERSION: ${{ needs.plan.outputs.version }}
       REFERENCE: ${{ needs.plan.outputs.reference }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:
+      - name: Make room
+        run: nohup sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost >/dev/null 2>&1 &
+
       - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
@@ -190,9 +186,9 @@ jobs:
           certificate: ${{ secrets.LUFT_SECUREBOOT_CERT }}
           pcr-key: ${{ secrets.LUFT_PCR_KEY }}
 
-      - name: Build ${{ matrix.variant }}
+      - name: Build both images
         run: |
-          os/image/build.sh "${{ matrix.variant }}" --cache-from "$CACHE" --cache-to "$CACHE" \
+          os/image/build.sh luft luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
             --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
             --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
 
@@ -201,7 +197,9 @@ jobs:
         run: rm -rf "$LUFT_KEYS"
 
       - name: Push
-        run: podman push "localhost/luft:$FEDORA${{ matrix.suffix }}" "$IMAGE:$VERSION${{ matrix.suffix }}"
+        run: |
+          podman push "localhost/luft:$FEDORA" "$IMAGE:$VERSION"
+          podman push "localhost/luft:$FEDORA-nvidia" "$IMAGE:$VERSION-nvidia"
 
   publish:
     needs: [plan, image]

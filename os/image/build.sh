@@ -8,18 +8,21 @@ cache="${LUFT_IMAGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/luft-image}"
 registry="${LUFT_PARTS:-localhost/luft-parts}"
 fedora=45
 signed_parts=(boot nvidia)
+chunkah=quay.io/coreos/chunkah:v0.7.1
 retries=(--retry 6 --retry-delay 20s)
 
 usage() {
   cat <<'USAGE'
-Usage: os/image/build.sh [luft | luft-nvidia] [PODMAN BUILD OPTIONS...]
+Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh plan [luft | luft-nvidia]
        os/image/build.sh part NAME [PODMAN BUILD OPTIONS...]
        os/image/build.sh base
 
-Builds the Luft image with Podman and seals it as localhost/luft:45 or
-localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the system
-before sealing.
+Builds the Luft images with Podman and seals them as localhost/luft:45 and
+localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the systems
+before sealing. The default system is split into layers by content with
+chunkah, so a layer only changes when what's in it does, and the NVIDIA system
+is that system plus the driver, so the two images share every layer below it.
 
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc, the web runtime, Helium, the system services, each app and NVIDIA's
@@ -239,21 +242,47 @@ gather_parts() {
   openssl pkey -in "$LUFT_PCR_KEY" -pubout -out "$parts/keys/luft-pcr-policy.pub.pem"
 }
 
-build_image() {
-  local variant="$1" suffix="" system refs name ref names
-  [[ "$variant" == luft ]] || suffix="-nvidia"
+build_system() {
+  local target="$1" tag="$2"
+  shift 2
+  podman build "${retries[@]}" --layers --security-opt label=disable --target "$target" --file "$image/Containerfile" \
+    --build-context "parts=$state/parts" --build-arg "BASE=$base" "$@" \
+    --build-arg "VERSION=$fedora.$(date -u +%Y%m%d).dev" "${podman_options[@]}" --tag "$tag" "$luft"
+}
+
+rechunk() {
+  local system="$1" work id
+  work="$(mktemp -d "${TMPDIR:-/var/tmp}/luft-rechunk.XXXXXX")"
+  CHUNKAH_CONFIG_STR="$(podman image inspect "$system")" podman run "${retries[@]}" --rm --security-opt label=disable \
+    --mount "type=image,source=$system,destination=/chunkah" --volume "$work:/out" --env CHUNKAH_CONFIG_STR \
+    "$chunkah" build --rootfs /chunkah --max-layers 128 --prune /sysroot/ \
+    --label ostree.commit- --label ostree.final-diffid- --label rpmostree.inputhash- --output oci:/out/system
+  id="$(podman pull --quiet "oci:$work/system")"
+  podman tag "$id" "$system"
+  podman unshare rm -rf "$work"
+}
+
+build_images() {
+  local variant parts=luft system="localhost/luft-system:$fedora" refs name ref names
+  [[ " $* " != *" luft-nvidia "* ]] || parts="luft-nvidia"
   require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT LUFT_PCR_KEY
-  mapfile -t names < <(part_names "$variant")
+  mapfile -t names < <(part_names "$parts")
   refs="$(part_refs "${names[@]}")"
   while read -r name ref; do
     [[ -z "${LUFT_REBUILD:-}" ]] && part_exists "$ref" || echo "$name $ref"
   done <<<"$refs" | build_parts
   gather_parts <<<"$refs"
-  system="localhost/luft-system:$fedora$suffix"
-  podman build "${retries[@]}" --layers --target "$variant" --file "$image/Containerfile" \
-    --build-context "parts=$state/parts" --build-arg "BASE=$base" \
-    --build-arg "VERSION=$fedora.$(date -u +%Y%m%d).dev" "${podman_options[@]}" --tag "$system" "$luft"
-  "$image/seal.sh" "$system" "localhost/luft:$fedora$suffix"
+  build_system luft "$system"
+  rechunk "$system"
+  for variant; do
+    case "$variant" in
+      luft) "$image/seal.sh" "$system" "localhost/luft:$fedora" ;;
+      luft-nvidia)
+        build_system luft-nvidia "$system-nvidia" --build-arg "SYSTEM=$(podman image inspect --format '{{.Id}}' "$system")"
+        "$image/seal.sh" "$system-nvidia" "localhost/luft:$fedora-nvidia"
+        ;;
+    esac
+  done
 }
 
 plan() {
@@ -281,8 +310,13 @@ case "${1:-luft}" in
     ;;
   luft | luft-nvidia)
     base="$(resolve_base)"
-    podman_options=("${@:2}")
-    build_image "${1:-luft}"
+    variants=()
+    while [[ "${1:-}" == luft || "${1:-}" == luft-nvidia ]]; do
+      variants+=("$1")
+      shift
+    done
+    podman_options=("$@")
+    build_images "${variants[@]:-luft}"
     ;;
   *) usage >&2; exit 2 ;;
 esac

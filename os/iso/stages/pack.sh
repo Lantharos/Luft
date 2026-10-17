@@ -20,7 +20,7 @@ kernel_arguments() {
 }
 
 pack_store() {
-  "$iso/stages/contexts.sh" "$work/store" "$live/etc/selinux/targeted/contexts/files/file_contexts" >"$work/file_contexts"
+  "$iso/stages/contexts.sh" "$live/etc/selinux/targeted/contexts/files/file_contexts" >"$work/file_contexts"
   mkdir -p "$tree/LiveOS"
   mkfs.erofs --quiet -zlzma,level=6 -C1048576 \
     -T"$SOURCE_DATE_EPOCH" --mkfs-time --file-contexts="$work/file_contexts" \

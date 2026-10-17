@@ -55,8 +55,9 @@ async function checkPowerMenu() {
   const start = named('kestrel-start');
   await eventually(() => shown(start), 'Start opens from the notification center');
   await settled();
-  click(start.get_last_child().get_last_child());
-  const sessionActions = () => named('Power off', start)?.get_parent();
+  const footer = start.get_last_child();
+  click(footer.get_last_child());
+  const sessionActions = () => named('Power off', footer)?.get_parent();
   await eventually(() => sessionActions()?.visible, 'the power button shows the session actions');
   await capture('power-menu');
   press(Clutter.KEY_Escape);

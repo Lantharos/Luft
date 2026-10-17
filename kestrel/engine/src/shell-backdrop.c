@@ -10,9 +10,13 @@ typedef struct
   ClutterStageView *view;
   CoglFramebuffer *framebuffer;
   CoglPipeline *pipeline;
+  int capacity_width;
+  int capacity_height;
   MtkRectangle geometry;
   MtkRegion *valid;
 } Backdrop;
+
+#define CAPACITY_STEP 64
 
 static void
 view_destroyed (gpointer data,
@@ -43,23 +47,45 @@ shell_backdrop_cache_new (void)
   return g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, backdrop_free);
 }
 
-static void
-allocate_backdrop (Backdrop     *backdrop,
-                   CoglContext  *cogl,
-                   MtkRectangle *geometry)
+static int
+capacity_for (int size,
+              int limit)
 {
-  g_autoptr (CoglTexture) texture = cogl_texture_2d_new_with_size (cogl, geometry->width, geometry->height);
+  int rounded = (size + CAPACITY_STEP - 1) / CAPACITY_STEP * CAPACITY_STEP;
+
+  return MAX (size, MIN (rounded, limit));
+}
+
+static gboolean
+capacity_fits (int capacity,
+               int size,
+               int limit)
+{
+  return capacity >= size && capacity <= capacity_for (size, limit) + CAPACITY_STEP;
+}
+
+static void
+allocate_backdrop (Backdrop        *backdrop,
+                   CoglFramebuffer *source,
+                   MtkRectangle    *geometry)
+{
+  int width = capacity_for (geometry->width, cogl_framebuffer_get_width (source));
+  int height = capacity_for (geometry->height, cogl_framebuffer_get_height (source));
+  CoglContext *cogl = cogl_framebuffer_get_context (source);
+  g_autoptr (CoglTexture) texture = cogl_texture_2d_new_with_size (cogl, width, height);
   g_autoptr (CoglOffscreen) offscreen = cogl_offscreen_new_with_texture (texture);
   g_autoptr (GError) error = NULL;
 
   if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
     {
       g_warning ("Could not keep a %dx%d backdrop: %s",
-                 geometry->width, geometry->height, error->message);
+                 width, height, error->message);
       return;
     }
 
   backdrop->framebuffer = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
+  backdrop->capacity_width = width;
+  backdrop->capacity_height = height;
   backdrop->pipeline = cogl_pipeline_new (cogl);
   cogl_pipeline_set_layer_texture (backdrop->pipeline, 0, texture);
   cogl_pipeline_set_layer_filters (backdrop->pipeline, 0,
@@ -68,6 +94,30 @@ allocate_backdrop (Backdrop     *backdrop,
   cogl_pipeline_set_layer_wrap_mode (backdrop->pipeline, 0,
                                     COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
   cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
+}
+
+static gboolean
+holds (Backdrop        *backdrop,
+       CoglFramebuffer *source,
+       MtkRectangle    *geometry)
+{
+  return backdrop->framebuffer &&
+    capacity_fits (backdrop->capacity_width, geometry->width,
+                   cogl_framebuffer_get_width (source)) &&
+    capacity_fits (backdrop->capacity_height, geometry->height,
+                   cogl_framebuffer_get_height (source));
+}
+
+static void
+map_texture_to_geometry (Backdrop *backdrop)
+{
+  graphene_matrix_t matrix;
+
+  graphene_matrix_init_scale (&matrix,
+                              (float) backdrop->geometry.width / backdrop->capacity_width,
+                              (float) backdrop->geometry.height / backdrop->capacity_height,
+                              1.f);
+  cogl_pipeline_set_layer_matrix (backdrop->pipeline, 0, &matrix);
 }
 
 static Backdrop *
@@ -91,29 +141,29 @@ ensure_backdrop (GHashTable          *cache,
       g_hash_table_insert (cache, view, backdrop);
     }
 
-  *changed = !backdrop->framebuffer ||
-    !mtk_rectangle_equal (&backdrop->geometry, geometry);
-  if (*changed)
-    {
-      g_clear_pointer (&backdrop->valid, mtk_region_unref);
-      backdrop->valid = mtk_region_create ();
-    }
+  *changed = !mtk_rectangle_equal (&backdrop->geometry, geometry) ||
+    !holds (backdrop, source, geometry);
+  if (!*changed)
+    return backdrop;
 
-  if (backdrop->geometry.width != geometry->width ||
-      backdrop->geometry.height != geometry->height)
-    {
-      g_clear_object (&backdrop->framebuffer);
-      g_clear_object (&backdrop->pipeline);
-      allocate_backdrop (backdrop, cogl_framebuffer_get_context (source), geometry);
-    }
-  else if (backdrop->framebuffer &&
-           (backdrop->geometry.x != geometry->x ||
-            backdrop->geometry.y != geometry->y))
+  g_clear_pointer (&backdrop->valid, mtk_region_unref);
+  backdrop->valid = mtk_region_create ();
+  backdrop->geometry = *geometry;
+
+  if (holds (backdrop, source, geometry))
     {
       cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
     }
+  else
+    {
+      g_clear_object (&backdrop->framebuffer);
+      g_clear_object (&backdrop->pipeline);
+      allocate_backdrop (backdrop, source, geometry);
+    }
 
-  backdrop->geometry = *geometry;
+  if (backdrop->framebuffer)
+    map_texture_to_geometry (backdrop);
+
   return backdrop;
 }
 

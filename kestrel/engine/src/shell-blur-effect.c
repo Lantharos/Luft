@@ -576,6 +576,28 @@ paint_background (ShellBlurEffect     *self,
 }
 
 static gboolean
+texture_fits (CoglTexture  *texture,
+              unsigned int  width,
+              unsigned int  height,
+              float         downscale_factor)
+{
+  return texture &&
+    cogl_texture_get_width (texture) == floorf (width / downscale_factor) &&
+    cogl_texture_get_height (texture) == floorf (height / downscale_factor);
+}
+
+static gboolean
+framebuffers_fit (ShellBlurEffect *self,
+                  unsigned int     width,
+                  unsigned int     height,
+                  float            downscale_factor)
+{
+  return texture_fits (self->brightness_fb.texture, width, height, downscale_factor) &&
+    (self->mode != SHELL_BLUR_MODE_ACTOR ||
+     texture_fits (self->actor_fb.texture, width, height, downscale_factor));
+}
+
+static gboolean
 update_framebuffers (ShellBlurEffect *self,
                      ClutterActorBox *area)
 {
@@ -589,14 +611,14 @@ update_framebuffers (ShellBlurEffect *self,
 
   downscale_factor = calculate_downscale_factor (width, height, self->radius);
 
-  if (self->tex_width != width ||
-      self->tex_height != height ||
-      self->downscale_factor != downscale_factor)
+  if (self->tex_width == width &&
+      self->tex_height == height &&
+      self->downscale_factor == downscale_factor)
+    return self->brightness_fb.framebuffer != NULL;
+
+  if (!framebuffers_fit (self, width, height, downscale_factor))
     {
       clear_framebuffers (self);
-      self->tex_width = width;
-      self->tex_height = height;
-      self->downscale_factor = downscale_factor;
 
       if (!update_fbo (&self->brightness_fb, width, height, downscale_factor) ||
           (self->mode == SHELL_BLUR_MODE_ACTOR &&
@@ -606,6 +628,11 @@ update_framebuffers (ShellBlurEffect *self,
           clear_framebuffer_data (&self->brightness_fb);
         }
     }
+
+  self->tex_width = width;
+  self->tex_height = height;
+  self->downscale_factor = downscale_factor;
+  self->cache_flags = 0;
 
   return self->brightness_fb.framebuffer != NULL;
 }

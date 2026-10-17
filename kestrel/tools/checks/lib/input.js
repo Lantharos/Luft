@@ -105,6 +105,17 @@ export async function chord(...keys) {
   release(...keys);
 }
 
+export async function fingerScroll(distance, {steps = 12, interval = DRAG_STEP} = {}) {
+  for (let step = 0; step < steps; step++) {
+    pointer().notify_scroll_continuous(now(), 0, distance / steps, Clutter.ScrollSource.FINGER, Clutter.ScrollFinishFlags.NONE);
+    await pause(interval);
+  }
+}
+
+export function liftFingers() {
+  pointer().notify_scroll_continuous(now(), 0, 0, Clutter.ScrollSource.FINGER, Clutter.ScrollFinishFlags.HORIZONTAL | Clutter.ScrollFinishFlags.VERTICAL);
+}
+
 export function pinch(phase, scale = 1, fingers = 2) {
   pointer().notify_touchpad_pinch(now(), phase, fingers, 0, 0, 0, scale);
 }

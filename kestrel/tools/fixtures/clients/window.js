@@ -27,6 +27,12 @@ function acceptPastes(window) {
   window.set_child(new Gtk.Label({ label: 'Paste here' }));
 }
 
+function reportScrolling(window) {
+  const scroller = new Gtk.ScrolledWindow({ child: new Gtk.Box({ height_request: 6000 }) });
+  scroller.vadjustment.connect('value-changed', adjustment => { window.title = `Kestrel scrolled: ${adjustment.value}`; });
+  window.set_child(scroller);
+}
+
 app.connect('activate', () => {
   for (let index = 0; index < (ARGV.includes('--multiple') ? 2 : 1); index++) {
     const window = new Gtk.ApplicationWindow({
@@ -41,6 +47,8 @@ app.connect('activate', () => {
     window.set_child(entry);
   } else if (ARGV.includes('--paste')) {
     acceptPastes(window);
+  } else if (ARGV.includes('--scroll')) {
+    reportScrolling(window);
   } else {
     window.set_child(new Gtk.Label({ label: 'A window managed by Kestrel' }));
   }

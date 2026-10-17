@@ -10,7 +10,7 @@ session_timeout=30m
 max_startup_failures=3
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
-laptop_areas=(board panel:battery panel:screenshot)
+laptop_areas=(board input:scrolling panel:battery panel:screenshot)
 
 usage() {
   echo "Usage: kestrel/tools/session.sh capture [--only GROUPS] [--jobs N] [--list]"

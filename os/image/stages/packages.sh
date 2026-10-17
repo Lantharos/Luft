@@ -13,6 +13,9 @@ mapfile -t codecs <"$image/packages/codecs.txt"
 dnf install -y --setopt=install_weak_deps=False --allowerasing "${codecs[@]}"
 forget_rpmfusion
 
-mapfile -t replaced < <(rpm -q --qf '%{NAME}\n' $(cat "$image/packages/replaced.txt") 2>/dev/null | grep -v ' is not installed$' || true)
-((${#replaced[@]} == 0)) || dnf remove -y "${replaced[@]}"
+mapfile -t unwanted < <(cat "$image/packages/replaced.txt" "$image/packages/unused.txt")
+mapfile -t removed < <(rpm -qa --qf '%{NAME}\n' "${unwanted[@]}")
+((${#removed[@]} == 0)) || dnf remove -y "${removed[@]}"
+dnf autoremove -y
+rm -rf /usr/share/unicode/cldr/common/annotationsDerived
 dnf clean all

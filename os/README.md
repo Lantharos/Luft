@@ -31,7 +31,7 @@ CI builds each changed part in its own job, all at once, keeps it at `ghcr.io/la
 | `image/Containerfile` | The image, put together from the parts |
 | `image/parts` | Building the parts, and the scripts each one runs |
 | `image/stages` | The scripts that put the image together |
-| `image/packages` | Fedora packages for building, those added to the image, the codecs from RPM Fusion, and the GNOME parts Kestrel replaces |
+| `image/packages` | Fedora packages for building, those added to the image, the codecs from RPM Fusion, the GNOME parts Kestrel replaces and the base packages Luft leaves out |
 | `image/patches` | Changes to Fedora packages the image rebuilds, such as bootc |
 | `image/files` | Files copied into the image as they are |
 | `image/startup` | Building and signing the startup image |

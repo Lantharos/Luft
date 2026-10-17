@@ -104,3 +104,11 @@ export async function chord(...keys) {
   await nextFrame();
   release(...keys);
 }
+
+export function pinch(phase, scale = 1, fingers = 2) {
+  pointer().notify_touchpad_pinch(now(), phase, fingers, 0, 0, 0, scale);
+}
+
+export function swipe(phase, dx = 0, dy = 0, fingers = 3) {
+  pointer().notify_touchpad_swipe(now(), phase, fingers, dx, dy);
+}

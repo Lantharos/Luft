@@ -21,7 +21,8 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Desktop windows placed behind everything else, used for live wallpapers
 - `kestrel_window_v1`, which lets a client keep a toplevel out of window lists and above other windows
 - Variable refresh only for windows marked as games, and `wp_content_type_v1` support
-- Windows laid out on a transformed group, magnified without blur, and X11 windows kept reachable, for the board
+- Windows laid out on a transformed group, magnified without blur, X11 windows kept reachable, and touchpad pinches and swipes kept from apps, for the board
+- Virtual pointers that pinch and swipe like a touchpad
 - Checking and restoring inhibited keyboard shortcuts
 - A focus point for zoomed backgrounds, so a crop can keep something other than the middle
 - Event filters that run before the compositor's own, so the shell can check input it sends as it is delivered

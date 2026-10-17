@@ -23,6 +23,7 @@ const SUPER = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 const BUTTONS = Clutter.ModifierType.BUTTON1_MASK | Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK |
   Clutter.ModifierType.BUTTON4_MASK | Clutter.ModifierType.BUTTON5_MASK;
 
+type GestureKeeper = Meta.WaylandCompositor & { keep_touchpad_gestures(keep: boolean): void };
 type SwipeMode = 'none' | 'pan' | 'move' | 'step' | 'switch';
 
 export interface BoardActions {
@@ -71,6 +72,10 @@ export class BoardInput {
   constructor(private readonly actions: BoardActions, private readonly grabActor: Clutter.Actor) {
     grabActor.connect('event', (_actor, event: Clutter.Event) =>
       this.dragging && this.handle(event) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
+  }
+
+  keepGestures(keep: boolean): void {
+    ((global as unknown as Shell.Global).context.get_wayland_compositor() as GestureKeeper).keep_touchpad_gestures(keep);
   }
 
   syncShield(shown: boolean): void {
@@ -163,7 +168,7 @@ export class BoardInput {
     const camera = this.actions.camera;
     const [x, y] = event.get_coords();
     if (phase === Clutter.TouchpadGesturePhase.BEGIN) {
-      this.pinching = this.actions.active() && (event.get_touchpad_gesture_finger_count() >= 3 || this.shielded(x, y) || this.actions.onCanvas(x, y));
+      this.pinching = this.actions.active();
       if (this.pinching) {
         camera.stop();
         copyView(this.pinchStart, camera.view);

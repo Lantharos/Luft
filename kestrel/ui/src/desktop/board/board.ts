@@ -457,6 +457,7 @@ export class Board implements BoardActions {
     if (previous && previous !== canvas) copyView(previous.view, this.camera.view);
     this.collisions.end();
     this.presented = canvas;
+    this.input.keepGestures(canvas !== null);
     this.focus.detach();
     for (const window of this.magnified) setMagnification(window, FULL_SIZE);
     this.magnified.clear();

@@ -1,10 +1,13 @@
+import Clutter from 'gi://Clutter';
+
 import {Spring, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
+import {moveTo, pinch, swipe as swipeOver} from '../lib/input.js';
 import {stopAll} from '../lib/processes.js';
 import {nextFrame, pause, settled} from '../lib/wait.js';
-import {board, boardResting, boardWindows, leaveBoard, openWindows} from './lib/board.js';
+import {board, boardResting, boardWindows, leaveBoard, openWindows, showBoard, windowNamed} from './lib/board.js';
 import {touchpad} from './lib/touchpad.js';
 
 const {require, eventually} = checks('board gestures');
@@ -103,6 +106,59 @@ async function checkTurningAround() {
   require(shift(start, onScreen(window)) < 1, 'the windows spring back to their places on the board');
 }
 
+const {BEGIN, UPDATE, END} = Clutter.TouchpadGesturePhase;
+const gesturesOf = window => /~(\S+)/.exec(window.get_title())?.[1].split(',') ?? [];
+const middle = window => {
+  const extents = window.get_compositor_private().get_transformed_extents();
+  return [extents.get_x() + extents.get_width() / 2, extents.get_y() + extents.get_height() / 2];
+};
+const pinchWith = scales => [[BEGIN, 1], ...scales.map(scale => [UPDATE, scale]), [END, scales.at(-1)]].forEach(([phase, scale]) => pinch(phase, scale));
+
+async function pinchReachesApp(window, label) {
+  window.activate(global.get_current_time());
+  await settled();
+  const before = gesturesOf(window).length;
+  moveTo(middle(window));
+  await settled();
+  pinchWith([1.1, 1.2]);
+  await eventually(() => gesturesOf(window).slice(before).join() === 'pb,pu,pe', label);
+}
+
+async function checkKeepingGestures() {
+  await leaveBoard();
+  const notes = windowNamed('Notes');
+  await pinchReachesApp(notes, 'a pinch over a window on the desktop reaches its app');
+
+  pinch(BEGIN);
+  pinch(UPDATE, 1.1);
+  await eventually(() => gesturesOf(notes).at(-1) === 'pu', 'the app follows a pinch that starts on the desktop');
+  await showBoard();
+  await eventually(() => gesturesOf(notes).at(-1) === 'pc', 'turning the board on cancels the pinch for the app');
+  pinch(UPDATE, 1.2);
+  pinch(END, 1.2);
+
+  board().enterWindow(notes);
+  await boardResting();
+  const seen = gesturesOf(notes).length;
+  moveTo(middle(notes));
+  await settled();
+  swipeOver(BEGIN);
+  swipeOver(UPDATE, 4, 0);
+  swipeOver(END);
+  const scale = board().camera.view.scale;
+  pinch(BEGIN);
+  pinch(UPDATE, 0.8);
+  await eventually(() => board().camera.view.scale < scale, 'a pinch over an entered window zooms the board');
+  pinch(UPDATE, 0.7);
+  pinch(END, 0.7);
+  await eventually(() => !board().enteredWindow(), 'pinching in over the window returns to the overview');
+  await boardResting();
+  require(gesturesOf(notes).length === seen, 'the app under the pointer gets no pinches or swipes while the board is on');
+
+  await leaveBoard();
+  await pinchReachesApp(notes, 'after leaving the board, pinches reach the app again');
+}
+
 export async function run() {
   await openWindows();
   try {
@@ -110,6 +166,7 @@ export async function run() {
     await checkCommitting();
     await checkLeaving();
     await checkTurningAround();
+    await checkKeepingGestures();
   } finally {
     await leaveBoard();
     await stopAll();

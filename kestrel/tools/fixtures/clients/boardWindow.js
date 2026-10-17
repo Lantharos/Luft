@@ -1,8 +1,16 @@
+import Gdk from 'gi://Gdk?version=4.0';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 
 const [title, width, height] = ARGV;
 const MOVE_HANDLE = 32;
+const GESTURES = {[Gdk.EventType.TOUCHPAD_PINCH]: 'p', [Gdk.EventType.TOUCHPAD_SWIPE]: 's'};
+const PHASES = {
+  [Gdk.TouchpadGesturePhase.BEGIN]: 'b',
+  [Gdk.TouchpadGesturePhase.UPDATE]: 'u',
+  [Gdk.TouchpadGesturePhase.END]: 'e',
+  [Gdk.TouchpadGesturePhase.CANCEL]: 'c',
+};
 const app = new Gtk.Application({ application_id: 'com.lantharos.Kestrel.BoardWindow', flags: Gio.ApplicationFlags.NON_UNIQUE });
 
 app.connect('activate', () => {
@@ -12,7 +20,20 @@ app.connect('activate', () => {
   const click = new Gtk.GestureClick();
   let clicked = '';
   let scale = '';
-  const show = () => { window.title = `${title}${entry.text ? `: ${entry.text}` : ''}${clicked}${scale}`; };
+  const gestures = [];
+  const show = () => { window.title = `${title}${entry.text ? `: ${entry.text}` : ''}${clicked}${scale}${gestures.length ? ` ~${gestures.join(',')}` : ''}`; };
+  const touchpad = new Gtk.EventControllerLegacy();
+  touchpad.connect('event', (_controller, event) => {
+    const gesture = GESTURES[event.get_event_type()];
+    if (!gesture) return false;
+    const step = gesture + PHASES[event.get_gesture_phase()];
+    if (gestures.at(-1) !== step) {
+      gestures.push(step);
+      show();
+    }
+    return true;
+  });
+  window.add_controller(touchpad);
   click.connect('pressed', (_gesture, _count, x, y) => {
     clicked = ` @${Math.round(x)},${Math.round(y)}`;
     show();

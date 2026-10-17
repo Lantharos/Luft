@@ -99,7 +99,7 @@ sudo systemctl disable gdm && sudo systemctl enable greetd
 | Four fingers up, then down | Turn the desktop into a board, and back |
 | Four fingers down, then up | All windows, and back |
 | Three fingers (board) | Pan; spread to enter a window, swipe down to step out |
-| Pinch (board) | Zoom |
+| Pinch (board) | Zoom, also over windows |
 
 ## Seeing and using windows from other programs
 

@@ -8,7 +8,7 @@ const {require, eventually} = checks('Luft app');
 const SWITCH_X = 959;
 const TYPING_ASSIST = [SWITCH_X, 582];
 const SWITCHES = [
-  {name: 'reduce-animations', y: 349, schema: 'org.gnome.desktop.interface', key: 'enable-animations', on: value => !value.get_boolean()},
+  {name: 'reduce-motion', y: 349, schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', on: value => value.get_string()[0] === 'reduce'},
   {name: 'high-contrast', y: 293, schema: 'org.gnome.desktop.a11y.interface', key: 'high-contrast', on: value => value.get_boolean()},
   {name: 'large-text', y: 237, schema: 'org.gnome.desktop.interface', key: 'text-scaling-factor', on: value => value.get_double() > 1},
   {name: 'sticky-keys', y: 638, schema: 'org.gnome.desktop.a11y.keyboard', key: 'stickykeys-enable', on: value => value.get_boolean(), expand: true},

@@ -769,5 +769,4 @@ class AnimationsSettings {
 
 export function closeShellPopups() {
     KestrelUi.dismissImmediately();
-    panel.closeQuickSettings();
 }

@@ -8,7 +8,7 @@ const LOW_FRACTION: f64 = 0.05;
 const NOTICEABLE_DROP: f64 = 0.01;
 const PLENTY_BYTES: u64 = 1024 * 1024 * 1024;
 const QUIET_PERIOD: Duration = Duration::from_secs(10 * 60);
-const IGNORED: [&str; 1] = ["/boot"];
+const IGNORED: [&str; 3] = ["/boot", "/boot/efi", "/efi"];
 
 pub struct Low {
     pub path: PathBuf,

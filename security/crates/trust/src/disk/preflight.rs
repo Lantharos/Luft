@@ -64,7 +64,7 @@ fn layout(disk: &SystemDisk) -> Result<String, String> {
 
 fn boot_partition() -> Result<String, String> {
     if esp::find().is_err() {
-        return Err("The EFI system partition isn't mounted.".to_owned());
+        return Err("The EFI system partition couldn't be found.".to_owned());
     }
     Ok("The EFI system partition stays readable at startup.".to_owned())
 }
@@ -73,12 +73,6 @@ fn left_out(disk: &SystemDisk) -> Result<String, String> {
     let Some(this_disk) = blocks::disk_of(&disk.partition) else {
         return Err("The system disk couldn't be identified.".to_owned());
     };
-    let skipped: Vec<String> = ["/boot", "/boot/efi", "/efi"]
-        .iter()
-        .filter_map(|path| {
-            blocks::mount_at(path).and_then(|mount| blocks::kernel_name(&mount.source))
-        })
-        .collect();
     let mounted = std::fs::read_to_string("/proc/self/mountinfo").unwrap_or_default();
     let mut unprotected: Vec<String> = mounted
         .lines()
@@ -92,7 +86,7 @@ fn left_out(disk: &SystemDisk) -> Result<String, String> {
         .filter(|source| source.starts_with("/dev/"))
         .filter_map(|source| blocks::kernel_name(Path::new(&source)))
         .filter(|name| blocks::disk_of(name).as_deref() == Some(this_disk.as_str()))
-        .filter(|name| *name != disk.partition && !skipped.contains(name))
+        .filter(|name| *name != disk.partition && !esp::needed_at_startup(name))
         .collect();
     let swaps = std::fs::read_to_string("/proc/swaps").unwrap_or_default();
     unprotected.extend(

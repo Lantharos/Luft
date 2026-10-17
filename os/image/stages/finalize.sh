@@ -34,7 +34,7 @@ enable_units() {
   mapfile -t user < <(preset_units /usr/lib/systemd/user-preset/40-luft-*.preset)
   systemctl preset "${system[@]}"
   systemctl --global preset "${user[@]}"
-  systemctl mask bootc-fetch-apply-updates.timer
+  systemctl mask bootc-fetch-apply-updates.timer bootloader-update.service
 }
 
 write_image_reference() {
@@ -62,6 +62,10 @@ refresh_caches() {
   update-mime-database /usr/share/mime
 }
 
+make_efi_mountpoint() {
+  install -d -m 0755 /efi
+}
+
 leave_initramfs_to_the_startup_image() {
   rm -f /usr/lib/modules/*/initramfs.img
 }
@@ -86,5 +90,6 @@ configure_toolbox
 configure_security
 check_typelibs
 refresh_caches
+make_efi_mountpoint
 leave_initramfs_to_the_startup_image
 clean_build_state

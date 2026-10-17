@@ -19,6 +19,7 @@ const INCLUDED_FILESYSTEMS: &[&str] = &[
 
 const SYSTEM_MOUNTS: &[&str] = &[
     "/boot",
+    "/efi",
     "/snap",
     "/var/snap",
     "/run",

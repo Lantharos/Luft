@@ -20,7 +20,9 @@ Next to Windows, whose EFI system partition is usually too small for them, the s
 
 - SushiBoot starts the newest. Holding any key while the computer starts shows its menu, with the version before under Previous versions.
 - `bootc rollback` makes the previous version the default from a running system.
-- After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's.
+- After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's. bootupd, which does this on other bootc systems, is turned off.
+
+While Luft runs, the partition with the startup images and entries is at `/boot`: the EFI system partition, or the startup partition next to Windows, with the EFI system partition at `/efi` then. Each mounts when something opens it and unmounts after two idle minutes. trustd and bootc don't rely on those folders: they find the EFI system partition the computer started from, and the startup partition by its type on the same drive.
 
 ### Switching between the standard and NVIDIA images
 

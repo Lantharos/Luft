@@ -8,7 +8,8 @@ use std::sync::{Arc, Mutex};
 
 use luft_app::Events;
 use serde::{Deserialize, Serialize};
-use zbus::blocking::Proxy;
+use tokio::sync::OnceCell;
+use zbus::Proxy;
 
 use super::state;
 use ddc::{Request, Worker};
@@ -81,34 +82,28 @@ struct Service {
     ddc: Sender<Request>,
 }
 
-static SERVICE: Mutex<Option<Arc<Service>>> = Mutex::new(None);
+static SERVICE: OnceCell<Service> = OnceCell::const_new();
 
 impl Service {
-    fn start(events: Events) -> Result<Self, String> {
-        let proxy = state::proxy()?;
+    async fn start(events: Events) -> Result<Self, String> {
+        let proxy = state::proxy().await?;
         let publisher = Publisher {
             shared: Arc::new(Mutex::new(Shared {
-                panels: panel::read(&proxy),
+                panels: panel::read(&proxy).await,
                 ..Shared::default()
             })),
             events,
         };
         let (ddc, requests) = mpsc::channel();
-        let worker = Worker::new(publisher.clone());
+        let worker = Worker::new(publisher.clone(), proxy.clone());
         std::thread::Builder::new()
             .name("ddc".into())
             .spawn(move || worker.run(requests))
             .map_err(|error| error.to_string())?;
         let watcher = publisher.clone();
-        let watched = proxy.clone();
-        std::thread::Builder::new()
-            .name("backlight".into())
-            .spawn(move || {
-                panel::watch(&watched, |panels| {
-                    watcher.update(|shared| shared.panels = panels)
-                })
-            })
-            .map_err(|error| error.to_string())?;
+        luft_app::spawn(panel::watch(proxy.clone(), move |panels| {
+            watcher.update(|shared| shared.panels = panels)
+        }));
         Ok(Self {
             publisher,
             proxy,
@@ -117,18 +112,12 @@ impl Service {
     }
 }
 
-fn service(events: &Events) -> Result<Arc<Service>, String> {
-    let mut slot = SERVICE.lock().map_err(|error| error.to_string())?;
-    if let Some(service) = slot.as_ref() {
-        return Ok(Arc::clone(service));
-    }
-    let service = Arc::new(Service::start(events.clone())?);
-    *slot = Some(Arc::clone(&service));
-    Ok(service)
+async fn service(events: Events) -> Result<&'static Service, String> {
+    SERVICE.get_or_try_init(|| Service::start(events)).await
 }
 
-pub fn current(events: &Events) -> Result<Brightness, String> {
-    let service = service(events)?;
+pub async fn current(events: Events) -> Result<Brightness, String> {
+    let service = service(events).await?;
     let _ = service.ddc.send(Request::Detect);
     let shared = service
         .publisher
@@ -138,8 +127,8 @@ pub fn current(events: &Events) -> Result<Brightness, String> {
     Ok(shared.snapshot())
 }
 
-pub fn set(events: &Events, Change { connector, level }: Change) -> Result<(), String> {
-    let service = service(events)?;
+pub async fn set(events: Events, Change { connector, level }: Change) -> Result<(), String> {
+    let service = service(events).await?;
     let target = service
         .publisher
         .shared
@@ -148,7 +137,7 @@ pub fn set(events: &Events, Change { connector, level }: Change) -> Result<(), S
         .panels
         .target(&connector, level);
     if let Some(target) = target {
-        return panel::set(&service.proxy, &connector, target);
+        return panel::set(&service.proxy, &connector, target).await;
     }
     service
         .ddc
@@ -157,9 +146,7 @@ pub fn set(events: &Events, Change { connector, level }: Change) -> Result<(), S
 }
 
 pub fn monitors_changed() {
-    if let Ok(slot) = SERVICE.lock()
-        && let Some(service) = slot.as_ref()
-    {
+    if let Some(service) = SERVICE.get() {
         let _ = service.ddc.send(Request::Detect);
     }
 }

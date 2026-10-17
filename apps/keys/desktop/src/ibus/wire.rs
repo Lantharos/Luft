@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 
-use zbus::zvariant::Value;
+use zbus::Variant;
 
 const ATTRIBUTE_UNDERLINE: u32 = 1;
 const UNDERLINE_SINGLE: u32 = 1;
 const ORIENTATION_VERTICAL: i32 = 1;
 
-type Attachments = HashMap<String, Value<'static>>;
+type Attachments = HashMap<String, Variant<'static>>;
 
-fn attribute(kind: u32, value: u32, start: u32, end: u32) -> Value<'static> {
-    Value::from((
+fn attribute(kind: u32, value: u32, start: u32, end: u32) -> Variant<'static> {
+    Variant::from((
         "IBusAttribute".to_owned(),
         Attachments::new(),
         kind,
@@ -19,9 +19,9 @@ fn attribute(kind: u32, value: u32, start: u32, end: u32) -> Value<'static> {
     ))
 }
 
-fn styled(text: &str, attributes: Vec<Value<'static>>) -> Value<'static> {
-    let list = Value::from(("IBusAttrList".to_owned(), Attachments::new(), attributes));
-    Value::from((
+fn styled(text: &str, attributes: Vec<Variant<'static>>) -> Variant<'static> {
+    let list = Variant::from(("IBusAttrList".to_owned(), Attachments::new(), attributes));
+    Variant::from((
         "IBusText".to_owned(),
         Attachments::new(),
         text.to_owned(),
@@ -29,11 +29,11 @@ fn styled(text: &str, attributes: Vec<Value<'static>>) -> Value<'static> {
     ))
 }
 
-pub fn text(text: &str) -> Value<'static> {
+pub fn text(text: &str) -> Variant<'static> {
     styled(text, Vec::new())
 }
 
-pub fn underlined(text: &str) -> Value<'static> {
+pub fn underlined(text: &str) -> Variant<'static> {
     let length = text.chars().count() as u32;
     let attributes = if length == 0 {
         Vec::new()
@@ -43,10 +43,10 @@ pub fn underlined(text: &str) -> Value<'static> {
     styled(text, attributes)
 }
 
-pub fn lookup_table(candidates: &[String], page: u32, cursor: u32) -> Value<'static> {
-    let candidates: Vec<Value<'static>> =
+pub fn lookup_table(candidates: &[String], page: u32, cursor: u32) -> Variant<'static> {
+    let candidates: Vec<Variant<'static>> =
         candidates.iter().map(|candidate| text(candidate)).collect();
-    Value::from((
+    Variant::from((
         "IBusLookupTable".to_owned(),
         Attachments::new(),
         page,
@@ -55,16 +55,16 @@ pub fn lookup_table(candidates: &[String], page: u32, cursor: u32) -> Value<'sta
         false,
         ORIENTATION_VERTICAL,
         candidates,
-        Vec::<Value<'static>>::new(),
+        Vec::<Variant<'static>>::new(),
     ))
 }
 
-pub fn plain(value: &Value<'_>) -> Option<String> {
-    let Value::Structure(structure) = value else {
+pub fn plain(value: &Variant<'_>) -> Option<String> {
+    let Variant::Structure(structure) = value else {
         return None;
     };
     match structure.fields().get(2)? {
-        Value::Str(text) => Some(text.to_string()),
+        Variant::Str(text) => Some(text.to_string()),
         _ => None,
     }
 }

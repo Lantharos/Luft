@@ -1,9 +1,12 @@
 use std::collections::HashMap;
+use std::future::ready;
+use std::num::NonZeroUsize;
 use std::time::Duration;
 
-use luft_app::dbus;
-use zbus::blocking::MessageIterator;
-use zbus::zvariant::Value;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, failed};
+use zbus::message::Type;
+use zbus::{MatchRule, MessageStream, Variant};
 
 use super::backend::{self, Notice};
 use super::schedule;
@@ -14,9 +17,9 @@ const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
 const PAGE: &str = "kestrel-settings:updates";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
 
-type Properties<'a> = Vec<(&'a str, Value<'a>)>;
+type Properties<'a> = Vec<(&'a str, Variant<'a>)>;
 
-fn open_updates() -> Result<(), String> {
+async fn open_updates() -> Result<(), String> {
     let settings = std::env::current_exe()
         .map_err(|error| error.to_string())?
         .to_string_lossy()
@@ -24,24 +27,60 @@ fn open_updates() -> Result<(), String> {
     let unit = format!("app-com.lantharos.settings-{}.service", std::process::id());
     let command = vec![(settings.clone(), vec![settings, PAGE.to_owned()], false)];
     let properties: Properties = vec![
-        ("Description", Value::from("Settings")),
-        ("ExecStart", Value::from(command)),
+        ("Description", Variant::from("Settings")),
+        ("ExecStart", Variant::from(command)),
     ];
     let auxiliary: Vec<(&str, Properties)> = Vec::new();
-    schedule::call("StartTransientUnit", &(unit, "fail", properties, auxiliary))
+    schedule::call("StartTransientUnit", &(unit, "fail", properties, auxiliary)).await
 }
 
-pub fn notify(summary: &str, body: &str) -> Result<(), String> {
-    let connection = dbus::session()?;
-    let rule = zbus::MatchRule::builder()
-        .msg_type(zbus::message::Type::Signal)
+async fn answered(signals: MessageStream, id: u32) {
+    let mut signals = signals.filter_map(|message| ready(message.ok()));
+    while let Some(message) = signals.next().await {
+        let ours = |notification: Option<u32>| notification == Some(id);
+        match message.header().member().map(|member| member.as_str()) {
+            Some("ActionInvoked")
+                if ours(
+                    message
+                        .body()
+                        .deserialize::<(u32, String)>()
+                        .ok()
+                        .map(|(clicked, _)| clicked),
+                ) =>
+            {
+                if let Err(error) = open_updates().await {
+                    eprintln!("Opening Settings failed: {error}");
+                }
+                return;
+            }
+            Some("NotificationClosed")
+                if ours(
+                    message
+                        .body()
+                        .deserialize::<(u32, u32)>()
+                        .ok()
+                        .map(|(closed, _)| closed),
+                ) =>
+            {
+                return;
+            }
+            _ => {}
+        }
+    }
+}
+
+pub async fn notify(summary: &str, body: &str) -> Result<(), String> {
+    let connection = dbus::session().await?;
+    let rule = MatchRule::builder()
+        .msg_type(Type::Signal)
         .interface(NOTIFICATIONS)
-        .map_err(|error| error.to_string())?
-        .build();
-    let signals = MessageIterator::for_match_rule(rule, connection, Some(16))
-        .map_err(|error| error.to_string())?;
-    let hints: HashMap<&str, Value> =
-        HashMap::from([("desktop-entry", Value::from("com.lantharos.settings"))]);
+        .build()
+        .map_err(failed)?;
+    let signals = MessageStream::for_match_rule(rule, connection, NonZeroUsize::new(16))
+        .await
+        .map_err(failed)?;
+    let hints: HashMap<&str, Variant> =
+        HashMap::from([("desktop-entry", Variant::from("com.lantharos.settings"))]);
     let id: u32 = connection
         .call_method(
             Some(NOTIFICATIONS),
@@ -59,54 +98,16 @@ pub fn notify(summary: &str, body: &str) -> Result<(), String> {
                 -1i32,
             ),
         )
+        .await
         .and_then(|reply| reply.body().deserialize())
-        .map_err(|error| error.to_string())?;
-    std::thread::spawn(|| {
-        std::thread::sleep(WAIT_FOR_CLICK);
-        std::process::exit(0);
-    });
-    for message in signals.flatten() {
-        let member = message
-            .header()
-            .member()
-            .map(|member| member.to_string())
-            .unwrap_or_default();
-        let ours = |closed: Option<u32>| closed == Some(id);
-        match member.as_str() {
-            "ActionInvoked"
-                if ours(
-                    message
-                        .body()
-                        .deserialize::<(u32, String)>()
-                        .ok()
-                        .map(|(clicked, _)| clicked),
-                ) =>
-            {
-                if let Err(error) = open_updates() {
-                    eprintln!("Opening Settings failed: {error}");
-                }
-                break;
-            }
-            "NotificationClosed"
-                if ours(
-                    message
-                        .body()
-                        .deserialize::<(u32, u32)>()
-                        .ok()
-                        .map(|(closed, _)| closed),
-                ) =>
-            {
-                break;
-            }
-            _ => {}
-        }
-    }
+        .map_err(failed)?;
+    let _ = tokio::time::timeout(WAIT_FOR_CLICK, answered(signals, id)).await;
     Ok(())
 }
 
 fn check() -> Result<(), String> {
     match backend::current().check_in_background(Preferences::load().download)? {
-        Some(Notice { summary, body }) => notify(summary, body),
+        Some(Notice { summary, body }) => luft_app::block_on(notify(summary, body)),
         None => Ok(()),
     }
 }

@@ -2,10 +2,9 @@ use std::collections::HashMap;
 
 use luft_app::dbus;
 use serde::Serialize;
-use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
+use zbus::{OwnedVariant, Proxy};
 
-pub type Properties = HashMap<String, OwnedValue>;
+pub type Properties = HashMap<String, OwnedVariant>;
 pub type MonitorSpec = (String, String, String, String);
 type ModeInfo = (String, i32, i32, f64, f64, Vec<f64>, Properties);
 pub type MonitorInfo = (MonitorSpec, Vec<ModeInfo>, Properties);
@@ -59,13 +58,14 @@ struct LogicalMonitor {
     monitors: Vec<String>,
 }
 
-pub fn proxy() -> Result<Proxy<'static>, String> {
+pub async fn proxy() -> Result<Proxy<'static>, String> {
     Proxy::new(
-        dbus::session()?,
+        dbus::session().await?,
         "org.gnome.Mutter.DisplayConfig",
         "/org/gnome/Mutter/DisplayConfig",
         "org.gnome.Mutter.DisplayConfig",
     )
+    .await
     .map_err(|error| error.to_string())
 }
 
@@ -88,9 +88,10 @@ fn text(properties: &Properties, key: &str) -> Option<String> {
         .and_then(|value| value.downcast_ref::<String>().ok())
 }
 
-pub fn read(proxy: &Proxy) -> Result<CurrentState, String> {
+pub async fn read(proxy: &Proxy<'_>) -> Result<CurrentState, String> {
     proxy
         .call("GetCurrentState", &())
+        .await
         .map_err(|error| error.to_string())
 }
 
@@ -131,9 +132,9 @@ fn logical((x, y, scale, transform, primary, monitors, _): LogicalInfo) -> Logic
     }
 }
 
-pub fn current() -> Result<Displays, String> {
-    let proxy = proxy()?;
-    let (serial, monitors, logical_monitors, properties) = read(&proxy)?;
+pub async fn current() -> Result<Displays, String> {
+    let proxy = proxy().await?;
+    let (serial, monitors, logical_monitors, properties) = read(&proxy).await?;
     Ok(Displays {
         serial,
         monitors: monitors
@@ -144,9 +145,13 @@ pub fn current() -> Result<Displays, String> {
         logical: logical_monitors.into_iter().map(logical).collect(),
         logical_layout: number(&properties, "layout-mode") == Some(LOGICAL_LAYOUT),
         global_scale: flag(&properties, "global-scale-required"),
-        night_light: proxy.get_property("NightLightSupported").unwrap_or(false),
+        night_light: proxy
+            .get_property("NightLightSupported")
+            .await
+            .unwrap_or(false),
         orientation_managed: proxy
             .get_property("PanelOrientationManaged")
+            .await
             .unwrap_or(false),
     })
 }

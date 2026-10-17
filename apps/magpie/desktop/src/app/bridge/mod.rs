@@ -23,7 +23,9 @@ pub fn register(window: SabineWindow, state: &MagpieState) -> SabineWindow {
 
 fn register_app(window: SabineWindow, state: &MagpieState) -> SabineWindow {
     window
-        .with("app_state", state, |state, Empty {}| Ok(state.app_state()))
+        .with_async("app_state", state, |state, Empty {}| async move {
+            Ok(state.app_state().await)
+        })
         .command(
             "resolve_arguments",
             |Arguments {
@@ -37,21 +39,21 @@ fn register_app(window: SabineWindow, state: &MagpieState) -> SabineWindow {
                 ))
             },
         )
-        .command("choose_file", |Empty {}| {
+        .command_async("choose_file", |Empty {}| async {
             let filter = Filter {
                 name: "Photos, videos, music, documents and fonts",
                 patterns: kinds::patterns(),
             };
-            let chosen = portal::open_file("Open", filter)?;
+            let chosen = portal::open_file("Open", filter).await?;
             Ok(chosen.and_then(|uri| gio::File::for_uri(&uri).path()))
         })
-        .command("choose_folder", |Empty {}| {
+        .command_async("choose_folder", |Empty {}| async {
             let chooser = FileChooser {
                 title: "Open Folder",
                 directory: true,
                 ..FileChooser::default()
             };
-            let chosen = chooser.open()?.into_iter().next();
+            let chosen = chooser.open().await?.into_iter().next();
             Ok(chosen.and_then(|uri| gio::File::for_uri(&uri).path()))
         })
         .command("places", |Empty {}| Ok(folder::places()))
@@ -88,8 +90,8 @@ fn register_files(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         .command("open_with", |OpenWith { path, app }| {
             apps::open_with(FilePath::new(&path), &app)
         })
-        .command("show_in_folder", |Path { path }| {
-            file_manager::show_in_folder(FilePath::new(&path))
+        .command_async("show_in_folder", |Path { path }| async move {
+            file_manager::show_in_folder(FilePath::new(&path)).await
         })
         .command("open_uri", |Uri { uri }| apps::open_uri(&uri))
 }
@@ -103,10 +105,14 @@ fn register_media(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         .command("subtitle_cues", |Subtitles { path, id }| {
             video::cues(FilePath::new(&path), &id)
         })
-        .with("media_update", state, |state, playback: Playback| {
-            state.mpris.update(playback)
+        .with_async(
+            "media_update",
+            state,
+            |state, playback: Playback| async move { state.mpris.update(playback).await },
+        )
+        .with_async("media_clear", state, |state, Empty {}| async move {
+            state.mpris.clear().await
         })
-        .with("media_clear", state, |state, Empty {}| state.mpris.clear())
 }
 
 fn register_fonts(window: SabineWindow) -> SabineWindow {

@@ -1,7 +1,7 @@
-use luft_app::dbus;
+use luft_app::dbus::{self, service};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
-use zbus::zvariant::{DynamicType, Type, Value};
+use zbus::{DynamicType, Type, Variant};
 
 pub const SERVICE: &str = "com.lantharos.Keyring1";
 pub const PATH: &str = "/com/lantharos/Keyring1";
@@ -19,18 +19,19 @@ pub enum Problem {
 
 impl From<zbus::Error> for Problem {
     fn from(error: zbus::Error) -> Self {
-        let zbus::Error::MethodError(name, message, _) = error else {
+        if service::absent(&error) {
+            return Self::Absent;
+        }
+        let Some(name) = dbus::error_name(&error) else {
             return Self::Failed(error.to_string());
         };
         match name.as_str() {
-            "org.freedesktop.DBus.Error.ServiceUnknown"
-            | "org.freedesktop.DBus.Error.NameHasNoOwner" => Self::Absent,
             "org.freedesktop.DBus.Error.AccessDenied" => Self::Denied,
             "org.freedesktop.DBus.Error.UnknownObject"
             | "org.freedesktop.DBus.Error.UnknownInterface"
             | "org.freedesktop.DBus.Error.UnknownMethod"
             | "org.freedesktop.DBus.Error.UnknownProperty" => Self::Unsupported,
-            _ => Self::Failed(message.unwrap_or_else(|| name.to_string())),
+            _ => Self::Failed(dbus::error_message(&error).map_or(name, str::to_owned)),
         }
     }
 }
@@ -46,27 +47,25 @@ impl From<Problem> for String {
     }
 }
 
-pub fn call<B, R>(interface: &str, method: &str, body: &B) -> Result<R, Problem>
+pub async fn call<B, R>(interface: &str, method: &str, body: &B) -> Result<R, Problem>
 where
     B: Serialize + DynamicType,
     R: DeserializeOwned + Type,
 {
-    let reply = dbus::session().map_err(Problem::Failed)?.call_method(
-        Some(SERVICE),
-        PATH,
-        Some(interface),
-        method,
-        body,
-    )?;
+    let reply = dbus::session()
+        .await
+        .map_err(Problem::Failed)?
+        .call_method(Some(SERVICE), PATH, Some(interface), method, body)
+        .await?;
     Ok(reply.body().deserialize()?)
 }
 
-pub fn properties<R: DeserializeOwned + Type>(interface: &str) -> Result<R, Problem> {
-    call(PROPERTIES, "GetAll", &(interface,))
+pub async fn properties<R: DeserializeOwned + Type>(interface: &str) -> Result<R, Problem> {
+    call(PROPERTIES, "GetAll", &(interface,)).await
 }
 
-pub fn set_property(interface: &str, name: &str, value: bool) -> Result<(), Problem> {
-    call(PROPERTIES, "Set", &(interface, name, Value::from(value)))
+pub async fn set_property(interface: &str, name: &str, value: bool) -> Result<(), Problem> {
+    call(PROPERTIES, "Set", &(interface, name, Variant::from(value))).await
 }
 
 pub fn optional<T>(result: Result<T, Problem>) -> Result<Option<T>, Problem> {

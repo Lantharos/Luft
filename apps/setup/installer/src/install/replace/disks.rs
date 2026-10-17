@@ -3,42 +3,43 @@ use std::path::Path;
 
 use anyhow::{Context, Result, anyhow};
 use luft_disks::udisks::{self, BLOCK, Options, PARTITION};
-use zvariant::Value;
+use zbus::Variant;
 
 use crate::install::drive::layout::Role;
 use crate::survey::linux::Part;
 use crate::system::command::Tool;
+use crate::system::wait;
 
 pub const LUFT_SUBVOLUME: &str = "luft";
 
 fn options(label: Option<&str>) -> Options<'static> {
     let mut options: Options<'static> =
-        HashMap::from([("auth.no_user_interaction", Value::from(true))]);
+        HashMap::from([("auth.no_user_interaction", Variant::from(true))]);
     if let Some(label) = label {
-        options.insert("label", Value::from(label.to_owned()));
+        options.insert("label", Variant::from(label.to_owned()));
     }
     options
 }
 
 fn set_type(part: &Part, role: Role) -> Result<()> {
-    udisks::run(
+    wait(udisks::run(
         &part.block,
         PARTITION,
         "SetType",
         &(role.partition_type(), options(None)),
-    )
+    ))
     .map_err(|error| anyhow!(error))
     .with_context(|| format!("{} couldn't be marked for Luft", part.device))
 }
 
 pub fn format(part: &Part, role: Role) -> Result<()> {
     let (filesystem, label) = role.filesystem();
-    udisks::run(
+    wait(udisks::run(
         &part.block,
         BLOCK,
         "Format",
         &(filesystem, options(Some(label))),
-    )
+    ))
     .map_err(|error| anyhow!(error))
     .with_context(|| format!("{} couldn't be formatted", part.device))?;
     set_type(part, role)

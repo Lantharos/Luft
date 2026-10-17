@@ -1,23 +1,18 @@
 use std::fmt::Write;
 use std::sync::Once;
 
-use luft_app::dbus;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, explain, objects, service::absent};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::{MessageIterator, Proxy};
-use zbus::message::Type as MessageType;
-use zbus::zvariant::Type;
+use zbus::{DynamicType, Proxy, Type};
 
 const SERVICE: &str = "com.lantharos.Passkeys";
 const PATH: &str = "/com/lantharos/Passkeys1";
 const INTERFACE: &str = "com.lantharos.Passkeys1";
 const CHANGED: &str = "passkeys.changed";
-const ABSENT: [&str; 2] = [
-    "org.freedesktop.DBus.Error.ServiceUnknown",
-    "org.freedesktop.DBus.Error.NameHasNoOwner",
-];
 
 static WATCH: Once = Once::new();
 
@@ -87,27 +82,18 @@ fn unhex(text: &str) -> Result<Vec<u8>, String> {
         .ok_or_else(|| "That passkey doesn't exist".to_owned())
 }
 
-fn absent(error: &zbus::Error) -> bool {
-    matches!(error, zbus::Error::MethodError(name, ..) if ABSENT.contains(&name.as_str()))
+async fn proxy() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::session().await?, SERVICE, PATH, INTERFACE)
+        .await
+        .map_err(|error| explain(&error))
 }
 
-fn explain(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(_, Some(message), _) => message,
-        error => error.to_string(),
-    }
-}
-
-fn proxy() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::session()?, SERVICE, PATH, INTERFACE).map_err(explain)
-}
-
-fn read() -> Result<Option<Passkeys>, String> {
-    let proxy = proxy()?;
-    let entries: Vec<Entry> = match proxy.call("List", &()) {
+async fn read() -> Result<Option<Passkeys>, String> {
+    let proxy = proxy().await?;
+    let entries: Vec<Entry> = match proxy.call("List", &()).await {
         Ok(entries) => entries,
         Err(error) if absent(&error) => return Ok(None),
-        Err(error) => return Err(explain(error)),
+        Err(error) => return Err(explain(&error)),
     };
     let passkeys = entries
         .into_iter()
@@ -124,56 +110,59 @@ fn read() -> Result<Option<Passkeys>, String> {
         })
         .collect();
     Ok(Some(Passkeys {
-        protection: proxy.get_property("Protection").map_err(explain)?,
-        ready: proxy.get_property("Ready").map_err(explain)?,
+        protection: proxy
+            .get_property("Protection")
+            .await
+            .map_err(|error| explain(&error))?,
+        ready: proxy
+            .get_property("Ready")
+            .await
+            .map_err(|error| explain(&error))?,
         passkeys,
     }))
 }
 
 fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(session) = dbus::session() else {
+    luft_app::spawn(async move {
+        let Ok(session) = dbus::session().await else {
             return;
         };
-        let Ok(rule) = zbus::MatchRule::builder()
-            .msg_type(MessageType::Signal)
-            .sender(SERVICE)
-            .and_then(|rule| rule.path(PATH))
-            .map(|rule| rule.build())
-        else {
+        let Ok(mut signals) = objects::signals(session, SERVICE, PATH).await else {
             return;
         };
-        let Ok(messages) = MessageIterator::for_match_rule(rule, session, None) else {
-            return;
-        };
-        for _ in messages.flatten() {
-            if let Ok(Some(passkeys)) = read() {
+        while let Some(signal) = signals.next().await {
+            if signal.is_ok()
+                && let Ok(Some(passkeys)) = read().await
+            {
                 events.emit(CHANGED, passkeys);
             }
         }
     });
 }
 
-fn passkeys(events: &Events, _: Value) -> Result<Option<Passkeys>, String> {
-    let passkeys = read()?;
+async fn passkeys(events: Events, _: Value) -> Result<Option<Passkeys>, String> {
+    let passkeys = read().await?;
     if passkeys.is_some() {
-        let events = events.clone();
         WATCH.call_once(|| watch(events));
     }
     Ok(passkeys)
 }
 
+async fn call(method: &str, body: &(impl Serialize + DynamicType)) -> Result<(), String> {
+    proxy()
+        .await?
+        .call::<_, _, ()>(method, body)
+        .await
+        .map_err(|error| explain(&error))
+}
+
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("passkeys", events, passkeys)
-        .command("passkeys_rename", |Rename { id, name }| {
-            proxy()?
-                .call::<_, _, ()>("Rename", &(unhex(&id)?, name))
-                .map_err(explain)
+        .with_async("passkeys", events, passkeys)
+        .command_async("passkeys_rename", |Rename { id, name }| async move {
+            call("Rename", &(unhex(&id)?, name)).await
         })
-        .command("passkeys_delete", |Target { id }| {
-            proxy()?
-                .call::<_, _, ()>("Delete", &(unhex(&id)?,))
-                .map_err(explain)
+        .command_async("passkeys_delete", |Target { id }| async move {
+            call("Delete", &(unhex(&id)?,)).await
         })
 }

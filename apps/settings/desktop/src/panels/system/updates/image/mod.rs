@@ -45,13 +45,13 @@ fn expected_size() -> Option<u64> {
 }
 
 pub fn follow(task: Task) -> Result<(), String> {
-    image::follow(expected_size(), task)
+    luft_app::block_on(image::follow(expected_size(), task))
 }
 
 impl Backend for Image {
     fn load(&self, refresh: Option<Task>) -> Result<Loaded, String> {
         let refreshed = refresh.is_some();
-        let deployments = Deployments::load()?;
+        let deployments = luft_app::block_on(Deployments::load())?;
         let update = match refresh {
             Some(_) => check(&deployments)?,
             None => Found::load().update,
@@ -74,7 +74,7 @@ impl Backend for Image {
     }
 
     fn download(&self, task: Task) -> Result<(), String> {
-        image::download(expected_size(), task)
+        luft_app::block_on(image::download(expected_size(), task))
     }
 
     fn downloaded(&self) {
@@ -82,11 +82,11 @@ impl Backend for Image {
     }
 
     fn rollback(&self, _: Task) -> Result<(), String> {
-        image::rollback()
+        luft_app::block_on(image::rollback())
     }
 
     fn check_in_background(&self, download: bool) -> Result<Option<Notice>, String> {
-        let deployments = Deployments::load()?;
+        let deployments = luft_app::block_on(Deployments::load())?;
         let update = check(&deployments)?;
         Checked::now()?;
         let Some(update) = update.filter(|update| deployments.lacks(update)) else {
@@ -96,13 +96,13 @@ impl Backend for Image {
             return Ok(Some(AVAILABLE));
         }
         let quiet = |_: Progress| {};
-        image::download(
+        luft_app::block_on(image::download(
             Some(update.size),
             Task {
                 report: &quiet,
                 cancel: &Cancel::default(),
             },
-        )?;
+        ))?;
         Ok(Some(READY))
     }
 
@@ -111,6 +111,6 @@ impl Backend for Image {
     }
 
     fn scan(&self) {
-        watch::scan();
+        luft_app::spawn(watch::scan());
     }
 }

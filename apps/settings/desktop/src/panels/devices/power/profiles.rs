@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use serde::Serialize;
-use zbus::blocking::Connection;
-use zbus::zvariant::{OwnedValue, Value};
+use zbus::{Connection, OwnedVariant, Variant};
 
 use super::properties::{self, Properties};
 
@@ -16,11 +15,11 @@ pub struct Profiles {
     degraded: Vec<String>,
 }
 
-pub fn read(connection: &Connection) -> Result<Profiles, String> {
-    let properties = Properties::read(connection, DESTINATION, PATH, DESTINATION)?;
+pub async fn read(connection: &Connection) -> Result<Profiles, String> {
+    let properties = Properties::read(connection, DESTINATION, PATH, DESTINATION).await?;
     let available = properties
         .owned("Profiles")
-        .and_then(|profiles| Vec::<HashMap<String, OwnedValue>>::try_from(profiles).ok())
+        .and_then(|profiles| Vec::<HashMap<String, OwnedVariant>>::try_from(profiles).ok())
         .unwrap_or_default()
         .iter()
         .filter_map(|profile| profile.get("Profile")?.downcast_ref::<String>().ok())
@@ -41,13 +40,14 @@ pub fn read(connection: &Connection) -> Result<Profiles, String> {
     })
 }
 
-pub fn set(connection: &Connection, profile: &str) -> Result<(), String> {
+pub async fn set(connection: &Connection, profile: &str) -> Result<(), String> {
     properties::set(
         connection,
         DESTINATION,
         PATH,
         DESTINATION,
         "ActiveProfile",
-        Value::from(profile),
+        Variant::from(profile),
     )
+    .await
 }

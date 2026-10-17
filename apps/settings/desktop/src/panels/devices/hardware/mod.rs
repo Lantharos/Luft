@@ -23,21 +23,21 @@ pub struct Hardware {
     touchpad: bool,
 }
 
-fn detect() -> Hardware {
+async fn detect() -> Hardware {
     let pointers = pointers::detect();
     Hardware {
-        bluetooth: bluetooth::present(),
-        battery: power::has_battery(),
+        bluetooth: bluetooth::present().await,
+        battery: power::has_battery().await,
         mouse: pointers.mouse,
         touchpad: pointers.touchpad,
     }
 }
 
-fn hardware(events: &Events, _: Value) -> Result<Hardware, String> {
-    WATCH.call_once(|| watch::start(events.clone()));
-    Ok(detect())
+async fn hardware(events: Events, _: Value) -> Result<Hardware, String> {
+    WATCH.call_once(|| watch::start(events));
+    Ok(detect().await)
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window.with("hardware", events, hardware)
+    window.with_async("hardware", events, hardware)
 }

@@ -1,6 +1,7 @@
+use luft_app::dbus::failed;
 use serde::Serialize;
 
-use super::properties::{Map, Service, absent, failed, get};
+use super::properties::{Map, Service, absent, get};
 
 const FWUPD: Service = Service {
     name: "org.freedesktop.fwupd",
@@ -77,9 +78,9 @@ fn level(id: &str) -> Option<u32> {
     id.strip_prefix("HSI:")?.chars().next()?.to_digit(10)
 }
 
-pub fn read() -> Result<Option<HostSecurity>, String> {
-    let proxy = FWUPD.proxy()?;
-    let id: String = match proxy.get_property("HostSecurityId") {
+pub async fn read() -> Result<Option<HostSecurity>, String> {
+    let proxy = FWUPD.proxy().await?;
+    let id: String = match proxy.get_property("HostSecurityId").await {
         Ok(id) => id,
         Err(error) if absent(&error) => return Ok(None),
         Err(error) => return Err(failed(error)),
@@ -87,7 +88,7 @@ pub fn read() -> Result<Option<HostSecurity>, String> {
     let Some(level) = level(&id) else {
         return Ok(None);
     };
-    let attributes: Vec<Map> = match proxy.call("GetHostSecurityAttrs", &()) {
+    let attributes: Vec<Map> = match proxy.call("GetHostSecurityAttrs", &()).await {
         Ok(attributes) => attributes,
         Err(error) if absent(&error) => return Ok(None),
         Err(error) => return Err(failed(error)),

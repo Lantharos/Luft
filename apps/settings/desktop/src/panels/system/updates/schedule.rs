@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use luft_app::dbus;
+use luft_app::dbus::{self, failed};
+use zbus::DynamicType;
 
 use super::store::Schedule;
 
@@ -11,20 +12,18 @@ const SYSTEMD_PATH: &str = "/org/freedesktop/systemd1";
 const MANAGER: &str = "org.freedesktop.systemd1.Manager";
 pub const CHECK_ARGUMENT: &str = "--check-updates";
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
 fn units() -> PathBuf {
     dirs::config_dir().unwrap_or_default().join("systemd/user")
 }
 
-pub fn call<B>(method: &str, body: &B) -> Result<(), String>
+pub async fn call<B>(method: &str, body: &B) -> Result<(), String>
 where
-    B: serde::Serialize + zbus::zvariant::DynamicType,
+    B: serde::Serialize + DynamicType,
 {
-    dbus::session()?
+    dbus::session()
+        .await?
         .call_method(Some(SYSTEMD), SYSTEMD_PATH, Some(MANAGER), method, body)
+        .await
         .map(|_| ())
         .map_err(failed)
 }
@@ -41,25 +40,25 @@ fn timer(calendar: &str) -> String {
     )
 }
 
-pub fn apply(schedule: Schedule) -> Result<(), String> {
+pub async fn apply(schedule: Schedule) -> Result<(), String> {
     let folder = units();
     let calendar = match schedule {
         Schedule::Daily => "daily",
         Schedule::Weekly => "weekly",
         Schedule::Never => {
-            let _ = call("StopUnit", &(TIMER, "replace"));
-            let _ = call("DisableUnitFiles", &(vec![TIMER], false));
+            let _ = call("StopUnit", &(TIMER, "replace")).await;
+            let _ = call("DisableUnitFiles", &(vec![TIMER], false)).await;
             for unit in [TIMER, SERVICE] {
                 let _ = std::fs::remove_file(folder.join(unit));
             }
-            return call("Reload", &());
+            return call("Reload", &()).await;
         }
     };
     let executable = std::env::current_exe().map_err(failed)?;
     std::fs::create_dir_all(&folder).map_err(failed)?;
     std::fs::write(folder.join(SERVICE), service(&executable.to_string_lossy())).map_err(failed)?;
     std::fs::write(folder.join(TIMER), timer(calendar)).map_err(failed)?;
-    call("Reload", &())?;
-    call("EnableUnitFiles", &(vec![TIMER], false, true))?;
-    call("RestartUnit", &(TIMER, "replace"))
+    call("Reload", &()).await?;
+    call("EnableUnitFiles", &(vec![TIMER], false, true)).await?;
+    call("RestartUnit", &(TIMER, "replace")).await
 }

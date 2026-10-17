@@ -1,11 +1,10 @@
-use std::sync::mpsc::{self, Sender};
+use std::future::ready;
 
+use futures_util::StreamExt;
 use luft_app::Events;
 use luft_app::dbus::{self, objects};
-use zbus::MatchRule;
-use zbus::blocking::MessageIterator;
 use zbus::fdo::PropertiesChanged;
-use zbus::message::{Message, Type as MessageType};
+use zbus::message::Message;
 
 use super::bus::{ACCESS, PATH, PROPERTIES, SERVICE, SSH, STATUS};
 use super::snapshot;
@@ -29,34 +28,18 @@ fn concerns_keyring(message: &Message) -> bool {
     }
 }
 
-fn listen(changes: Sender<()>) {
-    let Ok(session) = dbus::session() else {
-        return;
-    };
-    let Ok(rule) = MatchRule::builder()
-        .msg_type(MessageType::Signal)
-        .sender(SERVICE)
-        .and_then(|rule| rule.path(PATH))
-        .map(|rule| rule.build())
-    else {
-        return;
-    };
-    let Ok(messages) = MessageIterator::for_match_rule(rule, session, None) else {
-        return;
-    };
-    for message in messages.flatten() {
-        if concerns_keyring(&message) && changes.send(()).is_err() {
-            return;
-        }
-    }
-}
-
 pub fn watch(events: Events) {
-    let (changes, settled) = mpsc::channel();
-    std::thread::spawn(move || listen(changes));
-    std::thread::spawn(move || {
-        while objects::settle(&settled) {
-            if let Ok(Some(keyring)) = snapshot::read() {
+    luft_app::spawn(async move {
+        let Ok(session) = dbus::session().await else {
+            return;
+        };
+        let Ok(signals) = objects::signals(session, SERVICE, PATH).await else {
+            return;
+        };
+        let mut changes =
+            signals.filter(|message| ready(message.as_ref().is_ok_and(concerns_keyring)));
+        while objects::settle(&mut changes).await {
+            if let Ok(Some(keyring)) = snapshot::read().await {
                 events.emit(CHANGED, keyring);
             }
         }

@@ -19,6 +19,7 @@ pub enum Direction {
         source: File,
         output: File,
         destination: PathBuf,
+        size: u64,
     },
     Restore {
         input: File,
@@ -60,13 +61,14 @@ pub fn run(events: &Events, block: &str, direction: Direction, cancelled: &Atomi
             mut source,
             mut output,
             destination,
+            size,
         } => {
             let total = source
                 .metadata()
                 .map(|meta| meta.len())
                 .ok()
                 .filter(|size| *size > 0)
-                .unwrap_or_else(|| device_size(block));
+                .unwrap_or(size);
             let copied = pump(&mut source, &mut output, total, cancelled, &report);
             if copied.is_err() {
                 let _ = std::fs::remove_file(&destination);
@@ -79,7 +81,7 @@ pub fn run(events: &Events, block: &str, direction: Direction, cancelled: &Atomi
             size,
         } => {
             let copied = pump(&mut input, &mut target, size, cancelled, &report);
-            let _ = udisks::run(block, BLOCK, "Rescan", &(no_options(),));
+            let _ = luft_app::block_on(udisks::run(block, BLOCK, "Rescan", &(no_options(),)));
             copied.map(|copied| (copied, size))
         }
     };
@@ -119,15 +121,4 @@ fn pump(
     }
     to.sync_all().map_err(|error| error.to_string())?;
     Ok(copied)
-}
-
-fn device_size(block: &str) -> u64 {
-    udisks::objects()
-        .ok()
-        .and_then(|objects| {
-            objects
-                .get(block, BLOCK)
-                .and_then(|target| target.get::<u64>("Size"))
-        })
-        .unwrap_or(0)
 }

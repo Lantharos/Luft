@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
 use std::path::Path;
 
+use futures_util::StreamExt;
 use inotify::{Inotify, WatchMask};
 use luft_app::dbus;
 use luft_software::packagekit::{
@@ -18,41 +19,49 @@ const DNF_LOCK: &str = "rpmtransaction.lock";
 const PACKAGEKIT_DAEMON: &str = "packagekitd";
 
 pub fn watch() {
-    std::thread::spawn(|| {
-        scan();
-        let _ = running::watch(scan);
+    luft_app::spawn(async {
+        let changes = running::changes().await;
+        scan().await;
+        let Ok(changes) = changes else {
+            return;
+        };
+        let mut changes = std::pin::pin!(changes);
+        while changes.next().await.is_some() {
+            scan().await;
+        }
     });
     std::thread::spawn(watch_dnf);
 }
 
-pub fn scan() {
+pub async fn scan() {
     if state::busy() {
         return;
     }
-    if let Some(transaction) = foreign_transaction() {
-        follow(transaction);
+    if let Some(transaction) = foreign_transaction().await {
+        follow(transaction).await;
     } else if let Some(pid) = dnf_holder() {
         wait_for(pid);
     }
 }
 
-fn foreign_transaction() -> Option<Running> {
-    let own = dbus::system().ok()?.unique_name()?.to_string();
+async fn foreign_transaction() -> Option<Running> {
+    let own = dbus::system().await.ok()?.unique_name()?.to_string();
     running::running()
+        .await
         .ok()?
         .into_iter()
         .find(|transaction| transaction.sender != own)
 }
 
-fn follow(transaction: Running) {
+async fn follow(transaction: Running) {
     let activity = elsewhere::activity(
-        elsewhere::sent_by(&transaction.sender),
+        elsewhere::sent_by(&transaction.sender).await,
         Some(transaction.change),
     );
     let path = transaction.path;
     state::start(
         activity,
-        move |task| packagekit::follow(&path, task),
+        move |task| luft_app::block_on(packagekit::follow(&path, task)),
         finished,
     );
 }
@@ -121,7 +130,7 @@ fn watch_dnf() {
             let _ = inotify.watches().add(&folder, lock);
         }
         if names.iter().any(|name| name == DNF_LOCK) {
-            scan();
+            luft_app::spawn(scan());
         }
     }
 }

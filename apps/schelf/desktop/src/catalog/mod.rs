@@ -10,6 +10,7 @@ use luft_software::packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::task::spawn_blocking;
 
 use appstream::Component;
 
@@ -38,9 +39,12 @@ struct FedoraApp {
     details: Option<PackageDetails>,
 }
 
-fn fedora_app(Id { id }: Id) -> Result<FedoraApp, String> {
-    let component = fedora::find(&id).ok_or("That app isn't in the catalog any more.")?;
-    let details = packages::details(&component.package);
+async fn fedora_app(Id { id }: Id) -> Result<FedoraApp, String> {
+    let component = spawn_blocking(move || fedora::find(&id))
+        .await
+        .map_err(|error| error.to_string())?
+        .ok_or("That app isn't in the catalog any more.")?;
+    let details = packages::details(&component.package).await;
     Ok(FedoraApp { component, details })
 }
 
@@ -49,6 +53,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("flathub_get", |Path { path }| flathub::get(&path))
         .command("flathub_search", |Query { query }| flathub::search(&query))
         .command("fedora_apps", |_: Value| Ok(fedora::list()))
-        .command("fedora_app", fedora_app)
+        .command_async("fedora_app", fedora_app)
         .command("tools_search", |Query { query }| tools::search(&query))
 }

@@ -1,7 +1,9 @@
 use std::fs;
-use std::sync::mpsc::Sender;
+use std::future::ready;
+use std::io;
 
-use inotify::{Inotify, WatchMask};
+use futures_util::{Stream, StreamExt, stream};
+use inotify::{EventOwned, EventStream, Inotify, WatchMask};
 
 const UDEV_DATA: &str = "/run/udev/data";
 const INPUT_DEVICE_PREFIX: &str = "c13:";
@@ -37,29 +39,28 @@ pub fn detect() -> Pointers {
         })
 }
 
-pub fn watch(changes: Sender<()>) {
-    std::thread::spawn(move || {
-        if let Err(error) = forward(&changes) {
-            eprintln!("hardware: {error}");
-        }
-    });
-}
-
-fn forward(changes: &Sender<()>) -> std::io::Result<()> {
-    let mut inotify = Inotify::init()?;
+fn events() -> io::Result<EventStream<[u8; EVENT_BUFFER]>> {
+    let inotify = Inotify::init()?;
     inotify.watches().add(
         UDEV_DATA,
         WatchMask::CREATE | WatchMask::CLOSE_WRITE | WatchMask::MOVED_TO | WatchMask::DELETE,
     )?;
-    let mut buffer = [0; EVENT_BUFFER];
-    loop {
-        let input = inotify.read_events_blocking(&mut buffer)?.any(|event| {
-            event
-                .name
-                .is_some_and(|name| name.to_string_lossy().starts_with(INPUT_DEVICE_PREFIX))
-        });
-        if input && changes.send(()).is_err() {
-            return Ok(());
-        }
-    }
+    inotify.into_event_stream([0; EVENT_BUFFER])
+}
+
+fn is_input(event: &EventOwned) -> bool {
+    event
+        .name
+        .as_ref()
+        .is_some_and(|name| name.to_string_lossy().starts_with(INPUT_DEVICE_PREFIX))
+}
+
+pub fn changes() -> impl Stream<Item = ()> {
+    let events = events()
+        .inspect_err(|error| eprintln!("hardware: {error}"))
+        .ok();
+    stream::iter(events)
+        .flatten()
+        .take_while(|event| ready(event.is_ok()))
+        .filter_map(|event| ready(event.ok().filter(is_input).map(drop)))
 }

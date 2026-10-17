@@ -4,6 +4,7 @@ mod state;
 
 use std::sync::Once;
 
+use futures_util::StreamExt;
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
@@ -12,35 +13,34 @@ const DISPLAYS_CHANGED: &str = "display.changed";
 
 static WATCH: Once = Once::new();
 
-fn watch(events: &Events) {
-    let events = events.clone();
+async fn watch(events: Events) {
+    let Ok(proxy) = state::proxy().await else {
+        return;
+    };
+    let Ok(mut changes) = proxy.receive_signal("MonitorsChanged").await else {
+        return;
+    };
+    while changes.next().await.is_some() {
+        brightness::monitors_changed();
+        if let Ok(current) = state::current().await {
+            events.emit(DISPLAYS_CHANGED, current);
+        }
+    }
+}
+
+async fn displays(events: Events, _: Value) -> Result<state::Displays, String> {
     WATCH.call_once(|| {
-        std::thread::spawn(move || {
-            let Ok(proxy) = state::proxy() else {
-                return;
-            };
-            let Ok(changes) = proxy.receive_signal("MonitorsChanged") else {
-                return;
-            };
-            for _ in changes {
-                brightness::monitors_changed();
-                if let Ok(current) = state::current() {
-                    events.emit(DISPLAYS_CHANGED, current);
-                }
-            }
-        });
+        luft_app::spawn(watch(events));
     });
+    state::current().await
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("display_state", events, |events, _: Value| {
-            watch(events);
-            state::current()
-        })
-        .command("display_apply", apply::apply)
-        .with("display_brightness", events, |events, _: Value| {
+        .with_async("display_state", events, displays)
+        .command_async("display_apply", apply::apply)
+        .with_async("display_brightness", events, |events, _: Value| {
             brightness::current(events)
         })
-        .with("display_set_brightness", events, brightness::set)
+        .with_async("display_set_brightness", events, brightness::set)
 }

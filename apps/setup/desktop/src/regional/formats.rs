@@ -1,5 +1,6 @@
 use gio::prelude::*;
-use luft_app::dbus::service::{failed, get};
+use luft_app::dbus::failed;
+use luft_app::dbus::service::get;
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -26,12 +27,13 @@ fn country_of(zone: &str) -> Option<String> {
         })
 }
 
-pub fn unset_country(_: Value) -> Result<Option<String>, String> {
+pub async fn unset_country(_: Value) -> Result<Option<String>, String> {
     if !gio::Settings::new(LOCALE).string(REGION).is_empty() {
         return Ok(None);
     }
     let zone: Option<String> = TIME
-        .read()?
+        .read()
+        .await?
         .and_then(|properties| get(&properties, "Timezone"));
     Ok(zone.as_deref().and_then(country_of))
 }

@@ -42,7 +42,8 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                  show_hidden,
              }| {
                 paths.retain(|path| {
-                    !crate::locations::network::is_remote(path) && !crate::locations::cloud::is_cloud(path)
+                    !crate::locations::network::is_remote(path)
+                        && !crate::locations::cloud::is_cloud(path)
                 });
                 state.counts.request(paths, show_hidden);
                 Ok(())
@@ -91,10 +92,15 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("eject_drive", |MountPoint { mount_point }| {
             drives::eject_drive(mount_point)
         })
-        .command("list_windows", |Empty {}| Ok(drives::closed_windows()))
-        .command("open_windows", |WindowsDevice { device, read_only }| {
-            drives::open_windows(&device, read_only)
+        .command_async("list_windows", |Empty {}| async {
+            Ok(drives::closed_windows().await)
         })
+        .command_async(
+            "open_windows",
+            |WindowsDevice { device, read_only }| async move {
+                drives::open_windows(&device, read_only).await
+            },
+        )
         .command("manage_drive", |MountPoint { mount_point }| {
             drives::manage(&mount_point)
         })
@@ -155,7 +161,9 @@ fn register_vcs(window: SabineWindow, state: &RoverState) -> SabineWindow {
 
 fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
-        .with("app_state", state, |state, Empty {}| Ok(state.app_state()))
+        .with_async("app_state", state, |state, Empty {}| async move {
+            Ok(state.app_state().await)
+        })
         .command(
             "resolve_arguments",
             |Arguments {

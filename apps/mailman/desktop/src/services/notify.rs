@@ -2,11 +2,11 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use futures_util::StreamExt;
 use luft_app::{Events, dbus};
 use parking_lot::Mutex;
 use serde::Serialize;
-use zbus::blocking::Proxy;
-use zbus::zvariant::Value;
+use zbus::{Proxy, Variant};
 
 use crate::APP_ID;
 use crate::events::OPEN_THREAD;
@@ -30,8 +30,35 @@ pub struct Notifier {
     enabled: Arc<AtomicBool>,
 }
 
-fn proxy() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::session()?, DESTINATION, PATH, DESTINATION).map_err(|error| error.to_string())
+async fn proxy() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::session().await?, DESTINATION, PATH, DESTINATION)
+        .await
+        .map_err(dbus::failed)
+}
+
+async fn notify(title: &str, body: &str) -> Result<u32, String> {
+    let hints = HashMap::from([
+        ("desktop-entry", Variant::from(APP_ID)),
+        ("urgency", Variant::from(LOW_URGENCY)),
+        ("category", Variant::from("email.arrived")),
+    ]);
+    proxy()
+        .await?
+        .call(
+            "Notify",
+            &(
+                "Mailman",
+                0u32,
+                APP_ID,
+                title,
+                body,
+                vec![DEFAULT_ACTION, "Open"],
+                hints,
+                -1i32,
+            ),
+        )
+        .await
+        .map_err(dbus::failed)
 }
 
 impl Notifier {
@@ -70,50 +97,29 @@ impl Notifier {
         if !self.enabled.load(Ordering::Relaxed) {
             return;
         }
-        let hints = HashMap::from([
-            ("desktop-entry", Value::from(APP_ID)),
-            ("urgency", Value::from(LOW_URGENCY)),
-            ("category", Value::from("email.arrived")),
-        ]);
-        let shown: Result<u32, String> = proxy().and_then(|proxy| {
-            proxy
-                .call(
-                    "Notify",
-                    &(
-                        "Mailman",
-                        0u32,
-                        APP_ID,
-                        title,
-                        body,
-                        vec![DEFAULT_ACTION, "Open"],
-                        hints,
-                        -1i32,
-                    ),
-                )
-                .map_err(|error| error.to_string())
+        let shown = self.shown.clone();
+        let (title, body) = (title.to_owned(), body.to_owned());
+        luft_app::spawn(async move {
+            if let Ok(id) = notify(&title, &body).await {
+                shown.lock().insert(
+                    id,
+                    Activation {
+                        thread,
+                        token: None,
+                    },
+                );
+            }
         });
-        if let Ok(id) = shown {
-            self.shown.lock().insert(
-                id,
-                Activation {
-                    thread,
-                    token: None,
-                },
-            );
-        }
     }
 
     pub fn watch(&self, events: Events) {
         let shown = self.shown.clone();
-        std::thread::spawn(move || {
-            let Ok(signals) = proxy().and_then(|proxy| {
-                proxy
-                    .receive_all_signals()
-                    .map_err(|error| error.to_string())
-            }) else {
+        luft_app::spawn(async move {
+            let Ok(proxy) = proxy().await else { return };
+            let Ok(mut signals) = proxy.receive_all_signals().await else {
                 return;
             };
-            for signal in signals {
+            while let Some(signal) = signals.next().await {
                 let header = signal.header();
                 match header.member().map(|member| member.as_str()) {
                     Some("ActivationToken") => {

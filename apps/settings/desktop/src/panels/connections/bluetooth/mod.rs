@@ -11,6 +11,7 @@ use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 
 use super::network;
@@ -49,89 +50,94 @@ struct Answer {
     value: Option<String>,
 }
 
-fn bluetooth() -> Result<Bluetooth, String> {
-    Ok(snapshot::build(&Objects::fetch(
-        dbus::system()?,
-        SERVICE,
-        "/",
-    )?))
+async fn bluetooth() -> Result<Bluetooth, String> {
+    Ok(snapshot::build(
+        &Objects::fetch(dbus::system().await?, SERVICE, "/").await?,
+    ))
 }
 
-pub fn present() -> bool {
+async fn running(connection: &zbus::Connection) -> Option<bool> {
+    let bus = DBusProxy::new(connection).await.ok()?;
+    bus.name_has_owner(BusName::from_static_str(SERVICE).ok()?)
+        .await
+        .ok()
+}
+
+pub async fn present() -> bool {
     if rfkill::hard_blocked() {
         return true;
     }
-    let Ok(connection) = dbus::system() else {
+    let Ok(connection) = dbus::system().await else {
         return false;
     };
-    let running = zbus::blocking::fdo::DBusProxy::new(connection)
-        .ok()
-        .and_then(|bus| {
-            bus.name_has_owner(BusName::from_static_str(SERVICE).ok()?)
-                .ok()
-        })
-        .unwrap_or(false);
-    running
+    running(connection).await.unwrap_or(false)
         && Objects::fetch(connection, SERVICE, "/")
+            .await
             .is_ok_and(|objects| objects.implementing(ADAPTER).next().is_some())
 }
 
-fn adapter() -> Result<Adapter, String> {
-    bluetooth()?
+async fn adapter() -> Result<Adapter, String> {
+    bluetooth()
+        .await?
         .adapter
         .ok_or_else(|| "There is no Bluetooth adapter".to_owned())
 }
 
-fn open(events: &Events, _: Value) -> Result<Bluetooth, String> {
-    watch::open(events);
-    if let Err(error) = agent::register(events) {
+async fn open(events: Events, _: Value) -> Result<Bluetooth, String> {
+    watch::open(&events);
+    if let Err(error) = agent::register(&events).await {
         eprintln!("bluetooth: {error}");
     }
-    let bluetooth = bluetooth()?;
+    let bluetooth = bluetooth().await?;
     if let Some(adapter) = &bluetooth.adapter {
-        actions::browse(adapter);
+        actions::browse(adapter).await;
     }
     Ok(bluetooth)
 }
 
-fn close(events: &Events, _: Value) -> Result<(), String> {
+async fn close(events: Events, _: Value) -> Result<(), String> {
     watch::close();
-    agent::unregister(events);
-    if let Some(adapter) = bluetooth()?.adapter {
-        actions::stop_browsing(&adapter);
+    agent::unregister(&events).await;
+    if let Some(adapter) = bluetooth().await?.adapter {
+        actions::stop_browsing(&adapter).await;
     }
     Ok(())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("bluetooth_open", events, open)
-        .with("bluetooth_close", events, close)
-        .command("bluetooth_set_powered", |Toggle { enabled }| {
-            actions::set_powered(&adapter()?, enabled)
+        .with_async("bluetooth_open", events, open)
+        .with_async("bluetooth_close", events, close)
+        .command_async("bluetooth_set_powered", |Toggle { enabled }| async move {
+            actions::set_powered(&adapter().await?, enabled).await
         })
-        .command("bluetooth_connect", |Device { device }| {
-            actions::connect(&device)
+        .command_async("bluetooth_connect", |Device { device }| async move {
+            actions::connect(&device).await
         })
-        .command("bluetooth_disconnect", |Device { device }| {
-            actions::disconnect(&device)
+        .command_async("bluetooth_disconnect", |Device { device }| async move {
+            actions::disconnect(&device).await
         })
-        .command("bluetooth_pair", |Device { device }| actions::pair(&device))
-        .command("bluetooth_cancel_pairing", |Device { device }| {
-            actions::cancel_pairing(&device)
+        .command_async("bluetooth_pair", |Device { device }| async move {
+            actions::pair(&device).await
         })
-        .command("bluetooth_forget", |Device { device }| {
-            actions::forget(&device)
+        .command_async("bluetooth_cancel_pairing", |Device { device }| async move {
+            actions::cancel_pairing(&device).await
         })
-        .command("bluetooth_set_trusted", |Trust { device, trusted }| {
-            actions::set_trusted(&device, trusted)
+        .command_async("bluetooth_forget", |Device { device }| async move {
+            actions::forget(&device).await
         })
-        .command(
-            "bluetooth_set_visible",
-            |Visibility { visible, timeout }| actions::set_visible(&adapter()?, visible, timeout),
+        .command_async(
+            "bluetooth_set_trusted",
+            |Trust { device, trusted }| async move { actions::set_trusted(&device, trusted).await },
         )
-        .command("bluetooth_windows", |_: Value| windows::waiting())
-        .command("bluetooth_import_windows", |_: Value| windows::import())
+        .command_async(
+            "bluetooth_set_visible",
+            |Visibility { visible, timeout }| async move {
+                actions::set_visible(&adapter().await?, visible, timeout).await
+            },
+        )
+        .command_async("bluetooth_windows", |_: Value| windows::waiting())
+        .command_async("bluetooth_import_windows", |_: Value| windows::import())
         .command("bluetooth_answer", |Answer { id, value }| {
             agent::answer(id, value);
             Ok(())

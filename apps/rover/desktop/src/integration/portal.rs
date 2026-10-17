@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::process::Command;
 use url::Url;
 use zbus::interface;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
+use zbus::{OwnedObjectPath, OwnedVariant, Variant};
 
 use super::chooser::{
     ACCEPT_LABEL_ENV, CURRENT_FOLDER_ENV, CURRENT_NAME_ENV, ChooserMode, ChooserResponse,
@@ -21,8 +21,8 @@ const FILE_CHOOSER_INTERFACE: &str = "org.freedesktop.impl.portal.FileChooser";
 const RESPONSE_SUCCESS: u32 = 0;
 const RESPONSE_CANCELLED: u32 = 1;
 
-type Options = HashMap<String, OwnedValue>;
-type Results = HashMap<String, OwnedValue>;
+type Options = HashMap<String, OwnedVariant>;
+type Results = HashMap<String, OwnedVariant>;
 
 #[derive(Default)]
 struct FileChooser {
@@ -170,7 +170,7 @@ fn portal_results(response: ChooserResponse) -> (u32, Results) {
         .collect();
     let mut results = Results::new();
     results.insert("uris".to_string(), owned(uris));
-    results.insert("writable".to_string(), OwnedValue::from(false));
+    results.insert("writable".to_string(), OwnedVariant::from(false));
     (RESPONSE_SUCCESS, results)
 }
 
@@ -234,9 +234,9 @@ fn response_path(handle: &str, request: u64) -> PathBuf {
     ))
 }
 
-fn owned<T>(value: T) -> OwnedValue
+fn owned<T>(value: T) -> OwnedVariant
 where
-    Value<'static>: From<T>,
+    Variant<'static>: From<T>,
 {
-    OwnedValue::try_from(Value::from(value)).expect("URI lists always fit in a D-Bus variant")
+    OwnedVariant::try_from(Variant::from(value)).expect("URI lists always fit in a D-Bus variant")
 }

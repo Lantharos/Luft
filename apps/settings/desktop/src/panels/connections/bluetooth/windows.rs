@@ -1,7 +1,6 @@
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 use zbus::proxy::MethodFlags;
 
 const SERVICE: &str = "com.lantharos.Windows1";
@@ -23,12 +22,14 @@ pub struct Paired {
     name: Option<String>,
 }
 
-fn proxy() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::system()?, SERVICE, PATH, SERVICE).map_err(failed)
+async fn proxy() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::system().await?, SERVICE, PATH, SERVICE)
+        .await
+        .map_err(failed)
 }
 
-pub fn waiting() -> Result<Vec<Paired>, String> {
-    let status: String = proxy()?.call("Status", &()).map_err(failed)?;
+pub async fn waiting() -> Result<Vec<Paired>, String> {
+    let status: String = proxy().await?.call("Status", &()).await.map_err(failed)?;
     let status: Status = serde_json::from_str(&status).map_err(failed)?;
     Ok(status
         .installations
@@ -37,16 +38,11 @@ pub fn waiting() -> Result<Vec<Paired>, String> {
         .collect())
 }
 
-pub fn import() -> Result<u32, String> {
-    proxy()?
-        .call_with_flags::<_, _, u32>(
-            "ImportBluetooth",
-            MethodFlags::AllowInteractiveAuth.into(),
-            &(),
-        )
-        .map_err(|error| match error {
-            zbus::Error::MethodError(_, Some(text), _) => text,
-            other => other.to_string(),
-        })?
+pub async fn import() -> Result<u32, String> {
+    proxy()
+        .await?
+        .call_with_flags::<_, _, u32>("ImportBluetooth", MethodFlags::ALLOW_INTERACTIVE_AUTH, &())
+        .await
+        .map_err(|error| dbus::explain(&error))?
         .ok_or_else(|| "Windows' Bluetooth devices weren't brought over".to_owned())
 }

@@ -1,10 +1,12 @@
 use luft_app::Commands;
-use luft_app::dbus::service::{Map, Service, absent, failed, get};
+use luft_app::dbus::service::{Map, Service, absent, get};
+use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::recovery::for_this_computer;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::zvariant::OwnedValue;
+use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedVariant};
 
 const TRUST: Service = Service {
     name: "com.lantharos.Trust1",
@@ -44,13 +46,13 @@ struct Encrypt {
 }
 
 fn group(properties: &Map, name: &str) -> Map {
-    get::<OwnedValue>(properties, name)
+    get::<OwnedVariant>(properties, name)
         .and_then(|value| Map::try_from(value).ok())
         .unwrap_or_default()
 }
 
-fn state(_: Value) -> Result<Option<State>, String> {
-    Ok(TRUST.read()?.map(|properties| {
+async fn state(_: Value) -> Result<Option<State>, String> {
+    Ok(TRUST.read().await?.map(|properties| {
         let key = group(&properties, "SigningKey");
         let disk = group(&properties, "Disk");
         State {
@@ -64,27 +66,29 @@ fn state(_: Value) -> Result<Option<State>, String> {
     }))
 }
 
-fn explain(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(name, Some(message), _) if name.starts_with(ERROR) => message,
-        zbus::Error::MethodError(name, _, _) if name.ends_with("NotAuthorized") => {
-            "Your password is needed for this".to_owned()
-        }
-        error if absent(&error) => "Device security isn't available on this computer".to_owned(),
-        error => failed(error),
+fn explain(error: &zbus::Error) -> String {
+    let name = error_name(error).unwrap_or_default();
+    match error_message(error) {
+        Some(message) if name.starts_with(ERROR) => message.to_owned(),
+        _ if name.ends_with("NotAuthorized") => "Your password is needed for this".to_owned(),
+        _ if absent(error) => "Device security isn't available on this computer".to_owned(),
+        _ => failed(error),
     }
 }
 
-fn call<B, R>(method: &str, body: &B) -> Result<R, String>
+async fn call<B, R>(method: &str, body: &B) -> Result<R, String>
 where
-    B: Serialize + zbus::zvariant::DynamicType,
-    R: for<'d> zbus::zvariant::DynamicDeserialize<'d>,
+    B: Serialize + DynamicType,
+    R: for<'d> DynamicDeserialize<'d>,
 {
-    TRUST.change(method, body).map_err(explain)
+    TRUST
+        .change(method, body)
+        .await
+        .map_err(|error| explain(&error))
 }
 
-fn checks(_: Value) -> Result<Vec<Check>, String> {
-    let checks: Vec<(String, bool, String)> = call("CheckEncryption", &())?;
+async fn checks(_: Value) -> Result<Vec<Check>, String> {
+    let checks: Vec<(String, bool, String)> = call("CheckEncryption", &()).await?;
     Ok(checks
         .into_iter()
         .map(|(id, passed, sentence)| Check {
@@ -95,27 +99,38 @@ fn checks(_: Value) -> Result<Vec<Check>, String> {
         .collect())
 }
 
+async fn enroll(_: Value) -> Result<String, String> {
+    call("EnrollSigningKey", &()).await
+}
+
+async fn recovery_key(_: Value) -> Result<String, String> {
+    call("GenerateRecoveryKey", &()).await
+}
+
+async fn save_key(Key { key }: Key) -> Result<bool, String> {
+    for_this_computer(&key).save("Recovery key.txt").await
+}
+
+async fn print_key(Key { key }: Key) -> Result<(), String> {
+    for_this_computer(&key).print().await
+}
+
+async fn encrypt(
+    Encrypt {
+        recovery_key,
+        passphrase,
+    }: Encrypt,
+) -> Result<(), String> {
+    call("TurnOnEncryption", &(recovery_key, "", passphrase)).await
+}
+
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command("trust_state", state)
-        .command("trust_enroll", |_: Value| {
-            call::<_, String>("EnrollSigningKey", &())
-        })
-        .command("trust_checks", checks)
-        .command("trust_recovery_key", |_: Value| {
-            call::<_, String>("GenerateRecoveryKey", &())
-        })
-        .command("trust_save_key", |Key { key }| {
-            for_this_computer(&key).save("Recovery key.txt")
-        })
-        .command("trust_print_key", |Key { key }| {
-            for_this_computer(&key).print()
-        })
-        .command(
-            "trust_encrypt",
-            |Encrypt {
-                 recovery_key,
-                 passphrase,
-             }| call::<_, ()>("TurnOnEncryption", &(recovery_key, "", passphrase)),
-        )
+        .command_async("trust_state", state)
+        .command_async("trust_enroll", enroll)
+        .command_async("trust_checks", checks)
+        .command_async("trust_recovery_key", recovery_key)
+        .command_async("trust_save_key", save_key)
+        .command_async("trust_print_key", print_key)
+        .command_async("trust_encrypt", encrypt)
 }

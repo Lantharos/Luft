@@ -101,7 +101,9 @@ fn register_terminals(window: SabineWindow, state: &TernState) -> SabineWindow {
 
 fn register_app(window: SabineWindow, state: &TernState) -> SabineWindow {
     window
-        .with("app_state", state, |state, Empty {}| Ok(state.app_state()))
+        .with_async("app_state", state, |state, Empty {}| async move {
+            Ok(state.app_state().await)
+        })
         .command(
             "resolve_launch",
             |Activation {

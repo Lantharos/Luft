@@ -1,5 +1,6 @@
+use luft_app::dbus::objects::Objects;
 use serde::{Deserialize, Serialize};
-use zbus::zvariant::Value;
+use zbus::{OwnedObjectPath, Variant};
 
 use super::{encryption, mounting};
 use crate::udisks::{self, BLOCK, Options, TABLE, no_options};
@@ -28,26 +29,24 @@ pub struct Support {
     resize: u64,
 }
 
-pub fn supported() -> Vec<Support> {
-    FILESYSTEMS
-        .iter()
-        .map(|filesystem| {
-            let (available, missing) =
-                udisks::manager::<(bool, String)>("CanFormat", &(*filesystem,))
-                    .unwrap_or((false, String::new()));
-            let (resizable, resize, _) = udisks::manager::<(bool, u64, String)>(
-                "CanResize",
-                &(*filesystem,),
-            )
-            .unwrap_or((false, 0, String::new()));
-            Support {
-                filesystem,
-                available,
-                missing,
-                resize: if resizable { resize } else { 0 },
-            }
-        })
-        .collect()
+pub async fn supported() -> Vec<Support> {
+    let mut supported = Vec::with_capacity(FILESYSTEMS.len());
+    for filesystem in FILESYSTEMS {
+        let (available, missing) = udisks::manager::<(bool, String)>("CanFormat", &(*filesystem,))
+            .await
+            .unwrap_or((false, String::new()));
+        let (resizable, resize, _) =
+            udisks::manager::<(bool, u64, String)>("CanResize", &(*filesystem,))
+                .await
+                .unwrap_or((false, 0, String::new()));
+        supported.push(Support {
+            filesystem,
+            available,
+            missing,
+            resize: if resizable { resize } else { 0 },
+        });
+    }
+    supported
 }
 
 impl Format {
@@ -66,84 +65,85 @@ impl Format {
             return Err(format!("{} isn't offered here", self.filesystem));
         }
         let mut options = no_options();
-        options.insert("label", Value::from(self.label.as_str()));
-        options.insert("update-partition-type", Value::from(typed));
-        options.insert("tear-down", Value::from(true));
+        options.insert("label", Variant::from(self.label.as_str()));
+        options.insert("update-partition-type", Variant::from(typed));
+        options.insert("tear-down", Variant::from(true));
         if OWNED.contains(&self.filesystem.as_str()) {
-            options.insert("take-ownership", Value::from(true));
+            options.insert("take-ownership", Variant::from(true));
         }
         if erase && self.erase {
-            options.insert("erase", Value::from("zero"));
+            options.insert("erase", Variant::from("zero"));
         }
         if let Some(passphrase) = self
             .passphrase
             .as_deref()
             .filter(|passphrase| !passphrase.is_empty())
         {
-            options.insert("encrypt.passphrase", Value::from(passphrase));
-            options.insert("encrypt.type", Value::from("luks2"));
+            options.insert("encrypt.passphrase", Variant::from(passphrase));
+            options.insert("encrypt.type", Variant::from("luks2"));
         }
         Ok(options)
     }
 
-    fn remember(&self, block: &str) -> Result<(), String> {
+    async fn remember(&self, block: &str) -> Result<(), String> {
         match self.passphrase.as_deref() {
             Some(passphrase) if self.remember && !passphrase.is_empty() => {
-                encryption::remember(block, passphrase)
+                encryption::remember(block, passphrase).await
             }
             _ => Ok(()),
         }
     }
 }
 
-pub fn format_volume(block: &str, format: &Format) -> Result<(), String> {
-    mounting::release(block)?;
+pub async fn format_volume(block: &str, format: &Format) -> Result<(), String> {
+    mounting::release(block).await?;
     udisks::run(
         block,
         BLOCK,
         "Format",
         &(format.filesystem.as_str(), format.options(true, true)?),
-    )?;
-    format.remember(block)
+    )
+    .await?;
+    format.remember(block).await
 }
 
-pub fn format_drive(
+pub async fn format_drive(
     block: &str,
     size: u64,
     removable: bool,
     format: &Format,
 ) -> Result<(), String> {
-    let objects = udisks::objects()?;
+    let objects = udisks::objects().await?;
     for path in partitions(&objects, block) {
-        mounting::release_in(&objects, &path)?;
+        mounting::release_in(&objects, &path).await?;
     }
-    mounting::release_in(&objects, block)?;
+    mounting::release_in(&objects, block).await?;
     let table = if removable && size < LARGE_TABLE {
         "dos"
     } else {
         "gpt"
     };
     let mut options = no_options();
-    options.insert("tear-down", Value::from(true));
+    options.insert("tear-down", Variant::from(true));
     if format.erase {
-        options.insert("erase", Value::from("zero"));
+        options.insert("erase", Variant::from("zero"));
     }
-    udisks::run(block, BLOCK, "Format", &(table, options))?;
-    create_partition(block, ALIGNMENT, 0, format, false)
+    udisks::run(block, BLOCK, "Format", &(table, options)).await?;
+    create_partition(block, ALIGNMENT, 0, format, false).await
 }
 
-pub fn create_partition(
+pub async fn create_partition(
     table: &str,
     offset: u64,
     size: u64,
     format: &Format,
     erase: bool,
 ) -> Result<(), String> {
-    let created = create_typed(table, (offset, size), ("", ""), format, erase)?;
-    format.remember(&created)
+    let created = create_typed(table, (offset, size), ("", ""), format, erase).await?;
+    format.remember(&created).await
 }
 
-pub fn create_typed(
+pub async fn create_typed(
     table: &str,
     (offset, size): (u64, u64),
     (kind, name): (&str, &str),
@@ -164,12 +164,13 @@ pub fn create_typed(
             format.options(erase, kind.is_empty())?,
         ),
     )
+    .await
 }
 
-fn partitions(objects: &luft_app::dbus::objects::Objects, block: &str) -> Vec<String> {
+fn partitions(objects: &Objects, block: &str) -> Vec<String> {
     objects
         .get(block, TABLE)
-        .and_then(|table| table.get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions"))
+        .and_then(|table| table.get::<Vec<OwnedObjectPath>>("Partitions"))
         .unwrap_or_default()
         .into_iter()
         .map(|path| path.to_string())

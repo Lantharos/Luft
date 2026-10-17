@@ -1,5 +1,6 @@
 mod watch;
 
+use futures_util::future::join;
 use luft_software::packagekit::{self, Mode, PackageId, Results, Update, offline};
 use luft_software::progress::Progress;
 use luft_software::task::{Cancel, Task};
@@ -28,8 +29,8 @@ fn ids(updates: &[Update]) -> Vec<PackageId> {
         .collect()
 }
 
-fn covered(updates: &[PackageId]) -> bool {
-    let prepared: Vec<PackageId> = offline::prepared().unwrap_or_default();
+async fn covered(updates: &[PackageId]) -> bool {
+    let prepared: Vec<PackageId> = offline::prepared().await.unwrap_or_default();
     !updates.is_empty()
         && updates
             .iter()
@@ -43,38 +44,65 @@ fn listed() -> Option<Vec<Update>> {
     }
 }
 
-fn system_updates() -> Result<Vec<PackageId>, String> {
+async fn system_updates() -> Result<Vec<PackageId>, String> {
     match listed() {
         Some(updates) => Ok(ids(&updates)),
-        None => Ok(ids(&PackageUpdates::load(Mode::Quiet)?.system)),
+        None => Ok(ids(&PackageUpdates::load(Mode::Quiet).await?.system)),
     }
+}
+
+async fn load(refresh: Option<Task<'_>>) -> Result<Loaded, String> {
+    if let Some(task) = refresh {
+        packagekit::refresh(true, Mode::Interactive, Some(task)).await?;
+    }
+    let packages = PackageUpdates::load(Mode::Quiet).await?;
+    let (prepared, results) = join(covered(&ids(&packages.system)), offline::results()).await;
+    Ok(Loaded {
+        package_apps: packages.apps.len(),
+        system: System::Packages(Overview {
+            prepared,
+            updates: packages.system,
+            results,
+        }),
+    })
+}
+
+async fn check_in_background(download: bool) -> Result<Option<Notice>, String> {
+    packagekit::refresh(false, Mode::Background, None).await?;
+    Checked::now()?;
+    let updates = ids(&PackageUpdates::load(Mode::Background).await?.system);
+    if updates.is_empty() || covered(&updates).await {
+        return Ok(None);
+    }
+    if !download {
+        return Ok(Some(AVAILABLE));
+    }
+    let quiet = |_: Progress| {};
+    packagekit::prepare(
+        &updates,
+        Task {
+            report: &quiet,
+            cancel: &Cancel::default(),
+        },
+    )
+    .await?;
+    Ok(Some(READY))
 }
 
 impl Backend for Packages {
     fn load(&self, refresh: Option<Task>) -> Result<Loaded, String> {
-        if let Some(task) = refresh {
-            packagekit::refresh(true, Mode::Interactive, Some(task))?;
-        }
-        let packages = PackageUpdates::load(Mode::Quiet)?;
-        Ok(Loaded {
-            package_apps: packages.apps.len(),
-            system: System::Packages(Overview {
-                prepared: covered(&ids(&packages.system)),
-                updates: packages.system,
-                results: offline::results(),
-            }),
-        })
+        luft_app::block_on(load(refresh))
     }
 
     fn download(&self, task: Task) -> Result<(), String> {
-        packagekit::prepare(&system_updates()?, task)
+        luft_app::block_on(async { packagekit::prepare(&system_updates().await?, task).await })
     }
 
     fn downloaded(&self) {
         let Some(updates) = listed() else {
             return;
         };
-        let prepared = covered(&ids(&updates));
+        let prepared = luft_app::block_on(covered(&ids(&updates)));
         state::edit_overview(|overview| {
             if let System::Packages(packages) = &mut overview.system {
                 packages.prepared = prepared;
@@ -87,24 +115,7 @@ impl Backend for Packages {
     }
 
     fn check_in_background(&self, download: bool) -> Result<Option<Notice>, String> {
-        packagekit::refresh(false, Mode::Background, None)?;
-        Checked::now()?;
-        let updates = ids(&PackageUpdates::load(Mode::Background)?.system);
-        if updates.is_empty() || covered(&updates) {
-            return Ok(None);
-        }
-        if !download {
-            return Ok(Some(AVAILABLE));
-        }
-        let quiet = |_: Progress| {};
-        packagekit::prepare(
-            &updates,
-            Task {
-                report: &quiet,
-                cancel: &Cancel::default(),
-            },
-        )?;
-        Ok(Some(READY))
+        luft_app::block_on(check_in_background(download))
     }
 
     fn watch(&self) {
@@ -112,6 +123,6 @@ impl Backend for Packages {
     }
 
     fn scan(&self) {
-        watch::scan();
+        luft_app::spawn(watch::scan());
     }
 }

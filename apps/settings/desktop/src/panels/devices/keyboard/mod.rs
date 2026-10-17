@@ -41,7 +41,7 @@ fn app_names(Apps { ids }: Apps) -> Result<HashMap<String, String>, String> {
 pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
         .command("keyboard_layouts", |_: Value| Ok(layouts::all()))
-        .command("keyboard_input_methods", |_: Value| methods::all())
+        .command_async("keyboard_input_methods", |_: Value| methods::all())
         .command("keyboard_keys_installed", |_: Value| {
             Ok(gio_unix::DesktopAppInfo::new(KEYS).is_some())
         })

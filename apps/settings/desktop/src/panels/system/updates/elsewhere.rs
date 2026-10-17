@@ -12,8 +12,9 @@ pub fn finished() {
     backend::current().scan();
 }
 
-fn process_of(sender: &str) -> Option<u32> {
+async fn process_of(sender: &str) -> Option<u32> {
     dbus::system()
+        .await
         .ok()?
         .call_method(
             Some("org.freedesktop.DBus"),
@@ -22,6 +23,7 @@ fn process_of(sender: &str) -> Option<u32> {
             "GetConnectionUnixProcessID",
             &(sender,),
         )
+        .await
         .and_then(|reply| reply.body().deserialize())
         .ok()
 }
@@ -45,8 +47,9 @@ pub fn display_name(command: &str) -> Option<String> {
     Some(name.into())
 }
 
-pub fn sent_by(sender: &str) -> Option<String> {
+pub async fn sent_by(sender: &str) -> Option<String> {
     process_of(sender)
+        .await
         .and_then(command)
         .and_then(|command| display_name(&command))
 }

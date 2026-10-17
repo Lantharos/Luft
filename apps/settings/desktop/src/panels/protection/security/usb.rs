@@ -1,6 +1,7 @@
+use luft_app::dbus::{error_message, failed};
 use serde::Serialize;
 
-use super::properties::{Service, absent, failed, get};
+use super::properties::{Service, absent, get};
 
 pub const USB_PROTECTION: Service = Service {
     name: "com.lantharos.UsbProtection1",
@@ -23,8 +24,8 @@ pub struct UsbProtection {
     held: Vec<Device>,
 }
 
-pub fn read() -> Result<Option<UsbProtection>, String> {
-    Ok(USB_PROTECTION.read()?.map(|properties| {
+pub async fn read() -> Result<Option<UsbProtection>, String> {
+    Ok(USB_PROTECTION.read().await?.map(|properties| {
         let held: Vec<(String, String)> = get(&properties, "Held").unwrap_or_default();
         UsbProtection {
             enabled: get(&properties, "Enabled").unwrap_or_default(),
@@ -37,12 +38,13 @@ pub fn read() -> Result<Option<UsbProtection>, String> {
     }))
 }
 
-pub fn set_enabled(enabled: bool) -> Result<(), String> {
+pub async fn set_enabled(enabled: bool) -> Result<(), String> {
     USB_PROTECTION
         .change("SetEnabled", &enabled)
-        .map_err(|error| match error {
-            zbus::Error::MethodError(_, Some(message), _) => message,
-            error if absent(&error) => "USB protection isn't available on this computer".into(),
-            error => failed(error),
+        .await
+        .map_err(|error| match error_message(&error) {
+            Some(message) => message.to_owned(),
+            None if absent(&error) => "USB protection isn't available on this computer".into(),
+            None => failed(error),
         })
 }

@@ -51,9 +51,9 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
     let watch_events = events.clone();
     let watcher = watcher.clone();
     window
-        .command("app_state", |_: Value| {
+        .command_async("app_state", |_: Value| async {
             Ok(AppState {
-                appearance: Appearance::current(),
+                appearance: Appearance::current().await,
                 page: std::env::args()
                     .skip(1)
                     .find(|argument| argument.starts_with(PAGE_SCHEME)),

@@ -41,24 +41,24 @@ fn open_file(reloader: &Reloader, OpenFile { path }: OpenFile) -> Result<Opened,
     }
 }
 
+async fn app_state(_: Value) -> Result<AppState, String> {
+    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    Ok(AppState {
+        appearance: Appearance::current().await,
+        link: arguments
+            .iter()
+            .find(|argument| argument.starts_with(LINK_SCHEME))
+            .cloned(),
+        files: arguments
+            .into_iter()
+            .filter(|argument| !argument.starts_with(LINK_SCHEME) && !argument.starts_with('-'))
+            .collect(),
+    })
+}
+
 pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
     window
-        .command("app_state", |_: Value| {
-            let arguments: Vec<String> = std::env::args().skip(1).collect();
-            Ok(AppState {
-                appearance: Appearance::current(),
-                link: arguments
-                    .iter()
-                    .find(|argument| argument.starts_with(LINK_SCHEME))
-                    .cloned(),
-                files: arguments
-                    .into_iter()
-                    .filter(|argument| {
-                        !argument.starts_with(LINK_SCHEME) && !argument.starts_with('-')
-                    })
-                    .collect(),
-            })
-        })
+        .command_async("app_state", app_state)
         .with("open_file", reloader, open_file)
         .command("characters", |_: Value| Ok(characters::all()))
         .command("input_sources", |_: Value| sources::list())

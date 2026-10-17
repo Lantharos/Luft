@@ -3,8 +3,7 @@ use std::time::SystemTime;
 
 use xkbcommon::xkb::Keysym;
 use zbus::object_server::SignalEmitter;
-use zbus::zvariant::Value;
-use zbus::{fdo, interface};
+use zbus::{Variant, fdo, interface};
 
 use super::composer::{Composed, Composer};
 use super::wire;
@@ -127,7 +126,7 @@ impl InputMethod {
     }
 }
 
-#[interface(name = "org.freedesktop.IBus.Engine")]
+#[interface(name = "org.freedesktop.IBus.Engine", spawn = false)]
 impl InputMethod {
     async fn process_key_event(
         &mut self,
@@ -251,7 +250,7 @@ impl InputMethod {
         self.feed(&emitter, Input::Down).await.map(drop)
     }
 
-    async fn set_surrounding_text(&mut self, text: Value<'_>, cursor_pos: u32, _anchor_pos: u32) {
+    async fn set_surrounding_text(&mut self, text: Variant<'_>, cursor_pos: u32, _anchor_pos: u32) {
         if let Some(text) = wire::plain(&text) {
             let before: String = text.chars().take(cursor_pos as usize).collect();
             self.session.surrounding(&before);
@@ -272,9 +271,9 @@ impl InputMethod {
 
     async fn cancel_hand_writing(&self, _n_strokes: u32) {}
 
-    async fn panel_extension_received(&self, _event: Value<'_>) {}
+    async fn panel_extension_received(&self, _event: Variant<'_>) {}
 
-    async fn panel_extension_register_keys(&self, _data: Value<'_>) {}
+    async fn panel_extension_register_keys(&self, _data: Variant<'_>) {}
 
     #[zbus(property)]
     fn focus_id(&self) -> bool {
@@ -287,12 +286,12 @@ impl InputMethod {
     }
 
     #[zbus(signal)]
-    async fn commit_text(emitter: &SignalEmitter<'_>, text: &Value<'_>) -> zbus::Result<()>;
+    async fn commit_text(emitter: &SignalEmitter<'_>, text: &Variant<'_>) -> zbus::Result<()>;
 
     #[zbus(signal)]
     async fn update_preedit_text(
         emitter: &SignalEmitter<'_>,
-        text: &Value<'_>,
+        text: &Variant<'_>,
         cursor_pos: u32,
         visible: bool,
         mode: u32,
@@ -301,7 +300,7 @@ impl InputMethod {
     #[zbus(signal)]
     async fn update_lookup_table(
         emitter: &SignalEmitter<'_>,
-        table: &Value<'_>,
+        table: &Variant<'_>,
         visible: bool,
     ) -> zbus::Result<()>;
 }

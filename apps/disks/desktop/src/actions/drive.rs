@@ -1,26 +1,28 @@
+use zbus::OwnedObjectPath;
+
 use super::mounting;
 use crate::udisks::{self, ATA, DRIVE, NVME, TABLE, no_options};
 
-pub fn safely_remove(drive: &str, block: &str) -> Result<(), String> {
-    let objects = udisks::objects()?;
+pub async fn safely_remove(drive: &str, block: &str) -> Result<(), String> {
+    let objects = udisks::objects().await?;
     let partitions = objects
         .get(block, TABLE)
-        .and_then(|table| table.get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions"))
+        .and_then(|table| table.get::<Vec<OwnedObjectPath>>("Partitions"))
         .unwrap_or_default();
     for partition in &partitions {
-        mounting::release_in(&objects, partition.as_str())?;
+        mounting::release_in(&objects, partition.as_str()).await?;
     }
-    mounting::release_in(&objects, block)?;
+    mounting::release_in(&objects, block).await?;
     let info = objects.get(drive, DRIVE).ok_or("This drive is gone")?;
     if info.flag("CanPowerOff") {
-        udisks::run(drive, DRIVE, "PowerOff", &(no_options(),))
+        udisks::run(drive, DRIVE, "PowerOff", &(no_options(),)).await
     } else {
-        udisks::run(drive, DRIVE, "Eject", &(no_options(),))
+        udisks::run(drive, DRIVE, "Eject", &(no_options(),)).await
     }
 }
 
-fn health_interface(drive: &str) -> Result<&'static str, String> {
-    let objects = udisks::objects()?;
+async fn health_interface(drive: &str) -> Result<&'static str, String> {
+    let objects = udisks::objects().await?;
     if objects.get(drive, ATA).is_some() {
         Ok(ATA)
     } else if objects.get(drive, NVME).is_some() {
@@ -30,21 +32,23 @@ fn health_interface(drive: &str) -> Result<&'static str, String> {
     }
 }
 
-pub fn start_selftest(drive: &str, extended: bool) -> Result<(), String> {
+pub async fn start_selftest(drive: &str, extended: bool) -> Result<(), String> {
     let kind = if extended { "extended" } else { "short" };
     udisks::run(
         drive,
-        health_interface(drive)?,
+        health_interface(drive).await?,
         "SmartSelftestStart",
         &(kind, no_options()),
     )
+    .await
 }
 
-pub fn stop_selftest(drive: &str) -> Result<(), String> {
+pub async fn stop_selftest(drive: &str) -> Result<(), String> {
     udisks::run(
         drive,
-        health_interface(drive)?,
+        health_interface(drive).await?,
         "SmartSelftestAbort",
         &(no_options(),),
     )
+    .await
 }

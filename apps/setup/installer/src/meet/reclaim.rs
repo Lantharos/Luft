@@ -9,6 +9,7 @@ use luft_meet::{Folder, Handoff};
 use crate::system::command::Tool;
 use crate::system::files::write;
 use crate::system::mount::{self, Mounted};
+use crate::system::wait;
 
 const RECORD: &str = "meet.json";
 const PHYSICAL_ROOT: &str = "/sysroot";
@@ -53,7 +54,7 @@ fn root_device() -> Result<String> {
 }
 
 fn remove_partitions(handoff: &Handoff) -> Result<()> {
-    let objects = udisks::objects().map_err(anyhow::Error::msg)?;
+    let objects = wait(udisks::objects()).map_err(anyhow::Error::msg)?;
     let drives = snapshot::build(&objects).drives;
     let ours: Vec<&str> = handoff.partitions().collect();
     for drive in &drives {
@@ -61,9 +62,14 @@ fn remove_partitions(handoff: &Handoff) -> Result<()> {
             if let Segment::Volume(volume) = segment
                 && ours.contains(&volume.partition_uuid.to_ascii_lowercase().as_str())
             {
-                udisks::run(&volume.block, PARTITION, "Delete", &(no_options(),))
-                    .map_err(anyhow::Error::msg)
-                    .with_context(|| format!("Couldn't remove {}", volume.device))?;
+                wait(udisks::run(
+                    &volume.block,
+                    PARTITION,
+                    "Delete",
+                    &(no_options(),),
+                ))
+                .map_err(anyhow::Error::msg)
+                .with_context(|| format!("Couldn't remove {}", volume.device))?;
             }
         }
     }
@@ -72,7 +78,7 @@ fn remove_partitions(handoff: &Handoff) -> Result<()> {
 
 fn grow_root() -> Result<()> {
     let device = root_device()?;
-    let objects = udisks::objects().map_err(anyhow::Error::msg)?;
+    let objects = wait(udisks::objects()).map_err(anyhow::Error::msg)?;
     for drive in snapshot::build(&objects).drives {
         let free: Vec<Span> = drive
             .segments
@@ -97,8 +103,13 @@ fn grow_root() -> Result<()> {
                 },
                 &free,
             ) {
-                udisks::run(&root.block, PARTITION, "Resize", &(size, no_options()))
-                    .map_err(anyhow::Error::msg)?;
+                wait(udisks::run(
+                    &root.block,
+                    PARTITION,
+                    "Resize",
+                    &(size, no_options()),
+                ))
+                .map_err(anyhow::Error::msg)?;
             }
             return Tool::new("btrfs")
                 .args(["filesystem", "resize", "max", WRITABLE_ROOT])

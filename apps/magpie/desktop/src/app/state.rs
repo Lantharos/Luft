@@ -38,10 +38,10 @@ impl MagpieState {
         }
     }
 
-    pub fn app_state(&self) -> AppState {
+    pub async fn app_state(&self) -> AppState {
         AppState {
             launch_paths: self.launch_paths.to_vec(),
-            appearance: Appearance::current(),
+            appearance: Appearance::current().await,
         }
     }
 }

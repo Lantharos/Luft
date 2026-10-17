@@ -1,8 +1,8 @@
 use std::fs;
 
-use luft_app::dbus;
+use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 
 const INCIDENTS: &str = "/var/lib/kestrel-watchdog/incidents";
 
@@ -65,17 +65,22 @@ pub fn problems() -> Result<Vec<Problem>, String> {
     Ok(problems)
 }
 
-pub fn restart_to_firmware() -> Result<(), String> {
+pub async fn restart_to_firmware() -> Result<(), String> {
     let login = Proxy::new(
-        dbus::system()?,
+        dbus::system().await?,
         "org.freedesktop.login1",
         "/org/freedesktop/login1",
         "org.freedesktop.login1.Manager",
     )
-    .map_err(|error| error.to_string())?;
+    .await
+    .map_err(failed)?;
     login
         .call_method("SetRebootToFirmwareSetup", &(true,))
-        .and_then(|_| login.call_method("Reboot", &(true,)))
+        .await
+        .map_err(failed)?;
+    login
+        .call_method("Reboot", &(true,))
+        .await
         .map(|_| ())
-        .map_err(|error| error.to_string())
+        .map_err(failed)
 }

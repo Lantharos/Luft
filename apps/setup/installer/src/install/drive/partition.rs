@@ -4,7 +4,7 @@ use anyhow::{Context, Result, anyhow};
 use luft_dbus::objects::Objects;
 use luft_disks::udisks::{self, BLOCK, Options, TABLE, bytes_text};
 use luft_disks::{mounting, resize};
-use zvariant::{OwnedObjectPath, Value};
+use zbus::{OwnedObjectPath, Variant};
 
 use super::layout::{Part, Role};
 use super::plan::Plan;
@@ -16,7 +16,7 @@ pub struct Created {
 }
 
 fn quiet() -> Options<'static> {
-    HashMap::from([("auth.no_user_interaction", Value::from(true))])
+    HashMap::from([("auth.no_user_interaction", Variant::from(true))])
 }
 
 fn failed(message: String) -> anyhow::Error {
@@ -33,15 +33,19 @@ fn partitions(objects: &Objects, drive: &str) -> Vec<String> {
         .collect()
 }
 
-fn wipe(drive: &str) -> Result<()> {
-    let objects = udisks::objects().map_err(failed)?;
+async fn wipe(drive: &str) -> Result<()> {
+    let objects = udisks::objects().await.map_err(failed)?;
     for partition in partitions(&objects, drive) {
-        mounting::release_in(&objects, &partition).map_err(failed)?;
+        mounting::release_in(&objects, &partition)
+            .await
+            .map_err(failed)?;
     }
-    udisks::run(drive, BLOCK, "Format", &("gpt", quiet())).map_err(failed)
+    udisks::run(drive, BLOCK, "Format", &("gpt", quiet()))
+        .await
+        .map_err(failed)
 }
 
-fn create(drive: &str, part: &Part) -> Result<String> {
+async fn create(drive: &str, part: &Part) -> Result<String> {
     let (offset, size, kind, name) = (
         part.offset,
         part.size,
@@ -50,19 +54,20 @@ fn create(drive: &str, part: &Part) -> Result<String> {
     );
     let (filesystem, label) = part.role.filesystem();
     let mut format = quiet();
-    format.insert("label", Value::from(label));
+    format.insert("label", Variant::from(label));
     udisks::created(
         drive,
         TABLE,
         "CreatePartitionAndFormat",
         &(offset, size, kind, name, quiet(), filesystem, format),
     )
+    .await
     .map_err(failed)
     .with_context(|| format!("Couldn't make the {} partition", part.role.name()))
 }
 
-fn describe(role: Role, block: &str) -> Result<Created> {
-    let objects = udisks::objects().map_err(failed)?;
+async fn describe(role: Role, block: &str) -> Result<Created> {
+    let objects = udisks::objects().await.map_err(failed)?;
     let info = objects
         .get(block, BLOCK)
         .context("A new partition disappeared")?;
@@ -73,17 +78,20 @@ fn describe(role: Role, block: &str) -> Result<Created> {
     })
 }
 
-pub fn apply(plan: &Plan) -> Result<Vec<Created>> {
+pub async fn apply(plan: &Plan) -> Result<Vec<Created>> {
     if plan.wipe {
-        wipe(&plan.drive)?;
+        wipe(&plan.drive).await?;
     }
     if let Some(shrink) = &plan.shrink {
         resize::resize(&shrink.block, shrink.size, true)
+            .await
             .map_err(failed)
             .context("Windows couldn't be made smaller")?;
     }
-    plan.parts
-        .iter()
-        .map(|part| create(&plan.drive, part).and_then(|block| describe(part.role, &block)))
-        .collect()
+    let mut created = Vec::with_capacity(plan.parts.len());
+    for part in &plan.parts {
+        let block = create(&plan.drive, part).await?;
+        created.push(describe(part.role, &block).await?);
+    }
+    Ok(created)
 }

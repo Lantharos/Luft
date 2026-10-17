@@ -1,5 +1,7 @@
+use std::pin::pin;
 use std::sync::Once;
 
+use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
 use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider};
 use luft_app::{Commands, Events};
@@ -57,30 +59,37 @@ struct Address {
     url: String,
 }
 
-fn snapshot() -> Result<Snapshot, String> {
+async fn snapshot() -> Result<Snapshot, String> {
     Ok(Snapshot {
-        accounts: client::accounts()?,
-        drives: client::drives()?,
+        accounts: client::accounts().await?,
+        drives: client::drives().await?,
     })
 }
 
-fn watch(events: Events) {
-    client::watch(move |signal| match signal {
-        Signal::Accounts | Signal::Drives => {
-            if let Ok(snapshot) = snapshot() {
-                events.emit(CHANGED, snapshot);
+async fn watch(events: Events) {
+    let Ok(signals) = client::signals().await else {
+        return;
+    };
+    let mut signals = pin!(signals);
+    while let Some(signal) = signals.next().await {
+        match signal {
+            Signal::Accounts | Signal::Drives => {
+                if let Ok(snapshot) = snapshot().await {
+                    events.emit(CHANGED, snapshot);
+                }
+            }
+            Signal::Step { session, step } => {
+                events.emit(STEP, json!({"session": session, "step": step}));
             }
         }
-        Signal::Step { session, step } => {
-            events.emit(STEP, json!({"session": session, "step": step}));
-        }
-    });
+    }
 }
 
-fn accounts(events: &Events, _: Value) -> Result<Snapshot, String> {
-    let snapshot = snapshot()?;
-    let events = events.clone();
-    WATCH.call_once(|| watch(events));
+async fn accounts(events: Events, _: Value) -> Result<Snapshot, String> {
+    let snapshot = snapshot().await?;
+    WATCH.call_once(|| {
+        luft_app::spawn(watch(events));
+    });
     Ok(snapshot)
 }
 
@@ -88,20 +97,49 @@ fn open(Address { url }: Address) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err("That isn't a web address".to_owned());
     }
-    gio::AppInfo::launch_default_for_uri(&url, gio::AppLaunchContext::NONE).map_err(|error| error.to_string())
+    gio::AppInfo::launch_default_for_uri(&url, gio::AppLaunchContext::NONE)
+        .map_err(|error| error.to_string())
+}
+
+async fn sign_in(
+    SignIn {
+        provider,
+        credentials,
+    }: SignIn,
+) -> Result<String, String> {
+    client::sign_in(provider, &credentials).await
+}
+
+async fn sign_in_again(
+    SignInAgain {
+        account,
+        credentials,
+    }: SignInAgain,
+) -> Result<String, String> {
+    client::sign_in_again(&account, &credentials).await
+}
+
+async fn answer(Answering { session, answer }: Answering) -> Result<(), String> {
+    client::answer(&session, &answer).await
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("accounts", events, accounts)
-        .command("accounts_sign_in", |SignIn { provider, credentials }| client::sign_in(provider, &credentials))
-        .command("accounts_sign_in_again", |SignInAgain { account, credentials }| {
-            client::sign_in_again(&account, &credentials)
+        .with_async("accounts", events, accounts)
+        .command_async("accounts_sign_in", sign_in)
+        .command_async("accounts_sign_in_again", sign_in_again)
+        .command_async("accounts_step", |Session { session }| async move {
+            client::step(&session).await
         })
-        .command("accounts_step", |Session { session }| client::step(&session))
-        .command("accounts_answer", |Answering { session, answer }| client::answer(&session, &answer))
-        .command("accounts_cancel", |Session { session }| client::cancel(&session))
-        .command("accounts_rename", |Rename { account, name }| client::rename(&account, &name))
-        .command("accounts_remove", |Target { account }| client::remove(&account))
+        .command_async("accounts_answer", answer)
+        .command_async("accounts_cancel", |Session { session }| async move {
+            client::cancel(&session).await
+        })
+        .command_async("accounts_rename", |Rename { account, name }| async move {
+            client::rename(&account, &name).await
+        })
+        .command_async("accounts_remove", |Target { account }| async move {
+            client::remove(&account).await
+        })
         .command("accounts_open", open)
 }

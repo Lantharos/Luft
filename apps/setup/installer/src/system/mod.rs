@@ -3,9 +3,17 @@ pub mod files;
 pub mod mount;
 
 use std::ffi::CString;
+use std::future::Future;
 use std::mem::MaybeUninit;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
+
+use tokio::runtime::Handle;
+
+/// Waits for `future` on the service's runtime, from an install job's blocking thread.
+pub fn wait<F: Future>(future: F) -> F::Output {
+    Handle::current().block_on(future)
+}
 
 pub fn used_space(path: &Path) -> Option<u64> {
     let path = CString::new(path.as_os_str().as_bytes()).ok()?;

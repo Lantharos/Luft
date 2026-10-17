@@ -1,5 +1,5 @@
 use serde::Serialize;
-use zbus::blocking::Connection;
+use zbus::Connection;
 
 use super::battery::{self, DESTINATION, DEVICE, Pack};
 use super::failed;
@@ -73,21 +73,22 @@ pub fn read(packs: &[Pack]) -> Option<ChargeLimit> {
     })
 }
 
-pub fn set(connection: &Connection, enabled: bool) -> Result<(), String> {
-    let devices = battery::devices(connection)?;
-    battery::packs(&devices)
+pub async fn set(connection: &Connection, enabled: bool) -> Result<(), String> {
+    let devices = battery::devices(connection).await?;
+    for pack in battery::packs(&devices)
         .iter()
         .filter(|pack| PackLimit::of(pack).supported)
-        .try_for_each(|pack| {
-            connection
-                .call_method(
-                    Some(DESTINATION),
-                    pack.path.as_str(),
-                    Some(DEVICE),
-                    "EnableChargeThreshold",
-                    &enabled,
-                )
-                .map(|_| ())
-                .map_err(failed)
-        })
+    {
+        connection
+            .call_method(
+                Some(DESTINATION),
+                pack.path.as_str(),
+                Some(DEVICE),
+                "EnableChargeThreshold",
+                &enabled,
+            )
+            .await
+            .map_err(failed)?;
+    }
+    Ok(())
 }

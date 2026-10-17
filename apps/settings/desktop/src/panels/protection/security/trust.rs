@@ -1,7 +1,10 @@
+use futures_util::future::join;
+use luft_app::dbus::{error_message, error_name, failed};
 use serde::Serialize;
-use zbus::zvariant::{DynamicType, OwnedValue};
+use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedVariant};
 
-use super::properties::{Map, Service, absent, failed, get};
+use super::properties::{Map, Service, absent, get};
 
 pub const TRUST: Service = Service {
     name: "com.lantharos.Trust1",
@@ -123,7 +126,7 @@ fn flag(map: &Map, key: &str) -> bool {
 }
 
 fn group(properties: &Map, name: &str) -> Map {
-    get::<OwnedValue>(properties, name)
+    get::<OwnedVariant>(properties, name)
         .and_then(|value| Map::try_from(value).ok())
         .unwrap_or_default()
 }
@@ -176,8 +179,8 @@ fn disk(map: &Map) -> Disk {
     }
 }
 
-fn drives() -> Drives {
-    let Ok(Some(properties)) = DRIVES.read() else {
+async fn drives() -> Drives {
+    let Ok(Some(properties)) = DRIVES.read().await else {
         return Drives::default();
     };
     let entries: std::collections::HashMap<String, Map> =
@@ -200,9 +203,13 @@ fn drives() -> Drives {
     }
 }
 
-pub fn read() -> Result<Option<Trust>, String> {
-    Ok(TRUST.read()?.map(|properties| Trust {
-        drives: drives(),
+pub async fn read() -> Result<Option<Trust>, String> {
+    let (properties, drives) = join(TRUST.read(), drives()).await;
+    let Some(properties) = properties? else {
+        return Ok(None);
+    };
+    Ok(Some(Trust {
+        drives,
         secure_boot: text(&properties, "SecureBoot"),
         tpm: tpm(&group(&properties, "Tpm")),
         signing_key: signing_key(&group(&properties, "SigningKey")),
@@ -213,42 +220,42 @@ pub fn read() -> Result<Option<Trust>, String> {
 }
 
 fn explain(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(name, Some(message), _) if name.starts_with(ERROR) => message,
-        zbus::Error::MethodError(name, _, _) if name.ends_with("NotAuthorized") => {
+    let name = error_name(&error).unwrap_or_default();
+    match error_message(&error) {
+        Some(message) if name.starts_with(ERROR) => message.to_owned(),
+        _ if name.ends_with("NotAuthorized") => {
             "Administrator rights are needed to change this".to_owned()
         }
-        error if absent(&error) => "Device security isn't available on this computer".to_owned(),
-        error => failed(error),
+        _ if absent(&error) => "Device security isn't available on this computer".to_owned(),
+        _ => failed(error),
     }
 }
 
-pub fn call<B, R>(method: &str, body: &B) -> Result<R, String>
+pub async fn call<B, R>(method: &str, body: &B) -> Result<R, String>
 where
     B: Serialize + DynamicType,
-    R: for<'d> zbus::zvariant::DynamicDeserialize<'d>,
+    R: for<'d> DynamicDeserialize<'d>,
 {
-    TRUST.change(method, body).map_err(explain)
+    TRUST.change(method, body).await.map_err(explain)
 }
 
-pub fn unlocking<B, R>(method: &str, body: &B) -> Result<Outcome<R>, String>
+pub async fn unlocking<B, R>(method: &str, body: &B) -> Result<Outcome<R>, String>
 where
     B: Serialize + DynamicType,
-    R: for<'d> zbus::zvariant::DynamicDeserialize<'d>,
+    R: for<'d> DynamicDeserialize<'d>,
 {
-    match TRUST.change(method, body) {
+    match TRUST.change(method, body).await {
         Ok(value) => Ok(Outcome::Done(value)),
-        Err(zbus::Error::MethodError(name, message, _)) if name.as_str() == WRONG_KEY => {
-            Ok(Outcome::WrongKey(message.unwrap_or_else(|| {
-                "That key didn't unlock the disk".into()
-            })))
-        }
+        Err(error) if error_name(&error).as_deref() == Some(WRONG_KEY) => Ok(Outcome::WrongKey(
+            error_message(&error)
+                .map_or_else(|| "That key didn't unlock the disk".into(), str::to_owned),
+        )),
         Err(error) => Err(explain(error)),
     }
 }
 
-pub fn checks() -> Result<Vec<Check>, String> {
-    let checks: Vec<(String, bool, String)> = call("CheckEncryption", &())?;
+pub async fn checks() -> Result<Vec<Check>, String> {
+    let checks: Vec<(String, bool, String)> = call("CheckEncryption", &()).await?;
     Ok(checks
         .into_iter()
         .map(|(id, passed, sentence)| Check {

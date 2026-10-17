@@ -14,7 +14,7 @@ use params::*;
 
 pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
     let window = window
-        .with("app_state", state, |state, Empty {}| state.app_state())
+        .with_async("app_state", state, |state, Empty {}| state.app_state())
         .command(
             "resolve_arguments",
             |Arguments {

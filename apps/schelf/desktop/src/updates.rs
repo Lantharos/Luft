@@ -10,6 +10,7 @@ use luft_software::{packages, toolbox};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
+use tokio::task::{JoinHandle, spawn_blocking};
 
 use crate::library::Source;
 
@@ -146,19 +147,25 @@ fn installed_tools() -> Result<Vec<AppUpdate>, String> {
     }
 }
 
-fn check(_: Value) -> Result<Updates, String> {
-    let (packages, flatpaks, appimages, tools) = std::thread::scope(|scope| {
-        let packages = scope.spawn(|| packages::updates().map(packages));
-        let flatpaks = scope.spawn(|| flatpak::updates().map(flatpaks));
-        let tools = scope.spawn(installed_tools);
-        let appimages = scope.spawn(appimages);
-        (
-            packages.join().unwrap_or_else(|_| Err(String::new())),
-            flatpaks.join().unwrap_or_else(|_| Err(String::new())),
-            appimages.join().unwrap_or_default(),
-            tools.join().unwrap_or_else(|_| Err(String::new())),
-        )
-    });
+async fn package_updates() -> Result<Vec<AppUpdate>, String> {
+    let updates = packages::updates().await?;
+    spawn_blocking(move || packages(updates))
+        .await
+        .map_err(|error| error.to_string())
+}
+
+async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
+    work.await.unwrap_or_else(|error| Err(error.to_string()))
+}
+
+async fn check(_: Value) -> Result<Updates, String> {
+    let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
+    let tools = spawn_blocking(installed_tools);
+    let appimages = spawn_blocking(appimages);
+    let packages = package_updates().await;
+    let flatpaks = joined(flatpaks).await;
+    let tools = joined(tools).await;
+    let appimages = appimages.await.unwrap_or_default();
     let error = [&packages, &flatpaks, &tools]
         .into_iter()
         .find_map(|result| result.as_ref().err())
@@ -178,5 +185,5 @@ fn check(_: Value) -> Result<Updates, String> {
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    window.command("updates_check", check)
+    window.command_async("updates_check", check)
 }

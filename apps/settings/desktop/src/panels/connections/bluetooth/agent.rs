@@ -3,12 +3,10 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{LazyLock, Mutex};
 
 use luft_app::Events;
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use luft_app::dbus::{self, failed};
 use serde::Serialize;
 use tokio::sync::oneshot;
-use zbus::blocking::Proxy;
-use zbus::zvariant::{ObjectPath, OwnedValue};
+use zbus::{ObjectPath, OwnedVariant, Proxy};
 
 use super::{DEVICE, SERVICE};
 
@@ -67,7 +65,7 @@ async fn device_name(connection: &zbus::Connection, device: &ObjectPath<'_>) -> 
         .await;
     reply
         .ok()
-        .and_then(|reply| reply.body().deserialize::<OwnedValue>().ok())
+        .and_then(|reply| reply.body().deserialize::<OwnedVariant>().ok())
         .and_then(|alias| String::try_from(alias).ok())
         .unwrap_or_default()
 }
@@ -207,18 +205,20 @@ pub fn answer(id: u32, value: Option<String>) {
     }
 }
 
-fn manager() -> Result<Proxy<'static>, String> {
+async fn manager() -> Result<Proxy<'static>, String> {
     Proxy::new(
-        dbus::system()?,
+        dbus::system().await?,
         SERVICE,
         "/org/bluez",
         "org.bluez.AgentManager1",
     )
+    .await
     .map_err(failed)
 }
 
-pub fn register(events: &Events) -> Result<(), String> {
-    dbus::system()?
+pub async fn register(events: &Events) -> Result<(), String> {
+    dbus::system()
+        .await?
         .object_server()
         .at(
             PATH,
@@ -226,24 +226,29 @@ pub fn register(events: &Events) -> Result<(), String> {
                 events: events.clone(),
             },
         )
+        .await
         .map_err(failed)?;
-    let manager = manager()?;
+    let manager = manager().await?;
     let path = ObjectPath::from_static_str_unchecked(PATH);
     manager
         .call_method("RegisterAgent", &(&path, CAPABILITY))
+        .await
         .map_err(failed)?;
     manager
         .call_method("RequestDefaultAgent", &(&path,))
+        .await
         .map(drop)
         .map_err(failed)
 }
 
-pub fn unregister(events: &Events) {
+pub async fn unregister(events: &Events) {
     cancel(events);
-    if let Ok(manager) = manager() {
-        let _ = manager.call_method(
-            "UnregisterAgent",
-            &(ObjectPath::from_static_str_unchecked(PATH),),
-        );
+    if let Ok(manager) = manager().await {
+        let _ = manager
+            .call_method(
+                "UnregisterAgent",
+                &(ObjectPath::from_static_str_unchecked(PATH),),
+            )
+            .await;
     }
 }

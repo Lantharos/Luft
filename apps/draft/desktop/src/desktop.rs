@@ -4,8 +4,7 @@ use std::path::{Path, PathBuf};
 use luft_app::portal::{FileChooser, uri_path};
 use luft_app::{dbus, file_manager};
 use serde::Deserialize;
-use zbus::blocking::Proxy;
-use zbus::zvariant::{OwnedObjectPath, Value};
+use zbus::{OwnedObjectPath, Proxy, Variant};
 
 use crate::files::{Target, failed};
 
@@ -34,7 +33,7 @@ fn paths(uris: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-pub fn choose_files(Open { folder }: Open) -> Result<Vec<String>, String> {
+pub async fn choose_files(Open { folder }: Open) -> Result<Vec<String>, String> {
     FileChooser {
         title: "Open",
         multiple: true,
@@ -42,10 +41,11 @@ pub fn choose_files(Open { folder }: Open) -> Result<Vec<String>, String> {
         ..FileChooser::default()
     }
     .open()
+    .await
     .map(paths)
 }
 
-pub fn choose_folder(Open { folder }: Open) -> Result<Option<String>, String> {
+pub async fn choose_folder(Open { folder }: Open) -> Result<Option<String>, String> {
     FileChooser {
         title: "Open Folder",
         directory: true,
@@ -53,10 +53,11 @@ pub fn choose_folder(Open { folder }: Open) -> Result<Option<String>, String> {
         ..FileChooser::default()
     }
     .open()
+    .await
     .map(|uris| paths(uris).into_iter().next())
 }
 
-pub fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, String> {
+pub async fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, String> {
     FileChooser {
         title: "Save As",
         current_name: Some(&name),
@@ -64,30 +65,33 @@ pub fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, String
         ..FileChooser::default()
     }
     .save()
+    .await
     .map(|uri| uri.and_then(|uri| uri_path(&uri)))
     .map(|path| path.map(|path| path.to_string_lossy().into_owned()))
 }
 
-pub fn show_in_folder(Target { path }: Target) -> Result<(), String> {
-    file_manager::show_in_folder(Path::new(&path))
+pub async fn show_in_folder(Target { path }: Target) -> Result<(), String> {
+    file_manager::show_in_folder(Path::new(&path)).await
 }
 
-pub fn open_link(Link { uri }: Link) -> Result<(), String> {
+pub async fn open_link(Link { uri }: Link) -> Result<(), String> {
     if !LINK_SCHEMES.iter().any(|scheme| uri.starts_with(scheme)) {
         return Err("Only web and mail links open outside Draft".into());
     }
-    Proxy::new(
-        dbus::session()?,
+    let proxy = Proxy::new(
+        dbus::session().await?,
         "org.freedesktop.portal.Desktop",
         "/org/freedesktop/portal/desktop",
         "org.freedesktop.portal.OpenURI",
     )
-    .and_then(|proxy| {
-        proxy.call::<_, _, OwnedObjectPath>(
+    .await
+    .map_err(failed)?;
+    proxy
+        .call::<_, _, OwnedObjectPath>(
             "OpenURI",
-            &("", uri.as_str(), HashMap::<&str, Value>::new()),
+            &("", uri.as_str(), HashMap::<&str, Variant>::new()),
         )
-    })
-    .map(drop)
-    .map_err(failed)
+        .await
+        .map(drop)
+        .map_err(failed)
 }

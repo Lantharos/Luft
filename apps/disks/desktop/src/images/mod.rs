@@ -10,6 +10,7 @@ use luft_app::Events;
 use luft_app::portal::{self, FileChooser, Filter};
 use parking_lot::Mutex;
 use serde::Serialize;
+use zbus::OwnedObjectPath;
 
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, TABLE, no_options};
@@ -66,12 +67,22 @@ pub fn default_folder() -> String {
 }
 
 impl Imaging {
-    pub fn create(&self, events: &Events, block: &str, destination: &Path) -> Result<(), String> {
+    pub async fn create(
+        &self,
+        events: &Events,
+        block: &str,
+        destination: &Path,
+    ) -> Result<(), String> {
         if destination.exists() {
             return Err("A file with that name is already there".to_owned());
         }
-        let source: zbus::zvariant::OwnedFd =
-            udisks::call(block, BLOCK, "OpenForBackup", &(no_options(),))?;
+        let size = udisks::objects()
+            .await?
+            .get(block, BLOCK)
+            .and_then(|target| target.get::<u64>("Size"))
+            .unwrap_or(0);
+        let source: zbus::OwnedFd =
+            udisks::call(block, BLOCK, "OpenForBackup", &(no_options(),)).await?;
         let output = File::create_new(destination).map_err(|error| error.to_string())?;
         self.start(
             events,
@@ -80,24 +91,26 @@ impl Imaging {
                 source: File::from(OwnedFd::from(source)),
                 output,
                 destination: destination.to_path_buf(),
+                size,
             },
         )
     }
 
-    pub fn choose_folder(&self) -> Result<Option<String>, String> {
+    pub async fn choose_folder(&self) -> Result<Option<String>, String> {
         let chosen = FileChooser {
             title: "Choose a folder",
             directory: true,
             ..FileChooser::default()
         }
-        .open()?;
+        .open()
+        .await?;
         Ok(chosen
             .first()
             .and_then(|uri| portal::uri_path(uri))
             .map(|path| path.to_string_lossy().into_owned()))
     }
 
-    pub fn choose(&self) -> Result<Option<ChosenImage>, String> {
+    pub async fn choose(&self) -> Result<Option<ChosenImage>, String> {
         let filter = Filter {
             name: "Disk images",
             patterns: IMAGE_PATTERNS
@@ -105,7 +118,7 @@ impl Imaging {
                 .map(|pattern| pattern.to_string())
                 .collect(),
         };
-        let Some(uri) = portal::open_file("Choose a disk image", filter)? else {
+        let Some(uri) = portal::open_file("Choose a disk image", filter).await? else {
             return Ok(None);
         };
         let path =
@@ -113,9 +126,9 @@ impl Imaging {
         ChosenImage::read(&path).map(Some)
     }
 
-    pub fn restore(&self, events: &Events, block: &str, image: &Path) -> Result<(), String> {
+    pub async fn restore(&self, events: &Events, block: &str, image: &Path) -> Result<(), String> {
         let input = File::open(image).map_err(|error| error.to_string())?;
-        let objects = udisks::objects()?;
+        let objects = udisks::objects().await?;
         let capacity = objects
             .get(block, BLOCK)
             .and_then(|target| target.get::<u64>("Size"))
@@ -126,14 +139,14 @@ impl Imaging {
         }
         let partitions = objects
             .get(block, TABLE)
-            .and_then(|table| table.get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions"))
+            .and_then(|table| table.get::<Vec<OwnedObjectPath>>("Partitions"))
             .unwrap_or_default();
         for partition in &partitions {
-            mounting::release_in(&objects, partition.as_str())?;
+            mounting::release_in(&objects, partition.as_str()).await?;
         }
-        mounting::release_in(&objects, block)?;
-        let target: zbus::zvariant::OwnedFd =
-            udisks::call(block, BLOCK, "OpenForRestore", &(no_options(),))?;
+        mounting::release_in(&objects, block).await?;
+        let target: zbus::OwnedFd =
+            udisks::call(block, BLOCK, "OpenForRestore", &(no_options(),)).await?;
         self.start(
             events,
             block,

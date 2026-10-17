@@ -51,5 +51,5 @@ pub fn offer(deployments: Deployments, refreshed: bool) -> Option<Offer> {
 }
 
 pub fn run(variant: Variant, task: Task) -> Result<(), String> {
-    image::switch(variant, known_size(variant), task)
+    luft_app::block_on(image::switch(variant, known_size(variant), task))
 }

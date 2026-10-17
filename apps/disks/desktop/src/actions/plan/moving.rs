@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 
 use luft_app::Events;
 use serde::Serialize;
-use zbus::zvariant::Value;
+use zbus::Variant;
 
 use crate::udisks::{self, BLOCK, PARTITION, TABLE, no_options};
 
@@ -33,8 +33,8 @@ struct Entry {
 }
 
 impl Entry {
-    fn read(block: &str) -> Result<Self, String> {
-        let objects = udisks::objects()?;
+    async fn read(block: &str) -> Result<Self, String> {
+        let objects = udisks::objects().await?;
         let partition = objects
             .get(block, PARTITION)
             .ok_or("This partition is gone")?;
@@ -61,9 +61,9 @@ impl Entry {
 struct Disk(File);
 
 impl Disk {
-    fn open(block: &str) -> Result<Self, String> {
-        let descriptor: zbus::zvariant::OwnedFd =
-            udisks::call(block, BLOCK, "OpenDevice", &("rw", no_options()))?;
+    async fn open(block: &str) -> Result<Self, String> {
+        let descriptor: zbus::OwnedFd =
+            udisks::call(block, BLOCK, "OpenDevice", &("rw", no_options())).await?;
         Ok(Self(File::from(OwnedFd::from(descriptor))))
     }
 
@@ -86,38 +86,72 @@ impl Disk {
     }
 }
 
-pub fn shift(events: &Events, block: &str, offset: u64) -> Result<String, String> {
-    let entry = Entry::read(block)?;
-    let length = entry.size;
-    let head = length.min(EDGE);
-    let tail_start = head.max(length.saturating_sub(EDGE));
-    let disk = Disk::open(&entry.table)?;
-    let saved_head = disk.read(entry.offset, head)?;
-    let saved_tail = disk.read(entry.offset + tail_start, length - tail_start)?;
-    copy_body(events, &disk, entry.offset, offset, (head, tail_start))?;
-    disk.sync()?;
-    drop(disk);
+struct Edges {
+    head: Vec<u8>,
+    tail: Vec<u8>,
+    tail_start: u64,
+}
 
-    udisks::run(block, PARTITION, "Delete", &(no_options(),))?;
-    let moved = recreate(&entry, offset)?;
-    let partition = Disk::open(&moved)?;
-    partition.write(0, &saved_head)?;
-    partition.write(tail_start, &saved_tail)?;
-    partition.sync()?;
-    let restored = partition.read(0, head)? == saved_head
-        && partition.read(tail_start, length - tail_start)? == saved_tail;
-    drop(partition);
-    if !restored {
-        return Err("The start of the moved partition didn't read back the same".to_owned());
+impl Edges {
+    fn restore(&self, partition: &Disk) -> Result<(), String> {
+        partition.write(0, &self.head)?;
+        partition.write(self.tail_start, &self.tail)?;
+        partition.sync()?;
+        let restored = partition.read(0, self.head.len() as u64)? == self.head
+            && partition.read(self.tail_start, self.tail.len() as u64)? == self.tail;
+        if !restored {
+            return Err("The start of the moved partition didn't read back the same".to_owned());
+        }
+        Ok(())
     }
-    udisks::run(&moved, BLOCK, "Rescan", &(no_options(),))?;
+}
+
+pub async fn shift(events: &Events, block: &str, offset: u64) -> Result<String, String> {
+    let entry = Entry::read(block).await?;
+    let disk = Disk::open(&entry.table).await?;
+    let events = events.clone();
+    let (from, length) = (entry.offset, entry.size);
+    let edges = blocking(move || move_body(&events, &disk, from, offset, length)).await?;
+
+    udisks::run(block, PARTITION, "Delete", &(no_options(),)).await?;
+    let moved = recreate(&entry, offset).await?;
+    let partition = Disk::open(&moved).await?;
+    blocking(move || edges.restore(&partition)).await?;
+    udisks::run(&moved, BLOCK, "Rescan", &(no_options(),)).await?;
     Ok(moved)
 }
 
-fn recreate(entry: &Entry, offset: u64) -> Result<String, String> {
+async fn blocking<T: Send + 'static>(
+    work: impl FnOnce() -> Result<T, String> + Send + 'static,
+) -> Result<T, String> {
+    tokio::task::spawn_blocking(work)
+        .await
+        .map_err(|error| error.to_string())?
+}
+
+fn move_body(
+    events: &Events,
+    disk: &Disk,
+    from: u64,
+    to: u64,
+    length: u64,
+) -> Result<Edges, String> {
+    let head = length.min(EDGE);
+    let tail_start = head.max(length.saturating_sub(EDGE));
+    let edges = Edges {
+        head: disk.read(from, head)?,
+        tail: disk.read(from + tail_start, length - tail_start)?,
+        tail_start,
+    };
+    copy_body(events, disk, from, to, (head, tail_start))?;
+    disk.sync()?;
+    Ok(edges)
+}
+
+async fn recreate(entry: &Entry, offset: u64) -> Result<String, String> {
     let mut options = no_options();
     if entry.gpt && !entry.uuid.is_empty() {
-        options.insert("partition-uuid", Value::from(entry.uuid.as_str()));
+        options.insert("partition-uuid", Variant::from(entry.uuid.as_str()));
     }
     let name = if entry.gpt { entry.name.as_str() } else { "" };
     let created = udisks::created(
@@ -125,14 +159,16 @@ fn recreate(entry: &Entry, offset: u64) -> Result<String, String> {
         TABLE,
         "CreatePartition",
         &(offset, entry.size, entry.kind.as_str(), name, options),
-    )?;
+    )
+    .await?;
     if entry.flags != 0 {
         udisks::run(
             &created,
             PARTITION,
             "SetFlags",
             &(entry.flags, no_options()),
-        )?;
+        )
+        .await?;
     }
     Ok(created)
 }

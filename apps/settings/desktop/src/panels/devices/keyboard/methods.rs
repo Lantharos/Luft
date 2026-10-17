@@ -1,8 +1,8 @@
 use luft_app::{dbus, ibus};
 use serde::Serialize;
-use zbus::blocking::fdo::PropertiesProxy;
+use zbus::fdo::PropertiesProxy;
 use zbus::names::InterfaceName;
-use zbus::zvariant::{OwnedValue, Structure, Value};
+use zbus::{OwnedVariant, Structure, Variant};
 
 const DESTINATION: &str = "org.freedesktop.IBus";
 const PATH: &str = "/org/freedesktop/IBus";
@@ -20,15 +20,15 @@ pub struct InputMethod {
 
 fn text(structure: &Structure, index: usize) -> Option<String> {
     match structure.fields().get(index)? {
-        Value::Str(text) => Some(text.to_string()),
+        Variant::Str(text) => Some(text.to_string()),
         _ => None,
     }
 }
 
-fn method(value: &Value) -> Option<InputMethod> {
+fn method(value: &Variant) -> Option<InputMethod> {
     let structure = match value {
-        Value::Value(inner) => return method(inner),
-        Value::Structure(structure) => structure,
+        Variant::Variant(inner) => return method(inner),
+        Variant::Structure(structure) => structure,
         _ => return None,
     };
     let id = text(structure, NAME)?;
@@ -42,26 +42,28 @@ fn method(value: &Value) -> Option<InputMethod> {
     })
 }
 
-fn engines(properties: &PropertiesProxy, name: &str) -> Result<Vec<InputMethod>, String> {
+async fn engines(properties: &PropertiesProxy<'_>, name: &str) -> Result<Vec<InputMethod>, String> {
     let interface = InterfaceName::try_from(DESTINATION).map_err(|error| error.to_string())?;
-    let engines: OwnedValue = properties
+    let engines: OwnedVariant = properties
         .get(interface, name)
+        .await
         .map_err(|error| error.to_string())?;
     Ok(match &*engines {
-        Value::Array(engines) => engines.iter().filter_map(method).collect(),
+        Variant::Array(engines) => engines.iter().filter_map(method).collect(),
         _ => Vec::new(),
     })
 }
 
-pub fn all() -> Result<Vec<InputMethod>, String> {
-    let connection = dbus::at(&ibus::address()?)?;
+pub async fn all() -> Result<Vec<InputMethod>, String> {
+    let connection = dbus::at(&ibus::address()?).await?;
     let properties = PropertiesProxy::builder(&connection)
         .destination(DESTINATION)
-        .and_then(|builder| builder.path(PATH))
-        .and_then(|builder| builder.build())
+        .path(PATH)
+        .build()
+        .await
         .map_err(|error| error.to_string())?;
-    let mut methods = engines(&properties, "Engines")?;
-    methods.extend(engines(&properties, "ActiveEngines")?);
+    let mut methods = engines(&properties, "Engines").await?;
+    methods.extend(engines(&properties, "ActiveEngines").await?);
     methods.sort_by_cached_key(|method| method.name.to_lowercase());
     Ok(methods)
 }

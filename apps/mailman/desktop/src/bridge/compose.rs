@@ -27,14 +27,15 @@ fn chosen(path: &std::path::Path) -> Chosen {
     }
 }
 
-fn choose_files(Empty {}: Empty) -> Result<Vec<Chosen>, String> {
+async fn choose_files(Empty {}: Empty) -> Result<Vec<Chosen>, String> {
     let chooser = FileChooser {
         title: "Attach Files",
         multiple: true,
         ..FileChooser::default()
     };
     Ok(chooser
-        .open()?
+        .open()
+        .await?
         .iter()
         .filter_map(|uri| luft_app::portal::uri_path(uri))
         .map(|path| chosen(&path))
@@ -87,7 +88,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("unsubscribe", state, |state, Id { id }| {
             compose::unsubscribe(state, id)
         })
-        .command("choose_files", choose_files)
+        .command_async("choose_files", choose_files)
         .command("describe_files", describe_files)
         .bridge_handler("stash_file", stash)
         .with("templates", state, |state, Empty {}| {

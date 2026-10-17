@@ -5,7 +5,8 @@ mod zones;
 use std::time::Duration;
 
 use luft_app::Commands;
-use luft_app::dbus::service::{Service, failed, get};
+use luft_app::dbus::failed;
+use luft_app::dbus::service::{Service, get};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -52,19 +53,27 @@ struct Location {
     country_code: Option<String>,
 }
 
-fn online() -> bool {
+async fn online() -> bool {
     NETWORK
         .read()
+        .await
         .ok()
         .flatten()
         .and_then(|properties| get::<u32>(&properties, "Connectivity"))
         == Some(FULL_CONNECTIVITY)
 }
 
-fn locate(_: Value) -> Result<Option<Location>, String> {
-    if !online() {
+async fn locate(_: Value) -> Result<Option<Location>, String> {
+    if !online().await {
         return Ok(None);
     }
+    tokio::task::spawn_blocking(fetch_location)
+        .await
+        .map_err(failed)?
+        .map(Some)
+}
+
+fn fetch_location() -> Result<Location, String> {
     let agent = ureq::Agent::config_builder()
         .timeout_global(Some(LOCATION_TIMEOUT))
         .build()
@@ -76,7 +85,20 @@ fn locate(_: Value) -> Result<Option<Location>, String> {
         .body_mut()
         .read_to_string()
         .map_err(failed)?;
-    serde_json::from_str(&body).map(Some).map_err(failed)
+    serde_json::from_str(&body).map_err(failed)
+}
+
+async fn set_keyboard(Keyboard { layout, variant }: Keyboard) -> Result<(), String> {
+    LOCALE
+        .change::<_, ()>("SetX11Keyboard", &(layout, "", variant, "", true, true))
+        .await
+        .map_err(failed)
+}
+
+async fn set_zone(Zone { zone }: Zone) -> Result<(), String> {
+    TIME.change::<_, ()>("SetTimezone", &(zone, true))
+        .await
+        .map_err(failed)
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
@@ -87,16 +109,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
                 zones: zones::all(),
             })
         })
-        .command("regional_locate", locate)
-        .command("regional_keyboard", |Keyboard { layout, variant }| {
-            LOCALE
-                .change::<_, ()>("SetX11Keyboard", &(layout, "", variant, "", true, true))
-                .map_err(failed)
-        })
-        .command("regional_zone", |Zone { zone }| {
-            TIME.change::<_, ()>("SetTimezone", &(zone, true))
-                .map_err(failed)
-        })
-        .command("regional_formats_country", formats::unset_country)
+        .command_async("regional_locate", locate)
+        .command_async("regional_keyboard", set_keyboard)
+        .command_async("regional_zone", set_zone)
+        .command_async("regional_formats_country", formats::unset_country)
         .command("regional_set_formats", formats::set)
 }

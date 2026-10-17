@@ -1,40 +1,42 @@
+use futures_util::StreamExt;
 use luft_app::{Events, dbus};
-use zbus::blocking::Proxy;
+use serde_json::Value;
+use zbus::Proxy;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";
 const PATH: &str = "/org/freedesktop/NetworkManager";
 const FULL: u32 = 4;
 const ONLINE: &str = "signin.online";
 
-fn network_manager() -> Option<Proxy<'static>> {
-    let connection = dbus::system().ok()?;
-    Proxy::new(connection, SERVICE, PATH, SERVICE).ok()
+async fn network_manager() -> Option<Proxy<'static>> {
+    let connection = dbus::system().await.ok()?;
+    Proxy::new(connection, SERVICE, PATH, SERVICE).await.ok()
 }
 
 pub fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Some(manager) = network_manager() else {
+    luft_app::spawn(async move {
+        let Some(manager) = network_manager().await else {
             return;
         };
-        let changes = manager.receive_property_changed::<u32>("Connectivity");
-        if manager.get_property::<u32>("Connectivity") == Ok(FULL) {
+        let mut changes = manager
+            .receive_property_changed::<u32>("Connectivity")
+            .await;
+        if manager.get_property::<u32>("Connectivity").await == Ok(FULL) {
             events.emit(ONLINE, ());
         }
-        for change in changes {
-            if change.get() == Ok(FULL) {
+        while let Some(change) = changes.next().await {
+            if change.get().await == Ok(FULL) {
                 events.emit(ONLINE, ());
             }
         }
     });
 }
 
-pub fn check(events: &Events) {
-    let events = events.clone();
-    std::thread::spawn(move || {
-        let connectivity = network_manager()
-            .and_then(|manager| manager.call::<_, _, u32>("CheckConnectivity", &()).ok());
-        if connectivity == Some(FULL) {
-            events.emit(ONLINE, ());
-        }
-    });
+pub async fn check(events: Events, _: Value) -> Result<(), String> {
+    if let Some(manager) = network_manager().await
+        && manager.call::<_, _, u32>("CheckConnectivity", &()).await == Ok(FULL)
+    {
+        events.emit(ONLINE, ());
+    }
+    Ok(())
 }

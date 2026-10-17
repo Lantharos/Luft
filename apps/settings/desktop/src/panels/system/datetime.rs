@@ -2,12 +2,13 @@ use std::collections::HashMap;
 use std::fs;
 use std::sync::Once;
 
-use luft_app::dbus;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, failed};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::Proxy;
+use zbus::{DynamicType, Proxy};
 
 pub const CLOCK_CHANGED: &str = "datetime.changed";
 
@@ -48,46 +49,40 @@ struct Time {
     usec: i64,
 }
 
-fn proxy(interface: &'static str) -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::system()?, TIMEDATED, TIMEDATED_PATH, interface)
-        .map_err(|error| error.to_string())
+async fn proxy(interface: &'static str) -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::system().await?, TIMEDATED, TIMEDATED_PATH, interface)
+        .await
+        .map_err(failed)
 }
 
-fn read() -> Result<Clock, String> {
-    let timedated = proxy(TIMEDATED)?;
-    let property = |name: &str| -> Result<bool, String> {
-        timedated
-            .get_property(name)
-            .map_err(|error| error.to_string())
-    };
+async fn read() -> Result<Clock, String> {
+    let timedated = proxy(TIMEDATED).await?;
     Ok(Clock {
-        timezone: timedated
-            .get_property("Timezone")
-            .map_err(|error| error.to_string())?,
-        automatic: property("NTP")?,
-        can_automatic: property("CanNTP")?,
+        timezone: timedated.get_property("Timezone").await.map_err(failed)?,
+        automatic: timedated.get_property("NTP").await.map_err(failed)?,
+        can_automatic: timedated.get_property("CanNTP").await.map_err(failed)?,
     })
 }
 
 fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(properties) = proxy(PROPERTIES) else {
+    luft_app::spawn(async move {
+        let Ok(properties) = proxy(PROPERTIES).await else {
             return;
         };
-        let Ok(changes) = properties.receive_signal("PropertiesChanged") else {
+        let Ok(mut changes) = properties.receive_signal("PropertiesChanged").await else {
             return;
         };
-        for _ in changes {
-            if let Ok(clock) = read() {
+        while changes.next().await.is_some() {
+            if let Ok(clock) = read().await {
                 events.emit(CLOCK_CHANGED, clock);
             }
         }
     });
 }
 
-fn clock(events: &Events, _: Value) -> Result<Clock, String> {
-    WATCH.call_once(|| watch(events.clone()));
-    read()
+async fn clock(events: Events, _: Value) -> Result<Clock, String> {
+    WATCH.call_once(|| watch(events));
+    read().await
 }
 
 fn countries() -> HashMap<String, String> {
@@ -104,10 +99,12 @@ fn countries() -> HashMap<String, String> {
         .collect()
 }
 
-fn zones(_: Value) -> Result<Vec<Zone>, String> {
-    let listed: Vec<String> = proxy(TIMEDATED)?
+async fn zones(_: Value) -> Result<Vec<Zone>, String> {
+    let listed: Vec<String> = proxy(TIMEDATED)
+        .await?
         .call("ListTimezones", &())
-        .map_err(|error| error.to_string())?;
+        .await
+        .map_err(failed)?;
     let countries = countries();
     Ok(listed
         .into_iter()
@@ -121,30 +118,32 @@ fn zones(_: Value) -> Result<Vec<Zone>, String> {
         .collect())
 }
 
-fn call(method: &str, body: &(impl Serialize + zbus::zvariant::DynamicType)) -> Result<(), String> {
-    proxy(TIMEDATED)?
+async fn call(method: &str, body: &(impl Serialize + DynamicType)) -> Result<(), String> {
+    proxy(TIMEDATED)
+        .await?
         .call_method(method, body)
+        .await
         .map(|_| ())
-        .map_err(|error| error.to_string())
+        .map_err(failed)
 }
 
-fn set_timezone(Timezone { timezone }: Timezone) -> Result<(), String> {
-    call("SetTimezone", &(timezone, true))
+async fn set_timezone(Timezone { timezone }: Timezone) -> Result<(), String> {
+    call("SetTimezone", &(timezone, true)).await
 }
 
-fn set_automatic(Automatic { enabled }: Automatic) -> Result<(), String> {
-    call("SetNTP", &(enabled, true))
+async fn set_automatic(Automatic { enabled }: Automatic) -> Result<(), String> {
+    call("SetNTP", &(enabled, true)).await
 }
 
-fn set_time(Time { usec }: Time) -> Result<(), String> {
-    call("SetTime", &(usec, false, true))
+async fn set_time(Time { usec }: Time) -> Result<(), String> {
+    call("SetTime", &(usec, false, true)).await
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("datetime_clock", events, clock)
-        .command("datetime_zones", zones)
-        .command("datetime_set_timezone", set_timezone)
-        .command("datetime_set_automatic", set_automatic)
-        .command("datetime_set_time", set_time)
+        .with_async("datetime_clock", events, clock)
+        .command_async("datetime_zones", zones)
+        .command_async("datetime_set_timezone", set_timezone)
+        .command_async("datetime_set_automatic", set_automatic)
+        .command_async("datetime_set_time", set_time)
 }

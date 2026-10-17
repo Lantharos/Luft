@@ -4,8 +4,7 @@ use std::sync::Arc;
 use luft_app::Events;
 use parking_lot::Mutex;
 use serde::Serialize;
-use zbus::interface;
-use zbus::zvariant::{ObjectPath, OwnedValue};
+use zbus::{ObjectPath, OwnedVariant, interface};
 
 use super::playback::{self, Repeat, Reported};
 use crate::app::events::MEDIA_ACTION;
@@ -174,7 +173,7 @@ impl Player {
     }
 
     #[zbus(property)]
-    fn metadata(&self) -> HashMap<String, OwnedValue> {
+    fn metadata(&self) -> HashMap<String, OwnedVariant> {
         playback::metadata(&self.state.lock().playback)
     }
 

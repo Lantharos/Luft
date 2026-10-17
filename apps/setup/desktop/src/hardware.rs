@@ -49,17 +49,18 @@ fn portable() -> bool {
         .is_ok_and(|chassis| PORTABLE_CHASSIS.contains(&chassis))
 }
 
-pub fn detect() -> Hardware {
+pub async fn detect() -> Hardware {
     Hardware {
         nvidia: !luft_variant::nvidia_cards().is_empty(),
         portable: portable(),
         on_battery: UPOWER
             .read()
+            .await
             .ok()
             .flatten()
             .and_then(|properties| get(&properties, "OnBattery"))
             .unwrap_or(false),
         touchpad: has_touchpad(),
-        fingerprint: luft_fingerprint::reader_present(),
+        fingerprint: luft_fingerprint::reader_present().await,
     }
 }

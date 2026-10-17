@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use zbus::zvariant::{StructureBuilder, Value};
+use zbus::{Structure, Variant};
 
 use crate::method::{Summary, engine_name};
 
@@ -14,7 +14,7 @@ const ICON: &str = "input-keyboard-symbolic";
 const LAYOUT: &str = "default";
 const LANGUAGE_NEUTRAL: &str = "other";
 
-type Attachments = HashMap<String, Value<'static>>;
+type Attachments = HashMap<String, Variant<'static>>;
 
 fn symbol(method: &Summary) -> String {
     let label = method.label.trim();
@@ -25,13 +25,13 @@ fn symbol(method: &Summary) -> String {
     }
 }
 
-fn engine(method: &Summary) -> Result<Value<'static>, String> {
+fn engine(method: &Summary) -> Result<Variant<'static>, String> {
     let language = if method.language.is_empty() {
         LANGUAGE_NEUTRAL
     } else {
         &method.language
     };
-    let mut builder = StructureBuilder::new()
+    let mut builder = Structure::builder()
         .add_field("IBusEngineDesc".to_owned())
         .add_field(Attachments::new());
     for text in [
@@ -52,13 +52,13 @@ fn engine(method: &Summary) -> Result<Value<'static>, String> {
     }
     builder
         .build()
-        .map(Value::from)
+        .map(Variant::from)
         .map_err(|error| error.to_string())
 }
 
-pub fn component(methods: &[Summary], exec: String) -> Result<Value<'static>, String> {
+pub fn component(methods: &[Summary], exec: String) -> Result<Variant<'static>, String> {
     let engines = methods.iter().map(engine).collect::<Result<Vec<_>, _>>()?;
-    Ok(Value::from((
+    Ok(Variant::from((
         "IBusComponent".to_owned(),
         Attachments::new(),
         COMPONENT.to_owned(),
@@ -69,7 +69,7 @@ pub fn component(methods: &[Summary], exec: String) -> Result<Value<'static>, St
         HOMEPAGE.to_owned(),
         exec,
         String::new(),
-        Vec::<Value<'static>>::new(),
+        Vec::<Variant<'static>>::new(),
         engines,
     )))
 }

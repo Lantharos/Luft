@@ -1,8 +1,11 @@
 use gio::prelude::*;
 use luft_app::Commands;
-use luft_app::dbus::{self, service::failed};
+use luft_app::dbus::{self, failed};
 use sabine::SabineWindow;
 use serde_json::Value;
+use zbus::Connection;
+use zbus::fdo::DBusProxy;
+use zbus::names::WellKnownName;
 
 const SETUP: &str = "com.lantharos.Kestrel.Setup";
 const SETUP_PATH: &str = "/com/lantharos/Kestrel/Setup";
@@ -11,27 +14,31 @@ const LOGIN_PATH: &str = "/org/freedesktop/login1";
 const LOGIN_MANAGER: &str = "org.freedesktop.login1.Manager";
 const DISKS: &str = "com.lantharos.disks.desktop";
 
-fn in_setup() -> bool {
-    dbus::session()
-        .ok()
-        .and_then(|bus| zbus::blocking::fdo::DBusProxy::new(bus).ok())
-        .and_then(|proxy| proxy.name_has_owner(SETUP.try_into().ok()?).ok())
+async fn in_setup(session: &Connection) -> bool {
+    let Ok(proxy) = DBusProxy::new(session).await else {
+        return false;
+    };
+    proxy
+        .name_has_owner(WellKnownName::from_static_str_unchecked(SETUP).into())
+        .await
         .unwrap_or(false)
 }
 
-fn finish(_: Value) -> Result<bool, String> {
-    if !in_setup() {
+async fn finish(_: Value) -> Result<bool, String> {
+    let session = dbus::session().await?;
+    if !in_setup(session).await {
         return Ok(false);
     }
-    dbus::session()?
+    session
         .call_method(Some(SETUP), SETUP_PATH, Some(SETUP), "Finish", &())
-        .map(drop)
+        .await
         .map_err(failed)?;
     Ok(true)
 }
 
-fn restart(_: Value) -> Result<(), String> {
-    dbus::system()?
+async fn restart(_: Value) -> Result<(), String> {
+    dbus::system()
+        .await?
         .call_method(
             Some(LOGIN),
             LOGIN_PATH,
@@ -39,6 +46,7 @@ fn restart(_: Value) -> Result<(), String> {
             "Reboot",
             &(true,),
         )
+        .await
         .map(drop)
         .map_err(failed)
 }
@@ -51,7 +59,7 @@ fn open_disks(_: Value) -> Result<(), String> {
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command("session_finish", finish)
-        .command("session_restart", restart)
+        .command_async("session_finish", finish)
+        .command_async("session_restart", restart)
         .command("session_open_disks", open_disks)
 }

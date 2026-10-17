@@ -10,13 +10,13 @@ mod schedule;
 mod state;
 mod store;
 
-use std::sync::Once;
-
-use luft_app::{Commands, Events, dbus};
+use luft_app::dbus::{self, failed};
+use luft_app::{Commands, Events};
 use luft_software::variant::Variant;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+use tokio::sync::OnceCell;
 
 use firmware::Firmware;
 use state::{Activity, Kind, Status};
@@ -28,7 +28,7 @@ pub use schedule::CHECK_ARGUMENT;
 
 const APP_UPDATES: &str = "schelf:updates";
 
-static FIRST_RUN: Once = Once::new();
+static FIRST_RUN: OnceCell<()> = OnceCell::const_new();
 
 #[derive(Deserialize)]
 struct Device {
@@ -40,15 +40,18 @@ struct Switch {
     variant: Variant,
 }
 
-fn load(_: Value) -> Result<(), String> {
-    FIRST_RUN.call_once(|| {
-        if !Preferences::exists() {
+async fn load(_: Value) -> Result<(), String> {
+    FIRST_RUN
+        .get_or_init(|| async {
+            if Preferences::exists() {
+                return;
+            }
             let preferences = Preferences::default();
-            let _ = preferences
-                .save()
-                .and_then(|_| schedule::apply(preferences.schedule));
-        }
-    });
+            if preferences.save().is_ok() {
+                let _ = schedule::apply(preferences.schedule).await;
+            }
+        })
+        .await;
     if state::overview().is_none() {
         overview::reload();
     }
@@ -125,15 +128,16 @@ fn install_firmware(Device { id }: Device) -> Result<(), String> {
         .ok_or_else(|| "Something is already being installed.".into())
 }
 
-fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
-    if !firmware::available() {
+async fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
+    if !firmware::available().await {
         return Ok(Vec::new());
     }
-    firmware::updates()
+    firmware::updates().await
 }
 
-fn restart(_: Value) -> Result<(), String> {
-    dbus::session()?
+async fn restart(_: Value) -> Result<(), String> {
+    dbus::session()
+        .await?
         .call_method(
             Some("org.gnome.SessionManager"),
             "/org/gnome/SessionManager",
@@ -141,15 +145,16 @@ fn restart(_: Value) -> Result<(), String> {
             "Reboot",
             &(),
         )
+        .await
         .map(|_| ())
-        .map_err(|error| error.to_string())
+        .map_err(failed)
 }
 
-fn set_preferences(preferences: Preferences) -> Result<(), String> {
+async fn set_preferences(preferences: Preferences) -> Result<(), String> {
     let previous = Preferences::load();
     preferences.save()?;
     if previous.schedule != preferences.schedule {
-        schedule::apply(preferences.schedule)?;
+        schedule::apply(preferences.schedule).await?;
     }
     Ok(())
 }
@@ -166,21 +171,21 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_status", |_: Value| {
             Ok::<Status, String>(state::status())
         })
-        .command("updates_load", load)
+        .command_async("updates_load", load)
         .command("updates_check", check)
         .command("updates_download", download)
         .command("updates_cancel", |_: Value| {
             state::cancel();
             Ok(())
         })
-        .command("updates_firmware", firmware_updates)
+        .command_async("updates_firmware", firmware_updates)
         .command("updates_firmware_install", install_firmware)
         .command("updates_rollback", rollback)
         .command("updates_switch", switch)
-        .command("updates_restart", restart)
+        .command_async("updates_restart", restart)
         .command("updates_preferences", |_: Value| {
             Ok::<Preferences, String>(Preferences::load())
         })
-        .command("updates_set_preferences", set_preferences)
+        .command_async("updates_set_preferences", set_preferences)
         .command("updates_open_apps", open_apps)
 }

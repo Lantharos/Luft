@@ -17,6 +17,7 @@ use luft_app::portal::{self, FileChooser, Filter};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::task::spawn_blocking;
 
 use crate::compose::{Reloader, sequences, system};
 use crate::{paths, sources};
@@ -144,23 +145,26 @@ pub fn import_path(path: &Path, reloader: &Reloader) -> Result<Layout, String> {
     )
 }
 
-fn import(reloader: &Reloader) -> Result<Option<Layout>, String> {
+async fn import(reloader: Reloader, _: Value) -> Result<Option<Layout>, String> {
     let chosen = portal::open_file(
         "Import a layout",
         Filter {
             name: "Keyboard layouts",
             patterns: vec!["*".into()],
         },
-    )?;
-    chosen
-        .as_deref()
-        .and_then(portal::uri_path)
-        .map(|path| import_path(&path, reloader))
-        .transpose()
+    )
+    .await?;
+    let Some(path) = chosen.as_deref().and_then(portal::uri_path) else {
+        return Ok(None);
+    };
+    spawn_blocking(move || import_path(&path, &reloader))
+        .await
+        .map_err(|error| error.to_string())?
+        .map(Some)
 }
 
-fn export(Export { id, format }: Export) -> Result<bool, String> {
-    let (contents, file_name) = match format {
+fn contents(id: String, format: Format) -> Result<(Vec<u8>, String), String> {
+    Ok(match format {
         Format::Symbols => (
             fs::read(paths::user_symbols().join(&id)).map_err(|error| error.to_string())?,
             id.clone(),
@@ -177,17 +181,26 @@ fn export(Export { id, format }: Export) -> Result<bool, String> {
             klc::encode(&klc::write(&store::open(&id)?)),
             format!("{id}.klc"),
         ),
-    };
+    })
+}
+
+async fn export(Export { id, format }: Export) -> Result<bool, String> {
+    let (contents, file_name) = spawn_blocking(move || contents(id, format))
+        .await
+        .map_err(|error| error.to_string())??;
     let chosen = FileChooser {
         title: "Export layout",
         current_name: Some(&file_name),
         ..FileChooser::default()
     }
-    .save()?;
+    .save()
+    .await?;
     let Some(path) = chosen.as_deref().and_then(portal::uri_path) else {
         return Ok(false);
     };
-    fs::write(path, contents).map_err(|error| error.to_string())?;
+    tokio::fs::write(path, contents)
+        .await
+        .map_err(|error| error.to_string())?;
     Ok(true)
 }
 
@@ -215,10 +228,8 @@ pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
             store::remove(&id, reloader)
         })
         .command("layout_use", |Id { id }| sources::add("xkb", &id))
-        .with("layout_import", reloader, |reloader, _: Value| {
-            import(reloader)
-        })
-        .command("layout_export", export)
+        .with_async("layout_import", reloader, import)
+        .command_async("layout_export", export)
         .command("layout_describe", describe)
         .command("layout_specials", |_: Value| {
             Ok(Specials {

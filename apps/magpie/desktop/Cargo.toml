@@ -24,7 +24,7 @@ parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 serde = { version = "1.0.229", features = ["derive"] }
 skrifa = "0.48"
-tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread"] }
+tokio = { version = "1.53.3", default-features = false, features = ["sync"] }
 write-fonts = "0.54"
 wuff = "0.2.9"
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }
+zbus = { version = "6.0.0", default-features = false, features = ["service", "tokio"] }

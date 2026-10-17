@@ -14,6 +14,7 @@ name = "settings_lib"
 bzip2 = "0.6.1"
 dirs = "7.0.0"
 flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
+futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 gio-unix = "0.22.8"
 gstreamer = "0.25.4"
@@ -34,10 +35,10 @@ sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 tar = "0.4.46"
-tokio = { version = "1.53.3", default-features = false, features = ["sync"] }
+tokio = { version = "1.53.3", default-features = false, features = ["net", "rt", "sync", "time"] }
 ureq = { version = "3.4.2", features = ["platform-verifier"] }
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }
-zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
+zip = { version = "9.0.4", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
 
 [dev-dependencies]
 tempfile = "3.27.0"

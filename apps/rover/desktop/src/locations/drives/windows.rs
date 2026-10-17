@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use luft_app::dbus;
+use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
-use zbus::zvariant::Value;
+use zbus::Variant;
 
 const SERVICE: &str = "com.lantharos.Windows1";
 const PATH: &str = "/com/lantharos/Windows1";
@@ -26,22 +26,20 @@ pub struct WindowsDrive {
     pub hibernated: bool,
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
+async fn drives() -> Result<Vec<Drive>, String> {
+    let text = dbus::system()
+        .await?
+        .call_method(Some(SERVICE), PATH, Some(SERVICE), "Drives", &())
+        .await
+        .map_err(failed)?
+        .body()
+        .deserialize::<String>()
+        .map_err(failed)?;
+    serde_json::from_str(&text).map_err(failed)
 }
 
-pub fn closed_windows() -> Vec<WindowsDrive> {
-    let drives = dbus::system().and_then(|connection| {
-        connection
-            .call_method(Some(SERVICE), PATH, Some(SERVICE), "Drives", &())
-            .map_err(failed)?
-            .body()
-            .deserialize::<String>()
-            .map_err(failed)
-    });
-    let Ok(drives) =
-        drives.and_then(|text| serde_json::from_str::<Vec<Drive>>(&text).map_err(failed))
-    else {
+pub async fn closed_windows() -> Vec<WindowsDrive> {
+    let Ok(drives) = drives().await else {
         return Vec::new();
     };
     drives
@@ -55,17 +53,18 @@ pub fn closed_windows() -> Vec<WindowsDrive> {
         .collect()
 }
 
-pub fn open_windows(device: &str, read_only: bool) -> Result<String, String> {
+pub async fn open_windows(device: &str, read_only: bool) -> Result<String, String> {
     let name = Path::new(device)
         .file_name()
         .and_then(|name| name.to_str())
         .filter(|name| name.bytes().all(|byte| byte.is_ascii_alphanumeric()))
         .ok_or("That isn't a drive")?;
-    let mut options: HashMap<&str, Value> = HashMap::new();
+    let mut options: HashMap<&str, Variant> = HashMap::new();
     if read_only {
-        options.insert("options", Value::from("ro"));
+        options.insert("options", Variant::from("ro"));
     }
-    dbus::system()?
+    dbus::system()
+        .await?
         .call_method(
             Some(UDISKS),
             format!("{BLOCK_DEVICES}/{name}").as_str(),
@@ -73,10 +72,8 @@ pub fn open_windows(device: &str, read_only: bool) -> Result<String, String> {
             "Mount",
             &(options,),
         )
-        .map_err(|error| match error {
-            zbus::Error::MethodError(_, Some(text), _) => text,
-            other => other.to_string(),
-        })?
+        .await
+        .map_err(|error| dbus::explain(&error))?
         .body()
         .deserialize::<String>()
         .map_err(failed)

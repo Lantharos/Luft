@@ -11,6 +11,7 @@ use luft_meet::Handoff;
 use serde::Serialize;
 
 use crate::meet;
+use crate::system::wait;
 pub use drives::{Drive, Space};
 pub use room::ALIGNMENT;
 
@@ -57,7 +58,7 @@ pub fn take(
     handoff: Option<&Handoff>,
     scratch: &Path,
 ) -> Result<Survey, String> {
-    let objects = udisks::objects()?;
+    let objects = wait(udisks::objects())?;
     let snapshot = snapshot::build(&objects);
     let drives: Vec<Drive> = snapshot
         .drives

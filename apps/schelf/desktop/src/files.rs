@@ -193,7 +193,7 @@ fn inspect(File { path }: File) -> Result<Opened, String> {
     }
 }
 
-fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
+async fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
     let chosen = FileChooser {
         title: "Add an AppImage",
         filters: vec![Filter {
@@ -202,7 +202,8 @@ fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
         }],
         ..FileChooser::default()
     }
-    .open()?;
+    .open()
+    .await?;
     Ok(chosen
         .first()
         .and_then(|uri| gio::File::for_uri(uri).path())
@@ -212,5 +213,5 @@ fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command("files_inspect", inspect)
-        .command("files_choose_appimage", choose)
+        .command_async("files_choose_appimage", choose)
 }

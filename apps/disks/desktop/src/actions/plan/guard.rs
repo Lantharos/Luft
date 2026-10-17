@@ -34,8 +34,8 @@ fn display_name(volume: &Volume) -> String {
 }
 
 impl Guard {
-    pub fn table(table: &str) -> Result<(), String> {
-        let snapshot = snapshot::build(&udisks::objects()?);
+    pub async fn table(table: &str) -> Result<(), String> {
+        let snapshot = snapshot::build(&udisks::objects().await?);
         let drive = snapshot
             .drives
             .iter()
@@ -44,8 +44,8 @@ impl Guard {
         writable(drive)
     }
 
-    pub fn volume(block: &str) -> Result<Self, String> {
-        let snapshot = snapshot::build(&udisks::objects()?);
+    pub async fn volume(block: &str) -> Result<Self, String> {
+        let snapshot = snapshot::build(&udisks::objects().await?);
         let (drive, volume) = snapshot
             .drives
             .iter()

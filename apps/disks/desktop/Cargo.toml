@@ -11,6 +11,7 @@ rust-version = "1.98"
 name = "disks_lib"
 
 [dependencies]
+futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 luft-app = { path = "../../../packages/app", features = ["recovery"] }
 luft-disks = { path = "../../../packages/disks" }
@@ -19,4 +20,5 @@ rayon = "1.12.0"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }
+tokio = { version = "1.53.3", default-features = false, features = ["rt", "time"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }

@@ -43,14 +43,15 @@ impl TernState {
         }
     }
 
-    pub fn app_state(&self) -> AppState {
+    pub async fn app_state(&self) -> AppState {
+        let appearance = Appearance::current().await;
         AppState {
             settings: self.settings.read().clone(),
             launch: self.launch.as_ref().clone(),
             default_shell: shell::default_shell().to_string_lossy().into_owned(),
             shells: shell::available_shells(),
             glass: self.glass,
-            appearance: Appearance::current(),
+            appearance,
         }
     }
 

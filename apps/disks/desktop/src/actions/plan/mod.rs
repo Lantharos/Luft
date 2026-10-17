@@ -49,7 +49,7 @@ pub enum Step {
     },
 }
 
-pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
+pub async fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
     match step {
         Step::Create {
             table,
@@ -61,7 +61,7 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
             filesystem,
             label,
         } => {
-            Guard::table(&table)?;
+            Guard::table(&table).await?;
             let created = if filesystem.is_empty() {
                 udisks::created(
                     &table,
@@ -74,7 +74,8 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
                         name.as_str(),
                         no_options(),
                     ),
-                )?
+                )
+                .await?
             } else {
                 formatting::create_typed(
                     &table,
@@ -82,29 +83,32 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
                     (&partition_type, &name),
                     &Format::plain(filesystem, label),
                     false,
-                )?
+                )
+                .await?
             };
             if !flags.is_empty() {
-                set_flags(&created, &flags)?;
+                set_flags(&created, &flags).await?;
             }
             Ok(Some(created))
         }
         Step::Delete { block } => {
-            Guard::volume(&block)?.changeable()?;
-            partitions::delete(&block).map(|()| None)
+            Guard::volume(&block).await?.changeable()?;
+            partitions::delete(&block).await.map(|()| None)
         }
         Step::Place {
             block,
             offset,
             size,
-        } => place(events, &block, offset, size),
+        } => place(events, &block, offset, size).await,
         Step::Format {
             block,
             filesystem,
             label,
         } => {
-            Guard::volume(&block)?.changeable()?;
-            formatting::format_volume(&block, &Format::plain(filesystem, label)).map(|()| None)
+            Guard::volume(&block).await?.changeable()?;
+            formatting::format_volume(&block, &Format::plain(filesystem, label))
+                .await
+                .map(|()| None)
         }
         Step::Change {
             block,
@@ -113,35 +117,42 @@ pub fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
             flags,
             label,
         } => {
-            Guard::volume(&block)?.changeable()?;
-            change(&block, partition_type, name, flags, label).map(|()| None)
+            Guard::volume(&block).await?.changeable()?;
+            change(&block, partition_type, name, flags, label)
+                .await
+                .map(|()| None)
         }
     }
 }
 
-fn place(events: &Events, block: &str, offset: u64, size: u64) -> Result<Option<String>, String> {
-    let guard = Guard::volume(block)?;
+async fn place(
+    events: &Events,
+    block: &str,
+    offset: u64,
+    size: u64,
+) -> Result<Option<String>, String> {
+    let guard = Guard::volume(block).await?;
     if offset == guard.offset {
         guard.resizable()?;
-        resize::resize(block, size, !guard.system)?;
+        resize::resize(block, size, !guard.system).await?;
         return Ok(None);
     }
     guard.movable()?;
     if size != guard.size {
         guard.resizable()?;
     }
-    mounting::release(block)?;
+    mounting::release(block).await?;
     if size < guard.size {
-        resize::resize(block, size, true)?;
+        resize::resize(block, size, true).await?;
     }
-    let moved = moving::shift(events, block, offset)?;
+    let moved = moving::shift(events, block, offset).await?;
     if size > guard.size {
-        resize::resize(&moved, size, true)?;
+        resize::resize(&moved, size, true).await?;
     }
     Ok(Some(moved))
 }
 
-fn change(
+async fn change(
     block: &str,
     partition_type: Option<String>,
     name: Option<String>,
@@ -149,22 +160,22 @@ fn change(
     label: Option<String>,
 ) -> Result<(), String> {
     if let Some(kind) = partition_type {
-        udisks::run(block, PARTITION, "SetType", &(kind.as_str(), no_options()))?;
+        udisks::run(block, PARTITION, "SetType", &(kind.as_str(), no_options())).await?;
     }
     if let Some(name) = name {
-        udisks::run(block, PARTITION, "SetName", &(name.as_str(), no_options()))?;
+        udisks::run(block, PARTITION, "SetName", &(name.as_str(), no_options())).await?;
     }
     if let Some(flags) = flags {
-        set_flags(block, &flags)?;
+        set_flags(block, &flags).await?;
     }
     if let Some(label) = label {
-        mounting::set_label(&labelled(block)?, &label)?;
+        mounting::set_label(&labelled(block).await?, &label).await?;
     }
     Ok(())
 }
 
-fn labelled(block: &str) -> Result<String, String> {
-    let objects = udisks::objects()?;
+async fn labelled(block: &str) -> Result<String, String> {
+    let objects = udisks::objects().await?;
     if objects.get(block, FILESYSTEM).is_some() {
         return Ok(block.to_owned());
     }
@@ -180,10 +191,10 @@ fn labelled(block: &str) -> Result<String, String> {
         .ok_or_else(|| "There's no file system to name".to_owned())
 }
 
-fn set_flags(block: &str, bits: &[u8]) -> Result<(), String> {
+async fn set_flags(block: &str, bits: &[u8]) -> Result<(), String> {
     let flags = bits
         .iter()
         .filter(|bit| **bit < 64)
         .fold(0_u64, |flags, bit| flags | 1 << bit);
-    udisks::run(block, PARTITION, "SetFlags", &(flags, no_options()))
+    udisks::run(block, PARTITION, "SetFlags", &(flags, no_options())).await
 }

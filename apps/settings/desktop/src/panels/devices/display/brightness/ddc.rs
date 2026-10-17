@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::sync::mpsc::{Receiver, RecvTimeoutError};
 use std::time::{Duration, Instant};
 
+use zbus::Proxy;
+
 use super::super::state::{self, MonitorSpec};
 use super::ddcutil::{self, Availability, Found};
 use super::{Control, Publisher};
@@ -93,14 +95,16 @@ pub struct Worker {
     buses: BTreeMap<String, Bus>,
     controls: BTreeMap<String, Control>,
     publisher: Publisher,
+    displays: Proxy<'static>,
 }
 
 impl Worker {
-    pub fn new(publisher: Publisher) -> Self {
+    pub fn new(publisher: Publisher, displays: Proxy<'static>) -> Self {
         Self {
             buses: BTreeMap::new(),
             controls: BTreeMap::new(),
             publisher,
+            displays,
         }
     }
 
@@ -143,8 +147,7 @@ impl Worker {
             self.controls.clear();
             return self.publish(availability);
         }
-        let monitors: Vec<MonitorSpec> = state::proxy()
-            .and_then(|proxy| state::read(&proxy))
+        let monitors: Vec<MonitorSpec> = luft_app::block_on(state::read(&self.displays))
             .map(|(_, monitors, ..)| monitors.into_iter().map(|(spec, ..)| spec).collect())
             .unwrap_or_default();
         let mut buses = BTreeMap::new();

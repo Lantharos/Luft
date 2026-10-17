@@ -4,9 +4,11 @@ mod playback;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use luft_app::{Events, dbus};
+use luft_app::Events;
+use luft_app::dbus::{self, failed};
 use parking_lot::Mutex;
-use zbus::zvariant::Value;
+use tokio::sync::Mutex as AsyncMutex;
+use zbus::Variant;
 
 use interfaces::{Player, Root, Shared};
 pub use playback::Playback;
@@ -18,15 +20,11 @@ const PLAYER: &str = "org.mpris.MediaPlayer2.Player";
 const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
 const SEEK_TOLERANCE: f64 = 1.0;
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
 #[derive(Clone)]
 pub struct Mpris {
     events: Events,
     state: Shared,
-    published: Arc<Mutex<bool>>,
+    published: Arc<AsyncMutex<bool>>,
 }
 
 impl Mpris {
@@ -38,9 +36,9 @@ impl Mpris {
         }
     }
 
-    pub fn update(&self, playback: Playback) -> Result<(), String> {
-        let connection = dbus::session()?;
-        let mut published = self.published.lock();
+    pub async fn update(&self, playback: Playback) -> Result<(), String> {
+        let connection = dbus::session().await?;
+        let mut published = self.published.lock().await;
         let previous = std::mem::replace(&mut *self.state.lock(), Reported::new(playback.clone()));
         if !*published {
             let server = connection.object_server();
@@ -51,6 +49,7 @@ impl Mpris {
                         events: self.events.clone(),
                     },
                 )
+                .await
                 .map_err(failed)?;
             server
                 .at(
@@ -60,8 +59,9 @@ impl Mpris {
                         state: self.state.clone(),
                     },
                 )
+                .await
                 .map_err(failed)?;
-            connection.request_name(BUS_NAME).map_err(failed)?;
+            connection.request_name(BUS_NAME).await.map_err(failed)?;
             *published = true;
             return Ok(());
         }
@@ -75,6 +75,7 @@ impl Mpris {
                     "PropertiesChanged",
                     &(PLAYER, changed, Vec::<&str>::new()),
                 )
+                .await
                 .map_err(failed)?;
         }
         let expected = playback::seconds(previous.position());
@@ -89,30 +90,31 @@ impl Mpris {
                     "Seeked",
                     &(playback::microseconds(playback.position),),
                 )
+                .await
                 .map_err(failed)?;
         }
         Ok(())
     }
 
-    pub fn clear(&self) -> Result<(), String> {
-        let mut published = self.published.lock();
+    pub async fn clear(&self) -> Result<(), String> {
+        let mut published = self.published.lock().await;
         if !*published {
             return Ok(());
         }
-        let connection = dbus::session()?;
-        connection.release_name(BUS_NAME).map_err(failed)?;
+        let connection = dbus::session().await?;
+        connection.release_name(BUS_NAME).await.map_err(failed)?;
         let server = connection.object_server();
-        server.remove::<Player, _>(PATH).map_err(failed)?;
-        server.remove::<Root, _>(PATH).map_err(failed)?;
+        server.remove::<Player, _>(PATH).await.map_err(failed)?;
+        server.remove::<Root, _>(PATH).await.map_err(failed)?;
         *published = false;
         Ok(())
     }
 }
 
-fn changes(previous: &Playback, next: &Playback) -> HashMap<&'static str, Value<'static>> {
-    let mut changed: HashMap<&'static str, Value<'static>> = HashMap::new();
+fn changes(previous: &Playback, next: &Playback) -> HashMap<&'static str, Variant<'static>> {
+    let mut changed: HashMap<&'static str, Variant<'static>> = HashMap::new();
     if previous.status != next.status {
-        changed.insert("PlaybackStatus", Value::from(next.status.name()));
+        changed.insert("PlaybackStatus", Variant::from(next.status.name()));
     }
     let described = |playback: &Playback| {
         (
@@ -126,28 +128,28 @@ fn changes(previous: &Playback, next: &Playback) -> HashMap<&'static str, Value<
         )
     };
     if described(previous) != described(next) {
-        changed.insert("Metadata", Value::from(playback::metadata(next)));
+        changed.insert("Metadata", Variant::from(playback::metadata(next)));
     }
     if previous.rate != next.rate {
-        changed.insert("Rate", Value::from(next.rate));
+        changed.insert("Rate", Variant::from(next.rate));
     }
     if previous.volume != next.volume {
-        changed.insert("Volume", Value::from(next.volume));
+        changed.insert("Volume", Variant::from(next.volume));
     }
     if previous.shuffle != next.shuffle {
-        changed.insert("Shuffle", Value::from(next.shuffle));
+        changed.insert("Shuffle", Variant::from(next.shuffle));
     }
     if previous.repeat != next.repeat {
-        changed.insert("LoopStatus", Value::from(next.repeat.name()));
+        changed.insert("LoopStatus", Variant::from(next.repeat.name()));
     }
     if previous.can_next != next.can_next {
-        changed.insert("CanGoNext", Value::from(next.can_next));
+        changed.insert("CanGoNext", Variant::from(next.can_next));
     }
     if previous.can_previous != next.can_previous {
-        changed.insert("CanGoPrevious", Value::from(next.can_previous));
+        changed.insert("CanGoPrevious", Variant::from(next.can_previous));
     }
     if previous.length.is_some() != next.length.is_some() {
-        changed.insert("CanSeek", Value::from(next.length.is_some()));
+        changed.insert("CanSeek", Variant::from(next.length.is_some()));
     }
     changed
 }

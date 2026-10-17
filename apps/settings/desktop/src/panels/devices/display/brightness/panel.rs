@@ -1,9 +1,9 @@
 use std::collections::{BTreeMap, HashMap};
 
-use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
+use futures_util::StreamExt;
+use zbus::{OwnedVariant, Proxy};
 
-type Reported = (u32, Vec<HashMap<String, OwnedValue>>);
+type Reported = (u32, Vec<HashMap<String, OwnedVariant>>);
 
 const PROPERTY: &str = "Backlight";
 
@@ -19,7 +19,7 @@ pub struct Panels {
     lights: BTreeMap<String, Light>,
 }
 
-fn number(entry: &HashMap<String, OwnedValue>, key: &str) -> Option<i32> {
+fn number(entry: &HashMap<String, OwnedVariant>, key: &str) -> Option<i32> {
     entry.get(key)?.downcast_ref::<i32>().ok()
 }
 
@@ -62,23 +62,30 @@ impl Panels {
     }
 }
 
-pub fn set(proxy: &Proxy, connector: &str, (serial, value): (u32, i32)) -> Result<(), String> {
+pub async fn set(
+    proxy: &Proxy<'_>,
+    connector: &str,
+    (serial, value): (u32, i32),
+) -> Result<(), String> {
     proxy
         .call_method("SetBacklight", &(serial, connector, value))
+        .await
         .map(|_| ())
         .map_err(|error| error.to_string())
 }
 
-pub fn read(proxy: &Proxy) -> Panels {
+pub async fn read(proxy: &Proxy<'_>) -> Panels {
     proxy
         .get_property::<Reported>(PROPERTY)
+        .await
         .map(Panels::from_reported)
         .unwrap_or_default()
 }
 
-pub fn watch(proxy: &Proxy, mut changed: impl FnMut(Panels)) {
-    for change in proxy.receive_property_changed::<Reported>(PROPERTY) {
-        if let Ok(reported) = change.get() {
+pub async fn watch(proxy: Proxy<'static>, mut changed: impl FnMut(Panels)) {
+    let mut changes = proxy.receive_property_changed::<Reported>(PROPERTY).await;
+    while let Some(change) = changes.next().await {
+        if let Ok(reported) = change.get().await {
             changed(Panels::from_reported(reported));
         }
     }

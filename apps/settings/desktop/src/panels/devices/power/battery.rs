@@ -1,8 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
-use zbus::blocking::Connection;
-use zbus::zvariant::OwnedObjectPath;
+use zbus::{Connection, OwnedObjectPath};
 
 use super::failed;
 use super::limit::{self, ChargeLimit};
@@ -178,8 +177,9 @@ fn is_battery(display: &Properties) -> bool {
     is(display, "IsPresent") && display.get::<u32>("Type") == Some(TYPE_BATTERY)
 }
 
-pub fn present(connection: &Connection) -> bool {
+pub async fn present(connection: &Connection) -> bool {
     Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE)
+        .await
         .is_ok_and(|display| is_battery(&display))
 }
 
@@ -199,7 +199,9 @@ fn battery(display: &Properties, on_battery: bool, packs: &[Pack]) -> Option<Bat
             _ => 0,
         },
         charge,
-        rate: display.get::<f64>("EnergyRate").filter(|rate| *rate >= SMALLEST_RATE),
+        rate: display
+            .get::<f64>("EnergyRate")
+            .filter(|rate| *rate >= SMALLEST_RATE),
         capacity: capacity(packs),
         cycles: packs.iter().filter_map(Pack::cycles).collect(),
         limit: limit::read(packs),
@@ -222,7 +224,9 @@ fn peripheral((path, device): &(OwnedObjectPath, Properties)) -> Option<Device> 
     })
 }
 
-pub fn devices(connection: &Connection) -> Result<Vec<(OwnedObjectPath, Properties)>, String> {
+pub async fn devices(
+    connection: &Connection,
+) -> Result<Vec<(OwnedObjectPath, Properties)>, String> {
     let paths: Vec<OwnedObjectPath> = connection
         .call_method(
             Some(DESTINATION),
@@ -231,24 +235,27 @@ pub fn devices(connection: &Connection) -> Result<Vec<(OwnedObjectPath, Properti
             "EnumerateDevices",
             &(),
         )
+        .await
         .map_err(failed)?
         .body()
         .deserialize()
         .map_err(failed)?;
-    Ok(paths
-        .into_iter()
-        .filter_map(|path| {
-            let properties =
-                Properties::read(connection, DESTINATION, path.as_str(), DEVICE).ok()?;
-            Some((path, properties))
-        })
-        .collect())
+    let mut devices = Vec::with_capacity(paths.len());
+    for path in paths {
+        if let Ok(properties) =
+            Properties::read(connection, DESTINATION, path.as_str(), DEVICE).await
+        {
+            devices.push((path, properties));
+        }
+    }
+    Ok(devices)
 }
 
-pub fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<Device>), String> {
-    let devices = devices(connection)?;
-    let display = Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE)?;
-    let on_battery = Properties::read(connection, DESTINATION, PATH, DESTINATION)?
+pub async fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<Device>), String> {
+    let devices = devices(connection).await?;
+    let display = Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE).await?;
+    let on_battery = Properties::read(connection, DESTINATION, PATH, DESTINATION)
+        .await?
         .get::<bool>("OnBattery")
         .unwrap_or(true);
     Ok((

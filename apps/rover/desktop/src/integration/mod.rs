@@ -12,22 +12,23 @@ use futures_util::StreamExt;
 use zbus::{MessageStream, connection, object_server::Interface};
 
 fn serve_dbus<I: Interface>(bus_name: &str, object_path: &str, interface: I) -> Result<(), String> {
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
+    luft_app::block_on(serve(bus_name, object_path, interface))
+}
+
+async fn serve<I: Interface>(
+    bus_name: &str,
+    object_path: &str,
+    interface: I,
+) -> Result<(), String> {
+    let connection = connection::Builder::session()
+        .name(bus_name)
+        .serve_at(object_path, interface)
         .build()
+        .await
         .map_err(|error| error.to_string())?;
-    runtime.block_on(async {
-        let connection = connection::Builder::session()
-            .and_then(|builder| builder.name(bus_name))
-            .and_then(|builder| builder.serve_at(object_path, interface))
-            .map_err(|error| error.to_string())?
-            .build()
-            .await
-            .map_err(|error| error.to_string())?;
-        let mut messages = MessageStream::from(&connection);
-        while messages.next().await.is_some() {}
-        Ok(())
-    })
+    let mut messages = MessageStream::from(&connection);
+    while messages.next().await.is_some() {}
+    Ok(())
 }
 
 fn install_dbus_service(bus_name: &str, flag: &str) -> Result<(), String> {

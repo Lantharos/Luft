@@ -11,6 +11,7 @@ use luft_app::portal::{self, FileChooser, Filter};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+use tokio::task::spawn_blocking;
 
 use crate::{paths, sources};
 use definition::Method;
@@ -39,35 +40,43 @@ pub fn import_path(path: &Path) -> Result<Stored, String> {
     store::create(import::read(path)?)
 }
 
-fn import(_: Value) -> Result<Option<Stored>, String> {
+async fn import(_: Value) -> Result<Option<Stored>, String> {
     let chosen = portal::open_file(
         "Import an input method",
         Filter {
             name: "Input methods",
             patterns: vec!["*.toml".into(), "*.mim".into(), "*.txt".into()],
         },
-    )?;
-    chosen
-        .as_deref()
-        .and_then(portal::uri_path)
-        .map(|path| import_path(&path))
-        .transpose()
+    )
+    .await?;
+    let Some(path) = chosen.as_deref().and_then(portal::uri_path) else {
+        return Ok(None);
+    };
+    spawn_blocking(move || import_path(&path))
+        .await
+        .map_err(|error| error.to_string())?
+        .map(Some)
 }
 
-fn export(Id { id }: Id) -> Result<bool, String> {
-    let method = definition::load(&id)?;
+async fn export(Id { id }: Id) -> Result<bool, String> {
     let file_name = format!("{id}.toml");
+    let text = spawn_blocking(move || definition::load(&id).map(|method| method.to_text()))
+        .await
+        .map_err(|error| error.to_string())??;
     let chosen = FileChooser {
         title: "Export input method",
         current_name: Some(&file_name),
         ..FileChooser::default()
     }
-    .save()?;
+    .save()
+    .await?;
     let Some(path) = chosen.as_deref().and_then(portal::uri_path) else {
         return Ok(false);
     };
-    paths::write(&path, &method.to_text())?;
-    Ok(true)
+    spawn_blocking(move || paths::write(&path, &text))
+        .await
+        .map_err(|error| error.to_string())?
+        .map(|()| true)
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
@@ -88,8 +97,8 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("method_use", |Id { id }| {
             sources::add("ibus", &store::engine_name(&id))
         })
-        .command("method_import", import)
-        .command("method_export", export)
+        .command_async("method_import", import)
+        .command_async("method_export", export)
         .with("method_try", &preview, |preview, method: Method| {
             preview.load(&method);
             Ok(())

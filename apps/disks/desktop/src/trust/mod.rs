@@ -2,8 +2,10 @@ pub mod drives;
 
 use std::collections::HashMap;
 
+use futures_util::StreamExt;
 use luft_app::Events;
 use serde::Serialize;
+use zbus::OwnedVariant;
 
 use luft_disks::trust::{self as client, DRIVES, Map, TRUST, get};
 
@@ -40,23 +42,24 @@ fn drive(map: &Map) -> DriveState {
     }
 }
 
-fn system_protected() -> Result<bool, String> {
-    let disk = client::read(TRUST)?
-        .and_then(|properties| get::<zbus::zvariant::OwnedValue>(&properties, "Disk"))
+async fn system_protected() -> Result<bool, String> {
+    let disk = client::read(TRUST)
+        .await?
+        .and_then(|properties| get::<OwnedVariant>(&properties, "Disk"))
         .and_then(|value| Map::try_from(value).ok())
         .unwrap_or_default();
     Ok(get::<bool>(&disk, "Encrypted").unwrap_or(false)
         && get::<String>(&disk, "State").as_deref() == Some("on"))
 }
 
-pub fn state() -> Result<Protection, String> {
-    let Some(properties) = client::read(DRIVES)? else {
+pub async fn state() -> Result<Protection, String> {
+    let Some(properties) = client::read(DRIVES).await? else {
         return Ok(Protection::default());
     };
     let drives: HashMap<String, Map> = get(&properties, "Drives").unwrap_or_default();
     Ok(Protection {
         available: true,
-        auto_unlock: if system_protected()? {
+        auto_unlock: if system_protected().await? {
             String::new()
         } else {
             NEEDS_DEVICE_ENCRYPTION.to_owned()
@@ -69,9 +72,14 @@ pub fn state() -> Result<Protection, String> {
 }
 
 pub fn watch(events: Events) {
-    client::watch(move || {
-        if let Ok(state) = state() {
-            events.emit(CHANGED, state);
+    luft_app::spawn(async move {
+        let Ok(mut changes) = client::changes().await else {
+            return;
+        };
+        while changes.next().await.is_some() {
+            if let Ok(state) = state().await {
+                events.emit(CHANGED, state);
+            }
         }
     });
 }

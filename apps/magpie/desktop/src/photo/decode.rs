@@ -26,13 +26,7 @@ static CONTEXT: LazyLock<glib::MainContext> = LazyLock::new(|| {
     let context = glib::MainContext::new();
     let running = context.clone();
     thread::spawn(move || {
-        let runtime = tokio::runtime::Builder::new_multi_thread()
-            .worker_threads(1)
-            .thread_name("glycin")
-            .enable_all()
-            .build()
-            .expect("the image decoding runtime starts");
-        let _entered = runtime.enter();
+        let _entered = sabine::async_runtime().enter();
         let _ = running.with_thread_default(|| {
             glib::MainLoop::new(Some(&running), false).run();
         });

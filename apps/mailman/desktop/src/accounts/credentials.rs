@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use luft_app::secrets;
+use luft_app::{block_on, secrets};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
@@ -36,14 +36,14 @@ fn key(account: i64) -> String {
 impl Credentials {
     pub fn save(&self, account: i64, secret: Secret) -> Result<(), String> {
         let encoded = serde_json::to_vec(&secret).map_err(|error| error.to_string())?;
-        secrets::store(&key(account), &encoded)?;
+        block_on(secrets::store(&key(account), &encoded))?;
         self.cache.lock().insert(account, secret);
         Ok(())
     }
 
     pub fn forget(&self, account: i64) {
         self.cache.lock().remove(&account);
-        let _ = secrets::delete(&key(account));
+        let _ = block_on(secrets::delete(&key(account)));
     }
 
     pub fn renew(&self, account: &Account, rejected: &str) -> Result<Login, String> {
@@ -93,7 +93,7 @@ impl Credentials {
         if let Some(secret) = self.cache.lock().get(&account) {
             return Ok(secret.clone());
         }
-        let stored = secrets::load(&key(account))?
+        let stored = block_on(secrets::load(&key(account)))?
             .ok_or("The password for this account is missing from the keyring")?;
         let secret: Secret = serde_json::from_slice(&stored).map_err(|error| error.to_string())?;
         self.cache.lock().insert(account, secret.clone());

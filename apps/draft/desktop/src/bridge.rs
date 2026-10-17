@@ -10,7 +10,7 @@ use crate::store;
 
 pub fn register(window: SabineWindow, state: &DraftState) -> SabineWindow {
     window
-        .command("app_state", |_: Value| state::app_state())
+        .command_async("app_state", |_: Value| state::app_state())
         .command("activation_folders", launch::activation_folders)
         .command("store_read", store::read)
         .command("store_write", store::write)
@@ -19,11 +19,11 @@ pub fn register(window: SabineWindow, state: &DraftState) -> SabineWindow {
         .command("dir_files", index::files)
         .command("file_stat", files::stat)
         .command("file_encoding", encoding::detect)
-        .command("choose_files", desktop::choose_files)
-        .command("choose_folder", desktop::choose_folder)
-        .command("choose_save", desktop::choose_save)
-        .command("show_in_folder", desktop::show_in_folder)
-        .command("open_link", desktop::open_link)
+        .command_async("choose_files", desktop::choose_files)
+        .command_async("choose_folder", desktop::choose_folder)
+        .command_async("choose_save", desktop::choose_save)
+        .command_async("show_in_folder", desktop::show_in_folder)
+        .command_async("open_link", desktop::open_link)
         .with("write_chunk", &state.writes, |writes, chunk| {
             writes.append(chunk)
         })

@@ -3,15 +3,15 @@ use std::fmt::Display;
 use std::fs::File;
 use std::sync::Once;
 
-use luft_app::dbus;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, error_message, error_name, failed, service::absent};
 use luft_app::portal::{self, Filter};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
-use zbus::zvariant::{DynamicType, Fd, OwnedValue};
+use zbus::{DynamicType, Fd, OwnedVariant, Proxy};
 
 use crate::panels::personalization::appearance::wallpaper;
 
@@ -21,12 +21,11 @@ const GREETER: &str = "com.lantharos.Greeter1";
 const GREETER_PATH: &str = "/com/lantharos/Greeter1";
 const GREETER_ERROR: &str = "com.lantharos.Greeter1.Error.";
 const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
-const SERVICE_UNKNOWN: &str = "org.freedesktop.DBus.Error.ServiceUnknown";
 const PICTURES: [&str; 5] = ["jpg", "jpeg", "png", "webp", "jxl"];
 
 static WATCH: Once = Once::new();
 
-type Properties = HashMap<String, OwnedValue>;
+type Properties = HashMap<String, OwnedVariant>;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -66,29 +65,26 @@ struct AutomaticLogin {
     user: String,
 }
 
-fn failed(error: impl Display) -> String {
-    error.to_string()
-}
-
 fn explain(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(name, _, _) if name.ends_with("NotAuthorized") => {
-            "Administrator rights are needed to change this".to_owned()
-        }
-        zbus::Error::MethodError(name, Some(message), _) if name.starts_with(GREETER_ERROR) => {
-            message
-        }
-        error => error.to_string(),
+    let name = error_name(&error).unwrap_or_default();
+    if name.ends_with("NotAuthorized") {
+        return "Administrator rights are needed to change this".to_owned();
+    }
+    match error_message(&error) {
+        Some(message) if name.starts_with(GREETER_ERROR) => message.to_owned(),
+        _ => error.to_string(),
     }
 }
 
-fn greeter(interface: &'static str) -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::system()?, GREETER, GREETER_PATH, interface).map_err(failed)
+async fn greeter(interface: &'static str) -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::system().await?, GREETER, GREETER_PATH, interface)
+        .await
+        .map_err(failed)
 }
 
 fn take<T>(properties: &mut Properties, name: &str) -> Result<T, String>
 where
-    T: TryFrom<OwnedValue>,
+    T: TryFrom<OwnedVariant>,
     T::Error: Display,
 {
     properties
@@ -98,12 +94,11 @@ where
         .map_err(failed)
 }
 
-fn read() -> Result<Option<LoginScreen>, String> {
-    let mut properties: Properties = match greeter(PROPERTIES)?.call("GetAll", &GREETER) {
+async fn read() -> Result<Option<LoginScreen>, String> {
+    let mut properties: Properties = match greeter(PROPERTIES).await?.call("GetAll", &GREETER).await
+    {
         Ok(properties) => properties,
-        Err(zbus::Error::MethodError(name, _, _)) if name.as_str() == SERVICE_UNKNOWN => {
-            return Ok(None);
-        }
+        Err(error) if absent(&error) => return Ok(None),
         Err(error) => return Err(explain(error)),
     };
     let wallpaper: String = take(&mut properties, "SharedWallpaper")?;
@@ -122,37 +117,39 @@ fn read() -> Result<Option<LoginScreen>, String> {
 }
 
 fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(properties) = greeter(PROPERTIES) else {
+    luft_app::spawn(async move {
+        let Ok(properties) = greeter(PROPERTIES).await else {
             return;
         };
-        let Ok(changes) = properties.receive_signal("PropertiesChanged") else {
+        let Ok(mut changes) = properties.receive_signal("PropertiesChanged").await else {
             return;
         };
-        for _ in changes {
-            if let Ok(Some(screen)) = read() {
+        while changes.next().await.is_some() {
+            if let Ok(Some(screen)) = read().await {
                 events.emit(LOGIN_CHANGED, screen);
             }
         }
     });
 }
 
-fn screen(events: &Events, _: Value) -> Result<Option<LoginScreen>, String> {
-    let screen = read()?;
+async fn screen(events: Events, _: Value) -> Result<Option<LoginScreen>, String> {
+    let screen = read().await?;
     if screen.is_some() {
-        WATCH.call_once(|| watch(events.clone()));
+        WATCH.call_once(|| watch(events));
     }
     Ok(screen)
 }
 
-fn change<B: Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
-    greeter(GREETER)?
-        .call_with_flags::<_, _, ()>(method, MethodFlags::AllowInteractiveAuth.into(), body)
+async fn change<B: Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
+    greeter(GREETER)
+        .await?
+        .call_with_flags::<_, _, ()>(method, MethodFlags::ALLOW_INTERACTIVE_AUTH, body)
+        .await
         .map(|_| ())
         .map_err(explain)
 }
 
-fn choose_wallpaper(_: Value) -> Result<bool, String> {
+async fn choose_wallpaper(_: Value) -> Result<bool, String> {
     let Some(uri) = portal::open_file(
         "Choose a Picture",
         Filter {
@@ -162,34 +159,41 @@ fn choose_wallpaper(_: Value) -> Result<bool, String> {
                 .map(|extension| format!("*.{extension}"))
                 .collect(),
         },
-    )?
+    )
+    .await?
     else {
         return Ok(false);
     };
     let path = portal::uri_path(&uri).ok_or("This picture can't be opened")?;
     let picture = File::open(&path).map_err(failed)?;
-    let focus: (f64, f64) = wallpaper::focus::of(&path).into();
-    change("SetSharedWallpaper", &(Fd::from(&picture), focus))?;
+    let focus: (f64, f64) = tokio::task::spawn_blocking(move || wallpaper::focus::of(&path))
+        .await
+        .map_err(failed)?
+        .into();
+    change("SetSharedWallpaper", &(Fd::from(&picture), focus)).await?;
     Ok(true)
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("login_screen", events, screen)
-        .command("login_choose_wallpaper", choose_wallpaper)
-        .command("login_clear_wallpaper", |_: Value| {
+        .with_async("login_screen", events, screen)
+        .command_async("login_choose_wallpaper", choose_wallpaper)
+        .command_async("login_clear_wallpaper", |_: Value| {
             change("ClearSharedWallpaper", &())
         })
-        .command("login_set_show_users", |Enabled { enabled }| {
-            change("SetShowUsers", &enabled)
+        .command_async("login_set_show_users", |Enabled { enabled }| async move {
+            change("SetShowUsers", &enabled).await
         })
-        .command("login_set_hidden_users", |HiddenUsers { users }| {
-            change("SetHiddenUsers", &users)
-        })
-        .command("login_set_default_session", |DefaultSession { session }| {
-            change("SetDefaultSession", &session)
-        })
-        .command("login_set_automatic_login", |AutomaticLogin { user }| {
-            change("SetAutomaticLogin", &user)
-        })
+        .command_async(
+            "login_set_hidden_users",
+            |HiddenUsers { users }| async move { change("SetHiddenUsers", &users).await },
+        )
+        .command_async(
+            "login_set_default_session",
+            |DefaultSession { session }| async move { change("SetDefaultSession", &session).await },
+        )
+        .command_async(
+            "login_set_automatic_login",
+            |AutomaticLogin { user }| async move { change("SetAutomaticLogin", &user).await },
+        )
 }

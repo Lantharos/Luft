@@ -75,14 +75,15 @@ impl RoverState {
             .unwrap_or_else(|| APP_NAME.to_string())
     }
 
-    pub fn app_state(&self) -> AppState {
+    pub async fn app_state(&self) -> AppState {
+        let appearance = Appearance::current().await;
         AppState {
             chooser: self.chooser.as_ref().map(|session| session.config.clone()),
             launch_paths: self.launch_paths.to_vec(),
             settings: self.settings.read().clone(),
             user_dirs: self.user_dirs.as_ref().clone(),
             can_manage_drives: crate::locations::drives::can_manage(),
-            appearance: Appearance::current(),
+            appearance,
         }
     }
 }

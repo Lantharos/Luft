@@ -9,8 +9,7 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use inotify::{EventStream, Inotify, WatchMask};
 use zbus::object_server::ObjectServer;
-use zbus::zvariant::OwnedObjectPath;
-use zbus::{Connection, MessageStream, connection, fdo, interface};
+use zbus::{Connection, MessageStream, OwnedObjectPath, connection, fdo, interface};
 
 use crate::method::{self, ENGINE_PREFIX, SERVE_FLAG, Summary};
 use crate::paths;
@@ -84,9 +83,8 @@ fn exec() -> Result<String, String> {
 async fn register(methods: &[Summary]) -> Result<Connection, String> {
     let address = luft_app::ibus::address()?;
     let connection = connection::Builder::address(address.as_str())
-        .and_then(|builder| builder.name(COMPONENT))
-        .and_then(|builder| builder.serve_at(FACTORY_PATH, Factory::default()))
-        .map_err(|error| error.to_string())?
+        .name(COMPONENT)
+        .serve_at(FACTORY_PATH, Factory::default())
         .build()
         .await
         .map_err(|error| error.to_string())?;
@@ -166,11 +164,7 @@ pub fn serve() -> Result<(), String> {
     let Some(_lock) = lock()? else {
         return Ok(());
     };
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .map_err(|error| error.to_string())?;
-    runtime.block_on(async {
+    luft_app::block_on(async {
         let mut changes = watch()?;
         let mut failures = 0;
         loop {

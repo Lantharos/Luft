@@ -41,14 +41,16 @@ fn window(window: SabineWindow) -> SabineWindow {
         .single_instance(SingleInstancePolicy::FocusExisting)
 }
 
+async fn app_state(_: Value) -> Result<AppState, String> {
+    Ok(AppState {
+        appearance: Appearance::current().await,
+        hardware: hardware::detect().await,
+        meet: meet_intent(),
+    })
+}
+
 fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    let window = window.command("app_state", |_: Value| {
-        Ok(AppState {
-            appearance: Appearance::current(),
-            hardware: hardware::detect(),
-            meet: meet_intent(),
-        })
-    });
+    let window = window.command_async("app_state", app_state);
     let window = luft_network::register(window, events);
     let window = luft_fingerprint::register(window, events);
     let window = installer::register(window);
@@ -62,6 +64,6 @@ pub fn run() -> ! {
     luft_app::run(
         &events,
         |built| register(window(built), &events),
-        |events| installer::watch(&events),
+        installer::watch,
     )
 }

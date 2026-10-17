@@ -1,12 +1,12 @@
+use std::pin::pin;
 use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc::{self, Sender};
 
+use futures_util::{Stream, StreamExt, stream};
 use luft_app::Events;
-use luft_app::dbus;
-use luft_app::dbus::objects::{self, failed};
-use zbus::blocking::MessageIterator;
+use luft_app::dbus::{self, failed, objects};
 use zbus::message::Type;
+use zbus::{MatchRule, MessageStream};
 
 use super::{SERVICE, actions, rfkill};
 
@@ -26,49 +26,42 @@ pub fn close() {
     OPEN.store(false, Ordering::Relaxed);
 }
 
-fn rules() -> zbus::Result<[zbus::MatchRule<'static>; 2]> {
-    let signals = || {
-        zbus::MatchRule::builder()
-            .msg_type(Type::Signal)
-            .sender(SERVICE)
-    };
-    Ok([
-        signals()?.path_namespace("/org/bluez")?.build(),
-        signals()?.interface(OBJECT_MANAGER)?.path("/")?.build(),
-    ])
+async fn bluez() -> Result<impl Stream<Item = ()>, String> {
+    let system = dbus::system().await?;
+    let devices = objects::signals(system, SERVICE, "/org/bluez").await?;
+    let rule = MatchRule::builder()
+        .msg_type(Type::Signal)
+        .sender(SERVICE)
+        .interface(OBJECT_MANAGER)
+        .path("/")
+        .build()
+        .map_err(failed)?;
+    let interfaces = MessageStream::for_match_rule(rule, system, None)
+        .await
+        .map_err(failed)?;
+    Ok(stream::select(devices, interfaces).map(drop))
 }
 
 fn start(events: Events) {
-    let (changes, refreshes) = mpsc::channel();
-    rfkill::watch(changes.clone());
-    for rule in rules().into_iter().flatten() {
-        let changes = changes.clone();
-        std::thread::spawn(move || {
-            if let Err(error) = forward(rule, &changes) {
-                eprintln!("bluetooth: {error}");
-            }
-        });
-    }
-    std::thread::spawn(move || {
-        while objects::settle(&refreshes) {
+    luft_app::spawn(async move {
+        let bluez = bluez()
+            .await
+            .inspect_err(|error| eprintln!("bluetooth: {error}"))
+            .ok();
+        let mut changes = pin!(stream::select(
+            stream::iter(bluez).flatten(),
+            rfkill::changes()
+        ));
+        while objects::settle(&mut changes).await {
             if !OPEN.load(Ordering::Relaxed) {
                 continue;
             }
-            if let Ok(bluetooth) = super::bluetooth() {
+            if let Ok(bluetooth) = super::bluetooth().await {
                 if let Some(adapter) = &bluetooth.adapter {
-                    actions::browse(adapter);
+                    actions::browse(adapter).await;
                 }
                 events.emit(CHANGED, bluetooth);
             }
         }
     });
-}
-
-fn forward(rule: zbus::MatchRule<'static>, changes: &Sender<()>) -> Result<(), String> {
-    for _ in MessageIterator::for_match_rule(rule, dbus::system()?, None).map_err(failed)? {
-        if changes.send(()).is_err() {
-            break;
-        }
-    }
-    Ok(())
 }

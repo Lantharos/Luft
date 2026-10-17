@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use serde::Deserialize;
-use zbus::zvariant::Value;
+use zbus::Variant;
 
 use super::state::{self, MonitorInfo};
 
 const PERSISTENT: u32 = 2;
 const PASSED_THROUGH: [&str; 2] = ["color-mode", "rgb-range"];
 
-type MonitorConfig = (String, String, HashMap<&'static str, Value<'static>>);
+type MonitorConfig = (String, String, HashMap<&'static str, Variant<'static>>);
 type LogicalConfig = (i32, i32, f64, u32, bool, Vec<MonitorConfig>);
 
 #[derive(Deserialize)]
@@ -36,27 +36,27 @@ struct Output {
 fn monitor_properties(
     monitors: &[MonitorInfo],
     connector: &str,
-) -> HashMap<&'static str, Value<'static>> {
+) -> HashMap<&'static str, Variant<'static>> {
     let Some((_, _, properties)) = monitors.iter().find(|((name, ..), ..)| name == connector)
     else {
         return HashMap::new();
     };
-    let mut passed: HashMap<&'static str, Value<'static>> = PASSED_THROUGH
+    let mut passed: HashMap<&'static str, Variant<'static>> = PASSED_THROUGH
         .into_iter()
-        .filter_map(|key| Some((key, Value::from(state::number(properties, key)?))))
+        .filter_map(|key| Some((key, Variant::from(state::number(properties, key)?))))
         .collect();
     if properties.contains_key("is-underscanning") {
         passed.insert(
             "underscanning",
-            Value::from(state::flag(properties, "is-underscanning")),
+            Variant::from(state::flag(properties, "is-underscanning")),
         );
     }
     passed
 }
 
-pub fn apply(Apply { serial, logical }: Apply) -> Result<(), String> {
-    let proxy = state::proxy()?;
-    let (_, monitors, _, properties) = state::read(&proxy)?;
+pub async fn apply(Apply { serial, logical }: Apply) -> Result<(), String> {
+    let proxy = state::proxy().await?;
+    let (_, monitors, _, properties) = state::read(&proxy).await?;
     let config: Vec<LogicalConfig> = logical
         .into_iter()
         .map(|logical| {
@@ -78,17 +78,18 @@ pub fn apply(Apply { serial, logical }: Apply) -> Result<(), String> {
             )
         })
         .collect();
-    let mut options: HashMap<&str, Value> = HashMap::new();
+    let mut options: HashMap<&str, Variant> = HashMap::new();
     if state::flag(&properties, "supports-changing-layout-mode")
         && let Some(layout) = state::number(&properties, "layout-mode")
     {
-        options.insert("layout-mode", Value::from(layout));
+        options.insert("layout-mode", Variant::from(layout));
     }
     proxy
         .call_method(
             "ApplyMonitorsConfig",
             &(serial, PERSISTENT, config, options),
         )
+        .await
         .map(|_| ())
         .map_err(|error| error.to_string())
 }

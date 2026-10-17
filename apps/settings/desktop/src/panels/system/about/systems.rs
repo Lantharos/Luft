@@ -17,8 +17,9 @@ pub struct Removal {
     id: String,
 }
 
-pub fn list() -> Result<Vec<OtherSystem>, String> {
-    Ok(systems::find()?
+pub async fn list() -> Result<Vec<OtherSystem>, String> {
+    Ok(systems::find()
+        .await?
         .into_iter()
         .filter(|system| {
             system.kind == Kind::OldSystem

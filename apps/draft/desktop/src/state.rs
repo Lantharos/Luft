@@ -34,11 +34,11 @@ impl DraftState {
     }
 }
 
-pub fn app_state() -> Result<AppState, String> {
+pub async fn app_state() -> Result<AppState, String> {
     let home = dirs::home_dir().ok_or("Could not find the home folder")?;
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     Ok(AppState {
-        appearance: Appearance::current(),
+        appearance: Appearance::current().await,
         home: home.to_string_lossy().into_owned(),
         backups: store::backups()?.to_string_lossy().into_owned(),
         folders: launch::folders(&arguments, std::env::current_dir().ok().as_deref()),

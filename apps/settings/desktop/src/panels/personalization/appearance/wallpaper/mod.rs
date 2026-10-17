@@ -11,6 +11,7 @@ use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde_json::Value;
 
+use cache::failed;
 use library::Wallpaper;
 
 static WATCH: Once = Once::new();
@@ -20,7 +21,7 @@ fn wallpapers(events: &Events, _: Value) -> Result<Vec<Wallpaper>, String> {
     library::list()
 }
 
-fn add_wallpapers(_: Value) -> Result<(), String> {
+async fn add_wallpapers(_: Value) -> Result<(), String> {
     let chosen = portal::open_files(
         "Add Wallpapers",
         Filter {
@@ -29,8 +30,11 @@ fn add_wallpapers(_: Value) -> Result<(), String> {
                 .map(|extension| format!("*.{extension}"))
                 .collect(),
         },
-    )?;
-    library::add(&chosen)
+    )
+    .await?;
+    tokio::task::spawn_blocking(move || library::add(&chosen))
+        .await
+        .map_err(failed)?
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
@@ -38,6 +42,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .with("appearance_wallpapers", events, wallpapers)
         .command("appearance_thumbnail", thumbnail::thumbnail)
         .command("appearance_wallpaper_focus", focus::focus)
-        .command("appearance_add_wallpapers", add_wallpapers)
+        .command_async("appearance_add_wallpapers", add_wallpapers)
         .command("appearance_open_folder", |_: Value| library::open_folder())
 }

@@ -71,7 +71,8 @@ impl MailmanState {
         self.engine.start();
     }
 
-    pub fn app_state(&self) -> Result<AppState, String> {
+    pub async fn app_state(self) -> Result<AppState, String> {
+        let appearance = Appearance::current().await;
         Ok(AppState {
             launch: self.launch.clone(),
             accounts: self.store.accounts()?,
@@ -79,7 +80,7 @@ impl MailmanState {
             mailboxes: self.store.mailboxes(None)?,
             settings: self.store.settings(),
             oauth: oauth_providers(),
-            appearance: Appearance::current(),
+            appearance,
         })
     }
 }

@@ -81,8 +81,8 @@ fn launch(Desktop { desktop }: Desktop) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-fn removal_plan(Package { package }: Package) -> Result<Vec<String>, String> {
-    luft_software::packages::removal_plan(&package)
+async fn removal_plan(Package { package }: Package) -> Result<Vec<String>, String> {
+    luft_software::packages::removal_plan(&package).await
 }
 
 fn permissions(
@@ -98,6 +98,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
-        .command("library_removal_plan", removal_plan)
+        .command_async("library_removal_plan", removal_plan)
         .command("library_permissions", permissions)
 }

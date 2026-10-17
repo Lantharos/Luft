@@ -6,9 +6,10 @@ mod usb;
 
 use std::sync::Once;
 
+use futures_util::StreamExt;
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use properties::Service;
@@ -56,95 +57,106 @@ struct Enabled {
     enabled: bool,
 }
 
-fn trust(events: &Events, _: Value) -> Result<Option<Trust>, String> {
-    let state = trust::read()?;
+fn follow<T, F>(service: &'static Service, name: &'static str, events: Events, read: fn() -> F)
+where
+    T: Serialize,
+    F: Future<Output = Result<Option<T>, String>> + Send + 'static,
+{
+    luft_app::spawn(async move {
+        let Ok(mut changes) = service.changes().await else {
+            return;
+        };
+        while changes.next().await.is_some() {
+            if let Ok(Some(state)) = read().await {
+                events.emit(name, state);
+            }
+        }
+    });
+}
+
+async fn trust(events: Events, _: Value) -> Result<Option<Trust>, String> {
+    let state = trust::read().await?;
     if state.is_some() {
-        let events = events.clone();
-        WATCH_TRUST.call_once(|| {
-            TRUST.watch(move || {
-                if let Ok(Some(state)) = trust::read() {
-                    events.emit(TRUST_CHANGED, state);
-                }
-            })
-        });
+        WATCH_TRUST.call_once(|| follow(&TRUST, TRUST_CHANGED, events, trust::read));
     }
     Ok(state)
 }
 
-fn usb_protection(events: &Events, _: Value) -> Result<Option<UsbProtection>, String> {
-    let state = usb::read()?;
+async fn usb_protection(events: Events, _: Value) -> Result<Option<UsbProtection>, String> {
+    let state = usb::read().await?;
     if state.is_some() {
-        let events = events.clone();
-        WATCH_USB.call_once(|| {
-            USB_PROTECTION.watch(move || {
-                if let Ok(Some(state)) = usb::read() {
-                    events.emit(USB_CHANGED, state);
-                }
-            })
-        });
+        WATCH_USB.call_once(|| follow(&USB_PROTECTION, USB_CHANGED, events, usb::read));
     }
     Ok(state)
 }
 
-fn restart(_: Value) -> Result<(), String> {
+async fn restart(_: Value) -> Result<(), String> {
     LOGIN
         .change::<_, ()>("Reboot", &true)
+        .await
         .map_err(|error| error.to_string())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("security_trust", events, trust)
-        .with("security_usb", events, usb_protection)
-        .command("security_host", |_: Value| hsi::read())
-        .command("security_set_usb", |Enabled { enabled }| {
+        .with_async("security_trust", events, trust)
+        .with_async("security_usb", events, usb_protection)
+        .command_async("security_host", |_: Value| hsi::read())
+        .command_async("security_set_usb", |Enabled { enabled }| {
             usb::set_enabled(enabled)
         })
-        .command("security_check_encryption", |_: Value| trust::checks())
-        .command("security_generate_key", |_: Value| {
+        .command_async("security_check_encryption", |_: Value| trust::checks())
+        .command_async("security_generate_key", |_: Value| {
             trust::call::<_, String>("GenerateRecoveryKey", &())
         })
-        .command(
+        .command_async(
             "security_turn_on",
             |TurnOn {
                  recovery_key,
                  pin,
                  passphrase,
-             }| {
-                trust::call::<_, ()>("TurnOnEncryption", &(recovery_key, pin, passphrase))
+             }| async move {
+                trust::call::<_, ()>("TurnOnEncryption", &(recovery_key, pin, passphrase)).await
             },
         )
-        .command("security_turn_off", |Unlock { unlock }| {
-            trust::unlocking::<_, ()>("TurnOffEncryption", &unlock)
+        .command_async("security_turn_off", |Unlock { unlock }| async move {
+            trust::unlocking::<_, ()>("TurnOffEncryption", &unlock).await
         })
-        .command("security_set_up_tpm", |TpmUnlock { unlock, pin }| {
-            trust::unlocking::<_, String>("SetUpTpmUnlock", &(unlock, pin))
+        .command_async(
+            "security_set_up_tpm",
+            |TpmUnlock { unlock, pin }| async move {
+                trust::unlocking::<_, String>("SetUpTpmUnlock", &(unlock, pin)).await
+            },
+        )
+        .command_async("security_remove_tpm", |Unlock { unlock }| async move {
+            trust::unlocking::<_, ()>("RemoveTpmUnlock", &unlock).await
         })
-        .command("security_remove_tpm", |Unlock { unlock }| {
-            trust::unlocking::<_, ()>("RemoveTpmUnlock", &unlock)
-        })
-        .command("security_show_key", |_: Value| {
+        .command_async("security_show_key", |_: Value| {
             trust::call::<_, String>("ShowRecoveryKey", &())
         })
-        .command("security_replace_key", |Unlock { unlock }| {
-            trust::unlocking::<_, String>("ReplaceRecoveryKey", &unlock)
+        .command_async("security_replace_key", |Unlock { unlock }| async move {
+            trust::unlocking::<_, String>("ReplaceRecoveryKey", &unlock).await
         })
-        .command("security_enroll_key", |_: Value| {
+        .command_async("security_enroll_key", |_: Value| {
             trust::call::<_, String>("EnrollSigningKey", &())
         })
-        .command("security_cancel_enrollment", |_: Value| {
+        .command_async("security_cancel_enrollment", |_: Value| {
             trust::call::<_, ()>("CancelSigningKeyEnrollment", &())
         })
-        .command("security_remove_other_keys", |_: Value| {
+        .command_async("security_remove_other_keys", |_: Value| {
             trust::call::<_, String>("RemoveOtherKeys", &())
         })
-        .command("security_keep_other_keys", |_: Value| {
+        .command_async("security_keep_other_keys", |_: Value| {
             trust::call::<_, ()>("KeepOtherKeys", &())
         })
-        .command("security_install_startup", |_: Value| {
+        .command_async("security_install_startup", |_: Value| {
             trust::call::<_, ()>("InstallSignedStartup", &())
         })
-        .command("security_save_key", |Key { key }| recovery::save(&key))
-        .command("security_print_key", |Key { key }| recovery::print(&key))
-        .command("security_restart", restart)
+        .command_async("security_save_key", |Key { key }| async move {
+            recovery::save(&key).await
+        })
+        .command_async("security_print_key", |Key { key }| async move {
+            recovery::print(&key).await
+        })
+        .command_async("security_restart", restart)
 }

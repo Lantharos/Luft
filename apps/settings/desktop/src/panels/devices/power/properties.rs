@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 
-use zbus::blocking::Connection;
-use zbus::zvariant::{OwnedValue, Value};
+use zbus::{Connection, OwnedVariant, Variant};
 
 use super::failed;
 
-pub struct Properties(HashMap<String, OwnedValue>);
+pub struct Properties(HashMap<String, OwnedVariant>);
 
 impl Properties {
-    pub fn read(
+    pub async fn read(
         connection: &Connection,
         destination: &str,
         path: &str,
@@ -22,6 +21,7 @@ impl Properties {
                 "GetAll",
                 &interface,
             )
+            .await
             .map_err(failed)?
             .body()
             .deserialize()
@@ -31,24 +31,24 @@ impl Properties {
 
     pub fn get<'a, T>(&'a self, key: &str) -> Option<T>
     where
-        T: TryFrom<&'a Value<'a>>,
-        <T as TryFrom<&'a Value<'a>>>::Error: Into<zbus::zvariant::Error>,
+        T: TryFrom<&'a Variant<'a>>,
+        <T as TryFrom<&'a Variant<'a>>>::Error: Into<zbus::Error>,
     {
         self.0.get(key)?.downcast_ref().ok()
     }
 
-    pub fn owned(&self, key: &str) -> Option<OwnedValue> {
+    pub fn owned(&self, key: &str) -> Option<OwnedVariant> {
         self.0.get(key)?.try_clone().ok()
     }
 }
 
-pub fn set(
+pub async fn set(
     connection: &Connection,
     destination: &str,
     path: &str,
     interface: &str,
     key: &str,
-    value: Value,
+    value: Variant<'_>,
 ) -> Result<(), String> {
     connection
         .call_method(
@@ -58,6 +58,7 @@ pub fn set(
             "Set",
             &(interface, key, value),
         )
+        .await
         .map(|_| ())
         .map_err(failed)
 }

@@ -5,12 +5,12 @@ use std::ffi::CString;
 use std::fs;
 
 use gio::prelude::*;
-use luft_app::dbus;
+use luft_app::dbus::{self, failed};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 
 const DISKS: &str = "com.lantharos.disks.desktop";
 
@@ -40,14 +40,15 @@ struct Rename {
     name: String,
 }
 
-fn hostnamed() -> Result<Proxy<'static>, String> {
+async fn hostnamed() -> Result<Proxy<'static>, String> {
     Proxy::new(
-        dbus::system()?,
+        dbus::system().await?,
         "org.freedesktop.hostname1",
         "/org/freedesktop/hostname1",
         "org.freedesktop.hostname1",
     )
-    .map_err(|error| error.to_string())
+    .await
+    .map_err(failed)
 }
 
 fn os_release() -> String {
@@ -154,11 +155,17 @@ fn pci_name(names: &str, vendor: &str, device: &str) -> Option<String> {
     Some(format!("{short_vendor} {device_name}"))
 }
 
-fn about() -> Result<About, String> {
-    let hostnamed = hostnamed()?;
-    let hostname: String = hostnamed.get_property("StaticHostname").unwrap_or_default();
-    let pretty: String = hostnamed.get_property("PrettyHostname").unwrap_or_default();
-    Ok(About {
+async fn about(_: Value) -> Result<About, String> {
+    let hostnamed = hostnamed().await?;
+    let hostname: String = hostnamed
+        .get_property("StaticHostname")
+        .await
+        .unwrap_or_default();
+    let pretty: String = hostnamed
+        .get_property("PrettyHostname")
+        .await
+        .unwrap_or_default();
+    tokio::task::spawn_blocking(move || About {
         device_name: if pretty.is_empty() {
             hostname.clone()
         } else {
@@ -175,6 +182,8 @@ fn about() -> Result<About, String> {
         memory: memory(),
         storage: storage(),
     })
+    .await
+    .map_err(failed)
 }
 
 fn launch_disks(argument: &str) -> Result<(), String> {
@@ -184,22 +193,24 @@ fn launch_disks(argument: &str) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-fn rename(Rename { name }: Rename) -> Result<(), String> {
-    hostnamed()?
+async fn rename(Rename { name }: Rename) -> Result<(), String> {
+    hostnamed()
+        .await?
         .call_method("SetPrettyHostname", &(name.trim(), true))
+        .await
         .map(|_| ())
-        .map_err(|error| error.to_string())
+        .map_err(failed)
 }
 
 pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
-        .command("about", |_: Value| about())
-        .command("about_rename", rename)
+        .command_async("about", about)
+        .command_async("about_rename", rename)
         .command("about_open_disks", |_: Value| launch_disks("file:///"))
-        .command("about_other_systems", |_: Value| systems::list())
+        .command_async("about_other_systems", |_: Value| systems::list())
         .command("about_remove_system", systems::remove)
         .command("about_problems", |_: Value| problems::problems())
-        .command("about_firmware_restart", |_: Value| {
+        .command_async("about_firmware_restart", |_: Value| {
             problems::restart_to_firmware()
         })
 }

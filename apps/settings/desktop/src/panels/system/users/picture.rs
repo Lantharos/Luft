@@ -15,7 +15,7 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-pub fn choose() -> Result<Option<PathBuf>, String> {
+pub async fn choose() -> Result<Option<PathBuf>, String> {
     let Some(uri) = portal::open_file(
         "Choose a Picture",
         Filter {
@@ -25,14 +25,18 @@ pub fn choose() -> Result<Option<PathBuf>, String> {
                 .map(|extension| format!("*.{extension}"))
                 .collect(),
         },
-    )?
+    )
+    .await?
     else {
         return Ok(None);
     };
     let source = gio::File::for_uri(&uri)
         .path()
         .ok_or("This picture can't be opened")?;
-    square(&source).map(Some)
+    tokio::task::spawn_blocking(move || square(&source))
+        .await
+        .map_err(failed)?
+        .map(Some)
 }
 
 fn decode(source: &Path) -> Result<DynamicImage, String> {

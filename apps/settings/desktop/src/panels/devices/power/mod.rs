@@ -4,20 +4,21 @@ mod limit;
 mod profiles;
 mod properties;
 
-use std::sync::Once;
-
-use luft_app::dbus;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, failed};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::{Connection, MessageIterator};
+use tokio::sync::OnceCell;
+use zbus::message::Type;
+use zbus::{Connection, MatchRule, MessageStream};
 
 pub const POWER_CHANGED: &str = "power.changed";
 
 const UPOWER_NAMESPACE: &str = "/org/freedesktop/UPower";
 
-static WATCH: Once = Once::new();
+static WATCH: OnceCell<()> = OnceCell::const_new();
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -45,11 +46,7 @@ struct Keyboard {
     level: i32,
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
-fn can_hibernate(connection: &Connection) -> bool {
+async fn can_hibernate(connection: &Connection) -> bool {
     connection
         .call_method(
             Some("org.freedesktop.login1"),
@@ -58,70 +55,72 @@ fn can_hibernate(connection: &Connection) -> bool {
             "CanHibernate",
             &(),
         )
+        .await
         .and_then(|reply| reply.body().deserialize::<String>())
         .is_ok_and(|answer| matches!(answer.as_str(), "yes" | "challenge"))
 }
 
-pub fn has_battery() -> bool {
-    dbus::system().is_ok_and(battery::present)
+pub async fn has_battery() -> bool {
+    match dbus::system().await {
+        Ok(connection) => battery::present(connection).await,
+        Err(_) => false,
+    }
 }
 
-fn read() -> Result<PowerState, String> {
-    let connection = dbus::system()?;
-    let (battery, devices) = battery::read(connection).unwrap_or_default();
+async fn read() -> Result<PowerState, String> {
+    let connection = dbus::system().await?;
+    let (battery, devices) = battery::read(connection).await.unwrap_or_default();
     Ok(PowerState {
         battery,
         devices,
-        keyboard: keyboard::read(connection).ok().flatten(),
-        profiles: profiles::read(connection).ok(),
-        can_hibernate: can_hibernate(connection),
+        keyboard: keyboard::read(connection).await.ok().flatten(),
+        profiles: profiles::read(connection).await.ok(),
+        can_hibernate: can_hibernate(connection).await,
     })
 }
 
-fn watch(events: Events) -> Result<(), String> {
-    let connection = dbus::system()?;
-    let rule = zbus::MatchRule::builder()
-        .msg_type(zbus::message::Type::Signal)
+async fn watch(events: Events) -> Result<(), String> {
+    let rule = MatchRule::builder()
+        .msg_type(Type::Signal)
         .path_namespace(UPOWER_NAMESPACE)
-        .map_err(failed)?
-        .build();
-    let signals = MessageIterator::for_match_rule(rule, connection, None).map_err(failed)?;
-    std::thread::Builder::new()
-        .name("power-watch".into())
-        .spawn(move || {
-            for _ in signals.flatten() {
-                if let Ok(state) = read() {
-                    events.emit(POWER_CHANGED, state);
-                }
-            }
-        })
+        .build()
         .map_err(failed)?;
+    let mut signals = MessageStream::for_match_rule(rule, dbus::system().await?, None)
+        .await
+        .map_err(failed)?;
+    luft_app::spawn(async move {
+        while let Some(signal) = signals.next().await {
+            if signal.is_ok()
+                && let Ok(state) = read().await
+            {
+                events.emit(POWER_CHANGED, state);
+            }
+        }
+    });
     Ok(())
 }
 
-fn state(events: &Events, _: Value) -> Result<PowerState, String> {
-    let mut started = Ok(());
-    WATCH.call_once(|| started = watch(events.clone()));
-    started?;
-    read()
+async fn state(events: Events, _: Value) -> Result<PowerState, String> {
+    WATCH.get_or_try_init(|| watch(events)).await?;
+    read().await
 }
 
-fn set_profile(Profile { profile }: Profile) -> Result<(), String> {
-    profiles::set(dbus::system()?, &profile)
+async fn set_profile(Profile { profile }: Profile) -> Result<(), String> {
+    profiles::set(dbus::system().await?, &profile).await
 }
 
-fn set_charge_limit(ChargeLimit { enabled }: ChargeLimit) -> Result<(), String> {
-    limit::set(dbus::system()?, enabled)
+async fn set_charge_limit(ChargeLimit { enabled }: ChargeLimit) -> Result<(), String> {
+    limit::set(dbus::system().await?, enabled).await
 }
 
-fn set_keyboard(Keyboard { id, level }: Keyboard) -> Result<(), String> {
-    keyboard::set(dbus::system()?, &id, level)
+async fn set_keyboard(Keyboard { id, level }: Keyboard) -> Result<(), String> {
+    keyboard::set(dbus::system().await?, &id, level).await
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("power_state", events, state)
-        .command("power_set_profile", set_profile)
-        .command("power_set_charge_limit", set_charge_limit)
-        .command("power_set_keyboard", set_keyboard)
+        .with_async("power_state", events, state)
+        .command_async("power_set_profile", set_profile)
+        .command_async("power_set_charge_limit", set_charge_limit)
+        .command_async("power_set_keyboard", set_keyboard)
 }

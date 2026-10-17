@@ -16,9 +16,9 @@ struct AppState {
 
 pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
     window
-        .command("app_state", |_: Value| {
+        .command_async("app_state", |_: Value| async {
             Ok(AppState {
-                appearance: Appearance::current(),
+                appearance: Appearance::current().await,
                 settings: settings::read(),
             })
         })

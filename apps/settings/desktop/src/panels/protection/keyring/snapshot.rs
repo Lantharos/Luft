@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
+use futures_util::future::join;
 use luft_app::apps::App;
 use serde::Serialize;
-use zbus::zvariant::{DeserializeDict, OwnedObjectPath, Type};
+use zbus::{DeserializeDict, OwnedObjectPath, Type};
 
 use super::bus::{self, ACCESS, Problem, SSH, STATUS};
 
@@ -14,7 +15,7 @@ type Record = (u64, String, String, String, String);
 type Key = (String, String, String, bool, bool, u64);
 
 #[derive(DeserializeDict, Type, Serialize)]
-#[zvariant(signature = "a{sv}", rename_all = "PascalCase")]
+#[zbus(signature = "a{sv}", rename_all = "PascalCase")]
 #[serde(rename_all = "camelCase")]
 struct Status {
     locked: bool,
@@ -27,7 +28,7 @@ struct Status {
 }
 
 #[derive(DeserializeDict, Type)]
-#[zvariant(signature = "a{sv}", rename_all = "PascalCase")]
+#[zbus(signature = "a{sv}", rename_all = "PascalCase")]
 struct Agent {
     socket: String,
     chip_keys: bool,
@@ -144,9 +145,10 @@ fn group(entries: Vec<Entry>) -> Vec<AppAccess> {
     apps
 }
 
-fn access() -> Result<Access, Problem> {
-    let entries: Vec<Entry> = bus::call(ACCESS, "Entries", &())?;
-    let mut stores: Vec<AppStore> = bus::call::<_, Vec<Store>>(ACCESS, "AppStores", &())?
+async fn access() -> Result<Access, Problem> {
+    let entries: Vec<Entry> = bus::call(ACCESS, "Entries", &()).await?;
+    let mut stores: Vec<AppStore> = bus::call::<_, Vec<Store>>(ACCESS, "AppStores", &())
+        .await?
         .into_iter()
         .map(|(key, name, desktop_id, secrets)| AppStore {
             app: identity(key, name, &desktop_id),
@@ -154,7 +156,8 @@ fn access() -> Result<Access, Problem> {
         })
         .collect();
     by_name(&mut stores, |store| &store.app.name);
-    let history = bus::call::<_, Vec<Record>>(ACCESS, "History", &(HISTORY_LIMIT,))?
+    let history = bus::call::<_, Vec<Record>>(ACCESS, "History", &(HISTORY_LIMIT,))
+        .await?
         .into_iter()
         .map(|(time, app, _, action, what)| Event {
             time,
@@ -170,9 +173,10 @@ fn access() -> Result<Access, Problem> {
     })
 }
 
-fn ssh() -> Result<Ssh, Problem> {
-    let agent: Agent = bus::properties(SSH)?;
-    let keys = bus::call::<_, Vec<Key>>(SSH, "Keys", &())?
+async fn ssh() -> Result<Ssh, Problem> {
+    let agent: Agent = bus::properties(SSH).await?;
+    let keys = bus::call::<_, Vec<Key>>(SSH, "Keys", &())
+        .await?
         .into_iter()
         .map(|(fingerprint, name, kind, chip, confirm, added)| SshKey {
             fingerprint,
@@ -190,13 +194,14 @@ fn ssh() -> Result<Ssh, Problem> {
     })
 }
 
-pub fn read() -> Result<Option<Keyring>, Problem> {
-    let Some(status) = bus::optional(bus::properties::<Status>(STATUS))? else {
+pub async fn read() -> Result<Option<Keyring>, Problem> {
+    let Some(status) = bus::optional(bus::properties::<Status>(STATUS).await)? else {
         return Ok(None);
     };
+    let (access, ssh) = join(access(), ssh()).await;
     Ok(Some(Keyring {
         status,
-        access: bus::optional(access())?,
-        ssh: bus::optional(ssh())?,
+        access: bus::optional(access)?,
+        ssh: bus::optional(ssh)?,
     }))
 }

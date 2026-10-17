@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
-use luft_app::dbus;
-use zbus::blocking::{Connection, Proxy};
-use zbus::zvariant::{DynamicDeserialize, DynamicType, OwnedObjectPath, OwnedValue, Value};
+use futures_util::StreamExt;
+use luft_app::dbus::{self, failed};
+use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 const SERVICE: &str = "org.freedesktop.secrets";
 const ROOT: &str = "/org/freedesktop/secrets";
@@ -18,11 +19,7 @@ const UUID: &str = "gvfs-luks-uuid";
 
 type Secret = (OwnedObjectPath, Vec<u8>, Vec<u8>, String);
 
-fn connection() -> Result<&'static Connection, String> {
-    dbus::session()
-}
-
-fn call<R>(
+async fn call<R>(
     path: &str,
     interface: &str,
     method: &str,
@@ -31,78 +28,77 @@ fn call<R>(
 where
     R: for<'a> DynamicDeserialize<'a>,
 {
-    connection()?
+    dbus::session()
+        .await?
         .call_method(Some(SERVICE), path, Some(interface), method, body)
+        .await
         .and_then(|reply| reply.body().deserialize::<R>())
-        .map_err(|error| error.to_string())
+        .map_err(failed)
 }
 
-fn session() -> Result<OwnedObjectPath, String> {
-    let (_, session): (OwnedValue, OwnedObjectPath) =
-        call(ROOT, SECRETS, "OpenSession", &("plain", Value::from("")))?;
+async fn session() -> Result<OwnedObjectPath, String> {
+    let (_, session): (OwnedVariant, OwnedObjectPath) =
+        call(ROOT, SECRETS, "OpenSession", &("plain", Variant::from(""))).await?;
     Ok(session)
 }
 
-fn prompt(path: OwnedObjectPath) -> Result<Option<OwnedValue>, String> {
+async fn prompt(path: OwnedObjectPath) -> Result<Option<OwnedVariant>, String> {
     if path.as_str() == NO_PROMPT {
         return Ok(None);
     }
-    let proxy =
-        Proxy::new(connection()?, SERVICE, path, PROMPT).map_err(|error| error.to_string())?;
-    let mut completed = proxy
-        .receive_signal("Completed")
-        .map_err(|error| error.to_string())?;
-    proxy
-        .call_method("Prompt", &("",))
-        .map_err(|error| error.to_string())?;
-    let Some(signal) = completed.next() else {
+    let proxy = Proxy::new(dbus::session().await?, SERVICE, path, PROMPT)
+        .await
+        .map_err(failed)?;
+    let mut completed = proxy.receive_signal("Completed").await.map_err(failed)?;
+    proxy.call_method("Prompt", &("",)).await.map_err(failed)?;
+    let Some(signal) = completed.next().await else {
         return Ok(None);
     };
-    let (dismissed, result): (bool, OwnedValue) = signal
-        .body()
-        .deserialize()
-        .map_err(|error| error.to_string())?;
+    let (dismissed, result): (bool, OwnedVariant) = signal.body().deserialize().map_err(failed)?;
     Ok((!dismissed).then_some(result))
 }
 
-fn items(uuid: &str) -> Result<Vec<OwnedObjectPath>, String> {
+async fn items(uuid: &str) -> Result<Vec<OwnedObjectPath>, String> {
     let (mut unlocked, locked): (Vec<OwnedObjectPath>, Vec<OwnedObjectPath>) = call(
         ROOT,
         SECRETS,
         "SearchItems",
         &(HashMap::from([(UUID, uuid)]),),
-    )?;
+    )
+    .await?;
     if !locked.is_empty() {
         let (opened, waiting): (Vec<OwnedObjectPath>, OwnedObjectPath) =
-            call(ROOT, SECRETS, "Unlock", &(&locked,))?;
+            call(ROOT, SECRETS, "Unlock", &(&locked,)).await?;
         unlocked.extend(opened);
-        if let Some(result) = prompt(waiting)? {
+        if let Some(result) = prompt(waiting).await? {
             unlocked.extend(Vec::<OwnedObjectPath>::try_from(result).unwrap_or_default());
         }
     }
     Ok(unlocked)
 }
 
-pub fn load(uuid: &str) -> Option<String> {
-    let item = items(uuid).ok()?.into_iter().next()?;
-    let session = session().ok()?;
-    let (_, _, value, _): Secret = call(item.as_str(), ITEM, "GetSecret", &(&session,)).ok()?;
+pub async fn load(uuid: &str) -> Option<String> {
+    let item = items(uuid).await.ok()?.into_iter().next()?;
+    let session = session().await.ok()?;
+    let (_, _, value, _): Secret = call(item.as_str(), ITEM, "GetSecret", &(&session,))
+        .await
+        .ok()?;
     String::from_utf8(value).ok()
 }
 
-pub fn store(uuid: &str, name: &str, passphrase: &str) -> Result<(), String> {
-    delete(uuid);
-    let session = session()?;
+pub async fn store(uuid: &str, name: &str, passphrase: &str) -> Result<(), String> {
+    delete(uuid).await;
+    let session = session().await?;
     let label = format!("Encryption passphrase for {name}");
     let attributes = HashMap::from([("xdg:schema", SCHEMA), (UUID, uuid)]);
     let properties = HashMap::from([
         (
             "org.freedesktop.Secret.Item.Label",
-            Value::from(label.as_str()),
+            Variant::from(label.as_str()),
         ),
         (
             "org.freedesktop.Secret.Item.Attributes",
-            Value::from(attributes),
+            Variant::from(attributes),
         ),
     ]);
     let secret = (
@@ -116,15 +112,16 @@ pub fn store(uuid: &str, name: &str, passphrase: &str) -> Result<(), String> {
         COLLECTION,
         "CreateItem",
         &(properties, secret, true),
-    )?;
-    prompt(waiting)?;
+    )
+    .await?;
+    prompt(waiting).await?;
     Ok(())
 }
 
-pub fn delete(uuid: &str) {
-    for item in items(uuid).unwrap_or_default() {
-        if let Ok(waiting) = call::<OwnedObjectPath>(item.as_str(), ITEM, "Delete", &()) {
-            let _ = prompt(waiting);
+pub async fn delete(uuid: &str) {
+    for item in items(uuid).await.unwrap_or_default() {
+        if let Ok(waiting) = call::<OwnedObjectPath>(item.as_str(), ITEM, "Delete", &()).await {
+            let _ = prompt(waiting).await;
         }
     }
 }

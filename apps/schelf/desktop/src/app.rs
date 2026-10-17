@@ -55,19 +55,21 @@ fn open_url(Link { url }: Link) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
+async fn state(_: Value) -> Result<AppState, String> {
+    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    Ok(AppState {
+        appearance: Appearance::current().await,
+        files: files(&arguments, None),
+        page: arguments
+            .into_iter()
+            .find(|argument| argument.starts_with(PAGE_SCHEME)),
+        system: System::current(),
+    })
+}
+
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command("app_state", |_: Value| {
-            let arguments: Vec<String> = std::env::args().skip(1).collect();
-            Ok(AppState {
-                appearance: Appearance::current(),
-                files: files(&arguments, None),
-                page: arguments
-                    .into_iter()
-                    .find(|argument| argument.starts_with(PAGE_SCHEME)),
-                system: System::current(),
-            })
-        })
+        .command_async("app_state", state)
         .command("app_activation_files", |activation: Activation| {
             Ok(files(
                 &activation.arguments,

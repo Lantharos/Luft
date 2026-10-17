@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use gio::prelude::*;
 use serde::{Deserialize, Serialize};
-use zbus::zvariant::{ObjectPath, OwnedValue, Value};
+use zbus::{ObjectPath, OwnedVariant, Variant};
 
 const MICROSECONDS: f64 = 1_000_000.0;
 
@@ -107,7 +107,7 @@ pub fn seconds(microseconds: i64) -> f64 {
     microseconds as f64 / MICROSECONDS
 }
 
-fn owned(value: Value<'_>) -> Option<OwnedValue> {
+fn owned(value: Variant<'_>) -> Option<OwnedVariant> {
     value.try_into_owned().ok()
 }
 
@@ -120,45 +120,45 @@ pub fn track_path(track: u32) -> ObjectPath<'static> {
         .expect("track numbers form a valid object path")
 }
 
-pub fn metadata(playback: &Playback) -> HashMap<String, OwnedValue> {
-    let mut metadata: HashMap<String, OwnedValue> = HashMap::new();
-    let mut insert = |key: &str, value: Option<Value<'_>>| {
+pub fn metadata(playback: &Playback) -> HashMap<String, OwnedVariant> {
+    let mut metadata: HashMap<String, OwnedVariant> = HashMap::new();
+    let mut insert = |key: &str, value: Option<Variant<'_>>| {
         if let Some(value) = value.and_then(owned) {
             metadata.insert(key.to_string(), value);
         }
     };
     insert(
         "mpris:trackid",
-        Some(Value::from(track_path(playback.track))),
+        Some(Variant::from(track_path(playback.track))),
     );
     insert(
         "mpris:length",
         playback
             .length
-            .map(|length| Value::from(microseconds(length))),
+            .map(|length| Variant::from(microseconds(length))),
     );
     insert(
         "mpris:artUrl",
         playback
             .art
             .as_deref()
-            .map(|art| Value::from(file_uri(art))),
+            .map(|art| Variant::from(file_uri(art))),
     );
     insert(
         "xesam:url",
         playback
             .path
             .as_deref()
-            .map(|path| Value::from(file_uri(path))),
+            .map(|path| Variant::from(file_uri(path))),
     );
-    insert("xesam:title", playback.title.clone().map(Value::from));
-    insert("xesam:album", playback.album.clone().map(Value::from));
+    insert("xesam:title", playback.title.clone().map(Variant::from));
+    insert("xesam:album", playback.album.clone().map(Variant::from));
     insert(
         "xesam:artist",
         playback
             .artist
             .clone()
-            .map(|artist| Value::from(vec![artist])),
+            .map(|artist| Variant::from(vec![artist])),
     );
     metadata
 }

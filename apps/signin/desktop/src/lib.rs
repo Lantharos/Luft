@@ -23,9 +23,9 @@ struct AppState {
     link: Option<String>,
 }
 
-fn app_state(_: Value) -> Result<AppState, String> {
+async fn app_state(_: Value) -> Result<AppState, String> {
     Ok(AppState {
-        appearance: Appearance::current(),
+        appearance: Appearance::current().await,
         link: std::env::args().find(|argument| argument.starts_with(LINK_SCHEME)),
     })
 }
@@ -41,10 +41,9 @@ pub fn run_app() -> ! {
 }
 
 fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window
-        .command("app_state", app_state)
-        .with("check_connectivity", events, |events, _: Value| {
-            connectivity::check(events);
-            Ok(())
-        })
+    window.command_async("app_state", app_state).with_async(
+        "check_connectivity",
+        events,
+        connectivity::check,
+    )
 }

@@ -3,14 +3,14 @@ use std::fs;
 use std::io::ErrorKind;
 use std::sync::Once;
 
+use futures_util::StreamExt;
 use gio::prelude::*;
 use luft_app::dbus;
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
+use zbus::{OwnedVariant, Proxy};
 
 pub const PERMISSIONS_CHANGED: &str = "privacy.permissions";
 
@@ -90,8 +90,10 @@ struct Update {
     apps: Vec<App>,
 }
 
-fn store() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::session()?, STORE, STORE_PATH, STORE).map_err(|error| error.to_string())
+async fn store() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::session().await?, STORE, STORE_PATH, STORE)
+        .await
+        .map_err(dbus::failed)
 }
 
 fn app_name(id: &str) -> String {
@@ -114,10 +116,14 @@ fn apps(kind: Kind, permissions: Permissions) -> Vec<App> {
     apps
 }
 
-fn lookup(kind: Kind) -> Result<Permissions, String> {
-    match store()?.call::<_, _, (Permissions, OwnedValue)>("Lookup", &(kind.table(), kind.id())) {
+async fn lookup(kind: Kind) -> Result<Permissions, String> {
+    let store = store().await?;
+    match store
+        .call::<_, _, (Permissions, OwnedVariant)>("Lookup", &(kind.table(), kind.id()))
+        .await
+    {
         Ok((permissions, _)) => Ok(permissions),
-        Err(zbus::Error::MethodError(name, _, _)) if name.as_str() == NOT_FOUND => {
+        Err(error) if dbus::error_name(&error).as_deref() == Some(NOT_FOUND) => {
             Ok(Permissions::new())
         }
         Err(error) => Err(error.to_string()),
@@ -125,18 +131,18 @@ fn lookup(kind: Kind) -> Result<Permissions, String> {
 }
 
 fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(proxy) = store() else {
+    luft_app::spawn(async move {
+        let Ok(proxy) = store().await else {
             return;
         };
-        let Ok(changes) = proxy.receive_signal("Changed") else {
+        let Ok(mut changes) = proxy.receive_signal("Changed").await else {
             return;
         };
-        for message in changes {
+        while let Some(message) = changes.next().await {
             let Ok((table, id, deleted, _, permissions)) =
                 message
                     .body()
-                    .deserialize::<(String, String, bool, OwnedValue, Permissions)>()
+                    .deserialize::<(String, String, bool, OwnedVariant, Permissions)>()
             else {
                 continue;
             };
@@ -162,14 +168,15 @@ fn watch(events: Events) {
     });
 }
 
-fn permissions(events: &Events, Query { kind }: Query) -> Result<Vec<App>, String> {
-    WATCH.call_once(|| watch(events.clone()));
-    Ok(apps(kind, lookup(kind)?))
+async fn permissions(events: Events, Query { kind }: Query) -> Result<Vec<App>, String> {
+    WATCH.call_once(|| watch(events));
+    Ok(apps(kind, lookup(kind).await?))
 }
 
-fn set_permission(Change { kind, app, allowed }: Change) -> Result<(), String> {
-    let previous = lookup(kind)?.remove(&app).unwrap_or_default();
-    store()?
+async fn set_permission(Change { kind, app, allowed }: Change) -> Result<(), String> {
+    let previous = lookup(kind).await?.remove(&app).unwrap_or_default();
+    store()
+        .await?
         .call_method(
             "SetPermission",
             &(
@@ -180,6 +187,7 @@ fn set_permission(Change { kind, app, allowed }: Change) -> Result<(), String> {
                 kind.permissions(allowed, &previous),
             ),
         )
+        .await
         .map(|_| ())
         .map_err(|error| error.to_string())
 }
@@ -196,7 +204,7 @@ fn clear_history(_: Value) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("privacy_permissions", events, permissions)
-        .command("privacy_set_permission", set_permission)
+        .with_async("privacy_permissions", events, permissions)
+        .command_async("privacy_set_permission", set_permission)
         .command("privacy_clear_history", clear_history)
 }

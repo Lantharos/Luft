@@ -6,6 +6,7 @@ use luft_app::Commands;
 use luft_app::portal::FileChooser;
 use sabine::SabineWindow;
 use serde::Serialize;
+use tokio::task::spawn_blocking;
 
 use super::params::*;
 use crate::events::IMAGES;
@@ -96,8 +97,10 @@ fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-fn save_attachment(state: &MailmanState, part: Part) -> Result<Option<String>, String> {
-    let (name, bytes) = raw_attachment(state, &part)?;
+async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<String>, String> {
+    let (name, bytes) = spawn_blocking(move || raw_attachment(&state, &part))
+        .await
+        .map_err(|error| error.to_string())??;
     let name = safe_name(&name);
     let downloads = dirs::download_dir();
     let chooser = FileChooser {
@@ -107,12 +110,15 @@ fn save_attachment(state: &MailmanState, part: Part) -> Result<Option<String>, S
         ..FileChooser::default()
     };
     let Some(path) = chooser
-        .save()?
+        .save()
+        .await?
         .and_then(|uri| luft_app::portal::uri_path(&uri))
     else {
         return Ok(None);
     };
-    std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
+    tokio::fs::write(&path, bytes)
+        .await
+        .map_err(|error| error.to_string())?;
     Ok(Some(path.to_string_lossy().into_owned()))
 }
 
@@ -180,7 +186,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             state.store.set_verdict(&address, &verdict)
         })
         .with("open_attachment", state, open_attachment)
-        .with("save_attachment", state, save_attachment)
+        .with_async("save_attachment", state, save_attachment)
         .with("contacts", state, |state, Query { query }| {
             state.store.contacts(&query, 8)
         })

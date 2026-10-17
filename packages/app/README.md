@@ -41,7 +41,7 @@ struct AppState {
     appearance: Appearance,
 }
 
-AppState { appearance: Appearance::current() }
+AppState { appearance: Appearance::current().await }
 ```
 
 Bridge commands go through the `Commands` trait on `SabineWindow`, for handlers that return `Result<T, String>`:
@@ -50,9 +50,10 @@ Bridge commands go through the `Commands` trait on `SabineWindow`, for handlers 
 window
     .command("about_info", |_: Value| info())
     .with("network_open", &events, open)
+    .command_async("disks_list", list)
 ```
 
-`command` takes a function of the request; `with` also passes a shared context such as `Events` or the app's state.
+`command` takes a function of the request; `with` also passes a shared context such as `Events` or the app's state. `command_async` and `with_async` take async functions, awaited on Sabine's runtime; anything that waits on D-Bus belongs there. `spawn` runs background work on the same runtime, and `block_on` waits on it from a thread of the app's own, such as a long job.
 
 ## Exports
 
@@ -62,9 +63,10 @@ window
 | `run` | Starts the app and the palette and font watchers |
 | `Events` | `emit` sends a JSON event to the page, `emit_bytes` sends raw bytes that arrive as a `Uint8Array` |
 | `Appearance` | Kestrel's palette and the desktop's fonts and text size, for the startup state |
-| `Commands` | `command` and `with` for typed bridge commands |
-| `dbus` | `session()` and `system()` return cached blocking zbus connections, `at(address)` connects to any other bus |
-| `dbus::objects` | `Objects` reads `ObjectManager` trees; `settle` debounces bursts of change signals |
+| `Commands` | `command`, `with`, `command_async` and `with_async` for typed bridge commands |
+| `spawn`, `block_on` | Run or wait for async work on Sabine's runtime |
+| `dbus` | [luft-dbus](../dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |
+| `dbus::objects` | `Objects` reads `ObjectManager` trees; `signals` and `settle` follow their changes |
 | `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `path_uri` and `uri_path` convert between paths and URIs |
 | `file_manager` | `show_in_folder(path)` opens the folder with the file selected, `show_folder(path)` opens the folder itself |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
@@ -84,15 +86,15 @@ window
 ```rust
 use luft_app::portal::{self, Filter};
 
-let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["*.png".into()] })?;
+let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["*.png".into()] }).await?;
 ```
 
 ```rust
 use luft_app::secrets;
 
-secrets::store("account-token", token.as_bytes())?;
-let token: Option<Vec<u8>> = secrets::load("account-token")?;
-secrets::delete("account-token")?;
+secrets::store("account-token", token.as_bytes()).await?;
+let token: Option<Vec<u8>> = secrets::load("account-token").await?;
+secrets::delete("account-token").await?;
 ```
 
 Secrets are only readable by the app that stored them, without prompts.

@@ -14,9 +14,11 @@ luft-software = { path = "../../../packages/software" }
 use luft_software::packagekit::Mode;
 use luft_software::updates::{self, PackageUpdates};
 
-let updates = PackageUpdates::load(Mode::Quiet)?;
-let waiting_in_schelf = updates::app_count(&updates);
+let updates = PackageUpdates::load(Mode::Quiet).await?;
+let waiting_in_schelf = updates::app_count(updates.apps.len());
 ```
+
+PackageKit and the image updater are reached over D-Bus, so their functions are async. Flatpak, Toolbox and AppImage work runs programs and downloads, so it stays synchronous and belongs on a thread of its own; a job on such a thread waits for the async parts with `luft_app::block_on`.
 
 ## Two kinds of systems
 
@@ -39,17 +41,17 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | --- | --- |
 | `system` | `System::current()`, `Packages` or `Image` |
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
-| `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `watch` for a download started anywhere |
+| `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../variant/README.md), which image suits this computer |
 | `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
 | `packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
 | `packagekit::offline` | `prepared()` lists the prepared offline update and `results()` reports how the last one went |
-| `packagekit::running` | `running()` lists PackageKit transactions in progress and `watch` calls back when they change |
+| `packagekit::running` | `running()` lists PackageKit transactions in progress and `changes()` streams their changes |
 | `flatpak` | `installed`, `updates`, `install`, `install_ref`, `update`, `uninstall`, `add_remote`, `ensure_flathub` and `permissions`, for the user and system `Installation` |
 | `appimage` | `inspect` reads an AppImage's name and icon without running it; `install` moves it into `~/Applications` and `install_copy` copies it there, with a desktop entry named like the one inside it and its icon; `placement` tells where it would go; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) |
-| `task` | `Task` (a progress `report` and a `Cancel`) passed to every operation that changes the system |
+| `task` | `Task` (a progress `report` and a `Cancel`) passed to every operation that changes the system; `Cancel::while_running` and `while_awaiting` stop work when it's cancelled |
 | `progress` | `Progress`, `Stage` and `Report` |
 | `http` | Shared HTTP agent with `text` and `download` |
 

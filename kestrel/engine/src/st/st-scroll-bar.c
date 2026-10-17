@@ -458,7 +458,7 @@ adjust_with_direction (StAdjustment           *adj,
       break;
     }
 
-  st_adjustment_adjust_for_scroll_event (adj, delta);
+  st_adjustment_adjust_for_scroll_event (adj, CLUTTER_SCROLL_SOURCE_WHEEL, delta);
 }
 
 static gboolean
@@ -480,6 +480,7 @@ st_scroll_bar_scroll_event (ClutterActor *actor,
     {
     case CLUTTER_SCROLL_SMOOTH:
       {
+        ClutterScrollSource source = clutter_event_get_scroll_source (event);
         gdouble delta_x, delta_y;
         clutter_event_get_scroll_delta (event, &delta_x, &delta_y);
 
@@ -487,9 +488,9 @@ st_scroll_bar_scroll_event (ClutterActor *actor,
           delta_x *= -1;
 
         if (priv->orientation == CLUTTER_ORIENTATION_VERTICAL)
-          st_adjustment_adjust_for_scroll_event (priv->adjustment, delta_y);
+          st_adjustment_adjust_for_scroll_event (priv->adjustment, source, delta_y);
         else
-          st_adjustment_adjust_for_scroll_event (priv->adjustment, delta_x);
+          st_adjustment_adjust_for_scroll_event (priv->adjustment, source, delta_x);
       }
       break;
     case CLUTTER_SCROLL_LEFT:

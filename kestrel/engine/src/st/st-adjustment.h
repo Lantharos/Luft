@@ -90,8 +90,9 @@ void          st_adjustment_get_values  (StAdjustment *adjustment,
                                          gdouble      *page_increment,
                                          gdouble      *page_size);
 
-void          st_adjustment_adjust_for_scroll_event (StAdjustment *adjustment,
-                                                     gdouble       delta);
+void          st_adjustment_adjust_for_scroll_event (StAdjustment        *adjustment,
+                                                     ClutterScrollSource  source,
+                                                     gdouble              delta);
 
 ClutterTransition * st_adjustment_get_transition    (StAdjustment      *adjustment,
                                                      const char        *name);

@@ -717,7 +717,7 @@ adjust_with_direction (StAdjustment           *adj,
       break;
     }
 
-  st_adjustment_adjust_for_scroll_event (adj, delta);
+  st_adjustment_adjust_for_scroll_event (adj, CLUTTER_SCROLL_SOURCE_WHEEL, delta);
 }
 
 static void
@@ -766,14 +766,15 @@ st_scroll_view_scroll_event (ClutterActor *self,
     {
     case CLUTTER_SCROLL_SMOOTH:
       {
+        ClutterScrollSource source = clutter_event_get_scroll_source (event);
         gdouble delta_x, delta_y;
         clutter_event_get_scroll_delta (event, &delta_x, &delta_y);
 
         if (direction == CLUTTER_TEXT_DIRECTION_RTL)
           delta_x *= -1;
 
-        st_adjustment_adjust_for_scroll_event (priv->hadjustment, delta_x);
-        st_adjustment_adjust_for_scroll_event (priv->vadjustment, delta_y);
+        st_adjustment_adjust_for_scroll_event (priv->hadjustment, source, delta_x);
+        st_adjustment_adjust_for_scroll_event (priv->vadjustment, source, delta_y);
       }
       break;
     case CLUTTER_SCROLL_UP:

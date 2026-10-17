@@ -36,6 +36,8 @@
 #include "st-adjustment.h"
 #include "st-private.h"
 
+#define PIXELS_PER_SCROLL_STEP 10.0
+
 typedef struct _StAdjustmentPrivate StAdjustmentPrivate;
 
 struct _StAdjustmentPrivate
@@ -923,6 +925,7 @@ st_adjustment_get_values (StAdjustment *adjustment,
 /**
  * st_adjustment_adjust_for_scroll_event:
  * @adjustment: An #StAdjustment
+ * @source: The source of the scroll event
  * @delta: A delta, retrieved directly from clutter_event_get_scroll_delta()
  *   or similar.
  *
@@ -930,23 +933,28 @@ st_adjustment_get_values (StAdjustment *adjustment,
  * You should use this instead of using [method@St.Adjustment.set_value]
  * as this method will tweak the values directly using the same
  * math as GTK+, to ensure that scrolling is consistent across
- * the environment.
+ * the environment: wheel steps scale with the page, while touchpads and
+ * other continuous sources move the content as far as the fingers travel.
  */
 void
-st_adjustment_adjust_for_scroll_event (StAdjustment *adjustment,
-                                       gdouble       delta)
+st_adjustment_adjust_for_scroll_event (StAdjustment        *adjustment,
+                                       ClutterScrollSource  source,
+                                       gdouble              delta)
 {
   StAdjustmentPrivate *priv;
-  gdouble new_value, scroll_unit;
+  gdouble scroll_unit;
 
   g_return_if_fail (ST_IS_ADJUSTMENT (adjustment));
 
   priv = st_adjustment_get_instance_private (adjustment);
 
-  scroll_unit = pow (priv->page_size, 2.0 / 3.0);
+  if (source == CLUTTER_SCROLL_SOURCE_FINGER ||
+      source == CLUTTER_SCROLL_SOURCE_CONTINUOUS)
+    scroll_unit = PIXELS_PER_SCROLL_STEP;
+  else
+    scroll_unit = pow (priv->page_size, 2.0 / 3.0);
 
-  new_value = priv->value + delta * scroll_unit;
-  st_adjustment_set_value (adjustment, new_value);
+  st_adjustment_set_value (adjustment, priv->value + delta * scroll_unit);
 }
 
 static void

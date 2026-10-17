@@ -32,6 +32,8 @@ async function checkInterruptedSurface(surface, name) {
   await settled();
   const actor = named(name);
   toggleSurface(surface);
+  require(actor.get_transition('translation-y').duration < Spring.snappy.duration * 2,
+    `${surface} stops repainting soon after its slide stops moving`);
   await pause(80);
   await nextFrame();
   const before = actor.translation_y;

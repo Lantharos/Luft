@@ -129,15 +129,17 @@ damping_ratio (double bounce)
 static double
 parent_scale (ClutterActor *actor)
 {
-  graphene_point3d_t corners[4];
-  float width = clutter_actor_get_width (actor);
-  double scale_x;
+  ClutterActor *parent;
+  double scale = 1.0;
 
-  clutter_actor_get_scale (actor, &scale_x, NULL);
-  if (width <= 0.0f || scale_x == 0.0)
-    return 1.0;
-  clutter_actor_get_abs_allocation_vertices (actor, corners);
-  return graphene_point3d_distance (&corners[0], &corners[1], NULL) / width / fabs (scale_x);
+  for (parent = clutter_actor_get_parent (actor); parent; parent = clutter_actor_get_parent (parent))
+    {
+      double scale_x;
+
+      clutter_actor_get_scale (parent, &scale_x, NULL);
+      scale *= fabs (scale_x);
+    }
+  return scale;
 }
 
 static double

@@ -15,6 +15,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 | `ui` | Panel, Start, quick settings and every other surface, in TypeScript |
 | [`compositor`](compositor/README.md) | Mutter patch series |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone |
+| `search` | `kestrel-search`, the file index behind Start's search |
 | `greeter` | `kestrel-greeter-service`, which stores the login screen's settings |
 | [`keyring`](keyring/README.md) | Luft Keyring |
 | [`passkeys`](passkeys/README.md) | Luft Passkeys |
@@ -26,7 +27,7 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 ## Features
 
 - Taskbar with pinned and running apps, live window previews, unread counts and progress, and a tray for StatusNotifierItem apps
-- Start with folders, search across apps, Settings pages, recent files and calculations
+- Start with folders, and search across apps, actions, Settings pages, files and their text, calculations and unit conversions ([docs/search.md](../docs/search.md))
 - Quick settings as rearrangeable tiles: network, Bluetooth, audio devices, brightness (including DDC/CI monitors with `ddcutil`), power mode, Night Light, Dark Style, Keep Awake and more
 - Notification center with grouping, inline replies, media controls and a calendar
 - All-windows view, dynamic workspaces up to ten, snap layouts and snap groups
@@ -151,6 +152,7 @@ Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-
 | --- | --- |
 | `~/.local/state/kestrel` | Launch history, brightness, notifications |
 | `~/.cache/kestrel/backgrounds` | Scaled and blurred wallpaper copies |
+| `~/.cache/kestrel/search` | The index of file contents for search |
 | `~/.config/kestrel/appearance.json`, `appearance.css` | The wallpaper palette for apps |
 | `~/.local/share/kestrel/wallpapers` | Still frames of live wallpapers |
 | `~/.config/xkb` | Your own keyboard layouts, such as those made in Keys |
@@ -164,6 +166,7 @@ Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-
 | --- | --- |
 | `kestrel-session` | Started by the login screen; runs `kestrel-session.target` and Kestrel's session manager in place of gnome-session |
 | `kestrel-settings` | Settings service started before the shell |
+| `kestrel-search` | Indexes the names and text of files in the home folder for Start, at idle priority |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck, see [docs/boot.md](../docs/boot.md#graphics-driver-stopped-responding) |

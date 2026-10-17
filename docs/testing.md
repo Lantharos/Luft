@@ -44,7 +44,7 @@ Optional tools widen the capture: with `rclone` installed Rover connects to loca
 
 ### Frame timing
 
-`frames` opens Start, quick settings, the notification center and the overview, opens, closes and drags windows, slides windows under stacked glass and under a blurred app window, and enters, pans, pinches, zooms and leaves a board. Each runs three times for timing and twice more to time the GPU. For every interaction it prints the frames drawn, missed refreshes, frames slower than a refresh, CPU time per frame on the compositor thread, update time, layout time and GPU time after each frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
+`frames` opens Start, quick settings, the notification center and the overview, types a search into Start, opens, closes and drags windows, slides windows under stacked glass and under a blurred app window, and enters, pans, pinches, zooms and leaves a board. Each runs three times for timing and twice more to time the GPU. For every interaction it prints the frames drawn, missed refreshes, frames slower than a refresh, CPU time per frame on the compositor thread, update time, layout time and GPU time after each frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
 
 | Variable | Purpose |
 | --- | --- |

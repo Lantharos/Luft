@@ -13,6 +13,7 @@ import {focus, holdCode, releaseCode, useSources} from './typing.js';
 
 const {require, eventually} = checks('Keys');
 const KEY_RIGHTALT = 100;
+const APP_CACHE_REFRESH = 15000;
 
 function installKeysEntry() {
   const cache = GLib.get_user_cache_dir();
@@ -35,7 +36,7 @@ async function checkMenu(id) {
     Object.values(sources.inputSources).find(source => source.id === ENGINE).activate(true);
     await eventually(() => sources.currentSource?.id === ENGINE, 'the input method is the current input source');
     await eventually(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.keys.desktop')?.get_app_info().get_filename()?.startsWith(GLib.get_user_data_dir()),
-      'Kestrel notices Keys');
+      'Kestrel notices Keys', APP_CACHE_REFRESH);
     click(named('kestrel-input-source'));
     const menu = named('kestrel-context-menu');
     await eventually(() => menu.visible && named('Show keyboard layout', menu), 'the input source menu offers Show keyboard layout while Keys is installed');

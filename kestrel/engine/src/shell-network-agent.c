@@ -239,7 +239,6 @@ get_secrets_keyring_cb (GObject            *source,
   ShellAgentRequest *closure;
   ShellNetworkAgent *self;
   GError *secret_error = NULL;
-  GError *error = NULL;
   GList *items;
   GList *l;
   gboolean secrets_found = FALSE;
@@ -259,14 +258,8 @@ get_secrets_keyring_cb (GObject            *source,
 
   if (secret_error != NULL)
     {
-      g_set_error (&error,
-                   NM_SECRET_AGENT_ERROR,
-                   NM_SECRET_AGENT_ERROR_FAILED,
-                   "Internal error while retrieving secrets from the keyring (%s)", secret_error->message);
+      g_message ("No saved network secrets could be read from the keyring: %s", secret_error->message);
       g_error_free (secret_error);
-      closure->callback (NM_SECRET_AGENT_OLD (closure->self), closure->connection, NULL, error, closure->callback_data);
-
-      goto out;
     }
 
   g_variant_builder_init (&builder_setting, NM_VARIANT_TYPE_SETTING);
@@ -330,9 +323,7 @@ get_secrets_keyring_cb (GObject            *source,
                      g_variant_builder_end (&builder_connection), NULL,
                      closure->callback_data);
 
- out:
   g_hash_table_remove (self->requests, closure->request_id);
-  g_clear_error (&error);
 }
 
 static void

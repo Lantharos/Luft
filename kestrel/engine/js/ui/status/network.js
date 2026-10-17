@@ -22,6 +22,7 @@ import {registerDestroyableType} from '../../misc/signalTracker.js';
 Gio._promisify(Gio.DBusConnection.prototype, 'call');
 Gio._promisify(NM.Client, 'new_async');
 Gio._promisify(NM.Client.prototype, 'dbus_set_property');
+Gio._promisify(NM.Client.prototype, 'add_and_activate_connection_async');
 Gio._promisify(NM.DeviceWifi.prototype, 'request_scan_async');
 
 const WIFI_SCAN_FREQUENCY = 15;
@@ -41,6 +42,21 @@ function signalToIcon(value) {
         return 'good';
     else
         return 'excellent';
+}
+
+function forgetUnlessJoined(activeConnection) {
+    const {connection} = activeConnection;
+    const settle = () => {
+        const {state} = activeConnection;
+        if (state === NM.ActiveConnectionState.ACTIVATED) {
+            activeConnection.disconnect(watch);
+        } else if (state === NM.ActiveConnectionState.DEACTIVATED) {
+            activeConnection.disconnect(watch);
+            connection.delete_async(null, null);
+        }
+    };
+    const watch = activeConnection.connect('notify::state', settle);
+    settle();
 }
 
 function ssidToLabel(ssid) {
@@ -918,8 +934,17 @@ const WirelessNetwork = GObject.registerClass({
                 setting.add_permission('user', GLib.get_user_name(), null);
                 conn.add_setting(setting);
             }
-            this._device.client.add_and_activate_connection_async(
-                conn, this._device, ap.get_path(), null, null);
+            this._join(conn, ap);
+        }
+    }
+
+    async _join(connection, ap) {
+        try {
+            const activeConnection = await this._device.client.add_and_activate_connection_async(
+                connection, this._device, ap.get_path(), null);
+            forgetUnlessJoined(activeConnection);
+        } catch (e) {
+            console.warn(`Couldn't join ${this._name}: ${e.message}`);
         }
     }
 

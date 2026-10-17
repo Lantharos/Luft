@@ -156,4 +156,30 @@
 	.row-group > .row-slot + .row-slot {
 		box-shadow: none;
 	}
+
+	.selection-track {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.selection-pill {
+		position: absolute;
+		top: 0;
+		z-index: -1;
+		border-radius: var(--radius-pill);
+		background: var(--sidebar-active);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity var(--motion-quick) var(--ease-decelerate);
+	}
+
+	.selection-pill.shown {
+		opacity: 1;
+	}
+
+	.progress-fill {
+		width: 100%;
+		translate: calc((var(--progress, 0) - 1) * 100%) 0;
+		transition: translate var(--spring-smooth-duration) var(--spring-smooth);
+	}
 }

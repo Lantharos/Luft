@@ -114,13 +114,13 @@
 		border-radius: 0;
 		color: #fff;
 		transition:
-			left 260ms var(--ease),
-			right 260ms var(--ease),
-			bottom 260ms var(--ease),
-			height 260ms var(--ease),
-			border-radius 260ms var(--ease),
-			background-color 200ms var(--ease),
-			transform 240ms var(--ease);
+			left var(--spring-snappy-duration) var(--spring-snappy),
+			right var(--spring-snappy-duration) var(--spring-snappy),
+			bottom var(--spring-snappy-duration) var(--spring-snappy),
+			height var(--spring-snappy-duration) var(--spring-snappy),
+			border-radius var(--spring-snappy-duration) var(--spring-snappy),
+			background-color var(--motion-tap) var(--ease-decelerate),
+			transform var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
 	.bar.floating {
@@ -162,8 +162,8 @@
 		gap: 1px;
 		transform: translate(-50%, -50%);
 		transition:
-			left 260ms var(--ease),
-			transform 260ms var(--ease);
+			left var(--spring-snappy-duration) var(--spring-snappy),
+			transform var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
 	.bar.left .apps {
@@ -179,8 +179,8 @@
 		place-items: center;
 		border-radius: 8px;
 		transition:
-			width 260ms var(--ease),
-			height 260ms var(--ease);
+			width var(--spring-snappy-duration) var(--spring-snappy),
+			height var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
 	.start svg {

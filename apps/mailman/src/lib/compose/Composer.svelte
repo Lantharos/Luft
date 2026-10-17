@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, MenuButton, MenuItem, MenuSeparator, Select, tooltip } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem, MenuSeparator, Select, Spring, springTiming, tooltip } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -28,6 +28,28 @@
 	}
 
 	let { composition = $bindable() }: Props = $props();
+
+	let panel = $state<HTMLDivElement>();
+	let surface = $state<HTMLDivElement>();
+	let sheet = $state<HTMLDivElement>();
+	let before: DOMRect | null = null;
+
+	$effect.pre(() => {
+		void composer.expanded;
+		before = panel?.getBoundingClientRect() ?? null;
+	});
+
+	$effect(() => {
+		void composer.expanded;
+		if (!before || !panel || !surface || !sheet) return;
+		const after = panel.getBoundingClientRect();
+		if (after.width === before.width && after.height === before.height) return;
+		const timing = springTiming(Spring.snappy);
+		surface.animate({ scale: [`${before.width / after.width} ${before.height / after.height}`, '1 1'] }, timing);
+		const top = Math.max(0, after.height - before.height);
+		const left = Math.max(0, after.width - before.width);
+		sheet.animate({ clipPath: [`inset(${top}px 0 0 ${left}px round 24px)`, 'inset(0 round 24px)'] }, timing);
+	});
 
 	let editor = $state<Editor>();
 	let showQuote = $state(false);
@@ -95,112 +117,115 @@
 	}
 </script>
 
-<div class="composer" class:expanded={composer.expanded} role="dialog" aria-label={title} tabindex="-1" onkeydown={keydown} transition:fly={{ y: 24, duration: 220 }}>
-	<header class="flex h-12 flex-none items-center gap-1 pr-2 pl-5">
-		<p class="min-w-0 flex-1 truncate text-[14px] font-semibold">{title}</p>
-		<button type="button" class="icon-button small" aria-label={composer.expanded ? 'Shrink' : 'Enlarge'} onclick={() => (composer.expanded = !composer.expanded)}>
-			{#if composer.expanded}<Minimize size={15} />{:else}<Maximize size={15} />{/if}
-		</button>
-		<button type="button" class="icon-button small" aria-label="Close" onclick={close} {@attach tooltip('Close and keep as draft')}>
-			<X size={17} />
-		</button>
-	</header>
-	{#if senders.length > 1}
-		<div class="field">
-			<span class="label">From</span>
-			<Select options={senders} value={composition.identity} label="From" onchange={chooseSender} />
-			{#if wildcard}
-				<input class="sender" bind:value={composition.from} placeholder="Address to send as" aria-label="Address to send as" />
-			{/if}
-		</div>
-	{/if}
-	<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
-		{#snippet trailing()}
-			{#if !composition.showCopies}
-				<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip('Ctrl+Shift+C')}>Cc Bcc</button>
-			{/if}
-		{/snippet}
-	</RecipientField>
-	{#if composition.showCopies}
-		<RecipientField label="Cc" bind:addresses={composition.cc} />
-		<RecipientField label="Bcc" bind:addresses={composition.bcc} />
-	{/if}
-	<div class="field">
-		<input class="subject" bind:value={composition.subject} placeholder="Subject" aria-label="Subject" onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
-	</div>
-	{#key composition.key}
-		<Editor bind:this={editor} html={composition.body} placeholder="Write something. **bold**, *italic*, - lists and > quotes work as you type." autofocus={composition.to.length > 0} onsend={() => send()} />
-	{/key}
-	{#if composition.quote}
-		<div class="px-5 pb-2">
-			<button type="button" class="plain-button quote-toggle" onclick={() => (showQuote = !showQuote)}>
-				<Quote size={15} />{showQuote ? 'Hide quoted text' : 'Show quoted text'}
+<div bind:this={panel} class="composer" class:expanded={composer.expanded} role="dialog" aria-label={title} tabindex="-1" onkeydown={keydown} transition:fly={{ y: 24, duration: 220 }}>
+	<div bind:this={surface} class="surface"></div>
+	<div bind:this={sheet} class="sheet">
+		<header class="flex h-12 flex-none items-center gap-1 pr-2 pl-5">
+			<p class="min-w-0 flex-1 truncate text-[14px] font-semibold">{title}</p>
+			<button type="button" class="icon-button small" aria-label={composer.expanded ? 'Shrink' : 'Enlarge'} onclick={() => (composer.expanded = !composer.expanded)}>
+				{#if composer.expanded}<Minimize size={15} />{:else}<Maximize size={15} />{/if}
 			</button>
-			{#if showQuote}
-				<div class="quote soft-scroll">{@html composition.quote}</div>
-			{/if}
+			<button type="button" class="icon-button small" aria-label="Close" onclick={close} {@attach tooltip('Close and keep as draft')}>
+				<X size={17} />
+			</button>
+		</header>
+		{#if senders.length > 1}
+			<div class="field">
+				<span class="label">From</span>
+				<Select options={senders} value={composition.identity} label="From" onchange={chooseSender} />
+				{#if wildcard}
+					<input class="sender" bind:value={composition.from} placeholder="Address to send as" aria-label="Address to send as" />
+				{/if}
+			</div>
+		{/if}
+		<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
+			{#snippet trailing()}
+				{#if !composition.showCopies}
+					<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip('Ctrl+Shift+C')}>Cc Bcc</button>
+				{/if}
+			{/snippet}
+		</RecipientField>
+		{#if composition.showCopies}
+			<RecipientField label="Cc" bind:addresses={composition.cc} />
+			<RecipientField label="Bcc" bind:addresses={composition.bcc} />
+		{/if}
+		<div class="field">
+			<input class="subject" bind:value={composition.subject} placeholder="Subject" aria-label="Subject" onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
 		</div>
-	{/if}
-	{#if composition.attachments.length}
-		<div class="flex flex-wrap gap-2 px-5 pb-3">
-			{#each composition.attachments as attachment (attachment.path)}
-				<span class="attachment">
-					<Paperclip size={14} class="flex-none text-[var(--text-muted)]" />
-					<span class="truncate">{attachment.name}</span>
-					{#if attachment.size}<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>{/if}
-					<button type="button" aria-label="Remove {attachment.name}" onclick={() => (composition.attachments = composition.attachments.filter((candidate) => candidate !== attachment))}><X size={13} /></button>
-				</span>
-			{/each}
-		</div>
-	{/if}
-	<footer class="flex h-[58px] flex-none items-center gap-1 px-3">
-		<div class="send">
-			<button type="button" class="button primary main" disabled={composer.sending} onclick={() => send()} {@attach tooltip('Send (Ctrl+Enter)')}>Send</button>
-			<MenuButton label="Send later" class="button primary chevron" align="start">
-				{#snippet trigger()}<ChevronDown size={16} />{/snippet}
+		{#key composition.key}
+			<Editor bind:this={editor} html={composition.body} placeholder="Write something. **bold**, *italic*, - lists and > quotes work as you type." autofocus={composition.to.length > 0} onsend={() => send()} />
+		{/key}
+		{#if composition.quote}
+			<div class="px-5 pb-2">
+				<button type="button" class="plain-button quote-toggle" onclick={() => (showQuote = !showQuote)}>
+					<Quote size={15} />{showQuote ? 'Hide quoted text' : 'Show quoted text'}
+				</button>
+				{#if showQuote}
+					<div class="quote soft-scroll">{@html composition.quote}</div>
+				{/if}
+			</div>
+		{/if}
+		{#if composition.attachments.length}
+			<div class="flex flex-wrap gap-2 px-5 pb-3">
+				{#each composition.attachments as attachment (attachment.path)}
+					<span class="attachment">
+						<Paperclip size={14} class="flex-none text-[var(--text-muted)]" />
+						<span class="truncate">{attachment.name}</span>
+						{#if attachment.size}<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>{/if}
+						<button type="button" aria-label="Remove {attachment.name}" onclick={() => (composition.attachments = composition.attachments.filter((candidate) => candidate !== attachment))}><X size={13} /></button>
+					</span>
+				{/each}
+			</div>
+		{/if}
+		<footer class="flex h-[58px] flex-none items-center gap-1 px-3">
+			<div class="send">
+				<button type="button" class="button primary main" disabled={composer.sending} onclick={() => send()} {@attach tooltip('Send (Ctrl+Enter)')}>Send</button>
+				<MenuButton label="Send later" class="button primary chevron" align="start">
+					{#snippet trigger()}<ChevronDown size={16} />{/snippet}
+					{#snippet children(closeMenu)}
+						{#each SEND_LATER as moment (moment.id)}
+							{@const at = moment.at()}
+							<MenuItem onclick={() => (closeMenu(), send(at))}>
+								<span class="flex-1">{moment.label}</span><span class="text-[12px] text-[var(--text-muted)]">{laterFormat.format(at * 1000)}</span>
+							</MenuItem>
+						{/each}
+					{/snippet}
+				</MenuButton>
+			</div>
+			<MenuButton label="Remind me" class={['icon-button', reminder && 'on']} align="start">
+				{#snippet trigger()}<Bell size={17} />{/snippet}
 				{#snippet children(closeMenu)}
-					{#each SEND_LATER as moment (moment.id)}
-						{@const at = moment.at()}
-						<MenuItem onclick={() => (closeMenu(), send(at))}>
-							<span class="flex-1">{moment.label}</span><span class="text-[12px] text-[var(--text-muted)]">{laterFormat.format(at * 1000)}</span>
-						</MenuItem>
+					<p class="px-2.5 pt-1 pb-1.5 text-[12px] text-[var(--text-muted)]">Bring this back if nobody replies</p>
+					{#each REMINDERS as option (option.seconds)}
+						<MenuItem checked={composition.remindAfter === option.seconds} onclick={() => (closeMenu(), (composition.remindAfter = composition.remindAfter === option.seconds ? null : option.seconds))}>{option.label}</MenuItem>
 					{/each}
 				{/snippet}
 			</MenuButton>
-		</div>
-		<MenuButton label="Remind me" class={['icon-button', reminder && 'on']} align="start">
-			{#snippet trigger()}<Bell size={17} />{/snippet}
-			{#snippet children(closeMenu)}
-				<p class="px-2.5 pt-1 pb-1.5 text-[12px] text-[var(--text-muted)]">Bring this back if nobody replies</p>
-				{#each REMINDERS as option (option.seconds)}
-					<MenuItem checked={composition.remindAfter === option.seconds} onclick={() => (closeMenu(), (composition.remindAfter = composition.remindAfter === option.seconds ? null : option.seconds))}>{option.label}</MenuItem>
-				{/each}
-			{/snippet}
-		</MenuButton>
-		<button type="button" class="icon-button" aria-label="Attach files" onclick={() => void attach()} {@attach tooltip('Attach files')}><Paperclip size={17} /></button>
-		<span class="divider"></span>
-		<button type="button" class="icon-button" aria-label="Bold" onclick={() => editor?.command('bold')} {@attach tooltip('Bold (Ctrl+B)')}><Bold size={16} /></button>
-		<button type="button" class="icon-button" aria-label="Italic" onclick={() => editor?.command('italic')} {@attach tooltip('Italic (Ctrl+I)')}><Italic size={16} /></button>
-		<button type="button" class="icon-button" aria-label="List" onclick={() => editor?.command('insertUnorderedList')} {@attach tooltip('List')}><List size={16} /></button>
-		<button type="button" class="icon-button" aria-label="Link" onclick={() => editor?.command('link')} {@attach tooltip('Link (Ctrl+K)')}><Link size={16} /></button>
-		<MenuButton label="Templates" class="plain-button templates" align="start" onpointerdown={() => void loadTemplates()}>
-			{#snippet trigger()}Templates{/snippet}
-			{#snippet children(closeMenu)}
-				{#each templates as template (template.id)}
-					<MenuItem onclick={() => (closeMenu(), editor?.insert(template.body))}>{template.name}</MenuItem>
-				{:else}
-					<p class="px-2.5 py-2 text-[12.5px] text-[var(--text-muted)]">Save a message you write often and insert it here.</p>
-				{/each}
-				<MenuSeparator />
-				<MenuItem onclick={() => (closeMenu(), void saveTemplate())}>Save this as a template</MenuItem>
-			{/snippet}
-		</MenuButton>
-		<span class="flex-1"></span>
-		{#if reminder}
-			<span class="mr-1 text-[12px] text-[var(--text-muted)]">Reminder {reminder.label.toLowerCase()}</span>
-		{/if}
-		<button type="button" class="icon-button" aria-label="Discard" onclick={() => composer.discard()} {@attach tooltip('Discard')}><Trash size={16} /></button>
-	</footer>
+			<button type="button" class="icon-button" aria-label="Attach files" onclick={() => void attach()} {@attach tooltip('Attach files')}><Paperclip size={17} /></button>
+			<span class="divider"></span>
+			<button type="button" class="icon-button" aria-label="Bold" onclick={() => editor?.command('bold')} {@attach tooltip('Bold (Ctrl+B)')}><Bold size={16} /></button>
+			<button type="button" class="icon-button" aria-label="Italic" onclick={() => editor?.command('italic')} {@attach tooltip('Italic (Ctrl+I)')}><Italic size={16} /></button>
+			<button type="button" class="icon-button" aria-label="List" onclick={() => editor?.command('insertUnorderedList')} {@attach tooltip('List')}><List size={16} /></button>
+			<button type="button" class="icon-button" aria-label="Link" onclick={() => editor?.command('link')} {@attach tooltip('Link (Ctrl+K)')}><Link size={16} /></button>
+			<MenuButton label="Templates" class="plain-button templates" align="start" onpointerdown={() => void loadTemplates()}>
+				{#snippet trigger()}Templates{/snippet}
+				{#snippet children(closeMenu)}
+					{#each templates as template (template.id)}
+						<MenuItem onclick={() => (closeMenu(), editor?.insert(template.body))}>{template.name}</MenuItem>
+					{:else}
+						<p class="px-2.5 py-2 text-[12.5px] text-[var(--text-muted)]">Save a message you write often and insert it here.</p>
+					{/each}
+					<MenuSeparator />
+					<MenuItem onclick={() => (closeMenu(), void saveTemplate())}>Save this as a template</MenuItem>
+				{/snippet}
+			</MenuButton>
+			<span class="flex-1"></span>
+			{#if reminder}
+				<span class="mr-1 text-[12px] text-[var(--text-muted)]">Reminder {reminder.label.toLowerCase()}</span>
+			{/if}
+			<button type="button" class="icon-button" aria-label="Discard" onclick={() => composer.discard()} {@attach tooltip('Discard')}><Trash size={16} /></button>
+		</footer>
+	</div>
 </div>
 
 <style>
@@ -212,14 +237,24 @@
 		display: flex;
 		width: min(620px, calc(100vw - var(--sidebar-width) - 40px));
 		height: min(600px, calc(100vh - 100px));
-		flex-direction: column;
+		outline: none;
+	}
+
+	.surface {
+		position: absolute;
+		inset: 0;
 		border-radius: 24px;
 		background: var(--popover);
 		box-shadow: 0 28px 80px var(--shadow-soft), 0 0 0 1px var(--hairline);
-		outline: none;
-		transition:
-			width 240ms var(--ease),
-			height 240ms var(--ease);
+		transform-origin: bottom right;
+	}
+
+	.sheet {
+		position: relative;
+		display: flex;
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
 	}
 
 	.composer.expanded {

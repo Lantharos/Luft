@@ -24,7 +24,7 @@
 	<p class="mt-2 max-w-[520px] text-[15px] leading-relaxed text-[var(--text-soft)]">{title[1]}</p>
 	<div class="mt-9 flex flex-col gap-3" role="progressbar" aria-valuenow={Math.round(fraction * 100)} aria-label={title[0]}>
 		<div class="track" class:waiting={!progress || (!measured && fraction < 1)}>
-			<div class="fill" style:width="{Math.max(fraction, 0.02) * 100}%"></div>
+			<div class="fill progress-fill" style:--progress={Math.max(fraction, 0.02)}></div>
 		</div>
 		<span class="text-[13px] text-[var(--text-muted)]">
 			{#if measured && progress}
@@ -48,11 +48,11 @@
 		height: 100%;
 		border-radius: inherit;
 		background: var(--accent);
-		transition: width 400ms var(--ease);
 	}
 
 	.waiting .fill {
-		width: 30% !important;
+		width: 30%;
+		translate: none;
 		animation: drift 1.6s var(--ease) infinite;
 	}
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { SearchField, tooltip } from '@luft/ui';
+	import { SearchField, selectionPill, tooltip } from '@luft/ui';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Settings from '@lucide/svelte/icons/settings-2';
 	import { composer } from '#lib/compose/composer.svelte.js';
@@ -67,7 +67,7 @@
 	<div class="flex-none px-3 pb-3">
 		<SearchField bind:this={search} bind:value={query} label="Search mail" variant="sidebar" onkeydown={searchKey} />
 	</div>
-	<nav class="scroll-fade soft-scroll flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3">
+	<nav class="scroll-fade soft-scroll flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3" {@attach selectionPill()}>
 		<div class="flex flex-col gap-px">
 			{#each primary as view (view.id)}
 				<NavItem

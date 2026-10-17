@@ -141,11 +141,11 @@
 		font-weight: 500;
 		color: var(--text-soft);
 		transition:
-			transform 260ms var(--ease),
-			width 260ms var(--ease),
-			height 260ms var(--ease),
-			background-color 160ms var(--ease),
-			box-shadow 160ms var(--ease);
+			transform var(--spring-snappy-duration) var(--spring-snappy),
+			width var(--spring-snappy-duration) var(--spring-snappy),
+			height var(--spring-snappy-duration) var(--spring-snappy),
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.display:hover {

@@ -357,11 +357,11 @@
 		text-shadow:
 			0 0 3px rgba(0, 0, 0, 0.9),
 			0 1px 6px rgba(0, 0, 0, 0.8);
-		transition: bottom 240ms var(--ease);
+		transition: translate var(--spring-snappy-duration) var(--spring-snappy);
 		pointer-events: none;
 	}
 
 	.cue.raised {
-		bottom: calc(100px + var(--strip-space, 0px));
+		translate: 0 calc(-60px - var(--strip-space, 0px));
 	}
 </style>

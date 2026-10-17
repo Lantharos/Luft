@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { bytes } from '@luft/ui';
+	import { bytes, selectionPill } from '@luft/ui';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import DriveIcon from './DriveIcon.svelte';
 </script>
 
 <aside class="glass-sidebar drag-region gap-3 px-3 py-4">
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Drives">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Drives" {@attach selectionPill()}>
 		{#each disks.drives as drive (drive.id)}
 			{@const active = disks.drive?.id === drive.id}
 			<button
@@ -49,9 +49,8 @@
 	}
 
 	.nav-item.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.nav-item:active {

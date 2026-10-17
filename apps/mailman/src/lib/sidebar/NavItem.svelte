@@ -46,9 +46,8 @@
 	}
 
 	.item.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.item:active {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isInside, SearchField } from '@luft/ui';
+	import { isInside, SearchField, selectionPill } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey, TRASH_DROP_PATH } from '#lib/file-manager/drag/drop-targets.js';
@@ -74,7 +74,7 @@
 		<SearchField bind:this={search} variant="sidebar" label="Search current folder" bind:value={manager.searchQuery} />
 	</div>
 
-	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places">
+	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places" {@attach selectionPill('.sidebar-item.is-active')}>
 		<div class="sidebar-group">
 			{#if showHome}
 				<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />

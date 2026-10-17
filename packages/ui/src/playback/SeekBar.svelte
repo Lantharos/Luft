@@ -117,15 +117,16 @@
 
 	.rail {
 		position: absolute;
-		inset: 12px 0;
+		inset: 11px 0;
 		overflow: hidden;
 		border-radius: var(--radius-pill);
 		background: var(--control);
-		transition: inset 140ms var(--ease);
+		scale: 1 0.6667;
+		transition: scale var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.active .rail {
-		inset: 11px 0;
+		scale: 1;
 	}
 
 	.buffered,

@@ -48,7 +48,7 @@
 	<div class="action">
 		{#if busy}
 			<span class="progress" role="progressbar" aria-label="Installing {item.name}" aria-valuenow={fraction === null ? undefined : Math.round(fraction * 100)}>
-				<span class="bar" class:waiting={fraction === null} style:width={fraction === null ? undefined : `${fraction * 100}%`}></span>
+				<span class="bar progress-fill" class:waiting={fraction === null} style:--progress={fraction}></span>
 			</span>
 		{:else if installed && installed === current}
 			<span class="in-use">In use</span>
@@ -169,11 +169,11 @@
 		left: 0;
 		border-radius: inherit;
 		background: var(--accent);
-		transition: width 200ms var(--ease);
 	}
 
 	.bar.waiting {
 		width: 40%;
+		translate: none;
 		animation: slide 1.1s var(--ease) infinite;
 	}
 

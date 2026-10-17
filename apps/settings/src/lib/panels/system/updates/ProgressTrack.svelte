@@ -3,7 +3,7 @@
 </script>
 
 <div class="track {className}">
-	<span class:indeterminate={fraction === null} style:width={fraction === null ? undefined : `${fraction * 100}%`}></span>
+	<span class="progress-fill" class:indeterminate={fraction === null} style:--progress={fraction}></span>
 </div>
 
 <style>
@@ -17,11 +17,11 @@
 		height: 100%;
 		border-radius: inherit;
 		background: var(--accent);
-		transition: width 240ms var(--ease);
 	}
 
 	.indeterminate {
 		width: 30%;
+		translate: none;
 		animation: slide 1.4s var(--ease) infinite;
 	}
 

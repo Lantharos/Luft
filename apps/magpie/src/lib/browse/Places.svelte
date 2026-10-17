@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { selectionPill } from '@luft/ui';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Film from '@lucide/svelte/icons/film';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
@@ -17,7 +18,7 @@
 	}
 </script>
 
-<nav class="flex flex-col gap-0.5">
+<nav class="flex flex-col gap-0.5" {@attach selectionPill()}>
 	{#each library.places as location (location.place)}
 		{@const Icon = ICONS[location.place]}
 		<button
@@ -61,9 +62,8 @@
 	}
 
 	.place.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.place:active {

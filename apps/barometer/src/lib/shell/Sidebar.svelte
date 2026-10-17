@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { selectionPill } from '@luft/ui';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import ListTree from '@lucide/svelte/icons/list-tree';
 	import type { Component } from 'svelte';
@@ -19,7 +20,7 @@
 {/snippet}
 
 <aside class="glass-sidebar drag-region px-3 pt-4 pb-3">
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" aria-label="Views">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" aria-label="Views" {@attach selectionPill()}>
 		<div class="flex flex-col gap-0.5">
 			{@render view('apps', 'Apps', LayoutGrid)}
 			{@render view('processes', 'Processes', ListTree)}
@@ -57,9 +58,8 @@
 	}
 
 	.view.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.view:active {

@@ -3,7 +3,7 @@
 	import Compass from '@lucide/svelte/icons/compass';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import { SearchField } from '@luft/ui';
+	import { SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES } from '#lib/catalog/categories.js';
 	import { activity, percent } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -55,7 +55,7 @@
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
 	<SearchField variant="sidebar" label="Search apps" bind:value={navigation.query} onkeydown={submit} />
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		<div class="flex flex-col gap-0.5">
 			{@render item({ page: 'discover' }, 'Discover', Compass)}
 			{@render item({ page: 'installed' }, 'Installed', HardDrive)}
@@ -76,7 +76,7 @@
 					<span class="tabular-nums text-[var(--sidebar-text-muted)]">{value}%</span>
 				{/if}
 			</div>
-			<div class="track"><span class:indeterminate={value === null} style:width={value === null ? undefined : `${value}%`}></span></div>
+			<div class="track"><span class="progress-fill" class:indeterminate={value === null} style:--progress={value === null ? undefined : value / 100}></span></div>
 			{#if remaining > 1}
 				<span class="text-[12px] text-[var(--sidebar-text-muted)]">{remaining - 1} more waiting</span>
 			{/if}
@@ -105,9 +105,8 @@
 	}
 
 	.nav-item.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.nav-item:active {
@@ -140,11 +139,11 @@
 		height: 100%;
 		border-radius: inherit;
 		background: var(--accent);
-		transition: width 240ms var(--ease);
 	}
 
 	.track .indeterminate {
 		width: 30%;
+		translate: none;
 		animation: slide 1.4s var(--ease) infinite;
 	}
 

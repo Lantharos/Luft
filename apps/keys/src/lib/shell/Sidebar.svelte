@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import { tooltip } from '@luft/ui';
+	import { selectionPill, tooltip } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 
 	interface Item {
@@ -43,7 +43,7 @@
 {/snippet}
 
 <aside class="glass-sidebar drag-region px-3 py-4">
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto" {@attach selectionPill()}>
 		{@render group('Layouts', 'layout', layouts, 'New layout')}
 		{@render group('Input methods', 'method', methods, 'New input method')}
 	</nav>
@@ -90,9 +90,8 @@
 	}
 
 	.nav-item.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.nav-item:active {

@@ -47,7 +47,7 @@
 	}
 
 	.entry.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
 	}
 
@@ -68,10 +68,6 @@
 		font-size: 14px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-	}
-
-	.active .title {
-		font-weight: 500;
 	}
 
 	.summary {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SearchField } from '@luft/ui';
+	import { SearchField, selectionPill } from '@luft/ui';
 	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
@@ -34,7 +34,7 @@
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
 	<SearchField variant="sidebar" label="Search settings" bind:value={app.query} onkeydown={openFirst} />
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		{#if present}
 			{#each results as group, index (index)}
 				<div class="flex flex-col gap-0.5">
@@ -72,9 +72,8 @@
 	}
 
 	.nav-item.active {
-		background: var(--sidebar-active);
+		background: transparent;
 		color: var(--text);
-		font-weight: 500;
 	}
 
 	.nav-item:active {

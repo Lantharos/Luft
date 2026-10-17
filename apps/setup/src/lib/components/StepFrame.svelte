@@ -37,7 +37,7 @@
 		{#if installing}
 			<div class="flex items-center gap-3 text-[13px] text-[var(--text-muted)]" role="progressbar" aria-label="Installing Luft" aria-valuenow={percent}>
 				<div class="h-1.5 w-28 overflow-hidden rounded-full bg-[var(--surface-hover)]">
-					<div class="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500" style:width="{percent}%"></div>
+					<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={percent / 100}></div>
 				</div>
 				Installing, {percent}%
 			</div>

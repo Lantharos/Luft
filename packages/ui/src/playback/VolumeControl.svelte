@@ -48,23 +48,43 @@
 
 <style>
 	.volume {
+		position: relative;
 		display: flex;
 		align-items: center;
 	}
 
 	.level {
-		width: 0;
-		overflow: hidden;
+		position: absolute;
+		right: -6px;
+		bottom: calc(100% + 8px);
+		z-index: 10;
+		width: 148px;
+		padding: 4px 12px;
+		border-radius: var(--radius-pill);
+		background: var(--popover);
+		box-shadow: 0 8px 24px var(--shadow-soft);
 		opacity: 0;
+		scale: 0.96;
+		translate: 0 4px;
+		transform-origin: bottom right;
+		pointer-events: none;
 		transition:
-			width 200ms var(--ease),
-			opacity 160ms var(--ease);
+			opacity var(--motion-tap) linear,
+			scale var(--spring-snappy-duration) var(--spring-snappy),
+			translate var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.level::after {
+		position: absolute;
+		inset: 100% 0 -8px;
+		content: '';
 	}
 
 	.volume:hover .level,
 	.volume:focus-within .level {
-		width: 124px;
-		padding-inline: 2px 4px;
 		opacity: 1;
+		scale: 1;
+		translate: 0 0;
+		pointer-events: auto;
 	}
 </style>

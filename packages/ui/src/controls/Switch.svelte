@@ -30,7 +30,9 @@
 		width: 44px;
 		border-radius: var(--radius-pill);
 		background: var(--control);
-		transition: background-color 200ms var(--ease), opacity 200ms var(--ease);
+		transition:
+			background-color var(--motion-quick) var(--ease-decelerate),
+			opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.switch:hover:not(:disabled) {
@@ -55,19 +57,18 @@
 		border-radius: var(--radius-pill);
 		background: var(--text);
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-		transition: transform 220ms var(--ease), background-color 200ms var(--ease);
+		transition:
+			translate var(--spring-snappy-duration) var(--spring-snappy),
+			scale var(--spring-snappy-duration) var(--spring-snappy),
+			background-color var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.on .knob {
-		transform: translateX(18px);
+		translate: 18px 0;
 		background: var(--accent-text);
 	}
 
 	.switch:active:not(:disabled) .knob {
-		width: 23px;
-	}
-
-	.on:active:not(:disabled) .knob {
-		transform: translateX(15px);
+		scale: 1.15 1;
 	}
 </style>

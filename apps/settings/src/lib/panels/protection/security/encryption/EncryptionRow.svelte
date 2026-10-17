@@ -26,7 +26,7 @@
 
 {#snippet progress()}
 	<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
-		<div class="bar h-full rounded-full bg-[var(--accent)]" style:width="{disk.progress * 100}%"></div>
+		<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={disk.progress}></div>
 	</div>
 {/snippet}
 
@@ -57,9 +57,3 @@
 {:else if open === 'off'}
 	<TurnOffDialog onclose={() => (open = null)} />
 {/if}
-
-<style>
-	.bar {
-		transition: width 240ms var(--ease);
-	}
-</style>

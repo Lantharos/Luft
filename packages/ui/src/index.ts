@@ -52,7 +52,9 @@ export {
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';
 export { default as RecoveryKey } from './security/RecoveryKey.svelte';
 
+export { springTiming } from './motion/easing';
 export { reorder } from './motion/lists';
+export { selectionPill } from './motion/pill';
 export { dialog, fade, item, menu, page, toast } from './motion/transitions';
 
 export { default as Toast } from './notices/Toast.svelte';

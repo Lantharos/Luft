@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { plural } from '@luft/ui';
+	import { plural, SpringValue } from '@luft/ui';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import PageThumbnails from '#lib/document/PageThumbnails.svelte';
 	import { documentState } from '#lib/document/state.svelte.js';
@@ -11,6 +11,21 @@
 	import Places from './Places.svelte';
 
 	let open = $derived(chrome.sidebar && !chrome.fullscreen);
+	let aside = $state<HTMLElement>();
+	let content: SpringValue | null = null;
+	let wasOpen: boolean | null = null;
+
+	$effect(() => {
+		const opening = open;
+		const neighbour = aside?.nextElementSibling;
+		if (wasOpen !== null && wasOpen !== opening && neighbour instanceof HTMLElement) {
+			content ??= new SpringValue(neighbour, (x) => ({ translate: `${x}px 0` }));
+			const width = aside!.offsetWidth;
+			content.set(content.value + (opening ? -width : width));
+			void content.to(0);
+		}
+		wasOpen = opening;
+	});
 	let title = $derived(library.group === 'audio' ? 'Queue' : library.group === 'document' ? 'Pages' : library.folder ? folderTitle(library.folder, library.places) : '');
 	let summary = $derived.by(() => {
 		if (library.group === 'audio') return plural(player.queue.length, 'song', 'songs');
@@ -24,7 +39,7 @@
 	});
 </script>
 
-<aside class="glass-sidebar sidebar" class:collapsed={!open} aria-hidden={!open} inert={!open}>
+<aside bind:this={aside} class="glass-sidebar sidebar" class:collapsed={!open} aria-hidden={!open} inert={!open}>
 	<div class="inner drag-region">
 		<div class="flex-none p-3">
 			<Places />
@@ -48,11 +63,14 @@
 <style>
 	.sidebar {
 		overflow: hidden;
-		transition: width 240ms var(--ease);
+		transition: translate var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
 	.sidebar.collapsed {
-		width: 0;
+		position: absolute;
+		inset-block: 0;
+		left: 0;
+		translate: -100% 0;
 	}
 
 	.inner {

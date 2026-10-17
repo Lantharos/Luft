@@ -94,10 +94,12 @@
 	<div class="rail">
 		<div class="fill"></div>
 	</div>
-	<div class="thumb">
-		{#if dragging && format}
-			<span class="value">{format(current)}</span>
-		{/if}
+	<div class="handle">
+		<div class="thumb">
+			{#if dragging && format}
+				<span class="value">{format(current)}</span>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -125,27 +127,44 @@
 	}
 
 	.fill {
-		width: var(--travel);
 		height: 100%;
 		background: var(--accent);
+		translate: calc(var(--travel) - 100%) 0;
+	}
+
+	.handle {
+		position: absolute;
+		inset: 0;
+		translate: var(--travel) 0;
+		pointer-events: none;
+	}
+
+	.fill,
+	.handle {
+		transition: translate var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.dragging .fill,
+	.dragging .handle {
+		transition: none;
 	}
 
 	.thumb {
 		position: absolute;
 		top: 4px;
-		left: var(--travel);
+		left: 0;
 		height: var(--thumb);
 		width: var(--thumb);
 		margin-left: calc(var(--thumb) / -2);
 		border-radius: var(--radius-pill);
 		background: var(--text);
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-		transition: transform 160ms var(--ease);
+		transition: scale var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.slider:not(.disabled):hover .thumb,
 	.dragging .thumb {
-		transform: scale(1.1);
+		scale: 1.1;
 	}
 
 	.value {

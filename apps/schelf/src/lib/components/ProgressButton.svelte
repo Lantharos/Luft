@@ -12,7 +12,7 @@
 </script>
 
 <div class="progress" class:large role="progressbar" aria-label={operation.title} aria-valuenow={value ?? undefined} aria-valuemin={0} aria-valuemax={100}>
-	<span class="fill" class:indeterminate={value === null} style:width={value === null ? undefined : `${value}%`}></span>
+	<span class="fill progress-fill" class:indeterminate={value === null} style:--progress={value === null ? undefined : value / 100}></span>
 	<span class="label">{activity(operation)}{value === null ? '…' : ` ${value}%`}</span>
 	<button type="button" class="cancel" aria-label="Cancel" {@attach tooltip('Cancel')} onclick={() => operations.cancel(operation.id)}>
 		<X size={14} />
@@ -41,13 +41,14 @@
 
 	.fill {
 		position: absolute;
-		inset: 0 auto 0 0;
+		inset: 0;
 		background: var(--accent-soft);
-		transition: width 240ms var(--ease);
 	}
 
 	.fill.indeterminate {
+		right: auto;
 		width: 30%;
+		translate: none;
 		animation: slide 1.4s var(--ease) infinite;
 	}
 

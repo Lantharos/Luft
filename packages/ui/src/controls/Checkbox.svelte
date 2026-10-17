@@ -23,9 +23,7 @@
 	onclick={() => onchange(!checked)}
 >
 	<span class="box" class:on={checked}>
-		{#if checked}
-			<Check size={13} strokeWidth={3} />
-		{/if}
+		<Check class="mark" size={13} strokeWidth={3} />
 	</span>
 	{#if children}
 		<span class="text">{@render children()}</span>
@@ -77,5 +75,18 @@
 	.box.on {
 		background: var(--accent);
 		box-shadow: none;
+	}
+
+	.box :global(.mark) {
+		opacity: 0;
+		scale: 0.5;
+		transition:
+			opacity var(--motion-tap) linear,
+			scale var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.box.on :global(.mark) {
+		opacity: 1;
+		scale: 1;
 	}
 </style>

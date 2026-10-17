@@ -71,7 +71,7 @@
 				<span class="text-[var(--text-muted)] tabular-nums">{percent}%</span>
 			</div>
 			<div class="h-2 overflow-hidden rounded-full bg-[var(--surface-hover)]">
-				<div class="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500" style:width="{percent}%"></div>
+				<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={percent / 100}></div>
 			</div>
 			{#if setup.hardware.portable && setup.hardware.onBattery}
 				<p class="mt-2 text-[13.5px] text-[var(--text-soft)]">Keep your computer plugged in until it’s done.</p>

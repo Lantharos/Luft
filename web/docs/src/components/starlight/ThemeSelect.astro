@@ -1,0 +1,69 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+
+const choices = [
+	{ value: 'auto', label: 'Match the system', icon: 'laptop' },
+	{ value: 'light', label: 'Light', icon: 'sun' },
+	{ value: 'dark', label: 'Dark', icon: 'moon' }
+] as const;
+---
+
+<luft-theme-switch class="flex items-center gap-0.5 rounded-full bg-well p-0.5" role="group" aria-label="Style">
+	{
+		choices.map(({ value, label, icon }) => (
+			<button
+				type="button"
+				data-theme-choice={value}
+				aria-label={label}
+				title={label}
+				aria-pressed="false"
+				class="grid size-7 cursor-pointer place-items-center rounded-full bg-transparent text-ink-muted transition-colors duration-(--motion-tap) hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+			>
+				<Icon name={icon} size="0.95rem" />
+			</button>
+		))
+	}
+</luft-theme-switch>
+
+<script>
+	type Theme = 'auto' | 'dark' | 'light';
+	const storageKey = 'starlight-theme';
+
+	const stored = (): Theme => {
+		try {
+			const value = localStorage.getItem(storageKey);
+			return value === 'light' || value === 'dark' ? value : 'auto';
+		} catch {
+			return 'auto';
+		}
+	};
+
+	const systemTheme = () => (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+
+	function apply(theme: Theme) {
+		document.documentElement.dataset.theme = theme === 'auto' ? systemTheme() : theme;
+		document.querySelectorAll('[data-theme-choice]').forEach((button) => {
+			button.setAttribute('aria-pressed', String(button.getAttribute('data-theme-choice') === theme));
+		});
+		try {
+			localStorage.setItem(storageKey, theme === 'auto' ? '' : theme);
+		} catch {}
+	}
+
+	matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+		if (stored() === 'auto') apply('auto');
+	});
+
+	customElements.define(
+		'luft-theme-switch',
+		class extends HTMLElement {
+			connectedCallback() {
+				apply(stored());
+				this.addEventListener('click', (event) => {
+					const choice = (event.target as Element).closest('[data-theme-choice]');
+					if (choice) apply(choice.getAttribute('data-theme-choice') as Theme);
+				});
+			}
+		}
+	);
+</script>

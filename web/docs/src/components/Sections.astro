@@ -1,0 +1,81 @@
+---
+const sections = [
+	{
+		title: 'Getting started',
+		text: 'Try Luft, install it next to Windows or in place of another Linux, and the first start.',
+		links: [
+			['What is Luft', '/start/what-is-luft/'],
+			['Try Luft with Meet Luft', '/start/meet-luft/'],
+			['Install from a USB stick', '/start/usb-stick/'],
+			['Moving from Fedora', '/start/from-fedora/']
+		]
+	},
+	{
+		title: 'Using Luft',
+		text: 'The taskbar, Start, Quick settings, the board, snapping and every shortcut.',
+		links: [
+			['The desktop', '/desktop/overview/'],
+			['Start and search', '/desktop/start-and-search/'],
+			['The board', '/windows/board/'],
+			['Keyboard shortcuts and gestures', '/desktop/shortcuts/']
+		]
+	},
+	{
+		title: 'Apps',
+		text: 'What comes with Luft, and what each app can do.',
+		links: [
+			['Settings', '/apps/settings/'],
+			['Rover', '/apps/rover/'],
+			['Mailman', '/apps/mailman/'],
+			['Schelf', '/apps/schelf/']
+		]
+	},
+	{
+		title: 'System',
+		text: 'Updates, installing software, security, recovery and reporting problems.',
+		links: [
+			['How updates work', '/system/updates/'],
+			['Installing software', '/system/software/'],
+			['Security', '/system/security/'],
+			['Recovery and troubleshooting', '/system/recovery/']
+		]
+	},
+	{
+		title: 'Files and accounts',
+		text: 'Cloud drives, the keyring, SSH keys and passkeys.',
+		links: [
+			['Accounts and cloud drives', '/files/cloud-drives/'],
+			['Keyring and passkeys', '/files/keyring-and-passkeys/']
+		]
+	},
+	{
+		title: 'For developers',
+		text: 'How the pieces fit, building Luft yourself, and contributing.',
+		links: [
+			['How Luft fits together', '/developers/architecture/'],
+			['Building Luft', '/developers/building/'],
+			['Contributing', '/developers/contributing/']
+		]
+	}
+];
+---
+
+<div class="not-content mt-16 grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+	{
+		sections.map(({ title, text, links }) => (
+			<section>
+				<h2 class="text-lg font-semibold tracking-tight text-ink">{title}</h2>
+				<p class="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-muted">{text}</p>
+				<ul class="mt-4 list-none space-y-1.5 p-0">
+					{links.map(([label, href]) => (
+						<li>
+							<a href={href} class="text-[0.9375rem] font-medium text-ink-soft no-underline transition-colors duration-(--motion-tap) hover:text-ink">
+								{label}
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
+</div>

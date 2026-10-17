@@ -1,0 +1,17 @@
+---
+import { nav, urls } from '@luft/web';
+
+const links = nav.filter(({ href }) => href !== urls.docs);
+---
+
+<ul class="m-0 flex list-none items-center gap-1 p-0 text-[0.9375rem] font-medium">
+	{
+		links.map(({ label, href }) => (
+			<li>
+				<a href={href} class="rounded-full px-3 py-2 text-ink no-underline opacity-80 transition-opacity duration-(--motion-tap) hover:opacity-100">
+					{label}
+				</a>
+			</li>
+		))
+	}
+</ul>

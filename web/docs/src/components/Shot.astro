@@ -1,0 +1,68 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+interface Props {
+	name: string;
+	alt: string;
+	caption?: string;
+}
+
+const shots = import.meta.glob<{ default: ImageMetadata }>('../assets/shots/*.webp', { eager: true });
+const find = (name: string) => shots[`../assets/shots/${name}.webp`]?.default;
+
+const { name, alt, caption } = Astro.props;
+const dark = find(name);
+if (!dark) throw new Error(`No screenshot named ${name}`);
+const light = find(`${name}-light`);
+
+const widths = [480, 768, 1080, 1440];
+const sizes = '(min-width: 72rem) 46rem, calc(100vw - 2rem)';
+const formats = ['avif', 'webp'] as const;
+
+async function picture(image: ImageMetadata) {
+	const fitting = widths.filter((width) => width <= image.width);
+	const sources = await Promise.all(
+		formats.map(async (format) => {
+			const variants = await Promise.all(
+				fitting.map((width) => getImage({ src: image, width, format, quality: format === 'avif' ? 60 : 80 }))
+			);
+			return { type: `image/${format}`, srcset: variants.map((variant, index) => `${variant.src} ${fitting[index]}w`).join(', ') };
+		})
+	);
+	const fallback = await getImage({ src: image, width: Math.min(1080, image.width), format: 'webp' });
+	return { image, sources, fallback };
+}
+
+const pictures = [{ theme: light ? 'dark' : undefined, ...(await picture(dark)) }];
+if (light) pictures.push({ theme: 'light', ...(await picture(light)) });
+---
+
+<figure class="shot not-content my-8">
+	{
+		pictures.map(({ theme, image, sources, fallback }) => (
+			<picture data-shot-theme={theme}>
+				{sources.map((source) => (
+					<source type={source.type} srcset={source.srcset} sizes={sizes} />
+				))}
+				<img
+					src={fallback.src}
+					alt={alt}
+					width={image.width}
+					height={image.height}
+					loading="lazy"
+					decoding="async"
+					class="block h-auto w-full rounded-[14px] bg-well"
+				/>
+			</picture>
+		))
+	}
+	{caption && <figcaption class="mt-3 text-sm text-ink-muted">{caption}</figcaption>}
+</figure>
+
+<style>
+	:global([data-theme='light']) [data-shot-theme='dark'],
+	:global([data-theme='dark']) [data-shot-theme='light'] {
+		display: none;
+	}
+</style>

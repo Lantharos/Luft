@@ -1,0 +1,11 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import openRunde from '../../../../../packages/ui/fonts/OpenRunde-Regular.woff2?url';
+import openRundeSemibold from '../../../../../packages/ui/fonts/OpenRunde-Semibold.woff2?url';
+---
+
+<link rel="preload" href={openRunde} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={openRundeSemibold} as="font" type="font/woff2" crossorigin />
+<meta name="theme-color" content="#12110e" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#fcf9f3" media="(prefers-color-scheme: light)" />
+<Default />

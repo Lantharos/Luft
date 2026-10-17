@@ -31,3 +31,4 @@
 0031-clutter-pick-an-offscreen-effect-s-texture-filter-as.patch
 0032-wayland-let-the-shell-keep-touchpad-pinches-and-swip.patch
 0033-backends-let-virtual-pointers-pinch-and-swipe-like-a.patch
+0034-backends-follow-the-touchpad-scroll-speed-setting.patch

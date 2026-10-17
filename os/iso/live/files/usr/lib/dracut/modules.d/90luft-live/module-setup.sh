@@ -13,7 +13,7 @@ installkernel() {
 }
 
 install() {
-    inst_multiple mount udevadm blkid
+    inst_multiple mount udevadm blkid touch
     inst_hook cmdline 90 "$moddir/parse-luft-live.sh"
     inst_script "$moddir/luft-live-root.sh" /usr/libexec/luft-live-root
     inst_simple "$moddir/luft-live-root.service" "$systemdsystemunitdir/luft-live-root.service"

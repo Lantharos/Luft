@@ -75,6 +75,8 @@ esac
 mount -t erofs -o ro,loop "$medium/LiveOS/luft.erofs" "$store"
 mount -t tmpfs -o mode=0755 luft-writable "$writable"
 mkdir "$writable/upper" "$writable/work"
+touch "$writable/layers.lock"
+mount --bind "$writable/layers.lock" "$store/overlay-layers/layers.lock"
 
 options=userxattr
 while read -r layer; do

@@ -5,6 +5,7 @@ variant="$1"
 version="$2"
 reference="$3"
 fedora="$(rpm -E %fedora)"
+codename="Alizé"
 
 write_os_release() {
   rm -f /usr/lib/os-release
@@ -14,7 +15,8 @@ ID=luft
 ID_LIKE=fedora
 VERSION="$version"
 VERSION_ID=$fedora
-PRETTY_NAME="Luft"
+VERSION_CODENAME=alize
+PRETTY_NAME="Luft $codename"
 IMAGE_ID=$variant
 IMAGE_VERSION=$version
 PLATFORM_ID="platform:f$fedora"

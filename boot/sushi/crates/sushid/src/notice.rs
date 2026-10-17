@@ -7,6 +7,7 @@ use sushi::scene::Notice;
 use sushi::terminal::Key;
 
 const LIMIT: Duration = Duration::from_secs(240);
+const KEY_ENROLLMENT_SHOWN: Duration = Duration::from_secs(20);
 
 pub struct Shown {
     pub notice: Notice,
@@ -22,11 +23,11 @@ fn spaced(code: &str) -> String {
     format!("{first} {second}")
 }
 
-pub fn key_enrollment(enrollment: &KeyEnrollment) -> Notice {
+pub fn key_enrollment(enrollment: &KeyEnrollment, waiting: UnixStream) -> Shown {
     let retry = enrollment
         .again
         .then(|| "Luft's key wasn't added last time. Let's try again.".to_owned());
-    Notice {
+    let notice = Notice {
         title: "One more step after the restart".to_owned(),
         body: retry
             .into_iter()
@@ -41,8 +42,12 @@ pub fn key_enrollment(enrollment: &KeyEnrollment) -> Notice {
             format!("Type {} and press Enter", spaced(&enrollment.code)),
             "Choose Reboot".to_owned(),
         ],
-        footer: "Press Enter to restart".to_owned(),
-    }
+        footer: format!("Restarting in {SECONDS} seconds. Press Enter to restart now."),
+    };
+    let mut shown = Shown::new(notice, waiting);
+    shown.countdown = Some(KEY_ENROLLMENT_SHOWN);
+    shown.count();
+    shown
 }
 
 impl Shown {

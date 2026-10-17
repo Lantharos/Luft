@@ -48,7 +48,7 @@ impl Daemon {
                 {
                     Some(enrollment) => {
                         eprintln!("Explaining the key enrollment screen before restarting");
-                        self.show_notice(Shown::new(notice::key_enrollment(&enrollment), stream))
+                        self.show_notice(notice::key_enrollment(&enrollment, stream))
                     }
                     None => reply(stream, "ok"),
                 }

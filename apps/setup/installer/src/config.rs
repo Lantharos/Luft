@@ -42,11 +42,20 @@ impl Config {
         toml::from_str(&text).with_context(|| format!("Couldn't parse {}", path.display()))
     }
 
-    pub fn image(&self, variant: &str) -> Result<Image> {
-        let source = self
-            .images
-            .get(variant)
-            .with_context(|| format!("There's no {variant} image to install."))?;
+    fn chosen(&self, wanted: &str) -> Option<(&str, &Source)> {
+        if let Some((name, source)) = self.images.get_key_value(wanted) {
+            return Some((name, source));
+        }
+        match self.images.iter().collect::<Vec<_>>().as_slice() {
+            [(name, source)] => Some((name.as_str(), *source)),
+            _ => None,
+        }
+    }
+
+    pub fn image(&self, wanted: &str) -> Result<Image> {
+        let (variant, source) = self
+            .chosen(wanted)
+            .with_context(|| format!("There's no {wanted} image to install."))?;
         let running = std::fs::read_to_string(IMAGE_REFERENCE)
             .with_context(|| format!("Couldn't read {IMAGE_REFERENCE}"))?;
         let target = Variant::named(variant)
@@ -57,5 +66,40 @@ impl Config {
             target,
             size: source.size,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn stick(images: &str) -> Config {
+        toml::from_str(images).unwrap()
+    }
+
+    const NVIDIA_ONLY: &str = "[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45-nvidia\"\nsize = 2\n";
+    const UNIVERSAL: &str = "[images.default]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45\"\nsize = 1\n[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45-nvidia\"\nsize = 2\n";
+
+    #[test]
+    fn a_stick_with_one_image_installs_that_one() {
+        let config = stick(NVIDIA_ONLY);
+        assert_eq!(
+            config.chosen("default").map(|(name, _)| name),
+            Some("nvidia")
+        );
+    }
+
+    #[test]
+    fn a_stick_with_both_installs_the_one_asked_for() {
+        let config = stick(UNIVERSAL);
+        assert_eq!(
+            config.chosen("default").map(|(name, _)| name),
+            Some("default")
+        );
+        assert_eq!(
+            config.chosen("nvidia").map(|(name, _)| name),
+            Some("nvidia")
+        );
+        assert!(config.chosen("other").is_none());
     }
 }

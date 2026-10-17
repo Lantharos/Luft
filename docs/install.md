@@ -153,7 +153,7 @@ source = "containers-storage:ghcr.io/lantharos/luft:45"   # where the stick has 
 size = 5286520084                                         # bytes installed, for the progress bar
 ```
 
-The image ships only the settings above the `[images]` tables. The stick's build adds a table for each image it carries, with the size Podman reports for it. `[images.nvidia]` is used on computers with an NVIDIA graphics card. Updates come from the reference in `/usr/share/luft/image-reference` (`ghcr.io/lantharos/luft:45`, or `:45-nightly` in nightly images; the image build's `IMAGE_REFERENCE` sets it), with `-nvidia` added for the NVIDIA image.
+The image ships only the settings above the `[images]` tables. The stick's build adds a table for each image it carries, with the size Podman reports for it. `[images.nvidia]` is used on computers with an NVIDIA graphics card. A stick with a single table installs that image on any computer. Updates come from the reference in `/usr/share/luft/image-reference` (`ghcr.io/lantharos/luft:45`, or `:45-nightly` in nightly images; the image build's `IMAGE_REFERENCE` sets it), with `-nvidia` added for the NVIDIA image.
 
 - The stick ([os/iso](../os/iso)) keeps both images in a read-only image store on the stick, which the session there adds to Podman's storage, so `containers-storage:` sources install without a network.
 - Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included. Install Luft is listed in Start only there.

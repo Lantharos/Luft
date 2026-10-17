@@ -8,6 +8,7 @@ vm="${LUFT_INSTALLER_VM:-$installer/target/vm}"
 system=localhost/luft-installer-check-system
 image=localhost/luft-installer-check
 base="${LUFT_SYSTEM:-localhost/luft-system:45}"
+carried="${LUFT_STICK_IMAGE:-default}"
 stage="$vm/stage"
 
 if [[ -z "${LUFT_SECUREBOOT_KEY:-}" ]]; then
@@ -32,7 +33,7 @@ place 644 "$here/luft-installer-check.service" /usr/lib/systemd/system/luft-inst
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-installer-check.rules
 printf 'kargs = ["console=ttyS0,115200"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/90-check.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
-printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
+printf '[images.%s]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$carried" "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
 podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage"

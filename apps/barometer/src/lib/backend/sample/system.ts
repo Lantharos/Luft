@@ -5,42 +5,42 @@ const CORES = 16;
 
 export const devices: Devices = {
 	cpu: {
-		name: 'AMD Ryzen 7 5800X 8-Core Processor',
+		name: 'AMD Ryzen 7 7700 8-Core Processor',
 		logical: CORES,
 		physical: 8,
 		sockets: 1,
 		architecture: 'x86_64',
 		virtualization: 'AMD-V',
-		maxFrequency: 4854,
+		maxFrequency: 5389,
 		minFrequency: 556,
 		governor: 'schedutil',
 		caches: [
 			{ level: 1, kind: 'Data', size: 32 * 1024, instances: 8 },
 			{ level: 1, kind: 'Instruction', size: 32 * 1024, instances: 8 },
-			{ level: 2, kind: 'Unified', size: 512 * 1024, instances: 8 },
+			{ level: 2, kind: 'Unified', size: 1024 * 1024, instances: 8 },
 			{ level: 3, kind: 'Unified', size: 32 * 1024 * 1024, instances: 1 }
 		]
 	},
 	gpus: [
 		{
 			id: 'gpu:0000:07:00.0',
-			name: 'NVIDIA GeForce RTX 3060',
+			name: 'NVIDIA GeForce RTX 4060',
 			vendor: 'NVIDIA',
 			driver: 'nvidia',
 			driverVersion: '615.71.09',
 			slot: '0000:07:00.0',
 			link: 'PCIe 4.0 ×16',
 			integrated: false,
-			memoryTotal: 12 * GIB,
-			powerCap: 170,
-			maxClock: 2100,
-			maxMemoryClock: 7501
+			memoryTotal: 8 * GIB,
+			powerCap: 115,
+			maxClock: 2460,
+			maxMemoryClock: 8501
 		}
 	],
 	drives: [
-		{ id: 'drive:nvme0n1', name: 'nvme0n1', model: 'WD_BLACK SN7100 1TB', kind: 'nvme', size: 1000204886016, removable: false, virtual: false, readOnly: false },
-		{ id: 'drive:sda', name: 'sda', model: 'ST2000DM008-2UB102', kind: 'hdd', size: 2000398934016, removable: false, virtual: false, readOnly: false },
-		{ id: 'drive:sdb', name: 'sdb', model: 'SPCC Solid State Disk', kind: 'ssd', size: 512110190592, removable: false, virtual: false, readOnly: false },
+		{ id: 'drive:nvme0n1', name: 'nvme0n1', model: 'Samsung SSD 990 PRO 1TB', kind: 'nvme', size: 1000204886016, removable: false, virtual: false, readOnly: false },
+		{ id: 'drive:sda', name: 'sda', model: 'WDC WD20EZBX-00AYRA0', kind: 'hdd', size: 2000398934016, removable: false, virtual: false, readOnly: false },
+		{ id: 'drive:sdb', name: 'sdb', model: 'CT500MX500SSD1', kind: 'ssd', size: 500107862016, removable: false, virtual: false, readOnly: false },
 		{ id: 'drive:zram0', name: 'zram0', model: null, kind: 'zram', size: 8 * GIB, removable: false, virtual: true, readOnly: false }
 	],
 	networks: [
@@ -137,11 +137,11 @@ export function tick(time: number, seconds: number, detailed: string | null): Ti
 				id: 'gpu:0000:07:00.0',
 				usage: gpuUsage,
 				memoryUsed: vram.next(),
-				memoryTotal: 12 * GIB,
+				memoryTotal: 8 * GIB,
 				temperature: 44 + gpuUsage * 0.3,
 				power: 22 + gpuUsage * 1.6,
 				clock: Math.round(210 + gpuUsage * 24),
-				memoryClock: gpuUsage > 10 ? 7501 : 405,
+				memoryClock: gpuUsage > 10 ? 8501 : 405,
 				encoder: gpuUsage > 40 ? 12 : 0,
 				decoder: 6 + Math.random() * 4,
 				fan: gpuUsage > 50 ? 38 : 0
@@ -179,7 +179,7 @@ export function tick(time: number, seconds: number, detailed: string | null): Ti
 								speed: network.kind === 'ethernet' ? 1000 : null,
 								mtu: 1500,
 								signal: network.kind === 'wifi' ? -54 : null,
-								addresses: index === 0 ? ['192.168.1.42/24', 'fd00::5a1c:9e2f:4b77:8c21/64', 'fe80::b62e:99ff:fe3a:510c/64'] : []
+								addresses: index === 0 ? ['192.0.2.42/24', 'fd00::5a1c:9e2f:4b77:8c21/64', 'fe80::b62e:99ff:fe3a:510c/64'] : []
 							}
 						: undefined
 			};

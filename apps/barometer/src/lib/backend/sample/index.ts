@@ -97,7 +97,7 @@ function details(pid: number): Details {
 		parent: 'systemd',
 		arguments: process.command.split(' '),
 		executable: process.command.split(' ')[0],
-		directory: process.uid === 0 ? null : '/home/kristof',
+		directory: process.uid === 0 ? null : '/home/mara',
 		user: process.user,
 		state: process.state,
 		threads: process.threads,

@@ -2,7 +2,7 @@ import type { DriveInfo, FileEntry, TrashItem, UserDirs } from '#lib/types/index
 import { joinPath } from '#lib/utils/paths.js';
 
 const now = Math.floor(Date.now() / 1000);
-const HOME = '/home/kristof';
+const HOME = '/home/mara';
 const LARGE_FOLDER_SIZE = 12_000;
 
 export const previewUserDirs: UserDirs = {
@@ -34,7 +34,7 @@ export const previewDrives: DriveInfo[] = [
 	},
 	{
 		name: 'ROVER USB',
-		mount_point: '/run/media/kristof/ROVER_USB',
+		mount_point: '/run/media/mara/ROVER_USB',
 		total_space: 64 * 1024 ** 3,
 		available_space: 42 * 1024 ** 3,
 		used_space: 22 * 1024 ** 3,

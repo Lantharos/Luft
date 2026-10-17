@@ -1275,8 +1275,6 @@ export class MessageTray extends St.Widget {
     _hideNotification(animate) {
         this._notificationFocusGrabber.ungrabFocus();
 
-        this._banner.disconnectObject(this);
-
         this._resetNotificationLeftTimeout();
         this._bannerBin.remove_all_transitions();
 
@@ -1287,7 +1285,7 @@ export class MessageTray extends St.Widget {
             translation_y: BANNER_SLIDE_DISTANCE,
             duration,
             mode: Clutter.AnimationMode.EASE_IN_QUAD,
-            onStopped: () => {
+            onComplete: () => {
                 this._notificationState = State.HIDDEN;
                 this._hideNotificationCompleted();
                 this._updateState();

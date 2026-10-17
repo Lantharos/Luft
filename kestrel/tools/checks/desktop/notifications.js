@@ -88,6 +88,26 @@ async function checkBanner(replies) {
   dismissImmediately();
 }
 
+async function checkUpdateWhileHiding() {
+  const tray = Main.messageTray;
+  const source = new MessageTray.Source({title: 'Downloads', iconName: 'folder-download-symbolic'});
+  tray.add(source);
+  const notification = new MessageTray.Notification({source, title: 'Downloading photos', body: '10 of 40'});
+  try {
+    source.addNotification(notification);
+    await eventually(() => tray._notification === notification && tray._notificationState === MessageTray.State.SHOWN, 'the download banner shows');
+    tray._notificationExpired = true;
+    tray._updateState();
+    require(tray._notificationState === MessageTray.State.HIDING, 'the banner starts hiding once it expires');
+    notification.set({body: '20 of 40'});
+    notification.acknowledged = false;
+    await eventually(() => tray._notificationState === MessageTray.State.SHOWN, 'the banner comes back when its notification updates while hiding');
+    require(tray._notification === notification && shown(tray._banner), 'the updated notification keeps its banner');
+  } finally {
+    source.destroy();
+  }
+}
+
 async function checkAppRules() {
   const general = new Gio.Settings({schema_id: 'org.gnome.desktop.notifications'});
   const rules = new Gio.Settings({
@@ -154,6 +174,7 @@ export async function run() {
     clearAll();
     await checkCenter(replies);
     await checkBanner(replies);
+    await checkUpdateWhileHiding();
     await checkAppRules();
     await checkCalendar();
   } finally {

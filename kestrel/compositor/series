@@ -27,3 +27,4 @@
 0027-core-let-the-shell-mark-windows-it-tiles-itself.patch
 0028-clutter-reuse-blur-node-targets-across-frames.patch
 0029-core-let-the-shell-see-the-rectangle-a-window-is-mov.patch
+0030-core-keep-late-windows-from-taking-focus-after-newer.patch

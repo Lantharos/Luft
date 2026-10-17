@@ -1027,6 +1027,8 @@ shell_global_create_app_launch_context (ShellGlobal *global,
 
   if (timestamp == 0)
     timestamp = shell_global_get_current_time (global);
+  if (timestamp == 0)
+    timestamp = meta_display_get_current_time_roundtrip (global->meta_display);
   meta_launch_context_set_timestamp (context, timestamp);
 
   if (workspace > -1)

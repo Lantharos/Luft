@@ -1,0 +1,372 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 15:19:14 +0200
+Subject: [PATCH 30/30] core: keep late windows from taking focus after newer
+ input
+
+A window that maps after the user moved on to another window opens behind
+it and asks for attention instead of taking focus.
+
+- Wayland windows activated with a token before they map count from the
+  token's time; a token a client made itself only counts while the input
+  it was made for is still the latest.
+- A Wayland client's first window without a token counts from when the
+  client connected, which covers autostarted and session-restored apps.
+- X11 user times and _NET_ACTIVE_WINDOW requests for new windows that are
+  newer than any key, button or touch event are ignored, since toolkits
+  fetch them from the X server when presenting without an event.
+- Every new normal window denied focus demands attention, not only those
+  the focus window covers.
+---
+ src/core/display-private.h                |  3 ++
+ src/core/display.c                        |  1 +
+ src/core/events.c                         | 20 +++++++++
+ src/core/window.c                         | 26 +++++++++---
+ src/wayland/meta-wayland-activation.c     | 49 ++++++++++++++++++-----
+ src/wayland/meta-wayland-client-private.h |  5 +++
+ src/wayland/meta-wayland-client.c         | 24 +++++++++++
+ src/x11/window-props.c                    | 12 ++++++
+ src/x11/window-x11.c                      | 15 +++++++
+ 9 files changed, 141 insertions(+), 14 deletions(-)
+
+diff --git a/src/core/display-private.h b/src/core/display-private.h
+index 117c85c2cbd715a1182db51d1f468c68be45232c..73d090315a6dae4469869196ae36189536935070 100644
+--- a/src/core/display-private.h
++++ b/src/core/display-private.h
+@@ -90,6 +90,9 @@ struct _MetaDisplay
+   /* last user interaction time in any app */
+   guint32 last_user_time;
+ 
++  /* time of the last key, button or touch event the user made */
++  guint32 last_input_time;
++
+   /* whether we're using mousenav (only relevant for sloppy&mouse focus modes;
+    * !mouse_mode means "keynav mode")
+    */
+diff --git a/src/core/display.c b/src/core/display.c
+index 5a0100d5b783ced65bb03bb5b7d3b33b82c5a734..df86a89f99cc693821fb06988fadaa7da06b1625 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -873,6 +873,7 @@ meta_display_new (MetaContext  *context,
+ 
+   display->last_focus_time = timestamp;
+   display->last_user_time = timestamp;
++  display->last_input_time = timestamp;
+ 
+   if (!meta_compositor_manage (display->compositor, plugin_options, error))
+     {
+diff --git a/src/core/events.c b/src/core/events.c
+index b2e89dd49514c10b28e31f80ad2233e45ee925e5..25f43f0886ee9f1fb7dc0fd5db466807d24461c2 100644
+--- a/src/core/events.c
++++ b/src/core/events.c
+@@ -322,6 +322,23 @@ meta_display_handle_event (MetaDisplay        *display,
+   return CLUTTER_EVENT_PROPAGATE;
+ }
+ 
++static gboolean
++is_user_input (const ClutterEvent *event)
++{
++  switch (clutter_event_type (event))
++    {
++    case CLUTTER_KEY_PRESS:
++    case CLUTTER_KEY_RELEASE:
++    case CLUTTER_BUTTON_PRESS:
++    case CLUTTER_BUTTON_RELEASE:
++    case CLUTTER_TOUCH_BEGIN:
++    case CLUTTER_TOUCH_END:
++      return TRUE;
++    default:
++      return FALSE;
++    }
++}
++
+ static gboolean
+ event_callback (const ClutterEvent *event,
+                 ClutterActor       *event_actor,
+@@ -331,6 +348,9 @@ event_callback (const ClutterEvent *event,
+   gboolean retval;
+ 
+   display->current_time = clutter_event_get_time (event);
++  if (display->current_time != META_CURRENT_TIME && is_user_input (event) &&
++      XSERVER_TIME_IS_BEFORE (display->last_input_time, display->current_time))
++    display->last_input_time = display->current_time;
+   retval = meta_display_handle_event (display, event, event_actor);
+   display->current_time = META_CURRENT_TIME;
+ 
+diff --git a/src/core/window.c b/src/core/window.c
+index 34f925c5d856018d04343430a11593da0789558f..f04f0b88376e975233b8708ce7bedeb556ff8d01 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -84,6 +84,7 @@
+ #include "meta/prefs.h"
+ #include "meta/meta-window-config.h"
+ #include "mtk/mtk.h"
++#include "wayland/meta-wayland-client-private.h"
+ #include "wayland/meta-wayland-private.h"
+ #include "wayland/meta-wayland-surface-private.h"
+ #include "wayland/meta-window-wayland.h"
+@@ -2118,10 +2119,17 @@ meta_window_queue (MetaWindow   *window,
+   meta_display_queue_window (window->display, window, queue_types);
+ }
+ 
++static MetaWaylandClient *
++window_wayland_client (MetaWindow *window)
++{
++  return meta_window_wayland_get_client (META_WINDOW_WAYLAND (window));
++}
++
+ static gboolean
+ intervening_user_event_occurred (MetaWindow *window)
+ {
+   guint32 compare;
++  guint32 launch_time;
+   MetaWindow *focus_window;
+ 
+   focus_window = window->display->focus_window;
+@@ -2165,7 +2173,10 @@ intervening_user_event_occurred (MetaWindow *window)
+       return TRUE;
+     }
+ 
+-  if (!(window->net_wm_user_time_set) && !(window->initial_timestamp_set))
++  if (!(window->net_wm_user_time_set) && !(window->initial_timestamp_set) &&
++      !(META_IS_WINDOW_WAYLAND (window) &&
++        meta_wayland_client_get_launch_time (window_wayland_client (window),
++                                             &launch_time)))
+     {
+       meta_topic (META_DEBUG_STARTUP,
+                   "no information about window %s found",
+@@ -2201,6 +2212,8 @@ intervening_user_event_occurred (MetaWindow *window)
+     compare = window->net_wm_user_time;
+   else if (window->initial_timestamp_set)
+     compare = window->initial_timestamp;
++  else
++    compare = launch_time;
+ 
+   if ((focus_window != NULL) &&
+       XSERVER_TIME_IS_BEFORE (compare, focus_window->net_wm_user_time))
+@@ -2635,16 +2648,16 @@ meta_window_show (MetaWindow *window)
+            meta_prefs_get_raise_on_click ()))
+         meta_window_stack_just_below (window, focus_window);
+ 
+-      /* If the window will be obscured by the focus window, then the
+-       * user might not notice the window appearing so set the
+-       * demands attention hint.
++      /* A new window denied focus asks for attention so the shell can
++       * show that it is ready, as does any window the focus window
++       * would obscure, since the user might not notice it appearing.
+        *
+        * We set the hint ourselves rather than calling
+        * meta_window_set_demands_attention() because that would cause
+        * a recalculation of overlap, and a call to set_net_wm_state()
+        * which we are going to call ourselves here a few lines down.
+        */
+-      if (overlap)
++      if (overlap || window->type == META_WINDOW_NORMAL)
+         {
+           if (!window->wm_state_demands_attention)
+             {
+@@ -2701,6 +2714,9 @@ meta_window_show (MetaWindow *window)
+   if (window->showing_for_first_time)
+     {
+       window->showing_for_first_time = FALSE;
++      if (META_IS_WINDOW_WAYLAND (window))
++        meta_wayland_client_note_window_shown (window_wayland_client (window));
++
+       if (takes_focus_on_map)
+         {
+           guint32 timestamp;
+diff --git a/src/wayland/meta-wayland-activation.c b/src/wayland/meta-wayland-activation.c
+index 435a9992dfbe4b2b2972de3b8ae9cc18fd155a16..1818ba76af29b2872a4a318b86809349dc01b179 100644
+--- a/src/wayland/meta-wayland-activation.c
++++ b/src/wayland/meta-wayland-activation.c
+@@ -322,6 +322,21 @@ startup_sequence_is_recent (MetaDisplay         *display,
+   return seq_timestamp_ms >= last_user_time_ms;
+ }
+ 
++static MetaStartupSequence *
++lookup_sequence (MetaWaylandActivation *activation,
++                 const char            *token_str)
++{
++  MetaDisplay *display = display_from_activation (activation);
++  MetaXdgActivationToken *token;
++
++  token = g_hash_table_lookup (activation->tokens, token_str);
++  if (token)
++    return token->sequence;
++
++  return meta_startup_notification_lookup_sequence (display->startup_notification,
++                                                    token_str);
++}
++
+ static gboolean
+ maybe_activate (MetaWaylandActivation *activation,
+                 MetaWindow            *window,
+@@ -338,15 +353,7 @@ maybe_activate (MetaWaylandActivation *activation,
+     return FALSE;
+ 
+   token = g_hash_table_lookup (activation->tokens, token_str);
+-  if (token)
+-    {
+-      sequence = token->sequence;
+-    }
+-  else
+-    {
+-      sequence = meta_startup_notification_lookup_sequence (display->startup_notification,
+-                                                            token_str);
+-    }
++  sequence = lookup_sequence (activation, token_str);
+ 
+   if (!sequence)
+     return TRUE;
+@@ -445,6 +452,29 @@ add_pending_activate (MetaWaylandActivation *activation,
+                        window, g_steal_pointer (&requests));
+ }
+ 
++/* A window activated before it maps was launched when its token was made,
++ * so whether it takes focus on map depends on any newer user activity. A
++ * token a client made itself only counts with the input it was made for.
++ */
++static void
++set_launch_time (MetaWaylandActivation *activation,
++                 MetaWindow            *window,
++                 const char            *token_str)
++{
++  MetaXdgActivationToken *token = g_hash_table_lookup (activation->tokens,
++                                                       token_str);
++  MetaStartupSequence *sequence = lookup_sequence (activation, token_str);
++
++  if (!sequence || window->initial_timestamp_set)
++    return;
++
++  if (token && !token_can_activate (token))
++    return;
++
++  window->initial_timestamp = meta_startup_sequence_get_timestamp (sequence);
++  window->initial_timestamp_set = TRUE;
++}
++
+ static void
+ activation_activate (struct wl_client   *client,
+                      struct wl_resource *resource,
+@@ -460,6 +490,7 @@ activation_activate (struct wl_client   *client,
+ 
+   g_assert (window != NULL);
+ 
++  set_launch_time (activation, window, token_str);
+   add_pending_activate (activation, window, token_str);
+ }
+ 
+diff --git a/src/wayland/meta-wayland-client-private.h b/src/wayland/meta-wayland-client-private.h
+index a07152e67b859b12dfcb2506970292f0921212b2..817da0be8ebfebc7f03c2f209d6f70d43edeb819 100644
+--- a/src/wayland/meta-wayland-client-private.h
++++ b/src/wayland/meta-wayland-client-private.h
+@@ -54,6 +54,11 @@ MetaContext * meta_wayland_client_get_context (MetaWaylandClient *wayland_client
+ META_EXPORT_TEST
+ struct wl_client * meta_wayland_client_get_wl_client (MetaWaylandClient *wayland_client);
+ 
++gboolean meta_wayland_client_get_launch_time (MetaWaylandClient *wayland_client,
++                                              uint32_t          *launch_time);
++
++void meta_wayland_client_note_window_shown (MetaWaylandClient *wayland_client);
++
+ META_EXPORT_TEST
+ gboolean meta_wayland_client_matches (MetaWaylandClient      *wayland_client,
+                                       const struct wl_client *wl_client);
+diff --git a/src/wayland/meta-wayland-client.c b/src/wayland/meta-wayland-client.c
+index 3c36928cb998db7a4559b0115e661eb9290df28f..853bb34b08ebb4bf2d330d697bde87e74fb60cf7 100644
+--- a/src/wayland/meta-wayland-client.c
++++ b/src/wayland/meta-wayland-client.c
+@@ -75,6 +75,9 @@ struct _MetaWaylandClient
+   char *window_tag;
+ 
+   pid_t pid;
++
++  uint32_t connection_time;
++  gboolean shown_window;
+ };
+ 
+ G_DEFINE_TYPE (MetaWaylandClient, meta_wayland_client, G_TYPE_OBJECT)
+@@ -132,6 +135,7 @@ set_wayland_client (MetaWaylandClient *client,
+   g_autoptr (MetaWaylandClient) old_client = NULL;
+ 
+   client->wayland_client = wayland_client;
++  client->connection_time = (uint32_t) (g_get_monotonic_time () / 1000);
+ 
+   old_client = wl_client_get_user_data (wayland_client);
+   if (old_client)
+@@ -285,6 +289,26 @@ meta_wayland_client_get_wl_client (MetaWaylandClient *client)
+   return client->wayland_client;
+ }
+ 
++/* Until a client shows its first window, that window was asked for when
++ * the client started.
++ */
++gboolean
++meta_wayland_client_get_launch_time (MetaWaylandClient *client,
++                                     uint32_t          *launch_time)
++{
++  if (client->shown_window)
++    return FALSE;
++
++  *launch_time = client->connection_time;
++  return TRUE;
++}
++
++void
++meta_wayland_client_note_window_shown (MetaWaylandClient *client)
++{
++  client->shown_window = TRUE;
++}
++
+ gboolean
+ meta_wayland_client_matches (MetaWaylandClient      *client,
+                              const struct wl_client *wl_client)
+diff --git a/src/x11/window-props.c b/src/x11/window-props.c
+index f399bea45311911eca7be88640be717f8e71397a..97c600dc01db7cc0f5927d790ba2cd757d52be7e 100644
+--- a/src/x11/window-props.c
++++ b/src/x11/window-props.c
+@@ -447,6 +447,18 @@ reload_net_wm_user_time (MetaWindow    *window,
+   if (value->type != META_PROP_VALUE_INVALID)
+     {
+       uint32_t cardinal = value->v.cardinal;
++
++      /* Toolkits stamp windows they present without an event with the X
++       * server's current time, which no user input stands behind.
++       */
++      if (XSERVER_TIME_IS_BEFORE (window->display->last_input_time, cardinal))
++        {
++          meta_topic (META_DEBUG_STARTUP,
++                      "Ignoring _NET_WM_USER_TIME %u of %s, newer than any input",
++                      cardinal, window->desc);
++          return;
++        }
++
+       meta_window_set_user_time (window, cardinal);
+     }
+ }
+diff --git a/src/x11/window-x11.c b/src/x11/window-x11.c
+index 8d7210355fdbf80a07ac82cf03ae594a7461f3ea..fd9d43399447ab05352fc63761872fdad785870a 100644
+--- a/src/x11/window-x11.c
++++ b/src/x11/window-x11.c
+@@ -3657,6 +3657,21 @@ meta_window_x11_client_message (MetaWindow *window,
+           timestamp = meta_display_get_current_time (display);
+         }
+ 
++      /* A new window asking without a time, or with one newer than any
++       * input, has no input behind the request, so it counts from when it
++       * was launched.
++       */
++      if (window->showing_for_first_time &&
++          source_indication != META_CLIENT_TYPE_PAGER &&
++          (timestamp == 0 ||
++           XSERVER_TIME_IS_BEFORE (window->display->last_input_time, timestamp)))
++        {
++          meta_topic (META_DEBUG_FOCUS,
++                      "_NET_ACTIVE_WINDOW time %u of %s has no input behind it",
++                      timestamp, window->desc);
++          timestamp = window->net_wm_user_time;
++        }
++
+       meta_window_activate_full (window, timestamp, source_indication, NULL);
+       return TRUE;
+     }

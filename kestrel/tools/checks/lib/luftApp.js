@@ -88,14 +88,14 @@ export function sabineService() {
 }
 
 export class LuftApp {
-  constructor(name, args = []) {
+  constructor(name, args = [], env = {}) {
     this.name = name;
     this.id = `com.lantharos.${name}`;
     this._log = [];
     const {path, manifest} = command(name);
     if (!GLib.file_test(path, GLib.FileTest.IS_EXECUTABLE))
       throw new Error(`${name} is not built at ${path}`);
-    this._process = spawn([path, ...args], {env: environment(manifest), flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
+    this._process = spawn([path, ...args], {env: {...environment(manifest), ...env}, flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
     this._painted = false;
     this._exited = false;
     this.lifecycle = [];

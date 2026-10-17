@@ -42,6 +42,7 @@
 #include "st-theme-context.h"
 #include "st-theme-node-transition.h"
 #include "st-theme-node-private.h"
+#include "st-theme-private.h"
 #include "st-drawing-area.h"
 
 #include "st-widget-accessible.h"
@@ -1421,6 +1422,36 @@ st_widget_get_style (StWidget *actor)
   return ST_WIDGET_PRIVATE (actor)->inline_style;
 }
 
+static gboolean
+style_depends_on_structure (StWidget *widget)
+{
+  StWidgetPrivate *priv = st_widget_get_instance_private (widget);
+  StTheme *theme;
+
+  if (!priv->theme_node)
+    return TRUE;
+
+  theme = st_theme_node_get_theme (priv->theme_node);
+  return theme && _st_theme_depends_on_structure (theme, priv->theme_node);
+}
+
+static void
+set_structural_pseudo_class (StWidget   *widget,
+                             const char *pseudo_class,
+                             gboolean    present)
+{
+  StWidgetPrivate *priv = st_widget_get_instance_private (widget);
+  gboolean changed = present ? add_class_name (&priv->pseudo_class, pseudo_class)
+                             : remove_class_name (&priv->pseudo_class, pseudo_class);
+
+  if (!changed)
+    return;
+
+  if (style_depends_on_structure (widget))
+    st_widget_style_changed (widget);
+  g_object_notify_by_pspec (G_OBJECT (widget), props[PROP_PSEUDO_CLASS]);
+}
+
 static void
 st_widget_set_first_visible_child (StWidget     *widget,
                                    ClutterActor *actor)
@@ -1436,7 +1467,7 @@ st_widget_set_first_visible_child (StWidget     *widget,
 
   if (priv->first_visible_child != NULL)
     {
-      st_widget_remove_style_pseudo_class (priv->first_visible_child, "first-child");
+      set_structural_pseudo_class (priv->first_visible_child, "first-child", FALSE);
       g_clear_object (&priv->first_visible_child);
     }
 
@@ -1445,7 +1476,7 @@ st_widget_set_first_visible_child (StWidget     *widget,
 
   if (ST_IS_WIDGET (actor))
     {
-      st_widget_add_style_pseudo_class (ST_WIDGET (actor), "first-child");
+      set_structural_pseudo_class (ST_WIDGET (actor), "first-child", TRUE);
       priv->first_visible_child = g_object_ref (ST_WIDGET (actor));
     }
 }
@@ -1465,7 +1496,7 @@ st_widget_set_last_visible_child (StWidget     *widget,
 
   if (priv->last_visible_child != NULL)
     {
-      st_widget_remove_style_pseudo_class (priv->last_visible_child, "last-child");
+      set_structural_pseudo_class (priv->last_visible_child, "last-child", FALSE);
       g_clear_object (&priv->last_visible_child);
     }
 
@@ -1474,7 +1505,7 @@ st_widget_set_last_visible_child (StWidget     *widget,
 
   if (ST_IS_WIDGET (actor))
     {
-      st_widget_add_style_pseudo_class (ST_WIDGET (actor), "last-child");
+      set_structural_pseudo_class (ST_WIDGET (actor), "last-child", TRUE);
       priv->last_visible_child = g_object_ref (ST_WIDGET (actor));
     }
 }

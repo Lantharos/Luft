@@ -70,6 +70,8 @@ struct _StTheme
   GHashTable *files_by_stylesheet;
 
   CRCascade *cascade;
+
+  GPtrArray *structural_selectors;
 };
 
 enum
@@ -288,6 +290,7 @@ st_theme_load_stylesheet (StTheme    *theme,
 
   cr_stylesheet_ref (stylesheet);
   theme->custom_stylesheets = g_slist_prepend (theme->custom_stylesheets, stylesheet);
+  g_clear_pointer (&theme->structural_selectors, g_ptr_array_unref);
   g_signal_emit (theme, signals[STYLESHEETS_CHANGED], 0);
 
   return TRUE;
@@ -315,6 +318,7 @@ st_theme_unload_stylesheet (StTheme    *theme,
     return;
 
   theme->custom_stylesheets = g_slist_remove (theme->custom_stylesheets, stylesheet);
+  g_clear_pointer (&theme->structural_selectors, g_ptr_array_unref);
 
   g_signal_emit (theme, signals[STYLESHEETS_CHANGED], 0);
 
@@ -387,6 +391,7 @@ st_theme_finalize (GObject * object)
   g_slist_foreach (theme->custom_stylesheets, (GFunc) cr_stylesheet_unref, NULL);
   g_clear_slist (&theme->custom_stylesheets, NULL);
 
+  g_clear_pointer (&theme->structural_selectors, g_ptr_array_unref);
   g_hash_table_destroy (theme->stylesheets_by_file);
   g_hash_table_destroy (theme->files_by_stylesheet);
 
@@ -527,6 +532,20 @@ string_in_list (GString    *stryng,
 }
 
 static gboolean
+is_structural_pseudo_class (CRAdditionalSel *a_add_sel)
+{
+  GString *name;
+
+  if (!a_add_sel->content.pseudo || !a_add_sel->content.pseudo->name ||
+      !a_add_sel->content.pseudo->name->stryng)
+    return FALSE;
+
+  name = a_add_sel->content.pseudo->name->stryng;
+  return !strqcmp ("first-child", name->str, name->len) ||
+         !strqcmp ("last-child", name->str, name->len);
+}
+
+static gboolean
 pseudo_class_add_sel_matches_style (StTheme         *a_this,
                                     CRAdditionalSel *a_add_sel,
                                     StThemeNode     *a_node)
@@ -621,7 +640,8 @@ id_add_sel_matches_style (CRAdditionalSel *a_add_sel,
 static gboolean
 additional_selector_matches_style (StTheme         *a_this,
                                    CRAdditionalSel *a_add_sel,
-                                   StThemeNode     *a_node)
+                                   StThemeNode     *a_node,
+                                   gboolean         a_any_structure)
 {
   CRAdditionalSel *cur_add_sel = NULL;
 
@@ -645,6 +665,8 @@ additional_selector_matches_style (StTheme         *a_this,
           g_warning ("Attribute selectors not supported");
           return FALSE;
         case  PSEUDO_CLASS_ADD_SELECTOR:
+          if (a_any_structure && is_structural_pseudo_class (cur_add_sel))
+            break;
           if (!pseudo_class_add_sel_matches_style (a_this, cur_add_sel, a_node))
             return FALSE;
           break;
@@ -692,6 +714,8 @@ element_name_matches_type (const char *element_name,
  *the next simple selector (after the evaluation of the current one)
  *and recursively evaluate it. Must be usually set to TRUE unless you
  *know what you are doing.
+ *@param a_any_structure if set to TRUE, :first-child and :last-child
+ *match a_node whether or not it has them.
  */
 static enum CRStatus
 sel_matches_style_real (StTheme     *a_this,
@@ -699,7 +723,8 @@ sel_matches_style_real (StTheme     *a_this,
                         StThemeNode *a_node,
                         gboolean    *a_result,
                         gboolean     a_eval_sel_list_from_end,
-                        gboolean     a_recurse)
+                        gboolean     a_recurse,
+                        gboolean     a_any_structure)
 {
   CRSimpleSel *cur_sel = NULL;
   StThemeNode *cur_node = NULL;
@@ -740,7 +765,8 @@ sel_matches_style_real (StTheme     *a_this,
            */
           if (cur_sel->add_sel)
             {
-              if (additional_selector_matches_style (a_this, cur_sel->add_sel, cur_node))
+              if (additional_selector_matches_style (a_this, cur_sel->add_sel, cur_node,
+                                                 a_any_structure && cur_node == a_node))
                 goto walk_a_step_in_expr;
               else
                 goto done;
@@ -753,7 +779,8 @@ sel_matches_style_real (StTheme     *a_this,
         {
           if (!cur_sel->add_sel)
             goto done;
-          if (additional_selector_matches_style (a_this, cur_sel->add_sel, cur_node))
+          if (additional_selector_matches_style (a_this, cur_sel->add_sel, cur_node,
+                                                 a_any_structure && cur_node == a_node))
             goto walk_a_step_in_expr;
           else
             goto done;
@@ -796,7 +823,7 @@ sel_matches_style_real (StTheme     *a_this,
                 enum CRStatus status;
                 gboolean matches = FALSE;
 
-                status = sel_matches_style_real (a_this, cur_sel->prev, n, &matches, FALSE, TRUE);
+                status = sel_matches_style_real (a_this, cur_sel->prev, n, &matches, FALSE, TRUE, FALSE);
 
                 if (status != CR_OK)
                   goto done;
@@ -856,6 +883,30 @@ done:
   return CR_OK;
 }
 
+static CRStyleSheet *
+imported_stylesheet (StTheme        *theme,
+                     CRStyleSheet   *parent,
+                     CRAtImportRule *import_rule)
+{
+  if (import_rule->sheet == NULL)
+    {
+      CRStyleSheet *sheet = NULL;
+      g_autoptr (GFile) file = NULL;
+
+      if (import_rule->url->stryng && import_rule->url->stryng->str)
+        {
+          file = _st_theme_resolve_url (theme, parent,
+                                        import_rule->url->stryng->str);
+          sheet = resolve_stylesheet (theme, file, NULL);
+        }
+
+      /* A marker keeps a missing or broken stylesheet from being parsed again */
+      import_rule->sheet = sheet ? sheet : (CRStyleSheet *) - 1;
+    }
+
+  return import_rule->sheet != (CRStyleSheet *) - 1 ? import_rule->sheet : NULL;
+}
+
 static void
 add_matched_properties (StTheme      *a_this,
                         CRStyleSheet *a_nodesheet,
@@ -897,42 +948,11 @@ add_matched_properties (StTheme      *a_this,
 
         case AT_IMPORT_RULE_STMT:
           {
-            CRAtImportRule *import_rule = cur_stmt->kind.import_rule;
+            CRStyleSheet *sheet = imported_stylesheet (a_this, a_nodesheet,
+                                                       cur_stmt->kind.import_rule);
 
-            if (import_rule->sheet == NULL)
-              {
-                CRStyleSheet *sheet = NULL;
-                GFile *file = NULL;
-
-                if (import_rule->url->stryng && import_rule->url->stryng->str)
-                  {
-                    file = _st_theme_resolve_url (a_this,
-                                                  a_nodesheet,
-                                                  import_rule->url->stryng->str);
-                    sheet = resolve_stylesheet (a_this, file, NULL);
-                  }
-
-                if (sheet)
-                  {
-                    import_rule->sheet = sheet;
-                  }
-                else
-                  {
-                    /* Set a marker to avoid repeatedly trying to parse a non-existent or
-                     * broken stylesheet
-                     */
-                    import_rule->sheet = (CRStyleSheet *) - 1;
-                  }
-
-                if (file)
-                  g_object_unref (file);
-              }
-
-            if (import_rule->sheet != (CRStyleSheet *) - 1)
-              {
-                add_matched_properties (a_this, import_rule->sheet,
-                                        a_node, props);
-              }
+            if (sheet)
+              add_matched_properties (a_this, sheet, a_node, props);
           }
           break;
         case AT_MEDIA_RULE_STMT:
@@ -957,7 +977,7 @@ add_matched_properties (StTheme      *a_this,
           if (!cur_sel->simple_sel)
             continue;
 
-          status = sel_matches_style_real (a_this, cur_sel->simple_sel, a_node, &matches, TRUE, TRUE);
+          status = sel_matches_style_real (a_this, cur_sel->simple_sel, a_node, &matches, TRUE, TRUE, FALSE);
 
           if (status == CR_OK && matches)
             {
@@ -1022,6 +1042,102 @@ compare_declarations (gconstpointer a,
     return decl_a->parent_statement->specificity - decl_b->parent_statement->specificity;
 
   return 0;
+}
+
+static gboolean
+has_structural_pseudo_class (CRAdditionalSel *add_sel)
+{
+  for (; add_sel; add_sel = add_sel->next)
+    {
+      if (add_sel->type == PSEUDO_CLASS_ADD_SELECTOR &&
+          is_structural_pseudo_class (add_sel))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+collect_structural_selectors (StTheme      *theme,
+                              CRStyleSheet *sheet,
+                              GPtrArray    *selectors)
+{
+  CRStatement *statement;
+
+  for (statement = sheet->statements; statement; statement = statement->next)
+    {
+      if (statement->type == RULESET_STMT && statement->kind.ruleset)
+        {
+          CRSelector *selector;
+
+          for (selector = statement->kind.ruleset->sel_list; selector; selector = selector->next)
+            {
+              CRSimpleSel *compound;
+
+              for (compound = selector->simple_sel; compound; compound = compound->next)
+                {
+                  if (has_structural_pseudo_class (compound->add_sel))
+                    g_ptr_array_add (selectors, compound);
+                }
+            }
+        }
+      else if (statement->type == AT_IMPORT_RULE_STMT)
+        {
+          CRStyleSheet *imported = imported_stylesheet (theme, sheet,
+                                                        statement->kind.import_rule);
+
+          if (imported)
+            collect_structural_selectors (theme, imported, selectors);
+        }
+    }
+}
+
+static GPtrArray *
+ensure_structural_selectors (StTheme *theme)
+{
+  enum CRStyleOrigin origin;
+  GSList *iter;
+
+  if (theme->structural_selectors)
+    return theme->structural_selectors;
+
+  theme->structural_selectors = g_ptr_array_new ();
+
+  for (origin = ORIGIN_UA; origin < NB_ORIGINS; origin++)
+    {
+      CRStyleSheet *sheet = cr_cascade_get_sheet (theme->cascade, origin);
+
+      if (sheet)
+        collect_structural_selectors (theme, sheet, theme->structural_selectors);
+    }
+
+  for (iter = theme->custom_stylesheets; iter; iter = iter->next)
+    collect_structural_selectors (theme, iter->data, theme->structural_selectors);
+
+  return theme->structural_selectors;
+}
+
+/* Sibling combinators aren't supported, so a node's :first-child and
+ * :last-child only matter where a selector part tested against the node
+ * itself uses them, and that part and its ancestors match ignoring them.
+ */
+gboolean
+_st_theme_depends_on_structure (StTheme     *theme,
+                                StThemeNode *node)
+{
+  GPtrArray *selectors = ensure_structural_selectors (theme);
+  guint i;
+
+  for (i = 0; i < selectors->len; i++)
+    {
+      gboolean matches = FALSE;
+
+      sel_matches_style_real (theme, selectors->pdata[i], node, &matches, FALSE, TRUE, TRUE);
+      if (matches)
+        return TRUE;
+    }
+
+  return FALSE;
 }
 
 GPtrArray *

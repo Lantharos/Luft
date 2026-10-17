@@ -35,4 +35,7 @@ GFile *_st_theme_resolve_url (StTheme      *theme,
 
 CRDeclaration *_st_theme_parse_declaration_list (const char *str);
 
+gboolean _st_theme_depends_on_structure (StTheme     *theme,
+                                         StThemeNode *node);
+
 G_END_DECLS

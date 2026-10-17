@@ -1,0 +1,59 @@
+---
+title: Mailman
+description: Mail for every account in one place, kept on your computer so it never waits on the network.
+sidebar:
+  order: 4
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Mailman keeps a local copy of every account, so opening, searching and sorting mail never waits on the network. New mail arrives as it's sent, and only changes are fetched.
+
+<Shot name="mailman" alt="Mailman showing a message" />
+
+## Accounts
+
+Type your address and Mailman finds the settings for most providers by itself. IMAP and SMTP accounts work, and so do JMAP accounts. Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring-and-passkeys/), where only Mailman can read them.
+
+An account can send from several addresses, each with its own signature and reply address. Replies go out from the address a message was written to.
+
+## A calmer inbox
+
+- **One inbox** for every account, with conversations grouped across folders.
+- **The Screener** holds mail from people writing for the first time until you let them in.
+- **Bundles** gather newsletters, receipts and updates, each with one-click unsubscribe.
+- **Later** sets a conversation aside until later today, tomorrow morning, the weekend, next week or next month.
+- **Reminders** bring a conversation back when nobody replied in a day, three days or a week.
+
+## Writing
+
+- Formatting as you type, in the style of Markdown, with pictures inline.
+- Templates, and drafts saved to the server.
+- **Undo send** for 5 to 30 seconds, and **send later**.
+- Mailman opens `mailto:` links and `.eml` files.
+
+## Reading safely
+
+Mail shows without scripts and without remote pictures until you allow them, and tracking pixels are removed. **Darken bright messages** tones down mail designed for a white page.
+
+## Search
+
+Search works offline across every account. Combine words with `from:`, `to:`, `subject:`, `is:unread`, `is:starred`, `has:attachment`, or `in:anywhere` to include Trash and Junk.
+
+## Keyboard shortcuts
+
+<kbd>Ctrl</kbd>+<kbd>K</kbd> opens the command palette, and <kbd>?</kbd> lists every shortcut.
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>J</kbd> / <kbd>K</kbd> | Next and previous conversation |
+| <kbd>E</kbd> | Archive |
+| <kbd>#</kbd> | Delete |
+| <kbd>B</kbd> | Set aside for later |
+| <kbd>S</kbd> | Star |
+| <kbd>R</kbd> / <kbd>A</kbd> / <kbd>F</kbd> | Reply, reply all, forward |
+| <kbd>C</kbd> | Write a message |
+| <kbd>/</kbd> | Search |
+| <kbd>Z</kbd> | Undo |
+| <kbd>G</kbd> then <kbd>I</kbd>, <kbd>K</kbd>, <kbd>L</kbd> | Inbox, Screener, Later |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Send |

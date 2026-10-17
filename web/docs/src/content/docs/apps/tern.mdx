@@ -1,0 +1,43 @@
+---
+title: Tern
+description: Luft's terminal, with tabs, split panes and prompts it understands.
+sidebar:
+  order: 9
+---
+
+Tern is the terminal. It follows your accent, light or dark style, monospace font and text size, and takes its colours from your wallpaper.
+
+
+## What it does
+
+- Tabs and split panes with draggable dividers. New tabs and panes open in the folder you're in.
+- Jump between prompts, and get a notification when a long command finishes while you're elsewhere.
+- Find, with match case and regular expressions.
+- <kbd>Ctrl</kbd>+click opens links, including ones programs mark up themselves, such as `ls --hyperlink`.
+- Pasting several lines, or something that looks risky, asks first. So does closing a tab with a program still running.
+- A soft flash instead of a bell sound.
+- Programs can copy to the clipboard. Reading it is off until you allow it in Preferences.
+
+These work in bash, zsh and fish without changing your configuration files.
+
+## Preferences
+
+Style, text size, a see-through background and how see-through it is, the cursor's shape and blinking, how much history to keep, which shell to start, and copying text as soon as it's selected.
+
+## Keyboard shortcuts
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> | New tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> / <kbd>E</kbd> | Split right, split down |
+| <kbd>Alt</kbd>+arrows | Move between panes |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | Close the pane |
+| <kbd>Ctrl</kbd>+<kbd>Page Up</kbd> / <kbd>Page Down</kbd> | Previous, next tab |
+| <kbd>Alt</kbd>+<kbd>1</kbd> … <kbd>9</kbd> | Go to a tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> / <kbd>V</kbd> | Copy, paste |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Find |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Up</kbd> / <kbd>Down</kbd> | Previous, next prompt |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> | Clear the history |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Preferences |
+
+From the command line, `tern --working-directory ~/Projects` starts in a folder and `tern -e ssh example.org` runs a command. If Tern is already open, these open a new tab.

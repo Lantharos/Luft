@@ -1,0 +1,40 @@
+---
+title: Screenshots and recording
+description: Take screenshots of an area, a window or the screen, and record the screen.
+sidebar:
+  order: 7
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Press <kbd>Print</kbd> or <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> to open the screenshot tool.
+
+<Shot name="screenshot-tool" alt="The screenshot tool selecting an area of the screen" />
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Print</kbd> or <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | The screenshot tool |
+| <kbd>Shift</kbd>+<kbd>Print</kbd> | A screenshot of the whole screen, straight away |
+| <kbd>Alt</kbd>+<kbd>Print</kbd> | A screenshot of the window you're using |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> | Start recording the screen, or stop |
+
+## The screenshot tool
+
+Choose an area, the whole screen or a window, decide whether to include the pointer, then capture.
+
+| Key | Does |
+| --- | --- |
+| <kbd>S</kbd> / <kbd>C</kbd> / <kbd>W</kbd> | Area, screen, window |
+| <kbd>P</kbd> | Show the pointer |
+| <kbd>V</kbd> | Switch to recording |
+| Arrows, with <kbd>Ctrl</kbd>, <kbd>Shift</kbd> or <kbd>Alt</kbd> | Move or resize the selected area |
+| <kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>Ctrl</kbd>+<kbd>C</kbd> | Capture |
+| <kbd>Esc</kbd> | Close |
+
+Screenshots are saved in `~/Pictures/Screenshots` and copied to the clipboard at the same time, ready to paste. A notification offers to show the file.
+
+## Recording
+
+Switch the tool to **Record Screen**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd>. While recording, the privacy indicator on the taskbar shows it; stop with the same shortcut or from the indicator's menu.
+
+Recordings are saved as MP4 videos in `~/Videos/Screencasts`, encoded by the graphics card where it can. They don't include sound.

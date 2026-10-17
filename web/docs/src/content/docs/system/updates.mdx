@@ -1,0 +1,61 @@
+---
+title: How updates work
+description: Luft updates as one sealed image, installs at the next restart, and can always go back.
+sidebar:
+  order: 1
+---
+
+Luft isn't a collection of packages that update one by one. Each version of the system is one sealed image, built and signed in one go, and an update swaps the whole system for the next version. Your files, settings and apps live apart from it and stay as they are.
+
+This means an update either happens completely or not at all. A restart in the middle of downloading leaves the system you had, and if a new version doesn't start, Luft goes back by itself.
+
+## Getting an update
+
+Once you've opened Updates in Settings, Luft looks for updates every day and downloads them in the background. When one is ready, a notification says so.
+
+1. **Settings, Updates** shows the new version, what's new in it, when it was released and how much it downloads. Only the parts of the system that changed are downloaded.
+2. **Restart to install.** The download waits until you restart or shut down.
+3. The **Restart** and **Power off** dialogs have an **Install version …** box, ticked unless the battery is low. Leave it unticked and the update simply waits for another time.
+
+The version you had stays on the computer as the previous version.
+
+In **Automatic updates** you choose how often Luft looks (every day, every week, or only when you check) and whether it downloads in the background.
+
+
+## Going back
+
+If something in a new version doesn't suit you, **Go back to the previous version** in Settings, under Updates, makes the version before it start next time. Your files and settings stay as they are. While going back is queued, you can still choose to stay.
+
+You can also go back while the computer starts: hold any key to show the boot menu, and pick the version under **Previous versions**.
+
+## When an update doesn't start
+
+A new version gets three tries to reach the login screen. If it doesn't get there, Luft starts the version that last worked, explains what happened before the login screen, and doesn't offer that update again; the next release replaces it.
+
+## Releases and nightly builds
+
+| | Comes | Follows |
+| --- | --- | --- |
+| Releases | When a version is ready | `ghcr.io/lantharos/luft:45` |
+| Nightly builds | Every night, when something changed | `ghcr.io/lantharos/luft:45-nightly` |
+
+A computer follows whatever it was installed from: a stick made from `luft-nightly.iso` keeps getting nightly builds. To move between them, run this in [Tern](/apps/tern/) and restart:
+
+```sh
+sudo bootc switch ghcr.io/lantharos/luft:45-nightly   # or :45 for releases
+```
+
+On a computer with NVIDIA graphics, add `-nvidia` to the end, such as `:45-nightly-nvidia`.
+
+## Firmware and apps
+
+- **Firmware** for the computer and its devices also comes through Settings, under Updates, when the maker publishes it. Most firmware updates finish at the next restart.
+- **Apps** aren't part of the system image. Settings points to [Schelf](/apps/schelf/), which updates them.
+
+## From the command line
+
+| Command | Does |
+| --- | --- |
+| `bootc status` | Shows the running version, a downloaded one, and the previous one |
+| `sudo bootc upgrade` | Downloads the newest version for the next restart |
+| `sudo bootc rollback` | Starts the previous version next time |

@@ -1,0 +1,45 @@
+---
+title: Draft
+description: A fast text and code editor.
+sidebar:
+  order: 5
+---
+
+Draft is Luft's text and code editor. Open a file and you get just the editor and its tabs; start Draft on its own and a folder tree joins them in the sidebar.
+
+
+## Editing
+
+- Syntax highlighting for over a hundred languages, picked from the file name or its `#!` line. Change it from the status bar.
+- Multiple cursors, rectangular selection with <kbd>Alt</kbd>+drag, folding, bracket matching and auto-indent.
+- Find and replace with case, whole word and regular expressions.
+- Indentation, encoding and line endings are detected and kept when saving, and can be changed from the status bar.
+- A command palette, quick open, and a Markdown preview that follows the editor.
+- Syntax colours come from your wallpaper's accent, in light and dark.
+
+## It remembers
+
+Draft restores your folder, tabs, cursors and unsaved changes the next time it starts, untitled documents included. Files changed on disk reload by themselves, and Draft asks first when you have unsaved changes.
+
+Large files open quickly. Files over 10 MB open as plain text until you pick a language.
+
+## Keyboard shortcuts
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>P</kbd> | Go to a file; type `>` for commands or `:` for a line |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | All commands |
+| <kbd>Ctrl</kbd>+<kbd>O</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> | Open files, open a folder |
+| <kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> | Save, save all |
+| <kbd>Ctrl</kbd>+<kbd>G</kbd> | Go to a line |
+| <kbd>Ctrl</kbd>+<kbd>F</kbd> / <kbd>Ctrl</kbd>+<kbd>H</kbd> | Find, find and replace |
+| <kbd>Ctrl</kbd>+<kbd>D</kbd> | Select the next occurrence |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Select every occurrence |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Up</kbd> / <kbd>Down</kbd> | Add a cursor above or below |
+| <kbd>Ctrl</kbd>+<kbd>/</kbd> | Comment |
+| <kbd>Alt</kbd>+<kbd>Up</kbd> / <kbd>Down</kbd> | Move lines |
+| <kbd>Ctrl</kbd>+<kbd>B</kbd> | Sidebar |
+| <kbd>Alt</kbd>+<kbd>Z</kbd> | Word wrap |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> | Markdown preview |
+
+Settings live in `~/.config/draft/settings.json`.

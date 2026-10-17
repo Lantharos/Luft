@@ -1,0 +1,20 @@
+---
+title: Helium
+description: Luft's web browser.
+sidebar:
+  order: 11
+---
+
+[Helium](https://helium.computer) is the web browser that comes with Luft. It's a Chromium-based browser made by imput.
+
+## How it's set up
+
+Luft's image carries Helium, checked against Helium's signing key. The first time you sign in, before the desktop appears, Luft adds it to your account, even without a connection. If no other browser is your default yet, Helium becomes it.
+
+From then on Helium is an ordinary app: it updates itself from Helium's releases every few hours, and you can remove it in [Schelf](/apps/schelf/) like any other app. Once removed, it stays removed.
+
+To use another browser, install it from Schelf and choose it in Settings, under Apps, Default apps.
+
+## Passkeys
+
+Helium sees [Luft Passkeys](/files/keyring-and-passkeys/#passkeys) as a security key, so sites that support passkeys work without an extension.

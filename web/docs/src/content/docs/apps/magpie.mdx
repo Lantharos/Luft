@@ -1,0 +1,49 @@
+---
+title: Magpie
+description: Photos, videos, music, PDFs and fonts in one viewer.
+sidebar:
+  order: 3
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Magpie opens photos, videos, music, PDFs and fonts. Opening a file shows just that file, with the rest of its folder an arrow key away. Started on its own, Magpie opens your Pictures, with Pictures, Videos, Music and Documents in the sidebar.
+
+<Shot name="magpie-font" alt="Magpie showing the details of a font" />
+
+## Photos
+
+- The common formats, plus HEIC, JPEG XL, TIFF, OpenEXR, JPEG 2000 and more. Animated GIF, WebP and PNG play.
+- Zoom, pan, rotate, flip, copy, and a slideshow.
+- Camera details, with a map link when a photo knows where it was taken.
+- **Set as wallpaper**, for the light or the dark style. The picture is copied into `~/Pictures/Wallpapers`, where [Settings](/personalize/appearance/#wallpapers) finds it.
+
+## Videos and music
+
+- Videos play with frame previews when you hover the timeline, speed control, picture in picture, and subtitles from `.srt` or `.vtt` files or from inside MKV and MP4 files. Magpie remembers where you stopped.
+- H.264, HEVC and other formats the viewer can't decode itself play through the system's media framework, with the same controls. When a video can't play at all, Magpie offers other apps that might.
+- Music turns the folder into a queue, with tags, covers, shuffle and repeat. The media controls in [Notifications](/desktop/notifications/) control it, and songs you open while one plays join the queue.
+
+## PDFs and fonts
+
+- PDFs have selectable text, links, search, zoom and page thumbnails.
+- Fonts show samples, every character, details, variable font axes and the faces in a collection. **Install** adds a font for your account, and you can make it the interface or monospace font from there.
+
+## Keyboard shortcuts
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Left</kbd> / <kbd>Right</kbd> | Previous and next photo or font; seek 5 seconds in videos and music |
+| <kbd>Page Up</kbd> / <kbd>Page Down</kbd> | Previous and next item |
+| <kbd>Space</kbd> | Play or pause |
+| <kbd>J</kbd> / <kbd>L</kbd> | Seek 10 seconds back or forward in videos |
+| <kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd> / <kbd>1</kbd> | Zoom in, zoom out, fit, actual size |
+| <kbd>R</kbd> / <kbd>Shift</kbd>+<kbd>R</kbd> | Rotate right and left |
+| <kbd>H</kbd> | Flip |
+| <kbd>F5</kbd> | Slideshow |
+| <kbd>Up</kbd> / <kbd>Down</kbd> / <kbd>M</kbd> | Volume and mute |
+| <kbd>S</kbd> | Shuffle |
+| <kbd>Ctrl</kbd>+<kbd>F</kbd> | Find in a PDF |
+| <kbd>Alt</kbd>+<kbd>Enter</kbd> | Photo details |
+| <kbd>F9</kbd> | Sidebar, thumbnails, queue or pages |
+| <kbd>F</kbd> or <kbd>F11</kbd> | Full screen |

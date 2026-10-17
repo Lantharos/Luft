@@ -1,0 +1,38 @@
+---
+title: Meet Luft
+description: The app for Windows and Linux that gets a computer ready for Luft.
+sidebar:
+  order: 12
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Meet Luft runs on Windows and Linux, not on Luft itself. It checks a computer, puts Luft next to the system already there, and restarts into it once to try or install it, without a USB stick. It also makes USB sticks.
+
+<Shot name="meet" alt="Meet Luft, ready to try or install Luft" />
+
+| | Download |
+| --- | --- |
+| Windows 10 or 11 | [meet-luft.exe](https://get.luft.lanth.me/meet-luft.exe) |
+| Linux | [meet-luft.AppImage](https://get.luft.lanth.me/meet-luft.AppImage) |
+
+## What it does
+
+- **Checks the computer**: processor, firmware, drive layout, Secure Boot, TPM, BitLocker, Fast Startup, free space, graphics and Wi-Fi, and says what each means.
+- **Makes room** next to Windows with Windows' own tools, or keeps Luft in a folder on Linux.
+- **Restarts into Luft** once, to **Try Luft**, **Install Luft**, or on Linux **Replace** the old system.
+- **Packs a moving box** of your files and settings from Windows for your new account.
+- **Makes USB sticks**, and adds Luft to Ventoy sticks.
+- **Gets the newest Luft** when a newer build is out.
+- **Takes it all back out** if you change your mind.
+
+[Try Luft with Meet Luft](/start/meet-luft/) walks through each step.
+
+## Shortcuts
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> | Switch between releases and nightly builds |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Save the newest logs from Try Luft to the desktop |
+
+When a step doesn't finish, Meet Luft says which one and offers to try again. On Windows, what went wrong is written to `%LOCALAPPDATA%\Sabine\logs\meet.jsonl`.

@@ -17,6 +17,12 @@ const WINDOW: GlassWindow = GlassWindow {
     single_instance: Some("com.lantharos.barometer"),
 };
 
+const SAMPLE_SYSTEM: &str = "LUFT_SAMPLE_SYSTEM";
+
+pub(crate) fn sample_system() -> bool {
+    std::env::var_os(SAMPLE_SYSTEM).is_some()
+}
+
 pub fn run_app() -> ! {
     raise_file_limit();
     let events = Events::default();
@@ -25,7 +31,11 @@ pub fn run_app() -> ! {
     luft_app::run(
         &events,
         |window| bridge::register(WINDOW.apply(window), &monitor),
-        move |events| sampler.start(events).expect("Barometer needs /proc to run"),
+        move |events| {
+            if !sample_system() {
+                sampler.start(events).expect("Barometer needs /proc to run");
+            }
+        },
     )
 }
 

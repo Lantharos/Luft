@@ -1,5 +1,7 @@
 import Cairo from 'cairo';
 
+import {drawAvatar} from '../system/avatar.js';
+
 const [directory] = ARGV;
 
 const WALLPAPERS = {
@@ -26,19 +28,5 @@ function wallpaper(name, [background, blobs]) {
   surface.writeToPNG(`${directory}/${name}-wallpaper.png`);
 }
 
-function avatar(name, color) {
-  const size = 256;
-  const surface = new Cairo.ImageSurface(Cairo.Format.RGB24, size, size);
-  const context = new Cairo.Context(surface);
-  context.setSourceRGB(...color);
-  context.paint();
-  context.setSourceRGB(1, 1, 1);
-  context.arc(size / 2, size * 0.4, size * 0.18, 0, 2 * Math.PI);
-  context.fill();
-  context.arc(size / 2, size * 1.02, size * 0.38, 0, 2 * Math.PI);
-  context.fill();
-  surface.writeToPNG(`${directory}/${name}-avatar.png`);
-}
-
 for (const [name, spec] of Object.entries(WALLPAPERS)) wallpaper(name, spec);
-for (const [name, color] of Object.entries(AVATARS)) avatar(name, color);
+for (const [name, color] of Object.entries(AVATARS)) drawAvatar(`${directory}/${name}-avatar.png`, color);

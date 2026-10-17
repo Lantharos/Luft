@@ -33,6 +33,9 @@ const KEYBOARD = `<node><interface name="org.freedesktop.UPower.KbdBacklight">
 </interface></node>`;
 const HOSTNAME = `<node><interface name="org.freedesktop.hostname1">
   <property name="Chassis" type="s" access="read"/>
+  <property name="Hostname" type="s" access="read"/>
+  <property name="StaticHostname" type="s" access="read"/>
+  <property name="PrettyHostname" type="s" access="read"/>
 </interface></node>`;
 const SYSTEMD = `<node><interface name="org.freedesktop.systemd1.Manager">
   <property name="Virtualization" type="s" access="read"/>
@@ -85,7 +88,7 @@ export function publishBasics(publish, calls) {
       backlight = level;
     },
   }, '/org/freedesktop/UPower/KbdBacklight');
-  publish(HOSTNAME, {Chassis: 'laptop'}, '/org/freedesktop/hostname1');
+  publish(HOSTNAME, {Chassis: 'laptop', Hostname: 'mara-laptop', StaticHostname: 'mara-laptop', PrettyHostname: 'Mara’s Laptop'}, '/org/freedesktop/hostname1');
   publish(SYSTEMD, {Virtualization: ''}, '/org/freedesktop/systemd1');
   publish(LOCALE, {
     X11Layout: 'us',

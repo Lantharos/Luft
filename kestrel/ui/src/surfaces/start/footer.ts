@@ -24,16 +24,16 @@ export class StartFooter {
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
     const avatar = new Avatar(user, { styleClass: 'kestrel-avatar', iconSize: 32 });
     avatar.y_align = Clutter.ActorAlign.CENTER;
-    const signals = [
-      user.connect('notify::is-loaded', () => avatar.update()),
-      user.connect('changed', () => avatar.update()),
-    ];
+    const name = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
+    const update = () => {
+      avatar.update();
+      name.text = (user.is_loaded && user.get_real_name()) || GLib.get_real_name() || GLib.get_user_name();
+    };
+    const signals = [user.connect('notify::is-loaded', update), user.connect('changed', update)];
     avatar.connect('destroy', () => signals.forEach(signal => user.disconnect(signal)));
-    avatar.update();
+    update();
     this.account.add_child(avatar);
-    this.account.add_child(new St.Label({
-      text: GLib.get_real_name() || GLib.get_user_name(), y_align: Clutter.ActorAlign.CENTER,
-    }));
+    this.account.add_child(name);
     this.stack.add_child(this.account);
     for (const action of [LOCK, ...POWER_ACTIONS]) this.actions.add_child(this.actionButton(action));
     this.stack.add_child(this.actions);

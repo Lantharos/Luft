@@ -50,6 +50,7 @@ start_system_bus() {
   wait_until "the stand-in system bus" test -s "$session/system-bus"
   KESTREL_SYSTEM_BUS="$(head -n1 "$session/system-bus")"
   export KESTREL_SYSTEM_BUS
+  [[ "$mode" == nested ]] || export KESTREL_STAND_IN_BUS="$KESTREL_SYSTEM_BUS"
 }
 
 start() {

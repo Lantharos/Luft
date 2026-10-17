@@ -42,6 +42,8 @@ export { signInToNetwork } from './system/network/signIn.js';
 export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
+export { useStandInAccounts } from './system/standIn/accounts.js';
+export { standInBus } from './system/standIn/bus.js';
 export { afterMotion, holdMotion } from './shared/afterMotion.js';
 export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion.js';
 

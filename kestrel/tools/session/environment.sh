@@ -93,7 +93,7 @@ use_fixture_desktop() {
   export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"
   printf '%s\n' "['com.lantharos.rover.desktop', 'com.lantharos.draft.desktop', 'com.lantharos.mailman.desktop', 'com.lantharos.tern.desktop', 'com.lantharos.schelf.desktop', 'com.lantharos.settings.desktop']" > "$session/favorites.txt"
   printf '/dev/luft/system / btrfs rw 0 0\n/dev/luft/travel %s exfat rw 0 0\n' "$drives/TRAVEL" > "$fixture/mounts"
-  export LUFT_MOUNTS="$fixture/mounts"
+  export LUFT_MOUNTS="$fixture/mounts" LUFT_SAMPLE_SYSTEM=1
 }
 
 export_build_paths() {

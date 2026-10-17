@@ -27,7 +27,7 @@ Build Kestrel first (see [Building Luft](https://docs.luft.computer/developers/b
 
 The board groups, `input:scrolling`, `panel:battery` and `panel:screenshot` also run on two laptop panels at their automatic display scale: a 14-inch 1920×1200 panel at 150%, as the groups ending in `+laptop`, and a 15.6-inch 1080p panel at 125%, as the groups ending in `+laptop15`. Their screenshots go to a `laptop` or `laptop15` folder inside the capture folder.
 
-The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Headless sessions instead show Luft's own apps plus the stand-in apps in `kestrel/tools/fixtures/apps`, and Rover lists two stand-in drives from the mount table that `LUFT_MOUNTS` points it at, so screenshots never show what is installed or plugged in on the host. Theme edits reload live after `meson compile -C kestrel/build`.
+The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Headless sessions instead show Luft's own apps plus the stand-in apps in `kestrel/tools/fixtures/apps`, sign in as Mara Lindqvist on a computer named Mara’s Laptop, and read accounts and Bluetooth devices from the stand-in system bus that `KESTREL_STAND_IN_BUS` names. Rover lists two stand-in drives from the mount table that `LUFT_MOUNTS` points it at, and with `LUFT_SAMPLE_SYSTEM` set Barometer shows sample hardware and processes, so screenshots never show who uses the host or what is installed, running or plugged in on it. Theme edits reload live after `meson compile -C kestrel/build`.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |

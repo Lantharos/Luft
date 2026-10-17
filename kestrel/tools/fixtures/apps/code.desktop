@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Visual Studio Code
+GenericName=Text Editor
+Exec=true
+Icon=code
+Categories=Development;TextEditor;IDE;
+MimeType=text/plain;

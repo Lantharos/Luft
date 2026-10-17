@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 
 const INCLUDED_FILESYSTEMS: &[&str] = &[
     "ext4",
@@ -28,15 +29,22 @@ const SYSTEM_MOUNTS: &[&str] = &[
     "/sys",
 ];
 
-pub(super) const MOUNTS_FILE: &str = "/proc/self/mounts";
+const MOUNTS_FILE: &str = "/proc/self/mounts";
+const MOUNTS_OVERRIDE: &str = "LUFT_MOUNTS";
 
 pub(super) struct Mount {
     pub device: String,
     pub mount_point: String,
 }
 
+pub(super) fn mounts_file() -> PathBuf {
+    std::env::var_os(MOUNTS_OVERRIDE)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| MOUNTS_FILE.into())
+}
+
 pub(super) fn visible_mounts() -> Vec<Mount> {
-    let Ok(mounts) = fs::read_to_string(MOUNTS_FILE) else {
+    let Ok(mounts) = fs::read_to_string(mounts_file()) else {
         return Vec::new();
     };
     mounts

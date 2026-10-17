@@ -4,11 +4,11 @@ use std::thread;
 
 use luft_app::Events;
 
-use super::mounts::MOUNTS_FILE;
+use super::mounts::mounts_file;
 use crate::app::events::DRIVES_CHANGED;
 
 pub fn watch_mounts(events: Events) {
-    let Ok(mounts) = File::open(MOUNTS_FILE) else {
+    let Ok(mounts) = File::open(mounts_file()) else {
         return;
     };
     thread::spawn(move || {

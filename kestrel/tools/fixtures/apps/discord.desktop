@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Discord
+GenericName=Chat
+Exec=true
+Icon=discord
+Categories=Network;InstantMessaging;

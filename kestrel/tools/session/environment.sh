@@ -65,6 +65,37 @@ write_dbus_services() {
   done
 }
 
+luft_app_entries() {
+  local apps
+  apps="$(find "$root/apps/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | paste -sd'|')"
+  printf '^com\\.lantharos\\.(%s)(\\..+)?\\.desktop$' "$apps"
+}
+
+mask_host_apps() {
+  local fixture="$1" luft dir entry data_dirs
+  luft="$(luft_app_entries)"
+  IFS=: read -ra data_dirs <<< "$XDG_DATA_DIRS"
+  for dir in "${data_dirs[@]}"; do
+    [[ "$dir" != "$compositor_data" && -d "$dir/applications" ]] || continue
+    while read -r entry; do
+      mkdir -p "$fixture/applications/$(dirname "$entry")"
+      printf '[Desktop Entry]\nHidden=true\n' > "$fixture/applications/$entry"
+    done < <(cd "$dir/applications" && find . -name '*.desktop' -printf '%P\n' | grep -Ev "$luft")
+  done
+}
+
+use_fixture_desktop() {
+  local fixture="$session/fixture" drives="$1"
+  rm -rf "$fixture"
+  mkdir -p "$fixture/applications" "$drives/TRAVEL"
+  mask_host_apps "$fixture"
+  cp "$tools/fixtures/apps/"*.desktop "$fixture/applications/"
+  export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"
+  printf '%s\n' "['com.lantharos.rover.desktop', 'com.lantharos.draft.desktop', 'com.lantharos.mailman.desktop', 'com.lantharos.tern.desktop', 'com.lantharos.schelf.desktop', 'com.lantharos.settings.desktop']" > "$session/favorites.txt"
+  printf '/dev/luft/system / btrfs rw 0 0\n/dev/luft/travel %s exfat rw 0 0\n' "$drives/TRAVEL" > "$fixture/mounts"
+  export LUFT_MOUNTS="$fixture/mounts"
+}
+
 export_build_paths() {
   export LD_LIBRARY_PATH="$build/src:$build/src/st:$compositor:$compositor/mutter-51${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
   export GI_TYPELIB_PATH="$build/src:$build/src/st:$compositor/mutter-51${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"

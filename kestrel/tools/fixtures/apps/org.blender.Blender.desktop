@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Blender
+GenericName=3D Modeler
+Exec=true
+Icon=org.blender.Blender
+Categories=Graphics;3DGraphics;
+MimeType=application/x-blender;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Helium
+GenericName=Web Browser
+Exec=true
+Icon=helium
+Categories=Network;WebBrowser;
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;

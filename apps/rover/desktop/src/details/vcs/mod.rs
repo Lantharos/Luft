@@ -155,7 +155,7 @@ fn project_root(root: &str) -> Result<(VcsKind, PathBuf), String> {
 fn find_root(path: &Path) -> Option<(VcsKind, PathBuf)> {
     let home = dirs::home_dir();
     path.ancestors()
-        .filter(|dir| home.as_deref() != Some(*dir))
+        .take_while(|dir| home.as_deref() != Some(*dir))
         .find_map(|dir| {
             [VcsKind::Pig, VcsKind::Git]
                 .into_iter()

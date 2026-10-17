@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=OBS Studio
+GenericName=Streaming and Recording
+Exec=true
+Icon=com.obsproject.Studio
+Categories=AudioVideo;Recorder;

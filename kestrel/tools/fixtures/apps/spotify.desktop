@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Spotify
+GenericName=Music Player
+Exec=true
+Icon=spotify
+Categories=Audio;Music;Player;AudioVideo;

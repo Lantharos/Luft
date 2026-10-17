@@ -9,13 +9,13 @@ const { title, id, flip = false } = Astro.props;
 ---
 
 <section id={id} class="page grid items-center gap-12 py-24 md:grid-cols-12 md:gap-16 md:py-40">
-	<div class:list={['reveal md:col-span-5 lg:col-span-4', flip && 'md:order-2 md:col-start-8 lg:col-start-9']}>
+	<div class:list={['reveal md:col-span-5', flip && 'md:order-2 md:col-start-8']}>
 		<h2 class="text-title font-semibold text-balance">{title}</h2>
 		<div class="mt-5 space-y-4 text-lg text-ink-soft text-pretty">
 			<slot />
 		</div>
 	</div>
-	<div class:list={['settle md:col-span-7 lg:col-span-8', flip && 'md:order-1 md:col-start-1 md:row-start-1']}>
+	<div class:list={['settle md:col-span-7', flip && 'md:order-1 md:col-start-1 md:row-start-1']}>
 		<slot name="media" />
 	</div>
 </section>

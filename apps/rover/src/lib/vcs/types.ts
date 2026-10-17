@@ -1,12 +1,9 @@
-export type VcsKind = 'git' | 'pig';
-
 export interface VcsRoot {
 	root: string;
-	kind: VcsKind;
 }
 
 export interface VcsProject extends VcsRoot {
-	branchOrWorkspace: string | null;
+	branch: string | null;
 	ahead: number | null;
 	behind: number | null;
 	changedCount: number;

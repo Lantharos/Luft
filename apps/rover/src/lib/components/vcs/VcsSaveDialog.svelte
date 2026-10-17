@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import Icon from '#lib/components/Icon.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
-	import { primaryActionLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
@@ -14,7 +13,6 @@
 	let selected = $state.raw<string[]>([]);
 
 	let files = $derived(vcs.changedFiles);
-	let actionLabel = $derived(primaryActionLabel(vcs.project));
 	let canSubmit = $derived(Boolean(message.trim()) && selected.length > 0 && !vcs.busy);
 
 	$effect(() => {
@@ -46,10 +44,10 @@
 		<button class="absolute inset-0 h-full w-full" type="button" aria-label="Cancel" onclick={close}></button>
 		<section
 			class="relative z-10 flex max-h-[min(680px,calc(100dvh-32px))] w-[520px] max-w-full flex-col rounded-[18px] bg-[var(--raised)] text-[var(--text)] shadow-[0_24px_80px_var(--shadow-soft),inset_0_1px_0_var(--hairline)]"
-			aria-label={`${actionLabel} changes`}
+			aria-label="Commit changes"
 		>
 			<header class="flex h-[52px] shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
-				<div class="text-[14px] font-medium">{actionLabel} changes</div>
+				<div class="text-[14px] font-medium">Commit changes</div>
 				<button class="icon-button large" type="button" aria-label="Close" onclick={close}>
 					<Icon name="x" size={16} />
 				</button>
@@ -108,7 +106,7 @@
 			<footer class="flex shrink-0 justify-end gap-2 px-4 py-4 shadow-[inset_0_1px_0_var(--hairline)]">
 				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={close}>Cancel</button>
 				<button class="button large" type="button" disabled={!canSubmit} onclick={submit}>
-					{vcs.busy === 'save' ? `${actionLabel}...` : actionLabel}
+					{vcs.busy === 'save' ? 'Committing…' : 'Commit'}
 				</button>
 			</footer>
 		</section>

@@ -6,7 +6,6 @@ use super::{Statuses, VcsFileStatus, relative_path};
 
 pub(super) fn statuses(root: &Path) -> Result<Statuses, String> {
     let output = run_bytes(
-        "git",
         root,
         args(&["status", "--porcelain=v1", "-z", "--untracked-files=all"]),
         &[0],
@@ -56,19 +55,11 @@ pub(super) fn diff(root: &Path, file_path: Option<String>) -> Result<String, Str
         command
     };
     let diff = run_text_with_codes(
-        "git",
         root,
         with_file(&["diff", "--no-ext-diff", "HEAD", "--"]),
         &[0],
     )
-    .or_else(|_| {
-        run_text_with_codes(
-            "git",
-            root,
-            with_file(&["diff", "--no-ext-diff", "--"]),
-            &[0],
-        )
-    })?;
+    .or_else(|_| run_text_with_codes(root, with_file(&["diff", "--no-ext-diff", "--"]), &[0]))?;
     let Some(file) = file.filter(|_| diff.trim().is_empty()) else {
         return Ok(diff);
     };
@@ -82,7 +73,6 @@ pub(super) fn diff(root: &Path, file_path: Option<String>) -> Result<String, Str
         return Ok(diff);
     }
     run_text_with_codes(
-        "git",
         root,
         args(&["diff", "--no-index", "--", "/dev/null", &file]),
         &[0, 1],
@@ -95,7 +85,7 @@ pub(super) fn save(root: &Path, message: &str, files: &[String]) -> Result<(), S
     } else {
         let mut command = args(&["add", "--"]);
         command.extend(files.iter().map(OsString::from));
-        run_text_with_codes("git", root, command, &[0])?;
+        run_text_with_codes(root, command, &[0])?;
     }
     run(root, &["commit", "-m", message]).map(|_| ())
 }
@@ -130,7 +120,7 @@ pub(super) fn sync(root: &Path) -> Result<(), String> {
 }
 
 fn run(root: &Path, values: &[&str]) -> Result<String, String> {
-    run_text_with_codes("git", root, args(values), &[0])
+    run_text_with_codes(root, args(values), &[0])
 }
 
 fn file_status(x: char, y: char) -> VcsFileStatus {

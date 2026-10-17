@@ -8,7 +8,6 @@
 	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
 	import type { FileEntry } from '#lib/types/index.js';
-	import { primaryActionLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
@@ -23,7 +22,6 @@
 	let target = $derived(menu.target);
 	let isPinned = $derived(Boolean(target && bookmarks.isPinned(target.path)));
 	let offersVcs = $derived(Boolean(vcs.project && (!target || target.is_dir || vcs.statusFor(target.path, false))));
-	let primaryAction = $derived(primaryActionLabel(vcs.project));
 	let targets = $derived(target ? tools.targetsOf(manager, target) : []);
 	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
 	let kept = $derived(cloud.keptEverywhere(manager, targets));
@@ -63,7 +61,7 @@
 		{/if}
 		{#if offersVcs}
 			{@render item('code', target.is_dir ? 'View project changes' : 'View changes', () => viewChanges(target))}
-			{@render item('check', target.is_dir ? `${primaryAction} changes` : `${primaryAction} this file`, () => saveChanges(target))}
+			{@render item('check', target.is_dir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
 		{/if}
 		{#if target.is_dir}
 			{@render item('plus', 'Open in tab', () => manager.openTab(target.path))}
@@ -118,7 +116,7 @@
 		{#if offersVcs}
 			<MenuSeparator />
 			{@render item('code', 'View project changes', () => viewChanges(null))}
-			{@render item('check', `${primaryAction} changes`, () => saveChanges(null))}
+			{@render item('check', 'Commit changes', () => saveChanges(null))}
 			{@render item('refresh', 'Sync project', vcs.sync)}
 		{/if}
 	{/if}

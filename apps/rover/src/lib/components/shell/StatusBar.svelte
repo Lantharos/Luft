@@ -25,7 +25,7 @@
 	let drive = $derived(manager.view === 'home' && !cloudDrive ? manager.drives.holding(manager.currentPath) : undefined);
 	let status = $derived.by(() => {
 		if (vcs.busy === 'sync') return 'Syncing…';
-		if (vcs.busy === 'save') return vcs.project?.kind === 'pig' ? 'Saving…' : 'Committing…';
+		if (vcs.busy === 'save') return 'Committing…';
 		if (vcs.error) return 'Version control needs attention';
 		return vcs.lastResult ?? (vcs.project ? projectSummary(vcs.project) : null);
 	});

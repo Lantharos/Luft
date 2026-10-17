@@ -69,7 +69,7 @@
 				{@attach tooltip('Changes')}
 			>
 				<Icon name="git-branch" size={15} />
-				<span class="truncate">{vcs.project.branchOrWorkspace ?? (vcs.project.kind === 'pig' ? 'Pig' : 'Git')}</span>
+				<span class="truncate">{vcs.project.branch ?? 'Git'}</span>
 				{#if vcs.project.changedCount > 0}
 					<span class="text-[var(--text-muted)]">{vcs.project.changedCount}</span>
 				{/if}

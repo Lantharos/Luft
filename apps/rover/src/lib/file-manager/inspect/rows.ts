@@ -51,6 +51,6 @@ function versionControl(entry: FileEntry, vcs: VcsState): DetailRow | null {
 	if (!project) return null;
 	const status = vcs.statusFor(entry.path, entry.is_dir);
 	const state = status && status !== 'ignored' ? statusLabel(status) : status === 'ignored' ? 'Ignored' : 'Unchanged';
-	const where = project.branchOrWorkspace ? ` on ${project.branchOrWorkspace}` : '';
-	return { label: project.kind === 'pig' ? 'Pig' : 'Git', value: `${state}${where}` };
+	const where = project.branch ? ` on ${project.branch}` : '';
+	return { label: 'Git', value: `${state}${where}` };
 }

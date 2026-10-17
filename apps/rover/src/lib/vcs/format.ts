@@ -25,22 +25,10 @@ const STATUS_MARKERS: Record<VcsFileStatus, string> = {
 export const statusLabel = (status: VcsFileStatus) => STATUS_LABELS[status];
 export const statusMarker = (status: VcsFileStatus) => STATUS_MARKERS[status];
 
-export function primaryActionLabel(project: VcsProject | null) {
-	return project?.kind === 'pig' ? 'Save' : 'Commit';
-}
-
-export function projectTypeLabel(project: VcsProject) {
-	return project.kind === 'pig' ? 'Pig project' : 'Git repository';
-}
-
-export function workspaceLabel(project: VcsProject) {
-	return project.kind === 'pig' ? 'Workspace' : 'Branch';
-}
-
 export function projectSummary(project: VcsProject | null) {
 	if (!project) return '';
-	const parts = [project.kind === 'pig' ? 'Pig' : 'Git'];
-	if (project.branchOrWorkspace) parts.push(project.branchOrWorkspace);
+	const parts = ['Git'];
+	if (project.branch) parts.push(project.branch);
 	parts.push(`${project.changedCount} changed`);
 	if (project.ahead) parts.push(`ahead ${project.ahead}`);
 	else if (project.behind) parts.push(`behind ${project.behind}`);

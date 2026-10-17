@@ -97,7 +97,7 @@ export class VcsState {
 		await this.#run('save', async () => {
 			await api.saveVcs(project.root, message, files.map((path) => absolutePath(project.root, path)));
 			this.saveDialogOpen = false;
-			this.lastResult = project.kind === 'pig' ? 'Saved' : 'Committed';
+			this.lastResult = 'Committed';
 		});
 	};
 

@@ -4,8 +4,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::LazyLock;
 
-use serde_json::Value;
-
 static SEARCH_PATH: LazyLock<Vec<PathBuf>> = LazyLock::new(|| {
     let mut paths: Vec<PathBuf> = env::var_os("PATH")
         .map(|path| env::split_paths(&path).collect())
@@ -30,33 +28,20 @@ pub(super) fn args(values: &[&str]) -> Vec<OsString> {
     values.iter().map(OsString::from).collect()
 }
 
-pub(super) fn run_json(program: &str, cwd: &Path, args: Vec<OsString>) -> Result<Value, String> {
-    let text = run_text(program, cwd, args)?;
-    serde_json::from_str(&text).map_err(|error| error.to_string())
-}
-
-pub(super) fn run_text(program: &str, cwd: &Path, args: Vec<OsString>) -> Result<String, String> {
-    run_text_with_codes(program, cwd, args, &[0])
-}
-
 pub(super) fn run_text_with_codes(
-    program: &str,
     cwd: &Path,
     args: Vec<OsString>,
     success_codes: &[i32],
 ) -> Result<String, String> {
-    run_bytes(program, cwd, args, success_codes)
-        .map(|output| String::from_utf8_lossy(&output).into_owned())
+    run_bytes(cwd, args, success_codes).map(|output| String::from_utf8_lossy(&output).into_owned())
 }
 
 pub(super) fn run_bytes(
-    program: &str,
     cwd: &Path,
     args: Vec<OsString>,
     success_codes: &[i32],
 ) -> Result<Vec<u8>, String> {
-    let executable = find_program(program)
-        .ok_or_else(|| format!("{} executable not found", program_label(program)))?;
+    let executable = find_git().ok_or("Git executable not found")?;
     let output = Command::new(&executable)
         .args(args)
         .current_dir(cwd)
@@ -66,13 +51,7 @@ pub(super) fn run_bytes(
             env::join_paths(SEARCH_PATH.iter()).unwrap_or_default(),
         )
         .output()
-        .map_err(|error| {
-            format!(
-                "Failed to run {} from {}: {error}",
-                program_label(program),
-                cwd.display()
-            )
-        })?;
+        .map_err(|error| format!("Failed to run Git from {}: {error}", cwd.display()))?;
     if output
         .status
         .code()
@@ -88,21 +67,13 @@ pub(super) fn run_bytes(
     })
 }
 
-pub(super) fn is_installed(program: &str) -> bool {
-    find_program(program).is_some()
+pub(super) fn is_installed() -> bool {
+    find_git().is_some()
 }
 
-fn find_program(program: &str) -> Option<PathBuf> {
+fn find_git() -> Option<PathBuf> {
     SEARCH_PATH
         .iter()
-        .map(|dir| dir.join(program))
+        .map(|dir| dir.join("git"))
         .find(|candidate| candidate.is_file())
-}
-
-fn program_label(program: &str) -> &'static str {
-    match program {
-        "git" => "Git",
-        "pig" => "Pig",
-        _ => "Version control tool",
-    }
 }

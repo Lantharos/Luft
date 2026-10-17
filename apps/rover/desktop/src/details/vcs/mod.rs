@@ -1,6 +1,5 @@
 mod command;
 mod git;
-mod pig;
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -14,41 +13,16 @@ use crate::app::events::VCS_STATUS;
 
 static NEXT_STATUS_ID: AtomicU64 = AtomicU64::new(1);
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub enum VcsKind {
-    Git,
-    Pig,
-}
-
-impl VcsKind {
-    fn program(self) -> &'static str {
-        match self {
-            Self::Git => "git",
-            Self::Pig => "pig",
-        }
-    }
-
-    fn metadata_dir(self) -> &'static str {
-        match self {
-            Self::Git => ".git",
-            Self::Pig => ".pig",
-        }
-    }
-}
-
 #[derive(Debug, Serialize)]
 pub struct VcsRoot {
     pub root: String,
-    pub kind: VcsKind,
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VcsProject {
     pub root: String,
-    pub kind: VcsKind,
-    pub branch_or_workspace: Option<String>,
+    pub branch: Option<String>,
     pub ahead: Option<usize>,
     pub behind: Option<usize>,
     pub changed_count: usize,
@@ -80,10 +54,9 @@ struct StatusEvent {
 }
 
 pub fn root(path: String) -> Option<VcsRoot> {
-    let (kind, root) = find_root(Path::new(&path))?;
-    command::is_installed(kind.program()).then(|| VcsRoot {
+    let root = find_root(Path::new(&path))?;
+    command::is_installed().then(|| VcsRoot {
         root: root.to_string_lossy().into_owned(),
-        kind,
     })
 }
 
@@ -91,9 +64,9 @@ pub fn start_status(root: String, events: Events) -> String {
     let id = NEXT_STATUS_ID.fetch_add(1, Ordering::Relaxed).to_string();
     let event_id = id.clone();
     thread::spawn(move || {
-        let result = project_root(&root).and_then(|(kind, root)| {
-            let statuses = statuses(kind, &root)?;
-            Ok((project(kind, &root, &statuses), statuses))
+        let result = project_root(&root).and_then(|root| {
+            let statuses = git::statuses(&root)?;
+            Ok((project(&root, &statuses), statuses))
         });
         let (project, statuses, error) = match result {
             Ok((project, statuses)) => (Some(project), Some(statuses), None),
@@ -113,75 +86,49 @@ pub fn start_status(root: String, events: Events) -> String {
 }
 
 pub fn diff(root: String, file_path: Option<String>) -> Result<String, String> {
-    let (kind, root) = project_root(&root)?;
-    match kind {
-        VcsKind::Git => git::diff(&root, file_path),
-        VcsKind::Pig => pig::diff(&root, file_path),
-    }
+    git::diff(&project_root(&root)?, file_path)
 }
 
 pub fn save(root: String, message: String, files: Option<Vec<String>>) -> Result<(), String> {
     if message.trim().is_empty() {
         return Err("Message is required".to_string());
     }
-    let (kind, root) = project_root(&root)?;
+    let root = project_root(&root)?;
     let files: Vec<String> = files
         .unwrap_or_default()
         .iter()
         .map(|path| relative_path(&root, path))
         .filter(|path| !path.is_empty())
         .collect();
-    match kind {
-        VcsKind::Git => git::save(&root, &message, &files),
-        VcsKind::Pig => pig::save(&root, &message, &files),
-    }
+    git::save(&root, &message, &files)
 }
 
 pub fn sync(root: String) -> Result<(), String> {
-    let (kind, root) = project_root(&root)?;
-    match kind {
-        VcsKind::Git => git::sync(&root),
-        VcsKind::Pig => pig::sync(&root),
-    }
+    git::sync(&project_root(&root)?)
 }
 
-fn project_root(root: &str) -> Result<(VcsKind, PathBuf), String> {
+fn project_root(root: &str) -> Result<PathBuf, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("Project folder no longer exists: {root}"));
     }
     find_root(Path::new(root)).ok_or_else(|| "No versioned project found".to_string())
 }
 
-fn find_root(path: &Path) -> Option<(VcsKind, PathBuf)> {
+fn find_root(path: &Path) -> Option<PathBuf> {
     let home = dirs::home_dir();
     path.ancestors()
         .take_while(|dir| home.as_deref() != Some(*dir))
-        .find_map(|dir| {
-            [VcsKind::Pig, VcsKind::Git]
-                .into_iter()
-                .find(|kind| dir.join(kind.metadata_dir()).exists())
-                .map(|kind| (kind, dir.to_path_buf()))
-        })
+        .find(|dir| dir.join(".git").exists())
+        .map(Path::to_path_buf)
 }
 
-fn statuses(kind: VcsKind, root: &Path) -> Result<Statuses, String> {
-    match kind {
-        VcsKind::Git => git::statuses(root),
-        VcsKind::Pig => pig::statuses(root),
-    }
-}
-
-fn project(kind: VcsKind, root: &Path, statuses: &Statuses) -> VcsProject {
-    let (branch_or_workspace, ahead, behind) = match kind {
-        VcsKind::Git => git::position(root),
-        VcsKind::Pig => (pig::workspace(root), None, None),
-    };
+fn project(root: &Path, statuses: &Statuses) -> VcsProject {
+    let (branch, ahead, behind) = git::position(root);
     let count =
         |matches: fn(&VcsFileStatus) -> bool| statuses.values().filter(|s| matches(s)).count();
     VcsProject {
         root: root.to_string_lossy().into_owned(),
-        kind,
-        branch_or_workspace,
+        branch,
         ahead,
         behind,
         changed_count: count(|status| *status != VcsFileStatus::Ignored),

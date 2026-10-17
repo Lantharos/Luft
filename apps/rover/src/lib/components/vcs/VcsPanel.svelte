@@ -1,13 +1,7 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
-	import {
-		primaryActionLabel,
-		projectTypeLabel,
-		projectSummary,
-		statusLabel,
-		workspaceLabel
-	} from '#lib/vcs/format.js';
+	import { projectSummary, statusLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
@@ -49,10 +43,10 @@
 
 		<div class="grid gap-3 px-4 py-4 shadow-[inset_0_-1px_0_var(--hairline)]">
 			<div class="grid gap-1">
-				<div class="text-[14px] font-medium">{projectTypeLabel(vcs.project)}</div>
-				{#if vcs.project.branchOrWorkspace}
+				<div class="text-[14px] font-medium">Git repository</div>
+				{#if vcs.project.branch}
 					<div class="text-[12px] text-[var(--text-muted)]">
-						{workspaceLabel(vcs.project)}: {vcs.project.branchOrWorkspace}
+						Branch: {vcs.project.branch}
 					</div>
 				{/if}
 				<div class="text-[12px] text-[var(--text-muted)]">
@@ -61,7 +55,7 @@
 						· {vcs.project.addedCount} added · {modifiedCount} modified · {vcs.project.deletedCount} deleted
 					{/if}
 				</div>
-				{#if vcs.project.kind === 'git' && (vcs.project.ahead || vcs.project.behind)}
+				{#if vcs.project.ahead || vcs.project.behind}
 					<div class="text-[12px] text-[var(--text-muted)]">
 						{#if vcs.project.ahead}Ahead {vcs.project.ahead}{/if}
 						{#if vcs.project.ahead && vcs.project.behind} · {/if}
@@ -78,7 +72,7 @@
 					onclick={() => vcs.openSaveDialog()}
 				>
 					<Icon name="check" size={16} />
-					<span>{primaryActionLabel(vcs.project)}</span>
+					<span>Commit</span>
 				</button>
 				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={() => vcs.sync()}>
 					<Icon name="refresh" size={16} />

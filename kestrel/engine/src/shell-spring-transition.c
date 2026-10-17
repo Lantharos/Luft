@@ -207,7 +207,7 @@ shell_spring_transition_attached (ClutterTransition *transition,
   const char *name = clutter_property_transition_get_property_name (CLUTTER_PROPERTY_TRANSITION (self));
   GValue current = G_VALUE_INIT;
   GValue target = G_VALUE_INIT;
-  g_autoptr (ClutterInterval) interval = NULL;
+  ClutterInterval *interval;
   double epsilon;
 
   self->pspec = clutter_animatable_find_property (animatable, name);

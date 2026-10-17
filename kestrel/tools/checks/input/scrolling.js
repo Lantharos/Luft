@@ -1,4 +1,6 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
 import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
@@ -7,7 +9,7 @@ import {show} from '../apps/settings/navigation.js';
 import {firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {centerOf, fingerScroll, liftFingers, moveTo, press, rest} from '../lib/input.js';
-import {gjs, stop, waitForWindow} from '../lib/processes.js';
+import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('scrolling');
@@ -15,6 +17,8 @@ const DISTANCE = 120;
 const SLOWEST = 0.8;
 const FASTEST = 1.3;
 const GTK_TOUCHPAD_FACTOR = 2.5;
+const HELIUM_OPEN_TIMEOUT = 60000;
+const SCHELF_CHROMIUM_FEATURES = '--enable-features=WaylandUnscaledTouchpadScrolling:scroll_scaling_factor/1';
 const PAGE_STRIP = {x: 0.45, width: 0.4, top: 140, height: 160, reach: 300};
 
 function requireSane(surface, moved, factor = 1) {
@@ -100,8 +104,27 @@ async function checkSabine() {
   });
 }
 
+async function checkHelium(appImage) {
+  const page = `file://${fixture('pages', 'scroll.html')}`;
+  const process = spawn([appImage, `--user-data-dir=${scratch('kestrel-helium')}`, '--no-first-run', '--no-default-browser-check', '--password-store=basic', SCHELF_CHROMIUM_FEATURES, page],
+    {env: {APPIMAGE_EXTRACT_AND_RUN: '1', TMPDIR: scratch()}});
+  const window = await waitForWindow(candidate => candidate.get_title()?.startsWith('Kestrel page'), 'Helium opens the page', HELIUM_OPEN_TIMEOUT);
+  require(window.get_client_type() === Meta.WindowClientType.WAYLAND, 'Helium runs on Wayland');
+  window.activate(global.get_current_time());
+  await scrollOver(centerOf(window.get_compositor_private()));
+  await eventually(() => window.title.startsWith('Kestrel scrolled:'), 'the page scrolls');
+  await settled();
+  requireSane('a page in Helium', parseFloat(window.title.split(': ')[1]));
+  await finish();
+  window.delete(global.get_current_time());
+  await process.exited;
+}
+
 export async function run() {
   await checkShell();
   await checkGtk();
   await checkSabine();
+  const helium = GLib.getenv('KESTREL_HELIUM');
+  if (helium) await checkHelium(helium);
+  else console.log('Kestrel scrolling: Helium skipped without KESTREL_HELIUM');
 }

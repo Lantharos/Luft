@@ -1,6 +1,6 @@
 # Luft website
 
-The site at luft.lanth.me: the home page and downloads. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
+The site at [luft.lanth.me](https://luft.lanth.me): the home page and downloads. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
 
 ## Run it
 
@@ -21,10 +21,8 @@ The site is a Cloudflare Worker that only serves the files in `dist/` ([`wrangle
 
 ```sh
 bunx wrangler login
-bun run deploy       # builds, then uploads dist/
+bun run deploy       # builds, then uploads dist/ to luft.lanth.me
 ```
-
-Then add the custom domain in the Cloudflare dashboard under Workers, `luft-site`, Settings, Domains & Routes, or add `"routes": [{ "pattern": "luft.lanth.me", "custom_domain": true }]` to `wrangler.jsonc` and deploy again.
 
 ## Pictures and clips
 

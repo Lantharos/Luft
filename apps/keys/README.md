@@ -1,49 +1,20 @@
 # Keys
 
-Keys makes your own keyboard layouts and input methods for Luft. It is built with Sabine and Svelte.
-
-## Features
-
-- New layouts start from any installed layout or one of your own, drawn on an ANSI, ISO or JIS keyboard
-- Edit all four levels of a key (alone, Shift, AltGr, Shift+AltGr) by typing, or by searching characters, emoji, dead keys and XKB key names
-- Your own dead keys, each with its own table, multi-character results and chained dead keys
-- Editable copies of the standard dead keys from the layout you started from
-- Move AltGr, place Compose and change Caps Lock per layout
-- Try layouts, dead keys and input methods in place before anything is saved, with a list of likely mistakes to fix
-- View any layout, installed or your own, without editing it; Kestrel's "Show keyboard layout" opens it this way
-- Input methods through IBus with replacements, word choices and Compose-style sequences, available without restarting IBus or signing out
-- Import XKB symbols, `.xkb` keymaps, Windows `.klc`, m17n `.mim` and IBus table files; export layouts as symbols, a keymap, a Compose file or `.klc`, and input methods as `.toml`
-- Undo and redo for every change, saved as you go
+Keys makes your own keyboard layouts, dead keys and input methods for Luft, and imports and exports them in the usual formats. Using it is described in [the docs](https://docs.luft.lanth.me/apps/keys/).
 
 ## Build and run
 
-Install dependencies once from the repository root with `bun install`, then from this directory:
+Install dependencies once from the repository root with `bun install`, then from this folder:
 
 ```sh
 bun run desktop:dev      # Vite dev server and the native window
 bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
 bun run desktop:bundle   # release bundle
-```
-
-## Install
-
-```sh
 sabine install --bundle .
 ```
 
 Installing registers the `kestrel-keys:` link scheme.
-
-## Keyboard shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+1` … `Ctrl+3` | Layout tabs: Keys, Dead keys, Settings |
-| `Ctrl+1` … `Ctrl+4` | Input method tabs: Replacements, Words, Sequences, Settings |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Shift+Z` / `Ctrl+Y` | Redo |
-| `Backspace` / `Delete` in a key's panel | Clear the level |
-| `Escape` in a key's panel | Back to the keyboard |
 
 ## Links
 
@@ -108,3 +79,7 @@ sequences = [
 | `rules` | Replacements; the longest match wins, and `after` limits one to follow certain characters |
 | `words` | Choices offered while typing; Space takes the highlighted one, a number any other |
 | `sequences` | Keys typed after the `compose` key |
+
+## License
+
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.

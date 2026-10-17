@@ -25,7 +25,5 @@ Screenshots come from `kestrel/tools/session.sh capture`. Put them in `src/asset
 
 ```sh
 bunx wrangler login
-bun run deploy             # builds and deploys the luft-docs Worker
+bun run deploy             # builds and deploys the luft-docs Worker on docs.luft.lanth.me
 ```
-
-Then add `docs.luft.lanth.me` as a custom domain on the Worker in the Cloudflare dashboard.

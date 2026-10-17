@@ -2,9 +2,7 @@
 
 ![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
 
-An app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, puts the live Luft system next to the one already there and restarts into it once, to try Luft, install it or, on Linux, replace the old system and keep your files. On Windows it makes room with Windows' own tools and can pack files and settings into a moving box; on Linux it keeps Luft in a folder and repartitions nothing. It can take everything back out again, and make a USB stick, or add Luft to a Ventoy stick. How it fits together is in [docs/meet.md](../../docs/meet.md).
-
-Builds aren't code-signed yet, so Windows SmartScreen asks before the first start ("More info", then "Run anyway").
+Meet Luft is an app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, makes room next to the system already there, and restarts into Luft once to try it, install it or, on Linux, replace the old system and keep your files. It can also make a USB stick, and take everything back out again. Using it is described in [the docs](https://docs.luft.lanth.me/start/meet-luft/), and how it works in [docs/meet.md](../../docs/meet.md).
 
 ## Parts
 
@@ -18,19 +16,18 @@ What Meet Luft leaves on the drive for Install Luft, and the moving box's format
 
 ## Build
 
-Install dependencies once from the repository root with `bun install`, then from this directory:
+Install dependencies once from the repository root with `bun install`, then from this folder:
 
 ```sh
 bun run check
 bun run build
-cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml
+cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml   # Windows, with MinGW
+sabine bundle . --target appimage --release                                               # Linux, needs appimagetool
 ```
 
-On Linux, `sabine bundle . --target appimage --release` makes `Meet Luft.AppImage` (it needs `appimagetool`). The Windows build cross-compiles from Linux with MinGW. To run it, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`; the first start sets up Sabine. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds `meet-luft.exe` (a setup program) on Windows and `meet-luft.AppImage` on Linux, and publishes both to `get.luft.lanth.me` every time it runs. Start it by hand to publish the current main.
+To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds the Windows setup program and the AppImage and publishes them to get.luft.lanth.me.
 
-Start it with `--nightly`, or press Ctrl+Shift+N in it, to use nightly builds instead of releases. Ctrl+Shift+N again switches back.
-
-Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip. Where Luft keeps them is in [docs/meet.md](../../docs/meet.md#logs-from-try-luft).
+`--nightly`, or Ctrl+Shift+N in the app, uses nightly builds instead of releases. Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip.
 
 ## Testing
 

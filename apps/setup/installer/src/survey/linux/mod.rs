@@ -5,7 +5,7 @@ mod packages;
 mod release;
 mod volumes;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use luft_disks::udisks::snapshot;
 use luft_meet::Layout;
@@ -22,7 +22,8 @@ use crate::system::mount::{self, Mounted};
 const READABLE: [&str; 3] = ["btrfs", "ext4", "xfs"];
 const SMALLEST_SHARED_ESP: u64 = 1 << 30;
 const SMALLEST_STARTUP: u64 = 1 << 30;
-const LIVE_MEDIUM: [&str; 2] = ["/run/initramfs", "/run/luft/host"];
+const LIVE_HOST: &str = "/run/luft/host";
+const LIVE_MEDIUM: [&str; 2] = ["/run/initramfs", LIVE_HOST];
 const NOT_A_DRIVE: [&str; 7] = ["swap", "tmpfs", "proc", "sysfs", "devpts", "none", "auto"];
 const SYSTEM_MOUNTS: [&str; 5] = ["/", "/home", "/boot", "/boot/efi", "/efi"];
 
@@ -229,8 +230,29 @@ fn roots_in(top: &Path, fs_type: &str) -> Vec<Option<String>> {
     roots
 }
 
+enum Looking {
+    Mounted(Mounted),
+    Live(PathBuf),
+}
+
+impl Looking {
+    fn open(root: &Part, scratch: &Path) -> anyhow::Result<Self> {
+        if let Some(point) = root.mount_points.iter().find(|point| *point == LIVE_HOST) {
+            return Ok(Self::Live(PathBuf::from(point)));
+        }
+        Mounted::new(&root.device, mount::looking_into(&root.fs_type), scratch).map(Self::Mounted)
+    }
+
+    fn path(&self) -> &Path {
+        match self {
+            Self::Mounted(mounted) => mounted.path(),
+            Self::Live(path) => path,
+        }
+    }
+}
+
 fn systems_on(drive: &snapshot::Drive, root: &Part, parts: &[Part], scratch: &Path) -> Vec<System> {
-    let opened = match Mounted::new(&root.device, mount::looking_into(&root.fs_type), scratch) {
+    let opened = match Looking::open(root, scratch) {
         Ok(opened) => opened,
         Err(error) => {
             eprintln!("{} couldn't be looked into: {error:#}", root.device);

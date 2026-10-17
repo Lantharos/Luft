@@ -52,6 +52,12 @@ export {
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';
 export { default as RecoveryKey } from './security/RecoveryKey.svelte';
 
+export { reorder } from './motion/lists';
+export { dialog, fade, item, menu, page, toast } from './motion/transitions';
+
+export { default as Toast } from './notices/Toast.svelte';
+export { Toasts, type ToastAction, type ToastMessage } from './notices/toasts.svelte';
+
 export { ago, bytes, memoryBytes, plural, watts } from './text/format';
 export { renderMarkdown } from './text/markdown';
 export { basename, fileUri, fileUrlPath, isInside, pathsFromUriList } from './text/paths';

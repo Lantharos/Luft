@@ -51,7 +51,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
-		transition: background-color 160ms var(--ease), color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.reveal:hover:not(:disabled) {

@@ -7,8 +7,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition-property: background-color, color, transform;
-		transition-duration: 160ms;
-		transition-timing-function: var(--ease);
+		transition-duration: var(--motion-tap);
+		transition-timing-function: var(--ease-decelerate);
 	}
 
 	.window-control:hover {
@@ -35,8 +35,8 @@
 		font-weight: 500;
 		white-space: nowrap;
 		transition-property: background-color, color, transform, opacity;
-		transition-duration: 180ms;
-		transition-timing-function: var(--ease);
+		transition-duration: var(--motion-tap);
+		transition-timing-function: var(--ease-decelerate);
 	}
 
 	.button.large,
@@ -99,8 +99,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition-property: background-color, color, opacity, transform;
-		transition-duration: 160ms;
-		transition-timing-function: var(--ease);
+		transition-duration: var(--motion-tap);
+		transition-timing-function: var(--ease-decelerate);
 	}
 
 	.icon-button.large {
@@ -125,7 +125,7 @@
 		padding-inline: 14px;
 		font-size: 13px;
 		outline: none;
-		transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.text-field:hover {
@@ -148,7 +148,12 @@
 		overflow: hidden;
 	}
 
-	.row-group > * + * {
+	.row-group > * + *,
+	.row-group > .row-slot + .row-slot > * {
 		box-shadow: inset 0 1px 0 var(--hairline);
+	}
+
+	.row-group > .row-slot + .row-slot {
+		box-shadow: none;
 	}
 }

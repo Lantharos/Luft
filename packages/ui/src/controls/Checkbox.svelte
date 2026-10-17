@@ -42,7 +42,7 @@
 		font-size: 13px;
 		text-align: start;
 		color: var(--text-soft);
-		transition: color 160ms var(--ease), opacity 160ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate), opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.checkbox:hover:not(:disabled) {
@@ -63,7 +63,7 @@
 		background: var(--control);
 		box-shadow: inset 0 0 0 1.5px var(--control-outline);
 		color: var(--accent-text);
-		transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease), transform 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.checkbox:hover:not(:disabled) .box:not(.on) {

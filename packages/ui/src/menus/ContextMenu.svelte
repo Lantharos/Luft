@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { menu } from '../motion/transitions';
 	import { atPoint, type Point, type PointPlacement } from './placement';
 	import { topLayer } from './topLayer';
 
@@ -36,6 +37,7 @@
 	onclick={stop}
 	onpointerdown={stop}
 	oncontextmenu={stop}
+	out:menu
 >
 	{@render children()}
 </div>
@@ -58,14 +60,18 @@
 		background: var(--popover);
 		box-shadow: 0 12px 40px var(--shadow-soft);
 		outline: none;
-		opacity: 0;
-		scale: 0.98;
-		transition-property: opacity, scale;
-		transition-duration: 120ms;
+		visibility: hidden;
 	}
 
 	.menu.placed {
-		opacity: 1;
-		scale: 1;
+		visibility: visible;
+		animation: open var(--motion-standard) var(--ease-decelerate);
+	}
+
+	@keyframes open {
+		from {
+			opacity: 0;
+			scale: 0.98;
+		}
 	}
 </style>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { menu } from '../motion/transitions';
 	import { besideAnchor, type Align, type AnchorPlacement } from './placement';
 	import { topLayer } from './topLayer';
 
@@ -46,6 +47,7 @@
 	style:bottom={placement?.bottom == null ? undefined : `${placement.bottom}px`}
 	style:min-width="{Math.max(anchor.offsetWidth, minWidth)}px"
 	style:max-height="{placement?.maxHeight ?? maxHeight}px"
+	out:menu
 >
 	{@render children()}
 </div>
@@ -78,29 +80,31 @@
 		background: var(--popover);
 		box-shadow: 0 12px 40px var(--shadow-soft);
 		visibility: hidden;
+		transform-origin: top;
 	}
 
 	.popover.placed {
 		visibility: visible;
-		animation: open 160ms var(--ease);
+		animation: open var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.popover.above {
 		top: auto;
+		transform-origin: bottom;
 		animation-name: open-above;
 	}
 
 	@keyframes open {
 		from {
 			opacity: 0;
-			transform: translateY(-4px);
+			transform: translateY(-4px) scale(0.98);
 		}
 	}
 
 	@keyframes open-above {
 		from {
 			opacity: 0;
-			transform: translateY(4px);
+			transform: translateY(4px) scale(0.98);
 		}
 	}
 </style>

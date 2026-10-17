@@ -11,7 +11,61 @@
 		line-height: 16px;
 		box-shadow: 0 8px 24px var(--shadow-soft);
 		pointer-events: none;
-		animation: tooltip-in 120ms var(--ease);
+		animation: tooltip-in var(--motion-quick) var(--ease-decelerate);
+	}
+
+	.toast-region {
+		position: fixed;
+		bottom: 28px;
+		left: 50%;
+		z-index: 45;
+		display: grid;
+		translate: -50% 0;
+		pointer-events: none;
+	}
+
+	.toast {
+		grid-area: 1 / 1;
+		justify-self: center;
+		display: flex;
+		max-width: min(520px, calc(100vw - 48px));
+		min-height: 42px;
+		align-items: center;
+		gap: 14px;
+		padding: 6px 6px 6px 16px;
+		border-radius: var(--radius-pill);
+		background: color-mix(in oklab, var(--popover) 92%, transparent);
+		box-shadow:
+			0 16px 48px var(--shadow-soft),
+			inset 0 1px 0 var(--hairline);
+		backdrop-filter: blur(24px);
+		color: var(--text-soft);
+		font-size: 13px;
+		pointer-events: auto;
+		touch-action: pan-y;
+		user-select: none;
+	}
+
+	.toast.plain {
+		padding-right: 16px;
+	}
+
+	.toast.failed {
+		color: var(--danger);
+	}
+
+	.toast-action {
+		flex: none;
+		min-height: 30px;
+		padding-inline: 12px;
+		border-radius: var(--radius-pill);
+		color: var(--accent);
+		font-weight: 500;
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.toast-action:hover {
+		background: var(--surface-hover);
 	}
 }
 

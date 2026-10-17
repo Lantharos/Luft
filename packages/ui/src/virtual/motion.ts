@@ -1,14 +1,15 @@
-const EASE = 'cubic-bezier(0.2, 0, 0, 1)';
-const ENTER_MS = 150;
-const MOVE_MS = 240;
-const LEAVE_MS = 140;
+import { Curve, Duration } from '@luft/motion';
+import { motionPreference } from '../motion/preference';
+
+const EASE = `cubic-bezier(${Curve.decelerate.join(', ')})`;
+const ENTER_MS = Duration.quick;
+const MOVE_MS = Duration.standard;
+const LEAVE_MS = Duration.quick;
 
 export const MAX_STAGGER_MS = 60;
 
-const reducedMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-
 export function motionAllowed() {
-	return !reducedMotion?.matches;
+	return motionPreference() === 'full';
 }
 
 export function animateEnter(node: HTMLElement, delay = 0) {

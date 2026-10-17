@@ -69,7 +69,7 @@
 		font-size: 13px;
 		font-weight: 500;
 		color: var(--text-muted);
-		transition: color 180ms var(--ease);
+		transition: color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.compact button {

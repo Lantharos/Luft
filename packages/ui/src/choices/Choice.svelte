@@ -36,8 +36,8 @@
 		border-radius: 18px;
 		padding: 14px 16px 14px 14px;
 		transition:
-			background-color 160ms var(--ease),
-			transform 160ms var(--ease);
+			background-color var(--motion-tap) var(--ease-decelerate),
+			transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover:not(:disabled),

@@ -70,6 +70,13 @@ actor.ease({translation_x: target, spring: Spring.smooth, velocity: releaseSpeed
 
 `Shell.SpringTransition` is the transition underneath, for code that builds its own transitions. `kestrel/ui/src/shared/motion.ts` exports the tokens with `reducedMotion()`, `rubberband()` and `projection()`, which turns a release speed into the distance a fling would travel.
 
+### Windows
+
+- A window opens once its first frame has been drawn: it fades in over `quick` with `decelerate` while it grows from 94% and rises 8 px on `snappy`. Dialogs start at 96% without the rise.
+- Closing fades it out over `quick` and shrinks it to 95% on `snappy`, staying above the window that takes focus.
+- Maximizing, restoring, snapping, Snap Layouts and corner snaps move the window on `smooth` from the moment they start. A picture of the window that keeps its corners and title bar ends unstretched leads until the app has drawn its new size, then crossfades to the live window over `tap`.
+- Work that follows a window opening or closing, such as refreshing the taskbar, waits for the motion to end: pass it to `afterMotion()` from `kestrel/ui/src/shared/afterMotion.ts`.
+
 ## In the apps
 
 `@luft/ui`'s styles define every token as a CSS custom property:
@@ -97,4 +104,42 @@ import { SpringValue, Spring } from '@luft/ui';
 const offset = new SpringValue(element, (x) => ({ translate: `${x}px 0` }));
 offset.set(fingerX);
 offset.to(0, { velocity: releaseSpeed, spring: Spring.thrown });
+```
+
+### Presets
+
+`@luft/ui` has Svelte transitions for the things apps show and hide, so they enter and leave the same way everywhere. Each enters on `standard` with `decelerate` and leaves within `quick`, and under reduced motion only fades:
+
+| Preset | Enters | Leaves |
+| --- | --- | --- |
+| `page` | Rises 16 px | Fades |
+| `dialog` | Settles from 105% | Grows to 105% while it fades in 83 ms |
+| `fade` | Fades | Fades |
+| `toast` | Rises 16 px on `snappy` | Drops 8 px |
+| `item` | Grows from 98% | Fades |
+| `menu` | Through CSS, once placed | Fades in 83 ms |
+
+```svelte
+{#key view}
+	<div in:page out:page>…</div>
+{/key}
+
+{#each devices as device (device.id)}
+	<div class="row-slot" animate:reorder in:item out:item>…</div>
+{/each}
+```
+
+`reorder` slides list items to their new places as others arrive and leave. Inside a `Section`, wrap each row in a `row-slot` so the dividers stay between rows.
+
+Toasts go through `Toast` and a `Toasts` store, which shows one toast at a time, pauses while the pointer is on it, and can be swiped away:
+
+```svelte
+<script lang="ts">
+	import { Toast, Toasts } from '@luft/ui';
+
+	const toasts = new Toasts();
+	toasts.show('Moved to the bin', { action: { label: 'Undo', run: undo } });
+</script>
+
+<Toast toast={toasts.current} ondismiss={toasts.dismiss} onhold={toasts.hold} onrelease={toasts.release} />
 ```

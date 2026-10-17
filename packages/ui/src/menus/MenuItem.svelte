@@ -38,8 +38,8 @@
 		font-size: 13px;
 		color: var(--text-soft);
 		transition-property: background-color, color, transform, opacity;
-		transition-duration: 210ms;
-		transition-timing-function: var(--ease);
+		transition-duration: var(--motion-tap);
+		transition-timing-function: var(--ease-decelerate);
 	}
 
 	.menu-item:hover:not(:disabled),

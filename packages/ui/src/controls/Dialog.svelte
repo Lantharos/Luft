@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { topLayer } from '../menus/topLayer';
+	import { dialog, fade } from '../motion/transitions';
 
 	interface Props {
 		title: string;
@@ -43,8 +44,15 @@
 
 <svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
 
-<div {@attach topLayer} class="overlay" role="presentation" onpointerdown={(event) => event.target === event.currentTarget && onclose()}>
-	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap}>
+<div
+	{@attach topLayer}
+	class="overlay"
+	role="presentation"
+	onpointerdown={(event) => event.target === event.currentTarget && onclose()}
+	in:fade
+	out:fade
+>
+	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap} in:dialog out:dialog>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="text-[17px] font-semibold">{title}</h2>
 			{#if description}
@@ -71,7 +79,6 @@
 		display: grid;
 		place-items: center;
 		background: rgba(8, 8, 7, 0.45);
-		animation: fade 180ms var(--ease);
 	}
 
 	.dialog {
@@ -85,7 +92,6 @@
 		background: var(--popover);
 		box-shadow: 0 24px 64px var(--shadow-soft);
 		outline: none;
-		animation: rise 220ms var(--ease);
 	}
 
 	.wide {
@@ -99,18 +105,5 @@
 		gap: 12px;
 		overflow-x: hidden;
 		overflow-y: auto;
-	}
-
-	@keyframes fade {
-		from {
-			opacity: 0;
-		}
-	}
-
-	@keyframes rise {
-		from {
-			opacity: 0;
-			transform: translateY(8px) scale(0.98);
-		}
 	}
 </style>

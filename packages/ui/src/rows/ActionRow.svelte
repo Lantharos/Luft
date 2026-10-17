@@ -37,7 +37,7 @@
 	.action-row {
 		display: flex;
 		align-items: center;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.action-row:has(.main:hover:not(:disabled)) {

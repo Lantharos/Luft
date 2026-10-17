@@ -1,4 +1,6 @@
 import type { Attachment } from 'svelte/attachments';
+import { Duration } from '@luft/motion';
+import { motionPreference } from '../motion/preference';
 
 const SHOW_DELAY_MS = 550;
 const WARM_MS = 400;
@@ -6,10 +8,13 @@ const GAP = 8;
 const MARGIN = 8;
 
 let bubble: HTMLDivElement | null = null;
+let fading: Animation | null = null;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let hiddenAt = 0;
 
 function place(anchor: HTMLElement, text: string) {
+	fading?.cancel();
+	fading = null;
 	bubble ??= Object.assign(document.createElement('div'), { className: 'tooltip' });
 	bubble.textContent = text;
 	document.body.append(bubble);
@@ -23,9 +28,17 @@ function place(anchor: HTMLElement, text: string) {
 
 function hide() {
 	clearTimeout(timer);
-	if (!bubble?.isConnected) return;
-	bubble.remove();
+	if (!bubble?.isConnected || fading) return;
 	hiddenAt = performance.now();
+	const fade = bubble.animate({ opacity: [1, 0] }, { duration: motionPreference() === 'off' ? 0 : Duration.tap, fill: 'forwards' });
+	fading = fade;
+	fade.finished.then(
+		() => {
+			bubble?.remove();
+			fading = null;
+		},
+		() => {}
+	);
 }
 
 export function tooltip(text: string): Attachment<HTMLElement> {

@@ -67,13 +67,13 @@ async function checkEmail() {
   try {
     Gio.DesktopAppInfo.new_from_filename(desktop).set_as_default_for_type('x-scheme-handler/mailto');
     const [response] = (await call('Email', 'ComposeEmail', new GLib.Variant('(ossa{sv})', [requestHandle(), 'org.gnome.TextEditor', '', {
-      address: new GLib.Variant('s', 'ayesha@example.org'),
+      address: new GLib.Variant('s', 'theo@example.org'),
       cc: new GLib.Variant('as', ['sam@example.org']),
       subject: new GLib.Variant('s', 'Dinner & drinks'),
       body: new GLib.Variant('s', 'See you at seven?'),
     }]), '(ua{sv})')).deepUnpack();
     require(response === 0, 'apps can compose emails');
-    await eventually(() => mail() === 'mailto:ayesha@example.org?cc=sam@example.org&subject=Dinner%20%26%20drinks&body=See%20you%20at%20seven%3F',
+    await eventually(() => mail() === 'mailto:theo@example.org?cc=sam@example.org&subject=Dinner%20%26%20drinks&body=See%20you%20at%20seven%3F',
       'emails open in the mail app with their recipients, subject and text');
   } finally {
     if (previous) previous.set_as_default_for_type('x-scheme-handler/mailto');

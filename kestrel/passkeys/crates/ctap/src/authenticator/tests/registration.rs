@@ -31,8 +31,8 @@ fn creates_a_discoverable_passkey_from_the_spec_request() {
 #[test]
 fn replaces_a_discoverable_passkey_for_the_same_account() {
     let mut authenticator = Authenticator::new(Mock::default());
-    resident(&mut authenticator, "github.com", "kristof");
-    let newer = resident(&mut authenticator, "github.com", "kristof");
+    resident(&mut authenticator, "github.com", "mara");
+    let newer = resident(&mut authenticator, "github.com", "mara");
     let stored = authenticator.platform().stored.borrow();
     assert_eq!(stored.len(), 1);
     assert_eq!(stored[0].credential.id, newer);
@@ -41,7 +41,7 @@ fn replaces_a_discoverable_passkey_for_the_same_account() {
 #[test]
 fn refuses_to_register_twice_after_confirmation() {
     let mut authenticator = Authenticator::new(Mock::default());
-    let id = resident(&mut authenticator, "github.com", "kristof");
+    let id = resident(&mut authenticator, "github.com", "mara");
     let exclude = Value::Array(vec![crate::model::descriptor(&id)]);
     let mut body = vec![
         (0x01, Value::Bytes(vec![1; 32])),

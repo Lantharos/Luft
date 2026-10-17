@@ -10,7 +10,7 @@ import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkDelivery} from './mailman/delivery.js';
 
 const {eventually} = checks('Luft app');
-const MESSAGE = 'From: Ayesha <ayesha@example.test>\r\nTo: luft@example.test\r\nSubject: Harbour photos\r\n\r\nThe photos from Saturday are in the shared folder.\r\n';
+const MESSAGE = 'From: Theo <theo@example.test>\r\nTo: luft@example.test\r\nSubject: Harbour photos\r\n\r\nThe photos from Saturday are in the shared folder.\r\n';
 const DRAG = {steps: 24, interval: 30, hover: 300};
 const DATA = GLib.build_filenamev([GLib.get_user_data_dir(), 'mailman']);
 const CACHE = scratch('mailman');

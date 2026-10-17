@@ -41,7 +41,7 @@ fn a_uv_token_authorizes_one_registration() {
     let token = token(&mut authenticator, 0x01, Some("github.com"));
     let param = Protocol::Two.authenticate(&token, &[1; 32]);
     let auth = |param: &[u8]| vec![(0x08, Value::Bytes(param.to_vec())), (0x09, Value::from(2))];
-    let response = make_credential(&mut authenticator, "github.com", "kristof", auth(&param));
+    let response = make_credential(&mut authenticator, "github.com", "mara", auth(&param));
     assert_eq!(
         parse_auth_data(bytes(&entries(&response), 0x02)).flags & (UP | UV),
         UP | UV
@@ -75,8 +75,8 @@ fn a_uv_token_authorizes_one_registration() {
 #[test]
 fn manages_passkeys_with_a_uv_token() {
     let mut authenticator = Authenticator::new(Mock::default());
-    resident(&mut authenticator, "github.com", "kristof");
-    let gitlab = resident(&mut authenticator, "gitlab.com", "kristof");
+    resident(&mut authenticator, "github.com", "mara");
+    let gitlab = resident(&mut authenticator, "gitlab.com", "mara");
     let token = token(&mut authenticator, 0x04, None);
     let manage =
         |authenticator: &mut Authenticator<Mock>, subcommand: u8, parameters: Option<Value>| {

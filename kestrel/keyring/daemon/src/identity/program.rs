@@ -167,16 +167,16 @@ mod tests {
     #[test]
     fn versions_leave_the_path() {
         assert_eq!(
-            versionless("/home/k/.config/discord/app-1.0.160/Discord"),
-            "/home/k/.config/discord/app-*/Discord"
+            versionless("/home/mara/.config/discord/app-1.0.160/Discord"),
+            "/home/mara/.config/discord/app-*/Discord"
         );
         assert_eq!(
             versionless("/opt/idea-IU-241.14494.240/bin/idea"),
             "/opt/idea-IU-*/bin/idea"
         );
         assert_eq!(
-            versionless("/home/k/Apps/Obsidian-1.6.7.AppImage"),
-            "/home/k/Apps/Obsidian-*.AppImage"
+            versionless("/home/mara/Apps/Obsidian-1.6.7.AppImage"),
+            "/home/mara/Apps/Obsidian-*.AppImage"
         );
         assert_eq!(versionless("/usr/bin/python3.14"), "/usr/bin/python3.14");
         assert_eq!(versionless("/opt/helium/helium"), "/opt/helium/helium");
@@ -194,7 +194,7 @@ mod tests {
             "obsidian"
         );
         assert_eq!(
-            Program::parse("/home/k/.config/discord/app-1.0.160/Discord").name(),
+            Program::parse("/home/mara/.config/discord/app-1.0.160/Discord").name(),
             "discord"
         );
     }

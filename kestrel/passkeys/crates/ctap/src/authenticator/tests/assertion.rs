@@ -35,7 +35,7 @@ fn answers_the_spec_assertion_request_for_a_listed_credential() {
 #[test]
 fn signs_in_with_a_discoverable_passkey_without_claiming_backup() {
     let mut authenticator = Authenticator::new(Mock::default());
-    let id = resident(&mut authenticator, "github.com", "kristof");
+    let id = resident(&mut authenticator, "github.com", "mara");
     let request = cbor::map([
         (0x01, Value::from("github.com")),
         (0x02, Value::Bytes(Sha256::digest(b"client data").to_vec())),
@@ -49,7 +49,7 @@ fn signs_in_with_a_discoverable_passkey_without_claiming_backup() {
     let user = entries(fields.required(0x04).unwrap());
     assert_eq!(
         cbor::text(user.required("name").unwrap()).unwrap(),
-        "kristof"
+        "mara"
     );
 
     let message = [auth_data, Sha256::digest(b"client data").as_slice()].concat();

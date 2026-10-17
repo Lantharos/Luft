@@ -15,7 +15,7 @@ const previews = () => styled('unlock-dialog-notification-preview-title').filter
 async function checkBanner() {
   const source = messages();
   Main.messageTray.add(source);
-  const notification = new MessageTray.Notification({source, title: 'Ayesha', body: 'Are we still on for tomorrow? I booked the table for seven.'});
+  const notification = new MessageTray.Notification({source, title: 'Theo', body: 'Are we still on for tomorrow? I booked the table for seven.'});
   notification.addAction('Reply', () => {});
   source.addNotification(notification);
   await eventually(() => shownStyled('notification-banner'), 'a new notification shows a banner');
@@ -30,9 +30,9 @@ async function checkLockScreen() {
   const source = messages();
   try {
     Main.messageTray.add(source);
-    source.addNotification(new MessageTray.Notification({source, title: 'Ayesha', body: 'Running ten minutes late.'}));
+    source.addNotification(new MessageTray.Notification({source, title: 'Theo', body: 'Running ten minutes late.'}));
     await wake();
-    await eventually(() => previews().includes('Ayesha'), 'the lock screen previews a notification that came in while locked');
+    await eventually(() => previews().includes('Theo'), 'the lock screen previews a notification that came in while locked');
     await capture('lock-screen');
     source.destroy();
     await eventually(() => previews().length === 0, 'the preview goes with its app');

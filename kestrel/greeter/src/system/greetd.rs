@@ -90,14 +90,14 @@ user = \"greetd\"
     #[test]
     fn adds_and_removes_the_initial_session() {
         let session = InitialSession {
-            user: "kristof",
+            user: "mara",
             command: "env XDG_SESSION_TYPE=wayland kestrel",
         };
         let enabled = with_initial_session(CONFIG, Some(session)).unwrap();
         assert_eq!(
             enabled,
             format!(
-                "{CONFIG}\n[initial_session]\nuser = \"kristof\"\n\
+                "{CONFIG}\n[initial_session]\nuser = \"mara\"\n\
                  command = \"env XDG_SESSION_TYPE=wayland kestrel\"\n"
             )
         );

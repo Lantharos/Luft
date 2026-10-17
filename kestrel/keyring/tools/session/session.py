@@ -138,7 +138,7 @@ def exercise(root, home, environment, script, requests):
             "service",
             "github.com",
             "user",
-            "kristof",
+            "mara",
         ],
         env=environment,
         check=True,
@@ -149,7 +149,7 @@ def exercise(root, home, environment, script, requests):
     store(environment, "Reader", "reader-key", "application", "reader")
 
     check(
-        lookup(environment, "service", "github.com", "user", "kristof") == "gh-token",
+        lookup(environment, "service", "github.com", "user", "mara") == "gh-token",
         "a keyring tool reads another app's item once the person allows it",
     )
     check(
@@ -230,7 +230,7 @@ def exercise(root, home, environment, script, requests):
     )
     script(passwords=["nope", LOGIN], access="allow")
     check(
-        lookup(environment, "service", "github.com", "user", "kristof") == "gh-token",
+        lookup(environment, "service", "github.com", "user", "mara") == "gh-token",
         "a locked keyring asks for the password and answers",
     )
     retried = requests("password")[-1]["request"]

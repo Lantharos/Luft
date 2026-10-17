@@ -11,7 +11,7 @@ import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 
 const {eventually} = checks('overlay');
-const COPIED = ['https://lantharos.dev/kestrel', 'Meet at the harbour at seven, the table is under Imeri.'];
+const COPIED = ['https://lantharos.dev/kestrel', 'Meet at the harbour at seven, the table is under Lindqvist.'];
 
 async function checkMediaControls() {
   const player = gjs('clients/mediaPlayer.js');

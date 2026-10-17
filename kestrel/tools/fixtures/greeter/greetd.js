@@ -7,13 +7,13 @@ const [socketPath, events] = ARGV;
 const FAILURE_DELAY = 400;
 
 const CONVERSATIONS = {
-  kristof: [{secret: 'Password: ', answer: 'hunter2'}],
-  ayesha: [
-    {info: 'Welcome back, Ayesha'},
+  [GLib.get_user_name()]: [{secret: 'Password: ', answer: 'hunter2'}],
+  mara: [
+    {info: 'Welcome back, Mara'},
     {secret: 'Password: ', answer: 'tulips'},
     {secret: 'Verification code: ', answer: '424242'},
   ],
-  sam: [
+  theo: [
     {error: 'Your password expires in 3 days'},
     {secret: 'Password: ', answer: 'meadow'},
   ],

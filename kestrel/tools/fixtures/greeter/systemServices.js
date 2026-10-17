@@ -8,9 +8,9 @@ const HOUR = 3600;
 
 const now = Math.floor(Date.now() / 1000);
 const people = [
-  {name: 'kristof', realName: 'Kristof Imeri', uid: new Gio.Credentials().get_unix_user(), loginTime: now - HOUR, session: 'kestrel'},
-  {name: 'ayesha', realName: 'Ayesha Khan', uid: 2001, loginTime: now - 30 * HOUR, session: 'sway'},
-  {name: 'sam', realName: 'Sam Rivera', uid: 2002, loginTime: now - 90 * HOUR, session: ''},
+  {name: GLib.get_user_name(), realName: 'Sam Rivera', uid: new Gio.Credentials().get_unix_user(), loginTime: now - HOUR, session: 'kestrel'},
+  {name: 'mara', realName: 'Mara Lindqvist', uid: 2001, loginTime: now - 30 * HOUR, session: 'sway'},
+  {name: 'theo', realName: 'Theo Brandt', uid: 2002, loginTime: now - 90 * HOUR, session: ''},
 ];
 
 const interfaceXml = name => Gio.DBusNodeInfo

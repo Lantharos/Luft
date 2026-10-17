@@ -11,6 +11,7 @@ pub mod ibus;
 pub mod portal;
 #[cfg(feature = "recovery")]
 pub mod recovery;
+mod sample;
 pub mod secrets;
 mod tasks;
 #[cfg(feature = "thumbnails")]
@@ -19,5 +20,6 @@ mod window;
 
 pub use bridge::Commands;
 pub use bridge::events::Events;
+pub use sample::sample_system;
 pub use tasks::{block_on, spawn};
 pub use window::{Appearance, GlassWindow, run};

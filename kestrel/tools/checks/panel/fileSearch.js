@@ -21,6 +21,7 @@ const UNPLUGGED = GLib.build_filenamev([FOLDER, 'Written unplugged.txt']);
 const BACKUP = GLib.build_filenamev([FOLDER, 'Settings backup.txt']);
 const RECENT = scratch('kestrel-quarterly-report.txt');
 const HISTORY = GLib.build_filenamev([GLib.get_user_data_dir(), 'recently-used.xbel']);
+const SECOND_APP = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.SearchCheckPrinters.desktop']);
 const INDEX_TIMEOUT = 20000;
 
 const uri = path => GLib.filename_to_uri(path, null);
@@ -91,13 +92,18 @@ async function checkNames() {
   await eventually(() => row(`file:${uri(GLib.path_get_dirname(FERRIES))}`), 'search finds folders');
   search('settings backup');
   await eventually(() => row(`file:${uri(BACKUP)}`), 'the index finds a file that shares a name with an app');
-  search('settings');
-  await eventually(() => {
-    const titles = groupTitles();
-    return titles[0] === 'Best match' && titles.includes('Apps') && titles.includes('Files');
-  }, 'mixed results come in groups under the best match');
-  require(groupTitles().indexOf('Apps') < groupTitles().indexOf('Files'), 'apps come before files');
-  await capture('search-files');
+  write(SECOND_APP, '[Desktop Entry]\nType=Application\nName=Printer Settings\nExec=true\nIcon=printer\n');
+  try {
+    search('settings');
+    await eventually(() => {
+      const titles = groupTitles();
+      return titles[0] === 'Best match' && titles.includes('Apps') && titles.includes('Files');
+    }, 'mixed results come in groups under the best match');
+    require(groupTitles().indexOf('Apps') < groupTitles().indexOf('Files'), 'apps come before files');
+    await capture('search-files');
+  } finally {
+    GLib.unlink(SECOND_APP);
+  }
 
   await withHandler('text/plain', 'Text Check', async opened => {
     search('harbor plans');

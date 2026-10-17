@@ -4,11 +4,11 @@ import GLib from 'gi://GLib';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {LuftApp, sabineService} from '../lib/luftApp.js';
-import {firstLine, gjs, scratch, spawn, stop} from '../lib/processes.js';
-import {waitUntil} from '../lib/wait.js';
+import {firstLine, scratch, spawn, stop} from '../lib/processes.js';
 
 const {require, eventually} = checks('network sign-in');
 const PAGE_COLOR = '#f2e8d8';
+const PORTAL = 2;
 const FULL = 4;
 const CLOSE_TIMEOUT = 5000;
 const PAGE_TIMEOUT = 15000;
@@ -28,12 +28,6 @@ function control(connection, method, parameters = null, replyType = null) {
   return call(...NETWORK_MANAGER, method, parameters, replyType, {connection});
 }
 
-async function owned(connection) {
-  const reply = await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
-    new GLib.Variant('(s)', ['org.freedesktop.NetworkManager']), '(b)', {connection});
-  return reply.deepUnpack()[0];
-}
-
 async function startPortal(folder) {
   GLib.mkdir_with_parents(folder, 0o700);
   GLib.file_set_contents(`${folder}/index.html`, PORTAL_PAGE);
@@ -48,11 +42,10 @@ export async function run() {
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const scheme = styles.get_string('color-scheme');
   const bus = systemBus();
-  const networkManager = gjs('system/networkManager.js', [], {env: {DBUS_SYSTEM_BUS_ADDRESS: GLib.getenv('KESTREL_SYSTEM_BUS')}});
   const portal = await startPortal(folder);
   await sabineService();
   try {
-    await waitUntil(() => owned(bus), 'the NetworkManager stand-in starts');
+    await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [PORTAL]));
     styles.set_string('color-scheme', 'prefer-dark');
     const app = new LuftApp('signin', [`kestrel-signin:?network=${encodeURIComponent('Harbor Hotel')}&url=${encodeURIComponent(portal.url)}`]);
     await app.open();
@@ -73,7 +66,7 @@ export async function run() {
   } finally {
     styles.set_string('color-scheme', scheme);
     await stop(portal.server);
-    await stop(networkManager);
+    await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [FULL]));
     bus.close_sync(null);
     await spawn(['rm', '-rf', folder]).exited;
   }

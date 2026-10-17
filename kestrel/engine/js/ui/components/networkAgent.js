@@ -421,6 +421,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 class NetworkAgent {
     constructor() {
         this._native = new Shell.NetworkAgent({
+            dbus_connection: KestrelUi.standInBus(),
             identifier: 'com.lantharos.Kestrel.NetworkAgent',
             capabilities: NM.SecretAgentCapabilities.VPN_HINTS,
             auto_register: false,

@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {ACCOUNTS_NAME, publishAccounts} from './accounts.js';
 import {BASIC_NAMES, publishBasics} from './basics.js';
+import {NETWORK_MANAGER_NAME, publishNetworkManager} from './networkManager.js';
 import {PACKAGEKIT_NAME, publishPackageKit} from './packageKit.js';
 import {publishSecurity, SECURITY_NAMES} from './security.js';
 import {publishUdisks} from './udisks/service.js';
@@ -26,6 +27,7 @@ function publish(xml, implementation, path) {
 
 publishBasics(publish, calls);
 publishAccounts(publish);
+publishNetworkManager(publish, calls);
 publish(CALLS, {
   Take: () => {
     const fresh = calls.splice(0);
@@ -38,6 +40,6 @@ publishSecurity(publish, calls, publishUdisks(calls));
 publishPackageKit(publish, calls);
 publishWindows(publish);
 
-for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', PACKAGEKIT_NAME, WINDOWS_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', PACKAGEKIT_NAME, WINDOWS_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

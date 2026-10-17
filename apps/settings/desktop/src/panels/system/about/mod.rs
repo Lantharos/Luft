@@ -1,4 +1,5 @@
 mod problems;
+mod sample;
 mod systems;
 
 use std::ffi::CString;
@@ -165,12 +166,16 @@ async fn about(_: Value) -> Result<About, String> {
         .get_property("PrettyHostname")
         .await
         .unwrap_or_default();
+    let device_name = if pretty.is_empty() {
+        hostname.clone()
+    } else {
+        pretty
+    };
+    if luft_app::sample_system() {
+        return Ok(sample::about(device_name, hostname));
+    }
     tokio::task::spawn_blocking(move || About {
-        device_name: if pretty.is_empty() {
-            hostname.clone()
-        } else {
-            pretty
-        },
+        device_name,
         hostname,
         system: os_release(),
         kernel: fs::read_to_string("/proc/sys/kernel/osrelease")

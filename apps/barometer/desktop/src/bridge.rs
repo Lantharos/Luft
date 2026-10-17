@@ -17,7 +17,7 @@ struct AppState {
 pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
     window
         .command("sample_system", |_: Value| {
-            Ok::<_, String>(crate::sample_system())
+            Ok::<_, String>(luft_app::sample_system())
         })
         .command_async("app_state", |_: Value| async {
             Ok(AppState {

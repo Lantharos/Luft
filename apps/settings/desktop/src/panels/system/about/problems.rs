@@ -40,6 +40,9 @@ pub struct Problem {
 }
 
 pub fn problems() -> Result<Vec<Problem>, String> {
+    if luft_app::sample_system() {
+        return Ok(Vec::new());
+    }
     let Ok(entries) = fs::read_dir(INCIDENTS) else {
         return Ok(Vec::new());
     };

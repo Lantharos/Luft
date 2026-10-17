@@ -29,7 +29,7 @@ const DEFAULTS: Settings = {
 	networkBits: false,
 	temperature: 'celsius',
 	showVirtual: false,
-	normalizeCpu: false,
+	normalizeCpu: true,
 	showCores: true,
 	animateGraphs: false,
 	processColumns: ['user', 'cpu', 'memory', 'gpu', 'pid'],

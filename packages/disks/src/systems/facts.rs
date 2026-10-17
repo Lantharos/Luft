@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use serde::Deserialize;
-use zbus::blocking::Proxy;
+use zbus::{OwnedVariant, Proxy};
 
 use crate::trust::{self, Map, TRUST};
 
@@ -58,18 +58,20 @@ struct WindowsFound {
 
 type Listed = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
-fn luft_starts() -> bool {
+async fn luft_starts() -> bool {
     let startup = trust::read(TRUST)
+        .await
         .ok()
         .flatten()
-        .and_then(|properties| trust::get::<zbus::zvariant::OwnedValue>(&properties, "Startup"))
+        .and_then(|properties| trust::get::<OwnedVariant>(&properties, "Startup"))
         .and_then(|value| Map::try_from(value).ok())
         .unwrap_or_default();
     trust::get::<bool>(&startup, "Installed").unwrap_or(false)
 }
 
-fn startups() -> Vec<OtherStartup> {
+async fn startups() -> Vec<OtherStartup> {
     trust::call::<_, Vec<Listed>>(TRUST, "OtherStartups", &())
+        .await
         .inspect_err(|error| eprintln!("Other systems' startups couldn't be read: {error}"))
         .unwrap_or_default()
         .into_iter()
@@ -83,14 +85,21 @@ fn startups() -> Vec<OtherStartup> {
         .collect()
 }
 
-fn windows() -> Vec<WindowsInstall> {
-    let status = luft_dbus::system().and_then(|connection| {
-        Proxy::new(connection, WINDOWS, WINDOWS_PATH, WINDOWS)
-            .and_then(|proxy| proxy.call::<_, _, String>("Status", &()))
-            .map_err(|error| error.to_string())
-    });
-    status
-        .ok()
+async fn status() -> Option<String> {
+    let proxy = Proxy::new(
+        luft_dbus::system().await.ok()?,
+        WINDOWS,
+        WINDOWS_PATH,
+        WINDOWS,
+    )
+    .await
+    .ok()?;
+    proxy.call("Status", &()).await.ok()
+}
+
+async fn windows() -> Vec<WindowsInstall> {
+    status()
+        .await
         .and_then(|json| serde_json::from_str::<WindowsStatus>(&json).ok())
         .map(|status| {
             status
@@ -121,14 +130,15 @@ fn old_system() -> Option<OldSystem> {
 }
 
 impl Facts {
-    pub fn gather() -> Self {
-        if !luft_starts() {
+    pub async fn gather() -> Self {
+        if !luft_starts().await {
             return Self::default();
         }
+        let (startups, windows) = futures_util::future::join(startups(), windows()).await;
         Self {
             luft_starts: true,
-            startups: startups(),
-            windows: windows(),
+            startups,
+            windows,
             old_system: old_system(),
         }
     }

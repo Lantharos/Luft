@@ -1,6 +1,5 @@
 use serde::Serialize;
-use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
+use zbus::{OwnedVariant, Proxy};
 
 pub const TYPOGRAPHY_CHANGED: &str = "appearance.typography";
 
@@ -58,27 +57,29 @@ impl Default for Typography {
     }
 }
 
-fn text(proxy: &Proxy, key: &str) -> Option<String> {
-    let value = super::read(proxy, INTERFACE, key)?;
+async fn text(proxy: &Proxy<'_>, key: &str) -> Option<String> {
+    let value = super::read(proxy, INTERFACE, key).await?;
     let description = String::try_from(value).ok()?;
     Some(family(&description)).filter(|family| !family.is_empty())
 }
 
 impl Typography {
-    pub fn read(proxy: &Proxy) -> Self {
+    pub async fn read(proxy: &Proxy<'_>) -> Self {
         Self {
-            interface: text(proxy, INTERFACE_FONT),
-            monospace: text(proxy, MONOSPACE_FONT),
+            interface: text(proxy, INTERFACE_FONT).await,
+            monospace: text(proxy, MONOSPACE_FONT).await,
             text_scale: super::read(proxy, INTERFACE, TEXT_SCALE)
-                .and_then(|value: OwnedValue| f64::try_from(value).ok())
+                .await
+                .and_then(|value: OwnedVariant| f64::try_from(value).ok())
                 .unwrap_or(1.0),
         }
     }
 
-    pub fn current() -> Self {
-        super::proxy()
-            .map(|proxy| Self::read(&proxy))
-            .unwrap_or_default()
+    pub async fn current() -> Self {
+        match super::proxy().await {
+            Ok(proxy) => Self::read(&proxy).await,
+            Err(_) => Self::default(),
+        }
     }
 }
 

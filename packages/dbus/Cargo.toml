@@ -1,13 +1,14 @@
 [package]
 name = "luft-dbus"
 version = "0.1.0"
-description = "Blocking D-Bus connections, ObjectManager snapshots and service properties shared by Luft's apps and services"
+description = "Shared D-Bus connections, ObjectManager snapshots and service properties for Luft's apps and services"
 authors = ["Kristof"]
 license = "MIT"
 edition = "2024"
 rust-version = "1.98"
 
 [dependencies]
+futures-util = { version = "0.3.34", default-features = false }
 serde = "1.0.229"
-tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread", "sync"] }
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "p2p", "tokio"] }
+tokio = { version = "1.53.3", default-features = false, features = ["sync", "time"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }

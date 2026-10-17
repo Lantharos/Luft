@@ -1,15 +1,13 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc::{self, Sender};
 use std::sync::{LazyLock, Mutex, OnceLock};
 
+use futures_util::{StreamExt, stream};
 use luft_app::Events;
 use luft_app::dbus;
-use luft_app::dbus::objects::{self, failed};
+use luft_app::dbus::objects;
 use serde::Serialize;
 use zbus::Message;
-use zbus::blocking::MessageIterator;
-use zbus::message::Type;
 
 use super::{CONNECTION, DEVICE, MANAGER_PATH, SERVICE, airplane, saved, snapshot};
 
@@ -66,41 +64,30 @@ pub fn remember(objects: &objects::Objects) {
 }
 
 fn start(events: Events) {
-    let (changes, refreshes) = mpsc::channel();
-    airplane::watch(changes.clone());
-    let signal_events = events.clone();
-    std::thread::spawn(move || {
-        if let Err(error) = listen(&signal_events, &changes) {
+    luft_app::spawn(async move {
+        if let Err(error) = listen(&events).await {
             eprintln!("network: {error}");
-        }
-    });
-    std::thread::spawn(move || {
-        while objects::settle(&refreshes) {
-            if !OPEN.load(Ordering::Relaxed) {
-                continue;
-            }
-            if let Ok(network) = super::network() {
-                events.emit(CHANGED, network);
-            }
         }
     });
 }
 
-fn listen(events: &Events, changes: &Sender<()>) -> Result<(), String> {
-    let rule = zbus::MatchRule::builder()
-        .msg_type(Type::Signal)
-        .sender(SERVICE)
-        .map_err(failed)?
-        .path_namespace(MANAGER_PATH)
-        .map_err(failed)?
-        .build();
-    for message in MessageIterator::for_match_rule(rule, dbus::system()?, None).map_err(failed)? {
-        let Ok(message) = message else {
+async fn listen(events: &Events) -> Result<(), String> {
+    let messages = objects::signals(dbus::system().await?, SERVICE, MANAGER_PATH).await?;
+    let manager = messages.map(|message| {
+        if let Ok(message) = message {
+            inspect(events, &message);
+        }
+    });
+    let mut changes = match airplane::changes().await {
+        Some(airplane) => stream::select(manager, airplane).boxed(),
+        None => manager.boxed(),
+    };
+    while objects::settle(&mut changes).await {
+        if !OPEN.load(Ordering::Relaxed) {
             continue;
-        };
-        inspect(events, &message);
-        if changes.send(()).is_err() {
-            break;
+        }
+        if let Ok(network) = super::network().await {
+            events.emit(CHANGED, network);
         }
     }
     Ok(())
@@ -141,7 +128,9 @@ fn device_changed(events: &Events, device: &str, state: u32, reason: u32) {
         }
         DEVICE_FAILED => {
             if let Some(pending) = take_pending(device) {
-                let _ = saved::delete(&pending.connection);
+                luft_app::spawn(async move {
+                    let _ = saved::delete(&pending.connection).await;
+                });
             }
             let reason = match reason {
                 REASON_NO_SECRETS | REASON_SUPPLICANT_DISCONNECT => Reason::Password,

@@ -1,10 +1,9 @@
 use std::sync::OnceLock;
-use std::sync::mpsc::Sender;
 
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use futures_util::{Stream, StreamExt};
+use luft_app::dbus::{self, failed};
 use serde::Serialize;
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -18,49 +17,42 @@ const PATH: &str = "/com/lantharos/Settings/Rfkill";
 
 static RFKILL: OnceLock<Proxy<'static>> = OnceLock::new();
 
-pub fn rfkill() -> Result<&'static Proxy<'static>, String> {
+pub async fn rfkill() -> Result<&'static Proxy<'static>, String> {
     if let Some(proxy) = RFKILL.get() {
         return Ok(proxy);
     }
-    let proxy = Proxy::new(dbus::session()?, SERVICE, PATH, SERVICE).map_err(failed)?;
+    let proxy = Proxy::new(dbus::session().await?, SERVICE, PATH, SERVICE)
+        .await
+        .map_err(failed)?;
     Ok(RFKILL.get_or_init(|| proxy))
 }
 
-pub fn state() -> Option<Airplane> {
-    let rfkill = rfkill().ok()?;
-    let flag = |name: &str| rfkill.get_property::<bool>(name).ok();
-    if !flag("ShouldShowAirplaneMode")? {
+pub async fn state() -> Option<Airplane> {
+    let rfkill = rfkill().await.ok()?;
+    let flag = async |name: &str| rfkill.get_property::<bool>(name).await.ok();
+    if !flag("ShouldShowAirplaneMode").await? {
         return None;
     }
     Some(Airplane {
-        enabled: flag("AirplaneMode")?,
-        hardware: flag("HardwareAirplaneMode").unwrap_or(false),
+        enabled: flag("AirplaneMode").await?,
+        hardware: flag("HardwareAirplaneMode").await.unwrap_or(false),
     })
 }
 
-pub fn set(enabled: bool) -> Result<(), String> {
-    rfkill()?
+pub async fn set(enabled: bool) -> Result<(), String> {
+    rfkill()
+        .await?
         .set_property("AirplaneMode", enabled)
+        .await
         .map_err(failed)
 }
 
-pub fn watch(changes: Sender<()>) {
-    std::thread::spawn(move || {
-        let Ok(connection) = dbus::session() else {
-            return;
-        };
-        let Ok(properties) =
-            Proxy::new(connection, SERVICE, PATH, "org.freedesktop.DBus.Properties")
-        else {
-            return;
-        };
-        let Ok(signals) = properties.receive_signal("PropertiesChanged") else {
-            return;
-        };
-        for _ in signals {
-            if changes.send(()).is_err() {
-                return;
-            }
-        }
-    });
+/// Every change to airplane mode, as `()`.
+pub async fn changes() -> Option<impl Stream<Item = ()>> {
+    let connection = dbus::session().await.ok()?;
+    let properties = Proxy::new(connection, SERVICE, PATH, "org.freedesktop.DBus.Properties")
+        .await
+        .ok()?;
+    let signals = properties.receive_signal("PropertiesChanged").await.ok()?;
+    Some(signals.map(drop))
 }

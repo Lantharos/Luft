@@ -63,66 +63,68 @@ struct Choose {
     purpose: certificate::Purpose,
 }
 
-fn objects() -> Result<Objects, String> {
-    Objects::fetch(dbus::system()?, SERVICE, "/org/freedesktop")
+async fn objects() -> Result<Objects, String> {
+    Objects::fetch(dbus::system().await?, SERVICE, "/org/freedesktop").await
 }
 
-fn network() -> Result<Network, String> {
-    let objects = objects()?;
+async fn network() -> Result<Network, String> {
+    let objects = objects().await?;
     watch::remember(&objects);
-    Ok(snapshot::build(&objects))
+    Ok(snapshot::build(&objects).await)
 }
 
-fn open(events: &Events, _: Value) -> Result<Network, String> {
-    watch::open(events);
-    let network = network()?;
+async fn open(events: Events, _: Value) -> Result<Network, String> {
+    watch::open(&events);
+    let network = network().await?;
     if let Some(wifi) = &network.wifi {
-        actions::scan(&wifi.device);
+        actions::scan(&wifi.device).await;
     }
     Ok(network)
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("network_open", events, open)
+        .with_async("network_open", events, open)
         .command("network_close", |_: Value| {
             watch::close();
             Ok(())
         })
-        .command("network_set_wifi", |Toggle { enabled }| {
+        .command_async("network_set_wifi", |Toggle { enabled }| {
             actions::set_wifi(enabled)
         })
-        .command("network_set_airplane", |Toggle { enabled }| {
+        .command_async("network_set_airplane", |Toggle { enabled }| {
             airplane::set(enabled)
         })
-        .command("network_activate", actions::activate)
-        .command("network_deactivate", |Active { active }| {
-            actions::deactivate(&active)
+        .command_async("network_activate", actions::activate)
+        .command_async("network_deactivate", |Active { active }| async move {
+            actions::deactivate(&active).await
         })
-        .command("network_disconnect", |Device { device }| {
-            actions::disconnect(&device)
+        .command_async("network_disconnect", |Device { device }| async move {
+            actions::disconnect(&device).await
         })
-        .command("network_join", actions::join)
-        .command("network_forget", |Ssid { ssid }| {
-            actions::forget(&ssid, &objects()?)
+        .command_async("network_join", actions::join)
+        .command_async("network_forget", |Ssid { ssid }| async move {
+            actions::forget(&ssid, &objects().await?).await
         })
-        .command("network_remove", |Connection { path }| saved::delete(&path))
-        .command("network_vpn_import", |_: Value| vpn::import())
+        .command_async("network_remove", |Connection { path }| async move {
+            saved::delete(&path).await
+        })
+        .command_async("network_vpn_import", |_: Value| vpn::import())
         .command("network_wireguard_keys", |_: Value| {
             vpn::wireguard::generate()
         })
         .command("network_wireguard_public_key", |PrivateKey { key }| {
             vpn::wireguard::public_key(&key)
         })
-        .command("network_wireguard_add", vpn::wireguard::add)
-        .command("network_profile", |Connection { path }| {
-            profile::load(&path)
+        .command_async("network_wireguard_add", vpn::wireguard::add)
+        .command_async("network_profile", |Connection { path }| async move {
+            profile::load(&path).await
         })
-        .command("network_profile_save", profile::save)
-        .command("network_profile_secret", |Connection { path }| {
-            profile::secret(&path)
+        .command_async("network_profile_save", profile::save)
+        .command_async("network_profile_secret", |Connection { path }| async move {
+            profile::secret(&path).await
         })
-        .command("network_choose_certificate", |Choose { purpose }| {
+        .command_async("network_choose_certificate", |Choose { purpose }| {
             certificate::choose(purpose)
         })
 }

@@ -4,7 +4,7 @@ use std::mem::MaybeUninit;
 
 use luft_dbus::objects::{Object, Objects};
 use serde::Serialize;
-use zbus::zvariant::OwnedValue;
+use zbus::OwnedVariant;
 
 use super::snapshot::{Job, Jobs};
 use super::system::Usage;
@@ -86,7 +86,7 @@ pub struct Span {
 pub fn extended(objects: &Objects, whole: &Object) -> Option<Span> {
     objects
         .get(whole.path, TABLE)?
-        .get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions")?
+        .get::<Vec<zbus::OwnedObjectPath>>("Partitions")?
         .iter()
         .filter_map(|path| objects.get(path.as_str(), PARTITION))
         .find(|partition| partition.flag("IsContainer"))
@@ -116,7 +116,7 @@ pub fn map(
         )))];
     };
     let mut partitions: Vec<(Object, Object)> = table
-        .get::<Vec<zbus::zvariant::OwnedObjectPath>>("Partitions")
+        .get::<Vec<zbus::OwnedObjectPath>>("Partitions")
         .unwrap_or_default()
         .iter()
         .filter_map(|path| {
@@ -232,7 +232,7 @@ fn cleartext<'a>(objects: &'a Objects, backing: &str) -> Option<Object<'a>> {
 
 fn startup(block: &Object) -> Option<Startup> {
     block
-        .get::<Vec<(String, HashMap<String, OwnedValue>)>>("Configuration")?
+        .get::<Vec<(String, HashMap<String, OwnedVariant>)>>("Configuration")?
         .into_iter()
         .find(|(kind, _)| kind == "fstab")
         .map(|(_, entry)| {

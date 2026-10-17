@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
-use luft_app::dbus;
-use zbus::blocking::MessageIterator;
+use futures_util::future::join_all;
+use futures_util::{Stream, StreamExt};
+use luft_app::dbus::{self, failed};
+use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue};
+use zbus::{MatchRule, MessageStream, OwnedObjectPath, OwnedVariant};
 
 use super::enums::{flag, role, status};
 use super::transaction::{MANAGER, PATH, PROPERTIES, SERVICE, TRANSACTION};
@@ -30,12 +32,9 @@ pub struct Running {
     pub sender: String,
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
-fn describe(path: OwnedObjectPath) -> Option<Running> {
-    let properties: HashMap<String, OwnedValue> = dbus::system()
+async fn describe(path: OwnedObjectPath) -> Option<Running> {
+    let properties: HashMap<String, OwnedVariant> = dbus::system()
+        .await
         .ok()?
         .call_method(
             Some(SERVICE),
@@ -44,6 +43,7 @@ fn describe(path: OwnedObjectPath) -> Option<Running> {
             "GetAll",
             &(TRANSACTION,),
         )
+        .await
         .and_then(|reply| reply.body().deserialize())
         .ok()?;
     let number = |name: &str| {
@@ -69,11 +69,13 @@ fn describe(path: OwnedObjectPath) -> Option<Running> {
     })
 }
 
-pub fn running() -> Result<Vec<Running>, String> {
-    let connection = dbus::system()?;
-    let started = zbus::blocking::fdo::DBusProxy::new(connection)
+pub async fn running() -> Result<Vec<Running>, String> {
+    let connection = dbus::system().await?;
+    let started = DBusProxy::new(connection)
+        .await
         .map_err(failed)?
         .name_has_owner(BusName::from_static_str(SERVICE).map_err(failed)?)
+        .await
         .map_err(failed)?;
     if !started {
         return Ok(Vec::new());
@@ -86,28 +88,28 @@ pub fn running() -> Result<Vec<Running>, String> {
             "GetTransactionList",
             &(),
         )
+        .await
         .and_then(|reply| reply.body().deserialize())
         .map_err(failed)?;
-    Ok(paths.into_iter().filter_map(describe).collect())
+    Ok(join_all(paths.into_iter().map(describe))
+        .await
+        .into_iter()
+        .flatten()
+        .collect())
 }
 
-pub fn watch(mut changed: impl FnMut()) -> Result<(), String> {
-    let connection = dbus::system()?;
-    let rule = zbus::MatchRule::builder()
+/// Every change to PackageKit's list of transactions, as `()`.
+pub async fn changes() -> Result<impl Stream<Item = ()>, String> {
+    let rule = MatchRule::builder()
         .msg_type(zbus::message::Type::Signal)
         .sender(SERVICE)
-        .map_err(failed)?
         .path(PATH)
-        .map_err(failed)?
         .interface(MANAGER)
-        .map_err(failed)?
         .member("TransactionListChanged")
-        .map_err(failed)?
-        .build();
-    let signals = MessageIterator::for_match_rule(rule, connection, Some(64)).map_err(failed)?;
-    for message in signals {
-        message.map_err(failed)?;
-        changed();
-    }
-    Ok(())
+        .build()
+        .map_err(failed)?;
+    let signals = MessageStream::for_match_rule(rule, dbus::system().await?, None)
+        .await
+        .map_err(failed)?;
+    Ok(signals.map(drop))
 }

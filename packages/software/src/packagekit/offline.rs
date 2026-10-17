@@ -1,6 +1,6 @@
-use luft_app::dbus;
+use luft_app::dbus::{self, failed};
 use serde::Serialize;
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 
 use super::package::PackageId;
 use super::transaction::{PATH, SERVICE};
@@ -16,18 +16,22 @@ pub struct Results {
     pub error: Option<String>,
 }
 
-fn proxy() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::system()?, SERVICE, PATH, INTERFACE).map_err(|error| error.to_string())
+async fn proxy() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::system().await?, SERVICE, PATH, INTERFACE)
+        .await
+        .map_err(failed)
 }
 
-pub fn prepared() -> Result<Vec<PackageId>, String> {
-    let ids: Vec<String> = proxy()?
+pub async fn prepared() -> Result<Vec<PackageId>, String> {
+    let ids: Vec<String> = proxy()
+        .await?
         .call("GetPrepared", &())
-        .map_err(|error| error.to_string())?;
+        .await
+        .map_err(failed)?;
     Ok(ids.iter().filter_map(|id| PackageId::parse(id)).collect())
 }
 
-pub fn results() -> Option<Results> {
+pub async fn results() -> Option<Results> {
     let (success, ids, _role, finished, _code, description): (
         bool,
         Vec<String>,
@@ -35,7 +39,7 @@ pub fn results() -> Option<Results> {
         u64,
         u32,
         String,
-    ) = proxy().ok()?.call("GetResults", &()).ok()?;
+    ) = proxy().await.ok()?.call("GetResults", &()).await.ok()?;
     Some(Results {
         success,
         packages: ids.len(),

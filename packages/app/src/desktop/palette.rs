@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
+use futures_util::StreamExt;
 use serde::Serialize;
-use zbus::blocking::Proxy;
-use zbus::blocking::fdo::PropertiesProxy;
+use zbus::Proxy;
+use zbus::fdo::PropertiesProxy;
 
 use crate::bridge::events::Events;
 use crate::dbus;
@@ -66,44 +67,49 @@ pub struct Schemes {
 }
 
 impl Schemes {
-    fn read(proxy: &Proxy, prefix: &str) -> Option<Self> {
+    async fn read(proxy: &Proxy<'_>, prefix: &str) -> Option<Self> {
         Some(Self {
-            light: proxy.get_property(&format!("Light{prefix}")).ok()?,
-            dark: proxy.get_property(&format!("Dark{prefix}")).ok()?,
+            light: proxy.get_property(&format!("Light{prefix}")).await.ok()?,
+            dark: proxy.get_property(&format!("Dark{prefix}")).await.ok()?,
         })
     }
 }
 
-pub fn palette() -> Option<Palette> {
-    let proxy = Proxy::new(dbus::session().ok()?, DESTINATION, PATH, INTERFACE).ok()?;
-    let accent = proxy.get_property::<String>("AccentColor").ok()?;
+pub async fn palette() -> Option<Palette> {
+    let session = dbus::session().await.ok()?;
+    let proxy = Proxy::new(session, DESTINATION, PATH, INTERFACE)
+        .await
+        .ok()?;
+    let accent = proxy.get_property::<String>("AccentColor").await.ok()?;
     (!accent.is_empty()).then_some(())?;
     Some(Palette {
         accent,
-        wallpaper_accent: proxy.get_property("WallpaperAccentColor").ok()?,
-        pure_black: proxy.get_property("PureBlack").ok()?,
-        colors: Schemes::read(&proxy, "Colors")?,
-        terminal: Schemes::read(&proxy, "TerminalColors")?,
-        app_icons: AppIcons::from_map(proxy.get_property("AppIcons").ok()?)?,
+        wallpaper_accent: proxy.get_property("WallpaperAccentColor").await.ok()?,
+        pure_black: proxy.get_property("PureBlack").await.ok()?,
+        colors: Schemes::read(&proxy, "Colors").await?,
+        terminal: Schemes::read(&proxy, "TerminalColors").await?,
+        app_icons: AppIcons::from_map(proxy.get_property("AppIcons").await.ok()?)?,
     })
 }
 
-fn properties() -> zbus::Result<PropertiesProxy<'static>> {
-    PropertiesProxy::builder(dbus::session().map_err(zbus::Error::Failure)?)
-        .destination(DESTINATION)?
-        .path(PATH)?
+pub async fn watch_palette(events: Events) {
+    let Ok(session) = dbus::session().await else {
+        return;
+    };
+    let Ok(properties) = PropertiesProxy::builder(session)
+        .destination(DESTINATION)
+        .path(PATH)
         .build()
-}
-
-pub fn watch_palette(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(changes) = properties().and_then(|proxy| proxy.receive_properties_changed()) else {
-            return;
-        };
-        for _ in changes {
-            if let Some(palette) = palette() {
-                events.emit(PALETTE_CHANGED, palette);
-            }
+        .await
+    else {
+        return;
+    };
+    let Ok(mut changes) = properties.receive_properties_changed().await else {
+        return;
+    };
+    while changes.next().await.is_some() {
+        if let Some(palette) = palette().await {
+            events.emit(PALETTE_CHANGED, palette);
         }
-    });
+    }
 }

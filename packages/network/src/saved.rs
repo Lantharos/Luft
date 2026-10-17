@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
-use luft_app::dbus;
-use luft_app::dbus::objects::{Objects, failed};
-use zbus::blocking::Proxy;
+use futures_util::future::join_all;
+use luft_app::dbus::objects::Objects;
+use luft_app::dbus::{self, failed};
 use zbus::proxy::MethodFlags;
+use zbus::{OwnedObjectPath, Proxy};
 
 use super::profile::settings::{Settings, get};
 use super::{CONNECTION, SERVICE, SETTINGS};
@@ -40,36 +41,50 @@ fn kind(settings: &Settings) -> Kind {
     }
 }
 
-fn load(path: &str) -> Result<Saved, String> {
-    let connection = Proxy::new(dbus::system()?, SERVICE, path, CONNECTION).map_err(failed)?;
-    let settings: Settings = connection.call("GetSettings", &()).map_err(failed)?;
+async fn connection(path: &str) -> Result<Proxy<'_>, String> {
+    Proxy::new(dbus::system().await?, SERVICE, path, CONNECTION)
+        .await
+        .map_err(failed)
+}
+
+async fn load(path: String) -> Result<Saved, String> {
+    let settings: Settings = connection(&path)
+        .await?
+        .call("GetSettings", &())
+        .await
+        .map_err(failed)?;
     Ok(Saved {
-        path: path.to_owned(),
         name: get(&settings, "connection", "id").unwrap_or_default(),
         kind: kind(&settings),
+        path,
     })
 }
 
-pub fn all(objects: &Objects) -> Vec<Saved> {
+pub async fn all(objects: &Objects) -> Vec<Saved> {
     let paths: Vec<String> = objects
         .get(super::SETTINGS_PATH, SETTINGS)
-        .and_then(|settings| settings.get::<Vec<zbus::zvariant::OwnedObjectPath>>("Connections"))
+        .and_then(|settings| settings.get::<Vec<OwnedObjectPath>>("Connections"))
         .unwrap_or_default()
         .into_iter()
         .map(|path| path.to_string())
         .collect();
+    let missing: Vec<String> = {
+        let mut cache = CACHE.lock().unwrap();
+        cache.retain(|path, _| paths.contains(path));
+        paths
+            .iter()
+            .filter(|path| !cache.contains_key(*path))
+            .cloned()
+            .collect()
+    };
+    let loaded = join_all(missing.into_iter().map(load)).await;
     let mut cache = CACHE.lock().unwrap();
-    cache.retain(|path, _| paths.contains(path));
+    for saved in loaded.into_iter().flatten() {
+        cache.insert(saved.path.clone(), saved);
+    }
     paths
         .iter()
-        .filter_map(|path| {
-            if let Some(saved) = cache.get(path) {
-                return Some(saved.clone());
-            }
-            let saved = load(path).ok()?;
-            cache.insert(path.clone(), saved.clone());
-            Some(saved)
-        })
+        .filter_map(|path| cache.get(path).cloned())
         .collect()
 }
 
@@ -77,10 +92,11 @@ pub fn invalidate(path: &str) {
     CACHE.lock().unwrap().remove(path);
 }
 
-pub fn delete(path: &str) -> Result<(), String> {
-    Proxy::new(dbus::system()?, SERVICE, path, CONNECTION)
-        .map_err(failed)?
-        .call_with_flags::<_, _, ()>("Delete", MethodFlags::AllowInteractiveAuth.into(), &())
-        .map(|_| ())
+pub async fn delete(path: &str) -> Result<(), String> {
+    connection(path)
+        .await?
+        .call_with_flags::<_, _, ()>("Delete", MethodFlags::ALLOW_INTERACTIVE_AUTH, &())
+        .await
+        .map(drop)
         .map_err(failed)
 }

@@ -80,10 +80,10 @@ pub struct Appearance {
 }
 
 impl Appearance {
-    pub fn current() -> Self {
+    pub async fn current() -> Self {
         Self {
-            palette: palette::palette(),
-            typography: Typography::current(),
+            palette: palette::palette().await,
+            typography: Typography::current().await,
         }
     }
 }
@@ -100,8 +100,8 @@ pub fn run(
             if let Some(emitter) = process.bridge_event_emitter() {
                 events.attach(emitter);
             }
-            palette::watch_palette(events.clone());
-            desktop::watch(events.clone());
+            crate::spawn(palette::watch_palette(events.clone()));
+            crate::spawn(desktop::watch(events.clone()));
             started(events);
         },
     )

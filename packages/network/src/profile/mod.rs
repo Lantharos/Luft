@@ -4,10 +4,9 @@ mod reapply;
 pub mod settings;
 pub mod wireless;
 
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
-use zbus::blocking::Proxy;
+use zbus::Proxy;
 use zbus::proxy::MethodFlags;
 
 use super::{CONNECTION, SERVICE};
@@ -85,26 +84,28 @@ fn metered(value: Option<i32>) -> Metered {
     }
 }
 
-pub fn explain(error: zbus::Error) -> String {
-    match &error {
-        zbus::Error::MethodError(name, _, _) if name.ends_with("PermissionDenied") => {
-            "You don't have permission to change this connection".to_owned()
-        }
-        zbus::Error::MethodError(_, Some(message), _) => message.clone(),
-        _ => error.to_string(),
+pub fn explain(error: &zbus::Error) -> String {
+    if dbus::error_name(error).is_some_and(|name| name.ends_with("PermissionDenied")) {
+        return "You don't have permission to change this connection".to_owned();
     }
+    dbus::explain(error)
 }
 
-fn connection(path: &str) -> Result<Proxy<'_>, String> {
-    Proxy::new(dbus::system()?, SERVICE, path, CONNECTION).map_err(failed)
+async fn connection(path: &str) -> Result<Proxy<'_>, String> {
+    Proxy::new(dbus::system().await?, SERVICE, path, CONNECTION)
+        .await
+        .map_err(failed)
 }
 
-fn settings(connection: &Proxy) -> Result<Settings, String> {
-    connection.call("GetSettings", &()).map_err(explain)
+async fn settings(connection: &Proxy<'_>) -> Result<Settings, String> {
+    connection
+        .call("GetSettings", &())
+        .await
+        .map_err(|error| explain(&error))
 }
 
-pub fn load(path: &str) -> Result<Profile, String> {
-    let settings = settings(&connection(path)?)?;
+pub async fn load(path: &str) -> Result<Profile, String> {
+    let settings = settings(&connection(path).await?).await?;
     let kind = kind(&settings);
     let link = link(kind).and_then(|group| settings.get(group));
     let permissions: Vec<String> = get(&settings, GENERAL, "permissions").unwrap_or_default();
@@ -129,15 +130,15 @@ pub fn owner() -> Vec<String> {
     )]
 }
 
-pub fn save(
+pub async fn save(
     Save {
         path,
         profile,
         secret,
     }: Save,
 ) -> Result<(), String> {
-    let connection = connection(&path)?;
-    let mut settings = settings(&connection)?;
+    let connection = connection(&path).await?;
+    let mut settings = settings(&connection).await?;
     let general = settings.entry(GENERAL.to_owned()).or_default();
     put(general, "id", profile.name.trim().to_owned());
     put(general, "autoconnect", profile.autoconnect);
@@ -169,27 +170,21 @@ pub fn save(
         wireless::store(&mut settings, wireless, secret.as_deref());
     }
     connection
-        .call_with_flags::<_, _, ()>(
-            "Update",
-            MethodFlags::AllowInteractiveAuth.into(),
-            &(settings,),
-        )
-        .map_err(explain)?;
-    reapply::reapply(&path)
+        .call_with_flags::<_, _, ()>("Update", MethodFlags::ALLOW_INTERACTIVE_AUTH, &(settings,))
+        .await
+        .map_err(|error| explain(&error))?;
+    reapply::reapply(&path).await
 }
 
-pub fn secret(path: &str) -> Result<Option<String>, String> {
-    let connection = connection(path)?;
-    let settings = settings(&connection)?;
+pub async fn secret(path: &str) -> Result<Option<String>, String> {
+    let connection = connection(path).await?;
+    let settings = settings(&connection).await?;
     let Some((group, key)) = wireless::secret_key(&settings) else {
         return Ok(None);
     };
     let secrets: Option<Settings> = connection
-        .call_with_flags(
-            "GetSecrets",
-            MethodFlags::AllowInteractiveAuth.into(),
-            &(group,),
-        )
-        .map_err(explain)?;
+        .call_with_flags("GetSecrets", MethodFlags::ALLOW_INTERACTIVE_AUTH, &(group,))
+        .await
+        .map_err(|error| explain(&error))?;
     Ok(secrets.and_then(|secrets| get(&secrets, group, key)))
 }

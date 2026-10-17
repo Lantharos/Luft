@@ -32,19 +32,35 @@ impl Cancel {
         hook: impl Fn() + Send + 'static,
         run: impl FnOnce() -> T,
     ) -> Option<T> {
-        {
-            let mut state = self.lock();
-            if matches!(*state, State::Cancelled) {
-                return None;
-            }
-            *state = State::Running(Box::new(hook));
+        self.start(hook).then(|| self.finish(run()))
+    }
+
+    pub async fn while_awaiting<T>(
+        &self,
+        hook: impl Fn() + Send + 'static,
+        run: impl Future<Output = T>,
+    ) -> Option<T> {
+        if !self.start(hook) {
+            return None;
         }
-        let result = run();
+        Some(self.finish(run.await))
+    }
+
+    fn start(&self, hook: impl Fn() + Send + 'static) -> bool {
+        let mut state = self.lock();
+        if matches!(*state, State::Cancelled) {
+            return false;
+        }
+        *state = State::Running(Box::new(hook));
+        true
+    }
+
+    fn finish<T>(&self, result: T) -> T {
         let mut state = self.lock();
         if matches!(*state, State::Running(_)) {
             *state = State::Idle;
         }
-        Some(result)
+        result
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, State> {

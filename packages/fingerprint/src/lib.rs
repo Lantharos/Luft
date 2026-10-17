@@ -1,14 +1,14 @@
 use std::sync::{Mutex, OnceLock};
 
+use futures_util::StreamExt;
 use luft_app::dbus;
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::blocking::{MessageIterator, Proxy};
 use zbus::message::Type;
 use zbus::proxy::MethodFlags;
-use zbus::zvariant::OwnedObjectPath;
+use zbus::{DynamicType, MatchRule, MessageStream, OwnedObjectPath, Proxy};
 
 const PROGRESS: &str = "fingerprint.enroll";
 
@@ -40,11 +40,8 @@ struct Progress {
 static ENROLLING: Mutex<Option<Proxy<'static>>> = Mutex::new(None);
 static LISTENING: OnceLock<()> = OnceLock::new();
 
-fn explain(error: zbus::Error) -> String {
-    let name = match &error {
-        zbus::Error::MethodError(name, _, _) => name.as_str(),
-        _ => "",
-    };
+fn explain(error: &zbus::Error) -> String {
+    let name = dbus::error_name(error).unwrap_or_default();
     match name.rsplit('.').next() {
         Some("PermissionDenied") => "You don't have permission to change fingerprints",
         Some("AlreadyInUse") => "The fingerprint reader is busy",
@@ -54,111 +51,132 @@ fn explain(error: zbus::Error) -> String {
     .to_owned()
 }
 
-fn reader() -> Option<Proxy<'static>> {
-    let system = dbus::system().ok()?;
-    let manager = Proxy::new(system, SERVICE, MANAGER_PATH, MANAGER).ok()?;
-    let path: OwnedObjectPath = manager.call("GetDefaultDevice", &()).ok()?;
-    Proxy::new(system, SERVICE, path, DEVICE).ok()
+async fn manager() -> Option<Proxy<'static>> {
+    Proxy::new(dbus::system().await.ok()?, SERVICE, MANAGER_PATH, MANAGER)
+        .await
+        .ok()
 }
 
-pub fn reader_present() -> bool {
-    let Ok(system) = dbus::system() else {
+async fn reader() -> Option<Proxy<'static>> {
+    let path: OwnedObjectPath = manager().await?.call("GetDefaultDevice", &()).await.ok()?;
+    Proxy::new(dbus::system().await.ok()?, SERVICE, path, DEVICE)
+        .await
+        .ok()
+}
+
+pub async fn reader_present() -> bool {
+    let Some(manager) = manager().await else {
         return false;
     };
-    Proxy::new(system, SERVICE, MANAGER_PATH, MANAGER)
-        .and_then(|manager| manager.call::<_, _, Vec<OwnedObjectPath>>("GetDevices", &()))
+    manager
+        .call::<_, _, Vec<OwnedObjectPath>>("GetDevices", &())
+        .await
         .is_ok_and(|devices| !devices.is_empty())
 }
 
-fn call(
-    reader: &Proxy,
+async fn call(
+    reader: &Proxy<'_>,
     method: &str,
-    body: &(impl serde::Serialize + zbus::zvariant::DynamicType),
+    body: &(impl Serialize + DynamicType),
 ) -> Result<(), String> {
     reader
-        .call_with_flags::<_, _, ()>(method, MethodFlags::AllowInteractiveAuth.into(), body)
+        .call_with_flags::<_, _, ()>(method, MethodFlags::ALLOW_INTERACTIVE_AUTH, body)
+        .await
         .map(drop)
-        .map_err(explain)
+        .map_err(|error| explain(&error))
 }
 
-fn list() -> Option<Fingerprints> {
-    let reader = reader()?;
-    Some(Fingerprints {
-        swipe: reader.get_property::<String>("scan-type").ok().as_deref() == Some("swipe"),
-        stages: reader.get_property("num-enroll-stages").unwrap_or(0),
+async fn list(_: Value) -> Result<Option<Fingerprints>, String> {
+    let Some(reader) = reader().await else {
+        return Ok(None);
+    };
+    Ok(Some(Fingerprints {
+        swipe: reader
+            .get_property::<String>("scan-type")
+            .await
+            .ok()
+            .as_deref()
+            == Some("swipe"),
+        stages: reader.get_property("num-enroll-stages").await.unwrap_or(0),
         enrolled: reader
             .call("ListEnrolledFingers", &(CURRENT_USER,))
+            .await
             .unwrap_or_default(),
-    })
+    }))
 }
 
-fn delete(Finger { finger }: Finger) -> Result<(), String> {
-    let reader = reader().ok_or("There's no fingerprint reader")?;
-    call(&reader, "Claim", &(CURRENT_USER,))?;
-    let deleted = call(&reader, "DeleteEnrolledFinger", &(finger,));
-    let _ = reader.call_method("Release", &());
+async fn delete(Finger { finger }: Finger) -> Result<(), String> {
+    let reader = reader().await.ok_or("There's no fingerprint reader")?;
+    call(&reader, "Claim", &(CURRENT_USER,)).await?;
+    let deleted = call(&reader, "DeleteEnrolledFinger", &(finger,)).await;
+    let _ = reader.call_method("Release", &()).await;
     deleted
 }
 
-fn enroll(events: &Events, Finger { finger }: Finger) -> Result<(), String> {
-    LISTENING.get_or_init(|| listen(events.clone()));
-    let reader = reader().ok_or("There's no fingerprint reader")?;
-    call(&reader, "Claim", &(CURRENT_USER,))?;
-    if let Err(error) = call(&reader, "EnrollStart", &(finger,)) {
-        let _ = reader.call_method("Release", &());
+async fn enroll(events: Events, Finger { finger }: Finger) -> Result<(), String> {
+    LISTENING.get_or_init(|| {
+        luft_app::spawn(listen(events));
+    });
+    let reader = reader().await.ok_or("There's no fingerprint reader")?;
+    call(&reader, "Claim", &(CURRENT_USER,)).await?;
+    if let Err(error) = call(&reader, "EnrollStart", &(finger,)).await {
+        let _ = reader.call_method("Release", &()).await;
         return Err(error);
     }
     *ENROLLING.lock().unwrap() = Some(reader);
     Ok(())
 }
 
-fn stop() {
-    if let Some(reader) = ENROLLING.lock().unwrap().take() {
-        let _ = reader.call_method("EnrollStop", &());
-        let _ = reader.call_method("Release", &());
-    }
+async fn stop() {
+    let Some(reader) = ENROLLING.lock().unwrap().take() else {
+        return;
+    };
+    let _ = reader.call_method("EnrollStop", &()).await;
+    let _ = reader.call_method("Release", &()).await;
 }
 
-fn listen(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(system) = dbus::system() else {
-            return;
-        };
-        let Ok(rule) = zbus::MatchRule::builder()
-            .msg_type(Type::Signal)
-            .sender(SERVICE)
-            .and_then(|rule| rule.interface(DEVICE))
-            .and_then(|rule| rule.member("EnrollStatus"))
-            .map(|rule| rule.build())
+async fn listen(events: Events) {
+    let Ok(system) = dbus::system().await else {
+        return;
+    };
+    let Ok(rule) = MatchRule::builder()
+        .msg_type(Type::Signal)
+        .sender(SERVICE)
+        .interface(DEVICE)
+        .member("EnrollStatus")
+        .build()
+    else {
+        return;
+    };
+    let Ok(mut messages) = MessageStream::for_match_rule(rule, system, None).await else {
+        return;
+    };
+    while let Some(message) = messages.next().await {
+        let Ok((result, done)) =
+            message.and_then(|message| message.body().deserialize::<(String, bool)>())
         else {
-            return;
+            continue;
         };
-        let Ok(messages) = MessageIterator::for_match_rule(rule, system, None) else {
-            return;
-        };
-        for message in messages.flatten() {
-            let Ok((result, done)) = message.body().deserialize::<(String, bool)>() else {
-                continue;
-            };
-            if ENROLLING.lock().unwrap().is_none() {
-                continue;
-            }
-            events.emit(PROGRESS, Progress { result, done });
-            if done {
-                stop();
-            }
+        if ENROLLING.lock().unwrap().is_none() {
+            continue;
         }
-    });
+        events.emit(PROGRESS, Progress { result, done });
+        if done {
+            stop().await;
+        }
+    }
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .command("fingerprint_reader", |_: Value| Ok(reader_present()))
-        .command("fingerprint_list", |_: Value| Ok(list()))
-        .with("fingerprint_enroll", events, enroll)
-        .command("fingerprint_stop", |_: Value| {
-            stop();
+        .command_async("fingerprint_reader", |_: Value| async {
+            Ok(reader_present().await)
+        })
+        .command_async("fingerprint_list", list)
+        .with_async("fingerprint_enroll", events, enroll)
+        .command_async("fingerprint_stop", |_: Value| async {
+            stop().await;
             Ok(())
         })
-        .command("fingerprint_delete", delete)
+        .command_async("fingerprint_delete", delete)
 }

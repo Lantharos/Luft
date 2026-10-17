@@ -3,10 +3,10 @@ use std::os::unix::ffi::{OsStrExt, OsStringExt};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use zbus::blocking::{MessageIterator, Proxy};
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
+use futures_util::StreamExt;
+use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
-use crate::dbus;
+use crate::dbus::{self, failed};
 
 const PORTAL: &str = "org.freedesktop.portal.Desktop";
 const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
@@ -29,24 +29,20 @@ pub struct FileChooser<'a> {
     pub current_folder: Option<&'a Path>,
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
 impl FileChooser<'_> {
-    pub fn open(&self) -> Result<Vec<String>, String> {
-        self.request("OpenFile")
+    pub async fn open(&self) -> Result<Vec<String>, String> {
+        self.request("OpenFile").await
     }
 
-    pub fn save(&self) -> Result<Option<String>, String> {
-        Ok(self.request("SaveFile")?.into_iter().next())
+    pub async fn save(&self) -> Result<Option<String>, String> {
+        Ok(self.request("SaveFile").await?.into_iter().next())
     }
 
-    fn options(&self, token: &str) -> HashMap<&'static str, Value<'_>> {
+    fn options(&self, token: &str) -> HashMap<&'static str, Variant<'_>> {
         let mut options = HashMap::new();
-        options.insert("handle_token", Value::from(token.to_owned()));
-        options.insert("multiple", Value::from(self.multiple));
-        options.insert("directory", Value::from(self.directory));
+        options.insert("handle_token", Variant::from(token.to_owned()));
+        options.insert("multiple", Variant::from(self.multiple));
+        options.insert("directory", Variant::from(self.directory));
         if !self.filters.is_empty() {
             let filters: Vec<(&str, Vec<(u32, String)>)> = self
                 .filters
@@ -60,27 +56,28 @@ impl FileChooser<'_> {
                     (filter.name, patterns)
                 })
                 .collect();
-            options.insert("filters", Value::from(filters));
+            options.insert("filters", Variant::from(filters));
         }
         if let Some(name) = self.current_name {
-            options.insert("current_name", Value::from(name));
+            options.insert("current_name", Variant::from(name));
         }
         if let Some(folder) = self.current_folder {
             let mut bytes = folder.as_os_str().as_bytes().to_vec();
             bytes.push(0);
-            options.insert("current_folder", Value::from(bytes));
+            options.insert("current_folder", Variant::from(bytes));
         }
         options
     }
 
-    fn request(&self, method: &str) -> Result<Vec<String>, String> {
-        let connection = dbus::session()?;
+    async fn request(&self, method: &str) -> Result<Vec<String>, String> {
+        let connection = dbus::session().await?;
         let chooser = Proxy::new(
             connection,
             PORTAL,
             PORTAL_PATH,
             "org.freedesktop.portal.FileChooser",
         )
+        .await
         .map_err(failed)?;
         let token = format!(
             "luft{}_{}",
@@ -96,22 +93,23 @@ impl FileChooser<'_> {
         let rule = zbus::MatchRule::builder()
             .msg_type(zbus::message::Type::Signal)
             .interface("org.freedesktop.portal.Request")
-            .map_err(failed)?
             .member("Response")
-            .map_err(failed)?
             .path(handle.as_str())
-            .map_err(failed)?
-            .build();
-        let mut responses =
-            MessageIterator::for_match_rule(rule, connection, None).map_err(failed)?;
+            .build()
+            .map_err(failed)?;
+        let mut responses = MessageStream::for_match_rule(rule, connection, None)
+            .await
+            .map_err(failed)?;
         let _: OwnedObjectPath = chooser
             .call(method, &("", self.title, self.options(&token)))
+            .await
             .map_err(failed)?;
         let message = responses
             .next()
+            .await
             .ok_or("The file chooser closed")?
             .map_err(failed)?;
-        let (response, results): (u32, HashMap<String, OwnedValue>) =
+        let (response, results): (u32, HashMap<String, OwnedVariant>) =
             message.body().deserialize().map_err(failed)?;
         if response != 0 {
             return Ok(Vec::new());
@@ -126,18 +124,19 @@ impl FileChooser<'_> {
     }
 }
 
-pub fn open_file(title: &str, filter: Filter) -> Result<Option<String>, String> {
+pub async fn open_file(title: &str, filter: Filter<'_>) -> Result<Option<String>, String> {
     Ok(FileChooser {
         title,
         filters: vec![filter],
         ..FileChooser::default()
     }
-    .open()?
+    .open()
+    .await?
     .into_iter()
     .next())
 }
 
-pub fn open_files(title: &str, filter: Filter) -> Result<Vec<String>, String> {
+pub async fn open_files(title: &str, filter: Filter<'_>) -> Result<Vec<String>, String> {
     FileChooser {
         title,
         filters: vec![filter],
@@ -145,6 +144,7 @@ pub fn open_files(title: &str, filter: Filter) -> Result<Vec<String>, String> {
         ..FileChooser::default()
     }
     .open()
+    .await
 }
 
 pub fn path_uri(path: &Path) -> String {

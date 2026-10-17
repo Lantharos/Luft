@@ -65,8 +65,8 @@ pub struct System {
     pub folder: Option<String>,
 }
 
-pub fn find() -> Result<Vec<System>, String> {
-    let facts = Facts::gather();
-    let snapshot = snapshot::build(&udisks::objects()?);
+pub async fn find() -> Result<Vec<System>, String> {
+    let facts = Facts::gather().await;
+    let snapshot = snapshot::build(&udisks::objects().await?);
     Ok(detect::systems(&snapshot, &facts))
 }

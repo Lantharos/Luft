@@ -1,64 +1,56 @@
 pub mod objects;
 pub mod service;
 
-use std::sync::{LazyLock, OnceLock};
+use tokio::sync::OnceCell;
+use zbus::connection::Builder;
+use zbus::{Connection, DBusError};
 
-use tokio::runtime::Runtime;
-use zbus::blocking::Connection;
+static SYSTEM: OnceCell<Connection> = OnceCell::const_new();
+static SESSION: OnceCell<Connection> = OnceCell::const_new();
 
-static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
-    tokio::runtime::Builder::new_multi_thread()
-        .worker_threads(1)
-        .thread_name("dbus")
-        .enable_all()
-        .build()
-        .expect("the D-Bus runtime starts")
-});
-static SYSTEM: OnceLock<Connection> = OnceLock::new();
-static SESSION: OnceLock<Connection> = OnceLock::new();
+pub fn failed(error: impl std::fmt::Display) -> String {
+    error.to_string()
+}
 
-fn cached(
-    slot: &'static OnceLock<Connection>,
-    connect: impl Future<Output = zbus::Result<zbus::Connection>>,
-) -> Result<&'static Connection, String> {
-    if let Some(connection) = slot.get() {
-        return Ok(connection);
+/// The name of the D-Bus error a call was answered with, such as
+/// `org.freedesktop.DBus.Error.AccessDenied`.
+pub fn error_name(error: &zbus::Error) -> Option<String> {
+    match error {
+        zbus::Error::MethodError(name, _, _) => Some(name.to_string()),
+        zbus::Error::FDO(error) => Some(error.name().to_string()),
+        _ => None,
     }
-    let _context = RUNTIME.enter();
-    let connection = Connection::from(
-        RUNTIME
-            .block_on(connect)
-            .map_err(|error| error.to_string())?,
-    );
-    connection.object_server();
-    Ok(slot.get_or_init(|| connection))
 }
 
-pub fn system() -> Result<&'static Connection, String> {
-    cached(&SYSTEM, zbus::Connection::system())
+/// The message of the D-Bus error a call was answered with.
+pub fn error_message(error: &zbus::Error) -> Option<&str> {
+    match error {
+        zbus::Error::MethodError(_, message, _) => message.as_deref(),
+        zbus::Error::FDO(error) => error.description(),
+        _ => None,
+    }
 }
 
-pub fn session() -> Result<&'static Connection, String> {
-    cached(&SESSION, zbus::Connection::session())
+/// What went wrong with a call: the message of the D-Bus error it was
+/// answered with, or the error itself.
+pub fn explain(error: &zbus::Error) -> String {
+    error_message(error).map_or_else(|| error.to_string(), str::to_owned)
 }
 
-fn build(builder: zbus::connection::Builder<'_>) -> Result<Connection, String> {
-    RUNTIME
-        .block_on(builder.build())
-        .map(Connection::from)
-        .map_err(|error| error.to_string())
+/// The system bus, connected once per process on the Tokio runtime that
+/// first asks for it.
+pub async fn system() -> Result<&'static Connection, String> {
+    SYSTEM
+        .get_or_try_init(|| async { Connection::system().await.map_err(failed) })
+        .await
 }
 
-fn address(address: &str) -> Result<zbus::connection::Builder<'_>, String> {
-    zbus::connection::Builder::address(address).map_err(|error| error.to_string())
+pub async fn session() -> Result<&'static Connection, String> {
+    SESSION
+        .get_or_try_init(|| async { Connection::session().await.map_err(failed) })
+        .await
 }
 
-pub fn at(address: &str) -> Result<Connection, String> {
-    let _context = RUNTIME.enter();
-    build(self::address(address)?)
-}
-
-pub fn peer(address: &str) -> Result<Connection, String> {
-    let _context = RUNTIME.enter();
-    build(self::address(address)?.p2p())
+pub async fn at(address: &str) -> Result<Connection, String> {
+    Builder::address(address).build().await.map_err(failed)
 }

@@ -12,7 +12,7 @@ use host::{Deployment, Host, Reference};
 use registry::Image;
 
 pub use config::Release;
-pub use updater::{download, downloading, follow, rollback, switch, watch};
+pub use updater::{changes, download, downloading, follow, rollback, switch};
 
 const NOT_FROM_AN_IMAGE: &str = "This system doesn't get its updates from an image.";
 
@@ -37,8 +37,8 @@ pub struct Update {
 pub struct Deployments(Host);
 
 impl Deployments {
-    pub fn load() -> Result<Self, String> {
-        Host::parse(&updater::status()?).map(Self)
+    pub async fn load() -> Result<Self, String> {
+        Host::parse(&updater::status().await?).map(Self)
     }
 
     fn all(&self) -> impl Iterator<Item = &Deployment> {

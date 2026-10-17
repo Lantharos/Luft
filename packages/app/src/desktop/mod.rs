@@ -1,46 +1,46 @@
 pub mod palette;
 pub mod typography;
 
-use zbus::blocking::Proxy;
-use zbus::zvariant::OwnedValue;
+use futures_util::StreamExt;
+use zbus::{OwnedVariant, Proxy};
 
 use crate::bridge::events::Events;
 use crate::dbus;
 
-fn proxy() -> Result<Proxy<'static>, String> {
+async fn proxy() -> Result<Proxy<'static>, String> {
     Proxy::new(
-        dbus::session()?,
+        dbus::session().await?,
         "org.freedesktop.portal.Desktop",
         "/org/freedesktop/portal/desktop",
         "org.freedesktop.portal.Settings",
     )
-    .map_err(|error| error.to_string())
+    .await
+    .map_err(dbus::failed)
 }
 
-fn read(proxy: &Proxy, namespace: &str, key: &str) -> Option<OwnedValue> {
-    proxy.call("ReadOne", &(namespace, key)).ok()
+async fn read(proxy: &Proxy<'_>, namespace: &str, key: &str) -> Option<OwnedVariant> {
+    proxy.call("ReadOne", &(namespace, key)).await.ok()
 }
 
-pub fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let Ok(proxy) = proxy() else {
-            return;
+pub async fn watch(events: Events) {
+    let Ok(proxy) = proxy().await else {
+        return;
+    };
+    let Ok(mut signals) = proxy.receive_signal("SettingChanged").await else {
+        return;
+    };
+    while let Some(signal) = signals.next().await {
+        let Ok((namespace, key, _)) = signal
+            .body()
+            .deserialize::<(String, String, OwnedVariant)>()
+        else {
+            continue;
         };
-        let Ok(signals) = proxy.receive_signal("SettingChanged") else {
-            return;
-        };
-        for signal in signals {
-            let Ok((namespace, key, _)) =
-                signal.body().deserialize::<(String, String, OwnedValue)>()
-            else {
-                continue;
-            };
-            if typography::changed(&namespace, &key) {
-                events.emit(
-                    typography::TYPOGRAPHY_CHANGED,
-                    typography::Typography::read(&proxy),
-                );
-            }
+        if typography::changed(&namespace, &key) {
+            events.emit(
+                typography::TYPOGRAPHY_CHANGED,
+                typography::Typography::read(&proxy).await,
+            );
         }
-    });
+    }
 }

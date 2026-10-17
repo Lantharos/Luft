@@ -40,7 +40,7 @@ impl Contents {
         }
     }
 
-    pub fn mode(&self, growing: bool) -> Result<Mode, String> {
+    pub async fn mode(&self, growing: bool) -> Result<Mode, String> {
         let Some(kind) = &self.filesystem else {
             return if self.usage.is_empty() {
                 Ok(Mode::InPlace)
@@ -48,7 +48,8 @@ impl Contents {
                 Err("Disks can only resize partitions that hold a file system it knows".to_owned())
             };
         };
-        let (_, flags, _) = udisks::manager::<(bool, u64, String)>("CanResize", &(kind.as_str(),))?;
+        let (_, flags, _) =
+            udisks::manager::<(bool, u64, String)>("CanResize", &(kind.as_str(),)).await?;
         let (online, offline) = if growing {
             (ONLINE_GROW, OFFLINE_GROW)
         } else {
@@ -64,11 +65,12 @@ impl Contents {
         }
     }
 
-    fn prepare(&self, block: &str, mode: Mode) -> Result<(), String> {
+    async fn prepare(&self, block: &str, mode: Mode) -> Result<(), String> {
         let offline = mode == Mode::Unmounted || (mode == Mode::InPlace && !self.mounted);
         match &self.filesystem {
             Some(kind) if offline && CHECKED_FIRST.contains(&kind.as_str()) => {
-                let repaired: bool = udisks::call(block, FILESYSTEM, "Repair", &(no_options(),))?;
+                let repaired: bool =
+                    udisks::call(block, FILESYSTEM, "Repair", &(no_options(),)).await?;
                 if repaired {
                     Ok(())
                 } else {
@@ -80,8 +82,8 @@ impl Contents {
     }
 }
 
-pub fn resize(block: &str, size: u64, may_unmount: bool) -> Result<(), String> {
-    let objects = udisks::objects()?;
+pub async fn resize(block: &str, size: u64, may_unmount: bool) -> Result<(), String> {
+    let objects = udisks::objects().await?;
     let current = objects
         .get(block, PARTITION)
         .and_then(|partition| partition.get::<u64>("Size"))
@@ -91,36 +93,37 @@ pub fn resize(block: &str, size: u64, may_unmount: bool) -> Result<(), String> {
     }
     let growing = size > current;
     let contents = Contents::read(&objects, block);
-    let mode = contents.mode(growing)?;
+    let mode = contents.mode(growing).await?;
     if mode == Mode::Unmounted && !may_unmount {
         return Err("It has to be unmounted to resize, and the system is using it".to_owned());
     }
     match mode {
-        Mode::Unmounted => mounting::unmount(block)?,
+        Mode::Unmounted => mounting::unmount(block).await?,
         Mode::Mounted => {
-            mounting::mount(block)?;
+            mounting::mount(block).await?;
         }
         Mode::InPlace => {}
     }
-    let resized = contents
-        .prepare(block, mode)
-        .and_then(|()| resize_in_order(block, size, growing, contents.filesystem.is_some()));
+    let resized = match contents.prepare(block, mode).await {
+        Ok(()) => resize_in_order(block, size, growing, contents.filesystem.is_some()).await,
+        Err(error) => Err(error),
+    };
     let restored = match mode {
-        Mode::Unmounted => mounting::mount(block).map(drop),
-        Mode::Mounted => mounting::unmount(block),
+        Mode::Unmounted => mounting::mount(block).await.map(drop),
+        Mode::Mounted => mounting::unmount(block).await,
         Mode::InPlace => Ok(()),
     };
     resized.and(restored)
 }
 
-fn resize_in_order(
+async fn resize_in_order(
     block: &str,
     size: u64,
     growing: bool,
     has_filesystem: bool,
 ) -> Result<(), String> {
     if growing {
-        udisks::run(block, PARTITION, "Resize", &(size, no_options()))?;
+        udisks::run(block, PARTITION, "Resize", &(size, no_options())).await?;
     }
     if has_filesystem {
         udisks::run(
@@ -128,10 +131,11 @@ fn resize_in_order(
             FILESYSTEM,
             "Resize",
             &(if growing { 0 } else { size }, no_options()),
-        )?;
+        )
+        .await?;
     }
     if !growing {
-        udisks::run(block, PARTITION, "Resize", &(size, no_options()))?;
+        udisks::run(block, PARTITION, "Resize", &(size, no_options())).await?;
     }
     Ok(())
 }

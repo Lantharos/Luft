@@ -10,9 +10,10 @@ pub struct PackageUpdates {
 }
 
 impl PackageUpdates {
-    pub fn load(mode: Mode) -> Result<Self, String> {
+    pub async fn load(mode: Mode) -> Result<Self, String> {
         let classification = Classification::current();
-        let (apps, system) = packagekit::updates(mode)?
+        let (apps, system) = packagekit::updates(mode)
+            .await?
             .into_iter()
             .partition(|update| classification.is_app(&update.package.name));
         Ok(Self { system, apps })

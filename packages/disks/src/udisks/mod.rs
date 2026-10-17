@@ -5,8 +5,10 @@ pub mod volumes;
 
 use std::collections::HashMap;
 
-use luft_dbus::objects::{Objects, failed};
-use zbus::zvariant::{DynamicDeserialize, DynamicType, OwnedObjectPath, Value};
+use luft_dbus::objects::Objects;
+use luft_dbus::{error_name, failed};
+use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedObjectPath, Variant};
 
 pub const SERVICE: &str = "org.freedesktop.UDisks2";
 pub const ROOT: &str = "/org/freedesktop/UDisks2";
@@ -28,13 +30,13 @@ const MANAGER_INTERFACE: &str = "org.freedesktop.UDisks2.Manager";
 pub const CANCELLED: &str = "cancelled";
 const DISMISSED: &str = "org.freedesktop.UDisks2.Error.NotAuthorizedDismissed";
 
-pub type Options<'a> = HashMap<&'static str, Value<'a>>;
+pub type Options<'a> = HashMap<&'static str, Variant<'a>>;
 
-pub fn objects() -> Result<Objects, String> {
-    Objects::fetch(luft_dbus::system()?, SERVICE, ROOT)
+pub async fn objects() -> Result<Objects, String> {
+    Objects::fetch(luft_dbus::system().await?, SERVICE, ROOT).await
 }
 
-pub fn call<R>(
+pub async fn call<R>(
     path: &str,
     interface: &str,
     method: &str,
@@ -43,47 +45,53 @@ pub fn call<R>(
 where
     R: for<'a> DynamicDeserialize<'a>,
 {
-    let reply = luft_dbus::system()?
+    let reply = luft_dbus::system()
+        .await?
         .call_method(Some(SERVICE), path, Some(interface), method, body)
-        .map_err(explain)?;
+        .await
+        .map_err(|error| explain(&error))?;
     reply.body().deserialize::<R>().map_err(failed)
 }
 
-pub fn run(
+pub async fn run(
     path: &str,
     interface: &str,
     method: &str,
     body: &(impl serde::Serialize + DynamicType),
 ) -> Result<(), String> {
-    call::<()>(path, interface, method, body)
+    call::<()>(path, interface, method, body).await
 }
 
-pub fn created(
+pub async fn created(
     path: &str,
     interface: &str,
     method: &str,
     body: &(impl serde::Serialize + DynamicType),
 ) -> Result<String, String> {
-    call::<OwnedObjectPath>(path, interface, method, body).map(|path| path.to_string())
+    call::<OwnedObjectPath>(path, interface, method, body)
+        .await
+        .map(|path| path.to_string())
 }
 
-pub fn manager<R>(method: &str, body: &(impl serde::Serialize + DynamicType)) -> Result<R, String>
+pub async fn manager<R>(
+    method: &str,
+    body: &(impl serde::Serialize + DynamicType),
+) -> Result<R, String>
 where
     R: for<'a> DynamicDeserialize<'a>,
 {
-    call(MANAGER, MANAGER_INTERFACE, method, body)
+    call(MANAGER, MANAGER_INTERFACE, method, body).await
 }
 
 pub fn no_options() -> Options<'static> {
     HashMap::new()
 }
 
-fn explain(error: zbus::Error) -> String {
-    match &error {
-        zbus::Error::MethodError(name, _, _) if name.as_str() == DISMISSED => CANCELLED.to_owned(),
-        zbus::Error::MethodError(_, Some(message), _) => message.clone(),
-        _ => error.to_string(),
+fn explain(error: &zbus::Error) -> String {
+    if error_name(error).as_deref() == Some(DISMISSED) {
+        return CANCELLED.to_owned();
     }
+    luft_dbus::explain(error)
 }
 
 pub fn bytes_text(bytes: Vec<u8>) -> String {

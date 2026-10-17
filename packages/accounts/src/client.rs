@@ -1,10 +1,11 @@
 use std::collections::BTreeMap;
 
-use luft_dbus::session;
+use futures_util::{Stream, StreamExt};
+use luft_dbus::{explain, objects, session};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
-use zbus::blocking::{MessageIterator, Proxy};
-use zbus::message::Type as MessageType;
+use zbus::proxy::{Builder, CacheProperties};
+use zbus::{DynamicType, Proxy, Type};
 
 use crate::types::{Account, Answer, Credentials, Drive, FileState, Provider, Step};
 
@@ -19,37 +20,35 @@ pub enum Signal {
     Step { session: String, step: Step },
 }
 
-fn explain(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(_, Some(message), _) => message,
-        error => error.to_string(),
-    }
-}
-
-fn proxy(interface: &'static str) -> Result<Proxy<'static>, String> {
-    zbus::blocking::proxy::Builder::new(session()?)
+async fn proxy(interface: &'static str) -> Result<Proxy<'static>, String> {
+    Builder::new(session().await?)
         .destination(NAME)
-        .and_then(|builder| builder.path(PATH))
-        .and_then(|builder| builder.interface(interface))
-        .map(|builder| builder.cache_properties(zbus::proxy::CacheProperties::No))
-        .and_then(|builder| builder.build())
-        .map_err(explain)
+        .path(PATH)
+        .interface(interface)
+        .cache_properties(CacheProperties::No)
+        .build()
+        .await
+        .map_err(|error| explain(&error))
 }
 
-fn call<B, R>(interface: &'static str, method: &str, body: &B) -> Result<R, String>
+async fn call<B, R>(interface: &'static str, method: &str, body: &B) -> Result<R, String>
 where
-    B: Serialize + zbus::zvariant::DynamicType,
-    R: DeserializeOwned + zbus::zvariant::Type,
+    B: Serialize + DynamicType,
+    R: DeserializeOwned + Type,
 {
-    proxy(interface)?.call(method, body).map_err(explain)
+    proxy(interface)
+        .await?
+        .call(method, body)
+        .await
+        .map_err(|error| explain(&error))
 }
 
-fn call_json<B, R>(interface: &'static str, method: &str, body: &B) -> Result<R, String>
+async fn call_json<B, R>(interface: &'static str, method: &str, body: &B) -> Result<R, String>
 where
-    B: Serialize + zbus::zvariant::DynamicType,
+    B: Serialize + DynamicType,
     R: DeserializeOwned,
 {
-    let text: String = call(interface, method, body)?;
+    let text: String = call(interface, method, body).await?;
     serde_json::from_str(&text).map_err(|error| error.to_string())
 }
 
@@ -57,96 +56,87 @@ fn json(value: &impl Serialize) -> String {
     serde_json::to_string(value).expect("requests always serialize")
 }
 
-pub fn accounts() -> Result<Vec<Account>, String> {
-    call_json(ACCOUNTS, "Accounts", &())
+pub async fn accounts() -> Result<Vec<Account>, String> {
+    call_json(ACCOUNTS, "Accounts", &()).await
 }
 
-pub fn sign_in(provider: Provider, credentials: &Credentials) -> Result<String, String> {
+pub async fn sign_in(provider: Provider, credentials: &Credentials) -> Result<String, String> {
     let provider = json(&provider);
-    call(ACCOUNTS, "SignIn", &(provider.trim_matches('"'), json(credentials)))
+    call(
+        ACCOUNTS,
+        "SignIn",
+        &(provider.trim_matches('"'), json(credentials)),
+    )
+    .await
 }
 
-pub fn sign_in_again(account: &str, credentials: &Credentials) -> Result<String, String> {
-    call(ACCOUNTS, "SignInAgain", &(account, json(credentials)))
+pub async fn sign_in_again(account: &str, credentials: &Credentials) -> Result<String, String> {
+    call(ACCOUNTS, "SignInAgain", &(account, json(credentials))).await
 }
 
-pub fn step(session: &str) -> Result<Step, String> {
-    call_json(ACCOUNTS, "Step", &(session,))
+pub async fn step(session: &str) -> Result<Step, String> {
+    call_json(ACCOUNTS, "Step", &(session,)).await
 }
 
-pub fn answer(session: &str, answer: &Answer) -> Result<(), String> {
-    call(ACCOUNTS, "Answer", &(session, json(answer)))
+pub async fn answer(session: &str, answer: &Answer) -> Result<(), String> {
+    call(ACCOUNTS, "Answer", &(session, json(answer))).await
 }
 
-pub fn cancel(session: &str) -> Result<(), String> {
-    call(ACCOUNTS, "Cancel", &(session,))
+pub async fn cancel(session: &str) -> Result<(), String> {
+    call(ACCOUNTS, "Cancel", &(session,)).await
 }
 
-pub fn rename(account: &str, name: &str) -> Result<(), String> {
-    call(ACCOUNTS, "Rename", &(account, name))
+pub async fn rename(account: &str, name: &str) -> Result<(), String> {
+    call(ACCOUNTS, "Rename", &(account, name)).await
 }
 
-pub fn remove(account: &str) -> Result<(), String> {
-    call(ACCOUNTS, "Remove", &(account,))
+pub async fn remove(account: &str) -> Result<(), String> {
+    call(ACCOUNTS, "Remove", &(account,)).await
 }
 
-pub fn drives() -> Result<Vec<Drive>, String> {
-    call_json(FILES, "Drives", &())
+pub async fn drives() -> Result<Vec<Drive>, String> {
+    call_json(FILES, "Drives", &()).await
 }
 
-pub fn states(folder: &str) -> Result<BTreeMap<String, FileState>, String> {
-    call_json(FILES, "States", &(folder,))
+pub async fn states(folder: &str) -> Result<BTreeMap<String, FileState>, String> {
+    call_json(FILES, "States", &(folder,)).await
 }
 
-pub fn keep(paths: &[String]) -> Result<(), String> {
-    call(FILES, "Keep", &(paths,))
+pub async fn keep(paths: &[String]) -> Result<(), String> {
+    call(FILES, "Keep", &(paths,)).await
 }
 
-pub fn free(paths: &[String]) -> Result<(), String> {
-    call(FILES, "Free", &(paths,))
+pub async fn free(paths: &[String]) -> Result<(), String> {
+    call(FILES, "Free", &(paths,)).await
 }
 
-pub fn share_link(path: &str) -> Result<String, String> {
-    call(FILES, "ShareLink", &(path,))
+pub async fn share_link(path: &str) -> Result<String, String> {
+    call(FILES, "ShareLink", &(path,)).await
 }
 
-pub fn web_address(path: &str) -> Result<String, String> {
-    call(FILES, "WebAddress", &(path,))
+pub async fn web_address(path: &str) -> Result<String, String> {
+    call(FILES, "WebAddress", &(path,)).await
 }
 
-pub fn dismiss_conflict(account: &str, copy: &str) -> Result<(), String> {
-    call(FILES, "DismissConflict", &(account, copy))
+pub async fn dismiss_conflict(account: &str, copy: &str) -> Result<(), String> {
+    call(FILES, "DismissConflict", &(account, copy)).await
 }
 
-pub fn watch(mut receive: impl FnMut(Signal) + Send + 'static) {
-    std::thread::spawn(move || {
-        let Ok(session) = session() else { return };
-        let Ok(rule) = zbus::MatchRule::builder()
-            .msg_type(MessageType::Signal)
-            .sender(NAME)
-            .and_then(|rule| rule.path(PATH))
-            .map(|rule| rule.build())
-        else {
-            return;
-        };
-        let Ok(messages) = MessageIterator::for_match_rule(rule, session, None) else {
-            return;
-        };
-        for message in messages.flatten() {
-            let header = message.header();
-            let signal = match header.member().map(|member| member.as_str()) {
-                Some("Changed") => Signal::Accounts,
-                Some("DrivesChanged") => Signal::Drives,
-                Some("SignInStep") => {
-                    let Ok((session, step)) = message.body().deserialize::<(String, String)>() else {
-                        continue;
-                    };
-                    let Ok(step) = serde_json::from_str(&step) else { continue };
-                    Signal::Step { session, step }
-                }
-                _ => continue,
-            };
-            receive(signal);
+/// The service's signals, as they arrive. Ends when the session bus goes.
+pub async fn signals() -> Result<impl Stream<Item = Signal>, String> {
+    let messages = objects::signals(session().await?, NAME, PATH).await?;
+    Ok(messages.filter_map(|message| async move {
+        let message = message.ok()?;
+        let header = message.header();
+        match header.member().map(|member| member.as_str()) {
+            Some("Changed") => Some(Signal::Accounts),
+            Some("DrivesChanged") => Some(Signal::Drives),
+            Some("SignInStep") => {
+                let (session, step) = message.body().deserialize::<(String, String)>().ok()?;
+                let step = serde_json::from_str(&step).ok()?;
+                Some(Signal::Step { session, step })
+            }
+            _ => None,
         }
-    });
+    }))
 }

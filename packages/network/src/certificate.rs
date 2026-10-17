@@ -10,7 +10,7 @@ pub enum Purpose {
     Key,
 }
 
-pub fn choose(purpose: Purpose) -> Result<Option<String>, String> {
+pub async fn choose(purpose: Purpose) -> Result<Option<String>, String> {
     let (title, name, extensions): (&str, &str, &[&str]) = match purpose {
         Purpose::Authority => (
             "Choose a CA Certificate",
@@ -35,7 +35,7 @@ pub fn choose(purpose: Purpose) -> Result<Option<String>, String> {
             .map(|extension| format!("*.{extension}"))
             .collect(),
     };
-    let Some(uri) = portal::open_file(title, filter)? else {
+    let Some(uri) = portal::open_file(title, filter).await? else {
         return Ok(None);
     };
     let path = gio::File::for_uri(&uri)

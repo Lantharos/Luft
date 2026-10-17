@@ -7,7 +7,7 @@ mod transaction;
 use std::collections::HashMap;
 
 use serde::Serialize;
-use zbus::zvariant::OwnedValue;
+use zbus::OwnedVariant;
 
 use crate::task::Task;
 use enums::{flag, info};
@@ -50,7 +50,7 @@ fn text(details: &Details, key: &str) -> String {
 fn number(details: &Details, key: &str) -> u64 {
     details
         .get(key)
-        .and_then(|value: &OwnedValue| u64::try_from(value).ok())
+        .and_then(|value: &OwnedVariant| u64::try_from(value).ok())
         .unwrap_or(0)
 }
 
@@ -58,12 +58,15 @@ fn ids(packages: &[PackageId]) -> Vec<&str> {
     packages.iter().map(|package| package.id.as_str()).collect()
 }
 
-pub fn refresh(force: bool, mode: Mode, task: Option<Task>) -> Result<(), String> {
-    transaction::run("RefreshCache", &(force,), mode, task).map(|_| ())
+pub async fn refresh(force: bool, mode: Mode, task: Option<Task<'_>>) -> Result<(), String> {
+    transaction::run("RefreshCache", &(force,), mode, task)
+        .await
+        .map(drop)
 }
 
-pub fn updates(mode: Mode) -> Result<Vec<Update>, String> {
-    let packages: Vec<Package> = transaction::run("GetUpdates", &(filter::NONE,), mode, None)?
+pub async fn updates(mode: Mode) -> Result<Vec<Update>, String> {
+    let packages: Vec<Package> = transaction::run("GetUpdates", &(filter::NONE,), mode, None)
+        .await?
         .packages
         .into_iter()
         .filter(|package| package.info != info::BLOCKED)
@@ -72,7 +75,8 @@ pub fn updates(mode: Mode) -> Result<Vec<Update>, String> {
         return Ok(Vec::new());
     }
     let ids: Vec<PackageId> = packages.iter().map(|package| package.id.clone()).collect();
-    let sizes: HashMap<String, u64> = details(&ids, mode)?
+    let sizes: HashMap<String, u64> = details(&ids, mode)
+        .await?
         .into_iter()
         .map(|details| (details.package.id, details.download_size))
         .collect();
@@ -80,7 +84,8 @@ pub fn updates(mode: Mode) -> Result<Vec<Update>, String> {
         .iter()
         .map(|package| package.id.name.as_str())
         .collect();
-    let installed: HashMap<(String, String), String> = resolve(&names, filter::INSTALLED, mode)?
+    let installed: HashMap<(String, String), String> = resolve(&names, filter::INSTALLED, mode)
+        .await?
         .into_iter()
         .map(|package| ((package.id.name, package.id.arch), package.id.version))
         .collect();
@@ -98,27 +103,30 @@ pub fn updates(mode: Mode) -> Result<Vec<Update>, String> {
         .collect())
 }
 
-pub fn resolve(names: &[&str], filter: u64, mode: Mode) -> Result<Vec<Package>, String> {
+pub async fn resolve(names: &[&str], filter: u64, mode: Mode) -> Result<Vec<Package>, String> {
     if names.is_empty() {
         return Ok(Vec::new());
     }
-    Ok(transaction::run("Resolve", &(filter, names), mode, None)?.packages)
+    Ok(transaction::run("Resolve", &(filter, names), mode, None)
+        .await?
+        .packages)
 }
 
-pub fn resolve_available(name: &str) -> Result<Option<PackageId>, String> {
+pub async fn resolve_available(name: &str) -> Result<Option<PackageId>, String> {
     let available = resolve(
         &[name],
         filter::NOT_INSTALLED | filter::NEWEST | filter::ARCH,
         Mode::Quiet,
-    )?;
+    )
+    .await?;
     Ok(available.into_iter().next().map(|package| package.id))
 }
 
-pub fn details(packages: &[PackageId], mode: Mode) -> Result<Vec<PackageDetails>, String> {
+pub async fn details(packages: &[PackageId], mode: Mode) -> Result<Vec<PackageDetails>, String> {
     if packages.is_empty() {
         return Ok(Vec::new());
     }
-    let outcome = transaction::run("GetDetails", &(ids(packages),), mode, None)?;
+    let outcome = transaction::run("GetDetails", &(ids(packages),), mode, None).await?;
     Ok(outcome.details.iter().filter_map(read_details).collect())
 }
 
@@ -134,33 +142,36 @@ fn read_details(details: &Details) -> Option<PackageDetails> {
     })
 }
 
-pub fn install(packages: &[PackageId], task: Task) -> Result<(), String> {
+pub async fn install(packages: &[PackageId], task: Task<'_>) -> Result<(), String> {
     transaction::run(
         "InstallPackages",
         &(flag::ONLY_TRUSTED, ids(packages)),
         Mode::Interactive,
         Some(task),
     )
-    .map(|_| ())
+    .await
+    .map(drop)
 }
 
-pub fn install_file(path: &str, task: Task) -> Result<(), String> {
+pub async fn install_file(path: &str, task: Task<'_>) -> Result<(), String> {
     transaction::run(
         "InstallFiles",
         &(flag::NONE, vec![path]),
         Mode::Interactive,
         Some(task),
     )
-    .map(|_| ())
+    .await
+    .map(drop)
 }
 
-pub fn removal_plan(packages: &[PackageId]) -> Result<Vec<PackageId>, String> {
+pub async fn removal_plan(packages: &[PackageId]) -> Result<Vec<PackageId>, String> {
     let outcome = transaction::run(
         "RemovePackages",
         &(flag::SIMULATE, ids(packages), true, false),
         Mode::Quiet,
         None,
-    )?;
+    )
+    .await?;
     Ok(outcome
         .packages
         .into_iter()
@@ -169,32 +180,35 @@ pub fn removal_plan(packages: &[PackageId]) -> Result<Vec<PackageId>, String> {
         .collect())
 }
 
-pub fn remove(packages: &[PackageId], task: Task) -> Result<(), String> {
+pub async fn remove(packages: &[PackageId], task: Task<'_>) -> Result<(), String> {
     transaction::run(
         "RemovePackages",
         &(flag::NONE, ids(packages), true, false),
         Mode::Interactive,
         Some(task),
     )
-    .map(|_| ())
+    .await
+    .map(drop)
 }
 
-pub fn update(packages: &[PackageId], task: Task) -> Result<(), String> {
+pub async fn update(packages: &[PackageId], task: Task<'_>) -> Result<(), String> {
     transaction::run(
         "UpdatePackages",
         &(flag::ONLY_TRUSTED, ids(packages)),
         Mode::Interactive,
         Some(task),
     )
-    .map(|_| ())
+    .await
+    .map(drop)
 }
 
-pub fn prepare(packages: &[PackageId], task: Task) -> Result<(), String> {
+pub async fn prepare(packages: &[PackageId], task: Task<'_>) -> Result<(), String> {
     transaction::run(
         "UpdatePackages",
         &(flag::ONLY_TRUSTED | flag::ONLY_DOWNLOAD, ids(packages)),
         Mode::Background,
         Some(task),
     )
-    .map(|_| ())
+    .await
+    .map(drop)
 }

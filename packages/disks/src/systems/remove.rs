@@ -75,11 +75,11 @@ fn largest_free(drives: &[Drive], drive: &str) -> Option<Space> {
         .max_by_key(|space| space.size)
 }
 
-fn drives() -> Result<Vec<Drive>, String> {
-    Ok(snapshot::build(&udisks::objects()?).drives)
+async fn drives() -> Result<Vec<Drive>, String> {
+    Ok(snapshot::build(&udisks::objects().await?).drives)
 }
 
-fn remove_startups(system: &System) -> Result<(), String> {
+async fn remove_startups(system: &System) -> Result<(), String> {
     if system.startups.is_empty() && system.parts.is_empty() {
         return Ok(());
     }
@@ -93,21 +93,22 @@ fn remove_startups(system: &System) -> Result<(), String> {
         .iter()
         .map(|part| part.partition_uuid.clone())
         .collect();
-    trust::call::<_, ()>(TRUST, "RemoveStartups", &(folders, partitions))
+    trust::call::<_, ()>(TRUST, "RemoveStartups", &(folders, partitions)).await
 }
 
-pub fn grow(unlock: &str) -> Result<Outcome<u64>, String> {
-    trust::unlocking(TRUST, "GrowSystem", &(unlock,))
+pub async fn grow(unlock: &str) -> Result<Outcome<u64>, String> {
+    trust::unlocking(TRUST, "GrowSystem", &(unlock,)).await
 }
 
-pub fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
-    let system = find()?
+pub async fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
+    let system = find()
+        .await?
         .into_iter()
         .find(|system| system.id == id)
         .ok_or("It's already gone")?;
     if !system.startups.is_empty() || !system.parts.is_empty() {
         step(Step::Startup);
-        remove_startups(&system)?;
+        remove_startups(&system).await?;
     }
     let mut parts = system.parts.clone();
     parts.sort_by_key(|part| part.role == Role::System);
@@ -115,11 +116,11 @@ pub fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
         step(Step::Partition {
             block: part.block.clone(),
         });
-        partitions::delete(&part.block)?;
+        partitions::delete(&part.block).await?;
     }
     if system.kind == Kind::OldSystem {
         step(Step::OldSystem);
-        trust::call::<_, ()>(TRUST, "RemoveOldSystem", &())?;
+        trust::call::<_, ()>(TRUST, "RemoveOldSystem", &()).await?;
     }
     let mut removed = Removed {
         grown: 0,
@@ -127,13 +128,13 @@ pub fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
         drive: system.drive.clone(),
         free: None,
     };
-    if room_after_root(&drives()?) {
+    if room_after_root(&drives().await?) {
         step(Step::Grow);
-        match grow("")? {
+        match grow("").await? {
             Outcome::Done(grown) => removed.grown = grown,
             Outcome::WrongKey(_) => removed.needs_key = true,
         }
     }
-    removed.free = largest_free(&drives()?, &system.drive);
+    removed.free = largest_free(&drives().await?, &system.drive);
     Ok(removed)
 }

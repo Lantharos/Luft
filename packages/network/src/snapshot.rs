@@ -3,7 +3,7 @@ use std::net::Ipv6Addr;
 
 use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue};
+use zbus::{OwnedObjectPath, OwnedVariant};
 
 use super::profile::Security;
 use super::saved::{self, Kind, Saved};
@@ -139,7 +139,7 @@ fn security(access_point: &Object) -> Security {
 
 fn addresses(config: Option<Object>) -> Vec<String> {
     config
-        .and_then(|config| config.get::<Vec<HashMap<String, OwnedValue>>>("AddressData"))
+        .and_then(|config| config.get::<Vec<HashMap<String, OwnedVariant>>>("AddressData"))
         .unwrap_or_default()
         .into_iter()
         .filter_map(|address| String::try_from(address.get("address")?.try_clone().ok()?).ok())
@@ -160,7 +160,7 @@ fn details(objects: &Objects, device: &Object) -> Details {
             .filter(|gateway| !gateway.is_empty())
     };
     let mut dns: Vec<String> = ipv4
-        .and_then(|config| config.get::<Vec<HashMap<String, OwnedValue>>>("NameserverData"))
+        .and_then(|config| config.get::<Vec<HashMap<String, OwnedVariant>>>("NameserverData"))
         .unwrap_or_default()
         .into_iter()
         .filter_map(|server| String::try_from(server.get("address")?.try_clone().ok()?).ok())
@@ -348,13 +348,13 @@ pub fn names(objects: &Objects) -> HashMap<String, String> {
         .collect()
 }
 
-pub fn build(objects: &Objects) -> Network {
-    let saved = saved::all(objects);
+pub async fn build(objects: &Objects) -> Network {
+    let saved = saved::all(objects).await;
     Network {
         wifi: wifi(objects, &saved),
         known: known(&saved),
         wired: wired(objects),
         vpns: vpns(objects, &saved),
-        airplane: super::airplane::state(),
+        airplane: super::airplane::state().await,
     }
 }

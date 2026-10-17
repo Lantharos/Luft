@@ -1,9 +1,10 @@
 use std::collections::HashMap;
+use std::num::NonZeroUsize;
 
-use luft_app::dbus;
+use futures_util::StreamExt;
+use luft_app::dbus::{self, failed};
 use serde::Serialize;
-use zbus::blocking::{Connection, MessageIterator};
-use zbus::zvariant::{DynamicType, OwnedObjectPath, OwnedValue};
+use zbus::{Connection, DynamicType, MatchRule, MessageStream, OwnedObjectPath, OwnedVariant};
 
 use super::enums::{self, exit, status};
 use super::package::Package;
@@ -15,9 +16,9 @@ pub const MANAGER: &str = "org.freedesktop.PackageKit";
 pub const TRANSACTION: &str = "org.freedesktop.PackageKit.Transaction";
 pub const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
 const UNKNOWN_PERCENTAGE: u32 = 101;
-const QUEUED_SIGNALS: usize = 8192;
+const QUEUED_SIGNALS: NonZeroUsize = NonZeroUsize::new(8192).unwrap();
 
-pub type Details = HashMap<String, OwnedValue>;
+pub type Details = HashMap<String, OwnedVariant>;
 
 #[derive(Default)]
 pub struct Outcome {
@@ -48,67 +49,75 @@ impl Mode {
     }
 }
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
-fn property_u32(changed: &HashMap<String, OwnedValue>, name: &str) -> Option<u32> {
+fn property_u32(changed: &HashMap<String, OwnedVariant>, name: &str) -> Option<u32> {
     changed
         .get(name)
         .and_then(|value| u32::try_from(value).ok())
 }
 
-fn subscribe(connection: &Connection, path: &str) -> Result<MessageIterator, String> {
-    let rule = zbus::MatchRule::builder()
+async fn subscribe(connection: &Connection, path: &str) -> Result<MessageStream, String> {
+    let rule = MatchRule::builder()
         .msg_type(zbus::message::Type::Signal)
         .path(path)
-        .map_err(failed)?
-        .build();
-    MessageIterator::for_match_rule(rule, connection, Some(QUEUED_SIGNALS)).map_err(failed)
+        .build()
+        .map_err(failed)?;
+    MessageStream::for_match_rule(rule, connection, Some(QUEUED_SIGNALS))
+        .await
+        .map_err(failed)
 }
 
-fn while_running<T>(
-    task: Task,
+async fn while_running<T>(
+    task: Task<'_>,
     path: &str,
-    run: impl FnOnce() -> Result<T, String>,
+    run: impl Future<Output = Result<T, String>>,
 ) -> Result<T, String> {
     let path = path.to_owned();
     task.cancel
-        .while_running(
+        .while_awaiting(
             move || {
-                if let Ok(connection) = dbus::system() {
-                    let _ = call(connection, &path, "Cancel", &());
-                }
+                let path = path.clone();
+                luft_app::spawn(async move {
+                    if let Ok(connection) = dbus::system().await {
+                        let _ = call(connection, &path, "Cancel", &()).await;
+                    }
+                });
             },
             run,
         )
+        .await
         .unwrap_or_else(|| Err(CANCELLED.into()))
 }
 
-pub fn run<B>(method: &str, body: &B, mode: Mode, task: Option<Task>) -> Result<Outcome, String>
+pub async fn run<B>(
+    method: &str,
+    body: &B,
+    mode: Mode,
+    task: Option<Task<'_>>,
+) -> Result<Outcome, String>
 where
     B: Serialize + DynamicType,
 {
-    let connection = dbus::system()?;
+    let connection = dbus::system().await?;
     let path: OwnedObjectPath = connection
         .call_method(Some(SERVICE), PATH, Some(MANAGER), "CreateTransaction", &())
+        .await
         .and_then(|reply| reply.body().deserialize())
         .map_err(failed)?;
-    let signals = subscribe(connection, path.as_str())?;
-    call(connection, path.as_str(), "SetHints", &(mode.hints(),))?;
-    let execute = || {
-        call(connection, path.as_str(), method, body)?;
-        collect(signals, task, Tracker::default())
+    let signals = subscribe(connection, path.as_str()).await?;
+    call(connection, path.as_str(), "SetHints", &(mode.hints(),)).await?;
+    let execute = async {
+        call(connection, path.as_str(), method, body).await?;
+        collect(signals, task, Tracker::default()).await
     };
     match task {
-        Some(task) => while_running(task, path.as_str(), execute),
-        None => execute(),
+        Some(task) => while_running(task, path.as_str(), execute).await,
+        None => execute.await,
     }
 }
 
-pub fn follow(path: &str, task: Task) -> Result<(), String> {
-    let connection = dbus::system()?;
-    let signals = subscribe(connection, path)?;
+pub async fn follow(path: &str, task: Task<'_>) -> Result<(), String> {
+    let connection = dbus::system().await?;
+    let signals = subscribe(connection, path).await?;
     let Ok(properties) = connection
         .call_method(
             Some(SERVICE),
@@ -117,7 +126,8 @@ pub fn follow(path: &str, task: Task) -> Result<(), String> {
             "GetAll",
             &(TRANSACTION,),
         )
-        .and_then(|reply| reply.body().deserialize::<HashMap<String, OwnedValue>>())
+        .await
+        .and_then(|reply| reply.body().deserialize::<HashMap<String, OwnedVariant>>())
     else {
         return Ok(());
     };
@@ -127,30 +137,30 @@ pub fn follow(path: &str, task: Task) -> Result<(), String> {
         return Ok(());
     }
     tracker.report(task);
-    while_running(task, path, || collect(signals, Some(task), tracker)).map(|_| ())
+    while_running(task, path, collect(signals, Some(task), tracker))
+        .await
+        .map(drop)
 }
 
-fn call<B>(connection: &Connection, path: &str, method: &str, body: &B) -> Result<(), String>
+async fn call<B>(connection: &Connection, path: &str, method: &str, body: &B) -> Result<(), String>
 where
     B: Serialize + DynamicType,
 {
     connection
         .call_method(Some(SERVICE), path, Some(TRANSACTION), method, body)
-        .map(|_| ())
-        .map_err(|error| match error {
-            zbus::Error::MethodError(_, Some(message), _) => message,
-            error => error.to_string(),
-        })
+        .await
+        .map(drop)
+        .map_err(|error| dbus::explain(&error))
 }
 
-fn collect(
-    signals: MessageIterator,
-    task: Option<Task>,
+async fn collect(
+    mut signals: MessageStream,
+    task: Option<Task<'_>>,
     mut tracker: Tracker,
 ) -> Result<Outcome, String> {
     let mut outcome = Outcome::default();
     let mut error = None;
-    for message in signals {
+    while let Some(message) = signals.next().await {
         let message = message.map_err(failed)?;
         let member = message
             .header()
@@ -192,7 +202,7 @@ fn collect(
                     && let Ok((_, changed, _)) =
                         message
                             .body()
-                            .deserialize::<(String, HashMap<String, OwnedValue>, Vec<String>)>()
+                            .deserialize::<(String, HashMap<String, OwnedVariant>, Vec<String>)>()
                     && tracker.update(&changed)
                 {
                     tracker.report(task);
@@ -228,7 +238,7 @@ impl Default for Tracker {
 }
 
 impl Tracker {
-    fn update(&mut self, changed: &HashMap<String, OwnedValue>) -> bool {
+    fn update(&mut self, changed: &HashMap<String, OwnedVariant>) -> bool {
         let previous = (self.status, self.percentage);
         self.status = property_u32(changed, "Status").unwrap_or(self.status);
         self.percentage = property_u32(changed, "Percentage").unwrap_or(self.percentage);

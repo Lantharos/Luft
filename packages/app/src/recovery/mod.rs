@@ -6,10 +6,9 @@ use std::io::{Seek, Write};
 use std::os::fd::{AsFd, FromRawFd};
 use std::os::unix::fs::OpenOptionsExt;
 
-use zbus::blocking::Proxy;
-use zbus::zvariant::{Fd, OwnedObjectPath, Value};
+use zbus::{Fd, OwnedObjectPath, Proxy, Variant};
 
-use crate::dbus;
+use crate::dbus::{self, failed};
 use crate::portal::{FileChooser, uri_path};
 use sheet::{Font, Line};
 
@@ -39,10 +38,6 @@ pub fn computer() -> String {
     std::fs::read_to_string("/proc/sys/kernel/hostname")
         .map(|name| name.trim().to_owned())
         .unwrap_or_else(|_| "this computer".into())
-}
-
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
 }
 
 impl Sheet<'_> {
@@ -96,13 +91,14 @@ impl Sheet<'_> {
         lines
     }
 
-    pub fn save(&self, file_name: &str) -> Result<bool, String> {
+    pub async fn save(&self, file_name: &str) -> Result<bool, String> {
         let Some(uri) = FileChooser {
             title: "Save Recovery Key",
             current_name: Some(file_name),
             ..FileChooser::default()
         }
-        .save()?
+        .save()
+        .await?
         else {
             return Ok(false);
         };
@@ -118,21 +114,23 @@ impl Sheet<'_> {
         Ok(true)
     }
 
-    pub fn print(&self) -> Result<(), String> {
+    pub async fn print(&self) -> Result<(), String> {
         let document = sealed_file(&sheet::pdf(&self.lines()))?;
         let printer = Proxy::new(
-            dbus::session()?,
+            dbus::session().await?,
             "org.freedesktop.portal.Desktop",
             "/org/freedesktop/portal/desktop",
             "org.freedesktop.portal.Print",
         )
+        .await
         .map_err(failed)?;
-        let options: HashMap<&str, Value> = HashMap::new();
+        let options: HashMap<&str, Variant> = HashMap::new();
         let _: OwnedObjectPath = printer
             .call(
                 "Print",
                 &("", "Recovery key", Fd::from(document.as_fd()), options),
             )
+            .await
             .map_err(failed)?;
         Ok(())
     }

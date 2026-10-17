@@ -2,13 +2,13 @@ use std::collections::HashMap;
 use std::net::IpAddr;
 
 use serde::{Deserialize, Serialize};
-use zbus::zvariant::Value;
+use zbus::Variant;
 
 use super::settings::{Group, put, put_text, read};
 
 const LEGACY: [&str; 3] = ["addresses", "routes", "dns"];
 
-type Entry = HashMap<String, Value<'static>>;
+type Entry = HashMap<String, Variant<'static>>;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -85,8 +85,8 @@ fn split(text: &str) -> Result<(String, u32), String> {
 fn address(text: &str) -> Result<Entry, String> {
     let (address, prefix) = split(text)?;
     Ok(HashMap::from([
-        ("address".to_owned(), Value::from(address)),
-        ("prefix".to_owned(), Value::from(prefix)),
+        ("address".to_owned(), Variant::from(address)),
+        ("prefix".to_owned(), Variant::from(prefix)),
     ]))
 }
 
@@ -97,14 +97,14 @@ pub fn address_data(texts: &[String]) -> Result<Vec<Entry>, String> {
 fn route(route: &Route) -> Result<Entry, String> {
     let (destination, prefix) = split(&route.destination)?;
     let mut entry = HashMap::from([
-        ("dest".to_owned(), Value::from(destination)),
-        ("prefix".to_owned(), Value::from(prefix)),
+        ("dest".to_owned(), Variant::from(destination)),
+        ("prefix".to_owned(), Variant::from(prefix)),
     ]);
     if !route.gateway.is_empty() {
-        entry.insert("next-hop".to_owned(), Value::from(route.gateway.clone()));
+        entry.insert("next-hop".to_owned(), Variant::from(route.gateway.clone()));
     }
     if let Some(metric) = route.metric {
-        entry.insert("metric".to_owned(), Value::from(metric));
+        entry.insert("metric".to_owned(), Variant::from(metric));
     }
     Ok(entry)
 }

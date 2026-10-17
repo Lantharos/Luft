@@ -2,13 +2,11 @@ use std::collections::HashMap;
 use std::net::IpAddr;
 
 use gio::glib;
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
 use x25519_dalek::{X25519_BASEPOINT_BYTES, x25519};
-use zbus::blocking::Proxy;
 use zbus::proxy::MethodFlags;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
+use zbus::{OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use super::super::profile::settings::{Group, Settings, put};
 use super::super::profile::{explain, ip, owner};
@@ -162,31 +160,31 @@ fn interface(name: &str) -> String {
     }
 }
 
-fn peer(peer: &Peer) -> Result<HashMap<String, Value<'static>>, String> {
+fn peer(peer: &Peer) -> Result<HashMap<String, Variant<'static>>, String> {
     key(&peer.public_key, "server's public key")?;
     let mut entry = HashMap::from([
         (
             "public-key".to_owned(),
-            Value::from(peer.public_key.trim().to_owned()),
+            Variant::from(peer.public_key.trim().to_owned()),
         ),
         (
             "allowed-ips".to_owned(),
-            Value::from(peer.allowed_ips.clone()),
+            Variant::from(peer.allowed_ips.clone()),
         ),
     ]);
     if !peer.endpoint.is_empty() {
-        entry.insert("endpoint".to_owned(), Value::from(peer.endpoint.clone()));
+        entry.insert("endpoint".to_owned(), Variant::from(peer.endpoint.clone()));
     }
     if !peer.preshared_key.is_empty() {
         key(&peer.preshared_key, "preshared key")?;
         entry.insert(
             "preshared-key".to_owned(),
-            Value::from(peer.preshared_key.trim().to_owned()),
+            Variant::from(peer.preshared_key.trim().to_owned()),
         );
-        entry.insert("preshared-key-flags".to_owned(), Value::from(0_u32));
+        entry.insert("preshared-key-flags".to_owned(), Variant::from(0_u32));
     }
     if let Some(keepalive) = peer.keepalive {
-        entry.insert("persistent-keepalive".to_owned(), Value::from(keepalive));
+        entry.insert("persistent-keepalive".to_owned(), Variant::from(keepalive));
     }
     Ok(entry)
 }
@@ -279,16 +277,18 @@ fn settings(config: &WireGuard) -> Result<Settings, String> {
     ]))
 }
 
-pub fn add(config: WireGuard) -> Result<(), String> {
+pub async fn add(config: WireGuard) -> Result<(), String> {
     let settings = settings(&config)?;
-    let arguments: HashMap<&str, Value> = HashMap::new();
-    Proxy::new(dbus::system()?, SERVICE, SETTINGS_PATH, SETTINGS)
+    let arguments: HashMap<&str, Variant> = HashMap::new();
+    Proxy::new(dbus::system().await?, SERVICE, SETTINGS_PATH, SETTINGS)
+        .await
         .map_err(failed)?
-        .call_with_flags::<_, _, (OwnedObjectPath, HashMap<String, OwnedValue>)>(
+        .call_with_flags::<_, _, (OwnedObjectPath, HashMap<String, OwnedVariant>)>(
             "AddConnection2",
-            MethodFlags::AllowInteractiveAuth.into(),
+            MethodFlags::ALLOW_INTERACTIVE_AUTH,
             &(settings, TO_DISK, arguments),
         )
-        .map_err(explain)?;
+        .await
+        .map_err(|error| explain(&error))?;
     Ok(())
 }

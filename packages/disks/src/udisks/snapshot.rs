@@ -190,7 +190,7 @@ impl Jobs {
                 .implementing(JOB)
                 .map(|job| {
                     let targets = job
-                        .get::<Vec<zbus::zvariant::OwnedObjectPath>>("Objects")
+                        .get::<Vec<zbus::OwnedObjectPath>>("Objects")
                         .unwrap_or_default()
                         .into_iter()
                         .map(|path| path.to_string())

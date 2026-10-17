@@ -1,9 +1,9 @@
-use luft_app::dbus::{self, service::Service};
+use futures_util::{Stream, StreamExt};
+use luft_app::dbus::{self, failed, service::Service};
 use luft_variant::Variant;
-use zbus::blocking::MessageIterator;
-use zbus::blocking::fdo::DBusProxy;
+use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
-use zbus::zvariant::OwnedValue;
+use zbus::{MessageStream, OwnedVariant};
 
 use crate::progress::{Progress, Stage};
 use crate::task::{CANCELLED, Task};
@@ -17,54 +17,52 @@ const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
 const DOWNLOADED: &str = "Downloaded";
 const STOPPED: &str = "The update service stopped unexpectedly.";
 
-type Changes = std::collections::HashMap<String, OwnedValue>;
+type Changes = std::collections::HashMap<String, OwnedVariant>;
 
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
+async fn change(method: &str) -> Result<(), String> {
+    UPDATER
+        .change::<_, ()>(method, &())
+        .await
+        .map_err(|error| dbus::explain(&error))
 }
 
-fn message_of(error: zbus::Error) -> String {
-    match error {
-        zbus::Error::MethodError(_, Some(message), _) => message,
-        error => error.to_string(),
-    }
+pub async fn status() -> Result<String, String> {
+    UPDATER
+        .proxy()
+        .await?
+        .call("Status", &())
+        .await
+        .map_err(|error| dbus::explain(&error))
 }
 
-fn change(method: &str) -> Result<(), String> {
-    UPDATER.change::<_, ()>(method, &()).map_err(message_of)
+pub async fn rollback() -> Result<(), String> {
+    change("Rollback").await
 }
 
-pub fn status() -> Result<String, String> {
-    UPDATER.proxy()?.call("Status", &()).map_err(message_of)
+async fn signals() -> Result<MessageStream, String> {
+    let connection = dbus::system().await?;
+    dbus::objects::signals(connection, UPDATER.name, UPDATER.path).await
 }
 
-pub fn rollback() -> Result<(), String> {
-    change("Rollback")
-}
-
-fn signals() -> Result<MessageIterator, String> {
-    let rule = zbus::MatchRule::builder()
-        .msg_type(zbus::message::Type::Signal)
-        .sender(UPDATER.name)
-        .map_err(failed)?
-        .path(UPDATER.path)
-        .map_err(failed)?
-        .build();
-    MessageIterator::for_match_rule(rule, dbus::system()?, Some(64)).map_err(failed)
-}
-
-fn started() -> Result<bool, String> {
-    DBusProxy::new(dbus::system()?)
+async fn started() -> Result<bool, String> {
+    DBusProxy::new(dbus::system().await?)
+        .await
         .map_err(failed)?
         .name_has_owner(BusName::from_static_str(UPDATER.name).map_err(failed)?)
+        .await
         .map_err(failed)
 }
 
-pub fn downloading() -> Result<bool, String> {
-    if !started()? {
+pub async fn downloading() -> Result<bool, String> {
+    if !started().await? {
         return Ok(false);
     }
-    UPDATER.proxy()?.get_property("Downloading").map_err(failed)
+    UPDATER
+        .proxy()
+        .await?
+        .get_property("Downloading")
+        .await
+        .map_err(failed)
 }
 
 fn progress(downloaded: u64, size: Option<u64>) -> Progress {
@@ -75,8 +73,12 @@ fn progress(downloaded: u64, size: Option<u64>) -> Progress {
     }
 }
 
-fn collect(signals: MessageIterator, size: Option<u64>, task: Task) -> Result<(), String> {
-    for message in signals {
+async fn collect(
+    mut signals: MessageStream,
+    size: Option<u64>,
+    task: Task<'_>,
+) -> Result<(), String> {
+    while let Some(message) = signals.next().await {
         let message = message.map_err(failed)?;
         let header = message.header();
         let body = message.body();
@@ -109,46 +111,51 @@ fn collect(signals: MessageIterator, size: Option<u64>, task: Task) -> Result<()
     Err(STOPPED.into())
 }
 
-fn cancellable(signals: MessageIterator, size: Option<u64>, task: Task) -> Result<(), String> {
+async fn cancellable(
+    signals: MessageStream,
+    size: Option<u64>,
+    task: Task<'_>,
+) -> Result<(), String> {
     task.cancel
-        .while_running(
+        .while_awaiting(
             || {
-                let _ = change("Cancel");
+                luft_app::spawn(async {
+                    let _ = change("Cancel").await;
+                });
             },
-            || collect(signals, size, task),
+            collect(signals, size, task),
         )
+        .await
         .unwrap_or_else(|| Err(CANCELLED.into()))
 }
 
-pub fn download(size: Option<u64>, task: Task) -> Result<(), String> {
-    let signals = signals()?;
+pub async fn download(size: Option<u64>, task: Task<'_>) -> Result<(), String> {
+    let signals = signals().await?;
     task.progress(Stage::Preparing, None);
-    change("Download")?;
-    cancellable(signals, size, task)
+    change("Download").await?;
+    cancellable(signals, size, task).await
 }
 
-pub fn switch(variant: Variant, size: Option<u64>, task: Task) -> Result<(), String> {
-    let signals = signals()?;
+pub async fn switch(variant: Variant, size: Option<u64>, task: Task<'_>) -> Result<(), String> {
+    let signals = signals().await?;
     task.progress(Stage::Preparing, None);
     UPDATER
         .change::<_, ()>("SwitchVariant", &(variant.name(),))
-        .map_err(message_of)?;
-    cancellable(signals, size, task)
+        .await
+        .map_err(|error| dbus::explain(&error))?;
+    cancellable(signals, size, task).await
 }
 
-pub fn follow(size: Option<u64>, task: Task) -> Result<(), String> {
-    let signals = signals()?;
-    if !downloading()? {
+pub async fn follow(size: Option<u64>, task: Task<'_>) -> Result<(), String> {
+    let signals = signals().await?;
+    if !downloading().await? {
         return Ok(());
     }
     task.progress(Stage::Preparing, None);
-    cancellable(signals, size, task)
+    cancellable(signals, size, task).await
 }
 
-pub fn watch(mut changed: impl FnMut()) -> Result<(), String> {
-    for message in signals()? {
-        message.map_err(failed)?;
-        changed();
-    }
-    Ok(())
+/// Every signal the updater sends, as `()`.
+pub async fn changes() -> Result<impl Stream<Item = ()>, String> {
+    Ok(signals().await?.map(drop))
 }

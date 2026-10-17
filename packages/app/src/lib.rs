@@ -12,10 +12,12 @@ pub mod portal;
 #[cfg(feature = "recovery")]
 pub mod recovery;
 pub mod secrets;
+mod tasks;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;
 mod window;
 
 pub use bridge::Commands;
 pub use bridge::events::Events;
+pub use tasks::{block_on, spawn};
 pub use window::{Appearance, GlassWindow, run};

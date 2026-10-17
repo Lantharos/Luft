@@ -9,10 +9,11 @@ rust-version = "1.98"
 
 [features]
 default = ["client"]
-client = ["dep:luft-dbus", "dep:serde_json", "dep:zbus"]
+client = ["dep:futures-util", "dep:luft-dbus", "dep:serde_json", "dep:zbus"]
 
 [dependencies]
+futures-util = { version = "0.3.34", default-features = false, optional = true }
 luft-dbus = { path = "../dbus", optional = true }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", optional = true }
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"], optional = true }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"], optional = true }

@@ -1,16 +1,15 @@
 use std::collections::HashMap;
 
-use zbus::blocking::Proxy;
-use zbus::proxy::MethodFlags;
-use zbus::zvariant::{DynamicType, OwnedValue};
+use serde::Serialize;
+use zbus::proxy::{MethodFlags, SignalStream};
+use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedVariant, Proxy, fdo};
+
+use crate::failed;
 
 const PROPERTIES: &str = "org.freedesktop.DBus.Properties";
-const ABSENT: [&str; 2] = [
-    "org.freedesktop.DBus.Error.ServiceUnknown",
-    "org.freedesktop.DBus.Error.NameHasNoOwner",
-];
 
-pub type Map = HashMap<String, OwnedValue>;
+pub type Map = HashMap<String, OwnedVariant>;
 
 pub struct Service {
     pub name: &'static str,
@@ -18,56 +17,66 @@ pub struct Service {
     pub interface: &'static str,
 }
 
-pub fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
-
-pub fn get<T: TryFrom<OwnedValue>>(map: &Map, key: &str) -> Option<T> {
+pub fn get<T: TryFrom<OwnedVariant>>(map: &Map, key: &str) -> Option<T> {
     map.get(key)
         .and_then(|value| value.try_clone().ok())
         .and_then(|value| T::try_from(value).ok())
 }
 
+/// Whether the error says the service isn't on the bus.
 pub fn absent(error: &zbus::Error) -> bool {
-    matches!(error, zbus::Error::MethodError(name, _, _) if ABSENT.contains(&name.as_str()))
+    matches!(
+        error,
+        zbus::Error::FDO(error)
+            if matches!(**error, fdo::Error::ServiceUnknown(_) | fdo::Error::NameHasNoOwner(_))
+    )
 }
 
 impl Service {
-    pub fn proxy(&self) -> Result<Proxy<'static>, String> {
-        Proxy::new(crate::system()?, self.name, self.path, self.interface).map_err(failed)
+    pub async fn proxy(&self) -> Result<Proxy<'static>, String> {
+        Proxy::new(crate::system().await?, self.name, self.path, self.interface)
+            .await
+            .map_err(failed)
     }
 
-    fn properties(&self) -> Result<Proxy<'static>, String> {
-        Proxy::new(crate::system()?, self.name, self.path, PROPERTIES).map_err(failed)
+    async fn properties(&self) -> Result<Proxy<'static>, String> {
+        Proxy::new(crate::system().await?, self.name, self.path, PROPERTIES)
+            .await
+            .map_err(failed)
     }
 
-    pub fn read(&self) -> Result<Option<Map>, String> {
-        match self.properties()?.call("GetAll", &self.interface) {
+    pub async fn read(&self) -> Result<Option<Map>, String> {
+        match self
+            .properties()
+            .await?
+            .call("GetAll", &self.interface)
+            .await
+        {
             Ok(properties) => Ok(Some(properties)),
             Err(error) if absent(&error) => Ok(None),
             Err(error) => Err(failed(error)),
         }
     }
 
-    pub fn change<B, R>(&self, method: &str, body: &B) -> Result<R, zbus::Error>
+    pub async fn change<B, R>(&self, method: &str, body: &B) -> Result<R, zbus::Error>
     where
-        B: serde::Serialize + DynamicType,
-        R: for<'d> zbus::zvariant::DynamicDeserialize<'d>,
+        B: Serialize + DynamicType,
+        R: for<'d> DynamicDeserialize<'d>,
     {
         self.proxy()
+            .await
             .map_err(zbus::Error::Failure)?
-            .call_with_flags(method, MethodFlags::AllowInteractiveAuth.into(), body)?
+            .call_with_flags(method, MethodFlags::ALLOW_INTERACTIVE_AUTH, body)
+            .await?
             .ok_or_else(|| zbus::Error::Failure(format!("{method} gave no answer")))
     }
 
-    pub fn watch(&self, changed: impl Fn() + Send + 'static) {
-        let Ok(properties) = self.properties() else {
-            return;
-        };
-        std::thread::spawn(move || {
-            if let Ok(changes) = properties.receive_signal("PropertiesChanged") {
-                changes.for_each(|_| changed());
-            }
-        });
+    /// The service's property changes, one item each.
+    pub async fn changes(&self) -> Result<SignalStream<'static>, String> {
+        self.properties()
+            .await?
+            .receive_signal("PropertiesChanged")
+            .await
+            .map_err(failed)
     }
 }

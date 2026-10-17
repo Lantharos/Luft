@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use luft_app::dbus;
-use luft_app::dbus::objects::failed;
+use luft_app::dbus::objects::Objects;
+use luft_app::dbus::{self, failed};
 use serde::Deserialize;
-use zbus::blocking::Proxy;
-use zbus::zvariant::{ObjectPath, OwnedObjectPath, Value};
+use zbus::{ObjectPath, OwnedObjectPath, Proxy, Variant};
 
 use super::profile::enterprise::Enterprise;
 use super::profile::settings::{Group, Settings, put};
@@ -33,58 +32,68 @@ pub struct Activate {
     pub device: Option<String>,
 }
 
-fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, String> {
-    Proxy::new(dbus::system()?, SERVICE, path, interface).map_err(failed)
+async fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, String> {
+    Proxy::new(dbus::system().await?, SERVICE, path, interface)
+        .await
+        .map_err(failed)
 }
 
 fn object(path: &str) -> Result<ObjectPath<'_>, String> {
     ObjectPath::try_from(path).map_err(failed)
 }
 
-fn manager() -> Result<Proxy<'static>, String> {
-    proxy(MANAGER_PATH, MANAGER)
+async fn manager() -> Result<Proxy<'static>, String> {
+    proxy(MANAGER_PATH, MANAGER).await
 }
 
-pub fn scan(device: &str) {
-    if let Ok(wireless) = proxy(device, WIRELESS) {
-        let options: HashMap<&str, Value> = HashMap::new();
-        let _ = wireless.call_method("RequestScan", &(options,));
+pub async fn scan(device: &str) {
+    if let Ok(wireless) = proxy(device, WIRELESS).await {
+        let options: HashMap<&str, Variant> = HashMap::new();
+        let _ = wireless.call_method("RequestScan", &(options,)).await;
     }
 }
 
-pub fn set_wifi(enabled: bool) -> Result<(), String> {
-    manager()?
+pub async fn set_wifi(enabled: bool) -> Result<(), String> {
+    manager()
+        .await?
         .set_property("WirelessEnabled", enabled)
+        .await
         .map_err(failed)
 }
 
-pub fn activate(Activate { connection, device }: Activate) -> Result<(), String> {
+pub async fn activate(Activate { connection, device }: Activate) -> Result<(), String> {
     let connection = connection.unwrap_or_else(|| ANY.to_owned());
     let device = device.unwrap_or_else(|| ANY.to_owned());
-    let _: OwnedObjectPath = manager()?
+    let _: OwnedObjectPath = manager()
+        .await?
         .call(
             "ActivateConnection",
             &(object(&connection)?, object(&device)?, object(ANY)?),
         )
+        .await
         .map_err(failed)?;
     Ok(())
 }
 
-pub fn deactivate(active: &str) -> Result<(), String> {
-    manager()?
+pub async fn deactivate(active: &str) -> Result<(), String> {
+    manager()
+        .await?
         .call_method("DeactivateConnection", &(object(active)?,))
-        .map(|_| ())
+        .await
+        .map(drop)
         .map_err(failed)
 }
 
-pub fn disconnect(device: &str) -> Result<(), String> {
-    proxy(device, DEVICE)?
+pub async fn disconnect(device: &str) -> Result<(), String> {
+    proxy(device, DEVICE)
+        .await?
         .call_method("Disconnect", &())
-        .map(|_| ())
+        .await
+        .map(drop)
         .map_err(failed)
 }
 
-pub fn join(join: Join) -> Result<(), String> {
+pub async fn join(join: Join) -> Result<(), String> {
     let mut wifi = Group::new();
     put(&mut wifi, "ssid", join.ssid.into_bytes());
     if join.hidden {
@@ -100,21 +109,23 @@ pub fn join(join: Join) -> Result<(), String> {
     };
     let password = Some(join.password.as_str()).filter(|password| !password.is_empty());
     wireless::store(&mut settings, &wireless, password);
-    let (connection, _active): (OwnedObjectPath, OwnedObjectPath) = manager()?
+    let (connection, _active): (OwnedObjectPath, OwnedObjectPath) = manager()
+        .await?
         .call(
             "AddAndActivateConnection",
             &(settings, object(&join.device)?, object(ANY)?),
         )
+        .await
         .map_err(failed)?;
     watch::expect(join.device, connection.to_string());
     Ok(())
 }
 
-pub fn forget(ssid: &str, objects: &luft_app::dbus::objects::Objects) -> Result<(), String> {
-    saved::all(objects)
-        .into_iter()
-        .filter(
-            |saved| matches!(&saved.kind, Kind::Wifi { ssid: known } if known == ssid.as_bytes()),
-        )
-        .try_for_each(|saved| saved::delete(&saved.path))
+pub async fn forget(ssid: &str, objects: &Objects) -> Result<(), String> {
+    for saved in saved::all(objects).await {
+        if matches!(&saved.kind, Kind::Wifi { ssid: known } if known == ssid.as_bytes()) {
+            saved::delete(&saved.path).await?;
+        }
+    }
+    Ok(())
 }

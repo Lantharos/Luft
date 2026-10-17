@@ -1,19 +1,18 @@
 use std::collections::HashMap;
-use std::sync::mpsc::Receiver;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
-use zbus::blocking::{Connection, Proxy};
-use zbus::zvariant::{OwnedObjectPath, OwnedValue};
+use futures_util::{Stream, StreamExt};
+use tokio::time::{Instant, timeout_at};
+use zbus::message::Type;
+use zbus::{Connection, MatchRule, MessageStream, OwnedObjectPath, OwnedVariant, Proxy};
+
+use crate::failed;
 
 const SETTLE: Duration = Duration::from_millis(120);
 const MAX_DELAY: Duration = Duration::from_millis(600);
 
-type Properties = HashMap<String, OwnedValue>;
+type Properties = HashMap<String, OwnedVariant>;
 type Managed = HashMap<OwnedObjectPath, HashMap<String, Properties>>;
-
-pub fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
-}
 
 pub struct Objects(HashMap<String, HashMap<String, Properties>>);
 
@@ -24,15 +23,19 @@ pub struct Object<'a> {
 }
 
 impl Objects {
-    pub fn fetch(connection: &Connection, service: &str, root: &str) -> Result<Self, String> {
+    pub async fn fetch(connection: &Connection, service: &str, root: &str) -> Result<Self, String> {
         let manager = Proxy::new(
             connection,
             service,
             root,
             "org.freedesktop.DBus.ObjectManager",
         )
+        .await
         .map_err(failed)?;
-        let managed: Managed = manager.call("GetManagedObjects", &()).map_err(failed)?;
+        let managed: Managed = manager
+            .call("GetManagedObjects", &())
+            .await
+            .map_err(failed)?;
         Ok(Self(
             managed
                 .into_iter()
@@ -60,7 +63,7 @@ impl Objects {
 }
 
 impl Object<'_> {
-    pub fn get<T: TryFrom<OwnedValue>>(&self, name: &str) -> Option<T> {
+    pub fn get<T: TryFrom<OwnedVariant>>(&self, name: &str) -> Option<T> {
         self.properties.get(name)?.try_clone().ok()?.try_into().ok()
     }
 
@@ -75,15 +78,32 @@ impl Object<'_> {
     }
 }
 
-pub fn settle(changes: &Receiver<()>) -> bool {
-    if changes.recv().is_err() {
+/// Every signal `sender` sends from an object under `root`.
+pub async fn signals(
+    connection: &Connection,
+    sender: &str,
+    root: &str,
+) -> Result<MessageStream, String> {
+    let rule = MatchRule::builder()
+        .msg_type(Type::Signal)
+        .sender(sender)
+        .path_namespace(root)
+        .build()
+        .map_err(failed)?;
+    MessageStream::for_match_rule(rule, connection, None)
+        .await
+        .map_err(failed)
+}
+
+/// Waits for the next change, then for the burst it starts to quiet down,
+/// so a refresh follows a flurry of changes once. False once the changes end.
+pub async fn settle<S: Stream + Unpin>(changes: &mut S) -> bool {
+    if changes.next().await.is_none() {
         return false;
     }
     let deadline = Instant::now() + MAX_DELAY;
-    while let Some(remaining) = deadline.checked_duration_since(Instant::now()) {
-        if changes.recv_timeout(remaining.min(SETTLE)).is_err() {
-            break;
-        }
-    }
+    while let Ok(Some(_)) =
+        timeout_at((Instant::now() + SETTLE).min(deadline), changes.next()).await
+    {}
     true
 }

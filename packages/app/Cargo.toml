@@ -26,6 +26,7 @@ thumbnails = [
 [dependencies]
 dirs = { version = "7.0.0", optional = true }
 fast_image_resize = { version = "6.1.0", optional = true }
+futures-util = { version = "0.3.34", default-features = false }
 gio = { version = "0.22.10", optional = true }
 gio-unix = { version = "0.22.8", optional = true }
 image = { version = "0.25.10", optional = true, default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "qoi", "tga", "pnm"] }
@@ -39,4 +40,5 @@ sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.43" }
 skrifa = { version = "0.48", optional = true }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-zbus = { version = "5.19.0", default-features = false, features = ["blocking-api", "tokio"] }
+tokio = { version = "1.53.3", default-features = false, features = ["rt"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }

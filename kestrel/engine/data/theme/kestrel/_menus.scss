@@ -14,13 +14,12 @@
 
 .kestrel-context-menu { @include context-menu; }
 
-.popup-menu-boxpointer, .candidate-popup-boxpointer, .keyboard-subkeys {
+.popup-menu-boxpointer, .candidate-popup-boxpointer {
   -arrow-base: 0; -arrow-rise: 0; -arrow-border-width: 0;
   -arrow-background-color: transparent; -arrow-border-color: transparent;
   -arrow-box-shadow: none;
 }
 .popup-menu { min-width: 0; }
-.popup-menu-content.kestrel-glass { padding: 6px; border-radius: 18px; }
 .popup-menu-item { padding: 9px 10px; border-radius: 12px; }
 .popup-menu-item:active, .popup-menu-item:checked, .popup-menu-item:hover, .popup-menu-item:focus { background-color: fill(0.16); color: ink(); }
 .popup-sub-menu, .popup-menu-section { background-color: transparent; box-shadow: none; }

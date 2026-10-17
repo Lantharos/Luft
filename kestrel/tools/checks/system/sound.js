@@ -1,9 +1,12 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
+import {labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {press} from '../lib/input.js';
 import {spawn, stop} from '../lib/processes.js';
+import {capture} from '../lib/screenshots.js';
 
 const {require, eventually} = checks('sound');
 
@@ -15,6 +18,17 @@ export async function run() {
     'the default speakers and microphone are found');
   require(device('Speakers')?.get_active() && device('Headphones') && !device('Headphones').get_active(),
     'every output is offered with the current one marked');
+
+  toggleSurface('quick');
+  const quick = named('kestrel-quick-settings');
+  await eventually(() => shown(quick), 'Quick Settings opens');
+  const outputs = styled('kestrel-inline-menu', quick).find(menu => labelled('Headphones', menu));
+  outputs._delegate.sourceActor._menuButton.emit('clicked', Clutter.BUTTON_PRIMARY);
+  await eventually(() => shown(labelled('Headphones', outputs)) && outputs.height > 0, 'the outputs open beneath the volume slider');
+  await capture('sound-outputs');
+  outputs._delegate.close();
+  toggleSurface('quick');
+  await eventually(() => !quick.visible, 'Quick Settings closes');
 
   const {output} = mixer;
   const volume = output.volume;

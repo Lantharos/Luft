@@ -41,6 +41,12 @@ async function checkScreenKeyboard() {
     Main.keyboard.open(global.display.get_primary_monitor());
     await eventually(() => Main.keyboard.visible && shown(Main.keyboard.keyboardActor), 'the on-screen keyboard opens');
     await capture('screen-keyboard');
+    const key = descendants(Main.keyboard.keyboardActor).find(actor => actor._extendedKeys?.length && actor.mapped);
+    key._ensureExtendedKeysPopup();
+    key._showSubkeys();
+    await eventually(() => shownStyled('keyboard-subkeys-boxpointer'), 'a key with extra characters shows them');
+    await capture('screen-keyboard-subkeys');
+    key._hideSubkeys();
     Main.keyboard.close();
     await eventually(() => !Main.keyboard.visible, 'the on-screen keyboard closes');
   } finally {

@@ -4,7 +4,7 @@
 .kestrel-quick-content { spacing: 14px; }
 .kestrel-quick-sliders { spacing: 2px; }
 .kestrel-slider-value { padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; font-feature-settings: "tnum"; color: ink(); background-color: pick(rgba(250, 250, 252, 0.94), rgba(28, 28, 32, 0.92)); }
-.kestrel-quick-settings .quick-toggle-menu.kestrel-inline-menu { margin: 2px 0 4px; }
+.kestrel-quick-settings .kestrel-inline-menu .quick-toggle-menu { margin: 2px 0 4px; }
 .kestrel-quick-settings .kestrel-tile-menu .quick-toggle-menu { margin: 0; }
 .kestrel-quick-settings .quick-toggle-menu { border-radius: 14px; padding: 14px; background-color: fill(0.06); box-shadow: none; color: ink(); }
 .kestrel-quick-settings .quick-toggle-menu .header { padding: 0 0 10px; spacing: 8px; }

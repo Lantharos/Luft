@@ -20,7 +20,6 @@
 #include "shell-util.h"
 #include "shell-app-system-private.h"
 #include "st.h"
-#include "gtkactionmuxer.h"
 #include "switcheroo-control.h"
 
 /* This is mainly a memory usage optimization - the user is going to
@@ -41,10 +40,12 @@ typedef struct {
   /* Whether or not we need to resort the windows; this is done on demand */
   guint window_sort_stale : 1;
 
-  /* See GApplication documentation */
-  GtkActionMuxer   *muxer;
-  char             *unique_bus_name;
+  guint looked_up_app_id : 1;
+
   GDBusConnection  *session;
+  GDBusActionGroup *actions;
+  char             *actions_bus_name;
+  GCancellable     *actions_lookup;
 
 } ShellAppRunningState;
 
@@ -403,30 +404,6 @@ shell_app_activate_window (ShellApp     *app,
 }
 
 
-void
-shell_app_update_window_actions (ShellApp *app, MetaWindow *window)
-{
-  const char *object_path;
-
-  object_path = meta_window_get_gtk_window_object_path (window);
-  if (object_path != NULL)
-    {
-      GActionGroup *actions;
-
-      actions = g_object_get_data (G_OBJECT (window), "actions");
-      if (actions == NULL)
-        {
-          actions = G_ACTION_GROUP (g_dbus_action_group_get (app->running_state->session,
-                                                             meta_window_get_gtk_unique_bus_name (window),
-                                                             object_path));
-          g_object_set_data_full (G_OBJECT (window), "actions", actions, g_object_unref);
-        }
-
-      g_assert (app->running_state->muxer);
-      gtk_action_muxer_insert (app->running_state->muxer, "win", actions);
-    }
-}
-
 /**
  * shell_app_activate:
  * @app: a #ShellApp
@@ -493,6 +470,20 @@ shell_app_activate_full (ShellApp      *app,
     }
 }
 
+static gboolean
+app_has_action (ShellApp   *app,
+                const char *action_name)
+{
+  GActionGroup *actions;
+
+  if (app->running_state == NULL || app->running_state->actions == NULL)
+    return FALSE;
+
+  actions = G_ACTION_GROUP (app->running_state->actions);
+  return g_action_group_has_action (actions, action_name) &&
+         g_action_group_get_action_parameter_type (actions, action_name) == NULL;
+}
+
 static GVariant *
 get_platform_data (ShellApp *app,
                    guint     timestamp,
@@ -536,7 +527,6 @@ void
 shell_app_open_new_window (ShellApp      *app,
                            int            workspace)
 {
-  GActionGroup *group = NULL;
   const char * const *actions;
 
   g_return_if_fail (app->info != NULL);
@@ -553,20 +543,11 @@ shell_app_open_new_window (ShellApp      *app,
       return;
     }
 
-  /* Next, check whether the app exports an explicit "new-window" action
-   * that we can activate on the bus - the muxer will add startup notification
-   * information to the platform data, so this should work just as well as
-   * desktop actions.
-   */
-  group = app->running_state ? G_ACTION_GROUP (app->running_state->muxer)
-                             : NULL;
-
-  if (group &&
-      g_action_group_has_action (group, "app.new-window") &&
-      g_action_group_get_action_parameter_type (group, "app.new-window") == NULL)
+  if (app_has_action (app, "new-window"))
     {
-      gtk_action_muxer_activate_action_full (GTK_ACTION_MUXER (group), "app.new-window",
-                                             NULL, get_platform_data (app, 0, workspace));
+      g_remote_action_group_activate_action_full (G_REMOTE_ACTION_GROUP (app->running_state->actions),
+                                                  "new-window", NULL,
+                                                  get_platform_data (app, 0, workspace));
       return;
     }
 
@@ -609,7 +590,7 @@ shell_app_can_open_new_window (ShellApp *app)
   /* If the app has an explicit new-window action, then it can
      (or it should be able to) ...
   */
-  if (g_action_group_has_action (G_ACTION_GROUP (state->muxer), "app.new-window"))
+  if (app_has_action (app, "new-window"))
     return TRUE;
 
   /* If the app doesn't have a desktop file, then nothing is possible */
@@ -649,14 +630,9 @@ shell_app_can_open_new_window (ShellApp *app)
 
   window = state->windows->data;
 
-  if (state->unique_bus_name != NULL &&
-      meta_window_get_gtk_application_object_path (window) != NULL)
-    {
-      if (meta_window_get_gtk_application_id (window) != NULL)
-        return FALSE;
-      else
-        return TRUE;
-    }
+  if (state->actions != NULL)
+    return meta_window_get_gtk_application_object_path (window) != NULL &&
+           meta_window_get_gtk_application_id (window) == NULL;
 
   /* In all other cases, we don't have a reliable source of information
      or a decent heuristic, so we err on the compatibility side and say
@@ -982,7 +958,7 @@ _shell_app_add_window (ShellApp        *app,
   g_signal_connect_object (window, "notify::toplevel-icon", G_CALLBACK (shell_app_on_toplevel_icon_changed), app, 0);
   shell_app_on_toplevel_icon_changed (window, NULL, app);
 
-  shell_app_update_app_actions (app, window);
+  _shell_app_update_actions (app, window);
 
   if (!meta_window_is_skip_taskbar (window))
     app->running_state->interesting_windows++;
@@ -1101,26 +1077,17 @@ _shell_app_handle_startup_sequence (ShellApp            *app,
 gboolean
 shell_app_request_quit (ShellApp   *app)
 {
-  GActionGroup *group = NULL;
   GSList *iter;
 
   if (shell_app_get_state (app) != SHELL_APP_STATE_RUNNING)
     return FALSE;
 
-  /* First, check whether the app exports an explicit "quit" action
-   * that we can activate on the bus
-   */
-  group = G_ACTION_GROUP (app->running_state->muxer);
-
-  if (g_action_group_has_action (group, "app.quit") &&
-      g_action_group_get_action_parameter_type (group, "app.quit") == NULL)
+  if (app_has_action (app, "quit"))
     {
-      g_action_group_activate_action (group, "app.quit", NULL);
-
+      g_action_group_activate_action (G_ACTION_GROUP (app->running_state->actions), "quit", NULL);
       return TRUE;
     }
 
-  /* Otherwise, fall back to closing all the app's windows */
   for (iter = app->running_state->windows; iter; iter = iter->next)
     {
       MetaWindow *win = iter->data;
@@ -1334,6 +1301,17 @@ shell_app_launch_action (ShellApp        *app,
 }
 
 static gchar *
+bus_name_from_app (ShellApp *app)
+{
+  const char *desktop_id = g_app_info_get_id (G_APP_INFO (app->info));
+
+  if (g_str_has_suffix (desktop_id, ".desktop"))
+    return g_strndup (desktop_id, strlen (desktop_id) - strlen (".desktop"));
+
+  return g_strdup (desktop_id);
+}
+
+static gchar *
 object_path_from_app_id (const gchar *app_id)
 {
   gchar *app_id_path, *iter;
@@ -1382,7 +1360,6 @@ activate_action_get_bus_cb (GObject      *object,
   g_autofree gchar *app_id = NULL;
   GVariant *task_data = NULL;
   GCancellable *cancellable = NULL;
-  gchar *last_dot;
 
   session_bus = g_bus_get_finish (result, &error);
 
@@ -1394,10 +1371,7 @@ activate_action_get_bus_cb (GObject      *object,
 
   app = SHELL_APP (g_task_get_source_object (task));
 
-  app_id = g_strdup (g_app_info_get_id (G_APP_INFO (app->info)));
-  last_dot = strrchr (app_id, '.');
-  if (last_dot && g_str_equal (last_dot, ".desktop"))
-      *last_dot = '\0';
+  app_id = bus_name_from_app (app);
 
   object_path = object_path_from_app_id (app_id);
   task_data = g_task_get_task_data (task);
@@ -1522,42 +1496,88 @@ create_running_state (ShellApp *app)
 
   app->running_state->session = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert (app->running_state->session != NULL);
-  app->running_state->muxer = gtk_action_muxer_new ();
+}
+
+static void
+start_fetching_actions (GActionGroup *actions)
+{
+  g_strfreev (g_action_group_list_actions (actions));
+}
+
+static void
+watch_actions (ShellAppRunningState *state,
+               const char           *bus_name,
+               const char           *object_path)
+{
+  if (g_strcmp0 (state->actions_bus_name, bus_name) == 0)
+    return;
+
+  g_set_str (&state->actions_bus_name, bus_name);
+  g_clear_object (&state->actions);
+  state->actions = g_dbus_action_group_get (state->session, bus_name, object_path);
+  start_fetching_actions (G_ACTION_GROUP (state->actions));
+}
+
+static void
+on_app_bus_name_owner (GObject      *source,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  g_autoptr (GVariant) reply = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autofree char *app_id = NULL;
+  g_autofree char *object_path = NULL;
+  ShellApp *app = user_data;
+  const char *owner;
+
+  reply = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source), result, &error);
+  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+    return;
+
+  g_clear_object (&app->running_state->actions_lookup);
+  if (reply == NULL || app->running_state->actions != NULL)
+    return;
+
+  g_variant_get (reply, "(&s)", &owner);
+  app_id = bus_name_from_app (app);
+  object_path = object_path_from_app_id (app_id);
+  watch_actions (app->running_state, owner, object_path);
+}
+
+static void
+find_actions_by_app_id (ShellApp *app)
+{
+  ShellAppRunningState *state = app->running_state;
+  g_autofree char *app_id = NULL;
+
+  if (app->info == NULL || state->actions != NULL || state->looked_up_app_id)
+    return;
+
+  state->looked_up_app_id = TRUE;
+  app_id = bus_name_from_app (app);
+  if (!g_application_id_is_valid (app_id))
+    return;
+
+  state->actions_lookup = g_cancellable_new ();
+  g_dbus_connection_call (state->session,
+                          "org.freedesktop.DBus", "/org/freedesktop/DBus",
+                          "org.freedesktop.DBus", "GetNameOwner",
+                          g_variant_new ("(s)", app_id), G_VARIANT_TYPE ("(s)"),
+                          G_DBUS_CALL_FLAGS_NONE, -1, state->actions_lookup,
+                          on_app_bus_name_owner, app);
 }
 
 void
-shell_app_update_app_actions (ShellApp   *app,
-                              MetaWindow *window)
+_shell_app_update_actions (ShellApp   *app,
+                           MetaWindow *window)
 {
-  const gchar *unique_bus_name;
+  const char *bus_name = meta_window_get_gtk_unique_bus_name (window);
+  const char *object_path = meta_window_get_gtk_application_object_path (window);
 
-  /* We assume that 'gtk-application-object-path' and
-   * 'gtk-app-menu-object-path' are the same for all windows which
-   * have it set.
-   *
-   * It could be possible, however, that the first window we see
-   * belonging to the app didn't have them set.  For this reason, we
-   * take the values from the first window that has them set and ignore
-   * all the rest (until the app is stopped and restarted).
-   */
-
-  unique_bus_name = meta_window_get_gtk_unique_bus_name (window);
-
-  if (g_strcmp0 (app->running_state->unique_bus_name, unique_bus_name) != 0)
-    {
-      const gchar *application_object_path;
-      GDBusActionGroup *actions;
-
-      application_object_path = meta_window_get_gtk_application_object_path (window);
-
-      if (application_object_path == NULL || unique_bus_name == NULL)
-        return;
-
-      g_set_str (&app->running_state->unique_bus_name, unique_bus_name);
-      actions = g_dbus_action_group_get (app->running_state->session, unique_bus_name, application_object_path);
-      gtk_action_muxer_insert (app->running_state->muxer, "app", G_ACTION_GROUP (actions));
-      g_object_unref (actions);
-    }
+  if (bus_name != NULL && object_path != NULL)
+    watch_actions (app->running_state, bus_name, object_path);
+  else
+    find_actions_by_app_id (app);
 }
 
 static void
@@ -1575,9 +1595,11 @@ unref_running_state (ShellAppRunningState *state)
 
   g_clear_signal_handler (&state->workspace_switch_id, workspace_manager);
 
-  g_clear_object (&state->muxer);
+  g_cancellable_cancel (state->actions_lookup);
+  g_clear_object (&state->actions_lookup);
+  g_clear_object (&state->actions);
   g_clear_object (&state->session);
-  g_clear_pointer (&state->unique_bus_name, g_free);
+  g_clear_pointer (&state->actions_bus_name, g_free);
 
   g_free (state);
 }

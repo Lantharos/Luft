@@ -20,4 +20,6 @@ void _shell_app_add_window (ShellApp *app, MetaWindow *window);
 
 void _shell_app_remove_window (ShellApp *app, MetaWindow *window);
 
+void _shell_app_update_actions (ShellApp *app, MetaWindow *window);
+
 G_END_DECLS

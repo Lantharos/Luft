@@ -493,10 +493,7 @@ update_focus_app (ShellWindowTracker *self)
   new_focus_app = new_focus_win ? shell_window_tracker_get_window_app (self, new_focus_win) : NULL;
 
   if (new_focus_app)
-    {
-      shell_app_update_window_actions (new_focus_app, new_focus_win);
-      shell_app_update_app_actions (new_focus_app, new_focus_win);
-    }
+    _shell_app_update_actions (new_focus_app, new_focus_win);
 
   if (g_set_object (&self->focus_app, new_focus_app))
     g_object_notify_by_pspec (G_OBJECT (self), props[PROP_FOCUS_APP]);

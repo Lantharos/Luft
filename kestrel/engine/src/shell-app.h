@@ -83,9 +83,4 @@ shell_app_activate_action_finish (ShellApp      *app,
 
 int shell_app_compare (ShellApp *app, ShellApp *other);
 
-void shell_app_update_window_actions (ShellApp *app, MetaWindow *window);
-void shell_app_update_app_actions    (ShellApp *app, MetaWindow *window);
-
-
-
 G_END_DECLS

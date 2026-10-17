@@ -57,27 +57,6 @@ if have_xwayland
   kestrel_deps += x11_dep
 endif
 
-libshell_menu_sources = [
-  'gtkactionmuxer.h',
-  'gtkactionmuxer.c',
-  'gtkactionobservable.h',
-  'gtkactionobservable.c',
-  'gtkactionobserver.h',
-  'gtkactionobserver.c'
-]
-
-libshell_menu = library('kestrel-menu',
-  sources: libshell_menu_sources,
-  dependencies: [gio_dep, clutter_dep, mtk_dep],
-  include_directories: conf_inc,
-  build_rpath: mutter_typelibdir,
-  install_rpath: mutter_typelibdir,
-  install_dir: pkglibdir,
-  install: true
-)
-
-libshell_menu_dep = declare_dependency(link_with: libshell_menu)
-
 libshell_public_headers = [
   'shell-app.h',
   'shell-app-system.h',
@@ -179,7 +158,7 @@ libshell_no_gir_sources += dbus_generated
 
 libshell = library('shell-' + mutter_api_version,
   sources: libshell_gir_sources + libshell_no_gir_sources,
-  dependencies: kestrel_deps + [libshell_menu_dep, libst_dep, mutter_dep, xkbregistry_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
+  dependencies: kestrel_deps + [libst_dep, mutter_dep, xkbregistry_dep, m_dep, cairo_dep, fontconfig_dep, harfbuzz_dep, harfbuzz_raster_dep],
   include_directories: [conf_inc],
   c_args: kestrel_cflags,
   build_rpath: mutter_typelibdir,

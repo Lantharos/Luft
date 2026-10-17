@@ -5,6 +5,16 @@ export interface Sending {
 	from: string | null;
 }
 
+const ADDRESS = /^[^\s@<>,;*][^\s@<>,;]*@[^\s@<>,;]+\.[^\s@<>,;]+$/;
+
+export function isWildcard(identity: Identity) {
+	return identity.address.startsWith('*@');
+}
+
+export function isAddress(address: string) {
+	return ADDRESS.test(address.trim());
+}
+
 function split(address: string) {
 	const at = address.lastIndexOf('@');
 	return { local: address.slice(0, at).toLowerCase(), domain: address.slice(at + 1).toLowerCase() };
@@ -15,14 +25,18 @@ function withoutTag(local: string) {
 }
 
 function exact(identity: Identity, address: string) {
-	if (identity.address.startsWith('*@')) return false;
+	if (isWildcard(identity)) return false;
 	const wanted = split(address);
 	const own = split(identity.address);
 	return own.domain === wanted.domain && (own.local === wanted.local || own.local === withoutTag(wanted.local));
 }
 
 function wildcard(identity: Identity, address: string) {
-	return identity.address.startsWith('*@') && split(address).domain === identity.address.slice(2).toLowerCase();
+	return isWildcard(identity) && split(address).domain === identity.address.slice(2).toLowerCase();
+}
+
+export function covers(identity: Identity, address: string) {
+	return isWildcard(identity) ? wildcard(identity, address) : identity.address === address.trim().toLowerCase();
 }
 
 function sameDomain(identity: Identity, address: string) {
@@ -32,7 +46,7 @@ function sameDomain(identity: Identity, address: string) {
 export function ownIdentity(address: string, identities: Identity[]): Sending | null {
 	const lower = address.toLowerCase();
 	const found = identities.find((identity) => identity.address === lower) ?? identities.find((identity) => wildcard(identity, lower));
-	return found ? { identity: found, from: found.address.startsWith('*@') ? lower : null } : null;
+	return found ? { identity: found, from: isWildcard(found) ? lower : null } : null;
 }
 
 export function sendingFor(message: Message, identities: Identity[]): Sending | null {
@@ -53,8 +67,4 @@ export function sendingFor(message: Message, identities: Identity[]): Sending | 
 		if (found) return { identity: found, from: null };
 	}
 	return null;
-}
-
-export function shownAddress(identity: Identity, from: string | null) {
-	return identity.address.startsWith('*@') ? (from ?? identity.address) : identity.address;
 }

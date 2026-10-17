@@ -1,11 +1,12 @@
 import * as api from '#lib/api/index.js';
 import type { Address, Attached, Draft, Message, Rendered } from '#lib/api/index.js';
 import { longDate } from '#lib/app/format.js';
+import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { reader } from '#lib/reader/reader.svelte.js';
 import { toasts } from '#lib/shell/toasts.svelte.js';
 import { escapeHtml, signatureHtml } from './html';
-import { ownIdentity, sendingFor, type Sending } from './identity';
+import { isWildcard, ownIdentity, sendingFor, type Sending } from './identity';
 import { parseMailto } from './mailto';
 
 export interface Attachment extends Attached {
@@ -56,7 +57,8 @@ class Composer {
 	private keys = 0;
 
 	defaultAccount() {
-		return mail.accounts[0]?.id ?? 0;
+		const mailbox = mail.mailboxes.find((candidate) => `mailbox:${candidate.id}` === list.view);
+		return mailbox?.account ?? list.current?.account ?? mail.accounts[0]?.id ?? 0;
 	}
 
 	signature(identity: number) {
@@ -66,7 +68,8 @@ class Composer {
 
 	private sendingFrom(account: number, sending: Sending | null): Pick<Composition, 'account' | 'identity' | 'from'> {
 		if (sending) return { account: sending.identity.account, identity: sending.identity.id, from: sending.from };
-		return { account, identity: mail.preferredIdentity(account)?.id ?? 0, from: null };
+		const preferred = mail.preferredIdentity(account);
+		return { account, identity: preferred?.id ?? 0, from: preferred && isWildcard(preferred) ? '' : null };
 	}
 
 	start(partial: Partial<Composition> = {}) {
@@ -139,9 +142,10 @@ class Composer {
 			await reader.body(id);
 			const draft = await api.reopenDraft(id);
 			const from = draft.from.toLowerCase();
-			const own = mail.identitiesOf(draft.account).find((identity) => identity.address === from || identity.address === `*@${from.split('@')[1]}`);
+			const own = ownIdentity(from, mail.identitiesOf(draft.account));
+			const fallback = mail.preferredIdentity(draft.account);
 			this.start({
-				...this.sendingFrom(draft.account, own ? { identity: own, from: own.address.startsWith('*@') ? from : null } : null),
+				...this.sendingFrom(draft.account, own ?? (fallback ? { identity: fallback, from } : null)),
 				to: draft.recipients.to,
 				cc: draft.recipients.cc,
 				showCopies: draft.recipients.cc.length > 0,

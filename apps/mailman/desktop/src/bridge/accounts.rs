@@ -50,6 +50,7 @@ fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
         id: 0,
         email: email.clone(),
         name: name.clone(),
+        custom_from: false,
         config: config.clone(),
         added: now(),
     };
@@ -101,6 +102,9 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
                 Ok(id)
             },
         )
+        .with("prefer_identity", state, |state, Id { id }| {
+            state.store.prefer_identity(id)
+        })
         .with("remove_identity", state, |state, Id { id }| {
             if let Some(removed) = state.store.remove_identity(id)? {
                 state.engine.queue(

@@ -3,6 +3,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import * as api from '#lib/api/index.js';
 	import type { Address } from '#lib/api/index.js';
+	import ComposeField from './ComposeField.svelte';
 
 	interface Props {
 		label: string;
@@ -80,8 +81,7 @@
 	}
 </script>
 
-<div class="field">
-	<span class="label">{label}</span>
+<ComposeField {label}>
 	<div class="chips">
 		{#each addresses as address (address.address)}
 			<span class="chip" title={address.address}>
@@ -109,26 +109,9 @@
 			{/each}
 		</div>
 	{/if}
-</div>
+</ComposeField>
 
 <style>
-	.field {
-		position: relative;
-		display: flex;
-		min-height: 42px;
-		align-items: center;
-		gap: 10px;
-		padding-inline: 18px 12px;
-		box-shadow: inset 0 -1px 0 var(--hairline);
-	}
-
-	.label {
-		width: 48px;
-		flex: none;
-		font-size: 13px;
-		color: var(--text-muted);
-	}
-
 	.chips {
 		display: flex;
 		min-width: 0;
@@ -174,10 +157,10 @@
 	.suggestions {
 		position: absolute;
 		top: calc(100% + 4px);
-		left: 72px;
+		left: -6px;
 		z-index: 10;
 		display: flex;
-		width: min(360px, calc(100% - 84px));
+		width: min(360px, 100%);
 		flex-direction: column;
 		gap: 2px;
 		border-radius: 16px;

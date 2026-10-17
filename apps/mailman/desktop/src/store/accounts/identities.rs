@@ -105,6 +105,17 @@ impl Store {
         })
     }
 
+    pub fn prefer_identity(&self, id: i64) -> Result<(), String> {
+        self.writing(|connection| {
+            connection.execute(
+                "UPDATE identities SET preferred = (id = ?1)
+                 WHERE account = (SELECT account FROM identities WHERE id = ?1)",
+                [id],
+            )
+        })
+        .map(drop)
+    }
+
     pub fn remove_identity(&self, id: i64) -> Result<Option<Identity>, String> {
         let removed = self.identity(id)?;
         self.writing(|connection| {

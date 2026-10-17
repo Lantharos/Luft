@@ -25,6 +25,7 @@ export interface Account {
 	name: string;
 	config: AccountConfig;
 	added: number;
+	customFrom: boolean;
 }
 
 export interface Identity {

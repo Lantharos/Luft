@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, MenuButton, MenuItem, MenuSeparator, Select, Spring, springTiming, tooltip } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -16,12 +16,12 @@
 	import * as api from '#lib/api/index.js';
 	import type { Template } from '#lib/api/index.js';
 	import { REMINDERS, SEND_LATER } from '#lib/app/when.js';
-	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { composer, type Composition } from './composer.svelte';
-	import { shownAddress } from './identity';
+	import ComposeField from './ComposeField.svelte';
 	import Editor from './Editor.svelte';
 	import RecipientField from './RecipientField.svelte';
+	import SenderField from './SenderField.svelte';
 
 	interface Props {
 		composition: Composition;
@@ -55,27 +55,10 @@
 	let showQuote = $state(false);
 	let templates = $state<Template[]>([]);
 
-	let senders = $derived(
-		mail.identities.map((identity) => {
-			const address = identity.id === composition.identity ? shownAddress(identity, composition.from) : identity.address;
-			return { value: identity.id, label: identity.name ? `${identity.name} <${address}>` : address };
-		})
-	);
-	let wildcard = $derived(mail.identities.find((identity) => identity.id === composition.identity)?.address.startsWith('*@') ?? false);
 	let title = $derived(composition.subject.trim() || (composition.inReplyTo ? 'Reply' : 'New message'));
 	let reminder = $derived(REMINDERS.find((option) => option.seconds === composition.remindAfter));
 
 	const laterFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
-
-	function chooseSender(id: number) {
-		const identity = mail.identities.find((candidate) => candidate.id === id);
-		if (!identity) return;
-		const domain = identity.address.startsWith('*@') ? identity.address.slice(1) : null;
-		composition.account = identity.account;
-		composition.identity = identity.id;
-		composition.from = domain && composition.from?.endsWith(domain) ? composition.from : null;
-		editor?.replaceSignature(composer.signature(identity.id));
-	}
 
 	function send(at: number | null = null) {
 		if (editor) void composer.send(editor.content(), at);
@@ -129,28 +112,22 @@
 				<X size={17} />
 			</button>
 		</header>
-		{#if senders.length > 1}
-			<div class="field">
-				<span class="label">From</span>
-				<Select options={senders} value={composition.identity} label="From" onchange={chooseSender} />
-				{#if wildcard}
-					<input class="sender" bind:value={composition.from} placeholder="Address to send as" aria-label="Address to send as" />
-				{/if}
-			</div>
-		{/if}
-		<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
-			{#snippet trailing()}
-				{#if !composition.showCopies}
-					<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip('Ctrl+Shift+C')}>Cc Bcc</button>
-				{/if}
-			{/snippet}
-		</RecipientField>
-		{#if composition.showCopies}
-			<RecipientField label="Cc" bind:addresses={composition.cc} />
-			<RecipientField label="Bcc" bind:addresses={composition.bcc} />
-		{/if}
-		<div class="field">
-			<input class="subject" bind:value={composition.subject} placeholder="Subject" aria-label="Subject" onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
+		<div class="fields">
+			<SenderField {composition} onchoose={(identity) => editor?.replaceSignature(composer.signature(identity.id))} />
+			<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
+				{#snippet trailing()}
+					{#if !composition.showCopies}
+						<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip('Ctrl+Shift+C')}>Cc Bcc</button>
+					{/if}
+				{/snippet}
+			</RecipientField>
+			{#if composition.showCopies}
+				<RecipientField label="Cc" bind:addresses={composition.cc} />
+				<RecipientField label="Bcc" bind:addresses={composition.bcc} />
+			{/if}
+			<ComposeField label="Subject">
+				<input class="subject" bind:value={composition.subject} aria-label="Subject" onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
+			</ComposeField>
 		</div>
 		{#key composition.key}
 			<Editor bind:this={editor} html={composition.body} placeholder="Write something. **bold**, *italic*, - lists and > quotes work as you type." autofocus={composition.to.length > 0} onsend={() => send()} />
@@ -267,31 +244,11 @@
 		width: 30px;
 	}
 
-	.field {
-		display: flex;
-		min-height: 42px;
-		align-items: center;
-		gap: 10px;
-		padding-inline: 18px 12px;
-		box-shadow: inset 0 -1px 0 var(--hairline);
-	}
-
-	.label {
-		width: 48px;
+	.fields {
+		display: grid;
 		flex: none;
-		font-size: 13px;
-		color: var(--text-muted);
-	}
-
-	.sender {
-		height: 32px;
-		min-width: 0;
-		flex: 1;
-		border-radius: var(--radius-pill);
-		background: var(--control);
-		padding-inline: 12px;
-		font-size: 13px;
-		outline: none;
+		grid-template-columns: max-content minmax(0, 1fr);
+		column-gap: 10px;
 	}
 
 	.subject {
@@ -301,11 +258,6 @@
 		font-size: 14px;
 		font-weight: 500;
 		outline: none;
-	}
-
-	.subject::placeholder {
-		color: var(--text-muted);
-		font-weight: 400;
 	}
 
 	.copies {

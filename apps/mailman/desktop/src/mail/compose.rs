@@ -34,6 +34,12 @@ pub struct Draft {
     pub remind_after: Option<i64>,
 }
 
+pub struct Sender {
+    pub from: Address,
+    pub reply_to: String,
+    pub on_behalf_of: Option<String>,
+}
+
 pub struct Built {
     pub raw: Vec<u8>,
     pub recipients: Vec<String>,
@@ -86,7 +92,12 @@ pub fn message_id(from: &str) -> String {
     format!("{token}@{domain}")
 }
 
-pub fn build(draft: &Draft, from: &Address, reply_to: &str) -> Result<Built, String> {
+pub fn build(draft: &Draft, sender: &Sender) -> Result<Built, String> {
+    let Sender {
+        from,
+        reply_to,
+        on_behalf_of,
+    } = sender;
     let message_id = message_id(&from.address);
     let mut builder = MessageBuilder::new()
         .from(BuiltAddress::new_address(
@@ -100,11 +111,11 @@ pub fn build(draft: &Draft, from: &Address, reply_to: &str) -> Result<Built, Str
     if !draft.html.is_empty() {
         builder = builder.html_body(draft.html.clone());
     }
+    if let Some(account) = on_behalf_of {
+        builder = builder.sender(BuiltAddress::new_address(None::<String>, account.clone()));
+    }
     if !reply_to.is_empty() {
-        builder = builder.reply_to(BuiltAddress::new_address(
-            None::<String>,
-            reply_to.to_owned(),
-        ));
+        builder = builder.reply_to(BuiltAddress::new_address(None::<String>, reply_to.clone()));
     }
     if !draft.to.is_empty() {
         builder = builder.to(built_addresses(&draft.to));

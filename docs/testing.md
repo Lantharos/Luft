@@ -41,7 +41,7 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on, such as one from `kestrel/compositor/build.sh BUILD_DIR PREFIX` |
 
-Optional tools widen the capture: with `rclone` installed Rover connects to local WebDAV and FTP servers, and with `stalwart` Mailman signs in to a local mail server.
+Optional tools widen the capture: with `rclone` installed Rover connects to local WebDAV and FTP servers, and with `stalwart` 0.15 Mailman signs in to a local mail server and sends from aliases over SMTP and JMAP. Stalwart 0.16 and later dropped the in-memory directory these checks configure.
 
 ### Frame timing
 

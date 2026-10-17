@@ -9,7 +9,7 @@ Mailman is the mail app of Luft. It keeps every account in one local copy, so op
 - One inbox for every account, with conversations grouped across folders
 - The Screener holds mail from first-time senders until you let them in
 - Bundles for newsletters, receipts and updates, one-click unsubscribe, and Later to set conversations aside
-- Several addresses per account with their own signatures; replies go out from the address they were written to
+- Several addresses per account with their own signatures; replies go out from the address they were written to, and the composer can send from any address the server allows
 - Undo for archiving, moving, deleting and sending, plus send later and no-reply reminders
 - Safe mail display: no scripts, no remote content until you allow it, tracking pixels removed
 - Offline full-text search across every account

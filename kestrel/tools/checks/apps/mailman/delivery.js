@@ -8,7 +8,8 @@ import {press, type} from '../../lib/input.js';
 import {fixture} from '../../lib/processes.js';
 import {pause, settled, Timeout, waitUntil} from '../../lib/wait.js';
 import {changes, withApp} from '../lib/apps.js';
-import {MailServer, USERS} from './stalwart.js';
+import {checkSending} from './compose.js';
+import {address, ALIASES, MailServer, USERS} from './stalwart.js';
 
 const {require, eventually} = checks('Luft app');
 const ARRIVAL_TARGET = 2000;
@@ -40,11 +41,13 @@ function seed(ports) {
   ];
   const statements = accounts.map(([user, protocol], index) => {
     const config = JSON.stringify({protocol, username: user, oauth: null});
-    return `INSERT INTO accounts (id, email, name, config, added) VALUES (${index + 1}, '${user}@example.test', '${user}', '${config}', strftime('%s', 'now'));
-      INSERT INTO identities (account, name, address, preferred) VALUES (${index + 1}, '${user}', '${user}@example.test', 1);`;
+    return `INSERT INTO accounts (id, email, name, config, added) VALUES (${index + 1}, '${address(user)}', '${user}', '${config}', strftime('%s', 'now'));
+      INSERT INTO identities (account, name, address, preferred) VALUES (${index + 1}, '${user}', '${address(user)}', 1);`;
   });
+  const alias = `INSERT INTO identities (account, name, address) VALUES (1, 'alice', '${address(ALIASES.alice)}');`;
   query(`${statements.join('\n')}
-    INSERT OR REPLACE INTO settings (key, value) VALUES ('settings', '{"screener":false,"notifications":false}');`);
+    ${alias}
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('settings', '{"screener":false,"notifications":false,"undoSeconds":1}');`);
   return Object.fromEntries(accounts.map(([user], index) => [`account-${index + 1}`, JSON.stringify({kind: 'password', password: USERS[user]})]));
 }
 
@@ -139,6 +142,7 @@ export async function checkDelivery(stalwart) {
       await eventually(() => query("SELECT count(*) FROM messages WHERE subject LIKE 'welcome-%'") === '2', 'mailman syncs the first messages', SYNC_TIMEOUT);
       await checkArrivals(app, server);
       (await app.settle(() => true)).save('mailman-inbox');
+      await checkSending(app, server);
       await checkScreener(app);
     });
   } finally {

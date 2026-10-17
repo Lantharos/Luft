@@ -9,17 +9,24 @@ use crate::accounts::{Account, AccountConfig};
 
 fn account(row: &Row) -> rusqlite::Result<Account> {
     let config: String = row.get(3)?;
+    let config: AccountConfig = serde_json::from_str(&config)
+        .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))?;
     Ok(Account {
         id: row.get(0)?,
         email: row.get(1)?,
         name: row.get(2)?,
-        config: serde_json::from_str(&config)
-            .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))?,
+        custom_from: config.custom_from(row.get(5)?),
+        config,
         added: row.get(4)?,
     })
 }
 
-const COLUMNS: &str = "id, email, name, config, added";
+const COLUMNS: &str = "id, email, name, config, added,
+    EXISTS (SELECT 1 FROM settings WHERE key = 'custom_from:' || accounts.id)";
+
+fn custom_from_key(account: i64) -> String {
+    format!("custom_from:{account}")
+}
 
 impl Store {
     pub fn add_account(
@@ -79,7 +86,30 @@ impl Store {
     }
 
     pub fn remove_account(&self, id: i64) -> Result<(), String> {
-        self.writing(|connection| connection.execute("DELETE FROM accounts WHERE id = ?1", [id]))
-            .map(drop)
+        self.writing(|connection| {
+            let transaction = connection.transaction()?;
+            transaction.execute("DELETE FROM accounts WHERE id = ?1", [id])?;
+            transaction.execute("DELETE FROM settings WHERE key = ?1", [custom_from_key(id)])?;
+            transaction.commit()
+        })
+    }
+
+    pub fn set_server_allows_custom_from(
+        &self,
+        account: i64,
+        allowed: bool,
+    ) -> Result<bool, String> {
+        let key = custom_from_key(account);
+        self.writing(|connection| {
+            if allowed {
+                connection.execute(
+                    "INSERT OR IGNORE INTO settings (key, value) VALUES (?1, '1')",
+                    [&key],
+                )
+            } else {
+                connection.execute("DELETE FROM settings WHERE key = ?1", [&key])
+            }
+        })
+        .map(|changed| changed > 0)
     }
 }

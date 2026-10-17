@@ -59,6 +59,16 @@ class MailState {
 		this.identities = await api.identities();
 	};
 
+	reloadSenders = async () => {
+		[this.accounts, this.identities] = await Promise.all([api.accounts(), api.identities()]);
+	};
+
+	async preferIdentity(identity: Identity) {
+		if (identity.preferred) return;
+		this.identities = this.identities.map((candidate) => (candidate.account === identity.account ? { ...candidate, preferred: candidate.id === identity.id } : candidate));
+		await api.preferIdentity(identity.id);
+	}
+
 	identitiesOf(account: number) {
 		return this.identities.filter((identity) => identity.account === account);
 	}

@@ -3,11 +3,11 @@ use base64::engine::general_purpose::STANDARD;
 use serde::Serialize;
 use serde_json::json;
 
-use crate::mail::compose::{self, Draft};
+use crate::mail::compose::{self, Draft, Sender};
 use crate::mail::envelope::{Address, Unsubscribe};
 use crate::mail::render;
 use crate::state::MailmanState;
-use crate::store::{Outgoing, Role, now};
+use crate::store::{Identity, Outgoing, Role, now};
 use crate::sync::{Operation, Target};
 
 #[derive(Serialize)]
@@ -24,34 +24,59 @@ pub enum Unsubscribed {
     Opened,
 }
 
-struct Sender {
-    from: Address,
-    reply_to: String,
+fn is_address(address: &str) -> bool {
+    address.rsplit_once('@').is_some_and(|(local, domain)| {
+        !local.is_empty()
+            && !local.starts_with('*')
+            && domain.contains('.')
+            && !address
+                .contains(|character: char| character.is_whitespace() || "<>,;".contains(character))
+    })
+}
+
+fn covers(identity: &Identity, address: &str) -> bool {
+    match identity.address.strip_prefix("*@") {
+        Some(domain) => address
+            .rsplit_once('@')
+            .is_some_and(|(_, at)| at.eq_ignore_ascii_case(domain)),
+        None => identity.address == address,
+    }
 }
 
 fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
+    let account = state
+        .store
+        .account(draft.account)?
+        .ok_or("That account is gone")?;
     let identity = state
         .store
         .identity(draft.identity)?
-        .filter(|identity| identity.account == draft.account)
+        .filter(|identity| identity.account == account.id)
         .ok_or("That address can't send from this account")?;
-    let address = match identity.address.strip_prefix("*@") {
-        Some(domain) => draft
-            .from
-            .clone()
-            .filter(|from| {
-                from.rsplit_once('@')
-                    .is_some_and(|(local, at)| !local.is_empty() && at.eq_ignore_ascii_case(domain))
-            })
-            .ok_or("Pick the address to send from")?,
-        None => identity.address,
-    };
+    let address = draft
+        .from
+        .as_deref()
+        .map(str::trim)
+        .filter(|from| !from.is_empty())
+        .map_or_else(|| identity.address.clone(), str::to_lowercase);
+    if !is_address(&address) {
+        return Err("Pick the address to send from".into());
+    }
+    let own = state
+        .store
+        .identities()?
+        .iter()
+        .any(|candidate| candidate.account == account.id && covers(candidate, &address));
+    if !own && !account.custom_from {
+        return Err("This account only sends from its own addresses".into());
+    }
     Ok(Sender {
         from: Address {
             name: identity.name,
             address,
         },
         reply_to: identity.reply_to,
+        on_behalf_of: (!own).then_some(account.email),
     })
 }
 
@@ -59,8 +84,8 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
     if draft.to.is_empty() && draft.cc.is_empty() && draft.bcc.is_empty() {
         return Err("Add someone to send this to".into());
     }
-    let Sender { from, reply_to } = sender(state, &draft)?;
-    let built = compose::build(&draft, &from, &reply_to)?;
+    let sender = sender(state, &draft)?;
+    let built = compose::build(&draft, &sender)?;
     let send_at = draft
         .send_at
         .unwrap_or_else(|| now() + state.store.settings().undo_seconds);
@@ -70,7 +95,7 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
         id: 0,
         account: draft.account,
         raw: built.raw,
-        sender: from.address,
+        sender: sender.from.address,
         recipients: built.recipients,
         remind_at,
     };
@@ -88,8 +113,7 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
 }
 
 pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> Result<(), String> {
-    let Sender { from, reply_to } = sender(state, &draft)?;
-    let built = compose::build(&draft, &from, &reply_to)?;
+    let built = compose::build(&draft, &sender(state, &draft)?)?;
     let drafts = state
         .store
         .mailbox_with_role(draft.account, Role::Drafts)?

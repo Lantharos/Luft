@@ -75,7 +75,7 @@
 			api.events.status(mail.receiveStatus),
 			api.events.body(reader.receive),
 			api.events.images(remoteImages.receive),
-			api.events.identities(() => void mail.reloadIdentities()),
+			api.events.identities(() => void mail.reloadSenders()),
 			api.events.open(({ thread, token }) => {
 				appWindow.focus(token ?? undefined);
 				opened.close();

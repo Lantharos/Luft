@@ -53,6 +53,7 @@ export const removeAccount = (id: number) => call<void>('remove_account', { id }
 export const renameAccount = (id: number, name: string) => call<void>('rename_account', { id, name });
 export const identities = () => call<Identity[]>('identities');
 export const saveIdentity = (identity: Identity) => call<number>('save_identity', { identity });
+export const preferIdentity = (id: number) => call<void>('prefer_identity', { id });
 export const removeIdentity = (id: number) => call<void>('remove_identity', { id });
 export const accounts = () => call<Account[]>('accounts');
 export const mailboxes = () => call<Mailbox[]>('mailboxes');

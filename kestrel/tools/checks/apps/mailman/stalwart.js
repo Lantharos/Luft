@@ -7,14 +7,28 @@ import {waitUntil} from '../../lib/wait.js';
 import {removeTree, write} from '../lib/files.js';
 
 const STARTUP = 20000;
+export const DOMAIN = 'example.com';
 export const USERS = {alice: 'alice-password', bob: 'bob-password'};
+export const ALIASES = {alice: 'alice.work', bob: 'bob.desk'};
+const HEADERS = `import imaplib, sys
+port, user, password, subject = sys.argv[1:]
+imap = imaplib.IMAP4('127.0.0.1', int(port))
+imap.login(user, password)
+imap.select('INBOX', readonly=True)
+found = imap.search(None, 'SUBJECT', f'"{subject}"')[1][0].split()
+if found:
+    sys.stdout.write(imap.fetch(found[-1], '(BODY.PEEK[HEADER.FIELDS (FROM SENDER)])')[1][0][1].decode())
+imap.logout()
+`;
+
+export const address = user => `${user}@${DOMAIN}`;
 
 function config(ports, data) {
   const principals = Object.entries(USERS).map(([name, secret]) => `[[directory."memory".principals]]
 name = "${name}"
 class = "individual"
 secret = "${secret}"
-email = ["${name}@example.test"]
+email = ["${address(name)}", "${address(ALIASES[name])}"]
 `).join('\n');
   return `[server]
 hostname = "127.0.0.1"
@@ -100,6 +114,12 @@ export class MailServer {
     if (await this._relayLine() !== 'cut off') throw new Error('The relay did not cut its connections off');
   }
 
+  received(user, subject) {
+    const [, stdout] = GLib.spawn_sync(null, ['python3', '-I', '-c', HEADERS, `${this.ports.imap}`, user, USERS[user], subject],
+      null, GLib.SpawnFlags.SEARCH_PATH, null);
+    return new TextDecoder().decode(stdout).trim();
+  }
+
   deliver(from, to, subject) {
     const connection = new Gio.SocketClient().connect_to_host(`127.0.0.1:${this.ports.smtp}`, 0, null);
     const input = new Gio.DataInputStream({base_stream: connection.get_input_stream()});
@@ -114,12 +134,12 @@ export class MailServer {
       reply();
     };
     reply();
-    say('EHLO checks.example.test');
+    say(`EHLO checks.${DOMAIN}`);
     say(`AUTH PLAIN ${GLib.base64_encode(new TextEncoder().encode(`\0${from}\0${USERS[from]}`))}`);
-    say(`MAIL FROM:<${from}@example.test>`);
-    say(`RCPT TO:<${to}@example.test>`);
+    say(`MAIL FROM:<${address(from)}>`);
+    say(`RCPT TO:<${address(to)}>`);
     say('DATA');
-    say(`From: ${from}@example.test\r\nTo: ${to}@example.test\r\nSubject: ${subject}\r\nMessage-ID: <${subject}@example.test>\r\n\r\nHello from the delivery check.\r\n.`);
+    say(`From: ${address(from)}\r\nTo: ${address(to)}\r\nSubject: ${subject}\r\nMessage-ID: <${subject}@${DOMAIN}>\r\n\r\nHello from the delivery check.\r\n.`);
     say('QUIT');
     connection.close(null);
     return GLib.get_monotonic_time();

@@ -10,6 +10,19 @@ pub use credentials::{Credentials, Secret};
 pub use discover::discover;
 pub use oauth::{Provider, available as oauth_providers, sign_in as oauth_sign_in};
 
+const SENDS_ONLY_OWN_ADDRESSES: [&str; 10] = [
+    "gmail.com",
+    "googlemail.com",
+    "office365.com",
+    "outlook.com",
+    "hotmail.com",
+    "live.com",
+    "icloud.com",
+    "me.com",
+    "yahoo.com",
+    "aol.com",
+];
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum Protocol {
@@ -33,6 +46,22 @@ pub struct Account {
     pub name: String,
     pub config: AccountConfig,
     pub added: i64,
+    pub custom_from: bool,
+}
+
+impl AccountConfig {
+    pub fn custom_from(&self, server_allows: bool) -> bool {
+        match &self.protocol {
+            Protocol::Jmap { .. } => server_allows,
+            Protocol::Imap { smtp, .. } => {
+                let host = smtp.host.to_ascii_lowercase();
+                self.oauth.is_none()
+                    && !SENDS_ONLY_OWN_ADDRESSES
+                        .iter()
+                        .any(|domain| host.ends_with(domain))
+            }
+        }
+    }
 }
 
 pub enum Login {

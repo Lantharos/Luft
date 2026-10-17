@@ -72,14 +72,24 @@ impl JmapRemote {
     }
 
     pub(super) fn load_identities(&self, context: &Context) -> Result<bool, String> {
-        let found: Vec<Identity> = self
-            .listed_identities()?
+        let listed = self.listed_identities()?;
+        let found: Vec<Identity> = listed
             .iter()
             .filter_map(|identity| from_server(context.account.id, identity))
             .collect();
-        context
+        let custom_from = listed.iter().any(|identity| {
+            identity["mayDelete"].as_bool() == Some(true)
+                || identity["email"]
+                    .as_str()
+                    .is_some_and(|email| email.starts_with("*@"))
+        });
+        let merged = context
             .store
-            .merge_identities(context.account.id, &found, true)
+            .merge_identities(context.account.id, &found, true)?;
+        let allowed = context
+            .store
+            .set_server_allows_custom_from(context.account.id, custom_from)?;
+        Ok(merged || allowed)
     }
 
     pub(super) fn push_identity(

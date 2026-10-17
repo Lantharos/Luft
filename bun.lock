@@ -297,6 +297,16 @@
         "vite": "^8.3.2",
       },
     },
+    "web/docs": {
+      "name": "@luft/docs",
+    },
+    "web/shared": {
+      "name": "@luft/web",
+      "version": "0.1.0",
+      "dependencies": {
+        "@luft/motion": "workspace:*",
+      },
+    },
   },
   "packages": {
     "@codemirror/autocomplete": ["@codemirror/autocomplete@6.20.3", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.17.0", "@lezer/common": "^1.0.0" } }, "sha512-tlosUqb+3BbxCxZdu4tKeRghPFC+QM7q4X5YhKV2eCmPG+1r2F3f4AaSz5sCrFqUtX4Jh20VFTKecl16MgiV9g=="],
@@ -409,9 +419,13 @@
 
     "@lucide/svelte": ["@lucide/svelte@1.58.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-yUKVOUokJews09DTEf23We9/0Lju+XR+1Pcr6rYZBilpf4Uf6T3XRmalUgOsQW0drFfCI53WlIzgokkq2EqwYg=="],
 
+    "@luft/docs": ["@luft/docs@workspace:web/docs"],
+
     "@luft/motion": ["@luft/motion@workspace:packages/motion"],
 
     "@luft/ui": ["@luft/ui@workspace:packages/ui"],
+
+    "@luft/web": ["@luft/web@workspace:web/shared"],
 
     "@marijn/find-cluster-break": ["@marijn/find-cluster-break@1.0.4", "", {}, "sha512-Wy0V7+SGUjnF9/TkiM1hKVDPj7jKXduPNboMVtHTA8dySMURWqfg/JZ9E2Sq8JgSJmkl7k7Qe9FLeMSrSraWmQ=="],
 

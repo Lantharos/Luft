@@ -1,0 +1,59 @@
+@theme {
+	--font-sans: 'Open Runde', 'Open Runde Fallback', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'Maple Mono NF', ui-monospace, monospace;
+}
+
+@theme inline {
+	--color-canvas: var(--canvas);
+	--color-raised: var(--raised);
+	--color-well: var(--well);
+	--color-ink: var(--ink);
+	--color-ink-soft: var(--ink-soft);
+	--color-ink-muted: var(--ink-muted);
+	--color-accent: var(--accent);
+	--color-accent-ink: var(--accent-ink);
+	--color-hairline: var(--hairline);
+	--color-glass: var(--glass);
+}
+
+:root {
+	--dark-canvas: #12110e;
+	--dark-raised: #1d1b17;
+	--dark-well: #2c2a25;
+	--dark-ink: #ece9e3;
+	--dark-ink-soft: #cbc6bd;
+	--dark-ink-muted: #959087;
+	--dark-accent: #ddc393;
+	--dark-accent-ink: #402d00;
+
+	--light-canvas: #fcf9f3;
+	--light-raised: #ffffff;
+	--light-well: #ebe8e2;
+	--light-ink: #1d1b17;
+	--light-ink-soft: #4a463e;
+	--light-ink-muted: #6f6b62;
+	--light-accent: #725b2d;
+	--light-accent-ink: #ffffff;
+
+	color-scheme: light dark;
+	--canvas: light-dark(var(--light-canvas), var(--dark-canvas));
+	--raised: light-dark(var(--light-raised), var(--dark-raised));
+	--well: light-dark(var(--light-well), var(--dark-well));
+	--ink: light-dark(var(--light-ink), var(--dark-ink));
+	--ink-soft: light-dark(var(--light-ink-soft), var(--dark-ink-soft));
+	--ink-muted: light-dark(var(--light-ink-muted), var(--dark-ink-muted));
+	--accent: light-dark(var(--light-accent), var(--dark-accent));
+	--accent-ink: light-dark(var(--light-accent-ink), var(--dark-accent-ink));
+	--hairline: color-mix(in oklab, var(--ink) 9%, transparent);
+	--glass: color-mix(in oklab, var(--canvas) 55%, transparent);
+	--radius-window: 16px;
+	--radius-group: 18px;
+}
+
+:root[data-scheme='light'] {
+	color-scheme: light;
+}
+
+:root[data-scheme='dark'] {
+	color-scheme: dark;
+}

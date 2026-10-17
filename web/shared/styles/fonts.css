@@ -1,0 +1,40 @@
+@font-face {
+	font-family: 'Open Runde';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../../../packages/ui/fonts/OpenRunde-Regular.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Open Runde';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('../../../packages/ui/fonts/OpenRunde-Medium.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Open Runde';
+	font-style: normal;
+	font-weight: 600 700;
+	font-display: swap;
+	src: url('../../../packages/ui/fonts/OpenRunde-Semibold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'Open Runde Fallback';
+	src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+	size-adjust: 107.06%;
+	ascent-override: 90.49%;
+	descent-override: 22.56%;
+	line-gap-override: 0%;
+}
+
+@font-face {
+	font-family: 'Maple Mono NF';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../../../packages/ui/fonts/MapleMono-NF-Regular.woff2') format('woff2');
+}

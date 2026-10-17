@@ -1,0 +1,14 @@
+{
+	"name": "@luft/web",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./styles.css": "./styles/index.css",
+		"./logo.svg": "./assets/logo.svg"
+	},
+	"dependencies": {
+		"@luft/motion": "workspace:*"
+	}
+}

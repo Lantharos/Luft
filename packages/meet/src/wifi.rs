@@ -33,6 +33,14 @@ fn text<'a>(node: Node<'a, 'a>, names: &[&str]) -> Option<&'a str> {
         .map(str::trim)
 }
 
+fn usable_psk(key: &str) -> bool {
+    match key.len() {
+        8..=63 => true,
+        64 => key.bytes().all(|byte| byte.is_ascii_hexdigit()),
+        _ => false,
+    }
+}
+
 fn hex(text: &str) -> Option<Vec<u8>> {
     if !text.len().is_multiple_of(2) {
         return None;
@@ -58,6 +66,7 @@ pub fn parse_profile(xml: &str) -> Result<Option<Network>, String> {
     let security =
         path(profile, &["MSM", "security"]).ok_or("The profile has no security settings")?;
     let authentication = text(security, &["authEncryption", "authentication"]).unwrap_or("open");
+    let encrypted = text(security, &["authEncryption", "encryption"]) != Some("none");
     let one_x = text(security, &["authEncryption", "useOneX"]) == Some("true");
     let transition = text(security, &["authEncryption", "transitionMode"]) == Some("true");
     let key = path(security, &["sharedKey", "keyMaterial"])
@@ -66,8 +75,8 @@ pub fn parse_profile(xml: &str) -> Result<Option<Network>, String> {
     let protected = text(security, &["sharedKey", "protected"]) == Some("true");
     let security = match (authentication, key) {
         _ if one_x => return Ok(None),
-        ("open", None) => Security::Open,
-        (_, Some(_)) if protected => return Ok(None),
+        ("open", None) if !encrypted => Security::Open,
+        (_, Some(key)) if protected || !usable_psk(&key) => return Ok(None),
         ("WPAPSK" | "WPA2PSK", Some(key)) => Security::Wpa(key),
         ("WPA3SAE", Some(key)) if transition => Security::Wpa(key),
         ("WPA3SAE", Some(key)) => Security::Sae(key),
@@ -191,7 +200,12 @@ mod tests {
             "",
         );
         assert_eq!(parse_profile(&encrypted_key).unwrap(), None);
-        let open = parse_profile(&profile("open", "", "")).unwrap().unwrap();
+        let short_key = profile("WPA2PSK", &KEY.replace(" pass;word", "short"), "");
+        assert_eq!(parse_profile(&short_key).unwrap(), None);
+        let wep = profile("open", "", "").replace("<encryption>AES", "<encryption>WEP");
+        assert_eq!(parse_profile(&wep).unwrap(), None);
+        let open = profile("open", "", "").replace("<encryption>AES", "<encryption>none");
+        let open = parse_profile(&open).unwrap().unwrap();
         assert!(!open.keyfile("u").contains("wifi-security"));
     }
 

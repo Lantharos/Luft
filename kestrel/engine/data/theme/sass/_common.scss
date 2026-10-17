@@ -75,7 +75,7 @@ stage {
   padding: $base_padding;
   spacing: $base_padding;
   text-align: center;
-  transition-duration: 100ms;
+  transition-duration: $motion-tap;
 }
 
 // common button styling
@@ -120,7 +120,7 @@ stage {
 %menuitem {
   font-weight: normal;
   spacing: $base_padding;
-  transition-duration: 100ms;
+  transition-duration: $motion-tap;
   padding: $base_padding * 1.5 $base_padding * 2;
 }
 

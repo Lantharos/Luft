@@ -1,7 +1,7 @@
 @mixin context-menu {
   padding: 6px; spacing: 2px; border-radius: 18px; background-color: glass(clear); color: ink(0.86);
 
-  .kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; font-weight: 500; }
+  .kestrel-context-action { padding: 9px 10px; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; font-weight: 500; transition-duration: $motion-tap; }
   .kestrel-context-action:hover, .kestrel-context-action:focus { background-color: fill(0.16); }
   .kestrel-context-action:active { background-color: fill(0.24); }
   .kestrel-context-row { spacing: 10px; }

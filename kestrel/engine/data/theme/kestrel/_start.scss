@@ -14,13 +14,13 @@
 .kestrel-app-grid, .kestrel-search-results { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
 .kestrel-app-content { spacing: 8px; }
-.kestrel-app-button { border-radius: 12px; padding: 12px 4px 8px; }
+.kestrel-app-button { border-radius: 12px; padding: 12px 4px 8px; transition-duration: $motion-tap; }
 .kestrel-app-button:hover,
 .kestrel-app-button:focus { background-color: fill(0.12); }
 .kestrel-app-button:active { background-color: fill(0.20); }
 .kestrel-app-label { font-size: 12px; max-width: 84px; height: 30px; text-align: center; }
 
-.kestrel-search-result { padding: 0; border-radius: 12px; transition-duration: 120ms; }
+.kestrel-search-result { padding: 0; border-radius: 12px; transition-duration: $motion-tap; }
 .kestrel-search-result:hover { background-color: fill(0.09); }
 .kestrel-search-result:focus { background-color: fill(0.14); }
 .kestrel-search-result:active { background-color: fill(0.20); }
@@ -33,7 +33,7 @@
 .kestrel-footer { padding: 12px 0 0; spacing: 8px; }
 .kestrel-footer .kestrel-icon-button:checked { background-color: fill(0.14); }
 .kestrel-session-actions { spacing: 4px; }
-.kestrel-session-action { padding: 9px 12px; min-width: 72px; border-radius: 999px; font-size: 12px; font-weight: 500; transition-duration: 120ms; }
+.kestrel-session-action { padding: 9px 12px; min-width: 72px; border-radius: 999px; font-size: 12px; font-weight: 500; transition-duration: $motion-tap; }
 .kestrel-session-action:hover, .kestrel-session-action:focus { background-color: fill(0.12); }
 .kestrel-session-action:active { background-color: fill(0.20); }
 .kestrel-session-action-content { spacing: 7px; }

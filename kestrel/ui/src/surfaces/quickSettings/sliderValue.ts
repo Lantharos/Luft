@@ -1,8 +1,7 @@
-import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { animateActor } from '../../shared/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion.js';
 
 const VISIBLE_AFTER_CHANGE_MS = 900;
 const BUBBLE_GAP = 6;
@@ -13,7 +12,7 @@ export function attachSliderValue(slider: St.Widget & { value: number }): void {
   let hideTimer = 0;
   const hide = () => {
     hideTimer = 0;
-    animateActor(bubble, { opacity: 0, duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUAD, onStopped: () => { if (!hideTimer) bubble.hide(); } });
+    animateActor(bubble, { opacity: 0, duration: Duration.tap, onStopped: () => { if (!hideTimer) bubble.hide(); } });
     return GLib.SOURCE_REMOVE;
   };
   const place = () => {
@@ -30,7 +29,7 @@ export function attachSliderValue(slider: St.Widget & { value: number }): void {
     bubble.get_parent()!.set_child_above_sibling(bubble, null);
     bubble.show();
     place();
-    animateActor(bubble, { opacity: 255, duration: 100, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(bubble, { opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
     if (hideTimer) GLib.Source.remove(hideTimer);
     hideTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, VISIBLE_AFTER_CHANGE_MS, hide);
   });

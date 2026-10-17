@@ -122,13 +122,13 @@ $default_key_bg_color: if($variant=='light', darken($key_bg_color, 11%), darken(
 $page_indicator_size: 10px;
 .page-indicator {
   padding: $base_padding $base_padding * 2 0;
-  transition-duration:400ms;
+  transition-duration: $motion-quick;
 
   .page-indicator-icon {
     width: $page_indicator_size;
     height: $page_indicator_size;
     border-radius: $forced_circular_radius;
     background-color: $system_fg_color;
-    transition-duration: 400ms;
+    transition-duration: $motion-quick;
   }
 }

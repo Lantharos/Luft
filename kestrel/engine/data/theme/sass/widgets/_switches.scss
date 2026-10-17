@@ -6,7 +6,7 @@ $switch_handle_size: 20px;
 .toggle-switch {
   width: $switch_width;
   border-radius: $forced_circular_radius;
-  transition-duration: 100ms;
+  transition-duration: $motion-quick;
   color: $fg_color;
 
   @if $contrast == 'high' {
@@ -34,7 +34,7 @@ $switch_handle_size: 20px;
     border-radius: $forced_circular_radius;
     background: if($variant == 'light', white, mix(white, $bg_color, 80%));
     box-shadow: 0 2px 4px transparentize(black, .8);
-    transition-duration: 100ms;
+    transition-duration: $motion-quick;
   }
 
   &:checked {

@@ -38,7 +38,7 @@ $screenshot_ui_button_red: $red_4;
 
   .screenshot-ui-capture-button-circle {
     background-color: $osd_fg_color;
-    transition-duration: 200ms;
+    transition-duration: $motion-tap;
     &:hover, &:focus { background-color: $hover_bg_color;}
     border-radius: $forced_circular_radius;
   }
@@ -141,13 +141,13 @@ $screenshot_ui_button_red: $red_4;
 }
 
 .screenshot-ui-window-selector-window-border {
-  transition-duration: 200ms;
+  transition-duration: $motion-quick;
   border-radius: $modal_radius;
   border: 6px transparent;
 }
 
 .screenshot-ui-window-selector-check {
-  transition-duration: 200ms;
+  transition-duration: $motion-quick;
   color: transparent;
   border-radius: $forced_circular_radius;
   border-width: 12px;
@@ -174,7 +174,7 @@ $screenshot_ui_button_red: $red_4;
 }
 
 .screenshot-ui-screen-selector {
-  transition-duration: 200ms;
+  transition-duration: $motion-quick;
   background-color: rgba(0,0,0,.5);
 
   &:hover { background-color: rgba(0,0,0,.3);}

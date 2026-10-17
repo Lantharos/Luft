@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor, Spring } from '../../../shared/motion.js';
 import type { QuickControl } from '../quickControls.js';
 
 interface TileParts {
@@ -41,7 +41,7 @@ function chevron(item: QuickControl): St.Button {
     else item.menu!.open();
   });
   item.menu!.connect('open-state-changed', (_menu, open) =>
-    animateActor(icon, { rotation_angle_z: open ? -90 : 0, duration: 220, mode: Clutter.AnimationMode.EASE_OUT_CUBIC }));
+    animateActor(icon, { rotation_angle_z: open ? -90 : 0, spring: Spring.snappy }));
   return more;
 }
 

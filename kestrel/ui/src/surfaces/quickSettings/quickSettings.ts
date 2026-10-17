@@ -10,7 +10,7 @@ import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.j
 import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { KeepAwake } from './keepAwake.js';
-import { animateActor } from '../../shared/motion.js';
+import { animateActor, Spring } from '../../shared/motion.js';
 import { blurSurface } from '../../shared/surface.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 import { styleControl } from './tiles/controlTile.js';
@@ -257,7 +257,7 @@ export class QuickSettings {
     const chevron = item._menuButton?.child;
     chevron?.set_pivot_point(0.5, 0.5);
     menu.connect('open-state-changed', (_menu, open: boolean) => {
-      if (chevron) animateActor(chevron, { rotation_angle_z: open ? -90 : 0, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      if (chevron) animateActor(chevron, { rotation_angle_z: open ? -90 : 0, spring: Spring.snappy });
       if (open) this.menuOpened(menu);
       else this.menuClosed(menu);
     });

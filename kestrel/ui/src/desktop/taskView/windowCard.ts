@@ -5,6 +5,7 @@ import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { windowIcon } from '../../appearance/icons/appIcons.js';
+import { animateActor, Duration } from '../../shared/motion.js';
 import type { Rect } from './grid.js';
 
 export const CARD_HEADER = 30;
@@ -40,7 +41,10 @@ export class WindowCard {
       if (button === Clutter.BUTTON_MIDDLE) window.delete((global as unknown as Shell.Global).get_current_time());
       else activate();
     });
-    const revealClose = () => { close.opacity = this.actor.hover || this.actor.has_key_focus() ? 255 : 0; };
+    const revealClose = () => animateActor(close, {
+      opacity: this.actor.hover || this.actor.has_key_focus() ? 255 : 0,
+      duration: Duration.tap,
+    });
     this.actor.connect('notify::hover', revealClose);
     this.actor.connect('key-focus-in', revealClose);
     this.actor.connect('key-focus-out', revealClose);

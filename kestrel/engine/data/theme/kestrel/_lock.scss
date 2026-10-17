@@ -9,13 +9,13 @@
   .unlock-dialog .user-widget.vertical .user-icon { icon-size: 96px; }
   .unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
   .unlock-dialog .login-dialog-default-button-well { margin-right: 6px; }
-  .login-dialog-button.next-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; transition-duration: 160ms; }
+  .login-dialog-button.next-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; transition-duration: $motion-tap; }
   .login-dialog-button.next-button { background-color: fill(0.16); }
   .login-dialog-button.next-button:hover { background-color: fill(0.24); }
   .unlock-dialog .login-dialog-message { margin-top: 4px; font-size: 13px; color: ink(0.78); }
   .unlock-dialog .login-dialog-message-warning { color: ink(); font-weight: 500; }
   .kestrel-greeter-users { spacing: 4px; margin: 28px; }
-  .kestrel-greeter-user { padding: 6px 16px 6px 6px; border-radius: 999px; transition-duration: 160ms; }
+  .kestrel-greeter-user { padding: 6px 16px 6px 6px; border-radius: 999px; transition-duration: $motion-tap; }
   .kestrel-greeter-user:hover, .kestrel-greeter-user:focus { background-color: fill(0.10); }
   .kestrel-greeter-user:checked { background-color: fill(0.16); }
   .kestrel-greeter-user-content { spacing: 12px; }

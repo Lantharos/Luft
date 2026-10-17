@@ -28,31 +28,31 @@
   padding: 0;
   border: none;
   border-radius: 12px;
-  transition-duration: 160ms;
+  transition-duration: $motion-tap;
 }
 .kestrel-task-button StIcon { icon-shadow: none; }
 .kestrel-status-button:hover, .kestrel-icon-button:hover, .kestrel-text-button:hover { background-color: fill(0.10); }
 
-.kestrel-running-dot { margin: 0; border-radius: 2px; transition-duration: 180ms; }
+.kestrel-running-dot { margin: 0; border-radius: 2px; transition-duration: $motion-quick; }
 .kestrel-task-attention { border-radius: 12px; background-color: rgba(255, 150, 40, 0.62); }
 .kestrel-task-badge { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background-color: $danger; color: $on_danger; font-size: 10px; font-weight: 700; font-feature-settings: "tnum"; text-align: center; }
 .kestrel-task-progress { height: 3px; border-radius: 999px; }
 .kestrel-task-progress-fill { height: 3px; border-radius: 999px; }
-.kestrel-peek { width: 8px; padding: 0; border-radius: 0; background-color: transparent; box-shadow: none; transition-duration: 150ms; }
+.kestrel-peek { width: 8px; padding: 0; border-radius: 0; background-color: transparent; box-shadow: none; transition-duration: $motion-tap; }
 
 .kestrel-status-button {
   padding: 0 8px;
   height: 40px;
   border-radius: 12px;
-  transition-duration: 160ms;
+  transition-duration: $motion-tap;
 }
 .kestrel-status-button:active { background-color: fill(0.14); }
 .kestrel-privacy { height: 28px; padding: 0 10px; margin: 0 4px; border-radius: 999px; }
 .kestrel-privacy-icons { spacing: 6px; }
 .kestrel-clock { text-align: right; font-size: 12px; font-weight: 500; font-feature-settings: "tnum"; }
 .kestrel-input-source-label { min-width: 20px; text-align: center; font-size: 12px; font-weight: 500; }
-.kestrel-icon-button { padding: 11px; border-radius: 10px; transition-duration: 120ms; }
-.kestrel-text-button { padding: 8px 10px; border-radius: 999px; font-size: 12px; }
+.kestrel-icon-button { padding: 11px; border-radius: 10px; transition-duration: $motion-tap; }
+.kestrel-text-button { padding: 8px 10px; border-radius: 999px; font-size: 12px; transition-duration: $motion-tap; }
 .kestrel-status-button:focus, .kestrel-icon-button:focus, .kestrel-text-button:focus { background-color: fill(0.17); }
 .kestrel-icon-button:active { background-color: fill(0.24); }
 

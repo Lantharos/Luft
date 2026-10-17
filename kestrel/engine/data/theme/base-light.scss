@@ -2,6 +2,7 @@ $variant: 'light';
 $contrast: 'normal';
 
 @import "sass/_colors"; //use gtk colors
+@import "sass/_motion";
 @import "sass/_drawing";
 @import "sass/_common";
 @import "sass/_widgets";

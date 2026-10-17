@@ -8,7 +8,7 @@ import secondary from './luft-secondary.svg';
 import { markEdge, markShade, monochromeShade } from './shade.js';
 import { showsWallpaper, taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor, Spring } from '../../../shared/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
 
 const MARK_SCALE = 0.65;
@@ -61,7 +61,7 @@ function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: n
         translation_x: lifted ? direction * 0.6 : 0,
         translation_y: lifted ? direction * 0.6 : 0,
         rotation_angle_z: lifted ? direction * 3 : 0,
-        duration: 150, mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        spring: Spring.snappy,
       });
     };
     button.connect('notify::hover', update);

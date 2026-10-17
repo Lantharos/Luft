@@ -14,9 +14,9 @@
 .kestrel-quick-settings .quick-slider .icon-button:hover { background-color: fill(0.12); }
 .kestrel-quick-settings .quick-slider .slider-bin { padding: 8px; }
 
-.kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: 120ms; }
+.kestrel-quick-settings .popup-menu-item { border-radius: 10px; transition-duration: $motion-tap; }
 .kestrel-quick-settings .keyboard-brightness-level { spacing: 6px; font-size: 13px; }
-.kestrel-quick-settings .keyboard-brightness-level .icon-button { padding: 10px; border-radius: 999px; background-color: fill(0.08); transition-duration: 120ms; }
+.kestrel-quick-settings .keyboard-brightness-level .icon-button { padding: 10px; border-radius: 999px; background-color: fill(0.08); transition-duration: $motion-tap; }
 .kestrel-quick-settings .keyboard-brightness-level .icon-button:hover { background-color: fill(0.14); }
 .kestrel-quick-settings .keyboard-brightness-level .icon-button:checked { background-color: fill(0.26); }
 .kestrel-quick-settings .keyboard-brightness-level .icon-button:checked:hover { background-color: fill(0.32); }
@@ -27,7 +27,7 @@
 .kestrel-control {
   padding: 14px; border: none; border-radius: 12px;
   background-color: fill(0.07); color: ink(); box-shadow: none;
-  transition-duration: 140ms; min-width: 0;
+  transition-duration: $motion-tap; min-width: 0;
 }
 .kestrel-control:hover { background-color: fill(0.13); }
 .kestrel-control:active { background-color: fill(0.19); }

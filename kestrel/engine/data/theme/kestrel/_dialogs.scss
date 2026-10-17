@@ -10,7 +10,7 @@
 .modal-dialog .message-dialog-description { text-align: left; font-size: 14px; color: ink(0.70); }
 .kestrel-shortcut-list { spacing: 4px; }
 .kestrel-shortcut-row { spacing: 16px; font-size: 14px; }
-.kestrel-shortcut-key { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: fill(0.08); transition-duration: 120ms; }
+.kestrel-shortcut-key { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: fill(0.08); transition-duration: $motion-tap; }
 .kestrel-shortcut-key:hover { background-color: fill(0.14); }
 .kestrel-shortcut-key:focus { background-color: fill(0.18); }
 .modal-dialog .dialog-list { spacing: 10px; }
@@ -70,7 +70,7 @@
 
 .kestrel-portal-list { spacing: 6px; }
 .kestrel-portal-scroll { max-height: 22em; }
-.kestrel-portal-row { padding: 10px 14px; border-radius: 14px; background-color: fill(0.07); color: ink(); transition-duration: 120ms; }
+.kestrel-portal-row { padding: 10px 14px; border-radius: 14px; background-color: fill(0.07); color: ink(); transition-duration: $motion-tap; }
 .kestrel-portal-row:hover { background-color: fill(0.13); }
 .kestrel-portal-row:focus { background-color: fill(0.13); box-shadow: inset 0 0 0 1px ink(0.35); }
 .kestrel-portal-row:checked { background-color: fill(0.22); }
@@ -105,17 +105,17 @@
 .kestrel-print-field { spacing: 16px; min-height: 36px; }
 .kestrel-print-field-label { font-size: 14px; }
 .kestrel-print-segments { padding: 3px; spacing: 2px; border-radius: 999px; background-color: fill(0.07); }
-.kestrel-print-segment { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: ink(0.72); transition-duration: 120ms; }
+.kestrel-print-segment { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: ink(0.72); transition-duration: $motion-tap; }
 .kestrel-print-segment:hover { background-color: fill(0.08); color: ink(); }
 .kestrel-print-segment:focus { box-shadow: inset 0 0 0 1px ink(0.35); }
 .kestrel-print-segment:checked { background-color: fill(0.22); color: ink(); }
 .kestrel-print-stepper { spacing: 4px; }
-.kestrel-print-step { width: 32px; height: 32px; border-radius: 999px; background-color: fill(0.07); color: ink(); transition-duration: 120ms; }
+.kestrel-print-step { width: 32px; height: 32px; border-radius: 999px; background-color: fill(0.07); color: ink(); transition-duration: $motion-tap; }
 .kestrel-print-step StIcon { icon-size: 14px; }
 .kestrel-print-step:hover, .kestrel-print-step:focus { background-color: fill(0.14); }
 .kestrel-print-step:insensitive { background-color: fill(0.03); color: ink(0.3); }
 .kestrel-print-count { width: 3.2em; padding: 7px 8px; font-size: 13px; font-weight: 500; }
-.kestrel-print-pick { padding: 8px 10px 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: fill(0.07); color: ink(); transition-duration: 120ms; }
+.kestrel-print-pick { padding: 8px 10px 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: fill(0.07); color: ink(); transition-duration: $motion-tap; }
 .kestrel-print-pick:hover, .kestrel-print-pick:focus { background-color: fill(0.14); }
 .kestrel-print-pick-box { spacing: 6px; }
 .kestrel-print-pick-arrow { icon-size: 14px; color: ink(0.62); }

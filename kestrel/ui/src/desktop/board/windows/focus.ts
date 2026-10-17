@@ -1,8 +1,7 @@
-import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
 import { CAMERA_DURATION, type Camera } from '../view/camera.js';
 import { boundsOf, copyView, fitView, nearestInDirection, type View } from '../view/geometry.js';
@@ -11,7 +10,6 @@ import { boardWindows, frameBox } from './windows.js';
 export const FIT_PADDING = 56;
 export const WINDOW_PADDING = 24;
 const DIMMED = 184;
-const DIM_DURATION = 220;
 const MAX_ARC = 0.16;
 const ARC_REACH = 4;
 const SETTLED = 0.5;
@@ -132,7 +130,7 @@ export class Focus {
       const opacity = entered && window !== entered ? DIMMED : 255;
       if (actor.opacity === opacity && !actor.get_transition('opacity')) continue;
       if (animated) {
-        animateActor(actor, { opacity, duration: DIM_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+        animateActor(actor, { opacity, duration: Duration.quick, curve: Curve.decelerate });
       } else {
         actor.remove_transition('opacity');
         actor.opacity = opacity;

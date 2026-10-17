@@ -4,13 +4,12 @@ import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Monitor } from '../../panel/panel.js';
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion.js';
 import { blurSurface } from '../../../shared/surface.js';
 import { Dock, type DockActions } from './dock.js';
 import { CornerPill } from './pill.js';
 
 const MARGIN = 12;
-const FADE_DURATION = 180;
 
 interface CornerActions extends DockActions {
   openQuickSettings(): void;
@@ -104,8 +103,8 @@ export class Corner {
     if (shown) this.overview.show();
     animateActor(this.overview, {
       opacity: shown ? 255 : 0,
-      duration: FADE_DURATION,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.quick,
+      curve: Curve.decelerate,
       onComplete: () => this.overview.visible = this.actor.visible && this.entered,
     });
   }

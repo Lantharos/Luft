@@ -11,6 +11,7 @@ theme_sources = files([
   'sass/_default-colors.scss',
   'sass/_drawing.scss',
   'sass/_high-contrast-colors.scss',
+  'sass/_motion.scss',
   'sass/_palette.scss',
   'sass/_widgets.scss',
   'sass/widgets/_a11y.scss',

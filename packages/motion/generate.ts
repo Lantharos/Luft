@@ -3,7 +3,6 @@ import { join } from 'node:path';
 
 import { Curve, DampedSpring, Duration, Spring } from './src/index';
 
-const OUTPUT = join(import.meta.dir, '../ui/src/styles/motion.css');
 const SAMPLES_PER_SECOND = 90;
 const REST = 0.002;
 
@@ -36,12 +35,25 @@ function stylesheet(): string {
 	].join('\n');
 }
 
-const css = stylesheet();
-if (process.argv.includes('--check')) {
-	if (readFileSync(OUTPUT, 'utf8') !== css) {
-		console.error('packages/ui/src/styles/motion.css is out of date; run bun run generate in packages/motion');
-		process.exit(1);
-	}
-} else {
-	writeFileSync(OUTPUT, css);
+function shellStylesheet(): string {
+	const durations = Object.entries(Duration).map(([name, ms]) => `$motion-${kebab(name)}: ${ms}ms;`);
+	return ['// Generated from packages/motion/tokens.json by packages/motion/generate.ts.', '', ...durations, ''].join('\n');
+}
+
+const ROOT = join(import.meta.dir, '../..');
+const outputs: [string, string][] = [
+	['packages/ui/src/styles/motion.css', stylesheet()],
+	['kestrel/engine/data/theme/sass/_motion.scss', shellStylesheet()]
+];
+
+const checking = process.argv.includes('--check');
+const stale = outputs.filter(([path, contents]) => {
+	const file = join(ROOT, path);
+	if (checking) return readFileSync(file, 'utf8') !== contents;
+	writeFileSync(file, contents);
+	return false;
+});
+if (stale.length) {
+	console.error(`${stale.map(([path]) => path).join(' and ')} out of date; run bun run generate in packages/motion`);
+	process.exit(1);
 }

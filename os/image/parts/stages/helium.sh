@@ -32,5 +32,5 @@ mkdir -p "$work"
 curl -fsSL --retry 5 --retry-all-errors -o "$work/$appimage" \
   "https://github.com/imputnet/helium-linux/releases/download/$version/$appimage"
 verify
-install -Dm644 "$work/$appimage" "$destdir/usr/share/luft/preinstall/helium.AppImage"
+install -Dm755 "$work/$appimage" "$destdir/usr/share/luft/preinstall/helium.AppImage"
 rm -rf "$work"

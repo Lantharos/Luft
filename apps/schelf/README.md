@@ -70,6 +70,6 @@ Electron AppImages are started with `--no-sandbox`, since Chromium's sandbox ref
 
 ## Preinstalled apps and background updates
 
-On Luft, `schelf --preinstall` runs once per account at sign-in and installs each AppImage in `/usr/share/luft/preinstall` the same way as opening it in Schelf, so it works offline and can be removed like any other app. A browser among them becomes the default one if there's none yet. Each app is only preinstalled once, so a removed app stays removed. `schelf --update-apps` runs a few minutes after sign-in and every six hours after that, and updates every AppImage that has a newer version.
+On Luft, `schelf --preinstall` runs at sign-in before the desktop appears and adds each AppImage in `/usr/share/luft/preinstall` to the account like opening it in Schelf, linked to the image's copy until its first update, so it works offline, takes no extra space and can be removed like any other app. A browser among them becomes the default one if there's none yet. Each app is only preinstalled once, so a removed app stays removed. `schelf --update-apps` runs a few minutes after sign-in and every six hours after that, and updates every AppImage that has a newer version.
 
 When Schelf starts, it gives AppImages installed earlier the icons they ship if theirs are missing or the wrong size.

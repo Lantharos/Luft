@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::os::unix::fs::PermissionsExt;
+use std::os::unix::fs::{PermissionsExt, symlink};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -39,7 +39,7 @@ fn slug(name: &str) -> String {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Transfer {
     Move,
-    Copy,
+    Link,
 }
 
 pub struct Placement {
@@ -81,8 +81,8 @@ pub fn install(source: &Path, task: Task) -> Result<AppImage, String> {
     add(source, Transfer::Move, task)
 }
 
-pub fn install_copy(source: &Path, task: Task) -> Result<AppImage, String> {
-    add(source, Transfer::Copy, task)
+pub fn install_link(source: &Path, task: Task) -> Result<AppImage, String> {
+    add(source, Transfer::Link, task)
 }
 
 fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String> {
@@ -105,13 +105,16 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String
 
 fn place(source: &Path, destination: &Path, transfer: Transfer, task: Task) -> Result<(), String> {
     let staging = destination.with_extension("AppImage.part");
-    if transfer == Transfer::Copy || fs::rename(source, &staging).is_err() {
-        copy(source, &staging, task)?;
+    match transfer {
+        Transfer::Link => symlink(source, &staging).map_err(failed)?,
+        Transfer::Move => {
+            if fs::rename(source, &staging).is_err() {
+                copy(source, &staging, task)?;
+                fs::remove_file(source).map_err(failed)?;
+            }
+            fs::set_permissions(&staging, fs::Permissions::from_mode(0o755)).map_err(failed)?;
+        }
     }
-    if transfer == Transfer::Move && source.exists() {
-        fs::remove_file(source).map_err(failed)?;
-    }
-    fs::set_permissions(&staging, fs::Permissions::from_mode(0o755)).map_err(failed)?;
     fs::rename(&staging, destination).map_err(failed)
 }
 

@@ -6,6 +6,6 @@ mod update;
 
 pub use bundle::{Bundle, read as inspect};
 pub use elf::is_appimage;
-pub use integrate::{Placement, install, install_copy, placement, remove, repair};
+pub use integrate::{Placement, install, install_link, placement, remove, repair};
 pub use library::{AppImage, find, list};
 pub use update::{Available, apply as update, check};

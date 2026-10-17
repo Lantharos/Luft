@@ -95,7 +95,7 @@ fn install_seed(seed: &Path) -> Result<Option<AppImage>, String> {
     {
         return Ok(None);
     }
-    quietly(|task| appimage::install_copy(seed, task)).map(Some)
+    quietly(|task| appimage::install_link(seed, task)).map(Some)
 }
 
 fn prefer_as_browser(app: &AppImage) {

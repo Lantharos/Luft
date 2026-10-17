@@ -38,7 +38,6 @@ export const BoxPointer = GObject.registerClass({
         this._arrowSide = arrowSide;
         this._userArrowSide = arrowSide;
         this._arrowOrigin = 0;
-        this._arrowActor = null;
         this.bin = new St.Bin(binProperties);
         styleSurface(this.bin, 18);
         this.add_child(this.bin);
@@ -272,18 +271,6 @@ export const BoxPointer = GObject.registerClass({
 
     _drawBorder(area) {
         const themeNode = this.get_theme_node();
-
-        if (this._arrowActor) {
-            const [sourceX, sourceY] = this._arrowActor.get_transformed_position();
-            const [sourceWidth, sourceHeight] = this._arrowActor.get_transformed_size();
-            const [absX, absY] = this.get_transformed_position();
-
-            if (this._arrowSide === St.Side.TOP ||
-                this._arrowSide === St.Side.BOTTOM)
-                this._arrowOrigin = sourceX - absX + sourceWidth / 2;
-            else
-                this._arrowOrigin = sourceY - absY + sourceHeight / 2;
-        }
 
         const borderWidth = themeNode.get_length('-arrow-border-width');
         const base = themeNode.get_length('-arrow-base');
@@ -616,16 +603,6 @@ export const BoxPointer = GObject.registerClass({
         }
     }
 
-    // @actor: an actor relative to which the arrow is positioned.
-    // Differently from setPosition, this will not move the boxpointer itself,
-    // on the arrow
-    setArrowActor(actor) {
-        if (this._arrowActor !== actor) {
-            this._arrowActor = actor;
-            this._border.queue_repaint();
-        }
-    }
-
     _calculateArrowSide(arrowSide) {
         const sourceTopLeft = this._sourceExtents.get_top_left();
         const sourceBottomRight = this._sourceExtents.get_bottom_right();
@@ -666,20 +643,5 @@ export const BoxPointer = GObject.registerClass({
 
             this.emit('arrow-side-changed');
         }
-    }
-
-    updateArrowSide(side) {
-        this._arrowSide = this._userArrowSide = side;
-        this.queue_relayout();
-
-        this.emit('arrow-side-changed');
-    }
-
-    getPadding(side) {
-        return this.bin.get_theme_node().get_padding(side);
-    }
-
-    getArrowHeight() {
-        return this.get_theme_node().get_length('-arrow-rise');
     }
 });

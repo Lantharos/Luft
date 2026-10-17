@@ -491,35 +491,12 @@ export class Magnifier extends Signals.EventEmitter {
     }
 
     /**
-     * Get the crosshairs thickness.
-     *
-     * @returns {number} The width of the vertical and horizontal
-     *     lines of the crosshairs.
-     */
-    getCrosshairsThickness() {
-        if (this._crossHairs)
-            return this._crossHairs.getThickness();
-        else
-            return 0;
-    }
-
-    /**
      * @param {number} opacity Value between 0.0 (transparent)
      *     and 1.0 (fully opaque).
      */
     setCrosshairsOpacity(opacity) {
         if (this._crossHairs)
             this._crossHairs.setOpacity(opacity * 255);
-    }
-
-    /**
-     * @returns {number} Value between 0.0 (transparent) and 1.0 (fully opaque).
-     */
-    getCrosshairsOpacity() {
-        if (this._crossHairs)
-            return this._crossHairs.getOpacity() / 255.0;
-        else
-            return 0.0;
     }
 
     /**

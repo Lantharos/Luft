@@ -1041,18 +1041,6 @@ class UIWindowSelectorWindow extends St.Button {
         };
     }
 
-    chromeHeights() {
-        return [0, 0];
-    }
-
-    chromeWidths() {
-        return [0, 0];
-    }
-
-    overlapHeights() {
-        return [0, 0];
-    }
-
     get cursorPoint() {
         return this.child.cursorPoint;
     }

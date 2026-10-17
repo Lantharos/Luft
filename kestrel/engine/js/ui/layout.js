@@ -512,11 +512,6 @@ export const LayoutManager = GObject.registerClass({
         return false;
     }
 
-    get currentMonitor() {
-        const index = global.display.get_current_monitor();
-        return this.monitors[index];
-    }
-
     get keyboardMonitor() {
         return this.monitors[this.keyboardIndex];
     }
@@ -529,12 +524,6 @@ export const LayoutManager = GObject.registerClass({
         else if (global.display.focus_window != null)
             i = global.display.focus_window.get_monitor();
         return i;
-    }
-
-    get focusMonitor() {
-        if (this.focusIndex < 0)
-            return null;
-        return this.monitors[this.focusIndex];
     }
 
     set keyboardIndex(v) {

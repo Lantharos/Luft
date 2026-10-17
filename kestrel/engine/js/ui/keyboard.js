@@ -361,10 +361,6 @@ class KeyboardModel {
     getLevels() {
         return this._model.levels;
     }
-
-    getKeysForLevel(levelName) {
-        return this._model.levels.find(level => level === levelName);
-    }
 }
 
 class FocusTracker extends Signals.EventEmitter {
@@ -631,17 +627,6 @@ const EmojiPager = GObject.registerClass({
                 pageKeys.push(section.keys[j]);
             }
         }
-    }
-
-    _lookupSection(section, nPage) {
-        for (let i = 0; i < this._pages.length; i++) {
-            const page = this._pages[i];
-
-            if (page.section === section && page.page === nPage)
-                return i;
-        }
-
-        return -1;
     }
 
     _generatePanel(nPage) {
@@ -1461,21 +1446,6 @@ export const Keyboard = GObject.registerClass({
             key.iconName = latched
                 ? 'osk-caps-lock-symbolic' : 'osk-shift-symbolic';
         }
-    }
-
-    _getGridSlots() {
-        let numOfHorizSlots = 0;
-        const rows = this._currentPage.get_children();
-        const numOfVertSlots = rows.length;
-
-        for (let i = 0; i < rows.length; ++i) {
-            const keyboardRow = rows[i];
-            const keys = keyboardRow.get_children();
-
-            numOfHorizSlots = Math.max(numOfHorizSlots, keys.length);
-        }
-
-        return [numOfHorizSlots, numOfVertSlots];
     }
 
     _relayout() {

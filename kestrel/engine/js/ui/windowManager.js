@@ -41,7 +41,6 @@ const DIALOG_OPEN_SCALE = 0.96;
 const WINDOW_CLOSE_SCALE = 0.94;
 const WINDOW_OPEN_RISE = 14;
 export const WINDOW_ANIMATION_TIME = 250;
-export const SCROLL_TIMEOUT_TIME = 150;
 export const DIM_BRIGHTNESS = -0.3;
 export const DIM_TIME = 500;
 export const UNDIM_TIME = 250;
@@ -508,7 +507,6 @@ export class WindowManager {
         this._allowedKeybindings = {};
 
         this._isWorkspacePrepended = false;
-        this._canScroll = true; // limiting scrolling speed
         this._blockCount = 0;
 
         this._shellwm.connect('kill-window-effects', (shellwm, actor) => {
@@ -865,43 +863,6 @@ export class WindowManager {
         }
     }
 
-    _lookupIndex(windows, metaWindow) {
-        for (let i = 0; i < windows.length; i++) {
-            if (windows[i].metaWindow === metaWindow)
-                return i;
-        }
-        return -1;
-    }
-
-    _switchApp() {
-        const windows = global.get_window_actors().filter(actor => {
-            const win = actor.metaWindow;
-            const workspaceManager = global.workspace_manager;
-            const activeWorkspace = workspaceManager.get_active_workspace();
-            return !win.is_override_redirect() &&
-                    win.located_on_workspace(activeWorkspace);
-        });
-
-        if (windows.length === 0)
-            return;
-
-        const focusWindow = global.display.focus_window;
-        let nextWindow;
-
-        if (focusWindow == null) {
-            nextWindow = windows[0].metaWindow;
-        } else {
-            let index = this._lookupIndex(windows, focusWindow) + 1;
-
-            if (index >= windows.length)
-                index = 0;
-
-            nextWindow = windows[index].metaWindow;
-        }
-
-        Main.activateWindow(nextWindow);
-    }
-
     insertWorkspace(pos) {
         const workspaceManager = global.workspace_manager;
 
@@ -993,11 +954,6 @@ export class WindowManager {
         if (action !== Meta.KeyBindingAction.NONE)
             this.allowKeybinding(name, modes);
         return action;
-    }
-
-    removeKeybinding(name) {
-        if (global.display.remove_keybinding(name))
-            this.allowKeybinding(name, Shell.ActionMode.NONE);
     }
 
     allowKeybinding(name, modes) {
@@ -1716,59 +1672,6 @@ export class WindowManager {
             global.display.clear_mouse_mode();
             workspace.activate_with_focus(window, global.get_current_time());
         }
-    }
-
-    handleWorkspaceScroll(event) {
-        if (!this._canScroll)
-            return Clutter.EVENT_PROPAGATE;
-
-        if (event.type() !== Clutter.EventType.SCROLL)
-            return Clutter.EVENT_PROPAGATE;
-
-        const direction = event.get_scroll_direction();
-        if (direction === Clutter.ScrollDirection.SMOOTH)
-            return Clutter.EVENT_PROPAGATE;
-
-        const workspaceManager = global.workspace_manager;
-        const vertical = workspaceManager.layout_rows === -1;
-        const rtl = Clutter.get_default_text_direction() === Clutter.TextDirection.RTL;
-        const activeWs = workspaceManager.get_active_workspace();
-        let ws;
-        switch (direction) {
-        case Clutter.ScrollDirection.UP:
-            if (vertical)
-                ws = activeWs.get_neighbor(Meta.MotionDirection.UP);
-            else if (rtl)
-                ws = activeWs.get_neighbor(Meta.MotionDirection.RIGHT);
-            else
-                ws = activeWs.get_neighbor(Meta.MotionDirection.LEFT);
-            break;
-        case Clutter.ScrollDirection.DOWN:
-            if (vertical)
-                ws = activeWs.get_neighbor(Meta.MotionDirection.DOWN);
-            else if (rtl)
-                ws = activeWs.get_neighbor(Meta.MotionDirection.LEFT);
-            else
-                ws = activeWs.get_neighbor(Meta.MotionDirection.RIGHT);
-            break;
-        case Clutter.ScrollDirection.LEFT:
-            ws = activeWs.get_neighbor(Meta.MotionDirection.LEFT);
-            break;
-        case Clutter.ScrollDirection.RIGHT:
-            ws = activeWs.get_neighbor(Meta.MotionDirection.RIGHT);
-            break;
-        default:
-            return Clutter.EVENT_PROPAGATE;
-        }
-        this.actionMoveWorkspace(ws);
-
-        this._canScroll = false;
-        GLib.timeout_add_once(GLib.PRIORITY_DEFAULT,
-            SCROLL_TIMEOUT_TIME, () => {
-                this._canScroll = true;
-            });
-
-        return Clutter.EVENT_STOP;
     }
 
     _confirmDisplayChange() {

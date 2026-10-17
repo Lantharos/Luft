@@ -84,16 +84,6 @@ export const FADE_ANIMATION_TIME = 1000;
 let _backgroundCache = null;
 let _backgroundTextureCache = null;
 
-function _fileEqual0(file1, file2) {
-    if (file1 === file2)
-        return true;
-
-    if (!file1 || !file2)
-        return false;
-
-    return file1.equal(file2);
-}
-
 class BackgroundCache extends Signals.EventEmitter {
     constructor() {
         super();

@@ -782,10 +782,6 @@ const WirelessNetwork = GObject.registerClass({
         return false;
     }
 
-    hasAccessPoint(ap) {
-        return this._accessPoints.has(ap);
-    }
-
     hasAccessPoints() {
         return this._accessPoints.size > 0;
     }
@@ -929,11 +925,6 @@ const WirelessNetwork = GObject.registerClass({
 
     destroy() {
         this.emit('destroy');
-    }
-
-    _getDeviceDBusPath() {
-        // nm_object_get_path() is shadowed by nm_device_get_path()
-        return NM.Object.prototype.get_path.call(this._device);
     }
 
     _getApSecurityType(ap) {

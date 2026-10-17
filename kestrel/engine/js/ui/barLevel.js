@@ -249,10 +249,6 @@ export const BarLevel = GObject.registerClass({
         return this._value;
     }
 
-    _getOverdriveStart() {
-        return this._overdriveStart;
-    }
-
     _getMinimumValue() {
         return 0;
     }

@@ -205,10 +205,6 @@ export const MessageDialogContent = GObject.registerClass({
         this.add_child(this._description);
     }
 
-    get titleActor() {
-        return this._title;
-    }
-
     get iconName() {
         return this._icon.icon_name;
     }

@@ -619,10 +619,6 @@ class _Draggable extends Signals.EventEmitter {
             duration: SNAP_BACK_ANIMATION_TIME,
         });
     }
-
-    get startGesture() {
-        return this._dndGesture;
-    }
 }
 
 /**

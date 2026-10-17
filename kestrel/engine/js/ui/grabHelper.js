@@ -50,10 +50,6 @@ export class GrabHelper {
         return this._grabStack.length > 0;
     }
 
-    get grabStack() {
-        return this._grabStack;
-    }
-
     _findStackIndex(actor) {
         if (!actor)
             return -1;

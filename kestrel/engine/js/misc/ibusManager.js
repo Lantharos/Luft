@@ -112,12 +112,6 @@ class IBusManager extends Signals.EventEmitter {
             this._spawn([]);
     }
 
-    _tryAppendEnv(env, varname) {
-        const value = GLib.getenv(varname);
-        if (value)
-            env.push(`${varname}=${value}`);
-    }
-
     _spawn(extraArgs = []) {
         try {
             const cmdLine = ['ibus-daemon', '--panel', 'disable', ...extraArgs];

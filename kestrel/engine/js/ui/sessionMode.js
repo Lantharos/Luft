@@ -91,13 +91,6 @@ export class SessionMode extends Signals.EventEmitter {
         this._sync();
     }
 
-    switchMode(to) {
-        if (this.currentMode === to)
-            return;
-        this._modeStack[this._modeStack.length - 1] = to;
-        this._sync();
-    }
-
     get currentMode() {
         return this._modeStack[this._modeStack.length - 1];
     }

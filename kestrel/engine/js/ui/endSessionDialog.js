@@ -30,7 +30,6 @@ import * as Dialog from './dialog.js';
 import * as GnomeSession from '../misc/gnomeSession.js';
 import * as KestrelUi from './kestrelUi.js';
 import * as LoginManager from '../misc/loginManager.js';
-import * as Main from './main.js';
 import * as ModalDialog from './modalDialog.js';
 import * as UserWidget from './userWidget.js';
 

@@ -17,7 +17,8 @@
  * been loaded, a #ShellAppCache::changed signal is emitted.
  */
 
-#define DEFAULT_TIMEOUT_SECONDS 5
+#define QUIET_MS 250
+#define LONGEST_WAIT_US (2 * G_USEC_PER_SEC)
 
 struct _ShellAppCache
 {
@@ -28,6 +29,7 @@ struct _ShellAppCache
   GList           *app_infos;
 
   guint            queued_update;
+  gint64           first_queued;
 };
 
 G_DEFINE_TYPE (ShellAppCache, shell_app_cache, G_TYPE_OBJECT)
@@ -101,6 +103,7 @@ shell_app_cache_do_update (gpointer user_data)
   g_autoptr(GTask) task = NULL;
 
   cache->queued_update = 0;
+  cache->first_queued = 0;
 
   /* Reset the cancellable state so we don't race with
    * two updates coming back overlapped and applying the
@@ -120,12 +123,18 @@ shell_app_cache_queue_update (ShellAppCache *self)
 {
   g_assert (SHELL_IS_APP_CACHE (self));
 
-  if (self->queued_update != 0)
+  gint64 now = g_get_monotonic_time ();
+
+  if (self->queued_update == 0)
+    self->first_queued = now;
+  else if (now - self->first_queued >= LONGEST_WAIT_US)
+    return;
+  else
     g_source_remove (self->queued_update);
 
-  self->queued_update = g_timeout_add_seconds_once (DEFAULT_TIMEOUT_SECONDS,
-                                                    shell_app_cache_do_update,
-                                                    self);
+  self->queued_update = g_timeout_add_once (QUIET_MS,
+                                            shell_app_cache_do_update,
+                                            self);
 }
 
 static void

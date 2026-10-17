@@ -13,7 +13,7 @@ import {focus, holdCode, releaseCode, useSources} from './typing.js';
 
 const {require, eventually} = checks('Keys');
 const KEY_RIGHTALT = 100;
-const APP_CACHE_REFRESH = 15000;
+const APP_CACHE_REFRESH = 3000;
 
 function installKeysEntry() {
   const cache = GLib.get_user_cache_dir();

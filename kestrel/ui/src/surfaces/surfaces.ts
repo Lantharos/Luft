@@ -5,6 +5,7 @@ import St from 'gi://St';
 
 import type { CaretPopup, Context } from '../context.js';
 import type { Board } from '../desktop/board/board.js';
+import { banded, type SwipeTrack } from '../desktop/gestures/fourFingers.js';
 import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import type { PanelSet } from '../desktop/panel/panels.js';
@@ -46,6 +47,7 @@ interface SurfaceParts {
 
 export class Surfaces {
   readonly cover = new St.Widget({ reactive: true, visible: false });
+  readonly layer = new Clutter.Actor({ name: 'kestrel-surfaces' });
   private monitor: Monitor | null = null;
   private current: Surface | null = null;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
@@ -56,6 +58,7 @@ export class Surfaces {
       this.close();
       return Clutter.EVENT_STOP;
     });
+    for (const actor of this.all()) this.layer.add_child(actor);
     const shown = [...this.all(), parts.taskView.actor];
     for (const actor of shown)
       actor.connect('notify::visible', () => this.keepComposited(shown.some(surface => surface.visible)));
@@ -68,12 +71,6 @@ export class Surfaces {
   all(): St.BoxLayout[] {
     const { start, quick, notifications, clipboard, emoji, snapLayouts } = this.parts;
     return [start.actor, quick.actor, notifications.actor, clipboard.actor, emoji.actor, snapLayouts.actor];
-  }
-
-  clipToFloor(actor: Clutter.Actor): void {
-    const updateClip = () => actor.set_clip(0, 0, actor.width, Math.max(0, this.floor() - actor.y - actor.translation_y));
-    for (const signal of ['notify::translation-y', 'notify::width', 'notify::height', 'notify::y'] as const)
-      actor.connect(signal, updateClip);
   }
 
   monitorAt(x: number, y: number): Monitor | null {
@@ -125,9 +122,24 @@ export class Surfaces {
     const [snapWidth, snapHeight] = snapLayouts.size();
     snapLayouts.actor.set_size(snapWidth, snapHeight);
     snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
+    this.clipToFloor();
   }
 
-  toggle(surface: Surface, monitor = this.pointerMonitor()): void {
+  followTasks(): SwipeTrack {
+    const { taskView } = this.parts;
+    const opening = this.current !== 'tasks';
+    if (opening) this.toggle('tasks', this.pointerMonitor(), true);
+    const direction = opening ? 1 : -1;
+    return {
+      update: progress => taskView.follow(opening ? banded(progress) : 1 - banded(progress)),
+      release: (velocity, commit) => {
+        if (commit !== opening) this.close(Duration.quick, direction * velocity);
+        else taskView.settle(direction * velocity);
+      },
+    };
+  }
+
+  toggle(surface: Surface, monitor = this.pointerMonitor(), following = false): void {
     const { previews, snapLayouts, board, taskView, start, notifications } = this.parts;
     if (!this.parts.canInteract()) return;
     previews.close();
@@ -154,7 +166,8 @@ export class Surfaces {
     this.cover.show();
     for (const panel of panels.all) panel.actor.get_parent()!.set_child_above_sibling(panel.actor, this.cover);
     if (surface === 'tasks') {
-      taskView.open(monitor);
+      if (following) taskView.prepare(monitor);
+      else taskView.open(monitor);
       this.parts.syncSession();
       return;
     }
@@ -163,7 +176,8 @@ export class Surfaces {
     this.releaseSelection(actor);
     if (surface === 'start') start.reset();
 
-    actor.get_parent()!.set_child_above_sibling(actor, null);
+    this.layer.get_parent()!.set_child_above_sibling(this.layer, null);
+    this.layer.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
     if (surface === 'notifications') notifications.prepareOpen();
@@ -180,7 +194,7 @@ export class Surfaces {
     else if (!popup) actor.grab_key_focus();
   }
 
-  close(fade: number = Duration.quick): void {
+  close(fade: number = Duration.quick, velocity?: number): void {
     const { menus, notifications, taskView, quick } = this.parts;
     menus.close();
     const surface = this.current;
@@ -197,7 +211,7 @@ export class Surfaces {
     if (focus && [...this.all(), taskView.actor].some(actor => actor.contains(focus)))
       stage.set_key_focus(null);
     if (surface === 'tasks') {
-      taskView.close();
+      taskView.close(false, velocity);
       panels.setActive(null, null);
       this.parts.syncSession();
       return;
@@ -214,6 +228,14 @@ export class Surfaces {
       if (surface === 'quick') quick.closeSubmenu(false);
       if (!this.current) panels.setActive(null, null);
     });
+  }
+
+  private clipToFloor(): void {
+    const width = (global as unknown as Shell.Global).stage.width;
+    const floor = this.floor();
+    const [, , clipWidth, clipHeight] = this.layer.get_clip();
+    if (this.layer.has_clip && clipWidth === width && clipHeight === floor) return;
+    this.layer.set_clip(0, 0, width, floor);
   }
 
   private keepComposited(composited: boolean): void {

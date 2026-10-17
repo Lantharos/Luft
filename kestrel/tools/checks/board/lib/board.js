@@ -1,4 +1,4 @@
-import {board as currentBoard} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {board as currentBoard, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {gjs, waitForWindow, windows} from '../../lib/processes.js';
@@ -46,7 +46,7 @@ export async function boardResting() {
 
 export function fourFingerSwipe(dy) {
   for (const event of [touchpad.swipe('begin', 4), touchpad.swipe('update', 4, 0, dy), touchpad.swipe('end', 4)])
-    currentBoard().input.handle(event);
+    handleTouchpad(event);
 }
 
 export function doubleTapSuper() {

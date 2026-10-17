@@ -2,18 +2,11 @@ import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
-import { Gesture, projection } from '../../../shared/motion.js';
 import type { Camera } from '../view/camera.js';
 import { copyView, FULL_SIZE, type View } from '../view/geometry.js';
-import type { GlideTrack } from '../view/transitions.js';
 
 const TAP_DURATION = 250;
 const TAP_TO_DRAG = 400;
-const UNITS_PER_MM = 1000 / 25.4;
-const TOUCHPAD_FALLBACK_HEIGHT = 70;
-const TRACK_SHARE = 2 / 3;
-const FLING_VELOCITY = 0.4;
-const VELOCITY_WINDOW = 150;
 const DOUBLE_CLICK_TIME = 400;
 const DOUBLE_CLICK_DISTANCE = 8;
 const ZOOM_STEP = 1.25;
@@ -30,14 +23,12 @@ const SUPER = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 const BUTTONS = Clutter.ModifierType.BUTTON1_MASK | Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK |
   Clutter.ModifierType.BUTTON4_MASK | Clutter.ModifierType.BUTTON5_MASK;
 
-type SwipeMode = 'none' | 'pan' | 'move' | 'step' | 'direction' | 'track' | 'switch' | 'passed';
+type SwipeMode = 'none' | 'pan' | 'move' | 'step' | 'switch';
 
 export interface BoardActions {
   readonly camera: Camera;
   active(): boolean;
   canInteract(): boolean;
-  track(entering: boolean): GlideTrack;
-  untrack(entering: boolean): void;
   fitAll(): void;
   enteredWindow(): Meta.Window | null;
   enterWindow(window: Meta.Window, from?: View): void;
@@ -76,11 +67,6 @@ export class BoardInput {
   private lastClickX = 0;
   private lastClickY = 0;
   private swallowedButton = 0;
-  private track: GlideTrack | null = null;
-  private tracksEntering = false;
-  private trackProgress = 0;
-  private trackDistance = 1;
-  private trackSamples: { time: number; step: number }[] = [];
 
   constructor(private readonly actions: BoardActions, private readonly grabActor: Clutter.Actor) {
     grabActor.connect('event', (_actor, event: Clutter.Event) =>
@@ -112,7 +98,7 @@ export class BoardInput {
     const mode = this.swipeMode;
     if (phase === Clutter.TouchpadGesturePhase.END || phase === Clutter.TouchpadGesturePhase.CANCEL) {
       this.endSwipe();
-      return mode !== 'none' && mode !== 'passed';
+      return mode !== 'none';
     }
     if (mode === 'pan' || mode === 'move') {
       const [dx, dy] = event.get_gesture_motion_delta();
@@ -125,18 +111,12 @@ export class BoardInput {
       return true;
     }
     if (mode === 'step') return this.chooseStep(event);
-    if (mode === 'direction') return this.chooseDirection(event);
-    if (mode === 'track') return this.follow(event);
     return mode === 'switch';
   }
 
   private beginSwipe(fingers: number, time: number, event: Clutter.Event): void {
     this.swipeX = this.swipeY = this.velocityX = this.velocityY = 0;
     this.lastSwipeTime = time;
-    if (fingers === 4) {
-      this.swipeMode = 'direction';
-      return;
-    }
     if (fingers !== 3 || !this.actions.active()) {
       this.swipeMode = 'none';
       return;
@@ -164,59 +144,10 @@ export class BoardInput {
     return true;
   }
 
-  private chooseDirection(event: Clutter.Event): boolean {
-    const [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
-    this.swipeX += dx;
-    this.swipeY += dy;
-    if (Math.hypot(this.swipeX, this.swipeY) < Gesture.directionLock) return false;
-    if (Math.abs(this.swipeX) >= Math.abs(this.swipeY)) {
-      this.swipeMode = 'passed';
-      return false;
-    }
-    const entering = this.swipeY < 0;
-    if (entering === this.actions.active()) {
-      this.swipeMode = 'switch';
-      return true;
-    }
-    const [found, , height] = event.get_source_device()?.get_dimensions() ?? [false, 0, 0];
-    this.trackDistance = (found ? height : TOUCHPAD_FALLBACK_HEIGHT) * UNITS_PER_MM * TRACK_SHARE;
-    this.tracksEntering = entering;
-    this.trackProgress = 0;
-    this.trackSamples = [{ time: this.lastSwipeTime, step: 0 }];
-    this.swipeMode = 'track';
-    this.track = this.actions.track(entering);
-    return this.follow(event, this.swipeY);
-  }
-
-  private follow(event: Clutter.Event, dy = event.get_gesture_motion_delta_unaccelerated()[1]): boolean {
-    const time = event.get_time();
-    const step = (this.tracksEntering ? -dy : dy) / this.trackDistance;
-    this.trackSamples.push({ time, step });
-    this.trackSamples = this.trackSamples.filter(sample => sample.time >= time - VELOCITY_WINDOW);
-    this.trackProgress += step;
-    this.track!.update(this.trackProgress);
-    return true;
-  }
-
   private endSwipe(): void {
     if (this.swipeMode === 'pan') this.actions.camera.glide(this.velocityX, this.velocityY);
     if (this.swipeMode === 'move') this.actions.endMove();
-    if (this.swipeMode === 'track') this.releaseTrack();
     this.swipeMode = 'none';
-  }
-
-  private releaseTrack(): void {
-    const track = this.track!;
-    const entering = this.tracksEntering;
-    const [first] = this.trackSamples;
-    const last = this.trackSamples[this.trackSamples.length - 1]!;
-    const travelled = this.trackSamples.slice(1).reduce((sum, sample) => sum + sample.step, 0);
-    const velocity = last.time > first!.time ? travelled * 1000 / (last.time - first!.time) : 0;
-    const commit = this.trackProgress + projection(velocity) >= 0.5 || velocity >= FLING_VELOCITY;
-    this.track = null;
-    track.release(velocity, commit, () => {
-      if (!commit) this.actions.untrack(entering);
-    });
   }
 
   private hold(event: Clutter.Event): boolean {

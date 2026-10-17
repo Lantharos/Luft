@@ -17,6 +17,8 @@ const MARGIN = 40;
 const SPACING = 28;
 const RECEDED = 0.96;
 
+const receded = (shown: number) => RECEDED + (1 - RECEDED) * shown;
+
 export class TaskView {
   readonly actor = new St.Widget({ name: 'kestrel-task-view', style_class: 'kestrel-task-view', reactive: true, visible: false });
   private readonly windowLayer = new St.Widget();
@@ -43,6 +45,12 @@ export class TaskView {
   }
 
   open(monitor: Monitor): void {
+    this.prepare(monitor);
+    animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+    this.scaleWindows(1);
+  }
+
+  prepare(monitor: Monitor): void {
     this.cover(monitor);
     const shell = global as unknown as Shell.Global;
     const manager = shell.workspace_manager;
@@ -61,9 +69,21 @@ export class TaskView {
       this.windowLayer.set_scale(reducedMotion() ? 1 : RECEDED, reducedMotion() ? 1 : RECEDED);
       this.actor.show();
     }
-    animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
-    this.scaleWindows(1);
     this.actor.grab_key_focus();
+  }
+
+  follow(shown: number): void {
+    this.actor.remove_transition('opacity');
+    this.windowLayer.remove_transition('scale-x');
+    this.windowLayer.remove_transition('scale-y');
+    this.actor.opacity = Math.round(255 * Math.min(1, Math.max(0, shown)));
+    const scale = reducedMotion() ? 1 : receded(shown);
+    this.windowLayer.set_scale(scale, scale);
+  }
+
+  settle(velocity: number): void {
+    animateActor(this.actor, { opacity: 255, spring: Spring.snappy, velocity: 255 * velocity });
+    this.scaleWindows(1, velocity);
   }
 
   prewarm(monitor: Monitor): void {
@@ -80,7 +100,7 @@ export class TaskView {
     this.strip.clear();
   }
 
-  close(immediate = false): void {
+  close(immediate = false, velocity?: number): void {
     if (!this.monitor) return;
     this.monitor = null;
     for (const [object, id] of this.signals) object.disconnect(id);
@@ -98,12 +118,15 @@ export class TaskView {
       finish();
       return;
     }
-    if (!reducedMotion()) this.scaleWindows(RECEDED);
-    animateActor(this.actor, { opacity: 0, duration: Duration.quick, curve: Curve.decelerate, onStopped: finish });
+    if (!reducedMotion()) this.scaleWindows(RECEDED, velocity);
+    const fade = velocity === undefined
+      ? { duration: Duration.quick, curve: Curve.decelerate }
+      : { spring: Spring.snappy, velocity: 255 * velocity };
+    animateActor(this.actor, { opacity: 0, ...fade, onStopped: finish });
   }
 
-  private scaleWindows(scale: number): void {
-    animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.snappy });
+  private scaleWindows(scale: number, velocity?: number): void {
+    animateActor(this.windowLayer, { scale_x: scale, scale_y: scale, spring: Spring.snappy, velocity: (1 - RECEDED) * (velocity ?? 0) });
   }
 
   private prewarmOnceWindowShows(monitor: Monitor): void {

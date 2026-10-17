@@ -107,14 +107,35 @@ class MonitorBackdrop {
   }
 }
 
+class MonitorWallpaper {
+  readonly actor: Clutter.Actor;
+  private readonly background: { destroy(): void };
+
+  constructor(monitor: Monitor, createBackground: BackgroundFactory) {
+    this.actor = new Clutter.Actor({ x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height });
+    this.background = createBackground(this.actor, monitor.index);
+  }
+
+  destroy(): void {
+    this.background.destroy();
+    this.actor.destroy();
+  }
+}
+
 export class Backdrop {
   readonly actor = new St.Widget({ name: 'kestrel-board', reactive: true, visible: false });
+  readonly board = new Clutter.Actor();
+  private readonly desktop = new Clutter.Actor({ visible: false });
   private monitors: MonitorBackdrop[] = [];
+  private wallpapers: MonitorWallpaper[] = [];
   private tile!: St.ImageContent;
   private brightness = 1;
 
   constructor(private readonly createBackground: BackgroundFactory, light: boolean) {
     this.setLight(light);
+    this.actor.add_child(this.desktop);
+    this.actor.add_child(this.board);
+    this.board.connect('notify::opacity', () => this.desktop.visible = this.board.opacity < 255);
   }
 
   setLight(light: boolean): void {
@@ -125,11 +146,17 @@ export class Backdrop {
 
   build(monitors: Monitor[]): void {
     for (const monitor of this.monitors) monitor.destroy();
+    for (const wallpaper of this.wallpapers) wallpaper.destroy();
     this.monitors = monitors.map(monitor => {
       const backdrop = new MonitorBackdrop(monitor, this.createBackground, this.tile);
       backdrop.setTile(this.tile, this.brightness);
-      this.actor.add_child(backdrop.actor);
+      this.board.add_child(backdrop.actor);
       return backdrop;
+    });
+    this.wallpapers = monitors.map(monitor => {
+      const wallpaper = new MonitorWallpaper(monitor, this.createBackground);
+      this.desktop.add_child(wallpaper.actor);
+      return wallpaper;
     });
   }
 
@@ -147,7 +174,9 @@ export class Backdrop {
 
   destroy(): void {
     for (const monitor of this.monitors) monitor.destroy();
+    for (const wallpaper of this.wallpapers) wallpaper.destroy();
     this.monitors = [];
+    this.wallpapers = [];
     this.actor.destroy();
   }
 }

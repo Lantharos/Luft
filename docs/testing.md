@@ -56,7 +56,7 @@ Optional tools widen the capture: with `rclone` installed Rover connects to loca
 
 ### Motion clips
 
-`motion` records every frame Kestrel paints while surfaces open, close and change their mind half-way, windows minimise and restore, and workspaces switch, back to back and with reduced motion. Each clip goes to its own folder in `clips` inside the capture folder, with the frames as pictures and `frames.json` listing when each was painted and how far along the change it looks. `KESTREL_MOTION_ONLY` picks groups of clips: `surfaces`, `windows`, `board`, `reduced` and `snap`.
+`motion` records every frame Kestrel paints while surfaces open, close and change their mind half-way, windows minimise and restore, and workspaces switch, back to back and with reduced motion. Each clip goes to its own folder in `clips` inside the capture folder, with the frames as pictures and `frames.json` listing when each was painted and how far along the change it looks. `KESTREL_MOTION_ONLY` picks groups of clips: `surfaces`, `windows`, `board`, `gestures`, `reduced` and `snap`.
 
 `kestrel/tools/motion/sheets.py CLIPS` turns each clip into a contact sheet and a video at real speed, with ImageMagick and FFmpeg.
 

@@ -9,6 +9,7 @@ import type { AppearanceService } from './appearance/service.js';
 import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
 import { LockControls } from './auth/lockScreen/controls.js';
 import { Board, type BoardFrame } from './desktop/board/board.js';
+import { FourFingerSwipe, type SwipeDirection, type SwipeTrack } from './desktop/gestures/fourFingers.js';
 import { ContextMenus } from './desktop/menus/contextMenus.js';
 import { coveredMonitors } from './desktop/panel/coverage.js';
 import type { Monitor } from './desktop/panel/panel.js';
@@ -58,6 +59,7 @@ class KestrelUi {
   private readonly surfaces: Surfaces;
   readonly board: Board;
   private readonly liveWallpaper: LiveWallpaper;
+  private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private sessionSyncLater = 0;
@@ -137,9 +139,8 @@ class KestrelUi {
     }));
 
     context.layoutManager.addTopChrome(this.surfaces.cover);
-    for (const actor of this.surfaces.all()) context.layoutManager.addTopChrome(actor);
+    context.layoutManager.addTopChrome(this.surfaces.layer);
     context.layoutManager.addTopChrome(this.taskView.actor);
-    for (const actor of this.surfaces.all()) this.surfaces.clipToFloor(actor);
 
     this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
       const active = this.surfaces.active;
@@ -150,7 +151,7 @@ class KestrelUi {
       return Clutter.EVENT_PROPAGATE;
     });
     this.watch(shellGlobal.stage, 'captured-event', (_stage, event) => {
-      if (this.board.input.handle(event)) return Clutter.EVENT_STOP;
+      if (this.touchpad(event)) return Clutter.EVENT_STOP;
       if (event.type() === Clutter.EventType.SCROLL) {
         const [x, y] = event.get_coords();
         const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
@@ -259,6 +260,14 @@ class KestrelUi {
     this.surfaces.toggle('start');
   }
 
+  private followFourFingers(direction: SwipeDirection): SwipeTrack | null {
+    const up = direction === 'up';
+    if (this.surfaces.active === 'tasks') return up ? this.surfaces.followTasks() : null;
+    if (!this.canInteract() || this.surfaces.active) return null;
+    if (this.board.shown) return up ? null : this.board.track(false);
+    return up ? this.board.track(true) : this.surfaces.followTasks();
+  }
+
   private takeScreenshot(): void {
     this.dismissImmediately();
     const stage = (global as unknown as Shell.Global).stage;
@@ -281,6 +290,10 @@ class KestrelUi {
   }
 
   taskViewOpen(): boolean { return this.taskView.visible; }
+
+  touchpad(event: Clutter.Event): boolean {
+    return this.fourFingers.handle(event) || this.board.input.handle(event);
+  }
 
   shutdown(): void {
     for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
@@ -361,6 +374,8 @@ export function taskbarClearance(): number { return taskbarPreferences.clearance
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
 
 export function lockControls(): LockControls { return currentUi!.lockControls(); }
+
+export function touchpad(event: Clutter.Event): boolean { return currentUi?.touchpad(event) ?? false; }
 
 export function board(): Board | null { return currentUi?.board ?? null; }
 

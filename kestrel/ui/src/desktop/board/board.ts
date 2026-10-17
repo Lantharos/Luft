@@ -4,6 +4,7 @@ import type Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import type { Keybindings } from '../../context.js';
+import type { SwipeTrack } from '../gestures/fourFingers.js';
 import type { Monitor } from '../panel/panel.js';
 import { isDark, watchScheme } from '../../shared/scheme.js';
 import type { Box } from '../../shared/placement.js';
@@ -13,7 +14,7 @@ import { BoardKeys } from './input/keys.js';
 import { Backdrop, type BackgroundFactory } from './view/backdrop.js';
 import { Camera } from './view/camera.js';
 import { boundsOf, copyView, fits, FULL_SIZE, freeSpot, intersection, PLACEMENT_GAP, planExit, type View } from './view/geometry.js';
-import { endGlideTracking, fadeIn, glideFrom, settleActor, trackGlides, type GlideTrack } from './view/transitions.js';
+import { endGlideTracking, fadeIn, fadeOut, glideFrom, settleActor, trackGlides } from './view/transitions.js';
 import { arrange, putBack, restoreSizes } from './windows/arrange.js';
 import { Focus, WINDOW_PADDING, type FocusState } from './windows/focus.js';
 import { Follower } from './windows/follower.js';
@@ -179,15 +180,15 @@ export class Board implements BoardActions {
     else this.enter();
   }
 
-  track(entering: boolean): GlideTrack {
-    const track = trackGlides();
+  track(entering: boolean): SwipeTrack {
+    const track = trackGlides(() => this.untrack(entering));
     if (entering) this.enter();
     else this.exit();
     return track;
   }
 
-  untrack(entering: boolean): void {
-    const track = trackGlides();
+  private untrack(entering: boolean): void {
+    const track = trackGlides(() => {});
     if (entering) this.exit();
     else this.enter();
     track.finish();
@@ -228,7 +229,7 @@ export class Board implements BoardActions {
     const fitted = entered ?? windows.find(window => fits(view, frameBox(window), viewport, WINDOW_PADDING)) ?? null;
     const plan = planExit([...canvas.layout], view, viewport, workArea, fitted);
     canvas.shown = false;
-    this.present(null);
+    this.present(null, true);
     putBack(plan, canvas, view, viewport, workArea);
     endGlideTracking();
   }
@@ -426,8 +427,7 @@ export class Board implements BoardActions {
     canvas.layout.clear();
     canvas.normal.clear();
     windows.forEach((window, index) => canvas.normal.set(window, before[index]!));
-    this.present(canvas);
-    fadeIn(this.backdrop.actor);
+    this.present(canvas, true);
     windows.forEach((window, index) => {
       settleActor(window);
       window.move_frame(false, Math.round(boxes[index]!.x), Math.round(boxes[index]!.y));
@@ -452,7 +452,7 @@ export class Board implements BoardActions {
     this.present(canvas?.shown ? canvas : null);
   }
 
-  private present(canvas: Canvas | null): void {
+  private present(canvas: Canvas | null, fade = false): void {
     const previous = this.presented;
     if (previous && previous !== canvas) copyView(previous.view, this.camera.view);
     this.collisions.end();
@@ -464,11 +464,9 @@ export class Board implements BoardActions {
     if (!canvas) {
       if (!previous) return;
       this.camera.release();
-      this.backdrop.actor.remove_transition('opacity');
-      this.backdrop.actor.hide();
       this.corner.setShown(false);
-      this.host.wallpaper.show();
-      this.setDesktopWindowsVisible(true);
+      if (fade) fadeOut(this.backdrop.board, () => this.uncover());
+      else this.uncover();
       this.host.setPanelsHidden(false);
       this.keys.release();
       this.host.changed();
@@ -479,8 +477,7 @@ export class Board implements BoardActions {
     this.input.shield.set_position(viewport.x, viewport.y);
     this.input.shield.set_size(viewport.width, viewport.height);
     this.camera.engage(canvas.view, shell().display.get_monitor_scale(primary?.index ?? 0));
-    this.backdrop.actor.show();
-    this.backdrop.actor.opacity = 255;
+    this.cover(fade);
     this.host.wallpaper.hide();
     this.setDesktopWindowsVisible(false);
     this.host.setPanelsHidden(true);
@@ -492,6 +489,26 @@ export class Board implements BoardActions {
     this.focus.attach(canvas, shell().workspace_manager.get_active_workspace());
     this.windowsChanged();
     this.host.changed();
+  }
+
+  private cover(fade: boolean): void {
+    const board = this.backdrop.board;
+    if (!this.backdrop.actor.visible) board.opacity = fade ? 0 : 255;
+    if (fade) {
+      fadeIn(board);
+    } else {
+      board.remove_transition('opacity');
+      board.opacity = 255;
+    }
+    this.backdrop.actor.show();
+  }
+
+  private uncover(): void {
+    if (this.presented) return;
+    this.backdrop.board.remove_transition('opacity');
+    this.backdrop.actor.hide();
+    this.host.wallpaper.show();
+    this.setDesktopWindowsVisible(true);
   }
 
   private setDesktopWindowsVisible(visible: boolean): void {

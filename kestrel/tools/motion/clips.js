@@ -1,11 +1,12 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import {dismissImmediately, switchWorkspace, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, switchWorkspace, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {leaveBoard, openBoardWindow, openWindows, showBoard} from '../checks/board/lib/board.js';
+import {touchpad} from '../checks/board/lib/touchpad.js';
 import {chord, rest} from '../checks/lib/input.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
-import {pause, settled} from '../checks/lib/wait.js';
+import {nextFrame, pause, settled} from '../checks/lib/wait.js';
 
 const SURFACES = ['start', 'quick', 'notifications', 'emoji', 'snap', 'tasks'];
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
@@ -94,6 +95,35 @@ async function board(clip) {
   await reset();
 }
 
+const FINGER_STEP = 24;
+
+async function fourFingers(...moves) {
+  handleTouchpad(touchpad.swipe('begin', 4));
+  for (const [direction, frames] of moves) {
+    for (let i = 0; i < frames; i++) {
+      handleTouchpad(touchpad.swipe('update', 4, 0, direction * FINGER_STEP));
+      await nextFrame();
+    }
+  }
+  handleTouchpad(touchpad.swipe('end', 4));
+}
+
+async function gestures(clip) {
+  await reset();
+  await openWindows();
+  await settled();
+  await clip('board-enter-fingers', () => fourFingers([-1, 20]), {timeout: 8000, notes: 'Four fingers up'});
+  await clip('board-leave-fingers', () => fourFingers([1, 20]), {timeout: 8000, notes: 'Four fingers down'});
+  await showBoard();
+  await clip('board-leave-fingers-reversed', () => fourFingers([1, 20], [-1, 20]),
+    {timeout: 8000, notes: 'Four fingers down, then back up before letting go'});
+  await leaveBoard();
+  await clip('tasks-open-fingers', () => fourFingers([1, 20]), {notes: 'Four fingers down'});
+  await clip('tasks-close-fingers', () => fourFingers([-1, 20]), {notes: 'Four fingers up'});
+  await stopAll();
+  await reset();
+}
+
 async function reduced(clip) {
   a11y.set_string('reduced-motion', 'reduce');
   try {
@@ -116,4 +146,4 @@ async function keyboardSnap(clip) {
   await reset();
 }
 
-export const groups = {surfaces, windows, board, reduced, snap: keyboardSnap};
+export const groups = {surfaces, windows, board, gestures, reduced, snap: keyboardSnap};

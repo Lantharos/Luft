@@ -390,7 +390,6 @@ export const MonitorGroup = GObject.registerClass({
     }
 });
 
-const THROWN_VELOCITY = 1.5;
 
 const range = (first, last) => Array.from({length: last - first + 1}, (_, i) => first + i);
 
@@ -536,7 +535,7 @@ export class WorkspaceAnimationController {
         const switchData = this._switchData;
         switchData.completeEffect = onComplete;
         for (const monitorGroup of switchData.monitors) {
-            const params = {spring: KestrelUi.Spring.smooth, velocity, epsilon: monitorGroup.epsilon};
+            const params = {spring: KestrelUi.Spring.snappy, velocity, epsilon: monitorGroup.epsilon};
             if (monitorGroup === this._primaryGroup()) {
                 params.onComplete = () => {
                     this._finishWorkspaceSwitch(switchData);
@@ -643,11 +642,9 @@ export class WorkspaceAnimationController {
             return;
         }
 
-        const spring = Math.abs(velocity) >= THROWN_VELOCITY
-            ? KestrelUi.Spring.thrown : KestrelUi.Spring.smooth;
         for (const monitorGroup of this._switchData.monitors) {
             const progress = monitorGroup.getWorkspaceProgress(newWs);
-            const params = {spring, velocity, epsilon: monitorGroup.epsilon};
+            const params = {spring: KestrelUi.Spring.snappy, velocity, epsilon: monitorGroup.epsilon};
             if (monitorGroup === this._primaryGroup())
                 params.onComplete = finish;
             monitorGroup.ease_property('progress', progress, params);

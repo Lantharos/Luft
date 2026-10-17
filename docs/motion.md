@@ -34,8 +34,8 @@ A spring is given by its duration, how long it takes to come visually close to i
 
 | Token | Duration | Bounce | For |
 | --- | --- | --- | --- |
-| `snappy` | 250 ms | 0 | Flyouts, popovers, banners, small things moving |
-| `smooth` | 350 ms | 0 | Windows, workspaces, the board camera, the lock curtain |
+| `snappy` | 250 ms | 0 | Flyouts, popovers, banners, small things moving, workspace switches, the board turning on and off |
+| `smooth` | 350 ms | 0 | Moving and resizing windows, the board camera, the lock curtain |
 | `thrown` | 400 ms | 0.12 | Settling after a fling that carried real speed |
 
 A spring ends once it is within half a device pixel of its target and moving less than a pixel per frame, so its invisible tail doesn't keep the screen repainting.
@@ -48,7 +48,7 @@ A spring ends once it is within half a device pixel of its target and moving les
 | `deceleration` | 0.997 | Where a fling would come to rest, per millisecond, to decide which page or workspace it lands on |
 | `directionLock` | 10 px | How far a swipe moves before it commits to a direction |
 
-After changing `tokens.json`, run `bun run generate` in `packages/motion` to update the apps' CSS; `bun run check` there tells whether it is up to date.
+After changing `tokens.json`, run `bun run generate` in `packages/motion` to update the apps' CSS and the shell theme's `sass/_motion.scss`; `bun run check` there tells whether they are up to date.
 
 ## In Kestrel
 
@@ -67,6 +67,8 @@ actor.ease({translation_x: target, spring: Spring.smooth, velocity: releaseSpeed
 - `velocity` sets the starting speed in the property's units per second, for example the speed of a finger at release. It can also map property names to speeds.
 - `curve` takes one of the curves, in place of `mode`.
 - `St.Adjustment.ease()` and `ease_property()` take the same options.
+
+The theme's stylesheets have the durations as `$motion-tap`, `$motion-quick`, `$motion-standard` and `$motion-large`. Hover and press feedback uses `$motion-tap`; state changes such as switches and selections use `$motion-quick`.
 
 `Shell.SpringTransition` is the transition underneath, for code that builds its own transitions. `kestrel/ui/src/shared/motion.ts` exports the tokens with `reducedMotion()`, `rubberband()` and `projection()`, which turns a release speed into the distance a fling would travel.
 
@@ -153,6 +155,14 @@ Toasts go through `Toast` and a `Toasts` store, which shows one toast at a time,
 ## Gestures
 
 Swiping between workspaces with three fingers follows the fingers: a swipe across about two thirds of the touchpad moves one workspace, using the touchpad's real size when it reports one. Past the first and last workspace the desktop resists and springs back. On release, the speed of the swipe decides where it lands, so a quick flick moves on even if it was short, and a fast one can cross several workspaces. The settle starts at the speed the fingers had. Scrolling with two fingers while holding Super works the same way.
+
+Four fingers move between the desktop, the board and the task view, and follow the fingers the same way. Each can be turned around before letting go, resists past its end, and settles at the speed the fingers had:
+
+| Where | Four fingers up | Four fingers down |
+| --- | --- | --- |
+| Desktop | Turns it into a board | Opens the task view |
+| Board | | Turns it back into a desktop |
+| Task view | Closes it | |
 
 Keyboard switches, Super and the wheel, and swipes all drive the same spring, so pressing Super+3 while a switch to the second workspace is still under way carries on across, and reversing turns around where the desktop is. Minimising a window and restoring it, or opening and closing Start, Quick settings, the notification center or the task view, also turn around from wherever they are.
 

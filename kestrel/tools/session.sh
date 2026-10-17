@@ -38,7 +38,7 @@ Environment:
   KESTREL_COMPOSITOR    Mutter install to run on (default: kestrel/run/mutter-install).
   KESTREL_FRAMES_BASELINE  A saved frames report to compare against.
   KESTREL_FRAMES_ONLY   Comma separated words; measures only interactions named with one.
-  KESTREL_MOTION_ONLY   Comma separated clip groups to record: surfaces, windows, board, reduced, snap.
+  KESTREL_MOTION_ONLY   Comma separated clip groups to record: surfaces, windows, board, gestures, reduced, snap.
 USAGE
 }
 

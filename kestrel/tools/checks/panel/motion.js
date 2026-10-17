@@ -73,6 +73,25 @@ async function checkReducedSurface(surface, name) {
   require(actor.translation_y === 0, `with reduced motion ${surface} fades out without sliding`);
 }
 
+async function checkClippedAtTaskbar() {
+  dismissImmediately();
+  await settled();
+  const actor = named('kestrel-start');
+  const top = named('kestrel-panel').get_transformed_position()[1];
+  toggleSurface('start');
+  await waitUntil(() => resting(actor), 'start opens', 2000);
+  toggleSurface('start');
+  const frames = [];
+  await sample(actor, 6, () => {
+    const [, y] = actor.get_transformed_position();
+    const [, , , clipHeight] = actor.get_parent().get_clip();
+    frames.push({bottom: y + actor.height, clip: actor.get_parent().has_clip ? clipHeight : Infinity});
+  });
+  require(frames.some(frame => frame.bottom > top) && frames.every(frame => Math.abs(frame.clip - top) < 1),
+    'a closing surface is cut off at the top of the taskbar');
+  await waitUntil(() => !actor.visible, 'start closes', 2000);
+}
+
 function testActor() {
   const actor = new Clutter.Actor({width: 200, height: 200});
   global.stage.add_child(actor);
@@ -138,6 +157,7 @@ export async function run() {
   await checkRetarget();
   await checkDisabledAnimations();
   for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
+  await checkClippedAtTaskbar();
   a11y.set_string('reduced-motion', 'reduce');
   try {
     for (const [surface, name] of SURFACES) await checkReducedSurface(surface, name);

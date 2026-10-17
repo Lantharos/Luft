@@ -96,7 +96,8 @@ sudo systemctl disable gdm && sudo systemctl enable greetd
 | Gesture | Action |
 | --- | --- |
 | Three fingers sideways | Next or previous workspace; on a board, next window |
-| Four fingers up / down | Turn the desktop into a board, or back |
+| Four fingers up, then down | Turn the desktop into a board, and back |
+| Four fingers down, then up | All windows, and back |
 | Three fingers (board) | Pan; spread to enter a window, swipe down to step out |
 | Pinch (board) | Zoom |
 

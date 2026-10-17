@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import {switchWorkspace, taskViewOpen, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {Spring, switchWorkspace, taskViewOpen, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {openBoardWindow} from '../board/lib/board.js';
@@ -14,7 +14,7 @@ const manager = global.workspace_manager;
 const animation = () => Main.wm._workspaceAnimation;
 const switching = () => animation()._switchData !== null;
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
-const LARGEST_STEP = 0.2;
+const JUMP = 0.1;
 
 function watchFrames(read) {
   const values = [];
@@ -25,7 +25,9 @@ function watchFrames(read) {
   };
 }
 
-const largestStep = values => Math.max(0, ...values.slice(1).map((value, i) => Math.abs(value - values[i])));
+const steps = values => values.slice(1).map((value, i) => Math.abs(value - values[i]));
+const largestStep = values => Math.max(0, ...steps(values));
+const jumps = values => steps(values).some((step, i, all) => step > JUMP && step > 2 * Math.max(all[i - 1] ?? 0, all[i + 1] ?? 0));
 
 function visibleWorkspace() {
   const data = animation()._switchData;
@@ -42,11 +44,13 @@ async function settledOn(index, label) {
 async function checkWorkspaceSwitches() {
   const stopWatching = watchFrames(visibleWorkspace);
   switchWorkspace(1);
+  const slide = animation()._switchData.monitors[0].get_transition('progress');
+  require(slide.duration < Spring.snappy.duration * 2, 'a workspace switch settles on the snappy spring');
   await pause(80);
   switchWorkspace(0);
   await settledOn(0, 'switching back mid-way ends on the first workspace');
   let path = stopWatching();
-  require(path.some(index => index > 0.05) && largestStep(path) < LARGEST_STEP,
+  require(path.some(index => index > 0.05) && !jumps(path),
     'switching back mid-way turns around without jumping');
 
   const chained = watchFrames(visibleWorkspace);
@@ -55,7 +59,7 @@ async function checkWorkspaceSwitches() {
   switchWorkspace(2);
   await settledOn(2, 'a second switch mid-way carries on to the third workspace');
   path = chained();
-  require(largestStep(path) < LARGEST_STEP && path.every((index, i) => i === 0 || index >= path[i - 1] - 0.01),
+  require(!jumps(path) && path.every((index, i) => i === 0 || index >= path[i - 1] - 0.01),
     'chained switches flow across without jumping back');
   switchWorkspace(0);
   await settledOn(0, 'the first workspace comes back');
@@ -160,6 +164,47 @@ async function checkTaskView() {
   await waitUntil(() => !view.visible, 'the task view closes', 2000);
 }
 
+const STEP = 12;
+
+async function fourFingers(direction, steps, {thenHold = false} = {}) {
+  handleTouchpad(touchpad.swipe('begin', 4));
+  for (let i = 0; i < steps; i++) handleTouchpad(touchpad.swipe('update', 4, 0, direction * STEP));
+  if (!thenHold) return;
+  for (let i = 0; i < 12; i++) {
+    handleTouchpad(touchpad.swipe('update', 4, 0, 0));
+    await pause(16);
+  }
+}
+
+const letGo = () => handleTouchpad(touchpad.swipe('end', 4));
+
+async function checkTaskViewGesture() {
+  const view = named('kestrel-task-view');
+  const windows = () => view.get_first_child();
+  const still = () => view.get_transition('opacity') === null && windows().get_transition('scale-x') === null;
+
+  await fourFingers(1, 20, {thenHold: true});
+  require(view.visible && view.opacity > 0 && view.opacity < 255 && windows().scale_x < 1,
+    'four fingers moving down bring the task view in under the fingers');
+  letGo();
+  await waitUntil(() => !view.visible && !taskViewOpen(), 'letting go of a short, slow swipe puts the task view away', 2000);
+
+  await fourFingers(1, 160);
+  const stretched = windows().scale_x;
+  require(view.opacity === 255 && stretched > 1 && stretched < 1.04, 'swiping past fully open resists');
+  letGo();
+  await waitUntil(() => taskViewOpen() && still(), 'a long swipe down opens the task view', 2000);
+  require(view.opacity === 255 && windows().scale_x === 1, 'the task view settles fully open');
+
+  await fourFingers(-1, 20);
+  require(view.opacity < 255 && windows().scale_x < 1, 'four fingers moving up take the task view away with them');
+  for (let i = 0; i < 20; i++) handleTouchpad(touchpad.swipe('update', 4, 0, STEP));
+  require(view.opacity === 255, 'moving back down mid-way brings it back');
+  for (let i = 0; i < 30; i++) handleTouchpad(touchpad.swipe('update', 4, 0, -STEP));
+  letGo();
+  await waitUntil(() => !view.visible && !taskViewOpen(), 'a quick swipe up closes the task view', 2000);
+}
+
 async function checkReducedWorkspaceSwitch() {
   a11y.set_string('reduced-motion', 'reduce');
   try {
@@ -190,6 +235,7 @@ export async function run() {
     await settled();
     await checkMinimizeRestore(first);
     await checkTaskView();
+    await checkTaskViewGesture();
   } finally {
     for (const client of clients) await stop(client);
   }

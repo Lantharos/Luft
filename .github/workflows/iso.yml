@@ -68,13 +68,14 @@ jobs:
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
           echo "IMAGE=$image" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "CHANNEL=$channel" >> "$GITHUB_ENV"
 
       - name: Build
         if: env.SKIP != '1'
         run: |
           mkdir -p "$LUFT_ISO"
-          os/iso/build.sh "$IMAGE"
+          os/iso/build.sh "$IMAGE" universal standard nvidia
           ls -l "$LUFT_ISO"
 
       - name: Upload to R2
@@ -86,17 +87,18 @@ jobs:
         run: |
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
           cd "$LUFT_ISO"
-          iso="$(ls luft-*.iso)"
           s3() { aws s3 "$@" --endpoint-url "$endpoint" --no-progress; }
-          if [[ "$CHANNEL" == latest ]]; then
-            s3 cp "$iso" "s3://$R2_BUCKET/$iso"
-            s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
-          fi
-          alias="luft-$CHANNEL.iso"
-          s3 cp "$iso" "s3://$R2_BUCKET/$alias"
-          sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
+          for iso in luft-*.iso; do
+            if [[ "$CHANNEL" == latest ]]; then
+              s3 cp "$iso" "s3://$R2_BUCKET/$iso"
+              s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
+            fi
+            alias="luft-$CHANNEL${iso#luft-"$VERSION"}"
+            s3 cp "$iso" "s3://$R2_BUCKET/$alias"
+            sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
+          done
           if [[ "$CHANNEL" == nightly ]]; then
-            echo "${iso#luft-}" | sed 's/\.iso$//' | s3 cp - "s3://$R2_BUCKET/luft-nightly.version"
+            echo "$VERSION" | s3 cp - "s3://$R2_BUCKET/luft-nightly.version"
             aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256'
           fi
 

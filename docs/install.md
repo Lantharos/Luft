@@ -8,6 +8,8 @@ Download [luft-latest.iso](https://get.luft.lanth.me/luft-latest.iso) (checksum:
 
 For testing, [luft-nightly.iso](https://get.luft.lanth.me/luft-nightly.iso) ([checksum](https://get.luft.lanth.me/luft-nightly.iso.sha256)) is built from the latest nightly image, and computers installed from it keep updating to nightly images. [Testing on real hardware](hardware-testing.md) lists what to try.
 
+These sticks carry both of Luft's images, so they install offline on any computer. Smaller ones carry just one: `luft-latest-standard.iso` for computers without NVIDIA graphics and `luft-latest-nvidia.iso` for those with it, and the same with `nightly` for nightly builds, each with a `.sha256` next to it. [Meet Luft](meet.md) picks the right one by itself.
+
 The stick starts straight into Install Luft, over the blurred wallpaper. Holding Esc while it starts shows a menu with a basic graphics mode for screens that stay dark.
 
 1. **Language, keyboard and time zone.** Guessed from the firmware's language, from Windows if it's on the computer, and from the network once you're online.

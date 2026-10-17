@@ -45,13 +45,24 @@ CI builds each changed part in its own job, all at once, keeps it at `ghcr.io/la
 ## USB stick
 
 ```sh
-os/iso/build.sh                              # from localhost/luft:45 and :45-nvidia
-os/iso/build.sh ghcr.io/lantharos/luft:45    # from the published images
+os/iso/build.sh                                         # from localhost/luft:45 and :45-nvidia
+os/iso/build.sh ghcr.io/lantharos/luft:45               # from the published images
+os/iso/build.sh localhost/luft:45 standard nvidia       # the sticks with one image each
 ```
 
-It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. Releases build it in CI and publish it at https://get.luft.lanth.me/luft-latest.iso; each nightly image gets one at https://get.luft.lanth.me/luft-nightly.iso, whose installs keep following the nightly images. [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.
+It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.
 
-The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc shows GRUB's menu. It carries both images, so installing needs no network, and the session on the stick runs the regular image, so choosing *Just try Luft* gives the normal desktop with Install Luft in the launcher.
+The universal stick carries both images; `standard` and `nvidia` carry one each and come out as `luft-VERSION-standard.iso` and `luft-VERSION-nvidia.iso`. The images share every layer below NVIDIA's driver, and the stick keeps each layer once. CI publishes all three at https://get.luft.lanth.me with a `.sha256` next to each:
+
+| File | Carries |
+| --- | --- |
+| `luft-latest.iso`, `luft-VERSION.iso` | Both images, for any computer |
+| `luft-latest-standard.iso`, `luft-VERSION-standard.iso` | The image for computers without NVIDIA graphics |
+| `luft-latest-nvidia.iso`, `luft-VERSION-nvidia.iso` | The NVIDIA image |
+| `luft-nightly.iso`, `luft-nightly-standard.iso`, `luft-nightly-nvidia.iso` | The same from the newest nightly image; installs keep following the nightly images |
+| `luft-nightly.version` | The nightly build's version |
+
+The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc shows GRUB's menu. It carries its images, so installing needs no network, and the session on the stick runs the regular image, so choosing *Just try Luft* gives the normal desktop with Install Luft in the launcher.
 
 | Path | Holds |
 | --- | --- |

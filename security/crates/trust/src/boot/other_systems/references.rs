@@ -69,7 +69,9 @@ impl Partitions {
 
 fn read_small(path: &Path, largest: u64) -> Option<Vec<u8>> {
     let size = std::fs::metadata(path).ok()?.len();
-    (size <= largest).then(|| std::fs::read(path).ok()).flatten()
+    (size <= largest)
+        .then(|| std::fs::read(path).ok())
+        .flatten()
 }
 
 pub fn of_windows(folder: &Path, partitions: &Partitions) -> Vec<String> {
@@ -93,7 +95,10 @@ mod tests {
         Partitions {
             by_partuuid: vec![(windows.to_owned(), guid_bytes(windows).unwrap())],
             by_uuid: HashMap::from([
-                (plain("3f6c1d2e-8b9a-4c7d-a1e2-f3b4c5d6e7f8"), "boot-partition".to_owned()),
+                (
+                    plain("3f6c1d2e-8b9a-4c7d-a1e2-f3b4c5d6e7f8"),
+                    "boot-partition".to_owned(),
+                ),
                 (plain("4e5d-9a1b"), "esp".to_owned()),
             ]),
         }
@@ -103,7 +108,10 @@ mod tests {
     fn finds_the_partitions_a_grub_config_looks_for() {
         let config = "search --no-floppy --fs-uuid --set=dev 3f6c1d2e-8b9a-4c7d-a1e2-f3b4c5d6e7f8\n\
                       set prefix=($dev)/grub2\nsearch.fs_uuid 4E5D-9A1B esp\nexport $prefix\n";
-        assert_eq!(partitions().named_in_grub(config), ["boot-partition", "esp"]);
+        assert_eq!(
+            partitions().named_in_grub(config),
+            ["boot-partition", "esp"]
+        );
     }
 
     #[test]
@@ -111,7 +119,10 @@ mod tests {
         let mut store = vec![0u8; 64];
         store.extend(guid_bytes("8d0b4b6c-6a5e-4d2b-9b1f-3c4d5e6f7a8b").unwrap());
         store.extend([0u8; 32]);
-        assert_eq!(partitions().named_in_bcd(&store), ["8d0b4b6c-6a5e-4d2b-9b1f-3c4d5e6f7a8b"]);
+        assert_eq!(
+            partitions().named_in_bcd(&store),
+            ["8d0b4b6c-6a5e-4d2b-9b1f-3c4d5e6f7a8b"]
+        );
         assert!(partitions().named_in_bcd(&[0u8; 128]).is_empty());
     }
 }

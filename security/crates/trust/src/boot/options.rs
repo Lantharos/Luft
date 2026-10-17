@@ -17,7 +17,8 @@ pub struct LoadOption {
 impl LoadOption {
     pub fn starts_from(&self, partition: &str, folder: &str) -> bool {
         let prefix = format!("\\{}\\", folder.replace('/', "\\")).to_lowercase();
-        self.partition.as_deref() == Some(partition) && self.path.to_lowercase().starts_with(&prefix)
+        self.partition.as_deref() == Some(partition)
+            && self.path.to_lowercase().starts_with(&prefix)
     }
 }
 

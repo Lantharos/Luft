@@ -405,8 +405,10 @@ impl Trust {
             .map(|(esp, folder)| (esp.to_lowercase(), folder))
             .collect();
         let partitions: Vec<String> = partitions.iter().map(|uuid| uuid.to_lowercase()).collect();
-        self.run(&emitter, move || other_systems::remove(&folders, &partitions))
-            .await
+        self.run(&emitter, move || {
+            other_systems::remove(&folders, &partitions)
+        })
+        .await
     }
 
     async fn remove_old_system(

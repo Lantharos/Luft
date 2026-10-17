@@ -19,7 +19,10 @@ struct Record {
 
 fn checked(subvolume: &str) -> Result<&Path> {
     let path = Path::new(subvolume);
-    if subvolume.is_empty() || !path.components().all(|part| matches!(part, Component::Normal(_)))
+    if subvolume.is_empty()
+        || !path
+            .components()
+            .all(|part| matches!(part, Component::Normal(_)))
     {
         bail!(Unsupported(format!(
             "“{subvolume}” isn't a place inside Luft's file system."
@@ -97,7 +100,8 @@ fn remove_subvolume(subvolume: &str) -> Result<()> {
 pub fn remove() -> Result<()> {
     let text = std::fs::read_to_string(RECORD)
         .map_err(|_| Unsupported("There's no old system on this computer.".to_owned()))?;
-    let record: Record = serde_json::from_str(&text).context("The old system's record can't be read")?;
+    let record: Record =
+        serde_json::from_str(&text).context("The old system's record can't be read")?;
     if let Some(subvolume) = &record.subvolume {
         remove_subvolume(subvolume)?;
     }

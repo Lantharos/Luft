@@ -65,7 +65,10 @@ fn sectors_in(status: &str, field: &str) -> Option<u64> {
 }
 
 fn grow_encryption(disk: &SystemDisk, mapping: &str, typed: &Secret) -> Result<()> {
-    let status = Tool::new("cryptsetup").arg("status").arg(mapping).output()?;
+    let status = Tool::new("cryptsetup")
+        .arg("status")
+        .arg(mapping)
+        .output()?;
     let (Some(offset), Some(size)) = (sectors_in(&status, "offset"), sectors_in(&status, "size"))
     else {
         bail!("The disk's encryption didn't say how big it is.");

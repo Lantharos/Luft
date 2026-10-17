@@ -161,7 +161,9 @@ fn checked_folder(folder: &str) -> Result<&str> {
         .filter(|name| !name.is_empty() && !name.contains(['/', '\\']) && *name != "..")
         .ok_or_else(|| Unsupported(format!("“{folder}” isn't a boot loader's folder.")))?;
     if is_luft_folder(name) {
-        bail!(Unsupported(format!("“{folder}” is how Luft starts, so it stays.")));
+        bail!(Unsupported(format!(
+            "“{folder}” is how Luft starts, so it stays."
+        )));
     }
     Ok(name)
 }

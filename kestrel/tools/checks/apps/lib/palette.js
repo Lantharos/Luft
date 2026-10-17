@@ -1,4 +1,5 @@
 import Cairo from 'cairo';
+import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 
 import {checks} from '../../lib/check.js';
@@ -37,6 +38,7 @@ function writeWallpaper(path) {
 }
 
 async function showTestWallpaper() {
+  if (GLib.getenv('KESTREL_CAPTURE_WALLPAPER')) return;
   const uri = writeWallpaper(scratch('luft-app-wallpaper.png'));
   const before = await appearance('WallpaperAccentColor');
   background.set_string('picture-uri', uri);

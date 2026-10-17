@@ -1,0 +1,16 @@
+[Unit]
+Description=Kestrel file search
+CollectMode=inactive-or-failed
+PartOf=kestrel-session.target
+After=kestrel.service
+
+[Service]
+Slice=background.slice
+Type=dbus
+BusName=com.lantharos.Search
+ExecStart=@libexecdir@/kestrel-search
+Nice=19
+CPUSchedulingPolicy=idle
+IOSchedulingClass=idle
+Restart=on-failure
+TimeoutStopSec=5

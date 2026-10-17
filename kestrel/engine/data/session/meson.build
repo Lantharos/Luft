@@ -45,6 +45,13 @@ configure_file(
   install_dir: systemduserunitdir,
 )
 
+configure_file(
+  input: 'kestrel-search.service.in',
+  output: 'kestrel-search.service',
+  configuration: settingsconf,
+  install_dir: systemduserunitdir,
+)
+
 install_data('kestrel-session.target', install_dir: systemduserunitdir)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
 install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')

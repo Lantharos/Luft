@@ -48,10 +48,11 @@ build_engine() {
 
 build_services() {
   local project
-  for project in settings openconnect peek greeter keyring watchdog; do
+  for project in settings search openconnect peek greeter keyring watchdog; do
     cargo build --release --locked --manifest-path "$luft/kestrel/$project/Cargo.toml"
   done
   install -Dm755 "$release/kestrel-settings" "$destdir/usr/libexec/kestrel-settings"
+  install -Dm755 "$release/kestrel-search" "$destdir/usr/libexec/kestrel-search"
   install -Dm755 "$release/kestrel-openconnect" "$destdir/usr/libexec/kestrel-openconnect"
   install -Dm755 "$release/peek" "$destdir/usr/bin/peek"
   install -Dm755 "$release/kestrel-greeter-service" "$destdir/usr/libexec/kestrel-greeter-service"

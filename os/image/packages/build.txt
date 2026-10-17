@@ -37,6 +37,7 @@ python3
 sassc
 sbsigntools
 sccache
+sqlite-devel
 systemd-devel
 tpm2-tss-devel
 unzip

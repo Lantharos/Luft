@@ -37,6 +37,7 @@ require_build() {
 build_helpers() {
   glib-compile-schemas "$build/data"
   cargo build --release --quiet --manifest-path "$root/kestrel/settings/Cargo.toml"
+  cargo build --release --quiet --manifest-path "$root/kestrel/search/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/keyring/Cargo.toml" -p luft-pinentry
   cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/greeter/Cargo.toml"

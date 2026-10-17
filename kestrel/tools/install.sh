@@ -50,6 +50,11 @@ install_settings() {
   as_owner "$prefix" install -DZ -m755 "$root/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
 }
 
+install_search() {
+  cargo build --release --manifest-path "$root/kestrel/search/Cargo.toml"
+  as_owner "$prefix" install -DZ -m755 "$root/kestrel/search/target/release/kestrel-search" "$prefix/libexec/kestrel-search"
+}
+
 install_openconnect() {
   cargo build --release --manifest-path "$root/kestrel/openconnect/Cargo.toml"
   as_owner "$prefix" install -DZ -m755 "$root/kestrel/openconnect/target/release/kestrel-openconnect" "$prefix/libexec/kestrel-openconnect"
@@ -161,6 +166,7 @@ install_everything() {
   as_owner "$prefix" meson install -C "$build/engine" --no-rebuild
   prune_stale_files
   install_settings
+  install_search
   install_openconnect
   install_peek
   as_owner "$prefix" glib-compile-schemas "$prefix/share/glib-2.0/schemas"

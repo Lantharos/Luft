@@ -1,0 +1,20 @@
+[package]
+name = "kestrel-search"
+description = "Keeps an index of the files in the home folder for Start"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+
+[dependencies]
+futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
+ignore = "0.4.33"
+memchr = "2.8.3"
+rusqlite = "0.40.2"
+rustix = { version = "1.1.5", features = ["fs"] }
+tokio = { version = "1.53.3", default-features = false, features = ["rt", "macros", "signal"] }
+zbus = { version = "6.0.0", default-features = false, features = ["tokio", "proxy", "service"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

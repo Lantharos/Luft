@@ -17,14 +17,7 @@ How secrets are encrypted, unlocked and what that protects against is in [docs/s
 
 ## Install
 
-Luft's image carries the keyring. On a regular Fedora system it's installed with Kestrel by `kestrel/tools/install.sh install` (building needs `tpm2-tss-devel`), which adds:
-
-- `luft-keyring`, `luft-keyring-unlock` and `luft-pinentry` in `/opt/kestrel/libexec`, and `pam_luft_keyring.so` in `/usr/local/lib64/security`
-- the unlock service, and the keyring's user units, D-Bus activation files and portal under `/usr/local`
-- the PAM rules `kestrel-unlock`, `kestrel-unlock-fingerprint` and `greetd`, and `authselect`'s `with-fingerprint` feature
-- `/etc/gnupg/gpg-agent.conf` pointing at `luft-pinentry`, unless it exists, and a small SELinux module for the login screen
-
-Sign out and in once with your password afterwards; that sets up the keyring and seals it to the TPM. `kestrel/tools/install.sh remove` leaves your data in `~/.local/share/luft-keyring`.
+Luft's image carries the keyring. On a regular Fedora install, `kestrel/tools/install.sh install` installs it with Kestrel (building needs `tpm2-tss-devel`), along with its PAM rules, units and a small SELinux module. Sign out and in once with your password afterwards to set up the keyring and seal it to the TPM. `kestrel/tools/install.sh remove` leaves your data in place.
 
 ## Files
 
@@ -37,11 +30,7 @@ Sign out and in once with your password afterwards; that sets up the keyring and
 
 ## App access
 
-- Each request is tied to the app that made it: Flatpak ID, `com.lantharos.*` ID, the Sabine app behind a Sabine host, launcher entry, or program path (version numbers in folder names ignored).
-- An app can always use what it saved. Anything else asks first ("Allow Firefox to use “github.com”?"), and remembered choices can be revoked in Settings.
-- Keyring tools such as `secret-tool` and Seahorse are asked like any other app and never take over items.
-- Encrypted drive passphrases are shared between Kestrel's unlock dialog and Disks (GVfs's `gvfs-luks-uuid` attribute).
-- Settings shows which app read, saved, deleted or was refused what, and when.
+Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app.
 
 ## App secrets
 
@@ -89,4 +78,4 @@ Run from `kestrel/keyring`:
 
 ## Adding data to the keyring
 
-New kinds of data get their own place in the vault's `Contents` and their own module and D-Bus interface in the daemon, next to `ssh` and `manage`, as [Luft Passkeys](../passkeys/README.md) does. Modules use `Daemon::ensure_unlocked`, `Keyring::edit` and `Keyring::record`, `identity`, `prompter`, and `unlocking::authenticate` and `unlocking::link`.
+New kinds of data get their own place in the vault's `Contents` and their own module and D-Bus interface in the daemon, next to `ssh` and `manage`, as [Luft Passkeys](../passkeys/README.md) does.

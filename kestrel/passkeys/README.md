@@ -13,20 +13,7 @@ Browsers see Luft Passkeys as a USB security key, so Chrome, Chromium-based brow
 | Luft Keyring | you | Keeps passkeys in its Passkeys collection and makes every signature |
 | Kestrel | you | Shows the prompt; `kestrel-authenticate` checks the fingerprint or password |
 
-## Features
-
-- Discoverable credentials, ES256 keys, built-in user verification, `credProtect` and `hmac-secret` (PRF)
-- Private keys made inside the TPM when there is one, otherwise kept in the encrypted keyring
-- Passkeys are bound to this computer and never marked as backed up
-- Account picker in the same prompt when a site has several accounts
-- Settings, under Security, lists passkeys by site with the last use, and can rename or remove them
-
-| | Create | Sign in | Choose account | PRF | Manage from the browser |
-| --- | --- | --- | --- | --- | --- |
-| Chrome, Chromium, Helium, Electron, Sabine | Yes | Yes | Yes | Yes | No (Chrome asks for a PIN) |
-| Firefox | Yes | Yes | Yes | Yes | Yes, in `about:webauthn` |
-
-Browsers call it a security key and don't offer passkeys in autofill. That needs the [Credentials portal](https://github.com/flatpak/xdg-desktop-portal/pull/1889), which is still experimental.
+Private keys are made inside the TPM when there is one, and passkeys stay bound to the computer. Browsers treat it as a security key, so they don't offer passkeys in autofill until the [Credentials portal](https://github.com/flatpak/xdg-desktop-portal/pull/1889) lands. Using it is described in [Keyring and passkeys](https://docs.luft.lanth.me/files/keyring-and-passkeys/).
 
 ## Install
 
@@ -36,8 +23,6 @@ Luft's image carries Luft Passkeys. On a regular Fedora system, after `kestrel/t
 kestrel/passkeys/install.sh install   # build, install into /opt/kestrel and enable
 kestrel/passkeys/install.sh remove    # disable and remove; saved passkeys stay in the keyring
 ```
-
-The relay needs no SELinux policy of its own; its unit drops every capability and denies the network, home folders and every device except `/dev/uhid`.
 
 ## Development
 

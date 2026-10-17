@@ -4,7 +4,7 @@ Every test here runs in isolation: test sessions use their own D-Bus buses, stan
 
 ## Kestrel sessions
 
-Build Kestrel first (see the [repository README](../README.md#develop)). Then from the repository root:
+Build Kestrel first (see [Building Luft](https://docs.luft.lanth.me/developers/building/)). Then from the repository root:
 
 | Command | Runs |
 | --- | --- |

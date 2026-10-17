@@ -1,18 +1,16 @@
 # Kestrel
 
-Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mutter 51 and brings its own panel, Start menu, quick settings, notification center, lock screen, session manager, settings service and portal backend.
+Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Start, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.lanth.me/desktop/overview/).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="../docs/screenshots/notification-center-light.png">
   <img src="../docs/screenshots/notification-center.png" alt="The notification center and calendar">
 </picture>
 
-## Parts
-
 | Folder | What it is |
 | --- | --- |
 | [`engine`](engine/README.md) | The native shell, started from GNOME Shell 51.0 |
-| `ui` | Panel, Start, quick settings and every other surface, in TypeScript |
+| `ui` | Taskbar, Start, quick settings and every other surface, in TypeScript |
 | [`compositor`](compositor/README.md) | Mutter patch series |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone |
 | `search` | `kestrel-search`, the file index behind Start's search |
@@ -24,39 +22,17 @@ Kestrel is Luft's desktop shell and login screen. It runs on its own patched Mut
 | `peek` | `peek`, lets other programs see and use windows |
 | `tools` | Development sessions, checks and the install script |
 
-## Features
+## Build and run
 
-- Taskbar with pinned and running apps, live window previews, unread counts and progress, and a tray for StatusNotifierItem apps
-- Start with folders, and search across apps, actions, Settings pages, files and their text, calculations and unit conversions ([search](https://docs.luft.lanth.me/desktop/start-and-search/))
-- Quick settings as rearrangeable tiles: network, Bluetooth, audio devices, brightness (including DDC/CI monitors with `ddcutil`), power mode, Night Light, Dark Style, Keep Awake and more
-- Notification center with grouping, inline replies, media controls and a calendar
-- All-windows view, dynamic workspaces up to ten, snap layouts and snap groups
-- Board mode: any desktop becomes an endless canvas where windows sit side by side
-- Clipboard history with pictures, and an emoji, symbol and kaomoji picker
-- Lock screen and login screen (on greetd) with fingerprint support
-- Accent color and a full palette from the wallpaper, shared with apps ([docs/appearance.md](../docs/appearance.md)); tinted or clear app icons; Pure black; live video wallpapers
-- Privacy indicator for camera, microphone, screen sharing, location and programs using your windows
-- Its own dialogs for polkit, Wi-Fi and VPN secrets, keyring and GnuPG prompts ([docs/prompts.md](../docs/prompts.md)), and every xdg-desktop-portal interface it backs
-
-![Board mode with several apps side by side](../docs/screenshots/board.png)
-
-## Build
-
-Building is covered in the [repository README](../README.md#develop). To try a build in a window:
+[Building Luft](https://docs.luft.lanth.me/developers/building/) sets up the dependencies and builds Kestrel into `kestrel/build`. To try it in a window:
 
 ```sh
 kestrel/tools/session.sh nested
 ```
 
-Other session modes and test options are in [docs/testing.md](../docs/testing.md).
+`kestrel/tools/session.sh capture` runs every check headless and saves a screenshot of every surface. The other modes and options are in [docs/testing.md](../docs/testing.md).
 
-![The login screen](../docs/screenshots/login-users.png)
-
-The login screen runs on greetd. The Login Screen page in Settings chooses its wallpaper, which people are listed, the default session and automatic login.
-
-## On a regular Fedora system
-
-Luft's image carries Kestrel. To use a development build as your session on a regular Fedora install instead:
+To use a development build as your session on a regular Fedora install:
 
 ```sh
 kestrel/tools/install.sh install     # into /opt/kestrel, with Luft Keyring, the login screen service and the watchdog
@@ -66,11 +42,7 @@ sudo systemctl disable gdm && sudo systemctl enable greetd
 
 `kestrel/tools/install.sh remove` takes it out again. If the login screen doesn't appear after a restart, press Ctrl+Alt+F3, sign in, and check `journalctl -b -u greetd`.
 
-## Keyboard shortcuts
-
-Every shortcut and gesture is listed in [Keyboard shortcuts and gestures](https://docs.luft.lanth.me/desktop/shortcuts/). They live in `com.lantharos.kestrel.keybindings` and `com.lantharos.kestrel.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`.
-
-## Seeing and using windows from other programs
+## peek
 
 `peek` lets a program, such as a development tool, take pictures of windows and click and type in them. `peek --help` explains every command.
 
@@ -82,53 +54,11 @@ peek type $h 'Hello'
 peek stop $h
 ```
 
-`peek run` gives every program its own hidden display: a headless Kestrel with its own monitor, pointer and keyboard, so nothing reaches your screen and nothing asks first. The program still uses your session for settings, files, the keyring and the network. The display closes when the program quits. `peek run --here` opens the program on your screen instead.
-
-`--size` sets the hidden display's resolution, 1280x800 by default. Add its physical size to have Kestrel pick a scale the way it does for a real screen: `peek run --size 1920x1200:302x189mm -- …` stands in for a 14" laptop panel and runs at 150%.
-
-Windows you opened yourself need permission: Kestrel asks whether the app may see your windows, or see and use them, once or until it quits, and a refusal holds until the app quits. The privacy menu in the panel shows who has access and takes it back. Nothing works while the screen is locked or a password prompt is open, and nothing is remembered after signing out. Hidden displays need `dbus-daemon`.
+`peek run` gives the program its own hidden display, so nothing reaches your screen; `--here` opens it on your screen instead, and `--size 1920x1200:302x189mm` sets the hidden display's resolution and physical size. Windows you opened yourself need your permission first, which the privacy menu in the taskbar shows and takes back.
 
 ## Settings
 
-Kestrel's settings live in `com.lantharos.kestrel`. Settings changes most of them; the main keys:
-
-| Key | Values |
-| --- | --- |
-| `accent` | `wallpaper`, `white` |
-| `pure-black` | `true`, `false` |
-| `theme-apps` | Write wallpaper colors for GTK, Qt and Ghostty |
-| `app-icon-style` | `default`, `tinted`, `clear` |
-| `app-icon-tint` | Color for tinted icons, or empty for the accent |
-| `dark-schedule` | `off`, `sunset`, `custom` (`dark-schedule-from`, `dark-schedule-to` in hours) |
-| `live-wallpaper`, `live-wallpaper-dark` | Video URI for each style |
-| `live-wallpaper-on-battery` | Keep playing on battery |
-| `wallpaper-focus`, `wallpaper-focus-dark` | Part of the wallpaper kept when Fill crops it ([docs/appearance.md](../docs/appearance.md#wallpaper-position)) |
-| `variable-refresh` | `games`, `fullscreen` |
-| `taskbar-alignment` | `center`, `left` |
-| `taskbar-look` | `glass`, `solid`, `transparent`, `accent` |
-| `taskbar-style` | `bar`, `floating` |
-| `taskbar-size` | `compact`, `normal`, `large` |
-| `taskbar-auto-hide` | `never`, `always`, `windows` |
-| `taskbar-show-pinned` | Show pinned apps on the taskbar |
-| `taskbar-displays` | `all`, `primary` |
-| `taskbar-windows-per-display`, `taskbar-windows-per-workspace` | Limit each taskbar to its display's or workspace's windows |
-| `lock-screen-content` | Show notification text on the lock screen |
-
-Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-switcher`, `.media-keys`, `.power`, `.night-light`, `.touchscreen`, `.notifications.application` and `.diagnostics`. Live wallpapers need `gstreamer1-plugin-gtk4`.
-
-## Files
-
-| Path | Contents |
-| --- | --- |
-| `~/.local/state/kestrel` | Launch history, brightness, notifications |
-| `~/.cache/kestrel/backgrounds` | Scaled and blurred wallpaper copies |
-| `~/.cache/kestrel/search` | The index of file contents for search |
-| `~/.config/kestrel/appearance.json`, `appearance.css` | The wallpaper palette for apps |
-| `~/.local/share/kestrel/wallpapers` | Still frames of live wallpapers |
-| `~/.config/xkb` | Your own keyboard layouts, such as those made in Keys |
-| `~/.config/fontconfig/conf.d/50-kestrel-families.conf` | Generic font families pointed at your chosen fonts |
-| `/var/lib/kestrel-greeter` | Login screen wallpapers and display arrangement |
-| `/var/lib/kestrel-watchdog/incidents` | Reports from GPU hangs |
+Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.lanth.me/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [docs/appearance.md](../docs/appearance.md), and its own dialogs for the keyring and GnuPG in [docs/prompts.md](../docs/prompts.md).
 
 ## Session services
 
@@ -136,12 +66,10 @@ Related schemas: `com.lantharos.kestrel.keybindings`, `.window-switcher`, `.app-
 | --- | --- |
 | `kestrel-session` | Started by the login screen; runs `kestrel-session.target` and Kestrel's session manager in place of gnome-session |
 | `kestrel-settings` | Settings service started before the shell |
-| `kestrel-search` | Indexes the names and text of files in the home folder for Start, at idle priority |
+| `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
-| `kestrel-watchdog` | Restarts the computer when the GPU is stuck, see [docs/boot.md](../docs/boot.md#graphics-driver-stopped-responding) |
+| `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([details](../docs/boot.md#graphics-driver-stopped-responding)) |
 | `kestrel-wallpaper` | Plays live wallpapers |
 
-`kestrel-session --setup` first runs Kestrel in setup mode, which shows only Install Luft over the blurred wallpaper, then starts the session when setup finishes ([docs/install.md](../docs/install.md)).
-
-The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior. Portal preferences are in `kestrel-portals.conf`: Kestrel handles everything except file dialogs (Rover) and secrets (Luft Keyring).
+`kestrel-session --setup` runs Install Luft alone over the blurred wallpaper first ([docs/install.md](../docs/install.md)). The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior.

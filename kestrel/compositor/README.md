@@ -1,6 +1,6 @@
 # Kestrel compositor
 
-Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered Git patch series. The host's Mutter is never replaced.
+Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered Git patch series. It builds next to the system's Mutter and never replaces it.
 
 | File | Purpose |
 | --- | --- |
@@ -12,25 +12,16 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 
 ## What the patches add
 
-- Rounded window corners (15px), square on maximized, tiled and fullscreen windows so those stay eligible for direct scanout
-- Windows the shell snaps into corners or layout cells count as tiled on the screen edges they touch, for apps and for the corners
-- The rectangle a window is moving to before its app has redrawn, so maximizing and snapping animate at once
-- Shared blur shader for app-requested background blur, and blur targets kept between frames instead of allocated for every one
-- `xdg-toplevel-icon-v1` window icons
+- Rounded window corners that stay square on maximized, tiled and fullscreen windows, so those keep direct scanout
+- Shared background blur, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists
+- Snapping and maximizing that animate at once, and windows the shell tiles counting as tiled
 - Shell text with fractional glyph advances and grayscale antialiasing
-- Desktop windows placed behind everything else, used for live wallpapers
-- `kestrel_window_v1`, which lets a client keep a toplevel out of window lists and above other windows
-- Variable refresh only for windows marked as games, and `wp_content_type_v1` support
-- Windows laid out on a transformed group, magnified without blur, X11 windows kept reachable, and touchpad pinches and swipes kept from apps, for the board
-- Virtual pointers that pinch and swipe like a touchpad
-- Checking and restoring inhibited keyboard shortcuts
-- A focus point for zoomed backgrounds, so a crop can keep something other than the middle
-- Event filters that run before the compositor's own, so the shell can check input it sends as it is delivered
-- Settings from `kestrel-settings` instead of gnome-settings-daemon, and monitor vendor names from systemd's hardware database
-- Default display scales aimed at 110 DPI, on quarter steps where they fit, and `--virtual-monitor 1920x1080:344x194mm` for virtual monitors with a physical size
-- Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe, plus reporting how long frames wait to be presented
-- Windows that appear after you moved on to another window, whether launched, autostarted or slow to start, open behind it and ask for attention instead of taking focus
-- Smaller fixes: input method focus on destroyed text fields, cursor theme fallback, keeping the last frame on screen at exit, repainting as soon as a display stops scanning out a window, text cached by labels staying sharp from its first paint
+- Desktop windows for live wallpapers, and the transformed window groups behind the board
+- Variable refresh only for games, and `wp_content_type_v1`
+- Settings from `kestrel-settings` in place of gnome-settings-daemon, and default display scales aimed at 110 DPI
+- Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe
+- Windows that appear after you moved on open behind and ask for attention instead of taking focus
+- Smaller fixes, each described in its patch
 
 ## Build
 
@@ -91,8 +82,7 @@ gsettings set com.lantharos.kestrel.diagnostics log-direct-scanout true
 
 ## Known issues
 
-- Changing fractional scale while a GTK Xwayland window is open can scale its content incorrectly. This also happens without the corner patch.
-- Direct scanout and mixed-scale monitor hotplug still need testing on real hardware.
+Changing fractional scale while a GTK Xwayland window is open can scale its content incorrectly, with or without the corner patch.
 
 ## License
 

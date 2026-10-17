@@ -16,6 +16,7 @@ ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUF
 
 FROM builder AS kestrel-build
 COPY kestrel /src/kestrel
+COPY packages/motion /src/packages/motion
 COPY apps/settings/src/lib/panels/pages.ts /src/apps/settings/src/lib/panels/pages.ts
 COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \

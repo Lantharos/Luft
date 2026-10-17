@@ -76,7 +76,7 @@ export function buildCommands(app: App): Command[] {
 		{ id: 'settings.indentation', title: 'Change Default Indentation…', run: () => palette.show(defaultIndentationPicker(app)) },
 		{ id: 'document.lineEndings', title: 'Change Line Endings…', available: hasDocument, run: pick(lineEndingPicker) },
 		{ id: 'file.reveal', title: 'Reveal in Sidebar', available: () => Boolean(active()?.path && workspace.tree.root), run: () => app.reveal(active()!) },
-		{ id: 'file.showInFolder', title: 'Show in Files', available: () => Boolean(active()?.path), run: () => void app.backend.showInFolder(active()!.path!) },
+		{ id: 'file.showInFolder', title: 'Show in Rover', available: () => Boolean(active()?.path), run: () => void app.backend.showInFolder(active()!.path!) },
 		{ id: 'file.copyPath', title: 'Copy Path', available: () => Boolean(active()?.path), run: () => void navigator.clipboard.writeText(active()!.path!) }
 	];
 }

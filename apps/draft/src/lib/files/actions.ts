@@ -5,7 +5,7 @@ import type { MenuEntry } from '#lib/app/menus.svelte.js';
 
 function pathEntries(app: App, path: string): MenuEntry[] {
 	return [
-		{ label: 'Show in Files', run: () => void app.backend.showInFolder(path) },
+		{ label: 'Show in Rover', run: () => void app.backend.showInFolder(path) },
 		{ label: 'Copy Path', run: () => void navigator.clipboard.writeText(path) }
 	];
 }

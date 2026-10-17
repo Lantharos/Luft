@@ -2361,7 +2361,7 @@ export class ScreenshotUI extends St.Widget {
             const file = Gio.file_new_for_path(this._screencastPath);
 
             // Translators: button on the screencast notification.
-            notification.addAction(_('Show in Files'), () => {
+            notification.addAction(_('Show in Rover'), () => {
                 const app =
                     Gio.app_info_get_default_for_type('inode/directory', false);
 
@@ -2583,7 +2583,7 @@ function _storeScreenshot(bytes, pixbuf) {
 
     if (!disableSaveToDisk) {
         // Translators: button on the screenshot notification.
-        notification.addAction(_('Show in Files'), () => {
+        notification.addAction(_('Show in Rover'), () => {
             const app =
                 Gio.app_info_get_default_for_type('inode/directory', false);
 

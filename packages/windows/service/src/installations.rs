@@ -82,7 +82,7 @@ pub struct Found {
 impl Found {
     pub fn changeable(&self) -> Result<()> {
         if self.mounted {
-            bail!("Windows' drive is open in Luft. Close it in Files first");
+            bail!("Windows' drive is open in Luft. Close it in Rover first");
         }
         if self.hibernated {
             bail!(

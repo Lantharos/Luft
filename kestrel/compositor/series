@@ -28,3 +28,4 @@
 0028-clutter-reuse-blur-node-targets-across-frames.patch
 0029-core-let-the-shell-see-the-rectangle-a-window-is-mov.patch
 0030-core-keep-late-windows-from-taking-focus-after-newer.patch
+0031-clutter-pick-an-offscreen-effect-s-texture-filter-as.patch

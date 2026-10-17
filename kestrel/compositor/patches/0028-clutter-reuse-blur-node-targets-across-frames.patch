@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Fri, 16 Oct 2026 23:11:47 +0200
-Subject: [PATCH 28/30] clutter: reuse blur node targets across frames
+Subject: [PATCH 28/31] clutter: reuse blur node targets across frames
 
 Every blur node allocated a texture and framebuffer for its layer and two more
 for the blur passes, and a framebuffer blur also a full-size capture texture,

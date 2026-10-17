@@ -29,7 +29,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Default display scales aimed at 110 DPI, on quarter steps where they fit, and `--virtual-monitor 1920x1080:344x194mm` for virtual monitors with a physical size
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe, plus reporting how long frames wait to be presented
 - Windows that appear after you moved on to another window, whether launched, autostarted or slow to start, open behind it and ask for attention instead of taking focus
-- Smaller fixes: input method focus on destroyed text fields, cursor theme fallback, keeping the last frame on screen at exit, repainting as soon as a display stops scanning out a window
+- Smaller fixes: input method focus on destroyed text fields, cursor theme fallback, keeping the last frame on screen at exit, repainting as soon as a display stops scanning out a window, text cached by labels staying sharp from its first paint
 
 ## Build
 

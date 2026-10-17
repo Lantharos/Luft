@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 16:47:44 +0200
+Subject: [PATCH 31/31] clutter: pick an offscreen effect's texture filter as
+ soon as it has a pipeline
+
+The filter for the resource scale was applied to the previous pipeline,
+which had just been cleared, so a new offscreen kept linear filtering
+until the actor was painted into it a second time. Text in a label that
+was only painted once came out blurred whenever the label sat at a
+fractional position, and sharp once anything had repainted it.
+---
+ clutter/clutter/clutter-offscreen-effect.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/clutter/clutter/clutter-offscreen-effect.c b/clutter/clutter/clutter-offscreen-effect.c
+index 405e3f8f09d5f73b824acc78c6850363aeca2df6..0f3fd83e62aeafb09e218a835efcbed0a0cdbc60 100644
+--- a/clutter/clutter/clutter-offscreen-effect.c
++++ b/clutter/clutter/clutter-offscreen-effect.c
+@@ -207,16 +207,10 @@ static CoglPipeline *
+ clutter_offscreen_effect_real_create_pipeline (ClutterOffscreenEffect *effect,
+                                                CoglTexture            *texture)
+ {
+-  ClutterOffscreenEffectPrivate *priv =
+-    clutter_offscreen_effect_get_instance_private (effect);
+   CoglContext *ctx = cogl_texture_get_context (texture);
+   CoglPipeline *pipeline;
+-  float resource_scale;
+-
+-  resource_scale = clutter_actor_get_real_resource_scale (priv->actor);
+ 
+   pipeline = cogl_pipeline_new (ctx);
+-  ensure_pipeline_filter_for_scale (effect, resource_scale);
+   cogl_pipeline_set_layer_texture (pipeline, 0, texture);
+ 
+   return pipeline;
+@@ -295,6 +289,7 @@ update_fbo (ClutterEffect *effect,
+ 
+   g_clear_object (&priv->pipeline);
+   priv->pipeline = offscreen_class->create_pipeline (self, priv->texture);
++  ensure_pipeline_filter_for_scale (self, resource_scale);
+ 
+   return TRUE;
+ }

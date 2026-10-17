@@ -1,0 +1,332 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 16 Oct 2026 23:11:47 +0200
+Subject: [PATCH 28/28] clutter: reuse blur node targets across frames
+
+Every blur node allocated a texture and framebuffer for its layer and two more
+for the blur passes, and a framebuffer blur also a full-size capture texture,
+then freed them all once the frame was painted. Blurred glass and blurred app
+backgrounds repaint whenever what is behind them changes, so this allocated
+and freed several framebuffers every frame, which costs more CPU time in the
+driver than drawing the blur itself.
+
+Blur nodes now take their targets from a small pool of idle ones with the
+same size and radius, and give them back when they are freed. Idle targets
+are released after two seconds.
+---
+ clutter/clutter/clutter-paint-nodes.c | 223 ++++++++++++++++++++------
+ 1 file changed, 175 insertions(+), 48 deletions(-)
+
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index 08bd72b260d451efae86fa269761f0723277c70c..989e96d85b6c014d0a71fd50f368fafb53918fab 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1430,11 +1430,28 @@ clutter_blit_node_add_blit_rectangle (ClutterBlitNode *blit_node,
+  * ClutterBlurNode:
+  */
+ 
++#define IDLE_BLUR_TARGET_LIMIT 8
++#define IDLE_BLUR_TARGET_LIFETIME_MS 2000
++
++typedef struct
++{
++  CoglFramebuffer *offscreen;
++  CoglFramebuffer *capture;
++  ClutterBlur *blur;
++  unsigned int width;
++  unsigned int height;
++  float radius;
++  int64_t idle_since_us;
++} BlurTarget;
++
++static GQueue idle_blur_targets = G_QUEUE_INIT;
++static unsigned int idle_blur_targets_trim_id;
++
+ struct _ClutterBlurNode
+ {
+   ClutterLayerNode parent_instance;
+ 
+-  ClutterBlur *blur;
++  BlurTarget *target;
+   CoglFramebuffer *source_framebuffer;
+   CoglFramebuffer *capture_framebuffer;
+   CoglPipeline *capture_pipeline;
+@@ -1446,19 +1463,138 @@ struct _ClutterBlurNode
+ 
+ G_DEFINE_TYPE (ClutterBlurNode, clutter_blur_node, CLUTTER_TYPE_LAYER_NODE)
+ 
+-static gboolean
+-create_blur_capture_render_objects (ClutterBlurNode *blur_node,
+-                                    unsigned int     width,
+-                                    unsigned int     height)
++static void
++blur_target_free (BlurTarget *target)
++{
++  g_clear_pointer (&target->blur, clutter_blur_free);
++  g_clear_object (&target->offscreen);
++  g_clear_object (&target->capture);
++  g_free (target);
++}
++
++static BlurTarget *
++blur_target_new (CoglContext  *cogl_context,
++                 unsigned int  width,
++                 unsigned int  height,
++                 float         radius)
+ {
+-  CoglContext *cogl_context =
+-    cogl_framebuffer_get_context (blur_node->source_framebuffer);
+   g_autoptr (CoglTexture) texture = NULL;
+   g_autoptr (CoglOffscreen) offscreen = NULL;
+   g_autoptr (GError) error = NULL;
++  BlurTarget *target;
++  ClutterBlur *blur;
+ 
+   texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
++  cogl_texture_set_premultiplied (texture, TRUE);
++
++  offscreen = cogl_offscreen_new_with_texture (texture);
++  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
++    {
++      g_warning ("Unable to allocate paint node offscreen: %s",
++                 error->message);
++      return NULL;
++    }
++
++  blur = clutter_blur_new (texture, radius);
++  if (!blur)
++    {
++      g_warning ("Failed to create blur pipeline");
++      return NULL;
++    }
++
++  cogl_framebuffer_orthographic (COGL_FRAMEBUFFER (offscreen),
++                                 0.0, 0.0,
++                                 width, height,
++                                 0.0, 1.0);
++
++  target = g_new0 (BlurTarget, 1);
++  target->offscreen = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
++  target->blur = blur;
++  target->width = width;
++  target->height = height;
++  target->radius = radius;
++  return target;
++}
++
++static BlurTarget *
++take_blur_target (CoglContext  *cogl_context,
++                  unsigned int  width,
++                  unsigned int  height,
++                  float         radius)
++{
++  GList *l;
++
++  for (l = idle_blur_targets.head; l; l = l->next)
++    {
++      BlurTarget *target = l->data;
++
++      if (target->width == width &&
++          target->height == height &&
++          target->radius == radius &&
++          cogl_framebuffer_get_context (target->offscreen) == cogl_context)
++        {
++          g_queue_delete_link (&idle_blur_targets, l);
++          return target;
++        }
++    }
++
++  return blur_target_new (cogl_context, width, height, radius);
++}
++
++static gboolean
++trim_idle_blur_targets (gpointer user_data)
++{
++  int64_t now_us = g_get_monotonic_time ();
++  BlurTarget *target;
++
++  while ((target = g_queue_peek_tail (&idle_blur_targets)) &&
++         now_us - target->idle_since_us >=
++         IDLE_BLUR_TARGET_LIFETIME_MS * G_TIME_SPAN_MILLISECOND)
++    blur_target_free (g_queue_pop_tail (&idle_blur_targets));
++
++  if (!g_queue_is_empty (&idle_blur_targets))
++    return G_SOURCE_CONTINUE;
++
++  idle_blur_targets_trim_id = 0;
++  return G_SOURCE_REMOVE;
++}
++
++static void
++release_blur_target (BlurTarget *target)
++{
++  target->idle_since_us = g_get_monotonic_time ();
++  g_queue_push_head (&idle_blur_targets, target);
++
++  while (g_queue_get_length (&idle_blur_targets) > IDLE_BLUR_TARGET_LIMIT)
++    blur_target_free (g_queue_pop_tail (&idle_blur_targets));
++
++  if (!idle_blur_targets_trim_id)
++    {
++      idle_blur_targets_trim_id =
++        g_timeout_add (IDLE_BLUR_TARGET_LIFETIME_MS,
++                       trim_idle_blur_targets, NULL);
++      g_source_set_name_by_id (idle_blur_targets_trim_id,
++                               "[clutter] trim_idle_blur_targets");
++    }
++}
+ 
++static gboolean
++ensure_blur_capture (BlurTarget   *target,
++                     CoglContext  *cogl_context,
++                     unsigned int  width,
++                     unsigned int  height)
++{
++  g_autoptr (CoglTexture) texture = NULL;
++  g_autoptr (CoglOffscreen) offscreen = NULL;
++  g_autoptr (GError) error = NULL;
++
++  if (target->capture &&
++      cogl_framebuffer_get_width (target->capture) == (int) width &&
++      cogl_framebuffer_get_height (target->capture) == (int) height)
++    return TRUE;
++
++  g_clear_object (&target->capture);
++  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
+   offscreen = cogl_offscreen_new_with_texture (texture);
+   if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
+     {
+@@ -1467,14 +1603,30 @@ create_blur_capture_render_objects (ClutterBlurNode *blur_node,
+       return FALSE;
+     }
+ 
++  target->capture = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
++  return TRUE;
++}
++
++static gboolean
++create_blur_capture_render_objects (ClutterBlurNode *blur_node,
++                                    unsigned int     width,
++                                    unsigned int     height)
++{
++  CoglContext *cogl_context =
++    cogl_framebuffer_get_context (blur_node->source_framebuffer);
++  CoglTexture *texture;
++
++  if (!ensure_blur_capture (blur_node->target, cogl_context, width, height))
++    return FALSE;
++
++  texture = cogl_offscreen_get_texture (COGL_OFFSCREEN (blur_node->target->capture));
+   blur_node->capture_pipeline = create_texture_pipeline ();
+   cogl_pipeline_set_layer_filters (blur_node->capture_pipeline, 0,
+                                    COGL_PIPELINE_FILTER_LINEAR,
+                                    COGL_PIPELINE_FILTER_LINEAR);
+   cogl_pipeline_set_layer_texture (blur_node->capture_pipeline, 0, texture);
+ 
+-  blur_node->capture_framebuffer =
+-    COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
++  blur_node->capture_framebuffer = g_object_ref (blur_node->target->capture);
+ 
+   return TRUE;
+ }
+@@ -1615,7 +1767,7 @@ clutter_blur_node_post_draw (ClutterPaintNode    *node,
+     }
+ 
+   if (should_blur)
+-    clutter_blur_apply (blur_node->blur);
++    clutter_blur_apply (blur_node->target->blur);
+ 
+   parent_class->post_draw (node, paint_context);
+ }
+@@ -1625,7 +1777,7 @@ clutter_blur_node_finalize (ClutterPaintNode *node)
+ {
+   ClutterBlurNode *blur_node = CLUTTER_BLUR_NODE (node);
+ 
+-  g_clear_pointer (&blur_node->blur, clutter_blur_free);
++  g_clear_pointer (&blur_node->target, release_blur_target);
+   g_clear_object (&blur_node->source_framebuffer);
+   g_clear_object (&blur_node->capture_framebuffer);
+   g_clear_object (&blur_node->capture_pipeline);
+@@ -1667,15 +1819,11 @@ clutter_blur_node_new (unsigned int width,
+                        unsigned int height,
+                        float        radius)
+ {
+-  g_autoptr (CoglOffscreen) offscreen = NULL;
+-  g_autoptr (CoglTexture) texture = NULL;
+-  g_autoptr (GError) error = NULL;
+   ClutterLayerNode *layer_node;
+   ClutterBlurNode *blur_node;
+   ClutterContext *context;
+   ClutterBackend *backend;
+   CoglContext *cogl_context;
+-  ClutterBlur *blur;
+ 
+   g_return_val_if_fail (radius >= 0.0, NULL);
+ 
+@@ -1683,43 +1831,19 @@ clutter_blur_node_new (unsigned int width,
+   backend = clutter_context_get_backend (context);
+   cogl_context = clutter_backend_get_cogl_context (backend);
+   blur_node = _clutter_paint_node_create (CLUTTER_TYPE_BLUR_NODE);
+-  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
+-
+-  cogl_texture_set_premultiplied (texture, TRUE);
+-
+-  offscreen = cogl_offscreen_new_with_texture (texture);
+-  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
+-    {
+-      g_warning ("Unable to allocate paint node offscreen: %s",
+-                 error->message);
+-      goto out;
+-    }
+-
+-  blur = clutter_blur_new (texture, radius);
+-  blur_node->blur = blur;
+-
+-  if (!blur)
+-    {
+-      g_warning ("Failed to create blur pipeline");
+-      goto out;
+-    }
++  blur_node->target = take_blur_target (cogl_context, width, height, radius);
++  if (!blur_node->target)
++    return (ClutterPaintNode *) blur_node;
+ 
+   layer_node = CLUTTER_LAYER_NODE (blur_node);
+-  layer_node->offscreen = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
++  layer_node->offscreen = g_object_ref (blur_node->target->offscreen);
+   layer_node->pipeline = create_texture_pipeline ();
+   cogl_pipeline_set_layer_filters (layer_node->pipeline, 0,
+                                    COGL_PIPELINE_FILTER_LINEAR,
+                                    COGL_PIPELINE_FILTER_LINEAR);
+-  cogl_pipeline_set_layer_texture (layer_node->pipeline,
+-                                   0,
+-                                   clutter_blur_get_texture (blur));
+-
+-  cogl_framebuffer_orthographic (layer_node->offscreen,
+-                                 0.0, 0.0,
+-                                 width, height,
+-                                 0.0, 1.0);
++  cogl_pipeline_set_layer_texture (layer_node->pipeline, 0,
++                                   clutter_blur_get_texture (blur_node->target->blur));
+ 
+-out:
+   return (ClutterPaintNode *) blur_node;
+ }
+ 
+@@ -1776,10 +1900,13 @@ clutter_blur_node_new_from_framebuffer (CoglFramebuffer *framebuffer,
+   scaled_radius = radius / downscale_factor;
+ 
+   node = clutter_blur_node_new (scaled_width, scaled_height, scaled_radius);
+-  if (!node)
+-    return NULL;
+-
+   blur_node = CLUTTER_BLUR_NODE (node);
++  if (!blur_node->target)
++    {
++      clutter_paint_node_unref (node);
++      return NULL;
++    }
++
+   blur_node->source_framebuffer = g_object_ref (framebuffer);
+   blur_node->source_x = src_x;
+   blur_node->source_y = src_y;

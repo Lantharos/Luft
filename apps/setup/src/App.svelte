@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { isAvailable } from '@lantharos/sabine';
+	import { appWindow, isAvailable } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
 	import Fingerprint from '#lib/steps/firstboot/Fingerprint.svelte';
 	import SecureBoot from '#lib/steps/firstboot/SecureBoot.svelte';
@@ -24,6 +24,7 @@
 	onMount(() => {
 		if (!isAvailable()) return;
 		const stopping = setup.start();
+		appWindow.revealWhen(stopping);
 		return () => void stopping.then((stop) => stop());
 	});
 

@@ -51,11 +51,13 @@ pub async fn apply(schedule: Schedule) -> Result<(), String> {
             for unit in [TIMER, SERVICE] {
                 let _ = std::fs::remove_file(folder.join(unit));
             }
+            call("MaskUnitFiles", &(vec![TIMER], false, true)).await?;
             return call("Reload", &()).await;
         }
     };
     let executable = std::env::current_exe().map_err(failed)?;
     std::fs::create_dir_all(&folder).map_err(failed)?;
+    call("UnmaskUnitFiles", &(vec![TIMER], false)).await?;
     std::fs::write(folder.join(SERVICE), service(&executable.to_string_lossy())).map_err(failed)?;
     std::fs::write(folder.join(TIMER), timer(calendar)).map_err(failed)?;
     call("Reload", &()).await?;

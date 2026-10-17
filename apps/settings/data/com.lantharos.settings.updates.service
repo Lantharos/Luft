@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for system updates
+ConditionUser=!@system
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/settings --check-updates
+Nice=19
+IOSchedulingClass=idle

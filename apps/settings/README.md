@@ -67,7 +67,7 @@ A link to a page for missing hardware, such as Bluetooth without an adapter, exp
 
 ## Automatic updates
 
-Settings writes the systemd user timer `com.lantharos.settings.updates.timer` the first time Updates opens, and rewrites it when the schedule changes. The timer runs Settings with `--check-updates`, which looks for updates, downloads them without a window and sends a notification when they are ready. On a regular Fedora install that means PackageKit's offline updates; on an image-based install it means the next image, staged for the next restart.
+`data/com.lantharos.settings.updates.timer`, a systemd user timer enabled for every account, checks daily from the first start. Settings writes its own copy when the schedule changes, and masks it when automatic checks are off. The timer runs Settings with `--check-updates`, which looks for updates, downloads them without a window and sends a notification when they are ready. On a regular Fedora install that means PackageKit's offline updates; on an image-based install it means the next image, staged for the next restart.
 
 ## NVIDIA graphics
 

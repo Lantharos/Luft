@@ -13,6 +13,7 @@ Modes:
   capture       Run the checks headless and save screenshots.
   performance   Measure startup and Start menu timings headless.
   frames        Measure frame times of animations and gestures headless.
+  motion        Record every painted frame of animations headless.
   greeter       Run the login screen checks headless.
   setup         Run the first-run setup checks headless.
   scaling       Check the default scale of laptop panels and monitors headless.
@@ -37,6 +38,7 @@ Environment:
   KESTREL_COMPOSITOR    Mutter install to run on (default: kestrel/run/mutter-install).
   KESTREL_FRAMES_BASELINE  A saved frames report to compare against.
   KESTREL_FRAMES_ONLY   Comma separated words; measures only interactions named with one.
+  KESTREL_MOTION_ONLY   Comma separated clip groups to record: surfaces, windows, board, reduced, snap.
 USAGE
 }
 
@@ -44,7 +46,7 @@ mode="${1:-nested}"
 [[ $# -eq 0 ]] || shift
 case "$mode" in
   -h | --help) usage; exit 0 ;;
-  nested | performance | frames | greeter)
+  nested | performance | frames | motion | greeter)
     [[ $# -eq 0 ]] || { usage >&2; exit 2; }
     require_build
     build_helpers

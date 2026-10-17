@@ -15,6 +15,7 @@ Build Kestrel first (see the [repository README](../README.md#develop)). Then fr
 | `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
 | `kestrel/tools/session.sh frames` | Frame times of animations and gestures, see [Frame timing](#frame-timing) |
+| `kestrel/tools/session.sh motion` | Every painted frame of animations, see [Motion clips](#motion-clips) |
 
 `capture` splits the checks into groups and runs several sessions side by side:
 
@@ -52,6 +53,12 @@ Optional tools widen the capture: with `rclone` installed Rover connects to loca
 | `KESTREL_FRAMES_ONLY` | Comma-separated words; only interactions whose name contains one run |
 
 `KESTREL_CAPTURE_SIZE=1920x1200:302x189mm` measures a 14-inch laptop panel at its own scale. To compare two builds, point `KESTREL_BUILD` and `KESTREL_COMPOSITOR` at each in turn, ideally while nothing else loads the machine.
+
+### Motion clips
+
+`motion` records every frame Kestrel paints while surfaces open, close and change their mind half-way, windows minimise and restore, and workspaces switch, back to back and with reduced motion. Each clip goes to its own folder in `clips` inside the capture folder, with the frames as pictures and `frames.json` listing when each was painted and how far along the change it looks. `KESTREL_MOTION_ONLY` picks groups of clips: `surfaces`, `windows`, `board`, `reduced` and `snap`.
+
+`kestrel/tools/motion/sheets.py CLIPS` turns each clip into a contact sheet and a video at real speed, with ImageMagick and FFmpeg.
 
 Polkit, real network credentials, unlocking with the computer's own sign-in rules, physical displays and suspend still need a real login session.
 

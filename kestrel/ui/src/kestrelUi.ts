@@ -65,7 +65,7 @@ class KestrelUi {
     const place = () => this.surfaces.place();
     const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
 
-    this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately());
+    this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately(), context.swipeWorkspaces);
     this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow);
     this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);

@@ -165,7 +165,7 @@ function _setCurve(transition, curve) {
 }
 
 function _spring(animatable, actor, targets, spring, params) {
-    const {velocity, animationRequired} = params;
+    const {velocity, epsilon, animationRequired} = params;
     const duration = actor?.mapped ? adjustAnimationTime(spring.duration, {animationRequired}) : 0;
     const {prepare, cleanup} = _makeEasePrepareAndCleanup(duration);
     const {promise, callback} = _makeEaseCallback(params, cleanup);
@@ -192,6 +192,8 @@ function _spring(animatable, actor, targets, spring, params) {
         animatable.remove_transition(name);
         const transition = Shell.SpringTransition.new(name, target, duration, bounce, startVelocity);
         transition.delay = delay;
+        if (epsilon)
+            transition.epsilon = epsilon;
         animatable.add_transition(name, transition);
         if (!longest || transition.duration > longest.duration)
             longest = transition;
@@ -208,8 +210,8 @@ function _spring(animatable, actor, targets, spring, params) {
 
 function _easeActor(actor, params) {
     if (params.spring) {
-        const {spring, velocity, delay, onComplete, onStopped, animationRequired = false, ...targets} = params;
-        return _spring(actor, actor, targets, spring, {velocity, delay, onComplete, onStopped, animationRequired});
+        const {spring, velocity, epsilon, delay, onComplete, onStopped, animationRequired = false, ...targets} = params;
+        return _spring(actor, actor, targets, spring, {velocity, epsilon, delay, onComplete, onStopped, animationRequired});
     }
 
     params = {
@@ -284,9 +286,9 @@ function _easeActor(actor, params) {
 
 function _easeAnimatableProperty(animatable, propName, target, params) {
     if (params.spring) {
-        const {spring, velocity, delay, onComplete, onStopped, animationRequired = false} = params;
+        const {spring, velocity, epsilon, delay, onComplete, onStopped, animationRequired = false} = params;
         return _spring(animatable, animatable.get_actor(), {[propName]: target}, spring,
-            {velocity, delay, onComplete, onStopped, animationRequired});
+            {velocity, epsilon, delay, onComplete, onStopped, animationRequired});
     }
 
     params = {

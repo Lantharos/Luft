@@ -149,3 +149,9 @@ Toasts go through `Toast` and a `Toasts` store, which shows one toast at a time,
 
 <Toast toast={toasts.current} ondismiss={toasts.dismiss} onhold={toasts.hold} onrelease={toasts.release} />
 ```
+
+## Gestures
+
+Swiping between workspaces with three fingers follows the fingers: a swipe across about two thirds of the touchpad moves one workspace, using the touchpad's real size when it reports one. Past the first and last workspace the desktop resists and springs back. On release, the speed of the swipe decides where it lands, so a quick flick moves on even if it was short, and a fast one can cross several workspaces. The settle starts at the speed the fingers had. Scrolling with two fingers while holding Super works the same way.
+
+Keyboard switches, Super and the wheel, and swipes all drive the same spring, so pressing Super+3 while a switch to the second workspace is still under way carries on across, and reversing turns around where the desktop is. Minimising a window and restoring it, or opening and closing Start, Quick settings, the notification center or the task view, also turn around from wherever they are.

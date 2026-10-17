@@ -1,11 +1,99 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor, rubberband, Spring } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
 import type { View } from './geometry.js';
 
-const TRANSITION_DURATION = 320;
+const FADE_DURATION = 160;
+const GLIDE_PROPERTIES = ['scale_x', 'scale_y', 'translation_x', 'translation_y'] as const;
+
+type GlideProperty = typeof GLIDE_PROPERTIES[number];
+type Glide = { actor: Meta.WindowActor; from: Record<GlideProperty, number> };
+
+let tracking: GlideTrack | null = null;
+
+type TrackState = 'following' | 'released' | 'finishing';
+
+export class GlideTrack {
+  private readonly glides: Glide[] = [];
+  private readonly fades: Clutter.Actor[] = [];
+  private progress = 0;
+  private state: TrackState = 'following';
+
+  add(actor: Meta.WindowActor): void {
+    if (this.state === 'released') {
+      glide(actor);
+      return;
+    }
+    const from = Object.fromEntries(GLIDE_PROPERTIES.map(property => [property, actor[property]])) as Record<GlideProperty, number>;
+    this.glides.push({ actor, from });
+    this.apply();
+  }
+
+  fade(actor: Clutter.Actor): void {
+    if (this.state === 'released') {
+      animateActor(actor, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      return;
+    }
+    this.fades.push(actor);
+    this.apply();
+  }
+
+  update(progress: number): void {
+    this.progress = progress > 1 ? 1 + rubberband(progress - 1, 1) : progress < 0 ? rubberband(progress, 1) : progress;
+    this.apply();
+  }
+
+  release(velocity: number, commit: boolean, settled: () => void): void {
+    this.state = 'released';
+    const end = commit ? 1 : 0;
+    const living = this.glides.filter(({ actor }) => !actor.is_destroyed());
+    living.forEach(({ actor, from }, index) => {
+      const targets = Object.fromEntries(GLIDE_PROPERTIES.map(property => [property, from[property] + (identity(property) - from[property]) * end]));
+      const speeds = Object.fromEntries(GLIDE_PROPERTIES.map(property => [property, (identity(property) - from[property]) * velocity]));
+      animateActor(actor, { ...targets, spring: Spring.smooth, velocity: speeds, onComplete: index === 0 ? settled : undefined });
+    });
+    for (const actor of this.fades) animateActor(actor, { opacity: 255 * end, spring: Spring.smooth, velocity: 255 * velocity });
+    if (!living.length) settled();
+  }
+
+  finish(): void {
+    this.state = 'finishing';
+    this.progress = 1;
+    this.apply();
+  }
+
+  private apply(): void {
+    for (const { actor, from } of this.glides) {
+      if (actor.is_destroyed()) continue;
+      for (const property of GLIDE_PROPERTIES)
+        actor[property] = from[property] + (identity(property) - from[property]) * this.progress;
+    }
+    for (const actor of this.fades) actor.opacity = Math.round(255 * Math.min(1, Math.max(0, this.progress)));
+  }
+}
+
+const identity = (property: GlideProperty) => property.startsWith('scale') ? 1 : 0;
+
+function glide(actor: Meta.WindowActor): void {
+  animateActor(actor, { scale_x: 1, scale_y: 1, translation_x: 0, translation_y: 0, spring: Spring.smooth });
+}
+
+export function trackGlides(): GlideTrack {
+  tracking = new GlideTrack();
+  return tracking;
+}
+
+export function endGlideTracking(): void {
+  tracking = null;
+}
+
+export function fadeIn(actor: Clutter.Actor): void {
+  actor.opacity = 0;
+  if (tracking) tracking.fade(actor);
+  else animateActor(actor, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+}
 
 const IDENTITY: View = { x: 0, y: 0, scale: 1 };
 
@@ -39,11 +127,8 @@ export function glideFrom(window: Meta.Window, screen: Box, view: View | null, v
   const actor = window.get_compositor_private() as Meta.WindowActor | null;
   if (!actor) return;
   placeAt(actor, window, screen, view, viewport);
-  animateActor(actor, {
-    scale_x: 1, scale_y: 1, translation_x: 0, translation_y: 0,
-    duration: TRANSITION_DURATION,
-    mode: Clutter.AnimationMode.EASE_OUT_QUART,
-  });
+  if (tracking) tracking.add(actor);
+  else glide(actor);
 }
 
 export function fadeAway(window: Meta.Window, screen: Box, viewport: Box, done: () => void): void {
@@ -55,7 +140,7 @@ export function fadeAway(window: Meta.Window, screen: Box, viewport: Box, done: 
   placeAt(actor, window, screen, null, viewport);
   animateActor(actor, {
     opacity: 0,
-    duration: TRANSITION_DURATION / 2,
+    duration: FADE_DURATION,
     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
     onStopped: () => {
       if (actor.is_destroyed()) return;

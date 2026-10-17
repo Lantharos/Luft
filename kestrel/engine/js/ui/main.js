@@ -329,6 +329,7 @@ async function _initializeUI() {
             layoutManager, messageTray, quickSettings, sessionMode, screenShield,
             canInteract: () => actionMode === Shell.ActionMode.NORMAL,
             snapWindow: (window, rect) => wm.snapWindow(window, rect),
+            swipeWorkspaces: event => wm.swipeWorkspaces(event),
             activateWindow: window => wm.activateWithSnapGroup(window),
             openScreenshot: () => screenshotUI.open().catch(logError),
             stopScreencast: () => screenshotUI.stopScreencast(),

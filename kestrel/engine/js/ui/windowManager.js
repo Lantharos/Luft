@@ -26,8 +26,7 @@ import {CornerSnap} from './cornerSnap.js';
 
 export const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
 
-const MINIMIZE_WINDOW_ANIMATION_TIME = 300;
-const MINIMIZE_WINDOW_ANIMATION_MODE = Clutter.AnimationMode.EASE_OUT_QUART;
+const MINIMIZE_PROPERTIES = ['x', 'y', 'scale_x', 'scale_y', 'opacity'];
 const MINIMIZED_WINDOW_SCALE = 0.04;
 const TILE_PREVIEW_GAP = 8;
 const TILE_PREVIEW_RADIUS = 16;
@@ -497,6 +496,7 @@ export class WindowManager {
 
         this._minimizing = new Set();
         this._unminimizing = new Set();
+        this._minimizeMotion = new Map();
         this._mapping = new Set();
         this._resizing = new Set();
         this._resizePending = new Set();
@@ -510,7 +510,7 @@ export class WindowManager {
         this._blockCount = 0;
 
         this._shellwm.connect('kill-window-effects', (shellwm, actor) => {
-            this._minimizeWindowDone(shellwm, actor);
+            this._handOverMinimizeMotion(shellwm, actor);
             this._mapWindowDone(shellwm, actor);
             this._destroyWindowDone(shellwm, actor);
             this._sizeChangeWindowDone(shellwm, actor);
@@ -999,43 +999,34 @@ export class WindowManager {
             Meta.WindowType.MODAL_DIALOG,
             Meta.WindowType.DIALOG,
         ];
+        const motion = this._resumeMinimizeMotion(actor);
         if (!this._shouldAnimateActor(actor, types)) {
             shellwm.completed_minimize(actor);
             return;
         }
 
-        actor.set_scale(1.0, 1.0);
-
         this._minimizing.add(actor);
+        const done = () => this._minimizeWindowDone(shellwm, actor);
+        const target = !actor.meta_window.is_monitor_sized() && !KestrelUi.reducedMotion()
+            ? this._minimizeTarget(actor) : null;
 
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
-
-        if (actor.meta_window.is_monitor_sized() || !useMotion) {
+        if (target) {
             actor.ease({
-                opacity: 0,
-                duration: MINIMIZE_WINDOW_ANIMATION_TIME,
-                mode: MINIMIZE_WINDOW_ANIMATION_MODE,
-                onStopped: () => this._minimizeWindowDone(shellwm, actor),
-            });
-        } else {
-            const target = this._minimizeTarget(actor);
-            if (!target) {
-                this._minimizeWindowDone(shellwm, actor);
-                return;
-            }
-
-            actor.ease({
-                opacity: 0,
-                scale_x: target.scale,
-                scale_y: target.scale,
                 x: target.x,
                 y: target.y,
-                duration: MINIMIZE_WINDOW_ANIMATION_TIME,
-                mode: MINIMIZE_WINDOW_ANIMATION_MODE,
-                onStopped: () => this._minimizeWindowDone(shellwm, actor),
+                scale_x: target.scale,
+                scale_y: target.scale,
+                spring: KestrelUi.Spring.smooth,
+                velocity: motion,
             });
         }
+        actor.ease({
+            opacity: 0,
+            duration: KestrelUi.Duration.quick,
+            delay: target ? KestrelUi.Duration.quick : 0,
+            curve: KestrelUi.Curve.decelerate,
+            onStopped: done,
+        });
     }
 
     _minimizeTarget(actor) {
@@ -1047,13 +1038,50 @@ export class WindowManager {
         const {x, y, width, height} = hasIcon
             ? icon
             : {x: monitor.x + monitor.width / 2, y: monitor.y + monitor.height, width: 0, height: 0};
+        const rect = actor.meta_window.get_buffer_rect();
         const scale = Math.max(MINIMIZED_WINDOW_SCALE,
-            Math.min(width / actor.width, height / actor.height));
+            Math.min(width / rect.width, height / rect.height));
         return {
-            x: x + width / 2 - actor.width * scale / 2,
-            y: y + height / 2 - actor.height * scale / 2,
+            x: x + width / 2 - rect.width * scale / 2,
+            y: y + height / 2 - rect.height * scale / 2,
             scale,
         };
+    }
+
+    _handOverMinimizeMotion(shellwm, actor) {
+        const minimizing = this._minimizing.delete(actor);
+        const unminimizing = this._unminimizing.delete(actor);
+        if (!minimizing && !unminimizing)
+            return;
+
+        const properties = Object.fromEntries(MINIMIZE_PROPERTIES.map(prop => [prop, {
+            value: actor[prop],
+            velocity: actor.get_transition(prop.replaceAll('_', '-'))?.get_velocity?.() ?? 0,
+        }]));
+        const destroyId = actor.connect('destroy', () => this._minimizeMotion.delete(actor));
+        this._minimizeMotion.set(actor, {properties, destroyId});
+        actor.remove_all_transitions();
+        if (minimizing)
+            shellwm.completed_minimize(actor);
+        else
+            shellwm.completed_unminimize(actor);
+    }
+
+    _resumeMinimizeMotion(actor) {
+        const handedOver = this._minimizeMotion.get(actor);
+        this._minimizeMotion.delete(actor);
+        actor.set_pivot_point(0, 0);
+        if (!handedOver) {
+            actor.set_scale(1, 1);
+            actor.opacity = 255;
+            return null;
+        }
+        actor.disconnect(handedOver.destroyId);
+        const motion = handedOver.properties;
+        actor.set_position(motion.x.value, motion.y.value);
+        actor.set_scale(motion.scale_x.value, motion.scale_y.value);
+        actor.opacity = motion.opacity.value;
+        return Object.fromEntries(MINIMIZE_PROPERTIES.map(prop => [prop, motion[prop].velocity]));
     }
 
     _minimizeWindowDone(shellwm, actor) {
@@ -1073,49 +1101,45 @@ export class WindowManager {
             Meta.WindowType.MODAL_DIALOG,
             Meta.WindowType.DIALOG,
         ];
+        const motion = this._resumeMinimizeMotion(actor);
+        const rect = actor.meta_window.get_buffer_rect();
         if (!this._shouldAnimateActor(actor, types)) {
+            actor.set_position(rect.x, rect.y);
+            actor.set_scale(1, 1);
+            actor.opacity = 255;
             shellwm.completed_unminimize(actor);
             return;
         }
 
         this._unminimizing.add(actor);
+        const done = () => this._unminimizeWindowDone(shellwm, actor);
+        const target = !actor.meta_window.is_monitor_sized() && !KestrelUi.reducedMotion()
+            ? this._minimizeTarget(actor) : null;
 
-        const {reducedMotion} = St.Settings.get();
-        const useMotion = reducedMotion !== St.ReducedMotion.REDUCE;
-
-        if (actor.meta_window.is_monitor_sized() || !useMotion) {
+        if (!motion) {
             actor.opacity = 0;
-            actor.set_scale(1.0, 1.0);
-            actor.ease({
-                opacity: 255,
-                duration: MINIMIZE_WINDOW_ANIMATION_TIME,
-                mode: MINIMIZE_WINDOW_ANIMATION_MODE,
-                onStopped: () => this._unminimizeWindowDone(shellwm, actor),
-            });
-        } else {
-            const target = this._minimizeTarget(actor);
-            if (!target) {
-                actor.show();
-                this._unminimizeWindowDone(shellwm, actor);
-                return;
+            if (target) {
+                actor.set_position(target.x, target.y);
+                actor.set_scale(target.scale, target.scale);
             }
-            actor.set_position(target.x, target.y);
-            actor.set_scale(target.scale, target.scale);
-            actor.opacity = 0;
-
-            const rect = actor.meta_window.get_buffer_rect();
-            const [xDest, yDest] = [rect.x, rect.y];
-
-            actor.show();
+        }
+        const moves = target || motion;
+        actor.show();
+        actor.ease({
+            opacity: 255,
+            duration: KestrelUi.Duration.quick,
+            curve: KestrelUi.Curve.decelerate,
+            onStopped: moves ? null : done,
+        });
+        if (moves) {
             actor.ease({
-                opacity: 255,
+                x: rect.x,
+                y: rect.y,
                 scale_x: 1,
                 scale_y: 1,
-                x: xDest,
-                y: yDest,
-                duration: MINIMIZE_WINDOW_ANIMATION_TIME,
-                mode: MINIMIZE_WINDOW_ANIMATION_MODE,
-                onStopped: () => this._unminimizeWindowDone(shellwm, actor),
+                spring: KestrelUi.Spring.smooth,
+                velocity: motion,
+                onStopped: done,
             });
         }
     }
@@ -1444,6 +1468,10 @@ export class WindowManager {
             this._shellwm.completed_switch_workspace();
             this._switchInProgress = false;
         });
+    }
+
+    swipeWorkspaces(event) {
+        return this._workspaceAnimation.handleScrollEvent(event);
     }
 
     _switchWorkspaceDone() {

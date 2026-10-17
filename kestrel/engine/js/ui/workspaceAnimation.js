@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
@@ -12,7 +13,6 @@ import * as Util from '../misc/util.js';
 
 import * as Main from './main.js';
 
-export const WINDOW_ANIMATION_TIME = 250;
 export const WORKSPACE_SPACING = 0;
 
 export const BaseWorkspaceGroup = GObject.registerClass(
@@ -221,6 +221,7 @@ export const MonitorGroup = GObject.registerClass({
         });
 
         this._monitor = monitor;
+        this._workspaceIndices = workspaceIndices;
 
         const constraint = new Layout.MonitorConstraint({index: monitor.index});
         this.add_constraint(constraint);
@@ -311,6 +312,34 @@ export const MonitorGroup = GObject.registerClass({
         return this._monitor.index;
     }
 
+    get epsilon() {
+        return 0.5 / (this.baseDistance * global.display.get_monitor_scale(this._monitor.index));
+    }
+
+    get progressVelocity() {
+        return this.get_transition('progress')?.get_velocity?.() ?? 0;
+    }
+
+    get _indexStep() {
+        const [first, second] = this._workspaceIndices;
+        return second === undefined ? 1 : Math.sign(second - first);
+    }
+
+    positionOf(index) {
+        return (index - this._workspaceIndices[0]) * this._indexStep;
+    }
+
+    indexAt(position) {
+        return this._workspaceIndices[0] + position * this._indexStep;
+    }
+
+    ghostOf(workspace) {
+        const group = this._workspaceGroups.find(g => g.workspace === workspace);
+        const ghost = new Clutter.Clone({source: group});
+        this.insert_child_above(ghost, this._container);
+        return ghost;
+    }
+
     getWorkspaceProgress(workspace) {
         const group = this._workspaceGroups.find(g =>
             g.workspace.index() === workspace.index());
@@ -361,6 +390,10 @@ export const MonitorGroup = GObject.registerClass({
     }
 });
 
+const THROWN_VELOCITY = 1.5;
+
+const range = (first, last) => Array.from({length: last - first + 1}, (_, i) => first + i);
+
 export class WorkspaceAnimationController {
     constructor() {
         this._movingWindow = null;
@@ -397,10 +430,12 @@ export class WorkspaceAnimationController {
         switchData.monitors = [];
 
         switchData.gestureActivated = false;
-        switchData.inProgress = false;
+        switchData.superseded = false;
+        switchData.completeEffect = null;
 
         if (!workspaceIndices)
             workspaceIndices = [...Array(nWorkspaces).keys()];
+        switchData.workspaceIndices = workspaceIndices;
 
         const monitors = Meta.prefs_get_workspaces_only_on_primary()
             ? [Main.layoutManager.primaryMonitor] : Main.layoutManager.monitors;
@@ -440,61 +475,107 @@ export class WorkspaceAnimationController {
         this.movingWindow = null;
     }
 
+    _primaryGroup() {
+        return this._switchData.monitors.find(m => m.index === Main.layoutManager.primaryIndex) ??
+            this._switchData.monitors[0];
+    }
+
+    _visibleWorkspace() {
+        const primary = this._primaryGroup();
+        return {
+            index: primary.indexAt(primary.progress),
+            velocity: primary.progressVelocity,
+        };
+    }
+
+    _rebuildSwitch(workspaceIndices) {
+        const {index} = this._visibleWorkspace();
+        this._abandonSwitch();
+        this._prepareWorkspaceSwitch(workspaceIndices);
+        for (const monitorGroup of this._switchData.monitors)
+            monitorGroup.progress = monitorGroup.positionOf(index);
+    }
+
+    _abandonSwitch() {
+        const switchData = this._switchData;
+        for (const monitorGroup of switchData.monitors)
+            monitorGroup.remove_all_transitions();
+        this._finishWorkspaceSwitch(switchData);
+        switchData.completeEffect?.();
+    }
+
     animateSwitch(from, to, direction, onComplete) {
-        this._swipeTracker.enabled = false;
-
-        let workspaceIndices = [];
-
-        switch (direction) {
-        case Meta.MotionDirection.UP:
-        case Meta.MotionDirection.LEFT:
-        case Meta.MotionDirection.UP_LEFT:
-        case Meta.MotionDirection.UP_RIGHT:
-            workspaceIndices = [to, from];
-            break;
-
-        case Meta.MotionDirection.DOWN:
-        case Meta.MotionDirection.RIGHT:
-        case Meta.MotionDirection.DOWN_LEFT:
-        case Meta.MotionDirection.DOWN_RIGHT:
-            workspaceIndices = [from, to];
-            break;
+        if (KestrelUi.reducedMotion()) {
+            this._crossfade(from, to, onComplete);
+            return;
         }
 
-        if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL &&
-            direction !== Meta.MotionDirection.UP &&
-            direction !== Meta.MotionDirection.DOWN)
-            workspaceIndices.reverse();
+        let start = from;
+        let velocity = 0;
+        if (this._switchData?.superseded) {
+            this._switchData.superseded = false;
+            ({index: start, velocity} = this._visibleWorkspace());
+        }
 
-        this._prepareWorkspaceSwitch(workspaceIndices);
-        this._switchData.inProgress = true;
+        const first = Math.min(Math.floor(start), to);
+        const last = Math.max(Math.ceil(start), to);
+        const indices = this._switchData?.workspaceIndices;
+        if (!indices || !indices.includes(first) || !indices.includes(last)) {
+            if (this._switchData)
+                this._abandonSwitch();
+            const workspaceIndices = range(first, last);
+            if (Clutter.get_default_text_direction() === Clutter.TextDirection.RTL &&
+                direction !== Meta.MotionDirection.UP &&
+                direction !== Meta.MotionDirection.DOWN)
+                workspaceIndices.reverse();
+            this._prepareWorkspaceSwitch(workspaceIndices);
+            for (const monitorGroup of this._switchData.monitors)
+                monitorGroup.progress = monitorGroup.positionOf(start);
+        }
 
-        const fromWs = global.workspace_manager.get_workspace_by_index(from);
-        const toWs = global.workspace_manager.get_workspace_by_index(to);
-
-        for (const monitorGroup of this._switchData.monitors) {
-            monitorGroup.progress = monitorGroup.getWorkspaceProgress(fromWs);
-            const progress = monitorGroup.getWorkspaceProgress(toWs);
-
-            const params = {
-                duration: WINDOW_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
-            };
-
-            if (monitorGroup.index === Main.layoutManager.primaryIndex) {
+        const switchData = this._switchData;
+        switchData.completeEffect = onComplete;
+        for (const monitorGroup of switchData.monitors) {
+            const params = {spring: KestrelUi.Spring.smooth, velocity, epsilon: monitorGroup.epsilon};
+            if (monitorGroup === this._primaryGroup()) {
                 params.onComplete = () => {
-                    this._finishWorkspaceSwitch(this._switchData);
+                    this._finishWorkspaceSwitch(switchData);
                     onComplete();
-                    this._swipeTracker.enabled = true;
                 };
             }
+            monitorGroup.ease_property('progress', monitorGroup.positionOf(to), params);
+        }
+    }
 
-            monitorGroup.ease_property('progress', progress, params);
+    _crossfade(from, to, onComplete) {
+        if (this._switchData)
+            this._abandonSwitch();
+        this._prepareWorkspaceSwitch([from, to]);
+        const switchData = this._switchData;
+        switchData.completeEffect = onComplete;
+        const fromWs = global.workspace_manager.get_workspace_by_index(from);
+        const toWs = global.workspace_manager.get_workspace_by_index(to);
+        for (const monitorGroup of switchData.monitors) {
+            const ghost = monitorGroup.ghostOf(fromWs);
+            monitorGroup.progress = monitorGroup.getWorkspaceProgress(toWs);
+            ghost.ease({
+                opacity: 0,
+                duration: KestrelUi.Duration.quick,
+                curve: KestrelUi.Curve.decelerate,
+                onComplete: monitorGroup === this._primaryGroup() ? () => {
+                    this._finishWorkspaceSwitch(switchData);
+                    onComplete();
+                } : null,
+            });
         }
     }
 
     canHandleScrollEvent(event) {
         return this._swipeTracker.canHandleScrollEvent(event);
+    }
+
+    handleScrollEvent(event) {
+        return this._swipeTracker.handleScrollEvent(event);
     }
 
     _findMonitorGroup(monitorIndex) {
@@ -512,9 +593,11 @@ export class WorkspaceAnimationController {
             ? Clutter.Orientation.HORIZONTAL
             : Clutter.Orientation.VERTICAL;
 
-        if (this._switchData && this._switchData.gestureActivated) {
+        if (this._switchData?.gestureActivated) {
             for (const group of this._switchData.monitors)
                 group.remove_all_transitions();
+        } else if (this._switchData) {
+            this._rebuildSwitch(null);
         } else {
             this._prepareWorkspaceSwitch();
         }
@@ -540,7 +623,7 @@ export class WorkspaceAnimationController {
             monitorGroup.updateSwipeForMonitor(progress, this._switchData.baseMonitorGroup);
     }
 
-    _switchWorkspaceEnd(tracker, duration, endProgress) {
+    _switchWorkspaceEnd(tracker, velocity, endProgress, immediate) {
         if (!this._switchData)
             return;
 
@@ -549,23 +632,24 @@ export class WorkspaceAnimationController {
 
         const newWs = switchData.baseMonitorGroup.findClosestWorkspace(endProgress);
         const endTime = Clutter.get_current_event_time();
+        const finish = () => {
+            if (!newWs.active)
+                newWs.activate(endTime);
+            this._finishWorkspaceSwitch(switchData);
+        };
 
+        if (immediate) {
+            finish();
+            return;
+        }
+
+        const spring = Math.abs(velocity) >= THROWN_VELOCITY
+            ? KestrelUi.Spring.thrown : KestrelUi.Spring.smooth;
         for (const monitorGroup of this._switchData.monitors) {
             const progress = monitorGroup.getWorkspaceProgress(newWs);
-
-            const params = {
-                duration,
-                mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
-            };
-
-            if (monitorGroup.index === Main.layoutManager.primaryIndex) {
-                params.onComplete = () => {
-                    if (!newWs.active)
-                        newWs.activate(endTime);
-                    this._finishWorkspaceSwitch(switchData);
-                };
-            }
-
+            const params = {spring, velocity, epsilon: monitorGroup.epsilon};
+            if (monitorGroup === this._primaryGroup())
+                params.onComplete = finish;
             monitorGroup.ease_property('progress', progress, params);
         }
     }
@@ -575,13 +659,17 @@ export class WorkspaceAnimationController {
     }
 
     cancelSwitchAnimation() {
-        if (!this._switchData)
+        const switchData = this._switchData;
+        if (!switchData || switchData.gestureActivated)
             return;
 
-        if (this._switchData.gestureActivated)
-            return;
-
-        this._finishWorkspaceSwitch(this._switchData);
+        switchData.superseded = true;
+        switchData.completeEffect = null;
+        global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+            if (this._switchData === switchData && switchData.superseded)
+                this._finishWorkspaceSwitch(switchData);
+            return GLib.SOURCE_REMOVE;
+        });
     }
 
     set movingWindow(movingWindow) {

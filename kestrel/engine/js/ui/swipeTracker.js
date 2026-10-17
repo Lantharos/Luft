@@ -3,34 +3,20 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Mtk from 'gi://Mtk';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as Params from '../misc/params.js';
 
-// FIXME: ideally these values matches physical touchpad size. We can get the
-// correct values for gnome-shell specifically, since mutter uses libinput
-// directly, but GTK apps cannot get it, so use an arbitrary value so that
-// it's consistent with apps.
-const TOUCHPAD_BASE_HEIGHT = 300;
-const TOUCHPAD_BASE_WIDTH = 400;
+const UNITS_PER_MM = 1000 / 25.4;
+const TOUCHPAD_FALLBACK_MM = [105, 70];
+const TOUCHPAD_SWIPE_SHARE = 2 / 3;
+const SCROLL_DISTANCE = [400, 300];
 
 const EVENT_HISTORY_THRESHOLD_MS = 150;
 
 const SCROLL_MULTIPLIER = 10;
 
-const MIN_ANIMATION_DURATION = 100;
-const MAX_ANIMATION_DURATION = 400;
-const VELOCITY_THRESHOLD_TOUCH = 0.3;
-const VELOCITY_THRESHOLD_TOUCHPAD = 0.6;
-const DECELERATION_TOUCH = 0.998;
-const DECELERATION_TOUCHPAD = 0.997;
-const VELOCITY_CURVE_THRESHOLD = 2;
-const DECELERATION_PARABOLA_MULTIPLIER = 0.35;
-const DRAG_THRESHOLD_DISTANCE = 16;
-
-// Derivative of easeOutCubic at t=0
-const DURATION_MULTIPLIER = 3;
-const ANIMATION_BASE_VELOCITY = 0.002;
-const EPSILON = 0.005;
+const FLING_VELOCITY = 0.4;
 
 const GESTURE_FINGER_COUNT = 3;
 
@@ -117,6 +103,13 @@ const TouchpadSwipeGesture = GObject.registerClass({
             'event::touchpad', this._handleEvent.bind(this), this);
     }
 
+    _distance(event, vertical) {
+        const [found, width, height] = event.get_source_device()?.get_dimensions() ?? [false];
+        const [fallbackWidth, fallbackHeight] = TOUCHPAD_FALLBACK_MM;
+        const millimetres = vertical ? (found ? height : fallbackHeight) : (found ? width : fallbackWidth);
+        return millimetres * UNITS_PER_MM * TOUCHPAD_SWIPE_SHARE;
+    }
+
     _handleEvent(actor, event) {
         if (event.type() !== Clutter.EventType.TOUCHPAD_SWIPE)
             return Clutter.EVENT_PROPAGATE;
@@ -139,7 +132,7 @@ const TouchpadSwipeGesture = GObject.registerClass({
         const time = event.get_time();
 
         const [x, y] = event.get_coords();
-        const [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
+        let [dx, dy] = event.get_gesture_motion_delta_unaccelerated();
 
         if (this._state === TouchpadState.NONE) {
             if (dx === 0 && dy === 0)
@@ -158,11 +151,12 @@ const TouchpadSwipeGesture = GObject.registerClass({
             const cdy = this._cumulativeY;
             const distance = Math.sqrt(cdx * cdx + cdy * cdy);
 
-            if (distance >= DRAG_THRESHOLD_DISTANCE) {
+            if (distance >= KestrelUi.Gesture.directionLock) {
                 const gestureOrientation = Math.abs(cdx) > Math.abs(cdy)
                     ? Clutter.Orientation.HORIZONTAL
                     : Clutter.Orientation.VERTICAL;
 
+                [dx, dy] = [cdx, cdy];
                 this._cumulativeX = 0;
                 this._cumulativeY = 0;
 
@@ -180,7 +174,7 @@ const TouchpadSwipeGesture = GObject.registerClass({
 
         const vertical = this.orientation === Clutter.Orientation.VERTICAL;
         let delta = vertical ? dy : dx;
-        const distance = vertical ? TOUCHPAD_BASE_HEIGHT : TOUCHPAD_BASE_WIDTH;
+        const distance = this._distance(event, vertical);
 
         switch (event.get_gesture_phase()) {
         case Clutter.TouchpadGesturePhase.BEGIN:
@@ -252,7 +246,7 @@ const ScrollGesture = GObject.registerClass({
         this.notify('enabled');
     }
 
-    canHandleEvent(event) {
+    canHandleEvent(event, ignoreModifiers = false) {
         if (event.type() !== Clutter.EventType.SCROLL)
             return false;
 
@@ -266,22 +260,22 @@ const ScrollGesture = GObject.registerClass({
         if ((this._allowedModes & Main.actionMode) === 0)
             return false;
 
-        if (!this._began && this.scrollModifiers !== 0 &&
+        if (!ignoreModifiers && !this._began && this.scrollModifiers !== 0 &&
             (event.get_state() & this.scrollModifiers) !== this.scrollModifiers)
             return false;
 
         return true;
     }
 
-    _handleEvent(actor, event) {
-        if (!this.canHandleEvent(event))
+    _handleEvent(actor, event, ignoreModifiers = false) {
+        if (!this.canHandleEvent(event, ignoreModifiers))
             return Clutter.EVENT_PROPAGATE;
 
         if (event.get_scroll_direction() !== Clutter.ScrollDirection.SMOOTH)
             return Clutter.EVENT_PROPAGATE;
 
         const vertical = this.orientation === Clutter.Orientation.VERTICAL;
-        const distance = vertical ? TOUCHPAD_BASE_HEIGHT : TOUCHPAD_BASE_WIDTH;
+        const distance = SCROLL_DISTANCE[vertical ? 1 : 0];
 
         const time = event.get_time();
         const [dx, dy] = event.get_scroll_delta();
@@ -297,7 +291,8 @@ const ScrollGesture = GObject.registerClass({
             this._began = true;
         }
 
-        const delta = (vertical ? dy : dx) * SCROLL_MULTIPLIER;
+        const along = vertical || Math.abs(dy) > Math.abs(dx) ? dy : dx;
+        const delta = along * SCROLL_MULTIPLIER;
 
         this.emit('update', time, delta, distance);
 
@@ -328,12 +323,10 @@ const ScrollGesture = GObject.registerClass({
 // update(tracker, progress)
 //   The handler should set the progress to the given value.
 //
-// end(tracker, duration, endProgress)
-//   The handler should animate the progress to endProgress. If endProgress is
-//   0, it should do nothing after the animation, otherwise it should change the
-//   state, e.g. change the current page or switch workspace.
-//   NOTE: duration can be 0 in some cases, in this case it should finish
-//   instantly.
+// end(tracker, velocity, endProgress, immediate)
+//   The handler should settle the progress at endProgress, starting with
+//   velocity (progress units per second), and then change the state, e.g.
+//   switch workspace. With immediate it should finish without animating.
 
 /** A class for handling swipe gestures */
 export const SwipeTracker = GObject.registerClass({
@@ -350,10 +343,6 @@ export const SwipeTracker = GObject.registerClass({
             'distance', null, null,
             GObject.ParamFlags.READWRITE,
             0, Infinity, 0),
-        'allow-long-swipes': GObject.ParamSpec.boolean(
-            'allow-long-swipes', null, null,
-            GObject.ParamFlags.READWRITE,
-            false),
         'scroll-modifiers': GObject.ParamSpec.flags(
             'scroll-modifiers', null, null,
             GObject.ParamFlags.READWRITE,
@@ -362,7 +351,7 @@ export const SwipeTracker = GObject.registerClass({
     Signals: {
         'begin':  {param_types: [GObject.TYPE_UINT]},
         'update': {param_types: [GObject.TYPE_DOUBLE]},
-        'end':    {param_types: [GObject.TYPE_UINT64, GObject.TYPE_DOUBLE]},
+        'end':    {param_types: [GObject.TYPE_DOUBLE, GObject.TYPE_DOUBLE, GObject.TYPE_BOOLEAN]},
     },
 }, class SwipeTracker extends GObject.Object {
     _init(actor, orientation, allowedModes, params) {
@@ -443,6 +432,21 @@ export const SwipeTracker = GObject.registerClass({
         return this._scrollGesture.canHandleEvent(scrollEvent);
     }
 
+    /**
+     * handleScrollEvent:
+     * Feeds a touchpad scroll to the tracker whatever modifiers are held,
+     * for callers that already decided the scroll belongs to it.
+     *
+     * @param {Clutter.Event} scrollEvent a smooth scroll event
+     * @returns {boolean} whether the tracker used the event
+     */
+    handleScrollEvent(scrollEvent) {
+        if (!this.enabled || this._scrollGesture === null)
+            return false;
+
+        return this._scrollGesture._handleEvent(null, scrollEvent, true) === Clutter.EVENT_STOP;
+    }
+
     get enabled() {
         return this._enabled;
     }
@@ -478,6 +482,7 @@ export const SwipeTracker = GObject.registerClass({
 
         this._prevOffset = 0;
         this._progress = 0;
+        this._trackedProgress = 0;
 
         this._cancelled = false;
 
@@ -485,7 +490,7 @@ export const SwipeTracker = GObject.registerClass({
     }
 
     _interrupt() {
-        this.emit('end', 0, this._cancelProgress);
+        this.emit('end', 0, this._cancelProgress, true);
         this._panGesture.cancel();
         this._reset();
     }
@@ -518,59 +523,22 @@ export const SwipeTracker = GObject.registerClass({
         return distances.indexOf(min);
     }
 
-    _findNextPoint(pos) {
-        return this._snapPoints.findIndex(p => p >= pos);
-    }
-
-    _findPreviousPoint(pos) {
-        const index =
-            this._snapPoints.findLastIndex(p => p <= pos);
-        if (index !== -1)
-            return index;
-
-        console.trace(`Invalid position ${pos}`);
-        // also out-of-bounds, but somehow callers fail less hard than with -1
-        return this._snapPoints.length;
-    }
-
-    _findPointForProjection(pos, velocity) {
-        const initial = this._findClosestPoint(this._initialProgress);
-        const prev = this._findPreviousPoint(pos);
-        const next = this._findNextPoint(pos);
-
-        if ((velocity > 0 ? prev : next) === initial)
-            return velocity > 0 ? next : prev;
-
-        return this._findClosestPoint(pos);
-    }
-
-    _getBounds(pos) {
-        if (this.allowLongSwipes)
-            return [this._snapPoints[0], this._snapPoints[this._snapPoints.length - 1]];
-
-        const closest = this._findClosestPoint(pos);
-
-        let prev, next;
-        if (Math.abs(this._snapPoints[closest] - pos) < EPSILON) {
-            prev = next = closest;
-        } else {
-            prev = this._findPreviousPoint(pos);
-            next = this._findNextPoint(pos);
-        }
-
-        const lowerIndex = Math.max(prev - 1, 0);
-        const upperIndex = Math.min(next + 1, this._snapPoints.length - 1);
-
-        return [this._snapPoints[lowerIndex], this._snapPoints[upperIndex]];
+    _rubberband(progress) {
+        const first = this._snapPoints[0];
+        const last = this._snapPoints[this._snapPoints.length - 1];
+        if (progress < first)
+            return first + KestrelUi.rubberband(progress - first, 1);
+        if (progress > last)
+            return last + KestrelUi.rubberband(progress - last, 1);
+        return progress;
     }
 
     _updateGesture(delta, distance) {
         if (this._state !== State.SCROLLING)
             return;
 
-        this._progress += delta / distance;
-
-        this._progress = Math.clamp(this._progress, ...this._getBounds(this._initialProgress));
+        this._trackedProgress += delta / distance;
+        this._progress = this._rubberband(this._trackedProgress);
 
         this.emit('update', this._progress);
     }
@@ -598,39 +566,22 @@ export const SwipeTracker = GObject.registerClass({
         this._updateGesture(delta, distance);
     }
 
-    _getEndProgress(velocity, distance, isTouchpad) {
+    _getEndProgress(velocity) {
         if (this._cancelled)
             return this._cancelProgress;
 
-        const threshold = isTouchpad ? VELOCITY_THRESHOLD_TOUCHPAD : VELOCITY_THRESHOLD_TOUCH;
-
-        if (Math.abs(velocity) < threshold)
-            return this._snapPoints[this._findClosestPoint(this._progress)];
-
-        const decel = isTouchpad ? DECELERATION_TOUCHPAD : DECELERATION_TOUCH;
-        const slope = decel / (1.0 - decel) / 1000.0;
-
-        let pos;
-        if (Math.abs(velocity) > VELOCITY_CURVE_THRESHOLD) {
-            const c = slope / 2 / DECELERATION_PARABOLA_MULTIPLIER;
-            const x = Math.abs(velocity) - VELOCITY_CURVE_THRESHOLD + c;
-
-            pos = slope * VELOCITY_CURVE_THRESHOLD +
-                DECELERATION_PARABOLA_MULTIPLIER * x * x -
-                DECELERATION_PARABOLA_MULTIPLIER * c * c;
-        } else {
-            pos = Math.abs(velocity) * slope;
-        }
-
-        pos = pos * Math.sign(velocity) + this._progress;
-        pos = Math.clamp(pos, ...this._getBounds(this._initialProgress));
-
-        const index = this._findPointForProjection(pos, velocity);
+        const projected = this._trackedProgress + KestrelUi.projection(velocity);
+        const first = this._snapPoints[0];
+        const last = this._snapPoints[this._snapPoints.length - 1];
+        let index = this._findClosestPoint(Math.clamp(projected, first, last));
+        const initial = this._findClosestPoint(this._initialProgress);
+        if (index === initial && Math.abs(velocity) >= FLING_VELOCITY)
+            index = Math.clamp(index + Math.sign(velocity), 0, this._snapPoints.length - 1);
 
         return this._snapPoints[index];
     }
 
-    _endGesture(velocity, distance, isTouchpad) {
+    _endGesture(velocity, distance) {
         if (this._state !== State.SCROLLING)
             return;
 
@@ -639,22 +590,12 @@ export const SwipeTracker = GObject.registerClass({
             return;
         }
 
-        const endProgress = this._getEndProgress(velocity, distance, isTouchpad);
-
-        velocity /= distance;
-
-        if ((endProgress - this._progress) * velocity <= 0)
-            velocity = ANIMATION_BASE_VELOCITY;
-
-        const nPoints = Math.max(1, Math.ceil(Math.abs(this._progress - endProgress)));
-        const maxDuration = MAX_ANIMATION_DURATION * Math.log2(1 + nPoints);
-
-        let duration = Math.abs((this._progress - endProgress) / velocity * DURATION_MULTIPLIER);
-        if (duration > 0)
-            duration = Math.clamp(duration, MIN_ANIMATION_DURATION, maxDuration);
+        const progressVelocity = velocity * 1000 / distance;
+        const endProgress = this._getEndProgress(progressVelocity);
+        const overshoot = this._progress !== this._trackedProgress;
 
         this._reset();
-        this.emit('end', duration, endProgress);
+        this.emit('end', overshoot ? 0 : progressVelocity, endProgress, false);
     }
 
     _endPanGesture(panGesture) {
@@ -663,7 +604,7 @@ export const SwipeTracker = GObject.registerClass({
             ? this._getGestureDirFactor() * velocity.get_x()
             : this._getGestureDirFactor() * velocity.get_y();
 
-        this._endGesture(v, this._distance, false);
+        this._endGesture(v, this._distance);
     }
 
     _endTouchpadGesture(gesture, time, distance) {
@@ -675,7 +616,7 @@ export const SwipeTracker = GObject.registerClass({
         this._history.trim(time);
         const velocity = this._history.calculateVelocity();
 
-        this._endGesture(velocity, distance, true);
+        this._endGesture(velocity, distance);
     }
 
     _cancelPanGesture() {
@@ -683,7 +624,7 @@ export const SwipeTracker = GObject.registerClass({
             return;
 
         this._cancelled = true;
-        this._endGesture(0, this._distance, false);
+        this._endGesture(0, this._distance);
     }
 
     _getGestureDirFactor() {
@@ -712,6 +653,7 @@ export const SwipeTracker = GObject.registerClass({
         this._snapPoints = snapPoints;
         this._initialProgress = currentProgress;
         this._progress = currentProgress;
+        this._trackedProgress = currentProgress;
         this._cancelProgress = cancelProgress;
 
         this._state = State.SCROLLING;

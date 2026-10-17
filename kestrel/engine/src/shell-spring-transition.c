@@ -398,7 +398,7 @@ shell_spring_transition_class_init (ShellSpringTransitionClass *klass)
   props[PROP_EPSILON] =
     g_param_spec_double ("epsilon", NULL, NULL,
                          0.0, G_MAXDOUBLE, 0.0,
-                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, props);
 }

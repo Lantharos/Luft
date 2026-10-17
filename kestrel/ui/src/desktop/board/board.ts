@@ -5,7 +5,6 @@ import type St from 'gi://St';
 
 import type { Keybindings } from '../../context.js';
 import type { Monitor } from '../panel/panel.js';
-import { animateActor } from '../../shared/motion.js';
 import { isDark, watchScheme } from '../../shared/scheme.js';
 import type { Box } from '../../shared/placement.js';
 import { Corner } from './corner/corner.js';
@@ -14,14 +13,13 @@ import { BoardKeys } from './input/keys.js';
 import { Backdrop, type BackgroundFactory } from './view/backdrop.js';
 import { Camera } from './view/camera.js';
 import { boundsOf, copyView, fits, FULL_SIZE, freeSpot, intersection, PLACEMENT_GAP, planExit, type View } from './view/geometry.js';
-import { glideFrom, settleActor } from './view/transitions.js';
+import { endGlideTracking, fadeIn, glideFrom, settleActor, trackGlides, type GlideTrack } from './view/transitions.js';
 import { arrange, putBack, restoreSizes } from './windows/arrange.js';
 import { Focus, WINDOW_PADDING, type FocusState } from './windows/focus.js';
 import { Follower } from './windows/follower.js';
 import { appWindowAfter, boardWindows, byOpening, Collisions, frameBox, isBoardWindow, magnify, setMagnification, setUnconstrained } from './windows/windows.js';
 import { X11Origin } from './windows/x11Origin.js';
 
-const FADE_DURATION = 200;
 
 export interface Canvas extends FocusState {
   readonly view: View;
@@ -181,23 +179,44 @@ export class Board implements BoardActions {
     else this.enter();
   }
 
+  track(entering: boolean): GlideTrack {
+    const track = trackGlides();
+    if (entering) this.enter();
+    else this.exit();
+    return track;
+  }
+
+  untrack(entering: boolean): void {
+    const track = trackGlides();
+    if (entering) this.exit();
+    else this.enter();
+    track.finish();
+  }
+
   enter(): void {
     const workspace = shell().workspace_manager.get_active_workspace();
     const canvas = this.canvasFor(workspace);
-    if (canvas.shown || this.cancelRestore) return;
+    if (canvas.shown || this.cancelRestore) {
+      endGlideTracking();
+      return;
+    }
     canvas.shown = true;
     const windows = boardWindows(workspace);
     for (const window of windows) setUnconstrained(window, true);
     this.cancelRestore = restoreSizes(windows, () => {
       this.cancelRestore = null;
       if (canvas.shown && workspace.active) this.layOut(workspace, canvas);
+      endGlideTracking();
     });
   }
 
   exit(): void {
     const canvas = this.presented;
     const workspace = this.presentedWorkspace();
-    if (!canvas || !workspace) return;
+    if (!canvas || !workspace) {
+      endGlideTracking();
+      return;
+    }
     this.collisions.end();
     const windows = boardWindows(workspace).filter(window => !window.minimized);
     const view = copyView({ x: 0, y: 0, scale: 1 }, this.camera.shown);
@@ -211,6 +230,7 @@ export class Board implements BoardActions {
     canvas.shown = false;
     this.present(null);
     putBack(plan, canvas, view, viewport, workArea);
+    endGlideTracking();
   }
 
   fitAll(): void {
@@ -407,8 +427,7 @@ export class Board implements BoardActions {
     canvas.normal.clear();
     windows.forEach((window, index) => canvas.normal.set(window, before[index]!));
     this.present(canvas);
-    this.backdrop.actor.opacity = 0;
-    animateActor(this.backdrop.actor, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    fadeIn(this.backdrop.actor);
     windows.forEach((window, index) => {
       settleActor(window);
       window.move_frame(false, Math.round(boxes[index]!.x), Math.round(boxes[index]!.y));

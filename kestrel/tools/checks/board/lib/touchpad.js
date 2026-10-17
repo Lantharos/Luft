@@ -19,6 +19,7 @@ function gesture(type, phase, fingers, {dx = 0, dy = 0, scale = 1, x = 720, y = 
     get_gesture_motion_delta_unaccelerated: () => [dx, dy],
     get_gesture_pinch_scale: () => scale,
     get_state: () => 0,
+    get_source_device: () => null,
   };
 }
 

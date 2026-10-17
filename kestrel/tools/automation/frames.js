@@ -10,6 +10,7 @@ import {settled} from '../checks/lib/wait.js';
 import {boardInteractions} from '../frames/board.js';
 import {glassInteractions} from '../frames/glass.js';
 import {FrameRecorder, summarize, summarizeGpu, timelines} from '../frames/recorder.js';
+import {popupInteractions} from '../frames/popups.js';
 import {printReport, saveReport} from '../frames/report.js';
 import {surfaceInteractions} from '../frames/surfaces.js';
 import {windowInteractions} from '../frames/windows.js';
@@ -29,12 +30,12 @@ async function record(interaction, gpu) {
   return recorder;
 }
 
-async function measure(interaction, refreshRate) {
-  console.log(`Kestrel frames: measuring ${interaction.name}`);
+async function measure(name, rounds) {
+  console.log(`Kestrel frames: measuring ${name}`);
   try {
-    return await measureRounds(interaction, refreshRate);
+    return await rounds();
   } catch (error) {
-    logError(error, interaction.name);
+    logError(error, name);
     return {error: error.message};
   }
 }
@@ -45,20 +46,24 @@ async function reset() {
   await settled();
 }
 
-async function measureRounds(interaction, refreshRate) {
+async function measureRounds(interaction, refreshRate, timingRounds, gpuRounds) {
   await reset();
-  const timing = [];
-  for (let round = 0; round < TIMING_ROUNDS; round++) timing.push(await record(interaction, false));
-  const gpu = [];
-  for (let round = 0; round < GPU_ROUNDS; round++) gpu.push(await record(interaction, true));
-  return {...summarize(timing, refreshRate), gpu: summarizeGpu(gpu), timelines: timelines(timing)};
+  try {
+    const timing = [];
+    for (let round = 0; round < timingRounds; round++) timing.push(await record(interaction, false));
+    const gpu = [];
+    for (let round = 0; round < gpuRounds; round++) gpu.push(await record(interaction, true));
+    return {...summarize(timing, refreshRate), ...gpu.length ? {gpu: summarizeGpu(gpu)} : {}, timelines: timelines(timing)};
+  } finally {
+    await interaction.finish?.();
+  }
 }
 
-function selected(interactions) {
+function selected(interactions, nameOf) {
   const only = GLib.getenv('KESTREL_FRAMES_ONLY');
   if (!only) return interactions;
   const words = only.toLowerCase().split(',');
-  return interactions.filter(({name}) => words.some(word => name.toLowerCase().includes(word)));
+  return interactions.filter(interaction => words.some(word => nameOf(interaction).toLowerCase().includes(word)));
 }
 
 function display() {
@@ -78,8 +83,11 @@ export async function run() {
   interfaceSettings.set_boolean('cursor-blink', false);
   await openWindows();
   try {
-    for (const interaction of selected([...surfaceInteractions, ...glassInteractions, ...windowInteractions, ...boardInteractions]))
-      results[interaction.name] = await measure(interaction, screen.refreshRate);
+    const interactions = [...surfaceInteractions, ...popupInteractions, ...glassInteractions, ...windowInteractions, ...boardInteractions];
+    for (const interaction of selected(interactions.filter(({first}) => first), ({first}) => first))
+      results[interaction.first] = await measure(interaction.first, () => measureRounds(interaction, screen.refreshRate, 1, 0));
+    for (const interaction of selected(interactions, ({name}) => name))
+      results[interaction.name] = await measure(interaction.name, () => measureRounds(interaction, screen.refreshRate, TIMING_ROUNDS, GPU_ROUNDS));
   } finally {
     await leaveBoard();
     await stopAll();

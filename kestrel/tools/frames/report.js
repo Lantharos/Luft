@@ -1,15 +1,17 @@
 import GLib from 'gi://GLib';
 
 const COLUMNS = [
+  ['first frame', result => result.firstFrameMs],
   ['frames', result => result.frames],
   ['missed', result => result.missed],
   ['slow', result => result.slow],
   ['CPU p50', result => result.cpu.p50],
   ['CPU p95', result => result.cpu.p95],
+  ['CPU max', result => result.cpu.max],
   ['update p95', result => result.update.p95],
   ['layout p95', result => result.layout.p95],
-  ['GPU p50', result => result.gpu.p50],
-  ['GPU p95', result => result.gpu.p95],
+  ['GPU p50', result => result.gpu?.p50 ?? '-'],
+  ['GPU p95', result => result.gpu?.p95 ?? '-'],
   ['longest', result => result.longestIntervalMs],
 ];
 const NAME_WIDTH = 36;

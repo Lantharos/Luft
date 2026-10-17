@@ -34,7 +34,7 @@ async function searching() {
 
 export const surfaceInteractions = [
   ...SURFACES.flatMap(([label, surface]) => [
-    {name: `${label} open`, prepare: closed, act: measured(() => toggleSurface(surface))},
+    {name: `${label} open`, first: `${label} first open`, prepare: closed, act: measured(() => toggleSurface(surface))},
     {name: `${label} close`, prepare: opened(surface), act: measured(() => toggleSurface(surface))},
   ]),
   {name: 'Start typing', prepare: searching, act: measured(typed)},

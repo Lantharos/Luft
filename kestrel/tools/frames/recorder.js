@@ -113,6 +113,7 @@ export function summarize(runs, refreshRate) {
   }
   return {
     frames: frames.length,
+    firstFrameMs: ms(Math.max(0, ...runs.map(run => run.frames.length ? run.frames[0].paintEnd - run.startedAt : 0))),
     missed,
     slow: frames.filter(frame => frame.updateEnd - frame.updateStart > interval).length,
     longestIntervalMs: ms(longest),

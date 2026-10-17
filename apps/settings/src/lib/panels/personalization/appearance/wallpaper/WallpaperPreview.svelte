@@ -147,7 +147,7 @@
 		width: 100%;
 		object-fit: cover;
 		user-select: none;
-		animation: appear 240ms var(--ease);
+		animation: appear var(--motion-standard) var(--ease-decelerate);
 	}
 
 	img.contain {
@@ -170,7 +170,7 @@
 		color: rgba(255, 255, 255, 0.92);
 		opacity: 0;
 		transform: translate(-50%, 4px);
-		transition: opacity 160ms var(--ease), transform 160ms var(--ease);
+		transition: opacity var(--motion-quick) var(--ease-decelerate), transform var(--motion-quick) var(--ease-decelerate);
 		pointer-events: none;
 	}
 

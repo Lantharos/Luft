@@ -125,7 +125,7 @@
 
 <style>
 	.results {
-		transition: opacity 180ms var(--ease);
+		transition: opacity var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.results.loading {
@@ -138,7 +138,7 @@
 
 	.placeholder {
 		height: 88px;
-		animation: pulse 1.4s var(--ease) infinite alternate;
+		animation: pulse 1.4s var(--ease-decelerate) infinite alternate;
 		background: var(--surface);
 	}
 

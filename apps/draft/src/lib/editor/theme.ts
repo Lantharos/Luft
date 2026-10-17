@@ -56,7 +56,7 @@ export const theme = EditorView.theme({
 		width: '14px',
 		color: 'var(--text-muted)',
 		opacity: '0',
-		transition: 'opacity 140ms var(--ease)'
+		transition: 'opacity var(--motion-tap) var(--ease-decelerate)'
 	},
 	'.cm-gutters:hover .cm-foldGutter .cm-gutterElement': {
 		opacity: '1'

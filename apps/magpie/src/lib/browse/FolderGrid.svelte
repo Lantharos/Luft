@@ -73,7 +73,7 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
-		animation: reveal 200ms var(--ease);
+		animation: reveal var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.video {

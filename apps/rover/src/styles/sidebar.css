@@ -87,7 +87,7 @@
 		padding-inline: 12px;
 		text-align: left;
 		font-size: 14px;
-		transition: transform 140ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.sidebar-item__main:active:not(:disabled) {

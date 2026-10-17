@@ -73,7 +73,7 @@
 		border-radius: 14px;
 		background: var(--surface);
 		scroll-snap-align: start;
-		transition: transform 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.shot:active {
@@ -94,7 +94,7 @@
 		display: grid;
 		place-items: center;
 		padding: 56px 72px;
-		animation: fade 180ms var(--ease);
+		animation: fade var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.backdrop {

@@ -58,7 +58,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--control-hover);
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-		transition: transform 240ms var(--ease);
+		transition: transform var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
 	button {

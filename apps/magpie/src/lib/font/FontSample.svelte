@@ -30,7 +30,7 @@
 		font-size: 44px;
 		line-height: 1;
 		color: var(--text);
-		animation: reveal 200ms var(--ease);
+		animation: reveal var(--motion-standard) var(--ease-decelerate);
 	}
 
 	@keyframes reveal {

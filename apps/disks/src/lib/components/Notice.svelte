@@ -23,7 +23,7 @@
 		padding: 10px 10px 10px 18px;
 		font-size: 13px;
 		box-shadow: 0 16px 48px var(--shadow-soft);
-		animation: rise 220ms var(--ease);
+		animation: rise var(--motion-standard) var(--ease-decelerate);
 	}
 
 	@keyframes rise {

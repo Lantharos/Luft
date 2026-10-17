@@ -128,7 +128,7 @@
 		border-radius: 18px;
 		background: var(--popover);
 		box-shadow: 0 12px 40px var(--shadow-soft);
-		animation: candidates-in 120ms var(--ease);
+		animation: candidates-in var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.path-candidate {

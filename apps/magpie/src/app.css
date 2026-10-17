@@ -42,7 +42,7 @@
 }
 
 .fade-idle {
-	transition: opacity 240ms var(--ease);
+	transition: opacity var(--motion-quick) var(--ease-decelerate);
 }
 
 .idle .fade-idle {

@@ -66,7 +66,7 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
-		animation: appear 240ms var(--ease);
+		animation: appear var(--motion-standard) var(--ease-decelerate);
 	}
 
 	@keyframes appear {

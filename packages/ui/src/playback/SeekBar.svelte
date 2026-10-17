@@ -161,8 +161,8 @@
 		opacity: 0;
 		transform: scale(0.5);
 		transition:
-			opacity 140ms var(--ease),
-			transform 140ms var(--ease);
+			opacity var(--motion-quick) var(--ease-decelerate),
+			transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.active .thumb {

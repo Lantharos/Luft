@@ -136,7 +136,7 @@
 
 	.row :global(.icon-button) {
 		opacity: 0;
-		transition: opacity 120ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.row:hover :global(.icon-button),

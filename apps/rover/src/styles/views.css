@@ -84,7 +84,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--hairline);
 		opacity: 0;
-		transition: opacity 140ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.list-header:hover .list-resize::after {
@@ -210,7 +210,7 @@
 		gap: 4px;
 		padding: 24px;
 		text-align: center;
-		animation: empty-in 220ms var(--ease) both;
+		animation: empty-in var(--motion-standard) var(--ease-decelerate) both;
 	}
 
 	.empty-state__icon {
@@ -246,7 +246,7 @@
 		display: grid;
 		gap: 8px;
 		padding: 40px 20px 0;
-		animation: empty-in 200ms var(--ease) both;
+		animation: empty-in var(--motion-standard) var(--ease-decelerate) both;
 	}
 
 	.loading-rows span {

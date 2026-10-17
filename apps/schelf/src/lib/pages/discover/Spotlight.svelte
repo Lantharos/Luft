@@ -38,7 +38,7 @@
 		background: var(--surface);
 		padding: 28px 0 28px 32px;
 		text-align: left;
-		transition: background-color 180ms var(--ease), transform 180ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.spotlight:hover {

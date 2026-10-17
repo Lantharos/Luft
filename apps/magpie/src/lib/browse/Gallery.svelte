@@ -79,7 +79,7 @@
 		border-radius: 14px;
 		background: var(--surface-hover);
 		color: var(--text-muted);
-		transition: transform 180ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.entry:hover .cover {
@@ -94,7 +94,7 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
-		animation: reveal 200ms var(--ease);
+		animation: reveal var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.name {

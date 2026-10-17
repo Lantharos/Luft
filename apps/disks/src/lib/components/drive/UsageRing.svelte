@@ -50,6 +50,6 @@
 		stroke-linecap: round;
 		transform: rotate(-90deg);
 		transform-origin: center;
-		transition: stroke-dasharray 300ms var(--ease);
+		transition: stroke-dasharray var(--motion-standard) var(--ease-point);
 	}
 </style>

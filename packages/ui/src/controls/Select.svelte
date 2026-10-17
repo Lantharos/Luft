@@ -126,7 +126,7 @@
 	.trigger :global(.chevron) {
 		flex: none;
 		color: var(--text-muted);
-		transition: transform 200ms var(--ease);
+		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.trigger.open :global(.chevron) {

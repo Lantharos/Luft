@@ -128,7 +128,7 @@
 		font-weight: 600;
 		color: var(--text);
 		opacity: 0;
-		transition: opacity 180ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.puck {

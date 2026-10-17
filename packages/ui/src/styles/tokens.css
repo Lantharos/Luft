@@ -45,7 +45,6 @@
 	--radius-group: 18px;
 	--window-radius: 16px;
 	--sidebar-width: 280px;
-	--ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root[data-black]:not([data-scheme='light']) {

@@ -85,7 +85,7 @@
 	}
 
 	.pane .xterm-screen {
-		transition: opacity 160ms var(--ease);
+		transition: opacity var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.pane.dimmed .xterm-screen {
@@ -115,7 +115,7 @@
 		background: color-mix(in oklab, var(--text) 7%, transparent);
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 260ms var(--ease);
+		transition: opacity var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.bell.flashing {
@@ -135,7 +135,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--popover);
 		box-shadow: 0 10px 32px var(--shadow-soft);
-		animation: search-in 160ms var(--ease);
+		animation: search-in var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.search-input {

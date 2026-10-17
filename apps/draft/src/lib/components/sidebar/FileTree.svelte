@@ -89,7 +89,7 @@
 	.tree-row :global(.chevron) {
 		flex: none;
 		color: var(--sidebar-text-muted);
-		transition: transform 160ms var(--ease);
+		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.tree-row :global(.chevron.open) {

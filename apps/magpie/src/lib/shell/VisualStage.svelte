@@ -88,9 +88,9 @@
 		box-shadow: 0 6px 22px var(--shadow-soft);
 		backdrop-filter: blur(18px);
 		transition:
-			opacity 240ms var(--ease),
-			background-color 160ms var(--ease),
-			transform 160ms var(--ease);
+			opacity var(--motion-quick) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate),
+			transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.nav:hover {

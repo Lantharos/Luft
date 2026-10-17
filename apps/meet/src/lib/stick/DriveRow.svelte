@@ -29,7 +29,7 @@
 		gap: 14px;
 		border-radius: 16px;
 		padding: 11px 16px 11px 12px;
-		transition: background-color 160ms var(--ease);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.drive:hover:not(:disabled),
@@ -58,7 +58,7 @@
 		flex: none;
 		border-radius: 50%;
 		box-shadow: inset 0 0 0 1.5px var(--text-muted);
-		transition: box-shadow 160ms var(--ease);
+		transition: box-shadow var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.selected .dot {

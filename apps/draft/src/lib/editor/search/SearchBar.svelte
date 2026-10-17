@@ -193,7 +193,7 @@
 	.search-expand {
 		height: 32px;
 		width: 28px;
-		transition: transform 180ms var(--ease);
+		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.search-expand.open :global(svg) {
@@ -201,7 +201,7 @@
 	}
 
 	.search-expand :global(svg) {
-		transition: transform 180ms var(--ease);
+		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.search-field {

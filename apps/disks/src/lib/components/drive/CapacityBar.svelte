@@ -56,8 +56,8 @@
 		border-radius: 8px;
 		background: color-mix(in oklab, var(--tone) 24%, transparent);
 		transition:
-			opacity 180ms var(--ease),
-			background-color 180ms var(--ease);
+			opacity var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.segment:first-child {
@@ -92,6 +92,6 @@
 		inset: 0;
 		background: var(--tone);
 		transform-origin: left;
-		transition: transform 300ms var(--ease);
+		transition: transform var(--spring-smooth-duration) var(--spring-smooth);
 	}
 </style>

@@ -117,7 +117,7 @@
 		background: var(--ink);
 		box-shadow: 0 2px 8px var(--shadow-soft);
 		transform: translate(-1px, -50%);
-		transition: transform 160ms var(--ease);
+		transition: transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.track:hover .handle,

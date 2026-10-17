@@ -91,7 +91,7 @@
 		height: 100%;
 		width: 100%;
 		opacity: 0;
-		transition: opacity 160ms var(--ease);
+		transition: opacity var(--motion-standard) var(--ease-decelerate);
 	}
 
 	canvas:global(.ready) {

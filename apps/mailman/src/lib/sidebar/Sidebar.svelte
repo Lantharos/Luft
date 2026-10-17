@@ -119,8 +119,8 @@
 		font-weight: 600;
 		text-shadow: none;
 		transition:
-			filter 160ms var(--ease),
-			transform 160ms var(--ease);
+			filter var(--motion-tap) var(--ease-decelerate),
+			transform var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.write:hover {

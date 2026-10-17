@@ -51,8 +51,8 @@
 	.fill {
 		stroke: var(--accent);
 		transition:
-			stroke-dashoffset 400ms var(--ease),
-			stroke 200ms var(--ease);
+			stroke-dashoffset var(--motion-standard) var(--ease-point),
+			stroke var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.done {

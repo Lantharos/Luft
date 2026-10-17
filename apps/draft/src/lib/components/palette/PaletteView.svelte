@@ -113,7 +113,7 @@
 		background: var(--popover);
 		padding: 6px;
 		box-shadow: 0 20px 56px var(--shadow-soft);
-		animation: palette-in 160ms var(--ease);
+		animation: palette-in var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.palette-input {

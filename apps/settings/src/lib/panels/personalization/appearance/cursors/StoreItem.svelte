@@ -174,7 +174,7 @@
 	.bar.waiting {
 		width: 40%;
 		translate: none;
-		animation: slide 1.1s var(--ease) infinite;
+		animation: slide 1.1s var(--ease-point) infinite;
 	}
 
 	@keyframes slide {

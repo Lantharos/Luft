@@ -189,8 +189,8 @@
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
 		transition:
-			transform 200ms var(--ease),
-			background-color 140ms var(--ease);
+			transform var(--motion-quick) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.disclosure:hover {

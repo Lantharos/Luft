@@ -120,8 +120,8 @@
 		background: var(--accent);
 		color: var(--accent-text);
 		transition:
-			transform 160ms var(--ease),
-			filter 160ms var(--ease);
+			transform var(--motion-tap) var(--ease-decelerate),
+			filter var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.play:hover {

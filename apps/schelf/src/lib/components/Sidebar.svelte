@@ -144,7 +144,7 @@
 	.track .indeterminate {
 		width: 30%;
 		translate: none;
-		animation: slide 1.4s var(--ease) infinite;
+		animation: slide 1.4s var(--ease-point) infinite;
 	}
 
 	@keyframes slide {

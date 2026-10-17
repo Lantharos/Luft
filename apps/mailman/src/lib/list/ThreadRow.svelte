@@ -180,7 +180,7 @@
 		box-shadow: 0 6px 20px var(--shadow-faint);
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 120ms var(--ease);
+		transition: opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.actions .icon-button {

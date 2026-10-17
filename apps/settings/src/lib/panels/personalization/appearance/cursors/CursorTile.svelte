@@ -82,7 +82,7 @@
 
 	img {
 		height: 32px;
-		animation: appear 240ms var(--ease);
+		animation: appear var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.name {

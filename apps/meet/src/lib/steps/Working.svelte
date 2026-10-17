@@ -61,7 +61,7 @@
 	.waiting .fill {
 		width: 30%;
 		translate: none;
-		animation: drift 1.6s var(--ease) infinite;
+		animation: drift 1.6s var(--ease-point) infinite;
 	}
 
 	@keyframes drift {

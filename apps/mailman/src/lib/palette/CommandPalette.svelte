@@ -86,7 +86,7 @@
 		align-items: flex-start;
 		padding-top: 14vh;
 		background: rgba(8, 8, 7, 0.32);
-		animation: fade 140ms var(--ease);
+		animation: fade var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.palette {
@@ -97,7 +97,7 @@
 		border-radius: 24px;
 		background: var(--popover);
 		box-shadow: 0 28px 80px var(--shadow-soft);
-		animation: rise 180ms var(--ease);
+		animation: rise var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.field {

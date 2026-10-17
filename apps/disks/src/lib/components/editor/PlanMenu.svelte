@@ -59,7 +59,7 @@
 
 	.plan :global(svg) {
 		color: var(--text-muted);
-		transition: transform 200ms var(--ease);
+		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 
 	.plan.open :global(svg) {

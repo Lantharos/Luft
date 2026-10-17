@@ -131,7 +131,7 @@
 		border-radius: var(--radius-pill);
 		background: var(--popover);
 		box-shadow: 0 12px 40px var(--shadow-soft);
-		animation: rise 220ms var(--ease);
+		animation: rise var(--motion-standard) var(--ease-decelerate);
 	}
 
 	@keyframes rise {

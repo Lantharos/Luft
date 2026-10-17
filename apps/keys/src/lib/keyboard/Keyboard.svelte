@@ -105,7 +105,7 @@
 		background: var(--popover);
 		padding: 6px;
 		box-shadow: 0 12px 40px var(--shadow-soft);
-		animation: open 160ms var(--ease);
+		animation: open var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.inspector.above {

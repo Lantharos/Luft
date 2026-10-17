@@ -74,7 +74,6 @@ body {
 
 header.header {
 	backdrop-filter: blur(24px) saturate(1.5);
-	-webkit-backdrop-filter: blur(24px) saturate(1.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

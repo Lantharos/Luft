@@ -1,0 +1,5 @@
+#!/bin/sh
+if grep -Eqs '"intent"[[:space:]]*:[[:space:]]*"try"' /run/initramfs/live/meet.json; then
+  exec /usr/bin/kestrel-session
+fi
+exec /usr/bin/kestrel-session --setup

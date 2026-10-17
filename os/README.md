@@ -66,7 +66,7 @@ The stick starts Install Luft through Fedora's signed shim and GRUB; holding Esc
 
 | Path | Holds |
 | --- | --- |
-| `iso/live` | What the session on the stick adds to the image: the `live` account, signing it in to setup, and the startup step that builds its root from the stick |
+| `iso/live` | What the session on the stick adds to the image: the `live` account, signing it in to Install Luft or, for Meet Luft's Try Luft, straight to the desktop, and the startup step that builds its root from the stick |
 | `iso/stages` | Packing the images and making the ISO |
 | `iso/loader` | The boot loader on the stick |
 

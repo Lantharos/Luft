@@ -2,21 +2,29 @@
 	import { bytes } from '@luft/ui';
 	import type { Stage } from '#lib/api/meet.js';
 	import { session } from '#lib/state/meet.svelte.js';
+	import { maker } from '#lib/state/stick.svelte.js';
 
 	const TITLES: Record<Stage, [string, string]> = {
 		shrinking: ['Making room', 'Windows is moving its files to make space. This can take a few minutes.'],
 		partitioning: ['Setting up Luft’s space', 'Preparing the partitions Luft starts from.'],
 		downloading: ['Bringing Luft over', 'Luft is copied straight into its own space and checked on the way.'],
 		packing: ['Packing your things', 'Copying everything you chose into the moving box. Big folders take a while.'],
-		removing: ['Removing Luft', 'Giving the space back to Windows.']
+		removing: ['Removing Luft', 'Giving the space back to Windows.'],
+		writing: ['Making the stick', 'Luft is written onto the whole stick. Keep it plugged in.'],
+		copying: ['Adding Luft to Ventoy', 'Luft is copied next to the other ISOs on the stick. Keep it plugged in.'],
+		verifying: ['Checking the stick', 'Reading it all back to make sure it starts.']
 	};
+	const STICK_DOWNLOADING: [string, string] = ['Downloading Luft', 'It’s checked on the way and kept, so the next stick is quicker.'];
+	const MEASURED: Stage[] = ['downloading', 'packing', 'writing', 'copying', 'verifying'];
 	const LINUX_REMOVING: [string, string] = ['Removing Luft', 'Taking out its files and its start entry.'];
 
 	let progress = $derived(session.progress);
 	let stage = $derived(progress?.stage ?? 'shrinking');
-	let title = $derived(stage === 'removing' && session.platform === 'linux' ? LINUX_REMOVING : TITLES[stage]);
+	let title = $derived(
+		stage === 'removing' && session.platform === 'linux' ? LINUX_REMOVING : stage === 'downloading' && maker.making ? STICK_DOWNLOADING : TITLES[stage]
+	);
 	let fraction = $derived(progress && progress.total > 0 ? progress.done / progress.total : 0);
-	let measured = $derived(!!progress && progress.total > 0 && (progress.stage === 'downloading' || progress.stage === 'packing'));
+	let measured = $derived(!!progress && progress.total > 0 && MEASURED.includes(progress.stage));
 </script>
 
 <section class="flex h-full flex-col justify-center px-14">

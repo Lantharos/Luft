@@ -1,0 +1,158 @@
+[
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 1,
+    "Offset": 1048576,
+    "Size": 209715200,
+    "GptType": "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}",
+    "MbrType": null,
+    "AccessPaths": [
+      "\\\\?\\Volume{2e89da85-a574-4e85-8564-0ffb2a5ccb36}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": true,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 2,
+    "Offset": 210763776,
+    "Size": 16777216,
+    "GptType": "{e3c9e316-0b5c-4db8-817d-f92df00215ae}",
+    "MbrType": null,
+    "AccessPaths": null,
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 3,
+    "Offset": 227540992,
+    "Size": 463036481536,
+    "GptType": "{ebd0a0a2-b9e5-4433-87c0-68b6b72699c7}",
+    "MbrType": null,
+    "AccessPaths": [
+      "C:\\",
+      "\\\\?\\Volume{d4ecf53c-4f88-4421-8fb2-77b4ae30610d}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": true
+  },
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 4,
+    "Offset": 1017314803712,
+    "Size": 536870912,
+    "GptType": "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}",
+    "MbrType": null,
+    "AccessPaths": [
+      "\\\\?\\Volume{a5d568ea-d1e0-4d7c-b3dd-aba05f7afe60}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 5,
+    "Offset": 1017851674624,
+    "Size": 5421137920,
+    "GptType": "{ebd0a0a2-b9e5-4433-87c0-68b6b72699c7}",
+    "MbrType": null,
+    "AccessPaths": [
+      "\\\\?\\Volume{de919c8b-e064-4695-a03c-2a8b4384a365}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 0,
+    "PartitionNumber": 6,
+    "Offset": 1023272812544,
+    "Size": 935329792,
+    "GptType": "{de94bba4-06d1-4d40-a16a-bfd50179d6ac}",
+    "MbrType": null,
+    "AccessPaths": [
+      "\\\\?\\Volume{659997d5-8770-41cc-8305-dbfbf2839895}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 1,
+    "PartitionNumber": 1,
+    "Offset": 1048576,
+    "Size": 30715936768,
+    "GptType": null,
+    "MbrType": 7,
+    "AccessPaths": [
+      "E:\\",
+      "\\\\?\\Volume{7a1c0e55-1111-11ef-9c3b-806e6f6e6963}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 1,
+    "PartitionNumber": 2,
+    "Offset": 30716985344,
+    "Size": 33554432,
+    "GptType": null,
+    "MbrType": 239,
+    "AccessPaths": [
+      "\\\\?\\Volume{7a1c0e55-2222-11ef-9c3b-806e6f6e6963}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 2,
+    "PartitionNumber": 1,
+    "Offset": 1048576,
+    "Size": 1000203837440,
+    "GptType": null,
+    "MbrType": 7,
+    "AccessPaths": [
+      "\\\\?\\Volume{0f0f0f0f-3333-11ef-9c3b-806e6f6e6963}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": true
+  },
+  {
+    "DiskNumber": 3,
+    "PartitionNumber": 1,
+    "Offset": 1048576,
+    "Size": 2000397885440,
+    "GptType": null,
+    "MbrType": 7,
+    "AccessPaths": [
+      "D:\\",
+      "\\\\?\\Volume{0e0e0e0e-4444-11ef-9c3b-806e6f6e6963}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  },
+  {
+    "DiskNumber": 5,
+    "PartitionNumber": 1,
+    "Offset": 1048576,
+    "Size": 8003256320,
+    "GptType": null,
+    "MbrType": 7,
+    "AccessPaths": [
+      "F:\\",
+      "\\\\?\\Volume{0d0d0d0d-5555-11ef-9c3b-806e6f6e6963}\\"
+    ],
+    "DriveLetter": null,
+    "IsSystem": false,
+    "IsBoot": false
+  }
+]

@@ -3,11 +3,13 @@
 	import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
+	import Usb from '@lucide/svelte/icons/usb';
 	import { Choice, Dialog } from '@luft/ui';
 	import type { Intent } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
+	import { maker } from '#lib/state/stick.svelte.js';
 
 	const REPLACEABLE = ['subvolumes', 'separateHome'];
 
@@ -61,6 +63,7 @@
 			description="Restart into the installer to put Luft on another drive or in free space."
 			onclick={() => (restarting = 'install')}
 		/>
+		<Choice icon={Usb} title="Make a USB stick" description="Put Luft on a stick to start it on any computer." onclick={() => maker.open()} />
 	</div>
 	{#if session.failure}
 		<div class="mt-4"><Problem failure={session.failure} /></div>

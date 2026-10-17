@@ -14,6 +14,7 @@ mod live;
 mod plan;
 mod protocol;
 mod serving;
+mod stick;
 
 fn main() {
     #[cfg(windows)]

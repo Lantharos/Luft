@@ -10,6 +10,7 @@ mod link;
 mod logs;
 #[cfg(windows)]
 mod on_windows;
+mod stick;
 
 use std::sync::{Arc, OnceLock};
 
@@ -69,6 +70,12 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
     });
     let window = job::command(window, "meet_show_file", events, |_, path: String| {
         platform::show_file(&path).map(|()| Value::Null)
+    });
+    let window = job::command(window, "meet_stick_offers", events, |_, asking| {
+        stick::offers(asking)
+    });
+    let window = job::command(window, "meet_make_stick", events, |events, making| {
+        stick::make(events, making, platform::call)
     });
     job::command(window, "meet_pick_iso", events, |_, _: Value| {
         Ok(platform::pick_iso().map_or(Value::Null, Value::String))

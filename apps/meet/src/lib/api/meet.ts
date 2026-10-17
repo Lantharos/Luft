@@ -1,7 +1,7 @@
 import { invoke, listen } from '@lantharos/sabine';
 
 export type Level = 'fine' | 'note' | 'blocks';
-export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing';
+export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing' | 'writing' | 'copying' | 'verifying';
 export type Intent = 'try' | 'install' | 'replace';
 export type Platform = 'windows' | 'linux';
 export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
@@ -127,7 +127,7 @@ function settle(finished: Finished) {
 	else job.resolve(finished.value);
 }
 
-async function start<T>(command: string, request: unknown = {}): Promise<T> {
+export async function start<T>(command: string, request: unknown = {}): Promise<T> {
 	if (!listening) {
 		listen<Finished>('meet.finished', settle);
 		listening = true;
@@ -143,7 +143,7 @@ async function start<T>(command: string, request: unknown = {}): Promise<T> {
 	return finished;
 }
 
-const call = <T>(request: object) => start<T>('meet_call', request);
+export const call = <T>(request: object) => start<T>('meet_call', request);
 
 export const check = (source: Source) => call<Report>({ call: 'check', source });
 export const prepare = (luft: number, source: Source) => call<Prepared>({ call: 'prepare', luft, source });

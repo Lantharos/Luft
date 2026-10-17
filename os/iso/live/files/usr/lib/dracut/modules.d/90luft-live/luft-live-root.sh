@@ -18,11 +18,30 @@ medium_spec() {
 
 medium_device() {
     case "$1" in
-        LABEL=*) echo "/dev/disk/by-label/${1#LABEL=}" ;;
         PARTUUID=*) echo "/dev/disk/by-partuuid/${1#PARTUUID=}" ;;
         UUID=*/*) local uuid="${1#UUID=}"; echo "/dev/disk/by-uuid/${uuid%%/*}" ;;
         *) echo "Luft doesn't know where to start from: root=luft-live:$1" >&2; return 1 ;;
     esac
+}
+
+labelled() {
+    local found
+    read -r found < <(blkid --cache-file /dev/null --match-token "LABEL=$1" --output device) || return 1
+    echo "$found"
+}
+
+wait_for_label() {
+    local label="$1" link="/dev/disk/by-label/$1" attempt
+    for ((attempt = 0; attempt < 240; attempt++)); do
+        if [[ -e $link ]]; then
+            echo "$link"
+            return
+        fi
+        labelled "$label" && return
+        sleep 0.5
+    done
+    echo "Luft's medium labelled $label didn't show up" >&2
+    return 1
 }
 
 mount_folder() {
@@ -41,8 +60,13 @@ layers() {
 }
 
 spec="$(medium_spec)"
-device="$(medium_device "$spec")"
-udevadm wait --timeout=120 "$device"
+case "$spec" in
+    LABEL=*) device="$(wait_for_label "${spec#LABEL=}")" ;;
+    *)
+        device="$(medium_device "$spec")"
+        udevadm wait --timeout=120 "$device"
+        ;;
+esac
 mkdir -p "$medium" "$store" "$writable" "$root"
 case "$spec" in
     UUID=*/*) mount_folder "$device" "/${spec#*/}" ;;

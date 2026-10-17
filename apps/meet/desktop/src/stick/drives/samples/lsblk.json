@@ -1,0 +1,463 @@
+{
+  "blockdevices": [
+    {
+      "name": "nvme0n1",
+      "path": "/dev/nvme0n1",
+      "type": "disk",
+      "tran": "nvme",
+      "rm": false,
+      "hotplug": false,
+      "ro": false,
+      "size": 1000204886016,
+      "vendor": null,
+      "model": "Samsung SSD 990 PRO 1TB",
+      "serial": "S73VNU0X",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "nvme0n1p1",
+          "path": "/dev/nvme0n1p1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": false,
+          "ro": false,
+          "size": 629145600,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": null,
+          "fstype": "vfat",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            "/boot/efi"
+          ]
+        },
+        {
+          "name": "nvme0n1p2",
+          "path": "/dev/nvme0n1p2",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": false,
+          "ro": false,
+          "size": 2147483648,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": null,
+          "fstype": "ext4",
+          "start": 1230848,
+          "log-sec": 512,
+          "mountpoints": [
+            "/boot"
+          ]
+        },
+        {
+          "name": "nvme0n1p3",
+          "path": "/dev/nvme0n1p3",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": false,
+          "ro": false,
+          "size": 997426610176,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "fedora",
+          "fstype": "btrfs",
+          "start": 5425152,
+          "log-sec": 512,
+          "mountpoints": [
+            "/home",
+            "/"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sda",
+      "path": "/dev/sda",
+      "type": "disk",
+      "tran": "usb",
+      "rm": true,
+      "hotplug": true,
+      "ro": false,
+      "size": 30752636928,
+      "vendor": "SanDisk ",
+      "model": "Ultra",
+      "serial": "4C530001230521116221",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sda1",
+          "path": "/dev/sda1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 30751588352,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "PHOTOS",
+          "fstype": "vfat",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            "/run/media/ada/PHOTOS"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sdb",
+      "path": "/dev/sdb",
+      "type": "disk",
+      "tran": "usb",
+      "rm": false,
+      "hotplug": true,
+      "ro": false,
+      "size": 1000204886016,
+      "vendor": "Samsung ",
+      "model": "PSSD T7",
+      "serial": "S5SXNS0R",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sdb1",
+          "path": "/dev/sdb1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 1000203837440,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": null,
+          "fstype": "ext4",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            "/"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sdc",
+      "path": "/dev/sdc",
+      "type": "disk",
+      "tran": "usb",
+      "rm": true,
+      "hotplug": true,
+      "ro": false,
+      "size": 0,
+      "vendor": "Generic ",
+      "model": "STORAGE DEVICE",
+      "serial": "000000001536",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ]
+    },
+    {
+      "name": "sdd",
+      "path": "/dev/sdd",
+      "type": "disk",
+      "tran": "usb",
+      "rm": true,
+      "hotplug": true,
+      "ro": false,
+      "size": 15518924800,
+      "vendor": "Kingston",
+      "model": "DataTraveler 3.0",
+      "serial": "E0D55EA573F4",
+      "label": "Luft-45",
+      "fstype": "iso9660",
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sdd1",
+          "path": "/dev/sdd1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 3018784768,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "Luft-45",
+          "fstype": "iso9660",
+          "start": 64,
+          "log-sec": 512,
+          "mountpoints": [
+            null
+          ]
+        },
+        {
+          "name": "sdd2",
+          "path": "/dev/sdd2",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 10485760,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "LUFT-EFI",
+          "fstype": "vfat",
+          "start": 5896256,
+          "log-sec": 512,
+          "mountpoints": [
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sde",
+      "path": "/dev/sde",
+      "type": "disk",
+      "tran": "usb",
+      "rm": true,
+      "hotplug": true,
+      "ro": true,
+      "size": 8004304896,
+      "vendor": "Lexar",
+      "model": "JumpDrive",
+      "serial": "AA00000000000489",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sde1",
+          "path": "/dev/sde1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": true,
+          "size": 8003256320,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "LEXAR",
+          "fstype": "exfat",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sdf",
+      "path": "/dev/sdf",
+      "type": "disk",
+      "tran": "usb",
+      "rm": false,
+      "hotplug": true,
+      "ro": false,
+      "size": 500107862016,
+      "vendor": "WD",
+      "model": "My Passport",
+      "serial": "575833314131",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sdf1",
+          "path": "/dev/sdf1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 500106813440,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": null,
+          "fstype": "LVM2_member",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            null
+          ],
+          "children": [
+            {
+              "name": "backup-home",
+              "path": "/dev/backup-home",
+              "type": "lvm",
+              "tran": null,
+              "rm": false,
+              "hotplug": false,
+              "ro": false,
+              "size": 500103643136,
+              "vendor": null,
+              "model": null,
+              "serial": null,
+              "label": null,
+              "fstype": "ext4",
+              "start": null,
+              "log-sec": 512,
+              "mountpoints": [
+                null
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sdg",
+      "path": "/dev/sdg",
+      "type": "disk",
+      "tran": "sata",
+      "rm": false,
+      "hotplug": false,
+      "ro": false,
+      "size": 2000398934016,
+      "vendor": "ATA     ",
+      "model": "ST2000DM008",
+      "serial": "ZFL1ABCD",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sdg1",
+          "path": "/dev/sdg1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": false,
+          "ro": false,
+          "size": 2000397885440,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "Data",
+          "fstype": "ext4",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            "/mnt/data"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sdh",
+      "path": "/dev/sdh",
+      "type": "disk",
+      "tran": "usb",
+      "rm": true,
+      "hotplug": true,
+      "ro": false,
+      "size": 62914560000,
+      "vendor": "SanDisk",
+      "model": "Extreme",
+      "serial": "AA010203",
+      "label": null,
+      "fstype": null,
+      "start": null,
+      "log-sec": 512,
+      "mountpoints": [
+        null
+      ],
+      "children": [
+        {
+          "name": "sdh1",
+          "path": "/dev/sdh1",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 4294967296,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": null,
+          "fstype": "swap",
+          "start": 2048,
+          "log-sec": 512,
+          "mountpoints": [
+            "[SWAP]"
+          ]
+        },
+        {
+          "name": "sdh2",
+          "path": "/dev/sdh2",
+          "type": "part",
+          "tran": null,
+          "rm": false,
+          "hotplug": true,
+          "ro": false,
+          "size": 58618544128,
+          "vendor": null,
+          "model": null,
+          "serial": null,
+          "label": "Data",
+          "fstype": "exfat",
+          "start": 8390656,
+          "log-sec": 512,
+          "mountpoints": [
+            null
+          ]
+        }
+      ]
+    }
+  ]
+}

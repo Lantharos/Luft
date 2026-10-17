@@ -36,6 +36,29 @@ After Luft is installed and you sign in for the first time, it removes the start
 
 When a newer Luft is out than the one on its partition, Meet Luft offers *Get the newest Luft* next to *Try Luft*. Newer means a different checksum than the build it copied, from the releases or nightly builds Meet Luft is using, or from an ISO picked with *Use an ISO I already have*; an ISO without a `.sha256` next to it always counts as newer. It downloads the new build in place of the old one and keeps the room, the moving box and the logs from Try Luft. When the new build fits the partitions Meet Luft already made, only their files change. Otherwise it makes them again at the size the new build needs, taking what's missing from Windows, and adds the start entry back. Meet Luft remembers which build it copied by its checksum in `LiveOS\iso.sha256`. If an update stops halfway, Meet Luft won't restart into Luft until the update is done.
 
+## Making a USB stick
+
+*Make a USB stick*, on the first screen and next to *Try Luft* and *Install Luft*, puts Luft on a stick, on Windows and on Linux. It lists only USB drives that can be taken out, with each one's name, size and what's on it. Internal drives, read-only sticks, the drive the computer runs from and the drive holding a chosen ISO never show up. Sticks are looked for again every few seconds, so one plugged in later appears by itself.
+
+By default the stick gets the universal image, `luft-latest.iso` (`luft-nightly.iso` for nightly builds), since a stick is often used on other computers. *For this PC* picks the smaller image built for this computer's graphics instead, `luft-latest-standard.iso` or `luft-latest-nvidia.iso`. *Use an ISO I already have* writes that ISO, checked against a `.sha256` next to it when there is one.
+
+Downloads are checked against their `.sha256` and kept, so the next stick doesn't download again: in `~/.cache/luft-meet` on Linux, and `%LOCALAPPDATA%\Lantharos\Meet Luft\Downloads` on Windows. A newer build replaces the one kept there. They can be deleted any time.
+
+### Erasing the stick
+
+Meet Luft names the stick and asks before erasing it. It writes the ISO to the whole stick, reads everything back and compares its SHA-256 with the ISO's, then ejects the stick.
+
+- **Windows:** the helper locks and dismounts each of the stick's volumes, clears its partition table and writes `\\.\PhysicalDriveN` unbuffered, as Rufus does. Windows then reads the new partitions, and the stick is ejected like *Safely Remove Hardware* does.
+- **Linux:** the helper unmounts the stick's partitions through UDisks, opens the drive exclusively with `O_DIRECT`, writes and flushes it, reads it back past the page cache, and powers it off through UDisks.
+
+### Ventoy
+
+A stick made with [Ventoy](https://www.ventoy.net) is recognised the way Ventoy recognises it: its first partition starts at 1 MiB, its second is exactly 32 MiB right after it and is the FAT partition labelled `VTOYEFI` (named `VTOYEFI` too on GPT). Meet Luft then asks whether to add Luft to it, or to erase the whole stick and make it a Luft stick.
+
+Adding copies the ISO into Ventoy's data partition, the large exFAT or NTFS one, next to the other ISOs. On Windows it's opened by its drive letter or volume path; on Linux through UDisks when it isn't mounted yet. Meet Luft checks the free space first, asks before replacing a Luft ISO already on the stick, copies to a temporary name, reads the copy back and compares its SHA-256, and only then gives it its name and ejects the stick.
+
+Luft starts from Ventoy's normal mode, with nothing to set in `ventoy.json`: Ventoy maps the ISO onto a device-mapper device, and Luft's live system looks for its label on every block device, not only on whole sticks. With Secure Boot on, Ventoy asks once, on its own blue screen, to enroll its key.
+
 ## Logs from Try Luft
 
 When Luft starts from Meet Luft's partition or folder, it keeps its logs on that partition, so problems on real hardware can be looked at from Windows afterwards. It saves them a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down or restarts, so pulling the plug loses a few minutes at most. Each start gets one zip, `Luft logs\YYYY-MM-DD HH-MM-SS.zip` on the *Luft* partition (on Linux, in Meet Luft's folder), named after the time of its first save, and each save replaces it whole. Starting from a USB stick saves nothing.

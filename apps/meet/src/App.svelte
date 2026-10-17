@@ -13,9 +13,11 @@
 	import Ready from '#lib/steps/Ready.svelte';
 	import Removed from '#lib/steps/Removed.svelte';
 	import Room from '#lib/steps/Room.svelte';
+	import Stick from '#lib/steps/Stick.svelte';
+	import StickDone from '#lib/steps/StickDone.svelte';
 	import Working from '#lib/steps/Working.svelte';
 
-	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed };
+	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed, stick: Stick, stickDone: StickDone };
 	const SLIDE = 28;
 
 	const SHORTCUTS: Record<string, () => unknown> = {

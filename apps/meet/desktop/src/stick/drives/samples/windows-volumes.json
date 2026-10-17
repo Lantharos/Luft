@@ -1,0 +1,72 @@
+[
+  {
+    "Path": "\\\\?\\Volume{2e89da85-a574-4e85-8564-0ffb2a5ccb36}\\",
+    "FileSystem": "FAT32",
+    "FileSystemLabel": "",
+    "Size": 205520896,
+    "SizeRemaining": 162402304
+  },
+  {
+    "Path": "\\\\?\\Volume{659997d5-8770-41cc-8305-dbfbf2839895}\\",
+    "FileSystem": "NTFS",
+    "FileSystemLabel": "",
+    "Size": 935325696,
+    "SizeRemaining": 94023680
+  },
+  {
+    "Path": "\\\\?\\Volume{a5d568ea-d1e0-4d7c-b3dd-aba05f7afe60}\\",
+    "FileSystem": "FAT32",
+    "FileSystemLabel": "LUFT-START",
+    "Size": 532676608,
+    "SizeRemaining": 436723712
+  },
+  {
+    "Path": "\\\\?\\Volume{d4ecf53c-4f88-4421-8fb2-77b4ae30610d}\\",
+    "FileSystem": "NTFS",
+    "FileSystemLabel": "",
+    "Size": 463036477440,
+    "SizeRemaining": 392301334528
+  },
+  {
+    "Path": "\\\\?\\Volume{de919c8b-e064-4695-a03c-2a8b4384a365}\\",
+    "FileSystem": "exFAT",
+    "FileSystemLabel": "Luft",
+    "Size": 5419040768,
+    "SizeRemaining": 2501869568
+  },
+  {
+    "Path": "\\\\?\\Volume{7a1c0e55-1111-11ef-9c3b-806e6f6e6963}\\",
+    "FileSystem": "exFAT",
+    "FileSystemLabel": "Ventoy",
+    "Size": 30715904000,
+    "SizeRemaining": 27400000000
+  },
+  {
+    "Path": "\\\\?\\Volume{7a1c0e55-2222-11ef-9c3b-806e6f6e6963}\\",
+    "FileSystem": "FAT",
+    "FileSystemLabel": "VTOYEFI",
+    "Size": 33521664,
+    "SizeRemaining": 1048576
+  },
+  {
+    "Path": "\\\\?\\Volume{0f0f0f0f-3333-11ef-9c3b-806e6f6e6963}\\",
+    "FileSystem": "NTFS",
+    "FileSystemLabel": "Windows To Go",
+    "Size": 1000203833344,
+    "SizeRemaining": 800000000000
+  },
+  {
+    "Path": "\\\\?\\Volume{0e0e0e0e-4444-11ef-9c3b-806e6f6e6963}\\",
+    "FileSystem": "NTFS",
+    "FileSystemLabel": "Data",
+    "Size": 2000397881344,
+    "SizeRemaining": 1500000000000
+  },
+  {
+    "Path": "\\\\?\\Volume{0d0d0d0d-5555-11ef-9c3b-806e6f6e6963}\\",
+    "FileSystem": "exFAT",
+    "FileSystemLabel": "LEXAR",
+    "Size": 8003223552,
+    "SizeRemaining": 8000000000
+  }
+]

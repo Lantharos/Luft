@@ -3,6 +3,7 @@ mod live_system;
 mod pack;
 mod prepare;
 mod refresh;
+mod stick;
 mod system;
 mod undo;
 
@@ -52,6 +53,16 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
         Call::Tidy => serde_json::to_value(prepare::tidy()?),
         Call::FirmwareSettings => serde_json::to_value(system::firmware::restart_into_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),
+        Call::Sticks { iso } => serde_json::to_value(stick::sticks(iso.as_deref())?),
+        Call::Flash { stick, image } => {
+            serde_json::to_value(stick::flash(context, &stick, &image)?)
+        }
+        Call::VentoyRoom { stick, needed } => serde_json::to_value(stick::room(&stick, needed)?),
+        Call::AddToVentoy {
+            stick,
+            image,
+            replace,
+        } => serde_json::to_value(stick::add_to_ventoy(context, &stick, &image, replace)?),
     };
     value.map_err(|error| error.to_string())
 }

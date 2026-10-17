@@ -6,6 +6,7 @@ mod machine;
 mod place;
 mod prepare;
 mod restart;
+mod stick;
 mod undo;
 
 use std::io;
@@ -29,6 +30,16 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
         Call::Restart { intent, .. } => serde_json::to_value(restart::restart(intent)?),
         Call::FirmwareSettings => serde_json::to_value(restart::firmware_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),
+        Call::Sticks { iso } => serde_json::to_value(stick::sticks(iso.as_deref())?),
+        Call::Flash { stick, image } => {
+            serde_json::to_value(stick::flash(context, &stick, &image)?)
+        }
+        Call::VentoyRoom { stick, needed } => serde_json::to_value(stick::room(&stick, needed)?),
+        Call::AddToVentoy {
+            stick,
+            image,
+            replace,
+        } => serde_json::to_value(stick::add_to_ventoy(context, &stick, &image, replace)?),
         Call::Pack { .. } | Call::Tidy => {
             return Err("Meet Luft doesn't do that on Linux.".to_owned());
         }

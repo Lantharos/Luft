@@ -29,12 +29,23 @@ impl Channel {
     }
 
     fn isos(self, downloads: &str, variant: Variant) -> [String; 2] {
-        let name = self.name();
         [
-            format!("{downloads}/luft-{name}-{}.iso", variant.name()),
-            format!("{downloads}/luft-{name}.iso"),
+            published_at(downloads, self, Some(variant)),
+            published_at(downloads, self, None),
         ]
     }
+}
+
+fn published_at(downloads: &str, channel: Channel, variant: Option<Variant>) -> String {
+    let name = channel.name();
+    match variant {
+        Some(variant) => format!("{downloads}/luft-{name}-{}.iso", variant.name()),
+        None => format!("{downloads}/luft-{name}.iso"),
+    }
+}
+
+pub fn published(channel: Channel, variant: Option<Variant>) -> String {
+    published_at(DOWNLOADS, channel, variant)
 }
 
 pub struct Located {
@@ -141,6 +152,23 @@ fn checksum(agent: &Agent, iso: &str) -> Result<[u8; 32], Fetch> {
             "The checksum file isn't readable",
         ))
     })
+}
+
+pub fn published_checksum(agent: &Agent, iso: &str) -> io::Result<Option<[u8; 32]>> {
+    match checksum(agent, iso) {
+        Ok(checksum) => Ok(Some(checksum)),
+        Err(Fetch::Missing) => Ok(None),
+        Err(other) => Err(other.into_io()),
+    }
+}
+
+pub fn published_size(agent: &Agent, iso: &str) -> io::Result<u64> {
+    let response = agent.head(iso).call().map_err(failed)?;
+    response
+        .headers()
+        .get("content-length")
+        .and_then(|value| value.to_str().ok()?.parse().ok())
+        .ok_or_else(|| io::Error::other("The download's size isn't known"))
 }
 
 pub struct Download {

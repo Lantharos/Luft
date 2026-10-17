@@ -11,7 +11,10 @@
 		restart: 'Meet Luft couldn’t set up the restart.',
 		tidy: 'The old start entries couldn’t be removed.',
 		firmware: 'Meet Luft couldn’t open the firmware settings.',
-		folders: 'Meet Luft couldn’t look through your folders.'
+		folders: 'Meet Luft couldn’t look through your folders.',
+		sticks: 'Meet Luft couldn’t look for USB drives.',
+		stick: 'Making the stick didn’t finish.',
+		offers: 'Luft can’t be downloaded right now. Check that you’re online, or use an ISO you already have.'
 	};
 	const DECLINED = {
 		windows: 'Meet Luft needs your permission to work on the drive. Choose Yes when Windows asks.',
@@ -19,7 +22,13 @@
 	};
 
 	let { failure }: { failure: Failure } = $props();
-	let said = $derived(failure.task === 'room' && session.platform === 'linux' ? 'Getting Luft ready didn’t finish.' : SAID[failure.task]);
+	let said = $derived(
+		failure.task === 'stick' && failure.detail
+			? failure.detail
+			: failure.task === 'room' && session.platform === 'linux'
+				? 'Getting Luft ready didn’t finish.'
+				: SAID[failure.task]
+	);
 </script>
 
 <div class="flex items-center gap-2 text-[13.5px]" role="alert">

@@ -23,6 +23,10 @@ pub struct Failed {
 }
 
 impl Failed {
+    pub fn detail(&self) -> &str {
+        &self.detail
+    }
+
     pub fn declined(detail: impl Into<String>) -> Self {
         Self {
             failure: Failure::Declined,

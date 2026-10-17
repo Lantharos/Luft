@@ -2,7 +2,7 @@
 
 ![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
 
-An app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, puts the live Luft system next to the one already there and restarts into it once, to try Luft, install it or, on Linux, replace the old system and keep your files. On Windows it makes room with Windows' own tools and can pack files and settings into a moving box; on Linux it keeps Luft in a folder and repartitions nothing. It can take everything back out again. How it fits together is in [docs/meet.md](../../docs/meet.md).
+An app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, puts the live Luft system next to the one already there and restarts into it once, to try Luft, install it or, on Linux, replace the old system and keep your files. On Windows it makes room with Windows' own tools and can pack files and settings into a moving box; on Linux it keeps Luft in a folder and repartitions nothing. It can take everything back out again, and make a USB stick, or add Luft to a Ventoy stick. How it fits together is in [docs/meet.md](../../docs/meet.md).
 
 Builds aren't code-signed yet, so Windows SmartScreen asks before the first start ("More info", then "Run anyway").
 

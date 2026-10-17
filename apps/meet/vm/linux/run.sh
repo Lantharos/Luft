@@ -20,6 +20,7 @@ keeps its own changes, so tests can start over by deleting state/NAME.
   HEADLESS=0        show a window
   MEMORY=6144       memory in MB
   ISO=path          also attach a Luft ISO as a USB stick, and start from it
+  STICK=path        also attach a disk image as a writable USB stick
   SHARE=folder      share a folder read-only, as the 9p tag "share"
 
 Control it with apps/meet/vm/control.py NAME.
@@ -48,6 +49,8 @@ if [[ -n "${INSTALL_ISO:-}" ]]; then
 elif [[ -n "${ISO:-}" ]]; then
   media=(-drive "if=none,id=stick,format=raw,readonly=on,file=$ISO" -device "usb-storage,bus=usb.0,drive=stick,removable=on,bootindex=0")
 fi
+stick=()
+[[ -n "${STICK:-}" ]] && stick=(-drive "if=none,id=usbstick,format=raw,cache=unsafe,file=$STICK" -device "usb-storage,bus=usb.0,drive=usbstick,removable=on,serial=MEETSTICK01")
 data=()
 [[ -f "$vm/data.qcow2" ]] && data=(-drive "if=virtio,format=qcow2,cache=unsafe,discard=unmap,file=$vm/data.qcow2")
 share=()
@@ -69,7 +72,7 @@ qemu-system-x86_64 -machine q35,accel=kvm,smm=on -cpu host -smp 4 -m "${MEMORY:-
   -drive "if=pflash,format=qcow2,file=$vm/vars.qcow2" \
   -device qemu-xhci,id=usb -device usb-tablet,bus=usb.0 -device usb-kbd,bus=usb.0 \
   -drive "if=none,id=nvme,format=qcow2,cache=unsafe,discard=unmap,file=$vm/disk.qcow2" -device "nvme,serial=MEETVM0002,drive=nvme$disk_boot" \
-  "${data[@]}" "${media[@]}" "${share[@]}" \
+  "${data[@]}" "${media[@]}" "${stick[@]}" "${share[@]}" \
   -chardev "socket,id=tpm,path=$sockets/tpm.sock" -tpmdev emulator,id=tpm,chardev=tpm -device tpm-tis,tpmdev=tpm \
   -device virtio-vga,xres=1600,yres=1000 \
   -nic user,model=virtio-net-pci \

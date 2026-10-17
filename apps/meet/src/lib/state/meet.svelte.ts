@@ -2,16 +2,17 @@ import { Toasts } from '@luft/ui';
 import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
-export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed';
-export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders';
+export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
+export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders' | 'sticks' | 'stick' | 'offers';
 
 export interface Failure {
 	task: Task;
 	declined: boolean;
+	detail?: string;
 	retry: () => unknown;
 }
 
-const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'removed'];
+const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;
@@ -41,13 +42,13 @@ class MeetState {
 
 	private inspection = 0;
 
-	go(step: Step) {
-		this.direction = ORDER.indexOf(step) >= ORDER.indexOf(this.step) ? 1 : -1;
+	go(step: Step, direction = ORDER.indexOf(step) >= ORDER.indexOf(this.step) ? 1 : -1) {
+		this.direction = direction;
 		this.failure = null;
 		this.step = step;
 	}
 
-	private async run<T>(task: Task, work: () => Promise<T>, retry: () => unknown): Promise<T | null> {
+	async run<T>(task: Task, work: () => Promise<T>, retry: () => unknown): Promise<T | null> {
 		this.busy = true;
 		this.failure = null;
 		try {
@@ -56,8 +57,9 @@ class MeetState {
 			console.error(`Meet Luft couldn't finish ${task}:`, error);
 			const stage = this.progress?.stage;
 			this.failure = {
-				task: (task === 'room' || task === 'update') && stage === 'downloading' ? 'download' : task,
+				task: (task === 'room' || task === 'update' || task === 'stick') && stage === 'downloading' ? 'download' : task,
 				declined: error instanceof meet.Failed && error.failure === 'declined',
+				detail: error instanceof Error ? error.message : undefined,
 				retry
 			};
 			return null;
@@ -120,16 +122,9 @@ class MeetState {
 		await this.check();
 	}
 
-	private async working<T>(
-		task: Task,
-		first: Stage,
-		work: () => Promise<T>,
-		retry: () => unknown,
-		after: 'ready' | 'removed',
-		back: 'check' | 'room' | 'ready' | 'box'
-	) {
+	async working<T>(task: Task, first: Stage, work: () => Promise<T>, retry: () => unknown, after: Step, back: Step) {
 		this.progress = { stage: first, done: 0, total: 0 };
-		this.go('working');
+		this.go('working', 1);
 		const result = await this.run(task, work, retry);
 		this.progress = null;
 		if (result === null && this.failure) {

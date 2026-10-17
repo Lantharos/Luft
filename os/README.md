@@ -50,7 +50,7 @@ os/iso/build.sh ghcr.io/lantharos/luft:45               # from the published ima
 os/iso/build.sh localhost/luft:45 standard nvidia       # the sticks with one image each
 ```
 
-It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD. [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.
+It writes `os/iso/state/luft-VERSION.iso` and a `.sha256` next to it, in a few minutes and without root. Write it to a stick of 4 GB or more with Meet Luft or Fedora Media Writer, or with `sudo dd if=luft-VERSION.iso of=/dev/sdX bs=4M oflag=direct status=progress`; it also starts as a DVD, and from a [Ventoy](https://www.ventoy.net) stick in Ventoy's normal mode. [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.
 
 The universal stick carries both images; `standard` and `nvidia` carry one each and come out as `luft-VERSION-standard.iso` and `luft-VERSION-nvidia.iso`. The images share every layer below NVIDIA's driver, and the stick keeps each layer once. CI publishes all three at https://get.luft.lanth.me with a `.sha256` next to each:
 

@@ -27,6 +27,8 @@ libc = "0.2.190"
 raw-window-handle = "0.6.2"
 wmi = { version = "0.18.4", default-features = false }
 windows = { version = "0.62.2", features = [
+  "Win32_Devices_DeviceAndDriverInstallation",
+  "Win32_Devices_Properties",
   "Win32_Foundation",
   "Win32_Globalization",
   "Win32_Networking_WinSock",
@@ -36,6 +38,7 @@ windows = { version = "0.62.2", features = [
   "Win32_Storage_FileSystem",
   "Win32_System_Com",
   "Win32_System_IO",
+  "Win32_System_Ioctl",
   "Win32_System_Pipes",
   "Win32_System_Power",
   "Win32_System_Registry",

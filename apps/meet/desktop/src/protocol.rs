@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use luft_meet::Intent;
 use luft_meet::moving_box::{FolderKind, Regional};
 use serde::{Deserialize, Serialize};
@@ -5,6 +7,7 @@ use serde_json::Value;
 
 use crate::check::common::Finding;
 use crate::live::source::Source;
+use crate::stick::Image;
 
 #[derive(Serialize, Deserialize)]
 #[serde(
@@ -33,6 +36,22 @@ pub enum Call {
     Tidy,
     FirmwareSettings,
     Undo,
+    Sticks {
+        iso: Option<PathBuf>,
+    },
+    Flash {
+        stick: String,
+        image: Image,
+    },
+    VentoyRoom {
+        stick: String,
+        needed: u64,
+    },
+    AddToVentoy {
+        stick: String,
+        image: Image,
+        replace: bool,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Default)]
@@ -57,6 +76,9 @@ pub enum Stage {
     Downloading,
     Packing,
     Removing,
+    Writing,
+    Copying,
+    Verifying,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]

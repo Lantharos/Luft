@@ -55,9 +55,11 @@ async function checkScreenKeyboard() {
 }
 
 async function checkScreenshotTool() {
+  const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  shell.set_strv('quick-tiles-removed', shell.get_strv('quick-tiles-removed').filter(id => id !== 'screenshot'));
   toggleSurface('quick');
   const quick = named('kestrel-quick-settings');
-  await eventually(() => shown(quick), 'Quick Settings opens');
+  await eventually(() => shown(quick) && named('Screenshot', quick), 'Quick Settings opens with the Screenshot tile added');
   named('Screenshot', quick).emit('clicked', Clutter.BUTTON_PRIMARY);
   await eventually(() => Main.screenshotUI.visible && !quick.visible, 'Quick Settings opens the screenshot tool without itself in view');
   await capture('screenshot-controls');
@@ -69,6 +71,7 @@ async function checkScreenshotTool() {
   rest();
   Main.screenshotUI.close(true);
   await eventually(() => !Main.screenshotUI.visible && Main.modalCount === 0, 'the screenshot tool closes');
+  shell.reset('quick-tiles-removed');
 }
 
 async function copy(clipboard, text) {

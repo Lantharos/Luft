@@ -36,7 +36,10 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
     value.map_err(|error| error.to_string())
 }
 
+const READABLE_BY_EVERYONE: libc::mode_t = 0o022;
+
 pub fn serve() {
+    unsafe { libc::umask(READABLE_BY_EVERYONE) };
     let context = Context::new(io::stdout());
     serving::serve(io::stdin(), &context, handle);
 }

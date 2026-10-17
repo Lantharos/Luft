@@ -10,6 +10,7 @@ import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
 import Polkit from 'gi://Polkit';
 import Shell from 'gi://Shell';
@@ -148,7 +149,69 @@ function _getPropertyTarget(actor, propName) {
     throw new Error(`Invalid property name ${propName}`);
 }
 
+function _springBounce(spring) {
+    const reduced = St.Settings.get().reducedMotion === St.ReducedMotion.REDUCE;
+    return reduced ? Math.min(0, spring.bounce) : spring.bounce;
+}
+
+function _velocityOf(velocity, prop) {
+    return typeof velocity === 'number' ? velocity : velocity?.[prop];
+}
+
+function _setCurve(transition, curve) {
+    const [x1, y1, x2, y2] = curve;
+    transition.set_cubic_bezier_progress(
+        new Graphene.Point({x: x1, y: y1}), new Graphene.Point({x: x2, y: y2}));
+}
+
+function _spring(animatable, actor, targets, spring, params) {
+    const {velocity, animationRequired} = params;
+    const duration = actor?.mapped ? adjustAnimationTime(spring.duration, {animationRequired}) : 0;
+    const {prepare, cleanup} = _makeEasePrepareAndCleanup(duration);
+    const {promise, callback} = _makeEaseCallback(params, cleanup);
+
+    if (duration === 0) {
+        for (const [prop, target] of Object.entries(targets)) {
+            animatable.remove_transition(prop.replaceAll('_', '-'));
+            const [obj, name] = _getPropertyTarget(animatable, prop);
+            obj[name] = target;
+        }
+        prepare?.();
+        callback(true);
+        return promise;
+    }
+
+    const bounce = _springBounce(spring);
+    const delay = params.delay ? adjustAnimationTime(params.delay, {animationRequired}) : 0;
+    let longest = null;
+    for (const [prop, target] of Object.entries(targets)) {
+        const name = prop.replaceAll('_', '-');
+        const running = animatable.get_transition(name);
+        const startVelocity = _velocityOf(velocity, prop) ??
+            (running instanceof Shell.SpringTransition ? running.get_velocity() : 0);
+        animatable.remove_transition(name);
+        const transition = Shell.SpringTransition.new(name, target, duration, bounce, startVelocity);
+        transition.delay = delay;
+        animatable.add_transition(name, transition);
+        if (!longest || transition.duration > longest.duration)
+            longest = transition;
+    }
+
+    if (longest) {
+        _setupTransitionCompletion(longest, actor, callback, prepare);
+    } else {
+        prepare?.();
+        callback(true);
+    }
+    return promise;
+}
+
 function _easeActor(actor, params) {
+    if (params.spring) {
+        const {spring, velocity, delay, onComplete, onStopped, animationRequired = false, ...targets} = params;
+        return _spring(actor, actor, targets, spring, {velocity, delay, onComplete, onStopped, animationRequired});
+    }
+
     params = {
         repeatCount: 0,
         autoReverse: false,
@@ -184,6 +247,9 @@ function _easeActor(actor, params) {
         actor.set_easing_mode(params.mode);
     delete params.mode;
 
+    const curve = params.curve;
+    delete params.curve;
+
     const easingDuration = actor.get_easing_duration();
     const {prepare, cleanup} = _makeEasePrepareAndCleanup(easingDuration);
     const {promise, callback} = _makeEaseCallback(params, cleanup);
@@ -201,6 +267,8 @@ function _easeActor(actor, params) {
         .filter(t => t !== null);
 
     transitions.forEach(t => t.set({repeatCount, autoReverse}));
+    if (curve)
+        transitions.forEach(t => _setCurve(t, curve));
 
     const [transition] = transitions;
 
@@ -215,6 +283,12 @@ function _easeActor(actor, params) {
 }
 
 function _easeAnimatableProperty(animatable, propName, target, params) {
+    if (params.spring) {
+        const {spring, velocity, delay, onComplete, onStopped, animationRequired = false} = params;
+        return _spring(animatable, animatable.get_actor(), {[propName]: target}, spring,
+            {velocity, delay, onComplete, onStopped, animationRequired});
+    }
+
     params = {
         repeatCount: 0,
         autoReverse: false,
@@ -226,6 +300,9 @@ function _easeAnimatableProperty(animatable, propName, target, params) {
     if (params.mode)
         params.progress_mode = params.mode;
     delete params.mode;
+
+    const curve = params.curve;
+    delete params.curve;
 
     const animationRequired = params.animationRequired;
     delete params.animationRequired;
@@ -283,6 +360,8 @@ function _easeAnimatableProperty(animatable, propName, target, params) {
         auto_reverse: autoReverse,
         ...params,
     });
+    if (curve)
+        _setCurve(transition, curve);
     animatable.add_transition(propName, transition);
 
     transition.set_to(target);

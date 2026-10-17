@@ -39,6 +39,7 @@ export { signInToNetwork } from './system/network/signIn.js';
 export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
+export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion.js';
 
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
 

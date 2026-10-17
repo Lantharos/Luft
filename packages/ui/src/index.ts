@@ -14,6 +14,8 @@ export { default as Slider } from './controls/Slider.svelte';
 export { default as Switch } from './controls/Switch.svelte';
 export { default as TextField } from './controls/TextField.svelte';
 
+export { Curve, Gesture, motionPreference, projection, rubberband, Spring, SpringValue, type MotionPreference, type SpringOptions, type SpringToken } from './motion';
+
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
 

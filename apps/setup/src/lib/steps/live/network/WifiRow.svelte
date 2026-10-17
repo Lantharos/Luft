@@ -19,7 +19,7 @@
 
 	let Signal = $derived(network.strength > 66 ? Wifi : network.strength > 33 ? WifiHigh : WifiLow);
 	let status = $derived(
-		problem || { connected: 'Connected', connecting: 'Connecting…', disconnected: network.saved ? 'Saved' : '', unplugged: '' }[network.state]
+		problem || { connected: 'Connected', connecting: 'Connecting…', disconnected: network.joined ? 'Saved' : '', unplugged: '' }[network.state]
 	);
 </script>
 

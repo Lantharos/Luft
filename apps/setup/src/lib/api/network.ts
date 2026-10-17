@@ -8,6 +8,7 @@ export interface WifiNetwork {
 	strength: number;
 	security: Security;
 	saved: string | null;
+	joined: boolean;
 	state: Link;
 }
 

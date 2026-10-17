@@ -125,6 +125,7 @@ fn device_changed(events: &Events, device: &str, state: u32, reason: u32) {
     match state {
         DEVICE_ACTIVATED => {
             take_pending(device);
+            saved::invalidate_all();
         }
         DEVICE_FAILED => {
             if let Some(pending) = take_pending(device) {

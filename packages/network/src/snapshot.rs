@@ -59,6 +59,7 @@ pub struct WifiNetwork {
     strength: u8,
     security: Security,
     saved: Option<String>,
+    joined: bool,
     state: Link,
     details: Option<Details>,
     radio: Option<Radio>,
@@ -216,14 +217,15 @@ fn wifi(objects: &Objects, saved: &[Saved]) -> Option<Wifi> {
             continue;
         }
         let current = active_ssid.as_ref() == Some(&ssid);
+        let profile = saved
+            .iter()
+            .find(|saved| matches!(&saved.kind, Kind::Wifi { ssid: known } if *known == ssid));
         let network = WifiNetwork {
             ssid: String::from_utf8_lossy(&ssid).into_owned(),
             strength,
             security: security(&point),
-            saved: saved
-                .iter()
-                .find(|saved| matches!(&saved.kind, Kind::Wifi { ssid: known } if *known == ssid))
-                .map(|saved| saved.path.clone()),
+            saved: profile.map(|saved| saved.path.clone()),
+            joined: profile.is_some_and(|saved| saved.joined),
             state: if current {
                 link(state)
             } else {

@@ -22,6 +22,7 @@ pub struct Saved {
     pub path: String,
     pub name: String,
     pub kind: Kind,
+    pub joined: bool,
 }
 
 static CACHE: LazyLock<Mutex<HashMap<String, Saved>>> = LazyLock::new(Mutex::default);
@@ -56,6 +57,8 @@ async fn load(path: String) -> Result<Saved, String> {
     Ok(Saved {
         name: get(&settings, "connection", "id").unwrap_or_default(),
         kind: kind(&settings),
+        joined: get::<u64>(&settings, "connection", "timestamp")
+            .is_some_and(|timestamp| timestamp > 0),
         path,
     })
 }
@@ -90,6 +93,10 @@ pub async fn all(objects: &Objects) -> Vec<Saved> {
 
 pub fn invalidate(path: &str) {
     CACHE.lock().unwrap().remove(path);
+}
+
+pub fn invalidate_all() {
+    CACHE.lock().unwrap().clear();
 }
 
 pub async fn delete(path: &str) -> Result<(), String> {

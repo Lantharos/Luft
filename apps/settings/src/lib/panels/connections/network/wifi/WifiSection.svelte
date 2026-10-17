@@ -35,7 +35,7 @@
 	function describe(network: WifiNetwork) {
 		if (problems[network.ssid]) return problems[network.ssid];
 		if (network.state !== 'disconnected') return linkLabel(network.state);
-		if (network.saved) return 'Saved';
+		if (network.joined) return 'Saved';
 		if (network.security === 'enterprise') return 'Sign in with a work or school account';
 		return undefined;
 	}

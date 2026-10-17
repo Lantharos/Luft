@@ -101,16 +101,17 @@ class OsdWindow extends Clutter.Actor {
             super.show();
             this.opacity = 0;
             this.get_parent().set_child_above_sibling(this, null);
+        }
 
+        if (this._hideTimeoutId) {
+            GLib.source_remove(this._hideTimeoutId);
+        } else {
             this.ease({
                 opacity: 255,
                 duration: FADE_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
         }
-
-        if (this._hideTimeoutId)
-            GLib.source_remove(this._hideTimeoutId);
         this._hideTimeoutId = GLib.timeout_add_once(
             GLib.PRIORITY_DEFAULT, HIDE_TIMEOUT, this._hide.bind(this));
         GLib.Source.set_name_by_id(this._hideTimeoutId, '[kestrel] this._hide');

@@ -34,6 +34,19 @@ async function checkLevelOsd(name, icon, level) {
   await eventually(() => !osd.visible, `the ${name} level hides again`);
 }
 
+async function checkOsdReturnsWhileFading() {
+  const [osd] = Main.osdWindowManager._osdWindows;
+  const icon = new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'});
+  Main.osdWindowManager.showAll(icon, null, 0.5, 1);
+  await eventually(() => osd.visible && osd.opacity === 255, 'the volume level shows on screen');
+  Main.osdWindowManager.hideAll();
+  await eventually(() => osd.visible && osd.opacity < 255, 'the volume level starts fading out');
+  Main.osdWindowManager.showAll(icon, null, 0.6, 1);
+  await eventually(() => osd.visible && osd.opacity === 255, 'a volume key pressed while the level fades out brings it back');
+  Main.osdWindowManager.hideAll();
+  await eventually(() => !osd.visible, 'the volume level hides again');
+}
+
 async function checkScreenKeyboard() {
   const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.applications'});
   settings.set_boolean('screen-keyboard-enabled', true);
@@ -96,6 +109,7 @@ export async function run() {
   await checkMediaControls();
   await checkLevelOsd('volume', 'audio-volume-high-symbolic', 0.6);
   await checkLevelOsd('brightness', 'display-brightness-symbolic', 0.4);
+  await checkOsdReturnsWhileFading();
   await checkScreenKeyboard();
   await checkScreenshotTool();
   await checkClipboardHistory();

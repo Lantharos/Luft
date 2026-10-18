@@ -23,6 +23,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe
 - Windows that appear after you moved on open behind and ask for attention instead of taking focus
 - Touchpad scrolling at the speed set by the touchpad's `scroll-speed` setting
+- Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - Smaller fixes, each described in its patch
 
 ## Build

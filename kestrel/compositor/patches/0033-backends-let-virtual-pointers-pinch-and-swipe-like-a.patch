@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 19:19:33 +0200
-Subject: [PATCH 33/34] backends: let virtual pointers pinch and swipe like a
+Subject: [PATCH 33/36] backends: let virtual pointers pinch and swipe like a
  touchpad
 
 Add clutter_virtual_input_device_notify_touchpad_pinch() and

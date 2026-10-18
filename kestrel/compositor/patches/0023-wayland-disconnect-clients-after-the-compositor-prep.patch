@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 14 Oct 2026 05:38:42 +0200
-Subject: [PATCH 23/34] wayland: disconnect clients after the compositor
+Subject: [PATCH 23/36] wayland: disconnect clients after the compositor
  prepares to shut down
 
 The Wayland compositor connects to prepare-compositor-shutdown before

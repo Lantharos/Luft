@@ -1,0 +1,428 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 18 Oct 2026 04:43:04 +0200
+Subject: [PATCH 36/36] frames: draw X11 window frames in Kestrel's style
+
+Load a stylesheet with Kestrel's title bar, title and window buttons,
+and the colors Kestrel writes to ~/.config/kestrel/appearance.css,
+reloading them when they change. Both follow the light or dark style
+through prefers-color-scheme, which the helper now sets through
+gtk-interface-color-scheme when libadwaita isn't loaded. The title sits
+at the start of the bar like in Kestrel's own windows.
+---
+ src/frames/main.c                             |  3 +
+ src/frames/meson.build                        |  7 ++
+ src/frames/meta-frame-header.c                | 55 +++++++++++--
+ src/frames/meta-frame-style.c                 | 79 +++++++++++++++++++
+ src/frames/meta-frame-style.h                 | 20 +++++
+ src/frames/meta-window-tracker.c              | 20 +++--
+ src/frames/style/frames.css                   | 79 +++++++++++++++++++
+ src/frames/style/frames.gresource.xml         |  9 +++
+ .../style/icons/window-close-symbolic.svg     |  1 +
+ .../style/icons/window-maximize-symbolic.svg  |  1 +
+ .../style/icons/window-minimize-symbolic.svg  |  1 +
+ 11 files changed, 262 insertions(+), 13 deletions(-)
+ create mode 100644 src/frames/meta-frame-style.c
+ create mode 100644 src/frames/meta-frame-style.h
+ create mode 100644 src/frames/style/frames.css
+ create mode 100644 src/frames/style/frames.gresource.xml
+ create mode 100644 src/frames/style/icons/window-close-symbolic.svg
+ create mode 100644 src/frames/style/icons/window-maximize-symbolic.svg
+ create mode 100644 src/frames/style/icons/window-minimize-symbolic.svg
+
+diff --git a/src/frames/main.c b/src/frames/main.c
+index d3bdc0a0afccfc48137ca4a1eab22949d586473e..1e889e05646fc60f91a989b4f750805a6fd2a273 100644
+--- a/src/frames/main.c
++++ b/src/frames/main.c
+@@ -19,6 +19,7 @@
+ 
+ #include "config.h"
+ 
++#include "meta-frame-style.h"
+ #include "meta-frames-client.h"
+ #include "meta-window-tracker.h"
+ 
+@@ -111,6 +112,8 @@ main (int   argc,
+   if (should_load_libadwaita ())
+     load_libadwaita ();
+ 
++  meta_frame_style_init (display);
++
+   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+   xdisplay = gdk_x11_display_get_xdisplay (display);
+   G_GNUC_END_IGNORE_DEPRECATIONS
+diff --git a/src/frames/meson.build b/src/frames/meson.build
+index c33bb52ad7650ef6c90db0fce2464ccde6c2384e..d62f5a38ffd660f80fdc160f22d1a2fd7626cf7d 100644
+--- a/src/frames/meson.build
++++ b/src/frames/meson.build
+@@ -3,9 +3,16 @@ x11_frames_sources = [
+   'meta-frame.c',
+   'meta-frame-content.c',
+   'meta-frame-header.c',
++  'meta-frame-style.c',
+   'meta-window-tracker.c',
+ ]
+ 
++x11_frames_sources += gnome.compile_resources('meta-frame-resources',
++  'style/frames.gresource.xml',
++  source_dir: 'style',
++  c_name: 'meta_frame',
++)
++
+ x11_frames = executable('mutter-x11-frames',
+   sources: x11_frames_sources,
+   dependencies: [
+diff --git a/src/frames/meta-frame-header.c b/src/frames/meta-frame-header.c
+index f84afb5235eea59899fc6d6d85c85e4774d28572..29ef624c2b869b978f453185d5503eb97ebc6f15 100644
+--- a/src/frames/meta-frame-header.c
++++ b/src/frames/meta-frame-header.c
+@@ -24,6 +24,9 @@
+ struct _MetaFrameHeader
+ {
+   GtkWidget parent_instance;
++
++  GtkWidget *title;
++  GBinding *title_binding;
+ };
+ 
+ G_DEFINE_TYPE (MetaFrameHeader, meta_frame_header, GTK_TYPE_WIDGET)
+@@ -97,6 +100,29 @@ meta_frame_header_size_allocate (GtkWidget *widget,
+   gtk_widget_size_allocate (child, &child_allocation, baseline);
+ }
+ 
++static void
++meta_frame_header_root (GtkWidget *widget)
++{
++  MetaFrameHeader *header = META_FRAME_HEADER (widget);
++
++  GTK_WIDGET_CLASS (meta_frame_header_parent_class)->root (widget);
++
++  header->title_binding =
++    g_object_bind_property (gtk_widget_get_root (widget), "title",
++                            header->title, "label",
++                            G_BINDING_SYNC_CREATE);
++}
++
++static void
++meta_frame_header_unroot (GtkWidget *widget)
++{
++  MetaFrameHeader *header = META_FRAME_HEADER (widget);
++
++  g_clear_pointer (&header->title_binding, g_binding_unbind);
++
++  GTK_WIDGET_CLASS (meta_frame_header_parent_class)->unroot (widget);
++}
++
+ static void
+ meta_frame_header_class_init (MetaFrameHeaderClass *klass)
+ {
+@@ -107,19 +133,34 @@ meta_frame_header_class_init (MetaFrameHeaderClass *klass)
+ 
+   widget_class->measure = meta_frame_header_measure;
+   widget_class->size_allocate = meta_frame_header_size_allocate;
++  widget_class->root = meta_frame_header_root;
++  widget_class->unroot = meta_frame_header_unroot;
+ }
+ 
+ static void
+-meta_frame_header_init (MetaFrameHeader *content)
++meta_frame_header_init (MetaFrameHeader *header)
+ {
+-  GtkWidget *header_bar;
++  GtkWidget *handle, *bar;
++
++  bar = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
++  gtk_widget_add_css_class (bar, "frame-titlebar");
++
++  header->title = gtk_label_new (NULL);
++  gtk_label_set_ellipsize (GTK_LABEL (header->title), PANGO_ELLIPSIZE_END);
++  gtk_label_set_single_line_mode (GTK_LABEL (header->title), TRUE);
++  gtk_label_set_xalign (GTK_LABEL (header->title), 0.0f);
++  gtk_widget_set_hexpand (header->title, TRUE);
++  gtk_widget_add_css_class (header->title, "title");
++
++  gtk_box_append (GTK_BOX (bar), gtk_window_controls_new (GTK_PACK_START));
++  gtk_box_append (GTK_BOX (bar), header->title);
++  gtk_box_append (GTK_BOX (bar), gtk_window_controls_new (GTK_PACK_END));
+ 
+-  header_bar = gtk_header_bar_new ();
+-  gtk_widget_add_css_class (header_bar, "titlebar");
+-  gtk_widget_add_css_class (header_bar, "default-decoration");
+-  gtk_widget_insert_before (header_bar, GTK_WIDGET (content), NULL);
++  handle = gtk_window_handle_new ();
++  gtk_window_handle_set_child (GTK_WINDOW_HANDLE (handle), bar);
++  gtk_widget_insert_before (handle, GTK_WIDGET (header), NULL);
+ 
+-  gtk_widget_add_css_class (GTK_WIDGET (content), "default-decoration");
++  gtk_widget_add_css_class (GTK_WIDGET (header), "default-decoration");
+ }
+ 
+ GtkWidget *
+diff --git a/src/frames/meta-frame-style.c b/src/frames/meta-frame-style.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..a9fe34054d39277ba357c64d21ece9e160f905f7
+--- /dev/null
++++ b/src/frames/meta-frame-style.c
+@@ -0,0 +1,79 @@
++/*
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "meta-frame-style.h"
++
++static void
++load_palette (GtkCssProvider *palette,
++              GFile          *file)
++{
++  if (g_file_query_exists (file, NULL))
++    gtk_css_provider_load_from_file (palette, file);
++  else
++    gtk_css_provider_load_from_string (palette, "");
++}
++
++static void
++on_palette_changed (GFileMonitor      *monitor,
++                    GFile             *file,
++                    GFile             *other_file,
++                    GFileMonitorEvent  event,
++                    GtkCssProvider    *palette)
++{
++  switch (event)
++    {
++    case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
++    case G_FILE_MONITOR_EVENT_CREATED:
++    case G_FILE_MONITOR_EVENT_DELETED:
++      load_palette (palette, file);
++      break;
++    default:
++      break;
++    }
++}
++
++static GtkCssProvider *
++add_provider (GdkDisplay *display)
++{
++  GtkCssProvider *provider = gtk_css_provider_new ();
++
++  g_object_bind_property (gtk_settings_get_for_display (display), "gtk-interface-color-scheme",
++                          provider, "prefers-color-scheme",
++                          G_BINDING_SYNC_CREATE);
++  gtk_style_context_add_provider_for_display (display, GTK_STYLE_PROVIDER (provider),
++                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++  return provider;
++}
++
++void
++meta_frame_style_init (GdkDisplay *display)
++{
++  GtkCssProvider *frames, *palette;
++  g_autoptr (GFile) file = NULL;
++  GFileMonitor *monitor;
++
++  frames = add_provider (display);
++  gtk_css_provider_load_from_resource (frames, "/org/gnome/mutter/frames/frames.css");
++
++  file = g_file_new_build_filename (g_get_user_config_dir (), "kestrel", "appearance.css", NULL);
++  palette = add_provider (display);
++  load_palette (palette, file);
++
++  monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
++  if (monitor)
++    g_signal_connect (monitor, "changed", G_CALLBACK (on_palette_changed), palette);
++}
+diff --git a/src/frames/meta-frame-style.h b/src/frames/meta-frame-style.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..15d66548acf1d4fcf151e00b18996f100b6a49c0
+--- /dev/null
++++ b/src/frames/meta-frame-style.h
+@@ -0,0 +1,20 @@
++/*
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include <gtk/gtk.h>
++
++void meta_frame_style_init (GdkDisplay *display);
+diff --git a/src/frames/meta-window-tracker.c b/src/frames/meta-window-tracker.c
+index 3f08388b5ea3c797e85797091919be26553bc8ed..04298748e4bac7642a5aa9f6d09cc58fa519b1fe 100644
+--- a/src/frames/meta-window-tracker.c
++++ b/src/frames/meta-window-tracker.c
+@@ -92,17 +92,25 @@ meta_window_tracker_get_property (GObject    *object,
+ static void
+ update_color_scheme (MetaWindowTracker *window_tracker)
+ {
+-  GDesktopColorScheme color_scheme;
+-  gboolean is_dark;
++  GtkInterfaceColorScheme interface_color_scheme;
+ 
+   g_assert (window_tracker->interface_settings != NULL);
+ 
+-  color_scheme = g_settings_get_enum (window_tracker->interface_settings,
+-                                      "color-scheme");
+-  is_dark = color_scheme == G_DESKTOP_COLOR_SCHEME_PREFER_DARK;
++  switch (g_settings_get_enum (window_tracker->interface_settings, "color-scheme"))
++    {
++    case G_DESKTOP_COLOR_SCHEME_PREFER_DARK:
++      interface_color_scheme = GTK_INTERFACE_COLOR_SCHEME_DARK;
++      break;
++    case G_DESKTOP_COLOR_SCHEME_PREFER_LIGHT:
++      interface_color_scheme = GTK_INTERFACE_COLOR_SCHEME_LIGHT;
++      break;
++    default:
++      interface_color_scheme = GTK_INTERFACE_COLOR_SCHEME_DEFAULT;
++      break;
++    }
+ 
+   g_object_set (gtk_settings_get_default (),
+-                "gtk-application-prefer-dark-theme", is_dark,
++                "gtk-interface-color-scheme", interface_color_scheme,
+                 NULL);
+ }
+ 
+diff --git a/src/frames/style/frames.css b/src/frames/style/frames.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ad064593b1f6672ff1c7c3bbeb831ebe779babe
+--- /dev/null
++++ b/src/frames/style/frames.css
+@@ -0,0 +1,79 @@
++window.ssd-frame {
++  background: none;
++  font-family: "Open Runde", sans-serif;
++}
++
++window.ssd-frame .frame-titlebar {
++  min-height: 40px;
++  padding: 0 6px;
++  background-color: var(--kestrel-surface-container, #f3f3f0);
++  color: var(--kestrel-on-surface, #1b1b19);
++  transition: color 150ms ease-out;
++}
++
++@media (prefers-color-scheme: dark) {
++  window.ssd-frame .frame-titlebar {
++    background-color: var(--kestrel-surface-dim, #111110);
++    color: var(--kestrel-on-surface, #f3f3ef);
++  }
++}
++
++window.ssd-frame:backdrop .frame-titlebar {
++  color: var(--kestrel-outline, #75756e);
++}
++
++window.ssd-frame .frame-titlebar > .title {
++  margin: 0 10px;
++  font-size: 13px;
++  font-weight: 600;
++}
++
++window.ssd-frame windowcontrols {
++  border-spacing: 4px;
++}
++
++window.ssd-frame windowcontrols > button {
++  min-width: 28px;
++  min-height: 28px;
++  margin: 0;
++  padding: 0;
++  border: none;
++  border-radius: 999px;
++  box-shadow: none;
++  background-color: transparent;
++  background-image: none;
++  background-repeat: no-repeat;
++  background-position: center;
++  background-size: 16px;
++  color: var(--kestrel-outline, #75756e);
++  transition: background-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
++}
++
++window.ssd-frame windowcontrols > button > image {
++  opacity: 0;
++}
++
++window.ssd-frame windowcontrols > button.minimize {
++  background-image: -gtk-recolor(url("resource:///org/gnome/mutter/frames/icons/window-minimize-symbolic.svg"));
++}
++
++window.ssd-frame windowcontrols > button.maximize {
++  background-image: -gtk-recolor(url("resource:///org/gnome/mutter/frames/icons/window-maximize-symbolic.svg"));
++}
++
++window.ssd-frame windowcontrols > button.close {
++  background-image: -gtk-recolor(url("resource:///org/gnome/mutter/frames/icons/window-close-symbolic.svg"));
++}
++
++window.ssd-frame windowcontrols > button:hover {
++  background-color: color-mix(in oklab, currentColor 6.5%, transparent);
++  color: var(--kestrel-on-surface, #1b1b19);
++}
++
++window.ssd-frame windowcontrols > button:active {
++  transform: scale(0.96);
++}
++
++window.ssd-frame:backdrop windowcontrols > button:not(:hover) {
++  color: color-mix(in oklab, var(--kestrel-outline, #75756e) 70%, transparent);
++}
+diff --git a/src/frames/style/frames.gresource.xml b/src/frames/style/frames.gresource.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..517e3a6d9a4f7220c4ffa8fb79ab3d4f10e60d46
+--- /dev/null
++++ b/src/frames/style/frames.gresource.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<gresources>
++  <gresource prefix="/org/gnome/mutter/frames">
++    <file>frames.css</file>
++    <file preprocess="xml-stripblanks">icons/window-minimize-symbolic.svg</file>
++    <file preprocess="xml-stripblanks">icons/window-maximize-symbolic.svg</file>
++    <file preprocess="xml-stripblanks">icons/window-close-symbolic.svg</file>
++  </gresource>
++</gresources>
+diff --git a/src/frames/style/icons/window-close-symbolic.svg b/src/frames/style/icons/window-close-symbolic.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..2115e75ecfad2296e933dbd6232e9a3e70aecbfe
+--- /dev/null
++++ b/src/frames/style/icons/window-close-symbolic.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><rect x="1.675" y="7.333" width="12.65" height="1.333" rx="0.667" transform="rotate(45 8 8)"/><rect x="1.675" y="7.333" width="12.65" height="1.333" rx="0.667" transform="rotate(-45 8 8)"/></svg>
+diff --git a/src/frames/style/icons/window-maximize-symbolic.svg b/src/frames/style/icons/window-maximize-symbolic.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..82e3e9eabc04c607ca27b26a6a684bb0095800a8
+--- /dev/null
++++ b/src/frames/style/icons/window-maximize-symbolic.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.208 2.583h7.584a1.625 1.625 0 0 1 1.625 1.625v7.584a1.625 1.625 0 0 1-1.625 1.625H4.208a1.625 1.625 0 0 1-1.625-1.625V4.208a1.625 1.625 0 0 1 1.625-1.625zM4.208 3.667a.542.542 0 0 0-.541.541v7.584c0 .299.242.541.541.541h7.584a.542.542 0 0 0 .541-.541V4.208a.542.542 0 0 0-.541-.541z"/></svg>
+diff --git a/src/frames/style/icons/window-minimize-symbolic.svg b/src/frames/style/icons/window-minimize-symbolic.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f33e547d687cdba4bf94811be1498bda85623b4
+--- /dev/null
++++ b/src/frames/style/icons/window-minimize-symbolic.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><rect x="2.667" y="7.333" width="10.667" height="1.333" rx="0.667"/></svg>

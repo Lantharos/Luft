@@ -2,3 +2,6 @@
 font-name='Open Runde 11'
 document-font-name='Open Runde 12'
 monospace-font-name='Maple Mono NF 11'
+
+[org/gnome/desktop/wm/preferences]
+button-layout=':minimize,maximize,close'

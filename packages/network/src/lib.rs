@@ -82,6 +82,17 @@ async fn open(events: Events, _: Value) -> Result<Network, String> {
     Ok(network)
 }
 
+pub async fn store_secrets_system_wide() -> Result<(), String> {
+    for saved in saved::all(&objects().await?).await {
+        if matches!(saved.kind, saved::Kind::Wifi { .. })
+            && let Err(error) = profile::store_secret_system_wide(&saved.path).await
+        {
+            eprintln!("{}'s password stays with this account: {error}", saved.name);
+        }
+    }
+    Ok(())
+}
+
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
         .with_async("network_open", events, open)

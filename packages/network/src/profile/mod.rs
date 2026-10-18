@@ -188,3 +188,23 @@ pub async fn secret(path: &str) -> Result<Option<String>, String> {
         .map_err(|error| explain(&error))?;
     Ok(secrets.and_then(|secrets| get(&secrets, group, key)))
 }
+
+pub async fn store_secret_system_wide(path: &str) -> Result<(), String> {
+    let connection = connection(path).await?;
+    let mut settings = settings(&connection).await?;
+    let Some((group, key)) = wireless::secret_key(&settings) else {
+        return Ok(());
+    };
+    if !wireless::kept_by_agent(&settings, group, key) {
+        return Ok(());
+    }
+    let Some(secret) = secret(path).await? else {
+        return Ok(());
+    };
+    wireless::keep_system_wide(settings.entry(group.to_owned()).or_default(), key, secret);
+    connection
+        .call_with_flags::<_, _, ()>("Update", MethodFlags::ALLOW_INTERACTIVE_AUTH, &(settings,))
+        .await
+        .map(drop)
+        .map_err(|error| explain(&error))
+}

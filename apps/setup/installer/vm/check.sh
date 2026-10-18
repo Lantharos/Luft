@@ -36,8 +36,37 @@ deployment() {
   compgen -G "$root/state/deploy/*/etc" | head -n1 | xargs dirname
 }
 
+join_wifi() {
+  install -Dm600 /dev/stdin /etc/NetworkManager/system-connections/Lovelace.nmconnection <<'KEYFILE'
+[connection]
+id=Lovelace
+uuid=5f0c1d2e-8a7b-4c3d-9e1f-2a3b4c5d6e7f
+type=wifi
+permissions=user:liveuser;
+
+[wifi]
+mode=infrastructure
+ssid=Lovelace
+
+[wifi-security]
+key-mgmt=wpa-psk
+psk-flags=0
+psk=analytical engine
+KEYFILE
+}
+
+check_wifi_carried() {
+  local root=$1 carried
+  carried="$root/etc/NetworkManager/system-connections/Lovelace.nmconnection"
+  [[ "$(stat -c '%u %a' "$carried" 2>&1)" == "0 600" ]] || fail "the Wi-Fi joined before installing isn't kept for root alone: $(stat -c '%u %a' "$carried" 2>&1)"
+  grep -qx 'psk=analytical engine' "$carried" && ! grep -q '^permissions=' "$carried" ||
+    fail "the Wi-Fi joined before installing won't connect by itself on the new system"
+  pass "the Wi-Fi joined before installing connects by itself on the new system, its password readable by root alone"
+}
+
 check_whole_drive() {
   local survey drive
+  join_wifi
   survey="$(call Survey | jq -r '.data[0]')" || fail "the survey failed"
   drive="$(jq -r '.drives[] | select(.device == "/dev/vdb") | .block' <<< "$survey")"
   [[ -n "$drive" && "$(jq -r '.drives[] | select(.device == "/dev/vda") | .blocked' <<< "$survey")" == running ]] ||
@@ -67,9 +96,11 @@ check_whole_drive() {
     grep -q '^XKBLAYOUT=de$' "$root/etc/vconsole.conf" && grep -q '"nodeadkeys"' "$root/etc/X11/xorg.conf.d/00-keyboard.conf" &&
     [[ "$(cat "$root/etc/hostname")" == ada-laptop ]] || fail "the regional settings aren't in the new system"
   pass "the time zone, language, keyboard and name are in the new system"
-  ! grep -q initial_session "$root/etc/greetd/config.toml" || fail "the first start signs someone in by itself"
+  check_wifi_carried "$root"
+  [[ "$(sed -n '/^\[initial_session\]/,$p' "$root/etc/greetd/config.toml" | xargs)" == "[initial_session] user = ada command = /usr/bin/kestrel-session" ]] ||
+    fail "starting doesn't sign ada in by itself"
   [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
-  pass "the first start shows the login screen, and setup continues once ada signs in"
+  pass "every start signs ada straight into setup until it's finished"
   local tag=45
   grep -q '^\[images\.nvidia\]$' /usr/lib/luft-installer/install.toml && tag=45-nvidia
   grep -rqsx ".*ghcr.io/lantharos/luft:$tag" "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from the image the stick carries"
@@ -212,12 +243,15 @@ check_first_boot_finish() {
   usermod --append --groups luft-setup ada
   mkdir -p /var/lib/luft-installer
   echo ada > /var/lib/luft-installer/first-boot
+  cp /etc/greetd/config.toml /run/greetd.toml
+  printf '\n[initial_session]\nuser = "ada"\ncommand = "/usr/bin/kestrel-session"\n' >> /etc/greetd/config.toml
   [[ "$(busctl --json=short get-property "${BUS[@]}" Phase | jq -r .data)" == first-boot ]] || fail "the installed system doesn't know setup is pending"
   sign_in_ada
   check_setup_needs_no_password
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
   [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
+  cmp -s /etc/greetd/config.toml /run/greetd.toml || fail "the next start would still sign ada in by itself"
   pass "only the new account ends setup"
   check_password_needed_after_setup
 }

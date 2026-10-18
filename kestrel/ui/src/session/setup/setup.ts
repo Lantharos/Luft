@@ -8,6 +8,7 @@ import { LockBackdrop } from 'resource:///com/lantharos/kestrel/ui/lockScreen/ba
 
 import { AppearanceService } from '../../appearance/service.js';
 import type { Rgb } from '../../appearance/color.js';
+import { LoginWallpaper } from '../../desktop/wallpaper/loginWallpaper.js';
 import { PortalBackend } from '../../portal/backend.js';
 import { terminateOnceShown } from '../../shared/handoff.js';
 import { animateActor } from '../../shared/motion.js';
@@ -53,6 +54,7 @@ export class Setup {
   private readonly backdrop = new LockBackdrop();
   private readonly portal = PortalBackend.forSetup();
   private readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
+  private readonly loginWallpaper = shell().backend.is_headless() ? null : new LoginWallpaper();
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly nameId: number;
   private readonly placement: () => void;
@@ -96,6 +98,7 @@ export class Setup {
   }
 
   destroy(): void {
+    this.loginWallpaper?.destroy();
     this.appearance.destroy();
     this.portal.destroy();
     this.placement();

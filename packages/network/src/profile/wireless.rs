@@ -1,13 +1,15 @@
 use serde::{Deserialize, Serialize};
 
 use super::enterprise::{self, Enterprise};
-use super::settings::{Settings, get, put};
+use super::settings::{Group, Settings, get, put};
 
 pub const SECURITY: &str = "802-11-wireless-security";
 pub const EAP: &str = "802-1x";
 
 const WEP_KEY: u32 = 1;
 const SYSTEM_STORED: u32 = 0;
+const AGENT_OWNED: u32 = 1;
+const NOT_SAVED: u32 = 2;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -64,6 +66,24 @@ pub fn secret_key(settings: &Settings) -> Option<(&'static str, &'static str)> {
         Security::Enterprise => Some((EAP, enterprise::secret_key(settings.get(EAP)))),
         Security::Open | Security::Owe => None,
     }
+}
+
+fn flags_of(key: &str) -> String {
+    if key.starts_with("wep-key") {
+        "wep-key-flags".to_owned()
+    } else {
+        format!("{key}-flags")
+    }
+}
+
+pub fn kept_by_agent(settings: &Settings, group: &str, key: &str) -> bool {
+    let flags: u32 = get(settings, group, &flags_of(key)).unwrap_or(SYSTEM_STORED);
+    flags & AGENT_OWNED != 0 && flags & NOT_SAVED == 0
+}
+
+pub fn keep_system_wide(group: &mut Group, key: &str, secret: String) {
+    put(group, &flags_of(key), SYSTEM_STORED);
+    put(group, key, secret);
 }
 
 pub fn store(settings: &mut Settings, wireless: &Wireless, secret: Option<&str>) {

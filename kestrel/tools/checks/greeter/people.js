@@ -57,7 +57,8 @@ export async function checkPeople() {
 
   click(rows[2]);
   await eventually(() => !promptState().secret && promptState().hint === 'Username', 'another account asks for a username first');
-  require(background.get_string('picture-options') === 'none', 'another account shows black behind the prompt');
+  require(background.get_string('picture-uri-dark') === background.get_default_value('picture-uri-dark').unpack(),
+    'another account shows Luft’s own wallpaper behind the prompt');
   await capture('login-another-account');
   const user = GLib.get_user_name();
   type(user);

@@ -1,5 +1,6 @@
 pub mod command;
 pub mod files;
+pub mod greetd;
 pub mod mount;
 
 use std::ffi::CString;

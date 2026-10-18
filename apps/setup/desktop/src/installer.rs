@@ -92,6 +92,9 @@ async fn create_account(
         password,
     }: Account,
 ) -> Result<(), String> {
+    if let Err(error) = luft_network::store_secrets_system_wide().await {
+        eprintln!("Saved networks weren't readied for the new system: {error}");
+    }
     call("CreateAccount", &(name, full_name, password)).await
 }
 

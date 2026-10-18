@@ -16,7 +16,7 @@ pub use configure::regional::Regional;
 
 use crate::config::Image;
 use configure::deployment::Deployment;
-use configure::handoff;
+use configure::{handoff, networks};
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
@@ -247,6 +247,9 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     };
     if let Some(meet) = &job.meet {
         reclaim::remember(&deployment.var(STATE), meet)?;
+    }
+    if let Err(error) = networks::carry_from_live(&deployment) {
+        eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");
     }
     handoff::prepare(&deployment, &user)?;
     drop(deployment);

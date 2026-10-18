@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { AppIcon, ItemRow, Row, Section, Switch } from '@luft/ui';
-	import AddStartupDialog from './AddStartupDialog.svelte';
+	import ChooseAppDialog from './ChooseAppDialog.svelte';
 	import { addStartup, setStartup, startupApps, type StartupApp } from './api';
 
 	let apps = $state<StartupApp[]>([]);
@@ -42,5 +42,11 @@
 </Section>
 
 {#if adding}
-	<AddStartupDialog exclude={apps.filter((app) => app.enabled).map((app) => app.id)} onadd={add} onclose={() => (adding = false)} />
+	<ChooseAppDialog
+		title="Add a startup app"
+		description="Choose an app to open every time you sign in."
+		exclude={apps.filter((app) => app.enabled).map((app) => app.id)}
+		onchoose={add}
+		onclose={() => (adding = false)}
+	/>
 {/if}

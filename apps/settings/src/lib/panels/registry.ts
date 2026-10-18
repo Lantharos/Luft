@@ -9,6 +9,7 @@ import Info from '@lucide/svelte/icons/info';
 import Keyboard from '@lucide/svelte/icons/keyboard';
 import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 import LogIn from '@lucide/svelte/icons/log-in';
+import Mic from '@lucide/svelte/icons/mic';
 import Monitor from '@lucide/svelte/icons/monitor';
 import Mouse from '@lucide/svelte/icons/mouse';
 import Palette from '@lucide/svelte/icons/palette';
@@ -45,6 +46,7 @@ export interface Panel extends Omit<Page, 'title'>, Omit<View, 'title'> {
 
 const appearance = () => import('./personalization/appearance/AppearancePanel.svelte');
 const accounts = () => import('./connections/accounts/AccountsPanel.svelte');
+const keyboard = () => import('./devices/keyboard/KeyboardPanel.svelte');
 
 const VIEWS: Record<PageId, View> = {
 	network: { icon: Wifi, load: () => import('./connections/network/NetworkPanel.svelte') },
@@ -62,7 +64,7 @@ const VIEWS: Record<PageId, View> = {
 	},
 	appearance: { icon: Palette, load: appearance },
 	notifications: { icon: Bell, load: () => import('./personalization/notifications/NotificationsPanel.svelte') },
-	keyboard: { icon: Keyboard, load: () => import('./devices/keyboard/KeyboardPanel.svelte') },
+	keyboard: { icon: Keyboard, load: keyboard },
 	mouse: {
 		icon: Mouse,
 		load: () => import('./devices/mouse/MousePanel.svelte'),
@@ -82,6 +84,7 @@ const VIEWS: Record<PageId, View> = {
 	'appearance/taskbar': { icon: PanelBottom, load: appearance },
 	'appearance/fonts': { icon: Type, load: appearance },
 	'appearance/cursors': { icon: MousePointer2, load: appearance },
+	'keyboard/dictation': { icon: Mic, load: keyboard },
 	'accounts/add': { icon: Plus, load: accounts }
 };
 

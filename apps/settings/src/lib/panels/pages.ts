@@ -19,7 +19,7 @@ export type PanelId =
 	| 'updates'
 	| 'about';
 
-export type SubpageId = 'appearance/taskbar' | 'appearance/fonts' | 'appearance/cursors' | 'accounts/add';
+export type SubpageId = 'appearance/taskbar' | 'appearance/fonts' | 'appearance/cursors' | 'keyboard/dictation' | 'accounts/add';
 
 export type PageId = PanelId | SubpageId;
 
@@ -47,7 +47,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('notifications', 'Notifications', 'preferences-system-notifications-symbolic', ['do not disturb', 'banners', 'lock screen', 'apps'])
 	],
 	[
-		page('keyboard', 'Keyboard', 'input-keyboard-symbolic', ['input sources', 'layout', 'shortcuts', 'repeat', 'language']),
+		page('keyboard', 'Keyboard', 'input-keyboard-symbolic', ['input sources', 'layout', 'shortcuts', 'repeat', 'language', 'copilot key']),
 		page('mouse', 'Mouse & Touchpad', 'input-mouse-symbolic', ['mouse', 'pointer', 'speed', 'scroll', 'natural scrolling', 'scrolling speed', 'scroll speed', 'tap to click', 'touchpad']),
 		page('accessibility', 'Accessibility', 'preferences-desktop-accessibility-symbolic', ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'])
 	],
@@ -70,6 +70,7 @@ export const SUBPAGES: Page<SubpageId>[] = [
 	page('appearance/taskbar', 'Taskbar', 'user-desktop-symbolic', ['panel', 'dock', 'auto-hide', 'hide automatically', 'floating', 'transparent', 'pinned apps', 'alignment', 'start button', 'displays', 'workspace', 'desktop', 'virtual desktop']),
 	page('appearance/fonts', 'Fonts', 'preferences-desktop-font-symbolic', ['all fonts', 'typefaces', 'font families', 'install fonts', 'remove fonts']),
 	page('appearance/cursors', 'Cursor themes', 'input-mouse-symbolic', ['cursors', 'pointer', 'mouse pointer', 'get more cursors']),
+	page('keyboard/dictation', 'Dictation', 'audio-input-microphone-symbolic', ['speech', 'voice typing', 'speech to text', 'talk', 'copilot key', 'microphone', 'parakeet', 'whisper', 'speech models']),
 	page('accounts/add', 'Add an account', 'list-add-symbolic', ['sign in', 'online accounts', 'icloud', 'onedrive', 'dropbox', 'nextcloud', 'webdav'])
 ];
 

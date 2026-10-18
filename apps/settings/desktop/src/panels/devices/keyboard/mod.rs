@@ -1,3 +1,4 @@
+mod dictation;
 mod layouts;
 mod methods;
 mod shortcuts;
@@ -39,8 +40,8 @@ fn app_names(Apps { ids }: Apps) -> Result<HashMap<String, String>, String> {
         .collect())
 }
 
-pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
-    window
+pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    dictation::register(window, events)
         .command("keyboard_layouts", |_: Value| Ok(layouts::all()))
         .command_async("keyboard_input_methods", |_: Value| methods::all())
         .command("keyboard_keys_installed", |_: Value| {

@@ -2094,6 +2094,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-speech"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "luft-dbus",
+ "serde",
+ "serde_json",
+ "zbus",
+]
+
+[[package]]
 name = "luft-variant"
 version = "0.1.0"
 dependencies = [
@@ -3451,6 +3462,7 @@ dependencies = [
  "luft-fingerprint",
  "luft-network",
  "luft-software",
+ "luft-speech",
  "roxmltree 0.21.1",
  "sabine",
  "serde",

@@ -8,7 +8,7 @@
 	import { headline, subline } from './headline';
 	import ImageUpdates from './image/ImageUpdates.svelte';
 	import PackageUpdates from './packages/PackageUpdates.svelte';
-	import ProgressTrack from './ProgressTrack.svelte';
+	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
 
 	let devices = $state<Firmware[]>([]);
 	let preferences = $state<Preferences | null>(null);

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Activity } from './api';
 	import { fractionOf } from './activity';
-	import ProgressTrack from './ProgressTrack.svelte';
+	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
 
 	let { activity }: { activity: Activity } = $props();
 

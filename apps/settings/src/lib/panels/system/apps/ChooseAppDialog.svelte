@@ -3,12 +3,14 @@
 	import { installedApps, matches, type App } from './api';
 
 	interface Props {
-		exclude: string[];
-		onadd: (id: string) => void;
+		title: string;
+		description: string;
+		exclude?: string[];
+		onchoose: (id: string) => void;
 		onclose: () => void;
 	}
 
-	let { exclude, onadd, onclose }: Props = $props();
+	let { title, description, exclude = [], onchoose, onclose }: Props = $props();
 
 	let apps = $state<App[]>([]);
 	let query = $state('');
@@ -18,11 +20,11 @@
 	void installedApps().then((list) => (apps = list));
 </script>
 
-<Dialog title="Add a startup app" description="Choose an app to open every time you sign in." {onclose}>
+<Dialog {title} {description} {onclose}>
 	<SearchField label="Search apps" bind:value={query} />
 	<div class="list soft-scroll">
 		{#each shown as app (app.id)}
-			<button type="button" class="app" onclick={() => onadd(app.id)}>
+			<button type="button" class="app" onclick={() => onchoose(app.id)}>
 				<AppIcon icon={app.icon} id={app.id} size={28} />
 				<span class="truncate">{app.name}</span>
 			</button>

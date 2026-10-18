@@ -11,6 +11,7 @@ pub mod packagekit;
 pub mod packages;
 pub mod progress;
 pub mod system;
+#[cfg(feature = "system")]
 pub mod system_packages;
 pub mod task;
 pub mod toolbox;

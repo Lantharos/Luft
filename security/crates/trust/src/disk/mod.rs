@@ -7,6 +7,7 @@ pub mod old_system;
 mod preflight;
 pub mod reencrypt;
 mod room;
+pub mod seal;
 pub mod stage;
 pub mod state;
 mod top_level;

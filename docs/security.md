@@ -42,7 +42,8 @@ The TPM releases the disk key only when both match:
 
 - Updates to Luft and ordinary firmware updates keep unlocking without a prompt.
 - Once the disk is open, its volume key is measured into PCR 15, so anything sealed to the running system later only opens on this disk.
-- When PCR 7 changes, Sushi asks for the recovery key and says why, and Settings offers to link the TPM again.
+- A new forbidden list or new keys installed while Luft runs, as Settings and fwupd do, are in the firmware before the restart. As the computer shuts down, trustd works out from the TPM's event log what PCR 7 the next start will measure and seals the disk key to that, so the restart unlocks without a prompt.
+- When PCR 7 changes any other way, Sushi asks for the recovery key once and says why. With Secure Boot on, trustd then seals the disk key to how the computer started, so the next start unlocks by itself again. A TPM with a PIN can't be sealed again without the PIN, so Settings offers to link it again instead.
 - An optional PIN of 6 to 20 digits makes the TPM also require something you know, with its own guessing lockout.
 - Every encrypted disk has a 64-character recovery key, in groups of eight, from letters that type the same on almost every keyboard. With a TPM, a sealed copy lets Settings show it again after an administrator password.
 

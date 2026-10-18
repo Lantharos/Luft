@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::disk::{SystemDisk, keys, luks};
+use crate::disk::{SystemDisk, keys, luks, seal};
 use crate::errors::Unsupported;
 use crate::system::secret::Secret;
 use crate::system::tpm;
@@ -32,7 +32,7 @@ pub fn set_up_tpm_unlock(typed: &Secret, pin: &Secret) -> Result<Option<Secret>>
     if let Some(recovery) = recovery.filter(|_| !keys::has_escrow() && tpm::detect().usable) {
         keys::escrow(&recovery)?;
     }
-    keys::enroll_tpm(&device, &key, pin)?;
+    seal::enroll(&device, &key, pin)?;
     Ok(created)
 }
 

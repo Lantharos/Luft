@@ -1,0 +1,15 @@
+[Unit]
+Description=Keep the TPM unlocking the disk after the Secure Boot settings change
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md
+ConditionSecurity=measured-uki
+After=local-fs.target tpm2.target cryptsetup.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/true
+ExecStop=/usr/bin/trustctl tpm before-restart
+TimeoutStopSec=2min
+
+[Install]
+WantedBy=multi-user.target

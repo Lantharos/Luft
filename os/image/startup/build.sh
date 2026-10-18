@@ -53,4 +53,5 @@ ukify build \
   --pcr-banks=sha256 \
   --sign-profile=main \
   --output="$out/luft.efi"
+python3 -I /usr/local/lib/luft-check-policy.py "$out/luft.efi" /usr/share/luft/secure-boot/pcr-policy.pem
 rm -rf "$work"

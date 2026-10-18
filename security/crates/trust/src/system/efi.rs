@@ -35,7 +35,7 @@ pub fn booted_with_uefi() -> bool {
     Path::new("/sys/firmware/efi").is_dir()
 }
 
-fn variable(name: &str, guid: &str) -> Option<Vec<u8>> {
+pub fn variable(name: &str, guid: &str) -> Option<Vec<u8>> {
     let data = std::fs::read(format!("{VARIABLES}/{name}-{guid}")).ok()?;
     data.get(4..).map(<[u8]>::to_vec)
 }

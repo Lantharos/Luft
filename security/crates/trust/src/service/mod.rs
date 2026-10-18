@@ -10,7 +10,7 @@ use std::time::Duration;
 
 use access::Idle;
 
-use crate::{boot, keys, system};
+use crate::{boot, disk, keys, system};
 
 pub use interface::Trust;
 
@@ -56,5 +56,11 @@ async fn follow_up_on_this_start() {
         .expect("following up on the startup doesn't panic")
     {
         eprintln!("Couldn't follow up on Luft's startup: {error:#}");
+    }
+    if let Err(error) = tokio::task::spawn_blocking(disk::seal::follow_up)
+        .await
+        .expect("following up on the TPM's disk key doesn't panic")
+    {
+        eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
     }
 }

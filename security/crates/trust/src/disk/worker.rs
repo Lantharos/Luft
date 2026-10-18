@@ -4,7 +4,7 @@ use anyhow::{Context, Result, bail};
 
 pub use super::reencrypt::Progress;
 use super::state::{Change, Mode, Plan};
-use super::{SystemDisk, initrd, keys, luks, mask, reencrypt, stage};
+use super::{SystemDisk, initrd, keys, luks, mask, reencrypt, seal, stage};
 use crate::errors::NeedsKey;
 use crate::system::secret::Secret;
 use crate::system::{keyring, power};
@@ -39,7 +39,7 @@ fn finish_encrypting(plan: &Plan, key: &Secret) -> Result<()> {
     };
     match plan.mode {
         Mode::Tpm => {
-            keys::enroll_tpm(&device, key, &keys::pin_kept_for_later())?;
+            seal::enroll(&device, key, &keys::pin_kept_for_later())?;
             keys::forget_kept_pin();
         }
         Mode::Passphrase => {

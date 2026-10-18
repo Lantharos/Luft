@@ -168,7 +168,12 @@ pub fn tpm_unavailable_reason() -> Option<String> {
     None
 }
 
-pub fn enroll_tpm(device: &Path, unlock: &Secret, pin: &Secret) -> Result<()> {
+pub fn enroll_tpm(
+    device: &Path,
+    unlock: &Secret,
+    pin: &Secret,
+    secure_boot_pcr: &str,
+) -> Result<()> {
     if let Some(reason) = tpm_unavailable_reason() {
         bail!(Unsupported(reason));
     }
@@ -176,7 +181,7 @@ pub fn enroll_tpm(device: &Path, unlock: &Secret, pin: &Secret) -> Result<()> {
         .arg("--unlock-key-file=/dev/stdin")
         .arg("--wipe-slot=tpm2")
         .arg("--tpm2-device=auto")
-        .arg("--tpm2-pcrs=7")
+        .arg(format!("--tpm2-pcrs=7:sha256={secure_boot_pcr}"))
         .arg(format!("--tpm2-public-key={}", signing::PCR_PUBLIC_KEY))
         .arg("--tpm2-public-key-pcrs=11")
         .arg("--tpm2-pcrlock=")

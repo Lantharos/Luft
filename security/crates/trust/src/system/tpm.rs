@@ -2,6 +2,8 @@ use std::path::Path;
 
 use super::command::Tool;
 
+const SECURE_BOOT_PCR: &str = "/sys/class/tpm/tpm0/pcr-sha256/7";
+
 #[derive(Clone, Debug, Default)]
 pub struct Tpm {
     pub present: bool,
@@ -36,6 +38,12 @@ fn readiness() -> Result<(), &'static str> {
     } else {
         Ok(())
     }
+}
+
+pub fn secure_boot_pcr() -> Option<String> {
+    std::fs::read_to_string(SECURE_BOOT_PCR)
+        .ok()
+        .map(|value| value.trim().to_ascii_lowercase())
 }
 
 pub fn detect() -> Tpm {

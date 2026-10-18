@@ -90,6 +90,8 @@ enum TpmAction {
         pin: bool,
     },
     Remove,
+    /// Seal the disk key to the Secure Boot settings the next start measures
+    BeforeRestart,
 }
 
 #[derive(Subcommand)]
@@ -172,6 +174,7 @@ fn tpm_unlock(action: TpmAction) -> Result<()> {
             Ok(())
         }
         TpmAction::Remove => actions::remove_tpm_unlock(&ask::unlock_key()?),
+        TpmAction::BeforeRestart => disk::seal::before_restart(),
     }
 }
 

@@ -2,6 +2,7 @@ pub mod blocks;
 pub mod command;
 pub mod creds;
 pub mod efi;
+pub mod eventlog;
 pub mod journal;
 pub mod keyring;
 pub mod live;

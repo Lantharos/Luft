@@ -38,14 +38,15 @@ function drawnAtTarget(actor) {
 /**
  * @param {Meta.WindowActor} actor
  * @param {{x: number, y: number, width: number, height: number}} rect
- * @returns {WindowSnapshot}
+ * @returns {WindowSnapshot | null} null when the window has nothing to show there
  */
 function snapshotOf(actor, rect) {
     const clip = new Mtk.Rectangle({
         x: Math.round(rect.x), y: Math.round(rect.y),
         width: Math.round(rect.width), height: Math.round(rect.height),
     });
-    return new WindowSnapshot(actor.paint_to_content(clip), clip);
+    const content = actor.paint_to_content(clip);
+    return content ? new WindowSnapshot(content, clip) : null;
 }
 
 /**
@@ -206,7 +207,7 @@ class Morph {
      * Ends the morph and hands its picture over to the next one, starting
      * from where this one is on screen.
      *
-     * @returns {{snapshot: WindowSnapshot, velocity: object | undefined}}
+     * @returns {{snapshot: WindowSnapshot | null, velocity: object | undefined}}
      */
     handOver() {
         if (!this._live) {
@@ -248,9 +249,12 @@ export class WindowMorphs {
         if (reducedMotion() || from.width <= 0 || from.height <= 0)
             return false;
 
-        const {snapshot, velocity} = this._handedOver.get(actor) ?? {snapshot: snapshotOf(actor, from)};
+        const handedOver = this._handedOver.get(actor);
         this._handedOver.delete(actor);
-        const morph = new Morph(actor, snapshot, velocity, () => {
+        const snapshot = handedOver?.snapshot ?? snapshotOf(actor, from);
+        if (!snapshot)
+            return false;
+        const morph = new Morph(actor, snapshot, handedOver?.velocity, () => {
             if (this._morphs.get(actor) === morph)
                 this._morphs.delete(actor);
             completed();
@@ -270,7 +274,10 @@ export class WindowMorphs {
         if (!morph)
             return;
         this._morphs.delete(actor);
-        this._handedOver.set(actor, morph.handOver());
+        const handedOver = morph.handOver();
+        if (!handedOver.snapshot)
+            return;
+        this._handedOver.set(actor, handedOver);
         this._dropLater ||= laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
             this._dropLater = 0;
             for (const {snapshot} of this._handedOver.values())

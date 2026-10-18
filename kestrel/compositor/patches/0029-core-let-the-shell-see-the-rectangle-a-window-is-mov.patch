@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 13:55:20 +0200
-Subject: [PATCH 29/42] core: let the shell see the rectangle a window is
+Subject: [PATCH 29/43] core: let the shell see the rectangle a window is
  moving to
 
 A Wayland window keeps its old frame rectangle until the client has

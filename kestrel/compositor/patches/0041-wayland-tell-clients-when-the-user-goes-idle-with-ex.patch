@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 19:48:28 +0200
-Subject: [PATCH 41/42] wayland: tell clients when the user goes idle with
+Subject: [PATCH 41/43] wayland: tell clients when the user goes idle with
  ext-idle-notify-v1
 
 Implement ext_idle_notifier_v1 on top of the core idle monitor. Plain

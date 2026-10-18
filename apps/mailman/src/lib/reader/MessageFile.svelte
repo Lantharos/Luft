@@ -70,7 +70,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		padding: 18px 20px;
+		padding: 20px;
 		border-radius: 20px;
 		background: var(--raised);
 	}

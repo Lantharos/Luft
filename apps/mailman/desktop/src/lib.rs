@@ -16,7 +16,7 @@ pub const APP_ID: &str = "com.lantharos.mailman";
 const WINDOW: GlassWindow = GlassWindow {
     title: "Mailman",
     size: (1520, 900),
-    min_size: (820, 520),
+    min_size: (560, 520),
     sidebar_width: 248,
     single_instance: Some(APP_ID),
 };

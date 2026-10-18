@@ -4,9 +4,10 @@
 	import { appearance, GlassShell, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
-	import { commands, WIDE_WINDOW, type Shell } from '#lib/app/commands.js';
+	import { commands, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
+	import { followSidebarRegions, layout } from '#lib/app/layout.svelte.js';
 	import { navigate, openThread } from '#lib/app/navigation.js';
 	import Composer from '#lib/compose/Composer.svelte';
 	import { composer } from '#lib/compose/composer.svelte.js';
@@ -31,11 +32,9 @@
 	import Welcome from '#lib/shell/Welcome.svelte';
 	import Sidebar from '#lib/sidebar/Sidebar.svelte';
 
-	const LIST_WIDTH = 408;
 	const REFRESH_DELAY = 200;
 	const SEARCH_CAP = 1000;
 
-	let width = $state(window.innerWidth);
 	let sidebar = $state<Sidebar>();
 	let readerActions = $state<ReaderActions>();
 	let palette = $state(false);
@@ -45,9 +44,8 @@
 	let refreshing = false;
 	let refreshAgain = false;
 
-	let wide = $derived(width >= WIDE_WINDOW);
-	let showList = $derived(wide || reader.thread === null);
-	let showReader = $derived(wide || reader.thread !== null);
+	let showList = $derived(layout.sideBySide || reader.thread === null);
+	let showReader = $derived(layout.sideBySide || reader.thread !== null);
 	let title = $derived(list.searching ? 'Search' : viewLabel(list.view, mail.mailboxes));
 	let subtitle = $derived.by(() => {
 		if (list.chosen.size) return `${list.chosen.size} selected`;
@@ -68,6 +66,8 @@
 	$effect(() => {
 		document.documentElement.dataset.scheme = appearance.scheme;
 	});
+
+	followSidebarRegions();
 
 	onMount(() => {
 		const stops = [
@@ -139,7 +139,7 @@
 </script>
 
 <svelte:window
-	bind:innerWidth={width}
+	bind:innerWidth={layout.width}
 	onkeydown={(event) => handleKeydown(event, { commands: () => commands(shell), palette: () => (palette = true) })}
 	onfocus={() => void api.setFocused(true)}
 	onblur={() => void api.setFocused(false)}
@@ -147,10 +147,10 @@
 	ondrop={drop}
 />
 
-<div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full select-none [--sidebar-width:248px]">
-		{#if !opened.focused}
-			<Sidebar bind:this={sidebar} onsettings={() => (settings = true)} />
+<div class="h-[100dvh] w-screen overflow-hidden" style:--sidebar-width="{layout.sidebarWidth}px">
+	<GlassShell class="h-full select-none">
+		{#if layout.sidebar !== 'none'}
+			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={() => (palette = true)} />
 		{/if}
 		<main class="glass-content relative isolate">
 			{#if opened.file}
@@ -163,9 +163,9 @@
 				</Header>
 				<MessageFile path={opened.file} />
 			{:else}
-				<Header {title} {subtitle} width={wide && mail.accounts.length ? LIST_WIDTH : null}>
+				<Header {title} {subtitle} width={layout.sideBySide && mail.accounts.length ? layout.listWidth : null}>
 					{#snippet leading()}
-						{#if !wide && reader.thread !== null}
+						{#if !layout.sideBySide && reader.thread !== null}
 							<button type="button" class="icon-button" aria-label="Back" onclick={() => reader.close()} {@attach tooltip('Back (Esc)')}><ArrowLeft size={18} /></button>
 						{/if}
 					{/snippet}
@@ -185,7 +185,7 @@
 						<Welcome onadd={() => (adding = true)} />
 					{:else}
 						{#if showList}
-							<div class="flex min-h-0 flex-col" class:flex-1={!wide} style:width={wide ? `${LIST_WIDTH}px` : undefined}>
+							<div class={['flex min-h-0 flex-col', layout.sideBySide ? 'flex-none' : 'flex-1']} style:width={layout.sideBySide ? `${layout.listWidth}px` : undefined}>
 								<ThreadList />
 							</div>
 						{/if}

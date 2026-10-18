@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { SearchField, selectionPill, tooltip } from '@luft/ui';
 	import PenLine from '@lucide/svelte/icons/pen-line';
+	import Search from '@lucide/svelte/icons/search';
 	import Settings from '@lucide/svelte/icons/settings-2';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { list } from '#lib/mail/list.svelte.js';
@@ -13,10 +14,12 @@
 	import NavItem from './NavItem.svelte';
 
 	interface Props {
+		rail: boolean;
 		onsettings: () => void;
+		onsearch: () => void;
 	}
 
-	let { onsettings }: Props = $props();
+	let { rail, onsettings, onsearch }: Props = $props();
 
 	let search = $state<{ focus: () => void }>();
 	let query = $state('');
@@ -31,7 +34,8 @@
 	});
 
 	export function focusSearch() {
-		search?.focus();
+		if (rail) onsearch();
+		else search?.focus();
 	}
 
 	function searchKey(event: KeyboardEvent) {
@@ -54,20 +58,27 @@
 	});
 </script>
 
-<aside class="glass-sidebar drag-region sidebar">
+<aside class="glass-sidebar drag-region">
 	<div class="flex h-[60px] flex-none items-center gap-2 px-3">
-		<button type="button" class="write" onclick={() => composer.start()} {@attach tooltip('Write (C)')}>
-			<PenLine size={16} />
-			<span>Write</span>
+		<button type="button" class="write" class:rail aria-label={rail ? 'Write' : undefined} onclick={() => composer.start()} {@attach tooltip('Write (C)')}>
+			<PenLine size={rail ? 18 : 16} />
+			{#if !rail}<span>Write</span>{/if}
 		</button>
-		<button type="button" class="icon-button" aria-label="Settings" onclick={onsettings} {@attach tooltip('Settings')}>
-			<Settings size={18} />
-		</button>
+		{#if !rail}
+			<button type="button" class="icon-button" aria-label="Settings" onclick={onsettings} {@attach tooltip('Settings')}>
+				<Settings size={18} />
+			</button>
+		{/if}
 	</div>
-	<div class="flex-none px-3 pb-3">
-		<SearchField bind:this={search} bind:value={query} label="Search mail" variant="sidebar" onkeydown={searchKey} />
-	</div>
-	<nav class="scroll-fade soft-scroll flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3" {@attach selectionPill()}>
+	{#if !rail}
+		<div class="flex-none px-3 pb-3">
+			<SearchField bind:this={search} bind:value={query} label="Search mail" variant="sidebar" onkeydown={searchKey} />
+		</div>
+	{/if}
+	<nav class="scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3" class:hidden-scroll={rail} class:soft-scroll={!rail} {@attach selectionPill()}>
+		{#if rail}
+			<NavItem label="Search mail" icon={Search} active={list.searching} {rail} onclick={onsearch} />
+		{/if}
 		<div class="flex flex-col gap-px">
 			{#each primary as view (view.id)}
 				<NavItem
@@ -76,15 +87,16 @@
 					active={list.view === view.id && !list.searching}
 					count={view.count?.(mail.counts) ?? 0}
 					strong={!view.total}
+					{rail}
 					onclick={() => navigate(view.id)}
 				/>
 			{/each}
 		</div>
 		{#if mail.settings.bundles}
 			<div class="flex flex-col gap-px">
-				<p class="group">Bundles</p>
+				{#if !rail}<p class="group">Bundles</p>{/if}
 				{#each BUNDLES as view (view.id)}
-					<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={view.count?.(mail.counts) ?? 0} onclick={() => navigate(view.id)} />
+					<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={view.count?.(mail.counts) ?? 0} {rail} onclick={() => navigate(view.id)} />
 				{/each}
 			</div>
 		{/if}
@@ -92,16 +104,23 @@
 			{@const folders = mail.folders(account.id)}
 			{#if folders.length}
 				<div class="flex flex-col gap-px">
-					<p class="group truncate">{multiple ? account.email : 'Folders'}</p>
+					{#if !rail}<p class="group truncate">{multiple ? account.email : 'Folders'}</p>{/if}
 					{#each folders as folder (folder.id)}
 						{@const view = mailboxView(folder)}
-						<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={mail.unreadIn(folder.id)} onclick={() => navigate(view.id)} />
+						<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={mail.unreadIn(folder.id)} {rail} onclick={() => navigate(view.id)} />
 					{/each}
 				</div>
 			{/if}
 		{/each}
 	</nav>
-	<AccountStatus />
+	{#if rail}
+		<div class="flex flex-none justify-center pb-3">
+			<button type="button" class="icon-button large" aria-label="Settings" onclick={onsettings} {@attach tooltip('Settings')}>
+				<Settings size={18} />
+			</button>
+		</div>
+	{/if}
+	<AccountStatus {rail} />
 </aside>
 
 <style>
@@ -129,6 +148,12 @@
 
 	.write:active {
 		transform: scale(0.97);
+	}
+
+	.write.rail {
+		height: 44px;
+		width: 48px;
+		flex: none;
 	}
 
 	.group {

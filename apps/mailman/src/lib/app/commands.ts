@@ -4,6 +4,7 @@ import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
 import { reader } from '#lib/reader/reader.svelte.js';
+import { layout } from './layout.svelte';
 import { navigate, openThread } from './navigation';
 
 export interface Command {
@@ -105,11 +106,5 @@ function open() {
 
 export function step(offset: number) {
 	const row = list.step(offset);
-	if (row && (reader.thread !== null || wide())) void openThread(row.thread);
-}
-
-export const WIDE_WINDOW = 1080;
-
-function wide() {
-	return window.innerWidth >= WIDE_WINDOW;
+	if (row && (reader.thread !== null || layout.sideBySide)) void openThread(row.thread);
 }

@@ -24,6 +24,8 @@ export function stylesheet(rendered: Rendered, dark: boolean, darken: boolean) {
 		.mm-root { overflow-wrap: anywhere; font: 14px/1.6 ${adopt ? "'Open Runde', system-ui, sans-serif" : 'system-ui, sans-serif'}; color: ${adopt ? 'var(--text)' : '#1b1b19'}; user-select: text; cursor: auto; }
 		${adopt ? '.mm-root a { color: var(--accent); } .mm-root blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--hairline); color: var(--text-muted); }' : '.mm-root { background: #fff; border-radius: 12px; padding: 12px; }'}
 		${inverted ? '.mm-root { filter: invert(0.9) hue-rotate(180deg); } .mm-root img, .mm-root video, .mm-root [style*="background-image"] { filter: invert(1) hue-rotate(180deg); }' : ''}
+		.mm-root > :first-child { margin-top: 0; }
+		.mm-root > :last-child { margin-bottom: 0; }
 		.mm-plain { white-space: pre-wrap; }
 		.mm-collapsed .mm-hidden { display: none !important; }
 		img { max-width: 100%; height: auto; }

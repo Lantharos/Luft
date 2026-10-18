@@ -38,6 +38,20 @@
 	});
 
 	$effect(() => {
+		if (!host || !content) return;
+		const body = content;
+		const fit = () => {
+			body.style.zoom = '';
+			const natural = body.scrollWidth;
+			const room = body.clientWidth;
+			if (natural > room) body.style.zoom = `${room / natural}`;
+		};
+		const resizes = new ResizeObserver(fit);
+		resizes.observe(host);
+		return () => resizes.disconnect();
+	});
+
+	$effect(() => {
 		if (images && rendered.remote.length) remoteImages.request(rendered.remote);
 	});
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Dictation
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Speech1
+ExecStart=/usr/libexec/luft-speech
+Restart=on-failure
+MemoryHigh=1600M
+MemoryMax=2G
+MemorySwapMax=0
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallArchitectures=native

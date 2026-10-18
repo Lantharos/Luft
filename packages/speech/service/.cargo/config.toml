@@ -1,0 +1,4 @@
+[env]
+ORT_LIB_PATH = "/usr/lib64"
+ORT_PREFER_DYNAMIC_LINK = "1"
+GGML_NATIVE = "OFF"

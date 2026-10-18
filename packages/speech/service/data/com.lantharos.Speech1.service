@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Speech1
+Exec=/usr/libexec/luft-speech
+SystemdService=luft-speech.service

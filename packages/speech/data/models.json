@@ -1,0 +1,56 @@
+{
+  "mirror": "https://get.luft.computer/models",
+  "models": [
+    {
+      "id": "parakeet-tdt-0.6b-v3",
+      "engine": "parakeet",
+      "name": "Parakeet",
+      "licence": "CC BY 4.0",
+      "credit": "Parakeet TDT 0.6B v3 by NVIDIA, converted to ONNX by Ilya Stupakov, with its encoder quantized to 4 bits for Luft",
+      "homepage": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+      "source": "https://huggingface.co/istupakov/parakeet-tdt-0.6b-v3-onnx/resolve/8f23f0c03c8761650bdb5b40aaf3e40d2c15f1ce",
+      "files": [
+        {
+          "name": "encoder-model.q4.onnx",
+          "size": 679402015,
+          "sha256": "14e582528d3cef94373053c8ae68fbbe810f8a82a404ea875e4d3722859d51fe",
+          "quantizedFrom": [
+            "encoder-model.onnx",
+            "encoder-model.onnx.data"
+          ]
+        },
+        {
+          "name": "decoder_joint-model.int8.onnx",
+          "size": 18202004,
+          "sha256": "eea7483ee3d1a30375daedc8ed83e3960c91b098812127a0d99d1c8977667a70"
+        },
+        {
+          "name": "nemo128.onnx",
+          "size": 139764,
+          "sha256": "a9fde1486ebfcc08f328d75ad4610c67835fea58c73ba57e3209a6f6cf019e9f"
+        },
+        {
+          "name": "vocab.txt",
+          "size": 93939,
+          "sha256": "d58544679ea4bc6ac563d1f545eb7d474bd6cfa467f0a6e2c1dc1c7d37e3c35d"
+        }
+      ]
+    },
+    {
+      "id": "whisper-large-v3-turbo-q5_0",
+      "engine": "whisper",
+      "name": "Whisper",
+      "licence": "MIT",
+      "credit": "Whisper large-v3-turbo by OpenAI, in the whisper.cpp format by Georgi Gerganov",
+      "homepage": "https://huggingface.co/openai/whisper-large-v3-turbo",
+      "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1",
+      "files": [
+        {
+          "name": "ggml-large-v3-turbo-q5_0.bin",
+          "size": 574041195,
+          "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"
+        }
+      ]
+    }
+  ]
+}

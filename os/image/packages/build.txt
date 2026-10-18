@@ -12,6 +12,7 @@ gcc-c++
 gettext
 git-core
 gjs-devel
+glslc
 glycin-devel
 gsettings-desktop-schemas-devel
 gstreamer1-devel
@@ -28,6 +29,7 @@ libxml2-devel
 meson
 NetworkManager-libnm-devel
 ninja-build
+onnxruntime-devel
 openssl-devel
 pam-devel
 pipewire-devel
@@ -41,3 +43,5 @@ sqlite-devel
 systemd-devel
 tpm2-tss-devel
 unzip
+vulkan-headers
+vulkan-loader-devel

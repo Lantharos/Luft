@@ -64,3 +64,9 @@ install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$accounts/data/com.lanth
 install -Dm644 -t "$destdir/usr/lib/systemd/user" "$accounts/data/luft-accounts.service"
 printf 'enable luft-accounts.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-accounts.preset"
+
+speech="$luft/packages/speech/service"
+(cd "$speech" && cargo build --release --locked)
+install -Dm755 "$CARGO_TARGET_DIR/release/luft-speech" "$destdir/usr/libexec/luft-speech"
+install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$speech/data/com.lantharos.Speech1.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/user" "$speech/data/luft-speech.service"

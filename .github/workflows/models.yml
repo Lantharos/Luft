@@ -1,0 +1,49 @@
+name: Speech models
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/speech/data/models.json
+      - packages/speech/mirror/**
+  workflow_dispatch:
+
+concurrency:
+  group: models
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_IMAGE: docker.io/library/python@sha256:2b4f19dae3a777dfc3b76730bda1e82e1f66ab2a2686fa93ca78edbfb4f04ffe
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch, quantize and check the models
+        run: |
+          mkdir -p "$RUNNER_TEMP/models"
+          docker run --rm -v "$PWD/packages/speech:/speech:ro" -v "$RUNNER_TEMP/models:/models" "$PYTHON_IMAGE" sh -c '
+            apt-get update -qq && apt-get install -qq --yes curl jq > /dev/null &&
+            pip install --quiet --no-deps --requirement /speech/mirror/requirements.txt &&
+            /speech/mirror/mirror.sh /speech/data/models.json /models'
+
+      - name: Upload to R2
+        if: env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        working-directory: ${{ runner.temp }}/models
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          find . -type f -printf '%P\n' | while read -r file; do
+            aws s3 cp --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" --no-progress "$file" "s3://$R2_BUCKET/models/$file"
+          done

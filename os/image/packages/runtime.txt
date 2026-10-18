@@ -75,6 +75,7 @@ NetworkManager-openvpn
 NetworkManager-wifi
 NetworkManager-wwan
 nss-mdns
+onnxruntime
 openconnect
 pciutils
 pipewire

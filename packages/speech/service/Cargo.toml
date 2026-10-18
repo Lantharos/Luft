@@ -1,0 +1,38 @@
+[package]
+name = "luft-speech-service"
+version = "0.1.0"
+description = "Dictation for Luft: listens while the Copilot key is held and turns speech into text on this computer"
+authors = ["Kristof"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+
+[[bin]]
+name = "luft-speech"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+gio = "0.22.10"
+libc = "0.2.190"
+luft-speech = { path = "..", default-features = false }
+ort = { version = "2.0.0-rc.14", default-features = false, features = ["std", "api-24"] }
+pipewire = "0.10.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sha2 = "0.11.1"
+tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread", "macros", "time", "sync", "signal"] }
+ureq = { version = "3.4.2", features = ["platform-verifier"] }
+whisper-rs = { version = "0.16.0", features = ["vulkan"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

@@ -7,10 +7,11 @@
 		size: number;
 		thumbnail?: string | null;
 		backdrop?: boolean;
+		app?: boolean;
 		fit?: 'cover' | 'contain';
 	}
 
-	let { name, size, thumbnail = null, backdrop = false, fit = 'cover' }: Props = $props();
+	let { name, size, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
 	const TONES: Partial<Record<EntryIconName, string>> = {
@@ -24,10 +25,11 @@
 	};
 
 	let showThumbnail = $derived(Boolean(thumbnail) && failedThumbnail !== thumbnail);
+	let artwork = $derived(app ? 'entry-icon--app' : `entry-icon--thumbnail entry-icon--${fit}`);
 </script>
 
 <span
-	class={['entry-icon', showThumbnail ? `entry-icon--thumbnail entry-icon--${fit}` : `entry-icon--${TONES[name] ?? 'file'}`]}
+	class={['entry-icon', showThumbnail ? artwork : `entry-icon--${TONES[name] ?? 'file'}`]}
 	style:--icon-size="{size}px"
 	aria-hidden="true"
 >

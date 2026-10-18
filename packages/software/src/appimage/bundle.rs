@@ -13,6 +13,7 @@ const MAX_LINKS: usize = 8;
 const THEMED_ICONS: &str = "/usr/share/icons/hicolor";
 const ELECTRON_MARKERS: [&str; 2] = ["/chrome-sandbox", "/resources/app.asar"];
 const CHROMIUM_MARKER: &str = "chrome_100_percent.pak";
+const IMAGE_EXTENSIONS: [&str; 2] = ["png", "svg"];
 
 pub struct Icon {
     pub bytes: Vec<u8>,
@@ -101,23 +102,27 @@ impl<'a, 'b> Contents<'a, 'b> {
             .collect()
     }
 
-    fn icons(&self, name: &str) -> Vec<Icon> {
-        let root = [
-            format!("/{name}.svg"),
-            format!("/{name}.png"),
-            "/.DirIcon".to_owned(),
-        ];
-        let mut icons: Vec<Icon> = self
-            .themed(name)
-            .into_iter()
-            .chain(root.iter().map(Path::new))
-            .filter_map(|path| self.icon_at(path))
+    fn icons(&self, name: Option<&str>) -> Vec<Icon> {
+        let named = name.into_iter().flat_map(|name| {
+            self.themed(name)
+                .into_iter()
+                .map(Path::to_path_buf)
+                .chain([format!("/{name}.svg"), format!("/{name}.png")].map(PathBuf::from))
+        });
+        let mut icons: Vec<Icon> = named
+            .chain(std::iter::once(PathBuf::from("/.DirIcon")))
+            .filter_map(|path| self.icon_at(&path))
             .collect();
         if icons.is_empty() {
             icons = self
                 .nodes
                 .keys()
                 .filter(|path| path.parent() == Some(Path::new("/")))
+                .filter(|path| {
+                    path.extension().is_some_and(|extension| {
+                        IMAGE_EXTENSIONS.iter().any(|known| extension == *known)
+                    })
+                })
                 .filter_map(|path| self.icon_at(path))
                 .collect();
         }
@@ -153,12 +158,33 @@ fn image_kind(bytes: &[u8]) -> Option<(&'static str, IconSize)> {
     head.contains("<svg").then_some(("svg", IconSize::Scalable))
 }
 
-pub fn read(path: &Path) -> Result<Bundle, String> {
-    let unreadable = || "This file isn't an AppImage this computer can open.".to_string();
+fn unreadable() -> String {
+    "This file isn't an AppImage this computer can open.".to_string()
+}
+
+fn open(path: &Path) -> Result<FilesystemReader<'static>, String> {
     let mut file = File::open(path).map_err(|error| error.to_string())?;
     let offset = elf::payload_offset(&mut file).ok_or_else(unreadable)?;
-    let filesystem = FilesystemReader::from_reader_with_offset(BufReader::new(file), offset)
-        .map_err(|_| unreadable())?;
+    FilesystemReader::from_reader_with_offset(BufReader::new(file), offset)
+        .map_err(|_| unreadable())
+}
+
+pub fn icons(path: &Path) -> Result<Vec<Icon>, String> {
+    let filesystem = open(path)?;
+    let contents = Contents::new(&filesystem);
+    let name = contents
+        .desktop_file()
+        .and_then(|desktop| contents.read(&desktop))
+        .and_then(|text| {
+            DesktopEntry::parse(&String::from_utf8_lossy(&text))
+                .get("Icon")
+                .map(str::to_owned)
+        });
+    Ok(contents.icons(name.as_deref()))
+}
+
+pub fn read(path: &Path) -> Result<Bundle, String> {
+    let filesystem = open(path)?;
     let contents = Contents::new(&filesystem);
     let desktop = contents
         .desktop_file()
@@ -166,10 +192,7 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
     let entry_text =
         String::from_utf8_lossy(&contents.read(&desktop).ok_or_else(unreadable)?).into_owned();
     let entry = DesktopEntry::parse(&entry_text);
-    let icons = entry
-        .get("Icon")
-        .map(|name| contents.icons(name))
-        .unwrap_or_default();
+    let icons = contents.icons(entry.get("Icon"));
     let electron = ELECTRON_MARKERS
         .iter()
         .any(|marker| contents.nodes.contains_key(Path::new(marker)));

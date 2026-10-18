@@ -18,6 +18,8 @@ let updates = PackageUpdates::load(Mode::Quiet).await?;
 let waiting_in_schelf = updates::app_count(updates.apps.len());
 ```
 
+Without its default `system` feature (`default-features = false`) it leaves out `packages`, `packagekit`, `image` and `updates`, and with them D-Bus and `luft-app`.
+
 PackageKit and the image updater are reached over D-Bus, so their functions are async. Flatpak, Toolbox and AppImage work runs programs and downloads, so it stays synchronous and belongs on a thread of its own; a job on such a thread waits for the async parts with `luft_app::block_on`.
 
 ## Two kinds of systems
@@ -52,7 +54,7 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | `packagekit::offline` | `prepared()` lists the prepared offline update and `results()` reports how the last one went |
 | `packagekit::running` | `running()` lists PackageKit transactions in progress and `changes()` streams their changes |
 | `flatpak` | `installed`, `updates`, `install`, `install_ref`, `update`, `uninstall`, `add_remote`, `ensure_flathub` and `permissions`, for the user and system `Installation` |
-| `appimage` | `inspect` reads an AppImage's name and icon without running it; `install` moves it into `~/Applications` and `install_copy` copies it there, with a desktop entry named like the one inside it and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland; `placement` tells where it would go; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) |
+| `appimage` | `inspect` reads an AppImage's name and icon without running it, and `icons` only its icons; `install` moves it into `~/Applications` and `install_copy` copies it there, with a desktop entry named like the one inside it and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland; `placement` tells where it would go; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) |
 | `task` | `Task` (a progress `report` and a `Cancel`) passed to every operation that changes the system; `Cancel::while_running` and `while_awaiting` stop work when it's cancelled; `exclusive` waits until no other process is changing the account's software, reporting `Waiting` meanwhile, and holds that until it's dropped |
 | `progress` | `Progress`, `Stage` and `Report` |
 | `http` | Shared HTTP agent with `text` and `download` |
@@ -76,6 +78,10 @@ Versions and release notes come from the image's labels:
 
 `updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks.
 
+## Thumbnails
+
+`luft-thumbnailer` (in `thumbnailer/`) is a freedesktop thumbnailer that shows the app's own icon for AppImages, Flatpak bundles and `.flatpakref` files, in Rover and anything else that reads the shared thumbnail cache. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded for its remotes, so it never goes online. SVG icons are drawn at the size asked for.
+
 ## Command-line tools
 
 On image systems Schelf installs Fedora packages into the default Toolbox container, `fedora-toolbox-45`, creating it the first time from Fedora's toolbox image, pulled through Podman's API so the download shows its progress. Updates for the tools come from `dnf` inside the container and appear in Schelf's Updates. Each command a package puts in `/usr/bin` gets a small launcher in `~/.local/bin`, unless the system already has a command by that name, so it runs from Tern like any other. The list of tools installed this way is kept in `~/.local/share/luft/tools.json`.
@@ -87,4 +93,5 @@ cargo clippy
 cargo fmt --check
 cargo test
 (cd updater && cargo clippy && cargo test)
+(cd thumbnailer && cargo clippy)
 ```

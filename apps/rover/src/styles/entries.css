@@ -121,6 +121,17 @@
 		outline-offset: -1px;
 	}
 
+	.entry-icon--app {
+		background: transparent;
+	}
+
+	.entry-icon--app .entry-thumbnail {
+		height: 100%;
+		width: 100%;
+		object-fit: contain;
+		filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+	}
+
 	.entry-thumbnail.has-backdrop {
 		background: var(--thumbnail-backdrop);
 	}

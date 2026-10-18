@@ -26,6 +26,11 @@ install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$updater/data/com.lantharos.updater.policy"
 install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-updater.rules"
 
+thumbnailer="$luft/packages/software/thumbnailer"
+cargo build --release --locked --manifest-path "$thumbnailer/Cargo.toml"
+install -Dm755 "$CARGO_TARGET_DIR/release/luft-thumbnailer" "$destdir/usr/libexec/luft-thumbnailer"
+install -Dm644 -t "$destdir/usr/share/thumbnailers" "$thumbnailer/data/luft-apps.thumbnailer"
+
 windows="$luft/packages/windows/service"
 cargo build --release --locked --manifest-path "$windows/Cargo.toml"
 install -Dm755 "$CARGO_TARGET_DIR/release/luft-windows" "$destdir/usr/libexec/luft-windows"

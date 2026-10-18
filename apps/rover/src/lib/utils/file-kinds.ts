@@ -10,7 +10,7 @@ const EXTENSION_ICONS: Record<EntryIconName, string[]> = {
 	music: ['mp3', 'wav', 'ogg', 'oga', 'flac', 'aac', 'm4a', 'm4b', 'wma', 'opus', 'weba'],
 	archive: ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'zst'],
 	'file-text': ['pdf', 'doc', 'docx', 'odt', 'rtf', 'xls', 'xlsx', 'ods', 'csv', 'ppt', 'pptx', 'odp'],
-	package: ['appimage', 'deb', 'rpm', 'flatpak', 'snap'],
+	package: ['appimage', 'deb', 'rpm', 'flatpak', 'flatpakref', 'snap'],
 	code: [
 		'txt', 'md', 'json', 'xml', 'yaml', 'yml', 'toml', 'js', 'ts', 'jsx', 'tsx', 'css', 'scss', 'html', 'svelte', 'vue',
 		'py', 'rb', 'rs', 'go', 'java', 'c', 'cpp', 'h', 'hpp', 'sh', 'bash', 'zsh', 'fish', 'ps1', 'conf', 'ini', 'cfg',
@@ -24,14 +24,21 @@ const ICON_BY_EXTENSION = new Map(
 
 const TRANSPARENT_EXTENSIONS = new Set(['png', 'apng', 'svg', 'gif', 'webp', 'ico', 'avif', 'ttf', 'otf', 'ttc', 'woff', 'woff2', 'pfb']);
 
-const PACKAGE_MIME_TYPES = new Set([
+const APP_BUNDLE_MIME_TYPES = new Set([
 	'application/vnd.appimage',
 	'application/x-appimage',
 	'application/x-iso9660-appimage',
+	'application/vnd.flatpak',
+	'application/vnd.flatpak.ref'
+]);
+
+const APP_BUNDLE_EXTENSIONS = new Set(['appimage', 'flatpak', 'flatpakref']);
+
+const PACKAGE_MIME_TYPES = new Set([
+	...APP_BUNDLE_MIME_TYPES,
 	'application/vnd.debian.binary-package',
 	'application/x-debian-package',
 	'application/x-rpm',
-	'application/vnd.flatpak',
 	'application/vnd.snap'
 ]);
 
@@ -46,6 +53,10 @@ export function isImage(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
 
 export function mayBeTransparent(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
 	return Boolean(entry.mime_type?.startsWith('font/')) || TRANSPARENT_EXTENSIONS.has(extensionOf(entry.name));
+}
+
+export function isAppBundle(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
+	return APP_BUNDLE_MIME_TYPES.has(entry.mime_type ?? '') || APP_BUNDLE_EXTENSIONS.has(extensionOf(entry.name));
 }
 
 export function entryIcon(entry: Pick<FileEntry, 'name' | 'is_dir' | 'mime_type'>): EntryIconName {

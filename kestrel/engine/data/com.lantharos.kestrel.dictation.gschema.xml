@@ -2,8 +2,8 @@
   <schema id="com.lantharos.kestrel.dictation" path="/com/lantharos/kestrel/dictation/">
     <key name="enabled" type="b">
       <default>false</default>
-      <summary>Dictate while the Copilot key is held</summary>
-      <description>When on, holding the Copilot key listens and types what is said into the focused text field. Turning it on in Settings downloads the speech model first.</description>
+      <summary>Dictation</summary>
+      <description>When on, holding the dictation shortcut or the Copilot key listens and types what is said into the focused text field, and pressing the shortcut starts and stops listening. Turning it on in Settings downloads the speech model first.</description>
     </key>
     <key name="language" type="s">
       <default>''</default>

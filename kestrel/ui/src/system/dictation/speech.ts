@@ -4,20 +4,34 @@ import GLib from 'gi://GLib';
 const NAME = 'com.lantharos.Speech1';
 const PATH = '/com/lantharos/Speech1';
 const NOT_INSTALLED = 'com.lantharos.Speech1.Error.NotInstalled';
+const UNSUPPORTED = 'com.lantharos.Speech1.Error.Unsupported';
 const STOP_TIMEOUT_MS = 60_000;
 
 export class NotInstalled extends Error {}
 
+export class Unsupported extends Error {
+  constructor(readonly language: string) {
+    super(language);
+  }
+}
+
+export interface Heard {
+  partial(text: string): void;
+  level(level: number): void;
+  quiet(): void;
+}
+
 export class Speech {
   private readonly subscriptions: number[];
 
-  constructor(partial: (text: string) => void, level: (level: number) => void) {
+  constructor(heard: Heard) {
     const subscribe = (signal: string, handle: (parameters: GLib.Variant) => void) =>
       Gio.DBus.session.signal_subscribe(NAME, NAME, signal, PATH, null, Gio.DBusSignalFlags.NONE,
         (_connection, _sender, _path, _interface, _signal, parameters) => handle(parameters));
     this.subscriptions = [
-      subscribe('Partial', parameters => partial((parameters.deep_unpack() as [string])[0])),
-      subscribe('Level', parameters => level((parameters.deep_unpack() as [number])[0])),
+      subscribe('Partial', parameters => heard.partial((parameters.deep_unpack() as [string])[0])),
+      subscribe('Level', parameters => heard.level((parameters.deep_unpack() as [number])[0])),
+      subscribe('Quiet', () => heard.quiet()),
     ];
   }
 
@@ -26,7 +40,13 @@ export class Speech {
       return await Gio.DBus.session.call(NAME, PATH, NAME, method, parameters, reply ? new GLib.VariantType(reply) : null,
         Gio.DBusCallFlags.NONE, timeout, null);
     } catch (error) {
-      if (error instanceof GLib.Error && Gio.DBusError.get_remote_error(error) === NOT_INSTALLED) throw new NotInstalled();
+      if (!(error instanceof GLib.Error)) throw error;
+      const remote = Gio.DBusError.get_remote_error(error);
+      if (remote === NOT_INSTALLED) throw new NotInstalled();
+      if (remote === UNSUPPORTED) {
+        Gio.DBusError.strip_remote_error(error);
+        throw new Unsupported(error.message);
+      }
       throw error;
     }
   }

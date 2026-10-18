@@ -16,10 +16,20 @@ const SPEECH = 'com.lantharos.Speech1';
 const SERVICE = repository('packages', 'speech', 'service', 'target', 'release', 'luft-speech');
 const RECORDING = GLib.getenv('KESTREL_DICTATION');
 const KEY_ESC = 1;
+const KEY_TAB = 15;
+const KEY_LEFTCTRL = 29;
+const KEY_D = 32;
+const KEY_J = 36;
 const KEY_LEFTSHIFT = 42;
+const KEY_LEFTALT = 56;
+const KEY_RIGHTALT = 100;
 const KEY_LEFTMETA = 125;
+const KEY_RIGHTMETA = 126;
 const KEY_F23 = 193;
 const COPILOT = [KEY_LEFTMETA, KEY_LEFTSHIFT, KEY_F23];
+const SUPER_ALT = [KEY_LEFTMETA, KEY_LEFTALT];
+const ALT_SUPER = [KEY_RIGHTALT, KEY_RIGHTMETA];
+const HOLD_MS = 600;
 const US_LAYOUT = new GLib.Variant('a(ss)', [['xkb', 'us']]);
 const WAV_HEADER = 44;
 const BYTES_PER_SECOND = 32000;
@@ -32,17 +42,29 @@ const words = text => text.toLowerCase().split(/[^\p{L}\p{N}']+/u).filter(Boolea
 const entryText = window => window.title.match(/^Kestrel entry: (.*?)(?: \[.*\])?$/)?.[1] ?? '';
 const preedit = window => window.title.match(/\[(.+)\]$/)?.[1] ?? '';
 
-function holdCopilot() {
-  for (const key of COPILOT) keyboard().notify_key(now(), key, Clutter.KeyState.PRESSED);
+function holdKeys(keys) {
+  for (const key of keys) keyboard().notify_key(now(), key, Clutter.KeyState.PRESSED);
 }
 
-function releaseCopilot() {
-  for (const key of COPILOT.toReversed()) keyboard().notify_key(now(), key, Clutter.KeyState.RELEASED);
+function releaseKeys(keys) {
+  for (const key of keys) keyboard().notify_key(now(), key, Clutter.KeyState.RELEASED);
 }
 
-function tapKey(key) {
-  keyboard().notify_key(now(), key, Clutter.KeyState.PRESSED);
-  keyboard().notify_key(now(), key, Clutter.KeyState.RELEASED);
+const holdCopilot = () => holdKeys(COPILOT);
+const releaseCopilot = () => releaseKeys(COPILOT.toReversed());
+const tapKey = key => {
+  holdKeys([key]);
+  releaseKeys([key]);
+};
+const tapChord = () => {
+  holdKeys(SUPER_ALT);
+  releaseKeys(SUPER_ALT);
+};
+const offeredSetup = () => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === 'Type by speaking'));
+
+function dismissNotifications() {
+  for (const source of Main.messageTray.getSources())
+    for (const notification of [...source.notifications]) notification.destroy();
 }
 
 async function owned(name) {
@@ -77,36 +99,120 @@ async function checkPress(copilotKey) {
   holdCopilot();
   releaseCopilot();
   await eventually(() => !start().visible, 'another press closes Start again');
+
+  copilotKey.set_boolean('hold', false);
+  holdCopilot();
+  await eventually(() => shown(start()), 'with holding turned off, the Copilot key opens Start as soon as it goes down');
+  await pause(HOLD_MS);
+  require(!indicator().visible, 'holding the Copilot key doesn’t dictate when its hold is turned off');
+  releaseCopilot();
+  holdCopilot();
+  releaseCopilot();
+  await eventually(() => !start().visible, 'pressing it again closes Start');
+  copilotKey.reset('hold');
 }
 
 async function checkSetupOffer() {
   const service = await startService(false);
   holdCopilot();
-  await pause(600);
+  await pause(HOLD_MS);
   releaseCopilot();
-  const offered = () => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === 'Type by speaking'));
-  await eventually(offered, 'holding the key without a downloaded model offers to set dictation up');
+  await eventually(offeredSetup, 'holding the key without a downloaded model offers to set dictation up');
   await eventually(() => !indicator().visible, 'the indicator goes away when there’s nothing to listen with');
-  for (const source of Main.messageTray.getSources())
-    for (const notification of [...source.notifications]) notification.destroy();
+  dismissNotifications();
+
+  holdKeys(SUPER_ALT);
+  await pause(HOLD_MS);
+  releaseKeys(SUPER_ALT);
+  await eventually(offeredSetup, 'holding Super and Alt dictates too, offering to set it up first');
+  dismissNotifications();
+  tapChord();
+  await eventually(offeredSetup, 'a quick press of Super and Alt starts listening too');
+  dismissNotifications();
   await stop(service);
 }
 
-async function dictateInto(window, seconds) {
+async function checkChordKeepsShortcuts() {
+  holdKeys(SUPER_ALT);
+  releaseKeys(SUPER_ALT);
+  await pause(400);
+  require(!shown(start()), 'letting go of Super and Alt doesn’t open Start');
+  holdKeys(ALT_SUPER);
+  tapKey(KEY_J);
+  await pause(HOLD_MS);
+  releaseKeys(ALT_SUPER);
+  await pause(400);
+  require(!indicator().visible && !offeredSetup() && !shown(start()), 'Super and Alt with another key, held in either order, leave dictation alone');
+  holdKeys([KEY_LEFTALT, KEY_TAB]);
+  releaseKeys([KEY_TAB]);
+  holdKeys([KEY_LEFTMETA]);
+  await pause(HOLD_MS);
+  releaseKeys([KEY_LEFTMETA, KEY_LEFTALT]);
+  await pause(400);
+  require(!indicator().visible && !offeredSetup(), 'Alt+Tab followed by Super doesn’t dictate');
+  tapKey(KEY_LEFTMETA);
+  await eventually(() => shown(start()), 'a press of Super alone still opens Start');
+  tapKey(KEY_LEFTMETA);
+  await eventually(() => !start().visible, 'and closes it again');
+}
+
+async function dictateInto(window, seconds, {down, up, name}) {
   const typed = entryText(window);
-  holdCopilot();
-  await eventually(() => shown(indicator()), 'holding the Copilot key shows the listening indicator');
+  down();
+  await eventually(() => shown(indicator()), `holding ${name} shows the listening indicator`);
   await eventually(() => preedit(window).length > 0, 'what is heard shows in the text field while still talking', 15000);
   await capture('dictation');
   await pause(seconds * 1000);
   const released = now();
-  releaseCopilot();
+  up();
   await eventually(() => !preedit(window) && entryText(window) !== typed, 'letting go types what was said', 15000);
   console.log(`Kestrel dictation: typed ${((now() - released) / 1000).toFixed(0)} ms after letting go`);
   return entryText(window).slice(typed.length);
 }
 
-async function checkDictation(service) {
+function heardEnough(text, expected) {
+  const typed = words(text);
+  return expected.filter(word => typed.includes(word)).length / expected.length >= HEARD_ENOUGH;
+}
+
+async function checkShortcut(window, seconds, expected, keybindings) {
+  const holding = await dictateInto(window, seconds, {down: () => holdKeys(ALT_SUPER), up: () => releaseKeys(ALT_SUPER), name: 'Alt and Super'});
+  require(heardEnough(holding, expected), 'holding Alt and Super types what was said');
+
+  let before = entryText(window);
+  tapChord();
+  await eventually(() => shown(indicator()), 'a quick press of Super and Alt starts listening');
+  await eventually(() => preedit(window).length > 0, 'what is heard shows while listening', 15000);
+  await pause(seconds * 1000);
+  tapChord();
+  await eventually(() => !preedit(window) && entryText(window) !== before, 'pressing Super and Alt again types what was said', 15000);
+  require(heardEnough(entryText(window).slice(before.length), expected), 'the text typed after pressing twice is what was said');
+
+  before = entryText(window);
+  tapChord();
+  await eventually(() => preedit(window).length > 0, 'pressing Super and Alt listens again', 15000);
+  await eventually(() => !shown(indicator()) && !preedit(window) && entryText(window) !== before, 'it stops by itself once nothing has been said for a few seconds', (seconds + 10) * 1000);
+  require(heardEnough(entryText(window).slice(before.length), expected), 'what was said before the quiet is typed');
+
+  before = entryText(window);
+  tapChord();
+  await eventually(() => preedit(window).length > 0, 'pressing Super and Alt listens once more', 15000);
+  tapKey(KEY_ESC);
+  await eventually(() => !preedit(window) && !shown(indicator()), 'Escape stops listening that was started with a press');
+  await pause(1500);
+  require(entryText(window) === before, 'nothing is typed after Escape');
+
+  keybindings.set_strv('dictate', ['<Control><Super>d']);
+  const custom = await dictateInto(window, seconds, {
+    down: () => holdKeys([KEY_LEFTCTRL, KEY_LEFTMETA, KEY_D]),
+    up: () => releaseKeys([KEY_LEFTMETA, KEY_LEFTCTRL, KEY_D]),
+    name: 'a shortcut of its own',
+  });
+  require(heardEnough(custom, expected), 'a changed shortcut types what was said, even when its modifiers come up before its key');
+  keybindings.reset('dictate');
+}
+
+async function checkDictation(service, keybindings) {
   const expected = words(new TextDecoder().decode(GLib.file_get_contents(GLib.build_filenamev([RECORDING, 'speech.txt']))[1]));
   const size = Gio.File.new_for_path(GLib.build_filenamev([RECORDING, 'speech.wav'])).query_info('standard::size', Gio.FileQueryInfoFlags.NONE, null).get_size();
   const seconds = (size - WAV_HEADER) / BYTES_PER_SECOND;
@@ -114,11 +220,9 @@ async function checkDictation(service) {
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus() && Main.inputMethod.currentFocus, 'the text field takes the keyboard');
 
-  const text = await dictateInto(window, seconds);
-  const typed = words(text);
-  const heard = expected.filter(word => typed.includes(word)).length / expected.length;
-  console.log(`Kestrel dictation: typed “${text}”, ${Math.round(heard * 100)}% of the words said; ${JSON.stringify(memory(service))} MB`);
-  require(heard >= HEARD_ENOUGH, 'the text typed is what was said');
+  const text = await dictateInto(window, seconds, {down: holdCopilot, up: releaseCopilot, name: 'the Copilot key'});
+  console.log(`Kestrel dictation: typed “${text}”; ${JSON.stringify(memory(service))} MB`);
+  require(heardEnough(text, expected), 'the text typed is what was said');
 
   const before = entryText(window);
   holdCopilot();
@@ -128,6 +232,7 @@ async function checkDictation(service) {
   releaseCopilot();
   await pause(1500);
   require(entryText(window) === before, 'nothing is typed after Escape');
+  await checkShortcut(window, seconds, expected, keybindings);
   await stop(entry);
 
   const x11 = gjs('clients/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
@@ -143,11 +248,12 @@ async function checkDictation(service) {
   await stop(x11);
 }
 
-export const timeout = 240000;
+export const timeout = 360000;
 
 export async function run() {
   const dictation = new Gio.Settings({schema_id: 'com.lantharos.kestrel.dictation'});
   const copilotKey = new Gio.Settings({schema_id: 'com.lantharos.kestrel.copilot-key'});
+  const keybindings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.keybindings'});
   const inputSources = new Gio.Settings({schema_id: 'org.gnome.desktop.input-sources'});
   const savedSources = {sources: inputSources.get_value('sources'), mru: inputSources.get_value('mru-sources')};
   inputSources.set_value('mru-sources', US_LAYOUT);
@@ -156,19 +262,22 @@ export async function run() {
   try {
     await checkPress(copilotKey);
     await checkSetupOffer();
+    await checkChordKeepsShortcuts();
     if (!RECORDING) {
       console.log('Kestrel dictation: KESTREL_DICTATION isn’t set, so dictating into apps isn’t checked');
       return;
     }
     const service = await startService(true);
     try {
-      await checkDictation(service);
+      await checkDictation(service, keybindings);
     } finally {
       await stop(service);
     }
   } finally {
     for (const key of ['enabled', 'language', 'engine']) dictation.reset(key);
     copilotKey.reset('press');
+    copilotKey.reset('hold');
+    keybindings.reset('dictate');
     inputSources.set_value('sources', savedSources.sources);
     inputSources.set_value('mru-sources', savedSources.mru);
   }

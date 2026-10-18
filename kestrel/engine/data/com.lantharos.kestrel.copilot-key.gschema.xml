@@ -8,7 +8,17 @@
       </choices>
       <default>'search'</default>
       <summary>What a press of the Copilot key does</summary>
-      <description>"search" opens Start with search, "app" opens the app in the app key, "nothing" ignores the press. Holding the key dictates when dictation is on.</description>
+      <description>"search" opens Start with search, "app" opens the app in the app key, "nothing" ignores the press.</description>
+    </key>
+    <key name="hold" type="b">
+      <default>true</default>
+      <summary>Dictate while the Copilot key is held</summary>
+      <description>When on, holding the key dictates once dictation is on. When off, the key only does what a press does, as soon as it goes down.</description>
+    </key>
+    <key name="seen" type="b">
+      <default>false</default>
+      <summary>A Copilot key was pressed</summary>
+      <description>Set the first time a Copilot or assistant key is pressed, since keyboards don't say whether they have one. Settings shows the key's options from then on, while a keyboard that can send it is connected.</description>
     </key>
     <key name="app" type="s">
       <default>''</default>

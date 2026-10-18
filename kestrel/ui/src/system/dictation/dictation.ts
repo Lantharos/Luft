@@ -8,13 +8,14 @@ import { getInputSourceManager } from 'resource:///com/lantharos/kestrel/ui/stat
 import type { Context } from '../../context.js';
 import { openSettings } from '../settingsPages.js';
 import { DictationIndicator } from './indicator.js';
-import { NotInstalled, Speech } from './speech.js';
+import { NotInstalled, Speech, Unsupported } from './speech.js';
 
 const HELD_MODIFIERS = Clutter.ModifierType.SHIFT_MASK | Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 const MODIFIER_POLL_MS = 20;
 const MODIFIER_WAIT_MS = 1000;
 
 type Phase = 'idle' | 'listening' | 'finishing';
+type Mode = 'hold' | 'toggle';
 
 const shell = () => global as unknown as Shell.Global;
 const prependFilter = (Clutter.Event as unknown as { prepend_filter: typeof Clutter.Event.add_filter }).prepend_filter;
@@ -40,26 +41,41 @@ export class Dictation {
   private readonly speech: Speech;
   private readonly indicator: DictationIndicator;
   private phase: Phase = 'idle';
+  private mode: Mode = 'hold';
   private started: Promise<boolean> = Promise.resolve(false);
   private session = 0;
   private target: Clutter.InputFocus | null = null;
   private escapeFilter = 0;
   private offeredSetup = false;
+  private readonly toldUnsupported = new Set<string>();
 
   constructor(private readonly context: Context, private readonly paste: (text: string) => void) {
     this.indicator = new DictationIndicator(context);
-    this.speech = new Speech(text => this.heard(text), level => {
-      if (this.phase === 'listening') this.indicator.level(level);
+    this.speech = new Speech({
+      partial: text => this.heard(text),
+      level: level => {
+        if (this.phase === 'listening') this.indicator.level(level);
+      },
+      quiet: () => {
+        if (this.mode === 'toggle') this.end();
+      },
     });
   }
 
-  begin(): void {
+  toggle(): void {
+    if (this.phase === 'idle') this.begin('toggle');
+    else if (this.mode === 'toggle') this.end();
+  }
+
+  begin(mode: Mode): void {
+    if (this.phase !== 'idle') return;
     if (!this.preferences.get_boolean('enabled')) {
       if (!this.offeredSetup) this.offerSetup();
       return;
     }
     const session = ++this.session;
     this.phase = 'listening';
+    this.mode = mode;
     this.target = this.context.inputMethod.currentFocus;
     this.indicator.show(this.context.inputMethod.caret, !this.target);
     this.listenForEscape();
@@ -67,6 +83,7 @@ export class Dictation {
       if (session !== this.session) return false;
       this.finish();
       if (error instanceof NotInstalled) this.offerSetup();
+      else if (error instanceof Unsupported) this.tellUnsupported(error.language);
       else console.warn(`Dictation couldn't start: ${error}`);
       return false;
     });
@@ -90,7 +107,7 @@ export class Dictation {
       });
   }
 
-  private cancel(): void {
+  cancel(): void {
     if (this.phase === 'idle') return;
     this.session++;
     this.speech.cancel();
@@ -141,10 +158,24 @@ export class Dictation {
     const notification = new MessageTray.Notification({
       source,
       title: 'Type by speaking',
-      body: 'Hold the Copilot key and talk to type what you say. It listens on this computer, so it needs its speech model first.',
+      body: 'Talk to type what you say, in any app. It listens on this computer, so it needs its speech model first.',
       gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
     });
     notification.addAction('Set up dictation', () => openSettings('keyboard/dictation'));
+    source.addNotification(notification);
+  }
+
+  private tellUnsupported(language: string): void {
+    if (this.toldUnsupported.has(language)) return;
+    this.toldUnsupported.add(language);
+    const source = MessageTray.getSystemSource();
+    const notification = new MessageTray.Notification({
+      source,
+      title: `Dictation in ${language} isn’t available on this computer`,
+      body: `Its processor can’t run the speech recognizer ${language} needs. You can dictate in another language.`,
+      gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
+    });
+    notification.addAction('Dictation settings', () => openSettings('keyboard/dictation'));
     source.addNotification(notification);
   }
 

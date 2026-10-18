@@ -415,6 +415,13 @@
       <default>["&lt;Super&gt;Return","&lt;Super&gt;KP_Enter"]</default>
       <summary>Enter the focused window on the board</summary>
     </key>
+    <key name="dictate" type="as">
+      <default>["&lt;Super&gt;&lt;Alt&gt;"]</default>
+      <summary>Dictate</summary>
+      <description>
+        Hold to talk and let go to type what was said, or press to start and stop listening. Modifiers alone, such as the default Super and Alt, count when pressed together with no other key.
+      </description>
+    </key>
     <key name="system-monitor" type="as">
       <default>["&lt;Control&gt;&lt;Shift&gt;Escape"]</default>
       <summary>Open the system monitor</summary>

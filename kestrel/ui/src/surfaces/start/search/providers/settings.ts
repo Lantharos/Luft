@@ -1,3 +1,5 @@
+import Gio from 'gi://Gio';
+
 import { launchHistory } from '../../../../shared/launchHistory.js';
 import { openSettings, SETTINGS_PAGES, type SettingsPage } from '../../../../system/settingsPages.js';
 import { themedIcon } from '../icons.js';
@@ -14,7 +16,9 @@ function description(page: SettingsPage): string {
   return `${parent.title} settings`;
 }
 
-const PAGES = SETTINGS_PAGES.map(page => searchable({ page }, `setting:${page.id}`, page.title, page.keywords));
+const copilotKeySeen = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.copilot-key' }).get_boolean('seen');
+const keywords = (page: SettingsPage) => copilotKeySeen ? [...page.keywords, ...page.copilotKeyKeywords ?? []] : page.keywords;
+const PAGES = SETTINGS_PAGES.map(page => searchable({ page }, `setting:${page.id}`, page.title, keywords(page)));
 
 export class SettingsResults {
   constructor(private readonly close: () => void) {}

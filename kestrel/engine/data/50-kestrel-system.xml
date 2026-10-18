@@ -20,6 +20,9 @@
 	<KeyListEntry name="emoji-picker"
                       description="Insert emoji"/>
 
+	<KeyListEntry name="dictate"
+                      description="Dictate"/>
+
 	<KeyListEntry name="snap-layouts"
                       description="Show snap layouts for the focused window"/>
 

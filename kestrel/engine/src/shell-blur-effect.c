@@ -110,6 +110,7 @@ struct _ShellBlurEffect
 
   GHashTable *backdrops;
   CoglPipeline *last_backdrop;
+  ShellBackdropSpread *spread;
   FramebufferData brightness_fb;
   int brightness_uniform;
   int surface_size_uniform;
@@ -389,6 +390,25 @@ calculate_downscale_factor (float width,
   return downscale_factor;
 }
 
+static float
+blur_reach (ShellBlurEffect *self)
+{
+  float sigma = self->radius / (2.f * self->downscale_factor);
+
+  return (2.f * ceilf (1.5f * sigma) + 4.f) * self->downscale_factor;
+}
+
+static void
+sync_spread (ShellBlurEffect *self)
+{
+  gboolean spreads = self->actor && self->mode == SHELL_BLUR_MODE_BACKGROUND;
+
+  if (spreads && !self->spread)
+    self->spread = shell_backdrop_spread_new (CLUTTER_ACTOR_META (self));
+  else if (!spreads)
+    g_clear_pointer (&self->spread, shell_backdrop_spread_free);
+}
+
 static void
 shell_blur_effect_set_actor (ClutterActorMeta *meta,
                              ClutterActor     *actor)
@@ -406,6 +426,7 @@ shell_blur_effect_set_actor (ClutterActorMeta *meta,
 
   /* we keep a back pointer here, to avoid going through the ActorMeta */
   self->actor = clutter_actor_meta_get_actor (meta);
+  sync_spread (self);
 }
 
 static float
@@ -783,9 +804,11 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
 
       if (self->mode == SHELL_BLUR_MODE_BACKGROUND)
         {
-          backdrop = shell_backdrop_capture (self->backdrops, self->actor,
-                                             paint_context, &actor_box, &area,
-                                             scale, &background_changed);
+          shell_backdrop_spread_set_reach (self->spread, blur_reach (self));
+          backdrop = shell_backdrop_capture (self->backdrops, self->spread,
+                                             self->actor, paint_context,
+                                             &actor_box, &area, scale,
+                                             &background_changed);
           if (!backdrop)
             goto fail;
 
@@ -854,6 +877,7 @@ shell_blur_effect_finalize (GObject *object)
 
   clear_graphics (self);
   g_clear_pointer (&self->backdrops, g_hash_table_unref);
+  g_clear_pointer (&self->spread, shell_backdrop_spread_free);
 
   G_OBJECT_CLASS (shell_blur_effect_parent_class)->finalize (object);
 }
@@ -1131,6 +1155,7 @@ shell_blur_effect_set_mode (ShellBlurEffect *self,
 
   self->mode = mode;
   clear_framebuffers (self);
+  sync_spread (self);
   if (mode == SHELL_BLUR_MODE_ACTOR)
     {
       g_hash_table_remove_all (self->backdrops);

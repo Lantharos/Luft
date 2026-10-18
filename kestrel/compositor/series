@@ -41,3 +41,4 @@
 0041-wayland-tell-clients-when-the-user-goes-idle-with-ex.patch
 0042-wayland-let-trusted-clients-manage-the-clipboard-wit.patch
 0043-window-actor-stop-counting-surfaces-after-they-leave.patch
+0044-stage-let-the-shell-grow-redraw-clips.patch

@@ -89,6 +89,25 @@ export class Frame {
     return this._pixels.length === other._pixels.length && this._pixels.every((value, index) => Math.abs(value - other._pixels[index]) <= tolerance);
   }
 
+  differences(other) {
+    const [width, height, stride, size] = [this._pixbuf.get_width(), this._pixbuf.get_height(), this._pixbuf.get_rowstride(), this._pixbuf.get_n_channels()];
+    const [a, b] = [this._pixels, other._pixels];
+    const box = {x1: width, y1: height, x2: 0, y2: 0};
+    let count = 0;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const offset = y * stride + x * size;
+        if (a[offset] === b[offset] && a[offset + 1] === b[offset + 1] && a[offset + 2] === b[offset + 2]) continue;
+        count++;
+        box.x1 = Math.min(box.x1, x);
+        box.y1 = Math.min(box.y1, y);
+        box.x2 = Math.max(box.x2, x + 1);
+        box.y2 = Math.max(box.y2, y + 1);
+      }
+    }
+    return {count, box};
+  }
+
   save(name) {
     GLib.file_set_contents(output(name), this.bytes.toArray());
   }
@@ -172,6 +191,26 @@ export async function renderedFrame(area) {
     height: toPixels(area.height),
   });
   return new Frame(stream.steal_as_bytes());
+}
+
+async function frameOf(snapshot) {
+  const stream = Gio.MemoryOutputStream.new_resizable();
+  await compositeTo(stream, snapshot.texture, snapshot.whole);
+  return new Frame(stream.steal_as_bytes());
+}
+
+export async function shownAndRepainted() {
+  const view = global.stage.peek_stage_views().find(primaryView);
+  const shown = new ViewCopy(view);
+  const repainted = await new Promise(resolve => {
+    const signal = global.stage.connect('after-paint', (_stage, painted) => {
+      if (painted !== view) return;
+      global.stage.disconnect(signal);
+      resolve(new ViewCopy(painted));
+    });
+    global.stage.queue_redraw();
+  });
+  return [await frameOf(shown), await frameOf(repainted)];
 }
 
 export async function captureArea(name, area) {

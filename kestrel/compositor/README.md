@@ -13,7 +13,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 ## What the patches add
 
 - Rounded window corners that stay square on maximized, tiled and fullscreen windows, so those keep direct scanout
-- Shared background blur, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists
+- Shared background blur, redraw clip filters the shell uses to repaint glass as far as its blur reaches, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists
 - Snapping and maximizing that animate at once, and windows the shell tiles counting as tiled
 - Shell text with fractional glyph advances and grayscale antialiasing
 - Shell text, icons and labels drawn at a fractional scale's own resolution and on whole pixels, so they stay sharp at 125% and 150%
